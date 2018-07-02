@@ -17,10 +17,10 @@ use vars qw(
   $path
   $per_page
   $server
-  );
+);
 @HTML::Menu::Pages::EXPORT  = qw(makePages);
 @ISA                        = qw(Exporter);
-$HTML::Menu::Pages::VERSION = '1.14';
+$HTML::Menu::Pages::VERSION = '1.15';
 $DefaultClass               = 'HTML::Menu::Pages' unless defined $HTML::Menu::Pages::DefaultClass;
 
 =head1 NAME
@@ -99,11 +99,11 @@ makePages
 =cut
 
 sub new {
-    my ($class, @initializer) = @_;
+    my ( $class, @initializer ) = @_;
     my $self = {};
     bless $self, ref $class || $class || $DefaultClass;
     return $self;
-}
+} ## end sub new
 
 =head2 makePages()
 
@@ -112,7 +112,7 @@ see SYNOPSIS
 =cut
 
 sub makePages {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $hashref = $p[0];
     $action   = $hashref->{action};
     $server   = defined $hashref->{server} ? $hashref->{server} : $ENV{SCRIPT_NAME};
@@ -123,8 +123,8 @@ sub makePages {
     $pages    = $hashref->{title} ? $hashref->{title} : 'Pages';
     $path     = $hashref->{path} ? $hashref->{path} : 'cgi-bin/';
     $per_page = $hashref->{links_pro_page} ? $hashref->{links_pro_page} : 10;
-    $self->ebis() if ($length > $per_page);
-}
+    $self->ebis() if ( $length > $per_page );
+} ## end sub makePages
 
 =head2 ebis()
 
@@ -133,86 +133,82 @@ private
 =cut
 
 sub ebis {
-    my ($self, @p) = getSelf(@_);
-    my $previousPage = (($nStart - $per_page) > 0) ? $nStart - $per_page : 0;
+    my ( $self, @p ) = getSelf(@_);
+    my $previousPage = ( ( $nStart - $per_page ) > 0 ) ? $nStart - $per_page : 0;
     my $nextPage = $nStart;
-    $nextPage = $per_page if ($previousPage <= 0);
+    $nextPage = $per_page if ( $previousPage <= 0 );
     my %template = (
-                    path     => "$path/templates",
-                    style    => $sStyle,
-                    template => "pages.htm",
-                    name     => 'pages'
-                   );
+        path     => "$path/templates",
+        style    => $sStyle,
+        template => "pages.htm",
+        name     => 'pages'
+    );
     my @data = (
-                {
-                 name  => 'header',
-                 pages => '<a class ="menuLink3" href="'
-                   . ("javascript:requestURI('$server?action=$action&$append','$action','$action')")
-                   . '">'
-                   . $pages . '</a>',
-                },
-               );
+        {
+            name  => 'header',
+            pages => '<a class ="menuLink3" href="'
+              . ("javascript:requestURI('$server?action=$action&$append','$action','$action')") . '">'
+              . $pages . '</a>',
+        },
+    );
     push @data,
       {
         name => "previous",
-        href =>
-          "javascript:requestURI('$server?von=$previousPage&bis=$nextPage&action=$action&$append','$action','$action')",
+        href => "javascript:requestURI('$server?von=$previousPage&bis=$nextPage&action=$action&$append','$action','$action')",
       }
-      if ($nStart - $per_page >= 0);
+      if ( $nStart - $per_page >= 0 );
     my $sites = 1;
 
-    if ($length > 1) {
-        if ($length % $per_page == 0) {
-            $sites = (int($length / $per_page)) * 10;
+    if ( $length > 1 ) {
+        if ( $length % $per_page == 0 ) {
+            $sites = ( int( $length / $per_page ) ) * 10;
         } else {
-            $sites = (int($length / $per_page) + 1) * 10;
-        }
-    }
+            $sites = ( int( $length / $per_page ) + 1 ) * 10;
+        } ## end else [ if ( $length % $per_page...)]
+    } ## end if ( $length > 1 )
     my $beginn = $nStart / $per_page;
-    $beginn = (int($nStart / $per_page) + 1) * 10 unless ($nStart % $per_page == 0);
-    $beginn = 0 if ($beginn < 0);
-    my $b = ($sites >= 10) ? $beginn : 0;
-    $b = ($beginn - $per_page >= 0) ? $beginn - $per_page : 0;
-    my $h1 = (($nStart - ($per_page * 5)) / $per_page);
-    $b = $h1 if ($h1 > 0);
-    my $m_nEnd = ($sites >= 10) ? $b + 10 : $sites;
+    $beginn = ( int( $nStart / $per_page ) + 1 ) * 10 unless ( $nStart % $per_page == 0 );
+    $beginn = 0 if ( $beginn < 0 );
+    my $b = ( $sites >= 10 ) ? $beginn : 0;
+    $b = ( $beginn - $per_page >= 0 ) ? $beginn - $per_page : 0;
+    my $h1 = ( ( $nStart - ( $per_page * 5 ) ) / $per_page );
+    $b = $h1 if ( $h1 > 0 );
+    my $m_nEnd = ( $sites >= 10 ) ? $b + 10 : $sites;
     $b      = int($b);
     $m_nEnd = int($m_nEnd);
 
-    while ($b <= $m_nEnd) {    # append links
+    while ( $b <= $m_nEnd ) {    # append links
         my $c = $b * $per_page;
         my $d = $c + $per_page;
-        $d = $length if ($d > $length);
-        my $svbis =
-          "javascript:requestURI('$server?von=$c&bis=$d&action=$action&$append','$action','$action')";
+        $d = $length if ( $d > $length );
+        my $svbis = "javascript:requestURI('$server?von=$c&bis=$d&action=$action&$append','$action','$action')";
         push @data,
-          ($b * $per_page eq $nStart)
+          ( $b * $per_page eq $nStart )
           ? {
-             name  => 'currentLinks',
-             href  => $svbis,
-             title => $b + 1,
-            }
+            name  => 'currentLinks',
+            href  => $svbis,
+            title => $b + 1,
+          }
           : {
-             name  => 'links',
-             href  => $svbis,
-             title => $b + 1,
-            };
-        last if ($d eq $length);
+            name  => 'links',
+            href  => $svbis,
+            title => $b + 1,
+          };
+        last if ( $d eq $length );
         $b++;
-    }
+    } ## end while ( $b <= $m_nEnd )
     my $v    = $nStart + $per_page;
     my $next = $v + $per_page;
-    $next = $length if ($next > $length);
-    my $esvbis =
-      "javascript:requestURI('$server?von=$v&bis=$next&action=$action&$append','$action','$action')";
+    $next = $length if ( $next > $length );
+    my $esvbis = "javascript:requestURI('$server?von=$v&bis=$next&action=$action&$append','$action','$action')";
     push @data,
       {
         name => "next",
         href => $esvbis
-      } if ($v < $length);    # apend the Next "button"
-    push @data, {name => 'footer'};    # apend the footer
-    return initTemplate(\%template, \@data);
-}
+      } if ( $v < $length );    # apend the Next "button"
+    push @data, { name => 'footer' };    # apend the footer
+    return initTemplate( \%template, \@data );
+} ## end sub ebis
 
 =head2  getSelf()
 
@@ -221,12 +217,11 @@ privat see L<HTML::Menu::TreeView>
 =cut
 
 sub getSelf {
-    return @_ if defined($_[0]) && (!ref($_[0])) && ($_[0] eq 'HTML::Menu::Pages');
-    return (defined($_[0])
-            && (ref($_[0]) eq 'HTML::Menu::Pages' || UNIVERSAL::isa($_[0], 'HTML::Menu::Pages')))
+    return @_ if defined( $_[0] ) && ( !ref( $_[0] ) ) && ( $_[0] eq 'HTML::Menu::Pages' );
+    return ( defined( $_[0] ) && ( ref( $_[0] ) eq 'HTML::Menu::Pages' || UNIVERSAL::isa( $_[0], 'HTML::Menu::Pages' ) ) )
       ? @_
-      : ($HTML::Menu::Pages::DefaultClass->new, @_);
-}
+      : ( $HTML::Menu::Pages::DefaultClass->new, @_ );
+} ## end sub getSelf
 
 =head1 AUTHOR
 
@@ -251,5 +246,4 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 =cut
-
 1;

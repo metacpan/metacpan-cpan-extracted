@@ -4,7 +4,7 @@
 
 use strict;
 
-use File::Temp;
+use File::Temp qw(tempfile);
 use Test::More;
 use lib 't';
 use Mail::Mbox::MessageParser;
@@ -56,14 +56,14 @@ sub TestImplementation
 
   my ($folder_name) = $filename =~ /\/([^\/]*)\.txt$/;
 
-  my $output = File::Temp->new();
-  binmode $output;
+  my ($output_fh, $output_fn) = tempfile();
+  binmode $output_fh;
 
   my $filehandle = new FileHandle($filename);
 
-  my $cache = File::Temp->new();
+  my ($cache_fh, $cache_fn) = tempfile();
 
-  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache->filename})
+  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache_fn})
     if $enable_cache;
 
   my $folder_reader =
@@ -80,19 +80,19 @@ sub TestImplementation
   my $prologue = $folder_reader->prologue;
   ok(0),return if $folder_name eq 'newlines_at_beginning' && $prologue ne "\n";
   ok(0),return if $folder_name ne 'newlines_at_beginning' && $prologue ne "";
-  print $output $prologue;
+  print $output_fh $prologue;
 
   # This is the main loop. It's executed once for each email
   while(!$folder_reader->end_of_file())
   {
     my $email_text = $folder_reader->read_next_email();
 
-    print $output $$email_text;
+    print $output_fh $$email_text;
   }
 
-  $output->close();
+  $output_fh->close();
 
-  CheckDiffs([$filename,$output->filename]);
+  CheckDiffs([$filename,$output_fn]);
 }
 
 # ---------------------------------------------------------------------------

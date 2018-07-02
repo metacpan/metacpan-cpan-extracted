@@ -9,23 +9,24 @@ has keywords    => 'SSOT, CRM, ERP, CMS, Perl, Mojolicious, SQL';
 sub generator { return 'Slovo ' . $Slovo::VERSION . ' - ' . $Slovo::CODENAME }
 
 has domain => sub {
-  my $дом = $_[0]->req->headers->host;
-  $дом =~ s/(\:\d+)$//;    # remove port
-  return $дом;
+  my $domain = $_[0]->req->headers->host;
+  $domain =~ s/(\:\d+)$//;    # remove port
+  return $domain;
 };
 
 sub debug;
 if ($DEV_MODE) {
 
   sub debug {
+    my ($c, @params) = @_;
 
     # https://stackoverflow.com/questions/50489062
     # Display readable UTF-8
     # Redefine Data::Dumper::qquote() to do nothing
+    ##no critic qw(TestingAndDebugging::ProhibitNoWarnings)
     no warnings 'redefine';
     local *Data::Dumper::qquote = sub {qq["${\(shift)}"]};
     local $Data::Dumper::Useperl = 1;
-    my ($c, @params) = @_;
     my ($package, $filename, $line, $subroutine) = caller(0);
     state $log = $c->app->log;
     for my $pp (@params) {

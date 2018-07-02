@@ -5,13 +5,14 @@ use 5.010001;
 use Test::More tests => 33;
 
 use Math::Complex;
-use Math::Polynomial::Solve qw(:numeric poly_nonzero_term_count ascending_order);
+use Math::Polynomial::Solve qw(:numeric poly_nonzero_term_count);
 use Math::Utils qw(:polynomial :compare);
 use strict;
 use warnings;
 
+coefficients order => 'ascending';
+
 my($eq, $ne) = generate_relational(2.5e-7);
-ascending_order(1);
 
 my @case = (
 	[1, 0, 1],

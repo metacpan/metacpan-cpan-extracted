@@ -1,0 +1,75 @@
+---
+abstract: "JMASLAK's Plugin Bundle"
+author:
+  - 'Joelle Maslak <jmaslak@antelope.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::UseAllModules: '0.17'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-Author-JMASLAK
+provides:
+  Dist::Zilla::PluginBundle::Author::JMASLAK:
+    file: lib/Dist/Zilla/PluginBundle/Author/JMASLAK.pm
+    version: '0.004'
+requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::Plugin::AutoPrereqs: '0'
+  Dist::Zilla::Plugin::ConfirmRelease: '0'
+  Dist::Zilla::Plugin::ContributorCovenant: '0'
+  Dist::Zilla::Plugin::CopyFilesFromBuild: '0'
+  Dist::Zilla::Plugin::ExecDir: '0'
+  Dist::Zilla::Plugin::ExtraTests: '0'
+  Dist::Zilla::Plugin::GatherDir: '0'
+  Dist::Zilla::Plugin::GenerateFile::FromShareDir: '0'
+  Dist::Zilla::Plugin::Git::Check: '0'
+  Dist::Zilla::Plugin::Git::Commit: '0'
+  Dist::Zilla::Plugin::Git::Push: '0'
+  Dist::Zilla::Plugin::Git::Tag: '0'
+  Dist::Zilla::Plugin::GitHub::Meta: '0'
+  Dist::Zilla::Plugin::License: '0'
+  Dist::Zilla::Plugin::MakeMaker: '0'
+  Dist::Zilla::Plugin::Manifest: '0'
+  Dist::Zilla::Plugin::ManifestSkip: '0'
+  Dist::Zilla::Plugin::MetaJSON: '0'
+  Dist::Zilla::Plugin::MetaProvides::Package: '0'
+  Dist::Zilla::Plugin::MetaYAML: '0'
+  Dist::Zilla::Plugin::PkgVersion: '0'
+  Dist::Zilla::Plugin::PodSyntaxTests: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::PruneCruft: '0'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
+  Dist::Zilla::Plugin::ShareDir: '0'
+  Dist::Zilla::Plugin::Test::EOL: '0'
+  Dist::Zilla::Plugin::Test::Kwalitee::Extra: '0'
+  Dist::Zilla::Plugin::Test::NoTabs: '0'
+  Dist::Zilla::Plugin::Test::ReportPrereqs: '0'
+  Dist::Zilla::Plugin::Test::TrailingSpace: '0'
+  Dist::Zilla::Plugin::Test::UnusedVars: '0'
+  Dist::Zilla::Plugin::Test::UseAllModules: '0'
+  Dist::Zilla::Plugin::Test::Version: '0'
+  Dist::Zilla::Plugin::TestRelease: '0'
+  Dist::Zilla::Plugin::UploadToCPAN: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Moose: '0'
+  Test::UseAllModules: '0.17'
+  perl: v5.14.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/jmaslak/Dist-Zilla-PluginBundle-Author-JMASLAK/issues
+  repository: git://github.com/jmaslak/Dist-Zilla-PluginBundle-Author-JMASLAK.git
+version: '0.004'
+x_contributor_covenant:
+  version: 0.02
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

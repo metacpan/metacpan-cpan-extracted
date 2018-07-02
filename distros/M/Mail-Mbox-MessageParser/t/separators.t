@@ -2,7 +2,7 @@
 
 use strict;
 
-use File::Temp;
+use File::Temp qw(tempfile);
 use Test::More;
 use lib 't';
 use Mail::Mbox::MessageParser;
@@ -57,12 +57,12 @@ sub TestImplementation
 
   my ($folder_name) = $filename =~ /\/([^\/\\]*)\..*?$/;
 
-  my $output = File::Temp->new();
-  binmode $output;
+  my ($output_fh, $output_fn) = tempfile();
+  binmode $output_fh;
 
-  my $cache = File::Temp->new();
+  my ($cache_fh, $cache_fn) = tempfile();
 
-  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache->filename})
+  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache_fn})
     if $enable_cache;
 
   my $folder_reader =
@@ -77,7 +77,7 @@ sub TestImplementation
   die $folder_reader unless ref $folder_reader;
 
   my $prologue = $folder_reader->prologue;
-  print $output $prologue;
+  print $output_fh $prologue;
 
   my $count = 0;
 
@@ -89,7 +89,7 @@ sub TestImplementation
     $count++;
   }
 
-  $output->close();
+  $output_fh->close();
 
   is($count,$number_of_emails, "Number of emails in $filename");
 }

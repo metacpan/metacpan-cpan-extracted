@@ -1,3 +1,7 @@
+v0.13.1 2018-06-26T07:03:52Z
+ - Docker base image changed from "softvisio/pcore:v0.67.0" to
+   "softvisio/pcore:v0.69.0"
+
 v0.13.0 2018-06-06T18:24:24Z
  - PM util merged with Sys
  - Docker base image changed from "softvisio/pcore:v0.66.0" to

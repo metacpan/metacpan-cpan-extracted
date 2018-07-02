@@ -1,5 +1,9 @@
 Revision history for Config::App
 
+1.07      2018-06-26 16:43:37-07:00 America/Los_Angeles
+        - Returned complex data structures are copies not refs to original data
+        - Able to merge arrays in place of hashes
+
 1.06      2018-06-15 16:03:13-07:00 America/Los_Angeles
         - Adding Perl versions to test; annual general update for 2018
         - Extended "libs" keyword to allow for single scalar string

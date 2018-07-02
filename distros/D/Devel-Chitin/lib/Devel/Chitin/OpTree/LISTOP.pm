@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::LISTOP;
 use base Devel::Chitin::OpTree::BINOP;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Fcntl qw(:DEFAULT :flock SEEK_SET SEEK_CUR SEEK_END);
 use POSIX qw(:sys_wait_h);
@@ -171,8 +171,9 @@ sub _aslice_hslice_builder {
         die "unexpected aslice/hslice for $open_paren $close_paren";
     }
 
-    my $sigil = ($self->op->name eq 'kvhslice'
-                 or $self->op->name eq 'kvaslice') ? '%' : '@';
+    my $op_name = $self->op_name;
+    my $sigil = ($op_name eq 'kvhslice'
+                 or $op_name eq 'kvaslice') ? '%' : '@';
 
     my $array_name = substr($self->children->[2]->deparse, 1); # remove the sigil
     "${sigil}${array_name}" . $open_paren . $children->[1]->deparse(skip_parens => 1) . $close_paren;

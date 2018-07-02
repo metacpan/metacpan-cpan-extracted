@@ -5,7 +5,7 @@
 
 package Lab::Instrument::IPS;
 #ABSTRACT: Oxford Instruments IPS Magnet Power Supply
-$Lab::Instrument::IPS::VERSION = '3.652';
+$Lab::Instrument::IPS::VERSION = '3.653';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 
@@ -970,7 +970,7 @@ Lab::Instrument::IPS - Oxford Instruments IPS Magnet Power Supply
 
 =head1 VERSION
 
-version 3.652
+version 3.653
 
 =head1 SYNOPSIS
 

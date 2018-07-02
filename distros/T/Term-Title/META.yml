@@ -4,14 +4,14 @@ author:
   - 'David Golden <dagolden@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  File::Spec::Functions: '0'
-  List::Util: '0'
+  File::Spec: '0'
   Test::More: '0'
-  version: '0'
+  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,16 +19,16 @@ meta-spec:
 name: Term-Title
 no_index:
   directory:
+    - corpus
+    - examples
     - t
     - xt
-    - examples
-    - corpus
   package:
     - DB
 provides:
   Term::Title:
     file: lib/Term/Title.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Exporter: '0'
   perl: '5.006'
@@ -38,8 +38,11 @@ resources:
   bugtracker: https://github.com/dagolden/Term-Title/issues
   homepage: https://github.com/dagolden/Term-Title
   repository: https://github.com/dagolden/Term-Title.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Pedro Melo <melo@simplicidade.org>'
+  - 'Slobodan Mišković <slobodan@miskovic.ca>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

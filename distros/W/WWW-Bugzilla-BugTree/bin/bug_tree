@@ -11,7 +11,7 @@ use Term::ANSIColor;
 
 # PODNAME: bug_tree
 # ABSTRACT: Print a bugzilla tree out to stdout
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 # TODO: what to do when server doesn't require basic auth,
@@ -123,7 +123,7 @@ bug_tree - Print a bugzilla tree out to stdout
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

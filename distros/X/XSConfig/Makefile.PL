@@ -1,4 +1,6 @@
 use ExtUtils::MakeMaker;
+use Data::Dumper;
+use Cwd;
 
 push(@ExtUtils::MakeMaker::Overridable, qw(pm_to_blib));
 my $in_core = ! -d "regen";
@@ -60,14 +62,20 @@ unless ($ENV{PERL_CORE}) {
     unlink('UNINST_1');
     # touch what we plan for UNINST to be in the makefile
     @ARGV  = 'UNINST_'.($uninst ? '1' : '0');
+    print "will touch $ARGV[0], cwd is ".getcwd()."\n";
+    print Dumper([stat $ARGV[0]]);
     ExtUtils::Command::touch();
     # now touch Makefile.PL so the above doesn't trigger a rebuild.
     # note that with a src tarball, Makefile.PL is readonly
     if (-w 'Makefile.PL') {
         @ARGV = 'Makefile.PL';
+        print "will touch $ARGV[0], cwd is ".getcwd()."\n";
+        print Dumper([stat $ARGV[0]]);
         ExtUtils::Command::touch();
     }
     @ARGV = 'Makefile'; #we aren't inside WriteMakefile with open FH anymore
+    print "will touch $ARGV[0], cwd is ".getcwd()."\n";
+    print Dumper([stat $ARGV[0]]);
     ExtUtils::Command::touch();
     # if Makefile.PL and poison target are the same second, no rebuild happens
     sleep 1;
@@ -75,6 +83,8 @@ unless ($ENV{PERL_CORE}) {
     # to force a rebuild. The only way this becomes a dependency of Makefile
     # is to override the maketool on the command line
     @ARGV  = 'UNINST_'.($uninst ? '0' : '1');
+    print "will touch $ARGV[0], cwd is ".getcwd()."\n";
+    print Dumper([stat $ARGV[0]]);
     ExtUtils::Command::touch();
 }
 
@@ -173,6 +183,30 @@ sub makefile {
         length('$(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)'),
                '$(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP) UNINST_$(UNINST)');
     return $makefile;
+}
+
+sub xs_c {
+    my $xs_c = $_[0]->SUPER::xs_c(@_);
+    my $pos = index($xs_c, '$(MV) $*.xsc $*.c');
+    die 'can\'t match in sub xs_c()' if $pos == -1;
+    substr($xs_c, $pos,
+        length('$(MV) $*.xsc $*.c'),
+               '$(MV) $*.xsc $*.c
+	$(PERLRUN) DumpDotC.PL');
+    return $xs_c;
+}
+
+sub xs_o {
+    my $xs_o = $_[0]->SUPER::xs_o(@_);
+    if(length $xs_o) {
+        my $pos = index($xs_o, '$(MV) $*.xsc $*.c');
+        die 'can\'t match in sub xs_o()' if $pos == -1;
+        substr($xs_o, $pos,
+            length('$(MV) $*.xsc $*.c'),
+                   '$(MV) $*.xsc $*.c
+	$(PERLRUN) DumpDotC.PL');
+    }
+    return $xs_o;
 }
 
 package main;

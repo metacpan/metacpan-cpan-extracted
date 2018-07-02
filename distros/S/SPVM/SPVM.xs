@@ -743,7 +743,7 @@ get_subs(...)
   SV* sv_package_name = ST(1);
   const char* package_name = SvPV_nolen(sv_package_name);
 
-  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, package_name, strlen(package_name));
+  SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, package_name, strlen(package_name));
   SPVM_PACKAGE* package = op_package->uv.package;
   
   AV* av_subs = (AV*)sv_2mortal((SV*)newAV());
@@ -813,7 +813,7 @@ get_sub_names(...)
   SV* sv_package_name = ST(1);
   const char* package_name = SvPV_nolen(sv_package_name);
 
-  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, package_name, strlen(package_name));
+  SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, package_name, strlen(package_name));
   SPVM_PACKAGE* package = op_package->uv.package;
   
   AV* av_sub_names = (AV*)sv_2mortal((SV*)newAV());
@@ -890,7 +890,7 @@ get_package_load_path(...)
   const char* package_name = SvPV_nolen(sv_package_name);
   
   // Subroutine information
-  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, package_name, strlen(package_name));;
+  SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, package_name, strlen(package_name));;
   SPVM_PACKAGE* package = op_package->uv.package;
   
   const char* package_load_path = package->load_path;
@@ -996,29 +996,10 @@ compile_spvm(...)
   else {
     sv_compile_success = sv_2mortal(newSViv(1));
   }
-  
+
   XPUSHs(sv_compile_success);
   
   XSRETURN(1);
-}
-
-SV*
-build_opcode(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  HV* hv_self = (HV*)SvRV(sv_self);
-
-  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
-  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
-  
-  // Build opcode
-  SPVM_OPCODE_BUILDER_build_opcode_array(compiler);
-  
-  XSRETURN(0);
 }
 
 SV*
@@ -1035,7 +1016,7 @@ build_runtime(...)
   SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
   
   // Create run-time
-  SPVM_RUNTIME* runtime = SPVM_RUNTIME_new(compiler);
+  SPVM_RUNTIME* runtime = SPVM_COMPILER_new_runtime(compiler);
   compiler->runtime = runtime;
   
   // Set ENV
@@ -1091,7 +1072,7 @@ bind_sub(...)
   void* native_address = INT2PTR(void*, SvIV(sv_native_address));
   
   // Set native address to subroutine
-  SPVM_OP* op_sub = SPVM_HASH_search(compiler->op_sub_symtable, native_sub_name, strlen(native_sub_name));
+  SPVM_OP* op_sub = SPVM_HASH_fetch(compiler->op_sub_symtable, native_sub_name, strlen(native_sub_name));
   SPVM_SUB* sub = op_sub->uv.sub;
   
   sub->native_address = native_address;
@@ -1115,14 +1096,14 @@ build_package_csource(...)
   SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
   
   
-  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, package_name, strlen(package_name));
+  SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, package_name, strlen(package_name));
   int32_t package_id = op_package->uv.package->id;
   
   // String buffer for csource
   SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
   
   // Build package csource
-  SPVM_CSOURCE_BUILDER_build_package_csource(compiler, string_buffer, package_id);
+  SPVM_CSOURCE_BUILDER_build_package_csource(compiler, string_buffer, package_name);
   
   SV* sv_package_csource = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
   
@@ -1150,7 +1131,7 @@ bind_sub(...)
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
   SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
   
-  SPVM_OP* op_sub = SPVM_HASH_search(compiler->op_sub_symtable, sub_abs_name, strlen(sub_abs_name));
+  SPVM_OP* op_sub = SPVM_HASH_fetch(compiler->op_sub_symtable, sub_abs_name, strlen(sub_abs_name));
   SPVM_SUB* sub = op_sub->uv.sub;
   
   sub->precompile_address = sub_precompile_address;
@@ -1183,21 +1164,24 @@ call_sub(...)
   
   int32_t stack_arg_start = 0;
   
-  SV* sv_sub_abs_name = ST(0);
-  stack_arg_start++;
-  
+  SV* sv_package_name = ST(0);
+  SV* sv_sub_name = ST(1);
+
   SPVM_ENV* env = SPVM_XS_UTIL_get_env();
   SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->get_runtime(env);
   SPVM_COMPILER* compiler = runtime->compiler;
+  
+  const char* package_name = SvPV_nolen(sv_package_name);
+  const char* sub_name = SvPV_nolen(sv_sub_name);
 
-  const char* sub_abs_name = SvPV_nolen(sv_sub_abs_name);
+  SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, package_name, strlen(package_name));
+  SPVM_PACKAGE* package = op_package->uv.package;
+  SPVM_OP* op_sub = SPVM_HASH_fetch(package->op_sub_symtable, sub_name, strlen(sub_name));
+  SPVM_SUB* sub = op_sub->uv.sub;
+  const char* sub_abs_name = sub->abs_name;
   int32_t sub_id = env->get_sub_id(env, sub_abs_name);
   
-  
-  // Subroutine information
-  SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
-  SPVM_SUB* sub = op_sub->uv.sub;
-  
+  stack_arg_start += 2;
   
   // Arguments
   {
@@ -1405,7 +1389,7 @@ new_byte_array_len(...)
   SPVM_ENV* env = SPVM_XS_UTIL_get_env();
   
   // New array
-  void* array =  env->new_byte_array(env, length);
+  void* array =  env->new_byte_array_raw(env, length);
   
   // Increment reference count
   env->inc_ref_count(env, array);
@@ -1430,7 +1414,7 @@ new_short_array_len(...)
   SPVM_ENV* env = SPVM_XS_UTIL_get_env();
   
   // New array
-  void* array =  env->new_short_array(env, length);
+  void* array =  env->new_short_array_raw(env, length);
   
   // Increment reference count
   env->inc_ref_count(env, array);
@@ -1455,7 +1439,7 @@ new_int_array_len(...)
   SPVM_ENV* env = SPVM_XS_UTIL_get_env();
   
   // New array
-  void* array =  env->new_int_array(env, length);
+  void* array =  env->new_int_array_raw(env, length);
   
   // Increment reference count
   env->inc_ref_count(env, array);
@@ -1480,7 +1464,7 @@ new_long_array_len(...)
   SPVM_ENV* env = SPVM_XS_UTIL_get_env();
   
   // New array
-  void* array =  env->new_long_array(env, length);
+  void* array =  env->new_long_array_raw(env, length);
   
   // Increment reference count
   env->inc_ref_count(env, array);
@@ -1505,7 +1489,7 @@ new_float_array_len(...)
   SPVM_ENV* env = SPVM_XS_UTIL_get_env();
   
   // New array
-  void* array =  env->new_float_array(env, length);
+  void* array =  env->new_float_array_raw(env, length);
   
   // Increment reference count
   env->inc_ref_count(env, array);
@@ -1530,7 +1514,7 @@ new_double_array_len(...)
   SPVM_ENV* env = SPVM_XS_UTIL_get_env();
   
   // New array
-  void* array =  env->new_double_array(env, length);
+  void* array =  env->new_double_array_raw(env, length);
   
   // Increment reference count
   env->inc_ref_count(env, array);
@@ -1561,11 +1545,11 @@ new_object_array_len(...)
   // Element type id
   const char* basic_type_name = SvPV_nolen(sv_basic_type_name);
   
-  SPVM_BASIC_TYPE* basic_type = SPVM_HASH_search(compiler->basic_type_symtable, basic_type_name, strlen(basic_type_name));
+  SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, basic_type_name, strlen(basic_type_name));
   assert(basic_type);
   
   // New array
-  void* array = env->new_object_array(env, basic_type->id, length);
+  void* array = env->new_object_array_raw(env, basic_type->id, length);
   
   // Increment reference count
   env->inc_ref_count(env, array);
@@ -1599,11 +1583,11 @@ new_multi_array_len(...)
   // Element type id
   const char* basic_type_name = SvPV_nolen(sv_basic_type_name);
   
-  SPVM_BASIC_TYPE* basic_type = SPVM_HASH_search(compiler->basic_type_symtable, basic_type_name, strlen(basic_type_name));
+  SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, basic_type_name, strlen(basic_type_name));
   assert(basic_type);
   
   // New array
-  void* array = env->new_multi_array(env, basic_type->id, element_dimension, length);
+  void* array = env->new_multi_array_raw(env, basic_type->id, element_dimension, length);
   
   // Increment reference count
   env->inc_ref_count(env, array);

@@ -73,10 +73,6 @@ has_field 'pages' => (
     label => 'Pages',
     order => '8',
 );
-has_field 'comment' => (
-    type  => 'Text',
-    order => 9,
-);
 
 has_field 'borrower' => (
     type => 'Select',

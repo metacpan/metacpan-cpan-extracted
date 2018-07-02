@@ -5,11 +5,13 @@ author:
   - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Simple: '1.302073'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::Which: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -24,12 +26,9 @@ requires:
   File::Which: '0'
   IPC::Run: '0'
   Log::Log4perl: '0'
-  Test::Simple: '1.302073'
   perl: '5.008001'
 resources:
-  X_type: git
-  X_url: https://github.com/glasswalk3r/archive-tar-wrapper-perl
   bugtracker: https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues
   repository: https://github.com/glasswalk3r/archive-tar-wrapper-perl.git
-version: '0.27'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

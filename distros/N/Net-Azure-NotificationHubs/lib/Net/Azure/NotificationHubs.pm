@@ -21,7 +21,7 @@ use Class::Accessor::Lite (
     ]],
 );
 
-our $VERSION             = "0.07";
+our $VERSION             = "0.08";
 our $DEFAULT_API_VERSION = "2015-04";
 our $DEFAULT_TIMEOUT     = 60;
 

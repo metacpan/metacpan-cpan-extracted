@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.015    2018-06-19
+        - 'no_spacebar' to 'meta_items'.
+
 2.014    2018-04-20
         - Improved documentation.
 

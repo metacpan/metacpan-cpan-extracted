@@ -2,8 +2,10 @@ use strict;
 use warnings;
 
 use Test::More 0.88;
-plan skip_all => 'skipping for regular installs, due to possible circular dependency issues'
-    unless $ENV{AUTHOR_TESTING} || $ENV{AUTOMATED_TESTING};
+BEGIN {
+    plan skip_all => 'skipping for regular installs, due to possible circular dependency issues'
+        unless $ENV{AUTHOR_TESTING} || $ENV{AUTOMATED_TESTING};
+}
 
 use Test::Needs { 'Moose' => 0, 'MooseX::Role::Parameterized' => 0 };
 

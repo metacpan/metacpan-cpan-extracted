@@ -1,3 +1,10 @@
+Revision history for Term-Clui
+
+1.72 2018-06-25 16:20:10 -0400
+  - New maintainer: PLICEASE
+  - New github repository (see META.json)
+  - Fix metadata typo for ExtUtils::MakeMaker (rt#120160)
+
 20170205 1.71 eliminate $[ and assume 0
 20141221 1.70 ask_filename() uses readline to display its own prompt
 20140712 1.69 ask() displays a default of "0"

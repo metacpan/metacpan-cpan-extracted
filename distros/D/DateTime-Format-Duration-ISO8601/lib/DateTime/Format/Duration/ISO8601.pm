@@ -1,7 +1,7 @@
 package DateTime::Format::Duration::ISO8601;
 
-our $DATE = '2018-02-06'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2018-06-23'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -156,7 +156,7 @@ sub _error {
 }
 
 1;
-# ABSTRACT: Format DateTime::Duration object as ISO8601 duration string
+# ABSTRACT: Parse and format ISO8601 duration
 
 __END__
 
@@ -166,11 +166,11 @@ __END__
 
 =head1 NAME
 
-DateTime::Format::Duration::ISO8601 - Format DateTime::Duration object as ISO8601 duration string
+DateTime::Format::Duration::ISO8601 - Parse and format ISO8601 duration
 
 =head1 VERSION
 
-This document describes version 0.006 of DateTime::Format::Duration::ISO8601 (from Perl distribution DateTime-Format-Duration-ISO8601), released on 2018-02-06.
+This document describes version 0.008 of DateTime::Format::Duration::ISO8601 (from Perl distribution DateTime-Format-Duration-ISO8601), released on 2018-06-23.
 
 =head1 SYNOPSIS
 
@@ -236,9 +236,11 @@ feature.
 
 =head1 SEE ALSO
 
-L<DateTime::Format::ISO8601> to format L<DateTime> object into ISO8601 date/time
-string. At the time of this writing, there is no support to format
-L<DateTime::Duration> object, hence this module.
+L<DateTime::Format::ISO8601> to parse ISO8601 date/time string into L<DateTime>
+object. At the time of this writing, there is no support to parse and format
+L<DateTime::Duration> object, hence this module you're reading. Also, there is
+no support to format DateTime object as ISO8601 date/time string; for that
+functionality use L<DateTime::Format::ISO8601::Format>.
 
 L<DateTime::Format::Duration> to format DateTime::Duration object using
 strftime-style formatting.

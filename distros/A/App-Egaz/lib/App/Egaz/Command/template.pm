@@ -37,6 +37,7 @@ sub opt_spec {
         [ "multiname=s", "naming multiply alignment", ],
         [ "outgroup=s",  "the name of outgroup", ],
         [ "tree=s",      "a predefined guiding tree for multiz", ],
+        [ "order",       "multiple alignments with original order (using fake_tree.nwk)", ],
         [ "rawphylo",    "create guiding tree by joining pairwise alignments", ],
         [ "vcf",         "create vcf files", ],
         [],
@@ -526,9 +527,10 @@ sub gen_packup {
 #----------------------------#
 log_warn [% sh %]
 
-find . -type f \
-    | grep -v -E "\.(sh|2bit)$" \
-    | grep -v -F "fake_tree.nwk" \
+find . -type f |
+    grep -v -E "\.(sh|2bit)$" |
+    grep -v -E "(_fasta|_raw)\/" |
+    grep -v -F "fake_tree.nwk" \
     > file_list.txt
 
 tar -czvf [% opt.multiname %].tar.gz -T file_list.txt
@@ -855,6 +857,19 @@ egaz multiz \
 [% END -%]
 [% END -%]
     --tree [% opt.tree %] \
+    -o [% opt.multiname %]_mz \
+    --parallel [% opt.parallel %]
+
+[% ELSIF opt.order %]
+egaz multiz \
+[% FOREACH item IN opt.data -%]
+[% IF not loop.first -%]
+[% t = opt.data.0.name -%]
+[% q = item.name -%]
+    Pairwise/[% t %]vs[% q %] \
+[% END -%]
+[% END -%]
+    --tree fake_tree.nwk \
     -o [% opt.multiname %]_mz \
     --parallel [% opt.parallel %]
 

@@ -1,0 +1,105 @@
+NAME
+    DBIx::CSV - Generate CSV from SQL query result
+
+VERSION
+    This document describes version 0.002 of DBIx::CSV (from Perl
+    distribution DBIx-CSV), released on 2018-07-02.
+
+SYNOPSIS
+     use DBI;
+     use DBIx::CSV;
+     my $dbh = DBI->connect("dbi:mysql:database=mydb", "someuser", "somepass");
+
+    Generating a row of CSV (with header):
+
+     print $dbh->selectrow_csv("SELECT * FROM member");
+
+    Sample result:
+
+     "Name","Rank","Serial"
+     "alice","pvt","123456"
+
+    Generating a row of CSV (without header):
+
+     print $dbh->selectrow_csv_noheader("SELECT * FROM member");
+
+    Sample result:
+
+     "alice","pvt","123456"
+
+    Generating all rows (with header):
+
+     print $dbh->selectrow_csv("SELECT * FROM member");
+
+    Sample result:
+
+     "Name","Rank","Serial"
+     "alice","pvt","123456"
+     "bob","cpl","98765321"
+     "carol","brig gen","8745"
+
+    Generating all rows (without header):
+
+     print $dbh->selectrow_csv("SELECT * FROM member");
+
+    Statement handle versions:
+
+     print $sth->fetchrow_csv;
+     print $sth->fetchrow_csv_noheader;
+     print $sth->fetchall_csv;
+     print $sth->fetchall_csv_noheader;
+
+DESCRIPTION
+    This package is a thin glue between DBI and DBIx::TextTableAny (which in
+    turn is a thin glue to Text::Table::Any). It adds the following methods
+    to database handle:
+
+     selectrow_csv
+     selectall_csv
+     selectrow_csv_noheader
+     selectall_csv_noheader
+
+    as well as the following methods to statement handle:
+
+     fetchrow_csv
+     fetchall_csv
+     fetchrow_csv_noheader
+     fetchall_csv_noheader
+
+    The methods send the result of query to Text::Table::Any (using the
+    Text::Table::CSV backend) and return the rendered CSV data.
+
+    In essence, this is an easy, straightforward way produce CSV data from
+    SQL query.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DBIx-CSV>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-DBIx-CSV>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-CSV>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DBI::Format, particularly DBI::Format::CSV
+
+    DBIx::CSVDumper
+
+    DBIx::TextTableAny which has a similar interface as this module and
+    offers multiple output formats.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

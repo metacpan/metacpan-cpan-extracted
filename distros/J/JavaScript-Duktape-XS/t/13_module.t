@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use Ref::Util qw/ is_scalarref /;
 use Test::More;
-use JavaScript::Duktape::XS;
+
+my $CLASS = 'JavaScript::Duktape::XS';
 
 sub _module_resolve {
     my ($requested_id, $parent_id) = @_;
@@ -44,38 +44,38 @@ sub _module_load {
 }
 
 sub test_module {
-    my $duk = JavaScript::Duktape::XS->new();
-    $duk->set('perl_module_resolve', \&_module_resolve);
-    $duk->set('perl_module_load', \&_module_load);
-    ok($duk, "created JavaScript::Duktape::XS object");
+    my $vm = $CLASS->new();
+    $vm->set('perl_module_resolve', \&_module_resolve);
+    $vm->set('perl_module_load', \&_module_load);
+    ok($vm, "created $CLASS object");
 
-    $duk->eval('var p = require("pig");');
-    is($duk->typeof('p'), 'string', 'basic require()');
+    $vm->eval('var p = require("pig");');
+    is($vm->typeof('p'), 'string', 'basic require()');
 
-    $duk->eval('var r = require("cow"); var c = r.indexOf("pig");');
-    # printf STDERR ("cow: %s", Dumper($duk->get('r')));
-    ok($duk->get('c') >= 0, 'nested require()');
+    $vm->eval('var r = require("cow"); var c = r.indexOf("pig");');
+    # printf STDERR ("cow: %s", Dumper($vm->get('r')));
+    ok($vm->get('c') >= 0, 'nested require()');
 
-    $duk->eval('var ape1 = require("ape"); var ape2 = require("ape");');
-    my $a1 = $duk->get('ape1');
-    my $a2 = $duk->get('ape2');
+    $vm->eval('var ape1 = require("ape"); var ape2 = require("ape");');
+    my $a1 = $vm->get('ape1');
+    my $a2 = $vm->get('ape2');
     is_deeply($a1, $a2, 'cached require');
 
-    $duk->eval('var ape1 = require("ape"); var inCache = "ape.js" in require.cache; delete require.cache["ape.js"]; var ape2 = require("ape");');
-    ok($duk->get('inCache'), 'cached required, inCache');
-    ok($duk->get('ape2') ne $duk->get('ape1'), 'cached require, not equal');
+    $vm->eval('var ape1 = require("ape"); var inCache = "ape.js" in require.cache; delete require.cache["ape.js"]; var ape2 = require("ape");');
+    ok($vm->get('inCache'), 'cached required, inCache');
+    ok($vm->get('ape2') ne $vm->get('ape1'), 'cached require, not equal');
 
-    $duk->eval('var ape3 = require("ape");');
+    $vm->eval('var ape3 = require("ape");');
 
-    is($duk->typeof('ape3.module.require'), "function", "module.require is a function");
+    is($vm->typeof('ape3.module.require'), "function", "module.require is a function");
 
-    my $a30 = $duk->get('ape3');
-    my $a31 = $duk->get('ape3.module.exports');
-    my $a32 = $duk->get('ape3.module.id');
-    my $a33 = $duk->get('ape3.module.filename');
-    my $a34 = $duk->get('ape3.module.loaded');
-    my $a35 = $duk->get('ape3.wasLoaded');
-    my $a36 = $duk->get('ape3.__filename');
+    my $a30 = $vm->get('ape3');
+    my $a31 = $vm->get('ape3.module.exports');
+    my $a32 = $vm->get('ape3.module.id');
+    my $a33 = $vm->get('ape3.module.filename');
+    my $a34 = $vm->get('ape3.module.loaded');
+    my $a35 = $vm->get('ape3.wasLoaded');
+    my $a36 = $vm->get('ape3.__filename');
 
     is_deeply($a30, $a31, 'aped require');
 
@@ -88,22 +88,24 @@ sub test_module {
 
     is($a36, 'ape.js', 'ape __filename');
 
-    $duk->eval('var badger = require("badger");');
-    # printf STDERR ("badger: %s", Dumper($duk->get('badger')));
-    is($duk->get('badger.foo'), 123, 'exports.foo assignment');
-    is($duk->get('badger.bar'), 234, 'exports.bar assignment');
+    $vm->eval('var badger = require("badger");');
+    # printf STDERR ("badger: %s", Dumper($vm->get('badger')));
+    is($vm->get('badger.foo'), 123, 'exports.foo assignment');
+    is($vm->get('badger.bar'), 234, 'exports.bar assignment');
 
-    $duk->eval('var comment = require("comment");');
-    # printf STDERR ("comment %s", Dumper($duk->get('comment')));
-    is($duk->get('comment.foo'), 123, 'comment.foo, last line with // comment');
-    is($duk->get('comment.bar'), 234, 'comment.bar, last line with // comment');
+    $vm->eval('var comment = require("comment");');
+    # printf STDERR ("comment %s", Dumper($vm->get('comment')));
+    is($vm->get('comment.foo'), 123, 'comment.foo, last line with // comment');
+    is($vm->get('comment.bar'), 234, 'comment.bar, last line with // comment');
 
-    $duk->eval('var shebang = require("shebang");');
-    is($duk->get('shebang.foo'), 123, 'shebang.foo');
-    is($duk->get('shebang.bar'), 234, 'shebang.bar');
+    $vm->eval('var shebang = require("shebang");');
+    is($vm->get('shebang.foo'), 123, 'shebang.foo');
+    is($vm->get('shebang.bar'), 234, 'shebang.bar');
 }
 
 sub main {
+    use_ok($CLASS);
+
     test_module();
     done_testing;
 

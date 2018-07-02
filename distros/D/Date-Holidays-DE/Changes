@@ -59,3 +59,11 @@ v1.8.3  Mon Sep 19 21:25:02 CEST 2016
 
 v1.9    Tue Sep 27 09:42:43 CEST 2016
 	- Version bump in a desperate attempt to fix some inconsistency
+
+v2.00 	Mon Jun 25 11:46:50 CEST 2018
+	- Submissions by Christoph Biedl
+	  - Reformationstag in additional states [rt.cpan.org #124559] 
+	  - Typo [rt.cpan.org #115897] 
+	- Removed stale link to the official list of holidays
+	- Major Version bump due to all those prior versioning fails
+	

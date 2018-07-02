@@ -8,6 +8,7 @@ use Pcore::HTTP::Headers;
 use HTTP::Parser::XS qw[HEADERS_AS_ARRAYREF HEADERS_NONE];
 use Pcore::AE::Handle::Cache;
 use Pcore::Util::Scalar qw[is_ref is_plain_arrayref];
+use Pcore::Util::CA;
 
 our $EXPORT = { TLS_CTX => [qw[$TLS_CTX_HIGH $TLS_CTX_LOW]] };
 
@@ -15,7 +16,7 @@ const our $TLS_CTX_LOW  => 0;
 const our $TLS_CTX_HIGH => 1;
 const our $TLS_CTX      => {
     $TLS_CTX_LOW => {
-        $MSWIN ? ( ca_file => P->ca->ca_file ) : (),
+        $MSWIN ? ( ca_file => Pcore::Util::CA->ca_file ) : (),
         cache           => 1,
         verify          => 0,
         verify_peername => undef,
@@ -23,7 +24,7 @@ const our $TLS_CTX      => {
         dh              => undef,    # Diffie-Hellman is disabled
     },
     $TLS_CTX_HIGH => {
-        $MSWIN ? ( ca_file => P->ca->ca_file ) : (),
+        $MSWIN ? ( ca_file => Pcore::Util::CA->ca_file ) : (),
         cache           => 1,
         verify          => 1,
         verify_peername => 'http',
@@ -577,27 +578,27 @@ sub get_connect ($connect) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 212                  | * Subroutine "read_http_res_headers" with high complexity score (22)                                           |
-## |      | 338                  | * Subroutine "read_http_body" with high complexity score (29)                                                  |
+## |      | 215                  | * Subroutine "read_http_res_headers" with high complexity score (22)                                           |
+## |      | 341                  | * Subroutine "read_http_body" with high complexity score (29)                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 248, 249             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 251, 252             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 49                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 52                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 161                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    2 | 164                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 285                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 288                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 603                  | * Link L<AnyEvent::Handle> on line 609 does not specify text                                                   |
-## |      | 603                  | * Link L<AnyEvent::Handle> on line 617 does not specify text                                                   |
-## |      | 603                  | * Link L<AnyEvent::Handle> on line 645 does not specify text                                                   |
-## |      | 603                  | * Link L<AnyEvent::Handle> on line 661 does not specify text                                                   |
-## |      | 603                  | * Link L<AnyEvent::Socket> on line 661 does not specify text                                                   |
-## |      | 603, 603             | * Link L<Pcore::Proxy> on line 627 does not specify text                                                       |
-## |      | 603                  | * Link L<Pcore::Proxy> on line 661 does not specify text                                                       |
+## |      | 606                  | * Link L<AnyEvent::Handle> on line 612 does not specify text                                                   |
+## |      | 606                  | * Link L<AnyEvent::Handle> on line 620 does not specify text                                                   |
+## |      | 606                  | * Link L<AnyEvent::Handle> on line 648 does not specify text                                                   |
+## |      | 606                  | * Link L<AnyEvent::Handle> on line 664 does not specify text                                                   |
+## |      | 606                  | * Link L<AnyEvent::Socket> on line 664 does not specify text                                                   |
+## |      | 606, 606             | * Link L<Pcore::Proxy> on line 630 does not specify text                                                       |
+## |      | 606                  | * Link L<Pcore::Proxy> on line 664 does not specify text                                                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 45, 50               | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 48, 53               | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,7 +1,7 @@
 package Sah::Schemas::URL;
 
-our $DATE = '2018-06-05'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2018-06-26'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to URL
@@ -18,7 +18,7 @@ Sah::Schemas::URL - Sah schemas related to URL
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schemas::URL (from Perl distribution Sah-Schemas-URL), released on 2018-06-05.
+This document describes version 0.008 of Sah::Schemas::URL (from Perl distribution Sah-Schemas-URL), released on 2018-06-26.
 
 =head1 SAH SCHEMAS
 

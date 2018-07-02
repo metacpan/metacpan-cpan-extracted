@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// spvm_case_info.h
+struct SPVM_case_info;
+typedef struct SPVM_case_info SPVM_CASE_INFO;
+
 // spvm_basic_type.h
 struct SPVM_basic_type;
 typedef struct SPVM_basic_type SPVM_BASIC_TYPE;
@@ -24,13 +28,13 @@ typedef struct SPVM_undef SPVM_UNDEF;
 struct SPVM_string_buffer;
 typedef struct SPVM_string_buffer SPVM_STRING_BUFFER;
 
+// spvm_package_var_access.h
+struct SPVM_package_var_access;
+typedef struct SPVM_package_var_access SPVM_PACKAGE_VAR_ACCESS;
+
 // spvm_package_var.h
 struct SPVM_package_var;
 typedef struct SPVM_package_var SPVM_PACKAGE_VAR;
-
-// spvm_field.h
-struct SPVM_our;
-typedef struct SPVM_our SPVM_OUR;
 
 // spvm_call_sub.h
 struct SPVM_call_sub;

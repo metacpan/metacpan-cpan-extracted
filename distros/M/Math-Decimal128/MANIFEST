@@ -1,5 +1,6 @@
 MANIFEST
 Decimal128.pm
+Decimal128.pod
 Decimal128.xs
 Makefile.PL
 README

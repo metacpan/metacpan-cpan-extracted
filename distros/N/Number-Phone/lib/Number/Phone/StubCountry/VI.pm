@@ -22,18 +22,18 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214157;
 
 my $formatters = [
                 {
-                  'intl_format' => 'NA',
                   'format' => '$1-$2',
+                  'intl_format' => 'NA',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'format' => '($1) $2-$3',
-                  'intl_format' => '$1-$2-$3'
+                  'intl_format' => '$1-$2-$3',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
@@ -66,7 +66,7 @@ my $validators = {
               9[023]
             )|
             7(?:
-              1[2-589]|
+              1[2-57-9]|
               27|
               7\\d
             )|
@@ -100,7 +100,7 @@ my $validators = {
               9[023]
             )|
             7(?:
-              1[2-589]|
+              1[2-57-9]|
               27|
               7\\d
             )|
@@ -108,21 +108,19 @@ my $validators = {
             998
           )\\d{4}
         )',
+                'pager' => '',
+                'voip' => '',
                 'personal_number' => '
           5(?:
-            (?:
-              00|
-              22|
-              33|
-              44|
-              66|
-              77|
-              88
-            )[2-9]|
-            21[23]
-          )\\d{6}
+            00|
+            2[12]|
+            33|
+            44|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
         ',
-                'pager' => '',
                 'toll_free' => '
           8(?:
             00|
@@ -133,8 +131,7 @@ my $validators = {
             77|
             88
           )[2-9]\\d{6}
-        ',
-                'voip' => ''
+        '
               };
 use Number::Phone::NANP::Data;
 sub areaname {

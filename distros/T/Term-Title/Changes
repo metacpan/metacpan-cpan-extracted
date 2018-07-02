@@ -1,5 +1,11 @@
 Revision history for Term-Title
 
+0.09      2018-06-20 14:49:46-06:00 America/Denver
+
+    [ADDED]
+
+    - Support set_tab_title on konsole
+
 0.08      2014-03-14 15:40:03+01:00 Europe/Paris
 
     [FIXED]

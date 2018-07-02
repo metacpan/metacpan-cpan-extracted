@@ -1,5 +1,12 @@
 Revision history for Perl extension App-Egaz
 
+0.2.1 2018-06-29T11:18:45Z
+    - Handle old NCBI fasta headers: `>gi|\d+gb|\d+` or `>gi|\d+ref|\d+`
+    - Update flowcharts
+    - `egaz template`
+        - Add --order
+        - Exclude _fasta/ and _raw/
+
 0.2.0 2018-04-24T21:32:24Z
     - `egaz template`
         - Add 7_multi_aligndb.sh
@@ -7,7 +14,7 @@ Revision history for Perl extension App-Egaz
         - Add 9_pack_up.sh
         - Store anno.yml and chr_length.csv to Results/
     - `egaz repeatmasker`
-        - Try hard to find rmOutToGFF3.pl
+        - Try harder to find rmOutToGFF3.pl
     - `egaz prepseq`
         - Simplify headers for sequences in directory
     - `egaz masked`

@@ -14,7 +14,7 @@ sub isWindowsVista {
 
 }
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 BEGIN {use_ok('Net::Ping')};
 
 SKIP: {
@@ -23,5 +23,10 @@ SKIP: {
     skip "No getprotobyname", 1 unless $Config{d_getpbyname};
     skip "Not allowed on $^O", 1 if $^O =~ /^(hpux|irix|aix)$/;
     my $p = new Net::Ping "udp";
+    # message_type can't be used
+    eval {
+        $p->message_type();
+    };
+    like($@, qr/message type only supported on 'icmp' protocol/, "message_type() API only concern 'icmp' protocol");
     is($p->ping("127.0.0.1"), 1);
 }

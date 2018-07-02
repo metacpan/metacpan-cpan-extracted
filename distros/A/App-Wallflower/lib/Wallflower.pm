@@ -1,12 +1,13 @@
 package Wallflower;
-$Wallflower::VERSION = '1.007';
+$Wallflower::VERSION = '1.008';
 use strict;
 use warnings;
 
 use Plack::Util ();
 use Path::Class;
 use URI;
-use HTTP::Date qw( time2str );
+use HTTP::Date qw( time2str str2time);
+use HTTP::Headers::Fast;    # same as Plack::Response
 use Carp;
 
 # quick getters
@@ -158,6 +159,13 @@ sub get {
 
         # finish
         close $fh;
+
+        # if the app sent Last-Modified, set the local file date to that
+        if ( my $last_modified = HTTP::Headers::Fast->new(@$headers)
+             ->header('Last-Modified') ) {
+            my $epoch = str2time( $last_modified );
+            utime $epoch, $epoch, $file;
+        }
     }
 
     return [ $status, $headers, $file ];
@@ -172,6 +180,10 @@ __END__
 =head1 NAME
 
 Wallflower - Stick Plack applications to the wallpaper
+
+=head1 VERSION
+
+version 1.008
 
 =head1 SYNOPSIS
 
@@ -256,6 +268,9 @@ If an error is encountered when trying to open the file, C<$status>
 will be set to C<999> (an invalid HTTP status code), and a warning will
 be emitted.
 
+If the application sends the C<Last-Modified> header in its response,
+the modification date of the target file will be modified accordingly.
+
 If a file exists at the location pointed to by the target, a
 C<If-Modified-Since> header is added to the Plack environment,
 with the modification timestamp for this file as the value.
@@ -286,10 +301,9 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2012-2015 by Philippe Bruhat (BooK).
+Copyright 2012-2018 by Philippe Bruhat (BooK).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

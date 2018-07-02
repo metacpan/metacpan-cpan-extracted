@@ -1,3 +1,11 @@
+0.11     2018-06-21
+
+- Add the ability to look up project memberships.
+
+- Make sure that LWP::Protocol::https is listed as an explicit dependency. The
+  PT API uses HTTPS so we need this module to talk to it.
+
+
 0.10     2018-01-04
 
 - Make sure all queries that retrieve one or more stories get the requested_by

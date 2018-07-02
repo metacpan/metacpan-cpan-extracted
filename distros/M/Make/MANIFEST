@@ -13,7 +13,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
-pmake
+pure-perl-make
 README
 t/00-compile.t
 t/94-version.t

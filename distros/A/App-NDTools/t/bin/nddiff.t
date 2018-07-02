@@ -3,7 +3,7 @@ use warnings FATAL => 'all';
 
 use File::Spec::Functions qw(catfile);
 use Test::File::Contents;
-use Test::More tests => 65;
+use Test::More tests => 74;
 
 use App::NDTools::Test;
 
@@ -35,13 +35,16 @@ run_ok(
     exit => 0,
 );
 
+my $orig_program_name = $0;
+$0 = $bin; # Pod::Usage will be able to find binary with pod
 $test = "help";
 run_ok(
     name => $test,
-    cmd => [ $^X, $bin, '--help', '-h' ], # argv pod inside bin
+    cmd => [ @cmd, '--help', '-h' ], # argv pod inside bin
     stderr => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
     exit => 0,
 );
+$0 = $orig_program_name; # just in case
 
 ### bin specific tests
 
@@ -69,12 +72,11 @@ run_ok(
     exit => 8,
 );
 
-$test = "json_full";
+$test = "json_U";
 run_ok(
     name => $test,
-    cmd => [ @cmd, '--json', '--full', "_menu.a.json", "_menu.b.json" ],
+    cmd => [ @cmd, '--json', '--U', "_menu.a.json", "_menu.b.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
-    stderr => qr/ ALERT] --full opt is deprecated and will be removed soon. --U should be used instead/,
     exit => 8,
 );
 
@@ -147,7 +149,7 @@ run_ok(
 $test = "rules";
 run_ok(
     name => $test,
-    cmd => [ @cmd, '--rules', "_cfg.alpha.json", "_cfg.beta.json" ],
+    cmd => [ @cmd, '--rules', "_bool.a.json", "_bool.b.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
     exit => 8,
 );
@@ -171,7 +173,7 @@ run_ok(
 $test = "term_bool";
 run_ok(
     name => $test,
-    cmd => [ @cmd, '--nopretty', "_bool.a.json", "_bool.b.json" ],
+    cmd => [ @cmd, "_bool.a.json", "_bool.b.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
     exit => 8,
 );
@@ -208,11 +210,20 @@ run_ok(
     exit => 8,
 );
 
+$test = "term_colors_wU";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--colors', '-U', "_cfg.alpha.json", "_cfg.beta.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
 $test = "term_full_headers";
 run_ok(
     name => $test,
     cmd => [ @cmd, '--full-headers', "_cfg.alpha.json", "_cfg.beta.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    stderr => qr/ ALERT] --full-headers opt is deprecated and will be removed soon/,
     exit => 8,
 );
 
@@ -307,6 +318,14 @@ run_ok(
     exit => 8,
 );
 
+$test = "term_wU";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--U', "_bool.a.json", "_bool.b.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
 $test = "term_nodiff";
 run_ok(
     name => $test,
@@ -317,6 +336,14 @@ $test = "term_nopretty";
 run_ok(
     name => $test,
     cmd => [ @cmd, '--nopretty', "_menu.a.json", "_menu.b.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "term_nopretty_AR"; # Should be separated paths for A and R items
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--nopretty', "_bool.a.json", "_bool.b.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
     exit => 8,
 );
@@ -337,6 +364,14 @@ run_ok(
     exit => 8,
 );
 
+$test = "term_show_blame";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--show', "$test.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
 $test = "term_show_brief";
 run_ok(
     name => $test,
@@ -350,6 +385,14 @@ run_ok(
     name => $test,
     cmd => [ @cmd, '--show', "$test.json" ],
     stderr => qr/ FATAL] Diff validation failed\. /,
+    exit => 1,
+);
+
+$test = "term_show_noargs";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--show' ],
+    stderr => qr/ FATAL] At least one argument expected when --show used\. /,
     exit => 1,
 );
 
@@ -534,6 +577,38 @@ run_ok(
     name => $test,
     cmd => [ @cmd, "_text-utf8.a.json", "_text-utf8.b.json" ],
     stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test, { encoding => 'UTF-8' }) },
+    exit => 8,
+);
+
+$test = "term_text_vs_empty_string";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, "$test.a.json", "$test.b.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "term_text_vs_ref";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, "$test.a.json", "$test.b.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "term_text_vs_undef_0";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, "term_text_vs_undef.a.json", "term_text_vs_undef.b.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
+    exit => 8,
+);
+
+$test = "term_text_vs_undef_1";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, "term_text_vs_undef.b.json", "term_text_vs_undef.a.json" ],
+    stdout => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
     exit => 8,
 );
 

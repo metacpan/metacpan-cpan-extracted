@@ -1,8 +1,46 @@
 Revision history for Perl module DBIx-Array
 
 TODO:
-  - Add "int" namespace as wrapper around SQL::Interp::sql_interp_strict
   - Do we need to $dbh->quote_identifier($column) in bulkinsert methods?
+
+0.59 2018-06-24
+  - Updated t/011_bulk_updates.t to pass when SQL::Abstract not installed
+
+0.58 2018-06-21
+  - Updated t/010_objects.t and Makefile.PL to pass tests - RT 125644 
+
+0.57 2018-06-20
+  - Updated lib/DBIx/Array.pm
+    - Added bulksqlinsertarrayhash method
+      - to be parallel with bulkabsinsertarrayhash 
+      - a way to support MySQL's INSERT IGNORE without folding non-ASNI in the module
+
+0.56 2016-02-17
+  - Updated connect method to show Perl script name in V$SESSION.PROGRAM instead of simply "perl"
+
+0.55 2016-01-28
+  - Added sqlhashhash method
+  - Added abshashhash method
+
+0.54 2016-01-19
+  - Updated commit to supress warning "commit ineffective with AutoCommit enabled"
+
+0.53 2016-01-16
+  - Updated comments in sql to use ANSI standard
+
+0.52 2015-09-03
+  - Bumped version as 0.51 RPMs were never built for some reason.
+
+0.51 2015-04-08
+  - Added Tie::Cache package to manage prepare statements to avoid "ORA-01000: maximum open cursors exceeded"
+  - Dropped Package::New base package to reduce external dependencies
+
+0.50 2014-05-12
+  - Fixed Makefile.PL NAME property - CentOS rebuild
+  - Updated Documentation
+
+0.49_2 2014-05-12
+  - Documentation
 
 0.49 2014-05-12
   - Removed single use of "//" to support perl 5.8
@@ -94,7 +132,7 @@ TODO:
 
 0.23 2011-11-21
   - Corrected three spelling mistakes
-  - Updated spec to removed hard coded requires for DBI
+  - Updated spec to remove hard coded requires for DBI
 
 0.22 2011-08-27
   - Updated documentation

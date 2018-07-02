@@ -4,13 +4,13 @@
 
 use strict;
 
-use File::Temp;
+use File::Temp qw(tempfile);
 use Test::More;
 use lib 't';
-use Test::Utils;
 use Mail::Mbox::MessageParser;
 use Mail::Mbox::MessageParser::Config;
 use File::Spec::Functions qw(:ALL);
+use Test::Utils;
 use FileHandle;
 
 eval 'require Storable;';
@@ -57,14 +57,14 @@ sub TestImplementation
 
   my ($folder_name) = $filename =~ /\/([^\/]*)\.txt$/;
 
-  my $output = File::Temp->new();
-  binmode $output;
+  my ($output_fh, $output_fn) = tempfile();
+  binmode $output_fh;
 
   my $filehandle = new FileHandle($filename);
 
-  my $cache = File::Temp->new();
+  my ($cache_fh, $cache_fn) = tempfile();
 
-  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache->filename})
+  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache_fn})
     if $enable_cache;
 
   my $folder_reader =
@@ -83,15 +83,15 @@ sub TestImplementation
   {
     $folder_reader->read_next_email();
 
-    print $output $folder_reader->length() . "\n";
+    print $output_fh $folder_reader->length() . "\n";
   }
 
-  $output->close();
+  $output_fh->close();
 
   my $compare_filename =
     catfile('t','results',"${testname}_${folder_name}.stdout");
 
-  CheckDiffs([$compare_filename,$output->filename]);
+  CheckDiffs([$compare_filename,$output_fn]);
 }
 
 # ---------------------------------------------------------------------------

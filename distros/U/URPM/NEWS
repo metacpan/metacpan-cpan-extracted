@@ -1,3 +1,13 @@
+Version 5.18 - 25 June 2018
+
+- Don't select an obsolete package to resolve dependencies/conflicts
+  (mga#23223)
+
+Version 5.17 - 14 June 2018
+
+- fix finding better pkg (mga#23037)
+- make logs more reproductible
+
 Version 5.16 - 10 February 2018
 
 - make clear URPM needs rpm >= 4.14

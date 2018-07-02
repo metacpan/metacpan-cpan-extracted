@@ -1,10 +1,10 @@
 {
    "abstract" : "Provides the official rt command line client",
    "author" : [
-      "Best Practical Solutions, LLC"
+      "-2018 by Best Practical Solutions, LLC"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -15,12 +15,12 @@
    "name" : "RT-Client-CLI",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
-         "inc",
-         "share",
          "eg",
          "examples",
+         "inc",
+         "share",
+         "t",
+         "xt",
          "devel"
       ],
       "package" : [
@@ -48,7 +48,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.20",
             "Test::Pod" : "1.41"
          }
       },
@@ -86,11 +86,14 @@
          "web" : "https://github.com/bestpractical/rt-client-cli"
       }
    },
-   "version" : "4.2.11",
+   "version" : "4.4.3",
    "x_contributors" : [
       "Alex Vandiver <alexmv@bestpractical.com>",
+      "sunnavy <sunnavy@bestpractical.com>",
       "Thomas Sibley <trs@bestpractical.com>",
       "Todd Wade <todd@bestpractical.com>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_static_install" : 1
 }
 

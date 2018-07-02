@@ -1,0 +1,41 @@
+---
+abstract: 'perlcritic add-ons that generally check for un-needed stuffs.'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.023, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-TooMuchCode
+provides:
+  Perl::Critic::Policy::TooMuchCode::ProhibitLargeTryBlock:
+    file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitLargeTryBlock.pm
+    version: '0.01'
+  Perl::Critic::Policy::TooMuchCode::ProhibitUnnecessaryUTF8Pragma:
+    file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnnecessaryUTF8Pragma.pm
+    version: '0.01'
+  Perl::Critic::Policy::TooMuchCode::ProhibitUnusedConstant:
+    file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedConstant.pm
+    version: '0.01'
+  Perl::Critic::Policy::TooMuchCode::ProhibitUnusedImport:
+    file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedImport.pm
+    version: '0.01'
+  Perl::Critic::Policy::TooMuchCode::ProhibitUnusedInclude:
+    file: lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedInclude.pm
+    version: '0.01'
+  Perl::Critic::TooMuchCode:
+    file: lib/Perl/Critic/TooMuchCode.pm
+    version: '0.02'
+requires:
+  Perl::Critic: '0'
+resources:
+  repository: https://github.com/gugod/Perl-Critic-TooMuchCode.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: '1'

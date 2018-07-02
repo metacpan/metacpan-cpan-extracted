@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use DateTime::Format::RFC3339;
 use Params::ValidationCompiler qw( validation_for );
@@ -13,6 +13,7 @@ use WebService::PivotalTracker::Client;
 use WebService::PivotalTracker::Me;
 use WebService::PivotalTracker::Project;
 use WebService::PivotalTracker::ProjectIteration;
+use WebService::PivotalTracker::ProjectMembership;
 use WebService::PivotalTracker::Story;
 use WebService::PivotalTracker::Types
     qw( ArrayRef ClientObject IterationScope LWPObject MD5Hex NonEmptyStr PositiveInt Uri );
@@ -125,6 +126,38 @@ sub projects {
             raw_content => $content,
             pt_api      => $self,
         );
+    }
+}
+
+{
+    my $check = validation_for(
+        params => {
+            project_id => { type => PositiveInt },
+            sort_by    => {
+                type     => NonEmptyStr,    # This could be an enum.
+                optional => 1,
+            },
+        },
+    );
+
+    sub project_memberships {
+        my $self = shift;
+        my %args = $check->(@_);
+
+        my $project_id = delete $args{project_id};
+        my $uri        = $self->_client->build_uri(
+            "/projects/$project_id/memberships",
+            \%args,
+        );
+
+        return [
+            map {
+                WebService::PivotalTracker::ProjectMembership->new(
+                    raw_content => $_,
+                    pt_api      => $self,
+                    )
+            } @{ $self->_client->get($uri) }
+        ];
     }
 }
 
@@ -276,7 +309,7 @@ WebService::PivotalTracker - Perl library for the Pivotal Tracker REST API
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -399,6 +432,18 @@ A story ID after which this story should be added.
 
 By default the story will be added as the last story in the icebox.
 
+=head2 $pt->project_memberships(...)
+
+This looks up memberships in a project. It returns an array reference of
+L<WebService::PivotalTracker::ProjectMembership> objects.
+
+It is useful if you need to discover information about a person who is a member
+of your project.
+
+The C<project_id> parameter is required.
+
+The C<sort_by> parameter is optional.
+
 =head2 $pt->me
 
 This returns a L<WebService::PivotalTracker::Me> object for the user to which
@@ -414,7 +459,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dave Rolsky Florian Ragwitz Greg Oschwald
+=for stopwords Dave Rolsky Florian Ragwitz Greg Oschwald Will Storey
 
 =over 4
 
@@ -429,6 +474,10 @@ Florian Ragwitz <rafl@debian.org>
 =item *
 
 Greg Oschwald <goschwald@maxmind.com>
+
+=item *
+
+Will Storey <will@summercat.com>
 
 =back
 

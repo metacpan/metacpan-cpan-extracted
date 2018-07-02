@@ -88,7 +88,7 @@
    "provides" : {
       "File::Find::Object::Rule" : {
          "file" : "lib/File/Find/Object/Rule.pm",
-         "version" : "0.0307"
+         "version" : "0.0309"
       }
    },
    "release_status" : "stable",
@@ -103,7 +103,7 @@
          "web" : "https://github.com/shlomif/file-find-object-rule"
       }
    },
-   "version" : "0.0307",
+   "version" : "0.0309",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026002"

@@ -20,6 +20,12 @@ t/03-call.cmd
 t/03-call.t
 t/04-for.cmd
 t/04-for.t
+t/05-label_with_whitespaces.cmd
+t/05-label_with_whitespaces.t
+t/06-label_with_colon.cmd
+t/06-label_with_colon.t
+t/07-goto_label_stating_with_colon.cmd
+t/07-goto_label_stating_with_colon.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

@@ -1,5 +1,19 @@
 Revision history for Alien-Build
 
+1.46      2018-06-25 03:08:25 +0000
+  - Production release identical to 1.45_01
+
+1.45_01   2018-06-24 08:13:08 -0400
+  - Add alt method to Alien::Base.  This merges the capabilities from
+    Alien::Role::Alt into core, making that role now obsolete.
+  - Add alt_names and alt_exists methods to Alien::Base.  This was a
+    capability missing from Alien::Role::Alt
+  - Fix bug in Alien::Build::MM where 'make alien_prop_runtime' printed
+    install instead of runtime properties
+
+1.44_01   2018-06-20 06:36:57 -0600
+  - Added Alien::Build::Plugin::Prefer::GoodVersion
+
 1.43      2018-06-03 06:41:28 -0400
   - Documentation fixes
   - Use a custom site.config to ensure libraries are installed in lib

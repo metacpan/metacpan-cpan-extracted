@@ -6,6 +6,17 @@ Home page:    <https://metacpan.org/release/Kavorka>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.038	2017-01-31
+
+ [ Documentation ]
+ - Add note about Devel::CallParser issue to documentation.
+
+ [ Other ]
+ - 98undefer.t now requires Moops 0.035
+   Fixes RT#124827.
+   Slaven Rezić++
+   <https://rt.cpan.org/Ticket/Display.html?id=124827>
+
 0.037	2017-01-31
 
  [ Bug Fixes ]

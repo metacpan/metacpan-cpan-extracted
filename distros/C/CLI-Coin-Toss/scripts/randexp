@@ -9,7 +9,6 @@ my $untilNum = $o{g} //= 10 ; # 生成予定個数
 my $lambda = $o{l} //= 1 ; # ラプラス分布のパラメータを指定
 $o{s} =  do { defined $o{s} ? srand $o{s} : srand } ;
 #srand  do{ $o{s}//='';my $s=($o{s}=~s/(.*)!$//)?$1:1<<32; my $seed = $o{s}||int rand($s) } ; # <-- 要デバグ。! を使った時に
-print STDERR CYAN "Using random seeds: ", BRIGHT_CYAN $o{s} , " ($Script)\n" unless $o{1} ;  
 sub randvalue ; 
 * randvalue = * randexpGen ; 
 * randvalue = * randLaplaceGen if $o{2} ;
@@ -20,6 +19,7 @@ while ( $count  <= $untilNum ) {
     print "\n" ; 
     $count ++ ;
 }
+print STDERR CYAN "Using random seeds: ", BRIGHT_CYAN $o{s} , " ($Script)\n" unless $o{1} ;  
 
 sub randexpGen { 
     my $rand = 1 - rand ; 
@@ -31,8 +31,14 @@ sub randLaplaceGen {
     return  rand > 0.5 ? -log($rand)/$lambda : log($rand)/$lambda ;
 }
 
-## ヘルプの扱い
-sub VERSION_MESSAGE {}
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  our $VERSION = 0.08 ;
+    # 十分にリファクタが為されているならば、最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+}  
 sub HELP_MESSAGE {
     use FindBin qw[ $Script ] ; 
     $ARGV[1] //= '' ;
@@ -49,7 +55,9 @@ sub HELP_MESSAGE {
 
 =head1
 
- $0 
+ randexp 
+
+   指数分布に従う乱数を出力する。
 
  オプション: 
 
@@ -63,6 +71,7 @@ sub HELP_MESSAGE {
  
   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+  --version :　このプログラムのバージョン情報を出力する。
  
   開発メモ : 
 

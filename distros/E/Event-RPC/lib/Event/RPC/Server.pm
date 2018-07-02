@@ -325,7 +325,7 @@ sub setup_auth_module {
     1;
 }
 
-sub start {
+sub prepare {
     my $self = shift;
 
     $self->setup_listeners
@@ -340,6 +340,15 @@ sub start {
             $self->get_insecure_msg_fmt_ok
         )
     );
+
+    1;
+}
+
+sub start {
+    my $self = shift;
+
+    #-- Prepare server for startup
+    $self->prepare;
 
     my $loop = $self->get_loop;
 
@@ -566,7 +575,12 @@ Event::RPC::Server - Simple API for event driven RPC servers
   );
 
   $server->set_max_packet_size(2*1024*1024*1024);
+
+  # start server and event loop
   $server->start;
+
+  # or prepare server start if you like to control event loop by yourself
+  $server->prepare;
 
   # and later from inside your server implementation
   Event::RPC::Server->instance->stop;

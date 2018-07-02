@@ -6,7 +6,7 @@ Time::TAI::Simple - High resolution UNIX epoch time without leapseconds
 
 ## VERSION
 
-1.13
+1.14
 
 ## SYNOPSIS
 

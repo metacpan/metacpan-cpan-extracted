@@ -14,11 +14,12 @@ Options:
     --[no]colors
         On/Off colors for diff.
 
-    --ctx-text [int]
+    --ctx-text <int>
         Amount of lines for multiline values context. Default is 3.
 
     --full-headers
-        Print full headers (delta printed by default).
+        Print full headers (delta printed by default). Deprecated and will
+        be removed soon. "--no-pretty" should be used instead.
 
     --grep <path>
         Grep substructures to diff. See path syntax description at
@@ -44,7 +45,8 @@ Options:
         App::NDTools for more info.
 
     --[no]pretty
-        On/Off pretty-print for JSON. Enabled by default.
+        On/Off pretty-print for default and JSON formats. Full headers will
+        be printed in default mode if disabled. Enabled by default.
 
     --quiet|-q
         Don't show diff, only exit code shows exists diff or not.

@@ -33,7 +33,6 @@
             "Digest::SHA" : "0",
             "Digest::SHA1" : "0",
             "Digest::SHA256" : "0",
-            "File::Spec" : "0",
             "HTTP::Request" : "0",
             "Hash::Inflator" : "0",
             "JSON" : "0",
@@ -41,11 +40,12 @@
             "LWP::Protocol::https" : "0",
             "MIME::Base64" : "0",
             "Module::Install::TestTarget" : "0",
-            "Moose" : "0",
-            "MooseX::Aliases" : "0",
+            "Moo" : "0",
+            "MooX::Aliases" : "0",
             "Mozilla::CA" : "0",
             "Scalar::Util" : "0",
             "Try::Tiny" : "0",
+            "Type::Tiny" : "0",
             "URI" : "0",
             "URI::Query" : "0",
             "XML::LibXML" : "0",
@@ -60,11 +60,9 @@
             "Data::Printer" : "0",
             "String::CamelCase" : "0",
             "Test::Deep" : "0",
-            "Test::Moose" : "0",
             "Test::More" : "0.98",
             "Test::Pod" : "0",
-            "Test::Warn" : "0",
-            "Try::Tiny" : "0"
+            "Test::Warn" : "0"
          }
       }
    },
@@ -80,7 +78,7 @@
          "web" : "https://github.com/singingfish/braintree_perl"
       }
    },
-   "version" : "1.5",
+   "version" : "1.6",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

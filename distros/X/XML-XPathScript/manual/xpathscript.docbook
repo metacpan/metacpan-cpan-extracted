@@ -1,0 +1,1910 @@
+<book
+><bookinfo
+><title
+>XML-XPathScript</title
+><subtitle
+>version 1.45</subtitle
+><authorgroup
+><author
+><firstname
+>Yanick</firstname
+><surname
+>Champoux</surname
+></author
+><author
+><firstname
+>Dominique</firstname
+><surname
+>Quatravaux</surname
+></author
+><author
+><firstname
+>Matt</firstname
+><surname
+>Sergeant</surname
+></author
+></authorgroup
+></bookinfo
+><chapter>
+      <para>
+	 XPathScript is a stylesheet language similar in many ways to XSLT
+	 (in concept, not in appearance), for transforming XML from one
+	 format to another (possibly HTML, but XPathScript also shines for
+	 non-XML-like output).
+      </para>
+      <para>
+	 Like XSLT, XPathScript offers a dialect to mix verbatim portions
+	 of documents and code. Also like XSLT, it leverages the powerful
+	 ``templates/apply-templates'' and ``cascading stylesheets'' design
+	 patterns, that greatly simplify the design of stylesheets for
+	 programmers. The availability of the <emphasis role="italic">XPath</emphasis> query language inside stylesheets
+	 promotes the use of a purely document-dependent, side-effect-free
+	 coding style. But unlike XSLT which uses its own dedicated control
+	 language with an XML-compliant syntax, XPathScript uses Perl which
+	 is terse and highly extendable.
+      </para>
+      <para>
+	 The result of the merge is an extremely powerful tool for
+	 rendering complex XML documents into other formats. Stylesheets
+	 written in XPathScript are very easy to create, extend and reuse,
+	 even if they manage hundreds of different XML tags.
+      </para>
+   <title>
+	 XML::XPathScript - a Perl framework for XML stylesheets
+      </title>
+   
+   <section id="ID-fce4ef88dc097a256585250f262a04b0"><title>SYNOPSIS</title>
+      <screen><![CDATA[use XML::XPathScript;
+
+# the short way
+my $xps = XML::XPathScript->new;
+my $transformed = $xps->transform( $xml, $stylesheet );
+
+# having the output piped to STDOUT directly
+my $xps = XML::XPathScript->new( xml => $xml, stylesheet => $stylesheet );
+$xps->process;
+
+# caching the compiled stylesheet for reuse and
+# outputting to multiple files
+my $xps = XML::XPathScript->new( stylesheetfile => $filename )
+foreach my $xml (@xmlfiles) {
+  my $transformed = $xps->transform( $xml );
+
+  # do stuff with $transformed ...
+};
+
+# Making extra variables available to the stylesheet dialect:
+my $xps = XML::XPathScript->new;
+$xps->compile( qw/ $foo $bar / );
+
+         # in stylesheet, $foo will be set to 'a'
+         # and $bar to 'b'
+$xps->transform( $xml, $stylesheet, [ 'a', 'b' ] );]]></screen>
+   </section>
+   
+   <section id="ID-5af7eff5a65d9bdf59de94ca2d12fba6"><title>STYLESHEET WRITER DOCUMENTATION</title>
+      <para>
+	 If you are interested to write stylesheets, refers to the
+	 <emphasis role="bold">XML::XPathScript::Stylesheet</emphasis>
+	 manpage. You might also want to take a peek at the manpage of
+	 <emphasis role="bold">xpathscript</emphasis>, a program bundled
+	 with this module to perform XPathScript transformations via the
+	 command line.
+      </para>
+   </section>
+   <section id="ID-7414df9549a121fb0b1d2b3c1d074600"><title>STYLESHEET UTILITY METHODS</title>
+      <para>
+	 Those methods are meants to be used from within a stylesheet.
+      </para>
+      <section id="ID-a03d2030d2cfcd97965e16e0e8d0e45b"><title>current</title>
+         <screen><![CDATA[$xps = XML::XPathScript->current]]></screen>
+         <para>
+	    This class method returns the stylesheet object currently being
+	    applied. This can be called from anywhere within the
+	    stylesheet, except a BEGIN or END block or similar. <emphasis role="bold">Beware though</emphasis> that using the return
+	    value for altering (as opposed to reading) stuff from anywhere
+	    except the stylesheet's top level is unwise.
+         </para>
+      </section>
+      <section id="ID-69a97e57f3b13c3443420dd7b0981505"><title>interpolation</title>
+         <screen><![CDATA[$interpolate = $XML::XPathScript::current->interpolation
+$interpolate = $XML::XPathScript::current->interpolation( $boolean )]]></screen>
+         <para>
+	    Gets (first call form) or sets (second form) the XPath
+	    interpolation boolean flag. If true, values set in <literal role="code"><![CDATA[ pre ]]></literal> and <literal role="code"><![CDATA[ post ]]></literal> may contain
+	    expressions within curly braces, that will be interpreted as
+	    XPath expressions and substituted in place.
+         </para>
+         <para>
+	    For example, when interpolation is on, the following code
+         </para>
+         <screen><![CDATA[$template->set( link => { pre  => '<a href="{@url}">',
+                          post => '</a>'               } );]]></screen>
+         <para>
+	    is enough for rendering a <literal role="code"><![CDATA[<link>]]></literal> element as an HTML
+	    hyperlink. The interpolation-less version is slightly more
+	    complex as it requires a <literal role="code"><![CDATA[testcode]]></literal>:
+         </para>
+         <screen><![CDATA[sub link_testcode  {
+   my ($node, $t) = @_;
+   my $url = $node->findvalue('@url');
+   $t->set({ pre  => "<a href='$url'>",
+             post => "</a>"             });
+       return DO_SELF_AND_KIDS();
+};]]></screen>
+         <para>
+	    Interpolation is on by default.
+         </para>
+      </section>
+      <section id="ID-e15f0223cef4ec45e59ce62ae2cd2a98"><title>interpolation_regex</title>
+         <screen><![CDATA[$regex = $XML::XPathScript::curent->interpolation_regex
+$XML::XPathScript::curent->interpolation_regex( $regex )]]></screen>
+         <para>
+	    Gets or sets the regex to use for interpolation. The value to
+	    be interpolated must be capture by $1.
+         </para>
+         <para>
+	    By default, the interpolation regex is qr/{(.*?)}/.
+         </para>
+         <para>
+	    Example:
+         </para>
+         <screen><![CDATA[$XML::XPathScript::current->interpolation_regex( qr#\|(.*?)\|# );
+
+$template->set( bird => { pre => '|@name| |@gender| |@type|' } );]]></screen>
+      </section>
+      <section id="ID-4e1d282708eed467b7b505372f756682"><title>binmode</title>
+         <para>
+	    Declares that the stylesheet output is <emphasis role="bold">not</emphasis> in UTF-8, but instead in an
+	    (unspecified) character encoding embedded in the stylesheet
+	    source that neither Perl nor XPathScript should have any
+	    business dealing with. Calling <literal role="code"><![CDATA[XML::XPathScript->current()->binmode()]]></literal>
+	    is an <emphasis role="bold">irreversible</emphasis> operation
+	    with the consequences outlined in <link linkend="ID-c1e686f7ae9900d55b1b1a62d91c721a"><quote>The
+	    Unicode mess</quote></link>.
+         </para>
+      </section>
+   </section>
+   <section id="ID-1adf09c77d8430b9c3c896c1f6e58b90"><title>TECHNICAL DOCUMENTATION</title>
+      <para>
+	 The rest of this POD documentation is <emphasis role="bold">not</emphasis> useful to programmers who just want to
+	 write stylesheets; it is of use only to people wanting to call
+	 existing stylesheets or more generally embed the XPathScript
+	 engine into some wider framework.
+      </para>
+      <para>
+	 <emphasis role="italic">XML::XPathScript</emphasis> is an
+	 object-oriented class with the following features:
+      </para>
+      <para>
+         <itemizedlist>
+            <listitem>
+               <para>
+		  an <emphasis role="italic">embedded Perl
+		  dialect</emphasis> that allows the merging of the
+		  stylesheet code with snippets of the output document.
+		  Don't be afraid, this is exactly the same kind of stuff
+		  as in <emphasis role="italic">Text::Template</emphasis>,
+		  <emphasis role="italic">HTML::Mason</emphasis> or other
+		  similar packages: instead of having text inside Perl
+		  (that one <emphasis role="italic">print()</emphasis>s),
+		  we have Perl inside text, with a special escaping form
+		  that a preprocessor interprets and extracts. For
+		  XPathScript, this preprocessor is embodied by the
+		  <emphasis role="italic">xpathscript</emphasis> shell tool
+		  (see <link linkend="ID-269b63941e6959227fe8a4c40841af68"><quote>xpathscript
+		  Invocation</quote></link>) and also available through
+		  this package's API;
+               </para>
+            </listitem>
+            <listitem>
+               <para>
+		  a <emphasis role="italic">templating engine</emphasis>,
+		  that does the apply-templates loop, starting from the top
+		  XML node and applying templates to it and its subnodes as
+		  directed by the stylesheet.
+               </para>
+            </listitem>
+         </itemizedlist>
+      </para>
+      <para>
+	 When run, the stylesheet is expected to fill in the <emphasis role="italic">template object</emphasis> $template, which is a
+	 lexically-scoped variable made available to it at preprocess time.
+      </para>
+   </section>
+   <section id="ID-c7c57b42f5d4464a60bcb05fc387b9d0"><title>METHODS</title>
+      <section id="ID-cdf8e5289517c63f5b904136dc7c3e00"><title>new</title>
+         <screen><![CDATA[$xps = XML::XPathScript->new( %arguments )]]></screen>
+         <para>
+	    Creates a new XPathScript translator. The recognized named
+	    arguments are
+         </para>
+         <para>
+            <variablelist>
+               <varlistentry>
+                  <term><anchor id="ID-bb8b0b4a76285186e87c93c677409fc3"/>xml =&gt; $xml</term>
+                  <listitem>
+                     <para>
+			$xml is a scalar containing XML text, or a
+			reference to a filehandle from which XML input is
+			available, or an <emphasis role="italic">XML::XPath</emphasis> or <emphasis role="italic">XML::libXML</emphasis> object.
+                     </para>
+                     <para>
+			An XML::XPathscript object without an <emphasis role="italic">xml</emphasis> argument to the
+			constructor is only able to compile stylesheets
+			(see <link linkend="ID-fce4ef88dc097a256585250f262a04b0"><quote>SYNOPSIS</quote></link>).
+                     </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-429769c5a392b74b8900a99259e10557"/>stylesheet =&gt; $stylesheet</term>
+                  <listitem>
+                     <para>
+			$stylesheet is a scalar containing the stylesheet
+			text, or a reference to a filehandle from which the
+			stylesheet text is available.  The stylesheet text
+			may contain unresolved <literal role="code"><![CDATA[<!--#include -->]]></literal>
+			constructs, which will be resolved relative to ".".
+                     </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-475ccb59ef1c5b1f6b01a9d3d0b65d5e"/>stylesheetfile =&gt; $filename</term>
+                  <listitem>
+                     <para>
+			Same as <emphasis role="italic">stylesheet</emphasis> but let
+			<emphasis role="italic">XML::XPathScript</emphasis>
+			do the loading itself.	Using this form, relative
+			<literal role="code"><![CDATA[<!--#include
+			-->]]></literal>s in the stylesheet file will be
+			honored with respect to the dirname of $filename
+			instead of "."; this provides SGML-style behaviour
+			for inclusion (it does not depend on the current
+			directory), which is usually what you want.
+                     </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-d33c6c4586bafe481de0708da54e9237"/>compiledstylesheet =&gt; $function</term>
+                  <listitem>
+                     <para>
+			Re-uses a previous return value of <emphasis role="italic">compile()</emphasis> (see <link linkend="ID-fce4ef88dc097a256585250f262a04b0"><quote>SYNOPSIS</quote></link>
+			and <link linkend="ID-e33c251ddd2560a2b673073a1d20705f"><quote>compile</quote></link>),
+			typically to apply the same stylesheet to several
+			XML documents in a row.
+                     </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-6b01240d7bd59eedbc9b70fe6f3d9c72"/>interpolation_regex =&gt; $regex</term>
+                  <listitem>
+                     <para>
+			Sets the interpolation regex. Whatever is captured
+			in $1 will be used as the xpath expression.
+			Defaults to qr/{(.*?)}/.
+                     </para>
+                  </listitem>
+               </varlistentry>
+            </variablelist>
+         </para>
+      </section>
+      <section id="ID-3eed59d9f6fc6a537ddc22931658f328"><title>transform</title>
+         <screen><![CDATA[$xps->transform( $xml, $stylesheet, \@args )]]></screen>
+         <para>
+	    Transforms the document $xml with the $stylesheet (optionally
+	    passing to the stylesheet the argument array @args) and returns
+	    the result.
+         </para>
+         <para>
+	    If the passed $xml or $stylesheet is undefined, the previously
+	    loaded xml document or stylesheet is used.
+         </para>
+         <para>
+	    E.g.,
+         </para>
+         <screen><![CDATA[# vanilla-flavored transformation
+my $xml = '<doc>...</doc>';
+my $stylesheet = '<% ... %>';
+my $transformed = $xps->transform( $xml, $stylesheet );
+
+# transform many documents
+$xps->set_stylesheet( $stylesheet );
+for my $xml ( @xml_documents ) {
+    my $transformed = $xps->transform( $xml );
+    # do stuff with $transformed ...
+}
+
+# do many transformation of a document
+$xps->set_xml( $xml );
+for my $stylesheet ( @stylesheets ) {
+    my $transformed = $xps->transform( undef, $stylesheet );
+    # do stuff with $transformed ...
+}]]></screen>
+      </section>
+      <section id="ID-30d037b7c7e573980c991cdd3bdbf625"><title>set_xml</title>
+         <screen><![CDATA[$xps->set_xml( $xml )]]></screen>
+         <para>
+	    Sets the xml document to $xml. $xml can be a file, a file
+	    handler reference, a string, or a XML::LibXML or XML::XPath
+	    node.
+         </para>
+      </section>
+      <section id="ID-20fa99240c8a4a362c33890b3a9d9f72"><title>set_stylesheet</title>
+         <screen><![CDATA[$xps->set_stylesheet( $stylesheet )]]></screen>
+         <para>
+	    Sets the processor's stylesheet to $stylesheet.
+         </para>
+      </section>
+      <section id="ID-73e28e8a31b3308b3d4439d0ac261cb8"><title>process</title>
+         <screen><![CDATA[$xps->process
+$xps->process( $printer )
+$xps->process( $printer, @varvalues )]]></screen>
+         <para>
+	    Processes the document and stylesheet set at construction time,
+	    and prints the result to STDOUT by default. If $printer is set,
+	    it must be either a reference to a filehandle open for output,
+	    or a reference to a string, or a reference to a subroutine
+	    which does the output, as in
+         </para>
+         <screen><![CDATA[open my $fh, '>', 'transformed.txt' 
+    or die "can't open file transformed.txt: $!";
+$xps->process( $fh );
+
+my $transformed;
+$xps->process( \$transformed );
+
+$xps->process( sub { 
+    my $output = shift;
+    $output =~ y/<>/%%/;
+    print $output;
+} );]]></screen>
+         <para>
+	    If the stylesheet was <emphasis role="italic">compile()</emphasis>d with extra <emphasis role="italic">varname</emphasis>s, then the calling code should
+	    call <emphasis role="italic">process()</emphasis> with a
+	    corresponding number of @varvalues. The corresponding lexical
+	    variables will be set accordingly, so that the stylesheet code
+	    can get at them (looking at <link linkend="ID-fce4ef88dc097a256585250f262a04b0"><quote>SYNOPSIS</quote></link>)
+	    is the easiest way of getting the meaning of this sentence).
+         </para>
+      </section>
+      <section id="ID-944d740589f1b55b90ae74edfc7ba020"><title>extract</title>
+         <screen><![CDATA[$xps->extract( $stylesheet )
+$xps->extract( $stylesheet, $filename )
+$xps->extract( $stylesheet, @includestack ) # from include_file() only]]></screen>
+         <para>
+	    The embedded dialect parser. Given $stylesheet, which is either
+	    a filehandle reference or a string, returns a string that holds
+	    all the code in real Perl. Unquoted text and <literal role="code"><![CDATA[<%= stuff %>]]></literal> constructs in
+	    the stylesheet dialect are converted into invocations of
+	    <emphasis role="italic">XML::XPathScript-&gt;current()-&gt;print()</emphasis>,
+	    while <literal role="code"><![CDATA[<% stuff %>]]></literal>
+	    constructs are transcripted verbatim.
+         </para>
+         <para>
+	    <literal role="code"><![CDATA[<!-- #include -->]]></literal>
+	    constructs are expanded by passing their filename argument to
+	    <link linkend="ID-f039415eafea5810b12c3a4eff1eb31e"><quote>include_file</quote></link>
+	    along with @includestack (if any) like this:
+         </para>
+         <screen><![CDATA[$self->include_file($includefilename,@includestack);]]></screen>
+         <para>
+	    @includestack is not interpreted by <emphasis role="italic">extract()</emphasis> (except for the first entry,
+	    to create line tags for the debugger). It is only a bandaid for
+	    <emphasis role="italic">include_file()</emphasis> to pass the
+	    inclusion stack to itself across the mutual recursion existing
+	    between the two methods (see <link linkend="ID-f039415eafea5810b12c3a4eff1eb31e"><quote>include_file</quote></link>).
+	     If <emphasis role="italic">extract()</emphasis> is invoked
+	    from outside <emphasis role="italic">include_file()</emphasis>,
+	    the last invocation form should not be used.
+         </para>
+         <para>
+	    This method does a purely syntactic job. No special framework
+	    declaration is prepended for isolating the code in its own
+	    package, defining $t or the like (<link linkend="ID-e33c251ddd2560a2b673073a1d20705f"><quote>compile</quote></link>
+	    does that). It may be overriden in subclasses to provide
+	    different escape forms in the stylesheet dialect.
+         </para>
+      </section>
+      <section id="ID-27c0a0f6e146094964e1fa7190caf7d3"><title>read_stylesheet</title>
+         <screen><![CDATA[$string = $xps->read_stylesheet( $stylesheet )]]></screen>
+         <para>
+	    Read the $stylesheet (which can be a filehandler or a string).
+	    Used by <emphasis role="italic">extract</emphasis> and exists
+	    such that it can be overloaded in <emphasis role="italic">Apache::AxKit::Language::YPathScript</emphasis>.
+         </para>
+      </section>
+      <section id="ID-f039415eafea5810b12c3a4eff1eb31e"><title>include_file</title>
+         <screen><![CDATA[$xps->include_file( $filename )
+$xps->include_file( $filename, @includestack )]]></screen>
+         <para>
+	    Resolves a <literal role="code"><![CDATA[<!--#include
+	    file="foo" -->]]></literal> directive on behalf of <emphasis role="italic">extract()</emphasis>, that is, returns the script
+	    contents of <emphasis role="italic">$filename</emphasis>. The
+	    return value must be de-embedded too, which means that
+	    <emphasis role="italic">extract()</emphasis> has to be called
+	    recursively to expand the contents of $filename (which may
+	    contain more <literal role="code"><![CDATA[<!--#include
+	    -->]]></literal>s etc.)
+         </para>
+         <para>
+	    $filename has to be slash-separated, whatever OS it is you are
+	    using (this is the XML way of things). If $filename is relative
+	    (i.e. does not begin with "/" or "./"), it is resolved
+	    according to the basename of the stylesheet that includes it
+	    (that is, $includestack[0], see below) or "." if we are in the
+	    topmost stylesheet. Filenames beginning with "./" are
+	    considered absolute; this gives stylesheet writers a way to
+	    specify that they really really want a stylesheet that lies in
+	    the system's current working directory.
+         </para>
+         <para>
+	    @includestack is the include stack currently in use, made up of
+	    all values of $filename through the stack, lastly added
+	    (innermost) entries first. The toplevel stylesheet is not in
+	    @includestack (that is, the outermost call does not specify an
+	    @includestack).
+         </para>
+         <para>
+	    This method may be overridden in subclasses to provide support
+	    for alternate namespaces (e.g. ``axkit://'' URIs).
+         </para>
+         <para>
+	    Compiles the stylesheet set at <emphasis role="italic">new()</emphasis> time and returns an anonymous
+	    CODE reference.
+         </para>
+         <para>
+	    <emphasis role="italic">varname1</emphasis>, <emphasis role="italic">varname2</emphasis>, etc. are extraneous
+	    arguments that will be made available to the stylesheet dialect
+	    as lexically scoped variables. <link linkend="ID-fce4ef88dc097a256585250f262a04b0"><quote>SYNOPSIS</quote></link>
+	    shows how to use this feature to pass variables to AxKit
+	    XPathScript stylesheets, which explains this feature better
+	    than a lengthy paragraph would do.
+         </para>
+         <para>
+	    The return value is an opaque token that encapsulates a
+	    compiled stylesheet.  It should not be used, except as the
+	    <emphasis role="italic">compiledstylesheet</emphasis> argument
+	    to <emphasis role="italic">new()</emphasis> to initiate new
+	    objects and amortize the compilation time.	Subclasses may
+	    alter the type of the return value, but will need to overload
+	    <emphasis role="italic">process()</emphasis> accordingly of
+	    course.
+         </para>
+         <para>
+	    The <emphasis role="italic">compile()</emphasis> method is
+	    idempotent. Subsequent calls to it will return the very same
+	    token, and calls to it when a <emphasis role="italic">compiledstylesheet</emphasis> argument was set at
+	    <emphasis role="italic">new()</emphasis> time will return said
+	    argument.
+         </para>
+      </section>
+      <section id="ID-97c17d338c36a5b675a98876ec956f54"><title>print</title>
+         <screen><![CDATA[$xps->print($text)]]></screen>
+         <para>
+	    Outputs a chunk of text on behalf of the stylesheet. The
+	    default implementation is to use the second argument to <link linkend="ID-73e28e8a31b3308b3d4439d0ac261cb8"><quote>process</quote></link>.
+	    Overloading this method in a subclass provides yet another
+	    method to redirect output.
+         </para>
+      </section>
+      <section id="ID-4550ee264eae687a0f3efc1cc4341021"><title>get_stylesheet_dependencies</title>
+         <screen><![CDATA[@files = $xps->get_stylesheet_dependencies]]></screen>
+         <para>
+	    Returns the files the loaded stylesheet depends on (i.e., has
+	    been included by the stylesheet or one of its includes). The
+	    order in which files are returned by the function has no
+	    special signification.
+         </para>
+      </section>
+   </section>
+   <section id="ID-8c1fb8d3b004d6b0d71eb8f0c64d0afa"><title>FUNCTIONS</title>
+      <para>
+	 #=head2 gen_package_name # #Generates a fresh package name in
+	 which we would compile a new #stylesheet. Never returns twice the
+	 same name.
+      </para>
+      <section id="ID-7e366da643486d5b5065caf7c74054cf"><title>document</title>
+         <screen><![CDATA[$nodeset = $xps->document( $uri )]]></screen>
+         <para>
+	    Reads XML given in $uri, parses it and returns it in a nodeset.
+         </para>
+      </section>
+   </section>
+   
+   
+   <section id="ID-b48f9f8ad1d0dcfaa755153ede8abbba"><title>LICENSE</title>
+      <para>
+	 This is free software. You may distribute it under the same terms
+	 as Perl itself.
+      </para>
+   </section>
+   <section id="ID-5ff133e983e51f81eb1c1b414abe82f1"><title>SEE ALSO</title>
+      <para>
+	 <citerefentry>
+	 <refentrytitle>XML::XPathScript::Stylesheet</refentrytitle>
+	 </citerefentry>, <citerefentry>
+	 <refentrytitle>XML::XPathScript::Processor</refentrytitle>
+	 </citerefentry>, <citerefentry>
+	 <refentrytitle>XML::XPathScript::Template</refentrytitle>
+	 </citerefentry>, <citerefentry>
+	 <refentrytitle>XML::XPathScript::Template::Tag</refentrytitle>
+	 </citerefentry>
+      </para>
+      <para>
+	 Guide of the original Axkit XPathScript:
+	 http://axkit.org/wiki/view/AxKit/XPathScriptGuide
+      </para>
+      <para>
+	 XPath documentation from W3C: http://www.w3.org/TR/xpath
+      </para>
+      <para>
+	 Unicode character table:
+	 http://www.unicode.org/charts/charindex.html
+      </para>
+   </section>
+<titleabbrev>
+	 XML::XPathScript </titleabbrev></chapter><chapter><title>
+	 XML::XPathScript::Stylesheet - XPathScript's Stylesheet Writer
+	 Guide
+      </title>
+   
+   <section id="ID-7605e1d4c42605b03e66995820c0757e"><title>STYLESHEET SYNTAX</title>
+      <para>
+	 An XPathScript stylesheet is written in an ASP-like format;
+	 everything that is not enclosed within special delimiters are
+	 printed verbatim.
+      </para>
+      <section id="ID-bf73f5caec716b6c9d10e2b2196f7fcc"><title>Delimiters</title>
+         <section id="ID-81f7a2ef9f16439db0a832702105c362"><title>&lt;% %&gt;</title>
+            <para>
+	       Evaluates the code enclosed without printing anything.
+            </para>
+            <para>
+	       Example:
+            </para>
+            <screen><![CDATA[<% $template->set( 'foo' => { pre => 'bar' } ); %>]]></screen>
+         </section>
+         <section id="ID-684e8fea7a9f0d21ff12636c3e26e0ce"><title>&lt;%=  %&gt;</title>
+            <para>
+	       Evaluates the code enclosed and prints out its result.
+            </para>
+            <para>
+	       Example:
+            </para>
+            <screen><![CDATA[Author: <%= findvalue( '/doc/author@name' ) %>]]></screen>
+         </section>
+         <section id="ID-e8434b63dabe5d21ed989adb1089d5c3"><title>&lt;%#  %&gt;</title>
+            <para>
+	       Comments out the code enclosed. The code will not be
+	       executed, nor show in the transformed document.
+            </para>
+         </section>
+         <section id="ID-4aa9101b0344992f9ba6aa8ce7e05271"><title>&lt;%~ %&gt;</title>
+            <para>
+	       A shorthand for &lt;%= apply_templates(	) %&gt;
+            </para>
+            <para>
+	       Example:
+            </para>
+            <screen><![CDATA[Author: <%~ /doc/author %>]]></screen>
+         </section>
+         <section id="ID-ece4fae32709ff54d8d0254db052e2f9"><title>&lt;%- -%&gt;, &lt;%-= -%&gt;, &lt;%-~ -%&gt;, &lt;%-#  -%&gt;</title>
+            <para>
+	       If a dash is added to a delimiter, all whitespaces
+	       (including carriage returns) predeceding or following the
+	       delimiter are removed from the transformed document. This is
+	       useful to keep a stylesheet readable without generating
+	       transformed document with many whitespace gaps. The dash can
+	       be added independently to the right and left delimiter.
+            </para>
+            <para>
+	       Example:
+            </para>
+            <screen><![CDATA[<h1>
+    <%-~ /doc/title -%>
+</h1>]]></screen>
+         </section>
+         <section id="ID-685c0f5af2f19a777e2e09b4500f1ab5"><title>&lt;!--#include file="/path/to/file" --&gt;</title>
+            <para>
+	       Insert the content of the file into the stylesheet. The path
+	       is relative to the stylesheet, not the processed document.
+            </para>
+         </section>
+      </section>
+   </section>
+   <section id="ID-9e4fc23e6166020793684b93e48d2459"><title>PRE-DEFINED VARIABLES</title>
+      <para>
+	 This section describes pre-defined variables accessible from
+	 within a XPathScript stylesheet.
+      </para>
+      <para>
+         <variablelist>
+            <varlistentry>
+               <term><anchor id="ID-1b2a4064bbf2f589371de00679e1747d"/>$template, $t, $XML::XPathScript::trans</term>
+               <listitem>
+                  <para>
+		     All three variables point to the stylesheet's
+		     template. See section <link linkend="ID-3f95173e3865feebe9279aa83f513fd3"><quote>TRANSFORMATION
+		     TEMPLATE</quote></link>.
+                  </para>
+               </listitem>
+            </varlistentry>
+            <varlistentry>
+               <term><anchor id="ID-de4635147550e30f99b6f24afe0d848c"/>$XML::XPathScript::xp</term>
+               <listitem>
+                  <para>
+		     The DOM of the xml document unto which the stylesheet
+		     is applied.
+                  </para>
+               </listitem>
+            </varlistentry>
+            <varlistentry>
+               <term><anchor id="ID-a75933d17ed90a2466ed3a50fc77dcc7"/>$XML::XPathScript::current</term>
+               <listitem>
+                  <para>
+		     The XML::XPathScript object from which the stylesheet
+		     has been invoked. See the <citerefentry>
+		     <refentrytitle>XML::XPathScript</refentrytitle>
+		     </citerefentry> manpage for a list of utility methods
+		     that can be called from within the stylesheet.
+                  </para>
+               </listitem>
+            </varlistentry>
+         </variablelist>
+      </para>
+   </section>
+   <section id="ID-3f95173e3865feebe9279aa83f513fd3"><title>TRANSFORMATION TEMPLATE</title>
+      <para>
+	 The transformation template defines the modification that will
+	 automatically be brought on document elements when
+	 'apply_templates' is called.
+      </para>
+      <para>
+	 See the <citerefentry>
+	 <refentrytitle>XML::XPathScript::Template</refentrytitle>
+	 </citerefentry> manpage for details on how to configure the
+	 template.
+      </para>
+      <section id="ID-5f923e67335c0d95d6043a1254ea507f"><title>Special tags</title>
+         <para>
+	    In addition to regular tag names, three special tags can be
+	    used in the template: text() and comment(), that match the
+	    corresponding nodes in the document, and '*', a catch-all tag.
+         </para>
+         <screen></screen>
+         <section id="ID-6278a84638fe664377e256bf0a21186a"><title>text(), #text</title>
+            <para>
+	       Matches text nodes.
+            </para>
+            <para>
+	       Note that text nodes can be assigned a special action. See
+	       section <link linkend="ID-b8ee08cfdb0b250473b77cd9c7b427fb"><quote>action</quote></link>
+	       of this manpage.
+            </para>
+            <para>
+	       Example:
+            </para>
+            <screen><![CDATA[<%
+    $template->set( 'text()' => { pre  => '\begin{comment}',
+                                  post => '\end{comment}',   );
+%>]]></screen>
+         </section>
+         <section id="ID-a6b3897c71bbee3e683978299d694e90"><title>comment()</title>
+            <para>
+	       Matches comment nodes.
+            </para>
+         </section>
+         <section id="ID-c4929db176381916311e3129510d4fb3"><title>'*'</title>
+            <para>
+	       Matches any regular tag (that is, not comments nor text)
+	       that isn't explicitly matched.
+            </para>
+         </section>
+      </section>
+      <section id="ID-dfce29107daf5046470b76c376ca6f8d"><title>Tag Attributes</title>
+         <para>
+	    The tags' attributes define how the associated nodes are
+	    transformed by the template.
+         </para>
+         <section id="ID-16ebb50d1b19bd20ffbafed55b95c5bd"><title>pre, intro, prechildren, prechild, postchild, postchildren, extro, post</title>
+            <para>
+	       Define the text to be printed around a node. All defined
+	       attributes are outputed in the following order:
+            </para>
+            <screen><![CDATA[pre
+<tag>              # if showtag == 1
+intro   
+prechildren        # if <tag> has children
+prechild           # for each child
+[ child node ]
+postchild          # for each child
+postchildren       # if <tag> has children
+extro
+</tag>             # if showtag == 1
+post]]></screen>
+            <para>
+	       If interpolation is enabled, XPath expressions delimited by
+	       curly braces can be imbedded in any of these attributes.
+            </para>
+            <screen><![CDATA[$template->set( 'movie' => { 
+    pre => 'title: {./@title}, year: {./year}' 
+} );]]></screen>
+            <para>
+	       Interpolation is enabled via the XML::XPathScript object's
+	       method interpolation.
+            </para>
+            <para>
+	       The expressions' delimiter can be modified via the
+	       XML::XPathScript object's method interpolation_regex.
+            </para>
+         </section>
+         <section id="ID-56e06f143bdc81f65b8d7fbc345ee50d"><title>showtag</title>
+            <para>
+	       If set to true, the original tag is printed out.
+            </para>
+         </section>
+         <section id="ID-b8ee08cfdb0b250473b77cd9c7b427fb"><title>action</title>
+            <para>
+	       Dictate how the node and its children are processed. The
+	       allowed values are:
+            </para>
+            <para>
+               <variablelist>
+                  <varlistentry>
+                     <term><anchor id="ID-491db3b9dcb82f1c4fdca908f2db2d50"/>DO_SELF_AND_KIDS</term>
+                     <listitem>
+                        <para>
+			   Process the current node and its children.
+                        </para>
+                     </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                     <term><anchor id="ID-e3e84e3032e8a055004b14ef3833a2ba"/>DO_SELF_ONLY</term>
+                     <listitem>
+                        <para>
+			   Process the current node, but not its children.
+                        </para>
+                     </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                     <term><anchor id="ID-efe9b6b8ae12833bd81181700d9d4331"/>DO_NOT_PROCESS</term>
+                     <listitem>
+                        <para>
+			   Do not process either the current node or any of
+			   its children.
+                        </para>
+                     </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                     <term><anchor id="ID-2ebabbddecd1c206a0c009f896071129"/>DO_TEXT_AS_CHILD</term>
+                     <listitem>
+                        <para>
+			   Only meaningful for text nodes. When this value
+			   is given, the processor pretends that the text
+			   is a child of the node, which basically means
+			   that <literal role="code"><![CDATA[$t->{pre}]]></literal> and
+			   <literal role="code"><![CDATA[$t->{post}]]></literal>
+			   will frame the text instead of replacing it.
+                        </para>
+                        <para>
+			   Example:
+                        </para>
+                        <screen><![CDATA[$template->( 'text()' => { pre => 'replacement text' } );
+# will transform <foo>blah</foo> 
+# into <foo>replacement text</foo>
+
+$template->( 'text()' => { action => DO_TEXT_AS_CHILD,
+                           pre => 'text: '   } );
+# will transform <foo>blah</foo> 
+# into <foo>text: blah</foo>]]></screen>
+                     </listitem>
+                  </varlistentry>
+                  <varlistentry>
+                     <term><anchor id="ID-c139564fe9105bae864749c090a1be4c"/><emphasis role="italic">xpath expression</emphasis></term>
+                     <listitem>
+                        <para>
+			   Process the current node and all its children
+			   that match the xpath expression. The XPath
+			   expression is anchored on the current node.
+                        </para>
+                        <para>
+			   Example:
+                        </para>
+                        <screen><![CDATA[# only do the children of 'foo' having their attribute 'process' 
+# set to 'yes'
+$template->set( 'foo' => { action => './*[@process = "yes"]' } );]]></screen>
+                     </listitem>
+                  </varlistentry>
+               </variablelist>
+            </para>
+         </section>
+         <section id="ID-0c37645d1e3b3499ec1bfbf2007fb2ad"><title>testcode</title>
+            <para>
+	       A reference to a subroutine that will be executed upon
+	       visiting the tag. When invoked, the subroutine is passed two
+	       parameters: the current node's object and a tag object
+	       holding all the attributes of the visited tag. Modifications
+	       to the tag object only affect the transformation of the
+	       current node. To change the transformation of all subsequent
+	       tag of the same type, use the stylesheet $template instead.
+            </para>
+            <para>
+	       Also, the return value of the subroutine overrides the value
+	       of the 'action' attribute.
+            </para>
+            <para>
+	       Example:
+            </para>
+            <screen><![CDATA[<% 
+    $template->set( '*' => { testcode => \&uppercase_tag } );
+
+sub uppercase_tag {
+    my( $n, $tag ) = @_;
+    my $name = uc $n->getName;
+    $tag->set({ pre => "<$name>",
+                post => "</$name>", });
+
+        return DO_SELF_AND_KIDS;
+    }
+%>]]></screen>
+         </section>
+         <section id="ID-a9c232fa1e08b1493672056188029084"><title>rename</title>
+            <para>
+	       Renames the tag to the given value. Implicitly sets
+	       'showtag' to true.
+            </para>
+            <para>
+	       Example:
+            </para>
+            <screen><![CDATA[# change <foo abc="def">..</foo> to 
+# <bar abc="def">...</bar>
+<% $t->set( foo => { rename => 'bar' } ); %>]]></screen>
+         </section>
+      </section>
+   </section>
+   <section id="ID-872a27f994118815c4e066c0afc83581"><title>STYLESHEET WRITING GUIDELINES</title>
+      <para>
+	 Here are a few things to watch out for when coding stylesheets.
+      </para>
+      <section id="ID-4540556a984c682a4370e8ad961c2e72"><title>XPath scalar return values considered harmful</title>
+         <para>
+	    XML::XPath calls such as <emphasis role="italic">findvalue()</emphasis> return objects in an
+	    object class designed to map one of the types mandated by the
+	    XPath spec (see <citerefentry>
+	    <refentrytitle>XML::XPath</refentrytitle> </citerefentry> for
+	    details). This is often not what a Perl programmer comes to
+	    expect (e.g. strings and numbers cannot be treated the same).
+	    There are some work-arounds built in XML::XPath, using operator
+	    overloading: when using those objects as strings (by
+	    concatenating them, using them in regular expressions etc.),
+	    they become strings, through a transparent call to one of their
+	    methods such as <emphasis role="italic"> -</emphasis>value()
+	    &gt;. However, we do not support this for a variety of reasons
+	    (from limitations in <link linkend="ID-535d6059522d06dd71dbc8a38c7e6423"><quote>overload</quote></link>
+	    to stylesheet compatibility between XML::XPath and XML::LibXML
+	    to Unicode considerations), and that is why our <link linkend="ID-526032676bc0fc6643fc8128450e0d3d"><quote>findvalue</quote></link>
+	    and friends return a real Perl scalar, in violation of the
+	    XPath specification.
+         </para>
+         <para>
+	    On the other hand, <link linkend="ID-89ef75e0f1ac3ccbe368442d23000189"><quote>findnodes</quote></link>
+	    does return a list of objects in list context, and an <emphasis role="italic">XML::XPath::NodeSet</emphasis> or <emphasis role="italic">XML::LibXML::NodeList</emphasis> instance in
+	    scalar context, obeying the XPath specification in full.
+	    Therefore you most likely do not want to call <emphasis role="italic">findnodes()</emphasis> in scalar context, ever:
+	    replace
+         </para>
+         <screen><![CDATA[my $attrnode = findnodes('@url',$xrefnode); # WRONG!]]></screen>
+         <para>
+	    with
+         </para>
+         <screen><![CDATA[my ($attrnode) = findnodes('@url',$xrefnode);
+
+]]></screen>
+      </section>
+      <section id="ID-cda1ae4fc0175db4f0c4199c425343ee"><title>Do not use DOM method calls, for they make stylesheets non-portable</title>
+         <para>
+	    The <emphasis role="italic">findvalue()</emphasis> such
+	    functions described in <citerefentry>
+	    <refentrytitle>XML::XPathScript::Processor</refentrytitle>
+	    </citerefentry> are not the only way of extracting bits from
+	    the XML document. Objects passed as the first argument to the
+	    <literal role="code"><![CDATA[testcode]]></literal> tag
+	    attribute and returned by <emphasis role="italic">findnodes()</emphasis> in array context are of
+	    one of the <emphasis role="italic">XML::XPath::Node::*</emphasis> or <emphasis role="italic">XML::LibXML::*</emphasis> classes, and they
+	    feature some data extraction methods by themselves, conforming
+	    to the DOM specification.
+         </para>
+         <para>
+	    However, the names of those methods are not standardized even
+	    among DOM parsers (the accessor to the <literal role="code"><![CDATA[childNodes]]></literal> property, for
+	    example, is named <literal role="code"><![CDATA[childNodes()]]></literal> in <emphasis role="italic">XML::LibXML</emphasis> and <literal role="code"><![CDATA[getChildNodes()]]></literal> in <emphasis role="italic">XML::XPath</emphasis>!). In order to write a
+	    stylesheet that is portable between <citerefentry>
+	    <refentrytitle>XML::libXML</refentrytitle> </citerefentry> and
+	    <citerefentry> <refentrytitle>XML::XPath</refentrytitle>
+	    </citerefentry> used as back-ends to <citerefentry>
+	    <refentrytitle>XML::XPathScript</refentrytitle>
+	    </citerefentry>, one should refrain from doing that. The exact
+	    same data is available through appropriate XPath formulae,
+	    albeit more slowly, and there are also type-checking accessors
+	    such as <literal role="code"><![CDATA[is_element_node()]]></literal> in
+	    <citerefentry>
+	    <refentrytitle>XML::XPathScript::Processor</refentrytitle>
+	    </citerefentry>.
+         </para>
+      </section>
+   </section>
+   <section id="ID-012667ca00d5dc1a1f67a8fc16bfc4f2"><title>THE UNICODE MESS</title>
+      <para>
+	 Unicode is a balucitherian character numbering standard, that
+	 strives to be a superset of all character sets currently in use by
+	 humans and computers. Going Unicode is therefore the way of the
+	 future, as it will guarantee compatibility of your applications
+	 with every character set on planet Earth: for this reason, all
+	 XML-compliant APIs (XML::XPathScript being no exception) should
+	 return Unicode strings in all their calls, regardless of the
+	 charset used to encode the XML document to begin with.
+      </para>
+      <para>
+	 The gotcha is, the brave Unicode world sells itself in much the
+	 same way as XML when it promises that you'll still be able to read
+	 your data back in 30 years: that will probably turn out to be
+	 true, but until then, you can't :-)
+      </para>
+      <para>
+	 Therefore, you as a stylesheet author will more likely than not
+	 need to do some wrestling with Unicode in Perl, XML::XPathScript
+	 or not. Here is a primer on how.
+      </para>
+      <section id="ID-dbec12a7cb3f073a122bcf097d7eee45"><title>Unicode, UTF-8 and Perl</title>
+         <para>
+	    Unicode is <emphasis role="bold">not</emphasis> a text file
+	    format: UTF-8 is. Perl, when doing Unicode, prefers to use
+	    UTF-8 internally.
+         </para>
+         <para>
+	    Unicode is a character numbering standard: that is, an abstract
+	    registry that associates unique integer numbers to a cast of
+	    thousands of characters. For example the "smiling face" is
+	    character number 0x263a, and the thin space is 0x2009 (there is
+	    a URL to a Unicode character table in <link linkend="ID-5ff133e983e51f81eb1c1b414abe82f1"><quote>SEE
+	    ALSO</quote></link>). Of course, this means that the 8-bits-
+	    (or even, Heaven forbid, 7-bits-?)-per-character idea goes
+	    through the window this instant. Coding every character on 16
+	    bits in memory is an option (called UTF-16), but not as simple
+	    an idea as it sounds: one would have to rewrite nearly every
+	    piece of C code for starters, and even then the Chinese aren't
+	    quite happy with "only" 65536 character code points.
+         </para>
+         <para>
+	    Introducing UTF-8, which is a way of encoding Unicode character
+	    numbers (of any size) in an ASCII- and C-friendly way: all 127
+	    ASCII characters (such as "A" or or "/" or ".", but <emphasis role="italic">not</emphasis> the ISO-8859-1 8-bit extensions)
+	    have the same encoding in both ASCII and UTF-8, including the
+	    null character (which is good for strcpy() and friends). Of
+	    course, this means that the other characters are rendered using
+	    <emphasis role="italic">several</emphasis> bytes, for example
+	    "e" is "é" in UTF-8. The result is therefore vaguely
+	    intelligible for a Western reader.
+         </para>
+      </section>
+      <section id="ID-60e5c2ce3371bcd121400f40b0318a68"><title>Output to UTF-8 with XPathScript</title>
+         <para>
+	    The programmer- and C-friendly characteristics of UTF-8 have
+	    made it the choice for dealing with Unicode in Perl. The
+	    interpreter maintains an "UTF8-tainted" bit on every string
+	    scalar it handles (much like what <citerefentry>
+	    <refentrytitle>perlsec</refentrytitle> </citerefentry> does for
+	    untrusted data). Every function in XML::XPathScript returns a
+	    string with such bit set to true: therefore, producing UTF-8
+	    output is straightforward and one does not have to take any
+	    special precautions in XPathScript.
+         </para>
+      </section>
+      <section id="ID-7053e6ccd9b94445025144ee252ca6e4"><title>Output to a non-UTF-8 character set with XPathScript</title>
+         <para>
+	    When <link linkend="ID-4e1d282708eed467b7b505372f756682"><quote>binmode</quote></link>
+	    is invoked from the stylesheet body, it signals that the
+	    stylesheet output should <emphasis role="italic">not</emphasis>
+	    be UTF-8, but instead some user-chosen character encoding that
+	    XML::XPathScript cannot and will not know or care about.
+	    Calling <literal role="code"><![CDATA[
+	    XML::XPathScript-]]></literal>current()-&gt;binmode() &gt; has
+	    the following consequences:
+         </para>
+         <para>
+            <itemizedlist>
+               <listitem>
+                  <para>
+		     presence of this "UTF-8 taint" in the stylesheet
+		     output is now a fatal error. That is, whenever the
+		     result of a template evaluation is marked internally
+		     in Perl with the "this string is UTF-8" flag (as
+		     opposed to being treated by Perl as binary data
+		     without character meaning, see <link linkend="ID-6b570886ed05c4a33e6b1f49a73e62d9"><quote>perlunicode</quote></link>),
+		     <quote>translate_node</quote> in <citerefentry>
+		     <refentrytitle>XML::XPathScript::Processor</refentrytitle>
+		     </citerefentry> will croak;
+                  </para>
+               </listitem>
+               <listitem>
+                  <para>
+		     the stylesheet therefore needs to build an "unicode
+		     firewall". That is, <literal role="code"><![CDATA[testcode]]></literal> blocks have
+		     to take input in UTF-8 (as per the XML standard, UTF-8
+		     indeed is what will be returned by
+		     <quote>findvalue</quote> in <citerefentry>
+		     <refentrytitle>XML::XPathScript::Processor</refentrytitle>
+		     </citerefentry> and such) and provide output in binary
+		     (in whatever character set is intended for the
+		     output), lest <emphasis role="italic">translate_node()</emphasis> croaks as
+		     explained above. The <citerefentry>
+		     <refentrytitle>Unicode::String</refentrytitle>
+		     </citerefentry> module comes in handy to the
+		     stylesheet writer to cast from UTF-8 to an
+		     8-bit-per-character charset such as ISO 8859-1, while
+		     laundering Perl's internal UTF-8-string bit at the
+		     same time;
+                  </para>
+               </listitem>
+               <listitem>
+                  <para>
+		     the appropriate voodoo is performed on the output
+		     filehandle(s) so that a spurious, final charset
+		     conversion will not happen at print() time under any
+		     locales, versions of Perl, or phases of moon.
+                  </para>
+               </listitem>
+            </itemizedlist>
+         </para>
+         <screen></screen>
+      </section>
+   </section>
+   
+<titleabbrev>
+	 XML::XPathScript::Stylesheet </titleabbrev></chapter><chapter>
+      <para>
+	 The <emphasis role="italic">XML::XPathScript</emphasis>
+	 distribution offers an XML parser glue, an embedded stylesheet
+	 language, and a way of processing an XML document into a text
+	 output. This package implements the latter part: it takes an
+	 already filled out <literal role="code"><![CDATA[$template]]></literal> template object and an
+	 already parsed XML document (which come from <citerefentry>
+	 <refentrytitle>XML::XPathScript</refentrytitle> </citerefentry>
+	 behind the scenes), and provides a simple API to implement
+	 stylesheets. In particular, the <link linkend="ID-3fa0d5891df9bb140b1100136f607860"><quote>apply_templates</quote></link>
+	 function triggers the recursive expansion of the whole XML
+	 document when used as shown in <link linkend="ID-fce4ef88dc097a256585250f262a04b0"><quote>SYNOPSIS</quote></link>.
+      </para>
+   <title>
+	 XML::XPathScript::Processor - the XML transformation engine in
+	 XML::XPathScript
+      </title>
+   
+   <section id="ID-fce4ef88dc097a256585250f262a04b0"><title>SYNOPSIS</title>
+      <para>
+	 In a stylesheet <literal role="code"><![CDATA[->{testcode}]]></literal> sub for e.g.
+	 Docbook's <literal role="code"><![CDATA[<ulink>]]></literal> tag:
+      </para>
+      <screen><![CDATA[my $url = findvalue('@url',$self);
+if (findnodes("node()", $self)) {
+   # ...
+          $t->set({ pre  => "<a href='$url'>", 
+            post => '</a>'             });
+          return DO_SELF_AND_KIDS;
+} 
+else {
+  $t->set({  pre  => "<a href='$url'>$url</a>",
+             post => ''                          });
+          return DO_SELF_ONLY;
+};]]></screen>
+      <para>
+	 At the stylesheet's top-level one often finds:
+      </para>
+      <screen><![CDATA[<%= apply_templates() %>]]></screen>
+   </section>
+   
+   <section id="ID-75f9cbb2b4f499e787411edb9c49cf2b"><title>XPATHSCRIPT LANGUAGE FUNCTIONS</title>
+      <para>
+	 All of these functions are intended to be called solely from
+	 within the <literal role="code"><![CDATA[->{testcode}]]></literal>
+	 templates or <literal role="code"><![CDATA[<% %>]]></literal> or
+	 <literal role="code"><![CDATA[<%= %>]]></literal> blocks in
+	 XPathScript stylesheets. They are automatically exported to both
+	 these contexts.
+      </para>
+      <section id="ID-89ef75e0f1ac3ccbe368442d23000189"><title>findnodes</title>
+         <screen><![CDATA[( @nodes ) = findnodes( $path )
+( @nodes ) = findnodes( $path, $context )]]></screen>
+         <para>
+	    Returns a list of nodes found by XPath expression $path,
+	    optionally using $context as the context node (default is the
+	    root node of the current document).  In scalar context returns
+	    a NodeSet object (but you do not want to do that, see
+	    <quote>XPath scalar return values considered harmful</quote> in
+	    <citerefentry> <refentrytitle>XML::XPathScript</refentrytitle>
+	    </citerefentry>).
+         </para>
+      </section>
+      <section id="ID-526032676bc0fc6643fc8128450e0d3d"><title>findvalue</title>
+         <screen><![CDATA[$value = findvalue( $path )
+$value = findvalue( $path, $context )]]></screen>
+         <para>
+	    Evaluates XPath expression $path and returns the resulting
+	    value. If the path returns one of the "Literal", "Numeric" or
+	    "NodeList" XPath types, the stringification is done
+	    automatically for you using <link linkend="ID-2a50be0d5c6163bf114446290fbb184e"><quote>xpath_to_string</quote></link>.
+         </para>
+      </section>
+      <section id="ID-2a50be0d5c6163bf114446290fbb184e"><title>xpath_to_string</title>
+         <screen><![CDATA[$string = xpath_to_string( $blob )]]></screen>
+         <para>
+	    Converts any XPath data type, such as "Literal", "Numeric",
+	    "NodeList", text nodes, etc. into a pure Perl string (UTF-8
+	    tainted too - see <link linkend="ID-7b7fe1c77265d5ad3876445c1306b962"><quote>is_utf8_tainted</quote></link>).
+	    Scalar XPath types are interpreted in the straightforward way,
+	    DOM nodes are stringified into conform XML, and NodeList's are
+	    stringified by concatenating the stringification of their
+	    members (in the latter case, the result obviously is not
+	    guaranteed to be valid XML).
+         </para>
+         <para>
+	    See <quote>XPath scalar return values considered
+	    harmful</quote> in <citerefentry>
+	    <refentrytitle>XML::XPathScript</refentrytitle> </citerefentry>
+	    on why this is useful.
+         </para>
+      </section>
+      <section id="ID-d74c44e809537e54816468f3c5f96534"><title>findvalues</title>
+         <screen><![CDATA[@values = findvalues( $path )
+@values = findvalues( $path, $context )]]></screen>
+         <para>
+	    Evaluates XPath expression $path as a nodeset expression, just
+	    like <link linkend="ID-89ef75e0f1ac3ccbe368442d23000189"><quote>findnodes</quote></link>
+	    would, but returns a list of UTF8-encoded XML strings instead
+	    of node objects or node sets. See also <quote>XPath scalar
+	    return values considered harmful</quote> in <citerefentry>
+	    <refentrytitle>XML::XPathScript</refentrytitle>
+	    </citerefentry>.
+         </para>
+      </section>
+      <section id="ID-537587ef915a7f2f822dd5c8edb5d4ac"><title>findnodes_as_string</title>
+         <screen><![CDATA[@nodes = findnodes_as_string( $path )
+@nodes = findnodes_as_string( $path, $context )]]></screen>
+         <para>
+	    Similar to <link linkend="ID-d74c44e809537e54816468f3c5f96534"><quote>findvalues</quote></link>
+	    but concatenates the XML snippets.	The result obviously is not
+	    guaranteed to be valid XML.
+         </para>
+      </section>
+      <section id="ID-0f5264c86be4c5d8ea6cfeb29d8bf500"><title>matches</title>
+         <screen><![CDATA[$bool = matches( $node, $path )
+$bool = matches( $node, $path, $context )]]></screen>
+         <para>
+	    Returns true if the node matches the path (optionally in
+	    context $context)
+         </para>
+      </section>
+      <section id="ID-3fa0d5891df9bb140b1100136f607860"><title>apply_templates</title>
+         <screen><![CDATA[$transformed = apply_templates()
+$transformed = apply_templates( $xpath )
+$transformed = apply_templates( $xpath, $context )
+$transformed = apply_templates( @nodes )]]></screen>
+         <para>
+	    This is where the whole magic in XPathScript resides:
+	    recursively applies the stylesheet templates to the nodes
+	    provided either literally (last invocation form) or through an
+	    XPath expression (second and third invocation forms), and
+	    returns a string concatenation of all results. If called
+	    without arguments at all, renders the whole document (same as
+	    <literal role="code"><![CDATA[apply_templates("/")]]></literal>).
+         </para>
+         <para>
+	    Calls to <emphasis role="italic">apply_templates()</emphasis>
+	    may occur both implicitly (at the top of the document, and for
+	    rendering subnodes when the templates choose to handle that by
+	    themselves), and explicitly (because <literal role="code"><![CDATA[testcode]]></literal> routines require the
+	    XML::XPathScript::Processor to <link linkend="ID-491db3b9dcb82f1c4fdca908f2db2d50"><quote>DO_SELF_AND_KIDS</quote></link>).
+         </para>
+         <para>
+	    If appropriate care is taken in all templates (especially the
+	    <literal role="code"><![CDATA[testcode]]></literal> routines
+	    and the <emphasis role="italic">text()</emphasis> template),
+	    the string result of <emphasis role="italic">apply_templates</emphasis> need not be UTF-8 (see
+	    <quote>binmode</quote> in <citerefentry>
+	    <refentrytitle>XML::XPathScript</refentrytitle>
+	    </citerefentry>): it is thus possible to use XPathScript to
+	    produce output in any character set without an extra
+	    translation pass.
+         </para>
+      </section>
+      <section id="ID-3c43a94a903427b7cca6baeb8568a283"><title>call_template</title>
+         <screen><![CDATA[call_template( $node, $t, $templatename )]]></screen>
+         <para>
+	    <emphasis role="bold">EXPERIMENTAL</emphasis> - allows <literal role="code"><![CDATA[testcode]]></literal> routines to invoke a
+	    template by name, even if the selectors do not fit (e.g. one
+	    can apply template B to an element node of type A). Returns the
+	    stylesheeted string computed out of $node just like <link linkend="ID-3fa0d5891df9bb140b1100136f607860"><quote>apply_templates</quote></link>
+	    would.
+         </para>
+      </section>
+      <section id="ID-ec233373b69469c78fee6ff6d06fe4d6"><title>is_element_node</title>
+         <screen><![CDATA[$bool = is_element_node( $object )]]></screen>
+         <para>
+	    Returns true if $object is an element node, false otherwise.
+         </para>
+      </section>
+      <section id="ID-4f93c128af1db0248ae7ea66620b8fab"><title>is_text_node</title>
+         <screen><![CDATA[$bool = is_text_node( $object )]]></screen>
+         <para>
+	    Returns true if $object is a "true" text node (<emphasis role="bold">not</emphasis> a comment node), false otherwise.
+         </para>
+         <screen><![CDATA[$bool = is_comment_node ( $object )]]></screen>
+         <para>
+	    Returns true if $object is an XML comment node, false
+	    otherwise.
+         </para>
+      </section>
+      <section id="ID-b840ce0c2e82f2bef82e1185c88660dd"><title>is_pi_node</title>
+         <screen><![CDATA[$bool = is_pi_node( $object )]]></screen>
+         <para>
+	    Returns true iff $object is a processing instruction node.
+         </para>
+      </section>
+      <section id="ID-3f505b804ab400e7defe8a5b1701736f"><title>is_nodelist</title>
+         <screen><![CDATA[$bool = is_nodelist( $object )]]></screen>
+         <para>
+	    Returns true if $node is a node list (as returned by <link linkend="ID-89ef75e0f1ac3ccbe368442d23000189"><quote>findnodes</quote></link>
+	    in scalar context), false otherwise.
+         </para>
+      </section>
+      <section id="ID-3621884d4447fe2fa240ea24e797d832"><title>is_utf_tainted</title>
+         <screen><![CDATA[$bool = is_utf8_tainted( $string )]]></screen>
+         <para>
+	    Returns true if Perl thinks that $string is a string of
+	    characters (in UTF-8 internal representation), and false if
+	    Perl treats $string as a meaningless string of bytes.
+         </para>
+         <para>
+	    The dangerous part of the story is when concatenating a
+	    non-tainted string with a tainted one, as it causes the whole
+	    string to be re-interpreted into UTF-8, even the part that was
+	    supposedly meaningless character-wise, and that happens in a
+	    nonportable fashion (depends on locale and Perl version). So
+	    don't do that - and use this function to prevent that from
+	    happening.
+         </para>
+      </section>
+      <section id="ID-cc13ad678d1a6a7b1cd3bad0476734d6"><title>get_xpath_of_node</title>
+         <screen><![CDATA[$xpath = get_xpath_of_node( $node )]]></screen>
+         <para>
+	    Returns an XPath string that points to $node, from the root.
+	    Useful to create error messages that point at some location in
+	    the original XML document.
+         </para>
+      </section>
+   </section>
+   
+   
+<titleabbrev>
+	 XML::XPathScript::Processor </titleabbrev></chapter><chapter>
+      <para>
+	 A stylesheet's template defines the transformations and actions
+	 that are performed on the tags of a document as they are
+	 processed.
+      </para>
+      <para>
+	 The template of a stylesheet can be accessed via variables
+	 <emphasis role="italic">$t</emphasis>, <emphasis role="italic">$template</emphasis> and <emphasis role="italic">$XML::XPathScript::trans</emphasis>.
+      </para>
+      <screen></screen>
+   <title>
+	 XML::XPathScript::Template - XML::XPathScript transformation
+	 template
+      </title>
+   
+   <section id="ID-fce4ef88dc097a256585250f262a04b0"><title>SYNOPSIS</title>
+      <screen><![CDATA[<%
+    $t->set( 'important' => { 'pre' => '<blink>', 
+                              'post' => '</blink>',
+                              'prechild' => '<u>',
+                              'postchild' => '</u>',
+                              } );
+
+# urgent and annoying share the 'pre' and 'post'
+# of important
+$t->copy( 'important' => [ qw/ urgent annoying / ], 
+            [ qw/ pre post / ],        );
+
+# redHot is a synonym of important
+$t->alias( 'important' => 'redHot' );
+
+%>
+<%= apply_templates() %>]]></screen>
+   </section>
+   
+   <section id="ID-c7c57b42f5d4464a60bcb05fc387b9d0"><title>METHODS</title>
+      <section id="ID-cdf8e5289517c63f5b904136dc7c3e00"><title>new</title>
+         <screen><![CDATA[$template = XML::XPathScript::Template->new]]></screen>
+         <para>
+	    Creates and returns a new, empty template.
+         </para>
+      </section>
+      <section id="ID-784c17c43ed95226b1fda232471f9398"><title>set</title>
+         <screen><![CDATA[$template->( $tag, \%attributes )
+$template->set_template( \@tags , \%attributes )]]></screen>
+         <para>
+	    Update the $tag or @tags in the template with the given
+	    %attributes.
+         </para>
+         <para>
+	    Example:
+         </para>
+         <screen><![CDATA[$template->set( 'foo' => { pre => '<a>', post => '</a>' } );]]></screen>
+      </section>
+      <section id="ID-72f6fc3915c1e634d1f5f2a683d2dbba"><title>copy</title>
+         <screen><![CDATA[$template->copy( $original_tag, $copy_tag );
+$template->copy( $original_tag, $copy_tag, \@attributes );
+$template->copy( $original_tag, \@copy_tags );
+$template->copy( $original_tag, \@copy_tags, \@attributes );]]></screen>
+         <para>
+	    Copies all attributes (or a subset of them if @attributes is
+	    given) of $original_tag to $copy_tag.
+         </para>
+         <para>
+	    Note that subsequent modifications of the original tag will not
+	    affect the copies. To bind several tags to the same behavior,
+	    see <citerefentry> <refentrytitle>alias</refentrytitle>
+	    </citerefentry>.
+         </para>
+         <para>
+	    Example:
+         </para>
+         <screen><![CDATA[# copy the attributes 'pre' and 'post' of important 
+# to 'urgent' and 'redHot'
+$template->copy( 'important' => [ qw/ urgent redHot / ], 
+                    [ qw/ pre post / ] );]]></screen>
+      </section>
+      <section id="ID-c1690ee72fb9b2fdcbe96e0ae2851975"><title>alias</title>
+         <screen><![CDATA[$template->alias( $original_tag => $alias_tag )
+$template->alias( $original_tag => \@alias_tags )]]></screen>
+         <para>
+	    Makes the target tags aliases to the original tag. Further
+	    modifications that will be done on any of these tags will be
+	    reflected on all others.
+         </para>
+         <para>
+	    Example:
+         </para>
+         <screen><![CDATA[$template->alias( 'foo' => 'bar' );
+
+# also modifies 'foo'
+$template->set( 'bar' => { pre => '<u>' } );
+
+]]></screen>
+      </section>
+      <section id="ID-5f863feb9ab7e93ab9edef3e7f6886d7"><title>is_alias</title>
+         <screen><![CDATA[@aliases = $template->is_alias( $tag )]]></screen>
+         <para>
+	    Returns all tags that are aliases to $tag.
+         </para>
+      </section>
+      <section id="ID-b75e5cce0efa370872a640f52be12f51"><title>unalias</title>
+         <screen><![CDATA[$template->unalias( $tag )]]></screen>
+         <para>
+	    Unmerge $tag of its aliases, if it has any. Further
+	    modifications to $tag will not affect the erstwhile aliases,
+	    and vice versa.
+         </para>
+         <para>
+	    Example:
+         </para>
+         <screen><![CDATA[$template->alias( 'foo' => [ qw/ bar baz / ] );
+$template->set( 'foo' => { pre => '<a>' } );    # affects foo, bar and baz
+$template->unalias( 'bar' );
+$template->set( 'bar' => { pre => '<c>' } );    # affects only bar
+$template->set( 'baz' => { pre => '<b>' } );    # affects foo and baz]]></screen>
+      </section>
+      <section id="ID-d0a7214fa4f34915fc55686c409fc908"><title>clear</title>
+         <screen><![CDATA[$template->clear()
+$template->clear( \@tags )]]></screen>
+         <para>
+	    Delete all tags, or those given by @tags, from the template.
+         </para>
+         <para>
+	    Example:
+         </para>
+         <screen><![CDATA[$template->clear([ 'foo', 'bar' ]);]]></screen>
+      </section>
+      <section id="ID-d8a73405a6abc0a4d935414aa02be431"><title>dump</title>
+         <screen><![CDATA[$template->dump()
+$template->dump( @tags )]]></screen>
+         <para>
+	    Returns a pretty-printed dump of the templates. If @tags are
+	    specified, only return their templates.
+         </para>
+         <para>
+	    Example:
+         </para>
+         <screen><![CDATA[<%= $template->dump( 'foo' ) %>
+
+# will yield something like
+#
+# $template = {
+#    foo => {
+#        post => '</bar>',
+#        pre  => '<bar>',
+#    }
+# };
+
+]]></screen>
+      </section>
+      <section id="ID-542b4f5b9e1be53b159b1c8e9809070e"><title>namespace</title>
+         <screen><![CDATA[my $subtemplate = $template->namespace( $uri );]]></screen>
+         <para>
+	    Returns the sub-template associated to the namespace defined by
+	    $uri.
+         </para>
+         <para>
+	    Example:
+         </para>
+         <screen><![CDATA[$template->set( 'foo' => { 'pre' => 'within default namespace' } );
+my $subtemplate = $template->namespace( 'http://www.www3c.org/blah/' );
+$subtemplate->set( 'foo' => { 'pre' => "within 'blah' namespace" } );]]></screen>
+      </section>
+      <section id="ID-a7154d893b1c46a1770e91afda442b46"><title>resolve</title>
+         <screen><![CDATA[$tag = $template->resolve( $namespace, $tagname );
+$tag = $template->resolve( $tagname );]]></screen>
+         <para>
+	    Returns the tag object within $template that matches $namespace
+	    and $tagname best. The returned match is the first one met in
+	    the following list:
+         </para>
+         <para>
+            <itemizedlist>
+               <listitem>
+                  <para>
+		     $namespace:$tagname
+                  </para>
+               </listitem>
+               <listitem>
+                  <para>
+		     $namespace:*
+                  </para>
+               </listitem>
+               <listitem>
+                  <para>
+		     $tagname
+                  </para>
+               </listitem>
+               <listitem>
+                  <para>
+		     *
+                  </para>
+               </listitem>
+               <listitem>
+                  <para>
+		     undef
+                  </para>
+               </listitem>
+            </itemizedlist>
+         </para>
+         <para>
+	    Example:
+         </para>
+         <screen><![CDATA[$template->set( foo => { pre => 'a' } );
+$template->set( '*' => { pre => 'b' } );
+$template->namespace( 'http://blah' )->set( foo => { pre => 'c' } );
+$template->namespace( 'http://blah' )->set( '*' => { pre => 'd' } );
+
+$template->resolve( 'foo' )->get( 'pre' );  # returns 'a'
+$template->resolve( 'baz' )->get( 'pre' );  # returns 'b'
+$template->resolve( 'http://meeh', 'foo' )->get( 'pre' );  # returns 'a'
+$template->resolve( 'http://blah', 'foo' )->get( 'pre' );  # returns 'c'
+$template->resolve( 'http://blah', 'baz' )->get( 'pre' );  # returns 'd']]></screen>
+      </section>
+   </section>
+   <section id="ID-1f182dd9c635f73a247d0c65f0391f7c"><title>BACKWARD COMPATIBILITY</title>
+      <para>
+	 Prior to version 1.0 of XML::XPathScript, the template of a
+	 stylesheet was not an object but a simple hash reference.
+	 Modifications to the template were done by manipulating the hash
+	 directly.
+      </para>
+      <screen><![CDATA[<%
+    # pre-1.0 way of manipulating the template
+    $t->{important}{pre}  = '<blink>';
+    $t->{important}{post} = '</blink>';
+
+for my $tag ( qw/ urgent redHot / ) {
+    for my $attr ( qw/ pre post / ) {
+        $t->{$tag}{$attr} = $t->{important}{$attr};
+    }
+}
+
+    $t->{ alert } = $t->{ important };
+%>]]></screen>
+      <para>
+	 Don't tell anyone, but as an XML::XPathScript::Template is a
+	 blessed hash reference this way of doing things will still work.
+	 However, direct manipulation of the template's hash is deprecated.
+	 Instead, it is recommended to use the object's access methods.
+      </para>
+      <screen><![CDATA[<%
+    # correct way to manipulate the template
+    $t->set( important => { pre => '<blink>', 
+                            post => '</blink>',
+                            showtag => 1
+                            } );
+
+$t->copy( important => [ qw/ urgent redHot / ], [ qw/ pre post / ] );
+
+    $t->alias( important => alert );
+%>]]></screen>
+   </section>
+   
+   
+<titleabbrev>
+	 XML::XPathScript::Template </titleabbrev></chapter><chapter>
+      <para>
+	 The XML::XPathScript::Tag class is used to represent tags within
+	 an XPathScript template.
+      </para>
+   <title>
+	 XML::XPathScript::Template::Tag - XPathScript Template Element
+      </title>
+   
+   <section id="ID-fce4ef88dc097a256585250f262a04b0"><title>SYNOPSIS</title>
+      <screen><![CDATA[<%
+    $tag->set( 'foo' => { testcode => \&frumble  } );
+
+sub frumble {
+    my( $n, $t ) = @_;
+
+$t->set({ 'pre' =>  '<bar>' });
+
+return DO_SELF_AND_CHILDREN();
+
+   }
+%>
+<%= apply_templates() %>]]></screen>
+   </section>
+   
+   <section id="ID-bf346ae21678e8c4d292cea1bbc90bf9"><title>CALLED AS ARGUMENT TO THE TESTCODE FUNCTIONS</title>
+      <para>
+	 Typically, the only time you'll be exposed to those objects is via
+	 the testcode functions, which receive as arguments a reference to
+	 the current node and its associated template entry.
+      </para>
+      <para>
+	 Note that changing any of the tag's attributes only impacts the
+	 current node and doesn't change the tag entry in the template. To
+	 modify the template, you'll have to access <emphasis role="italic">$template</emphasis> directly.
+      </para>
+      <para>
+	 Example:
+      </para>
+      <screen><![CDATA[<%
+    $template->set( 'foo' => { testcode => \&frumble  } );
+
+sub frumble {
+    my( $n, $t ) = @_;
+
+if( $n->findvalue( './@bar' ) eq 'whonk' ) {
+    # we've been whonk'ed! This foo must
+    # blink
+    $t->set({ 
+        'pre' => '<blink>', 'post' => '</blink>' 
+    });
+
+            # and the next foos will be in italic
+            $template->set( foo => { 
+                pre => '<i>', post => '</i>' 
+            } );
+        }
+        return DO_SELF_AND_CHILDREN();
+    }
+%>]]></screen>
+   </section>
+   <section id="ID-c7c57b42f5d4464a60bcb05fc387b9d0"><title>METHODS</title>
+      <section id="ID-cdf8e5289517c63f5b904136dc7c3e00"><title>new</title>
+         <screen><![CDATA[$tag = XML::XPathScript::Template::Tag->new]]></screen>
+         <para>
+	    Creates a new, empty tag.
+         </para>
+      </section>
+      <section id="ID-784c17c43ed95226b1fda232471f9398"><title>set</title>
+         <screen><![CDATA[$t->set( \%attributes )]]></screen>
+         <para>
+	    Updates the tag's attributes with the values given in
+	    \%attributes
+         </para>
+         <para>
+	    Example:
+         </para>
+         <screen><![CDATA[$t->set({ pre => '<a>', post => '</a>' });]]></screen>
+      </section>
+      <section id="ID-25d368ae4622dac14eb7748b3ce6ea0c"><title>get</title>
+         <screen><![CDATA[@values = $tag->get( @attributes )]]></screen>
+         <para>
+	    Returns the values of @attributes.
+         </para>
+         <para>
+	    Example:
+         </para>
+         <screen><![CDATA[@values = $tag->get( 'pre', 'post' );]]></screen>
+      </section>
+   </section>
+   <section id="ID-1f182dd9c635f73a247d0c65f0391f7c"><title>BACKWARD COMPATIBILITY</title>
+      <para>
+	 As for XML::XPathScript::Template, prior to release 1.0 of
+	 XPathScript, the tags within the template of a stylesheet were not
+	 objects but simple hash references. Modifications to the tag
+	 attributes were done by manipulating the hash directly.
+      </para>
+      <screen><![CDATA[<%
+    $t->{foo}{testcode} = sub {  
+        my( $n, $t ) = @_;
+
+$t->{pre} = '<a>';
+$t->{post} = '</a>';
+
+        return DO_SELF_AND_CHILDREN;
+    };
+%>]]></screen>
+      <para>
+	 Don't tell anyone, but as an XML::XPathScript::Template::Tag is a
+	 blessed hash reference this way of doing things will still work.
+	 However, direct manipulation of the tag's hash is deprecated.
+	 Instead, it is recommended to use the object's access methods.
+      </para>
+      <screen><![CDATA[<%
+    $template->set( foo => { testcode => \&tc_foo } );
+    sub tc_foo {  
+        my( $n, $t ) = @_;
+
+$t->set({ 
+    pre => '<a>', post => '</a>' 
+});
+
+        return DO_SELF_AND_CHILDREN;
+    };
+%>]]></screen>
+   </section>
+   
+   
+<titleabbrev>
+	 XML::XPathScript::Template::Tag </titleabbrev></chapter><chapter><title>
+	 Apache2::TomKit::Processor::XPathScript - XPathScript Processor
+	 for TomKit
+      </title>
+   
+   <section id="ID-fce4ef88dc097a256585250f262a04b0"><title>SYNOPSIS</title>
+      <screen><![CDATA[# in the relevant .htaccess
+PerlSetVar AxAddProcessorMap "text/xps=>Apache2::TomKit::Processor::XPathScript"
+
+<Files *\.xml>
+    PerlFixupHandler Apache2::TomKit
+    PerlSetVar AxAddProcessorDef "text/xps=>stylesheet.xps"
+</Files>]]></screen>
+   </section>
+   
+   
+<titleabbrev>
+	 Apache2::TomKit::Processor::XPathScript </titleabbrev></chapter><chapter>
+      <para>
+	 YPathScript is a fork of the original AxKit's XPathScript using
+	 XML::XPathScript as its transforming engine.
+      </para>
+      <para>
+	 As it is mostly backward compatible with the classic Axkit
+	 XPathScript module, the definitive reference for XPathScript,
+	 located at http://axkit.org/docs/xpathscript/guide.dkb, also
+	 applies to YPathScript, excepts for the differences listed in the
+	 sections below.
+      </para>
+   <title>
+	 Apache::AxKit::Language::YPathScript - An XML Stylesheet Language
+      </title>
+   
+   <section id="ID-fce4ef88dc097a256585250f262a04b0"><title>SYNOPSIS</title>
+      <screen><![CDATA[AxAddStyleMap "application/x-xpathscript => \
+      Apache::AxKit::Language::YPathScript"]]></screen>
+   </section>
+   
+   <section id="ID-a833db803cb6e749080a2ff2efd1505e"><title>PRE-DEFINED STYLESHEET VARIABLES AND FUNCTIONS</title>
+      <section id="ID-a04c20611c8614408aa1cc2b3867cc06"><title>VARIABLES</title>
+         <para>
+            <variablelist>
+               <varlistentry>
+                  <term><anchor id="ID-1ba6ae54a3b0e06279d7e7375b2c74d8"/>$r</term>
+                  <listitem>
+                     <para>
+			A copy of the Apache::AxKit::request object --
+			which is itself a wrapper around the
+			Apache::request object -- tied to the current
+			document.
+                     </para>
+                     <screen><![CDATA[<%      %args = $r->args() %>
+<p>args: <%= join ' : ', map "$_ => $args{$_}", keys %args %></p>]]></screen>
+                  </listitem>
+               </varlistentry>
+            </variablelist>
+         </para>
+      </section>
+      <section id="ID-8c1fb8d3b004d6b0d71eb8f0c64d0afa"><title>FUNCTIONS</title>
+         <para>
+            <variablelist>
+               <varlistentry>
+                  <term><anchor id="ID-8ca7568078abce2fb65c186bceb6bca1"/>$node = XML::XPathScript::current-&gt;document( $uri )</term>
+                  <listitem>
+                     <para>
+			Fetch the xml document located at $uri and return
+			it as a dom node.
+                     </para>
+                  </listitem>
+               </varlistentry>
+            </variablelist>
+         </para>
+      </section>
+      <section id="ID-36a9f99cda4fdc380ab3aa274ec22580"><title>Functions</title>
+         <para>
+            <variablelist>
+               <varlistentry>
+                  <term><anchor id="ID-7f0e1edea8d46491b7b9c70ca715d101"/>$xps = new Apache::AxKit::Language::YPathScript($xml_provider, $style_provider)</term>
+                  <listitem>
+                     <para>
+			Construct a new YPathScript language interpreter
+			out of the provided providers.
+                     </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-0f59af7d0bcd0ff2c60e495e13a79c17"/>$rc = handler( $class, $request, $xml_provider, $style_provider )</term>
+                  <listitem>
+                     <screen><![CDATA[The handler function called by Apache.]]></screen>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-c89def1bc1d4462ce366e32f13695ce9"/>$file_content = <emphasis role="italic">include_file( $filename )</emphasis></term>
+                  <listitem>
+                     <para/>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-34346d24cb0e0f6c7facb0618f9b47ed"/>$file_content = <emphasis role="italic">include_file( $filename, @includestack )</emphasis></term>
+                  <listitem>
+                     <para>
+			Overloaded from XML::XPathScript in order to
+			provide URI-based stylesheet inclusions: $filename
+			may now be any AxKit URI.  The AxKit language class
+			drops support for plain filenames that exists in
+			the ancestor class: this means that include
+			directives like
+                     </para>
+                     <screen><![CDATA[<!-- #include file="/some/where.xps" -->]]></screen>
+                     <para>
+			in existing stylesheets should be turned into
+                     </para>
+                     <screen><![CDATA[<!-- #include file="file:///some/where.xps" -->]]></screen>
+                     <para>
+			in order to work with AxKit.
+                     </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-2114dd0ee58ad849564c316381da3611"/>$doc = get_source_tree( $xml_provider  )</term>
+                  <listitem>
+                     <para>
+			Read an XML document from the provider and return
+			it as a string.
+                     </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-373a0c37d17dadaa58093be2092a7bd2"/>$string = <emphasis role="italic">read_stylesheet( $stylesheet )</emphasis></term>
+                  <listitem>
+                     <para>
+			Retrieve and return the $stylesheet (which can be a
+			filehandler or a string) as a string.
+                     </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-b8f0424165a0ce73f3b22a2a629550d7"/>$self-&gt;debug( $level, $message )</term>
+                  <listitem>
+                     <para>
+			Print $message if the requested debug level is
+			equal or smaller than $level.
+                     </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-7761eb57d810fa267feb1e475f8201ab"/>$self-&gt;die( $suicide_note )</term>
+                  <listitem>
+                     <para>
+			Print the $suicide_note and exit;
+                     </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-a37c47fa4d9e47ba15bad647d413be15"/>$nodeset = $self-&gt;document( $uri )</term>
+                  <listitem>
+                     <para>
+			Read XML document located at $uri, parse it and
+			return it in a node object.
+                     </para>
+                     <para>
+			The $uri can be specified using the regular schemes
+			('http://foo.org/bar.xml',
+			'ftp://foo.org/bar.xml'), or the Axkit scheme
+			('axkit://baz.xml'), or as a local file
+			('/home/web/foo.xml', './foo.xml' ).
+                     </para>
+                  </listitem>
+               </varlistentry>
+            </variablelist>
+         </para>
+      </section>
+   </section>
+   
+   
+<titleabbrev>
+	 Apache::AxKit::Language::YPathScript </titleabbrev></chapter><chapter>
+      <para>
+	 If the second type of call is used, xpathscript assumes that the
+	 xml source file  and the XPathScript stylesheet are named
+	 &lt;name&gt;.xml and &lt;name&gt;.xps.
+      </para>
+      <section id="ID-5d6d333fae4fdfee3906a50fc7e8bfa9"><title>ARGUMENTS</title>
+         <para>
+            <variablelist>
+               <varlistentry>
+                  <term><anchor id="ID-703be7add2d5aa080afa21b32acd44ea"/>-i</term>
+                  <listitem>
+                     <para>
+			Enable interpolation
+                     </para>
+                  </listitem>
+               </varlistentry>
+               <varlistentry>
+                  <term><anchor id="ID-ec66a25c0eb945c8ccfe84529ccaedb6"/>-q=&lt;query_string&gt;</term>
+                  <listitem>
+                     <para>
+			query_string is passed as if it was a query string.
+			E.g.,
+                     </para>
+                     <screen><![CDATA[xpathscript -q="page=3&images=no" doc.xml htmlify.xps]]></screen>
+                     <para>
+			will act as if the document was requested from the
+			web server with the url
+			'http://your.server.org/doc.xml?page=3&amp;images=no'
+                     </para>
+                  </listitem>
+               </varlistentry>
+            </variablelist>
+         </para>
+      </section>
+   <title>
+	 xpathscript - XPathScript command-line utility
+      </title>
+   
+   <section id="ID-fce4ef88dc097a256585250f262a04b0"><title>SYNOPSIS</title>
+      <para>
+	 xpathscript [-i] [-q=&lt;query_string&gt;] &lt;xml_file&gt;
+	 &lt;stylesheet_file&gt;
+      </para>
+      <para>
+	 xpathscript [-i] [-q=&lt;query_string&gt;] &lt;name&gt;
+      </para>
+   </section>
+   
+   <section id="ID-5ff133e983e51f81eb1c1b414abe82f1"><title>SEE ALSO</title>
+      <para>
+	 XML::XPathScript
+      </para>
+   </section>
+   
+   
+<titleabbrev>
+	 xpathscript </titleabbrev></chapter></book
+>

@@ -8,7 +8,7 @@ use warnings;
 use DateTime;
 use DateTime::Format::Human::Duration;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -68,7 +68,7 @@ Bot::IRC::Seen - Bot::IRC track when and where users were last seen
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 SYNOPSIS
 

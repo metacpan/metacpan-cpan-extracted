@@ -76,7 +76,7 @@
          "web" : "https://github.com/perlancar/perl-App-cryp-exchange"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

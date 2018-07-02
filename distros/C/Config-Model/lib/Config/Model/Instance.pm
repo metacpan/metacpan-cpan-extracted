@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.124';
+$Config::Model::Instance::VERSION = '2.125';
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -658,7 +658,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.124
+version 2.125
 
 =head1 SYNOPSIS
 

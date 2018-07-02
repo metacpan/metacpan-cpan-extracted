@@ -1,0 +1,38 @@
+CLI-KeyValue-Hack
+
+ KeyValue形式の2列のTSV形式のテキストデータに対して、下記の様な機能を持つコマンドを
+ 提供する。
+
+ 1. wisejoin : キー列を参照して参照表と別の入力表を合成する。(joinコマンドやSQLのjoinと似ている。)
+ 2. keyvalues : 各キー値が異なるバリュー値をいくつ持つか。(全て1かどうか知りたいことは多いであろう。)
+ 3. kvcmp : キーバリュー形式の2個のファイルについてそれぞれキーとバリューの関係がどの程度同じで異なるか。
+ 4. polar : キー値を共有する複数ファイルのバリュー値を横に展開する。
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2018 "Toshiyuki Shimono"
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+

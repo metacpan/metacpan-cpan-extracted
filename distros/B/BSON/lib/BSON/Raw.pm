@@ -6,7 +6,7 @@ package BSON::Raw;
 # ABSTRACT: BSON type wrapper for pre-encoded BSON documents
 
 use version;
-our $VERSION = 'v1.6.4';
+our $VERSION = 'v1.6.6';
 
 use Moo;
 
@@ -39,7 +39,7 @@ BSON::Raw - BSON type wrapper for pre-encoded BSON documents
 
 =head1 VERSION
 
-version v1.6.4
+version v1.6.6
 
 =head1 SYNOPSIS
 

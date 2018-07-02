@@ -8,6 +8,7 @@ requires 'URI';
 requires 'JSON';
 requires 'Carp';
 requires 'Try::Tiny';
+requires 'Net::SSLeay';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

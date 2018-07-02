@@ -1,0 +1,112 @@
+#!perl
+
+use strict;
+use warnings FATAL => 'all';
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL;
+use Sport::Analytics::NHL::Usage;
+
+my @accepts_opts = qw(
+	:season :database
+	data-dir force no-schedule-crawl
+);
+my @accepts_args = (
+	{
+		name        => 'GAME_IDS',
+		description => 'The NHL 10-digit game ids or HDB 9-digit game ids or YYYYMMDD dates',
+	}
+);
+
+use Data::Dumper;
+
+my $what_it_does = 'Scrape the NHL games and store them';
+my $opts = gopts($what_it_does, \@accepts_opts, \@accepts_args);
+my $hockeydb = Sport::Analytics::NHL->new($opts);
+$hockeydb->scrape_games($opts, @ARGV);
+
+=head1 NAME
+
+scrape - scrape the NHL website for games
+
+=head1 SYNOPSIS
+
+ cognac: ~/RP/hockeydb>p1 scripts/scrape -h
+ Scrape the NHL games and store them
+ Usage: scripts/scrape [Options] Arguments
+
+ Options:
+	-h|--help                       print this message and exit
+	-V|--version                    print version and exit
+	-v|--verbose                    produce verbose output to STDERR
+	-d|--debug                      produce debug output to STDERR
+	-s|--start-season    SEASON     Start at season SEASON (default 2018)
+	-S|--stop-season     SEASON     Stop at season SEASON (default 2018)
+	-T|--start-season    STAGE      Scrape stage STAGE (2: REGULAR, 3: PLAYOFF, default: 3
+	--no-database                   Do not use a MongoDB backend
+	-D|--database        DB         Use Mongo database DB (default hockey)
+ Arguments:
+	GAME_IDS             The NHL 10-digit game ids or HDB 9-digit game ids or YYYYMMDD dates
+
+
+=cut
+
+=head1 AUTHOR
+
+More Hockey Stats, C<< <contact at morehockeystats.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<contact at morehockeystats.com>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sport::Analytics::NHL>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Sport::Analytics::NHL
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Sport::Analytics::NHL>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Sport::Analytics::NHL>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/d/Sport::Analytics::NHL>
+
+=item * Search CPAN
+
+L<https://metacpan.org/release/Sport::Analytics::NHL>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2018 More Hockey Stats.
+
+This program is released under the following license: gnu
+
+
+=cut
+
+1;
+

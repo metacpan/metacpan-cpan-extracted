@@ -1,0 +1,23 @@
+---
+abstract: 'Command line utility for controlling NP-05B networked power switch'
+author:
+  - 'TTKCIAR <ttk@ciar.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-np05bctl
+requires:
+  Device::Power::Synaccess::NP05B: '1.03'
+  JSON: '2.00'
+  Test::Differences: '0.60'
+  Test::Most: '0.30'
+  perl: '5.010000'
+version: '1.04'
+x_generated_by_perl: v5.18.1
+x_serialization_backend: 'YAML::Tiny version 1.63'

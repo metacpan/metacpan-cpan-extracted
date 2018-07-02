@@ -6,7 +6,7 @@ package # hide from pause
 use 5.010_001;
 use strictures 1;
 
-use Moose;
+use Moo;
 
 has total_items => (is => 'ro');
 has page_size => (is => 'ro');

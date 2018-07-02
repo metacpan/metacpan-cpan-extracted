@@ -1,4 +1,13 @@
-cpan2rpm
+sudo yum install perl-DBIx-Array
+
+--or--
+
+perl Makefile.PL
+make
+make test
+make dist
+rpmbuild -ta DBIx-Array-0.??.tar.gz
+sudo yum install ~/rpm/RPMS/noarch/perl-DBIx-Array-*.rpm
 
 --or--
 

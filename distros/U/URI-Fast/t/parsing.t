@@ -16,7 +16,7 @@ is uri(undef), '', 'undef';
 is uri(''), '', 'empty string';
 
 is uri('/foo')->scheme, '', 'missing scheme';
-is uri('http://'), 'http://', 'non-file scheme w/o host';
+is uri('http:'), 'http:', 'non-file scheme w/o host';
 is uri('http://test'), 'http://test', 'auth w/ invalid host';
 
 is uri('http://usr:pwd')->usr, '', 'no usr w/o @';
@@ -34,12 +34,14 @@ subtest 'param' => sub{
   is uri('?=bar')->param('bar'), undef, 'query =value w/o key && request key eq value';
   is uri('?=')->param('foo'), undef, 'query w/ = but w/o key or value';
   is uri('???')->param('??'), undef, 'multiple question marks';
+  is uri('?food=bard&foo=bar')->param('foo'), 'bar', 'substring match';
 };
 
 subtest 'query_hash' => sub{
   is uri('?')->query_hash, hash{ end }, 'empty query';
   is uri('?foo')->query_hash, hash{ field 'foo' => array{ end }; end }, 'query key w/o =value';
-  is uri('?foo=')->query_hash, hash{ field 'foo' => array{ end }; end }, 'query key w/o value';
+  is uri('?foo')->query_hash, hash{ field 'foo' => array{ end }; end }, 'query key w/o =value';
+  is uri('?foo=')->query_hash, hash{ field 'foo' => array{ item ''; end }; end }, 'query key w/o value';
   is uri('?=bar')->query_hash, hash{ end }, 'query =value w/o key';
   is uri('?=')->query_hash, hash{ end }, 'query w/ = but w/o key or value';
   is uri('???')->query_hash, hash{ field '??' => array{ end }; end }, 'multiple question marks';

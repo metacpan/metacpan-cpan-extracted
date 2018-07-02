@@ -6,9 +6,9 @@ use utf8;
 use vars qw($config $DefaultClass @EXPORT  @ISA $defaultconfig);
 @MySQL::Admin::Config::EXPORT  = qw(loadConfig saveConfig $config);
 @ISA                           = qw(Exporter);
-$MySQL::Admin::Config::VERSION = '1.14';
-$DefaultClass  = 'MySQL::Admin::Config' unless defined $MySQL::Admin::Config::DefaultClass;
-$defaultconfig = '%CONFIG%';
+$MySQL::Admin::Config::VERSION = '1.15';
+$DefaultClass                  = 'MySQL::Admin::Config' unless defined $MySQL::Admin::Config::DefaultClass;
+$defaultconfig                 = '%CONFIG%';
 
 =head1 NAME
 
@@ -29,28 +29,28 @@ loadConfig() saveConfig() $config
 =cut
 
 sub new {
-    my ($class, @initializer) = @_;
+    my ( $class, @initializer ) = @_;
     my $self = {};
     bless $self, ref $class || $class || $DefaultClass;
     return $self;
-}
+} ## end sub new
 
 =head2 loadConfig()
 
 =cut
 
 sub loadConfig {
-    my ($self, @p) = getSelf(@_);
-    my $do = (defined $p[0]) ? $p[0] : $defaultconfig;
-    if (-e $do) { do $do; }
-}
+    my ( $self, @p ) = getSelf(@_);
+    my $do = ( defined $p[0] ) ? $p[0] : $defaultconfig;
+    if ( -e $do ) { do $do; }
+} ## end sub loadConfig
 
 =head2 saveConfig()
 
 =cut
 
 sub saveConfig {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $saveAs = defined $p[0] ? $p[0] : $defaultconfig;
     $config = defined $p[1] ? $p[1] : $config;
     my $var = defined $p[2] ? $p[2] : 'config';
@@ -64,23 +64,19 @@ sub saveConfig {
 
     if ($rsas) {
         open $fh, ">$rsas.bak"
-          or warn "$/MySQL::Admin::Config::saveConfig$/ $! $/ File: $rsas $/Caller: "
-          . caller()
-          . $/;
+          or warn "$/MySQL::Admin::Config::saveConfig$/ $! $/ File: $rsas $/Caller: " . caller() . $/;
         flock $fh, 2;
         seek $fh, 0, 0;
         truncate $fh, 0;
         print $fh $content;
         close $fh;
-    }
-    if (-e "$rsas.bak") {
+    } ## end if ($rsas)
+    if ( -e "$rsas.bak" ) {
         rename "$rsas.bak", $rsas
-          or warn "$/MySQL::Admin::Config::saveConfig$/ $! $/ File: $rsas $/Caller: "
-          . caller()
-          . $/;
+          or warn "$/MySQL::Admin::Config::saveConfig$/ $! $/ File: $rsas $/Caller: " . caller() . $/;
         do $rsas;
-    }
-}
+    } ## end if ( -e "$rsas.bak" )
+} ## end sub saveConfig
 
 =head1 Private
 
@@ -91,13 +87,11 @@ see L<HTML::Menu::TreeView>
 =cut
 
 sub getSelf {
-    return @_ if defined($_[0]) && (!ref($_[0])) && ($_[0] eq 'MySQL::Admin::Config');
-    return (defined($_[0])
-          && (ref($_[0]) eq 'MySQL::Admin::Config' || UNIVERSAL::isa($_[0], 'MySQL::Admin::Config'))
-      )
+    return @_ if defined( $_[0] ) && ( !ref( $_[0] ) ) && ( $_[0] eq 'MySQL::Admin::Config' );
+    return ( defined( $_[0] ) && ( ref( $_[0] ) eq 'MySQL::Admin::Config' || UNIVERSAL::isa( $_[0], 'MySQL::Admin::Config' ) ) )
       ? @_
-      : ($MySQL::Admin::Config::DefaultClass->new, @_);
-}
+      : ( $MySQL::Admin::Config::DefaultClass->new, @_ );
+} ## end sub getSelf
 
 =head2 see Also
 
@@ -120,5 +114,4 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 =cut
-
 1;

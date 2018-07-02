@@ -1,6 +1,6 @@
 package Bio::DB::USeq;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 =head1 NAME
 
@@ -110,7 +110,9 @@ Bio::DB::USeq - Read USeq archive database files
 Bio::DB::USeq is a B<BioPerl> style adaptor for reading USeq files. USeq files 
 are compressed, indexed data files supporting modern bioinformatic datasets, 
 including genomic points, scores, and intervals. More information about the 
-format can be found at L<http://useq.sourceforge.net/useqArchiveFormat.html>. 
+USeq software package can be found at L<https://github.com/HuntsmanCancerInstitute/USeq>, 
+including a description of the USeq data 
+L<archive format|https://github.com/HuntsmanCancerInstitute/USeq/blob/master/Documentation/USeqDocumentation/useqArchiveFormat.html>. 
 
 USeq files are typically half the size of corresponding bigBed and bigWig files, 
 due to a compact internal format and lack of internal zoom data. This adaptor, 
@@ -120,8 +122,9 @@ manner as big files, albeit at a cost of calculating these in realtime.
 =head2 Generating useq files
 
 USeq files may be generated using tools from the USeq package, available at 
-L<http://useq.sourceforge.net>. They may be generated from native Bar files,
-text Wig files, text Bed files, and UCSC bigWig and bigBed file formats.
+L<https://github.com/HuntsmanCancerInstitute/USeq>. They may be generated from 
+native Bar files, text Wig files, text Bed files, and UCSC bigWig and bigBed file 
+formats.
 
 =head2 Compatibility
 
@@ -339,7 +342,8 @@ types may be specified using the -type argument.
 
 The default feature type if the type argument is not specified. 
 These are SeqFeatureI compatible objects representing observations 
-in the useq file archive. These are compatible with the iterator.
+in the useq file archive. These are compatible with the iterator. 
+SeqFeature observations are returned in genomic order.
 
 =item chromosome
 
@@ -459,10 +463,8 @@ and summary feature types.
 This is a simplified data accessor that only returns the score 
 values overlapping an interrogated interval, rather than 
 assembling each observation into a SeqFeature object. The scores 
-are not associated with genomic coordinates, but are generally 
-in ascending position order across the interval, with the 
-exception of collecting scores from both strands, where the 
-scores from the forward strand come first.
+are not associated with genomic coordinates, and are not guaranteed 
+to be returned in original genomic order.
 
 Provide the interval coordinates in the same manner as the 
 features() method. Stranded data collection is supported.
@@ -472,6 +474,29 @@ features() method. Stranded data collection is supported.
         -start      => $start,
         -end        => $end,
     );
+
+=item observations
+
+This is a low-level data accessor, similar to features() but returning 
+an array of references to the original USeq observations. Each USeq 
+observation is an anonymous array reference of 2-4 elements: start, stop, 
+score, and text, depending on the stored data type. All coordinates are in 
+0-based coordinates, unlike high level accessors. Note that while strand is 
+supported, it is not reported for each observation. If observations exist on 
+both strands, then each strand should be searched separately. Observations 
+are not guaranteed to be returned in genomic order. 
+    
+    my @observations = $useq->observations(
+        -seq_id     => $seq_id,
+        -start      => $start,
+        -end        => $end,
+    );
+    foreach my $obs (@observations) {
+        my $start = $obs->[0] + 1; # convert to 1-based coordinate
+        my $stop  = $obs->[1];
+        my $score = $obs->[2]; # may not be present
+        my $text  = $obs->[3]; # may not be present
+    }
 
 =item segment
 
@@ -834,6 +859,7 @@ require 5.010000;
 use strict;
 use Carp qw(carp cluck croak confess);
 use Archive::Zip qw( :ERROR_CODES );
+use Set::IntervalTree;
 use File::Spec;
 
 use base 'Exporter';
@@ -1008,7 +1034,7 @@ sub chr_stats {
 	# chromosome stats must be generated
 	my @slices = $self->_translate_coordinates_to_slices(
 		$seq_id, 1, $self->length($seq_id), 0);
-	$self->_clear_buffer(@slices);
+	$self->_clear_buffer(\@slices);
 	my $stat = $self->_stat_summary(1, $self->length($seq_id), \@slices);
 	
 	# then associate with the metadata
@@ -1318,7 +1344,7 @@ sub scores {
 	my @slices = $self->_translate_coordinates_to_slices(
 		$seq_id, $start, $stop, $strand);
 	return unless @slices;
-	$self->_clear_buffer(@slices);
+	$self->_clear_buffer(\@slices);
 	
 	# collect the scores from each of the requested slices
 	my $scores = $self->_scores($start, $stop, \@slices);
@@ -1326,7 +1352,32 @@ sub scores {
 	return wantarray ? @$scores : $scores;
 }
 
+sub observations {
+	my $self = shift;
+	
+	# arguments can be chromo, start, stop, strand
+	my ($seq_id, $start, $stop, $strand) = $self->_get_coordinates(@_);
+	return unless $self->length($seq_id); # make sure chromosome is represented
+	
+	# determine which slices to retrieve
+	my @slices = $self->_translate_coordinates_to_slices(
+		$seq_id, $start, $stop, $strand);
+	return unless @slices;
+	$self->_clear_buffer(\@slices);
+	
+	# collect the scores from each of the requested slices
+	my @observations;
+	foreach my $slice (@slices) {
+		# load and unpack the data
+		$self->_load_slice($slice);
+		
+		# find the overlapping observations
+		my $results = $self->{'buffer'}{$slice}->fetch($start - 1, $stop);
+		push @observations, @$results;
+	}
 
+	return wantarray ? @observations : \@observations;
+}
 
 
 
@@ -1415,24 +1466,9 @@ sub _parse_members {
 		$self->{'file2attribute'}{$member} = 
 			[$chromo, $start, $stop, $strand, $extension, $number];
 		
-		# store the member details
-		# hash hash array array
-		# chromosome -> strand -> [ [start, member],... ]
-		if (exists $self->{'coord2file'}{$chromo}{$strand}) {
-			push @{ $self->{'coord2file'}{$chromo}{$strand} }, [$start, $stop, $member];
-		}
-		else {
-			$self->{'coord2file'}{$chromo}{$strand} = [ [$start, $stop, $member] ];
-		}
-	}
-	
-	# sort the coord2file arrays by increasing start position
-	foreach my $chromo (keys %{ $self->{coord2file} }) {
-		foreach my $strand (keys %{ $self->{coord2file}{$chromo} }) {
-			@{ $self->{coord2file}{$chromo}{$strand} } =  
-				sort { $a->[0] <=> $b->[0] } 
-				@{ $self->{coord2file}{$chromo}{$strand} };
-		}
+		# store the member into a chromosome-strand-specific interval tree
+		$self->{'coord2file'}{$chromo}{$strand} ||= Set::IntervalTree->new();
+		$self->{'coord2file'}{$chromo}{$strand}->insert($member, $start, $stop);
 	}
 	
 	# check parsing
@@ -1495,31 +1531,16 @@ sub _translate_coordinates_to_slices {
 	my @slices;
 	if ($both) {
 		# need to collect from both strands
-		# plus strand first
-		foreach my $slice ( @{ $self->{'coord2file'}{$seq_id}{1} }) {
-			# each slice is [start, stop, name]
-			next if $start > $slice->[1]; # end
-			last if $stop  < $slice->[0]; # start
-			push @slices, $slice->[2];
-		}
-	
-		# minus strand next
-		foreach my $slice ( @{ $self->{'coord2file'}{$seq_id}{-1} }) {
-			# each slice is [start, stop, name]
-			next if $start > $slice->[1]; # end
-			last if $stop  < $slice->[0]; # start
-			push @slices, $slice->[2];
-		}
+		# plus strand first, then minus strand
+		my $results = $self->{'coord2file'}{$seq_id}{1}->fetch($start, $stop);
+		my $results2 = $self->{'coord2file'}{$seq_id}{-1}->fetch($start, $stop);
+		push @slices, @$results, @$results2;
 	}
 	
 	# specific strand
 	else {
-		foreach my $slice ( @{ $self->{'coord2file'}{$seq_id}{$strand} }) {
-			# each slice is [start, stop, name]
-			next if $start > $slice->[1]; # end
-			last if $stop  < $slice->[0]; # start
-			push @slices, $slice->[2];
-		}
+		my $results = $self->{'coord2file'}{$seq_id}{$strand}->fetch($start, $stop);
+		push @slices, @$results;
 	}
 	
 	return @slices;
@@ -1530,7 +1551,7 @@ sub _clear_buffer {
 	my $self = shift;
 	
 	# make a quick hash of wanted slices
-	my %wanted = map {$_ => 1} @_;
+	my %wanted = map {$_ => 1} @{$_[0]};
 	
 	# delete the existing buffers of slices we do not want
 	foreach (keys %{ $self->{buffer} }) {
@@ -1541,9 +1562,13 @@ sub _clear_buffer {
 sub _load_slice {
 	my $self = shift;
 	my $slice = shift;
-	return unless $slice;
 	return if (exists $self->{'buffer'}{$slice});
-	$self->{'buffer'}{$slice} = [];
+	
+	# each slice is parsed into observations consisting of start, stop, and 
+	# optionally score and text depending on type
+	# these are stored as anonymous arrays [start, stop, score, text]
+	# for quick retrieval each observation interval is stored in a Set::IntervalTree 
+	# these operations maintain the original 0-based coordinate system
 	
 	my $type = $self->slice_type($slice);
 	if    ($type eq 's')    { $self->_load_s_slice($slice) }
@@ -1567,18 +1592,13 @@ sub _load_slice {
 	else {
 		croak "unable to load slice '$slice'! Unsupported slice type $type\n";
 	}
-	
-	# sanity check
-	if (scalar @{ $self->{buffer}{$slice} } != $self->slice_obs_number($slice)) {
-		croak "slice load failed! Only loaded ", scalar @{ $self->{buffer}{$slice} }, 
-			" observations when expecting ", $self->slice_obs_number($slice), "!\n";
-	}
 }
 
 
 sub _load_s_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	
 	# unpack the data slice zip member
 	my $number = $self->slice_obs_number($slice);
@@ -1586,19 +1606,23 @@ sub _load_s_slice {
 	
 	# convert the unpacked data into start, stop, score
 	# first observation
-	my $position = (shift @data) + 1;
-	push @{ $self->{buffer}{$slice} }, [$position, $position, undef];
+	my $position = shift @data;
+	$tree->insert( [$position, $position + 1, undef], $position, $position + 1);
 	
 	# remaining observations
 	while (@data) {
 		$position += (shift @data) + 32768;
-		push @{ $self->{buffer}{$slice} }, [$position, $position, undef];
+		$tree->insert( [$position, $position + 1, undef], $position, $position + 1);
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_sf_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	
 	# unpack the data slice zip member
 	my $number = $self->slice_obs_number($slice);
@@ -1606,19 +1630,23 @@ sub _load_sf_slice {
 	
 	# convert the unpacked data into start, stop, score
 	# first observation
-	my $position = (shift @data) + 1;
-	push @{ $self->{buffer}{$slice} }, [$position, $position, shift(@data)];
+	my $position = shift @data;
+	$tree->insert( [$position, $position + 1, shift(@data)], $position, $position + 1);
 	
 	# remaining observations
 	while (@data) {
 		$position += (shift @data) + 32768;
-		push @{ $self->{buffer}{$slice} }, [$position, $position, shift(@data)];
+		$tree->insert( [$position, $position + 1, shift(@data)], $position, $position + 1);
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_st_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	
 	# convert the unpacked data into start, stop, (score), text
 	
@@ -1629,26 +1657,30 @@ sub _load_st_slice {
 	my $i = 8; # go ahead and set index up to first observation text
 	my (undef, $position, $t) = unpack('si>s>', substr($contents, 0, $i));
 		# initial null, position, text_length
-	$position += 1;
 	my $text = unpack("A$t", substr($contents, $i, $t));
-	push @{ $self->{buffer}{$slice} }, [$position, $position, undef, $text];
+	$tree->insert( [$position, $position + 1, undef, $text], $position, $position + 1);
 	$i += $t;
 	
 	# remaining observations
 	my $p; # position offset
-	while ($i < CORE::length($contents)) {
+	my $len = CORE::length($contents);
+	while ($i < $len) {
 		my ($p, $t) = unpack('s>s>', substr($contents, $i, 4));
 		$i += 4;
 		$position += $p + 32768;
 		$text = unpack("A$t", substr($contents, $i, $t));
-		push @{ $self->{buffer}{$slice} }, [$position, $position, undef, $text];
+		$tree->insert( [$position, $position + 1, undef, $text], $position, $position + 1);
 		$i += $t;
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_ss_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	
 	# unpack the data slice zip member
 	my $number = $self->slice_obs_number($slice);
@@ -1656,21 +1688,25 @@ sub _load_ss_slice {
 	
 	# convert the unpacked data into start, stop, no score
 	# first observation
-	my $position = (shift @data) + 1; # interbase to base
-	my $position2 = $position + (shift @data) + 32767; # 32768 - 1
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, undef];
+	my $position = @data;
+	my $position2 = $position + (shift @data) + 32768;
+	$tree->insert( [$position, $position2, undef], $position, $position2);
 	
 	# remaining observations
 	while (@data) {
 		$position += (shift @data) + 32768;
-		$position2 = $position + (shift @data) + 32767;
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, undef];
+		$position2 = $position + (shift @data) + 32768;
+		$tree->insert( [$position, $position2, undef], $position, $position2);
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_ssf_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	
 	# unpack the data slice zip member
 	my $number = $self->slice_obs_number($slice);
@@ -1678,77 +1714,89 @@ sub _load_ssf_slice {
 	
 	# convert the unpacked data into start, stop, score
 	# first observation
-	my $position = (shift @data) + 1; # interbase to base
-	my $position2 = $position + (shift @data) + 32767; # 32768 - 1
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, shift(@data)];
+	my $position = (shift @data); 
+	my $position2 = $position + (shift @data) + 32768; 
+	$tree->insert( [$position, $position2, shift(@data)], $position, $position2);
 	
 	# remaining observations
 	while (@data) {
 		$position += (shift @data) + 32768;
-		$position2 = $position + (shift @data) + 32767;
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, shift(@data)];
+		$position2 = $position + (shift @data) + 32768;
+		$tree->insert( [$position, $position2, shift(@data)], $position, $position2);
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_sst_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	my $contents = $self->zip->contents($slice);
 	
 	# first observation
 	my $i = 10; # go ahead and set index up to first observation text
 	my (undef, $position, $l, $t) = unpack('si>s>s>', substr($contents, 0, $i));
 		# initial null, position, length, text_length
-	$position += 1; # interbase to base
-	my $position2 = $position + $l + 32767; # 32768 - 1
+	my $position2 = $position + $l + 32768;
 	my $text = unpack("A$t", substr($contents, $i, $t));
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, undef, $text];
+	$tree->insert( [$position, $position2, undef, $text], $position, $position2);
 	$i += $t;
 	
 	# remaining observations
 	my $p; # position offset
-	while ($i < CORE::length($contents)) {
+	my $len = CORE::length($contents);
+	while ($i < $len) {
 		($p, $l, $t) = unpack('s>s>s>', substr($contents, $i, 6));
 		$i += 6;
 		$position += $p + 32768;
-		$position2 = $position + $l + 32767;
+		$position2 = $position + $l + 32768;
 		$text = unpack("A$t", substr($contents, $i, $t));
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, undef, $text];
+		$tree->insert( [$position, $position2, undef, $text], $position, $position2);
 		$i += $t;
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_ssft_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	my $contents = $self->zip->contents($slice);
 	
 	# first observation
 	my $i = 14; # go ahead and set index up to first observation text
 	my (undef, $position, $l, $s, $t) = unpack('si>s>f>s>', substr($contents, 0, $i));
 		# initial null, position, length, score, text_length
-	$position += 1; # interbase to base
-	my $position2 = $position + $l + 32767; # 32768 - 1
+	my $position2 = $position + $l + 32768;
 	my $text = unpack("A$t", substr($contents, $i, $t));
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, $s, $text];
+	$tree->insert( [$position, $position2, $s, $text], $position, $position2);
 	$i += $t;
 	
 	# remaining observations
 	my $p; # position offset
-	while ($i < CORE::length($contents)) {
+	my $len = CORE::length($contents);
+	while ($i < $len) {
 		($p, $l, $s, $t) = unpack('s>s>f>s>', substr($contents, $i, 10));
 		$i += 10;
 		$position += $p + 32768;
-		$position2 = $position + $l + 32767;
+		$position2 = $position + $l + 32768;
 		$text = unpack("A$t", substr($contents, $i, $t));
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, $s, $text];
+		$tree->insert( [$position, $position2, $s, $text], $position, $position2);
 		$i += $t;
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_i_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	
 	# unpack the data slice zip member
 	my $number = $self->slice_obs_number($slice);
@@ -1756,19 +1804,23 @@ sub _load_i_slice {
 	
 	# convert the unpacked data into start, stop, score
 	# first observation
-	my $position = (shift @data) + 1;
-	push @{ $self->{buffer}{$slice} }, [$position, $position, undef];
+	my $position = @data;
+	$tree->insert( [$position, $position + 1, undef], $position, $position + 1);
 	
 	# remaining observations
 	while (@data) {
 		$position += (shift @data);
-		push @{ $self->{buffer}{$slice} }, [$position, $position, undef];
+		$tree->insert( [$position, $position + 1, undef], $position, $position + 1);
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_if_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	
 	# unpack the data slice zip member
 	my $number = $self->slice_obs_number($slice);
@@ -1776,19 +1828,23 @@ sub _load_if_slice {
 	
 	# convert the unpacked data into start, stop, score
 	# first observation
-	my $position = (shift @data) + 1;
-	push @{ $self->{buffer}{$slice} }, [$position, $position, shift(@data)];
+	my $position = @data;
+	$tree->insert( [$position, $position + 1, shift(@data)], $position, $position + 1);
 	
 	# remaining observations
 	while (@data) {
 		$position += (shift @data);
-		push @{ $self->{buffer}{$slice} }, [$position, $position, shift(@data)];
+		$tree->insert( [$position, $position + 1, shift(@data)], $position, $position + 1);
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_it_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	
 	# convert the unpacked data into start, stop, (score), text
 	
@@ -1799,26 +1855,30 @@ sub _load_it_slice {
 	my $i = 10; # go ahead and set index up to first observation text
 	my (undef, $position, $t) = unpack('si>i>', substr($contents, 0, $i));
 		# initial null, position, text_length
-	$position += 1;
 	my $text = unpack("A$t", substr($contents, $i, $t));
-	push @{ $self->{buffer}{$slice} }, [$position, $position, undef, $text];
+	$tree->insert( [$position, $position + 1, undef, $text], $position, $position + 1);
 	$i += $t;
 	
 	# remaining observations
 	my $p; # position offset
-	while ($i < CORE::length($contents)) {
+	my $len = CORE::length($contents);
+	while ($i < $len) {
 		($p, $t) = unpack('i>s>', substr($contents, $i, 6));
 		$i += 6; 
 		$position += $p + 32768;
 		$text = unpack("A$t", substr($contents, $i, $t));
-		push @{ $self->{buffer}{$slice} }, [$position, $position, undef, $text];
+		$tree->insert( [$position, $position + 1, undef, $text], $position, $position + 1);
 		$i += $t;
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_ii_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	
 	# unpack the data slice zip member
 	my $number = $self->slice_obs_number($slice);
@@ -1826,21 +1886,25 @@ sub _load_ii_slice {
 	
 	# convert the unpacked data into start, stop, score
 	# first observation
-	my $position = (shift @data) + 1; # interbase to base
-	my $position2 = $position + (shift @data) -1; 
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, undef];
+	my $position = @data;
+	my $position2 = $position + (shift @data); 
+	$tree->insert( [$position, $position2, undef], $position, $position2);
 	
 	# remaining observations
 	while (@data) {
 		$position += (shift @data);
-		$position2 = $position + (shift @data) - 1;
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, undef];
+		$position2 = $position + (shift @data);
+		$tree->insert( [$position, $position2, undef], $position, $position2);
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_iif_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	
 	# unpack the data slice zip member
 	my $number = $self->slice_obs_number($slice);
@@ -1848,76 +1912,88 @@ sub _load_iif_slice {
 	
 	# convert the unpacked data into start, stop, score
 	# first observation
-	my $position = (shift @data) + 1; # interbase to base
-	my $position2 = $position + (shift @data) - 1;
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, shift(@data)];
+	my $position = @data;
+	my $position2 = $position + (shift @data);
+	$tree->insert( [$position, $position2, shift(@data)], $position, $position2);
 	
 	# remaining observations
 	while (@data) {
 		$position += (shift @data);
-		$position2 = $position + (shift @data) - 1;
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, shift(@data)];
+		$position2 = $position + (shift @data);
+		$tree->insert( [$position, $position2, shift(@data)], $position, $position2);
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_iit_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	my $contents = $self->zip->contents($slice);
 	
 	# first observation
 	my $i = 12; # go ahead and set index up to first observation text
 	my (undef, $position, $l, $t) = unpack('si>i>s>', substr($contents, 0, $i));
 		# initial null, position, length, text_length
-	$position += 1; # interbase to base
-	my $position2 = $position + $l - 1;
+	my $position2 = $position + $l;
 	my $text = unpack("A$t", substr($contents, $i, $t));
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, undef, $text];
+	$tree->insert( [$position, $position2, undef, $text], $position, $position2);
 	$i += $t;
 	
 	# remaining observations
 	my $p; # position offset
-	while ($i < CORE::length($contents)) {
+	my $len = CORE::length($contents);
+	while ($i < $len) {
 		($p, $l, $t) = unpack('i>i>s>', substr($contents, $i, 10));
 		$i += 10;
 		$position += $p;
-		$position2 = $position + $l - 1;
+		$position2 = $position + $l;
 		$text = unpack("A$t", substr($contents, $i, $t));
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, undef, $text];
+		$tree->insert( [$position, $position2, undef, $text], $position, $position2);
 		$i += $t;
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_iift_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	my $contents = $self->zip->contents($slice);
 	
 	# first observation
 	my $i = 16; # go ahead and set index up to first observation text
 	my (undef, $position, $l, $s, $t) = unpack('si>i>f>s>', substr($contents, 0, $i));
 		# initial null, position, length, score, text_length
-	$position += 1; # interbase to base
-	my $position2 = $position + $l - 1;
+	my $position2 = $position + $l;
 	my $text = unpack("A$t", substr($contents, $i, $t));
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, $s, $text];
+	$tree->insert( [$position, $position2, $s, $text], $position, $position2);
 	$i += $t;
 	
 	# remaining observations
 	my $p; # position offset
-	while ($i < CORE::length($contents)) {
+	my $len = CORE::length($contents);
+	while ($i < $len) {
 		($p, $l, $s, $t) = unpack('i>i>f>s>', substr($contents, $i, 14));
 		$i += 14;
 		$position += $p;
-		$position2 = $position + $l - 1;
+		$position2 = $position + $l;
 		$text = unpack("A$t", substr($contents, $i, $t));
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, $s, $text];
+		$tree->insert( [$position, $position2, $s, $text], $position, $position2);
 		$i += $t;
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_is_slice {
 	my $self = shift;
+	my $tree = Set::IntervalTree->new();
 	my $slice = shift;
 	
 	# unpack the data slice zip member
@@ -1926,21 +2002,25 @@ sub _load_is_slice {
 	
 	# convert the unpacked data into start, stop, score
 	# first observation
-	my $position = (shift @data) + 1; # interbase to base
-	my $position2 = $position + (shift @data) + 32767; # 32768 - 1
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, undef];
+	my $position = @data;
+	my $position2 = $position + (shift @data) + 32768;
+	$tree->insert( [$position, $position2, undef], $position, $position2);
 	
 	# remaining observations
 	while (@data) {
 		$position += (shift @data);
-		$position2 = $position + (shift @data) + 32767;
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, undef];
+		$position2 = $position + (shift @data) + 32768;
+		$tree->insert( [$position, $position2, undef], $position, $position2);
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_isf_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	
 	# unpack the data slice zip member
 	my $number = $self->slice_obs_number($slice);
@@ -1948,59 +2028,66 @@ sub _load_isf_slice {
 	
 	# convert the unpacked data into start, stop, score
 	# first observation
-	my $position = (shift @data) + 1; # interbase to base
-	my $position2 = $position + (shift @data) + 32767; # 32768 - 1
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, shift(@data)];
+	my $position = @data;
+	my $position2 = $position + (shift @data) + 32768;
+	$tree->insert( [$position, $position2, shift(@data)], $position, $position2);
 	
 	# remaining observations
 	while (@data) {
 		$position += (shift @data);
-		$position2 = $position + (shift @data) + 32767;
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, shift(@data)];
+		$position2 = $position + (shift @data) + 32768;
+		$tree->insert( [$position, $position2, shift(@data)], $position, $position2);
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_ist_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	my $contents = $self->zip->contents($slice);
 	
 	# first observation
 	my $i = 10; # go ahead and set index up to first observation text
 	my (undef, $position, $l, $t) = unpack('si>s>s>', substr($contents, 0, $i));
 		# initial null, position, length, text_length
-	$position += 1; # interbase to base
-	my $position2 = $position + $l + 32767; # 32768 - 1
+	my $position2 = $position + $l + 32768;
 	my $text = unpack("A$t", substr($contents, $i, $t));
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, undef, $text];
+	$tree->insert( [$position, $position2, undef, $text], $position, $position2);
 	$i += $t;
 	
 	# remaining observations
 	my $p; # position offset
-	while ($i < CORE::length($contents)) {
+	my $len = CORE::length($contents);
+	while ($i < $len) {
 		($p, $l, $t) = unpack('i>s>s>', substr($contents, $i, 8));
 		$i += 8;
 		$position += $p;
-		$position2 = $position + $l + 32767;
+		$position2 = $position + $l + 32768;
 		$text = unpack("A$t", substr($contents, $i, $t));
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, undef, $text];
+		$tree->insert( [$position, $position2, undef, $text], $position, $position2);
 		$i += $t;
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _load_isft_slice {
 	my $self = shift;
 	my $slice = shift;
+	my $tree = Set::IntervalTree->new();
 	my $contents = $self->zip->contents($slice);
 	
 	# first observation
 	my $i = 14; # go ahead and set index up to first observation text
 	my (undef, $position, $l, $s, $t) = unpack('si>s>f>s>', substr($contents, 0, $i));
 		# initial null, position, length, score, text_length
-	$position += 1; # interbase to base
-	my $position2 = $position + $l + 32767; # 32768 - 1
+	my $position2 = $position + $l + 32768;
 	my $text = unpack("A$t", substr($contents, $i, $t));
-	push @{ $self->{buffer}{$slice} }, [$position, $position2, $s, $text];
+	$tree->insert( [$position, $position2, $s, $text], $position, $position2);
 	$i += $t;
 	
 	# remaining observations
@@ -2009,11 +2096,14 @@ sub _load_isft_slice {
 		($p, $l, $s, $t) = unpack('i>s>f>s>', substr($contents, $i, 12));
 		$i += 12;
 		$position += $p;
-		$position2 = $position + $l + 32767;
+		$position2 = $position + $l + 32768;
 		$text = unpack("A$t", substr($contents, $i, $t));
-		push @{ $self->{buffer}{$slice} }, [$position, $position2, $s, $text];
+		$tree->insert( [$position, $position2, $s, $text], $position, $position2);
 		$i += $t;
 	}
+	
+	# store Interval Tree buffer
+	$self->{buffer}{$slice} = $tree;
 }
 
 sub _scores {
@@ -2029,15 +2119,11 @@ sub _scores {
 		$self->_load_slice($slice);
 		
 		# find the overlapping observations
-		# each observation is [start, stop, score]
-		# quickly find a jump point and start from there through the rest of buffer
-		my $data = $self->{'buffer'}{$slice};
-		for my $d ($self->_jump($data, $start) .. $#{$data}) {
-			# check for overlap 
-			if ($data->[$d][0] <= $stop and $data->[$d][1] >= $start) {
-				push @scores, $data->[$d][2] if defined $data->[$d][2];
-			}
-			last if $data->[$d][0] > $stop;
+		my $results = $self->{'buffer'}{$slice}->fetch($start - 1, $stop);
+		
+		# record the scores
+		foreach my $r (@$results) {
+			push @scores, $r->[2] if defined $r->[2];
 		}
 	}
 	return \@scores;
@@ -2052,23 +2138,17 @@ sub _mean_score {
 	my $sum;
 	my $count = 0;
 	foreach my $slice (@$slices) {
+		next unless $self->slice_type($slice) =~ /f/; 
+			# no sense going through if no score present
 		
 		# load and unpack the data
 		$self->_load_slice($slice);
 		
-		# find the overlapping observations
-		# each observation is [start, stop, score]
-		# quickly find a jump point and start from there through the rest of buffer
-		my $data = $self->{'buffer'}{$slice};
-		for my $d ($self->_jump($data, $start) .. $#{$data}) {
-			# check for overlap 
-			if ($data->[$d][0] <= $stop and $data->[$d][1] >= $start) {
-				if ($data->[$d][2]) {
-					$sum += $data->[$d][2];
-					$count++;
-				}
-			}
-			last if $data->[$d][0] > $stop;
+		# find the overlapping observations and record values
+		my $results = $self->{'buffer'}{$slice}->fetch($start - 1, $stop);
+		foreach my $r (@$results) {
+			$sum += $r->[2] || 0;
+			$count++;
 		}
 	}
 	return $count ? $sum / $count : undef;
@@ -2088,26 +2168,23 @@ sub _stat_summary {
 	
 	# collect the scores from each of the requested slices
 	foreach my $slice (@$slices) {
+		next unless $self->slice_type($slice) =~ /f/; 
+			# no sense going through if no score present
 		
 		# load and unpack the data
 		$self->_load_slice($slice);
 		
 		# find the overlapping observations
-		# each observation is [start, stop, score]
-		# quickly find a jump point and start from there through the rest of buffer
-		my $data = $self->{'buffer'}{$slice};
-		for my $d ($self->_jump($data, $start) .. $#{$data}) {
-			# check for overlap 
-			if ($data->[$d][0] <= $stop and $data->[$d][1] >= $start) {
-				if ($data->[$d][2]) {
-					$count++;
-					$sum += $data->[$d][2];
-					$sum_squares += ($data->[$d][2] * $data->[$d][2]);
-					$min = $data->[$d][2] if (!defined $min or $data->[$d][2] < $min);
-					$max = $data->[$d][2] if (!defined $max or $data->[$d][2] > $max);
-				}
+		my $results = $self->{'buffer'}{$slice}->fetch($start - 1, $stop);
+		foreach my $r (@$results) {
+			# each observation is [start, stop, score]
+			if (defined $r->[2]) {
+				$count++;
+				$sum += $r->[2];
+				$sum_squares += ($r->[2] * $r->[2]);
+				$min = $r->[2] if (!defined $min or $r->[2] < $min);
+				$max = $r->[2] if (!defined $max or $r->[2] > $max);
 			}
-			last if $data->[$d][0] > $stop;
 		}
 	}
 	
@@ -2120,24 +2197,6 @@ sub _stat_summary {
 		'maxVal'        => $max || 0,
 	);
 	return \%summary;
-}
-
-sub _jump {
-	my $self = shift;
-	my ($data, $start) = @_;
-	
-	# jump increment of 100 observations
-	# with a typical slice of 10000 observations, we can quickly cover the 
-	# whole slice in < 100 loop iterations
-	my $jump = 100;
-	while ($jump < $#{$data}) {
-		if ($data->[$jump][0] >= $start) {
-			$jump -= 100; # go back a bit so we don't miss anything
-			last;
-		}
-		$jump += 100;
-	}
-	return $jump;
 }
 
 sub _rewrite_metadata {
@@ -2358,7 +2417,14 @@ sub new {
 		$args{-end}, 
 		$args{-strand},
 	);
-	$useq->_clear_buffer(@slices);
+	$useq->_clear_buffer(\@slices);
+	
+	# sort the slices as necessary
+	if (scalar(@slices) > 1) {
+		@slices = map {$_->[1]} 
+				sort {$a->[0] <=> $b->[0]} 
+				map { [$useq->slice_start($_), $_] } @slices;
+	}
 	
 	# how we set up the iterator depends on the feature type requested
 	# we need to add specific information to iterator object 
@@ -2368,21 +2434,23 @@ sub new {
 		$iterator->{'wiggle'} = 0;
 		
 		# prepare specific iterator information
-		$iterator->{'slices'} = [ @slices ];
-		$iterator->{'current_slice'} = undef;
-		$iterator->{'current_index'} = undef;
+		$iterator->{'slices'} = \@slices;
+		$iterator->{'current_results'} = undef;
+		$iterator->{'current_strand'} = undef;
 		
 		return $iterator;
 	}
 	
 	# otherwise we work with more complex wiggle or summary features
+	# set the type of wiggle feature: 1 = wiggle, 2 = summary
 	$iterator->{'wiggle'} = $iterator->type =~ /summary/ ? 2 : 1;
 	
-	# we could have data from one or more strands
+	# normally the iterator will only return one wigggle|summary feature, but 
+	# will return two if stranded data, per behavior for Bio::Grapics...
 	if ($iterator->strand == 0 and $useq->stranded) {
-		# separate the slices into each respective strand
-		my @f;
-		my @r;
+		# we have stranded data, so need to return two features
+		# separate the slices into each respective strands for each feature
+		my (@f, @r);
 		foreach (@slices) {
 			if ($useq->slice_strand($_) == 1) {
 				push @f, $_;
@@ -2394,7 +2462,7 @@ sub new {
 		$iterator->{slices} = [\@f, \@r];
 	}
 	else {
-		# only one strand to work with
+		# only need to return one feature
 		$iterator->{slices} = [ \@slices ];
 	}
 	
@@ -2429,83 +2497,49 @@ sub next_seq {
 sub next_feature {return shift->next_seq}
 
 sub _next_region {
+	# this will keep returning observations as SeqFeature objects until we run out 
+	# of observations in the requested interval
 	my $self = shift;
 	my $useq = $self->{'useq'};
 	
-	# get current information
-	my $slice = $self->{'current_slice'} || shift @{ $self->{'slices'} } || undef;
-	my $index = $self->{'current_index'} || 0;
-	
-	# load current slice
-	return unless $slice;
-	$useq->_load_slice($slice);
-	my $data = $useq->{buffer}{$slice};
-	my $last_index = $useq->slice_obs_number($slice) - 1;
-	
-	# walk through the slice
-	while ($slice) {
-		# check current observation for overlap
-		if ($data->[$index][0] <= $self->end and $data->[$index][1] >= $self->start) {
-			
-			# prepare for the next call
-			if ($index == $last_index) {
-				# this is the last observation
-				$self->{current_slice} = shift @{ $self->{'slices'} } || undef;
-				$self->{current_index} = 0;
-			}
-			else {
-				$self->{current_index} = $index + 1;
-				$self->{current_slice} = $slice;
-			}
-			
-			# return the found feature
-			return Bio::DB::USeq::Feature->new(
-				-seq_id     => $self->seq_id,
-				-start      => $data->[$index][0],
-				-end        => $data->[$index][1],
-				-strand     => $useq->slice_strand($slice),
-				-score      => $data->[$index][2],
-				-source     => $self->source,
-				-type       => $self->type,       
-				-name       => defined $data->[$index][3] ? $data->[$index][3] :
-					join(':', $self->seq_id, $data->[$index][0], $data->[$index][1]),
-			)
-		}
+	# get current results
+	unless ($self->{'current_results'}) {
+		my $slice = shift @{ $self->{'slices'} } || undef;
+		return unless $slice; # no more slices, we're done
 		
-		# gone beyond the requested region
-		if ($data->[$index][0] > $self->end) {
-			# reset the slice, although unlikely there are anymore
-			$slice = shift @{ $self->{'slices'} } || undef;
-			if ($slice) {
-				$useq->_load_slice($slice);
-				$data = $useq->{buffer}{$slice};
-			}
-			$self->{current_slice} = $slice;
-			$index = 0;
-			$self->{current_index} = $index;
-			next;
-		}
+		# collect the observations
+		$useq->_load_slice($slice);
+		my $result = $useq->{buffer}{$slice}->fetch($self->start - 1, $self->end);
 		
-		# no luck, prepare for next observation
-		if ($index == $last_index) {
-			# reset the slice, although unlikely there are anymore
-			$slice = shift @{ $self->{'slices'} } || undef;
-			if ($slice) {
-				$useq->_load_slice($slice);
-				$data = $useq->{buffer}{$slice};
-			}
-			$self->{current_slice} = $slice;
-			$index = 0;
-			$self->{current_index} = $index;
-		}
-		else {
-			$index++;
-		}
+		# sort the observations and store the results
+		my @sorted = sort {$a->[0] <=> $b->[0] or $a->[1] <=> $b->[1]} @$result;
+		$self->{'current_results'} = \@sorted;
+		$self->{'current_strand'} = $useq->slice_strand($slice);
 	}
-	return;
+	
+	# return next observation as a Feature object
+	my $obs = shift @{ $self->{'current_results'} };
+	unless (defined $obs) {
+		# no more observations for current slice, try to move to next slice
+		undef $self->{'current_results'};
+		return $self->_next_region;
+	}
+	return Bio::DB::USeq::Feature->new(
+		-seq_id     => $self->seq_id,
+		-start      => $obs->[0] + 1,
+		-end        => $obs->[1],
+		-strand     => $self->{'current_strand'},
+		-score      => $obs->[2],
+		-source     => $self->source,
+		-type       => $self->type,       
+		-name       => defined $obs->[3] ? $obs->[3] :
+			join(':', $self->seq_id, $obs->[0], $obs->[1]),
+	)
 }
 
 sub _next_wiggle {
+	# this will return one wiggle Feature, two if separate strands are requested
+	
 	my $self = shift;
 	my $useq = $self->{'useq'};
 	
@@ -2560,18 +2594,13 @@ sub _next_wiggle {
 			# load and unpack the data
 			$useq->_load_slice($slice);
 
-			# find the overlapping observations
+			# fetch the overlapping observations
 			# each observation is [start, stop, score]
-			# quickly find a jump point and start from there through the rest of buffer
-			my $data = $useq->{'buffer'}{$slice};
-			for my $d ($useq->_jump($data, $start) .. $#{$data}) {
-				# check for overlap 
-				if ($data->[$d][0] <= $stop and $data->[$d][1] >= $start) {
-					foreach my $p ( $data->[$d][0] .. $data->[$d][1] ) {
-						$pos2score{$p} = $data->[$d][2];
-					}
+			my $result = $useq->{'buffer'}{$slice}->fetch($start - 1, $stop);
+			foreach my $r (@$result) {
+				foreach my $p ( $r->[0] + 1 .. $r->[1] ) {
+					$pos2score{$p} = $r->[2];
 				}
-				last if $data->[$d][0] > $stop;
 			}
 		}
 
@@ -2600,6 +2629,7 @@ sub _next_wiggle {
 }
 
 sub _next_summary {
+	# this will return one summary Feature, two if separate strands are requested
 	my $self = shift;
 	
 	# determine which slices to retrieve
@@ -2751,7 +2781,7 @@ sub statistical_summary {
 		# this should already be established, but just in case
 		my @a = $useq->_translate_coordinates_to_slices($self->seq_id, 
 				$self->start, $self->end, $self->strand);
-		$useq->_clear_buffer(@a);
+		$useq->_clear_buffer(\@a);
 		$slices = \@a;
 	}
 	

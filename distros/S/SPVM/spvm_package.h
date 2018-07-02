@@ -13,12 +13,13 @@ extern const char* const SPVM_PACKAGE_C_CATEGORY_NAMES[];
 
 struct SPVM_package {
   SPVM_OP* op_name;
-  SPVM_LIST* op_subs;
   SPVM_LIST* op_fields;
   SPVM_HASH* op_field_symtable;
-  SPVM_LIST* object_field_ids;
-  SPVM_HASH* op_our_symtable;
-  SPVM_LIST* op_ours;
+  SPVM_LIST* op_package_vars;
+  SPVM_HASH* op_package_var_symtable;
+  SPVM_LIST* op_subs;
+  SPVM_HASH* op_sub_symtable;
+  SPVM_LIST* object_field_rel_ids;
   SPVM_HASH* method_signature_symtable;
   SPVM_HASH* has_interface_cache_symtable;
   SPVM_OP* op_sub_destructor;
@@ -28,6 +29,12 @@ struct SPVM_package {
   _Bool is_private;
   _Bool is_anon;
   int32_t category;
+  SPVM_LIST* op_package_var_accesses;
+  SPVM_LIST* op_field_accesses;
+  SPVM_LIST* op_types;
+  SPVM_LIST* op_call_subs;
+  SPVM_LIST* op_constants;
+  SPVM_LIST* op_switch_infos;
 };
 
 SPVM_PACKAGE* SPVM_PACKAGE_new(SPVM_COMPILER* compiler);

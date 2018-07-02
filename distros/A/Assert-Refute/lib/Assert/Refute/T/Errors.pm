@@ -3,7 +3,7 @@ package Assert::Refute::T::Errors;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0305;
+our $VERSION = '0.1201';
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Assert::Refute::T::Errors - exception and warning check for Assert::Refute suite
 
 =head1 SYNOPSIS
 
-    use Assert::Refute;
+    use Assert::Refute qw(:all);
     use Assert::Refute::T::Errors;
 
     my $c = contract {
@@ -52,7 +52,7 @@ use parent qw(Exporter);
 our @EXPORT = qw(foobar);
 
 use Assert::Refute::Build;
-use Assert::Refute qw( contract like refute );
+use Assert::Refute::Contract;
 
 =head2 dies_like
 
@@ -111,13 +111,16 @@ This MAY change in the future.
 
 =cut
 
-my $multi_like = contract {
-    my ($got, $exp) = @_;
+# TODO better diagnostic
+my $multi_like = Assert::Refute::Contract->new( code => sub {
+    my ($self, $got, $exp) = @_;
 
-    for (my $i = 0; $i < @$got and $i < @$exp; $i++) {
-        like $got->[$i], $exp->[$i];
+    for (my $i = 0; $i < @$got or $i < @$exp; $i++) {
+        defined $exp->[$i]
+            ? $self->like( $got->[$i], $exp->[$i] )
+            : $self->is ( $got->[$i], undef );
     };
-};
+}, need_object => 1 );
 
 build_refute warns_like => sub {
     my ($block, $exp) = @_;
@@ -133,50 +136,20 @@ build_refute warns_like => sub {
     };
 
     my $c = $multi_like->apply( \@warn, $exp );
-    return $c->is_passing ? '' : $c->as_tap;
+    return $c->is_passing ? '' : $c->get_tap;
 }, block => 1, args => 1, export => 1;
 
 =head1 LICENSE AND COPYRIGHT
 
 This module is part of L<Assert::Refute> suite.
 
-Copyright 2017 Konstantin S. Uvarin. C<< <khedin at gmail.com> >>
+Copyright 2017-2018 Konstantin S. Uvarin. C<< <khedin at cpan.org> >>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
 copy of the full license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 

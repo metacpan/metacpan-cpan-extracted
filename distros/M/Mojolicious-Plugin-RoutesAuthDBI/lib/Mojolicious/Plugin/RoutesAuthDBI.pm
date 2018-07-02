@@ -328,13 +328,13 @@ sub model {
   
 };
 
-our $VERSION = '0.841';
+our $VERSION = '0.842';
 
 =pod
 
 =encoding utf8
 
-Доброго всем
+=head1 Доброго всем
 
 ¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
 
@@ -344,7 +344,7 @@ Plugin makes an auth operations throught the plugin L<Mojolicious::Plugin::Authe
 
 =head1 VERSION
 
-0.841
+0.842
 
 =head1 NAME
 

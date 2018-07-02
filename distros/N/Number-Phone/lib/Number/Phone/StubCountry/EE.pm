@@ -22,11 +22,10 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221546;
+our $VERSION = 1.20180619214155;
 
 my $formatters = [
                 {
-                  'pattern' => '([3-79]\\d{2})(\\d{4})',
                   'leading_digits' => '
             [369]|
             4[3-8]|
@@ -44,20 +43,20 @@ my $formatters = [
             )|
             7[1-9]
           ',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'pattern' => '([3-79]\\d{2})(\\d{4})'
                 },
                 {
                   'pattern' => '(70)(\\d{2})(\\d{4})',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '70'
-                },
-                {
-                  'pattern' => '(8000)(\\d{3})(\\d{3})',
-                  'leading_digits' => '8000',
+                  'leading_digits' => '70',
                   'format' => '$1 $2 $3'
                 },
                 {
-                  'format' => '$1 $2',
+                  'leading_digits' => '8000',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(8000)(\\d{3})(\\d{3})'
+                },
+                {
                   'leading_digits' => '
             40|
             5|
@@ -66,20 +65,12 @@ my $formatters = [
               [1-5]
             )
           ',
+                  'format' => '$1 $2',
                   'pattern' => '([458]\\d{3})(\\d{3,4})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            3[23589]|
-            4[3-8]|
-            6\\d|
-            7[1-9]|
-            88
-          )\\d{5}
-        ',
                 'mobile' => '
           (?:
             5\\d|
@@ -103,7 +94,15 @@ my $validators = {
           )\\d{4}
         )',
                 'pager' => '',
-                'personal_number' => '70[0-2]\\d{5}',
+                'geographic' => '
+          (?:
+            3[23589]|
+            4[3-8]|
+            6\\d|
+            7[1-9]|
+            88
+          )\\d{5}
+        ',
                 'fixed_line' => '
           (?:
             3[23589]|
@@ -120,6 +119,7 @@ my $validators = {
             [2-9]
           )\\d{3}
         ',
+                'personal_number' => '70[0-2]\\d{5}',
                 'voip' => ''
               };
 my %areanames = (

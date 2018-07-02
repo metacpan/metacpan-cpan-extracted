@@ -10,28 +10,28 @@ use MySQL::Admin::Settings;
 use MySQL::Admin::GUI;
 loadSettings('%PATH%/config/settings.pl');
 *m_hrS = \$MySQL::Admin::Settings::m_hrSettings;
-%conf = (
-         name     => $m_hrS->{database}{name},
-         host     => $m_hrS->{database}{host},
-         user     => $m_hrS->{database}{user},
-         password => $m_hrS->{database}{password},
-        );
+%conf  = (
+    name     => $m_hrS->{database}{name},
+    host     => $m_hrS->{database}{host},
+    user     => $m_hrS->{database}{user},
+    password => $m_hrS->{database}{password},
+);
 *m_hrS = \$MySQL::Admin::Settings::m_hrSettings;
 $m_oDb = new DBI::Library::Database();
-$m_oDb->initDB(\%conf);
-$m_oDb->serverName($m_hrS->{cgi}{serverName});
+$m_oDb->initDB( \%conf );
+$m_oDb->serverName( $m_hrS->{cgi}{serverName} );
 $length = $m_oDb->tableLength('news');
 $start  = param('start');
 $start  = $start =~ /(\d+)/ ? $1 : 0;
-$start  = ($start >= 0 and $start < $length) ? $start : 0;
-$xml    = $m_oDb->rss('news', $start, "$m_hrS->{cgi}{title} rss feed");
+$start  = ( $start >= 0 and $start < $length ) ? $start : 0;
+$xml    = $m_oDb->rss( 'news', $start, "$m_hrS->{cgi}{title} rss feed" );
 utf8::encode($xml);
 $xsl = openFile("cgi-bin/config/feed.xsl");
 print header(
-             -type                        => 'text/html',
-             -access_control_allow_origin => '*',
-             -charset                     => 'UTF-8'
-            );
+    -type                        => 'text/html',
+    -access_control_allow_origin => '*',
+    -charset                     => 'UTF-8'
+);
 $bis = $start + 10;
 print qq{
 <html>
@@ -42,9 +42,9 @@ print qq{
 <body>
 };
 
-for (my ($i, $j) = 0 ,0 ; $i < $length / 10 ; $i++, $j += 10) {
+for ( my ( $i, $j ) = 0, 0 ; $i < $length / 10 ; $i++, $j += 10 ) {
     print qq|<a href="plaintext.pl?start=$j">Page $i</a>|;
-}
+} ## end for ( my ( $i, $j ) = 0...)
 use XML::XSLT;
 my $xslt = XML::XSLT->new($xsl);
 $xslt->transform($xml);

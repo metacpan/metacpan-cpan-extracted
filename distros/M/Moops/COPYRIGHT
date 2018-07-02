@@ -65,7 +65,7 @@ Files: Changes
  lib/Moops/TraitFor/Keyword/ro.pm
  lib/Moops/TraitFor/Keyword/rw.pm
  lib/Moops/TraitFor/Keyword/rwp.pm
-Copyright: Copyright 2014 Toby Inkster.
+Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
@@ -78,6 +78,7 @@ Files: INSTALL
  examples/multimethods.pl
  examples/using-moops-with-method-signatures.pl
  examples/using-moosextypes-in-moo.pl
+ lib/Moops/Manual/Objects101.pod
 Copyright: Unknown
 License: Unknown
 
@@ -95,41 +96,30 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: examples/bench.pl
- examples/extending-moops.pl
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: Makefile.PL
  dist.ini
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/Moops/Manual/Objects101.pod
-Copyright: Copyright 2013-2014 Toby Inkster and others.
-License: Expat
+Files: examples/bench.pl
+ examples/extending-moops.pl
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 Files: t/99threads.t
 Copyright: This software is copyright (c) 2014 by Aaron James Trevena.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The GNU General Public License, Version 1, February 1989
-
-License: Expat
- This software is Copyright (c) 2014 by the copyright holder(s).
- 
- This is free software, licensed under:
- 
-   The MIT (X11) License

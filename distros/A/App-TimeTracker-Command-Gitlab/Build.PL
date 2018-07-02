@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@cpan.org>"
   ],
   "dist_name" => "App-TimeTracker-Command-Gitlab",
-  "dist_version" => "1.003",
+  "dist_version" => "1.004",
   "license" => "perl",
   "module_name" => "App::TimeTracker::Command::Gitlab",
   "recursive_test_files" => 1,

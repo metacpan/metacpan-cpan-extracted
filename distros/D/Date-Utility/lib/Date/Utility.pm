@@ -3,6 +3,7 @@ package Date::Utility;
 use 5.006;
 use strict;
 use warnings;
+use feature qw(state);
 
 =head1 NAME
 
@@ -10,7 +11,7 @@ Date::Utility - A class that represents a datetime in various format
 
 =cut
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 =head1 SYNOPSIS
 
@@ -43,6 +44,7 @@ use Tie::Hash::LRU;
 use Time::Local qw(timegm);
 use Try::Tiny;
 use Time::Duration::Concise::Localize;
+use POSIX qw(floor);
 
 my %popular;
 my $lru = tie %popular, 'Tie::Hash::LRU', 300;
@@ -174,6 +176,8 @@ sub _build_quarter_of_year {
 }
 
 =head2 day_of_week
+
+    return day of week begin with 0
 
 =cut
 
@@ -447,13 +451,16 @@ dd-mmm-yy ddhddGMT, dd-mmm-yy, dd-mmm-yyyy, dd-Mmm-yy hh:mm:ssGMT, YYYY-MM-DD, Y
 
 =cut
 
-my $mon_re            = qr/j(?:an|u[nl])|feb|ma[ry]|a(?:pr|ug)|sep|oct|nov|dec/i;
-my $sub_second        = qr/^[0-9]+\.[0-9]+$/;
-my $date_only         = qr/^([0-3]?[0-9])-($mon_re)-([0-9]{2}|[0-9]{4})$/;
-my $date_with_time    = qr /^([0-3]?[0-9])-($mon_re)-([0-9]{2}) ([0-2]?[0-9])[h:]([0-5][0-9])(?::)?([0-5][0-9])?(?:GMT)?$/;
-my $numeric_date_only = qr/^([12][0-9]{3})-?([01]?[0-9])-?([0-3]?[0-9])$/;
-my $fully_specced     = qr/^([12][0-9]{3})-?([01]?[0-9])-?([0-3]?[0-9])(?:T|\s)?([0-2]?[0-9]):?([0-5]?[0-9]):?([0-5]?[0-9])(\.[0-9]+)?(?:Z)?$/;
+my $mon_re             = qr/j(?:an|u[nl])|feb|ma[ry]|a(?:pr|ug)|sep|oct|nov|dec/i;
+my $sub_second         = qr/^[0-9]+\.[0-9]+$/;
+my $date_only          = qr/^([0-3]?[0-9])-($mon_re)-([0-9]{2}|[0-9]{4})$/;
+my $time_only_tz       = qr/([0-2]?[0-9])[h:]([0-5][0-9])(?::)?([0-5][0-9])?(?:GMT)?/;
+my $date_with_time     = qr /^([0-3]?[0-9])-($mon_re)-([0-9]{2}) $time_only_tz$/;
+my $numeric_date_regex = qr/([12][0-9]{3})-?([01]?[0-9])-?([0-3]?[0-9])/;
+my $numeric_date_only  = qr/^$numeric_date_regex$/;
+my $fully_specced      = qr/^([12][0-9]{3})-?([01]?[0-9])-?([0-3]?[0-9])(?:T|\s)?([0-2]?[0-9]):?([0-5]?[0-9]):?([0-5]?[0-9])(\.[0-9]+)?(?:Z)?$/;
 my $numeric_date_only_dd_mm_yyyy = qr/^([0-3]?[0-9])-([01]?[0-9])-([12][0-9]{3})$/;
+my $datetime_yyyymmdd_hhmmss_TZ  = qr/^$numeric_date_regex $time_only_tz$/;
 
 sub _parse_datetime_param {
     my $datetime = shift;
@@ -493,6 +500,13 @@ sub _parse_datetime_param {
         $day    = $3;
         $month  = $2;
         $year   = $1;
+        $hour   = $4;
+        $minute = $5;
+        $second = $6;
+    } elsif ($datetime =~ $datetime_yyyymmdd_hhmmss_TZ) {
+        $year   = $1;
+        $month  = $2;
+        $day    = $3;
         $hour   = $4;
         $minute = $5;
         $second = $6;
@@ -827,6 +841,14 @@ sub _move_time_interval {
     my ($self, $ti, $dir) = @_;
 
     unless (ref($ti)) {
+        if ($ti =~ s/([\d.]+)y//) {
+            my $new_date = $self->_plus_years($dir * $1);
+            return $ti ? $new_date->_move_time_interval($ti, $dir) : $new_date;
+        }
+        if ($ti =~ s/([\d.]+)mo//i) {
+            my $new_date = $self->_plus_months($dir * $1);
+            return $ti ? $new_date->_move_time_interval($ti, $dir) : $new_date;
+        }
         try { $ti = Time::Duration::Concise::Localize->new(interval => $ti) }
         catch {
             $ti //= 'undef';
@@ -983,6 +1005,34 @@ sub truncate_to_day {
     return $popular{$tepoch} // Date::Utility->new($tepoch);
 }
 
+=head2 truncate_to_month
+
+Returns a Date::Utility object with the day and time part truncated out of it.
+
+For instance, '2011-12-13 23:24:25' will return a new Date::Utility
+object representing '2011-12-01 00:00:00'
+
+=cut
+
+sub truncate_to_month {
+    my ($self) = @_;
+    return Date::Utility->new(sprintf("%04d-%02d-01", $self->year, $self->month));
+}
+
+=head2 truncate_to_hour
+
+Returns a Date::Utility object with the minutes and seconds truncated out of it.
+
+For instance, '2011-12-13 23:24:25' will return a new Date::Utility
+object representing '2011-12-13 23:00:00'
+
+=cut
+
+sub truncate_to_hour {
+    my ($self) = @_;
+    return Date::Utility->new(sprintf("%04d-%02d-%02d %02d:00:00", $self->year, $self->month, $self->day_of_month, $self->hour));
+}
+
 =head2 today
 
 Returns Date::Utility object for the start of the current day. Much faster than
@@ -1003,6 +1053,95 @@ sub today {
         $today_ends_at   = $time + 86399;
     }
     return $today_obj;
+}
+
+=head2 _plus_years
+
+Returns a new L<Date::Utility> object plus the given years. If the day is greater than days in the new month, it will take the day of end month.
+e.g.
+
+    print Date::Utility->new('2000-02-29')->_plus_years(1)->date_yyyymmdd;
+    # will got 2001-02-28
+
+=cut
+
+sub _plus_years {
+    my ($self, $years) = @_;
+    die "Need a integer years number"
+        unless looks_like_number($years)
+        and $years == int($years);
+    return $self->_create_trimmed_date($self->year + $years, $self->month, $self->day_of_month);
+}
+
+=head2 _minus_years
+
+Returns a new L<Date::Utility> object minus the given years. If the day is greater than days in the new month, it will take the day of end month.
+e.g.
+
+    print Date::Utility->new('2000-02-29')->minus_years(1)->date_yyyymmdd;
+    # will got 1999-02-28
+
+=cut
+
+sub _minus_years {
+    my ($self, $years) = @_;
+    return $self->_plus_years(-$years);
+}
+
+=head2 _plus_months
+
+Returns a new L<Date::Utility> object plus the given months. If the day is greater than days in the new month, it will take the day of end month.
+e.g.
+
+    print Date::Utility->new('2000-01-31')->plus_months(1)->date_yyyymmdd;
+    # will got 2000-02-28
+
+=cut
+
+sub _plus_months {
+    my ($self, $months) = @_;
+    (looks_like_number($months) && $months == int($months)) || die "Need a integer months number";
+    my $new_year  = $self->year;
+    my $new_month = $self->month + $months;
+    if ($new_month < 1 || $new_month > 12) {
+        $new_year += floor($new_month / 12);
+        $new_month = $new_month % 12;
+        if ($new_month < 1) {    # when date is 2011-01-01, and $months is -13, then here $new_month will be 0, so hanndle this case here.
+            $new_year--;
+            $new_month += 12;
+        }
+    }
+    my $new_day = $self->day_of_month;
+    return $self->_create_trimmed_date($new_year, $new_month, $new_day);
+}
+
+=head2 _minus_months
+
+Returns a new L<Date::Utility> object minus the given months. If the day is greater than days in the new month, it will take the day of end month.
+e.g.
+
+    print Date::Utility->new('2000-03-31')->minus_months(1)->date_yyyymmdd;
+    # will got 2000-02-28
+
+=cut
+
+sub _minus_months {
+    my ($self, $months) = @_;
+    return $self->_plus_months(-$months);
+}
+
+=head2 _create_trimmed_date
+
+Return a valid L<Date::Utility> object whose date part is same with the given year, month and day and time part is not changed. If the day is greater than the max day in that month , then use that max day as the day in the new object.
+
+=cut
+
+sub _create_trimmed_date {
+    my ($self, $year, $month, $day) = @_;
+    my $max_day = __PACKAGE__->new(sprintf("%04d-%02d-01", $year, $month))->days_in_month;
+    $day = $day < $max_day ? $day : $max_day;
+    my $date_string = sprintf("%04d-%02d-%02d %02d:%02d:%02d", $year, $month, $day, $self->hour, $self->minute, $self->second);
+    return __PACKAGE__->new($date_string);
 }
 
 no Moose;

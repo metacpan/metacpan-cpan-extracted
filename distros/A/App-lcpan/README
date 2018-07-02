@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.022 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2018-02-08.
+    This document describes version 1.023 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2018-06-21.
 
 SYNOPSIS
     See lcpan script.
@@ -41,6 +41,11 @@ FUNCTIONS
     *   index_name => *filename* (default: "index.db")
 
         Filename of index.
+
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
 
     *   or => *bool*
 
@@ -143,13 +148,18 @@ FUNCTIONS
 
         Filename of index.
 
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
+
     *   level => *int* (default: 1)
 
         Recurse for a number of levels (-1 means unlimited).
 
     *   modules* => *array[perl::modname]*
 
-    *   perl_version => *str* (default: "v5.26.0")
+    *   perl_version => *str* (default: "v5.24.0")
 
         Set base Perl version for determining core modules.
 
@@ -223,6 +233,11 @@ FUNCTIONS
 
         Filename of index.
 
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
+
     *   latest => *bool*
 
     *   or => *bool*
@@ -294,6 +309,11 @@ FUNCTIONS
 
         Filename of index.
 
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
+
     *   latest => *bool*
 
     *   namespaces => *array[str]*
@@ -304,7 +324,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.26.0")
+    *   perl_version => *str* (default: "v5.24.0")
 
         Set base Perl version for determining core modules.
 
@@ -356,6 +376,11 @@ FUNCTIONS
     *   index_name => *filename* (default: "index.db")
 
         Filename of index.
+
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
 
     *   level => *int*
 
@@ -423,6 +448,11 @@ FUNCTIONS
 
         Filename of index.
 
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
+
     *   latest => *bool*
 
     *   namespaces => *array[str]*
@@ -433,7 +463,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.26.0")
+    *   perl_version => *str* (default: "v5.24.0")
 
         Set base Perl version for determining core modules.
 
@@ -495,6 +525,11 @@ FUNCTIONS
     *   index_name => *filename* (default: "index.db")
 
         Filename of index.
+
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
 
     *   level => *int* (default: 1)
 
@@ -562,6 +597,11 @@ FUNCTIONS
 
         Filename of index.
 
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
+
     *   latest => *bool*
 
     *   no_path => *bool*
@@ -610,6 +650,11 @@ FUNCTIONS
 
         Filename of index.
 
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -641,6 +686,11 @@ FUNCTIONS
     *   index_name => *filename* (default: "index.db")
 
         Filename of index.
+
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
 
     Returns an enveloped result (an array).
 
@@ -688,6 +738,11 @@ FUNCTIONS
     *   index_name => *filename* (default: "index.db")
 
         Filename of index.
+
+        If "index_name" is a filename without any path, e.g. "index.db" then
+        index will be located in the top-level of "cpan". If "index_name"
+        contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
+        the index will be located solely using the "index_name".
 
     *   max_file_size => *int*
 

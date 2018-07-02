@@ -31,10 +31,14 @@ unshift @out , $entropy / log $o{b} ;
 print join "\t" , @out ; 
 print "\n" ; 
 
-
-
-## ヘルプの扱い
-sub VERSION_MESSAGE {}
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  our $VERSION = 0.21 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+}  
 sub HELP_MESSAGE {
     use FindBin qw[ $Script ] ; 
     $ARGV[1] //= '' ;
@@ -51,14 +55,16 @@ sub HELP_MESSAGE {
 
 =head1
 
- $0 
+ entropy 
 
-  Calculates entropy. Input data values are assumed to be separated by "\n".
+  Calculates the entropy. Input data values are assumed to be separated by "\n".
 
  Options: 
   
-    -b num : change the base number to num. 
-    -e     : show the exp ( entropy ) 
+    -b num : changes the base number to num. Default : 2 
+    -e     : shows the 2 ** ( entropy ). This is independent from the value specified by -b.
 
+   --help : Shows this help.
+   --version : Shows the version information of this program.
 
 =cut

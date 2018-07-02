@@ -110,7 +110,7 @@ sub _to_subject_public_der {
 sub get_struct_for_public_jwk {
     my ($self) = @_;
 
-    Module::Load::load('MIME::Base64');
+    require MIME::Base64;
 
     return {
         kty => 'RSA',
@@ -124,8 +124,8 @@ sub get_struct_for_public_jwk {
 sub _asn1_find {
     my ($self, $macro) = @_;
 
-    Module::Load::load('Crypt::Perl::ASN1');
-    Module::Load::load('Crypt::Perl::RSA::Template');
+    require Crypt::Perl::ASN1;
+    require Crypt::Perl::RSA::Template;
     my $asn1 = Crypt::Perl::ASN1->new()->prepare(
         Crypt::Perl::RSA::Template::get_template('INTEGER'),
     );
@@ -164,7 +164,7 @@ sub _verify {
             die Crypt::Perl::X::create('Generic', $err);
         }
 
-        Module::Load::load('Crypt::Perl::RSA::PKCS1_v1_5');
+        require Crypt::Perl::RSA::PKCS1_v1_5;
         return $digest eq Crypt::Perl::RSA::PKCS1_v1_5::decode($octets, $hasher);
     }
 

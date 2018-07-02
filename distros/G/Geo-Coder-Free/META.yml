@@ -4,8 +4,11 @@ author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
   App::csv2sqlite: '0'
+  CGI::IDS: '0'
+  CGI::Lingua: '0'
   CHI: '0'
   CHI::Driver::RawMemory: '0'
+  Data::Throttler: '0'
   File::Basename: '0'
   File::Copy: '0'
   File::Spec: '0'
@@ -54,5 +57,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free
   repository: git://github.com/nigelhorne/Geo-Coder-Free.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

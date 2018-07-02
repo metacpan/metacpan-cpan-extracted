@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.006-4-g9a59ce0
+package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.007-4-g35ba876
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Ensure the author is releasing using the latest Perl
 # KEYWORDS: plugin release develop author perl version latest
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeRelease';
@@ -36,10 +36,10 @@ sub before_release
 
     # we cannot know in advance the release schedule of Module::CoreList in order to check the latest perl
     # releases, but we can make a guess -- development releases are made once a month.  We'll assume that any
-    # Module::CoreList older than 2 months old is out of date, and lean on modules like [PromptIfStale] to confirm
+    # Module::CoreList older than 3 months old is out of date, and lean on modules like [PromptIfStale] to confirm
     # against the PAUSE index.
 
-    my $delta = 2 * 30 * 24 * 60 * 60;
+    my $delta = 3 * 30 * 24 * 60 * 60;
     my @gmtime = gmtime(time() - $delta);
     my $expected_version = sprintf('5.%04d%02d%02d', $gmtime[5] + 1900, $gmtime[4] + 1, $gmtime[3]);
 
@@ -76,7 +76,7 @@ Dist::Zilla::Plugin::EnsureLatestPerl - Ensure the author is releasing using the
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

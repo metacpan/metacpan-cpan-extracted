@@ -11,7 +11,7 @@ use Bio::Gonzales::Util::File qw/gonzopen/;
 
 extends 'Bio::Grid::Run::SGE::Index::List';
 
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 around 'create' => sub {
   my $orig = shift;

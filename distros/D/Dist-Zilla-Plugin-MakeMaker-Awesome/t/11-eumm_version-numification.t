@@ -32,29 +32,6 @@ subtest "eumm_version = $_" => sub {
         'EUMM version uses quotes to prevent losing information from numification',
     );
 
-    (my $eumm_version_sanitized = $eumm_version) =~ s/_//g;
-
-    $content =~ /(['"])CONFIGURE_REQUIRES\1\s+=>\s+\{/mg;
-    my $start = pos($content);
-    ok($content =~ /\},$/mg, 'found end of CONFIGURE_REQUIRES %WriteMakefileArgs section');
-    my $end = pos($content);
-    my $configure_requires_writemakefileargs = substr($content, $start, $end - $start - 2);
-
-    my (undef, $eumm_writemakefileargs) =
-        $configure_requires_writemakefileargs =~ /(['"])ExtUtils::MakeMaker\1\W+([\d._]+)/;
-    is(
-        $eumm_writemakefileargs,
-        $eumm_version_sanitized,
-        'ExtUtils::MakeMaker prereq in %WriteMakefileArgs CONFIGURE_REQUIRES is numerically equal to what was specified, with no underscore',
-    );
-
-    my $eumm_prereq = $tzil->distmeta->{prereqs}{configure}{requires}{'ExtUtils::MakeMaker'};
-    is(
-        $eumm_prereq,
-        $eumm_version_sanitized,
-        'ExtUtils::MakeMaker prereq in metadata is numerically equal to what was specified, with no underscore',
-    );
-
     diag 'got log messages: ', explain $tzil->log_messages
         if not Test::Builder->new->is_passing;
 }

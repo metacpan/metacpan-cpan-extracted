@@ -22,54 +22,27 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3 $4',
                   'leading_digits' => '
             09|
             [289]
-          '
+          ',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
+                  'pattern' => '(08)(\\d{3})(\\d{3})',
                   'leading_digits' => '08',
-                  'format' => '$1 $2 $3',
-                  'pattern' => '(08)(\\d{3})(\\d{3})'
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'mobile' => '
-          (?:
-            8[089]|
-            9\\d
-          )\\d{6}
-        ',
-                'specialrate' => '(09\\d{6})',
-                'geographic' => '
-          2(?:
-            0(?:
-              20|
-              3[1-7]|
-              4[134]|
-              5[14]|
-              6[14578]|
-              7[1-578]
-            )|
-            1(?:
-              4[145]|
-              5[14]|
-              6[14-68]|
-              7[169]|
-              88
-            )
-          )\\d{4}
-        ',
                 'personal_number' => '',
-                'pager' => '',
-                'toll_free' => '08\\d{6}',
+                'voip' => '',
                 'fixed_line' => '
           2(?:
             0(?:
@@ -89,7 +62,34 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'voip' => ''
+                'toll_free' => '08\\d{6}',
+                'pager' => '',
+                'geographic' => '
+          2(?:
+            0(?:
+              20|
+              3[1-7]|
+              4[134]|
+              5[14]|
+              6[14578]|
+              7[1-578]
+            )|
+            1(?:
+              4[145]|
+              5[14]|
+              6[14-68]|
+              7[169]|
+              88
+            )
+          )\\d{4}
+        ',
+                'specialrate' => '(09\\d{6})',
+                'mobile' => '
+          (?:
+            8[04589]|
+            9\\d
+          )\\d{6}
+        '
               };
 my %areanames = (
   2272020 => "Niamey",

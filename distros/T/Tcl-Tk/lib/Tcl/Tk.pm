@@ -6,7 +6,7 @@ use Exporter 'import';
 use vars qw(@EXPORT_OK %EXPORT_TAGS);
 
 @Tcl::Tk::ISA = qw(Tcl);
-$Tcl::Tk::VERSION = '1.04';
+$Tcl::Tk::VERSION = '1.06';
 
 sub WIDGET_CLEANUP() {0}
 
@@ -48,6 +48,12 @@ installation. By using this module an interpreter object created, which
 then gain access to entire variety of installed Tcl libraries (Tk, Tix,
 BWidgets, BLT, etc) and existing features (for example natively looking
 widgets using C<tile>).
+
+=head2 Prerequisites
+
+For full functionality you need the Tcl packages "snit", which is part
+of the standard tcl library (see L<core.tcl.tk/tcllib>), and the standard 
+tk library (see L<https://core.tcl.tk/tklib/home>).
 
 =head2 Access to the Tcl and Tcl::Tk extensions
 
@@ -263,6 +269,8 @@ C<.path method submethod parameter1 parameter2> I<....>
 
 C<.path method submeth subsubmeth parameter1 parameter2> I<....>
 
+=back
+
 =head4 faster way of invoking methods on widgets
 
 In case it is guaranteed that preprocessing of C<@parameters> are not required
@@ -285,8 +293,6 @@ Example:
    $text->_insertEnd('text to insert','tag');
 
 When doing many inserts to text widget, faster version could fasten execution.
-
-=back
 
 =head2 using any Tcl/Tk feature with Tcl::Tk module
 
@@ -1781,6 +1787,11 @@ sub Menubutton {
 	    my $int = $wid->interp;
 	    $int->call("$wid.m",'add','radiobutton',@_);
 	},
+	cascade => sub {
+	    my $wid = shift;
+	    $wid = $int->widget("$wid.m");
+	    _addcascade($wid, @_);
+	},
 	separator => sub {
 	    my $wid = shift;
 	    my $int = $wid->interp;
@@ -1799,6 +1810,14 @@ sub Menubutton {
 	    } else {
 		die "Finish cget implementation for Menubutton";
 	    }
+	},
+	entryconfigure => sub {
+	    my $wid = shift;
+	    $wid = $int->widget("$wid.m");
+	    my $int = $wid->interp;
+	    my $label = shift;
+	    $label =~ s/~//;
+	    $int->call("$wid", 'entryconfigure', $label, @_);
 	});
     my $mnub = $int->widget(
 	$int->call('menubutton', $w, -menu => "$w.m", %args),

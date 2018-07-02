@@ -20,7 +20,7 @@ my $dir = tempdir( CLEANUP => 1 );
 my $name = our_catfile( $dir, 'abc def' );
 {
     for ( 1 .. 9 ) {
-        datafolder( path => $name );
+        datafolder( path => $name, date_prefix => 0, time_prefix => 0 );
     }
 
     # Check transistion 999 => 1000
@@ -29,7 +29,7 @@ my $name = our_catfile( $dir, 'abc def' );
         or die "mkdir failed";
 
     for ( 1 .. 19 ) {
-        datafolder( path => $name );
+        datafolder( path => $name, date_prefix => 0, time_prefix => 0 );
     }
 
     my @entries = get_dir_entries($dir);
@@ -48,7 +48,7 @@ $dir = tempdir( CLEANUP => 1 );
 $name = our_catfile( $dir, 'abc def' );
 {
     for ( 1 .. 9 ) {
-        datafolder( path => $name, date_prefix => 1 );
+        datafolder( path => $name, time_prefix => 0 );
     }
     my @entries = get_dir_entries($dir);
     is( @entries, 9, "created 9 folders with date prefix" );
@@ -68,9 +68,74 @@ $name = our_catfile( $dir, 'abc def' );
     }
 }
 
+# Check time prefix
+$dir = tempdir( CLEANUP => 1 );
+$name = our_catfile( $dir, 'abc def' );
+{
+    for ( 1 .. 9 ) {
+        datafolder( path => $name, date_prefix => 0 );
+    }
+    my @entries = get_dir_entries($dir);
+    is( @entries, 9, "created 9 folders with time prefix" );
+
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+    my $ti = $hour*60*60 + $min*60 + $sec;
+
+    for my $entry (@entries) {
+
+        # make sure that $time_prefix is actually a time
+        like(
+            $entry, qr/[0-2][0-9]-[0-5][0-9]-[0-6][0-9]/,
+            "time in foldername"
+        );
+
+        $entry =~ s/_abc def_00[1-9]//;
+        my ($h,$m,$s) = split '-', $entry;
+        my $dev = $ti-($h*60*60+$m*60+$s);
+        ok (abs($dev)<5, "correct time in folder name");
+
+    }
+}
+
+# Check combined date/time prefix
+$dir = tempdir( CLEANUP => 1 );
+$name = our_catfile( $dir, 'abc def' );
+{
+    for ( 1 .. 9 ) {
+        datafolder( path => $name );
+    }
+    my @entries = get_dir_entries($dir);
+    is( @entries, 9, "created 9 folders with date_time prefix" );
+
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+    my $ti = $hour*60*60 + $min*60 + $sec;
+    my $date_prefix = strftime( '%Y-%m-%d', localtime() );
+
+    for my $entry (@entries) {
+
+        # make sure that prefix is actually a date_time
+        like(
+            $entry,
+            qr/[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-2][0-9]-[0-5][0-9]-[0-6][0-9]/,
+            "date_time in foldername"
+        );
+
+        $entry =~ s/_abc def_00[1-9]//;  # remove remaining text
+        my ($d,$t)=split '_', $entry;    # date and time
+
+        ok ($d eq $date_prefix, 'correct date in folder name');
+
+        my ($h,$m,$s)=split '-', $t; # split up time
+        my $dev = $ti - ($h*60*60+$m*60+$s);
+        ok (abs($dev)<5, "correct time in folder name");
+
+    }
+}
+
 # Check meta file and copy of script.
 {
-    my $folder = datafolder( path => $name );
+    my $folder = datafolder( path => $name,
+                             date_prefix => 0, time_prefix => 0 );
     say "path: ", $folder->path();
     my $folder_name = 'abc def_001';
     is( $folder->path(), our_catfile( $dir, $folder_name ) );
@@ -97,7 +162,8 @@ $name = our_catfile( $dir, 'abc def' );
 {
     # Set script_name, so that the copy does not end with '.t' and is confused
     # as a test.
-    my $folder = datafolder( script_name => 'script' );
+    my $folder = datafolder( script_name => 'script',
+                             date_prefix => 0, time_prefix => 0 );
     isa_ok( $folder, 'Lab::Moose::DataFolder' );
     my $path = $folder->path();
     is( $path, 'MEAS_001', "default folder name" );

@@ -87,15 +87,16 @@ sub rgb24 {
     }
 }
 
+package xg {
+    sub new    { bless do { my $offset = 0; \$offset }, shift }
+    sub toggle { ${+shift} ^= 10 }
+    sub offset { ${+shift} }
+}
+
 sub ansi_numbers {
     local $_ = shift // '';
     my @numbers;
-    my %xg = do {
-	my $FG = 1;
-	toggle    => sub { $FG ^= 1      },
-	indicator => sub { $FG ? 38 : 48 },
-	shift16   => sub { $FG ?  0 : 10 };
-    };
+    my $xg = new xg;
 
     while (m{\G
 	     (?:
@@ -115,16 +116,16 @@ sub ansi_numbers {
 	     )
 	    }xig) {
 	if ($+{slash}) {
-	    $xg{toggle}->();
+	    $xg->toggle;
 	}
 	elsif ($+{h24}) {
-	    push @numbers, $xg{indicator}->(), rgb24($+{h24});
+	    push @numbers, 38 + $xg->offset, rgb24($+{h24});
 	}
 	elsif ($+{c256}) {
-	    push @numbers, $xg{indicator}->(), 5, ansi256_number $+{c256};
+	    push @numbers, 38 + $xg->offset, 5, ansi256_number $+{c256};
 	}
 	elsif ($+{c16}) {
-	    push @numbers, $numbers{$+{c16}} + $xg{shift16}->();
+	    push @numbers, $numbers{$+{c16}} + $xg->offset;
 	}
 	elsif ($+{efct}) {
 	    my $efct = uc $+{efct};

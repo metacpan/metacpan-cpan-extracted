@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::InsertOneResult;
 # ABSTRACT: MongoDB single insert result object
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 use namespace::clean;
@@ -56,7 +54,7 @@ MongoDB::InsertOneResult - MongoDB single insert result object
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 

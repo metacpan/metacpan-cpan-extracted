@@ -4,7 +4,7 @@ sub OptArgs2::STYLE_NORMAL  { 2 }
 sub OptArgs2::STYLE_FULL    { 3 }
 
 package OptArgs2::Mo;
-our $VERSION = '0.0.9';
+our $VERSION = '0.0.10';
 
 BEGIN {
 #<<< do not perltidy
@@ -23,7 +23,7 @@ use overload
   '""'     => 'as_string',
   fallback => 1;
 
-our $VERSION = '0.0.9';
+our $VERSION = '0.0.10';
 
 sub new {
     my $proto = shift;
@@ -56,7 +56,7 @@ use warnings;
 use OptArgs2::Mo;
 use Carp ();
 
-our $VERSION = '0.0.9';
+our $VERSION = '0.0.10';
 
 sub result {
     my $self = shift;
@@ -91,7 +91,7 @@ use strict;
 use warnings;
 use OptArgs2::Mo;
 
-our $VERSION = '0.0.9';
+our $VERSION = '0.0.10';
 
 has cmd => (
     is       => 'rw',
@@ -159,7 +159,7 @@ use strict;
 use warnings;
 use OptArgs2::Mo;
 
-our $VERSION = '0.0.9';
+our $VERSION = '0.0.10';
 
 extends 'OptArgs2::Arg';
 
@@ -172,7 +172,7 @@ use strict;
 use warnings;
 use OptArgs2::Mo;
 
-our $VERSION = '0.0.9';
+our $VERSION = '0.0.10';
 
 has alias => ( is => 'ro', );
 
@@ -225,11 +225,6 @@ sub new_from {
           if exists $ref->{trigger};
 
         $ref->{trigger} = sub { die shift->usage(OptArgs2::STYLE_FULL) };
-    }
-
-    if ( $ref->{isa} eq 'Flag' and exists $ref->{default} ) {
-        return OptArgs2::Util->croak( 'Define::FlagNoDefault',
-            'isa:Flag cannot have default' );
     }
 
     if ( !exists $isa2getopt{ $ref->{isa} } ) {
@@ -312,13 +307,14 @@ use OptArgs2::Mo;
 use List::Util qw/max/;
 use Scalar::Util qw/weaken/;
 
-our $VERSION = '0.0.9';
+our $VERSION = '0.0.10';
 
 sub BUILD {
     my $self = shift;
 
     unless ( $self->name ) {
         ( my $x = $self->class ) =~ s/.*://;
+        $x =~ s/_/-/g;
         $self->name($x);
     }
 }
@@ -538,18 +534,18 @@ sub usage {
         }
     }
 
-    # Output Subcommands
-    if (@sargs) {
-        $usage .= "\n";
-        foreach my $row (@sargs) {
-            $usage .= sprintf( $format, @$row );
-        }
-    }
-
     # Output Options
     if (@uopts) {
         $usage .= "\n";
         foreach my $row (@uopts) {
+            $usage .= sprintf( $format, @$row );
+        }
+    }
+
+    # Output Subcommands
+    if (@sargs) {
+        $usage .= "\n";
+        foreach my $row (@sargs) {
             $usage .= sprintf( $format, @$row );
         }
     }
@@ -588,7 +584,7 @@ use Getopt::Long qw/GetOptionsFromArray/;
 use Exporter qw/import/;
 use OptArgs2::Mo;
 
-our $VERSION   = '0.0.9';
+our $VERSION   = '0.0.10';
 our @EXPORT    = (qw/arg class_optargs cmd opt optargs subcmd/);
 our @EXPORT_OK = (qw/usage/);
 
@@ -890,7 +886,7 @@ OptArgs2 - command-line argument and option processor
 
 =head1 VERSION
 
-0.0.9 (2016-12-03)
+0.0.10 (2018-06-26)
 
 =head1 SYNOPSIS
 

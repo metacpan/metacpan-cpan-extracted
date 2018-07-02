@@ -1,0 +1,47 @@
+Changes
+lib/CPAN/Cpanorg/Auxiliary.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+not_yet/001-print-file.t
+README
+t/001-new.t
+t/002-fetch-perl-version-data.t
+t/003-make-api-call.t
+t/mock.perl_version_all.json
+t/mockserver/content/.hold_directory
+t/mockserver/CPAN/authors/id/A/AB/ABIGAIL/CHECKSUMS
+t/mockserver/CPAN/authors/id/A/AB/ABIGAIL/perl-5.27.8.tar.gz
+t/mockserver/CPAN/authors/id/A/AR/ARC/CHECKSUMS
+t/mockserver/CPAN/authors/id/A/AR/ARC/perl-5.27.2.tar.gz
+t/mockserver/CPAN/authors/id/B/BI/BINGOS/CHECKSUMS
+t/mockserver/CPAN/authors/id/B/BI/BINGOS/perl-5.27.7.tar.gz
+t/mockserver/CPAN/authors/id/E/EH/EHERMAN/CHECKSUMS
+t/mockserver/CPAN/authors/id/E/EH/EHERMAN/perl-5.27.1.tar.gz
+t/mockserver/CPAN/authors/id/E/ET/ETHER/CHECKSUMS
+t/mockserver/CPAN/authors/id/E/ET/ETHER/perl-5.27.6.tar.gz
+t/mockserver/CPAN/authors/id/G/GE/GENEHACK/CHECKSUMS
+t/mockserver/CPAN/authors/id/G/GE/GENEHACK/perl-5.27.4.tar.gz
+t/mockserver/CPAN/authors/id/R/RE/RENEEB/CHECKSUMS
+t/mockserver/CPAN/authors/id/R/RE/RENEEB/perl-5.27.9.tar.gz
+t/mockserver/CPAN/authors/id/S/SH/SHAY/CHECKSUMS
+t/mockserver/CPAN/authors/id/S/SH/SHAY/perl-5.26.1-RC1.tar.gz
+t/mockserver/CPAN/authors/id/S/SH/SHAY/perl-5.26.1.tar.gz
+t/mockserver/CPAN/authors/id/S/SH/SHAY/perl-5.26.2-RC1.tar.gz
+t/mockserver/CPAN/authors/id/S/SH/SHAY/perl-5.26.2.tar.gz
+t/mockserver/CPAN/authors/id/S/SH/SHAY/perl-5.27.5.tar.gz
+t/mockserver/CPAN/authors/id/T/TO/TODDR/CHECKSUMS
+t/mockserver/CPAN/authors/id/T/TO/TODDR/perl-5.27.10.tar.gz
+t/mockserver/CPAN/authors/id/W/WO/WOLFSAGE/CHECKSUMS
+t/mockserver/CPAN/authors/id/W/WO/WOLFSAGE/perl-5.27.3.tar.gz
+t/mockserver/CPAN/authors/id/X/XS/XSAWYERX/CHECKSUMS
+t/mockserver/CPAN/authors/id/X/XS/XSAWYERX/perl-5.26.0.tar.gz
+t/mockserver/CPAN/authors/id/X/XS/XSAWYERX/perl-5.27.11.tar.gz
+t/mockserver/CPAN/authors/id/X/XS/XSAWYERX/perl-5.28.0-RC1.tar.gz
+t/mockserver/CPAN/authors/id/X/XS/XSAWYERX/perl-5.28.0-RC2.tar.gz
+t/mockserver/CPAN/src/5.0/.hold_directory
+t/mockserver/data/.hold_directory
+t/testlib/Helpers.pm
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

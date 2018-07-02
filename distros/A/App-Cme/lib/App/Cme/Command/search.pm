@@ -10,7 +10,7 @@
 # ABSTRACT: Search the configuration of an application
 
 package App::Cme::Command::search ;
-$App::Cme::Command::search::VERSION = '1.027';
+$App::Cme::Command::search::VERSION = '1.028';
 use strict;
 use warnings;
 use 5.10.1;
@@ -38,7 +38,6 @@ sub opt_spec {
             "narrow-search=s" => "narrows down the search to element, value, key, summary, description or help",
             { regex => qr/^(?:element|value|key|summary|description|help|all)$/, default => 'all' }
         ],
-        [ "quiet!"            => "Suppress progress messages" ],
         $class->cme_global_options,
     );
 }
@@ -86,7 +85,7 @@ App::Cme::Command::search - Search the configuration of an application
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 

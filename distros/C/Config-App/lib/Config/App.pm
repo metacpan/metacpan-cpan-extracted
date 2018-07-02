@@ -13,7 +13,7 @@ use JSON::XS ();
 use YAML::XS ();
 use POSIX ();
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.07'; # VERSION
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
@@ -77,7 +77,7 @@ sub get {
     my $data = $self->{_conf};
 
     $data = $data->{$_} for (@_);
-    return $data;
+    return _clone($data);
 }
 
 sub put {
@@ -98,7 +98,11 @@ sub put {
 sub conf {
     my $self = shift;
     _merge_settings( $self->{_conf}, $_ ) for (@_);
-    return $self->{_conf};
+    return _clone( $self->{_conf} );
+}
+
+sub _clone {
+    return YAML::XS::Load( YAML::XS::Dump(@_) );
 }
 
 sub _location_fetch {
@@ -274,13 +278,18 @@ sub _merge_settings {
     my ( $merge, $source ) = @_;
     return unless $source;
 
-    for my $key ( keys %{$source} ) {
-        if ( exists $merge->{$key} and ref( $merge->{$key} ) eq 'HASH' ) {
-            _merge_settings( $merge->{$key}, $source->{$key} );
+    if ( ref $merge eq 'HASH' ) {
+        for my $key ( keys %{$source} ) {
+            if ( exists $merge->{$key} and ref $merge->{$key} eq 'HASH' and ref $source->{$key} eq 'HASH' ) {
+                _merge_settings( $merge->{$key}, $source->{$key} );
+            }
+            else {
+                $merge->{$key} = _clone( $source->{$key} );
+            }
         }
-        else {
-            $merge->{$key} = $source->{$key};
-        }
+    }
+    elsif ( ref $merge eq 'ARRAY' ) {
+        push( @$source, @$merge );
     }
 
     return;
@@ -300,7 +309,7 @@ Config::App - Cascading merged application configuration
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Config-App.svg)](https://travis-ci.org/gryphonshafer/Config-App)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Config-App/badge.png)](https://coveralls.io/r/gryphonshafer/Config-App)

@@ -9,11 +9,11 @@ use warnings;
 CLI::Numbers::Hack - commands for handling a bunch of numbers for `finding denominator', `N-th min/max', `cumulative sum' and so on.
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =cut
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 
 =head1 SYNOPSIS
@@ -27,6 +27,7 @@ PROVIDED COMMAND LINE INTERFACE programs :
   4. rounding -- outputs the rounded numbers. (The name of this command would change in the future.. )
   5. zeropad -- outputs the zero-padded numbers.
   6. meanvar -- shows the mean (average) and the variance of a sequence of numbers.
+  7. quantile -- shows the quantile values.
 
   All programs provides help-manual that is availble such as by "cumsum --help". 
   If you want to see only "switch options", do "cumsum --help opt(ions)". 

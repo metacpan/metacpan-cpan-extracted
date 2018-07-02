@@ -42,6 +42,7 @@ if (my @asn = get_asn_info($ip) ) {
     print "\tASN:               $asn[0] - $asn[1]\n";
     print "\tAS  Org:           $asn_org\n";
     print "\tClean Org:         $asn_co\n";
+    print "\tRIR:               $asn[3]\n";
     print "\tAS Country:        ", get_asn_country($asn[0]), "\n";
     print "\n";
     my @peers = get_peer_info($ip);
@@ -51,7 +52,7 @@ if (my @asn = get_asn_info($ip) ) {
         foreach my $peer (@peers){
             my $peer_org = get_as_description($peer->{'asn'}) || '';
             my $peer_co = get_as_company($peer->{'asn'}) || '';
- 
+
             print "\n";
             print "\tPeer:              $peer->{'asn'}\n";
             print "\tPeer Prefix:       $peer->{'prefix'}\n";

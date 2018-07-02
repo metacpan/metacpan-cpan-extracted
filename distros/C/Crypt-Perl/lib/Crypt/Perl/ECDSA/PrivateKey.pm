@@ -81,7 +81,6 @@ use parent qw( Crypt::Perl::ECDSA::KeyBase );
 use Try::Tiny;
 
 use Bytes::Random::Secure::Tiny ();
-use Module::Load ();
 
 use Crypt::Perl::ASN1 ();
 use Crypt::Perl::BigInt ();
@@ -163,7 +162,7 @@ sub sign_jwa {
 sub get_public_key {
     my ($self) = @_;
 
-    Module::Load::load('Crypt::Perl::ECDSA::PublicKey');
+    require Crypt::Perl::ECDSA::PublicKey;
 
     my $curve_hr = $self->_explicit_curve_parameters( seed => 1 );
     my $ccurve_hr = $curve_hr->{'ecParameters'}{'curve'};
@@ -180,7 +179,7 @@ sub get_struct_for_private_jwk {
 
     my $hr = $self->get_struct_for_public_jwk();
 
-    Module::Load::load('MIME::Base64');
+    require MIME::Base64;
 
     $hr->{'d'} = MIME::Base64::encode_base64url( $self->{'private'}->as_bytes() );
 

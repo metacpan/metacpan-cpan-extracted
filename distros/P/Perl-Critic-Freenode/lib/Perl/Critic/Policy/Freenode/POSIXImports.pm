@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use constant DESC => 'Using POSIX.pm without an explicit import list';
 use constant EXPL => 'Using the POSIX module without specifying an import list results in importing hundreds of symbols. Import the functions or constants you want explicitly, or prevent the import with ().';

@@ -1,19 +1,18 @@
 package Dist::Zilla::Plugin::Sah::Schemas;
 
-our $DATE = '2018-06-07'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2018-06-26'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-
 use Moose;
-use namespace::autoclean;
 
 use PMVersions::Util qw(version_from_pmversions);
 use Require::Hook::DzilBuild;
 
 with (
+    'Dist::Zilla::Role::CheckPackageDeclared',
     'Dist::Zilla::Role::FileGatherer',
     'Dist::Zilla::Role::FileMunger',
     'Dist::Zilla::Role::FileFinderUser' => {
@@ -22,6 +21,8 @@ with (
     'Dist::Zilla::Role::PrereqSource',
     #'Dist::Zilla::Role::RequireFromBuild',
 );
+
+use namespace::autoclean;
 
 sub _load_schema_modules {
     my $self = shift;
@@ -228,9 +229,8 @@ sub register_prereqs {
 
     # add prereqs to base schema modules
 
-    #use DD; dd $self->{_used_schema_modules}; dd $self->{_our_schema_modules};
     for my $mod (sort keys %{$self->{_used_schema_modules} // {}}) {
-        next if $self->{_our_schema_modules}{$mod};
+        next if $self->is_package_declared($mod);
         $self->log(["Adding prereq to %s", $mod]);
         $self->zilla->register_prereqs({phase=>'runtime'}, $mod => version_from_pmversions($mod) // 0);
     }
@@ -243,6 +243,7 @@ sub register_prereqs {
                 ref($xc) eq 'ARRAY' ? @$xc : ($xc);
             for my $c (@c) {
                 my $xcmod = "Perinci::Sub::XCompletion::$c";
+                next if $self->is_package_declared($xcmod);
                 $self->log(["Adding prereq to %s", $xcmod]);
                 $self->zilla->register_prereqs({phase=>'runtime'}, $xcmod => version_from_pmversions($xcmod) // 0);
             }
@@ -254,6 +255,7 @@ sub register_prereqs {
             for my $rule (@$crr) {
                 next unless $rule =~ /\A\w+(::\w+)*\z/;
                 my $crmod = "Data::Sah::Coerce::perl::$nsch->[0]::$rule";
+                next if $self->is_package_declared($crmod);
                 $self->log(["Adding prereq to %s", $crmod]);
                 $self->zilla->register_prereqs({phase=>'runtime'}, $crmod => version_from_pmversions($crmod) // 0);
             }
@@ -277,7 +279,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.013 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2018-06-07.
+This document describes version 0.014 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2018-06-26.
 
 =head1 SYNOPSIS
 

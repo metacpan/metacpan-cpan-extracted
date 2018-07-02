@@ -1,0 +1,43 @@
+---
+abstract: 'module to replace MS document by its text contents'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-optex-msdoc
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::optex::msdoc:
+    file: lib/App/optex/msdoc.pm
+    version: '0.04'
+requires:
+  App::Greple: '8.26'
+  App::Greple::msdoc: '1.01'
+  App::optex: v0.2.0
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/kaz-utashiro/optex-msdoc/issues
+  homepage: https://github.com/kaz-utashiro/optex-msdoc
+  repository: git://github.com/kaz-utashiro/optex-msdoc.git
+version: '0.04'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kaz Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

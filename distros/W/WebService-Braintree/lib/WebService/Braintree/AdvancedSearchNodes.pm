@@ -1,21 +1,25 @@
 # vim: sw=4 ts=4 ft=perl
 
+# Notes:
+# 1. name() is only used in one error message
+# 2. searcher() is returned so that every method can chain()
+
 {
     package WebService::Braintree::AdvancedSearchNodes;
-$WebService::Braintree::AdvancedSearchNodes::VERSION = '1.5';
+$WebService::Braintree::AdvancedSearchNodes::VERSION = '1.6';
 use 5.010_001;
     use strictures 1;
 
-    use Moose;
+    use Moo;
 }
 
 {
     package WebService::Braintree::SearchNode;
-$WebService::Braintree::SearchNode::VERSION = '1.5';
+$WebService::Braintree::SearchNode::VERSION = '1.6';
 use 5.010_001;
     use strictures 1;
 
-    use Moose;
+    use Moo;
 
     has searcher => (is => 'ro');
     has name => (is => 'ro');
@@ -42,11 +46,11 @@ use 5.010_001;
 
 {
     package WebService::Braintree::IsNode;
-$WebService::Braintree::IsNode::VERSION = '1.5';
+$WebService::Braintree::IsNode::VERSION = '1.6';
 use 5.010_001;
     use strictures 1;
 
-    use Moose;
+    use Moo;
     extends 'WebService::Braintree::SearchNode';
 
     sub is {
@@ -59,11 +63,11 @@ use 5.010_001;
 
 {
     package WebService::Braintree::EqualityNode;
-$WebService::Braintree::EqualityNode::VERSION = '1.5';
+$WebService::Braintree::EqualityNode::VERSION = '1.6';
 use 5.010_001;
     use strictures 1;
 
-    use Moose;
+    use Moo;
     extends 'WebService::Braintree::IsNode';
 
     sub is_not {
@@ -76,11 +80,11 @@ use 5.010_001;
 
 {
     package WebService::Braintree::KeyValueNode;
-$WebService::Braintree::KeyValueNode::VERSION = '1.5';
+$WebService::Braintree::KeyValueNode::VERSION = '1.6';
 use 5.010_001;
     use strictures 1;
 
-    use Moose;
+    use Moo;
     extends 'WebService::Braintree::SearchNode';
 
     sub default_criteria {
@@ -103,11 +107,11 @@ use 5.010_001;
 
 {
     package WebService::Braintree::PartialMatchNode;
-$WebService::Braintree::PartialMatchNode::VERSION = '1.5';
+$WebService::Braintree::PartialMatchNode::VERSION = '1.6';
 use 5.010_001;
     use strictures 1;
 
-    use Moose;
+    use Moo;
     extends 'WebService::Braintree::EqualityNode';
 
     sub starts_with {
@@ -125,11 +129,11 @@ use 5.010_001;
 
 {
     package WebService::Braintree::TextNode;
-$WebService::Braintree::TextNode::VERSION = '1.5';
+$WebService::Braintree::TextNode::VERSION = '1.6';
 use 5.010_001;
     use strictures 1;
 
-    use Moose;
+    use Moo;
     extends 'WebService::Braintree::PartialMatchNode';
 
     sub contains {
@@ -142,11 +146,11 @@ use 5.010_001;
 
 {
     package WebService::Braintree::RangeNode;
-$WebService::Braintree::RangeNode::VERSION = '1.5';
+$WebService::Braintree::RangeNode::VERSION = '1.6';
 use 5.010_001;
     use strictures 1;
 
-    use Moose;
+    use Moo;
     extends 'WebService::Braintree::EqualityNode';
 
     use overload ( '>=' => 'min', '<=' => 'max');
@@ -172,12 +176,12 @@ use 5.010_001;
 
 {
     package WebService::Braintree::MultipleValuesNode;
-$WebService::Braintree::MultipleValuesNode::VERSION = '1.5';
+$WebService::Braintree::MultipleValuesNode::VERSION = '1.6';
 use 5.010_001;
     use strictures 1;
 
     use Carp;
-    use Moose;
+    use Moo;
     use WebService::Braintree::Util qw(is_arrayref);
     extends 'WebService::Braintree::SearchNode';
 

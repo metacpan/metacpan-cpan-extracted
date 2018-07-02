@@ -11,7 +11,7 @@ use Mojo::SMTP::Client::Exception;
 use Scalar::Util 'weaken';
 use Carp;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use constant {
 	CMD_OK       => 2,
@@ -50,6 +50,7 @@ has tls                => 0;
 has 'tls_ca';
 has 'tls_cert';
 has 'tls_key';
+has tls_verify         => 1;
 has hello              => 'localhost.localdomain';
 has connect_timeout    => sub { $ENV{MOJO_CONNECT_TIMEOUT} || 10 };
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 20 };
@@ -106,13 +107,14 @@ sub send {
 			$self->{client}->on(connect => $connect_cb);
 			$self->{client}->on(error => $connect_cb);
 			$self->{client}->connect(
-				address  => $self->address,
-				port     => $self->port,
-				timeout  => $self->connect_timeout,
-				tls      => $self->tls,
-				tls_ca   => $self->tls_ca,
-				tls_cert => $self->tls_cert,
-				tls_key  => $self->tls_key
+				address    => $self->address,
+				port       => $self->port,
+				timeout    => $self->connect_timeout,
+				tls        => $self->tls,
+				tls_ca     => $self->tls_ca,
+				tls_cert   => $self->tls_cert,
+				tls_key    => $self->tls_key,
+				tls_verify => $self->tls_verify,
 			);
 		},
 		sub {
@@ -303,7 +305,7 @@ sub _cmd_starttls {
 				SSL_ca_file         => $self->tls_ca,
 				SSL_cert_file       => $self->tls_cert,
 				SSL_key_file        => $self->tls_key,
-				SSL_verify_mode     => $self->tls_ca ? 0x01 : 0x00,
+				SSL_verify_mode     => $self->tls_verify,
 				SSL_verifycn_name   => $self->address,
 				SSL_verifycn_scheme => $self->tls_ca ? 'smtp' : undef,
 				SSL_startHandshake  => 0,
@@ -719,6 +721,10 @@ Path to the TLS certificate file.
 =head2 tls_key
 
 Path to the TLS key file.
+
+=head2 tls_verify
+
+TLS verification mode. Use C<0> to disable verification, which turned on by default.
 
 =head2 hello
 

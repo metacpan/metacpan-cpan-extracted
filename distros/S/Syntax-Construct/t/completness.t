@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-my $plan; BEGIN { $plan = 5 * 65 + 0 }; # Constructs + old
+my $plan; BEGIN { $plan = 5 * 70 + 2 }; # Constructs + old
 
 use FindBin;
 use Test::More tests => $plan;
@@ -27,7 +27,7 @@ while (my $line = <$IN>) {
             $constructs{$constr}{version}{$version}++;
         }
 
-    } elsif ($line =~ / (?:'(5\.[0-9]{3})'|(old)) => \[qw\[$/) {
+    } elsif ($line =~ / (?:'(5\.[0-9]{3}(?:[0-9]{3})?)'|(old)) => \[qw\[$/) {
         my $v = $1 || $2;
         until ((my $l = <$IN>) =~ /\]\],$/) {
             for my $constr ($l =~ /(\S+)/g) {
@@ -36,7 +36,7 @@ while (my $line = <$IN>) {
             }
         }
     } elsif (my ($removed_construct, $rm_version)
-             = $line =~ / '([^']*)' +=> '(5\.[0-9]{3})',$/
+             = $line =~ / '([^']*)' +=> '(5\.[0-9]{3}(?:[0-9]{3})?)',$/
     ) {
         $constructs{$removed_construct}{removed}{$rm_version}++;
     }
@@ -55,7 +55,7 @@ while (<$TEST>) {
 }
 
 my $count_old = 0;
-for my $constr (keys %constructs) {
+for my $constr (sort keys %constructs) {
     is($constructs{$constr}{$_}, 1, "$_ for $constr") for qw( pod code test );
 
     my @versions = keys %{ $constructs{$constr}{version} };

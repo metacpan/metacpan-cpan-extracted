@@ -9,7 +9,7 @@ my $builder = Module::Build->new(
     dist_author         => q{"Toshiyuki Shimono" <bin4tsv@gmail.com>},
     dist_version_from   => 'lib/CLI/Table/Util.pm',
     release_status      => 'stable',
-    script_files        => [map{"scripts/$_"} qw[init.sh colsplit colsummary colchop csv2tsv] ], 
+    script_files  => [map{"scripts/$_"} qw[init.sh colsplit colsummary colchop csv2tsv colgrep] ], 
     configure_requires => {
         'Module::Build' => '0',
     },

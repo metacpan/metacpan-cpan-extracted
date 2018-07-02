@@ -31,14 +31,14 @@ use strict;
 use attributes qw(get reftype);
 use warnings;
 use vars qw($VERSION $BUILD);
-$VERSION = '0.21';
-$BUILD = 'Monday May 8 23:08:34 GMT 2006';
+$VERSION = '0.22';
 # ----------------------------------------------------------------------------------------------------
 {
 	package Class::STL::Algorithms;
-	use UNIVERSAL qw(isa can);
-	use vars qw( @EXPORT_OK %EXPORT_TAGS );
-	use Exporter;
+	use UNIVERSAL;
+	use vars qw( @ISA @EXPORT_OK %EXPORT_TAGS );
+    require Exporter;
+    @ISA = 'Exporter';
 	my @export_names = qw( 
 		find 
 		find_if 

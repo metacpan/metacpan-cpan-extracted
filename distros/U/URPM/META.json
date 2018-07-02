@@ -52,6 +52,6 @@
          "web" : "http://gitweb.mageia.org/software/rpm/perl-URPM/"
       }
    },
-   "version" : "5.16",
+   "version" : "5.18",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

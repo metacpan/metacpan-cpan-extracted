@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -40,6 +38,8 @@ subtest "parallel scan" => sub {
       unless $server_version >= v2.6.0;
     plan skip_all => "Parallel scan not supported on mongos"
       if $server_type eq 'Mongos';
+    plan skip_all => "Not supported on Atlas Free Tier"
+      if $ENV{ATLAS_PROXY};
 
     my $num_docs = 2000;
 

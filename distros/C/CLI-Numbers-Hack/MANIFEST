@@ -14,6 +14,7 @@ scripts/minmax
 scripts/meanvar
 scripts/cumsum
 scripts/nums
+scripts/quantile
 META.yml
 META.json
 scripts/init.sh

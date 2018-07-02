@@ -9,6 +9,7 @@ META.yml
 Makefile.PL
 README
 README.pod
+as.diff
 devops/MyConfig.pm
 devops/within_container
 dist.ini
@@ -18,8 +19,6 @@ lib/WebService/Braintree/AddOn.pm
 lib/WebService/Braintree/AddOnGateway.pm
 lib/WebService/Braintree/Address.pm
 lib/WebService/Braintree/AddressGateway.pm
-lib/WebService/Braintree/AdvancedSearch.pm
-lib/WebService/Braintree/AdvancedSearchFields.pm
 lib/WebService/Braintree/AdvancedSearchNodes.pm
 lib/WebService/Braintree/ApplePay.pm
 lib/WebService/Braintree/ApplePayCard/CardType.pm
@@ -111,6 +110,7 @@ lib/WebService/Braintree/Plan.pm
 lib/WebService/Braintree/PlanGateway.pm
 lib/WebService/Braintree/ResourceCollection.pm
 lib/WebService/Braintree/Result.pm
+lib/WebService/Braintree/Role/AdvancedSearch.pm
 lib/WebService/Braintree/Role/CollectionBuilder.pm
 lib/WebService/Braintree/Role/Interface.pm
 lib/WebService/Braintree/Role/MakeRequest.pm

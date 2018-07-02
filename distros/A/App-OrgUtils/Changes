@@ -1,3 +1,10 @@
+0.470   2018-06-30 (PERLANCAR)
+
+	- org2html: Add --browser option.
+
+        - Add utility: browse-org.
+
+
 0.46    2017-07-10 (PERLANCAR)
 
 	- Fix Rinci metadata: Used wrong attribute summary.alt.bool.neg

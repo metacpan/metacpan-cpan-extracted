@@ -5,6 +5,7 @@ use FindBin qw($Bin);
 use File::Temp qw(tempfile);
 use Test::More tests => 24;
 use File::Spec;
+use Config;
 
 use constant TARDIR => 't/data';
 Log::Log4perl->easy_init($ERROR);
@@ -14,12 +15,10 @@ BEGIN { use_ok('Archive::Tar::Wrapper') }
 umask(0);
 my $arch = Archive::Tar::Wrapper->new();
 
-if ( $arch->is_gnu ) {
-    note( $arch->{version_info} );
-}
-else {
-    note( $arch->{tar_error_msg} );
-}
+note('Is GNU tar? ' . $arch->is_gnu);
+note('Is BSD tar? ' . $arch->is_bsd);
+note( 'Version information: ' . $arch->{version_info} );
+note( $arch->{tar_error_msg} ) if (defined($arch->{tar_error_msg}));
 
 ok( $arch->read( File::Spec->catfile( TARDIR, 'foo.tgz' ) ),
     'can open the compressed tar file' );
@@ -38,20 +37,21 @@ note('Add data');
 my $data = "this is data";
 ok( $arch->add( "foo/bar/string", \$data ), "adding data" );
 ok( $arch->locate("foo/bar/baz"), "find added file" );
-ok( $arch->add( "foo/bar/permtest", $tmploc, { perm => oct(770) } ),
-    "adding file" );
+ok( $arch->add( "foo/bar/permtest", $tmploc, { perm => oct(770) } ), "adding file" );
 
 note('Make a tarball');
 my ( $fh, $filename ) = tempfile( UNLINK => 1 );
 ok( $arch->write($filename), "Tarring up" );
 
-note('List');
 my $a2 = Archive::Tar::Wrapper->new();
 ok( $a2->read($filename), "Reading in new tarball" );
-my $elements = $a2->list_all();
-my $got = join " ", sort map { $_->[0] } @$elements;
-is( $got, "001Basic.t foo/bar/baz foo/bar/permtest foo/bar/string",
-    "Check list" );
+
+my @got = sort( map { $_->[0] } @{ $a2->list_all } );
+is_deeply(
+    \@got,
+    [qw(001Basic.t foo/bar/baz foo/bar/permtest foo/bar/string)],
+    'list_all() returns the expected list elements'
+);
 
 my $f1 = $a2->locate("001Basic.t");
 my $f2 = $a2->locate("foo/bar/baz");
@@ -62,7 +62,11 @@ is( -s $f1, -s $f2, "Comparing tarball files sizes" );
 
 my $f3 = $a2->locate("foo/bar/permtest");
 my $perm = ( ( stat($f3) )[2] & oct('777') );
-is( $perm, oct(770), "permtest" );
+
+SKIP: {
+    skip 'Permissions are too different on Microsoft Windows', 1 if ($Config{osname} eq 'MSWin32');
+    is( $perm, oct(770), 'testing file permission inside the tarball' );
+}
 
 my $f4 = $a2->locate("foo/bar/string");
 open( my $in, '<', $f4 ) or die "Cannot open $f4: $!";
@@ -71,27 +75,27 @@ close($in);
 is( $got_data, $data, "comparing file data" );
 
 note('Iterators');
+# required to be invoke since list_all() invokes it implicit
 $arch->list_reset();
-my @elements = ();
+my @elements;
 while ( my $entry = $arch->list_next() ) {
     push @elements, $entry->[0];
 }
-$got = join " ", sort @elements;
-is( $got, "001Basic.t foo/bar/baz foo/bar/permtest foo/bar/string",
-    "Check list" );
+@elements = sort(@elements);
+is_deeply(
+    \@elements,
+    [qw(001Basic.t foo/bar/baz foo/bar/permtest foo/bar/string)],
+    'list_next() produce the expected results'
+);
 
 note('Check optional file names for extraction');
 
-#data/bar.tar
-#drwxrwxr-x mschilli/mschilli 0 2005-07-24 12:15:34 bar/
-#-rw-rw-r-- mschilli/mschilli 11 2005-07-24 12:15:27 bar/bar.dat
-#-rw-rw-r-- mschilli/mschilli 11 2005-07-24 12:15:34 bar/foo.dat
-
 my $a3 = Archive::Tar::Wrapper->new();
 $a3->read( File::Spec->catfile( TARDIR, 'bar.tar' ), 'bar/bar.dat' );
-$elements = $a3->list_all();
-is( scalar @$elements,   1,             "only one file extracted" );
-is( $elements->[0]->[0], "bar/bar.dat", "only one file extracted" );
+my $elements = $a3->list_all();
+is( scalar(@$elements), 1, 'only one file extracted' );
+is( $elements->[0]->[0],
+    'bar/bar.dat', 'the first index of list_all() has the expected data' );
 
 note('Ask for non-existent files in tarball');
 my $a4 = Archive::Tar::Wrapper->new();
@@ -99,14 +103,10 @@ my $a4 = Archive::Tar::Wrapper->new();
 # Suppress the warning
 Log::Log4perl->get_logger("")->level($FATAL);
 
-my $rc;
-
 SKIP: {
-    $rc = $a4->read( File::Spec->catfile( TARDIR, 'bar.tar' ),
-        "bar/bar.dat", "quack/schmack" );
-    if ( $^O =~ /freebsd/i ) {
-        skip( "FreeBSD's tar is too lenient - skipping", 1 );
-    }
+    skip( "FreeBSD's tar is too lenient - skipping", 1 ) if ( $^O =~ /freebsd/i );
+    skip 'bsdtar is too lenient', 1 if ( $a4->is_bsd() );
+    my $rc = $a4->read( File::Spec->catfile( TARDIR, 'bar.tar' ), 'bar/bar.dat', 'quack/schmack' );
     is( $rc, undef, "Failure to ask for non-existent files" );
 }
 
@@ -126,6 +126,7 @@ else {
 
 SKIP: {
     skip 'Cannot check permissions on a non-existent file', 1 unless $f1;
+    skip 'Permissions are too different on Microsoft Windows', 1 if ($Config{osname} eq 'MSWin32');
     is( $perm, oct(664), 'testing file permissions' );
 }
 
@@ -138,7 +139,7 @@ SKIP: {
     my $is_gnu = $a6->is_gnu();
     note( $a6->{tar_error_msg} ) if ( defined( $a6->{tar_error_msg} ) );
 
-    skip "Only with gnu tar", 1 unless $is_gnu;
+    skip 'Only with gnu tar', 1 unless $is_gnu;
 
     $a6->read( File::Spec->catfile( TARDIR, 'bar.tar' ) );
     $f1 = $a6->locate('bar/bar.dat');

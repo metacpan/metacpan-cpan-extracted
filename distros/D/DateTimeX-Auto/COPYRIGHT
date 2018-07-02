@@ -6,15 +6,14 @@ Source: https://metacpan.org/release/DateTimeX-Auto
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
  t/01basic.t
-Copyright: Copyright 2014 Toby Inkster.
+Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: CONTRIBUTING
- INSTALL
+Files: INSTALL
  LICENSE
+ Makefile.PL
  examples/example.pl
 Copyright: Unknown
 License: Unknown
@@ -30,23 +29,23 @@ Files: README
 Copyright: Copyright 2011-2012, 2014 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: dist.ini
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: t/02cloning.t
 Copyright: Copyright 2011 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  

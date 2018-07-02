@@ -18,34 +18,50 @@ name: App-BitBucketCli
 provides:
   App::BitBucketCli:
     file: lib/App/BitBucketCli.pm
-    version: '0.004'
+    version: '0.005'
   App::BitBucketCli::Base:
     file: lib/App/BitBucketCli/Base.pm
-    version: '0.004'
+    version: '0.005'
   App::BitBucketCli::Branch:
     file: lib/App/BitBucketCli/Branch.pm
-    version: '0.004'
+    version: '0.005'
+  App::BitBucketCli::Command::Branches:
+    file: lib/App/BitBucketCli/Command/Branches.pm
+    version: '0.005'
+  App::BitBucketCli::Command::Projects:
+    file: lib/App/BitBucketCli/Command/Projects.pm
+    version: '0.005'
+  App::BitBucketCli::Command::PullRequests:
+    file: lib/App/BitBucketCli/Command/PullRequests.pm
+    version: '0.005'
+  App::BitBucketCli::Command::Repositories:
+    file: lib/App/BitBucketCli/Command/Repositories.pm
+    version: '0.005'
+  App::BitBucketCli::Command::Repository:
+    file: lib/App/BitBucketCli/Command/Repository.pm
+    version: '0.005'
   App::BitBucketCli::Core:
     file: lib/App/BitBucketCli/Core.pm
-    version: '0.004'
+    version: '0.005'
   App::BitBucketCli::Link:
     file: lib/App/BitBucketCli/Link.pm
-    version: '0.004'
+    version: '0.005'
   App::BitBucketCli::Links:
     file: lib/App/BitBucketCli/Links.pm
-    version: '0.004'
+    version: '0.005'
   App::BitBucketCli::Project:
     file: lib/App/BitBucketCli/Project.pm
-    version: '0.004'
+    version: '0.005'
   App::BitBucketCli::PullRequest:
     file: lib/App/BitBucketCli/PullRequest.pm
-    version: '0.004'
+    version: '0.005'
   App::BitBucketCli::Repository:
     file: lib/App/BitBucketCli/Repository.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Getopt::Alt: v0.4.5
   JSON::XS: '0'
+  Module::Pluggable: '5.0'
   Moo: '2.0'
   Path::Tiny: '0.076'
   Scalar::Util: '0'
@@ -56,5 +72,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::BitBucketCli
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/App-bitbucket-cli.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

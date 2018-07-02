@@ -29,10 +29,10 @@ no_index:
 provides:
   Dist::Iller::Config::Author::CSSON:
     file: lib/Dist/Iller/Config/Author/CSSON.pm
-    version: '0.0321'
+    version: '0.0322'
   Dist::Iller::Config::Author::CSSON::MapMetro:
     file: lib/Dist/Iller/Config/Author/CSSON/MapMetro.pm
-    version: '0.0321'
+    version: '0.0322'
 requires:
   Dist::Iller: '0.1401'
   Moose: '2.0000'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON/issues
   homepage: https://metacpan.org/release/Dist-Iller-Config-Author-CSSON
   repository: https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON.git
-version: '0.0321'
+version: '0.0322'
 x_Dist_Zilla:
   perl:
     version: '5.020001'
@@ -69,7 +69,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -81,7 +81,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: PromptIfStale
-      version: '0.054'
+      version: '0.055'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: CopyFilesFromBuild
@@ -224,11 +224,11 @@ x_Dist_Zilla:
           git_version: 2.16.1
           repo_root: .
       name: Git::Check
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
-      version: '0.54'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Readme
       name: Readme
@@ -289,7 +289,7 @@ x_Dist_Zilla:
           order_by: name
           paths: []
       name: Git::Contributors
-      version: '0.030'
+      version: '0.034'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee::Extra
       name: Test::Kwalitee::Extra
@@ -432,7 +432,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: CommitBeforeTag
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -440,7 +440,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.0321'
+          tag: '0.0322'
           tag_format: '%v'
           tag_message: 'Release %v%n%n%c'
         Dist::Zilla::Role::Git::Repo:
@@ -449,7 +449,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Tag
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: InstallRelease
@@ -485,7 +485,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: CommitAfterRelease
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -497,7 +497,7 @@ x_Dist_Zilla:
           git_version: 2.16.1
           repo_root: .
       name: Git::Push
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Clean
       name: Clean

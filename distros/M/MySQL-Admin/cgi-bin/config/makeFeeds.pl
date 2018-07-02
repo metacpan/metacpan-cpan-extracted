@@ -10,23 +10,20 @@ use strict;
 use vars qw(@content $c $m_oDatabase $m_hrSettings );
 require Exporter;
 no warnings "uninitialized";
-
 loadSettings("/var/www/html/cgi-bin/config/settings.pl");
 *m_hrSettings = \$MySQL::Admin::Settings::m_hrSettings;
-my ($m_oDatabase, $m_dbh) =
-  new DBI::Library(
-                   {
-                    name     => $m_hrSettings->{database}{name},
-                    host     => $m_hrSettings->{database}{host},
-                    user     => $m_hrSettings->{database}{user},
-                    password => $m_hrSettings->{database}{password},
-                    style    => $m_hrSettings->{cgi}{style}
-                   }
-                  );
+my ( $m_oDatabase, $m_dbh ) = new DBI::Library(
+    {
+        name     => $m_hrSettings->{database}{name},
+        host     => $m_hrSettings->{database}{host},
+        user     => $m_hrSettings->{database}{user},
+        password => $m_hrSettings->{database}{password},
+        style    => $m_hrSettings->{cgi}{style}
+    }
+);
 my @o        = $m_oDatabase->fetch_array("select url from blogs where `right` = 0");
 my $m_sStyle = $m_hrSettings->{cgi}{'style'};
-push @content,
-  '<table border="0" width="100%"><tr><td><table CELLSPACING="0" CELLPADDING="0"><tr><td height="1200" valign="top">';
+push @content, '<table border="0" width="100%"><tr><td><table CELLSPACING="0" CELLPADDING="0"><tr><td height="1200" valign="top">';
 
 foreach my $url (@o) {
     eval(
@@ -71,8 +68,8 @@ foreach my $url (@o) {
         }
     }
     |
-        );
-}
+    );
+} ## end foreach my $url (@o)
 push @content, "</td></tr></table><br/></td></tr></table><br/><br/>";
 use Symbol;
 my $fh = gensym();

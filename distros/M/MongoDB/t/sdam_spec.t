@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -24,6 +22,7 @@ use Try::Tiny;
 
 use MongoDB;
 use MongoDB::_Credential;
+use BSON::Types ':all';
 
 my $iterator = path('t/data/SDAM')->iterator({recurse => 1});
 
@@ -48,12 +47,17 @@ sub create_mock_topology {
     my $type = ( $name =~ /^single/ && $seed_count == 1 ) ? 'Single' : "Unknown";
 
     return MongoDB::_Topology->new(
-        uri => $uri,
-        type => $type,
-        replica_set_name => $uri->options->{replicaset} || '',
-        max_wire_version => 2,
-        min_wire_version => 0,
-        credential => MongoDB::_Credential->new( mechanism => 'NONE' ),
+        uri                 => $uri,
+        type                => $type,
+        replica_set_name    => $uri->options->{replicaset} || '',
+        min_server_version  => "0.0.0",
+        max_wire_version    => 2,
+        min_wire_version    => 0,
+        credential          => MongoDB::_Credential->new(
+            mechanism => 'NONE',
+            monitoring_callback => undef,
+        ),
+        monitoring_callback => undef,
     );
 }
 
@@ -62,6 +66,9 @@ sub run_test {
     my ($name, $plan) = @_;
 
     $name =~ s/\.json$//;
+
+    # TODO: Fix issue with PossiblePrimary and MongoDB::_Topology::_update_rs_without_primary
+    return if $name eq 'rs/primary_hint_from_secondary_with_mismatched_me';
 
     subtest "$name" => sub {
 
@@ -74,9 +81,7 @@ sub run_test {
                 my ($addr, $is_master) = @$response;
 
                 if ( defined $is_master->{electionId} ){
-                    $is_master->{electionId} = MongoDB::OID->new(
-                        value => $is_master->{electionId}->{'$oid'}
-                    );
+                    $is_master->{electionId} = bson_oid($is_master->{electionId}->{'$oid'});
                 }
 
                 # Process response
@@ -121,6 +126,7 @@ sub check_outcome {
     my $expected_set_name = defined $outcome->{'setName'} ? $outcome->{'setName'} : "";
     is($topology->replica_set_name, $expected_set_name, 'correct setName for topology');
     is($topology->type, $outcome->{'topologyType'}, 'correct topology type');
+    is($topology->logical_session_timeout_minutes, $outcome->{'logicalSessionTimeoutMinutes'}, 'correct ls timeout');
 }
 
 done_testing;

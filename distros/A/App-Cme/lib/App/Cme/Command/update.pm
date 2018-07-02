@@ -10,7 +10,7 @@
 # ABSTRACT: Update the configuration of an application
 
 package App::Cme::Command::update ;
-$App::Cme::Command::update::VERSION = '1.027';
+$App::Cme::Command::update::VERSION = '1.028';
 use strict;
 use warnings;
 use 5.10.1;
@@ -34,7 +34,6 @@ sub opt_spec {
     return ( 
         [ "edit!"     => "Run editor after update is done" ],
         [ "backup:s"  => "Create a backup of configuration files before saving." ],
-        [ "quiet!"    => "Suppress progress messages" ],
         $class->cme_global_options,
     );
 }
@@ -55,15 +54,15 @@ sub execute {
 
     my ( $inst) = $self->instance($opt,$args);
 
-    say "updating data" unless $opt->{quiet};
+    say "Updating data..." unless $opt->{quiet};
 
     my @msgs = $inst->update(quiet => $opt->{quiet});
 
     if (@msgs and not $opt->{quiet}) {
-        say "update done";
+        say "Update done";
     }
     elsif (not $opt->{quiet}) {
-        say "command done, but ".$opt->{_application}
+        say "Command done, but ".$opt->{_application}
             . " model has no provision for update";
     }
 
@@ -92,7 +91,7 @@ App::Cme::Command::update - Update the configuration of an application
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 

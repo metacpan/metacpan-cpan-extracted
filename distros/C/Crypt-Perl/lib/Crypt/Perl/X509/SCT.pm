@@ -1,5 +1,10 @@
 package Crypt::Perl::X509::SCT;
 
+use strict;
+use warnings;
+
+=encoding utf-8
+
 =head1 NAME
 
 Crypt::Perl::X509::SCT
@@ -8,6 +13,9 @@ Crypt::Perl::X509::SCT
 
 This implements encoding of the structure defined in
 L<https://tools.ietf.org/html/rfc6962#section-3.2>.
+
+B<IMPORTANT:> Because SCT records timestamps in milliseconds rather than
+seconds, this module requires a 64-bit Perl interpreter.
 
 =head1 SEE ALSO
 
@@ -18,9 +26,9 @@ excellent walkthrough of the format that this module deals with.
 
 use constant _TEMPLATE => join(
     q<>,
-    'x',    # version 1
+    'x',    # version 1 (represented by 0)
     'a32',  # key_id
-    'N2',   # timestamp; use this rather than “Q>” to support Perl 5.8.9.
+    'N2',   # timestamp; use this rather than “Q>” to support Perl 5.8.
     'xx',   # zero-length extensions array
     'C',    # hash algorithm
     'C',    # signature algorithm
@@ -75,6 +83,12 @@ C<rsa> and C<ecdsa>. (cf. the URL for C<hash_algorithm> values)
 sub encode {
     my (%opts) = @_;
 
+    # A non-64-bit perl has no business in this module.
+    if (!_can_64_bit()) {
+        my $pkg = __PACKAGE__;
+        die "$pkg requires a 64-bit Perl interpreter.\n";
+    }
+
     my $hash_idx = _array_lookup(
         \@_TLS_hash_algorithm,
         $opts{'hash_algorithm'},
@@ -98,6 +112,17 @@ sub encode {
         length($opts{'signature'}),
         $opts{'signature'},
     );
+}
+
+# called from test
+sub _can_64_bit {
+    my $exc = $@;
+
+    my $ok = !!eval { pack 'q' };
+
+    $@ = $exc;
+
+    return $ok;
 }
 
 # decode() will be easy to implement when needed

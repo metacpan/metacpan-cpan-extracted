@@ -1,5 +1,8 @@
 Revision history for RT-Client-CLI
 
+4.4.3 2018-06-27
+ - Respect value 0(#31290)
+
 4.2.11 2015-05-07
  - Default to enabling error warnings to the screen for interactive commands
  - Standardize --help, --quiet and --verbose options across tools

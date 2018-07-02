@@ -26,6 +26,7 @@ function Debugger(sel) {
         breakpointRightClickMenu: Handlebars.compile( $('#breakpoint-right-click-template').html() ),
         saveLoadBreakpointsModal: Handlebars.compile($('#save-load-breakpoints-modal-template').html() ),
         subPickerTemplate: Handlebars.compile($('#sub-picker-template').html() ),
+        quickBreakpointModal: Handlebars.compile($('#quick-breakpoint-entry-template').html() ),
     };
 
     // The step in, over, run buttons
@@ -266,10 +267,11 @@ function Debugger(sel) {
     // This function is called after each control button has returned control
     // to us (step, run, etc).  The stack tabs will already be updated, but
     // enything else that needs updated goes in here.
-    function done_after_stack_update() {
+    function done_after_stack_update(next_statement) {
         $control_buttons.attr('disabled', false);
         $('#stack-tabs a:first').trigger('click');
         this.watchedExpressionManager.updateExpressions();
+        this.setCurrentStatementForCodeTable(next_statement);
     }
 
     function notifyProgramHasCompletelyExited() {
@@ -279,6 +281,56 @@ function Debugger(sel) {
             .appendTo('#controls');
         alert('Debugged program has exited');
     }
+
+    var $original_line_elt;
+    var original_line_of_code = '';
+    this.setCurrentStatementForCodeTable = function(next_statement) {
+        var $topLevelCodePane = $('div.tab-pane[data-frameno=0]'),
+            $line = $topLevelCodePane.find('.code-line.active span.code'),
+            stackFrame = this.stackManager.frame(0),
+            filename = stackFrame.filename,
+            lineno = stackFrame.line,
+            this_line_code = $line.text();
+
+        if ($original_line_elt) {
+            $original_line_elt.html(original_line_of_code);
+            $original_line_elt = undefined;
+        }
+
+        if (next_statement) {
+            // Basic chars that need to be escaped (but not parens)
+            var next_statement_re = next_statement.replace(/([.*+?^=!:${}|\[\]\/\\])/g, "\\$1");
+
+            // The deparsed next_statement can have whitespace differences from the original
+            next_statement_re = next_statement_re.replace(/\s+/g, '\\s*');
+
+            // parens can also be optional, maybe with whitespace before/after
+            next_statement_re = next_statement_re.replace(/\(/g, '\\s*\\(?\\s*');
+            next_statement_re = next_statement_re.replace(/\)/g, '\\s*\\)?\\s*');
+
+            // qq(...) is the same as "..."
+            next_statement_re = next_statement_re.replace(/(?:"|qq\\s\*\\\()(.*)(?:"|\\\))/, function(quoted, str) {
+                                                            return '(?:"|qq\\s*\\(?:\(|\{|\[|\/))' + str + '(?:"|qq\\(?:\)|\}|\]|\/))';
+                                                        });
+
+            next_statement_re = RegExp(next_statement_re);
+            // Wrap a <span> around the next_statement
+            var matched = false;
+            var marked_up_this_line_code = this_line_code.replace(next_statement_re, function (code) {
+                                                matched = true;
+                                                return '<span class="next-statement">' + code + '</span>' });
+            if (matched) {
+                // save the original look of the current line so we can restore it next time we're
+                // back in this function
+                $original_line_elt = $line;
+                original_line_of_code = $line.html();
+                // Write the marked up line back into the window
+                $line.html(marked_up_this_line_code);
+            } else {
+                console.warn("didn't find next_statement on line " + lineno + ": " + next_statement);
+            }
+        }
+    };
 
     this.controlButtonClicked = function(e) {
         e.preventDefault();
@@ -312,7 +364,7 @@ function Debugger(sel) {
 
         this.stackManager.update()
             .progress(this.stackFrameChanged.bind(this))
-            .done( done_after_stack_update.bind(this) );
+            .done( done_after_stack_update.bind(this, response.next_statement) );
 
         events.forEach(function(event) {
             event.render($elt)
@@ -475,14 +527,229 @@ function Debugger(sel) {
                     $('#breakpoint-container-handle').click();
                     e.stopPropagation();
                     break;
-                case 98: //b
+                case 66: //B
                     dbg.stackDiv.find('.tab-pane.active .code-line.active span.lineno').click();
+                    e.stopPropagation();
+                    break;
+                case 98: //b
+                    dbg.quickBreakpointDialog();
                     e.stopPropagation();
                     break;
             }
         });
     }
 
+    var quick_bp_dialog_open = false;
+    this.quickBreakpointDialog = function() {
+        if (quick_bp_dialog_open) {
+            return;
+        }
+        quick_bp_dialog_open = true;
+
+        var modal = $(this.templates.quickBreakpointModal());
+
+        modal.appendTo($elt)
+            .modal({ backdrop: true, keyboard: true, show: true })
+            .on('hidden', function() {
+                quick_bp_dialog_open = false;
+                modal.remove();
+            })
+            .keyup(function(e) {
+                if (e.keyCode == 27) { // escape - abort editing
+                    modal.modal('hide');
+                    return false;
+                }
+            })
+            .find('input')
+                .focus();
+
+        modal.find('form')
+            .submit(function(e) {
+                    e.preventDefault();
+                    var bp_text = $(e.target).find('[name=breakpoint]').val();
+
+                    parseQuickBreakpointText(bp_text)
+                        .done(function(filename, line) {
+                            dbg.breakpointManager.createBreakpoint({filename: filename, line: line});
+                        })
+                        .fail(function(message) {
+                            alert(message);
+                        })
+                        .always(function() {
+                            modal.modal('hide');
+                        });
+            });
+    }
+
+    function QB_isCurrentLine(text) {
+        var d = $.Deferred();
+        if (text.match(/^\.$/)) {  // A single period
+            var current_frameno = $('div#stack-panes .tab-pane.active').attr('data-frameno'),
+                stack_frame = dbg.stackManager.frame(current_frameno);
+            debugger;
+            d.resolve(stack_frame.filename, stack_frame.line);
+        } else {
+            d.reject(undefined);
+        }
+        return d;
+    }
+
+    function QB_isLineNumber(text) {
+        var d = $.Deferred();
+        var matches = text.match(/^\d+$/);  // match only digits - a line number in the current stackframe's file
+        if (matches) {
+            var line = dbg.stackDiv.find('.tab-pane.active .code-line[data-lineno='+text+']');
+            if (line.length == 0) {
+                d.reject('No such line number in the current file');
+            } else if (line.hasClass('unbreakable')) {
+                d.reject('Line ' + text + ' is not breakable');
+            } else {
+                var file = dbg.stackDiv.find('.tab-pane.active .program-code-container').attr('data-filename');
+                d.resolve(file, text);
+            }
+        } else {
+            d.reject(undefined);
+        }
+        return d.promise();
+    }
+
+    function QB_isFQSubroutine(text) {
+        var d = $.Deferred();
+        var matches = text.match(/^(.+?::\w+)(?::(\d+))?$/); // match "package::subname" or "package::subname:line"
+        if (matches) {
+            var subname = matches[1],
+                line = matches[2];
+
+            restInterface.subInfo(subname)
+                    .done(function(data) {
+                        _QB_findBreakableLineInSub(line, d, data);
+                    })
+                    .fail(function() {
+                        d.reject(undefined);
+                    })
+
+        } else {
+            d.reject(undefined);
+        }
+        return d.promise();
+    }
+
+    function QB_isSubroutine(text) {
+        var d = $.Deferred();
+        var matches = text.match(/^(.+?)(?::(\d+))?$/);  // match either "string" or "string:numbers"
+        if (matches) {
+            var subname = matches[1],
+                line = matches[2],
+                current_frameno = $('div#stack-panes .tab-pane.active').attr('data-frameno'),
+                stack_frame = dbg.stackManager.frame(current_frameno),
+                current_package = stack_frame.package;
+
+            restInterface.subInfo(current_package + '::' + subname)
+                        .done(function(data) {
+                            _QB_findBreakableLineInSub(line, d, data);
+                        })
+                        .fail(function(data) {
+                            d.reject(undefined);
+                        });
+        } else {
+            d.reject(undefined);
+        }
+        return d.promise();
+    }
+
+    function _QB_findBreakableLineInSub(requested_line_str, deferred, subinfo_data) {
+        var start_breakable_search,
+            sub_start_line = parseInt(subinfo_data.line, 10),
+            sub_end_line = parseInt(subinfo_data.end, 10),
+            requested_line = parseInt(requested_line_str, 10);
+
+        if (requested_line_str) {  // They wanted to stop on a particular line
+            var sub_length = sub_end_line - sub_start_line;
+            if (requested_line > sub_length) {
+                deferred.reject(requested_line_str + ' is outside the range of sub ' + subinfo_data.subroutine);
+            }
+            start_breakable_search = sub_start_line + requested_line;
+
+            if (dbg.fileManager.isBreakable(subinfo_data.filename, sub_start_line)) {
+                // if the sub's first line is breakable, then line "1" of the sub
+                // is the same as the sub's start line
+                start_breakable_search = start_breakable_search - 1;
+            }
+
+        } else {
+            start_breakable_search = sub_start_line;
+        }
+
+        for(var break_on_line = start_breakable_search; break_on_line < subinfo_data.end; break_on_line++) {
+            if (dbg.fileManager.isBreakable(subinfo_data.filename, break_on_line)) {
+                deferred.resolve(subinfo_data.filename, break_on_line);
+            }
+        }
+        deferred.reject("Couldn't file a breakable line within '"
+                        + subinfo_data.subroutine
+                        + '. Tried line ' + requested_line + ' to the end of the function');
+    }
+
+    function QB_isFile(text) {
+        var d = $.Deferred();
+        var matches = text.match(/^(.+?):(\d+)$/);  // match "string:numbers"
+        if (matches) {
+            var filename = matches[1],
+                line = matches[2];
+            if (dbg.fileManager.isLoaded(filename)) {
+                if (dbg.fileManager.isBreakable(filename, line)) {
+                    d.resolve(filename, line);
+                } else {
+                    d.reject(filename + ':' + line + ' is not breakable');
+                }
+            } else {
+                d.reject(undefined);
+            }
+        } else {
+            d.reject(undefined);
+        }
+        return d.promise();
+    }
+
+    function QB_unparsable(text) {
+        var d = $.Deferred();
+        d.reject("Could not parse breakpoint '" + text + "'");
+        return d.promise();
+    }
+
+    var quick_breakpoint_resolvers = [
+        QB_isCurrentLine,
+        QB_isLineNumber,
+        QB_isFQSubroutine,
+        QB_isSubroutine,
+        QB_isFile,
+        QB_unparsable,
+    ];
+    function parseQuickBreakpointText(text) {
+        var i = 0,
+            d = $.Deferred();
+
+        function tryNextResolver() {
+            var resolver = quick_breakpoint_resolvers[i],
+                p = resolver(text);
+            i++;
+
+            p.done(function(filename, line) {
+                d.resolve(filename, line);  // try just putting d in the done()?
+            })
+            .fail(function(message) {
+                if (message) {
+                    d.reject(message);
+                } else {
+                    tryNextResolver();
+                }
+            })
+        }
+
+        tryNextResolver();
+        return d.promise();
+    }
+                                    
     var $breakpointPane = $('#breakpoint-container'),
         $breakpointToggleIcon = $('#breakpoint-container-handle-icon');
 
@@ -689,8 +956,9 @@ function Debugger(sel) {
     this.stackManager = new StackManager(this.restInterface);
     this.stackManager.initialize()
         .progress(this.stackFrameChanged.bind(this))
-        .done(function() {
+        .done(function(status) {
                 done_after_stack_update.call(dbg);
+                dbg.setCurrentStatementForCodeTable(status.next_statement);
                 dbg.breakpointManager.sync();
         });
 

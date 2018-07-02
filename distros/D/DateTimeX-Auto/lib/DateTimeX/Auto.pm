@@ -11,7 +11,7 @@ use warnings;
 	
 	BEGIN {
 		$DateTimeX::Auto::AUTHORITY = 'cpan:TOBYINK';
-		$DateTimeX::Auto::VERSION   = '0.008';
+		$DateTimeX::Auto::VERSION   = '0.009';
 	}
 	
 	our %EXPORT_TAGS = (
@@ -77,15 +77,15 @@ use warnings;
 {
 	package DateTimeX::Auto::DateTime;
 	
-	use base qw[DateTime];
-	use UNIVERSAL::ref;
+	use parent qw[DateTime];
+	BEGIN { eval 'use UNIVERSAL::ref;' };
 	use constant ref => 'DateTime';
 	
 	use DateTime::Format::Strptime qw[];
 	
 	BEGIN {
 		$DateTimeX::Auto::DateTime::AUTHORITY = 'cpan:TOBYINK';
-		$DateTimeX::Auto::DateTime::VERSION   = '0.008';
+		$DateTimeX::Auto::DateTime::VERSION   = '0.009';
 	}
 	
 	sub from_object
@@ -191,13 +191,13 @@ use warnings;
 {
 	package DateTimeX::Auto::Duration;
 	
-	use base qw[DateTime::Duration];
-	use UNIVERSAL::ref;
+	use parent qw[DateTime::Duration];
+	BEGIN { eval 'use UNIVERSAL::ref;' };
 	use constant ref => 'DateTime::Duration';
 	
 	BEGIN {
 		$DateTimeX::Auto::Duration::AUTHORITY = 'cpan:TOBYINK';
-		$DateTimeX::Auto::Duration::VERSION   = '0.008';
+		$DateTimeX::Auto::Duration::VERSION   = '0.009';
 	}
 	
 	sub new
@@ -217,11 +217,11 @@ use warnings;
 			(?:([\d\.]*)M)?    # n Months
 			(?:([\d\.]*)W)?    # n Weeks
 			(?:([\d\.]*)D)?    # n Days
-			(?:                 
-				 T               # And a time of...
-				 (?:([\d\.]*)H)? # n Hours
-				 (?:([\d\.]*)M)? # n Minutes
-				 (?:([\d\.]*)S)? # n Seconds
+			(?:
+				T               # And a time of...
+				(?:([\d\.]*)H)? # n Hours
+				(?:([\d\.]*)M)? # n Minutes
+				(?:([\d\.]*)S)? # n Seconds
 			)?
 		/ix;
 			
@@ -342,8 +342,8 @@ digits after the ninth will be zeroed out.
  print "$dt\n"; # 1234-12-12T12:34:56.123456789000000000
 
 Objects are blessed into the C<DateTimeX::Auto::DateTime> class which
-inherits from C<DateTime>. They use L<UNIVERSAL::ref> to masquerade as
-plain C<DateTime> objects.
+inherits from C<DateTime>. They use L<UNIVERSAL::ref> (if installed) to
+masquerade as plain C<DateTime> objects.
 
  print ref('2000-01-01')."\n";   # DateTime
 

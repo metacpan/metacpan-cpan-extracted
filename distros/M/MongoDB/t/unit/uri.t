@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -267,13 +265,13 @@ subtest "auth credentials" => sub {
 
     like(
         exception { $class->new( uri => 'mongodb://user@name:password@localhost' ) },
-        qr/username must be URL encoded, found unescaped '\@'/,
+        qr/username must be URL encoded/,
         'username with unescaped at sign'
     );
 
     like(
         exception { $class->new( uri => 'mongodb://username:pass:word@localhost' ) },
-        qr/password must be URL encoded, found unescaped ':'/,
+        qr/password must be URL encoded/,
         "password with unescaped colon"
     );
 };

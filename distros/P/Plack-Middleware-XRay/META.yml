@@ -27,15 +27,15 @@ no_index:
 provides:
   Plack::Middleware::XRay:
     file: lib/Plack/Middleware/XRay.pm
-    version: '0.02'
+    version: '0.04'
 requires:
-  AWS::XRay: '0.02'
+  AWS::XRay: '0.04'
   Plack::Middleware: '0'
   perl: '5.012000'
 resources:
   bugtracker: https://github.com/fujiwara/Plack-Middleware-XRay/issues
   homepage: https://github.com/fujiwara/Plack-Middleware-XRay
   repository: git://github.com/fujiwara/Plack-Middleware-XRay.git
-version: '0.02'
+version: '0.04'
 x_authority: cpan:FUJIWARA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

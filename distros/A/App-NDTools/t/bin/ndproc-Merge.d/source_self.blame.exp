@@ -4,30 +4,46 @@
       "rule_id" : 0
    },
    {
-      "A" : {
-         "files" : {
-            "/etc/cron.d/beta" : "* * * * * root sleep 5",
-            "/etc/hostname" : "beta",
-            "/etc/hosts" : "127.0.0.1    localhost",
-            "/etc/resolv.conf" : "nameserver 8.8.8.8"
-         }
+      "diff" : {
+         "N" : {
+            "files" : {
+               "/etc/cron.d/beta" : "* * * * * root sleep 5",
+               "/etc/hostname" : "beta",
+               "/etc/hosts" : "127.0.0.1    localhost",
+               "/etc/resolv.conf" : "nameserver 8.8.8.8"
+            }
+         },
+         "O" : null
       },
       "rule_id" : 1,
       "source" : "_cfg.beta.json"
    },
    {
-      "A" : {
-         "files" : {
-            "/etc/hostname" : "gamma"
+      "diff" : {
+         "D" : {
+            "files" : {
+               "D" : {
+                  "/etc/hostname" : {
+                     "N" : "gamma",
+                     "O" : "beta"
+                  }
+               }
+            }
          }
       },
       "rule_id" : 2,
       "source" : "_cfg.gamma.json"
    },
    {
-      "A" : {
-         "fqdn" : "alpha.example.org",
-         "mtime" : 1462431001
+      "diff" : {
+         "D" : {
+            "fqdn" : {
+               "A" : "alpha.example.org"
+            },
+            "mtime" : {
+               "A" : 1462431001
+            }
+         }
       },
       "rule_id" : 3,
       "source" : "source_self.got"

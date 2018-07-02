@@ -3,8 +3,16 @@ package OpusVL::Preferences::RolesFor::ResultSet::PrfOwner;
 
 use strict;
 use warnings;
+use v5.24;
 use Moose::Role;
 use Carp;
+use OpusVL::FB11::Hive;
+
+sub _schema {
+    state $schema = OpusVL::FB11::Hive
+        ->fancy_hat('preferences')
+        ->schema;
+}
 
 sub prf_get_default
 {
@@ -41,25 +49,22 @@ sub prf_set_default
 sub setup_owner_type
 {
 	my $self   = shift;
-	my $schema = $self->result_source->schema;
 	my $source = $self->result_source;
 
-	return $schema->resultset ('PrfOwnerType')->setup_from_source ($source);
+	return _schema->resultset ('PrfOwnerType')->setup_from_source ($source);
 }
 
 sub get_owner_type
 {
 	my $self   = shift;
-	my $schema = $self->result_source->schema;
 	my $source = $self->result_source;
 
-	return $schema->resultset ('PrfOwnerType')->get_from_source ($source);
+	return _schema->resultset ('PrfOwnerType')->get_from_source ($source);
 }
 
 sub prf_defaults
 {
 	my $self   = shift;
-	my $schema = $self->result_source->schema;
 	my $type   = $self->setup_owner_type;      # we always want a result here
 
 	return $type->prf_defaults;
@@ -80,8 +85,7 @@ sub with_fields
     my $x = 1;
     # well this sucks, we need to figure out if these are encrypted fields.
     # we can't do this entirely at the DB layer.
-    my $schema = $self->result_source->schema;
-    my $crypto = $schema->encryption_client;
+    my $crypto = _schema->encryption_client;
     if($crypto)
     {
         # no point in checking for encryption unless we have a crypto object setup.
@@ -116,8 +120,37 @@ sub with_fields
         push @joins, 'prf_preferences';
         $x++;
     }
-    return $self->search({ -and => \@params }, {
-        join => { prf_owner => \@joins }
+
+    # FIXME: This runs many queries but I'm too overwhelmed right now
+
+    # We want to find all PrfOwner rows whose PrfPreference values match the
+    # query. This is enough information to filter the existing resultset.
+    # We can't use join any more, because the existing resultset won't have any
+    # relationships into this code.
+
+    my $local_query = _schema->resultset('PrfOwner')->search({
+        # They will all have the same ID here. This is a silly architecture.
+        "me.prf_owner_type_id" => $self->get_column('prf_owner_type_id')->first,
+
+        # Assume the id column is the id column because this is a hack
+        "me.prf_owner_id" => {
+            -in => $self->get_column('id')->as_query,
+        },
+    });
+
+    # Join on the PrfPreferences
+    $local_query = $local_query->search({
+        -and => \@params
+    }, {
+        join => \@joins
+    });
+
+    # Now add the resulting prf_owner_ids back as a filter on the original ID
+    # column.
+    return $self->search({
+        "me.id" => {
+            -in => $local_query->get_column('prf_owner_id')->as_query
+        }
     });
 }
 

@@ -1,0 +1,119 @@
+==================================================
+Changes from 2018-06-23 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.0.3 at 2018-06-23 16:05:57 +0000
+------------------------------------------
+
+  Change: af2540202621b8e1f96145c2cf3acf3a683b768f
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2018-06-23 12:05:39 +0000
+
+    clean up the manifest, tidy things 
+
+  Change: 27cb6d9e6bddb79bc7f0747b5c1fb88ec8d8eb80
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-28 11:44:09 +0000
+
+    update Changes/MANIFEST 
+
+  Change: 240022fce326d2aba96d27c5caa81c0393ee67b7
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-28 11:43:31 +0000
+
+    I thought I was clever. I thought wrong 
+
+  Change: 4f4e5443d39e0dfaaed23ed1f7abfc484bc25570
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-28 11:21:02 +0000
+
+    tidy up, bump version, add MANIFEST, update other build files / Changes 
+
+  Change: 534fb85e613b3bb82546b64588e351d92a52f737
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-28 11:18:58 +0000
+
+    drop autodie own to :default to avoid IPC::System::Simple dependency 
+
+  Change: 569ef8990c2f4e1176f447afe24c8cef0425cd51
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-21 23:19:19 +0000
+
+    remove old perltidy config 
+
+  Change: e6ba4457c16fe97e92b00319e0f967d87b2bee67
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-21 23:18:30 +0000
+
+    remove dzil Perl::Critic test, get updated build scripst and changes file 
+
+  Change: b65a996c1898530e3e96cd3ab09333015e07be07
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-21 23:17:29 +0000
+
+    use autodie, tidy up 
+
+  Change: 1a3efb2c240083ee13bb69d6dec5409b6874e299
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-21 22:47:43 +0000
+
+    housekeeping configs 
+
+  Change: bc1475c5f82c35d8e9fef133037284db4bc568ce
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-15 00:15:36 +0000
+
+    update Changes 
+
+  Change: d61108ad8b7959d147c2b0f31f18d41789b9f348
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-15 00:14:45 +0000
+
+    gain a bit of speed 
+
+  Change: 4591f63601ff29f7dac41b362f9c1c39a97f92a9
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-14 23:57:07 +0000
+
+    add README 
+
+  Change: 3f6e043fd61478abbef8e8b020713e496c014be8
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-14 23:50:21 +0000
+
+    use semantic versioning 
+
+  Change: f7726b22e2f31878fca64cf899a33a098fdaab0d
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-14 23:49:43 +0000
+
+    updates for .gitignore 
+
+  Change: c6e6bd7bbfb351b788bc50aaee08ac6f2c11a36f
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-14 23:47:23 +0000
+
+    track build scripts and etc 
+
+  Change: 19da6fb88e799d8e33ff11d50ab27ef6ff05e2aa
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-14 23:46:23 +0000
+
+    require perl 5.10.0 
+
+  Change: e92c5bc73ee57c4e3d6fbc98578d18e604311e86
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-14 23:38:55 +0000
+
+    fix some things, tidy up, use the things 
+
+  Change: c2ebc5c80dda832d47e366f93c48ee0736a0f83c
+  Author: Kevin Phair <phair.kevin@gmail.com>
+  Date : 2016-07-14 23:13:36 +0000
+
+    initial commit of showreverse utility 
+
+================
+End of releases.
+================

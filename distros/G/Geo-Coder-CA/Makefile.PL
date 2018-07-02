@@ -8,13 +8,17 @@ my $online_tests;
 
 if($ENV{RELEASE_TESTING}) {
 	$online_tests = are_online();
-} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING}) {
+} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING} || (!-t STDIN)) {
 	$online_tests = 0;
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
 
 	if(!defined($online_tests)) {
-		$online_tests = are_online();
+		if($ENV{RELEASE_TESTING}) {
+			$online_tests = are_online();
+		} else {
+			$online_tests = 0;
+		}
 	}
 }
 
@@ -23,6 +27,7 @@ my $test_requires = {
 	'Test::NoWarnings' => 0,
 	'Test::Number::Delta' => 0,
 	'Test::Carp' => 0,
+	'Test::Script' => 0,
 	'Test::LWP::UserAgent' => 0
 };
 
@@ -35,54 +40,54 @@ if($online_tests) {
 }
 
 WriteMakefile(
-    NAME		=> 'Geo::Coder::CA',
-    AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
-    VERSION_FROM	=> 'lib/Geo/Coder/CA.pm',
-    ABSTRACT_FROM       => 'lib/Geo/Coder/CA.pm',
-    ((defined($ExtUtils::MakeMaker::VERSION) &&
-     ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-      ? ('LICENSE'=> 'GPL')
-      : ()),
-    PL_FILES	=> {},
-    TEST_REQUIRES => $test_requires,
-    PREREQ_PM => {
-	'Encode' => 0,
-	'JSON' => 0,
-	'HTTP::Request' => 0,
-	'LWP::UserAgent' => 0,
-	'LWP::Protocol::https' => 0,
-	'URI' => 0,
-    },
-    dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean		=> { FILES => 'Geo-Coder-CA-*' },
-    META_MERGE		=> {
-    	'meta-spec' => { version => 2 },
-    	resources => {
-    		repository => {
+	NAME		=> 'Geo::Coder::CA',
+	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
+	VERSION_FROM	=> 'lib/Geo/Coder/CA.pm',
+	ABSTRACT_FROM	=> 'lib/Geo/Coder/CA.pm',
+	((defined($ExtUtils::MakeMaker::VERSION) &&
+	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
+	  ? ('LICENSE'=> 'GPL')
+	  : ()),
+	PL_FILES	=> {},
+	TEST_REQUIRES => $test_requires,
+	PREREQ_PM => {
+		'Encode' => 0,
+		'JSON' => 0,
+		'HTTP::Request' => 0,
+		'LWP::UserAgent' => 0,
+		'LWP::Protocol::https' => 0,
+		'URI' => 0,
+	},
+	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+	clean		=> { FILES => 'Geo-Coder-CA-*' },
+	META_MERGE		=> {
+		'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
 			type => 'git',
 			url => 'git://github.com/nigelhorne/Geo-Coder-CA.git',
 			web => 'https://github.com/nigelhorne/Geo-Coder-CA',
-    		},
-		bugtracker => {
-			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-CA',
-			mailto => 'bug-Geo-Coder-CA@rt.cpan.org'
-		}
+			},
+			bugtracker => {
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-CA',
+				mailto => 'bug-Geo-Coder-CA@rt.cpan.org'
+			}
+		},
 	},
-    },
-    MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
 );
 
 sub are_online
 {
 	my $s = IO::Socket::INET->new(
-		PeerAddr => 'geocode.ca:443',
+		PeerAddr => 'geocoder.ca:443',
 		Timeout => 10
 	);
 	if($s) {
 		print <<EOF;
 
 You appear to be directly connected to the Internet.  I have some tests
-that try to query geocode.ca.
+that try to query geocoder.ca.
 
 EOF
 		close($s);

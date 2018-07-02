@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Barcelona
 
+0.63  Fri Jun 29 10:10:00 2018
+      - Updated dependency on Map::Tube v3.53.
+
 0.62  Tue Jun 12 10:50:00 2018
       - Used new_ok() in test script.
 

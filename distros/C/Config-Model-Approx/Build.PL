@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Approx
 #
-# This software is Copyright (c) 2009-2017 by Dominique Dumont.
+# This software is Copyright (c) 2015-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -62,24 +62,27 @@ my $build = $class->new
    appli_files => \%appli_files ,
  
   'build_requires' => {
-    'Config::Model::Tester' => '2.042',
+    'Config::Model::Tester' => '3.006',
+    'Config::Model::Tester::Setup' => '0',
     'Module::Build' => '0.34',
     'Test::More' => '0'
   },
   'configure_requires' => {
-    'Config::Model' => '2.041',
-    'Log::Log4perl' => '1.11',
-    'Module::Build' => '0.34',
-    'Mouse' => '0'
+    'Module::Build' => '0.34'
   },
   'recommends' => {
-    'Config::Model::CursesUI' => '0',
+    'App::Cme' => '0',
     'Config::Model::TkUI' => '0'
   },
   'requires' => {
-    'Config::Model' => '2.041',
-    'Log::Log4perl' => '1.11',
-    'perl' => 'v5.10.1'
+    'Carp' => '0',
+    'Config::Model' => '2.123',
+    'Config::Model::Backend::Any' => '0',
+    'File::Copy' => '0',
+    'File::Path' => '0',
+    'Log::Log4perl' => '0',
+    'Mouse' => '0',
+    'perl' => '5.010'
   },
 
    add_to_cleanup => [qw/wr_root/] ,

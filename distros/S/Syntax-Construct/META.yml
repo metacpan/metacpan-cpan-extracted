@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,11 +22,11 @@ no_index:
 provides:
   Syntax::Construct:
     file: lib/Syntax/Construct.pm
-    version: '1.004'
+    version: '1.007'
 requires:
   Config: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/choroba/syntactic-construct
-version: '1.004'
+version: '1.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

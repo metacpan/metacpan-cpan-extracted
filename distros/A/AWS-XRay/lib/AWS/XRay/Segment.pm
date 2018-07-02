@@ -43,7 +43,11 @@ sub close {
 
 sub trace_header {
     my $self = shift;
-    sprintf("Root=%s;Parent=%s", $self->{trace_id}, $self->{id});
+    my $h = sprintf("Root=%s;Parent=%s", $self->{trace_id}, $self->{id});
+    if (defined $AWS::XRay::SAMPLED) {
+        $h .= ";Sampled=$AWS::XRay::SAMPLED"
+    }
+    return $h;
 }
 
 package AWS::XRay::Segment::NoTrace;

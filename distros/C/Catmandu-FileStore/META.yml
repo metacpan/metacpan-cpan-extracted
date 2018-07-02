@@ -1,0 +1,46 @@
+---
+abstract: 'Namespace for packages that can make files persistent'
+author:
+  - 'Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>'
+build_requires:
+  Log::Any::Adapter::Log4perl: '0'
+  Log::Any::Test: '1.03'
+  Log::Log4perl: '0'
+  Module::Build: '0.28'
+  Test::Deep: '0.112'
+  Test::Exception: '0.43'
+  Test::LWP::UserAgent: '0'
+  Test::More: '0.99'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Catmandu-FileStore
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  Log::Any::Adapter::Log4perl: '0.06'
+  Log::Log4perl: '1.44'
+requires:
+  Catmandu: '1.06'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Catmandu-FileStore/issues
+  homepage: https://github.com/LibreCat/Catmandu-FileStore
+  repository: https://github.com/LibreCat/Catmandu-FileStore.git
+version: '1.11'
+x_contributors:
+  - 'Nicolas Franck <nicolas.franck@ugent.be>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

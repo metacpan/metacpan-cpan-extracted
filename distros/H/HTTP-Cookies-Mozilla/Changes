@@ -1,5 +1,8 @@
 Revision history for Perl module HTTP::Cookies::Mozilla
 
+2.034 2018-06-24T13:57:31Z
+	* Clarify that it's the Artistic License 2.0
+
 2.033 2017-08-24T21:16:22Z
 	* Bump version and test release code
 

@@ -11,7 +11,7 @@ Pandoc - wrapper for the mighty Pandoc document converter
 
 =cut
 
-our $VERSION = '0.8.4';
+our $VERSION = '0.8.5';
 
 use Pandoc::Version;
 use Pandoc::Error;
@@ -341,6 +341,31 @@ sub libs {
     $_[0]->{libs};
 }
 
+sub symlink {
+    my $self = shift;
+    my ( $name, %opts ) = @_ % 2 ? @_ : ( '', @_ );
+
+    if ( '' eq $name // '' ) {
+        $name = pandoc_data_dir( 'bin', 'pandoc' );
+    }
+    elsif ( -d $name ) {
+        $name = "$name/pandoc";
+    }
+
+    my $bin = $self->bin;
+
+    unlink $name if -l $name;
+    if ( symlink $bin, $name ) {
+        say "symlinked $name -> $bin" if $opts{verbose};
+        $self->bin($name);
+    }
+    else {
+        die "failed to create symlink $name -> $bin\n";
+    }
+
+    $self;
+}
+
 1;
 
 __END__
@@ -569,6 +594,15 @@ minimal version use one of:
 
 Return or set the pandoc executable. Setting an new executable also updates
 version and data_dir by calling C<pandoc --version>.
+
+=head2 symlink( [ $name ] [ verbose => 0|1 ] )
+
+Create a symlink with given name to the executable and change executable to the
+symlink location afterwards. An existing symlink is replaced. If C<$name> is an
+existing directory, the symlink will be named C<pandoc> in there. This makes
+most sense if the directory is listed in environment variable C<$PATH>. If the
+name is omitted or an empty string, symlink is created in subdirectory C<bin>
+of pandoc data directory.
 
 =head2 arguments( [ @arguments | \@arguments )
 

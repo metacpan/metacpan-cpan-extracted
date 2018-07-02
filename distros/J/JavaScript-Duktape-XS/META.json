@@ -4,13 +4,13 @@
       "Gonzalo Diethelm (gonzus@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "JavaScript-Duktape-XS",
    "no_index" : {
@@ -41,7 +41,6 @@
          "requires" : {
             "Data::Dumper" : "0",
             "Path::Tiny" : "0",
-            "Ref::Util" : "0",
             "Test::More" : "0",
             "Test::Output" : "0",
             "Text::Trim" : "0",
@@ -56,5 +55,5 @@
          "web" : "https://github.com/gonzus/JavaScript-Duktape-XS"
       }
    },
-   "version" : "0.000065"
+   "version" : "0.000067"
 }

@@ -1,0 +1,51 @@
+CLI-TextLines-Hack
+
+
+ The following CLI commands each written as a stand-alone Perl program are provided.
+
+  alluniq -- Is every line different from others? If not, how many are $n$-plet occur for each $n$?
+  idmaker -- Identical numbers are attached to each line. Same ID for the same line contents.
+  shuffler -- shuffles the lines randomly. With options of taking $n$ lines from the top.
+  hashtotal -- Calculates the total sum of the first 4 bytes of SHA1 of each line.
+  ngram -- character-wise $n$-gram ranking (experimental; not fully implemented as planed).
+  utf8bom -- you can check the existence and add/delete UTF-8 BOM on files.
+  digitdist -- Enables to see the concrete values based on lengths and character positions.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+  Only Japanese manual is provided, and you can see them by the following command.
+
+    alluniq --help
+    idmader --help
+    shuffler --help
+    hashtotal --help 
+    ngram --help 
+    digitdist --help 
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2018 "Toshiyuki Shimono"
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+

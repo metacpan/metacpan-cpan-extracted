@@ -71,6 +71,9 @@ WriteMakefile(
 		'LWP::UserAgent::Throttled' => 0,
 	},
 	TEST_REQUIRES => {
+		'CGI::IDS' => 0,
+		'CGI::Lingua' => 0,
+		'Data::Throttler' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Number::Delta' => 0,

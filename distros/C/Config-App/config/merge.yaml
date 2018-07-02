@@ -1,0 +1,7 @@
+---
+default:
+    logs:
+        outputs:
+            Screen:
+                name:      screen
+                min_level: debug

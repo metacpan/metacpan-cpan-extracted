@@ -1,28 +1,26 @@
 package Mail::Mbox::MessageParser::Grep;
 
-no strict;
-
-@ISA = qw( Exporter Mail::Mbox::MessageParser );
-
 use strict;
 use Carp;
 
 use Mail::Mbox::MessageParser;
 use Mail::Mbox::MessageParser::Config;
 
-use vars qw( $VERSION $DEBUG );
-use vars qw( $CACHE );
+use vars qw( $VERSION $_DEBUG @ISA );
+use vars qw( $_CACHE );
+
+@ISA = qw( Exporter Mail::Mbox::MessageParser );
 
 $VERSION = sprintf "%d.%02d%02d", q/1.70.5/ =~ /(\d+)/g;
 
-*ENTRY_STILL_VALID = \&Mail::Mbox::MessageParser::MetaInfo::ENTRY_STILL_VALID;
-sub ENTRY_STILL_VALID;
+*_ENTRY_STILL_VALID = \&Mail::Mbox::MessageParser::MetaInfo::_ENTRY_STILL_VALID;
+sub _ENTRY_STILL_VALID;
 
-*CACHE = \$Mail::Mbox::MessageParser::MetaInfo::CACHE;
+*_CACHE = \$Mail::Mbox::MessageParser::MetaInfo::_CACHE;
 
-*DEBUG = \$Mail::Mbox::MessageParser::DEBUG;
-*dprint = \&Mail::Mbox::MessageParser::dprint;
-sub dprint;
+*_DEBUG = \$Mail::Mbox::MessageParser::_DEBUG;
+*_dprint = \&Mail::Mbox::MessageParser::_dprint;
+sub _dprint;
 
 #-------------------------------------------------------------------------------
 
@@ -100,7 +98,7 @@ sub _read_prologue
 {
   my $self = shift;
 
-  dprint "Reading mailbox prologue using grep";
+  _dprint "Reading mailbox prologue using grep";
 
   $self->_read_until_match(
     qr/$Mail::Mbox::MessageParser::Config{'from_pattern'}/m,0);
@@ -118,32 +116,31 @@ sub read_next_email
 {
   my $self = shift;
 
-  unless (defined $self->{'file_name'} &&
-    ENTRY_STILL_VALID($self->{'file_name'}))
+  unless (defined $self->{'file_name'} && _ENTRY_STILL_VALID($self->{'file_name'}))
   {
     # Patch up the data structures for the Perl implementation
     undef $self->{'CHUNK_INDEX'};
     $self->{'CURRENT_LINE_NUMBER'} =
-      $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'line_number'};
+      $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'line_number'};
     $self->{'CURRENT_OFFSET'} =
-      $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'offset'};
+      $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'offset'};
     $self->{'READ_CHUNK_SIZE'} =
       $Mail::Mbox::MessageParser::Config{'read_chunk_size'};
 
     # Invalidate the remaining data
-    $#{ $CACHE->{$self->{'file_name'}}{'emails'} } = $self->{'email_number'};
+    $#{ $_CACHE->{$self->{'file_name'}}{'emails'} } = $self->{'email_number'};
 
     bless ($self, 'Mail::Mbox::MessageParser::Perl');
 
     return $self->read_next_email();
   }
 
-  return undef if $self->end_of_file();
+  return undef if $self->end_of_file(); ## no critic (ProhibitExplicitReturnUndef)
 
   $self->{'email_line_number'} =
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'line_number'};
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'line_number'};
   $self->{'email_offset'} =
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'offset'};
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'offset'};
 
   $self->{'START_OF_EMAIL'} = $self->{'END_OF_EMAIL'};
 
@@ -158,7 +155,7 @@ sub read_next_email
   {
     # Could issue a warning here, but I'm not sure how to do this cleanly for
     # a work-only module like this. Maybe something like CGI's cgi_error()?
-    dprint "Inconsistent multi-part message. Could not find ending for " .
+    _dprint "Inconsistent multi-part message. Could not find ending for " .
       "boundary \"" . $self->_multipart_boundary() . "\"";
 
     # Try to read the content length and use that
@@ -273,7 +270,7 @@ sub _multipart_boundary
     }
   }
 
-  return undef;
+  return undef; ## no critic (ProhibitExplicitReturnUndef)
 }
 
 #-------------------------------------------------------------------------------
@@ -307,7 +304,7 @@ sub _extract_email_and_finalize
     $self->{'email_length'});
 
   while ($self->{'email_length'} >
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'length'})
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'length'})
   {
     $self->_adjust_cache_data();
   }
@@ -388,7 +385,7 @@ sub _read_chunk
   # Reading the prologue, so use the offset of the first email
   if ($self->{'CHUNK_INDEX'} == -1)
   {
-    my $length_to_read = $CACHE->{$self->{'file_name'}}{'emails'}[0]{'offset'};
+    my $length_to_read = $_CACHE->{$self->{'file_name'}}{'emails'}[0]{'offset'};
     my $total_amount_read = 0;
 
     do {
@@ -401,12 +398,12 @@ sub _read_chunk
     $self->{'CHUNK_INDEX'}++;
   }
 
-  my $last_email_index = $#{$CACHE->{$self->{'file_name'}}{'emails'}};
+  my $last_email_index = $#{$_CACHE->{$self->{'file_name'}}{'emails'}};
 
   return 0 if $self->{'CHUNK_INDEX'} == $last_email_index+1;
 
   my $length_to_read =
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'CHUNK_INDEX'}]{'length'};
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'CHUNK_INDEX'}]{'length'};
   my $total_amount_read = 0;
 
   do {
@@ -427,7 +424,7 @@ sub _adjust_cache_data
 {
   my $self = shift;
 
-  my $last_email_index = $#{$CACHE->{$self->{'file_name'}}{'emails'}};
+  my $last_email_index = $#{$_CACHE->{$self->{'file_name'}}{'emails'}};
 
   die<<EOF
 Error: Cannot adjust cache data. Please email the author with your mailbox to
@@ -435,18 +432,18 @@ have him fix the problem. In the meantime, disable the grep implementation.
 EOF
     if $self->{'email_number'} == $last_email_index;
 
-  $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'length'} +=
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}+1]{'length'};
+  $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'length'} +=
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}+1]{'length'};
 
   if($self->{'email_number'}+2 <= $last_email_index)
   {
-    @{$CACHE->{$self->{'file_name'}}{'emails'}}
+    @{$_CACHE->{$self->{'file_name'}}{'emails'}}
       [$self->{'email_number'}+1..$last_email_index-1] =
-        @{$CACHE->{$self->{'file_name'}}{'emails'}}
+        @{$_CACHE->{$self->{'file_name'}}{'emails'}}
         [$self->{'email_number'}+2..$last_email_index];
   }
 
-  pop @{$CACHE->{$self->{'file_name'}}{'emails'}};
+  pop @{$_CACHE->{$self->{'file_name'}}{'emails'}};
 
   $self->{'CHUNK_INDEX'}--;
 }
@@ -462,9 +459,9 @@ sub _initialize_cache_entry
   my $size = $stat[7];
   my $time_stamp = $stat[9];
 
-  $CACHE->{$self->{'file_name'}}{'size'} = $size;
-  $CACHE->{$self->{'file_name'}}{'time_stamp'} = $time_stamp;
-  $CACHE->{$self->{'file_name'}}{'emails'} =
+  $_CACHE->{$self->{'file_name'}}{'size'} = $size;
+  $_CACHE->{$self->{'file_name'}}{'time_stamp'} = $time_stamp;
+  $_CACHE->{$self->{'file_name'}}{'emails'} =
     _READ_GREP_DATA($self->{'file_name'});
 }
 
@@ -476,14 +473,14 @@ sub _READ_GREP_DATA
 
   my @lines_and_offsets;
 
-  dprint "Reading grep data";
+  _dprint "Reading grep data";
 
   {
     my @grep_results;
 
     @grep_results = `unset LC_ALL LC_COLLATE LANG LC_CTYPE LC_MESSAGES; $Mail::Mbox::MessageParser::Config{'programs'}{'grep'} --extended-regexp --line-number --byte-offset --binary-files=text "^From [^:]+(:[0-9][0-9]){1,2}(  *([A-Z]{2,6}|[+-]?[0-9]{4})){1,3}( remote from .*)?\r?\$" "$filename"`;
 
-    dprint "Read " . scalar(@grep_results) . " lines of grep data";
+    _dprint "Read " . scalar(@grep_results) . " lines of grep data";
 
     foreach my $match_result (@grep_results)
     {
@@ -588,6 +585,14 @@ handle to the mailbox.
 
 Returns a reference to a Mail::Mbox::MessageParser object, or a string
 describing the error.
+
+=item end_of_file()
+
+=item reset()
+
+=item read_next_email()
+
+These methods are overridden in this subclass of Mail::Mbox::MessageParser.
 
 =back
 

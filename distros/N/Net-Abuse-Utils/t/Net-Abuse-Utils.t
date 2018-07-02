@@ -1,3 +1,6 @@
+BEGIN { chdir 't' if -d 't' }
+use lib '../lib';
+
 BEGIN {
     unless ($ENV{RELEASE_TESTING} || $ENV{ONLINE_TESTS}) {
         require Test::More;
@@ -46,5 +49,12 @@ $ip = '216.87.155.0';
 
 ok(get_asn_info($ip), 'get_asn_info with multiple results..');
 ok(get_peer_info($ip), 'get_peer_info with multiple results..');
+
+$ip = '18.0.0.1';
+# no modification time:
+# dig +short 0.0.0.18.origin.asn.cymru.com TXT
+# "3 | 18.0.0.1/8 | US | arin |"
+my @result = get_asn_info( $ip );
+is( $result[3], 'arin', "${ip} has RIR 'arin' and not 'arin |'" );
 
 done_testing;

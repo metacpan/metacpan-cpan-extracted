@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,39 +14,25 @@
 
 use strict;
 use warnings;
+use version;
 use Test::More 0.96;
 use Test::Fatal;
 
 use MongoDB;
 
 use lib "t/lib";
-use MongoDBTest qw/skip_unless_mongod build_client get_test_db server_type server_version/;
+use MongoDBTest qw(
+  skip_unless_mongod build_client get_test_db server_type server_version
+  skip_unless_failpoints_available
+);
 
 skip_unless_mongod();
+skip_unless_failpoints_available();
 
 my $conn           = build_client();
 my $testdb         = get_test_db($conn);
 my $server_type    = server_type($conn);
 my $server_version = server_version($conn);
-
-# This test sets failpoints, which will make the tested server unusable
-# for ordinary purposes. As this is risky, the test requires the user
-# to opt-in
-unless ( $ENV{FAILPOINT_TESTING} ) {
-    plan skip_all => "\$ENV{FAILPOINT_TESTING} is false";
-}
-
-# Test::Harness 3.31 supports the t/testrules.yml file to ensure that
-# this test file won't be run in parallel other tests, since turning on
-# a fail point will interfere with other tests.
-if ( $ENV{HARNESS_VERSION} < 3.31 ) {
-    plan skip_all => "not safe to run fail points before Test::Harness 3.31";
-}
-
-my $param = eval {
-    $conn->get_database('admin')
-      ->run_command( [ getParameter => 1, enableTestCommands => 1 ] );
-};
 
 my $coll;
 my $admin = $conn->get_database("admin");
@@ -62,6 +47,8 @@ my $bulk = $coll->ordered_bulk;
 $bulk->insert_one( { _id => $_ } ) for 1 .. 20;
 my $err = exception { $bulk->execute };
 is( $err, undef, "inserted 20 documents for testing" );
+
+my $iv = $coll->indexes;
 
 subtest "expected behaviors" => sub {
 
@@ -102,7 +89,7 @@ subtest "expected behaviors" => sub {
 
     is(
         exception {
-            my $doc = $coll->count( {}, { maxTimeMS => 5000 } );
+            my $doc = $coll->count_documents( {}, { maxTimeMS => 5000 } );
         },
         undef,
         "count helper with maxTimeMS works"
@@ -161,6 +148,8 @@ subtest "expected behaviors" => sub {
         unless $server_version >= v2.6.0;
         plan skip_all => "Parallel scan not supported on mongos"
         if $server_type eq 'Mongos';
+        plan skip_all => "Not supported on Atlas Free Tier"
+          if $ENV{ATLAS_PROXY};
 
         is(
             exception {
@@ -176,12 +165,6 @@ subtest "expected behaviors" => sub {
 subtest "force maxTimeMS failures" => sub {
     plan skip_all => "maxTimeMS not available before 2.6"
       unless $server_version >= v2.6.0;
-
-    plan skip_all => "enableTestCommands is off"
-      unless $param && $param->{enableTestCommands};
-
-    plan skip_all => "fail points not supported via mongos"
-      if $server_type eq 'Mongos';
 
     # low batchSize to force multiple batches to get all docs
     my $cursor = $coll->find( {}, { batchSize => 5, maxTimeMS => 5000 } )->result;
@@ -225,7 +208,7 @@ subtest "force maxTimeMS failures" => sub {
 
     like(
         exception {
-            my $doc = $coll->count( {}, { maxTimeMS => 10 } );
+            my $doc = $coll->count_documents( {}, { maxTimeMS => 10 } );
         },
         qr/exceeded time limit/,
         "count command with maxTimeMS times out"
@@ -249,7 +232,7 @@ subtest "force maxTimeMS failures" => sub {
 
     like(
         exception {
-            my $doc = $coll->count( {}, { maxTimeMS => 10 } );
+            my $doc = $coll->count_documents( {}, { maxTimeMS => 10 } );
         },
         qr/exceeded time limit/,
         "count helper with maxTimeMS times out"
@@ -320,7 +303,7 @@ subtest "force maxTimeMS failures" => sub {
 
     subtest "max_time_ms via constructor" => sub {
         is(
-            exception { my $doc = $coll->count( {} ) },
+            exception { my $doc = $coll->count_documents( {} ) },
             undef,
             "count helper with default maxTimeMS 0 from client works"
         );
@@ -331,7 +314,7 @@ subtest "force maxTimeMS failures" => sub {
 
         like(
             exception {
-                my $doc = $coll2->count( {} );
+                my $doc = $coll2->count_documents( {} );
             },
             qr/exceeded time limit/,
             "count helper with configured maxTimeMS times out"
@@ -368,7 +351,7 @@ subtest "force maxTimeMS failures" => sub {
 
         is(
             exception {
-                my $doc = $coll->count( {}, { maxTimeMS => 0 } );
+                my $doc = $coll->count_documents( {}, { maxTimeMS => 0 } );
             },
             undef,
             "count helper with MaxTimeMS zero works"
@@ -423,6 +406,232 @@ subtest "force maxTimeMS failures" => sub {
         },
         undef,
         "turned off maxTimeAlwaysTimeOut fail point"
+    );
+};
+
+subtest "create_many w/ maxTimeMS" => sub {
+    plan skip_all => "maxTimeMS not available before 3.6"
+      unless $server_version >= v3.6.0;
+
+    $coll->drop;
+
+    is(
+        exception {
+            $admin->run_command([
+                configureFailPoint => 'maxTimeAlwaysTimeOut',
+                mode => 'alwaysOn',
+            ]);
+        },
+        undef,
+        'max time failpoint on',
+    );
+
+    like(
+        exception {
+            $iv->create_many(
+                { keys => [ x => 1 ] }, { keys => [ y => -1 ] },
+                { maxTimeMS => 10 },
+            );
+        },
+        qr/exceeded time limit/,
+        'timeout for index creation',
+    );
+
+    is(
+        exception {
+            $iv->create_many(
+                { keys => [ x => 1 ] }, { keys => [ y => -1 ] },
+            );
+        },
+        undef,
+        'no timeout without max time',
+    );
+
+    is(
+        exception {
+            $admin->run_command([
+                configureFailPoint => 'maxTimeAlwaysTimeOut',
+                mode => 'off',
+            ]);
+        },
+        undef,
+        'max time failpoint off',
+    );
+
+    is(
+        exception {
+            $iv->create_many(
+                { keys => [ x => 1 ] }, { keys => [ y => -1 ] },
+                { maxTimeMS => 5000 },
+            );
+        },
+        undef,
+        'no timeout for index creation',
+    );
+};
+
+subtest "create_one w/ maxTimeMS" => sub {
+    plan skip_all => "maxTimeMS not available before 3.6"
+      unless $server_version >= v3.6.0;
+
+    $coll->drop;
+
+    is(
+        exception {
+            $admin->run_command([
+                configureFailPoint => 'maxTimeAlwaysTimeOut',
+                mode => 'alwaysOn',
+            ]);
+        },
+        undef,
+        'max time failpoint on',
+    );
+
+    is(
+        exception {
+            $iv->create_one([ x => 1 ]);
+        },
+        undef,
+        'no timeout without max time',
+    );
+
+    like(
+        exception {
+            $iv->create_one([ x => 1 ], { maxTimeMS => 10 });
+        },
+        qr/exceeded time limit/,
+        'timeout for index creation',
+    );
+
+    is(
+        exception {
+            $admin->run_command([
+                configureFailPoint => 'maxTimeAlwaysTimeOut',
+                mode => 'off',
+            ]);
+        },
+        undef,
+        'max time failpoint off',
+    );
+
+    is(
+        exception {
+            $iv->create_one([ x => 1 ], { maxTimeMS => 5000 });
+        },
+        undef,
+        'no timeout for index creation',
+    );
+};
+
+subtest "drop_one w/ maxTimeMS" => sub {
+    plan skip_all => "maxTimeMS not available before 3.6"
+      unless $server_version >= v3.6.0;
+
+    $coll->drop;
+
+    is(
+        exception {
+            $admin->run_command([
+                configureFailPoint => 'maxTimeAlwaysTimeOut',
+                mode => 'alwaysOn',
+            ]);
+        },
+        undef,
+        'max time failpoint on',
+    );
+
+    is(
+        exception {
+            my $name = $iv->create_one([ x => 1 ]);
+            $iv->drop_one($name);
+        },
+        undef,
+        'no timeout without max time',
+    );
+
+    like(
+        exception {
+            my $name = $iv->create_one([ x => 1 ]);
+            $iv->drop_one($name, { maxTimeMS => 10 });
+        },
+        qr/exceeded time limit/,
+        'timeout for index drop',
+    );
+
+    is(
+        exception {
+            $admin->run_command([
+                configureFailPoint => 'maxTimeAlwaysTimeOut',
+                mode => 'off',
+            ]);
+        },
+        undef,
+        'max time failpoint off',
+    );
+
+    is(
+        exception {
+            my $name = $iv->create_one([ x => 1 ]);
+            $iv->drop_one($name, { maxTimeMS => 5000 });
+        },
+        undef,
+        'no timeout for index drop',
+    );
+};
+
+subtest "drop_all w/ maxTimeMS" => sub {
+    plan skip_all => "maxTimeMS not available before 3.6"
+      unless $server_version >= v3.6.0;
+
+    $coll->drop;
+
+    is(
+        exception {
+            $admin->run_command([
+                configureFailPoint => 'maxTimeAlwaysTimeOut',
+                mode => 'alwaysOn',
+            ]);
+        },
+        undef,
+        'max time failpoint on',
+    );
+
+    is(
+        exception {
+            $iv->create_many( map { { keys => $_ } }[ x => 1 ], [ y => 1 ], [ z => 1 ] );
+            $iv->drop_all();
+        },
+        undef,
+        'no timeout without max time',
+    );
+
+    like(
+        exception {
+            $iv->create_many( map { { keys => $_ } }[ x => 1 ], [ y => 1 ], [ z => 1 ] );
+            $iv->drop_all({ maxTimeMS => 10 });
+        },
+        qr/exceeded time limit/,
+        'timeout for index drop',
+    );
+
+    is(
+        exception {
+            $admin->run_command([
+                configureFailPoint => 'maxTimeAlwaysTimeOut',
+                mode => 'off',
+            ]);
+        },
+        undef,
+        'max time failpoint off',
+    );
+
+    is(
+        exception {
+            $iv->create_many( map { { keys => $_ } }[ x => 1 ], [ y => 1 ], [ z => 1 ] );
+            $iv->drop_all({ maxTimeMS => 5000 });
+        },
+        undef,
+        'no timeout for index drop',
     );
 };
 

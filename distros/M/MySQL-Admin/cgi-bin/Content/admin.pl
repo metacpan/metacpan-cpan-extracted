@@ -11,8 +11,7 @@ $te  = translate('env');
 $tna = translate('navigation');
 $tr  = translate('trash');
 $trn = translate('translate');
-print
-  qq|<table align="center" border="0" cellpadding="5" cellspacing="5" class="ShowTables marginTop" summary="adminlayout" >
+print qq|<table align="center" border="0" cellpadding="5" cellspacing="5" class="ShowTables marginTop" summary="adminlayout" >
 <tr>
 <td align="center"><img src="style/$m_sStyle/buttons/settings.png" alt="$ts" border="0" title="$ts"/><br/><a href="javascript:requestURI('$m_hrSettings->{cgi}{serverName}$ENV{SCRIPT_NAME}?action=settings','settings','settings')">$ts</a></td>
 <td align="center"><img src="style/$m_sStyle/buttons/mysql.jpg" alt="$td" border="0" title="$td"/><br/><a href="javascript:requestURI('$m_hrSettings->{cgi}{serverName}$ENV{SCRIPT_NAME}?action=ShowDatabases','ShowDatabases','ShowDatabases')">$td</a>

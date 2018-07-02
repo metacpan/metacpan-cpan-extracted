@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Tokyo
 
+0.46  Tue Jun 19 17:15:00 2018
+      - Used new_ok() in test script.
+
 0.45  Sat Jun 09 03:00:00 2018
       - Updated dependency on Map::Tube v3.51.
 

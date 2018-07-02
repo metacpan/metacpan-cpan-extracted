@@ -22,6 +22,10 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Test::Warn:
+    file: Warn.pm
+    version: '0.36'
 requires:
   Carp: '1.22'
   Sub::Uplevel: '0.12'
@@ -30,5 +34,5 @@ requires:
   perl: '5.006'
 resources:
   repository: git://github.com/hanfried/test-warn.git
-version: '0.35'
+version: '0.36'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,9 @@
 Revision history for Sys::Linux::Namespaces
 
+0.016 - June 23 2018
+  * Update some documentation because I forgot how this worked
+  * Add support for the umount2 syscall
+
 0.015 - May 21 2017
   * Remove a few hacks for signals inside the child that aren't needed since using Linux::Clone instead of unshare only
 

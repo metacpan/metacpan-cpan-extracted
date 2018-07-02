@@ -1,5 +1,25 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+1.1.0 2018-06-25
+ - Features
+   - Ldns 1.7.0 using submodule (#41) 
+     - Changing from having a patched fork of LDNS to using standard LDNS.
+     - All ldns sources are removed from the repo - instead a git 
+       submodule is added for ldns (currently pointing to the tag 
+       release-1.7.0).
+     - Makefile.PL is updated to build `libldns.a` from the new location.
+   - Remove legacy parameters from Makefile.PL (#44) 
+   - Allow loading ldns as an ordinary dependency (#49)
+   - Make IDN support explicit (#45) 
+ - Fixed
+   - Updated installation tests to adjust for changes in live data (#39)
+   - Update .travis.yml with installation of Test::More (#38) 
+   - Update README.md (#42) updated installation instructions.
+   - Fix some issues raised by CPANTS (#46)    
+   - Reorganize README and add TOC (#49)
+   - Updated to have correct description of what to_idn() does. (#50)
+   - Update to Module::Install 1.19 (#52)
+
 1.0.2 2018-01-12
  - Fixed
    - Skip unit tests that depend on the Internet by default (#26)

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Parser;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE};
 use constant DEBUG => $ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE};
@@ -324,7 +324,10 @@ sub check_indent {
     if ($self->new_node) {
         # unindented sequence starts
         my $seq_start = $next_token->{name} eq 'DASH';
-        if ($space == $indent and $seq_start and $exp eq 'MAPVALUE') {
+        if (
+            $space == $indent and $seq_start
+            and ($exp eq 'MAPVALUE' or $exp eq 'MAP')
+        ) {
             return;
         }
         else {
@@ -749,20 +752,6 @@ sub alias_event {
     $self->callback->($self, 'alias_event', $info);
     $self->set_new_node(undef);
     $event_types->[-1] = $next_event{ $event_types->[-1] };
-}
-
-sub end {
-    my ($self, $event, $info) = @_;
-
-    my $event_types = $self->events;
-    pop @{ $self->offset };
-
-    my $last = pop @{ $event_types };
-    if ($last ne $event) {
-        die "end($event): Unexpected event '$last', expected $event";
-    }
-
-    return unless @$event_types;
 }
 
 sub event_to_test_suite {

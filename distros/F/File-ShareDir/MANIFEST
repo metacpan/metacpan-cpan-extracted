@@ -11,6 +11,7 @@ MANIFEST.SKIP
 README.md
 share/sample.txt
 share/subdir/sample.txt
+t/00_prereqs.t
 t/01_compile.t
 t/02_main.t
 t/03_extensions.t

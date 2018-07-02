@@ -74,6 +74,7 @@ my $build = $class->new
    dist_version_from => 'lib/XML/XPathScript.pm',
    license => 'artistic',
    requires => {
+                perl             => '5.8.0',
                 $XML_parser 	 => 0,
                 'Carp' 			 => 0,
                 'Symbol' 		 => 0,

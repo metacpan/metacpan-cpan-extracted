@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::Configuration;
-$WebService::Braintree::Configuration::VERSION = '1.5';
+$WebService::Braintree::Configuration::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -21,7 +21,7 @@ the distribution knows what to do.
 =cut
 
 use WebService::Braintree::Gateway;
-use Moose;
+use Moo;
 
 # IS THIS UNUSED? I cannot find reference in the current documentation for Ruby
 # or Node.JS nor is it referenced anywhere else in the code.

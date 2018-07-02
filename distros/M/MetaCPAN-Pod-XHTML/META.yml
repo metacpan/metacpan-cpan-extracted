@@ -18,12 +18,16 @@ no_index:
     - t
     - xt
 requires:
-  HTML::Entities: '0'
-  Pod::Simple::XHTML: '3.16'
+  HTML::Entities: '3.69'
+  Moo: '2.003000'
+  Moo::Role: '2.003000'
+  Pod::Simple::XHTML: '3.23'
+  URL::Encode: '0.03'
+  namespace::clean: '0.27'
 resources:
   IRC: irc://irc.perl.org/#metacpan
   bugtracker: https://github.com/metacpan/MetaCPAN-Pod-XHTML/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/metacpan/MetaCPAN-Pod-XHTML.git
-version: '0.001002'
+version: '0.002001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

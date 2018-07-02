@@ -1,7 +1,7 @@
 Name:           perl-DBIx-Array
-Version:        0.49
+Version:        0.59
 Release:        1%{?dist}
-Summary:        This module is a wrapper around DBI with array interfaces
+Summary:        DBI Wrapper with Perl style data structure interfaces
 License:        BSD
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/DBIx-Array/
@@ -9,18 +9,19 @@ Source0:        http://www.cpan.org/modules/by-module/DBIx/DBIx-Array-%{version}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 Requires:       perl(DBI)
-Requires:       perl(Package::New)
+Requires:       perl(Tie::Cache)
+Requires:       perl(List::MoreUtils) >= 0.07
 BuildRequires:  perl(DBD::CSV)
-BuildRequires:  perl(DBD::XBase)
 BuildRequires:  perl(DBI)
+BuildRequires:  perl(Tie::Cache)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(IO::Scalar)
-BuildRequires:  perl(Package::New)
 BuildRequires:  perl(Spreadsheet::WriteExcel::Simple::Tabs)
 BuildRequires:  perl(SQL::Abstract)
 BuildRequires:  perl(Test::Simple)
 BuildRequires:  perl(Text::CSV_XS)
 BuildRequires:  perl(XML::Simple)
+BuildRequires:  perl(List::MoreUtils) >= 0.07
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description

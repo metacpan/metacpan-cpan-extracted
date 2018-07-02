@@ -4,7 +4,8 @@ use Algorithm::Networksort;
 use strict;
 use warnings;
 
-my $nw = Algorithm::Networksort->new(inputs => 7, algorithm => "hibbard");
+my $nw = nwsrt(inputs => 7, algorithm => "hibbard");
+my $show_svg = 0;
 
 eval "use Test::XML::Easy";
 if ($@)
@@ -22,16 +23,17 @@ else
 	my $svg = $nw->graph_svg();
 
 	is_well_formed_xml($svg, "Test with default SVG settings");
+	diag($svg) if ($show_svg);
 
 	#
 	# Now create one that has the defaults changed.
 	#
-	$nw->title($nw->inputs . " input network using $nw->algorithm");
+	$nw->title($nw->inputs . " input network using " . $nw->algorithm);
 
-	$nw->colorsettings(inputbegin=>'red',
-		inputend=>'blue',
-		compbegin=>'magenta',
-		compend=>'teal');
+	$nw->colorsettings(
+		background => 'grey',
+		compbegin => 'red',
+		compend => 'blue');
 
 	$nw->graphsettings(
 		vt_margin => 25,
@@ -39,8 +41,12 @@ else
 		indent => 8,
 		hz_margin => 20,
 		hz_sep => 16,
-		stroke_width => 4);
+		inputradius => 0,
+		inputline => 3,
+		compline => 4);
 
 	$svg = $nw->graph_svg();
 	is_well_formed_xml($svg, "Test with defaults changed");
+
+	diag($svg) if ($show_svg);
 

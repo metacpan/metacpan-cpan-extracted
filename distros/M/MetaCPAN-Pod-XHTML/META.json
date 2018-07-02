@@ -30,8 +30,12 @@
       },
       "runtime" : {
          "requires" : {
-            "HTML::Entities" : "0",
-            "Pod::Simple::XHTML" : "3.16"
+            "HTML::Entities" : "3.69",
+            "Moo" : "2.003000",
+            "Moo::Role" : "2.003000",
+            "Pod::Simple::XHTML" : "3.23",
+            "URL::Encode" : "0.03",
+            "namespace::clean" : "0.27"
          }
       },
       "test" : {
@@ -55,6 +59,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#metacpan"
    },
-   "version" : "0.001002",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.002001",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -2,7 +2,7 @@ package MojoX::JSON::RPC;
 
 use strict;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 1;
 
@@ -10,11 +10,11 @@ __END__
 
 =head1 NAME
 
-MojoX::JSON::RPC - Perl implementation of JSON-RPC 2.0 protocol for Mojolicious
+MojoX::JSON::RPC - a Perl implementation of the JSON-RPC 2.0 protocol for Mojolicious
 
 =head1 SYNOPSIS
 
-Server as plugin (L<Mojolicious::Plugin::JsonRpcDispatcher>):
+Server as a plugin (L<Mojolicious::Plugin::JsonRpcDispatcher>):
 
     #!/usr/bin/env perl
     use Mojolicious::Lite;
@@ -101,8 +101,8 @@ Non-blocking client:
 
 =head1 DESCRIPTION
 
-This module implments a client and a server plugin for JSON-RPC 2.0 for use
-with Mojolicious.
+This module implments a client plugin and a server plugin for JSON-RPC 2.0 for
+use with Mojolicious.
 
 This module follows the draft specficiation for JSON-RPC 2.0. More information
 can be found at L<http://groups.google.com/group/json-rpc/web/json-rpc-2-0>.
@@ -138,5 +138,9 @@ of merchantibility and fitness for a particular purpose.
 
 This program is free software, you can redistribute it and/or modify it
 under the terms of the Artistic License version 2.0.
+
+=head1 SUPPORT
+
+Dmitry Karasik <dmitry@karasik.eu.org>
 
 =cut

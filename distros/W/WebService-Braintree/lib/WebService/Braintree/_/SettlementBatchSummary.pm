@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::SettlementBatchSummary;
-$WebService::Braintree::_::SettlementBatchSummary::VERSION = '1.5';
+$WebService::Braintree::_::SettlementBatchSummary::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,11 +17,14 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
+use Moo;
 
 extends 'WebService::Braintree::_';
 
-use WebService::Braintree::_::SettlementBatchSummaryRecord;
+use Types::Standard qw(ArrayRef);
+use WebService::Braintree::Types qw(
+    SettlementBatchSummaryRecord
+);
 
 =head1 ATTRIBUTES
 
@@ -35,7 +38,7 @@ This is the records of the summary. This will be an arrayref of type L<WebServic
 
 has records => (
     is => 'ro',
-    isa => 'ArrayRefOfSettlementBatchSummaryRecord',
+    isa => ArrayRef[SettlementBatchSummaryRecord],
     coerce => 1,
 );
 

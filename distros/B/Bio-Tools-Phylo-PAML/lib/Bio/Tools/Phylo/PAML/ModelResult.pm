@@ -1,5 +1,5 @@
 package Bio::Tools::Phylo::PAML::ModelResult;
-$Bio::Tools::Phylo::PAML::ModelResult::VERSION = '1.7.2';
+$Bio::Tools::Phylo::PAML::ModelResult::VERSION = '1.7.3';
 use utf8;
 use strict;
 use warnings;
@@ -245,7 +245,7 @@ Bio::Tools::Phylo::PAML::ModelResult - A container for NSSite Model Result from 
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 

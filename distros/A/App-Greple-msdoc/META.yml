@@ -1,0 +1,41 @@
+---
+abstract: 'Greple module for access MS office docx/pptx/xlsx documents'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Greple-msdoc
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::Greple::msdoc:
+    file: lib/App/Greple/msdoc.pm
+    version: '1.01'
+requires:
+  App::Greple: '8.26'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/kaz-utashiro/greple-msdoc/issues
+  homepage: https://github.com/kaz-utashiro/greple-msdoc
+  repository: git://github.com/kaz-utashiro/greple-msdoc.git
+version: '1.01'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kaz Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

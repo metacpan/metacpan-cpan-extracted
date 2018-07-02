@@ -7,6 +7,7 @@ use Config '%Config';
 use File::Spec;
 use Carp qw(croak);
 use File::Temp 'tempdir';
+use WWW::Mechanize::Chrome;
 
 use Log::Log4perl ':easy';
 
@@ -39,10 +40,7 @@ sub browser_instances {
             if $ENV{ CHROME_BIN } and -x $ENV{ CHROME_BIN };
 
     } else {
-        my ($default)=
-            map { my $exe= File::Spec->catfile($_,"chrome$Config{_exe}");
-                  -x $exe ? $exe : ()
-                } File::Spec->path();
+        my ($default) = WWW::Mechanize::Chrome->find_executable();
         push @instances, $default
             if $default;
         my $spec = 'chrome-versions/*/{*/,}chrome*'; # sorry, likely a bad default

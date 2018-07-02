@@ -19,9 +19,9 @@ no_index:
     - inc
 requires:
   Encode::Locale: '1.05'
-  Mojolicious: '6.11'
+  Mojolicious: '7.69'
   Parse::IRC: '1.20'
 resources:
   repository: git://github.com/sjdy521/Mojo-IRC-Server-Chinese.git
-version: v1.8.1
+version: v1.8.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

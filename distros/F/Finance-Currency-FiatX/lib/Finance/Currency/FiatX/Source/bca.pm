@@ -1,7 +1,7 @@
 package Finance::Currency::FiatX::Source::bca;
 
-our $DATE = '2018-06-19'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-06-27'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -20,33 +20,58 @@ sub get_all_spot_rates {
     my @recs;
     for my $to (sort keys %{ $res->[2]{currencies} }) {
         my $h = $res->[2]{currencies}{$to};
+        for (qw/buy sell/) {
+            push @recs, (
+                {
+                    pair => "$to/IDR",
+                    type => "${_}_er",
+                    rate => $h->{"${_}_er"},
+                    note => "$_ e-rate",
+                    mtime => $res->[2]{mtime_er},
+                },
+                {
+                    pair => "$to/IDR",
+                    type => "${_}_ttc",
+                    rate => $h->{"${_}_ttc"},
+                    note => "$_ TTC (through-the-counter) rate",
+                    mtime => $res->[2]{mtime_ttc},
+                },
+                {
+                    pair => "$to/IDR",
+                    type => "${_}_bn",
+                    rate => $h->{"${_}_bn"},
+                    note => "$_ bank notes rate",
+                    mtime => $res->[2]{mtime_bn},
+                },
+            );
+        }
         push @recs, (
             {
                 pair => "$to/IDR",
                 type => "buy",
                 rate => $h->{buy_er},
-                note => "buy_er",
+                note => "=buy_er",
                 mtime => $res->[2]{mtime_er},
             },
             {
                 pair => "$to/IDR",
                 type => "sell",
                 rate => $h->{sell_er},
-                note => "sell_er",
+                note => "=sell_er",
                 mtime => $res->[2]{mtime_er},
             },
             {
                 pair => "IDR/$to",
                 type => "buy",
-                rate => 1/$h->{sell_er},
-                note => "1/sell_er",
+                rate => $h->{sell_er} ? 1/$h->{sell_er} : 0,
+                note => "=1/sell_er",
                 mtime => $res->[2]{mtime_er},
             },
             {
                 pair => "IDR/$to",
                 type => "sell",
-                rate => 1/$h->{buy_er},
-                note => "1/buy_er",
+                rate => $h->{buy_er} ? 1/$h->{buy_er} : 0,
+                note => "=1/buy_er",
                 mtime => $res->[2]{mtime_er},
             },
         );
@@ -56,7 +81,11 @@ sub get_all_spot_rates {
 }
 
 sub get_spot_rate {
-    my ($from, $to, $type) = @_;
+    my %args = @_;
+
+    my $from = $args{from} or return [400, "Please specify from"];
+    my $to   = $args{to} or return [400, "Please specify to"];
+    my $type = $args{type} or return [400, "Please specify type"];
 
     return [501, "This source only provides buy/sell rate types"]
         unless $type =~ /\A(buy|sell)\z/;
@@ -116,7 +145,7 @@ Finance::Currency::FiatX::Source::bca - Get currency conversion rates from BCA (
 
 =head1 VERSION
 
-This document describes version 0.005 of Finance::Currency::FiatX::Source::bca (from Perl distribution Finance-Currency-FiatX), released on 2018-06-19.
+This document describes version 0.008 of Finance::Currency::FiatX::Source::bca (from Perl distribution Finance-Currency-FiatX), released on 2018-06-27.
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use 5.10.0;
+
+use App::MarkFiles qw(each_path remove);
+use File::Basename;
+use File::Copy;
+use File::Spec;
+use Getopt::Long;
+
+my @unmark;
+
+each_path(sub {
+  my ($path) = @_;
+
+  unless (-e $path) {
+    say "No such file: " . $path;
+    return;
+  }
+
+  my ($source_basename, $source_path) = fileparse($path);
+  my $target = File::Spec->catfile('.', $source_basename);
+
+  if (-e $target) {
+    say "Warning: $path will overwrite $target";
+
+    # So here's the question.  What do we do if the target exists?
+    #
+    # There are a couple of cases here:
+    #
+    # 1. Our mark list contains a file of the same name as something already in
+    # the destination directory.
+    #
+    # 2. Our mark list contains the same filename more than once.
+    #
+    # These seem like distinct problems, to a degree.  #1 is effectively
+    # standard unix behavior, and I'm not sure we need to protect the user from
+    # it unless they ask us to with a -i option or something.  #2 is more
+    # problematic.  No matter what you do, you're likely to wind up with
+    # unexpected outcomes.
+    #
+    # We could refuse to operate unless a "rename duplicates" option is
+    # invoked, or just interactively solve each collision.  This seems most
+    # pressing for mark-mv, since it could easily result in data loss by
+    # cascading a set of moves where you wind up with just one source file
+    # left anywhere.
+  }
+
+  if (move($path, $target)) {
+    say "Moved: $path";
+    push @unmark, $path;
+  } else {
+    say "Move failed: $!"
+  }
+});
+
+remove(@unmark);

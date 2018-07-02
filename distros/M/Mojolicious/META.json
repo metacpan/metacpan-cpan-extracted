@@ -58,6 +58,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#mojo"
    },
-   "version" : "7.84",
+   "version" : "7.85",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

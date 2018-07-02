@@ -1,3 +1,4 @@
+bin/address_lookup
 bin/createdatabase
 bin/geodecode
 bin/testcgibin
@@ -8,11 +9,13 @@ conf/njh
 conf/page.l4pconf
 createdatabase.PL
 css/style.css
+ignore.txt
 index.html
 lib/Geo/Coder/Free.pm
 lib/Geo/Coder/Free/bin/db2sql
 lib/Geo/Coder/Free/Config.pm
 lib/Geo/Coder/Free/DB.pm
+lib/Geo/Coder/Free/DB/MaxMind/admin.pm
 lib/Geo/Coder/Free/DB/MaxMind/admin1.pm
 lib/Geo/Coder/Free/DB/MaxMind/admin2.pm
 lib/Geo/Coder/Free/DB/MaxMind/cities.pm
@@ -31,16 +34,21 @@ lib/Geo/Coder/Free/Utils.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+META.json
+META.yml
 README.md
 t/00-load.t
 t/10-new.t
 t/admin1.t
 t/admin2.t
+t/bin.t
 t/cities.t
 t/coverage.t
 t/lib/MyLogger.pm
+t/links.t
 t/manifest.t
 t/maxmind.t
+t/no404s.t
 t/openaddr.t
 t/pod-cm.t
 t/pod.t
@@ -56,5 +64,3 @@ t/whosonfirst.t
 templates/Geo/Coder/Free/Display/index.tmpl
 templates/Geo/Coder/Free/Display/query.txt
 typhoon/openaddresses.ddl
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

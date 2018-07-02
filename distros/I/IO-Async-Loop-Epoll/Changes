@@ -1,5 +1,9 @@
 Revision history for IO-Async-Loop-Epoll
 
+0.19    2018-06-25 17:07:14
+        [BUGFIXES]
+         * Handle post-fork() situations correctly (RT119835)
+
 0.18    2018-01-21 23:59:10
         [BUGFIXES]
          * Account for recursive loop calls during signal handlers (RT124084)

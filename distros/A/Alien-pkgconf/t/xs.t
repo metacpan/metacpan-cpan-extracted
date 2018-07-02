@@ -1,5 +1,5 @@
+use Test2::V0 -no_srand => 1;
 use Test::Alien;
-use Test2::Tools::Basic;
 use Alien::pkgconf;
 
 alien_ok 'Alien::pkgconf';

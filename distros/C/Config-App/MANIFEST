@@ -12,6 +12,7 @@ config/app_optional.yaml
 config/app_optional_missing.yaml
 config/include.json
 config/libs.yaml
+config/merge.yaml
 cpanfile
 lib/Config/App.pm
 t/00-compile.t
@@ -21,5 +22,6 @@ t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/author-portability.t
 t/author-synopsis.t
+t/merge.t
 t/module.t
 t/release-kwalitee.t

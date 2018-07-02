@@ -42,7 +42,7 @@ name: File-Find-Object-Rule
 provides:
   File::Find::Object::Rule:
     file: lib/File/Find/Object/Rule.pm
-    version: '0.0307'
+    version: '0.0309'
 requires:
   Carp: '0'
   Class::XSAccessor: '0'
@@ -61,7 +61,7 @@ resources:
   bugtracker: https://github.com/shlomif/file-find-object-rule/issues
   homepage: http://www.shlomifish.org/open-source/projects/File-Find-Object/
   repository: http://bitbucket.org/shlomif/perl-file-find-object-rule
-version: '0.0307'
+version: '0.0309'
 x_Dist_Zilla:
   perl:
     version: '5.026002'

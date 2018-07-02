@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.142     2018-07-01 22:40:53Z
+          - always report installed version of Module::Runtime in
+            t/00-report-prereqs.t, as recent versions are incompatible with
+            older Moose.
+          - always report installed version of File::Temp
+
 0.141     2018-05-21 19:12:49Z
           - still more fixes to $TODO in xt/author/changes_has_content.t
 

@@ -8,7 +8,7 @@ my $build = Module::Build->new(
 
 	dist_abstract => 'Find the roots of polynomial equations',
 	dist_author => ['John M. Gamble <jgamble@cpan.org>'],
-	dist_version => '2.81',
+	dist_version => '2.85',
 	dist_name => 'Math-Polynomial-Solve',
 
 	provides => {
@@ -20,7 +20,7 @@ my $build = Module::Build->new(
 	requires => {
 		perl=> '5.10.1',
 		'Math::Complex'=> '1.36',  # Bugfix of Im().
-		'Math::Utils' => '1.06',
+		'Math::Utils' => '1.12',
 	},
 
 	configure_requires => {

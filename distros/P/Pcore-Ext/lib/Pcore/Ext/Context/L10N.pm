@@ -1,57 +1,93 @@
 package Pcore::Ext::Context::L10N;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[refaddr];
+use Pcore::Util::Scalar qw[refaddr is_ref];
+use Pcore::Util::Data qw[to_json];
 
-has ext          => ();
-has domain       => ();
-has msgid        => ();
-has msgid_plural => ();
-has num          => ();
+has ctx => ();
+has buf => ();
 
 use overload    #
-  q[""] => sub {
-    return $_[0]->to_js->$*;
+  q[""] => sub ( $self, @ ) {
+    return $self->to_js_func->$*;
   },
-  q[&{}] => sub {
-    my $self = $_[0];
+  q[.] => sub ( $self, $str, $pos ) {
+    return bless {
+        ctx => $self->{ctx},
+        buf => $pos ? [ is_ref $str ? $str->{buf}->@* : $str, $self->{buf}->@* ] : [ $self->{buf}->@*, is_ref $str ? $str->{buf}->@* : $str ],
+      },
+      __PACKAGE__;
+  },
+  q[&{}] => sub ( $self, @ ) {
+    die 'Invalid plural form usage' if $self->{buf}->@* > 1;
 
-    return sub { $self->to_js(@_)->$* };
+    return sub ($num) {
+        my $clone = bless {
+            ctx => $self->{ctx},
+            buf => [ [ $self->{buf}->[0]->@* ] ],
+          },
+          __PACKAGE__;
+
+        $clone->{buf}->[0]->[3] = $num;
+
+        return $clone;
+    };
   },
-  fallback => undef;
+  fallback => 1;
 
 sub TO_JSON ( $self ) {
     my $id = refaddr $self;
 
-    $self->{ext}->{_js_gen_cache}->{$id} = $self->to_js;
+    $self->{ctx}->{_js_gen_cache}->{$id} = $self->to_js_object;
 
     return "__JS${id}__";
 }
 
-sub to_js ( $self ) {
-    my $js;
+sub to_js_func ($self) {
+    my $buf;
 
-    # quote
-    my $domain = $self->{domain} =~ s/'/\\'/smgr;
-    my $msgid  = $self->{msgid} =~ s/'/\\'/smgr;
+    for my $item ( $self->{buf}->@* ) {
+        if ( !is_ref $item) {
+            $buf .= $item;
+        }
+        else {
+            my $json;
 
-    if ( $self->{msgid_plural} ) {
+            if ( defined $item->[2] ) {
+                my $num = $item->[2];
 
-        # quote $msgid_plural
-        my $msgid_plural = $self->{msgid_plural} =~ s/'/\\'/smgr;
+                local $item->[2] = P->uuid->v1mc_str;
 
-        my $num = $self->{num} // 1;
+                $json = to_json($item)->$*;
 
-        $js = qq[Ext.L10N.l10n('$domain', '$msgid', '$msgid_plural', $num)];
+                $json =~ s/"$item->[2]"/$num/sm;
+            }
+            else {
+                $json = to_json($item)->$*;
+            }
+
+            $buf .= qq[Ext.L10N.l10n($json)];
+        }
     }
-    else {
-        $js = qq[Ext.L10N.l10n('$domain', '$msgid')];
-    }
 
-    return \$js;
+    return \$buf;
+}
+
+sub to_js_object ( $self ) {
+    return \qq[new Ext.L10N.string(@{[ to_json($self->{buf})->$* ]})];
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    2 | 59                   | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 
@@ -62,6 +98,23 @@ __END__
 Pcore::Ext::Context::L10N - ExtJS function call generator
 
 =head1 SYNOPSIS
+
+    my $str = l10n('singular form', 'plural form', 5);
+
+    {
+        text => 'prefix' . l10n('singular form') . 'suffix',
+        text => 'prefix' . l10n('singular form', 'plural form', 5) . 'suffix',
+
+        method => func [], <<"JS",
+            console.log('prefix' + $l10n->{'singular form'} + 'suffix');
+
+            console.log('prefix' + $str + 'suffix');
+
+            // redefine num for predefined l10n string
+            var num = 10;
+            console.log('prefix' + @{[ $str->('num') ]} + 'suffix');
+    JS
+    }
 
 =head1 DESCRIPTION
 

@@ -33,12 +33,11 @@ use warnings;
 use vars qw($VERSION $BUILD);
 use Class::STL::ClassMembers::DataMember;
 use Class::STL::ClassMembers::FunctionMember;
-$VERSION = '0.19';
-$BUILD = 'Saturday May 6 17:08:34 GMT 2006';
+$VERSION = '0.20';
 # ----------------------------------------------------------------------------------------------------
 {
 	package Class::STL::Element;
-	use UNIVERSAL qw(isa can);
+	use UNIVERSAL;
 	use Carp qw(confess);
 	use Class::STL::ClassMembers qw( data ),
 		Class::STL::ClassMembers::DataMember->new(name => 'data_type', default => 'string',

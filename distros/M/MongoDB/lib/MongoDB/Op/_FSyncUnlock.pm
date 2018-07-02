@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -22,7 +20,7 @@ package MongoDB::Op::_FSyncUnlock;
 # names
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -55,7 +53,7 @@ sub execute {
     my ( $self, $link, $topology ) = @_;
 
     my $res =
-        $link->accepts_wire_version(4)
+        $link->supports_fsync_command
       ? $self->_command_fsync_unlock( $link, $topology )
       : $self->_legacy_fsync_unlock( $link, $topology );
 
@@ -70,11 +68,12 @@ sub _command_fsync_unlock {
     );
 
     my $op = MongoDB::Op::_Command->_new(
-        db_name         => $self->db_name,
-        query           => $cmd,
-        query_flags     => {},
-        read_preference => MongoDB::ReadPreference->new,
-        bson_codec      => $self->bson_codec,
+        db_name             => $self->db_name,
+        query               => $cmd,
+        query_flags         => {},
+        read_preference     => MongoDB::ReadPreference->new,
+        bson_codec          => $self->bson_codec,
+        monitoring_callback => $self->monitoring_callback,
     );
 
     my $res = $op->execute( $link, $topology );
@@ -86,27 +85,16 @@ sub _legacy_fsync_unlock {
     my ( $self, $link, $topology ) = @_;
 
     my $op = MongoDB::Op::_Query->_new(
-        modifiers           => {},
-        filter              => {},
-        allowPartialResults => 0,
-        batchSize           => 0,
-        comment             => '',
-        cursorType          => 'non_tailable',
-        maxAwaitTimeMS      => 0,
-        maxTimeMS           => 0,
-        noCursorTimeout     => 0,
-        oplogReplay         => 0,
-        projection          => undef,
-        skip                => 0,
-        sort                => undef,
-        db_name             => 'admin',
-        coll_name           => '$cmd.sys.unlock',
-        full_name           => 'admin.$cmd.sys.unlock',
-        limit               => -1,
-        bson_codec          => $self->bson_codec,
-        client              => $self->client,
-        read_preference     => MongoDB::ReadPreference->new,
-        read_concern        => MongoDB::ReadConcern->new,
+        bson_codec      => $self->bson_codec,
+        client          => $self->client,
+        coll_name       => '$cmd.sys.unlock',
+        db_name         => 'admin',
+        filter          => {},
+        full_name       => 'admin.$cmd.sys.unlock',
+        options         => MongoDB::Op::_Query->precondition_options( { limit => -1 } ),
+        read_concern    => MongoDB::ReadConcern->new,
+        read_preference => MongoDB::ReadPreference->new,
+        monitoring_callback => $self->monitoring_callback,
     );
 
     return $op->execute( $link, $topology )->next;

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use WebService::PivotalTracker::PropertyAttributes;
 use WebService::PivotalTracker::Types
@@ -66,7 +66,7 @@ WebService::PivotalTracker::Comment - A story comment
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

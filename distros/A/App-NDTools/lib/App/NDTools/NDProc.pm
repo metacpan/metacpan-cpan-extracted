@@ -13,7 +13,7 @@ use Struct::Diff 0.94 qw(diff split_diff);
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path);
 
-our $VERSION = '0.26';
+our $VERSION = '0.28';
 
 sub arg_opts {
     my $self = shift;
@@ -131,14 +131,30 @@ sub exec {
     # parse the rest of args (unrecognized by module (if was specified by args))
     # to be sure there is no unsupported opts remain
     my @rest_opts = (
-        'help|h' => sub { $self->usage; exit 0 },
-        'version|V' => sub { print $self->VERSION . "\n"; exit 0 },
+        'help|h' => sub {
+            $self->{OPTS}->{help} = 1;
+            die "!FINISH";
+        },
+        'version|V' => sub {
+            $self->{OPTS}->{version} = 1;
+            die "!FINISH";
+        },
     );
 
     Getopt::Long::Configure('nopass_through');
     unless (GetOptionsFromArray($self->{ARGV}, @rest_opts)) {
         $self->usage;
         die_fatal "Unsupported opts passed", 1;
+    }
+
+    if ($self->{OPTS}->{help}) {
+        $self->usage;
+        die_info, 0;
+    }
+
+    if ($self->{OPTS}->{version}) {
+        print $self->VERSION . "\n";
+        die_info, 0;
     }
 
     if ($self->{OPTS}->{'dump-rules'} and not @{$self->{ARGV}}) {
@@ -270,9 +286,7 @@ sub process_rules {
 
         my $changes = { rule_id => 0 + $rcnt };
         if (defined $rule->{blame} ? $rule->{blame} : $self->{OPTS}->{blame}) {
-            my $diff = split_diff(diff($result, ${$data}, noO => 1, noU => 1));
-            $changes->{R} = delete $diff->{a} if (exists $diff->{a}); # more obvious
-            $changes->{A} = delete $diff->{b} if (exists $diff->{b}); # --"--
+            $changes->{diff} = diff($result, ${$data}, noU => 1);
         }
         map { $changes->{$_} = $rule->{$_} if (defined $rule->{$_}) }
             qw(blame comment source); # preserve useful info

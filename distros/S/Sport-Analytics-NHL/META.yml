@@ -1,0 +1,63 @@
+---
+abstract: 'Interface to the National Hockey League data'
+author:
+  - 'More Hockey Stats <contact@morehockeystats.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sport-Analytics-NHL
+provides:
+  Sport::Analytics::NHL:
+    file: lib/Sport/Analytics/NHL.pm
+    version: '1.00'
+  Sport::Analytics::NHL::Config:
+    file: lib/Sport/Analytics/NHL/Config.pm
+  Sport::Analytics::NHL::DB:
+    file: lib/Sport/Analytics/NHL/DB.pm
+  Sport::Analytics::NHL::Errors:
+    file: lib/Sport/Analytics/NHL/Errors.pm
+  Sport::Analytics::NHL::LocalConfig:
+    file: lib/Sport/Analytics/NHL/LocalConfig.pm
+  Sport::Analytics::NHL::Report:
+    file: lib/Sport/Analytics/NHL/Report.pm
+  Sport::Analytics::NHL::Report::BS:
+    file: lib/Sport/Analytics/NHL/Report/BS.pm
+  Sport::Analytics::NHL::Scraper:
+    file: lib/Sport/Analytics/NHL/Scraper.pm
+  Sport::Analytics::NHL::Test:
+    file: lib/Sport/Analytics/NHL/Test.pm
+  Sport::Analytics::NHL::Tools:
+    file: lib/Sport/Analytics/NHL/Tools.pm
+  Sport::Analytics::NHL::Usage:
+    file: lib/Sport/Analytics/NHL/Usage.pm
+  Sport::Analytics::NHL::Util:
+    file: lib/Sport/Analytics/NHL/Util.pm
+recommends:
+  MongoDB: v1.8.1
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Date::Parse: '2.27'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  Getopt::Long: '0'
+  JSON::XS: '2.27'
+  LWP::Simple: '5.837'
+  List::MoreUtils: '0.22'
+  POSIX: '0'
+  Storable: '0'
+  Tie::IxHash: '1.23'
+  Time::HiRes: '1.9721'
+  boolean: v0.28.4
+  experimental: '0.016'
+  parent: '0'
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

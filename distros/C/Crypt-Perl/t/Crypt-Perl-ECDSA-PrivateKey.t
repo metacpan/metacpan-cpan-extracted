@@ -200,6 +200,8 @@ sub test_sign : Tests() {
 
                             skip 'Your OpenSSL can’t load this key!', 1 if !OpenSSL_Control::can_load_private_pem($ecdsa->to_pem_with_explicit_curve());
 
+                            skip 'Your OpenSSL can’t correct verify an ECDSA digest against a private key!', 1 if OpenSSL_Control::has_ecdsa_verify_private_bug();
+
                             my $ok = OpenSSL_Control::verify_private(
                                 $ecdsa->to_pem_with_explicit_curve(),
                                 $msg,

@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Convert-BI
   homepage: https://metacpan.org/release/Finance-Currency-Convert-BI
   repository: git://github.com/perlancar/perl-Finance-Currency-Convert-BI.git
-version: '0.060'
+version: '0.062'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

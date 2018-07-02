@@ -278,6 +278,13 @@ sub call{
         }
         else{return 1} 
     };
+    options '/*' => sub{
+        my $c = shift;
+        $c->res->headers->header("Access-Control-Allow-Origin" => "*");
+        $c->res->headers->header("Access-Control-Allow-Methods" => "OPTIONS, HEAD, GET, POST");
+        $c->res->headers->header("Access-Control-Allow-Headers" => "X-Requested-With, X-Auth-Token, Content-Type, Content-Length, Authorization");
+        $c->rendered(200);
+    };
     get '/openwx/get_user_info'     => sub {$_[0]->safe_render(json=>$client->user->to_json_hash());};
     get '/openwx/get_friend_info'   => sub {$_[0]->safe_render(json=>[map {$_->to_json_hash()} @{$client->friend}]); };
     get '/openwx/get_group_info'    => sub {$_[0]->safe_render(json=>[map {$_->to_json_hash()} @{$client->group}]); };
@@ -452,10 +459,13 @@ sub call{
                         $client->unsubscribe(receive_message=>$cb);
                         $c->safe_render(json=>{id=>$msg->id,code=>$msg->code,status=>$msg->info,reply_status=>"reply timeout",reply=>undef});
                     });
-                    $cb = $client->once(receive_message=>sub{
+                    $cb = $client->on(receive_message=>sub{
                         my($client,$msg) = @_;
                         Mojo::IOLoop->remove($timer);
-                        $c->safe_render(json=>{reply=>$msg->content,id=>$msg->id,code=>$msg->code,status=>$msg->info}); 
+                        if($msg->sender->id eq $object->id){
+                            $client->unsubscribe(receive_message=>$cb);
+                            $c->safe_render(json=>{reply=>$msg->content,id=>$msg->id,code=>$msg->code,status=>$msg->info});
+                        }
                     });
                 });
                 $msg->from("api");
@@ -742,7 +752,7 @@ sub call{
         );
         
     };
-    any '/*whatever'  => sub{whatever=>'',$_[0]->safe_render(text=>"api not found",status=>403)};
+    any '/*'  => sub{$_[0]->safe_render(text=>"api not found",status=>403)};
     package Mojo::Weixin::Plugin::Openwx;
     no utf8;
     $server = Mojo::Weixin::Server->new();   

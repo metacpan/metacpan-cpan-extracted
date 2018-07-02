@@ -19,7 +19,7 @@ else {
     plan skip_all => "Set GEO_CODER_OPENCAGE_API_KEY environment variable to run this test";
 }
 
-my $Geocoder = Geo::Coder::OpenCage->new(
+my $geocoder = Geo::Coder::OpenCage->new(
     api_key => $api_key,
 );
 
@@ -77,7 +77,7 @@ for my $test (@tests) {
     my $location = $test->{input}{location};
     ok $location, "Trying to geocode '$location'";
 
-    my $result = $Geocoder->geocode(%{ $test->{input} });
+    my $result = $geocoder->geocode(%{ $test->{input} });
 
     ok $result, '... got a sane response';
 

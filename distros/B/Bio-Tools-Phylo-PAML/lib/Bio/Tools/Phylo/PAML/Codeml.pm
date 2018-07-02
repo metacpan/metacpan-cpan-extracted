@@ -1,5 +1,5 @@
 package Bio::Tools::Phylo::PAML::Codeml;
-$Bio::Tools::Phylo::PAML::Codeml::VERSION = '1.7.2';
+$Bio::Tools::Phylo::PAML::Codeml::VERSION = '1.7.3';
 use utf8;
 use strict;
 use warnings;
@@ -89,7 +89,7 @@ Bio::Tools::Phylo::PAML::Codeml - Parses output from the PAML program codeml
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 

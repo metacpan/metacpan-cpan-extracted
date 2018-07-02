@@ -49,7 +49,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Kavorka";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_05>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_06>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_07>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_08>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_09>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_10>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_11>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-023>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-025>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-027>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-028>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-029>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-031>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-033>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-035>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-037>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_05>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_06>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_07>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_08>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_09>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_10>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-000_11>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-023>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-025>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-027>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-028>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-029>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-031>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-033>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-035>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-037>, <http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-038>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-kavorka>;
@@ -1038,6 +1038,24 @@
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.037.tar.gz>;
 	doap:revision        "0.037"^^xsd:string.
 
+<http://purl.org/NET/cpan-uri/dist/Kavorka/v_0-038>
+	a                    doap:Version;
+	dc:identifier        "Kavorka-0.038"^^xsd:string;
+	dc:issued            "2017-01-31"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Add note about Devel::CallParser issue to documentation.";
+		], [
+			rdfs:label "98undefer.t now requires Moops 0.035";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/124827>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/srezic>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Kavorka-0.038.tar.gz>;
+	doap:revision        "0.038"^^xsd:string.
+
 <http://purl.org/NET/cpan-uri/person/camspi>
 	a                    foaf:Person;
 	foaf:name            "Chris Tijerina";
@@ -1049,6 +1067,12 @@
 	foaf:name            "Piers Cawley";
 	foaf:nick            "PDCAWLEY";
 	foaf:page            <https://metacpan.org/author/PDCAWLEY>.
+
+<http://purl.org/NET/cpan-uri/person/srezic>
+	a                    foaf:Person;
+	foaf:name            "Slaven Rezić";
+	foaf:nick            "SREZIC";
+	foaf:page            <https://metacpan.org/author/SREZIC>.
 
 <http://purl.org/NET/cpan-uri/person/syohex>
 	a                    foaf:Person;
@@ -1080,6 +1104,11 @@
 	foaf:name            "Grzegorz Rożniecki";
 	foaf:nick            "XAERXESS";
 	foaf:page            <https://metacpan.org/author/XAERXESS>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/124827>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "124827"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=124827>.
 
 <http://purl.org/NET/cpan-uri/rt/ticket/91557>
 	a                    doap-bugs:Issue;

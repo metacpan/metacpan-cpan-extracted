@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.14
+    version 1.18
 
 SYNOPSIS
 
@@ -159,6 +159,7 @@ CONSTRUCTOR
         'prefix', specify an event prefix other than the default of 'testc';
         'timeout', specify number of seconds to wait for socket timeouts;
         'context', anything that can fit into a scalar, such as a ref, etc.
+        'usessl', enable SSL/TLS if POE::Component::SSLify is available;
 
       The semantics for filter, inputfilter and outputfilter are the same
       as for POE::Component::Server::TCP in that one may provide either a
@@ -171,6 +172,8 @@ CONSTRUCTOR
       specified they must be provided to subsequent connects. If
       autoconnect is specified, address and port must also be defined.
 
+      usessl is dependent on whether POE::Component::SSLify is available.
+
 METHODS
 
     connect
@@ -182,6 +185,7 @@ METHODS
         'port', the remote port to connect to;
         'localaddr', specify that connections be made from a particular local address, optional;
         'localport', specify that connections be made from a particular port, optional;
+        'usessl', enable SSL/TLS if POE::Component::SSLify is available;
 
       address and port are optional if they have been already specified
       during spawn.
@@ -222,7 +226,7 @@ METHODS
 
     terminate
 
-      Immediately disconnects a server conenction.
+      Immediately disconnects a server connection.
 
     wheel
 
@@ -293,7 +297,7 @@ INPUT EVENTS
 
     terminate
 
-      Immediately disconnects a server conenction.
+      Immediately disconnects a server connection.
 
 OUTPUT EVENTS
 

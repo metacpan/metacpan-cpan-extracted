@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+
+use 5.008 ; use strict ; use warnings ; 
+use Digest::SHA1 qw[ sha1 sha1_hex sha1_base64 ]; 
+use Getopt::Std ; getopts ':12h:qt:' , \my %o ; 
+use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use Time::HiRes qw[tv_interval gettimeofday] ; # 5.7から
+
+my $time0 = [gettimeofday]  ;
+my $sum = 0 ; # undef の方が良いかもしれないかも。
+my $prior = $o{h} // '' ; # 各行の先頭に付加する文字列
+my $post = $o{t} // '' ; # 各行の末尾に付加する文字列
+
+
+$SIG{ALRM} = sub { my $t = sprintf "%02d:%02d:%02d",(localtime)[2,1,0] ; print STDERR CYAN "$. line(s) being processed. ($t)\n" ; alarm 60 } ; 
+alarm 15;
+
+while ( <> ) { 
+	chomp ; 
+ 	my @x =  unpack 'C4' , sha1( $prior . $_ . $post) ;  # 0 -  255 の数が4個現れる。
+    $x[0] -= 128 if $o{1} ; 
+	$sum += ((($x[0]*256+$x[1])*256+$x[2])*256)+$x[3] ; 
+    #$sum -= 2147483648 if $o{1} ; # 2**31 と同じ値
+    print join ("\t", "$.:" , $sum, @x ) ,"\n" if $o{':'} ;
+    #print "$.\t$sum\n" if $o{':'} ; 
+}
+
+$sum *= 1 / 4294967296.0 * sqrt ( 12 ) if $o{1}; 
+$sum .= "\t" . ($sum**2) if $o{2} ;
+print $sum , "\n" ;
+
+# 処理した結果について2次情報を出力する。
+my $lines = $. ; 
+$lines =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/g ; # 3桁毎にコンマで区切る
+print STDERR CYAN "Processed ${lines} line(s). " , sprintf ("%02d:%02d:%02d" , (localtime)[2,1,0]) , 
+" in " , tv_interval($time0) , " seconds.\n" 
+unless $o{q} ;
+
+exit 0 ;
+
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.02 ;
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+   # shuffler 
+   #  Produced by Toshiyuki Shimono in Tokyo, 2016-01-25 ~ 2016-10-13 ; 2018-03-25 English added.
+   # 目安: 
+   #   0.21 : 人になんとか提供できる段階で 0.21 を目安とする。
+   #   1.00 以上 : 英語版のヘルプをきちんと出すことが必要条件。
+   #   2.00 以上 : テストコードが含むことが必要条件。
+}  
+
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+$0 
+
+  入力の各行について(行末の改行文字は除去して)、SHA1ハッシュ値を求め、先頭4バイト(32ビット)を 0〜2^32-1の整数に変換し、
+  全行についての、総和を求める。
+
+  オプション :
+
+    -1 : 各行について、加算対象の整数に対して-2^31を加算し最後に2^32で割ってsqrt(12)をかけ算して、ある種の正規化を行う。異なるn行を処理をするとN(0,n)に従う分布になる。
+      -1 により計算される値の2乗は、同じ内容の行が$n_i$行出現するとすると、近似的に、$n_i^2$の総和を自由度の値とするような、カイ二乗分布に従う。
+      -1 のオプションによる正規化により、出力された数の2乗は、2個のデータセットに対する差は、異なる内容の行を自由度とするカイ二乗分布に近似的に従うように分布する。
+      -1 のオプションで出力される数は、全く同じような内容の行が多数現れた場合の挙動は、かなり異なるようになるので、解釈に注意が必要である。
+
+    -2 : -1 が指定されている場合に、その場合の出力値と共に、それを2乗した値も出力する。
+
+    -h str ; 各行の末尾に str を付加して、ハッシュ値を計算するようにする。(何十回も異なる文字列の付加を反復すれば、出力値の分布から、統計が正確になる。)
+    -t str ; 各行の末尾に str を付加して、ハッシュ値を計算するようにする。(何十回も異なる文字列の付加を反復すれば、出力値の分布から、統計が正確になる。)
+   
+    -: ; 途中の各行の計算過程も出力する。
+    -q : 処理した行数などの2次情報を出力しない。
+
+=cut

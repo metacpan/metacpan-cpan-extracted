@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Net-Citadel.t'
 
@@ -33,7 +36,7 @@ $c->citadel_echo ('rrrrrr') and pass ('echo');
 $c->citadel_time and pass ('time');
 
 my $inforef = $c->citadel_info;
-is_deeply( $#{$inforef}, q{24}, "Expected 0 thru 23 information lines." );
+is_deeply( $#{$inforef}, q{24}, "Expected 0 through 23 information lines." );
 
 
 my (%mrtg_info, $key_count);
@@ -42,13 +45,13 @@ my (%mrtg_info, $key_count);
 $key_count = grep { defined } values %mrtg_info;
 TODO: {
     local $TODO ='Getting undefined when testing?';
-    is( $keycount, q{4}, 'citadel_mrtg returns 4 keys for type users.' );
+    is( $key_count, q{4}, 'citadel_mrtg returns 4 keys for type users.' );
 }
 %mrtg_info = $c->citadel_mrtg ('messages');
 $key_count = grep { defined } values %mrtg_info;
 TODO: {
     local $TODO ='Getting undefined when testing?';
-    is( $keycount, q{3}, 'citadel_mrtg returns 3 keys for type messages.' );
+    is( $key_count, q{3}, 'citadel_mrtg returns 3 keys for type messages.' );
 }
 
 # try to get rid of any testing artefacts

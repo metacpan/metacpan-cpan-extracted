@@ -1,0 +1,108 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Dist::Zilla::PluginBundle::Author::JMASLAK - JMASLAK's Plugin Bundle
+
+=head1 VERSION
+
+version 0.004
+
+=head1 DESCRIPTION
+
+This is Joelle Maslak's plugin bundle, used for her modules.  If you're not
+her, you probably want to create your own plugin module because I may modify
+this module based on her needs, breaking third party modules that use this.
+
+All of the following are in this module as of v0.003.
+
+It is somewhat equivilent to:
+
+    [AutoPrereqs]
+    [ConfirmRelease]
+    [ContributorCovenant]
+
+    [CopyFilesFromBuild]
+    copy = 'README.pod'
+
+    [ExecDir]
+    [ExtraTests]
+    [GatherDir]
+    [Git::Check]
+    [Git::Commit]
+    [Git::Push]
+    [Git::Tag]
+    [GitHub::Meta]
+    [License]
+    [Manifest]
+    [ManifestSkip]
+    [Makemaker]
+    [MetaJSON]
+    [MetaProvides::Package]
+    [MetaYAML]
+    [PkgVersion]
+    [PodSyntaxTests]
+    [PodWeaver]
+    [PruneCruft]
+    [ShareDir]
+
+    [ReadmeAnyFromPod]
+    type     = pod
+    filename = README.pod
+
+    [Test::EOL]
+    [Test::Kwalitee::Extra]
+    [Test::NoTabs]
+    [Test::ReportPrereqs]
+
+    [Test::TrailingSpace]
+    filename_regex = '\.($?:ini|pl|pm|t|txt)\z'
+
+    [Test::UnusedVars]
+    [Test::UseAllModules]
+    [Test::Version]
+    [TestRelease]
+    [UploadToCPAN]
+
+This creates a C<CODE_OF_CONDUCT.md> from the awesome Contributor Covenant
+project, a C<TODO> file, an C<AUTHOR_PLEDGE> file that indicates CPAN admins
+can take ownership should the project become abandoned, and a C<.travis.yml>
+file that will probably need to be edited.  If these files exist already,
+they will not get overwritten.
+
+It also generates a C<.mailmap> base file suitable for Joelle, if one does
+not already exists.
+
+=head1 USAGE
+
+In your C<dist.ini> -
+
+    [@Filter]
+    -bundle  = @Author::JMASLAK
+    -version = 0.003
+
+The C<-version> option should specify the latest version required and tested
+with a given package.
+
+=head1 SEE ALSO
+
+Core Dist::Zilla plugins:
+
+Dist::Zilla roles:
+L<PluginBundle|Dist::Zilla::Role::PluginBundle>,
+L<PluginBundle::Easy|Dist::Zilla::Role::PluginBundle::Easy>.
+
+=head1 AUTHOR
+
+Joelle Maslak <jmaslak@antelope.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Joelle Maslak.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,88 @@
+{
+   "abstract" : "Generate font subsets on-the-fly",
+   "author" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-FontSubset",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2::Plugin" : "0",
+            "Font::TTF::Font" : "0",
+            "Font::TTF::Scripts::Name" : "0",
+            "List::AllUtils" : "0",
+            "perl" : "v5.12.0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Dancer2" : "0",
+            "Dancer2::Plugin::Cache::CHI" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Requires" : "0",
+            "Test::WWW::Mechanize::PSGI" : "0",
+            "lib" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::FontSubset" : {
+         "file" : "lib/Dancer2/Plugin/FontSubset.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Dancer2-Plugin-FontSubset/issues"
+      },
+      "homepage" : "https://github.com/yanick/Dancer2-Plugin-FontSubset",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Dancer2-Plugin-FontSubset.git",
+         "web" : "https://github.com/yanick/Dancer2-Plugin-FontSubset"
+      }
+   },
+   "version" : "0.0.1",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
+   "x_contributors" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

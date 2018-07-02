@@ -3,9 +3,13 @@ use warnings;
 use strict;
 
 
+my $can_have_plan;
+
 BEGIN {
     require Test::More;
-    if ($Test::More::VERSION ge '0.87_01') { # Implements "done_testing".
+
+    # Implements "done_testing".
+    if ($can_have_plan = eval { Test::More->VERSION('0.88') }) {
         'Test::More'->import;
     } else {
         'Test::More'->import('no_plan');
@@ -22,6 +26,18 @@ sub skippable {
 
 
 my %tests = (
+    '5.028' => [
+        [ 'delete%',
+          'my %h = ( a => 12, b => 13, c => 14);'
+              . ' join " ", sort delete %h{"a", "b"}',
+          '12 13 a b' ],
+        [ 'unicode10.0',
+          '"\N{T-REX}" eq "\N{U+1F996}"', 1 ],
+        [ 'state@=',
+          'use feature "state"; sub { state @x = qw( a b ); "@x" }->()', 'a b'
+        ],
+    ],
+
     '5.026' => [
         [ '<<~',
           "<<~ 'EOF'\n a\n EOF", "a\n" ],
@@ -30,7 +46,7 @@ my %tests = (
         [ '^CAPTURE',
           '"ab" =~ /(.)(.)/; "@{^CAPTURE}"', "a b" ],
         [ 'unicode9.0',
-          '"\N{BUTTERFLY}"', eval q("\N{U+1F98B}") ],
+          '"\N{BUTTERFLY}" eq "\N{U+1F98B}"', 1 ],
         [ 'unicode-scx',
           '"\N{KATAKANA-HIRAGANA DOUBLE HYPHEN}" !~ /\p{Common}/', 1],
     ],
@@ -196,7 +212,7 @@ my %tests = (
         [ 'lexical-$_',
           '$_ = 7; { my $_ = 42; } $_ ', 7 ],
     ],
-    '5.008' => [
+    '5.008001' => [
         [ 's-utf8-delimiters-hack',
           eval q{qq{ my \$string = "a"; use utf8; \$string =~ s\N{U+2759}a\N{U+2759}\N{U+2759}b\N{U+2759}; \$string }}, 'b' ],
     ],
@@ -239,7 +255,7 @@ for my $version (keys %tests) {
     }
 }
 
-done_testing($count) if $Test::More::VERSION ge '0.87_01';
+done_testing($count) if $can_have_plan;
 
 
 __DATA__
@@ -252,6 +268,7 @@ readline default
     '5.020' => [
         [ 'utf8-locale',
     old => [
-
+        [ '??',     # see 04-extra.t
+        [ 'for-qw', # see 04-extra.t
 =cut
 

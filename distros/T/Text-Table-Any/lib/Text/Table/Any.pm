@@ -1,7 +1,7 @@
 package Text::Table::Any;
 
-our $DATE = '2017-01-01'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2018-07-02'; # DATE
+our $VERSION = '0.091'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -20,7 +20,7 @@ sub table {
 
     my $rows       = $params{rows} or die "Must provide rows!";
     my $backend    = $params{backend} || 'Text::Table::Tiny';
-    my $header_row = $params{header_row} // 0;
+    my $header_row = $params{header_row} // 1;
 
     if ($backend eq 'Text::Table::Tiny') {
         require Text::Table::Tiny;
@@ -45,6 +45,14 @@ sub table {
     } elsif ($backend eq 'Text::Table::CSV') {
         require Text::Table::CSV;
         return Text::Table::CSV::table(
+            rows => $rows, header_row => $header_row);
+    } elsif ($backend eq 'Text::Table::TSV') {
+        require Text::Table::TSV;
+        return Text::Table::TSV::table(
+            rows => $rows, header_row => $header_row);
+    } elsif ($backend eq 'Text::Table::LTSV') {
+        require Text::Table::LTSV;
+        return Text::Table::LTSV::table(
             rows => $rows);
     } elsif ($backend eq 'Text::Table::HTML') {
         require Text::Table::HTML;
@@ -136,7 +144,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.08 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2016-01-01.
+This document describes version 0.091 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2018-07-02.
 
 =head1 SYNOPSIS
 
@@ -270,6 +278,10 @@ Optional. Pick a backend module. Supported backends:
 
 =item * Text::Table::CSV
 
+=item * Text::Table::TSV
+
+=item * Text::Table::LTSV
+
 =item * Text::Table::HTML
 
 =item * Text::Table::HTML::DataTables
@@ -324,7 +336,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,96 @@
+NAME
+    DBIx::TSV - Generate TSV from SQL query result
+
+VERSION
+    This document describes version 0.002 of DBIx::TSV (from Perl
+    distribution DBIx-TSV), released on 2018-07-02.
+
+SYNOPSIS
+     use DBI;
+     use DBIx::TSV;
+     my $dbh = DBI->connect("dbi:mysql:database=mydb", "someuser", "somepass");
+
+    Generating a row of TSV (with header):
+
+     print $dbh->selectrow_tsv("SELECT * FROM member");
+
+    Generating a row of TSV (without header):
+
+    Sample result:
+
+     alice   pvt     123456
+
+    Generating all rows (with header):
+
+     print $dbh->selectall_tsv("SELECT * FROM member");
+
+    Sample result:
+
+     Name    Rank    Serial
+     alice   pvt     123456
+     bob     cpl     98765321
+     carol   brig gen        8745
+
+    Generating all rows (without header):
+
+     print $dbh->selectall_tsv_noheader("SELECT * FROM member");
+
+    Statement handle versions:
+
+     print $sth->fetchrow_tsv;
+     print $sth->fetchrow_tsv_noheader;
+     print $sth->fetchall_tsv;
+     print $sth->fetchall_tsv_noheader;
+
+DESCRIPTION
+    This package is a thin glue between DBI and DBIx::TextTableAny (which in
+    turn is a thin glue to Text::Table::Any). It adds the following methods
+    to database handle:
+
+     selectrow_tsv
+     selectall_tsv
+     selectrow_tsv_noheader
+     selectall_tsv_noheader
+
+    as well as the following methods to statement handle:
+
+     fetchrow_tsv
+     fetchall_tsv
+     fetchrow_tsv_noheader
+     fetchall_tsv_noheader
+
+    The methods send the result of query to Text::Table::Any (using the
+    Text::Table::TSV backend) and return the rendered TSV data.
+
+    In essence, this is an easy, straightforward way produce TSV data from
+    SQL query.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DBIx-TSV>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-DBIx-TSV>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-TSV>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DBIx::CSV
+
+    DBIx::TextTableAny which has a similar interface as this module and
+    offers multiple output formats.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -22,39 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
                   'pattern' => '([2-46-9]\\d{2})(\\d{4})',
-                  'leading_digits' => '[2-46-9]',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'leading_digits' => '[2-46-9]'
                 },
                 {
-                  'pattern' => '(5\\d{3})(\\d{4})',
+                  'leading_digits' => '5',
                   'format' => '$1 $2',
-                  'leading_digits' => '5'
+                  'pattern' => '(5\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(30\\d{5})',
-                'mobile' => '
-          5(?:
-            2[589]\\d|
-            4(?:
-              2[1-389]|
-              [489]\\d|
-              7[1-9]
-            )|
-            7\\d{2}|
-            8(?:
-              [0-689]\\d|
-              7[15-8]
-            )|
-            9[0-8]\\d
-          )\\d{4}
-        ',
                 'geographic' => '
           (?:
             2(?:
@@ -77,7 +60,6 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'personal_number' => '',
                 'pager' => '',
                 'toll_free' => '80[012]\\d{4}',
                 'fixed_line' => '
@@ -107,7 +89,25 @@ my $validators = {
             20|
             9\\d
           )\\d{4}
-        '
+        ',
+                'personal_number' => '',
+                'mobile' => '
+          5(?:
+            2[589]\\d|
+            4(?:
+              2[1-389]|
+              [489]\\d|
+              7[1-9]
+            )|
+            7\\d{2}|
+            8(?:
+              [0-689]\\d|
+              7[15-8]
+            )|
+            9[0-8]\\d
+          )\\d{4}
+        ',
+                'specialrate' => '(30\\d{5})'
               };
 my %areanames = (
   2302 => "North\ Region",

@@ -4,7 +4,7 @@
 
 use strict;
 
-use File::Temp;
+use File::Temp qw(tempfile);
 use Test::More;
 use lib 't';
 use Mail::Mbox::MessageParser;
@@ -84,14 +84,14 @@ sub TestPartialRead
 
   my ($folder_name) = $filename =~ /\/([^\/\\]*)\.txt$/;
 
-  my $output = File::Temp->new();
-  binmode $output;
+  my ($output_fh, $output_fn) = tempfile();
+  binmode $output_fh;
 
   my $filehandle = new FileHandle($filename);
 
-  my $cache = File::Temp->new();
+  my ($cache_fh, $cache_fn) = tempfile();
 
-  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache->filename})
+  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache_fn})
     if $enable_cache;
 
   my $folder_reader =
@@ -109,13 +109,13 @@ sub TestPartialRead
 
   $folder_reader->reset();
 
-  print $output $folder_reader->prologue;
+  print $output_fh $folder_reader->prologue;
 
   # This is the main loop. It's executed once for each email
   while(!$folder_reader->end_of_file())
   {
     my $email = $folder_reader->read_next_email();
-    print $output
+    print $output_fh
       "number: " . $folder_reader->number() . $folder_reader->endline() .
       "line: " . $folder_reader->line_number() . $folder_reader->endline() .
       "offset: " . $folder_reader->offset() . $folder_reader->endline() .
@@ -123,11 +123,11 @@ sub TestPartialRead
       $$email;
   }
 
-  $output->close();
+  $output_fh->close();
 
   my $compare_filename = catfile('t','results',"${testname}_${folder_name}.stdout");
 
-  CheckDiffs([$compare_filename,$output->filename]);
+  CheckDiffs([$compare_filename,$output_fn]);
 }
 
 # ---------------------------------------------------------------------------
@@ -143,15 +143,14 @@ sub TestFullRead
 
   my ($folder_name) = $filename =~ /\/([^\/\\]*)\.txt$/;
 
-  my $output = File::Temp->new();
-
-  binmode $output;
+  my ($output_fh, $output_fn) = tempfile();
+  binmode $output_fh;
 
   my $filehandle = new FileHandle($filename);
 
-  my $cache = File::Temp->new();
+  my ($cache_fh, $cache_fn) = tempfile();
 
-  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache->filename})
+  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache_fn})
     if $enable_cache;
 
   my $folder_reader =
@@ -173,13 +172,13 @@ sub TestFullRead
 
   $folder_reader->reset();
 
-  print $output $folder_reader->prologue;
+  print $output_fh $folder_reader->prologue;
 
   # This is the main loop. It's executed once for each email
   while(!$folder_reader->end_of_file())
   {
     my $email = $folder_reader->read_next_email();
-    print $output
+    print $output_fh
       "number: " . $folder_reader->number() . $folder_reader->endline() .
       "line: " . $folder_reader->line_number() . $folder_reader->endline() .
       "offset: " . $folder_reader->offset() . $folder_reader->endline() .
@@ -187,12 +186,12 @@ sub TestFullRead
       $$email;
   }
 
-  $output->close();
+  $output_fh->close();
 
   my $compare_filename = 
     catfile('t','results',"${testname}_${folder_name}.stdout");
 
-  CheckDiffs([$compare_filename,$output->filename]);
+  CheckDiffs([$compare_filename,$output_fn]);
 }
 
 # ---------------------------------------------------------------------------

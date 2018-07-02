@@ -4,7 +4,7 @@ use warnings;
 package Alt::Module::Runtime::ButEUMM;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 1;
 
@@ -24,7 +24,7 @@ Alt::Module::Runtime::ButEUMM - alternative distribution of Module::Runtime, usi
 
 This is an alternative distribution of Module::Runtime, allowing easier deployment on very old versions of Perl. If you have had no problems installing Module::Runtime, then you do not need this module!
 
-Version 0.001 of Alt::Module::Runtime::ButEUMM includes version 0.014 of Module::Runtime.
+Version 0.002 of Alt::Module::Runtime::ButEUMM includes version 0.016 of Module::Runtime.
 
 =head1 SEE ALSO
 

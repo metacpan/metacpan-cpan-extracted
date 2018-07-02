@@ -1,10 +1,22 @@
 # very simplistic
-
+BEGIN { $|=1; $^W=1; }
 use Test;
-BEGIN {plan tests=>3}
 use Tcl::Tk;
 
 my $mw = Tcl::Tk::MainWindow->new;
+
+if (!$mw->interp->pkg_require('snit')) {
+    print "1..0 # skip: no snit extension available\n";
+    exit;
+}
+
+if (!$mw->interp->pkg_require('scrolledwindow')) {
+    print "1..0 # skip: no tklib extension available\n";
+    exit;
+}
+
+plan tests=>3;
+
 my $tw = $mw->Scrolled('Text',-font=>32)->pack;
 ok(1);
 $tw->_insert('end',qq/\n/);

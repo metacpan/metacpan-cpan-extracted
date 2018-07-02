@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.836';
+our $VERSION = '1.838';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -581,7 +581,7 @@ sub _loop {
       my $_ret = eval { $_var->$_fcn(@_) };
 
       return print {$_DAU_R_SOCK} length($_ret).'0'.$LF, $_ret
-         if ( !ref $_ret && defined $_ret && !looks_like_number $_ret );
+         if ( !looks_like_number $_ret && !ref $_ret && defined $_ret );
 
       my $_buf = $_freeze->([ $_ret ]);
 
@@ -591,7 +591,7 @@ sub _loop {
    my $_fetch = sub {
       return print {$_DAU_R_SOCK} '-1'.$LF if !defined($_[0]);
       return print {$_DAU_R_SOCK} length($_[0]).'0'.$LF, $_[0]
-         if ( !ref $_[0] && defined $_[0] && !looks_like_number $_[0] );
+         if ( !looks_like_number $_[0] && !ref $_[0] && defined $_[0] );
 
       my $_buf = ( blessed($_[0]) && $_[0]->can('SHARED_ID') )
          ? $_ob2{ $_[0]->[0] } || $_freeze->([ $_[0] ])
@@ -832,7 +832,7 @@ sub _loop {
          }
          elsif ( $_wa ) {
             my $_ret = eval { $_code->($_var) };
-            if ( !ref $_ret && defined $_ret && !looks_like_number $_ret ) {
+            if ( !looks_like_number $_ret && !ref $_ret && defined $_ret ) {
                print {$_DAU_R_SOCK} length($_ret).'0'.$LF, $_ret;
             }
             else {
@@ -985,6 +985,7 @@ sub _loop {
 
       SHR_M_STP.$LF => sub {                      # Stop server
          $SIG{USR2} = sub {} unless $_is_MSWin32;
+
          $_done = 1;
 
          return;
@@ -1373,14 +1374,14 @@ sub _auto {
       print({$_DAT_W_SOCK} 'M~OB0'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF);
    }
-   elsif ( @_ == 3 && !ref $_[2] && defined $_[2] && !looks_like_number($_[2]) ) {
+   elsif ( @_ == 3 && !looks_like_number $_[2] && !ref $_[2] && defined $_[2] ) {
       $_dat_ex->();
       print({$_DAT_W_SOCK} 'M~OB1'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF .
          length($_[2]).$LF, $_[2]);
    }
-   elsif ( @_ == 4 && !ref $_[3] && defined $_[3] && !looks_like_number($_[3])
-                   && !ref $_[2] && defined $_[2] && !looks_like_number($_[2]) ) {
+   elsif ( @_ == 4 && !looks_like_number $_[3] && !ref $_[3] && defined $_[3]
+                   && !looks_like_number $_[2] && !ref $_[2] && defined $_[2] ) {
       $_dat_ex->();
       print({$_DAT_W_SOCK} 'M~OB2'.$LF . $_chn.$LF),
       print({$_DAU_W_SOCK} $_[1]->[_ID].$LF . $_[0].$LF . $_wa.$LF .
@@ -1489,7 +1490,7 @@ sub _req4 {
    local $/ = $LF   if ($/ ne $LF );
 
    if ( @_ == 3 ) {
-      $_key = ( ref $_[2] || !looks_like_number($_[2]) )
+      $_key = ( !looks_like_number $_[2] || ref $_[2] )
          ? $_[2].'0' : $_freeze->([ $_[2] ]).'1';
    }
 
@@ -1631,19 +1632,19 @@ sub export {
       map { $_ = $_->export($_lkup) if $_blessed->($_) && $_->can('export')
           } @{ $_item };
 
-      return [ @{ $_item } ] if $_lkup->{'unbless'};
+      return $_lkup->{ $_id } = [ @{ $_item } ] if $_lkup->{'unbless'};
    }
    elsif ( $_class->isa('MCE::Shared::Hash') || $_class->isa('Tie::StdHash') ) {
       map { $_ = $_->export($_lkup) if $_blessed->($_) && $_->can('export')
           } CORE::values %{ $_item };
 
-      return { %{ $_item } } if $_lkup->{'unbless'};
+      return $_lkup->{ $_id } = { %{ $_item } } if $_lkup->{'unbless'};
    }
    elsif ( $_class->isa('MCE::Shared::Scalar') || $_class->isa('Tie::StdScalar') ) {
       if ( $_blessed->(${ $_item }) && ${ $_item }->can('export') ) {
          ${ $_item } = ${ $_item }->export($_lkup);
       }
-      return \do { my $o = ${ $_item } } if $_lkup->{'unbless'};
+      return $_lkup->{ $_id } = \do { my $o = ${ $_item } } if $_lkup->{'unbless'};
    }
    else {
       if    ( $_class->isa('MCE::Shared::Ordhash') ) { $_data = $_item->[0] }
@@ -1840,7 +1841,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.836
+This document describes MCE::Shared::Server version 1.838
 
 =head1 DESCRIPTION
 

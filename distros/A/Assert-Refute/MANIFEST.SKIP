@@ -20,5 +20,4 @@ nytprof.*
 ^CHECKLIST$
 MYMETA\..*
 fake_lib
-TODO
 ^README\.md$

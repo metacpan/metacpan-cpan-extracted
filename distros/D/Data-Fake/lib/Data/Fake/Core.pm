@@ -5,13 +5,14 @@ use warnings;
 package Data::Fake::Core;
 # ABSTRACT: General purpose generators
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Exporter 5.57 qw/import/;
 
 our @EXPORT = qw(
   fake_hash
   fake_array
+  fake_flatten
   fake_pick
   fake_binomial
   fake_weighted
@@ -305,6 +306,39 @@ sub fake_join {
     };
 }
 
+#pod =func fake_flatten
+#pod
+#pod     $flatten_generator = fake_flatten( fake_array( 3, fake_first_name() ) );
+#pod     @array_of_names = $flatten_generator->();
+#pod
+#pod Given a generator that returns an array ref (such as fake_array) or a
+#pod hash ref (fake_hash), fake_flatten returns a generator that, when run,
+#pod executes the generators and returns their result in a dereferenced state.
+#pod
+#pod This is particularly useful when the return value is used directly as
+#pod input to another function, for example within a fake_join.
+#pod
+#pod     $generator = fake_join( " ", $flatten_generator );
+#pod
+#pod =cut
+
+sub fake_flatten {
+    my ($ref) = @_;
+
+    return sub {
+        my $result     = _transform($ref);
+        my $result_ref = ref($result);
+        if ( $result_ref eq 'ARRAY' ) {
+            return @$result;
+        }
+        elsif ( $result_ref eq 'HASH' ) {
+            return %$result;
+        }
+
+        croak "I do not know how to flatten a $result_ref";
+      }
+}
+
 sub _transform {
     my ($template) = @_;
 
@@ -356,7 +390,7 @@ Data::Fake::Core - General purpose generators
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -542,6 +576,20 @@ The separator itself may also be a generator if you want that degree of
 randomness as well.
 
     $generator = fake_join( fake_pick( q{}, q{ }, q{,} ), @args );
+
+=head2 fake_flatten
+
+    $flatten_generator = fake_flatten( fake_array( 3, fake_first_name() ) );
+    @array_of_names = $flatten_generator->();
+
+Given a generator that returns an array ref (such as fake_array) or a
+hash ref (fake_hash), fake_flatten returns a generator that, when run,
+executes the generators and returns their result in a dereferenced state.
+
+This is particularly useful when the return value is used directly as
+input to another function, for example within a fake_join.
+
+    $generator = fake_join( " ", $flatten_generator );
 
 =for Pod::Coverage BUILD
 

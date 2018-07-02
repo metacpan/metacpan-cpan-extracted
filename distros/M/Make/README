@@ -9,9 +9,9 @@ Requires perl5.005 or later as it uses some of new regular expression features.
 To install 
 
 perl Makefile.PL
-perl -I. pmake 
-perl -Mblib pmake test 
-perl -Mblib pmake install 
+perl -I. pure-perl-make 
+perl -Mblib pure-perl-make test 
+perl -Mblib pure-perl-make install 
 
 No other make required!
 

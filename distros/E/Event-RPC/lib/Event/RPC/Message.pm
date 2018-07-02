@@ -12,24 +12,6 @@ use Carp;
 use strict;
 use utf8;
 
-my %DECODERS = (
-    STOR    => sub { require Storable; Storable::thaw($_[0])                    },
-    JSON    => sub { require JSON::XS; JSON::XS->new->allow_tags->decode($_[0]) },
-    CBOR    => sub { require CBOR::XS; CBOR::XS->new->decode($_[0])             },
-    SERL    => sub { require Sereal;   Sereal::decode_sereal($_[0])             },
-
-    TEST    => sub { require Storable; Storable::thaw($_[0])                    },
-);
-
-my %ENCODERS = (
-    STOR    => sub { require Storable; Storable::nfreeze ($_[0])                                                    },
-    JSON    => sub { require JSON::XS; '%E:R:JSON%'.JSON::XS->new->latin1->allow_blessed->allow_tags->encode($_[0]) },
-    CBOR    => sub { require CBOR::XS; '%E:R:CBOR%'.CBOR::XS->new->encode($_[0])                                    },
-    SERL    => sub { require Sereal;   '%E:R:SERL%'.Sereal::encode_sereal($_[0])                                    },
-
-    TEST    => sub { "//NEGOTIATE(A,B,C)//" },
-);
-
 my $DEBUG = 0;
 my $MAX_PACKET_SIZE = 2*1024*1024*1024;
 

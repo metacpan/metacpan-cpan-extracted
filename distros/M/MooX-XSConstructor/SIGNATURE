@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f90fd31452c0c0c84be4dd22b1ea4582bf352b12 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 e8ad99c873a27010cef101f9e95619d008d224fd Changes
+SHA1 1ac5a6f87d7b7f63760fd9b3a6029ab76d90d40c INSTALL
+SHA1 4b7ceb6d8f98b8e378a50f11d2feb4e205aa68d8 LICENSE
+SHA1 c1bf799c0510997abff5f873bf392577c63e2f04 MANIFEST
+SHA1 0e6d06feab8548d3103290fbd3f397f46d8dae04 META.json
+SHA1 0eafdbc451573efe67acd1b7ea8b0883dd79b4dc META.yml
+SHA1 8862ba41c69200f03a17209c2b0197bcd4438a10 Makefile.PL
+SHA1 ad73033a9f8a2d866ee6c406d41c81fadffd88c3 README
+SHA1 a437f4a245fa7c6e47950b3940f6fffa5771fcd2 dist.ini
+SHA1 05c0911026301097e088600c7168d46f30f72f79 doap.ttl
+SHA1 f01286c37c25936922f90187342a129747b35abc lib/MooX/XSConstructor.pm
+SHA1 6e6446be2a343cc1a7082b6ea27cfe0ad7ff5f47 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCWypiFgAKCRDOv4Eoaip9
+Oa6tAJ4xPjPVlUW3HZFQPc30Y3QQpC7tFACgkSvdsNW043OKgH9jRA0EeZ27jq0=
+=I2qD
+-----END PGP SIGNATURE-----

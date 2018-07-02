@@ -1,0 +1,75 @@
+NAME
+    Text::Table::LTSV - Generate LTSV
+
+VERSION
+    This document describes version 0.001 of Text::Table::LTSV (from Perl
+    distribution Text-Table-LTSV), released on 2018-06-30.
+
+SYNOPSIS
+     use Text::Table::LTSV;
+
+     my $rows = [
+         # header row
+         ['Name', 'Rank', 'Serial'],
+         # rows
+         ['alice', 'pvt', '123456'],
+         ['bob',   'cpl', '98765321'],
+         ['carol', 'brig gen', '8745'],
+     ];
+     print Text::Table::LTSV::table(rows => $rows);
+
+DESCRIPTION
+    This module provides a single function, "table", which formats a
+    two-dimensional array of data as LTSV. This is basically a way to
+    generate LTSV using the same interface as that of Text::Table::Tiny
+    (v0.03) or Text::Table::Org.
+
+    The example shown in the SYNOPSIS generates the following table (Tab
+    might be shown as spaces):
+
+     Name:alice   Rank:pvt     Serial:123456
+     Name:bob     Rank:cpl     Serial:98765321
+     Name:carol   Rank:brig gen        Serial:8745
+
+FUNCTIONS
+  table(%params) => str
+  OPTIONS
+    The "table" function understands these arguments, which are passed as a
+    hash.
+
+    *   rows (aoaos)
+
+        Takes an array reference which should contain one or more rows of
+        data, where each row is an array reference.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-Table-LTSV>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-Table-LTSV>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-LTSV>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    <http://ltsv.org>
+
+    Text::Table::Tiny
+
+    See also Bencher::Scenario::TextTableModules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

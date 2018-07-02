@@ -1,180 +1,179 @@
 Revision history for Perl module XML::XPathScript
 
+1.55 2018-06-20
+  - Improve namespace support
+  - Fix a bug where "xmlns:" was duplicated in the top-level element
+  - Fix a bug that prevented manual switching between XML::XPath and
+    XML::LibXML as the back-end parser
+  - Move to Dist::Zilla.
+
+  [ STATISTICS ]
+    - code churn: 24 files changed, 380 insertions(+), 370 deletions(-)
+
 1.54 July 26, 2008
-    - Fix bugs in stylesheet DocBook2LaTex
-    - Fix bug in X::X::Processor::B where there is no whitespace
-        between the tagname and the first attribute.
-    - Change Readonly call in X::X::Processor to try to please Perl 5.6 and
-      earlier.
-    - Getting rid of internal class StdoutSnatcher.
+  - Fix bugs in stylesheet DocBook2LaTex
+  - Fix bug in X::X::Processor::B where there is no whitespace between the
+    tagname and the first attribute.
+  - Change Readonly call in X::X::Processor to try to please Perl 5.6 and
+    earlier.
+  - Getting rid of internal class StdoutSnatcher.
 
 1.53 Dec 18, 2007
-    - If no XML parser is present during installation, add XML::LibXML
-        to the dependencies (thanks to David for the bug report)
+  - If no XML parser is present during installation, add XML::LibXML to the
+    dependencies (thanks to David for the bug report)
 
 1.52 Jul 6, 2007
-    - Added Clone dependency
+  - Added Clone dependency
 
 1.51 Jul 5, 2007
-    - Changes to X::X::Stylesheet::Docbook2LaTeX for Pod::Manual
-
-1.50.1 Jul 5, 2007
-    - Silencing warnings in t/04unicode.t
-    - t/99signature.t is now an author test 
+  - Changes to X::X::Stylesheet::Docbook2LaTeX for Pod::Manual
 
 1.50 June 20, 2007
-    - Functional calls to Template and Tag are now shortcut to set()s
-    - Added method import_template() to XML::XPathScript::Template
-    - Silenced spurious warnings.
-    - New stylesheet module DocBook2LaTeX.pm
-    - xpathscript now accepts stylesheet modules as argument
-    - xpathscript can now do chained transformations
+  - Functional calls to Template and Tag are now shortcut to set()s
+  - Added method import_template() to XML::XPathScript::Template
+  - Silenced spurious warnings.
+  - New stylesheet module DocBook2LaTeX.pm
+  - xpathscript now accepts stylesheet modules as argument
+  - xpathscript can now do chained transformations
 
 1.49 Jan 31, 2007
-    - added tests for axkit and tomkit
-    - fixed bug for apply_templates called with a path without match
+  - added tests for axkit and tomkit
+  - fixed bug for apply_templates called with a path without match
 
 1.48 Jan 22, 2007
-    - Fixed t/26bxpath.t so that it skips if B::XPath is not installed
+  - Fixed t/26bxpath.t so that it skips if B::XPath is not installed
 
 1.47 Jan 20, 2007
-    - Changed Dom's email to domq@cpan.org
-    - Added the 'content' tag attribute
-    - Removed template action 'insteadofchildren'
-    - Display tags can now be strings or code references
-    - Now skip tests that doesn't work for XML::XPath if
-        that parser is chosen
-    - Parser-centric parts of X::X::Processor now reside
-        in sub-classes
-    - Added support for B::XPath (!)
+  - Changed Dom's email to domq@cpan.org
+  - Added the 'content' tag attribute
+  - Removed template action 'insteadofchildren'
+  - Display tags can now be strings or code references
+  - Now skip tests that doesn't work for XML::XPath if that parser is
+    chosen
+  - Parser-centric parts of X::X::Processor now reside in sub-classes
+  - Added support for B::XPath (!)
 
 1.46_02 Nov 22, 2006
-    - Removing depency to Class::Exporter
+  - Removing depency to Class::Exporter
 
 1.46_01 Nov 19, 2006
-    - XML::XPathScript::Processor is now OO 
-    - apply_templates now support the passing of parameters
-        to testcode (suggestion and partial patch by Tim Nelson)
-    - Added Readonly constants for template's actions (DO_SELF_ONLY, etc)
-    - Added template action 'insteadofchildren' 
-        (suggestion and partial patch by Tim Nelson)
-    - Removed support for $XML::XPathScript::DoNotInterpolate 
-        (use $xps->interpolation() instead)
+  - XML::XPathScript::Processor is now OO 
+  - apply_templates now support the passing of parameters to testcode
+    (suggestion and partial patch by Tim Nelson)
+  - Added Readonly constants for template's actions (DO_SELF_ONLY, etc)
+  - Added template action 'insteadofchildren'  (suggestion and partial
+    patch by Tim Nelson)
+  - Removed support for $XML::XPathScript::DoNotInterpolate  (use
+    $xps->interpolation() instead)
 
 1.46 Oct 25, 2006
-    - XML::XPathScript can now be require'd cleanly
-    - xpathscript now installed by default
-    - added Test::Signature test (thanks to The Schwern
-        for pointing it out)
-    - pod tidying
+  - XML::XPathScript can now be require'd cleanly
+  - xpathscript now installed by default
+  - added Test::Signature test (thanks to The Schwern for pointing it out)
+  - pod tidying
 
 1.45 Aug 7, 2006
-    - Added new 'rename' tag attribute
+  - Added new 'rename' tag attribute
 
 1.44 Jul 23, 2006
-    - Fixed Axkit and Tomkit interface modules to use the new 
-        set_xml() method
-    - Quiet warning about funny filenames in set_xml.
+  - Fixed Axkit and Tomkit interface modules to use the new  set_xml()
+    method
+  - Quiet warning about funny filenames in set_xml.
 
 1.43 Jul 6, 2006
-    - Added method transform() to XML::XPathScript
-    - Added methods set_xml() and set_stylesheet() to XML::XPathScript
-    - set_xml now accepts strings, files, filehandlers and
-      XML::LibXML/XML::XPath objects
-    - Added method get_stylesheet_dependencies() to XML::XPathScript
-    - Reworked XML::XPathScript synopsis
-    - Added a few tests
-
+  - Added method transform() to XML::XPathScript
+  - Added methods set_xml() and set_stylesheet() to XML::XPathScript
+  - set_xml now accepts strings, files, filehandlers and
+    XML::LibXML/XML::XPath objects
+  - Added method get_stylesheet_dependencies() to XML::XPathScript
+  - Reworked XML::XPathScript synopsis
+  - Added a few tests
 
 1.42 Jun 12 2006
-    - Added support for signatures.
-    - Fixed a XML::XPath-related bug in the testcases.
+  - Added support for signatures.
+  - Fixed a XML::XPath-related bug in the testcases.
 
 1.41 Jun 10 2006
-    - Added flags -axkit and -tomkit to Build.PL to force installation of 
-        Axkit/TomKit support 
-    - Big version jump to keep all modules' versions in sync
-    - Added synopsis to TomKit processor
-    - Misc. distribution clean-ups
+  - Added flags -axkit and -tomkit to Build.PL to force installation of 
+    Axkit/TomKit support 
+  - Big version jump to keep all modules' versions in sync
+  - Added synopsis to TomKit processor
+  - Misc. distribution clean-ups
+
+1.50.1 Jul 5, 2007
+  - Silencing warnings in t/04unicode.t
+  - t/99signature.t is now an author test 
 
 1.01 Mar 8 2006
-    - Added Dominique's excellent Docbook-into-LaTeX converting
-        stylesheet in an examples/ directory.
+  - Added Dominique's excellent Docbook-into-LaTeX converting stylesheet in
+    an examples/ directory.
 
 1.00 Mar 7 2006
-    - Massive documentation make-over. 
-    - Extension of the stylesheet syntax (addition of 
-        <%~ %>, <%# %>, and <%- -%>).
-    - API of stylesheet template re-worked (see pod of
-        XML::XPathScript::Template and XML::XPathScript::Template::Tag).
-    - UTF8 support improved.
-    - Added namespace support.
-    - Installation infrastructure switched to Module::Build
-    
+  - Massive documentation make-over. 
+  - Extension of the stylesheet syntax (addition of  <%~ %>, <%# %>, and
+    <%- -%>).
+  - API of stylesheet template re-worked (see pod of
+    XML::XPathScript::Template and XML::XPathScript::Template::Tag).
+  - UTF8 support improved.
+  - Added namespace support.
+  - Installation infrastructure switched to Module::Build
 
 0.16 Jan 2 2006
-	- Added alpha support for TomKit.
-	- Makefile.PL now only install AxKit and TomKit processors if they are
-	   detected.
-	- Added Test::Pod and Test::Pod::Coverage checks in the module's tests	   
+  - Added alpha support for TomKit.
+  - Makefile.PL now only install AxKit and TomKit processors if they are
+    detected.
+  - Added Test::Pod and Test::Pod::Coverage checks in the module's tests    
 
-0.15 Sun Jun 26 2005
-	- Template now supports two new tags: intro and extro. When a tag 
-       is processed, the elements of the templates are outputed as follow:
-		
-		pre
-		<tag>              # if showtag == 1
-		intro   
-		prechildren        # if <tag> has children
-		[ children ... ]
-		postchildren       # if <tag> has children
-		extro
-		</tag>             # if showtag == 1
-		post
-		
-	- In stylesheets under A::A::L::YPS, the variable $r is now pre-defined.
-	- Added function document() for XML::XPathScript and Apache::Axkit::Language::YPathScript.
-	- Fixed argument interpolation bugs ("<foo bar='&lt;"> was being transformed into "<foo bar='<'>")
-	- Bug fixes
+0.15 2005-06-26
+  - Template now supports two new tags: intro and extro. When a tag  is
+    processed, the elements of the templates are outputed as follow: pre
+    <tag>	  # if showtag == 1 intro    prechildren	# if <tag>
+    has children
 
-0.14 Thu Sep 23 2004
-	- XML::XPathScript->current()->binmode() for non-UTF8 output
-	- Renamed XML::XPathScript::Toys to XML::XPathScript::Processor
-	- Introduction of testcode return value DO_TEXT_AS_CHILD 
-	  for text nodes (see XML::XPathScript::Processor docs)
-	- Interpolation regex is now configurable
-	- Corrected Makefile.PL typo for XML::LibXML
-	- General bug and typo fixes
+  [ children ... ]
+    - postchildren     # if <tag> has children extro </tag>		#
+      if showtag == 1 post - In stylesheets under A::A::L::YPS, the
+      variable $r is now pre-defined. - Added function document() for
+      XML::XPathScript and Apache::Axkit::Language::YPathScript. - Fixed
+      argument interpolation bugs ("<foo bar='&lt;"> was being transformed
+      into "<foo bar='<'>") - Bug fixes
 
-0.13  Sun Aug 15 2004
-	- Added support for XML::LibXML
-	- Added tests for prechild, prechildren, postchild and postchildren
-	- DO_NOT_PROCESS, DO_SELF_ONLY, DO_SELF_AND_KIDS are now constants
-	- XML::XPathScript::Processor now has its own file
-	- Added Apache::Axkit::Language::YPathScript to the distribution 
-	- Fixed bugs in A:A:L::YPS 
-	- Added the template keys '#text' and '#comment' -- synonyms for
-		'text()' and 'comment()'. Although, behavior of those two
-		types of node altered: DO_SELF_ONLY will only print pre and
-		post keys, whereas DO_SELF_AND_KIDS will print the enclosed 
-		text
-	- Modified behavior of interpolating(), now returns the current
-		interpolating value
-	- Changed implementation detail such that <% print "stuff" %> works
+0.14 2004-09-23
+  - XML::XPathScript->current()->binmode() for non-UTF8 output
+  - Renamed XML::XPathScript::Toys to XML::XPathScript::Processor
+  - Introduction of testcode return value DO_TEXT_AS_CHILD  for text nodes
+    (see XML::XPathScript::Processor docs)
+  - Interpolation regex is now configurable
+  - Corrected Makefile.PL typo for XML::LibXML
+  - General bug and typo fixes
 
-0.10  Wed Aug 06 2003
-	- Enriched object-oriented interface, providing cache and
-	  code factoring with Apache::AxKit::Language::XPathScript
-	- Added ability to print to something else than STDOUT
-	- Support for text() template and document() XPath function
-	- Added same-directory searching for #include's
+0.13 2004-08-15
+  - Added support for XML::LibXML
+  - Added tests for prechild, prechildren, postchild and postchildren
+  - DO_NOT_PROCESS, DO_SELF_ONLY, DO_SELF_AND_KIDS are now constants
+  - XML::XPathScript::Processor now has its own file
+  - Added Apache::Axkit::Language::YPathScript to the distribution 
+  - Fixed bugs in A:A:L::YPS 
+  - Added the template keys '#text' and '#comment' -- synonyms for 'text()'
+    and 'comment()'. Although, behavior of those two types of node altered:
+    DO_SELF_ONLY will only print pre and post keys, whereas
+    DO_SELF_AND_KIDS will print the enclosed  text
+  - Modified behavior of interpolating(), now returns the current
+    interpolating value
+  - Changed implementation detail such that <% print "stuff" %> works
 
-0.03  Wed Jan 10 2000
-	- Added README
+0.10 2003-08-06
+  - Enriched object-oriented interface, providing cache and code factoring
+    with Apache::AxKit::Language::XPathScript
+  - Added ability to print to something else than STDOUT
+  - Support for text() template and document() XPath function
+  - Added same-directory searching for #include's
 
-0.02  Wed Jan 10 2000
-	- Change directory to stylesheet dir so relative stylesheets work
+0.03 2000-01-10
+  - Added README
 
-0.01  Wed Dec 27 17:52:37 2000
-	- original version; created by h2xs 1.19
+0.02 2000-01-10
+  - Change directory to stylesheet dir so relative stylesheets work
 
+0.01 2000-12-27T17:52:37Z
+  - original version; created by h2xs 1.19

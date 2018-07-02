@@ -4,9 +4,13 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.004';
+our $VERSION = '1.007';
 
-my %introduces = ( '5.026' => [qw[
+my %introduces = ( '5.028' => [qw[
+                                 delete% unicode10.0 state@=
+                             ]],
+
+                   '5.026' => [qw[
                                  <<~ /xx ^CAPTURE unicode9.0 unicode-scx
                               ]],
                    '5.024' => [qw[
@@ -41,17 +45,19 @@ my %introduces = ( '5.026' => [qw[
                                  stack-file-test recursive-sort /p
                                  lexical-$_
                               ]],
-                   '5.008' => [qw[
+                   '5.008001' => [qw[
                                  s-utf8-delimiters-hack
                               ]],
-                   # No construct to fake initial version ATM.
                    old => [qw[
+                                 ?? for-qw
                           ]],
                  );
 
 my %removed = ( 'auto-deref'             => '5.024',
                 'lexical-$_'             => '5.024',
+                '??'                     => '5.022',
                 's-utf8-delimiters-hack' => '5.020',
+                'for-qw'                 => '5.014',
               );
 
 my %_introduced = map {
@@ -98,7 +104,7 @@ sub import {
         if ($introduced{$_}) {
             ($min_version, $constr) = ($introduced{$_}, $_)
                 if $introduced{$_} gt $min_version;
-        } else {
+        } elsif (! $removed{$_}) {
             die "Unknown construct `$_' at ", _position(), ".\n"
         }
 
@@ -110,7 +116,7 @@ sub import {
         my $action = _hook()->{$_};
         push @actions, $action if $action;
     }
-    die 'Empty construct list at ', _position(), ".\n" if $min_version == 0;
+    die 'Empty construct list at ', _position(), ".\n" unless @_;
 
     my $nearest_stable = ( my $is_stable = $] =~ /^[0-5]\.[0-9][0-9][02468]/ )
                        ? $]
@@ -140,7 +146,7 @@ Syntax::Construct - Identify which non-feature constructs are used in the code.
 
 =head1 VERSION
 
-Version 1.004
+Version 1.007
 
 =head1 SYNOPSIS
 
@@ -207,6 +213,30 @@ version.
 
 =back
 
+=head2 Good Practice
+
+Some programmers just use all the I<non-features> their current Perl
+version provides without any notice. This leads to weird error
+messages in older Perl versions.
+
+Some other programmers will place C<use 5.22;> towards the top of the
+script, even if the only I<non-feature> they use is the C<//> operator
+available in 5.10 already. This prevents users of older versions of
+Perl to run the script, even if it would otherwise be easily possible.
+
+The kindest programmers will add C<use 5.10; # //> towards the top of
+the script. But it means they have to remember or find out what
+version introduced the I<non-feature> they use.
+
+B<Syntax::Construct> liberates you from the need to remember all the
+I<non-features> together with Perl versions that introduced them. It
+makes it easier for users of older Perl versions to migrate your code
+to their system. And finally, it improves the error messages they get.
+
+Similarly, it's a good practice to keep specifying C<use feature qw{
+postderef };> even if it's a no-op since 5.24: it makes your script
+available for people running older Perl versions. The same applies to
+C<use charnames> in 5.16 and later, etc.
 
 =head1 EXPORT
 
@@ -231,11 +261,11 @@ Same as C<introduced>, but for removed constructs (e.g. auto-deref in
 
 =head1 RECOGNISED CONSTRUCTS
 
-=head2 5.008
+=head2 5.008001
 
 =head3 s-utf8-delimiters-hack
 
-See below. The hack doesn't seem to work in 5.006.
+See below. The hack doesn't seem to work in 5.008 and older.
 
 =head2 5.010
 
@@ -512,27 +542,52 @@ L<perl5240delta/printf and sprintf now allow reordered precision arguments>.
 
 =head3 <<~
 
-L<perldelta/Indented Here documents>.
+L<perl526delta/Indented Here documents>.
 
 =head3 /xx
 
-L<perldelta/New-regular-expression-modifier-/xx>.
+L<perl526delta/New-regular-expression-modifier-/xx>.
 
 =head3 ^CAPTURE
 
-See C<@{^CAPTURE}>, C<%{^CAPTURE}>, and C<%{^CAPTURE_ALL}> in L<perldelta>.
+See C<@{^CAPTURE}>, C<%{^CAPTURE}>, and C<%{^CAPTURE_ALL}> in L<perl526delta>.
 
 =head3 unicode9.0
 
-L<perldelta/Unicode 9.0 is now supported>.
+L<perl526delta/Unicode 9.0 is now supported>.
 
 =head3 unicode-scx
 
 See I<"Use of \p{script} uses the improved Script_Extensions property">
-in L<perldelta>.
+in L<perl526delta>.
+
+=head2 5.028
+
+=head3 delete%
+
+See L<perldelta/delete-on-key/value-hash-slices>.
+
+=head3 unicode10.0
+
+See L<perldelta/Unicode 10.0 is supported>.
+
+=head3 state@=
+
+See L<perldelta/Initialisation-of-aggregate-state-variables>.
 
 =for completeness
 =head2 old
+
+=head2 Removed Constructs
+
+=head3 ??
+
+Removed in 5.022. See L<perl5220delta#Support for ?PATTERN? without
+explicit operator has been removed>.
+
+=head3 for-qw
+
+Removed in 5.14. See L<perl5140delta/Use of qw(...) as parentheses>.
 
 =head2 Accepted Features
 
@@ -599,7 +654,7 @@ L<Perl::MinimumVersion>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 - 2017 E. Choroba.
+Copyright 2013 - 2018 E. Choroba.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

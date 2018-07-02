@@ -55,11 +55,8 @@ solo/lib/TestCase/Struct.spvm
 solo/lib/TestCase/Weaken.spvm
 solo/lib/TestCase/Weaken2.spvm
 solo/Main.spvm
-solo/Makefile
-solo/README.md
-solo/spvm_main.c
-solo/t/spvm_t_array.c
-solo/t/spvm_t_hash.c
+solo/README
+solo/solo_Makefile.PL
 SPVM.xs
 spvm_base.h
 spvm_basic_type.c
@@ -69,6 +66,8 @@ spvm_block.h
 spvm_build/.gitkeep
 spvm_call_sub.c
 spvm_call_sub.h
+spvm_case_info.c
+spvm_case_info.h
 spvm_compiler.c
 spvm_compiler.h
 spvm_compiler_allocator.c
@@ -116,12 +115,12 @@ spvm_opcode_array.c
 spvm_opcode_array.h
 spvm_opcode_builder.c
 spvm_opcode_builder.h
-spvm_our.c
-spvm_our.h
 spvm_package.c
 spvm_package.h
 spvm_package_var.c
 spvm_package_var.h
+spvm_package_var_access.c
+spvm_package_var_access.h
 spvm_runtime.c
 spvm_runtime.h
 spvm_runtime_allocator.c
@@ -283,6 +282,8 @@ t/precompile/lib/TestCase/Short.spvm
 t/precompile/lib/TestCase/Simple.spvm
 t/precompile/lib/TestCase/SpecialAssign.spvm
 t/precompile/lib/TestCase/String.spvm
+t/precompile/lib/TestCase/Struct.native/Struct.c
+t/precompile/lib/TestCase/Struct.spvm
 t/precompile/lib/TestCase/Switch.spvm
 t/precompile/lib/TestCase/Weaken.spvm
 t/precompile/lib/TestCase/Weaken.wpvm

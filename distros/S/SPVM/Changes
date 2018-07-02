@@ -1,3 +1,84 @@
+0.0352 2018-06-27
+  - Separate mortal API and raw API
+    raw API create object which reference count is zero.
+    mortal API create object which refernece count is one and pushed to mortal stack.
+
+      [Mortal API]
+		  SPVM_RUNTIME_API_new_object
+		  SPVM_RUNTIME_API_new_byte_array
+		  SPVM_RUNTIME_API_new_short_array
+		  SPVM_RUNTIME_API_new_int_array
+		  SPVM_RUNTIME_API_new_long_array
+		  SPVM_RUNTIME_API_new_float_array
+		  SPVM_RUNTIME_API_new_double_array
+		  SPVM_RUNTIME_API_new_object_array
+		  SPVM_RUNTIME_API_new_multi_array
+		  SPVM_RUNTIME_API_new_string
+		  SPVM_RUNTIME_API_new_struct
+
+		  [Raw API]
+		  SPVM_RUNTIME_API_new_object_raw 
+		  SPVM_RUNTIME_API_new_byte_array_raw 
+		  SPVM_RUNTIME_API_new_short_array_raw 
+		  SPVM_RUNTIME_API_new_int_array_raw 
+		  SPVM_RUNTIME_API_new_long_array_raw 
+		  SPVM_RUNTIME_API_new_float_array_raw 
+		  SPVM_RUNTIME_API_new_double_array_raw 
+		  SPVM_RUNTIME_API_new_object_array_raw 
+		  SPVM_RUNTIME_API_new_multi_array_raw 
+		  SPVM_RUNTIME_API_new_string_raw 
+		  SPVM_RUNTIME_API_new_struct_raw 
+  - Add enter_scope and leave_scope native.h
+      If you use enter_scope, return scope_id. and you create objects,
+      and use leave_scope, objects is automatically released.
+		  {
+		    // Enter scope
+		    int32_t scope_id = env->enter_scope(env);
+
+		    env->new_int_array(env, 3);
+		    env->new_int_array(env, 3);
+		    env->new_int_array(env, 3);
+		    
+		    // Leave scope
+		    env->leave_scope(env, scope_id);
+		  }
+  
+  - remove SPVM_NATIVE_SUB macro in spvm_native.h. Native function name become start with SPVM_NATIVE_
+
+        SPVM_NATIVE_SUB(My__Point__clear)
+
+      is changed to
+
+        SPVM_NATIVE_My__Point__clear
+  - add SPVM_SUCCESS and SPVM_EXCEPTION macro in native.h
+      SPVM Native Interface must return 0 in success, or 1 in exception,
+      This mean exception flag, but this is little difficult to keep in mind.
+      I add SPVM_SUCCESS and SPVM_EXCEPTION macro.
+      You can use them
+      
+        return SPVM_SUCCESS
+        
+        return SPVM_EXCEPTION;
+      
+0.0351 2018-06-23
+  - improve exception message
+  - create_exception_stack_trace become receive package_name, sub_name, file instead of sub_id
+  - LOOKUP_SWITCH opcode become 1 operation
+  - opcode become 64bit from 128bit
+0.0350 2018-06-22
+  - improve solo SPVM tests command
+      You can run solo tests by the following commands. This comands is wrote in solo/README
+      
+     # Normal run
+     yacc/bison.sh && perl Makefile.PL && make && perl solo/solo_Makefile.PL && make -f solo/Makefile && ./solo/spvm_main TestCase
+
+     # Debug run - Print AST, package information, operaion codes
+     yacc/bison.sh && perl Makefile.PL --OPTIMIZE=O --DEFINE=SPVM_DEBUG_DUMP --DEFINE=SPVM_DEBUG_OBJECT_COUNT && make && perl solo/solo_Makefile.PL && make -f solo/Makefile && ./solo/spvm_main TestCase
+
+     # Parser Debug run - Print yacc result
+     yacc/bison.sh && perl Makefile.PL --OPTIMIZE=O --DEFINE=SPVM_DEBUG_YACC && make && perl solo/solo_Makefile.PL && make -f solo/Makefile && ./solo/spvm_main TestCase
+  - use package relative id in field access, call sub, package variable access, type
+      
 0.0349 2018-06-15
   - rename SPVM::Build::Base to SPVM::Build::CBuilder
   - rename SPVM::Build::Native to SPVM::Build::CBuilder::Native

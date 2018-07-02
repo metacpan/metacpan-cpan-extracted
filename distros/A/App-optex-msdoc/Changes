@@ -1,0 +1,19 @@
+Revision history for Perl extension App-optex-msdoc
+
+0.04 2018-07-02T08:52:29Z
+
+    - requires 'App::Greple::msdoc', '1.01';
+
+0.03 2018-07-01T04:39:19Z
+
+    - See OPTEX_MSDOC_CONVERTER variable, and support pandoc and tika.
+
+0.02 2018-07-01T02:07:39Z
+
+    - Add --git-external-diff option.
+    - Check file existence.
+
+0.01 2018-06-26T16:20:32Z
+
+    - original version
+

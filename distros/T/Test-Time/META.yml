@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,16 +25,17 @@ no_index:
 provides:
   Test::Time:
     file: lib/Test/Time.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Test::More: '0'
 resources:
   bugtracker: https://github.com/cho45/Test-Time/issues
   homepage: https://github.com/cho45/Test-Time
   repository: git://github.com/cho45/Test-Time.git
-version: '0.05'
+version: '0.06'
 x_contributors:
-  - 'Graham Knop <haarg@haarg.org>'
   - 'minimalist <minimalist@lavabit.com>'
   - 'motemen <motemen@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'Michael Jemmeson <mjemmeson@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

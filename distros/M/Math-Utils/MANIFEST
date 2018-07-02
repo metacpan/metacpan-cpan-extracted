@@ -4,6 +4,11 @@ lib/Math/Utils.pm
 Makefile.PL
 MANIFEST			This list of files
 README
+eg/derivative.pl
+eg/division.pl
+eg/evaluate.pl
+eg/finitedif.pl
+eg/multiply.pl
 t/00-load.t
 t/01-compare.t
 t/02-signs.t
@@ -11,6 +16,7 @@ t/03-logarithm.t
 t/04-fsum.t
 t/05-intfns.t
 t/06-moduli.t
+t/07-gcdlcm.t
 t/10-add.t
 t/11-subtract.t
 t/12-multiply.t

@@ -10,7 +10,7 @@ use List::MoreUtils qw/uniq/;
 
 with 'Bio::Grid::Run::SGE::Role::Indexable';
 
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 sub BUILD {
   my ($self) = @_;

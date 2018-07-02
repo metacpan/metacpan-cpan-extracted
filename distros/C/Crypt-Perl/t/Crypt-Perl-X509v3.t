@@ -17,6 +17,8 @@ use Test::NoWarnings;
 use Test::Deep;
 use Test::Exception;
 
+use Try::Tiny;
+
 use File::Temp;
 
 use lib "$FindBin::Bin/lib";
@@ -124,6 +126,29 @@ END
 
 sub test_creation : Tests() {
     my @key_combos = _key_combos();
+
+    my @needs_64bit;
+    if (try { pack 'Q' }) {
+        push @needs_64bit, (
+            [
+                'ct_precert_scts',
+                {
+                    timestamp => 1,
+                    key_id => pack( 'H*', 'ee4bbdb775ce60bae142691fabe19e66a30f7e5fb072d88300c47b897aa8fdcb'),
+                    hash_algorithm => 'sha256',
+                    signature_algorithm => 'ecdsa',
+                    signature => pack( 'H*', '3045022100e6fd1355f87c62d18d3f9628ffd074223764c947092bf3965c2584415b91472002200173b64dee1dcba40bd871c53073efd931acceec59368bdb97979ff07f9301c5'),
+                },
+                {
+                    timestamp => 100100,
+                    key_id => pack( 'H*', 'db74afeecb29ecb1feca3e716d2ce5b9aabb36f7847183c75d9d4f37b61fbf64' ),
+                    hash_algorithm => 'sha256',
+                    signature_algorithm => 'ecdsa',
+                    signature => pack( 'H*', '3046022100ac559e93ccd09148e802e54ad3f7832e0464c0c071eb64b6d3fd52f2cf7fabe0022100d83199b57a1c4f80267901984525970757213a44b982d4a3c4903b3a62552fb2'),
+                },
+            ],
+        );
+    }
 
     for my $kc (@key_combos) {
         my ($label, $subject_pem, $signer_pem) = @$kc;
@@ -266,23 +291,9 @@ sub test_creation : Tests() {
                     },
                 ],
                 [ 'ct_precert_poison' ],
-                [
-                    'ct_precert_scts',
-                    {
-                        timestamp => 1,
-                        key_id => pack( 'H*', 'ee4bbdb775ce60bae142691fabe19e66a30f7e5fb072d88300c47b897aa8fdcb'),
-                        hash_algorithm => 'sha256',
-                        signature_algorithm => 'ecdsa',
-                        signature => pack( 'H*', '3045022100e6fd1355f87c62d18d3f9628ffd074223764c947092bf3965c2584415b91472002200173b64dee1dcba40bd871c53073efd931acceec59368bdb97979ff07f9301c5'),
-                    },
-                    {
-                        timestamp => 100100,
-                        key_id => pack( 'H*', 'db74afeecb29ecb1feca3e716d2ce5b9aabb36f7847183c75d9d4f37b61fbf64' ),
-                        hash_algorithm => 'sha256',
-                        signature_algorithm => 'ecdsa',
-                        signature => pack( 'H*', '3046022100ac559e93ccd09148e802e54ad3f7832e0464c0c071eb64b6d3fd52f2cf7fabe0022100d83199b57a1c4f80267901984525970757213a44b982d4a3c4903b3a62552fb2'),
-                    },
-                ],
+
+                @needs_64bit,
+
                 [ 'acmeValidation-v1' => join( q<>, map { chr } 0 .. 31 ) ],
                 #[ 'subjectDirectoryAttributes',
                 #    [ commonName => 'foo', 'bar' ],

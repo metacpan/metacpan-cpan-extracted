@@ -1,5 +1,5 @@
 package Linux::Epoll;
-$Linux::Epoll::VERSION = '0.013';
+$Linux::Epoll::VERSION = '0.014';
 use 5.010;
 use strict;
 use warnings FATAL => 'all';
@@ -24,7 +24,7 @@ Linux::Epoll - O(1) multiplexing for Linux
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -76,6 +76,18 @@ Stream socket peer closed the connection, or shut down the writing half of conne
 =item * oneshot
 
 Sets the one-shot behavior for the associated file descriptor. This means that after an event is pulled out with C<wait> the associated file descriptor is internally disabled and no other events will be reported by the epoll interface. The user must call C<modify> to rearm the file descriptor with a new event mask.
+
+=item * wakeup
+
+If C<oneshot> and C<et> are clear and the process has the C<CAP_BLOCK_SUSPEND> capability, ensure that the system does not enter "suspend" or "hibernate" while this event is pending or being processed. The event is considered as being "processed" from the time when it is returned by a call to epoll_wait(2) until the next call to epoll_wait(2) on the same epoll(7) file descriptor, the closure of that file descriptor, the removal of the event file descriptor with EPOLL_CTL_DEL, or the clearing of EPOLLWAKEUP for the event file descriptor with EPOLL_CTL_MOD.
+
+=item * exclusive
+
+Sets an exclusive wakeup mode for the epoll file descriptor that is being attached to the target file descriptor, fd. When a wakeup event occurs and multiple epoll file descriptors are attached to the same target file using C<exclusive>, one or more of the epoll file descriptors will receive an event with C<wait()>. The default in this scenario (when C<exclusive> is not set) is for all epoll file descriptors to receive an event. C<exclusive> is thus useful for avoiding thundering herd problems in certain scenarios.
+
+If the same file descriptor is in multiple epoll instances, some with the C<exclusive> flag, and others without, then events will be provided to all epoll instances that did not specify C<exclusive>, and at least one of the epoll instances that did specify C<exclusive>.
+
+The following values may be specified in conjunction with C<exclusive>: C<in>, C<out>, C<wakeup>, and C<et>. C<hup> and C<err> can also be specified, but this is not required: as usual, these events are always reported if they occur, regardless of whether they are specified in events. Attempts to specify other values in events yield an error. C<exclusive> may be used only in an C<add()> operation; attempts to employ it with C<modify> yield an error. If C<exclusive> has been set using C<add()>, then a subsequent C<modify()> on the same epfd, fd pair yields an error. A call to C<add(> that specifies C<exclusive> in events and specifies the target file descriptor fd as an epoll instance will likewise fail. The error in all of these cases is C<EINVAL>.
 
 =back
 

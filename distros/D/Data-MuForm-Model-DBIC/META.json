@@ -68,7 +68,7 @@
          "web" : "http://github.com/gshank/data-muform-model-dbic"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

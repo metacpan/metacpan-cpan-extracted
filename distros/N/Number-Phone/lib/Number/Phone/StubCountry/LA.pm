@@ -22,34 +22,43 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
                   'pattern' => '(20)(\\d{2})(\\d{3})(\\d{3})',
+                  'leading_digits' => '20',
                   'format' => '$1 $2 $3 $4',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '20'
+                  'national_rule' => '0$1'
                 },
                 {
+                  'pattern' => '([2-8]\\d)(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
                   'leading_digits' => '
             2[13]|
             3[14]|
             [4-8]
-          ',
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'pattern' => '([2-8]\\d)(\\d{3})(\\d{3})'
+          '
                 },
                 {
-                  'leading_digits' => '30',
+                  'pattern' => '(30)(\\d{2})(\\d{2})(\\d{3})',
                   'national_rule' => '0$1',
                   'format' => '$1 $2 $3 $4',
-                  'pattern' => '(30)(\\d{2})(\\d{2})(\\d{3})'
+                  'leading_digits' => '30'
                 }
               ];
 
 my $validators = {
+                'mobile' => '
+          20(?:
+            2[2389]|
+            5[24-689]|
+            7[6-8]|
+            9[1-35-9]
+          )\\d{6}
+        ',
+                'specialrate' => '',
                 'geographic' => '
           (?:
             2[13]|
@@ -62,17 +71,8 @@ my $validators = {
             8[1468]
           )\\d{6}
         ',
-                'specialrate' => '',
-                'mobile' => '
-          20(?:
-            2[2389]|
-            5[24-689]|
-            7[6-8]|
-            9[125-9]
-          )\\d{6}
-        ',
                 'pager' => '',
-                'personal_number' => '',
+                'toll_free' => '',
                 'fixed_line' => '
           (?:
             2[13]|
@@ -85,8 +85,8 @@ my $validators = {
             8[1468]
           )\\d{6}
         ',
-                'toll_free' => '',
-                'voip' => ''
+                'voip' => '',
+                'personal_number' => ''
               };
 
     sub new {

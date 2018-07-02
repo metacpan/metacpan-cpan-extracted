@@ -21,7 +21,7 @@ sub debug {
   print STDERR @_ if $debug;
 }
 
-our $VERSION = v0.015;
+our $VERSION = '0.016';
 my @signames = grep {!/^__/} keys %SIG; # capture before anyone has probably localized it.
 
 for my $p (qw/tmp mount pid net ipc user uts sysvsem/) {
@@ -175,7 +175,7 @@ This module requires your script to have CAP_SYS_ADMIN, usually by running as C<
 
 Construct a new Sys::Linux::Namespace object.  This collects all the options you want to enable, but does not engage them.
 
-All arguments are passed in like a hash.
+All arguments are passed in like a hash.  This module uses Moo to build up the object, so all the below attributes can also be accessed on the instantiated object too.
 
 =over 1
 
@@ -227,11 +227,11 @@ Create a new System V Semaphore namespace.  This will let you create new semapho
 
 =head2 C<setup>
 
-Engage the namespaces with all the configured options.
+Engage the namespaces with all the configured options.  This does not fork, and affects the existing process.  The changes cannot be undone.
 
 =head2 C<run>
 
-Engage the namespaces on an unsuspecting coderef.  Arguments are passed in like a hash
+Engage the namespaces on an unsuspecting coderef.  Arguments are passed in like a hash.  This will perform a fork to run the coderef in the new namespaces
 
 =over 1
 
@@ -240,6 +240,10 @@ Engage the namespaces on an unsuspecting coderef.  Arguments are passed in like 
 The coderef to run.  It will receive all arguments passed to C<< ->run() >> as a hash.
 
 =back
+
+=head1 Debugging
+
+If $Sys::Linux::Namespace::debug is set to a true value, then some debugging messages will be sent to STDERR
 
 =head1 AUTHOR
 

@@ -1,0 +1,33 @@
+---
+abstract: 'given an ip block in cidr notation, show all reverse IP lookups'
+author:
+  - 'Kevin Phair <phair.kevin@gmail.com>'
+build_requires:
+  Module::Build: '0.28'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-showreverse
+requires:
+  App::Cmd::Simple: '0'
+  Net::CIDR: '0.18'
+  Net::DNS: '1.01'
+  Net::Works::Network: '0.21'
+  autodie: '0'
+  base: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/klp2/App-showreverse
+  repository: https://github.com/klp2/App-showreverse.git
+version: 0.0.3
+x_serialization_backend: 'YAML::Tiny version 1.70'

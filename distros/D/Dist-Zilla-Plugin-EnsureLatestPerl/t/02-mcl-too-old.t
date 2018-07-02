@@ -45,7 +45,7 @@ $tzil->chrome->logger->set_debug(1);
 ### BEGIN $tzil->release check
 like(
     exception { $tzil->release },
-    qr/^\[EnsureLatestPerl\] Module::CoreList is not new enough to check if this is the latest Perl \(expected at least 5\.203711\d\d\) -- disable check with DZIL_ANY_PERL=1/,
+    qr/^\[EnsureLatestPerl\] Module::CoreList is not new enough to check if this is the latest Perl \(expected at least 5\.203710\d\d\) -- disable check with DZIL_ANY_PERL=1/,
     'release halts if Module::CoreList is too much out of date',
 );
 ### END $tzil->release check

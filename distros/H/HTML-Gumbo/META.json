@@ -4,7 +4,7 @@
       "Ruslan Zakirov E<lt>ruz@bestpractical.comE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
    "provides" : {
       "HTML::Gumbo" : {
          "file" : "lib/HTML/Gumbo.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "url" : "https://github.com/ruz/HTML-Gumbo"
       }
    },
-   "version" : "0.17",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

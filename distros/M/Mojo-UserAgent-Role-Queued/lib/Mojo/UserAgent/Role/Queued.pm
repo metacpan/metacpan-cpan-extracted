@@ -2,29 +2,14 @@ package Mojo::UserAgent::Role::Queued;
 use Mojo::Base '-role';
 use Scalar::Util 'weaken';
 
-our $VERSION = "0.04";
+our $VERSION = "1.01";
 
 has max_active => sub { shift->max_connections };
 
-around start => sub {
-  my ($orig, $self, $tx, $cb) = @_;
-  if ($cb) {
-    $self->_enqueue($orig, {tx => $tx, cb => $cb});
-  }
-  else {
-    return $orig->($self, $tx); # Blocking calls skip the queue
-  }
-};
+# Private methods:
 
-sub _enqueue {
-  my ($self, $original_start, $job) = @_;
-  $self->{'jobs'} ||= [];
-  push @{$self->{'jobs'}}, $job;
-  $self->_process($original_start);
-}
-
-sub _process {
-  my ($self, $original_start) = @_;
+my $_process_queue = sub {
+  my ($self, $original_start, $ref_to_this_sub) = @_;
   state $start //= $original_start;
   state $active //= 0;
   # we have jobs and can run them:
@@ -34,13 +19,31 @@ sub _process {
     my ($tx, $cb) = ($job->{tx}, $job->{cb});
     $active++;
     weaken $self;
-    $tx->on(finish => sub { $active--; $self->_process() });
+    $tx->on(finish => sub { $active--; $self->$ref_to_this_sub() });
     $start->( $self, $tx, $cb );
   }
   if (scalar @{$self->{'jobs'}} == 0 && $active == 0) {
-    $self->emit('stop_queue');
+    $self->emit('queue_empty');
   }
-}
+};
+
+my $_enqueue = sub {
+  my ($self, $original_start, $job) = @_;
+  $self->{'jobs'} ||= [];
+  push @{$self->{'jobs'}}, $job;
+  $self->$_process_queue($original_start, $_process_queue);
+};
+
+
+around start => sub {
+  my ($orig, $self, $tx, $cb) = @_;
+  if ($cb) {
+    $self->$_enqueue($orig, {tx => $tx, cb => $cb});
+  }
+  else {
+    return $orig->($self, $tx); # Blocking calls skip the queue
+  }
+};
 
 
 1;
@@ -56,7 +59,7 @@ Mojo::UserAgent::Role::Queued - A role to process non-blocking requests in a rat
 
     use Mojo::UserAgent;
 
-    my $ua = Mojo::UserAgent->new->with_role('+Queued');
+    my $ua = Mojo::UserAgent->new->with_roles('+Queued');
     $ua->max_redirects(3);
     $ua->max_active(5); # process up to 5 requests at a time
     for my $url (@big_list_of_urls) {
@@ -80,8 +83,6 @@ Mojo::UserAgent::Role::Queued - A role to process non-blocking requests in a rat
 
 Mojo::UserAgent::Role::Queued manages all non-blocking requests made through L<Mojo::UserAgent> in a queue to limit the number of simultaneous requests.
 
-B<THIS IS AN INITIAL RELEASE>.
-
 L<Mojo::UserAgent> can make multiple concurrent non-blocking HTTP requests using Mojo's event loop, but because there is only a single process handling all of them, you must take care to limit the number of simultaneous requests you make.
 
 Some discussion of this issue is available here
@@ -95,11 +96,11 @@ L<Mojo::UserAgent::Role::Queued> tries to generalize the practice of managing a 
 
 L<Mojo::UserAgent::Role::Queued> adds the following event to those emitted by L<Mojo::UserAgent>:
 
-=head2 stop_queue
+=head2 queue_empty
 
-  $ua->on(stop_queue => sub { my ($ua) = @_; .... })
+  $ua->on(queue_empty => sub { my ($ua) = @_; .... })
 
-Emitted when the queue has been emptied of all pending jobs.
+Emitted when the queue has been emptied of all pending jobs. In previous releases, this event was called C<stop_queue> (B<this is a breaking change>).
 
 =head1 ATTRIBUTES
 

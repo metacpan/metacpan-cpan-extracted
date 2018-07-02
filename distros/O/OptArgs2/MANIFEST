@@ -4,6 +4,7 @@ cpanfile
 error
 example/demo
 example/simple
+lib/Getopt/Args2.pm
 lib/OptArgs2.pm
 MANIFEST			This list of files
 t/OptArgs2.t

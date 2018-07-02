@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -23,7 +21,7 @@ package MongoDB::Op::_GetMore;
 # (after inflation from BSON)
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -31,7 +29,9 @@ use MongoDB::_Protocol;
 use Types::Standard qw(
   Maybe
   Any
-  Num
+);
+use MongoDB::_Types qw(
+    Numish
 );
 
 use namespace::clean;
@@ -45,12 +45,12 @@ has cursor_id => (
 has batch_size => (
     is       => 'ro',
     required => 1,
-    isa      => Num,
+    isa      => Numish,
 );
 
 has max_time_ms => (
     is  => 'ro',
-    isa => Num,
+    isa => Numish,
 );
 
 with $_ for qw(
@@ -64,7 +64,7 @@ sub execute {
     my ( $self, $link ) = @_;
 
     my $res =
-        $link->accepts_wire_version(4)
+        $link->supports_query_commands
       ? $self->_command_get_more($link)
       : $self->_legacy_get_more($link);
 
@@ -74,18 +74,13 @@ sub execute {
 sub _command_get_more {
     my ( $self, $link ) = @_;
 
-    my $cmd = [
-        getMore    => $self->cursor_id,
-        collection => $self->coll_name,
-        ( $self->batch_size > 0 ? ( batchSize => $self->batch_size )  : () ),
-        ( $self->max_time_ms    ? ( maxTimeMS => $self->max_time_ms ) : () ),
-    ];
-
     my $op = MongoDB::Op::_Command->_new(
-        db_name     => $self->db_name,
-        query       => $cmd,
-        query_flags => {},
-        bson_codec  => $self->bson_codec,
+        db_name             => $self->db_name,
+        query               => $self->_as_command,
+        query_flags         => {},
+        bson_codec          => $self->bson_codec,
+        session             => $self->session,
+        monitoring_callback => $self->monitoring_callback,
     );
 
     my $c = $op->execute($link)->output->{cursor};
@@ -98,6 +93,16 @@ sub _command_get_more {
         number_returned => scalar @$batch,
         docs            => $batch,
     };
+}
+
+sub _as_command {
+    my ($self) = @_;
+    return [
+        getMore    => $self->cursor_id,
+        collection => $self->coll_name,
+        ( $self->batch_size > 0 ? ( batchSize => $self->batch_size )  : () ),
+        ( $self->max_time_ms    ? ( maxTimeMS => $self->max_time_ms ) : () ),
+    ];
 }
 
 sub _legacy_get_more {

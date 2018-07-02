@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Resolve" => "0.003",
     "Data::Sah::Util::Subschema" => 0,
     "Dist::Zilla::File::InMemory" => 0,
+    "Dist::Zilla::Role::CheckPackageDeclared" => 0,
     "Dist::Zilla::Role::FileFinderUser" => 0,
     "Dist::Zilla::Role::FileGatherer" => 0,
     "Dist::Zilla::Role::FileMunger" => 0,
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,6 +56,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Resolve" => "0.003",
   "Data::Sah::Util::Subschema" => 0,
   "Dist::Zilla::File::InMemory" => 0,
+  "Dist::Zilla::Role::CheckPackageDeclared" => 0,
   "Dist::Zilla::Role::FileFinderUser" => 0,
   "Dist::Zilla::Role::FileGatherer" => 0,
   "Dist::Zilla::Role::FileMunger" => 0,

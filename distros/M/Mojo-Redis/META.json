@@ -1,16 +1,16 @@
 {
-   "abstract" : "DEPRECATED Redis client",
+   "abstract" : "Redis driver based on Mojo::IOLoop",
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojo-Redis",
    "no_index" : {
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -32,21 +30,28 @@
       },
       "runtime" : {
          "requires" : {
-            "Encode" : "0",
-            "Mojolicious" : "3.0",
-            "Protocol::Redis" : "1.0"
+            "Mojolicious" : "7.30",
+            "Protocol::Redis" : "1.0006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/marcusramberg/mojo-redis/issues"
+         "web" : "https://github.com/jhthorsen/mojo-redis/issues"
       },
-      "homepage" : "https://github.com/marcusramberg/mojo-redis",
+      "homepage" : "https://github.com/jhthorsen/mojo-redis",
       "repository" : {
-         "url" : "https://github.com/marcusramberg/mojo-redis.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/mojo-redis.git",
+         "web" : "https://github.com/jhthorsen/mojo-redis"
       }
    },
-   "version" : "1.02"
+   "version" : "3.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

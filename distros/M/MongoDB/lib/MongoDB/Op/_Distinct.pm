@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::Op::_Distinct;
 # Encapsulate distinct operation; return MongoDB::QueryResult
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -87,17 +85,19 @@ sub execute {
         distinct => $self->coll_name,
         key      => $self->fieldname,
         query    => $filter,
-        ($link->accepts_wire_version(4) ?
-            @{ $self->read_concern->as_args } : ()),
+        ($link->supports_read_concern ?
+            @{ $self->read_concern->as_args( $self->session) } : ()),
         %$options
     );
 
     my $op = MongoDB::Op::_Command->_new(
-        db_name         => $self->db_name,
-        query           => Tie::IxHash->new(@command),
-        query_flags     => {},
-        read_preference => $self->read_preference,
-        bson_codec      => $self->bson_codec,
+        db_name             => $self->db_name,
+        query               => Tie::IxHash->new(@command),
+        query_flags         => {},
+        read_preference     => $self->read_preference,
+        bson_codec          => $self->bson_codec,
+        session             => $self->session,
+        monitoring_callback => $self->monitoring_callback,
     );
 
     my $res = $op->execute( $link, $topology );

@@ -54,7 +54,7 @@ get+post '/02/request' => sub {
 neaf->run;
 
 __DATA__
-@@ [TT02] main.html
+@@ main.html view=TT02
 <head>
     <title>[% title | html %] - [% file | html %]</title>
     <style>

@@ -1,17 +1,31 @@
-# http://module-build.sourceforge.net/META-spec-current.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Term-Clui
-version:      1.71
-version_from: Clui.pm
-installdirs:  site
+---
+abstract: 'Perl module offering a Command-Line User Interface'
+author:
+  - 'PJB, Peter Billam, www.pjb.com.au/comp/contact.html'
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.56'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Clui
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Term::ReadKey: 0
-  Term::ReadLine::Gnu: 0
-  Extutils::MakeMaker: 0
-  File::Copy: 0
-recommends:
-  Term::Size: 0
-license:      perl
-distribution_type: module
-generated_by: /usr/bin/vim
-
+  File::Copy: '0'
+  Term::ReadKey: '0'
+  Term::ReadLine::Gnu: '0'
+  perl: '5.006000'
+resources:
+  bugtracker: https://github.com/plicease/Term-Clui/issues
+  homepage: https://metacpan.org/pod/Term-Clui
+  repository: https://github.com/plicease/Term-Clui.git
+version: '1.72'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -22,10 +22,12 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d)(\\d{3})(\\d{3,4})',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
             [12]|
@@ -33,9 +35,7 @@ my $formatters = [
               0[3-9]|
               [1-9]
             )
-          ',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d)(\\d{3})(\\d{3,4})'
+          '
                 },
                 {
                   'leading_digits' => '
@@ -46,25 +46,25 @@ my $formatters = [
             )|
             8[2-9]
           ',
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{2,3})'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             70|
             8[01]|
             90[235-9]
-          ',
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
+          '
                 },
                 {
-                  'national_rule' => '0$1',
+                  'pattern' => '([78]00)(\\d{4})(\\d{4,5})',
                   'leading_digits' => '[78]00',
                   'format' => '$1 $2 $3',
-                  'pattern' => '([78]00)(\\d{4})(\\d{4,5})'
+                  'national_rule' => '0$1'
                 },
                 {
                   'pattern' => '([78]00)(\\d{5})(\\d{5,6})',
@@ -73,39 +73,15 @@ my $formatters = [
                   'format' => '$1 $2 $3'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'leading_digits' => '78',
+                  'pattern' => '(78)(\\d{2})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(78)(\\d{2})(\\d{3})'
+                  'national_rule' => '0$1',
+                  'leading_digits' => '78'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          [12]\\d{6,7}|
-          9(?:
-            0[3-9]|
-            [1-9]\\d
-          )\\d{5}|
-          (?:
-            3\\d|
-            4[023568]|
-            5[02368]|
-            6[02-469]|
-            7[4-69]|
-            8[2-9]
-          )\\d{6}|
-          (?:
-            4[47]|
-            5[14579]|
-            6[1578]|
-            7[0-357]
-          )\\d{5,6}|
-          (?:
-            78|
-            41
-          )\\d{5}
-        ',
+                'specialrate' => '(700\\d{7,11})',
                 'mobile' => '
           (?:
             1(?:
@@ -197,9 +173,7 @@ my $validators = {
             90[235-9]\\d
           )\\d{6}
         ',
-                'specialrate' => '(700\\d{7,11})',
-                'pager' => '',
-                'personal_number' => '',
+                'toll_free' => '800\\d{7,11}',
                 'fixed_line' => '
           [12]\\d{6,7}|
           9(?:
@@ -225,8 +199,34 @@ my $validators = {
             41
           )\\d{5}
         ',
-                'toll_free' => '800\\d{7,11}',
-                'voip' => ''
+                'voip' => '',
+                'personal_number' => '',
+                'geographic' => '
+          [12]\\d{6,7}|
+          9(?:
+            0[3-9]|
+            [1-9]\\d
+          )\\d{5}|
+          (?:
+            3\\d|
+            4[023568]|
+            5[02368]|
+            6[02-469]|
+            7[4-69]|
+            8[2-9]
+          )\\d{6}|
+          (?:
+            4[47]|
+            5[14579]|
+            6[1578]|
+            7[0-357]
+          )\\d{5,6}|
+          (?:
+            78|
+            41
+          )\\d{5}
+        ',
+                'pager' => ''
               };
 my %areanames = (
   2341 => "Lagos",

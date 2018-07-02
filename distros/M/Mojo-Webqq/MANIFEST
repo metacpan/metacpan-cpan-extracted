@@ -3,6 +3,7 @@ API.md
 Changes
 Collection.md
 Controller-API.md
+cpanfile
 demo/echo-reply.pl
 demo/load-plugin.pl
 demo/openqq-client.pl

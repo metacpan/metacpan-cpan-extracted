@@ -12,7 +12,7 @@ File::Find::Object::Rule::Procedural - File::Find::Object::Rule's procedural int
 
 =head1 VERSION
 
-version 0.0307
+version 0.0309
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ like so:
 
 =head1 VERSION
 
-version 0.0307
+version 0.0309
 
 =head1 AUTHOR
 

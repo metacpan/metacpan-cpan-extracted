@@ -23,7 +23,7 @@ use Perl::MinimumVersion;
 use Term::ANSIColor qw/colored/;
 use YAML::Syck qw/LoadFile/;
 
-our $VERSION = version->new('0.0.8');
+our $VERSION = version->new('0.0.9');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -95,7 +95,7 @@ sub main {
         else {
             eval {
                 push @dirs, grep {!/^[.][^.]+/} path($file)->children;
-                warn "$file\n" if $option{verbose} > 1;
+                warn "$file\n" if $option{verbose} > 5;
             };
         }
     }
@@ -340,8 +340,8 @@ sub process_file {
 sub pre_specified {
     my %requires;
 
-    if (-f 'META.yml') {
-        my $meta = LoadFile('META.yml');
+    if (-f 'MYMETA.yml' || -f 'META.yml') {
+        my $meta = LoadFile((-f 'MYMETA.yml' ? 'MY' : '') . 'META.yml');
         %requires = map {( $_ => { version => $meta->{requires}{$_} } )} keys %{ $meta->{requires} || {} };
         %requires = (
             %requires,

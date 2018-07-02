@@ -14,7 +14,6 @@ WriteMakefile(
     TEST_REQUIRES  => {
         'Data::Dumper' => 0,
         'Path::Tiny'   => 0,
-        'Ref::Util'    => 0,
         'Test::More'   => 0,
         'Test::Output' => 0,
         'Text::Trim'   => 0,

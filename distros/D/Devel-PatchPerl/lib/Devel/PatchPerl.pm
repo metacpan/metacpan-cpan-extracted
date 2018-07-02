@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '1.48';
+$Devel::PatchPerl::VERSION = '1.52';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -260,6 +260,15 @@ my @patch = (
               qr/^5\.24\.[01]$/,
             ],
     subs => [ [ \&_patch_time_hires ] ],
+  },
+  {
+    perl => [
+              qr/^5\.24\.3$/,
+              qr/^5\.25\.(?:[4-9]|10)$/,
+              qr/^5\.26\.[01]$/,
+              qr/^5\.27\.[0-4]$/,
+            ],
+    subs => [ [ \&_patch_fp_class_denorm ] ],
   },
 );
 
@@ -7633,6 +7642,79 @@ index 1124eb6483..3fa91f3a0b 100644
 END
 }
 
+sub _patch_fp_class_denorm {
+  my $perlver = shift;
+  my $num = _norm_ver( $perlver );
+
+  if ($num < 5.025004) {
+    _patch(<<'END');
+--- perl.h.orig
++++ perl.h
+@@ -1585,6 +1585,26 @@ EXTERN_C char *crypt(const char *, const char *);
+ #endif
+ #endif
+ 
++/* We have somehow managed not to define the denormal/subnormal
++ * detection.
++ *
++ * This may happen if the compiler doesn't expose the C99 math like
++ * the fpclassify() without some special switches.  Perl tries to
++ * stay C89, so for example -std=c99 is not an option.
++ *
++ * The Perl_isinf() and Perl_isnan() should have been defined even if
++ * the C99 isinf() and isnan() are unavailable, and the NV_MIN becomes
++ * from the C89 DBL_MIN or moral equivalent. */
++#if !defined(Perl_fp_class_denorm) && defined(Perl_isinf) && defined(Perl_isnan) && defined(NV_MIN)
++#  define Perl_fp_class_denorm(x) ((x) != 0.0 && !Perl_isinf(x) && !Perl_isnan(x) && PERL_ABS(x) < NV_MIN)
++#endif
++
++/* This is not a great fallback: subnormals tests will fail,
++ * but at least Perl will link and 99.999% of tests will work. */
++#if !defined(Perl_fp_class_denorm)
++#  define Perl_fp_class_denorm(x) FALSE
++#endif
++
+ /* There is no quadmath_vsnprintf, and therefore my_vsnprintf()
+  * dies if called under USE_QUADMATH. */
+ #if defined(HAS_VSNPRINTF) && defined(HAS_C99_VARIADIC_MACROS) && !(defined(DEBUGGING) && !defined(PERL_USE_GCC_BRACE_GROUPS)) && !defined(PERL_GCC_PEDANTIC)
+END
+
+  }
+  else {
+    _patch(<<'END');
+--- perl.h.orig
++++ perl.h
+@@ -6867,6 +6867,26 @@ extern void moncontrol(int);
+ #  endif
+ #endif
+ 
++/* We have somehow managed not to define the denormal/subnormal
++ * detection.
++ *
++ * This may happen if the compiler doesn't expose the C99 math like
++ * the fpclassify() without some special switches.  Perl tries to
++ * stay C89, so for example -std=c99 is not an option.
++ *
++ * The Perl_isinf() and Perl_isnan() should have been defined even if
++ * the C99 isinf() and isnan() are unavailable, and the NV_MIN becomes
++ * from the C89 DBL_MIN or moral equivalent. */
++#if !defined(Perl_fp_class_denorm) && defined(Perl_isinf) && defined(Perl_isnan) && defined(NV_MIN)
++#  define Perl_fp_class_denorm(x) ((x) != 0.0 && !Perl_isinf(x) && !Perl_isnan(x) && PERL_ABS(x) < NV_MIN)
++#endif
++
++/* This is not a great fallback: subnormals tests will fail,
++ * but at least Perl will link and 99.999% of tests will work. */
++#if !defined(Perl_fp_class_denorm)
++#  define Perl_fp_class_denorm(x) FALSE
++#endif
++
+ #ifdef DOUBLE_IS_IEEE_FORMAT
+ #  define DOUBLE_HAS_INF
+ #  define DOUBLE_HAS_NAN
+END
+  }
+}
+
 sub _norm_ver {
   my $ver = shift;
   my @v = split(qr/[._]0*/, $ver);
@@ -7674,7 +7756,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 1.48
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -7740,7 +7822,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams and Marcus Holland-Moritz.
+This software is copyright (c) 2018 by Chris Williams and Marcus Holland-Moritz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

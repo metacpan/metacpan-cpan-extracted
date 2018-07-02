@@ -1,5 +1,21 @@
 Revision history for Syntax-Construct
 
+1.007   2018-06-26
+
+        - Workaround threaded 5.10.0 throwing "Modification of a
+          read-only value attemted" for eval '?x?'
+
+1.006   2018-06-25
+
+        - Fix tests for 5.8.X
+
+1.005   2018-06-25
+
+        - Perl 5.28
+        - Fix version check (for older Perls).
+        - Added ?? and for-qw to removed constructs.
+        - "Good Practice" section in the POD.
+
 1.004   2017-08-16
 
         - Unified error messages

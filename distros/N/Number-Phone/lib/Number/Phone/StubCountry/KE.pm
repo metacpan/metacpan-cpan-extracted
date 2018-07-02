@@ -22,26 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '[24-6]',
                   'national_rule' => '0$1',
+                  'leading_digits' => '[24-6]',
                   'pattern' => '(\\d{2})(\\d{5,7})'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{6})',
-                  'format' => '$1 $2',
+                  'leading_digits' => '7',
                   'national_rule' => '0$1',
-                  'leading_digits' => '7'
+                  'format' => '$1 $2'
                 },
                 {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[89]',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})'
+                  'leading_digits' => '[89]'
                 }
               ];
 
@@ -55,25 +55,6 @@ my $validators = {
             8[0-25-9]
           )\\d{6}
         ',
-                'geographic' => '
-          20\\d{6,7}|
-          4(?:
-            0\\d{6,7}|
-            [136]\\d{7}|
-            [245]\\d{5,7}
-          )|
-          5(?:
-            [08]\\d{7}|
-            [1-79]\\d{5,7}
-          )|
-          6(?:
-            [01457-9]\\d{5,7}|
-            2\\d{7}|
-            6\\d{6,7}
-          )
-        ',
-                'personal_number' => '',
-                'pager' => '',
                 'toll_free' => '800[24-8]\\d{5,6}',
                 'fixed_line' => '
           20\\d{6,7}|
@@ -92,7 +73,26 @@ my $validators = {
             6\\d{6,7}
           )
         ',
-                'voip' => ''
+                'voip' => '',
+                'personal_number' => '',
+                'geographic' => '
+          20\\d{6,7}|
+          4(?:
+            0\\d{6,7}|
+            [136]\\d{7}|
+            [245]\\d{5,7}
+          )|
+          5(?:
+            [08]\\d{7}|
+            [1-79]\\d{5,7}
+          )|
+          6(?:
+            [01457-9]\\d{5,7}|
+            2\\d{7}|
+            6\\d{6,7}
+          )
+        ',
+                'pager' => ''
               };
 my %areanames = (
   25420 => "Nairobi",

@@ -1,0 +1,35 @@
+# CHECKSUMS file written on Fri Jun  8 17:16:22 2018 GMT by CPAN::Checksums (v2.12)
+$cksum = {
+  'perl-5.26.0.tar.gz' => {
+    'md5' => '5789641ea0f66a871e5191e0052aab21',
+    'md5-ungz' => '2481095eff13343bb3b65d5bd3166386',
+    'mtime' => '2018-06-08',
+    'sha256' => '6582ce8e02033d6edddbac128732c58f05bfe1ea8642e9e524034e8f8e51df76',
+    'sha256-ungz' => 'cbc628c9fdeb0760f456872def0639dc8f4e9a850de37bdbea3546ee4213c2d9',
+    'size' => 133
+  },
+  'perl-5.27.11.tar.gz' => {
+    'md5' => '81b991560135117506f44f3589ed4a5a',
+    'md5-ungz' => '9b1003e48fe490153eaee0808c930dda',
+    'mtime' => '2018-06-08',
+    'sha256' => '620d96a3941fd36a0223fb4cef53666cf61304d9097e9338f8ea71b6baf97728',
+    'sha256-ungz' => '3620b0123b818e974c27f9d015578602e020c61676bb5980404f8c001a1f16d0',
+    'size' => 134
+  },
+  'perl-5.28.0-RC1.tar.gz' => {
+    'md5' => 'f1dcd441957ebd5df654f4b0e894db13',
+    'md5-ungz' => '2151fa8c432238c76f7c6d24d136e80a',
+    'mtime' => '2018-06-08',
+    'sha256' => '8f5c7b1aa682953b0442225449a7f33972aa2cf99013436a0e7fb910e1a130c5',
+    'sha256-ungz' => '60cf59fd05196835f43453f7a0a779ccf47e0ffd0839d696abc2a376adc9ee87',
+    'size' => 140
+  },
+  'perl-5.28.0-RC2.tar.gz' => {
+    'md5' => 'f8a7e16b4a2cba407f5b020a15c4c73e',
+    'md5-ungz' => 'd1336f373ca2f1ebae198c2f12c9ea9b',
+    'mtime' => '2018-06-08',
+    'sha256' => 'dcb40214ce8401f243edcc8f55000ed26cf7bc60036ffa2b907d75b8f1e5847f',
+    'sha256-ungz' => 'a3d7b37199abfc67584ea300326f483d8fe5923577258ed7321613d0334dd612',
+    'size' => 141
+  }
+};

@@ -1,3 +1,27 @@
+1.008 - June 30, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Was attributig 240.0.0.0/4 to RFC1122 instead of correct RFC1112.
+ * Fix typos in test (rf6598 instead of rfc6598)
+ * Allow use of tags in exclude and additional_exclude
+ * Added additional test to compare Perl5 and Perl6 performance.
+ * Converted module to use Author's Dist::Zilla plugin for development
+ * Included changes from 1.007
+
+1.007 - June 30, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Changes that ended up in 1.008
+ * Released as -TRIAL version only
+
+1.006 - June 19, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Add Code of Conduct & contribution information
+ * Do not allow non-ASCII7 characters in CIDRs
+
+1.005 - November 25, 2017 (Not publicly released)
+Joelle Maslak <jmaslak@antelope.net>
+ * Fix minor critic errors
+ * Add Kwalitee and Critic tests
+
 1.004 - October 30, 2017
 Joelle Maslak <jmaslak@antelope.net>
  * Minor change to author name

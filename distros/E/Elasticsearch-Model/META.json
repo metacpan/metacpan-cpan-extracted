@@ -1,0 +1,61 @@
+{
+   "abstract" : "Does one thing only: helps to deploy a Moose model and accompanying document classes to Elasticsearch.",
+   "author" : [
+      "Amiri Barksdale <abarksdale@campusexplorer.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Elasticsearch-Model",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Data::Printer" : "0",
+            "List::AllUtils" : "0",
+            "Module::Find" : "0",
+            "Moose" : "0",
+            "Moose::Exporter" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Moose" : "0",
+            "Search::Elasticsearch" : "6.00",
+            "Try::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime" : "0",
+            "IO::Socket::INET" : "0",
+            "MooseX::Types::Structured" : "0",
+            "Test::Class::Load" : "0",
+            "Test::Class::Most" : "0",
+            "Test::Moose" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/amiri/Elasticsearch-Model.git",
+         "web" : "http://github.com/amiri/Elasticsearch-Model"
+      }
+   },
+   "version" : "0.0.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

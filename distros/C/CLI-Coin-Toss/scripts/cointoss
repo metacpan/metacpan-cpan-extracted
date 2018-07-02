@@ -4,15 +4,16 @@ use Getopt::Std ; getopts "1b:g:p:s:" , \my %o ;
 use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ; 
 use FindBin qw [ $Script ] ;
 
-END{ info () }
-$SIG{INT} = sub { exit 130 } ; 
+
+$SIG{INT} = sub { & info ; exit 130 } ; 
 my ( $s1 , $s2 ) = map { eval qq[$_] } split /[,x]/, $o{g} // '6,1' , 2 ; # 行列のように並べるサイズ
 $s2 //= 1 ; 
 my $n = $o{b} // 1 ; # 二項分布のパラメータで試行の回数
 my $p = $o{p} // 0.5 ; # 二項分布のパラメータで、成功確率
 my $seed = defined $o{s} ? srand $o{s} : srand ; # 乱数シード
 
-& main ( ) ;
+& main ;
+& info ; 
 exit 0 ;
 
 sub info ( )  { 
@@ -32,8 +33,15 @@ sub binomGen (  ) {
     return $s ; 
 }
 
-## ヘルプの扱い
-sub VERSION_MESSAGE {}
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  our $VERSION = 0.11 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+    # 0.22 : -g inf を指定可能とした。
+}  
 sub HELP_MESSAGE {
     use FindBin qw[ $Script ] ; 
     $ARGV[1] //= '' ;
@@ -63,6 +71,7 @@ sub HELP_MESSAGE {
 
   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+  --version : バージョン情報の表示。
  
   開発メモ :
       * -g で Infも指定可能としたい。poissonコマンドを参照。ただし、速度比較をせよ。

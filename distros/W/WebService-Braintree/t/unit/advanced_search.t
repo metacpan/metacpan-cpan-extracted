@@ -11,17 +11,18 @@ use WebService::Braintree::TestHelper;
 
 {
     package WebService::Braintree::AdvancedSearchTest;
-    use Moose;
-    extends 'WebService::Braintree::AdvancedSearch';
+    use Moo;
+    with 'WebService::Braintree::Role::AdvancedSearch';
 
-    my $field = WebService::Braintree::AdvancedSearchFields->new(metaclass => __PACKAGE__->meta);
-    $field->text("billing_company");
-    $field->equality("credit_card_expiration_date");
-    $field->range("amount");
-    $field->text("order_id");
-    $field->multiple_values("created_using", "full_information", "token");
-    $field->multiple_values("ids");
-    $field->key_value("refund");
+    use constant FIELDS => [];
+
+    __PACKAGE__->text_field('billing_company');
+    __PACKAGE__->equality_field('credit_card_expiration_date');
+    __PACKAGE__->range_field('amount');
+    __PACKAGE__->text_field('order_id');
+    __PACKAGE__->multiple_values_field('created_using', 'full_information', 'token');
+    __PACKAGE__->multiple_values_field('ids');
+    __PACKAGE__->key_value_field('refund');
 
     __PACKAGE__->meta->make_immutable;;
 }

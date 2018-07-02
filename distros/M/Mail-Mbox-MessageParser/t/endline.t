@@ -5,7 +5,7 @@
 
 use strict;
 
-use File::Temp;
+use File::Temp qw(tempfile);
 use Test::More;
 use lib 't';
 use Mail::Mbox::MessageParser;
@@ -52,9 +52,9 @@ sub TestImplementation
   my $enable_cache = shift;
   my $enable_grep = shift;
 
-  my $cache = File::Temp->new();
+  my ($cache_fh, $cache_fn) = tempfile();
 
-  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache->filename})
+  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache_fn})
     if $enable_cache;
 
   my $folder_reader =

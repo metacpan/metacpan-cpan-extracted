@@ -22,26 +22,31 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221546;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'leading_digits' => '
             44|
             9[5-7]
           ',
-                  'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+                  'format' => '$1 $2 $3'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{4})',
-                  'format' => '$1 $2',
-                  'leading_digits' => '40'
+                  'leading_digits' => '40',
+                  'format' => '$1 $2'
                 }
               ];
 
 my $validators = {
+                'toll_free' => '',
+                'fixed_line' => '443\\d{6}',
+                'voip' => '40\\d{5}',
+                'personal_number' => '',
                 'geographic' => '443\\d{6}',
+                'pager' => '',
                 'specialrate' => '',
                 'mobile' => '
           9(?:
@@ -49,12 +54,7 @@ my $validators = {
             6[569]|
             77
           )\\d{6}
-        ',
-                'pager' => '',
-                'personal_number' => '',
-                'fixed_line' => '443\\d{6}',
-                'toll_free' => '',
-                'voip' => '40\\d{5}'
+        '
               };
 my %areanames = (
   24544320 => "Bissau",

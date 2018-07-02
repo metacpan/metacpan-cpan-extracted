@@ -1,11 +1,10 @@
 package XML::XPathScript::Processor::LibXML;
-
+our $AUTHORITY = 'cpan:YANICK';
+$XML::XPathScript::Processor::LibXML::VERSION = '1.55';
 use strict;
 use warnings;
 
 use base qw/ XML::XPathScript::Processor /;
-
-our $VERSION = '1.54';
 
 sub get_namespace {
         my $ns = $_[1]->getNamespaces();
@@ -19,18 +18,19 @@ sub is_text_node {
            && !$_[1]->isa('XML::LibXML::Comment');
 }
 
-sub get_attributes   { return $_[1]->attributes }
-sub get_text_content { return $_[1]->textContent }
-sub get_child_nodes  { return $_[1]->childNodes }
-sub get_node_name    { return $_[1]->localname }
-sub is_element_node  { return $_[1]->isa( 'XML::LibXML::Element' ); }
-sub is_comment_node  { return $_[1]->isa( 'XML::LibXML::Comment' ); }
-sub is_pi_node       { return $_[1]->isa( 'XML::LibXML::PI' ); }
-sub is_nodelist      { return $_[1]->isa( 'XML::LibXML::NodeList' ); }
+sub get_attributes     { return $_[1]->attributes }
+sub get_text_content   { return $_[1]->textContent }
+sub get_child_nodes    { return $_[1]->childNodes }
+sub get_node_name      { return $_[1]->localname }
+sub get_qualified_name { return $_[1]->nodeName }
+sub is_element_node    { return $_[1]->isa( 'XML::LibXML::Element' ); }
+sub is_comment_node    { return $_[1]->isa( 'XML::LibXML::Comment' ); }
+sub is_pi_node         { return $_[1]->isa( 'XML::LibXML::PI' ); }
+sub is_nodelist        { return $_[1]->isa( 'XML::LibXML::NodeList' ); }
 
 sub get_attribute {
     return $_[1]->isa( 'XML::LibXML::Namespace' )
-         ?  ' xmlns:' . $_[1]->getName() . q{="} . $_[1]->value() . q{" }
+         ? sprintf(q{ %s="%s"}, $_[1]->getName(), $_[1]->value())
          : $_[1]->toString( 0, 1 )
          ;
 }
@@ -42,3 +42,44 @@ sub translate_node {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+XML::XPathScript::Processor::LibXML
+
+=head1 VERSION
+
+version 1.55
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=item *
+
+Dominique Quatravaux <domq@cpan.org>
+
+=item *
+
+Matt Sergeant <matt@sergeant.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2008, 2007 by Matt Sergeant.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

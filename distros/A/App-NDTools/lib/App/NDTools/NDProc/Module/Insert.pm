@@ -9,7 +9,7 @@ use Scalar::Util qw(looks_like_number);
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path);
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 sub MODINFO { "Insert value into structure" }
 
@@ -24,8 +24,8 @@ sub arg_opts {
             } elsif ($_[1] eq '0' or $_[1] =~ /(F|f)alse/) {
                 $self->{OPTS}->{value} = JSON::false;
             } else {
-                log_error { "Unsuitable value for --boolean" };
-                exit 1;
+                $self->{ARG_ERROR} = "Unsuitable value for --boolean";
+                die "!FINISH";
             }
         },
         'file|f=s' => \$self->{OPTS}->{file},
@@ -35,8 +35,8 @@ sub arg_opts {
             if (looks_like_number($_[1])) {
                 $self->{OPTS}->{value} = 0 + $_[1];
             } else {
-                log_error { "Unsuitable value for --number" };
-                exit 1;
+                $self->{ARG_ERROR} = "Unsuitable value for --number";
+                die "!FINISH";
             }
         },
         'string|value=s' => sub { $self->{OPTS}->{value} = $_[1] },

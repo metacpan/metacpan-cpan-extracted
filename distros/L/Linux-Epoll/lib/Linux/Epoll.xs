@@ -81,16 +81,22 @@ typedef struct { const char* key; size_t keylen; uint32_t value; } entry;
 typedef entry map[];
 
 static map events = {
-	{ "in"     , 2, EPOLLIN      },
-	{ "out"    , 3, EPOLLOUT     },
-	{ "err"    , 3, EPOLLERR     },
-	{ "prio"   , 4, EPOLLPRI     },
-	{ "et"     , 2, EPOLLET      },
-	{ "hup"    , 3, EPOLLHUP     },
+	{ "in"       , 2, EPOLLIN        },
+	{ "out"      , 3, EPOLLOUT       },
+	{ "err"      , 3, EPOLLERR       },
+	{ "prio"     , 4, EPOLLPRI       },
+	{ "et"       , 2, EPOLLET        },
+	{ "hup"      , 3, EPOLLHUP       },
 #ifdef EPOLLRDHUP
-	{ "rdhup"  , 5, EPOLLRDHUP   },
+	{ "rdhup"    , 5, EPOLLRDHUP     },
 #endif
-	{ "oneshot", 7, EPOLLONESHOT }
+#ifdef EPOLLWAKEUP
+	{ "wakeup"   , 6, EPOLLWAKEUP    },
+#endif
+#ifdef EPOLLEXCLUSIVE
+	{ "exclusive", 9, EPOLLEXCLUSIVE },
+#endif
+	{ "oneshot"  , 7, EPOLLONESHOT   }
 };
 
 static uint32_t S_get_eventid(pTHX_ SV* event) {
@@ -149,42 +155,36 @@ struct data {
 };
 
 static int weak_set(pTHX_ SV* sv, MAGIC* magic) {
-	struct data* data = (struct data*)magic->mg_ptr;
-	av_delete(data->backrefs, data->index, G_DISCARD);
+	if (!SvOK(sv)) {
+		struct data* data = (struct data*)magic->mg_ptr;
+		av_delete(data->backrefs, data->index, G_DISCARD);
+	}
 	return 0;
 }
 
-static int weak_free(pTHX_ SV* sv, MAGIC* magic);
-
 MGVTBL epoll_magic = { NULL };
-MGVTBL weak_magic = { NULL, weak_set, NULL, NULL, weak_free };
-
-static int weak_free(pTHX_ SV* sv, MAGIC* magic) {
-	struct data* data = (struct data*)magic->mg_ptr;
-	mg_findext(sv, PERL_MAGIC_ext, &weak_magic)->mg_virtual = NULL; /* Cover perl bugs under the carpet */
-}
+MGVTBL weak_magic = { NULL, weak_set, NULL, NULL, NULL };
 
 #define get_backrefs(epoll) (AV*)mg_findext(SvRV(epoll), PERL_MAGIC_ext, &epoll_magic)->mg_obj
 
-static void S_set_backref(pTHX_ SV* epoll, SV* fh, CV* callback) {
+static void S_set_backref(pTHX_ SV* epoll, SV* fh, int fd, CV* callback) {
 	AV* backrefs = get_backrefs(epoll);
-	int fd = get_fd(fh);
 	struct data backref = { backrefs, fd };
 	SV* ref = sv_rvweaken(SvROK(fh) ? newSVsv(fh) : newRV(fh));
 
 	av_store(backrefs, fd, ref);
 	sv_magicext(ref, (SV*)callback, PERL_MAGIC_ext, &weak_magic, (const char*)&backref, sizeof backref);
 }
-#define set_backref(epoll, fh, cb) S_set_backref(aTHX_ epoll, fh, cb)
+#define set_backref(epoll, fh, fd, cb) S_set_backref(aTHX_ epoll, fh, fd, cb)
 
-static void S_del_backref(pTHX_ SV* epoll, SV* fh) {
-	av_delete(get_backrefs(epoll), get_fd(fh), G_DISCARD);
+static void S_del_backref(pTHX_ SV* epoll, int fd) {
+	av_delete(get_backrefs(epoll), fd, G_DISCARD);
 }
-#define del_backref(epoll, fh) S_del_backref(aTHX_ epoll, fh)
+#define del_backref(epoll, fd) S_del_backref(aTHX_ epoll, fd)
 
 #define undef &PL_sv_undef
 
-static SV* S_io_fdopen(pTHX_ int fd) {
+static SV* S_io_fdopen(pTHX_ int fd, const char* package) {
 	PerlIO* pio = PerlIO_fdopen(fd, "r");
 	GV* gv = newGVgen("Linux::Epoll");
 	SV* ret = newRV_noinc((SV*)gv);
@@ -192,9 +192,10 @@ static SV* S_io_fdopen(pTHX_ int fd) {
 	IoTYPE(io) = '<';
 	IoIFP(io) = pio;
 	IoOFP(io) = pio;
+	sv_bless(ret, gv_stashpv(package, TRUE));
 	return ret;
 }
-#define io_fdopen(fd) S_io_fdopen(aTHX_ fd)
+#define io_fdopen(fd, package) S_io_fdopen(aTHX_ fd, package)
 
 static SV* S_event_bits_to_hash(pTHX_ UV bits) {
 	int shift;
@@ -219,7 +220,6 @@ new(package)
 	const char* package;
 	PREINIT:
 		int fd;
-		MAGIC* mg;
 	CODE: 
 #ifdef EPOLL_CLOEXEC
 		fd = epoll_create1(EPOLL_CLOEXEC);
@@ -228,9 +228,8 @@ new(package)
 #endif
 		if (fd < 0) 
 			die_sys("Couldn't open epollfd: %s");
-		RETVAL = io_fdopen(fd);
-		mg = sv_magicext(SvRV(RETVAL), sv_2mortal((SV*)newAV()), PERL_MAGIC_ext, &epoll_magic, NULL, 0);
-		sv_bless(RETVAL, gv_stashpv(package, TRUE));
+		RETVAL = io_fdopen(fd, package);
+		sv_magicext(SvRV(RETVAL), sv_2mortal((SV*)newAV()), PERL_MAGIC_ext, &epoll_magic, NULL, 0);
 	OUTPUT:
 		RETVAL
 
@@ -257,7 +256,7 @@ add(self, fh, events, callback)
 			else
 				die_sys("Couldn't add filehandle from epoll set: %s");
 		}
-		set_backref(self, fh, real_callback);
+		set_backref(self, fh, ofd, real_callback);
 		RETVAL = "0 but true";
 	OUTPUT:
 		RETVAL
@@ -284,7 +283,7 @@ modify(self, fh, events, callback)
 			else
 				die_sys("Couldn't modify filehandle from epoll set: %s");
 		}
-		set_backref(self, fh, real_callback);
+		set_backref(self, fh, ofd, real_callback);
 		RETVAL = "0 but true";
 	OUTPUT:
 		RETVAL
@@ -304,7 +303,7 @@ delete(self, fh)
 			else
 				die_sys("Couldn't delete filehandle from epoll set: %s");
 		}
-		del_backref(self, fh);
+		del_backref(self, ofd);
 		RETVAL = "0 but true";
 	OUTPUT:
 		RETVAL
@@ -344,8 +343,10 @@ wait(self, maxevents = 1, timeout = undef, sigset = undef)
 			PUSHMARK(SP);
 			mXPUSHs(event_bits_to_hash(events[i].events));
 			PUTBACK;
-			call_sv((SV*)callback, G_VOID | G_DISCARD);
+			call_sv((SV*)callback, G_VOID | G_DISCARD | G_EVAL);
 			SPAGAIN;
+			if (SvTRUE(ERRSV))
+				warn_sv(ERRSV);
 		}
 	OUTPUT:
 		RETVAL

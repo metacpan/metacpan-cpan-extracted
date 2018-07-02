@@ -1,6 +1,7 @@
 package Mojolicious::Plugin::ToolkitRenderer;
 # ABSTRACT: Template Toolkit Renderer Mojolicious Plugin
 
+use 5.010;
 use strict;
 use warnings;
 
@@ -8,15 +9,16 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Exception;
 use Template ();
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 sub register {
     my ( $self, $app, $settings ) = @_;
 
-    my $template = Template->new( $settings->{'config'} || {
-        'RELATIVE'  => 1,
-        'EVAL_PERL' => 0,
-    } );
+    $settings->{'config'}{'RELATIVE'}     //= 1;
+    $settings->{'config'}{'EVAL_PERL'}    //= 0;
+    $settings->{'config'}{'INCLUDE_PATH'} //= $app->renderer->paths;
+
+    my $template = Template->new( $settings->{'config'} );
 
     $settings->{'context'}->( $template->context ) if ( $settings->{'context'} );
 
@@ -33,8 +35,6 @@ sub register {
             },
             $output,
         ) || do {
-            $app->log->error( $template->error );
-
             if (
                 $app->mode ne 'development' and
                 ref( $settings->{'settings'}{'error_handler'} ) eq 'CODE'
@@ -42,18 +42,25 @@ sub register {
                 $settings->{'settings'}{'error_handler'}->( $controller, $renderer, $app );
             }
             else {
-                my $default_handler = $renderer->default_handler;
-                $renderer->default_handler('ep');
+                unless (
+                    $template->error and (
+                        $template->error eq 'file error - exception.html.tt: not found' or
+                        $template->error eq 'file error - exception.' . $app->mode . '.html.tt: not found'
+                    )
+                ) {
+                    my $default_handler = $renderer->default_handler;
+                    $renderer->default_handler('ep');
 
-                $controller->reply->exception(
-                    Mojo::Exception->new( __PACKAGE__ . ' - ' . $template->error || '' )
-                );
+                    $controller->reply->exception(
+                        Mojo::Exception->new( __PACKAGE__ . ' - ' . $template->error )
+                    );
 
-                $renderer->default_handler($default_handler);
+                    $controller->rendered(
+                        ( $template->error and $template->error =~ /not found/ ) ? 404 : 500
+                    );
 
-                $controller->rendered(
-                    ( $template->error and $template->error =~ /not found/ ) ? 404 : 500
-                );
+                    $renderer->default_handler($default_handler);
+                }
             }
         };
 
@@ -83,7 +90,7 @@ Mojolicious::Plugin::ToolkitRenderer - Template Toolkit Renderer Mojolicious Plu
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Mojo-Plugin-Toolkit.svg)](https://travis-ci.org/gryphonshafer/Mojo-Plugin-Toolkit)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Mojo-Plugin-Toolkit/badge.png)](https://coveralls.io/r/gryphonshafer/Mojo-Plugin-Toolkit)
@@ -92,7 +99,11 @@ version 1.07
 
 =head1 SYNOPSIS
 
-    # Mojolicious
+    # Simple Mojolicious
+    $self->plugin('ToolkitRenderer');
+    $self->renderer->default_handler('tt');
+
+    # Customized Mojolicious
     $self->plugin(
         'ToolkitRenderer',
         {
@@ -101,10 +112,11 @@ version 1.07
                 controller      => 'c',
             },
             config => {
-                RELATIVE  => 1,
-                EVAL_PERL => 0,
-                FILTERS   => { ucfirst => sub { return ucfirst shift } },
-                ENCODING  => 'utf8',
+                RELATIVE     => 1,
+                EVAL_PERL    => 0,
+                FILTERS      => { ucfirst => sub { return ucfirst shift } },
+                ENCODING     => 'utf8',
+                INCLUDE_PATH => $self->renderer->paths,
             },
             context => sub {
                 shift->define_vmethod( 'scalar', 'upper', sub { return uc shift } );
@@ -181,12 +193,25 @@ page and logs). But you can override this.
     error_handler => sub {
         my ( $controller, $renderer, $app ) = @_;
 
-        my $default_handler = $renderer->default_handler;
-        $renderer->default_handler('ep');
-        $controller->render_exception( Mojo::Exception->new( $template->error ) );
-        $renderer->default_handler($default_handler);
+        unless (
+            $template->error and (
+                $template->error eq 'file error - exception.html.tt: not found' or
+                $template->error eq 'file error - exception.' . $app->mode . '.html.tt: not found'
+            )
+        ) {
+            my $default_handler = $renderer->default_handler;
+            $renderer->default_handler('ep');
 
-        $controller->rendered(500);
+            $controller->reply->exception(
+                Mojo::Exception->new( __PACKAGE__ . ' - ' . $template->error )
+            );
+
+            $controller->rendered(
+                ( $template->error and $template->error =~ /not found/ ) ? 404 : 500
+            );
+
+            $renderer->default_handler($default_handler);
+        }
     }
 
 =head2 context
@@ -247,7 +272,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -20,15 +20,15 @@ qx.Class.define("callbackery.ui.Screen", {
         this.__cfg = cfg;
         this.__getParentFormDataCallBack =  getParentFormDataCallBack;
         this.__extraAction = extraAction;
-        switch (cfg.instanciationMode) {
+        switch (cfg.instantiationMode) {
             case 'onStartup':
-                this.instanciatePlugin();
+                this.instantiatePlugin();
                 break;
             case 'onTabSelection':
-                this.addListenerOnce('appear',this.instanciatePlugin,this);
+                this.addListenerOnce('appear',this.instantiatePlugin,this);
                 break;
             default:
-                console.log('ERROR unknown instanciationMode '+cfg.instanciationMode);
+                console.log('ERROR unknown instantiationMode '+cfg.instantiationMode);
         };
     },
 
@@ -39,7 +39,7 @@ qx.Class.define("callbackery.ui.Screen", {
         __extraAction: null,
         __getParentFormDataCallBack: null,
         __cfg: null,
-        instanciatePlugin: function(){
+        instantiatePlugin: function(){
             var rpc = callbackery.data.Server.getInstance();
             var pluginMap = callbackery.ui.Plugins.getInstance().getPlugins();
             var that = this;

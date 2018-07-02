@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::MerchantAccount;
-$WebService::Braintree::_::MerchantAccount::VERSION = '1.5';
+$WebService::Braintree::_::MerchantAccount::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,14 +17,17 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
-use MooseX::Aliases;
+use Moo;
+use MooX::Aliases;
 
 extends 'WebService::Braintree::_';
 
-use WebService::Braintree::_::MerchantAccount::BusinessDetails;
-use WebService::Braintree::_::MerchantAccount::FundingDetails;
-use WebService::Braintree::_::MerchantAccount::IndividualDetails;
+use WebService::Braintree::Types qw(
+    MerchantAccount
+    MerchantAccount_BusinessDetails
+    MerchantAccount_FundingDetails
+    MerchantAccount_IndividualDetails
+);
 
 =head1 ATTRIBUTES
 
@@ -41,7 +44,7 @@ C<< business_details() >> is an alias for this attribute.
 
 has business => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::MerchantAccount::BusinessDetails',
+    isa => MerchantAccount_BusinessDetails,
     coerce => 1,
     alias => 'business_details',
 );
@@ -80,7 +83,7 @@ C<< funding_details() >> is an alias for this attribute.
 
 has funding => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::MerchantAccount::FundingDetails',
+    isa => MerchantAccount_FundingDetails,
     coerce => 1,
     alias => 'funding_details',
 );
@@ -106,7 +109,7 @@ C<< individual_details() >> is an alias for this attribute.
 
 has individual => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::MerchantAccount::IndividualDetails',
+    isa => MerchantAccount_IndividualDetails,
     coerce => 1,
     alias => 'individual_details',
 );
@@ -120,7 +123,7 @@ object of type L<WebService::Braintree::_::MerchantAccount/>.
 
 has master_merchant_account => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::MerchantAccount',
+    isa => MerchantAccount,
     coerce => 1,
 );
 

@@ -25,7 +25,7 @@ print "# First sorted entry is '$first'\n";
 my $first_each;
 if (defined &Config::KEYS) {
     # when compiled the iter is not sorted anymore
-    my @keys = sort &Config::KEYS; # XXX sort Config::KEYS() is broken
+    my @keys = sort(Config::KEYS());
     $first_each = $keys[0];
     is($first_each, $first, "First sorted key is correct");
 } else {

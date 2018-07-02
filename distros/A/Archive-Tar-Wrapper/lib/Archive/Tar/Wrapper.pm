@@ -18,12 +18,61 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = "0.27";
+our $VERSION = '0.30';
 my $logger = get_logger();
 
-###########################################
+sub _acquire_tar_info {
+    my $self = shift;
+    my ( $wtr, $rdr, $err ) = ( gensym, gensym, gensym );
+    my $pid = open3( $wtr, $rdr, $err, "$self->{tar} --version" );
+    my ( $output, $error );
+    {
+        local $/ = undef;
+        $output = <$rdr>;
+        $error  = <$err>;
+    }
+    close($rdr);
+    close($err);
+    close($wtr);
+    waitpid( $pid, 0 );
+    my $exit = $? >> 8;
+
+    $self->{tar_error_msg} = $error;
+    $self->{version_info}  = $output;
+    my $bsd_regex = qr/bsd/i;
+    $self->{is_gnu} = 0;
+    $self->{is_bsd} = 0;
+
+    # bsdtar exit code is 1 when asking for version
+    unless ( ( $exit == 0 ) or ( $self->{tar} =~ $bsd_regex ) ) {
+        $self->{version_info} = 'Information not available. Search for errors';
+    }
+    else {
+        if ( $output =~ /GNU/ ) {
+            $self->{is_gnu} = 1;
+        }
+        elsif ( $self->{tar} =~ $bsd_regex ) {
+            $self->{is_bsd} = 1;
+        }
+    }
+}
+
+sub _setup_mswin {
+    my $self = shift;
+
+    # bsdtar is always preferred on Windows
+    my $tar_path = which('bsdtar');
+    $tar_path = which('tar') unless ( defined($tar_path) );
+
+    if ( $tar_path =~ /\s/ ) {
+
+        # double quoting will be required is there is a space
+        $tar_path = qq($tar_path);
+    }
+    $self->{tar} = $tar_path;
+}
+
 sub new {
-###########################################
     my ( $class, %options ) = @_;
 
     my $self = {
@@ -31,6 +80,7 @@ sub new {
         tmpdir                => undef,
         tar_read_options      => '',
         tar_write_options     => '',
+        tar_error_msg         => undef,
         tar_gnu_read_options  => [],
         tar_gnu_write_options => [],
         dirs                  => 0,
@@ -49,12 +99,30 @@ sub new {
 
     bless $self, $class;
 
-    $self->{tar} = which('tar')  unless defined $self->{tar};
-    $self->{tar} = which('gtar') unless defined $self->{tar};
+    if ( $Config{osname} eq 'MSWin32' ) {
+        $self->_setup_mswin();
+    }
+    else {
+        my $tar_location = which('tar');
+
+        unless ( defined($tar_location) ) {
+            $tar_location = which('gtar');
+        }
+
+        $self->{tar} = $tar_location;
+    }
 
     unless ( defined $self->{tar} ) {
-        LOGDIE 'tar not found in PATH, please specify location';
+
+        if ( $Config{osname} eq 'MSWin32' ) {
+            LOGDIE 'tar not found in PATH, OS unsupported';
+        }
+        else {
+            LOGDIE 'tar not found in PATH, please specify location';
+        }
     }
+
+    $self->_acquire_tar_info();
 
     if ( defined $self->{ramdisk} ) {
         my $rc = $self->ramdisk_mount( %{ $self->{ramdisk} } );
@@ -128,8 +196,7 @@ sub read {    ## no critic (ProhibitBuiltinHomonyms)
         );
     }
 
-    DEBUG "Running @cmd";
-
+    $logger->debug("Running @cmd") if ( $logger->is_debug );
     my $error_code = run( \@cmd, \my ( $in, $out, $err ) );
 
     unless ($error_code) {
@@ -138,9 +205,9 @@ sub read {    ## no critic (ProhibitBuiltinHomonyms)
         return;
     }
 
-    WARN $err if $err;
-    chdir $cwd or LOGDIE "Cannot chdir to $cwd";
-    return 1;
+    $logger->warn($err) if ( $logger->is_warn and $err );
+    chdir $cwd or LOGDIE "Cannot chdir to $cwd: $!";
+    return ( $error_code == 0 ) ? undef : $error_code;
 }
 
 ###########################################
@@ -172,11 +239,11 @@ sub locate {
     my $real_path = File::Spec->catfile( $self->{tardir}, $rel_path );
 
     if ( -e $real_path ) {
-        DEBUG "$real_path exists";
+        $logger->debug("$real_path exists") if ( $logger->is_debug );
         return $real_path;
     }
     else {
-        WARN "$rel_path not found in tarball";
+        $logger->warn("$rel_path not found in tarball") if ( $logger->is_warn );
         return;
     }
 }
@@ -325,7 +392,7 @@ sub list_reset {
     open( my $fh, '>', $list_file ) or LOGDIE "Can't open $list_file: $!";
 
     if ( $logger->is_debug ) {
-        $logger->info('List of all files identified inside the tar file');
+        $logger->debug('List of all files identified inside the tar file');
     }
 
     find(
@@ -446,7 +513,7 @@ sub write {    ## no critic (ProhibitBuiltinHomonyms)
         push @$cmd, @top_entries;
     }
 
-    DEBUG "Running @$cmd";
+    $logger->debug("Running @$cmd") if ( $logger->is_debug );
     my $rc = run( $cmd, \my ( $in, $out, $err ) );
 
     unless ($rc) {
@@ -472,32 +539,12 @@ sub DESTROY {
     return 1;
 }
 
-###########################################
 sub is_gnu {
-###########################################
-    my ($self) = @_;
-    my ( $wtr, $rdr, $err ) = ( gensym, gensym, gensym );
-    my $pid = open3( $wtr, $rdr, $err, "$self->{tar} --version" );
-    my ( $output, $error );
-    {
-        local $/ = undef;
-        $output = <$rdr>;
-        $error  = <$err>;
-    }
-    close($rdr);
-    close($err);
-    close($wtr);
-    waitpid( $pid, 0 );
-    my $exit = $? >> 8;
+    return shift->{is_gnu};
+}
 
-    unless ( $exit == 0 ) {
-        $self->{tar_error_msg} = $error;
-        return 0;
-    }
-    else {
-        $self->{version_info} = $output;
-        return $output =~ /GNU/;
-    }
+sub is_bsd {
+    return shift->{is_bsd};
 }
 
 ###########################################
@@ -715,7 +762,7 @@ C<max_cmd_line_args>:
 =item B<$arch-E<gt>read("archive.tgz")>
 
 C<read()> opens the given tarball, expands it into a temporary directory
-and returns 1 on success und C<undef> on failure.
+and returns 1 on success or C<undef> on failure.
 The temporary directory holding the tar data gets cleaned up when C<$arch>
 goes out of scope.
 
@@ -815,6 +862,12 @@ unpacked files before wrapping them back up into the tarball.
 Checks if the tar executable is a GNU tar by running 'tar --version'
 and parsing the output for "GNU".
 
+Returns true or false (in Perl terms).
+
+=item B<$arch-E<gt>is_bsd()>
+
+Same as C<is_gnu()>, but for BSD.
+
 =back
 
 =head1 Using RAM Disks
@@ -911,11 +964,41 @@ superuser).
 Archive::Tar::Wrapper doesn't currently handle filenames with embedded
 newlines.
 
+=head2 Microsoft Windows support
+
+Support on Microsoft Windows is limited.
+
+Version below Windows 10 will not be supported for desktops, and for servers from Windows 2012 and above.
+
+The GNU C<tar.exe> program doesn't work properly with the current interface of Archive::Tar::Wrapper.
+You must use the C<bsdtar.exe> and make sure it appears first in the C<PATH> environment variable than
+the GNU tar (if it is installed). See L<http://libarchive.org/> for details about how to download and
+install C<bsdtar.exe>, or go to L<http://gnuwin32.sourceforge.net/packages.html> for a direct download.
+
+Windows 10 might come already with bsdtar program installed. Check 
+L<https://blogs.technet.microsoft.com/virtualization/2017/12/19/tar-and-curl-come-to-windows/> for 
+more details.
+
+Having spaces in the path string to the tar program might be an issue too. Although there is some effort
+in terms of workaround it, you best might avoid it completely by installing in a different path than
+C<C:\Program Files>.
+
 =head1 LEGALESE
 
-Copyright 2005 by Mike Schilli, all rights reserved.
-This program is free software, you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This software is copyright (c) 2005 of Mike Schilli.
+
+Archive-Tar-Wrapper is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+Archive-Tar-Wrapper is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+Archive-Tar-Wrapper. If not, see <http://www.gnu.org/licenses/>.
 
 =head1 AUTHOR
 

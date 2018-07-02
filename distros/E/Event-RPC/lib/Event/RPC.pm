@@ -1,6 +1,6 @@
 package Event::RPC;
 
-$VERSION  = "1.08";
+$VERSION  = "1.10";
 $PROTOCOL = "1.00";
 
 use strict;

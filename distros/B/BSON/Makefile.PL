@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "List::Util" => 0,
     "MIME::Base64" => 0,
+    "Math::BigFloat" => 0,
     "Math::BigInt" => 0,
     "Moo" => "2.002004",
     "Scalar::Util" => 0,
@@ -55,7 +56,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v1.6.4",
+  "VERSION" => "v1.6.6",
   "test" => {
     "TESTS" => "t/*.t t/common/*.t t/corpus/*.t t/legacy/*.t t/mapping/*.t"
   }
@@ -74,6 +75,7 @@ my %FallbackPrereqs = (
   "JSON::MaybeXS" => 0,
   "List::Util" => 0,
   "MIME::Base64" => 0,
+  "Math::BigFloat" => 0,
   "Math::BigInt" => 0,
   "Moo" => "2.002004",
   "Path::Tiny" => "0.054",

@@ -88,9 +88,6 @@ sub build_spvm {
   my $compile_success = $self->compile_spvm();
   
   if ($compile_success) {
-    # Build opcode
-    $self->build_opcode;
-    
     # Build run-time
     $self->build_runtime;
     
@@ -126,9 +123,6 @@ sub create_shared_lib_precompile_dist {
   unless ($compile_success) {
     die "Compile error";
   }
-
-  # Build opcode
-  $self->build_opcode;
   
   $self->cbuilder_precompile->create_shared_lib_dist($package_name);
 }
@@ -179,7 +173,7 @@ sub bind_to_perl {
       *{"$sub_abs_name"} = sub {
         
         my $return_value;
-        eval { $return_value = SPVM::call_sub("$sub_abs_name", @_) };
+        eval { $return_value = SPVM::call_sub($package_name, $sub_name, @_) };
         my $error = $@;
         if ($error) {
           confess $error;

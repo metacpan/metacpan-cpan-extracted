@@ -1,0 +1,7 @@
+Revision history for WWW-YNAB
+
+0.02  2018-06-27
+      - set a minimum perl version (5.10)
+
+0.01  2018-06-24
+      - Initial release

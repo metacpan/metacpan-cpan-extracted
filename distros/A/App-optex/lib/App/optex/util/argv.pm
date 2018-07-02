@@ -78,11 +78,11 @@ Put I<suffix> to duplicated arguments.
 
 ######################################################################
 
-sub rev_arg {
+sub reverse {
     argv { reverse @_ };
 }
 
-=item B<rev_arg>()
+=item B<reverse>()
 
 Reverse arguments.
 
@@ -92,11 +92,13 @@ Reverse arguments.
 
 my @persist;
 
+use App::optex::Tmpfile;
+
 sub proc {
     argv {
 	for (@_) {
 	    my($command) = /^ \<\( (.*) \) $/x or next;
-	    my $tmp = new Tmpfile;
+	    my $tmp = new App::optex::Tmpfile;
 	    $tmp->write(`$command`)->rewind;
 	    push @persist, $tmp;
 	    $_ = $tmp->path;
@@ -119,68 +121,6 @@ Process substitution.
 =back
 
 =cut
-
-1;
-
-package Tmpfile;
-
-use strict;
-use warnings;
-use Carp;
-use Fcntl;
-use IO::File;
-use IO::Handle;
-
-sub new {
-    my $class = shift;
-    my $fh = new_tmpfile IO::File or die "new_tmpfile: $!\n";
-    $fh->fcntl(F_SETFD, 0) or die "fcntl F_SETFD: $!\n";
-    bless { FH => $fh }, $class;
-}
-
-sub write {
-    my $obj = shift;
-    my $fh = $obj->fh;
-    if (@_) {
-	my $data = join '', @_;
-	$fh->print($data);
-    }
-    $obj;
-}
-
-sub flush {
-    my $obj = shift;
-    $obj->fh->flush;
-    $obj;
-}
-
-sub rewind {
-    my $obj = shift;
-    $obj->fh->seek(0, 0) or die;
-    $obj;
-}
-
-sub reset {
-    my $obj = shift;
-    $obj->rewind;
-    $obj->fh->truncate(0);
-    $obj;
-}
-
-sub fh {
-    my $obj = shift;
-    $obj->{FH};
-}
-
-sub fd {
-    my $obj = shift;
-    $obj->fh->fileno;
-}
-
-sub path {
-    my $obj = shift;
-    sprintf "/dev/fd/%d", $obj->fd;
-}
 
 1;
 

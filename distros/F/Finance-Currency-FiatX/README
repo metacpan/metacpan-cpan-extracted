@@ -2,8 +2,8 @@ NAME
     Finance::Currency::FiatX - Fiat currency exchange rate library
 
 VERSION
-    This document describes version 0.005 of Finance::Currency::FiatX (from
-    Perl distribution Finance-Currency-FiatX), released on 2018-06-19.
+    This document describes version 0.008 of Finance::Currency::FiatX (from
+    Perl distribution Finance-Currency-FiatX), released on 2018-06-27.
 
 SYNOPSIS
     See fiatx from App::fiatx for an example on how to use this module.
@@ -29,7 +29,7 @@ FUNCTIONS
 
     *   dbh => *obj*
 
-    *   max_age_cache => *posint* (default: 14400)
+    *   max_age_cache => *nonnegint* (default: 14400)
 
         Above this age (in seconds), we retrieve rate from remote source
         again.
@@ -76,7 +76,7 @@ FUNCTIONS
 
     *   from* => *currency::code*
 
-    *   max_age_cache => *posint* (default: 14400)
+    *   max_age_cache => *nonnegint* (default: 14400)
 
         Above this age (in seconds), we retrieve rate from remote source
         again.
@@ -99,7 +99,7 @@ FUNCTIONS
 
     *   to* => *currency::code*
 
-    *   type => *str* (default: "sell")
+    *   type => *str*
 
         Which rate is wanted? e.g. sell, buy.
 

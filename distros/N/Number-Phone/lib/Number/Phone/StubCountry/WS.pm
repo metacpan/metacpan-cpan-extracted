@@ -22,52 +22,53 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221548;
+our $VERSION = 1.20180619214157;
 
 my $formatters = [
                 {
-                  'leading_digits' => '8',
+                  'pattern' => '(8\\d{2})(\\d{3,7})',
                   'format' => '$1 $2',
-                  'pattern' => '(8\\d{2})(\\d{3,4})'
+                  'leading_digits' => '8'
                 },
                 {
                   'pattern' => '(7\\d)(\\d{5})',
-                  'leading_digits' => '7',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'leading_digits' => '7'
                 },
                 {
-                  'pattern' => '(\\d{5})',
+                  'leading_digits' => '[2-6]',
                   'format' => '$1',
-                  'leading_digits' => '[2-6]'
+                  'pattern' => '(\\d{5})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '',
-                'mobile' => '
-          (?:
-            60|
-            7[25-7]\\d
-          )\\d{4}
-        ',
-                'geographic' => '
-          (?:
-            [2-5]\\d|
-            6[1-9]|
-            84\\d{2}
-          )\\d{3}
-        ',
+                'voip' => '',
                 'personal_number' => '',
-                'pager' => '',
                 'toll_free' => '800\\d{3}',
                 'fixed_line' => '
           (?:
             [2-5]\\d|
-            6[1-9]|
-            84\\d{2}
+            6[1-9]
           )\\d{3}
         ',
-                'voip' => ''
+                'geographic' => '
+          (?:
+            [2-5]\\d|
+            6[1-9]
+          )\\d{3}
+        ',
+                'pager' => '',
+                'specialrate' => '',
+                'mobile' => '
+          (?:
+            7[25-7]|
+            8(?:
+              [3-7]|
+              9\\d{3}
+            )
+          )\\d{5}
+        '
               };
 
     sub new {

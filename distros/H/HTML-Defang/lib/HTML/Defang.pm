@@ -127,10 +127,11 @@ our @ISA = ('Exporter');
 %EXPORT_TAGS = (all => [qw(@FormTags DEFANG_NONE DEFANG_ALWAYS DEFANG_DEFAULT)]);
 Exporter::export_ok_tags('all');
 
+use 5.010;
 use strict;
 use warnings;
 
-our $VERSION=1.05;
+our $VERSION=1.06;
 
 use constant DEFANG_NONE => 0;
 use constant DEFANG_ALWAYS => 1;
@@ -189,7 +190,7 @@ my %Rules =
   "form-method"  => qr/^(get|post)$/i,
   "frame"        => qr/^(void|above|below|hsides|vsides|lhs|rhs|box|border)$/i,
   # href: Not javascript, vbs or vbscript
-  "href"         => [ qr/^((?:[a-z]*script|mocha|opera|about|data|tcl)\s*:|.*\&{|hcp|smb|\/dev\/|<)/i ],
+  "href"         => [ qr/^((?:[a-z]*script|mocha|opera|about|data|tcl)\s*:|.*\&\{|hcp|smb|\/dev\/|<)/i ],
   "usemap-href"  => qr/^#[A-Za-z0-9_.-]+$/,  # this is not really a href at all!
   "input-size"   => qr/^(\d{1,4})$/, # some browsers freak out with very large widgets
   "input-type"   => qr/^(button|checkbox|file|hidden|image|password|radio|readonly|reset|submit|text)$/i,
@@ -215,7 +216,7 @@ my %Rules =
 #  "style"        => qr/expression|eval|script:|mocha:|\&{|\@import|(?<!background-)position:|background-image/i, # XXX there are probably a million more ways to cause trouble with css!
   "style"        => qr/^.*$/s,
 #kc In addition to this, we could strip all 'javascript:|expression|' etc. from all attributes(in attribute_cleanup())
-  "stylesheet"   => [ qr/expression|eval|script:|mocha:|\&{|\@import/i ], # stylesheets are forbidden if Embedded => 1.  css positioning can be allowed in an iframe.
+  "stylesheet"   => [ qr/expression|eval|script:|mocha:|\&\{|\@import/i ], # stylesheets are forbidden if Embedded => 1.  css positioning can be allowed in an iframe.
   # NB see also `process_stylesheet' below
   "style-type"   => [ qr/script|mocha/i ],
   "size"         => qr/^[\+\-]?[\d.]+(px|%)?$/i,

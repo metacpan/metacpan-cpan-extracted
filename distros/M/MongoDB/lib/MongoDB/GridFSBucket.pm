@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,7 +19,7 @@ package MongoDB::GridFSBucket;
 # ABSTRACT: A file storage abstraction
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 use MongoDB::GridFSBucket::DownloadStream;
@@ -35,7 +34,6 @@ use MongoDB::_Types qw(
 );
 use Scalar::Util qw/reftype/;
 use Types::Standard qw(
-  Int
   Str
   InstanceOf
 );
@@ -135,8 +133,8 @@ has read_preference => (
 #pod =attr bson_codec
 #pod
 #pod An object that provides the C<encode_one> and C<decode_one> methods, such
-#pod as from L<MongoDB::BSON>.  It may be initialized with a hash reference that
-#pod will be coerced into a new MongoDB::BSON object.  By default it will be
+#pod as from L<BSON>.  It may be initialized with a hash reference that
+#pod will be coerced into a new BSON object.  By default it will be
 #pod inherited from a L<MongoDB::Database> object.
 #pod
 #pod =cut
@@ -163,6 +161,18 @@ has max_time_ms => (
     is       => 'ro',
     isa      => NonNegNum,
     required => 1,
+);
+
+#pod =attr disable_md5
+#pod
+#pod When true, files will not include the deprecated C<md5> field in the
+#pod file document.  Defaults to false.
+#pod
+#pod =cut
+
+has disable_md5 => (
+    is       => 'ro',
+    isa      => Boolish,
 );
 
 # determines whether or not to attempt index creation
@@ -222,7 +232,7 @@ sub _create_indexes {
 
     my $pf = $self->_files->clone( read_preference => 'primary' );
 
-    return if $pf->count > 0;
+    return if $pf->count_documents({}) > 0;
 
     my $pfi = $pf->indexes;
     my $pci = $self->_chunks->clone( read_preference => 'primary' )->indexes;
@@ -395,8 +405,9 @@ sub open_upload_stream {
 
 sub open_upload_stream_with_id {
     my ( $self, $id, $filename, $options ) = @_;
+    my $id_copy = $id;
     MongoDB::UsageError->throw('No id provided to open_upload_stream_with_id')
-      unless defined $id && length $id;
+      unless defined $id_copy && length $id_copy;
     MongoDB::UsageError->throw('No filename provided to open_upload_stream_with_id')
       unless defined $filename && length $filename;
 
@@ -502,8 +513,9 @@ sub upload_from_stream {
 
 sub upload_from_stream_with_id {
     my ( $self, $id, $filename, $source_fh, $options ) = @_;
+    my $id_copy = $id; # preserve number/string form
     MongoDB::UsageError->throw('No id provided to upload_from_stream_with_id')
-      unless defined $id && length $id;
+      unless defined $id_copy && length $id_copy;
     MongoDB::UsageError->throw('No filename provided to upload_from_stream_with_id')
       unless defined $filename && length $filename;
     MongoDB::UsageError->throw('No handle provided to upload_from_stream_with_id')
@@ -573,7 +585,7 @@ MongoDB::GridFSBucket - A file storage abstraction
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -585,7 +597,7 @@ version v1.8.2
     $stream->close;
 
     # find and download a file
-    $result  = $bucket-find({filename => "foo.txt"});
+    $result  = $bucket->find({filename => "foo.txt"});
     $file_id = $result->next->{_id};
     $stream  = $bucket->open_download_stream($file_id)
     $data    = do { local $/; $stream->readline() };
@@ -604,7 +616,7 @@ object.
 =head2 Data model
 
 A GridFS file is represented in MongoDB as a "file document" with
-information like the file's name, length, MD5 hash, and any user-supplied
+information like the file's name, length, and any user-supplied
 metadata.  The actual contents are stored as a number of "chunks" of binary
 data.  (Think of the file document as a directory entry and the chunks like
 blocks on disk.)
@@ -615,7 +627,7 @@ Valid file documents typically include the following fields:
 
 =item *
 
-_id – a unique ID for this document, typically type BSON ObjectId.
+_id – a unique ID for this document, typically a BSON ObjectId.
 
 =item *
 
@@ -631,15 +643,15 @@ uploadDate – the date and time this file was added to GridFS, stored as a BSON
 
 =item *
 
-md5 – a hash of the contents of the stored file
-
-=item *
-
 filename – the name of this stored file; the combination of filename and uploadDate (millisecond resolution) must be unique
 
 =item *
 
 metadata – any additional application data the user wishes to store (optional)
+
+=item *
+
+md5 – DEPRECATED a hash of the contents of the stored file (store this in C<metadata> if you need it) (optional)
 
 =item *
 
@@ -722,8 +734,8 @@ if all file and chunk documents have not replicated to all secondaries.
 =head2 bson_codec
 
 An object that provides the C<encode_one> and C<decode_one> methods, such
-as from L<MongoDB::BSON>.  It may be initialized with a hash reference that
-will be coerced into a new MongoDB::BSON object.  By default it will be
+as from L<BSON>.  It may be initialized with a hash reference that
+will be coerced into a new BSON object.  By default it will be
 inherited from a L<MongoDB::Database> object.
 
 =head2 max_time_ms
@@ -734,6 +746,11 @@ L<MongoDB::Database> object.
 
 B<Note>: this will only be used for server versions 2.6 or greater, as that
 was when the C<$maxTimeMS> meta-operator was introduced.
+
+=head2 disable_md5
+
+When true, files will not include the deprecated C<md5> field in the
+file document.  Defaults to false.
 
 =head1 METHODS
 

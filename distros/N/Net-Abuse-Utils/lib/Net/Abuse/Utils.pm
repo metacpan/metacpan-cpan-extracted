@@ -7,7 +7,7 @@ use warnings;
 
 use Net::DNS;
 use Net::Whois::IP 1.11 'whoisip_query';
-use Email::Address;
+use Email::Address::XS;
 use Net::IP;
 # use Memoize;
 
@@ -22,7 +22,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 $VERSION = eval $VERSION;
 
 # memoize('_return_rr');
@@ -117,12 +117,12 @@ sub get_ipwi_contacts {
     # whoisip_query returns array ref if not found
     return unless ref($response) eq 'HASH';
 
-    foreach my $field (keys %$response) {
-        push @addresses, Email::Address->parse($response->{$field});
+    my @fields = exists $response->{'abuse-mailbox'} ? ( 'abuse-mailbox' ) : keys %$response;
+    foreach my $field (@fields) {
+        push @addresses, Email::Address::XS->parse($response->{$field});
     }
 
-    @addresses = map { $_->address } @addresses;
-
+    @addresses = grep { defined $_ } map { $_->address } @addresses;
     return _return_unique (\@addresses);
 }
 
@@ -141,7 +141,7 @@ sub get_all_asn_info {
     # 23028 | 216.90.108.0/24 | US | arin | 1998-09-25
     # 701 1239 3549 3561 7132 | 216.90.108.0/24 | US | arin | 1998-09-25
     for my $asinfo (@$data) {
-        $asinfo = { data => [ split m/ \| /, $asinfo ] };
+        $asinfo = { data => [ split m/ ?\| ?/, $asinfo ] };
         $asinfo->{length} = ( split m|/|, $asinfo->{data}[1] )[1];
     }
     $data = [ map { $_->{data} }
@@ -346,7 +346,7 @@ Net::Abuse::Utils - Routines useful for processing network abuse
 
 =head1 VERSION
 
-version 0.25
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -360,14 +360,6 @@ Net::Abuse::Utils provides serveral functions useful for determining
 information about an IP address including contact/reporting addresses,
 ASN/network info, reverse dns, and DNSBL listing status.  Functions which take
 an IP accept either IPv6 or IPv4 IPs unless indicated otherwise.
-
-=head1 NAME
-
-Net::Abuse::Utils - Routines useful for processing network abuse
-
-=head1 VERSION
-
-version 0.24
 
 =head1 CONFIGURATION
 
@@ -402,7 +394,7 @@ Returns the AS description for C<ASN>.
 
 =head2 get_as_company ( ASN )
 
-Similiar to C<get_as_description> but attempts to clean it up some before
+Similiar to L</get_as_description> but attempts to clean it up some before
 returning it.
 
 =head2 get_soa_contact( IP )
@@ -453,7 +445,7 @@ detection_rate.
 
 =head1 DIAGNOSTICS
 
-Each subroutine will return undef if unsuccessful.  In the furture,
+Each subroutine will return undef if unsuccessful.  In the future,
 debugging output will be available.
 
 =head1 CONFIGURATION AND ENVIRONMENT
@@ -466,7 +458,7 @@ may be made available in the future via an import flag to use.
 
 This module makes use of the following modules:
 
-L<Net::IP>, L<Net::DNS>, L<Net::Whois::IP>, and L<Email::Address>
+L<Net::IP>, L<Net::DNS>, L<Net::Whois::IP>, and L<Email::Address::XS>
 
 =head1 BUGS AND LIMITATIONS
 
@@ -529,7 +521,7 @@ Wes Young <github@barely3am.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by =over 4.
+This software is copyright (c) 2013-2018 by Michael Greb
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

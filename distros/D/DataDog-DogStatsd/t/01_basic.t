@@ -16,4 +16,6 @@ $statsd->decrement( 'test.stats', { tags => ['tag1', 'tag2'] } );
 $statsd->timing( 'test.timing', 1, { tags => ['tag1', 'tag2'] } );
 $statsd->gauge('test.gauge', 10, { tags => ['tag1', 'tag2'] } );
 
+$statsd->event('event title', 'event description!');
+
 done_testing;

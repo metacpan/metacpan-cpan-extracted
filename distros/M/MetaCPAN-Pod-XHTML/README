@@ -1,5 +1,47 @@
 NAME
     MetaCPAN::Pod::XHTML - Format Pod as HTML for MetaCPAN
 
-ATTRIBUTES
-  link_mappings
+SYNOPSIS
+      my $parser = MetaCPAN::Pod::XHTML->new;
+      $parser->link_mappings({
+        'Pod::Simple::Subclassing' => '/pod/distribution/Pod-Simple/lib/Pod/Simple/Subclassing.pod',
+      });
+      $parser->output_string(\my $html);
+      $parser->parse_string_document($pod);
+
+DESCRIPTION
+    This is a subclass of Pod::Simple::XHTML with improved header linking,
+    link overrides, and errata included in the HTML. Used internally by
+    MetaCPAN.
+
+ROLES
+    The behavior of this subclass is implemented through reusable roles:
+
+    *   Pod::Simple::Role::XHTML::WithLinkMappings
+
+    *   Pod::Simple::Role::XHTML::WithAccurateTargets
+
+    *   Pod::Simple::Role::XHTML::WithErrata
+
+    *   Pod::Simple::Role::StripVerbatimIndent
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
+    *   Olaf Alders <olaf@wundersolutions.com>
+
+    *   Randy Stauner <randy@magnificent-tears.com>
+
+    *   Moritz Onken <onken@netcubed.de>
+
+    *   Grant McLean <grant@mclean.net.nz>
+
+COPYRIGHT
+    Copyright (c) 2017 the MetaCPAN::Pod::XHTML "AUTHOR" and "CONTRIBUTORS"
+    as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <http://dev.perl.org/licenses/>.
+

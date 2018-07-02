@@ -27,6 +27,10 @@ $SPEC{app} = {
             summary => "Don't wrap HTML with HTML/HEAD/BODY elements",
             schema => ['bool', is=>1],
         },
+        browser => {
+            summary => 'Instead of returning the HTML, show it in browser',
+            schema => ['bool*', is=>1],
+        },
     },
 };
 sub app {
@@ -36,7 +40,7 @@ sub app {
     if ($args{input_filename} eq '-') {
         $oth_args{source_str} = do {
             local $/;
-            binmode STDIN, ":utf8";
+            binmode STDIN, ":encoding(utf8)";
             scalar <STDIN>;
         };
     } else {
@@ -48,7 +52,24 @@ sub app {
     $oth_args{html_title} = $args{title} if defined $args{title};
 
     require Org::To::HTML;
-    Org::To::HTML::org_to_html(%oth_args);
+    my $res = Org::To::HTML::org_to_html(%oth_args);
+    return $res unless $res->[0] == 200;
+
+    if ($args{browser}) {
+        require Browser::Open;
+        require File::Temp;
+        require URI::Escape;
+
+        my ($fh, $fpath) = File::Temp::tempfile();
+        print $fh $res->[2];
+        close $fh;
+
+        my $url = "file:" . URI::Escape::uri_escape($fpath);
+        Browser::Open::open_browser($url);
+        [200];
+    } else {
+        return $res;
+    }
 }
 
 Perinci::CmdLine::Any->new(
@@ -70,7 +91,7 @@ org2html - Convert Org document to HTML
 
 =head1 VERSION
 
-This document describes version 0.46 of org2html (from Perl distribution App-OrgUtils), released on 2017-07-10.
+This document describes version 0.470 of org2html (from Perl distribution App-OrgUtils), released on 2018-06-30.
 
 =head1 SYNOPSIS
 
@@ -90,6 +111,10 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--browser>
+
+Instead of returning the HTML, show it in browser.
 
 =item B<--input-filename>=I<s>*, B<-i>
 
@@ -242,6 +267,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ browser (see --browser)
  format (see --format)
  input_filename (see --input-filename)
  naked (see --naked)
@@ -296,7 +322,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

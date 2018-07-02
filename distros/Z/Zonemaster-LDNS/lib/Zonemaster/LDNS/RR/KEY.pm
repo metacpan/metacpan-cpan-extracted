@@ -1,5 +1,7 @@
-
 package Zonemaster::LDNS::RR::KEY;
+
+use strict;
+use warnings;
 
 use parent 'Zonemaster::LDNS::RR';
 
@@ -32,5 +34,7 @@ Returns the algorithm number.
 =item keydata()
 
 Returns the cryptographic key in binary form.
+
+=back
 
 =cut

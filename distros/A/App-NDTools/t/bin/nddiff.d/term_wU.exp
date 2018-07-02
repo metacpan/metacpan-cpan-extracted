@@ -1,0 +1,22 @@
+  {false}
+-   false
++   true
+  {list}
+    [0]
+      true
+-   [1]
+-     false
+    [2]
+      true
++   [3]
++     false
+    [4]
+      false
+  {same}
+    {
+       "false" : false,
+       "true" : true
+    }
+  {true}
+-   true
++   false

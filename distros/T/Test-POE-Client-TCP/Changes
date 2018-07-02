@@ -1,6 +1,40 @@
 ==================================================
-Changes from 2013-05-30 00:00:00 +0000 to present.
+Changes from 2013-07-03 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.18 at 2018-07-02 09:18:10 +0000
+-----------------------------------------
+
+  Change: 58133ae09a1087d1d0cf6e5eac3767961b2e2577
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-07-02 10:18:10 +0000
+
+    Added usessl option to enable SSL/TLS 
+
+-----------------------------------------
+version 1.16 at 2018-06-21 19:18:05 +0000
+-----------------------------------------
+
+  Change: 80815ed0757d71ba2b35b9366d3350a8b2415547
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-06-21 20:18:05 +0000
+
+    Bump version to 1.16 
+
+  Change: 6e7dd74c4d8bc13faee5c266d1650c2903c605fa
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2018-06-21 20:15:15 +0000
+
+    Merge pull request #1 from fschlich/patch-1
+
+    fix typos in POD 
+
+  Change: 253810a4de56c91c45a940397106cf76be899585
+  Author: Florian Schlichting <fsfs@debian.org>
+  Date : 2018-06-21 20:03:41 +0000
+
+    fix typos 
 
 -----------------------------------------
 version 1.14 at 2018-05-29 08:22:21 +0000
@@ -13,5 +47,5 @@ version 1.14 at 2018-05-29 08:22:21 +0000
     Added accessor for 'context' and update documentation 
 
 ================================================
-Plus 7 releases after 2013-05-30 00:00:00 +0000.
+Plus 7 releases after 2013-07-03 00:00:00 +0000.
 ================================================

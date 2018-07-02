@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
    "provides" : {
       "IO::Async::Loop::Epoll" : {
          "file" : "lib/IO/Async/Loop/Epoll.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -45,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.18",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

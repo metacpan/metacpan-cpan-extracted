@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2018-01-24'; # DATE
-our $VERSION = '0.592'; # VERSION
+our $DATE = '2018-06-26'; # DATE
+our $VERSION = '0.593'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -26,6 +26,7 @@ sub configure {
         'PERLANCAR::MetaResources',
         'CheckChangeLog',
         'CheckMetaResources',
+        'CheckSelfDependency',
         'CopyrightYearFromGit',
         'IfBuilt',
         'MetaJSON',
@@ -71,7 +72,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.592 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2018-01-24.
+This document describes version 0.593 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2018-06-26.
 
 =head1 SYNOPSIS
 

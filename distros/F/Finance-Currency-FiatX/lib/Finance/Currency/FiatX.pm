@@ -1,7 +1,7 @@
 package Finance::Currency::FiatX;
 
-our $DATE = '2018-06-19'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-06-27'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -31,10 +31,10 @@ our %args_caching = (
     max_age_cache => {
         summary => 'Above this age (in seconds), '.
             'we retrieve rate from remote source again',
-        schema => 'posint*',
+        schema => 'nonnegint*',
         default => 4*3600,
         cmdline_aliases => {
-            no_cache => {summary => 'Alias for --max-age-cache 0', code => sub { $_[0]{max_age_cache} = 0 }},
+            no_cache => {is_flag=>1, summary => 'Alias for --max-age-cache 0', code => sub { $_[0]{max_age_cache} = 0 }},
         },
     },
 );
@@ -101,8 +101,7 @@ our %args_spot_rate = (
     },
     type => {
         summary => 'Which rate is wanted? e.g. sell, buy',
-        schema => ['str*', in=>['sell', 'buy']],
-        default => 'sell', # because we want to buy
+        schema => 'str*',
     },
     %arg_source,
 );
@@ -111,12 +110,39 @@ sub _get_db_schema_spec {
     my $table_prefix = shift;
 
     +{
-        latest_v => 4,
+        latest_v => 5,
         component_name => 'fiatx',
         provides => ["${table_prefix}rate"],
         install => [
             "CREATE TABLE ${table_prefix}rate (
-                 id INT NOT NULL PRIMARY KEY,
+                 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                 query_time DOUBLE NOT NULL, -- when do we query the source?
+                 mtime DOUBLE, -- when is the rate last updated, according to the source?
+                 from_currency VARCHAR(10) NOT NULL,
+                 to_currency   VARCHAR(10) NOT NULL,
+                 rate DECIMAL(21,8) NOT NULL,         -- multiplier to use to convert 1 unit of from_currency to to_currency, e.g. from_currency = USD, to_currency = IDR, rate = 14000
+                 source VARCHAR(10) NOT NULL,
+                 type VARCHAR(32) NOT NULL DEFAULT '', -- 'sell', 'buy', etc
+                 note VARCHAR(255),
+                 _key TINYINT -- 1 = get_spot_rate, 2=get_all_spot_rates
+             )",
+            "CREATE INDEX ${table_prefix}rate_time ON ${table_prefix}rate(query_time)",
+        ],
+        upgrade_to_v5 => [
+            "ALTER TABLE ${table_prefix}rate CHANGE type type VARCHAR(32) NOT NULL DEFAULT ''",
+        ],
+        upgrade_to_v4 => [
+            "ALTER TABLE ${table_prefix}rate ADD _key TINYINT",
+        ],
+        upgrade_to_v3 => [
+            "ALTER TABLE ${table_prefix}rate ADD id INT NOT NULL PRIMARY KEY AUTO_INCREMENT FIRST, CHANGE time query_time DOUBLE NOT NULL, ADD mtime DOUBLE",
+        ],
+        upgrade_to_v2 => [
+            "ALTER TABLE ${table_prefix}rate CHANGE currency1 from_currency VARCHAR(10) NOT NULL, CHANGE currency2 to_currency VARCHAR(10) NOT NULL",
+        ],
+        install_v4 => [
+            "CREATE TABLE ${table_prefix}rate (
+                 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                  query_time DOUBLE NOT NULL, -- when do we query the source?
                  mtime DOUBLE, -- when is the rate last updated, according to the source?
                  from_currency VARCHAR(10) NOT NULL,
@@ -128,15 +154,6 @@ sub _get_db_schema_spec {
                  _key TINYINT -- 1 = get_spot_rate, 2=get_all_spot_rates
              )",
             "CREATE INDEX ${table_prefix}rate_time ON ${table_prefix}rate(query_time)",
-        ],
-        upgrade_to_v4 => [
-            "ALTER TABLE ${table_prefix}rate ADD _key TINYINT",
-        ],
-        upgrade_to_v3 => [
-            "ALTER TABLE ${table_prefix}rate ADD id INT NOT NULL PRIMARY KEY AUTO_INCREMENT FIRST, CHANGE time query_time DOUBLE NOT NULL, ADD mtime DOUBLE",
-        ],
-        upgrade_to_v2 => [
-            "ALTER TABLE ${table_prefix}rate CHANGE currency1 from_currency VARCHAR(10) NOT NULL, CHANGE currency2 to_currency VARCHAR(10) NOT NULL",
         ],
         install_v3 => [
             "CREATE TABLE ${table_prefix}rate (
@@ -200,8 +217,9 @@ $SPEC{get_all_spot_rates} = {
     summary => 'Get all spot rates from a source',
     args => {
         %args_db,
-        %arg_req0_source,
         %args_caching,
+
+        %arg_req0_source,
     },
 };
 sub get_all_spot_rates {
@@ -215,6 +233,7 @@ $SPEC{get_spot_rate} = {
     args => {
         %args_db,
         %args_caching,
+
         %args_spot_rate,
     },
 };
@@ -243,7 +262,7 @@ sub _get_all_spot_rates_or_get_spot_rate {
             if $source eq ':all';
         # in case user does this
         if ($from eq $to) {
-            return [304, "OK (identity)", 1];
+            return [304, "OK (identity)", {rate=>1}];
         }
     } else {
         $source or return [400, "Please specify from"];
@@ -634,7 +653,8 @@ sub _get_all_spot_rates_or_get_spot_rate {
         $resmeta->{'table.fields'}        = ['source', 'pair', 'type', 'rate',  'mtime',            'note', 'cache_time'];
         $resmeta->{'table.field_formats'} = [undef,    undef,   undef,  $fnum8, 'iso8601_datetime', undef , 'iso8601_datetime'];
         $resmeta->{'table.field_aligns'}  = ['left',   'ldef', 'left', 'right', 'left'];
-
+        $resmeta->{'table.field_align_code'}  = sub { $_[0] =~ /^(buy|sell)/ ? 'right' : undef },
+        $resmeta->{'table.field_format_code'} = sub { $_[0] =~ /^(buy|sell)/ ? $fnum8  : undef },
         [200, "OK", \@rates, $resmeta];
     }
 }
@@ -654,7 +674,7 @@ Finance::Currency::FiatX - Fiat currency exchange rate library
 
 =head1 VERSION
 
-This document describes version 0.005 of Finance::Currency::FiatX (from Perl distribution Finance-Currency-FiatX), released on 2018-06-19.
+This document describes version 0.008 of Finance::Currency::FiatX (from Perl distribution Finance-Currency-FiatX), released on 2018-06-27.
 
 =head1 SYNOPSIS
 
@@ -686,7 +706,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<dbh> => I<obj>
 
-=item * B<max_age_cache> => I<posint> (default: 14400)
+=item * B<max_age_cache> => I<nonnegint> (default: 14400)
 
 Above this age (in seconds), we retrieve rate from remote source again.
 
@@ -738,7 +758,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<from>* => I<currency::code>
 
-=item * B<max_age_cache> => I<posint> (default: 14400)
+=item * B<max_age_cache> => I<nonnegint> (default: 14400)
 
 Above this age (in seconds), we retrieve rate from remote source again.
 
@@ -760,7 +780,7 @@ sources.
 
 =item * B<to>* => I<currency::code>
 
-=item * B<type> => I<str> (default: "sell")
+=item * B<type> => I<str>
 
 Which rate is wanted? e.g. sell, buy.
 

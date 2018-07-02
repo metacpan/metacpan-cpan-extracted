@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::Grab;
-$Config::Model::Role::Grab::VERSION = '2.124';
+$Config::Model::Role::Grab::VERSION = '2.125';
 # ABSTRACT: Role to grab data from elsewhere in the tree
 
 use Mouse::Role;
@@ -369,7 +369,7 @@ Config::Model::Role::Grab - Role to grab data from elsewhere in the tree
 
 =head1 VERSION
 
-version 2.124
+version 2.125
 
 =head1 SYNOPSIS
 
@@ -463,8 +463,8 @@ Go down using C<xxx> element and id C<yy> (valid for hash or list elements)
 Go up the tree until a node containing element C<xxx> is found. Then go down
 the tree like item C<xxx>.
 
-If C<?xxx:yy>, go up the tree the same way. But no check is done to
-see if id C<yy> actually exists or not. Only the element C<xxx> is 
+C<?xxx:yy> goes up the tree the same way. But no check is done to see
+if id C<yy> key actually exists or not. Only the element C<xxx> is
 considered when going up the tree.
 
 =back

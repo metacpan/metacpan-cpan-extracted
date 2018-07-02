@@ -16,3 +16,4 @@ t/license-summary.t
 t/pod.t
 t/short-name-fallback.t
 t/summary_or_text.t
+test.pl~

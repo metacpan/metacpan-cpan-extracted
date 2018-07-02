@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Node;
-$Config::Model::Node::VERSION = '2.124';
+$Config::Model::Node::VERSION = '2.125';
 use Mouse;
 with "Config::Model::Role::NodeLoader";
 
@@ -1222,7 +1222,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.124
+version 2.125
 
 =head1 SYNOPSIS
 

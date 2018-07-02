@@ -3,6 +3,8 @@ package Devel::hdb::App::Base;
 use strict;
 use warnings;
 
+our $VERSION = '0.24';
+
 sub add_route {
     my($class, $method, $path, $cb) = @_;
     my $app = Devel::hdb::App->get();
@@ -52,5 +54,5 @@ Anthony Brummett <brummett@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2014, Anthony Brummett.  This module is free software. It may
+Copyright 2018, Anthony Brummett.  This module is free software. It may
 be used, redistributed and/or modified under the same terms as Perl itself.

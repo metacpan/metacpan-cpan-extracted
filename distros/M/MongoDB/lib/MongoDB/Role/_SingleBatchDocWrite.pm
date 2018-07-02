@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2016 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::Role::_SingleBatchDocWrite;
 # MongoDB interface for database insert/update/delete operations
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo::Role;
 
@@ -38,18 +36,20 @@ use namespace::clean;
 
 with $_ for qw(
   MongoDB::Role::_WriteOp
+  MongoDB::Role::_SessionSupport
+  MongoDB::Role::_CommandMonitoring
 );
 
 requires qw/db_name write_concern _parse_cmd _parse_gle/;
 
 sub _send_legacy_op_with_gle {
-    my ( $self, $link, $op_bson, $op_doc, $result_class ) = @_;
+    my ( $self, $link, $op_bson, $request_id, $op_doc, $result_class, $cmd_name ) = @_;
 
     my $wc_args = $self->write_concern->as_args();
     my @write_concern = scalar @$wc_args ? %{ $wc_args->[1] } : ();
 
     my $gle = $self->bson_codec->encode_one( [ getlasterror => 1, @write_concern ] );
-    my ( $gle_bson, $request_id ) =
+    my ( $gle_bson, $gle_request_id ) =
         MongoDB::_Protocol::write_query( $self->db_name . '.$cmd', $gle, undef, 0, -1 );
 
     # write op sent as a unit with GLE command to ensure GLE applies to the
@@ -64,8 +64,21 @@ sub _send_legacy_op_with_gle {
         );
     }
 
-    $link->write( $op_bson ),
-    ( my $result = MongoDB::_Protocol::parse_reply( $link->read, $request_id ) );
+    $self->publish_legacy_write_started( $link, $cmd_name, $op_doc, $request_id )
+      if $self->monitoring_callback;
+
+    my $result;
+    eval {
+        $link->write( $op_bson ),
+        ( $result = MongoDB::_Protocol::parse_reply( $link->read, $gle_request_id ) );
+    };
+    if ( my $err = $@ ) {
+        $self->publish_command_exception($err) if $self->monitoring_callback;
+        die $err;
+    }
+
+    $self->publish_command_reply( $result->{docs} )
+      if $self->monitoring_callback;
 
     my $res = $self->bson_codec->decode_one( $result->{docs} );
 
@@ -127,18 +140,32 @@ sub _send_legacy_op_with_gle {
 }
 
 sub _send_legacy_op_noreply {
-    my ( $self, $link, $op_bson, $op_doc, $result_class ) = @_;
-    $link->write($op_bson);
+    my ( $self, $link, $op_bson, $request_id, $op_doc, $result_class, $cmd_name) = @_;
+
+    $self->publish_legacy_write_started( $link, $cmd_name, $op_doc, $request_id )
+      if $self->monitoring_callback;
+
+    eval { $link->write($op_bson) };
+    if ( my $err = $@ ) {
+        $self->publish_command_exception($err) if $self->monitoring_callback;
+        die $err;
+    }
+
+    $self->publish_command_reply( { ok => 1 } )
+      if $self->monitoring_callback;
+
     return MongoDB::UnacknowledgedResult->_new(
         $self->_parse_gle( {}, $op_doc ),
-        acknowledged => 0,
-        write_errors => [],
+        acknowledged         => 0,
+        write_errors         => [],
         write_concern_errors => [],
     );
 }
 
 sub _send_write_command {
     my ( $self, $link, $cmd, $op_doc, $result_class ) = @_;
+
+    $self->_apply_session_and_cluster_time( $link, \$cmd );
 
     # send command and get response document
     my $command = $self->bson_codec->encode_one( $cmd );
@@ -155,12 +182,31 @@ sub _send_write_command {
         );
     }
 
-    $link->write( $op_bson ),
-    ( my $result = MongoDB::_Protocol::parse_reply( $link->read, $request_id ) );
+    $self->publish_command_started( $link, $cmd, $request_id )
+      if $self->monitoring_callback;
+
+    my $result;
+    eval {
+        $link->write( $op_bson ),
+        ( $result = MongoDB::_Protocol::parse_reply( $link->read, $request_id ) );
+    };
+    if ( my $err = $@ ) {
+        $self->_update_session_connection_error( $err );
+        $self->publish_command_exception($err) if $self->monitoring_callback;
+        die $err;
+    }
+
+    $self->publish_command_reply( $result->{docs} )
+      if $self->monitoring_callback;
 
     my $res = $self->bson_codec->decode_one( $result->{docs} );
 
+    $self->_update_session_pre_assert( $res );
+
+    $self->_update_session_and_cluster_time($res);
+
     # Error checking depends on write concern
+    # TODO does this logic get affected by transactions???? Probably?
 
     if ( $self->write_concern->is_acknowledged ) {
         # errors in the command itself get handled as normal CommandResult
@@ -178,12 +224,14 @@ sub _send_write_command {
 
         # otherwise, construct the desired result object, calling back
         # on class-specific parser to generate additional attributes
-        return $result_class->_new(
+        my $built_result = $result_class->_new(
             write_errors => ( $res->{writeErrors} ? $res->{writeErrors} : [] ),
             write_concern_errors =>
               ( $res->{writeConcernError} ? [ $res->{writeConcernError} ] : [] ),
             $self->_parse_cmd($res),
         );
+        $self->_assert_session_errors( $built_result );
+        return $built_result;
     }
     else {
         return MongoDB::UnacknowledgedResult->_new(

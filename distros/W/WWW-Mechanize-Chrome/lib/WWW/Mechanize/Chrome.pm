@@ -3,6 +3,7 @@ use strict;
 use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
+use File::Spec;
 use WWW::Mechanize::Plugin::Selector;
 use HTTP::Response;
 use HTTP::Headers;
@@ -16,8 +17,9 @@ use WWW::Mechanize::Chrome::Node;
 use JSON::PP;
 use MIME::Base64 'decode_base64';
 use Data::Dumper;
+use Storable 'dclone';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 our @CARP_NOT;
 
 =head1 NAME
@@ -194,12 +196,7 @@ websocket implementation(s) as source of bugs.
 sub build_command_line {
     my( $class, $options )= @_;
 
-    # Chrome.exe on Windows
-    # google-chrome on Linux (etc?)
-    my $default_exe = $^O =~ /mswin/i ? 'chrome'
-                                      : 'google-chrome';
-
-    $options->{ launch_exe } ||= $ENV{CHROME_BIN} || $default_exe;
+    $options->{ launch_exe } ||= $ENV{CHROME_BIN} || $class->find_executable();
     $options->{ launch_arg } ||= [];
 
     $options->{port} ||= 9222
@@ -259,7 +256,7 @@ sub build_command_line {
     push @{ $options->{ launch_arg }}, "$options->{start_url}"
         if exists $options->{start_url};
 
-    my $program = ($^O =~ /mswin/i and $options->{ launch_exe } =~ /\s/)
+    my $program = ($^O =~ /mswin/i and $options->{ launch_exe } =~ /[\s|<>&]/)
                   ? qq("$options->{ launch_exe }")
                   : $options->{ launch_exe };
 
@@ -267,6 +264,52 @@ sub build_command_line {
 
     @cmd
 };
+
+=head2 C<< WWW::Mechanize::Chrome->find_executable >>
+
+    my $chrome = WWW::Mechanize::Chrome->find_executable();
+
+    my $chrome = WWW::Mechanize::Chrome->find_executable(
+        'chromium.exe',
+        '.\\my-chrome-versions\\',
+    );
+
+Finds the first Chrome executable in the path (C<$ENV{PATH}>). For Windows, it
+also looks in C<< $ENV{ProgramFiles} >>, C<< $ENV{ProgramFiles(x86)} >>
+and C<< $ENV{"ProgramFilesW6432"} >>.
+
+This is used to find the default Chrome executable if none was given through
+the C<launch_exe> option.
+
+=cut
+
+sub find_executable( $class, $program=undef, @search ) {
+    $program ||= $^O =~ /mswin/i
+        ? 'chrome.exe'
+        : 'google-chrome';
+
+    push @search, File::Spec->path();
+
+    if( $^O =~ /MSWin/i ) {
+        push @search,
+            map { "$_\\Google\\Chrome\\Application\\" }
+            grep {defined}
+            ($ENV{'ProgramFiles'},
+             $ENV{'ProgramFiles(x86)'},
+             $ENV{"ProgramFilesW6432"},
+            );
+    };
+
+    my $found;
+    for my $path (@search) {
+        my $this = File::Spec->catfile( $path, $program );
+        if( -x $this ) {
+            $found = $this;
+            last;
+        };
+    }
+    return defined $found ? $found : ()
+}
 
 sub _find_free_port( $self, $start ) {
     my $port = $start;
@@ -479,53 +522,20 @@ sub new($class, %options) {
     );
 
     if( my $agent = delete $options{ user_agent }) {
-        push @setup, $self->agent_async( $agent );
+        push @setup, $self->agent_future( $agent );
     };
 
     Future->wait_all(
         @setup,
     )->get;
 
-    if( ! exists $options{ tab }) {
-        $self->get('about:blank'); # Reset to clean state, also initialize our frame id
+    # ->get() doesn't have ->get_future() yet
+    if( ! (exists $options{ tab } )) {
+        $self->get($options{ start_url }); # Reset to clean state, also initialize our frame id
     };
 
     $self
 };
-
-=head2 C<< $mech->add_listener >>
-
-  my $url_loaded = $mech->add_listener('Network.responseReceived', sub {
-      my( $info ) = @_;
-      warn "Loaded URL "
-           . $info->{params}->{response}->{url}
-           . ": "
-           . $info->{params}->{response}->{status};
-      warn "Resource timing: " . Dumper $info->{params}->{response}->{timing};
-  });
-
-Returns a listener object. If that object is discarded, the listener callback
-will be removed.
-
-Calling this method in void context croaks.
-
-To see the browser console live from your Perl script, use the following:
-
-  my $console = $mech->add_listener('Runtime.consoleAPICalled', sub {
-    warn join ", ",
-        map { $_->{value} // $_->{description} }
-        @{ $_[0]->{params}->{args} };
-  });
-
-=cut
-
-sub add_listener( $self, $event, $callback ) {
-    if( ! defined wantarray ) {
-        croak "->add_listener called in void context."
-            . "Please store the result somewhere";
-    };
-    return $self->driver->add_listener( $event, $callback )
-}
 
 sub _handleConsoleAPICall( $self, $msg ) {
     if( $self->{report_js_errors}) {
@@ -690,6 +700,40 @@ sub setRequestInterception_future( $self, @patterns ) {
 
 sub setRequestInterception( $self, @patterns ) {
     $self->requestInterception_future( @patterns )->get
+}
+
+=head2 C<< $mech->add_listener >>
+
+  my $url_loaded = $mech->add_listener('Network.responseReceived', sub {
+      my( $info ) = @_;
+      warn "Loaded URL "
+           . $info->{params}->{response}->{url}
+           . ": "
+           . $info->{params}->{response}->{status};
+      warn "Resource timing: " . Dumper $info->{params}->{response}->{timing};
+  });
+
+Returns a listener object. If that object is discarded, the listener callback
+will be removed.
+
+Calling this method in void context croaks.
+
+To see the browser console live from your Perl script, use the following:
+
+  my $console = $mech->add_listener('Runtime.consoleAPICalled', sub {
+    warn join ", ",
+        map { $_->{value} // $_->{description} }
+        @{ $_[0]->{params}->{args} };
+  });
+
+=cut
+
+sub add_listener( $self, $event, $callback ) {
+    if( ! defined wantarray ) {
+        croak "->add_listener called in void context."
+            . "Please store the result somewhere";
+    };
+    return $self->driver->add_listener( $event, $callback )
 }
 
 =head2 C<< $mech->on_request_intercepted( $cb ) >>
@@ -857,9 +901,9 @@ sub clear_js_errors {
     $self->driver->send_message('Runtime.discardConsoleEntries')->get;
 };
 
-=head2 C<< $mech->eval_in_page( $str, @args ) >>
+=head2 C<< $mech->eval_in_page( $str ) >>
 
-=head2 C<< $mech->eval( $str, @args ) >>
+=head2 C<< $mech->eval( $str ) >>
 
   my ($value, $type) = $mech->eval( '2+2' );
 
@@ -875,7 +919,7 @@ This method is special to WWW::Mechanize::Chrome.
 =cut
 
 sub eval_in_page {
-    my ($self,$str,@args) = @_;
+    my ($self,$str) = @_;
     # Report errors from scope of caller
     # This feels weirdly backwards here, but oh well:
     local @Chrome::DevToolsProtocol::CARP_NOT
@@ -926,13 +970,68 @@ sub eval_in_chrome {
     croak "Can't call eval_in_chrome";
 };
 
-sub agent_async( $self, $ua ) {
+=head2 C<< $mech->callFunctionOn( $function, @arguments ) >>
+
+  my ($value, $type) = $mech->callFunctionOn( 'function(greeting) { alert(greeting)}', 'Hello World' );
+
+Runs the given function with the specified arguments.
+
+This method is special to WWW::Mechanize::Chrome.
+
+=cut
+
+sub callFunctionOn_future( $self, $str, %options ) {
+    # Report errors from scope of caller
+    # This feels weirdly backwards here, but oh well:
+    local @Chrome::DevToolsProtocol::CARP_NOT
+        = (@Chrome::DevToolsProtocol::CARP_NOT, (ref $self)); # we trust this
+    local @CARP_NOT
+        = (@CARP_NOT, 'Chrome::DevToolsProtocol', (ref $self)); # we trust this
+    $self->driver->callFunctionOn($str, %options)
+    ->then( sub( $result ) {
+
+        if( $result->{error} ) {
+            $self->signal_condition(
+                join "\n", grep { defined $_ }
+                               $result->{error}->{message},
+                               $result->{error}->{data},
+                               $result->{error}->{code}
+            );
+        } elsif( $result->{exceptionDetails} ) {
+            $self->signal_condition(
+                join "\n", grep { defined $_ }
+                               $result->{exceptionDetails}->{text},
+                               $result->{exceptionDetails}->{exception}->{description},
+            );
+        }
+
+        return Future->done( $result->{result}->{value}, $result->{result}->{type} );
+    })
+};
+
+sub callFunctionOn {
+    my ($self,$str, %options) = @_;
+    # Report errors from scope of caller
+    # This feels weirdly backwards here, but oh well:
+    local @Chrome::DevToolsProtocol::CARP_NOT
+        = (@Chrome::DevToolsProtocol::CARP_NOT, (ref $self)); # we trust this
+    local @CARP_NOT
+        = (@CARP_NOT, 'Chrome::DevToolsProtocol', (ref $self)); # we trust this
+    $self->callFunctionOn_future($str, %options)->get;
+};
+
+{
+    no warnings 'once';
+    *eval = \&eval_in_page;
+}
+
+sub agent_future( $self, $ua ) {
     $self->driver->send_message('Network.setUserAgentOverride', userAgent => $ua )
 }
 
 sub agent( $self, $ua ) {
     if( $ua ) {
-        $self->agent_async( $ua )->get;
+        $self->agent_future( $ua )->get;
     };
 
     $self->chrome_version_info->{"User-Agent"}
@@ -1183,29 +1282,43 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
     };
 
     # Kick off the navigation ourselves
-    my $nav = $get_navigation_future->()->get;
-    # We have a race condition to find out whether Chrome navigates or not
-    # so we wait a bit to see if it will navigate in response to our click
-    $self->sleep(0.1); # X XX baad fix
+    my $nav;
+    $get_navigation_future->()
+    ->then( sub {
+        $nav = $_[0];
 
-    my @events;
-    if( $navigated or $options{ navigates }) {
-        #warn "Now collecting the navigation events from the backlog";
-        @events = $does_navigation->get;
-        # Handle all the events, by turning them into a ->response again
-        my $res = $self->httpMessageFromEvents( $self->frameId, \@events, $target_url );
-        $self->update_response( $res );
-    } else {
-        $self->log('trace', "No navigation occurred, not collecting events");
-        $does_navigation->cancel;
-    };
-    $scheduled->cancel;
-    undef $scheduled;
+        # We have a race condition to find out whether Chrome navigates or not
+        # so we wait a bit to see if it will navigate in response to our click
+        $self->sleep_future(0.1); # X XX baad fix
+    })->then( sub {
 
-    # Store our frame id so we know what events to listen for in the future!
-    $self->{frameId} ||= $nav->{frameId};
+        my $f;
+        my @events;
+        if( $navigated or $options{ navigates }) {
+            #warn "Now collecting the navigation events from the backlog";
+            $f = $does_navigation->then( sub {
+                @events = @_;
+                # Handle all the events, by turning them into a ->response again
+                my $res = $self->httpMessageFromEvents( $self->frameId, \@events, $target_url );
+                $self->update_response( $res );
+                $scheduled->cancel;
+                undef $scheduled;
 
-    @events
+                # Store our frame id so we know what events to listen for in the future!
+                $self->{frameId} ||= $nav->{frameId};
+
+                Future->done( @events )
+            })
+        } else {
+            $self->log('trace', "No navigation occurred, not collecting events");
+            $does_navigation->cancel;
+            $f = Future->done(@events);
+            $scheduled->cancel;
+            undef $scheduled;
+        };
+
+        $f
+    })
 }
 
 sub get($self, $url, %options ) {
@@ -1221,7 +1334,8 @@ sub get($self, $url, %options ) {
         $s->driver->send_message(
             'Page.navigate',
             url => "$url"
-    )}, url => "$url", %options, navigates => 1 );
+    )}, url => "$url", %options, navigates => 1 )
+    ->get;
 
     return $self->response;
 };
@@ -1602,7 +1716,8 @@ current request.
 sub reload( $self, %options ) {
     $self->_mightNavigate( sub {
         $self->driver->send_message('Page.reload', %options )
-    }, navigates => 1, %options);
+    }, navigates => 1, %options)
+    ->get;
 }
 
 =head2 C<< $mech->set_download_directory( $dir ) >>
@@ -1798,7 +1913,8 @@ sub back( $self, %options ) {
             my $entry = $history->{entries}->[ $history->{currentIndex}-1 ];
             $self->driver->send_message('Page.navigateToHistoryEntry', entryId => $entry->{id})
         });
-    }, navigates => 1, %options);
+    }, navigates => 1, %options)
+    ->get;
 };
 
 =head2 C<< $mech->forward() >>
@@ -1817,7 +1933,8 @@ sub forward( $self, %options ) {
             my $entry = $history->{entries}->[ $history->{currentIndex}+1 ];
             $self->driver->send_message('Page.navigateToHistoryEntry', entryId => $entry->{id})
         });
-    }, navigates => 1, %options);
+    }, navigates => 1, %options)
+    ->get;
 }
 
 =head2 C<< $mech->stop() >>
@@ -1844,28 +1961,32 @@ Returns the current document URI.
 =cut
 
 sub uri( $self ) {
-    my $d = $self->document->get;
+    my $d = $self->document;
     URI->new( $d->{root}->{documentURL} )
 }
 
 =head1 CONTENT METHODS
 
+=head2 C<< $mech->document_future() >>
+
 =head2 C<< $mech->document() >>
 
-    print $self->document->get->{nodeId};
-
-Returns the document object as a Future.
+    print $self->document->{nodeId};
 
 This is WWW::Mechanize::Chrome specific.
 
 =cut
 
-sub document( $self ) {
+sub document_future( $self ) {
     $self->driver->send_message( 'DOM.getDocument' )
 }
 
+sub document( $self ) {
+    $self->document_future->get
+}
+
 sub decoded_content($self) {
-    $self->document->then(sub( $root ) {
+    $self->document_future->then(sub( $root ) {
         # Join _all_ child nodes together to also fetch DOCTYPE nodes
         # and the stuff that comes after them
         my @content = map {
@@ -1966,7 +2087,7 @@ implemented as a convenience method for L<HTML::Display::MozRepl>.
 =cut
 
 sub update_html( $self, $content ) {
-    $self->document->then(sub( $root ) {
+    $self->document_future->then(sub( $root ) {
         # Find "HTML" child node:
         my $nodeId = $root->{root}->{children}->[0]->{nodeId};
         $self->log('trace', "Setting HTML for node " . $nodeId );
@@ -2704,7 +2825,7 @@ sub xpath( $self, $query, %options) {
     };
 
     DOCUMENTS: {
-        my $doc= $options{ document } || $self->document->get;
+        my $doc= $options{ document } || $self->document;
 
         # This stores the path to this document
         # $doc->{__path}||= [];
@@ -2875,7 +2996,8 @@ sub click {
     my $response =
     $self->_mightNavigate( sub {
         $self->driver->send_message('Runtime.callFunctionOn', objectId => $id, functionDeclaration => 'function() { this.click(); }', arguments => [])
-    }, %options);
+    }, %options)
+    ->get;
 }
 
 # Internal method to run either an XPath, CSS or id query against the DOM
@@ -3470,7 +3592,8 @@ sub submit($self,$dom_form = $self->current_form) {
                 objectId => $dom_form->objectId,
                 functionDeclaration => 'function() { var action = this.action; var isCallable = action && typeof(action) === "function"; if( isCallable) { action() } else { this.__proto__.submit.apply(this) }}'
             );
-        });
+        })
+        ->get;
 
         $self->clear_current_form;
     } else {
@@ -3601,6 +3724,237 @@ sub do_set_fields {
     }
 };
 
+=head1 CONTENT MONITORING METHODS
+
+=head2 C<< $mech->is_visible( $element ) >>
+
+=head2 C<< $mech->is_visible(  %options ) >>
+
+  if ($mech->is_visible( selector => '#login' )) {
+      print "You can log in now.";
+  };
+
+Returns true if the element is visible, that is, it is
+a member of the DOM and neither it nor its ancestors have
+a CSS C<visibility> attribute of C<hidden> or
+a C<display> attribute of C<none>.
+
+You can either pass in a DOM element or a set of key/value
+pairs to search the document for the element you want.
+
+=over 4
+
+=item *
+
+C<xpath> - the XPath query
+
+=item *
+
+C<selector> - the CSS selector
+
+=item *
+
+C<dom> - a DOM node
+
+=back
+
+The remaining options are passed through to either the
+L<< /$mech->xpath|xpath >> or L<< /$mech->selector|selector >> method.
+
+=cut
+
+sub is_visible ( $self, @ ) {
+    my %options;
+    if (2 == @_) {
+        ($self,$options{dom}) = @_;
+    } else {
+        ($self,%options) = @_;
+    };
+    _default_limiter( 'maybe', \%options );
+    if (! $options{dom}) {
+        $options{dom} = $self->_option_query(%options);
+    };
+    # No element means not visible
+    return
+        unless $options{ dom };
+    #$options{ window } ||= $self->tab->{linkedBrowser}->{contentWindow};
+
+    my $id = $options{ dom }->objectId;
+    my ($val, $type) = $self->callFunctionOn(<<'JS', objectId => $id, arguments => []); #->get;
+    function ()
+    {
+        var obj = this;
+        while (obj) {
+            // No object
+            if (!obj) return false;
+
+            try {
+                if( obj["parentNode"] ) 1;
+            } catch (e) {
+                // Dead object
+                return false
+            };
+            // Descends from document, so we're done
+            if (obj.parentNode === obj.ownerDocument) {
+                return true;
+            };
+            // Not in the DOM
+            if (!obj.parentNode) {
+                return false;
+            };
+            // Direct style check
+            if (obj.style) {
+                if (obj.style.display == 'none') return false;
+                if (obj.style.visibility == 'hidden') return false;
+            };
+
+            if (window.getComputedStyle) {
+                var style = window.getComputedStyle(obj, null);
+                if (style.display == 'none') {
+                    return false; }
+                if (style.visibility == 'hidden') {
+                    return false;
+                };
+            };
+            obj = obj.parentNode;
+        };
+        // The object does not live in the DOM at all
+        return false
+    }
+JS
+    $type eq 'boolean'
+        or die "Don't know how to handle Javascript type '$type'";
+    return $val
+};
+
+=head2 C<< $mech->wait_until_invisible( $element ) >>
+
+=head2 C<< $mech->wait_until_invisible( %options ) >>
+
+  $mech->wait_until_invisible( $please_wait );
+
+Waits until an element is not visible anymore.
+
+Takes the same options as L<< $mech->is_visible/->is_visible >>.
+
+In addition, the following options are accepted:
+
+=over 4
+
+=item *
+
+C<timeout> - the timeout after which the function will C<croak>. To catch
+the condition and handle it in your calling program, use an L<eval> block.
+A timeout of C<0> means to never time out.
+
+=item *
+
+C<sleep> - the interval in seconds used to L<sleep>. Subsecond
+intervals are possible.
+
+=back
+
+Note that when passing in a selector, that selector is requeried
+on every poll instance. So the following query will work as expected:
+
+  xpath => '//*[contains(text(),"stand by")]'
+
+This also means that if your selector query relies on finding
+a changing text, you need to pass the node explicitly instead of
+passing the selector.
+
+=cut
+
+sub wait_until_invisible( $self, %options ) {
+    if (2 == @_) {
+        ($self,$options{dom}) = @_;
+    } else {
+        ($self,%options) = @_;
+    };
+    my $sleep = delete $options{ sleep } || 0.3;
+    my $timeout = delete $options{ timeout } || 0;
+
+    _default_limiter( 'maybe', \%options );
+
+    my $timeout_after;
+    if ($timeout) {
+        $timeout_after = time + $timeout;
+    };
+    my $v;
+    my $node;
+    do {
+        $node = $options{ dom };
+        if (! $node) {
+            $node = $self->_option_query(%options);
+        };
+        return
+            unless $node;
+        $self->sleep( $sleep );
+
+        # If $node goes away due to a page reload, ->is_visible could die:
+        $v = eval { $self->is_visible($node) };
+    } while ( $v
+           and (!$timeout_after or time < $timeout_after ));
+    if ($node and time >= $timeout_after) {
+        croak "Timeout of $timeout seconds reached while waiting for element to become invisible";
+    };
+};
+
+=head2 C<< $mech->wait_until_visible( %options ) >>
+
+  $mech->wait_until_visible( selector => 'a.download' );
+
+Waits until an query returns a visible element.
+
+Takes the same options as L<< $mech->is_visible/->is_visible >>.
+
+In addition, the following options are accepted:
+
+=over 4
+
+=item *
+
+C<timeout> - the timeout after which the function will C<croak>. To catch
+the condition and handle it in your calling program, use an L<eval> block.
+A timeout of C<0> means to never time out.
+
+=item *
+
+C<sleep> - the interval in seconds used to L<sleep>. Subsecond
+intervals are possible.
+
+=back
+
+Note that when passing in a selector, that selector is requeried
+on every poll instance. So the following query will work as expected:
+
+=cut
+
+sub wait_until_visible( $self, %options ) {
+    my $sleep = delete $options{ sleep } || 0.3;
+    my $timeout = delete $options{ timeout } || 0;
+
+    _default_limiter( 'maybe', \%options );
+
+    my $timeout_after;
+    if ($timeout) {
+        $timeout_after = time + $timeout;
+    };
+    do {
+        # If $node goes away due to a page reload, ->is_visible could die:
+        my @nodes =
+            grep { eval { $self->is_visible( dom => $_ ) } }
+            $self->_option_query(%options);
+
+        if( @nodes ) {
+            return @nodes
+        };
+        $self->sleep( $sleep );
+    } while (!$timeout_after or time < $timeout_after );
+    if (time >= $timeout_after) {
+        croak "Timeout of $timeout seconds reached while waiting for element to become invisible";
+    };
+};
 
 =head1 CONTENT RENDERING METHODS
 
@@ -3657,6 +4011,161 @@ sub content_as_png($self, $rect={}, $target={}) {
     return $self->_as_raw_png( $img );
 };
 
+sub getResourceTree_future( $self ) {
+    $self->driver->send_message( 'Page.getResourceTree' )
+    ->then( sub( $result ) {
+        Future->done( $result->{frameTree} )
+    })
+}
+
+sub getResourceContent_future( $self, $url_or_resource, $frameId=$self->frameId, %additional ) {
+    my $url = ref $url_or_resource ? $url_or_resource->{url} : $url_or_resource;
+    %additional = (%$url_or_resource,%additional) if ref $url_or_resource;
+    $self->driver->send_message( 'Page.getResourceContent', frameId => $frameId, url => $url )
+    ->then( sub( $result ) {
+        if( delete $result->{base64Encoded}) {
+            $result->{content} = decode_base64( $result->{content} )
+        }
+        %$result = (%additional, %$result);
+        Future->done( $result )
+    })
+}
+
+# Replace that later with MIME::Detect
+our %extensions = (
+    'image/jpeg' => '.jpg',
+    'image/png'  => '.png',
+    'image/gif'  => '.gif',
+    'text/html'  => '.html',
+    'text/plain'  => '.txt',
+    'text/stylesheet'  => '.css',
+);
+
+# Allow the options to specify whether to filter duplicates here
+sub fetchResources_future( $self, %options ) {
+    $options{ save } ||= undef;
+    $options{ seen } ||= {};
+    $options{ names } ||= {};
+    my $seen = $options{ seen };
+    my $names = $options{ names };
+    my $save = $options{ save };
+
+    $self->getResourceTree_future
+    ->then( sub( $tree ) {
+        my @requested;
+
+        # Also fetch the frame itself?!
+        # Or better reuse ->content?!
+        # $tree->{frame}
+
+        # build the map from URLs to file names
+        # This should become a separate method
+        # Also something like get_page_resources, that returns the linear
+        # list of resources for all frames etc.
+        for my $res (@{ $tree->{resources}}) {
+            # Also include childFrames and subresources here, recursively
+
+            if( $names->{ $res->{url} } ) {
+                #warn "Skipping $res->{url} (already saved)";
+                next;
+            };
+
+            # we will only scrape HTTP resources
+            next if $res->{url} !~ /^https?:/i;
+            my $target = $self->filenameFromUrl( $res->{url}, $extensions{ $res->{mimeType} });
+            my %filenames = reverse %$names;
+
+            my $duplicates;
+            my $old_target = $target;
+            while( $filenames{ $target }) {
+                $duplicates++;
+                ( $target = $old_target )=~ s!\.(\w+)$!_$duplicates.$1!;
+            };
+            $names->{ $res->{url} } = $target;
+        };
+
+        # retrieve and save the resource content for each resource
+        for my $res (@{ $tree->{resources}}) {
+            next if $seen->{ $res->{url} };
+
+            # we will only scrape HTTP resources
+            next if $res->{url} !~ /^https?:/i;
+            my $fetch = $self->getResourceContent_future( $res );
+            if( $save ) {
+                #warn "Will save $res->{url}";
+                $fetch = $fetch->then( $save );
+            };
+            push @requested, $fetch;
+        };
+        Future->wait_all( @requested )->catch(sub {
+            warn $@;
+        });
+    })->catch(sub {
+            warn $@;
+        });
+}
+
+=head2 C<< $mech->saveResources_future >>
+
+    my $file_map = $mech->saveResources_future(
+        target_file => 'this_page.html',
+        target_dir  => 'this_page_files/',
+    )->get();
+
+Rough prototype of "Save Complete Page" feature
+
+=cut
+
+sub saveResources_future( $self, %options ) {
+    my $target_file = $options{ target_file }
+        or croak "Need filename to save as ('target_file')";
+    my $target_dir = $options{ target_dir };
+    if( ! defined $target_dir ) {
+        ($target_dir = $target_file) =~ s!\.\w+$! files!i;
+    };
+    if( not -e $target_dir ) {
+        mkdir $target_dir
+            or croak "Couldn't create '$target_dir': $!";
+    }
+
+    my %names = (
+        $self->uri => $target_file,
+    );
+    $self->fetchResources_future( save => sub( $resource ) {
+
+        # For mime/html targets without a name, use the title?!
+
+        # Rewrite all HTML, CSS links
+
+        # We want to store the top HTML under the name passed in (!)
+        $names{ $resource->{url} } ||= File::Spec->catfile( $target_dir, $names{ $resource->{url} });
+        my $target = $names{ $resource->{url} }
+            or die "Don't have a filename for URL '$resource->{url}' ?!";
+        $self->log( 'debug', "Saving '$resource->{url}' to '$target'" );
+        open my $fh, '>', $target
+            or croak "Couldn't save url '$resource->{url}' to $target: $!";
+        binmode $fh;
+        print $fh $resource->{content};
+        close $fh;
+
+        Future->done( $resource );
+    }, names => \%names, seen => \my %seen )->then( sub( @resources ) {
+        Future->done( %names );
+    })->catch(sub {
+            warn $@;
+    });
+}
+
+sub filenameFromUrl( $self, $url, $extension ) {
+    my $target = $url;
+    $target =~ s![\&\?\<\>\{\}\|\:\*]!_!g;
+    $target =~ s!.*[/\\]!!;
+
+    # Add/change extension here
+
+    return $target
+}
+
 =head2 C<< $mech->viewport_size >>
 
   print Dumper $mech->viewport_size;
@@ -3677,12 +4186,45 @@ The recognized keys are:
 
 =cut
 
-sub viewport_size( $self, $new ) {
-    if( $new and keys %$new) {
-        $self->driver->send_message('Emulation.setDeviceMetricsOverride', %$new )->get();
+sub viewport_size_future( $self, $new={} ) {
+    my $params = dclone $new;
+    if( keys %$params) {
+        my %reset = (
+            mobile => $JSON::PP::false,
+            width  => 0,
+            height => 0,
+            deviceScaleFactor => 0,
+            scale  => 1,
+            screenWidth => 0,
+            screenHeight => 0,
+            positionX => 0,
+            positionY => 0,
+            dontSetVisibleSize => $JSON::PP::false,
+            screenOrientation => {
+                type => 'landscapePrimary',
+                angle => 0,
+            },
+            #viewport => {
+            #    'x' => 0,
+            #    'y' => 0,
+            #    width => 0,
+            #    height => 0,
+            #    scale  => 1,
+            #}
+        );
+        for my $field (qw( mobile width height deviceScaleFactor )) {
+            if( ! exists $params->{ $field }) {
+                $params->{$field} = $reset{ $field };
+            };
+        };
+        return $self->driver->send_message('Emulation.setDeviceMetricsOverride', %$params );
     } else {
-        $self->driver->send_message('Emulation.clearDeviceMetricsOverride' )->get();
+        return $self->driver->send_message('Emulation.clearDeviceMetricsOverride' );
     };
+};
+
+sub viewport_size( $self, $new={} ) {
+    $self->viewport_size_future($new)->get
 };
 
 =head2 C<< $mech->element_as_png( $element ) >>
@@ -3831,9 +4373,7 @@ This method is specific to WWW::Mechanize::Chrome.
 
 =cut
 
-sub content_as_pdf {
-    my ($self, %options) = @_;
-
+sub content_as_pdf($self, %options) {
     my $base64 = $self->driver->send_message('Page.printToPDF', %options)->get->{data};
     return decode_base64( $base64 );
 };
@@ -3970,8 +4510,12 @@ screencast frames and to catch up before shutting down the connection.
 
 =cut
 
+sub sleep_future( $self, $seconds ) {
+    $self->driver->sleep( $seconds );
+}
+
 sub sleep( $self, $seconds ) {
-    $self->driver->sleep( $seconds )->get;
+    $self->sleep_future( $seconds )->get;
 }
 
 1;
@@ -4054,7 +4598,7 @@ I have no use for it
 
 C<< ->post >>
 
-Selenium does not support POST requests
+This module does not yet support POST requests
 
 =back
 

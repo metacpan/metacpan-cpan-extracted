@@ -1,7 +1,7 @@
 # -*- perl -*-
 use strict;
 use warnings;
-use Test::More tests => 143 * 2 + 1;
+use Test::More tests => 153 * 2 + 1;
 
 BEGIN { use_ok( 'DBIx::Array' ); }
 
@@ -76,6 +76,22 @@ foreach my $driver ("DBD::CSV", "DBD::XBase") {
     is($hash->{'1'}, 2, 'sqlhash');
     is($hash->{'2'}, 3, 'sqlhash');
   }
+
+  SKIP: {
+    skip $reason, 10 if $no_driver;
+    my $hash=$dba->sqlhashhash("SELECT F1,F2 FROM $table");
+    isa_ok($hash, "HASH", 'sqlarray scalar context');
+    isa_ok($hash->{'0'}, "HASH", 'sqlhashhash');
+    isa_ok($hash->{'1'}, "HASH", 'sqlhashhash');
+    isa_ok($hash->{'2'}, "HASH", 'sqlhashhash');
+    is($hash->{'0'}->{"F1"}, 0, 'sqlhashhash');
+    is($hash->{'1'}->{"F1"}, 1, 'sqlhashhash');
+    is($hash->{'2'}->{"F1"}, 2, 'sqlhashhash');
+    is($hash->{'0'}->{"F2"}, 1, 'sqlhashhash');
+    is($hash->{'1'}->{"F2"}, 2, 'sqlhashhash');
+    is($hash->{'2'}->{"F2"}, 3, 'sqlhashhash');
+  }
+
 
   SKIP: {
     skip $reason, 3 if $no_driver;

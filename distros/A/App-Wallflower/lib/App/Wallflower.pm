@@ -1,5 +1,5 @@
 package App::Wallflower;
-$App::Wallflower::VERSION = '1.007';
+$App::Wallflower::VERSION = '1.008';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ my @callbacks = (
             my ( $url, $response ) = @_;
             my ( $status, $headers, $file ) = @$response;
             return if $status == 200;
-            printf "$status %s%s\n", $url->path;
+            printf "$status %s\n", $url->path;
         },
     ],
     [
@@ -38,6 +38,13 @@ my @callbacks = (
             return if $status != 200;
             printf "$status %s%s\n", $url->path,
               $file && " => $file [${\-s $file}]";
+        },
+    ],
+    [
+        tap => sub {
+            my ( $url, $response ) = @_;
+            my ( $status, $headers, $file ) = @$response;
+            is( $status, 200, $url->path );
         },
     ],
 );
@@ -61,7 +68,7 @@ sub new_with_options {
         'index=s',       'environment=s',
         'follow!',       'filter|files|F',
         'quiet',         'include|INC=s@',
-        'verbose!',      'errors!',
+        'verbose!',      'errors!',                 'tap!',
         'host=s@',
         'url|uri=s',
         'help',          'manual',
@@ -111,6 +118,16 @@ sub new {
     # application is required
     croak "Option application is required" if !exists $option{application};
 
+    if ( $option{tap} ) {
+        require Test::More;
+        import Test::More;
+        $option{quiet} = 1;    # --tap = --quiet
+        if ( !exists $option{destination} ) {
+            require File::Temp;
+            $option{destination} = File::Temp::tempdir( CLEANUP => 1 );
+        }
+    }
+
     # --quiet = --no-verbose --no-errors
     $option{verbose} = $option{errors} = 0 if $option{quiet};
 
@@ -150,6 +167,7 @@ sub run {
     ( my $args, $self->{args} ) = ( $self->{args}, [] );
     my $method = $self->{option}{filter} ? '_process_args' : '_process_queue';
     $self->$method(@$args);
+    done_testing() if $self->{option}{tap};
 }
 
 sub _process_args {
@@ -220,6 +238,10 @@ __END__
 
 App::Wallflower - Class performing the moves for the wallflower program
 
+=head1 VERSION
+
+version 1.008
+
 =head1 SYNOPSIS
 
     # this is the actual code for wallflower
@@ -262,10 +284,9 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2012-2015 by Philippe Bruhat (BooK).
+Copyright 2012-2018 by Philippe Bruhat (BooK).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

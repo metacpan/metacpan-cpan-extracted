@@ -1,4 +1,4 @@
-# This file was auto-generated from iller.yaml by Dist::Iller on 2018-04-22 09:45:04 UTC.
+# This file was auto-generated from iller.yaml by Dist::Iller on 2018-06-29 22:12:20 UTC.
 
 on runtime => sub {
     requires 'Dist::Iller' => '0.1401';
@@ -31,7 +31,7 @@ on develop => sub {
     requires 'Badge::Depot::Plugin::Kwalitee' => '0';
     requires 'Badge::Depot::Plugin::Perl' => '0';
     requires 'Badge::Depot::Plugin::Travis' => '0';
-    requires 'Dist::Zilla' => '6.010';
+    requires 'Dist::Zilla' => '6.012';
     requires 'Dist::Zilla::Plugin::Authority' => '1.009';
     requires 'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.008';
     requires 'Dist::Zilla::Plugin::ChangeStats::Dependencies::Git' => '0.0200';
@@ -41,11 +41,11 @@ on develop => sub {
     requires 'Dist::Zilla::Plugin::CopyFilesFromBuild' => '0.170880';
     requires 'Dist::Zilla::Plugin::DistIller::MetaGeneratedBy' => '0';
     requires 'Dist::Zilla::Plugin::ExecDir' => '0';
-    requires 'Dist::Zilla::Plugin::Git' => '2.041';
+    requires 'Dist::Zilla::Plugin::Git' => '2.045';
     requires 'Dist::Zilla::Plugin::Git::Check' => '0';
     requires 'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch' => '0.014';
     requires 'Dist::Zilla::Plugin::Git::Commit' => '0';
-    requires 'Dist::Zilla::Plugin::Git::Contributors' => '0.030';
+    requires 'Dist::Zilla::Plugin::Git::Contributors' => '0.034';
     requires 'Dist::Zilla::Plugin::Git::GatherDir' => '0';
     requires 'Dist::Zilla::Plugin::Git::Push' => '0';
     requires 'Dist::Zilla::Plugin::Git::Tag' => '0';
@@ -64,7 +64,7 @@ on develop => sub {
     requires 'Dist::Zilla::Plugin::PodSyntaxTests' => '0';
     requires 'Dist::Zilla::Plugin::PodWeaver' => '4.006';
     requires 'Dist::Zilla::Plugin::Prereqs' => '0';
-    requires 'Dist::Zilla::Plugin::PromptIfStale' => '0.054';
+    requires 'Dist::Zilla::Plugin::PromptIfStale' => '0.055';
     requires 'Dist::Zilla::Plugin::Readme' => '0';
     requires 'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.163250';
     requires 'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.007';
@@ -105,5 +105,5 @@ on develop => sub {
 };
 on develop => sub {
     suggests 'Dist::Iller' => '0.1408';
-    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0321';
+    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0322';
 };

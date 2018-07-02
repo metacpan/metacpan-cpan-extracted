@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Lexer;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE};
 use constant DEBUG => $ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE};
@@ -583,8 +583,34 @@ sub _fetch_next_tokens_directive {
     my ($self, $yaml) = @_;
     my @tokens;
 
-    if ($$yaml =~ s/\A(\s*%YAML ?1\.2$RE_WS*)//) {
-        push @tokens, ( YAML_DIRECTIVE => $1 );
+    if ($$yaml =~ s/\A(\s*%YAML)//) {
+        my $dir = $1;
+        if ($$yaml =~ s/\A( )//) {
+            $dir .= $1;
+            if ($$yaml =~ s/\A(1\.2$RE_WS*)//) {
+                $dir .= $1;
+                push @tokens, ( YAML_DIRECTIVE => $dir );
+            }
+            else {
+                $$yaml =~ s/\A(.*)//;
+                $dir .= $1;
+                my $warn = $ENV{YAML_PP_RESERVED_DIRECTIVE} || 'warn';
+                if ($warn eq 'warn') {
+                    warn "Found reserved directive '$dir'";
+                }
+                elsif ($warn eq 'fatal') {
+                    die "Found reserved directive '$dir'";
+                }
+                push @tokens, ( RESERVED_DIRECTIVE => "$dir" );
+            }
+        }
+        else {
+            $$yaml =~ s/\A(.*)//;
+            $dir .= $1;
+            push @tokens, ( 'Invalid directive' => $dir );
+            $self->push_tokens(\@tokens);
+            return;
+        }
     }
     elsif ($$yaml =~ s/\A(\s*%TAG +(!$RE_NS_WORD_CHAR*!|!) +(tag:\S+|!$RE_URI_CHAR+)$RE_WS*)//) {
         push @tokens, ( TAG_DIRECTIVE => $1 );
@@ -666,11 +692,6 @@ sub push_tokens {
         $column += length $value;
     }
     return $next;
-}
-
-sub new_token {
-    my ($self, $type, $value, %args) = @_;
-    return { name => $type, value => $value, line => $self->line, %args };
 }
 
 sub exception {

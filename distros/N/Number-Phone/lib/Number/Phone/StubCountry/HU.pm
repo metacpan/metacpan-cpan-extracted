@@ -22,20 +22,20 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221546;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
-                  'pattern' => '(1)(\\d{3})(\\d{4})',
+                  'format' => '$1 $2 $3',
                   'national_rule' => '($1)',
                   'leading_digits' => '1',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(1)(\\d{3})(\\d{4})'
                 },
                 {
-                  'national_rule' => '($1)',
-                  'leading_digits' => '[2-9]',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
+                  'national_rule' => '($1)',
+                  'leading_digits' => '[2-9]'
                 }
               ];
 
@@ -55,13 +55,7 @@ my $validators = {
           )\\d{6}
         ',
                 'voip' => '21\\d{7}',
-                'mobile' => '
-          (?:
-            [257]0|
-            3[01]
-          )\\d{7}
-        ',
-                'specialrate' => '(9[01]\\d{6})|(38\\d{7})',
+                'personal_number' => '',
                 'geographic' => '
           (?:
             1\\d|
@@ -75,8 +69,14 @@ my $validators = {
             9[2-69]
           )\\d{6}
         ',
-                'personal_number' => '',
-                'pager' => ''
+                'pager' => '',
+                'specialrate' => '(9[01]\\d{6})|(38\\d{7})',
+                'mobile' => '
+          (?:
+            [257]0|
+            3[01]
+          )\\d{7}
+        '
               };
 my %areanames = (
   361 => "Budapest",

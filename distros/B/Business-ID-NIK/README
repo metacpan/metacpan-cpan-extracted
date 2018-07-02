@@ -3,8 +3,8 @@ NAME
     (NIK)
 
 VERSION
-    This document describes version 0.092 of Business::ID::NIK (from Perl
-    distribution Business-ID-NIK), released on 2018-04-08.
+    This document describes version 0.093 of Business::ID::NIK (from Perl
+    distribution Business-ID-NIK), released on 2018-07-01.
 
 SYNOPSIS
         use Business::ID::NIK qw(parse_nik);
@@ -35,6 +35,44 @@ FUNCTIONS
      parse_nik(%args) -> [status, msg, result, meta]
 
     Parse Indonesian citizenship registration number (NIK).
+
+    Examples:
+
+    *   Example #1:
+
+         parse_nik(nik => "32 7300 010101 0001");
+
+        Result:
+
+         {
+           dob => "2001-01-01",
+           gender => "M",
+           loc_code => 3273,
+           loc_ind_name => "BANDUNG",
+           loc_type => 1,
+           prov_code => 32,
+           prov_eng_name => "West Java",
+           prov_ind_name => "Jawa Barat",
+           serial => "0001",
+         }
+
+    *   Example #2:
+
+         parse_nik(nik => "32 7300 710101 0001");
+
+        Result:
+
+         {
+           dob => "2001-01-31",
+           gender => "F",
+           loc_code => 3273,
+           loc_ind_name => "BANDUNG",
+           loc_type => 1,
+           prov_code => 32,
+           prov_eng_name => "West Java",
+           prov_ind_name => "Jawa Barat",
+           serial => "0001",
+         }
 
     This function is not exported by default, but exportable.
 

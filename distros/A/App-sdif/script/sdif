@@ -143,8 +143,8 @@ my @optargs = (
     "nocolor|no-color" => sub { $opt_color = 'never' },
     "colormap|cm=s" => \@opt_colormap,
     "256!" => \$opt_256,
-    "b|ignore-space-change" => sub { push @opt_diffopts, '-b' },
-    "w|ignore-all-space"    => sub { push @opt_diffopts, '-w' },
+    "b|ignore-space-change" => sub { push @opt_diffopts, '-b'; push @opt_cdifopts, '-w' },
+    "w|ignore-all-space"    => sub { push @opt_diffopts, '-w'; push @opt_cdifopts, '-w' },
     "B|ignore-blank-lines"  => sub { push @opt_diffopts, '-B' },
     "c|context"             => sub { push @opt_diffopts, '-c' },
     "u|unified"             => sub { push @opt_diffopts, '-u' },
@@ -1023,11 +1023,13 @@ feature of sdif is making a side-by-side listing of two different
 files.  All contents of two files are listed on left and right sides.
 Center column is used to indicate how different those lines are.  No
 mark means no difference.  Added, deleted and modified lines are
-marked with `-' and `+' character.
+marked with minus (`-') and plus (`+') character, and wrapped line is
+marked with period (`.').
 
     1 deleted  -
     2 same          1 same
     3 changed  -+   2 modified
+      wrapped  ..     folded
     4 same          3 same
                 +   4 added
 

@@ -21,6 +21,7 @@ cgi-bin/Content/login.pl
 cgi-bin/Content/main.pl
 cgi-bin/Content/navigation.pl
 cgi-bin/Content/news.pl
+cgi-bin/Content/news.pl.ERR
 cgi-bin/Content/profile.pl
 cgi-bin/Content/quick.pl
 cgi-bin/Content/quickbar.pl

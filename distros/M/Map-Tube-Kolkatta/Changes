@@ -1,5 +1,11 @@
 Revision history for Map::Tube::Kolkatta
 
+0.21  Mon Jul 02 07:00:00 2018
+      - Updated dependency on Map::Tube v3.53.
+
+0.20  Thu Jun 21 11:20:00 2018
+      - Used new_ok() in test script.
+
 0.19  Mon Jun 04 02:35:00 2018
       - Updated dependency on Map::Tube v3.51.
 

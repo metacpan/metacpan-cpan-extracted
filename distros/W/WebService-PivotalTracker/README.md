@@ -4,7 +4,7 @@ WebService::PivotalTracker - Perl library for the Pivotal Tracker REST API
 
 # VERSION
 
-version 0.10
+version 0.11
 
 # SYNOPSIS
 
@@ -109,6 +109,18 @@ It also accepts two additional optional parameters:
 
 By default the story will be added as the last story in the icebox.
 
+## $pt->project\_memberships(...)
+
+This looks up memberships in a project. It returns an array reference of
+[WebService::PivotalTracker::ProjectMembership](https://metacpan.org/pod/WebService::PivotalTracker::ProjectMembership) objects.
+
+It is useful if you need to discover information about a person who is a member
+of your project.
+
+The `project_id` parameter is required.
+
+The `sort_by` parameter is optional.
+
 ## $pt->me
 
 This returns a [WebService::PivotalTracker::Me](https://metacpan.org/pod/WebService::PivotalTracker::Me) object for the user to which
@@ -127,6 +139,7 @@ Dave Rolsky <autarch@urth.org>
 - Dave Rolsky <drolsky@maxmind.com>
 - Florian Ragwitz <rafl@debian.org>
 - Greg Oschwald <goschwald@maxmind.com>
+- Will Storey <will@summercat.com>
 
 # COPYRIGHT AND LICENSE
 

@@ -11,13 +11,11 @@ enum {
 // Parser information
 struct SPVM_switch_info {
   SPVM_LIST* op_cases;
+  SPVM_LIST* op_cases_ordered;
   SPVM_OP* op_default;
-  int32_t max;
-  int32_t min;
   int32_t id;
-  int32_t opcode_index;
-  int32_t default_opcode_index;
-  SPVM_LIST* case_opcode_indexes;
+  int32_t default_opcode_rel_index;
+  int32_t rel_id;
 };
 
 SPVM_SWITCH_INFO* SPVM_SWITCH_INFO_new(SPVM_COMPILER* compiler);

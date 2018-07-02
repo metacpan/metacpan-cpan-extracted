@@ -10,7 +10,7 @@ use URI::Escape;
 use JSON;
 
 use LWP::UserAgent;
-use Moose;
+use Moo;
 use Carp qw(confess);
 use DDP;
 

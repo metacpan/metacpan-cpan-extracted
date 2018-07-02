@@ -1,0 +1,129 @@
+{
+   "abstract" : "a Perl framework for XML stylesheets",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>",
+      "Dominique Quatravaux <domq@cpan.org>",
+      "Matt Sergeant <matt@sergeant.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "XML-XPathScript",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "Symbol" : "0",
+            "XML::LibXML" : "0",
+            "XML::Parser" : "0",
+            "XML::XPath" : "0",
+            "XML::XPath::Node" : "0",
+            "XML::XPath::NodeSet" : "0",
+            "XML::XPath::XMLParser" : "0",
+            "base" : "0",
+            "bytes" : "0",
+            "constant" : "0",
+            "overload" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "XML::XPathScript" : {
+         "file" : "lib/XML/XPathScript.pm",
+         "version" : "1.55"
+      },
+      "XML::XPathScript::Processor" : {
+         "file" : "lib/XML/XPathScript/Processor.pm",
+         "version" : "1.55"
+      },
+      "XML::XPathScript::Processor::B" : {
+         "file" : "lib/XML/XPathScript/Processor/B.pm",
+         "version" : "1.55"
+      },
+      "XML::XPathScript::Processor::LibXML" : {
+         "file" : "lib/XML/XPathScript/Processor/LibXML.pm",
+         "version" : "1.55"
+      },
+      "XML::XPathScript::Processor::XPath" : {
+         "file" : "lib/XML/XPathScript/Processor/XPath.pm",
+         "version" : "1.55"
+      },
+      "XML::XPathScript::Stylesheet::DocBook2LaTeX" : {
+         "file" : "lib/XML/XPathScript/Stylesheet/DocBook2LaTeX.pm",
+         "version" : "1.55"
+      },
+      "XML::XPathScript::Template" : {
+         "file" : "lib/XML/XPathScript/Template.pm",
+         "version" : "1.55"
+      },
+      "XML::XPathScript::Template::Content" : {
+         "file" : "lib/XML/XPathScript/Processor.pm",
+         "version" : "1.55"
+      },
+      "XML::XPathScript::Template::Tag" : {
+         "file" : "lib/XML/XPathScript/Template/Tag.pm",
+         "version" : "1.55"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/xml-xpathscript/issues"
+      },
+      "homepage" : "https://github.com/yanick/xml-xpathscript",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/xml-xpathscript.git",
+         "web" : "https://github.com/yanick/xml-xpathscript"
+      }
+   },
+   "version" : "1.55",
+   "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

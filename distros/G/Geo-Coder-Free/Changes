@@ -1,5 +1,14 @@
 Revision history for Geo-Coder-Free
 
+0.12	Tue Jun 19 09:02:28 EDT 2018
+	Fix "RESTAURANT" insert where street is known but not number
+	Improved searches when Geo::Libpostal is not installed
+	Improved handling of un-normalized input
+	Removed duplicate code
+	Add current country on web interface
+	Added bin/address_lookup
+	No need to give openaddr argument to new() if OPENADDR_HOME is set
+
 0.11	Fri Jun  8 17:27:55 EDT 2018
 	Started work on scantext support
 	Fixed some calls in list mode which returned a scalar

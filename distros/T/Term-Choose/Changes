@@ -1,6 +1,13 @@
 Revision history for Term::Choose
 
 
+1.518   2018-06-20
+        - Removed 'pad_one_row' info.
+        - Removed deprecated method 'config'.
+        - 'include_highlighted' defaults to 0.
+        - Added undocumented value of the option 'include_highlighted' to the documentation.
+        - If not OO: pass $self directly to '__choose'.
+
 1.517   2018-06-15
         - New option 'include_highlighted'.
         - New option 'meta_items'.

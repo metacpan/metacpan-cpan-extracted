@@ -55,8 +55,14 @@ sub info2ndary ()  {
     print STDERR $info , "\n" ; 
 }
 
-## ヘルプの扱い
-sub VERSION_MESSAGE {}
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  our $VERSION = 0.11 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+}  
 sub HELP_MESSAGE {
     use FindBin qw[ $Script ] ; 
     $ARGV[1] //= '' ;
@@ -93,6 +99,7 @@ sub HELP_MESSAGE {
 
   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+  --version このプログラムのバージョン情報を出力。
  
   開発メモ : 
      * -. と -, はインターフェースとして改良の余地有り。

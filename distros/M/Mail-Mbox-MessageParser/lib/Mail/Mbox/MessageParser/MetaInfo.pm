@@ -1,29 +1,27 @@
 package Mail::Mbox::MessageParser::MetaInfo;
 
-no strict;
-
-@ISA = qw( Exporter );
-
 use strict;
 use Carp;
 
 use Mail::Mbox::MessageParser;
 
-use vars qw( $VERSION $DEBUG );
-use vars qw( $CACHE %CACHE_OPTIONS $UPDATING_CACHE );
+use vars qw( $VERSION $_DEBUG @ISA );
+use vars qw( $_CACHE %_CACHE_OPTIONS $UPDATING_CACHE );
+
+@ISA = qw( Exporter );
 
 $VERSION = sprintf "%d.%02d%02d", q/0.2.0/ =~ /(\d+)/g;
 
-*DEBUG = \$Mail::Mbox::MessageParser::DEBUG;
-*dprint = \&Mail::Mbox::MessageParser::dprint;
-sub dprint;
+*_DEBUG = \$Mail::Mbox::MessageParser::_DEBUG;
+*_dprint = \&Mail::Mbox::MessageParser::_dprint;
+sub _dprint;
 
 # The class-wide cache, which will be read and written when necessary. i.e.
 # read when an folder reader object is created which uses caching, and
 # written when a different cache is specified, or when the program exits, 
-$CACHE = {};
+$_CACHE = {};
 
-%CACHE_OPTIONS = ();
+%_CACHE_OPTIONS = ();
 
 $UPDATING_CACHE = 0;
 
@@ -31,7 +29,7 @@ $UPDATING_CACHE = 0;
 
 sub _LOAD_STORABLE
 {
-  if (eval 'require Storable;')
+  if (eval {require Storable})
   {
     import Storable;
     return 1;
@@ -55,15 +53,15 @@ sub SETUP_CACHE
   
   # Load Storable if we need to
   # See if the client is setting up a different cache
-  if (exists $CACHE_OPTIONS{'file_name'} &&
-    $cache_options->{'file_name'} ne $CACHE_OPTIONS{'file_name'})
+  if (exists $_CACHE_OPTIONS{'file_name'} &&
+    $cache_options->{'file_name'} ne $_CACHE_OPTIONS{'file_name'})
   {
-    dprint "New cache file specified--writing old cache if necessary.";
+    _dprint "New cache file specified--writing old cache if necessary.";
     WRITE_CACHE();
-    $CACHE = {};
+    $_CACHE = {};
   }
 
-  %CACHE_OPTIONS = %$cache_options;
+  %_CACHE_OPTIONS = %$cache_options;
 
   _READ_CACHE();
 
@@ -74,16 +72,16 @@ sub SETUP_CACHE
 
 sub CLEAR_CACHE
 {
-  unlink $CACHE_OPTIONS{'file_name'}
-    if defined $CACHE_OPTIONS{'file_name'} && -f $CACHE_OPTIONS{'file_name'};
+  unlink $_CACHE_OPTIONS{'file_name'}
+    if defined $_CACHE_OPTIONS{'file_name'} && -f $_CACHE_OPTIONS{'file_name'};
 
-  $CACHE = {};
+  $_CACHE = {};
   $UPDATING_CACHE = 1;
 }
 
 #-------------------------------------------------------------------------------
 
-sub INITIALIZE_ENTRY
+sub _INITIALIZE_ENTRY
 {
   my $file_name = shift;
 
@@ -95,43 +93,43 @@ sub INITIALIZE_ENTRY
   my $time_stamp = $stat[9];
 
 
-  if (exists $CACHE->{$file_name} &&
-      (defined $CACHE->{$file_name}{'size'} &&
-       defined $CACHE->{$file_name}{'time_stamp'} &&
-       $CACHE->{$file_name}{'size'} == $size &&
-       $CACHE->{$file_name}{'time_stamp'} == $time_stamp))
+  if (exists $_CACHE->{$file_name} &&
+      (defined $_CACHE->{$file_name}{'size'} &&
+       defined $_CACHE->{$file_name}{'time_stamp'} &&
+       $_CACHE->{$file_name}{'size'} == $size &&
+       $_CACHE->{$file_name}{'time_stamp'} == $time_stamp))
   {
-    dprint "Cache is valid";
+    _dprint "Cache is valid";
 
     # TODO: For now, if we re-initialize, we start over. Fix this so that we
     # can use partial cache information.
     if ($UPDATING_CACHE)
     {
-      dprint "Resetting cache entry for \"$file_name\"\n";
+      _dprint "Resetting cache entry for \"$file_name\"\n";
 
       # Reset the cache entry for this file
-      $CACHE->{$file_name}{'size'} = $size;
-      $CACHE->{$file_name}{'time_stamp'} = $time_stamp;
-      $CACHE->{$file_name}{'emails'} = [];
-      $CACHE->{$file_name}{'modified'} = 0;
+      $_CACHE->{$file_name}{'size'} = $size;
+      $_CACHE->{$file_name}{'time_stamp'} = $time_stamp;
+      $_CACHE->{$file_name}{'emails'} = [];
+      $_CACHE->{$file_name}{'modified'} = 0;
     }
   }
   else
   {
-    if (exists $CACHE->{$file_name})
+    if (exists $_CACHE->{$file_name})
     {
-      dprint "Size or time stamp has changed for file \"" .
+      _dprint "Size or time stamp has changed for file \"" .
         $file_name . "\". Invalidating cache entry";
     }
     else
     {
-      dprint "Cache is invalid: \"$file_name\" has not yet been parsed";
+      _dprint "Cache is invalid: \"$file_name\" has not yet been parsed";
     }
 
-    $CACHE->{$file_name}{'size'} = $size;
-    $CACHE->{$file_name}{'time_stamp'} = $time_stamp;
-    $CACHE->{$file_name}{'emails'} = [];
-    $CACHE->{$file_name}{'modified'} = 0;
+    $_CACHE->{$file_name}{'size'} = $size;
+    $_CACHE->{$file_name}{'time_stamp'} = $time_stamp;
+    $_CACHE->{$file_name}{'emails'} = [];
+    $_CACHE->{$file_name}{'modified'} = 0;
 
     $UPDATING_CACHE = 1;
   }
@@ -139,16 +137,16 @@ sub INITIALIZE_ENTRY
 
 #-------------------------------------------------------------------------------
 
-sub ENTRY_STILL_VALID
+sub _ENTRY_STILL_VALID
 {
   my $file_name = shift;
 
-  return 0 unless exists $CACHE->{$file_name} &&
-    defined $CACHE->{$file_name}{'size'} &&
-    defined $CACHE->{$file_name}{'time_stamp'} &&
+  return 0 unless exists $_CACHE->{$file_name} &&
+    defined $_CACHE->{$file_name}{'size'} &&
+    defined $_CACHE->{$file_name}{'time_stamp'} &&
     # Sanity check the cache to ensure we can at least determine the prologue
     # length.
-    defined $CACHE->{$file_name}{'emails'}[0]{'offset'};
+    defined $_CACHE->{$file_name}{'emails'}[0]{'offset'};
 
   my @stat = stat $file_name;
 
@@ -157,8 +155,8 @@ sub ENTRY_STILL_VALID
   my $size = $stat[7];
   my $time_stamp = $stat[9];
 
-  return ($CACHE->{$file_name}{'size'} == $size &&
-    $CACHE->{$file_name}{'time_stamp'} == $time_stamp);
+  return ($_CACHE->{$file_name}{'size'} == $size &&
+    $_CACHE->{$file_name}{'time_stamp'} == $time_stamp);
 }
 
 #-------------------------------------------------------------------------------
@@ -167,20 +165,20 @@ sub _READ_CACHE
 {
   my $self = shift;
 
-  return unless -f $CACHE_OPTIONS{'file_name'};
+  return unless -f $_CACHE_OPTIONS{'file_name'};
 
-  dprint "Reading cache";
+  _dprint "Reading cache";
 
   # Unserialize using Storable
   local $@;
 
-  eval { $CACHE = retrieve($CACHE_OPTIONS{'file_name'}) };
+  eval { $_CACHE = retrieve($_CACHE_OPTIONS{'file_name'}) };
 
   if ($@)
   {
-    $CACHE = {};
-    dprint "Invalid cache detected, and will be ignored.";
-    dprint "Message from Storable module: \"$@\"";
+    $_CACHE = {};
+    _dprint "Invalid cache detected, and will be ignored.";
+    _dprint "Message from Storable module: \"$@\"";
   }
 }
 
@@ -198,33 +196,33 @@ sub WRITE_CACHE
   # performance.
   my $cache_modified = 0;
 
-  foreach my $file_name (keys %$CACHE)
+  foreach my $file_name (keys %$_CACHE)
   {
-    if ($CACHE->{$file_name}{'modified'})
+    if ($_CACHE->{$file_name}{'modified'})
     {
       $cache_modified = 1;
-      $CACHE->{$file_name}{'modified'} = 0;
+      $_CACHE->{$file_name}{'modified'} = 0;
     }
   }
 
   unless ($cache_modified)
   {
-    dprint "Cache not modified, so no writing is necessary";
+    _dprint "Cache not modified, so no writing is necessary";
     return;
   }
 
-  dprint "Cache was modified, so writing is necessary";
+  _dprint "Cache was modified, so writing is necessary";
 
   # The mail box cache may contain sensitive information, so protect it
   # from prying eyes.
   my $oldmask = umask(077);
 
   # Serialize using Storable
-  store($CACHE, $CACHE_OPTIONS{'file_name'});
+  store($_CACHE, $_CACHE_OPTIONS{'file_name'});
 
   umask($oldmask);
 
-  $CACHE->{$CACHE_OPTIONS{'file_name'}}{'modified'} = 0;
+  $_CACHE->{$_CACHE_OPTIONS{'file_name'}}{'modified'} = 0;
 }
 
 #-------------------------------------------------------------------------------
@@ -232,8 +230,8 @@ sub WRITE_CACHE
 # Write the cache when the program exits
 sub END
 {
-  dprint "Exiting and writing cache if necessary"
-    if defined(&dprint);
+  _dprint "Exiting and writing cache if necessary"
+    if defined(&_dprint);
 
   WRITE_CACHE();
 }

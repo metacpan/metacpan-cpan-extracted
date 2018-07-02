@@ -4,7 +4,6 @@ use 5.010_001;
 use strictures 1;
 
 use Test::More;
-use Test::Moose;
 
 use lib qw(lib t/lib);
 

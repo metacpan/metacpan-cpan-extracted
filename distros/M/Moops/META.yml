@@ -12,7 +12,7 @@ conflicts:
   MooseX::Types::Common: '== 0.001011'
   MooseX::Types::URI: '== 0.04'
 dynamic_config: 1
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -47,61 +47,61 @@ optional_features:
 provides:
   Moops:
     file: lib/Moops.pm
-    version: '0.034'
+    version: '0.035'
   Moops::ImportSet:
     file: lib/Moops/ImportSet.pm
-    version: '0.034'
+    version: '0.035'
   Moops::Keyword:
     file: lib/Moops/Keyword.pm
-    version: '0.034'
+    version: '0.035'
   Moops::Keyword::Class:
     file: lib/Moops/Keyword/Class.pm
-    version: '0.034'
+    version: '0.035'
   Moops::Keyword::Library:
     file: lib/Moops/Keyword/Library.pm
-    version: '0.034'
+    version: '0.035'
   Moops::Keyword::Role:
     file: lib/Moops/Keyword/Role.pm
-    version: '0.034'
+    version: '0.035'
   Moops::MethodModifiers:
     file: lib/Moops/MethodModifiers.pm
-    version: '0.034'
+    version: '0.035'
   Moops::Parser:
     file: lib/Moops/Parser.pm
-    version: '0.034'
+    version: '0.035'
   Moops::TraitFor::Keyword::assertions:
     file: lib/Moops/TraitFor/Keyword/assertions.pm
-    version: '0.034'
+    version: '0.035'
   Moops::TraitFor::Keyword::dirty:
     file: lib/Moops/TraitFor/Keyword/dirty.pm
-    version: '0.034'
+    version: '0.035'
   Moops::TraitFor::Keyword::fp:
     file: lib/Moops/TraitFor/Keyword/fp.pm
-    version: '0.034'
+    version: '0.035'
   Moops::TraitFor::Keyword::mutable:
     file: lib/Moops/TraitFor/Keyword/mutable.pm
-    version: '0.034'
+    version: '0.035'
   Moops::TraitFor::Keyword::ro:
     file: lib/Moops/TraitFor/Keyword/ro.pm
-    version: '0.034'
+    version: '0.035'
   Moops::TraitFor::Keyword::rw:
     file: lib/Moops/TraitFor/Keyword/rw.pm
-    version: '0.034'
+    version: '0.035'
   Moops::TraitFor::Keyword::rwp:
     file: lib/Moops/TraitFor/Keyword/rwp.pm
-    version: '0.034'
+    version: '0.035'
   MooseX::FunctionParametersInfo:
     file: lib/MooseX/FunctionParametersInfo.pm
-    version: '0.034'
+    version: '0.035'
   MooseX::FunctionParametersInfo::Trait::Method:
     file: lib/MooseX/FunctionParametersInfo.pm
-    version: '0.034'
+    version: '0.035'
   MooseX::FunctionParametersInfo::Trait::WrappedMethod:
     file: lib/MooseX/FunctionParametersInfo.pm
-    version: '0.034'
+    version: '0.035'
   PerlX::Define:
     file: lib/PerlX/Define.pm
-    version: '0.034'
+    version: '0.035'
 recommends:
   Keyword::Simple: '0.02'
 requires:
@@ -122,6 +122,7 @@ requires:
   Variable::Magic: '0'
   namespace::autoclean: '0.20'
   perl: '5.014'
+  strictures: '0'
   'true': '0.18'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/Moops/project
@@ -129,10 +130,11 @@ resources:
   homepage: https://metacpan.org/release/Moops
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moops.git
-version: '0.034'
+version: '0.035'
 x_breaks:
   MooseX::Types::Common: '== 0.001011'
   MooseX::Types::URI: '== 0.04'
 x_contributors:
   - 'Maurice Mengel (MMAURICE) <mmaurice@cpan.org>'
   - 'Aaron James Trevena (TEEJAY) <teejay@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

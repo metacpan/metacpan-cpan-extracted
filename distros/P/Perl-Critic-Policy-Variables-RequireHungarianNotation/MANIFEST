@@ -1,0 +1,22 @@
+Changes
+lib/Perl/Critic/Policy/Variables/RequireHungarianNotation.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+LICENSE
+t/00.load.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/manifest.t
+t/01.arrays.t
+t/02.hashes.t
+t/03.scalar.t
+t/04.custom.t
+t/05.sub_call.t
+t/06.wrong_declared.t
+t/07.perlvars.t
+t/99.selftest.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.3.2 2018-06-22T09:40:47Z
+
+    - Pass -w option to cdif when -b or -w was given.
+
 4.3.1 2018-02-24T02:42:36Z
 
     - Remove App::sdif::osx_autocolor.

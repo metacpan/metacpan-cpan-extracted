@@ -39,7 +39,7 @@ no_index:
 provides:
   Alien::libuv:
     file: lib/Alien/libuv.pm
-    version: '1.002'
+    version: '1.003'
 requires:
   Alien::Base: '0'
   base: '0'
@@ -50,7 +50,7 @@ resources:
   bugtracker: https://github.com/genio/Alien-libuv/issues
   homepage: https://github.com/genio/Alien-libuv
   repository: https://github.com/genio/Alien-libuv.git
-version: '1.002'
+version: '1.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -241,7 +241,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.17.0
+          git_version: 2.17.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -264,7 +264,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.17.1
           repo_root: .
       name: '@Git/Check'
       version: '2.045'
@@ -281,7 +281,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.17.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -294,11 +294,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.002
+          tag: v1.003
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.17.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -312,7 +312,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.17.1
           repo_root: .
       name: '@Git/Push'
       version: '2.045'

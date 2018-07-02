@@ -1,7 +1,7 @@
 package Finance::Currency::Convert::BI;
 
-our $DATE = '2018-06-17'; # DATE
-our $VERSION = '0.060'; # VERSION
+our $DATE = '2018-06-24'; # DATE
+our $VERSION = '0.062'; # VERSION
 
 use 5.010001;
 use strict;
@@ -52,7 +52,7 @@ sub get_jisdor_rates {
             $page = $res->body;
         } else {
             my $err = $tx->error;
-            return [500, "Can't retrieve BI page: $err->{code} - $err->{message}"];
+            return [500, "Can't retrieve BI page: $err->{message}"];
         }
     }
 
@@ -115,7 +115,6 @@ sub get_currencies {
         }
         $page = $tx->res->body;
     }
-    log_trace "page: [[$page]]";
 
     my %currencies;
     my @recs;
@@ -175,7 +174,7 @@ Finance::Currency::Convert::BI - Get/convert currencies from website of Indonesi
 
 =head1 VERSION
 
-This document describes version 0.060 of Finance::Currency::Convert::BI (from Perl distribution Finance-Currency-Convert-BI), released on 2018-06-17.
+This document describes version 0.062 of Finance::Currency::Convert::BI (from Perl distribution Finance-Currency-Convert-BI), released on 2018-06-24.
 
 =head1 SYNOPSIS
 

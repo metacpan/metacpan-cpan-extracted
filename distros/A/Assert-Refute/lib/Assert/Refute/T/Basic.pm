@@ -3,7 +3,7 @@ package Assert::Refute::T::Basic;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = 0.0305;
+our $VERSION = '0.1201';
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ L<Test::More>, like C<is $got, $expected;> or C<like $got, qr/.../;>.
 
 They appear as both exportable functions in this module
 and L<Assert::Refute> itself
-I<and> as corresponding methods in L<Assert::Refute::Exec>.
+I<and> as corresponding methods in L<Assert::Refute::Report>.
 
 =head1 FUNCTIONS
 
@@ -28,11 +28,11 @@ exported by default. Scalar context is imposed onto arguments, so
 would actually compare arrays by length.
 
 If a C<contract { ... }> is in action, the results of each assertion
-will be recorded there. See L<Assert::Refute::Exec> for more.
+will be recorded there. See L<Assert::Refute::Report> for more.
 If L<Test::More> is in action, a unit testing script is assumed.
 If neither is true, an exception is thrown.
 
-In addition, a C<Assert::Refute::Exec-E<gt>function_name> method with
+In addition, a C<Assert::Refute::Report-E<gt>function_name> method with
 the same signature is generated for each of them
 (see L<Assert::Refute::Build>).
 
@@ -170,9 +170,8 @@ but DOES match C<".*ob.*"> OR C<qr/ob/>.
 
 =cut
 
-build_refute like => sub {
-    _like_unlike( $_[0], $_[1], 0 );
-}, args => 2, export => 1;
+build_refute like => \&_like_unlike,
+    args => 2, export => 1;
 
 build_refute unlike => sub {
     _like_unlike( $_[0], $_[1], 1 );
@@ -183,7 +182,8 @@ sub _like_unlike {
 
     $reg = qr#^(?:$reg)$# unless ref $reg eq 'Regexp';
         # retain compatibility with Test::More
-    return 'unexpected undef' if !defined $str;
+    return "got (undef), expecting ".($reverse ? "anything except" : "")."\n$reg"
+        if !defined $str;
     return '' if $str =~ $reg xor $reverse;
     return "$str\n".($reverse ? "unexpectedly matches" : "doesn't match")."\n$reg";
 };
@@ -253,15 +253,15 @@ sub _isa_ok {
 
 Check that a contract has been fullfilled to exactly the specified extent.
 
-See L<Assert::Refute::Exec/signature> for exact signature format.
+See L<Assert::Refute::Report/get_sign> for exact signature format.
 
 =cut
 
 build_refute contract_is => sub {
     my ($c, $sig) = @_;
 
-    my $got = $c->signature;
-    return $got ne $sig && <<"EOF".$c->as_tap;
+    my $got = $c->get_sign;
+    return $got ne $sig && <<"EOF".$c->get_tap;
 Unexpected subcontract signature.
 Got:      $got
 Expected: $sig
@@ -296,129 +296,156 @@ sub note (@) { ## no critic
     my $check = contract {
         my $arg = shift;
         my $expected = naive_impl( $arg );
-        is_deeply fast_impl( $arg ), $expected, "fast_impl ok for";
+        is_deeply fast_impl( $arg ), $expected, "fast_impl generates same data";
     };
 
-Unlike the L<Test::More> counterpart, prints all found discrepancies,
-although in a weird format.
-Better difference formatting wanted.
+Unlike the L<Test::More> counterpart, it will not first after first mismatch
+and print details about 10 mismatching entries.
+
+=head2 is_deeply_diff( $got, $expected, $max_diff )
+
+Same as above, but the third parameter specifies the number
+of mismatches in data to be reported.
+
+B<[EXPERIMENTAL]> name and meaning may change in the future.
+a C<$max_diff> of 0 would lead to unpredictable results.
 
 =cut
 
 push @EXPORT_OK, qw(deep_diff);
 
-build_refute is_deeply => sub {
-    my $diff = deep_diff( shift, shift );
-    return unless $diff;
-    return "Structures differ (got != expected):\n$diff";
-}, export => 1, args => 2;
+build_refute is_deeply => \&deep_diff, export => 1, args => 2;
+build_refute is_deeply_diff => \&deep_diff, export_ok => 1, args => 3;
 
 =head2 deep_diff( $old, $new )
 
 Not exported by default.
 Compares 2 scalars recursively, outputs nothing if they are identical,
-or a (somewhat strange) in-depth summary if they differ.
+or a I<complete> difference if they differ.
+
+The exact difference format shall not be relied upon.
 
 =cut
 
 sub deep_diff {
-    my ($old, $new, $known, $path) = @_;
+    my ($old, $new, $maxdiff, $known, $path) = @_;
 
-    $known ||= {};
-    $path ||= '&';
+    $path ||= '$deep';
+    $maxdiff = 10 unless defined $maxdiff;
 
-    # TODO combine conditions, too much branching
-    # diff refs => isn't right away
+    # First compare types. Report if different.
     if (ref $old ne ref $new or (defined $old xor defined $new)) {
-        return join "!=", to_scalar($old), to_scalar($new);
+        return _deep_not($path, $old, $new);
     };
 
-    # not deep - return right away
-    return '' unless defined $old;
+    # Check scalar values. compare with eq.
     if (!ref $old) {
-        return $old ne $new && join "!=", to_scalar($old), to_scalar($new),
+        return unless defined $old;
+        return $old eq $new
+            ? ()
+            : _deep_not($path, $old, $new),
     };
 
-    # recursion
-    # check topology first to avoid looping
-    # new is likely to be simpler (it is the "expected" one)
-    # FIXME BUG here - if new is tree, and old is DAG, this code won't catch it
-    if (my $new_path = $known->{refaddr $new}) {
-        my $old_path = $known->{-refaddr($old)};
-        return to_scalar($old)."!=$new_path" unless $old_path;
-        return $old_path ne $new_path && "$old_path!=$new_path";
+    # Topology check (and also avoid infinite loop)
+    # If we've seen these structures before,
+    #    just compare the place where it happened
+    # if not, remember for later
+    # From now on, $path eq $seen_* really means "never seen before"
+    # NOTE refaddr(...) to get rid of warning under older perls
+    my $seen_old = $known->{-refaddr($old)} ||= $path;
+    my $seen_new = $known->{ refaddr($new)} ||= $path;
+
+    # Seen previously in different places - report
+    if ($seen_old ne $seen_new) {
+        # same as _deep_not, but with addresses
+        return [
+            "At $path: ",
+            "     Got: ".($seen_old ne $path ? "Same as $seen_old" : to_scalar($old,2)),
+            "Expected: ".($seen_new ne $path ? "Same as $seen_new" : to_scalar($new,2)),
+        ];
     };
-    $known->{-refaddr($old)} = $path;
-    $known->{refaddr $new} = $path;
+    # these structures have already been compared elsewhere - skip
+    return if $seen_old ne $path;
+
+    # this is the same structure - skip
+    return if refaddr($old) eq refaddr($new);
+
+    # descend into deep structures
+    $known ||= {};
 
     if (UNIVERSAL::isa( $old , 'ARRAY') ) {
         my @diff;
-        for (my $i = 0; $i < @$old || $i < @$new; $i++ ) {
-            my $off = deep_diff( $old->[$i], $new->[$i], $known, $path."[$i]" );
-            push @diff, "$i:$off" if $off;
+        my $min = @$old < @$new ? scalar @$old : scalar @$new;
+        my $max = @$old > @$new ? scalar @$old : scalar @$new;
+        foreach my $i( 0 .. $min - 1 ) {
+            my $off = deep_diff( $old->[$i], $new->[$i], $maxdiff, $known, $path."[$i]" );
+            if ($off) {
+                push @diff, @$off;
+                $maxdiff -= @$off / 3;
+            };
+            last if $maxdiff <= 0;
         };
-        return @diff ? _array2str( \@diff, ref $old ) : '';
+        foreach my $i ($min .. $max - 1) {
+            push @diff, _deep_noexist( $path."[$i]", $old->[$i], $new->[$i], @$new - @$old );
+            $maxdiff--;
+            last if $maxdiff <= 0;
+        };
+        return @diff ? \@diff : ();
     };
+
     if (UNIVERSAL::isa( $old, 'HASH') ) {
-        my ($both_k, $old_k, $new_k) = _both_keys( $old, $new );
-        my %diff;
-        $diff{$_} = to_scalar( $old->{$_} )."!=(none)" for @$old_k;
-        $diff{$_} = "(none)!=".to_scalar( $new->{$_} ) for @$new_k;
-        foreach (@$both_k) {
-            my $off = deep_diff( $old->{$_}, $new->{$_}, $known, $path."{$_}" );
-            $diff{$_} = $off if $off;
+        my %both;
+        $both{$_}-- for keys %$old;
+        $both{$_}++ for keys %$new;
+        my @diff;
+        foreach (sort keys %both) {
+            if ($both{$_}) {
+                # nonzero = only one side exists
+                push @diff, _deep_noexist( $path."{$_}", $old->{$_}, $new->{$_}, $both{$_} );
+                $maxdiff--;
+                last if $maxdiff <= 0;
+            } else {
+                my $off = deep_diff( $old->{$_}, $new->{$_}, $maxdiff, $known, $path."{$_}" );
+                if ($off) {
+                    push @diff, @$off;
+                    $maxdiff -= @$off/3;
+                };
+                last if $maxdiff <= 0;
+            };
         };
-        return %diff ? _hash2str( \%diff, ref $old ) : '';
+        return @diff ? \@diff : ();
     };
 
-    # finally - don't know what to do, compare refs
-    $old = to_scalar($old);
-    $new = to_scalar($new);
-    return $old ne $new && join "!=", $old, $new;
+    # finally - totally different - just output them
+    return _deep_not($path, $old, $new);
 };
 
-sub _hash2str {
-    my ($hash, $type) = @_;
-    $type = '' if $type eq 'HASH';
-    return $type.'{'
-            . join(", ", map { to_scalar($_, 0).":$hash->{$_}" } sort keys %$hash)
-        ."}";
+sub _deep_not {
+    my ($path, $old, $new) = @_;
+    return [
+        "At $path: ",
+        "     Got: ".to_scalar( $old, 2 ),
+        "Expected: ".to_scalar( $new, 2 ),
+    ];
 };
 
-sub _array2str {
-    my ($array, $type) = @_;
-    $type = '' if $type eq 'ARRAY';
-    return "$type\[".join(", ", @$array)."]";
-};
-
-# in: hash + hash
-# out: common keys +
-sub _both_keys {
-    my ($old, $new) = @_;
-    # TODO write shorter
-    my %uniq;
-    $uniq{$_}++ for keys %$new;
-    $uniq{$_}-- for keys %$old;
-    my (@o_k, @n_k, @b_k);
-    foreach (sort keys %uniq) {
-        if (!$uniq{$_}) {
-            push @b_k, $_;
-        }
-        elsif ( $uniq{$_} < 0 ) {
-            push @o_k, $_;
-        }
-        else {
-            push @n_k, $_;
-        };
-    };
-    return (\@b_k, \@o_k, \@n_k);
+# $sign < 0 = $old exists, $sign > 0 $new exists
+# $sign == 0 and see above
+sub _deep_noexist {
+    my ($path, $old, $new, $sign) = @_;
+    # return array, not arrayref, as this is getting pushed
+    return (
+        "At $path: ",
+        "     Got: ".($sign < 0 ? to_scalar( $old, 2 ) : "Does not exist"),
+        "Expected: ".($sign > 0 ? to_scalar( $new, 2 ) : "Does not exist"),
+    );
 };
 
 =head1 LICENSE AND COPYRIGHT
 
 This module is part of L<Assert::Refute> suite.
 
-Copyright 2017 Konstantin S. Uvarin. C<< <khedin at gmail.com> >>
+Copyright 2017-2018 Konstantin S. Uvarin. C<< <khedin at cpan.org> >>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -426,35 +453,6 @@ copy of the full license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 =cut
+
 1;

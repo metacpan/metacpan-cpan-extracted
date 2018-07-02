@@ -65,7 +65,7 @@
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "v1.1.2"
+         "version" : "v1.1.3"
       },
       "Perlanet::Entry" : {
          "file" : "lib/Perlanet/Entry.pm"
@@ -103,8 +103,13 @@
       "homepage" : "http://perlanet.mag-sol.com/",
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg/perlanet.git",
+         "web" : "https://github.com/davorg/perlanet"
+      }
    },
-   "version" : "v1.1.2",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "v1.1.3",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

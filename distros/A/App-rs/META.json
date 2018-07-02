@@ -4,7 +4,7 @@
       "Yang Bo <rslovers@yandex.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "gpl_3"
    ],
@@ -43,5 +43,6 @@
          "web" : "https://github.com/057a3dd61f99517a3afea0051a49cb27994f94d/rslinux"
       }
    },
-   "version" : "v2.1.1"
+   "version" : "v2.1.2",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

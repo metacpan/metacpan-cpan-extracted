@@ -31,12 +31,11 @@ require 5.005_62;
 use strict;
 use warnings;
 use vars qw($VERSION $BUILD);
-$VERSION = '0.24';
-$BUILD = 'Saturday May 6 23:08:34 GMT 2006';
+$VERSION = '0.25';
 # ----------------------------------------------------------------------------------------------------
 {
 	package Class::STL::Trace; # Singleton
-	use UNIVERSAL qw(isa can);
+	use UNIVERSAL;
 	use Carp qw(confess);
 	sub new {
 		our $__class_stl_trace;

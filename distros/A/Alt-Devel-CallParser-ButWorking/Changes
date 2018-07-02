@@ -1,0 +1,38 @@
+version 0.002; 2013-09-21
+
+  * bugfix: allow generated headers to work on API-compatible Perls
+    other than the specific version under which this module was installed
+
+  * bugfix: work around core bugs relating to the padrange op
+
+  * load DynaLoader::Functions lazily, because it is only required at
+    build time of users of this module, not required at all in normal
+    runtime
+
+  * avoid potential circular dependency chain, by requiring a version
+    of DynaLoader::Functions that has reduced its dependencies
+
+  * in documentation, clarify that the header and linkable functions
+    should be called at build time
+
+  * test compatibility with indirect, and declare incompatibility with
+    older versions
+
+  * test compatibility with Sub::StrictDecl
+
+  * fix a typo in the documentation
+
+  * convert .cvsignore to .gitignore
+
+version 0.001; 2011-05-20
+
+  * add callparser_linkable constant to help users link with this module
+
+  * avoid false test failures with parallel testing
+
+  * look up Devel::CallChecker linkable library through its
+    callchecker_linkable constant
+
+version 0.000; 2011-04-29
+
+  * initial released version

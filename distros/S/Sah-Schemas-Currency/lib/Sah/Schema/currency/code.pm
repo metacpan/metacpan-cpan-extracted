@@ -1,7 +1,7 @@
 package Sah::Schema::currency::code;
 
-our $DATE = '2018-03-08'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-06-27'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use Locale::Codes::Currency_Codes ();
 
@@ -36,7 +36,7 @@ Sah::Schema::currency::code - Currency code
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::currency::code (from Perl distribution Sah-Schemas-Currency), released on 2018-03-08.
+This document describes version 0.002 of Sah::Schema::currency::code (from Perl distribution Sah-Schemas-Currency), released on 2018-06-27.
 
 =head1 DESCRIPTION
 

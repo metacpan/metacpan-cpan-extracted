@@ -16,6 +16,7 @@ foreach my $arg ( @ARGV ) {
     }
 }
 
+exit(version()) if ($OPT{version});
 exit(usage()) if ($OPT{h} || $OPT{help} || $OPT{'?'});
 
 my $nl = "\n";
@@ -92,6 +93,11 @@ if ($OPT{i}) {
 }
 exit(0);
 
+sub version {
+    print "Time::TAI::Simple $Time::TAI::Simple::VERSION\n";
+    return 1;
+}
+
 sub usage {
     print "Usage: $0 [options]\n" .
           "Options are:\n" .
@@ -143,6 +149,7 @@ Currently supported options:
     --neol     Do not print terminating EOL
     --p=N      Show N digits of precision when displaying as float
                (default: 9)
+    --version  Show the version of Time::TAI::Simple library used
 
 =head1 EXAMPLES
 

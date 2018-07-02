@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::Subscription;
-$WebService::Braintree::_::Subscription::VERSION = '1.5';
+$WebService::Braintree::_::Subscription::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,8 +17,8 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
-use MooseX::Aliases;
+use Moo;
+use MooX::Aliases;
 
 extends 'WebService::Braintree::_';
 
@@ -26,11 +26,14 @@ extends 'WebService::Braintree::_';
 
 =cut
 
-use WebService::Braintree::_::AddOn;
-use WebService::Braintree::_::Descriptor;
-use WebService::Braintree::_::Discount;
-use WebService::Braintree::_::Subscription::StatusDetail;
-use WebService::Braintree::_::Transaction;
+use Types::Standard qw(ArrayRef);
+use WebService::Braintree::Types qw(
+    AddOn
+    Descriptor
+    Discount
+    Subscription_StatusDetail
+    Transaction
+);
 
 =head2 add_ons()
 
@@ -41,7 +44,7 @@ of L<WebService::Braintree::_::AddOn/>.
 
 has add_ons => (
     is => 'ro',
-    isa => 'ArrayRefOfAddOn',
+    isa => ArrayRef[AddOn],
     coerce => 1,
 );
 
@@ -139,7 +142,7 @@ object of type L<WebService::Braintree::_::Descriptor/>.
 
 has descriptor => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Descriptor',
+    isa => Descriptor,
     coerce => 1,
 );
 
@@ -152,7 +155,7 @@ of L<WebService::Braintree::_::Discount/>.
 
 has discounts => (
     is => 'ro',
-    isa => 'ArrayRefOfDiscount',
+    isa => ArrayRef[Discount],
     coerce => 1,
 );
 
@@ -306,7 +309,7 @@ of L<WebService::Braintree::_::Subscription::StatusDetail/>.
 
 has status_history => (
     is => 'ro',
-    isa => 'ArrayRefOfSubscriptionStatusDetail',
+    isa => ArrayRef[Subscription_StatusDetail],
     coerce => 1,
     default => sub { [] },
 );
@@ -320,7 +323,7 @@ of L<WebService::Braintree::_::Transaction/>.
 
 has transactions => (
     is => 'ro',
-    isa => 'ArrayRefOfTransaction',
+    isa => ArrayRef[Transaction],
     coerce => 1,
 );
 

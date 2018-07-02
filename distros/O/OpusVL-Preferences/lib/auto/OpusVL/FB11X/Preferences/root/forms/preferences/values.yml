@@ -1,0 +1,103 @@
+---
+indicator: submit
+auto_fieldset: 0
+form_error_message: Oops, looks like there was a problem - please check below and try again.
+
+elements:
+  - type: Block
+    attributes:
+      class: "content_block"
+    elements:
+      - type: Hidden
+        name: element_count
+
+      - type: Fieldset
+        legend: "Existing values"
+        name: current_values
+        elements:
+          - type: Repeatable
+            name: rep
+            counter_name: element_count
+            elements:
+              - type: Multi
+                container_attributes:
+                  class: filter
+                elements:
+                  - type: Hidden
+                    name: id
+
+                  - type: Hidden
+                    name: name
+                  
+                  - type: Hidden
+                    name: prf_owner_type_id
+
+
+                  - type: Text
+                    name: value
+                    label: Value
+                    constraints:
+                      - type: Required
+                      - type: DBIC::Unique
+                        model: TokenDB
+                        others: 
+                          - name
+                          - prf_owner_type_id
+                        resultset: PrfDefaultValues
+                        column: value
+                        id_field: id
+                        message: This value already exists
+
+                  - type: Text
+                    name: display_order
+                    label: Sequence
+                    constraints:
+                      - Number
+                      - Required
+
+                  - type: Checkbox
+                    name: delete
+                    label: Delete
+
+
+      - type: Fieldset
+        legend: "New value"
+        elements:
+              
+          - type: Hidden
+            name: name
+          
+          - type: Hidden
+            name: prf_owner_type_id
+
+          - type: Text
+            name: value
+            label: Value *
+            constraints:
+              - type: DBIC::Unique
+                model: TokenDB
+                others: 
+                  - name
+                  - prf_owner_type_id
+                resultset: PrfDefaultValues
+                message: This value is already in use
+
+          - type: Text
+            name: display_order
+            label: Sequence
+            constraints:
+              - Number
+              - Required
+
+  - type: Submit
+    name: submit
+    value: Save changes
+    attributes:
+      class: "submit submit_ok"
+
+  - type: Submit
+    name: cancel
+    value: Done
+    attributes:
+      class: "submit submit_cancel"
+

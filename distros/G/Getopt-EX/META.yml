@@ -26,7 +26,7 @@ no_index:
 provides:
   Getopt::EX:
     file: lib/Getopt/EX.pm
-    version: v1.7.3
+    version: v1.8.0
   Getopt::EX::Colormap:
     file: lib/Getopt/EX/Colormap.pm
   Getopt::EX::Func:
@@ -41,6 +41,8 @@ provides:
     file: lib/Getopt/EX/Long.pm
   Getopt::EX::Module:
     file: lib/Getopt/EX/Module.pm
+  xg:
+    file: lib/Getopt/EX/Colormap.pm
 requires:
   List::Util: '1.45'
   perl: '5.016'
@@ -48,7 +50,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Getopt-EX/issues
   homepage: https://github.com/kaz-utashiro/Getopt-EX
   repository: git://github.com/kaz-utashiro/Getopt-EX.git
-version: v1.7.3
+version: v1.8.0
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <utashiro@cpan.org>'

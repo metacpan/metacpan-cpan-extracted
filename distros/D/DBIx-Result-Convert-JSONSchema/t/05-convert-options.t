@@ -54,7 +54,7 @@ ok $json_schema->{properties}->{decimal}->{pattern}, 'got set pattern for decima
 ok ! exists $json_schema->{properties}->{ $_ }->{description}, "-- description does not exist for key $_"
     for keys %{ $json_schema->{properties} };
 
-is $json_schema->{additional_properties}, 1, 'allow additional properties in JSON schema';
+is $json_schema->{additionalProperties}, 1, 'allow additional properties in JSON schema';
 
 ok ! exists $json_schema->{properties}->{char}, 'char key no longer exists';
 ok ! exists $json_schema->{properties}->{datetime}, 'datetime key no longer exists';

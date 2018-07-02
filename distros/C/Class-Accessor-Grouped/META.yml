@@ -3,33 +3,33 @@ abstract: 'Lets you build groups of accessors'
 author:
   - 'Matt S. Trout <mst@shadowcatsystems.co.uk>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Test::Exception: 0.31
-  Test::More: 0.88
+  Test::Exception: '0.31'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::CBuilder: 0.27
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Class-Accessor-Grouped
 no_index:
   directory:
-    - inc
     - t
+    - xt
 recommends:
-  Class::XSAccessor: 1.19
-  Sub::Name: 0.05
+  Class::XSAccessor: '1.19'
+  Sub::Name: '0.05'
 requires:
-  Carp: 0
-  Module::Runtime: 0.012
-  Scalar::Util: 0
-  perl: 5.6.0
+  Carp: '0'
+  Module::Runtime: '0.012'
+  Scalar::Util: '0'
+  perl: '5.006'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Accessor-Grouped
+  homepage: https://metacpan.org/release/Class-Accessor-Grouped
   license: http://dev.perl.org/licenses/
   repository: git://git.shadowcat.co.uk/p5sagit/Class-Accessor-Grouped.git
-version: 0.10012
+version: '0.10014'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

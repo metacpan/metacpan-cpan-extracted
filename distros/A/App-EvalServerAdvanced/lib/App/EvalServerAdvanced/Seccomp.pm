@@ -1,5 +1,5 @@
 package App::EvalServerAdvanced::Seccomp;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use strict;
 use warnings;
@@ -45,7 +45,12 @@ method load_yaml($yaml_file) {
   # TODO sanitize file name via Path::Tiny, ensure it's either in the module location, or next to the sandbox config
 
   my $input = do {no warnings 'io'; local $/; open(my $fh, "<", $yaml_file) or die "Couldn't load seccomp YAML $yaml_file: $!"; <$fh>};
-  my $data = YAML::XS::Load($input);
+  my $data = do {
+    local $YAML::XS::LoadBlessed = 0;
+    local $YAML::XS::UseCode = 0;
+    local $YAML::XS::LoadCode = 0;
+    YAML::XS::Load($input);
+  };
 
   if (my $consts = $data->{constants}) {
     for my $const_plugin (($consts->{plugins}//[])->@*) {

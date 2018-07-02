@@ -10,10 +10,9 @@ use File::Spec     ();
 use POSIX;
 use Test::More;
 
-use constant NO_PERMISSION_CHECK => ($^O eq 'MSWin32' or $< == 0);
-
 sub dies
 {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my $code    = shift;
     my $pattern = shift;
     my $message = shift || 'Code dies as expected';
@@ -29,8 +28,18 @@ unshift @INC, $testlib;
 
 use_ok("ShareDir::TestClass");
 
+my $fh;
 my $testautolib     = File::Spec->catdir($testlib,     "auto");
 my $testsharedirold = File::Spec->catdir($testautolib, qw(ShareDir TestClass));
+
+END { remove_tree($testautolib); }
+
+remove_tree($testautolib);
+make_path($testautolib, {mode => 0700});
+sysopen($fh, File::Spec->catfile($testautolib, qw(noread.txt)), O_RDWR | O_CREAT, 0100) or diag("$!");
+close($fh);
+
+my $NO_PERMISSION_CHECK = -r File::Spec->catfile($testautolib, qw(noread.txt));
 
 dies(sub { File::ShareDir::_DIST("ShareDir::TestClass") }, qr/Not a valid distribution name/, "Not a valid distribution name");
 dies(
@@ -41,20 +50,18 @@ dies(
     "Cannot use absolute file name"
 );
 
-END { remove_tree($testautolib); }
-
 dies(sub { module_dir() },   qr/Not a valid module name/, 'No params to module_dir dies');
 dies(sub { module_dir('') }, qr/Not a valid module name/, 'Null param to module_dir dies');
 dies(
     sub { module_dir('File::ShareDir::Bad') },
     qr/Module 'File::ShareDir::Bad' is not loaded/,
-    'Getting module dir for known non-existant module dies',
+    'Getting module dir for known non-existent module dies',
 );
 # test from RT#125582
 dies(
     sub { dist_file('File-ShareDir', 'file/name.txt'); },
     qr,Failed to find shared file 'file/name.txt' for dist 'File-ShareDir',,
-    "Getting non-existant file dies"
+    "Getting non-existent file dies"
 );
 
 remove_tree($testautolib);
@@ -67,7 +74,7 @@ make_path($testsharedirold,          {mode => 0100});
 
 SKIP:
 {
-    skip("Root always has read permissions", 1) if NO_PERMISSION_CHECK;
+    skip("Root always has read permissions", 1) if $NO_PERMISSION_CHECK;
     dies(
         sub { my $module_dir = module_dir('ShareDir::TestClass'); },
         qr/No read permission/,
@@ -81,7 +88,7 @@ make_path($testsharedirnew,          {mode => 0100});
 
 SKIP:
 {
-    skip("Root always has read permissions", 1) if NO_PERMISSION_CHECK;
+    skip("Root always has read permissions", 1) if $NO_PERMISSION_CHECK;
     dies(
         sub { my $dist_dir = dist_dir('ShareDir-TestClass'); },
         qr/but no read permissions/,
@@ -90,7 +97,7 @@ SKIP:
 }
 
 remove_tree($testautolib);
-open(my $fh, ">", $testsharedirold);
+open($fh, ">", $testsharedirold);
 close($fh);
 
 dies(sub { my $module_dir = module_dir('ShareDir::TestClass'); }, qr/No such directory/, "Old module directory but file");
@@ -111,7 +118,7 @@ close($fh);
 
 SKIP:
 {
-    skip("Root always has read permissions", 3) if NO_PERMISSION_CHECK;
+    skip("Root always has read permissions", 3) if $NO_PERMISSION_CHECK;
     dies(sub { my $dist_file = dist_file('ShareDir-TestClass', 'noread.txt'); }, qr/No read permission/, "Unreadable dist_file");
     dies(
         sub { my $module_file = module_file('ShareDir::TestClass', 'noread.txt'); },

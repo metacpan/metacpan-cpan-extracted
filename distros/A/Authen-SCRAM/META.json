@@ -93,19 +93,19 @@
    "provides" : {
       "Authen::SCRAM" : {
          "file" : "lib/Authen/SCRAM.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "Authen::SCRAM::Client" : {
          "file" : "lib/Authen/SCRAM/Client.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "Authen::SCRAM::Role::Common" : {
          "file" : "lib/Authen/SCRAM/Role/Common.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "Authen::SCRAM::Server" : {
          "file" : "lib/Authen/SCRAM/Server.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -120,7 +120,7 @@
          "web" : "https://github.com/dagolden/Authen-SCRAM"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "David Golden <xdg@xdg.me>"

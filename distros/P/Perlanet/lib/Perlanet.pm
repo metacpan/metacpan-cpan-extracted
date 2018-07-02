@@ -18,7 +18,7 @@ use XML::Feed;
 use vars qw{$VERSION};
 
 BEGIN {
-  $VERSION = '1.1.2';
+  $VERSION = '1.1.3';
 }
 
 with 'MooseX::Traits';
@@ -404,6 +404,9 @@ sub run {
 
   $self->render($feed);
 }
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 =head1 TO DO
 

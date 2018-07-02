@@ -1,5 +1,15 @@
 Revision history for Map::Tube::Delhi
 
+0.76  Sat Jun 30 05:40:00 2018
+      - Updated dependency on Map::Tube v3.53.
+
+0.75  Sun Jun 24 03:30:00 2018
+      - Used File::ShareDir v1.114 instead of File::Share.
+      - Explicitly added configure prereq File::ShareDir::Install v0.13.
+
+0.74  Sat Jun 23 22:10:00 2018
+      - Built dist with latest Dist::Zilla::Plugin::Test::Map::Tube.
+
 0.73  Sun Jun 03 03:45:00 2018
       - Updated dependency on Map::Tube v3.51.
 

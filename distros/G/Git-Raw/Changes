@@ -1,5 +1,12 @@
 Revision history for Git-Raw
 
+0.81      2018-06-27 19:20:17+02:00 Africa/Johannesburg
+
+ - Cleanup generated inc files (GH#196)
+ - Replace deprecated calls to git_buf_free() with git_buf_dispose()
+ - Improve reliability of testers by disabling parallel builds
+ - Update libgit2 to 967da2c71c
+
 0.80      2018-06-17 10:45:28+02:00 Africa/Johannesburg
 
  - Added Commit methods:

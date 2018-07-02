@@ -17,16 +17,16 @@ has subscribe_events => ();    # Str or ArrayRef[Str]
 # callbacks
 has on_connect    => ();       # Maybe [CodeRef], ($self)
 has on_disconnect => ();       # Maybe [CodeRef], ($self, $status)
-has on_auth       => ();       # Maybe [CodeRef], server: ($self, $token, $cb), client: ($self, $auth)
+has on_auth       => ();       # Maybe [CodeRef], server: ($self, $token), client: ($self, $auth)
 has on_subscribe  => ();       # Maybe [CodeRef], ($self, $mask), must return true for subscribe to event
 has on_event      => ();       # Maybe [CodeRef], ($self, $ev)
 has on_rpc        => ();       # Maybe [CodeRef], ($self, $req, $tx)
 
+has is_ready      => ();            # Bool
 has _peer_is_text => ();            # remote peer message serialization protocol
 has _req_cb       => sub { {} };    # HashRef, tid => $cb
 has _listeners    => ();            # HashRef, events listeners
 has _conn_ver     => 0;             # increased on each reset call
-has _auth_ver     => ();            # increased on each auth call on server
 
 const our $PROTOCOL => 'pcore';
 
@@ -40,6 +40,8 @@ my $CBOR = Pcore::Util::Data::get_cbor();
 my $JSON = Pcore::Util::Data::get_json( utf8 => 1 );
 
 sub auth ( $self, $token, %events ) {
+    $self->_reset;
+
     $self->{token} = $token;
 
     $self->{forward_events}   = $events{forward};
@@ -55,40 +57,51 @@ sub auth ( $self, $token, %events ) {
 }
 
 sub rpc_call ( $self, $method, $args, $cb ) {
-    my $msg = {
-        type   => $TX_TYPE_RPC,
-        method => $method,
-        args   => $args,
-    };
-
-    # detect callback
-    if ($cb) {
-        $msg->{tid} = uuid_v1mc_str;
-
-        $self->{_req_cb}->{ $msg->{tid} } = $cb;
+    if ( !$self->{is_ready} ) {
+        if ($cb) {
+            $cb->( res [ 500, 'Connection is not ready' ] );
+        }
     }
+    else {
+        my $msg = {
+            type   => $TX_TYPE_RPC,
+            method => $method,
+            args   => $args,
+        };
 
-    $self->_send_msg($msg);
+        # detect callback
+        if ($cb) {
+            $msg->{tid} = uuid_v1mc_str;
+
+            $self->{_req_cb}->{ $msg->{tid} } = $cb;
+        }
+
+        $self->_send_msg($msg);
+    }
 
     return;
 }
 
 # listen for remote events
 sub subscribe ( $self, $events ) {
-    $self->_send_msg( {
-        type   => $TX_TYPE_SUBSCRIBE,
-        events => $events,
-    } );
+    if ( $self->{is_ready} ) {
+        $self->_send_msg( {
+            type   => $TX_TYPE_SUBSCRIBE,
+            events => $events,
+        } );
+    }
 
     return;
 }
 
 # remove remote events subscription
 sub unsubscribe ( $self, $events ) {
-    $self->_send_msg( {
-        type   => $TX_TYPE_UNSUBSCRIBE,
-        events => $events,
-    } );
+    if ( $self->{is_ready} ) {
+        $self->_send_msg( {
+            type   => $TX_TYPE_UNSUBSCRIBE,
+            events => $events,
+        } );
+    }
 
     return;
 }
@@ -157,84 +170,95 @@ sub _on_message ( $self, $msg ) {
             }
         }
 
-        # SUBSCRIBE
-        elsif ( $tx->{type} eq $TX_TYPE_SUBSCRIBE ) {
-            $self->_on_subscribe( $tx->{events} ) if $tx->{events};
+        # connection is NOT IN the ready state
+        elsif ( !$self->{is_ready} ) {
+
+            # 1002 Protocol error
+            $self->disconnect( res [ 1012, $Pcore::WebSocket::Handle::WEBSOCKET_STATUS_REASON ] );
         }
 
-        # UNSUBSCRIBE
-        elsif ( $tx->{type} eq $TX_TYPE_UNSUBSCRIBE ) {
-            if ( $tx->{events} ) {
-                for my $event ( is_plain_arrayref $tx->{events} ? $tx->{events}->@* : $tx->{events} ) {
-                    delete $self->{_listeners}->{$event};
-                }
+        # connection is IN the ready state
+        else {
+
+            # SUBSCRIBE
+            if ( $tx->{type} eq $TX_TYPE_SUBSCRIBE ) {
+                $self->_on_subscribe( $tx->{events} ) if $tx->{events};
             }
-        }
 
-        # EVENT
-        elsif ( $tx->{type} eq $TX_TYPE_EVENT ) {
-            $self->{on_event}->( $self, $tx->{event} ) if $self->{on_event};
-        }
-
-        # RPC
-        elsif ( $tx->{type} eq $TX_TYPE_RPC ) {
-
-            # method is specified, this is rpc call
-            if ( $tx->{method} ) {
-
-                # RPC calls are not supported by this peer
-                if ( !$self->{on_rpc} ) {
-                    if ( $tx->{tid} ) {
-                        $self->_send_msg( {
-                            type   => $TX_TYPE_RPC,
-                            tid    => $tx->{tid},
-                            result => {
-                                status => 400,
-                                reason => 'RPC calls are not supported',
-                            }
-                        } );
+            # UNSUBSCRIBE
+            elsif ( $tx->{type} eq $TX_TYPE_UNSUBSCRIBE ) {
+                if ( $tx->{events} ) {
+                    for my $event ( is_plain_arrayref $tx->{events} ? $tx->{events}->@* : $tx->{events} ) {
+                        delete $self->{_listeners}->{$event};
                     }
                 }
+            }
 
-                # RPC call
-                else {
-                    my $req = bless {}, 'Pcore::WebSocket::pcore::Request';
+            # EVENT
+            elsif ( $tx->{type} eq $TX_TYPE_EVENT ) {
+                $self->{on_event}->( $self, $tx->{event} ) if $self->{on_event};
+            }
 
-                    # callback is required
-                    if ( my $tid = $tx->{tid} ) {
-                        my $weak_self = $self;
+            # RPC
+            elsif ( $tx->{type} eq $TX_TYPE_RPC ) {
 
-                        weaken $weak_self;
+                # method is specified, this is rpc call
+                if ( $tx->{method} ) {
 
-                        # store current _conn_ver
-                        my $conn_ver = $self->{_conn_ver};
-
-                        $req->{_cb} = sub ($res) {
-                            return if !defined $weak_self;
-
-                            # check _conn_ver, skip, if connection was reset during rpc call
-                            return if $conn_ver != $self->{_conn_ver};
-
+                    # RPC calls are not supported by this peer
+                    if ( !$self->{on_rpc} ) {
+                        if ( $tx->{tid} ) {
                             $self->_send_msg( {
                                 type   => $TX_TYPE_RPC,
-                                tid    => $tid,
-                                result => $res,
+                                tid    => $tx->{tid},
+                                result => {
+                                    status => 400,
+                                    reason => 'RPC calls are not supported',
+                                }
                             } );
-
-                            return;
-                        };
+                        }
                     }
 
-                    $self->{on_rpc}->( $self, $req, $tx );
+                    # RPC call
+                    else {
+                        my $req = bless {}, 'Pcore::WebSocket::pcore::Request';
+
+                        # callback is required
+                        if ( my $tid = $tx->{tid} ) {
+                            my $weak_self = $self;
+
+                            weaken $weak_self;
+
+                            # store current _conn_ver
+                            my $conn_ver = $self->{_conn_ver};
+
+                            $req->{_cb} = sub ($res) {
+                                return if !defined $weak_self;
+
+                                # check _conn_ver, skip, if connection was reset during rpc call
+                                return if $conn_ver != $self->{_conn_ver};
+
+                                $self->_send_msg( {
+                                    type   => $TX_TYPE_RPC,
+                                    tid    => $tid,
+                                    result => $res,
+                                } );
+
+                                return;
+                            };
+                        }
+
+                        Coro::async_pool { $self->{on_rpc}->( $self, $req, $tx ) }->cede_to;
+                    }
                 }
-            }
 
-            # method is not specified, this is callback, tid is required
-            elsif ( $tx->{tid} ) {
-                if ( my $cb = delete $self->{_req_cb}->{ $tx->{tid} } ) {
+                # method is not specified, this is callback, tid is required
+                elsif ( $tx->{tid} ) {
+                    if ( my $cb = delete $self->{_req_cb}->{ $tx->{tid} } ) {
 
-                    # convert result to response object
-                    $cb->( bless $tx->{result}, 'Pcore::Util::Result' );
+                        # convert result to response object
+                        $cb->( bless $tx->{result}, 'Pcore::Util::Result' );
+                    }
                 }
             }
         }
@@ -245,44 +269,44 @@ sub _on_message ( $self, $msg ) {
 
 # auth request, processed on server only
 sub _on_auth_request ( $self, $tx ) {
-    my $auth_ver = ++$self->{_auth_ver};
+    $self->_reset;
+
+    my $conn_ver = $self->{_conn_ver};
 
     if ( $self->{on_auth} ) {
         weaken $self;
 
-        $self->{on_auth}->(
-            $self,
-            $tx->{token},
-            sub ( $auth, %events ) {
-                return if !$self;
+        Coro::async_pool {
+            my ( $auth, %events ) = $self->{on_auth}->( $self, $tx->{token} );
 
-                # skip, if other auth requests was received during authentication
-                return if $self->{_auth_ver} != $auth_ver;
+            return if !$self;
 
-                $self->_reset;
+            return if $conn_ver != $self->{_conn_ver};
 
-                $self->{auth} = $auth;
+            $self->{is_ready} = 1;
 
-                # subscribe client to the server events
-                $self->_set_listeners( $events{forward} ) if $events{forward};
+            $self->{auth} = $auth;
 
-                # subscribe client to the server events from client request
-                $self->_on_subscribe( $tx->{events} ) if $tx->{events};
+            # subscribe client to the server events
+            $self->_set_listeners( $events{forward} ) if $events{forward};
 
-                $self->_send_msg( {
-                    type   => $TX_TYPE_AUTH,
-                    auth   => $auth,
-                    events => $events{subscribe},
-                } );
+            # subscribe client to the server events from client request
+            $self->_on_subscribe( $tx->{events} ) if $tx->{events};
 
-                return;
-            }
-        );
+            $self->_send_msg( {
+                type   => $TX_TYPE_AUTH,
+                auth   => $auth,
+                events => $events{subscribe},
+            } );
+
+            return;
+        }
+        ->cede_to;
     }
 
     # auth is not supported, reject
     else {
-        $self->_reset;
+        $self->{is_ready} = 1;
 
         $self->{auth} = undef;
 
@@ -300,9 +324,9 @@ sub _on_auth_request ( $self, $tx ) {
 
 # auth response, processed on client only
 sub _on_auth_response ( $self, $tx ) {
-    $self->_reset;
+    $self->{is_ready} = 1;
 
-    # create auth object
+    # create and store auth object
     $self->{auth} = bless $tx->{auth}, 'Pcore::Util::Result';
 
     # set forward events
@@ -360,10 +384,13 @@ sub _reset ( $self, $status = undef ) {
 
     delete $self->{_listeners};
 
+    $self->{is_ready} = 0;
     $self->{_conn_ver}++;
 
     # call pending callbacks
     if ( $self->{_req_cb}->%* ) {
+
+        # 1012 Service Restart
         $status = res [ 1012, $Pcore::WebSocket::Handle::WEBSOCKET_STATUS_REASON ] if !defined $status;
 
         for my $tid ( keys $self->{_req_cb}->%* ) {
@@ -395,12 +422,14 @@ sub _send_msg ( $self, $msg ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 96                   | * Private subroutine/method '_on_connect' declared but not used                                                |
-## |      | 110                  | * Private subroutine/method '_on_disconnect' declared but not used                                             |
-## |      | 118                  | * Private subroutine/method '_on_text' declared but not used                                                   |
-## |      | 130                  | * Private subroutine/method '_on_binary' declared but not used                                                 |
+## |      | 109                  | * Private subroutine/method '_on_connect' declared but not used                                                |
+## |      | 123                  | * Private subroutine/method '_on_disconnect' declared but not used                                             |
+## |      | 131                  | * Private subroutine/method '_on_text' declared but not used                                                   |
+## |      | 143                  | * Private subroutine/method '_on_binary' declared but not used                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 142                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (27)               |
+## |    3 | 155                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (29)               |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 210, 227             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::BulkWriteView;
 # ABSTRACT: Bulk write operations against a query document
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -33,6 +31,7 @@ use MongoDB::_Types qw(
 );
 use Types::Standard qw(
     Maybe
+    ArrayRef
     InstanceOf
 );
 use boolean;
@@ -59,19 +58,25 @@ has _collation => (
     isa => Maybe [Document],
 );
 
+has _array_filters => (
+    is => 'ro',
+    isa => Maybe [ArrayRef[Document]],
+);
+
 has _upsert => (
     is      => 'ro',
     isa     => Boolish,
     default => 0,
 );
 
-with $_ for qw(
-  MongoDB::Role::_DeprecationWarner
-);
-
 sub collation {
     my ($self, $collation) = @_;
     return $self->new( %$self, _collation => $collation );
+}
+
+sub arrayFilters {
+  my ( $self, $array_filters ) = @_;
+  return $self->new( %$self, _array_filters => $array_filters );
 }
 
 sub upsert {
@@ -115,6 +120,9 @@ sub _update {
         $doc = Tie::IxHash->new(%$doc);
     }
 
+    $self->_bulk->_retryable( 0 ) if $method eq 'update_many';
+    $self->_bulk->_retryable( 0 ) if $method eq 'delete_many';
+
     my $update = {
         q      => $self->_query,
         u      => $doc,
@@ -122,6 +130,7 @@ sub _update {
         upsert => boolean( $self->_upsert ),
         is_replace => $method eq 'replace_one',
         (defined $self->_collation ? (collation => $self->_collation) : ()),
+        (defined $self->_array_filters ? (arrayFilters => $self->_array_filters) : ()),
     };
 
     $self->_enqueue_write( [ update => $update ] );
@@ -137,6 +146,7 @@ sub delete_many {
                 q     => $self->_query,
                 limit => 0,
                 ( defined $self->_collation ? ( collation => $self->_collation ) : () ),
+                (defined $self->_array_filters ? (arrayFilters => $self->_array_filters) : ()),
             }
         ]
     );
@@ -151,38 +161,11 @@ sub delete_one {
                 q     => $self->_query,
                 limit => 1,
                 ( defined $self->_collation ? ( collation => $self->_collation ) : () ),
+                (defined $self->_array_filters ? (arrayFilters => $self->_array_filters) : ()),
             }
         ]
     );
     return;
-}
-
-#--------------------------------------------------------------------------#
-# Deprecated methods
-#--------------------------------------------------------------------------#
-
-sub update {
-    my $self = shift;
-
-    $self->_warn_deprecated( 'update' => [qw/update_many/] );
-
-    return $self->update_many(@_);
-}
-
-sub remove {
-    my $self = shift;
-
-    $self->_warn_deprecated( 'remove' => [qw/delete_many/] );
-
-    return $self->delete_many(@_);
-}
-
-sub remove_one {
-    my $self = shift;
-
-    $self->_warn_deprecated( 'remove_one' => [qw/delete_one/] );
-
-    return $self->delete_one(@_);
 }
 
 1;
@@ -199,7 +182,7 @@ MongoDB::BulkWriteView - Bulk write operations against a query document
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -236,6 +219,9 @@ version v1.8.2
     # Remove all documents matching the selector
     bulk->find( { a => 5 } )->delete_many();
 
+    # Update any arrays with the matching filter
+    bulk->find( {} )->arrayFilters([ { 'i.b' => 1 } ])->update_many( { '$set' => { 'y.$[i].b' => 2 } } );
+
     # Remove all documents matching the selector, with respect to a collation
     bulk->find( { a => { '$gte' => 'F' } )->collation($collation)->delete_many();
 
@@ -250,10 +236,18 @@ document.
 To instantiate a C<MongoDB::BulkWriteView>, use the L<find|MongoDB::BulkWrite/find>
 method from L<MongoDB::BulkWrite>.
 
-Except for L</collation> and L</upsert>, all methods have an empty return on
-success; an exception will be thrown on error.
+Except for L</arrayFilters>, L</collation> and L</upsert>, all methods have an
+empty return on success; an exception will be thrown on error.
 
 =head1 METHODS
+
+=head2 arrayFilters
+
+    $bulk->arrayFilters( $array_filters )->update_many( $modification );
+
+Returns a new C<MongoDB::BulkWriteView> object, where the specified arrayFilter
+will be used to determine which array elements to modify for an update
+operation on an array field.
 
 =head2 collation
 

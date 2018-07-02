@@ -1,7 +1,13 @@
-SYNOPSIS
+NAME
+    Text::Table::CSV - Generate CSV
 
+VERSION
+    This document describes version 0.020 of Text::Table::CSV (from Perl
+    distribution Text-Table-CSV), released on 2018-06-30.
+
+SYNOPSIS
      use Text::Table::CSV;
-    
+
      my $rows = [
          # header row
          ['Name', 'Rank', 'Serial'],
@@ -13,8 +19,7 @@ SYNOPSIS
      print Text::Table::CSV::table(rows => $rows, header_row => 1);
 
 DESCRIPTION
-
-    This module provides a single function, table, which formats a
+    This module provides a single function, "table", which formats a
     two-dimensional array of data as CSV. This is basically a way to
     generate CSV using the same interface as that of Text::Table::Tiny
     (v0.03) or Text::Table::Org.
@@ -27,22 +32,42 @@ DESCRIPTION
      "carol","brig gen","8745"
 
 FUNCTIONS
-
- table(%params) => str
-
- OPTIONS
-
-    The table function understands these arguments, which are passed as a
+  table(%params) => str
+  OPTIONS
+    The "table" function understands these arguments, which are passed as a
     hash.
 
-      * rows (aoaos)
+    *   rows (aoaos)
 
-      Takes an array reference which should contain one or more rows of
-      data, where each row is an array reference.
+        Takes an array reference which should contain one or more rows of
+        data, where each row is an array reference.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-Table-CSV>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-Table-CSV>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-CSV>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     The de-facto module for handling CSV in Perl: Text::CSV, Text::CSV_XS.
 
     See also Bencher::Scenario::TextTableModules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

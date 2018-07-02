@@ -35,5 +35,5 @@ resources:
   bugtracker: https://github.com/gryphonshafer/Config-App/issues
   homepage: https://github.com/gryphonshafer/Config-App
   repository: https://github.com/gryphonshafer/Config-App.git
-version: '1.06'
+version: '1.07'
 x_serialization_backend: 'YAML::Tiny version 1.73'

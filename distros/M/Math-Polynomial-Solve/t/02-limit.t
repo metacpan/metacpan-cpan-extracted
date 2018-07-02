@@ -1,9 +1,11 @@
 use 5.010001;
 use Test::More tests => 10;
 
-use Math::Polynomial::Solve qw(:utility);
+use Math::Polynomial::Solve qw(:utility coefficients);
 use strict;
 use warnings;
+
+coefficients order => 'descending';
 
 #
 # Cue the poly_iteration choices...

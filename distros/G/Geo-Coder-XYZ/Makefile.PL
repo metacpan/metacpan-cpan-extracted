@@ -1,24 +1,28 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 use Getopt::Long;	# Technique inspired by IO::Lambda
 use IO::Socket::INET;
 
 my $online_tests;
 
-if($ENV{RELEASE_TESTING}) {
+if($ENV{AUTHOR_TESTING}) {
 	$online_tests = are_online();
-} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING}) {
+} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING} || (!-t STDIN)) {
 	$online_tests = 0;
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
 
 	if(!defined($online_tests)) {
-		$online_tests = are_online();
+		if($ENV{AUTHOR_TESTING}) {
+			$online_tests = are_online();
+		} else {
+			$online_tests = 0;
+		}
 	}
 }
 
-my $build_requires = {
+my $test_requires = {
 	'Test::Most' => 0,
 	'Test::NoWarnings' => 0,
 };
@@ -26,9 +30,9 @@ my $build_requires = {
 if($online_tests) {
 	open(my $enabled, '>', 't/online.enabled') || die "Can't touch t/online.enabled $!";
 	close($enabled) || die "Can't touch t/online.enabled $!";
-	$build_requires->{'Test::LWP::UserAgent'} = 0;
-	$build_requires->{'Test::Number::Delta'} = 0;
-	$build_requires->{'Test::Carp'} = 0;
+	$test_requires->{'Test::LWP::UserAgent'} = 0;
+	$test_requires->{'Test::Number::Delta'} = 0;
+	$test_requires->{'Test::Carp'} = 0;
 } else {
 	unlink('t/online.enabled');
 }
@@ -43,7 +47,7 @@ WriteMakefile(
       ? ('LICENSE'=> 'GPL')
       : ()),
     PL_FILES	=> {},
-    BUILD_REQUIRES => $build_requires,
+	TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
 	'Encode' => 0,
 	'JSON' => 0,

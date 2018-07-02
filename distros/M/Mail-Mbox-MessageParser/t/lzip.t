@@ -2,7 +2,7 @@
 
 use strict;
 
-use File::Temp;
+use File::Temp qw(tempfile);
 use Test::More;
 use lib 't';
 use Test::Utils;
@@ -49,12 +49,12 @@ sub TestIt
   my $testname = [splitdir($0)]->[-1];
   $testname =~ s/\.t//;
 
-  my $test_stdout = File::Temp->new();
-  $test_stdout->close();
-  my $test_stderr = File::Temp->new();
-  $test_stderr->close();
+  my ($test_stdout_fh, $test_stdout_fn) = tempfile();
+  $test_stdout_fh->close();
+  my ($test_stderr_fh, $test_stderr_fn) = tempfile();
+  $test_stderr_fh->close();
 
-  system "$test 1>" . $test_stdout->filename . " 2>" . $test_stderr->filename;
+  system "$test 1>$test_stdout_fn 2>" . $test_stderr_fn;
 
   if (!$? && defined $error_expected)
   {
@@ -65,7 +65,7 @@ sub TestIt
   if ($? && !defined $error_expected)
   {
     ok(0,"Encountered an error executing the test when one was not expected.\n" .
-      "See " . $test_stdout->filename . " and " . $test_stderr->filename . ".\n\n");
+      "See $test_stdout_fn and $test_stderr_fn.\n\n");
     return;
   }
 
@@ -73,7 +73,7 @@ sub TestIt
   my $real_stdout = catfile('t','results',$stdout_file);
   my $real_stderr = catfile('t','results',$stderr_file);
 
-  CheckDiffs([$real_stdout,$test_stdout->filename],[$real_stderr,$test_stderr->filename]);
+  CheckDiffs([$real_stdout,$test_stdout_fn],[$real_stderr,$test_stderr_fn]);
 }
 
 # ---------------------------------------------------------------------------

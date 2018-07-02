@@ -21,7 +21,9 @@ warnings_like {
     is $status, 500, "Template not found";
 } [qr/req_id=/], "Warning logged";
 
-neaf->load_resources(\*DATA);
+warnings_like {
+    neaf->load_resources(\*DATA);
+} [{ carped => qr/Xslate/ }], "Xslate hasn't been loaded = warn";
 
 my ($status, $head, $content) = neaf->run_test( '/render?tpl=foo.html' );
 is $status, 200, "Template found now";
@@ -52,19 +54,19 @@ __DATA__
 
 garbage
 
-@@ [TT] foo.html
+@@ foo.html view=TT
 FOO=[% foo %]
 
-@@ [TT] bar.html
+@@ bar.html view=TT
 BAR=[% bar %]
 
-@@ [Xslate] baz.html
+@@ baz.html view=Xslate
 <: xslate_unsupported :>
 
-@@ [TT] base64.html format=base64
+@@ base64.html format=base64 view=TT
 PGI+c28/PC9iPg==
 
-@@ [TT] base64url.html format=base64
+@@ base64url.html format=base64 view=TT
 PGI-c28_PC9iPg
 
 @@ /favicon.ico format=base64 type=png

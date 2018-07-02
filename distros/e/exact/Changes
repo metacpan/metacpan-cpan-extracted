@@ -1,5 +1,12 @@
 Revision history for exact
 
+1.05      2018-06-21 16:16:55-07:00 America/Los_Angeles
+        - Reverse use of strictures in favor of strict/warnings
+
+1.04      2018-06-20 12:31:51-07:00 America/Los_Angeles
+        - use strictures 2
+        - use namespace::autoclean
+
 1.03      2018-01-04 18:58:07-08:00 America/Los_Angeles
         - Add Perl versions to test; annual general update for 2018
         - Remove testing switch statements (given/when) because v27 drops support

@@ -247,8 +247,8 @@ BioX::Seq::Fetch - Fetch records from indexed FASTA non-sequentially
 
     my $parser = BioX::Seq::Fetch->new($filename);
 
-    my $seq = $parser->fetch('seq_ABC');
-    my $sub = $parser->fetch('seq_XYZ', 8 => 15);
+    my $seq = $parser->fetch_seq('seq_ABC');
+    my $sub = $parser->fetch_seq('seq_XYZ', 8 => 15);
 
 =head1 DESCRIPTION
 

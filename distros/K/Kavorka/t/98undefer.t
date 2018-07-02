@@ -25,7 +25,7 @@ use warnings;
 use lib qw( lib t/lib );
 
 use Test::More;
-use Test::Requires { Moops => '0.033' };
+use Test::Requires { Moops => '0.035' };
 use Test::Fatal;
 
 use Moops -strict;

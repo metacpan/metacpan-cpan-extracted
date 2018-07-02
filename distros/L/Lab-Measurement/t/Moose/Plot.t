@@ -66,7 +66,8 @@ $plot->plot(
 
 {
 
-    my $folder     = datafolder( path => our_catfile( $dir, 'gnuplot' ) );
+    my $folder     = datafolder( path => our_catfile( $dir, 'gnuplot' ),
+                                 date_prefix => 0, time_prefix => 0 );
     my $foldername = "$dir/gnuplot_001";
     my $file       = datafile(
         type     => 'Gnuplot',

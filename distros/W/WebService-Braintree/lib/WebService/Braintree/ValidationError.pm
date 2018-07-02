@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::ValidationError;
-$WebService::Braintree::ValidationError::VERSION = '1.5';
+$WebService::Braintree::ValidationError::VERSION = '1.6';
 =head1 NAME
 
 WebService::Braintree::ValidationError
@@ -14,7 +14,7 @@ This class will only be created as part of a L<error response|WebService::Braint
 
 =cut
 
-use Moose;
+use Moo;
 
 =head1 METHODS
 

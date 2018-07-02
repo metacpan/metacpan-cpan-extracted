@@ -1,3 +1,10 @@
+0.005 2018-06-29
+
+  * deprecate new_license_with_summary constructor in favor
+    of new_from_short_name
+  * fix detection of Debian distro
+  * add license_class method
+
 0.004 2018-05-28
 
   * move LGPL_2 license in Software::LicenseMoreUtils

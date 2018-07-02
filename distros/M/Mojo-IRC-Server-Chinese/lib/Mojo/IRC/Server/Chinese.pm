@@ -1,6 +1,6 @@
 package Mojo::IRC::Server::Chinese;
 use strict;
-$Mojo::IRC::Server::Chinese::VERSION = "1.8.1";
+$Mojo::IRC::Server::Chinese::VERSION = "1.8.2";
 use Encode;
 use Encode::Locale;
 use Carp;
@@ -25,6 +25,7 @@ has create_time => sub{POSIX::strftime( '%Y/%m/%d %H:%M:%S', localtime() )};
 has log_level => "info";
 has log_path => undef;
 has auth=>undef;
+has motd_path => undef;
 
 has version => sub{$Mojo::IRC::Server::Chinese::VERSION};
 has start_time => sub{time};
@@ -106,6 +107,8 @@ sub new_user{
         elsif($msg->{command} eq "USER"){$user->emit(user=>$msg);$s->emit(user=>$user,$msg);}
         elsif($msg->{command} eq "JOIN"){$user->emit(join=>$msg);$s->emit(join=>$user,$msg);}
         elsif($msg->{command} eq "PART"){$user->emit(part=>$msg);$s->emit(part=>$user,$msg);}
+        elsif($msg->{command} eq "KICK"){$user->emit(kick=>$msg);$s->emit(kick=>$user,$msg);}
+        elsif($msg->{command} eq "INVITE"){$user->emit(invite=>$msg);$s->emit(invite=>$user,$msg);}
         elsif($msg->{command} eq "PING"){$user->emit(ping=>$msg);$s->emit(ping=>$user,$msg);}
         elsif($msg->{command} eq "PONG"){$user->emit(pong=>$msg);$s->emit(pong=>$user,$msg);}
         elsif($msg->{command} eq "MODE"){$user->emit(mode=>$msg);$s->emit(mode=>$user,$msg);}
@@ -176,6 +179,32 @@ sub new_user{
         my $channel = $user->search_channel(name=>$channel_name);
         return if not defined $channel;
         $user->part_channel($channel,$part_info);
+    });
+    $user->on(invite=>sub{
+        my($user,$msg) = @_;
+        my $invite_nickname = $msg->{params}[0];
+        my $channel_name = $msg->{params}[1];
+        my $channel = $user->search_channel(name=>$channel_name);
+        my $invite_user = $user->search_user(nick=>$invite_nickname);
+        if(not defined $invite_user){
+            $user->send($user->serverident,"401",$user->nick,$invite_nickname,"No such nick");
+            return;
+        }
+        if(not defined $channel){
+            $user->send($user->serverident,"403",$user->nick,$channel_name,"No such channel");
+        }
+        elsif(defined $channel){
+            if( not $user->is_join_channel($channel)){
+                $user->send($user->serverident,"442",$user->nick,$channel->name,"You're not on that channel");
+            }
+            elsif($invite_user->is_join_channel($channel)){
+                $user->send($user->serverident,"443",$user->nick,$invite_user->nick,$channel->name,"is already on channel");
+            }
+            else{
+                $user->send($user->serverident,"341",$user->nick,$invite_user->nick,$channel->name);
+                $invite_user->send($user->ident,"INVITE",$invite_user->nick,$channel->name);
+            }
+        }
     });
     $user->on(ping=>sub{my($user,$msg) = @_;
         my $servername = $msg->{params}[0];
@@ -266,7 +295,19 @@ sub new_user{
             
         }
     });
-    $user->on(whois=>sub{my($user,$msg) = @_;});
+    $user->on(whois=>sub{my($user,$msg) = @_;
+        my $nickname = $msg->{params}[0];
+        my $whois_user = $user->search_user(nick=>$nickname); 
+        if(not defined $whois_user){
+            $user->send($user->serverident,"401",$user->nick,$nickname,"No such nick");
+            return;
+        }
+        $user->send($user->serverident,"311",$user->nick,$whois_user->nick,$whois_user->user,$whois_user->host,"*",$whois_user->realname);
+        $user->send($user->serverident,"312",$user->nick,$whois_user->nick,$whois_user->servername,$whois_user->servername);
+        $user->send($user->serverident,"319",$user->nick,$whois_user->nick,join(" ",map {$_->name} $whois_user->channels));
+        $user->send($user->serverident,"318",$user->nick,$whois_user->nick,"End of WHOIS list");
+        
+    });
     $user->on(list=>sub{my($user,$msg) = @_;
         for my $channel ($user->{_server}->channels){
             next if $channel->mode =~ /s/;
@@ -470,9 +511,21 @@ sub ready {
         }
         $user->send($user->serverident,"001",$user->nick,"Welcome to " . $s->network . " " .  $user->ident);
         $user->send($user->serverident,"002",$user->nick,"Your host is " . $s->servername. ", running version " . $s->version);
-        $user->send($user->serverident,"003",$user->nick,"This server was created " . POSIX::strftime('%a %b %d %y at %H:%M:%S %Z',localtime($s->start_time)));
-        $user->send($user->serverident,"004",$user->nick,$s->servername." " .$s->version . " DOQRSZaghilopswz Pbis");
-        #$user->send($user->serverident,"001",$user->nick,"欢迎来到 Chinese IRC Network " . $user->ident);
+        $user->send($user->serverident,"003",$user->nick,"This server was created " . POSIX::strftime('%a %b %d %Y at %H:%M:%S %Z',localtime($s->start_time)));
+        $user->send($user->serverident,"004",$user->nick,$s->servername." " .$s->version . " aio PioOvstkb");
+        $user->send($user->serverident,"251",$user->nick,"There are ". (0+@{$s->user}) ." users and 0 services on 1 servers");
+        if(defined $s->motd_path and -f $s->motd_path and -s $s->motd_path){
+            eval{
+                open my $motd_fd,$s->motd_path or die "open motd file [" . $s->motd_path . "] error: $!";
+                $user->send($user->serverident,"375",$user->nick,"- " . $s->servername . " Message of the day - ");
+                while(<$motd_fd>){
+                    s/[\r\n]+$//g;
+                    $user->send($user->serverident,"372",$user->nick,"- $_");
+                }
+                $user->send($user->serverident,"376",$user->nick,"End of MOTD command");
+            };
+            $s->warn($@) if $@;
+        }
         $user->send($user->serverident,"396",$user->nick,$user->host,"您的主机地址已被隐藏");    
     });
     $s->on(user_msg=>sub{

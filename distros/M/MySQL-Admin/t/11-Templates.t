@@ -47,31 +47,30 @@ open OUT, ">./test.html" or die " $!\n";
 print OUT$template;
 close OUT;
 my %template = (
-                path     => "./",
-                style    => "",
-                template => "test.html",
-               );
+    path     => "./",
+    style    => "",
+    template => "test.html",
+);
 my @data = (
-            {
-             name => 'menuHeader',
-            },
-            {
-             name  => 'links',
-             style => "mysql",
-             text  => "Link",
-             title => "Link"
-            },
-            {name => 'menuFooter'},
-           );
+    {
+        name => 'menuHeader',
+    },
+    {
+        name  => 'links',
+        style => "mysql",
+        text  => "Link",
+        title => "Link"
+    },
+    { name => 'menuFooter' },
+);
 use Template::Quick;
 my $temp = new Template::Quick();
-$temp->initTemplate(\%template);
-my $t1 = $temp->initArray(\@data);
+$temp->initTemplate( \%template );
+my $t1 = $temp->initArray( \@data );
 use Test::More tests => 3;
-ok(length($t1) > 0);
-ok(length($t1) < length($template));
-my $t2 = initTemplate(\%template, \@data);
-ok(length($t1) == length($t2));
+ok( length($t1) > 0 );
+ok( length($t1) < length($template) );
+my $t2 = initTemplate( \%template, \@data );
+ok( length($t1) == length($t2) );
 unlink 'test.html' or warn "Could not unlink test.html: $!";
-
 1;

@@ -29,7 +29,6 @@ sub main ( ) {  #  乱数の出力
    }
 }
 
-
 sub SecondInfo( ) {   #  処理したことについての二次情報を出力
     use FindBin qw [ $Script ] ; 
     print STDERR 
@@ -40,10 +39,15 @@ sub SecondInfo( ) {   #  処理したことについての二次情報を出力
        CYAN " ($Script) " , "\n" ;
  }
 
-
-
-## ヘルプの扱い
-sub VERSION_MESSAGE {}
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  our $VERSION = 0.22 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+    # 0.22 : -g inf を指定可能とした。
+}  
 sub HELP_MESSAGE {
     use FindBin qw[ $Script $Bin ] ;
     sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
@@ -99,6 +103,7 @@ sub HELP_MESSAGE {
     --help opt ..or..  --help options : Only shows the option helps. It is easy to read when you are in very necessary.
     --help ja : Shows Japanese online help manual. ; "'=script=' --help ja" で日本語のオンラインマニュアルを表示します。
     --help nopod : Print this online manual using the code insdide this program without using the function of Perl POD.
+    --version : Shows version information of this program.
 
 =begin JapaneseManual 
    プログラム名 : '=script='  ('=bin=')
@@ -123,7 +128,7 @@ sub HELP_MESSAGE {
   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
   --help en : 英語版のオンラインヘルプマニュアルを出力。Online help in English version. 
-  
+  --version : バージョン情報の表示  
 
   開発上のメモ 
     * srand 関数の挙動が Perl 5.14 とそれ以前で異なる。その様子を検知するテストが必要と考えられる。

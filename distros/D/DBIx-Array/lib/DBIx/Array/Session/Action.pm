@@ -2,11 +2,11 @@ package DBIx::Array::Session::Action;
 use strict;
 use warnings;
 
-our $VERSION='0.49';
+our $VERSION='0.58';
 
 =head1 NAME
 
-DBIx::Array::Session::Action - This module ties DBIx::Array->{"action"} to the database
+DBIx::Array::Session::Action - Ties DBIx::Array->{"action"} to the database
 
 =head1 SYNOPSIS
 

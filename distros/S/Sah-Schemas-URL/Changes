@@ -1,3 +1,14 @@
+0.008   2018-06-26 (PERLANCAR)
+
+        - [build] Rebuild to fix circular dependency (dependency to package
+          Data::Sah::Coerce::str::str_url provided by us) [RT#125676].
+
+
+0.007   2018-06-20 (PERLANCAR)
+
+	- Add test prereq to URI [RT#125618].
+
+
 0.006   2018-06-05 (PERLANCAR)
 
 	- [Bugfix] Depend on newer version of Data::Sah (0.891)

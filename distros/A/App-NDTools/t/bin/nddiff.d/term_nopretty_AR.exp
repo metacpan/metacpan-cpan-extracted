@@ -1,0 +1,12 @@
+  {false}
+-   false
++   true
+  {list}
+-   [1]
+-     false
+  {list}
++   [3]
++     false
+  {true}
+-   true
++   false

@@ -1,0 +1,35 @@
+---
+abstract: 'a thing'
+author:
+  - 'Jeff Ober <sysread@fastmail.fm>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::V0: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-XSVersion
+provides:
+  Dist::Zilla::Plugin::XSVersion:
+    file: lib/Dist/Zilla/Plugin/XSVersion.pm
+    version: '0.01'
+requires:
+  Dist::Zilla::Role::FileMunger: '0'
+  Moose: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sysread/Dist-Zilla-Plugin-XSVersion/issues
+  homepage: https://github.com/sysread/Dist-Zilla-Plugin-XSVersion
+  repository: https://github.com/sysread/Dist-Zilla-Plugin-XSVersion.git
+version: '0.01'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

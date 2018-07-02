@@ -285,6 +285,11 @@ symbolic link.
     interpretation is still effective, and there is no problem using
     module option in rc or module files.
 
+- **--exit** _status_
+
+    Usually **optex** exits with status of executed command.  This option
+    override it and force to exit with specified status code.
+
 # CONFIGURATION FILE
 
 When starting up, **optex** reads configuration file

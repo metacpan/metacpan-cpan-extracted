@@ -5,9 +5,18 @@ package DataDog::DogStatsd;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use IO::Socket::INET;
+
+my %OPTS_KEYS = (
+	date_happened    => 'd',
+	hostname         => 'h',
+	aggregation_key  => 'k',
+	priority         => 'p',
+	source_type_name => 's',
+	alert_type       => 't'
+);
 
 sub new {
 	my $classname = shift;
@@ -106,6 +115,44 @@ sub set {
 	my $value = shift;
 	my $opts  = shift || {};
 	$self->send_stats( $stat, $value, 's', $opts );
+}
+
+sub event {
+	my $self  = shift;
+	my $title = shift;
+	my $text  = shift;
+	my $opts  = shift || {};
+
+	my $event_string = format_event( $title, $text, $opts );
+
+	$self->send_to_socket($event_string);
+}
+
+sub format_event {
+	my $title = shift;
+	my $text  = shift;
+	my $opts  = shift || {};
+
+	my $tags = delete $opts->{tags};
+
+	$title =~ s/\n/\\n/g;
+	$text =~ s/\n/\\n/g;
+
+	my $event_string_data = sprintf "_e{%d,%d}:%s|%s",
+	length($title), length($text), $title, $text;
+
+	for my $opt ( keys %$opts ) {
+		if ( my $key = $OPTS_KEYS{$opt} ) {
+			$opts->{$opt} =~ s/|//g;
+			$event_string_data .= "|$key:$opts->{$opt}";
+		}
+	}
+
+	if ($tags) {
+		$event_string_data .= "|#" . join ",", map { s/|//g; $_ } @$tags;
+	}
+
+	return $event_string_data;
 }
 
 sub send_stats {
@@ -236,6 +283,10 @@ Sends a timing (in ms) for the given stat to the statsd server. The sample_rate 
 	$statsd->set('visitors.uniques', $user_id);
 
 Sends a value to be tracked as a set to the statsd server.
+
+=head2 event
+
+	$statsd->event('event title', 'event text', { tags => ['tag1, 'tag2'] });
 
 =head1 AUTHORS
 

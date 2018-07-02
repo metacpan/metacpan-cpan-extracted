@@ -5,10 +5,6 @@ package WebService::Braintree;
 use 5.010_001;
 use strictures 1;
 
-# These have to be loaded first-er-est because they weren't loaded before.
-use WebService::Braintree::AdvancedSearchFields;
-use WebService::Braintree::AdvancedSearchNodes;
-
 # Load the error codes omnibus so clients can get at them.
 use WebService::Braintree::ErrorCodes;
 

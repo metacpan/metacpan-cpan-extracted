@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/CLI/TextLines/Utils.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/init.sh
+scripts/ngram
+scripts/alluniq
+scripts/idmaker
+scripts/shuffler
+scripts/hashtotal
+scripts/utf8bom
+scripts/digitdist
+META.yml
+META.json

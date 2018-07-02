@@ -6,21 +6,24 @@ package # hide from pause
 use 5.010_001;
 use strictures 1;
 
+use Class::Load qw(try_load_class);
 use Hash::Inflator;
 
-use Moose;
-use Moose::Util::TypeConstraints;
+use Type::Library -base;
+use Type::Utils -all;
+use Types::Standard -types;
 
-foreach my $type_proto (qw(
+# These are the ones that live in WS::BT::_
+my @obj_types = qw(
     AccountUpdaterDailyReport
     AchMandate AddOn Address AmexExpressCheckoutCard AndroidPayCard
-    ApplePay ApplePayCard
+    ApplePay ApplePayCard ApplePayOptions
     AuthorizationAdjustment
     BinData CoinbaseAccount
     ConnectedMerchantPayPalStatusChanged
     ConnectedMerchantStatusTransitioned
     CreditCard CreditCardVerification Customer
-    Descriptor Disbursement DisbursementDetails Discount Dispute
+    Descriptor Disbursement Discount Dispute
     DocumentUpload EuropeBankAccount GrantedPaymentInstrumentUpdate
     IbanBankAccount IdealPayment MasterpassCard
     Merchant MerchantAccount PaymentMethodNonce PaymentMethodNonceDetails
@@ -55,46 +58,56 @@ foreach my $type_proto (qw(
     Transaction::UsBankAccountDetail
     Transaction::VenmoAccountDetail
     Transaction::VisaCheckoutCardDetail
-)) {
+);
+
+# These are the ones that live in WS::BT
+my @class_types = qw(
+    ValidationErrorCollection
+    ErrorResult
+);
+
+foreach my $type_proto (@obj_types) {
     my $class = "WebService::Braintree::_::${type_proto}";
 
-    my $type = $type_proto;
-    $type =~ s/:://g;
+    # Type names cannot have '::' in them, so convert that to '_'
+    (my $type = $type_proto) =~ s/::/_/g;
 
-    subtype "ArrayRefOf${type}",
-        as "ArrayRef[${class}]";
+    class_type $type, { class => $class };
 
-    coerce "ArrayRefOf${type}",
-        from 'ArrayRef[HashRef]',
-        via {[ map { $class->new($_) } @{$_} ]};
-
-    coerce $class,
-        from 'HashRef',
-        via { $class->new($_) };
+    coerce $type,
+        from HashRef, via { $class->new($_) };
 }
 
 # These are unconverted classes
-foreach my $type (qw(
-    ErrorResult ValidationErrorCollection
-)) {
+foreach my $type (@class_types) {
     my $class = "WebService::Braintree::${type}";
 
-    subtype "ArrayRefOf${type}",
-        as "ArrayRef[$class]";
+    class_type $type, { class => $class };
 
-    coerce "ArrayRefOf${type}",
-        from 'ArrayRef[HashRef]',
-        via {[ map { $class->new($_) } @{$_} ]};
-
-    coerce $class,
-        from 'HashRef',
-        via { $class->new($_) };
+    coerce $type,
+        from HashRef, via { $class->new($_) };
 }
 
-class_type 'Hash::Inflator';
-coerce 'Hash::Inflator',
-    from 'HashRef',
-    via { Hash::Inflator->new($_) };
+class_type HashInflator => { class => 'Hash::Inflator' };
+coerce HashInflator =>
+    from HashRef, via { Hash::Inflator->new($_) };
+
+# Now, load all the classes here so they don't have to be loaded
+# anywhere else.
+
+foreach my $type_proto (@obj_types) {
+    my $class = "WebService::Braintree::_::${type_proto}";
+
+    my ($ok, $error) = try_load_class($class);
+    $ok ? $class->import : die $error;
+}
+
+foreach my $type_proto (@class_types) {
+    my $class = "WebService::Braintree::${type_proto}";
+
+    my ($ok, $error) = try_load_class($class);
+    $ok ? $class->import : die $error;
+}
 
 1;
 __END__

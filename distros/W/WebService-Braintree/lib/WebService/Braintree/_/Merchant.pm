@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::Merchant;
-$WebService::Braintree::_::Merchant::VERSION = '1.5';
+$WebService::Braintree::_::Merchant::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,9 +17,14 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
+use Moo;
 
 extends 'WebService::Braintree::_';
+
+use Types::Standard qw(ArrayRef);
+use WebService::Braintree::Types qw(
+    MerchantAccount
+);
 
 =head1 ATTRIBUTES
 
@@ -94,7 +99,7 @@ associated with this merchant.
 
 has merchant_accounts => (
     is => 'ro',
-    isa => 'ArrayRefOfMerchantAccount',
+    isa => ArrayRef[MerchantAccount],
     coerce => 1,
 );
 

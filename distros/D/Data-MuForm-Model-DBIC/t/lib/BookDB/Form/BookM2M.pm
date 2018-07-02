@@ -69,10 +69,6 @@ sub field_list {
             label => 'Pages:',
             order => '8',
         },
-        comment => {
-            type  => 'Text',
-            order => 9,
-        },
     ];
 }
 

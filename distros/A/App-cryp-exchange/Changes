@@ -1,3 +1,9 @@
+0.010   2018-06-24 (PERLANCAR)
+
+	- [Bugfix] indodax: get_order: return incorrect filled_base_size
+	  and filled_quote_size because of using wrong hash key.
+
+
 0.009   2018-06-13 (PERLANCAR)
 
 	- [ux] balance, open-orders, orderbook, pairs: Formatting of

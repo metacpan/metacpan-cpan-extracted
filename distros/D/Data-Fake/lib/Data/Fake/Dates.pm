@@ -5,7 +5,7 @@ use warnings;
 package Data::Fake::Dates;
 # ABSTRACT: Fake date data generators
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Exporter 5.57 qw/import/;
 
@@ -107,7 +107,7 @@ Data::Fake::Dates - Fake date data generators
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

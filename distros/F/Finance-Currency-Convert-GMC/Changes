@@ -1,3 +1,8 @@
+0.005   2018-06-24 (PERLANCAR)
+
+	- Mojo's error doesn't give code, only message.
+
+
 0.004   2018-06-17 (PERLANCAR)
 
 	- Extract last update information from the website.

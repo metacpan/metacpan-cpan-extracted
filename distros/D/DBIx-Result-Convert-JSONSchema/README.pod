@@ -1,14 +1,16 @@
 =head1 NAME
     DBIx::Result::Convert::JSONSchema - Convert DBIx result schema to JSON schema
 
-=for html
+=begin html
 
     <a href='https://travis-ci.org/Humanstate/p5-dbix-result-convert-jsonschema?branch=master'><img src='https://travis-ci.org/Humanstate/p5-dbix-result-convert-jsonschema.svg?branch=master' alt='Build Status' /></a>
     <a href='https://coveralls.io/github/Humanstate/p5-dbix-result-convert-jsonschema?branch=master'><img src='https://coveralls.io/repos/github/Humanstate/p5-dbix-result-convert-jsonschema/badge.svg?branch=master' alt='Coverage Status' /></a>
 
+=end html
+
 =head1 VERSION
 
-    0.02
+    0.03
 
 =head1 SYNOPSIS
 
@@ -31,7 +33,7 @@ L<DBIx::Class::ResultSource> from other database solutions.
 
 Note, relations between tables are not taken in account!
 
-=head2 C<get_json_schema>
+=head2 get_json_schema
 
 Returns somewhat equivalent JSON schema based on DBIx result source name.
 
@@ -55,32 +57,59 @@ Returns somewhat equivalent JSON schema based on DBIx result source name.
         exclude_properties => [ qw/ mouse house / ],
     });
 
-    ARGS:
-        Required ARGS[0]:
-            - Source name e.g. 'Address'
-        Optional ARGS[1]:
-            decimals_to_pattern:
-                True/false value to indicate if 'number' type field should be converted to 'string' type with
-                RegExp pattern based on decimal place definition in database
-            has_schema_property_description:
-                True/false value to indicate if basic JSON schema properties should include 'description' key
-                containing basic information about field
-            allow_additional_properties:
-                1/0 to indicate if JSON schema should accept properties which are not defined by default
-            overwrite_schema_property_keys:
-                HashRef containing { OLD_PROPERTY => NEW_PROPERTY } to overwrite default column names, default
-                property attributes from old key will be assigned to new key
-                (!) The key conversion is executed last, every other option e.g. exclude_properties will work
-                only on original database column names
-            overwrite_schema_properties:
-                HashRef of { PROPERTY_NAME => { ... JSON SCHEMA ATTRIBUTES ... } } which will replace default generated
-                schema properties.
-            exclude_required:
-                ArrayRef of database column names which should always be EXCLUDED from required schema properties
-            include_required:
-                ArrayRef of database column names which should always be INCLUDED in required schema properties
-            exclude_properties:
-                ArrayRef of database column names which should be excluded from JSON schema
+Optional arguments to change how JSON schema is generated:
+
+=over 8
+
+=item * decimals_to_pattern
+
+1/0 - value to indicate if 'number' type field should be converted to 'string' type with
+RegExp pattern based on decimal place definition in database.
+
+B<Default>: 0
+
+=item * has_schema_property_description
+
+Generates very basic schema description fields e.g. 'Optional numeric type value for field context e.g. 1'.
+
+B<Default>: 0
+
+=item * allow_additional_properties
+
+Define if the schema accepts additional keys in given payload.
+
+B<Default>: 0
+
+=item * overwrite_schema_property_keys
+
+HashRef representing mapping between old property name and new property name to overwrite existing schema keys,
+Properties from old key will be assigned to the new property.
+
+B<Note> The key conversion is executed last, every other option e.g. C<exclude_properties> will work only on original
+database column names.
+
+=item * overwrite_schema_properties
+
+HashRef of property name and new attributes which can be either overwritten or merged based on given B<_action> key.
+
+=item * exclude_required
+
+ArrayRef of database column names which should always be EXCLUDED from REQUIRED schema properties.
+
+=item * include_required
+
+ArrayRef of database column names which should always be INCLUDED in REQUIRED schema properties
+
+=item * exclude_properties
+
+ArrayRef of database column names which should be excluded from JSON schema AT ALL
+
+=item * schema_overwrite
+
+HashRef of top level schema properties e.g. 'required', 'properties' etc. to overwrite
+
+=back
+
 
 =head1 SEE ALSO
 

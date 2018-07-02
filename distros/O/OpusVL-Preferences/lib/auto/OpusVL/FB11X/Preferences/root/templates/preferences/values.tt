@@ -1,0 +1,4 @@
+<div class="fb11-card">
+  <h1>[% preference.name %] values</h1>
+  [% form.render | none %]
+</div>

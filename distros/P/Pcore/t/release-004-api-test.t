@@ -25,7 +25,7 @@ package App {
 
     with qw[Pcore::App];
 
-    our $APP_API_ROLES = [ 'admin', 'user' ];
+    our $API_ROLES = [ 'admin', 'user' ];
 
     sub run { }
 
@@ -51,10 +51,10 @@ my $sess = $api->create_user_session('root');
 ok( $sess, 'create_user_session' );
 
 my $auth;
-$api->authenticate( $sess->{data}->{token}, sub { ($auth) = @_ } );
+$auth = $api->authenticate( $sess->{data}->{token} );
 ok( $auth->{is_authenticated}, 'authenticate_session_token_1' );
 
-$api->authenticate( [ 'root', 'fake_password' ], sub { ($auth) = @_ } );
+$auth = $api->authenticate( [ 'root', 'fake_password' ] );
 ok( !$auth->{is_authenticated}, 'authenticate_password_1' );
 
 done_testing $TESTS;

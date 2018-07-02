@@ -27,7 +27,7 @@ name: Perlanet
 provides:
   Perlanet:
     file: lib/Perlanet.pm
-    version: v1.1.2
+    version: v1.1.3
   Perlanet::Entry:
     file: lib/Perlanet/Entry.pm
   Perlanet::Feed:
@@ -72,5 +72,6 @@ requires:
 resources:
   homepage: http://perlanet.mag-sol.com/
   license: http://dev.perl.org/licenses/
-version: v1.1.2
+  repository: git://github.com/davorg/perlanet.git
+version: v1.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

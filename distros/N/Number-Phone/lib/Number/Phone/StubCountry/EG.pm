@@ -22,18 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221546;
+our $VERSION = 1.20180619214155;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d)(\\d{7,8})',
                   'format' => '$1 $2',
+                  'national_rule' => '0$1',
                   'leading_digits' => '[23]',
-                  'national_rule' => '0$1'
+                  'pattern' => '(\\d)(\\d{7,8})'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{6,7})',
-                  'format' => '$1 $2',
                   'leading_digits' => '
             1(?:
               3|
@@ -42,21 +41,21 @@ my $formatters = [
             [4-6]|
             [89][2-9]
           ',
+                  'format' => '$1 $2',
                   'national_rule' => '0$1'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
             1[0-25]|
             [89]00
           ',
-                  'national_rule' => '0$1'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
                 'toll_free' => '800\\d{7}',
                 'fixed_line' => '
           (?:
@@ -95,10 +94,8 @@ my $validators = {
             )\\d
           )\\d{5}
         ',
+                'voip' => '',
                 'personal_number' => '',
-                'pager' => '',
-                'specialrate' => '(900\\d{7})',
-                'mobile' => '1[0125]\\d{8}',
                 'geographic' => '
           (?:
             1(?:
@@ -135,7 +132,10 @@ my $validators = {
               7[2-4]
             )\\d
           )\\d{5}
-        '
+        ',
+                'pager' => '',
+                'specialrate' => '(900\\d{7})',
+                'mobile' => '1[0125]\\d{8}'
               };
 my %areanames = (
   2013 => "Banha",

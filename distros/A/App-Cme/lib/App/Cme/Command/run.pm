@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.027';
+$App::Cme::Command::run::VERSION = '1.028';
 use strict;
 use warnings;
 use 5.10.1;
@@ -45,9 +45,9 @@ sub opt_spec {
         [ "commit|c:s" => "commit change with passed message" ],
         [ "cat" => "Show the script file" ],
         [ "no-commit|nc!" => "skip commit to git" ],
-        [ "quiet!"  => "Suppress progress messages" ],
         [ "doc!"    => "show documention of script" ],
         [ "list!"   => "list available scripts" ],
+        [ "verbose!" => "show execution of the instructions from the 'run' script" ],
         $class->cme_global_options,
     );
 }
@@ -118,7 +118,7 @@ sub execute {
 
     if ($content =~ m/^#!/ or $content =~ /^use/m) {
         splice @ARGV, 0,2; # remove 'run script' arguments
-        eval $script->slurp_utf8;
+        eval $script->slurp_utf8; ## no critic BuiltinFunctions::ProhibitStringyEval
         die "Error in script $script_name: $@\n" if $@;
         return;
     }
@@ -231,10 +231,12 @@ sub execute {
 
     # check if workspace and index are clean
     if ($commit_msg) {
-        my $r = `git status --porcelain`;
+        my $r = `git status --porcelain --untracked-files=no`;
         die "Cannot run commit command in a non clean repo. Please commit or stash pending changes: $r"
             if $r;
     }
+
+    $opt->{_verbose} = 'Loader' if $opt->{verbose};
 
     # call loads
     my ($model, $inst, $root) = $self->init_cme($opt,$app_args);
@@ -249,7 +251,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var;
-$App::Cme::Run::Var::VERSION = '1.027';
+$App::Cme::Run::Var::VERSION = '1.028';
 require Tie::Hash;
 
 our @ISA = qw(Tie::ExtraHash);
@@ -276,7 +278,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 
@@ -453,6 +455,10 @@ committed with the passed commit message.
 =head2 no-commit
 
 Don't commit to git (even if the above option is set)
+
+=head2 verbose
+
+Show effect of the modify instructions.
 
 =head1 Common options
 

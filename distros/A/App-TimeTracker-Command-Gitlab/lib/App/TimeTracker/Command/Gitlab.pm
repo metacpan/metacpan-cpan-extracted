@@ -6,7 +6,7 @@ use 5.010;
 # ABSTRACT: App::TimeTracker Gitlab plugin
 use App::TimeTracker::Utils qw(error_message warning_message);
 
-our $VERSION = "1.003";
+our $VERSION = "1.004";
 
 use Moose::Role;
 use HTTP::Tiny;
@@ -69,14 +69,7 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
     my $issuename = 'issue#' . $self->issue;
     $self->insert_tag($issuename);
 
-    my $issues = $self->_call('GET','projects/'.$self->project_id.'/issues?iids[]='.$self->issue);
-    my $issue_from_list = $issues->[0];
-    unless ($issue_from_list) {
-        error_message("Cannot find issue %s in %s",$self->issue,$self->project_id);
-        return;
-    }
-    my $issue_id = $issue_from_list->{id};
-    my $issue =  $self->_call('GET','projects/'.$self->project_id.'/issues/'.$issue_id);
+    my $issue =  $self->_call('GET','projects/'.$self->project_id.'/issues/'.$self->issue);
 
     my $name = $issue->{title};
 
@@ -98,7 +91,7 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
 
     # reopen
     if ($self->config->{gitlab}{reopen} && $issue->{state} eq 'closed') {
-        $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$issue_id.'?state_event=reopen');
+        $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$self->issue.'?state_event=reopen');
         say "reopend closed issue";
     }
 
@@ -119,7 +112,7 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
                 }
             }
             else {
-                $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$issue_id.'?assignee_id='.$user->{id});
+                $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$self->issue.'?assignee_id='.$user->{id});
                 say "Assignee set to you";
             }
         }
@@ -141,7 +134,7 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
                 delete $l{$remove};
             }
         }
-        $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$issue_id.'?labels='.uri_escape(join(',',keys %l)));
+        $self->_call('PUT','projects/'.$self->project_id.'/issues/'.$self->issue.'?labels='.uri_escape(join(',',keys %l)));
         say "Labels are now: ".join(', ',sort keys %l);
     }
 };
@@ -161,13 +154,13 @@ sub _get_user_id {
 sub _call {
     my ($self,$method,  $endpoint, $args) = @_;
 
-    my $url = $self->config->{gitlab}{url}.'/api/v3/'.$endpoint;
+    my $url = $self->config->{gitlab}{url}.'/api/v4/'.$endpoint;
     my $res = $self->gitlab_client->request($method,$url);
     if ($res->{success}) {
         my $data = decode_json($res->{content});
         return $data;
     }
-    error_message(join(" ",$res->{status},$res->{reason}));
+    error_message(join(" ",$res->{status}, $res->{reason}, "\n" . $res->{content}));
 }
 
 sub App::TimeTracker::Data::Task::gitlab_issue {
@@ -193,7 +186,7 @@ App::TimeTracker::Command::Gitlab - App::TimeTracker Gitlab plugin
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 DESCRIPTION
 

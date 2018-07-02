@@ -46,6 +46,7 @@ my %module = (
     PREREQ_PM => {
         'Exporter'           => 5, # for 'import'
         'POSIX'              => 0, # for 'setsid' on POSIXish systems
+        'File::Spec'         => 0,
 
         'Filter::signatures' => '0.09',
         'Carp'               => 0,
@@ -78,6 +79,7 @@ my %module = (
         'File::Basename'                   => 0,
         'WWW::Mechanize::Link'             => 0,
         'IO::Socket::INET'                 => 0,
+        'Storable'                         => 0, # for dclone
         'Object::Import'                   => 0,
 
         # for extracting element screenshots, loaded dynamically

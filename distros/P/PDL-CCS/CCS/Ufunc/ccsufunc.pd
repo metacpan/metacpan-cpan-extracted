@@ -5,7 +5,7 @@
 ##======================================================================
 
 use PDL::VectorValued::Dev;
-my $VERSION = '1.23.8'; ##-- update with perl-reversion from Perl::Version module
+my $VERSION = '1.23.9'; ##-- update with perl-reversion from Perl::Version module
 pp_setversion($VERSION);
 
 ##------------------------------------------------------
@@ -388,7 +388,7 @@ ccs_accum_def('bor', 'bitwise "or"',
 	      max_type_perl  => 'ccs_indx',
 	      init_missingOut=>'missingOut = missingVal;',
 	      tmp_addmissing =>'if (nMissing > 0) { tmp = tmp | missingVal; }',
-	      tmp_addval     =>'tmp |= $nzvalsIn(NnzIn=>nnzii);',
+	      tmp_addval     =>'tmp = (tmp | $nzvalsIn(NnzIn=>nnzii));',
 	      doc_addmissing => <<'EOMD',
 
 If $N() is specified and greater than zero, $missing() is bitwise (or)ed
@@ -409,7 +409,7 @@ ccs_accum_def('band', 'bitwise "and"',
 	      max_type_perl  => 'ccs_indx',
 	      init_missingOut=>'missingOut = missingVal;',
 	      tmp_addmissing =>'if (nMissing > 0) { tmp &= missingVal; }',
-	      tmp_addval     =>'tmp &= $nzvalsIn(NnzIn=>nnzii);',
+	      tmp_addval     =>'tmp = (tmp & $nzvalsIn(NnzIn=>nnzii));',
 	      doc_addmissing => <<'EOMD',
 
 If $N() is specified and greater than zero, $missing() is bitwise (and)ed

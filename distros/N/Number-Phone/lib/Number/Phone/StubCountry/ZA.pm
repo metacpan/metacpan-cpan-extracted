@@ -22,29 +22,28 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221548;
+our $VERSION = 1.20180619214157;
 
 my $formatters = [
                 {
-                  'leading_digits' => '860',
-                  'national_rule' => '0$1',
+                  'pattern' => '(860)(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(860)(\\d{3})(\\d{3})'
+                  'national_rule' => '0$1',
+                  'leading_digits' => '860'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{3,4})',
-                  'national_rule' => '0$1',
                   'leading_digits' => '8[1-4]',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'national_rule' => '0$1'
                 },
                 {
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2,3})',
                   'leading_digits' => '8[1-4]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2,3})'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
                   'leading_digits' => '
             [1-79]|
             8(?:
@@ -52,14 +51,13 @@ my $formatters = [
               6[1-9]
             )
           ',
+                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'voip' => '87\\d{7}',
-                'toll_free' => '80\\d{7}',
                 'fixed_line' => '
           (?:
             1[0-8]|
@@ -69,8 +67,19 @@ my $validators = {
             5[1346-8]
           )\\d{7}
         ',
+                'toll_free' => '80\\d{7}',
                 'personal_number' => '',
+                'voip' => '87\\d{7}',
                 'pager' => '',
+                'geographic' => '
+          (?:
+            1[0-8]|
+            2[1-378]|
+            3[1-69]|
+            4\\d|
+            5[1346-8]
+          )\\d{7}
+        ',
                 'specialrate' => '(860\\d{6})|(
           86[2-9]\\d{6}|
           9[0-2]\\d{7}
@@ -84,55 +93,46 @@ my $validators = {
             [1-4]\\d{1,5}|
             5\\d{5}
           )\\d{2}
-        ',
-                'geographic' => '
-          (?:
-            1[0-8]|
-            2[1-378]|
-            3[1-69]|
-            4\\d|
-            5[1346-8]
-          )\\d{7}
         '
               };
 my %areanames = (
   2710 => "Johannesburg",
   2711 => "Johannesburg",
-  2712 => "Tshwane",
-  2713 => "Middelburg\/Witbank\/Nelspruit",
-  2714 => "Rustenburg",
-  2715 => "Polokwane",
+  2712 => "Brits\/Tshwane",
+  2713 => "Bronkhorstspruit\/Eastern\ Gauteng\/Middelburg\/Nelspruit\/Northern\ and\ Western\ Mpumalanga\/Witbank",
+  2714 => "Modimolle\/Northern\ North\ West\ and\ Southwestern\ Limpopo\/Rustenburg",
+  2715 => "Northern\ and\ Eastern\ Limpopo\/Polokwane",
   2716 => "Vaal\ Triangle",
-  2717 => "Ermelo\/Secunda",
-  2718 => "Potchefstroom\/Klerksdorp",
-  2721 => "Cape\ Town",
-  2722 => "Malmesbury\/Vredenburg",
-  2723 => "Worcester\/Robertson",
-  2727 => "Vredendal\/Springbok",
-  2728 => "Hermanus\/Swellendam",
+  2717 => "Ermelo\/Secunda\/Southern\ Mpumalanga",
+  2718 => "Klerksdorp\/Lichtenburg\/Potchefstroom",
+  2721 => "Cape\ Town\/Gordons\ Bay\/Somerset\ West\/Stellenbosch",
+  2722 => "Boland\/Malmesbury\/Vredenburg\/Western\ coast\ of\ Western\ Cape",
+  2723 => "Beaufort\ West\/Karoo\/Robertson\/Worcester",
+  2727 => "Alexander\ Bay\/Calvinia\/Clanwilliam\/Namaqualand\/Port\ Nolloth\/Springbok\/Vredendal",
+  2728 => "Caledon\/Hermanus\/Southern\ coast\ of\ Western\ Cape\/Swellendam",
   2731 => "Durban",
-  2732 => "Stanger",
-  2733 => "Pietermaritzburg",
-  2734 => "Newcastle\/Vryheid",
-  2735 => "Zululand",
-  2736 => "Ladysmith",
-  2739 => "Eastern\ Pondoland\/Port\ Shepstone",
-  2740 => "Bisho\/Alice",
-  2741 => "Port\ Elizabeth",
-  2742 => "Jeffreys\ Bay\/Humansdorp",
+  2732 => "Ballito\/KwaZulu\ Natal\ coast\/Stanger\/Tongaat\/Verulam",
+  2733 => "KwaZulu\ Natal\ Midlands\/Pietermaritzburg",
+  2734 => "Newcastle\/Northern\ KwaZulu\ Natal\/Vryheid",
+  2735 => "Richards\ Bay\/St\.\ Lucia\/Ulundi\/Zululand",
+  2736 => "Drakensberg\/Ladysmith",
+  2739 => "Eastern\ Pondoland\/Port\ Shepstone\/Southern\ coast\ of\ KwaZulu\ Natal",
+  2740 => "Alice\/Bhisho",
+  2741 => "Port\ Elizabeth\/Uitenhage",
+  2742 => "Jeffreys\ Bay\/Humansdorp\/Southern\ and\ central\ Eastern\ Cape",
   2743 => "East\ London",
-  2744 => "Garden\ Route",
-  2745 => "Queenstown",
-  2746 => "Grahamstown",
-  2747 => "Mthatha\/Butterworth",
-  2748 => "Cradock",
-  2749 => "Graaff\-Reinet",
-  2751 => "Bloemfontein\/Aliwal\ North",
-  2753 => "Kimberley\/Kuruman",
-  2754 => "Upington",
-  2756 => "Parys",
-  2757 => "Voorspoed\,\ Welkom\/Welkom\ Central\,\ Welkom",
-  2758 => "Bethlehem",
+  2744 => "Garden\ Route\/George\/Knysna\/Mossel\ Bay\/Oudtshoorn\/Plettenberg\ Bay",
+  2745 => "Northern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Queenstown",
+  2746 => "Bathurst\/Southern\ and\ eastern\ parts\ of\ Eastern\ Cape\/Grahamstown\/Kenton\-on\-Sea\/Port\ Alfred",
+  2747 => "Butterworth\/Eastern\ part\ of\ Eastern\ Cape\/Mthatha",
+  2748 => "Cradock\/Northern\ part\ of\ Eastern\ Cape\/Steynsburg",
+  2749 => "Graaff\-Reinet\/Western\ part\ of\ Eastern\ Cape",
+  2751 => "Aliwal\ North\/Bloemfontein\/Far\ eastern\ part\ of\ Eastern\ Cape\/Southern\ and\ Central\ Free\ State",
+  2753 => "Eastern\ part\ of\ Northern\ Cape\/Far\ western\ part\ of\ North\ West\/Kimberley\/Kuruman",
+  2754 => "Upington\/Gordonia",
+  2756 => "Kroonstad\/Parys\/Northern\ Free\ State",
+  2757 => "Northern\ Free\ State\ Goldfields\/Welkom",
+  2758 => "Bethlehem\/Eastern\ Free\ State",
 );
     sub new {
       my $class = shift;

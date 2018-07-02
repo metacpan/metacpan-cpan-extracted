@@ -6,9 +6,9 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0.96'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,8 +30,9 @@ resources:
   bugtracker: https://github.com/nichtich/Pandoc-Wrapper/issues
   homepage: https://github.com/nichtich/Pandoc-Wrapper
   repository: https://github.com/nichtich/Pandoc-Wrapper.git
-version: 0.8.4
+version: 0.8.5
 x_contributors:
   - 'Benct Philip Jonsson <bpjonsson@gmail.com>'
   - 'Edward Betts <edward@4angle.com>'
   - 'Jakob Voß <jakob.voss@gbv.de>'
+  - 'Theo van Hoesel <Th.J.v.Hoesel@THEMA-MEDIA.nl>'

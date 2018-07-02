@@ -1,3 +1,16 @@
+0.0.10 (2018-06-26)
+
+    Enhancements:
+        - Output Sub-Commands *after* Options in usage message
+        - Allow "Flag" options to have defaults as I don't remember
+          what the reason may have been for the restriction. I also
+          can't think of a valid one now, and it is sometimes useful to
+          set a Flag value based on %ENV.
+        - Convert command_names to command-names in messages
+
+    Bug Fixes:
+        - Remove Getopts/Args2.pm from MANIFEST.SKIP
+
 0.0.9 (2016-12-03)
 
     Enhancements:

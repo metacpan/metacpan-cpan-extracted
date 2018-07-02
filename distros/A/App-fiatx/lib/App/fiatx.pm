@@ -1,7 +1,7 @@
 package App::fiatx;
 
-our $DATE = '2018-06-19'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-06-27'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,6 +34,21 @@ our %args_db = (
     },
 );
 
+our %arg_per_type = (
+    per_type => {
+        summary => 'Return one row of result per rate type',
+        schema => 'bool*',
+        description => <<'_',
+
+This allow seeing notes and different mtime per rate type, which can be
+different between different types of the same source.
+
+_
+    },
+);
+
+my $fnum8 = [number => {precision=>8}];
+
 sub _connect {
     my $args = shift;
 
@@ -44,18 +59,6 @@ sub _connect {
         $args->{db_password},
         {RaiseError=>1},
     );
-}
-
-sub _supply {
-    my ($args, $args_spec) = @_;
-
-    my %res;
-    for (keys %$args_spec) {
-        if (exists $args->{$_}) {
-            $res{$_} = $args->{$_};
-        }
-    }
-    %res;
 }
 
 $SPEC{sources} = {
@@ -81,48 +84,139 @@ sub sources {
     [200, "OK", \@res];
 }
 
-$SPEC{spot_rate} = {
+my %arg_0_source = (
+    source => {
+        %{ $Finance::Currency::FiatX::arg_source{source} },
+        pos => 0,
+        default => ':all',
+    },
+);
+
+my %arg_1_pair = (
+    pair => {
+        schema => 'currency::pair*',
+        pos => 1,
+    },
+);
+
+my %arg_2_type = (
+    type => {
+        %{ $Finance::Currency::FiatX::args_spot_rate{type} },
+        pos => 2,
+    },
+);
+
+$SPEC{spot_rates} = {
     v => 1.1,
-    summary => 'Get spot (latest) rate',
+    summary => 'Get spot (latest) rate(s) from a source',
     args => {
         %args_db,
         %Finance::Currency::FiatX::args_caching,
-        %Finance::Currency::FiatX::args_spot_rate,
+        %arg_0_source,
+        %arg_1_pair,
+        %arg_2_type,
+        %arg_per_type,
     },
 };
-sub spot_rate {
+sub spot_rates {
     my %args = @_;
+
+    my $source = $args{source};
+    my $pair   = $args{pair};
+    my $type   = $args{type};
+
+    my ($from, $to); ($from, $to) = $pair =~ m!(.+)/(.+)! if $pair;
 
     my $dbh = _connect(\%args);
 
-    Finance::Currency::FiatX::get_spot_rate(
-        dbh => $dbh,
+    my $rows0;
 
-        _supply(\%args, \%Finance::Currency::FiatX::args_caching),
-        _supply(\%args, \%Finance::Currency::FiatX::args_spot_rate),
-    );
-}
+    if ($source ne ':all' && $pair && $type) {
+        my $bres = Finance::Currency::FiatX::get_spot_rate(
+            dbh => $dbh,
+            max_age_cache => $args{max_age_cache},
+            source        => $source,
+            from          => $from,
+            to            => $to,
+            type          => $type,
+        );
+        return $bres unless $bres->[0] == 200 || $bres->[0] == 304;
+        $rows0 = [$bres->[2]];
+    } else {
+        my $bres = Finance::Currency::FiatX::get_all_spot_rates(
+            dbh => $dbh,
+            max_age_cache => $args{max_age_cache},
+            source        => $source,
+        );
+        return $bres unless $bres->[0] == 200 || $bres->[0] == 304;
+        $rows0 = $bres->[2];
+    }
 
-$SPEC{all_spot_rates} = {
-    v => 1.1,
-    summary => 'Get all spot (latest) rates from a source',
-    args => {
-        %args_db,
-        %Finance::Currency::FiatX::args_caching,
-        %Finance::Currency::FiatX::arg_req0_source,
-    },
-};
-sub all_spot_rates {
-    my %args = @_;
+    my @rows;
+    my $resmeta = {};
 
-    my $dbh = _connect(\%args);
+    if ($args{per_type}) {
+        for (@$rows0) {
+            delete $_->{source} unless $source eq ':all';
+            push @rows, $_;
+        }
+        $resmeta->{'table.fields'}        = ['source', 'pair', 'type' , 'rate' , 'note'];
+        $resmeta->{'table.field_formats'} = [undef   , undef , undef  , $fnum8 , undef ];
+        $resmeta->{'table.field_aligns'}  = ['left'  , 'left', 'right', 'right', 'left'];
+        unless ($source eq ':all') {
+            shift @{ $resmeta->{'table.fields'} };
+            shift @{ $resmeta->{'table.field_formats'} };
+            shift @{ $resmeta->{'table.field_aligns'} };
+        }
+    } else {
+        my %sources;
+        for my $r (@$rows0) {
+            my $src = $r->{source} // '';
+            $sources{ $src }++;
+        }
 
-    Finance::Currency::FiatX::get_all_spot_rates(
-        dbh => $dbh,
+        for my $src (sort keys %sources) {
+            my %per_pair_rates;
+            for my $r (@$rows0) {
+                next unless ($r->{source} // '') eq $src;
+                $per_pair_rates{ $r->{pair} } //= {
+                    pair => $r->{pair},
+                    mtime => 0,
+                };
+                $per_pair_rates{ $r->{pair} }{source} = $src
+                    unless $source eq $src;
+                next unless $r->{type} =~ /^(buy|sell)/;
+                $per_pair_rates{ $r->{pair} }{ $r->{type} } = $r->{rate};
+                $per_pair_rates{ $r->{pair} }{mtime} = $r->{mtime}
+                    if $per_pair_rates{ $r->{pair} }{mtime} < $r->{mtime};
+            }
+            for my $pair (sort keys %per_pair_rates) {
+                push @rows, $per_pair_rates{$pair};
+            }
+        }
+        $resmeta->{'table.fields'}        = ['source', 'pair', 'buy'  , 'sell' , 'mtime'           ];
+        $resmeta->{'table.field_formats'} = [undef   , undef , $fnum8 , $fnum8 , 'iso8601_datetime'];
+        $resmeta->{'table.field_aligns'}  = ['left'  , 'left', 'right', 'right', 'left'];
+        if ($source =~ /\A\w+\z/) {
+            shift @{ $resmeta->{'table.fields'} };
+            shift @{ $resmeta->{'table.field_formats'} };
+            shift @{ $resmeta->{'table.field_aligns'} };
+        }
+        $resmeta->{'table.field_align_code'}  = sub { $_[0] =~ /^(buy|sell)/ ? 'right' : undef },
+        $resmeta->{'table.field_format_code'} = sub { $_[0] =~ /^(buy|sell)/ ? $fnum8  : undef },
+    }
 
-        _supply(\%args, \%Finance::Currency::FiatX::args_caching),
-        _supply(\%args, \%Finance::Currency::FiatX::arg_req0_source),
-    );
+  FILTER_ROWS:
+    {
+        my @rows_f;
+        for (@rows) {
+            next if $pair && $_->{pair} ne $pair;
+            push @rows_f, $_;
+        }
+        @rows = @rows_f;
+    }
+
+    [200, "OK", \@rows, $resmeta];
 }
 
 1;
@@ -140,65 +234,13 @@ App::fiatx - Fiat currency exchange rate tool
 
 =head1 VERSION
 
-This document describes version 0.005 of App::fiatx (from Perl distribution App-fiatx), released on 2018-06-19.
+This document describes version 0.007 of App::fiatx (from Perl distribution App-fiatx), released on 2018-06-27.
 
 =head1 SYNOPSIS
 
 See the included script L<fiatx>.
 
 =head1 FUNCTIONS
-
-
-=head2 all_spot_rates
-
-Usage:
-
- all_spot_rates(%args) -> [status, msg, result, meta]
-
-Get all spot (latest) rates from a source.
-
-This function is not exported.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<db_name>* => I<str>
-
-=item * B<db_password> => I<str>
-
-=item * B<db_username> => I<str>
-
-=item * B<max_age_cache> => I<posint> (default: 14400)
-
-Above this age (in seconds), we retrieve rate from remote source again.
-
-=item * B<source>* => I<str> (default: ":any")
-
-Ask for a specific remote source.
-
-If you want a specific remote source, you can specify it here. The default is
-':any' which is to pick the first source that returns a recent enough current
-rate.
-
-Other special values: C<:highest> to return highest rate of all sources,
-C<:lowest> to return lowest rate of all sources, ':newest' to return rate from
-source with the newest last update time, ':oldest' to return rate from source
-with the oldest last update time, ':average' to return arithmetic average of all
-sources.
-
-=back
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
 
 
 =head2 sources
@@ -225,13 +267,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 spot_rate
+=head2 spot_rates
 
 Usage:
 
- spot_rate(%args) -> [status, msg, result, meta]
+ spot_rates(%args) -> [status, msg, result, meta]
 
-Get spot (latest) rate.
+Get spot (latest) rate(s) from a source.
 
 This function is not exported.
 
@@ -245,13 +287,20 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_username> => I<str>
 
-=item * B<from>* => I<currency::code>
-
-=item * B<max_age_cache> => I<posint> (default: 14400)
+=item * B<max_age_cache> => I<nonnegint> (default: 14400)
 
 Above this age (in seconds), we retrieve rate from remote source again.
 
-=item * B<source> => I<str> (default: ":any")
+=item * B<pair> => I<currency::pair>
+
+=item * B<per_type> => I<bool>
+
+Return one row of result per rate type.
+
+This allow seeing notes and different mtime per rate type, which can be
+different between different types of the same source.
+
+=item * B<source> => I<str> (default: ":all")
 
 Ask for a specific remote source.
 
@@ -265,9 +314,7 @@ source with the newest last update time, ':oldest' to return rate from source
 with the oldest last update time, ':average' to return arithmetic average of all
 sources.
 
-=item * B<to>* => I<currency::code>
-
-=item * B<type> => I<str> (default: "sell")
+=item * B<type> => I<str>
 
 Which rate is wanted? e.g. sell, buy.
 

@@ -20,9 +20,22 @@ my $c = contract {
     warns_like {
         warn "Bar";
     } qr/^Foo/, "Unexpected warning";
+
+    warns_like {
+        # no warnings
+    } qr/^Foo/, "Missing expected warning";
+
+    warns_like {
+        warn "Foo";
+    } [], "Extra warning";
+
+    warns_like {
+        warn "Foo";
+        warn "Bar";
+    } qr/^Foo/, "Extra second warning";
 }->apply;
 
-contract_is $c, "t2Nd", "Contract as expected";
-note $c->as_tap;
+contract_is $c, "t2NNNNd", "Contract as expected";
+note "REPORT\n".$c->get_tap."/REPORT";
 
 done_testing;

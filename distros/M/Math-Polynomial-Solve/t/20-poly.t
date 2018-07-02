@@ -6,7 +6,7 @@ use 5.010001;
 use Test::More tests => 22;
 
 use Math::Complex;
-use Math::Polynomial::Solve qw(:numeric ascending_order);
+use Math::Polynomial::Solve qw(:numeric);
 use Math::Utils qw(:polynomial :compare);
 use strict;
 use warnings;
@@ -27,7 +27,7 @@ my @case = (
 	[25, 60, 46, 12, 1],
 );
 
-ascending_order(1);
+coefficients order => 'ascending';
 
 #
 # All of these tests will be dispatched to the

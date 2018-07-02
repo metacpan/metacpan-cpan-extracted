@@ -7,6 +7,8 @@ use Math::Utils qw(:compare);
 use strict;
 use warnings;
 
+coefficients order => 'descending';
+
 my $fltcmp = generate_fltcmp();
 
 my @case = (

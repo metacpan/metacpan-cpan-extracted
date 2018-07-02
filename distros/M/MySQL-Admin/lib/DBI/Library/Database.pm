@@ -12,7 +12,7 @@ use vars qw(
   %m_hFunctions
   $m_sServerName
   $m_nSecs
-  );
+);
 $m_sDefaultClass = 'DBI::Library::Database' unless defined $DBI::Library::Database::m_sDefaultClass;
 require Exporter;
 use DBI::Library qw(:all $m_dbh $m_dsn);
@@ -36,7 +36,7 @@ use DBI::Library qw(:all $m_dbh $m_dsn);
         qw(getIndex CurrentPass CurrentUser CurrentHost CurrentDb Driver addUser hasAcount isMember right checkPass checkSession setSid getName checkFlood GetColumns GetAttrs GetCollation GetColumnCollation GetExtra GetNull GetEngineForRow GetEngines GetCharacterSet GetDataBases GetAutoIncrement GetPrimaryKey GetAutoIncrementValue)
     ],
 );
-$DBI::Library::Database::VERSION = '1.14';
+$DBI::Library::Database::VERSION = '1.15';
 $m_nSecs                         = 10;
 
 =head1 NAME
@@ -54,12 +54,12 @@ constructor
 =cut
 
 sub new {
-    my ($class, @initializer) = @_;
+    my ( $class, @initializer ) = @_;
     my $self = {};
     bless $self, ref $class || $class || $m_sDefaultClass;
     $m_dbh = $self->SUPER::initDB(@initializer) if (@initializer);
     return $self;
-}
+} ## end sub new
 
 =head2 getName
 
@@ -68,9 +68,9 @@ sub new {
 =cut
 
 sub getName {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $m_sSid = $p[0];
-    if (defined $m_sSid) {
+    if ( defined $m_sSid ) {
         my $sql = 'SELECT user FROM `users` where sid = ?;';
         my $sth = $m_dbh->prepare($sql) or warn $m_dbh->errstr;
         $sth->execute($m_sSid) or warn $m_dbh->errstr;
@@ -79,8 +79,8 @@ sub getName {
         return $name;
     } else {
         return 'guest';
-    }
-}
+    } ## end else [ if ( defined $m_sSid )]
+} ## end sub getName
 
 =head2 setSid
 
@@ -89,7 +89,7 @@ sub getName {
 =cut
 
 sub setSid {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $name = $p[0];
     my $pass = $p[1];
     my $ip   = $p[2];
@@ -104,10 +104,10 @@ sub setSid {
     my $fingerprint = $md5->hexdigest();
     my $sql         = 'UPDATE users  SET sid = ? ,ip = ? WHERE user = ?';
     my $sth         = $m_dbh->prepare($sql);
-    $sth->execute($fingerprint, $ip, $name);
+    $sth->execute( $fingerprint, $ip, $name );
     $sth->finish();
     return $fingerprint;
-}
+} ## end sub setSid
 
 =head2 checkSession
 
@@ -116,21 +116,21 @@ sub setSid {
 =cut
 
 sub checkSession {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $sUser  = shift @p;
     my $ssid   = shift @p;
     my $ip     = shift @p;
     my $return = 0;
-    if (length($sUser) > 3 && length($ssid) > 3) {
+    if ( length($sUser) > 3 && length($ssid) > 3 ) {
         my $sql = 'select sid from  users where  user = ?';
         my $sth = $m_dbh->prepare($sql);
         $sth->execute($sUser) or warn $m_dbh->errstr;
         my $session = $sth->fetchrow_array();
         $sth->finish();
-        $return = 1 if (defined $session && defined $ssid && $ssid eq $session);
-    }
+        $return = 1 if ( defined $session && defined $ssid && $ssid eq $session );
+    } ## end if ( length($sUser) > ...)
     return $return;
-}
+} ## end sub checkSession
 
 =head2 checkPass
 
@@ -139,20 +139,20 @@ sub checkSession {
 =cut
 
 sub checkPass {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $u  = $p[0];
     my $cp = $p[1];
-    if (defined $u) {
+    if ( defined $u ) {
         my $sql = q(SELECT pass  FROM users where user = ?);
         my $sth = $m_dbh->prepare($sql) or warn $m_dbh->errstr;
         $sth->execute($u);
         my $cpass = $sth->fetchrow_array();
         $sth->finish();
         $cpass = defined $cpass ? $cpass : 0;
-        return ($cp eq $cpass) ? 1 : 0;
-    }
+        return ( $cp eq $cpass ) ? 1 : 0;
+    } ## end if ( defined $u )
     return 0;
-}
+} ## end sub checkPass
 
 =head2 right()
 
@@ -161,10 +161,10 @@ sub checkPass {
 =cut
 
 sub right {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $sUser = $p[0];
     return userright($sUser);
-}
+} ## end sub right
 
 =head2 userright()
 
@@ -173,7 +173,7 @@ sub right {
 =cut
 
 sub userright {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $sUser = $p[0];
     my $sql   = 'SELECT `right`  FROM users where `user` = ? ';
     my $sth   = $m_dbh->prepare($sql);
@@ -181,7 +181,7 @@ sub userright {
     my @q = $sth->fetchrow_array;
     $sth->finish();
     return $q[0];
-}
+} ## end sub userright
 
 =head2 catright()
 
@@ -190,18 +190,18 @@ sub userright {
 =cut
 
 sub catright {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $cat = $p[0];
     my @select = split /\|/, $cat;
     my %sel;
     $sel{$_} = 1 foreach @select;
     my @cats   = $self->fetch_AoH('SELECT * FROM cats');
     my $nRight = 0;
-    for (my $i = 0 ; $i <= $#cats ; $i++) {
-        $nRight = $cats[$i]->{right} if ($sel{$cats[$i]->{name}} && $cats[$i]->{right} > $nRight);
-    }
+    for ( my $i = 0 ; $i <= $#cats ; $i++ ) {
+        $nRight = $cats[$i]->{right} if ( $sel{ $cats[$i]->{name} } && $cats[$i]->{right} > $nRight );
+    } ## end for ( my $i = 0 ; $i <=...)
     return $nRight;
-}
+} ## end sub catright
 
 =head2 isMember
 
@@ -210,18 +210,18 @@ sub catright {
 =cut
 
 sub isMember {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $sUser = lc $p[0];
-    if (defined $sUser) {
+    if ( defined $sUser ) {
         my $sth = $m_dbh->prepare('SELECT user  FROM users where user = ?') or warn $m_dbh->errstr;
         $sth->execute($sUser);
         my ($member) = $sth->fetchrow_array();
         $sth->finish();
-        return defined $member ? ($sUser eq $member) ? 1 : 0 : 0;
+        return defined $member ? ( $sUser eq $member ) ? 1 : 0 : 0;
     } else {
         return 1;
-    }
-}
+    } ## end else [ if ( defined $sUser ) ]
+} ## end sub isMember
 
 =head2 hasAcount
 
@@ -230,19 +230,19 @@ sub isMember {
 =cut
 
 sub hasAcount {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $mail = lc $p[0];
-    if (defined $mail) {
+    if ( defined $mail ) {
         my $sth = $m_dbh->prepare('SELECT email  FROM users where email = ?')
           or warn $m_dbh->errstr;
         $sth->execute($mail);
         my ($email) = $sth->fetchrow_array();
         $sth->finish();
-        return ($mail eq $email) ? 1 : 0;
+        return ( $mail eq $email ) ? 1 : 0;
     } else {
         return 1;
-    }
-}
+    } ## end else [ if ( defined $mail ) ]
+} ## end sub hasAcount
 
 =head2 addUser
 
@@ -251,7 +251,7 @@ sub hasAcount {
 =cut
 
 sub addUser {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $newuser = $p[0];
     my $newpass = $p[1];
     my $mail    = $p[2];
@@ -260,13 +260,12 @@ sub addUser {
     $md5->add($newuser);
     $md5->add($newpass);
     my $fingerprint = $md5->hexdigest();
-    my $sql_addUser =
-      q/insert into users (user,pass,email,`right`,cats) values(?,?,?,1,'news|member')/;
-    my $sth = $m_dbh->prepare($sql_addUser);
-    my $anzahl = $sth->execute($newuser, $fingerprint, $mail) or warn $m_dbh->errstr;
+    my $sql_addUser = q/insert into users (user,pass,email,`right`,cats) values(?,?,?,1,'news|member')/;
+    my $sth         = $m_dbh->prepare($sql_addUser);
+    my $anzahl      = $sth->execute( $newuser, $fingerprint, $mail ) or warn $m_dbh->errstr;
     $sth->finish();
-    return 1 if ($anzahl + 0 == 1);
-}
+    return 1 if ( $anzahl + 0 == 1 );
+} ## end sub addUser
 
 =head2 serverName()
 
@@ -275,13 +274,13 @@ set serverName.
 =cut
 
 sub serverName {
-    my ($self, @p) = getSelf(@_);
-    if (defined $p[0]) {
+    my ( $self, @p ) = getSelf(@_);
+    if ( defined $p[0] ) {
         $m_sServerName = $p[0];
     } else {
         return $m_sServerName;
-    }
-}
+    } ## end else [ if ( defined $p[0] ) ]
+} ## end sub serverName
 
 =head2 floodtime()
 
@@ -290,13 +289,13 @@ set floodtime.
 =cut
 
 sub floodtime {
-    my ($self, @p) = getSelf(@_);
-    if (defined $p[0]) {
+    my ( $self, @p ) = getSelf(@_);
+    if ( defined $p[0] ) {
         $m_nSecs = $p[0];
     } else {
         return $m_nSecs;
-    }
-}
+    } ## end else [ if ( defined $p[0] ) ]
+} ## end sub floodtime
 
 =head2 checkFlood
 
@@ -311,26 +310,26 @@ checkFlood( remote_addr() );
 =cut
 
 sub checkFlood {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $ip = $p[0];
     $m_nSecs = defined $p[1] ? $p[1] : $m_nSecs;
     my $return = 0;
-    if (defined $ip) {
+    if ( defined $ip ) {
         my $sql = q(SELECT ti  FROM flood where remote_addr = ? );
         my $sth = $m_dbh->prepare($sql) or warn $m_dbh->errstr;
         $sth->execute($ip);
         my $ltime = $sth->fetchrow_array();
-        unless (defined $ltime) {
-            $self->void('insert into flood (remote_addr, ti) VALUES(?,?)', $ip, time());
+        unless ( defined $ltime ) {
+            $self->void( 'insert into flood (remote_addr, ti) VALUES(?,?)', $ip, time() );
             $return = 1;
         } else {
-            $return = (time() - $ltime > $m_nSecs) ? 1 : 0;
-            $self->void('update flood set ti =?  where remote_addr = ?', time(), $ip);
-        }
+            $return = ( time() - $ltime > $m_nSecs ) ? 1 : 0;
+            $self->void( 'update flood set ti =?  where remote_addr = ?', time(), $ip );
+        } ## end else
         $sth->finish();
-    }
+    } ## end if ( defined $ip )
     return $return;
-}
+} ## end sub checkFlood
 
 =head2 GetAutoIncrementValue()
 
@@ -339,13 +338,13 @@ sub checkFlood {
 =cut
 
 sub GetAutoIncrementValue {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $name = $p[0];
     my @a    = $self->fetch_AoH('SHOW TABLE STATUS');
-    for (my $i = 0 ; $i <= $#a ; $i++) {
-        return $a[$i]->{Auto_increment} if ($a[$i]->{Name} eq $name);
-    }
-}
+    for ( my $i = 0 ; $i <= $#a ; $i++ ) {
+        return $a[$i]->{Auto_increment} if ( $a[$i]->{Name} eq $name );
+    } ## end for ( my $i = 0 ; $i <=...)
+} ## end sub GetAutoIncrementValue
 
 =head2 GetPrimaryKey()
 
@@ -356,44 +355,42 @@ sub GetAutoIncrementValue {
 =cut
 
 sub GetPrimaryKey {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $tbl = $p[0];
-    if (defined $tbl) {
+    if ( defined $tbl ) {
         $tbl = $m_dbh->quote_identifier($tbl);
         my @caption = $self->fetch_AoH("show columns from $tbl");
         my @return;
-        for (my $j = 0 ; $j <= $#caption ; $j++) {
-            push @return, $caption[$j]->{'Field'} if ($caption[$j]->{'Key'} eq 'PRI');
-        }
+        for ( my $j = 0 ; $j <= $#caption ; $j++ ) {
+            push @return, $caption[$j]->{'Field'} if ( $caption[$j]->{'Key'} eq 'PRI' );
+        } ## end for ( my $j = 0 ; $j <=...)
         push @return, $caption[0]->{'Field'} if $#caption eq 0;
         return @return;
     } else {
         return 0;
-    }
-}
+    } ## end else [ if ( defined $tbl ) ]
+} ## end sub GetPrimaryKey
 
 =head2 getIndex()
 
 =cut
 
 sub getIndex {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $tbl = $p[0];
-    if (defined $tbl) {
+    if ( defined $tbl ) {
         $tbl = $m_dbh->quote_identifier($tbl);
         my $hr = $self->fetch_hashref("SHOW CREATE TABLE $tbl");
         my @return;
-        foreach my $line (split /\n/, $hr->{'Create Table'}) {
-            if ($line =~
-                /(PRIMARY KEY|FOREIGN KEY|FULLTEXT KEY|UNIQUE KEY|KEY) (`([^`]+)`)? ?(\(([^)]+)\))?/
-              ) {
+        foreach my $line ( split /\n/, $hr->{'Create Table'} ) {
+            if ( $line =~ /(PRIMARY KEY|FOREIGN KEY|FULLTEXT KEY|UNIQUE KEY|KEY) (`([^`]+)`)? ?(\(([^)]+)\))?/ ) {
                 my $type = $1;
                 my $name = $type eq 'FOREIGN KEY' ? $return[$#return]->{field} : $2;
                 delete $return[$#return];
                 my $sfields = $5;
                 my @fields;
                 push @fields, /`([^`]+)`/ for split ',', $5;
-                if ($line =~ /REFERENCES `([^`]+)` \(([^)]+)\)/) {
+                if ( $line =~ /REFERENCES `([^`]+)` \(([^)]+)\)/ ) {
                     my $table = $1;
                     my @references;
                     push @references, /`([^`]+)`/ for split ',', $2;
@@ -419,41 +416,40 @@ sub getIndex {
                         field => /`([^`]+)`/,
                         name  => $name,
                         type  => $type,
-                      }
-                      for split ',', $5;
-                }
-            }
-        }
+                      } for split ',', $5;
+                } ## end else [ if ( $line =~ /REFERENCES `([^`]+)` \(([^)]+)\)/(([(])))]
+            } ## end if ( $line =~ /(PRIMARY KEY|FOREIGN KEY|FULLTEXT KEY|UNIQUE KEY|KEY) (`([^`]+)`)? ?(\(([^)]+)\))?/((([(]))))
+        } ## end foreach my $line ( split /\n/...)
         return @return;
-    }
-}
+    } ## end if ( defined $tbl )
+} ## end sub getIndex
 
 =head2 getConstraintKeys()
 
 =cut
 
 sub getConstraintKeys {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $tbl = $p[0];
     my $key = $p[1];
     my @return;
-    if (defined $tbl) {
+    if ( defined $tbl ) {
         $tbl = $m_dbh->quote_identifier($tbl);
         my $hr = $self->fetch_hashref("SHOW CREATE TABLE $tbl");
-        foreach my $line (split /\n/, $hr->{'Create Table'}) {
+        foreach my $line ( split /\n/, $hr->{'Create Table'} ) {
             my %keys;
-            if ($line =~ /CONSTRAINT `([^`]+)` FOREIGN KEY \(([^)]+)\)/) {
+            if ( $line =~ /CONSTRAINT `([^`]+)` FOREIGN KEY \(([^)]+)\)/ ) {
                 my $i = 0;
-                for (split ',', $2) {
+                for ( split ',', $2 ) {
                     /`([^`]+)`/;
                     $keys{$1} = 1;
-                }
-                push @return, $1 if ($keys{$key} and $return[$#return - 1] ne $1);
-            }
-        }
+                } ## end for ( split ',', $2 )
+                push @return, $1 if ( $keys{$key} and $return[ $#return - 1 ] ne $1 );
+            } ## end if ( $line =~ /CONSTRAINT `([^`]+)` FOREIGN KEY \(([^)]+)\)/(([(])))
+        } ## end foreach my $line ( split /\n/...)
         return @return;
-    }
-}
+    } ## end if ( defined $tbl )
+} ## end sub getConstraintKeys
 
 =head2 GetAutoIncrement()
 
@@ -464,20 +460,20 @@ sub getConstraintKeys {
 =cut
 
 sub GetAutoIncrement {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $tbl = $p[0];
-    if (defined $tbl) {
+    if ( defined $tbl ) {
         $tbl = $m_dbh->quote_identifier($tbl);
         my @caption = $self->fetch_AoH("show columns from $tbl");
         my $r;
-        for (my $j = 0 ; $j <= $#caption ; $j++) {
-            $r = $caption[$j]->{'Field'} if ($caption[$j]->{'Extra'} eq 'auto_increment');
-        }
+        for ( my $j = 0 ; $j <= $#caption ; $j++ ) {
+            $r = $caption[$j]->{'Field'} if ( $caption[$j]->{'Extra'} eq 'auto_increment' );
+        } ## end for ( my $j = 0 ; $j <=...)
         return $r;
     } else {
         return 0;
-    }
-}
+    } ## end else [ if ( defined $tbl ) ]
+} ## end sub GetAutoIncrement
 
 =head2 fetch_string()
 
@@ -485,10 +481,10 @@ sub GetAutoIncrement {
 =cut
 
 sub fetch_string {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my @a = $self->fetch_array(@p);
     return $a[0];
-}
+} ## end sub fetch_string
 
 #html erzeugende funktionen
 
@@ -497,9 +493,8 @@ sub fetch_string {
      returns a <select> list with the Databases.
 
 =cut
-
 sub GetDataBases {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $name = $p[0] ? shift(@p) : 'm_ChangeCurrentDb';
     my $change = $p[0] ? 'onchange="submitForm(this.form)"' : '';
     my $m_sCurrentDb = $self->CurrentDb();
@@ -507,15 +502,12 @@ sub GetDataBases {
     my $return       = qq|<select align="center" $change name="$name" style="width:75%" >|;
     $return .=
       $_ eq $m_sCurrentDb
-      ? qq|<option  value="$_"  selected="selected" >$_(|
-      . $self->TableCount4Db($_)
-      . q|)</option>|
+      ? qq|<option  value="$_"  selected="selected" >$_(| . $self->TableCount4Db($_) . q|)</option>|
       : qq|<option  value="$_">$_(| . $self->TableCount4Db($_) . q|)</option>|
       foreach @dbs;
-
     $return .= '</select>';
     return $return;
-}
+} ## end sub GetDataBases
 
 =head2 TableCount4Db()
 
@@ -524,12 +516,12 @@ sub GetDataBases {
 =cut
 
 sub TableCount4Db {
-    my ($self, @p) = getSelf(@_);
-    $p[0] = $m_dbh->quote_identifier($p[0]);
+    my ( $self, @p ) = getSelf(@_);
+    $p[0] = $m_dbh->quote_identifier( $p[0] );
     my @count = $self->fetch_array("show tables from $p[0]");
     warn $@ if $@;
     return $#count > 0 ? $#count : 0;
-}
+} ## end sub TableCount4Db
 
 =head2 GetCharacterSet()
 
@@ -540,15 +532,15 @@ sub TableCount4Db {
 =cut
 
 sub GetCharacterSet {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $c = shift @p;
-    if (defined $c) {
-        my $coalation = $self->fetch_hashref("SHOW COLLATION like ?", $c);
+    if ( defined $c ) {
+        my $coalation = $self->fetch_hashref( "SHOW COLLATION like ?", $c );
         return $coalation->{Charset};
     } else {
         return 0;
-    }
-}
+    } ## end else [ if ( defined $c ) ]
+} ## end sub GetCharacterSet
 
 =head2 GetEngines()
 
@@ -559,12 +551,12 @@ sub GetCharacterSet {
 =cut
 
 sub GetEngines {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $tbl  = shift @p;
     my $name = shift @p;
-    if (defined $tbl) {
+    if ( defined $tbl ) {
         my @co     = $self->fetch_AoH('SHOW ENGINES');
-        my $status = $self->fetch_hashref('SHOW TABLE STATUS where `Name` = ? ', $tbl);
+        my $status = $self->fetch_hashref( 'SHOW TABLE STATUS where `Name` = ? ', $tbl );
         my $return = qq|<select class="editTable" name="$name">|;
         $return .=
           $_->{Engine} eq $status->{Engine}
@@ -575,8 +567,8 @@ sub GetEngines {
         return $return;
     } else {
         return 0;
-    }
-}
+    } ## end else [ if ( defined $tbl ) ]
+} ## end sub GetEngines
 
 =head2 GetEngineForRow()
 
@@ -585,12 +577,12 @@ sub GetEngines {
 =cut
 
 sub GetEngineForRow {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $tbl  = shift @p;
     my $name = shift @p;
-    if (defined $tbl && defined $name) {
+    if ( defined $tbl && defined $name ) {
         my @co       = $self->fetch_array('SHOW ENGINES');
-        my @EINGINES = $self->fetch_AoH('SHOW TABLE STATUS where `Name` = ?  ', $tbl);
+        my @EINGINES = $self->fetch_AoH( 'SHOW TABLE STATUS where `Name` = ?  ', $tbl );
         my $return   = qq|<select class="editTable" name="$name">|;
         $return .=
           $_->{Engine} eq "@co"
@@ -601,8 +593,8 @@ sub GetEngineForRow {
         return $return;
     } else {
         return 0;
-    }
-}
+    } ## end else [ if ( defined $tbl && defined...)]
+} ## end sub GetEngineForRow
 
 =head2 GetNull()
 
@@ -613,10 +605,10 @@ sub GetEngineForRow {
 =cut
 
 sub GetNull {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $null = shift @p;
     my $name = shift @p;
-    if (defined $null && defined $name) {
+    if ( defined $null && defined $name ) {
         my $return = qq|<select class="editTable" name="$name">|;
         $return .= qq|<option value="not NULL">not NULL</option>|;
         $return .=
@@ -627,8 +619,8 @@ sub GetNull {
         return $return;
     } else {
         return 0;
-    }
-}
+    } ## end else [ if ( defined $null && ...)]
+} ## end sub GetNull
 
 =head2 GetExtra()
 
@@ -639,10 +631,10 @@ sub GetNull {
 =cut
 
 sub GetExtra {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $selected = shift @p;
     my $name     = shift @p;
-    if (defined $selected && defined $name) {
+    if ( defined $selected && defined $name ) {
         my $return = qq|<select class="editTable" name="$name">|;
         $return .= '<option value=""></option>';
         $return .=
@@ -653,8 +645,8 @@ sub GetExtra {
         return $return;
     } else {
         return 0;
-    }
-}
+    } ## end else [ if ( defined $selected...)]
+} ## end sub GetExtra
 
 =head2 GetColumnCollation()
 
@@ -665,17 +657,16 @@ sub GetExtra {
 =cut
 
 sub GetColumnCollation {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $tbl    = shift @p;
     my $column = shift @p;
     my $name   = shift @p;
-    if (defined $tbl && defined $column && defined $name) {
+    if ( defined $tbl && defined $column && defined $name ) {
         $tbl = $m_dbh->quote_identifier($tbl);
-        my $col = $self->fetch_hashref("show full columns from $tbl where field = ?", $column);
+        my $col       = $self->fetch_hashref( "show full columns from $tbl where field = ?", $column );
         my @collation = $self->fetch_AoH("SHOW COLLATION");
-        my $return =
-          qq|<select class="editTable" name="$name" style="width:100px;"><option></option>|;
-        unless ($col->{Collation}) {
+        my $return    = qq|<select class="editTable" name="$name" style="width:100px;"><option></option>|;
+        unless ( $col->{Collation} ) {
             $return .= qq|<option  value="NULL"  selected="selected" >NULL</option>|;
         } else {
             $return .=
@@ -683,13 +674,13 @@ sub GetColumnCollation {
               ? qq|<option  value="$_->{Collation}"  selected="selected" >$_->{Collation}</option>|
               : qq|<option  value="$_->{Collation}">$_->{Collation}</option>|
               foreach @collation;
-        }
+        } ## end else
         $return .= '</select>';
         return $return;
     } else {
         return 0;
-    }
-}
+    } ## end else [ if ( defined $tbl && defined...)]
+} ## end sub GetColumnCollation
 
 =head2 GetCollation()
 
@@ -698,26 +689,23 @@ sub GetColumnCollation {
 =cut
 
 sub GetCollation {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $name     = shift @p;
     my $selected = shift @p;
     no warnings;    #$selected maybe empty
     my @collation = $self->fetch_AoH("SHOW COLLATION");
     if ($name) {
         my @a = $self->fetch_AoH("SHOW TABLE STATUS");
-        for (my $i = 0 ; $i <= $#a ; $i++) {
-            $selected = $a[$i]->{Collation} if ($a[$i]->{Name} eq $selected);
-        }
-    }
+        for ( my $i = 0 ; $i <= $#a ; $i++ ) {
+            $selected = $a[$i]->{Collation} if ( $a[$i]->{Name} eq $selected );
+        } ## end for ( my $i = 0 ; $i <=...)
+    } ## end if ($name)
     my $return = qq|<select class="editTable" name="$name" style="width:100px;"><option></option>|;
-    $return .=
-        qq|<option  value="$_->{Collation}"|
-      . ($selected eq $_->{Collation} ? 'selected="selected"' : '')
-      . qq|>$_->{Collation}</option>|
+    $return .= qq|<option  value="$_->{Collation}"| . ( $selected eq $_->{Collation} ? 'selected="selected"' : '' ) . qq|>$_->{Collation}</option>|
       foreach @collation;
     $return .= '</select>';
     return $return;
-}
+} ## end sub GetCollation
 
 =head2 GetCharset()
 
@@ -726,26 +714,23 @@ sub GetCollation {
 =cut
 
 sub GetCharset {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $name     = shift @p;
     my $selected = shift @p;
     my @Charset  = $self->fetch_AoH("SHOW Charset");
     if ($name) {
         my @a = $self->fetch_AoH("SHOW TABLE STATUS");
-        for (my $i = 0 ; $i <= $#a ; $i++) {
-            $selected = $a[$i]->{Collation} if ($a[$i]->{Name} eq $selected);
-        }
-    }
+        for ( my $i = 0 ; $i <= $#a ; $i++ ) {
+            $selected = $a[$i]->{Collation} if ( $a[$i]->{Name} eq $selected );
+        } ## end for ( my $i = 0 ; $i <=...)
+    } ## end if ($name)
     $selected = GetCharacterSet($selected);
     my $return = qq|<select class="editTable" name="$name" style="width:100px;"><option></option>|;
-    $return .=
-        qq|<option  value="$_->{Charset}"|
-      . ($selected eq $_->{Charset} ? 'selected="selected"' : '')
-      . qq|>$_->{Charset}</option>|
+    $return .= qq|<option  value="$_->{Charset}"| . ( $selected eq $_->{Charset} ? 'selected="selected"' : '' ) . qq|>$_->{Charset}</option>|
       foreach @Charset;
     $return .= '</select>';
     return $return;
-}
+} ## end sub GetCharset
 
 =head2 GetAttrs
 
@@ -754,7 +739,7 @@ sub GetCharset {
 =cut
 
 sub GetAttrs {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $tbl    = shift @p;
     my $select = shift @p;
     my $name   = shift @p;
@@ -762,35 +747,32 @@ sub GetAttrs {
         $tbl = $m_dbh->quote_identifier($tbl);
         my $hr = $self->fetch_hashref("SHOW CREATE TABLE $tbl");
         $select = $self->quote_identifier($select);
-        return
-          qq|<select class="editTable" name="$name" style="width:100px;"><option></option><option value="UNSIGNED" |
+        return qq|<select class="editTable" name="$name" style="width:100px;"><option></option><option value="UNSIGNED" |
           . (
-             $hr->{'Create Table'} =~ /$select[^,]+UNSIGNED/ ? 'selected="selected"'
-             : ''
-            )
+            $hr->{'Create Table'} =~ /$select[^,]+UNSIGNED/ ? 'selected="selected"'
+            : ''
+          )
           . q|>UNSIGNED</option><option  value="UNSIGNED ZEROFILL" |
           . (
-             $hr->{'Create Table'} =~ /$select[^,]+UNSIGNED ZEROFILL/ ? 'selected="selected"'
-             : ''
-            )
+            $hr->{'Create Table'} =~ /$select[^,]+UNSIGNED ZEROFILL/ ? 'selected="selected"'
+            : ''
+          )
           . q|>UNSIGNED ZEROFILL</option><option  value="ON UPDATE CURRENT_TIMESTAMP"  |
           . (
-             $hr->{'Create Table'} =~ /$select[^,]+ON UPDATE CURRENT_TIMESTAMP/
-             ? 'selected="selected"'
-             : ''
-            )
-          . q|>ON UPDATE CURRENT_TIMESTAMP</option></select>|;
+            $hr->{'Create Table'} =~ /$select[^,]+ON UPDATE CURRENT_TIMESTAMP/ ? 'selected="selected"'
+            : ''
+          ) . q|>ON UPDATE CURRENT_TIMESTAMP</option></select>|;
     } else {
         return
-          qq(<select class="editTable" name="$name" style="width:100px;"><option></option><option  value="UNSIGNED" )
-          . ($select eq 'UNSIGNED' ? 'selected="selected"' : '')
+            qq(<select class="editTable" name="$name" style="width:100px;"><option></option><option  value="UNSIGNED" )
+          . ( $select eq 'UNSIGNED' ? 'selected="selected"' : '' )
           . q(>UNSIGNED</option><option  value="UNSIGNED ZEROFILL" )
-          . ($select eq 'UNSIGNED ZEROFILL' ? 'selected="selected"' : '')
+          . ( $select eq 'UNSIGNED ZEROFILL' ? 'selected="selected"' : '' )
           . q(>UNSIGNED ZEROFILL</option><option  value="ON UPDATE CURRENT_TIMESTAMP" )
-          . ($select eq 'ON UPDATE CURRENT_TIMESTAMP' ? 'selected="selected"' : '')
+          . ( $select eq 'ON UPDATE CURRENT_TIMESTAMP' ? 'selected="selected"' : '' )
           . q(>ON UPDATE CURRENT_TIMESTAMP</option></select>);
-    }
-}
+    } ## end else [ if ($tbl) ]
+} ## end sub GetAttrs
 
 =head2 GetColumns
 
@@ -799,21 +781,17 @@ sub GetAttrs {
 =cut
 
 sub GetColumns {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $tbl      = shift @p;
     my $name     = shift @p;
     my $selected = $p[0] ? shift @p : '';
     $tbl = $m_dbh->quote_identifier($tbl);
     my @col    = $self->fetch_AoH("show columns from $tbl");
     my $return = qq|<select class="editTable" name="$name" style="width:100px;">|;
-    $return .=
-        qq|<option  value="$_->{Field}" |
-      . ($selected eq $_->{Field} ? 'selected="selected"' : '')
-      . qq|>$_->{Field}</option>|
-      foreach @col;
+    $return .= qq|<option  value="$_->{Field}" | . ( $selected eq $_->{Field} ? 'selected="selected"' : '' ) . qq|>$_->{Field}</option>| foreach @col;
     $return .= '</select>';
     return $return;
-}
+} ## end sub GetColumns
 
 =head2 addMessage
 
@@ -849,13 +827,13 @@ sub GetColumns {
 =cut
 
 sub addMessage {
-    my ($self, @p) = getSelf(@_);
-    if ($self->checkFlood($p[0]->{ip})) {
+    my ( $self, @p ) = getSelf(@_);
+    if ( $self->checkFlood( $p[0]->{ip} ) ) {
         my $thread = defined $p[0]->{thread} ? $p[0]->{thread} : 'trash';
-        $thread = ($thread =~ /^(\w{3,50})$/) ? $1 : 'trash';
+        $thread = ( $thread =~ /^(\w{3,50})$/ ) ? $1 : 'trash';
         $thread = $m_dbh->quote_identifier($thread);
         my $headline = defined $p[0]->{title} ? $p[0]->{title} : 'headline';
-        $headline = ($headline =~ /^(.{3,100})$/) ? $1 : 'Invalid headline';
+        $headline = ( $headline =~ /^(.{3,100})$/ ) ? $1 : 'Invalid headline';
         my $sUser     = defined $p[0]->{user}   ? $p[0]->{user}   : 'guest';
         my $body      = defined $p[0]->{body}   ? $p[0]->{body}   : 'Body';
         my $cat       = defined $p[0]->{cat}    ? $p[0]->{cat}    : 'news';
@@ -863,18 +841,17 @@ sub addMessage {
         my $attach    = defined $p[0]->{attach} ? $p[0]->{attach} : 0;
         my $format    = defined $p[0]->{format} ? $p[0]->{format} : 'markdown';
         my $m_sAction = defined $p[0]->{action} ? $p[0]->{action} : 'news';
-        my $sql =
-          "insert into $thread (`title`,`body`,`attach`,`cat`,`right`,`user`,`action`,`format`) values(?,?,?,?,?,?,?,?)";
-        my $sth = $m_dbh->prepare($sql);
-        $sth->execute($headline, $body, $attach, $cat, $rght, $sUser, $m_sAction, $format)
+        my $sql       = "insert into $thread (`title`,`body`,`attach`,`cat`,`right`,`user`,`action`,`format`) values(?,?,?,?,?,?,?,?)";
+        my $sth       = $m_dbh->prepare($sql);
+        $sth->execute( $headline, $body, $attach, $cat, $rght, $sUser, $m_sAction, $format )
           or warn $m_dbh->errstr;
-        my $id = $m_dbh->last_insert_id(undef, undef, qw(news news_id));
+        my $id = $m_dbh->last_insert_id( undef, undef, qw(news news_id) );
         $sth->finish();
         return $id;
     } else {
         return 0;
-    }
-}
+    } ## end else [ if ( $self->checkFlood...)]
+} ## end sub addMessage
 
 =head2 editMessage()
 
@@ -909,14 +886,14 @@ sub addMessage {
 =cut
 
 sub editMessage {
-    my ($self, @p) = getSelf(@_);
-    if ($self->checkFlood($p[0]->{ip})) {
+    my ( $self, @p ) = getSelf(@_);
+    if ( $self->checkFlood( $p[0]->{ip} ) ) {
         my $thread = defined $p[0]->{thread} ? $p[0]->{thread} : 'trash';
-        $thread = ($thread =~ /^(\w{3,50})$/) ? $1 : 'trash';
+        $thread = ( $thread =~ /^(\w{3,50})$/ ) ? $1 : 'trash';
         $thread = $m_dbh->quote_identifier($thread);
         my $refid    = defined $p[0]->{id}    ? $p[0]->{id}    : 1;
         my $headline = defined $p[0]->{title} ? $p[0]->{title} : 'headline';
-        $headline = ($headline =~ /^(.{3,100})$/) ? $1 : 'Invalid headline';
+        $headline = ( $headline =~ /^(.{3,100})$/ ) ? $1 : 'Invalid headline';
         my $sUser  = defined $p[0]->{user}   ? $p[0]->{user}   : 'guest';
         my $body   = defined $p[0]->{body}   ? $p[0]->{body}   : 'Body';
         my $attach = defined $p[0]->{attach} ? $p[0]->{attach} : 0;
@@ -927,24 +904,21 @@ sub editMessage {
           ? $p[0]->{uploadpath}
           : '/srv/www/htdocs/downloads';
 
-        if ($attach ne '0.0') {
-            my $sql_insert =
-              qq/update $thread set title =?, body =? , attach= ?,format =?,user =?,cat =?,`right` =? where id = ?;/;
-            my $sth = $m_dbh->prepare($sql_insert);
-            $sth->execute($headline, $body, $attach, $format, $sUser, $cat, $self->catright($cat),
-                          $refid)
+        if ( $attach ne '0.0' ) {
+            my $sql_insert = qq/update $thread set title =?, body =? , attach= ?,format =?,user =?,cat =?,`right` =? where id = ?;/;
+            my $sth        = $m_dbh->prepare($sql_insert);
+            $sth->execute( $headline, $body, $attach, $format, $sUser, $cat, $self->catright($cat), $refid )
               or warn $m_dbh->errstr;
             $sth->finish();
         } else {
-            my $sql_insert =
-              qq/update $thread set title =?, body = ? ,format = ?,user = ?,cat = ?,`right` =?  where id = ?;/;
-            my $sth = $m_dbh->prepare($sql_insert);
-            $sth->execute($headline, $body, $format, $sUser, $cat, $self->catright($cat), $refid)
+            my $sql_insert = qq/update $thread set title =?, body = ? ,format = ?,user = ?,cat = ?,`right` =?  where id = ?;/;
+            my $sth        = $m_dbh->prepare($sql_insert);
+            $sth->execute( $headline, $body, $format, $sUser, $cat, $self->catright($cat), $refid )
               or warn $m_dbh->errstr;
             $sth->finish();
-        }
-    }
-}
+        } ## end else [ if ( $attach ne '0.0' )]
+    } ## end if ( $self->checkFlood...)
+} ## end sub editMessage
 
 =head2 reply
 
@@ -971,25 +945,22 @@ sub editMessage {
 =cut
 
 sub reply {
-    my ($self, @p) = getSelf(@_);
-
-    if ($self->checkFlood($p[0]->{ip})) {
+    my ( $self, @p ) = getSelf(@_);
+    if ( $self->checkFlood( $p[0]->{ip} ) ) {
         my $headline = defined $p[0]->{title} ? $p[0]->{title} : 'headline';
-        $headline = ($headline =~ /^(.{3,100})$/) ? $1 : 'Invalid headline';
+        $headline = ( $headline =~ /^(.{3,100})$/ ) ? $1 : 'Invalid headline';
         my $sUser  = defined $p[0]->{user}   ? $p[0]->{user}   : 'guest';
         my $body   = defined $p[0]->{body}   ? $p[0]->{body}   : 'Body';
         my $attach = defined $p[0]->{attach} ? $p[0]->{attach} : 0;
         my $format = defined $p[0]->{format} ? $p[0]->{format} : 'markdown';
         my $refid  = defined $p[0]->{id}     ? $p[0]->{id}     : 1;
-        my $sql =
-          "insert into replies (`title`,`body`,`attach`,`right`,`user`,`refererId`,`format`) values(?,?,?,?,?,?,?)";
-        my $sth = $m_dbh->prepare($sql);
-        $sth->execute($headline, $body, $attach, $self->topicright($refid), $sUser, $refid, $format)
+        my $sql    = "insert into replies (`title`,`body`,`attach`,`right`,`user`,`refererId`,`format`) values(?,?,?,?,?,?,?)";
+        my $sth    = $m_dbh->prepare($sql);
+        $sth->execute( $headline, $body, $attach, $self->topicright($refid), $sUser, $refid, $format )
           or warn $m_dbh->errstr;
         $sth->finish();
-
-    }
-}
+    } ## end if ( $self->checkFlood...)
+} ## end sub reply
 
 =head2 deleteMessage
 
@@ -998,29 +969,28 @@ sub reply {
 =cut
 
 sub deleteMessage {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $p_sTable   = $p[0];
     my $id         = $p[1];
     my $sql_backup = "select * from $p_sTable  Where id  = '$id'";
     my $sth_backup = $m_dbh->prepare($sql_backup);
     $sth_backup->execute();
     my $backup    = $sth_backup->fetchrow_hashref();
-    my $c         = ($p_sTable eq 'replies') ? 'replies' : $backup->{cat};
-    my $refererId = ($p_sTable eq 'replies') ? $backup->{refererId} : 0;
+    my $c         = ( $p_sTable eq 'replies' ) ? 'replies' : $backup->{cat};
+    my $refererId = ( $p_sTable eq 'replies' ) ? $backup->{refererId} : 0;
     my $sql_trash =
-      "insert into `trash`  (`table`,`oldId`,`title`,`body`,`date`,`user`,`right`,`attach`,`cat`,`sticky`,`refererId`,`format`) values(?,?,?,?,?,?,?,?,?,?,?)";
+"insert into `trash`  (`table`,`oldId`,`title`,`body`,`date`,`user`,`right`,`attach`,`cat`,`sticky`,`refererId`,`format`) values(?,?,?,?,?,?,?,?,?,?,?)";
     my $sth_trash = $m_dbh->prepare($sql_trash);
     $sth_trash->execute(
-                        $p_sTable,       $id,               $backup->{title}, $backup->{body},
-                        $backup->{date}, $backup->{user},   $backup->{right}, $backup->{attach},
-                        $c,              $backup->{sticky}, $refererId,       $backup->{format}
-                       );
+        $p_sTable,        $id,               $backup->{title}, $backup->{body},   $backup->{date}, $backup->{user},
+        $backup->{right}, $backup->{attach}, $c,               $backup->{sticky}, $refererId,      $backup->{format}
+    );
     my $sql_delete = "DELETE FROM $p_sTable Where id  = '$id'";
     my $sth        = $m_dbh->prepare($sql_delete);
     $sth->execute() or warn $m_dbh->errstr;
     $sth->finish();
     return 1;
-}
+} ## end sub deleteMessage
 
 =head2 readMenu()
 
@@ -1029,35 +999,33 @@ sub deleteMessage {
 =cut
 
 sub readMenu {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $thread   = $p[0];
     my $p_nRight = $p[1];
     my $p_nStart = $p[2];
     my $p_nEnd   = $p[3];
-    $p_nStart = 0  unless (defined $p_nStart);
-    $p_nEnd   = 10 unless (defined $p_nEnd);
-    my $limit = $p_nEnd - $p_nStart;
-    my $sql_read =
-      qq/select title,id from  $thread where `right` <= $p_nRight order by date desc  LIMIT $p_nStart , $limit/;
-    my $sth = $m_dbh->prepare($sql_read);
+    $p_nStart = 0  unless ( defined $p_nStart );
+    $p_nEnd   = 10 unless ( defined $p_nEnd );
+    my $limit    = $p_nEnd - $p_nStart;
+    my $sql_read = qq/select title,id from  $thread where `right` <= $p_nRight order by date desc  LIMIT $p_nStart , $limit/;
+    my $sth      = $m_dbh->prepare($sql_read);
     $sth->execute();
     my @output;
 
-    while (my @data = $sth->fetchrow_array()) {
+    while ( my @data = $sth->fetchrow_array() ) {
         my $headline = $data[0];
         my $id       = $data[1];
         $headline =~ s/(.{15}).+/$1.../;
-        my $nl =
-          "javascript:requestURI('$m_sServerName$ENV{SCRIPT_NAME}?action=$thread&von=$p_nStart&bis=$p_nEnd');";
+        my $nl = "javascript:requestURI('$m_sServerName$ENV{SCRIPT_NAME}?action=$thread&von=$p_nStart&bis=$p_nEnd');";
         push @output,
           {
             text => $headline,
             href => $nl,
           };
-    }
+    } ## end while ( my @data = $sth->...)
     $sth->finish();
     return @output;
-}
+} ## end sub readMenu
 
 =head2 rss()
 
@@ -1066,35 +1034,33 @@ sub readMenu {
 =cut
 
 sub rss {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $thread = $p[0];
-    $thread = 'news' unless (defined $thread);
+    $thread = 'news' unless ( defined $thread );
     my $p_nStart = $p[1];
-    $p_nStart = 0 unless (defined $p_nStart);
+    $p_nStart = 0 unless ( defined $p_nStart );
     my $description = $p[2];
-    $description = 'Feed' unless (defined $description);
-    my $time = localtime;
-    my $sql_read =
-      qq/select *from  $thread  where `right` = '0' order by id desc LIMIT $p_nStart , 10/;
-    my $sth = $m_dbh->prepare($sql_read);
+    $description = 'Feed' unless ( defined $description );
+    my $time     = localtime;
+    my $sql_read = qq/select *from  $thread  where `right` = '0' order by id desc LIMIT $p_nStart , 10/;
+    my $sth      = $m_dbh->prepare($sql_read);
     $sth->execute();
     my @output;
     push @output,
-      qq(<?xml version="1.0" encoding="UTF-8"?>\n<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[$thread]]></title>\n<description><![CDATA[$description]]></description>\n<link><![CDATA[$m_sServerName]]></link>\n<language>de</language>\n<pubDate><![CDATA[$time]]></pubDate>\n);
+qq(<?xml version="1.0" encoding="UTF-8"?>\n<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[$thread]]></title>\n<description><![CDATA[$description]]></description>\n<link><![CDATA[$m_sServerName]]></link>\n<language>de</language>\n<pubDate><![CDATA[$time]]></pubDate>\n);
 
-    while (my @data = $sth->fetchrow_array()) {
+    while ( my @data = $sth->fetchrow_array() ) {
         my $headline = $data[0];
         my $body     = $data[1];
         my $href     = $data[9];
-        my $link =
-          "$m_sServerName?$m_sServerName/cgi-bin/mysql.pl?action=reply&reply=$href&thread=news#$href";
+        my $link     = "$m_sServerName?$m_sServerName/cgi-bin/mysql.pl?action=reply&reply=$href&thread=news#$href";
         push @output,
           "\n<item>\n<title><![CDATA[$headline]]></title>\n<link><![CDATA[$link]]></link>\n<description><![CDATA[$body]]></description></item>";
-    }
+    } ## end while ( my @data = $sth->...)
     push @output, "\n</channel>\n</rss>";
     $sth->finish();
     return "@output";
-}
+} ## end sub rss
 
 =head2 searchDB()
 
@@ -1105,9 +1071,9 @@ regexp search in tabelle ...
 =cut
 
 sub searchDB {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $p_sQuery = $p[0];
-    eval{return 0 if/($p_sQuery)/;};
+    eval { return 0 if /($p_sQuery)/; };
     return "Invalid regexp : $@" if $@;
     $p_sQuery = $self->quote($p_sQuery);
     my $p_sCol = $p[1];
@@ -1122,38 +1088,36 @@ sub searchDB {
     $p_nStart = $p_nStart =~ /(\d+)/ ? $1 : 0;
     $limit    = $limit =~ /(\d+)/    ? $1 : 10;
     my $sql_select =
-      "SELECT * FROM $p_sTable WHERE  `right` <= $p_nRight  && ( $p_sCol REGEXP $p_sQuery || title REGEXP $p_sQuery )  order by date desc LIMIT $p_nStart , $limit ";
+"SELECT * FROM $p_sTable WHERE  `right` <= $p_nRight  && ( $p_sCol REGEXP $p_sQuery || title REGEXP $p_sQuery )  order by date desc LIMIT $p_nStart , $limit ";
     my $b =
-      '<table align="center" summary="layoutSearch" border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td class="caption">Title</td><td class="caption">User</td><td class="caption">Datum</td></tr>';
+'<table align="center" summary="layoutSearch" border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td class="caption">Title</td><td class="caption">User</td><td class="caption">Datum</td></tr>';
     my @messages = $self->fetch_AoH($sql_select);
 
-    for (my $i = 0 ; $i <= $#messages ; $i++) {
+    for ( my $i = 0 ; $i <= $#messages ; $i++ ) {
         my $body = $messages[$i]->{body};
-        if (!utf8::is_utf8($body)) {
+        if ( !utf8::is_utf8($body) ) {
             utf8::decode($body);
-        }
+        } ## end if ( !utf8::is_utf8($body...))
         $body =~ s/\[([^\]])+\]//gs;
         $body =~ s?<[^>]+>??gs;
         my $j = index $body, /$p[0]/;
         $j = $j > 50 ? $j - 50 : 0;
-        $body = substr($body, $j, 150);
+        $body = substr( $body, $j, 150 );
         $body = encode_entities($body);
         $body =~ s?($p[0])?<span style="color:red;">$1</span>?ig;
 
-        if (!utf8::is_utf8($messages[$i]->{title})) {
-            utf8::decode($messages[$i]->{title});
-        }
-        $messages[$i]->{title} = encode_entities($messages[$i]->{title});
+        if ( !utf8::is_utf8( $messages[$i]->{title} ) ) {
+            utf8::decode( $messages[$i]->{title} );
+        } ## end if ( !utf8::is_utf8( $messages...))
+        $messages[$i]->{title} = encode_entities( $messages[$i]->{title} );
         $messages[$i]->{title} =~ s?($p[0])?<span style="color:red;">$1</span>?ig;
-
-        my $link =
-          "javascript:requestURI('$m_sServerName$ENV{SCRIPT_NAME}?action=showthread&reply=$messages[$i]->{id}','showthread','showthread');";
+        my $link = "javascript:requestURI('$m_sServerName$ENV{SCRIPT_NAME}?action=showthread&reply=$messages[$i]->{id}','showthread','showthread');";
         $b .=
-          qq(<tr><td class="values"><a href="$link" class="menuLink">$messages[$i]->{title}</a></td><td class="values">$messages[$i]->{user}</td><td align="right" class="values"><font size="-1">$messages[$i]->{date}</font></td></tr><tr><td colspan="3"><font size="-2">$body</font></td></tr>);
-    }
+qq(<tr><td class="values"><a href="$link" class="menuLink">$messages[$i]->{title}</a></td><td class="values">$messages[$i]->{user}</td><td align="right" class="values"><font size="-1">$messages[$i]->{date}</font></td></tr><tr><td colspan="3"><font size="-2">$body</font></td></tr>);
+    } ## end for ( my $i = 0 ; $i <=...)
     $b .= '</table>';
     return $b;
-}
+} ## end sub searchDB
 
 =head2 fulltext()
 
@@ -1164,9 +1128,9 @@ fulltextsuche in tabelle ...
 =cut
 
 sub fulltext {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $p_sQuery = $p[0];
-    eval{return 0 if/($p_sQuery)/;};
+    eval { return 0 if /($p_sQuery)/; };
     return "Invalid Query : <br/>" if $@;
     $p_sQuery = $self->quote($p_sQuery);
     my $p_sTable = $p[1];
@@ -1178,38 +1142,35 @@ sub fulltext {
     $p_nRight = $p_nRight =~ /(\d+)/ ? $1 : 0;
     $p_nStart = $p_nStart =~ /(\d+)/ ? $1 : 0;
     $limit    = $limit =~ /(\d+)/    ? $1 : 10;
-    my $b =
-      '<table class="ShowTables"><tr><td class="caption">Title</td><td class="caption">User</td><td class="caption">Datum</td></tr>';
+    my $b        = '<table class="ShowTables"><tr><td class="caption">Title</td><td class="caption">User</td><td class="caption">Datum</td></tr>';
     my @messages = $self->fetch_AoH(
-        "SELECT * FROM $p_sTable  where `right` <= $p_nRight and MATCH (title,body) AGAINST($p_sQuery) order by date desc LIMIT $p_nStart , $limit"
-    );
+        "SELECT * FROM $p_sTable  where `right` <= $p_nRight and MATCH (title,body) AGAINST($p_sQuery) order by date desc LIMIT $p_nStart , $limit");
 
-    for (my $i = 0 ; $i <= $#messages ; $i++) {
+    for ( my $i = 0 ; $i <= $#messages ; $i++ ) {
         my $body = $messages[$i]->{body};
-        if (!utf8::is_utf8($body)) {
+        if ( !utf8::is_utf8($body) ) {
             utf8::decode($body);
-        }
+        } ## end if ( !utf8::is_utf8($body...))
         $body =~ s/\[([^\]])+\]//gs;
         $body =~ s?<[^>]+>??gs;
         my $j = index $body, $p_sQuery;
         $j = $j > 50 ? $j - 50 : 0;
-        $body = substr($body, $j, 150);
+        $body = substr( $body, $j, 150 );
         $body = encode_entities($body);
         $body =~ s/($p[0])/<span style="color:red;">$1<\/span>/ig;
 
-        if (!utf8::is_utf8($messages[$i]->{title})) {
-            utf8::decode($messages[$i]->{title});
-        }
-        $messages[$i]->{title} = encode_entities($messages[$i]->{title});
+        if ( !utf8::is_utf8( $messages[$i]->{title} ) ) {
+            utf8::decode( $messages[$i]->{title} );
+        } ## end if ( !utf8::is_utf8( $messages...))
+        $messages[$i]->{title} = encode_entities( $messages[$i]->{title} );
         $messages[$i]->{title} =~ s/($p[0])/<span style="color:red;">$1<\/span>/ig;
-        my $link =
-          "javascript:requestURI('$m_sServerName$ENV{SCRIPT_NAME}?action=showthread&reply=$messages[$i]->{id}','showthread','showthread')";
+        my $link = "javascript:requestURI('$m_sServerName$ENV{SCRIPT_NAME}?action=showthread&reply=$messages[$i]->{id}','showthread','showthread')";
         $b .=
-          qq(<tr><td class="values"><a href="$link" class="menuLink">$messages[$i]->{title}</a></td><td class="values">$messages[$i]->{user}</td><td align="right" class="values"><font size="-1">$messages[$i]->{date}</font></td></tr><tr><td colspan="3"><font size="-2">$body</font></td></tr>);
-    }
+qq(<tr><td class="values"><a href="$link" class="menuLink">$messages[$i]->{title}</a></td><td class="values">$messages[$i]->{user}</td><td align="right" class="values"><font size="-1">$messages[$i]->{date}</font></td></tr><tr><td colspan="3"><font size="-2">$body</font></td></tr>);
+    } ## end for ( my $i = 0 ; $i <=...)
     $b .= '</table>';
     return $b;
-}
+} ## end sub fulltext
 
 =head2 getAction
 
@@ -1218,7 +1179,7 @@ sub fulltext {
 =cut
 
 sub getAction {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $m_sAction = $p[0];
     my $sql       = q/select * from actions where action = ?/;
     my $sth       = $m_dbh->prepare($sql) or warn $m_dbh->errstr;
@@ -1226,7 +1187,7 @@ sub getAction {
     my $hr = $sth->fetchrow_hashref;
     $sth->finish();
     return $hr;
-}
+} ## end sub getAction
 
 =head2 getActionRight
 
@@ -1235,7 +1196,7 @@ sub getAction {
 =cut
 
 sub getActionRight {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $m_sAction = $p[0];
     my $sql       = q/select `right` from actions where action = ?/;
     my $sth       = $m_dbh->prepare($sql) or warn $m_dbh->errstr;
@@ -1243,7 +1204,7 @@ sub getActionRight {
     my $hr = $sth->fetchrow_array;
     $sth->finish();
     return $hr;
-}
+} ## end sub getActionRight
 
 =head2 topicright()
 
@@ -1252,7 +1213,7 @@ sub getActionRight {
 =cut
 
 sub topicright {
-    my ($self, @p) = getSelf(@_);
+    my ( $self, @p ) = getSelf(@_);
     my $id  = $p[0];
     my $sql = 'SELECT `right` FROM news where id = ?';
     my $sth = $m_dbh->prepare($sql);
@@ -1260,7 +1221,7 @@ sub topicright {
     my @q = $sth->fetchrow_array;
     $sth->finish();
     return $q[0];
-}
+} ## end sub topicright
 
 =head2 getSelf()
 
@@ -1269,14 +1230,14 @@ sub topicright {
 =cut
 
 sub getSelf {
-    return @_ if defined($_[0]) && (!ref($_[0])) && ($_[0] eq 'DBI::Library::Database');
+    return @_ if defined( $_[0] ) && ( !ref( $_[0] ) ) && ( $_[0] eq 'DBI::Library::Database' );
     return (
-            defined($_[0]) && (ref($_[0]) eq 'DBI::Library::Database'
-                               || UNIVERSAL::isa($_[0], 'DBI::Library::Database'))
-           )
+        defined( $_[0] ) && ( ref( $_[0] ) eq 'DBI::Library::Database'
+            || UNIVERSAL::isa( $_[0], 'DBI::Library::Database' ) )
+      )
       ? @_
-      : ($DBI::Library::Database::m_sDefaultClass->new, @_);
-}
+      : ( $DBI::Library::Database::m_sDefaultClass->new, @_ );
+} ## end sub getSelf
 
 package DBI::Library::Database::db;
 use vars qw(@ISA);
@@ -1287,10 +1248,10 @@ use vars qw(@ISA);
 =cut
 
 sub prepare {
-    my ($m_dbh, @args) = @_;
+    my ( $m_dbh, @args ) = @_;
     my $sth = $m_dbh->SUPER::prepare(@args) or return;
     return $sth;
-}
+} ## end sub prepare
 
 package DBI::Library::Database::st;
 use vars qw(@ISA);
@@ -1301,20 +1262,20 @@ use vars qw(@ISA);
 =cut
 
 sub execute {
-    my ($sth, @args) = @_;
+    my ( $sth, @args ) = @_;
     my $rv = $sth->SUPER::execute(@args) or return;
     return $rv;
-}
+} ## end sub execute
 
 =head2 fetch()
 
 =cut
 
 sub fetch {
-    my ($sth, @args) = @_;
+    my ( $sth, @args ) = @_;
     my $row = $sth->SUPER::fetch(@args) or return;
     return $row;
-}
+} ## end sub fetch
 
 =head1 SEE ALSO
 
@@ -1337,5 +1298,4 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 =cut
-
 1;

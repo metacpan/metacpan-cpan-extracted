@@ -1,0 +1,43 @@
+# CHECKSUMS file written on Fri Jun  8 17:16:22 2018 GMT by CPAN::Checksums (v2.12)
+$cksum = {
+  'perl-5.26.1-RC1.tar.gz' => {
+    'md5' => 'df32619aff1da8beadea9064669aca25',
+    'md5-ungz' => '0e36293f667f35f70e6420e227a23bf0',
+    'mtime' => '2018-06-08',
+    'sha256' => 'd6acae68af8f97d5536f958b516431b7a8799c3447b49943fa7e0957b5bb1dbd',
+    'sha256-ungz' => '4c0221b7dd033e6d794226abc710a2cac4762a26e704aa3742804f341d19b060',
+    'size' => 140
+  },
+  'perl-5.26.1.tar.gz' => {
+    'md5' => '44473eb50c42286033a989b835268282',
+    'md5-ungz' => '82673fc66357ecf35b5f5cb09f7505f7',
+    'mtime' => '2018-06-08',
+    'sha256' => 'b698b65edf3d2be76b28e6fccbf69e5ad3e96781e1411eda439dde628a27b6ef',
+    'sha256-ungz' => 'ea4e4ab8df601f934f0989310f7d29e53b2bbd852cf7511a5135aa9c3eeed19c',
+    'size' => 134
+  },
+  'perl-5.26.2-RC1.tar.gz' => {
+    'md5' => 'f67605b1952cb55471605cd8839b4aa9',
+    'md5-ungz' => 'df676d72842f4051acb4be8742eda1a0',
+    'mtime' => '2018-06-08',
+    'sha256' => '2ec74279257c9f35c5c094ecfb3e827d257b90f9b6286fbf047c3c431f47da36',
+    'sha256-ungz' => '21dfb86584ec67c258fefb05d4991e74f4d9a1cc2e18765d7e1e98bf910cecda',
+    'size' => 140
+  },
+  'perl-5.26.2.tar.gz' => {
+    'md5' => '8552a1d6391a5e380fb9c0419369676b',
+    'md5-ungz' => '6c42825d1a13b815d02929c146fc60dd',
+    'mtime' => '2018-06-08',
+    'sha256' => '9d696c784b8bf9a22bd2078c2b352eb97ccf1267b831b82d99dee69af8838b23',
+    'sha256-ungz' => 'af295f3e0f0494ebcafa7e8e643672f5c682bdec7d1fd537c679c417b77189b6',
+    'size' => 134
+  },
+  'perl-5.27.5.tar.gz' => {
+    'md5' => 'f59b4ec6284c702ff7d2a6d8075442c3',
+    'md5-ungz' => '44d8defa309f737d1f2c29728ac0240f',
+    'mtime' => '2018-06-08',
+    'sha256' => '74d8765b788b99bd475e704020cf1a7b382a72870822a1a66e4bf97a1f0275fe',
+    'sha256-ungz' => 'b3673e640544080f0519a314174d8c6b332500bee0b0770dd7336932bc7f887f',
+    'size' => 134
+  }
+};

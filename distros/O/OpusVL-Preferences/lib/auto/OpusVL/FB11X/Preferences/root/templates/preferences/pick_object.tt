@@ -1,0 +1,10 @@
+<div class="fb11-card">
+  <h1>Preferences</h1>
+  <p>Please choose an object whose preferences to manage:</p>
+  [% FOREACH class IN classes %]
+    <a href="[% c.uri_for( c.controller.action_for('list'), [ class ] ) %]"
+      class="btn btn-primary">
+      [% class %]
+    </a>
+  [% END %]
+</div>

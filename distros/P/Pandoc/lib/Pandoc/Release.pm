@@ -3,20 +3,22 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.8.4';
+our $VERSION = '0.8.5';
 
 # core modules since 5.014
 use HTTP::Tiny;
 use JSON::PP;
 
-use Pandoc;
-use Pandoc::Version;
 use Cwd;
 use File::Path qw(make_path remove_tree);
 use File::Copy 'move';
 use File::Temp 'tempdir';
 
+use Pandoc;
+use Pandoc::Version;
+
 use parent 'Exporter';
+
 our @EXPORT = qw(get list latest);
 
 =head1 NAME
@@ -25,8 +27,7 @@ Pandoc::Release - get pandoc releases from GitHub
 
 =cut
 
-our $VERSION = '0.8.3';
-our $CLIENT  = HTTP::Tiny->new;
+our $CLIENT = HTTP::Tiny->new;
 
 sub _api_request {
     my ( $url, %opts ) = @_;
@@ -99,7 +100,10 @@ sub download {
         $bin = "$bin/pandoc-$version";
         if ( -f $bin ) {
             say "skipping existing $bin" if $opts{verbose};
-            return Pandoc->new($bin);
+            my $pandoc = Pandoc->new($bin);
+            $pandoc = $pandoc->symlink( $opts{symlink}, %opts )
+              if exists $opts{symlink};
+            return $pandoc;
         }
     }
 
@@ -129,7 +133,10 @@ sub download {
         system($cmd) and die "failed to extract pandoc from $deb:\n $cmd";
         say $bin if $opts{verbose};
 
-        return Pandoc->new($bin);
+        my $pandoc = Pandoc->new($bin);
+        $pandoc = $pandoc->symlink( $opts{symlink}, %opts )
+          if exists $opts{symlink};
+        return $pandoc;
     }
     else {
         return $version;
@@ -149,6 +156,9 @@ From command line:
 
   # download latest release unless already in ~/.pandoc/bin
   perl -MPandoc::Release -E 'latest->download'
+
+  # same and create symlink ~/.pandoc/bin/pandoc
+  perl -MPandoc::Release -E 'latest->download->symlink'
 
 In Perl code:
 
@@ -176,6 +186,9 @@ In Perl code:
 This utility module fetches information about pandoc releases via GitHub API.
 It requires at least Perl 5.14 or L<HTTP::Tiny> and L<JSON::PP> installed.
 
+On Debian-bases systems, this module can update and switch locally installed
+pandoc versions if you add directory C<~/.pandoc/bin> to your C<$PATH>.
+
 =head1 FUNCTIONS
 
 All functions are exported by default.
@@ -201,21 +214,43 @@ C<range>. Equivalent to method C<list> with option C<< limit => 1 >>.
 
 =head1 METHODS
 
-=head2 download( [ dir => $dir ] [ arch => $arch ] [ bin => $bin ] [ verbose => 0|1] )
+=head2 download( %options )
 
-Download the Debian release file for some architecture (e.g. C<amd64>) to
-directory C<dir>, unless already there. By default architecture is determined
-via calling C<dpkg> and download directory is a newly created temporary
-directory.  Pandoc executables is then extracted to directory C<bin> named by
-pandoc version number (e.g. C<pandoc-2.1.2>). The default C<bin> directory is
-C<~/.pandoc/bin> on Unix (see L<Pandoc> function C<pandoc_data_dir>):
+Download the Debian release file for some architecture (e.g. C<amd64>) Pandoc
+executables is then extracted to directory C<bin> named by pandoc version
+number (e.g. C<pandoc-2.1.2>). Skips downloading if an executable of this name
+is already found there.  Returns a L<Pandoc> instance if C<bin> is not false or
+L<Pandoc::Version> otherwise.
 
-  $release->download( bin => pandoc_data_dir('bin') );
-  $release->download;   # equivalent
+=over
 
-Extraction of executables can be disabled by setting C<bin> to a false value.
-Returns a L<Pandoc> instance if C<bin> is not false or L<Pandoc::Version>
-otherwise.
+=item dir
+
+Where to download release files to. A temporary directory is used by default.
+
+=item arch
+
+System architecture, detected with C<dpkg --print-architecture> by default.
+
+=item bin
+
+Where to extract pandoc binary to. By default set to C<~/.pandoc/bin> on Unix
+(see L<Pandoc> function C<pandoc_data_dir>).  Extraction of executables can be
+disabled by setting C<bin> to a false value.
+
+=item symlink
+
+Create a symlink to the executable. This is just a shortcut for calling function
+C<symlink> of L<Pandoc>:
+
+  $release->download( verbose => $v )->symlink( $l, verbose => $v )
+  $release->download( verbose => $v, symlink => $l )   # equivalent
+
+=item verbose
+
+Print what's going on (disabled by default).
+
+=back
 
 =head1 SEE ALSO
 

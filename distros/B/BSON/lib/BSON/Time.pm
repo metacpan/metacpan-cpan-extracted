@@ -6,7 +6,7 @@ package BSON::Time;
 # ABSTRACT: BSON type wrapper for date and time
 
 use version;
-our $VERSION = 'v1.6.4';
+our $VERSION = 'v1.6.6';
 
 use Carp qw/croak/;
 use Config;
@@ -97,7 +97,15 @@ sub BUILDARGS {
 #pod =cut
 
 sub epoch {
-    return $_[0]->value / 1000;
+    my $self = shift;
+    if ( $Config{use64bitint} ) {
+        return $self->value / 1000;
+    }
+    else {
+        require Math::BigFloat;
+        my $upgrade = Math::BigFloat->new($self->value->bstr);
+        return 0 + $upgrade->bdiv(1000)->bstr;
+    }
 }
 
 #pod =method as_iso8601
@@ -230,7 +238,7 @@ BSON::Time - BSON type wrapper for date and time
 
 =head1 VERSION
 
-version v1.6.4
+version v1.6.6
 
 =head1 SYNOPSIS
 

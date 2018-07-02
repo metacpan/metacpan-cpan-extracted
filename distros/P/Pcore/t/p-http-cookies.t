@@ -5,7 +5,7 @@ package main v0.1.0;
 use Pcore;
 use Test::More;
 use Pcore::HTTP::Cookies;
-use Pcore::Util::URI::Host;
+use Pcore::Util::Host;
 
 my $test_data = {
     set_cover_domain => [    #
@@ -73,7 +73,7 @@ sub set_cover_domain {
 }
 
 sub get_cookies {
-    delete Pcore::Util::URI::Host->pub_suffixes->{'amazonaws.com'};
+    delete Pcore::Util::Host->pub_suffixes->{'amazonaws.com'};
 
     my $c = Pcore::HTTP::Cookies->new;
 

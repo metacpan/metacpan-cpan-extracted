@@ -1,0 +1,296 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Pcore-Ext\n"
+"Report-Msgid-Bugs-To: zdm <zdm@softvisio.net>\n"
+"POT-Creation-Date: 2018-06-28 10:56+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: zdm <zdm@softvisio.net>\n"
+"Language-Team: \n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: l10n;l10n:1,2;$l10n\n"
+"X-Poedit-Basepath: ../..\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 2.0.8\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Poedit-SearchPath-0: lib\n"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:95
+msgid "Error connecting to the server"
+msgstr "Ошибка соединения с серверм"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:95
+msgid "Try again."
+msgstr "Попробовать еще раз."
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:265
+msgid "You have no permissions to access this area"
+msgstr "У вас нет прав доступа к этому разделу"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:318
+msgid "Password changed"
+msgstr "Пароль изменен"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:335
+msgid "Password change instructions was sent to the email address, associated with your account."
+msgstr "Инструкции по смене пароля были отправлены на email адрес, связанный с вашей учетной записью."
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:423
+msgid "SIGN IN"
+msgstr "ВОЙТИ"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:436
+msgid "User name"
+msgstr "Имя пользователя"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:437
+msgid "email"
+msgstr ""
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:443
+msgid "Password"
+msgstr "Пароль"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:444
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:544
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:550
+msgid "password"
+msgstr "пароль"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:450
+msgid "Remember me"
+msgstr "Запомнить меня"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:456
+msgid "Forgot password"
+msgstr "Забыли пароль"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:460
+msgid "Sign in"
+msgstr "Войти"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:485
+msgid "Passwords are not match"
+msgstr "Пароли не совпадают"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:528
+msgid "PASSWORD CHANGING"
+msgstr "ИЗМЕНЕНИЕ ПАРОЛЯ"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:543
+msgid "New password"
+msgstr "Новый пароль"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:549
+msgid "Confirm new password"
+msgstr "Подтвердите новый пароль"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:556
+msgid "Cancel"
+msgstr "Отменить"
+
+#: lib/Pcore/Ext/Lib/Core/Viewport.pm:560
+msgid "Change"
+msgstr "Изменить"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:58
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:84
+msgid "January"
+msgstr "Январь"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:58
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:84
+msgid "February"
+msgstr "Февраль"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:58
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:84
+msgid "March"
+msgstr "Март"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:59
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:85
+msgid "April"
+msgstr "Апрель"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:59
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:66
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:85
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:90
+msgid "May"
+msgstr "Май"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:59
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:85
+msgid "June"
+msgstr "Июнь"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:60
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:86
+msgid "July"
+msgstr "Июль"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:60
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:86
+msgid "August"
+msgstr "Август"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:60
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:86
+msgid "September"
+msgstr "Сентябрь"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:61
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:87
+msgid "October"
+msgstr "Октябрь"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:61
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:87
+msgid "November"
+msgstr "Ноябрь"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:61
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:87
+msgid "December"
+msgstr "Декабрь"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:65
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:89
+msgid "Jan"
+msgstr "Янв"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:65
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:89
+msgid "Feb"
+msgstr "Фев"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:65
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:89
+msgid "Mar"
+msgstr "Мар"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:66
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:90
+msgid "Apr"
+msgstr "Апр"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:66
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:90
+msgid "Jun"
+msgstr "Июнь"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:67
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:91
+msgid "Jul"
+msgstr "Июль"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:67
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:91
+msgid "Aug"
+msgstr "Авг"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:67
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:91
+msgid "Sep"
+msgstr "Сен"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:68
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:92
+msgid "Oct"
+msgstr "Окт"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:68
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:92
+msgid "Nov"
+msgstr "Ноя"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:68
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:92
+msgid "Dec"
+msgstr "Дек"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:72
+msgid "Sunday"
+msgstr "Воскресенье"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:72
+msgid "Monday"
+msgstr "Понедельник"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:72
+msgid "Tuesday"
+msgstr "Вторник"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:73
+msgid "Wednesday"
+msgstr "Среда"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:73
+msgid "Thursday"
+msgstr "Четверг"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:73
+msgid "Friday"
+msgstr "Пятница"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:74
+msgid "Saturday"
+msgstr "Суббота"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:78
+msgid "Sun"
+msgstr "Вс"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:78
+msgid "Mon"
+msgstr "Пн"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:78
+msgid "Tue"
+msgstr "Вт"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:79
+msgid "Wed"
+msgstr "Ср"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:79
+msgid "Thu"
+msgstr "Чт"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:79
+msgid "Fri"
+msgstr "Пя"
+
+#: lib/Pcore/Ext/Lib/Overrides/Core.pm:80
+msgid "Sat"
+msgstr "Сб"
+
+#: lib/Pcore/Ext/Lib/Overrides/Modern.pm:6
+msgid "Sort Ascending"
+msgstr "Сортировать по возрастанию"
+
+#: lib/Pcore/Ext/Lib/Overrides/Modern.pm:10
+msgid "Sort Descending"
+msgstr "Сортировать по убыванию"
+
+#: lib/Pcore/Ext/Lib/Overrides/Modern.pm:16
+msgid "Collapse panel"
+msgstr "Свернуть панель"
+
+#: lib/Pcore/Ext/Lib/Overrides/Modern.pm:17
+msgid "Expand panel"
+msgstr "Развернуть панель"
+
+#: lib/Pcore/Ext/Lib1/Grid.pm:9
+msgid "Total {0}"
+msgstr "Всего {0}"
+
+#: lib/Pcore/Ext/Lib1/Grid.pm:10
+msgid "Reload"
+msgstr "Перезагрузить"
+
+#~ msgid "Change password"
+#~ msgstr "Изменить пароль"

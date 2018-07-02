@@ -8,12 +8,11 @@ use Time::HiRes qw[];
 
 with qw[Pcore::Core::Event::Listener::Pipe];
 
-has tmpl => ( is => 'ro', isa => Str, default => $BOLD . $GREEN . '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>]' . $BOLD . $YELLOW . '[<: $channel :>]' . $BOLD . $RED . '[<: $level :>]' . $RESET . ' <: $title | raw :>' . $LF . '<: $text | raw :>' );
+has tmpl => $BOLD . $GREEN . '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>]' . $BOLD . $YELLOW . '[<: $channel :>]' . $BOLD . $RED . '[<: $level :>]' . $RESET . ' <: $title | raw :>' . $LF . '<: $text | raw :>';
 
-has _tmpl => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Template'], init_arg => undef );
-has _is_ansi => ( is => 'ro', isa => Bool, init_arg => undef );
-
-has _init => ( is => 'ro', isa => Bool, init_arg => undef );
+has _tmpl    => ();    # isa => InstanceOf ['Pcore::Util::Tmpl'], init_arg => undef );
+has _is_ansi => ();    # isa => Bool, init_arg => undef );
+has _init    => ();    # isa => Bool, init_arg => undef );
 
 const our $INDENT => q[ ] x 4;
 
@@ -70,9 +69,9 @@ sub sendlog ( $self, $ev ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 42                   | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 41                   | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 39, 42               | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
+## |    2 | 38, 41               | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 11                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

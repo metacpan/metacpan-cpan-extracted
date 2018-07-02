@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 21;
+use Test::Most tests => 33;
 use Test::Number::Delta;
 use Test::Carp;
 use lib 't/lib';
@@ -15,7 +15,7 @@ BEGIN {
 WHOSONFIRST: {
 	SKIP: {
 		if($ENV{'WHOSONFIRST_HOME'} && $ENV{'OPENADDR_HOME'}) {
-			if($ENV{RELEASE_TESTING}) {
+			if($ENV{AUTHOR_TESTING}) {
 				diag('This will take some time and memory');
 
 				my $libpostal_is_installed = 0;
@@ -25,7 +25,7 @@ WHOSONFIRST: {
 
 				Geo::Coder::Free::DB::init(logger => new_ok('MyLogger'));
 
-				my $geocoder = new_ok('Geo::Coder::Free' => [ openaddr => $ENV{'OPENADDR_HOME'} ]);
+				my $geocoder = new_ok('Geo::Coder::Free');
 				my $location = $geocoder->geocode(location => 'Margate, Kent, England');
 				delta_within($location->{latitude}, 51.38, 1e-2);
 				delta_within($location->{longitude}, 1.30, 1e-2);
@@ -41,6 +41,24 @@ WHOSONFIRST: {
 				ok(ref($location) eq 'HASH');
 				delta_within($location->{latitude}, 39.06, 1e-2);
 				delta_within($location->{longitude}, -77.12, 1e-2);
+
+				$location = $geocoder->geocode('Rock Bottom, Norfolk Ave, Bethesda, MD, USA');
+				ok(defined($location));
+				ok(ref($location) eq 'HASH');
+				delta_within($location->{latitude}, 38.99, 1e-2);
+				delta_within($location->{longitude}, -77.10, 1e-2);
+
+				$location = $geocoder->geocode('Rock Bottom, Bethesda, MD, USA');
+				ok(defined($location));
+				ok(ref($location) eq 'HASH');
+				delta_within($location->{latitude}, 38.99, 1e-2);
+				delta_within($location->{longitude}, -77.10, 1e-2);
+
+				$location = $geocoder->geocode('Rock Bottom Restaurant & Brewery, Norfolk Ave, Bethesda, MD, USA');
+				ok(defined($location));
+				ok(ref($location) eq 'HASH');
+				delta_within($location->{latitude}, 38.99, 1e-2);
+				delta_within($location->{longitude}, -77.10, 1e-2);
 
 				$location = $geocoder->geocode('12276 Rockville Pike, Rockville, MD, USA');
 				delta_within($location->{latitude}, 39.06, 1e-2);
@@ -63,11 +81,11 @@ WHOSONFIRST: {
 				}
 			} else {
 				diag('Author tests not required for installation');
-				skip('Author tests not required for installation', 20);
+				skip('Author tests not required for installation', 32);
 			}
 		} else {
 			diag('Set WHOSONFIRST_HOME and OPENADDR_HOME to enable whosonfirst.org testing');
-			skip 'WHOSONFIRST_HOME and/or OPENADDR_HOME not defined', 20;
+			skip 'WHOSONFIRST_HOME and/or OPENADDR_HOME not defined', 32;
 		}
 	}
 }

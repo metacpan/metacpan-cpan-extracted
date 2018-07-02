@@ -1,4 +1,14 @@
-Revision history for Text-Table-Any
+0.091   2018-07-02 (PERLANCAR)
+
+	- [Incompatible change] Change header_row default from 0 to 1.
+
+
+0.090   2018-06-30 (PERLANCAR)
+
+	- Add new backends: Text::Table::{TSV,LTSV}.
+
+	- CSV backend: pass header_row option (Text::Table::CSV 0.020+).
+
 
 0.08    2017-01-01 (PERLANCAR)
 

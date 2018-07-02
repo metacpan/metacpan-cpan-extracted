@@ -22,25 +22,30 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214157;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{4})(\\d{4})',
+                  'leading_digits' => '[0237]',
+                  'format' => '$1 $2'
+                },
+                {
                   'format' => '$1 $2',
-                  'leading_digits' => '[027]',
-                  'pattern' => '(\\d{4})(\\d{4})'
+                  'leading_digits' => '900',
+                  'pattern' => '(\\d{5})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'mobile' => '7[6-9]\\d{6}',
-                'specialrate' => '',
-                'geographic' => '2[2-9]\\d{6}',
-                'personal_number' => '',
                 'pager' => '',
+                'geographic' => '[23][2-5]\\d{6}',
+                'personal_number' => '',
+                'voip' => '70\\d{6}',
+                'fixed_line' => '[23][2-5]\\d{6}',
                 'toll_free' => '0800\\d{4}',
-                'fixed_line' => '2[2-9]\\d{6}',
-                'voip' => ''
+                'mobile' => '7[6-9]\\d{6}',
+                'specialrate' => '(900\\d{6})'
               };
 my %areanames = (
   2682207 => "Nhlangano\,\ Shiselweni\ district",
@@ -79,10 +84,10 @@ my %areanames = (
   2682528 => "Malkerns\,\ Manzini\ district",
   2682538 => "Mankayane\,\ Manzini\ district",
   2682548 => "Ludzeludze\,\ Manzini\ district",
-  26826 => "Hhohho",
-  26827 => "Manzini",
-  26828 => "Lubombo",
-  26829 => "Shiselweni",
+  26832 => "Shiselweni",
+  26833 => "Lubombo",
+  26834 => "Hhohho",
+  26835 => "Manzini",
 );
     sub new {
       my $class = shift;

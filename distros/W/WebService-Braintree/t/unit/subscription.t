@@ -4,7 +4,6 @@ use 5.010_001;
 use strictures 1;
 
 use Test::More;
-use Test::Moose;
 
 use lib qw(lib t/lib);
 
@@ -15,7 +14,6 @@ subtest 'does have correct attributes' => sub {
     my $subscription = WebService::Braintree::_::Subscription->new(balance => '12.00');
 
     is $subscription->balance, '12.00';
-    has_attribute_ok $subscription, 'balance';
 };
 
 subtest 'throws NotFoundError if find is given empty string' => sub {

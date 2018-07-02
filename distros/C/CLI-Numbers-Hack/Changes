@@ -1,5 +1,7 @@
 Revision history for CLI-Numbers-Hack
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.22    2018-06-19
+        Added the program file "quantile".
 
+0.21    2018-06-15
+        cumsum, denomfind, minmax, meanvar, nums, rounding, zeropad.

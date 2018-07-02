@@ -4,7 +4,7 @@ use warnings;
 package YAML::PP;
 use B;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use base 'Exporter';
 our @EXPORT_OK = qw/ Load LoadFile Dump DumpFile /;
@@ -261,7 +261,6 @@ sub load_scalar_tag {
             }
             return $res;
         }
-        die "Tag $tag ($value)";
     }
     if (my $regex = $res->{regex}) {
         for my $item (@$regex) {
@@ -418,13 +417,27 @@ sub register {
         flags => $int_flags,
         code => sub {
             my ($rep, $value) = @_;
+            if (int($value) ne $value) {
+                return { skip => 1 };
+            }
             return { plain => "$value" };
         },
     );
+    my %special = ( (0+'nan').'' => '.nan', (0+'inf').'' => '.inf', (0-'inf').'' => '-.inf' );
     $schema->add_representer(
         flags => $float_flags,
         code => sub {
             my ($rep, $value) = @_;
+            # TODO is inf/nan supported in YAML JSON Schema?
+            if (exists $special{ $value }) {
+                return { plain => "$value" };
+            }
+            if (0.0 + $value ne $value) {
+                return { skip => 1 };
+            }
+            if (int($value) eq $value and not $value =~ m/\./) {
+                $value .= '.0';
+            }
             return { plain => "$value" };
         },
     );
@@ -448,7 +461,7 @@ sub register {
 package YAML::PP::Schema::Core;
 use base 'YAML::PP::Schema';
 
-my $RE_INT_CORE = qr{^([+-]?(?:0|[1-9][0-9]*))$};
+my $RE_INT_CORE = qr{^([+-]?(?:[0-9]+))$};
 my $RE_FLOAT_CORE = qr{^([+-]?(?:\.[0-9]+|[0-9]+(?:\.[0-9]*)?)(?:[eE][+-]?[0-9]+)?)$};
 my $RE_INT_OCTAL = qr{^0o([0-7]+)$};
 my $RE_INT_HEX = qr{^0x([0-9a-fA-F]+)$};
@@ -496,6 +509,18 @@ sub register {
         match => [ regex => $RE_FLOAT_CORE => \&YAML::PP::Schema::JSON::_to_float ],
     );
     $schema->add_resolver(
+        tag => 'tag:yaml.org,2002:float',
+        match => [ equals => $_ => 0 + "inf" ],
+    ) for (qw/ .inf .Inf .INF /);
+    $schema->add_resolver(
+        tag => 'tag:yaml.org,2002:float',
+        match => [ equals => $_ => 0 - "inf" ],
+    ) for (qw/ -.inf -.Inf -.INF /);
+    $schema->add_resolver(
+        tag => 'tag:yaml.org,2002:float',
+        match => [ equals => $_ => 0 + "nan" ],
+    ) for (qw/ .nan .NaN .NAN /);
+    $schema->add_resolver(
         tag => 'tag:yaml.org,2002:str',
         match => [ regex => qr{^(.*)$} => sub { $_[0] } ],
         implicit => 0,
@@ -514,13 +539,26 @@ sub register {
         flags => $int_flags,
         code => sub {
             my ($rep, $value) = @_;
+            if (int($value) ne $value) {
+                return { skip => 1 };
+            }
             return { plain => "$value" };
         },
     );
+    my %special = ( (0+'nan').'' => '.nan', (0+'inf').'' => '.inf', (0-'inf').'' => '-.inf' );
     $schema->add_representer(
         flags => $float_flags,
         code => sub {
             my ($rep, $value) = @_;
+            if (exists $special{ $value }) {
+                return { plain => $special{ $value } };
+            }
+            if (0.0 + $value ne $value) {
+                return { skip => 1 };
+            }
+            if (int($value) eq $value and not $value =~ m/\./) {
+                $value .= '.0';
+            }
             return { plain => "$value" };
         },
     );
@@ -602,6 +640,9 @@ Some utility scripts:
 
     # Create ANSI colored YAML
     yamlpp5-highlight < file.yaml
+
+    # Parse and emit events directly without loading
+    yamlpp5-parse-emit < file.yaml
 
 
 =head1 DESCRIPTION

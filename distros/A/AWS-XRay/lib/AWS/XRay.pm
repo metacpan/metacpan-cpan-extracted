@@ -12,11 +12,15 @@ use AWS::XRay::Segment;
 use Exporter 'import';
 our @EXPORT_OK = qw/ new_trace_id capture capture_from trace /;
 
-our $VERSION = "0.02";
+our $VERSION = "0.04";
 
 our $TRACE_ID;
 our $SEGMENT_ID;
-our $ENABLED = 1;
+our $ENABLED;
+our $SAMPLED;
+our $SAMPLING_RATE = 1;
+our $SAMPLER       = sub { rand() < $SAMPLING_RATE };
+
 our $DAEMON_HOST = "127.0.0.1";
 our $DAEMON_PORT = 2000;
 
@@ -25,6 +29,22 @@ if ($ENV{"AWS_XRAY_DAEMON_ADDRESS"}) {
 }
 
 my $Sock;
+
+sub sampling_rate {
+    my $class = shift;
+    if (@_) {
+        $SAMPLING_RATE = shift;
+    }
+    $SAMPLING_RATE;
+}
+
+sub sampler {
+    my $class = shift;
+    if (@_) {
+        $SAMPLER = shift;
+    }
+    $SAMPLER;
+}
 
 sub sock {
     $Sock //= IO::Socket::INET->new(
@@ -51,7 +71,22 @@ sub new_id {
 
 sub capture {
     my ($name, $code) = @_;
-    return $code->(AWS::XRay::Segment->new) if !$ENABLED;
+
+    my $enabled;
+    my $sampled = $AWS::XRay::SAMPLED;
+    if (defined $AWS::XRay::ENABLED) {
+        $enabled = $AWS::XRay::ENABLED ? 1 : 0; # fix true or false (not undef)
+    } elsif ($AWS::XRay::TRACE_ID) {
+        $enabled = 0; # called from parent capture
+    } else {
+        # root capture try sampling
+        $sampled = $SAMPLER->() ? 1 : 0;
+        $enabled = $sampled     ? 1 : 0;
+    }
+    local $AWS::XRay::ENABLED = $enabled;
+    local $AWS::XRay::SAMPLED = $sampled;
+
+    return $code->(AWS::XRay::Segment->new) if !$enabled;
 
     local $AWS::XRay::TRACE_ID = $AWS::XRay::TRACE_ID // new_trace_id();
 
@@ -92,21 +127,28 @@ sub capture {
 
 sub capture_from {
     my ($header, $name, $code) = @_;
-    local($AWS::XRay::TRACE_ID, $AWS::XRay::SEGMENT_ID) = parse_trace_header($header);
+    my ($trace_id, $segment_id, $sampled) = parse_trace_header($header);
+
+    local $AWS::XRay::SAMPLED = $sampled // $SAMPLER->();
+    local $AWS::XRay::ENABLED = $AWS::XRay::SAMPLED;
+    local($AWS::XRay::TRACE_ID, $AWS::XRay::SEGMENT_ID) = ($trace_id, $segment_id);
     capture($name, $code);
 }
 
 sub parse_trace_header {
     my $header = shift or return;
 
-    my ($trace_id, $segment_id);
+    my ($trace_id, $segment_id, $sampled);
     if ($header =~ /Root=([0-9a-fA-F-]+)/) {
         $trace_id = $1;
     }
     if ($header =~ /Parent=([0-9a-fA-F]+)/) {
         $segment_id = $1;
     }
-    return ($trace_id, $segment_id);
+    if ($header =~ /Sampled=([^;]+)/) {
+        $sampled = $1;
+    }
+    return ($trace_id, $segment_id, $sampled);
 }
 
 1;
@@ -192,9 +234,30 @@ Parse a trace header (e.g. "Root=1-5759e988-bd862e3fe1be46a994272793;Parent=5399
 
 =head1 CONFIGURATION
 
-=head2 $AWS::XRay::Enabled
+=head2 sampling_rate($rate)
 
-Default true. When set false, capture() executes sub but do not send segument documents to X-Ray daemon.
+Set/Get a sampling rate for capture().
+
+    AWS::XRay->sampling_rate(0.1); # 10% sampling
+
+$rate is allowed a float value between 0 and 1.
+
+0 means disable tracing.
+1 means all of capture() are traced.
+
+When capture_from() called with a trace header includes "Sampled=1", all of followed capture() are traced.
+
+=head2 samplier($code)
+
+Set/Get a code ref to sample for capture().
+
+    AWS::XRay->sampler(sub {
+        if ($some_condition) {
+           return 1;
+        } else {
+           return 0;
+        }
+    });
 
 =head2 AWS_XRAY_DAEMON_ADDRESS environment variable
 

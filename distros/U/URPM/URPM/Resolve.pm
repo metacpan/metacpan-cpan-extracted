@@ -336,6 +336,7 @@ sub _find_required_package__sort {
 	my ($best, @other) = sort {
 	      $a->[1] <=> $b->[1] #- we want the lowest (ie preferred arch)
 	      || $b->[2] <=> $a->[2] #- and the higher score
+	      || $b->[0]->compare_pkg($a->[0]) #- then by EVR (for upgrade)
 	      || $a->[0]->fullname cmp $b->[0]->fullname; #- then by name
 	} map {
 	    my $score = 0;
@@ -359,7 +360,7 @@ sub _find_required_package__sort {
     if ($urpm->{media}) {
 	@chosen_with_score = sort {
 	    $a->[2] != $b->[2] ? 
-	       $a->[0]->id <=> $b->[0]->id : 
+	       $b->[0]->compare_pkg($a->[0]) :
 	       $b->[1] <=> $a->[1] || $b->[0]->compare_pkg($a->[0]);
 	} map { [ $_, _score_for_locales($urpm, $db, $_), pkg2media($urpm->{media}, $_) ] } @chosen;
     } else {
@@ -1501,6 +1502,8 @@ sub _handle_diff_provides {
 		    $_->obsoletes_overlap($p->name . " == " . $p->epoch . ":" . $p->version . "-" . $p->release))
 		   && (!strict_arch($urpm) || strict_arch_check($p, $_));
 	     } @packages;
+	#- don't promote an obsolete package (mga#23223)
+	@packages = grep { _find_packages_obsoleting($urpm, $state, $_) == 0 } @packages;
 
 	if (!@packages) {
 	    @packages = _find_packages_obsoleting($urpm, $state, $p);
@@ -1558,6 +1561,8 @@ sub _handle_conflict {
       $p->version . "-" . $p->release;
     my @packages = grep { $_->name eq $p->name } find_candidate_packages($urpm, $need_deps, $state->{rejected});
     @packages = grep { ! $_->provides_overlap($property) } @packages;
+    #- don't promote an obsolete package (mga#23223)
+    @packages = grep { _find_packages_obsoleting($urpm, $state, $_) == 0 } @packages;
 
     if (!@packages) {
 	@packages = _find_packages_obsoleting($urpm, $state, $p);
@@ -2031,10 +2036,10 @@ sub request_packages_to_upgrade {
 	}
 	if (my @pkgs = _choose_bests_obsolete($urpm, $db, $pkg_installed, _find_packages_obsoleting($urpm, $state, $pkg_installed))) {
 	    if (@pkgs == 1) {
-		$pkg and $urpm->{debug_URPM}("auto-select: prefering " . $pkgs[0]->fullname . " obsoleting " .  $pkg_installed->fullname . " over " . $pkg->fullname) if $urpm->{debug_URPM};
+		$pkg and $urpm->{debug_URPM}("auto-select: preferring " . $pkgs[0]->fullname . " obsoleting " .  $pkg_installed->fullname . " over " . $pkg->fullname) if $urpm->{debug_URPM};
 		$pkg = $pkgs[0];
 	    } elsif (@pkgs > 1) {
-		$urpm->{debug_URPM}("auto-select: multiple packages (" . join(' ', map { scalar $_->fullname } @pkgs) . ") obsoleting " . $pkg_installed->fullname) if $urpm->{debug_URPM};
+		$urpm->{debug_URPM}("auto-select: multiple packages (" . join(' ', sort(map { scalar $_->fullname } @pkgs)) . ") obsoleting " . $pkg_installed->fullname) if $urpm->{debug_URPM};
 		$pkg = undef;
 	    }
 	}

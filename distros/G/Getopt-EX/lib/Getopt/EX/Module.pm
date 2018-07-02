@@ -326,8 +326,8 @@ sub parseline {
     my $optname = $arg[1] // '';
     if ($arg[0] eq "builtin") {
 	for ($optname) {
-	    s/[^\w\|].*//;
-	    s/\b(?=(\w+))/length($1) == 1 ? '-' : '--'/ge;
+	    s/[^\w\-].*//; # remove alternative names after `|'.
+	    s/^(?=([\w\-]+))/length($1) == 1 ? '-' : '--'/e;
 	}
     }
     if ($arg[2] and $arg[2] =~ s{ (?:^|\s+) // \s+ (?<message>.*) }{}x) {

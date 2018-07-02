@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::ResourceCollection;
-$WebService::Braintree::ResourceCollection::VERSION = '1.5';
+$WebService::Braintree::ResourceCollection::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -18,19 +18,21 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
+use Moo;
+
+use Types::Standard qw(CodeRef HashRef);
 
 # These attributes and methods are undocumented because they're meant to be
 # internal-use only. But, prepending underscores makes the code ugly.
 
-has 'callback' => (
+has callback => (
     is => 'ro',
-    isa => 'CodeRef',
+    isa => CodeRef,
     required => 1,
 );
-has 'response' => (
+has response => (
     is => 'ro',
-    isa => 'HashRef',
+    isa => HashRef,
     required => 1,
 );
 

@@ -1,5 +1,8 @@
 Revision history for Pandoc Perl module
 
+0.8.5  2018-06-20 23:11:29 CEST
+    - Add method to symlink executable
+
 0.8.4  2018-05-22 13:28:30 CEST
     - Introduce Pandoc::Error
     - Export Pandoc::Release methods as functions

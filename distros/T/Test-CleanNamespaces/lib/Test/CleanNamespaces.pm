@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::CleanNamespaces; # git description: v0.21-2-ga6ae109
+package Test::CleanNamespaces; # git description: v0.22-6-g67eaa09
 # ABSTRACT: Check for uncleaned imports
 # KEYWORDS: testing namespaces clean dirty imports exports subroutines methods
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use Module::Runtime ();
 use Sub::Identify ();
@@ -188,7 +188,7 @@ Test::CleanNamespaces - Check for uncleaned imports
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

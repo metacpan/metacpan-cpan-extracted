@@ -64,9 +64,10 @@
          "web" : "https://github.com/pablrod/App-BatParser"
       }
    },
-   "version" : "0.006",
+   "version" : "0.009",
    "x_contributors" : [
       "eva.dominguez <eva.dominguez@meteologica.com>",
+      "juanradiego <kilaweo@gmail.com>",
       "Toby Inkster <tobyink@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.22.2",

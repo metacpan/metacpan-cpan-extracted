@@ -95,7 +95,7 @@ sub run ($self) {
                     # create connection, accept websocket connect request
                     Pcore::WebSocket::pcore->new(
                         compression => 0,
-                        on_auth     => sub ( $h, $token, $cb ) {
+                        on_auth     => sub ( $h, $token ) {
 
                             # compare tokens
                             if ( ( $token // q[] ) ne $self->{_token} ) {
@@ -104,9 +104,7 @@ sub run ($self) {
                                 return;
                             }
 
-                            $cb->( res(200), forward => $self->{forward_events}, subscribe => $self->{subscribe_events} );
-
-                            return;
+                            return res(200), forward => $self->{forward_events}, subscribe => $self->{subscribe_events};
                         },
                         on_subscribe => $self->{on_subscribe},
                         on_event     => $self->{on_event},
@@ -457,7 +455,7 @@ sub run_node ( $self, @args ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 258                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 256                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

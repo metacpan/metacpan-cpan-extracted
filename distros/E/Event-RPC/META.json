@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -32,7 +32,6 @@
       },
       "runtime" : {
          "requires" : {
-            "CBOR::XS" : "0",
             "Event" : "0",
             "Glib" : "0",
             "IO::Socket::INET" : "0",
@@ -46,5 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.08"
+   "version" : "1.10",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

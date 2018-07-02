@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::Subscription;
-$WebService::Braintree::Subscription::VERSION = '1.5';
+$WebService::Braintree::Subscription::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -19,7 +19,7 @@ and lists all subscriptions.
 use WebService::Braintree::SubscriptionGateway;
 use WebService::Braintree::Subscription::Status;
 
-use Moose;
+use Moo;
 
 with 'WebService::Braintree::Role::Interface';
 

@@ -145,7 +145,7 @@ our @EXPORT_OK = qw{
 our %EXPORT_TAGS = (
     ALL => [@EXPORT_OK],
 );
-our $VERSION = '1.112';
+our $VERSION = '1.116';
 
 #####################################################################
 # Interface Functions
@@ -189,7 +189,7 @@ sub _dist_dir_new
     # Create the subpath
     my $path = File::Spec->catdir('auto', 'share', 'dist', $dist);
 
-    # Find the full dir withing @INC
+    # Find the full dir within @INC
     return _search_inc_path($path);
 }
 
@@ -240,7 +240,7 @@ sub _module_dir_new
     # Create the subpath
     my $path = File::Spec->catdir('auto', 'share', 'module', _module_subdir($module),);
 
-    # Find the full dir withing @INC
+    # Find the full dir within @INC
     return _search_inc_path($path);
 }
 
@@ -460,7 +460,7 @@ sub _search_inc_path
         sub {
             my $d;
             $d = File::Spec->catdir($_, $path) if defined _STRING($_);
-            defined $d and -d $d and return $d;
+            defined $d and -d $d ? $d : 0;
         },
         @INC
     ) or return;

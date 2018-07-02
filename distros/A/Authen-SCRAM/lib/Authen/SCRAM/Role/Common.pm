@@ -4,7 +4,7 @@ use warnings;
 
 package Authen::SCRAM::Role::Common;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Moo::Role 1.001000;
 
@@ -108,7 +108,9 @@ has _nonce_generator => (
 
 sub _build__nonce_generator {
     my ($self) = @_;
-    return sub { return $self->_base64( urandom( $self->nonce_size / 8 ) ) };
+    # extract from $self to avoid circular reference
+    my $nonce_size = $self->nonce_size;
+    return sub { return encode_base64( urandom( $nonce_size / 8 ), "" ) };
 }
 
 # _session builds up parameters used during a SCRAM session.  Keys

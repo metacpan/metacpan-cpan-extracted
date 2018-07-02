@@ -12,7 +12,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/MojoX/JSON/RPC.pm',
     ABSTRACT     => 'Perl implementation of JSON-RPC 2.0 protocol for Mojolicious',
     AUTHOR       => 'Henry Tang <henryykt@gmail.com>',
-    PREREQ_PM    => { 'Mojolicious' => '5.77' },
+    PREREQ_PM    => { 'Mojolicious' => '7' },
     LICENSE      => 'artistic_2',
     test         => { TESTS => 't/*.t t/*/*.t t/*/*/*.t' },
     META_MERGE => {
@@ -20,8 +20,8 @@ WriteMakefile(
         resources => {
             repository => {
                 type => 'git',
-                url => 'https://github.com/henryykt/MojoX-JSON-RPC.git',
-                web => 'https://github.com/henryykt/MojoX-JSON-RPC',
+                url => 'https://github.com/dk/MojoX-JSON-RPC.git',
+                web => 'https://github.com/dk/MojoX-JSON-RPC',
             },
         },
     },

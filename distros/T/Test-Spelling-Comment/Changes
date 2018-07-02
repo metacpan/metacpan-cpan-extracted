@@ -1,0 +1,18 @@
+Revision history for Test-Spelling-Comment
+
+0.004  2018-06-25 18:13:37 UTC
+
+  - Use g flag for the substitution with the skip patterns
+
+0.003  2018-06-24 19:35:33 UTC
+
+  - added argument skip to new
+
+0.002  2018-06-22 22:39:27 UTC
+
+  - add_stopwords returns $self instead of undef to allow chaining
+  - fixed abstract
+
+0.001  2018-06-21 20:05:26 UTC
+
+  - Initial release

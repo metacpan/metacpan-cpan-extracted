@@ -1,5 +1,8 @@
 package Zonemaster::LDNS::RR::NSEC;
 
+use strict;
+use warnings;
+
 use parent 'Zonemaster::LDNS::RR';
 
 sub nxtdname {

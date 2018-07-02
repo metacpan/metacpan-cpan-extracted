@@ -16,6 +16,7 @@ my @files = (
     'lib/WebService/PivotalTracker/Person.pm',
     'lib/WebService/PivotalTracker/Project.pm',
     'lib/WebService/PivotalTracker/ProjectIteration.pm',
+    'lib/WebService/PivotalTracker/ProjectMembership.pm',
     'lib/WebService/PivotalTracker/PropertyAttributes.pm',
     'lib/WebService/PivotalTracker/Story.pm',
     'lib/WebService/PivotalTracker/Types.pm',

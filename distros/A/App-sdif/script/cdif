@@ -101,8 +101,8 @@ my @optargs = (
     "h|help" => sub { pod2usage() },
     "man" => sub { pod2usage({-verbose => 2}) },
     "env!" => \$opt_env,
-    "stat" => \$opt_stat,
-    "mecab" => \$opt_mecab,
+    "stat!" => \$opt_stat,
+    "mecab!" => \$opt_mecab,
     "old!" => \$opt_old,
     "new!" => \$opt_new,
     "command!" => \$opt_command,
@@ -136,18 +136,18 @@ if ($opt_d) {
 $rcs++ if @rcsopt;
 $diff = $rcs ? 'rcsdiff' : 'diff' unless $diff;
 
-push(@diffopts,
-     $opt_i ? "-i" : (),
-     $opt_b ? "-b" : (),
-     $opt_w ? "-w" : (),
-     $opt_t ? "-t" : (),
-     $opt_T ? "-T" : (),
-    );
+push @diffopts, map { $_->[1] } grep { $_->[0] } (
+    [ $opt_i, "-i" ],
+    [ $opt_b, "-b" ],
+    [ $opt_w, "-w" ],
+    [ $opt_t, "-t" ],
+    [ $opt_T, "-T" ],
+);
 
-push(@sub_diffopts,
-     $opt_i ? "-i" : (),
-     $opt_w ? "-w" : (),
-    );
+push @sub_diffopts, map { $_->[1] } grep { $_->[0] } (
+    [ $opt_i, "-i" ],
+    [ $opt_w, "-w" ],
+);
 
 my %colormap = do {
     my $col = $opt_256 ? 0 : 1;
@@ -853,7 +853,7 @@ Options:
 	-c, -Cn		context diff
 	-u, -Un		unified diff
 	-i		ignore case
-	-b		ignore trailing blank
+	-b		ignore space change
 	-w		ignore whitespace
 	-t		expand tabs
 	-T		initial tabs

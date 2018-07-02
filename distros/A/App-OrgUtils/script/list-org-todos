@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.46'; # VERSION
+our $DATE = '2018-06-30'; # DATE
+our $VERSION = '0.470'; # VERSION
 
 use 5.010;
 use strict;
@@ -9,7 +9,7 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
-binmode STDOUT, ":utf8";
+binmode STDOUT, ":encoding(utf8)";
 Perinci::CmdLine::Any->new(url => '/App/ListOrgTodos/list_org_todos')->run;
 
 1;
@@ -28,7 +28,7 @@ list-org-todos - List all todo items in all Org files
 
 =head1 VERSION
 
-This document describes version 0.46 of list-org-todos (from Perl distribution App-OrgUtils), released on 2017-07-10.
+This document describes version 0.470 of list-org-todos (from Perl distribution App-OrgUtils), released on 2018-06-30.
 
 =head1 SYNOPSIS
 
@@ -179,7 +179,7 @@ Show details instead of just titles.
 
 Only show todo items that are done.
 
-=item B<--due-in>=I<i>
+=item B<--due-in>=I<s>
 
 Only show todo items that are (nearing|passed) due.
 
@@ -195,7 +195,7 @@ than 7) but <2011-07-10 Sun +1y -14d> will (warning period 14 days is already
 passed by that time).
 
 
-=item B<--from-level>=I<i>
+=item B<--from-level>=I<s>
 
 Only show headlines having this level as the minimum.
 
@@ -288,7 +288,7 @@ any), and HL is the Org::Headline object.
 
 Only show todo items that have this state.
 
-=item B<--to-level>=I<i>
+=item B<--to-level>=I<s>
 
 Only show headlines having this level as the maximum.
 
@@ -423,7 +423,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

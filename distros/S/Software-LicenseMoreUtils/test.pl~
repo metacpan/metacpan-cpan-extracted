@@ -1,0 +1,6 @@
+my $gpl = Software::LicenseMoreUtils->new_from_short_name({
+   short_name => 'GPL-1+',
+   holder => 'X. Ample'
+});
+
+say $gpl->summary_or_text;

@@ -1,30 +1,17 @@
 package Pcore::Ext::Base;
 
-use Pcore -const;
+use Pcore;
 
 sub MODIFY_CODE_ATTRIBUTES ( $pkg, $ref, @attrs ) {
     my @bad;
 
     for my $attr (@attrs) {
-        if ( $attr =~ /(Extend|Type) [(] (?:'(.+?)')? [)]/smxx ) {
+        if ( $attr =~ /(Define|Ext|Extend|Override|Type) [(] (?:'(.+?)')? [)]/smxx ) {
             my ( $attr, $val ) = ( $1, $2 );
 
             no strict qw[refs];
 
-            for my $sym ( values %{"$pkg\::"} ) {
-                if ( *{$sym}{CODE} && *{$sym}{CODE} == $ref ) {
-                    my $sub = *{$sym}{NAME};
-
-                    if ( $sub =~ s/\AEXT_//sm ) {
-                        ${"$pkg\::_EXT_MAP"}->{$sub}->{ lc $attr } = $val;
-                    }
-                    else {
-                        push @bad, $attr;
-                    }
-
-                    last;
-                }
-            }
+            ${"$pkg\::_EXT_MAP"}->{$ref}->{ lc $attr } = $val;
         }
         else {
             push @bad, $attr;

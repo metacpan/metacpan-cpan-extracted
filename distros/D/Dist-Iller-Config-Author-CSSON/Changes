@@ -1,6 +1,18 @@
 Revision history for Dist-Iller-Config-Author-Csson
 
-0.0321 2018-04-22 10:24:57 UTC
+0.0322 2018-06-29 22:27:23 UTC
+ [Config Changes]
+ - Bump some prereqs.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 5 insertions(+), 5 deletions(-)
+ - (dev req) ~ Dist::Zilla 6.010 --> 6.012
+ - (dev req) ~ Dist::Zilla::Plugin::Git 2.041 --> 2.045
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors 0.030 --> 0.034
+ - (dev req) ~ Dist::Zilla::Plugin::PromptIfStale 0.054 --> 0.055
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0321 --> 0.0322
+
+0.0321 2018-04-22T10:24:57Z UTC
  [Config Changes]
  - Move [PromptIfStale] to build phase.
 

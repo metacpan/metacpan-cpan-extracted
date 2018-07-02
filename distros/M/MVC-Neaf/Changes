@@ -1,5 +1,9 @@
 Revision history for MVC-Neaf
 
+0.26    Sun Jun 10 2018
+        - API BREAK rework load_resources, @@ foo.tpl view=TT now supported
+        - TST Improve coverage, add tests, refactor things
+
 0.2501  Sun Jun 3 2018
         - API BREAK Restrict characters for path, in particular ":" (a warning only)
         - BUG Understand double slashes in URLs

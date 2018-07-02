@@ -1,18 +1,20 @@
 package DBIx::Array;
 use strict;
 use warnings;
-use base qw{Package::New};
+use File::Basename qw{basename};
+use Tie::Cache;
 use Data::Dumper qw{Dumper};
+use List::MoreUtils qw(mesh);
 use List::Util qw(sum);
 use DBI;
 use DBIx::Array::Session::Action;
 
-our $VERSION='0.49';
+our $VERSION='0.59';
 our $PACKAGE=__PACKAGE__;
 
 =head1 NAME
 
-DBIx::Array - This module is a wrapper around DBI with array interfaces
+DBIx::Array - DBI Wrapper with Perl style data structure interfaces
 
 =head1 SYNOPSIS
 
@@ -36,6 +38,50 @@ With stored connection information from a File
 This module provides a Perl data structure interface for Structured Query Language (SQL).  This module is for people who truly understand SQL and who understand Perl data structures.  If you understand how to modify your SQL to meet your data requirements then this module is for you.
 
 This module is used to connect to Oracle 10g and 11g using L<DBD::Oracle> on both Linux and Win32, MySQL 4 and 5 using L<DBD::mysql> on Linux, Microsoft SQL Server using L<DBD::Sybase> on Linux and using L<DBD::ODBC> on Win32 systems, and PostgreSQL using L<DBD::Pg> in a 24x7 production environment.  Tests are written against L<DBD::CSV> and L<DBD::XBase>.
+
+=head2 CONVENTIONS
+
+=over
+
+=item Methods are named "type + data structure".
+
+=over
+
+=item Methods that are type "sql" use the passed SQL to hit the database.
+
+=item Methods that are type "abs" use L<SQL::Abstract> to build the SQL to hit the database.
+
+=back
+
+=item Methods data structures are:
+
+=over
+
+=item scalar which is a single value the value of the first line first column.
+
+=item array which is a flatten list of values from all rows.
+
+=item arrayarray which is an array of array references
+
+=item arrayhash which is an array of hash references (works best when used with case sensitive column aliases)
+
+=item arrayarrayname which is an array of array references with the first row being the column names passed from the database
+
+=item arrayhashname which is an array of hash references with the first row being the column names passed from the database
+
+=back
+
+=item Methods are context sensitive
+
+=over
+
+=item Methods in list context return a list e.g. (), ([],[],[],...), ({},{},{},...)
+
+=item Methods in scalar context return an array reference e.g. [], [[],[],[],...], [{},{},{},...]
+
+=back
+
+=back
 
 =head1 USAGE
 
@@ -66,7 +112,23 @@ Bless directly into a class
 
 =cut
 
-#See Package::New->new
+sub new {
+  my $this=shift;
+  my $class=ref($this) || $this;
+  my $self={};
+  bless $self, $class;
+  $self->initialize(@_);
+  return $self;
+}
+
+=head2 initialize
+
+=cut
+
+sub initialize {
+  my $self=shift;
+  %$self=@_;
+}
 
 =head1 METHODS (Properties)
 
@@ -122,6 +184,7 @@ Examples:
 
 sub connect {
   my $self=shift;
+  local $0=sprintf("perl:%s", basename($0)); #Force DBD::Oracle to show "perl:script@host" in v$session.program instead of "perl@host"
   my $dbh=DBI->connect(@_);
   $self->dbh($dbh);
   CORE::delete $self->{'action'} if exists $self->{'action'};
@@ -154,6 +217,7 @@ Wrapper around dbh->commit
 
 sub commit {
   my $self=shift;
+  local $self->dbh->{'AutoCommit'} = 0;
   return $self->dbh->commit;
 }
 
@@ -172,18 +236,50 @@ sub rollback {
 
 =head2 prepare
 
-Wrapper around dbh->prepare with a local cache.
+Wrapper around dbh->prepare with a L<Tie::Cache> cache.
 
-  my $sth=$dbh->prepare($sql);
+  my $sth=$dbx->prepare($sql);
 
 =cut
 
 sub prepare {
   my $self  = shift;
   my $sql   = shift;
-  my $cache = $self->{'_prepared'} ||= {};
-  my $sth   = $cache->{$sql}       ||= $self->dbh->prepare($sql) or die($self->errstr);
+  my $sth;
+  if ($self->prepare_max_count > 0) {
+    my $cache = $self->{'_prepared'} ||= $self->_prepare_tie;       #orisahash
+    $sth      = $cache->{$sql}       ||= $self->dbh->prepare($sql); #orisacache
+  } else {
+    $sth      = $self->dbh->prepare($sql);
+  }
+  die($self->errstr) unless $sth;
   return $sth;
+}
+
+sub _prepare_tie {
+  my $self=shift;
+  my $hash = {};
+  tie %$hash, 'Tie::Cache', {MaxCount => $self->prepare_max_count};
+  return $hash;
+}
+
+=head2 prepare_max_count
+
+Maximum number of prepared statements to keep in the cache.
+
+  $dbx->prepare_max_count(128); #default
+  $dbx->prepare_max_count(0);   #disabled
+
+=cut
+
+sub prepare_max_count {
+  my $self=shift;
+  if (@_) {
+    $self->{"prepare_max_count"}=shift;
+    CORE::delete $self->{'_prepared'}; #clear cache if we switch handles
+  }
+  $self->{"prepare_max_count"}=128 unless defined $self->{"prepare_max_count"};
+  return $self->{"prepare_max_count"};
 }
 
 =head2 AutoCommit
@@ -268,7 +364,7 @@ Note: In true Perl fashion extra hash binds are ignored.
 Scalar references are passed in and out with a hash bind.
 
   my $inout=3;
-  $dbx->execute("BEGIN :inout := :inout * 2; END;", {inout=>\$inout});
+  $dbx->sqlexecute("BEGIN :inout := :inout * 2; END;", {inout=>\$inout});
   print "$inout\n";  #$inout is 6
 
 Direct Plug-in for L<SQL::Abstract> but no column alias support.
@@ -375,6 +471,24 @@ sub sqlhash {
   my $self=shift;
   my $rows=$self->sqlarrayarray(@_);
   my @rows=map {$_->[0], $_->[1]} @$rows;
+  return wantarray ? @rows : {@rows};
+}
+
+=head2 sqlhashhash
+
+Returns a hash where the keys are the values of the first column and the values are a hash reference of all (including the key) column values.
+
+  my $hash = $dbx->sqlhashhash($sql, @parameters); #returns {$=>{}, $=>{}, ...}
+  my %hash = $dbx->sqlhashhash($sql, @parameters); #returns ($=>{}, $=>{}, ...)
+  my @hash = $dbx->sqlhashhash($sql, @parameters); #returns ($=>{}, $=>{}, ...) #ordered
+
+=cut
+
+sub sqlhashhash {
+  my $self   = shift;
+  my $rows   = $self->sqlarrayarrayname(@_);
+  my $header = shift @$rows;
+  my @rows   = map {$_->[0] => {mesh @$header, @$_}} @$rows; #TODO remove mem copy
   return wantarray ? @rows : {@rows};
 }
 
@@ -528,8 +642,8 @@ sub _sqlarrayhash {
 
 Returns the SQL result as an array of blessed hash objects in to the $class namespace.
 
-  my $array=$dbx->sqlarrayobject($class, $sql,  @parameters); #returns (bless({}, $class), ...)
-  my @array=$dbx->sqlarrayobject($class, $sql,  @parameters); #returns [bless({}, $class), ...]
+  my $array=$dbx->sqlarrayobject($class, $sql,  @parameters); #returns [bless({}, $class), ...]
+  my @array=$dbx->sqlarrayobject($class, $sql,  @parameters); #returns (bless({}, $class), ...)
   my ($object)=$dbx->sqlarrayobject($class, $sql,  {id=>$id}); #$object is bless({}, $class)
 
 =cut
@@ -587,11 +701,16 @@ sub sqlarrayarraynamesort {
 
 =head1 METHODS (Read) - SQL::Abstract
 
+Please note the "abs" API is a 100% pass through to L<SQL::Abstract>.  Please reference the L<SQL::Abstract> documentation for syntax assistance with that API.
+
 =head2 abscursor
 
 Returns the prepared and executed SQL cursor.
 
   my $sth=$dbx->abscursor($table, \@columns, \%where, \@order);
+  my $sth=$dbx->abscursor($table, \@columns, \%where);          #no order required defaults to storage
+  my $sth=$dbx->abscursor($table, \@columns);                   #no where required defaults to all
+  my $sth=$dbx->abscursor($table);                              #no columns required defaults to '*' (all)
 
 =cut
 
@@ -603,6 +722,8 @@ sub abscursor {
 =head2 absscalar
 
 Returns the first row first column value as a scalar.
+
+This works great for selecting one value.
 
   my $scalar=$dbx->absscalar($table, \@columns, \%where, \@order); #returns $
 
@@ -617,7 +738,7 @@ sub absscalar {
 
 Returns the SQL result as a array.
 
-This works great for selecting one value.
+This works great for selecting one column from a table or selecting one row from a table.
 
   my @array=$dbx->absarray($table, \@columns, \%where, \@order); #returns ()
   my $array=$dbx->absarray($table, \@columns, \%where, \@order); #returns []
@@ -642,6 +763,21 @@ sub abshash {
   my $self=shift;
   return $self->sqlhash($self->abs->select(@_));
 }
+
+=head2 abshashhash
+
+Returns a hash where the keys are the values of the first column and the values are a hash reference of all (including the key) column values.
+
+  my $hash=$dbx->abshashhash($table, \@columns, \%where, \@order); #returns {}
+  my %hash=$dbx->abshashhash($table, \@columns, \%where, \@order); #returns ()
+
+=cut
+
+sub abshashhash {
+  my $self=shift;
+  return $self->sqlhashhash($self->abs->select(@_));
+}
+
 
 =head2 absarrayarray
 
@@ -687,7 +823,7 @@ sub absarrayhash {
 
 =head2 absarrayhashname
 
-Returns the SQL result as an array or array ref of hash references ({},{},...) or [{},{},...]
+Returns the SQL result as an array or array ref of hash references ({},{},...) or [{},{},...] where the first row contains an array reference to the column names.
 
   my $array=$dbx->absarrayhashname($table, \@columns, \%where, \@order); #returns [[],{},{},...]
   my @array=$dbx->absarrayhashname($table, \@columns, \%where, \@order); #returns ([],{},{},...)
@@ -703,8 +839,8 @@ sub absarrayhashname {
 
 Returns the SQL result as an array of blessed hash objects in to the $class namespace.
 
-  my $array=$dbx->absarrayobject($class, $table, \@columns, \%where, \@order); #returns (bless({}, $class), ...)
-  my @array=$dbx->absarrayobject($class, $table, \@columns, \%where, \@order); #returns [bless({}, $class), ...]
+  my $array=$dbx->absarrayobject($class, $table, \@columns, \%where, \@order); #returns [bless({}, $class), ...]
+  my @array=$dbx->absarrayobject($class, $table, \@columns, \%where, \@order); #returns (bless({}, $class), ...)
 
 =cut
 
@@ -772,19 +908,20 @@ Note: Some Oracle clients do not support row counts on delete instead the value 
 
 *delete=\&update;
 
-=head2 execute, exec
+=head2 sqlexecute, execute, exec
 
 Executes stored procedures.
 
   my $out;
-  my $return=$dbx->execute($sql, $in, \$out);            #pass in/out vars as scalar reference
-  my $return=$dbx->execute($sql, [$in, \$out]);
-  my $return=$dbx->execute($sql, {in=>$in, out=>\$out});
+  my $return=$dbx->sqlexecute($sql, $in, \$out);            #pass in/out vars as scalar reference
+  my $return=$dbx->sqlexecute($sql, [$in, \$out]);
+  my $return=$dbx->sqlexecute($sql, {in=>$in, out=>\$out});
 
-Note: Currently sqlupdate, sqlinsert, sqldelete, and execute all point to the same method.  This may change in the future if we need to change the behavior of one method.  So, please use the correct method name for your function.
+Note: Currently sqlupdate, sqlinsert, sqldelete, and sqlexecute all point to the same method.  This may change in the future if we need to change the behavior of one method.  So, please use the correct method name for your function.
 
 =cut
 
+*sqlexecute=\&update;
 *execute=\&update;
 *exec=\&update;   #deprecated
 
@@ -836,7 +973,7 @@ sub absdelete {
 Insert records in bulk.
 
   my @arrayarray=(
-                  [data1, $data2, $data3, $data4, ...],
+                  [$data1, $data2, $data3, $data4, ...],
                   [@row_data_2],
                   [@row_data_3], ...
                  );
@@ -845,17 +982,51 @@ Insert records in bulk.
 =cut
 
 sub bulksqlinsertarrayarray {
-  my $self         = shift;
-  my $sql          = shift or die('Error: sql required.');
-  my $arrayarray   = shift or die('Error: array of array references required.');
-  my $sth          = $self->prepare($sql);
-  my $size         = @$arrayarray;
-  my @tuple_status = ();
-  my $count        = $sth->execute_for_fetch( sub {shift @$arrayarray}, \@tuple_status);
-  unless ($count == $size) {
-    warn map {"$_\n"} @tuple_status; #TODO better error trapping...
+  my $self              = shift;
+  my $sql               = shift or die('Error: sql required.');
+  my $arrayarray        = shift or die('Error: array of array references required.');
+  my $sth               = $self->prepare($sql);
+  my $rows              = 0;
+  my $size              = @$arrayarray;
+  my @tuple_status      = ();
+  my ($tupples, $count) = $sth->execute_for_fetch( sub {shift @$arrayarray}, \@tuple_status);
+  #print Dumper \@tuple_status, $tupples, $count;
+  if (not defined $count) { #driver does not support count yet
+    foreach my $status (@tuple_status) {
+      if (ref($status) eq "ARRAR") {
+        warn($status->[1]);
+      } elsif ($status == -1) {
+        $rows++; #no error assume 1 row inserted.
+      } else {
+        warn(Dumper $status);
+      }
+    }
+    $count=$rows;
   }
   return $count;
+}
+
+=head2 bulksqlinsertarrayhash
+
+Insert records in bulk.
+
+  my @columns   = ("Col1", "Col2", "Col3", "Col4", ...);                         #case sensitive with respect to @arrayhash
+  my @arrayhash = (
+                   {C0l1=>data1, Col2=>$data2, Col3=>$data3, Col4=>$data4, ...}, #extra hash items ignored when sliced using @columns
+                   \%row_hash_data_2,
+                   \%row_hash_data_3, ...
+                  );
+  my $count     = $dbx->bulksqlinsertarrayhash($sql, \@columns, \@arrayhash);
+
+=cut
+
+sub bulksqlinsertarrayhash {
+  my $self       = shift;
+  my $sql        = shift or die("Error: SQL required.");
+  my $columns    = shift or die("Error: columns array reference required.");
+  my $arrayhash  = shift or die("Error: array of hash references required.");
+  my @arrayarray = map {my %hash=%$_; my @slice=@hash{@$columns}; \@slice} @$arrayhash;
+  return $self->bulksqlinsertarrayarray($sql, \@arrayarray);
 }
 
 =head2 bulksqlinsertcursor
@@ -870,7 +1041,7 @@ Step 2 insert in to table 2 in database 2
 
   my $count=$dbx2->bulksqlinsertcursor($sql, $sth1);
 
-Note: If you are inside a single database, it is much more efficient to use insert from select syntax. As there is no need for data to be transferred between the server and the client.
+Note: If you are inside a single database, it is much more efficient to use insert from select syntax as no data needs to be transferred to and from the client.
 
 =cut
 
@@ -902,15 +1073,18 @@ Update records in bulk.
 =cut
 
 sub bulksqlupdatearrayarray {
-  my $self         = shift;
-  my $sql          = shift or die('Error: sql required.');
-  my $arrayarray   = shift or die('Error: array of array references required.');
-  my $sth          = $self->prepare($sql);
-  my $size         = @$arrayarray;
-  my @tuple_status = ();
-  my $noerror      = $sth->execute_for_fetch( sub {shift @$arrayarray}, \@tuple_status);
-  warn("Warning: Atempted $size updates but only $noerror where successful.") unless $size == $noerror;
-  my $count        = sum(0, grep {$_ > 0} @tuple_status);
+  my $self              = shift;
+  my $sql               = shift or die('Error: sql required.');
+  my $arrayarray        = shift or die('Error: array of array references required.');
+  my $sth               = $self->prepare($sql);
+  my $size              = @$arrayarray;
+  my @tuple_status      = (); #pass to set $tupples
+  my ($tupples, $count) = $sth->execute_for_fetch( sub {shift @$arrayarray}, \@tuple_status);
+  warn("Warning: Atempted $size transactions but only $tupples where successful.") unless $size == $tupples;
+  #warn Dumper \@tuple_status;
+  unless (defined($count) and $count >= 0) {
+    $count = sum(0, grep {$_ > 0} grep {not ref($_)} @tuple_status);
+  }
   return $count;
 }
 
@@ -945,7 +1119,7 @@ sub bulkabsinsertarrayarray {
 
 Insert records in bulk.
 
-  my @columns=("Col1", "Col2", "Col3", "Col4", ...);                           #case sensative with respect to @arrayhash
+  my @columns=("Col1", "Col2", "Col3", "Col4", ...);                           #case sensitive with respect to @arrayhash
   my @arrayhash=(
                  {C0l1=>data1, Col2=>$data2, Col3=>$data3, Col4=>$data4, ...}, #extra hash items ignored when sliced using @columns
                  \%row_hash_data_2,
@@ -978,7 +1152,7 @@ Step 2 insert in to table 2 in database 2
 
   my $count=$dbx2->bulkabsinsertcursor($table2, \@columns, $sth1); #if your DBD/API does not support column alias support
 
-Note: If you are inside a single database, it is much more efficient to use insert from select syntax. As no data needs to be transferred to and from the client.
+Note: If you are inside a single database, it is much more efficient to use insert from select syntax as no data needs to be transferred to and from the client.
 
 =cut
 
@@ -1031,7 +1205,7 @@ sub bulkabsupdatearrayarray {
   return $self->bulksqlupdatearrayarray($sql, $arrayarray);
 }
 
-#head2 _bulkinsert_sql
+#head2 _bulkupdate_sql
 #
 #Our own method since SQL::Abstract does not support ordered column values
 #
@@ -1099,7 +1273,7 @@ sub module {
   if (@_) {
     my $module=shift;
     my $action=shift;
-    $self->execute($self->_set_module_sql, $module, $action);
+    $self->sqlexecute($self->_set_module_sql, $module, $action);
   }
   if (defined wantarray) {
     return $self->sqlscalar($self->_sys_context_userenv_sql, 'MODULE');
@@ -1109,10 +1283,10 @@ sub module {
 }
 
 sub _set_module_sql {
-  return qq{
-            --Script: $0
-            --Package: $PACKAGE
-            --Method: _set_module_action_sql
+  return qq{/* be655786-bcbe-11e5-8338-005056a31307 */
+            /* Script: $0 */
+            /* Package: $PACKAGE */
+            /* Method: _set_module_sql */
             BEGIN
               DBMS_APPLICATION_INFO.set_module(module_name => ?, action_name => ?);
             END;
@@ -1138,7 +1312,7 @@ sub client_info {
   return unless $self->dbms_name eq 'Oracle';
   if (@_) {
     my $text=shift;
-    $self->execute($self->_set_client_info_sql, $text);
+    $self->sqlexecute($self->_set_client_info_sql, $text);
   }
   if (defined wantarray) {
     return $self->sqlscalar($self->_sys_context_userenv_sql, 'CLIENT_INFO');
@@ -1148,10 +1322,10 @@ sub client_info {
 }
 
 sub _set_client_info_sql {
-  return qq{
-            --Script: $0
-            --Package: $PACKAGE
-            --Method: _action_sql
+  return qq{/* d04d0138-bcbe-11e5-b0e3-005056a31307 */
+            /* Script: $0 */
+            /* Package: $PACKAGE */
+            /* Method: _set_client_info_sql */
             BEGIN
               DBMS_APPLICATION_INFO.set_client_info(client_info => ?);
             END;
@@ -1178,7 +1352,7 @@ sub action {
   return unless $self->dbms_name eq 'Oracle';
   if (@_) {
     my $text=shift;
-    $self->execute($self->_set_action_sql, $text);
+    $self->sqlexecute($self->_set_action_sql, $text);
   }
   if (defined wantarray) {
     return $self->sqlscalar($self->_sys_context_userenv_sql, 'ACTION');
@@ -1188,10 +1362,10 @@ sub action {
 }
 
 sub _set_action_sql {
-  return qq{
-            --Script: $0
-            --Package: $PACKAGE
-            --Method: _action_sql
+  return qq{/* e682f1a6-bcbe-11e5-bd3e-005056a31307 */
+            /* Script: $0 */
+            /* Package: $PACKAGE */
+            /* Method: _set_action_sql */
             BEGIN
               DBMS_APPLICATION_INFO.set_action(action_name => ?);
             END;
@@ -1218,7 +1392,7 @@ sub client_identifier {
   return unless $self->dbms_name eq 'Oracle';
   if (@_) {
     my $text=shift;
-    $self->execute($self->_set_client_identifier_sql, $text);
+    $self->sqlexecute($self->_set_client_identifier_sql, $text);
   }
   if (defined wantarray) {
     return $self->sqlscalar($self->_sys_context_userenv_sql, 'CLIENT_IDENTIFIER');
@@ -1228,10 +1402,10 @@ sub client_identifier {
 }
 
 sub _set_client_identifier_sql {
-  return qq{
-            --Script: $0
-            --Package: $PACKAGE
-            --Method: _client_identifier_sql
+  return qq{/* f8226e6e-bcbe-11e5-91b8-005056a31307 */
+            /* Script: $0 */
+            /* Package: $PACKAGE */
+            /* Method: _set_client_identifier_sql */
             BEGIN
               DBMS_SESSION.SET_IDENTIFIER(client_id => ?);
             END;
@@ -1239,9 +1413,10 @@ sub _set_client_identifier_sql {
 }
 
 sub _sys_context_userenv_sql {
-  return qq{
-            --Script: $0
-            --Package: $PACKAGE
+  return qq{/* 09648e1e-bcbf-11e5-916a-005056a31307 */
+            /* Script: $0 */
+            /* Package: $PACKAGE */
+            /* Method: _sys_context_userenv_sql */
             SELECT sys_context('USERENV',?)
               FROM SYS.DUAL
            };
@@ -1285,7 +1460,7 @@ The full text of the license can be found in the LICENSE file included with this
 
 =head2 The Competition
 
-L<DBIx::DWIW>, L<DBIx::Wrapper>, L<DBIx::Simple>, L<Data::Table::fromSQL>, L<DBIx::Wrapper::VerySimple>, L<DBIx::Raw>
+L<DBIx::DWIW>, L<DBIx::Wrapper>, L<DBIx::Simple>, L<Data::Table::fromSQL>, L<DBIx::Wrapper::VerySimple>, L<DBIx::Raw>, L<Dancer::Plugin::Database> quick_*
 
 =head2 The Building Blocks
 

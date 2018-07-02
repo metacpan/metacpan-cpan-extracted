@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -22,15 +20,19 @@ package MongoDB::Role::_DatabaseOp;
 # and a BSON codec.  This is likely a "base role" for all operations.
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo::Role;
 
 use MongoDB::_Types qw(
+    Boolish
     BSONCodec
+    ClientSession
+    Stringish
 );
 use Types::Standard qw(
-    Str
+    CodeRef
+    Maybe
 );
 
 use namespace::clean;
@@ -44,7 +46,28 @@ has bson_codec => (
 has db_name => (
     is       => 'ro',
     required => 1,
-    isa      => Str,
+    isa      => Stringish,
+);
+
+# required, but allowed to be undef so we're sure this gets wired up
+# correctly through all database ops.
+has monitoring_callback => (
+    is       => 'ro',
+    required => 1,
+    isa      => Maybe[CodeRef],
+);
+
+has session => (
+    is => 'ro',
+    required => 0,
+    isa => Maybe[ClientSession],
+);
+
+# set during retryable writes on supported operations
+has retryable_write => (
+    is      => 'rw',
+    isa     => Boolish,
+    default => 0,
 );
 
 1;

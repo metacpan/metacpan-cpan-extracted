@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 
 use Config;
-use 5.006;
+use 5.008;
 
 $defines = $] < 5.008 ? "-DOLDPERL" : "-DNEWPERL";
 

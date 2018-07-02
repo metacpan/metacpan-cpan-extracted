@@ -1,5 +1,19 @@
 Summary of important user-visible changes for Bio-Tools-Phylo-PAML
 ------------------------------------------------------------------
 
+1.7.3     2018-07-01 13:35:29+01:00 Europe/London
+  * Bio::Installer::PAML has been removed.  Not only did it no longer
+    work, it was also unsecure.  Either install PAML via your system
+    package manager, or download it from upstream, currently at
+    http://abacus.gene.ucl.ac.uk/software/paml.html
+
+  * Check for the presence of paml programs now happens during build
+    instead of during the test phase.  This avoids failure reports
+    from CPAN Testers.
+
+  * Fixed reading of results for at least codeml and yno00 in cases
+    where next_result was previously returning undef.  May be specific
+    to PAML version 4.8 and 4.9 (current PAML version).
+
 1.7.2     2017-09-11 19:11:43+01:00 Europe/London
   * First release after split from bioperl-live and bioperl-run.

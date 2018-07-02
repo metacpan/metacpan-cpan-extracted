@@ -140,7 +140,7 @@ sub sign_RS512 {
 sub get_public_key {
     my ($self) = @_;
 
-    Module::Load::load('Crypt::Perl::RSA::PublicKey');
+    require Crypt::Perl::RSA::PublicKey;
 
     return Crypt::Perl::RSA::PublicKey->new( {
         modulus => $self->{'modulus'},
@@ -151,7 +151,7 @@ sub get_public_key {
 sub get_struct_for_private_jwk {
     my ($self) = @_;
 
-    Module::Load::load('MIME::Base64');
+    require MIME::Base64;
 
     my $jwk = $self->get_struct_for_public_jwk();
 
@@ -217,7 +217,7 @@ sub _sign {
     my $sig;
 
     if ($scheme eq 'PKCS1_v1_5') {
-        Module::Load::load('Crypt::Perl::RSA::PKCS1_v1_5');
+        require Crypt::Perl::RSA::PKCS1_v1_5;
 
         my $sig_length = $self->modulus_byte_length();
 
@@ -239,7 +239,7 @@ sub _sign {
         substr( $sig, 0, 0 ) = "\0" x ($sig_length - length $sig);
     }
     else {
-        die Crypt::Perl::X::create('Generic', "Unknown signature scheme: “$scheme”");
+        die Crypt::Perl::X::create('Generic', "Unknown RSA signature scheme: “$scheme”");
     }
 
     return $sig;

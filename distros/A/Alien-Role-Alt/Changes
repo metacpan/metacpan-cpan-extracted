@@ -1,5 +1,10 @@
 Revision history for Alien-Role-Alt
 
+0.04      2018-06-25 05:38:15 -0400
+  - Alien::Role::Alt is now an empty role;
+    alt capability is now in Alien::Build core
+    this role remains for compatibility
+
 0.03      2017-08-12 06:39:53 -0400
   - Add IRC in metadata
 

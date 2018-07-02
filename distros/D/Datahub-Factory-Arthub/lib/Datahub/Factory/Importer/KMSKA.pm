@@ -2,7 +2,7 @@ package Datahub::Factory::Importer::KMSKA;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '0.97';
+our $VERSION = '0.98';
 
 use Moo;
 use Catmandu;
@@ -21,15 +21,19 @@ has generate_temp_tables => (is => 'ro', default => 1);
 sub _build_importer {
     my $self = shift;
     my $dsn = sprintf('dbi:mysql:%s', $self->db_name);
+
     # Add indices
     $self->logger->info('Creating indices on TMS tables.');
-    Datahub::Factory::Importer::KMSKA::TMS::Index->new(
+    my $index = Datahub::Factory::Importer::KMSKA::TMS::Index->new(
         db_host => $self->db_host,
         db_name => $self->db_name,
         db_user => $self->db_user,
         db_password => $self->db_password
     );
-    my $query = 'select * from vgsrpObjTombstoneD_RO;';
+
+    $index->add_indices();
+
+    my $query = 'select * from CITvgsrpObjTombstoneD_RO;';
     my $importer = Catmandu->importer('DBI', dsn => $dsn, host => $self->db_host, user => $self->db_user, password => $self->db_password, query => $query, encoding => ':iso-8859-1');
 
     if ($self->generate_temp_tables) {
@@ -52,6 +56,8 @@ sub prepare {
     $self->__subjects();
     $self->logger->info('Adding "pids" temporary table.');
     $self->__pids();
+    $self->logger->info('Adding "constituents" temporary table.');
+    $self->__constituents();
 }
 
 sub prepare_call {
@@ -110,6 +116,20 @@ sub merge_call {
     }
 }
 
+sub __constituents {
+    my $self = shift;
+    $self->prepare_call('
+        SELECT ConstituentID AS _id,
+            AlphaSort,
+            DisplayName,
+            BeginDate,
+            EndDate,
+            BeginDateISO,
+            EndDateISO
+        FROM Constituents
+    ', 'constituents');
+}
+
 sub __classifications {
     my $self = shift;
     $self->prepare_call('select ClassificationID as _id, Classification as term from Classifications', 'classifications');
@@ -123,13 +143,22 @@ sub __period {
 sub __pids {
     my $self = shift;
     # key is object_number
-    $self->prepare_call('select ObjectNumber as _id, workPidURI as workPid, dataPidURI as dataPid from Cit_KMSKApids_conversie_gecorrigeerd', 'Cit_KMSKApids_conversie_gecorrigeerd');
+
+    $self->prepare_call("SELECT o.ObjectNumber as _id, pids.* FROM CITvgsrpObjTombstoneD_RO o, 
+(select
+    ID,
+    SUBSTRING_INDEX(GROUP_CONCAT(FieldValue), ',', 1) AS dataPid,
+    SUBSTRING_INDEX(SUBSTRING_INDEX(GROUP_CONCAT(FieldValue), ',', 2), ',', -1) AS representationPid,
+    SUBSTRING_INDEX(SUBSTRING_INDEX(GROUP_CONCAT(FieldValue), ',', -3), ',', -1) AS workPid
+from UserFieldXrefs 
+WHERE userFieldID IN (44, 46, 48) GROUP BY ID ORDER BY userFieldID) pids WHERE o.ObjectID = pids.ID", 'Cit_KMSKApids_conversie_gecorrigeerd');
+
 }
 
 sub __dimensions {
     my $self = shift;
     my $query = "SELECT o.ObjectID as objectid, d.Dimension as dimension, t.DimensionType as type, e.Element as element, u.UnitName as unit
-    FROM vgsrpObjTombstoneD_RO o
+    FROM CITvgsrpObjTombstoneD_RO o
     LEFT JOIN
         DimItemElemXrefs x ON x.ID = o.ObjectID
     INNER JOIN
@@ -150,7 +179,7 @@ sub __dimensions {
 sub __subjects {
     my $self = shift;
     my $query = "SELECT o.ObjectID as objectid, t.Term as subject
-    FROM Terms t, vgsrpObjTombstoneD_RO o, ThesXrefs x, ThesXrefTypes y
+    FROM Terms t, CITvgsrpObjTombstoneD_RO o, ThesXrefs x, ThesXrefTypes y
     WHERE
     x.TermID = t.TermID and
     x.ID = o.ObjectID and

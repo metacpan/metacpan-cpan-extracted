@@ -12,7 +12,7 @@ use Config;
 use base qw( Module::Build );
 
 # ABSTRACT: Build Perl extensions in C with FFI
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 __PACKAGE__->add_property( ffi_libtest_dir =>
@@ -27,7 +27,7 @@ __PACKAGE__->add_property( ffi_libtest_optional =>
   default => 1,
 );
 
-__PACKAGE__->add_property( ffi_source_dir => 
+__PACKAGE__->add_property( ffi_source_dir =>
   default => [ 'ffi' ],
 );
 
@@ -55,7 +55,7 @@ sub new
     print STDERR "This distribution requires a compiler\n";
     exit;
   }
-  
+
   if(-d $self->ffi_libtest_dir->[0] && !$self->ffi_libtest_optional && !$have_compiler)
   {
     print STDERR "This distribution requires a compiler\n";
@@ -71,15 +71,15 @@ my @cpp_extensions = qw( c cpp cxx cc c++ );
 sub ffi_have_compiler
 {
   my($self) = @_;
-  
+
   my $cpp = 0;
-  
+
   foreach my $dir (@{ $self->ffi_source_dir }, @{ $self->ffi_libtest_dir })
   {
     next unless -d $dir;
     $cpp = 1 if scalar map { bsd_glob("$dir/*.$_") } @cpp_extensions;
   }
-  
+
   my $cb = $self->cbuilder;
   $cpp ? $cb->have_cplusplus && $cb->have_compiler : $cb->have_compiler;
 }
@@ -90,12 +90,12 @@ sub _ffi_headers ($$)
   my($self, $dir) = @_;
 
   my @headers;
-  
+
   my @dirs = @$dir;
   push @dirs, grep { -d $_ } ref $self->ffi_include_dir ? @{ $self->ffi_include_dir } : ($self->ffi_include_dir);
 
   push @headers, map { bsd_glob("$_/*.h") } @dirs;
-  
+
   \@headers;
 }
 
@@ -107,7 +107,7 @@ sub _share_dir
 sub _ffi_include_dirs ($$)
 {
   my($self, $dir) = @_;
-  
+
   my @includes = (@$dir);
 
   push @includes, grep { -d $_ } ref $self->ffi_include_dir ? @{ $self->ffi_include_dir } : ($self->ffi_include_dir);
@@ -116,7 +116,7 @@ sub _ffi_include_dirs ($$)
 
   push @includes, ref($self->include_dirs) ? @{ $self->include_dirs } : $self->include_dirs
     if defined $self->include_dirs;
-  
+
   \@includes;
 }
 
@@ -124,9 +124,9 @@ sub _ffi_include_dirs ($$)
 sub ffi_build_dynamic_lib ($$$;$)
 {
   my($self, $dirs, $name, $dest_dir) = @_;
-  
+
   $dest_dir ||= $dirs->[0];
-  
+
   my $header_time = do {
     my @list = sort map { (stat $_)[9] } @{ _ffi_headers $self, $dirs };
     pop @list;
@@ -135,7 +135,7 @@ sub ffi_build_dynamic_lib ($$$;$)
   my $b = $self->cbuilder;
 
   my @obj;
-  
+
   foreach my $dir (@$dirs)
   {
     push @obj,  map {
@@ -199,8 +199,13 @@ sub ffi_build_dynamic_lib ($$$;$)
 
 sub ffi_dlext
 {
-  require Config;
-  $Config::Config{dlext};
+  if($^O eq 'darwin')
+  { ('bundle', 'dylib', 'so' ) }
+  else
+  {
+    require Config;
+    $Config::Config{dlext};
+  }
 }
 
 sub _ffi_libtest_name ()
@@ -213,9 +218,9 @@ sub ACTION_libtest
   my $self = shift;
   _inflate($self);
   my @dirs = @{ $self->ffi_libtest_dir };
-  
+
   return unless -d $dirs[0];
-  
+
   foreach my $dir (@dirs)
   {
     $self->add_to_cleanup(map { "$dir/$_" } qw(
@@ -226,16 +231,16 @@ sub ACTION_libtest
       *.bundle
     ));
   }
-  
+
   my $have_compiler = $self->ffi_have_compiler;
-  
+
   unless($have_compiler)
   {
     print STDERR "libtest directory is included, but not compiler is available\n";
     print STDERR "some tests may fail if they depend on libtest\n";
     return;
   }
-  
+
   $self->ffi_build_dynamic_lib(\@dirs, _ffi_libtest_name);
 }
 
@@ -244,9 +249,9 @@ sub ACTION_ffi
   my $self = shift;
   _inflate($self);
   my @dirs = @{ $self->ffi_source_dir };
-  
+
   return unless -d $dirs[0];
-  
+
   foreach my $dir (@dirs)
   {
     $self->add_to_cleanup(map { "$dir/$_" } qw(
@@ -257,7 +262,7 @@ sub ACTION_ffi
       *.bundle
     ));
   }
-  
+
   unless($self->ffi_have_compiler)
   {
     print STDERR "a compiler is required.\n";
@@ -267,7 +272,7 @@ sub ACTION_ffi
   die "Can't determine module name" unless $self->module_name;
   my @parts = split /::/, $self->module_name;
 
-  my $arch_dir = File::Spec->catdir($self->blib, 'arch', 'auto', @parts);  
+  my $arch_dir = File::Spec->catdir($self->blib, 'arch', 'auto', @parts);
   File::Path::mkpath($arch_dir, 0, oct(777)) unless -d $arch_dir;
 
   my $name = $parts[-1];
@@ -308,7 +313,7 @@ Module::Build::FFI - Build Perl extensions in C with FFI
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -456,16 +461,16 @@ Defined in C<ffi_util.h>
 
 [version 0.04]
 
-This is the L<FFI::Platypus> (prior to version 0.15 it was the 
-L<FFI::Util> version number) version number multiplied by 100 (so it 
+This is the L<FFI::Platypus> (prior to version 0.15 it was the
+L<FFI::Util> version number) version number multiplied by 100 (so it
 would be 4 for 0.04 and 101 for 1.01).
 
 =item FFI_UTIL_EXPORT
 
 [version 0.04]
 
-The appropriate attribute needed to export functions from shared 
-libraries / DLLs.  For now this is only necessary on Windows when using 
+The appropriate attribute needed to export functions from shared
+libraries / DLLs.  For now this is only necessary on Windows when using
 Microsoft Visual C++, but it may be necessary elsewhere in the future.
 
 =back

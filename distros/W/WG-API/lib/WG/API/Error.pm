@@ -8,11 +8,11 @@ WG::API::Error - module for work with API error
 
 =head1 VERSION
 
-Version v0.8.8
+Version v0.9
 
 =cut
 
-our $VERSION = 'v0.8.8';
+our $VERSION = 'v0.9';
 
 =head1 SYNOPSIS
 
@@ -123,7 +123,7 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: GitHub's request tracker (report bugs here)
+=item * RT: Gitlab's request tracker (report bugs here)
 
 L<https://gitlab.com/cynovg/WG-API/issues>
 

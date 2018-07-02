@@ -21,18 +21,14 @@ script.
 
 2. perl Makefile.PL
    make
+   make test
    make install
 
-In rare case when you do cross-compiling for WinCE, you need to edit
-Makefile.PL to reflect your paths, and then invoke as
-  perl -MCross=[your-cross-name] Makefile.PL
-Please see into Makefile.PL for more details on that.
-
 AUTHOR
-    Malcolm Beattie	mbeattie@sable.ox.ac.uk
+    Malcolm Beattie
 
 MAINTAINERS
-    Vadim Konovalov	vkonovalov@peterstar.ru
+    Vadim Konovalov
     Jeff Hobbs
     Gisle Aas
 

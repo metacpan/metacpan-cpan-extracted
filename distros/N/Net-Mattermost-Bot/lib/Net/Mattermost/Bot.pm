@@ -11,9 +11,9 @@ use Mojo::IOLoop;
 use Mojo::UserAgent;
 use Moo;
 use MooX::HandlesVia;
-use Types::Standard qw(ArrayRef HashRef Int Object Str);
+use Types::Standard qw(ArrayRef Bool HashRef Int Object Str);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 ################################################################################
 
@@ -22,6 +22,7 @@ has team_name => (is => 'ro', isa => Str, required => 1);
 has username  => (is => 'ro', isa => Str, required => 1);
 has password  => (is => 'ro', isa => Str, required => 1);
 
+has debug         => (is => 'ro', isa => Bool,    default => 0);
 has ping_interval => (is => 'ro', isa => Int,     default => 15);
 has ssl_opts      => (is => 'ro', isa => HashRef, default => sub { {} });
 has token         => (is => 'rw', isa => Str,     default => '');
@@ -88,7 +89,9 @@ sub handle_message {
     my $output;
 
     if ($content->{event} eq 'hello') {
-        carp sprintf('Sending auth token (token: %s) at %d', $self->token, time());
+        if ($self->debug) {
+            carp sprintf('Sending auth token (token: %s) at %d', $self->token, time());
+        }
 
         $output = {
             seq    => 1,
@@ -126,7 +129,7 @@ sub _start {
     $ua->on('start' => sub {
         my ($ua, $tx) = @_;
 
-        carp 'Started';
+        carp 'Started' if $self->debug;
 
         $tx->req->headers->header($_->[0] => $_->[1]) foreach pairs @{$self->headers};
     });
@@ -141,7 +144,7 @@ sub _start {
         $ping_loop_id = Mojo::IOLoop->recurring($self->ping_interval => sub {
             my $loop = shift;
 
-            carp 'Ping '.time();
+            carp 'Ping '.time() if $self->debug;
 
             $tx->send(encode_json({ seq => ++$last, action => 'ping' }));
         });
@@ -239,7 +242,7 @@ Net::Mattermost::Bot - A base class for Mattermost bots.
 
 =head1 VERSION
 
-0.03
+0.04
 
 =head1 SYNOPSIS
 
@@ -250,6 +253,8 @@ Extend C<Net::Mattermost::Bot> in a C<Moo> or C<Moose> package.
         password  => 'password here',
         team_name => 'team name here',
         base_url  => 'Mattermost server\'s base URL here',
+
+        debug => 1, # For extra WebSocket connection information
     });
 
     $bot->connect();

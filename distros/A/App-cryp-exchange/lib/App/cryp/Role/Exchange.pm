@@ -1,7 +1,7 @@
 package App::cryp::Role::Exchange;
 
-our $DATE = '2018-06-13'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-06-24'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -84,7 +84,7 @@ App::cryp::Role::Exchange - Role for interacting with an exchange
 
 =head1 VERSION
 
-This document describes version 0.009 of App::cryp::Role::Exchange (from Perl distribution App-cryp-exchange), released on 2018-06-13.
+This document describes version 0.010 of App::cryp::Role::Exchange (from Perl distribution App-cryp-exchange), released on 2018-06-24.
 
 =head1 DESCRIPTION
 

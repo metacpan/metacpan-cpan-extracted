@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -20,29 +18,42 @@ use warnings;
 package MongoDB::_Credential;
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 use MongoDB::Error;
 use MongoDB::Op::_Command;
 use MongoDB::_Types qw(
   AuthMechanism
-  Boolish
   NonEmptyStr
 );
 
 use Digest::MD5 qw/md5_hex/;
 use Encode qw/encode/;
 use MIME::Base64 qw/encode_base64 decode_base64/;
+use Safe::Isa;
 use Tie::IxHash;
 use Try::Tiny;
+use MongoDB::_Types qw(
+    Boolish
+);
 use Types::Standard qw(
+  CodeRef
   HashRef
   InstanceOf
+  Maybe
   Str
 );
 
 use namespace::clean -except => 'meta';
+
+# Required so we're sure it's passed explicitly, even if undef, so we don't
+# miss wiring it up.
+has monitoring_callback => (
+    is => 'ro',
+    required => 1,
+    isa => Maybe[CodeRef],
+);
 
 has mechanism => (
     is       => 'ro',
@@ -85,22 +96,46 @@ has _digested_password => (
     builder => '_build__digested_password',
 );
 
-has _scram_client => (
+has _scram_sha1_client => (
     is      => 'lazy',
     isa     => InstanceOf ['Authen::SCRAM::Client'],
-    builder => '_build__scram_client',
+    builder => '_build__scram_sha1_client',
 );
 
-sub _build__scram_client {
+has _scram_sha256_client => (
+    is      => 'lazy',
+    isa     => InstanceOf ['Authen::SCRAM::Client'],
+    builder => '_build__scram_sha256_client',
+);
+
+sub _build__scram_sha1_client {
     my ($self) = @_;
     # loaded only demand as it has a long load time relative to other
     # modules
     require Authen::SCRAM::Client;
-    Authen::SCRAM::Client->VERSION(0.009);
+    Authen::SCRAM::Client->VERSION(0.011);
     return Authen::SCRAM::Client->new(
-        username      => $self->username,
-        password      => $self->_digested_password,
-        skip_saslprep => 1,
+        username                => $self->username,
+        password                => $self->_digested_password,
+        digest                  => 'SHA-1',
+        minimum_iteration_count => 4096,
+        skip_saslprep           => 1,
+    );
+}
+
+sub _build__scram_sha256_client {
+    my ($self) = @_;
+    # loaded only demand as it has a long load time relative to other
+    # modules
+    require Authen::SCRAM::Client;
+    Authen::SCRAM::Client->VERSION(0.007);
+    require Authen::SASL::SASLprep;
+    return Authen::SCRAM::Client->new(
+        username                => $self->username,
+        password                => Authen::SASL::SASLprep::saslprep($self->password),
+        digest                  => 'SHA-256',
+        minimum_iteration_count => 4096,
+        skip_saslprep           => 1,
     );
 }
 
@@ -114,9 +149,9 @@ sub _build_source {
     my ($self) = @_;
     my $mech = $self->mechanism;
     return
-      $mech eq 'DEFAULT' || $mech eq 'MONGODB-CR' || $mech eq 'SCRAM-SHA-1'
-      ? 'admin'
-      : '$external';
+      $mech eq 'MONGODB-X509' || $mech eq 'PLAIN' || $mech eq 'GSSAPI'
+      ? '$external'
+      : 'admin';
 }
 
 #<<< No perltidy
@@ -143,6 +178,12 @@ my %CONSTRAINTS = (
         mechanism_properties => sub { !keys %$_ },
     },
     'SCRAM-SHA-1' => {
+        username             => sub { length },
+        password             => sub { length },
+        source               => sub { length },
+        mechanism_properties => sub { !keys %$_ },
+    },
+    'SCRAM-SHA-256' => {
         username             => sub { length },
         password             => sub { length },
         source               => sub { length },
@@ -181,11 +222,11 @@ sub BUILD {
 }
 
 sub authenticate {
-    my ( $self, $link, $bson_codec ) = @_;
+    my ( $self, $server, $link, $bson_codec ) = @_;
 
     my $mech = $self->mechanism;
     if ( $mech eq 'DEFAULT' ) {
-        $mech = $link->accepts_wire_version(3) ? 'SCRAM-SHA-1' : 'MONGODB-CR';
+        $mech = $self->_get_default_mechanism($server, $link);
     }
     my $method = "_authenticate_$mech";
     $method =~ s/-/_/g;
@@ -223,7 +264,7 @@ sub _authenticate_MONGODB_X509 {
 
     my $username = $self->username;
 
-    if ( !$username && !$link->accepts_wire_version(5) ) {
+    if ( !$username && !$link->supports_x509_user_from_cert ) {
         $username = $link->client_certificate_subject
           or MongoDB::UsageError->throw(
             "Could not extract subject from client SSL certificate");
@@ -292,34 +333,44 @@ sub _authenticate_GSSAPI {
         }
     }
     catch {
-        MongoDB::AuthError->throw("GSSAPI error: $_");
+        my $msg = $_->$_isa("MongoDB::Error") ? $_->message : "$_";
+        MongoDB::AuthError->throw("GSSAPI error: $msg");
     };
 
     return 1;
 }
 
 sub _authenticate_SCRAM_SHA_1 {
-    my ( $self, $link, $bson_codec ) = @_;
+    my $self = shift;
 
-    my $client = $self->_scram_client;
-
-    my ( $msg, $sasl_resp, $conv_id, $done );
-    try {
-        $msg = $client->first_msg;
-        ( $sasl_resp, $conv_id, $done ) =
-          $self->_sasl_start( $link, $bson_codec, $msg, 'SCRAM-SHA-1' );
-        $msg = $client->final_msg($sasl_resp);
-        ( $sasl_resp, $conv_id, $done ) =
-          $self->_sasl_continue( $link, $bson_codec, $msg, $conv_id );
-        $client->validate($sasl_resp);
-        # might require an empty payload to complete SASL conversation
-        $self->_sasl_continue( $link, $bson_codec, "", $conv_id ) if !$done;
-    }
-    catch {
-        MongoDB::AuthError->throw("SCRAM-SHA-1 error: $_");
-    };
+    $self->_scram_auth(@_, $self->_scram_sha1_client, 'SCRAM-SHA-1');
 
     return 1;
+}
+
+sub _authenticate_SCRAM_SHA_256 {
+    my $self = shift;
+
+    $self->_scram_auth(@_, $self->_scram_sha256_client, 'SCRAM-SHA-256');
+
+    return 1;
+}
+
+sub _get_default_mechanism {
+    my ( $self, $server, $link ) = @_;
+
+    if ( my $supported = $server->is_master->{saslSupportedMechs} ) {
+        if ( grep { $_ eq 'SCRAM-SHA-256' } @$supported ) {
+            return 'SCRAM-SHA-256';
+        }
+        return 'SCRAM-SHA-1';
+    }
+
+    if ( $link->supports_scram_sha1 ) {
+        return 'SCRAM-SHA-1';
+    }
+
+    return 'MONGODB-CR';
 }
 
 #--------------------------------------------------------------------------#
@@ -354,6 +405,7 @@ sub _sasl_encode_payload {
     my ( $self, $payload ) = @_;
     $payload = "" unless defined $payload;
     return encode_base64( $payload, "" ) if $self->mechanism eq 'GSSAPI';
+    $payload = encode( "UTF-8", $payload );
     return \$payload;
 }
 
@@ -401,14 +453,36 @@ sub _sasl_send {
     );
 }
 
+sub _scram_auth {
+    my ( $self, $link, $bson_codec, $client, $mech ) = @_;
+
+    my ( $msg, $sasl_resp, $conv_id, $done );
+    try {
+        $msg = $client->first_msg;
+        ( $sasl_resp, $conv_id, $done ) =
+          $self->_sasl_start( $link, $bson_codec, $msg, $mech );
+        $msg = $client->final_msg($sasl_resp);
+        ( $sasl_resp, $conv_id, $done ) =
+          $self->_sasl_continue( $link, $bson_codec, $msg, $conv_id );
+        $client->validate($sasl_resp);
+        # might require an empty payload to complete SASL conversation
+        $self->_sasl_continue( $link, $bson_codec, "", $conv_id ) if !$done;
+    }
+    catch {
+        my $msg = $_->$_isa("MongoDB::Error") ? $_->message : "$_";
+        MongoDB::AuthError->throw("$mech error: $msg");
+    };
+}
+
 sub _send_command {
     my ( $self, $link, $bson_codec, $db_name, $command ) = @_;
 
     my $op = MongoDB::Op::_Command->_new(
-        db_name     => $db_name,
-        query       => $command,
-        query_flags => {},
-        bson_codec  => $bson_codec,
+        db_name             => $db_name,
+        query               => $command,
+        query_flags         => {},
+        bson_codec          => $bson_codec,
+        monitoring_callback => $self->monitoring_callback,
     );
     my $res = $op->execute($link);
     return $res;

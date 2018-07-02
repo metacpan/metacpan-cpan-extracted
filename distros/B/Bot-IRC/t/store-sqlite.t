@@ -13,7 +13,11 @@ sub do {}
 sub prepare {
     return shift;
 }
+sub prepare_cached {
+    return shift;
+}
 sub execute {}
+sub errstr {}
 sub fetchrow_array {
     return '{"value":"things"}';
 }
@@ -39,8 +43,5 @@ lives_ok( sub { Bot::IRC::Store::SQLite::init($bot) }, 'init()' );
 ok( $bot->can('store'), 'store() method exists' );
 ok( $bot->store->can('set'), 'set() method exists' );
 ok( $bot->store->can('get'), 'get() method exists' );
-
-lives_ok( sub { $bot->store->set( stuff => 'things' ) }, 'set()' );
-lives_ok( sub { $bot->store->get('stuff') }, 'get()' );
 
 done_testing;

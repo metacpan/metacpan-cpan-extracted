@@ -78,14 +78,10 @@ around init => sub ( $orig, $self ) {
 
 # AUTHENTICATE
 # parse token, create private token, forward to authenticate_private
-sub authenticate ( $self, $token, $cb ) {
+sub authenticate ( $self, $token ) {
 
     # no auth token provided
-    if ( !defined $token ) {
-        $cb->( bless { app => $self->{app} }, 'Pcore::App::API::Auth' );
-
-        return;
-    }
+    return bless { app => $self->{app} }, 'Pcore::App::API::Auth' if !defined $token;
 
     my ( $token_type, $token_id, $private_token_hash );
 
@@ -96,11 +92,7 @@ sub authenticate ( $self, $token, $cb ) {
         $private_token_hash = eval { sha3_512 encode_utf8( $token->[1] ) . encode_utf8 $token->[0] };
 
         # error decoding token
-        if ($@) {
-            $cb->( bless { app => $self->{app} }, 'Pcore::App::API::Auth' );
-
-            return;
-        }
+        return bless { app => $self->{app} }, 'Pcore::App::API::Auth' if $@;
 
         $token_type = $TOKEN_TYPE_USER_PASSWORD;
 
@@ -124,40 +116,30 @@ sub authenticate ( $self, $token, $cb ) {
         };
 
         # error decoding token
-        if ($@) {
-            $cb->( bless { app => $self->{app} }, 'Pcore::App::API::Auth' );
-
-            return;
-        }
+        return bless { app => $self->{app} }, 'Pcore::App::API::Auth' if $@;
 
         # invalid token type
-        if ( !exists $TOKEN_TYPE->{$token_type} ) {
-            $cb->( bless { app => $self->{app} }, 'Pcore::App::API::Auth' );
-
-            return;
-        }
+        return bless { app => $self->{app} }, 'Pcore::App::API::Auth' if !exists $TOKEN_TYPE->{$token_type};
     }
 
-    $self->authenticate_private( [ $token_type, $token_id, $private_token_hash ], $cb );
-
-    return;
+    return $self->authenticate_private( [ $token_type, $token_id, $private_token_hash ] );
 }
 
-sub authenticate_private ( $self, $private_token, $cb ) {
+sub authenticate_private ( $self, $private_token ) {
 
     # try to find token in cache
     my $auth = $self->{_auth_cache}->{ $private_token->[2] };
 
     # token was cached
-    if ($auth) {
-        $cb->($auth);
+    return $auth if defined $auth;
 
-        return;
-    }
+    my $rouse_cb = Coro::rouse_cb;
 
-    push $self->{_auth_cb_queue}->{ $private_token->[2] }->@*, $cb;
+    my $cache = $self->{_auth_cb_queue};
 
-    return if $self->{_auth_cb_queue}->{ $private_token->[2] }->@* > 1;
+    push $cache->{ $private_token->[2] }->@*, $rouse_cb;
+
+    return Coro::rouse_wait $rouse_cb if $cache->{ $private_token->[2] }->@* > 1;
 
     # authenticate on backend
     my $res = $self->do_authenticate_private($private_token);
@@ -192,13 +174,13 @@ sub authenticate_private ( $self, $private_token, $cb ) {
     }
 
     # call callbacks
-    while ( my $cb = shift $self->{_auth_cb_queue}->{ $private_token->[2] }->@* ) {
+    $cache = delete $cache->{ $private_token->[2] };
+
+    while ( my $cb = shift $cache->@* ) {
         $cb->($auth);
     }
 
-    delete $self->{_auth_cb_queue}->{ $private_token->[2] };
-
-    return;
+    return Coro::rouse_wait $rouse_cb;
 }
 
 1;
@@ -208,7 +190,7 @@ sub authenticate_private ( $self, $private_token, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 114                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 106                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

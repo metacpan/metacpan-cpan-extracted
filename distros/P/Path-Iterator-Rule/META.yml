@@ -13,12 +13,13 @@ build_requires:
   Test::Filename: '0.03'
   Test::More: '0.92'
   lib: '0'
+  parent: '0'
   perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,10 +36,10 @@ no_index:
 provides:
   PIR:
     file: lib/PIR.pm
-    version: '1.012'
+    version: '1.014'
   Path::Iterator::Rule:
     file: lib/Path/Iterator/Rule.pm
-    version: '1.012'
+    version: '1.014'
 requires:
   Carp: '0'
   File::Basename: '0'
@@ -57,12 +58,16 @@ resources:
   bugtracker: https://github.com/dagolden/Path-Iterator-Rule/issues
   homepage: https://github.com/dagolden/Path-Iterator-Rule
   repository: https://github.com/dagolden/Path-Iterator-Rule.git
-version: '1.012'
+version: '1.014'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Diab Jerius <djerius@cfa.harvard.edu>'
+  - 'Edward Betts <edward@4angle.com>'
   - 'Gian Piero Carrubba <gpiero@butterfly.fdc.rm-rf.it>'
   - 'Graham Knop <haarg@cpan.org>'
   - 'Ricardo Signes <rjbs@cpan.org>'
   - 'Slaven Rezic <slaven.rezic@idealo.de>'
   - 'Toby Inkster <tobyink@cpan.org>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

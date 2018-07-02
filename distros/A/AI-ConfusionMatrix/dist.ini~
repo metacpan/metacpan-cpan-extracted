@@ -1,0 +1,41 @@
+name    = AI-ConfusionMatrix
+author  = Vincent Lequertier <vi.le@autistici.org>
+license = Perl_5
+copyright_holder = Vincent Lequertier
+copyright_year   = 2018
+
+version = 0.009
+
+[MetaResources]
+bugtracker.web = http://rt.cpan.org/NoAuth/Bugs.html?AI-ConfusionMatrix
+bugtracker.mailto = bug-ai-confusionmatrix@rt.cpan.org
+repository.url = https://gitlab.com/vi.le/perl-ai-confusionmatrix.git
+repository.web = https://gitlab.com/vi.le/perl-ai-confusionmatrix
+repository.type = git
+
+[AutoPrereqs]
+[ChangelogFromGit]
+file_name   = Changes
+max_age = 730
+[CopyFilesFromBuild]
+# copy = cpanfile
+copy = LICENSE
+copy = Makefile.PL
+copy = README.md
+[GatherDir]
+exclude_filename = cpanfile
+exclude_filename = LICENSE
+exclude_filename = Makefile.PL
+[License]
+[MetaYAML]
+[MetaJSON]
+[MetaProvides::Package]
+[MakeMaker]
+[ManifestSkip]
+[Manifest]
+[PkgVersion]
+[PodSyntaxTests]
+[ReadmeAnyFromPod]
+type = markdown
+filename = README.md
+location = build

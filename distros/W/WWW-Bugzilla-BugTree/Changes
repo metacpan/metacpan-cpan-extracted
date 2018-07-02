@@ -1,7 +1,10 @@
 Revision history for WWW-Bugzilla-BugTree
 
+0.08      2018-06-25 17:00:11 -0400
+  - disable fetch.t as landfill has been completely decomissioned.
+
 0.07      2015-12-17 08:24:12 -0500
-  - Do not test against landfil 4.0 anymore, it is gonners!
+  - Do not test against landfill 4.0 anymore, it is gonners!
   - Use Ref::Util for ref testing
 
 0.06      2015-11-22 15:42:45 -0500

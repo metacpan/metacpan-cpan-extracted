@@ -1,5 +1,5 @@
 package Git::Raw::Stash::Progress;
-$Git::Raw::Stash::Progress::VERSION = '0.80';
+$Git::Raw::Stash::Progress::VERSION = '0.81';
 use strict;
 use warnings;
 use Carp;
@@ -29,7 +29,7 @@ Git::Raw::Stash::Progress - Git stash progress
 
 =head1 VERSION
 
-version 0.80
+version 0.81
 
 =head1 DESCRIPTION
 

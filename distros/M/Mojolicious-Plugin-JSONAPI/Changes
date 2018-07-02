@@ -1,4 +1,8 @@
+1.7       2018-06-24 17:19:35+01:00 Europe/London
+
 1.6       2018-06-08 00:48:57+01:00 Europe/London
+- Fix bug where requested_fields would return all main resource keys in related_fields
+if the namespace was longer than one segment. Thanks pspencer for the bug report!
 
 1.5       2018-06-03 15:24:37+01:00 Europe/London
 - Support nested relationships in requested_resources

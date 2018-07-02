@@ -6,8 +6,10 @@ package # hide from pause
 use 5.010_001;
 use strictures 1;
 
-use Moose;
+use Moo;
 with 'WebService::Braintree::Role::MakeRequest';
+
+use Carp qw(confess);
 
 use WebService::Braintree::Validations qw(verify_params);
 

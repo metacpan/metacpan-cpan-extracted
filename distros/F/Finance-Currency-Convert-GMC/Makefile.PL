@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Perinci::Sub::Property::exit_on_error" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }

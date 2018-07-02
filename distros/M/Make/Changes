@@ -1,9 +1,19 @@
+Changes in 1.2.0
+    Rename pmake script to pure-perl-make to avoid conflicting with the BSD pmake
+    (https://github.com/klp2/Make/issues/6)
+
+Changes in 1.1.5
+    Clean up MANIFEST, especially to avoid MYMETA.* files ending up in the distribution
+    Update perltidy config, get rid of tabs
+
 Changes in 1.1.4
     Fix META information to modernize Makefile.PL and META.JSON. (Chase Whitener)
     Remove .git info from the build. (Chase Whitener)
     Split things out into their proper module files. (Chase Whitener)
+
 Changes in 1.1.3
     new pod test, pod fixes, MANIFEST fix (Lisa Hare)
+
 Changes in 1.1.2
     fixed declaration of minimum Test::Compile version
         a number of CPANtesters failures occured because
@@ -17,25 +27,24 @@ Changes in 1.1.1
     mostly releasing to get properly CPAN indexed
 
 Changes in 1.1.0
-	Cheat to allow installation on Strawberry Perl 5.22.0
-	add META.yml and META.json
-	modernize Makefile.PL
-	add /lib and move Make.pm there
-	match up distribution and module version numbers
+    Cheat to allow installation on Strawberry Perl 5.22.0
+    add META.yml and META.json
+    modernize Makefile.PL
+    add /lib and move Make.pm there
+    match up distribution and module version numbers
 
 Changes in 0.03
-	Handle $(mktmp,file ...) for Win32
-	Handle dmake-like $(var:s,\,\\,) for Win32
-	Collapse rules which are partially specified as variables e.g.
-		$(INST_STATIC) :
-		libpTk.a :
-	both add dependancies to libpTk.a
-	Use negative-lookbehind to implement $$ as a literal $ e.g. in
-	command line perl scripts.
-	Add a test to keep cpan-testers from complaining it has not got one.
-
+    Handle $(mktmp,file ...) for Win32
+    Handle dmake-like $(var:s,\,\\,) for Win32
+    Collapse rules which are partially specified as variables e.g.
+        $(INST_STATIC) :
+        libpTk.a :
+    both add dependancies to libpTk.a
+    Use negative-lookbehind to implement $$ as a literal $ e.g. in
+    command line perl scripts.
+    Add a test to keep cpan-testers from complaining it has not got one.
 
 Changes is 0.02
-	Sarathy's Win32 patches
-	Handle blank lines in build command sequences
-	Add README, Changes
+    Sarathy's Win32 patches
+    Handle blank lines in build command sequences
+    Add README, Changes

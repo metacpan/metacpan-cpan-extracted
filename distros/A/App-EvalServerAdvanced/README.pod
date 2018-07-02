@@ -1,7 +1,7 @@
 package App::EvalServerAdvanced;
 
 use strict;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 
 use IO::Async::Loop;
 use IO::Async::Function;

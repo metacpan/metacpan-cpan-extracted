@@ -20,7 +20,7 @@ use Bio::Gonzales::Util::Log;
 use base 'Exporter';
 
 our ( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 @EXPORT      = qw(job);
 %EXPORT_TAGS = ();

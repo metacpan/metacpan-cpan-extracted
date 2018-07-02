@@ -1,3 +1,8 @@
+2018-06-25 - 1.011
+
+  Update to cope with newer Config::Model
+    * Backend: use file_path instead of io_handle (gh #1)
+
 2017-11-13 - 1.010
 
     * upgrade model with cme meta

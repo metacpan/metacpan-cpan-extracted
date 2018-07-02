@@ -80,7 +80,7 @@ sub sys_fatal {
 
 sub sys_pipe_fatal {
   my $self = shift;
-  my $cmd  = 'set pipefail; ' . sys_fmt(@_);
+  my $cmd  = 'set -o pipefail; ' . sys_fmt(@_);
   return $self->sys_fatal($cmd);
 }
 

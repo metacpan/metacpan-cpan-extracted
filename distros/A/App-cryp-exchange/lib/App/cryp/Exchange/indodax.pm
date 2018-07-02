@@ -1,7 +1,7 @@
 package App::cryp::Exchange::indodax;
 
-our $DATE = '2018-06-13'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-06-24'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -368,14 +368,14 @@ sub get_order {
         $quote_size = $apires->{return}{order}{$key};
         $base_size  = $quote_size / $price;
         my $rkey = "remain_" . ($nquotecur eq 'idr' ? 'rp' : $nquotecur);
-        $filled_quote_size = $quote_size - $apires->{return}{order}{$key};
+        $filled_quote_size = $quote_size - $apires->{return}{order}{$rkey};
         $filled_base_size  = $filled_quote_size / $price;
     } else {
         my $key = "order_" . $nbasecur;
         $base_size = $apires->{return}{order}{$key};
         $quote_size = $base_size * $price;
         my $rkey = "remain_" . $nbasecur;
-        $filled_base_size  = $base_size - $apires->{return}{order}{$key};
+        $filled_base_size  = $base_size - $apires->{return}{order}{$rkey};
         $filled_quote_size = $filled_base_size * $price;
     }
 
@@ -559,7 +559,7 @@ App::cryp::Exchange::indodax - Interact with Indodax
 
 =head1 VERSION
 
-This document describes version 0.009 of App::cryp::Exchange::indodax (from Perl distribution App-cryp-exchange), released on 2018-06-13.
+This document describes version 0.010 of App::cryp::Exchange::indodax (from Perl distribution App-cryp-exchange), released on 2018-06-24.
 
 =for Pod::Coverage ^(.+)$
 

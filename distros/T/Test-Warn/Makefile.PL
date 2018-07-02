@@ -34,6 +34,14 @@ WriteMakefile1(
         },
       keywords => ['testing', 'warnings'],
     },
+    META_ADD => {
+        provides => {
+            'Test::Warn' => {
+                file => 'Warn.pm',
+                version => '0.36',
+            },
+        },
+    },
     PL_FILES => {},
     $^O =~/win/i ? (
         dist => {

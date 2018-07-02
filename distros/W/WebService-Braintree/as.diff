@@ -1,0 +1,17 @@
+diff --git a/lib/WebService/Braintree/Role/AdvancedSearch.pm b/lib/WebService/Braintree/Role/AdvancedSearch.pm
+index 03ee267..bf84c34 100644
+--- a/lib/WebService/Braintree/Role/AdvancedSearch.pm
++++ b/lib/WebService/Braintree/Role/AdvancedSearch.pm
+@@ -37,11 +37,7 @@ sub field {
+         };
+     }
+ 
+-    $class->meta->add_attribute($name => (
+-        is => 'rw',
+-        default => $default,
+-    ));
+-
++    $class->can('has')->($name, is => 'rw', default => $default);
+     return;
+ }
+ 

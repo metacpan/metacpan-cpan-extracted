@@ -21,9 +21,11 @@ requires:
   DBI: '1.6'
   DBIx::Mojo::Template: '0.05'
   Hash::Merge: '0.2'
-  Mojolicious: '6'
+  Mojolicious: '7'
   Mojolicious::Plugin::Authentication: '1.29'
   Mojolicious::Plugin::OAuth2::Che: '1.539'
   perl: '5.014'
-version: '0.841'
+resources:
+  repository: git://github.com/mche/Mojolicious-Plugin-RoutesAuthDBI.git
+version: '0.842'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

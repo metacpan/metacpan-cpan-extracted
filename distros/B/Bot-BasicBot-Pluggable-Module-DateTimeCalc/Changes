@@ -1,0 +1,27 @@
+Revision history for Bot-BasicBot-Pluggable-Module-DateTimeCalc
+
+0.0302 2018-06-24 22:53:16
+    - Improve documentation yet again...
+
+0.0301 2018-06-24 21:58:06
+    - Fix docs.
+    - Use the BasicBot default quit message.
+
+0.03 2018-06-24 18:49:43
+    - Add shutdown functionality.
+
+0.0203 2018-06-24 18:14:58
+    - Improve documentation yet again...
+
+0.0202 2018-06-24 18:05:59
+    - Improve documentation again!
+
+0.0201 2018-06-24 17:57:10
+    - Improve documentation.
+
+0.02 2018-06-24 17:43:32
+    - Improve documentation.
+    - Correct the localtime operation.
+
+0.01 2018-06-24 17:13:19
+    - Minted by Dist::Zilla.

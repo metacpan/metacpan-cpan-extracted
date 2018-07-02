@@ -1,5 +1,5 @@
 package Bio::Tools::Run::Phylo::PAML::Evolver;
-$Bio::Tools::Run::Phylo::PAML::Evolver::VERSION = '1.7.2';
+$Bio::Tools::Run::Phylo::PAML::Evolver::VERSION = '1.7.3';
 use utf8;
 use strict;
 use warnings;
@@ -413,7 +413,7 @@ Bio::Tools::Run::Phylo::PAML::Evolver - Wrapper aroud the PAML program evolver
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 

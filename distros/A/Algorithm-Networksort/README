@@ -1,4 +1,4 @@
-Algorithm::Networksort version 2.01
+Algorithm::Networksort version 2.02
 ===================================
 
     "I've got to sort this out. ... There must be a list somewhere
@@ -47,8 +47,8 @@ in an encapsulated postscript, SVG, or text form.
 INSTALLATION
 
 The usual way.  Unpack the archive:
-	gzip -d Algorithm-Networksort-2.01.tar.gz
-	tar xvf Algorithm-Networksort-2.01.tar
+	gzip -d Algorithm-Networksort-2.02.tar.gz
+	tar xvf Algorithm-Networksort-2.02.tar
 
 Go into the resulting directory, and type:
 	perl Build.PL

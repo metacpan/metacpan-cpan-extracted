@@ -3,8 +3,8 @@ NAME
     interface
 
 VERSION
-    This document describes version 0.009 of App::cryp::exchange (from Perl
-    distribution App-cryp-exchange), released on 2018-06-13.
+    This document describes version 0.010 of App::cryp::exchange (from Perl
+    distribution App-cryp-exchange), released on 2018-06-24.
 
 SYNOPSIS
     Please see included script cryp-exchange.

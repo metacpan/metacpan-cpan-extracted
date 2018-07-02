@@ -17,16 +17,16 @@ $report = contract {
     is_deeply {bar => 2}, {foo => 1 };
 }->apply;
 
-is $report->count, 1, "is_deeply bad: 1 test run";
+is $report->get_count, 1, "is_deeply bad: 1 test run";
 ok !$report->is_passing, "is_deeply bad: not passing";
-note $report->as_tap;
+note $report->get_tap;
 
 $report = contract {
     package Foo;
     is_deeply {foo => 1}, {foo => 1 };
 }->apply;
 
-is $report->count, 1, "is_deeply good: 1 test run";
+is $report->get_count, 1, "is_deeply good: 1 test run";
 ok $report->is_passing, "is_deeply good: passing";
 
 $report = contract {
@@ -35,8 +35,8 @@ $report = contract {
     diag "bared";
 }->apply;
 
-like $report->as_tap(2), qr/^## foo \{ *"x" *: *42 *\}/, "note works";
-like $report->as_tap(2), qr/\n# bared/, "diag works";
+like $report->get_tap(2), qr/^## foo \{ *["']?x["']? *=> *42 *\}/, "note works";
+like $report->get_tap(2), qr/\n# bared/, "diag works";
 
 $report = contract {
     package Foo;
@@ -44,9 +44,8 @@ $report = contract {
     like "foobar", "f.*b.*r";
 }->apply;
 
-is $report->count, 2, "is + like bad: 2 tests run";
+is $report->get_count, 2, "is + like bad: 2 tests run";
 ok !$report->is_passing, "is + like bad: not passing";
-note $report->as_tap;
-
+note $report->get_tap;
 
 done_testing;

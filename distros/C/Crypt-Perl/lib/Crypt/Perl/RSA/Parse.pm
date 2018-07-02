@@ -28,7 +28,6 @@ use warnings;
 use Try::Tiny;
 
 use Crypt::Format ();
-use Module::Load ();
 
 use Crypt::Perl::ASN1 ();
 use Crypt::Perl::RSA::Template ();
@@ -133,7 +132,7 @@ sub jwk {
 
     my %constr_args;
 
-    Module::Load::load('Crypt::Perl::JWK');
+    require Crypt::Perl::JWK;
 
     for my $k (keys %$hr) {
         next if !$JTK_TO_NEW{$k};
@@ -142,11 +141,11 @@ sub jwk {
 
     if ($hr->{'d'}) {
         $constr_args{'version'} = 0;
-        Module::Load::load('Crypt::Perl::RSA::PrivateKey');
+        require Crypt::Perl::RSA::PrivateKey;
         return Crypt::Perl::RSA::PrivateKey->new( \%constr_args );
     }
 
-    Module::Load::load('Crypt::Perl::RSA::PublicKey');
+    require Crypt::Perl::RSA::PublicKey;
     return Crypt::Perl::RSA::PublicKey->new( \%constr_args );
 }
 
@@ -216,14 +215,14 @@ sub _decode_spki {
 sub _new_public {
     my ($parsed_hr) = @_;
 
-    Module::Load::load('Crypt::Perl::RSA::PublicKey');
+    require Crypt::Perl::RSA::PublicKey;
     return Crypt::Perl::RSA::PublicKey->new($parsed_hr);
 }
 
 sub _new_private {
     my ($parsed_hr) = @_;
 
-    Module::Load::load('Crypt::Perl::RSA::PrivateKey');
+    require Crypt::Perl::RSA::PrivateKey;
     return Crypt::Perl::RSA::PrivateKey->new($parsed_hr);
 }
 

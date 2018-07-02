@@ -1,6 +1,19 @@
+# PODNAME: XML::XPathScript::Stylesheet
+# ABSTRACT: XPathScript's Stylesheet Writer Guide
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 XML::XPathScript::Stylesheet - XPathScript's Stylesheet Writer Guide
+
+=head1 VERSION
+
+version 1.55
 
 =head1 STYLESHEET SYNTAX
 
@@ -57,7 +70,6 @@ is equivalent to
     END_CONTENT
     %>
 
-
 =head3 <%- -%>, <%-= -%>, <%-~ -%>, <%-#  -%>, <%-@ -%>
 
 If a dash is added to a delimiter, all whitespaces (including carriage
@@ -82,7 +94,7 @@ relative to the stylesheet, not the processed document.
 This section describes pre-defined variables accessible from within
 a XPathScript stylesheet. 
 
-=over 
+=over
 
 =item $template, $t, $XML::XPathScript::trans
 
@@ -101,7 +113,7 @@ utility methods that can be called from within the stylesheet.
 
 =back
 
-=head1  TRANSFORMATION TEMPLATE
+=head1 TRANSFORMATION TEMPLATE
 
 The transformation template defines the modification that
 will automatically be brought on document elements when 
@@ -116,8 +128,7 @@ In addition to regular tag names, three special tags can be
 used in the template: text() and comment(), that match the
 corresponding nodes in the document, and '*', a catch-all tag.
 
-
-=head3  text(), #text
+=head3 text(), #text
 
 Matches text nodes.
 
@@ -131,7 +142,7 @@ Example:
                                       post => '\end{comment}',   );
     %>
 
-=head3  comment()
+=head3 comment()
 
 Matches comment nodes.
 
@@ -339,7 +350,6 @@ B<WARNING>: If you are to insert Perl code in a content, remember
 that interpolation is enabled by default, and that the default
 interpolation demarcations are the curly braces. So something like
 
-
     $template->set( foo => { content => <<'END_CONTENT' } );
         <%= map { $_ x 2 } @something_or_other %>
     END_CONTENT
@@ -351,7 +361,6 @@ regex to something more benign. For example:
 
     # using double-curlies 
     $XML::XPathScript::current->interpolation_regex( qr/{{(.*?)}}/ )
-    
 
 =head3 insteadofchildren
 
@@ -381,7 +390,6 @@ Example of use with a scalar:
                         # if the node had children, and
                         # '<foo></foo>' if not
 
-
 Example if use with a function ref
 
     <%
@@ -399,8 +407,6 @@ Example if use with a function ref
 
     <%~ //foo %>        # yields '<foo>node has X children</foo>'
                         # if the node has at least 1 child 
-
-
 
 =head1 STYLESHEET WRITING GUIDELINES
 
@@ -434,7 +440,6 @@ scalar context, ever: replace
 with
 
    my ($attrnode) = findnodes('@url',$xrefnode);
-
 
 =head2 Do not use DOM method calls, for they make stylesheets non-portable
 
@@ -500,7 +505,7 @@ characters (such as "A" or or "/" or ".", but I<not> the ISO-8859-1
 8-bit extensions) have the same encoding in both ASCII and UTF-8,
 including the null character (which is good for strcpy() and
 friends). Of course, this means that the other characters are rendered
-using I<several> bytes, for example "�" is "é" in UTF-8. The result
+using I<several> bytes, for example "é" is "Ã©" in UTF-8. The result
 is therefore vaguely intelligible for a Western reader.
 
 =head2 Output to UTF-8 with XPathScript
@@ -552,9 +557,29 @@ time under any locales, versions of Perl, or phases of moon.
 
 =back
 
-
 =head1 AUTHORS
 
-Yanick Champoux <yanick@cpan.org> 
-and Dominique Quatravaux <domq@cpan.org>
+=over 4
 
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=item *
+
+Dominique Quatravaux <domq@cpan.org>
+
+=item *
+
+Matt Sergeant <matt@sergeant.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2008, 2007 by Matt Sergeant.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -9,11 +9,13 @@ use Capture::Tiny 0.17 qw/capture_merged/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 sub import {
   my $class = shift;
+
+  return if $class eq __PACKAGE__;
 
   return if $class->runtime_prop;
 
@@ -417,6 +419,14 @@ sub Inline {
   sub runtime_prop
   {
     my($class) = @_;
+
+    if(ref($class))
+    {
+      # called as an instance method.
+      my $self = $class;
+      $class = ref $self;
+      return $self->{_alt}->{runtime_prop} if defined $self->{_alt};
+    }
   
     return $alien_build_config_cache{$class} if
       exists $alien_build_config_cache{$class};
@@ -437,6 +447,62 @@ sub Inline {
   }
 }
 
+
+sub alt
+{
+  my($old, $name) = @_;
+  my $new = ref $old ? (ref $old)->new : $old->new;
+
+  my $orig;
+
+  if(ref($old) && defined $old->{_alt})
+  { $orig = $old->{_alt}->{orig} }
+  else
+  { $orig = $old->runtime_prop }
+
+  require Storable;
+  my $runtime_prop = Storable::dclone($orig);
+  
+  if($runtime_prop->{alt}->{$name})
+  {
+    foreach my $key (keys %{ $runtime_prop->{alt}->{$name} })
+    {
+      $runtime_prop->{$key} = $runtime_prop->{alt}->{$name}->{$key};
+    }
+  }
+  else
+  {
+    Carp::croak("no such alt: $name");
+  }
+
+  $new->{_alt} = {
+    runtime_prop => $runtime_prop,
+    orig         => $orig,
+  };   
+
+  $new;
+}
+
+
+sub alt_names
+{
+  my($class) = @_;
+  my $alts = $class->runtime_prop->{alt};
+  defined $alts
+    ? sort keys %$alts
+    : ();
+}
+
+
+sub alt_exists
+{
+  my($class, $alt_name) = @_;
+  my $alts = $class->runtime_prop->{alt};
+  defined $alts
+    ? exists $alts->{$alt_name} && defined $alts->{$alt_name}
+    : 0;
+}
+
 1;
 
 =pod
@@ -449,7 +515,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -776,6 +842,57 @@ Returns a hash reference of the runtime properties computed by L<Alien::Build> d
 install process.  If the L<Alien::Base> based L<Alien> was not built using L<Alien::Build>,
 then this will return undef.
 
+=head2 alt
+
+ my $new_alien = Alien::MyLibrary->alt($alt_name);
+ my $new_alien = $old_alien->alt($alt_name);
+
+Returns an L<Alien::Base> instance with the alternate configuration.
+
+Some packages come with multiple libraries, and multiple C<.pc> files to
+use with them.  This method can be used with C<pkg-config> plugins to
+access different configurations.  (It could also be used with non-pkg-config
+based packages too, though there are not as of this writing any build
+time plugins that take advantage of this feature).
+
+From your L<alienfile>
+
+ use alienfile;
+ 
+ plugin 'PkgConfig' => (
+   pkg_name => [ 'libfoo', 'libbar', ],
+ );
+
+Then in your base class:
+
+ package Alien::MyLibrary;
+ 
+ use base qw( Alien::Base );
+ use Role::Tiny::With qw( with );
+ 
+ with 'Alien::Role::Alt';
+ 
+ 1;
+
+Then you can use it:
+
+ use Alien::MyLibrary;
+ 
+ my $cflags = Alien::MyLibrary->alt('foo1')->cflags;
+ my $libs   = Alien::MyLibrary->alt('foo1')->libs;
+
+=head2 alt_names
+
+ my @alt_names = Alien::MyLibrary->alt_names
+
+Returns the list of all available alternative configuration names.
+
+=head2 alt_exists
+
+ my $bool = Alien::MyLibrary->alt_exists($alt_name)
+
+Returns true if the given alternative configuration exists.
+
 =head1 SUPPORT AND CONTRIBUTING
 
 First check the L<Alien::Build::Manual::FAQ> for questions that have already been answered.
@@ -919,7 +1036,7 @@ Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2011-2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

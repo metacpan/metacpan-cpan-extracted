@@ -2,9 +2,9 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use Ref::Util qw/ is_scalarref /;
 use Test::More;
-use JavaScript::Duktape::XS;
+
+my $CLASS = 'JavaScript::Duktape::XS';
 
 sub test_typeof {
     # boolean is tested separately on test_typeof_boolean()
@@ -16,15 +16,15 @@ sub test_typeof {
         'array'     => [ [], [1, 2, 3] ],
         'object'    => [ { foo => 1, bar => 2 } ],
     );
-    my $duk = JavaScript::Duktape::XS->new();
-    ok($duk, "created JavaScript::Duktape::XS object");
 
     foreach my $type (sort keys %data) {
         my $name = "var_$type";
         my $values = $data{$type};
         foreach my $value (@$values) {
-            $duk->set($name, $value) unless is_scalarref($value);
-            my $got = $duk->typeof($name);
+            my $vm = $CLASS->new();
+            ok($vm, "created $CLASS object");
+            $vm->set($name, $value) unless $type eq 'undefined';
+            my $got = $vm->typeof($name);
             is($got, $type, "got correct typeof for $type");
         }
     }
@@ -37,14 +37,14 @@ var var_false     = false;
 var var_Boolean_1 = Boolean(1);
 var var_Boolean_0 = Boolean(0);
 JS
-    my @booleans = qw/ var_true var_false var_Boolean_1 var_Boolean_0 /;
-    my $duk = JavaScript::Duktape::XS->new();
-    ok($duk, "created JavaScript::Duktape::XS object");
-    $duk->eval($js);
+    my $vm = $CLASS->new();
+    ok($vm, "created $CLASS object");
 
+    my @booleans = qw/ var_true var_false var_Boolean_1 var_Boolean_0 /;
+    $vm->eval($js);
     my $type = 'boolean';
     foreach my $boolean (@booleans) {
-        my $got = $duk->typeof($boolean);
+        my $got = $vm->typeof($boolean);
         is($got, $type, "got correct typeof for $type");
     }
 }
@@ -63,17 +63,19 @@ JS
         model => "string",
         year => "number",
     );
-    my $duk = JavaScript::Duktape::XS->new();
-    ok($duk, "created JavaScript::Duktape::XS object");
-    $duk->eval($js);
+    my $vm = $CLASS->new();
+    ok($vm, "created $CLASS object");
 
+    $vm->eval($js);
     foreach my $field (sort keys %fields) {
-        my $got = $duk->typeof("auto.$field");
+        my $got = $vm->typeof("auto.$field");
         is($got, $fields{$field}, "got correct typeof for field $field");
     }
 }
 
 sub main {
+    use_ok($CLASS);
+
     test_typeof();
     test_typeof_boolean();
     test_typeof_object();

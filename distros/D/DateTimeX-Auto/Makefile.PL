@@ -9,8 +9,8 @@ my $meta = {
                         "Toby Inkster <tobyink\@cpan.org>",
                         "TOBYINK <tobyink\@cpan.org>",
                       ],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+  "dynamic_config" => 1,
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"       => [
                         "Date",
                         "DateTime",
@@ -30,20 +30,21 @@ my $meta = {
   "prereqs"        => {
                         configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                         runtime => {
-                          requires => {
-                            "DateTime"                   => 0,
-                            "DateTime::Duration"         => 0,
-                            "DateTime::Format::Strptime" => 0,
-                            "Exporter::Shiny"            => 0,
-                            "UNIVERSAL::ref"             => 0,
-                          },
+                          recommends => { "UNIVERSAL::ref" => 0 },
+                          requires   => {
+                                          "DateTime" => 0,
+                                          "DateTime::Duration" => 0,
+                                          "DateTime::Format::Strptime" => 0,
+                                          "Exporter::Shiny" => 0,
+                                          "perl" => "5.008000",
+                                        },
                         },
                         test => { requires => { "Test::More" => 0.61 } },
                       },
   "provides"       => {
-                        "DateTimeX::Auto"           => { file => "lib/DateTimeX/Auto.pm", version => 0.008 },
-                        "DateTimeX::Auto::DateTime" => { file => "lib/DateTimeX/Auto.pm", version => 0.008 },
-                        "DateTimeX::Auto::Duration" => { file => "lib/DateTimeX/Auto.pm", version => 0.008 },
+                        "DateTimeX::Auto"           => { file => "lib/DateTimeX/Auto.pm", version => 0.009 },
+                        "DateTimeX::Auto::DateTime" => { file => "lib/DateTimeX/Auto.pm", version => 0.009 },
+                        "DateTimeX::Auto::Duration" => { file => "lib/DateTimeX/Auto.pm", version => 0.009 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -57,12 +58,17 @@ my $meta = {
                                           url  => "git://github.com/tobyink/p5-datetimex-auto.git",
                                           web  => "https://github.com/tobyink/p5-datetimex-auto",
                                         },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/DateTimeX-Auto/project",
+                        x_identifier => "http://purl.org/NET/cpan-uri/dist/DateTimeX-Auto/project",
                       },
-  "version"        => 0.008,
+  "version"        => 0.009,
 };
 
 my %dynamic_config;
+do {
+$meta->{prereqs}{runtime}{requires}{'UNIVERSAL::ref'}   = '0'  if $] < 5.02500;
+$meta->{prereqs}{runtime}{requires}{'parent'}   = '0'  if $] < 5.010001;
+
+};
 
 my %WriteMakefileArgs = (
 	ABSTRACT   => $meta->{abstract},

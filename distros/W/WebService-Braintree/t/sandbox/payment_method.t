@@ -20,6 +20,7 @@ use WebService::Braintree::Test;
 use WebService::Braintree::Xml;
 use Data::GUID;
 use JSON;
+use Scalar::Util qw(blessed);
 
 subtest "Create" => sub {
     subtest "it creates a paypal account method with a future payment nonce" => sub {
@@ -36,7 +37,7 @@ subtest "Create" => sub {
 
         isnt($payment_method_result->paypal_account->token, undef);
         isnt($payment_method_result->paypal_account->image_url, undef);
-        is($payment_method_result->paypal_account->meta->name, "WebService::Braintree::_::PayPalAccount");
+        is(blessed($payment_method_result->paypal_account), "WebService::Braintree::_::PayPalAccount");
     };
 
     subtest "it creates a credit card payment method with a nonce" => sub {
@@ -51,7 +52,7 @@ subtest "Create" => sub {
         validate_result($payment_method_result) or return;
 
         isnt($payment_method_result->credit_card->token, undef);
-        is($payment_method_result->credit_card->meta->name, "WebService::Braintree::_::CreditCard");
+        is(blessed($payment_method_result->credit_card), "WebService::Braintree::_::CreditCard");
     };
 
     subtest "it creates a payment method with a fake apple pay nonce" => sub {
@@ -66,7 +67,7 @@ subtest "Create" => sub {
 
         my $apple_pay_card = $payment_method_result->apple_pay_card;
         isnt($apple_pay_card->token, undef);
-        is($apple_pay_card->meta->name, "WebService::Braintree::_::ApplePayCard");
+        is(blessed($apple_pay_card), "WebService::Braintree::_::ApplePayCard");
         is($apple_pay_card->card_type, WebService::Braintree::ApplePayCard::CardType::MasterCard);
         ok $apple_pay_card->default;
         ok $apple_pay_card->image_url =~ /apple_pay/;

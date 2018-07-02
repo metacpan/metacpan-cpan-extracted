@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+mark-add - add files to the current set of marked files
+
+=head1 SYNOPSIS
+
+  mark-add:  stashes a filesystem path for use with other utilities
+
+  USAGE:
+    mark add path_to_mark
+
+  EXAMPLE:
+    mark add *.txt
+    cd ~/notes
+    mark mv
+
+=head1 AUTHOR
+
+Brennen Bearnes <bbearnes@gmail.com>
+
+=cut
+
+use warnings;
+use strict;
+use 5.10.0;
+
+use App::MarkFiles qw(add);
+use Cwd qw(cwd abs_path);
+use Getopt::Long;
+use Pod::Usage;
+
+GetOptions(
+  # 'config=s' => \$config_file,
+  help => sub { pod2usage(0) },
+) or pod2usage(2);
+
+add(map { abs_path($_) } @ARGV);

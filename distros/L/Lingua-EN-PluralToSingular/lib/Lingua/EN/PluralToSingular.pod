@@ -32,13 +32,13 @@ produces output
     'Cannabis' is not plural.
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.20/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.21/examples/synopsis.pl> in the distribution.)
 
     
 =head1 VERSION
 
-This documents Lingua::EN::PluralToSingular version 0.20
-corresponding to git commit L<9cbdc3f9f198f5de3b027c1f88f32a581ec821df|https://github.com/benkasminbullock/Lingua-EN-PluralToSingular/commit/9cbdc3f9f198f5de3b027c1f88f32a581ec821df> released on Mon Jun 18 09:10:12 2018 +0900.
+This documents Lingua::EN::PluralToSingular version 0.21
+corresponding to git commit L<2d53254eeaec8d2006655f63f61b4f6868e81153|https://github.com/benkasminbullock/Lingua-EN-PluralToSingular/commit/2d53254eeaec8d2006655f63f61b4f6868e81153> released on Thu Jun 21 17:48:56 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -74,7 +74,7 @@ returns 'battlehorn'.
 Returns 1 if the word is a valid plural, 0 if not. It also returns 1
 for ambiguous words like "sheep".
 
-=head1 LIMITATIONS
+=head1 LIMITATIONS AND CAVEATS
 
 =head2 Assumes the input is a noun
 
@@ -110,6 +110,16 @@ capitalized.
 The module does not attempt to handle pronoun forms like "ourselves"
 or "themselves". These words are left unaltered.
 
+=head2 False plurals also accepted
+
+For the sake of user convenience, false plurals like "octopi" are also
+accepted by the module. (The plural of "octopus" is "octopuses".)
+
+=head2 Not all exceptional plurals are included
+
+There are many exceptions which have not been included, notably words
+with Latin or Greek plurals.
+
 =head1 STANDALONE SCRIPT
 
 The script F<scripts/singular> provides a quick way to get singular
@@ -117,15 +127,6 @@ versions of nouns:
 
     singular cats dogs geese
     # Prints "cat dog goose".
-
-=head1 BUGS
-
-See also L</LIMITATIONS> above.
-
-This module is in development, and there are many exceptions which are
-not included yet. Also my criterion for including words is basically
-my own knowledge, so a lot of words I didn't recognize in the
-dictionary haven't been entered yet.
 
 =head1 SEE ALSO
 

@@ -11,7 +11,7 @@ use Getopt::Long qw(GetOptionsFromArray :config bundling noignore_case);
 use Log::Log4Cli;
 use Struct::Path 0.80 qw(path);
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 sub arg_opts {
     my $self = shift;
@@ -36,7 +36,8 @@ sub arg_opts {
 sub check_args {
     my $self = shift;
 
-    die_fatal 'At least one argument expected', 1 unless (@_);
+    die_fatal 'At least one argument expected', 1
+        unless (@_ or $self->{OPTS}->{'dump-opts'});
 
     return $self;
 }

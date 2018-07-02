@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::IndexView;
 # ABSTRACT: Index management for a collection
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 use MongoDB::Error;
@@ -146,11 +144,12 @@ sub list {
     my ($self) = @_;
 
     my $op = MongoDB::Op::_ListIndexes->_new(
-        client     => $self->_client,
-        db_name    => $self->_db_name,
-        full_name  => '', # unused
-        coll_name  => $self->_coll_name,
-        bson_codec => $self->_bson_codec,
+        client              => $self->_client,
+        db_name             => $self->_db_name,
+        full_name           => '',                                # unused
+        coll_name           => $self->_coll_name,
+        bson_codec          => $self->_bson_codec,
+        monitoring_callback => $self->_client->monitoring_callback,
     );
 
     return $self->_client->send_primary_op($op);
@@ -173,6 +172,12 @@ sub list {
 #pod See L</create_many> for important information about index specifications
 #pod and options.
 #pod
+#pod The following additional options are recognized:
+#pod
+#pod =for :list
+#pod * C<maxTimeMS> — maximum time in milliseconds before the operation will
+#pod   time out.
+#pod
 #pod =cut
 
 my $create_one_args;
@@ -183,8 +188,15 @@ sub create_one {
     MongoDB::UsageError->throw("Argument to create_one must be an ordered document")
       unless is_OrderedDoc($keys);
 
-    my ($name) =
-      $self->create_many( { keys => $keys, ( $opts ? ( options => $opts ) : () ) } );
+    my $global_opts = {};
+    if (exists $opts->{maxTimeMS}) {
+        $global_opts->{maxTimeMS} = delete $opts->{maxTimeMS};
+    }
+
+    my ($name) = $self->create_many(
+        { keys => $keys, ( $opts ? ( options => $opts ) : () ) },
+        $global_opts,
+    );
     return $name;
 }
 
@@ -195,9 +207,19 @@ sub create_one {
 #pod         { keys => [ z => 1 ], options => { unique => 1 } }
 #pod     );
 #pod
+#pod     @names = $indexes->create_many(
+#pod         { keys => [ x => 1, y => 1 ] },
+#pod         { keys => [ z => 1 ], options => { unique => 1 } }
+#pod         \%global_options,
+#pod     );
+#pod
 #pod This method takes a list of index models (given as hash references)
 #pod and returns a list of index names created.  It will throw an exception
 #pod on error.
+#pod
+#pod If the last value is a hash reference without a C<keys> entry, it will
+#pod be assumed to be a set of global options. See below for a list of
+#pod accepted global options.
 #pod
 #pod Each index module is described by the following fields:
 #pod
@@ -242,6 +264,13 @@ sub create_one {
 #pod * C<name> — a name (string) for the index; one will be generated if this is
 #pod   omitted.
 #pod
+#pod Global options specified as the last value can contain the following
+#pod keys:
+#pod
+#pod =for :list
+#pod * C<maxTimeMS> — maximum time in milliseconds before the operation will
+#pod   time out.
+#pod
 #pod =cut
 
 my $create_many_args;
@@ -249,17 +278,27 @@ my $create_many_args;
 sub create_many {
     my ( $self, @models ) = @_;
 
+    my $opts;
+    if (@models and ref $models[-1] eq 'HASH' and not exists $models[-1]{keys}) {
+        $opts = pop @models;
+    }
+
     MongoDB::UsageError->throw("Argument to create_many must be a list of index models")
       unless is_IndexModelList(\@models);
 
     my $indexes = [ map __flatten_index_model($_), @models ];
     my $op = MongoDB::Op::_CreateIndexes->_new(
-        db_name       => $self->_db_name,
-        coll_name     => $self->_coll_name,
-        full_name     => '', # unused
-        bson_codec    => $self->_bson_codec,
-        indexes       => $indexes,
-        write_concern => $self->_write_concern,
+        db_name             => $self->_db_name,
+        coll_name           => $self->_coll_name,
+        full_name           => '',                                # unused
+        bson_codec          => $self->_bson_codec,
+        indexes             => $indexes,
+        write_concern       => $self->_write_concern,
+        monitoring_callback => $self->_client->monitoring_callback,
+        (defined($opts->{maxTimeMS})
+            ? (max_time_ms   => $opts->{maxTimeMS})
+            : ()
+        ),
     );
 
     # succeed or die; we don't care about response document
@@ -271,17 +310,26 @@ sub create_many {
 #pod =method drop_one
 #pod
 #pod     $output = $indexes->drop_one( $name );
+#pod     $output = $indexes->drop_one( $name, \%options );
 #pod
 #pod This method takes the name of an index and drops it.  It returns the output
 #pod of the dropIndexes command (a hash reference) on success or throws a
-#pod exception if the command fails.
+#pod exception if the command errors.  However, if the index does not exist, the
+#pod command output will have the C<ok> field as a false value, but no exception
+#pod will e thrown.
+#pod
+#pod Valid options are:
+#pod
+#pod =for :list
+#pod * C<maxTimeMS> — maximum time in milliseconds before the operation will
+#pod   time out.
 #pod
 #pod =cut
 
 my $drop_one_args;
 
 sub drop_one {
-    my ( $self, $name ) = @_;
+    my ( $self, $name, $opts ) = @_;
 
     MongoDB::UsageError->throw("Argument to drop_one must be a string")
       unless is_Str($name);
@@ -291,12 +339,17 @@ sub drop_one {
     }
 
     my $op = MongoDB::Op::_DropIndexes->_new(
-        db_name       => $self->_db_name,
-        coll_name     => $self->_coll_name,
-        full_name     => '',                   # unused
-        bson_codec    => $self->_bson_codec,
-        write_concern => $self->_write_concern,
-        index_name    => $name,
+        db_name             => $self->_db_name,
+        coll_name           => $self->_coll_name,
+        full_name           => '',                                 # unused
+        bson_codec          => $self->_bson_codec,
+        write_concern       => $self->_write_concern,
+        index_name          => $name,
+        monitoring_callback => $self->_client->monitoring_callback,
+        (defined($opts->{maxTimeMS})
+            ? (max_time_ms   => $opts->{maxTimeMS})
+            : ()
+        ),
     );
 
     $self->_client->send_write_op($op)->output;
@@ -305,25 +358,37 @@ sub drop_one {
 #pod =method drop_all
 #pod
 #pod     $output = $indexes->drop_all;
+#pod     $output = $indexes->drop_all(\%options);
 #pod
 #pod This method drops all indexes (except the one on the C<_id> field).  It
 #pod returns the output of the dropIndexes command (a hash reference) on success
 #pod or throws a exception if the command fails.
+#pod
+#pod Valid options are:
+#pod
+#pod =for :list
+#pod * C<maxTimeMS> — maximum time in milliseconds before the operation will
+#pod   time out.
 #pod
 #pod =cut
 
 my $drop_all_args;
 
 sub drop_all {
-    my ($self) = @_;
+    my ($self, $opts) = @_;
 
     my $op = MongoDB::Op::_DropIndexes->_new(
-        db_name       => $self->_db_name,
-        coll_name     => $self->_coll_name,
-        full_name     => '',                   # unused
-        bson_codec    => $self->_bson_codec,
-        write_concern => $self->_write_concern,
-        index_name    => '*',
+        db_name             => $self->_db_name,
+        coll_name           => $self->_coll_name,
+        full_name           => '',                                 # unused
+        bson_codec          => $self->_bson_codec,
+        write_concern       => $self->_write_concern,
+        index_name          => '*',
+        monitoring_callback => $self->_client->monitoring_callback,
+        (defined($opts->{maxTimeMS})
+            ? (max_time_ms   => $opts->{maxTimeMS})
+            : ()
+        ),
     );
 
     $self->_client->send_write_op($op)->output;
@@ -402,7 +467,7 @@ MongoDB::IndexView - Index management for a collection
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -484,6 +549,16 @@ direction/type.
 See L</create_many> for important information about index specifications
 and options.
 
+The following additional options are recognized:
+
+=over 4
+
+=item *
+
+C<maxTimeMS> — maximum time in milliseconds before the operation will time out.
+
+=back
+
 =head2 create_many
 
     @names = $indexes->create_many(
@@ -491,9 +566,19 @@ and options.
         { keys => [ z => 1 ], options => { unique => 1 } }
     );
 
+    @names = $indexes->create_many(
+        { keys => [ x => 1, y => 1 ] },
+        { keys => [ z => 1 ], options => { unique => 1 } }
+        \%global_options,
+    );
+
 This method takes a list of index models (given as hash references)
 and returns a list of index names created.  It will throw an exception
 on error.
+
+If the last value is a hash reference without a C<keys> entry, it will
+be assumed to be a set of global options. See below for a list of
+accepted global options.
 
 Each index module is described by the following fields:
 
@@ -552,21 +637,56 @@ C<name> — a name (string) for the index; one will be generated if this is omit
 
 =back
 
+Global options specified as the last value can contain the following
+keys:
+
+=over 4
+
+=item *
+
+C<maxTimeMS> — maximum time in milliseconds before the operation will time out.
+
+=back
+
 =head2 drop_one
 
     $output = $indexes->drop_one( $name );
+    $output = $indexes->drop_one( $name, \%options );
 
 This method takes the name of an index and drops it.  It returns the output
 of the dropIndexes command (a hash reference) on success or throws a
-exception if the command fails.
+exception if the command errors.  However, if the index does not exist, the
+command output will have the C<ok> field as a false value, but no exception
+will e thrown.
+
+Valid options are:
+
+=over 4
+
+=item *
+
+C<maxTimeMS> — maximum time in milliseconds before the operation will time out.
+
+=back
 
 =head2 drop_all
 
     $output = $indexes->drop_all;
+    $output = $indexes->drop_all(\%options);
 
 This method drops all indexes (except the one on the C<_id> field).  It
 returns the output of the dropIndexes command (a hash reference) on success
 or throws a exception if the command fails.
+
+Valid options are:
+
+=over 4
+
+=item *
+
+C<maxTimeMS> — maximum time in milliseconds before the operation will time out.
+
+=back
 
 =head1 AUTHORS
 

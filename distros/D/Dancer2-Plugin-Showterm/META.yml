@@ -1,0 +1,44 @@
+---
+abstract: 'Replay terminal typescript captures'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Showterm
+provides:
+  Dancer2::Plugin::Showterm:
+    file: lib/Dancer2/Plugin/Showterm.pm
+    version: v0.0.1
+requires:
+  Dancer2::Plugin: '0'
+  File::ShareDir::Tarball: '0'
+  Moo: '0'
+  Path::Tiny: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Dancer2-Plugin-Showterm/issues
+  homepage: https://github.com/yanick/Dancer2-Plugin-Showterm
+  repository: https://github.com/yanick/Dancer2-Plugin-Showterm.git
+version: 0.0.1
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.01
+x_contributors:
+  - 'Yanick Champoux <yanick@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

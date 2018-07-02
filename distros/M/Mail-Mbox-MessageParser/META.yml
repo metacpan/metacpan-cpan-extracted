@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: 6.36
   File::Path: 2.08
   File::Slurp: 0
+  Test::Compile: 0
   Test::More: 0
   Text::Diff: 0
 configure_requires:
@@ -35,4 +36,4 @@ resources:
   homepage: https://github.com/coppit/mail-mbox-messageparser
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/coppit/mail-mbox-messageparser
-version: '1.5105'
+version: '1.5106'

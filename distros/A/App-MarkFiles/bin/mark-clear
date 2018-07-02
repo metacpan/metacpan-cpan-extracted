@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use 5.10.0;
+
+use App::MarkFiles qw(get_dbh);
+
+get_dbh()->prepare(q{DELETE FROM marks})->execute();

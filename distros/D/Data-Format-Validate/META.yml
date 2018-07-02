@@ -1,0 +1,19 @@
+--- Data::Format::Validate
+abstract: 'Perl module to validate data'
+author:
+  - 'Israel Costa <israel.batista@univem.edu.br>'
+build_requires:
+  Test::Simple: '1.302136'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Format-Validate
+requires:
+  Carp: v1.3.8
+resources:
+  license: http://www.opensource.org/licenses/mit-license.php
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,14 +1,13 @@
 #!/bin/perl
 #
 use Carp;
-use Math::Polynomial::Solve qw(:utility ascending_order);
+use Math::Polynomial::Solve qw(:utility);
 use Math::Utils qw(:polynomial);
 use Math::Complex;
 use strict;
 use warnings;
 
-my $ascending = 1;
-ascending_order($ascending);
+coefficients order => 'ascending';
 
 while (my $line = prompt("Polynomial: "))
 {

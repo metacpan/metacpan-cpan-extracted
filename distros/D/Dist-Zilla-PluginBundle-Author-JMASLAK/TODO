@@ -1,0 +1,12 @@
+TODO
+
+ * Automatically create Changes
+ * Check for uncommited changes
+ * Don't copy perltidy.err/errors.err to distro
+ * Make & config perltidy work automatically
+ * Meaningful tests
+ * Minimal Perl version if not set
+ * Validate that the most recent version of the plugin is installed
+ * Combine both Test::EOL and Test::TrailingSpace, and run only for
+   author.
+ * AUTHOR_PLEDGE should not refer to Joelle directly

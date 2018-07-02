@@ -1,0 +1,12 @@
+Changes
+cpanfile
+lib/OpenOffice/OODoc/HeadingStyles.pm
+LICENCE
+Makefile.PL
+MANIFEST
+README.md
+t/00_use_ok.t
+t/10_createHeadingStyle.t
+t/11_establishHeadingStyle.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

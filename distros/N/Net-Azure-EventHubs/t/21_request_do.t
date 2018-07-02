@@ -7,8 +7,8 @@ use URI;
 use LWP::UserAgent;
 
 subtest 'do' => sub {
-    my $uri = URI->new('http://search.cpan.org/search');
-    $uri->query_form(query => 'Azure', mode => 'all'); 
+    my $uri = URI->new('http://metacpan.org/search');
+    $uri->query_form(q => 'Azure', size => '50'); 
     my $req = Net::Azure::EventHubs::Request->new(GET => $uri);
     $req->agent(LWP::UserAgent->new);
     isa_ok $req, 'Net::Azure::EventHubs::Request';
@@ -21,7 +21,7 @@ subtest 'do' => sub {
 };
 
 subtest 'do - 404' => sub {
-    my $uri = URI->new('http://search.cpan.org/search');
+    my $uri = URI->new('http://metacpan.org/notfound');
     my $req = Net::Azure::EventHubs::Request->new(GET => $uri);
     $req->agent(LWP::UserAgent->new);
     isa_ok $req, 'Net::Azure::EventHubs::Request';

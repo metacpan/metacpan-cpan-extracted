@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::Warn.
 
+0.36  2018-06-23
+        - Added provide section to META.yml via changing Makefile.PL
+
 0.35  2018-06-13
         Merged several Pull Requests:
         - README clean-up: Assign Copyright to current author

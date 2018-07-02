@@ -24,7 +24,6 @@ t/unicode.t		some unicode tests
 t/zzPhoto.t
 demos/wcolors.pl	demo script with syntax very similar to perlTk
 demos/activex.pl	demo script for Windows that uses ActiveX
-demos/tcltkdb.pm	very alpha but working debugger ptkdb adopted for usage with Tcl::Tk
 demos/blt-tabnbook.pl	example of using Tcl/Tk widget, never mentioned in Tcl::Tk
 tk-demos/images/earth.gif            
 tk-demos/images/earthris.gif         

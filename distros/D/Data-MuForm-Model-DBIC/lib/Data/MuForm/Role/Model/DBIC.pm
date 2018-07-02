@@ -366,7 +366,7 @@ Data::MuForm::Role::Model::DBIC - model role that interfaces with DBIx::Class
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

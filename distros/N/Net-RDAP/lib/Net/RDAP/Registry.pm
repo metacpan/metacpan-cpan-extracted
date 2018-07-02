@@ -1,9 +1,10 @@
 package Net::RDAP::Registry;
 use Carp qw(croak);
-use File::Basename qw(basename);
-use File::stat;
+use File::Basename qw(dirname basename);
 use File::Slurp;
 use File::Spec;
+use File::Temp;
+use File::stat;
 use HTTP::Request::Common;
 use JSON;
 use Net::RDAP::UA;
@@ -32,10 +33,10 @@ L<Net::RDAP::Registry> - an interface to the IANA RDAP registries.
 	use Net::IP;
 	use Net::ASN;
 
-	$url = Net::RDAP::Registry->domain(Net::DNS::Domain->new('example.com'));
-	$url = Net::RDAP::Registry->ip(Net::IP->new('192.168.0.1'));
-	$url = Net::RDAP::Registry->ip(Net::IP->new('2001:DB8::/32'));
-	$url = Net::RDAP::Registry->ip(Net::ASN->new(65536));
+	$url = Net::RDAP::Registry->get_url(Net::DNS::Domain->new('example.com'));
+	$url = Net::RDAP::Registry->get_url(Net::IP->new('192.168.0.1'));
+	$url = Net::RDAP::Registry->get_url(Net::IP->new('2001:DB8::/32'));
+	$url = Net::RDAP::Registry->get_url(Net::ASN->new(65536));
 
 =head1 DESCRIPTION
 
@@ -96,7 +97,8 @@ sub get_url {
 
 =pod
 
-C<Net::RDAP::Registry-E<gt>get_url()> is just a wrapper to the methods below:
+C<Net::RDAP::Registry-E<gt>get_url()> is just a wrapper to the
+following methods:
 
 =cut
 
@@ -133,7 +135,7 @@ sub ip {
 	}
 
 	return undef if (scalar(keys(%{$matches})) < 1);
-	
+
 	# prefer the service with the longest prefix length
 	my @urls = @{$matches->{(sort { Net::IP->new($b)->prefixlen <=> Net::IP->new($a)->prefixlen } keys(%{$matches}))[0]}};
 
@@ -163,7 +165,8 @@ sub autnum {
 	SERVICE: foreach my $service (@{$registry->{'services'}}) {
 		VALUE: foreach my $value (@{$service->[0]}) {
 			if ($value == $autnum->toasplain) {
-				# exact match, create an entry for NNNN-NNN where both sides are the same (simplifies sorting later)
+				# exact match, create an entry for NNNN-NNN where both sides are
+				# the same (simplifies sorting later)
 				$matches = { sprintf('%d-%d', $value, $value) => $service->[1] };
 				last SERVICE;
 
@@ -200,6 +203,10 @@ This method returns a L<URI> object corresponding to the authoritative
 RDAP URL for C<$domain>, which is a L<Net::DNS::Domain> object
 corresponding to a fully-qualified domain name.
 
+C<$domain> may either represent a "forward" name such as
+C<example.com>, or a "reverse" domain such as
+C<168.192.in-addr.arpa>.
+
 If no URL can be found in the IANA registry, then C<undef> is returned.
 
 =cut
@@ -226,12 +233,84 @@ sub domain {
 		}
 	}
 
-	return undef if (scalar(keys(%{$matches})) < 1);
+	if (scalar(keys(%{$matches})) < 1) {
+		if ($domain->name =~ /\.(in-addr|ip6)\.arpa$/) {
+			# special workaround for the lack of .arpa in the RDAP registry
+			return $package->reverse_domain($domain);
 
-	# prefer the service with the longest domain name
-	my @urls = @{$matches->{(sort { length($a) <=> length($b) } keys(%{$matches}))[0]}};
+		} else {
+			return undef;
 
-	return $package->assemble_url($package->get_best_url(@urls), 'domain', $domain->name);
+		}
+
+	} else {
+		# prefer the service with the longest domain name
+		my @urls = @{$matches->{(sort { length($b) <=> length($a) } keys(%{$matches}))[0]}};
+
+		return $package->assemble_url($package->get_best_url(@urls), 'domain', $domain->name);
+	}
+}
+
+#
+# construct the RDAP URL for a reverse domain. as of writing there's
+# nothing in the IANA registry for the reverse tree so we work around
+# that by by constructing the CIDR prefix that corresponds to the
+# domain, resolving the RDAP URL for that, and then munging it to
+# obtain the URL for the domain. clever, eh?
+#
+sub reverse_domain {
+	my ($package, $domain) = @_;
+
+	my @labels = reverse($domain->label);
+	shift(@labels); # discard 'arpa'
+
+	my $ip;
+	if ('ip6' eq shift(@labels)) {
+		# @labels is an array of hex digits, we want an array of 4-hex digit parts
+		my @parts;
+		push(@parts, join('', splice(@labels, 0, 4))) while (scalar(@labels) > 0);
+
+		# remove any trailing parts that are zero
+		pop(@parts) while (0 == hex($parts[-1]));
+
+		# compute prefix length
+		my $prefixlen = 16 * (scalar(@parts));
+
+		$ip = Net::IP->new(sprintf(
+			'%s:%s:%s:%s:%s:%s:%s:%s/%u',
+			shift(@parts) || 0,
+			shift(@parts) || 0,
+			shift(@parts) || 0,
+			shift(@parts) || 0,
+			shift(@parts) || 0,
+			shift(@parts) || 0,
+			shift(@parts) || 0,
+			shift(@parts) || 0,
+			$prefixlen,
+		));
+
+	} else {
+		pop(@labels) while (0 == $labels[-1]);
+
+		my $prefixlen = 8 * (scalar(@labels));
+
+		$ip = Net::IP->new(sprintf(
+			'%u.%u.%u.%u/%u',
+			shift(@labels) || 0,
+			shift(@labels) || 0,
+			shift(@labels) || 0,
+			shift(@labels) || 0,
+			$prefixlen,
+		));
+	}
+
+	return undef if (!$ip);
+
+	my $url = $package->ip($ip);
+
+	return undef if (!$url);
+
+	return URI->new_abs(sprintf('../../domain/%s', $domain->name), $url);
 }
 
 #
@@ -244,9 +323,9 @@ sub load_registry {
 	if (!defined($REGISTRY->{$url})) {
 		my $file = sprintf('%s/%s-%s', File::Spec->tmpdir, $package, basename($url));
 
-		my $mirror = undef;
+		my ($mirror, $stat);
 		if (-e $file) {
-			my $stat = stat($file);
+			$stat = stat($file);
 			$mirror = (time() - $stat->mtime > 86400);
 
 		} else {
@@ -255,10 +334,24 @@ sub load_registry {
 		}
 
 		if ($mirror) {
-			my $response = $UA->mirror($url, $file);
+			my $request = GET($url);
+			$request->header('If-Modified-Since' => HTTP::Date::time2str($stat->mtime)) if ($stat);
 
-			carp($response->status_line) if ($response->is_error);
-			utime(undef, undef, $file) unless ($response->is_error);
+			my $response = $UA->request($request);
+
+			if (304 == $response->code) {
+				utime(undef, undef, $file);
+
+			} elsif ($response->is_success) {
+				my $tmpfile = File::Temp::tempnam(dirname($file), basename($file));
+				carp("Unable to write response data to $tmpfile: $!") if (!write_file($tmpfile, $response->content));
+				carp("Unable to move $tmpfile to $file: $!") if (!rename($tmpfile, $file));
+
+			} else {
+				carp($response->status_line);
+
+			}
+
 		}
 
 		if (-e $file) {

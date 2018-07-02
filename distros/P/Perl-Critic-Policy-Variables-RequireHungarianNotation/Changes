@@ -1,0 +1,32 @@
+Revision history for Perl-Critic-Policy-Variables-RequireHungarianNotation
+
+0.0.7  Wed Jun 30 12:24:19 2018
+    * get rid of of own test utils lib
+    * update test comments
+    * changing test lists
+
+0.0.6  Wed Jun 21 09:24:19 2018
+    * documentations (thanks dsonntag)
+    * supports use vars
+    * better restrictions between arrays and hashes
+
+0.0.5  Wed Jun 21 09:24:19 2018
+    * ignore @ARGV
+    * add file handle as possible prefix 
+    * add state
+    * documentations
+
+0.0.4  Tue Jun 20 08:24:19 2018
+    * documentations
+
+0.0.3  Mon Jun 19 15:24:19 2018
+    * add code ref to prefixes
+    * add float to prefixes
+    * documentations
+
+0.0.2  Mon Jun 19 15:24:19 2018
+    * supporting sub declarations
+
+0.0.1  Mon Jun 18 19:24:19 2018
+    * Initial release.
+

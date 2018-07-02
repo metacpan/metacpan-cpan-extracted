@@ -22,18 +22,16 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221545;
+our $VERSION = 1.20180619214154;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d)(\\d{4})(\\d{4})',
-                  'national_rule' => '($1)',
                   'leading_digits' => '2[23]',
-                  'format' => '$1 $2 $3'
+                  'national_rule' => '($1)',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d)(\\d{4})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'national_rule' => '($1)',
                   'leading_digits' => '
             [357]|
             4[1-35]|
@@ -43,57 +41,59 @@ my $formatters = [
               [1-9]
             )
           ',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '($1)',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
                   'pattern' => '(9)(\\d{4})(\\d{4})',
-                  'leading_digits' => '9',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '9'
                 },
                 {
                   'pattern' => '(44)(\\d{3})(\\d{4})',
-                  'leading_digits' => '44',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '44'
                 },
                 {
-                  'leading_digits' => '[68]00',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '[68]00',
                   'pattern' => '([68]00)(\\d{3})(\\d{3,4})'
                 },
                 {
-                  'pattern' => '(600)(\\d{3})(\\d{2})(\\d{3})',
                   'leading_digits' => '600',
-                  'format' => '$1 $2 $3 $4'
+                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(600)(\\d{3})(\\d{2})(\\d{3})'
                 },
                 {
-                  'leading_digits' => '1230',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '1230',
                   'pattern' => '(1230)(\\d{3})(\\d{4})'
                 },
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '219',
                   'national_rule' => '($1)',
+                  'leading_digits' => '219',
                   'pattern' => '(\\d{5})(\\d{4})'
                 },
                 {
+                  'pattern' => '(\\d{4,5})',
+                  'intl_format' => 'NA',
                   'leading_digits' => '[1-9]',
                   'national_rule' => '$1',
-                  'format' => '$1',
-                  'intl_format' => 'NA',
-                  'pattern' => '(\\d{4,5})'
+                  'format' => '$1'
                 }
               ];
 
 my $validators = {
-                'voip' => '44\\d{7}',
+                'specialrate' => '(600\\d{7,8})',
                 'toll_free' => '
           800\\d{6}|
           1230\\d{7}
         ',
                 'personal_number' => '',
+                'voip' => '44\\d{7}',
                 'pager' => '',
-                'specialrate' => '(600\\d{7,8})',
                 'geographic' => '
           2(?:
             1962\\d{4}|

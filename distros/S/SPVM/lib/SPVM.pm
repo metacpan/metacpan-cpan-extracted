@@ -16,7 +16,7 @@ use Encode 'encode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0349';
+our $VERSION = '0.0352';
 
 our $ENV;
 our $BUILD;
@@ -53,7 +53,7 @@ CHECK {
   if ($BUILD) {
     my $compile_success = $BUILD->build_spvm();
     unless ($compile_success) {
-      croak("SPVM compile error");
+      die "SPVM compile error";
     }
   }
 }
@@ -386,10 +386,10 @@ C Source File;
   // lib/MyMathNative.native/MyMathNative.c
   #include <spvm_native.h>
 
-  int32_t SPVM_NATIVE_SUB(MyMathNative__sum) (SPVM_ENV* env, SPVM_VALUE* args) {
+  int32_t SPVM_NATIVE_MyMathNative__sum(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     // First argument
-    void* sp_nums = args[0].oval;
+    void* sp_nums = stack[0].oval;
     
     // Array length
     int32_t length = env->get_array_length(env, sp_nums);
@@ -406,11 +406,11 @@ C Source File;
       }
     }
     
-    // Return value is set to args[0]
-    args[0].ival = total;
+    // Return value is set to stack[0]
+    stack[0].ival = total;
     
-    // If function success, return 0
-    return 0;
+    // If function success, return SPVM_SUCCESS
+    return SPVM_SUCCESS;
   }
 
 Use Extension Module from Perl:

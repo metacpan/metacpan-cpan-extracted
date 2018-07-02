@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-XYZ
 
+0.09	Thu Jun 21 10:59:01 EDT 2018
+	Don't run on-line tests unless AUTHOR_TESTING is on
+	Move build_requires to tests_requires
+
 0.08	Sun 29 Apr 10:55:48 EDT 2018
 	Change tests for changing results from geocode.xyz
 

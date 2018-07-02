@@ -1,0 +1,46 @@
+---
+title: Publications
+---
+<div class="row">
+<div class="eleven columns">
+<table class="u-max-full-width publications">
+  <thead>
+    <tr>
+      <th>Year</th>
+      <th>Type</th>
+      <th>Authors</th>
+      <th>Publication</th>
+      <th></th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+    [% FOREACH p IN page.publications %]
+    <tr>
+      <td class="year">[% p.year %]</td>
+      <td class="type">[% p.type %]</td>
+      <td class="author">
+        [% FOREACH n IN p.author %]
+          [% n %]
+          [%- "," IF !loop.last %]
+        [% END %]
+      </td>
+      <td>[% p.title%]</td>
+      <td class="utils">
+        [% IF p.url %]<a href="[% p.url %]"><i class="fa fa-external-link"></i></a>[% END %]
+      </td>
+      <td class="utils">
+        <a alt="Bibtex entry" href="#" onclick='$("#dialog_[% p.id %]").dialog({height:300,width:600});'><i class="fa fa-book"></i></a>
+      </td>
+    </tr>
+    [% END %]
+  </tbody>
+</table>
+<div>
+</div>
+[% FOREACH p IN page.publications %]
+<div id="dialog_[% p.id %]" title="Bibtex Entry" style="display:none">
+  <pre>
+    [% p.source %]
+  </pre>
+</div>
+[% END %]

@@ -18,10 +18,13 @@
 #   along with RSLinux.  If not, see <http://www.gnu.org/licenses/>.
 
 use App::rs 'sane',
-    iautoload => [qw/App::rs Term::ANSIColor Cwd/,
+    iautoload => ['App::rs',
+		  ['Term::ANSIColor', [qw/colored c/]],
+		  [qw/Cwd abs_path getcwd/],
 		  [qw/File::Path make_path/],
-		  ['List::Util', map { "0$_" } qw/reduce all first/],
-		  ['Fcntl', map { "0$_" } qw/S_IFMT S_IFLNK S_IFREG S_IFDIR/]];
+		  ['List::Util', map { "&$_" } qw/reduce all first none/],
+		  ['Fcntl', map { "&$_" } qw/S_IFMT S_IFLNK S_IFREG S_IFDIR/],
+		  [qw/Config %Config/]];
 
 BEGIN {
 	for my $c (qw/green cyan yellow magenta red/) {
@@ -282,8 +285,8 @@ sub filter {
 	$f->({event => 'ret'}) or $v;
 }
 sub confirm ($) {
-	state $s = colored(GG, 'yes') . ' or ' .
-	    colored(RR, 'no') . ': ';
+	state $s = c(GG, 'yes') . ' or ' .
+	    c(RR, 'no') . ': ';
 	print shift, ', ', $s;
 	while (1) {
 		chomp(my $a = <STDIN>);
@@ -294,9 +297,9 @@ sub confirm ($) {
 }
 sub rs_unparse_wrap {
 	my $o = shift;
-	print colored(YY, "Writing $o->{d}"), ': ';
+	print c(YY, "Writing $o->{d}"), ': ';
 	rs_unparse(@$o{qw/v fd/});
-	say colored(GG, 'done'), '.';
+	say c(GG, 'done'), '.';
 }
 sub depdiff {
 	my ($p, $q) = @_;
@@ -306,7 +309,7 @@ sub depdiff {
 sub depF {
 	my $o = shift;
 	return 1 if $o->{phase} =~ /^(configure|build|test|runtime)$/ and $o->{relationship} eq 'requires';
-	say colored(Y, 'Dependency: ', jw($o), 'not installed by default.');
+	say c(Y, 'Dependency: ', jw($o), 'not installed by default.');
 	0;
 }
 sub Nrev {
@@ -314,14 +317,15 @@ sub Nrev {
 	$n =~ s/-/::/g or $n =~ s/::/-/g;
 	$n;
 }
-{ my $s;
+{ local $| = 1;
+  my $s;
   { my $H = $ENV{HOME};
     my $P = "$H/.rs";
     $s = {db => "$P/db.rs",
 	  root => "$H/CPAN/",
 	  pool => "$P/pool/",
 	  refdb => "$P/refdb.json",
-	  'compile-in' => '.'};
+	  'compile-in' => getcwd()};
     my $cmdline = arg_parse();
     my $profile = do($cmdline->{profile} || "$H/.rs.profile") || {};
     add($s, %$profile, %$cmdline);
@@ -330,16 +334,16 @@ sub Nrev {
   print 'run-time config: ', jw($s);
   { my $p = $s->{https} ? 'https' : 'http';
     sub Rmodinfo {
-	    http_req({method => 'GET',
-		      json => 1,
-		      url => "$p://fastapi.metacpan.org/v1/release/" . Nrev(shift)});
+	    purl({method => 'GET',
+		  json => 1,
+		  url => "$p://fastapi.metacpan.org/v1/release/" . Nrev(shift)});
     }
     sub Vmodinfo {
-	    http_req({method => 'POST',
-		      json => 1,
-		      url => "$p://fastapi.metacpan.org/v1/release/_search",
-		      'post-data' => jw({query => {term => {provides => shift}},
-					 filter => {term => {status => 'latest'}}})});
+	    purl({method => 'POST',
+		  json => 1,
+		  url => "$p://fastapi.metacpan.org/v1/release/_search",
+		  'post-data' => jw({query => {term => {provides => shift}},
+				     filter => {term => {status => 'latest'}}})});
     } }
   # mod tells us whether the database is modified.
   my ($db, $mod) = -f $s->{db} ? rs_parse($s->{db}) : {};
@@ -410,7 +414,7 @@ sub Nrev {
 		  # drop root privilege before compile, as suggested by many packages.
 		  my $u = $s->{'compile-as'} || $ENV{USER};
 		  if ($u eq 'root') {
-			  say colored(RR, 'You are compiling as root!');
+			  say c(RR, 'You are compiling as root!');
 			  $root = 0;
 		  } else {
 			  runas($u);
@@ -428,7 +432,7 @@ sub Nrev {
 			      $p, $d);
 		  }
 	  } else {
-		  ($oid) = $p =~ m|([^/]*).tar.\w+$|;
+		  ($oid) = $p =~ m{([^/]*).(tar.\w+|tgz)$};
 		  ($d) = (xsh(1, qw/tar -xvf/, $p))[0] =~ m|([^/\n]*)| or die 'bad tarball.';
 	  }
 	  ($pkg) = $s->{package} || $oid =~ m|(.*)-|;
@@ -448,7 +452,7 @@ sub Nrev {
 				       'no-make-install' => 1,
 				       'post-make-install' => "./Build install --install_base=$s->{prefix}"};
 			  } else {
-				  die colored(RR, 'Neither Makefile.PL nor Build.PL found.');
+				  die c(RR, 'Neither Makefile.PL nor Build.PL found.');
 			  }
 		  } else {
 			  my ($b, $v) = (do $s->{build}, $pkg);
@@ -482,7 +486,7 @@ sub Nrev {
 	  xsh(0, qw/make install/, @{$b->{'make-install-parameter'}}) or die 'make install failed.' unless $b->{'no-make-install'};
 	  xsh({'feed-stdin' => 1}, $b->{'post-make-install'}, 'bash') or die 'post-make failed.' if $b->{'post-make-install'};
 	  # do some cleaning.
-	  unless ($s->{'no-rm'}) {
+	  unless ($s->{prepared} or $s->{'no-rm'}) {
 		  my $cwd = getcwd();
 		  xsh(0, qw/rm -rf/, "../$d") if $s->{rm} or confirm "'rm -rf ../$d' on $cwd";
 	  }
@@ -495,7 +499,7 @@ sub Nrev {
   sub _which {
 	  my $r = shift;
 	  if ($r =~ m{^/}) {
-		  die colored(RR, "Absolute path $r not prefixed by $s->{root}"), ".\n" unless 0 == index $r, $s->{root};
+		  die c(RR, "Absolute path $r not prefixed by $s->{root}"), ".\n" unless 0 == index $r, $s->{root};
 		  $r = substr $r, length $s->{root};
 	  }
 	  my ($d, @p) = (0, split m{/}, $r);
@@ -530,13 +534,17 @@ sub Nrev {
   }
   { my $refdb;
     sub _RR () { $refdb = -f $s->{refdb} ? jr(rf($s->{refdb})) : {} }
-    sub _RW () { wf($s->{refdb}, jw($refdb)) }
+    sub _RW () {
+	    print c(YY, "Writing reference counting database $s->{refdb}", ': ');
+	    wf($s->{refdb}, jw($refdb));
+	    say c(GG, 'done'), '.';
+    }
     sub _install {
 	    my $o = shift;
 	    print "Satisfying: ", jw($o);
 	    my $q = $refdb->{$o->{module}} ||= {};
 	    my ($A, $L) = ($q->{current},
-			   $s->{latest} || $o->{version} eq 'latest');
+			   $s->{latest});
 	    if ($A)	{ return if not $L and vcmp($A->{version}, $o->{version}) >= 0 }
 	    # no update on CORE module even when latest is required.
 	    else	{ return if vsat(@$o{qw/module version/}) }
@@ -551,9 +559,12 @@ sub Nrev {
 		    $j = Rmodinfo($o->{module});
 		    if (eval { $j->{code} == 404 }) {
 			    $j = Vmodinfo($o->{module});
-			    die jw($j) unless $j->{hits}{total} == 1;
-			    my $k = $j->{hits}{hits}[0]{_source};
-			    say colored(YY, "Using $k->{name} for $o->{module}.");
+			    my @r = map { $_->{_source} } @{$j->{hits}{hits}};
+			    if (@r < 1)		{ die c(RR, "Nothing provides $o->{module}.") }
+			    elsif (@r > 1)	{ say c(YY, "Multiple modules provides $o->{module}: ",
+							join ', ', map { $_->{distribution} } @r) }
+			    my $k = $r[0];
+			    say c(YY, "Using $k->{name} for $o->{module}.");
 			    my $v = $k->{version};
 			    $j = {name => Nrev($o->{module}) . "-$v",
 				  version => $v,
@@ -576,17 +587,17 @@ sub Nrev {
 								   $D);
 	    }
 	    if (-f(my $f = "$s->{pool}$B->{name}.rs")) {
-		    say colored(YY, "Reusing compiled package $f.");
+		    say c(YY, "Reusing compiled package $f.");
 		    patch($f);
 	    } elsif (not $V) {
 		    if (-f($f = "$s->{'compile-in'}/$j->{archive}")) {
-			    say colored(YY, "Reusing source archive $f.");
+			    say c(YY, "Reusing source archive $f.");
 		    } else {
 			    $j->{download_url} =~ s|(?<=^http)s(?=://)|| unless $s->{https};
 			    say "Downloading $j->{download_url} @ $j->{date}...";
-			    http_req({method => 'GET',
-				      url => $j->{download_url},
-				      save => $f});
+			    purl({method => 'GET',
+				  url => $j->{download_url},
+				  save => $f});
 		    }
 		    compile($f);
 		    unshift @{$q->{available}}, $B;
@@ -596,28 +607,25 @@ sub Nrev {
     }
     { my $l;
       sub _lib () {
-	      my (@p, @q) = split ':', $ENV{PERLLIB} || '';
-	      my %h = map { s|/$||r => 1 } @p;
+	      my @p = split ':', $ENV{PERL5LIB} || '';
 	      my $b = "$s->{prefix}/lib/perl5";
-	      require Config;
-	      no warnings 'once';
-	      if (@q = grep { not $h{$_} } $b, "$b/$Config::Config{archname}") {
-		      $ENV{PERLLIB} = $l = join ':', @p, @q;
-		      say 'PERLLIB set to: ', colored(YY, $l), '.';
+	      if (none { $b eq s|/$||r } @p) {
+		      $ENV{PERL5LIB} = $l = join ':', @p, $b;
+		      say 'PERL5LIB set to: ', c(YY, $l), '.';
 	      }
       }
       sub install {
 	      _RR;
 	      _lib;
-	      @$s{qw/cpan rm/} = (1, 1), $s->{version} ||= 0;
+	      @$s{qw/cpan rm/} = (1, 1);
 	      _install({module => my $module = shift,
-			version => $s->{version},
+			version => $s->{version} || 0,
 			phase => 'runtime',
 			relationship => 'requires'});
 	      $refdb->{$module}{direct} = 1;
 	      _RW;
-	      say 'Please set your PERLLIB environment to ',
-		  colored(CC, $l), ' to use the installed modules.' if $l;
+	      say 'Please set your PERL5LIB environment to ',
+		  c(CC, $l), ' to use the installed modules.' if $l;
       } }
     sub _uninstall {
 	    my $o = shift;
@@ -636,7 +644,7 @@ sub Nrev {
     sub uninstall {
 	    _RR;
 	    my $q = $refdb->{my $module = shift};
-	    die colored(RR, "$module not installed or directly referenced by you."),
+	    die c(RR, "$module not installed or directly referenced by you."),
 		unless $q->{current} and $q->{direct};
 	    delete $q->{direct};
 	    _uninstall({to => $module,
@@ -659,15 +667,14 @@ sub Nrev {
 	    for (@{_orphan()}) {
 		    my $q = $refdb->{$_};
 		    my $A = $q->{available} ||= [];
-		    say 'There are ', colored(YY, 0+@$A), " available versions of orphan $_.";
+		    say 'There are ', c(YY, 0+@$A), " available versions of orphan $_.";
 		    for (@$A) {
 			    $_ = "$s->{pool}$_->{name}.rs";
 			    if (-f) {
-				    unlink and
-					say colored(GG, "$_ removed.") or
-					say colored(RR, "removing $_ failed.");
+				    if (unlink)	{ say c(GG, "$_ removed.") }
+				    else	{ say c(RR, "removing $_ failed.") }
 			    } else {
-				    say colored(M, "$_ doesn't exist.");
+				    say c(M, "$_ doesn't exist.");
 			    }
 		    }
 		    delete $refdb->{$_};
@@ -679,7 +686,7 @@ sub Nrev {
   if ($mod)	{ rs_unparse_wrap({v => $db,
 				   fd => fileno wf($s->{db}),
 				   d => "database $s->{db}"}) }
-  else		{ say colored(G, 'Database not touched'), '.' } }
+  else		{ say c(G, 'Database not touched'), '.' } }
 
 __END__
 
@@ -1540,15 +1547,14 @@ Just follow the usual idiom to build a Perl module:
     # make install
 
 That will install B<rs> to your system directory and it's recommended since
-you do not have to mess around with the PATH or PERLLIB environment. You could
+you do not have to mess around with the PATH or PERL5LIB environment. You could
 also install to a custom directory by using:
 
     # perl Makefile.PL INSTALL_BASE=/path/to/prefix
 
 The executable will reside in the C<bin> direcory under prefix and the Perl
-modules will be in C<lib/perl5/x86_64-linux>, the C<x86_64-linux> part will
-be different if you're using a architecture other than C<x86_64>. Adjust your
-PATH and PERLLIB accordingly.
+modules will be in C<lib/perl5>. Adjust your
+PATH and PERL5LIB accordingly.
 
 Note that since C<App::rs> is used to bootstrap both RSLinux and CPAN, it's
 explicitly designed to have no dependency other than the core Perl modules.
@@ -1568,10 +1574,9 @@ but of course all these settings could be customized, if
 you want to do customization reading the full mannual is highly suggested,
 it will be worth your while.
 
-The only thing you have to do is setting your C<PERLLIB> environment to include
-C<< <HOME>/CPAN/lib/perl5 >> and C<< <HOME>/CPAN/lib/perl5/x86_64-linux >>,
-assuming you're using the default configuration
-(the x86_64-linux part will be different depending on your OS and architecture),
+The only thing you have to do is setting your C<PERL5LIB> environment to include
+C<< <HOME>/CPAN/lib/perl5 >>,
+assuming you're using the default configuration,
 you don't have to do this before doing installation using B<rs> since B<rs> will automatically
 add them and print a helpful reminder if they're missing during the installation
 process. Here's some quick usage introduction:
@@ -1646,6 +1651,11 @@ that they ever existed once this command finishes. A typical pattern would be:
 The not CPAN specific commands L</tag> L</which> L</list> L</crowded>
 are still very useful when using B<rs> as a CPAN client, please see
 their description for more information.
+
+=head1 SEE ALSO
+
+A short L<video|https://www.youtube.com/watch?v=QtMcbqtivOU> introduction
+to App::rs as CPAN client.
 
 =head1 LICENSE
 

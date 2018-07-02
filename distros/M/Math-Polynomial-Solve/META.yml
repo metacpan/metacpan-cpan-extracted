@@ -16,15 +16,15 @@ name: Math-Polynomial-Solve
 provides:
   Math::Polynomial::Solve:
     file: lib/Math/Polynomial/Solve.pm
-    version: '2.81'
+    version: '2.85'
 requires:
   Math::Complex: '1.36'
-  Math::Utils: '1.06'
+  Math::Utils: '1.12'
   perl: v5.10.1
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/jgamble/Math-Polynomial-Solve.git
-version: '2.81'
+version: '2.85'
 x_keyword:
   - math
   - polynomial

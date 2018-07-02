@@ -1,5 +1,12 @@
 Revision history for Perl extension Class::STL::Containers.
 
+0.37 Thu June 21 18:42:00 GMT 2018
+    - Bump version number and re-upload to CPAN after PAUSE permissions fix.
+
+0.36 Thu June 21 17:07:00 GMT 2018
+    - Fixed modern requirements for how Exporter works, and what UNIVERSAL can export.
+    - First maintenance release by David Oswald <davido@cpan.org>
+
 0.35 Tue April 3 19:33:14 GMT 2007
 	- Fixed sort pragma usage when perl version <5.8.
 	- In tests qualify all stl imports instead of importing names due to some odd

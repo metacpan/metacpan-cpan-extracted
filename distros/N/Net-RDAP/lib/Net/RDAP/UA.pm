@@ -9,10 +9,6 @@ use strict;
 
 L<Net::RDAP::UA> - an RDAP user agent, based on L<LWP::UserAgent>.
 
-=head1 SYNOPSIS
-
-	use Net::RDAP::UA;
-
 =head1 DESCRIPTION
 
 This module extends L<LWP::UserAgent> in order to inject various
@@ -45,7 +41,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #
 # create a new object, which is just an LWP::UserAgent with
-# some additional 
+# some additional
 #
 sub new {
 	my ($package, %options) = @_;
@@ -53,8 +49,8 @@ sub new {
 	$options{'agent'} = sprintf('%s/%f', $package, $Net::RDAP::VERSION) if (!defined($options{'agent'}));
 
 	$options{'ssl_opts'}= {} if (!defined($options{'ssl_opts'}));
-	
-	$options{'ssl_opts'}->{'verify_hostname'} => 1 unless (defined($options{'ssl_opts'}->{'verify_hostname'}));
+
+	$options{'ssl_opts'}->{'verify_hostname'} = 1 unless (defined($options{'ssl_opts'}->{'verify_hostname'}));
 	$options{'ssl_opts'}->{'SSL_ca_file'} = Mozilla::CA::SSL_ca_file() unless (defined($options{'ssl_opts'}->{'SSL_ca_file'}));
 
 	return $package->SUPER::new(%options);
@@ -65,9 +61,17 @@ sub new {
 # server for JSON:
 #
 sub request {
-	my $self = shift;
-	$_[0]->header('Accept' => 'application/rdap+json, application/json');
-	return $self->SUPER::request(@_);
+	my ($self, $request) = @_;
+
+	$request->header('Accept' => 'application/rdap+json, application/json');
+
+	print STDERR $request->as_string if (1 == $ENV{'NET_RDAP_UA_DEBUG'});
+
+	my $response = $self->SUPER::request($request);
+
+	print STDERR $response->as_string if (1 == $ENV{'NET_RDAP_UA_DEBUG'});
+
+	return $response;
 }
 
 1;

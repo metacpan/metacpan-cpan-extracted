@@ -46,6 +46,7 @@ our $debug;
 our $no_operation;
 our $mod_opt = '-M';
 our $mod_arg = 1;	# Process -M option in target command
+our $exit_code;
 
 my($cmd_dir, $cmd_name) = ($0           =~ m{ (.*) / ([^/]+) $ }x) or die;
 my($abs_dir, $abs_name) = (abs_path($0) =~ m{ (.*) / ([^/]+) $ }x) or die;
@@ -183,7 +184,9 @@ warn "$abs_name: exec $target_name @ARGV\n" if $debug;
 ##
 ## execute target command
 ##
-exit system($target_name, @ARGV) >> 8;
+my $status = system $target_name, @ARGV;
+
+exit(defined $exit_code ? $exit_code : $status >> 8);
 
 ######################################################################
 
@@ -235,6 +238,7 @@ sub self_option {
 	"M"         => \$opt{M},
 	"module!"   => \$main::mod_arg,
 	"x|nop!"    => \$main::no_operation,
+	"exit=i"    => \$main::exit_code,
 	);
     GetOptionsFromArray $argv, @optargs;
 
@@ -700,6 +704,12 @@ However, there is a command which also uses same option for own
 purpose.  Option B<--nomodule> disables that behavior.  Other option
 interpretation is still effective, and there is no problem using
 module option in rc or module files.
+
+
+=item B<--exit> I<status>
+
+Usually B<optex> exits with status of executed command.  This option
+override it and force to exit with specified status code.
 
 
 =back

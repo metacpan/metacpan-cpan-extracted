@@ -15,7 +15,7 @@ use Data::Dumper;
 use Cwd qw/fastcwd/;
 use JSON::XS;
 
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 has 'num_elems_cumulative' => ( is => 'rw' );
 has overwrite              => ( is => 'rw', default => 1 );

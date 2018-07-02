@@ -10,7 +10,7 @@
 # Pass Fail statistics should be repeated at bottom to be more usable on terminals
 
 package Data::Edit::Xml::Lint;
-our $VERSION = 20180616;
+our $VERSION = 20180629;
 require v5.16.0;
 use warnings FATAL => qw(all);
 use strict;
@@ -150,6 +150,7 @@ sub lintOP($$@)                                                                 
    {my $d = $lint->dtds;                                                        # Optional dtd to use
     my $f = $file;                                                              # File name
     my $p = " --noent --noout --valid";                                         # Suppress printed output and entity transformation, validate
+#      $p .= " --debug --debugent --load-trace";                                         # Suppress printed output and entity transformation, validate
     return qq(xmllint --path "$d" $p "$f" 2>&1) if $d;                          # Lint against DTDs
     my $c = $lint->catalog;                                                     # Optional dtd catalog to use
     return qq(xmllint $p - < "$f" 2>&1) unless $c;                              # Normal lint
@@ -264,7 +265,7 @@ sub read($)                                                                     
    }
 
   my ($S, @S) = split /(?=<!--linted:)/s, $s;                                   # Split source on errors
-  my ($U, $C) = split /(?=<!--compressedErrors:)/s, $S[-1];                     # Split errors
+  my ($U, $C) = split /(?=<!--compressedErrors:)/s, $S[-1]//'';                 # Split errors
   my @U = $U ? split /\n+/, $U : ();                                            # Split uncompressed errors
   my @C = $C ? split /\n+/, $C : ();                                            # Split   compressed errors
   shift @C;                                                                     # Remove the number of compressed errors
@@ -645,6 +646,9 @@ END
       push @report, sprintf("%6d %s\n", $count, $message);
      }
    }
+
+  push @report, "\n", (split /\n/, $report[0])[0];                              # Repeat summary line
+
   return bless {                                                                # Return report
     compressedErrors                => \%CE,
     failingFiles                    => [@filesFail],
@@ -748,11 +752,11 @@ Produces:
 
 =head2 Rereading
 
-Once a L<file|/file> has been L<linted|/lint>, it can reread with L<read|/read>
-to obtain details about the xml including id=?s defined (see: idDefs below) and
-any L<labels|Data::Edit::Xml/Labels> that refer to these id=?s (see: labelDefs
-below). Such L<labels|Data::Edit::Xml/Labels> provide additional names for a
-node which cannot be stored in the xml itself.
+Once a L<file|/file> has been L<linted|/lint>, it can be reread with L<read|/read>
+to obtain details about the xml including any B<id> attributes defined (see: idDefs below) and
+any L<labels|Data::Edit::Xml/Labels> that refer to these B<id> attributes (see: labelDefs
+below). Such L<labels|Data::Edit::Xml/Labels> provide additional identities for a
+node beyond that provided by the B<id> attribute.
 
   {catalog    => "/home/phil/hp/dtd/Dtd_2016_07_12/catalog-hpe.xml",
    definition => "bbb",
@@ -779,33 +783,35 @@ node which cannot be stored in the xml itself.
 =head2 ReLinting
 
 In order to fix references between L<files|/file>, a list of L<files|/file> can be
-L<relinted|/relint>:
+L<relinted|/relint> which performs the following actions:
 
 =over 2
 
 =item 1
 
-the specified L<files|/file> are L<read|/read>
+reads the specified L<files|/file> via L<read|/read>
 
 =item 2
 
-a map is constructed to locate all the ids and labels defined in the specified
-L<files|/file>
+constructs an B<id map> to locate an B<id>s from B<label>s defined in the
+specified L<files|/file>
 
 =item 3
 
-each L<file|/file> is L<reparsed|Data::Edit::Xml/new>
+L<Reparses|Data::Edit::Xml/new> each of the specified L<files|/file> to build a
+parse tree representing the xml in each file.
 
 =item 4
 
-the resulting L<parse tree|Data::Edit::Xml/new> and id map are handed to a caller provided 𝘀𝘂𝗯 that
-can the traverse the L<parse tree|Data::Edit::Xml/new> fixing attributes which make references between
-the L<files|/file>.
+Calls a user supplied B<sub> passing it the L<parse tree|Data::Edit::Xml/new>
+for each specified file and the B<id map>. The B<sub> should traverse the
+L<parse tree|Data::Edit::Xml/new> fixing attributes which make references
+between the L<files|/file> using the supplied B<id map>.
 
 =item 5
 
-the modified L<parse trees|Data::Edit::Xml/new> are written back to the
-originating L<file|/file> thus fixing the changes
+Writes any modified L<parse trees|Data::Edit::Xml/new> back to the originating
+L<file|/file> thus fixing the changes
 
 =back
 
@@ -840,6 +846,16 @@ Optional author of the xml - only needed if you want to generate an SDL file map
 Optional catalog file containing the locations of the DTDs used to validate the xml
 
 
+=head3 compressedErrors :lvalue
+
+Number of compressed errors
+
+
+=head3 compressedErrorText :lvalue
+
+Text of compressed errors
+
+
 =head3 ditaType :lvalue
 
 Optional Dita topic type(concept|task|troubleshooting|reference) of the xml - only needed if you want to generate an SDL file map
@@ -857,7 +873,12 @@ Optional directory containing the DTDs used to validate the xml
 
 =head3 errors :lvalue
 
-Number of lint errors detected by xmllint
+Number of uncompressed lint errors detected by xmllint
+
+
+=head3 errorText :lvalue
+
+Text of uncompressed lint errors detected by xmllint
 
 
 =head3 file :lvalue
@@ -943,25 +964,17 @@ Lint xml L<files|/file> in parallel
 
 Store some xml in a L<files|/file>, apply xmllint in parallel and update the source file with the results
 
-     Parameter    Description
-  1  $lint        Linter
-  2  %attributes  Attributes to be recorded as xml comments
+     Parameter    Description                                
+  1  $lint        Linter                                     
+  2  %attributes  Attributes to be recorded as xml comments  
 
 =head2 lintNOP($@)
 
 Store some xml in a L<files|/file>, apply xmllint in single and update the source file with the results
 
-     Parameter    Description
-  1  $lint        Linter
-  2  %attributes  Attributes to be recorded as xml comments
-
-=head2 nolint($@)
-
-Store just the attributes in a file so that they can be retrieved later to process non xml objects referenced in the xml - like images
-
-     Parameter    Description
-  1  $lint        Linter
-  2  %attributes  Attributes to be recorded as xml comments
+     Parameter    Description                                
+  1  $lint        Linter                                     
+  2  %attributes  Attributes to be recorded as xml comments  
 
 =head1 Report
 
@@ -971,30 +984,15 @@ Methods for L<reporting|Data::Edit::Xml::Lint/report> the results of L<linting|/
 
 Analyse the results of prior L<lints|/lint> and return a hash reporting various statistics and a L<printable|/print> report
 
-     Parameter         Description
-  1  $outputDirectory  Directory to search
-  2  $filter           Optional regular expression to filter files
+     Parameter         Description                                  
+  1  $outputDirectory  Directory to search                          
+  2  $filter           Optional regular expression to filter files  
 
 =head2 Attributes
 
-=head3 passRatePercent :lvalue
+=head3 compressedErrors :lvalue
 
-Total number of passes as a percentage of all input files
-
-
-=head3 timestamp :lvalue
-
-Timestamp of report
-
-
-=head3 numberOfProjects :lvalue
-
-Number of L<projects|/project> defined - each L<project|/project> can contain zero or more L<files|/file>
-
-
-=head3 numberOfFiles :lvalue
-
-Number of L<files|/file> encountered
+Compressed errors over all files
 
 
 =head3 failingFiles :lvalue
@@ -1007,24 +1005,54 @@ Array of [number of errors, L<project|/project>, L<files|/file>] ordered from le
 [Projects with xmllint errors]
 
 
+=head3 filter :lvalue
+
+File selection filter
+
+
+=head3 numberOfFiles :lvalue
+
+Number of L<files|/file> encountered
+
+
+=head3 numberOfProjects :lvalue
+
+Number of L<projects|/project> defined - each L<project|/project> can contain zero or more L<files|/file>
+
+
 =head3 passingProjects :lvalue
 
 [Projects with no xmllint errors]
 
 
-=head3 totalErrors :lvalue
+=head3 passRatePercent :lvalue
 
-Total number of errors
-
-
-=head3 projects :lvalue
-
-Hash of "project name"=>[L<project name|/project>, pass, fail, total, percent pass]
+Total number of passes as a percentage of all input files
 
 
 =head3 print :lvalue
 
 A printable L<report|/report> of the above
+
+
+=head3 timestamp :lvalue
+
+Timestamp of report
+
+
+=head3 totalCompressedErrorsFileByFile :lvalue
+
+Total number of errros summed file by file
+
+
+=head3 totalCompressedErrors :lvalue
+
+Number of compressed errors
+
+
+=head3 totalErrors :lvalue
+
+Total number of errors
 
 
 
@@ -1034,18 +1062,18 @@ A printable L<report|/report> of the above
 
 Store some xml in a L<files|/file>, apply xmllint in parallel or single and update the source file with the results
 
-     Parameter    Description
-  1  $inParallel  In parallel or not
-  2  $lint        Linter
-  3  %attributes  Attributes to be recorded as xml comments
+     Parameter    Description                                
+  1  $inParallel  In parallel or not                         
+  2  $lint        Linter                                     
+  3  %attributes  Attributes to be recorded as xml comments  
 
 =head2 p4($$)
 
 Format a fraction as a percentage to 4 decimal places
 
-     Parameter  Description
-  1  $p         Pass
-  2  $f         Fail
+     Parameter  Description  
+  1  $p         Pass         
+  2  $f         Fail         
 
 
 =head1 Index
@@ -1055,77 +1083,85 @@ Format a fraction as a percentage to 4 decimal places
 
 2 L<catalog|/catalog>
 
-3 L<ditaType|/ditaType>
+3 L<compressedErrors|/compressedErrors>
 
-4 L<docType|/docType>
+4 L<compressedErrorText|/compressedErrorText>
 
-5 L<dtds|/dtds>
+5 L<ditaType|/ditaType>
 
-6 L<errors|/errors>
+6 L<docType|/docType>
 
-7 L<failingFiles|/failingFiles>
+7 L<dtds|/dtds>
 
-8 L<failingProjects|/failingProjects>
+8 L<errors|/errors>
 
-9 L<file|/file>
+9 L<errorText|/errorText>
 
-10 L<fileNumber|/fileNumber>
+10 L<failingFiles|/failingFiles>
 
-11 L<guid|/guid>
+11 L<failingProjects|/failingProjects>
 
-12 L<header|/header>
+12 L<file|/file>
 
-13 L<idDefs|/idDefs>
+13 L<fileNumber|/fileNumber>
 
-14 L<labelDefs|/labelDefs>
+14 L<filter|/filter>
 
-15 L<labels|/labels>
+15 L<guid|/guid>
 
-16 L<lint|/lint>
+16 L<header|/header>
 
-17 L<linted|/linted>
+17 L<idDefs|/idDefs>
 
-18 L<lintNOP|/lintNOP>
+18 L<labelDefs|/labelDefs>
 
-19 L<lintOP|/lintOP>
+19 L<labels|/labels>
 
-20 L<new|/new>
+20 L<lint|/lint>
 
-21 L<nolint|/nolint>
+21 L<linted|/linted>
 
-22 L<numberOfFiles|/numberOfFiles>
+22 L<lintNOP|/lintNOP>
 
-23 L<numberOfProjects|/numberOfProjects>
+23 L<lintOP|/lintOP>
 
-24 L<p4|/p4>
+24 L<new|/new>
 
-25 L<passingProjects|/passingProjects>
+25 L<numberOfFiles|/numberOfFiles>
 
-26 L<passRatePercent|/passRatePercent>
+26 L<numberOfProjects|/numberOfProjects>
 
-27 L<preferredSource|/preferredSource>
+27 L<p4|/p4>
 
-28 L<print|/print>
+28 L<passingProjects|/passingProjects>
 
-29 L<processes|/processes>
+29 L<passRatePercent|/passRatePercent>
 
-30 L<project|/project>
+30 L<preferredSource|/preferredSource>
 
-31 L<projects|/projects>
+31 L<print|/print>
 
-32 L<report|/report>
+32 L<processes|/processes>
 
-33 L<reusedInProject|/reusedInProject>
+33 L<project|/project>
 
-34 L<sha256|/sha256>
+34 L<report|/report>
 
-35 L<source|/source>
+35 L<reusedInProject|/reusedInProject>
 
-36 L<timestamp|/timestamp>
+36 L<sha256|/sha256>
 
-37 L<title|/title>
+37 L<source|/source>
 
-38 L<totalErrors|/totalErrors>
+38 L<timestamp|/timestamp>
+
+39 L<title|/title>
+
+40 L<totalCompressedErrors|/totalCompressedErrors>
+
+41 L<totalCompressedErrorsFileByFile|/totalCompressedErrorsFileByFile>
+
+42 L<totalErrors|/totalErrors>
 
 =head1 Installation
 

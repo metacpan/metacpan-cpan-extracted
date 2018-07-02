@@ -78,7 +78,6 @@ t/115-Neaf-Request-header-out.t
 t/116-Neaf-Request-multi.t
 t/117-Neaf-Request-post-raw.t
 t/118-Neaf-Request-cookie.t
-t/122-Neaf-force-view.t
 t/135-Request-get_form_as_list.t
 t/136-View-JS-nonhash.t
 t/137-Request-id.t
@@ -128,11 +127,19 @@ t/238-helper-pre.t
 t/239-helper-id-redefine.t
 t/240-helper-log_printf.t
 t/241-strict-mode.t
+t/242-session.t
+t/243-run-cgi.t
+t/244-force-view.t
+t/245-error-tpl.t
+t/246-strict-empty.t
 t/301-default-view.t
 t/401-pre-logic-403-tpl.t
 t/402-error-logged.t
 t/403-non-hash-return.t
 t/404-exception-in-hook.t
+t/405-add_route-fail.t
+t/406-resource-load-fail.t
+t/407-session-garb.t
 t/801-cli.t
 t/802-X-Form.t
 t/803-X-Form-LIVR.t
@@ -152,6 +159,8 @@ t/909-unblessed-no-more-0.30.t
 t/910-default-args-0.30.t
 t/911-Apache2-0.30.t
 t/912-check_path-0.30.t
+t/913-add_route-view-0.30.t
+t/914-preload-tpl.t
 t/README
 t/todo.t
 TODO

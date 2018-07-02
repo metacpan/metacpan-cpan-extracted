@@ -76,9 +76,30 @@ Parse a trace header (e.g. "Root=1-5759e988-bd862e3fe1be46a994272793;Parent=5399
 
 # CONFIGURATION
 
-## $AWS::XRay::Enabled
+## sampling\_rate($rate)
 
-Default true. When set false, capture() executes sub but do not send segument documents to X-Ray daemon.
+Set/Get a sampling rate for capture().
+
+    AWS::XRay->sampling_rate(0.1); # 10% sampling
+
+$rate is allowed a float value between 0 and 1.
+
+0 means disable tracing.
+1 means all of capture() are traced.
+
+When capture\_from() called with a trace header includes "Sampled=1", all of followed capture() are traced.
+
+## samplier($code)
+
+Set/Get a code ref to sample for capture().
+
+    AWS::XRay->sampler(sub {
+        if ($some_condition) {
+           return 1;
+        } else {
+           return 0;
+        }
+    });
 
 ## AWS\_XRAY\_DAEMON\_ADDRESS environment variable
 

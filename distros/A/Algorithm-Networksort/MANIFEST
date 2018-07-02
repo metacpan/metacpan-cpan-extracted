@@ -16,6 +16,7 @@ t/pod.t
 t/svg.t
 t/zero_one.pl
 eg/algtest.pl
+eg/best.pl
 eg/bruteforce.pl
 eg/eps.pl
 eg/fmt00.pl

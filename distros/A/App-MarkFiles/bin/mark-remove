@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+mark-remove - remove files from the current set of marked files
+
+=head1 SYNOPSIS
+
+  mark-remove:  removes filesystem paths from the mark list
+
+  USAGE:
+    mark remove path_to_mark
+
+  EXAMPLE:
+    mark remove foo.txt
+
+=head1 AUTHOR
+
+Brennen Bearnes <bbearnes@gmail.com>
+
+=cut
+
+use warnings;
+use strict;
+use 5.10.0;
+
+use App::MarkFiles qw(remove);
+use Cwd qw(cwd abs_path);
+use Getopt::Long;
+use Pod::Usage;
+
+GetOptions(
+  # 'config=s' => \$config_file,
+  help => sub { pod2usage(0) },
+) or pod2usage(2);
+
+remove(map { abs_path($_) } @ARGV);

@@ -10,7 +10,7 @@
 # ABSTRACT: Modify the configuration of an application
 
 package App::Cme::Command::modify ;
-$App::Cme::Command::modify::VERSION = '1.027';
+$App::Cme::Command::modify::VERSION = '1.028';
 use strict;
 use warnings;
 use 5.10.1;
@@ -20,6 +20,7 @@ use App::Cme -command ;
 use base qw/App::Cme::Common/;
 
 use Config::Model::ObjTreeScanner;
+use Config::Model qw/initialize_log4perl/;
 
 sub validate_args {
     my ($self, $opt, $args) = @_;
@@ -33,7 +34,7 @@ sub opt_spec {
     my ( $class, $app ) = @_;
     return ( 
         [ "backup:s"  => "Create a backup of configuration files before saving." ],
-        [ "quiet!"    => "Suppress progress messages" ],
+        [ "verbose!" => "show execution of the modification instructions" ],
         $class->cme_global_options,
     );
 }
@@ -51,6 +52,8 @@ sub description {
 
 sub execute {
     my ($self, $opt, $args) = @_;
+
+    $opt->{_verbose} = 'Loader' if $opt->{verbose};
 
     my ($model, $inst, $root) = $self->init_cme($opt,$args);
 
@@ -78,7 +81,7 @@ App::Cme::Command::modify - Modify the configuration of an application
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 
@@ -101,6 +104,26 @@ configuration file name. You must then use C<-file> option:
 
    cme modify dpkg-copyright -file ubuntu/copyright 'Comment="Silly example"'
 
+Finding the right instructions to perform a modification may be
+difficult when starting from scratch.
+
+To get started, you can run C<cme dump --format cml> command to get
+the content of your configuration in the syntax accepted by C<cme modify>:
+
+ $ cme dump ssh -format cml
+ Host:"*" -
+ Host:"alioth.debian.org"
+   User=dod -
+ Host:"*.debian.org"
+   IdentityFile:="~/.ssh/id_debian"
+   User=dod -
+
+Then you can use this output to create instruction for a modification:
+
+ $  cme modify ssh 'Host:"*" User=dod'
+ Changes applied to ssh configuration:
+ - Host:"*" User has new value: 'dod'
+
 =head1 Common options
 
 See L<cme/"Global Options">.
@@ -112,6 +135,10 @@ See L<cme/"Global Options">.
 =item -save
 
 Force a save even if no change was done. Useful to reformat the configuration file.
+
+=item -verbose
+
+Show effect of the modify instructions.
 
 =back
 

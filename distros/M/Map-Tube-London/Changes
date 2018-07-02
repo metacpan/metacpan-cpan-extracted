@@ -1,5 +1,8 @@
 Revision history for Map::Tube::London
 
+1.06  2018-06-28
+      - Updated dependency on Map::Tube v3.53.
+
 1.05  2018-06-11
       - Used new_ok() in test script.
 

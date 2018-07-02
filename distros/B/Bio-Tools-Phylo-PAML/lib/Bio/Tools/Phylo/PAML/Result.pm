@@ -1,5 +1,5 @@
 package Bio::Tools::Phylo::PAML::Result;
-$Bio::Tools::Phylo::PAML::Result::VERSION = '1.7.2';
+$Bio::Tools::Phylo::PAML::Result::VERSION = '1.7.3';
 use utf8;
 use strict;
 use warnings;
@@ -590,7 +590,7 @@ Bio::Tools::Phylo::PAML::Result - A PAML result set object
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 

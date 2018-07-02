@@ -1,5 +1,11 @@
 Revision history for BioX-Seq
 
+0.006007 2018-06-19
+         Removed CPAN::Uploader as hard dependency
+
+0.006006 2018-05-18
+         Misc documentation fixes
+
 0.006005 2018-01-12
          Fixed bug in ORF regex from Util module
 

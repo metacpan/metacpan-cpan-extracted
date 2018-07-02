@@ -1,3 +1,11 @@
+2018-06-29 Mojo::IRC::Server::Chinese v1.8.2
+1）修复客户端修改昵称时，如果昵称包含空格等特殊字符导致异常的问题
+2）修复服务器打印时间中的年份格式错误
+3）增加 INVITE WHOIS 支持 
+4）用户登录成功后，支持输出MOTD信息
+5）更新依赖关系，解决 IO::Socket::SSL 2.009+ required for TLS support 问题
+
+
 2017-02-12 Mojo::IRC::Server::Chinese v1.8.1
 1）新增频道bug修复
 2）TLS加密支持

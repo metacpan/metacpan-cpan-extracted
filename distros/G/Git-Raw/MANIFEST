@@ -82,6 +82,7 @@ deps/libgit2/include/git2/ignore.h
 deps/libgit2/include/git2/index.h
 deps/libgit2/include/git2/indexer.h
 deps/libgit2/include/git2/inttypes.h
+deps/libgit2/include/git2/mailmap.h
 deps/libgit2/include/git2/merge.h
 deps/libgit2/include/git2/message.h
 deps/libgit2/include/git2/net.h
@@ -253,6 +254,8 @@ deps/libgit2/src/integer.h
 deps/libgit2/src/iterator.c
 deps/libgit2/src/iterator.h
 deps/libgit2/src/khash.h
+deps/libgit2/src/mailmap.c
+deps/libgit2/src/mailmap.h
 deps/libgit2/src/map.h
 deps/libgit2/src/merge.c
 deps/libgit2/src/merge.h

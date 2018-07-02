@@ -6,11 +6,11 @@
 
 # Geo::Coder::Free
 
-Provides a geocoding functionality using free databases
+Provides a Geo-Coding functionality using free databases
 
 # VERSION
 
-Version 0.11
+Version 0.12
 
 # SYNOPSIS
 
@@ -136,7 +136,7 @@ All other users (including Commercial, Charity, Educational, Government)
 must apply in writing for a licence for use from Nigel Horne at \`&lt;njh at nigelhorne.com>\`.
 
 This product includes GeoLite2 data created by MaxMind, available from
-[http://www.maxmind.com](http://www.maxmind.com).
+[https://www.maxmind.com/en/home](https://www.maxmind.com/en/home).
 
 This product includes data from Who's on First.
 See [https://github.com/whosonfirst-data/whosonfirst-data/blob/master/LICENSE.md](https://github.com/whosonfirst-data/whosonfirst-data/blob/master/LICENSE.md) for licensing information.

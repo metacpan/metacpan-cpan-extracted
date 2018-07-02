@@ -9,7 +9,7 @@ use Symbol;
 use File::Basename;
 use Carp;
 
-my $VERSION = '1.54';
+my $VERSION = '1.55';
 
 my ( $query, $interpolate );
 GetOptions( 'query=s' => \$query, 

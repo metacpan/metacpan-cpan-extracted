@@ -1,5 +1,8 @@
 package Zonemaster::LDNS::RR::RRSIG;
 
+use strict;
+use warnings;
+
 use parent 'Zonemaster::LDNS::RR';
 
 sub verify {

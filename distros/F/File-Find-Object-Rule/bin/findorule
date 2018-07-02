@@ -85,12 +85,12 @@ findorule - command line wrapper to File::Find::Object::Rule
 
 =head1 VERSION
 
-version 0.0307
+version 0.0309
 
 =head1 DESCRIPTION
 
 C<findorule> mostly borrows the interface from GNU find(1) to provide a
-command-line interface onto the File::Find::Object::Rule heirarchy of modules.
+command-line interface onto the File::Find::Object::Rule hierarchy of modules.
 
 The syntax for expressions is the rule name, preceded by a dash,
 followed by an optional argument.  If the argument is an opening
@@ -105,7 +105,7 @@ files named C<foo> or C<bar>, below the current directory.
 
  find -file -name foo -bar
 
-files named C<foo>, that have pubs (for this is what our ficticious
+files named C<foo>, that have pubs (for this is what our fictitious
 C<bar> clause specifies), below the current directory.
 
  find -file -name ( -bar )
@@ -126,7 +126,7 @@ extension modules, so check the documentation to see what those would be.
 
 =head1 VERSION
 
-version 0.0307
+version 0.0309
 
 =head1 USAGE
 

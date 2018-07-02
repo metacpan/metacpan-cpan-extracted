@@ -10,20 +10,21 @@ CLI::Table::Util - If you are given table text file, what would you do? This pro
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 
 =head1 SYNOPSIS
 
 This module provides the following programs : 
-  1. colsummary
-  2. colsplit
-  3. colchop
-  4. csv2tsv
+  1. colsummary -- gives sevelral useful information about each columns of a table by this one-shot command.
+  2. colsplit -- divides a TSV file into files each contains each original column. 
+  3. colchop -- limits the column string lenghs by folding or omitting for the sake of viewing.
+  4. csv2tsv -- transforms from CSV (RFC4180) into TSV format.
+  5. colgrep -- performs "grep" on only spcified column.
 
  To know the detail of the commands, please read the documents invoked by "--help" such as 
  "colsummary --help" etc. 

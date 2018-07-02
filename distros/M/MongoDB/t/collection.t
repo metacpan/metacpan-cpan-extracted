@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2009 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,8 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-
 
 use strict;
 use warnings;
@@ -24,11 +21,10 @@ use Test::Deep qw/!blessed/;
 use utf8;
 use Tie::IxHash;
 use Encode qw(encode decode);
-use MongoDB::Timestamp; # needed if db is being run as master
 use MongoDB::Error;
-use MongoDB::Code;
 
 use MongoDB;
+use BSON::Types ':all';
 
 use lib "t/lib";
 use MongoDBTest qw/skip_unless_mongod build_client get_test_db server_version server_type/;
@@ -110,7 +106,7 @@ subtest get_namespace => sub {
     $coll->drop;
 
     $id = $coll->insert_one({})->inserted_id;
-    isa_ok($id, 'MongoDB::OID');
+    isa_ok($id, 'BSON::OID');
     $tiny = $coll->find_one;
     is($tiny->{'_id'}, $id);
 
@@ -144,7 +140,7 @@ if ( $server_version >= v2.4.11 ) {
     $coll->drop;
 
     $id = $coll->insert_one({ just => 'another', perl => 'hacker' })->inserted_id;
-    is($coll->count, 1, 'count');
+    is($coll->count_documents({}), 1, 'count');
 
     $coll->replace_one({ _id => $id }, {
         just => "an\xE4oth\0er",
@@ -152,32 +148,36 @@ if ( $server_version >= v2.4.11 ) {
         with => { a => 'reference' },
         and => [qw/an array reference/],
     });
-    is($coll->count, 1);
+    is($coll->count_documents({}), 1);
 }
 
 # rename
 {
     my $newcoll = $coll->rename('test_collection.rename');
     is($newcoll->name, 'test_collection.rename', 'rename');
-    is($coll->count, 0, 'rename');
-    is($newcoll->count, 1, 'rename');
+    is($coll->count_documents({}), 0, 'rename');
+    is($newcoll->count_documents({}), 1, 'rename');
     $coll = $newcoll->rename('test_collection');
     is($coll->name, 'test_collection', 'rename');
-    is($coll->count, 1, 'rename');
-    is($newcoll->count, 0, 'rename');
+    is($coll->count_documents({}), 1, 'rename');
+    is($newcoll->count_documents({}), 0, 'rename');
 }
 
-# count
+# count_documents
 {
-    is($coll->count({ mongo => 'programmer' }), 0, 'count = 0');
-    is($coll->count({ mongo => 'hacker'     }), 1, 'count = 1');
-    is($coll->count({ 'with.a' => 'reference' }), 1, 'inner obj count');
+    is($coll->count_documents({ mongo => 'programmer' }), 0, 'count = 0');
+    is($coll->count_documents({ mongo => 'hacker'     }), 1, 'count = 1');
+    is($coll->count_documents({ 'with.a' => 'reference' }), 1, 'inner obj count');
+
+    # requires filter
+    like( exception { $coll->count_documents },
+        qr/MongoDB::UsageError/, "requires a filter" );
 
     # missing collection
     my $coll2 = $testdb->coll("aadfkasfa");
     my $count;
     is(
-        exception { $count = $coll2->count({}) },
+        exception { $count = $coll2->count_documents({}) },
         undef,
         "count on missing collection lives"
     );
@@ -206,7 +206,7 @@ if ( $server_version >= v2.4.11 ) {
   $result = $coll->find_id($id, { c => 3 });
   cmp_deeply(
     $result,
-    { _id => $id, c => 3 },
+    { _id => str($id), c => num(3) }, # use str() to allow MongoDB::OID vs BSON::OID
     "find_id projection"
   );
 
@@ -216,7 +216,7 @@ if ( $server_version >= v2.4.11 ) {
 # remove
 {
     $coll->delete_one($obj);
-    is($coll->count, 0, 'remove() deleted everything (won\'t work on an old version of Mongo)');
+    is($coll->count_documents({}), 0, 'remove() deleted everything (won\'t work on an old version of Mongo)');
 }
 
 # doubles
@@ -294,7 +294,7 @@ if ( $server_version >= v2.4.11 ) {
 {
     $coll->drop;
     my $ids = $coll->insert_many([{'x' => 1}, {'x' => 2}, {'x' => 3}])->inserted_ids;
-    is($coll->count, 3, 'insert_many');
+    is($coll->count_documents({}), 3, 'insert_many');
 }
 
 # sort
@@ -314,14 +314,14 @@ if ( $server_version >= v2.4.11 ) {
 
     cmp_deeply(
         $yer,
-        { _id => ignore(), y => 2 },
+        { _id => ignore(), y => num(2) },
         "projection fields correct"
     );
 
     $coll->drop;
     $coll->insert_many([{"x" => 1}, {"x" => 1}, {"x" => 1}]);
     $coll->delete_one( { "x" => 1 } );
-    is ($coll->count, 2, 'remove just one');
+    is ($coll->count_documents({}), 2, 'remove just one');
 }
 
 # tie::ixhash for update/insert
@@ -329,7 +329,7 @@ if ( $server_version >= v2.4.11 ) {
     $coll->drop;
     my $hash = Tie::IxHash->new("f" => 1, "s" => 2, "fo" => 4, "t" => 3);
     $id = $coll->insert_one($hash)->inserted_id;
-    isa_ok($id, 'MongoDB::OID');
+    isa_ok($id, 'BSON::OID');
     $tied = $coll->find_one;
     is($tied->{'_id'}."", "$id");
     is($tied->{'f'}, 1);
@@ -345,12 +345,35 @@ if ( $server_version >= v2.4.11 ) {
     is($tied->{'something'}, 'else');
 }
 
+subtest "BSON::Doc for insert/update" => sub {
+    $coll->drop;
+    my $hash = bson_doc("f" => 1, "s" => 2, "fo" => 4, "t" => 3);
+    $id = $coll->insert_one($hash)->inserted_id;
+    isa_ok($id, 'BSON::OID');
+    my $got = $coll->find_one;
+    is($got->{'_id'}."", "$id");
+    is($got->{'f'}, 1);
+    is($got->{'s'}, 2);
+    is($got->{'fo'}, 4);
+    is($got->{'t'}, 3);
+
+    my $criteria = bson_doc("_id" => $id);
+    $coll->replace_one($criteria, bson_doc( f => 1, something => 'else' ));
+    $got = $coll->find_one;
+    is($got->{'f'}, 1);
+    is($got->{'something'}, 'else');
+
+    my $oid = bson_oid();
+    ok( $coll->insert_one(bson_doc(_id => $oid)), "inserted with oid" );
+    ok( $coll->find_id($oid), "found by oid" );
+};
+
 # () update/insert
 {
     $coll->drop;
-    my @h = ("f" => 1, "s" => 2, "fo" => 4, "t" => 3);
+    my @h = ("f" => bson_int32(1), "s" => 2, "fo" => 4, "t" => 3);
     $id = $coll->insert_one(\@h)->inserted_id;
-    isa_ok($id, 'MongoDB::OID');
+    isa_ok($id, 'BSON::OID');
     $tied = $coll->find_one;
     is($tied->{'_id'}."", "$id");
     is($tied->{'f'}, 1);
@@ -380,7 +403,7 @@ if ( $server_version >= v2.4.11 ) {
     ok($coll->find_one({"x" => 1}));
 
     my $res = $coll->update_many({"x" => 2}, {'$set' => {'x' => 4}});
-    is($coll->count({"x" => 4}), 2) or diag explain $res;
+    is($coll->count_documents({"x" => 4}), 2) or diag explain $res;
 
     $cursor = $coll->query({"x" => 4})->sort({"y" => 1});
 
@@ -396,7 +419,7 @@ subtest "multiple update" => sub {
       unless $server_version >= v1.3.0;
 
     $coll->update_many({"x" => 4}, {'$set' => {"x" => 3}}, {'upsert' => 1});
-    is($coll->count({"x" => 3}), 2, 'count');
+    is($coll->count_documents({"x" => 3}), 2, 'count');
 
     $cursor = $coll->query({"x" => 3})->sort({"y" => 1});
 
@@ -536,7 +559,7 @@ SKIP: {
      $ok = $coll->insert_one({ $kanji => 1});
     };
     is($ok,0,"Insert key with Null Char Operation Failed");
-    is($coll->count, 0, "Insert key with Null Char in Key Failed");
+    is($coll->count_documents({}), 0, "Insert key with Null Char in Key Failed");
     $coll->drop;
     $ok = 0;
     my $kanji_a = "漢\0字";
@@ -549,7 +572,7 @@ SKIP: {
      $ok = $coll->insert_many([{ $kanji_a => "some data"} , { $kanji_b => "some more data"}, { $kanji_c => "even more data"}]);
     };
     is($ok,0, "insert_many key with Null Char in Key Operation Failed");
-    is($coll->count, 0, "insert_many key with Null Char in Key Failed");
+    is($coll->count_documents({}), 0, "insert_many key with Null Char in Key Failed");
     $coll->drop;
 
     #test ixhash
@@ -558,7 +581,7 @@ SKIP: {
      $ok = $coll->insert_one($hash);
     };
     is($ok,0, "ixHash Insert key with Null Char in Key Operation Failed");
-    is($coll->count, 0, "ixHash key with Null Char in Key Operation Failed");
+    is($coll->count_documents({}), 0, "ixHash key with Null Char in Key Operation Failed");
     $tied = $coll->find_one;
     $coll->drop;
 }
@@ -682,6 +705,111 @@ subtest "aggregation explain" => sub {
     $coll->drop;
 };
 
+# aggregation index hints
+subtest "aggregation index hint string" => sub {
+    plan skip_all => "Aggregation index hints unsupported on MongoDB $server_version"
+        unless $server_version >= v3.6.0;
+
+
+    $coll->insert_many( [ { _id => 1, category => "cake", type => "chocolate", qty => 10 },
+                          { _id => 2, category => "cake", type => "ice cream", qty => 25 },
+                          { _id => 3, category => "pie", type => "boston cream", qty => 20 },
+                          { _id => 4, category => "pie", type => "blueberry", qty => 15 } ] );
+
+    # creating two indicies to give the planner a choice
+    $coll->indexes->create_one( [ qty => 1, type => 1 ] );
+    my $index_name = $coll->indexes->create_one( [ qty => 1, category => 1 ] );
+
+    my $cursor_no_hint = $coll->aggregate(
+        [
+            { '$sort' => { qty => 1 } },
+            { '$match' => { category => 'cake', qty => 10 } },
+            { '$sort' => { type => -1 } }
+        ],
+        { explain => 1 }
+    );
+
+    my $cursor_with_hint = $coll->aggregate(
+        [
+            { '$sort' => { qty => 1 } },
+            { '$match' => { category => 'cake', qty => 10 } },
+            { '$sort' => { type => -1 } } ],
+        { hint => $index_name, explain => 1 }
+    );
+
+    my $result_no_hint = $cursor_no_hint->next;
+
+    is( ref( $result_no_hint ), 'HASH', "aggregate with explain returns a hashref" );
+
+    ok(
+        scalar( @{ $result_no_hint->{stages}->[0]->{'$cursor'}->{queryPlanner}->{rejectedPlans} } ) > 0,
+        "aggregate with no hint had rejectedPlans",
+    );
+
+    my $result_with_hint = $cursor_with_hint->next;
+
+    is( ref( $result_with_hint ), 'HASH', "aggregate with explain returns a hashref" );
+
+    ok(
+        scalar( @{ $result_with_hint->{stages}->[0]->{'$cursor'}->{queryPlanner}->{rejectedPlans} } ) == 0,
+        "aggregate with hint had no rejectedPlans",
+    );
+
+    $coll->drop;
+};
+
+subtest "aggregation index hint object" => sub {
+    plan skip_all => "Aggregation index hints unsupported on MongoDB $server_version"
+        unless $server_version >= v3.6.0;
+
+
+    $coll->insert_many( [ { _id => 1, category => "cake", type => "chocolate", qty => 10 },
+                          { _id => 2, category => "cake", type => "ice cream", qty => 25 },
+                          { _id => 3, category => "pie", type => "boston cream", qty => 20 },
+                          { _id => 4, category => "pie", type => "blueberry", qty => 15 } ] );
+
+    # creating two indicies to give the planner a choice
+    $coll->indexes->create_one( [ qty => 1, type => 1 ] );
+    $coll->indexes->create_one( [ qty => 1, category => 1 ] );
+
+    my $cursor_no_hint = $coll->aggregate(
+        [
+            { '$sort' => { qty => 1 } },
+            { '$match' => { category => 'cake', qty => 10 } },
+            { '$sort' => { type => -1 } }
+        ],
+        { explain => 1 }
+    );
+
+    my $cursor_with_hint = $coll->aggregate(
+        [
+            { '$sort' => { qty => 1 } },
+            { '$match' => { category => 'cake', qty => 10 } },
+            { '$sort' => { type => -1 } } ],
+        { hint => Tie::IxHash->new( qty => 1, category => 1 ), explain => 1 }
+    );
+
+    my $result_no_hint = $cursor_no_hint->next;
+
+    is( ref( $result_no_hint ), 'HASH', "aggregate with explain returns a hashref" );
+
+    ok(
+        scalar( @{ $result_no_hint->{stages}->[0]->{'$cursor'}->{queryPlanner}->{rejectedPlans} } ) > 0,
+        "aggregate with no hint had rejectedPlans",
+    );
+
+    my $result_with_hint = $cursor_with_hint->next;
+
+    is( ref( $result_with_hint ), 'HASH', "aggregate with explain returns a hashref" );
+
+    ok(
+        scalar( @{ $result_with_hint->{stages}->[0]->{'$cursor'}->{queryPlanner}->{rejectedPlans} } ) == 0,
+        "aggregate with hint had no rejectedPlans",
+    );
+
+    $coll->drop;
+};
+
 subtest "aggregation with collation" => sub {
     $coll->insert_one( { _id => "foo" } );
 
@@ -717,52 +845,55 @@ subtest "deep update" => sub {
 
     like(
         exception { $coll->replace_one( { _id => 1 }, { 'p.q' => 23 } ) },
-        qr/documents for storage cannot contain/,
+        qr/documents for storage cannot contain|has invalid character/,
         "replace with dots in field dies"
     );
 
 };
 
-subtest "count w/ hint" => sub {
+subtest "count_document w/ hint" => sub {
+
+    plan skip_all => "count_document with hints unsupported on MongoDB $server_version"
+        unless $server_version >= v3.6.0;
 
     $coll->drop;
     $coll->insert_one( { i => 1 } );
     $coll->insert_one( { i => 2 } );
-    is ($coll->count(), 2, 'count = 2');
+    is ($coll->count_documents({}), 2, 'count = 2');
 
     $coll->indexes->create_one( { i => 1 } );
 
-    is( $coll->count( { i => 1 }, { hint => '_id_' } ), 1, 'count w/ hint & spec');
-    is( $coll->count( {}, { hint => '_id_' } ), 2, 'count w/ hint');
+    is( $coll->count_documents( { i => 1 }, { hint => '_id_' } ), 1, 'count w/ hint & spec');
+    is( $coll->count_documents( {}, { hint => '_id_' } ), 2, 'count w/ hint');
 
     my $current_version = version->parse($server_version);
     my $version_2_6 = version->parse('v2.6');
 
     if ( $current_version > $version_2_6 ) {
 
-        eval { $coll->count( { i => 1 } , { hint => 'BAD HINT' } ) };
-        like($@, ($server_type eq "Mongos" ? qr/failed/ : qr/bad hint/ ), 'check bad hint error');
+        eval { $coll->count_documents( { i => 1 } , { hint => 'BAD HINT' } ) };
+        like($@, qr/failed|bad hint/, 'check bad hint error');
 
     } else {
 
-        is( $coll->count( { i => 1 } , { hint => 'BAD HINT' } ), 1, 'bad hint and spec');
+        is( $coll->count_documents( { i => 1 } , { hint => 'BAD HINT' } ), 1, 'bad hint and spec');
     }
 
     $coll->indexes->create_one( { x => 1 }, { sparse => 1 } );
 
     if ($current_version > $version_2_6 ) {
 
-        is( $coll->count( {  i => 1 } , { hint => 'x_1' } ), 0, 'spec & hint on empty sparse index');
+        is( $coll->count_documents( {  i => 1 } , { hint => 'x_1' } ), 0, 'spec & hint on empty sparse index');
 
     } else {
 
-        is( $coll->count( {  i => 1 } , { hint => 'x_1' } ), 1, 'spec & hint on empty sparse index');
+        is( $coll->count_documents( {  i => 1 } , { hint => 'x_1' } ), 1, 'spec & hint on empty sparse index');
     }
 
     # XXX Failing on nightly master -- xdg, 2016-02-11
     TODO: {
         local $TODO = "Failing nightly master";
-        is( $coll->count( {}, { hint => 'x_1' } ), 2, 'hint on empty sparse index');
+        is( $coll->count_documents( {}, { hint => 'x_1' } ), 2, 'hint on empty sparse index');
     }
 };
 
@@ -771,13 +902,13 @@ subtest "count w/ collation" => sub {
     $coll->insert_one( { x => "foo" } );
 
     if ($supports_collation) {
-        is( $coll->count( { x => "FOO" }, { collation => $case_insensitive_collation } ),
+        is( $coll->count_documents( { x => "FOO" }, { collation => $case_insensitive_collation } ),
             1, 'count w/ collation' );
     }
     else {
         like(
             exception {
-                $coll->count( { x => "FOO" }, { collation => $case_insensitive_collation } );
+                $coll->count_documents( { x => "FOO" }, { collation => $case_insensitive_collation } );
             },
             qr/MongoDB host '.*:\d+' doesn't support collation/,
             "count w/ collation returns error if unsupported"
@@ -818,7 +949,7 @@ subtest "querying w/ collation" => sub {
 
         my $doc = $coll->find_one( { _id => 0, x => "foo" },
             undef, { collation => $case_insensitive_collation } );
-        cmp_deeply( $doc, { _id => 0, x => "FOO" }, "find_one w/ collation" );
+        cmp_deeply( $doc, { _id => num(0), x => str("FOO") }, "find_one w/ collation" );
     }
     else {
         like(
@@ -840,12 +971,29 @@ subtest "querying w/ collation" => sub {
     }
 };
 
+subtest "bulk_write writeConcern used" => sub {
+    plan skip_all => "Test requires ReplicaSet"
+        unless $server_type eq 'RSPrimary';
+
+    $coll->drop;
+
+    like exception {
+        $coll->bulk_write(
+            [insert_one => [{ x => 3 }]],
+            { writeConcern => { w => 999 } },
+        );
+    }, qr/WriteConcernError/, 'write concern is taken into account';
+};
+
 my $js_str = 'function() { return this.a > this.b }';
-my $js_obj = MongoDB::Code->new( code => $js_str );
+my $js_obj = bson_code ($js_str );
 
 for my $criteria ( $js_str, $js_obj ) {
     my $type = ref($criteria) || 'string';
     subtest "query with \$where as $type" => sub {
+        plan skip_all => "Not supported on Atlas Free Tier"
+          if $ENV{ATLAS_PROXY};
+
         $coll->drop;
         $coll->insert_one( { a => 1, b => 1, n => 1 } );
         $coll->insert_one( { a => 2, b => 1, n => 2 } );
@@ -860,8 +1008,8 @@ for my $criteria ( $js_str, $js_obj ) {
         cmp_deeply(
             \@docs,
             [
-                { _id => ignore(), a => 2, b => 1, n => 2 },
-                { _id => ignore(), a => 3, b => 1, n => 3 }
+                { _id => ignore(), a => num(2), b => num(1), n => num(2) },
+                { _id => ignore(), a => num(3), b => num(1), n => num(3) }
             ],
             "javascript query correct"
         );

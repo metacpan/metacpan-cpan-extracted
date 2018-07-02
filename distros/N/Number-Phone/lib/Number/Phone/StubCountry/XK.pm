@@ -22,33 +22,43 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221548;
+our $VERSION = 1.20180619214157;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
                   'leading_digits' => '
             [23][89]|
             4[3-79]
           ',
                   'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{5})',
-                  'national_rule' => '0$1',
                   'leading_digits' => '[89]00',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
+                'toll_free' => '800\\d{5}',
+                'fixed_line' => '
+          (?:
+            2[89]0?|
+            3(?:
+              8|
+              90?
+            )
+          )\\d{6}
+        ',
+                'voip' => '',
                 'personal_number' => '',
                 'geographic' => '
           (?:
@@ -59,19 +69,9 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'mobile' => '4[3-79]\\d{6}',
+                'pager' => '',
                 'specialrate' => '(900\\d{5})',
-                'voip' => '',
-                'fixed_line' => '
-          (?:
-            2[89]0?|
-            3(?:
-              8|
-              90?
-            )
-          )\\d{6}
-        ',
-                'toll_free' => '800\\d{5}'
+                'mobile' => '4[3-79]\\d{6}'
               };
 my %areanames = (
   38328 => "Mitrovica",

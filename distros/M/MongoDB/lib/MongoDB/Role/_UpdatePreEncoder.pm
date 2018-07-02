@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,10 +19,11 @@ package MongoDB::Role::_UpdatePreEncoder;
 # MongoDB interface for pre-encoding and validating update/replace docs
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo::Role;
 
+use BSON::Raw;
 use MongoDB::Error;
 use MongoDB::_Constants;
 
@@ -33,13 +32,13 @@ use namespace::clean;
 requires qw/bson_codec/;
 
 sub _pre_encode_update {
-    my ( $self, $link, $doc, $is_replace ) = @_;
+    my ( $self, $max_bson_object_size, $doc, $is_replace ) = @_;
 
     my $bson_doc = $self->bson_codec->encode_one(
         $doc,
         {
             invalid_chars => $is_replace ? '.' : '',
-            max_length => $is_replace ? $link->max_bson_object_size : undef,
+            max_length => $is_replace ? $max_bson_object_size : undef,
         }
     );
 
@@ -72,7 +71,7 @@ sub _pre_encode_update {
     }
 
     # manually bless for speed
-    return bless { bson => $bson_doc, metadata => {} }, "MongoDB::BSON::_EncodedDoc";
+    return bless { bson => $bson_doc, metadata => {} }, "BSON::Raw";
 }
 
 1;

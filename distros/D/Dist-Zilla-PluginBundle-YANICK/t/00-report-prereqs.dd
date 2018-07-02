@@ -27,6 +27,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::DOAP' => '0',
                                       'Dist::Zilla::Plugin::Git' => '0',
                                       'Dist::Zilla::Plugin::Git::Contributors' => '0',
+                                      'Dist::Zilla::Plugin::GitHubREADME::Badge' => '0.23',
                                       'Dist::Zilla::Plugin::GithubMeta' => '0',
                                       'Dist::Zilla::Plugin::HelpWanted' => '0',
                                       'Dist::Zilla::Plugin::InstallGuide' => '1.200000',

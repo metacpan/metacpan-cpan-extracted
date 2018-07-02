@@ -1,9 +1,11 @@
-use Test::More tests => 9;
 use DateTimeX::Auto ':auto';
 
-is(ref('2000-01-01'), 'DateTime', 'yyyy-mm-dd');
+use Test::More tests => defined($UNIVERSAL::ref::VERSION) ? 9 : 6;
 
-is(ref('2000-01-01T12:00:00'), 'DateTime', 'yyyy-mm-ddThh:mm:ss');
+if (defined($UNIVERSAL::ref::VERSION)) {
+	is(ref('2000-01-01'), 'DateTime', 'yyyy-mm-dd');
+	is(ref('2000-01-01T12:00:00'), 'DateTime', 'yyyy-mm-ddThh:mm:ss');
+}
 
 {
 	no DateTimeX::Auto;
@@ -11,7 +13,8 @@ is(ref('2000-01-01T12:00:00'), 'DateTime', 'yyyy-mm-ddThh:mm:ss');
 	
 	local @_ = ();
 	
-	is(ref(&d), 'DateTime', '&d works with no argument.');
+	is(ref(&d), 'DateTime', '&d works with no argument.')
+		if defined($UNIVERSAL::ref::VERSION);
 	
 	is(d('2000-01-01T12:00:00.1234567891') , '2000-01-01T12:00:00.1234567890',
 		'Precision past nanoseconds supported');

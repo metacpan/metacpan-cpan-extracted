@@ -11,10 +11,12 @@ build_requires:
   IO::Socket: '0'
   Test::More: '0'
   lib: '0'
+  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.027, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,7 +26,7 @@ requires:
   Carp: '0'
   Data::Dumper: '0'
   Data::Transform::ExplicitMetadata: '0'
-  Devel::Chitin: '0.06'
+  Devel::Chitin: '0.15'
   Digest::MD5: '0'
   Exception::Class: '0'
   Exporter: '0'
@@ -41,9 +43,11 @@ requires:
   Time::HiRes: '0'
   URI::Escape: '0'
   base: '0'
+  perl: '5.006'
   strict: '0'
   vars: '0'
   warnings: '0'
 resources:
   repository: https://github.com/brummett/Devel-hdb.git
-version: '0.23'
+version: '0.24'
+x_serialization_backend: 'YAML::Tiny version 1.70'

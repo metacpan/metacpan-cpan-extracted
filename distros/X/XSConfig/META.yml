@@ -21,10 +21,10 @@ no_index:
 provides:
   XSConfig:
     file: Config.pm
-    version: '6.24'
+    version: '6.26'
 requires:
   perl: '5.008007'
 resources:
   repository: https://github.com/perl11/p5-Config
-version: '6.24'
-x_serialization_backend: YAML::XS version 0.66
+version: '6.26'
+x_serialization_backend: YAML::XS version 0.70

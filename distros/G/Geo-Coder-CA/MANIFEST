@@ -1,3 +1,4 @@
+bin/ca
 Changes
 ignore.txt
 lib/Geo/Coder/CA.pm
@@ -8,6 +9,7 @@ README
 README.md
 t/00-load.t
 t/10-new.t
+t/bin.t
 t/boiler.t
 t/ca.t
 t/carp.t

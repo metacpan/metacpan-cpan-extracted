@@ -6,7 +6,7 @@ use Regexp::Grammars;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '0.006';    # VERSION
+our $VERSION = '0.009';    # VERSION
 
 # ABSTRACT: Parse DOS .bat and .cmd files
 
@@ -19,11 +19,11 @@ has 'grammar' => (
     
            <rule: File> (?:<[Lines]>\n)*
 
-           <rule: Lines> <Comment> | <Label> | <Statement>
+           <rule: Lines> <Comment> | <Label> | <Statement> 
 
            <rule: Comment> \:\:<Text=Token> | REM <Text=Token>
 
-           <rule: Label> \:(?!:)<Identifier=Token>
+           <rule: Label> \:(?!:)<Identifier=LabelIdentifier>[^\n]*
 
            <rule: Statement> \@?<Command>
            
@@ -47,7 +47,7 @@ has 'grammar' => (
 
            <rule: Call> call <Token>
 
-           <rule: Goto> Goto <Identifier=Token>
+           <rule: Goto> Goto :?<Identifier=LabelIdentifier>
 
            <rule: Set> set <Variable=Token>=<Value=Token>
 
@@ -60,6 +60,8 @@ has 'grammar' => (
            <token: Literal> [^\s]+
 
            <token: Token> [^\n]*
+
+           <token: LabelIdentifier> [^\n\s\:]*
 
         }xmi;
     }
@@ -104,7 +106,7 @@ App::BatParser - Parse DOS .bat and .cmd files
 
 =head1 VERSION
 
-version 0.006
+version 0.009
 
 =head1 DESCRIPTION
 
@@ -148,13 +150,17 @@ the same terms as the Perl 5 programming language system itself.
 
 =head1 CONTRIBUTORS
 
-=for stopwords eva.dominguez Toby Inkster
+=for stopwords eva.dominguez juanradiego Toby Inkster
 
 =over 4
 
 =item *
 
 eva.dominguez <eva.dominguez@meteologica.com>
+
+=item *
+
+juanradiego <kilaweo@gmail.com>
 
 =item *
 

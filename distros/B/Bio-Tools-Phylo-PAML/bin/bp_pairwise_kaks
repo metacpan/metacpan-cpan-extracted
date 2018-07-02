@@ -4,6 +4,16 @@ use utf8;
 use strict;
 use warnings;
 
+use Getopt::Long;
+
+use Bio::Align::Utilities qw(aa_to_dna_aln);
+use Bio::AlignIO;
+use Bio::SeqIO;
+use Bio::Tools::Run::Alignment::Clustalw;
+use Bio::Tools::Run::Alignment::TCoffee;
+use Bio::Tools::Run::Phylo::PAML::Codeml;
+use Bio::Tools::Run::Phylo::PAML::Yn00;
+
 # PODNAME: bp_pairwise_kaks
 # ABSTRACT: calculate pairwise Ka,Ks for a set of sequences
 # AUTHOR: Jason Stajich <jason@bioperl.org>
@@ -11,30 +21,13 @@ use warnings;
 # LICENSE: Perl_5
 
 
-eval {
-    # Ka/Ks estimators
-    require Bio::Tools::Run::Phylo::PAML::Codeml;
-    require Bio::Tools::Run::Phylo::PAML::Yn00;
-
-    # Multiple Sequence Alignment programs
-    require Bio::Tools::Run::Alignment::Clustalw;
-    require Bio::Tools::Run::Alignment::TCoffee;
-};
-if( $@ ) {
-    die("Must have bioperl-run pkg installed to run this script");
-}
-# for projecting alignments from protein to R/DNA space
-use Bio::Align::Utilities qw(aa_to_dna_aln);
-
-# for input of the sequence data
-use Bio::SeqIO;
-use Bio::AlignIO;
-
-# for the command line argument parsing
-use Getopt::Long;
-
-my ($aln_prog, $kaks_prog,$format, $output,
-    $cdna,$verbose,$help) = qw(clustalw codeml fasta);
+my $aln_prog = "clustalw";
+my $kaks_prog = "codeml";
+my $format = "fasta";
+my $output;
+my $cdna;
+my $verbose;
+my $help;
 
 GetOptions(
            'i|input:s'      => \$cdna,
@@ -180,28 +173,65 @@ bp_pairwise_kaks - calculate pairwise Ka,Ks for a set of sequences
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 
-bp_pairwise_kaks.PLS -i t/data/worm_fam_2785.cdna [-f fasta/genbank/embl...] [-msa tcoffee/clustal] [-kaks yn00/codeml]
+bp_pairwise_kaks.PLS -i INPUT-cDNA [-f FORMAT] [-o OUTPUT] \
+    [--msa tcoffee|clustal] [--kaks yn00|codeml]
 
 =head1 DESCRIPTION
 
-  This script will take as input a dataset of cDNA sequences verify
- that they contain no stop codons, align them in protein space,
- project the alignment back into cDNA and estimate the Ka
- (non-synonymous) and Ks (synonymous) substitutions based on the ML
- method of Yang with the PAML package.
+This script will take as input a dataset of cDNA sequences, verify
+that they contain no stop codons, align them in protein space, project
+the alignment back into cDNA, and estimate the Ka (non-synonymous) and
+Ks (synonymous) substitutions based on the Maximum Likelihood method
+of Yang with the PAML package.
 
- Requires:
- * bioperl-run package
- * PAML program codeml or yn00
- * Multiple sequence alignment programs Clustalw OR T-Coffee
+Often there are specific specific parameters you want to run when you
+are computing Ka/Ks ratios so consider this script a starting point
+and do not rely it on for every situation.
 
- Often there are specific specific parameters you want to run when you
- a computing Ka/Ks ratios so consider this script a starting point and
- do not rely it on for every situation.
+=head1 OPTIONS
+
+=over 4
+
+=item B<-i>, B<--input>
+
+The input file with the cDNA sequences.  Must have at least two
+sequences, and be in a format that L<Bio::SeqIO> is capable to read.
+In addition, if Bio::SeqIO is inable to automatically identify the
+format, the B<-f> option should be specified.
+
+Technically not an option, this is a required value.
+
+=item B<-f>, B<--format>
+
+Specify the format of INPUT-cDNA for L<Bio::SeqIO>.
+
+=item B<-o>, B<--output>
+
+Specify the file for output.  Defaults to STDOUT.
+
+=item B<--msa>
+
+Program used for alignment, either clustalw or tcoffee.  Defaults to
+clustalw.
+
+=item B<--kaks>
+
+Program used for the Ka/Ks estimation, either codeml or yn00.
+Defaults to codeml.
+
+=item B<-v>, B<--verbose>
+
+Be verbose.
+
+=item B<-h>, B<--help>
+
+Print help text.
+
+=back
 
 =head1 FEEDBACK
 

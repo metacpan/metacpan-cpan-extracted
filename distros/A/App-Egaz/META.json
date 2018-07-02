@@ -75,7 +75,7 @@
    "provides" : {
       "App::Egaz" : {
          "file" : "lib/App/Egaz.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.2.1"
       },
       "App::Egaz::Command::blastlink" : {
          "file" : "lib/App/Egaz/Command/blastlink.pm"
@@ -152,7 +152,7 @@
          "web" : "https://github.com/wang-q/App-Egaz"
       }
    },
-   "version" : "0.2.0",
+   "version" : "0.2.1",
    "x_authority" : "cpan:WANGQ",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,3 +1,9 @@
+1.023   2018-06-21 (PERLANCAR)
+
+	- Locate index solely using index_name if index_name contains path
+	  separator character.
+
+
 1.022   2018-02-08 (PERLANCAR)
 
 	- [Bugfix] Make log level overridable from environment variable,

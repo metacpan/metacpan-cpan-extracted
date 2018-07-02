@@ -1,7 +1,7 @@
 package App::cryp::Cmd::Exchange::balance;
 
-our $DATE = '2018-06-13'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-06-24'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::cryp::Cmd::Exchange::balance - List account balance
 
 =head1 VERSION
 
-This document describes version 0.009 of App::cryp::Cmd::Exchange::balance (from Perl distribution App-cryp-exchange), released on 2018-06-13.
+This document describes version 0.010 of App::cryp::Cmd::Exchange::balance (from Perl distribution App-cryp-exchange), released on 2018-06-24.
 
 =head1 FUNCTIONS
 

@@ -1,0 +1,53 @@
+{
+   "abstract" : "Dancer2 Session implementation for databases",
+   "author" : [
+      "Mike Shipper <AKALINUX@CPAN.ORG>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Session-DatabasePlugin",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.42",
+            "Dancer2::Core::Role::SessionFactory" : "0.206000",
+            "Dancer2::Plugin::Database" : "2.17",
+            "Data::Dumper" : "2.161",
+            "Modern::Perl" : "1.20170117",
+            "Moo" : "2.003002",
+            "MooX::Types::MooseLike::Base" : "0.29",
+            "Ref::Util" : "0.203",
+            "Scalar::Util" : "1.48",
+            "Storable" : "2.62",
+            "Test::More" : "1.302073",
+            "namespace::clean" : "0.27"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 1.0006,
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

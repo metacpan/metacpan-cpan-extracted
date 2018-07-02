@@ -1,11 +1,10 @@
+package XML::XPathScript::Processor::B;
+our $AUTHORITY = 'cpan:YANICK';
+$XML::XPathScript::Processor::B::VERSION = '1.55';
 use strict;
 use warnings;
 
-package XML::XPathScript::Processor::B;
-
 use base qw/ XML::XPathScript::Processor /;
-
-our $VERSION = '1.54';
 
 # No namespaces here
 sub get_namespace { }
@@ -31,6 +30,8 @@ sub to_string {
 
 sub get_node_name { $_[1]->get_name }
 
+sub get_qualified_name { $_[1]->get_name }
+
 sub get_attributes {
     if ( $_[1]->can( 'get_attr_names' ) ) {
         return map { ( [ $_ => $_[1]->get_attr_value( $_ ) ] )
@@ -52,3 +53,43 @@ sub is_pi_node       { 0 }
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+XML::XPathScript::Processor::B
+
+=head1 VERSION
+
+version 1.55
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=item *
+
+Dominique Quatravaux <domq@cpan.org>
+
+=item *
+
+Matt Sergeant <matt@sergeant.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2008, 2007 by Matt Sergeant.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

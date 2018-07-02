@@ -1,5 +1,5 @@
 $VAR1 = {
-         'admin' => {},
-         'guest' => {}
-        };
+    'admin' => {},
+    'guest' => {}
+};
 $session = $VAR1;

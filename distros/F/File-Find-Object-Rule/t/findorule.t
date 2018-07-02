@@ -122,7 +122,7 @@ is_deeply(run $copy_fn . ' -maxdepth 0 -directory',
 
 
 {
-    local $TODO = "Win32 cmd.exe hurts my brane"
+    local $TODO = "Win32 cmd.exe hurts my brain"
       if ($^O =~ m/Win32/ || $^O eq 'dos');
 
     # TEST

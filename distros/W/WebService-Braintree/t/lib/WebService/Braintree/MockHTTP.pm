@@ -5,7 +5,7 @@ package WebService::Braintree::MockHTTP;
 use 5.010_001;
 use strictures 1;
 
-use Moose;
+use Moo;
 
 has method => (is => 'rw');
 has result => (is => 'rw');

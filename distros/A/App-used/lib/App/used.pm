@@ -14,7 +14,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use base qw/Exporter/;
 
-our $VERSION     = version->new('0.0.8');
+our $VERSION     = version->new('0.0.9');
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
 
@@ -28,7 +28,7 @@ App::used - Find modules used or required in perl files or directories of perl f
 
 =head1 VERSION
 
-This documentation refers to App::used version 0.0.8
+This documentation refers to App::used version 0.0.9
 
 
 =head1 SYNOPSIS
@@ -45,8 +45,16 @@ This documentation refers to App::used version 0.0.8
   -U --update     Update the requires section of the Build.PL file
   -d --decending  Reverse the sort order
 
+  -m --min-version
+                  Show all files minimum Perl version requirement.
   -p --perl-version
                   Show files that require the highest version of Perl to be used
+  -u --uses       Show dependent modules in order of how often they are used
+  -b --build[=]name
+                  Specify the builder script file (Default Build.PL)
+  -x --exclude[=]regexp
+                  Ignore directories and files matching this regexp
+  -q --quiet      Quiet down output
   -v --verbose    Show more detailed option
                     Specified once shows module verion numbers verses required
                     versions.
@@ -58,6 +66,10 @@ This documentation refers to App::used version 0.0.8
      --man        Prints the full documentation for used
 
 =head1 DESCRIPTION
+
+The C<used> tells you what modules have been C<used> or C<required> or
+C<extend>ed (Moose) or L<Catalyst> plugins used by files in the current
+directory and subdirectories.
 
 =head1 SUBROUTINES/METHODS
 

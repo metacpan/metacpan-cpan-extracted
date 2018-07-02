@@ -12,7 +12,8 @@ our %EXPORT_TAGS = (
 	compare => [ qw(generate_fltcmp generate_relational) ],
 	fortran => [ qw(log10 copysign) ],
 	utility => [ qw(log10 log2 copysign flipsign
-			sign floor ceil fsum moduli) ],
+			sign floor ceil fsum
+			gcd hcf lcm moduli) ],
 	polynomial => [ qw(pl_evaluate pl_dxevaluate
 			pl_add pl_sub pl_div pl_mult
 			pl_derivative pl_antiderivative) ],
@@ -24,7 +25,7 @@ our @EXPORT_OK = (
 	@{ $EXPORT_TAGS{polynomial} },
 );
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 =head1 NAME
 
@@ -154,7 +155,7 @@ sub log10
     $xlog2 = log2($x);
     @xlog2 = log2(@x);
 
-Return the log base ten of the argument. A list form of the function
+Return the log base two of the argument. A list form of the function
 is also provided.
 
 =cut
@@ -303,19 +304,117 @@ sub fsum
 	return $sum;
 }
 
+=head3 gcd
+
+=head3 hcf
+
+Return the greatest common divisor (also known as the highest
+common factor) of a list of integers. These are simply synomyms:
+
+    $factor = gcd(@values);
+    $factor = hfc(@numbers);
+
+=cut
+
+sub gcd
+{
+	use integer;
+	my($x, $y, $r);
+
+	#
+	# It could happen. Someone might type \$x instead of $x.
+	#
+	my @values = map{(ref $_ eq "ARRAY")? @$_:
+			((ref $_ eq "SCALAR")? $$_: $_)} grep {$_} @_;
+
+	return 0 if (scalar @values == 0);
+
+	$y = abs pop @values;
+	$x = abs pop @values;
+
+	while (1)
+	{
+		($x, $y) = ($y, $x) if ($y < $x);
+
+		$r = $y % $x;
+		$y = $x;
+
+		if ($r == 0)
+		{
+			return $x if (scalar @values == 0);
+			$r = abs pop @values;
+		}
+
+		$x = $r;
+	}
+
+	return $y;
+}
+
+#
+#sub bgcd
+#{
+#	my($x, $y) = map(abs($_), @_);
+#
+#	return $y if ($x == 0);
+#	return $x if ($y == 0);
+#
+#	my $lsbx = low_set_bit($x);
+#	my $lsby = low_set_bit($y);
+#	$x >>= $lsbx;
+#	$y >>= $lsby;
+#
+#	while ($x != $y)
+#	{
+#		($x, $y) = ($y, $x) if ($x > $y);
+#
+#		$y -= $x;
+#		$y >>= low_set_bit($y);
+#	}
+#	return ($x << (($lsbx > $lsby)? $lsby: $lsbx));
+#}
+
+*hcf = \&gcd;
+
+=head3 lcm
+
+Return the greatest common divisor of a list of integers.
+
+    $factor = lcm(@values);
+
+=cut
+
+sub lcm
+{
+	#
+	# It could happen. Someone might type \$x instead of $x.
+	#
+	my @values = map{(ref $_ eq "ARRAY")? @$_:
+			((ref $_ eq "SCALAR")? $$_: $_)} @_;
+
+	my $x = pop @values;
+
+	for my $m (@values)
+	{
+		$x *= $m/gcd($m, $x);
+	}
+
+	return abs $x;
+}
+
 =head3 moduli()
 
-Return the moduli of a number after repeated divisions. The remainders are
+Return the moduli of an integer after repeated divisions. The remainders are
 returned in a list from left to right.
 
-    @rems = moduli(29, 3);        # Returns (2, 0, 0, 1)
     @digits = moduli(1899, 10);   # Returns (9, 9, 8, 1)
+    @rems = moduli(29, 3);        # Returns (2, 0, 0, 1)
 
 =cut
 
 sub moduli
 {
-	my($n, $b) = @_;
+	my($n, $b) = (abs($_[0]), abs($_[1]));
 	my @mlist;
 	use integer;
 
@@ -418,12 +517,13 @@ Perform some polynomial operations on plain lists of coefficients.
     @coefficients = (1, 2, 4, 8);    # 1 + 2x + 4x**2 + 8x**3
 
 In all functions the coeffcient list is passed by reference to the function,
-and the functions that return coefficients all return references to a coefficient list.
+and the functions that return coefficients all return references to a
+coefficient list.
 
 B<It is assumed that any leading zeros in the coefficient lists have
 already been removed before calling these functions, and that any leading
 zeros found in the returned lists will be handled by the caller.> This caveat
-is particulary important to note in the case of C<pl_div()>.
+is particularly important to note in the case of C<pl_div()>.
 
 Although these functions are convenient for simple polynomial operations,
 for more advanced polynonial operations L<Math::Polynomial> is recommended.
@@ -599,7 +699,8 @@ the remainder.
     my($q_ref, $r_ref) = pl_div($f1, $f2);
 
     #
-    # Remove any leading zeros in the remainder.
+    # Remove any leading zeros (i.e., numbers smaller in
+    # magnitude than machine epsilon) in the remainder.
     #
     my @remd = @{$r_ref};
     pop @remd while (@remd and abs($remd[$#remd]) < $epsilon);
@@ -609,6 +710,9 @@ the remainder.
 
 If C<$f1> and C<$f2> were to go through that bit of code again, not
 removing the leading zeros would lead to a divide-by-zero error.
+
+If either list of coefficients is empty, pl_div() returns undefs for
+both quotient and remainder.
 
 =cut
 

@@ -32,48 +32,66 @@ no_index:
     - t
     - xt
 provides:
+  OpusVL::FB11X::Model::PreferencesDB:
+    file: lib/OpusVL/FB11X/Model/PreferencesDB.pm
+    version: '0.30'
+  OpusVL::FB11X::Preferences:
+    file: lib/OpusVL/FB11X/Preferences.pm
+    version: '0.30'
+  OpusVL::FB11X::Preferences::Controller::Preferences:
+    file: lib/OpusVL/FB11X/Preferences/Controller/Preferences.pm
+    version: '0.30'
+  OpusVL::FB11X::Preferences::Role::ParameterValueEditing:
+    file: lib/OpusVL/FB11X/Preferences/Role/ParameterValueEditing.pm
+    version: '0.30'
+  OpusVL::FB11X::Preferences::Role::PreferencesController:
+    file: lib/OpusVL/FB11X/Preferences/Role/PreferencesController.pm
+    version: '0.30'
   OpusVL::Preferences:
     file: lib/OpusVL/Preferences.pm
-    version: '0.29'
+    version: '0.30'
+  OpusVL::Preferences::Hat::preferences:
+    file: lib/OpusVL/Preferences/Hat/preferences.pm
+    version: '0.30'
   OpusVL::Preferences::RolesFor::Result::PrfOwner:
     file: lib/OpusVL/Preferences/RolesFor/Result/PrfOwner.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::RolesFor::ResultSet::PrfOwner:
     file: lib/OpusVL/Preferences/RolesFor/ResultSet/PrfOwner.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::RolesFor::Schema:
     file: lib/OpusVL/Preferences/RolesFor/Schema.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::Schema:
     file: lib/OpusVL/Preferences/Schema.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::Schema::Result::CustomDataUniqueValues:
     file: lib/OpusVL/Preferences/Schema/Result/CustomDataUniqueValues.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::Schema::Result::PrfDefault:
     file: lib/OpusVL/Preferences/Schema/Result/PrfDefault.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::Schema::Result::PrfDefaultValues:
     file: lib/OpusVL/Preferences/Schema/Result/PrfDefaultValues.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::Schema::Result::PrfOwner:
     file: lib/OpusVL/Preferences/Schema/Result/PrfOwner.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::Schema::Result::PrfOwnerType:
     file: lib/OpusVL/Preferences/Schema/Result/PrfOwnerType.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::Schema::Result::PrfPreference:
     file: lib/OpusVL/Preferences/Schema/Result/PrfPreference.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::Schema::ResultSet::PrfDefault:
     file: lib/OpusVL/Preferences/Schema/ResultSet/PrfDefault.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::Schema::ResultSet::PrfDefaultValues:
     file: lib/OpusVL/Preferences/Schema/ResultSet/PrfDefaultValues.pm
-    version: '0.29'
+    version: '0.30'
   OpusVL::Preferences::Schema::ResultSet::PrfOwnerType:
     file: lib/OpusVL/Preferences/Schema/ResultSet/PrfOwnerType.pm
-    version: '0.29'
+    version: '0.30'
 requires:
   DBIx::Class::Core: '0'
   DBIx::Class::ResultSet: '0'
@@ -90,7 +108,7 @@ requires:
 resources:
   bugtracker: https://github.com/OpusVL/OpusVL-Preferences/issues
   repository: git://github.com/OpusVL/OpusVL-Preferences.git
-version: '0.29'
+version: '0.30'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -368,7 +386,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.29
+          tag: v0.30
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

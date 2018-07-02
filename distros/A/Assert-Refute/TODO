@@ -1,0 +1,68 @@
+        -- next big thing --
++   +   API bail_out()
+
+        -- backlog --
+++  +   MOD multiline like
++   ++  MOD port Test::Deep to refute
++   ++  MOD port Test::Differences to refute
++   ++  TST Even more examples
++   +++ BUG Consistent reporting of caller under Test::More
+++  +   MOD T::Array: point out misbehaving elements in all tests
+++  ++  API todo() or $TODO - need to do something about passing tests
+++  ++  MOD Round-trip assertion
+++  ++  MOD Util::Tempfile - preserve file if tests fail
++++ +   API Report: configurable verbosity level
++++ +   API If contract with args fails, display args
++++ +   API Optional short-circuit on first failure
++++ +   API Some extra goodies to contract {...} like title
++++ +   API verbosity switch to include more/less info in report
++++ +   MOD T::Array: block subs curry if no second arg
++++ +   API skip remaining tests [workaround: return]
+++  +++ DRV add Test-based driver
+++  +++ MOD Provide what Test::Most can
+++  +++ MOD import Test::Builder-based tests
++++ ++  MOD `is_diff` LCS-based multiline test
++++ +++ DRV A TAP consumer class
++++ +++ DRV Own Unit-testing backend (adhere TAP::Harness)
++++ +++ MOD async_ok "event id" => [ prerequisite1, prerequisite2 ]
+
+        -- need to think more --
+++  +++ API one-line abbreviated log-friendly report
++++ +   MOD `is_unique` - make a string unique within current contract
++++ +++ MOD Module to check that "foo" is really implementation of "bar"
+
+        -- this file's structure --
+{priority} {complexity} {TAG} {brief feature/bug description}
+
+# *Priority* _decreases_ from `+` to `+++`
+
+The questions to ask oneself:
+
+* Can 1.0 ship without this?
+* Is not having this done awkward?
+* Are there users asking for this?
+* Do other features depend on this?
+
+# *Complexity* _increases_ from `+` to `+++`
+
+The questions to ask oneself:
+
+* What is the simplest meaningful example?
+* How should this be tested/documented?
+* What extra knowledge is required for this?
+* What other features does this depend upon?
+
+# *Tag* is 3 uppercase letters
+
+Known tags are (also used in commit messages):
+
+* **API** - extending API
+* **MOD** - condition/check arsenal
+* **DRV** - test backends/drivers
+* **BLD** - own builder features/bugs
+* **REF** - refactoring, internal structure changes, optimisations
+* **DOC** - improving documentation, use case descriptions
+* **TST** - adding tests/examples
+* **BUG** - bugfix
+* **AUX** - changing distribution files (Makefile, README, xt tests etc)
+

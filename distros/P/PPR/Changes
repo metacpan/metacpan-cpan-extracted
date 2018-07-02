@@ -158,3 +158,32 @@ Revision history for PPR
 
     * Added Perl 5.28 ":attributes(before) ($ignature)" syntax for subroutines
       (thanks, Matt)
+
+
+0.000018  Mon Jun 25 09:59:36 2018
+
+    * Fixed _uniq()
+      (thanks Adriano!)
+
+
+0.000019  Tue Jun 26 19:33:17 2018
+
+    * Fixed parsing of multiple POD sections
+      (thanks Adriano!)
+
+
+0.000020  Tue Jun 26 19:54:42 2018
+
+    * Oops, fixed decomment() too.
+
+    * Updates PPR::X approriately as well.
+
+
+
+0.000021  Wed Jun 27 06:33:51 2018
+
+    * Removed spurious Regexp::Debugger dependency
+      (thanks, Adriano)
+
+    * Fixed edge case on POD/whitespace parsing
+      (thanks, Adriano)

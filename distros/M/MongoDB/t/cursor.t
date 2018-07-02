@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2009 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,14 +11,13 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-
 
 use strict;
 use warnings;
 use Test::More;
 use Test::Fatal;
 use Tie::IxHash;
+use Time::HiRes qw/time/;
 use version;
 
 use MongoDB;
@@ -89,6 +87,12 @@ my @values;
     is ($values[2]->{foo}, 4);
 }
 
+# limit propagation to result
+{
+    my $c = $coll->query({}, { limit => 3, sort_by => { foo => 1 } });
+    is($c->result->_limit, 3, 'query limit was propagated');
+}
+
 # skip
 {
     @values = $coll->query({}, { limit => 3, skip => 1, sort_by => { foo => 1 } })->all;
@@ -108,7 +112,7 @@ $coll->drop;
     my $id1 = $coll->insert_one({x => 1})->inserted_id;
     my $id2 = $coll->insert_one({x => 5})->inserted_id;
 
-    is($coll->count, 2);
+    is($coll->count_documents({}), 2);
     $cursor = $coll->query;
     is($cursor->next->{'x'}, 1);
     is($cursor->next->{'x'}, 5);
@@ -137,27 +141,6 @@ $coll->drop;
     is($cursor_sort->next->{'x'}, 5, 'Tie::IxHash cursor->sort');
     is($cursor_sort->next->{'x'}, 1);
 }
-
-# snapshot
-# XXX tests don't fail if snapshot is turned off ?!?
-subtest "snapshot" => sub {
-    plan skip_all => "Snapshot removed in 3.7+"
-      unless $server_version < v3.7.0;
-
-    my $cursor3 = $coll->query->snapshot(1);
-    is( $cursor3->has_next, 1, 'check has_next' );
-    my $r1 = $cursor3->next;
-    is( $cursor3->has_next, 1,
-        'if this failed, the database you\'re running is old and snapshot won\'t work' );
-    $cursor3->next;
-    is( int $cursor3->has_next, 0, 'check has_next is false' );
-
-    like(
-        exception { $coll->query->snapshot },
-        qr/requires a defined, boolean argument/,
-        "snapshot exception without argument"
-    );
-};
 
 # paging
 {
@@ -252,24 +235,24 @@ subtest "snapshot" => sub {
     $cursor = $coll->find();
 
     $cursor = $cursor->tailable(1);
-    is($cursor->_query->cursorType, 'tailable', "set tailable");
+    is($cursor->_query->options->{cursorType}, 'tailable', "set tailable");
     $cursor = $cursor->tailable(0);
-    is($cursor->_query->cursorType, 'non_tailable', "clear tailable");
+    is($cursor->_query->options->{cursorType}, 'non_tailable', "clear tailable");
 
     $cursor = $cursor->tailable_await(1);
-    is($cursor->_query->cursorType, 'tailable_await', "set tailable_await");
+    is($cursor->_query->options->{cursorType}, 'tailable_await', "set tailable_await");
     $cursor = $cursor->tailable_await(0);
-    is($cursor->_query->cursorType, 'non_tailable', "clear tailable_await");
+    is($cursor->_query->options->{cursorType}, 'non_tailable', "clear tailable_await");
 
     $cursor = $cursor->tailable(1);
-    is($cursor->_query->cursorType, 'tailable', "set tailable");
+    is($cursor->_query->options->{cursorType}, 'tailable', "set tailable");
     $cursor = $cursor->tailable_await(0);
-    is($cursor->_query->cursorType, 'non_tailable', "clear tailable_await");
+    is($cursor->_query->options->{cursorType}, 'non_tailable', "clear tailable_await");
 
     $cursor = $cursor->tailable_await(1);
-    is($cursor->_query->cursorType, 'tailable_await', "set tailable_await");
+    is($cursor->_query->options->{cursorType}, 'tailable_await', "set tailable_await");
     $cursor = $cursor->tailable(0);
-    is($cursor->_query->cursorType, 'non_tailable', "clear tailable");
+    is($cursor->_query->options->{cursorType}, 'non_tailable', "clear tailable");
 
     #test is actual cursor
     $coll->drop;
@@ -281,9 +264,9 @@ subtest "snapshot" => sub {
     $cursor = $coll->find();
 
     $cursor->immortal(1);
-    ok($cursor->_query->noCursorTimeout, "set immortal");
+    ok($cursor->_query->options->{noCursorTimeout}, "set immortal");
     $cursor->immortal(0);
-    ok(! $cursor->_query->noCursorTimeout, "clear immortal");
+    ok(! $cursor->_query->options->{noCursorTimeout}, "clear immortal");
 }
 
 # explain
@@ -326,6 +309,7 @@ subtest "snapshot" => sub {
     $cursor->all;
     $info = $cursor->info;
     is($info->{at}, 1000);
+    is($info->{num}, 1000, 'cursor_num after ->all');
 }
 
 # sort_by
@@ -338,7 +322,7 @@ subtest "snapshot" => sub {
 
     # XXX this test makes no sense; remove? fix? -- xdg, 2016-08-10
     $cursor = $coll->query({}, { limit => 10, skip => 0, sort_by => {created => 1 }});
-    is($coll->count(), 5);
+    is($coll->count_documents({}), 5);
 }
 
 # delayed tailable cursor
@@ -380,7 +364,7 @@ subtest "await data" => sub {
 
     my $start = time;
     $cursor = $coll2->find( { _id => { '$gt' => $last_doc->{_id} } } )->tailable_await(1)
-      ->max_await_time_ms(1000);
+      ->max_await_time_ms(2000);
 
     # We won't get anything yet
     $cursor->next();
@@ -388,7 +372,7 @@ subtest "await data" => sub {
 
     # did it actually block for a bit?
     ok( $end >= $start + 1, "cursor blocked to await data" )
-      or diag "START: $start; END: $end";
+      and diag "START: $start; END: $end";
 };
 
 done_testing;

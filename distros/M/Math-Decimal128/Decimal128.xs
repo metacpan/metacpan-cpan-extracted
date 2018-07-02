@@ -38,7 +38,7 @@
 #define M_D128_SvUV SvUVX
 #endif
 
-#if defined(DEBUGGING) && defined(NV_IS_DOUBLE)
+#if (defined(DEBUGGING) && defined(NV_IS_DOUBLE)) || defined(__MINGW64__)
 typedef _Decimal128 D128 __attribute__ ((aligned(8)));
 #else
 typedef _Decimal128 D128;
@@ -155,20 +155,16 @@ SV *  _is_inf_NV(pTHX_ SV * x) {
 }
 
 SV *  _is_neg_zero_NV(pTHX_ SV * x) {
-      char * buffer;
+      char buffer[3];
 
       if(SvNV(x) != 0.0) return newSViv(0);
-
-      Newx(buffer, 2, char);
 
       sprintf(buffer, "%.0f", (double)SvNV(x));
 
       if(strcmp(buffer, "-0")) {
-        Safefree(buffer);
         return newSViv(0);
       }
 
-      Safefree(buffer);
       return newSViv(1);
 }
 
@@ -1555,11 +1551,8 @@ void _d128_bytes(pTHX_ SV * sv) {
   dXSARGS;
   D128 d128 = *(INT2PTR(D128 *, M_D128_SvIV(SvRV(sv))));
   int i, n = sizeof(D128);
-  char * buff;
+  char buff[4];
   void * p = &d128;
-
-  Newx(buff, 4, char);
-  if(buff == NULL) croak("Failed to allocate memory in _d128_bytes function");
 
   sp = mark;
 
@@ -1573,7 +1566,6 @@ void _d128_bytes(pTHX_ SV * sv) {
     XPUSHs(sv_2mortal(newSVpv(buff, 0)));
   }
   PUTBACK;
-  Safefree(buff);
   XSRETURN(n);
 }
 
@@ -1582,7 +1574,6 @@ SV * _bid_mant(pTHX_ SV * bin) {
   D128 * d128;
   SV * obj_ref, * obj;
   int i, imax = av_len((AV*)SvRV(bin));
-  char * buf;
   D128 val = 0.DL;
   extern D128 add_on[];
 

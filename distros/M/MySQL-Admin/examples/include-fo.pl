@@ -5,8 +5,8 @@ use MySQL::Admin qw(:all);
 use strict;
 init();
 print header;
-if( param('include') ) {
-    include().br();
+if ( param('include') ) {
+    include() . br();
     print a( { href => "$ENV{SCRIPT_NAME}" }, 'next' );
     clearSession();
 } else {
@@ -18,9 +18,7 @@ if( param('include') ) {
     );
     my $qstring = createSession( \%vars );
     print qq(Action wurde erzeugt.);
-    print br(),
-        a( { href => "$ENV{SCRIPT_NAME}?include=$qstring" },
-        'next' );
-}
+    print br(), a( { href => "$ENV{SCRIPT_NAME}?include=$qstring" }, 'next' );
+} ## end else [ if ( param('include') )]
 use showsource;
 &showSource('./include-fo.pl');

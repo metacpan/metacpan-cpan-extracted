@@ -1,7 +1,7 @@
 #!/bin/perl
 #
 use Carp;
-use Math::Polynomial::Solve qw(:sturm ascending_order);
+use Math::Polynomial::Solve qw(:sturm);
 use Math::Utils qw(:compare :polynomial);
 use Math::Complex;
 use strict;
@@ -9,8 +9,7 @@ use warnings;
 
 my $fltcmp = generate_fltcmp();
 
-my $ascending = 1;
-ascending_order($ascending);
+coefficients order => 'ascending';
 
 while (my $line = prompt("Polynomial: "))
 {

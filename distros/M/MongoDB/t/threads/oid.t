@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2010 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -25,11 +23,11 @@ BEGIN { plan skip_all => 'requires threads' unless $Config{usethreads} }
 BEGIN { plan skip_all => 'threads not supported before Perl 5.8.5' unless $] ge "5.008005" }
 
 use MongoDB;
-use MongoDB::OID;
+use BSON::OID;
 
 my @threads = map {
     threads->create(sub {
-        [map { MongoDB::OID->new } 0 .. 3]
+        [map { BSON::OID->new } 0 .. 3]
     });
 } 0 .. 9;
 

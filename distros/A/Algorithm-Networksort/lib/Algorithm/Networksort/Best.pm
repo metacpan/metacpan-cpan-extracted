@@ -31,7 +31,7 @@ use warnings;
 
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 #
 # The hashes represent each network, with a short, hopefully descriptive, key.
@@ -209,6 +209,19 @@ my %nw_best_by_name = (
 		[12,13], [2,3], [8,11], [4,9], [10,11], [6,7], [5,6], [4,8],
 		[7,9], [4,5], [9,11], [11,12], [3,4], [6,8], [7,10], [9,10],
 		[5,6], [7,8], [8,9], [6,7]]},
+	vanvoorhis16 => {
+		inputs => 16,
+		depth => 9,
+		title => '16-Input Network by David C. Van Voorhis',
+		comparators =>
+		[[0,1], [2,3], [4,5], [6,7], [8,9], [10,11], [12,13], [14,15],
+		[1,3], [5,7], [9,11], [13,15], [0,2], [4,6], [8,10], [12,14],
+		[3,7], [11,15], [2,6], [10,14], [1,5], [9,13], [0,4], [8,12],
+		[7,15], [6,14], [5,13], [4,12], [3,11], [2,10], [1,9], [0,8],
+		[1,2], [3,12], [13,14], [4,8], [7,11], [5,10], [6,9],
+		[2,8], [7,13], [3,9], [5,12], [1,4], [6,10], [11,14],
+		[2,4], [6,8], [10,12], [3,5], [7,9], [11,13],
+		[3,6], [7,10], [5,8], [9,12], [3,4], [5,6], [7,8], [9,10], [11,12]]},
 	senso17 => {
 		inputs => 17,
 		depth => 17,
@@ -474,7 +487,7 @@ INIT
     my $inputs = 9;
 
     #
-    # First find if any networks exist for the size you want.
+    # First find if any networks exist for the input size.
     #
     my @nwkeys = nw_best_names($inputs);
 
@@ -512,7 +525,9 @@ The current networks are:
 
 =item 'floyd09'
 
-A 9-input network of depth 9 discovered by R. W. Floyd.
+A 9-input network of depth 9 discovered by R. W. Floyd. Of interest also
+because it is using what are essentially three-way comparators split into
+three sets of two-way comparators.
 
 =item 'senso09'
 
@@ -527,7 +542,7 @@ V. K. Valsalam and R. Miikkulaainen.
 
 =item 'waksman10'
 
-a 10-input network of depth 9 found by A. Waksman.
+A 10-input network of depth 9 found by A. Waksman.
 
 =item 'senso10'
 
@@ -625,6 +640,10 @@ A 16-input network of depth 10 found by M. W. Green.
 
 A 16-input network of depth 10 found using the SENSO program by
 V. K. Valsalam and R. Miikkulaainen.
+
+=item 'vanvoorhis16'
+
+From the book B<Designing Sorting Networks> (see L<Non-algorithmic discoveries> below).
 
 =back
 
@@ -788,11 +807,16 @@ An unlikely example:
 
     my $inputs = 12;
 
-    for my $name (nwsrt_best_names())
+    for my $name (nwsrt_best_names($inputs))
     {
-    	my $nw = nwsrt_best(inputs => $inputs, name => $name);
+    	my $nw = nwsrt_best(name => $name);
     	print $nw->title(), "\n", $nw, "\n";
     }
+
+To get the list of all available names (regardless of input size), simply
+call the function with no argument:
+
+    my @names = nwsrt_best_names();
 
 =cut
 
@@ -872,6 +896,12 @@ L<http://www.cs.brandeis.edu/~hugues/sorting_networks.html>.
 The 18 and 22 input networks found by Sherenaz Waleed Al-Haj Baddar
 are described in her dissertation "Finding Better Sorting Networks" at
 L<http://etd.ohiolink.edu/view.cgi?acc_num=kent1239814529>.
+
+=item
+
+The 16 input network found by David C. Van Voorhis is described in chapter
+5 of B<Designing Sorting Networks>, by Sherenaz W. Al-Haj Baddar and Kenneth E.
+Batcher.
 
 =item
 

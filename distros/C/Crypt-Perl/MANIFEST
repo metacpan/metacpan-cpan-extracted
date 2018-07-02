@@ -105,6 +105,7 @@ t/Crypt-Perl-PK.t
 t/Crypt-Perl-PKCS10-Attribute-extensionRequest.t
 t/Crypt-Perl-PKCS10.t
 t/Crypt-Perl-RSA-Generate.t
+t/Crypt-Perl-RSA-PKCS1_v1_5.t
 t/Crypt-Perl-RSA-Parse.t
 t/Crypt-Perl-RSA-PrivateKey.t
 t/Crypt-Perl-RSA-PublicKey.t

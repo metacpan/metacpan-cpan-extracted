@@ -20,10 +20,16 @@ sub arg_opts {
 
     return (
         'blame!' => \$self->{OPTS}->{blame}, # just to set opt in rule
-        'help|h' => sub { $self->usage(); exit 0 },
+        'help|h' => sub {
+            $self->{OPTS}->{help} = 1;
+            die "!FINISH";
+        },
         'path=s@' => \$self->{OPTS}->{path},
         'preserve=s@' => \$self->{OPTS}->{preserve},
-        'version|V' => sub { print $self->VERSION . "\n"; exit 0 },
+        'version|V' => sub {
+            $self->{OPTS}->{version} = 1;
+            die "!FINISH";
+        },
     )
 }
 
@@ -64,6 +70,19 @@ sub parse_args {
         $self->usage;
         die_fatal "Unsupported opt passed", 1;
     }
+
+    if ($self->{OPTS}->{help}) {
+        $self->usage;
+        die_info, 0;
+    }
+
+    if ($self->{OPTS}->{version}) {
+        print $self->VERSION . "\n";
+        die_info, 0;
+    }
+
+    die_fatal $self->{ARG_ERROR}, 1 if (defined $self->{ARG_ERROR});
+
     $self->configure;
 
     return $self;

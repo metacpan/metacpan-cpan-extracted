@@ -25,6 +25,7 @@ lib/Class/STL/Trace.pm
 docs/class-stl-containers.pod
 docs/class-stl-containers.pdf
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json
 examples/algorithms.pl
 examples/compare.pl
 examples/class_members.pl

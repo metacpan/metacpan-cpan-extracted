@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::PaymentMethodResult;
-$WebService::Braintree::PaymentMethodResult::VERSION = '1.5';
+$WebService::Braintree::PaymentMethodResult::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -18,7 +18,23 @@ This class is a sibling class to L<WebService::Braintree::Result>.
 
 =cut
 
-use Moose;
+use Moo;
+
+use WebService::Braintree::Types qw(
+    AmexExpressCheckoutCard
+    AndroidPayCard
+    ApplePayCard
+    CoinbaseAccount
+    CreditCard
+    EuropeBankAccount
+    MasterpassCard
+    PaymentMethodNonce
+    PayPalAccount
+    UsBankAccount
+    VenmoAccount
+    VisaCheckoutCard
+    UnknownPaymentMethod
+);
 
 =head1 METHODS
 
@@ -64,81 +80,36 @@ will be in the C<< unknown() >>.
 
 =cut
 
-has amex_express_checkout_card => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::AmexExpressCheckoutCard',
-    coerce => 1,
+my %payment_methods = (
+    amex_express_checkout_card => AmexExpressCheckoutCard,
+    android_pay_card => AndroidPayCard,
+    apple_pay_card => ApplePayCard,
+    coinbase_account => CoinbaseAccount,
+    credit_card => CreditCard,
+    europe_bank_account => EuropeBankAccount,
+    masterpass_card => MasterpassCard,
+    payment_method_nonce => PaymentMethodNonce,
+    paypal_account => PayPalAccount,
+    us_bank_account => UsBankAccount,
+    venmo_account => VenmoAccount,
+    visa_checkout_card => VisaCheckoutCard,
+    unknown => UnknownPaymentMethod,
 );
-has android_pay_card => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::AndroidPayCard',
-    coerce => 1,
-);
-has apple_pay_card => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::ApplePayCard',
-    coerce => 1,
-);
-has coinbase_account => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::CoinbaseAccount',
-    coerce => 1,
-);
-has credit_card => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::CreditCard',
-    coerce => 1,
-);
-has europe_bank_account => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::EuropeBankAccount',
-    coerce => 1,
-);
-has masterpass_card => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::MasterpassCard',
-    coerce => 1,
-);
-has payment_method_nonce => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::PaymentMethodNonce',
-    coerce => 1,
-);
-has paypal_account => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::PayPalAccount',
-    coerce => 1,
-);
-has us_bank_account => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::UsBankAccount',
-    coerce => 1,
-);
-has venmo_account => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::VenmoAccount',
-    coerce => 1,
-);
-has visa_checkout_card => (
-    is => 'ro',
-    isa => 'WebService::Braintree::_::VisaCheckoutCard',
-    coerce => 1,
-);
-has unknown => (
-    is => 'rw',
-    isa => 'WebService::Braintree::_::UnknownPaymentMethod',
-    coerce => 1,
-);
+
+while (my ($method, $type) = each %payment_methods) {
+    has $method => (
+        is => 'ro',
+        isa => $type,
+        coerce => 1,
+    );
+}
 
 sub BUILD {
     my ($self, $attrs) = @_;
 
     my $have_item = 0;
-    my $meta = __PACKAGE__->meta;
-    foreach my $attr ($meta->get_all_attributes) {
-        my $name = $attr->name;
-
-        if ($self->$name) {
+    foreach my $attr (keys %payment_methods) {
+        if ($self->$attr) {
             $have_item = 1;
             last;
         }
@@ -156,10 +127,8 @@ This will return the value encapsulated in this PaymentMethodResult.
 sub payment_method {
     my $self = shift;
 
-    my $meta = __PACKAGE__->meta;
-    foreach my $attr ($meta->get_all_attributes) {
-        my $name = $attr->name;
-        return $self->$name if $self->$name;
+    foreach my $attr (keys %payment_methods) {
+        return $self->$attr if $self->$attr;
     }
 
     return;
@@ -167,7 +136,7 @@ sub payment_method {
 
 =head2 is_success
 
-This always returns false.
+This always returns true.
 
 =cut
 

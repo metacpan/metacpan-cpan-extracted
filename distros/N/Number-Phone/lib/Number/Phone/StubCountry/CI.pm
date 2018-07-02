@@ -22,18 +22,25 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221545;
+our $VERSION = 1.20180619214154;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2 $3 $4'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'personal_number' => '',
+                'mobile' => '
+          (?:
+            [07][1-9]|
+            [45]\\d|
+            6[014-9]|
+            8[4-9]
+          )\\d{6}
+        ',
+                'specialrate' => '',
                 'geographic' => '
           (?:
             2(?:
@@ -51,17 +58,10 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'specialrate' => '',
-                'mobile' => '
-          (?:
-            0[1-9]|
-            [45]\\d|
-            6[014-9]|
-            7[124-9]|
-            8[4-9]
-          )\\d{6}
-        ',
+                'pager' => '',
                 'voip' => '',
+                'personal_number' => '',
+                'toll_free' => '',
                 'fixed_line' => '
           (?:
             2(?:
@@ -78,20 +78,19 @@ my $validators = {
               6[08]
             )
           )\\d{5}
-        ',
-                'toll_free' => ''
+        '
               };
 my %areanames = (
-  22520 => "Plateau",
-  22521 => "Abidjan",
-  22522 => "Cocody",
-  22523 => "Banco",
-  22524 => "Abobo",
+  22520 => "Plateau\,\ Abidjan",
+  22521 => "Abidjan\ \(southeast\)",
+  22522 => "Cocody\,\ Abidjan",
+  22523 => "Banco\,\ Abidjan",
+  22524 => "Abobo\,\ Abidjan",
   22530 => "Yamoussoukro",
   22531 => "Bouaké",
   22532 => "Daloa",
   22533 => "Man",
-  22534 => "San\ Pedro",
+  22534 => "San\-Pédro",
   22535 => "Abengourou",
   22536 => "Korhogo",
 );

@@ -23,6 +23,7 @@ on 'test' => sub {
   requires "Test::Filename" => "0.03";
   requires "Test::More" => "0.92";
   requires "lib" => "0";
+  requires "parent" => "0";
   requires "perl" => "5.008001";
 };
 
@@ -39,7 +40,6 @@ on 'develop' => sub {
   requires "Dist::Zilla" => "5";
   requires "Dist::Zilla::Plugin::AppendExternalData" => "0";
   requires "Dist::Zilla::PluginBundle::DAGOLDEN" => "0.072";
-  requires "English" => "0";
   requires "File::Spec" => "0";
   requires "File::Temp" => "0";
   requires "IO::Handle" => "0";
@@ -47,9 +47,11 @@ on 'develop' => sub {
   requires "Pod::Wordlist" => "0";
   requires "Software::License::Apache_2_0" => "0";
   requires "Test::CPAN::Meta" => "0";
+  requires "Test::MinimumVersion" => "0";
   requires "Test::More" => "0";
+  requires "Test::Perl::Critic" => "0";
   requires "Test::Pod" => "1.41";
+  requires "Test::Portability::Files" => "0";
   requires "Test::Spelling" => "0.12";
   requires "Test::Version" => "1";
-  requires "blib" => "1.01";
 };

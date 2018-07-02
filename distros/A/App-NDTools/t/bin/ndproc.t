@@ -30,17 +30,20 @@ run_ok(
 $test = "verbose";
 run_ok(
     name => $test,
-    cmd => [ $^X, $bin, '-vv', '-v4', '--verbose', '--verbose', '4', '-V'], # FIXME: get rid of exit(0) in arg parser and use mod here
+    cmd => [ @cmd, '-vv', '-v4', '--verbose', '--verbose', '4', '-V'],
     stderr => qr/ TRACE] Indexing modules/, # FIXME: there must be no actions on -V
     stdout => qr/^\d+\.\d+/,
 );
 
+my $orig_program_name = $0;
+$0 = $bin; # Pod::Usage will be able to find binary with pod
 $test = "help";
 run_ok(
     name => $test,
-    cmd => [ $^X, $bin, '--help', '-h' ], # FIXME: two issues: exit(0) in arg parser and no pod in mod
+    cmd => [ @cmd, '--help', '-h' ],
     stderr => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
 );
+$0 = $orig_program_name; # just in case
 
 ### bin specific tests
 
@@ -126,7 +129,7 @@ run_ok(
 $test = "module_unsupported_opt";
 run_ok(
     name => $test,
-    cmd => [ $^X, $bin, qw/--module Remove --unsupported-opt-test/ ],
+    cmd => [ @cmd, qw/--module Remove --unsupported-opt-test/ ],
     stderr => qr/Unknown option: unsupported-opt-test/,
     exit => 1
 );

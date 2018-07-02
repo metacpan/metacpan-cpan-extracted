@@ -22,22 +22,38 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221546;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
-                  'intl_format' => 'NA',
                   'format' => '$1-$2',
+                  'intl_format' => 'NA',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'format' => '($1) $2-$3',
-                  'intl_format' => '$1-$2-$3'
+                  'intl_format' => '$1-$2-$3',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
+                'mobile' => '
+          473(?:
+            4(?:
+              0[2-79]|
+              1[04-9]|
+              2[0-5]|
+              58
+            )|
+            5(?:
+              2[01]|
+              3[3-8]
+            )|
+            901
+          )\\d{4}
+        ',
+                'specialrate' => '(900[2-9]\\d{6})',
                 'geographic' => '
           473(?:
             2(?:
@@ -66,36 +82,17 @@ my $validators = {
             938
           )\\d{4}
         ',
-                'specialrate' => '(900[2-9]\\d{6})',
-                'mobile' => '
-          473(?:
-            4(?:
-              0[2-79]|
-              1[04-9]|
-              2[0-5]|
-              58
-            )|
-            5(?:
-              2[01]|
-              3[3-8]
-            )|
-            901
-          )\\d{4}
-        ',
                 'pager' => '',
-                'personal_number' => '
-          5(?:
-            (?:
-              00|
-              22|
-              33|
-              44|
-              66|
-              77|
-              88
-            )[2-9]|
-            21[23]
-          )\\d{6}
+                'toll_free' => '
+          8(?:
+            00|
+            33|
+            44|
+            55|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
         ',
                 'fixed_line' => '
           473(?:
@@ -125,18 +122,18 @@ my $validators = {
             938
           )\\d{4}
         ',
-                'toll_free' => '
-          8(?:
+                'voip' => '',
+                'personal_number' => '
+          5(?:
             00|
+            2[12]|
             33|
             44|
-            55|
             66|
             77|
             88
           )[2-9]\\d{6}
-        ',
-                'voip' => ''
+        '
               };
 use Number::Phone::NANP::Data;
 sub areaname {

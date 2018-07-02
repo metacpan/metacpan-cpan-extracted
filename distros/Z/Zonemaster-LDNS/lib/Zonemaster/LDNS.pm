@@ -2,7 +2,7 @@ package Zonemaster::LDNS;
 
 use 5.014;
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.1.0';
 
 use parent 'Exporter';
 our @EXPORT_OK = qw[to_idn has_idn ldns_version load_zonefile];
@@ -18,7 +18,7 @@ use Zonemaster::LDNS::Packet;
 
 =head1 NAME
 
-    Zonemaster::LDNS - DNS-talking module based on the ldns C library
+Zonemaster::LDNS - Perl wrapper for the ldns DNS library.
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,9 @@ Returns the ldns version string. Can be exported, but is not by default.
 
 =item to_idn($name, ...)
 
-Takes a number of strings and returns a list of them converted to IDNA format.
+Takes a number of domain names (in string format) and returns them with all
+labels converted to A-labels unless they are already in ASCII.
+
 Assumes that the strings have been converted to Perl's internal encoding before
 it's called. Can be exported, but is not by default.
 
@@ -191,3 +193,22 @@ Get and/or set the socket timeout for the resolver.
 Get and/or set the IP address the resolver should try to send its queries from.
 
 =back
+
+=head1 AUTHORS
+
+Mattias P <mattias.paivarinta@iis.se>
+- Current maintainer
+
+Calle Dybedahl <calle@init.se>
+- Original author
+
+=head1 LICENSE
+
+This is free software, licensed under:
+
+The (three-clause) BSD License
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
+
+=cut

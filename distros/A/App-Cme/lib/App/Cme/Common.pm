@@ -10,12 +10,12 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.027';
+$App::Cme::Common::VERSION = '1.028';
 use strict;
 use warnings;
 use 5.10.1;
 
-use Config::Model 2.116;
+use Config::Model 2.124 qw/initialize_log4perl/;
 use Config::Model::Lister;
 use Pod::POM;
 use Pod::POM::View::Text;
@@ -40,7 +40,8 @@ sub cme_global_options {
       # to be deprecated
       [ "canonical!"         => "write back config data according to canonical order" ],
       [ "trace|stack-trace!" => "Provides a full stack trace when exiting on error"],
-      [ "verbose=s"          => "Verbosity level (1, 2, 3  or info, debug, trace)"],
+      [ "verbose!"           => "Show what's going on"],
+      [ "quiet"              => "Suppress all output except error messages"],
       # no bundling
       { getopt_conf => [ qw/no_bundling/ ] }
   );
@@ -85,8 +86,6 @@ sub process_args {
             . "You may need to install another Config::Model Perl module.\n"
             . "See the available models there: https://github.com/dod38fr/config-model/wiki/Available-models-and-backends\n";
     }
-
-    say "cme: using $root_model model" unless $opt->{quiet};
 
     my $command = (split('::', ref($self)))[-1] ;
 
@@ -137,28 +136,12 @@ sub process_args {
 sub model {
     my ($self, $opt, $args) = @_;
 
-    my @levels = qw/WARN INFO DEBUG TRACE/;
-    my $optv = $opt->{verbose} ;
-
-    my $log_level;
-    if (defined $optv) {
-        if ($optv =~ /^\d$/) {
-            $log_level =  $levels[$opt->{verbose}];
-        }
-        else {
-            ($log_level) = grep { /^$optv/i } @levels;
-        }
-        if (not $log_level) {
-            die "unknown log level $optv. Must be 1 ,2, 3 or warn, info, debug, trace.\n" ;
-        }
-    }
-
-
     my %cm_args;
     $cm_args{model_dir} = $opt->{model_dir} if $opt->{model_dir};
-    $cm_args{log_level} = $log_level if $log_level;
 
     if (not $self->{_model}) {
+        initialize_log4perl( verbose => $opt->{_verbose} );
+
         my $model = $self->{_model} = Config::Model->new( %cm_args );
         push @store, $model;
     }
@@ -276,7 +259,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 

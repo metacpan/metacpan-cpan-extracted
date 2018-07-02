@@ -1,3 +1,15 @@
+0.062   2018-06-24 (PERLANCAR)
+
+	- Mojo's error doesn't give code, only message.
+
+
+0.061   2018-06-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [debug] Remove log statement.
+
+
 0.060   2018-06-17 (PERLANCAR)
 
 	- No functional changes.

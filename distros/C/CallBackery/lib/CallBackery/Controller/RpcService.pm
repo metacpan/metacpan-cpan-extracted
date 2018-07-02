@@ -138,18 +138,18 @@ sub logout {
 
 
 
-=head2 instanciatePlugin
+=head2 instantiatePlugin
 
 get an instance for the given plugin
 
 =cut
 
-sub instanciatePlugin {
+sub instantiatePlugin {
     my $self = shift;
     my $name = shift;
     my $args = shift;
     my $user = $self->user;
-    return $self->config->instanciatePlugin($name,$user,$args);
+    return $self->config->instantiatePlugin($name,$user,$args);
 }
 
 =head2 processPluginData(plugin,args)
@@ -164,7 +164,7 @@ sub processPluginData {
     # creating two statements will make things
     # easier to debug since there is only one
     # thing that can go wrong per line.
-    my $instance = $self->instanciatePlugin($plugin);
+    my $instance = $self->instantiatePlugin($plugin);
     return $instance->processData(@_);
 }
 
@@ -177,7 +177,7 @@ validate the content of the given field for the given plugin
 sub validatePluginData {
     my $self = shift;
     my $plugin = shift;
-    return $self->instanciatePlugin($plugin)
+    return $self->instantiatePlugin($plugin)
         ->validateData(@_);
 }
 
@@ -190,7 +190,7 @@ return the current value for the given field
 sub getPluginData {
     my $self = shift;
     my $plugin = shift;
-    return $self->instanciatePlugin($plugin)
+    return $self->instantiatePlugin($plugin)
         ->getData(@_);
 }
 
@@ -207,14 +207,15 @@ sub getUserConfig {
     my $ph = $self->pluginMap;
     for my $name (@{$ph->{list}}){
         my $obj = eval {
-            $self->instanciatePlugin($name);
+            $self->instantiatePlugin($name);
         };
         warn "$@" if $@;
         next unless $obj;
+        my $iM = $obj->can('instanciationMode') ? $obj->instanciationMode : $obj->instantiationMode;
         push @plugins, {
             tabName => $obj->tabName,
             name => $obj->name,
-            instanciationMode => $obj->instanciationMode
+            instantiationMode => $iM
         };
     }
     return {
@@ -225,7 +226,7 @@ sub getUserConfig {
 
 =head2 getPluginConfig(plugin,args)
 
-returns a plugin configuration removing all the 'backend' keys and non ARRAY or HASH
+returns a plugin configuration removing all the 'back end' keys and non ARRAY or HASH
 references in the process.
 
 =cut
@@ -234,7 +235,7 @@ sub getPluginConfig {
     my $self = shift;
     my $plugin = shift;
     my $args = shift;
-    my $obj = $self->instanciatePlugin($plugin,$args);
+    my $obj = $self->instantiatePlugin($plugin,$args);
     return $obj->filterHashKey($obj->screenCfg,'backend');
 }
 
@@ -261,7 +262,7 @@ sub runEventActions {
 =head2 setPreDestroyAction(key,callback);
 
 This can be used to have tasks completed at the end of a webtransaction since
-the controller gets instanciated per transaction.
+the controller gets instantiated per transaction.
 An example application would be backing up the configuration changes only
 once even if more than one configChange event has occured.
 
@@ -326,7 +327,7 @@ sub handleUpload {
     if (not $upload){
         return $self->render(text=>encode_json({exception=>{message=>'Upload Missing',code=>9384}}));
     }
-    my $obj = $self->config->instanciatePlugin($name,$self->user);
+    my $obj = $self->config->instantiatePlugin($name,$self->user);
 
     my $form;
     if (my $formData = $self->req->param('formData')){
@@ -396,7 +397,7 @@ sub handleDownload {
         return $self->render(text=>encode_json({exception=>{message=>'Plugin Name missing',code=>3923}}));
     }
 
-    my $obj = $self->config->instanciatePlugin($name,$self->user);
+    my $obj = $self->config->instantiatePlugin($name,$self->user);
 
     my $form;
     if (my $formData = $self->req->param('formData')){

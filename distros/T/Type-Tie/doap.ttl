@@ -16,11 +16,11 @@
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008005"^^doap-deps:CpanId ], [
 		doap-deps:on "Exporter::Tiny 0.026"^^doap-deps:CpanId;
 	];
-	doap-deps:runtime-suggests [
+	doap-deps:runtime-suggestion [
 		doap-deps:on "Types::Standard 0.004"^^doap-deps:CpanId;
 	];
-	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
-	doap-deps:test-suggests [
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap-deps:test-suggestion [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ], [
 		doap-deps:on "Types::Standard 0.004"^^doap-deps:CpanId;
 	], [
 		doap-deps:on "MooseX::Types::Moose"^^doap-deps:CpanId;
@@ -34,7 +34,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Type-Tie";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-009>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-011>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-type-tie>;
@@ -189,6 +189,40 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.009.tar.gz>;
 	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "Type-Tie-0.010"^^xsd:string;
+	dc:issued            "2018-06-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Bundle copies of Test::Requires, Try::Tiny, and Test::Fatal in inc.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Bundle Type::Nano for testing.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Type-Tie/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "Type-Tie-0.011"^^xsd:string;
+	dc:issued            "2018-06-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Type::Nano does overloading.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Improvements to Type::Nano documentation.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Type-Tie-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/haarg>
 	a                    foaf:Person;

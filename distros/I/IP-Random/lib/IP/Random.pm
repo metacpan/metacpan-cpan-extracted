@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016 Joelle Maslak
+# Copyright (C) 2016-2018 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package IP::Random;
-$IP::Random::VERSION = '1.004';
+$IP::Random::VERSION = '1.008';
 # ABSTRACT: Generate IP Addresses Randomly
 
 
@@ -19,37 +19,40 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 
 use Carp;
-use List::Util qw(none notall pairs);
+
+# We need a version of List::Util with uniq in it
+use List::Util 1.50 qw(any none notall pairs uniq);
 use Socket qw(inet_aton);
 
-my $DEFAULT_IPV4_EXCLUDE = {
-    '0.0.0.0/8'          => 'rfc1122',
-    '10.0.0.0/8'         => 'rfc1918',
-    '100.64.0.0/10'      => 'rfc6598',
-    '127.0.0.0/8'        => 'rfc1122',
-    '169.254.0.0/16'     => 'rfc3927',
-    '172.16.0.0/12'      => 'rfc1918',
-    '192.0.0.0/24'       => 'rfc5736',
-    '192.0.2.0/24'       => 'rfc5737',
-    '192.88.99.0/24'     => 'rfc3068',
-    '192.168.0.0/16'     => 'rfc1918',
-    '198.18.0.0/15'      => 'rfc2544',
-    '198.51.100.0/24'    => 'rfc5737',
-    '203.0.113.0/24'     => 'rfc5737',
-    '224.0.0.0/4'        => 'rfc3171',
-    '240.0.0.0/4'        => 'rfc1112',
-    '255.255.255.255/32' => 'rfc919',
+my $IPV4_EXCLUDE = {
+    '0.0.0.0/8'          => [ 'default', 'rfc1122' ],
+    '10.0.0.0/8'         => [ 'default', 'rfc1918' ],
+    '100.64.0.0/10'      => [ 'default', 'rfc6598' ],
+    '127.0.0.0/8'        => [ 'default', 'rfc1122' ],
+    '169.254.0.0/16'     => [ 'default', 'rfc3927' ],
+    '172.16.0.0/12'      => [ 'default', 'rfc1918' ],
+    '192.0.0.0/24'       => [ 'default', 'rfc5736' ],
+    '192.0.2.0/24'       => [ 'default', 'rfc5737' ],
+    '192.88.99.0/24'     => [ 'default', 'rfc3068' ],
+    '192.168.0.0/16'     => [ 'default', 'rfc1918' ],
+    '198.18.0.0/15'      => [ 'default', 'rfc2544' ],
+    '198.51.100.0/24'    => [ 'default', 'rfc5737' ],
+    '203.0.113.0/24'     => [ 'default', 'rfc5737' ],
+    '224.0.0.0/4'        => [ 'default', 'rfc3171' ],
+    '240.0.0.0/4'        => [ 'default', 'rfc1112' ],
+    '255.255.255.255/32' => [ 'default', 'rfc919' ],
 };
+
+# Build cache of valid types
+my %VALID_TYPES = map { $_, 1 } uniq sort map { @$_ } values %$IPV4_EXCLUDE;
 
 
 sub random_ipv4 ( %args ) {
     $args{rand} //= sub { int( rand( shift() + 1 ) ) };
 
     # Can't have exclude and additional_types_allowed both existing
-    if ( exists( $args{exclude} ) && exists( $args{additional_types_allowed} ) )
-    {
-        croak(  "Cannot define both 'exclude' and "
-              . "'additional_types_allowed' parameters" );
+    if ( exists( $args{exclude} ) && exists( $args{additional_types_allowed} ) ) {
+        croak( "Cannot define both 'exclude' and " . "'additional_types_allowed' parameters" );
     }
 
     # This saves us some later branches
@@ -72,8 +75,18 @@ sub random_ipv4 ( %args ) {
           _get_ipv4_excludes( $args{additional_types_allowed} );
     }
 
+    # Expand out tags in exclude list
+    my (@exclude_cidrs) = grep { m/^\d+\.\d+\.\d+\.\d+(:?\/\d+)$/ } @{ $args{exclude} },
+      @{ $args{additional_exclude} };
+
+    my (@exclude_tags) = grep { !m/^\d+\.\d+\.\d+\.\d+(:?\/\d+)$/ } @{ $args{exclude} },
+      @{ $args{additional_exclude} };
+
+    my (@exclude_expanded) = ( @exclude_cidrs, map { @{ _get_ipv4_excludes( $args{additional_types_allowed}, $_ ) } } @exclude_tags );
+
+    my (@exclude_all) = uniq sort @exclude_expanded;
+
     # Build a closure for checking to see if an address is excluded
-    my (@exclude_all) = ( @{ $args{exclude} }, @{ $args{additional_exclude} } );
     my $is_not_excluded = sub($addr) {
         none { in_ipv4_subnet( $_, $addr ) } @exclude_all;
     };
@@ -94,11 +107,32 @@ sub random_ipv4 ( %args ) {
 # of additional types allowed
 #
 # Returns a list ref
-sub _get_ipv4_excludes( $addl_types ) {
-    my @ret = grep {
-        my $k = $_;
-        none { $DEFAULT_IPV4_EXCLUDE->{$k} eq $_ } @{ $addl_types }
-    } keys %{ $DEFAULT_IPV4_EXCLUDE };
+sub _get_ipv4_excludes ( $addl_types, $tag = 'default' ) {
+    foreach my $t (@$addl_types) {
+        if ( !exists( $VALID_TYPES{$t} ) ) {
+            confess("Type '$t' is not a valid type");
+        }
+    }
+    if ( !exists( $VALID_TYPES{$tag} ) ) {
+        confess("Type '$tag' is not a valid type");
+    }
+
+    my @ret;
+
+  NEXT_EXCLUDE:
+    foreach my $default_exclude ( keys %$IPV4_EXCLUDE ) {
+        if ( none { $_ eq $tag } @{ $IPV4_EXCLUDE->{$default_exclude} } ) {
+            next NEXT_EXCLUDE;
+        }
+
+        foreach my $checktype ( @{ $IPV4_EXCLUDE->{$default_exclude} } ) {
+            if ( any { $_ eq $checktype } @$addl_types ) {
+                # Not excluded.
+                next NEXT_EXCLUDE;
+            }
+        }
+        push @ret, $default_exclude;
+    }
 
     return \@ret;
 }
@@ -108,14 +142,14 @@ sub in_ipv4_subnet ( $sub_cidr, $ip ) {
     if ( !defined($sub_cidr) ) { confess("subnet_cidr is not defined"); }
     if ( !defined($ip) )       { confess("ip is not defined"); }
 
-    if ( $sub_cidr !~ m/\A(?:[\d\.]+)(?:\/(?:\d+))?\z/ ) {
+    if ( $sub_cidr !~ m/\A(?:[0-9\.]+)(?:\/(?:[0-9]+))?\z/ ) {
         confess("$sub_cidr is not in the format A.B.C.D/N");
     }
-    my ( $sub_net, $sub_mask ) = $sub_cidr =~ m/\A([\d\.]+)(?:\/(\d+))?\z/ms;
+    my ( $sub_net, $sub_mask ) = $sub_cidr =~ m/\A([0-9\.]+)(?:\/([0-9]+))?\z/ms;
     $sub_mask //= 32;
 
-    my $addr = unpack( 'N', inet_aton( $ip ) );
-    my $sub  = unpack( 'N', inet_aton( $sub_net ) );
+    my $addr = unpack( 'N', inet_aton($ip) );
+    my $sub  = unpack( 'N', inet_aton($sub_net) );
 
     my $mask = 0;
     for ( 1 .. $sub_mask ) {
@@ -127,7 +161,7 @@ sub in_ipv4_subnet ( $sub_cidr, $ip ) {
         return 1;
     }
 
-    return undef;
+    return;
 }
 
 
@@ -149,7 +183,7 @@ IP::Random - Generate IP Addresses Randomly
 
 =head1 VERSION
 
-version 1.004
+version 1.008
 
 =head1 SYNOPSIS
 
@@ -214,8 +248,9 @@ ending in C<.0> and C<255>, you could do something like:
 
 =item exclude
 
-This is an array reference of CIDRs (in string format) to exclude from
-the results.  See C<default_exclude()> for the default list, which
+This is an array reference of CIDRs (in string format) or exclude list
+tags (see the groups listed under L<additional_types_allowed>) to exclude
+from the results.  See C<default_exclude()> for the default list, which
 excludes addresses such as RFC1918 (private) IP addresses.  If passed an
 empty list reference such as C<[]>, it will not exclude any IPs.  This is
 almost certainly not what you desire (since it may return IPs in class D and
@@ -232,6 +267,11 @@ default excludes and add an additional exclude:
 
   my $ipv4 = random_ipv4(
     exclude => [ default_exclude(), '4.2.2.1/32' ] );
+
+or
+
+  my $ipv4 = random_ipv4(
+    exclude => [ 'default', '4.2.2.1/32' ] );
 
 Of course this particular example can also be done with
 the C<additional_exclude> optional parameter.
@@ -254,7 +294,7 @@ This is an array refence of strings that contain the "groups" you do
 not want to exclude by default.  For instance, you may want to use
 some/all RFC1918 addresses.
 
-Valid groups:
+Valid groups (all off the above are also in the C<default> group:
 
 =over 4
 
@@ -262,9 +302,13 @@ Valid groups:
 
 Limited broadcast address (C<255.255.255.255/32>).
 
+=item rfc1112
+
+Multicast addresses (C<240.0.0.0/4>)
+
 =item rfc1122
 
-Basic protocol design (C<0.0.0.0/8>, C<127.0.0.0/8>, C<240.0.0.0/4>)
+Basic protocol design (C<0.0.0.0/8>, C<127.0.0.0/8>)
 
 =item rfc1918
 
@@ -341,7 +385,7 @@ This list contains:
 
 =item 0.0.0.0/8
 
-"This" Network (RFC 1122, Section 3.2.1.3)
+"This" Network (RFC1122, Section 3.2.1.3)
 
 =item 10.0.0.0/8
 
@@ -353,7 +397,7 @@ Shared Address Space (RFC6598)
 
 =item 127.0.0.0/8
 
-Loopback (RFC 1122, Section 3.2.1.3)
+Loopback (RFC1122, Section 3.2.1.3)
 
 =item 169.254.0.0/16
 
@@ -399,6 +443,10 @@ Multicast (RFC3171)
 
 Reserved for Future Use (RFC 1112, Section 4)
 
+=item 255.255.255.255/32
+
+Braodcast address (RFC919)
+
 =back
 
 =head1 SECURITY WARNING
@@ -432,15 +480,13 @@ IPv6 support must be added.  IPv4 is a subset of IPv6, so there should
 be one set of pick functions and the like, with wrappers to handle
 conversion of IPv4 to IPv6 and back, when needed.
 
-I have plans to port this to Perl 6.
-
 =head1 AUTHOR
 
 Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Joelle Maslak.
+This software is Copyright (c) 2018 by Joelle Maslak.
 
 This is free software, licensed under:
 

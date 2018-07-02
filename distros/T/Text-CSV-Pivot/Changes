@@ -1,7 +1,10 @@
 Revision history for Text::CSV::Pivot
 
+0.09  2018-06-25
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
 0.08  2018-06-17
-      - Added strict/warnings pragrma.
+      - Added strict/warnings pragma.
 
 0.07  2018-06-16
       - Added key 'provides' to the Makefile.PL script.

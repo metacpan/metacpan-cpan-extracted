@@ -45,7 +45,7 @@ static const void* SPVM_ENV_RUNTIME[]  = {
   SPVM_RUNTIME_API_get_double_array_elements,
   SPVM_RUNTIME_API_get_object_array_element,
   SPVM_RUNTIME_API_set_object_array_element,
-  SPVM_RUNTIME_API_get_field_id,
+  SPVM_RUNTIME_API_get_field_rel_id,
   SPVM_RUNTIME_API_get_byte_field,
   SPVM_RUNTIME_API_get_short_field,
   SPVM_RUNTIME_API_get_int_field,
@@ -62,19 +62,19 @@ static const void* SPVM_ENV_RUNTIME[]  = {
   SPVM_RUNTIME_API_set_double_field,
   SPVM_RUNTIME_API_set_object_field,
   SPVM_RUNTIME_API_get_sub_id,
-  SPVM_RUNTIME_API_get_sub_id_interface_method,
+  SPVM_RUNTIME_API_get_sub_id_method_call,
   SPVM_RUNTIME_API_get_basic_type_id,
-  SPVM_RUNTIME_API_new_object,
-  SPVM_RUNTIME_API_new_byte_array,
-  SPVM_RUNTIME_API_new_short_array,
-  SPVM_RUNTIME_API_new_int_array,
-  SPVM_RUNTIME_API_new_long_array,
-  SPVM_RUNTIME_API_new_float_array,
-  SPVM_RUNTIME_API_new_double_array,
-  SPVM_RUNTIME_API_new_object_array,
-  SPVM_RUNTIME_API_new_multi_array,
-  SPVM_RUNTIME_API_new_string,
-  SPVM_RUNTIME_API_new_struct,
+  SPVM_RUNTIME_API_new_object_raw,
+  SPVM_RUNTIME_API_new_byte_array_raw,
+  SPVM_RUNTIME_API_new_short_array_raw,
+  SPVM_RUNTIME_API_new_int_array_raw,
+  SPVM_RUNTIME_API_new_long_array_raw,
+  SPVM_RUNTIME_API_new_float_array_raw,
+  SPVM_RUNTIME_API_new_double_array_raw,
+  SPVM_RUNTIME_API_new_object_array_raw,
+  SPVM_RUNTIME_API_new_multi_array_raw,
+  SPVM_RUNTIME_API_new_string_raw,
+  SPVM_RUNTIME_API_new_struct_raw,
   SPVM_RUNTIME_API_get_exception,
   SPVM_RUNTIME_API_set_exception,
   SPVM_RUNTIME_API_get_ref_count,
@@ -97,10 +97,80 @@ static const void* SPVM_ENV_RUNTIME[]  = {
   (void*)(intptr_t)offsetof(SPVM_OBJECT, dimension), // object_dimension_byte_offset
   (void*)(intptr_t)offsetof(SPVM_OBJECT, elements_length), // object_elements_length_byte_offset
   SPVM_RUNTIME_call_sub,
+  SPVM_RUNTIME_API_enter_scope,
+  SPVM_RUNTIME_API_push_mortal,
+  SPVM_RUNTIME_API_leave_scope,
+  SPVM_RUNTIME_API_new_object,
+  SPVM_RUNTIME_API_new_byte_array,
+  SPVM_RUNTIME_API_new_short_array,
+  SPVM_RUNTIME_API_new_int_array,
+  SPVM_RUNTIME_API_new_long_array,
+  SPVM_RUNTIME_API_new_float_array,
+  SPVM_RUNTIME_API_new_double_array,
+  SPVM_RUNTIME_API_new_object_array,
+  SPVM_RUNTIME_API_new_multi_array,
+  SPVM_RUNTIME_API_new_string,
+  SPVM_RUNTIME_API_new_struct,
 };
 
 SPVM_ENV* SPVM_RUNTIME_API_get_env_runtime() {
   return (SPVM_ENV*)SPVM_ENV_RUNTIME;
+}
+
+int32_t SPVM_RUNTIME_API_enter_scope(SPVM_ENV* env) {
+  (void)env;
+  
+  SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
+  
+  int32_t mortal_stack_top = runtime->mortal_stack_top;
+  
+  return mortal_stack_top;
+}
+
+void SPVM_RUNTIME_API_push_mortal(SPVM_ENV* env, SPVM_OBJECT* object) {
+  (void)env;
+
+  SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
+  
+  if (object != NULL) {
+    // Extend mortal stack
+    if (runtime->mortal_stack_top >= runtime->mortal_stack_capacity) {
+      int32_t new_mortal_stack_capacity = runtime->mortal_stack_capacity * 2;
+      SPVM_OBJECT** new_mortal_stack = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_OBJECT*) * new_mortal_stack_capacity);
+      memcpy(new_mortal_stack, runtime->mortal_stack, sizeof(SPVM_OBJECT*) * runtime->mortal_stack_capacity);
+      runtime->mortal_stack_capacity = new_mortal_stack_capacity;
+      runtime->mortal_stack = new_mortal_stack;
+    }
+    
+    runtime->mortal_stack[runtime->mortal_stack_top] = object;
+    runtime->mortal_stack_top++;
+    
+    object->ref_count++;
+  }
+}
+
+void SPVM_RUNTIME_API_leave_scope(SPVM_ENV* env, int32_t original_mortal_stack_top) {
+  (void)env;
+  
+  SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
+
+  int32_t mortal_stack_index;
+  for (mortal_stack_index = original_mortal_stack_top; mortal_stack_index < runtime->mortal_stack_top; mortal_stack_index++) {
+    SPVM_OBJECT* object = runtime->mortal_stack[mortal_stack_index];
+    
+    if (object != NULL) {
+      if (object->ref_count > 1) {
+        object->ref_count--;
+      }
+      else {
+        SPVM_RUNTIME_API_dec_ref_count(env, object);
+      }
+    }
+    
+    runtime->mortal_stack[mortal_stack_index] = NULL;
+  }
+  
+  runtime->mortal_stack_top = original_mortal_stack_top;
 }
 
 int32_t SPVM_RUNTIME_API_check_cast(SPVM_ENV* env, int32_t cast_basic_type_id, int32_t cast_type_dimension, SPVM_OBJECT* object) {
@@ -112,24 +182,12 @@ int32_t SPVM_RUNTIME_API_check_cast(SPVM_ENV* env, int32_t cast_basic_type_id, i
   return SPVM_OP_CHECKER_can_assign(compiler, cast_basic_type_id, cast_type_dimension, object->basic_type_id, object->dimension);
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_create_exception_stack_trace(SPVM_ENV* env, SPVM_OBJECT* exception, int32_t sub_id, int32_t current_line) {
-
-  SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
-  SPVM_COMPILER* compiler = runtime->compiler;
-  
-  // Constant pool sub
-  SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
-  SPVM_SUB* sub = op_sub->uv.sub;
-  
-  // Sub name
-  const char* sub_name = sub->abs_name;
-  
-  // File name
-  const char* file_name = sub->file_name;
+SPVM_OBJECT* SPVM_RUNTIME_API_create_exception_stack_trace(SPVM_ENV* env, SPVM_OBJECT* exception, const char* package_name, const char* sub_name, const char* file, int32_t line) {
   
   // stack trace strings
-  const char* from = "\n  from ";
-  const char* at = "() at ";
+  const char* from_part = "\n  from ";
+  const char* arrow_part = "->";
+  const char* at_part = " at ";
 
   // Exception
   int8_t* exception_bytes = env->get_byte_array_elements(env, exception);
@@ -138,20 +196,22 @@ SPVM_OBJECT* SPVM_RUNTIME_API_create_exception_stack_trace(SPVM_ENV* env, SPVM_O
   // Total string length
   int32_t total_length = 0;
   total_length += exception_length;
-  total_length += strlen(from);
+  total_length += strlen(from_part);
+  total_length += strlen(package_name);
+  total_length += strlen(arrow_part);
   total_length += strlen(sub_name);
-  total_length += strlen(at);
-  total_length += strlen(file_name);
+  total_length += strlen(at_part);
+  total_length += strlen(file);
 
-  const char* line = " line ";
+  const char* line_part = " line ";
   char line_str[20];
   
-  sprintf(line_str, "%" PRId32, current_line);
-  total_length += strlen(line);
+  sprintf(line_str, "%" PRId32, line);
+  total_length += strlen(line_part);
   total_length += strlen(line_str);
   
   // Create exception message
-  void* new_exception = env->new_string(env, NULL, total_length);
+  void* new_exception = env->new_string_raw(env, NULL, total_length);
   int8_t* new_exception_bytes = env->get_byte_array_elements(env, new_exception);
   
   memcpy(
@@ -162,13 +222,15 @@ SPVM_OBJECT* SPVM_RUNTIME_API_create_exception_stack_trace(SPVM_ENV* env, SPVM_O
 
   sprintf(
     (char*)new_exception_bytes + exception_length,
-    "%s%s%s%s%s%" PRId32,
-    from,
+    "%s%s%s%s%s%s%s%" PRId32,
+    from_part,
+    package_name,
+    arrow_part,
     sub_name,
-    at,
-    file_name,
-    line,
-    current_line
+    at_part,
+    file,
+    line_part,
+    line
   );
   
   return new_exception;
@@ -192,12 +254,12 @@ SPVM_OBJECT* SPVM_RUNTIME_API_concat(SPVM_ENV* env, SPVM_OBJECT* string1, SPVM_O
   (void)env;
 
   if (string1 == NULL) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, ". operater left string must be defined(string . string)", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, ". operater left string must be defined(string . string)", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return NULL;
   }
   else if (string2 == NULL) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, ". operater right string must be defined(string . string)", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, ". operater right string must be defined(string . string)", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return NULL;
   }
@@ -206,7 +268,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_concat(SPVM_ENV* env, SPVM_OBJECT* string1, SPVM_O
   int32_t string2_length = SPVM_RUNTIME_API_get_array_length(env, string2);
   
   int32_t string3_length = string1_length + string2_length;
-  SPVM_OBJECT* string3 = SPVM_RUNTIME_API_new_string(env, NULL, string3_length);
+  SPVM_OBJECT* string3 = SPVM_RUNTIME_API_new_string_raw(env, NULL, string3_length);
   
   int8_t* string1_bytes = SPVM_RUNTIME_API_get_byte_array_elements(env, string1);
   int8_t* string2_bytes = SPVM_RUNTIME_API_get_byte_array_elements(env, string2);
@@ -388,6 +450,116 @@ SPVM_OBJECT* SPVM_RUNTIME_API_get_exception(SPVM_ENV* env) {
 SPVM_OBJECT* SPVM_RUNTIME_API_new_byte_array(SPVM_ENV* env, int32_t length) {
   (void)env;
   
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_byte_array_raw(env, length);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_short_array(SPVM_ENV* env, int32_t length) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_short_array_raw(env, length);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_int_array(SPVM_ENV* env, int32_t length) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_int_array_raw(env, length);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_long_array(SPVM_ENV* env, int32_t length) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_long_array_raw(env, length);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_float_array(SPVM_ENV* env, int32_t length) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_float_array_raw(env, length);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_double_array(SPVM_ENV* env, int32_t length) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_double_array_raw(env, length);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_object_array(SPVM_ENV* env, int32_t basic_type_id, int32_t length) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_object_array_raw(env, basic_type_id, length);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_multi_array(SPVM_ENV* env, int32_t basic_type_id, int32_t element_dimension, int32_t length) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_multi_array(env, basic_type_id, element_dimension, length);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_object(SPVM_ENV* env, int32_t basic_type_id) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_object_raw(env, basic_type_id);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_struct(SPVM_ENV* env, int32_t basic_type_id, void* struct_ptr) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_struct_raw(env, basic_type_id, struct_ptr);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_string(SPVM_ENV* env, char* bytes, int32_t length) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_string_raw(env, bytes, length);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_new_byte_array_raw(SPVM_ENV* env, int32_t length) {
+  (void)env;
+  
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
 
   // Alloc length + 1. Last element value is 0 to use c string functions easily
@@ -409,7 +581,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_byte_array(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_short_array(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_short_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
 
@@ -432,7 +604,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_short_array(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_int_array(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_int_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
 
@@ -455,7 +627,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_int_array(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_long_array(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_long_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
 
@@ -478,7 +650,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_long_array(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_float_array(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_float_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
 
@@ -501,7 +673,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_float_array(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_double_array(SPVM_ENV* env, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_double_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
 
@@ -524,7 +696,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_double_array(SPVM_ENV* env, int32_t length) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_object_array(SPVM_ENV* env, int32_t basic_type_id, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_object_array_raw(SPVM_ENV* env, int32_t basic_type_id, int32_t length) {
   (void)env;
   
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
@@ -551,11 +723,11 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_object_array(SPVM_ENV* env, int32_t basic_type
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_multi_array(SPVM_ENV* env, int32_t basic_type_id, int32_t element_dimension, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_multi_array_raw(SPVM_ENV* env, int32_t basic_type_id, int32_t element_dimension, int32_t length) {
   (void)env;
   
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
-
+  
   // Alloc length + 1. Last element value is 0 to use c string functions easily
   int64_t array_byte_size = (int64_t)sizeof(SPVM_OBJECT) + ((int64_t)length + 1) * (int64_t)sizeof(SPVM_OBJECT*);
   SPVM_OBJECT* object = SPVM_RUNTIME_ALLOCATOR_alloc(runtime, array_byte_size);
@@ -575,7 +747,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_multi_array(SPVM_ENV* env, int32_t basic_type_
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_object(SPVM_ENV* env, int32_t basic_type_id) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_object_raw(SPVM_ENV* env, int32_t basic_type_id) {
   (void)env;
   
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
@@ -583,7 +755,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_object(SPVM_ENV* env, int32_t basic_type_id) {
   
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
 
-  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, basic_type->name, strlen(basic_type->name));
+  SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, basic_type->name, strlen(basic_type->name));
   SPVM_PACKAGE* package = op_package->uv.package;
   
   int32_t fields_length = package->op_fields->length;
@@ -610,7 +782,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_object(SPVM_ENV* env, int32_t basic_type_id) {
   return object;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_new_struct(SPVM_ENV* env, int32_t basic_type_id, void* struct_ptr) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_struct_raw(SPVM_ENV* env, int32_t basic_type_id, void* struct_ptr) {
   (void)env;
   
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
@@ -618,7 +790,7 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_struct(SPVM_ENV* env, int32_t basic_type_id, v
   
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
 
-  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, basic_type->name, strlen(basic_type->name));
+  SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, basic_type->name, strlen(basic_type->name));
   SPVM_PACKAGE* package = op_package->uv.package;
   
   // Alloc length + 1. Last element value is 0 to use c string functions easily
@@ -644,20 +816,14 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_struct(SPVM_ENV* env, int32_t basic_type_id, v
   return object;
 }
 
-int32_t SPVM_RUNTIME_API_get_array_length(SPVM_ENV* env, SPVM_OBJECT* object) {
-  (void)env;
-  
-  return object->elements_length;
-}
-
-SPVM_OBJECT* SPVM_RUNTIME_API_new_string(SPVM_ENV* env, char* bytes, int32_t length) {
+SPVM_OBJECT* SPVM_RUNTIME_API_new_string_raw(SPVM_ENV* env, char* bytes, int32_t length) {
   (void)env;
 
   if (length == 0) {
     length = strlen((char*)bytes);
   }
 
-  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_byte_array(env, length);
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_new_byte_array_raw(env, length);
   
   if (length > 0) {
     if (bytes == NULL) {
@@ -669,6 +835,12 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_string(SPVM_ENV* env, char* bytes, int32_t len
   }
 
   return object;
+}
+
+int32_t SPVM_RUNTIME_API_get_array_length(SPVM_ENV* env, SPVM_OBJECT* object) {
+  (void)env;
+  
+  return object->elements_length;
 }
 
 int8_t* SPVM_RUNTIME_API_get_byte_array_elements(SPVM_ENV* env, SPVM_OBJECT* object) {
@@ -780,7 +952,7 @@ void SPVM_RUNTIME_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
       }
       else {
         SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, object->basic_type_id);
-        SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, basic_type->name, strlen(basic_type->name));
+        SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, basic_type->name, strlen(basic_type->name));
         SPVM_PACKAGE* package = op_package->uv.package;
         
         // Call destructor
@@ -813,14 +985,14 @@ void SPVM_RUNTIME_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
       
       // Type
       SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, object->basic_type_id);
-      SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, basic_type->name, strlen(basic_type->name));
+      SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, basic_type->name, strlen(basic_type->name));
       SPVM_PACKAGE* package = op_package->uv.package;
       
       {
         int32_t index;
-        for (index = 0; index < package->object_field_ids->length; index++) {
-          int32_t object_field_id = (intptr_t)SPVM_LIST_fetch(package->object_field_ids, index);
-          SPVM_OBJECT** object_field_address = (SPVM_OBJECT**)((intptr_t)object + sizeof(SPVM_OBJECT) + sizeof(SPVM_VALUE) * object_field_id);
+        for (index = 0; index < package->object_field_rel_ids->length; index++) {
+          int32_t object_field_rel_id = (intptr_t)SPVM_LIST_fetch(package->object_field_rel_ids, index);
+          SPVM_OBJECT** object_field_address = (SPVM_OBJECT**)((intptr_t)object + sizeof(SPVM_OBJECT) + sizeof(SPVM_VALUE) * object_field_rel_id);
           if (*object_field_address != NULL) {
             // If object is weak, unweaken
             if (__builtin_expect(SPVM_RUNTIME_API_isweak(env, *object_field_address), 0)) {
@@ -857,31 +1029,29 @@ int32_t SPVM_RUNTIME_API_get_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
   return object->ref_count;
 }
 
-int32_t SPVM_RUNTIME_API_get_field_id(SPVM_ENV* env, SPVM_OBJECT* object, const char* name) {
+int32_t SPVM_RUNTIME_API_get_field_rel_id(SPVM_ENV* env, const char* package_name, const char* field_name) {
   (void)env;
   
   // Runtime
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
   SPVM_COMPILER* compiler = runtime->compiler;
   
-  // Type
-  SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, object->basic_type_id);
-  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, basic_type->name, strlen(basic_type->name));
+  // Package
+  SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, package_name, strlen(package_name));
   
-  SPVM_LIST* op_fields = op_package->uv.package->op_fields;
+  // Field
+  SPVM_HASH* op_field_symtable = op_package->uv.package->op_field_symtable;
+  SPVM_OP* op_field = SPVM_HASH_fetch(op_field_symtable, field_name, strlen(field_name));
   
-  int32_t field_id = -1;
-  {
-    for (field_id = 0; field_id < op_fields->length; field_id++) {
-      SPVM_OP* op_field = SPVM_LIST_fetch(op_fields, field_id);
-      SPVM_FIELD* field = op_field->uv.field;
-      if (strcmp(name, field->op_name->uv.name) == 0) {
-        return field->id;
-      }
-    }
+  int32_t field_rel_id;
+  if (op_field) {
+    field_rel_id = op_field->uv.field->rel_id;
+  }
+  else {
+    field_rel_id = -1;
   }
   
-  return field_id;
+  return field_rel_id;
 }
 
 int32_t SPVM_RUNTIME_API_get_sub_id(SPVM_ENV* env, const char* name) {
@@ -894,29 +1064,25 @@ int32_t SPVM_RUNTIME_API_get_sub_id(SPVM_ENV* env, const char* name) {
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
   SPVM_COMPILER* compiler = runtime->compiler;
   
-  SPVM_OP* op_sub = SPVM_HASH_search(compiler->op_sub_symtable, name, strlen(name));
+  SPVM_OP* op_sub = SPVM_HASH_fetch(compiler->op_sub_symtable, name, strlen(name));
   int32_t sub_id = op_sub->uv.sub->id;
   
   return sub_id;
 }
 
-int32_t SPVM_RUNTIME_API_get_sub_id_interface_method(SPVM_ENV* env, SPVM_OBJECT* object, int32_t decl_sub_id) {
+int32_t SPVM_RUNTIME_API_get_sub_id_method_call(SPVM_ENV* env, SPVM_OBJECT* object, const char* sub_name) {
   (void)env;
   
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
   SPVM_COMPILER* compiler = runtime->compiler;
   
-  SPVM_OP* op_sub_decl_sub = SPVM_LIST_fetch(compiler->op_subs, decl_sub_id);
-
-  const char* method_signature = op_sub_decl_sub->uv.sub->method_signature;
-  
   SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, object->basic_type_id);
-  SPVM_OP* op_package = SPVM_HASH_search(compiler->op_package_symtable, basic_type->name, strlen(basic_type->name));  
+  SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, basic_type->name, strlen(basic_type->name));  
   SPVM_PACKAGE* package = op_package->uv.package;
   
-  SPVM_SUB* sub_call_sub = SPVM_HASH_search(package->method_signature_symtable, method_signature, strlen(method_signature));
+  SPVM_OP* op_sub = SPVM_HASH_fetch(package->op_sub_symtable, sub_name, strlen(sub_name));
   
-  return  sub_call_sub->id;
+  return  op_sub->uv.sub->id;
 }
 
 int32_t SPVM_RUNTIME_API_get_basic_type_id(SPVM_ENV* env, const char* name) {
@@ -929,7 +1095,7 @@ int32_t SPVM_RUNTIME_API_get_basic_type_id(SPVM_ENV* env, const char* name) {
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime();
   SPVM_COMPILER* compiler = runtime->compiler;
   
-  SPVM_BASIC_TYPE* basic_type = SPVM_HASH_search(compiler->basic_type_symtable, name, strlen(name));
+  SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, name, strlen(name));
   if (basic_type) {
     int32_t basic_type_id = basic_type->id;
     return basic_type_id;
@@ -939,92 +1105,92 @@ int32_t SPVM_RUNTIME_API_get_basic_type_id(SPVM_ENV* env, const char* name) {
   }
 }
 
-int8_t SPVM_RUNTIME_API_get_byte_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id) {
+int8_t SPVM_RUNTIME_API_get_byte_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(get_byte_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(get_byte_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return 0;
   }
   
-  int8_t value = *(int8_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id);
+  int8_t value = *(int8_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id);
   
   return value;
 }
 
-int16_t SPVM_RUNTIME_API_get_short_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id) {
+int16_t SPVM_RUNTIME_API_get_short_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(get_short_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(get_short_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return 0;
   }
 
-  int16_t value = *(int16_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id);
+  int16_t value = *(int16_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id);
   
   return value;
 }
 
-int32_t SPVM_RUNTIME_API_get_int_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id) {
+int32_t SPVM_RUNTIME_API_get_int_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(get_int_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(get_int_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return 0;
   }
 
-  int32_t value = *(int32_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id);
+  int32_t value = *(int32_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id);
   
   return value;
 }
-int64_t SPVM_RUNTIME_API_get_long_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id) {
+int64_t SPVM_RUNTIME_API_get_long_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(get_long_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(get_long_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return 0;
   }
 
-  int64_t value = *(int64_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id);
+  int64_t value = *(int64_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id);
   
   return value;
 }
 
-float SPVM_RUNTIME_API_get_float_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id) {
+float SPVM_RUNTIME_API_get_float_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(get_float_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(get_float_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return 0;
   }
 
-  float value = *(float*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id);
+  float value = *(float*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id);
   
   return value;
 }
 
-double SPVM_RUNTIME_API_get_double_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id) {
+double SPVM_RUNTIME_API_get_double_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(get_double_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(get_double_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return 0;
   }
 
-  double value = *(double*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id);
+  double value = *(double*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id);
   
   return value;
 }
 
-void SPVM_RUNTIME_API_weaken_object_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id) {
+void SPVM_RUNTIME_API_weaken_object_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id) {
 
   if (__builtin_expect(!object, 0)) {
-    SPVM_OBJECT* exception = env->new_string(env, "Object to weaken an object field must not be undefined.", 0);
+    SPVM_OBJECT* exception = env->new_string_raw(env, "Object to weaken an object field must not be undefined.", 0);
     env->set_exception(env, exception);
     return;
   }
 
-  SPVM_OBJECT** object_address = (SPVM_OBJECT**)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id);
+  SPVM_OBJECT** object_address = (SPVM_OBJECT**)((intptr_t)object + sizeof(SPVM_OBJECT) + sizeof(SPVM_VALUE) * field_rel_id);
   
   // Weaken object field
   if (*object_address != NULL) {
@@ -1034,92 +1200,92 @@ void SPVM_RUNTIME_API_weaken_object_field(SPVM_ENV* env, SPVM_OBJECT* object, in
   return;
 }
 
-SPVM_OBJECT* SPVM_RUNTIME_API_get_object_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id) {
+SPVM_OBJECT* SPVM_RUNTIME_API_get_object_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(get_object_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(get_object_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return NULL;
   }
 
-  void* value = *(void**)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id);
+  void* value = *(void**)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id);
   
   return value;
 }
 
-void SPVM_RUNTIME_API_set_byte_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id, int8_t value) {
+void SPVM_RUNTIME_API_set_byte_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id, int8_t value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(set_byte_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(set_byte_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return;
   }
 
-  *(int8_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id) = value;
+  *(int8_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id) = value;
 }
 
-void SPVM_RUNTIME_API_set_short_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id, int16_t value) {
+void SPVM_RUNTIME_API_set_short_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id, int16_t value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(set_short_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(set_short_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return;
   }
 
-  *(int16_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id) = value;
+  *(int16_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id) = value;
 }
 
-void SPVM_RUNTIME_API_set_int_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id, int32_t value) {
+void SPVM_RUNTIME_API_set_int_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id, int32_t value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(set_int_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(set_int_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return;
   }
 
-  *(int32_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id) = value;
+  *(int32_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id) = value;
 }
 
-void SPVM_RUNTIME_API_set_long_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id, int64_t value) {
+void SPVM_RUNTIME_API_set_long_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id, int64_t value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(set_long_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(set_long_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return;
   }
 
-  *(int64_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id) = value;
+  *(int64_t*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id) = value;
 }
 
-void SPVM_RUNTIME_API_set_float_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id, float value) {
+void SPVM_RUNTIME_API_set_float_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id, float value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(set_float_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(set_float_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return;
   }
   
-  *(float*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id) = value;
+  *(float*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id) = value;
 }
 
-void SPVM_RUNTIME_API_set_double_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id, double value) {
+void SPVM_RUNTIME_API_set_double_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id, double value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(set_double_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(set_double_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return;
   }
 
-  *(double*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id) = value;
+  *(double*)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id) = value;
 }
 
-void SPVM_RUNTIME_API_set_object_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_id, SPVM_OBJECT* value) {
+void SPVM_RUNTIME_API_set_object_field(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field_rel_id, SPVM_OBJECT* value) {
 
   if (__builtin_expect(object == NULL, 0)) {
-    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string(env, "Object must be not undef(set_object_field).", 0);
+    SPVM_OBJECT* exception = SPVM_RUNTIME_API_new_string_raw(env, "Object must be not undef(set_object_field).", 0);
     SPVM_RUNTIME_API_set_exception(env, exception);
     return;
   }
   
-  SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((SPVM_OBJECT**)((intptr_t)object + sizeof(SPVM_OBJECT) + field_id), value);
+  SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((SPVM_OBJECT**)((intptr_t)object + sizeof(SPVM_OBJECT) + field_rel_id), value);
 }

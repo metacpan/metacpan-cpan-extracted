@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use WebService::PivotalTracker::PropertyAttributes;
 use WebService::PivotalTracker::Types
@@ -44,7 +44,7 @@ WebService::PivotalTracker::Person - A Person (a PT user)
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

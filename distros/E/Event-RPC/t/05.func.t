@@ -14,7 +14,7 @@ if ( not $depend_modules ) {
 
 plan tests => 18;
 
-require "t/Event_RPC_Test_Server.pm";
+require "./t/Event_RPC_Test_Server.pm";
 my $PORT = Event_RPC_Test_Server->port;
 
 # load client class

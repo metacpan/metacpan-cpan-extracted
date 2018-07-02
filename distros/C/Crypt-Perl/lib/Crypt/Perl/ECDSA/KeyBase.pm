@@ -10,7 +10,6 @@ use parent qw(
 );
 
 use Crypt::Format ();
-use Module::Load ();
 
 use Crypt::Perl::ASN1 ();
 use Crypt::Perl::BigInt ();
@@ -145,7 +144,7 @@ sub get_struct_for_public_jwk {
 
     my ($xb, $yb) = Crypt::Perl::ECDSA::Utils::split_G_or_public( $self->_decompress_public_point() );
 
-    Module::Load::load('MIME::Base64');
+    require MIME::Base64;
 
     return {
         kty => 'EC',
@@ -201,7 +200,7 @@ sub _get_jwk_digest_cr {
         die Crypt::Perl::X::create('Generic', $err);
     };
 
-    Module::Load::load('Digest::SHA');
+    require Digest::SHA;
 
     return Digest::SHA->can( $getter_cr->() );
 }
@@ -326,7 +325,7 @@ sub __to_der {
 
     local $data_hr->{'publicKey'} = $pub_bin;
 
-    Module::Load::load('Crypt::Perl::ASN1');
+    require Crypt::Perl::ASN1;
     my $asn1 = Crypt::Perl::ASN1->new()->prepare($template);
 
     return $asn1->find($macro)->encode( $data_hr );

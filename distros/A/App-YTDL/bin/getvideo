@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.255';
+our $VERSION = '0.301';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -22,13 +22,12 @@ use Term::Form       qw();
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 print "\e(U" if $^O eq 'MSWin32';
 
-use App::YTDL::Arguments qw( from_arguments_to_choices );
-use App::YTDL::Download  qw( download_youtube );
-use App::YTDL::Helper    qw( encode_fs uni_capture );
-use App::YTDL::History   qw( read_history_files uploader_history_menu );
-use App::YTDL::Info      qw( get_download_infos );
-use App::YTDL::Merge     qw( search_and_merge );
-use App::YTDL::Options   qw( read_config_file set_options );
+use App::YTDL::Arguments  qw( from_arguments_to_choices );
+use App::YTDL::Download   qw( download_youtube );
+use App::YTDL::Helper     qw( uni_capture );
+use App::YTDL::History    qw( add_uploaders_to_history read_history_files uploader_history_menu );
+use App::YTDL::Video_Info qw( gather_video_infos );
+use App::YTDL::Options    qw( read_config_file set_options );
 
 binmode STDIN,  ':encoding(console_in)';
 binmode STDOUT, ':encoding(console_out)';
@@ -40,192 +39,137 @@ GetOptions( 'f|file=s@' => \$arg_file, 'h|?|help' => \$help )
 or pod2usage( -message => $!, -verbose => 99, -sections => "SYNOPSIS" );
 
 
-my $my_videos = decode 'locale_fs', File::HomeDir->my_videos || curdir;
+my $my_videos = File::HomeDir->my_videos || curdir; ##
+if ( ! -d $my_videos ) {
+    say "Could not find the video directory '$my_videos'!";
+    exit 1;
+}
+
 my $config_home;
 if ( which( 'xdg-user-dir' ) ) {
-    $config_home = decode 'locale_fs', File::HomeDir::FreeDesktop->my_config();
+    $config_home = File::HomeDir::FreeDesktop->my_config(); ##
 }
 else {
-    $config_home = decode 'locale_fs', File::HomeDir->my_data();
+    $config_home = File::HomeDir->my_data();
 }
 my $config_dir = catdir $config_home, 'getvideo';
-make_path encode( 'locale_fs', $config_dir );
+make_path $config_dir;
 
-
-my $youtube_dl = which( 'youtube-dl' );
-my $ffmpeg     = which( 'ffmpeg' );
-my $ffprobe    = which( 'ffprobe' );
 
 my $opt = {
-    youtube_dl                  => $youtube_dl,
-    ffmpeg                      => $ffmpeg,
-    ffprobe                     => $ffprobe,
+    ffmpeg                      => which( 'ffmpeg' ),
+    ffprobe                     => which( 'ffprobe' ),
 
     config_dir                  => $config_dir,
     config_file                 => catfile( $config_dir, 'config.json' ),
-    video_dir                   => $my_videos,
-    preferred_file              => catfile( $config_dir, 'preferred_fmt.json' ),
     log_file                    => catfile( $config_dir, 'download_info.log' ),
     history_file                => catfile( $config_dir, 'uploader_history.json' ),
     sticky_file                 => catfile( $config_dir, 'uploader_sticky.json' ),
-    archive_dir                 => catfile( $config_dir, 'download_archive' ),
-    dir_stream_files            => 'STREAM_FILES',
 
-    max_info_width              => 120,
-    right_margin                => $^O eq 'MSWin32' ? 1 : 2,
-    text_unidecode              => 0,
+    video_dir                   => $my_videos,
+    use_extractor_dir           => 1,
+    use_uploader_dir            => 1,
+
+    quality                     => 3,
+    no_height_ok                => 1,
+    prefer_free_formats         => 1,
 
     useragent                   => 'Mozilla/5.0',
-    skip_archived_videos        => 0,
-    retries                     => 5,
+    retries                     => 7,
     timeout                     => 60,
-    overwrite                   => 0,
 
-    max_len_f_name              => 62,
-    replace_spaces              => 1,
-    sanitize_filename           => 1,
-    unmappable_filename         => 1,
-    modify_timestamp            => 1,
+    max_info_width              => 120,
+    no_warnings                 => 0,
+    right_margin                => $^O eq 'MSWin32' ? 1 : 2,
 
-    merge_enabled               => 0,
-    merge_ext                   => 'mkv',
-    merge_overwrite             => 1,
-    merge_loglevel              => 'warning',
-    merged_in_files             => 1,
-
-    auto_quality                => 'keep_uploader_playlist',
-    preferred                   => [ 43 ],
-    pref_qual_slots             => 3,
-
-    extractor_dir               => 0,
-    uploader_dir                => 1,
-
-    max_size_history            => 15,
+    max_size_history            => 50,
     sort_history_by_timestamp   => 1,
-    enable_download_archive     => 0,
 
-    small_list_size             => 0,
+    list_type_vimeo             => 2,
+    list_type_youtube           => 2,
+
     list_sort_item              => 'upload_date',
     list_sort_order             => 'Desc',
     show_view_count             => 0,
-    fast_list_youtube           => 1,
-    fast_list_vimeo             => 1,
 
-    use_netrc                   => 0,
+    yt_dl_config_file           => undef,
+    yt_dl_ignore_config         => 0,
 
     no_upload_datetime          => '0000-00-00T00:00:00',
-    skipped_archived_videos     => [],
-    error_get_download_infos    => [],
-    incomplete_download         => [],
-    error_merge                 => [],
+    error_get_download_infos    => [], ##
 };
 
+my $youtube_dl = which( 'youtube-dl' );
+if ( ! $youtube_dl ) {
+    say "Could not find 'youtube-dl' - 'youtube-dl' is required - http://rg3.github.io/youtube-dl/.";
+    exit 1;
+};
+$opt->{youtube_dl} = [ $youtube_dl ];
 
 read_config_file( $opt, $opt->{config_file} );
 set_options( $opt ) if $help;
 
-
-if ( ! -d $opt->{video_dir} ) {
-    say "Could not find the video directory '$opt->{video_dir}'!";
-    exit 1;
-}
-if ( ! $opt->{youtube_dl} ) {
-    say "Could not find 'youtube-dl' - 'youtube-dl' is required - http://rg3.github.io/youtube-dl/.";
-    exit 1;
-};
+push @{$opt->{youtube_dl}}, '--config-location', $opt->{yt_dl_config_file} if $opt->{yt_dl_config_file};
+push @{$opt->{youtube_dl}}, '--ignore-config',                             if $opt->{yt_dl_ignore_config};
+push @{$opt->{youtube_dl}}, '--no-warnings'                                if $opt->{no_warnings};
+push @{$opt->{youtube_dl}}, '--user-agent',      $opt->{useragent}         if defined $opt->{useragent};
+push @{$opt->{youtube_dl}}, '--retries',         $opt->{retries}           if defined $opt->{retries};
+push @{$opt->{youtube_dl}}, '--socket-timeout',  $opt->{timeout}           if defined $opt->{timeout};
+push @{$opt->{youtube_dl}}, '--prefer-free-formats'                        if $opt->{prefer_free_formats};
 
 
 local $| = 1;
 print locate( 1, 1 ), cldown;
 
 
-make_path encode( 'locale_fs', $opt->{archive_dir} ) if $opt->{enable_download_archive};
 read_history_files( $opt );
 
-my @ids = _gather_arguments( $opt, $arg_file, @ARGV );
+
+my @ids = @ARGV;
+
+for my $file ( @$arg_file ) {
+    open my $fh, '<:encoding(utf-8)', $file or die $!;
+    while ( my $line = <$fh> ) {
+        next if $line =~ /^\s*\z/;
+        next if $line =~ /^\s*#/;
+        $line =~ s/^\s+|\s+\z//g;
+        push @ids, split /\s+/, $line;
+    }
+    close $fh or die $!;
+}
+
+if ( ! @ids ) {
+    my $trs = Term::Form->new();
+    my $ids = $trs->readline( 'Enter url/id: ' );
+    @ids = split /\s+/, $ids;
+    print up( 1 ), cldown;
+}
+
+if ( ! @ids && ( %{$opt->{history}} || %{$opt->{sticky}} ) ) {
+    @ids = uploader_history_menu( $opt );
+}
+
+if ( ! @ids ) {
+    say "No arguments" and exit;
+}
+
+
 my $info = from_arguments_to_choices( $opt, @ids );
-get_download_infos( $opt, $info );
+
+gather_video_infos( $opt, $info );
+
 download_youtube( $opt, $info );
 
-
-if ( $opt->{merge_enabled} ) {
-    my $merge_ok = 1;
-    if ( $opt->{merge_enabled} == 1 ) {
-        print "\n";
-        $merge_ok = choose(
-            [ '  NO', '  YES' ],
-            { prompt => 'Enable Merge', layout => 3, index => 1 }
-        );
-        up( 1 );
-    }
-    if ( $merge_ok ) {
-        print "\n";
-        search_and_merge( $opt, $info );
-    }
-}
+add_uploaders_to_history( $opt, $info ) if $opt->{max_size_history};
 
 
-
-my $add_nl;
-if ( @{$opt->{skipped_archived_videos}} ) {
-    print "\n";
-    say "Skipped videos listed in the download archive:";
-    for my $video ( @{$opt->{skipped_archived_videos}} ) {
-        say '  ' . $video;
-    }
-    $add_nl++;
-}
-if ( @{$opt->{error_get_download_infos}} ) {
-    print "\n";
-    say "Error fetching download infos:";
+if ( @{$opt->{error_get_download_infos}} ) { ##
+    say "\nError fetching download infos:";
     for my $video_id ( @{$opt->{error_get_download_infos}} ) {
         say '  ' . $video_id;
     }
-    $add_nl++;
 }
-if ( @{$opt->{incomplete_download}} ) {
-    print "\n";
-    say "Incomplete download:";
-    for my $video_id ( @{$opt->{incomplete_download}} ) {
-        say '  ' . $video_id;
-    }
-    $add_nl++;
-}
-if ( @{$opt->{error_merge}} ) {
-    print "\n";
-    say "Merge error:";
-    for my $video_id ( @{$opt->{error_merge}} ) {
-        say '  ' . $video_id;
-    }
-    $add_nl++;
-}
-print "\n" if $add_nl;
 
-
-sub _gather_arguments {
-    my ( $opt, $arg_file, @ids ) = @_;
-    for my $file ( @$arg_file ) {
-        open my $fh, '<:encoding(utf-8)', encode_fs( $opt, $file ) or die $!;
-        while ( my $line = <$fh> ) {
-            next if $line =~ /^\s*\z/;
-            next if $line =~ /^\s*#/;
-            $line =~ s/^\s+|\s+\z//g;
-            push @ids, split /\s+/, $line;
-        }
-        close $fh or die $!;
-    }
-    if ( ! @ids ) {
-        my $trs = Term::Form->new();
-        my $ids = $trs->readline( 'Enter url/id: ' );
-        @ids = split /\s+/, $ids;
-        print up( 1 ), cldown;
-    }
-    if ( ! @ids && ( %{$opt->{history}} || %{$opt->{sticky}} ) ) {
-        @ids = uploader_history_menu( $opt );
-    }
-    say "No arguments" and exit if ! @ids;
-    return @ids;
-}
 
 
 __END__
@@ -240,7 +184,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.255
+Version 0.301
 
 =cut
 
@@ -258,38 +202,20 @@ Version 0.255
 
 Download single videos or choose videos from a playlist or an uploader.
 
-Call C<getvideo> followed by the space separated urls. The urls can also be entered after calling C<getvideo> - this is
-useful if urls contain shell metacharacters like C<&>. As an other possibility the urls can be passed with a file:
-C<getvideo -f|--file filename>. The urls in the file have to be space separated.
+Call C<getvideo> followed by the space separated urls or enter the urls after calling C<getviedo>. If the urls are
+entered after calling C<getvideo> shell metacharacters are escaped automatically.
+
+The urls can also be passed with a file: C<getvideo -f|--file filename>. The urls in the file have to be space separated.
 
 If a passed url results in more than one video, it is shown a menu with the video titles. The user can then choose from
 the menu which videos to download. It is possible to filter the video titles of the list menu with a regexp. The filter
-can be inverted by adding C<!~> and a space in front of the regexp.
-
-See L<Term::Choose/USAGE-AND-RETURN-VALUES> how to select more items with the C<SpaceBar> or C<Ctrl>-C<SpaceBar>.
-
-Before the download the script shows some video info and lets you choose the video quality from the available qualities.
-It is possible to choose more than one video format with the C<SpaceBar> key. Instead of choosing the quality manually
-it is possible to set and use preferred qualities.
+can be inverted by adding C<!~> and a space in front of the regexp. Use the C<SpaceBar> to select more than one video -
+see L<Term::Choose/USAGE-AND-RETURN-VALUES>.
 
 The different options of C<getvideo> can be reached by calling C<getvideo -h>.
 
-C<App::YTDL> uses L<youtube-dl|http://rg3.github.io/youtube-dl/> to get the data required for the video download. To
-list the supported extractors call C<getvideo -h> and select the entry I<Youtube-dl E<gt> Extractors>.
-
-=head3 Auto merge
-
-Downloaded files from the same video-id are tried to merge if
-
-- the option I<Merge> is enabled. See L</Merge>.
-
-- C<ffmpeg> and C<ffprobe> are available.
-
-- not more and not less than 2 files from the same video-id and the same extractor have been downloaded.
-
-- one of these two files has only an audio stream.
-
-- one of these two files has a video stream.
+C<App::YTDL> uses L<youtube-dl|http://rg3.github.io/youtube-dl/> to get the info data and to download the videos. To
+list the extractors supported by C<youtube-dl> call C<getvideo -h> and select the entry I<Extractors>.
 
 =head1 Options
 
@@ -310,286 +236,59 @@ Choose an alternative main video directory.
 
 =head3 Extractor directory
 
-=over
-
-=item
-
-no
-
-Don't create/use extractor directories.
-
-=item
-
-yes
-
 Create/use extractor directories.
 
-=back
+- no
+
+- yes
 
 =head3 Uploader directory
 
-=over
+Create/use uploader directories
 
-=item
+- no
 
-no
+- yes
 
-Don't create/use uploader directories.
-
-=item
-
-if from list-menu
-
-Create/use uploader directories if the videos are chosen from an uploader or a playlist.
-
-=item
-
-always
-
-Always create/use uploader directories.
-
-=back
-
-=head2 File
-
-=head3 Max filename length
-
-Set the maximum length of the filename. Filenames longer then the maximum length are truncated.
-
-=head3 Replace spaces
-
-If enabled, spaces in filenames are replaced with underscores.
-
-=head3 Sanitize filename
-
-=over
-
-=item
-
-keep all
-
-Keep all characters in filenames.
-
-=item
-
-replace / \ : " * ? < > | &
-
-Replace each character matching the character class C<["\/\\:*?E<lt>E<gt>|&]> with a hyphen.
-
-Leading dots are removed.
-
-=item
-
-replace /
-
-Replace C</> with a hyphen.
-
-Leading dots are removed.
-
-=back
-
-=head3 Unmappable filename
-
-=over
-
-=item
-
-don't encode
-
-Don't encode the filename.
-
-=item
-
-use Text::Unidecode
-
-Map the filename with C<Text::Unidecode> to ASCII.
-
-=back
-
-=head3 File timestamp
-
-Change the timestamps of the downloaded videos to the their upload date.
+- if chosen from an uploader or a playlist
 
 =head2 Quality
 
-=head3 Auto quality mode
+=head3 Resolution
 
-Set the I<auto quality mode>:
+Set the video height.
 
-=over
+=head3 No video height
 
-=item
+Download videos whose height is unknown.
 
-manually
+- no
 
-Choose the video quality always manually
+- yes
 
-=item
+=head3 Prefer free formats
 
-keep_uploader_playlist
+Prefer free video formats (I<--prefer-free-formats>).
 
-Keep the first quality chosen for a video of a playlist/uploader for all videos of that playlist/uploader if
-possible.
+- no
 
-=item
-
-keep_extractor
-
-Keep the first quality chosen for a video of an extractor for all videos of that extractor if possible.
-
-=item
-
-preferred
-
-Use preferred qualities.
-
-=item
-
-default
-
-Use the default (best) quality.
-
-=back
-
-=head3 Slots 'preferred qualities'
-
-Set the number of the available I<preferred qualities> slots.
-
-If the preferred quality/qualities set in a slot (beginning at the first slot) is/are not available, the
-quality/qualities from the next set slot is/are used.
-
-=head3 Preferred qualities
-
-Prints the set preferred qualities.
-
-How to set the I<preferred qualities>:
-
-Set the option I<auto quality mode> to C<manually>, C<keep_uploader_playlist> or C<keep_extractor>. Then, when
-downloading a video, instead of selecting the desired video quality select the entry C<Menu> and then the entry
-C<Preferred qualities>.
+- yes
 
 =head2 Download
 
 =head3 UserAgent
 
-Set the useragent string.
-
-If entered nothing, the default useragent string (Mozilla/5.0) is used.
-
-=head3 Skip archived videos
-
-If enabled skips the download for videos, whose video-id is saved in a download-archive file (each extractor has its
-file). Enabling I<skip archived> does not automatically enable the option I<download archive>.
-
-=head3 Overwrite
-
-If enabled, C<getvideo> overwrites existing files else getvideo appends to partially downloaded files.
+Set the useragent string (I<--user-agent>).
 
 =head3 Download retries
 
-Set the number of download retries.
+Set the number of download retries (I<--retries>).
 
 =head3 Timeout
 
-Connection timeout in seconds.
-
-=head2 Merge
-
-=head3 Enable Merge
-
-=over
-
-=item
-
-no
-
-=item
-
-ask
-
-=item
-
-yes
-
-=back
-
-=head3 ffmpeg overwrites
-
-If set to 'yes', C<ffmpeg> overwrites an existing file when merging two files into one file else
-the user will be asked what to do.
-
-=head3 Output formats
-
-Choose the container format for the new file: C<mkv>, C<mp4>, C<ogg>, C<webm> or C<flv>.
-
-=head3 ffmpeg verbosity
-
-=over
-
-=item
-
-error
-
-Show all errors.
-
-=item
-
-warning
-
-Show all warnings and errors.
-
-=item
-
-info
-
-Show informative messages during processing. This is in addition to warnings and errors.
-
-=back
-
-=head3 Input files
-
-=over
-
-=item
-
-keep
-
-Keep the merged input files.
-
-=item
-
-move to "STREAM_FILES"
-
-Move the merged input files to the directory "STREAM_FILES". The directory "STREAM_FILES" is created (if it not already
-exits) in the directory where the input files were downloaded.
-
-=item
-
-remove
-
-Remove the merged input files.
-
-=back
+Connection timeout in seconds (I<--socket-timeout>).
 
 =head2 History
-
-=head3 Download archive
-
-=over
-
-=item no
-
-I<Download archive> disabled.
-
-=item yes
-
-Save the video-id of the downloaded videos.
-
-=item more
-
-Save the video-id and other info (title, upload date, download date, uploader, format) of the downloaded videos.
-
-=back
 
 =head3 Size history
 
@@ -602,8 +301,8 @@ disables the uploader-history.
 An uploader can be made sticky. Uploaders made sticky don't count regarding the I<size history> limit. An uploader made
 sticky gets also a new timestamp.
 
-When added to the uploader-history an uploader gets the return value of C<time()> as a timestamp. If the I<size history>
-limit is reached, the uploader with the oldest timestamp is removed first.
+When added to the uploader-history an uploader gets the current timestamp. If the I<size history> limit is reached, the
+uploader with the oldest timestamp is removed first.
 
 The supported extractors are YouTube and Vimeo.
 
@@ -611,145 +310,80 @@ The supported extractors are YouTube and Vimeo.
 
 Sort the history
 
-=over
+- by name
 
-=item
+- by timestamp
 
-by name
+=head2 Uploader videos
 
-=item
+=head3 List type
 
-by timestamp
+- all standard (list all uploader/playlist videos in the menu).
 
-=back
+- all fast (list all uploader/playlist videos in the menu).
 
-=head2 Video List
+- latest (list only the latest videos in the menu - Vimeo: 48, YouTube: 50).
 
-=head3 Fast list-menu
+If I<all fast> or I<latest fast> is chosen, the download of the required data for the list-menu takes less time since
+the data required for the video downloads is fetched later only for the chosen videos.
 
-If I<fast list-menu> is enabled, the download of the required data for the list-menu takes less time since the data
-required for the video downloads is fetched only later for the chosen videos.
-
-With I<fast list-menu> enabled a progress info is shown.
+With I<all fast> or I<latest fast> enabled a progress info is shown.
 
 Supported extractors:
 
-=over
+- Vimeo (no view-count available).
 
-=item
-
-Vimeo (no view-count available).
-
-=item
-
-YouTube (the upload-date is relative to now).
-
-=back
-
-=head3 List size
-
-This option has no meaning if I<fast list-menu> is not enabled. The supported extractors are Vimeo and YouTube.
-
-=over
-
-=item
-
-all
-
-Show (fetch info for) all videos of the uploader.
-
-=item
-
-latest
-
-Show only the latest videos. (Vimeo: 48 videos, YouTube: 50 videos).
-
-=back
+- YouTube (the upload-date is relative to now).
 
 =head3 Sort order
 
-Sort the list-menu entries by
+Sort the videos in the list-menu by
 
-=over
+- upload date (fallback title);
 
-=item
+- title
 
-upload date
+- view count (fallback upload date)
 
-If there is no upload date data for the list, the title is used instead to the sort the list.
+- duration (fallback upload date)
 
-=item
-
-title
-
-=item
-
-view count
-
-If there is no view count data for the list, the upload date is used instead to the sort the list.
-
-=item
-
-duration
-
-If there is no duration data for the list, the upload date is used instead to the sort the list.
-
-=back
+Fallback is used, if the chosen entry is not available.
 
 =head3 Show view count
 
-=over
+- if sorted by view count
 
-=item
+- always
 
-if sorted by view count
+=head2 Info Output
 
-Show the view count in the list-menu entries only when sorted by view count.
+=head3 Disable warnings
 
-=item
-
-always
-
-Show the view count always.
-
-=back
-
-Some extractors don't provide a view count.
-
-=head2 Output
-
-=head3 Unmappable characters
-
-=over
-
-=item
-
-replace with *
-
-If I<replace with *> is selected, unmappable characters are replaced with C<*> before the output on the screen.
-
-=item
-
-use Text::Unidecode
-
-If I<use Text::Unidecode> is selected, C<unidecode()> from L<Text::Unidecode> tries to "translate" words not mappable to
-the console-out encoding to ASCII. The output of C<unidecode()> always consists entirely of US-ASCII characters.
-
-=back
+Ignore C<youtube-dl> warnings (I<--no-warnings>).
 
 =head3 Max info width
 
 Set the maximum width of the video info output.
 
-=head2 Youtube-dl
+=head2 Youtube-dl config file
 
-=head3 Use '.netrc'
+=head3 youtube-dl config file
 
-Enable the C<youtube-dl> option C<--netrc>. See C<youtube-dl --help> for more info.
+Location of the C<youtube-dl> configuration file (I<--config-location>).
 
-=head3 Extractors
+=head3 Ignore youtube-dl config file
+
+Do not read C<youtube-dl> configuration files (I<--ignore-config>).
+
+=head2 Available extractors
+
+=head3 List Extractors
 
 List the extractors supported by C<youtube-dl>.
+
+=head3 Extractor descriptions
+
+Output descriptions of supported extractors.
 
 =head1 REQUIREMENTS
 

@@ -12,10 +12,10 @@ use Getopt::Alt;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use FindBin qw/$Bin/;
-use App::BitBucketCli;
-use YAML::Syck qw/LoadFile/;
+use YAML::Syck qw/LoadFile DumpFile/;
+use Path::Tiny;
 
-our $VERSION = 0.004;
+our $VERSION = 0.005;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 exit main();
@@ -49,36 +49,23 @@ sub main {
                     notbuilt => 'grey12',
                 },
             },
-            sub_command => {
-                help   => [],
-                branch => [
-                    @common,
-                    'long|l',
-                    'recipient|R=s',
-                ],
-                projects => [
-                    @common,
-                ],
-                repositories => [
-                    @common,
-                    'project|p=s',
-                ],
-                repository => [
-                    @common,
-                    'project|p=s',
-                    'repository|r=s',
-                ],
-                pull_requests => [
-                    @common,
-                    'repository|r=s',
-                    'project|p=s',
-                ],
-            },
+            sub_command   => sub_commands(),
+            help_packages => sub_commands_help(),
             auto_complete => sub {
                 my ($option, $auto, $errors) = @_;
                 my $sub_command = $option->cmd;
                 if ( $sub_command eq '--' ) {
                     warn '--';
+                }
+                elsif ( ! $sub_command || $sub_command eq $name  || $sub_command eq $0 ) {
+                    my $part = shift @ARGV;
+                    print join "\n", (
+                        grep { $part ? /$part/ : 1 }
+                        sort keys %{ sub_commands() }
+                    ), '';
+                }
+                else {
+                    warn Dumper $sub_command, \@ARGV, $0;
                 }
             },
         },
@@ -90,13 +77,18 @@ sub main {
     $options = set_defaults($options);
 
     # do stuff here
-    my $bbs = App::BitBucketCli->new(
+    my $module = 'App::BitBucketCli::Command::' . join '', map {ucfirst $_} split /-/, $cmd;
+    my $file = "$module.pm";
+    $file =~ s/::/\//g;
+    require $file;
+    my $bbs = $module->new(
         host => $options->{host},
         user => $options->{username},
         pass => $options->{password},
         opt  => $options,
     );
 
+    $cmd =~ s/-/_/g;
     return $bbs->$cmd(@ARGV) || 0;
 }
 
@@ -158,6 +150,50 @@ sub set_defaults {
     return $opt;
 }
 
+sub sub_commands_help {
+    my ($self) = @_;
+    my %help;
+
+    for my $cmd (keys %{sub_commands()}) {
+        my $module = 'App::BitBucketCli::Command::' . join '', map {ucfirst $_} split /-/, $cmd;
+        $help{$cmd} = $module;
+    }
+
+    return \%help;
+}
+
+sub sub_commands {
+    my ($self)   = @_;
+    my $sub_file = path $ENV{HOME}, '.bb-cli', 'sub-commands.yml';
+
+    mkdir $sub_file->parent if ! -d $sub_file->parent;
+
+    return LoadFile("$sub_file") if -f $sub_file;
+
+    return generate_sub_command();
+}
+
+sub generate_sub_command {
+    my ($self)   = @_;
+    my $sub_file = path $ENV{HOME}, '.bb-cli', 'sub-commands.yml';
+
+    require Module::Pluggable;
+    Module::Pluggable->import( require => 1, search_path => ['App::BitBucketCli::Command'] );
+    my @commands = __PACKAGE__->plugins;
+
+    my $sub_commands = {};
+    for my $command (reverse sort @commands) {
+        my ($name) = $command =~ /::([^:]+)$/;
+        $name = join "-", map {lc $_} split /(?=[A-Z])/, $name;
+        my ($conf) = $command->options;
+        $sub_commands->{$name} = $conf;
+    }
+
+    DumpFile($sub_file, $sub_commands);
+
+    return $sub_commands;
+}
+
 __DATA__
 
 =head1 NAME
@@ -166,7 +202,7 @@ bb-cli - Command line tool for communicating with BitBucket Server
 
 =head1 VERSION
 
-0his documentation refers to bb-cli version 0.004
+0his documentation refers to bb-cli version 0.005
 
 =head1 SYNOPSIS
 

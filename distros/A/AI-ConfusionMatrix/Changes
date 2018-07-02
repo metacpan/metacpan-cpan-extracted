@@ -1,10 +1,57 @@
 ==================================================
-Changes from 2015-12-05 00:00:00 +0000 to present.
+Changes from 2016-06-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.007 at 2017-12-04 20:01:19 +0000
+version 0.009 at 2018-06-23 12:04:12 +0000
 ------------------------------------------
+
+  Change: facd8f12a48582eab14e71c9e16a1e4bb7de14ba
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2018-06-23 13:37:50 +0000
+
+    Change git repository URL 
+
+  Change: 01c4725ed70a887a24e1b287a8b5d7cfb36f5ff7
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2018-06-05 21:53:14 +0000
+
+    Travis CI -> Gitlab CI 
+
+  Change: afc765032c1dddcf7a371da058a0565caadd3a31
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2018-02-24 14:20:16 +0000
+
+    Fix function getConfusionMatrix in the doc 
+
+  Change: b718f61845a79d7f5dbc84fff6708583df2a6308
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2018-02-07 18:54:12 +0000
+
+    Add the ability to retrieve the confusion matrix data 
+
+  Change: ac01df632c259c96152217d84bb50bdc28f52240
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2018-01-24 19:02:36 +0000
+
+    Clarify the documentation about the expected format of the input
+    matrix 
+
+  Change: 4d11cf8544859f74d7af1798728a057101288aec
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2018-01-22 20:40:16 +0000
+
+    2017 -> 2018 
+
+------------------------------------------
+version 0.007 at 2017-12-04 20:14:52 +0000
+------------------------------------------
+
+  Change: ea89a7af0e34d51d89844f0263d4b71790a70fb3
+  Author: Vincent Lequertier <vi.le@autistici.org>
+  Date : 2017-12-04 21:14:52 +0000
+
+    Release 0.007 
 
   Change: 94701b325fc7641a666e05518533839960be1dc2
   Author: Vincent Lequertier <vi.le@autistici.org>

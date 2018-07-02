@@ -69,13 +69,13 @@ has tabName => sub {
     return shift->config->{'tab-name'};
 };
 
-=head2 instanciationMode
+=head2 instantiationMode
 
-Should the plugin in the webui be instanciated immediately or only when the tab gets selected
+Should the plugin in the webui be instantiated immediately or only when the tab gets selected
 
 =cut
 
-has instanciationMode => sub {
+has instantiationMode => sub {
     return 'onTabSelection'; # or onStartup
 };
 
@@ -129,7 +129,7 @@ has log => sub {
 
 =head2 args
 
-some meta information provided when instanciating the plugin
+some meta information provided when instantiating the plugin
 
 =cut
 

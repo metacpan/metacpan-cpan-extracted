@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,17 +11,16 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
 package MongoDB::_Topology;
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
-use MongoDB::BSON;
+use BSON;
 use MongoDB::Error;
 use MongoDB::Op::_Command;
 use MongoDB::_Platform;
@@ -30,23 +28,28 @@ use MongoDB::ReadPreference;
 use MongoDB::_Constants;
 use MongoDB::_Link;
 use MongoDB::_Types qw(
-    BSONCodec
     Boolish
+    BSONCodec
+    CompressionType
     Document
     NonNegNum
     TopologyType
+    ZlibCompressionLevel
     to_IxHash
 );
 use Types::Standard qw(
+    CodeRef
     HashRef
+    ArrayRef
     InstanceOf
     Num
     Str
     Maybe
 );
 use MongoDB::_Server;
+use MongoDB::_Protocol;
 use Config;
-use List::Util qw/first max/;
+use List::Util qw/first max min/;
 use Safe::Isa;
 use Time::HiRes qw/time usleep/;
 use Try::Tiny;
@@ -61,6 +64,12 @@ has uri => (
     is       => 'ro',
     required => 1,
     isa => InstanceOf['MongoDB::_URI'],
+);
+
+has min_server_version => (
+    is       => 'ro',
+    required => 1,
+    isa => Str,
 );
 
 has max_wire_version => (
@@ -79,6 +88,26 @@ has credential => (
     is       => 'ro',
     required => 1,
     isa => InstanceOf['MongoDB::_Credential'],
+);
+
+# Required so it's passed explicitly, even if undef, to ensure it's wired
+# up correctly.
+has monitoring_callback => (
+    is => 'ro',
+    required => 1,
+    isa => Maybe[CodeRef],
+);
+
+has compressors => (
+    is => 'ro',
+    isa => ArrayRef[CompressionType],
+    default => sub { [] },
+);
+
+has zlib_compression_level => (
+    is => 'ro',
+    isa => ZlibCompressionLevel,
+    default => sub { -1 },
 );
 
 has type => (
@@ -120,6 +149,13 @@ has local_threshold_sec => (
     isa => Num,
 );
 
+has logical_session_timeout_minutes => (
+    is => 'ro',
+    default => undef,
+    writer => '_set_logical_session_timeout_minutes',
+    isa => Maybe [NonNegNum],
+);
+
 has next_scan_time => (
     is      => 'ro',
     default => sub { time() },
@@ -159,8 +195,9 @@ has link_options => (
 
 has bson_codec => (
     is       => 'ro',
-    default  => sub { MongoDB::BSON->new },
+    default  => sub { BSON->new },
     isa => BSONCodec,
+    init_arg => undef,
 );
 
 has number_of_seeds => (
@@ -200,6 +237,12 @@ has wire_version_floor => (
     default => 0,
 );
 
+has wire_version_ceil => (
+    is => 'ro',
+    writer => '_set_wire_version_ceil',
+    default => 0,
+);
+
 has current_primary => (
     is => 'rwp',
     clearer => '_clear_current_primary',
@@ -220,6 +263,12 @@ has servers => (
     isa => HashRef[InstanceOf['MongoDB::_Server']],
 );
 
+has _incompatible_servers => (
+    is => 'rw',
+    default => sub { [] },
+    isa => ArrayRef[InstanceOf['MongoDB::_Server']],
+);
+
 has links => (
     is      => 'ro',
     default => sub { {} },
@@ -231,6 +280,29 @@ has rtt_ewma_sec => (
     default => sub { {} },
     isa => HashRef[Num],
 );
+
+has cluster_time => (
+    is => 'rwp',
+    isa => Maybe[Document],
+    init_arg => undef,
+    default => undef,
+);
+
+sub update_cluster_time {
+    my ( $self, $cluster_time ) = @_;
+
+    return unless $cluster_time && exists $cluster_time->{clusterTime}
+        && ref($cluster_time->{clusterTime}) eq 'BSON::Timestamp';
+
+    # Only update the cluster time if it is more recent than the current entry
+    if ( !defined $self->cluster_time ) {
+        $self->_set_cluster_time($cluster_time);
+    }
+    elsif ( $cluster_time->{'clusterTime'} > $self->cluster_time->{'clusterTime'} ) {
+        $self->_set_cluster_time($cluster_time);
+    }
+    return;
+}
 
 #--------------------------------------------------------------------------#
 # builders
@@ -301,6 +373,8 @@ sub BUILD {
 #--------------------------------------------------------------------------#
 
 sub all_servers { return values %{ $_[0]->servers } }
+
+sub all_data_bearing_servers { return grep { $_->is_data_bearing } $_[0]->all_servers }
 
 sub check_address {
     my ( $self, $address ) = @_;
@@ -408,11 +482,11 @@ sub mark_stale {
 }
 
 sub scan_all_servers {
-    my ($self) = @_;
+    my ($self, $force) = @_;
 
     my ( $next, @ordinary, @to_check );
     my $start_time = time;
-    my $cooldown_time = $start_time - COOLDOWN_SECS;
+    my $cooldown_time = $force ? $start_time : $start_time - COOLDOWN_SECS;
 
     # anything not updated since scan start is eligible for a check; when all servers
     # are updated, the loop terminates; Unknown servers aren't checked if
@@ -518,23 +592,81 @@ sub _check_wire_versions {
 
     my $compat = 1;
     my $min_seen = $max_int32;
+    my $max_seen = 0;
     for my $server ( grep { $_->is_available } $self->all_servers ) {
         my ( $server_min_wire_version, $server_max_wire_version ) =
           @{ $server->is_master }{qw/minWireVersion maxWireVersion/};
 
-        $server_max_wire_version = 0 unless defined $server_max_wire_version; 
-        $server_min_wire_version = 0 unless defined $server_min_wire_version; 
+        $server_max_wire_version = 0 unless defined $server_max_wire_version;
+        $server_min_wire_version = 0 unless defined $server_min_wire_version;
 
-        $compat = 0
-          if $server_min_wire_version > $self->max_wire_version
-          || $server_max_wire_version < $self->min_wire_version;
+        if ( $server_min_wire_version > $self->max_wire_version
+          || $server_max_wire_version < $self->min_wire_version ) {
+            $compat = 0;
+            push @{ $self->_incompatible_servers }, $server;
+        }
 
         $min_seen = $server_max_wire_version if $server_max_wire_version < $min_seen;
+        $max_seen = $server_max_wire_version if $server_max_wire_version > $max_seen;
     }
     $self->_set_is_compatible($compat);
     $self->_set_wire_version_floor($min_seen);
+    $self->_set_wire_version_ceil($max_seen);
 
     return;
+}
+
+sub _update_ls_timeout_minutes {
+    my ( $self, $new_server ) = @_;
+
+    my @data_bearing_servers = grep { $_->is_data_bearing } $self->all_servers;
+    my $timeout = min map {
+        # use -1 as a flag to prevent undefined warnings
+        defined $_->logical_session_timeout_minutes
+          ? $_->logical_session_timeout_minutes
+          : -1
+    } @data_bearing_servers;
+    # min will return undef if the array is empty
+    if ( defined $timeout && $timeout < 0 ) {
+        $timeout = undef;
+    }
+    $self->_set_logical_session_timeout_minutes( $timeout );
+    return;
+}
+
+sub _supports_sessions {
+    my ( $self ) = @_;
+
+    $self->scan_all_servers if $self->stale;
+
+    my @servers = $self->all_servers;
+    return if @servers == 1 && $servers[0]->type eq 'Standalone';
+
+    return defined $self->logical_session_timeout_minutes;
+}
+
+# Used for bulkWrite for shortcutting to original execute command
+sub _supports_retry_writes {
+    my ( $self ) = @_;
+
+    # retryWrites arent supported in standalone servers
+    return if $self->type eq 'Single';
+
+    # retryWrites require a wire version of at least six
+    return if $self->wire_version_ceil < 6;
+
+    # must have lstm present
+    return 1 if defined $self->logical_session_timeout_minutes;
+    return;
+}
+
+sub _supports_transactions {
+    my ( $self ) = @_;
+
+    return unless $self->_supports_sessions;
+    return if $self->wire_version_ceil < 7;
+    return if $self->type eq 'Sharded';
+    return 1;
 }
 
 sub _check_staleness_compatibility {
@@ -764,12 +896,13 @@ sub _initialize_link {
     # servers are considered invalid and we throw an error
     if ( $self->type eq 'Single' || first { $_ eq $server->type } qw/Standalone Mongos RSPrimary RSSecondary/ ) {
         try {
-            $self->credential->authenticate($link, $self->bson_codec);
+            $self->credential->authenticate($server, $link, $self->bson_codec);
         }
         catch {
             my $err = $_;
+            my $msg = $err->$_isa("MongoDB::Error") ? $err->message : "$err";
             $self->_reset_address_to_unknown( $_->address, $err ) for $self->all_servers;
-            MongoDB::AuthError->throw("Authentication to $address failed: $err");
+            MongoDB::AuthError->throw("Authentication to $address failed: $msg");
         };
     }
 
@@ -854,9 +987,31 @@ sub _selection_timeout {
 
         unless ( $self->is_compatible ) {
             $self->_set_stale(1);
-            MongoDB::ProtocolError->throw(
-                "Incompatible wire protocol version. This version of the MongoDB driver is not compatible with the server. You probably need to upgrade this library."
-            );
+            my $error_string = '';
+            for my $server ( @{ $self->_incompatible_servers } ) {
+                my $min_wire_ver = $server->is_master->{minWireVersion};
+                my $max_wire_ver = $server->is_master->{maxWireVersion};
+                my $host         = $server->address;
+                if ( $min_wire_ver > $self->max_wire_version ) {
+                    $error_string .= sprintf(
+                        "Server at %s requires wire version %d, but this version of %s only supports up to %d.\n",
+                        $host,
+                        $min_wire_ver,
+                        'Perl MongoDB Driver',
+                        $self->max_wire_version
+                    );
+                } else {
+                    $error_string .= sprintf(
+                        "Server at %s reports wire version %d, but this version of %s requires at least %d (MongoDB %s).\n",
+                        $host,
+                        $max_wire_ver,
+                        'Perl MongoDB Driver',
+                        $self->min_wire_version,
+                        $self->min_server_version,
+                    );
+                }
+            }
+            MongoDB::ProtocolError->throw( $error_string );
         }
 
         my $server = $self->$method($read_pref);
@@ -880,11 +1035,23 @@ sub _selection_timeout {
 my $PRIMARY = MongoDB::ReadPreference->new;
 
 sub _generate_ismaster_request {
-    my ($self, $should_perform_handshake) = @_;
-    return [
-        ismaster => 1,
-        ($should_perform_handshake ? (client => $self->handshake_document) : ()),
-    ];
+    my ( $self, $link, $should_perform_handshake ) = @_;
+    my @opts;
+    if ($should_perform_handshake) {
+        push @opts, client => $self->handshake_document;
+        if ( $self->credential->mechanism eq 'DEFAULT' ) {
+            my $db_user = join( ".", map { $self->credential->$_ } qw/source username/ );
+            push @opts, saslSupportedMechs => $db_user;
+        }
+        if (@{ $self->compressors }) {
+            push @opts, compression => $self->compressors;
+        }
+    }
+    if ( $link->supports_clusterTime && defined $self->cluster_time ) {
+        push @opts, '$clusterTime' => $self->cluster_time;
+    }
+
+    return [ ismaster => 1, @opts ];
 }
 
 sub _update_topology_from_link {
@@ -893,11 +1060,12 @@ sub _update_topology_from_link {
     my $start_time = time;
     my $is_master = eval {
         my $op = MongoDB::Op::_Command->_new(
-            db_name         => 'admin',
-            query           => $self->_generate_ismaster_request( $opts{with_handshake} ),
-            query_flags     => {},
-            bson_codec      => $self->bson_codec,
-            read_preference => $PRIMARY,
+            db_name             => 'admin',
+            query               => $self->_generate_ismaster_request( $link, $opts{with_handshake} ),
+            query_flags         => {},
+            bson_codec          => $self->bson_codec,
+            read_preference     => $PRIMARY,
+            monitoring_callback => $self->monitoring_callback,
         );
         # just for this command, use connect timeout as socket timeout;
         # this violates encapsulation, but requires less API modification
@@ -905,13 +1073,15 @@ sub _update_topology_from_link {
         local $link->{socket_timeout} = $link->{connect_timeout};
         $op->execute( $link )->output;
     };
-    if ( $@ ) {
-        local $_ = $@;
-        warn "During MongoDB topology update for @{[$link->address]}: $_"
+    if ( my $e = $@ ) {
+        if ($e->$_isa("MongoDB::DatabaseError") && $e->code == USER_NOT_FOUND ) {
+            MongoDB::AuthError->throw("mechanism negotiation error: $e");
+        }
+        warn "During MongoDB topology update for @{[$link->address]}: $e"
             if WITH_ASSERTS;
-        $self->_reset_address_to_unknown( $link->address, $_ );
+        $self->_reset_address_to_unknown( $link->address, $e );
         # retry a network error if server was previously known to us
-        if (    $_->$_isa("MongoDB::NetworkError")
+        if (    $e->$_isa("MongoDB::NetworkError")
             and $link->server
             and $link->server->type ne 'Unknown'
             and $link->server->type ne 'PossiblePrimary' )
@@ -925,6 +1095,10 @@ sub _update_topology_from_link {
 
     return unless $is_master;
 
+    if ( my $cluster_time = $is_master->{'$clusterTime'} ) {
+        $self->update_cluster_time($cluster_time);
+    }
+
     my $end_time = time;
     my $rtt_sec = $end_time - $start_time;
 
@@ -933,11 +1107,34 @@ sub _update_topology_from_link {
         last_update_time => $end_time,
         rtt_sec           => $rtt_sec,
         is_master        => $is_master,
+        compressor       => $self->_construct_compressor($is_master),
     );
 
     $self->_update_topology_from_server_desc( $link->address, $new_server );
 
     return;
+}
+
+# find suitable compressor
+#
+# implemented here because the result is based on the specified
+# order of compressors combined with the list of server supported
+# compressors
+sub _construct_compressor {
+    my ($self, $is_master) = @_;
+
+    my @supported = @{ ($is_master || {})->{compression} || [] }
+        or return undef; ## no critic
+
+    for my $name (@{ $self->compressors }) {
+        if (grep { $name eq $_ } @supported) {
+            return MongoDB::_Protocol::get_compressor($name, {
+                zlib_compression_level => $self->zlib_compression_level,
+            });
+        }
+    }
+
+    return undef; ## no critic
 }
 
 sub _update_topology_from_server_desc {
@@ -959,6 +1156,8 @@ sub _update_topology_from_server_desc {
 
     # if link is still around, tag it with server specifics
     $self->_update_link_metadata( $address, $new_server );
+
+    $self->_update_ls_timeout_minutes( $new_server );
 
     return $new_server;
 }
@@ -1204,26 +1403,46 @@ sub _update_Single {
     return;
 }
 
+# Direct mode is like Unknown, except that it switches only between Sharded
+# or Single based on the response.
+sub _update_Direct {
+    my ( $self, $address, $new_server ) = @_;
+
+    my $server_type = $new_server->type;
+
+    if ( $server_type eq 'Mongos' ) {
+        $self->_set_type('Sharded');
+        return;
+    }
+
+    $self->_set_type('Single');
+    return;
+}
+
 sub _update_Unknown {
     my ( $self, $address, $new_server ) = @_;
 
     my $server_type = $new_server->type;
 
+    # Starting from topology type 'unknown', a standalone server when we
+    # were given multiple seeds must be a replica set member in maintenance
+    # mode so we drop it and will rediscover it later.
     if ( $server_type eq 'Standalone' ) {
-        if ( $self->number_of_seeds == 1 ) {
-            $self->_set_type('Single');
-        }
-        else {
-            # a standalone server with multiple seeds is a replica set member
-            # in maintenance mode; we drop it and may pick it up later if it
-            # rejoins the replica set.
+        if ( $self->number_of_seeds > 1 ) {
             $self->_remove_address($address);
         }
+        else {
+            $self->_set_type('Single');
+        }
+        return;
     }
-    elsif ( $server_type eq 'Mongos' ) {
+
+    if ( $server_type eq 'Mongos' ) {
         $self->_set_type('Sharded');
+        return;
     }
-    elsif ( $server_type eq 'RSPrimary' ) {
+
+    if ( $server_type eq 'RSPrimary' ) {
         $self->_set_type('ReplicaSetWithPrimary');
         $self->_update_rs_with_primary_from_primary($new_server);
         # topology changes might have removed all primaries

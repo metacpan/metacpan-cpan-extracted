@@ -37,13 +37,14 @@ Show where differences occured, but don't show what exactly changed.
 
 On/Off colors for diff.
 
-=item B<--ctx-text> [int]
+=item B<--ctx-text> E<lt>intE<gt>
 
 Amount of lines for multiline values context. Default is 3.
 
 =item B<--full-headers>
 
-Print full headers (delta printed by default).
+Print full headers (delta printed by default). B<Deprecated and will be removed
+soon>. C<--no-pretty> should be used instead.
 
 =item B<--grep> E<lt>pathE<gt>
 
@@ -76,7 +77,8 @@ more info.
 
 =item B<--[no]pretty>
 
-On/Off pretty-print for JSON. Enabled by default.
+On/Off pretty-print for default and JSON formats. Full headers will be printed
+in default mode if disabled. Enabled by default.
 
 =item B<--quiet|-q>
 

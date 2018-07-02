@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 161aa6998bcfc402edf06d8c497de425d1abd38d AUTHOR_PLEDGE
+SHA1 351580dc856122b3a65d53b18d0273e80fac2592 CODE_OF_CONDUCT.md
+SHA1 c52b4dae904551e87bb0a08457eccad7a100b12d CONTRIBUTORS
+SHA1 0a7ea3788b46361a1a9d70f2537a0a06c4984ee4 Changes
+SHA1 f9cb5fa3ecab30bf28015149d778cd2a62a6bdce INSTALL
+SHA1 eb157f25f1e662b3d0a5085afbb8d20427d1348e LICENSE
+SHA1 67bd21287ae607bf6535a948b1450655f8bf5aef MANIFEST
+SHA1 e7b64b2598f066d1c3ef4a6b02da62f02942e0f4 META.json
+SHA1 ba4d2591e96709510f15efbfdcbccc2e193dbcb2 META.yml
+SHA1 bd2ad6aa1acec3987c81b47265732b922fc1c7d1 Makefile.PL
+SHA1 4f1b33f8eabfd5de2d0d5c0eee9830694fcb4165 README.mkdn
+SHA1 4a518c18b507282304f9579e758b4e8f0593cbfb cpanfile
+SHA1 56eaa44a8ac361054c77ad203ecce69e25648e20 doap.xml
+SHA1 2744aca5e80e356564097a151d1e906265b331a0 lib/Dancer2/Template/Mustache.pm
+SHA1 918e35278408b34ef50a45502f2da15e45946d40 t/00-compile.t
+SHA1 240b106da7e7f3e6d4a658489d5b027ce4db8933 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 be09e7f0fe588ebd9961671d3b9124503f0861f8 t/01-basic.t
+SHA1 c1881def866e984d9b46136f72346b9ce200be55 t/app.t
+SHA1 e09eb74bddf2a9d32b3af18077364c8723c22aa1 t/layout.t
+SHA1 805a52576c45be538adf6aeb6f7c7307f9746af2 t/views/basic.mustache
+SHA1 9ae22869553bb63a4f4133b33d9b0e315b842f7e t/views/goatee.mustache
+SHA1 4c586efa9940e7e4819f4048e2f7fe456776383e t/views/index.mustache
+SHA1 2de11fc02cf1abbca05c8b7a9ceb31947d75f6e3 t/views/layout.mustache
+SHA1 33eb4e977d09a819a874bd807a63c799d1519caa t/views/layouts/face.mustache
+SHA1 d7f17cb3b128fabcfe922ef26545dc70af200bb4 t/views/partial.mustache
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlsq5+sACgkQ34Hwf+GwC4yQswCeOVSpy/fufLxd7f+KFf5c91qy
+rr8An31YLg2eFc2pQ2qHdqZK7eAgVtxu
+=VC2O
+-----END PGP SIGNATURE-----

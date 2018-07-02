@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::Transaction::DisbursementDetail;
-$WebService::Braintree::_::Transaction::DisbursementDetail::VERSION = '1.5';
+$WebService::Braintree::_::Transaction::DisbursementDetail::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,10 +17,14 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
-use MooseX::Aliases;
+use Moo;
+use MooX::Aliases;
 
 extends 'WebService::Braintree::_';
+
+use WebService::Braintree::Types qw(
+    MerchantAccount
+);
 
 =head1 ATTRIBUTES
 
@@ -97,7 +101,7 @@ object of type L<WebService::Braintree::_::MerchantAccount/>.
 
 has merchant_account => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::MerchantAccount',
+    isa => MerchantAccount,
     coerce => 1,
 );
 

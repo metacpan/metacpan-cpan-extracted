@@ -13,7 +13,7 @@ use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 our @CARP_NOT;
 
 sub _build_log( $self ) {
@@ -107,11 +107,10 @@ sub connect( $self, %args ) {
     } elsif( $args{ tab } and ref $args{ tab } eq 'HASH' ) {
         $endpoint = $args{ tab }->{webSocketDebuggerUrl};
 
-    } elsif( exists $args{ new_tab } ) {
-        $endpoint = undef;
-        #$args{ tab } ||= 0;
-
     } elsif( $args{ tab } and $args{ tab } =~ /^\d+$/) {
+        $endpoint = undef;
+
+    } elsif( $args{ new_tab } ) {
         $endpoint = undef;
 
     } else {
@@ -406,6 +405,20 @@ sub send_message( $self, $method, %params ) {
     $response
 }
 
+=head2 C<< $chrome->callFunctionOn >>
+
+=cut
+
+sub callFunctionOn( $self, $function, %options ) {
+    $self->send_message('Runtime.callFunctionOn',
+        functionDeclaration => $function,
+        returnByValue => JSON::true,
+        arguments => $options{ arguments },
+        objectId => $options{ objectId },
+        %options
+    )
+};
+
 =head2 C<< $chrome->evaluate >>
 
 =cut
@@ -541,6 +554,9 @@ sub DESTROY {
 1;
 
 =head1 SEE ALSO
+
+The inofficial Chrome debugger API documentation at
+L<https://github.com/buggerjs/bugger-daemon/blob/master/README.md#api>
 
 Chrome DevTools at L<https://chromedevtools.github.io/devtools-protocol/1-2>
 

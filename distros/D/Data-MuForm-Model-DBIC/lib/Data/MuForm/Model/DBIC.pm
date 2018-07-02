@@ -19,7 +19,7 @@ Data::MuForm::Model::DBIC - MuForm class with DBIC model already applied
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 AUTHOR
 

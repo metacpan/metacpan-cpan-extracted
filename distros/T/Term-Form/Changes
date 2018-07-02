@@ -1,6 +1,11 @@
 Revision history for Term::Form
 
 
+0.316   2018-06-19
+        - Reset $self before leaving "readline"/"fill_form".
+        - Method "config" deprecated.
+
+
 0.315   2018-03-13
         - "readline": trim prompt if it is to long.
 

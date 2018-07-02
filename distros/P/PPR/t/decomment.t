@@ -47,6 +47,10 @@ my $text = <<'END_TEXT';
 
     say '#Here';
 
+    =begin comment
+
+    Anothe comment-like component here
+
 END_TEXT
 
 $text =~ s{^    }{}gms;
@@ -54,7 +58,7 @@ $text =~ s{^    }{}gms;
 my $decommented = PPR::decomment($text);
 
 $text =~ s{# A comment\h*}{}g;
-$text =~ s{ ^ = [^\W\d]\w*+ .*? ^ = cut \b [^\n]*+ $ }{}gxms;
+$text =~ s{ ^ = [^\W\d]\w*+ .*? (?: ^ = cut \b [^\n]*+ $ | \z ) }{}gxms;
 
 is $decommented, $text => 'Decommented correctly';
 

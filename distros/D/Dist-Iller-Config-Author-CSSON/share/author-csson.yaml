@@ -46,7 +46,7 @@ prereqs:
 plugins:
  - +plugin: Git::GatherDir
    +prereqs:
-    - develop_requires: Dist::Zilla::Plugin::Git 2.043
+    - develop_requires: Dist::Zilla::Plugin::Git 2.045
    exclude_filename:
    - META.json
    - LICENSE
@@ -54,7 +54,7 @@ plugins:
    - $self.build_file
 
  - +plugin: PromptIfStale
-   +version: 0.054
+   +version: 0.055
    check_all_plugins: 1
    phase: build
 
@@ -150,7 +150,7 @@ plugins:
  - +plugin: DistIller::MetaGeneratedBy
 
  - +plugin: Git::Contributors
-   +version: 0.030
+   +version: 0.034
 
  - +plugin: Test::Kwalitee::Extra
    +version: v0.2.1

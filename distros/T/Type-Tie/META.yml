@@ -3,13 +3,11 @@ abstract: 'tie a variable to a type constraint'
 author:
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
 build_requires:
-  Test::Fatal: '0'
   Test::More: '0.96'
-  Test::Requires: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 1
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -25,21 +23,24 @@ no_index:
     - xt
 optional_features: {}
 provides:
+  Type::Nano:
+    file: lib/Type/Nano.pm
+    version: '0.011'
   Type::Tie:
     file: lib/Type/Tie.pm
-    version: '0.009'
+    version: '0.011'
   Type::Tie::ARRAY:
     file: lib/Type/Tie.pm
-    version: '0.009'
+    version: '0.011'
   Type::Tie::BASE:
     file: lib/Type/Tie.pm
-    version: '0.009'
+    version: '0.011'
   Type::Tie::HASH:
     file: lib/Type/Tie.pm
-    version: '0.009'
+    version: '0.011'
   Type::Tie::SCALAR:
     file: lib/Type/Tie.pm
-    version: '0.009'
+    version: '0.011'
 recommends:
   Hash::FieldHash: '0'
 requires:
@@ -51,4 +52,5 @@ resources:
   homepage: https://metacpan.org/release/Type-Tie
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-type-tie.git
-version: '0.009'
+version: '0.011'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

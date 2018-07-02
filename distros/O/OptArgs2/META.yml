@@ -13,7 +13,7 @@ configure_requires:
   Module::Build::Pluggable: '0'
   Module::Build::Pluggable::CPANfile: '0.05'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: gpl
 meta-spec:
@@ -43,5 +43,5 @@ resources:
   homepage: https://github.com/mlawren/p5-OptArgs2
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: git://github.com/mlawren/p5-OptArgs2.git
-version: v0.0.9
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: v0.0.10
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

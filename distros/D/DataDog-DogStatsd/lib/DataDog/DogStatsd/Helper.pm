@@ -2,10 +2,10 @@ package DataDog::DogStatsd::Helper;
 
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use base qw( Exporter );
-our @EXPORT_OK = qw/stats_inc stats_dec stats_timing stats_gauge stats_count/;
+our @EXPORT_OK = qw/stats_inc stats_dec stats_timing stats_gauge stats_count stats_histogram/;
 
 use DataDog::DogStatsd;
 
@@ -33,8 +33,9 @@ sub stats_timing {
     __get_dogstatsd()->timing(@args);
 }
 
-sub stats_gauge  { __get_dogstatsd()->gauge(@_); }
-sub stats_count  { __get_dogstatsd()->count(@_); }
+sub stats_gauge      { __get_dogstatsd()->gauge(@_); }
+sub stats_count      { __get_dogstatsd()->count(@_); }
+sub stats_histogram  { __get_dogstatsd()->histogram(@_); }
 
 my $__DOGSTATSD;
 sub __get_dogstatsd {
@@ -53,13 +54,14 @@ DataDog::DogStatsd::Helper - shortcut/helper for L<DataDog::DogStatsd>
 
 =head1 SYNOPSIS
 
-    use DataDog::DogStatsd::Helper qw(stats_inc stats_dec stats_timing stats_gauge stats_count)
+    use DataDog::DogStatsd::Helper qw(stats_inc stats_dec stats_timing stats_gauge stats_count stats_histogram)
 
     stats_inc('logins'); # shortcut for DataDog::DogStatsd->new->increment('logins')
     stats_dec('logins'); # shortcut for DataDog::DogStatsd->new->decrement('logins')
     stats_timing('test.timing', 1); # ->timing
     stats_gauge('test.gauge', 10); # ->gauge
     stats_count('test.count', 20); # ->count
+    stats_histogram('test.histogram', 100); # ->histogram
 
 =head1 DESCRIPTION
 

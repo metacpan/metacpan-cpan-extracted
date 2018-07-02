@@ -1,3 +1,17 @@
+v0.19.5 2018-06-26T08:24:50Z
+ - Dockerfile fixed
+
+v0.19.4 2018-06-26T08:09:45Z
+ - Dockerfile fixed
+
+v0.19.3 2018-06-26T08:02:22Z
+ - dockerfile yum
+
+v0.19.2 2018-06-26T07:15:58Z
+ - dockerfile yum
+ - Docker base image changed from "softvisio/pcore:v0.67.0" to
+   "softvisio/pcore:v0.69.0"
+
 v0.19.1 2018-06-07T07:37:12Z
  - postgresql-contrib added
 

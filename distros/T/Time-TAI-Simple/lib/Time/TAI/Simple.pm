@@ -14,7 +14,7 @@ use base qw(Exporter);
 
 BEGIN {
     @Time::TAI::Simple::EXPORT = qw(tai tai10 tai35);
-    $Time::TAI::Simple::VERSION = '1.13';
+    $Time::TAI::Simple::VERSION = '1.14';
 }
 
 our @LEAPSECOND_UNIX_PATHNAME_LIST = (
@@ -729,6 +729,9 @@ Please report relevant bugs to <ttk[at]ciar[dot]org>.
 Bugfix patches are also welcome.
 
 =head1 SEE ALSO
+
+L<DateTime> has a C<subtract_datetime_absolute> method which will give the actual 
+difference between two times, just like taking the difference between two TAI times.
 
 If you are a scientist, you might want
 L<Time::TAI|https://metacpan.org/pod/Time::TAI> or

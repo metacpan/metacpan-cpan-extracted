@@ -46,11 +46,18 @@ sub main ( ) {
 sub info ( ) {
     exit 0 if $o{1} ;
     $0 =~ s|.*/||;
-    print STDERR CYAN "used random seed = $o{s} ($0 -s $o{s} -g ${c}x${r} -y $d..$u" . 
+    print STDERR CYAN "used random seed = $o{s} ($0 -s $o{s} -g ${r}x${c} -y $d..$u" . 
        (defined $o{'.'} ? " -. $o{'.'}" : '' ) .")\n" ;
 }
 
-sub VERSION_MESSAGE {}
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  our $VERSION = 0.21 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+}  
 sub HELP_MESSAGE {
     use FindBin qw[ $Script $Bin ] ;
     sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
@@ -110,6 +117,7 @@ sub HELP_MESSAGE {
     --help opt ..or..  --help options : Only shows the option helps. It is easy to read when you are in very necessary.
     --help ja : Shows Japanese online help manual. ; "saikoro --help ja" で日本語のオンラインマニュアルを表示します。
     --help nopod : Print this online manual using the code insdide this program without using the function of Perl POD.
+    --version : Outputs version information of this program.
 
  # This program has been made since 2016-03-04(Fri) by Toshiyuki Shimono, as a part of TSV hacking toolset for table data.
 
@@ -136,6 +144,7 @@ sub HELP_MESSAGE {
   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
   --help en : 英語版のオンラインヘルプマニュアルを出力。Online help in English version. 
+  --version : バージョン情報の出力
 
  例:
 

@@ -1,5 +1,4 @@
-#
-#  Copyright 2015
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -31,13 +29,13 @@ use threads::shared;
 
 use lib "t/lib";
 
-my $class = "MongoDB::BSON";
+my $class = "BSON";
 
 require_ok($class);
 
 my $codec = $class->new;
 
-my $var       = { a => 0.1 +0 };
+my $var       = { a => "x" };
 my $clone     = shared_clone $var;
 my $enc_var   = $codec->encode_one($var);
 my $enc_clone = $codec->encode_one($clone);
@@ -84,8 +82,8 @@ sub _bson_is {
 
 sub _hexdump {
     my $str = shift;
-    $str =~ s{([^[:graph:]])}{sprintf("\\x{%02x}",ord($1))}ge;
-    return $str;
+    my $out = unpack("H*", $str);
+    return $out;
 }
 
 done_testing();

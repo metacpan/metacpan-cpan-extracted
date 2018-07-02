@@ -6,7 +6,7 @@ use strict;
 use 5.010000;
 
 use Exporter qw( import );
-our @EXPORT_OK = qw( get_vimeo_list_info get_youtube_list_info get_new_video_url get_download_info );
+our @EXPORT_OK = qw( get_vimeo_list_info get_youtube_list_info get_download_info );
 
 use JSON             qw( decode_json );
 use LWP::UserAgent   qw();
@@ -15,10 +15,9 @@ use Term::ANSIScreen qw( :screen );
 
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
-use App::YTDL::DataExtract  qw( json_to_hash );
+use App::YTDL::ExtractData  qw( json_to_hash );
 use App::YTDL::Helper       qw( uni_capture HIDE_CURSOR SHOW_CURSOR );
 use App::YTDL::LWPUserAgent qw();
-
 
 
 sub get_youtube_list_info {
@@ -64,7 +63,7 @@ sub get_youtube_list_info {
                 last PAGE if $h_ref->{content_html} !~ /\S/;
                 my $content = '<!DOCTYPE html><html>' . $h_ref->{content_html} . '</html>';
                 _parse_yt_list_html( $content, $uploader, $tmp );
-                if ( $opt->{small_list_size} ) {
+                if ( $opt->{list_type_youtube} == 2 ) {
                    $#$tmp = 49 if @$tmp > 50;
                    last PAGE;
                 }
@@ -72,6 +71,7 @@ sub get_youtube_list_info {
             }
             1 }
         ) {
+            print SHOW_CURSOR;
             return $tmp;
         }
         else {
@@ -198,34 +198,9 @@ sub get_vimeo_list_info {
 }
 
 
-sub get_new_video_url {
-    my ( $opt, $info, $ex, $webpage_url, $fmt ) = @_;
-    my @cmd = ( $opt->{youtube_dl} );
-    push @cmd, '--user-agent', $opt->{useragent}    if defined $opt->{useragent};
-    push @cmd, '--netrc'                            if $opt->{use_netrc};
-    push @cmd, '--socket-timeout', $opt->{timeout};
-    push @cmd, '--format', $fmt, '--get-url', '--', $webpage_url;
-    my $video_url;
-    if ( eval {
-        $video_url = uni_capture( @cmd );
-        die $webpage_url . ' - could not get new video url!' if ! $video_url;
-        1 }
-    ) {
-        return $video_url;
-    }
-    else {
-        say $@;
-        return;
-    }
-}
-
-
 sub get_download_info {
     my ( $opt, $webpage_url, $message ) = @_;
-    my @cmd = ( $opt->{youtube_dl} );
-    push @cmd, '--user-agent', $opt->{useragent}    if defined $opt->{useragent};
-    push @cmd, '--netrc'                            if $opt->{use_netrc};
-    push @cmd, '--socket-timeout', $opt->{timeout};
+    my @cmd = @{$opt->{youtube_dl}};
     push @cmd, '--youtube-skip-dash-manifest';
     push @cmd, '--dump-json', '--', $webpage_url;
     my $json_all;

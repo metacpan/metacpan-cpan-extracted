@@ -5,13 +5,13 @@
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "open_source"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Archive-Tar-Wrapper",
    "no_index" : {
@@ -28,7 +28,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Which" : "0"
          }
       },
       "runtime" : {
@@ -38,22 +39,26 @@
             "File::Which" : "0",
             "IPC::Run" : "0",
             "Log::Log4perl" : "0",
-            "Test::Simple" : "1.302073",
             "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "1.302073"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "X_type" : "git",
-      "X_url" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl",
       "bugtracker" : {
          "web" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues"
       },
       "repository" : {
-         "url" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl.git"
+         "type" : "git",
+         "url" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl.git",
+         "web" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl"
       }
    },
-   "version" : "0.27",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.30",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

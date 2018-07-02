@@ -32,6 +32,6 @@ ok $report->is_passing, "137 is fine";
    $report = $spec->apply( 42 );
 ok !$report->is_passing, "Life is not fine";
 
-note $report->as_tap;
+note $report->get_tap;
 
 done_testing;

@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-Azure-EventHubs
 
+0.06 2018-07-02T06:08:44Z
+    - Change URLs to 'metacpan.org' in test files that was directs 'search.cpan.org' 
+
 0.05 2018-06-11T01:12:57Z
     - Fix for supporting to Net-Azure-Authorization-SAS-0.03
 

@@ -1,7 +1,7 @@
 package Business::ID::NIK;
 
-our $DATE = '2018-04-08'; # DATE
-our $VERSION = '0.092'; # VERSION
+our $DATE = '2018-07-01'; # DATE
+our $VERSION = '0.093'; # VERSION
 
 use 5.010001;
 use warnings;
@@ -36,6 +36,10 @@ $SPEC{parse_nik} = {
             schema  => [bool => default => 1],
         },
     },
+    examples => [
+        {args=>{nik=>"32 7300 010101 0001"}},
+        {args=>{nik=>"32 7300 710101 0001"}},
+    ],
 };
 sub parse_nik {
     my %args = @_;
@@ -111,7 +115,7 @@ Business::ID::NIK - Parse Indonesian citizenship registration number (NIK)
 
 =head1 VERSION
 
-This document describes version 0.092 of Business::ID::NIK (from Perl distribution Business-ID-NIK), released on 2018-04-08.
+This document describes version 0.093 of Business::ID::NIK (from Perl distribution Business-ID-NIK), released on 2018-07-01.
 
 =head1 SYNOPSIS
 
@@ -146,6 +150,48 @@ Usage:
  parse_nik(%args) -> [status, msg, result, meta]
 
 Parse Indonesian citizenship registration number (NIK).
+
+Examples:
+
+=over
+
+=item * Example #1:
+
+ parse_nik(nik => "32 7300 010101 0001");
+
+Result:
+
+ {
+   dob => "2001-01-01",
+   gender => "M",
+   loc_code => 3273,
+   loc_ind_name => "BANDUNG",
+   loc_type => 1,
+   prov_code => 32,
+   prov_eng_name => "West Java",
+   prov_ind_name => "Jawa Barat",
+   serial => "0001",
+ }
+
+=item * Example #2:
+
+ parse_nik(nik => "32 7300 710101 0001");
+
+Result:
+
+ {
+   dob => "2001-01-31",
+   gender => "F",
+   loc_code => 3273,
+   loc_ind_name => "BANDUNG",
+   loc_type => 1,
+   prov_code => 32,
+   prov_eng_name => "West Java",
+   prov_ind_name => "Jawa Barat",
+   serial => "0001",
+ }
+
+=back
 
 This function is not exported by default, but exportable.
 

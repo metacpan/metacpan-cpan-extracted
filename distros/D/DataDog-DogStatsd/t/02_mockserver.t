@@ -54,6 +54,20 @@ $statsd->gauge('test.gauge', 10, { tags => ['tag1', 'tag2'] } );
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, 'test.gauge:10|g|#tag1,tag2';
 
+$statsd->event('test event', 'test description');
+($msg) = MockServer::get_and_reset_messages();
+is $msg, '_e{10,16}:test event|test description';
+
+$statsd->event('test event', 'test description', { tags => [ 'tag1', 'tag2' ] } );
+($msg) = MockServer::get_and_reset_messages();
+is $msg, '_e{10,16}:test event|test description|#tag1,tag2';
+
+$statsd->event('test event', 'test description',
+    { hostname => "host", tags => [ 'tag1', 'tag2' ] } );
+($msg) = MockServer::get_and_reset_messages();
+is $msg, '_e{10,16}:test event|test description|h:host|#tag1,tag2';
+
+
 ## test namespace
 $statsd->namespace('test2.');
 $statsd->increment( 'stats' );

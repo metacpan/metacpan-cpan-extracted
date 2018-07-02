@@ -6,7 +6,7 @@ use strict;
 use 5.010000;
 
 use Exporter qw( import );
-our @EXPORT_OK = qw( read_history_files uploader_history_menu add_uploader_to_history new_uploader_to_history_file );
+our @EXPORT_OK = qw( read_history_files uploader_history_menu add_uploaders_to_history );
 
 use List::MoreUtils  qw( any none );
 use LWP::UserAgent   qw();
@@ -16,7 +16,6 @@ use Term::Choose     qw( choose );
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
 use App::YTDL::Helper qw( read_json write_json );
-
 
 
 sub read_history_files {
@@ -34,12 +33,12 @@ sub uploader_history_menu {
     my ( $opt ) = @_;
 
     MENU : while ( 1 ) {
-        my @list_size = ( '  ALL', '  50' );
-        my $list_size_regexp = join '|', map { quotemeta } @list_size;
+        #my @list_size = ( '  ALL', '  50' );
+        #my $list_size_regexp = join '|', map { quotemeta } @list_size;
         my ( $uploader, $sticky ) = ( '- Uploader', '  Sticky' );
         # Choose
         my $choice = choose(
-            [ undef, $uploader, $sticky, $list_size[$opt->{small_list_size}] ],
+            [ undef, $uploader, $sticky ],                                        # , $list_size[$opt->{small_list_size}
             { prompt => 'Choose:', layout => 3, undef => '  QUIT' }
         );
         if ( ! defined $choice ) {
@@ -61,7 +60,7 @@ sub uploader_history_menu {
                 my @indexes = choose(
                     $choices,
                     { prompt => $prompt, layout => 3, index => 1, default => 1,
-                        undef => '  BACK', no_spacebar => [ 0 .. $#pre ] }
+                        undef => '  BACK', meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
                 );
                 if ( ! defined $indexes[0] || ! defined $choices->[$indexes[0]] ) {
                     if ( @ids ) {
@@ -154,11 +153,11 @@ sub uploader_history_menu {
                 }
             }
         }
-        if ( $choice =~ /^$list_size_regexp\z/ ) {
-            $opt->{small_list_size}++;
-            $opt->{small_list_size} = 0 if $opt->{small_list_size} > $#list_size;
-            next MENU;
-        }
+        #if ( $choice =~ /^$list_size_regexp\z/ ) {
+        #    $opt->{small_list_size}++;
+        #    $opt->{small_list_size} = 0 if $opt->{small_list_size} > $#list_size;
+        #    next MENU;
+        #}
     }
 }
 
@@ -217,57 +216,50 @@ sub _sticky_name_and_url {
 }
 
 
-sub add_uploader_to_history {
-    my ( $opt, $info, $ex, $video_id ) = @_;
-    my $uploader    = $info->{$ex}{$video_id}{uploader};
-    my $uploader_id = $info->{$ex}{$video_id}{uploader_id};
-    return if ! length $uploader_id;
-    my $uploader_url;
-    if ( $ex eq 'youtube' ) {
-        my $user_url    = sprintf 'https://www.youtube.com/user/%s', $uploader_id;
-        my $channel_url = sprintf 'https://www.youtube.com/channel/%s', $uploader_id;
-        return if any { $user_url eq $_ || $channel_url eq $_ } keys %{$opt->{sticky}};
-        return if any { $user_url eq $_ || $channel_url eq $_ } keys %{$opt->{history}};
-        my @type = ( length $uploader_id == 24 ? ( 'channel', 'user' ) : ( 'user', 'channel' ) );
-        my $ua = LWP::UserAgent->new(
-            agent         => $opt->{useragent},
-            timeout       => $opt->{timeout},
-            show_progress => 1
-        );
-        my $url = sprintf 'https://www.youtube.com/%s/%s', $type[0], $uploader_id;
-        my $res = $ua->head( $url );
-        print up( 1 ), cldown;
-        if ( $res->is_success ) {
-            $uploader_url = sprintf 'https://www.youtube.com/%s/', $type[0];
-        }
-        else {
-            my $url = sprintf 'https://www.youtube.com/%s/%s', $type[1], $uploader_id;
-            my $res = $ua->head( $url );
-            print up( 1 ), cldown;
-            if ( $res->is_success ) {
-                $uploader_url = sprintf 'https://www.youtube.com/%s/', $type[1];
+sub add_uploaders_to_history {
+    my ( $opt, $info ) = @_;
+    for my $ex ( keys %$info ) {
+        for my $video_id ( keys %{$info->{$ex}} ) {
+            my $uploader    = $info->{$ex}{$video_id}{uploader};
+            my $uploader_id = $info->{$ex}{$video_id}{uploader_id};
+            return if ! length $uploader_id;
+            my $uploader_url;
+            if ( $ex eq 'youtube' ) {
+                my $user_url    = sprintf 'https://www.youtube.com/user/%s', $uploader_id;
+                my $channel_url = sprintf 'https://www.youtube.com/channel/%s', $uploader_id;
+                return if any { $user_url eq $_ || $channel_url eq $_ } keys %{$opt->{sticky}};
+                return if any { $user_url eq $_ || $channel_url eq $_ } keys %{$opt->{history}};
+                my @type = ( length $uploader_id == 24 ? ( 'channel', 'user' ) : ( 'user', 'channel' ) );
+                my $ua = LWP::UserAgent->new(
+                    agent         => $opt->{useragent},
+                    timeout       => $opt->{timeout},
+                    show_progress => 1
+                );
+                $uploader_url = sprintf 'https://www.youtube.com/%s/%s', $type[0], $uploader_id;
+                my $res = $ua->head( $uploader_url );
+                print up( 1 ), cldown;
+                if ( ! $res->is_success ) {
+                    $uploader_url = sprintf 'https://www.youtube.com/%s/%s', $type[1], $uploader_id;
+                    my $res = $ua->head( $uploader_url );
+                    print up( 1 ), cldown;
+                    $uploader_url = undef if ! $res->is_success;
+                }
+            }
+            elsif ( $ex eq 'vimeo' ) {
+                $uploader_url = 'https://vimeo.com/' . $uploader_id;
+            }
+            if ( defined $uploader_url ) {
+                if ( none{ $uploader_url eq $_ } keys %{$opt->{sticky}} ) {
+                    $opt->{history}{$uploader_url} = {
+                        uploader     => $uploader,
+                        uploader_id  => $uploader_id,
+                        extractor    => $ex,
+                        timestamp    => time(),
+                    };
+                }
             }
         }
     }
-    elsif ( $ex eq 'vimeo' ) {
-        $uploader_url = 'https://vimeo.com/';
-    }
-    if ( defined $uploader_url ) {
-        $uploader_url .= $uploader_id;
-        if ( none{ $uploader_url eq $_ } keys %{$opt->{sticky}} ) {
-            $opt->{history}{$uploader_url} = {
-                uploader     => $uploader,
-                uploader_id  => $uploader_id,
-                extractor    => $ex,
-                timestamp    => time(),
-            };
-        }
-    }
-}
-
-
-sub new_uploader_to_history_file {
-    my ( $opt ) = @_;
     my $c_hist = $opt->{history};
     my @keys = sort { $c_hist->{$b}{timestamp} <=> $c_hist->{$a}{timestamp} } keys %$c_hist;
     while ( @keys > $opt->{max_size_history} ) {
@@ -277,6 +269,8 @@ sub new_uploader_to_history_file {
     }
     write_json( $opt, $opt->{history_file}, $c_hist );
 }
+
+
 
 
 1;

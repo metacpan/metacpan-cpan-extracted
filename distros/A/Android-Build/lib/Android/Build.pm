@@ -13,7 +13,7 @@ use Data::Table::Text qw(:all);
 use File::Copy;
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 
-our $VERSION = '20180318';
+our $VERSION = '20180626';
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -677,9 +677,7 @@ sub run($)                                                                      
 
 =head1 Name
 
-Android::Build - L<lint|/lint>, L<compile|/compile>, L<install|/install>,
-L<run|/run> an Android app using the command line tools minus Ant and Gradle
-thus freeing development effort from the strictures imposed by Android Studio.
+Android::Build - Lint, compile, install, run an Android app using the command line tools minus Ant and Gradle thus freeing development effort from the strictures imposed by Android Studio.
 
 =head1 Prerequisites
 
@@ -749,6 +747,8 @@ script:
  ./SampleApp/perl/generateAKey.pl
 
 =head1 Description
+
+Lint, compile, install, run an Android app using the command line tools minus Ant and Gradle thus freeing development effort from the strictures imposed by Android Studio.
 
 The following sections describe the methods in each functional area of this
 module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
@@ -901,37 +901,37 @@ The version number of the app. Default is today's date, formatted as B<YYYYMMDD>
 
 Compile the app.
 
-     Parameter  Description
-  1  $android   Android build
+     Parameter  Description    
+  1  $android   Android build  
 
 =head2 cloneApk($$)
 
 Clone an apk file: copy the existing apk, replace the L<assets|/assets>, re-sign, zipalign, return the name of the newly created apk file.
 
-     Parameter  Description
-  1  $android   Android build
-  2  $oldApk    The file name of the apk to be cloned
+     Parameter  Description                            
+  1  $android   Android build                          
+  2  $oldApk    The file name of the apk to be cloned  
 
 =head2 lint($)
 
 Lint all the Java source code files for the app.
 
-     Parameter  Description
-  1  $android   Android build
+     Parameter  Description    
+  1  $android   Android build  
 
 =head2 install($)
 
 Install an already L<compiled|/compile> app on to the selected L<device|/device>
 
-     Parameter  Description
-  1  $android   Android build
+     Parameter  Description    
+  1  $android   Android build  
 
 =head2 run($)
 
 L<Compile|/compile> the app, L<install|/install> and then run it on the selected L<device|/device>
 
-     Parameter  Description
-  1  $android   Android build
+     Parameter  Description    
+  1  $android   Android build  
 
 
 =head1 Index
@@ -1003,15 +1003,10 @@ L<Compile|/compile> the app, L<install|/install> and then run it on the selected
 
 =head1 Installation
 
-This module is written in 100% Pure Perl and, thus, it is easy to read, use,
-modify and install.
+This module is written in 100% Pure Perl and, thus, it is easy to read,
+comprehend, use, modify and install via B<cpan>:
 
-Standard L<Module::Build> process for building and installing modules:
-
-  perl Build.PL
-  ./Build
-  ./Build test
-  ./Build install
+  sudo cpan install Android::Build
 
 =head1 Author
 

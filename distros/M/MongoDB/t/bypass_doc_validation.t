@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -312,7 +310,7 @@ subtest "aggregate with \$out" => sub {
             "invalid aggregate output throws error"
         );
 
-        is( $coll->count, 0, "no docs in \$out collection" );
+        is( $coll->count_documents({}), 0, "no docs in \$out collection" );
     }
 
     is(
@@ -325,7 +323,7 @@ subtest "aggregate with \$out" => sub {
         "validation bypassed"
     );
 
-    is( $coll->count, 10, "correct doc count in \$out collection" );
+    is( $coll->count_documents({}), 10, "correct doc count in \$out collection" );
 
     is(
         exception {

@@ -1,5 +1,9 @@
 Changes for Plack::App::ServiceStatus
 
+0.903   2018-06-25T13:41:15
+    - add app version to reported static data
+
+
 0.902   2016-11-21T14:42:21
      - Add Icinga/Nagios check script (mstock)
      - Add Net::Stomp connection check (mstock)

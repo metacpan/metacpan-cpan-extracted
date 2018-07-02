@@ -22,24 +22,24 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'pager' => '',
                 'mobile' => '[34]\\d{6}',
                 'specialrate' => '(8\\d{6})',
                 'geographic' => '7[4-7]\\d{5}',
-                'voip' => '',
+                'pager' => '',
                 'toll_free' => '',
-                'fixed_line' => '7[4-7]\\d{5}'
+                'fixed_line' => '7[4-7]\\d{5}',
+                'voip' => '',
+                'personal_number' => ''
               };
 my %areanames = (
   269760 => "Domoni",

@@ -7,7 +7,7 @@ use App::Egaz -command;
 use App::Egaz::Common;
 
 sub abstract {
-    return 'convert .lav files to .psl files';
+    return 'convert .lav files to .psl';
 }
 
 sub opt_spec {

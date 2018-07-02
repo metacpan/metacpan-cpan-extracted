@@ -19,7 +19,7 @@ my %module_build_args = (
     "and Andy Lester andy\@petdance.com."
   ],
   "dist_name" => "File-Find-Object-Rule",
-  "dist_version" => "0.0307",
+  "dist_version" => "0.0309",
   "license" => "perl",
   "module_name" => "File::Find::Object::Rule",
   "recursive_test_files" => 1,

@@ -6,6 +6,19 @@ NOTE: All bugs and requests are now being handled through GitHub.
 
 Please DO NOT send bug reports to http://rt.cpan.org/.
 
+
+2.32    Fri Jun 22 15:57:39 CDT 2018
+
+Note that this very well may be the final release of HTML::Lint that I
+make. I've been spending my time on HTML::Tidy5, which works on HTML5,
+checks for more problems, and is much faster. If you're interested in
+maintaining HTML::Lint, send me email at andy@petdance.com.  I'm not
+sure I want to hand it off to anyone yet, but we can discuss.
+
+    [ENHANCEMENTS]
+    Allow "weblint -" to read from STDIN.  Thanks, Frank Dana.
+
+
 2.30    Sun Jan  7 22:02:25 CST 2018
     No changes since 2.27_03.
 

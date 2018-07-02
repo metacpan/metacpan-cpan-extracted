@@ -4,7 +4,7 @@ use warnings;
 
 package Path::Iterator::Rule;
 # ABSTRACT: Iterative, recursive file finder
-our $VERSION = '1.012';
+our $VERSION = '1.014';
 
 # Register warnings category
 use warnings::register;
@@ -168,9 +168,11 @@ sub _iter {
     # if not subclassed, we want to inline
     my $can_children = $self->can("_children");
 
-    # queue structure: flat list in tuples of 4: (object, basename, depth, origin)
-    # if object is arrayref, then that's a special case signal that it
-    # was already of interest and can finally be returned for postorder searches
+    # queue structure: flat list of (unnested) tuples of 4 (object,
+    # basename, depth, origin).  If object is a coderef, it's a deferred
+    # directory list.  If the object is an arrayref, then that's a special
+    # case signal that it was already of interest and can finally be
+    # returned for postorder searches
     my @queue =
       map {
         my $i = $self->_objectify($_);
@@ -181,6 +183,11 @@ sub _iter {
         LOOP: {
             my ( $item, $base, $depth, $origin ) = splice( @queue, 0, 4 );
             return unless $item;
+            if ( ref $item eq 'CODE' ) {
+                # replace placeholder with children
+                unshift @queue, $item->();
+                redo LOOP;
+            }
             return $item->[0] if ref $item eq 'ARRAY'; # deferred for postorder
             my $string_item = $opt_stringify ? "$item" : $item;
 
@@ -196,8 +203,7 @@ sub _iter {
                 local $_ = $item;
                 $stash->{_depth} = $depth;
                 if ($opt_error_handler) {
-                    $interest =
-                      try { $self->test( $item, $base, $stash ) }
+                    $interest = try { $self->test( $item, $base, $stash ) }
                     catch { $opt_error_handler->( $item, $_ ) };
                 }
                 else {
@@ -228,33 +234,37 @@ sub _iter {
                     warnings::warnif("Directory '$string_item' is not readable. Skipping it");
                 }
                 else {
-                    my @next;
                     my $depth_p1 = $depth + 1;
+                    my $next;
                     if ($can_children) {
-                        my @paths = $can_children->( $self, $item );
-                        if ($opt_sorted) {
-                            @paths = sort { "$a->[0]" cmp "$b->[0]" } @paths;
-                        }
-                        @next = map { ( $_->[1], $_->[0], $depth_p1, $origin ) } @paths;
+                        $next = sub {
+                            my @paths = $can_children->( $self, $item );
+                            if ($opt_sorted) {
+                                @paths = sort { "$a->[0]" cmp "$b->[0]" } @paths;
+                            }
+                            map { ( $_->[1], $_->[0], $depth_p1, $origin ) } @paths;
+                        };
                     }
                     else {
-                        opendir( my $dh, $string_item );
-                        if ($opt_sorted) {
-                            @next =
-                              map { ( "$string_item/$_", $_, $depth_p1, $origin ) }
-                              sort { $a cmp $b } grep { $_ ne "." && $_ ne ".." } readdir $dh;
-                        }
-                        else {
-                            @next =
-                              map { ( "$string_item/$_", $_, $depth_p1, $origin ) }
-                              grep { $_ ne "." && $_ ne ".." } readdir $dh;
-                        }
+                        $next = sub {
+                            opendir( my $dh, $string_item );
+                            if ($opt_sorted) {
+                                map { ( "$string_item/$_", $_, $depth_p1, $origin ) }
+                                  sort { $a cmp $b } grep { $_ ne "." && $_ ne ".." } readdir $dh;
+                            }
+                            else {
+                                map { ( "$string_item/$_", $_, $depth_p1, $origin ) }
+                                  grep { $_ ne "." && $_ ne ".." } readdir $dh;
+                            }
+                        };
                     }
 
                     if ($opt_depthfirst) {
-                        # for postorder, requeue as reference to signal it can be returned
-                        # without being retested
-                        push @next,
+                        # either preorder (parents before kids) or
+                        # postorder (parents after kids); for postorder,
+                        # requeue current item as a reference to signal it
+                        # can be returned without being retested
+                        unshift @queue,
                           [
                             (
                                   $opt_relative
@@ -262,16 +272,17 @@ sub _iter {
                                 : $item
                             )
                           ],
-                          $base, $depth, $origin
+                          undef, undef, undef
                           if $interest && $opt_depthfirst > 0;
-                        unshift @queue, @next;
+                        unshift @queue, $next, undef, undef, undef;
                         redo LOOP if $opt_depthfirst > 0;
                     }
                     else {
-                        push @queue, @next;
+                        # breadth-first: add placeholder for children at the end
+                        push @queue, $next, undef, undef, undef;
                     }
                 }
-            }
+            } # end of "is directory maybe with children"
             return (
                   $opt_relative
                 ? $self->_objectify( File::Spec->abs2rel( $string_item, $origin ) )
@@ -741,7 +752,7 @@ Path::Iterator::Rule - Iterative, recursive file finder
 
 =head1 VERSION
 
-version 1.012
+version 1.014
 
 =head1 SYNOPSIS
 
@@ -811,6 +822,10 @@ provides an API for extensions
 
 As a convenience, the L<PIR> module is an empty subclass of this one
 that is less arduous to type for one-liners.
+
+B<Note>: paths are constructed with unix-style forward-slashes for
+efficiency rather than using L<File::Spec>.  If proper path separators are
+needed, call L<canonpath|File::Spec/canonpath> on the search results.
 
 =head1 USAGE
 
@@ -1568,13 +1583,21 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords David Steinbrunner Gian Piero Carrubba Graham Knop Ricardo Signes Slaven Rezic Toby Inkster
+=for stopwords David Steinbrunner Diab Jerius Edward Betts Gian Piero Carrubba Graham Knop Ricardo Signes Slaven Rezic Toby Inkster
 
 =over 4
 
 =item *
 
 David Steinbrunner <dsteinbrunner@pobox.com>
+
+=item *
+
+Diab Jerius <djerius@cfa.harvard.edu>
+
+=item *
+
+Edward Betts <edward@4angle.com>
 
 =item *
 

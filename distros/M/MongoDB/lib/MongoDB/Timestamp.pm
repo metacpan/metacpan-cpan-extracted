@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2010 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,50 +11,29 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
 package MongoDB::Timestamp;
-# ABSTRACT: Replication timestamp
+
+# ABSTRACT: (DEPRECATED) Replication timestamp type
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
-use Types::Standard qw(
-    Int
-);
-use namespace::clean -except => 'meta';
+extends 'BSON::Timestamp';
 
-#pod =attr sec
-#pod
-#pod Seconds since epoch.
-#pod
-#pod =cut
-
-has sec => (
-    is       => 'ro',
-    isa      => Int,
-    required => 1,
+with $_ for qw(
+  MongoDB::Role::_DeprecationWarner
 );
 
-#pod =attr inc
-#pod
-#pod Incrementing field.
-#pod
-#pod =cut
-
-has inc => (
-    is       => 'ro',
-    isa      => Int,
-    required => 1,
-);
-
+sub BUILD {
+    my $self = shift;
+    $self->_warn_deprecated_class(__PACKAGE__, ["BSON::Timestamp"], 0);
+};
 
 1;
-
-__END__
 
 =pod
 
@@ -63,28 +41,15 @@ __END__
 
 =head1 NAME
 
-MongoDB::Timestamp - Replication timestamp
+MongoDB::Timestamp - (DEPRECATED) Replication timestamp type
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 DESCRIPTION
 
-This is an internal type used for replication.  It is not for storing dates,
-times, or timestamps in the traditional sense.  Unless you are looking to mess
-with MongoDB's replication internals, the class you are probably looking for is
-L<DateTime>.  See L<MongoDB::DataTypes> for more information.
-
-=head1 ATTRIBUTES
-
-=head2 sec
-
-Seconds since epoch.
-
-=head2 inc
-
-Incrementing field.
+This class is now an empty subclass of L<BSON::Timestamp>.
 
 =head1 AUTHORS
 
@@ -121,3 +86,8 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
+
+__END__
+
+
+# vim: set ts=4 sts=4 sw=4 et tw=75:

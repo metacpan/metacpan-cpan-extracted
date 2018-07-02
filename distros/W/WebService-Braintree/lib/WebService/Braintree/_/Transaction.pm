@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::Transaction;
-$WebService::Braintree::_::Transaction::VERSION = '1.5';
+$WebService::Braintree::_::Transaction::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,34 +17,39 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
-use MooseX::Aliases;
+use Moo;
+use MooX::Aliases;
 
 extends 'WebService::Braintree::_';
 
-use WebService::Braintree::_::AddOn;
-use WebService::Braintree::_::AuthorizationAdjustment;
-use WebService::Braintree::_::Discount;
-use WebService::Braintree::_::ThreeDSecureInfo;
-use WebService::Braintree::_::Transaction::AddressDetail;
-use WebService::Braintree::_::Transaction::AmexExpressCheckoutDetail;
-use WebService::Braintree::_::Transaction::AndroidPayDetail;
-use WebService::Braintree::_::Transaction::ApplePayDetail;
-use WebService::Braintree::_::Transaction::CoinbaseDetail;
-use WebService::Braintree::_::Transaction::CreditCardDetail;
-use WebService::Braintree::_::Transaction::CustomerDetail;
-use WebService::Braintree::_::Transaction::DisbursementDetail;
-use WebService::Braintree::_::Transaction::FacilitatedDetail;
-use WebService::Braintree::_::Transaction::FacilitatorDetail;
-use WebService::Braintree::_::Transaction::IdealPaymentDetail;
-use WebService::Braintree::_::Transaction::MasterpassCardDetail;
-use WebService::Braintree::_::Transaction::PayPalDetail;
-use WebService::Braintree::_::Transaction::RiskData;
-use WebService::Braintree::_::Transaction::StatusDetail;
-use WebService::Braintree::_::Transaction::SubscriptionDetail;
-use WebService::Braintree::_::Transaction::UsBankAccountDetail;
-use WebService::Braintree::_::Transaction::VenmoAccountDetail;
-use WebService::Braintree::_::Transaction::VisaCheckoutCardDetail;
+use Types::Standard qw(ArrayRef Undef);
+use WebService::Braintree::Types qw(
+    AddOn
+    AuthorizationAdjustment
+    Descriptor
+    Discount
+    Dispute
+    ThreeDSecureInfo
+    Transaction_AddressDetail
+    Transaction_AmexExpressCheckoutDetail
+    Transaction_AndroidPayDetail
+    Transaction_ApplePayDetail
+    Transaction_CoinbaseDetail
+    Transaction_CreditCardDetail
+    Transaction_CustomerDetail
+    Transaction_DisbursementDetail
+    Transaction_FacilitatedDetail
+    Transaction_FacilitatorDetail
+    Transaction_IdealPaymentDetail
+    Transaction_MasterpassCardDetail
+    Transaction_PayPalDetail
+    Transaction_RiskData
+    Transaction_StatusDetail
+    Transaction_SubscriptionDetail
+    Transaction_UsBankAccountDetail
+    Transaction_VenmoAccountDetail
+    Transaction_VisaCheckoutCardDetail
+);
 
 =head2 add_ons()
 
@@ -55,7 +60,7 @@ of L<WebService::Braintree::_::AddOn/>.
 
 has add_ons => (
     is => 'ro',
-    isa => 'ArrayRefOfAddOn',
+    isa => ArrayRef[AddOn],
     coerce => 1,
 );
 
@@ -79,7 +84,7 @@ C<< amex_express_checkout_details() >> is an alias to this attribute.
 
 has amex_express_checkout => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::AmexExpressCheckoutDetail',
+    isa => Transaction_AmexExpressCheckoutDetail,
     coerce => 1,
     alias => 'amex_express_checkout_details',
 );
@@ -105,7 +110,7 @@ C<< android_pay_details() >> is an alias to this attribute.
 
 has android_pay => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::AndroidPayDetail',
+    isa => Transaction_AndroidPayDetail,
     coerce => 1,
     alias => 'android_pay_details',
 );
@@ -120,7 +125,7 @@ C<< apple_pay_details() >> is an alias to this attribute.
 
 has apple_pay => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::ApplePayDetail',
+    isa => Transaction_ApplePayDetail,
     coerce => 1,
     alias => 'apple_pay_details',
 );
@@ -134,7 +139,7 @@ of L<WebService::Braintree::_::AuthorizationAdjustment/>.
 
 has authorization_adjustments => (
     is => 'ro',
-    isa => 'ArrayRefOfAuthorizationAdjustment',
+    isa => ArrayRef[AuthorizationAdjustment],
     coerce => 1,
 );
 
@@ -188,7 +193,7 @@ C<< billing_details() >> is an alias to this attribute.
 
 has billing => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::AddressDetail',
+    isa => Transaction_AddressDetail,
     coerce => 1,
     alias => 'billing_details',
 );
@@ -213,7 +218,7 @@ C<< coinbase_details() >> is an alias to this attribute.
 
 has coinbase => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::CoinbaseDetail',
+    isa => Transaction_CoinbaseDetail,
     coerce => 1,
     alias => 'coinbase_details',
 );
@@ -239,7 +244,7 @@ C<< credit_card_details() >> is an alias to this attribute.
 
 has credit_card => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::CreditCardDetail',
+    isa => Transaction_CreditCardDetail,
     coerce => 1,
     alias => 'credit_card_details',
 );
@@ -276,7 +281,7 @@ C<< customer_details() >> is an alias to this attribute.
 
 has customer => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::CustomerDetail',
+    isa => Transaction_CustomerDetail,
     coerce => 1,
     alias => 'customer_details',
 );
@@ -299,7 +304,7 @@ This returns the transaction's descriptor (if any). This will be an object of ty
 
 has descriptor => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Descriptor',
+    isa => Descriptor,
     coerce => 1,
 );
 
@@ -313,7 +318,7 @@ C<< disbursement_details() >> is an alias to this attribute.
 
 has disbursement => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::DisbursementDetail',
+    isa => Transaction_DisbursementDetail,
     coerce => 1,
     alias => 'disbursement_details',
 );
@@ -337,7 +342,7 @@ of L<WebService::Braintree::_::Discount/>.
 
 has discounts => (
     is => 'ro',
-    isa => 'ArrayRefOfDiscount',
+    isa => ArrayRef[Discount],
     coerce => 1,
 );
 
@@ -350,7 +355,7 @@ of L<WebService::Braintree::_::Dispute/>.
 
 has disputes => (
     is => 'ro',
-    isa => 'ArrayRefOfDispute',
+    isa => ArrayRef[Dispute],
     coerce => 1,
 );
 
@@ -372,7 +377,7 @@ This returns the transaction's facilitated details (if any). This will be an obj
 
 has facilitated_details => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::FacilitatedDetail',
+    isa => Transaction_FacilitatedDetail,
     coerce => 1,
 );
 
@@ -384,7 +389,7 @@ This returns the transaction's facilitator details (if any). This will be an obj
 
 has facilitator_details => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::FacilitatorDetail',
+    isa => Transaction_FacilitatorDetail,
     coerce => 1,
 );
 
@@ -418,7 +423,7 @@ C<< ideal_payment_details() >> is an alias to this attribute.
 
 has ideal_payment => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::IdealPaymentDetail',
+    isa => Transaction_IdealPaymentDetail,
     coerce => 1,
     alias => 'ideal_payment_details',
 );
@@ -433,7 +438,7 @@ C<< masterpass_card_details() >> is an alias to this attribute.
 
 has masterpass_card => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::MasterpassCardDetail',
+    isa => Transaction_MasterpassCardDetail,
     coerce => 1,
     alias => 'masterpass_card_details',
 );
@@ -521,7 +526,7 @@ C<< paypal_details() >> is an alias to this attribute.
 
 has paypal => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::PayPalDetail',
+    isa => Transaction_PayPalDetail,
     coerce => 1,
     alias => 'paypal_details',
 );
@@ -647,7 +652,7 @@ This returns the transaction's risk data details (if any). This will be an objec
 
 has risk_data => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::RiskData',
+    isa => Transaction_RiskData,
     coerce => 1,
 );
 
@@ -692,7 +697,7 @@ C<< shipping_details() >> is an alias to this attribute.
 
 has shipping => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::AddressDetail',
+    isa => Transaction_AddressDetail,
     coerce => 1,
     alias => 'shipping_details',
 );
@@ -725,7 +730,7 @@ This is the balance for this transaction.
 
 has status_history => (
     is => 'ro',
-    isa => 'ArrayRefOfTransactionStatusDetail',
+    isa => ArrayRef[Transaction_StatusDetail],
     coerce => 1,
 );
 
@@ -747,7 +752,7 @@ This is the balance for this transaction.
 
 has subscription => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::SubscriptionDetail',
+    isa => Transaction_SubscriptionDetail,
     coerce => 1,
     alias => 'subscription_details',
 );
@@ -794,7 +799,7 @@ This is the balance for this transaction.
 
 has three_d_secure_info => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::ThreeDSecureInfo|Undef',
+    isa => ThreeDSecureInfo|Undef,
     coerce => 1,
 );
 
@@ -828,7 +833,7 @@ This is the balance for this transaction.
 
 has us_bank_account => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::UsBankAccountDetail',
+    isa => Transaction_UsBankAccountDetail,
     coerce => 1,
     alias => 'us_bank_account_details',
 );
@@ -841,7 +846,7 @@ This is the balance for this transaction.
 
 has venmo_account => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::VenmoAccountDetail',
+    isa => Transaction_VenmoAccountDetail,
     coerce => 1,
     alias => 'venmo_account_details',
 );
@@ -854,7 +859,7 @@ This is the balance for this transaction.
 
 has visa_checkout_card => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Transaction::VisaCheckoutCardDetail',
+    isa => Transaction_VisaCheckoutCardDetail,
     coerce => 1,
     alias => 'visa_checkout_card_details',
 );

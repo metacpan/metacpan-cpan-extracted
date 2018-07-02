@@ -1,6 +1,36 @@
 ==================================================
-Changes from 2013-06-20 00:00:00 +0000 to present.
+Changes from 2013-06-28 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 3.68 at 2018-06-27 00:55:44 +0000
+-----------------------------------------
+
+  Change: 56da5405ec89c9b7690bdf8325f7373af97cd2d7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-06-27 01:55:44 +0000
+
+    Updated for v5.29.0 
+
+-----------------------------------------
+version 3.66 at 2018-06-23 08:49:18 +0000
+-----------------------------------------
+
+  Change: 71317c12d5690ebf283bf2cd8a8950df1ea5b5a4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-06-23 09:49:18 +0000
+
+    Updated for v5.28.0 
+
+-----------------------------------------
+version 3.64 at 2018-06-19 20:54:52 +0000
+-----------------------------------------
+
+  Change: 7e9a12d611aa91158c9c110bacdd85b51ee52cb4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-06-19 21:54:52 +0000
+
+    Updated for v5.28.0-RC4 
 
 -----------------------------------------
 version 3.62 at 2018-06-19 07:06:23 +0000
@@ -1251,38 +1281,6 @@ version 1.26 at 2013-07-22 08:25:41 +0000
 
     Update for v5.19.2 
 
------------------------------------------
-version 1.24 at 2013-06-21 07:01:12 +0000
------------------------------------------
-
-  Change: 73f1b5bdee2bcf52a9e39f7ae61ca4d003881f22
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-06-21 08:01:12 +0000
-
-    Updated for v5.19.1 
-
-  Change: 76c5a70570ee99229c4553717e4368782dad77c7
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-27 03:05:10 +0000
-
-    Merge pull request #2 from salva/give-more
-
-    add sub 'perl_versions' that returns the list of versions supported
-    by the module 
-
-  Change: 311199c26fcf63d80b39bcacc462e87e0b593aed
-  Author: Salvador <sfandino@yahoo.com>
-  Date : 2013-05-27 11:06:12 +0000
-
-    add tests for perl_versions sub 
-
-  Change: fe9542930febd38718ecaf459c80da36507e9741
-  Author: Salvador <sfandino@yahoo.com>
-  Date : 2013-05-27 10:08:41 +0000
-
-    add perl_versions function returning list of perl versions known to
-    the module 
-
 =================================================
-Plus 60 releases after 2013-06-20 00:00:00 +0000.
+Plus 61 releases after 2013-06-28 00:00:00 +0000.
 =================================================

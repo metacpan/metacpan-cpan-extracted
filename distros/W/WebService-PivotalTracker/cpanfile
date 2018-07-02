@@ -2,6 +2,7 @@ requires "Cpanel::JSON::XS" => "0";
 requires "DateTime::Format::RFC3339" => "0";
 requires "Exporter" => "0";
 requires "HTTP::Request" => "0";
+requires "LWP::Protocol::https" => "0";
 requires "LWP::UserAgent" => "0";
 requires "Moo" => "0";
 requires "Moo::Role" => "0";

@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2010 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,61 +11,29 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
 package MongoDB::Code;
 
-
-# ABSTRACT: JavaScript Code
+# ABSTRACT: (DEPRECATED) JavaScript code type
 
 use version;
-our $VERSION = 'v1.8.2';
-
-#pod =head1 NAME
-#pod
-#pod MongoDB::Code - JavaScript code
-#pod
-#pod =cut
+our $VERSION = 'v2.0.0';
 
 use Moo;
-use Types::Standard qw(
-    HashRef
-    Str
-);
-use namespace::clean -except => 'meta';
+extends 'BSON::Code';
 
-#pod =head1 ATTRIBUTES
-#pod
-#pod =head2 code
-#pod
-#pod A string of JavaScript code.
-#pod
-#pod =cut
-
-has code => (
-    is       => 'ro',
-    isa      => Str,
-    required => 1,
+with $_ for qw(
+  MongoDB::Role::_DeprecationWarner
 );
 
-#pod =head2 scope
-#pod
-#pod An optional hash of variables to pass as the scope.
-#pod
-#pod =cut
-
-has scope => (
-    is       => 'ro',
-    isa      => HashRef,
-    required => 0,
-);
-
+sub BUILD {
+    my $self = shift;
+    $self->_warn_deprecated_class(__PACKAGE__, ["BSON::Code"], 0);
+};
 
 1;
-
-__END__
 
 =pod
 
@@ -74,25 +41,15 @@ __END__
 
 =head1 NAME
 
-MongoDB::Code - JavaScript Code
+MongoDB::Code - (DEPRECATED) JavaScript code type
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
-=head1 NAME
+=head1 DESCRIPTION
 
-MongoDB::Code - JavaScript code
-
-=head1 ATTRIBUTES
-
-=head2 code
-
-A string of JavaScript code.
-
-=head2 scope
-
-An optional hash of variables to pass as the scope.
+This class is now an empty subclass of L<BSON::Code>.
 
 =head1 AUTHORS
 
@@ -129,3 +86,8 @@ This is free software, licensed under:
   The Apache License, Version 2.0, January 2004
 
 =cut
+
+__END__
+
+
+# vim: set ts=4 sts=4 sw=4 et tw=75:

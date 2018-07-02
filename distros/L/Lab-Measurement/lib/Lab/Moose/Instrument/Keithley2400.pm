@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Keithley2400;
-$Lab::Moose::Instrument::Keithley2400::VERSION = '3.652';
+$Lab::Moose::Instrument::Keithley2400::VERSION = '3.653';
 #ABSTRACT: Keithley 2400 voltage/current sourcemeter.
 
 use 5.010;
@@ -270,7 +270,7 @@ Lab::Moose::Instrument::Keithley2400 - Keithley 2400 voltage/current sourcemeter
 
 =head1 VERSION
 
-version 3.652
+version 3.653
 
 =head1 SYNOPSIS
 
@@ -305,7 +305,7 @@ version 3.652
  ### Measurement 
 
  # Measure current
- $source->sense_function(value => 'current');
+ $source->sense_function(value => 'CURR');
  # Use measurement integration time of 2 NPLC
  $source->sense_nplc(value => 2);
 
@@ -350,7 +350,7 @@ new level is larger than C<max_units_per_step>.
 =head2 get_measurement
 
  my $sample = $source->get_measurement();
- my $current $sample->{CURR};
+ my $current = $sample->{CURR};
 
 Do new measurement and return sample hashref of measured elements.
 

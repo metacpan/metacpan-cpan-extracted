@@ -1,5 +1,13 @@
 Revision history for Perl extension Math::Polynomial::Solve.
 
+2.85
+     June 30 2018
+	- Enable the warning to set the coefficient order in one's code.
+	- Change ascending_order(1 or 0) to
+	  coefficients order => 'ascending' or 'descending'. It has
+	  clarity the function call lacks. (The function
+	  ascending_order() still exists, but is undocumented.)
+	- Some code cleanup in aisle poly_sturm_chain().
 2.81
      October 24 2017
 	- Internally all coefficients are handled in ascending order.
@@ -75,6 +83,7 @@ Revision history for Perl extension Math::Polynomial::Solve.
 	  sturm_bisection_root(), which now calls it.
 	- Fix (deprecated, but in use) fltcmp() to avoid an error that
 	  could result in fltcmp thinking equal values are less than.
+	- Perl version required moved up to 5.10.1.
 
 2.70
      Jan 27 2014

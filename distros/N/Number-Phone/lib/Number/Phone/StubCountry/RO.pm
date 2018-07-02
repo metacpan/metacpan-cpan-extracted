@@ -22,61 +22,51 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214157;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3',
+                  'leading_digits' => '[23]1',
                   'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+                },
+                {
+                  'pattern' => '(\\d{2})(\\d{4})',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2',
                   'leading_digits' => '[23]1'
                 },
                 {
-                  'format' => '$1 $2',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '[23]1',
-                  'pattern' => '(\\d{2})(\\d{4})'
-                },
-                {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
                   'leading_digits' => '
             [23][3-7]|
             [7-9]
-          '
+          ',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '(2\\d{2})(\\d{3})',
+                  'leading_digits' => '2[3-6]',
                   'format' => '$1 $2',
                   'national_rule' => '0$1',
-                  'leading_digits' => '2[3-6]'
+                  'pattern' => '(2\\d{2})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'fixed_line' => '
-          2(?:
+                'mobile' => '
+          7(?:
+            [02-7]\\d{2}|
             1(?:
-              \\d{7}|
-              9\\d{3}
+              [01]\\d|
+              20
             )|
-            [3-6](?:
-              \\d{7}|
-              \\d9\\d{2}
-            )
-          )|
-          3(?:
-            1\\d{4}(?:
-              \\d{3}
-            )?|
-            [3-6]\\d{7}
-          )
+            8[03-8]\\d|
+            99\\d
+          )\\d{5}
         ',
-                'toll_free' => '800\\d{6}',
-                'pager' => '',
-                'personal_number' => '',
+                'specialrate' => '(801\\d{6})|(90[036]\\d{6})|(37\\d{7})',
                 'geographic' => '
           2(?:
             1(?:
@@ -95,18 +85,28 @@ my $validators = {
             [3-6]\\d{7}
           )
         ',
-                'mobile' => '
-          7(?:
-            [02-7]\\d{2}|
+                'pager' => '',
+                'voip' => '',
+                'personal_number' => '',
+                'toll_free' => '800\\d{6}',
+                'fixed_line' => '
+          2(?:
             1(?:
-              [01]\\d|
-              20
+              \\d{7}|
+              9\\d{3}
             )|
-            8[03-8]\\d|
-            99\\d
-          )\\d{5}
-        ',
-                'specialrate' => '(801\\d{6})|(90[036]\\d{6})|(37\\d{7})'
+            [3-6](?:
+              \\d{7}|
+              \\d9\\d{2}
+            )
+          )|
+          3(?:
+            1\\d{4}(?:
+              \\d{3}
+            )?|
+            [3-6]\\d{7}
+          )
+        '
               };
 my %areanames = (
   4021 => "Bucharest\ and\ Ilfov\ County",

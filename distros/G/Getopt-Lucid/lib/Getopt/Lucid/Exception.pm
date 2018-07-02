@@ -1,10 +1,10 @@
-use 5.006;
+use 5.008001;
 use strict;
 use warnings;
 package Getopt::Lucid::Exception;
 # ABSTRACT: Exception classes for Getopt::Lucid
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use Exporter;
 our @ISA = qw/Exporter Exception::Class::Base/;
@@ -21,6 +21,7 @@ use Exception::Class 1.23 (
 
     "Getopt::Lucid::Exception::ARGV" => {
         description => "Invalid argument on command line",
+        fields => ['usage'],
     },
 
     "Getopt::Lucid::Exception::Usage" => {
@@ -37,7 +38,7 @@ my %throwers = (
 
 for my $t ( keys %throwers ) {
     no strict 'refs';
-    *{$t} = sub { $throwers{$t}->throw("$_[0]\n") };
+    *{$t} = sub { $throwers{$t}->throw(message => "$_[0]\n", @_[1..$#_]) };
 }
 
 1;
@@ -54,7 +55,7 @@ Getopt::Lucid::Exception - Exception classes for Getopt::Lucid
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =for Pod::Coverage description
 throw_argv
@@ -67,7 +68,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by David Golden.
+This software is Copyright (c) 2018 by David Golden.
 
 This is free software, licensed under:
 

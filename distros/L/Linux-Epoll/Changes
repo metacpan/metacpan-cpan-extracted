@@ -1,5 +1,9 @@
 Revision history for Linux-Epoll
 
+0.014     2018-06-30 11:07:06+02:00 Europe/Amsterdam
+          - Swallow exceptions in wait
+          - Add wakeup and exclusive flags
+
 0.013     2018-03-28 20:04:22+02:00 Europe/Amsterdam
           - Correctly handle non-reference file handles
           - Allow tied handles to be added to the epoll

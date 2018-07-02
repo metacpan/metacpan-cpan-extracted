@@ -1,0 +1,124 @@
+#!/bin/sh
+
+: <<=cut
+=pod
+
+=head1 NAME
+
+mark - a tool for marking and acting on file paths
+
+=head1 SYNOPSIS
+
+    mark add <path>     # Add a file path to the mark list
+    mark remove <path>  # Remove a file path from the mark list
+    mark clear          # Remove all marks from list
+    mark ls             # List current marks
+    mark ls-print0      # List current marks, separated by NUL chars
+    mark cp             # Copy marked files to current directory
+    mark mv             # Move files to current directory and unmark
+    mark each <command> # Execute command with each marked file as parameter
+    mark -h             # Print help message
+
+=head1 DESCRIPTION
+
+mark stores a list of marked file paths in an SQLite database called marks.db
+in the user's home directory.  Once marked, files can be copied, moved, listed,
+or passed as parameters to arbitrary shell commands.
+
+Commands are intended to be invoked as subcommands of mark(1), in the style of
+git(1).
+
+=head1 COMMANDS
+
+=head2 mark-add
+
+Add one or more paths to the mark list.  Relative paths will be stored by their
+absolute location.  Repeated commands are idempotent - a path can only appear
+once in the mark list.
+
+=head2 mark-remove
+
+Remove one or more paths from the mark list.  Relative paths will be resolved
+to their absolute location before the list is searched.
+
+=head2 mark-clear
+
+Clear the entire mark list.
+
+=head2 mark-ls
+
+List all currently marked paths, one line per path.
+
+=head2 mark-ls-print0
+
+List all currently marked paths, separated by null characters, for use when
+piping to C<xargs -0> or other commands which expect null-terminated file
+lists.  Analogous to C<find -print0>.  This is useful where filenames contain
+whitespace, quotes, etc.
+
+=head2 mark-cp
+
+Copy all marked paths to the current working directory.
+
+=head2 mark-mv
+
+Move all marked paths to the current working directory, and remove them from
+the mark list.
+
+=head2 mark-each
+
+Execute the provided command once per marked path, with the path as a
+parameter, and print any output from the command.
+
+This is crudely analogous to C<xargs>.  While good enough for simple commands,
+it's likely to break in more complex cases, and may be slow for large mark
+lists.  Consider using mark-ls-print0(1) and xargs(1) instead.
+
+=head1 SEE ALSO
+
+App::MarkFiles
+
+=head1 LICENSE
+
+    mark is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+=head1 AUTHOR
+
+Brennen Bearnes
+
+=cut
+
+print_help() {
+  echo "$0 - mark and operate on files"
+  echo
+  echo "Usage: mark [command] [args]"
+  echo "    mark add [path]     - Add a file path to the mark list"
+  echo "    mark clear          - Clear mark list"
+  echo "    mark cp             - Copy marked files to current directory"
+  echo "    mark each [command] - Execute command for each marked file"
+  echo "    mark ls             - List current marks"
+  echo "    mark ls-nullsep     - List current marks, separated by NUL chars"
+  echo "    mark mv             - Move files to current directory and unmark"
+  echo "    mark -h             - Print this help message"
+  echo
+  echo "You must specify a command."
+  exit 1
+}
+
+if [ $# -lt 1 ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+  print_help
+fi
+
+subprog="mark-$1"
+
+# Make sure that the command we've been given exists:
+command -v "$subprog" >/dev/null 2>&1 || {
+  echo "mark: '$1' is not a mark command.  See 'mark -h'."
+  exit 1
+}
+
+shift
+exec "$subprog" "$@"

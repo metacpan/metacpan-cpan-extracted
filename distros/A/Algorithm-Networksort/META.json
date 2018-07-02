@@ -4,7 +4,7 @@
       "John M. Gamble <jgamble@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
       "sort",
       "sorting-network",
@@ -47,11 +47,11 @@
    "provides" : {
       "Algorithm::Networksort" : {
          "file" : "lib/Algorithm/Networksort.pm",
-         "version" : "2.01"
+         "version" : "2.02"
       },
       "Algorithm::Networksort::Best" : {
          "file" : "lib/Algorithm/Networksort/Best.pm",
-         "version" : "2.01"
+         "version" : "2.02"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "url" : "git://github.com/jgamble/Algorithm-Networksort.git"
       }
    },
-   "version" : "2.01",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

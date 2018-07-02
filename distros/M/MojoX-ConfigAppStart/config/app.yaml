@@ -1,0 +1,3 @@
+---
+default:
+    mojo_app_lib: Application::Control

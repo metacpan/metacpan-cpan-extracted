@@ -1,3 +1,9 @@
+0.009 2018-06-30 20:00:00+0000
+  -Fix goto labels can have colons
+0.008 2018-06-27 20:00:00+0000
+  -Fix labels can't have colons
+0.007 2018-06-26 20:00:00+0000
+  -Fix labels can't have spaces
 0.006 2018-06-02 15:00:00+0000
   -Switch from Moose to Moo
   -Add Changes file

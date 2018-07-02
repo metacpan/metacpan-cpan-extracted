@@ -1,0 +1,14 @@
+Revision history for OpenOffice::OODoc::HeadingStyles
+
+0.03  2018-06-28 19:35Z VANHOESEL
+
+      - update cpanfile, removing sneaked in 'List::Utils' ... grrr
+      
+0.02  2018-06-28 17:35Z VANHOESEL
+
+      - initial release
+
+0.01  2018-06-28 16:48Z VANHOESEL
+
+      - initial release
+

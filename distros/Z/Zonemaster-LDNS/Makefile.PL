@@ -9,37 +9,19 @@ BEGIN {
     }
 }
 
-my $headdir;
-my $libdir;
-my $prefix;
-my $randomize;
-
-GetOptions(
-    'headers=s'  => \$headdir,
-    'libs=s'     => \$libdir,
-    'prefix=s'   => \$prefix,
-    'randomize!' => \$randomize,
-);
-
-if ( $prefix ) {
-    $headdir = catdir( $prefix, 'include' );
-    $libdir  = catdir( $prefix, 'lib' );
-}
-
-cc_include_paths( $headdir ) if $headdir;
-cc_libs( '-L' . $libdir ) if $libdir;
-
-cc_include_paths( 'include' );
-
 name 'Zonemaster-LDNS';
-version_from 'lib/Zonemaster/LDNS.pm';
-perl_version_from 'lib/Zonemaster/LDNS.pm';
-license 'bsd';
-author 'Calle Dybedahl <calle@init.se>';
-author 'Mattias P <mattias.paivarinta@iis.se>';
-abstract 'Perl wrapper for the ldns DNS library.';
+all_from 'lib/Zonemaster/LDNS.pm';
 repository 'https://github.com/dotse/zonemaster-ldns';
 bugtracker 'https://github.com/dotse/zonemaster-ldns/issues';
+
+my $opt_randomize     = 0;
+my $opt_idn           = 1;
+my $opt_internal_ldns = 1;
+GetOptions(
+    'randomize!'     => \$opt_randomize,
+    'idn!'           => \$opt_idn,
+    'internal-ldns!' => \$opt_internal_ldns,
+);
 
 configure_requires 'Devel::CheckLib';
 requires 'MIME::Base64';
@@ -48,56 +30,72 @@ test_requires 'Test::Fatal';
 
 use_ppport 3.19;
 cc_libs 'crypto';
+cc_include_paths 'include';
 cc_src_paths 'src';
+
+if ( $opt_internal_ldns ) {
+    cc_libs '-Lldns/lib';
+    cc_include_paths 'ldns';
+    print "Feature internal ldns enabled\n";
+}
+else {
+    cc_libs 'ldns';
+    print "Feature internal ldns disabled\n";
+}
 
 my %assert_args = (
     lib      => 'crypto',
     header   => 'openssl/crypto.h',
     function => 'if(SSLeay()) return 0; else return 1;'
 );
-$assert_args{LIBS} = '-L' . $libdir  if $libdir;
-$assert_args{INC}  = '-I' . $headdir if $headdir;
 
 cc_assert_lib %assert_args;
 
-if (not check_ecdsa(%assert_args)) {
-    print "Your OpenSSL does not seem to support ECDSA.\n";
-    exit;
-}
-else {
-    print "ECDSA support detected.\n";
-}
-
-if (not check_gost(%assert_args)) {
-    print "Your OpenSSL does not seem to support GOST.\n";
-}
-else {
-    print "GOST support detected.\n";
-    cc_define '-DUSE_GOST';
-}
-
-if (
-    check_lib(
-        lib      => 'idn',
-        header   => 'idna.h',
-        function => 'if(strcmp(IDNA_ACE_PREFIX,"xn--")==0) return 0; else return 1;'
-    )
-  )
-{
+if ( $opt_idn ) {
+    check_lib_or_exit(
+        lib    => 'idn',
+        header => 'idna.h',
+        function =>
+          'if(strcmp(IDNA_ACE_PREFIX,"xn--")==0) return 0; else return 1;'
+    );
     cc_libs 'idn';
     cc_define '-DWE_CAN_HAZ_IDN';
-    print "IDNA support detected.\n";
+    print "Feature idn enabled\n";
+}
+else {
+    print "Feature idn disabled\n";
 }
 
-if ( $randomize ) {
+if ( $opt_randomize ) {
     cc_define '-DRANDOMIZE';
-    print( ( "=" x 65 ) . "\n" );
-    print "Compiling with randomzied capitalization.\n";
-    print( ( "=" x 65 ) . "\n" );
+    print "Feature randomized capitalization enabled\n";
+}
+else {
+    print "Feature randomized capitalization disabled\n";
 }
 
 sub MY::postamble {
-    return <<'TARGET';
+
+    my $internal_ldns_make = <<'END_INTERNAL_LDNS';
+
+LDFROM += ldns/.libs/libldns.a
+
+config :: ldns/.libs/libldns.a
+
+ldns/.libs/libldns.a: ldns/configure
+	cd ldns ;\
+	./configure CFLAGS=-fPIC --disable-ldns-config --disable-dane ;\
+	make lib
+
+ldns/configure:
+	git submodule update --init
+	cd ldns ; libtoolize -ci
+	cd ldns ; autoreconf -fi
+
+END_INTERNAL_LDNS
+
+    my $contributors_make = <<'END_CONTRIBUTORS';
+
 CONTRIBUTORS.txt:
 	@( \
 	echo "This module is based on the ldns library from NLnet Labs <https://www.nlnetlabs.nl/projects/ldns/>" ; \
@@ -105,54 +103,27 @@ CONTRIBUTORS.txt:
 	echo "Contributors to this module:" ; \
 	git shortlog -sne | cut -b8- \
 	) >| CONTRIBUTORS.txt
-TARGET
+
+END_CONTRIBUTORS
+
+    my $postamble = '';
+
+    $postamble .= $contributors_make;
+    $postamble .= $internal_ldns_make if $opt_internal_ldns;
+
+    return $postamble;
+}
+
+sub MY::test_via_harness {
+    local $_ = shift()->MM::test_via_harness(@_);
+    s/\bPERL_DL_NONLAZY=1 +//g;
+    return $_;
+}
+
+sub MY::test_via_script {
+    local $_ = shift()->MM::test_via_script(@_);
+    s/\bPERL_DL_NON_LAZY=1 +//g;
+    return $_;
 }
 
 WriteAll;
-
-sub check_ecdsa {
-    my %args = @_;
-
-    $args{header} = [ 'openssl/crypto.h', 'openssl/ecdsa.h' ];
-    $args{function} = q[if(ECDSA_SIG_new()) return 0; else return 1;];
-
-    return check_lib(%args);
-}
-
-sub check_gost {
-    my %args = @_;
-
-    $args{header} = [ 'openssl/crypto.h', 'openssl/ecdsa.h', 'openssl/engine.h' ];
-    $args{function} = <<'CODE';
-    const EVP_PKEY_ASN1_METHOD* meth;
-    ENGINE* e;
-
-    meth = EVP_PKEY_asn1_find_str(NULL, "gost2001", -1);
-    if(meth) {
-       return 0;
-    }
-
-    e = ENGINE_by_id("gost");
-    if(!e) {
-       ENGINE_load_builtin_engines();
-       ENGINE_load_dynamic();
-       e = ENGINE_by_id("gost");
-    }
-    if(!e) {
-       return 1;
-    }
-    if(!ENGINE_set_default(e, ENGINE_METHOD_ALL)) {
-       return 1;
-    }
-
-    meth = EVP_PKEY_asn1_find_str(&e, "gost2001", -1);
-    if(!meth) {
-       return 1;
-    }
-
-    return 0;
-
-CODE
-
-    return check_lib(%args);
-}

@@ -22,28 +22,27 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '[24-9]'
+                  'leading_digits' => '[24-9]',
+                  'format' => '$1 $2 $3 $4'
                 },
                 {
                   'pattern' => '(\\d{4})',
+                  'format' => '$1',
                   'leading_digits' => '
             67|
             74
           ',
-                  'intl_format' => 'NA',
-                  'format' => '$1'
+                  'intl_format' => 'NA'
                 }
               ];
 
 my $validators = {
                 'pager' => '',
-                'personal_number' => '',
                 'geographic' => '
           (?:
             2(?:
@@ -62,18 +61,7 @@ my $validators = {
             )\\d
           )\\d{4}
         ',
-                'mobile' => '
-          (?:
-            2(?:
-              079|
-              17\\d
-            )|
-            50[0-4]\\d|
-            [679]\\d{3}|
-            8[239]\\d{2}
-          )\\d{4}
-        ',
-                'specialrate' => '',
+                'personal_number' => '',
                 'voip' => '',
                 'fixed_line' => '
           (?:
@@ -93,7 +81,19 @@ my $validators = {
             )\\d
           )\\d{4}
         ',
-                'toll_free' => '80\\d{6}'
+                'toll_free' => '80\\d{6}',
+                'mobile' => '
+          (?:
+            2(?:
+              079|
+              17\\d
+            )|
+            50\\d{2}|
+            [679]\\d{3}|
+            8[239]\\d{2}
+          )\\d{4}
+        ',
+                'specialrate' => ''
               };
 my %areanames = (
   223202 => "Bamako",

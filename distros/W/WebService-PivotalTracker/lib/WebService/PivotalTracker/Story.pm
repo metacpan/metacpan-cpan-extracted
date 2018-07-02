@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Params::ValidationCompiler qw( validation_for );
 use WebService::PivotalTracker::Comment;
@@ -37,11 +37,11 @@ my %props = (
     requested_by_id => PositiveInt,
     owner_ids       => ArrayRef [PositiveInt],
     task_ids        => {
-        type => ArrayRef [PositiveInt],
+        type    => ArrayRef [PositiveInt],
         default => sub { [] },
     },
     follower_ids => {
-        type => ArrayRef [PositiveInt],
+        type    => ArrayRef [PositiveInt],
         default => sub { [] },
     },
     created_at => {
@@ -271,7 +271,7 @@ WebService::PivotalTracker::Story - A single story
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

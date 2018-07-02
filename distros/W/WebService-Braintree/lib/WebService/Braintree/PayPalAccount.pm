@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::PayPalAccount;
-$WebService::Braintree::PayPalAccount::VERSION = '1.5';
+$WebService::Braintree::PayPalAccount::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -15,7 +15,7 @@ This class finds, creates, updates, and deletes PayPal accounts.
 
 =cut
 
-use Moose;
+use Moo;
 
 with 'WebService::Braintree::Role::Interface';
 

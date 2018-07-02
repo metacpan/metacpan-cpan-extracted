@@ -1,6 +1,6 @@
 package App::Egaz;
 
-our $VERSION = "0.2.0";
+our $VERSION = "0.2.1";
 
 use strict;
 use warnings;
@@ -28,10 +28,11 @@ App::Egaz - Backend of B<E>asy B<G>enome B<A>ligner
         blastmatch: matched positions by blastn in genome sequences
             blastn: blastn wrapper between two fasta files
         exactmatch: exact matched positions in genome sequences
+           fas2vcf: list variations in blocked fasta file
            formats: formats of files use in this project
              lastz: lastz wrapper for two genomes or self alignments
-           lav2axt: convert .lav files to .axt files
-           lav2psl: convert .lav files to .psl files
+           lav2axt: convert .lav files to .axt
+           lav2psl: convert .lav files to .psl
             lpcnam: the pipeline of pairwise lav-psl-chain-net-axt-maf
             masked: masked (or gaps) regions in fasta files
          maskfasta: soft/hard-masking sequences in a fasta file

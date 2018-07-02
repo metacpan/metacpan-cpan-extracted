@@ -12,6 +12,7 @@ isa_ok( $wowp, 'WG::API::WoWp' );
 
 can_ok( $wowp, qw/account_list account_info account_planes/ );
 can_ok( $wowp, qw/ratings_types ratings_accounts ratings_neighbors ratings_top ratings_dates/ );
+can_ok( $wowp, qw/planes_stats planes_achievements/ );
 
 SKIP: {
     skip 'developers only', 21 unless $ENV{'WGMODE'} && $ENV{'WGMODE'} eq 'dev';
@@ -50,6 +51,16 @@ SKIP: {
         is( $wowp->ratings_dates, undef, 'get rating dates without rating type' );
         is( $wowp->ratings_dates( type => 'xxx' ), undef, 'get rating dates with invalid rating type' );
         ok( $wowp->ratings_dates( type => '1' ), 'get rating dates with valid rating type' );
+    };
+
+    subtest 'aircraft' => sub {
+        my $account = $wowp->account_list( search => 'test' )->[0];
+
+        ok( $wowp->planes_stats( account_id => $account->{account_id} ), "get planes stats for valid account" );
+        ok( !$wowp->planes_stats( account_id => undef ), "get empty planes stats for invalid account" );
+
+        ok( $wowp->planes_achievements( account_id => $account->{account_id} ), "get planes achievements for valid account" );
+        ok( !$wowp->planes_achievements( account_id => undef ), "get empty planes achievements for invalid account" );
     };
 }
 

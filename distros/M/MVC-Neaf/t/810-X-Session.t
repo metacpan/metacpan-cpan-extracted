@@ -28,12 +28,16 @@ use MVC::Neaf::Request;
 
 my $req = MVC::Neaf::Request->new( neaf_cookie_in => {cook => 137} );
 
-$req->_set_session_handler([
-    My::Session->new,
-    'cook',
-    '.+',
-    '100',
-]);
+# White box testing sucks
+my $engine = My::Session->new;
+$req->route->helpers->{_session_setup} = sub {
+    {
+        engine => $engine,
+        cookie => 'cook',
+        regex  => '.+',
+        ttl    => '10000',
+    };
+};
 
 is_deeply ($req->session, {}, "Empty session ok");
 $req->session->{foo} = 42;

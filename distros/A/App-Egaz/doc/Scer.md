@@ -180,7 +180,7 @@ cd ~/data/alignment/egaz
 egaz template \
     S288c RM11_1a YJM789 Spar Spas Seub \
     --multi -o multi6/ \
-    --rawphylo --parallel 8 -v
+    --rawphylo --order --parallel 8 -v
 
 bash multi6/1_pair.sh
 bash multi6/2_rawphylo.sh

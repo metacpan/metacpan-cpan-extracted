@@ -6,13 +6,12 @@ AI::ConfusionMatrix - make a confusion matrix
 
     my %matrix;
 
-    Loop over your tests
-
-    ---
+    # Loop over your predictions
+    # [...]
 
     $matrix{$expected}{$predicted} += 1;
 
-    ---
+    # [...]
 
     makeConfusionMatrix(\%matrix, 'output.csv');
 
@@ -20,7 +19,7 @@ AI::ConfusionMatrix - make a confusion matrix
 
 This module prints a [confusion matrix](https://en.wikipedia.org/wiki/Confusion_matrix) from a hash reference. This module tries to be generic enough to be used within a lot of machine learning projects.
 
-### Function
+### Functions:
 
 #### `makeConfusionMatrix($hash_ref, $file [, $delimiter ])`
 
@@ -35,19 +34,16 @@ Examples:
 The hash reference must look like this :
 
     $VAR1 = {
-
-
               'value_expected1' => {
-                          'value_predicted1' => value
+                          'value_predicted1' => number_of_predictions
                         },
               'value_expected2' => {
-                          'value_predicted1' => value,
-                          'value_predicted2' => value
+                          'value_predicted1' => number_of_predictions,
+                          'value_predicted2' => number_of_predictions
                         },
               'value_expected3' => {
-                          'value_predicted3' => value
+                          'value_predicted3' => number_of_predictions
                         }
-
             };
 
 The output will be in CSV. Here is an example:
@@ -90,6 +86,14 @@ Prettified:
 - ACC:
 
     Accuracy
+
+#### `getConfusionMatrix($hash_ref)`
+
+Get the data used to compute the table above.
+
+Example:
+
+    my %cm = getConfusionMatrix(\%matrix);
 
 # AUTHOR
 

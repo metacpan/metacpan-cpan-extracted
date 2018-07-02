@@ -8,7 +8,7 @@ use Devel::hdb::TraceFollow;
 use IO::Socket::INET;
 use IO::File;
 
-our $VERSION = 0.23;
+our $VERSION = '0.24';
 
 sub import {
     my $class = shift;
@@ -198,7 +198,45 @@ command-line debugger commands
 
 =item L - Open the breakpoint manager
 
-=item b - Toggle a breakpoint on the current line
+=item b - Open the Quick Breakpoint entry dialog
+
+=item B - Toggle a breakpoint on the current line
+
+=back
+
+The Quick Breakpoint dialog accepts several different types of expressions
+to set unconditional breakpoints:
+
+=over 4
+
+=item <integer>
+
+Sets a breakpoint on a particular line in the file the debugger is currently
+stopped in.
+
+=item subName
+
+Sets a breakpoint for the first line in the named subroutine within the current package.
+
+=item subName:<integer>
+
+Sets a breakpoint for the nth line in the named subroutine within the current package.
+
+=item Some::Package::subName
+
+Sets a breakpoint for the first line in the named subroutine.
+
+=item Some::Package::subName:<integer>
+
+Sets a breakpoint for the nth line in the named subroutine.
+
+=item some/file.pm:<integer>
+
+Sets a breakpoint for a particular line in the named file.
+
+=item .
+
+Toggle a breakpoint on the current line
 
 =back
 
@@ -267,6 +305,6 @@ Anthony Brummett <brummett@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2014, Anthony Brummett.  This module is free software. It may
+Copyright 2018, Anthony Brummett.  This module is free software. It may
 be used, redistributed and/or modified under the same terms as Perl itself.
 

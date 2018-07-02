@@ -4,8 +4,9 @@ package exact;
 use 5.010;
 use strict;
 use warnings;
+use namespace::autoclean;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 use feature    ();
 use mro        ();
@@ -27,7 +28,9 @@ my %experiments = (
     26 => ['declared_refs'],
 );
 
-my @function_list  = qw( nostrict nowarnings noc3 nobundle noexperiments noskipexperimentalwarnings );
+my @function_list = qw(
+    nostrict nowarnings noc3 nobundle noexperiments noskipexperimentalwarnings noautoclean
+);
 my @feature_list   = map { @$_ } values %features, values %experiments;
 my ($perl_version) = $^V =~ /^v5\.(\d+)/;
 
@@ -52,10 +55,11 @@ sub import {
         }
     }
 
-    mro::set_mro( scalar caller(), 'c3' ) unless ( grep { $_ eq 'noc3' } @functions );
-
     strict->import unless ( grep { $_ eq 'nostrict' } @functions );
     warnings->import unless ( grep { $_ eq 'nowarnings' } @functions );
+    mro::set_mro( scalar caller(), 'c3' ) unless ( grep { $_ eq 'noc3' } @functions );
+    namespace::autoclean->import( '-cleanee' => scalar caller() )
+        unless ( grep { $_ eq 'noautoclean' } @functions ) ;
 
     if (@bundles) {
         my ($bundle) = sort { $b <=> $a } @bundles;
@@ -93,7 +97,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.03
+version 1.05
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact.svg)](https://travis-ci.org/gryphonshafer/exact)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact/badge.png)](https://coveralls.io/r/gryphonshafer/exact)
@@ -109,6 +113,7 @@ Instead of this:
     use mro 'c3';
     use IO::File;
     use IO::Handle;
+    use namespace::autoclean;
 
     no warnings "experimental::signatures";
     no warnings "experimental::refaliasing";
@@ -121,7 +126,7 @@ Type this:
 Or for finer control, add some trailing modifiers like a line of the following:
 
     use exact '5.20';
-    use exact qw( 5.16 nowarnings noc3 noexperiments );
+    use exact qw( 5.16 nostrict nowarnings noc3 noexperiments noautoclean );
     use exact qw( noexperiments fc signatures );
 
 =head1 DESCRIPTION
@@ -136,11 +141,7 @@ By default, L<exact> will:
 
 =item *
 
-enable L<strict>
-
-=item *
-
-enable L<warnings>
+enable L<strictures> (version 2)
 
 =item *
 
@@ -190,6 +191,10 @@ This skips enabling all features currently labled experimental by L<feature>.
 
 Normally, L<exact> will disable experimental warnings. This skips that
 disabling step.
+
+=head2 C<noautoclean>
+
+This skips using L<namespace::autoclean>.
 
 =head2 Explicit Features and Bundles by Name
 

@@ -1,15 +1,19 @@
+.travis.yml
 Changes
-Clui.pm
-Clui/FileSelect.pm
-Makefile.PL
-test.pl
-MANIFEST
-README
-META.yml
-examples/login_shell
-examples/test_script
-examples/linux_admin
 examples/audio_stuff
 examples/choose
+examples/linux_admin
+examples/login_shell
+examples/test_script
+lib/Term/Clui.pm
+lib/Term/Clui/FileSelect.pm
+LICENSE
+maint/releaseprep
+Makefile.PL
+MANIFEST			This list of files
 py/TermClui.py
 py/test_script
+README
+t/term_clui.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -30,7 +30,7 @@ my $build = $class->new(
 
 	dist_abstract => 'Create Sorting Networks',
 	dist_author => ['John M. Gamble <jgamble@cpan.org>'],
-	dist_version => '2.01',
+	dist_version => '2.02',
 
 	provides => {
 		'Algorithm::Networksort' => {

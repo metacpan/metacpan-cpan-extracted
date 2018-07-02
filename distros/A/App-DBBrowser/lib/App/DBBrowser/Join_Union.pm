@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.014';
+our $VERSION = '2.015';
 
 use List::MoreUtils qw( any );
 
@@ -102,7 +102,8 @@ sub union_tables {
             # Choose
             my @col = choose(
                 [ @pre_col, @{$u->{col_names}{$union_table}} ],
-                { %{$sf->{i}{lyt_stmt_h}}, prompt => 'Choose Column:', no_spacebar => [ 0 .. $#pre_col ] }
+                { %{$sf->{i}{lyt_stmt_h}}, prompt => 'Choose Column:',
+                  meta_items => [ 0 .. $#pre_col ], include_highlighted => 2 }
             );
             if ( ! defined $col[0] ) {
                 if ( defined $union->{used_cols}{$union_table} ) {

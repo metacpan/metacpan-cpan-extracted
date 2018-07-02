@@ -18,7 +18,7 @@ name: Bio-Grid-Run-SGE
 requires:
   AnyEvent: '0'
   AnyEvent::XMPP: '0'
-  Bio::Gonzales: '0'
+  Bio::Gonzales: '0.068'
   Capture::Tiny: '0'
   Clone: '0'
   Config::Auto: '0'
@@ -51,5 +51,5 @@ requires:
   XML::LibXML: '0'
   parent: '0'
   perl: '5.010'
-version: '0.060'
+version: '0.064'
 x_serialization_backend: 'YAML::Tiny version 1.70'

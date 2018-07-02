@@ -27,7 +27,7 @@ requires:
   Alien::Build: '0.25'
 resources:
   repository: http://github.com/joenio/alien-doxyparse
-version: '0.08'
+version: '0.09'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 1.39'
   requires:

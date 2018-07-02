@@ -9,18 +9,16 @@ with qw[Pcore::Core::Event::Listener::Pipe];
 
 has tmpl => ( is => 'ro', isa => Str, default => '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>][<: $channel :>][<: $level :>] <: $title | raw :><: $text | raw :>' );
 
-has username => ( is => 'ro', isa => Str,         required => 1 );
-has password => ( is => 'ro', isa => Str,         required => 1 );
-has host     => ( is => 'ro', isa => Str,         required => 1 );
-has port     => ( is => 'ro', isa => PositiveInt, default  => 5222 );
+has username => ();      # is => 'ro', isa => Str, required => 1
+has password => ();      # isa => Str,         required => 1
+has host     => ();      # isa => Str,         required => 1
+has port     => 5222;    # isa => PositiveInt
+has to       => ();      # isa => Str,         required => 1
 
-has to => ( is => 'ro', isa => Str, required => 1 );
-
-has _tmpl => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Template'], init_arg => undef );
-has _h    => ( is => 'ro', isa => InstanceOf ['Pcore::Handle::xmpp'],   init_arg => undef );
-has _queue => ( is => 'ro', isa => ArrayRef, init_arg => undef );
-
-has _init => ( is => 'ro', isa => Bool, init_arg => undef );
+has _tmpl  => ();        # InstanceOf ['Pcore::Util::Tmpl'], init_arg => undef
+has _h     => ();        # InstanceOf ['Pcore::Handle::xmpp'],   init_arg => undef
+has _queue => ();        # isa => ArrayRef, init_arg => undef
+has _init  => ();        #  isa => Bool, init_arg => undef
 
 const our $INDENT => q[ ] x 4;
 
@@ -104,11 +102,11 @@ sub _on_connect ( $self, $xmpp, $acc ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 63                   | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 61                   | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 60, 63               | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
+## |    2 | 58, 61               | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 74                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    2 | 72                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 10                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

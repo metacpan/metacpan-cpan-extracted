@@ -22,10 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221544;
+our $VERSION = 1.20180619214154;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2-$3-$4',
                   'national_rule' => '8 0$1',
                   'leading_digits' => '
             17(?:
@@ -36,12 +37,10 @@ my $formatters = [
             2[4-9]|
             [34]
           ',
-                  'format' => '$1 $2-$3-$4',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
-                  'format' => '$1 $2-$3-$4',
                   'leading_digits' => '
             1(?:
               5[24]|
@@ -61,9 +60,11 @@ my $formatters = [
               3[26]
             )
           ',
-                  'national_rule' => '8 0$1'
+                  'national_rule' => '8 0$1',
+                  'format' => '$1 $2-$3-$4'
                 },
                 {
+                  'pattern' => '(\\d{4})(\\d{2})(\\d{3})',
                   'leading_digits' => '
             1(?:
               5[169]|
@@ -84,48 +85,39 @@ my $formatters = [
               3[3-5]
             )
           ',
-                  'national_rule' => '8 0$1',
                   'format' => '$1 $2-$3',
-                  'pattern' => '(\\d{4})(\\d{2})(\\d{3})'
+                  'national_rule' => '8 0$1'
                 },
                 {
                   'pattern' => '([89]\\d{2})(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             8[01]|
             9
           ',
-                  'national_rule' => '8 $1'
+                  'national_rule' => '8 $1',
+                  'format' => '$1 $2 $3'
                 },
                 {
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '82',
+                  'pattern' => '(82\\d)(\\d{4})(\\d{4})',
                   'national_rule' => '8 $1',
-                  'pattern' => '(82\\d)(\\d{4})(\\d{4})'
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '82'
                 },
                 {
                   'leading_digits' => '800',
-                  'national_rule' => '8 $1',
                   'format' => '$1 $2',
+                  'national_rule' => '8 $1',
                   'pattern' => '(800)(\\d{3})'
                 },
                 {
-                  'pattern' => '(800)(\\d{2})(\\d{2,4})',
-                  'leading_digits' => '800',
                   'national_rule' => '8 $1',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '800',
+                  'pattern' => '(800)(\\d{2})(\\d{2,4})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'pager' => '',
-                'specialrate' => '(
-          (?:
-            810|
-            902
-          )\\d{7}
-        )',
                 'mobile' => '
           (?:
             2(?:
@@ -136,6 +128,12 @@ my $validators = {
             44\\d
           )\\d{6}
         ',
+                'specialrate' => '(
+          (?:
+            810|
+            902
+          )\\d{7}
+        )',
                 'geographic' => '
           (?:
             1(?:
@@ -170,7 +168,7 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'voip' => '249\\d{6}',
+                'pager' => '',
                 'toll_free' => '
           8(?:
             0[13]|
@@ -211,7 +209,9 @@ my $validators = {
               )
             )
           )\\d{5}
-        '
+        ',
+                'voip' => '249\\d{6}',
+                'personal_number' => ''
               };
 my %areanames = (
   3751511 => "Vyalikaya\ Byerastavitsa\,\ Grodno\ Region",

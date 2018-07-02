@@ -15,11 +15,11 @@ use URI::QueryParam;
 
 =head1 VERSION
 
-Version v0.8.8
+Version v0.9
 
 =cut
 
-our $VERSION = 'v0.8.8';
+our $VERSION = 'v0.9';
 
 =head1 SYNOPSIS
 
@@ -197,7 +197,8 @@ sub _request {
 sub _validate_params {
     my ( undef, $required_params, %passed_params ) = @_;
 
-    return if $required_params && !keys %passed_params;    #without params when they are needed
+    $required_params //= [];
+    return if @$required_params > keys %passed_params;
 
     for (@$required_params) {
         return unless defined $passed_params{$_};
@@ -336,7 +337,7 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: GitHub's request tracker (report bugs here)
+=item * RT: Gitlab's request tracker (report bugs here)
 
 L<https://gitlab.com/cynovg/WG-API/issues>
 

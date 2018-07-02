@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::ErrorCodes::Transaction::Options;
-$WebService::Braintree::ErrorCodes::Transaction::Options::VERSION = '1.5';
+$WebService::Braintree::ErrorCodes::Transaction::Options::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 

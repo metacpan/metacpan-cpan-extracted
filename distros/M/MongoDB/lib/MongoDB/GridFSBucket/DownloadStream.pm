@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,7 +19,7 @@ package MongoDB::GridFSBucket::DownloadStream;
 # ABSTRACT: File handle abstraction for downloading
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 use Types::Standard qw(
@@ -44,16 +43,16 @@ use namespace::clean -except => 'meta';
 #pod Valid file documents typically include the following fields:
 #pod
 #pod =for :list
-#pod * _id – a unique ID for this document, typically a L<MongoDB::OID> object.
+#pod * _id – a unique ID for this document, typically a L<BSON::OID> object.
 #pod   Legacy GridFS files may store this value as a different type.
 #pod * length – the length of this stored file, in bytes
 #pod * chunkSize – the size, in bytes, of each full data chunk of this file.
 #pod * uploadDate – the date and time this file was added to GridFS, stored as a
 #pod   BSON datetime value and inflated per the bucket's
 #pod   L<bson_codec|MongoDB::GridFSBucket/bson_codec> attribute.
-#pod * md5 – a hash of the contents of the stored file
 #pod * filename – the name of this stored file; this does not need to be unique
 #pod * metadata – any additional application-specific data
+#pod * md5 – DEPRECATED
 #pod * contentType – DEPRECATED
 #pod * aliases – DEPRECATED
 #pod
@@ -438,7 +437,7 @@ MongoDB::GridFSBucket::DownloadStream - File handle abstraction for downloading
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -472,7 +471,7 @@ Valid file documents typically include the following fields:
 
 =item *
 
-_id – a unique ID for this document, typically a L<MongoDB::OID> object. Legacy GridFS files may store this value as a different type.
+_id – a unique ID for this document, typically a L<BSON::OID> object. Legacy GridFS files may store this value as a different type.
 
 =item *
 
@@ -488,15 +487,15 @@ uploadDate – the date and time this file was added to GridFS, stored as a BSON
 
 =item *
 
-md5 – a hash of the contents of the stored file
-
-=item *
-
 filename – the name of this stored file; this does not need to be unique
 
 =item *
 
 metadata – any additional application-specific data
+
+=item *
+
+md5 – DEPRECATED
 
 =item *
 

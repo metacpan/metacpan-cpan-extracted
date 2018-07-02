@@ -6,7 +6,7 @@ package BSON::Timestamp;
 # ABSTRACT: BSON type wrapper for timestamps
 
 use version;
-our $VERSION = 'v1.6.4';
+our $VERSION = 'v1.6.6';
 
 use Carp ();
 
@@ -98,9 +98,16 @@ sub TO_JSON {
 }
 
 sub _cmp {
-    my ( $l, $r ) = @_;
-    return ( $l->{seconds} <=> $r->{seconds} )
+    my ( $l, $r, $swap ) = @_;
+    if ( !defined($l) || !defined($r) ) {
+        Carp::carp "Use of uninitialized value in BSON::Timestamp comparison (<=>); will be treated as 0,0";
+    }
+    $l //= { seconds => 0, increment => 0 };
+    $r //= { seconds => 0, increment => 0 };
+    ($r, $l) = ($l, $r) if $swap;
+    my $cmp = ( $l->{seconds} <=> $r->{seconds} )
       || ( $l->{increment} <=> $r->{increment} );
+    return $cmp;
 }
 
 use overload (
@@ -120,7 +127,7 @@ BSON::Timestamp - BSON type wrapper for timestamps
 
 =head1 VERSION
 
-version v1.6.4
+version v1.6.6
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Map::Tube::Types;
 
-$Map::Tube::Types::VERSION   = '3.51';
+$Map::Tube::Types::VERSION   = '3.53';
 $Map::Tube::Types::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Types - Attribute type definition for Map::Tube.
 
 =head1 VERSION
 
-Version 3.51
+Version 3.53
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use strict; use warnings;
 
 use Type::Library -base, -declare => qw(Color Node NodeMap Nodes Line LineMap Lines Route Routes Table Tables);
-use Types::Standard qw(Str Object ArrayRef Map);
+use Types::Standard qw(Str InstanceOf ArrayRef Map);
 use Type::Utils;
 use Map::Tube::Utils qw(is_valid_color);
 
@@ -27,8 +27,7 @@ declare 'Color',
     message { "ERROR: Invalid color name [$_]." };
 
 declare 'Node',
-    as Object,
-    where   { ref($_) eq 'Map::Tube::Node' };
+    as InstanceOf['Map::Tube::Node'];
 
 declare 'NodeMap',
     as Map[Str, Node];
@@ -37,8 +36,7 @@ declare 'Nodes',
     as ArrayRef[Node];
 
 declare 'Line',
-    as Object,
-    where   { ref($_) eq 'Map::Tube::Line' };
+    as InstanceOf['Map::Tube::Line'];
 
 declare 'LineMap',
     as Map[Str, Line];
@@ -47,15 +45,13 @@ declare 'Lines',
     as ArrayRef[Line];
 
 declare 'Route',
-    as Object,
-    where   { ref($_) eq 'Map::Tube::Route' };
+    as InstanceOf['Map::Tube::Route'];
 
 declare 'Routes',
     as ArrayRef[Route];
 
 declare 'Table',
-    as Object,
-    where   { ref($_) eq 'Map::Tube::Table' };
+    as InstanceOf['Map::Tube::Table'];
 
 declare 'Tables',
     as Map[Str, Table];

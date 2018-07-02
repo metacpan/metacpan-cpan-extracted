@@ -10,7 +10,7 @@
 # ABSTRACT: Fix the configuration of an application
 
 package App::Cme::Command::fix ;
-$App::Cme::Command::fix::VERSION = '1.027';
+$App::Cme::Command::fix::VERSION = '1.028';
 use strict;
 use warnings;
 use 5.10.1;
@@ -33,7 +33,6 @@ sub opt_spec {
         [ "from=s@"  => "fix only a subset of a configuration tree" ],
         [ "backup:s"  => "Create a backup of configuration files before saving." ],
         [ "filter=s" => "pattern to select the element name to be fixed"],
-        [ "quiet!"   => "Suppress progress messages" ],
         $class->cme_global_options,
     );
 }
@@ -60,7 +59,7 @@ sub execute {
         my $node_to_fix = $inst->config_root->grab($path);
         my $msg = "cme: running fix on ".$inst->name." configuration";
         $msg .= "from node", $node_to_fix->name if $path;
-        say $msg. "..." unless $opt->{quiet};
+        say $msg. "..." if $opt->{verbose};
         $node_to_fix->apply_fixes($opt->{fix_filter});
     }
 
@@ -81,7 +80,7 @@ App::Cme::Command::fix - Fix the configuration of an application
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 

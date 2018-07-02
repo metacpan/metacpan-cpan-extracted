@@ -1,5 +1,7 @@
 package XML::XPathScript::Processor;
-
+our $AUTHORITY = 'cpan:YANICK';
+# ABSTRACT: XML::XPathScript transformation engine
+$XML::XPathScript::Processor::VERSION = '1.55';
 use strict;
 use warnings;
 use Carp;
@@ -8,8 +10,6 @@ use base qw/ Exporter /;
 
 use XML::XPathScript::Template;
 use Readonly;
-
-our $VERSION = '1.54';
 
 our @EXPORT = qw/ 
         $DO_SELF_AS_CHILD 
@@ -158,7 +158,7 @@ sub import_functional {
     # call as XML::XPathScript::Processor->import_functional
     $self = XML::XPathScript::Processor->new unless ref $self;
 
-    my($caller, $file, $line) = caller;
+    my($caller) = caller;
 
     $self->_export( $caller, $_, $prefix ) for @EXPORT_OK;
 
@@ -632,7 +632,7 @@ sub translate_comment_node {
 sub start_tag {
     my( $self, $node, $name ) = @_;
 
-    $name ||= $self->get_node_name( $node ) or return;
+    $name ||= $self->get_qualified_name( $node ) or return;
 
     my $string = '<'.$name;
 
@@ -653,7 +653,7 @@ sub start_tag {
 
 sub end_tag {
     my $self = shift;
-    if (my $name = $_[1] || $self->get_node_name( $_[0] ) ) {
+    if (my $name = $_[1] || $self->get_qualified_name( $_[0] ) ) {
         return "</$name>";
     }
 	return '';
@@ -679,9 +679,36 @@ sub interpolate {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 XML::XPathScript::Processor - XML::XPathScript transformation engine
+
+=head1 VERSION
+
+version 1.55
+
+=head1 SYNOPSIS
+
+    # OO API
+    use XML::XPathScript::Processor;
+
+    my $processor = XML::XPathScript::Processor->new;
+    $processor->set_xml( $dom );
+    $processor->set_template( $template );
+
+    my $transformed = $processor->apply_templates( '//foo' );
+
+    # functional API
+    use XML::XPathScript::Processor;
+    XML::XPathscript::Processor->import_functional;
+
+    set_xml( $dom );
+    set_template( $template );
+    my $transformed = apply_templates( '//foo' );
 
 =head1 SYNOPSIS
 
@@ -793,6 +820,96 @@ Same example, with Embperl:
 
     <p>This orchid is a [+ $processor->apply_templates( '//orchid' ) +].</p>
 
+=head1 DESCRIPTION
+
+The I<XML::XPathScript> distribution offers an XML parser glue, an
+embedded stylesheet language, and a way of processing an XML document
+into a text output. This module implements the latter part: it takes
+an already filled out C<< $template >> template object and an already parsed
+XML document (which are usually both provided by the parent
+L<XML::XPathScript> object),
+and provides a simple API to implement stylesheets. 
+
+Typically, the processor is encapsulated within a L<XML::XPathScript>
+object. In which case, all the black magick is already done for you,
+and the only part you have to worry about is the XPathScript 
+language functions that XML::XPathScript::Processor imports into
+the stylesheet (see L</XPATHSCRIPT LANGUAGE FUNCTIONS>).
+
+It is also possible to use a processor on its own, without using a
+stylesheet. This might be desirable, for example, to use XPathScript
+within a different templating system, like L<Embperl> or L<HTML::Mason>.
+For a discussion on how to use this module in such cases, see section 
+L</Embedding XML::XPathScript::Processor in a Templating System>.
+
+=head2 Embedding XML::XPathScript::Processor in a Templating System
+
+It is possible to use the XPathScript processing engine without having 
+to rely on stylesheets. This can be desirable if one wishes to use XPathScript
+within a different templating system, like Embperl or HTML::Mason. To do 
+so, one simply has to directly use XML::XPathScript::Processor. 
+
+Example, with HTML::Mason:
+
+    <%perl>
+        use XML::XPathScript::Processor;
+        use XML::XPathScript::Template;
+        use XML::LibXML;
+
+        my $processor = XML::XPathScript::Processor->new;
+
+        # load the dom
+        my $dom = XML::LibXML->new->parse_string( <<'END_XML' );
+            <orchid>
+                <genus>Miltonesia</genus>
+                <species>spectabilis</species>
+                <variety>moreliana</variety>
+            </orchid>
+    END_XML
+        $processor->set_dom( $dom );
+
+        # load the template
+        my $template = XML::XPathScript::Template->new;
+        $processor->set_template( $template );
+        $template->set( orchid => { showtag => 0 } );
+        $template->set( genus  => { rename => 'i' } );
+        $template->set( species  => { rename => 'i' } );
+        $template->set( variety  => { pre => 'var. '  } );
+    </%perl>
+
+    <p>This orchid is a <% $processor->apply_templates( '//orchid' )  %>.</p>
+
+Same example, with Embperl:
+
+    [!
+        use XML::XPathScript::Processor;
+        use XML::XPathScript::Template;
+        use XML::LibXML;
+    !]
+
+    [-
+        $processor = XML::XPathScript::Processor->new;
+
+        # load the dom
+        $dom = XML::LibXML->new->parse_string( <<'END_XML' );
+            <orchid>
+                <genus>Miltonesia</genus>
+                <species>spectabilis</species>
+                <variety>moreliana</variety>
+            </orchid>
+    END_XML
+        $processor->set_dom( $dom );
+
+        # load the template
+        $template = XML::XPathScript::Template->new;
+        $processor->set_template( $template );
+        $template->set( orchid => { showtag => 0 } );
+        $template->set( genus  => { rename => 'i' } );
+        $template->set( species  => { rename => 'i' } );
+        $template->set( variety  => { pre => 'var. '  } );
+    -]
+
+    <p>This orchid is a [+ $processor->apply_templates( '//orchid' ) +].</p>
 
 =head1 XPATHSCRIPT LANGUAGE FUNCTIONS
 
@@ -951,13 +1068,13 @@ pass.
 =item call_template
 
     call_template( $node, $t, $templatename )
-    
+
 B<EXPERIMENTAL> - allows C<testcode> routines to invoke a template by
 name, even if the selectors do not fit (e.g. one can apply template B
 to an element node of type A). Returns the stylesheeted string
 computed out of $node just like L</apply_templates> would.
 
-=item  is_element_node 
+=item is_element_node 
 
     $bool = is_element_node( $object )
 
@@ -1012,11 +1129,10 @@ Returns an XPath string that points to $node, from the root. Useful to
 create error messages that point at some location in the original XML
 document.
 
-=for comment
-    =head2 Functional and OO APIs
+=for comment =head2 Functional and OO APIs
     If used within a stylesheet, 
 
-=back    
+=back
 
 =head1 XPATHSCRIPT LANGUAGE CONSTANTS
 
@@ -1073,117 +1189,6 @@ Example:
 =head1 NAME
 
 XML::XPathScript::Processor - XML::XPathScript transformation engine
-
-=head1 SYNOPSIS
-
-    # OO API
-    use XML::XPathScript::Processor;
-
-    my $processor = XML::XPathScript::Processor->new;
-    $processor->set_xml( $dom );
-    $processor->set_template( $template );
-
-    my $transformed = $processor->apply_templates( '//foo' );
-
-    # functional API
-    use XML::XPathScript::Processor;
-    XML::XPathscript::Processor->import_functional;
-
-    set_xml( $dom );
-    set_template( $template );
-    my $transformed = apply_templates( '//foo' );
-
-=head1 DESCRIPTION
-
-The I<XML::XPathScript> distribution offers an XML parser glue, an
-embedded stylesheet language, and a way of processing an XML document
-into a text output. This module implements the latter part: it takes
-an already filled out C<< $template >> template object and an already parsed
-XML document (which are usually both provided by the parent
-L<XML::XPathScript> object),
-and provides a simple API to implement stylesheets. 
-
-Typically, the processor is encapsulated within a L<XML::XPathScript>
-object. In which case, all the black magick is already done for you,
-and the only part you have to worry about is the XPathScript 
-language functions that XML::XPathScript::Processor imports into
-the stylesheet (see L</XPATHSCRIPT LANGUAGE FUNCTIONS>).
-
-It is also possible to use a processor on its own, without using a
-stylesheet. This might be desirable, for example, to use XPathScript
-within a different templating system, like L<Embperl> or L<HTML::Mason>.
-For a discussion on how to use this module in such cases, see section 
-L</Embedding XML::XPathScript::Processor in a Templating System>.
-
-=head2 Embedding XML::XPathScript::Processor in a Templating System
-
-It is possible to use the XPathScript processing engine without having 
-to rely on stylesheets. This can be desirable if one wishes to use XPathScript
-within a different templating system, like Embperl or HTML::Mason. To do 
-so, one simply has to directly use XML::XPathScript::Processor. 
-
-Example, with HTML::Mason:
-
-    <%perl>
-        use XML::XPathScript::Processor;
-        use XML::XPathScript::Template;
-        use XML::LibXML;
-
-        my $processor = XML::XPathScript::Processor->new;
-
-        # load the dom
-        my $dom = XML::LibXML->new->parse_string( <<'END_XML' );
-            <orchid>
-                <genus>Miltonesia</genus>
-                <species>spectabilis</species>
-                <variety>moreliana</variety>
-            </orchid>
-    END_XML
-        $processor->set_dom( $dom );
-
-        # load the template
-        my $template = XML::XPathScript::Template->new;
-        $processor->set_template( $template );
-        $template->set( orchid => { showtag => 0 } );
-        $template->set( genus  => { rename => 'i' } );
-        $template->set( species  => { rename => 'i' } );
-        $template->set( variety  => { pre => 'var. '  } );
-    </%perl>
-
-    <p>This orchid is a <% $processor->apply_templates( '//orchid' )  %>.</p>
-
-Same example, with Embperl:
-
-    [!
-        use XML::XPathScript::Processor;
-        use XML::XPathScript::Template;
-        use XML::LibXML;
-    !]
-
-    [-
-        $processor = XML::XPathScript::Processor->new;
-
-        # load the dom
-        $dom = XML::LibXML->new->parse_string( <<'END_XML' );
-            <orchid>
-                <genus>Miltonesia</genus>
-                <species>spectabilis</species>
-                <variety>moreliana</variety>
-            </orchid>
-    END_XML
-        $processor->set_dom( $dom );
-
-        # load the template
-        $template = XML::XPathScript::Template->new;
-        $processor->set_template( $template );
-        $template->set( orchid => { showtag => 0 } );
-        $template->set( genus  => { rename => 'i' } );
-        $template->set( species  => { rename => 'i' } );
-        $template->set( variety  => { pre => 'var. '  } );
-    -]
-
-    <p>This orchid is a [+ $processor->apply_templates( '//orchid' ) +].</p>
-
 
 =head1 XPATHSCRIPT LANGUAGE FUNCTIONS
 
@@ -1337,13 +1342,13 @@ pass.
 =item call_template
 
     call_template( $node, $t, $templatename )
-    
+
 B<EXPERIMENTAL> - allows C<testcode> routines to invoke a template by
 name, even if the selectors do not fit (e.g. one can apply template B
 to an element node of type A). Returns the stylesheeted string
 computed out of $node just like L</apply_templates> would.
 
-=item  is_element_node 
+=item is_element_node 
 
     $bool = is_element_node( $object )
 
@@ -1398,11 +1403,10 @@ Returns an XPath string that points to $node, from the root. Useful to
 create error messages that point at some location in the original XML
 document.
 
-=for comment
-    =head2 Functional and OO APIs
+=for comment =head2 Functional and OO APIs
     If used within a stylesheet, 
 
-=back    
+=back
 
 =head1 METHODS
 
@@ -1441,14 +1445,29 @@ Example:
 
 =back
 
-=head1 BUGS
-
-Please send bug reports to <bug-xml-xpathscript@rt.cpan.org>,
-or via the web interface at 
-http://rt.cpan.org/Public/Dist/Display.html?Name=XML-XPathScript .
-
 =head1 AUTHORS
 
-Yanick Champoux <yanick@cpan.org> 
-and Dominique Quatravaux <domq@cpan.org>
+=over 4
 
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=item *
+
+Dominique Quatravaux <domq@cpan.org>
+
+=item *
+
+Matt Sergeant <matt@sergeant.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2008, 2007 by Matt Sergeant.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

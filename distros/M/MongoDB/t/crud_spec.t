@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,19 +19,32 @@ use JSON::MaybeXS;
 use Test::Deep;
 use Path::Tiny;
 use Try::Tiny;
+use version;
 
 use MongoDB;
 
 use lib "t/lib";
-use MongoDBTest qw/skip_unless_mongod build_client get_test_db server_version server_type get_capped/;
+use MongoDBTest qw/
+    skip_unless_mongod
+    build_client
+    get_test_db
+    server_version
+    server_type
+    get_features
+/;
 
 skip_unless_mongod();
+
+plan skip_all => "Not testing with BSON wrappers"
+  if $ENV{PERL_MONGO_TEST_CODEC_WRAPPED};
 
 my $conn           = build_client();
 my $testdb         = get_test_db($conn);
 my $server_version = server_version($conn);
 my $server_type    = server_type($conn);
+my $features       = get_features($conn);
 my $coll           = $testdb->get_collection('test_collection');
+
 
 for my $dir ( map { path("t/data/CRUD/$_") } qw/read write/ ) {
     my $iterator = $dir->iterator( { recurse => 1 } );
@@ -47,11 +58,23 @@ for my $dir ( map { path("t/data/CRUD/$_") } qw/read write/ ) {
         my $name = $path->relative($dir)->basename(".json");
 
         subtest $name => sub {
+            if ( $name =~ 'arrayFilter' && ! $features->supports_arrayFilters ) {
+                plan skip_all => "arrayFilters not supported on this mongod";
+            }
+            if ( exists $plan->{minServerVersion} ) {
+                my $min_version = $plan->{minServerVersion};
+                $min_version = "v$min_version" unless $min_version =~ /^v/;
+                $min_version .= ".0" unless $min_version =~ /^v\d+\.\d+.\d+$/;
+                $min_version = version->new($min_version);
+                plan skip_all => "Requires MongoDB $min_version"
+                    if $min_version > $server_version;
+            }
             for my $test ( @{ $plan->{tests} } ) {
                 $coll->drop;
                 $coll->insert_many( $plan->{data} );
                 my $op   = $test->{operation};
                 my $meth = $op->{name};
+                local $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1 if $meth eq 'count';
                 $meth =~ s{([A-Z])}{_\L$1}g;
                 my $test_meth = "test_$meth";
                 my $res = main->$test_meth( $test->{description}, $meth, $op->{arguments},
@@ -60,7 +83,6 @@ for my $dir ( map { path("t/data/CRUD/$_") } qw/read write/ ) {
         };
     }
 }
-
 #--------------------------------------------------------------------------#
 # generic tests
 #--------------------------------------------------------------------------#
@@ -100,7 +122,7 @@ sub test_modify {
         && $args->{upsert}
         && exists( $args->{replacement} ) )
     {
-        $outcome->{collection}{data}[-1]{_id} = ignore();
+        $outcome->{collection}{data}[-1]{_id} = ignore() if exists $outcome->{collection};
     }
     my $doc = delete $args->{replacement} || delete $args->{update};
     my $res = $coll->$method( $filter, $doc, ( scalar %$args ? $args : () ) );
@@ -123,14 +145,15 @@ sub test_find_and_modify {
         $outcome->{result} = {};
     }
     # SERVER-5289 -- _id not taken from filter before 2.6
-    if (   $server_version < v2.6.0 ) {
-
-        if ( $outcome->{result} && ( !exists $args->{projection}{_id} || $args->{projection}{_id} ) ) {
+    if ( $server_version < v2.6.0 ) {
+        if ( $outcome->{result}
+            && ( !exists $args->{projection}{_id} || $args->{projection}{_id} ) )
+        {
             $outcome->{result}{_id} = ignore();
         }
 
         if ( $args->{upsert} && !$coll->find_one($filter) ) {
-            $outcome->{collection}{data}[-1]{_id} = ignore();
+            $outcome->{collection}{data}[-1]{_id} = ignore() if exists $outcome->{collection};
         }
     }
     my $res = $coll->$method( $filter, $doc, ( scalar %$args ? $args : () ) );
@@ -138,23 +161,54 @@ sub test_find_and_modify {
 }
 
 BEGIN {
-    *test_find                 = \&test_read_w_filter;
-    *test_count                = \&test_read_w_filter;
-    *test_delete_many          = \&test_write_w_filter;
-    *test_delete_one           = \&test_write_w_filter;
-    *test_insert_many          = \&test_insert;
-    *test_insert_one           = \&test_insert;
-    *test_replace_one          = \&test_modify;
-    *test_update_one           = \&test_modify;
-    *test_update_many          = \&test_modify;
-    *test_find_one_and_delete  = \&test_write_w_filter;
-    *test_find_one_and_replace = \&test_find_and_modify;
-    *test_find_one_and_update  = \&test_find_and_modify;
+    *test_find                     = \&test_read_w_filter;
+    *test_count                    = \&test_read_w_filter;
+    *test_count_documents          = \&test_read_w_filter;
+    *test_estimated_document_count = \&test_read_w_filter;
+    *test_delete_many              = \&test_write_w_filter;
+    *test_delete_one               = \&test_write_w_filter;
+    *test_insert_many              = \&test_insert;
+    *test_insert_one               = \&test_insert;
+    *test_replace_one              = \&test_modify;
+    *test_update_one               = \&test_modify;
+    *test_update_many              = \&test_modify;
+    *test_find_one_and_delete      = \&test_write_w_filter;
+    *test_find_one_and_replace     = \&test_find_and_modify;
+    *test_find_one_and_update      = \&test_find_and_modify;
 }
 
 #--------------------------------------------------------------------------#
 # method-specific tests
 #--------------------------------------------------------------------------#
+
+sub test_bulk_write {
+    my ( $class, $label, $method, $args, $outcome ) = @_;
+
+    my $bulk;
+
+    if ( $args->{options}->{ordered} ) {
+        $bulk = $coll->initialize_ordered_bulk_op;
+    } else {
+        $bulk = $coll->initialize_unordered_bulk_op;
+    }
+
+    for my $request ( @{ $args->{requests} } ) {
+        my $req_method = $request->{name};
+        my $arg = $request->{arguments};
+        $req_method =~ s{([A-Z])}{_\L$1}g;
+        my $filter = delete $arg->{filter};
+        my $update = delete $arg->{update};
+        my $arr_filters = delete $arg->{arrayFilters};
+        my $bulk_view = $bulk->find( $filter );
+        if ( scalar( @$arr_filters ) ) {
+          $bulk_view = $bulk_view->arrayFilters( $arr_filters );
+        }
+        $bulk_view->$req_method( $update );
+    }
+    my $res = $bulk->execute;
+
+    check_write_outcome( $label, $res, $outcome );
+}
 
 sub test_aggregate {
     my ( $class, $label, $method, $args, $outcome ) = @_;
@@ -179,7 +233,7 @@ sub test_distinct {
     my ( $class, $label, $method, $args, $outcome ) = @_;
     my $fieldname = delete $args->{fieldName};
     my $filter    = delete $args->{filter};
-    my $res       = $coll->distinct( grep { defined } $fieldname, $filter, $args );
+    my $res = $coll->distinct( $fieldname, $filter, $args );
     check_read_outcome( $label, $res, $outcome );
 }
 
@@ -206,6 +260,10 @@ sub check_write_outcome {
     my ( $label, $res, $outcome ) = @_;
 
     for my $k ( keys %{ $outcome->{result} } ) {
+        # Tests have upsertedCount field, but this is not required by the
+        # CRUD spec itself.  It seems to be there for drivers that return
+        # BulkWriteResults for everything.
+        next if $k eq 'upsertedCount' && $res->isa("MongoDB::UpdateResult");
         ( my $attr = $k ) =~ s{([A-Z])}{_\L$1}g;
         if ( $server_version < v2.6.0 ) {
             $outcome->{result}{$k} = undef    if $k eq 'modifiedCount';
@@ -232,11 +290,7 @@ sub check_insert_outcome {
         return check_write_outcome( $label, $res, $outcome );
     }
 
-    my $ids = [
-        map  { $res->inserted_ids->{$_} }
-        sort { $a <=> $b } keys %{ $res->inserted_ids }
-    ];
-    cmp_deeply( $ids, $outcome->{result}{insertedIds}, "$label: result doc" );
+    cmp_deeply( $res->inserted_ids , $outcome->{result}{insertedIds}, "$label: result doc" );
     check_collection( $label, $outcome );
 }
 

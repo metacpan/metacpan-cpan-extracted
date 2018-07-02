@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::YANICK;
 our $AUTHORITY = 'cpan:YANICK';
-$Dist::Zilla::PluginBundle::YANICK::VERSION = '0.28.0';
+$Dist::Zilla::PluginBundle::YANICK::VERSION = '0.29.0';
 # ABSTRACT: Be like Yanick when you build your dists
 
 # [TODO] add CONTRIBUTING file
@@ -65,6 +65,11 @@ has travis_perl_versions => (
     default => '14..26' 
 );
 
+has badge => (
+    isa => 'ArrayRef',
+    is => 'ro',
+    default => sub { [] },
+);
 
 sub configure {
     my ( $self ) = @_;
@@ -89,6 +94,7 @@ sub configure {
             CoalescePod
             InstallGuide
             Covenant
+            ContributorCovenant
         /,
         [ GithubMeta => { 
             remote => $upstream, 
@@ -139,8 +145,9 @@ sub configure {
             script => 'prove -l t',
             
             map { ( perl_version => $_ ) } $self->travis_perl_versions->@*
-        ]  ]
+        ]  ],
     );
+
 
     # Git::Commit can't be before Git::CommitBuild :-/
     $self->add_plugins(
@@ -225,7 +232,7 @@ Dist::Zilla::PluginBundle::YANICK - Be like Yanick when you build your dists
 
 =head1 VERSION
 
-version 0.28.0
+version 0.29.0
 
 =head1 DESCRIPTION
 
@@ -243,6 +250,7 @@ his distributions. It's roughly equivalent to
 
     [InstallGuide]
     [Covenant]
+    [ContributorCovenant]
 
     [GithubMeta]
     remote=github
@@ -332,6 +340,8 @@ his distributions. It's roughly equivalent to
 
     [CopyrightYearFromGit]
 
+    [GitHubREADME::Badge]
+
 =head2 ARGUMENTS
 
 =head3 autoprereqs_skip
@@ -408,7 +418,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011, 2010 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2012, 2011, 2010 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

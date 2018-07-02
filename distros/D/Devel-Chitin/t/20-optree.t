@@ -3,7 +3,7 @@ use warnings;
 
 use Devel::Chitin::OpTree;
 use Devel::Chitin::Location;
-use Test::More tests => 33;
+use Test::More tests => 34;
 
 use Fcntl qw(:flock :DEFAULT SEEK_SET SEEK_CUR SEEK_END);
 use POSIX qw(:sys_wait_h);
@@ -1287,6 +1287,14 @@ subtest 'perl-5.25.6 split changes' => sub {
         excludes_version(v5.25.6),
         split_specials => join("\n",    q(our @s = split('', $a);),
                                         q(my @strings = split(' ', $a))),
+    );
+};
+
+subtest 'perl-5.28.0' => sub {
+    _run_tests(
+        requires_version(v5.28.0),
+        delete_hash_slice => join("\n", q(my %myhash;),
+                                        q(my %a = delete(%myhash{'baz', 'quux'}))),
     );
 };
 

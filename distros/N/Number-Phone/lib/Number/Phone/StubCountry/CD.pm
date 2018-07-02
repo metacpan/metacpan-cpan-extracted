@@ -22,49 +22,40 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221545;
+our $VERSION = 1.20180619214154;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '12',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
                   'leading_digits' => '
             8[0-2459]|
             9
           ',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
                   'pattern' => '([89]\\d{2})(\\d{3})(\\d{3})'
                 },
                 {
-                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})',
                   'leading_digits' => '88',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})'
+                  'national_rule' => '0$1'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{5})',
                   'national_rule' => '0$1',
+                  'format' => '$1 $2',
                   'leading_digits' => '[1-6]',
-                  'format' => '$1 $2'
+                  'pattern' => '(\\d{2})(\\d{5})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
                 'pager' => '',
-                'specialrate' => '',
-                'mobile' => '
-          8(?:
-            [0-2459]\\d{2}|
-            8
-          )\\d{5}|
-          9[017-9]\\d{7}
-        ',
                 'geographic' => '
           1(?:
             2\\d{7}|
@@ -72,15 +63,24 @@ my $validators = {
           )|
           [2-6]\\d{6}
         ',
-                'voip' => '',
-                'toll_free' => '',
                 'fixed_line' => '
           1(?:
             2\\d{7}|
             \\d{6}
           )|
           [2-6]\\d{6}
-        '
+        ',
+                'toll_free' => '',
+                'personal_number' => '',
+                'voip' => '',
+                'mobile' => '
+          8(?:
+            [0-2459]\\d{2}|
+            8
+          )\\d{5}|
+          9[017-9]\\d{7}
+        ',
+                'specialrate' => ''
               };
 my %areanames = (
   2431 => "Kinshasa",

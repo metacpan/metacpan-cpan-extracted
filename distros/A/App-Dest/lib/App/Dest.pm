@@ -7,7 +7,7 @@ use warnings;
 
 use File::Basename qw( dirname basename );
 use File::Copy 'copy';
-use File::Copy::Recursive 'dircopy';
+use File::Copy::Recursive qw( dircopy rcopy );
 use File::DirCompare ();
 use File::Find 'find';
 use File::Path qw( mkpath rmtree );
@@ -16,7 +16,7 @@ use Path::Tiny 'path';
 use Text::Diff ();
 use Try::Tiny qw( try catch finally );
 
-our $VERSION = '1.17'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 my $env;
 
@@ -197,30 +197,40 @@ sub make {
         die "Failed to fully make $path; check permissions or existing files\n";
     };
 
-    $self->list($path);
+    $self->expand($path);
+    return 0;
+}
+
+sub expand {
+    my ( $self, $path ) = @_;
+    print join( ' ', map { <"$path/$_*"> } qw( deploy verify revert ) ), "\n";
     return 0;
 }
 
 sub list {
-    my ( $self, $path ) = @_;
+    my ( $self, $filter ) = @_;
     die "Project not initialized\n" unless _env();
 
-    if ($path) {
-        print join( ' ', map { <"$path/$_*"> } qw( deploy verify revert ) ), "\n";
-    }
-    else {
-        for my $path ( $self->watch_list ) {
-            print $path, "\n";
+    for my $path ( sort $self->watch_list ) {
+        my @actions;
 
-            find( {
-                follow   => 1,
-                no_chdir => 1,
-                wanted   => sub {
-                    return unless ( m|/deploy(?:\.[^\/]+)?| );
-                    ( my $action = $_ ) =~ s|/deploy(?:\.[^\/]+)?||;
-                    print '  ', $action, "\n";
-                },
-            }, $path );
+        find( {
+            follow   => 1,
+            no_chdir => 1,
+            wanted   => sub {
+                return unless ( m|/deploy(?:\.[^\/]+)?| );
+                ( my $action = $_ ) =~ s|/deploy(?:\.[^\/]+)?||;
+
+                push( @actions, $action ) if (
+                    not defined $filter or
+                    index( $action, $filter ) > -1
+                );
+            },
+        }, $path );
+
+        print $path, "\n";
+        if (@actions) {
+            print '  ', $_, "\n" for ( sort @actions );
         }
     }
 
@@ -297,14 +307,24 @@ sub diff {
 }
 
 sub clean {
-    my ($self) = @_;
+    my $self = shift;
     die "Project not initialized\n" unless _env();
 
-    for ( map { _rel2root($_) } $self->watch_list ) {
-        my $dest = _rel2dir(".dest/$_");
-        rmtree($dest);
-        dircopy( _rel2dir($_), $dest );
+    if (@_) {
+        for (@_) {
+            my $dest = _rel2dir(".dest/$_");
+            rmtree($dest);
+            rcopy( _rel2dir($_), $dest );
+        }
     }
+    else {
+        for ( map { _rel2root($_) } $self->watch_list ) {
+            my $dest = _rel2dir(".dest/$_");
+            rmtree($dest);
+            dircopy( _rel2dir($_), $dest );
+        }
+    }
+
     return 0;
 }
 
@@ -597,7 +617,7 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/dest.svg)](https://travis-ci.org/gryphonshafer/dest)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/dest/badge.png)](https://coveralls.io/r/gryphonshafer/dest)
@@ -617,11 +637,12 @@ dest COMMAND [DIR || NAME]
     dest writewatch      # creates watch file in project root directory
 
     dest make NAME [EXT] # create a named template set (set of 3 files)
-    dest list [NAME]     # dump a list of the template set (set of 3 files)
+    dest expand NAME     # dump a list of the template set (set of 3 files)
+    dest list [FILTER]   # list all actions in all watches
 
     dest status          # check status of tracked directories
     dest diff [NAME]     # display a diff of any modified actions
-    dest clean           # reset dest state to match current files/directories
+    dest clean [NAME]    # reset dest state to match current files/directories
     dest preinstall      # set dest state so an "update" will deploy everything
 
     dest deploy NAME     # deployment of a specific action
@@ -738,15 +759,18 @@ Optionally, you can specify an extention for the created files. For example:
     #    db/schema/revert.sql
     #    db/schema/verify.sql
 
-=head2 list [NAME]
+=head2 expand NAME
 
-If provided a name of an action, it does the last step of C<make>. It lists
-out the relative paths of the 3 files, so you can do stuff like:
+This command lists out the relative paths and names of the 3 files of the
+action provided, so you can do stuff like:
 
-    vi `dest list db/schema`
+    vi `dest expand db/schema`
 
-If not provided a name of an action, it will list all tracked directories and
-every action within each directory.
+=head2 list [FILTER]
+
+This command will list all tracked directories and every action within each
+directory. If provided a filter, it will limit what's displayed to actions
+containing the filter.
 
 =head2 status
 
@@ -780,6 +804,12 @@ Let's say that for some reason you have a delta between what C<dest> thinks your
 system is and what your code says it ought to be, and you really believe your
 code is right. You can call C<clean> to tell C<dest> to just assume that what
 the code says is right.
+
+You can optionally provide a specific action or even a step of an action to
+clean. For example:
+
+    dest clean db/schema
+    dest clean db/schema/deploy
 
 =head2 preinstall
 
@@ -1130,7 +1160,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

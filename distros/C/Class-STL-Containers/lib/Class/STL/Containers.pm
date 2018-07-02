@@ -30,12 +30,12 @@ package Class::STL::Containers;
 require 5.005_62;
 use strict;
 use warnings;
-use vars qw( $VERSION $BUILD @EXPORT_OK %EXPORT_TAGS );
-use Exporter;
+use vars qw( $VERSION $BUILD @ISA @EXPORT_OK %EXPORT_TAGS );
+require Exporter;
+@ISA = 'Exporter';
 @EXPORT_OK = qw( vector list deque queue priority_queue stack tree );
 %EXPORT_TAGS = ( all => [qw( vector list deque queue priority_queue stack tree )] );
-$VERSION = '0.35';
-$BUILD = 'Tue April 3 19:33:14 GMT 2007';
+$VERSION = '0.37';
 # ----------------------------------------------------------------------------------------------------
 {
 	package Class::STL::Containers;
@@ -58,7 +58,7 @@ $BUILD = 'Tue April 3 19:33:14 GMT 2007';
 	use base qw(Class::STL::Element); # container is also an element
 	use overload '+' => 'append', '+=' => 'append', '=' => 'clone', '""' => 'str', '==' => 'eq', '!=' => 'ne';
 	use Class::STL::Iterators qw(:all);
-	use UNIVERSAL qw(isa can);
+	use UNIVERSAL;
 	use Carp qw(confess);
 	use Class::STL::ClassMembers
 		Class::STL::ClassMembers::DataMember->new(
@@ -634,7 +634,7 @@ $BUILD = 'Tue April 3 19:33:14 GMT 2007';
 # ----------------------------------------------------------------------------------------------------
 {
 	package Class::STL::Containers::MakeFind;
-	use UNIVERSAL qw(isa can);
+	use UNIVERSAL;
 	use Carp qw(cluck confess);
 	sub new # --> import...
 	{

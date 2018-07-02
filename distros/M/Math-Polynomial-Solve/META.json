@@ -27,7 +27,7 @@
       "runtime" : {
          "requires" : {
             "Math::Complex" : "1.36",
-            "Math::Utils" : "1.06",
+            "Math::Utils" : "1.12",
             "perl" : "v5.10.1"
          }
       }
@@ -35,7 +35,7 @@
    "provides" : {
       "Math::Polynomial::Solve" : {
          "file" : "lib/Math/Polynomial/Solve.pm",
-         "version" : "2.81"
+         "version" : "2.85"
       }
    },
    "release_status" : "stable",
@@ -47,7 +47,7 @@
          "url" : "git://github.com/jgamble/Math-Polynomial-Solve.git"
       }
    },
-   "version" : "2.81",
+   "version" : "2.85",
    "x_keyword" : [
       "math",
       "polynomial",
@@ -63,5 +63,5 @@
       "Hessenberg",
       "Newton-Raphson"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

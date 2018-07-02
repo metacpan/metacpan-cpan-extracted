@@ -4,7 +4,7 @@
       "Zak B. Elep <zakame@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.17",
+   "generated_by" : "Minilla/v3.1.1",
    "license" : [
       "perl_5"
    ],
@@ -57,6 +57,7 @@
             "Perl::Critic" : "0",
             "Perl::Critic::Freenode" : "0",
             "Term::ReadLine::Gnu" : "0",
+            "Test2::Suite" : "0",
             "Web::Query" : "0",
             "perlsecret" : "0"
          },
@@ -101,7 +102,7 @@
    "provides" : {
       "Task::BeLike::ZAKAME" : {
          "file" : "lib/Task/BeLike/ZAKAME.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -115,10 +116,11 @@
          "web" : "https://github.com/zakame/Task-BeLike-ZAKAME"
       }
    },
-   "version" : "0.18",
+   "version" : "0.19",
    "x_contributors" : [
       "Zak B. Elep <zak.elep@yoyo.ph>",
       "Zak B. Elep <zakame@zakame.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

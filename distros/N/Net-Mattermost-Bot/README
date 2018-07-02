@@ -1,4 +1,4 @@
-Net-Mattermost-Bot version 0.03
+Net-Mattermost-Bot version 0.04
 ===============================
 
 A base class for Mattermost bots. Provides a websocket connection and basic API

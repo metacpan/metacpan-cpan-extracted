@@ -1,7 +1,7 @@
 package App::OrgUtils;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.46'; # VERSION
+our $DATE = '2018-06-30'; # DATE
+our $VERSION = '0.470'; # VERSION
 
 use 5.010;
 use strict;
@@ -168,7 +168,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-This document describes version 0.46 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2017-07-10.
+This document describes version 0.470 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2018-06-30.
 
 =head1 DESCRIPTION
 
@@ -177,6 +177,8 @@ documents; some originally created as examples/demos for L<Org::Parser>. The
 following are the included scripts:
 
 =over
+
+=item * L<browse-org>
 
 =item * L<count-done-org-todos>
 
@@ -236,7 +238,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

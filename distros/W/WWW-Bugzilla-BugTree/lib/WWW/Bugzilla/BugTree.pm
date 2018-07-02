@@ -7,7 +7,7 @@ use 5.012;
 use Moo;
 
 # ABSTRACT: Fetch a tree of bugzilla bugs blocking a bug
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 has ua => (
@@ -22,7 +22,7 @@ has ua => (
 );
 
 
-my $default_url = $ENV{BUG_TREE_URL} // "https://landfill.bugzilla.org/bugzilla-3.6-branch";
+my $default_url = $ENV{BUG_TREE_URL} // "https://landfill.bugzilla.org/bugzilla-4.2-branch";
 
 has url => (
   is      => 'ro',
@@ -102,7 +102,7 @@ WWW::Bugzilla::BugTree - Fetch a tree of bugzilla bugs blocking a bug
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -153,7 +153,7 @@ If not provided it falls back to using the C<BUG_TREE_URL> environment
 variable, and if that isn't set it uses this bugzilla provided for
 testing:
 
-L<https://landfill.bugzilla.org/bugzilla-3.6-branch>
+L<Bugzilla v4.2|https://landfill.bugzilla.org/bugzilla-4.2-branch>
 
 =head1 METHODS
 

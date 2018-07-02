@@ -1,5 +1,15 @@
 Revision history for Perl extension Net::Citadel.
 
+0.25    23:34 25 June 2018
+  - Add 'use strict;' & 'use warnings;' at beginning of the t/01citadel.t file.
+  - Correct the variable name "$keycount" to "$key_count" in lines 48 & 54 of
+    the t/01citadel.t file.
+  - Update the lib/Net/Citadel/ToDo.pod file.
+
+        17:43 24 June 2018
+  - Correct spelling error on line 777 of lib/Net/Citadel.pm: Higest > Highest.
+  - Correct spelling error on line 36 of t/01citadel.t: thru > through.
+
 0.24    14:07 25 September 2017
   - Add t/02critic.t for an Author test using Test::Perl::Critic.
   - Updated lib/Net/Citadel/ToDo.pod for new version.

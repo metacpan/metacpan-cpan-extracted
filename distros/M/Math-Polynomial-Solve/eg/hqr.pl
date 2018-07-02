@@ -2,15 +2,13 @@
 #
 #
 use Carp;
-use Math::Polynomial::Solve qw(:numeric ascending_order);
+use Math::Polynomial::Solve qw(:numeric);
 use Math::Complex;
 use Math::Matrix;
 use strict;
 use warnings;
 
-my $ascending = 1;
-
-ascending_order($ascending);
+coefficients order => 'ascending';
 
 while (my $line = prompt("Polynomial: "))
 {

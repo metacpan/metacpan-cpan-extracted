@@ -14,7 +14,7 @@ BEGIN {
 
 LOOKUP: {
 	SKIP: {
-		if($ENV{RELEASE_TESTING}) {
+		if($ENV{AUTHOR_TESTING}) {
 			diag('This may take some time and consume a lot of memory if the database is not SQLite');
 
 			Geo::Coder::Free::DB::init(logger => new_ok('MyLogger'));

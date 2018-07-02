@@ -1,0 +1,77 @@
+{
+   "abstract" : "Devel::CallParser patched to fix RT#110623",
+   "author" : [
+      "Devel::CallParser by Andrew Main (Zefram) <zefram@fysh.org>.",
+      "Alt distribution by Toby Inkster (TOBYINK) <tobyink@cpan.org>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alt-Devel-CallParser-ButWorking",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::CallChecker" : "0.002",
+            "DynaLoader" : "0",
+            "ExtUtils::CBuilder" : "0.15",
+            "ExtUtils::ParseXS" : "0",
+            "File::Spec" : "0",
+            "IO::File" : "1.03",
+            "Module::Build" : "0",
+            "Test::More" : "0",
+            "perl" : "5.011002",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "perl" : "5.011002",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "conflicts" : {
+            "Data::Alias" : "< 1.13",
+            "Devel::Declare" : "< 0.006004",
+            "indirect" : "< 0.27"
+         },
+         "requires" : {
+            "Devel::CallChecker" : "0.002",
+            "DynaLoader" : "0",
+            "DynaLoader::Functions" : "0.001",
+            "Exporter" : "0",
+            "parent" : "0",
+            "perl" : "5.011002",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alt::Devel::CallParser::ButWorking" : {
+         "file" : "lib/Alt/Devel/CallParser/ButWorking.pm",
+         "version" : "0.002"
+      },
+      "Devel::CallParser" : {
+         "file" : "lib/Devel/CallParser.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

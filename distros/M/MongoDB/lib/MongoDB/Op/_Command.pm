@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::Op::_Command;
 # Encapsulate running a command and returning a MongoDB::CommandResult
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -30,9 +28,12 @@ use MongoDB::_Types qw(
     Document
     ReadPreference
 );
+use List::Util qw/first/;
 use Types::Standard qw(
+    CodeRef
     HashRef
     Maybe
+    InstanceOf
 );
 
 use namespace::clean;
@@ -51,7 +52,8 @@ has query_flags => (
 );
 
 has read_preference => (
-    is  => 'ro',
+    # Needs to be rw for transactions
+    is  => 'rw',
     isa => Maybe [ReadPreference],
 );
 
@@ -59,11 +61,28 @@ with $_ for qw(
   MongoDB::Role::_PrivateConstructor
   MongoDB::Role::_DatabaseOp
   MongoDB::Role::_ReadPrefModifier
+  MongoDB::Role::_SessionSupport
+  MongoDB::Role::_CommandMonitoring
+);
+
+my %IS_NOT_COMPRESSIBLE = map { ($_ => 1) } qw(
+    ismaster
+    saslstart
+    saslcontinue
+    getnonce
+    authenticate
+    createuser
+    updateuser
+    copydbsaslstart
+    copydbgetnonce
+    copydb
 );
 
 sub execute {
     my ( $self, $link, $topology_type ) = @_;
     $topology_type ||= 'Single'; # if not specified, assume direct
+
+    $self->_apply_session_and_cluster_time( $link, \$self->{query} );
 
     # $query is passed as a reference because it *may* be replaced
     $self->_apply_read_prefs( $link, $topology_type, $self->{query_flags}, \$self->{query});
@@ -80,17 +99,50 @@ sub execute {
         );
     }
 
-    $link->write( $op_bson ),
-    ( my $result = MongoDB::_Protocol::parse_reply( $link->read, $request_id ) );
+    $self->publish_command_started( $link, $self->{query}, $request_id )
+      if $self->monitoring_callback;
+
+    my %write_opt = (
+        disable_compression => $IS_NOT_COMPRESSIBLE{ _get_command_name( $self->{query} ) },
+    );
+
+    my $result;
+    eval {
+        $link->write( $op_bson, \%write_opt ),
+        ( $result = MongoDB::_Protocol::parse_reply( $link->read, $request_id ) );
+    };
+    if ( my $err = $@ ) {
+        $self->_update_session_connection_error( $err );
+        $self->publish_command_exception($err) if $self->monitoring_callback;
+        die $err;
+    }
+
+    $self->publish_command_reply( $result->{docs} )
+      if $self->monitoring_callback;
 
     my $res = MongoDB::CommandResult->_new(
         output => $self->{bson_codec}->decode_one( $result->{docs} ),
         address => $link->address,
     );
 
+    $self->_update_session_pre_assert( $res );
+
     $res->assert;
 
+    $self->_update_session_and_cluster_time($res);
+
+    $self->_assert_session_errors($res);
+
     return $res;
+}
+
+sub _get_command_name {
+    my ($doc) = @_;
+    my $type = ref $doc;
+    return
+        $type eq 'ARRAY' || $type eq 'BSON::Doc' ? $doc->[0]
+      : $type eq 'Tie::IxHash' ? $doc->Keys(0)
+      :                          $doc->{ [ keys %$doc ]->[0] };
 }
 
 1;

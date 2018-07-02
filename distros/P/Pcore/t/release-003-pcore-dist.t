@@ -301,7 +301,7 @@ sub generate_test_dir ( $dist_name, $args ) {
 
     my $tree = Pcore::Util::File::Tree->new;
 
-    my $dist_cfg = P->data->encode_data( $Pcore::Util::Config::EXT_TYPE_MAP->{$Pcore::Core::Const::DIST_CFG_TYPE}, { name => $dist_name } );
+    my $dist_cfg = P->data->encode_data( $Pcore::Util::Cfg::EXT_TYPE_MAP->{$Pcore::Core::Const::DIST_CFG_TYPE}, { name => $dist_name } );
 
     my $package = <<"PERL";
 package $res->{package_name} v0.1.0;

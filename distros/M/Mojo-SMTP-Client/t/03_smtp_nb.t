@@ -14,7 +14,7 @@ if ($^O eq 'MSWin32') {
 # 1
 my $loop = Mojo::IOLoop->singleton;
 my ($pid, $sock, $host, $port) = Utils::make_smtp_server();
-my $smtp = Mojo::SMTP::Client->new(address => $host, port => $port);
+my $smtp = Mojo::SMTP::Client->new(tls_verify => 0, address => $host, port => $port);
 my $connections = 0;
 $smtp->on(start => sub {
 	$connections++;
@@ -60,7 +60,7 @@ kill 15, $pid;
 
 # 2
 ($pid, $sock, $host, $port) = Utils::make_smtp_server();
-$smtp = Mojo::SMTP::Client->new(address => $host, port => $port, hello => 'dragon-host.net');
+$smtp = Mojo::SMTP::Client->new(tls_verify => 0, address => $host, port => $port, hello => 'dragon-host.net');
 $connections = 0;
 $smtp->on(start => sub {
 	$connections++;
@@ -174,8 +174,8 @@ kill 15, $pid;
 my ($pid1, $sock1, $host1, $port1) = Utils::make_smtp_server();
 my ($pid2, $sock2, $host2, $port2) = Utils::make_smtp_server();
 
-my $smtp1 = Mojo::SMTP::Client->new(address => $host1, port => $port1, inactivity_timeout => 0.5);
-my $smtp2 = Mojo::SMTP::Client->new(address => $host2, port => $port2, inactivity_timeout => 0.5);
+my $smtp1 = Mojo::SMTP::Client->new(tls_verify => 0, address => $host1, port => $port1, inactivity_timeout => 0.5);
+my $smtp2 = Mojo::SMTP::Client->new(tls_verify => 0, address => $host2, port => $port2, inactivity_timeout => 0.5);
 my $clients = 2;
 
 $smtp1->send(
@@ -283,7 +283,7 @@ kill 15, $pid1, $pid2;
 
 # 4
 ($pid, $sock, $host, $port) = Utils::make_smtp_server();
-$smtp = Mojo::SMTP::Client->new(address => $host, port => $port);
+$smtp = Mojo::SMTP::Client->new(tls_verify => 0, address => $host, port => $port);
 $connections = 0;
 $i = 0;
 @cmd = (
@@ -352,7 +352,7 @@ kill 15, $pid;
 
 # 5
 ($pid, $sock, $host, $port) = Utils::make_smtp_server();
-$smtp = Mojo::SMTP::Client->new(address => $host, port => $port);
+$smtp = Mojo::SMTP::Client->new(tls_verify => 0, address => $host, port => $port);
 
 @cmd = (
 	'CONNECT' => '220 CONNECTED',
@@ -404,7 +404,7 @@ kill 15, $pid;
 
 # 6
 ($pid, $sock, $host, $port) = Utils::make_smtp_server();
-$smtp = Mojo::SMTP::Client->new(address => $host, port => $port);
+$smtp = Mojo::SMTP::Client->new(tls_verify => 0, address => $host, port => $port);
 
 sub get_data {
 	my $len = shift // 2;
@@ -461,7 +461,7 @@ kill 15, $pid;
 
 # 7
 ($pid, $sock, $host, $port) = Utils::make_smtp_server();
-$smtp = Mojo::SMTP::Client->new(address => $host, port => $port, hello => 'dragon-host.net');
+$smtp = Mojo::SMTP::Client->new(tls_verify => 0, address => $host, port => $port, hello => 'dragon-host.net');
 $smtp->on(start => sub {
 	die "error from start callback\n";
 });
@@ -486,7 +486,7 @@ kill 15, $pid;
 
 # 8
 ($pid, $sock, $host, $port) = Utils::make_smtp_server();
-$smtp = Mojo::SMTP::Client->new(address => $host, port => $port, hello => 'dragon-host.net');
+$smtp = Mojo::SMTP::Client->new(tls_verify => 0, address => $host, port => $port, hello => 'dragon-host.net');
 $smtp->on(response => sub {
 	my $cmd = $_[1];
 	
@@ -527,7 +527,7 @@ kill 15, $pid;
 
 # 9 - AUTH LOGIN method
 ($pid, $sock, $host, $port) = Utils::make_smtp_server();
-$smtp = Mojo::SMTP::Client->new(address => $host, port => $port);
+$smtp = Mojo::SMTP::Client->new(tls_verify => 0, address => $host, port => $port);
 $connections = 0;
 $smtp->on(start => sub {
     $connections++;

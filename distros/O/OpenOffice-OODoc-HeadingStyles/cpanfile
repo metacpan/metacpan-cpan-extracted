@@ -1,0 +1,10 @@
+requires 'OpenOffice::OODoc' => 0;
+requires 'List::Util'        => 0;
+requires 'Readonly'          => 0;
+requires 'Scalar::Util'      => 0;
+
+on 'test' => sub {
+    requires 'Test::Most'        => 0;
+    requires 'Test::MockObject'  => 0;
+};
+

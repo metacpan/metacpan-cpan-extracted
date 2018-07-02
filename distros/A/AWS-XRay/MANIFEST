@@ -11,5 +11,10 @@ t/00_compile.t
 t/01_trace.t
 t/02_from.t
 t/03_miss_from.t
+t/04_sampling.t
+t/05_sampled_header.t
+t/06_sampler.t
+t/Util.pm
+xt/01_overhead.t
 META.yml
 MANIFEST

@@ -1,0 +1,58 @@
+<div class="fb11-card">
+  <h1>[% object_name %] Preferences</h1>
+
+  <table class="table table-striped datatable">
+      <thead>
+          <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Active</th>
+              <th>Required</th>
+              <th>Audit</th>
+              <th>Searchable</th>
+              [% IF enc %]
+              <th>Encrypted</th>
+              [% END %]
+              <th>Display Order</th>
+              <th>Confirmation Box Required</th>
+              [% IF extra_fields %]
+                  [% extra_fields | none %]
+              [% END %]
+              <th>Action</th>
+          </tr>
+      </thead>
+      <tbody>
+          [% FOR pref IN preferences %]
+              <tr>
+                  <td>[% pref.name %]</td>
+                  <td>[% pref.comment %]</td>
+                  <td>[% pref.data_type %]</td>
+                  <td>[% pref.default_value %]</td>
+                  <td>[% IF pref.active %]Yes[% ELSE %]No[% END %]</td>
+                  <td>[% IF pref.required %]Yes[% ELSE %]No[% END %]</td>
+                  <td>[% IF pref.audit %]Yes[% ELSE %]No[% END %]</td>
+                  <td>[% IF pref.searchable %]Yes[% ELSE %]No[% END %]</td>
+                  [% IF enc %]
+                  <td>[% IF pref.encrypted %]Yes[% ELSE %]No[% END %]</td>
+                  [% END %]
+                  <td>[% pref.display_order %]</td>
+                  <td>[% IF pref.confirmation_required %]Yes[% ELSE %]No[% END %]</td>
+                  [% PROCESS extra_field_values | none %]
+                  <td>
+                      <a href="[% c.uri_for(c.controller.action_for('edit'), [
+                        object_name, pref.name ]) %]">edit</a>
+                      [% IF pref.data_type == 'select' %]
+                          <a href="[%
+                            c.uri_for(c.controller.action_for('values'), [
+                            object_name, pref.name ]) %]">values</a>
+                      [% END %]
+                  </td>
+              </tr>
+          [% END %]
+      </tbody>
+  </table>
+  <a href="[% c.uri_for(c.controller.action_for('add'), [ object_name ]) %]"
+    class="btn btn-primary">Add</a>
+</div>

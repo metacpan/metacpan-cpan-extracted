@@ -1,7 +1,7 @@
 #ifndef FFI_PERL_H
 #define FFI_PERL_H
 
-#define FFI_UTIL_VERSION 047
+#define FFI_UTIL_VERSION 048
 
 #ifdef _MSC_VER
 #define FFI_UTIL_EXPORT __declspec(dllexport)

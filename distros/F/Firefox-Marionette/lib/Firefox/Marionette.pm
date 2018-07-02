@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -1049,6 +1049,9 @@ sub _setup_new_profile {
     else {
         $profile = Firefox::Marionette::Profile->new();
     }
+    my $mime_types = join q[,], $self->mime_types();
+    $profile->set_value( 'browser.helperApps.neverAsk.saveToDisk',
+        $mime_types );
     if ( !$self->_is_auto_listen_okay() ) {
         socket my $socket, Socket::PF_INET(), Socket::SOCK_STREAM(), 0
           or Firefox::Marionette::Exception->throw(
@@ -3095,7 +3098,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.56
+Version 0.57
 
 =head1 SYNOPSIS
 

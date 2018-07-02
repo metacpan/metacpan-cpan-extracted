@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Cpanel::JSON::XS qw( decode_json encode_json );
 use HTTP::Request;
+use LWP::Protocol::https;
 use LWP::UserAgent;
 use URI;
 use WebService::PivotalTracker::Types qw( LWPObject MD5Hex Uri );
@@ -115,7 +116,7 @@ WebService::PivotalTracker::Client - The API client
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 DESCRIPTION
 

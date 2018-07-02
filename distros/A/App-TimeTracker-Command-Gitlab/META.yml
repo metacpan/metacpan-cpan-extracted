@@ -27,5 +27,5 @@ requires:
 resources:
   homepage: http://timetracker.plix.at
   repository: git://github.com/domm/App-TimeTracker-Gitlab.git
-version: '1.003'
+version: '1.004'
 x_serialization_backend: 'YAML::Tiny version 1.64'

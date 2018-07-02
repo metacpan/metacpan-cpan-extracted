@@ -1,5 +1,5 @@
 package Bio::Tools::Run::Phylo::PAML::Codeml;
-$Bio::Tools::Run::Phylo::PAML::Codeml::VERSION = '1.7.2';
+$Bio::Tools::Run::Phylo::PAML::Codeml::VERSION = '1.7.3';
 use utf8;
 use strict;
 use warnings;
@@ -427,7 +427,7 @@ Bio::Tools::Run::Phylo::PAML::Codeml - Wrapper aroud the PAML program codeml
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 

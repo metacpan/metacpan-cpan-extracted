@@ -7,7 +7,7 @@ use App::Egaz -command;
 use App::Egaz::Common;
 
 sub abstract {
-    return 'convert .lav files to .axt files';
+    return 'convert .lav files to .axt';
 }
 
 sub opt_spec {

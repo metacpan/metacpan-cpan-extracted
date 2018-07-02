@@ -14,7 +14,7 @@ require Exporter;
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(holidays);
-our $VERSION   = '1.9';
+our $VERSION   = '2.00';
 
 sub holidays{
 	my %parameters = (
@@ -118,9 +118,15 @@ sub holidays{
 
 	# Extras for Bremen
 	@{$holidays{'hb'}} = qw();
+	if ($year >= 2018) {
+		push @{$holidays{'hb'}}, qw(refo);
+	}
 
 	# Extras for Hamburg
 	@{$holidays{'hh'}} = qw();
+	if ($year >= 2018) {
+		push @{$holidays{'hh'}}, qw(refo);
+	}
 
 	# Extras for Hessen
 	@{$holidays{'he'}} = qw(fron);
@@ -130,6 +136,9 @@ sub holidays{
 
 	# Extras for Niedersachsen
 	@{$holidays{'ni'}} = qw();
+	if ($year >= 2018) {
+		push @{$holidays{'ni'}}, qw(refo);
+	}
 
 	# Extras for Nordrhein-Westfalen
 	@{$holidays{'nw'}} = qw(fron alhe);
@@ -148,6 +157,9 @@ sub holidays{
 
 	# Extras for Schleswig-Holstein
 	@{$holidays{'sh'}} = qw();
+	if ($year >= 2018) {
+		push @{$holidays{'sh'}}, qw(refo);
+	}
 
 	# Extras for Thueringen
 	@{$holidays{'th'}} = qw(refo);
@@ -496,7 +508,7 @@ will return a list of all known holidays. This was added in version 0.6.
 
 There are a number of holidays that aren't really holidays, e.g. New Year's Eve 
 and Christmas Eve. These aren't contained in the I<common> set of holidays 
-returnd by the B<holidays()> function. The aforementioned I<silv> and I<heil> 
+returned by the B<holidays()> function. The aforementioned I<silv> and I<heil> 
 are probably the most likely ones that you'll need. If you live in Koeln, you'll
 probably want to include I<romo> and I<fadi>, too. ;-)
 
@@ -562,10 +574,6 @@ not a bug. Awareness for this was introduced in Version 1.1.
 
 The German Federal Ministry of the Interior used to publish a comprehensive
 list of holiday dates. This does currently not appear to be the case.
-
-A list of holidays per state is available at:
-
-  http://www.bmi.bund.de/cae/servlet/contentblob/150560/publicationFile/13610/feiertage_de.pdf
 
 =head1 LIMITATIONS
 

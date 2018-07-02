@@ -21,3 +21,8 @@ SV *_umount_sys(const char *target)
 	CODE:
 	ST(0) = sv_newmortal();
 	sv_setiv(ST(0), umount(target));
+
+SV *_umount2_sys(const char *target, int umountflags)
+	CODE:
+	ST(0) = sv_newmortal();
+	sv_setiv(ST(0), umount2(target, umountflags));

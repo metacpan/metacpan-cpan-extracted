@@ -1,0 +1,53 @@
+---
+abstract: 'Devel::CallParser patched to fix RT#110623'
+author:
+  - 'Devel::CallParser by Andrew Main (Zefram) <zefram@fysh.org>.'
+  - 'Alt distribution by Toby Inkster (TOBYINK) <tobyink@cpan.org>.'
+build_requires:
+  Devel::CallChecker: '0.002'
+  DynaLoader: '0'
+  ExtUtils::CBuilder: '0.15'
+  ExtUtils::ParseXS: '0'
+  File::Spec: '0'
+  IO::File: '1.03'
+  Module::Build: '0'
+  Test::More: '0'
+  perl: '5.011002'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0'
+  perl: '5.011002'
+  strict: '0'
+  warnings: '0'
+conflicts:
+  Data::Alias: '< 1.13'
+  Devel::Declare: '< 0.006004'
+  indirect: '< 0.27'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alt-Devel-CallParser-ButWorking
+provides:
+  Alt::Devel::CallParser::ButWorking:
+    file: lib/Alt/Devel/CallParser/ButWorking.pm
+    version: '0.002'
+  Devel::CallParser:
+    file: lib/Devel/CallParser.pm
+    version: '0.002'
+requires:
+  Devel::CallChecker: '0.002'
+  DynaLoader: '0'
+  DynaLoader::Functions: '0.001'
+  Exporter: '0'
+  parent: '0'
+  perl: '5.011002'
+  strict: '0'
+  warnings: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

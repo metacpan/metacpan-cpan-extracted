@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; 
+undef $/ ;
+print $_ while <> ; 
+
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.01 ;
+   # shuffler 
+   #  Produced by Toshiyuki Shimono in Tokyo, 2016-01-25 ~ 2016-10-13 ; 2018-03-25 English added.
+   # 目安: 
+   #   0.21 : 人になんとか提供できる段階で 0.21 を目安とする。
+   #   1.00 以上 : 英語版のヘルプをきちんと出すことが必要条件。
+   #   2.00 以上 : テストコードが含むことが必要条件。
+  use FindBin qw[$Script] ; 
+  if ( grep { m/--version/} @ARGV )
+  {
+  	print STDERR "$Script version $VERSION, running under Perl $^V.\n"  ;
+  	exit 0 ; 
+  }
+
+  if ( grep { m/--help/} @ARGV ) 
+  {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+  }
+}  
+
+
+
+=encoding utf8
+
+=pod
+
+=head1 NAME
+
+buffer
+
+=head1 VERSION
+
+version 0.01
+
+=head1 SYNOPSYS
+
+=over 4
+
+=item cat | buffer 
+
+=item buffer < somefile
+
+=item buffer | someCommand 
+
+=item buffer | tee writtenFile | someCommand 
+
+=back
+
+=head1 DESCRIPTION
+
+Reads the whole input then write into STDOUT. Probably useful at copy/paste operation.
+
+=head1 TODO
+
+Probably some useful options should be carefully selected and implemented to this command.
+
+
+=cut 

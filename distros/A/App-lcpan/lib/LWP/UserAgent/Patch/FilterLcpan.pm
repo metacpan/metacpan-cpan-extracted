@@ -1,14 +1,14 @@
 package LWP::UserAgent::Patch::FilterLcpan;
 
-our $DATE = '2018-02-08'; # DATE
-our $VERSION = '1.022'; # VERSION
+our $DATE = '2018-06-21'; # DATE
+our $VERSION = '1.023'; # VERSION
 
 use 5.010001;
 use strict;
 no warnings;
 
 use HTTP::Response;
-use Module::Patch 0.26 qw();
+use Module::Patch qw();
 use base qw(Module::Patch);
 
 our %config;
@@ -117,7 +117,7 @@ LWP::UserAgent::Patch::FilterLcpan - Filter mirror()
 
 =head1 VERSION
 
-This document describes version 1.022 of LWP::UserAgent::Patch::FilterLcpan (from Perl distribution App-lcpan), released on 2018-02-08.
+This document describes version 1.023 of LWP::UserAgent::Patch::FilterLcpan (from Perl distribution App-lcpan), released on 2018-06-21.
 
 =head1 HOMEPAGE
 

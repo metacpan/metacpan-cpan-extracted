@@ -67,13 +67,23 @@ share {
 
     meta->after_hook(gather_share => sub {
         my $build= shift;
-        my $flags = '-DWIN32';
-        $flags .= ' -DWIN64' if $bits == 64;
+        my $flags = '-DWIN32 -D_WIN32';
+        $flags .= ' -DWIN64 -D_WIN64' if $bits == 64;
         if (my $ver = WINVER()) {
             $flags .= " -D_WINVER=$ver -D_WIN32_WINNT=$ver"
         }
         $build->runtime_prop->{$_} .= " $flags" for qw( cflags cflags_static );
-        $build->runtime_prop->{$_} .= ' -lpsapi -luserenv -lIphlpapi' for qw( libs libs_static );
+        # on windows, we need the following libraries to be included. MinGW can't pull these
+        # from source on windows, so we add the equivalent to these pragma comments
+        # to our libs/libs_static area:
+        #pragma comment(lib, "Advapi32.lib")
+        #pragma comment(lib, "IPHLPAPI.lib")
+        #pragma comment(lib, "kernel32.lib")
+        #pragma comment(lib, "Psapi.lib")
+        #pragma comment(lib, "User32.lib")
+        #pragma comment(lib, "Userenv.lib")
+        #pragma comment(lib, "Ws2_32.lib")
+        $build->runtime_prop->{$_} .= ' -ladvapi32 -lIphlpapi -lkernel32 -lpsapi -luser32 -luserenv -lws2_32' for qw( libs libs_static );
     });
 
     build [

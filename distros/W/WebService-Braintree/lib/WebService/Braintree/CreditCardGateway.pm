@@ -6,7 +6,7 @@ package # hide from pause
 use 5.010_001;
 use strictures 1;
 
-use Moose;
+use Moo;
 extends 'WebService::Braintree::PaymentMethodGatewayBase';
 with 'WebService::Braintree::Role::CollectionBuilder';
 

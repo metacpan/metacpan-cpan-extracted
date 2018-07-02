@@ -3,7 +3,7 @@ package Devel::Chitin::OpTree;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Carp;
 use Scalar::Util qw(blessed reftype weaken refaddr);
@@ -323,6 +323,8 @@ my %flag_values = (
 my %private_values = (
     BARE => B::OPpCONST_BARE,
     TARGMY => B::OPpTARGET_MY,
+    SLICE => B::OPpSLICE,
+    ($^V ge v5.28.0 ? ( KVSLICE => &B::OPpKVSLICE ) : ()),
 );
 sub print_as_tree {
     my $self = shift;
@@ -646,50 +648,40 @@ sub _maybe_targmy {
     }
 }
 
+sub op_name {
+    my $self = shift;
+    return $self->is_null
+            ? substr($self->_ex_name, 3)  # remove the preceding pp_
+            : $self->op->name;
+}
+
 # return true for scalar things we can assign to
 my %scalar_container_ops = (
     rv2sv => 1,
-    pp_rv2sv => 1,
     padsv => 1,
-    pp_padsv => 1,
 );
 sub is_scalar_container {
     my $self = shift;
-    my $op_name = $self->is_null
-                    ? $self->_ex_name
-                    : $self->op->name;
-    $scalar_container_ops{$op_name};
+    $scalar_container_ops{$self->op_name};
 }
 
 my %array_container_ops = (
     rv2av => 1,
-    pp_rv2av => 1,
     padav => 1,
-    pp_padav => 1,
 );
 sub is_array_container {
     my $self = shift;
-    my $op_name = $self->is_null
-                    ? $self->_ex_name
-                    : $self->op->name;
-    $array_container_ops{$op_name};
+    $array_container_ops{$self->op_name};
 }
 
 my %scopelike_ops = (
     scope => 1,
-    pp_scope => 1,
     leave => 1,
-    pp_leave => 1,
     leavetry => 1,
-    pp_leavetry => 1,
     leavesub => 1,
-    pp_leavesub => 1,
     leaveloop => 1,
-    pp_leaveloop => 1,
     entergiven => 1,
-    pp_entergiven => 1,
     enterwhile => 1,
-    pp_enterwhile => 1,
     #entergiven => 1,        # Part of the reverted given/whereso/whereis from 5.27.7
     #pp_entergiven => 1,
     #enterwhereso => 1,
@@ -697,10 +689,7 @@ my %scopelike_ops = (
 );
 sub is_scopelike {
     my $self = shift;
-    my $op_name = $self->is_null
-                    ? $self->_ex_name
-                    : $self->op->name;
-    $scopelike_ops{$op_name};
+    $scopelike_ops{$self->op_name};
 }
 
 sub is_for_loop {
@@ -1013,6 +1002,14 @@ the same subroutine, the same OpTree object will be returned.
 =item op
 
 Returns the B::OP-related object wrapped by the invocant
+
+=item op_name
+
+Returns the original OP name, even if the OP has been optimized away, and
+without any preceding 'pp_'.  For example, the OP named 'pp_exists' will
+return 'exists', and an optimized away pp_padsv will still return 'padsv'
+even though it's OP is a pp_null.  To get the real OP name without this
+munging, use C<$op->op->name>.
 
 =item parent
 

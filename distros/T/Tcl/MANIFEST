@@ -28,8 +28,11 @@ tcl-core/include/tclPlatDecls.h
 tcl-core/linux-i686/libtclstub8.4.a
 tcl-core/linux-ia64/libtclstub8.4.a
 tcl-core/linux-x86_64/libtclstub8.4.a
+tcl-core/cygwin-i686/libtclstub8.4.a
+tcl-core/cygwin-x86_64/libtclstub8.4.a
 tcl-core/solaris-sparc/libtclstub8.4.a
 tcl-core/solaris-x86/libtclstub8.4.a
 tcl-core/win32-x86/tclstub84.lib
 tcl-core/win32-x64/tclstub84.lib
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

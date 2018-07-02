@@ -12,7 +12,7 @@ File::Find::Object::Rule::Extending - the mini-guide to extending File::Find::Ob
 
 =head1 VERSION
 
-version 0.0307
+version 0.0309
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ version 0.0307
 =head1 DESCRIPTION
 
 L<File::Find::Object::Rule> inherits L<File::Find::Rule>'s extensibility. It
-is now possibile to extend it, using the following conventions.
+is now possible to extend it, using the following conventions.
 
 =head2 Declare your package
 
@@ -82,7 +82,7 @@ doesn't know about a C<'.'> rule.
 
 =head1 VERSION
 
-version 0.0307
+version 0.0309
 
 =head1 NOTES ABOUT THE CALLBACK
 

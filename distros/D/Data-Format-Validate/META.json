@@ -1,0 +1,36 @@
+{
+   "abstract" : "Perl module to validate data",
+   "author" : [
+      "Israel Costa <israel.batista@univem.edu.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Format-Validate",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Simple" : "1.302136"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "v1.3.8"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

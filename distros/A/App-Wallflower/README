@@ -16,7 +16,7 @@ for tips on how to write your Plack application to work with wallflower.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2010-2012 Philippe Bruhat (BooK)
+Copyright (C) 2010-2018 Philippe Bruhat (BooK)
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

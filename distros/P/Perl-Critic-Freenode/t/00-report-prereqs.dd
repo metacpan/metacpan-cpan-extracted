@@ -23,6 +23,7 @@ do { my $x = {
                                       'Perl::Critic::Policy::Subroutines::ProhibitAmpersandSigils' => '1.126',
                                       'Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref' => '90',
                                       'Perl::Critic::Policy::Variables::ProhibitConditionalDeclarations' => '1.126',
+                                      'Perl::Critic::Policy::Variables::ProhibitLoopOnHash' => '0.005',
                                       'Scalar::Util' => '0',
                                       'parent' => '0',
                                       'perl' => '5.010001',

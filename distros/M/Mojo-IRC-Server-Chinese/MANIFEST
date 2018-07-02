@@ -1,4 +1,5 @@
 Changes
+cpanfile
 demo/demo.pl
 doc/Chinese.pod
 lib/Mojo/IRC/Server/Chinese.pm

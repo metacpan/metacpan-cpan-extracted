@@ -2,48 +2,33 @@
 
 **Assert::Refute** - unified testing, assertion, and design-by-contract tool
 
-# DESCRIPTION
+# SYNOPSIS
 
 This module allows to create snippets of code called *contracts*
 that behave just as a unit test would,
-but do not require the enclosing code to be a unit test.
+but do not require the enclosing code to be a unit test:
 
-A **refutation** is an inverted form of assertion:
+    use Assert::Refute qw(:all) { on_fail => 'croak' };
 
-    refute( $condition, $message );
+    # deep in the production code
+    my $data = Some::Module->bloated_untestable_sub;
+    try_refute {
+        like $data->{foo}, qr/f?o?r?m?a?t/;
+        is $data->{bar}, 42;
+        can_ok $data->{baz}, qw(do_this do_that frobnicate);
+    }; # this dies if conditions are not met
 
-Succeeds silently if the condition is *false*, but fails loudly if it is *true*
-and asumes the condition value itself to be the *reason* of failure.
+This can be transferred *verbatim* into a unit-test,
+allowing to find the sweet spot on the `speed <---> accuracy` scale.
 
-Such inversion simplifies building and composition of tests a lot.
-Normal `is`, `like` etc can easily be built on top of that:
+# WHY REFUTE
 
-    sub my_is($$;$) {
-        my ($got, $exp, $message) = @_;
-        refute( $got ne $exp && "$got != $exp", $message );
-        # no diag() needed!
-    };
+Communicating a passing test/check requires 1 bit of information:
+exerything is fine.
+When something's not right, however, the more details, the better.
 
-A **contract** is a group of assertions that is saved for later execution:
-
-    # once, at start up
-    use Assert::Refute;
-    my $spec = contract {
-        my ($foo, $bar) = @_;
-        # insert checks here
-    };
-
-    # much later
-    $spec->apply( $real_foo, $real_bar );
-    $spec->is_passing; # true of false
-    $spec->count;      # number of tests performed
-    $spec->as_tap;     # summary in Test::More's format
-
-A **subcontract** is an application of a preexisting contract
-to the data at hand as a single check.
-
-These three elements allow for creation of arbitarily complex checks
-applicable uniformly in production code or test scripts.
+Thus `refute`, an inverted assertion, is the central building block
+of this module.
 
 # INSTALLATION
 
@@ -54,12 +39,42 @@ To install this module, run the following commands:
 	make test
 	make install
 
+# CONTENT OF THIS PACKAGE
+
+* `Changes` - change log
+* `examples` - really simple scripts demonstrating usage
+* `lib` - modules
+* `Makefile.PL`
+* `README.md`/`README` - this file
+* `t` - tests required for installation
+* `TODO` - approximate roadmap
+* `xt` - tests required for development only
+* `.githooks` - author's default pre-commit hooks
+
+The modules include:
+
+* `Assert::Refute` - the main frontend with a lot of exports.
+It also handles runtime assertions.
+
+* `Assert::Refute::Build` - helper module to build more test conditions
+(those would also work fine under Test::More).
+
+* `Assert::Refute::Contract` - implementations of contract *specification*.
+
+* `Assert::Refute::Report` - implementation of contract execution *report*.
+This is where `refute` is implemented.
+
+* `Assert::Refute::Driver::*` - assertion/testing protocol implementations
+(currently only Test::More compatibility layer there).
+
+* `Assert::Refute::T::*` - extra conditions and checks.
+
 # SUPPORT AND DOCUMENTATION
 
-After installing, you can find documentation for this module with the
-perldoc command.
+See https://metacpan.org/pod/Assert::Refute
 
-    perldoc Assert::Refute
+This package is under heavy development.
+Bugs may be lurking!
 
 Please report bugs and ask for features here:
 
@@ -67,7 +82,7 @@ Please report bugs and ask for features here:
 
 # LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Konstantin S. Uvarin `khedin@gmail.com`
+Copyright (C) 2017-2018 Konstantin S. Uvarin `khedin@cpan.org`
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

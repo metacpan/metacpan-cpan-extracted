@@ -2,21 +2,18 @@ use strict;
 use warnings;
 package YAML::PP::Emitter;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use constant DEBUG => $ENV{YAML_PP_EMIT_DEBUG};
 
 sub new {
     my ($class, %args) = @_;
     my $self = bless {
-        yaml => undef,
         indent => $args{indent} // 2,
     }, $class;
     return $self;
 }
 
-sub yaml { return $_[0]->{yaml} }
-sub set_yaml { $_[0]->{yaml} = $_[1] }
 sub event_stack { return $_[0]->{event_stack} }
 sub set_event_stack { $_[0]->{event_stack} = $_[1] }
 sub indent { return $_[0]->{indent} }
@@ -26,8 +23,6 @@ sub set_writer { $_[0]->{writer} = $_[1] }
 
 sub init {
     my ($self) = @_;
-    my $yaml = '';
-    $self->set_yaml(\$yaml);
 }
 
 sub mapping_start_event {
@@ -102,7 +97,8 @@ sub mapping_start_event {
     $self->writer->write($yaml);
     my $new_info = { index => 0, indent => $new_indent, info => $info, append => $new_append };
     if (($info->{style} || '') eq 'flow') {
-        $new_info->{type} = 'FLOWMAP';
+#        $new_info->{type} = 'FLOWMAP';
+        $new_info->{type} = 'MAP';
     }
     else {
         $new_info->{type} = 'MAP';
@@ -286,6 +282,7 @@ my %to_escape = (
     %control,
 );
 my $escape_re = $control_re . '\n\t\r';
+my $escape_re_without_lb = $control_re . '\t\r';
 
 
 sub scalar_event {
@@ -309,18 +306,38 @@ sub scalar_event {
 
     my $append = $last->{append};
 
-    my $style = $info->{style} || ':';
+    my $style = $info->{style};
     DEBUG and local $Data::Dumper::Useqq = 1;
     $value //= '';
+    if (not $style and $value eq '') {
+        $style = "'";
+    }
+    $style ||= ':';
 
     my $first = substr($value, 0, 1);
     # no control characters anywhere
     if ($style ne '"' and $value =~ m/[$control_re]/) {
         $style = '"';
     }
-    elsif ($style eq ':') {
-        if ($value =~ m/[$escape_re]/) {
+    elsif ($style eq "'") {
+        if ($value =~ m/ \n/ or $value =~ m/\n / or $value =~ m/^\n/ or $value =~ m/\n$/) {
             $style = '"';
+        }
+        elsif ($value eq "\n") {
+            $style = '"';
+        }
+    }
+    elsif ($style eq '|' or $style eq '>') {
+    }
+    elsif ($style eq ':') {
+        if ($value =~ m/[$escape_re_without_lb]/) {
+            $style = '"';
+        }
+        elsif ($value eq "\n") {
+            $style = '"';
+        }
+        elsif ($value =~ m/\n/) {
+            $style = '|';
         }
         elsif ($forbidden_first{ $first }) {
             $style = "'";
@@ -349,18 +366,30 @@ sub scalar_event {
         $value =~ s/\n/\n\n/g;
     }
     elsif ($style eq "'") {
-        $value =~ s/\n/\n\n/g;
+        my $new_indent = $last->{indent} . (' ' x $self->indent);
+        $value =~ s/(\n+)/"\n" x (1 + (length $1))/eg;
+        my @lines = split m/\n/, $value, -1;
+        if (@lines > 1) {
+            for my $line (@lines[1 .. $#lines]) {
+                $line = $new_indent . $line
+                    if length $line;
+            }
+        }
+        $value = join "\n", @lines;
         $value =~ s/'/''/g;
         $value = "'" . $value . "'";
     }
     elsif ($style eq '|') {
         DEBUG and warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$value], ['value']);
         my $indicators = '';
+        if ($value =~ m/\A\n* +/) {
+            $indicators .= $self->indent;
+        }
         if ($value !~ m/\n\z/) {
             $indicators .= '-';
             $value .= "\n";
         }
-        elsif ($value =~ m/\n\n\z/) {
+        elsif ($value =~ m/(\n|\A)\n\z/) {
             $indicators .= '+';
         }
         $value =~ s/^(?=.)/$indent  /gm;
@@ -372,6 +401,9 @@ sub scalar_event {
         DEBUG and warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\@lines], ['lines']);
         my $eol = 0;
         my $indicators = '';
+        if ($value =~ m/\A\n* +/) {
+            $indicators .= $self->indent;
+        }
         if ($lines[-1] eq '') {
             pop @lines;
             $eol = 1;
@@ -481,6 +513,7 @@ sub scalar_event {
             }
         }
         else {
+#            warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$last], ['last']);
             die "Unexpected";
         }
         if (not $multiline) {
@@ -516,6 +549,10 @@ sub alias_event {
     }
     elsif ($last->{type} eq 'DOC') {
         $self->writer->write("$alias\n");
+    }
+    else {
+        $self->writer->write("$indent: $alias\n");
+        $last->{type} = 'MAP';
     }
 }
 
@@ -568,6 +605,11 @@ sub emit_tag {
         $tag = "!<$tag>";
     }
     return $tag;
+}
+
+sub finish {
+    my ($self) = @_;
+    $self->writer->finish;
 }
 
 1;

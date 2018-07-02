@@ -1,5 +1,4 @@
-#
-#  Copyright 2016 MongoDB, Inc.
+#  Copyright 2016 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -49,7 +47,8 @@ sub run_test {
     $warning_counter = 0;
     {
         local $SIG{__WARN__} = sub { ++$warning_counter; };
-        $uri = new_ok( "MongoDB::_URI", [ uri => $test->{uri} ], "uri construction" );
+        $uri = new_ok( "MongoDB::_URI", [ uri => $test->{uri} ], "uri construction" )
+          or return;
     }
 
     my @hosts;
@@ -80,9 +79,10 @@ sub run_test {
 
 my $dir      = path("t/data/connection_string");
 my $iterator = $dir->iterator;
+my $json = JSON::MaybeXS->new;
 while ( my $path = $iterator->() ) {
     next unless $path =~ /\.json$/;
-    my $plan = eval { decode_json( $path->slurp_utf8 ) };
+    my $plan = eval { $json->decode( $path->slurp_utf8 ) };
     if ($@) {
         die "Error decoding $path: $@";
     }

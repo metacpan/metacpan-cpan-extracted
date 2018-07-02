@@ -9,7 +9,7 @@ my $builder = Module::Build->new(
     dist_author         => q{"Toshiyuki Shimono" <bin4tsv@gmail.com>},
     dist_version_from   => 'lib/CLI/Numbers/Hack.pm',
     release_status      => 'stable',
-    script_files =>[map{"scripts/$_"}qw[denomfind rounding zeropad cumsum meanvar minmax nums]],
+    script_files =>[map{"scripts/$_"}qw[denomfind rounding zeropad cumsum meanvar minmax nums quantile]],
     configure_requires => {
         'Module::Build' => '0',
     },

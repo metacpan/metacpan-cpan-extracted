@@ -1,3 +1,14 @@
+0.273   2018-06-27 (PERLANCAR)
+
+	- Introduce table.field_{format,align}_code,
+	  table.default_field_{format,align}.
+
+
+0.272   2018-06-14 (PERLANCAR)
+
+	- Introduce table.field_labels.
+
+
 0.271   2018-01-31 (PERLANCAR)
 
 	- Introduce table.field_orders (which will be fed to Sort::BySpec

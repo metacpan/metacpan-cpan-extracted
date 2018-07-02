@@ -1,8 +1,8 @@
-package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.43-3-ge8b4a71
+package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.44-2-gd5fc164
 # ABSTRACT: A more awesome MakeMaker plugin for L<Dist::Zilla>
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain customize override
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use Moose;
 use MooseX::Types::Moose qw< Str ArrayRef HashRef >;
@@ -412,10 +412,9 @@ sub _build_footer {
 sub register_prereqs {
     my ($self) = @_;
 
-    (my $eumm_version = $self->eumm_version) =~ tr/_//d;
     $self->zilla->register_prereqs(
         { phase => 'configure' },
-        'ExtUtils::MakeMaker' => $eumm_version,
+        'ExtUtils::MakeMaker' => $self->eumm_version || 0,
     );
 
     return unless keys %{ $self->zilla->_share_dir_map };
@@ -497,7 +496,7 @@ Dist::Zilla::Plugin::MakeMaker::Awesome - A more awesome MakeMaker plugin for L<
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

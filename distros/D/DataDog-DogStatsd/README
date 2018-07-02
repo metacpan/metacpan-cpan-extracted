@@ -90,6 +90,10 @@ METHODS
 
     Sends a value to be tracked as a set to the statsd server.
 
+ event
+
+            $statsd->event('event title', 'event text', { tags => ['tag1, 'tag2'] });
+
 AUTHORS
 
     Stefan Goethals <stefan@zipkid.eu>

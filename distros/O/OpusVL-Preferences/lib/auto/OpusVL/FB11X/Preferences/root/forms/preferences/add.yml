@@ -1,0 +1,130 @@
+---
+indicator: submit
+auto_fieldset: 0
+form_error_message: Oops, looks like there was a problem - please check below and try again.
+
+elements:
+
+  - type: Block
+    name: main_block
+    attributes:
+      class: "content_block"
+    elements:
+
+      - type: Hidden
+        name: prf_owner_type_id
+
+      - type: Text
+        label: Code *
+        name: name
+        constraints:
+          - Required
+          - type: Regex
+            regex: '^[\w_]+$'
+            message: Code can only contain letters, numbers and underscores. 
+          - type: Callback
+            message: There is already a setting named that.
+          - type: DBIC::Unique
+            model: PreferencesDB
+            resultset: PrfDefault
+            message_loc: "Code must be unique"
+            others: prf_owner_type_id
+            # NOTE: this is ugly and depends on the internals
+            # of HTML::FormFu just checking the one field
+            # for the id.  It's support for compound pk's is 
+            # spotty + it can't really do the whole thing
+            # via this single constraint.
+            id_field: prf_owner_type_id
+
+      - type: Text
+        label: Name *
+        name: comment
+        constraints:
+          - Required
+          - type: DBIC::Unique
+            model: PreferencesDB
+            resultset: PrfDefault
+            message_loc: "Name must be unique"
+            others: prf_owner_type_id
+            id_field: prf_owner_type_id
+
+      - type: Text
+        name: default_value
+        label: Default Value
+
+      - type: Select
+        label: Type *
+        name: data_type
+        options:
+          - [ 'text', 'Text' ]
+          - [ 'textarea', 'Text Area' ]
+          - [ 'integer', 'Integer' ]
+          - [ 'select', 'Select' ]
+          - [ 'date', 'Date' ]
+          - [ 'boolean', 'True/False' ]
+          - [ 'number', 'Number' ]
+          - [ 'email', 'Email' ]
+        constraints:
+          - Required
+
+      - type: Checkbox
+        name: active
+        label: Active
+
+      - type: Checkbox
+        name: required
+        label: Required
+
+      - type: Checkbox
+        name: searchable
+        label: Searchable
+
+      - type: Checkbox
+        name: audit
+        label: Audit
+
+      - type: Checkbox
+        name: hidden
+        label: Hidden
+
+      - type: Checkbox
+        name: gdpr_erasable
+        label: GDPR Erasable
+
+
+      - type: Text
+        name: display_order
+        label: Display Order
+        constraints:
+          - Number
+          - Required
+
+      - type: Checkbox
+        name: confirmation_required
+        label: Confirmation Box Required
+
+      - type: Checkbox
+        name: encrypted
+        label: Encrypted
+        attributes:
+          disabled: disabled
+
+      - type: Text
+        name: display_mask
+        container_attributes:
+          title: Mask sensitive data output on reports.  Uses a regex, captures specify which characters to display.  e.g. (\d{3}).*(\d{4}) displays the first 3 digits and the last 4.
+        label: Display Mask
+
+      - type: Text
+        name: mask_char
+        label: Mask Character
+
+  - type: Submit                                                                
+    name: submit
+    value: Save
+    attributes:
+      class: "submit submit_ok"
+
+
+
+

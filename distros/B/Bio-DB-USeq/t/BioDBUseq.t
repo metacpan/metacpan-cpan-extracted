@@ -7,11 +7,12 @@ use Test;
 use FindBin '$Bin';
 
 BEGIN {
-	plan tests => 25,
+	plan tests => 26,
 }
 
-use lib "$Bin/../lib";
+use lib "$Bin/../blib/lib";
 use Bio::DB::USeq qw(binMean binStdev);
+printf "Using USeq module version %s\n", Bio::DB::USeq->VERSION;
 
 my $file = "$Bin/data/sample1.useq";
 
@@ -44,8 +45,10 @@ ok($segment->start, 166301);
 my @scores = $segment->scores;
 # print "These are ", scalar(@scores), " segment scores: ", join(' ', @scores), "\n";
 ok(scalar @scores, 31);
-ok(sprintf("%.2f", $scores[0]), 7.91); # round to 2 decimal places to avoid any
-ok(sprintf("%.2f", $scores[2]), 8.02); # potential floating point errors
+# sort the scores to check the min and max
+@scores = sort {$a <=> $b} @scores;
+ok(sprintf("%.2f", $scores[0]), '0.00');
+ok(sprintf("%.2f", $scores[30]), '8.56');
 
 # check features via an iterator
 my $i = $segment->get_seq_stream;
@@ -71,7 +74,7 @@ ok(sprintf("%.2f", $wig_bins[9]), 1.94);
 # check chromosome stats
 my $chr_mean = $useq->chr_mean('chrI');
 # print "The chromosome mean for chrI is $chr_mean\n";
-ok(sprintf("%.2f", $chr_mean), 1.88);
+ok(sprintf("%.2f", $chr_mean), 1.82);
 
 # check statistical function
 my ($summary) = $useq->features(
@@ -81,13 +84,14 @@ my ($summary) = $useq->features(
 	-type       => 'summary',
 );
 ok($summary);
+ok(ref($summary), 'Bio::DB::USeq::Summary');
 my $stats = $summary->statistical_summary(10);
 ok(scalar @$stats, 10);
 my $second_mean  = binMean( $stats->[1] );
 my $second_stdev = binStdev( $stats->[1] );
 # print "Second interval mean is $second_mean\n";
 # print "Second interval stdev is $second_stdev\n"; 
-ok(sprintf("%.2f", $second_mean), '0.60');
+ok(sprintf("%.2f", $second_mean), '0.57');
 ok(sprintf("%.2f", $second_stdev), 0.62);
 
 

@@ -9,7 +9,7 @@
       "perl_5"
    ],
    "meta-spec" : {
-      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "Astro-satpass",
@@ -46,39 +46,39 @@
    "provides" : {
       "Astro::Coord::ECI" : {
          "file" : "lib/Astro/Coord/ECI.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       },
       "Astro::Coord::ECI::Mixin" : {
          "file" : "lib/Astro/Coord/ECI/Mixin.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       },
       "Astro::Coord::ECI::Moon" : {
          "file" : "lib/Astro/Coord/ECI/Moon.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       },
       "Astro::Coord::ECI::Star" : {
          "file" : "lib/Astro/Coord/ECI/Star.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       },
       "Astro::Coord::ECI::Sun" : {
          "file" : "lib/Astro/Coord/ECI/Sun.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       },
       "Astro::Coord::ECI::TLE" : {
          "file" : "lib/Astro/Coord/ECI/TLE.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       },
       "Astro::Coord::ECI::TLE::Iridium" : {
          "file" : "lib/Astro/Coord/ECI/TLE/Iridium.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       },
       "Astro::Coord::ECI::TLE::Set" : {
          "file" : "lib/Astro/Coord/ECI/TLE/Set.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       },
       "Astro::Coord::ECI::Utils" : {
          "file" : "lib/Astro/Coord/ECI/Utils.pm",
-         "version" : "0.098"
+         "version" : "0.099"
       }
    },
    "release_status" : "stable",
@@ -96,6 +96,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI"
       }
    },
-   "version" : "0.098",
+   "version" : "0.099",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

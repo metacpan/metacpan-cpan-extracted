@@ -1,0 +1,9 @@
+Perltidy version is 20180220
+
+There is no previous '{' to match a '}' on line 513
+513: }
+     ^
+513:	Starting negative indentation
+515:	resetting level to 0 at sub showThread
+840:	To see 7 non-critical warnings rerun with -w
+840:	To save a full .LOG file rerun with -g

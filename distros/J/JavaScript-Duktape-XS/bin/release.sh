@@ -58,7 +58,7 @@ rm -f /tmp/release_$$_a /tmp/release_$$_b
 
 echo "== Checking missing modules required by tests ==" >>$errors
 mkfifo /tmp/release_$$_a
-git grep use t | sed 's/::/@@/g' | awk -F: '{print $2}' | sed 's/qw.*//g' | sed 's/#.*//g' | tr -d ';' | sed 's/ *$//g' | sed 's/@@/::/g' | egrep -v 'use (strict|warnings|utf8|parent|JavaScript::Duktape::XS)' | sed 's/^use //g' | sort -u >/tmp/release_$$_a &
+git grep use t | sed 's/::/@@/g' | awk -F: '{print $2}' | sed 's/qw.*//g' | sed 's/#.*//g' | tr -d ';' | sed 's/ *$//g' | sed 's/@@/::/g' | egrep -v 'use (strict|warnings|utf8|parent|JavaScript::Duktape::XS)|^[ \t]*use_ok' | sed 's/^use //g' | sort -u >/tmp/release_$$_a &
 mkfifo /tmp/release_$$_b
 cat Makefile.PL | awk '{if ($0 ~ /},/) {p=0; next;} if (p) { print; } if ($0 ~ /TEST_REQUIRES/) {p=1; next;}}' | awk -F\' '{print $2}' | sort -u >/tmp/release_$$_b &
 diff /tmp/release_$$_a /tmp/release_$$_b >>$errors

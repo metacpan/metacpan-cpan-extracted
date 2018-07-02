@@ -17,7 +17,7 @@ use Data::Dumper;
 
 use Sys::Hostname;
 
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 has config              => ( is => 'rw', required   => 1 );
 has env                 => ( is => 'rw', required   => 1 );
@@ -100,7 +100,6 @@ sub analyse {
   my $log_dir = my_glob( $conf->{log_dir} );
 
   my $something_crashed;
-  my $num_skipped = 0;
 
   $self->_report_log( 'main log file: ' . $self->failed_log_file, '' );
 
@@ -175,8 +174,6 @@ sub analyse {
       );
       # track which nodes broke, often one specific node always breaks
       $err_hosts{ $log_data->{hostname} }++;
-    } elsif ( exists( $log_data->{'comp.task.exit.skip'} ) ) {
-      $num_skipped++;
     }
   }
 
@@ -208,10 +205,8 @@ sub analyse {
   }
 
   $self->num_jobs($num_jobs);
-  $self->num_jobs_skipped($num_skipped);
 
   $self->_report_log( $num_jobs . " jobs in total" );
-  $self->_report_log( '(' . $num_skipped . " jobs did not need to run again)" ) if ($num_skipped);
   if ($no_jobs_ran_at_all) {
     $self->_report_log("obviously, no jobs were run at all");
     $self->num_jobs_failed($num_jobs);

@@ -14,11 +14,12 @@ however, can still return statistics across different zoom levels in the same
 manner as big files, albeit at a cost of calculating these in realtime.
 
 More information about the format can be found at 
-http://useq.sourceforge.net/useqArchiveFormat.html. 
+https://github.com/HuntsmanCancerInstitute/USeq/blob/master/Documentation/USeqDocumentation/useqArchiveFormat.html. 
 
 Useq files may be generated using tools in the USeq package, available at 
-http://useq.sourceforge.net. They may be generated from native Bar files,
-text Wig files, text Bed files, and UCSC bigWig and bigBed file formats.
+https://github.com/HuntsmanCancerInstitute/USeq. They may be generated from 
+native Bar files, text Wig files, text Bed files, and UCSC bigWig and bigBed 
+file formats.
 
 
 COMPATIBILITY

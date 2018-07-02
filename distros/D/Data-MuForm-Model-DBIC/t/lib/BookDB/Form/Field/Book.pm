@@ -52,9 +52,6 @@ has_field 'pages' => (
     type  => 'Integer',
     label => 'Pages',
 );
-has_field 'comment' => (
-    type  => 'Text',
-);
 
 has_field submit => ( type => 'Submit', value => 'Update' );
 

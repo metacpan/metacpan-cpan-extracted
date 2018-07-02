@@ -1,3 +1,21 @@
+0.007   2018-06-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Forgot to update examples in Synopsis.
+
+
+0.006   2018-06-27 (PERLANCAR)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Merge subcommands 'spot-rate' and 'all-spot-rates' into 'spot-rates'.
+
+        [ENHANCEMENTS]
+
+        - Make the output more human-readable/-usable by default.
+
+
 0.005   2018-06-19 (PERLANCAR)
 
 	- No functional changes.

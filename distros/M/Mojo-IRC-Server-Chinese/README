@@ -1,4 +1,4 @@
-Mojo-IRC-Server-Chinese v1.8.1
+Mojo-IRC-Server-Chinese v1.8.2
 ========================
 使用Perl语言编写的IRC服务端，基于Mojolicious的异步事件驱动，支持中文昵称和频道名称
 

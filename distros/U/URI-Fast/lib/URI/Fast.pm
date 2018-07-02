@@ -4,7 +4,7 @@ use strict;
 use warnings;
 no strict 'refs';
 
-our $VERSION = '0.32';
+our $VERSION = '0.35';
 
 use Carp;
 use Exporter;
@@ -13,13 +13,23 @@ require XSLoader;
 XSLoader::load('URI::Fast', $VERSION);
 
 use Exporter 'import';
-our @EXPORT_OK = qw(uri iri uri_split encode decode);
 
-use overload '""' => sub{ $_[0]->to_string };
+our @EXPORT_OK = qw(
+  uri iri uri_split
+  encode url_encode
+  decode url_decode
+);
+
+use overload '""' => sub{ $_[0]->to_string },
+             'eq' => sub{ $_[0]->compare($_[1]) };
 
 sub uri { URI::Fast->new($_[0]) }
 sub iri { URI::Fast::IRI->new_iri($_[0]) }
-sub as_string { goto \&to_string }
+
+# Aliases
+sub as_string  { goto \&to_string }
+sub url_encode { goto \&encode    }
+sub url_decode { goto \&decode    }
 
 # Build a simple accessor for basic attributes
 foreach my $attr (qw(scheme usr pwd host port frag)) {
@@ -96,9 +106,9 @@ sub query {
   return %{ $self->query_hash };            # list context
 }
 
-sub query_keys {
-  keys %{ $_[0]->get_query_keys };
-}
+sub query_hash   { $_[0]->get_query_hash }
+sub query_keys   { keys %{ $_[0]->get_query_keys } }
+sub query_keyset { $_[0]->update_query_keyset($_[1], $_[2] || '&') }
 
 sub param {
   my ($self, $key, $val, $sep) = @_;
@@ -121,6 +131,57 @@ sub param {
   return wantarray     ? @$params
        : @$params == 1 ? $params->[0]
        : croak("param: multiple values encountered for query parameter '$key' when called in SCALAR context");
+}
+
+sub add_param {
+  my ($self, $key, $val, $sep) = @_;
+  $self->param($key, [$self->param($key), $val], $sep);
+}
+
+sub _cmp ($$) {
+  if (defined $_[0]) {
+    return if !defined $_[1];
+    return if $_[0] ne $_[1];
+  }
+  elsif (defined $_[1]) {
+    return;
+  }
+
+  return 1;
+}
+
+sub compare {
+  my ($self, $other) = @_;
+  $other = uri $other;
+
+  return unless _cmp($self->scheme, $other->scheme)
+    && _cmp($self->usr,  $other->usr)
+    && _cmp($self->pwd,  $other->pwd)
+    && _cmp($self->host, $other->host)
+    && _cmp($self->port, $other->port)
+    && _cmp($self->frag, $other->frag);
+
+  my @spath = $self->path;
+  my @opath = $other->path;
+  return unless @spath == @opath;
+
+  foreach (0 .. $#spath) {
+    return unless _cmp($spath[$_], $opath[$_]);
+  }
+
+  my $sparam = $self->query_hash;
+  my $oparam = $other->query_hash;
+
+  foreach my $k (keys %$sparam) {
+    return unless exists $oparam->{$k};
+    return unless @{$sparam->{$k}} == @{$oparam->{$k}};
+
+    foreach (0 .. $#{$sparam->{$k}}) {
+      return unless _cmp($sparam->{$k}[$_], $oparam->{$k}[$_]);
+    }
+  }
+
+  return 1;
 }
 
 =encoding UTF8
@@ -174,7 +235,7 @@ be percent-encoded when modified.
 
 Behaves (hopefully) identically to L<URI::Split>, but roughly twice as fast.
 
-=head2 encode/decode
+=head2 encode/decode/url_encode/url_decode
 
 See L</ENCODING>.
 
@@ -217,7 +278,9 @@ L</auth>.
 =head3 host
 
 The host name segment of the authorization string. May be a domain string or an
-IP address. Updating this value alters L</auth>.
+IP address. If the host is an IPV6 address, it must be surrounded by square
+brackets (per spec), which are included in the host string. Updating this value
+alters L</auth>.
 
 =head3 port
 
@@ -246,17 +309,29 @@ C<?>. The query string may be set in several ways.
 In list context, returns a hash ref mapping query keys to array refs of their
 values (see L</query_hash>).
 
-=head3 query_keys
+Both '&' and ';' are treated as separators for key/value parameters.
+
+=head2 frag
+
+The fragment section of the URI, excluding the leading C<#>.
+
+=head1 METHODS
+
+=head2 query_keys
 
 Does a fast scan of the query string and returns a list of unique parameter
 names that appear in the query string.
 
-=head3 query_hash
+Both '&' and ';' are treated as separators for key/value parameters.
+
+=head2 query_hash
 
 Scans the query string and returns a hash ref of key/value pairs. Values are
 returned as an array ref, as keys may appear multiple times.
 
-=head3 param
+Both '&' and ';' are treated as separators for key/value parameters.
+
+=head2 param
 
 Gets or sets a parameter value. Setting a parameter value will replace existing
 values completely; the L</query> string will also be updated. Setting a
@@ -265,22 +340,85 @@ parameter to C<undef> deletes the parameter from the URI.
   $uri->param('foo', ['bar', 'baz']);
   $uri->param('fnord', 'slack');
 
-  my $value_scalar    = $uri->param('fnord'); # fnord appears once
-  my @value_list      = $uri->param('foo');   # foo appears twice
-  my $value_scalar    = $uri->param('foo');   # croaks; expected single value but foo has multiple
+  my $value_scalar = $uri->param('fnord'); # fnord appears once
+  my @value_list   = $uri->param('foo');   # foo appears twice
+  my $value_scalar = $uri->param('foo');   # croaks; expected single value but foo has multiple
 
   # Delete 'foo'
   $uri->param('foo', undef);
 
-An optional third parameter may be specified to control the character used to
-separate key/value pairs.
+Both '&' and ';' are treated as separators for key/value parameters when
+parsing the query string. An optional third parameter explicitly selects the
+character used to separate key/value pairs.
 
   $uri->param('foo', 'bar', ';'); # foo=bar
   $uri->param('baz', 'bat', ';'); # foo=bar;baz=bat
 
-=head2 frag
+When unspecified, '&' is chosen as the default. I<In either case, all
+separators in the query string will be normalized to the chosen separator>.
 
-The fragment section of the URI, excluding the leading C<#>.
+  $uri->param('foo', 'bar', ';'); # foo=bar
+  $uri->param('baz', 'bat', ';'); # foo=bar;baz=bat
+  $uri->param('fnord', 'slack');  # foo=bar&baz=bat&fnord=slack
+
+=head2 add_param
+
+Updates the query string by adding a new value for the specified key. If the
+key already exists in the query string, the new value is appended without
+altering the original value.
+
+  $uri->add_param('foo', 'bar'); # foo=bar
+  $uri->add_param('foo', 'baz'); # foo=bar&foo=baz
+
+This method is simply sugar for calling:
+
+  $uri->param('key', [$uri->param('key'), 'new value']);
+
+As with L</param>, the separator character may be specified as the final
+parameter. The same caveats apply with regard to normalization of the query
+string separator.
+
+  $uri->add_param('foo', 'bar', ';'); # foo=bar
+  $uri->add_param('foo', 'baz', ';'); # foo=bar;foo=baz
+
+=head2 query_keyset
+
+Allows modification of the query string in the manner of a set, using keys
+without C<=value>, e.g. C<foo&bar&baz>. Accepts a hash ref of keys to update.
+A truthy value adds the key, a falsey value removes it. Any keys not mentioned
+in the update hash are left unchanged.
+
+  my $uri = uri '&baz&bat';
+  $uri->query_keyset({foo => 1, bar => 1}); # baz&bat&foo&bar
+  $uri->query_keyset({baz => 0, bat => 0}); # foo&bar
+
+If there are key-value pairs in the query string as well, the behavior of
+this method becomes a little more complex. When a key is specified in the
+hash update hash ref, a positive value will leave an existing key/value pair
+untouched. A negative value will remove the key and value.
+
+  my $uri = uri '&foo=bar&baz&bat';
+  $uri->query_keyset({foo => 1, baz => 0}); # foo=bar&bat
+
+An optional second parameter may be specified to control the separator
+character used when updating the query string. The same caveats apply with
+regard to normalization of the query string separator.
+
+=head2 to_string
+
+=head2 as_string
+
+=head2 "$uri"
+
+Stringifies the URI, encoding output as necessary. String interpolation is
+overloaded.
+
+=head2 compare
+
+=head2 $uri eq $other
+
+Compares the URI to another, returning true if the URIs are equivalent.
+Overloads the C<eq> operator.
 
 =head1 ENCODING
 
@@ -329,9 +467,41 @@ Decodes a percent-encoded string.
 
   my $decoded = URI::Fast::decode($some_string);
 
+=head2 url_encode
+
+=head2 url_decode
+
+These are aliases of L</encode> and L</decode>, respectively. They were added
+to make L<BLUEFEET|https://metacpan.org/author/BLUEFEET> happy after he made
+fun of me for naming L</encode> and L</decode> too generically.
+
 =head1 SPEED
 
 See L<URI::Fast::Benchmarks>.
+
+=head1 FUTURE PLANS
+
+=over
+
+=item Zero-copy strategy for parsing and updating query string
+
+L</uri> does a single, fast pass over the input string and copies portions into
+the struct members. Some compound fields, such as the query and path, are only
+parsed as needed. Switching to a zero-copy strategy could make the initial pass
+faster, reduce time spent zeroing out the struct, and make better use of the
+cache.
+
+=item Support for arbitrary binary data in query string
+
+Currently, queries are restricted to keys or key/value pairs and decoded into
+utf8 strings.
+
+=item Compat module
+
+Add a compatibility layer with URI that implements what functionality is
+possible and croaks loudly otherwise.
+
+=back
 
 =head1 SEE ALSO
 
@@ -356,6 +526,28 @@ dedication to quality software development this distribution would not exist.
 =head1 AUTHOR
 
 Jeff Ober <sysread@fastmail.fm>
+
+=head1 CONTRIBUTORS
+
+The following people have contributed to this module with patches, bug reports,
+API advice, identifying areas where the documentation is unclear, or by making
+fun of me for naming certain methods too generically.
+
+=over
+
+=item Andy Ruder
+
+=item Aran Deltac (BLUEFEET)
+
+=item Dave Hubbard (DAVEH)
+
+=item James Messrie
+
+=item Randal Schwartz (MERLYN)
+
+=item Sara Siegal (SSIEGAL)
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

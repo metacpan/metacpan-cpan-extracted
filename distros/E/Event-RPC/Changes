@@ -1,10 +1,27 @@
 Revision history and release notes for Event::RPC:
 
+1.10 Wed Jun 27, 2018, joern
+    Bugfixes:
+    - Test suite failed on newer Perl versions which
+      do not have . in @INC anymore.
+
+1.09 Mon Jun 25, 2018, joern
+    Features:
+    - Event::RPC::Server->prepare() to support having
+      control over the Event loop yourself.
+
+    Bugfixes:
+    - SSL tests failed due to expired CA certificate.
+      Just created new certificates with 30 year
+      expiration and put a gen.sh script inside to
+      easily generate new certificates after that
+      period ;)
+    - Removed unused code. Thanks for the hint to
+      ppisar AT redhat.com.
+
 1.08 Sun Sep 26, 2015, joern
     Notes:
-    - Just a stable release without changes. I thought
-      CPAN testers would pick up developer releases
-      too, but was wrong ;)
+    - Just a stable release without changes.
 
 1.08_01 Sat Sep 26, 2015, joern
     Features:
@@ -51,7 +68,7 @@ Revision history and release notes for Event::RPC:
       in IO::Socket:SSL >= 2.017. Fixed that by adding
       proper certificates with cn 'localhost' and a test
       which verifies the failing connection with wrong
-      hostname. Thanks to ppisar[...]redhat.com. This
+      hostname. Thanks to ppisar AT redhat.com. This
       fixes rt #106874.
 
 1.05 Tue Feb 28, 2014, joern

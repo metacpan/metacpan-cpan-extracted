@@ -1,0 +1,43 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Dancer2::Plugin' => '0',
+                                      'Font::TTF::Font' => '0',
+                                      'Font::TTF::Scripts::Name' => '0',
+                                      'List::AllUtils' => '0',
+                                      'perl' => 'v5.12.0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Dancer2' => '0',
+                                   'Dancer2::Plugin::Cache::CHI' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Requires' => '0',
+                                   'Test::WWW::Mechanize::PSGI' => '0',
+                                   'lib' => '0',
+                                   'strict' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

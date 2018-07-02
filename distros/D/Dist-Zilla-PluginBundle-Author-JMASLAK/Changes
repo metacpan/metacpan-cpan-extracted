@@ -1,0 +1,24 @@
+0.003 - 2018-06-23
+Joelle Maslak <jmaslak@antelope.net>
+ * Fix bug in naming of covenant plugin
+
+0.003 - 2018-06-23
+Joelle Maslak <jmaslak@antelope.net>
+ * Fix missing dependency
+ * Create TODO file when not present
+ * Remove Covenant module which requires Perl 5.20
+
+0.002 - 2018-06-22
+Joelle Maslak <jmaslak@antelope.net>
+ * Auto tag git releases
+ * Include dependencies
+ * Test for EOL characters
+ * Test for tab characters
+ * Report prerequisites
+ * Add .travis.yml, .mailmap, and CONTRIBUTING generation when these
+   files are not already there.
+
+0.001 - 2018-06-22
+Joelle Maslak <jmaslak@antelope.net>
+ * Initial Version
+

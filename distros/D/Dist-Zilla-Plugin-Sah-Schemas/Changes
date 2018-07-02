@@ -1,3 +1,8 @@
+0.014   2018-06-26 (PERLANCAR)
+
+	- [Bugfix] Avoid adding prereqs for packages defined by self.
+
+
 0.013   2018-06-07 (PERLANCAR)
 
 	- Use minimum version from pmversions.ini.

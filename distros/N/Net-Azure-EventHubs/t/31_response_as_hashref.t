@@ -5,8 +5,8 @@ use Net::Azure::EventHubs::Request;
 use LWP::UserAgent;
 
 subtest 'html response' => sub {
-    my $uri = URI->new('http://search.cpan.org/search');
-    $uri->query_form(query => 'Azure', mode => 'all'); 
+    my $uri = URI->new('http://metacpan.org/search');
+    $uri->query_form(q => 'Azure', size => '50'); 
     my $req = Net::Azure::EventHubs::Request->new(GET => $uri);
     $req->agent(LWP::UserAgent->new);
     my $res = $req->do;

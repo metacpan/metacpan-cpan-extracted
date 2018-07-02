@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::Op::_Aggregate;
 # Encapsulate aggregate operation; return MongoDB::QueryResult
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -33,6 +31,7 @@ use MongoDB::_Types qw(
 use Types::Standard qw(
     HashRef
     InstanceOf
+    Num
 );
 
 use namespace::clean;
@@ -61,6 +60,11 @@ has has_out => (
     isa      => Boolish,
 );
 
+has maxAwaitTimeMS => (
+    is       => 'rw',
+    isa      => Num,
+);
+
 with $_ for qw(
   MongoDB::Role::_PrivateConstructor
   MongoDB::Role::_CollectionOp
@@ -73,14 +77,14 @@ sub execute {
     my ( $self, $link, $topology ) = @_;
 
     my $options = $self->options;
-    my $is_2_6 = $link->does_write_commands;
+    my $is_2_6 = $link->supports_write_commands;
 
     # maxTimeMS isn't available until 2.6 and the aggregate command
     # will reject it as unrecognized
     delete $options->{maxTimeMS} unless $is_2_6;
 
     # bypassDocumentValidation isn't available until 3.2 (wire version 4)
-    delete $options->{bypassDocumentValidation} unless $link->accepts_wire_version(4);
+    delete $options->{bypassDocumentValidation} unless $link->supports_document_validation;
 
     if ( defined $options->{collation} and !$link->supports_collation ) {
         MongoDB::UsageError->throw(
@@ -120,24 +124,31 @@ sub execute {
 
     my $has_out = $self->has_out;
 
+    if ( $self->coll_name eq 1 && ! $link->supports_db_aggregation ) {
+        MongoDB::Error->throw(
+            "Calling aggregate with a collection name of '1' is not supported on Wire Version < 6" );
+    }
+
     my @command = (
         aggregate => $self->coll_name,
         pipeline  => $self->pipeline,
         %$options,
         (
-            !$has_out && $link->accepts_wire_version(4) ? @{ $self->read_concern->as_args } : ()
+            !$has_out && $link->supports_read_concern ? @{ $self->read_concern->as_args( $self->session) } : ()
         ),
         (
-            $has_out && $link->accepts_wire_version(5) ? @{ $self->write_concern->as_args } : ()
+            $has_out && $link->supports_helper_write_concern ? @{ $self->write_concern->as_args } : ()
         ),
     );
 
     my $op = MongoDB::Op::_Command->_new(
-        db_name         => $self->db_name,
-        query           => Tie::IxHash->new(@command),
-        query_flags     => {},
-        bson_codec      => $self->bson_codec,
+        db_name     => $self->db_name,
+        query       => Tie::IxHash->new(@command),
+        query_flags => {},
+        bson_codec  => $self->bson_codec,
         ( $has_out ? () : ( read_preference => $self->read_preference ) ),
+        session             => $self->session,
+        monitoring_callback => $self->monitoring_callback,
     );
 
     my $res = $op->execute( $link, $topology );

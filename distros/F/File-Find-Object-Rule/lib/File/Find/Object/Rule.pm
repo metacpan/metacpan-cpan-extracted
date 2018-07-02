@@ -1,7 +1,7 @@
 #       $Id: /mirror/lab/perl/File-Find-Rule/lib/File/Find/Rule.pm 2102 2006-06-01T15:39:03.942922Z richardc  $
 
 package File::Find::Object::Rule;
-$File::Find::Object::Rule::VERSION = '0.0307';
+$File::Find::Object::Rule::VERSION = '0.0309';
 use strict;
 use warnings;
 
@@ -516,7 +516,7 @@ File::Find::Object::Rule - Alternative interface to File::Find::Object
 
 =head1 VERSION
 
-version 0.0307
+version 0.0309
 
 =head1 SYNOPSIS
 
@@ -548,7 +548,7 @@ L<File::Find::Object::Rule> to its RT CPAN Queue.
 
 =head1 VERSION
 
-version 0.0307
+version 0.0309
 
 =head1 METHODS
 

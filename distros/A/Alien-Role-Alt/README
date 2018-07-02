@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -16,7 +16,7 @@ SYNOPSIS
        pkg_name => [ 'libfoo', 'libbar', ],
      );
 
-    The in your base class:
+    Then in your base class:
 
      package Alien::Libfoo;
      
@@ -35,6 +35,10 @@ SYNOPSIS
      my $libs   = Alien::Libfoo->alt('foo1')->libs;
 
 DESCRIPTION
+
+    NOTE: The capabilities that used to be provided by this role have been
+    moved into Alien::Base's core class. This is an empty role provided for
+    compatibility only. New code should not be using this class.
 
     Some packages come with multiple libraries, and multiple .pc files to
     use with them. This Role::Tiny role can be used with Alien::Base to

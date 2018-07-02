@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-OpenCage
 
+0.15    2018-06-19
+        - updated OpenCage documentation URLs, no code changes
+
 0.14    2017-10-01
         - dont actually need say
 

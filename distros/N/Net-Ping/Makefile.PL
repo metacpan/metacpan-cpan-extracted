@@ -47,7 +47,7 @@ WriteMakefile(
         'Test::More'  => 0,
         'Time::HiRes' => 0,
     },
-    INSTALLDIRS => 'perl',
+    INSTALLDIRS => ($ENV{PERL_CORE} ? 'perl' : 'site'),
     clean      => { FILES => 'Net-Ping-*' },
     @extras
 );

@@ -146,7 +146,7 @@ feature windows => sub {
 # Pcore::Util::Text
 requires 'HTML::Entities';
 
-# Pcore::Util::Template
+# Pcore::Util::Tmpl
 requires 'Text::Xslate';
 requires 'Text::Xslate::Bridge::TT2Like';
 

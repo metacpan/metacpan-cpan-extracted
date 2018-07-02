@@ -4,6 +4,7 @@ use Pcore -class, -const, -res;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 use Pcore::Util::List qw[pairs];
 use Pcore::Util::Text qw[encode_utf8];
+use Pcore::App::API::Auth;
 
 use overload    #
   q[&{}] => sub ( $self, @ ) {
@@ -218,14 +219,14 @@ sub accept_websocket ( $self, $headers = undef ) {
 }
 
 # AUTHENTICATE
-sub authenticate ( $self, $cb ) {
+sub authenticate ( $self ) {
 
     # request is already authenticated
     if ( exists $self->{_auth} ) {
-        $cb->( $self->{_auth} );
+        return $self->{_auth};
     }
     elsif ( !$self->{app}->{api} ) {
-        $cb->( $self->{_auth} = res 401 );
+        return $self->{_auth} = bless { app => $self->{app} }, 'Pcore::App::API::Auth';
     }
     else {
         my $env = $self->{env};
@@ -250,15 +251,8 @@ sub authenticate ( $self, $cb ) {
             $token = $1;
         }
 
-        $self->{app}->{api}->authenticate(
-            $token,
-            sub ($auth) {
-                $cb->( $self->{_auth} = $auth );
-            }
-        );
+        return $self->{_auth} = $self->{app}->{api}->authenticate($token);
     }
-
-    return;
 }
 
 1;

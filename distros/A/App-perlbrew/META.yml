@@ -18,7 +18,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.023, CPAN::Meta::Converter version 2.150005'
+generated_by: 'App::ModuleBuildTiny version 0.023, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,15 +27,15 @@ name: App-perlbrew
 provides:
   App::perlbrew:
     file: lib/App/perlbrew.pm
-    version: '0.83'
+    version: '0.84'
 requires:
-  CPAN::Perl::Releases: '3.24'
+  CPAN::Perl::Releases: '3.66'
   Capture::Tiny: '0.36'
-  Devel::PatchPerl: '1.40'
+  Devel::PatchPerl: '1.52'
   File::Temp: '0.2304'
   JSON::PP: '0'
   Pod::Parser: '1.63'
   Pod::Usage: '1.68'
   local::lib: '2.000014'
-version: '0.83'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.84'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

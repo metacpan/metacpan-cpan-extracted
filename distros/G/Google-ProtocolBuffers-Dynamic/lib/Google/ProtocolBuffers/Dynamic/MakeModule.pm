@@ -90,6 +90,7 @@ sub _to_perl_package {
 }
 
 my %boolean_options = map +($_ => [$_, 1], "no_$_" => [$_, 0]), qw(
+    implicit_maps
     use_bigints
     check_required_fields
     explicit_defaults
@@ -205,7 +206,7 @@ Google::ProtocolBuffers::Dynamic::MakeModule
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 AUTHOR
 

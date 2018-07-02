@@ -3,8 +3,9 @@ use warnings;
 
 use Data::Dumper;
 use Test::More;
-use Test::Output;
-use JavaScript::Duktape::XS;
+use Test::Output qw/ stderr_like /;
+
+my $CLASS = 'JavaScript::Duktape::XS';
 
 sub get_js {
     my $js = <<JS;
@@ -17,22 +18,24 @@ JS
 }
 
 sub test_sandbox_memory {
-    my $duk = JavaScript::Duktape::XS->new({ max_memory_bytes => 0});
-    ok($duk, "created JavaScript::Duktape::XS object with max_memory_bytes => 0");
-    stderr_like sub { $duk->eval(get_js()); },
+    my $vm = $CLASS->new({ max_memory_bytes => 0});
+    ok($vm, "created $CLASS object with max_memory_bytes => 0");
+    stderr_like sub { $vm->eval(get_js()); },
                 qr/error: Error: alloc failed/,
                 "got correct error from memory sandbox";
 }
 
 sub test_sandbox_runtime {
-    my $duk = JavaScript::Duktape::XS->new({ max_timeout_us => 0});
-    ok($duk, "created JavaScript::Duktape::XS object with max_timeout_us => 0");
-    stderr_like sub { $duk->eval(get_js()); },
+    my $vm = $CLASS->new({ max_timeout_us => 0});
+    ok($vm, "created $CLASS object with max_timeout_us => 0");
+    stderr_like sub { $vm->eval(get_js()); },
                 qr/error: RangeError: execution timeout/,
                 "got correct error from runtime sandbox";
 }
 
 sub main {
+    use_ok($CLASS);
+
     test_sandbox_memory();
     test_sandbox_runtime();
     done_testing;

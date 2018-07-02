@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-YANICK
 
+0.29.0 2018-06-20
+  [ ENHANCEMENTS ]
+    - added GitHubREADME::Badge plugin.
+    - added ContributorCovenant plugin.
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 25 insertions(+), 2 deletions(-)
+
 0.28.0 2017-12-03
   [ ENHANCEMENTS ]
     - Travis tweaks.

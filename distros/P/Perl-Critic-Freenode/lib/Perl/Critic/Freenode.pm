@@ -3,7 +3,7 @@ package Perl::Critic::Freenode;
 use strict;
 use warnings;
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 1;
 
@@ -83,6 +83,10 @@ Don't use C<return> with no arguments
 =item L<Perl::Critic::Policy::Freenode::IndirectObjectNotation>
 
 Don't call methods indirectly
+
+=item L<Perl::Critic::Policy::Freenode::LoopOnHash>
+
+Don't loop over hashes
 
 =item L<Perl::Critic::Policy::Freenode::ModPerl>
 

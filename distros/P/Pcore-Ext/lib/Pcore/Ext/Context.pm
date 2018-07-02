@@ -3,7 +3,6 @@ package Pcore::Ext::Context;
 use Pcore -class;
 use Pcore::Util::Scalar qw[weaken];
 use Pcore::Ext::Context::Raw;
-use Pcore::Ext::Context::Call;
 use Pcore::Ext::Context::Func;
 use Pcore::Ext::Context::L10N;
 
@@ -11,70 +10,7 @@ has app  => ();
 has tree => ();
 has ctx  => ();
 
-has api           => ();    # ( is => 'ro', isa => HashRef, init_arg => undef );    # tied to $self->_ext_api_method
-has class         => ();    # ( is => 'ro', isa => HashRef, init_arg => undef );    # tied to $self->_ext_class
-has type          => ();    # ( is => 'ro', isa => HashRef, init_arg => undef );    # tied to $self->_ext_type
 has _js_gen_cache => ();    # ( is => 'ro', isa => HashRef, init_arg => undef );    # cache for JS functions strings
-
-sub BUILD ( $self, $args ) {
-    weaken $self;
-
-    tie $self->{api}->%*,   'Pcore::Ext::Context::_TiedAttr', $self, '_ext_api_method';
-    tie $self->{class}->%*, 'Pcore::Ext::Context::_TiedAttr', $self, '_ext_class';
-    tie $self->{type}->%*,  'Pcore::Ext::Context::_TiedAttr', $self, '_ext_type';
-
-    return;
-}
-
-# JS GENERATORS
-sub js_raw ( $self, $js ) {
-    return bless {
-        ext => $self,
-        js  => $js,
-      },
-      'Pcore::Ext::Context::Raw';
-}
-
-sub js_call ( $self, $func_name, $func_args = undef ) {
-    return bless {
-        ext       => $self,
-        func_name => $func_name,
-        func_args => $func_args,
-      },
-      'Pcore::Ext::Context::Call';
-}
-
-sub js_func ( $self, @ ) {
-    my ( $func_name, $func_args, $func_body );
-
-    if ( @_ == 2 ) {
-        $func_body = $_[1];
-    }
-    elsif ( @_ == 3 ) {
-        $func_body = $_[2];
-
-        if ( ref $_[1] eq 'ARRAY' ) {
-            $func_args = $_[1];
-        }
-        else {
-            $func_name = $_[1];
-        }
-    }
-    elsif ( @_ == 4 ) {
-        ( $func_name, $func_args, $func_body ) = ( $_[1], $_[2], $_[3] );
-    }
-    else {
-        die q[Invalid params];
-    }
-
-    return bless {
-        ext       => $self,
-        func_name => $func_name,
-        func_args => $func_args,
-        func_body => $func_body,
-      },
-      'Pcore::Ext::Context::Func';
-}
 
 # Ext resolvers
 sub _ext_api_method ( $self, $method_id ) {
@@ -160,20 +96,17 @@ sub _resolve_class_path ( $self, $path ) {
 }
 
 sub to_js ( $self ) {
-    my $data = do {
+    my ( $data, $on_create_func ) = do {
         my $method = "EXT_$self->{ctx}->{generator}";
 
         my $l10n = sub ( $msgid, $msgid_plural = undef, $num = undef ) : prototype($;$$) {
-            my $domain = caller;
 
-            $self->{ctx}->{l10n_domain}->{$domain} = undef;
+            # register msgid in ctx
+            $self->{ctx}->{l10n}->{$msgid} = 1;
 
             return bless {
-                ext          => $self,
-                domain       => $domain,
-                msgid        => $msgid,
-                msgid_plural => $msgid_plural,
-                num          => $num // 1,
+                ctx => $self,
+                buf => [ [ $msgid, $msgid_plural, $num // 1 ] ],
               },
               'Pcore::Ext::Context::L10N';
         };
@@ -181,31 +114,72 @@ sub to_js ( $self ) {
         no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
         no warnings qw[redefine];
 
+        local *{"$self->{ctx}->{namespace}\::raw"} = sub ($js) : prototype($) {
+            return bless {
+                ctx => $self,
+                js  => $js,
+              },
+              'Pcore::Ext::Context::Raw';
+        };
+
+        local *{"$self->{ctx}->{namespace}\::func"} = sub {
+            return bless(
+                {   ctx       => $self,
+                    func_args => shift,
+                    func_body => shift,
+                },
+                'Pcore::Ext::Context::Func'
+            ), @_;
+        };
+
+        tie my $api->%*,   'Pcore::Ext::Context::_TiedAttr', $self, '_ext_api_method';
+        tie my $class->%*, 'Pcore::Ext::Context::_TiedAttr', $self, '_ext_class';
+        tie my $type->%*,  'Pcore::Ext::Context::_TiedAttr', $self, '_ext_type';
+
+        local *{"$self->{ctx}->{namespace}::api"}   = \$api;
+        local *{"$self->{ctx}->{namespace}::class"} = \$class;
+        local *{"$self->{ctx}->{namespace}::type"}  = \$type;
+
         local *{"$self->{ctx}->{namespace}::l10n"} = $l10n;
 
         tie my $l10n_hash->%*, 'Pcore::Ext::Context::_l10n', $self;
 
         local ${"$self->{ctx}->{namespace}::l10n"} = $l10n_hash;
 
-        *{"$self->{ctx}->{namespace}::$method"}->($self);
+        # run generator
+        *{"$self->{ctx}->{namespace}::$method"}->();
     };
-
-    # set "extend" property
-    $data->{extend} = $self->{ctx}->{extend} if $self->{ctx}->{extend};
 
     # remove "requires" property, because we build full app
     delete $data->{requires};
 
-    # set alias
-    $data->{alias} = "$self->{ctx}->{alias_namespace}.$self->{ctx}->{alias}" if $self->{ctx}->{alias};
+    # set "override" property
+    if ( $self->{ctx}->{override} ) {
+        $data->{override} = $self->{ctx}->{override};
+    }
 
-    my $js = $self->js_call( 'Ext.define', [ $self->{ctx}->{ext_class_name}, $data ] )->to_js;
+    else {
+
+        # set "extend" property
+        if ( $self->{ctx}->{extend} ) {
+            $data->{extend} = $self->{ctx}->{extend};
+        }
+
+        # set alias, if is not already defined
+        if ( !$data->{alias} && $self->{ctx}->{alias} ) {
+            $data->{alias} = "$self->{ctx}->{alias_namespace}.$self->{ctx}->{alias}";
+        }
+    }
+
+    my $class_name = $self->{ctx}->{override} ? q[null] : qq["$self->{ctx}->{ext_class_name}"];
+
+    my $js = qq[Ext.define( $class_name, ] . P->data->to_json( $data, canonical => 1 )->$* . qq[@{[ defined $on_create_func ? ',"' . $on_create_func->TO_JSON . '"' : q[] ]})];
 
     my $js_gen_cache = $self->{_js_gen_cache};
 
-    $js->$* =~ s/"__JS(\d+)__"/$js_gen_cache->{$1}->$*/smge;
+    $js =~ s/"__JS(\d+)__"/$js_gen_cache->{$1}->$*/smge;
 
-    $self->{ctx}->{content} = $js;
+    $self->{ctx}->{content} = \$js;
 
     return;
 }
@@ -230,14 +204,13 @@ package Pcore::Ext::Context::_l10n {
     }
 
     sub FETCH {
-        my $domain = caller;
 
-        $_[0]->[0]->{ctx}->{l10n_domain}->{$domain} = undef;
+        # register msgid in ctx
+        $_[0]->[0]->{ctx}->{l10n}->{ $_[1] } = 1;
 
         return bless {
-            ext    => $_[0]->[0],
-            domain => $domain,
-            msgid  => $_[1],
+            ctx => $_[0]->[0],
+            buf => [ [ $_[1] ] ],
           },
           'Pcore::Ext::Context::L10N';
     }
@@ -251,11 +224,11 @@ package Pcore::Ext::Context::_l10n {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 80                   | * Private subroutine/method '_ext_api_method' declared but not used                                            |
-## |      | 111                  | * Private subroutine/method '_ext_class' declared but not used                                                 |
-## |      | 124                  | * Private subroutine/method '_ext_type' declared but not used                                                  |
+## |      | 16                   | * Private subroutine/method '_ext_api_method' declared but not used                                            |
+## |      | 47                   | * Private subroutine/method '_ext_class' declared but not used                                                 |
+## |      | 60                   | * Private subroutine/method '_ext_type' declared but not used                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 22, 23, 24, 186      | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## |    2 | 135, 136, 137, 145   | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

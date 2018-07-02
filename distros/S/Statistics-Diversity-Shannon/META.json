@@ -4,7 +4,7 @@
       "Gene Boggs <gene@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,7 +48,6 @@
             "IPC::Open3" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "blib" : "1.01",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -66,10 +65,10 @@
          "web" : "https://github.com/ology/Statistics-Diversity-Shannon"
       }
    },
-   "version" : "0.0101",
+   "version" : "0.0102",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.020003"
+         "version" : "5.027007"
       },
       "plugins" : [
          {
@@ -90,7 +89,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
             "name" : "CheckChangesHasContent",
-            "version" : "0.008"
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
@@ -233,21 +232,21 @@
                "Dist::Zilla::Plugin::Test::EOL" : {
                   "filename" : "xt/author/eol.t",
                   "finder" : [
-                     ":InstallModules",
                      ":ExecFiles",
+                     ":InstallModules",
                      ":TestFiles"
                   ],
-                  "trailing_whitespace" : "1"
+                  "trailing_whitespace" : 1
                }
             },
             "name" : "Test::EOL",
-            "version" : "0.18"
+            "version" : "0.19"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
-                  "bail_out_on_fail" : "0",
+                  "bail_out_on_fail" : 0,
                   "fail_on_warning" : "author",
                   "fake_home" : 0,
                   "filename" : "t/00-compile.t",
@@ -259,11 +258,12 @@
                   "script_finder" : [
                      ":PerlExecFiles"
                   ],
-                  "skips" : []
+                  "skips" : [],
+                  "switch" : []
                }
             },
             "name" : "Test::Compile",
-            "version" : "2.054"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
@@ -273,7 +273,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::Synopsis",
             "name" : "Test::Synopsis",
-            "version" : "2.000006"
+            "version" : "2.000007"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
@@ -292,8 +292,21 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::PodSpelling",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::PodSpelling" : {
+                  "directories" : [
+                     "bin",
+                     "lib"
+                  ],
+                  "spell_cmd" : "aspell list",
+                  "stopwords" : [
+                     "foo"
+                  ],
+                  "wordlist" : "Pod::Wordlist"
+               }
+            },
             "name" : "Test::PodSpelling",
-            "version" : "2.006009"
+            "version" : "2.007005"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -381,7 +394,7 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
             "name" : "CopyFilesFromBuild",
-            "version" : "0.151680"
+            "version" : "0.170880"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -437,12 +450,12 @@
       "zilla" : {
          "class" : "Dist::Zilla::Dist::Builder",
          "config" : {
-            "is_trial" : "0"
+            "is_trial" : 0
          },
          "version" : "6.010"
       }
    },
    "x_authority" : "cpan:GENE",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

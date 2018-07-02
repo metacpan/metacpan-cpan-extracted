@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2009 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -22,8 +20,9 @@ package MongoDB::Collection;
 # ABSTRACT: A MongoDB Collection
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
+use MongoDB::ChangeStream;
 use MongoDB::Error;
 use MongoDB::IndexView;
 use MongoDB::InsertManyResult;
@@ -162,8 +161,8 @@ has max_time_ms => (
 #pod =attr bson_codec
 #pod
 #pod An object that provides the C<encode_one> and C<decode_one> methods, such
-#pod as from L<MongoDB::BSON>.  It may be initialized with a hash reference that
-#pod will be coerced into a new MongoDB::BSON object.  By default it will be
+#pod as from L<BSON>.  It may be initialized with a hash reference that
+#pod will be coerced into a new L<BSON> object.  By default it will be
 #pod inherited from a L<MongoDB::Database> object.
 #pod
 #pod =cut
@@ -262,14 +261,15 @@ has _op_args => (
 sub _build__op_args {
     my ($self) = @_;
     return {
-        client          => $self->client,
-        db_name         => $self->database->name,
-        bson_codec      => $self->bson_codec,
-        coll_name       => $self->name,
-        write_concern   => $self->write_concern,
-        read_concern    => $self->read_concern,
-        read_preference => $self->read_preference,
-        full_name       => join( ".", $self->database->name, $self->name ),
+        client              => $self->client,
+        db_name             => $self->database->name,
+        bson_codec          => $self->bson_codec,
+        coll_name           => $self->name,
+        write_concern       => $self->write_concern,
+        read_concern        => $self->read_concern,
+        read_preference     => $self->read_preference,
+        full_name           => join( ".", $self->database->name, $self->name ),
+        monitoring_callback => $self->client->monitoring_callback,
     };
 }
 
@@ -360,6 +360,8 @@ sub with_codec {
 #pod =for :list
 #pod * C<bypassDocumentValidation> - skips document validation, if enabled; this
 #pod   is ignored for MongoDB servers older than version 3.2.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod
 #pod =cut
 
@@ -368,8 +370,9 @@ sub insert_one {
     MongoDB::UsageError->throw("document argument must be a reference")
       unless ref( $_[1] );
 
-    return $_[0]->client->send_write_op(
+    return $_[0]->client->send_retryable_write_op(
         MongoDB::Op::_InsertOne->_new(
+            session => $_[0]->client->_get_session_from_hashref( $_[2] ),
             ( defined $_[2] ? (%{$_[2]}) : () ),
             document => $_[1],
             %{ $_[0]->_op_args },
@@ -398,6 +401,8 @@ sub insert_one {
 #pod =for :list
 #pod * C<bypassDocumentValidation> - skips document validation, if enabled; this
 #pod   is ignored for MongoDB servers older than version 3.2.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod * C<ordered> – when true, the server will halt insertions after the first
 #pod   error (if any).  When false, all documents will be processed and any
 #pod   error will only be thrown after all insertions are attempted.  The
@@ -415,14 +420,18 @@ sub insert_many {
     MongoDB::UsageError->throw("documents argument must be an array reference")
       unless ref( $_[1] ) eq 'ARRAY';
 
+    # internally ends up performing a retryable write if possible, see OP::_BulkWrite
     my $res = $_[0]->client->send_write_op(
         MongoDB::Op::_BulkWrite->_new(
             # default
             ordered => 1,
             # user overrides
+            session => $_[0]->client->_get_session_from_hashref( $_[2] ),
             ( defined $_[2] ? ( %{ $_[2] } ) : () ),
             # un-overridable
             queue => [ map { [ insert => $_ ] } @{ $_[1] } ],
+            # insert_many is specifically retryable (PERL-792)
+            _retryable => 1,
             %{ $_[0]->_op_args },
         )
     );
@@ -457,6 +466,8 @@ sub insert_many {
 #pod * C<collation> - a L<document|/Document> defining the collation for this operation.
 #pod   See docs for the format of the collation document here:
 #pod   L<https://docs.mongodb.com/master/reference/collation/>.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod
 #pod =cut
 
@@ -465,8 +476,9 @@ sub delete_one {
     MongoDB::UsageError->throw("filter argument must be a reference")
       unless ref( $_[1] );
 
-    return $_[0]->client->send_write_op(
+    return $_[0]->client->send_retryable_write_op(
         MongoDB::Op::_Delete->_new(
+            session => $_[0]->client->_get_session_from_hashref( $_[2] ),
             ( defined $_[2] ? (%{$_[2]}) : () ),
             filter   => $_[1],
             just_one => 1,
@@ -491,6 +503,8 @@ sub delete_one {
 #pod * C<collation> - a L<document|/Document> defining the collation for this operation.
 #pod   See docs for the format of the collation document here:
 #pod   L<https://docs.mongodb.com/master/reference/collation/>.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod
 #pod =cut
 
@@ -501,6 +515,7 @@ sub delete_many {
 
     return $_[0]->client->send_write_op(
         MongoDB::Op::_Delete->_new(
+            session => $_[0]->client->_get_session_from_hashref( $_[2] ),
             ( defined $_[2] ? (%{$_[2]}) : () ),
             filter   => $_[1],
             just_one => 0,
@@ -531,6 +546,8 @@ sub delete_many {
 #pod * C<collation> - a L<document|/Document> defining the collation for this operation.
 #pod   See docs for the format of the collation document here:
 #pod   L<https://docs.mongodb.com/master/reference/collation/>.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod * C<upsert> – defaults to false; if true, a new document will be added if one
 #pod   is not found
 #pod
@@ -541,8 +558,9 @@ sub replace_one {
     MongoDB::UsageError->throw("filter and replace arguments must be references")
       unless ref( $_[1] ) && ref( $_[2] );
 
-    return $_[0]->client->send_write_op(
+    return $_[0]->client->send_retryable_write_op(
         MongoDB::Op::_Update->_new(
+            session => $_[0]->client->_get_session_from_hashref( $_[3] ),
             ( defined $_[3] ? (%{$_[3]}) : () ),
             filter     => $_[1],
             update     => $_[2],
@@ -570,11 +588,16 @@ sub replace_one {
 #pod Valid options include:
 #pod
 #pod =for :list
+#pod * C<arrayFilters> - An array of filter documents that determines which array
+#pod   elements to modify for an update operation on an array field. Only available
+#pod   for MongoDB servers of version 3.6+.
 #pod * C<bypassDocumentValidation> - skips document validation, if enabled; this
 #pod   is ignored for MongoDB servers older than version 3.2.
 #pod * C<collation> - a L<document|/Document> defining the collation for this operation.
 #pod   See docs for the format of the collation document here:
 #pod   L<https://docs.mongodb.com/master/reference/collation/>.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod * C<upsert> – defaults to false; if true, a new document will be added if
 #pod   one is not found by taking the filter expression and applying the update
 #pod   document operations to it prior to insertion.
@@ -586,8 +609,9 @@ sub update_one {
     MongoDB::UsageError->throw("filter and update arguments must be references")
       unless ref( $_[1] ) && ref( $_[2] );
 
-    return $_[0]->client->send_write_op(
+    return $_[0]->client->send_retryable_write_op(
         MongoDB::Op::_Update->_new(
+            session => $_[0]->client->_get_session_from_hashref( $_[3] ),
             ( defined $_[3] ? (%{$_[3]}) : () ),
             filter     => $_[1],
             update     => $_[2],
@@ -615,11 +639,16 @@ sub update_one {
 #pod Valid options include:
 #pod
 #pod =for :list
+#pod * C<arrayFilters> - An array of filter documents that determines which array
+#pod   elements to modify for an update operation on an array field. Only available
+#pod   for MongoDB servers of version 3.6+.
 #pod * C<bypassDocumentValidation> - skips document validation, if enabled; this
 #pod   is ignored for MongoDB servers older than version 3.2.
 #pod * C<collation> - a L<document|/Document> defining the collation for this operation.
 #pod   See docs for the format of the collation document here:
 #pod   L<https://docs.mongodb.com/master/reference/collation/>.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod * C<upsert> – defaults to false; if true, a new document will be added if
 #pod   one is not found by taking the filter expression and applying the update
 #pod   document operations to it prior to insertion.
@@ -633,6 +662,7 @@ sub update_many {
 
     return $_[0]->client->send_write_op(
         MongoDB::Op::_Update->_new(
+            session => $_[0]->client->_get_session_from_hashref( $_[3] ),
             ( defined $_[3] ? (%{$_[3]}) : () ),
             filter     => $_[1],
             update     => $_[2],
@@ -651,7 +681,8 @@ sub update_many {
 #pod     $cursor = $coll->find({ i => { '$gt' => 42 } }, {limit => 20});
 #pod
 #pod Executes a query with a L<filter expression|/Filter expression> and returns a
-#pod C<MongoDB::Cursor> object.
+#pod B<lazy> C<MongoDB::Cursor> object.  (The query is not immediately
+#pod issued to the server; see below for details.)
 #pod
 #pod The query can be customized using L<MongoDB::Cursor> methods, or with an
 #pod optional hash reference of options.
@@ -665,34 +696,50 @@ sub update_many {
 #pod * C<collation> - a L<document|/Document> defining the collation for this operation.
 #pod   See docs for the format of the collation document here:
 #pod   L<https://docs.mongodb.com/master/reference/collation/>.
-#pod * C<comment> – attaches a comment to the query. If C<$comment> also exists in
-#pod   the C<modifiers> document, the comment field overwrites C<$comment>.
+#pod * C<comment> – attaches a comment to the query.
 #pod * C<cursorType> – indicates the type of cursor to use. It must be one of three
 #pod   string values: C<'non_tailable'> (the default), C<'tailable'>, and
 #pod   C<'tailable_await'>.
+#pod * C<hint> – L<specify an index to
+#pod   use|http://docs.mongodb.org/manual/reference/command/count/#specify-the-index-to-use>;
+#pod   must be a string, array reference, hash reference or L<Tie::IxHash> object.
 #pod * C<limit> – the maximum number of documents to return.
+#pod * C<max> – L<specify the B<exclusive> upper bound for a specific index|
+#pod   https://docs.mongodb.com/manual/reference/operator/meta/max/>.
 #pod * C<maxAwaitTimeMS> – the maximum amount of time for the server to wait on
 #pod   new documents to satisfy a tailable cursor query. This only applies
 #pod   to a C<cursorType> of 'tailable_await'; the option is otherwise ignored.
 #pod   (Note, this will be ignored for servers before version 3.2.)
-#pod * C<maxTimeMS> – the maximum amount of time to allow the query to run. If
-#pod   C<$maxTimeMS> also exists in the modifiers document, the C<maxTimeMS> field
-#pod   overwrites C<$maxTimeMS>. (Note, this will be ignored for servers before
-#pod   version 2.6.)
-#pod * C<modifiers> – a hash reference of dollar-prefixed L<query
+#pod * C<maxScan> – (DEPRECATED) L<maximum number of documents or index keys to scan|
+#pod   https://docs.mongodb.com/manual/reference/operator/meta/maxScan/>.
+#pod * C<maxTimeMS> – the maximum amount of time to allow the query to run.
+#pod   (Note, this will be ignored for servers before version 2.6.)
+#pod * C<min> – L<specify the B<inclusive> lower bound for a specific index|
+#pod   https://docs.mongodb.com/manual/reference/operator/meta/min/>.
+#pod * C<modifiers> – (DEPRECATED) a hash reference of dollar-prefixed L<query
 #pod   modifiers|http://docs.mongodb.org/manual/reference/operator/query-modifier/>
-#pod   modifying the output or behavior of a query.
+#pod   modifying the output or behavior of a query. Top-level options will always
+#pod   take precedence over corresponding modifiers.  Supported modifiers include
+#pod   $comment, $hint, $maxScan, $maxTimeMS, $max, $min, $orderby, $returnKey,
+#pod   $showDiskLoc, and $snapshot.  Some options may not be supported by
+#pod   newer server versions.
 #pod * C<noCursorTimeout> – if true, prevents the server from timing out a cursor
-#pod   after a period of inactivity
+#pod   after a period of inactivity.
 #pod * C<projection> - a hash reference defining fields to return. See "L<limit
-#pod   fields to
-#pod   return|http://docs.mongodb.org/manual/tutorial/project-fields-from-query-results/>"
+#pod   fields to return|http://docs.mongodb.org/manual/tutorial/project-fields-from-query-results/>"
 #pod   in the MongoDB documentation for details.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
+#pod * C<returnKey> – L<Only return the index field or fields for the results of
+#pod   the query|https://docs.mongodb.com/manual/reference/operator/meta/returnKey/>.
+#pod * C<showRecordId> – modifies the output of a query by adding a field
+#pod   L<$recordId|https://docs.mongodb.com/manual/reference/method/cursor.showRecordId/>
+#pod   that uniquely identifies a document in a collection.
 #pod * C<skip> – the number of documents to skip before returning.
 #pod * C<sort> – an L<ordered document|/Ordered document> defining the order in which
-#pod   to return matching documents. If C<$orderby> also exists in the modifiers
-#pod   document, the sort field overwrites C<$orderby>.  See docs for
-#pod   L<$orderby|http://docs.mongodb.org/manual/reference/operator/meta/orderby/>.
+#pod   to return matching documents.  See the L<$orderby
+#pod   documentation|https://docs.mongodb.com/manual/reference/operator/meta/orderby/>
+#pod   for examples.
 #pod
 #pod For more information, see the L<Read Operations
 #pod Overview|http://docs.mongodb.org/manual/core/read-operations-introduction/> in
@@ -724,27 +771,17 @@ sub find {
         $options->{maxTimeMS} = $self->max_time_ms;
     }
 
+    my $session = $self->client->_get_session_from_hashref( $options );
+
     # coerce to IxHash
     __ixhash( $options, 'sort' );
 
     return MongoDB::Cursor->new(
         client => $self->{_client},
         query => MongoDB::Op::_Query->_new(
-            modifiers           => {},
-            allowPartialResults => 0,
-            batchSize           => 0,
-            comment             => '',
-            cursorType          => 'non_tailable',
-            limit               => 0,
-            maxAwaitTimeMS      => 0,
-            maxTimeMS           => 0,
-            noCursorTimeout     => 0,
-            oplogReplay         => 0,
-            projection          => undef,
-            skip                => 0,
-            sort                => undef,
-            %$options,
-            filter => $filter || {},
+            filter  => $filter || {},
+            options => MongoDB::Op::_Query->precondition_options($options),
+            session => $session,
             %{ $self->_op_args },
         )
     );
@@ -778,6 +815,8 @@ sub find {
 #pod   L<https://docs.mongodb.com/master/reference/collation/>.
 #pod * C<maxTimeMS> – the maximum amount of time in milliseconds to allow the
 #pod   command to run.  (Note, this will be ignored for servers before version 2.6.)
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod * C<sort> – an L<ordered document|/Ordered document> defining the order in which
 #pod   to return matching documents. If C<$orderby> also exists in the modifiers
 #pod   document, the sort field overwrites C<$orderby>.  See docs for
@@ -797,29 +836,21 @@ sub find_one {
         $options->{maxTimeMS} = $self->max_time_ms;
     }
 
+    my $session = $self->client->_get_session_from_hashref( $options );
+
     # coerce to IxHash
     __ixhash( $options, 'sort' );
+    # overide projection and limit
+    $options->{projection} = $projection;
+    $options->{limit} = -1;
 
     return $self->client->send_read_op(
         MongoDB::Op::_Query->_new(
-            modifiers           => {},
-            allowPartialResults => 0,
-            batchSize           => 0,
-            comment             => '',
-            cursorType          => 'non_tailable',
-            limit               => 0,
-            maxAwaitTimeMS      => 0,
-            maxTimeMS           => 0,
-            noCursorTimeout     => 0,
-            oplogReplay         => 0,
-            skip                => 0,
-            sort                => undef,
-            %$options,
-            filter     => $filter     || {},
-            projection => $projection || {},
-            limit      => -1,
+            filter => $filter || {},
+            options => MongoDB::Op::_Query->precondition_options($options),
+            session => $session,
             %{ $self->_op_args },
-        )
+          )
     )->next;
 }
 
@@ -865,6 +896,8 @@ sub find_id {
 #pod   fields to
 #pod   return|http://docs.mongodb.org/manual/tutorial/project-fields-from-query-results/>"
 #pod   in the MongoDB documentation for details.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod * C<sort> – an L<ordered document|/Ordered document> defining the order in
 #pod   which to return matching documents.  See docs for
 #pod   L<$orderby|http://docs.mongodb.org/manual/reference/operator/meta/orderby/>.
@@ -886,6 +919,8 @@ sub find_one_and_delete {
         $options->{maxTimeMS} = $self->max_time_ms;
     }
 
+    my $session = $self->client->_get_session_from_hashref( $options );
+
     # coerce to IxHash
     __ixhash($options, 'sort');
 
@@ -893,9 +928,12 @@ sub find_one_and_delete {
         %{ $_[0]->_op_args },
         filter        => $filter,
         options       => $options,
+        session       => $session,
     );
 
-    return $self->client->send_write_op($op);
+    return $self->write_concern->is_acknowledged
+      ? $self->client->send_retryable_write_op( $op )
+      : $self->client->send_write_op( $op );
 }
 
 #pod =method find_one_and_replace
@@ -927,6 +965,8 @@ sub find_one_and_delete {
 #pod * C<returnDocument> – either the string C<'before'> or C<'after'>, to indicate
 #pod   whether the returned document should be the one before or after replacement.
 #pod   The default is C<'before'>.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod * C<sort> – an L<ordered document|/Ordered document> defining the order in
 #pod   which to return matching documents.  See docs for
 #pod   L<$orderby|http://docs.mongodb.org/manual/reference/operator/meta/orderby/>.
@@ -958,6 +998,9 @@ sub find_one_and_replace {
 #pod A hash reference of options may be provided. Valid keys include:
 #pod
 #pod =for :list
+#pod * C<arrayFilters> - An array of filter documents that determines which array
+#pod   elements to modify for an update operation on an array field. Only available
+#pod   for MongoDB servers of version 3.6+.
 #pod * C<bypassDocumentValidation> - skips document validation, if enabled; this
 #pod   is ignored for MongoDB servers older than version 3.2.
 #pod * C<collation> - a L<document|/Document> defining the collation for this operation.
@@ -972,6 +1015,8 @@ sub find_one_and_replace {
 #pod * C<returnDocument> – either the string C<'before'> or C<'after'>, to indicate
 #pod   whether the returned document should be the one before or after replacement.
 #pod   The default is C<'before'>.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod * C<sort> – an L<ordered document|/Ordered document> defining the order in
 #pod   which to return matching documents.  See docs for
 #pod   L<$orderby|http://docs.mongodb.org/manual/reference/operator/meta/orderby/>.
@@ -988,6 +1033,102 @@ sub find_one_and_update {
     my ( $self, $filter, $update, $options ) = @_;
 
     return $self->_find_one_and_update_or_replace($filter, $update, $options);
+}
+
+#pod =method watch
+#pod
+#pod Watches for changes on this collection-
+#pod
+#pod Perform an aggregation with an implicit initial C<$changeStream> stage
+#pod and returns a L<MongoDB::ChangeStream> result which can be used to
+#pod iterate over the changes in the collection. This functionality is
+#pod available since MongoDB 3.6.
+#pod
+#pod     my $stream = $collection->watch();
+#pod     my $stream = $collection->watch( \@pipeline );
+#pod     my $stream = $collection->watch( \@pipeline, \%options );
+#pod
+#pod     while (1) {
+#pod
+#pod         # This inner loop will only run until no more changes are
+#pod         # available.
+#pod         while (my $change = $stream->next) {
+#pod             # process $change
+#pod         }
+#pod     }
+#pod
+#pod The returned stream will not block forever waiting for changes. If you
+#pod want to respond to changes over a longer time use C<maxAwaitTimeMS> and
+#pod regularly call C<next> in a loop.
+#pod
+#pod B<Note>: Using this helper method is preferred to manually aggregating
+#pod with a C<$changeStream> stage, since it will automatically resume when
+#pod the connection was terminated.
+#pod
+#pod The optional first argument must be an array-ref of
+#pod L<aggregation pipeline|http://docs.mongodb.org/manual/core/aggregation-pipeline/>
+#pod documents. Each pipeline document must be a hash reference. Not all
+#pod pipeline stages are supported after C<$changeStream>.
+#pod
+#pod The optional second argument is a hash reference with options:
+#pod
+#pod =for :list
+#pod * C<fullDocument> - The fullDocument to pass as an option to the
+#pod   C<$changeStream> stage. Allowed values: C<default>, C<updateLookup>.
+#pod   Defaults to C<default>.  When set to C<updateLookup>, the change
+#pod   notification for partial updates will include both a delta describing the
+#pod   changes to the document, as well as a copy of the entire document that
+#pod   was changed from some time after the change occurred.
+#pod * C<resumeAfter> - The logical starting point for this change stream.
+#pod   This value can be obtained from the C<_id> field of a document returned
+#pod   by L<MongoDB::ChangeStream/next>. Cannot be specified together with
+#pod   C<startAtOperationTime>
+#pod * C<maxAwaitTimeMS> - The maximum number of milliseconds for the server
+#pod   to wait before responding.
+#pod * C<startAtOperationTime> - A L<BSON::Timestamp> specifying at what point
+#pod   in time changes will start being watched. Cannot be specified together
+#pod   with C<resumeAfter>. Plain values will be coerced to L<BSON::Timestamp>
+#pod   objects.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
+#pod
+#pod See L</aggregate> for more available options.
+#pod
+#pod See the L<manual section on Change Streams|https://docs.mongodb.com/manual/changeStreams/>
+#pod for general usage information on change streams.
+#pod
+#pod See the L<Change Streams specification|https://github.com/mongodb/specifications/blob/master/source/change-streams.rst>
+#pod for details on change streams.
+#pod
+#pod =cut
+
+sub watch {
+    my ( $self, $pipeline, $options ) = @_;
+
+    $pipeline ||= [];
+    $options ||= {};
+
+    my $session = $self->client->_get_session_from_hashref( $options );
+
+    return MongoDB::ChangeStream->new(
+        exists($options->{startAtOperationTime})
+            ? (start_at_operation_time => delete $options->{startAtOperationTime})
+            : (),
+        exists($options->{fullDocument})
+            ? (full_document => delete $options->{fullDocument})
+            : (full_document => 'default'),
+        exists($options->{resumeAfter})
+            ? (resume_after => delete $options->{resumeAfter})
+            : (),
+        exists($options->{maxAwaitTimeMS})
+            ? (max_await_time_ms => delete $options->{maxAwaitTimeMS})
+            : (),
+        client => $self->client,
+        pipeline => $pipeline,
+        session => $session,
+        options => $options,
+        op_args => $self->_op_args,
+    );
 }
 
 #pod =method aggregate
@@ -1007,6 +1148,11 @@ sub find_one_and_update {
 #pod pipeline|http://docs.mongodb.org/manual/core/aggregation-pipeline/> documents.
 #pod Each pipeline document must be a hash reference.
 #pod
+#pod B<Note>: Some pipeline documents have ordered arguments, such as C<$sort>.
+#pod Be sure to provide these argument using L<Tie::IxHash>.  E.g.:
+#pod
+#pod     { '$sort' => Tie::IxHash->new( age => -1, posts => 1 ) }
+#pod
 #pod A hash reference of options may be provided. Valid keys include:
 #pod
 #pod =for :list
@@ -1020,6 +1166,11 @@ sub find_one_and_update {
 #pod * C<explain> – if true, return a single document with execution information.
 #pod * C<maxTimeMS> – the maximum amount of time in milliseconds to allow the
 #pod   command to run.  (Note, this will be ignored for servers before version 2.6.)
+#pod * C<hint> - An index to use for this aggregation. (Only compatible with servers
+#pod   above version 3.6.) For more information, see the other aggregate options here:
+#pod   L<https://docs.mongodb.com/manual/reference/command/aggregate/index.html>
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod
 #pod B<Note> MongoDB 2.6+ added the '$out' pipeline operator.  If this operator is
 #pod used to write aggregation results directly to a collection, an empty result
@@ -1046,6 +1197,8 @@ sub aggregate {
     my ( $self, $pipeline, $options ) = @_;
     $options ||= {};
 
+    my $session = $self->client->_get_session_from_hashref( $options );
+
     # boolify some options
     for my $k (qw/allowDiskUse explain/) {
         $options->{$k} = ( $options->{$k} ? true : false ) if exists $options->{$k};
@@ -1064,18 +1217,25 @@ sub aggregate {
         options      => $options,
         read_concern => $self->read_concern,
         has_out      => $last_op eq '$out',
+        exists($options->{maxAwaitTimeMS})
+            ? (maxAwaitTimeMS => delete $options->{maxAwaitTimeMS})
+            : (),
+        session      => $session,
         %{ $self->_op_args },
     );
 
     return $self->client->send_read_op($op);
 }
 
-#pod =method count
+#pod =method count_documents
 #pod
-#pod     $count = $coll->count( $filter );
-#pod     $count = $coll->count( $filter, $options );
+#pod     $count = $coll->count_documents( $filter );
+#pod     $count = $coll->count_documents( $filter, $options );
 #pod
 #pod Returns a count of documents matching a L<filter expression|/Filter expression>.
+#pod To return a count of all documents, use an empty hash reference as the filter.
+#pod
+#pod B<NOTE>: this may result in a scan of all documents in the collection.
 #pod
 #pod A hash reference of options may be provided. Valid keys include:
 #pod
@@ -1083,26 +1243,48 @@ sub aggregate {
 #pod * C<collation> - a L<document|/Document> defining the collation for this operation.
 #pod   See docs for the format of the collation document here:
 #pod   L<https://docs.mongodb.com/master/reference/collation/>.
-#pod * C<hint> – L<specify an index to
-#pod   use|http://docs.mongodb.org/manual/reference/command/count/#specify-the-index-to-use>;
-#pod   must be a string, array reference, hash reference or L<Tie::IxHash> object.
+#pod * C<hint> – specify an index to use; must be a string, array reference,
+#pod   hash reference or L<Tie::IxHash> object. (Requires server version 3.6 or later.)
 #pod * C<limit> – the maximum number of documents to count.
 #pod * C<maxTimeMS> – the maximum amount of time in milliseconds to allow the
 #pod   command to run.  (Note, this will be ignored for servers before version 2.6.)
 #pod * C<skip> – the number of documents to skip before counting documents.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod
-#pod B<NOTE>: On a sharded cluster, C<count> can result in an inaccurate count if
-#pod orphaned documents exist or if a chunk migration is in progress.  See L<count
-#pod command
-#pod documentation|http://docs.mongodb.org/manual/reference/command/count/#behavior>
-#pod for details and a work-around using L</aggregate>.
+#pod B<NOTE>: When upgrading from the deprecated C<count> method, some legacy
+#pod operators are not supported and must be replaced:
+#pod
+#pod     +-------------+--------------------------------+
+#pod     | Legacy      | Modern Replacement             |
+#pod     +=============+================================+
+#pod     | $where      | $expr (Requires MongoDB 3.6+)  |
+#pod     +-------------+--------------------------------+
+#pod     | $near       | $geoWithin with $center        |
+#pod     +-------------+--------------------------------+
+#pod     | $nearSphere | $geoWithin with $centerSphere  |
+#pod     +-------------+--------------------------------+
 #pod
 #pod =cut
 
-sub count {
+sub count_documents {
     my ( $self, $filter, $options ) = @_;
-    $filter  ||= {};
+    MongoDB::UsageError->throw("filter argument must be a reference")
+      unless ref( $filter );
+
     $options ||= {};
+
+    my $pipeline = [ { '$match' => $filter } ];
+
+    if ( exists $options->{skip} ) {
+        push @$pipeline, { '$skip', delete $options->{skip} };
+    }
+
+    if ( exists $options->{limit} ) {
+        push @$pipeline, { '$limit', delete $options->{limit} };
+    }
+
+    push @$pipeline, { '$group' => { '_id' => undef, 'n' => { '$sum' => 1 } } };
 
     # possibly fallback to default maxTimeMS
     if ( ! exists $options->{maxTimeMS} && $self->max_time_ms ) {
@@ -1112,15 +1294,53 @@ sub count {
     # string is OK so we check ref, not just exists
     __ixhash($options, 'hint') if ref $options->{hint};
 
+    my $res = $self->aggregate($pipeline, $options)->next;
+
+    return $res->{n} // 0;
+}
+
+#pod =method estimated_document_count
+#pod
+#pod     $count = $coll->estimated_document_count();
+#pod     $count = $coll->estimated_document_count($options);
+#pod
+#pod Returns an estimated count of documents based on collection metadata.
+#pod
+#pod B<NOTE>: this method does not support sessions or transactions.
+#pod
+#pod A hash reference of options may be provided. Valid keys include:
+#pod
+#pod =for :list
+#pod * C<maxTimeMS> – the maximum amount of time in milliseconds to allow the
+#pod   command to run.  (Note, this will be ignored for servers before version 2.6.)
+#pod
+#pod =cut
+
+sub estimated_document_count {
+    my ( $self, $options ) = @_;
+    $options ||= {};
+
+    # only maxTimeMS is supported
+    my $filtered = {
+        ( exists $options->{maxTimeMS} ? ( maxTimeMS => $options->{maxTimeMS} ) : () )
+    };
+
+    # possibly fallback to default maxTimeMS
+    if ( ! exists $filtered->{maxTimeMS} && $self->max_time_ms ) {
+        $filtered->{maxTimeMS} = $self->max_time_ms;
+    }
+
+    # XXX replace this with direct use of a command op?
     my $op = MongoDB::Op::_Count->_new(
-        options         => $options,
-        filter          => $filter,
+        options         => $filtered,
+        filter          => undef,
+        session         => undef,
         %{ $self->_op_args },
     );
 
     my $res = $self->client->send_read_op($op);
 
-    return $res->{n};
+    return $res->{n} // 0;
 }
 
 #pod =method distinct
@@ -1143,6 +1363,8 @@ sub count {
 #pod   L<https://docs.mongodb.com/master/reference/collation/>.
 #pod * C<maxTimeMS> – the maximum amount of time in milliseconds to allow the
 #pod   command to run.  (Note, this will be ignored for servers before version 2.6.)
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod
 #pod See documentation for the L<distinct
 #pod command|http://docs.mongodb.org/manual/reference/command/distinct/> for
@@ -1165,10 +1387,13 @@ sub distinct {
         $options->{maxTimeMS} = $self->max_time_ms;
     }
 
+    my $session = $self->client->_get_session_from_hashref( $options );
+
     my $op = MongoDB::Op::_Distinct->_new(
         fieldname       => $fieldname,
         filter          => $filter,
         options         => $options,
+        session         => $session,
         %{ $self->_op_args },
     );
 
@@ -1250,17 +1475,29 @@ sub parallel_scan {
 #pod Renames the collection.  If a collection already exists with the new collection
 #pod name, this method will throw an exception.
 #pod
+#pod A hashref of options may be provided.
+#pod
+#pod Valid options include:
+#pod
+#pod =for :list
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
+#pod
 #pod It returns a new L<MongoDB::Collection> object corresponding to the renamed
 #pod collection.
 #pod
 #pod =cut
 
 sub rename {
-    my ( $self, $new_name ) = @_;
+    my ( $self, $new_name, $options ) = @_;
+
+    my $session = $self->client->_get_session_from_hashref( $options );
 
     my $op = MongoDB::Op::_RenameCollection->_new(
         src_ns => $self->full_name,
         dst_ns => join( ".", $self->database->name, $new_name ),
+        options => $options,
+        session => $session,
         %{ $self->_op_args },
     );
 
@@ -1278,9 +1515,17 @@ sub rename {
 #pod =cut
 
 sub drop {
-    my ($self) = @_;
+    my ( $self, $options ) = @_;
 
-    $self->client->send_write_op( MongoDB::Op::_DropCollection->_new( %{ $self->_op_args } ) );
+    my $session = $self->client->_get_session_from_hashref( $options );
+
+    $self->client->send_write_op(
+        MongoDB::Op::_DropCollection->_new(
+            options => $options,
+            session => $session,
+            %{ $self->_op_args },
+        )
+    );
 
     return;
 }
@@ -1392,6 +1637,8 @@ sub initialize_unordered_bulk_op {
 #pod * C<ordered> – when true, the bulk operation is executed like
 #pod   L</initialize_ordered_bulk>. When false, the bulk operation is executed
 #pod   like L</initialize_unordered_bulk>.  The default is true.
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod
 #pod See L<MongoDB::BulkWrite> for more details on bulk writes.  Be advised that
 #pod the legacy Bulk API method names differ slightly from MongoDB::Collection
@@ -1411,6 +1658,8 @@ sub bulk_write {
     $options ||= {};
 
     my $ordered = exists $options->{ordered} ? delete $options->{ordered} : 1;
+
+    my $session = $self->client->_get_session_from_hashref( $options );
 
     my $bulk =
       $ordered ? $self->ordered_bulk($options) : $self->unordered_bulk($options);
@@ -1464,6 +1713,7 @@ sub bulk_write {
             }
             elsif ( $method eq 'delete_many' ) {
                 $view->delete_many;
+                $bulk->_retryable( 0 );
                 next;
             }
 
@@ -1479,6 +1729,7 @@ sub bulk_write {
             }
             elsif ( $method eq 'update_many' ) {
                 $view->update_many($update_doc);
+                $bulk->_retryable( 0 );
             }
             else {
                 MongoDB::UsageError->throw("unknown bulk operation '$method'");
@@ -1486,7 +1737,10 @@ sub bulk_write {
         }
     }
 
-    return $bulk->execute;
+    return $bulk->execute(
+        $options->{writeConcern},
+        { session => $session },
+    );
 }
 
 BEGIN {
@@ -1536,15 +1790,54 @@ sub _find_one_and_update_or_replace {
     # pass separately for MongoDB::Role::_BypassValidation
     my $bypass = delete $options->{bypassDocumentValidation};
 
+    my $session = $self->client->_get_session_from_hashref( $options );
+
     my $op = MongoDB::Op::_FindAndUpdate->_new(
         filter         => $filter,
         modifier       => $modifier,
         options        => $options,
         bypassDocumentValidation => $bypass,
+        session        => $session,
         %{ $self->_op_args },
     );
 
-    return $self->client->send_write_op($op);
+    return $self->write_concern->is_acknowledged
+      ? $self->client->send_retryable_write_op( $op )
+      : $self->client->send_write_op( $op );
+}
+
+#--------------------------------------------------------------------------#
+# Deprecated functions
+#--------------------------------------------------------------------------#
+
+sub count {
+    my ( $self, $filter, $options ) = @_;
+
+    $self->_warn_deprecated_method( 'count' => [qw/count_documents estimated_document_count/] );
+
+    $filter  ||= {};
+    $options ||= {};
+
+    # possibly fallback to default maxTimeMS
+    if ( !exists $options->{maxTimeMS} && $self->max_time_ms ) {
+        $options->{maxTimeMS} = $self->max_time_ms;
+    }
+
+    my $session = $self->client->_get_session_from_hashref($options);
+
+    # string is OK so we check ref, not just exists
+    __ixhash( $options, 'hint' ) if ref $options->{hint};
+
+    my $op = MongoDB::Op::_Count->_new(
+        options => $options,
+        filter  => $filter,
+        session => $session,
+        %{ $self->_op_args },
+    );
+
+    my $res = $self->client->send_read_op($op);
+
+    return $res->{n};
 }
 
 #--------------------------------------------------------------------------#
@@ -1570,354 +1863,17 @@ sub __ixhash {
     return;
 }
 
-#--------------------------------------------------------------------------#
-# Deprecated legacy methods
-#--------------------------------------------------------------------------#
-
-my $legacy_insert_args;
-sub insert {
-    MongoDB::UsageError->throw("document argument must be a reference")
-      unless ref( $_[1] );
-
-    my ( $self, $document, $opts ) = @_;
-
-    $self->_warn_deprecated( 'insert' => ['insert_one'] );
-
-    my $op = MongoDB::Op::_InsertOne->_new(
-        document => $document,
-        %{ $self->_op_args },
-        write_concern => $self->_dynamic_write_concern($opts),
-    );
-
-    my $result = $self->client->send_write_op($op);
-
-    return $result->inserted_id;
-}
-
-sub batch_insert {
-    MongoDB::UsageError->throw("documents argument must be an array reference")
-      unless ref( $_[1] ) eq 'ARRAY';
-
-    my ( $self, $documents, $opts ) = @_;
-
-    $self->_warn_deprecated( 'batch_insert' => ['insert_many'] );
-
-    my $op = MongoDB::Op::_BatchInsert->_new(
-        documents     => $documents,
-        check_keys    => 0,
-        ordered       => 1,
-        %{ $_[0]->_op_args },
-        write_concern => $self->_dynamic_write_concern($opts),
-    );
-
-    my $result = $self->client->send_write_op($op);
-
-    return if $result->isa("MongoDB::UnacknowledgedResult");
-
-    my @ids;
-    my $inserted_ids = $result->inserted_ids;
-    for my $k ( sort { $a <=> $b } keys %$inserted_ids ) {
-        push @ids, $inserted_ids->{$k};
-    }
-
-    return @ids;
-}
-
-sub remove {
-    my ($self, $query, $opts) = @_;
-    $opts ||= {};
-
-    $self->_warn_deprecated( 'remove' => [qw/delete_many delete_one/] );
-
-    MongoDB::UsageError->throw(
-        "deprecated method 'remove' does not support a collation, use one of its replacement methods instead"
-    ) if exists $opts->{collation};
-
-    my $op = MongoDB::Op::_Delete->_new(
-        filter => $query || {},
-        just_one => !!$opts->{just_one},
-        %{ $self->_op_args },
-        write_concern => $self->_dynamic_write_concern($opts),
-    );
-
-    my $result = $self->client->send_write_op( $op );
-
-    # emulate key fields of legacy GLE result
-    return {
-        ok => 1,
-        n => $result->deleted_count,
-    };
-}
-
-my $legacy_update_args;
-sub update {
-    my ( $self, $query, $object, $opts ) = @_;
-    $opts ||= {};
-    $object ||= {};
-
-    $self->_warn_deprecated( 'update' => [qw/update_one update_many replace_one/] );
-
-    MongoDB::UsageError->throw(
-        "deprecated method 'update' does not support a collation, use one of its replacement methods instead"
-    ) if exists $opts->{collation};
-
-    if ( exists $opts->{multiple} ) {
-        if ( exists( $opts->{multi} ) && !!$opts->{multi} ne !!$opts->{multiple} ) {
-            MongoDB::UsageError->throw(
-                "can't use conflicting values of 'multiple' and 'multi' in 'update'");
-        }
-        $opts->{multi} = delete $opts->{multiple};
-    }
-
-    # figure out if first key based on op_char or '$'
-    my $type = ref($object);
-    my $fk = (
-          $type eq 'HASH' ? each(%$object)
-        : $type eq 'ARRAY' ? $object->[0]
-        : $type eq 'Tie::IxHash' ? $object->FIRSTKEY
-        : each (%$object)
-    );
-    $fk = defined($fk) ? substr($fk,0,1) : '';
-
-    my $op_char = eval { $self->bson_codec->op_char } || '$';
-    my $is_replace = $fk ne $op_char;
-
-    my $op = MongoDB::Op::_Update->_new(
-        filter => $query  || {},
-        update => $object || {},
-        multi  => $opts->{multi},
-        upsert => $opts->{upsert},
-        is_replace => $is_replace,
-        %{ $_[0]->_op_args },
-        write_concern => $self->_dynamic_write_concern($opts),
-    );
-
-    my $result = $self->client->send_write_op( $op );
-
-    if ( $result->acknowledged ) {
-        # emulate key fields of legacy GLE result
-        return {
-            ok => 1,
-            n => $result->matched_count,
-            ( $result->upserted_id ? ( upserted => $result->upserted_id ) : () ),
-        };
-    }
-    else {
-        return { ok => 1 };
-    }
-}
-
-sub save {
-    MongoDB::UsageError->throw("document argument must be a reference")
-      unless ref( $_[1] );
-
-    my ($self, $doc, $options) = @_;
-
-    $self->_warn_deprecated( 'save', "Use 'replace_one' with upsert instead." );
-
-    my $type = ref($doc);
-    my $id = (
-          $type eq 'HASH' ? $doc->{_id}
-        : $type eq 'ARRAY' ? do {
-            my $i;
-            for ( $i = 0; $i < @$doc; $i++ ) { last if $doc->[$i] eq '_id' }
-            $i < $#$doc ? $doc->[ $i + 1 ] : undef;
-          }
-        : $type eq 'Tie::IxHash' ? $doc->FETCH('_id')
-        : $doc->{_id} # hashlike?
-    );
-
-    if ( defined($id) ) {
-        $options ||= {};
-        $options->{'upsert'} = boolean::true;
-        return $self->update( { _id => $id }, $doc, $options );
-    }
-    else {
-        return $self->insert( $doc, ( $options ? $options : () ) );
-    }
-}
-
-sub find_and_modify {
-    my ( $self, $opts ) = @_;
-    $opts ||= {};
-
-    $self->_warn_deprecated( 'find_and_modify' =>
-          [qw/find_one_and_update find_one_and_replace find_one_and_delete/] );
-
-    MongoDB::UsageError->throw(
-        "deprecated method 'find_and_modify' does not support a collation, use one of its replacement methods instead"
-    ) if exists $opts->{collation};
-
-    MongoDB::UsageError->throw("find_and_modify requires a 'query' option")
-        unless $opts->{query};
-
-    MongoDB::UsageError->throw("find_and_modify requires a 'remove' or 'update' option")
-        unless $opts->{remove} || $opts->{update};
-
-    my $query = delete $opts->{query};
-    my $remove = delete $opts->{remove};
-    my $update = delete $opts->{update};
-
-    return $remove
-        ? $self->find_one_and_delete($query, $opts)
-        : $self->find_one_and_update($query, $update, $opts);
-}
-
-sub get_collection {
-    my $self = shift @_;
-    my $coll = shift @_;
-
-    $self->_warn_deprecated( 'get_collection',
-        "Use \$coll->database->coll(join('.', \$coll->name, 'subname')) instead." );
-
-    return $self->database->get_collection($self->name.'.'.$coll);
-}
-
-sub ensure_index {
-    my ( $self, $keys, $opts ) = @_;
-
-    $self->_warn_deprecated( 'ensure_index' => "Use 'indexes' to work with a MongoDB::IndexView instead." );
-
-    MongoDB::UsageError->throw("ensure_index options must be a hash reference")
-      if $opts && !ref($opts) eq 'HASH';
-
-    MongoDB::UsageError->throw(
-        "deprecated method 'ensure_index' does not support a collation, use 'indexes' instead"
-    ) if exists $opts->{collation};
-
-    $keys = Tie::IxHash->new(@$keys) if ref $keys eq 'ARRAY';
-    $opts = $self->_clean_index_options( $opts, $keys );
-
-    # always use safe write concern for index creation
-    my $wc =
-        $self->write_concern->is_acknowledged
-      ? $self->write_concern
-      : MongoDB::WriteConcern->new;
-
-    my $op = MongoDB::Op::_CreateIndexes->_new(
-        db_name       => $self->database->name,
-        coll_name     => $self->name,
-        full_name     => $self->full_name,
-        bson_codec    => $self->bson_codec,
-        indexes       => [ { key => $keys, %$opts } ],
-        write_concern => $wc,
-    );
-
-    $self->client->send_write_op($op);
-
-    return 1;
-}
-
-sub _clean_index_options {
-    my ( $self, $orig, $keys ) = @_;
-
-    # copy the original so we don't modify it
-    my $opts = { $orig ? %$orig : () };
-
-    # add name if not provided
-    $opts->{name} = __to_index_string($keys)
-      unless defined $opts->{name};
-
-    # safe is no more
-    delete $opts->{safe} if exists $opts->{safe};
-
-    # convert snake case
-    if ( exists $opts->{drop_dups} ) {
-        $opts->{dropDups} = delete $opts->{drop_dups};
-    }
-
-    # convert snake case and turn into an integer
-    if ( exists $opts->{expire_after_seconds} ) {
-        $opts->{expireAfterSeconds} = int( delete $opts->{expire_after_seconds} );
-    }
-
-    # convert some things to booleans
-    for my $k (qw/unique background sparse dropDups/) {
-        next unless exists $opts->{$k};
-        $opts->{$k} = boolean( $opts->{$k} );
-    }
-
-    return $opts;
-}
-
-sub __to_index_string {
-    my $keys = shift;
-
-    my @name;
-    if (ref $keys eq 'ARRAY') {
-        @name = @$keys;
-    }
-    elsif (ref $keys eq 'HASH' ) {
-        @name = %$keys
-    }
-    elsif (ref $keys eq 'Tie::IxHash') {
-        my @ks = $keys->Keys;
-        my @vs = $keys->Values;
-
-        for (my $i=0; $i<$keys->Length; $i++) {
-            push @name, $ks[$i];
-            push @name, $vs[$i];
-        }
-    }
-    else {
-        MongoDB::UsageError->throw("expected Tie::IxHash, hash, or array reference for keys");
-    }
-
-    return join("_", @name);
-}
-
-sub get_indexes {
-    my ($self) = @_;
-
-    $self->_warn_deprecated( 'get_indexes'  => "Use 'indexes' to work with a MongoDB::IndexView instead." );
-
-    my $op = MongoDB::Op::_ListIndexes->_new(
-        %{ $_[0]->_op_args },
-    );
-
-    my $res = $self->client->send_primary_op($op);
-
-    return $res->all;
-}
-
-sub drop_indexes {
-    my ($self) = @_;
-
-    $self->_warn_deprecated( 'drop_indexes'  => "Use 'indexes' to work with a MongoDB::IndexView instead." );
-
-    return $self->drop_index('*');
-}
-
-sub drop_index {
-    my ($self, $index_name) = @_;
-
-    $self->_warn_deprecated( 'drop_index'  => "Use 'indexes' to work with a MongoDB::IndexView instead." );
-
-    return $self->_run_command([
-        dropIndexes => $self->name,
-        index => $index_name,
-    ]);
-}
-
-sub validate {
-    my ($self, $scan_data) = @_;
-
-    $self->_warn_deprecated( 'validate'  => "Use 'validate' manually via MongoDB::Database::run_command" );
-
-    $scan_data = 0 unless defined $scan_data;
-    my $obj = $self->_run_command({ validate => $self->name });
-}
-
 # we have a private _run_command rather than using the 'database' attribute
 # so that we're using our BSON codec and not the source database one
 sub _run_command {
     my ( $self, $command ) = @_;
 
     my $op = MongoDB::Op::_Command->_new(
-        db_name     => $self->database->name,
-        query       => $command,
-        query_flags => {},
-        bson_codec  => $self->bson_codec,
+        db_name             => $self->database->name,
+        query               => $command,
+        query_flags         => {},
+        bson_codec          => $self->bson_codec,
+        monitoring_callback => $self->client->monitoring_callback,
     );
 
     my $obj = $self->client->send_read_op($op);
@@ -1937,7 +1893,7 @@ MongoDB::Collection - A MongoDB Collection
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -2001,6 +1957,18 @@ are recommended:
     };
 
 To retry failures automatically, consider using L<Try::Tiny::Retry>.
+
+=head2 Transactions
+
+To conduct operations in a transactions, get a L<MongoDB::ClientSession>
+from L<MongoDB::MongoClient/start_session>.  Start the transaction on the
+session using C<start_transaction> and pass the session as an option to all
+operations.  Then call C<commit_transaction> or C<abort_transaction> on the
+session.  See the L<MongoDB::ClientSession> for options and usage details.
+
+For detailed instructions on using transactions with MongoDB, see the
+MongoDB manual page:
+L<Transactions|https://docs.mongodb.com/master/core/transactions>.
 
 =head2 Terminology
 
@@ -2068,8 +2036,8 @@ was when the C<$maxTimeMS> meta-operator was introduced.
 =head2 bson_codec
 
 An object that provides the C<encode_one> and C<decode_one> methods, such
-as from L<MongoDB::BSON>.  It may be initialized with a hash reference that
-will be coerced into a new MongoDB::BSON object.  By default it will be
+as from L<BSON>.  It may be initialized with a hash reference that
+will be coerced into a new L<BSON> object.  By default it will be
 inherited from a L<MongoDB::Database> object.
 
 =head1 METHODS
@@ -2147,6 +2115,10 @@ Valid options include:
 
 C<bypassDocumentValidation> - skips document validation, if enabled; this is ignored for MongoDB servers older than version 3.2.
 
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
 =back
 
 =head2 insert_many
@@ -2172,6 +2144,10 @@ Valid options include:
 =item *
 
 C<bypassDocumentValidation> - skips document validation, if enabled; this is ignored for MongoDB servers older than version 3.2.
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
 
 =item *
 
@@ -2203,6 +2179,10 @@ Valid options include:
 
 C<collation> - a L<document|/Document> defining the collation for this operation. See docs for the format of the collation document here: L<https://docs.mongodb.com/master/reference/collation/>.
 
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
 =back
 
 =head2 delete_many
@@ -2222,6 +2202,10 @@ Valid options include:
 =item *
 
 C<collation> - a L<document|/Document> defining the collation for this operation. See docs for the format of the collation document here: L<https://docs.mongodb.com/master/reference/collation/>.
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
 
 =back
 
@@ -2253,6 +2237,10 @@ C<collation> - a L<document|/Document> defining the collation for this operation
 
 =item *
 
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=item *
+
 C<upsert> – defaults to false; if true, a new document will be added if one is not found
 
 =back
@@ -2277,11 +2265,19 @@ Valid options include:
 
 =item *
 
+C<arrayFilters> - An array of filter documents that determines which array elements to modify for an update operation on an array field. Only available for MongoDB servers of version 3.6+.
+
+=item *
+
 C<bypassDocumentValidation> - skips document validation, if enabled; this is ignored for MongoDB servers older than version 3.2.
 
 =item *
 
 C<collation> - a L<document|/Document> defining the collation for this operation. See docs for the format of the collation document here: L<https://docs.mongodb.com/master/reference/collation/>.
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
 
 =item *
 
@@ -2309,11 +2305,19 @@ Valid options include:
 
 =item *
 
+C<arrayFilters> - An array of filter documents that determines which array elements to modify for an update operation on an array field. Only available for MongoDB servers of version 3.6+.
+
+=item *
+
 C<bypassDocumentValidation> - skips document validation, if enabled; this is ignored for MongoDB servers older than version 3.2.
 
 =item *
 
 C<collation> - a L<document|/Document> defining the collation for this operation. See docs for the format of the collation document here: L<https://docs.mongodb.com/master/reference/collation/>.
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
 
 =item *
 
@@ -2329,7 +2333,8 @@ C<upsert> – defaults to false; if true, a new document will be added if one is
     $cursor = $coll->find({ i => { '$gt' => 42 } }, {limit => 20});
 
 Executes a query with a L<filter expression|/Filter expression> and returns a
-C<MongoDB::Cursor> object.
+B<lazy> C<MongoDB::Cursor> object.  (The query is not immediately
+issued to the server; see below for details.)
 
 The query can be customized using L<MongoDB::Cursor> methods, or with an
 optional hash reference of options.
@@ -2352,7 +2357,7 @@ C<collation> - a L<document|/Document> defining the collation for this operation
 
 =item *
 
-C<comment> – attaches a comment to the query. If C<$comment> also exists in the C<modifiers> document, the comment field overwrites C<$comment>.
+C<comment> – attaches a comment to the query.
 
 =item *
 
@@ -2360,7 +2365,15 @@ C<cursorType> – indicates the type of cursor to use. It must be one of three s
 
 =item *
 
+C<hint> – L<specify an index to use|http://docs.mongodb.org/manual/reference/command/count/#specify-the-index-to-use>; must be a string, array reference, hash reference or L<Tie::IxHash> object.
+
+=item *
+
 C<limit> – the maximum number of documents to return.
+
+=item *
+
+C<max> – L<specify the B<exclusive> upper bound for a specific index| https://docs.mongodb.com/manual/reference/operator/meta/max/>.
 
 =item *
 
@@ -2368,15 +2381,23 @@ C<maxAwaitTimeMS> – the maximum amount of time for the server to wait on new d
 
 =item *
 
-C<maxTimeMS> – the maximum amount of time to allow the query to run. If C<$maxTimeMS> also exists in the modifiers document, the C<maxTimeMS> field overwrites C<$maxTimeMS>. (Note, this will be ignored for servers before version 2.6.)
+C<maxScan> – (DEPRECATED) L<maximum number of documents or index keys to scan| https://docs.mongodb.com/manual/reference/operator/meta/maxScan/>.
 
 =item *
 
-C<modifiers> – a hash reference of dollar-prefixed L<query modifiers|http://docs.mongodb.org/manual/reference/operator/query-modifier/> modifying the output or behavior of a query.
+C<maxTimeMS> – the maximum amount of time to allow the query to run. (Note, this will be ignored for servers before version 2.6.)
 
 =item *
 
-C<noCursorTimeout> – if true, prevents the server from timing out a cursor after a period of inactivity
+C<min> – L<specify the B<inclusive> lower bound for a specific index| https://docs.mongodb.com/manual/reference/operator/meta/min/>.
+
+=item *
+
+C<modifiers> – (DEPRECATED) a hash reference of dollar-prefixed L<query modifiers|http://docs.mongodb.org/manual/reference/operator/query-modifier/> modifying the output or behavior of a query. Top-level options will always take precedence over corresponding modifiers.  Supported modifiers include $comment, $hint, $maxScan, $maxTimeMS, $max, $min, $orderby, $returnKey, $showDiskLoc, and $snapshot.  Some options may not be supported by newer server versions.
+
+=item *
+
+C<noCursorTimeout> – if true, prevents the server from timing out a cursor after a period of inactivity.
 
 =item *
 
@@ -2384,11 +2405,23 @@ C<projection> - a hash reference defining fields to return. See "L<limit fields 
 
 =item *
 
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=item *
+
+C<returnKey> – L<Only return the index field or fields for the results of the query|https://docs.mongodb.com/manual/reference/operator/meta/returnKey/>.
+
+=item *
+
+C<showRecordId> – modifies the output of a query by adding a field L<$recordId|https://docs.mongodb.com/manual/reference/method/cursor.showRecordId/> that uniquely identifies a document in a collection.
+
+=item *
+
 C<skip> – the number of documents to skip before returning.
 
 =item *
 
-C<sort> – an L<ordered document|/Ordered document> defining the order in which to return matching documents. If C<$orderby> also exists in the modifiers document, the sort field overwrites C<$orderby>.  See docs for L<$orderby|http://docs.mongodb.org/manual/reference/operator/meta/orderby/>.
+C<sort> – an L<ordered document|/Ordered document> defining the order in which to return matching documents.  See the L<$orderby documentation|https://docs.mongodb.com/manual/reference/operator/meta/orderby/> for examples.
 
 =back
 
@@ -2442,6 +2475,10 @@ C<maxTimeMS> – the maximum amount of time in milliseconds to allow the command
 
 =item *
 
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=item *
+
 C<sort> – an L<ordered document|/Ordered document> defining the order in which to return matching documents. If C<$orderby> also exists in the modifiers document, the sort field overwrites C<$orderby>.  See docs for L<$orderby|http://docs.mongodb.org/manual/reference/operator/meta/orderby/>.
 
 =back
@@ -2489,6 +2526,10 @@ C<projection> - a hash reference defining fields to return. See "L<limit fields 
 
 =item *
 
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=item *
+
 C<sort> – an L<ordered document|/Ordered document> defining the order in which to return matching documents.  See docs for L<$orderby|http://docs.mongodb.org/manual/reference/operator/meta/orderby/>.
 
 =back
@@ -2531,6 +2572,10 @@ C<returnDocument> – either the string C<'before'> or C<'after'>, to indicate w
 
 =item *
 
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=item *
+
 C<sort> – an L<ordered document|/Ordered document> defining the order in which to return matching documents.  See docs for L<$orderby|http://docs.mongodb.org/manual/reference/operator/meta/orderby/>.
 
 =item *
@@ -2556,6 +2601,10 @@ A hash reference of options may be provided. Valid keys include:
 
 =item *
 
+C<arrayFilters> - An array of filter documents that determines which array elements to modify for an update operation on an array field. Only available for MongoDB servers of version 3.6+.
+
+=item *
+
 C<bypassDocumentValidation> - skips document validation, if enabled; this is ignored for MongoDB servers older than version 3.2.
 
 =item *
@@ -2576,6 +2625,10 @@ C<returnDocument> – either the string C<'before'> or C<'after'>, to indicate w
 
 =item *
 
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=item *
+
 C<sort> – an L<ordered document|/Ordered document> defining the order in which to return matching documents.  See docs for L<$orderby|http://docs.mongodb.org/manual/reference/operator/meta/orderby/>.
 
 =item *
@@ -2583,6 +2636,75 @@ C<sort> – an L<ordered document|/Ordered document> defining the order in which
 C<upsert> – defaults to false; if true, a new document will be added if one is not found
 
 =back
+
+=head2 watch
+
+Watches for changes on this collection-
+
+Perform an aggregation with an implicit initial C<$changeStream> stage
+and returns a L<MongoDB::ChangeStream> result which can be used to
+iterate over the changes in the collection. This functionality is
+available since MongoDB 3.6.
+
+    my $stream = $collection->watch();
+    my $stream = $collection->watch( \@pipeline );
+    my $stream = $collection->watch( \@pipeline, \%options );
+
+    while (1) {
+
+        # This inner loop will only run until no more changes are
+        # available.
+        while (my $change = $stream->next) {
+            # process $change
+        }
+    }
+
+The returned stream will not block forever waiting for changes. If you
+want to respond to changes over a longer time use C<maxAwaitTimeMS> and
+regularly call C<next> in a loop.
+
+B<Note>: Using this helper method is preferred to manually aggregating
+with a C<$changeStream> stage, since it will automatically resume when
+the connection was terminated.
+
+The optional first argument must be an array-ref of
+L<aggregation pipeline|http://docs.mongodb.org/manual/core/aggregation-pipeline/>
+documents. Each pipeline document must be a hash reference. Not all
+pipeline stages are supported after C<$changeStream>.
+
+The optional second argument is a hash reference with options:
+
+=over 4
+
+=item *
+
+C<fullDocument> - The fullDocument to pass as an option to the C<$changeStream> stage. Allowed values: C<default>, C<updateLookup>. Defaults to C<default>.  When set to C<updateLookup>, the change notification for partial updates will include both a delta describing the changes to the document, as well as a copy of the entire document that was changed from some time after the change occurred.
+
+=item *
+
+C<resumeAfter> - The logical starting point for this change stream. This value can be obtained from the C<_id> field of a document returned by L<MongoDB::ChangeStream/next>. Cannot be specified together with C<startAtOperationTime>
+
+=item *
+
+C<maxAwaitTimeMS> - The maximum number of milliseconds for the server to wait before responding.
+
+=item *
+
+C<startAtOperationTime> - A L<BSON::Timestamp> specifying at what point in time changes will start being watched. Cannot be specified together with C<resumeAfter>. Plain values will be coerced to L<BSON::Timestamp> objects.
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=back
+
+See L</aggregate> for more available options.
+
+See the L<manual section on Change Streams|https://docs.mongodb.com/manual/changeStreams/>
+for general usage information on change streams.
+
+See the L<Change Streams specification|https://github.com/mongodb/specifications/blob/master/source/change-streams.rst>
+for details on change streams.
 
 =head2 aggregate
 
@@ -2600,6 +2722,11 @@ L<MongoDB::QueryResult> object.
 The first argument must be an array-ref of L<aggregation
 pipeline|http://docs.mongodb.org/manual/core/aggregation-pipeline/> documents.
 Each pipeline document must be a hash reference.
+
+B<Note>: Some pipeline documents have ordered arguments, such as C<$sort>.
+Be sure to provide these argument using L<Tie::IxHash>.  E.g.:
+
+    { '$sort' => Tie::IxHash->new( age => -1, posts => 1 ) }
 
 A hash reference of options may be provided. Valid keys include:
 
@@ -2629,6 +2756,14 @@ C<explain> – if true, return a single document with execution information.
 
 C<maxTimeMS> – the maximum amount of time in milliseconds to allow the command to run.  (Note, this will be ignored for servers before version 2.6.)
 
+=item *
+
+C<hint> - An index to use for this aggregation. (Only compatible with servers above version 3.6.) For more information, see the other aggregate options here: L<https://docs.mongodb.com/manual/reference/command/aggregate/index.html>
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
 =back
 
 B<Note> MongoDB 2.6+ added the '$out' pipeline operator.  If this operator is
@@ -2646,12 +2781,15 @@ or later, you must upgrade your mongod servers first before your mongos
 routers or aggregation queries will fail.  As a workaround, you may
 pass C<< cursor => undef >> as an option.
 
-=head2 count
+=head2 count_documents
 
-    $count = $coll->count( $filter );
-    $count = $coll->count( $filter, $options );
+    $count = $coll->count_documents( $filter );
+    $count = $coll->count_documents( $filter, $options );
 
 Returns a count of documents matching a L<filter expression|/Filter expression>.
+To return a count of all documents, use an empty hash reference as the filter.
+
+B<NOTE>: this may result in a scan of all documents in the collection.
 
 A hash reference of options may be provided. Valid keys include:
 
@@ -2663,7 +2801,7 @@ C<collation> - a L<document|/Document> defining the collation for this operation
 
 =item *
 
-C<hint> – L<specify an index to use|http://docs.mongodb.org/manual/reference/command/count/#specify-the-index-to-use>; must be a string, array reference, hash reference or L<Tie::IxHash> object.
+C<hint> – specify an index to use; must be a string, array reference, hash reference or L<Tie::IxHash> object. (Requires server version 3.6 or later.)
 
 =item *
 
@@ -2677,13 +2815,43 @@ C<maxTimeMS> – the maximum amount of time in milliseconds to allow the command
 
 C<skip> – the number of documents to skip before counting documents.
 
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
 =back
 
-B<NOTE>: On a sharded cluster, C<count> can result in an inaccurate count if
-orphaned documents exist or if a chunk migration is in progress.  See L<count
-command
-documentation|http://docs.mongodb.org/manual/reference/command/count/#behavior>
-for details and a work-around using L</aggregate>.
+B<NOTE>: When upgrading from the deprecated C<count> method, some legacy
+operators are not supported and must be replaced:
+
+    +-------------+--------------------------------+
+    | Legacy      | Modern Replacement             |
+    +=============+================================+
+    | $where      | $expr (Requires MongoDB 3.6+)  |
+    +-------------+--------------------------------+
+    | $near       | $geoWithin with $center        |
+    +-------------+--------------------------------+
+    | $nearSphere | $geoWithin with $centerSphere  |
+    +-------------+--------------------------------+
+
+=head2 estimated_document_count
+
+    $count = $coll->estimated_document_count();
+    $count = $coll->estimated_document_count($options);
+
+Returns an estimated count of documents based on collection metadata.
+
+B<NOTE>: this method does not support sessions or transactions.
+
+A hash reference of options may be provided. Valid keys include:
+
+=over 4
+
+=item *
+
+C<maxTimeMS> – the maximum amount of time in milliseconds to allow the command to run.  (Note, this will be ignored for servers before version 2.6.)
+
+=back
 
 =head2 distinct
 
@@ -2708,6 +2876,10 @@ C<collation> - a L<document|/Document> defining the collation for this operation
 =item *
 
 C<maxTimeMS> – the maximum amount of time in milliseconds to allow the command to run.  (Note, this will be ignored for servers before version 2.6.)
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
 
 =back
 
@@ -2746,6 +2918,18 @@ C<maxTimeMS> – the maximum amount of time in milliseconds to allow the command
 
 Renames the collection.  If a collection already exists with the new collection
 name, this method will throw an exception.
+
+A hashref of options may be provided.
+
+Valid options include:
+
+=over 4
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=back
 
 It returns a new L<MongoDB::Collection> object corresponding to the renamed
 collection.
@@ -2859,13 +3043,18 @@ C<bypassDocumentValidation> - skips document validation, if enabled; this is ign
 
 C<ordered> – when true, the bulk operation is executed like L</initialize_ordered_bulk>. When false, the bulk operation is executed like L</initialize_unordered_bulk>.  The default is true.
 
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
 =back
 
 See L<MongoDB::BulkWrite> for more details on bulk writes.  Be advised that
 the legacy Bulk API method names differ slightly from MongoDB::Collection
 method names.
 
-=for Pod::Coverage initialize_ordered_bulk_op
+=for Pod::Coverage count
+initialize_ordered_bulk_op
 initialize_unordered_bulk_op
 batch_insert
 find_and_modify
@@ -2873,57 +3062,6 @@ insert
 query
 remove
 update
-
-=head1 DEPRECATIONS
-
-With the introduction of the common driver CRUD API, these legacy methods
-have been deprecated:
-
-=over 4
-
-=item *
-
-batch_insert
-
-=item *
-
-find_and_modify
-
-=item *
-
-insert
-
-=item *
-
-query
-
-=item *
-
-remove
-
-=item *
-
-update
-
-=item *
-
-save
-
-=back
-
-The C<get_collection> method is deprecated; it implied a 'subcollection'
-relationship that is purely notional.
-
-The C<ensure_index>, C<drop_indexes>, C<drop_index>, and C<get_index>
-methods are deprecated. The new L<MongoDB::IndexView> class is accessible
-through the C<indexes> method, and offer greater consistency in behavior
-across drivers.
-
-The C<validate> method is deprecated as the return value was inconsistent
-over time. Users who need it should execute it via C<run_command> instead.
-
-The methods still exist, but are no longer documented.  In a future version
-they will warn when used, then will eventually be removed.
 
 =head1 AUTHORS
 

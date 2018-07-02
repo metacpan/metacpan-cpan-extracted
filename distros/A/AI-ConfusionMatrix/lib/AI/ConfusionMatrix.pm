@@ -1,10 +1,10 @@
 package AI::ConfusionMatrix;
-$AI::ConfusionMatrix::VERSION = '0.007';
+$AI::ConfusionMatrix::VERSION = '0.009';
 use strict;
 use warnings;
 use Carp;
 use Exporter 'import';
-our @EXPORT= qw (makeConfusionMatrix);
+our @EXPORT= qw (getConfusionMatrix makeConfusionMatrix);
 use strict;
 use Tie::File;
 
@@ -17,15 +17,66 @@ sub makeConfusionMatrix {
     }
 
     carp ('First argument must be a hash reference') if ref($matrix) ne 'HASH';
+
+    my %cmData = genConfusionMatrixData($matrix);
     tie my @array, 'Tie::File', $file or carp "$!";
+    my @columns = @{$cmData{columns}};
+    map {$array[0] .= $delem . $_} join $delem, (@columns, 'TOTAL', 'TP', 'FP', 'FN', 'SENS', 'ACC');
     my $n = 1;
-    my @columns;
+    my @expected = sort keys %{$matrix};
+    for my $expected (@expected) {
+        $array[$n] = $expected;
+        my $lastIndex = 0;
+        my $index;
+        for my $predicted (sort keys %{$matrix->{$expected}}) {
+            # Calculate the index of the label in the array of columns
+            $index = _findIndex($predicted, \@columns);
+            # Print some of the delimiter to get to the column of the next value predicted
+            $array[$n] .= $delem x ($index - $lastIndex) . $matrix->{$expected}{$predicted};
+            $lastIndex = $index;
+        }
+
+        # Get to the columns of the stats
+        $array[$n] .= $delem x (scalar(@columns) - $lastIndex + 1);
+        $array[$n] .= join $delem, (
+                                    $cmData{stats}{$expected}{'total'},
+                                    $cmData{stats}{$expected}{'tp'},
+                                    $cmData{stats}{$expected}{'fp'},
+                                    $cmData{stats}{$expected}{'fn'},
+                                    sprintf('%.2f%%', $cmData{stats}{$expected}{'sensitivity'}),
+                                    sprintf('%.2f%%', $cmData{stats}{$expected}{'acc'})
+                                   );
+        ++$n;
+    }
+    # Print the TOTAL row to the csv file
+    $array[$n] = 'TOTAL' . $delem;
+    map {$array[$n] .= $cmData{totals}{$_} . $delem} (sort keys %{$cmData{totals}})[0 .. $#columns];
+    $array[$n] .= join $delem, (
+                                $cmData{totals}{'total'},
+                                $cmData{totals}{'tp'},
+                                $cmData{totals}{'fp'},
+                                $cmData{totals}{'fn'},
+                                sprintf('%.2f%%', $cmData{totals}{'sensitivity'}),
+                                sprintf('%.2f%%', $cmData{totals}{'acc'})
+                            );
+
+    untie @array;
+}
+
+sub getConfusionMatrix {
+    my ($matrix) = @_;
+
+    carp ('First argument must be a hash reference') if ref($matrix) ne 'HASH';
+    return genConfusionMatrixData($matrix);
+}
+
+sub genConfusionMatrixData {
+    my $matrix = shift;
     my @expected = sort keys %{$matrix};
     my %stats;
     my %totals;
+    my @columns;
     for my $expected (@expected) {
-        $array[$n] = $expected;
-        ++$n;
         $stats{$expected}{'fn'} = 0;
         $stats{$expected}{'tp'} = 0;
         # Ensure that the False Positive counter is defined to be able to compute the total later
@@ -44,7 +95,7 @@ sub makeConfusionMatrix {
             push @columns, $predicted unless _findIndex($predicted, \@columns);
         }
 
-        $stats{$expected}{'acc'} = sprintf("%.2f%%", ($stats{$expected}{'tp'} * 100) / $stats{$expected}{'total'});
+        $stats{$expected}{'acc'} = ($stats{$expected}{'tp'} * 100) / $stats{$expected}{'total'};
     }
 
     for my $expected (@expected) {
@@ -52,43 +103,17 @@ sub makeConfusionMatrix {
         $totals{'tp'}    += $stats{$expected}{'tp'};
         $totals{'fn'}    += $stats{$expected}{'fn'};
         $totals{'fp'}    += $stats{$expected}{'fp'};
-        $stats{$expected}{'sensitivity'} = sprintf("%.2f%%", (($stats{$expected}{'tp'} * 100) / ($stats{$expected}{'tp'} + $stats{$expected}{'fp'})));
+        $stats{$expected}{'sensitivity'} = ($stats{$expected}{'tp'} * 100) / ($stats{$expected}{'tp'} + $stats{$expected}{'fp'});
     }
 
-    $totals{'acc'} = sprintf("%.2f%%", ($totals{'tp'} * 100) / $totals{'total'});
-    $totals{'sensitivity'} = sprintf("%.2f%%", ($totals{'tp'} * 100) / ($totals{'tp'} + $totals{'fp'}));
-    @columns = sort @columns;
-    map {$array[0] .= $delem . $_} join $delem, (@columns, 'TOTAL', 'TP', 'FP', 'FN', 'SENS', 'ACC');
-    $n = 1;
-    for my $expected (@expected) {
-        my $lastIndex = 0;
-        my $index;
-        for my $predicted (sort keys %{$matrix->{$expected}}) {
-            # Calculate the index of the label in the array of columns
-            $index = _findIndex($predicted, \@columns);
-            # Print some of the delimiter to get to the column of the next value predicted
-            $array[$n] .= $delem x ($index - $lastIndex) . $matrix->{$expected}{$predicted};
-            $lastIndex = $index;
-        }
+    $totals{'acc'} = ($totals{'tp'} * 100) / $totals{'total'};
+    $totals{'sensitivity'} = ($totals{'tp'} * 100) / ($totals{'tp'} + $totals{'fp'});
 
-        # Get to the columns of the stats
-        $array[$n] .= $delem x (scalar(@columns) - $lastIndex + 1);
-        $array[$n] .= join $delem, (
-            $stats{$expected}{'total'},
-            $stats{$expected}{'tp'},
-            $stats{$expected}{'fp'},
-            $stats{$expected}{'fn'},
-            $stats{$expected}{'sensitivity'},
-            $stats{$expected}{'acc'}
-        );
-        ++$n;
-    }
-    # Print the TOTAL row to the csv file
-    $array[$n] = 'TOTAL' . $delem;
-    map {$array[$n] .= $totals{$_} . $delem} (sort keys %totals)[0 .. $#columns];
-    $array[$n] .= join $delem, ($totals{'total'}, $totals{'tp'}, $totals{'fp'}, $totals{'fn'}, $totals{'sensitivity'}, $totals{'acc'});
-
-    untie @array;
+    return (
+        columns => [sort @columns],
+        stats   => \%stats,
+        totals  => \%totals
+    );
 }
 
 sub _findIndex {
@@ -106,13 +131,12 @@ AI::ConfusionMatrix - make a confusion matrix
 
     my %matrix;
 
-    Loop over your tests
-
-    ---
+    # Loop over your predictions
+    # [...]
 
     $matrix{$expected}{$predicted} += 1;
 
-    ---
+    # [...]
 
     makeConfusionMatrix(\%matrix, 'output.csv');
 
@@ -121,7 +145,7 @@ AI::ConfusionMatrix - make a confusion matrix
 
 This module prints a L<confusion matrix|https://en.wikipedia.org/wiki/Confusion_matrix> from a hash reference. This module tries to be generic enough to be used within a lot of machine learning projects.
 
-=head3 Function
+=head3 Functions:
 
 =head4 C<makeConfusionMatrix($hash_ref, $file [, $delimiter ])>
 
@@ -136,19 +160,16 @@ Examples:
 The hash reference must look like this :
 
     $VAR1 = {
-
-
               'value_expected1' => {
-                          'value_predicted1' => value
+                          'value_predicted1' => number_of_predictions
                         },
               'value_expected2' => {
-                          'value_predicted1' => value,
-                          'value_predicted2' => value
+                          'value_predicted1' => number_of_predictions,
+                          'value_predicted2' => number_of_predictions
                         },
               'value_expected3' => {
-                          'value_predicted3' => value
+                          'value_predicted3' => number_of_predictions
                         }
-
             };
 
 The output will be in CSV. Here is an example:
@@ -195,6 +216,14 @@ Sensitivity. Number of true positives divided by the number of positives.
 Accuracy
 
 =back
+
+=head4 C<getConfusionMatrix($hash_ref)>
+
+Get the data used to compute the table above.
+
+Example:
+
+    my %cm = getConfusionMatrix(\%matrix);
 
 =head1 AUTHOR
 

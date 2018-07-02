@@ -2,7 +2,7 @@ package MVC::Neaf::Route::Main;
 
 use strict;
 use warnings;
-our $VERSION = 0.2501;
+our $VERSION = 0.2601;
 
 =head1 NAME
 
@@ -694,15 +694,15 @@ sub get_hooks {
         for qw( pre_reply pre_cleanup );
 
     # Prepend session handler unconditionally, if present
-    if (my $engine = $self->{session_handler}) {
-        unshift @{ $ret{pre_route} }, sub {
-            $_[0]->_set_session_handler( $engine );
+    if (my $key = $self->{session_view_as}) {
+        unshift @{ $ret{pre_render} }, sub {
+            $_[0]->reply->{$key} = $_[0]->load_session;
         };
-        if (my $key = $self->{session_view_as}) {
-            unshift @{ $ret{pre_render} }, sub {
-                $_[0]->reply->{$key} = $_[0]->load_session;
-            };
-        };
+    };
+
+    if (my $force_view = $self->{force_view}) {
+        # TODO 0.40 also push pre-rendered -content through force_view
+        push @{ $ret{pre_render} }, sub { $_[0]->reply->{-view} = $force_view };
     };
 
     return \%ret;
@@ -717,23 +717,23 @@ sub get_hooks {
 sub set_helper {
     my ($self, $name, $code, %opt) = @_;
 
-    $self->my_croak( "inappropriate helper name '$name'" )
-        if $name !~ /^[a-z][a-z_0-9]*/ or $name =~ /^(?:do|neaf)/;
-
     $self->my_croak( "helper must be a CODEREF, not ".ref $code )
         unless ref $code and UNIVERSAL::isa( $code, 'CODE' );
+    _install_helper( $name );
 
     $self->{todo_helpers}{$name} ||= MVC::Neaf::Util::Container->new( exclusive => 1 );
     $self->{todo_helpers}{$name}->store( $code, %opt );
-
-    _install_helper( $name );
 };
 
 sub _install_helper {
     my $name = shift;
 
     return if $MVC::Neaf::Request::allow_helper{$name};
-    croak "Cannot override existing method '$name' with a helper"
+
+    croak( "NEAF: helper: inappropriate helper name '$name'" )
+        if $name !~ /^[a-z][a-z_0-9]*/ or $name =~ /^(?:do|neaf)/;
+
+    croak "NEAF: helper: Cannot override existing method '$name' in Request"
         if MVC::Neaf::Request->can( $name );
 
     my $sub = sub {
@@ -869,11 +869,12 @@ sub set_forced_view {
 
     $neaf->load_resources( $file_name || \*FH )
 
-Load pseudo-files from a file, like templates or static files.
+Load pseudo-files from a file (typically C<__DATA__>),
+say templates or static files.
 
 The format is as follows:
 
-    @@ [TT] main.html
+    @@ /main.html view=TT
 
     [% some_tt_template %]
 
@@ -885,12 +886,14 @@ The format is as follows:
 I<This is obviously stolen from L<Mojolicious>,
 in a slightly incompatible way.>
 
-If view is specified in brackets, preload template.
-A missing view is skipped, no error.
+An entry starts with a literal C<@@>, followed by 1 or more spaces,
+followed by a slash and a file name, optionally followed by a list
+of options, and finally by a newline.
 
-Otherwise file is considered a static resource.
+Everything following the newline and until next such entry
+is considered file content.
 
-Extra options may follow file name:
+Options may include:
 
 =over
 
@@ -898,46 +901,74 @@ Extra options may follow file name:
 
 =item * C<format=base64>
 
+=item * C<view=view_name,view_name...> - specify a template for given view(s)
+Leading slash will be stripped in this case.
+
 =back
 
-Unknown options are skipped.
-Unknown format value will cause exception though.
+Entries with unknown options will be skipped with a warning.
 
 B<[EXPERIMENTAL]> This method and exact format of data is being worked on.
 
 =cut
 
+# TODO split this sub & move to a separate file
 my $INLINE_SPEC = qr/^(?:\[(\w+)\]\s+)?(\S+)((?:\s+\w+=\S+)*)$/;
+my %load_resources_opt;
+$load_resources_opt{$_}++ for qw( view format type );
 sub load_resources {
     my ($self, $file) = @_;
 
-    my $fd;
-    if (ref $file) {
-        $fd = $file;
-    } else {
-        open $fd, "<", $file
+    my $content;
+
+    if (ref $file eq 'GLOB') {
+        local $/;
+        $content = <$file>;
+        # Die later
+    } elsif (ref $file eq 'SCALAR') {
+        $content = $$file;
+    } elsif (!ref $file and defined $file) {
+        open my $fd, "<", $file
             or $self->my_croak( "Failed to open(r) $file: $!" );
+        $content = <$fd>;
+    } else {
+        $self->my_croak( "Argument must be a scalar, a scalar ref, or a file descriptor" );
     };
 
-    local $/;
-    my $content = <$fd>;
     defined $content
         or $self->my_croak( "Failed to read from $file: $!" );
 
-    my @parts = split /^@@\s+(.*\S)\s*$/m, $content, -1;
+    # TODO 0.40 The regex should be: ^@@\s+(/\S+(?:\s+\w+=\S+)*)\s*$
+    #     but we must deprecate '[TT] foo.html' first
+    my @parts = split m{^@@\s+(\S.*?)\s*$}m, $content, -1;
     shift @parts;
-    die "Something went wrong" if @parts % 2;
+    confess "NEAF load_resources failed unexpectedly, file a bug in MVC::Neaf"
+        if @parts % 2;
 
     my %templates;
     my %static;
     while (@parts) {
-        # parse file
+        # parse pseudo-file
         my $spec = shift @parts;
-        my ($dest, $name, $extra) = ($spec =~ $INLINE_SPEC);
-        my %opt = $extra =~ /(\w+)=(\S+)/g;
-        $name or $self->my_croak("Bad resource spec format @@ $spec");
-
         my $content = shift @parts;
+
+        # process header
+        my ($dest, $name, $extra) = ($spec =~ $INLINE_SPEC);
+        $self->my_croak("Bad resource spec format @@ $spec")
+            unless defined $name;
+        my %opt = $extra =~ /(\w+)=(\S+)/g;
+        if ($dest) {
+            $opt{view} = $dest;
+            carp "DEPRECATED '@@ [$dest]' resource format,"
+                ." use '@@ $name view=$dest' instead";
+        };
+
+        if ( my @unknown = grep { !$load_resources_opt{$_} } keys %opt ) {
+            carp "Unknown options (@unknown) in '@@ name' in $file, skipping";
+            next;
+        };
+
+        # process content
         if (!$opt{format}) {
             $content =~ s/^\n+//s;
             $content =~ s/\s+$//s;
@@ -945,33 +976,40 @@ sub load_resources {
         } elsif ($opt{format} eq 'base64') {
             $content = decode_b64( $content );
         } else {
+            # TODO 0.50 calculate line
             $self->my_croak("Unknown format $opt{format} in '@@ $spec' in $file");
         };
 
-        if ($dest) {
+        # store for loading
+        if (defined( my $view = $opt{view} )) {
             # template
             $self->my_croak("Duplicate template '@@ $spec' in $file")
-                if defined $templates{lc $dest}{$name};
-            $templates{$dest}{$name} = $content;
+                if defined $templates{$view}{$name};
+            $templates{$view}{$name} = $content;
         } else {
             # static file
             $self->my_croak("Duplicate static file '@@ $spec' in $file")
                 if $static{$name};
             $static{$name} = [ $content, $opt{type} ];
         };
-    };
+    }; # end while @parts
 
     # now do the loading
     foreach my $name( keys %templates ) {
-        my $view = $self->get_view( $name, 1 ) or next;
-        $view->can("preload") or next; # TODO 0.30 warn here?
-        $view->preload( %{ $templates{$name} } );
+        my $view = $self->get_view( $name, 1 );
+        if (!$view) {
+            carp "NEAF: Unknown view $name mentioned in $file";
+        } elsif ($view->can("preload")) {
+            $view->preload( %{ $templates{$name} } );
+        } else  {
+            carp "NEAF: View $name mentioned in $file doesn't support template preloading";
+        };
     };
     if( %static ) {
         my $st = $self->_static_global;
         $st->preload( %static );
         foreach( keys %static ) {
-            $self->route( $_ => $st->one_file_handler, method => 'GET'
+            $self->add_route( $_ => $st->one_file_handler, method => 'GET'
                 , description => "Static resource from $file" );
         };
     };
@@ -1058,7 +1096,14 @@ sub set_session_handler {
     my $regex = $sess->session_id_regex;
     my $ttl   = $opt{ttl} || $sess->session_ttl || 0;
 
-    $self->{session_handler} = [ $sess, $cook, $regex, $ttl ];
+    my $setup = {
+        engine => $sess,
+        cookie => $cook,
+        regex  => $regex,
+        ttl    => $ttl,
+    };
+
+    $self->set_helper( _session_setup => sub { $setup }, override => 1 );
     $self->{session_view_as} = $opt{view_as};
     return $self;
 };
@@ -1469,73 +1514,33 @@ are for running callbacks, handling corner cases, and substituting sane defaults
 
 sub handle_request {
     my ($self, $req) = @_;
-
-    confess "Bareword usage forbidden"
-        unless blessed $self;
+    $self = _one_and_true($self) unless ref $self;
 
     my $data = eval {
         my $hash = $self->dispatch_logic( $req, '', $req->path );
-
-        # TODO 0.30 More suitable error message, force logging error
-        die "NEAF: FATAL: Controller must return hash at ".$req->endpoint_origin."\n"
-            unless ref $hash and UNIVERSAL::isa($hash, 'HASH');
-        # TODO 0.30 Also accept (&convert) hash headers
-        die "NEAF: FATAL: '-headers' must be an even-sized array at ".$req->endpoint_origin."\n"
-            if defined $hash->{-headers}
-                and (ref $hash->{-headers} ne 'ARRAY' or @{ $hash->{-headers} } % 2);
-
-        # Apply path-based defaults
-        my $def = $req->route->default;
-        %$hash = ( %$def, %$hash );
-
-        $req->_set_reply( $hash );
+        $hash = $req->_set_reply( $hash );
 
         if (my $hooks = $req->route->hooks->{pre_content}) {
             run_all_nodie( $hooks, sub {
-                    $req->log_error( "NEAF: WARN: pre_content hook failed: $@" )
+                    $req->log_error( "NEAF: pre_content hook failed: $@" )
             }, $req );
         };
 
-        # TODO 0.90 dispatch_view must belong to req->route
-        warn "DEBUG data is ".((ref $hash) || (defined $hash ? 'scalar' : 'undef'))
-            unless ref $hash eq 'HASH';
         $hash->{-content} = $self->dispatch_view( $req )
             unless defined $hash->{-content};
         $hash;
     };
 
     if (!$data) {
-        # Failed. TODO 0.30: do it better, still convoluted logic
-        $data = $self->error_to_reply( $req, $@ );
-        $req->_set_reply( $data );
-        confess "No content after error"
-            unless $data->{-content};
+        # TODO 0.30 Error handler should be route-dependent.
+        $req->_unset_reply;
+        $data = $self->_error_to_reply( $req, $@ );
     };
 
-    # Encode content, fix headers
-    $self->mangle_headers( $req );
-
-    # Apply hooks
-    if (my $hooks = $req->route->hooks->{pre_cleanup}) {
-        $req->postpone( $hooks );
-    };
-    if (my $hooks = $req->route->hooks->{pre_reply}) {
-        run_all_nodie( $hooks, sub {
-                $req->log_error( "NEAF: WARN: pre_reply hook failed: $@" )
-        }, $req );
-    };
-
-    # DISPATCH CONTENT
-    my $content = \$data->{-content};
-    $$content = '' if $req->method eq 'HEAD';
-    if ($data->{-continue} and $req->method ne 'HEAD') {
-        $req->postpone( $data->{'-continue'}, 1 );
-        $req->postpone( sub { $_[0]->write( $$content ); }, 1 );
-        return $req->do_reply( $data->{-status} );
-    } else {
-        return $req->do_reply( $data->{-status}, $$content );
-    };
-    # END DISPATCH CONTENT
+    # Encode content, fix headers - do it before hooks
+    $req->_mangle_headers;
+    $req->_apply_late_hooks;
+    $req->_respond;
 };
 
 =head2 get_view()
@@ -1556,10 +1561,6 @@ If L</set_forced_view> was called, return its argument instead.
 sub get_view {
     my ($self, $view, $lazy) = @_;
     $self = _one_and_true($self) unless ref $self;
-
-    # We've been overridden!
-    return $self->{force_view}
-        if exists $self->{force_view};
 
     # An object/code means controller knows better
     return $view
@@ -1683,18 +1684,20 @@ sub dispatch_view {
 
     my $content;
 
-    my $view = $self->get_view( $data->{-view} );
     eval {
         run_all( $route->hooks->{pre_render}, $req )
-            if $route and $route->hooks->{pre_render};
+            if $route->hooks->{pre_render};
+
+        my $view = $self->get_view( $data->{-view} );
 
         ($content, my $type) = blessed $view
             ? $view->render( $data ) : $view->( $data );
+
         $data->{-type} ||= $type;
     };
 
     if (!defined $content) {
-        $req->log_error( "Request processed, but rendering failed: ". ($@ || "unknown error") );
+        $req->log_error( "NEAF: Request processed, but rendering failed: ". ($@ || "unknown error") );
         die MVC::Neaf::Exception->new(
             -status => 500,
             -reason => "Rendering error: $@"
@@ -1704,11 +1707,7 @@ sub dispatch_view {
     return $content;
 };
 
-=head2 error_to_reply
-
-=cut
-
-sub error_to_reply {
+sub _error_to_reply {
     my ($self, $req, $err) = @_;
 
     # Convert all errors to Neaf expt.
@@ -1735,7 +1734,7 @@ sub error_to_reply {
             $self->{on_error}->($req, $err, $req->endpoint_origin);
             1;
         }
-            or $req->log_error( "on_error callback failed: ".($@ || "unknown reason") );
+            or $req->log_error( "NEAF: on_error callback failed: ".($@ || "unknown reason") );
     };
 
     # Try fancy error template
@@ -1746,12 +1745,12 @@ sub error_to_reply {
                 error => $err,
             );
             $data->{-status}  ||= $err->status;
-            $req->_set_reply( $data );
+            $data = $req->_set_reply( $data );
             $data->{-content} ||= $self->dispatch_view( $req );
             $data;
         };
         return $ret if $ret;
-        $req->log_error( "error_template for ".$err->status." failed:"
+        $req->log_error( "NEAF: error_template for ".$err->status." failed:"
             .( $@ || "unknown reason") );
     };
 
@@ -1759,67 +1758,7 @@ sub error_to_reply {
     #    keep track of reason on the inside
     $req->log_error( $err->reason )
         if $err->is_sudden;
-    return $err->make_reply( $req );
-};
-
-=head2 mangle_headers
-
-Fixup content & headers
-
-=cut
-
-sub mangle_headers {
-    my ($self, $req) = @_;
-
-    my $data = $req->reply;
-    my $content = \$data->{-content};
-
-    $$content = '' unless defined $$content;
-
-    # Process user-supplied headers
-    if (my $append = $data->{-headers}) {
-        my $head = $req->header_out;
-        for (my $i = 0; $i < @$append; $i+=2) {
-            $head->push_header($append->[$i], $append->[$i+1]);
-        };
-    };
-
-    # Encode unicode content NOW so that we don't lie about its length
-    # Then detect ascii/binary
-    if (Encode::is_utf8( $$content )) {
-        # UTF8 means text, period
-        $$content = encode_utf8( $$content );
-        $data->{-type} ||= 'text/plain';
-        $data->{-type} .= "; charset=utf-8"
-            unless $data->{-type} =~ /; charset=/;
-    } elsif (!$data->{-type}) {
-        # Autodetect binary. Plain text is believed to be in utf8 still
-        $data->{-type} = $$content =~ /^.{0,512}?[^\s\x20-\x7F]/s
-            ? 'application/octet-stream'
-            : 'text/plain; charset=utf-8';
-    } elsif ($data->{-type} =~ m#^text/#) {
-        # Some other text, mark as utf-8 just in case
-        $data->{-type} .= "; charset=utf-8"
-            unless $data->{-type} =~ /; charset=/;
-    };
-
-    # MANGLE HEADERS
-    # NOTE these modifications remain stored in req
-    my $head = $req->header_out;
-
-    # The most standard ones...
-    $head->init_header( content_type => $data->{-type} );
-    $head->init_header( location => $data->{-location} )
-        if $data->{-location};
-    $head->push_header( set_cookie => $req->format_cookies );
-    $head->init_header( content_length => length $$content )
-        unless $data->{-continue};
-
-    if ($data->{-status} == 200 and my $ttl = $req->route->cache_ttl) {
-        $head->init_header( expires => http_date( time + $ttl ) );
-    };
-
-    # END MANGLE HEADERS
+    $req->_set_reply( $err->make_reply( $req ) );
 };
 
 =head1 DEPRECATED METHODS

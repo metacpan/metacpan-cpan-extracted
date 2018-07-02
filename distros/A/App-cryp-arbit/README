@@ -1,0 +1,547 @@
+NAME
+    App::cryp::arbit - Cryptocurrency arbitrage utility
+
+VERSION
+    This document describes version 0.001 of App::cryp::arbit (from Perl
+    distribution App-cryp-arbit), released on 2018-06-25.
+
+SYNOPSIS
+    Please see included script cryp-arbit.
+
+DESCRIPTION
+  Glossary
+    *   inventory
+
+    *   order pair
+
+    *   gross profit margin
+
+        Price difference percentage of a cryptocurrency between two
+        exchanges, without taking into account trading fees and foreign
+        exchange spread.
+
+        For example, suppose BTC is being offered (ask price, sell price) at
+        7010 USD on exchange1 and is being bidden (bid price, buy price) at
+        7150 USD on exchange2. This means there is a (7150-7010)/7010 =
+        1.997% gross profit margin. We can buy BTC on exchange1 for 7010 USD
+        then sell the same amout of BTC on exchange2 for 7150 USD and gain
+        (7150-7010) = 140 USD per BTC, before fees.
+
+    *   trading profit margin
+
+        Price difference percentage of a cryptocurrency between two
+        exchanges, after taking into account trading fees.
+
+        For example, suppose BTC is being offered (ask price, sell price) at
+        7010 USD on exchange1 and is being bidden (bid price, buy price) at
+        7150 USD on exchange2. Trading (market maker) fee on exchange1 is
+        0.3% and on exchange2 is 0.25%. After trading fees, the ask price
+        becomes 7010 * (1+0.3%) = 7031.03 USD and the bid price becomes 7150
+        * (1-0.25%) = 7132.125. The trading profit margin is
+        (7132.125-7031.03)/7031.03 = 1.438%. We can buy BTC on exchange1 for
+        7010 USD then sell the same amout of BTC on exchange2 for 7150 USD
+        and still gain (7132.125-7031.03) = 101.095 USD per BTC, after
+        trading fees.
+
+    *   net profit margin
+
+        Price difference percentage of a cryptocurrency between two
+        exchanges, after taking into account trading fees and foreign
+        exchange spread. If the price on both exchanges are quoted in the
+        same currency (e.g. USD) then there is no forex spread and net
+        profit margin is the same as trading profit margin.
+
+        If the quoting currencies are different, e.g. USD on exchange1 and
+        IDR on exchange2, then first we calculate gross and trading profit
+        margin using prices converted to USD using average forex rate
+        (highest forex dealer's sell price + lowest buy price, divided by
+        two). Then we subtract trading profit margin with forex spread for
+        safety.
+
+        For example, suppose BTC is being offered (ask price, sell price) at
+        7010 USD on exchange1 and is being bidden (bid price, buy price) at
+        99,500,000 IDR on exchange2. The forex rate for USD/IDR is: buy
+        13,895, sell 13,925, average (13,925+13,895)/2 = 13,910, spread
+        (13,925-13,895)/13,895 = 0.216%. The price on exchange2 in USD is
+        99,500,000 / 13,910 = 7153.127 USD. Trading (market maker) fee on
+        exchange1 is 0.3% and on exchange2 is 0.25%. After trading fees, the
+        ask price becomes 7010 * (1+0.3%) = 7031.03 USD and the bid price
+        becomes 7153.127 * (1-0.25%) = 7135.244. The trading profit margin
+        is (7135.244-7031.03)/7031.03 = 1.482%. We can buy BTC on exchange1
+        for 7010 USD then sell the same amout of BTC on exchange2 for 7150
+        USD and still gain (7132.125-7031.03) = 101.095 USD per BTC, after
+        trading fees. The net profit margin is 1.482% - 0.216% = 1.266%.
+
+INTERNAL NOTES
+    The cryp app family uses Perinci::CmdLine::cryp which puts cryp-specific
+    information from the configuration into the $r->{_cryp} hash:
+
+     $r->{_cryp}
+       {arbit_strategies}  # from [arbit-strategy/XXX] config sections
+       {exchanges}         # from [exchange/XXX(/YYY)?] config sections
+       {masternodes}       # from [masternode/XXX(/YYY)?] config sections
+       {wallet}            # from [wallet/COIN]
+
+    Routines inside this module communicate with one another either using
+    the database (obviously), or by putting stuffs in $r (the request
+    hash/stash) and passing $r around. The keys that are used by routines in
+    this module:
+
+     $r->{_stash}
+       {dbh}
+       {account_balances}          # key=exchange safename, value={currency1 => [{account=>account1, account_id=>aid, available=>..., ...}, {...}]}. value->{currency} sorted by largest available balance first
+       {account_exchanges}         # key=exchange safename, value={account1 => 1, ...}
+       {account_ids}               # key=exchange safename, value={account1 => numeric ID from db, ...}
+       {base_currencies}           # target (crypto)currencies to arbitrage
+       {exchange_clients}          # key=exchange safename, value={account1 => $client1, ...}
+       {exchange_ids}              # key=exchange safename, value=exchange (numeric) ID from db
+       {exchange_recs}             # key=exchange safename, value=hash (from CryptoExchange::Catalog)
+       {exchange_coins}            # key=exchange safename, value=[COIN1, COIN2, ...]
+       {exchange_pairs}            # key=exchange safename, value=[{name=>PAIR1, min_base_size=>..., min_quote_size=>...}, ...]
+       {forex_rates}               # key=currency pair (e.g. IDR/USD), val=exchange rate (avg rate)
+       {forex_spreads}             # key=fiat currency pair, e.g. USD/IDR, value=percentage
+       {fx}                        # key=currency value=result from get_spot_rate()
+       {order_pairs}               # result from calculate_order_pairs()
+       {quote_currencies}          # what currencies we use to buy/sell the base currencies
+       {quote_currencies_for}      # key=base currency, value={quotecurrency1 => 1, quotecurrency2=>1, ...}
+       {trading_fees}              # key=exchange safename, value={coin1=>num (in percent) market taker fees, ...}, ':default' for all other coins, ':default' for all other exchanges
+
+FUNCTIONS
+  arbit
+    Usage:
+
+     arbit(%args) -> [status, msg, result, meta]
+
+    Perform arbitrage.
+
+    This utility monitors prices of several cryptocurrencies ("base
+    currencies", e.g. LTC) in several cryptoexchanges. The "quote currency"
+    can be fiat (e.g. USD, all other fiat currencies will be converted to
+    USD) or another cryptocurrency (usually BTC).
+
+    When it detects a net price difference for a base currency that is large
+    enough (see "min_net_profit_margin" option), it will perform a buy order
+    on the exchange that has the lower price and sell the exact same amount
+    of base currency on the exchange that has the higher price. For example,
+    if on XCHG1 the buy price of LTC 100.01 USD and on XCHG2 the sell price
+    of LTC is 98.80 USD, then this utility will buy LTC on XCHG2 for 98.80
+    USD and sell the same amount of LTD on XCHG1 for 100.01 USD. The profit
+    is (100.01 - 98.80 - trading fees) per LTC arbitraged. You have to
+    maintain enough LTC balance on XCHG1 and enough USD balance on XCHG2.
+
+    The balances are called inventories or your working capital. You fill
+    and transfer inventories manually to refill balances and/or to collect
+    profits.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   accounts => *array[cryptoexchange::account]*
+
+        Cryptoexchange accounts.
+
+        There should at least be two accounts, on at least two different
+        cryptoexchanges. If not specified, all accounts listed on the
+        configuration file will be included. Note that it's possible to
+        include two or more accounts on the same cryptoexchange.
+
+    *   base_currencies => *array[cryptocurrency]*
+
+        Target (crypto)currencies to arbitrate.
+
+        If not specified, will list all supported pairs on all the exchanges
+        and include the base cryptocurrencies that are listed on at least 2
+        different exchanges (for arbitrage possibility).
+
+    *   db_name* => *str*
+
+    *   db_password => *str*
+
+    *   db_username => *str*
+
+    *   frequency => *posint* (default: 30)
+
+        How many seconds to wait between rounds (in seconds).
+
+        A round consists of checking prices and then creating arbitraging
+        order pairs.
+
+    *   max_order_age => *posint* (default: 86400)
+
+        How long should we wait for orders to be completed before cancelling
+        them (in seconds).
+
+        Sometimes because of rapid trading and price movement, our order
+        might not be filled immediately. This setting sets a limit on how
+        long should an order be left open. After this limit is reached, we
+        cancel the order. The imbalance of the arbitrage transaction will be
+        recorded.
+
+    *   max_order_pairs_per_round => *posint*
+
+        Maximum number of order pairs to create per round.
+
+    *   max_order_quote_size => *float* (default: 100)
+
+        What is the maximum amount of a single order.
+
+        A single order will be limited to not be above this value (in quote
+        currency, which if fiat will be converted to USD). This is the
+        amount for the buying (because an arbitrage transaction is comprised
+        of a pair of orders, where one order is a selling order at a higher
+        quote currency size than the buying order).
+
+        For example if you are arbitraging BTC against USD and IDR, and set
+        this option to 75, then orders will not be above 75 USD. If you are
+        arbitraging LTC against BTC and set this to 0.03 then orders will
+        not be above 0.03 BTC.
+
+        Suggestion: If you set this option too high, a few orders can use up
+        your inventory (and you might not be getting optimal profit
+        percentage). Also, large orders can take a while (or too long) to
+        fill. If you set this option too low, you will hit the exchanges'
+        minimum order size and no orders can be created. Since we want
+        smaller risk of orders not getting filled quickly, we want small
+        order sizes. The optimum number range a little above the exchanges'
+        minimum order size.
+
+    *   min_account_balances => *hash*
+
+        What are the minimum account balances.
+
+    *   min_net_profit_margin => *float* (default: 0)
+
+        Minimum net profit margin that will trigger an arbitrage trading, in
+        percentage.
+
+        Below this percentage number, no order pairs will be sent to the
+        exchanges to do the arbitrage. Note that the net profit margin
+        already takes into account trading fees and forex spread (see
+        Glossary section for more details and illustration).
+
+        Suggestion: If you set this option too high, there might not be any
+        order pairs possible. If you set this option too low, you will be
+        getting too thin profits. Run "cryp-arbit opportunities" or
+        "cryp-arbit arbit --dry-run" for a while to see what the average
+        percentage is and then decide at which point you want to perform
+        arbitrage.
+
+    *   quote_currencies => *array[fiat_or_cryptocurrency]*
+
+        The currencies to exchange (buy/sell) the target currencies.
+
+        You can have fiat currencies as the quote currencies, to buy/sell
+        the target (base) currencies during arbitrage. For example, to
+        arbitrage LTC against USD and IDR, "base_currencies" is ['BTC'] and
+        "quote_currencies" is ['USD', 'IDR'].
+
+        You can also arbitrage cryptocurrencies against other cryptocurrency
+        (usually BTC, "the USD of cryptocurrencies"). For example, to
+        arbitrage XMR and LTC against BTC, "base_currencies" is ['XMR',
+        'LTC'] and "quote_currencies" is ['BTC'].
+
+    *   rounds => *int* (default: 1)
+
+        How many rounds.
+
+        -1 means unlimited.
+
+    *   strategy => *str* (default: "merge_order_book")
+
+        Which strategy to use for arbitration.
+
+        Strategy is implemented in a "App::cryp::arbit::Strategy::*" perl
+        module.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  check_orders
+    Usage:
+
+     check_orders(%args) -> [status, msg, result, meta]
+
+    Check the orders that have been created.
+
+    This subcommand will check the orders that have been created previously
+    by "arbit" subcommand. It will update the order status and filled size
+    (if still open). It will cancel (give up) the orders if deemed too old.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_name* => *str*
+
+    *   db_password => *str*
+
+    *   db_username => *str*
+
+    *   max_order_age => *posint* (default: 86400)
+
+        How long should we wait for orders to be completed before cancelling
+        them (in seconds).
+
+        Sometimes because of rapid trading and price movement, our order
+        might not be filled immediately. This setting sets a limit on how
+        long should an order be left open. After this limit is reached, we
+        cancel the order. The imbalance of the arbitrage transaction will be
+        recorded.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  dump_cryp_config
+    Usage:
+
+     dump_cryp_config() -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_profit_report
+    Usage:
+
+     get_profit_report(%args) -> [status, msg, result, meta]
+
+    Get profit report.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_name* => *str*
+
+    *   db_password => *str*
+
+    *   db_username => *str*
+
+    *   detail => *bool*
+
+    *   time_end => *date*
+
+    *   time_start => *date*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_order_pairs
+    Usage:
+
+     list_order_pairs(%args) -> [status, msg, result, meta]
+
+    List created order pairs.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_name* => *str*
+
+    *   db_password => *str*
+
+    *   db_username => *str*
+
+    *   open => *bool*
+
+    *   time_end => *date*
+
+    *   time_start => *date*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  show_opportunities
+    Usage:
+
+     show_opportunities(%args) -> [status, msg, result, meta]
+
+    Show arbitrage opportunities.
+
+    This subcommand, like the "arbit" subcommand, checks prices of
+    cryptocurrencies on several exchanges for arbitrage possibility; but
+    does not actually perform the arbitraging.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   accounts => *array[cryptoexchange::account]*
+
+        Cryptoexchange accounts.
+
+        There should at least be two accounts, on at least two different
+        cryptoexchanges. If not specified, all accounts listed on the
+        configuration file will be included. Note that it's possible to
+        include two or more accounts on the same cryptoexchange.
+
+    *   base_currencies => *array[cryptocurrency]*
+
+        Target (crypto)currencies to arbitrate.
+
+        If not specified, will list all supported pairs on all the exchanges
+        and include the base cryptocurrencies that are listed on at least 2
+        different exchanges (for arbitrage possibility).
+
+    *   db_name* => *str*
+
+    *   db_password => *str*
+
+    *   db_username => *str*
+
+    *   ignore_balance => *bool* (default: 0)
+
+        Ignore account balances.
+
+    *   ignore_min_order_size => *bool* (default: 0)
+
+        Ignore minimum order size limitation from exchanges.
+
+    *   max_order_pairs_per_round => *posint*
+
+        Maximum number of order pairs to create per round.
+
+    *   max_order_quote_size => *float* (default: 100)
+
+        What is the maximum amount of a single order.
+
+        A single order will be limited to not be above this value (in quote
+        currency, which if fiat will be converted to USD). This is the
+        amount for the buying (because an arbitrage transaction is comprised
+        of a pair of orders, where one order is a selling order at a higher
+        quote currency size than the buying order).
+
+        For example if you are arbitraging BTC against USD and IDR, and set
+        this option to 75, then orders will not be above 75 USD. If you are
+        arbitraging LTC against BTC and set this to 0.03 then orders will
+        not be above 0.03 BTC.
+
+        Suggestion: If you set this option too high, a few orders can use up
+        your inventory (and you might not be getting optimal profit
+        percentage). Also, large orders can take a while (or too long) to
+        fill. If you set this option too low, you will hit the exchanges'
+        minimum order size and no orders can be created. Since we want
+        smaller risk of orders not getting filled quickly, we want small
+        order sizes. The optimum number range a little above the exchanges'
+        minimum order size.
+
+    *   min_account_balances => *hash*
+
+        What are the minimum account balances.
+
+    *   min_net_profit_margin => *float* (default: 0)
+
+        Minimum net profit margin that will trigger an arbitrage trading, in
+        percentage.
+
+        Below this percentage number, no order pairs will be sent to the
+        exchanges to do the arbitrage. Note that the net profit margin
+        already takes into account trading fees and forex spread (see
+        Glossary section for more details and illustration).
+
+        Suggestion: If you set this option too high, there might not be any
+        order pairs possible. If you set this option too low, you will be
+        getting too thin profits. Run "cryp-arbit opportunities" or
+        "cryp-arbit arbit --dry-run" for a while to see what the average
+        percentage is and then decide at which point you want to perform
+        arbitrage.
+
+    *   quote_currencies => *array[fiat_or_cryptocurrency]*
+
+        The currencies to exchange (buy/sell) the target currencies.
+
+        You can have fiat currencies as the quote currencies, to buy/sell
+        the target (base) currencies during arbitrage. For example, to
+        arbitrage LTC against USD and IDR, "base_currencies" is ['BTC'] and
+        "quote_currencies" is ['USD', 'IDR'].
+
+        You can also arbitrage cryptocurrencies against other cryptocurrency
+        (usually BTC, "the USD of cryptocurrencies"). For example, to
+        arbitrage XMR and LTC against BTC, "base_currencies" is ['XMR',
+        'LTC'] and "quote_currencies" is ['BTC'].
+
+    *   strategy => *str* (default: "merge_order_book")
+
+        Which strategy to use for arbitration.
+
+        Strategy is implemented in a "App::cryp::arbit::Strategy::*" perl
+        module.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+BUGS
+    Please report all bug reports or feature requests to
+    <mailto:stevenharyanto@gmail.com>.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

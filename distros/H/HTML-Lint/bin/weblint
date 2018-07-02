@@ -56,6 +56,9 @@ for my $url ( @ARGV ) {
             next;
         }
     }
+    elsif ( $url eq '-' ) {
+        @lines = <STDIN>;
+    }
     else {
         open( my $fh, '<', $url ) or die "Can't open $url: $!";
         @lines = <$fh>;

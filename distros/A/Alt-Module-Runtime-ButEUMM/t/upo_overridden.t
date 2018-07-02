@@ -14,6 +14,6 @@ if("$]" < 5.007002) {
 no warnings "once";
 *CORE::GLOBAL::require = sub { require $_[0] };
 
-do "t/upo.t" or die $@ || $!;
+do "./t/upo.t" or die $@ || $!;
 
 1;

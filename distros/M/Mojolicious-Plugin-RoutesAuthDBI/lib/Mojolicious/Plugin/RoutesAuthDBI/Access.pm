@@ -90,7 +90,7 @@ sub apply_route {# meth in Plugin
   #~ $nr->over(authenticated=>$r_hash->{auth});
   # STEP ACCESS
   $nr->over(access => $r_hash);
-  my $host = eval {$r_hash->{host_re} || $r_hash->{host}};
+  my $host = eval($r_hash->{host_re} || $r_hash->{host});
   $nr->over(host => $host)
     if $host;
   

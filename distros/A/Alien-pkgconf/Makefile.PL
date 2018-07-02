@@ -21,14 +21,14 @@ my %args = (
   MIN_PERL_VERSION   => '5.008001',
   NAME               => 'Alien::pkgconf',
   VERSION_FROM       => 'lib/Alien/pkgconf.pm',
-  
+
   CONFIGURE_REQUIRES => {
     'ExtUtils::MakeMaker' => 0,
     'JSON::PP'            => '2.27400',
   },
   TEST_REQUIRES      => {
     'Test2'        => '1.302073',
-    'Test2::Suite' => '0.000065',
+    'Test2::V0'    => '0.000065',
     'Test::Alien'  => '0.08',
   },
   BUILD_REQUIRES => {
@@ -42,7 +42,7 @@ my %args = (
   PREREQ_PM => {
     'File::ShareDir' => '1.102',
   },
-  
+
   META_MERGE => {
     'meta-spec' => { version => 2 },
     resources => {
@@ -53,7 +53,7 @@ my %args = (
     },
     dynamic_config => 1,
   },
-  
+
 );
 
 if($^O eq 'cygwin' || $^O eq 'solaris')
@@ -75,10 +75,10 @@ rmtree '_alien', 0, 0 if -d '_alien';
 eval {
 
   die "ALIEN_FORCE" if $ENV{ALIEN_FORCE};
-  die "ALIEN_INSTALL_TYPE" if defined $ENV{ALIEN_INSTALL_TYPE} 
+  die "ALIEN_INSTALL_TYPE" if defined $ENV{ALIEN_INSTALL_TYPE}
                            && $ENV{ALIEN_INSTALL_TYPE} eq 'share';
 
-  system 'pkgconf', '--atleast-version=1.3.90', 'libpkgconf';
+  system 'pkgconf', '--atleast-version=1.5.0', 'libpkgconf';
   die "no pkgconf" if $?;
   my $cflags = `pkgconf --cflags libpkgconf`;
   die "getting cflags" if $?;
@@ -103,7 +103,7 @@ eval {
     ($dll ? (dll => $dll ) : ()),
   });
   close $fh;
-  
+
   $install_type = 'system';
 
 };
@@ -124,6 +124,11 @@ print "install type: $install_type\n";
 if($install_type eq 'system')
 {
   delete $args{BUILD_REQUIRES}->{$_} for qw( HTTP::Tiny Archive::Tar Alien::xz );
+}
+elsif($install_type eq 'share')
+{
+  $args{BUILD_REQUIRES}->{'IO::Socket::SSL'} = 1.56;
+  $args{BUILD_REQUIRES}->{'Net::SSLeay'}     = 1.49;
 }
 
 if($^O eq 'MSWin32' && $install_type eq 'share')

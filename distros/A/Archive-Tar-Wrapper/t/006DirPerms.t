@@ -1,6 +1,8 @@
 use warnings;
 use strict;
 use Log::Log4perl qw(:easy);
+use Config;
+
 Log::Log4perl->easy_init($ERROR);
 
 use File::Temp qw(tempfile tempdir);
@@ -25,19 +27,20 @@ my $foofile = "$foodir/foofile";
 mkdir "$foodir";
 chmod 0710, $foodir;
 
-open FILE, ">$foofile" or die "Cannot open $foofile ($!)";
-print FILE "blech\n";
-close FILE;
+open(my $fh2, '>', $foofile) or die "Cannot open $foofile ($!)";
+print $fh2 "blech\n";
+close($fh2);
 
 ok( $arch->add( "foo/foofile", $foofile ), "adding file" );
 
 # Make a tarball
 ok( $arch->write($tarfile), "Tarring up" );
 
-my $tarread = Archive::Tar::Wrapper->new();
-$tarread->read($tarfile);
-my $loc = $tarread->locate("foo");
-
-my $mode = ( stat $loc )[2] & 07777;
-
-is $mode, 0710, "check dir mode";
+SKIP: {
+    skip 'Permissions are too different on Microsoft Windows', 1 if ($Config{osname} eq 'MSWin32');
+    my $tarread = Archive::Tar::Wrapper->new();
+    $tarread->read($tarfile);
+    my $loc = $tarread->locate("foo");
+    my $mode = ( stat $loc )[2] & 07777;
+    is $mode, 0710, "check dir mode";
+}

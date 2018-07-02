@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2009 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,14 +11,11 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
 use Test::More;
 use Test::Fatal;
-
-use MongoDB::Timestamp; # needed if db is being run as master
 
 use MongoDB;
 
@@ -60,12 +56,10 @@ subtest "get_database and check names" => sub {
     my $db = $conn->get_database( $testdb->name );
     isa_ok( $db, 'MongoDB::Database', 'get_database' );
 
-    $db->get_collection('test_collection')->insert_one( { foo => 42 } );
+    $db->get_collection('test_collection1')->insert_one( { foo => 42 } );
 
     ok( ( grep { /testdb/ } $conn->database_names ), 'database_names' );
 
-    my $result = $db->drop;
-    is( $result->{'ok'}, 1, 'db was dropped' );
 };
 
 subtest "wire protocol versions" => sub {
@@ -79,7 +73,7 @@ subtest "wire protocol versions" => sub {
 
     like(
         exception { $conn2->send_admin_command( [ is_master => 1 ] ) },
-        qr/Incompatible wire protocol/i,
+        qr/Server at .*:\d* reports wire version/i,
         'exception on wire protocol'
     );
 
@@ -88,7 +82,7 @@ subtest "wire protocol versions" => sub {
 subtest "reconnect" => sub {
     ok( $testdb->_client->reconnect, "ran reconnect" );
     my $db = $conn->get_database( $testdb->name );
-    ok( $db->get_collection('test_collection')->insert_one( { foo => 42 } ),
+    ok( $db->get_collection('test_collection2')->insert_one( { foo => 42 } ),
         "inserted a doc after reconnection"
     );
 };
@@ -119,6 +113,7 @@ subtest "app name" => sub {
         if $ENV{ATLAS_PROXY};
     plan skip_all => "currentOp with appName not supported on mongos before v3.6.0"
       if $server_type eq 'Mongos' && $server_version < v3.6.0;
+
 
     my $app_name = 'test_app_name';
     my $conn2 = build_client( app_name => $app_name );

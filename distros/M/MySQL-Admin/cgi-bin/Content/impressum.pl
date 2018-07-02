@@ -17,4 +17,3 @@ $hrUser->{email}<br/>
 $hrUser->{phone}<br/></div>
 |;
 1;
-

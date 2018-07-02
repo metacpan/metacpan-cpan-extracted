@@ -50,7 +50,6 @@ t/mailboxes/separators1.sep
 t/mailboxes/separators2.sep
 t/number.t
 t/offset.t
-t/pod.t
 t/prologue.t
 t/reset.t
 t/separators.t
@@ -141,6 +140,7 @@ inc/Module/Install/GithubMeta.pm
 inc/Module/Install/Include.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
+inc/Module/Install/StandardTests.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/Sort/Versions.pm

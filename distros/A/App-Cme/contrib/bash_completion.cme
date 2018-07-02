@@ -61,7 +61,7 @@ _cme()
     COMPREPLY=()
     _get_comp_words_by_ref -n : cur prev
 
-    global_options='-force-load -create -backend -trace -quiet -file'
+    global_options='-force-load -create -trace -quiet -file'
 
     if [[ $COMP_CWORD -eq 1 ]] ; then
         _cme_commands
@@ -108,8 +108,11 @@ _cme()
                 ;;
                 # modify completion could be much more elaborate...
                 modify)
-                   COMPREPLY=( $( compgen -W "$global_options -save -backup" -- $cur ) )
+                   COMPREPLY=( $( compgen -W "$global_options -save -backup -format -verbose" -- $cur ) )
                 ;;
+                run)
+                   COMPREPLY=( $( compgen -W "$global_options -doc -cat -nc --no-commit -verbose" -- $cur ) )
+				;;
                 search)
                    COMPREPLY=( $( compgen -W "$global_options -search -narrow-search" -- $cur ) )
 				;;

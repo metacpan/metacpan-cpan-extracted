@@ -49,7 +49,7 @@ for (keys %txtset)
 
 $def_txtset{inputend} .= "\n" if (defined $txtset{inputend});
 
-$nw->graphsettings(%def_txtset);
+$nw->textsettings(%def_txtset);
 
 print $nw->graph_text() . "\t" . $nw->title() . "\n";
 

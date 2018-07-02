@@ -1,0 +1,114 @@
+#!/usr/bin/perl 
+use 5.001 ; use strict ; use warnings ;
+use Getopt::Std ; getopts '!bi:qABDF1' , \my%o ; 
+use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use File::Temp qw/tempfile tempdir/ ; 
+use FindBin qw[ $Script ] ; 
+
+do {select STDERR ; print STDERR BRIGHT_RED "Please give argument(s) to $Script.\n" ; & HELP_MESSAGE } if ! @ARGV ;	
+& eachFile ($_) for @ARGV ; 
+exit 0 ;
+
+sub eachFile ( $ ) { 
+  my $bom = "\xef\xbb\xbf" ; # <- UTF8 の BOM
+  my $ifn = $_[0] ; # 処理対象の1個のファイルの名前
+  my $bak = $o{'!'} ? undef : $o{i} // '.bak' ; # バックアップの拡張子。
+
+  # .bakを元に戻す処理
+  if ( $o{B} ) {
+  	do { print "Specification to $ifn is nullfied for safety.\n"; return } if $ifn =~ m/$bak$/ && ! $o{F} ; 
+  	do{ print "$ifn$bak does not exist.\n" ; return } if ! -e $ifn.$bak ; 
+  	my $ofn = tempfile ; 
+  	rename $ifn, $ofn ; 
+  	if ( rename $ifn.$bak, $ifn ) {
+  	  if ( rename $ofn , $ifn.$bak ) { print "$ifn.bak and $ifn are exchanged.\n" } 
+  	  else { print "$ifn.bak is renamed into $ifn.\n" } 
+  	  return 
+  	}
+  }
+
+  $ifn =~ s/\/?$/\// if -d $ifn ; # 後で警告を出す時に、ディレクトリであることを示唆するため。
+  do { print CYAN qq[Not a plain file            : `$ifn'.\n] ; return } if ! -f $ifn ; # 普通のファイルではない場合
+
+  open my $ifh , '<', $ifn or do { print STDERR BRIGHT_RED qq[File "$_[0]" does not open.\n] ; return } ;
+  $_ = <$ifh> ;  # まず1行目を読む
+  do { print CYAN qq[Cannot be read anything     : `$ifn'.\n] ; return } if ! defined $ifn ; # 何も読めない場合
+   
+  if (! $o{A} && ! $o{D}){
+  	my $p = index ( $_, $bom ) ; 
+  	print "BOM (utf-8) " ; 
+  	print $p == 0 ? YELLOW "exists          " : $p == -1 ? "non-existent    " : "irregularly laid" ; 
+  	do { my $B = -s $ifn ; $ifn = "$ifn\t(${B} bytes)" } if $o{b} ;
+  	print ": `$ifn'\n" ; 
+  	return ;
+  } ; 
+
+  do { print CYAN "Skipped the process on      : $ifn ($bak in the file name)\n" ; return } if ! $o{F} && $ifn =~ m/$bak$/ ; # バックアップ用に見えるファイル
+  do { print CYAN qq[A symbolic link file        : `$ifn'.\n] ; return } if -l $ifn ; # リンクファイルの場合
+  do { print CYAN qq[Already has].($o{D}?' omitted BOM':' BOM       ').qq[     : File ``$ifn''.\n] ; return } 
+  if index ($_ , $bom) != ($o{D} ? 0 : -1 ) ;   # 既に処理済みで何もする必要が無かった場合
+
+  my ($ofh, $ofn) = tempfile ;  binmode $ofh ; # 書き込むファイルの準備
+  $_ = $o{D} ? substr ( $_ , 3 )  : $bom . $_ ;   # BOMを付けたり外したりする処理
+  do { print {$ofh} $_ } while <$ifh> ;  # do {..} while 構文。必ず1回は実行する。
+
+  close $ofh ; 
+  rename $ifn, $ifn . $bak if defined $bak ; 
+  rename $ofn, $ifn ; 
+  print   "Processed                   : `$ifn'. " . (defined $bak ? "(`$ifn$bak' is left as original.)" : '') if ! $o{q} ; 
+  print  "\n" if ! $o{q} ;
+}
+
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.01 ;
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+   # shuffler 
+   #  Produced by Toshiyuki Shimono in Tokyo, 2016-01-25 ~ 2016-10-13 ; 2018-03-25 English added.
+   # 目安: 
+   #   0.21 : 人になんとか提供できる段階で 0.21 を目安とする。
+   #   1.00 以上 : 英語版のヘルプをきちんと出すことが必要条件。
+   #   2.00 以上 : テストコードが含むことが必要条件。
+}  
+
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+ UTF-8 の BOM (Byte Order Mark) があるかどうかを判定する。オプションにより書いたり消したりする。
+
+  $0 ファイル名 [ファイル名] [ファイル名] ..
+
+  多数のファイルを処理するには、find . | xargs -n 100 $0  のように指定すると良いだろう。
+  
+
+ オプション :
+
+  -A     : 指定した各ファイルに UTF-8のBOM を追加する。
+  -D     : 指定した各ファイルに UTF-8のBOM を除去する。
+  -B     : 指定したファイル名Bに対しB.bakをBへ。BがあればB.bakへ。-i で.bakの部分は変更可能。
+  -F     : -i でバックアップされたと思われる様な、特定の拡張子を持っていても、そのファイルに処理をする。(forced)
+  -!     : 元のファイルを残さない。
+
+  -b     : バイトサイズを出力する。(現状 -Aまたは-Dが指定された場合は無効。)
+  -i str : 元のファイルに対して，指定文字列の拡張子を付属して残す。未指定なら、".bak"。
+  -q     : どのファイルを処理した，と言うような情報の出力を抑制する。
+
+ 開発上のメモ : 
+    * ０バイトのファイルに対する処理を，適切に行うようにしたい。
+    * ファイルに対して処理するので無くて，標準入力に対する処理を加えたい。-p または -1で。
+    * 出力する空白文字の個数の指定をもっとスマートにしたい。ファイル名に対する囲み文字を統一したい。
+
+=cut 

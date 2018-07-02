@@ -19,7 +19,7 @@ OPENADDR: {
 
 			my $geo_coder = new_ok('Geo::Coder::Free' => [ openaddr => $ENV{'OPENADDR_HOME'} ]);
 
-			if($ENV{RELEASE_TESTING}) {
+			if($ENV{AUTHOR_TESTING}) {
 				diag('This will take some time and memory');
 
 				my $location = $geo_coder->geocode('Medlars Drive, Bethesda, MD, USA');

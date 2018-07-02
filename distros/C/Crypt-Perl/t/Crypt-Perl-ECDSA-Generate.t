@@ -105,7 +105,11 @@ sub test_generate : Tests() {
     my $dgst = Digest::SHA::sha1($msg);
     my $digest_alg = 'sha1';
 
+    my @ossl_curves = $ossl_has_ecdsa ? OpenSSL_Control::curve_names() : ();
+
     for my $curve ( $self->_KEY_TYPES_TO_TEST() ) {
+        diag "curve: $curve";
+
         my $key_obj = Crypt::Perl::ECDSA::Generate::by_curve_name($curve);
 
         isa_ok(
@@ -116,6 +120,10 @@ sub test_generate : Tests() {
 
       SKIP: {
             skip 'No OpenSSL ECDSA support!', 1 if !$ossl_has_ecdsa;
+
+            if (!grep { $curve eq $_ } @ossl_curves) {
+                skip "Your OpenSSL doesn’t support this curve ($curve).", 1;
+            }
 
             my ($fh, $path) = File::Temp::tempfile( CLEANUP => 1 );
             print {$fh} $key_obj->to_pem_with_explicit_curve() or die $!;
@@ -137,15 +145,25 @@ sub test_generate : Tests() {
               SKIP: {
                     skip 'No OpenSSL ECDSA support!', 1 if !$ossl_has_ecdsa;
 
+                    if (!grep { $curve eq $_ } @ossl_curves) {
+                        skip "Your OpenSSL doesn’t support this curve ($curve).", 1;
+                    }
+
+                    skip 'Your OpenSSL can’t correct verify an ECDSA digest against a private key!', 1 if OpenSSL_Control::has_ecdsa_verify_private_bug();
+
+                    # This used to use explicit curves, but certain older
+                    # OpenSSL releases can’t verify digests with those.
+                    my $key_pem = $key_obj->to_pem_with_curve_name();
+
                     ok(
                         OpenSSL_Control::verify_private(
-                            $key_obj->to_pem_with_explicit_curve(),
+                            $key_pem,
                             $msg,
                             $digest_alg,
                             $sig,
                         ),
-                        "$curve: OpenSSL verifies signature",
-                    ) or print $key_obj->to_pem_with_explicit_curve() . "\n";
+                        "$curve: OpenSSL verifies signature ($digest_alg) of ($msg)",
+                    ) or print "$key_pem\n";
                 }
             }
             catch {

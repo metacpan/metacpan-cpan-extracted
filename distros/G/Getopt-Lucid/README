@@ -2,7 +2,7 @@ NAME
     Getopt::Lucid - Clear, readable syntax for command line processing
 
 VERSION
-    version 1.08
+    version 1.09
 
 SYNOPSIS
        use Getopt::Lucid qw( :all );
@@ -222,6 +222,15 @@ USAGE
        @spec = (
          Switch("help|h")->anycase(),    # "Help", "HELP", etc.
        );
+
+   doc()
+    Sets the documentation string for an option.
+
+         @spec = (
+           Param("output")->doc("write output to the specified file"),
+         );
+
+    This string shows up in the "usage" method.
 
   Validation
     Validation happens in two stages. First, individual parameters may have
@@ -448,16 +457,8 @@ USAGE
         processed and fails to pass specified validation, requirements, or
         is otherwise determined to be invalid
 
-    These exception may be caught using an "eval" block and allow the
+    These exceptions may be caught using an "eval" block and allow the
     calling program to respond differently to each class of exception.
-
-       my $opt;
-       eval { $opt = Getopt::Lucid->getopt( \@spec ) };
-       if ($@) {
-         print "$@\n" && print_usage() && exit 1
-           if ref $@ eq 'Getopt::Lucid::Exception::ARGV';
-         ref $@ ? $@->rethrow : die $@;
-       }
 
   Ambiguous Cases and Gotchas
    One-character aliases and "anycase"
@@ -604,6 +605,20 @@ METHODS
     options. This undoes the effect of a "merge_defaults" or "add_defaults"
     call.
 
+  usage()
+    Returns a string of usage information derived from the options spec,
+    including any "doc" modifiers. Because invalid options throw exceptions,
+    if you want to provide usage, you should separately invoke "new" and
+    "getopt"
+
+       my $opt = Getopt::Lucid->new( \@spec );
+       eval { $opt->getopt() };
+       if ($@) {
+         print "$@\n" && print $opt->usage and exit 1
+           if ref $@ eq 'Getopt::Lucid::Exception::ARGV';
+         ref $@ ? $@->rethrow : die $@;
+       }
+
 API CHANGES
     In 1.00, the following API changes have been made:
 
@@ -638,16 +653,16 @@ BUGS
 SUPPORT
   Bugs / Feature Requests
     Please report any bugs or feature requests through the issue tracker at
-    <https://github.com/dagolden/getopt-lucid/issues>. You will be notified
+    <https://github.com/dagolden/Getopt-Lucid/issues>. You will be notified
     automatically of any progress on your issue.
 
   Source Code
     This is open source software. The code repository is available for
     public review and contribution under the terms of the license.
 
-    <https://github.com/dagolden/getopt-lucid>
+    <https://github.com/dagolden/Getopt-Lucid>
 
-      git clone https://github.com/dagolden/getopt-lucid.git
+      git clone https://github.com/dagolden/Getopt-Lucid.git
 
 AUTHOR
     David Golden <dagolden@cpan.org>
@@ -665,8 +680,10 @@ CONTRIBUTORS
 
     *   Robert Bohne <rbo@cpan.org>
 
+    *   thilp <thilp@thilp.net>
+
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2017 by David Golden.
+    This software is Copyright (c) 2018 by David Golden.
 
     This is free software, licensed under:
 

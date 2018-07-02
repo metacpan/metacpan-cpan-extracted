@@ -945,7 +945,7 @@ BEGIN {
 
     push @bad_specs, {
         spec  => [
-            { name => "-v", badtype => "badtype" },
+            bless( { name => "-v", badtype => "badtype" }, "Getopt::Lucid::Spec" ),
         ],
         exception => "Getopt::Lucid::Exception::Spec",
         error_msg => _key_invalid("badtype"),
@@ -954,7 +954,7 @@ BEGIN {
 
     push @bad_specs, {
         spec  => [
-            { name => "-v", type => "badtype" }
+            bless( { name => "-v", type => "badtype" }, "Getopt::Lucid::Spec" )
         ],
         exception => "Getopt::Lucid::Exception::Spec",
         error_msg => _type_invalid("badtype"),
@@ -963,7 +963,7 @@ BEGIN {
 
     push @bad_specs, {
         spec  => [
-            { name => "-v", type => "alist" },
+            bless( { name => "-v", type => "alist" }, "Getopt::Lucid::Spec" )
         ],
         exception => "Getopt::Lucid::Exception::Spec",
         error_msg => _type_invalid("alist"),

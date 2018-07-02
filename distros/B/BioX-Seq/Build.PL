@@ -9,7 +9,7 @@ my $deployer = Module::Build->subclass(
       code => <<'SUBCLASS' );
 sub ACTION_deploy {
 
-    use CPAN::Uploader;
+    require CPAN::Uploader;
     my $self = shift;
     $self->depends_on("dist");
 

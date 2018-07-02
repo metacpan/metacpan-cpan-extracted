@@ -1,5 +1,5 @@
 {
-   "abstract" : "unified assertion and testing tool",
+   "abstract" : "Unified testing and assertion tool",
    "author" : [
       "Konstantin S. Uvarin <khedin@gmail.com>"
    ],
@@ -27,17 +27,29 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Scalar::Util" : "1.14"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006"
+            "Data::Dumper" : "2",
+            "Scalar::Util" : "1.14",
+            "parent" : "0",
+            "perl" : "5.006002"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 0.0305,
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dallaylaen/assert-refute-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dallaylaen/assert-refute-perl.git",
+         "web" : "https://github.com/dallaylaen/assert-refute-perl"
+      }
+   },
+   "version" : "0.1201",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

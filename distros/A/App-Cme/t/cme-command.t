@@ -10,12 +10,12 @@ use Encode;
 use Path::Tiny;
 use Probe::Perl;
 
-use Test::Command 0.08;
 use Test::More;
 use Test::File::Contents;
 
 use App::Cmd::Tester;
 use App::Cme ;
+use Config::Model qw/initialize_log4perl/;
 
 if ( $^O !~ /linux|bsd|solaris|sunos/ ) {
     plan skip_all => "Test with system() in build systems don't work well on this OS ($^O)";
@@ -78,13 +78,33 @@ my @orig = <DATA>;
 
 $conf_file->spew_utf8(@orig);
 
+subtest "check" => sub {
+    # use -save to force a file save to update file header
+    my @test_cmd = (qw/check popcon -root-dir/, $wr_dir->stringify);
+    my $ok = test_app( 'App::Cme' => \@test_cmd );
+    is( $ok->exit_code, 0, 'all went well' ) or diag("Failed command @test_cmd");
+    is($ok->stderr.'', '', 'check: no log on stderr' );
+    is($ok->stdout.'', '', 'check: no message on stdout' );
+};
+
+subtest "check verbose mode" => sub {
+    # use -save to force a file save to update file header
+    my @test_cmd = (qw/check popcon --verbose -root-dir/, $wr_dir->stringify);
+    my $ok = test_app( 'App::Cme' => \@test_cmd );
+    is( $ok->exit_code, 0, 'all went well' ) or diag("Failed command @test_cmd");
+    is($ok->stderr.'', '', 'check: no log on stderr' );
+    is($ok->stdout.'', "Loading data...\nChecking data..\nCheck done.\n" ,
+       'check: got messages on stdout' );
+};
+
 subtest "minimal modification" => sub {
     # test minimal modif (re-order)
     my @test_cmd = (qw/modify popcon -save -backup -canonical -root-dir/, $wr_dir->stringify);
     my $ok = test_app( 'App::Cme' => \@test_cmd );
     is ($ok->exit_code, 0, 'all went well' ) or diag("Failed command cme @test_cmd");
     is($ok->error, undef, 'threw no exceptions');
-    say $ok->stdout;
+    is($ok->stderr.'', '', 'modify: no log on stderr' );
+    is($ok->stdout.'', '', 'modify: no message on stdout' );
 
     file_contents_like $conf_file->stringify,   qr/cme/,       "updated header";
     # with perl 5.14 5.16, IO::Handle writes an extra \n with print.
@@ -111,12 +131,22 @@ subtest "modification with good parameter" => sub {
     my @test_cmd = (qw/modify popcon -save -root-dir/, $wr_dir->stringify, qq/PARTICIPATE=yes/);
     my $ok = test_app( 'App::Cme' => \@test_cmd );
     is( $ok->exit_code, 0, 'all went well' ) or diag("Failed command @test_cmd");
+    is($ok->stderr.'', '', 'modify: no log on stderr' );
+    is($ok->stdout.'', '', 'modify: no message on stdout' );
     file_contents_like $conf_file->stringify,   qr/cme/,      "updated header";
     file_contents_unlike $conf_file->stringify, qr/removed`/, "double comment is removed";
 };
 
+subtest "modification with verbose option" => sub {
+    my @test_cmd = (qw/modify popcon -verbose -root-dir/, $wr_dir->stringify, qq/PARTICIPATE=yes/);
+    my $ok = test_app( 'App::Cme' => \@test_cmd );
+    is ($ok->exit_code, 0, 'no error detected' ) or diag("Failed command @test_cmd");
+    is($ok->stderr.'', qq!command 'PARTICIPATE=yes': Setting leaf 'PARTICIPATE' boolean to 'yes'.\n!,
+       'check log content' );
+};
+
 subtest "search" => sub {
-my @test_cmd = (qw/search popcon -root-dir/, $wr_dir->stringify, qw/-search y -narrow value/);
+    my @test_cmd = (qw/search popcon -root-dir/, $wr_dir->stringify, qw/-search y -narrow value/);
     my $search = test_app( 'App::Cme' => \@test_cmd );
     is( $search->error, undef, 'threw no exceptions');
     is( $search->exit_code, 0, 'search went well' ) or diag("Failed command @test_cmd");
@@ -138,18 +168,23 @@ subtest "modification with utf8 parameter" => sub {
 
 my @script_tests = (
     {
-        label => "modification with a script and args",
+        label => __LINE__.": modification with a script and args",
         script => [ "app:  popcon", 'load ! MY_HOSTID=\$name$name'],
         args => [qw!--arg name=foobar!],
-        test => qr/"\$namefoobar"/
+        test => qr/"\$namefoobar"/,
+        stdout => q(
+Changes applied to popcon configuration:
+- MY_HOSTID: 'héhôßœ' -> '$namefoobar'
+
+),
     },
     {
-        label => "modification with a script and a default value",
+        label => __LINE__.": modification with a script and a default value",
         script => [ "app:  popcon", "default: name foobar", 'load ! MY_HOSTID=\$name$name'],
         test => qr/"\$namefoobar"/
     },
     {
-        label => "modification with a script and a var that uses a default value",
+        label => __LINE__.": modification with a script and a var that uses a default value",
         script => [ "app:  popcon",
                     "default: defname foobar",
                     'var: $var{name} = $args{defname}',
@@ -158,18 +193,19 @@ my @script_tests = (
         test => qr/"\$namefoobar"/
     },
     {
-        label => "modification with a script and var section",
+        label => __LINE__.": quiet modification with a script and var section",
         script => [ "app:  popcon", 'var: $var{name}="foobar2"','load ! MY_HOSTID=\$name$name'],
-        test => qr/"\$namefoobar2"/
+        test => qr/"\$namefoobar2"/,
+        args => ['-quiet'],
     },
     {
-        label => "modification with a script and var section which uses args",
+        label => __LINE__.": modification with a script and var section which uses args",
         script => [ "app:  popcon", 'var: $var{name}=$args{fooname}."bar2"','load ! MY_HOSTID=\$name$name'],
         args => [qw/--arg fooname=foo/],
         test => qr/"\$namefoobar2"/
     },
     {
-        label => "modification with a Perl script run by cme run with args",
+        label => __LINE__.": modification with a Perl script run by cme run with args",
         script => [
             "use Config::Model qw(cme);",
             'my ($opt,$val,$name) = @ARGV;',
@@ -179,13 +215,23 @@ my @script_tests = (
         test => qr/"\$namefoobar3"/
     },
     {
-        label => "modification with a script and var section which uses regexp and capture",
+        label => __LINE__.": modification with a script and var section which uses regexp and capture",
         script => [
             "app:  popcon",
             'load: ! MY_HOSTID=aaaaab MY_HOSTID=~s/(a{$times})/$1x$times/',
         ],
-        args => [qw/--arg times=4/],
-        test => qr/aaaax4ab/
+        args => [qw/--arg times=4 --verbose/],
+        test => qr/aaaax4ab/,
+        stdout => q(
+Changes applied to popcon configuration:
+- MY_HOSTID: '$namefoobar3' -> 'aaaaab'
+- MY_HOSTID: 'aaaaab' -> 'aaaax4ab'
+
+),
+        stderr => q<command '!': Going from root node to root node
+command 'MY_HOSTID=aaaaab': Setting leaf 'MY_HOSTID' uniline to 'aaaaab'.
+command 'MY_HOSTID=~s/(a{4})/$1x4/': Applying regexp 's/(a{4})/$1x4/' to leaf 'MY_HOSTID' uniline. Result is 'aaaax4ab'.
+>,
     },
 );
 
@@ -208,25 +254,27 @@ foreach my $test ( @script_tests) {
 
         file_contents_like $conf_file->stringify, $test->{test},
             "updated MY_HOSTID with script" ,{ encoding => 'UTF-8' };
+        is($ok->stderr.'', $test->{stderr} || '', 'check "'.$test->{label}.'" stderr content' );
+        is($ok->stdout.'', $test->{stdout} || '', 'run "'.$test->{label}.'": stdout content' );
     };
 }
 
 # test failure case for run script
 my @bad_script_tests = (
     {
-        label => "modification with a Perl script run by cme run with missing arg",
+        label => __LINE__.": modification with a Perl script run by cme run with missing arg",
         script => [ "app:  popcon", 'load ! MY_HOSTID=\$name$name'],
         args => [],
         error_regexp => qr/use option '-arg name=xxx'/
     },
     {
-        label => "modification with a Perl script run by cme run with 2 missing args",
+        label => __LINE__.": modification with a Perl script run by cme run with 2 missing args",
         script => [ "app:  popcon", 'load ! MY_HOSTID=$name1$name2'],
         args => [],
         error_regexp => qr/use option '-arg name1=xxx -arg name2=xxx'/
     },
     {
-        label => "modification with a Perl script run by cme run with  missing args in var line",
+        label => __LINE__.": modification with a Perl script run by cme run with  missing args in var line",
         script => [
             "app:  popcon",
             'var: $var{name} = $args{name1}.$args{name2}',

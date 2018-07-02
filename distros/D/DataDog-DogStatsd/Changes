@@ -1,5 +1,8 @@
 Revision history for DataDog-DogStatsd
 
+0.05  2018-07-02 15:54:34 +08
+        - Add stats_histogram
+
 0.04  2015-01-13 18:09:20 CST
         - sprintf %d for timing
         - more tests

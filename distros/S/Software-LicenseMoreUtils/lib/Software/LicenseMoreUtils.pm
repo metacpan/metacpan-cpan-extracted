@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils;
-$Software::LicenseMoreUtils::VERSION = '0.004';
+$Software::LicenseMoreUtils::VERSION = '0.005';
 use strict;
 use warnings;
 use 5.10.1;
@@ -44,7 +44,7 @@ my %more_short_names = (
     'LGPL-3.0+'    => 'Software::License::LGPL_3_0',
 );
 
-sub new_from_short_name {
+sub _create_license {
     my ( $class, $arg ) = @_;
     croak "no license short name specified"
           unless defined $arg->{short_name};
@@ -72,6 +72,11 @@ sub new_from_short_name {
 }
 
 sub new_license_with_summary {
+    carp "new_license_with_summary is deprecated. Please use new_from_short_name";
+    goto & new_from_short_name;
+}
+
+sub new_from_short_name {
     my ( $class, $arg ) = @_;
     croak "no license short name specified"
         unless defined $arg->{short_name};
@@ -80,7 +85,7 @@ sub new_license_with_summary {
 
     my $info = $more_short_names{$short} || '';
     my $or_later = $short =~ /\+$/ ? 1 : 0;
-    my $lic = $class->new_from_short_name($arg);
+    my $lic = $class->_create_license($arg);
 
     my $xlic = Software::LicenseMoreUtils::LicenseWithSummary->new({
         license => $lic,
@@ -103,13 +108,13 @@ Software::LicenseMoreUtils - More utilities and a summary for Software::License
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
  use Software::LicenseMoreUtils;
 
- my $lic = Software::LicenseMoreUtils->new_license_with_summary({
+ my $lic = Software::LicenseMoreUtils->new_from_short_name({
     short_name => 'Apache-2.0',
     holder => 'X. Ample'
  });
@@ -163,17 +168,6 @@ summaries.
 
 =head1 Methods
 
-=head2 new_license_with_summary
-
- my $license_object = Software::LicenseMoreUtils->new_license_with_summary({
-      short_name => 'GPL-1',
-      holder => 'X. Ample'
- }) ;
-
-Returns a new L<Software::LicenseMoreUtils::LicenseWithSummary> object
-which is a L<Software::License> wrapped with a summary. This method
-accepts the same parameters as L<new_from_short_name>.
-
 =head2 new_from_short_name
 
  my $license_object = Software::LicenseMoreUtils->new_from_short_name({
@@ -181,7 +175,10 @@ accepts the same parameters as L<new_from_short_name>.
       holder => 'X. Ample'
  }) ;
 
-Create a new L<Software::License> object from the license specified
+Returns a new L<Software::LicenseMoreUtils::LicenseWithSummary> object
+which is a L<Software::License> wrapped with a summary.
+
+The new L<Software::License> object is created from the license specified
 with C<short_name>. Known short license names are C<GPL-*>, C<LGPL-*> ,
 C<Artistic> and C<Artistic-*>
 C<Artistic> and C<Artistic-*>. If the short name is not known, this
@@ -189,10 +186,6 @@ method will try to create a license object with C<Software::License::> and
 the specified short name (e.g. C<Software::License::MIT> with
 C<< short_name => 'MIT' >> or C<Software::License::Apache_2_0> with
 C<< short_name => 'Apapche-2.0' >>).
-
-Note: this method provides a plain vanilla L<Software::License> object
-without summary. Use L</new_license_with_summary> method if a summary
-is required
 
 =head1 AUTHOR
 

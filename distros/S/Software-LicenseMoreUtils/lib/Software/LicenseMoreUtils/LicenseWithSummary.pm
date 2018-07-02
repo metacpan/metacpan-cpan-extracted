@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils::LicenseWithSummary;
-$Software::LicenseMoreUtils::LicenseWithSummary::VERSION = '0.004';
+$Software::LicenseMoreUtils::LicenseWithSummary::VERSION = '0.005';
 # ABSTRACT: Software::License with a summary
 
 use strict;
@@ -26,7 +26,7 @@ our $AUTOLOAD;
 # must match a <distro>_summaries.yml file in the same directory at
 # this file
 my %path_to_distro = (
-    '/etc/sdebian_version' => 'debian',
+    '/etc/debian_version' => 'debian',
 );
 
 my $distro_file = first { -e $_ } keys %path_to_distro;
@@ -71,6 +71,11 @@ sub summary {
     );
 }
 
+sub license_class {
+    my $self = shift;
+    return ref($self->{license});
+}
+
 sub debian_text {
     my $self = shift;
     carp "debian_text is deprecated, please use summary_or_text";
@@ -103,12 +108,12 @@ Software::LicenseMoreUtils::LicenseWithSummary - Software::License with a summar
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
 See L<Software::LicenseMoreUtils>. This class should be created with
-  L<Software::LicenseMoreUtils/new_license_with_summary>
+  L<Software::LicenseMoreUtils/new_from_short_name>
 
 =head1 DESCRIPTION
 
@@ -132,6 +137,11 @@ Returns the license summary or the full text of the license.
 
 Returns the name of the Linux distribution found by this module. This
 method is intended for tests or debugging.
+
+=head2 license_class
+
+Returns the Perl class name of the underlying L<Software::License> object.
+E.g. C<Software::License::AGPL_3>
 
 =head1 AUTHOR
 

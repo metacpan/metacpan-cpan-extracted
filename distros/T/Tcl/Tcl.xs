@@ -271,10 +271,10 @@ NpLoadLibrary(pTHX_ HMODULE *tclHandle, char *dllFilename, int dllFilenameSize)
 	    if (*pos == '.') {
 		pos++;
 	    }
-	    *pos = '9'; /* count down from '8' to '4', and then to '0', it is also ok*/
-	    while (!handle && (--*pos >= '0')) {
+	    *pos = '9'; /* count down from '9' to '0': 8.9, 8.8, 8.7, 8.6, ... */
+	    do {
 		handle = dlopen(libname, RTLD_NOW | RTLD_GLOBAL);
-	    }
+	    } while (!handle && (--*pos >= '0'));
 	    if (!handle) {
 		warn("failed all posible tcl vers 8.x from 9 down to 0");
 		return TCL_ERROR;
@@ -370,8 +370,10 @@ NpInitialize(pTHX_ SV *X)
     /*
      * We want the Tcl_InitStubs func static to ourselves - before Tcl
      * is loaded dyanmically and possibly changes it.
+     * Variable initstubs have to be declared as volatile to prevent
+     * compiler optimizing it out.
      */
-    static CONST char *(*initstubs)(Tcl_Interp *, CONST char *, int)
+    static CONST char *(*volatile initstubs)(Tcl_Interp *, CONST char *, int)
 	= Tcl_InitStubs;
     char dllFilename[MAX_PATH];
     dllFilename[0] = '\0';
@@ -913,6 +915,12 @@ Tcl_PerlCallDeleteProc(ClientData clientData)
     }
 
     SvREFCNT_dec(av);
+/*   it got double tapped when it was made
+     ie AV *av = (AV *) SvREFCNT_inc((SV *) newAV());
+     so undouble tap it now
+*/
+    SvREFCNT_dec(av);
+
 }
 
 void
@@ -1056,7 +1064,7 @@ Tcl_Eval(interp, script, flags = 0)
 	/* sv_mortalcopy here prevents stringifying script - necessary ?? */
 	cscript = SvPV(sv_mortalcopy(script), length);
 	if (Tcl_EvalEx(interp, cscript, length, flags) != TCL_OK) {
-	    croak(Tcl_GetStringResult(interp));
+	    croak("%s", Tcl_GetStringResult(interp));
 	}
 	prepare_Tcl_result(aTHX_ interp, "Tcl::Eval");
 	SPAGAIN;
@@ -1119,7 +1127,7 @@ Tcl_EvalFile(interp, filename)
 	PUTBACK;
 	Tcl_ResetResult(interp);
 	if (Tcl_EvalFile(interp, filename) != TCL_OK) {
-	    croak(Tcl_GetStringResult(interp));
+	    croak("%s", Tcl_GetStringResult(interp));
 	}
 	prepare_Tcl_result(aTHX_ interp, "Tcl::EvalFile");
 	SPAGAIN;
@@ -1144,7 +1152,7 @@ Tcl_EvalFileHandle(interp, handle)
 	    {
 		Tcl_ResetResult(interp);
 		if (Tcl_Eval(interp, s) != TCL_OK)
-		    croak(Tcl_GetStringResult(interp));
+		    croak("%s", Tcl_GetStringResult(interp));
 		append = 0;
 	    }
 	}
@@ -1278,7 +1286,7 @@ Tcl_invoke(interp, sv, ...)
 	    }
 
 	    if (result != TCL_OK) {
-		croak(Tcl_GetStringResult(interp));
+		croak("%s", Tcl_GetStringResult(interp));
 	    }
 	    prepare_Tcl_result(aTHX_ interp, "Tcl::invoke");
 
@@ -1345,7 +1353,7 @@ Tcl_icall(interp, sv, ...)
 	    }
 
 	    if (result != TCL_OK) {
-		croak(Tcl_GetStringResult(interp));
+		croak("%s", Tcl_GetStringResult(interp));
 	    }
 	    prepare_Tcl_result(aTHX_ interp, "Tcl::icall");
 
@@ -1420,7 +1428,7 @@ Tcl_Init(interp)
     CODE:
 	if (!initialized) { return; }
 	if (tclKit_AppInit(interp) != TCL_OK) {
-	    croak(Tcl_GetStringResult(interp));
+	    croak("%s", Tcl_GetStringResult(interp));
 	}
 
 #ifdef HAVE_DDEINIT

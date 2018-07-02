@@ -1,0 +1,491 @@
+# NAME
+
+XML::XPathScript - a Perl framework for XML stylesheets
+
+# VERSION
+
+version 1.55
+
+# SYNOPSIS
+
+```perl
+use XML::XPathScript;
+
+# the short way
+my $xps = XML::XPathScript->new;
+my $transformed = $xps->transform( $xml, $stylesheet );
+
+# having the output piped to STDOUT directly
+my $xps = XML::XPathScript->new( xml => $xml, stylesheet => $stylesheet );
+$xps->process;
+
+# caching the compiled stylesheet for reuse and
+# outputting to multiple files
+my $xps = XML::XPathScript->new( stylesheetfile => $filename )
+foreach my $xml (@xmlfiles) {
+  my $transformed = $xps->transform( $xml );
+
+  # do stuff with $transformed ...
+};
+
+# Making extra variables available to the stylesheet dialect:
+my $xps = XML::XPathScript->new;
+$xps->compile( qw/ $foo $bar / );
+
+         # in stylesheet, $foo will be set to 'a'
+         # and $bar to 'b'
+$xps->transform( $xml, $stylesheet, [ 'a', 'b' ] ); 
+```
+
+# DESCRIPTION
+
+XPathScript is a stylesheet language similar in many ways to XSLT (in
+concept, not in appearance), for transforming XML from one format to
+another (possibly HTML, but XPathScript also shines for non-XML-like
+output).
+
+Like XSLT, XPathScript offers a dialect to mix verbatim portions of
+documents and code. Also like XSLT, it leverages the powerful
+\`\`templates/apply-templates'' and \`\`cascading stylesheets'' design
+patterns, that greatly simplify the design of stylesheets for
+programmers. The availability of the _XPath_ query language inside
+stylesheets promotes the use of a purely document-dependent,
+side-effect-free coding style. But unlike XSLT which uses its own
+dedicated control language with an XML-compliant syntax, XPathScript
+uses Perl which is terse and highly extendable.
+
+The result of the merge is an extremely powerful tool for rendering
+complex XML documents into other formats. Stylesheets written in
+XPathScript are very easy to create, extend and reuse, even if they
+manage hundreds of different XML tags.
+
+# STYLESHEET WRITER DOCUMENTATION
+
+If you are interested to write stylesheets, refers to the
+**XML::XPathScript::Stylesheet** manpage. You might also want 
+to take a peek at the manpage of **xpathscript**, a program 
+bundled with this module to perform XPathScript transformations
+via the command line. 
+
+# STYLESHEET UTILITY METHODS 
+
+Those methods are meants to be used from within a stylesheet.
+
+## current
+
+```
+$xps = XML::XPathScript->current
+```
+
+This class method returns
+the stylesheet object currently being applied. This can be called from
+anywhere within the stylesheet, except a BEGIN or END block or
+similar. **Beware though** that using the return value for altering (as
+opposed to reading) stuff from anywhere except the stylesheet's top
+level is unwise.
+
+## interpolation 
+
+```
+$interpolate = $XML::XPathScript::current->interpolation
+$interpolate = $XML::XPathScript::current->interpolation( $boolean )
+```
+
+Gets (first call form) or sets (second form) the XPath interpolation
+boolean flag. If true, values set in ` pre ` and ` post `
+may contain expressions within curly braces, that will be
+interpreted as XPath expressions and substituted in place.
+
+For example, when interpolation is on, the following code
+
+```perl
+$template->set( link => { pre  => '<a href="{@url}">',
+                          post => '</a>'               } );
+```
+
+is enough for rendering a `<link>` element as an HTML hyperlink.
+The interpolation-less version is slightly more complex as it requires a
+`testcode`:
+
+```perl
+sub link_testcode  {
+   my ($node, $t) = @_;
+   my $url = $node->findvalue('@url');
+   $t->set({ pre  => "<a href='$url'>",
+             post => "</a>"             });
+       return DO_SELF_AND_KIDS();
+};
+```
+
+Interpolation is on by default. 
+
+## interpolation\_regex
+
+```
+$regex = $XML::XPathScript::current->interpolation_regex
+$XML::XPathScript::current->interpolation_regex( $regex )
+```
+
+Gets or sets the regex to use for interpolation. The value to be 
+interpolated must be capture by $1. 
+
+By default, the interpolation regex is qr/{(.\*?)}/.
+
+Example:
+
+```perl
+$XML::XPathScript::current->interpolation_regex( qr#\|(.*?)\|# );
+
+$template->set( bird => { pre => '|@name| |@gender| |@type|' } );
+```
+
+## binmode
+
+Declares that the stylesheet output is **not** in UTF-8, but instead in
+an (unspecified) character encoding embedded in the stylesheet source
+that neither Perl nor XPathScript should have any business dealing
+with. Calling `XML::XPathScript->current()->binmode()` is an
+**irreversible** operation with the consequences outlined in ["The
+Unicode mess"](#the-unicode-mess).
+
+# TECHNICAL DOCUMENTATION
+
+The rest of this POD documentation is **not** useful to programmers who
+just want to write stylesheets; it is of use only to people wanting to
+call existing stylesheets or more generally embed the XPathScript
+engine into some wider framework.
+
+_XML::XPathScript_ is an object-oriented class with the following features:
+
+- an _embedded Perl dialect_ that allows the merging of the stylesheet
+code with snippets of the output document. Don't be afraid, this is
+exactly the same kind of stuff as in _Text::Template_, _HTML::Mason_
+or other similar packages: instead of having text inside Perl (that
+one _print()_s), we have Perl inside text, with a special escaping
+form that a preprocessor interprets and extracts. For XPathScript,
+this preprocessor is embodied by the _xpathscript_ shell tool (see
+["xpathscript Invocation"](#xpathscript-invocation)) and also available through this package's
+API;
+- a _templating engine_, that does the apply-templates loop, starting
+from the top XML node and applying templates to it and its subnodes as
+directed by the stylesheet.
+
+When run, the stylesheet is expected to fill in the _template object_
+$template, which is a lexically-scoped variable made available to it at
+preprocess time.
+
+# METHODS
+
+## new
+
+```
+$xps = XML::XPathScript->new( %arguments )
+```
+
+Creates a new XPathScript translator. The recognized named arguments are
+
+- xml => $xml
+
+    $xml is a scalar containing XML text, or a reference to a filehandle
+    from which XML input is available, or an _XML::XPath_ or
+    _XML::libXML_ object.
+
+    An XML::XPathscript object without an _xml_ argument
+    to the constructor is only able to compile stylesheets (see
+    ["SYNOPSIS"](#synopsis)).
+
+- stylesheet => $stylesheet
+
+    $stylesheet is a scalar containing the stylesheet text, or a reference
+    to a filehandle from which the stylesheet text is available.  The
+    stylesheet text may contain unresolved `<!--#include -->`
+    constructs, which will be resolved relative to ".".
+
+- stylesheetfile => $filename
+
+    Same as _stylesheet_ but let _XML::XPathScript_ do the loading
+    itself.  Using this form, relative `<!--#include -->`s in the
+    stylesheet file will be honored with respect to the dirname of
+    $filename instead of "."; this provides SGML-style behaviour for
+    inclusion (it does not depend on the current directory), which is
+    usually what you want.
+
+- compiledstylesheet => $function
+
+    Re-uses a previous return value of _compile()_ (see ["SYNOPSIS"](#synopsis) and
+    ["compile"](#compile)), typically to apply the same stylesheet to several XML
+    documents in a row.
+
+- interpolation\_regex => $regex
+
+    Sets the interpolation regex. Whatever is
+    captured in $1 will be used as the xpath expression. 
+    Defaults to qr/{(.\*?)}/.
+
+## transform
+
+```
+$xps->transform( $xml, $stylesheet, \@args )
+```
+
+Transforms the document $xml with the $stylesheet (optionally passing to
+the stylesheet the argument array @args) and returns the result.
+
+If the passed $xml or $stylesheet is undefined, the previously loaded xml 
+document or stylesheet is used.
+
+E.g.,
+
+```perl
+# vanilla-flavored transformation
+my $xml = '<doc>...</doc>';
+my $stylesheet = '<% ... %>';
+my $transformed = $xps->transform( $xml, $stylesheet );
+
+# transform many documents
+$xps->set_stylesheet( $stylesheet );
+for my $xml ( @xml_documents ) {
+    my $transformed = $xps->transform( $xml );
+    # do stuff with $transformed ...
+}
+
+# do many transformation of a document
+$xps->set_xml( $xml );
+for my $stylesheet ( @stylesheets ) {
+    my $transformed = $xps->transform( undef, $stylesheet );
+    # do stuff with $transformed ...
+}
+```
+
+## set\_dom
+
+```
+$xps->set_dom( $dom )
+```
+
+Set the DOM of the document to process. _$dom_
+must be a node object of one of the supported 
+parsers (XML::LibXML, XML::XPath, B::XPath).
+
+## set\_xml
+
+```
+$xps->set_xml( $xml )
+```
+
+Sets the xml document to $xml. $xml can be a file, a file handler 
+reference, a string, or a XML::LibXML or XML::XPath node.
+
+## set\_stylesheet
+
+```
+$xps->set_stylesheet( $stylesheet )
+```
+
+Sets the processor's stylesheet to $stylesheet.
+
+## process
+
+```
+$xps->process
+$xps->process( $printer )
+$xps->process( $printer, @varvalues )
+```
+
+Processes the document and stylesheet set at construction time, and
+prints the result to STDOUT by default. If $printer is set, it must be
+either a reference to a filehandle open for output, or a reference to
+a string, or a reference to a subroutine which does the output, as in
+
+```perl
+open my $fh, '>', 'transformed.txt' 
+    or die "can't open file transformed.txt: $!";
+$xps->process( $fh );
+
+my $transformed;
+$xps->process( \$transformed );
+
+$xps->process( sub { 
+    my $output = shift;
+    $output =~ y/<>/%%/;
+    print $output;
+} );
+```
+
+If the stylesheet was _compile()_d with extra _varname_s, then the
+calling code should call _process()_ with a corresponding number of
+@varvalues. The corresponding lexical variables will be set
+accordingly, so that the stylesheet code can get at them (looking at
+["SYNOPSIS"](#synopsis)) is the easiest way of getting the meaning of this
+sentence).
+
+## extract
+
+```
+$xps->extract( $stylesheet )
+$xps->extract( $stylesheet, $filename )
+$xps->extract( $stylesheet, @includestack ) # from include_file() only
+```
+
+The embedded dialect parser. Given $stylesheet, which is either a
+filehandle reference or a string, returns a string that holds all the
+code in real Perl. Unquoted text and `<%= stuff %>` constructs in
+the stylesheet dialect are converted into invocations of _XML::XPathScript->current()->print()_, while `<% stuff %>`
+constructs are transcripted verbatim.
+
+`<!-- #include -->` constructs are expanded by passing their
+filename argument to ["include\_file"](#include_file) along with @includestack (if any)
+like this:
+
+```perl
+$self->include_file($includefilename,@includestack);
+```
+
+@includestack is not interpreted by _extract()_ (except for the first
+entry, to create line tags for the debugger). It is only a bandaid for
+_include\_file()_ to pass the inclusion stack to itself across the
+mutual recursion existing between the two methods (see
+["include\_file"](#include_file)).  If _extract()_ is invoked from outside
+_include\_file()_, the last invocation form should not be used.
+
+This method does a purely syntactic job. No special framework
+declaration is prepended for isolating the code in its own package,
+defining $t or the like (["compile"](#compile) does that). It may be overriden
+in subclasses to provide different escape forms in the stylesheet
+dialect.
+
+## read\_stylesheet
+
+```
+$string = $xps->read_stylesheet( $stylesheet )
+```
+
+Read the $stylesheet (which can be a filehandler or a string). 
+Used by _extract_ and exists such that it can be overloaded in
+_Apache::AxKit::Language::YPathScript_.
+
+## include\_file
+
+```
+$xps->include_file( $filename )
+$xps->include_file( $filename, @includestack )
+```
+
+Resolves a `<!--#include file="foo" -->` directive on behalf of
+_extract()_, that is, returns the script contents of
+_$filename_. The return value must be de-embedded too, which means
+that _extract()_ has to be called recursively to expand the contents
+of $filename (which may contain more `<!--#include -->`s etc.)
+
+$filename has to be slash-separated, whatever OS it is you are using
+(this is the XML way of things). If $filename is relative (i.e. does
+not begin with "/" or "./"), it is resolved according to the basename
+of the stylesheet that includes it (that is, $includestack\[0\], see
+below) or "." if we are in the topmost stylesheet. Filenames beginning
+with "./" are considered absolute; this gives stylesheet writers a way
+to specify that they really really want a stylesheet that lies in the
+system's current working directory.
+
+@includestack is the include stack currently in use, made up of all
+values of $filename through the stack, lastly added (innermost)
+entries first. The toplevel stylesheet is not in @includestack
+(that is, the outermost call does not specify an @includestack).
+
+This method may be overridden in subclasses to provide support for
+alternate namespaces (e.g. \`\`axkit://'' URIs).
+
+## _compile()_
+
+## _compile(varname1, varname2,...)_
+
+Compiles the stylesheet set at _new()_ time and returns an anonymous
+CODE reference. 
+
+_varname1_, _varname2_, etc. are extraneous arguments that will be
+made available to the stylesheet dialect as lexically scoped
+variables. ["SYNOPSIS"](#synopsis) shows how to use this feature to pass variables
+to AxKit XPathScript stylesheets, which explains this
+feature better than a lengthy paragraph would do.
+
+The return value is an opaque token that encapsulates a compiled
+stylesheet.  It should not be used, except as the
+_compiledstylesheet_ argument to _new()_ to initiate new objects and
+amortize the compilation time.  Subclasses may alter the type of the
+return value, but will need to overload _process()_ accordingly of
+course.
+
+The _compile()_ method is idempotent. Subsequent calls to it will
+return the very same token, and calls to it when a
+_compiledstylesheet_ argument was set at _new()_ time will return
+said argument.
+
+## print
+
+```
+$xps->print($text)
+```
+
+Outputs a chunk of text on behalf of the stylesheet. The default
+implementation is to use the second argument to ["process"](#process). 
+Overloading this
+method in a subclass provides yet another method to redirect output.
+
+## get\_stylesheet\_dependencies
+
+```
+@files = $xps->get_stylesheet_dependencies
+```
+
+Returns the files the loaded stylesheet depends on (i.e., has been
+included by the stylesheet or one of its includes). The order in which
+files are returned by the function has no special signification.
+
+## processor
+
+```
+$processor = $xps->processor
+```
+
+Returns the processor object associated with _$xps_.
+
+# FUNCTIONS
+
+\#=head2 gen\_package\_name
+\#
+\#Generates a fresh package name in which we would compile a new
+\#stylesheet. Never returns twice the same name.
+
+## document
+
+```
+$nodeset = $xps->document( $uri )
+```
+
+Reads XML given in $uri, parses it and returns it in a nodeset.
+
+# SEE ALSO
+
+[XML::XPathScript::Stylesheet](https://metacpan.org/pod/XML::XPathScript::Stylesheet), [XML::XPathScript::Processor](https://metacpan.org/pod/XML::XPathScript::Processor), 
+[XML::XPathScript::Template](https://metacpan.org/pod/XML::XPathScript::Template), [XML::XPathScript::Template::Tag](https://metacpan.org/pod/XML::XPathScript::Template::Tag)
+
+Guide of the original Axkit XPathScript: 
+http://axkit.org/wiki/view/AxKit/XPathScriptGuide
+
+XPath documentation from W3C:
+http://www.w3.org/TR/xpath
+
+Unicode character table:
+http://www.unicode.org/charts/charindex.html
+
+# AUTHORS
+
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+- Dominique Quatravaux <domq@cpan.org>
+- Matt Sergeant <matt@sergeant.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2008, 2007 by Matt Sergeant.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

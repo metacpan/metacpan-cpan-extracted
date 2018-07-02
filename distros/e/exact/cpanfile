@@ -3,6 +3,7 @@ requires "IO::File" => "0";
 requires "IO::Handle" => "0";
 requires "feature" => "0";
 requires "mro" => "0";
+requires "namespace::autoclean" => "0";
 requires "perl" => "5.010";
 requires "strict" => "0";
 requires "warnings" => "0";

@@ -1323,6 +1323,10 @@ Sourceforge Project Page: C<http://sourceforge.net/projects/pstl>
 
 m gaffiero, E<lt>gaffie@users.sourceforge.netE<gt>
 
+=head2 CO-MAINTAINER
+
+David Oswald, E<lt>davido@cpan.orgE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright E<copy>1999-2007, Mario Gaffiero. All Rights Reserved.

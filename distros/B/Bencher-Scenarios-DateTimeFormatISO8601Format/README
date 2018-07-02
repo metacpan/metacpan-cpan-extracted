@@ -1,0 +1,53 @@
+NAME
+    Bencher::Scenarios::DateTimeFormatISO8601Format - Scenarios to benchmark
+    DateTime::Format::ISO8601::Format
+
+VERSION
+    This document describes version 0.001 of
+    Bencher::Scenarios::DateTimeFormatISO8601Format (from Perl distribution
+    Bencher-Scenarios-DateTimeFormatISO8601Format), released on 2018-07-01.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::DateTimeFormatISO8601Format::Startup
+
+    *   Bencher::Scenario::DateTimeFormatISO8601Format::Formatting
+
+    This distribution contains Bencher scenarios to benchmark
+    DateTime::Format::ISO8601::Format.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-DateTimeFormatISO8601For
+    mat>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenarios-DateTimeFormatISO86
+    01Format>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Dat
+    eTimeFormatISO8601Format>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Bencher::Scenarios::DateTimeFormatISO8601, scenarios to benchmark
+    DateTime::Format::ISO8601.
+
+    Bencher::Scenarios::DateTimeFormatDurationISO8601, scenarios to
+    benchmark DateTime::Format::Duration::ISO8601.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

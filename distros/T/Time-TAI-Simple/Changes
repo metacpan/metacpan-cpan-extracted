@@ -1,5 +1,10 @@
 Revision history for time-tai-simple
 
+1.14 Wed Jun 27 16:57:00 PST 2018
+	- Updated documentation "SEE ALSO" to point at DateTime's subtract_datetime_absolute method
+        - bin/tai: added --version feature
+        - cleaned out some build cruft that had been polluting previous versions
+
 1.13 Fri Jan 12 14:29:00 PST 2018
         - Updated documentation for tai (oops)
 

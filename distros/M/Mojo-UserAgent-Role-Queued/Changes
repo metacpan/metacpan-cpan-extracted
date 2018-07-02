@@ -1,5 +1,14 @@
 Revision history for Perl extension Mojo-UserAgent-Role-Queued
 
+1.01 2018-06-26T15:33:43Z
+    - use non-leaking version of private callback method
+    - restore typo fix in synopsis (Dan book)
+
+1.0 2018-06-25T14:41:53Z
+
+    - BREAKING CHANGE: rename "stop_queue" event to "queue_empty"
+    - fix breakage with Mojolicious v7.85 caused by having a method called _process() that conflicts with a new method in Mojo::UserAgent
+
 0.04 2018-01-01T17:23:07Z
 
     - refactor internals, replace timer with events 

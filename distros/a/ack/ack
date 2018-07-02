@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = '2.22'; # Check https://beyondgrep.com/ for updates
+our $VERSION = '2.24'; # Check https://beyondgrep.com/ for updates
 
 use 5.008008;
 use Getopt::Long 2.38 ();
@@ -945,7 +945,7 @@ sub main {
     set_up_line_context();
 
 RESOURCES:
-    while ( my $resource = $resources->next ) {
+    while ( defined(my $resource = $resources->next) ) {
         if ($is_tracking_context) {
             set_up_line_context_for_file();
         }
@@ -1032,7 +1032,18 @@ RESOURCES:
             }
         }
         else {
-            $nmatches += print_matches_in_resource( $resource, $opt );
+            my $needs_line_scan = 1;
+            if ( $opt->{regex} && !$opt->{passthru} ) {
+                if ( $resource->open ) {
+                    $needs_line_scan = $resource->needs_line_scan( $opt );
+                    if ( $needs_line_scan ) {
+                        $resource->reset();
+                    }
+                }
+            }
+            if ( $needs_line_scan ) {
+                $nmatches += print_matches_in_resource( $resource, $opt );
+            }
             if ( $nmatches && $only_first ) {
                 last RESOURCES;
             }
@@ -1486,8 +1497,6 @@ Invert match: select non-matching lines
 =item B<--version>
 
 Display version and copyright information.
-
-=item B<-w>, B<--word-regexp>
 
 =item B<-w>, B<--word-regexp>
 
@@ -2376,7 +2385,7 @@ Rob Hoelz.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2017 Andy Lester.
+Copyright 2005-2018 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License v2.0.

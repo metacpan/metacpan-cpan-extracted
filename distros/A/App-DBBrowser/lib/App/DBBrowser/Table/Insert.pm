@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.014';
+our $VERSION = '2.015';
 
 use Cwd                   qw( realpath );
 use Encode                qw( encode decode );
@@ -67,7 +67,8 @@ sub __insert_into_stmt_cols {
         # Choose
         my @idx = choose(
             $choices,
-            { %{$sf->{i}{lyt_stmt_h}}, prompt => 'Columns:', index => 1, no_spacebar => [ 0 .. $#pre ] }
+            { %{$sf->{i}{lyt_stmt_h}}, prompt => 'Columns:', index => 1,
+              meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
         );
         if ( ! defined $idx[0] || ! defined $choices->[$idx[0]] ) {
             return if ! @{$sql->{insert_into_cols}};
@@ -271,11 +272,10 @@ sub __file_name {
         }
         elsif ( $file eq $del_file ) {
             $file = undef;
-            my @pre = [ undef, $sf->{i}{ok} ];
             my $idx = choose_a_subset(
                 [ map { decode 'locale_fs', $_ } @files ],
                 { mouse => $sf->{o}{table}{mouse}, prefix => '  ', info => 'Files to remove:',
-                 no_spacebar => [ @pre ], index => 1, fmt_chosen => 1, remove_chosen => 1, clear_screen => 1 }
+                 index => 1, fmt_chosen => 1, remove_chosen => 1, clear_screen => 1 }
             );
             if ( ! defined $idx || ! @$idx ) {
                 next FILE;
@@ -611,7 +611,8 @@ sub __input_filter {
             # Choose
             my @idx = $stmt_v->choose(
                 $choices,
-                { prompt => 'Choose rows:', index => 1, no_spacebar => [ 0 .. $#pre ], undef => '<<', mark => $mark }
+                { prompt => 'Choose rows:', index => 1, meta_items => [ 0 .. $#pre ],
+                  undef => '<<', mark => $mark, include_highlighted => 2 }
             );
             if ( ! defined $idx[0] || ! defined $choices->[$idx[0]] ) {
                 next FILTER;

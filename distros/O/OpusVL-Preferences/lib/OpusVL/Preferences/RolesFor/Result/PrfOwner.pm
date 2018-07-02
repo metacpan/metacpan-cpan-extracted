@@ -71,9 +71,17 @@ This software is licensed according to the "IP Assignment Schedule" provided wit
 
 =cut
 
+use v5.24;
 use strict;
 use warnings;
 use Moose::Role;
+use Scalar::IfDefined qw/$ifdef/;
+
+sub _schema {
+    state $schema = OpusVL::FB11::Hive
+        ->fancy_hat('preferences')
+        ->schema;
+}
 
 =head2 prf_id_column
 
@@ -99,29 +107,27 @@ sub prf_owner_init
 			is_foreign_key => 1
 		}
 	);
+}
 
-	$class->belongs_to
-	(
-		prf_owner => 'OpusVL::Preferences::Schema::Result::PrfOwner',
-		{
-			'foreign.prf_owner_id'      => 'self.' . $class->prf_id_column,
-			'foreign.prf_owner_type_id' => 'self.prf_owner_type_id'
-		}
-	);
+sub prf_owner {
+    my $self = shift;
+    return $self->_schema->resultset('PrfOwner')->find({
+        prf_owner_type_id => $self->prf_owner_type_id,
+        prf_owner_id => $self->${ \$self->prf_id_column },
+    });
+}
 
-	$class->belongs_to
-	(
-		prf_owner_type => 'OpusVL::Preferences::Schema::Result::PrfOwnerType',
-		{
-			'foreign.prf_owner_type_id' => 'self.prf_owner_type_id'
-		}
-	);
+sub prf_owner_type {
+    my $self = shift;
+    return $self->_schema->resultset('PrfOwnerType')->find({
+        prf_owner_type_id => $self->prf_owner_type_id
+    });
 }
 
 after insert => sub
 {
 	my $self   = shift;
-	my $schema = $self->result_source->schema;
+	my $schema = _schema;
 	my $type   = $schema->resultset ('PrfOwnerType')->setup_from_source ($self->result_source);
 
 	# Ensure that any auto-generated values have been populated (in case the
@@ -151,14 +157,16 @@ sub prf_preferences
 
 	my $self = shift;
 
-	return $self->prf_owner->prf_preferences;
+	return $self->prf_owner->$ifdef('prf_preferences');
 }
 
 sub preferences_to_array
 {
     my $self = shift;
 
-    my $preferences = $self->prf_preferences;
+    my $preferences = $self->prf_preferences
+        or return [];
+
     my @expanded;
     for my $pref ($preferences->all)
     {
@@ -210,7 +218,7 @@ sub prf_get
     {
         if($pref)
         {
-            my $schema = $self->result_source->schema;
+            my $schema = _schema;
             my $crypto = $schema->encryption_client;
             if($crypto)
             {
@@ -234,15 +242,21 @@ sub _clear_out_inactive_unique_values
     my $prefname = shift;
     my $field = shift;
 
-    my $schema = $self->result_source->schema;
+    my $schema = $self->_schema;
     my $obj_rs = $schema->resultset($self->prf_owner_type->owner_resultset);
     if($obj_rs->can('inactive_for_unique_params'))
     {
         my $rs = $obj_rs->inactive_for_unique_params;
-        $rs->search_related('prf_owner')->search_related('prf_preferences', 
-           { 
-               "prf_preferences.name" => $prefname, 
-               "prf_preferences.prf_owner_type_id" => $field->prf_owner_type_id, 
+        $schema->resultset('PrfOwner')->search({
+            "prf_preferences.prf_owner_id"      => {
+                -in => [ $rs->get_column($self->prf_id_column)->all ],
+            },
+            "prf_preferences.prf_owner_type_id" => $self->prf_owner_type_id
+        })
+        ->search_related('prf_preferences',
+           {
+               "prf_preferences.name" => $prefname,
+               "prf_preferences.prf_owner_type_id" => $field->prf_owner_type_id,
            }
         )->search_related('unique_value')->delete;
     }

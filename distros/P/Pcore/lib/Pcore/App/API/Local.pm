@@ -31,7 +31,7 @@ sub init ( $self ) {
     my $roles = do {
         no strict qw[refs];
 
-        ${ ref( $self->{app} ) . '::APP_API_ROLES' };
+        ${ ref( $self->{app} ) . '::API_ROLES' };
     };
 
     # add api roles

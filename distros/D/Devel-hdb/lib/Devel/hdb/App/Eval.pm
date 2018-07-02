@@ -9,6 +9,8 @@ use base 'Devel::hdb::App::Base';
 
 use Devel::hdb::Utils;
 
+our $VERSION = '0.24';
+
 __PACKAGE__->add_route('post', '/eval', \&do_eval);
 __PACKAGE__->add_route('get', qr{/getvar/(\d+)/([^/]+)}, \&do_getvar);
 __PACKAGE__->add_route('get', qr{/getvar/(\d+)}, \&list_vars_at_level);
@@ -165,7 +167,7 @@ be decoded with Data::Transform::ExplicitMetadata.
 
 =head1 SEE ALSO
 
-Devel::hdb, Padwalker
+L<Devel::hdb>, L<Padwalker>
 
 =head1 AUTHOR
 
@@ -173,5 +175,5 @@ Anthony Brummett <brummett@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2014, Anthony Brummett.  This module is free software. It may
+Copyright 2018, Anthony Brummett.  This module is free software. It may
 be used, redistributed and/or modified under the same terms as Perl itself.

@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -49,7 +47,7 @@ subtest "insert_one" => sub {
     $res = $coll->insert_one( { _id => "foo", value => "bar" } );
     cmp_deeply(
         [ $coll->find( {} )->all ],
-        bag( { _id => "foo", value => "bar" } ),
+        bag( { _id => str("foo"), value => str("bar") } ),
         "insert with _id: doc inserted"
     );
     ok( $res->acknowledged, "result acknowledged" );
@@ -64,7 +62,7 @@ subtest "insert_one" => sub {
     my @got = $coll->find( {} )->all;
     cmp_deeply(
         \@got,
-        bag( { _id => ignore(), value => "bar" } ),
+        bag( { _id => ignore(), value => str("bar") } ),
         "insert without _id: hash doc inserted"
     );
     ok( $res->acknowledged, "result acknowledged" );
@@ -76,7 +74,7 @@ subtest "insert_one" => sub {
     $res = $coll->insert_one( [ value => "bar" ] );
     cmp_deeply(
         [ $coll->find( {} )->all ],
-        bag( { _id => ignore(), value => "bar" } ),
+        bag( { _id => ignore(), value => str("bar") } ),
         "insert without _id: array doc inserted"
     );
 
@@ -85,7 +83,7 @@ subtest "insert_one" => sub {
     $res = $coll->insert_one( Tie::IxHash->new( value => "bar" ) );
     cmp_deeply(
         [ $coll->find( {} )->all ],
-        bag( { _id => ignore(), value => "bar" } ),
+        bag( { _id => ignore(), value => str("bar") } ),
         "insert without _id: Tie::IxHash doc inserted"
     );
 
@@ -101,20 +99,20 @@ subtest "insert_many" => sub {
     my @got = $coll->find( {} )->all;
     cmp_deeply(
         \@got,
-        bag( { _id => "foo", value => "bar" }, { _id => ignore(), value => "baz" }, ),
+        bag( { _id => str("foo"), value => str("bar") }, { _id => ignore(), value => str("baz") }, ),
         "insert many: docs inserted"
     );
     ok( $res->acknowledged, "result acknowledged" );
     isa_ok( $res, "MongoDB::InsertManyResult", "result" );
     cmp_deeply(
         $res->inserted,
-        [ { index => 0, _id => 'foo' }, { index => 1, _id => obj_isa("MongoDB::OID") } ],
+        [ { index => num(0), _id => str("foo") }, { index => num(1), _id => obj_isa("BSON::OID") } ],
         "inserted contains correct hashrefs"
     );
     cmp_deeply(
         $res->inserted_ids,
         {
-            0 => "foo",
+            0 => str("foo"),
             1 => $res->inserted->[1]{_id},
         },
         "inserted_ids contains correct keys/values"
@@ -151,15 +149,15 @@ subtest "insert_many" => sub {
 subtest "delete_one" => sub {
     $coll->drop;
     $coll->insert_many( [ map { { _id => $_, x => "foo" } } 1 .. 2 ] );
-    is( $coll->count( { x => 'foo' } ), 2, "inserted two docs" );
+    is( $coll->count_documents( { x => 'foo' } ), 2, "inserted two docs" );
     $res = $coll->delete_one( { x => 'foo' } );
     ok( $res->acknowledged, "result acknowledged" );
     isa_ok( $res, "MongoDB::DeleteResult", "result" );
     is( $res->deleted_count, 1, "delete one document" );
-    is( $coll->count( { x => 'foo' } ), 1, "one document left" );
+    is( $coll->count_documents( { x => 'foo' } ), 1, "one document left" );
     $res = $coll->delete_one( { x => 'bar' } );
     is( $res->deleted_count, 0, "delete non existent document does nothing" );
-    is( $coll->count( { x => 'foo' } ), 1, "one document left" );
+    is( $coll->count_documents( { x => 'foo' } ), 1, "one document left" );
 
     if ($supports_collation) {
         my $doc;
@@ -167,7 +165,7 @@ subtest "delete_one" => sub {
         $res =
           $coll->delete_one( { x => 'FOO' }, { collation => $case_insensitive_collation } );
         is( $res->deleted_count, 1, "delete_one with collation" );
-        is( $coll->count( { x => 'foo' } ), 0, "no documents left" );
+        is( $coll->count_documents( { x => 'foo' } ), 0, "no documents left" );
 
         my $coll2 = $coll->clone( write_concern => { w => 0 } );
         like(
@@ -200,21 +198,21 @@ subtest "delete_one" => sub {
 subtest "delete_many" => sub {
     $coll->drop;
     $coll->insert_many( [ map { { _id => $_, x => "foo" } } 1 .. 5 ] );
-    is( $coll->count( {} ), 5, "inserted five docs" );
+    is( $coll->count_documents( {} ), 5, "inserted five docs" );
     $res = $coll->delete_many( { _id => { '$gt', 3 } } );
     ok( $res->acknowledged, "result acknowledged" );
     isa_ok( $res, "MongoDB::DeleteResult", "result" );
     is( $res->deleted_count, 2, "deleted two documents" );
-    is( $coll->count( {} ), 3, "three documents left" );
+    is( $coll->count_documents( {} ), 3, "three documents left" );
     $res = $coll->delete_many( { y => 'bar' } );
     is( $res->deleted_count, 0, "delete non existent document does nothing" );
-    is( $coll->count( {} ), 3, "three documents left" );
+    is( $coll->count_documents( {} ), 3, "three documents left" );
 
     if ($supports_collation) {
         $res =
           $coll->delete_many( { x => 'FOO' }, { collation => $case_insensitive_collation } );
         is( $res->deleted_count, 3, "delete_many with collation" );
-        is( $coll->count( {} ), 0, "no documents left" );
+        is( $coll->count_documents( {} ), 0, "no documents left" );
     }
     else {
         like(
@@ -243,7 +241,7 @@ subtest "replace_one" => sub {
     ok( $res->acknowledged, "result acknowledged" );
     isa_ok( $res, "MongoDB::UpdateResult", "result" );
     is( $res->matched_count, 0, "matched count is zero" );
-    is( $coll->count( {} ), 0, "collection still empty" );
+    is( $coll->count_documents( {} ), 0, "collection still empty" );
 
     # replace missing with upsert
     $res = $coll->replace_one( { x => 1 }, { x => 2 }, { upsert => 1 } );
@@ -257,15 +255,15 @@ subtest "replace_one" => sub {
     ok( $server_version >= 2.6.0 ? $res->has_modified_count : !$res->has_modified_count,
         "has_modified_count correct" );
 
-    isa_ok( $res->upserted_id, "MongoDB::OID", "got upserted id" );
-    is( $coll->count( {} ), 1, "one doc in database" );
+    isa_ok( $res->upserted_id, "BSON::OID", "got upserted id" );
+    is( $coll->count_documents( {} ), 1, "one doc in database" );
     my $got = $coll->find_one( { _id => $res->upserted_id } );
     is( $got->{x}, 2, "document contents correct" );
 
     # replace existing with upsert -- add duplicate to confirm only one
     $coll->insert_one( { x => 2 } );
     $res = $coll->replace_one( { x => 2 }, { x => 3 }, { upsert => 1 } );
-    is( $coll->count( {} ), 2, "replace existing with upsert" );
+    is( $coll->count_documents( {} ), 2, "replace existing with upsert" );
     is( $res->matched_count, 1, "matched_count 1" );
     is(
         $res->modified_count,
@@ -274,13 +272,13 @@ subtest "replace_one" => sub {
     );
     cmp_deeply(
         [ $coll->find( {} )->all ],
-        bag( { _id => ignore(), x => 2 }, { _id => ignore, x => 3 } ),
+        bag( { _id => ignore(), x => num(2) }, { _id => ignore, x => num(3) } ),
         "collection docs correct"
     );
 
     # replace existing without upsert
     $res = $coll->replace_one( { x => 3 }, { x => 4 } );
-    is( $coll->count( {} ), 2, "replace existing with upsert" );
+    is( $coll->count_documents( {} ), 2, "replace existing with upsert" );
     is( $res->matched_count, 1, "matched_count 1" );
     is(
         $res->modified_count,
@@ -289,7 +287,7 @@ subtest "replace_one" => sub {
     );
     cmp_deeply(
         [ $coll->find( {} )->all ],
-        bag( { _id => ignore(), x => 2 }, { _id => ignore, x => 4 } ),
+        bag( { _id => ignore(), x => num(2) }, { _id => ignore, x => num(4) } ),
         "collection docs correct"
     );
 
@@ -316,7 +314,7 @@ subtest "replace_one" => sub {
             { x         => 'bar' },
             { collation => $case_insensitive_collation }
         );
-        is( $coll->count( { x => 'bar' } ), 1, "replace_one with collation" );
+        is( $coll->count_documents( { x => 'bar' } ), 1, "replace_one with collation" );
     }
     else {
         like(
@@ -341,7 +339,7 @@ subtest "update_one" => sub {
     ok( $res->acknowledged, "result acknowledged" );
     isa_ok( $res, "MongoDB::UpdateResult", "result" );
     is( $res->matched_count, 0, "matched count is zero" );
-    is( $coll->count( {} ), 0, "collection still empty" );
+    is( $coll->count_documents( {} ), 0, "collection still empty" );
 
     # update missing with upsert
     $res = $coll->update_one( { x => 1 }, { '$set' => { x => 2 } }, { upsert => 1 } );
@@ -351,15 +349,15 @@ subtest "update_one" => sub {
         ( $server_version >= v2.6.0 ? 0 : undef ),
         "modified count correct based on server version"
     );
-    isa_ok( $res->upserted_id, "MongoDB::OID", "got upserted id" );
-    is( $coll->count( {} ), 1, "one doc in database" );
+    isa_ok( $res->upserted_id, "BSON::OID", "got upserted id" );
+    is( $coll->count_documents( {} ), 1, "one doc in database" );
     my $got = $coll->find_one( { _id => $res->upserted_id } );
     is( $got->{x}, 2, "document contents correct" );
 
     # update existing with upsert -- add duplicate to confirm only one
     $coll->insert_one( { x => 2 } );
     $res = $coll->update_one( { x => 2 }, { '$set' => { x => 3 } }, { upsert => 1 } );
-    is( $coll->count( {} ), 2, "update existing with upsert" );
+    is( $coll->count_documents( {} ), 2, "update existing with upsert" );
     is( $res->matched_count, 1, "matched_count 1" );
     is(
         $res->modified_count,
@@ -368,13 +366,13 @@ subtest "update_one" => sub {
     );
     cmp_deeply(
         [ $coll->find( {} )->all ],
-        bag( { _id => ignore(), x => 2 }, { _id => ignore, x => 3 } ),
+        bag( { _id => ignore(), x => num(2) }, { _id => ignore, x => num(3) } ),
         "collection docs correct"
     );
 
     # update existing without upsert
     $res = $coll->update_one( { x => 3 }, { '$set' => { x => 4 } } );
-    is( $coll->count( {} ), 2, "update existing with upsert" );
+    is( $coll->count_documents( {} ), 2, "update existing with upsert" );
     is( $res->matched_count, 1, "matched_count 1" );
     is(
         $res->modified_count,
@@ -383,7 +381,7 @@ subtest "update_one" => sub {
     );
     cmp_deeply(
         [ $coll->find( {} )->all ],
-        bag( { _id => ignore(), x => 2 }, { _id => ignore, x => 4 } ),
+        bag( { _id => ignore(), x => num(2) }, { _id => ignore, x => num(4) } ),
         "collection docs correct"
     );
 
@@ -402,7 +400,7 @@ subtest "update_one" => sub {
             { '$set'    => { x => 'bar' } },
             { collation => $case_insensitive_collation }
         );
-        is( $coll->count( { x => 'bar' } ), 1, "update_one with collation" );
+        is( $coll->count_documents( { x => 'bar' } ), 1, "update_one with collation" );
 
         my $coll2 = $coll->clone( write_concern => { w => 0 } );
         like(
@@ -440,7 +438,7 @@ subtest "update_many" => sub {
     ok( $res->acknowledged, "result acknowledged" );
     isa_ok( $res, "MongoDB::UpdateResult", "result" );
     is( $res->matched_count, 0, "matched count is zero" );
-    is( $coll->count( {} ), 0, "collection still empty" );
+    is( $coll->count_documents( {} ), 0, "collection still empty" );
 
     # update missing with upsert
     $res = $coll->update_many( { x => 1 }, { '$set' => { x => 2 } }, { upsert => 1 } );
@@ -450,19 +448,19 @@ subtest "update_many" => sub {
         ( $server_version >= v2.6.0 ? 0 : undef ),
         "modified count correct based on server version"
     );
-    isa_ok( $res->upserted_id, "MongoDB::OID", "got upserted id" );
-    is( $coll->count( {} ), 1, "one doc in database" );
+    isa_ok( $res->upserted_id, "BSON::OID", "got upserted id" );
+    is( $coll->count_documents( {} ), 1, "one doc in database" );
     my $got = $coll->find_one( { _id => $res->upserted_id } );
     cmp_deeply(
         [ $coll->find( {} )->all ],
-        bag( { _id => ignore(), x => 2 } ),
+        bag( { _id => ignore(), x => num(2) } ),
         "collection docs correct"
     );
 
     # update existing with upsert -- add duplicate to confirm multiple
     $coll->insert_one( { x => 2 } );
     $res = $coll->update_many( { x => 2 }, { '$set' => { x => 3 } }, { upsert => 1 } );
-    is( $coll->count( {} ), 2, "update existing with upsert" );
+    is( $coll->count_documents( {} ), 2, "update existing with upsert" );
     is( $res->matched_count, 2, "matched_count 2" );
     is(
         $res->modified_count,
@@ -471,13 +469,13 @@ subtest "update_many" => sub {
     );
     cmp_deeply(
         [ $coll->find( {} )->all ],
-        bag( { _id => ignore(), x => 3 }, { _id => ignore, x => 3 } ),
+        bag( { _id => ignore(), x => num(3) }, { _id => ignore, x => num(3) } ),
         "collection docs correct"
     );
 
     # update existing without upsert
     $res = $coll->update_many( { x => 3 }, { '$set' => { x => 4 } } );
-    is( $coll->count( {} ), 2, "update existing with upsert" );
+    is( $coll->count_documents( {} ), 2, "update existing with upsert" );
     is( $res->matched_count, 2, "matched_count 1" );
     is(
         $res->modified_count,
@@ -486,7 +484,7 @@ subtest "update_many" => sub {
     );
     cmp_deeply(
         [ $coll->find( {} )->all ],
-        bag( { _id => ignore(), x => 4 }, { _id => ignore, x => 4 } ),
+        bag( { _id => ignore(), x => num(4) }, { _id => ignore, x => num(4) } ),
         "collection docs correct"
     );
 
@@ -506,7 +504,7 @@ subtest "update_many" => sub {
             { '$set'    => { x => 'bar' } },
             { collation => $case_insensitive_collation }
         );
-        is( $coll->count( { x => 'bar' } ), 2, "update_many with collation" );
+        is( $coll->count_documents( { x => 'bar' } ), 2, "update_many with collation" );
     }
     else {
         like(
@@ -548,7 +546,7 @@ subtest 'bulk_write' => sub {
     my @got = $coll->find( {} )->all;
     cmp_deeply(
         \@got,
-        bag( map { { _id => ignore, x => $_ } } 3, 5, 7, 8, 9 ),
+        bag( map { { _id => ignore, x => num($_) } } 3, 5, 7, 8, 9 ),
         "collection docs correct",
     ) or diag explain \@got;
 
@@ -616,7 +614,7 @@ subtest 'bulk_write' => sub {
     };
     if ($supports_collation) {
         is( $err, undef, "bulk_write w/ collation" );
-        is( $coll->count( { y => 1 } ), 0, "collection updated" );
+        is( $coll->count_documents( { y => 1 } ), 0, "collection updated" );
     }
     else {
         like(
@@ -624,7 +622,7 @@ subtest 'bulk_write' => sub {
             qr/MongoDB host '.*:\d+' doesn't support collation/,
             "bulk_write w/ collation returns error if unsupported"
         );
-        is( $coll->count( { y => 1 } ), 5, "collection not updated" );
+        is( $coll->count_documents( { y => 1 } ), 5, "collection not updated" );
     }
 };
 
@@ -632,20 +630,20 @@ subtest "find_one_and_delete" => sub {
     $coll->drop;
     $coll->insert_one( { x => 1, y => 'a' } );
     $coll->insert_one( { x => 1, y => 'b' } );
-    is( $coll->count( {} ), 2, "inserted 2 docs" );
+    is( $coll->count_documents( {} ), 2, "inserted 2 docs" );
 
     my $doc;
 
     # find non-existent doc
     $doc = $coll->find_one_and_delete( { x => 2 } );
     is( $doc, undef, "find_one_and_delete on nonexistent doc returns undef" );
-    is( $coll->count( {} ), 2, "still 2 docs" );
+    is( $coll->count_documents( {} ), 2, "still 2 docs" );
 
     # find/remove existing doc (testing sort and projection, too)
     $doc = $coll->find_one_and_delete( { x => 1 },
         { sort => [ y => 1 ], projection => { y => 1 } } );
-    cmp_deeply( $doc, { _id => ignore(), y => 'a' }, "expected doc returned" );
-    is( $coll->count( {} ), 1, "only 1 doc left" );
+    cmp_deeply( $doc, { _id => ignore(), y => str("a") }, "expected doc returned" );
+    is( $coll->count_documents( {} ), 1, "only 1 doc left" );
 
     if ($supports_collation) {
         $doc = $coll->find_one_and_delete(
@@ -654,10 +652,10 @@ subtest "find_one_and_delete" => sub {
         );
         cmp_deeply(
             $doc,
-            { _id => ignore(), x => 1, y => 'b' },
+            { _id => ignore(), x => num(1), y => str("b") },
             "find_one_and_delete with collation"
         );
-        is( $coll->count( { y => 'b' } ), 0, "no documents left" );
+        is( $coll->count_documents( { y => 'b' } ), 0, "no documents left" );
     }
     else {
         like(
@@ -679,53 +677,53 @@ subtest "find_one_and_replace" => sub {
     $coll->drop;
     $coll->insert_one( { x => 1, y => 'a' } );
     $coll->insert_one( { x => 1, y => 'b' } );
-    is( $coll->count( {} ), 2, "inserted 2 docs" );
+    is( $coll->count_documents( {} ), 2, "inserted 2 docs" );
 
     my $doc;
 
     # find and replace non-existent doc, without upsert
     $doc = $coll->find_one_and_replace( { x => 2 }, { x => 3, y => 'c' } );
     is( $doc, undef, "find_one_and_replace on nonexistent doc returns undef" );
-    is( $coll->count( {} ), 2, "still 2 docs" );
-    is( $coll->count( { x => 3 } ), 0, "no docs matching replacment" );
+    is( $coll->count_documents( {} ), 2, "still 2 docs" );
+    is( $coll->count_documents( { x => 3 } ), 0, "no docs matching replacment" );
 
     # find and replace non-existent doc, with upsert
     $doc = $coll->find_one_and_replace( { x => 2 }, { x => 3, y => 'c' }, { upsert => 1 } );
     if ( $server_version >= v2.2.0 ) {
         is( $doc, undef, "find_one_and_replace upsert on nonexistent doc returns undef" );
     }
-    is( $coll->count( {} ), 3, "doc has been upserted" );
-    is( $coll->count( { x => 3 } ), 1, "1 doc matching replacment" );
+    is( $coll->count_documents( {} ), 3, "doc has been upserted" );
+    is( $coll->count_documents( { x => 3 } ), 1, "1 doc matching replacment" );
 
     # find and replace existing doc, with upsert
     $doc = $coll->find_one_and_replace( { x => 3 }, { x => 4, y => 'c' }, { upsert => 1 });
     cmp_deeply(
         $doc,
-        { _id => ignore(), x => 3, y => 'c' },
+        { _id => ignore(), x => num(3), y => str("c") },
         "find_one_and_replace on existing doc returned old doc",
     );
-    is( $coll->count( {} ), 3, "no new doc added" );
-    is( $coll->count( { x => 4 } ), 1, "1 doc matching replacment" );
+    is( $coll->count_documents( {} ), 3, "no new doc added" );
+    is( $coll->count_documents( { x => 4 } ), 1, "1 doc matching replacment" );
 
     # find and replace existing doc, with after doc
     $doc = $coll->find_one_and_replace( { x => 4 }, { x => 5, y => 'c' }, { returnDocument => 'after' });
     cmp_deeply(
         $doc,
-        { _id => ignore(), x => 5, y => 'c' },
+        { _id => ignore(), x => num(5), y => str("c") },
         "find_one_and_replace on existing doc returned new doc",
     );
-    is( $coll->count( {} ), 3, "no new doc added" );
-    is( $coll->count( { x => 5 } ), 1, "1 doc matching replacment" );
+    is( $coll->count_documents( {} ), 3, "no new doc added" );
+    is( $coll->count_documents( { x => 5 } ), 1, "1 doc matching replacment" );
 
     # test project and sort
     $doc = $coll->find_one_and_replace( { x => 1 }, { x => 2, y => 'z' }, { sort => [ y => -1 ], projection => { y => 1 } } );
     cmp_deeply(
         $doc,
-        { _id => ignore(), y => 'b' },
+        { _id => ignore(), y => str("b") },
         "find_one_and_replace on existing doc returned new doc",
     );
-    is( $coll->count( { x => 2 } ), 1, "1 doc matching replacment" );
-    is( $coll->count( { x => 1, y => 'a' } ), 1, "correct doc untouched" );
+    is( $coll->count_documents( { x => 2 } ), 1, "1 doc matching replacment" );
+    is( $coll->count_documents( { x => 1, y => 'a' } ), 1, "correct doc untouched" );
 
     # test duplicate key error
     $coll->drop;
@@ -748,10 +746,10 @@ subtest "find_one_and_replace" => sub {
         );
         cmp_deeply(
             $doc,
-            { _id => ignore(), y => 'b' },
+            { _id => ignore(), y => str("b") },
             "find_one_and_replace with collation"
         );
-        is( $coll->count( { y => 'c' } ), 1, "doc matching replacement" );
+        is( $coll->count_documents( { y => 'c' } ), 1, "doc matching replacement" );
     }
     else {
         like(
@@ -772,43 +770,43 @@ subtest "find_one_and_update" => sub {
     $coll->drop;
     $coll->insert_one( { x => 1, y => 'a' } );
     $coll->insert_one( { x => 1, y => 'b' } );
-    is( $coll->count( {} ), 2, "inserted 2 docs" );
+    is( $coll->count_documents( {} ), 2, "inserted 2 docs" );
 
     my $doc;
 
     # find and update non-existent doc, without upsert
     $doc = $coll->find_one_and_update( { x => 2 }, { '$inc' => { x => 1 } } );
     is( $doc, undef, "find_one_and_update on nonexistent doc returns undef" );
-    is( $coll->count( {} ), 2, "still 2 docs" );
-    is( $coll->count( { x => 3 } ), 0, "no docs matching update" );
+    is( $coll->count_documents( {} ), 2, "still 2 docs" );
+    is( $coll->count_documents( { x => 3 } ), 0, "no docs matching update" );
 
     # find and update non-existent doc, with upsert
     $doc = $coll->find_one_and_update( { x => 2 }, { '$inc' => { x => 1 }, '$set' => { y => 'c' } }, { upsert => 1 } );
     if ( $server_version >= v2.2.0 ) {
         is( $doc, undef, "find_one_and_update upsert on nonexistent doc returns undef" );
     }
-    is( $coll->count( {} ), 3, "doc has been upserted" );
-    is( $coll->count( { x => 3 } ), 1, "1 doc matching upsert" );
+    is( $coll->count_documents( {} ), 3, "doc has been upserted" );
+    is( $coll->count_documents( { x => 3 } ), 1, "1 doc matching upsert" );
 
     # find and update existing doc, with upsert
     $doc = $coll->find_one_and_update( { x => 3 }, { '$inc' => { x => 1 } }, { upsert => 1 });
     cmp_deeply(
         $doc,
-        { _id => ignore(), x => 3, y => 'c' },
+        { _id => ignore(), x => num(3), y => str("c") },
         "find_one_and_update on existing doc returned old doc",
     );
-    is( $coll->count( {} ), 3, "no new doc added" );
-    is( $coll->count( { x => 4 } ), 1, "1 doc matching replacment" );
+    is( $coll->count_documents( {} ), 3, "no new doc added" );
+    is( $coll->count_documents( { x => 4 } ), 1, "1 doc matching replacment" );
 
     # find and update existing doc, with after doc
     $doc = $coll->find_one_and_update( { x => 4 }, { '$inc' => { x => 1 } }, { returnDocument => 'after' });
     cmp_deeply(
         $doc,
-        { _id => ignore(), x => 5, y => 'c' },
+        { _id => ignore(), x => num(5), y => str("c") },
         "find_one_and_update on existing doc returned new doc",
     );
-    is( $coll->count( {} ), 3, "no new doc added" );
-    is( $coll->count( { x => 5 } ), 1, "1 doc matching replacment" );
+    is( $coll->count_documents( {} ), 3, "no new doc added" );
+    is( $coll->count_documents( { x => 5 } ), 1, "1 doc matching replacment" );
 
     # test project and sort
     $doc = $coll->find_one_and_update(
@@ -818,11 +816,11 @@ subtest "find_one_and_update" => sub {
     );
     cmp_deeply(
         $doc,
-        { _id => ignore(), y => 'b' },
+        { _id => ignore(), y => str("b") },
         "find_one_and_update on existing doc returned new doc",
     );
-    is( $coll->count( { x => 2 } ), 1, "1 doc matching replacment" );
-    is( $coll->count( { x => 1, y => 'a' } ), 1, "correct doc untouched" );
+    is( $coll->count_documents( { x => 2 } ), 1, "1 doc matching replacment" );
+    is( $coll->count_documents( { x => 1, y => 'a' } ), 1, "correct doc untouched" );
 
     # test duplicate key error
     $coll->drop;
@@ -846,10 +844,10 @@ subtest "find_one_and_update" => sub {
         );
         cmp_deeply(
             $doc,
-            { _id => ignore(), y => 'b' },
+            { _id => ignore(), y => str("b") },
             "find_one_and_update with collation"
         );
-        is( $coll->count( { y => 'c' } ), 1, "doc matching replacement" );
+        is( $coll->count_documents( { y => 'c' } ), 1, "doc matching replacement" );
     }
     else {
         like(

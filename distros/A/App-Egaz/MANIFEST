@@ -7,6 +7,8 @@ cpanfile
 doc/Karyotype.md
 doc/Scer-self.md
 doc/Scer.md
+doc/fig.multi.png
+doc/fig.multi.vsd
 lib/App/Egaz.pm
 lib/App/Egaz/Command/blastlink.pm
 lib/App/Egaz/Command/blastmatch.pm

@@ -5,7 +5,7 @@ use warnings;
 package Data::Fake;
 # ABSTRACT: Declaratively generate fake structured data for testing
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Import::Into;
 
@@ -34,7 +34,7 @@ Data::Fake - Declaratively generate fake structured data for testing
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -44,7 +44,7 @@ version 0.003
         {
             name      => fake_name(),
             battlecry => fake_sentences(1),
-            birthday  => fake_past_date("%Y-%m-%d"),
+            birthday  => fake_past_datetime("%Y-%m-%d"),
             friends   => fake_array( fake_int(2,4), fake_name() ),
             gender    => fake_pick(qw/Male Female Other/),
         }
@@ -89,7 +89,7 @@ etc. factory functions:
         {
             name      => fake_name(),
             battlecry => fake_sentences(1),
-            birthday  => fake_past_date("%Y-%m-%d"),
+            birthday  => fake_past_datetime("%Y-%m-%d"),
             friends   => fake_array( fake_int(2,4), fake_name() ),
             gender    => fake_pick(qw/Male Female Other/),
         }
@@ -285,17 +285,17 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords David Golden Ricardo Signes
+=for stopwords Ricardo Signes Stuart Skelton
 
 =over 4
 
 =item *
 
-David Golden <xdg@xdg.me>
+Ricardo Signes <rjbs@users.noreply.github.com>
 
 =item *
 
-Ricardo Signes <rjbs@users.noreply.github.com>
+Stuart Skelton <stuarts@broadbean.com>
 
 =back
 

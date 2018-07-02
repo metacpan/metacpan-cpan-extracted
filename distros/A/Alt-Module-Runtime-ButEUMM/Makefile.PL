@@ -4,30 +4,31 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "alternative distribution of Module::Runtime, using ExtUtils::MakeMaker",
-  "author"         => ["Andrew Main (Zefram) <zefram\@fysh.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::Simple version 0.022, CPAN::Meta::Converter version 2.140640",
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Alt-Module-Runtime-ButEUMM",
-  "no_index"       => {
-                        directory => ["eg", "examples", "inc", "t", "xt"],
-                        package   => ["Module::Runtime"],
-                      },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => { requires => { perl => 5.006 } },
-                        test => { requires => { "Test::More" => 0.47 } },
-                      },
-  "provides"       => {
-                        "Alt::Module::Runtime::ButEUMM" => { file => "lib/Alt/Module/Runtime/ButEUMM.pm", version => 0.001 },
-                      },
-  "release_status" => "stable",
-  "version"        => 0.001,
+  "abstract"         => "alternative distribution of Module::Runtime, using ExtUtils::MakeMaker",
+  "author"           => ["Andrew Main (Zefram) <zefram\@fysh.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::Simple version 0.024, CPAN::Meta::Converter version 2.150010",
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "Alt-Module-Runtime-ButEUMM",
+  "no_index"         => {
+                          directory => ["eg", "examples", "inc", "t", "xt"],
+                          package   => ["Module::Runtime"],
+                        },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => { requires => { perl => 5.006 } },
+                          test => { requires => { "Test::More" => 0.47 } },
+                        },
+  "provides"         => {
+                          "Alt::Module::Runtime::ButEUMM" => { file => "lib/Alt/Module/Runtime/ButEUMM.pm", version => 0.002 },
+                        },
+  "release_status"   => "stable",
+  "version"          => 0.002,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

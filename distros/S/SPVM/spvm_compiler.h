@@ -69,16 +69,22 @@ struct SPVM_compiler {
   SPVM_LIST* op_types;
 
   // OP our symtable
-  SPVM_HASH* op_our_symtable;
+  SPVM_LIST* op_package_vars;
 
-  // Package Variable length
-  int32_t package_var_length;
-  
+  // OP our symtable
+  SPVM_HASH* op_package_var_symtable;
+
   // Subroutine ops
   SPVM_LIST* op_subs;
   
   // Subroutine absolute name symbol table
   SPVM_HASH* op_sub_symtable;
+
+  // Field ops
+  SPVM_LIST* op_fields;
+  
+  // Field absolute name symbol table
+  SPVM_HASH* op_field_symtable;
 
   // Method signature
   SPVM_LIST* method_signatures;
@@ -95,9 +101,6 @@ struct SPVM_compiler {
   // Syntax error count
   int32_t error_count;
   
-  // Error is fatal
-  _Bool fatal_error;
-  
   // Temporary buffer
   char tmp_buffer[UINT16_MAX];
   
@@ -110,7 +113,7 @@ struct SPVM_compiler {
 };
 
 SPVM_COMPILER* SPVM_COMPILER_new();
-int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler);
+void SPVM_COMPILER_compile(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_free(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler);
 

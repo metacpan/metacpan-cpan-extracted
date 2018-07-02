@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep;
-$Lab::Moose::Sweep::VERSION = '3.652';
+$Lab::Moose::Sweep::VERSION = '3.653';
 #ABSTRACT: Base class for high level sweeps
 
 # Step/List and Continuous sweep are implemented as subclasses
@@ -172,7 +172,8 @@ sub start {
         # might allow point_dim = 2 in the future.
         point_dim => { isa => enum( [qw/1 0/] ), default => 0 },
         folder      => { isa => 'Str|Lab::Moose::DataFolder', optional => 1 },
-        date_prefix => { isa => 'Bool',                       default  => 0 },
+        date_prefix => { isa => 'Bool',                       default  => 1 },
+        time_prefix => { isa => 'Bool',                       default  => 1 },
         meta_data   => { isa => 'HashRef',                    optional => 1 },
     );
 
@@ -183,6 +184,7 @@ sub start {
     my $point_dim       = $args{point_dim};
     my $folder          = $args{folder};
     my $date_prefix     = $args{date_prefix};
+    my $time_prefix     = $args{time_prefix};
     my $meta_data       = $args{meta_data};
 
     $self->_ensure_no_slave();
@@ -261,12 +263,13 @@ sub start {
         else {
             $datafolder = Lab::Moose::datafolder(
                 path        => $folder,
-                date_prefix => $date_prefix
+                date_prefix => $date_prefix,
+                time_prefix => $time_prefix,
             );
         }
     }
     else {
-        $datafolder = Lab::Moose::datafolder( date_prefix => $date_prefix );
+        $datafolder = Lab::Moose::datafolder( date_prefix => $date_prefix, time_prefix => $time_prefix );
     }
 
     $self->_foldername( $datafolder->path() );
@@ -480,7 +483,7 @@ Lab::Moose::Sweep - Base class for high level sweeps
 
 =head1 VERSION
 
-version 3.652
+version 3.653
 
 =head1 DESCRIPTION
 
@@ -490,7 +493,8 @@ The Sweep interface is documented in L<Lab::Measurement::Tutorial>.
 
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2017-2018  Simon Reinhardt
+  Copyright 2017       Simon Reinhardt
+            2018       Andreas K. HÃ¼ttel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

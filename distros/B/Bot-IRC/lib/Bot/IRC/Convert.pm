@@ -7,7 +7,7 @@ use warnings;
 
 use Math::Units qw(convert);
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -45,7 +45,7 @@ Bot::IRC::Convert - Bot::IRC convert units of amounts
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 SYNOPSIS
 

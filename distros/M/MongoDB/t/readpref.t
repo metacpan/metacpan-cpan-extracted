@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2013 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,8 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-
 
 use strict;
 use warnings;
@@ -166,7 +163,7 @@ subtest "direct connection" => sub {
         my $conn2 = build_client( host => $addr );
         my $coll2 = $conn2->get_database( $testdb->name )->get_collection( $coll->name );
         my $count;
-        is( exception { $count = $coll2->count }, undef, "count on $addr ($type) succeeds" )
+        is( exception { $count = $coll2->count_documents({}) }, undef, "count_documents on $addr ($type) succeeds" )
           or diag explain $s;
     }
 };

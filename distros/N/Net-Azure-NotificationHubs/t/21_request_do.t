@@ -7,8 +7,8 @@ use URI;
 use HTTP::Tiny;
 
 subtest 'do' => sub {
-    my $uri = URI->new('http://search.cpan.org/search');
-    $uri->query_form(query => 'Azure', mode => 'all'); 
+    my $uri = URI->new('https://metacpan.org/search');
+    $uri->query_form(q => 'Azure', size => 100); 
     my $req = Net::Azure::NotificationHubs::Request->new(GET => $uri);
     $req->agent(HTTP::Tiny->new);
     isa_ok $req, 'Net::Azure::NotificationHubs::Request';
@@ -19,7 +19,7 @@ subtest 'do' => sub {
 };
 
 subtest 'do - 404' => sub {
-    my $uri = URI->new('http://search.cpan.org/search');
+    my $uri = URI->new('https://metacpan.org/notfound');
     my $req = Net::Azure::NotificationHubs::Request->new(GET => $uri);
     $req->agent(HTTP::Tiny->new);
     isa_ok $req, 'Net::Azure::NotificationHubs::Request';

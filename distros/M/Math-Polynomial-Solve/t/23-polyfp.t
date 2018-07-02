@@ -2,7 +2,7 @@ use 5.010001;
 use Test::More tests => 9;
 
 use Math::Complex;
-use Math::Polynomial::Solve qw(:numeric ascending_order);
+use Math::Polynomial::Solve qw(:numeric);
 use Math::Utils qw(:polynomial :compare);
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ my @case = (
 	[0.00021, -0.00737, 0.0969, -0.586, 1.64, -2.1, 1],
 );
 
-ascending_order(1);
+coefficients order => 'ascending';
 
 for (@case)
 {

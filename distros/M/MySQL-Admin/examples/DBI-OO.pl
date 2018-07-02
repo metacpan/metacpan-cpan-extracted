@@ -10,14 +10,16 @@ $m_oCgi->init();
 *m_hrSettings = \$MySQL::Admin::m_hrSettings;
 print $m_oCgi->header;
 my ( $dbi, $m_dbh ) = DBI::Library->new(
-    {   name     => $m_hrSettings->{database}{name},
+    {
+        name     => $m_hrSettings->{database}{name},
         host     => $m_hrSettings->{database}{host},
         user     => $m_hrSettings->{database}{user},
         password => $m_hrSettings->{database}{password},
     }
 );
 $dbi->addexecute(
-    {   title       => 'select',
+    {
+        title       => 'select',
         description => 'show query',
         sql         => "select *from querys where `title` = ?",
         return      => "fetch_hashref",
@@ -28,7 +30,6 @@ local $/ = "<br/>\n";
 
 foreach my $key ( keys %{$showQuery} ) {
     print "$key: ", $showQuery->{$key}, $/;
-}
+} ## end foreach my $key ( keys %{$showQuery...})
 use showsource;
 &showSource($0);
-

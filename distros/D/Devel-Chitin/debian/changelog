@@ -1,3 +1,60 @@
+libdevel-chitin-perl (0.16-1) unstable; urgency=low
+
+    * Support delete() on a hash-value slice, new in Perl 5.28
+
+ -- Anthony Brummett <brummett@cpan.org>   Sat, 23 Jun 2018  8:01:24 -0500
+
+libdevel-chitin-perl (0.15-1) unstable; urgency=low
+
+    * Handle changes to the translation table for tr/// introduced in 5.27.8
+
+ -- Anthony Brummett <brummett@cpan.org>   Tue, 6 Feb 2018  16:59:24 -0500
+
+libdevel-chitin-perl (0.14-1) unstable; urgency=low
+
+    * Revert given/whereso/whereis
+
+ -- Anthony Brummett <brummett@cpan.org>   Wed, 31 Jan 2018  13:07:10 -0500
+
+libdevel-chitin-perl (0.13-1) unstable; urgency=low
+
+    * Support for the new given/whereso/whereis syntax in 5.27.7
+
+ -- Anthony Brummett <brummett@cpan.org>  Thu, 21 Dec 2017 16:22:54 -0500
+
+libdevel-chitin-perl (0.12-1) unstable; urgency=low
+
+    * Support for the new multiconcat OP in 5.27.6
+
+ -- Anthony Brummett <brummett@cpan.org>  Mon, 13 Nov 2017 15:19:03 -0500
+
+libdevel-chitin-perl (0.11-1) unstable; urgency=low
+
+    * Fix a bug involving anon subs given a name with Sub::Name
+    * documentation improvements
+    * clean up warnings during t/20-optree.t
+
+ -- Anthony Brummett <brummett@cpan.org>  Thu, 19 Oct 2017 16:06:33 -0500
+
+libdevel-chitin-perl (0.10-1) unstable; urgency=low
+
+    * Fixes tests in bleadperl - pp_split is now a PMOP
+
+ -- Anthony Brummett <brummett@cpan.org>  Mon, 24 Oct 2016 11:44:26 -0500
+
+libdevel-chitin-perl (0.09-1) unstable; urgency=low
+
+    * Documented decompiling support - besides getting entire optrees,
+        you can use the next_statement() and next_fragment() methods
+
+ -- Anthony Brummett <brummett@cpan.org>  Fri, 9 Sep 2016 11:59:03 -0500
+
+libdevel-chitin-perl (0.08-1) unstable; urgency=low
+
+    * Require at least Perl 5.8.9
+
+ -- Anthony Brummett <brummett@cpan.org>  Tue, 23 Aug 2016 16:09:57 -0500
+
 libdevel-chitin-perl (0.07-1) unstable; urgency=low
 
     * Fix for running tests on Windows (thanks, nanis)

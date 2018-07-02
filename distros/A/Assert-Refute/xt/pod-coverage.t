@@ -15,4 +15,12 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-all_pod_coverage_ok();
+# Sorry but...
+my @files = @ARGV ? @ARGV : all_modules("lib");
+die "No pod files!" unless grep { /::/ } @files;
+
+foreach ( @files ) {
+    pod_coverage_ok($_);
+};
+
+done_testing;

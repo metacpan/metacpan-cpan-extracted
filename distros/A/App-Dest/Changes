@@ -1,5 +1,11 @@
 Revision history for App::Dest
 
+1.18      2018-06-20 16:31:42-07:00 America/Los_Angeles
+        - Adding Perl versions to test; annual general update for 2018
+        - Support for: "dest clean SPECIFIC_ACTION"
+        - Sort results from: "dest list"
+        - Add "expand" and expand what "list" can do with a filter
+
 1.17      2017-09-08 11:23:52-07:00 America/Los_Angeles
         - Minor status display fix for actions with file suffixes
         - Tiny test warning cleanup

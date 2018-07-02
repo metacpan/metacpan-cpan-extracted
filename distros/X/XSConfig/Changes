@@ -1,4 +1,19 @@
 Revision history for XSConfig
+6.26    Sun, Jul 01, 2018  4:01:17 PM
+        -version bump because most CPAN Testers builders dont test alpha
+         versions
+
+6.25_01 Thu, Jun 28, 2018  3:04:14 PM
+        -revisited a bug and revised a test in Config.t
+        -more common keys for CPAN Testers
+        -add Makefile.PL debugging code for
+         http://www.cpantesters.org/cpan/report/67c67f60-75b5-11e8-8fb1-ef5133556b3f
+
+6.25    Fri Jun 15 13:58:31 EDT 2018
+        -silence C warnings on 64 bit builds
+        -revise freezing of ActivePerl's runtime Config code (dlltool key
+         difference between PP and XS on old AP 5.14)
+        -more common keys for cperl and CPAN Testers
 
 6.24    Thu, Jun 07, 2018  2:56:27 PM
         -more common keys for CPAN Testers

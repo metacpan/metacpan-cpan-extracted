@@ -15,7 +15,7 @@ BEGIN {
 SCANTEXT: {
 	SKIP: {
 		if($ENV{'OPENADDR_HOME'}) {
-			if($ENV{RELEASE_TESTING}) {
+			if($ENV{AUTHOR_TESTING}) {
 				diag('This will take some time and memory');
 
 				Geo::Coder::Free::DB::init(logger => new_ok('MyLogger'));

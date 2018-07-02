@@ -23,20 +23,28 @@ my $data;
     local @ARGV = qw(--list);
 
     $app->run;
+    1;
 };
 like ($data, qr(^\[.*GET.*/bar.*\n\[.*GET.*/foo.*\n$)s, "--list works");
 unlike $data, qr(noexist), "No mentions of parallel reality routes";
 note $data;
 
+# 1st app has its routes already locked
+# And we cannot reinitialise (yet)
+my $app2 = MVC::Neaf->new;
+$app2->add_route( quux => sub { +{} } );
+
+$data = '';
 {
     local *STDOUT;
     open (STDOUT, ">", \$data) or die "Failed to redirect STDOUT";
-    local @ARGV = qw(--view Dumper /foo);
+    local @ARGV = qw(--view Dumper /quux);
 
-    $app->run;
+    $app2->run;
+    1;
 };
 like ($data, qr/\n\n\$VAR1\s*=\s*\{.*\};?$/s, "force view worked");
 note $data;
 
-ok !$warn, "$warn warnings issued";
+ok !$warn, "$warn of 0 warnings issued";
 done_testing;

@@ -22,42 +22,43 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214157;
 
 my $formatters = [
                 {
                   'pattern' => '(1\\d)(\\d{3})(\\d{4})',
-                  'national_rule' => '0$1',
                   'leading_digits' => '1[1-467]',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3'
                 },
                 {
-                  'leading_digits' => '5',
-                  'national_rule' => '0$1',
+                  'pattern' => '(5\\d)(\\d{3})(\\d{4})',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(5\\d)(\\d{3})(\\d{4})'
+                  'national_rule' => '0$1',
+                  'leading_digits' => '5'
                 },
                 {
                   'pattern' => '(92\\d{2})(\\d{5})',
                   'format' => '$1 $2',
-                  'leading_digits' => '92',
-                  'national_rule' => '$1'
+                  'national_rule' => '$1',
+                  'leading_digits' => '92'
                 },
                 {
                   'pattern' => '(800)(\\d{3})(\\d{4})',
-                  'leading_digits' => '800',
                   'national_rule' => '$1',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '800'
                 },
                 {
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
+                  'pattern' => '(811)(\\d{3})(\\d{3,4})',
                   'leading_digits' => '811',
-                  'pattern' => '(811)(\\d{3})(\\d{3,4})'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
+                'toll_free' => '800\\d{7}',
                 'fixed_line' => '
           1(?:
             1\\d|
@@ -68,8 +69,8 @@ my $validators = {
             7[235-7]
           )\\d{6}
         ',
-                'toll_free' => '800\\d{7}',
                 'voip' => '',
+                'personal_number' => '',
                 'geographic' => '
           1(?:
             1\\d|
@@ -80,6 +81,7 @@ my $validators = {
             7[235-7]
           )\\d{6}
         ',
+                'pager' => '',
                 'specialrate' => '(92[05]\\d{6})',
                 'mobile' => '
           (?:
@@ -89,9 +91,7 @@ my $validators = {
             )|
             811\\d
           )\\d{6}
-        ',
-                'pager' => '',
-                'personal_number' => ''
+        '
               };
 my %areanames = (
   96611 => "Riyadh\/Kharj",

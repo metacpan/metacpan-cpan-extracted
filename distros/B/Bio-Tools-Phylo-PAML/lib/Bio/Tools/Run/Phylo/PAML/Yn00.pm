@@ -1,5 +1,5 @@
 package Bio::Tools::Run::Phylo::PAML::Yn00;
-$Bio::Tools::Run::Phylo::PAML::Yn00::VERSION = '1.7.2';
+$Bio::Tools::Run::Phylo::PAML::Yn00::VERSION = '1.7.3';
 use utf8;
 use strict;
 use warnings;
@@ -254,7 +254,7 @@ Bio::Tools::Run::Phylo::PAML::Yn00 - Wrapper aroud the PAML program yn00
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 

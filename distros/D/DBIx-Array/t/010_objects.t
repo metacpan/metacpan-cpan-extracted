@@ -9,7 +9,6 @@ BEGIN { use_ok( 'DBIx::Array' ); }
 {
   package #hide from CPAN indexer
     My::Package;
-  use base qw{Package::New};
   sub id {shift->{"ID"}};
   sub type {shift->{"TYPE"}};
   sub name {shift->{"NAME"}};

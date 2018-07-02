@@ -1,5 +1,12 @@
 Revision history for Perl extension Parse-CSV
 
+2.05      2018-06-28 21:53:24-05:00 America/Chicago
+	- Fix error handling to be able to distinguish eof from a real
+	  error <Alexey Lebedeff>
+        - Add failing test case for non-ASCII data <Ken Williams>
+        - Various docs fixups <Ken Williams>
+        - Rename _getline() to getline() and expose it in the docs <Ken Williams>
+
 2.04      2015-07-15 20:48:16 America/Chicago
 	- Fixed a regression that resulted in some failures in the
           Parse::CSV::Colnames distribution [Spotted by H.Merijn Brand]

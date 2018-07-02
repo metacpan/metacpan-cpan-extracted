@@ -12,6 +12,7 @@ PROVIDED COMMAND LINE INTERFACE programs :
   4. rounding -- outputs the rounded numbers.
   5. zeropad -- outputs the zero-padded numbers.
   6. meanvar -- shows the mean (average) and the variance of a sequence of numbers.
+  7. quantile -- shows the quantile values.
 
   All programs provides help-manual that is availble such as by "cumsum --help". 
   If you want to see only "switch options", do "cumsum --help opt(ions)". 

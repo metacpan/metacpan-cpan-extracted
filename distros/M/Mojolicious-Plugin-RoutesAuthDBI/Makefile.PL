@@ -19,12 +19,22 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Mojolicious'=>6.00,
+        'Mojolicious'=>7.00,
         'Mojolicious::Plugin::Authentication'=>1.29,
         'Mojolicious::Plugin::OAuth2::Che'=>1.539,
         'DBI'=>1.6,
         'DBIx::Mojo::Template'=>0.05,
         'Hash::Merge'=>0.200,
+    },
+    META_MERGE => {
+      'meta-spec' => { version => 2 },
+      resources => {
+        repository => {
+          type => 'git',
+          url => 'git://github.com/mche/Mojolicious-Plugin-RoutesAuthDBI.git',
+          web => 'https://github.com/mche/Mojolicious-Plugin-RoutesAuthDBI',
+        },
+      },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     #~ clean => { FILES => 'Mojolicious-Plugin-RoutesAuthDBI-*' },

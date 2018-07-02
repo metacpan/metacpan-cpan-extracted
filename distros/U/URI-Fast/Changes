@@ -1,8 +1,32 @@
-0.32 2018-06-13
--Alias as_string -> to_string
+0.35 2018-06-??
+-behavior: all query scanning functions now treat '&' and ';' as valid separators
+-behavior: explicitly specifying a separator in a query setter replaces existing separators in the query
+-behavior: skip whitespace surrounding parsed uris
+-bugfix: correctly parse ipv6 addresses
+-bugfix: possible buffer overflow in uri_scan_auth
+-bugfix: set_query, set_fragment, set_path unnecessarily encode permitted characters (credit: Dave Hubbard)
+-bugfix: when stringifying, use ':' instead of '://' when no authority section present
+-bugfix: when stringifying, path is always separated from authority by '/'
+-documention: stringification with overloaded ""
+-new method: compare($other) with overloaded eq
+-new method: query_keyset({...})
+-new method: url_encode/url_decode aliased to encode/decode (credit: bluefeet)
+-new module: URI::Fast::Test to make unit testing with Test2 easier (credit: merlyn)
+-optimization: faster and more consistent query scanning
+-optimization: reduced memset usage (credit: aeruder)
+
+0.34 2018-06-13
+-bugfix: set_param could clobber existing query parameters (credit: aeruder)
+
+0.33 2018-06-13
+-new method add_param() appends query parameters without clobbering existing
+ query keys (credit: sara)
+
+0.32 2018-06-12
+-alias as_string -> to_string (credit: merlyn)
 
 0.31 2018-06-12
--@EXPORT_OK now includes encode() and decode()
+-@EXPORT_OK now includes encode() and decode() (credit: merlyn)
 
 0.30 2018-06-12
 -incompatible change: dropped default scheme; when no scheme is present in

@@ -1,6 +1,6 @@
 package Text::CSV::Pivot;
 
-$Text::CSV::Pivot::VERSION   = '0.08';
+$Text::CSV::Pivot::VERSION   = '0.09';
 $Text::CSV::Pivot::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Text::CSV::Pivot - Transform CSV file into Pivot Table format.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
@@ -152,7 +152,7 @@ The above code would then create the result in C<sample.pivot.csv> as below:
     | Smith, John    | Year 1 |           | 9.0     | 7.0      | 4.0   | 7.0   |
     +----------------+--------+-----------+---------+----------+-------+-------+
 
-In case, we would want to skip "Year" column then the following code:
+In case, we would want to skip C<"Year"> column then the following code:
 
     use strict; use warnings;
     use Text::CSV::Pivot;
@@ -174,7 +174,7 @@ You should get the result in C<sample.pivot.csv> as below:
 
 =head1 CLI
 
-With the C<Text::CSV::Pivot v0.06> or above, there is a tool distributed with the
+With the C<Text::CSV::Pivot v0.06> or above, there is a CLI tool supplied with the
 distribution called C<csv-pivot>.
 
   Usage: csv-pivot [OPTIONS]...
@@ -225,7 +225,7 @@ file as B<"sample.pivot.csv">.
 
 Column index starts with 0, left to right. So in the example below, the C<col_key_idx>
 would be 0. Similarly C<col_name_idx> and C<col_value_idx> would be 1 and 2 resp. In
-case, we would want to skip the column "Year" in the output file, then C<col_skip_idx>
+case, we would want to skip the column C<"Year"> in the output file, then C<col_skip_idx>
 would be [3]. All index related parameters except C<col_skip_idx> would expect number
 0 or more. The C<col_skip_idx> would expected an C<ArrayRef> of column index.
 

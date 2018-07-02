@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I/home/phil/z/perl/cpan/DataEditXmlLint/lib/ -I/home/phil/z/perl/cpan/DataEditXml/lib -I/home/phil/z/perl/cpan/DataTableText/lib
+#!/usr/bin/perl
 #-------------------------------------------------------------------------------
 # Create SDL file map from a set of linted xml files
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016
@@ -12,7 +12,7 @@ use strict;
 use Carp;
 use Data::Edit::Xml::Lint;
 use Data::Table::Text qw(:all);
-our $VERSION = 20170809;
+our $VERSION = 20180630;
 
 #1 Constructor                                                                  # Construct a new SDL file map creator
 
@@ -38,7 +38,7 @@ genLValueScalarMethods(qw(version));                                            
 #1 SDL File Map                                                                 # Generate an SDL file map
 
 sub xmlLineOne                                                                  #P Line one of all xml files
- {'<?xml version="1.0" encoding="utf-8"?>'
+ {'<?xml version="1.0" encoding="utf-8"?>'."\n"
  }
 
 sub getFileMap                                                                  #P File map tag
@@ -73,6 +73,7 @@ sub getFile($$)                                                                 
    }
 
   my (undef, $fileName, $fileExt) = parseFileName($lint->file);                 # Parse file name
+$fileExt or confess "No file extension for ".$lint->file;
   my $relFile = filePathExt($filePrefix, $fileName, $fileExt);
   <<END
 <file fileextension=".$fileExt" filename="$relFile" filepath="$relFile" filetype="$ishType" folderhasmixedcontent="$mixed" id="$guid" targetfolder="$targetFolder\\$project\\$section" title="$fileName">
@@ -91,9 +92,12 @@ END
 
 sub getFTitle                                                                   #P FTITLE tag
  {my ($sdl) = @_;                                                               # Sdl
-  my (undef, $fileName, $fileExt) = parseFileName($sdl->lint->file);            # Parse file name
+  my $lint  = $sdl->lint;                                                       # Lint
+  my $Title = $lint->title;                                                     # Title
+# warn "No title in\n".dump($lint)."\n" unless $Title;
+  my $title = $Title || 'REQUIRED-CLEANUP-TITLE';
   <<END
-<ishfield level="logical" name="FTITLE" xml:space="preserve">$fileName</ishfield>'
+<ishfield level="logical" name="FTITLE" xml:space="preserve">$title</ishfield>'
 END
  }
 
@@ -539,6 +543,7 @@ bm_007-6301-001.ditamap
 -->
 <!--guid: GUID-D7147C7F-2017-0001-FRMB-000000000001 -->
 <!--author: bill.gearhart\@hpe.com -->
+<!--title: Title of the bookmap goes here -->
 END
 
 sub testConcept {<<END}
@@ -555,6 +560,7 @@ concept1.dita
 -->
 <!--guid: GUID-D7147C7F-2017-0001-FRMB-000000000002 -->
 <!--author: bill.gearhart\@hpe.com -->
+<!--title: Test Concept One -->
 END
 
 sub testImage {<<END}
@@ -570,15 +576,16 @@ image1.jpg
 -->
 <!--guid: GUID-D7147C7F-2017-0001-FRMB-000000000002 -->
 <!--author: bill.gearhart\@hpe.com -->
+<!--title: Test Image -->
 END
 
 sub expectedOutput{<<'END'}
 <?xml version="1.0" encoding="utf-8"?>
- <filemap sourcebasepath="C:\hp\frame\batch1\out" version="12.0.0.0">;
+<filemap sourcebasepath="C:\hp\frame\batch1\out" version="12.0.0.0">;
 <file fileextension=".ditamap" filename="bm_007-6301-001.ditamap" filepath="bm_007-6301-001.ditamap" filetype="ISHMasterDoc" folderhasmixedcontent="True" id="GUID-D7147C7F-2017-0001-FRMB-000000000001" targetfolder="RyffineImportSGIfm\007-6301-001\maps" title="bm_007-6301-001">
 <ishobject ishref="GUID-D7147C7F-2017-0001-FRMB-000000000001" ishtype="ISHMasterDoc">
 <ishfields>
-<ishfield level="logical" name="FTITLE" xml:space="preserve">bm_007-6301-001</ishfield>'
+<ishfield level="logical" name="FTITLE" xml:space="preserve">Title of the bookmap goes here</ishfield>'
 <ishfield level="version" name="VERSION" xml:space="preserve">1</ishfield>
 <ishfield level="lng" name="DOC-LANGUAGE" xml:space="preserve">en-US</ishfield>
 <ishfield name="FAUTHOR" level="lng" xml:space="preserve">bill.gearhart@hpe.com</ishfield>
@@ -588,7 +595,7 @@ sub expectedOutput{<<'END'}
 <file fileextension=".dita" filename="concept1.dita" filepath="concept1.dita" filetype="ISHModule" folderhasmixedcontent="True" id="GUID-D7147C7F-2017-0001-FRMB-000000000002" targetfolder="RyffineImportSGIfm\007-6301-001\topics" title="concept1">
 <ishobject ishref="GUID-D7147C7F-2017-0001-FRMB-000000000002" ishtype="ISHModule">
 <ishfields>
-<ishfield level="logical" name="FTITLE" xml:space="preserve">concept1</ishfield>'
+<ishfield level="logical" name="FTITLE" xml:space="preserve">Test Concept One</ishfield>'
 <ishfield level="version" name="VERSION" xml:space="preserve">1</ishfield>
 <ishfield level="lng" name="DOC-LANGUAGE" xml:space="preserve">en-US</ishfield>
 <ishfield name="FAUTHOR" level="lng" xml:space="preserve">bill.gearhart@hpe.com</ishfield>
@@ -598,7 +605,7 @@ sub expectedOutput{<<'END'}
 <file fileextension=".jpg" filename="images/image1.jpg" filepath="images/image1.jpg" filetype="ISHIllustration" folderhasmixedcontent="False" id="GUID-D7147C7F-2017-0001-FRMB-000000000002" targetfolder="RyffineImportSGIfm\007-6301-001\images" title="image1">
 <ishobject ishref="GUID-D7147C7F-2017-0001-FRMB-000000000002" ishtype="ISHIllustration">
 <ishfields>
-<ishfield level="logical" name="FTITLE" xml:space="preserve">image1</ishfield>'
+<ishfield level="logical" name="FTITLE" xml:space="preserve">Test Image</ishfield>'
 <ishfield level="version" name="VERSION" xml:space="preserve">1</ishfield>
 <ishfield level="lng" name="DOC-LANGUAGE" xml:space="preserve">en-US</ishfield>
 <ishfield level="lng" name="FRESOLUTION" xml:space="preserve">High</ishfield>

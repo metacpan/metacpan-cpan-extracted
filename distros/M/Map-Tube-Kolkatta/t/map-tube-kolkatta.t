@@ -13,14 +13,7 @@ use Map::Tube::Kolkatta;
 
 SKIP: {
 
-    my $map;
-    eval { $map = Map::Tube::Kolkatta->new };
-    if (defined ($map)) {
-        pass("Wellformed Map Data");
-    }
-    else {
-        fail("Malformed Map Data") or skip "", 3;
-    }
+    my $map = new_ok('Map::Tube::Kolkatta');
 
     ok_map($map) or skip "Skip map function and routes test.", 2;
 

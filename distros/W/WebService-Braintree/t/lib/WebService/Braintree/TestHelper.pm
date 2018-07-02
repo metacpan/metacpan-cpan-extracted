@@ -273,7 +273,10 @@ sub settle {
     my $http = WebService::Braintree::HTTP->new(config => WebService::Braintree->configuration);
     my $response = $http->put("/transactions/${transaction_id}/settle");
 
-    my $x = WebService::Braintree::Result->new(response => $response);
+    my $x = WebService::Braintree::Result->new({
+        response => $response,
+        %$response,
+    });
     die Dumper($x) unless $x->is_success;
     return $x;
 }
@@ -283,7 +286,10 @@ sub settlement_decline {
     my $http = WebService::Braintree::HTTP->new(config => WebService::Braintree->configuration);
     my $response = $http->put("/transactions/${transaction_id}/settlement_decline");
 
-    my $x = WebService::Braintree::Result->new(response => $response);
+    my $x = WebService::Braintree::Result->new({
+        response => $response,
+        %$response,
+    });
     die Dumper($x) unless $x->is_success;
     return $x;
 }
@@ -293,7 +299,10 @@ sub settlement_pending {
     my $http = WebService::Braintree::HTTP->new(config => WebService::Braintree->configuration);
     my $response = $http->put("/transactions/${transaction_id}/settlement_pending");
 
-    my $x = WebService::Braintree::Result->new(response => $response);
+    my $x = WebService::Braintree::Result->new({
+        response => $response,
+        %$response,
+    });
     die Dumper($x) unless $x->is_success;
     return $x;
 }
@@ -329,7 +338,10 @@ sub create_escrowed_transaction {
     my $escrow     = $http->put('/transactions/' . $sale->transaction->id . '/escrow');
     die Dumper($escrow) if $escrow->{api_error_response};
 
-    return WebService::Braintree::Result->new(response => $escrow);
+    return WebService::Braintree::Result->new({
+        response => $escrow,
+        %$escrow,
+    });
 }
 
 sub create_3ds_verification {
@@ -526,9 +538,7 @@ sub nonce_for_paypal_account {
 sub generate_decoded_client_token {
     my $params = shift;
     my $encoded_client_token = WebService::Braintree::ClientToken->generate($params);
-    my $decoded_client_token = decode_base64($encoded_client_token);
-
-    $decoded_client_token;
+    return decode_base64($encoded_client_token);
 }
 
 sub generate_unique_integer {

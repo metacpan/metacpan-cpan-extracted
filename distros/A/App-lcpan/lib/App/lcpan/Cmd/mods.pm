@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::mods;
 
-our $DATE = '2018-02-08'; # DATE
-our $VERSION = '1.022'; # VERSION
+our $DATE = '2018-06-21'; # DATE
+our $VERSION = '1.023'; # VERSION
 
 use 5.010;
 use strict;
@@ -35,7 +35,7 @@ App::lcpan::Cmd::mods - Alias for 'modules'
 
 =head1 VERSION
 
-This document describes version 1.022 of App::lcpan::Cmd::mods (from Perl distribution App-lcpan), released on 2018-02-08.
+This document describes version 1.023 of App::lcpan::Cmd::mods (from Perl distribution App-lcpan), released on 2018-06-21.
 
 =head1 FUNCTIONS
 
@@ -82,6 +82,11 @@ Include non-core modules.
 
 Filename of index.
 
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
 =item * B<latest> => I<bool>
 
 =item * B<namespaces> => I<array[str]>
@@ -92,7 +97,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.0")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 

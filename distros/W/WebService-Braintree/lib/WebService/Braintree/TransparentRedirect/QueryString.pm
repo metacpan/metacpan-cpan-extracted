@@ -8,7 +8,7 @@ use strictures 1;
 
 use URI;
 use WebService::Braintree::Digest qw(hexdigest);
-use Moose;
+use Moo;
 use Carp qw(confess);
 
 has 'config' => ( is => 'rw', default => sub { WebService::Braintree->configuration});

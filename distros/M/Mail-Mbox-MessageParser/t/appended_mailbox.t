@@ -4,7 +4,7 @@
 
 use strict;
 
-use File::Temp;
+use File::Temp qw(tempfile);
 use Test::More;
 use lib 't';
 use Mail::Mbox::MessageParser;
@@ -132,14 +132,14 @@ sub TestModifiedMailbox
 
   my ($folder_name) = $source_filename =~ /\/([^\/\\]*)\.txt$/;
 
-  my $output = File::Temp->new();
-  binmode $output;
+  my ($output_fh, $output_fn) = tempfile();
+  binmode $output_fh;
 
   my $filehandle = new FileHandle($mailbox_filename);
 
-  my $cache = File::Temp->new();
+  my ($cache_fh, $cache_fn) = tempfile();
 
-  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache->filename})
+  Mail::Mbox::MessageParser::SETUP_CACHE({'file_name' => $cache_fn})
     if $enable_cache;
 
   my $folder_reader =
@@ -153,22 +153,22 @@ sub TestModifiedMailbox
 
   die $folder_reader unless ref $folder_reader;
 
-  print $output $folder_reader->prologue;
+  print $output_fh $folder_reader->prologue;
 
   # Read just 1 email
-  print $output ${$folder_reader->read_next_email()};
+  print $output_fh ${$folder_reader->read_next_email()};
 
 	AppendToMailbox($mailbox_filename, $second_part);
 
   # This is the main loop. It's executed once for each email
   while(!$folder_reader->end_of_file())
   {
-    print $output ${ $folder_reader->read_next_email() };
+    print $output_fh ${ $folder_reader->read_next_email() };
   }
 
-  $output->close();
+  $output_fh->close();
 
-  CheckDiffs([$source_filename,$output->filename]);
+  CheckDiffs([$source_filename,$output_fn]);
 }
 
 # ---------------------------------------------------------------------------

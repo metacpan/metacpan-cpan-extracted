@@ -1,0 +1,12 @@
+1.02 - Sat Jun 23 18:46:17 2018
+  * Bugfix: Stripped out bogus Exporter boilerplate (copied in from module template).
+  * Bugfix: Corrected package naming per CPAN conventions (thanks haarg).
+
+1.01 - Sat Jun 23 18:32:10 2018
+  * Bugfix (dependencies)
+
+1.00 - Sat Jun 23 18:02:50 2018
+  * Packaged up for CPAN (unit tests, documentation, dist.ini, etc)
+
+0.00 - Tue Jun 20 15:57:05 2017
+  * Started using personally to turn on and off the AC in my wellhouse-cum-datacenter when it gets too hot.

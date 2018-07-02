@@ -1,10 +1,10 @@
-use 5.006;
+use 5.008001;
 use strict;
 use warnings;
 package Getopt::Lucid;
 # ABSTRACT: Clear, readable syntax for command line processing
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 our @EXPORT_OK = qw(Switch Counter Param List Keypair);
 our %EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
@@ -12,6 +12,8 @@ our @ISA = qw( Exporter );
 
 use Carp;
 use Exporter ();
+use File::Basename ();
+use List::Util ();
 use Getopt::Lucid::Exception;
 use Storable 2.16 qw(dclone);
 
@@ -25,7 +27,7 @@ my $VALID_NAME      = qr/$VALID_LONG|$VALID_SHORT|$VALID_BARE/;
 my $SHORT_BUNDLE    = qr/-[$VALID_STARTCHAR]{2,}/;
 my $NEGATIVE        = qr/(?:--)?no-/;
 
-my @valid_keys = qw( name type default nocase valid needs canon );
+my @valid_keys = qw( name type default nocase valid needs canon doc );
 my @valid_types = qw( switch counter parameter list keypair);
 
 sub Switch  {
@@ -91,6 +93,10 @@ sub default {
 sub anycase { my $self = shift; $self->{nocase}=1; return $self };
 
 sub needs { my $self = shift; $self->{needs}=[@_]; return $self };
+
+sub doc { my $self = shift; $self->{doc}=shift; return $self };
+
+sub _clone { my $self = shift; bless { %$self }, ref $self }
 
 package Getopt::Lucid;
 
@@ -235,8 +241,10 @@ sub validate {
     throw_usage("'validate' argument 'requires' must be an array reference")
       if $requires && ref($requires) ne 'ARRAY';
     for my $p ( @$requires ) {
-        throw_argv("Required option '$self->{spec}{$p}{canon}' not found")
-            if ( ! $self->{seen}{$p} );
+        throw_spec("Requiring an unspecified option ('$p') in validate()")
+            unless exists $self->{spec}{$p};
+        throw_argv( "Required option '$self->{spec}{$p}{canon}' not found")
+            if ( !$self->{seen}{$p} );
     }
   }
 
@@ -364,6 +372,73 @@ sub reset_defaults {
     _set_defaults($self);
     _recalculate_options($self);
     return $self->options;
+}
+
+#--------------------------------------------------------------------------#
+# usage()
+#--------------------------------------------------------------------------#
+
+sub usage {
+    my ($self) = @_;
+    my @short_opts;
+    my @doc;
+    for my $opt ( sort { $a->{strip} cmp $b->{strip} } values %{$self->{spec}} ) {
+        my $names = [ @{ $opt->{names} } ];
+        push @doc, [
+            _build_usage_left_column( $names, \@short_opts ),
+            _build_usage_right_column( $opt->{doc}, $opt->{default}, $opt->{type} ),
+        ];
+    }
+
+    my $max_width = 3 + List::Util::max( map { length } @doc );
+
+    my $prog = File::Basename::basename($0);
+
+    local $" = '';
+    my $usage = "Usage: $prog [-@short_opts] [long options] [arguments]\n"
+      . join( "", map { sprintf( "\t%-${max_width}s %s\n", @$_ ) } @doc );
+}
+
+sub _build_usage_left_column {
+    my ($names, $all_short_opts) = @_;
+    my @sorted_names =
+      sort { length $a <=> length $b } map { my $s = $_; $s =~ s/^-*//; $s } @$names;
+
+    my @short_opts = grep { length == 1 } @sorted_names;
+    my @long_opts  = grep { length > 1 } @sorted_names;
+
+    push @$all_short_opts, @short_opts;
+
+    my $group = sub {
+        my $list = shift;
+        '-' . ( @$list == 1 ? $list->[0] : '[' . join( '|', @$list ) . ']' );
+    };
+    my $prepare = sub {
+        my $list = shift;
+        return ( length $list->[0] > 1 ? '-' : '' ) . $group->($list) if @$list;
+        return;
+    };
+
+    return join ', ' => map { $prepare->($_) } \@short_opts, \@long_opts;
+}
+
+sub _build_usage_right_column {
+    my ( $doc, $default, $type ) = @_;
+    my $str = defined $doc ? $doc : '';
+    return $str unless defined $default;
+    $str .= " " if length $str;
+    $str .= "(default: ";
+    if ($type eq 'list') {
+        $str .= join( ", ", @$default );
+    }
+    elsif ( $type eq 'keypair' ) {
+        $str .= join( ", ", map { "$_=$default->{$_}" } sort keys %$default );
+    }
+    else {
+        $str .= $default
+    }
+    $str .= ')';
+    return $str;
 }
 
 #--------------------------------------------------------------------------#
@@ -498,18 +573,26 @@ sub _parameter {
 sub _parse_spec {
     my ($self) = @_;
     my $spec = $self->{raw_spec};
-    for my $opt ( @$spec ) {
+    for my $v ( @$spec ) {
+        my $type = ref $v;
+        throw_spec(
+            "'$type' is not a valid option type"
+        ) unless $type eq 'Getopt::Lucid::Spec';
+    }
+    for my $opt ( map { $_->_clone } @$spec ) {
         my $name = $opt->{name};
         my @names = split( /\|/, $name );
         $opt->{canon} = $names[0];
         _validate_spec($self,\@names,$opt);
+        $opt->{names} = \@names;
+        ($opt->{strip} = $names[0]) =~ s/^-+//;
         @names = map { s/^-*//; $_ } @names unless $self->{strict}; ## no critic
         for (@names) {
             $self->{alias_hr}{$_} = $names[0];
             $self->{alias_nocase}{$_} = $names[0]  if $opt->{nocase};
         }
         $self->{spec}{$names[0]} = $opt;
-        ($self->{strip}{$names[0]} = $names[0]) =~ s/^-+//;
+        $self->{strip}{$names[0]} = $opt->{strip};
     }
     _validate_prereqs($self);
 }
@@ -798,7 +881,7 @@ Getopt::Lucid - Clear, readable syntax for command line processing
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =head1 SYNOPSIS
 
@@ -1055,6 +1138,16 @@ argument is needed.
    @spec = (
      Switch("help|h")->anycase(),    # "Help", "HELP", etc.
    );
+
+=head3 doc()
+
+Sets the documentation string for an option.
+
+     @spec = (
+       Param("output")->doc("write output to the specified file"),
+     );
+
+This string shows up in the "usage" method.
 
 =head2 Validation
 
@@ -1317,16 +1410,8 @@ otherwise determined to be invalid
 
 =back
 
-These exception may be caught using an C<<< eval >>> block and allow the calling
+These exceptions may be caught using an C<<< eval >>> block and allow the calling
 program to respond differently to each class of exception.
-
-   my $opt;
-   eval { $opt = Getopt::Lucid->getopt( \@spec ) };
-   if ($@) {
-     print "$@\n" && print_usage() && exit 1
-       if ref $@ eq 'Getopt::Lucid::Exception::ARGV';
-     ref $@ ? $@->rethrow : die $@;
-   }
 
 =head2 Ambiguous Cases and Gotchas
 
@@ -1493,6 +1578,20 @@ specification, recalculates the result of processing the command line with the
 restored defaults, and returns a hash with the resulting options.  This
 undoes the effect of a C<<< merge_defaults >>> or C<<< add_defaults >>> call.
 
+=head2 usage()
+
+Returns a string of usage information derived from the options spec, including
+any "doc" modifiers.  Because invalid options throw exceptions, if you want
+to provide usage, you should separately invoke "new" and "getopt"
+
+   my $opt = Getopt::Lucid->new( \@spec );
+   eval { $opt->getopt() };
+   if ($@) {
+     print "$@\n" && print $opt->usage and exit 1
+       if ref $@ eq 'Getopt::Lucid::Exception::ARGV';
+     ref $@ ? $@->rethrow : die $@;
+   }
+
 =head1 API CHANGES
 
 In 1.00, the following API changes have been made:
@@ -1558,7 +1657,7 @@ existing test-file that illustrates the bug or desired feature.
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/dagolden/getopt-lucid/issues>.
+at L<https://github.com/dagolden/Getopt-Lucid/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -1566,9 +1665,9 @@ You will be notified automatically of any progress on your issue.
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/dagolden/getopt-lucid>
+L<https://github.com/dagolden/Getopt-Lucid>
 
-  git clone https://github.com/dagolden/getopt-lucid.git
+  git clone https://github.com/dagolden/Getopt-Lucid.git
 
 =head1 AUTHOR
 
@@ -1576,7 +1675,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords David Golden Precious James E Keenan Kevin McGrath Nova Patch Robert Bohne
+=for stopwords David Golden Precious James E Keenan Kevin McGrath Nova Patch Robert Bohne thilp
 
 =over 4
 
@@ -1604,11 +1703,15 @@ Nova Patch <patch@cpan.org>
 
 Robert Bohne <rbo@cpan.org>
 
+=item *
+
+thilp <thilp@thilp.net>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by David Golden.
+This software is Copyright (c) 2018 by David Golden.
 
 This is free software, licensed under:
 

@@ -54,7 +54,7 @@ subtest 'utf8' => sub{
   is $uri->path("/$u/$u"), "/$u/$u", "path";
   is $uri->path([$u, $a]), "/$u/$a", "path";
 
-  is $uri->query("x=$a"), "x=$a", "query";
+  is $uri->query("x=$u"), "x=$a", "query";
   is $uri->param('x'), $u, 'param', $uri->get_query;
   is $uri->query({x => $u}), "x=$a", "query", $uri->get_query;
   is $uri->param('x'), $u, 'param', $uri->get_query;

@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Madrid
 
+0.10  2018-07-01
+      - Updated dependency on Map::Tube v3.53.
+
 0.09  2018-06-18
       - Used new_ok() in test script.
 

@@ -6,7 +6,7 @@ use Carp;
 use FileHandle::Unget;
 use File::Spec;
 use File::Temp;
-sub dprint;
+sub _dprint;
 
 use Mail::Mbox::MessageParser::MetaInfo;
 use Mail::Mbox::MessageParser::Config;
@@ -15,20 +15,20 @@ use Mail::Mbox::MessageParser::Perl;
 use Mail::Mbox::MessageParser::Grep;
 use Mail::Mbox::MessageParser::Cache;
 
-use vars qw( @ISA $VERSION $DEBUG );
-use vars qw( $CACHE $UPDATING_CACHE );
+use vars qw( @ISA $VERSION $_DEBUG );
+use vars qw( $_CACHE $UPDATING_CACHE );
 
 @ISA = qw(Exporter);
 
-$VERSION = sprintf "%d.%02d%02d", q/1.51.5/ =~ /(\d+)/g;
-$DEBUG = 0;
+$VERSION = sprintf "%d.%02d%02d", q/1.51.6/ =~ /(\d+)/g;
+$_DEBUG = 0;
 
 #-------------------------------------------------------------------------------
 
 # The class-wide cache, which will be read and written when necessary. i.e.
 # read when an folder reader object is created which uses caching, and
 # written when a different cache is specified, or when the program exits, 
-*CACHE = \$Mail::Mbox::MessageParser::MetaInfo::CACHE;
+*_CACHE = \$Mail::Mbox::MessageParser::MetaInfo::_CACHE;
 
 *UPDATING_CACHE = \$Mail::Mbox::MessageParser::MetaInfo::UPDATING_CACHE;
 *SETUP_CACHE = \&Mail::Mbox::MessageParser::MetaInfo::SETUP_CACHE;
@@ -36,11 +36,11 @@ sub SETUP_CACHE;
 
 #-------------------------------------------------------------------------------
 
-# Outputs debug messages if $DEBUG is true. 
+# Outputs debug messages if $_DEBUG is true. 
 
-sub dprint
+sub _dprint
 {
-  return 1 unless $DEBUG;
+  return 1 unless $_DEBUG;
 
   my $message = join '',@_;
 
@@ -49,7 +49,7 @@ sub dprint
     warn "DEBUG (" . __PACKAGE__ . "): $line\n";
   }
 
-  # Be sure to return 1 so code like 'dprint "blah\n" and exit' works.
+  # Be sure to return 1 so code like '_dprint "blah\n" and exit' works.
   return 1;
 }
 
@@ -71,7 +71,7 @@ sub new
     $options->{'enable_grep'} = 0;
   }
 
-  $DEBUG = $options->{'debug'}
+  $_DEBUG = $options->{'debug'}
     if defined $options->{'debug'};
 
   my ($file_type, $need_to_close_filehandle, $error, $endline);
@@ -80,11 +80,14 @@ sub new
     _PREPARE_FILE_HANDLE($options->{'file_name'}, $options->{'file_handle'});
 
   if (defined $error &&
-    !($error eq 'Not a mailbox' && $options->{'force_processing'}))
+    !($error eq 'Not a mailbox' && $options->{'force_processing'}) &&
+    !($error =~ 'Found a mix of unix and Windows line endings' && $options->{'force_processing'})
+    )
   {
-    # Here I assume the only error for which the filehandle was opened is
-    # "Not a mailbox"
-    close $options->{'file_handle'} if $error eq 'Not a mailbox';
+    # Here I assume the only errors for which the filehandle was opened is
+    # "Not a mailbox" and mixed line endings
+    close $options->{'file_handle'}
+      if $error eq 'Not a mailbox' || $error =~ /Found a mix of unix and Windows line endings/;
     return $error;
   }
 
@@ -108,7 +111,7 @@ sub new
 
     if ($UPDATING_CACHE)
     {
-      dprint "Couldn't instantiate Mail::Mbox::MessageParser::Cache: " .
+      _dprint "Couldn't instantiate Mail::Mbox::MessageParser::Cache: " .
         "Updating cache";
       $self = undef;
     }
@@ -122,7 +125,7 @@ sub new
     {
       if ($self =~ /not installed/)
       {
-        dprint "Couldn't instantiate Mail::Mbox::MessageParser::Grep: $self";
+        _dprint "Couldn't instantiate Mail::Mbox::MessageParser::Grep: $self";
       }
       else
       {
@@ -143,7 +146,7 @@ sub new
   die "Couldn't instantiate any mailbox parser implementation"
     unless defined $self;
 
-  dprint "Instantiate mailbox parser implementation: " . ref $self;
+  _dprint "Instantiate mailbox parser implementation: " . ref $self;
 
   $self->_print_debug_information();
 
@@ -190,7 +193,7 @@ sub _PREPARE_FILE_HANDLE
   my $file_name = shift;
   my $file_handle = shift;
 
-  dprint "Preparing file handle";
+  _dprint "Preparing file handle";
 
   if (defined $file_handle)
   {
@@ -201,7 +204,7 @@ sub _PREPARE_FILE_HANDLE
     binmode $file_handle;
 
     my $file_type = _GET_FILE_TYPE(\$file_handle);
-    dprint "Filehandle file type: $file_type";
+    _dprint "Filehandle file type: $file_type";
 
     # Do decompression if we need to
     if (_IS_COMPRESSED_TYPE($file_type))
@@ -215,26 +218,27 @@ sub _PREPARE_FILE_HANDLE
       return ($decompressed_file_handle,$file_type,0,"Not a mailbox",undef)
         if _GET_FILE_TYPE(\$decompressed_file_handle) ne 'mailbox';
 
-      my $endline = _GET_ENDLINE(\$decompressed_file_handle);
+      my $endline;
+      ($endline, $error) = _GET_ENDLINE(\$decompressed_file_handle);
 
-      return ($decompressed_file_handle,$file_type,0,undef,$endline);
+      return ($decompressed_file_handle,$file_type,0,$error,$endline);
     }
     else
     {
-      dprint "Filehandle is not compressed";
+      _dprint "Filehandle is not compressed";
 
-      my $endline = _GET_ENDLINE(\$file_handle);
+      my ($endline, $error) = _GET_ENDLINE(\$file_handle);
 
       return ($file_handle,$file_type,0,"Not a mailbox",$endline)
         if !eof($file_handle) && $file_type ne 'mailbox';
 
-      return ($file_handle,$file_type,0,undef,$endline);
+      return ($file_handle,$file_type,0,$error,$endline);
     }
   }
   else
   {
     my $file_type = _GET_FILE_TYPE(\$file_name);
-    dprint "Filename \"$file_name\" file type: $file_type";
+    _dprint "Filename \"$file_name\" file type: $file_type";
 
     my ($opened_file_handle,$error) =
       _OPEN_FILE_HANDLE($file_name, $file_type);
@@ -242,21 +246,22 @@ sub _PREPARE_FILE_HANDLE
     return ($file_handle,$file_type,0,$error,undef)
       unless defined $opened_file_handle;
 
-    my $endline = _GET_ENDLINE(\$opened_file_handle);
+    my $endline;
+    ($endline, $error) = _GET_ENDLINE(\$opened_file_handle);
 
     if (_IS_COMPRESSED_TYPE($file_type))
     {
       return ($opened_file_handle,$file_type,1,"Not a mailbox",$endline)
         if _GET_FILE_TYPE(\$opened_file_handle) ne 'mailbox';
 
-      return ($opened_file_handle,$file_type,1,undef,$endline);
+      return ($opened_file_handle,$file_type,1,$error,$endline);
     }
     else
     {
       return ($opened_file_handle,$file_type,1,"Not a mailbox",$endline)
         if $file_type ne 'mailbox';
 
-      return ($opened_file_handle,$file_type,1,undef,$endline);
+      return ($opened_file_handle,$file_type,1,$error,$endline);
     }
   }
 }
@@ -270,7 +275,7 @@ sub _OPEN_FILE_HANDLE
   my $file_name = shift;
   my $file_type = shift;
 
-  dprint "Opening file \"$file_name\"";
+  _dprint "Opening file \"$file_name\"";
 
   # Non-compressed file
   unless (_IS_COMPRESSED_TYPE($file_type))
@@ -280,7 +285,7 @@ sub _OPEN_FILE_HANDLE
 
     binmode $file_handle;
 
-    dprint "File \"$file_name\" is not compressed";
+    _dprint "File \"$file_name\" is not compressed";
 
     return ($file_handle,undef);
   }
@@ -291,7 +296,7 @@ sub _OPEN_FILE_HANDLE
 
   my $filter_command = qq{"$Mail::Mbox::MessageParser::Config{'programs'}{$file_type}" -cd "$file_name" |};
 
-  dprint "Calling \"$filter_command\" to decompress file \"$file_name\".";
+  _dprint "Calling \"$filter_command\" to decompress file \"$file_name\".";
 
   my $oldstderr;
   open $oldstderr,">&STDERR" or die "Can't save STDERR: $!\n";
@@ -360,7 +365,7 @@ sub _GET_FILE_TYPE
     {
       if(index($test_chars,"\n\n") == -1 && index($test_chars,"\r\n\r\n") == -1)
       {
-        dprint "Couldn't find end of first paragraph after " .
+        _dprint "Couldn't find end of first paragraph after " .
           "$Mail::Mbox::MessageParser::Config{'max_testchar_buffer_size'} bytes."
       }
 
@@ -395,16 +400,17 @@ sub _GET_FILE_TYPE
 #  return 'zip' if substr($test_chars, 0, 2) eq 'PK' &&
 #    ord(substr($test_chars,3,1)) == 0003 && ord(substr($test_chars,4,1)) == 0004;
   return 'gzip' if
-    ord(substr($test_chars,0,1)) == 0037 && ord(substr($test_chars,1,1)) == 0213;
+    ord(substr($test_chars,0,1)) == oct(37) && ord(substr($test_chars,1,1)) == oct(213);
   return 'compress' if
-    ord(substr($test_chars,0,1)) == 0037 && ord(substr($test_chars,1,1)) == 0235;
+    ord(substr($test_chars,0,1)) == oct(37) && ord(substr($test_chars,1,1)) == oct(235);
 
   return 'unknown binary';
 }
 
 #-------------------------------------------------------------------------------
 
-# Returns: undef, "\r\n", "\n"
+# Returns an endline result of either: undef, "\r\n", "\n"
+# Returns an error message (or undef) as well
 sub _GET_ENDLINE
 {
   my $file_name_or_handle_ref = shift;
@@ -445,7 +451,7 @@ sub _GET_ENDLINE
     {
       if(index($test_chars,"\n") == -1 && index($test_chars,"\r\n") == -1)
       {
-        dprint "Couldn't find end of first line after " .
+        _dprint "Couldn't find end of first line after " .
           "$Mail::Mbox::MessageParser::Config{'max_testchar_buffer_size'} bytes."
       }
 
@@ -463,17 +469,41 @@ sub _GET_ENDLINE
     $$file_handle_ref->ungets($test_chars);
   }
 
-  return undef unless defined $readResult && $readResult != 0;
+  return undef unless defined $readResult && $readResult != 0; ## no critic (ProhibitExplicitReturnUndef)
 
-  return undef if _IS_BINARY_MAILBOX(\$test_chars);
+  return undef if _IS_BINARY_MAILBOX(\$test_chars); ## no critic (ProhibitExplicitReturnUndef)
 
-  if(index($test_chars,"\r\n") != -1)
+  my $windows_count = 0;
+
+  while ($test_chars =~ /\r\n/gs)
   {
-    return "\r\n";
+    $windows_count++;
+  }
+
+  my $unix_count = 0;
+
+  while ($test_chars =~ /(?<!\r)\n/gs)
+  {
+    $unix_count++;
+  }
+
+  _dprint "Found $unix_count UNIX line endings and $windows_count Windows line endings in a sample of length " . 
+    CORE::length($test_chars);
+
+  if($windows_count > 0 && $unix_count == 0)
+  {
+    return "\r\n", undef;
+  }
+  elsif($windows_count == 0 && $unix_count > 0)
+  {
+    return "\n", undef;
   }
   else
   {
-    return "\n";
+    return $windows_count > $unix_count ? "\r\n" : "\n", 'Found a mix of unix and Windows line endings.' .
+      ' Please normalize the line endings using a tool like "dos2unix".' .
+      ' Use the force option to ignore this error and process using ' . ($windows_count > $unix_count ?
+       'Windows' : 'Unix') . ' line endings (best guess).';
   }
 }
 
@@ -495,7 +525,7 @@ sub _IS_COMPRESSED_TYPE
 
 # man perlfork for details
 # simulate open(FOO, "-|")
-sub pipe_from_fork ($)
+sub _pipe_from_fork
 {
   my $parent = shift;
   my $child = new FileHandle::Unget;
@@ -503,7 +533,7 @@ sub pipe_from_fork ($)
   pipe $parent, $child or die;
 
   my $pid = fork();
-  return undef unless defined $pid;
+  return undef unless defined $pid; ## no critic (ProhibitExplicitReturnUndef)
 
   if ($pid)
   {
@@ -542,7 +572,7 @@ sub _DO_WINDOWS_DECOMPRESSION
   # So that it won't be deleted until the program is complete
   # close $temp_file_handle;
 
-  dprint "Calling \"$filter_command\" to decompress filehandle";
+  _dprint "Calling \"$filter_command\" to decompress filehandle";
 
   my $decompressed_file_handle =
     new FileHandle::Unget("$filter_command $temp_file_name |");
@@ -564,11 +594,11 @@ sub _DO_NONWINDOWS_DECOMPRESSION
 
   my $filter_command = qq{"$Mail::Mbox::MessageParser::Config{'programs'}{$file_type}" -cd};
 
-  dprint "Calling \"$filter_command\" to decompress filehandle";
+  _dprint "Calling \"$filter_command\" to decompress filehandle";
 
   # Implicit fork
   my $decompressed_file_handle = new FileHandle::Unget;
-  my $pid = pipe_from_fork($decompressed_file_handle);
+  my $pid = _pipe_from_fork($decompressed_file_handle);
 
   unless (defined($pid))
   {
@@ -583,12 +613,12 @@ sub _DO_NONWINDOWS_DECOMPRESSION
   # uncompressed input.
   unless ($pid)
   {
-    open(FRONT_OF_PIPE, "|$filter_command 2>" . File::Spec->devnull())
+    open(my $front_of_pipe, "|$filter_command 2>" . File::Spec->devnull())
       or return (undef,"Can't execute \"$filter_command\" on file handle: $!");
 
-    binmode FRONT_OF_PIPE;
+    binmode $front_of_pipe;
 
-    print FRONT_OF_PIPE <$file_handle>;
+    print $front_of_pipe (<$file_handle>);
 
     $file_handle->close()
       or return (undef,"Can't execute \"$filter_command\" on file handle: $!");
@@ -596,7 +626,7 @@ sub _DO_NONWINDOWS_DECOMPRESSION
     # We intentionally don't check for error here. This is because the
     # parent may have aborted, in which case we let it take care of
     # error messages. (e.g. Non-mailbox standard input.)
-    close FRONT_OF_PIPE;
+    close $front_of_pipe;
 
     exit;
   }
@@ -696,7 +726,7 @@ sub reset
 
   if (_IS_A_PIPE($self->{'file_handle'}))
   {
-    dprint "Avoiding seek() on a pipe";
+    _dprint "Avoiding seek() on a pipe";
   }
   else
   {
@@ -716,7 +746,7 @@ sub _IS_A_PIPE
 {
   my $file_handle = shift;
 
-  return (-t $file_handle || -S $file_handle || -p $file_handle ||
+  return (-t $file_handle || -S $file_handle || -p $file_handle || ## no critic (ProhibitInteractiveTest)
     !-f $file_handle || !(seek $file_handle, 0, 1));
 }
 
@@ -742,11 +772,11 @@ sub prologue
 
 sub _print_debug_information
 {
-  return unless $DEBUG;
+  return unless $_DEBUG;
 
   my $self = shift;
 
-  dprint "Version: $VERSION";
+  _dprint "Version: $VERSION";
 
   foreach my $key (keys %$self)
   {
@@ -760,7 +790,7 @@ sub _print_debug_information
       $value = '<undef>';
     }
 
-    dprint "$key: $value";
+    _dprint "$key: $value";
   }
 }
 
@@ -832,29 +862,29 @@ sub read_next_email
 
   if ($UPDATING_CACHE)
   {
-    dprint "Storing data into cache, length " . $self->{'email_length'};
+    _dprint "Storing data into cache, length " . $self->{'email_length'};
 
-    my $CACHE = $Mail::Mbox::MessageParser::Cache::CACHE;
+    my $_CACHE = $Mail::Mbox::MessageParser::Cache::_CACHE;
 
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}-1]{'length'} =
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}-1]{'length'} =
       $self->{'email_length'};
 
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}-1]{'line_number'} =
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}-1]{'line_number'} =
       $self->{'email_line_number'};
 
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}-1]{'offset'} =
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}-1]{'offset'} =
       $self->{'email_offset'};
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}-1]{'validated'} =
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}-1]{'validated'} =
       1;
 
-    $CACHE->{$self->{'file_name'}}{'modified'} = 1;
+    $_CACHE->{$self->{'file_name'}}{'modified'} = 1;
 
     if ($self->end_of_file())
     {
       $UPDATING_CACHE = 0;
 
       # Last one is always validated
-      $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}-1]{'validated'} =
+      $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}-1]{'validated'} =
         1;
     }
 
@@ -902,7 +932,7 @@ sub _GET_HEADER_FIELD
     return wantarray ? ($1) : $1;
   }
 
-  return undef;
+  return undef; ## no critic (ProhibitExplicitReturnUndef)
 }
 
 1;

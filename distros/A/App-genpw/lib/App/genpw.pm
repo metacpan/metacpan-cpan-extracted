@@ -1,7 +1,7 @@
 package App::genpw;
 
-our $DATE = '2018-05-01'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2018-07-01'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -142,7 +142,7 @@ sub _pattern_has_w_conversion {
 
 $SPEC{genpw} = {
     v => 1.1,
-    summary => 'Generate random password (support patterns + wordlists)',
+    summary => 'Generate random password, with patterns and wordlists',
     description => <<'_',
 
 This is yet another utility to generate random password. Features:
@@ -150,24 +150,24 @@ This is yet another utility to generate random password. Features:
 * Allow specifying pattern(s), e.g. '%8a%s' means 8 random alphanumeric
   characters followed by a symbol.
 * Use words from wordlists.
-* Use strong random source (<pm:Math::Random::Secure>) when available, otherwise
-  fallback to Perl's builtin `rand()`.
+* Use strong random source when available, otherwise fallback to Perl's builtin
+  `rand()`.
 
 Examples:
 
-By default generate letters/digits 8-20 characters long:
+By default generate base56 password 12-20 characters long (-p %12$20B):
 
     % genpw
-    J9K3ZjBVR
+    Uk7Zim6pZeMTZQUyaM
 
 Generate 5 passwords instead of 1:
 
     % genpw 5
-    wAYftKsS
-    knaY7MOBbcvFFS3L1wyW
-    oQGz62aF
-    sG1A9reVOe
-    Zo8GoFEq
+    igYiRhUb5t9d9f3J
+    b7D44pnxZHJGQzDy2eg
+    RXDtqjMvp2hNAdQ
+    Xz3DmAL94akqtZ5xb
+    7TfANv9yxAaMGXm
 
 Generate random digits between 10 and 12 characters long:
 
@@ -194,7 +194,7 @@ Generate a random GUID:
 
 Like the above, but in uppercase:
 
-    % genpw -p '%8h-%4h-%4h-%4h-%12h'
+    % genpw -p '%8h-%4h-%4h-%4h-%12h' -U
     22E13D9E-1187-CD95-1D05-2B92A09E740D
 
 Use configuration file to avoid typing the pattern every time, put this in
@@ -263,9 +263,9 @@ sub genpw {
     my %args = @_;
 
     my $num = $args{num} // 1;
-    my $min_len = $args{min_len} // $args{len} // 8;
+    my $min_len = $args{min_len} // $args{len} // 12;
     my $max_len = $args{max_len} // $args{len} // 20;
-    my $patterns = $args{patterns} // ["%$min_len\$${max_len}a"];
+    my $patterns = $args{patterns} // ["%$min_len\$${max_len}B"];
     my $case = $args{case} // 'default';
 
   GET_WORDS_FROM_STDIN:
@@ -292,7 +292,7 @@ sub genpw {
 }
 
 1;
-# ABSTRACT: Generate random password (support patterns + wordlists)
+# ABSTRACT: Generate random password, with patterns and wordlists
 
 __END__
 
@@ -302,11 +302,11 @@ __END__
 
 =head1 NAME
 
-App::genpw - Generate random password (support patterns + wordlists)
+App::genpw - Generate random password, with patterns and wordlists
 
 =head1 VERSION
 
-This document describes version 0.007 of App::genpw (from Perl distribution App-genpw), released on 2018-05-01.
+This document describes version 0.009 of App::genpw (from Perl distribution App-genpw), released on 2018-07-01.
 
 =head1 SYNOPSIS
 
@@ -321,7 +321,7 @@ Usage:
 
  genpw(%args) -> [status, msg, result, meta]
 
-Generate random password (support patterns + wordlists).
+Generate random password, with patterns and wordlists.
 
 This is yet another utility to generate random password. Features:
 
@@ -332,26 +332,26 @@ characters followed by a symbol.
 
 =item * Use words from wordlists.
 
-=item * Use strong random source (L<Math::Random::Secure>) when available, otherwise
-fallback to Perl's builtin C<rand()>.
+=item * Use strong random source when available, otherwise fallback to Perl's builtin
+C<rand()>.
 
 =back
 
 Examples:
 
-By default generate letters/digits 8-20 characters long:
+By default generate base56 password 12-20 characters long (-p %12$20B):
 
  % genpw
- J9K3ZjBVR
+ Uk7Zim6pZeMTZQUyaM
 
 Generate 5 passwords instead of 1:
 
  % genpw 5
- wAYftKsS
- knaY7MOBbcvFFS3L1wyW
- oQGz62aF
- sG1A9reVOe
- Zo8GoFEq
+ igYiRhUb5t9d9f3J
+ b7D44pnxZHJGQzDy2eg
+ RXDtqjMvp2hNAdQ
+ Xz3DmAL94akqtZ5xb
+ 7TfANv9yxAaMGXm
 
 Generate random digits between 10 and 12 characters long:
 
@@ -378,7 +378,7 @@ Generate a random GUID:
 
 Like the above, but in uppercase:
 
- % genpw -p '%8h-%4h-%4h-%4h-%12h'
+ % genpw -p '%8h-%4h-%4h-%4h-%12h' -U
  22E13D9E-1187-CD95-1D05-2B92A09E740D
 
 Use configuration file to avoid typing the pattern every time, put this in

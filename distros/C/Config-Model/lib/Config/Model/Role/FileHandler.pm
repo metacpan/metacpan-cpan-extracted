@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::FileHandler;
-$Config::Model::Role::FileHandler::VERSION = '2.124';
+$Config::Model::Role::FileHandler::VERSION = '2.125';
 # ABSTRACT: role to read or write configuration files
 
 use strict;
@@ -65,7 +65,7 @@ Config::Model::Role::FileHandler - role to read or write configuration files
 
 =head1 VERSION
 
-version 2.124
+version 2.125
 
 =head1 SYNOPSIS
 

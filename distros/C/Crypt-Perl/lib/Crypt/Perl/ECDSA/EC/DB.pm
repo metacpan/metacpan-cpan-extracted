@@ -37,8 +37,6 @@ use warnings;
 
 use Try::Tiny;
 
-use Module::Load ();
-
 use Crypt::Perl::BigInt ();
 use Crypt::Perl::X ();
 
@@ -65,7 +63,7 @@ sub get_oid_for_curve_name {
     my $name_alt = $name;
     $name_alt =~ tr<-><_>;
 
-    Module::Load::load('Crypt::Perl::ECDSA::EC::CurvesDB');
+    require Crypt::Perl::ECDSA::EC::CurvesDB;
 
     my $translator_cr = Crypt::Perl::ECDSA::EC::CurvesDB->can("OID_$name_alt");
     die Crypt::Perl::X::create('ECDSA::NoCurveForName', $name) if !$translator_cr;
@@ -78,7 +76,7 @@ sub get_curve_name_by_data {
 
     my %hex_data = map { $_ => substr( $data_hr->{$_}->as_hex(), 2 ) } keys %$data_hr;
 
-    Module::Load::load('Crypt::Perl::ECDSA::EC::CurvesDB');
+    require Crypt::Perl::ECDSA::EC::CurvesDB;
 
     my $ns = \%Crypt::Perl::ECDSA::EC::CurvesDB::;
 
@@ -165,7 +163,7 @@ sub _get_curve_hex_data_by_oid {
     my $const = "CURVE_$oid";
     $const =~ tr<.><_>;
 
-    Module::Load::load('Crypt::Perl::ECDSA::EC::CurvesDB');
+    require Crypt::Perl::ECDSA::EC::CurvesDB;
 
     my $getter_cr = Crypt::Perl::ECDSA::EC::CurvesDB->can($const);
     die Crypt::Perl::X::create('ECDSA::NoCurveForOID', $oid) if !$getter_cr;

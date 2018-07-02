@@ -1,5 +1,42 @@
 Revision history for Perl extension Algorithm::Networksort.
 
+2.02
+	Thu June 21 2018
+	- Changed colorsettings(), which wasn't following the
+	  documentation correctly.
+	- Encapsulated Postscript works again.
+	- Encapsulated Postscript now can have color.
+	- At some point when I was new to Perl, I learned the 
+	      unpack("B32", pack("N", $x))
+	  idiom, not realizing that sprintf() had added a "%b"
+	  flag to its format. Sigh. Made the changes everywhere.
+
+	Fri Feb  9 2018
+	- Keys 'radius' and 'stroke_width' of graphsettings() split
+	  into two each for the input lines and the comparator lines,
+	  becoming 'inputradius' and 'compradius', and 'inputline'
+	  and 'compline'.  Zero-width radii (indicating no circle at
+	  all) for either line is possible, and the comparator lines
+	  and circles may be a different widths than the input lines
+	  and circles.
+	- The settings of the text version of diagrams are now set
+	  with function textsettings(), as making graphsettings()
+	  handle it all was ridiculous, not to mention the key
+	  collisions with the changes above.
+	- Check for "monotone" diagrams. If all the colors are
+	  the same, just set the color once in the SVG or
+	  EPS output instead of setting the color for each part
+	  of the diagram, resulting in a smaller file.
+	- Update the t/ and eg/ files to use the above changes.
+
+	Sun Jan 14 2018
+	- Test file best.t only skips networks of input size > 16
+	  instead of all skipping all networks if AUTHOR_TESTING
+	  isn't set.
+	Fri Jan 12 2018
+	- Added Designing Sorting Networks to the book list.
+	- Added David C. Van Voorhis's 16-input network (found in
+	  Designing Sorting Networks) to Best.pm.
 2.01
 	Wed Apr 20 2016
 	- Add nwsrt_title() to the list of default exported functions

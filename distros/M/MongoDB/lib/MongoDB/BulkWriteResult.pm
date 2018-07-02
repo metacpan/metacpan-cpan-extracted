@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::BulkWriteResult;
 # ABSTRACT: MongoDB bulk write result document
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 # empty superclass for backcompatibility; add a variable to the
 # package namespace so Perl thinks it's a real package
@@ -32,10 +30,10 @@ use MongoDB::Error;
 use MongoDB::_Constants;
 use MongoDB::_Types qw(
     ArrayOfHashRef
+    Numish
 );
 use Types::Standard qw(
     HashRef
-    Num
     Undef
 );
 use namespace::clean;
@@ -84,7 +82,7 @@ for my $attr (qw/inserted_count upserted_count matched_count deleted_count/) {
         is       => 'ro',
         writer   => "_set_$attr",
         required => 1,
-        isa      => Num,
+        isa      => Numish,
     );
 }
 
@@ -97,7 +95,7 @@ has modified_count => (
     is       => 'ro',
     writer   => '_set_modified_count',
     required => 1,
-    isa      => (Num|Undef),
+    isa      => (Numish|Undef),
 );
 
 sub has_modified_count {
@@ -109,14 +107,14 @@ has op_count => (
     is       => 'ro',
     writer   => '_set_op_count',
     required => 1,
-    isa      => Num,
+    isa      => Numish,
 );
 
 has batch_count => (
     is       => 'ro',
     writer   => '_set_batch_count',
     required => 1,
-    isa      => Num,
+    isa      => Numish,
 );
 
 #--------------------------------------------------------------------------#
@@ -336,7 +334,7 @@ MongoDB::BulkWriteResult - MongoDB bulk write result document
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ BEGIN {
 	$^W = 1;
 }
 
-use Test::More tests => 83;
+use Test::More tests => 87;
 use File::Spec::Functions ':ALL';
 use Parse::CSV;
 
@@ -18,6 +18,8 @@ ok( -f $readfile, "$readfile exists" );
 my $readfile2 = catfile( 't', 'data', 'newlines.csv' );
 ok( -f $readfile2, "$readfile2 exists" );
 
+my $malformed_file = catfile( 't', 'data', 'malformed.csv' );
+ok( -f $malformed_file, "$malformed_file exists" );
 
 
 
@@ -39,14 +41,11 @@ SCOPE: {
 	is( $csv->row,    1,  '->row returns 1' );
 	is( $csv->errstr, '', '->errstr returns ""' );
 
-	# Pull the first line
 	my $fetch2 = $csv->fetch;
 	is_deeply( $fetch2, [ qw{this is also a sample} ], '->fetch returns as expected' );
 	is( $csv->row,    2,  '->row returns 2' );
 	is( $csv->errstr, '', '->errstr returns ""' );
-	
 
-	# Pull the first line
 	my $fetch3 = $csv->fetch;
 	is_deeply( $fetch3, [ qw{1 2 3 4.5 5} ], '->fetch returns as expected' );
 	is( $csv->row,    3,  '->row returns 3' );
@@ -102,6 +101,7 @@ SCOPE: {
 		[ qw{a b c d e} ],
 		'->names ok',
 	);
+	# TODO the following is deprecated
 	is_deeply(
 		[$csv->fields],
 		[ qw{a b c d e} ],
@@ -118,18 +118,19 @@ SCOPE: {
 		'->fetch returns as expected',
 	);
 
-	# TODO string() should not be expected to return data here, according to the Text::CSV_XS docs.
-	my $line = $csv->string; 
+	# TODO the following is deprecated
+	my $line = $csv->string;
 	chomp($line); # $csv->string has linefeed
 	is( $line,"this,is,also,a,sample",'->string() works');
 	is_deeply(
+		# TODO the following is deprecated
 		[ $csv->fields ],
 		[ qw{this is also a sample} ],
 		'->fields() after first line returns as expected'
 	);
 
 	# Get the second line
-	my $fetch2 = $csv->fetch;	
+	my $fetch2 = $csv->fetch;
 	is( $csv->row,    3,  '->row returns 3' );
 	is( $csv->errstr, '', '->errstr returns ""' );
 	is_deeply(
@@ -165,6 +166,7 @@ SCOPE: {
 	is( $csv->row,    1,  '->row returns 1' );
 	is( $csv->errstr, '', '->errstr returns ""' );
 	is_deeply(
+		# TODO the following is deprecated
 		[$csv->fields],
 		[ qw{a b c d e} ],
 		'->fields() before first line and after open $csv returns as expected',
@@ -180,17 +182,18 @@ SCOPE: {
 		'->fetch returns as expected',
 	);
 
-	my $line = $csv->string; 
+	my $line = $csv->string;
 	chomp($line);  # $csv->string has linefeed
 	is( $line,"this,is,also,a,sample",'->string() works');
 	is_deeply(
+		# TODO the following is deprecated
 		[ $csv->fields ],
 		[ qw{this is also a sample} ],
 		'->fields() after first line returns as expected',
 	);
 
 	# Get the second line
-	my $fetch2 = $csv->fetch;	
+	my $fetch2 = $csv->fetch;
 	is( $csv->row,    3,  '->row returns 3' );
 	is( $csv->errstr, '', '->errstr returns ""' );
 	is_deeply(
@@ -245,7 +248,7 @@ SCOPE: {
 	);
 
 	# Get the second line
-	my $fetch2 = $csv->fetch;	
+	my $fetch2 = $csv->fetch;
 	is( $csv->row,    3,  '->row returns 3' );
 	is( $csv->errstr, '', '->errstr returns ""' );
 	is_deeply(
@@ -287,4 +290,21 @@ SCOPE: {
 	is( $fetch2, undef, '->fetch returns undef' );
 	is( $csv->row,    3,  '->row returns 3' );
 	is( $csv->errstr, '', '->errstr returns ""' );
+}
+
+#####################################################################
+# Errors from Text::CSV_XS are properly propagated
+
+SCOPE: {
+	my $csv = Parse::CSV->new(
+		file => $malformed_file,
+	);
+
+	my $fetch1 = $csv->fetch;
+	is_deeply( $fetch1, [ qw{1 2 3} ], '->fetch returns non-malformed line' );
+
+
+	my $fetch2 = $csv->fetch;
+	ok !defined($fetch2), "->fetch returns 'undef' on malformed line";
+	like $csv->errstr, qr/EIQ - Quoted field not terminated/, "->errstr returns proper error from Text::CSV_XS";
 }

@@ -30,12 +30,11 @@ require 5.005_62;
 use strict;
 use warnings;
 use vars qw($VERSION $BUILD);
-$VERSION = '0.26';
-$BUILD = 'Monday May 15 23:08:34 GMT 2006';
+$VERSION = '0.27';
 # ----------------------------------------------------------------------------------------------------
 {
 	package Class::STL::ClassMembers;
-	use UNIVERSAL qw(isa can);
+	use UNIVERSAL;
 	use Carp qw(confess);
 	use Class::STL::Trace;
 	sub import

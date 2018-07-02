@@ -1,7 +1,7 @@
 [PerlTidy]
 select = {lib,t}/**/*.{pl,pm,t}
 select = Makefile.PL
-select = pmake
+select = pure-perl-make
 argv = --profile=$ROOT/.perltidyrc
 
 [SortLines]

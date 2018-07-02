@@ -3,7 +3,7 @@ package MVC::Neaf::Request;
 use strict;
 use warnings;
 
-our $VERSION = 0.2501;
+our $VERSION = 0.2601;
 
 =head1 NAME
 
@@ -219,7 +219,7 @@ instead.
 
 sub route {
     my $self = shift;
-    return $self->{route} || MVC::Neaf::Route::Null->new;
+    return $self->{route} ||= MVC::Neaf::Route::Null->new;
 };
 
 =head2 set_path()
@@ -480,7 +480,7 @@ sub param {
     return $default if !defined $value;
     return $value   if  $value =~ /^(?:$regex)$/s;
 
-    if ($self->route->strict) {
+    if (length $value && $self->route->strict) {
         die 422; # TODO 0.30 configurable die message
     };
     return $default;
@@ -534,7 +534,7 @@ sub url_param {
     return $default if !defined $value;
     return $value   if  $value =~ /^(?:$regex)$/s;
 
-    if ($self->route->strict) {
+    if (length $value && $self->route->strict) {
         die 422; # TODO 0.30 configurable die message
     };
     return $default;
@@ -832,7 +832,7 @@ sub get_cookie {
 
     return $value if $value =~ /^$regex$/;
 
-    if ($self->route->strict) {
+    if (length $value && $self->route->strict) {
         die 422; # TODO 0.30 configurable die message
     };
     return $default;
@@ -1138,7 +1138,7 @@ sub session {
         return $sess;
     };
 
-    return $self->{session} = $self->{session_engine}->create_session;
+    return $self->{session} = $self->_session_setup->{engine}->create_session;
 };
 
 =head2 load_session
@@ -1155,20 +1155,34 @@ sub load_session {
     # aggressive caching FTW
     return $self->{session} if exists $self->{session};
 
+    my $setup = $self->_session_setup;
     $self->_croak("No session engine found, use Request->stash() for per-request data")
-        unless $self->{session_engine};
+        unless $setup;
 
     # Try loading session...
-    my $id = $self->get_cookie( $self->{session_cookie}, $self->{session_regex} );
-    my $hash = ($id && $self->{session_engine}->load_session( $id ));
+    my $id = $self->get_cookie( $setup->{cookie}, $setup->{regex} );
+    my $hash = ($id && $setup->{engine}->load_session( $id ));
 
-    if ($hash && ref $hash eq 'HASH' && $hash->{data}) {
+    if (!$hash) {
+        return;
+    } elsif ( ref $hash ne 'HASH' ) {
+        $self->_croak( (ref $setup->{engine})
+            ."->load_session must return a HASH and not ".(ref $hash) );
+    } elsif ($hash->{data} ) {
         # Loaded, cache it & refresh if needed
         $self->{session} = $hash->{data};
 
         $self->set_cookie(
-            $self->{session_cookie} => $hash->{id}, expire => $hash->{expire} )
-                if $hash->{id};
+            $setup->{cookie} => $hash->{id},
+            expire => $hash->{expire} || $setup->{expire},
+        )
+            if $hash->{id};
+    } else {
+        carp(
+            (ref $setup->{engine})
+            ."->load_session must return keys(data,[id,expire]) and not "
+            .join ",", keys %$hash
+        );
     };
 
     return $self->{session};
@@ -1196,21 +1210,21 @@ sub save_session {
         $self->{session} = shift;
     };
 
-    return $self
-        unless exists $self->{session_engine};
+    my $setup = $self->_session_setup;
+    return $self unless $setup;
 
     # TODO 0.90 set "save session" flag, save later
-    my $id = $self->get_cookie( $self->{session_cookie}, $self->{session_regex} );
-    $id ||= $self->{session_engine}->get_session_id();
+    my $id = $self->get_cookie( $setup->{cookie}, $setup->{regex} );
+    $id ||= $setup->{engine}->get_session_id();
 
-    my $hash = $self->{session_engine}->save_session( $id, $self->session );
+    my $hash = $setup->{engine}->save_session( $id, $self->session );
 
     if ( $hash && ref $hash eq 'HASH' ) {
         # save successful - send cookie to user
         my $expire = $hash->{expire};
 
         $self->set_cookie(
-            $self->{session_cookie} => $hash->{id} || $id,
+            $setup->{cookie} => $hash->{id} || $id,
             expire => $hash->{expire},
         );
     };
@@ -1226,24 +1240,21 @@ Remove session.
 
 sub delete_session {
     my $self = shift;
-    return unless $self->{session_engine};
 
-    my $id = $self->get_cookie( $self->{session_cookie}, $self->{session_regex} );
-    $self->{session_engine}->delete_session( $id )
+    my $setup = $self->_session_setup;
+    return unless $setup->{engine};
+
+    my $id = $self->get_cookie( $setup->{cookie}, $setup->{regex} );
+    $setup->{engine}->delete_session( $id )
         if $id;
-    $self->delete_cookie( $self->{session_cookie} );
+    $self->delete_cookie( $setup->{cookie} );
     return $self;
 };
 
-# TODO 0.90 This is awkward, but... Maybe optimize later
-# TODO 0.90 Replace with callback generator (managed by cb anyway)
-sub _set_session_handler {
-    my ($self, $data) = @_;
-    $self->{session_engine} = $data->[0];
-    $self->{session_cookie} = $data->[1];
-    $self->{session_regex}  = $data->[2];
-    $self->{session_ttl}    = $data->[3];
-};
+_helper_fallback( _session_setup => sub {
+    my $self = shift;
+    $self->_croak("No session engine found, use `neaf session => ...` to set up one");
+} );
 
 =head1 REPLY METHODS
 
@@ -1354,12 +1365,28 @@ sub reply {
 sub _set_reply {
     my ($self, $data) = @_;
 
-    croak "Bareword forbidden in reply"
+    # Cannot croak because it may point at wrong location
+    # TODO 0.30 More suitable error message, force logging error
+    die "NEAF: FATAL: Controller must return hash at ".$self->endpoint_origin."\n"
         unless ref $data and UNIVERSAL::isa($data, 'HASH');
+    # TODO 0.30 Also accept (&convert) hash headers
+    die "NEAF: FATAL: '-headers' must be an even-sized array at ".$self->endpoint_origin."\n"
+        if defined $data->{-headers}
+            and (ref $data->{-headers} ne 'ARRAY' or @{ $data->{-headers} } % 2);
+    Carp::cluck "NEAF: WARN: Request->_set_reply called twice, please file a bug in Neaf"
+        if $self->{response}{ret};
 
-    $self->{response}{ret} = $data;
-    return $self;
+    my $def = $self->route->default || {};
+
+    # Return the resulting hash
+    $self->{response}{ret} = { %$def, %$data };
 }
+
+# TODO 0.4 should we delete {response} altogether?
+sub _unset_reply {
+    my $self = shift;
+    delete $self->{response}{ret};
+};
 
 =head2 stash( ... )
 
@@ -1583,34 +1610,7 @@ some king of logging.
 
 sub log_error {
     my ($self, $msg) = @_;
-    $self->do_log_error( $self->_log_mark($msg) );
-};
-
-sub _where {
-    my $self = shift;
-
-    return $self->{prefix} || "pre_route";
-};
-
-sub _log_mark {
-    my ($self, $msg) = @_;
-
-    $msg ||= Carp::shortmess( "Something bad happened" );
-    $msg =~ s/\s*$//s;
-
-    return "req_id=".$self->id." in ".$self->_where.": $msg";
-};
-
-# See do_log_error below
-
-# If called outside user's code, carp() will point at http server
-#     which is misleading.
-# So make a warn/die message that actually blames user's code
-sub _message {
-    my ($self, $message) = @_;
-
-    return "NEAF: $message in handler ".$self->method." '".$self->script_name
-        ."' at ".$self->endpoint_origin."\n";
+    $self->log_message( error => $msg );
 };
 
 =head2 execute_postponed()
@@ -1636,6 +1636,97 @@ sub execute_postponed {
         }, $self );
 
     return $self;
+};
+
+
+sub _mangle_headers {
+    my $self = shift;
+
+    my $data = $self->reply;
+    my $content = \$data->{-content};
+
+    confess "NEAF: No content after request processing. File a bug in MVC::Neaf"
+         unless defined $$content;
+
+    # Process user-supplied headers
+    if (my $append = $data->{-headers}) {
+        my $head = $self->header_out;
+        for (my $i = 0; $i < @$append; $i+=2) {
+            $head->push_header($append->[$i], $append->[$i+1]);
+        };
+    };
+
+    # TODO 0.30 do something with this regex mess - its complicated & dog slow
+    # Encode unicode content NOW so that we don't lie about its length
+    # Then detect ascii/binary
+    if (Encode::is_utf8( $$content )) {
+        # UTF8 means text, period
+        $$content = encode_utf8( $$content );
+        $data->{-type} ||= 'text/plain';
+        $data->{-type} .= "; charset=utf-8"
+            unless $data->{-type} =~ /; charset=/;
+    } elsif (!$data->{-type}) {
+        # Autodetect binary. Plain text is believed to be in utf8 still
+        $data->{-type} = $$content =~ /^.{0,512}?[^\s\x20-\x7F]/s
+            ? 'application/octet-stream'
+            : 'text/plain; charset=utf-8';
+    } elsif ($data->{-type} =~ m#^text/#) {
+        # Some other text, mark as utf-8 just in case
+        $data->{-type} .= "; charset=utf-8"
+            unless $data->{-type} =~ /; charset=/;
+    };
+
+    # MANGLE HEADERS
+    my $head = $self->header_out;
+
+    # The most standard ones...
+    $head->init_header( content_type => $data->{-type} );
+    $head->init_header( location => $data->{-location} )
+        if $data->{-location};
+    $head->push_header( set_cookie => $self->format_cookies );
+    $head->init_header( content_length => length $$content )
+        unless $data->{-continue};
+
+    # TODO 0.30 must be hook
+    if ($data->{-status} == 200 and my $ttl = $self->route->cache_ttl) {
+        $head->init_header( expires => http_date( time + $ttl ) );
+    };
+
+    # END MANGLE HEADERS
+};
+
+# Apply route's pre_reply & pre_cleanup hooks to self, if any
+sub _apply_late_hooks {
+    my $self = shift;
+
+    my $route = $self->route;
+    if (my $hooks = $route->hooks->{pre_cleanup}) {
+        $self->postpone( $hooks );
+    };
+    if (my $hooks = $route->hooks->{pre_reply}) {
+        run_all_nodie( $hooks, sub {
+                $self->log_error( "NEAF: pre_reply hook failed: $@" )
+        }, $self );
+    };
+};
+
+# Dispatch headers & content
+# This is called at the end of handle_request
+sub _respond {
+    my $self = shift;
+
+    # TODO 0.30 kill do_reply, simplify this
+    my $data = $self->reply;
+
+    if( $self->method eq 'HEAD' ) {
+        return $self->do_reply( $data->{-status}, '' );
+    } elsif ( $data->{-continue} ) {
+        $self->postpone( $data->{-continue}, 1 );
+        $self->postpone( sub { $_[0]->write( $data->{-content} ); }, 1 );
+        return $self->do_reply( $data->{-status} );
+    } else {
+        return $self->do_reply( $data->{-status}, $data->{-content} );
+    };
 };
 
 sub DESTROY {
@@ -1715,10 +1806,14 @@ Suggested values are "fatal", "error", "warn", "debug".
 =cut
 
 _helper_fallback( log_message => sub {
-    my ($req, $level, @mess) = @_;
+    my ($req, $level, $mess) = @_;
 
-    warn sprintf "%s req_id=%s [%s]: %s"
-        , uc $level, $req->id, $req->_where, join " ", @mess;
+    $mess = Carp::shortmess("(undef)")
+        unless defined $mess;
+    $mess =~ s/\n+$//s;
+
+    warn sprintf "%s req_id=%s [%s]: %s\n"
+        , uc $level, $req->id, $req->route->path, $mess;
 });
 
 =head1 DRIVER METHODS
@@ -1762,8 +1857,6 @@ They SHOULD NOT be called directly inside the application.
 
 =item * do_close()
 
-=item * do_log_error()
-
 =back
 
 =cut
@@ -1785,13 +1878,6 @@ foreach (qw(
 
 # by default, just skip - the handle will auto-close anyway at some point
 sub do_close { return 1 };
-
-# by default, write to STDERR - ugly but at least it will get noticed
-sub do_log_error {
-    my ($self, $msg) = @_;
-
-    warn "NEAF: ERROR: $msg\n";
-};
 
 sub _croak {
     my ($self, $msg) = @_;

@@ -2,7 +2,7 @@ package App::Prove::Plugin::andoc;
 use strict;
 use warnings;
 
-our $VERSION = '0.8.4';
+our $VERSION = '0.8.5';
 
 use Pandoc;
 use File::Temp qw(tempdir);

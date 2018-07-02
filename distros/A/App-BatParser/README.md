@@ -4,7 +4,7 @@ App::BatParser - Parse DOS .bat and .cmd files
 
 # VERSION
 
-version 0.006
+version 0.009
 
 # DESCRIPTION
 
@@ -52,3 +52,4 @@ the same terms as the Perl 5 programming language system itself.
 
 - eva.dominguez <eva.dominguez@meteologica.com>
 - Toby Inkster <tobyink@cpan.org>
+- juanradiego <kilaweo@gmail.com>

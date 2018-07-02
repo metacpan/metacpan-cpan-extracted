@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,17 +11,17 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
+
 package MongoDB::Role::_BypassValidation;
 
 # MongoDB interface for optionally applying bypassDocumentValidation
 # to a command
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo::Role;
 
@@ -38,13 +37,13 @@ has bypassDocumentValidation => (
     isa => Boolish,
 );
 
-# args not unpacked for efficiency; args are self, link, command;
-# returns (unmodified) link and command
+# args not unpacked for efficiency; args are self, validation supported
+# flag, original command; returns (possibly modified) command
 sub _maybe_bypass {
     push @{ $_[2] },
       bypassDocumentValidation => ( $_[0]->bypassDocumentValidation ? true : false )
-      if defined $_[0]->bypassDocumentValidation && $_[1]->accepts_wire_version(4);
-    return $_[1], $_[2];
+      if $_[1] && defined $_[0]->bypassDocumentValidation;
+    return $_[2];
 }
 
 1;

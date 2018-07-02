@@ -4,8 +4,8 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $DATE = '2018-06-19'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-06-27'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -15,8 +15,7 @@ Perinci::CmdLine::Any->new(
     url => $prefix,
     log => 1,
     subcommands => {
-        'spot-rate'      => {url => "${prefix}spot_rate"},
-        'all-spot-rates' => {url => "${prefix}all_spot_rates"},
+        'spot-rates'     => {url => "${prefix}spot_rates"},
         'sources'        => {url => "${prefix}sources"},
     },
 )->run;
@@ -36,7 +35,7 @@ fiatx - Fiat currency exchange rate tool
 
 =head1 VERSION
 
-This document describes version 0.005 of fiatx (from Perl distribution App-fiatx), released on 2018-06-19.
+This document describes version 0.007 of fiatx (from Perl distribution App-fiatx), released on 2018-06-27.
 
 =head1 SYNOPSIS
 
@@ -47,44 +46,47 @@ First, create a MySQL database e.g. C<fiatx>. Then in F<~/.config/fiatx.conf>:
  ; db_username=...
  ; db_password=...
 
-To get conversion rates of USD/IDR (by default the dealer's 'sell' rate):
+To see all conversion rates for all pairs and all sources (possible huge list
+and takes a long time):
 
- % fiatx spot-rate USD IDR
+ % fiatx spot-rates
 
-By default result is cached for 4 hours, to force querying from the source
-again:
+To see conversion rates for all pairs from a single source e.g. C<bca> (note:
+not all sources might support this):
 
- % fiatx spot-rate USD IDR --no-cache
-
-To get dealer's 'buy' rate:
-
- % fiatx spot-rate USD IDR --type buy
-
-To query from a specific source:
-
- % fiatx spot-rate USD IDR --source bi
-
-To get highest/lowest rate of all sources:
-
- % fiatx spot-rate USD IDR --source :highest
- % fiatx spot-rate USD IDR --source :lowest
-
-To get rate from source with the newest/oldest update:
-
- % fiatx spot-rate USD IDR --source :newest
- % fiatx spot-rate USD IDR --source :oldest
-
-To get rate averaged from several sources:
-
- % fiatx spot-rate USD IDR --source :average
+ % fiatx spot-rates bca
 
 To list available sources:
 
  % fiatx sources
 
-To get all spot rates from a source:
+To see conversion rates for a single pair and type from a single source e.g.
+C<bca>:
 
- % fiatx all-spot-rates bca
+ % fiatx spot-rates bca USD/IDR sell
+
+By default result is cached in database for a few hours. To force fetching from
+remote source again:
+
+ % fiatx spot-rate bca USD/IDR sell --no-cache
+
+To get another type:
+
+ % fiatx spot-rate bca USD/IDR buy
+
+To get highest/lowest rate of all sources:
+
+ % fiatx spot-rate :highest USD/IDR
+ % fiatx spot-rate :lowest  USD/IDR
+
+To get rate from source with the newest/oldest update:
+
+ % fiatx spot-rate :newest USD/IDR
+ % fiatx spot-rate :oldest USD/IDR
+
+To get rate averaged from several sources:
+
+ % fiatx spot-rate :average USD/IDR
 
 For more details, use C<fiatx --help> or consult documentation.
 
@@ -92,17 +94,13 @@ For more details, use C<fiatx --help> or consult documentation.
 
 =head1 SUBCOMMANDS
 
-=head2 B<all-spot-rates>
-
-Get all spot (latest) rates from a source.
-
 =head2 B<sources>
 
 List available sources.
 
-=head2 B<spot-rate>
+=head2 B<spot-rates>
 
-Get spot (latest) rate.
+Get spot (latest) rate(s) from a source.
 
 =head1 OPTIONS
 
@@ -197,7 +195,7 @@ Display program's version and exit.
 
 =back
 
-=head2 Options for subcommand all-spot-rates
+=head2 Options for subcommand spot-rates
 
 =over
 
@@ -215,58 +213,21 @@ Default value:
 
  14400
 
-=item B<--no-cache>=I<s>
+=item B<--no-cache>
 
 Alias for --max-age-cache 0.
 
 See C<--max-age-cache>.
 
-=item B<--source>=I<s>*
+=item B<--pair>=I<s>
 
-Ask for a specific remote source.
+=item B<--per-type>
 
-Default value:
+Return one row of result per rate type.
 
- ":any"
+This allow seeing notes and different mtime per rate type, which can be
+different between different types of the same source.
 
-If you want a specific remote source, you can specify it here. The default is
-':any' which is to pick the first source that returns a recent enough current
-rate.
-
-Other special values: `:highest` to return highest rate of all sources,
-`:lowest` to return lowest rate of all sources, ':newest' to return rate from
-source with the newest last update time, ':oldest' to return rate from source
-with the oldest last update time, ':average' to return arithmetic average of all
-sources.
-
-
-=back
-
-=head2 Options for subcommand spot-rate
-
-=over
-
-=item B<--db-name>=I<s>*
-
-=item B<--db-password>=I<s>
-
-=item B<--db-username>=I<s>
-
-=item B<--from>=I<s>*
-
-=item B<--max-age-cache>=I<s>
-
-Above this age (in seconds), we retrieve rate from remote source again.
-
-Default value:
-
- 14400
-
-=item B<--no-cache>=I<s>
-
-Alias for --max-age-cache 0.
-
-See C<--max-age-cache>.
 
 =item B<--source>=I<s>
 
@@ -274,7 +235,7 @@ Ask for a specific remote source.
 
 Default value:
 
- ":any"
+ ":all"
 
 If you want a specific remote source, you can specify it here. The default is
 ':any' which is to pick the first source that returns a recent enough current
@@ -287,19 +248,9 @@ with the oldest last update time, ':average' to return arithmetic average of all
 sources.
 
 
-=item B<--to>=I<s>*
-
 =item B<--type>=I<s>
 
 Which rate is wanted? e.g. sell, buy.
-
-Default value:
-
- "sell"
-
-Valid values:
-
- ["sell","buy"]
 
 =back
 
@@ -363,26 +314,18 @@ List of available configuration parameters:
  log_level (see --log-level)
  naked_res (see --naked-res)
 
-=head2 Configuration for subcommand all-spot-rates
-
- db_name (see --db-name)
- db_password (see --db-password)
- db_username (see --db-username)
- max_age_cache (see --max-age-cache)
- source (see --source)
-
 =head2 Configuration for subcommand sources
 
 
-=head2 Configuration for subcommand spot-rate
+=head2 Configuration for subcommand spot-rates
 
  db_name (see --db-name)
  db_password (see --db-password)
  db_username (see --db-username)
- from (see --from)
  max_age_cache (see --max-age-cache)
+ pair (see --pair)
+ per_type (see --per-type)
  source (see --source)
- to (see --to)
  type (see --type)
 
 =head1 ENVIRONMENT

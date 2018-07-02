@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/ListOrgHeadlinesFast/count_org_todos
-# and generated automatically using Perinci::CmdLine::Gen version 0.46
+# Note: This script is a CLI for Riap function /App/ListOrgHeadlinesFast/count_org_todos
+# and generated automatically using Perinci::CmdLine::Gen version 0.485
 
-our $DATE = '2017-07-10'; # DATE
+our $DATE = '2018-06-30'; # DATE
 our $DIST = 'App-OrgUtils'; # DIST
-our $VERSION = '0.46'; # VERSION
+our $VERSION = '0.470'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,10 +13,12 @@ use warnings;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ListOrgHeadlinesFast/count_org_todos",
     program_name => "count-org-todos-fast",
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Count Org todos
 # PODNAME: count-org-todos-fast
@@ -33,7 +35,7 @@ count-org-todos-fast - Count Org todos
 
 =head1 VERSION
 
-This document describes version 0.46 of count-org-todos-fast (from Perl distribution App-OrgUtils), released on 2017-07-10.
+This document describes version 0.470 of count-org-todos-fast (from Perl distribution App-OrgUtils), released on 2018-06-30.
 
 =head1 SYNOPSIS
 
@@ -130,7 +132,7 @@ Only include headline which lack all these tags (JSON-encoded).
 
 See C<--lacks-tag>.
 
-=item B<--level>=I<i>
+=item B<--level>=I<s>
 
 =item B<--match>=I<s>
 
@@ -140,9 +142,9 @@ Value is either a string or a regex. If string is in the form of `/.../` or
 `/.../i` it is assumed to be a regex.
 
 
-=item B<--max-level>=I<i>
+=item B<--max-level>=I<s>
 
-=item B<--min-level>=I<i>
+=item B<--min-level>=I<s>
 
 =item B<--parent-match>=I<s>
 
@@ -308,7 +310,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::CustomerSearch;
-$WebService::Braintree::CustomerSearch::VERSION = '1.5';
+$WebService::Braintree::CustomerSearch::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -18,14 +18,14 @@ objects of this class through the search interface.
 
 =cut
 
-use Moose;
-extends 'WebService::Braintree::AdvancedSearch';
+use Moo;
+with 'WebService::Braintree::Role::AdvancedSearch';
+
+use constant FIELDS => [];
 
 =head1 FIELDS
 
 =cut
-
-my $field = WebService::Braintree::AdvancedSearchFields->new(metaclass => __PACKAGE__->meta);
 
 =head2 address_country_name
 
@@ -33,7 +33,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("address_country_name");
+__PACKAGE__->text_field("address_country_name");
 
 =head2 address_extended_address
 
@@ -41,7 +41,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("address_extended_address");
+__PACKAGE__->text_field("address_extended_address");
 
 =head2 address_first_name
 
@@ -49,7 +49,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("address_first_name");
+__PACKAGE__->text_field("address_first_name");
 
 =head2 address_last_name
 
@@ -57,7 +57,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("address_last_name");
+__PACKAGE__->text_field("address_last_name");
 
 =head2 address_locality
 
@@ -65,7 +65,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("address_locality");
+__PACKAGE__->text_field("address_locality");
 
 =head2 address_postal_code
 
@@ -73,7 +73,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("address_postal_code");
+__PACKAGE__->text_field("address_postal_code");
 
 =head2 address_region
 
@@ -81,7 +81,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("address_region");
+__PACKAGE__->text_field("address_region");
 
 =head2 address_street_address
 
@@ -89,7 +89,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("address_street_address");
+__PACKAGE__->text_field("address_street_address");
 
 =head2 cardholder_name
 
@@ -97,7 +97,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("cardholder_name");
+__PACKAGE__->text_field("cardholder_name");
 
 =head2 company
 
@@ -105,7 +105,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("company");
+__PACKAGE__->text_field("company");
 
 =head2 created_at
 
@@ -113,7 +113,7 @@ This is a L<range field|WebService::Braintree::AdvancedSearchNodes/"Range Field"
 
 =cut
 
-$field->range("created_at");
+__PACKAGE__->range_field("created_at");
 
 =head2 credit_card_expiration_date
 
@@ -122,7 +122,7 @@ credit cards with a specific expiration date.
 
 =cut
 
-$field->equality("credit_card_expiration_date");
+__PACKAGE__->equality_field("credit_card_expiration_date");
 
 =head2 credit_card_number
 
@@ -131,7 +131,7 @@ credit cards containing a specific card number.
 
 =cut
 
-$field->partial_match("credit_card_number");
+__PACKAGE__->partial_match_field("credit_card_number");
 
 =head2 email
 
@@ -139,7 +139,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("email");
+__PACKAGE__->text_field("email");
 
 =head2 fax
 
@@ -147,7 +147,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("fax");
+__PACKAGE__->text_field("fax");
 
 =head2 first_name
 
@@ -155,7 +155,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("first_name");
+__PACKAGE__->text_field("first_name");
 
 =head2 id
 
@@ -163,7 +163,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("id");
+__PACKAGE__->text_field("id");
 
 =head2 ids
 
@@ -171,7 +171,7 @@ This is a L<multiple-values field|WebService::Braintree::AdvancedSearchNodes/"Mu
 
 =cut
 
-$field->multiple_values("ids");
+__PACKAGE__->multiple_values_field("ids");
 
 =head2 last_name
 
@@ -179,7 +179,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("last_name");
+__PACKAGE__->text_field("last_name");
 
 =head2 payment_method_token
 
@@ -187,7 +187,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("payment_method_token");
+__PACKAGE__->text_field("payment_method_token");
 
 =head2 payment_method_token_with_duplicates
 
@@ -195,7 +195,7 @@ This is an L<is field|WebService::Braintree::AdvancedSearchNodes/"is Field">. It
 
 =cut
 
-$field->is("payment_method_token_with_duplicates");
+__PACKAGE__->is_field("payment_method_token_with_duplicates");
 
 =head2 paypal_account_email
 
@@ -203,7 +203,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("paypal_account_email");
+__PACKAGE__->text_field("paypal_account_email");
 
 =head2 phone
 
@@ -211,7 +211,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("phone");
+__PACKAGE__->text_field("phone");
 
 =head2 website
 
@@ -219,7 +219,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("website");
+__PACKAGE__->text_field("website");
 
 __PACKAGE__->meta->make_immutable;
 

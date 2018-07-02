@@ -66,7 +66,7 @@ my $simple = [
        list      => [ 2 ],
        used_keys => [ qw( ENTER ) ],
        expected  => "<2>",
-       options   => { prompt => 'Your choice: ', order => 0, layout => 0, hide_cursor => 0 },
+       options   => { prompt => 'Your choice: ', order => 0, layout => 0, hide_cursor => 0, include_highlighted => 1 },
    },
 ];
 
@@ -75,7 +75,7 @@ my $hide_cursor = [
        list      => [ 1 .. 199 ],
        used_keys => [ qw( ENTER ) ],
        expected  => "<1>",
-       options   => { prompt => 'Your choice: ', order => 0, layout => 0, hide_cursor => 1, clear_screen => 0  }
+       options   => { prompt => 'Your choice: ', order => 0, layout => 0, hide_cursor => 1, clear_screen => 0, include_highlighted => 1  }
    },
 ];
 
@@ -83,7 +83,7 @@ my $hide_cursor = [
 # CONTROL_C
 # KEY_q CONTROL_D
 my $k_list    = [ 0 .. 1999 ];
-my $k_options = { default => 1007, order => 0, layout => 0, hide_cursor => 0 };
+my $k_options = { default => 1007, order => 0, layout => 0, hide_cursor => 0, include_highlighted => 1 };
 my $seq_test = [
     #{ list => $k_list, used_keys => [ qw( ENTER ) ],        expected => "<1007>",     options => $k_options, },
     #{ list => $k_list, used_keys => [ qw( CONTROL_M ) ],    expected => "<1007>",     options => $k_options, },
@@ -227,25 +227,25 @@ my $list = {
 
 
 my $options = [
-    { max_height => undef, max_width => undef, layout => 0 },
-    { max_height => 20, max_width => undef, layout => 0 },
-    { max_height => undef, max_width => undef, layout => 1 },
-    { max_height => 20, max_width => undef, layout => 3 },
-    { max_height => undef, max_width => 61, layout => 2 },
-    { max_height => 20, max_width => 60, layout => 0 },
-    { max_height => 20, max_width => 60, layout => 1 },
-    { max_height => 20, max_width => 60, layout => 2 },
-    { max_height => 20, max_width => 60, layout => 3 },
+    { max_height => undef, max_width => undef, layout => 0, include_highlighted => 1 },
+    { max_height => 20, max_width => undef, layout => 0, include_highlighted => 1 },
+    { max_height => undef, max_width => undef, layout => 1, include_highlighted => 1 },
+    { max_height => 20, max_width => undef, layout => 3, include_highlighted => 1 },
+    { max_height => undef, max_width => 61, layout => 2, include_highlighted => 1 },
+    { max_height => 20, max_width => 60, layout => 0, include_highlighted => 1 },
+    { max_height => 20, max_width => 60, layout => 1, include_highlighted => 1 },
+    { max_height => 20, max_width => 60, layout => 2, include_highlighted => 1 },
+    { max_height => 20, max_width => 60, layout => 3, include_highlighted => 1 },
     { max_height => 20, max_width => 60, layout => 1, prompt => 'Your choice: ', page => 0, pad => 3, order => 1,
-      justify => 2, keep => 8, clear_screen => 1 },
+      justify => 2, keep => 8, clear_screen => 1, include_highlighted => 1 },
     { max_height => 20, max_width => 60, layout => 1, prompt => 'Your choice: ' x 100, page => 0, pad => 3, order => 1,
-      justify => 2, keep => 8, clear_screen => 1 },
+      justify => 2, keep => 8, clear_screen => 1, include_highlighted => 1 },
     { prompt => 'abc 12345678 def' x 50, default => 10, empty =>' ', undef => '--', beep => 1,
-      no_spacebar => [ 11 .. 2000 ], lf => [ 0, 4 ], keep => 16 },
-    { max_height => 20, max_width => 60, layout => 0, mark => [ 0, 10, 100 ] },
-    { max_height => 20, max_width => 60, layout => 1, mark => [ 0, 10, 100 ], index => 1 },
-    { max_height => 20, max_width => 60, layout => 2, mark => [ 0, 10, 35, 100, 1979 ], no_spacebar => [ 35, 1066, 1979 ] },
-    { max_height => 20, max_width => 60, layout => 3, mark => [ 0, 10, 100 ] },
+      no_spacebar => [ 11 .. 2000 ], lf => [ 0, 4 ], keep => 16, include_highlighted => 1 },
+    { max_height => 20, max_width => 60, layout => 0, mark => [ 0, 10, 100 ], include_highlighted => 1 },
+    { max_height => 20, max_width => 60, layout => 1, mark => [ 0, 10, 100 ], index => 1, include_highlighted => 1 },
+    { max_height => 20, max_width => 60, layout => 2, mark => [ 0, 10, 35, 100, 1979 ], no_spacebar => [ 35, 1066, 1979 ], include_highlighted => 1 },
+    { max_height => 20, max_width => 60, layout => 3, mark => [ 0, 10, 100 ], include_highlighted => 1 },
 ];
 
 
@@ -425,13 +425,13 @@ my $option_ll = [
         list      => $list->{ll},
         used_keys => [ ( 'DOWN' ) x 3, 'SPACE', ( 'RIGHT' ) x 3, 'SPACE', 'HOME', 'ENTER'  ],
         expected  => "<0 3 30>",
-        options   => { ll => 9, layout => 1 }
+        options   => { ll => 9, layout => 1, include_highlighted => 1 }
     },
     {
         list      => $list->{ll},
         used_keys => [  'END', 'SPACE', 'PAGE_UP', 'SPACE', ( 'UP' ) x 12, 'LEFT', 'ENTER'  ],
         expected  => "<9 21 43>",
-        options   => { ll => 9, layout => 3 }
+        options   => { ll => 9, layout => 3, include_highlighted => 1 }
     },
 ];
 

@@ -49,6 +49,7 @@ sub _build_encryption_client
     return $crypto;
 }
 
+sub schema_version { 1 }
 
 __PACKAGE__->load_namespaces;
 

@@ -14,7 +14,7 @@ use constant {
 };
 
 
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 has cur_comb_idx => ( is => 'rw', lazy_build => 1 );
 

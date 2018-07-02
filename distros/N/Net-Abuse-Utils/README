@@ -1,117 +1,137 @@
 NAME
+
     Net::Abuse::Utils - Routines useful for processing network abuse
 
 VERSION
-    version 0.25
+
+    version 0.27
 
 SYNOPSIS
+
         use Net::Abuse::Utils qw( :all );
         print "IP Whois Contacts: ", join( ' ', get_ipwi_contacts($ip) ), "\n";
         print "Abuse.net Contacts: ", get_abusenet_contact($domain), "\n";
 
 DESCRIPTION
+
     Net::Abuse::Utils provides serveral functions useful for determining
     information about an IP address including contact/reporting addresses,
-    ASN/network info, reverse dns, and DNSBL listing status. Functions which
-    take an IP accept either IPv6 or IPv4 IPs unless indicated otherwise.
-
-NAME
-    Net::Abuse::Utils - Routines useful for processing network abuse
-
-VERSION
-    version 0.24
+    ASN/network info, reverse dns, and DNSBL listing status. Functions
+    which take an IP accept either IPv6 or IPv4 IPs unless indicated
+    otherwise.
 
 CONFIGURATION
+
     There is a @RESOLVERS package variable you can use to specify name
     servers different than the systems nameservers for queries from this
     module. If you intend to use Google's nameservers here, please see This
     issue on GitHub for a note of caution
-    <https://github.com/mikegrb/Net-Abuse-Utils/issues/9#issuecomment-243874
-    35>.
+    <https://github.com/mikegrb/Net-Abuse-Utils/issues/9#issuecomment-24387435>.
 
 FUNCTIONS
+
     The following functions are exportable from this module. You may import
-    all of them into your namespace with the ":all" tag.
+    all of them into your namespace with the :all tag.
 
-  get_asn_info ( IP )
+ get_asn_info ( IP )
+
     Returns a list containing (ASN, Network/Mask, CC code, RIR, modified
-    date) for the network announcing "IP".
+    date) for the network announcing IP.
 
-  get_all_asn_info ( IP )
+ get_all_asn_info ( IP )
+
     Returns a reference to a list of listrefs containting ASN(s),
     Network,Mask, CC code, RIR, and modified date fall all networks
-    announcing "IP".
+    announcing IP.
 
-  get_peer_info ( IP )
+ get_peer_info ( IP )
+
     IPv4 Only. Returns an array of hash references containing (ASN,
     Network/Mask, CC code, RIR, modified date) for the peers of the network
-    announcing "IP".
+    announcing IP.
 
-  get_as_description ( ASN )
-    Returns the AS description for "ASN".
+ get_as_description ( ASN )
 
-  get_as_company ( ASN )
-    Similiar to "get_as_description" but attempts to clean it up some before
-    returning it.
+    Returns the AS description for ASN.
 
-  get_soa_contact( IP )
+ get_as_company ( ASN )
+
+    Similiar to "get_as_description" but attempts to clean it up some
+    before returning it.
+
+ get_soa_contact( IP )
+
     Returns the SOA contact email address for the reverse DNS /24 zone
-    containing "IP".
+    containing IP.
 
-  get_ipwi_contacts( IP )
-    Returns a list of all email addresses found in whois information for
-    "IP" with duplicates removed.
+ get_ipwi_contacts( IP )
 
-  get_rdns( IP )
-    Returns the reverse PTR for "IP".
+    Returns a list of all email addresses found in whois information for IP
+    with duplicates removed.
 
-  get_dnsbl_listing( IP, DNSBL zone )
-    IPv4 Only. Returns the listing text for "IP" for the designated DNSBL.
-    "DNSBL zone" should be the zone used for looking up addresses in the
+ get_rdns( IP )
+
+    Returns the reverse PTR for IP.
+
+ get_dnsbl_listing( IP, DNSBL zone )
+
+    IPv4 Only. Returns the listing text for IP for the designated DNSBL.
+    DNSBL zone should be the zone used for looking up addresses in the
     blocking list.
 
-  get_ip_country( IP )
-    Returns the 2 letter country code for "IP".
+ get_ip_country( IP )
 
-  get_asn_country( ASN )
-    Returns the 2 letter country code for "ASN".
+    Returns the 2 letter country code for IP.
 
-  get_abusenet_contact ( domain )
-    Returns the abuse.net listed contact email addresses for "domain".
+ get_asn_country( ASN )
 
-  is_ip ( IP )
-    Returns true if "IP" looks like an IP, false otherwise.
+    Returns the 2 letter country code for ASN.
 
-  get_domain ( IP )
+ get_abusenet_contact ( domain )
+
+    Returns the abuse.net listed contact email addresses for domain.
+
+ is_ip ( IP )
+
+    Returns true if IP looks like an IP, false otherwise.
+
+ get_domain ( IP )
+
     Takes a hostname and attempts to return the domain name.
 
-  get_malware ( md5 )
+ get_malware ( md5 )
+
     Takes a malware md5 hash and tests it against
     http://www.team-cymru.org/Services/MHR. Returns a HASHREF of last_seen
     and detection_rate.
 
 DIAGNOSTICS
-    Each subroutine will return undef if unsuccessful. In the furture,
+
+    Each subroutine will return undef if unsuccessful. In the future,
     debugging output will be available.
 
 CONFIGURATION AND ENVIRONMENT
+
     There are two commented out lines that can be uncommented to enable
-    Memoize support. I haven't yet decided whether to include this option by
-    default. It may be made available in the future via an import flag to
-    use.
+    Memoize support. I haven't yet decided whether to include this option
+    by default. It may be made available in the future via an import flag
+    to use.
 
 DEPENDENCIES
+
     This module makes use of the following modules:
 
-    Net::IP, Net::DNS, Net::Whois::IP, and Email::Address
+    Net::IP, Net::DNS, Net::Whois::IP, and Email::Address::XS
 
 BUGS AND LIMITATIONS
+
     There are no known bugs in this module. Please report problems to
     Michael Greb (mgreb@linode.com)
 
     Patches are welcome.
 
 ACKNOWLEDGEMENTS
+
     This module was inspired by Karsten M. Self's SpamTools shell scripts,
     available at http://linuxmafia.com/~karsten/.
 
@@ -123,37 +143,44 @@ ACKNOWLEDGEMENTS
     module.
 
 SEE ALSO
-    For a detailed usage example, please see examples/ip-info.pl included in
-    this module's distribution.
+
+    For a detailed usage example, please see examples/ip-info.pl included
+    in this module's distribution.
 
 AUTHORS
-    *   mikegrb <michael@thegrebs.com>
 
-    *   Wes Young <github@barely3am.com>
+      * mikegrb <michael@thegrebs.com>
+
+      * Wes Young <github@barely3am.com>
 
 COPYRIGHT AND LICENSE
+
     This software is copyright (c) 2013 by Mike Greb.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
 
 AUTHORS
-    *   mikegrb <michael@thegrebs.com>
 
-    *   Wes Young <github@barely3am.com>
+      * mikegrb <michael@thegrebs.com>
+
+      * Wes Young <github@barely3am.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2013 by =over 4.
+
+    This software is copyright (c) 2013-2018 by Michael Greb
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
 
 AUTHORS
-    *   mikegrb <michael@thegrebs.com>
 
-    *   Wes Young <github@barely3am.com>
+      * mikegrb <michael@thegrebs.com>
+
+      * Wes Young <github@barely3am.com>
 
 COPYRIGHT AND LICENSE
+
     This software is copyright (c) 2013 by =over 4.
 
     This is free software; you can redistribute it and/or modify it under

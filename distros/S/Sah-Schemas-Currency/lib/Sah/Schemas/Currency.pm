@@ -1,7 +1,7 @@
 package Sah::Schemas::Currency;
 
-our $DATE = '2018-03-08'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-06-27'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Various Sah currency schemas
@@ -18,7 +18,7 @@ Sah::Schemas::Currency - Various Sah currency schemas
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::Currency (from Perl distribution Sah-Schemas-Currency), released on 2018-03-08.
+This document describes version 0.002 of Sah::Schemas::Currency (from Perl distribution Sah-Schemas-Currency), released on 2018-06-27.
 
 =head1 HOMEPAGE
 

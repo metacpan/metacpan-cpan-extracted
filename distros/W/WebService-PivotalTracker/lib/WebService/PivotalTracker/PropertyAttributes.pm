@@ -3,7 +3,7 @@ package WebService::PivotalTracker::PropertyAttributes;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Scalar::Util qw( blessed );
 use Sub::Quote qw( quote_sub );
@@ -83,7 +83,7 @@ WebService::PivotalTracker::PropertyAttributes - An internal tool; nothing to se
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 DESCRIPTION
 

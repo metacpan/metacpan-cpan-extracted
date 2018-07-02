@@ -18,7 +18,6 @@ use Term::Form      qw();
 use App::YTDL::Helper qw( check_mapping_stdout );
 
 
-
 sub _my_sort {
     my ( $sort_item, $sort_order, $h_ref, $a, $b ) = @_;
     my @s = $sort_order eq 'Asc'
@@ -121,7 +120,7 @@ sub choose_videos {
         my @idx = choose(
             $choices,
             { prompt => $prompt . ':', layout => 3, index => 1, clear_screen => 1, mark => $mark,
-              undef => $back, no_spacebar => [ 0 .. $#pre ] }
+              undef => $back, meta_items => [ 0 .. $#pre ], include_highlighted => 2 }
         );
         if ( ! defined $idx[0] || ! defined $choices->[$idx[0]] ) {
             if ( length $regexp ) {

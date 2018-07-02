@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2009 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,8 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-
 
 use strict;
 use warnings;
@@ -21,9 +18,8 @@ use Test::More;
 use Test::Fatal;
 use Test::Deep;
 use Tie::IxHash;
+use BSON::Types ':all';
 use boolean;
-
-use MongoDB::Timestamp; # needed if db is being run as master
 
 use MongoDB;
 use MongoDB::_Constants;
@@ -60,6 +56,8 @@ subtest 'get_database' => sub {
     ok( $db = $conn->get_database( $db_name, { bson_codec => { op_char => '-' } } ),
         "get_database(NAME, OPTIONS)" );
     is( $db->bson_codec->op_char, '-', "DB-level bson_codec coerces" );
+
+    is( $db->client, $conn, "client method" );
 };
 
 subtest 'run_command' => sub {
@@ -70,6 +68,8 @@ subtest 'run_command' => sub {
         'HASH', "run_command(HASHREF) gives HASH" );
     is( ref $testdb->run_command( Tie::IxHash->new( ismaster => 1 ) ),
         'HASH', "run_command(IxHash) gives HASH" );
+    is( ref $testdb->run_command( bson_doc( ismaster => 1 ) ),
+        'HASH', "run_command(BSON::Doc) gives HASH" );
 
     if ( $server_type eq 'RSPrimary' && $conn->_topology->all_servers > 1 ) {
         my $primary = $testdb->run_command( [ ismaster => 1 ] );
@@ -86,7 +86,7 @@ subtest 'run_command' => sub {
     else {
         like(
             $err->message,
-            qr/no such cmd|unrecognized command/,
+            qr/no such cmd|unrecognized command|CMD_UNKNOWN/,
             "error from non-existent command"
         );
     }
@@ -94,6 +94,8 @@ subtest 'run_command' => sub {
     $err = exception { $testdb->run_command( [ x => "a" x MAX_BSON_WIRE_SIZE ] ) };
     like( $err, qr/command too large/, "error on too large command" );
 
+    $err = exception { $testdb->run_command( { ismaster => 1, other_param => 1 } ) };
+    like( $err, qr/not an ordered document/, "error on multi-key regular hashref" );
 };
 
 # collection_names
@@ -123,21 +125,8 @@ subtest "collection names" => sub {
     }
 
     my @names_of_capped = $testdb->collection_names( { 'options.capped' => true } );
-    cmp_deeply( \@names_of_capped, ['test_capped'], "collection_names with filter" );
+    cmp_deeply( \@names_of_capped, [str('test_capped')], "collection_names with filter" );
 };
-
-# reseterror 
-{
-    my $result = $testdb->run_command({reseterror => 1});
-    is($result->{ok}, 1, 'reset error');
-}
-
-# forceerror
-{
-    my $err = exception{ $testdb->run_command({forceerror => 1}) };
-
-    isa_ok( $err, "MongoDB::DatabaseError" );
-}
 
 # tie
 {

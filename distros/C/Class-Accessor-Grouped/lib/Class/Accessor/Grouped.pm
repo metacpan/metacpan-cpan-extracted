@@ -15,8 +15,8 @@ BEGIN {
   }
 }
 
-our $VERSION = '0.10012';
-$VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
+our $VERSION = '0.10014';
+$VERSION =~ tr/_//d; # numify for warning-free dev releases
 
 # when changing minimum version don't forget to adjust Makefile.PL as well
 our $__minimum_xsa_version;

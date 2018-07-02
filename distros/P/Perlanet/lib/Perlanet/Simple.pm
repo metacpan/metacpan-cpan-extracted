@@ -78,4 +78,7 @@ around clean_html => sub {
   return $html;
 };
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 1;

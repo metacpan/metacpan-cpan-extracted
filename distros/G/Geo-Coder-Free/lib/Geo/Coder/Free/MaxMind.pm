@@ -139,7 +139,7 @@ sub geocode {
 	my $concatenated_codes;
 	my ($first, $second, $third);
 
-	if($location =~ /^([\w\s\-]+)?,([\w\s]+),([\w\s]+)?$/) {
+	if($location =~ /^([\w\s\-]+),([\w\s]+),([\w\s]+)?$/) {
 		# Turn 'Ramsgate, Kent, UK' into 'Ramsgate'
 		$first = $location = $1;
 		$second = $county = $2;
@@ -156,7 +156,7 @@ sub geocode {
 			$state = $county;
 			$county = undef;
 		}
-	} elsif($location =~ /^([\w\s\-]+)?,([\w\s]+),([\w\s]+),\s*(Canada|United States|USA|US)?$/) {
+	} elsif($location =~ /^([\w\s\-]+),([\w\s]+),([\w\s]+),\s*(Canada|United States|USA|US)?$/) {
 		$location = $1;
 		$county = $2;
 		$state = $3;
@@ -171,7 +171,6 @@ sub geocode {
 		Carp::carp(__PACKAGE__, ": can't parse and handle $location");
 		return;
 	} elsif(($location =~ /^[\w\s-]+$/) && (my $region = $param{'region'})) {
-		$location = $location;
 		$location =~ s/^\s//g;
 		$location =~ s/\s$//g;
 		$country = uc($region);
@@ -198,10 +197,10 @@ sub geocode {
 				$concatenated_codes = $admin1->{'concatenated_codes'};
 				$admin1cache{$country} = $concatenated_codes;
 			} elsif($state) {
+				$concatenated_codes = uc($countrycode);
 				if($state =~ /^[A-Z]{2}$/) {
-					$concatenated_codes = uc($countrycode) . ".$state";
+					$concatenated_codes .= ".$state";
 				} else {
-					$concatenated_codes = uc($countrycode);
 					$country_code = $concatenated_codes;
 					my @admin1s = @{$self->{'admin1'}->selectall_hashref(asciiname => $state)};
 					foreach my $admin1(@admin1s) {
@@ -370,7 +369,7 @@ sub geocode {
 				}
 			}
 			$city->{'confidence'} = $confidence;
-			my $l= $options->{'City'};
+			my $l = $options->{'City'};
 			if($options->{'Region'}) {
 				$l .= ', ' . $options->{'Region'};
 			}
@@ -453,7 +452,7 @@ All other users (including Commercial, Charity, Educational, Government)
 must apply in writing for a licence for use from Nigel Horne at `<njh at nigelhorne.com>`.
 
 This product includes GeoLite2 data created by MaxMind, available from
-http://www.maxmind.com
+L<https://www.maxmind.com/en/home>.
 
 =cut
 

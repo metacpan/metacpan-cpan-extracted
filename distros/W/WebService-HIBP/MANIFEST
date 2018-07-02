@@ -1,0 +1,17 @@
+Changes
+ignore.txt
+lib/WebService/HIBP.pm
+lib/WebService/HIBP/Breach.pm
+lib/WebService/HIBP/Paste.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/01-hibp.t
+t/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

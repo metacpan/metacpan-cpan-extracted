@@ -4,27 +4,29 @@ use Algorithm::Networksort;
 use strict;
 use warnings;
 
-my $inputs = 4;
-my $alg = 'hibbard';
-my @fmts = ("(%d,%d), ");
-my @fstrs = ("(0,1), (2,3), (0,2), (1,3), (1,2), ");
+plan tests => 4;
 
-plan tests => (scalar @fmts + 1);
+my $nw = nwsrt(inputs => 4, algorithm => 'hibbard');
 
-my $nw = Algorithm::Networksort->new(inputs => $inputs, algorithm => $alg);
+my $str = "$nw";
 
-my $str = $nw->formatted();
+is($str, "[[0,1], [2,3],\n[0,2], [1,3],\n[1,2]]", "Stringify " . $nw->title());
 
-is($str, "[[0,1], [2,3], [0,2], [1,3], [1,2]]", "Default format $alg $inputs");
+$str = $nw->formatted();
+is($str, "[[0,1], [2,3], [0,2], [1,3], [1,2]]", "Default format " . $nw->title());
 
-for my $k (0 .. $#fmts)
-{
-	my $f = $fmts[$k];
-	my $fs = $fstrs[$k];
+#
+# Now some non-default formats.
+#
+$nw->formats(["(%d,%d), "]);
+$str = $nw->formatted();
+is($str, "(0,1), (2,3), (0,2), (1,3), (1,2), ",
+	"1st format: " . $nw->title());
 
-	$nw->formats([$f]);
-	$str = $nw->formatted();
-	is($str, $fs, "Format '$f': $alg $inputs");
-}
+$nw->index_base(['a' .. 'd']);
+$nw->formats(["cswp(%s,%s); "]);
+$str = $nw->formatted();
+is($str, "cswp(a,b); cswp(c,d); cswp(a,c); cswp(b,d); cswp(b,c); ",
+	"2nd format: " . $nw->title());
 
 exit(0);

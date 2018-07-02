@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::Op::_Explain;
 # Encapsulate code path for explain commands/queries
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -50,7 +48,7 @@ sub execute {
     my ( $self, $link, $topology ) = @_;
 
     my $res =
-        $link->accepts_wire_version(4)
+        $link->supports_explain_command
       ? $self->_command_explain( $link, $topology )
       : $self->_legacy_explain( $link, $topology );
 
@@ -60,10 +58,10 @@ sub execute {
 sub _command_explain {
     my ( $self, $link, $topology ) = @_;
 
-    my $cmd = Tie::IxHash->new( @{ $self->query->as_command } );
+    my $cmd = Tie::IxHash->new( @{ $self->query->_as_command } );
 
     # XXX need to standardize error here
-    if (defined $self->query->modifiers->{hint}) {
+    if ($self->query->has_hint) {
         # cannot use hint on explain, throw error
         MongoDB::Error->throw(
             message => "cannot use 'hint' with 'explain'",
@@ -71,14 +69,16 @@ sub _command_explain {
     }
 
     my $op = MongoDB::Op::_Command->_new(
-        db_name         => $self->db_name,
-        query           => [
-            explain   => $cmd,
-            @{ $self->read_concern->as_args }
+        db_name => $self->db_name,
+        query   => [
+            explain => $cmd,
+            @{ $self->read_concern->as_args( $self->session ) }
         ],
-        query_flags     => {},
-        read_preference => $self->read_preference,
-        bson_codec      => $self->bson_codec,
+        query_flags         => {},
+        read_preference     => $self->read_preference,
+        bson_codec          => $self->bson_codec,
+        session             => $self->session,
+        monitoring_callback => $self->monitoring_callback,
     );
     my $res = $op->execute( $link, $topology );
 
@@ -88,13 +88,20 @@ sub _command_explain {
 sub _legacy_explain {
     my ( $self, $link, $topology ) = @_;
 
-    my $new_query = $self->query->clone;
-    $new_query->modifiers->{'$explain'} = true;
+    my $orig_query  = $self->query;
+    my $cloned_opts = { %{ $orig_query->options } };
+    $cloned_opts->{explain} = 1;
 
     # per David Storch, drivers *must* send a negative limit to instruct
     # the query planner analysis module to add a LIMIT stage.  For older
     # explain implementations, it also ensures a cursor isn't left open.
-    $new_query->limit( -1 * abs( $new_query->limit ) );
+    $cloned_opts->{limit} = ( -1 * abs( $cloned_opts->{limit} ) );
+
+    my $new_query = MongoDB::Op::_Query->_new(
+        %$orig_query,
+        # override options from original
+        options => $cloned_opts
+    );
 
     return $new_query->execute( $link, $topology )->next;
 }

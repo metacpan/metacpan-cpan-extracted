@@ -6,11 +6,11 @@ META.json
 META.yml
 README
 README.md
-bin/perlbrew
 cpanfile
 doc/MIT-LICENSE
 doc/PERL-LICENSE
 lib/App/perlbrew.pm
+script/perlbrew
 t/00.load.t
 t/01.options.t
 t/02.format_perl_version.t

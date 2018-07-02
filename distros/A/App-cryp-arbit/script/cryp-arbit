@@ -1,0 +1,790 @@
+#!perl
+
+our $DATE = '2018-06-25'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::cryp;
+
+my $prefix = '/App/cryp/arbit/';
+
+Perinci::CmdLine::cryp->new(
+    url => $prefix,
+    log => 1,
+    pass_cmdline_object => 1,
+    config_filename => ["cryp.conf", "cryp-arbit.conf"],
+    subcommands => {
+        "dump-cryp-config" => { url=>"${prefix}dump_cryp_config" },
+        arbit => { url=>"${prefix}arbit" },
+        opportunities => { url=>"${prefix}show_opportunities" },
+        'check-orders' => { url=>"${prefix}check_orders" },
+        'order-pairs' => { url=>"${prefix}list_order_pairs" },
+        'profit-report' => { url=>"${prefix}get_profit_report" },
+    },
+)->run;
+
+# ABSTRACT: Cryptocurrency arbitrage utility
+# PODNAME: cryp-arbit
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cryp-arbit - Cryptocurrency arbitrage utility
+
+=head1 VERSION
+
+This document describes version 0.001 of cryp-arbit (from Perl distribution App-cryp-arbit), released on 2018-06-25.
+
+=head1 SYNOPSIS
+
+In F<~/.config/cryp-arbit.conf> (or F<~/.config/cryp.conf> as the configuration
+can be shared between cryp-* family of scripts):
+
+ [program=cryp-arbit]
+ db_name = cryp_arbit
+ ; db_username = youruser         ; optional, will be searched in ~/.my.cnf
+ ; db_password = yourpass         ; optional, will be searched in ~/.my.cnf
+
+ [exchange/bitcoin-indonesia]
+ key = ...
+ secret = ...
+
+ [exchange/gdax]
+ key = ...
+ secret = ...
+ passphrase = ...
+
+Then to test:
+
+ % cryp-arbit opportunities
+ % cryp-arbit arbit --debug --dry-run
+
+To really create sell/buy orders:
+
+ % cryp-arbit arbit
+
+To list created order pairs:
+
+ % cryp-arbit order-pairs
+ % cryp-arbit order-pairs --open
+
+To check the status of created orders (and cancel orders that are not being
+filled for too long):
+
+ % cryp-arbit check-orders
+
+To get profit report:
+
+ % cryp-arbit profit-report
+
+For other subcommands, use C<cryp-arbit --help> or see the documentation.
+
+=head1 DESCRIPTION
+
+=head1 SUBCOMMANDS
+
+=head2 B<arbit>
+
+Perform arbitrage.
+
+This utility monitors prices of several cryptocurrencies ("base currencies",
+e.g. LTC) in several cryptoexchanges. The "quote currency" can be fiat (e.g.
+USD, all other fiat currencies will be converted to USD) or another
+cryptocurrency (usually BTC).
+
+When it detects a net price difference for a base currency that is large enough
+(see C<min_net_profit_margin> option), it will perform a buy order on the
+exchange that has the lower price and sell the exact same amount of base
+currency on the exchange that has the higher price. For example, if on XCHG1 the
+buy price of LTC 100.01 USD and on XCHG2 the sell price of LTC is 98.80 USD,
+then this utility will buy LTC on XCHG2 for 98.80 USD and sell the same amount
+of LTD on XCHG1 for 100.01 USD. The profit is (100.01 - 98.80 - trading fees)
+per LTC arbitraged. You have to maintain enough LTC balance on XCHG1 and enough
+USD balance on XCHG2.
+
+The balances are called inventories or your working capital. You fill and
+transfer inventories manually to refill balances and/or to collect profits.
+
+
+=head2 B<check-orders>
+
+Check the orders that have been created.
+
+This subcommand will check the orders that have been created previously by
+C<arbit> subcommand. It will update the order status and filled size (if still
+open). It will cancel (give up) the orders if deemed too old.
+
+
+=head2 B<dump-cryp-config>
+
+=head2 B<opportunities>
+
+Show arbitrage opportunities.
+
+This subcommand, like the C<arbit> subcommand, checks prices of cryptocurrencies
+on several exchanges for arbitrage possibility; but does not actually perform
+the arbitraging.
+
+
+=head2 B<order-pairs>
+
+List created order pairs.
+
+=head2 B<profit-report>
+
+Get profit report.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand arbit
+
+=over
+
+=item B<--accounts-json>=I<s>
+
+Cryptoexchange accounts (JSON-encoded).
+
+See C<--accounts>.
+
+=item B<--accounts>=I<s@>
+
+Cryptoexchange accounts.
+
+There should at least be two accounts, on at least two different
+cryptoexchanges. If not specified, all accounts listed on the configuration file
+will be included. Note that it's possible to include two or more accounts on the
+same cryptoexchange.
+
+
+Can be specified multiple times.
+
+=item B<--base-currencies-json>=I<s>
+
+Target (crypto)currencies to arbitrate (JSON-encoded).
+
+See C<--base-currency>.
+
+=item B<--base-currency>=I<s@>
+
+Target (crypto)currencies to arbitrate.
+
+If not specified, will list all supported pairs on all the exchanges and include
+the base cryptocurrencies that are listed on at least 2 different exchanges (for
+arbitrage possibility).
+
+
+Can be specified multiple times.
+
+=item B<--db-name>=I<s>*
+
+=item B<--db-password>=I<s>
+
+=item B<--db-username>=I<s>
+
+=item B<--frequency>=I<s>
+
+How many seconds to wait between rounds (in seconds).
+
+Default value:
+
+ 30
+
+A round consists of checking prices and then creating arbitraging order pairs.
+
+
+=item B<--loop>
+
+Shortcut for --rounds -1.
+
+See C<--rounds>.
+
+=item B<--max-order-age>=I<s>
+
+How long should we wait for orders to be completed before cancelling them (in seconds).
+
+Default value:
+
+ 86400
+
+Sometimes because of rapid trading and price movement, our order might not be
+filled immediately. This setting sets a limit on how long should an order be
+left open. After this limit is reached, we cancel the order. The imbalance of
+the arbitrage transaction will be recorded.
+
+
+=item B<--max-order-pairs-per-round>=I<s>
+
+Maximum number of order pairs to create per round.
+
+=item B<--max-order-quote-size>=I<s>
+
+What is the maximum amount of a single order.
+
+Default value:
+
+ 100
+
+A single order will be limited to not be above this value (in quote currency,
+which if fiat will be converted to USD). This is the amount for the buying
+(because an arbitrage transaction is comprised of a pair of orders, where one
+order is a selling order at a higher quote currency size than the buying order).
+
+For example if you are arbitraging BTC against USD and IDR, and set this option
+to 75, then orders will not be above 75 USD. If you are arbitraging LTC against
+BTC and set this to 0.03 then orders will not be above 0.03 BTC.
+
+Suggestion: If you set this option too high, a few orders can use up your
+inventory (and you might not be getting optimal profit percentage). Also, large
+orders can take a while (or too long) to fill. If you set this option too low,
+you will hit the exchanges' minimum order size and no orders can be created.
+Since we want smaller risk of orders not getting filled quickly, we want small
+order sizes. The optimum number range a little above the exchanges' minimum
+order size.
+
+
+=item B<--min-account-balances-json>=I<s>
+
+What are the minimum account balances (JSON-encoded).
+
+See C<--min-account-balances>.
+
+=item B<--min-account-balances>=I<s>
+
+What are the minimum account balances.
+
+=item B<--min-net-profit-margin>=I<s>
+
+Minimum net profit margin that will trigger an arbitrage trading, in percentage.
+
+Default value:
+
+ 0
+
+Below this percentage number, no order pairs will be sent to the exchanges to do
+the arbitrage. Note that the net profit margin already takes into account
+trading fees and forex spread (see Glossary section for more details and
+illustration).
+
+Suggestion: If you set this option too high, there might not be any order pairs
+possible. If you set this option too low, you will be getting too thin profits.
+Run `cryp-arbit opportunities` or `cryp-arbit arbit --dry-run` for a while to
+see what the average percentage is and then decide at which point you want to
+perform arbitrage.
+
+
+=item B<--quote-currencies-json>=I<s>
+
+The currencies to exchange (buy/sell) the target currencies (JSON-encoded).
+
+See C<--quote-currency>.
+
+=item B<--quote-currency>=I<s@>
+
+The currencies to exchange (buy/sell) the target currencies.
+
+You can have fiat currencies as the quote currencies, to buy/sell the target
+(base) currencies during arbitrage. For example, to arbitrage LTC against USD
+and IDR, `base_currencies` is ['BTC'] and `quote_currencies` is ['USD', 'IDR'].
+
+You can also arbitrage cryptocurrencies against other cryptocurrency (usually
+BTC, "the USD of cryptocurrencies"). For example, to arbitrage XMR and LTC
+against BTC, `base_currencies` is ['XMR', 'LTC'] and `quote_currencies` is
+['BTC'].
+
+
+Can be specified multiple times.
+
+=item B<--rounds>=I<s>
+
+How many rounds.
+
+Default value:
+
+ 1
+
+-1 means unlimited.
+
+
+=item B<--strategy>=I<s>
+
+Which strategy to use for arbitration.
+
+Default value:
+
+ "merge_order_book"
+
+Strategy is implemented in a `App::cryp::arbit::Strategy::*` perl module.
+
+
+=back
+
+=head2 Options for subcommand check-orders
+
+=over
+
+=item B<--db-name>=I<s>*
+
+=item B<--db-password>=I<s>
+
+=item B<--db-username>=I<s>
+
+=item B<--max-order-age>=I<s>
+
+How long should we wait for orders to be completed before cancelling them (in seconds).
+
+Default value:
+
+ 86400
+
+Sometimes because of rapid trading and price movement, our order might not be
+filled immediately. This setting sets a limit on how long should an order be
+left open. After this limit is reached, we cancel the order. The imbalance of
+the arbitrage transaction will be recorded.
+
+
+=back
+
+=head2 Options for subcommand opportunities
+
+=over
+
+=item B<--accounts-json>=I<s>
+
+Cryptoexchange accounts (JSON-encoded).
+
+See C<--accounts>.
+
+=item B<--accounts>=I<s@>
+
+Cryptoexchange accounts.
+
+There should at least be two accounts, on at least two different
+cryptoexchanges. If not specified, all accounts listed on the configuration file
+will be included. Note that it's possible to include two or more accounts on the
+same cryptoexchange.
+
+
+Can be specified multiple times.
+
+=item B<--base-currencies-json>=I<s>
+
+Target (crypto)currencies to arbitrate (JSON-encoded).
+
+See C<--base-currency>.
+
+=item B<--base-currency>=I<s@>
+
+Target (crypto)currencies to arbitrate.
+
+If not specified, will list all supported pairs on all the exchanges and include
+the base cryptocurrencies that are listed on at least 2 different exchanges (for
+arbitrage possibility).
+
+
+Can be specified multiple times.
+
+=item B<--db-name>=I<s>*
+
+=item B<--db-password>=I<s>
+
+=item B<--db-username>=I<s>
+
+=item B<--ignore-balance>
+
+Ignore account balances.
+
+=item B<--ignore-min-order-size>
+
+Ignore minimum order size limitation from exchanges.
+
+=item B<--max-order-pairs-per-round>=I<s>
+
+Maximum number of order pairs to create per round.
+
+=item B<--max-order-quote-size>=I<s>
+
+What is the maximum amount of a single order.
+
+Default value:
+
+ 100
+
+A single order will be limited to not be above this value (in quote currency,
+which if fiat will be converted to USD). This is the amount for the buying
+(because an arbitrage transaction is comprised of a pair of orders, where one
+order is a selling order at a higher quote currency size than the buying order).
+
+For example if you are arbitraging BTC against USD and IDR, and set this option
+to 75, then orders will not be above 75 USD. If you are arbitraging LTC against
+BTC and set this to 0.03 then orders will not be above 0.03 BTC.
+
+Suggestion: If you set this option too high, a few orders can use up your
+inventory (and you might not be getting optimal profit percentage). Also, large
+orders can take a while (or too long) to fill. If you set this option too low,
+you will hit the exchanges' minimum order size and no orders can be created.
+Since we want smaller risk of orders not getting filled quickly, we want small
+order sizes. The optimum number range a little above the exchanges' minimum
+order size.
+
+
+=item B<--min-account-balances-json>=I<s>
+
+What are the minimum account balances (JSON-encoded).
+
+See C<--min-account-balances>.
+
+=item B<--min-account-balances>=I<s>
+
+What are the minimum account balances.
+
+=item B<--min-net-profit-margin>=I<s>
+
+Minimum net profit margin that will trigger an arbitrage trading, in percentage.
+
+Default value:
+
+ 0
+
+Below this percentage number, no order pairs will be sent to the exchanges to do
+the arbitrage. Note that the net profit margin already takes into account
+trading fees and forex spread (see Glossary section for more details and
+illustration).
+
+Suggestion: If you set this option too high, there might not be any order pairs
+possible. If you set this option too low, you will be getting too thin profits.
+Run `cryp-arbit opportunities` or `cryp-arbit arbit --dry-run` for a while to
+see what the average percentage is and then decide at which point you want to
+perform arbitrage.
+
+
+=item B<--quote-currencies-json>=I<s>
+
+The currencies to exchange (buy/sell) the target currencies (JSON-encoded).
+
+See C<--quote-currency>.
+
+=item B<--quote-currency>=I<s@>
+
+The currencies to exchange (buy/sell) the target currencies.
+
+You can have fiat currencies as the quote currencies, to buy/sell the target
+(base) currencies during arbitrage. For example, to arbitrage LTC against USD
+and IDR, `base_currencies` is ['BTC'] and `quote_currencies` is ['USD', 'IDR'].
+
+You can also arbitrage cryptocurrencies against other cryptocurrency (usually
+BTC, "the USD of cryptocurrencies"). For example, to arbitrage XMR and LTC
+against BTC, `base_currencies` is ['XMR', 'LTC'] and `quote_currencies` is
+['BTC'].
+
+
+Can be specified multiple times.
+
+=item B<--strategy>=I<s>
+
+Which strategy to use for arbitration.
+
+Default value:
+
+ "merge_order_book"
+
+Strategy is implemented in a `App::cryp::arbit::Strategy::*` perl module.
+
+
+=back
+
+=head2 Options for subcommand order-pairs
+
+=over
+
+=item B<--db-name>=I<s>*
+
+=item B<--db-password>=I<s>
+
+=item B<--db-username>=I<s>
+
+=item B<--open>
+
+=item B<--time-end>=I<s>
+
+=item B<--time-start>=I<s>
+
+=back
+
+=head2 Options for subcommand profit-report
+
+=over
+
+=item B<--db-name>=I<s>*
+
+=item B<--db-password>=I<s>
+
+=item B<--db-username>=I<s>
+
+=item B<--detail>, B<-l>
+
+=item B<--time-end>=I<s>
+
+=item B<--time-start>=I<s>
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C cryp-arbit cryp-arbit
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete cryp-arbit 'p/*/`cryp-arbit`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/cryp.conf>, F<~/.config/cryp-arbit.conf>, F<~/cryp.conf>, F<~/cryp-arbit.conf>, F</etc/cryp.conf>, or F</etc/cryp-arbit.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand arbit
+
+ accounts (see --accounts)
+ base_currencies (see --base-currency)
+ db_name (see --db-name)
+ db_password (see --db-password)
+ db_username (see --db-username)
+ frequency (see --frequency)
+ max_order_age (see --max-order-age)
+ max_order_pairs_per_round (see --max-order-pairs-per-round)
+ max_order_quote_size (see --max-order-quote-size)
+ min_account_balances (see --min-account-balances)
+ min_net_profit_margin (see --min-net-profit-margin)
+ quote_currencies (see --quote-currency)
+ rounds (see --rounds)
+ strategy (see --strategy)
+
+=head2 Configuration for subcommand check-orders
+
+ db_name (see --db-name)
+ db_password (see --db-password)
+ db_username (see --db-username)
+ max_order_age (see --max-order-age)
+
+=head2 Configuration for subcommand dump-cryp-config
+
+
+=head2 Configuration for subcommand opportunities
+
+ accounts (see --accounts)
+ base_currencies (see --base-currency)
+ db_name (see --db-name)
+ db_password (see --db-password)
+ db_username (see --db-username)
+ ignore_balance (see --ignore-balance)
+ ignore_min_order_size (see --ignore-min-order-size)
+ max_order_pairs_per_round (see --max-order-pairs-per-round)
+ max_order_quote_size (see --max-order-quote-size)
+ min_account_balances (see --min-account-balances)
+ min_net_profit_margin (see --min-net-profit-margin)
+ quote_currencies (see --quote-currency)
+ strategy (see --strategy)
+
+=head2 Configuration for subcommand order-pairs
+
+ db_name (see --db-name)
+ db_password (see --db-password)
+ db_username (see --db-username)
+ open (see --open)
+ time_end (see --time-end)
+ time_start (see --time-start)
+
+=head2 Configuration for subcommand profit-report
+
+ db_name (see --db-name)
+ db_password (see --db-password)
+ db_username (see --db-username)
+ detail (see --detail)
+ time_end (see --time-end)
+ time_start (see --time-start)
+
+=head1 ENVIRONMENT
+
+=head2 CRYP_ARBIT_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/cryp.conf>
+
+F<~/.config/cryp-arbit.conf>
+
+F<~/cryp.conf>
+
+F<~/cryp-arbit.conf>
+
+F</etc/cryp.conf>
+
+F</etc/cryp-arbit.conf>
+
+=head1 BUGS
+
+Please report all bug reports or feature requests to L<mailto:stevenharyanto@gmail.com>.
+
+=head1 SEE ALSO
+
+Other scripts in the C<cryp-*> family.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -2,7 +2,7 @@ NAME
     Data::Fake - Declaratively generate fake structured data for testing
 
 VERSION
-    version 0.003
+    version 0.004
 
 SYNOPSIS
         use Data::Fake qw/Core Names Text Dates/;
@@ -11,7 +11,7 @@ SYNOPSIS
             {
                 name      => fake_name(),
                 battlecry => fake_sentences(1),
-                birthday  => fake_past_date("%Y-%m-%d"),
+                birthday  => fake_past_datetime("%Y-%m-%d"),
                 friends   => fake_array( fake_int(2,4), fake_name() ),
                 gender    => fake_pick(qw/Male Female Other/),
             }
@@ -55,7 +55,7 @@ DESCRIPTION
             {
                 name      => fake_name(),
                 battlecry => fake_sentences(1),
-                birthday  => fake_past_date("%Y-%m-%d"),
+                birthday  => fake_past_datetime("%Y-%m-%d"),
                 friends   => fake_array( fake_int(2,4), fake_name() ),
                 gender    => fake_pick(qw/Male Female Other/),
             }
@@ -198,9 +198,9 @@ AUTHOR
     David Golden <dagolden@cpan.org>
 
 CONTRIBUTORS
-    *   David Golden <xdg@xdg.me>
-
     *   Ricardo Signes <rjbs@users.noreply.github.com>
+
+    *   Stuart Skelton <stuarts@broadbean.com>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2015 by David Golden.

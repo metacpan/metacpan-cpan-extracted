@@ -6,19 +6,15 @@ use strict;
 use 5.010000;
 
 use Exporter qw( import );
-our @EXPORT_OK = qw( sec_to_time get_filename timestamp_to_upload_date encode_fs check_mapping_stdout format_bytes_per_sec
-                    write_json read_json sanitize_for_path uni_capture uni_system HIDE_CURSOR SHOW_CURSOR );
+our @EXPORT_OK = qw( sec_to_time check_mapping_stdout write_json read_json uni_capture uni_system HIDE_CURSOR SHOW_CURSOR );
 
 use Encode             qw( encode FB_CROAK LEAVE_SRC );
 use Fcntl              qw( LOCK_EX LOCK_SH SEEK_END );
-use Time::Local        qw( timelocal );
 use Unicode::Normalize qw( NFC );
 
 use Encode::Locale         qw();
-use File::Touch            qw();
 use IPC::System::Simple    qw( capture system );
 use JSON                   qw();
-use Term::Choose::LineFold qw( print_columns cut_to_printwidth);
 #use Text::Unidecode       qw( unidecode ); # require-d
 
 use if $^O eq 'MSWin32', 'Win32::ShellQuote';
@@ -29,68 +25,16 @@ use constant {
 };
 
 
-
-sub get_filename {
-    my ( $opt, $title, $ext, $fmt ) = @_;
-    $ext //= 'unknown';
-    $fmt //= '';
-    $fmt = '_' . $fmt if length $fmt;
-    my $len_ext = print_columns( $ext );
-    my $len_fmt = print_columns( $fmt );
-    my $max_len_title = $opt->{max_len_f_name} - ( $len_fmt + 1 + $len_ext );
-    $title = cut_to_printwidth( sanitize_for_path( $opt, $title ), $max_len_title );
-    my $file_name = $title . $fmt . '.' . $ext;
-    return $file_name;
-}
-
-
-sub sanitize_for_path {
-    my ( $opt, $str ) = @_;
-    $str =~ s/^\s+|\s+\z//g;
-    $str =~ s/\s/_/g             if $opt->{replace_spaces};
-    $str =~ s/^\.+//             if $opt->{sanitize_filename};
-    $str =~ s{["/\\:*?<>&|]}{-}g if $opt->{sanitize_filename} == 1; # \0
-    $str =~ s{/}{-}g             if $opt->{sanitize_filename} == 2; # \0
-    # NTFS unsupported characters:  / \ : " * ? < > |
-    return $str;
-}
-
-
-sub timestamp_to_upload_date {
-    my ( $opt, $info, $ex, $video_id, $file ) = @_;
-    return if $info->{$ex}{$video_id}{upload_datetime} eq $opt->{no_upload_datetime};
-    if ( $info->{$ex}{$video_id}{upload_datetime} =~ /^(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)\z/ ) {
-        eval {
-            my $time = timelocal( $6, $5, $4, $3, $2 - 1, $1 );
-            my $ref = File::Touch->new( time => $time );
-            my $count = $ref->touch( encode_fs( $opt, $file ) );
-        } or warn $@;
-    }
-}
-
-
-sub encode_fs {
-    my ( $opt, $filename ) = @_;
-    my $encoded_filename;
-    if ( eval { $encoded_filename = encode( 'locale_fs', NFC $filename, FB_CROAK | LEAVE_SRC ) } ) {
-        return $encoded_filename;
-    }
-    elsif ( $opt->{unmappable_filename} ) {
-        require Text::Unidecode;
-        return Text::Unidecode::unidecode( $filename );
-    }
-    else {
-        return $filename;
-    }
-}
-
-
 sub check_mapping_stdout {
     my ( $opt, $string ) = @_;
     return $string if $Encode::Locale::ENCODING_CONSOLE_OUT =~ /^UTF-/i;
     return $string if eval { encode( 'console_out', $string, FB_CROAK | LEAVE_SRC ) };
-    if ( $opt->{text_unidecode} ) {
+    my $rc = eval {
         require Text::Unidecode;
+        Text::Unidecode->import();
+        1;
+    };
+    if ( $rc ) {
         my @words;
         for my $word ( split / /, $string ) {
             my $encoded_word;
@@ -108,26 +52,6 @@ sub check_mapping_stdout {
     my $encoded_lax = encode( 'console_out', NFC $string, sub { '*' } );
     binmode STDOUT, ':encoding(console_out)';
     return $encoded_lax;
-}
-
-
-sub format_bytes_per_sec {
-    my ( $val ) = @_;
-    return '--k/s' if ! $val;
-    $val /= 1024;
-    return '--k/s' if $val < 1;
-    for my $unit ( 'k', 'M', 'G' ) {
-        if ( length int $val > 3 ) {
-            $val /= 1024;
-            next;
-        }
-        elsif ( $val < 10 && $unit ne 'k' ) {
-            return sprintf "%0.1f%s/s", $val, $unit;
-        }
-        else {
-            return sprintf "%d%s/s", $val, $unit;
-        }
-    }
 }
 
 
@@ -190,7 +114,7 @@ sub sec_to_time {
 sub write_json {
     my ( $opt, $file, $ref ) = @_;
     my $json = JSON->new->pretty->canonical->utf8->encode( $ref );
-    open my $fh, '>', encode_fs( $opt, $file ) or die encode_fs( $opt, $file ) . " $!";
+    open my $fh, '>', $file or die $file . " $!";
     flock $fh, LOCK_EX     or die $!;
     seek  $fh, 0, SEEK_END or die $!;
     print $fh $json;
@@ -200,8 +124,8 @@ sub write_json {
 
 sub read_json {
     my ( $opt, $file ) = @_;
-    return if ! -f encode_fs( $opt, $file );
-    open my $fh, '<', encode_fs( $opt, $file ) or die encode_fs( $opt, $file ) . " $!";
+    return if ! -f $file;
+    open my $fh, '<', $file or die $file . " $!";
     flock $fh, LOCK_SH or die $!;
     my $json = do { local $/; <$fh> };
     close $fh;

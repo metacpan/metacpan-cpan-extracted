@@ -5,7 +5,7 @@
       "John M. Gamble <jgamble@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
       "boolean",
       "boolean-algebra",
@@ -27,17 +27,17 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4"
+            "Module::Build" : "0.4224"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "List::Compare::Functional" : "0.53",
-            "List::MoreUtils" : "0.401",
+            "List::MoreUtils" : "0.428",
             "Moose" : "2.16",
-            "Tie::Cycle" : "1.19",
-            "namespace::autoclean" : "0.16",
+            "Tie::Cycle" : "1.225",
+            "namespace::autoclean" : "0.28",
             "perl" : "v5.10.1"
          }
       }
@@ -45,15 +45,15 @@
    "provides" : {
       "Algorithm::QuineMcCluskey" : {
          "file" : "lib/Algorithm/QuineMcCluskey.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "Algorithm::QuineMcCluskey::Format" : {
          "file" : "lib/Algorithm/QuineMcCluskey/Format.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "Algorithm::QuineMcCluskey::Util" : {
          "file" : "lib/Algorithm/QuineMcCluskey/Util.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -65,6 +65,6 @@
          "url" : "git://github.com/jgamble/Algorithm-QuineMcCluskey"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

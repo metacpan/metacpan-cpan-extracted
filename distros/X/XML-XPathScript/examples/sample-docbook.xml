@@ -17,8 +17,8 @@
     <date>$Date: 2004-11-08 14:23:11 +0100 (lun, 08 nov 2004) $</date>
 
     <legalnotice>
-      <para>Si vous êtes assez bête pour utiliser ce document pour
-quoi que ce soit de sérieux, c'est votre problème.</para>
+      <para>Si vous Ãªtes assez bÃªte pour utiliser ce document pour
+quoi que ce soit de sÃ©rieux, c'est votre problÃ¨me.</para>
     </legalnotice>
 
     <abstract>
@@ -26,12 +26,12 @@ quoi que ce soit de sérieux, c'est votre problème.</para>
 <literal>docbook2latex.xps</literal>, et accessoirement de la feuille
 de style en cascade <literal>IDEALX.xps</literal>, disponibles dans le
 <acronym>CVS</acronym> d'IDEALX sous <ulink
-url="cvs:doc/xml/DocBkXML2LaTeX"/> et également sur le grand Internet,
+url="cvs:doc/xml/DocBkXML2LaTeX"/> et Ã©galement sur le grand Internet,
 <ulink url="http://www.idealx.org/DocBkXML2LaTeX/"/>. Tous deux sont
 maintenus par <email>domq@cpan.org</email>.</para>
-      <para>Notons que les tests sont déjà commencés, puisque cet
-<foreignphrase>abstract</foreignphrase> doit apparaître avant la
-notice légale (nonbstant le fait que dans le code source, c'est l'inverse).</para>
+      <para>Notons que les tests sont dÃ©jÃ  commencÃ©s, puisque cet
+<foreignphrase>abstract</foreignphrase> doit apparaÃ®tre avant la
+notice lÃ©gale (nonbstant le fait que dans le code source, c'est l'inverse).</para>
     </abstract>
   </articleinfo>
 
@@ -44,7 +44,7 @@ notice légale (nonbstant le fait que dans le code source, c'est l'inverse).</par
 	<title>Jeu de tests pour les tables</title>
 
   <table frame="all" colsep="1" rowsep="1" id="TABLE1">
-	  <title  id="TABLE1-titre">Tableau de la page 135 du LaTeX Companion (en haut à
+	  <title  id="TABLE1-titre">Tableau de la page 135 du LaTeX Companion (en haut Ã 
 	  gauche)</title>
 
 <!--
@@ -80,7 +80,7 @@ notice légale (nonbstant le fait que dans le code source, c'est l'inverse).</par
 	</tgroup>
   </table>
 
-	<para>La même avec un spanspec à la place des colspecs et sous
+	<para>La mÃªme avec un spanspec Ã  la place des colspecs et sous
 	forme d'informaltable:</para>
   <informaltable frame="all" colsep="1" rowsep="1" id="TABLE2">
 	<tgroup cols="3" align="center">
@@ -108,8 +108,8 @@ notice légale (nonbstant le fait que dans le code source, c'est l'inverse).</par
   </informaltable>
 
 
-	<para>Test des séparations de ligne et des cas limites (trous et
-	cellules qui débordent du tableau en bas):</para>
+	<para>Test des sÃ©parations de ligne et des cas limites (trous et
+	cellules qui dÃ©bordent du tableau en bas):</para>
   <informaltable frame="all" colsep="1" rowsep="1" id="TABLE2bis">
 	<tgroup cols="3" align="center">
 	  <colspec colname="chiffres"/>
@@ -135,7 +135,7 @@ notice légale (nonbstant le fait que dans le code source, c'est l'inverse).</par
 	</tgroup>
   </informaltable>
 
-<para>Il est normal que cette table soit rendue sous la forme d'une boîte
+<para>Il est normal que cette table soit rendue sous la forme d'une boÃ®te
     d'erreur (mais anormal que la compilation en soit interrompue) :
 </para>
     <table id="CC-Niveaux-Assurance">
@@ -215,7 +215,7 @@ OBJ - PPC - REQ - SRE - TSS</entry>
      </table>
 
 	<table frame="all" colsep="1" rowsep="1" id="TABLE3">
-		<title>Tableau croisé menaces objectifs</title>
+		<title>Tableau croisÃ© menaces objectifs</title>
 		<tgroup cols="22" tgroupstyle="footnotesize">
 		  <colspec colname="c1" colwidth="3.5cm"/>
 		  <colspec colname="c2"/>
@@ -365,9 +365,9 @@ l'environnement</para></entry>
 		</tgroup>
 	  </table>
 
-    <para>La table suivante doit avoir toutes ses colonnes «EAL» de la
-    même largeur (ce qui suppose que la largeur du chapeau est
-    calculée par la feuille de style ! Yow)</para>
+    <para>La table suivante doit avoir toutes ses colonnes Â«EALÂ» de la
+    mÃªme largeur (ce qui suppose que la largeur du chapeau est
+    calculÃ©e par la feuille de style ! Yow)</para>
     <table>
 <title>Petites bidouilles sur les largeurs de colonne</title>
 <tgroup cols="12">
@@ -835,7 +835,7 @@ OBJ - PPC - REQ - SRE - TSS</entry>
 
 
 		<table>
-		  <title>Un tableau très, très long</title>
+		  <title>Un tableau trÃ¨s, trÃ¨s long</title>
 		  
 		  <tgroup cols="3" tgroupstyle="footnotesize">
 			<colspec colname="c1" colwidth="4cm"/>
@@ -884,33 +884,33 @@ OBJ - PPC - REQ - SRE - TSS</entry>
 				</entry>
 				
 				<entry>
-				  <para>Le contrôle de l'accès physique et logique à
+				  <para>Le contrÃ´le de l'accÃ¨s physique et logique Ã 
 				  la TOE permet de s'assurer qu'en fonctionnement
-				  normal, seules les personnes autorisées ont accès
+				  normal, seules les personnes autorisÃ©es ont accÃ¨s
 				  aux informations confidentielles.</para>
 
 				  <para>L'exploitation de la TOE par des personnes
-				  compétentes et conscientes de leur rôle permet de
+				  compÃ©tentes et conscientes de leur rÃ´le permet de
 				  limiter les risques d'erreurs de saisie ou
 				  d'utilisation.</para>
 
-				  <para>L'administration sécurisée et le contrôle de
-				  bon fonctionnement de la TOE permettent d'éviter les
-				  piégeages et dysfonctionnements qui ouvrent des
-				  portes d'accès.</para>
+				  <para>L'administration sÃ©curisÃ©e et le contrÃ´le de
+				  bon fonctionnement de la TOE permettent d'Ã©viter les
+				  piÃ©geages et dysfonctionnements qui ouvrent des
+				  portes d'accÃ¨s.</para>
 
-				  <para>La qualité de développement de la TOE permet
+				  <para>La qualitÃ© de dÃ©veloppement de la TOE permet
 				  de limiter les risques de mauvais fonctionnement qui
-				  ouvrent des brèches dans la sécurité de la
+				  ouvrent des brÃ¨ches dans la sÃ©curitÃ© de la
 				  TOE.</para>
 
 				  <para>L'exploitation des traces d'audit permet de
-				  détecter les dysfonctionnements, détournements de
+				  dÃ©tecter les dysfonctionnements, dÃ©tournements de
 				  droits et attaques en cours.</para>
 
-				  <para>Le transport des données sécurisé entre la TOE
+				  <para>Le transport des donnÃ©es sÃ©curisÃ© entre la TOE
 				  et les autres composantes de l'IGC permet de
-				  préserver la confidentialité des biens
+				  prÃ©server la confidentialitÃ© des biens
 				  sensibles.</para>
 				</entry>
 			  </row>
@@ -935,36 +935,36 @@ OBJ - PPC - REQ - SRE - TSS</entry>
 				  <para>OE.SECOURS</para>
 				</entry>
 				<entry>
-				  <para>Le contrôle de l'accès physique et logique à
-				  la TOE permet de se prémunir contre certains actes
+				  <para>Le contrÃ´le de l'accÃ¨s physique et logique Ã 
+				  la TOE permet de se prÃ©munir contre certains actes
 				  de malveillance externes.</para>
 
-				  <para>La capacité de la TOE et de ses exploitants à
-				  sauvegarder et à restaurer les données sensibles
-				  permet d'assurer l'intégrité des biens gérés par la
+				  <para>La capacitÃ© de la TOE et de ses exploitants Ã 
+				  sauvegarder et Ã  restaurer les donnÃ©es sensibles
+				  permet d'assurer l'intÃ©gritÃ© des biens gÃ©rÃ©s par la
 				  TOE.</para>
 
 				  <para>L'exploitation des traces d'audit, et les
-				  contrôles d'intégrité dans les échanges ou en
-				  fonctionnement permettront de détecter toute perte
-				  d'intégrité des biens.</para>
+				  contrÃ´les d'intÃ©gritÃ© dans les Ã©changes ou en
+				  fonctionnement permettront de dÃ©tecter toute perte
+				  d'intÃ©gritÃ© des biens.</para>
 
-				  <para>Le contrôle de bon fonctionnement de la TOE
-				  permet d'éviter les piégeages et dysfonctionnements
+				  <para>Le contrÃ´le de bon fonctionnement de la TOE
+				  permet d'Ã©viter les piÃ©geages et dysfonctionnements
 				  de la TOE qui pourraient provoquer une perte
-				  d'intégrité des biens.</para>
+				  d'intÃ©gritÃ© des biens.</para>
 
-				  <para>La qualité de développement de la TOE permet
+				  <para>La qualitÃ© de dÃ©veloppement de la TOE permet
 				  de limiter les risques de mauvais fonctionnement qui
-				  ouvrent des brèches dans la sécurité de la
+				  ouvrent des brÃ¨ches dans la sÃ©curitÃ© de la
 				  TOE.</para>
 
-				  <para>L'intégrité des services est assurée par le
-				  plan de secours, et renforcé par la sensibilisation
+				  <para>L'intÃ©gritÃ© des services est assurÃ©e par le
+				  plan de secours, et renforcÃ© par la sensibilisation
 				  des exploitants.</para>
 
 				  <para>L'exploitation de la TOE par des personnes
-				  compétentes et conscientes de leur rôle permet de
+				  compÃ©tentes et conscientes de leur rÃ´le permet de
 				  limiter les risques d'erreurs de saisie ou
 				  d'utilisation.</para>
 				</entry>
@@ -983,17 +983,17 @@ OBJ - PPC - REQ - SRE - TSS</entry>
 				  <para>OE.SECOURS</para>
 				</entry>
 				<entry>
-				  <para>La résistance aux sinistres divers et aux
-				  pertes d'intégrité qu'ils peuvent entraîner repose
+				  <para>La rÃ©sistance aux sinistres divers et aux
+				  pertes d'intÃ©gritÃ© qu'ils peuvent entraÃ®ner repose
 				  essentiellement sur les objectifs de sauvegarde et
 				  de reprise.</para>
 
-				  <para>Les contrôles de fonctionnement, contrôles
-				  d'accès physique à la TOE, la sensibilisation et la
-				  compétence des exploitants visent à réduire le
+				  <para>Les contrÃ´les de fonctionnement, contrÃ´les
+				  d'accÃ¨s physique Ã  la TOE, la sensibilisation et la
+				  compÃ©tence des exploitants visent Ã  rÃ©duire le
 				  risque d'accidents.</para>
 
-				  <para>Le plan de secours est destiné à contrer un
+				  <para>Le plan de secours est destinÃ© Ã  contrer un
 				  sinistre.</para>
 				</entry>
 			  </row>
@@ -1006,11 +1006,11 @@ OBJ - PPC - REQ - SRE - TSS</entry>
 				  <para>OE.SENSIB_EXPL</para>
 				</entry>
 				<entry>
-				  <para>La TOE doit permettre le contrôle de
-				  l'identité de l'utilisateur.</para>
+				  <para>La TOE doit permettre le contrÃ´le de
+				  l'identitÃ© de l'utilisateur.</para>
 
-				  <para>Les exploitants doivent être sensibilisés au
-				  besoin de contrôler fortement cette identité.</para>
+				  <para>Les exploitants doivent Ãªtre sensibilisÃ©s au
+				  besoin de contrÃ´ler fortement cette identitÃ©.</para>
 				</entry>
 			  </row>
 			  <row>
@@ -1026,23 +1026,23 @@ OBJ - PPC - REQ - SRE - TSS</entry>
 				</entry>
 				<entry>
 				  <para>L'identification et l'authentification des
-				  exploitants rendent difficile cet abus, le contrôle
-				  d'accès physique à la TOE venant renforcer ces
+				  exploitants rendent difficile cet abus, le contrÃ´le
+				  d'accÃ¨s physique Ã  la TOE venant renforcer ces
 				  objectifs.</para>
 
-				  <para>La sensibilisation des exploitants, à la
-				  nécessité de protéger leurs moyens
+				  <para>La sensibilisation des exploitants, Ã  la
+				  nÃ©cessitÃ© de protÃ©ger leurs moyens
 				  d'authentification notamment, rend moins probable la
-				  possibilité de réussir une telle attaque.</para>
+				  possibilitÃ© de rÃ©ussir une telle attaque.</para>
 
-				  <para>La séparation des tâches et la nécessaire
+				  <para>La sÃ©paration des tÃ¢ches et la nÃ©cessaire
 				  collaboration entre exploitants, ainsi que
-				  l'administration correcte de ces rôles renforce le
-				  contrôle de légitimité des exploitants.</para>
+				  l'administration correcte de ces rÃ´les renforce le
+				  contrÃ´le de lÃ©gitimitÃ© des exploitants.</para>
 
-				  <para>La traçabilité de toutes les opérations, et
-				  l'exploitation de ces traces aide à détecter une
-				  éventuelle mascarade.</para>
+				  <para>La traÃ§abilitÃ© de toutes les opÃ©rations, et
+				  l'exploitation de ces traces aide Ã  dÃ©tecter une
+				  Ã©ventuelle mascarade.</para>
 				</entry>
 			  </row>
 			  <row>
@@ -1058,15 +1058,15 @@ OBJ - PPC - REQ - SRE - TSS</entry>
 				</entry>
 				<entry>
 				  <para>L'identification et l'authentification des
-				  exploitants ainsi que le contrôle d'accès physique à
-				  la TOE limitent les possibilités de mystification
+				  exploitants ainsi que le contrÃ´le d'accÃ¨s physique Ã 
+				  la TOE limitent les possibilitÃ©s de mystification
 				  d'exploitants.</para>
 
-				  <para>Les traces telles que la TOE doit les générer
-				  permettent de retrouver l'historique des opérations
+				  <para>Les traces telles que la TOE doit les gÃ©nÃ©rer
+				  permettent de retrouver l'historique des opÃ©rations
 				  avec leur auteur.</para>
 
-				  <para>Le contrôle d'intégrité des données échangées
+				  <para>Le contrÃ´le d'intÃ©gritÃ© des donnÃ©es Ã©changÃ©es
 				  par la TOE assure que les actions soient
 				  reconnaissables.</para>
 				</entry>
@@ -1080,9 +1080,9 @@ OBJ - PPC - REQ - SRE - TSS</entry>
 				  <para>OE.SECOURS</para>
 				</entry>
 				<entry>
-				  <para>La prise en compte des indisponibilités de
+				  <para>La prise en compte des indisponibilitÃ©s de
 				  personnel est du ressort du plan de secours. Ceci
-				  est clairement exprimé dans l'objectif
+				  est clairement exprimÃ© dans l'objectif
 				  OE.SECOURS.</para>
 				</entry>
 			  </row>
@@ -1095,10 +1095,10 @@ OBJ - PPC - REQ - SRE - TSS</entry>
 				  <para>OE.ACCESS</para>
 				</entry>
 				<entry>
-				  <para>La menace de persistance de données sensibles
-				  sur des supports d'information est contrée par le
-				  contrôle d'accès à tous les supports même
-				  désaffectés, et la protection des informations y
+				  <para>La menace de persistance de donnÃ©es sensibles
+				  sur des supports d'information est contrÃ©e par le
+				  contrÃ´le d'accÃ¨s Ã  tous les supports mÃªme
+				  dÃ©saffectÃ©s, et la protection des informations y
 				  compris sur les supports temporaires.</para>
 				</entry>
 			  </row>
@@ -1121,37 +1121,37 @@ OBJ - PPC - REQ - SRE - TSS</entry>
 				  <para>OE.SECOURS</para>
 				</entry>
 				<entry>
-				  <para>La politique de contrôle d'accès limite
-				  l'accès physique et logique aux exploitants
-				  autorisés.</para>
+				  <para>La politique de contrÃ´le d'accÃ¨s limite
+				  l'accÃ¨s physique et logique aux exploitants
+				  autorisÃ©s.</para>
 
 				  <para>La politique de sauvegarde et de reprises
-				  permet de luter contre la perte d'intégrité de biens
-				  nécessaires au bon fonctionnement de la TOE.</para>
+				  permet de luter contre la perte d'intÃ©gritÃ© de biens
+				  nÃ©cessaires au bon fonctionnement de la TOE.</para>
 
-				  <para>La gestion des rôles et l'administration de la
-				  TOE permettent de renforcer le contrôle d'accès à la
+				  <para>La gestion des rÃ´les et l'administration de la
+				  TOE permettent de renforcer le contrÃ´le d'accÃ¨s Ã  la
 				  TOE.</para>
 
-				  <para>Les contrôles de bon fonctionnement de la TOE
-				  et la trace de toutes les opérations réalisées
-				  permettent de limiter le risque de défaillance de la
+				  <para>Les contrÃ´les de bon fonctionnement de la TOE
+				  et la trace de toutes les opÃ©rations rÃ©alisÃ©es
+				  permettent de limiter le risque de dÃ©faillance de la
 				  TOE et facilitent les reprises.</para>
 
-				  <para>La qualité de développement de la TOE permet
+				  <para>La qualitÃ© de dÃ©veloppement de la TOE permet
 				  de limiter les risques de mauvais fonctionnement qui
-				  ouvrent des brèches dans la sécurité de la
+				  ouvrent des brÃ¨ches dans la sÃ©curitÃ© de la
 				  TOE.</para>
 
 				  <para>La sensibilisation des exploitants aux besoins
-				  de disponibilité des services et leur compétence
+				  de disponibilitÃ© des services et leur compÃ©tence
 				  renforce les chances de bon fonctionnement de la
 				  TOE.</para>
 
 				  <para>Le plan de secours permet, par exemple avec
-				  des procédures de remplacement ou de duplications,
-				  d'assurer la continuité des services vitaux, même
-				  dans un fonctionnement en mode dégradé.</para>
+				  des procÃ©dures de remplacement ou de duplications,
+				  d'assurer la continuitÃ© des services vitaux, mÃªme
+				  dans un fonctionnement en mode dÃ©gradÃ©.</para>
 				</entry>
 			  </row>
 			</tbody>
@@ -1161,8 +1161,8 @@ OBJ - PPC - REQ - SRE - TSS</entry>
 </sect1>
 
   <sect1>
-	<title>Mises en page caractère</title>
-  <para><quote>Étrange est</quote>, dit l'âne. Et il s'envole.</para>
+	<title>Mises en page caractÃ¨re</title>
+  <para><quote>Ã‰trange est</quote>, dit l'Ã¢ne. Et il s'envole.</para>
 
   <para lang="en"><quote>Strange is</quote>, said the donkey. And flew
   away.</para>
@@ -1173,14 +1173,14 @@ OBJ - PPC - REQ - SRE - TSS</entry>
   bear!</quote></quote></para>
 
 
-      <para>Avez-vous déjà essayé des footnotes dans les
+      <para>Avez-vous dÃ©jÃ  essayÃ© des footnotes dans les
 footnotes<footnote>
 	  <para>Avant<footnote>
-	      <para>Mais c'était avant !</para>
-	    </footnote>, ça ne marchait pas.</para>
-      </footnote>? Ou même des URLs<footnote>
-	<para>URL signifie «<foreignphrase><ulink
-url="http://www.w3.org/Addressing/URL/Overview.html">Uniform Resource Locator</ulink></foreignphrase>»</para>
+	      <para>Mais c'Ã©tait avant !</para>
+	    </footnote>, Ã§a ne marchait pas.</para>
+      </footnote>? Ou mÃªme des URLs<footnote>
+	<para>URL signifie Â«<foreignphrase><ulink
+url="http://www.w3.org/Addressing/URL/Overview.html">Uniform Resource Locator</ulink></foreignphrase>Â»</para>
       </footnote> ?</para>
 
   <para>Encore une footnote<footnote>
@@ -1188,7 +1188,7 @@ url="http://www.w3.org/Addressing/URL/Overview.html">Uniform Resource Locator</u
     </footnote>
 </para>
     <para>Et pourquoi pas dans une table ? Et n'oublions pas les
-références croisées vers les footnotes (<xref linkend="FOOT-imbriquee"/>).
+rÃ©fÃ©rences croisÃ©es vers les footnotes (<xref linkend="FOOT-imbriquee"/>).
 
 <informaltable>
 	<tgroup cols="1">
@@ -1213,15 +1213,15 @@ références croisées vers les footnotes (<xref linkend="FOOT-imbriquee"/>).
       </informaltable>
 </para>
 
-  <para>Test verbatim avec une <ulink url='&amp;~"#@^{[§\%'>URL</ulink>
-qui est &amp;~"#@^{[§\% de pénible.</para>
+  <para>Test verbatim avec une <ulink url='&amp;~"#@^{[Â§\%'>URL</ulink>
+qui est &amp;~"#@^{[Â§\% de pÃ©nible.</para>
 
     <para>Les URLs se mettent aussi en ligne: <ulink url="http://www.ens-cachan.fr"/></para>
 
     <para>le verbatim se teste aussi en bloc: <email>domq@cpan.org</email> se
-typesette bien à l'extérieur, mais dedans c'est moins sûr:
+typesette bien Ã  l'extÃ©rieur, mais dedans c'est moins sÃ»r:
 <programlisting>domq@cpan.org
-Avec du <varname>balisage</varname> à l'intérieur, l'espacement doit être correct. Les lignes longues doivent césurer.
+Avec du <varname>balisage</varname> Ã  l'intÃ©rieur, l'espacement doit Ãªtre correct. Les lignes longues doivent cÃ©surer.
 </programlisting>
 </para>
 
@@ -1237,15 +1237,15 @@ saut de paragraphe.</para>
 <screen><computeroutput>les() {
    espaces; sont;     significatifs;
 }</computeroutput></screen></para>
-	  <para>Ces deux mots doivent être<!-- bl ah -->collés.</para>
-	  <para>Pas d'espace après la <foreignphrase>footnote<footnote>
+	  <para>Ces deux mots doivent Ãªtre<!-- bl ah -->collÃ©s.</para>
+	  <para>Pas d'espace aprÃ¨s la <foreignphrase>footnote<footnote>
 			<para>Non, 
 
 rien.</para>
 		  </footnote> <!-- Ne pas blaster l'espace ici merci -->
 </foreignphrase>tout<emphasis>
-    <literal>ça</literal>
-</emphasis>doitêtrecolléaveclepetitchiffre.</para>
+    <literal>Ã§a</literal>
+</emphasis>doitÃªtrecollÃ©aveclepetitchiffre.</para>
 	  <para>	  En revanche, on doit voir un espace entre chou et
     fleur, mais pas entre fleur et le point:
      <emphasis>chou<footnote>
@@ -1253,9 +1253,9 @@ rien.</para>
 		  </footnote> <literal>fleur</literal>
  </emphasis>.
 </para>	  
-	  <para>Un dernier (pas <!-- du tout -->collé, pas de mots cou<!--
-   Aîe, chérie, ça va couper !!
--->pés ni de sauts de
+	  <para>Un dernier (pas <!-- du tout -->collÃ©, pas de mots cou<!--
+   AÃ®e, chÃ©rie, Ã§a va couper !!
+-->pÃ©s ni de sauts de
     paragraphe
 <!-- blah -->
 
@@ -1285,39 +1285,39 @@ bidon)</para>
 	<area coords="3" id="troisieme"/>
 	<area coords="1 3" id="tout-le-texte"/>
       </areaspec>
-      <screen>Première ligne, très longue (rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant)
-Deuxième ligne
-Troisième et dernière ligne</screen>
+      <screen>PremiÃ¨re ligne, trÃ¨s longue (rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant rant)
+DeuxiÃ¨me ligne
+TroisiÃ¨me et derniÃ¨re ligne</screen>
       <calloutlist>
          <title>Commentaires</title>
 	<callout arearefs="premiere">
-	    <para>C'est la première ligne<footnote>
-		<para>Un petit piège. Bien que nous sommes ici techniquement dans un screenco (au sens de l'inclusion XML), on ne devrait pas numéroter les lignes parce que ce n'est pas le <sgmltag>screen</sgmltag> que vous croyez.
+	    <para>C'est la premiÃ¨re ligne<footnote>
+		<para>Un petit piÃ¨ge. Bien que nous sommes ici techniquement dans un screenco (au sens de l'inclusion XML), on ne devrait pas numÃ©roter les lignes parce que ce n'est pas le <sgmltag>screen</sgmltag> que vous croyez.
 		  <screen>Voyons cela...</screen>
 </para>
-	      </footnote>. On pourrait commenter à
+	      </footnote>. On pourrait commenter Ã 
 	  l'envi sur cette ligne, juste pour avoir assez de blabla
-	  pour savoir si l'itémisation des callouts s'indente
+	  pour savoir si l'itÃ©misation des callouts s'indente
 	  joliment.</para>
 	</callout>
 	  <callout arearefs="premiere troisieme">
-	    <para>C'est une description de deux lignes à la fois.</para>
+	    <para>C'est une description de deux lignes Ã  la fois.</para>
 	  </callout>
 	  <callout arearefs="tout-le-texte">
-	    <para>C'est une description de tout le texte à la fois.</para>
+	    <para>C'est une description de tout le texte Ã  la fois.</para>
 	  </callout>
       </calloutlist>
     </screenco>
     </sect2>
   </sect1>
   <sect1>
-	<title>Références croisées</title>
-	<para>Le texte suivant ne doit pas être du charabia dans aucune langue:
+	<title>RÃ©fÃ©rences croisÃ©es</title>
+	<para>Le texte suivant ne doit pas Ãªtre du charabia dans aucune langue:
 <blockquote>
 		<para>
 	On regardera avec profit <xref linkend="TABLE1"/> dans <xref
 			linkend="SEC-tables"/>. <xref linkend="TABLE2"/> est
-			également intéressante (mais pas autant que le tableau
+			Ã©galement intÃ©ressante (mais pas autant que le tableau
 			<xref endterm="TABLE1-titre" linkend="TABLE1"/>).</para>
 		</blockquote>
 <blockquote lang="en">
@@ -1329,7 +1329,7 @@ Troisième et dernière ligne</screen>
 		</blockquote>
 </para>  
 	<para>
-Ne pas oublier qu'il y a d'autres types de références croisées...
+Ne pas oublier qu'il y a d'autres types de rÃ©fÃ©rences croisÃ©es...
 <orderedlist>
 		<listitem id="SEC-chef-tjrs-raison">
 		  <para>Le chef a toujours raison.</para>
@@ -1347,20 +1347,20 @@ Ne pas oublier qu'il y a d'autres types de références croisées...
 <segmentedlist role="cahier-recette">
 	<segtitle role="titre"/>
 	<segtitle>Objectif du test</segtitle>
-	<segtitle>Mode opératoire</segtitle>
-	<segtitle>Résultat attendu</segtitle>
+	<segtitle>Mode opÃ©ratoire</segtitle>
+	<segtitle>RÃ©sultat attendu</segtitle>
 	<segtitle role="conclusion">Conclusion</segtitle>
-	<segtitle role="remarques">Remarques éventuelles</segtitle>
+	<segtitle role="remarques">Remarques Ã©ventuelles</segtitle>
 	<segtitle role="validation">Validation</segtitle>
 	<seglistitem>
 	  <seg>Fonctionnement</seg>
-	  <seg>Vérifier si ça marche</seg>
+	  <seg>VÃ©rifier si Ã§a marche</seg>
 	  <seg>On appuie sur le bouton</seg>
-	  <seg>Ça ronronne et ça s'allume</seg>
+	  <seg>Ã‡a ronronne et Ã§a s'allume</seg>
 	</seglistitem>
 	<seglistitem>
-	  <seg>Sécurité</seg>
-	  <seg>Vérifier si ça n'explose pas</seg>
+	  <seg>SÃ©curitÃ©</seg>
+	  <seg>VÃ©rifier si Ã§a n'explose pas</seg>
 	  <seg>On appuie sur le bouton, on appuie sur le bouton, on appuie
 	  sur le bouton, on appuie sur le bouton, on appuie sur le bouton,
 	  on appuie sur le bouton, on appuie sur le bouton, on appuie sur
@@ -1383,14 +1383,14 @@ Ne pas oublier qu'il y a d'autres types de références croisées...
     <important>
       <title>Deux tirant</title>
       <para>
-      Dégâts ahead. (cartouche 'important')
+      DÃ©gÃ¢ts ahead. (cartouche 'important')
       </para>
     </important>
 
     <warning>
       <title>gaffe</title>
       <para>
-      Garopépin (cartouche 'warning')
+      GaropÃ©pin (cartouche 'warning')
       </para>
     </warning>
 
@@ -1406,7 +1406,7 @@ Ne pas oublier qu'il y a d'autres types de références croisées...
     <tip>
       <para>
       D'abord, quand il n'y a pas de titre, il doit y avoir le mot
-      «Conseil» qui apparaît. Ensuite, le C de «Conseil» ne doit pas
+      Â«ConseilÂ» qui apparaÃ®t. Ensuite, le C de Â«ConseilÂ» ne doit pas
       mordre l'arrondi de l'<literal>\ovalbox</literal>.</para>
       <para>
 Remplissor vous rend plissor !
@@ -1432,7 +1432,7 @@ rant rant rant rant rant rant rant rant rant rant rant rant rant rant
     </tip>
 
     <example>
-      <title>montrer n'est pas démontrer</title>
+      <title>montrer n'est pas dÃ©montrer</title>
       <para>
       hop (cartouche 'example')
       </para>
@@ -1449,8 +1449,8 @@ rant rant rant rant rant rant rant rant rant rant rant rant rant rant
 
   <sect1>
     <title>Tests de l'environnement de compilation</title>
-    <para>Ça consiste à inclure trois images, dont les sources sont
-    respectivement en PostScript®, fig et PNG.
+    <para>Ã‡a consiste Ã  inclure trois images, dont les sources sont
+    respectivement en PostScriptÂ®, fig et PNG.
 <foreignphrase>Use the zoom, Luke !</foreignphrase>
     <figure>
 	<title><filename>test1.fig</filename></title>
@@ -1471,12 +1471,12 @@ rant rant rant rant rant rant rant rant rant rant rant rant rant rant
     <bibliodiv>
       <title>Sous-section de bibliographie</title>
 
-      <para>C'est là qu'on essaye de donner l'impression qu'on est
-      cultivé et qu'on a lu les trucs qu'on cite.</para>
+      <para>C'est lÃ  qu'on essaye de donner l'impression qu'on est
+      cultivÃ© et qu'on a lu les trucs qu'on cite.</para>
 	<biblioentry>
 	  <abbrev>Zoinx_95</abbrev>
-	  <title>Il y avait un problème avec les underscores dans les
-	  abréviations de biblio. Voir <citation>Zoinx_95</citation> à ce sujet.</title>
+	  <title>Il y avait un problÃ¨me avec les underscores dans les
+	  abrÃ©viations de biblio. Voir <citation>Zoinx_95</citation> Ã  ce sujet.</title>
 	</biblioentry>
     </bibliodiv>
   </bibliography>

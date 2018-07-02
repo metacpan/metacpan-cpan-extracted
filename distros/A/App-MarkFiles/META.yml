@@ -1,0 +1,30 @@
+---
+abstract: 'some utility functions for marking and operating on files'
+author:
+  - unknown
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-MarkFiles
+provides:
+  App::MarkFiles:
+    file: lib/App/MarkFiles.pm
+    version: v0.0.1
+requires:
+  Cwd: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  Getopt::Long: '0'
+  POSIX: '0'
+  Sys::Hostname: '0'
+  perl: v5.10.0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

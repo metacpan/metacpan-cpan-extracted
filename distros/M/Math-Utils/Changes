@@ -1,5 +1,11 @@
 Revision history for Math-Utils
 
+1.12
+	26 Jun 2018
+	- Typo found by Florian Schlichting fixed.
+	- Add gcd() and lcm() functions.
+	- New example scripts (a couple transferred over from
+	  Math::Polynomial::Solve) in the new eg/ directory.
 1.11
 	11 Aug 2017
 	- Stupidly depended on Module::Start's boilerplate text for the

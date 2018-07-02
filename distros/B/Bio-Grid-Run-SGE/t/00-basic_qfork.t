@@ -12,6 +12,17 @@ use lib 't/lib';
 use Test::Util qw/rewrite_shebang/;
 use File::Path qw/remove_tree/;
 use Path::Tiny;
+use File::Which;
+
+BEGIN {
+  my $qsub = which('qsub');
+
+  if ($qsub) {
+    plan skip_all => 'Skipped, because we can perform live tests with qsub.';
+  }
+
+  use_ok('Bio::Grid::Run::SGE');
+}
 
 $ENV{BGRS_RC_FILE} = '';
 BEGIN { use_ok('Bio::Grid::Run::SGE'); }

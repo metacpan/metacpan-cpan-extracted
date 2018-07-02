@@ -51,9 +51,7 @@ subtest "creates a payment method nonce from a vaulted credit card" => sub {
         my $create_result = WebService::Braintree::PaymentMethodNonce->create($found_credit_card->token);
         validate_result($create_result) or return;
 
-        ok($create_result->{response}->{payment_method_nonce}->{nonce}, '.. we get a nonce');
         ok($create_result->payment_method_nonce->nonce, '.. we get a nonce object');
-        is($create_result->{response}->{payment_method_nonce}->{nonce}, $create_result->payment_method_nonce->nonce, '.. nonce accessor created successfully');
         ok($create_result->payment_method_nonce->details, '.. we have details');
         is($create_result->payment_method_nonce->details->last_two, substr($test_cc_number, -2), '.. details match the credit card');
     }

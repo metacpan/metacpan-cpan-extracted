@@ -7,13 +7,13 @@ use Moose::Exporter;
 use namespace::autoclean;
 
 use Carp;
-use integer;
 
 #
-# Three # for "I am here" messages, four # for variable dumps.
-# Five # for sort tracking.
+# Three # for "I am here" messages,
+# four # for (non-array) variable dumps,
+# five # for array dumps and sort tracking.
 #
-#use Smart::Comments ('####');
+#use Smart::Comments ('###');
 
 #
 # Export a couple of convenience functions:
@@ -24,7 +24,7 @@ Moose::Exporter->setup_import_methods(
 	as_is => [\&nwsrt_algorithms, \&nwsrt_title, \&nwsrt],
 );
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 #
 # Our one use of overload, because default
@@ -37,18 +37,18 @@ use overload
 # Names for the algorithm keys.
 #
 my %algname = (
-	bosenelson => "Bose-Nelson Sort",
-	batcher => "Batcher's Mergesort",
-	hibbard => "Hibbard's Sort",
-	bubble => "Bubble Sort",
-	bitonic => "Bitonic Sort",
-	oddeventrans => "Odd-Even Transposition Sort",
 	balanced => "Balanced",
+	batcher => "Batcher's Mergesort",
+	bitonic => "Bitonic Sort",
+	bosenelson => "Bose-Nelson Sort",
+	bubble => "Bubble Sort",
+	hibbard => "Hibbard's Sort",
+	oddeventrans => "Odd-Even Transposition Sort",
 	oddevenmerge => "Batcher's Odd-Even Merge Sort",
 );
 
 #
-# Default parameters for SVG, EPS, and text graphing.
+# Default parameters for SVG and EPS-based Knuth diagrams.
 #
 my %graphset = (
 	hz_sep => 12,
@@ -56,8 +56,16 @@ my %graphset = (
 	vt_sep => 12,
 	vt_margin => 21,
 	indent => 9,
-	radius => 2,
-	stroke_width => 2,
+	inputradius => 2,
+	compradius => 2,
+	inputline => 2,
+	compline => 2,
+);
+
+#
+# Default parameters for text-based Knuth diagrams.
+#
+my %textset = (
 	inputbegin => "o-",
 	inputline => "---",
 	inputcompline => "-|-",
@@ -78,8 +86,8 @@ my %colorset = (
 	inputbegin => undef,
 	inputline => undef,
 	inputend => undef,
-	compline=> undef,
 	compbegin => undef,
+	compline=> undef,
 	compend => undef,
 	background => undef,
 );
@@ -154,36 +162,40 @@ Algorithm::Networksort - Create Sorting Networks.
 =begin html
 
 <svg xmlns="http://www.w3.org/2000/svg"
-     xmlns:xlink="http://www.w3.org/1999/xlink" width="105" height="61" viewbox="0 0 105 61">
-  <rect width="100%" height="100%" fill="#eeeeee" />
+     xmlns:xlink="http://www.w3.org/1999/xlink" width="90" height="84" viewbox="0 0 90 84">
+  <title>Bose-Nelson Sort for N = 4</title>
   <defs>
-    <g id="I_41c1" style="fill:none; stroke-width:2" >
-      <circle style="stroke:#206068" cx="18" cy="0" r="2" />
-      <line style="stroke:#206068" x1="18" y1="0" x2="87" y2="0" />
-      <circle style="stroke:#206068" cx="87" cy="0" r="2" />
+    <g id="I_1c13" style="stroke-width:2; fill:#000; stroke:#000" >
+      <line  x1="12" y1="0" x2="78" y2="0" />
     </g>
 
-    <g id="C1_41c1" style="stroke-width:2" >
-      <line style="fill:#206068; stroke:#206068" x1="0" y1="0" x2="0" y2="15" />
-      <circle style="fill:#206068; stroke:#206068" cx="0" cy="0" r="2" />
-      <circle style="fill:#206068; stroke:#206068" cx="0" cy="15" r="2" />
+    <g id="C1_1c13" style="stroke-width:2;fill:#000; stroke:#000" >
+      <line  x1="0" y1="0" x2="0" y2="14" />
+      <circle  cx="0" cy="0" r="2" /> <circle  cx="0" cy="14" r="2" />
     </g>
-    <g id="C2_41c1" style="stroke-width:2" >
-      <line style="fill:#206068; stroke:#206068" x1="0" y1="0" x2="0" y2="30" />
-      <circle style="fill:#206068; stroke:#206068" cx="0" cy="0" r="2" />
-      <circle style="fill:#206068; stroke:#206068" cx="0" cy="30" r="2" />
+    <g id="C2_1c13" style="stroke-width:2;fill:#000; stroke:#000" >
+      <line  x1="0" y1="0" x2="0" y2="28" />
+      <circle  cx="0" cy="0" r="2" /> <circle  cx="0" cy="28" r="2" />
     </g>
   </defs>
 
-  <g id="N_41c1">
-    <use xlink:href="#I_41c1" y="8" /> <use xlink:href="#I_41c1" y="23" />
-    <use xlink:href="#I_41c1" y="38" /> <use xlink:href="#I_41c1" y="53" />
+  <g id="bosenelson04_1c13">
+    <use xlink:href="#I_1c13" y="21" /> <use xlink:href="#I_1c13" y="35" />
+    <use xlink:href="#I_1c13" y="49" /> <use xlink:href="#I_1c13" y="63" />
 
-    <use xlink:href="#C1_41c1" x="27" y="8" /> <use xlink:href="#C1_41c1" x="27" y="38" />
-    <use xlink:href="#C2_41c1" x="44" y="8" /> <use xlink:href="#C2_41c1" x="61" y="23" />
-    <use xlink:href="#C1_41c1" x="78" y="23" />
+    <use xlink:href="#C1_1c13" x="24" y="21" /> <use xlink:href="#C1_1c13" x="24" y="49" />
+    <use xlink:href="#C2_1c13" x="38" y="21" /> <use xlink:href="#C2_1c13" x="52" y="35" />
+    <use xlink:href="#C1_1c13" x="66" y="35" />
   </g>
 </svg>
+
+
+<p>Bose-Nelson sorting network, inputs = 4, drawn as a Knuth diagram.</p>
+
+<!--
+    This diagram was generated with the code in the SYNOPSIS; if you change
+    the code then please generate a new diagram from it.
+-->
 
 =end html
 
@@ -197,21 +209,29 @@ Algorithm::Networksort - Create Sorting Networks.
     #
     # Generate the sorting network (a list of comparators).
     #
-    my $nw = Algorithm::Networksort->new(inputs =>$inputs
-                                        algorithm => $algorithm);
+    # nwsrt() is a convenient short-hand
+    # for Algorithm::Networksort->new().
+    #
+    my $nw = nwsrt(inputs => $inputs, algorithm => $algorithm);
 
     #
-    # Print the comparator list using the default format,
-    # and print a graph of the list.
+    # Print the title, the comparator list using the default
+    # format, and a text-based Knuth diagram.
     #
-    print $nw->formatted(), "\n";
-    print $nw->graph_text(), "\n";
+    print $nw->title(), "\n";
+        $nw, "\n\n",
+        $nw->graph_text(), "\n";
 
     #
-    # Set up a pretty SVG image.
+    # Create an SVG image of the Knuth diagram.
+    # Set the diagram sizes.
     #
-    $nw->graphsettings(vt_margin => 8, vt_sep => 13, hz_sep=>15);
-    $nw->colorsettings(foreground => "#206068", background => "#c8c8c8");
+    $nw->graphsettings(indent => 12,
+        hz_margin => 12, hz_sep=>12,
+        vt_margin => 21, vt_sep => 12,
+        compradius => 2, compline => 2,
+        inputradius => 0, inputline => 2);
+
     print $nw->graph_svg();
 
 =head1 DESCRIPTION
@@ -281,7 +301,7 @@ sub nwsrt_algorithms
 
 =head3 nwsrt_title
 
-Return a descriptive title for the network, given an algorithm's key name.
+Return a descriptive title for an algorithm, given the algorithm's key name.
 
     $title = nwsrt_title($key);
 
@@ -317,6 +337,16 @@ sub nwsrt_title
 Returns an object that contains, among other things, a list of comparators that
 can sort B<$inputs> items. The algorithm for generating the list may be chosen,
 but by default the sorting network is generated by the Bose-Nelson algorithm.
+
+=head4 Arguments to new()
+
+=over 3
+
+=item 'inputs'
+
+The number of inputs of the sorting network.
+
+=item 'algorithm'
 
 The choices for the B<algorithm> key are
 
@@ -367,8 +397,9 @@ useful for illustrative purposes.
 =item 'oddeventrans'
 
 Use a naive odd-even transposition sort. This is a primitive sort closely
-related to bubble sort except it is more parallel. Because other algorithms
-are more efficient, this sort is included for illustrative purposes.
+related to bubble sort except that it is more parallel. Because other
+algorithms are more efficient, this sort is included for illustrative
+purposes.
 
 =item 'balanced'
 
@@ -394,6 +425,12 @@ outside source, using the C<comparators> option.
 
 Internally, this is what L<nwsrt_best()|Algorithm::Networksort::Best/nwsrt_best()>
 of L<Algorithm::Networksort::Best> uses.
+
+=back
+
+=item 'comparators'
+
+The list of comparators provided by the user instead of by an algorithm.
 
 =back
 
@@ -464,7 +501,7 @@ sub BUILD
 	@grouped = $self->group();
 
 	#
-	#### @grouped
+	###### @grouped
 	#
 	$self->depth(scalar @grouped);
 	$self->network([map { @$_ } @grouped]);
@@ -481,9 +518,9 @@ of parallelism, see L<network()>.
 
 =head3 network()
 
-Returns the comparators re-ordered from the 'raw' order, to provide a
-parallelized version of the comparator list; the best order possible to
-prevent stalling in a CPU's pipeline.
+Returns the comparators re-ordered from the 'raw' form, providing a
+parallelized version of the comparator list; e.g., the best order possible
+to prevent stalling in a CPU's pipeline.
 
 This is the form used when printing the sorting network using L<formats()>.
 
@@ -525,9 +562,7 @@ sub hibbard
 	# $t = ceiling(log2($inputs - 1)); but we'll
 	# find it using the length of the bitstring.
 	#
-	my $t = unpack("B32", pack("N", $inputs - 1));
-	$t =~ s/^0+//;
-	$t = length $t;
+	my $t = length sprintf("%b", $inputs - 1);
 
 	my $lastbit = 1 << $t;
 
@@ -544,7 +579,7 @@ sub hibbard
 		# comparator pair.
 		#
 		### hibbard() top of loop:
-		#### @comparators
+		##### @comparators
 		#
 		push @comparators, [$x, $y];
 
@@ -655,7 +690,7 @@ sub bn_split
 
 	if ($length >= 2)
 	{
-		my $mid = $length/2;
+		my $mid = $length >> 1;
 
 		push @comparators, bn_split($i, $mid);
 		push @comparators, bn_split($i + $mid, $length - $mid);
@@ -664,7 +699,7 @@ sub bn_split
 
 	#
 	### bn_split() returns
-	#### @comparators
+	##### @comparators
 	#
 	return @comparators;
 }
@@ -707,8 +742,8 @@ sub bn_merge
 	}
 	else
 	{
-		my $i_mid = $length_i/2;
-		my $j_mid = ($length_i & 1)? $length_j/2: ($length_j + 1)/2;
+		my $i_mid = int($length_i/2);
+		my $j_mid = int(($length_i & 1)? $length_j/2: ($length_j + 1)/2);
 
 		push @comparators, bn_merge($i, $i_mid, $j, $j_mid);
 		push @comparators, bn_merge($i + $i_mid, $length_i - $i_mid, $j + $j_mid, $length_j - $j_mid);
@@ -717,7 +752,7 @@ sub bn_merge
 
 	#
 	### bn_merge() returns
-	#### @comparators
+	##### @comparators
 	#
 	return @comparators;
 }
@@ -739,9 +774,7 @@ sub batcher
 	# $t = ceiling(log2($inputs)); but we'll
 	# find it using the length of the bitstring.
 	#
-	my $t = unpack("B32", pack("N", $inputs));
-	$t =~ s/^0+//;
-	$t = length $t;
+	my $t = length sprintf("%b", $inputs);
 
 	my $p = 1 << ($t -1);
 
@@ -790,7 +823,7 @@ sub bitonic
 		my ($lo, $n, $dir) = @_;
 
 		if ($n > 1) {
-			my $m = $n/2;
+			my $m = $n >> 1;
 			$sort->($lo, $m, !$dir);
 			$sort->($lo + $m, $n - $m, $dir);
 			$merge->($lo, $n, $dir);
@@ -805,9 +838,7 @@ sub bitonic
 			# $t = ceiling(log2($n - 1)); but we'll
 			# find it using the length of the bitstring.
 			#
-			my $t = unpack("B32", pack("N", $n - 1));
-			$t =~ s/^0+//;
-			$t = length $t;
+			my $t = length sprintf("%b", $n - 1);
 
 			my $m = 1 << ($t - 1);
 
@@ -915,17 +946,15 @@ sub balanced
 	# $t = ceiling(log2($inputs - 1)); but we'll
 	# find it using the length of the bitstring.
 	#
-	my $t = unpack("B32", pack("N", $inputs - 1));
-	$t =~ s/^0+//;
-	$t = length $t;
+	my $t = length sprintf("%b", $inputs - 1);
 
 	for (1 .. $t)
 	{
-		for (my $curr = 2**($t); $curr > 1; $curr /= 2)
+		for (my $curr = 1 << $t; $curr > 1; $curr >>= 1)
 		{
-			for (my $i = 0; $i < 2**$t; $i += $curr)
+			for (my $i = 0; $i < (1 << $t); $i += $curr)
 			{
-				for (my $j = 0; $j < $curr/2; $j++)
+				for (my $j = 0; $j < int($curr/2); $j++)
 				{
 					my $wire1 = $i+$j;
 					my $wire2 = $i+$curr-$j-1;
@@ -955,9 +984,7 @@ sub oddevenmerge
 	# $t = ceiling(log2($inputs - 1)); but we'll
 	# find it using the length of the bitstring.
 	#
-	my $t = unpack("B32", pack("N", $inputs - 1));
-	$t =~ s/^0+//;
-	$t = length $t;
+	my $t = length sprintf("%b", $inputs - 1);
 
 	my ($add_elem, $sort, $merge);
 
@@ -1002,7 +1029,7 @@ sub oddevenmerge
 		}
 	};
 
-	$sort->(0, 2**$t);
+	$sort->(0, 1 << $t);
 
 	return @network;
 }
@@ -1045,8 +1072,8 @@ sub sort
 
 	#
 	### sort():
-	#### $network
-	#### $array
+	##### $network
+	##### $array
 	#
 
 	#
@@ -1065,7 +1092,7 @@ sub sort
 		}
 
 		#
-		##### @$array
+		###### @$array
 		#
 	}
 
@@ -1110,14 +1137,37 @@ sub statistics
 
 The network object by default prints itself in a grouped format; that is
 
-    my $nw = nwsrt(inputs => 4, algorithm => 'bosenelson');
-    print $nw;
+    my $nw = nwsrt(inputs => 8, algorithm => 'bosenelson');
+    print $nw . "\n";
 
 Will result in the output
 
-    [[0,1], [2,3],
-    [0,2], [1,3],
-    [1,2]]
+    [[0,1], [2,3], [4,5], [6,7],
+    [0,2], [1,3], [4,6], [5,7],
+    [1,2], [5,6], [0,4], [3,7],
+    [1,5], [2,6],
+    [1,4], [3,6],
+    [2,4], [3,5],
+    [3,4]]
+
+If you had shifted the array index by one using L<index_base()>:
+
+    my $nw = nwsrt(inputs => 8, algorithm => 'bosenelson');
+    $nw->index_base([1 .. 8]);
+    print $nw . "\n";
+
+This would have resulted in the output
+
+    [[1,2], [3,4], [5,6], [7,8],
+    [1,3], [2,4], [5,7], [6,8],
+    [2,3], [6,7], [1,5], [4,8],
+    [2,6], [3,7],
+    [2,5], [4,7],
+    [3,5], [4,6],
+    [4,5]]
+
+For a wider variety of outputs, use C<formats()> and C<index_base()> as
+described below.
 
 =head3 formats()
 
@@ -1145,7 +1195,7 @@ sub _dflt_formatted
 
 	#
 	# Got comparators?
-	#### $network
+	##### $network
 	#
 	if (scalar @$network == 0)
 	{
@@ -1163,8 +1213,7 @@ sub _dflt_formatted
 		$string .= "[" . join(",", @$cmptr) . "], ";
 	}
 
-	chop $string;
-	chop $string;
+	chop $string;	# Remove the trailing space, but not the comma.
 
 	return $string;
 }
@@ -1172,7 +1221,7 @@ sub _dflt_formatted
 #
 # _stringify
 #
-# Show a nicely formatted sorting network.
+# Show a sorting network formatted by group (using _dflt_formatted() above).
 #
 sub _stringify
 {
@@ -1184,7 +1233,7 @@ sub _stringify
 	{
 		$string .= $self->_dflt_formatted($grp) . "\n";
 	}
-	substr($string, -1, 1) = ']';    # Overwrite the trailing "\n".
+	substr($string, -2) = ']';    # Overwrite the trailing ",\n".
 	return $string;
 }
 
@@ -1208,7 +1257,7 @@ B<Example 0: you want a string in the default format.>
 B<Example 1: you want the output to look like the default format, but
 one-based instead of zero-based.>
 
-    $nw->input_base([1..$inputs]);
+    $nw->index_base([1..$inputs]);
     print $nw->formatted();
 
 B<Example 2: you want a simple list of SWAP macros.>
@@ -1218,7 +1267,7 @@ B<Example 2: you want a simple list of SWAP macros.>
 
 B<Example 3: as with example 2, but the SWAP values need to be one-based instead of zero-based.>
 
-    $nw->input_base([1..$inputs]);
+    $nw->index_base([1..$inputs]);
     $nw->formats([ "SWAP(%d, %d);\n" ]);
     print $nw->formatted();
 
@@ -1230,7 +1279,7 @@ B<Example 4: you want a series of comparison and swap statements.>
 
 B<Example 5: you want the default format to use letters, not numbers.>
 
-    $nw->input_base( [('a'..'z')[0..$inputs]] );
+    $nw->index_base( [('a'..'z')[0..$inputs]] );
     $nw->formats([ "[%s,%s]," ]);      # Note that we're using the string flag.
 
     my $string = '[' . $nw->formatted();
@@ -1244,10 +1293,11 @@ sub formatted
 {
 	my $self = shift;
 	my $network = $self->network();
+	my $string = '';
 
 	#
 	# Got comparators?
-	#### $network
+	##### $network
 	#
 	if (scalar @$network == 0)
 	{
@@ -1257,14 +1307,17 @@ sub formatted
 
 	#
 	# Got formats?
+	# If not, produce a single string with no ending newline.
 	#
 	my(@formats) = $self->formats? @{ $self->formats() }: ();
 	unless (scalar @formats)
 	{
-		return '[' . $self->_dflt_formatted($network) . ']';
+		$string = $self->_dflt_formatted($network);
+		chop $string;		# Remove trailing comma
+
+		return '[' . $string . ']';
 	}
 
-	my $string = '';
 	my $index_base = $self->index_base();
 
 	for my $cmptr (@$network)
@@ -1294,13 +1347,19 @@ that represents parallel operations of comparators. Its values may be:
 
 =item 'graph'
 
-Group the comnparators as parallel as possible for graphing.
+Group the comparators as parallel as possible for graphing.
 
 =item 'parallel'
 
 Arrange the sequence in parallel so that it has a minimum depth. This,
 after flattening the lists into a single list again, is what is used to
 produce the sequence in L<network()>.
+
+=item I<number>
+
+Arrange the comparators every I<number> count. This is for simple
+printing of the comparators, without any grouping for graphing or
+maximum parallelization.
 
 =back
 
@@ -1423,7 +1482,7 @@ sub hz_coords
 
 	for my $idx (0..$columns-1)
 	{
-		$hcoord[$idx] += $idx * ($grset{hz_sep} + $grset{stroke_width});
+		$hcoord[$idx] += $idx * ($grset{hz_sep} + $grset{compline});
 	}
 
 	return @hcoord;
@@ -1440,10 +1499,77 @@ sub vt_coords
 
 	for my $idx (0..$inputs-1)
 	{
-		$vcoord[$idx] += $idx * ($grset{vt_sep} + $grset{stroke_width});
+		$vcoord[$idx] += $idx * ($grset{vt_sep} + $grset{inputline});
 	}
 
 	return @vcoord;
+}
+
+sub colorswithdefaults
+{
+	#
+	# Get the colorset, using the foreground color as the default color
+	# for drawing, except for 'background', which has its own default.
+	#
+	my @keylist = grep{$_ !~ /background/} keys %colorset;
+	my %clrset = map{$_ => ($colorset{$_} // $colorset{foreground} // '#000')}
+		@keylist;
+	$clrset{background} = $colorset{background};
+
+	#
+	#### colorset after defaults are set: %clrset
+	#
+	return %clrset;
+}
+
+#
+# Helper function to see if the drawing colors are all identical.
+# The hash is presumed to be one returned by colorswithdefaults().
+#
+sub ismonotone
+{
+	my (%clrs) = @_;
+
+	my @keylist = grep{$_ !~ /foreground|background/} keys %colorset;
+
+	return !scalar grep{$clrs{$_} ne $clrs{foreground}} @keylist;
+}
+
+#
+# For the postscript setrgbcolor operator.
+#
+sub psrgbcolor
+{
+	my $color = $_[0] // '000';
+
+	#
+	# A postscript user might have this in an 'rr gg bb' format,
+	# or not bother with the '#'.
+	#
+	$color =~ s/ //g;
+	$color =~ s/^#//;
+
+	if ($color =~ /[^0-9a-fA-F]/)
+	{
+		carp "Color '$color' is not in six or three hexadecimal digit RGB form.";
+		$color = "000";
+	}
+
+	if (length $color == 3)
+	{
+		$color =~ s/(.)(.)(.)/$1$1 $2$2 $3$3/;
+	}
+	elsif (length $color == 6)
+	{
+		$color =~ s/(..)(..)(..)/$1 $2 $3/;
+	}
+	else
+	{
+		carp "Color '$color' is not in six or three hexadecimal digit RGB form.";
+		$color = "0 0 0";
+	}
+
+	return join(" ", map{hex()/256} split(/ /, $color));
 }
 
 =head2 Methods For Graphing
@@ -1453,7 +1579,7 @@ sub vt_coords
 Returns a string that graphs out the network's comparators. The format
 will be encapsulated postscript.
 
-    my $nw = Algorithm::Networksort(inputs = 4, algorithm => 'bitonic');
+    my $nw = nwsrt(inputs = 4, algorithm => 'bitonic');
 
     print $nw->graph_eps();
 
@@ -1477,58 +1603,120 @@ sub graph_eps
 
 	my $xbound = $hcoord[$columns - 1] + $grset{hz_margin} + $grset{indent};
 	my $ybound = $vcoord[$inputs - 1] + $grset{vt_margin};
+	my $i_radius = $grset{inputradius};
+	my $c_radius = $grset{compradius};
+
+	my %clrset = colorswithdefaults();
+	my $monotone = ismonotone(%clrset);
+
+	map{$clrset{$_} = psrgbcolor($clrset{$_}) . " setrgbcolor"} keys %clrset;
 
 	#
-	# A long involved piece to create the necessary DSC, the subroutine
-	# definitions, arrays of vertical and horizontal coordinates, and
-	# left and right margin definitions.
+	# Create the necessary DSC, the arrays of vertical
+	# and horizontal coordinates, and the left and right
+	# margin definitions.
 	#
 	my $string =
-		qq(%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 $xbound $ybound\n%%CreationDate: ) .
-		localtime() .
+		qq(%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 $xbound $ybound\n) .
+		qq(%%CreationDate: ) .  localtime() .
 		qq(\n%%Creator: ) . $self->creator() .
 		qq(\n%%Title: ) . $self->title() .
 		qq(\n%%Pages: 1\n%%EndComments\n%%Page: 1 1\n) .
-q(
-% column inputline1 inputline2 draw-comparatorline
-/draw-comparatorline {
-    vcoord exch get 3 1 roll vcoord exch get
-    3 1 roll hcoord exch get 3 1 roll 2 index exch % x1 y1 x1 y2
-    newpath 2 copy currentlinewidth 0 360 arc gsave stroke grestore fill moveto
-    2 copy lineto stroke currentlinewidth 0 360 arc gsave stroke grestore fill
-} bind def
 
-% inputline draw-inputline
-/draw-inputline {
-    vcoord exch get leftmargin exch dup rightmargin exch % x1 y1 x2 y1
-    newpath 2 copy currentlinewidth 0 360 arc moveto
-    2 copy lineto currentlinewidth 0 360 arc stroke
-} bind def
-
-) .
-		"/vcoord [" .
-		join("\n    ", semijoin(' ', 16, @vcoord)) . "] def\n/hcoord [" .
-		join("\n    ", semijoin(' ', 16, @hcoord)) . "] def\n\n" .
-		"/leftmargin $grset{hz_margin} def\n/rightmargin " .
-		($xbound - $grset{hz_margin}) . " def\n\n";
+		qq(/vcoord [) .
+		join("\n    ", semijoin(' ', 16, @vcoord)) . qq(] def\n\n) .
+		qq(/hcoord [) .
+		join("\n    ", semijoin(' ', 16, @hcoord)) . qq(] def\n\n) .
+		qq(/leftmargin $grset{hz_margin} def\n) .
+		qq(/rightmargin ) . ($xbound - $grset{hz_margin}) . qq( def\n\n);
 
 	#
-	# Save the current graphics state, then change the default line width,
-	# and the drawing coordinates from (0,0) = lower left to an upper left
-	# origin.
+	# Define the input line procedure.
 	#
-	$string .= "gsave\n$grset{stroke_width} setlinewidth\n0 $ybound translate\n1 -1 scale\n";
+	$string .= qq(%\n% inputline draw-inputline\n%\n) .
+	qq(/draw-inputline {\n    vcoord exch get leftmargin exch\n) .
+	qq(    dup rightmargin exch % x1 y1 x2 y1\n\n);
+
+	$string .= qq(    4 copy\n) if ($i_radius > 0);
+	$string .= qq(    $clrset{inputline}\n) unless ($monotone);
+
+	$string .= qq(    newpath moveto lineto stroke\n);
+
+	if ($i_radius > 0)
+	{
+		if ($monotone)
+		{
+			$string .= qq(    newpath 2 copy moveto $i_radius 0 360 arc fill ) .
+				qq(newpath 2 copy moveto $i_radius 0 360 arc fill\n);
+		}
+		else
+		{
+			$string .= qq(    $clrset{inputend}\n) .
+				qq(    newpath 2 copy moveto $i_radius 0 360 arc fill\n) .
+				qq(    $clrset{inputbegin}\n) .
+				qq(    newpath 2 copy moveto $i_radius 0 360 arc fill\n);
+		}
+	}
+
+	$string .= qq(} bind def\n\n);
+
+	#
+	# Define the comparator procedure.
+	#
+	$string .= qq(%\n% column inputline1 inputline2 draw-comparatorline\n%\n) .
+		qq(/draw-comparatorline {\n) .
+    		qq(    vcoord exch get 3 1 roll vcoord exch get 3 1 roll\n) .
+    		qq(    hcoord exch get 3 1 roll 2 index exch % now x1 y1 x1 y2\n\n);
+
+	$string .= qq(    4 copy\n) if ($c_radius > 0);
+	$string .= qq(    $clrset{compline}\n) unless ($monotone);
+
+	$string .= qq(    newpath moveto lineto stroke\n);
+
+	if ($c_radius > 0)
+	{
+		if ($monotone)
+		{
+			$string .= qq(    newpath 2 copy moveto $c_radius 0 360 arc fill ) .
+				qq(newpath 2 copy moveto $c_radius 0 360 arc fill\n);
+		}
+		else
+		{
+			$string .= qq(    $clrset{compend}\n) .
+				qq(    newpath 2 copy moveto $c_radius 0 360 arc fill\n) .
+				qq(    $clrset{compbegin}\n) .
+				qq(    newpath 2 copy moveto $c_radius 0 360 arc fill\n);
+		}
+	}
+
+	$string .= qq(} bind def\n\n);
+
+	#
+	# Save the current graphics state, then change the drawing
+	# coordinates (from (0,0) = lower left to (0,0) = upper left),
+	# and the color if we're drawing in a single color.
+	#
+	$string .= qq(gsave\n0 $ybound translate\n1 -1 scale\n);
+	$string .= qq($clrset{foreground}\n) if ($monotone);
+
+	if (defined $clrset{background})
+	{
+		$string .= qq(\ngsave $clrset{background}\n);
+		$string .= qq(0 0 moveto 0 $ybound lineto $xbound $ybound lineto $xbound 0 lineto closepath);
+		$string .= qq(\nfill grestore\n);
+	}
 
 	#
 	# Draw the input lines.
 	#
-	$string .= "\n%\n% Draw the input lines.\n%\n0 1 " . ($inputs-1) . " {draw-inputline} for\n";
+	$string .= qq(\n%\n% Draw the input lines.\n%\n$grset{inputline} setlinewidth\n) .
+		qq(0 1 ) . ($inputs-1) . qq( {draw-inputline} for\n);
 
 	#
 	# Draw our comparators.
 	# Each member of a group of comparators is drawn in the same column.
 	#
-	$string .= "\n%\n% Draw the comparator lines.\n%\n";
+	$string .= qq(\n%\n% Draw the comparator lines.\n%\n$grset{compline} setlinewidth\n);
 	my $hidx = 0;
 	for my $group (@node_stack)
 	{
@@ -1539,28 +1727,25 @@ q(
 		$hidx++;
 	}
 
-	$string .= "showpage\ngrestore\n% End of the EPS graph.";
+	$string .= qq(showpage\ngrestore\n% End of the EPS graph.\n);
 	return $string;
 }
 
-#svg.pl --background="#9494A4" --indent=15 --hz_sep=22 --hz_margin=16 --vt_margin=20 --stroke_width=4 --radius=3 --algorithm=bosenelson 4
-
 =head3 graph_svg()
 
-Returns a string that graphs out the network's comparators.
+Returns a string that creates a Knuth diagram of a network.
 
-    $nw = Algorithm::Networksort(inputs => 4, algorithm => 'bitonic');
-    $svg = $nw->graph_svg();
+    $nw = nwsrt(inputs => 4, algorithm => 'bitonic');
+    $diagram = $nw->graph_svg();    # Using default attributes.
 
-The output will use the default colors and sizes, and will be enclosed between
-E<lt>svgE<gt> and E<lt>/svgE<gt> tags.
+The string will consist of SVG drawing tags enclosed by E<lt>svgE<gt> and E<lt>/svgE<gt> tags.
 
-An example of using the output in an HTML setting:
+The attributes of the diagram can be changed via colorsettings() and graphsettings().
 
     $nw = nwsrt_best(name => 'floyd09');   # See Algorithm::Networksort::Best
 
-    $nw->colorsettings(compbegin => '#04c', compend => '#40c');
-    $svg = $nw->graph_svg();
+    $nw->colorsettings(compbegin => '#04c', compend => '#00c');
+    $diagram = $nw->graph_svg();
 
 =begin html
 
@@ -1568,55 +1753,51 @@ An example of using the output in an HTML setting:
 
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:xlink="http://www.w3.org/1999/xlink" width="278" height="154" viewbox="0 0 278 154">
+  <title>9-input Network by Robert W. Floyd</title>
   <defs>
-    <g id="I_51b6" style="fill:none; stroke-width:2" >
-      <circle style="stroke:black" cx="18" cy="0" r="2" />
-      <line style="stroke:black" x1="18" y1="0" x2="260" y2="0" />
-      <circle style="stroke:black" cx="260" cy="0" r="2" />
+    <g id="I_454d" style="stroke-width:2" >
+      <line style="fill:#000; stroke:#000" x1="18" y1="0" x2="260" y2="0" />
+      <circle style="fill:#000; stroke:#000" cx="18" cy="0" r="2" /> <circle style="fill:#000; stroke:#000" cx="260" cy="0" r="2" />
     </g>
 
-    <g id="C1_51b6" style="stroke-width:2" >
-      <line style="fill:black; stroke:black" x1="0" y1="0" x2="0" y2="14" />
-      <circle style="fill:#04c; stroke:#04c" cx="0" cy="0" r="2" />
-      <circle style="fill:#40c; stroke:#40c" cx="0" cy="14" r="2" />
+    <g id="C1_454d" style="stroke-width:2" >
+      <line style="fill:#000; stroke:#000" x1="0" y1="0" x2="0" y2="14" />
+      <circle style="fill:#04c; stroke:#04c" cx="0" cy="0" r="2" /> <circle style="fill:#00c; stroke:#00c" cx="0" cy="14" r="2" />
     </g>
-    <g id="C3_51b6" style="stroke-width:2" >
-      <line style="fill:black; stroke:black" x1="0" y1="0" x2="0" y2="42" />
-      <circle style="fill:#04c; stroke:#04c" cx="0" cy="0" r="2" />
-      <circle style="fill:#40c; stroke:#40c" cx="0" cy="42" r="2" />
+    <g id="C3_454d" style="stroke-width:2" >
+      <line style="fill:#000; stroke:#000" x1="0" y1="0" x2="0" y2="42" />
+      <circle style="fill:#04c; stroke:#04c" cx="0" cy="0" r="2" /> <circle style="fill:#00c; stroke:#00c" cx="0" cy="42" r="2" />
     </g>
-    <g id="C2_51b6" style="stroke-width:2" >
-      <line style="fill:black; stroke:black" x1="0" y1="0" x2="0" y2="28" />
-      <circle style="fill:#04c; stroke:#04c" cx="0" cy="0" r="2" />
-      <circle style="fill:#40c; stroke:#40c" cx="0" cy="28" r="2" />
+    <g id="C2_454d" style="stroke-width:2" >
+      <line style="fill:#000; stroke:#000" x1="0" y1="0" x2="0" y2="28" />
+      <circle style="fill:#04c; stroke:#04c" cx="0" cy="0" r="2" /> <circle style="fill:#00c; stroke:#00c" cx="0" cy="28" r="2" />
     </g>
-    <g id="C4_51b6" style="stroke-width:2" >
-      <line style="fill:black; stroke:black" x1="0" y1="0" x2="0" y2="56" />
-      <circle style="fill:#04c; stroke:#04c" cx="0" cy="0" r="2" />
-      <circle style="fill:#40c; stroke:#40c" cx="0" cy="56" r="2" />
+    <g id="C4_454d" style="stroke-width:2" >
+      <line style="fill:#000; stroke:#000" x1="0" y1="0" x2="0" y2="56" />
+      <circle style="fill:#04c; stroke:#04c" cx="0" cy="0" r="2" /> <circle style="fill:#00c; stroke:#00c" cx="0" cy="56" r="2" />
     </g>
   </defs>
 
-  <g id="floyd09_51b6">
-    <use xlink:href="#I_51b6" y="21" /> <use xlink:href="#I_51b6" y="35" />
-    <use xlink:href="#I_51b6" y="49" /> <use xlink:href="#I_51b6" y="63" />
-    <use xlink:href="#I_51b6" y="77" /> <use xlink:href="#I_51b6" y="91" />
-    <use xlink:href="#I_51b6" y="105" /> <use xlink:href="#I_51b6" y="119" />
-    <use xlink:href="#I_51b6" y="133" />
+  <g id="floyd09_454d">
+    <use xlink:href="#I_454d" y="21" /> <use xlink:href="#I_454d" y="35" />
+    <use xlink:href="#I_454d" y="49" /> <use xlink:href="#I_454d" y="63" />
+    <use xlink:href="#I_454d" y="77" /> <use xlink:href="#I_454d" y="91" />
+    <use xlink:href="#I_454d" y="105" /> <use xlink:href="#I_454d" y="119" />
+    <use xlink:href="#I_454d" y="133" />
 
-    <use xlink:href="#C1_51b6" x="27" y="21" /> <use xlink:href="#C1_51b6" x="27" y="63" />
-    <use xlink:href="#C1_51b6" x="27" y="105" /> <use xlink:href="#C1_51b6" x="41" y="35" />
-    <use xlink:href="#C1_51b6" x="41" y="77" /> <use xlink:href="#C1_51b6" x="41" y="119" />
-    <use xlink:href="#C1_51b6" x="55" y="21" /> <use xlink:href="#C1_51b6" x="55" y="63" />
-    <use xlink:href="#C1_51b6" x="55" y="105" /> <use xlink:href="#C3_51b6" x="69" y="21" />
-    <use xlink:href="#C3_51b6" x="83" y="63" /> <use xlink:href="#C3_51b6" x="97" y="21" />
-    <use xlink:href="#C3_51b6" x="111" y="35" /> <use xlink:href="#C3_51b6" x="125" y="77" />
-    <use xlink:href="#C3_51b6" x="139" y="35" /> <use xlink:href="#C3_51b6" x="153" y="49" />
-    <use xlink:href="#C3_51b6" x="167" y="91" /> <use xlink:href="#C3_51b6" x="181" y="49" />
-    <use xlink:href="#C2_51b6" x="195" y="35" /> <use xlink:href="#C2_51b6" x="195" y="91" />
-    <use xlink:href="#C4_51b6" x="209" y="49" /> <use xlink:href="#C2_51b6" x="223" y="77" />
-    <use xlink:href="#C2_51b6" x="237" y="49" /> <use xlink:href="#C1_51b6" x="237" y="91" />
-    <use xlink:href="#C1_51b6" x="251" y="49" />
+    <use xlink:href="#C1_454d" x="27" y="21" /> <use xlink:href="#C1_454d" x="27" y="63" />
+    <use xlink:href="#C1_454d" x="27" y="105" /> <use xlink:href="#C1_454d" x="41" y="35" />
+    <use xlink:href="#C1_454d" x="41" y="77" /> <use xlink:href="#C1_454d" x="41" y="119" />
+    <use xlink:href="#C1_454d" x="55" y="21" /> <use xlink:href="#C1_454d" x="55" y="63" />
+    <use xlink:href="#C1_454d" x="55" y="105" /> <use xlink:href="#C3_454d" x="69" y="21" />
+    <use xlink:href="#C3_454d" x="83" y="63" /> <use xlink:href="#C3_454d" x="97" y="21" />
+    <use xlink:href="#C3_454d" x="111" y="35" /> <use xlink:href="#C3_454d" x="125" y="77" />
+    <use xlink:href="#C3_454d" x="139" y="35" /> <use xlink:href="#C3_454d" x="153" y="49" />
+    <use xlink:href="#C3_454d" x="167" y="91" /> <use xlink:href="#C3_454d" x="181" y="49" />
+    <use xlink:href="#C2_454d" x="195" y="35" /> <use xlink:href="#C2_454d" x="195" y="91" />
+    <use xlink:href="#C4_454d" x="209" y="49" /> <use xlink:href="#C2_454d" x="223" y="77" />
+    <use xlink:href="#C2_454d" x="237" y="49" /> <use xlink:href="#C1_454d" x="237" y="91" />
+    <use xlink:href="#C1_454d" x="251" y="49" />
   </g>
 </svg>
 
@@ -1636,16 +1817,16 @@ sub graph_svg
 	# are unique -- I got bit by this when I put two SVG
 	# images in the same page.
 	#
-	my $salt = "_" . sprintf("%x", int(rand(0x7fff)));
+	my $salt = sprintf("_%x", int(rand(0x7fff)));
 
 	my @node_stack = $self->group(grouping => 'graph');
 	my $columns = scalar @node_stack;
 
 	#
-	# Get the colorset, using the foreground color as the default color
-	# for drawing.
+	# Get the colors for drawing.
 	#
-	my %clrset = map{$_ => ($colorset{$_} // $colorset{foreground} // 'black')} keys %colorset;
+	my %clrset = colorswithdefaults();
+	my $monotone = ismonotone(%clrset);
 
 	#
 	# Set up the vertical and horizontal coordinates.
@@ -1657,7 +1838,8 @@ sub graph_svg
 	my $ybound = $vcoord[$inputs - 1] + $grset{vt_margin};
 
 	my $right_margin = $hcoord[$columns - 1] + $grset{indent};
-	my $radius = $grset{radius};
+	my $i_radius = $grset{inputradius};
+	my $c_radius = $grset{compradius};
 
 	my $string = qq(<svg xmlns="http://www.w3.org/2000/svg"\n) .
 		qq(     xmlns:xlink="http://www.w3.org/1999/xlink" ) .
@@ -1667,41 +1849,67 @@ sub graph_svg
 		qq(\n    Creator: ) . $self->creator() .  qq(\n  </desc>\n);
 
 	#
-	# Set a background color by inserting as the first element a <rect>
-	# with the full size of the view and a fill of the desired color.
-	# Use %colorset instead of %clrset, since we've just torpedoed
-	# the background value if it was an undef.
+	# Set up the input line template, and either set a single
+	# default color, or color the components individually.
 	#
-	if (defined $colorset{background})
-	{
-		my $filler = $colorset{background};
-		$string .= qq(  <rect width="100%" height="100%" fill="$filler" />\n);
-	}
+	#
+	my $g_style = qq(style="stroke-width:$grset{inputline});
+	my $b_style;
+	my $l_style;
+	my $e_style;
 
-	#
-	# Set up the input line template.
-	#
-	my $g_style = "style=\"fill:none; stroke-width:$grset{stroke_width}\"";
-	my $b_style = "style=\"stroke:$clrset{inputbegin}\"";
-	my $l_style = "style=\"stroke:$clrset{inputline}\"";
-	my $e_style = "style=\"stroke:$clrset{inputend}\"";
+	if ($monotone)
+	{
+		$g_style .= qq(; fill:$clrset{foreground}; stroke:$clrset{foreground}");
+		$b_style = "";
+		$l_style = "";
+		$e_style = "";
+	}
+	else
+	{
+		$g_style .= qq(");
+		$b_style = qq(style="fill:$clrset{inputbegin}; stroke:$clrset{inputbegin}");
+		$l_style = qq(style="fill:$clrset{inputline}; stroke:$clrset{inputline}");
+		$e_style = qq(style="fill:$clrset{inputend}; stroke:$clrset{inputend}");
+	}
 
 	$string .=
 		qq(  <defs>\n) .
 		qq(    <!-- Define the input line template. -->\n) .
 		qq(    <g id="I$salt" $g_style >\n) .
 		qq(      <desc>Input line</desc>\n) .
-		qq(      <line $l_style x1="$grset{hz_margin}" y1="0" x2="$right_margin" y2="0" />\n) .
-		qq(      <circle $b_style cx="$grset{hz_margin}" cy="0" r="$radius" />\n) .
-		qq(      <circle $e_style cx="$right_margin" cy="0" r="$radius" />\n) .
-		qq(    </g>\n\n);
+		qq(      <line $l_style x1="$grset{hz_margin}" y1="0" x2="$right_margin" y2="0" />\n);
+
+		if ($i_radius > 0)
+		{
+			$string .= qq(      <circle $b_style cx="$grset{hz_margin}" cy="0" r="$i_radius" />) .
+				qq( <circle $e_style cx="$right_margin" cy="0" r="$i_radius" />\n);
+		}
+
+		$string .= qq(    </g>\n\n);
 
 	#
-	# Set up the comparator templates.
+	# Set up the comparator templates, and like the input template,
+	# either set a single default color, or color the components
+	# individually.
 	#
-	$string .= qq(    <!-- Define the comparator lines, which vary in length. -->\n);
+	$string .= qq(    <!-- Define the different comparator lines. -->\n);
 
-	$g_style = "style=\"stroke-width:$grset{stroke_width}\"";
+	$g_style = qq(style="stroke-width:$grset{compline});
+	if ($monotone)
+	{
+		$g_style .= qq(;fill:$clrset{foreground}; stroke:$clrset{foreground}");
+		$b_style = "";
+		$l_style = "";
+		$e_style = "";
+	}
+	else
+	{
+		$g_style .= qq(");
+		$l_style = qq(style="fill:$clrset{compline}; stroke:$clrset{compline}");
+		$b_style = qq(style="fill:$clrset{compbegin}; stroke:$clrset{compbegin}");
+		$e_style = qq(style="fill:$clrset{compend}; stroke:$clrset{compend}");
+	}
 
 	my @cmptr = (0) x $inputs;
 	for my $comparator (@$network)
@@ -1710,23 +1918,22 @@ sub graph_svg
 		my $clen = $to - $from;
 		if ($cmptr[$clen] == 0)
 		{
-			my $endpoint = $vcoord[$to] - $vcoord[$from];
 			$cmptr[$clen] = 1;
 
-			#
-			# Color the components in the group individually.
-			#
-			$b_style = "style=\"fill:$clrset{compbegin}; stroke:$clrset{compbegin}\"";
-			$l_style = "style=\"fill:$clrset{compline}; stroke:$clrset{compline}\"";
-			$e_style = "style=\"fill:$clrset{compend}; stroke:$clrset{compend}\"";
+			my $endpoint = $vcoord[$to] - $vcoord[$from];
 
 			$string .=
-			qq(    <g id="C$clen$salt" $g_style >\n) .
-			qq(      <desc>Comparator size $clen</desc>\n) .
-			qq(      <line $l_style x1="0" y1="0" x2="0" y2="$endpoint" />\n) .
-			qq(      <circle $b_style cx="0" cy="0" r="$radius" />\n) .
-			qq(      <circle $e_style cx="0" cy="$endpoint" r="$radius" />\n) .
-			qq(    </g>\n);
+				qq(    <g id="C$clen$salt" $g_style >\n) .
+				qq(      <desc>Comparator size $clen</desc>\n) .
+				qq(      <line $l_style x1="0" y1="0" x2="0" y2="$endpoint" />\n);
+
+			if ($c_radius > 0)
+			{
+				$string .= qq(      <circle $b_style cx="0" cy="0" r="$c_radius" />) .
+					qq( <circle $e_style cx="0" cy="$endpoint" r="$c_radius" />\n);
+			}
+
+			$string .= qq(    </g>\n);
 		}
 	}
 
@@ -1736,6 +1943,16 @@ sub graph_svg
 	# End of definitions.  Draw the input lines as a group.
 	#
 	$string .= qq(  <g id=") . $self->nwid() . qq($salt">\n);
+
+	#
+	# If there's a background color, insert as the first element a <rect>
+	# with the full size of the view and a fill of the desired color.
+	#
+	if (defined $clrset{background})
+	{
+		$string .= qq(    <rect width="100%" height="100%" style="fill:$clrset{background}" />\n);
+	}
+
 	$string .= qq(    <!-- Draw the input lines. -->\n);
 	$string .= qq(    <use xlink:href="#I$salt" y="$vcoord[$_]" />\n) for (0..$inputs-1);
 
@@ -1790,7 +2007,7 @@ sub graph_text
 	my $self = shift;
 	my $network = $self->network();
 	my $inputs = $self->inputs();
-	my %txset = $self->graphsettings();
+	my %txset = $self->textsettings();
 
 	my @node_stack = $self->group(grouping => 'graph');
 	my @inuse_nodes;
@@ -1869,11 +2086,18 @@ sub graph_text
 
 =head3 colorsettings()
 
-Sets the colors of the graph parts, currently for SVG output only.
+Sets the colors of the graph parts, currently for Postscript and SVG
+output only.
 
 The parts are named.
 
-    my %old_colors = $nw->colorsettings(inputbegin => "#c04", inputend => "#c40");
+    my %old_colors = $nw->colorsettings(compbegin => "#cc0044", compend => "#cc4400");
+
+You may use L<web colors|https://en.wikipedia.org/wiki/Web_colors> names
+in place of the hex triplet if creating an SVG document (Postscript will
+not understand it, however). The shorthand hexadecimal form (using only
+three digits) is also valid, as it will be converted into the standard
+six digit form before writing out the diagram.
 
 =over 4
 
@@ -1907,14 +2131,15 @@ Default color for the graph as a whole.
 
 =item 'background'
 
-Color of the background. Currently unimplemented in SVG.
+Color of the background.
 
 =back
 
-All parts not named are reset to 'undef', and will be colored with the
-default 'foreground' color.  The foreground color itself has a default
-value of 'black'.  The one exception is the 'background' color, which
-has no default color at all.
+All parts I<not> named are reset to 'undef' (which means calling
+C<colorsettings()> with no arguments resets everything), and will be
+colored with the 'foreground' color. The foreground color itself has a
+default value of '#000000' (black). The one exception is 'background',
+which has no default color at all.
 
 =cut
 
@@ -1924,17 +2149,16 @@ sub colorsettings
 	my %settings = @_;
 	my %old_settings;
 
-	return %colorset if (scalar @_ == 0);
+	%old_settings = %colorset;
+	map{$colorset{$_} = undef} keys %colorset;
 
 	for my $k (keys %settings)
 	{
 		#
-		# If it's a real part to color, save the
-		# old value, then set it.
+		# If it's a real part to color, set it.
 		#
 		if (exists $colorset{$k})
 		{
-			$old_settings{$k} = $colorset{$k};
 			$colorset{$k} = $settings{$k};
 		}
 		else
@@ -1948,30 +2172,39 @@ sub colorsettings
 
 =head3 graphsettings()
 
-Alter the graphing settings, be it pixel measurements
-or ascii-art characters.
+Alter diagram properties such as line width or margin size.
 
     #
     # Set hz_margin, saving its old value for later.
     #
     my %old_gset = $nw->graphsettings(hz_margin => 12);
 
-=head4 Options for graph_svg() and graph_eps():
+=head4 Options
 
 SVG measurements are in pixels.
 
 =over 3
 
-=item 'hz_margin
+=item 'hz_margin'
 
 I<Default value: 18.>
 The horizontal spacing between the edges of the graphic and the
 sorting network.
 
-=item 'hz_sep
+=item 'hz_sep'
 
 I<Default value: 12.>
 The spacing separating the horizontal lines (the input lines).
+
+=item 'vt_margin'
+
+I<Default value: 21.>
+The vertical spacing between the edges of the graphic and the sorting network.
+
+=item 'vt_sep'
+
+I<Default value: 12.>
+The spacing separating the vertical lines (the comparators).
 
 =item 'indent'
 
@@ -1980,25 +2213,25 @@ The indention between the start of the input lines and the placement of
 the first comparator. The same value spaces the placement of the final
 comparator and the end of the input lines.
 
-=item 'radius'
+=item 'compline'
 
 I<Default value: 2.>
-Radii of the circles used to end the comparator and input lines.
+Width of the lines used to draw comparators.
 
-=item 'stroke_width
+=item 'compradius'
 
 I<Default value: 2.>
-Width of the lines used to define comparators and input lines.
+Radii of the circles used on either end of the comparator lines.
 
-=item 'vt_margin
+=item 'inputline'
 
-I<Default value: 21.>
-The vertical spacing between the edges of the graphic and the sorting network.
+I<Default value: 2.>
+Width of the lines used to draw input lines.
 
-=item 'vt_sep
+=item 'inputradius'
 
-I<Default value: 12.>
-The spacing separating the vertical lines (the comparators).
+I<Default value: 2.>
+Radii of the circles used on either end of the input lines.
 
 =back
 
@@ -2091,6 +2324,108 @@ sub graphsettings
 	return %old_settings;
 }
 
+=head3 textsettings()
+
+Alter the text settings for the ascii-art characters.
+
+    #
+    # Set different beginning and ending characters.
+    #
+    my %old_gset = $nw->textsettings(
+            inputbegin => '---', gapbegin => '   ',
+            inputend => '---\n', gapend => '   \n'
+        );
+
+
+=head4 Options
+
+=over 3
+
+=item 'inputbegin'
+
+I<Default value: "o-".>
+The starting characters for the input line.
+
+=item 'inputline'
+
+I<Default value: "---".>
+The characters that make up an input line.
+
+=item 'inputcompline'
+
+I<Default value: "-|-".>
+The characters that make up an input line that has a comparator crossing
+over it.
+
+=item 'inputend'
+
+I<Default value: "-o\n".>
+The characters that make up the end of an input line.
+
+=item 'compbegin'
+
+I<Default value: "-^-".>
+The characters that make up an input line with the starting point of
+a comparator.
+
+=item 'compend'
+
+I<Default value: "-v-".>
+The characters that make up an input line with the end point of
+a comparator.
+
+=item 'gapbegin'
+
+I<Default value: "  " (two spaces).>
+The characters that start the gap between the input lines.
+
+=item 'gapcompline'
+
+I<Default value: " | " (space vertical bar space).>
+The characters that make up the gap with a comparator passing through.
+
+=item 'gapnone'
+
+I<Default value: "  " (three spaces).>
+The characters that make up the space between the input lines.
+
+=item 'gapend'
+
+I<Default value: "  \n" (two spaces and a newline).>
+The characters that end the gap between the input lines.
+
+=back
+
+=cut
+
+sub textsettings
+{
+	my $self = shift;
+	my %settings = @_;
+	my %old_settings;
+
+	return %textset if (scalar @_ == 0);
+
+	for my $k (keys %settings)
+	{
+		#
+		# If it's a real part to graph, save the
+		# old value, then set it.
+		#
+		if (exists $textset{$k})
+		{
+			$old_settings{$k} = $textset{$k};
+			$textset{$k} = $settings{$k};
+		}
+		else
+		{
+			carp "textsettings(): Unknown key '$k'";
+		}
+	}
+
+	return %old_settings;
+}
+
 #
 # @newlist = semijoin($expr, $itemcount, @list);
 #
@@ -2161,7 +2496,8 @@ Frederick Hegeman, "Sorting Networks", The C/C++ User's Journal, February 1993.
 
 =item
 
-Joe Celko, I<Joe Celko's SQL For Smarties> (third edition). Implementing Bose-Nelson sorting network in SQL.
+Joe Celko, I<Joe Celko's SQL For Smarties> (third edition). Implementing
+Bose-Nelson sorting network in SQL.
 
 This material isn't in either the second or fourth edition of the book.
 
@@ -2169,7 +2505,8 @@ This material isn't in either the second or fourth edition of the book.
 
 Joe Celko, I<Joe Celko's Thinking in Sets: Auxiliary, Temporal, and Virtual Tables in SQL>.
 
-The sorting network material removed from the third edition of I<SQL For Smarties> seems to have been moved to this book.
+The sorting network material removed from the third edition of
+I<SQL For Smarties> seems to have been moved to this book.
 
 =back
 
@@ -2230,9 +2567,14 @@ T. H. Cormen, E. E. Leiserson, R. L. Rivest, C. Stein, Introduction to Algorithm
 
 =item
 
-Donald E. Knuth, The Art of Computer Programming, Vol. 3: (2nd ed.)
-Sorting and Searching, Addison Wesley Longman Publishing Co., Inc.,
+Donald E. Knuth, B<The Art of Computer Programming, Vol. 3:
+Sorting and Searching> (2nd ed.), Addison Wesley Longman Publishing Co., Inc.,
 Redwood City, CA, 1998.
+
+=item
+
+Sherenaz W. Al-Haj Baddar and Kenneth E. Batcher,
+B<Designing Sorting Networks: A New Paradigm>, Springer-Verlag, 2011
 
 =item
 

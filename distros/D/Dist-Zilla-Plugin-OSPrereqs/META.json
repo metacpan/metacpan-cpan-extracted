@@ -73,16 +73,11 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Dist::Zilla::Tester" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "Params::Util" : "0",
-            "Sub::Exporter" : "0",
-            "Test::Deep" : "0",
-            "Test::Deep::JSON" : "0",
+            "Test::DZil" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0.88",
-            "YAML::Tiny" : "0",
             "lib" : "0",
             "perl" : "5.008001"
          }
@@ -91,7 +86,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::OSPrereqs" : {
          "file" : "lib/Dist/Zilla/Plugin/OSPrereqs.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -106,7 +101,7 @@
          "web" : "https://github.com/dagolden/Dist-Zilla-Plugin-OSPrereqs"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Dave Rolsky <autarch@urth.org>",

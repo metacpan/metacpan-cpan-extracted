@@ -1,5 +1,5 @@
 package Lab::Moose::DataFolder;
-$Lab::Moose::DataFolder::VERSION = '3.652';
+$Lab::Moose::DataFolder::VERSION = '3.653';
 #ABSTRACT: Create a data directory with meta data
 
 use 5.010;
@@ -45,7 +45,13 @@ has path => (
 has date_prefix => (
     is      => 'ro',
     isa     => 'Bool',
-    default => 0
+    default => 1
+);
+
+has time_prefix => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 1
 );
 
 has meta_file => (
@@ -70,6 +76,11 @@ sub BUILD {
     my $folder   = $self->path();
     my $dirname  = dirname($folder);
     my $basename = basename($folder);
+
+    if ( $self->time_prefix ) {
+        $basename = strftime( '%H-%M-%S', localtime() ) . "_$basename";
+        $folder = our_catfile( $dirname, $basename );
+    }
 
     if ( $self->date_prefix ) {
         $basename = strftime( '%Y-%m-%d', localtime() ) . "_$basename";
@@ -191,7 +202,7 @@ Lab::Moose::DataFolder - Create a data directory with meta data
 
 =head1 VERSION
 
-version 3.652
+version 3.653
 
 =head1 DESCRIPTION
 
@@ -240,7 +251,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
-            2018       Simon Reinhardt
+            2018       Andreas K. HÃ¼ttel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

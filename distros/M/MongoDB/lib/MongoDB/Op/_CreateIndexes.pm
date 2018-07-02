@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -22,7 +20,7 @@ package MongoDB::Op::_CreateIndexes;
 # or a MongoDB::InsertManyResult, depending on the server version
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -32,6 +30,9 @@ use Types::Standard qw(
     ArrayRef
     HashRef
 );
+use MongoDB::_Types qw(
+    Numish
+);
 
 use namespace::clean;
 
@@ -39,6 +40,11 @@ has indexes => (
     is       => 'ro',
     required => 1,
     isa      => ArrayRef [HashRef],
+);
+
+has max_time_ms => (
+    is => 'ro',
+    isa => Numish,
 );
 
 with $_ for qw(
@@ -60,7 +66,7 @@ sub execute {
     }
 
     my $res =
-        $link->does_write_commands
+        $link->supports_write_commands
       ? $self->_command_create_indexes($link)
       : $self->_legacy_index_insert($link);
 
@@ -75,10 +81,15 @@ sub _command_create_indexes {
         query   => [
             createIndexes => $self->coll_name,
             indexes       => $self->indexes,
-            ( $link->accepts_wire_version(5) ? ( @{ $self->write_concern->as_args } ) : () )
+            ( $link->supports_helper_write_concern ? ( @{ $self->write_concern->as_args } ) : () ),
+            (defined($self->max_time_ms)
+                ? (maxTimeMS => $self->max_time_ms)
+                : ()
+            ),
         ],
-        query_flags => {},
-        bson_codec  => $self->bson_codec,
+        query_flags         => {},
+        bson_codec          => $self->bson_codec,
+        monitoring_callback => $self->monitoring_callback,
     );
 
     my $res = $op->execute( $link );
@@ -99,14 +110,15 @@ sub _legacy_index_insert {
     ];
 
     my $op = MongoDB::Op::_BatchInsert->_new(
-        db_name       => $self->db_name,
-        coll_name     => "system.indexes",
-        full_name     => (join ".", $self->db_name, "system.indexes"),
-        documents     => $indexes,
-        write_concern => $self->write_concern,
-        bson_codec    => $self->bson_codec,
-        check_keys    => 0,
-        ordered       => 1,
+        db_name             => $self->db_name,
+        coll_name           => "system.indexes",
+        full_name           => ( join ".", $self->db_name, "system.indexes" ),
+        documents           => $indexes,
+        write_concern       => $self->write_concern,
+        bson_codec          => $self->bson_codec,
+        check_keys          => 0,
+        ordered             => 1,
+        monitoring_callback => $self->monitoring_callback,
     );
 
     return $op->execute($link);

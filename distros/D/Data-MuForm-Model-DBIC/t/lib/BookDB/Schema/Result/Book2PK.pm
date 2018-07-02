@@ -1,6 +1,6 @@
 package BookDB::Schema::Result::Book2PK;
 
-use Moose;
+use Moo;
 use MIME::Base64;
 
 use base 'DBIx::Class';

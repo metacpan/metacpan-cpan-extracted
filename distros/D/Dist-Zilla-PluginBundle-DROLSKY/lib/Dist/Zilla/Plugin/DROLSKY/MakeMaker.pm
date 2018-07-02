@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use File::Which qw( which );
 
@@ -34,13 +34,6 @@ with 'Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter';
 sub default_jobs {
     return shift->_core_count;
 }
-
-# This is needed until
-# https://github.com/avar/dist-zilla-plugin-makemaker-awesome/pull/9 is merged
-# or some other fix is made for the underlying issue.
-has '+eumm_version' => (
-    default => '0',
-);
 
 override _build_WriteMakefile_dump => sub {
     my $self = shift;
@@ -76,7 +69,7 @@ Dist::Zilla::Plugin::DROLSKY::MakeMaker - Subclasses MakeMaker::Awesome to alway
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =for Pod::Coverage .*
 

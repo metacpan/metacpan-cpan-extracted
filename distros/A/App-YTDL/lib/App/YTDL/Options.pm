@@ -8,26 +8,26 @@ use 5.010000;
 use Exporter qw( import );
 our @EXPORT_OK = qw( read_config_file set_options );
 
+use Encode;
 use File::Spec::Functions qw( catfile );
 use File::Temp            qw();
 use FindBin               qw( $RealBin $RealScript );
 use Pod::Usage            qw( pod2usage );
 
 use Term::Choose       qw( choose );
-use Term::Choose::Util qw( print_hash choose_a_dir choose_a_number settings_menu insert_sep );
+use Term::Choose::Util qw( print_hash choose_a_dir choose_a_file choose_a_number settings_menu insert_sep );
 use Term::Form         qw();
 
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
 use App::YTDL::ChooseVideos qw( set_sort_videolist );
-use App::YTDL::Helper       qw( write_json read_json uni_capture HIDE_CURSOR SHOW_CURSOR );
-
+use App::YTDL::Helper       qw( write_json read_json uni_capture HIDE_CURSOR SHOW_CURSOR check_mapping_stdout );
 
 
 sub _show_info {
     my ( $opt ) = @_;
     my ( $youtube_dl_version, $ffmpeg_version, $ffprobe_version );
-    if ( ! eval { $youtube_dl_version = uni_capture( $opt->{youtube_dl}, '--version' ); 1 } ) {
+    if ( ! eval { $youtube_dl_version = uni_capture( @{$opt->{youtube_dl}}, '--version' ); 1 } ) {
         $youtube_dl_version = $@;
     }
     eval {
@@ -52,7 +52,6 @@ sub _show_info {
     my $bin         = '    bin    ';
     my $video_dir   = ' video dir ';
     my $config_dir  = 'config dir ';
-    my $archive_dir = 'archive dir';
     my $youtube_dl  = 'youtube-dl ';
     my $ffmpeg      = '  ffmpeg   ';
     my $ffprobe     = '  ffprobe  ';
@@ -61,12 +60,11 @@ sub _show_info {
         $bin         => catfile( $RealBin, $RealScript ),
         $video_dir   => $opt->{video_dir},
         $config_dir  => $opt->{config_dir},
-        $archive_dir => $opt->{archive_dir},
         $youtube_dl  => $youtube_dl_version // 'error',
         $ffmpeg      => $ffmpeg_version,
         $ffprobe     => $ffprobe_version,
     };
-    my $keys = [ $bin, $version, $video_dir, $config_dir, $archive_dir, $youtube_dl ];
+    my $keys = [ $bin, $version, $video_dir, $config_dir, $youtube_dl ];
     push @$keys, $ffmpeg  if $ffmpeg_version;
     push @$keys, $ffprobe if $ffprobe_version;
     print_hash( $path, { keys => $keys, preface => ' Close with ENTER' } );
@@ -76,68 +74,57 @@ sub _show_info {
 sub _menus {
     my $menus = {
         main => [
-            [ 'show_help_text',   "  HELP"       ],
-            [ 'show_info',        "  INFO"       ],
-            [ 'group_directory',  "- Directory"  ],
-            [ 'group_file',       "- File"       ],
-            [ 'group_quality',    "- Quality"    ],
-            [ 'group_download',   "- Download"   ],
-            [ 'group_merge',      "- Merge"      ],
-            [ 'group_history',    "- History"    ],
-            [ 'group_list_menu',  "- Video List" ],
-            [ 'group_output',     "- Output"     ],
-            [ 'group_youtube_dl', "- Youtube-dl" ],
+            [ 'show_help_text',             "  HELP"              ],
+            [ 'show_info',                  "  INFO"              ],
+            [ 'group_directory',            "- Directory"         ],
+            [ 'group_quality',              "- Quality"           ],
+            [ 'group_download',             "- Download"          ],
+            [ 'group_output',               "- Info Output"       ],
+            [ 'group_history',              "- History"           ],
+            [ 'group_list_menu',            "- Uploader Videos"   ],
+            [ 'group_yt_dl_config_file',    "- yt-dl config file" ],
+            [ 'group_avail_extractors',     "- Extractors"        ],
+        ],
+        group_avail_extractors => [
         ],
         group_directory => [
-            [ 'video_dir',     "- Main video directory" ],
-            [ 'extractor_dir', "- Extractor directory"  ],
-            [ 'uploader_dir',  "- Uploader directory"   ],
-        ],
-        group_file => [
-            [ 'max_len_f_name',      "- Max filename length" ],
-            [ 'replace_spaces',      "- Replace spaces"      ],
-            [ 'sanitize_filename',   "- Sanitize filename"   ],
-            [ 'unmappable_filename', "- Encode filename"     ],
-            [ 'modify_timestamp',    "- File timestamp"      ],
+            [ 'video_dir',         "- Main video directory" ],
+            [ 'use_extractor_dir', "- Extractor directory"  ],
+            [ 'use_uploader_dir',  "- Uploader directory"   ],
         ],
         group_quality => [
-            [ 'auto_quality',     "- Set auto-quality mode"    ],
-            [ 'pref_qual_slots',  "- Number of slots"          ],
-            [ '_print_pref_qual', "  Preferred qualities" ],
+            [ 'quality',             "- Resolution"          ],
+            [ 'no_height_ok',        "- No video height"     ],
+            [ 'prefer_free_formats', "- Prefer free formats" ],
         ],
         group_download => [
-            [ 'useragent',            "- UserAgent"            ],
-            [ 'skip_archived_videos', "- Skip archived videos" ],
-            [ 'overwrite',            "- Overwrite"            ],
-            [ 'retries',              "- Download retries"     ],
-            [ 'timeout',              "- Timeout"              ],
-        ],
-        group_merge => [
-            [ 'merge_enabled',   "- Enable Merge"      ],
-            [ 'merge_overwrite', "- ffmpeg overwrites" ],
-            [ 'merge_ext',       "- Output formats"    ],
-            [ 'merge_loglevel',  "- Verbosity"         ],
-            [ 'merged_in_files', "- Input files"       ],
-        ],
-        group_history => [
-            [ 'max_size_history',          "- Size history"     ],
-            [ 'sort_history_by_timestamp', "- History sort"     ],
-            [ 'enable_download_archive',   "- Download archive" ],
-        ],
+            [ 'useragent',           "- UserAgent"        ],
+            [ 'retries',             "- Download retries" ],
+            [ 'timeout',             "- Timeout"          ],
 
-        group_list_menu => [
-            [ '_fast_listmenu',  "- Fast list-menu"  ],
-            [ 'small_list_size', "- List size"       ],
-            [ 'list_sort_item',  "- Sort order"      ],
-            [ 'show_view_count', "- Show view count" ],
         ],
         group_output => [
-            [ 'text_unidecode', "- Unmappable infotext" ],
-            [ 'max_info_width', "- Max info width"    ],
+            [ 'no_warnings',     "- Disable warnings" ],
+            [ 'max_info_width',  "- Max info width"   ],
         ],
-        group_youtube_dl => [
-            [ 'use_netrc',         "- Use '.netrc'" ],
-            [ '_avail_extractors', "  Extractors"        ],
+        group_history => [
+            [ 'max_size_history',          "- Size history" ],
+            [ 'sort_history_by_timestamp', "- History sort" ],
+        ],
+        group_list_menu => [
+            [ '_type_listmenu',  "- List type" ],
+            [ 'list_sort_item',  "- Sort order"          ],
+            [ 'show_view_count', "- Show view count"     ],
+        ],
+
+        group_yt_dl_config_file => [
+            [ 'yt_dl_config_file',   "- yt-dl config file"        ],
+            [ 'yt_dl_ignore_config', "- Ignore yt-dl config file" ],
+        ],
+        group_avail_extractors => [
+            [ '_avail_extractors',        "  List Extractors"        ],
+            [ '_extractor_descriptions',  "  Extractor descriptions" ],
+
         ],
     };
     return $menus;
@@ -147,9 +134,9 @@ sub _menus {
 sub _sub_menus {
     my ( $key ) = @_;
     my $sub_menus = {
-        _fast_listmenu => [
-            [ 'fast_list_vimeo',   "- vimeo",   [ 'NO', 'YES' ] ],
-            [ 'fast_list_youtube', "- youtube", [ 'NO', 'YES' ] ],
+        _type_listmenu => [
+            [ 'list_type_vimeo',   "- vimeo",   [ 'all standard', 'all fast', 'latest fast' ] ],
+            [ 'list_type_youtube', "- youtube", [ 'all standard', 'all fast', 'latest fast' ] ],
         ],
     };
     return $sub_menus->{$key} if $key;
@@ -159,15 +146,16 @@ sub _sub_menus {
 
 sub _group_prompt {
     my ( $group ) = @_;
-    my $group_prompt ={
-        group_directory => "Directories:",
-        group_file      => "Files:",
-        group_quality   => "Quality:",
-        group_download  => "Download:",
-        group_merge     => "Merge:",
-        group_history   => "History:",
-        group_list_menu => "List menu:",
-        group_output    => "Appearance:",
+    my $group_prompt = {
+        group_directory             => "Directories:",
+        group_quality               => "Video format:",
+        group_download              => "Download:",
+        group_history               => "History:",
+        group_list_menu             => "Uploader video list:",
+        group_output                => "Info Outpupt:",
+        group_youtube_dl            => "youtube_dl:",
+        group_yt_dl_config_file     => "Youtube-dl config file:",
+        group_avail_extractors      => "Available extractors:",
     };
     return $group_prompt->{$group};
 }
@@ -182,7 +170,6 @@ sub set_options {
         next if $group eq 'main';
         push @keys, grep { ! /^_/ } map { $_->[0] } @{$menus->{$group}};
     }
-    #for my $key ( %$sub_menus ) {
     for my $key ( keys %$sub_menus ) {
         push @keys, map { $_->[0] } @{$sub_menus->{$key}};
     }
@@ -242,13 +229,11 @@ sub set_options {
                 _show_info( $opt );
             }
             elsif ( $choice eq "_avail_extractors" ) {
-                print HIDE_CURSOR;
                 say 'Close with ENTER';
                 my @capture;
-                if ( ! eval { @capture = uni_capture( $opt->{youtube_dl}, '--list-extractors' ); 1 } ) {
+                if ( ! eval { @capture = uni_capture( @{$opt->{youtube_dl}}, '--list-extractors' ); 1 } ) {
                     say "List extractors: $@";
                 }
-                print SHOW_CURSOR;
                 if ( @capture ) {
                     choose(
                         [ map { "  $_" } @capture ],
@@ -256,87 +241,37 @@ sub set_options {
                     );
                 }
             }
-            elsif ( $choice eq "video_dir" ) {
-                my $prompt = 'Video directory';
-                _opt_choose_a_directory( $opt, $choice, $prompt );
+            elsif ( $choice eq "_extractor_descriptions" ) {
+                say 'Close with ENTER';
+                my @capture;
+                if ( ! eval { @capture = uni_capture( @{$opt->{youtube_dl}}, '--extractor-descriptions' ); 1 } ) {
+                    say "Extractor descriptions: $@";
+                }
+                if ( @capture ) {
+                    choose(
+                        [ map { '  ' . check_mapping_stdout( $opt, decode( 'UTF_8', $_ ) ) } @capture ],
+                        { layout => 3 }
+                    );
+                }
             }
-            elsif ( $choice eq "extractor_dir" ) {
+            elsif ( $choice eq "video_dir" ) {
+                my $info = "Video Directory\nNow: " . $opt->{$choice} // 'current directory';
+                my $name = 'New: ';
+                _opt_choose_a_directory( $opt, $choice, $info, $name );
+            }
+            elsif ( $choice eq "use_extractor_dir" ) {
                 my $prompt = 'Use extractor directories';
                 my $list = [ qw( no yes ) ];
                 _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
             }
-            elsif ( $choice eq "uploader_dir" ) {
+            elsif ( $choice eq "use_uploader_dir" ) {
                 my $prompt = 'Use uploader directories';
                 my $list = [
                     'no',
-                    'if from list-menu', #
-                    'always',
+                    'yes',
+                    'if from list-menu',
                 ];
                 _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "max_len_f_name" ) {
-                my $prompt = 'Max filename length';
-                my $digits = 3;
-                _opt_number_range( $opt, $choice, $prompt, $digits );
-            }
-            elsif ( $choice eq "replace_spaces" ) {
-                my $prompt = 'Replace spaces in filenames';
-                my $list = [ qw( no yes ) ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "sanitize_filename" ) {
-                my $prompt = 'Sanitize filenames';
-                my $list = [
-                    'keep all',
-                    'replace  / \ : " * ? < > | &',
-                    'replace  /',
-                ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "unmappable_filename" ) {
-                my $prompt = 'Filename not mappable to file system encoding';
-                my $list = [
-                    'don\'t encode',
-                    'use Text::Unidecode',
-                ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "modify_timestamp" ) {
-                my $prompt = 'Timestamp to upload date';
-                my $list = [ qw( no yes ) ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "auto_quality" ) {
-                my $prompt = 'Auto quality';
-                my $list = [
-                    'manually',
-                    'keep_uploader_playlist',
-                    'keep_extractor',
-                    'preferred',
-                    'default',
-                ];
-                _opt_choose_from_list_value( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "_print_pref_qual" ) {
-                my $pref = read_json( $opt, $opt->{preferred_file} ) // {};
-                if ( ! %$pref ) {
-                    choose( [ 'Close with ENTER' ], { prompt => 'No preferred qualities set.' } );
-                }
-                else {
-                    my @p = ( ' ' );
-                    for my $key ( sort keys %$pref ) {
-                        push @p, "$key:";
-                        my $c = 1;
-                        push @p, map { sprintf "%4d. [%s]\n", $c++, join ',', @$_ } @{$pref->{$key}};
-                        push @p, ' ';
-                    }
-                    choose( \@p, { prompt => 'Close with ENTER', layout => 3, justify => 0 } );
-                }
-            }
-            elsif ( $choice eq "pref_qual_slots" ) {
-                my $prompt = 'Slots \'preferred qualilties\'';
-                my $digits = 2;
-                _opt_number_range( $opt, $choice, $prompt, $digits );
             }
             elsif ( $choice eq "useragent" ) {
                 my $prompt = 'Set the UserAgent';
@@ -344,65 +279,69 @@ sub set_options {
                     [ 'UserAgent', $opt->{useragent} ]
                 ];
                 _local_readline( $opt, $choice, $prompt, $list );
-                $opt->{useragent} = 'Mozilla/5.0' if $opt->{useragent} eq '';
-                $opt->{useragent} = ''            if $opt->{useragent} eq '""';
+                $opt->{useragent} = '' if $opt->{useragent} eq '""';
             }
-            elsif ( $choice eq "skip_archived_videos" ) {
-                my $prompt = 'Skip archived videos';
-                my $list = [ qw( no yes ) ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "overwrite" ) {
-                my $prompt = 'Overwrite files';
+            elsif ( $choice eq "quality" ) {
+                my $prompt = 'Video resolution';
                 my $list = [
-                    'no (append)',
+                    ' 180 or less',
+                    ' 360 or less',
+                    ' 720 or less',
+                    '1080 or less',
+                    '1440 or less',
+                    '2160 or less',
+                    'manually',
+                    ' 180 or better',
+                    ' 360 or better',
+                    ' 720 or better',
+                    '1080 or better',
+                    '1440 or better',
+                    '2160 or better',
+                    'best'
+                ];
+                _opt_choose_from_list_value( $opt, $choice, $prompt, $list );
+            }
+            elsif ( $choice eq "no_height_ok" ) {
+                my $prompt = 'Download videos with unkown height';
+                my $list = [
+                    'no',
                     'yes'
                 ];
                 _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
             }
             elsif ( $choice eq "retries" ) {
-                my $prompt = 'Download retries';
                 my $digits = 3;
-                _opt_number_range( $opt, $choice, $prompt, $digits );
+                my $info = sprintf "Download retries\nNow: %${digits}s", insert_sep( $opt->{$choice} );
+                my $name = 'New: ';
+                _opt_number_range( $opt, $choice, $name, $info, $digits );
             }
             elsif ( $choice eq "timeout" ) {
-                my $prompt = 'Connection timeout (s)';
                 my $digits = 3;
-                _opt_number_range( $opt, $choice, $prompt, $digits );
+                my $info = sprintf "Connection timeout (s)\nNow: %${digits}s", insert_sep( $opt->{$choice} );
+                my $name = 'New: ';
+                _opt_number_range( $opt, $choice, $name, $info, $digits );
             }
-            elsif ( $choice eq "merge_enabled" ) {
-                my $prompt = 'Enable merge';
-                my $list = [ qw( no ask yes ) ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "merge_overwrite" ) {
-                my $prompt = '\'ffmpeg\' - overwrite files';
-                my $list = [ qw( ask yes ) ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "merge_ext" ) {
-                my $prompt = 'Output format of merged files';
-                my $list = [ qw( mkv mp4 ogg webm flv ) ];
-                _opt_choose_from_list_value( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "merge_loglevel" ) {
-                my $prompt = '\'ffmpeg\' verbosity';
-                my $list = [ qw( error warning info ) ];
-                _opt_choose_from_list_value( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "merged_in_files" ) {
-                my $prompt = 'The merged input files:';
+            elsif ( $choice eq "no_warnings" ) {
+                my $prompt = 'Disable youtube-dl warnings';
                 my $list = [
-                    'keep',
-                    'move to "' . $opt->{dir_stream_files} . '"',
-                    'remove'
+                    'no',
+                    'yes'
+                ];
+                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
+            }
+            elsif ( $choice eq "prefer_free_formats" ) {
+                my $prompt = 'Prefer free formats';
+                my $list = [
+                    'no',
+                    'yes'
                 ];
                 _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
             }
             elsif ( $choice eq "max_size_history" ) {
-                my $prompt = 'Max size of history';
                 my $digits = 3;
-                _opt_number_range( $opt, $choice, $prompt, $digits );
+                my $info = sprintf "Max size of history\nNow: %${digits}s", insert_sep( $opt->{$choice} );
+                my $name = 'New: ';
+                _opt_number_range( $opt, $choice, $name, $info, $digits );
             }
             elsif ( $choice eq "sort_history_by_timestamp" ) {
                 my $prompt = 'Sort history by';
@@ -412,24 +351,11 @@ sub set_options {
                 ];
                 _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
             }
-            elsif ( $choice eq "enable_download_archive" ) {
-                my $prompt = 'Enable downlaod archive';
-                my $list = [ qw( no yes more ) ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
-            }
-            elsif ( $choice eq "_fast_listmenu" ) {
+            elsif ( $choice eq "_type_listmenu" ) {
                 my $sub_menu = _sub_menus( $choice );
                 my $current = { map { $_->[0] => $opt->{$_->[0]} } @$sub_menu };
-                my $prompt = 'Enable fast list-menu for';
+                my $prompt = 'Uploader/Playlist video list type';
                 _opt_settings_menu( $opt, $sub_menu, $current, $prompt );
-            }
-            elsif ( $choice eq "small_list_size" ) {
-                my $prompt = 'Videos in list-menu';
-                my $list = [
-                    'all',
-                    'latest',
-                ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
             }
             elsif ( $choice eq "list_sort_item" ) {
                 set_sort_videolist( $opt );
@@ -442,22 +368,31 @@ sub set_options {
                 ];
                 _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
             }
-            elsif ( $choice eq "text_unidecode" ) {
-                my $prompt = 'Characters not mappable to console out';
-                my $list = [
-                    'replace with *',
-                    'use Text::Unidecode',
-                ];
-                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
-            }
             elsif ( $choice eq "max_info_width" ) {
-                my $prompt = 'Max Info width';
                 my $digits = 3;
-                _opt_number_range( $opt, $choice, $prompt, $digits );
+                my $info = sprintf "Max Info width\nNow: %${digits}s", insert_sep( $opt->{$choice} );
+                my $name = 'New: ';
+                _opt_number_range( $opt, $choice, $name, $info, $digits );
             }
-            elsif ( $choice eq "use_netrc" ) {
-                my $prompt = 'Enable the option --netrc for youtube-dl';
-                my $list = [ qw( no yes ) ];
+            elsif ( $choice eq "yt_dl_config_file" ) {
+                my $info = "Youtube-dl Config File\nNow: ";
+                if ( defined $opt->{$choice} ) {
+                    $info .= $opt->{$choice};
+                }
+                else {
+                    $info .= 'default (';
+                    $info .= $^O eq 'MSWin32' ? "%APPDATA%/youtube-dl/config.txt" : "~/.config/youtube-dl/config";
+                    $info .= ')';
+                }
+                my $name = 'New: ';
+                _opt_choose_a_file( $opt, $choice, $info, $name );
+            }
+            elsif ( $choice eq "yt_dl_ignore_config" ) {
+                my $prompt = 'Ignore youtube-dl config file';
+                my $list = [
+                    'no',
+                    'yes'
+                ];
                 _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
             }
             else { die $choice }
@@ -479,12 +414,12 @@ sub _opt_settings_menu {
 
 
 sub _opt_choose_a_directory {
-    my( $opt, $choice, $prompt ) = @_;
-    my $new_dir = choose_a_dir( { dir => $opt->{$choice} } );
+    my( $opt, $choice, $info, $name ) = @_;
+    my $new_dir = choose_a_dir( { dir => $opt->{$choice}, name => $name, info => $info } );
     return if ! defined $new_dir;
     if ( $new_dir ne $opt->{$choice} ) {
         if ( ! eval {
-            my $fh = File::Temp->new( TEMPLATE => 'XXXXXXXXXXXXXXX', UNLINK => 1, DIR => $new_dir );
+            my $fh = File::Temp->new( TEMPLATE => 'XXXXXXXXXXXXXXX', UNLINK => 1, DIR => $new_dir ); ##
             1 }
         ) {
             print "$@";
@@ -495,6 +430,15 @@ sub _opt_choose_a_directory {
             $opt->{change}++;
         }
     }
+}
+
+
+sub _opt_choose_a_file {
+    my( $opt, $choice, $info, $name ) = @_;
+    my $file = choose_a_file( { name => $name, info => $info } );
+    return if ! defined $file;
+    $opt->{$choice} = $file;
+    $opt->{change}++;
 }
 
 
@@ -515,11 +459,9 @@ sub _local_readline {
 
 
 sub _opt_number_range {
-    my ( $opt, $section, $prompt, $digits ) = @_;
-    my $current = $opt->{$section};
-    $current = insert_sep( $current );
+    my ( $opt, $section, $name, $info, $digits ) = @_;
     # Choose_a_number
-    my $choice = choose_a_number( $digits, { name => "\"$prompt\"", current => $current } );
+    my $choice = choose_a_number( $digits, { name => $name, info => $info } );
     return if ! defined $choice;
     $opt->{$section} = $choice eq '--' ? undef : $choice;
     $opt->{change}++;
@@ -598,7 +540,7 @@ sub read_config_file {
     my $tmp = read_json( $opt, $file ) // {};
     my @keys = keys %$tmp;
     for my $section ( @keys ) {
-        $opt->{$section} = $tmp->{$section};
+        $opt->{$section} = $tmp->{$section} if defined $tmp->{$section};
     }
     return @keys;
 }

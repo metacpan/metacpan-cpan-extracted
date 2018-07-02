@@ -2,7 +2,7 @@ package MVC::Neaf::X;
 
 use strict;
 use warnings;
-our $VERSION = 0.2501;
+our $VERSION = 0.2601;
 
 # This class is empty (yet).
 # See MVC::Neaf::Util::Base for implementation

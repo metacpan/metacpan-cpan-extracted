@@ -1,3 +1,15 @@
+0.000067    2018-06-10
+            * Be explicit about imports from Test::Output.
+
+0.000066    2018-06-10
+            * Allow saying which files should be prioritised for a stack trace.
+            * Cleanup eventloop implementation, removing code that deals with
+              files and sockets, since we don't actually use that.
+            * Remove test dependencies on Ref::Util, it stopped working on my
+              laptop for some reason... :-(.
+            * Made tests easier to compare with tests for JavaScript::V8::XS.
+            * Add more tests.
+
 0.000065    2018-06-08
             * Fix some linux warnings.
 

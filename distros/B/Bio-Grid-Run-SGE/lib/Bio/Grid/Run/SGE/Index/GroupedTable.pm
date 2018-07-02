@@ -13,7 +13,7 @@ use Bio::Grid::Run::SGE::Util qw/glob_list/;
 use Data::Dumper;
 use Cwd qw/fastcwd/;
 
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 has 'col_sep' => ( is => 'rw', default => "\t" );
 has 'col_idx' => ( is => 'rw', default => 0 );

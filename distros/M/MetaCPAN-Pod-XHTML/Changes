@@ -1,5 +1,26 @@
 Revision history for MetaCPAN-Pod-XHTML
 
+0.002001 - 2018-06-25
+  - increased Pod::Simple prereq version to compatible version.
+  - removed extraneous pod section
+  - test cleanups
+
+0.002000 - 2018-06-19
+  - split behavior into roles
+    - Pod::Simple::Role::XHTML::WithLinkMappings adds the link_mappings
+      attribute to adjust module link destinations.
+    - Pod::Simple::Role::XHTML::WithAccurateTargets adds additional link
+      targets for headings and items based on the full unfiltered name,
+      and the first word.
+    - Pod::Simple::Role::XHTML::WithErrata adds an errata section to the
+      HTML as is used by MetaCPAN.
+    - Pod::Simple::Role::StripVerbatimIndent strips indentation from
+      verbatim blocks, while not breaking tab indents.  This is a new
+      feature.
+
+  - added tests
+  - added documentation
+
 0.001002 - 2017-12-06
   - list HTML::Entities as a prerequisite
   - use more accurate Pod::Simple::XHTML prereq

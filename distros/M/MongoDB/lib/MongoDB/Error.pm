@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,8 +11,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-use 5.008;
+
 use strict;
 use warnings;
 
@@ -25,15 +23,20 @@ package MongoDB::Error;
 
 use version;
 
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 use Carp;
 use MongoDB::_Types qw(
     ErrorStr
 );
+use Types::Standard qw(
+    ArrayRef
+    Str
+);
 use Scalar::Util ();
 use Sub::Quote ();
+use Safe::Isa;
 use Exporter 5.57 qw/import/;
 use namespace::clean -except => ['import'];
 
@@ -42,14 +45,25 @@ my $ERROR_CODES;
 BEGIN {
     $ERROR_CODES = {
         BAD_VALUE                 => 2,
+        HOST_UNREACHABLE          => 6,
+        HOST_NOT_FOUND            => 7,
         UNKNOWN_ERROR             => 8,
+        USER_NOT_FOUND            => 11,
         NAMESPACE_NOT_FOUND       => 26,
+        INDEX_NOT_FOUND           => 27,
+        CURSOR_NOT_FOUND          => 43,
         EXCEEDED_TIME_LIMIT       => 50,
         COMMAND_NOT_FOUND         => 59,
         WRITE_CONCERN_ERROR       => 64,
+        NETWORK_TIMEOUT           => 89,
+        SHUTDOWN_IN_PROGRESS      => 91,
+        PRIMARY_STEPPED_DOWN      => 189,
+        SOCKET_EXCEPTION          => 9001,
         NOT_MASTER                => 10107,
         DUPLICATE_KEY             => 11000,
         DUPLICATE_KEY_UPDATE      => 11001, # legacy before 2.6
+        INTERRUPTED_AT_SHUTDOWN   => 11600,
+        INTERRUPTED_DUE_TO_REPL_STATE_CHANGE => 11602,
         DUPLICATE_KEY_CAPPED      => 12582, # legacy before 2.6
         UNRECOGNIZED_COMMAND      => 13390, # mongos error before 2.4
         NOT_MASTER_NO_SLAVE_OK    => 13435,
@@ -93,6 +107,19 @@ has 'previous_exception' => (
   >),
 );
 
+has error_labels => (
+    is      => 'ro',
+    isa     => ArrayRef[Str],
+    default => sub { [] },
+);
+
+sub has_error_label {
+    my ( $self, $expected ) = @_;
+
+    return unless defined $self->error_labels;
+    return grep { $_ eq $expected } @{ $self->error_labels };
+}
+
 sub throw {
   my ($inv) = shift;
 
@@ -108,13 +135,76 @@ sub throw {
   die $throwable;
 }
 
+# internal flag indicating if an operation should be retried when
+# an error occurs.
+sub _is_resumable { 1 }
+
+# internal flag for if this error type specifically can be retried regardless
+# of other state. See _is_retryable which contains the full retryable error
+# logic.
+sub __is_retryable_error { 0 }
+
+sub _check_is_retryable_code {
+    my $code = $_[-1];
+
+    my @retryable_codes = (
+        MongoDB::Error::HOST_NOT_FOUND(),
+        MongoDB::Error::HOST_UNREACHABLE(),
+        MongoDB::Error::NETWORK_TIMEOUT(),
+        MongoDB::Error::SHUTDOWN_IN_PROGRESS(),
+        MongoDB::Error::PRIMARY_STEPPED_DOWN(),
+        MongoDB::Error::SOCKET_EXCEPTION(),
+        MongoDB::Error::NOT_MASTER(),
+        MongoDB::Error::INTERRUPTED_AT_SHUTDOWN(),
+        MongoDB::Error::INTERRUPTED_DUE_TO_REPL_STATE_CHANGE(),
+        MongoDB::Error::NOT_MASTER_NO_SLAVE_OK(),
+        MongoDB::Error::NOT_MASTER_OR_SECONDARY(),
+    );
+
+    return 1 if grep { $code == $_ } @retryable_codes;
+    return 0;
+}
+
+sub _check_is_retryable_message {
+  my $message = $_[-1];
+
+  return 0 unless defined $message;
+  return 1 if $message =~ /(not master|node is recovering)/i;
+  return 0;
+}
+
+# indicates if this error can be retried under retryable writes
+sub _is_retryable {
+    my $self = shift;
+
+    if ( $self->$_can( 'result' ) ) {
+        return 1 if _check_is_retryable_code( $self->result->last_code );
+    }
+
+    if ( $self->$_can( 'code' ) ) {
+        return 1 if _check_is_retryable_code( $self->code );
+    }
+
+    return 1 if _check_is_retryable_message( $self->message );
+
+    if ( $self->$_isa( 'MongoDB::WriteConcernError' ) ) {
+      return 1 if _check_is_retryable_code( $self->result->output->{writeConcernError}{code} );
+      return 1 if _check_is_retryable_message( $self->result->output->{writeConcernError}{message} );
+    }
+
+    # Defaults to 0 unless its a network exception
+    return $self->__is_retryable_error;
+}
+
 #--------------------------------------------------------------------------#
 # Subclasses with attributes included inline below
 #--------------------------------------------------------------------------#
 
 package MongoDB::DatabaseError;
 use Moo;
-use Types::Standard qw(Num);
+use MongoDB::_Types qw(
+    Numish
+);
 use namespace::clean;
 
 extends("MongoDB::Error");
@@ -127,11 +217,13 @@ has result => (
 
 has code => (
     is      => 'ro',
-    isa     => Num,
+    isa     => Numish,
     builder => '_build_code',
 );
 
 sub _build_code { return MongoDB::Error::UNKNOWN_ERROR() }
+
+sub _is_resumable { 0 }
 
 package MongoDB::DocumentError;
 
@@ -190,6 +282,9 @@ use Moo;
 use namespace::clean;
 extends 'MongoDB::Error';
 
+sub _is_resumable { 1 }
+sub __is_retryable_error { 1 }
+
 package MongoDB::HandshakeError;
 use Moo;
 use namespace::clean;
@@ -205,6 +300,8 @@ package MongoDB::TimeoutError;
 use Moo;
 use namespace::clean;
 extends 'MongoDB::Error';
+
+sub __is_retryable_error { 1 }
 
 package MongoDB::ExecutionTimeout;
 use Moo;
@@ -228,6 +325,7 @@ use Moo;
 use namespace::clean;
 extends 'MongoDB::DatabaseError';
 sub _build_code { return MongoDB::Error::NOT_MASTER() }
+sub _is_resumable { 1 }
 
 package MongoDB::WriteError;
 use Moo;
@@ -246,10 +344,17 @@ use Moo;
 use namespace::clean;
 extends 'MongoDB::Error';
 
-package MongoDB::CursorNotFoundError;
+package MongoDB::ConfigurationError;
 use Moo;
 use namespace::clean;
 extends 'MongoDB::Error';
+
+package MongoDB::CursorNotFoundError;
+use Moo;
+use namespace::clean;
+extends 'MongoDB::DatabaseError';
+sub _build_code { return MongoDB::Error::CURSOR_NOT_FOUND() }
+sub _is_resumable { 1 }
 
 package MongoDB::DecodingError;
 use Moo;
@@ -276,19 +381,26 @@ use Moo;
 use namespace::clean;
 extends 'MongoDB::Error';
 
+package MongoDB::InvalidOperationError;
+use Moo;
+use namespace::clean;
+extends 'MongoDB::Error';
+
 #--------------------------------------------------------------------------#
 # Private error classes
 #--------------------------------------------------------------------------#
 package MongoDB::_CommandSizeError;
 use Moo;
-use Types::Standard qw(Int);
+use MongoDB::_Types qw(
+    Intish
+);
 use namespace::clean;
 
 extends("MongoDB::Error");
 
 has size => (
     is       => 'ro',
-    isa      => Int,
+    isa      => Intish,
     required => 1,
 );
 
@@ -304,7 +416,7 @@ MongoDB::Error - MongoDB Driver Error classes
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -356,9 +468,11 @@ To retry failures automatically, consider using L<Try::Tiny::Retry>.
         |   |
         |   |->MongoDB::NetworkError
         |
-        |->MongoDB::CursorNotFoundError
+        |->MongoDB::ConfigurationError
         |
         |->MongoDB::DatabaseError
+        |   |
+        |   |->MongoDB::CursorNotFoundError
         |   |
         |   |->MongoDB::DuplicateKeyError
         |   |
@@ -375,6 +489,8 @@ To retry failures automatically, consider using L<Try::Tiny::Retry>.
         |->MongoDB::GridFSError
         |
         |->MongoDB::InternalError
+        |
+        |->MongoDB::InvalidOperationError
         |
         |->MongoDB::ProtocolError
         |
@@ -418,6 +534,12 @@ handshakes fail.
 
 This error is thrown when a socket error occurs, when the wrong number of bytes
 are read, or other wire-related errors occur.
+
+=head2 MongoDB::ConfigurationError
+
+This error is thrown when there is a configuration error between the MongoDB
+deployment and the configuration of the client, such as when trying to use
+explicit sessions on a MongoDB < 3.6
 
 =head2 MongoDB::CursorNotFoundError
 
@@ -526,6 +648,8 @@ will throw this — only ones originating directly from the MongoDB::* library
 files.  Some type and usage errors will originate from the L<Type::Tiny>
 library if the objects are used incorrectly.
 
+Also used to indicate usage errors for transaction commands.
+
 =head1 ERROR CODES
 
 The following error code constants are automatically exported by this module.
@@ -559,6 +683,26 @@ Only C<MongoDB::DatabaseError> objects have a C<code> attribute.
 =item *
 
 The database uses multiple write concern error codes.  The driver maps them all to WRITE_CONCERN_ERROR for consistency and convenience.
+
+=back
+
+=head1 ERROR LABELS
+
+From MongoDB 4.0 onwards, errors may contain an error labels field. This field
+is populated for extra information from either the server or the driver,
+depending on the error.
+
+Known error labels include (but are not limited to):
+
+=over 4
+
+=item *
+
+C<TransientTransactionError> - added when network errors are encountered inside a transaction.
+
+=item *
+
+C<UnknownTransactionCommitResult> - added when a transaction commit may not have been able to satisfy the provided write concern.
 
 =back
 

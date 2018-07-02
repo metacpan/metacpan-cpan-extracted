@@ -10,7 +10,7 @@ DESCRIPTION
     deployment on very old versions of Perl. If you have had no problems
     installing Module::Runtime, then you do not need this module!
 
-    Version 0.001 of Alt::Module::Runtime::ButEUMM includes version 0.014 of
+    Version 0.002 of Alt::Module::Runtime::ButEUMM includes version 0.016 of
     Module::Runtime.
 
 SEE ALSO

@@ -1,5 +1,5 @@
 package Wallflower::Util;
-$Wallflower::Util::VERSION = '1.007';
+$Wallflower::Util::VERSION = '1.008';
 use strict;
 use warnings;
 
@@ -68,6 +68,10 @@ __END__
 
 Wallflower::Util - Utility functions for Wallflower
 
+=head1 VERSION
+
+version 1.008
+
 =head1 SYNOPSIS
 
     use Wallflower;
@@ -103,10 +107,9 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2012-2015 by Philippe Bruhat (BooK).
+Copyright 2012-2018 by Philippe Bruhat (BooK).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

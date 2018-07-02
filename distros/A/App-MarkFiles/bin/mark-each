@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+mark-each - execute some command for each marked file
+
+=head1 SYNOPSIS
+
+  mark-each  execute a command for each marked file
+
+  USAGE:
+    mark each command
+
+  EXAMPLE:
+    mark foo.txt bar.txt
+    mark each wc -l
+
+=head1 AUTHOR
+
+Brennen Bearnes <bbearnes@gmail.com>
+
+=cut
+
+use strict;
+use warnings;
+use 5.10.0;
+
+use App::MarkFiles qw(each_path);
+use Getopt::Long;
+use Pod::Usage;
+
+GetOptions(
+  help => sub { pod2usage(0) },
+) or pod2usage(2);
+
+my ($cmd) = join ' ', @ARGV;
+
+each_path(sub {
+  my ($path) = @_;
+  print `$cmd "$path"`;
+});

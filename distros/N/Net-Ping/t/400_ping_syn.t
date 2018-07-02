@@ -45,7 +45,7 @@ my %webs = (
 );
 
 use Test::More;
-plan tests => 3 + 2 * keys %webs;
+plan tests => 4 + 2 * keys %webs;
 
 use_ok('Net::Ping');
 
@@ -68,6 +68,12 @@ isa_ok($p, 'Net::Ping', 'new() worked');
 # Change to use the more common web port.
 # (Make sure getservbyname works in scalar context.)
 cmp_ok(($p->{port_num} = getservbyname("http", "tcp")), '>', 0, 'valid port');
+
+# message_type can't be used
+eval {
+  $p->message_type();
+};
+like($@, qr/message type only supported on 'icmp' protocol/, "message_type() API only concern 'icmp' protocol");
 
 # check if network is up
 eval { $p->ping('www.google.com.'); };

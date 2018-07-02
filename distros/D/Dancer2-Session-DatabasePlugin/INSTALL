@@ -1,0 +1,13 @@
+To install from CPAN:
+
+  perl -MCPAN -e shell 
+    install Dancer2::Session::DatabasePlugin
+
+If you have DBD::Sqlite installed you can enable additional unit tests by setting ENABLE_DB_TESTING=1.
+
+  perl -MCPAN -e shell 
+    look Dancer2::Session::DatabasePlugin
+    perl Makefile.PL
+    make
+    ENABLE_DB_TESTING=1 make test
+    make install

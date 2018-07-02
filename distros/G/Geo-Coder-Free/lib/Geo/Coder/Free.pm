@@ -8,6 +8,7 @@ use lib '.';
 use Geo::Coder::Free::MaxMind;
 use Geo::Coder::Free::OpenAddresses;
 use List::MoreUtils;
+use Carp;
 
 =head1 NAME
 
@@ -15,11 +16,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -73,6 +74,11 @@ sub new {
 		maxmind => Geo::Coder::Free::MaxMind->new(%param)
 	};
 
+	if(!$param{'openaddr'}) {
+		if($ENV{'OPENADDR_HOME'}) {
+			$param{'openaddr'} = $ENV{'OPENADDR_HOME'};
+		}
+	}
 	if($param{'openaddr'}) {
 		$rc->{'openaddr'} = Geo::Coder::Free::OpenAddresses->new(%param);
 	}
@@ -261,7 +267,7 @@ All other users (including Commercial, Charity, Educational, Government)
 must apply in writing for a licence for use from Nigel Horne at `<njh at nigelhorne.com>`.
 
 This product includes GeoLite2 data created by MaxMind, available from
-L<http://www.maxmind.com>.
+L<https://www.maxmind.com/en/home>.
 
 This product includes data from Who's on First.
 See L<https://github.com/whosonfirst-data/whosonfirst-data/blob/master/LICENSE.md> for licensing information.

@@ -33,7 +33,6 @@ my $params = {
     'isbn'   => '123-02345-0502-2' ,
     'publisher' => 'EreWhon Publishing',
     'user_updated' => 1,
-    'comment' => 'this is a comment',
     'borrower' => '',
     'pages' => '',
     'year' => '',
@@ -46,7 +45,6 @@ END { $book->delete };
 
 ok ($book, 'get book object from form');
 
-is( $book->extra, 'this is a comment', 'comment exists' );
 is_deeply( $form->fif, $params, 'fif correct' );
 $params->{$_} = undef for qw/ year pages borrower/;
 is_deeply( $form->values, $params, 'values correct' );
@@ -120,12 +118,6 @@ is( $book->genres->count, 2, 'multiple select list updated ok');
 $params->{genres} = [];
 $form->process( model => $book, params => $params );
 is( $book->genres->count, 0, 'multiple select list has no selected options');
-
-=comment
-form's active_column
-$form = BookDB::Form::Book->new(schema => $schema, active_column => 'is_active');
-is( $form->field( 'genres' )->num_options, 3, 'active_column test' );
-=cut
 
 
 done_testing;

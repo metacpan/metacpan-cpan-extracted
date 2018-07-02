@@ -1,3 +1,7 @@
+0.06 2018-06-28T02:18:10Z
+
+	catching calls to localtime() (by mjemmeson)
+
 0.05 2017-08-04T13:53:20Z
 	Fix prereq (by haarg)
 

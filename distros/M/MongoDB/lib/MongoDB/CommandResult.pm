@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::CommandResult;
 # ABSTRACT: MongoDB generic command result document
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 use MongoDB::Error;
@@ -117,6 +115,18 @@ sub last_wtimeout {
         || exists $self->output->{writeConcernError} );
 }
 
+#pod =method last_error_labels
+#pod
+#pod Returns an array of error labels from the command, or an empty array if there
+#pod are none
+#pod
+#pod =cut
+
+sub last_error_labels {
+    my ( $self ) = @_;
+    return $self->output->{errorLabels} || [];
+}
+
 #pod =method assert
 #pod
 #pod Throws an exception if the command failed.
@@ -147,15 +157,6 @@ sub assert_no_write_concern_error {
     return 1;
 }
 
-# deprecated
-sub result {
-    my $self = shift;
-
-    $self->_warn_deprecated( 'result' => [qw/output/] );
-
-    return $self->output;
-}
-
 1;
 
 __END__
@@ -170,7 +171,7 @@ MongoDB::CommandResult - MongoDB generic command result document
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 DESCRIPTION
 
@@ -201,6 +202,11 @@ Error string (if any) or the empty string if there was no error.
 
 True if a write concern error or timeout occurred or false otherwise.
 
+=head2 last_error_labels
+
+Returns an array of error labels from the command, or an empty array if there
+are none
+
 =head2 assert
 
 Throws an exception if the command failed.
@@ -210,19 +216,6 @@ Throws an exception if the command failed.
 Throws an exception if a write concern error occurred
 
 =for Pod::Coverage result
-
-=head1 DEPRECATIONS
-
-The methods still exist, but are no longer documented.  In a future version
-they will warn when used, then will eventually be removed.
-
-=over 4
-
-=item *
-
-result
-
-=back
 
 =head1 AUTHORS
 

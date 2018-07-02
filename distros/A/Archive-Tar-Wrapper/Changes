@@ -1,6 +1,33 @@
 ######################################################################
 Revision history for Perl extension Archive::Tar::Wrapper
 
+0.30 (2018/06):
+    Keeping track of changes per request https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/7.
+    Fixing proper handling of File::Which when checking on Microsoft Windows.
+    Refactored troubleshooting messages on Microsoft Windows.
+    Bug fixes provided by Shoichi Kaji (skaji at cpan.org) in PRs https://github.com/glasswalk3r/archive-tar-wrapper-perl/pull/9
+    and https://github.com/glasswalk3r/archive-tar-wrapper-perl/pull/8
+
+0.29 (2018/06/25):
+    Added Microsoft Windows support with the help of Ingram Braun M.A. <me@ingram-braun.net>.
+
+0.28 (2018/06/19)
+    Moving Test::Simple dependency to TEST_REQUIRES per issue https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/6.
+    Removed the README (completely replaced by README.md).
+    Fixed licensing declaration per https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/5.
+    Refactored more debugging messages with proper use of Log::Log4perl.
+    Applied the usage of Test::More is_deeply() whenever possible to improve tests results in case of errors.
+    Small refactorings.
+
+0.27 (2018/06/15)
+    Added Test::Simple 1.302073 as minimum version required to be able to use is_deeply().
+    Getting a logger from Log::Log4perl to be able to improve performance by avoiding doing expensive string
+    concatenation unless the log level allows it.
+    Reverted changes on list_reset() to go back reading and printing each line recovered instead of keeping it
+    in memory, instead following PBP.
+    Refactored t/001Basic.t by following PBP, using three arguments for open() and adding note() to include more information.
+
+
 0.26 (2018/06/09)
     Implemented refactoring due warnings from Perl::Critic.
 

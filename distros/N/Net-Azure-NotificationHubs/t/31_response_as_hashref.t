@@ -5,8 +5,8 @@ use Net::Azure::NotificationHubs::Request;
 use HTTP::Tiny;
 
 subtest 'html response' => sub {
-    my $uri = URI->new('http://search.cpan.org/search');
-    $uri->query_form(query => 'Azure', mode => 'all'); 
+    my $uri = URI->new('https://metacpan.org/search');
+    $uri->query_form(q => 'Azure', size => 100); 
     my $req = Net::Azure::NotificationHubs::Request->new(GET => $uri);
     $req->agent(HTTP::Tiny->new);
     my $res = $req->do;

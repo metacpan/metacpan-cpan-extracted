@@ -10,7 +10,7 @@ use Math::Complex;
 use Math::Utils qw(:polynomial :utility);
 use Exporter;
 
-our $VERSION = '2.81';
+our $VERSION = '2.85';
 our @ISA = qw(Exporter);
 
 #
@@ -30,12 +30,14 @@ our %EXPORT_TAGS = (
 		quadratic_roots
 		cubic_roots
 		quartic_roots
+		coefficients
 	) ],
 	'numeric' => [ qw(poly_roots
 		poly_option
 		build_companion
 		balance_matrix
 		hqr_eigen_hessenberg
+		coefficients
 	) ],
 	'sturm' => [ qw(
 		poly_real_root_count
@@ -47,6 +49,7 @@ our %EXPORT_TAGS = (
 		sturm_sign_chain
 		sturm_sign_minus_inf
 		sturm_sign_plus_inf
+		coefficients
 	) ],
 	'utility' => [ qw(
 		epsilon
@@ -55,6 +58,7 @@ our %EXPORT_TAGS = (
 		poly_iteration
 		poly_nonzero_term_count
 		poly_tolerance
+		coefficients
 	) ],
 );
 
@@ -64,7 +68,7 @@ our @EXPORT_OK = (
 	@{ $EXPORT_TAGS{'sturm'} },
 	@{ $EXPORT_TAGS{'utility'} } );
 
-our @EXPORT = qw( ascending_order );
+our @EXPORT = qw( coefficients ascending_order );
 
 #
 # Add an :all tag automatically.
@@ -146,8 +150,7 @@ my $ascending_flag = 0;		# default 0, in a later version it will be 1.
 #
 # See the END block.
 #
-my $ascending_order_called = 0;
-my %called_by;
+my $coeff_order_set = 0;
 
 =pod
 
@@ -160,31 +163,34 @@ Math::Polynomial::Solve - Find the roots of polynomial equations.
 =head1 SYNOPSIS
 
     use Math::Complex;  # The roots may be complex numbers.
-    use Math::Polynomial::Solve qw(poly_roots);
+    use Math::Polynomial::Solve qw(poly_roots coefficients);
+    coefficients order => 'descending';
 
-    my @x = poly_roots(@coefficients);
+    my @x = poly_roots(1, 1, 4, 4);
 
 or
 
     use Math::Complex;  # The roots may be complex numbers.
-    use Math::Polynomial::Solve qw(:numeric);  # See the EXPORT section
+    use Math::Polynomial::Solve qw(:numeric coefficients);  # See the EXPORT section
+    coefficients order => 'descending';
 
     #
     # Find roots using the matrix method.
     #
-    my @x = poly_roots(@coefficients);
+    my @x = poly_roots(5, 12, 17, 12, 5);
 
     #
     # Alternatively, use the classical methods instead of the matrix
     # method if the polynomial degree is less than five.
     #
     poly_option(hessenberg => 0);
-    @x = poly_roots(@coefficients);
+    @x = poly_roots(5, 12, 17, 12, 5);
 
 or
 
     use Math::Complex;  # The roots may be complex numbers.
-    use Math::Polynomial::Solve qw(:classical);  # See the EXPORT section
+    use Math::Polynomial::Solve qw(:classical coefficients);  # See the EXPORT section
+    coefficients order => 'descending';
 
     #
     # Find the polynomial roots using the classical methods.
@@ -206,9 +212,12 @@ or
 
     use Math::Complex;  # The roots may be complex numbers.
     use Math::Polynomial;
-    use Math::Polynomial::Solve qw(:classical ascending_order);
+    use Math::Polynomial::Solve qw(:classical coefficients);
 
-    ascending_order(1); # Change default coefficient order for M::P::S.
+    #
+    # Change default coefficient order for M::P::S.
+    #
+    coefficients order => 'ascending';
 
     #
     # Form 8*x**3 - 6*x - 1
@@ -217,7 +226,7 @@ or
 
     #
     # Use Math::Polynomial's coefficient order.
-    # If ascending_order() had not been called,
+    # If the coefficient order had not been changed,
     # the statement would be:
     #
     # my @roots = poly_roots(reverse $p1->coefficients);
@@ -226,12 +235,13 @@ or
 
 or
 
-    use Math::Polynomial::Solve qw(:sturm);
+    use Math::Polynomial::Solve qw(:sturm coefficients);
+    coefficients order => 'descending';
 
     #
     # Find the number of unique real roots of the polynomial.
     #
-    my $no_of_unique_roots = poly_real_root_count(@coefficients);
+    my $no_of_unique_roots = poly_real_root_count(2, 7, 8, -8, -23, -11);
 
 =head1 DESCRIPTION
 
@@ -252,6 +262,8 @@ also been exported for your use.
 # $asending = ascending_order();
 # $oldorder = ascending_order($neworder);
 #
+# Obsolete way of doing it, but preserve it in case
+# someone was an early adopter.
 #
 sub ascending_order
 {
@@ -260,10 +272,35 @@ sub ascending_order
 	if (scalar @_ > 0)
 	{
 		$ascending_flag = ($_[0] == 0)? 0: 1;
-		$ascending_order_called  = 1;
+		$coeff_order_set  = 1;
 	}
 
 	return $ascend;
+}
+
+sub coefficients
+{
+	my %def = @_;
+	if (not exists $def{order})
+	{
+		carp "'coefficients' needs to know the order.";
+		$coeff_order_set = 0;
+	}
+	elsif ($def{order} =~ m/ascend/i)
+	{
+		$ascending_flag = 1;
+		$coeff_order_set = 1;
+	}
+	elsif ($def{order} =~ m/descend/i)
+	{
+		$ascending_flag = 0;
+		$coeff_order_set = 1;
+	}
+	else
+	{
+		carp "'coefficients' needs to know if the order is ascending  or descending.";
+		$coeff_order_set = 0;
+	}
 }
 
 #
@@ -280,6 +317,7 @@ sub ascending_order
 # root of the quadratic.
 #
 # Not exported. Coefficients are always in ascending order.
+#
 sub poly_analysis
 {
 	my(@coefficients) = @_;
@@ -343,7 +381,7 @@ sub poly_analysis
 
 There is an B<all> tag that exports everything.
 
-Currently there is one default export, L<ascending_order|ascending_order()>.
+Currently there is one default export, L<coefficients|coefficients()>.
 
 If you want to have more fine-grained control you may
 individually name the functions in an export list, or
@@ -356,7 +394,7 @@ L<utility|Utility Functions>,
 
 =head2 EXPORTED BY DEFAULT
 
-=head3 ascending_order()
+=head3 coefficients
 
 Changes the default order of the coefficents to the functions.
 
@@ -377,12 +415,12 @@ put in ascending order, e.g.:
 
 If you use Math::Polynomial with this module, it will probably be
 more convenient to change the default parameter list of
-Math::Polynomial::Solve's functions, using the ascending_order() function:
+Math::Polynomial::Solve's functions, using the coefficients() function:
 
     use Math::Polynomial;
     use Math::Polynomial::Solve qw(:all);
 
-    ascending_order(1);
+    coefficients order => 'ascending';
 
     my $fp4 = Math::Polynomial->interpolate([1 .. 4], [14, 19, 25, 32]);
 
@@ -395,15 +433,15 @@ or
 
     my @fp4_roots = poly_roots($fp4->coefficients);
 
-If C<ascending_order(1)> had not been called, the previous line of code
-would have been written instead as
+If C<coefficients order =E<gt> 'ascending'> had not been called, the
+previous line of code would have been written instead as
 
     my @fp4_roots = poly_roots(reverse $fp4->coefficients);
 
 The function is a way to help with the change in the API when version 3.00 of
 this module is released. At that point coefficients will be in ascending
-order by default, and you will need to use C<ascending_order(0)> to use the
-old (current) style.
+order by default, and you will need to use
+C<coefficients order =E<gt> 'ascending'> to use the old (current) style.
 
 =head2 Numeric Functions
 
@@ -1644,26 +1682,22 @@ sub poly_sturm_chain
 {
 	my @coefficients = @_;
 	my $degree = $#coefficients;
-	my(@chain, @remd);
-	my($f1, $f2);
+	my (@chain, @remd);
+	my ($f1, $f2);
 
 	@coefficients = reverse @coefficients unless ($ascending_flag);
 
 	$f1 = [@coefficients];
 	$f2 = pl_derivative(\@coefficients);
 
+	#
+	# The first link of the chain.
+	#
 	push @chain, $f1;
+	push @chain, $f2 if ($degree > 0);
 
-	#
-	# Start the first links of the chain.
-	#
-	SKIPIT: {
-		last SKIPIT if ($degree < 1); #return @chain if ($degree < 1);
-
-		push @chain, $f2;
-
-		last SKIPIT if ($degree < 2); #return @chain if ($degree < 2);
-
+	if ($degree > 1)
+	{
 		#
 		###### poly_sturm_chain chain before do loop:
 		###### @chain
@@ -2255,7 +2289,8 @@ sub poly_tolerance
 
 =head3 poly_nonzero_term_count()
 
-Returns a simple count of the number of coefficients that aren't zero.
+Returns a simple count of the number of coefficients that aren't zero
+(zero meaning between -epsilon and epsilon).
 
 =cut
 
@@ -2272,16 +2307,16 @@ sub poly_nonzero_term_count
 }
 
 END {
-	unless (1)	#unless ($ascending_order_called)
+	unless ($coeff_order_set)
 	{
-		my $end_list = join("\n", keys %called_by);
-		warn "Coefficient order is in a default state, which will change by version 3.00.\n\n",
-		"Please use ascending_order(0) at the beginning of your code to make\n",
+		warn "Your coefficient order is in a default state, which will change by version 3.00.\n\n",
+		"Please put\n",
+		"        coefficients order => 'descending';\n",
+		sprintf("at the beginning of file %s to make\n", (caller())[1]),
 		"sure your function parameters will be in the correct order when the\n",
 		"default order changes.\n\n",
 		"See the README file and the Math::Polynomial::Solve documentation for\n",
 		"more information.\n",
-		"File(s): $end_list\n";
 	}
 }
 

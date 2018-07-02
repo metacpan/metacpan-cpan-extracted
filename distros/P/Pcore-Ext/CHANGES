@@ -1,3 +1,41 @@
+v0.17.4 2018-07-02T07:28:01Z
+ - l10n plural form fixed
+
+v0.17.3 2018-06-29T21:19:40Z
+ - common dialogs moved to the lib
+ - init args updated
+ - errorTarget removed
+ - l10n updated
+
+v0.17.2 2018-06-27T17:19:04Z
+ - material fashion updated
+ - material theme
+ - on signin callback
+ - forgot password
+
+v0.17.1 2018-06-25T21:17:50Z
+ - viewport controller improvements
+ - l10n domains removed
+
+v0.17.0 2018-06-21T03:11:14Z
+ - ext raw/func calls converted
+ - Pcore::Ext::Context::Call removed
+ - ext map scanner improved
+ - syntax
+ - l10n updated
+ - l10n framework improved
+ - ext loader
+ - l10n overrides
+ - overrides
+ - app md5 fixed
+ - prepare js improved
+ - locale
+ - do not generate class name for overrides
+ - Ext.L10N moved to overrides
+ - fire remote event
+ - ext extend resolver fixed
+ - viewport controller improvements
+
 v0.16.1 2018-06-06T18:30:03Z
  - lib classes
 

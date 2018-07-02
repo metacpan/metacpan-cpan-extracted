@@ -1,4 +1,7 @@
-Revision history for Text-Table-CSV
+0.020   2018-06-30 (PERLANCAR)
+
+	- Observe option header_row.
+
 
 0.01    2015-12-18 (PERLANCAR)
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension AWS-XRay
 
+0.04 2018-06-22T15:05:03Z
+    - Add sampler()
+
+0.03 2018-06-19T16:34:09Z
+    - Add sampling_rate()
+
 0.02 2018-06-15T14:44:09Z
     - interface changed. (trace -> capture)
 

@@ -22,13 +22,13 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214157;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
                   'leading_digits' => '[379]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
+                  'format' => '$1 $2 $3 $4'
                 },
                 {
                   'format' => '$1 $2 $3 $4',
@@ -38,13 +38,15 @@ my $formatters = [
               ];
 
 my $validators = {
-                'voip' => '
-          39[01]\\d{6}|
-          3392\\d{5}|
-          93330\\d{4}
+                'mobile' => '
+          7(?:
+            [06-8]\\d|
+            21|
+            90
+          )\\d{6}
         ',
-                'toll_free' => '800\\d{6}',
-                'fixed_line' => '
+                'specialrate' => '(81[02468]\\d{6})|(88[4689]\\d{6})',
+                'geographic' => '
           3(?:
             0(?:
               1[0-2]|
@@ -58,17 +60,15 @@ my $validators = {
             611
           )\\d{5}
         ',
-                'personal_number' => '',
                 'pager' => '',
-                'specialrate' => '(81[02468]\\d{6})|(88[4689]\\d{6})',
-                'mobile' => '
-          7(?:
-            [06-8]\\d|
-            21|
-            90
-          )\\d{6}
+                'voip' => '
+          39[01]\\d{6}|
+          3392\\d{5}|
+          93330\\d{4}
         ',
-                'geographic' => '
+                'personal_number' => '',
+                'toll_free' => '800\\d{6}',
+                'fixed_line' => '
           3(?:
             0(?:
               1[0-2]|

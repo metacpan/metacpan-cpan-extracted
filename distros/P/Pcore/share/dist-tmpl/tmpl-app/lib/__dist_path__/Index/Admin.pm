@@ -4,10 +4,9 @@ use Pcore -class;
 
 with qw[Pcore::App::Controller::Ext];
 
-has ext_app    => 'Ext';
-has ext_title  => l10n('App Title');
-has ext_locale => ();
-has ext_theme  => ();
+has ext_app   => 'Ext';
+has ext_title => l10n('App Title');
+has ext_theme => ();
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
@@ -18,7 +17,7 @@ has ext_theme  => ();
 ## |======+======================+================================================================================================================|
 ## |    3 | 1                    | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 26                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 30 does not match the package declaration       |
+## |    1 | 25                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 29 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

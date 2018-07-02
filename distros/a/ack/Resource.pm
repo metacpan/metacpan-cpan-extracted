@@ -117,7 +117,10 @@ sub needs_line_scan {
     my $self  = shift;
     my $opt   = shift;
 
+    # Can't tell if it does NOT exist in the file.
     return 1 if $opt->{v};
+
+    return 1 unless -f $self->{fh};
 
     my $size = -s $self->{fh};
     if ( $size == 0 ) {
@@ -135,7 +138,7 @@ sub needs_line_scan {
     }
     return 0 unless $rc && ( $rc == $size );
 
-    return $buffer =~ /$opt->{regex}/m;
+    return $buffer =~ /$opt->{regex}/mo;
 }
 
 
@@ -152,6 +155,10 @@ sub reset {
 
     # Return if we haven't opened the file yet.
     if ( !defined($self->{fh}) ) {
+        return;
+    }
+
+    if ( !-f $self->{fh} ) {
         return;
     }
 

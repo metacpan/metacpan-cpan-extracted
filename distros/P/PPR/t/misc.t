@@ -47,6 +47,19 @@ __DATA__
 ####
     %x = do { $try > 10 };
 ####
+    label: %x = ();
+####
+    # leading "space"
+    label: %x = ();
+####
+    label: # in-between "space"
+      %x = ();
+####
+    # leading "space"
+    label: # in-between "space"
+      %x = ();
+####
+# THESE SHOULD FAIL
 # THESE SHOULD FAIL
     { $a = /\}/; };
 ####

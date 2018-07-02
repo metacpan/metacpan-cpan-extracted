@@ -1,5 +1,7 @@
 package XML::XPathScript::Template::Tag;
-
+our $AUTHORITY = 'cpan:YANICK';
+# ABSTRACT: XPathScript Template Element 
+$XML::XPathScript::Template::Tag::VERSION = '1.55';
 use strict;
 use warnings;
 
@@ -8,8 +10,6 @@ use Scalar::Util qw/ reftype /;
 
 use overload '&{}'  => \&_overload_func,
              q{""}  => \&_overload_quote;
-
-our $VERSION = '1.54';
 
 our @ALLOWED_ATTRIBUTES = qw{
   pre post
@@ -65,13 +65,17 @@ sub _overload_quote {
 
 __END__
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#  Module Documentation
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 XML::XPathScript::Template::Tag - XPathScript Template Element 
+
+=head1 VERSION
+
+version 1.55
 
 =head1 SYNOPSIS
 
@@ -198,15 +202,29 @@ access methods.
         };
     %>
 
-=head1 BUGS 
+=head1 AUTHORS
 
-Please send bug reports to <bug-xml-xpathscript@rt.cpan.org>,
-or via the web interface at 
-http://rt.cpan.org/Public/Dist/Display.html?Name=XML-XPathScript .
+=over 4
 
-=head1 AUTHOR
+=item *
 
 Yanick Champoux <yanick@cpan.org>
 
-=cut
+=item *
 
+Dominique Quatravaux <domq@cpan.org>
+
+=item *
+
+Matt Sergeant <matt@sergeant.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2008, 2007 by Matt Sergeant.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

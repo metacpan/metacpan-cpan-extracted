@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2018-02-08'; # DATE
-our $VERSION = '1.022'; # VERSION
+our $DATE = '2018-06-21'; # DATE
+our $VERSION = '1.023'; # VERSION
 
 use 5.010001;
 use strict;
@@ -61,6 +61,14 @@ _
         schema  => 'filename*',
         default => 'index.db',
         tags => ['common'],
+        description => <<'_',
+
+If `index_name` is a filename without any path, e.g. `index.db` then index will
+be located in the top-level of `cpan`. If `index_name` contains a path, e.g.
+`./index.db` or `/home/ujang/lcpan.db` then the index will be located solely
+using the `index_name`.
+
+_
         completion => sub {
             my %args = @_;
             my $word    = $args{word} // '';
@@ -873,7 +881,7 @@ sub _create_schema {
 
 sub _db_path {
     my ($cpan, $index_name) = @_;
-    "$cpan/$index_name";
+    $index_name =~ m!/|\\! ? $index_name : "$cpan/$index_name";
 }
 
 sub _connect_db {
@@ -3973,7 +3981,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.022 of App::lcpan (from Perl distribution App-lcpan), released on 2018-02-08.
+This document describes version 1.023 of App::lcpan (from Perl distribution App-lcpan), released on 2018-06-21.
 
 =head1 SYNOPSIS
 
@@ -4021,6 +4029,11 @@ Defaults to C<~/cpan>.
 =item * B<index_name> => I<filename> (default: "index.db")
 
 Filename of index.
+
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
 
 =item * B<or> => I<bool>
 
@@ -4128,13 +4141,18 @@ Include non-core modules.
 
 Filename of index.
 
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
 =item * B<level> => I<int> (default: 1)
 
 Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.26.0")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 
@@ -4218,6 +4236,11 @@ Defaults to C<~/cpan>.
 
 Filename of index.
 
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
 =item * B<latest> => I<bool>
 
 =item * B<or> => I<bool>
@@ -4296,6 +4319,11 @@ Include non-core modules.
 
 Filename of index.
 
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
 =item * B<latest> => I<bool>
 
 =item * B<namespaces> => I<array[str]>
@@ -4306,7 +4334,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.0")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 
@@ -4365,6 +4393,11 @@ Defaults to C<~/cpan>.
 =item * B<index_name> => I<filename> (default: "index.db")
 
 Filename of index.
+
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
 
 =item * B<level> => I<int>
 
@@ -4438,6 +4471,11 @@ Include non-core modules.
 
 Filename of index.
 
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
 =item * B<latest> => I<bool>
 
 =item * B<namespaces> => I<array[str]>
@@ -4448,7 +4486,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.0")
+=item * B<perl_version> => I<str> (default: "v5.24.0")
 
 Set base Perl version for determining core modules.
 
@@ -4517,6 +4555,11 @@ Defaults to C<~/cpan>.
 =item * B<index_name> => I<filename> (default: "index.db")
 
 Filename of index.
+
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
 
 =item * B<level> => I<int> (default: 1)
 
@@ -4589,6 +4632,11 @@ Defaults to C<~/cpan>.
 
 Filename of index.
 
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
 =item * B<latest> => I<bool>
 
 =item * B<no_path> => I<bool>
@@ -4643,6 +4691,11 @@ Defaults to C<~/cpan>.
 
 Filename of index.
 
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
+
 =back
 
 Returns an enveloped result (an array).
@@ -4680,6 +4733,11 @@ Defaults to C<~/cpan>.
 =item * B<index_name> => I<filename> (default: "index.db")
 
 Filename of index.
+
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
 
 =back
 
@@ -4733,6 +4791,11 @@ Only include files from certain author(s).
 =item * B<index_name> => I<filename> (default: "index.db")
 
 Filename of index.
+
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
 
 =item * B<max_file_size> => I<int>
 

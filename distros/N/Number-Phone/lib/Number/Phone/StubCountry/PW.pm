@@ -22,16 +22,27 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214157;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'format' => '$1 $2'
                 }
               ];
 
 my $validators = {
+                'specialrate' => '',
+                'mobile' => '
+          (?:
+            6[234689]0|
+            77\\d|
+            88[0-4]
+          )\\d{4}
+        ',
+                'voip' => '',
+                'personal_number' => '',
+                'toll_free' => '',
                 'fixed_line' => '
           (?:
             2(?:
@@ -62,8 +73,6 @@ my $validators = {
             900
           )\\d{4}
         ',
-                'toll_free' => '',
-                'voip' => '',
                 'geographic' => '
           (?:
             2(?:
@@ -94,16 +103,7 @@ my $validators = {
             900
           )\\d{4}
         ',
-                'specialrate' => '',
-                'mobile' => '
-          (?:
-            6[234689]0|
-            77\\d|
-            88[0-4]
-          )\\d{4}
-        ',
-                'pager' => '',
-                'personal_number' => ''
+                'pager' => ''
               };
 my %areanames = (
   680255 => "Sonsorol\ State\ and\ Hatohobei\ State",

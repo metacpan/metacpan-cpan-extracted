@@ -6,6 +6,20 @@ Home page:    <https://metacpan.org/release/Type-Tie>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tie>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.011	2018-06-26
+
+ [ Documentation ]
+ - Improvements to Type::Nano documentation.
+
+ [ Other ]
+ - Added: Type::Nano does overloading.
+
+0.010	2018-06-26
+
+ [ Packaging ]
+ - Bundle Type::Nano for testing.
+ - Bundle copies of Test::Requires, Try::Tiny, and Test::Fatal in inc.
+
 0.009	2014-09-17
 
  [ Packaging ]

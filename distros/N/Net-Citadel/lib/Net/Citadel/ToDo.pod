@@ -19,6 +19,27 @@ perhaps using IO::Socket::SSL?
 Change to using the jame@cpan.org address for Robert James Clay instead of the
 jame@rocasa.us address?
 
+Other issues: (but uncertain what this is supposed to be about except that it
+is related to the POD on those lines):
+$ find -type f \( -iname '*.pl' -o -iname '*.pm' \) -exec podlint {} \;
+spurious '>' at ./lib/Net/Citadel.pm line 130
+spurious '>' at ./lib/Net/Citadel.pm line 285
+spurious '>' at ./lib/Net/Citadel.pm line 332
+spurious '>' at ./lib/Net/Citadel.pm line 357
+spurious '>' at ./lib/Net/Citadel.pm line 383
+spurious '>' at ./lib/Net/Citadel.pm line 414
+spurious '>' at ./lib/Net/Citadel.pm line 437
+spurious '>' at ./lib/Net/Citadel.pm line 468
+spurious '>' at ./lib/Net/Citadel.pm line 514
+spurious '>' at ./lib/Net/Citadel.pm line 569
+
+$ env PERL5OPT=-m-lib=. perlcritic --noprofile -1 . 2>&1 | grep -vF 'No perl files were found.'
+./Makefile.PL: Code is not tidy at line 1, column 1.  See page 33 of PBP.  (Severity: 1)
+./Makefile.PL: No package-scoped "$VERSION" variable found at line 1, column 1.  See page 404 of PBP.  (Severity: 2)
+./Makefile.PL: Code before strictures are enabled at line 5, column 1.  See page 429 of PBP.  (Severity: 5)
+./Makefile.PL: Code before warnings are enabled at line 5, column 1.  See page 431 of PBP.  (Severity: 4)
+./Makefile.PL: Heredoc terminator must be quoted at line 32, column 12.  See page 64 of PBP.  (Severity: 3)
+
 
 =head2 Constants
 
@@ -164,8 +185,8 @@ Instead of having the debugging 'warning' lines commented out, use a DEBUG
 environment variable and/or a test.yaml configuration item for it. Same
 for the 'use Data::Dumper' line itself.
 
-Use Config::YAML::Tiny instead of Config::YAML? (Does not appear to be in
-Debian as yet, although YAML::Tiny is.)
+Use Config::YAML::Tiny instead of Config::YAML? Does not appear to be in Debian
+as yet, although YAML::Tiny is.  And it has not been updated since 2010.
 
 Use something like Test::MockObject to do at least basic testing of the 
 various functions? And/or Test::TCP? Could use Test::TCP::CheckPort to 
@@ -176,6 +197,59 @@ information lines returned by the server. That could change over time and
 different Citadel versions. Make that a testing configuration item?
 
 Do more extensive checking of what is returned by the citadel_info function?
+
+Instead of having the debugging 'warning' lines commented out, use a DEBUG
+environment variable and/or a test.yaml configuration item for it. Same
+for the 'use Data::Dumper' line itself. These are where they were found:
+$ grep -r warn *
+lib/Net/Citadel.pm:use warnings;
+lib/Net/Citadel.pm:  }; warn $@ if $@;
+lib/Net/Citadel.pm:#warn "_floors $_";
+lib/Net/Citadel.pm:#warn "looking for $name rooms ". Dumper \@floors;
+lib/Net/Citadel.pm:#warn "found floor: ".Dumper $floor;
+lib/Net/Citadel.pm:#warn "processing $_";
+lib/Net/Citadel/ToDo.pod:Instead of having the debugging 'warning' lines commented out, use a DEBUG
+t/00pods.t:use warnings;
+t/02critic.t:use warnings;
+t/01citadel.t:#warn Dumper \@floors;
+t/01citadel.t:#warn Dumper \@floors2;
+t/01citadel.t:#warn "before assert". Dumper \@rooms2;
+t/01citadel.t:#warn "after assert". Dumper \@rooms3;
+t/01citadel.t:#warn "after retract". Dumper \@rooms4;
+
+These Perl::Critic result needs further investigation, but possiable good
+reference is https://rt.cpan.org/Public/Bug/Display.html?id=42486, which notes
+the policy that is finding these "doesn't take Readonly into account" but it
+does also note how to exempt 'Readonlhy':
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 71, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 85, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 94, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 104, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 114, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 124, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 134, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 143, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 153, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 164, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 177, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 186, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 195, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 204, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 215, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 227, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 235, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 243, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 251, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 259, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 267, column 1.  This might be a major bug.  (Severity: 4)
+ -   Subroutine "Readonly" is neither declared nor explicitly imported at line 277, column 1.  This might be a major bug.  (Severity: 4)
+ 
+These Perl::Critic result needs further investigation:
+ -   Always unpack @_ first at line 308, column 1.  See page 178 of PBP.  (Severity: 4)
+ -   Always unpack @_ first at line 637, column 1.  See page 178 of PBP.  (Severity: 4)
+
+This Perl::Critic result needs further investigation:
+ -   Subroutine "SOCK_STREAM" is neither declared nor explicitly imported at line 317, column 58.  This might be a major bug.  (Severity: 4)
 
 
 =head1 SEE ALSO
@@ -189,7 +263,7 @@ Robert James Clay, C<< <jame at rocasa.us> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2017 Robert James Clay, all rights reserved.
+Copyright 2018 Robert James Clay, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

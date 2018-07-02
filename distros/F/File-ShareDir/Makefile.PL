@@ -1,5 +1,9 @@
+#!perl
+
 use strict;
 use warnings;
+
+use 5.008_001;
 
 use ExtUtils::MakeMaker;
 
@@ -36,14 +40,15 @@ my %RUN_DEPS = (
 );
 my %BUILD_DEPS = (
     'ExtUtils::MakeMaker'     => 0,
-    'File::ShareDir::Install' => '0.03'
+    'File::ShareDir::Install' => '0.13'
 );
 my %BUNDLE_CONFIGURE_DEPS = (
     'inc::latest'             => '0.500',
     'File::ShareDir::Install' => '0.08',
 );
 my %TEST_DEPS = (
-    'Test::More' => 0.90,
+    'Test::More' => '0.90',
+    'File::Path' => '2.08',
 );
 
 WriteMakefile1(
@@ -82,8 +87,11 @@ WriteMakefile1(
                 requires   => {%BUILD_DEPS},
                 recommends => {%BUNDLE_CONFIGURE_DEPS}
             },
-            build   => {requires => {%BUILD_DEPS}},
-            test    => {requires => {%TEST_DEPS}},
+            build => {requires => {%BUILD_DEPS}},
+            test  => {
+                requires   => {%TEST_DEPS},
+                recommends => {'CPAN::Meta' => 2.110440}
+            },
             runtime => {
                 requires   => {%RUN_DEPS},
                 recommends => {

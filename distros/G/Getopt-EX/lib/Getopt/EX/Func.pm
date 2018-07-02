@@ -17,6 +17,11 @@ sub new {
     my $obj = bless [ @_ ], $class;
 }
 
+sub append {
+    my $obj = shift;
+    push @$obj, @_;
+}
+
 sub call {
     my $obj = shift;
     unshift @_, @$obj;

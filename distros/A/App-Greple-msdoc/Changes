@@ -1,0 +1,34 @@
+Revision history for Perl extension App-Greple-msdoc
+
+1.01 2018-07-02T07:22:33Z
+
+    - Trial buggy implementation using in-memory file.
+    - Add --epilogue code for --dump to exit successfully.
+
+1.00 2018-06-26T07:50:02Z
+
+    - Implement everything in filter function.
+    - Extract text by default and deprecate --text option.
+    - Only works with latest greple and Getopt::EX.
+
+0.04 2018-06-24T04:58:02Z
+
+    - Totally update text extract strategy.
+    - Use xl/sharedStrings.xml for .xlsx file.
+    - Introduce --space built-in option.
+    - Delete --text-double option.
+    - Use single newline for pptx/xlsx, and double for docx.
+
+0.03 2018-06-23T15:22:23Z
+
+    - Remove unnecessary staff.
+    - Make --dump option more efficient.
+
+0.02 2018-06-23T00:04:00Z
+
+    - Add --dump and --text-double options.
+
+0.01 2018-06-22T04:59:02Z
+
+    - original version
+

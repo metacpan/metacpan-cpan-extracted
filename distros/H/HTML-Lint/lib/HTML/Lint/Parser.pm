@@ -18,11 +18,11 @@ HTML::Lint::Parser - Parser for HTML::Lint.  No user-serviceable parts inside.
 
 =head1 VERSION
 
-Version 2.30
+Version 2.32
 
 =cut
 
-our $VERSION = '2.30';
+our $VERSION = '2.32';
 
 =head1 SYNOPSIS
 

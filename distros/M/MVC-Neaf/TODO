@@ -1,50 +1,71 @@
-SINCE VERSION | TBD VERSION | COMMENT
+PRIORITY | COMPLEXITY | COMMENT
     -- next version --
+*     **    API Add regex-check for http headers, too
+*     *     API Make custom error handlers path-based
+*     **    API load_resources() automagically
     -- todo --
-0.24    0.30    DOC Big rewrite of docs
-0.24    0.30    API Add regex-check for http headers, too
-0.21    0.30    API helper_object to manage shared objects
-0.19    0.30    COR Async support via $req->future
-0.24    0.30    API load_resources() automagically
-0.13    0.30    TPL Add XSLate support
-0.18    0.30    TPL variables -> js module for TT
-0.25    0.30    API Add /foo/:bar with mandatory param_regex{bar}
-0.16    0.30    MOD Oauth2 example/helper
-0.20    0.30    API body_json( validator ) - die 422 is !json || val fails
-0.17    0.30    TPL Predefined header/footer to spare user of boilerplate
-0.12    0.30    MOD static file_regex, dir_regex
-0.21    0.35    REF Add digest, hmac, and digest_fast to Util
-0.19    0.35    API multiple uploads under same name, wildcard uploads
-0.21    0.35    API Add encoding detect & strict/coding flags to upload_utf8
-0.04    0.35    REF Req https detection: change to is_secure? http:https.
+*     *     API Add /foo/:bar with mandatory param_regex{bar} [HOLD v.0.3]
+*     **    TPL create a <script>var foo = "bar"</script> upon request
+**    **    TST blog, wiki & chat examples
+*     ***   DOC Big rewrite of docs
+*     ***   MOD Oauth2 example/helper
+*     ***   TPL Predefined header/footer to spare user of boilerplate
+**    *     MOD static file_regex, dir_regex
+**    *     REF Add digest, hmac, and digest_fast to Util
+**    **    API Add encoding detect & strict/coding flags to upload_utf8
+**    **    API body_json( validator ) - die 422 is !json || val fails
+*     ***** COR Async support via $req->future
     -- backlog --
-0.16    0.40    MOD OpenAPI plugin: model+in-spec+out-spec => swagger.txt+routes
-0.21    0.40    REF Split get/post PSGI request, remove hacks
-0.24    0.40    API Add encoding field to route to allow for non-utf8
-0.13    0.40    MOD static: X-Accel-Redirect (@cono)
-0.20    0.40    TPL Add default favicon for neaf
-0.20    0.40    MOD Add json schema support to forms
-0.19    0.40    API Generate a catalog of public resources on 404
-0.19    0.40    REF Use Digest::SHA3 everywhere (thx @akuklev)
-0.19    0.40    MOD Session::Redis
-0.18    0.40    API body_content() or smth - decoded as Content-Type suggests (ned accept_body => [ ... ])
-0.17    0.40    MOD form->data_hash instead of %{ form->data }
-0.07    0.40    MOD Add "cleanup" method to X::Session - for offline cleanups
-0.18    0.40    DEV last source file, complain if no run() at EOF
-0.14    0.40    API Add named forms to route defn JFYI
-0.02    0.50    DOC HOWTO add dumper to TT view (pre-render)
-0.17    0.50    MOD Add well-known regexes from Regexp::Common to default Form
-0.19    0.50    MOD Add clusterisation to wildcard form (thx @akuklev)
-0.09    0.50    MOD Add form defaults populating BOTH raw and data
-0.21    0.90    COR Add per-route exceptions instead of 404,422
-0.16    0.90    API Add -charset for content encoding
-0.06    0.90    NET POST/PUT request HMAC via HTTP header
-0.07    0.90    API Periodic actions in webapp
-0.01    0.99    DEV REPL - term::readline + neaf->run_test
+**    **    TST Coverage >90%
+**    *     API Add rendering in -continue via Request->write( \%hash )
+**    *     API Add encoding field to route to allow for non-utf8
+**    *     MOD form->data_hash instead of %{ form->data }
+**    **    REF Use Digest::SHA3 if avail (thx @akuklev)
+**    **    API Generate a catalog of public resources on 404
+**    **    MOD Session::Redis
+**    **    MOD static: X-Accel-Redirect (@cono)
+**    **    TPL Add default favicon for neaf
+***   *     REF Req https detection: change to is_secure? http:https.
+**    ***   API body_content() or smth - decoded as Content-Type suggests (ned accept_body => [ ... ])
+**    ***   MOD Add json schema support to forms
+**    ***   REF Split get/post PSGI request, remove hacks
+**    ****  MOD OpenAPI plugin: model+in-spec+out-spec => swagger.txt+routes
+***   *     MOD Add form defaults populating BOTH raw and data
+***   **    API multiple uploads under same name, wildcard uploads
+***   **    TPL Add XSLate support
+***   **    MOD Add well-known regexes from Regexp::Common to default Form
+***   ***   DOC HOWTO add dumper to TT view (pre-render)
+****  *     API helper_object to manage shared objects
+****  *     API Add -charset for content encoding
+****  **    COR Add per-route exceptions instead of 404,422
+****  **    DEV last source file, complain if no run() at EOF
+****  **    MOD Add "cleanup" method to X::Session - for offline cleanups
+****  **    NET POST/PUT request HMAC via HTTP header
+****  ***   MOD Add clusterisation to wildcard form (thx @akuklev)
+****  ****  API Periodic actions in webapp
+***** **    API Add named forms to route defn JFYI
     -- think more --
-0.18    0.30    MOD api module: neaf crude => '/path' => $object; get /foo =>'method'
-0.05    0.90    API Add ability to deploy existing app under unoccupied path
-0.06    0.90    TPL TT View - prepend configurable path to ALL links (mason)
-0.19    0.30    MOD Deprecate form( { ... } ) in favor of form( rules => { ... } ) as we already have a shortened syntax for that
-0.18    0.40    API neaf prefix => '/path', $req->prefix to fetch, pop on run()
-0.04    0.90    DEV CGI wrapper: use wrapper; route(/) {...}; run();
+**    **    API neaf chroot => '/path', $req->prefix to fetch, pop on run()
+**    ***   MOD api module: neaf crude => '/path' => $object; get /foo =>'method'
+***   *     MOD Deprecate form( { ... } ) in favor of form( rules => { ... } ) as we already have a shortened syntax for that
+****  **    TPL TT View - prepend configurable path to ALL links (mason)
+****  ***   API Add ability to deploy existing app under unoccupied path
+****  ***   DEV CGI wrapper: use wrapper; route(/) {...}; run();
+    -- help --
+PRIORITY   is 1 to 5 stars, the less the higher.
+Add 1 star for each question with non-trivial answer.
+
+* Can v.1.0 go without it?
+* Who are the users asking for it?
+* How awkward is absense of it?
+* What other features depend on it?
+
+COMPLEXITY is 1 to 5 stars
+Add 1 star for each question with non-trivial answer.
+
+* What would a simple meaningful example look like?
+* How do I cover it with tests?
+* How do I document it?
+* What do I need to study to do it properly?
+* What other parts are involved, disabled, or deprecated?
+* What other changes does it depend upon?

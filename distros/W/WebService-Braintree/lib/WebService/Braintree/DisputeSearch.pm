@@ -1,11 +1,9 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::DisputeSearch;
-$WebService::Braintree::DisputeSearch::VERSION = '1.5';
+$WebService::Braintree::DisputeSearch::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
-
-use Moose;
 
 =head1 NAME
 
@@ -17,13 +15,14 @@ This class represents a search for disputes.
 
 =cut
 
-extends 'WebService::Braintree::AdvancedSearch';
+use Moo;
+with 'WebService::Braintree::Role::AdvancedSearch';
+
+use constant FIELDS => [];
 
 =head1 FIELDS
 
 =cut
-
-my $field = WebService::Braintree::AdvancedSearchFields->new(metaclass => __PACKAGE__->meta);
 
 =head2 case_number
 
@@ -31,7 +30,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("case_number");
+__PACKAGE__->text_field("case_number");
 
 =head2 id
 
@@ -39,7 +38,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("id");
+__PACKAGE__->text_field("id");
 
 =head2 reference_number
 
@@ -47,7 +46,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("reference_number");
+__PACKAGE__->text_field("reference_number");
 
 =head2 transaction_id
 
@@ -55,7 +54,7 @@ This is a L<text field|WebService::Braintree::AdvancedSearchNodes/"Text Field">.
 
 =cut
 
-$field->text("transaction_id");
+__PACKAGE__->text_field("transaction_id");
 
 =head2 ids
 
@@ -63,7 +62,7 @@ This is a L<multiple-values field|WebService::Braintree::AdvancedSearchNodes/"Mu
 
 =cut
 
-$field->multiple_values("ids");
+__PACKAGE__->multiple_values_field("ids");
 
 =head2 merchant_account_id
 
@@ -71,7 +70,7 @@ This is a L<multiple-values field|WebService::Braintree::AdvancedSearchNodes/"Mu
 
 =cut
 
-$field->multiple_values("merchant_account_id");
+__PACKAGE__->multiple_values_field("merchant_account_id");
 
 =head2 reason
 
@@ -79,7 +78,7 @@ This is a L<multiple-values field|WebService::Braintree::AdvancedSearchNodes/"Mu
 
 =cut
 
-$field->multiple_values("reason");
+__PACKAGE__->multiple_values_field("reason");
 
 =head2 reason_code
 
@@ -87,7 +86,7 @@ This is a L<multiple-values field|WebService::Braintree::AdvancedSearchNodes/"Mu
 
 =cut
 
-$field->multiple_values("reason_code");
+__PACKAGE__->multiple_values_field("reason_code");
 
 =head2 status
 
@@ -95,7 +94,7 @@ This is a L<multiple-values field|WebService::Braintree::AdvancedSearchNodes/"Mu
 
 =cut
 
-$field->multiple_values("status");
+__PACKAGE__->multiple_values_field("status");
 
 =head2 transaction_source
 
@@ -103,7 +102,7 @@ This is a L<multiple-values field|WebService::Braintree::AdvancedSearchNodes/"Mu
 
 =cut
 
-$field->multiple_values("transaction_source");
+__PACKAGE__->multiple_values_field("transaction_source");
 
 
 =head2 amount_disputed
@@ -112,7 +111,7 @@ This is a L<range field|WebService::Braintree::AdvancedSearchNodes/"Range Field"
 
 =cut
 
-$field->range("amount_disputed");
+__PACKAGE__->range_field("amount_disputed");
 
 =head2 amount_won
 
@@ -120,7 +119,7 @@ This is a L<range field|WebService::Braintree::AdvancedSearchNodes/"Range Field"
 
 =cut
 
-$field->range("amount_won");
+__PACKAGE__->range_field("amount_won");
 
 =head2 received_date
 
@@ -128,7 +127,7 @@ This is a L<range field|WebService::Braintree::AdvancedSearchNodes/"Range Field"
 
 =cut
 
-$field->range("received_date");
+__PACKAGE__->range_field("received_date");
 
 =head2 reply_by_date
 
@@ -136,7 +135,7 @@ This is a L<range field|WebService::Braintree::AdvancedSearchNodes/"Range Field"
 
 =cut
 
-$field->range("reply_by_date");
+__PACKAGE__->range_field("reply_by_date");
 
 __PACKAGE__->meta->make_immutable;
 

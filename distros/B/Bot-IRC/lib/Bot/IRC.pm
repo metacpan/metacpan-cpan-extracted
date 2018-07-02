@@ -14,7 +14,7 @@ use Date::Format 'time2str';
 use Encode 'encode';
 use Try::Tiny;
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 sub new {
     my $class = shift;
@@ -478,7 +478,14 @@ sub hooks {
 
 sub helps {
     my $self = shift;
-    $self->{helps} = { %{ $self->{helps} }, @_ };
+
+    try {
+        $self->{helps} = { %{ $self->{helps} }, @_ };
+    }
+    catch {
+        $self->note('Plugin helps called but not properly implemented');
+    };
+
     return $self;
 }
 
@@ -500,6 +507,12 @@ sub ticks {
 
 sub subs {
     my $self = shift;
+
+    if ( @_ % 2 ) {
+        $self->note('Plugin helps called but not properly implemented');
+        return $self;
+    }
+
     my $subs = {@_};
 
     for my $name ( keys %$subs ) {
@@ -643,7 +656,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC)
@@ -679,9 +692,7 @@ version 1.20
             ssl    => 0,
         },
         plugins => [
-            'Store',
-            'Bot::IRC::X::Random',
-            'My::Own::Plugin',
+            ':core',
         ],
         vars => {
             store => 'bot.yaml',
@@ -689,12 +700,14 @@ version 1.20
     );
 
     $bot->load( 'Infobot', 'Karma' );
-    $bot->load({
-        hooks => [ [ {}, sub {}, {} ] ],
-        helps => { name => 'String' },
-        subs  => { name => sub {} },
-        ticks => [ [ '0 * * * *', sub {} ] ],
-    });
+
+    ## Example inline plugin structure
+    # $bot->load({
+    #     hooks => [ [ {}, sub {}, {} ] ],
+    #     helps => { name => 'String' },
+    #     subs  => { name => sub {} },
+    #     ticks => [ [ '0 * * * *', sub {} ] ],
+    # });
 
     $bot->run;
 
@@ -1039,10 +1052,11 @@ calling C<subs()> and C<helps()>. (See below.)
 This method accepts a list of arrayrefs, each containing a trigger, code, and
 attribute value and calls C<hook> for each set.
 
-    $bot->hooks(
-        [ {}, sub {}, {} ],
-        [ {}, sub {}, {} ],
-    );
+    ## Example hooks call structure
+    # $bot->hooks(
+    #     [ {}, sub {}, {} ],
+    #     [ {}, sub {}, {} ],
+    # );
 
 =head2 helps
 
@@ -1163,20 +1177,21 @@ all settings as a hashref.
 You can optionally inject inline plugins by providing them as hashref. This
 works both with C<load()> and the C<plugins> key.
 
-    $bot->load(
-        {
-            hooks => [ [ {}, sub {}, {} ], [ {}, sub {}, {} ] ],
-            ticks => [ [ 10, sub {} ], [ '0 0 * * *', sub {} ] ],
-            helps => { title => 'Description.' },
-            subs  => { name => sub {} },
-        },
-        {
-            hooks => [ [ {}, sub {}, {} ], [ {}, sub {}, {} ] ],
-            ticks => [ [ 10, sub {} ], [ '0 0 * * *', sub {} ] ],
-            helps => { title => 'Description.' },
-            subs  => { name => sub {} },
-        },
-    );
+    ## Example inline plugin structure
+    # $bot->load(
+    #     {
+    #         hooks => [ [ {}, sub {}, {} ], [ {}, sub {}, {} ] ],
+    #         ticks => [ [ 10, sub {} ], [ '0 0 * * *', sub {} ] ],
+    #         helps => { title => 'Description.' },
+    #         subs  => { name => sub {} },
+    #     },
+    #     {
+    #         hooks => [ [ {}, sub {}, {} ], [ {}, sub {}, {} ] ],
+    #         ticks => [ [ 10, sub {} ], [ '0 0 * * *', sub {} ] ],
+    #         helps => { title => 'Description.' },
+    #         subs  => { name => sub {} },
+    #     },
+    # );
 
 =head1 OPERATIONAL METHODS
 

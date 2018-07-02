@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::YANICK - Be like Yanick when you build your dists
 
 # VERSION
 
-version 0.28.0
+version 0.29.0
 
 # DESCRIPTION
 
@@ -23,6 +23,7 @@ his distributions. It's roughly equivalent to
 
 [InstallGuide]
 [Covenant]
+[ContributorCovenant]
 
 [GithubMeta]
 remote=github
@@ -111,6 +112,8 @@ verbose = 0
 [CPANFile]
 
 [CopyrightYearFromGit]
+
+[GitHubREADME::Badge]
 ```
 
 ## ARGUMENTS
@@ -191,7 +194,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011, 2010 by Yanick Champoux.
+This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2012, 2011, 2010 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

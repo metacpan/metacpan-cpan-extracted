@@ -1,5 +1,5 @@
 package Bio::Tools::Phylo::PAML;
-$Bio::Tools::Phylo::PAML::VERSION = '1.7.2';
+$Bio::Tools::Phylo::PAML::VERSION = '1.7.3';
 use utf8;
 use strict;
 use warnings;
@@ -59,6 +59,17 @@ sub next_result {
         # get the various codon and other sequence summary data, if necessary:
     $self->_parse_summary
       unless ( $self->{'_summary'} && !$self->{'_summary'}->{'multidata'} );
+
+    ## parse_summary reads the NG distance matrices which in the case
+    ## of codeml and yn00 appear at the end of the file.  This means
+    ## that for those programs, there's nothing left to read, so all
+    ## the code below is skipped, and we will return undef.  Maybe in
+    ## older versions of PAML (current version 4.9h) the order of
+    ## output was different.  Or maybe someone made parse_summary read
+    ## more stuff and didn't notice that next_result was here.
+    ## Anyway, rewinding to the start of the file after summary seems
+    ## to fix all the issues.
+    seek $self->_fh, 0, 0;
 
     # OK, depending on seqtype and runmode now, one of a few things can happen:
     my $seqtype = $self->{'_summary'}->{'seqtype'};
@@ -1672,7 +1683,7 @@ Bio::Tools::Phylo::PAML - Parses output from the PAML programs codeml, baseml, b
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 

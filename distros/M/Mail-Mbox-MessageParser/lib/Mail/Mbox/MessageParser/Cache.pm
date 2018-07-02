@@ -1,32 +1,30 @@
 package Mail::Mbox::MessageParser::Cache;
 
-no strict;
-
-@ISA = qw( Exporter Mail::Mbox::MessageParser );
-
 use strict;
 use Carp;
 
 use Mail::Mbox::MessageParser;
 use Mail::Mbox::MessageParser::MetaInfo;
 
-use vars qw( $VERSION $DEBUG );
-use vars qw( $CACHE );
+use vars qw( $VERSION $_DEBUG @ISA );
+use vars qw( $_CACHE );
+
+@ISA = qw( Exporter Mail::Mbox::MessageParser );
 
 $VERSION = sprintf "%d.%02d%02d", q/1.30.2/ =~ /(\d+)/g;
 
-*ENTRY_STILL_VALID = \&Mail::Mbox::MessageParser::MetaInfo::ENTRY_STILL_VALID;
-sub ENTRY_STILL_VALID;
+*_ENTRY_STILL_VALID = \&Mail::Mbox::MessageParser::MetaInfo::_ENTRY_STILL_VALID;
+sub _ENTRY_STILL_VALID;
 
-*CACHE = \$Mail::Mbox::MessageParser::MetaInfo::CACHE;
-*WRITE_CACHE = \&Mail::Mbox::MessageParser::MetaInfo::WRITE_CACHE;
-*INITIALIZE_ENTRY = \&Mail::Mbox::MessageParser::MetaInfo::INITIALIZE_ENTRY;
-sub WRITE_CACHE;
-sub INITIALIZE_ENTRY;
+*_CACHE = \$Mail::Mbox::MessageParser::MetaInfo::_CACHE;
+*_WRITE_CACHE = \&Mail::Mbox::MessageParser::MetaInfo::WRITE_CACHE;
+*_INITIALIZE_ENTRY = \&Mail::Mbox::MessageParser::MetaInfo::_INITIALIZE_ENTRY;
+sub _WRITE_CACHE;
+sub _INITIALIZE_ENTRY;
 
-*DEBUG = \$Mail::Mbox::MessageParser::DEBUG;
-*dprint = \&Mail::Mbox::MessageParser::dprint;
-sub dprint;
+*_DEBUG = \$Mail::Mbox::MessageParser::_DEBUG;
+*_dprint = \&Mail::Mbox::MessageParser::_dprint;
+sub _dprint;
 
 #-------------------------------------------------------------------------------
 
@@ -38,7 +36,7 @@ sub new
   carp "Need file_handle option" unless defined $self->{'file_handle'};
 
   carp "Call SETUP_CACHE() before calling new()"
-    unless exists $Mail::Mbox::MessageParser::MetaInfo::CACHE_OPTIONS{'file_name'};
+    unless exists $Mail::Mbox::MessageParser::MetaInfo::_CACHE_OPTIONS{'file_name'};
 
   bless ($self, __PACKAGE__);
 
@@ -53,11 +51,11 @@ sub _init
 {
   my $self = shift;
 
-  WRITE_CACHE();
+  _WRITE_CACHE();
 
   $self->SUPER::_init();
 
-  INITIALIZE_ENTRY($self->{'file_name'});
+  _INITIALIZE_ENTRY($self->{'file_name'});
 }
 
 #-------------------------------------------------------------------------------
@@ -69,7 +67,7 @@ sub reset
   $self->SUPER::reset();
 
   # If we're in the middle of parsing this file, we need to reset the cache
-  INITIALIZE_ENTRY($self->{'file_name'});
+  _INITIALIZE_ENTRY($self->{'file_name'});
 }
 
 #-------------------------------------------------------------------------------
@@ -78,9 +76,9 @@ sub _read_prologue
 {
   my $self = shift;
 
-  dprint "Reading mailbox prologue using cache";
+  _dprint "Reading mailbox prologue using cache";
 
-  my $prologue_length = $CACHE->{$self->{'file_name'}}{'emails'}[0]{'offset'};
+  my $prologue_length = $_CACHE->{$self->{'file_name'}}{'emails'}[0]{'offset'};
 
   my $total_amount_read = 0;
   do {
@@ -97,40 +95,39 @@ sub read_next_email
 
 	my $entry_became_invalidated = 0;
 
-  unless (defined $self->{'file_name'} &&
-    ENTRY_STILL_VALID($self->{'file_name'}))
+  unless (defined $self->{'file_name'} && _ENTRY_STILL_VALID($self->{'file_name'}))
   {
 		$entry_became_invalidated = 1;
 
     # Patch up the data structures for the Perl implementation
     $self->{'CURRENT_LINE_NUMBER'} =
-      $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'line_number'};
+      $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'line_number'};
     $self->{'CURRENT_OFFSET'} =
-      $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'offset'};
+      $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'offset'};
     $self->{'READ_CHUNK_SIZE'} =
       $Mail::Mbox::MessageParser::Config{'read_chunk_size'};
     $self->{'READ_BUFFER'} = '';
     $self->{'END_OF_EMAIL'} = 0;
 
     # Invalidate the remaining data
-    $#{ $CACHE->{$self->{'file_name'}}{'emails'} } = $self->{'email_number'};
+    $#{ $_CACHE->{$self->{'file_name'}}{'emails'} } = $self->{'email_number'};
 
     bless ($self, 'Mail::Mbox::MessageParser::Perl');
 
     return $self->read_next_email();
   }
 
-  return undef if $self->end_of_file();
+  return undef if $self->end_of_file(); ## no critic (ProhibitExplicitReturnUndef)
 
   $self->{'email_line_number'} =
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'line_number'};
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'line_number'};
   $self->{'email_offset'} =
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'offset'};
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'offset'};
 
   my $email = '';
 
   $self->{'email_length'} =
-    $CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'length'};
+    $_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'length'};
 
   {
     my $total_amount_read = length($email);
@@ -140,11 +137,11 @@ sub read_next_email
     } while ($total_amount_read != $self->{'email_length'});
   }
 
-  unless ($CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'validated'}) {
+  unless ($_CACHE->{$self->{'file_name'}}{'emails'}[$self->{'email_number'}]{'validated'}) {
 	  my $current_time = localtime;
 		my $email_last_modified_time = localtime((stat($self->{'file_name'}))[9]);
 		my $cache_last_modified_time =
-			localtime((stat($Mail::Mbox::MessageParser::MetaInfo::CACHE_OPTIONS{'file_name'}))[9]);
+			localtime((stat($Mail::Mbox::MessageParser::MetaInfo::_CACHE_OPTIONS{'file_name'}))[9]);
 
 		die <<EOF;
 Cache data not validated. This should not occur. Please send an email to
@@ -154,7 +151,7 @@ Debugging info:
 - Current time: $current_time
 - Email file: $self->{'file_name'}
 - Email file last modified time: $email_last_modified_time
-- Cache file: $Mail::Mbox::MessageParser::MetaInfo::CACHE_OPTIONS{'file_name'}
+- Cache file: $Mail::Mbox::MessageParser::MetaInfo::_CACHE_OPTIONS{'file_name'}
 - Cache file last modified time: $cache_last_modified_time
 - Email number: $self->{'email_number'}
 - Email line number: $self->{'email_line_number'}
@@ -178,14 +175,14 @@ EOF
 
 sub _print_debug_information
 {
-  return unless $DEBUG;
+  return unless $_DEBUG;
 
   my $self = shift;
 
   $self->SUPER::_print_debug_information();
 
-  dprint "Valid cache entry exists: " .
-    ($#{ $CACHE->{$self->{'file_name'}}{'emails'} } != -1 ? "Yes" : "No");
+  _dprint "Valid cache entry exists: " .
+    ($#{ $_CACHE->{$self->{'file_name'}}{'emails'} } != -1 ? "Yes" : "No");
 }
 
 1;
@@ -262,6 +259,12 @@ the opened file handle to the mailbox. Both arguments are required.
 
 Returns a reference to a Mail::Mbox::MessageParser object, or a string
 describing the error.
+
+=item reset()
+
+=item read_next_email()
+
+These methods are overridden in this subclass of Mail::Mbox::MessageParser.
 
 =back
 

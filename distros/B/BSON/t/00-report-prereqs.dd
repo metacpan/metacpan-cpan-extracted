@@ -38,6 +38,7 @@ do { my $x = {
                                       'Exporter' => '0',
                                       'List::Util' => '0',
                                       'MIME::Base64' => '0',
+                                      'Math::BigFloat' => '0',
                                       'Math::BigInt' => '0',
                                       'Moo' => '2.002004',
                                       'Scalar::Util' => '0',

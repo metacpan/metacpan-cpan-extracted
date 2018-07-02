@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 # Some portions of this code were copied and adapted from the Perl module
 # HTTP::Tiny, which is copyright Christian Hansen, David Golden and other
@@ -25,7 +23,7 @@ use warnings;
 package MongoDB::_Link;
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 use Errno qw[EINTR EPIPE];
@@ -35,16 +33,17 @@ use Socket qw/SOL_SOCKET SO_KEEPALIVE SO_RCVBUF IPPROTO_TCP TCP_NODELAY AF_INET/
 use Time::HiRes qw/time/;
 use MongoDB::Error;
 use MongoDB::_Constants;
+use MongoDB::_Protocol;
 use MongoDB::_Types qw(
     Boolish
     HostAddress
     NonNegNum
+    Numish
     ServerDesc
 );
 use Types::Standard qw(
     HashRef
     Maybe
-    Num
     Str
     Undef
 );
@@ -64,13 +63,13 @@ has address => (
 has connect_timeout => (
     is => 'ro',
     default => 20,
-    isa => Num,
+    isa => Numish,
 );
 
 has socket_timeout => (
     is => 'ro',
     default => 30,
-    isa => Num|Undef,
+    isa => Numish|Undef,
 );
 
 has with_ssl => (
@@ -115,15 +114,108 @@ for my $f ( @is_master_fields ) {
     );
 }
 
-# for caching wire version >= 2
-has does_write_commands => (
+# wire version >= 2
+has supports_write_commands => (
     is => 'rwp',
     init_arg => undef,
     isa => Boolish,
 );
 
-# for caching wire version >= 5
+# wire version >= 3
+has supports_list_commands => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_scram_sha1 => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+# wire version >= 4
+has supports_document_validation => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_explain_command => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_query_commands => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_find_modify_write_concern => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_fsync_command => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_read_concern => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+# wire version >= 5
 has supports_collation => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_helper_write_concern => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_x509_user_from_cert => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+# for caching wire version >=6
+has supports_arrayFilters => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_clusterTime => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_db_aggregation => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_retryWrites => (
+    is => 'rwp',
+    init_arg => undef,
+    isa => Boolish,
+);
+
+has supports_4_0_changestreams => (
     is => 'rwp',
     init_arg => undef,
     isa => Boolish,
@@ -233,8 +325,40 @@ sub set_metadata {
     $self->_set_max_message_size_bytes( $server->is_master->{maxMessageSizeBytes}
           || 2 * $self->max_bson_object_size );
 
-    $self->_set_does_write_commands( $self->accepts_wire_version(2) );
-    $self->_set_supports_collation( $self->accepts_wire_version(5) );
+    if ( $self->accepts_wire_version(2) ) {
+        $self->_set_supports_write_commands(1);
+    }
+    if ( $self->accepts_wire_version(3) ) {
+        $self->_set_supports_list_commands(1);
+        $self->_set_supports_scram_sha1(1);
+    }
+    if ( $self->accepts_wire_version(4) ) {
+        $self->_set_supports_document_validation(1);
+        $self->_set_supports_explain_command(1);
+        $self->_set_supports_query_commands(1);
+        $self->_set_supports_find_modify_write_concern(1);
+        $self->_set_supports_fsync_command(1);
+        $self->_set_supports_read_concern(1);
+    }
+    if ( $self->accepts_wire_version(5) ) {
+        $self->_set_supports_collation(1);
+        $self->_set_supports_helper_write_concern(1);
+        $self->_set_supports_x509_user_from_cert(1);
+    }
+    if ( $self->accepts_wire_version(6) ) {
+        $self->_set_supports_arrayFilters(1);
+        $self->_set_supports_clusterTime(1);
+        $self->_set_supports_db_aggregation(1);
+        $self->_set_supports_retryWrites(
+            defined( $server->logical_session_timeout_minutes )
+              && ( $server->type ne 'Standalone' )
+            ? 1
+            : 0
+        );
+    }
+    if ( $self->accepts_wire_version(7) ) {
+        $self->_set_supports_4_0_changestreams(1);
+    }
 
     return;
 }
@@ -306,7 +430,19 @@ sub is_connected {
 }
 
 sub write {
-    my ( $self, $buf ) = @_;
+    my ( $self, $buf, $write_opt ) = @_;
+    $write_opt ||= {};
+
+    if (
+        !$write_opt->{disable_compression}
+        && $self->server
+        && $self->server->compressor
+    ) {
+        $buf = MongoDB::_Protocol::compress(
+            $buf,
+            $self->server->compressor,
+        );
+    }
 
     my ( $len, $off, $pending, $nfound, $r ) = ( length($buf), 0 );
 

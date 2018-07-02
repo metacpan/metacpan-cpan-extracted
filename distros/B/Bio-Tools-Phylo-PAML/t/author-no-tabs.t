@@ -16,7 +16,6 @@ use Test::NoTabs;
 
 my @files = (
     'bin/bp_pairwise_kaks',
-    'lib/Bio/Installer/PAML.pm',
     'lib/Bio/Tools/Phylo/PAML.pm',
     'lib/Bio/Tools/Phylo/PAML/Codeml.pm',
     'lib/Bio/Tools/Phylo/PAML/ModelResult.pm',
@@ -32,8 +31,7 @@ my @files = (
     't/author-mojibake.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
-    't/author-pod-syntax.t',
-    't/requires_external.t'
+    't/author-pod-syntax.t'
 );
 
 notabs_ok($_) foreach @files;

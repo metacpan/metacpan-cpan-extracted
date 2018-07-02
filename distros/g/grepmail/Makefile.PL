@@ -5,6 +5,7 @@ use strict;
 # For PRIVATE Module::Install extensions
 use lib 'private-lib';
 
+use lib '.';
 use inc::Module::Install;
 
 # To prevent MakeMaker from processing our old directory
@@ -43,6 +44,7 @@ requires(
 );
 
 test_requires(
+  'Test::Compile' => 0,
   'Test::More' => 0,
   'File::Slurp' => 0,
 );
@@ -63,5 +65,9 @@ no_index 'directory' => 'private-lib';
 enable_verbose_cpan_testing();
 
 WriteAll();
+
+use_standard_tests;
+
+fix_standard_tests('grepmail');
 
 Update_Test_Version('grepmail','t/results/help');

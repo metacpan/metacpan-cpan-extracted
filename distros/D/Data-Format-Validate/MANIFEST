@@ -1,0 +1,16 @@
+Build.PL
+lib/Data/Format/Validate.pm
+lib/Data/Format/Validate/Email.pm
+lib/Data/Format/Validate/IP.pm
+lib/Data/Format/Validate/URL.pm
+lib/Data/Format/Validate/URN.pm
+LICENSE
+MANIFEST			This list of files
+README.md
+t/email_any_email.t
+t/email_common_email.t
+t/ip_ipv4.t
+t/ip_ipv6.t
+t/url_any_url.t
+t/url_full_url.t
+t/urn.t

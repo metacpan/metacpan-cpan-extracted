@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.517';
+our $VERSION = '1.518';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -39,7 +39,7 @@ sub new {
         $self->__validate_and_add_options( $opt );
     }
     $self->{plugin} = $Plugin_Package->new();
-    my $backup_self = { map{ $_ => $self->{$_} } keys %$self };  ##
+    my $backup_self = { map{ $_ => $self->{$_} } keys %$self };
     $self->{backup_self} = $backup_self;
     return $self;
 }
@@ -62,7 +62,7 @@ sub __defaults {        #hae
         #default            => undef,
         empty               => '<empty>',
         hide_cursor         => 1,
-        include_highlighted => 1, # ###
+        include_highlighted => 0,
         index               => 0,
         justify             => 0,
         keep                => 5,
@@ -100,7 +100,7 @@ sub __valid_options {       #hae
         index               => '[ 0 1 ]',
         order               => '[ 0 1 ]',
         page                => '[ 0 1 ]',
-        include_highlighted => '[ 0 1 2 ]', # '[ 0 1 ]'
+        include_highlighted => '[ 0 1 2 ]',
         justify             => '[ 0 1 2 ]',
         layout              => '[ 0 1 2 3 ]',
         mouse               => '[ 0 1 2 3 4 ]',
@@ -110,7 +110,6 @@ sub __valid_options {       #hae
         max_width           => '[ 1-9 ][ 0-9 ]*',
         default             => '[ 0-9 ]+',
         pad                 => '[ 0-9 ]+',
-        pad_one_row         => '[ 0-9 ]+', # removed ###
         lf                  => 'ARRAY',
         mark                => 'ARRAY',
         no_spacebar         => 'ARRAY',
@@ -197,26 +196,10 @@ sub __get_key {
 }
 
 
-sub config {            # DEPRECATED 10.02.2018
-    my $self = shift;
-    my ( $opt ) = @_;
-    ###################
-    print 'The method "config" is deprecated and will be removed with the next release.' . "\n";
-    print 'Continue with ENTER ';
-    my $p = <STDIN>;
-    print "\n";
-    ##################
-    croak "config: called with " . @_ . " arguments - 0 or 1 arguments expected" if @_ > 1;
-    if ( defined $opt ) {
-        croak "config: the argument must be a HASH reference" if ref $opt ne 'HASH';
-        $self->__validate_and_add_options( $opt );
-    }
-}
-
-
 sub choose {      #hae
     if ( ref $_[0] ne 'Term::Choose' ) {
-        return Term::Choose->new()->__choose( @_ );
+        #return Term::Choose->new()->__choose( @_ );
+        return __choose( bless( { plugin => $Plugin_Package->new() }, 'Term::Choose' ), @_ );
     }
     my $self = shift;
     return $self->__choose( @_ ); # 1 backup_self
@@ -234,15 +217,6 @@ sub __choose {
     if ( ! @$orig_list_ref ) {
         return;
     }
-
-    # ###
-    if ( defined $self->{pad_one_row} ) {
-        print 'Please remove the invalid option "pad_one_row" (see "Changes"/1.509).' . "\n";
-        print 'Continue with ENTER ';
-        my $p = <STDIN>;
-        print "\n";
-    }
-    # ###
 
     local $\ = undef;
     local $, = undef;
@@ -1101,7 +1075,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.517
+Version 1.518
 
 =cut
 
@@ -1162,16 +1136,6 @@ To set the different options it can be passed a reference to a hash as an option
 
 For detailed information about the options see L</OPTIONS>.
 
-=head2 config DEPRECATED
-
-    $new->config( \%options );
-
-The C<config> method is meant to set the different options. The options are passed as a hash reference.
-
-Options set with C<config> overwrite options set with the C<new> method.
-
-For detailed information about the different options, their allowed and default values see L</OPTIONS>.
-
 =head2 choose
 
 The method C<choose> allows the user to choose from a list.
@@ -1181,7 +1145,7 @@ The first argument is an array reference which holds the list of the available c
 As a second and optional argument it can be passed a reference to a hash where the keys are the option names and the
 values the option values.
 
-Options set with C<choose> overwrite options set with C<new> or C<config>. Before leaving C<choose> restores the
+Options set with C<choose> overwrite options set with C<new>. Before leaving C<choose> restores the
 overwritten options.
 
     $choice = $new->choose( $array_ref [, \%options] );
@@ -1611,11 +1575,14 @@ default: "<undef>"
 
 =head3 include_highlighted
 
-0 - In list context C<choose> returns the items marked with the C<SpaceBar>.
+In list context when C<Return> is pressed
 
-1 - In list context C<choose> returns the items marked with the C<SpaceBar> plus the highlighted item. (default)
+0 - C<choose> returns the items marked with the C<SpaceBar>. (default)
 
-The default value of this option will change with the next release.
+1 - C<choose> returns the items marked with the C<SpaceBar> plus the highlighted item.
+
+2 - C<choose> returns the items marked with the C<SpaceBar>. If no items are marked with the C<SpaceBar>, the
+highlighted item is returned.
 
 =head3 mark
 
@@ -1658,7 +1625,7 @@ This option has only meaning in list context.
 
 =head2 croak
 
-C<new|config|choose> dies if passed invalid arguments.
+C<new|choose> dies if passed invalid arguments.
 
 =head2 carp
 

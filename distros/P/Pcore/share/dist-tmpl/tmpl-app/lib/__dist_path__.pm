@@ -10,7 +10,7 @@ has util => ( is => 'ro', isa => InstanceOf ['<: $module_name :>::Util'], init_a
 
 with qw[Pcore::App];
 
-const our $APP_API_ROLES => [ 'admin', 'user' ];
+const our $API_ROLES => [ 'admin', 'user' ];
 
 sub run ( $self ) {
     $self->{util} = <: $module_name ~ "::Util" :>->new;

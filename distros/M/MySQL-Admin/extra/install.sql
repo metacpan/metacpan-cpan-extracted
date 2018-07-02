@@ -354,7 +354,7 @@ CREATE TABLE `news` (
   `action` varchar(50) NOT NULL DEFAULT 'main',
   `sticky` int(1) NOT NULL DEFAULT '0',
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `format` varchar(10) NOT NULL DEFAULT 'bbcode',
+  `format` varchar(10) NOT NULL DEFAULT 'markdown',
   PRIMARY KEY (`id`),
   FULLTEXT KEY `title` (`title`,`body`)
 ) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;

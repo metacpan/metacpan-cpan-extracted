@@ -38,3 +38,12 @@ $VERSION = sprintf "%d.%02d%02d", q/0.1.2/ =~ /(\d+)/g;
 
 1;
 
+__END__
+
+# --------------------------------------------------------------------------
+
+=head1 NAME
+
+Mail::Mbox::MessageParser::Config - An internal configuration class
+
+=cut

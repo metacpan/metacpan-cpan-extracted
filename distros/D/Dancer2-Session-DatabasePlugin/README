@@ -1,0 +1,7 @@
+
+
+Welcome to the project README file.
+
+For install instructions see INSTALL.
+
+For Configuration instructions see: perldoc Dancer2::Session::DatabasePlugin

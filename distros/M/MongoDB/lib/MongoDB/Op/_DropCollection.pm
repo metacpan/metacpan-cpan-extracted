@@ -1,5 +1,4 @@
-#
-#  Copyright 2016 MongoDB, Inc.
+#  Copyright 2016 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::Op::_DropCollection;
 # Implements a collection drop; returns a MongoDB::CommandResult
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -44,10 +42,12 @@ sub execute {
         db_name => $self->db_name,
         query   => [
             drop => $self->coll_name,
-            ( $link->accepts_wire_version(5) ? ( @{ $self->write_concern->as_args } ) : () ),
+            ( $link->supports_helper_write_concern ? ( @{ $self->write_concern->as_args } ) : () ),
         ],
-        query_flags => {},
-        bson_codec  => $self->bson_codec,
+        query_flags         => {},
+        bson_codec          => $self->bson_codec,
+        session             => $self->session,
+        monitoring_callback => $self->monitoring_callback,
     );
 
     my $res;

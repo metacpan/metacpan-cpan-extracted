@@ -1,0 +1,111 @@
+NAME
+    DBIx::TextTableAny - Generate text table from SQL query result using
+    Text::Table::Any
+
+VERSION
+    This document describes version 0.002 of DBIx::TextTableAny (from Perl
+    distribution DBIx-TextTableAny), released on 2018-07-01.
+
+SYNOPSIS
+     use DBI;
+     use DBIx::TextTableAny;
+     my $dbh = DBI->connect("dbi:mysql:database=mydb", "someuser", "somepass");
+
+    Selecting a row:
+
+     print $dbh->selectrow_texttable("SELECT * FROM member");
+
+    Sample result (default backend is Text::Table::Tiny):
+
+     +-------+----------+----------+
+     | Name  | Rank     | Serial   |
+     +-------+----------+----------+
+     | alice | pvt      | 123456   |
+     +-------+----------+----------+
+
+    Selecting all rows:
+
+     print $dbh->selectrow_texttable("SELECT * FROM member");
+
+    Sample result:
+
+     +-------+----------+----------+
+     | Name  | Rank     | Serial   |
+     +-------+----------+----------+
+     | alice | pvt      | 123456   |
+     | bob   | cpl      | 98765321 |
+     | carol | brig gen | 8745     |
+     +-------+----------+----------+
+
+    Picking another backend (and setting other options):
+
+     use DBIx::TextTableAny backend => 'Text::Table::CSV', header_row => 0;
+
+     my $sth = $dbh->prepare("SELECT * FROM member");
+     $sth->execute;
+
+     print $sth->fetchall_texttable;
+
+    Sample result (note that we instructed the header row to be omitted):
+
+     "alice","pvt","123456"
+     "bob","cpl","98765321"
+     "carol,"brig gen","8745"
+
+    If you want to change backend/options for subsequent tables, you can do
+    this:
+
+     DBIx::TextTableAny->import(backend => 'Text::Table::TSV', header_row => 0);
+     print $dbh->selectrow_texttable("more query ...");
+
+    or:
+
+     $DBIx::TextTableAny::opts{header_row} = 0; # you can just change one option
+     print $dbh->selectrow_texttable("more query ...");
+
+DESCRIPTION
+    This package is a thin glue between Text::Table::Any and DBI. It adds
+    the following methods to database handle:
+
+     selectrow_texttable
+     selectall_texttable
+
+    as well as the following methods to statement handle:
+
+     fetchrow_texttable
+     fetchall_texttable
+
+    The methods send the result of query to Text::Table::Any and return the
+    rendered table.
+
+    In essence, this is an easy, straightforward way produce text tables
+    from SQL query. You can generate CSV, ASCII table, or whatever format
+    the Text::Table::Tiny backend happens to support.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DBIx-TextTableAny>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DBIx-TextTableAny>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-TextTableAny>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DBI::Format
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-EnsureLatestPerl
 
+0.008     2018-06-19 23:05:30Z
+          - soften Module::CoreList requirement to allow a 3 month delay
+            between releases, rather than 2 months (RT#125632)
+
 0.007     2018-03-04 22:24:12Z
           - improved wording in error message
 

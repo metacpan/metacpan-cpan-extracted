@@ -13,7 +13,7 @@ use LWP::UserAgent;
 
 use WebService::Braintree::Xml qw(hash_to_xml xml_to_hash);
 
-use Moose;
+use Moo;
 use Carp qw(confess);
 use constant CLIENT_VERSION => $WebService::Braintree::VERSION || 'development';
 

@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -35,6 +33,7 @@ my $testdb         = get_test_db($conn);
 my $server_version = server_version($conn);
 my $server_type    = server_type($conn);
 my $coll           = $testdb->get_collection('test_collection');
+my $admin          = $conn->get_database("admin");
 
 my $supports_collation = $server_version >= 3.3.9;
 my $valid_collation           = { locale => "en_US", strength => 2 };
@@ -196,6 +195,10 @@ subtest "drop_one" => sub {
     my $found = grep { $_->{name} eq 'x_1' } $iv->list->all;
     ok( !$found, "dropped index on x" );
 
+    # Dropping non-existing index must not error
+    $res = $iv->drop_one("z_3");
+    ok( !$res->{ok}, "result of drop_one is a database result document with false, but no exception" );
+
     # exception on index drop
     like(
         exception { $iv->drop_one("*") },
@@ -240,7 +243,7 @@ subtest 'handling duplicates' => sub {
     $coll->drop;
     my $doc = { foo => 1, bar => 1, baz => 1, boo => 1 };
     $coll->insert_one($doc) for 1 .. 2;
-    is( $coll->count, 2, "two identical docs inserted" );
+    is( $coll->count_documents({}), 2, "two identical docs inserted" );
     like( exception { $iv->create_one( [ foo => 1 ], { unique => 1 } ) },
         qr/E11000/, "got expected error creating unique index with dups" );
 
@@ -248,7 +251,7 @@ subtest 'handling duplicates' => sub {
     if ( $server_version < v2.7.5 ) {
         ok( $iv->create_one( [ foo => 1 ], { unique => 1, dropDups => 1 } ),
             "create unique with dropDups" );
-        is( $coll->count, 1, "one doc dropped" );
+        is( $coll->count_documents({}), 1, "one doc dropped" );
     }
 };
 
@@ -290,13 +293,13 @@ subtest 'indexes w/ same key pattern but different collations' => sub {
         { collation => $valid_collation_alternate, name => "index2" } );
     cmp_deeply(
         [ map { $_->{key} } $iv->list->all ],
-        [ { _id => 1 }, { a => 1 }, { a => 1 } ],
+        [ { _id => num(1) }, { a => num(1) }, { a => num(1) } ],
         "both indexes created"
     );
     $iv->drop_one("index1");
     cmp_deeply(
         [ map { $_->{name} } $iv->list->all ],
-        [ "_id_", "index2" ],
+        [ str("_id_"), str("index2") ],
         "correct index dropped"
     );
 };
@@ -319,7 +322,7 @@ subtest "sparse indexes" => sub {
         $coll->insert_one( { x => $_, y => $_ } );
         $coll->insert_one( { x => $_ } );
     }
-    is( $coll->count, 20, "inserted 20 docs" );
+    is( $coll->count_documents({}), 20, "inserted 20 docs" );
 
     like(
         exception { $iv->create_one( { y => 1 }, { unique => 1, name => "foo" } ) },
@@ -351,7 +354,7 @@ subtest 'text indices' => sub {
     $coll2->drop;
     $coll2->insert_one( { language => 'english', w1 => 'hello', w2 => 'world' } )
       foreach ( 1 .. 10 );
-    is( $coll2->count, 10, "inserted 10 documents" );
+    is( $coll2->count_documents({}), 10, "inserted 10 documents" );
 
     my $res = $coll2->indexes->create_one(
         { '$**' => 'text' },

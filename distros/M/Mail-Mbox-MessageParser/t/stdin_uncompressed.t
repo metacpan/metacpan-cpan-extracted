@@ -4,7 +4,7 @@
 
 use strict;
 
-use File::Temp;
+use File::Temp qw(tempfile);
 use Test::More;
 use lib 't';
 use File::Spec::Functions qw(:ALL);
@@ -37,22 +37,22 @@ sub TestImplementation
 
   my ($folder_name) = $filename =~ /\/([^\/\\]*)\.txt.*$/;
 
-  my $output = File::Temp->new();
-  my $script = File::Temp->new();
+  my ($output_fh, $output_fn) = tempfile();
+  my ($script_fh, $script_fn) = tempfile();
 
   local $/ = undef;
 
-  write_file($script, {binmode => ':raw'}, $test_program);
+  write_file($script_fn, {binmode => ':raw'}, $test_program);
 
   my $mailbox = read_file($filename, { binmode => ':raw' });
 
-  open PIPE, "|$^X -I" . catdir('blib','lib') . " " . $script->filename . " \"" . $output->filename . "\"";
+  open PIPE, "|$^X -I" . catdir('blib','lib') . " $script_fn \"$output_fn\"";
   binmode PIPE;
   local $SIG{PIPE} = sub { die "test program pipe broke" };
   print PIPE $mailbox;
   close PIPE;
 
-  CheckDiffs([$filename,$output->filename]);
+  CheckDiffs([$filename,$output_fn]);
 }
 
 ################################################################################

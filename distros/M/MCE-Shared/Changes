@@ -1,6 +1,18 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.838 Mon Jun 25 22:00:00 EST 2018
+
+  * Fixed exporting deeply-shared regressions.
+
+1.837 Mon Jun 25 08:30:00 EST 2018
+
+  * Fixed deeply-shared regressions. Thank you, PerlMonks (Veltro).
+    See https://perlmonks.pairsite.com/?node_id=1216790.
+
+  * Applied small optimizations.
+  * Bumped MCE dependency to 1.836.
+
 1.836 Tue Mar 13 15:00:00 EST 2018
 
   * Added chameneos demonstration to MCE::Shared::Condvar.

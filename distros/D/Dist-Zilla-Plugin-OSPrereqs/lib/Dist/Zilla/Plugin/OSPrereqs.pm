@@ -6,7 +6,7 @@ use utf8;
 package Dist::Zilla::Plugin::OSPrereqs;
 # ABSTRACT: List prereqs conditional on operating system
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Moose;
 use List::Util 1.33 'first';
@@ -18,7 +18,6 @@ has prereq_os => (
     is       => 'ro',
     isa      => 'Str',
     lazy     => 1,
-    init_arg => 'phase',
     default  => sub {
         my ($self) = @_;
         my $os = $self->plugin_name;
@@ -161,7 +160,7 @@ Dist::Zilla::Plugin::OSPrereqs - List prereqs conditional on operating system
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -170,16 +169,24 @@ In your dist.ini:
   [OSPrereqs / MSWin32]
   Win32API::File = 0.11
 
+or
+
+  [OSPrereqs]
+  prereq_os = MSWin32
+  Win32API::File = 0.11
+
 Some prefixes are recognized, i.e. C<!> (not), C<~> (regex match), C<!~> (regex
 non-match). Regex matches are done case-insensitively for convenience:
 
   ; require on non-Win32 system
-  [OSPrereqs / !MSWin32]
+  [OSPrereqs]
+  prereq_os = !MSWin32
   Proc::ProcessTable = 0.50
 
   ; require on BSD
-  [OSPrereqs / ~bsd]
-  BSD::Resource=0
+  [OSPrereqs]
+  prereq_os = ~bsd
+  BSD::Resource = 0
 
   ; require on non-Windows system
   [OSPrereqs / !~win]

@@ -1,5 +1,16 @@
 Revision history for Dist-Zilla-Plugin-OSPrereqs
 
+0.011     2018-06-20 17:01:38-06:00 America/Denver
+
+  [CHANGES]
+
+  Explicit use of the prereq_os option in configs now uses the proper option
+  name.
+
+  [DOCUMENTED]
+
+  The explicit use of the prereq_os option is now described.
+
 0.010     2018-04-22 22:00:43+02:00 Europe/Oslo
 
   [ADDED]

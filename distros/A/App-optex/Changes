@@ -1,6 +1,14 @@
 Revision history for `optex' command.
 
-v0.0.15 2018-03-24T05:02:13Z
+v0.2 2018-07-01T02:09:04Z
+
+    - Add --exit option.
+
+v0.1 2018-06-25T14:19:03Z
+
+    - Separate Tmpfile.pm.
+
+v0.0.15 2018-03-24T05:30:20Z
 
     - Update license.
     - Update '--ls' output to include aliases.

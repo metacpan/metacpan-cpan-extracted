@@ -15,7 +15,7 @@ my $spec = contract {
 
 my $log = $spec->apply;
 
-is $log->count, 2, "Count as expected";
+is $log->get_count, 2, "Count as expected";
 ok !$log->is_passing, "Contract invalidated (as expected)";
 
 my $permitted = eval {

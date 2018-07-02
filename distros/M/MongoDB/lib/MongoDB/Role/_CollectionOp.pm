@@ -1,5 +1,4 @@
-#
-#  Copyright 2016 MongoDB, Inc.
+#  Copyright 2016 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -22,12 +20,12 @@ package MongoDB::Role::_CollectionOp;
 # collection name (and possibly full-name for legacy operation)
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo::Role;
 
-use Types::Standard qw(
-    Str
+use MongoDB::_Types qw(
+    Stringish
 );
 
 use namespace::clean;
@@ -35,13 +33,13 @@ use namespace::clean;
 has coll_name => (
     is       => 'ro',
     required => 1,
-    isa      => Str,
+    isa      => Stringish,
 );
 
 has full_name => (
     is       => 'ro',
     required => 1,
-    isa      => Str,
+    isa      => Stringish,
 );
 
 with $_ for qw(

@@ -36,10 +36,18 @@ EOS
 }
 
 unless ($res =~ /^ok2/m) {
-  die <<EOS;
+  warn <<EOS;
 
-Your Tk installation fails to find 'snit' package.
-Make sure that it is installed within your Tcl/Tk.
+Your Tk installation fails to find 'snit' package. For full functionality
+this package is required. Make sure that it is installed within your Tcl/Tk.
+EOS
+}
+
+unless ($res =~ /^ok3/m) {
+  warn <<EOS;
+
+Your Tk installation fails to find 'tklib' package. For full functionality
+this package is required. Make sure that it is installed within your Tcl/Tk.
 EOS
 }
 

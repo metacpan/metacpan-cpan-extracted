@@ -1,0 +1,205 @@
+==================================================
+Changes from 2017-07-01 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.3 at 2018-07-01 12:20:13 +0000
+----------------------------------------
+
+  Change: db4d734ec989dd15f65f4706e1b0e90fc9c66bc0
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-30 23:07:30 +0000
+
+    FIX: fixed array ordering 
+
+  Change: 1cd84fabf066198815c2967d4c909eee79ee2ecf
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-30 23:05:44 +0000
+
+    FIX: fixed wrong array 
+
+  Change: 8e9e5440ed35e93bf788753dcf1667548a7518a7
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-30 22:56:24 +0000
+
+    FIX: fixed missing VERSION variable in Modules 
+
+  Change: d0929edc4642c643892b26d365c0519a8c78699f
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-30 22:55:17 +0000
+
+    ADD: provide the 6 repositories with latest changes to index page 
+
+  Change: 997d6d456e450f0914075f2ab97eeb6585ea8856
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-30 22:09:41 +0000
+
+    ADD: generate tag and language cloud images 
+
+----------------------------------------
+version 0.2 at 2018-06-29 21:40:00 +0000
+----------------------------------------
+
+  Change: e2a8bdc71622e8d4a7d610337edc830347917fe6
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-29 23:40:00 +0000
+
+    ADD: ignore files 
+
+  Change: 64fb9ab526411b755b8bbab2aceb2024d9f20730
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-29 23:24:06 +0000
+
+    ADD: also generate the index file 
+
+  Change: 74c669fd2ad3cd3b6b28aea109e9d3603ab5260a
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-29 22:33:26 +0000
+
+    ADD: provide number of repos to pages 
+
+  Change: b0827a4a80ff0689b8a695c550372ddab2ea3375
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-29 21:44:44 +0000
+
+    FIX: correctly escaped string 
+
+----------------------------------------
+version 0.1 at 2018-06-29 15:58:33 +0000
+----------------------------------------
+
+  Change: 0f484473ee156c369471d772f6da639ee5ff0138
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-29 17:58:33 +0000
+
+    FIX: fixed license 
+
+  Change: a8e169c1b397c2876c7784ee40bb5184e35b8ced
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-29 17:55:42 +0000
+
+    ADD: prepared dist.ini for release 
+
+  Change: aaa00d2ca6fe684ff54ec29b9f68f4f7b1c461a2
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-28 23:41:50 +0000
+
+    ADD: syntax highlighting by Text::VimColor 
+
+  Change: e63f53e59269406207663dec0e8fd207d2a6735b
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-28 22:17:11 +0000
+
+    ADD: return latest commit of directory 
+
+  Change: 9c3e027023ba682f27ec7fc470fa1fabe90a3bd3
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-28 21:46:16 +0000
+
+    FIX: return log date in epoch 
+
+  Change: 4a01ae24a79b5278e64736860de5b01c3956f3dd
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-28 21:15:30 +0000
+
+    ADD: append last commit log to file tree 
+
+  Change: 73878e5922c097ce79be94936f1e00ceb2c221b7
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-27 23:41:29 +0000
+
+    ADD: provide base http/ssh urls to repository page 
+
+  Change: 6affd8b5b8dc912b54daf9a08c6dc31e4ceb5472
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-27 21:24:19 +0000
+
+    FIX: fixed git repository identification 
+
+  Change: 4123d26c3c219272279cdec9cd67a0aaf6b18b94
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-27 19:45:04 +0000
+
+    ADD: added sqlite schema migration 
+
+  Change: 242e2b9009ab483d55befdc94bff1814b538d340
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-27 19:44:47 +0000
+
+    ADD: added auto prereq management 
+
+  Change: d35df369b7c60f168e019ac9d34f7f915e226976
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-27 19:43:58 +0000
+
+    ADD: added sqlite caching for repository listing 
+
+  Change: 9e403a635f39743942a52beece37a5a968124bb4
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-26 22:43:49 +0000
+
+    ADD: improved code quality 
+
+  Change: b8f5e282913fbd86b1de81bce0e70c38642d4d53
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-26 22:12:06 +0000
+
+    ADD: improved logging 
+
+  Change: 1cc202d9c011274eaaa6f831341f0ab74472f84f
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-26 21:26:49 +0000
+
+    ADD: only generate files if repo is newer than existing files 
+
+  Change: b77658afb7ce801e57eba747ba5908f87bd05515
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-26 20:36:22 +0000
+
+    ADD: added json file providing file extension identification 
+
+  Change: 17462925142fef28e08f8470ea5e97082162946b
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-26 20:35:56 +0000
+
+    ADD: basic repository generation 
+
+  Change: cda07d5af88aaa40efff6064efcde04b5df755e0
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-26 20:35:14 +0000
+
+    ADD: renamed distribution + added shared dir 
+
+  Change: bb7ba4e266bc55dcde89863d7b032b08c30b81b1
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-25 15:51:50 +0000
+
+    ADD: ignore some files 
+
+  Change: 3c34dd9511ebede8a8782a1534ec525dff166ffb
+  Author: Dominik Meyer <dmeyer@hsu-hh.de>
+  Date : 2018-06-25 15:47:45 +0000
+
+    ADD: switched to GitPage modus 
+
+  Change: 67a3b91920726b6de908738d3eaddf8c01278c53
+  Author: Dominik Meyer <dmeyer@hsu-hh.de>
+  Date : 2018-06-25 15:47:23 +0000
+
+    REM: removed bugtrack information for the moment 
+
+  Change: 942cb53e97615880b02fc8b5e7e560e56e0dd1d5
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-25 10:33:40 +0000
+
+    ADD: base structure for page generation 
+
+  Change: 72980233c426ca1635dcd74b2e131c91684deb2a
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2018-06-22 21:02:24 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

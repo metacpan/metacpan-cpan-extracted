@@ -5,6 +5,7 @@ META.json
 README.md
 cpanfile
 lib/App/optex.pm
+lib/App/optex/Tmpfile.pm
 lib/App/optex/debug.pm
 lib/App/optex/help.pm
 lib/App/optex/util.pm

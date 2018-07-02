@@ -1,9 +1,6 @@
 use strict;
 package Parse::CSV;
-{
-  $Parse::CSV::VERSION = '2.04';
-}
-
+$Parse::CSV::VERSION = '2.05';
 =pod
 
 =head1 NAME
@@ -12,7 +9,7 @@ Parse::CSV - Highly flexible CSV parser for large files
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 
@@ -20,7 +17,7 @@ version 2.04
   my $simple = Parse::CSV->new(
       file => 'file.csv',
   );
-  
+
   while ( my $array_ref = $simple->fetch ) {
      # Do something...
   }
@@ -36,10 +33,10 @@ version 2.04
       names      => 1,
       filter     => sub { My::Object->new( $_ ) },
   );
-  
+
   while ( my $object = $objects->fetch ) {
       $object->do_something;
-  } 
+  }
 
 =head1 DESCRIPTION
 
@@ -68,7 +65,7 @@ B<Array Mode> - Parsing can be done in simple array mode, returning
 a reference to an array if the columns are not named.
 
 B<Hash Mode> - Parsing can be done in hash mode, putting the data into
-a hash and return a reference to it.
+a hash and returning a reference to it.
 
 B<Filter Capability> - All items returned can be passed through a
 custom filter. This filter can either modify the data on the fly,
@@ -76,20 +73,21 @@ or drop records you don't need.
 
 =head2 Writing Filters
 
-A L<Parse::CSV> filter is a subroutine reference that is passed the raw
-record as C<$_>, and should C<return> the alternative or modified record.
+A L<Parse::CSV> filter is a subroutine reference that is passed the
+original record as C<$_> (not as a function argument), and should
+C<return> the alternative or modified record.
 
-The null filter (does not modify or drop any records) looks like the
+A no-op filter (does not modify or drop any records) would look like the
 following.
 
-  sub { $_ };
+  sub { $_ }
 
-A filter which reversed the order of the columns (assuming the parser
+A filter that reversed the order of the columns (assuming the parser
 is in array mode) might look like the following.
 
-  sub { return [ reverse @$_ ] };
+  sub { [ reverse @$_ ] }
 
-To drop the record, you should return C<undef> from the filter. The
+To drop the record, return C<undef> from the filter. The
 parser will then keep pulling and parsing new records until one
 passes the filter.
 
@@ -102,6 +100,9 @@ To signal an error, throw an exception
       $_->{foo} =~ /bar/ or die "Assumption failed";
       return $_;
   }
+
+Feel free to modify C<$_> as a side-effect of your filter routine -
+this will have no effect on anything.
 
 =head1 METHODS
 
@@ -180,8 +181,8 @@ array references of the columns.
 The optional C<filter> param will be used to filter the records if
 provided. It should be a C<CODE> reference or any otherwise callable
 scalar, and each value parsed (either array reference or hash reference)
-will be passed to the filter to be changed or converted into an object,
-or whatever you wish.
+will be available to the filter as C<$_> to be changed or converted into an object,
+or whatever you wish.  See the L<Writing Filters> section for more details.
 
 =back
 
@@ -243,7 +244,7 @@ sub new {
 	# Handle automatic field names
 	if ( Params::Util::_STRING($self->{names}) and $self->{names} ) {
 		# Grab the first line
-		$self->{names} = $self->_getline;
+		$self->{names} = $self->getline;
 	}
 
 	# Check names
@@ -280,7 +281,7 @@ Returning C<undef> means either some part of the parsing and filtering
 process has resulted in an error, B<or> that the end of file has been
 reached.
 
-On receiving C<undef>, you should the C<errstr> method. If it is a null
+On receiving C<undef>, you should check the C<errstr> method. If it is an empty
 string you have reached the end of file. Otherwise the error message will
 be returned. Thus, the basic usage of L<Parse::CSV> will look like the
 following.
@@ -312,7 +313,7 @@ sub fetch {
 
 	# The filter can skip rows,
 	# iterate till we get something.
-	while ( my $row = $self->_getline ) {
+	while ( my $row = $self->getline ) {
 		# Turn the array ref into a hash if needed
 		my $rv;
 		if ( $self->{names} ) {
@@ -344,11 +345,35 @@ sub fetch {
 	return undef;
 }
 
-sub _getline {
+=head2 getline
+
+Returns the next line of the input as an array reference, without
+performing possible conversion to a hash, and without running any
+filters.  This is the routine that C<fetch()> uses internally to read
+its input.  It may be useful if you sometimes want to do filtering and
+sometimes don't, or sometimes want to do hash conversion and sometimes
+don't, or maybe you don't need either of those things and you just
+want to shave all the milliseconds off that you can (but then you
+might be better off just using C<Text::CSV> directly).
+
+=cut
+
+sub getline {
 	my $self = shift;
 	$self->{errstr} = '';
 
 	my $row = $self->{csv_xs}->getline( $self->{handle} );
+
+	if (!$row && 0+$self->{csv_xs}->error_diag) {
+		my $err = "".$self->{csv_xs}->error_diag;
+		# We need to propagate errors from Text::CSV_XS, but
+		# eof is also reported as an error. So we are going to
+		# filter out it as a special case.
+		if (!eof $self->{handle} || $err !~ /^EOF/) {
+			$self->{errstr} = $err;
+		}
+	}
+
 	$self->{row}++ if defined $row;
 	$self->{savedrow} = $row;
 	return $row;
@@ -456,7 +481,7 @@ sub fields {
 
   # Get the current column names in use
   my @names = $csv->names;
-  
+
   # Change the column names on the fly mid stream
   $csv->names( 'fn1', 'fn2' );
 

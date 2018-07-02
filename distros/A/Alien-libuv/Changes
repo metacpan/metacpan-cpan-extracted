@@ -1,5 +1,9 @@
 Revision history for Alien-libuv
 
+1.003     2018-06-19
+  - Update library inclusions for building with MinGW on Windows.
+  - Add a contributing document.
+
 1.002     2018-06-06
   - Update to the libuv v1.20.3 release
 

@@ -1,0 +1,38 @@
+{
+   "120° Compliments": {
+      "accentColor": "deep-purple",
+      "baseColor": "green"
+   },
+   "America's Captain": {
+      "accentColor": "blue",
+      "baseColor": "red"
+   },
+   "Bubble Gum": {
+      "accentColor": "light-blue",
+      "baseColor": "pink"
+   },
+   "Creamsicle": {
+      "accentColor": "grey",
+      "baseColor": "deep-orange"
+   },
+   "Daylight & Tungsten": {
+      "accentColor": "orange",
+      "baseColor": "light-blue"
+   },
+   "Dry Shores": {
+      "accentColor": "grey",
+      "baseColor": "blue-grey"
+   },
+   "Mocha Pop": {
+      "accentColor": "blue-grey",
+      "baseColor": "brown"
+   },
+   "Roboto House": {
+      "accentColor": "blue-grey",
+      "baseColor": "grey"
+   },
+   "Royal Appeal": {
+      "accentColor": "indigo",
+      "baseColor": "deep-purple"
+   }
+}

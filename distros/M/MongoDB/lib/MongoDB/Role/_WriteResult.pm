@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::Role::_WriteResult;
 # MongoDB interface for common write result attributes and methods
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo::Role;
 
@@ -122,6 +120,17 @@ sub last_wtimeout {
     # if we have actual write errors, we don't want to report a
     # write concern error
     return !!( $self->count_write_concern_errors && !$self->count_write_errors );
+}
+
+sub last_error_labels {
+    my ( $self ) = @_;
+    if ( $self->count_write_errors ) {
+        return $self->write_errors->[-1]{errorLabels} || [];
+    }
+    elsif ( $self->count_write_concern_errors ) {
+        return $self->write_errors->[-1]{errorLabels} || [];
+    }
+    return [];
 }
 
 1;

@@ -1,0 +1,187 @@
+{
+   "name" : "perl",
+   "releases" : [
+      {
+         "distvname" : "perl-5.28.0-RC2",
+         "version" : "5.28.0-RC2",
+         "archive" : "perl-5.28.0-RC2.tar.gz",
+         "authorized" : false,
+         "released" : "2018-06-06T12:34:00Z",
+         "dist" : "perl",
+         "cpanid" : "XSAWYERX",
+         "status" : "testing"
+      },
+      {
+         "authorized" : false,
+         "released" : "2018-05-21T13:12:00Z",
+         "cpanid" : "XSAWYERX",
+         "dist" : "perl",
+         "status" : "testing",
+         "version" : "5.28.0-RC1",
+         "archive" : "perl-5.28.0-RC1.tar.gz",
+         "distvname" : "perl-5.28.0-RC1"
+      },
+      {
+         "distvname" : "perl-5.27.11",
+         "version" : "5.27.11",
+         "archive" : "perl-5.27.11.tar.gz",
+         "authorized" : false,
+         "released" : "2018-04-20T15:10:52Z",
+         "dist" : "perl",
+         "status" : "testing",
+         "cpanid" : "XSAWYERX"
+      },
+      {
+         "version" : "5.26.2",
+         "archive" : "perl-5.26.2.tar.gz",
+         "distvname" : "perl-5.26.2",
+         "latest" : true,
+         "dist" : "perl",
+         "status" : "stable",
+         "cpanid" : "SHAY",
+         "authorized" : true,
+         "released" : "2018-04-14T11:27:18Z"
+      },
+      {
+         "distvname" : "perl-5.26.2-RC1",
+         "archive" : "perl-5.26.2-RC1.tar.gz",
+         "version" : "5.26.2-RC1",
+         "authorized" : true,
+         "released" : "2018-03-24T19:37:40Z",
+         "status" : "testing",
+         "dist" : "perl",
+         "cpanid" : "SHAY"
+      },
+      {
+         "version" : "5.27.10",
+         "archive" : "perl-5.27.10.tar.gz",
+         "distvname" : "perl-5.27.10",
+         "released" : "2018-03-20T21:08:53Z",
+         "authorized" : false,
+         "cpanid" : "TODDR",
+         "status" : "testing",
+         "dist" : "perl"
+      },
+      {
+         "authorized" : false,
+         "released" : "2018-02-20T20:46:45Z",
+         "dist" : "perl",
+         "status" : "testing",
+         "cpanid" : "RENEEB",
+         "distvname" : "perl-5.27.9",
+         "version" : "5.27.9",
+         "archive" : "perl-5.27.9.tar.gz"
+      },
+      {
+         "distvname" : "perl-5.27.8",
+         "version" : "5.27.8",
+         "archive" : "perl-5.27.8.tar.gz",
+         "status" : "testing",
+         "dist" : "perl",
+         "cpanid" : "ABIGAIL",
+         "released" : "2018-01-20T03:17:50Z",
+         "authorized" : true
+      },
+      {
+         "version" : "5.27.7",
+         "archive" : "perl-5.27.7.tar.gz",
+         "distvname" : "perl-5.27.7",
+         "dist" : "perl",
+         "status" : "testing",
+         "cpanid" : "BINGOS",
+         "released" : "2017-12-20T22:58:25Z",
+         "authorized" : true
+      },
+      {
+         "version" : "5.27.6",
+         "archive" : "perl-5.27.6.tar.gz",
+         "distvname" : "perl-5.27.6",
+         "cpanid" : "ETHER",
+         "status" : "testing",
+         "dist" : "perl",
+         "authorized" : false,
+         "released" : "2017-11-20T22:39:31Z"
+      },
+      {
+         "archive" : "perl-5.27.5.tar.gz",
+         "version" : "5.27.5",
+         "distvname" : "perl-5.27.5",
+         "authorized" : true,
+         "released" : "2017-10-20T22:08:15Z",
+         "status" : "testing",
+         "dist" : "perl",
+         "cpanid" : "SHAY"
+      },
+      {
+         "authorized" : true,
+         "released" : "2017-09-22T21:30:56Z",
+         "status" : "stable",
+         "dist" : "perl",
+         "cpanid" : "SHAY",
+         "version" : "5.26.1",
+         "archive" : "perl-5.26.1.tar.gz",
+         "distvname" : "perl-5.26.1"
+      },
+      {
+         "distvname" : "perl-5.27.4",
+         "version" : "5.27.4",
+         "archive" : "perl-5.27.4.tar.gz",
+         "dist" : "perl",
+         "status" : "testing",
+         "cpanid" : "GENEHACK",
+         "released" : "2017-09-20T21:44:42Z",
+         "authorized" : false
+      },
+      {
+         "version" : "5.26.1-RC1",
+         "archive" : "perl-5.26.1-RC1.tar.gz",
+         "distvname" : "perl-5.26.1-RC1",
+         "status" : "testing",
+         "cpanid" : "SHAY",
+         "dist" : "perl",
+         "authorized" : true,
+         "released" : "2017-09-10T15:39:09Z"
+      },
+      {
+         "version" : "5.27.3",
+         "archive" : "perl-5.27.3.tar.gz",
+         "distvname" : "perl-5.27.3",
+         "cpanid" : "WOLFSAGE",
+         "dist" : "perl",
+         "status" : "testing",
+         "released" : "2017-08-21T20:48:19Z",
+         "authorized" : true
+      },
+      {
+         "cpanid" : "ARC",
+         "status" : "testing",
+         "dist" : "perl",
+         "released" : "2017-07-20T19:29:06Z",
+         "authorized" : true,
+         "distvname" : "perl-5.27.2",
+         "version" : "5.27.2",
+         "archive" : "perl-5.27.2.tar.gz"
+      },
+      {
+         "authorized" : false,
+         "released" : "2017-06-20T06:41:46Z",
+         "status" : "testing",
+         "cpanid" : "EHERMAN",
+         "dist" : "perl",
+         "distvname" : "perl-5.27.1",
+         "archive" : "perl-5.27.1.tar.gz",
+         "version" : "5.27.1"
+      },
+      {
+         "status" : "stable",
+         "dist" : "perl",
+         "cpanid" : "XSAWYERX",
+         "authorized" : false,
+         "released" : "2017-05-30T19:42:51Z",
+         "distvname" : "perl-5.26.0",
+         "version" : "5.26.0",
+         "archive" : "perl-5.26.0.tar.bz2"
+      }
+   ],
+   "latest" : "perl-5.26.2"
+}

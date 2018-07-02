@@ -3,54 +3,31 @@
 use lib 'lib';
 
 use ExtUtils::testlib;
-use Test::More tests => 5;
+use Test::More;
 use Config::Model ;
-use Log::Log4perl qw(:easy) ;
-use File::Path ;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 
 use warnings;
-
 use strict;
 
-my $arg = shift || '';
-
-my ($log,$show) = (0) x 2 ;
-
-my $trace = $arg =~ /t/ ? 1 : 0 ;
-$log                = 1 if $arg =~ /l/;
-$show               = 1 if $arg =~ /s/;
-
-Log::Log4perl->easy_init($log ? $TRACE: $WARN);
-
-my $model = Config::Model -> new ( ) ;
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-ok(1,"compiled");
+my ($model, $trace) = init_test();
 
 # pseudo root where config files are written by config-model
-my $wr_root = 'wr_root';
-
-my $testdir = 'approx_test' ;
-
-# cleanup before tests
-rmtree($wr_root);
+my $wr_root = setup_test_dir;
 
 my @orig = <DATA> ;
 
-my $wr_dir = $wr_root.'/'.$testdir ;
-mkpath($wr_dir.'/etc/approx', { mode => 0755 }) 
-  || die "can't mkpath: $!";
-open(CONF,"> $wr_dir/etc/approx/approx.conf")
-  || die "can't open file: $!";
-print CONF @orig ;
-close CONF ;
+my $approx_dir = $wr_root->child('/etc/approx/');
+$approx_dir->mkpath;
+my $approx_conf = $approx_dir->child('approx.conf');
+$approx_conf->spew(@orig);
 
-my $inst = $model->instance (root_class_name   => 'Approx',
-			     instance_name     => 'approx_instance',
-			     root_dir          => $wr_dir,
-			    );
-my $approx_conf = "$wr_dir/etc/approx/approx.conf";
+my $inst = $model->instance (
+    root_class_name   => 'Approx',
+    instance_name     => 'approx_instance',
+    root_dir          => $wr_root,
+);
+
 ok($inst,"Read $approx_conf and created instance") ;
 
 my $cfg = $inst -> config_root ;
@@ -71,12 +48,12 @@ $cfg->load("max_rate=200K") ;
 
 $inst->write_back ;
 
-open(APPROX,$approx_conf) || die "Can't open $approx_conf:$!" ;
-my $approxlines = join('',<APPROX>) ;
-close APPROX;
+my $approxlines = $approx_conf->slurp;
 
 like($approxlines,qr/200K/,"checked written approx file") ;
 like($approxlines,qr/\$verbose/,"new approx file contains new style param") ;
+
+done_testing;
 
 __END__
 

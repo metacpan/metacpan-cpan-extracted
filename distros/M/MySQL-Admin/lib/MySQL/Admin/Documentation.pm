@@ -1,48 +1,41 @@
 package MySQL::Admin::Documentation;
-
 use 5.018002;
 use strict;
 use warnings;
 use Pod::Usage;
-
 require Exporter;
 use AutoLoader qw(AUTOLOAD);
+our @ISA     = qw(Exporter);
+our @EXPORT  = qw(help readPod);
+our $VERSION = '1.15';
 
-our @ISA = qw(Exporter);
+sub help {
+    pod2usage(1);
+} ## end sub help
 
-our @EXPORT = qw(help readPod);
-
-our $VERSION = '1.14';
-
-sub help{
-  pod2usage(1) ;
-
-}
-
-sub readPod{
-    my $pod     =  '%htdocs%/javascript/cms.js';
-    open(READ, "<$pod") or warn "$! $/";
-    my $sJs = '';
+sub readPod {
+    my $pod = '%htdocs%/javascript/cms.js';
+    open( READ, "<$pod" ) or warn "$! $/";
+    my $sJs    = '';
     my $bPrint = 0;
     while (<READ>) {
         $bPrint = 1 if $_ =~ /^=/;
         $bPrint = 0 if $_ =~ /=cut/g;
         $sJs .= $_ if $bPrint;
-
-    }
-    open(EDIT, '+<%docu%') or warn "$! $/";
+    } ## end while (<READ>)
+    open( EDIT, '+<%docu%' ) or warn "$! $/";
     my $sPerl = '';
     while (<EDIT>) {
-        $sPerl  .= $_ ;
-	last if $_ =~ /^__END__$/;
-    }
-    seek(EDIT, 0, 0);
-    print EDIT $sPerl.$sJs."$/=cut$/";
-    truncate(EDIT, tell(EDIT));
+        $sPerl .= $_;
+        last if $_ =~ /^__END__$/;
+    } ## end while (<EDIT>)
+    seek( EDIT, 0, 0 );
+    print EDIT $sPerl . $sJs . "$/=cut$/";
+    truncate( EDIT, tell(EDIT) );
     close(EDIT);
-}
-#readPod();
+} ## end sub readPod
 
+#readPod();
 1;
 __END__
 =head2 NAME
@@ -214,8 +207,6 @@ index.html
 
 </pre>
 
-I write a whole Documentation soon.No feedback so I'm not in rush.
-
 Look at http://lindnerei.sourceforge.net or http://lindnerei.de for further Details.
  
 =head2 loadPage(inXml, inXsl, outId, tabId, title)
@@ -356,7 +347,7 @@ use MySQL::Admin for translations.
 =head2 Autocomplete(evt)
 
 
-oAutocomplete = $("txt");
+oAutocomplete = $("#txt");
 
 autocomplete.push("foo");
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Writer;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 sub output { return $_[0]->{output} }
 sub set_output { $_[0]->{output} = $_[1] }
@@ -19,6 +19,11 @@ sub new {
 sub write {
     my ($self, $line) = @_;
     $self->{output} .= $line;
+}
+
+sub finish {
+    my ($self) = @_;
+    $self->{output} = undef;
 }
 
 package YAML::PP::Writer::File;
@@ -40,6 +45,11 @@ sub write {
     my ($self, $line) = @_;
     my $fh = $self->{filehandle} ||= $self->open_handle;
     print $fh $line;
+}
+
+sub finish {
+    my ($self) = @_;
+    close $self->{filehandle};
 }
 
 1;

@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application with fuse
 
 package App::Cme::Command::fusefs ;
-$App::Cme::Command::fusefs::VERSION = '1.027';
+$App::Cme::Command::fusefs::VERSION = '1.028';
 use strict;
 use warnings;
 use 5.10.1;
@@ -46,7 +46,6 @@ sub opt_spec {
         ],
         [ "dfuse!"     => "debug fuse problems" ],
         [ "dir-char=s" => "string to replace '/' in configuration parameter names"],
-        [ "quiet!"     => "Suppress progress messages" ],
         [ "backup:s"  => "Create a backup of configuration files before saving." ],
         $class->cme_global_options,
     );
@@ -110,7 +109,7 @@ App::Cme::Command::fusefs - Edit the configuration of an application with fuse
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 
@@ -128,10 +127,6 @@ See L<cme/"Global Options">.
 =head1 options
 
 =over
-
-=item -quiet
-
-Suppress progress messages.
 
 =item -fuse-dir
 

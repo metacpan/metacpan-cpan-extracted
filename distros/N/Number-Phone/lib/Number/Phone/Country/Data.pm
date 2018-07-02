@@ -2,7 +2,7 @@
     # automatically generated file, don't edit
 
     package Number::Phone::Country::Data;
-    $VERSION = '2.20180410221541';
+    $VERSION = '2.20180619214150';
         %Number::Phone::Country::idd_codes = (
     20 => 'EG',
 211 => 'SS',
@@ -425,7 +425,7 @@
 'TC' => ['1', '011', '1'],
 'TD' => ['235', '00', undef],
 'TG' => ['228', '00', undef],
-'TH' => ['66', '00', '0'],
+'TH' => ['66', '001', '0'],
 'TJ' => ['992', '810', '8'],
 'TK' => ['690', '00', undef],
 'TL' => ['670', '00', undef],
@@ -502,6 +502,14 @@ $Number::Phone::Country::idd_codes{67214} = 'AQ';
 $Number::Phone::Country::idd_codes{6723} = 'NF';
 $Number::Phone::Country::idd_codes{76} = 'KZ';
 $Number::Phone::Country::idd_codes{77} = 'KZ';
+$Number::Phone::Country::idd_codes{37744} = 'XK';
+$Number::Phone::Country::idd_codes{37745} = 'XK';
+$Number::Phone::Country::idd_codes{38128} = 'XK';
+$Number::Phone::Country::idd_codes{38129} = 'XK';
+$Number::Phone::Country::idd_codes{38138} = 'XK';
+$Number::Phone::Country::idd_codes{38139} = 'XK';
+$Number::Phone::Country::idd_codes{38643} = 'XK';
+$Number::Phone::Country::idd_codes{38649} = 'XK';
 $Number::Phone::Country::idd_codes{800} = 'InternationalFreephone';
 $Number::Phone::Country::idd_codes{808} = 'SharedCostServices';
 $Number::Phone::Country::idd_codes{870} = 'Inmarsat';

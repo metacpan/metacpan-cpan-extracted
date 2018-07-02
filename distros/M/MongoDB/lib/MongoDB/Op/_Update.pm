@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::Op::_Update;
 # Encapsulate an update operation; returns a MongoDB::UpdateResult
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -33,6 +31,7 @@ use MongoDB::_Types qw(
 );
 use Types::Standard qw(
     Maybe
+    ArrayRef
 );
 use Tie::IxHash;
 use boolean;
@@ -71,6 +70,11 @@ has collation => (
     isa      => Maybe( [Document] ),
 );
 
+has arrayFilters => (
+  is => 'ro',
+  isa => Maybe( [ArrayRef[Document]] ),
+);
+
 with $_ for qw(
   MongoDB::Role::_PrivateConstructor
   MongoDB::Role::_CollectionOp
@@ -94,70 +98,85 @@ sub execute {
           if !$self->write_concern->is_acknowledged;
     }
 
+    if ( defined $self->arrayFilters ) {
+        MongoDB::UsageError->throw(
+            "MongoDB host '" . $link->address . "' doesn't support arrayFilters" )
+          if !$link->supports_arrayFilters;
+        MongoDB::UsageError->throw(
+            "Unacknowledged updates that specify arrayFilters are not allowed")
+          if !$self->write_concern->is_acknowledged;
+    }
+
     my $orig_op = {
         q => (
             ref( $self->filter ) eq 'ARRAY'
             ? { @{ $self->filter } }
             : $self->filter
         ),
-        u      => $self->update,
-        multi  => $self->multi ? $true : $false,
+        u => $self->_pre_encode_update( $link->max_bson_object_size,
+            $self->update, $self->is_replace ),
+        multi  => $self->multi  ? $true : $false,
         upsert => $self->upsert ? $true : $false,
-        ( defined $self->collation ? ( collation => $self->collation ) : () ),
+        ( defined $self->collation    ? ( collation    => $self->collation )    : () ),
+        ( defined $self->arrayFilters ? ( arrayFilters => $self->arrayFilters ) : () ),
     };
 
-    return ! $self->write_concern->is_acknowledged
-      ? (
-        $self->_send_legacy_op_noreply(
-            $link,
-            MongoDB::_Protocol::write_update(
-                $self->full_name,
-                $self->bson_codec->encode_one( $orig_op->{q}, { invalid_chars => '' } ),
-                $self->_pre_encode_update( $link, $orig_op->{u}, $self->is_replace )->{bson},
-                {
-                    upsert => $orig_op->{upsert},
-                    multi  => $orig_op->{multi},
-                },
-            ),
-            $orig_op,
-            "MongoDB::UpdateResult"
-        )
-      )
-      : $link->does_write_commands
-      ? (
-        $self->_send_write_command(
-            $self->_maybe_bypass(
-                $link,
-                [
-                    update  => $self->coll_name,
-                    updates => [
-                        {
-                            %$orig_op, u => $self->_pre_encode_update( $link, $orig_op->{u}, $self->is_replace ),
-                        }
-                    ],
-                    @{ $self->write_concern->as_args },
+    return $self->_send_legacy_op_noreply(
+        $link,
+        MongoDB::_Protocol::write_update(
+            $self->full_name,
+            $self->bson_codec->encode_one( $orig_op->{q}, { invalid_chars => '' } ),
+            $self->_pre_encode_update( $link->max_bson_object_size,
+                $orig_op->{u}, $self->is_replace )->{bson},
+            {
+                upsert => $orig_op->{upsert},
+                multi  => $orig_op->{multi},
+            },
+        ),
+        $orig_op,
+        "MongoDB::UpdateResult",
+        "update",
+    ) if !$self->write_concern->is_acknowledged;
+
+    return $self->_send_write_command(
+        $link,
+        $self->_maybe_bypass(
+            $link->supports_document_validation,
+            [
+                update  => $self->coll_name,
+                updates => [
+                    {
+                        %$orig_op,
+                        u => $self->_pre_encode_update(
+                            $link->max_bson_object_size,
+                            $orig_op->{u}, $self->is_replace
+                        ),
+                    }
                 ],
-            ),
-            $orig_op,
-            "MongoDB::UpdateResult"
-        )->assert
-      )
-      : (
-        $self->_send_legacy_op_with_gle(
-            $link,
-            MongoDB::_Protocol::write_update(
-                $self->full_name,
-                $self->bson_codec->encode_one( $orig_op->{q}, { invalid_chars => '' } ),
-                $self->_pre_encode_update( $link, $orig_op->{u}, $self->is_replace )->{bson},
-                {
-                    upsert => $orig_op->{upsert},
-                    multi  => $orig_op->{multi},
-                },
-            ),
-            $orig_op,
-            "MongoDB::UpdateResult"
-        )->assert
-      );
+                @{ $self->write_concern->as_args },
+            ],
+        ),
+        $orig_op,
+        "MongoDB::UpdateResult"
+      )->assert
+      if $link->supports_write_commands;
+
+    return $self->_send_legacy_op_with_gle(
+        $link,
+        MongoDB::_Protocol::write_update(
+            $self->full_name,
+            $self->bson_codec->encode_one( $orig_op->{q}, { invalid_chars => '' } ),
+            $self->_pre_encode_update( $link->max_bson_object_size,
+                $orig_op->{u}, $self->is_replace )->{bson},
+            {
+                upsert => $orig_op->{upsert},
+                multi  => $orig_op->{multi},
+            },
+        ),
+        $orig_op,
+        "MongoDB::UpdateResult",
+        "update",
+    )->assert;
 }
 
 sub _parse_cmd {
@@ -184,8 +203,8 @@ sub _parse_gle {
         && !$res->{updatedExisting}
         && $res->{n} == 1 )
     {
-        $upserted = _find_id( $orig_doc->{u} );
-        $upserted = _find_id( $orig_doc->{q} ) unless defined $upserted;
+        $upserted = $self->_find_id( $orig_doc->{u} );
+        $upserted = $self->_find_id( $orig_doc->{q} ) unless defined $upserted;
     }
 
     return (
@@ -196,7 +215,10 @@ sub _parse_gle {
 }
 
 sub _find_id {
-    my ($doc) = @_;
+    my ($self, $doc) = @_;
+    if (ref($doc) eq "BSON::Raw") {
+       $doc = $self->bson_codec->decode_one($doc);
+    }
     my $type = ref($doc);
     return (
           $type eq 'HASH' ? $doc->{_id}

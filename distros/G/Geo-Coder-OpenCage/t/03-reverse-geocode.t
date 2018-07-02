@@ -19,7 +19,7 @@ else {
     plan skip_all => "Set GEO_CODER_OPENCAGE_API_KEY environment variable to run this test";
 }
 
-my $Geocoder = Geo::Coder::OpenCage->new(
+my $geocoder = Geo::Coder::OpenCage->new(
     api_key => $api_key,
 );
 
@@ -57,7 +57,7 @@ for my $test (@tests) {
     my $location = join(", ", $test->{input}{lat}, $test->{input}{lng});
     ok $location, "Trying to geocode '$location'";
 
-    my $result = $Geocoder->reverse_geocode(%{ $test->{input} });
+    my $result = $geocoder->reverse_geocode(%{ $test->{input} });
 
     ok $result, '... got a sane response';
 
@@ -84,7 +84,7 @@ for my $test (@tests) {
 
     my $result;
     warning_like
-        { $result = $Geocoder->reverse_geocode('lat'=>1000,'lng'=>1000); }
+        { $result = $geocoder->reverse_geocode('lat'=>1000,'lng'=>1000); }
         [ qr/400, invalid coordinates/ ],
         " got invalid coordinates warning ";
 

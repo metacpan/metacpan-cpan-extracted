@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 0.98
+version 0.99
 
 # SYNOPSIS
 
@@ -87,6 +87,7 @@ This is more or less equivalent to the following `dist.ini`:
 
     [CopyFilesFromBuild]
     copy = Build.PL
+    copy = CODE_OF_CONDUCT.md
     copy = CONTRIBUTING.md
     copy = LICENSE
     copy = Makefile.PL
@@ -222,6 +223,10 @@ This is more or less equivalent to the following `dist.ini`:
     ; This is determined by looking through the distro for .xs files.
     has_xs    = ...
 
+    [GenerateFile::FromShareDir / Generate CODE_OF_CONDUCT.md]
+    -dist     = Dist-Zilla-PluginBundle-DROLSKY
+    -filename = CODE_OF_CONDUCT.md
+
     [InstallGuide]
     [CPANFile]
 
@@ -249,6 +254,7 @@ This is more or less equivalent to the following `dist.ini`:
     ; The allow_dirty list is basically all of the generated or munged files
     ; in the distro, including:
     ;     Build.PL
+    ;     CODE_OF_CONDUCT.md
     ;     CONTRIBUTING.md
     ;     Changes
     ;     LICENSE

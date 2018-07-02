@@ -16,8 +16,8 @@ name: CLI-Table-Util
 provides:
   CLI::Table::Util:
     file: lib/CLI/Table/Util.pm
-    version: '0.05'
+    version: '0.06'
 resources:
   license: http://www.gnu.org/licenses/gpl-3.0.txt
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

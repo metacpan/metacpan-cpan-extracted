@@ -1,3 +1,7 @@
+2.30  19/06/2018
+- skip white_space test on MSWin32 as Windows will report that both
+  files exist, which is obviously a 'feature'
+
 2.28  08/06/2018 (madroach, ARC, OCBNET, ppisar)
 - fix creating file with trailing whitespace on filename - fixes 103279
 - allow archiving with absolute pathnames - fixes 97748

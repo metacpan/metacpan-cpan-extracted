@@ -4,14 +4,14 @@ use warnings;
 
 # PODNAME: dest
 # ABSTRACT: Deployment State Manager
-our $VERSION = '1.17'; # VERSION
+our $VERSION = '1.18'; # VERSION
 
 use Pod::Usage 'pod2usage';
 use App::Dest;
 
 my @commands = qw(
     init add rm watches putwatch writewatch
-    make list status diff clean preinstall
+    make expand list status diff clean preinstall
     deploy redeploy revdeploy verify revert update
     man version
 );
@@ -53,7 +53,7 @@ dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.17
+version 1.18
 
 =head1 AUTHOR
 
@@ -61,7 +61,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

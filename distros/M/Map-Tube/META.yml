@@ -6,7 +6,7 @@ build_requires:
   Test::More: '1.001014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  File::ShareDir::Install: '0'
+  File::ShareDir::Install: '0.13'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
@@ -21,31 +21,31 @@ no_index:
 provides:
   Map::Tube:
     file: lib/Map/Tube.pm
-    version: '3.51'
+    version: '3.53'
   Map::Tube::Line:
     file: lib/Map/Tube/Line.pm
-    version: '3.51'
+    version: '3.53'
   Map::Tube::Node:
     file: lib/Map/Tube/Node.pm
-    version: '3.51'
+    version: '3.53'
   Map::Tube::Pluggable:
     file: lib/Map/Tube/Pluggable.pm
-    version: '3.51'
+    version: '3.53'
   Map::Tube::Route:
     file: lib/Map/Tube/Route.pm
-    version: '3.51'
+    version: '3.53'
   Map::Tube::Table:
     file: lib/Map/Tube/Table.pm
-    version: '3.51'
+    version: '3.53'
   Map::Tube::Types:
     file: lib/Map/Tube/Types.pm
-    version: '3.51'
+    version: '3.53'
   Map::Tube::Utils:
     file: lib/Map/Tube/Utils.pm
-    version: '3.51'
+    version: '3.53'
 requires:
   File::Basename: '2.6'
-  File::Share: '0.25'
+  File::ShareDir: '1.114'
   JSON: '2.90'
   Map::Tube::Exception: '3.16'
   Module::Pluggable: '5.1'
@@ -63,5 +63,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Map-Tube.git
-version: '3.51'
+version: '3.53'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

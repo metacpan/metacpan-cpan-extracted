@@ -16,8 +16,8 @@ name: CLI-Numbers-Hack
 provides:
   CLI::Numbers::Hack:
     file: lib/CLI/Numbers/Hack.pm
-    version: '0.21'
+    version: '0.22'
 resources:
   license: http://www.gnu.org/licenses/gpl-3.0.txt
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -24,9 +24,10 @@ sub _make_request {
         );
     }
     else {
-        return WebService::Braintree::Result->new(
+        return WebService::Braintree::Result->new({
             response => $response,
-        );
+            %$response,
+        });
     }
 }
 

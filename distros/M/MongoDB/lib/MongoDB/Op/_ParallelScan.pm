@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::Op::_ParallelScan;
 # Encapsulate code path for parallelCollectionScan commands
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -32,6 +30,8 @@ use Types::Standard qw(
     HashRef
     Int
 );
+
+use BSON::Types qw/bson_int64/;
 
 use namespace::clean;
 
@@ -58,18 +58,19 @@ sub execute {
 
     my $command = [
         parallelCollectionScan => $self->coll_name,
-        numCursors             => $self->num_cursors,
-        ($link->accepts_wire_version(4) ?
-            @{ $self->read_concern->as_args } : () ),
+        numCursors             => bson_int64($self->num_cursors),
+        ($link->supports_read_concern ?
+            @{ $self->read_concern->as_args() } : () ),
         %{$self->options},
     ];
 
     my $op = MongoDB::Op::_Command->_new(
-        db_name         => $self->db_name,
-        query           => $command,
-        query_flags     => {},
-        bson_codec      => $self->bson_codec,
-        read_preference => $self->read_preference,
+        db_name             => $self->db_name,
+        query               => $command,
+        query_flags         => {},
+        bson_codec          => $self->bson_codec,
+        read_preference     => $self->read_preference,
+        monitoring_callback => $self->monitoring_callback,
     );
 
     return $op->execute( $link, $topology );

@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
@@ -279,7 +279,6 @@ sub _build_plugins {
     }
 
     return [
-        [ $self->make_tool => \%make_tool_args ],
         $self->_gather_dir_plugin,
         $self->_basic_plugins,
         $self->_authority_plugin,
@@ -298,6 +297,7 @@ sub _build_plugins {
         # README.md generation needs to come after pod weaving
         $self->_readme_md_plugin,
         $self->_contributing_md_plugin,
+        $self->_code_of_conduct_plugin,
         'InstallGuide',
         'CPANFile',
         $self->_maybe_ppport_plugin,
@@ -305,6 +305,11 @@ sub _build_plugins {
         $self->_release_check_plugins,
         $self->_tidyall_plugin,
         $self->_git_plugins,
+
+        # This needs to be last so that MakeMaker::Awesome can see all the
+        # prereqs that a distro has. If it comes first, it tries to check the
+        # prereqs before they've been added and makes a mess of things.
+        [ $self->make_tool => \%make_tool_args ],
     ];
 }
 
@@ -398,6 +403,7 @@ sub _build_files_to_copy_from_build {
     my $self = shift;
 
     my @files = qw(
+        CODE_OF_CONDUCT.md
         CONTRIBUTING.md
         LICENSE
         README.md
@@ -715,6 +721,18 @@ sub _contributing_md_plugin {
     ];
 }
 
+sub _code_of_conduct_plugin {
+    my $self = shift;
+
+    return [
+        'GenerateFile::FromShareDir' => 'Generate CODE_OF_CONDUCT.md' => {
+            -dist     => ( __PACKAGE__ =~ s/::/-/gr ),
+            -filename => 'CODE_OF_CONDUCT.md',
+            has_xs    => $self->has_xs,
+        },
+    ];
+}
+
 sub _maybe_ppport_plugin {
     my $self = shift;
 
@@ -832,7 +850,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 SYNOPSIS
 
@@ -915,6 +933,7 @@ This is more or less equivalent to the following F<dist.ini>:
 
     [CopyFilesFromBuild]
     copy = Build.PL
+    copy = CODE_OF_CONDUCT.md
     copy = CONTRIBUTING.md
     copy = LICENSE
     copy = Makefile.PL
@@ -1050,6 +1069,10 @@ This is more or less equivalent to the following F<dist.ini>:
     ; This is determined by looking through the distro for .xs files.
     has_xs    = ...
 
+    [GenerateFile::FromShareDir / Generate CODE_OF_CONDUCT.md]
+    -dist     = Dist-Zilla-PluginBundle-DROLSKY
+    -filename = CODE_OF_CONDUCT.md
+
     [InstallGuide]
     [CPANFile]
 
@@ -1077,6 +1100,7 @@ This is more or less equivalent to the following F<dist.ini>:
     ; The allow_dirty list is basically all of the generated or munged files
     ; in the distro, including:
     ;     Build.PL
+    ;     CODE_OF_CONDUCT.md
     ;     CONTRIBUTING.md
     ;     Changes
     ;     LICENSE

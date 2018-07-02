@@ -1,4 +1,6 @@
 *.swp
+*.tar
+*.tar.gz
 *~
 .tidyall.d/
 MANIFEST.bak

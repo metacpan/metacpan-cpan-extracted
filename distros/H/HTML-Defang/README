@@ -1,4 +1,4 @@
-HTML-Defang version 1.05
+HTML-Defang version 1.06
 ========================
 
 This module accepts an input HTML and/or CSS string and removes any

@@ -14,7 +14,7 @@ my $tls = (exists &Mojo::IOLoop::Client::TLS ? &Mojo::IOLoop::Client::TLS : &Moj
 
 # 1
 my ($pid, $sock, $host, $port) = Utils::make_smtp_server($tls);
-my $smtp = Mojo::SMTP::Client->new(address => $host, port => $port, tls => $tls);
+my $smtp = Mojo::SMTP::Client->new(address => $host, port => $port, tls => $tls, tls_verify => 0);
 syswrite($sock, join(CRLF, '220 host.net', '220 hello ok', '220 from ok', '220 to ok', '220 quit ok').CRLF);
 
 my $resp = $smtp->send(hello => 'mymail.host', from => '', to => 'jorik@gmail.com', quit => 1);
@@ -40,7 +40,7 @@ kill 15, $pid;
 
 # 2
 ($pid, $sock, $host, $port) = Utils::make_smtp_server();
-$smtp = Mojo::SMTP::Client->new(address => $host, port => $port, inactivity_timeout => 0.5, autodie => 1);
+$smtp = Mojo::SMTP::Client->new(address => $host, port => $port, inactivity_timeout => 0.5, autodie => 1, tls_verify => 0);
 eval {
 	$smtp->send(quit => 1);
 };
@@ -51,7 +51,7 @@ kill 15, $pid;
 
 # 3
 ($pid, $sock, $host, $port) = Utils::make_smtp_server();
-$smtp = Mojo::SMTP::Client->new(address => $host, port => $port, autodie => 1);
+$smtp = Mojo::SMTP::Client->new(address => $host, port => $port, autodie => 1, tls_verify => 0);
 syswrite($sock, '500 host.net is busy'.CRLF);
 eval {
 	$smtp->send();
@@ -63,7 +63,7 @@ kill 15, $pid;
 
 # 4
 ($pid, $sock, $host, $port) = Utils::make_smtp_server();
-$smtp = Mojo::SMTP::Client->new(address => $host, port => $port, autodie => 1);
+$smtp = Mojo::SMTP::Client->new(address => $host, port => $port, autodie => 1, tls_verify => 0);
 syswrite($sock, join(CRLF, '220 host.net', '220 hello ok', '220 from ok', '220 to ok', '220 quit ok').CRLF);
 
 $smtp->on(response => sub {

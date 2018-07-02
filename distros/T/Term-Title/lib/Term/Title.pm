@@ -2,7 +2,8 @@ package Term::Title;
 use strict;
 use warnings;
 # ABSTRACT: Portable API to set the terminal titlebar
-our $VERSION = '0.08'; # VERSION
+
+our $VERSION = '0.09';
 
 use Exporter;
 our @ISA       = 'Exporter';
@@ -34,6 +35,13 @@ my %terminal_tabs = (
             $ENV{TERM_PROGRAM} and $ENV{TERM_PROGRAM} eq 'iTerm.app';
         },
         pre  => "\033]1;",
+        post => "\007",
+    },
+    'konsole' => {
+        is_supported => sub {
+            $ENV{KONSOLE_PROFILE_NAME};
+        },
+        pre  => "\033]30;",
         post => "\007",
     },
 );
@@ -96,7 +104,7 @@ Term::Title - Portable API to set the terminal titlebar
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -217,6 +225,8 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
+=for stopwords Alexandr Ciornii Pedro Melo Slobodan Mišković
+
 =over 4
 
 =item *
@@ -226,6 +236,10 @@ Alexandr Ciornii <alexchorny@gmail.com>
 =item *
 
 Pedro Melo <melo@simplicidade.org>
+
+=item *
+
+Slobodan Mišković <slobodan@miskovic.ca>
 
 =back
 

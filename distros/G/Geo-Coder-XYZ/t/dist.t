@@ -4,7 +4,7 @@ use warnings;
 use Test::Most;
 
 BEGIN {
-	if($ENV{RELEASE_TESTING}) {
+	if($ENV{AUTHOR_TESTING}) {
 		eval {
 			require Test::Distribution;
 		};

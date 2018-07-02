@@ -4,6 +4,12 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.653 2018-06-22
+
+  * Documentation fixes
+  * Add time_prefix option for data folders
+  * Enable date_prefix and time_prefix by default
+
 3.652 2018-06-15
 
   * Add Step::Repeat sweep for repeating something

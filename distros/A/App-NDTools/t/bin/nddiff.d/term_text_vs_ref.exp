@@ -1,0 +1,6 @@
+  {text}
+-   some
+-   text
++   [
++      "ref"
++   ]

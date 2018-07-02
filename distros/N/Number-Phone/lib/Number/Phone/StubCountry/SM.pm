@@ -22,47 +22,47 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214157;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
                   'leading_digits' => '[5-7]',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
+                  'format' => '$1 $2 $3 $4'
                 },
                 {
+                  'pattern' => '(0549)(\\d{6})',
                   'leading_digits' => '0549',
-                  'format' => '$1 $2',
                   'intl_format' => '($1) $2',
-                  'pattern' => '(0549)(\\d{6})'
+                  'format' => '$1 $2'
                 },
                 {
-                  'leading_digits' => '[89]',
-                  'intl_format' => '(0549) $1',
                   'format' => '0549 $1',
+                  'intl_format' => '(0549) $1',
+                  'leading_digits' => '[89]',
                   'pattern' => '(\\d{6})'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '
-          0549(?:
-            8[0157-9]|
-            9\\d
-          )\\d{4}
-        ',
-                'toll_free' => '',
-                'voip' => '5[158]\\d{6}',
+                'mobile' => '6[16]\\d{6}',
+                'specialrate' => '(7[178]\\d{6})',
                 'geographic' => '
           0549(?:
             8[0157-9]|
             9\\d
           )\\d{4}
         ',
-                'specialrate' => '(7[178]\\d{6})',
-                'mobile' => '6[16]\\d{6}',
                 'pager' => '',
-                'personal_number' => ''
+                'voip' => '5[158]\\d{6}',
+                'personal_number' => '',
+                'toll_free' => '',
+                'fixed_line' => '
+          0549(?:
+            8[0157-9]|
+            9\\d
+          )\\d{4}
+        '
               };
 
     sub new {

@@ -1,0 +1,47 @@
+---
+abstract: 'Wrapper for the Mustache template system'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  Dancer2: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::WWW::Mechanize::PSGI: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Template-Mustache
+provides:
+  Dancer2::Template::Mustache:
+    file: lib/Dancer2/Template/Mustache.pm
+    version: v0.0.1
+requires:
+  Dancer2::Core::Role::Template: '0'
+  FindBin: '0'
+  Moo: '0'
+  Path::Tiny: '0'
+  Template::Mustache: v1.0.2
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Dancer2-Template-Mustache/issues
+  homepage: https://github.com/yanick/Dancer2-Template-Mustache
+  repository: https://github.com/yanick/Dancer2-Template-Mustache.git
+version: 0.0.1
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.01
+x_contributors:
+  - 'Yanick Champoux <yanick@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

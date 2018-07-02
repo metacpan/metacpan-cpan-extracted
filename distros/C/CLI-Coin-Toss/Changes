@@ -1,5 +1,12 @@
 Revision history for CLI-Coin-Toss
 
+0.35    2018-06-27. 
+        Made "--version" available for the first time.
+
+0.34    2018-06-27. 
+        Added -l on "boxmuller" by implementing log-normal distribution.
+        Display bug fixed on "saikoro" (2ndary info, -g, the order was exchanged.)
+
 0.33    2018-06-11.
 		Changed the switch "-q" into "-1".
         Added the CLI "matrixpack". 

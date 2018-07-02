@@ -1,19 +1,15 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 use Test::More;
 use Plack::Test;
 use Plack::Builder;
 use Plack::Middleware::XRay;
 use HTTP::Request::Common;
 use AWS::XRay qw/ capture /;
-use JSON::XS;
-use IO::Scalar;
-
-my $buf;
-no warnings 'redefine';
-*AWS::XRay::sock = sub {
-    IO::Scalar->new(\$buf);
-};
+use t::Util qw/ reset segments /;
 
 my $app = sub {
     my $env = shift;
@@ -42,13 +38,14 @@ $app = Plack::Builder::builder {
 };
 
 test_psgi $app, sub {
+    reset;
     my $cb = shift;
     my $res = $cb->(
         GET '/foo/bar',
         "X-User-ID" => "123456",
         "X-App-ID"  => "9999",
     );
-    my ($segApp, $segPlack) = parse_buf(2);
+    my ($segApp, $segPlack) = segments();
     is $segPlack->{name}    => "myTest";
     is $segApp->{trace_id}  => $segPlack->{trace_id};
     is $segApp->{parent_id} => $segPlack->{id};
@@ -65,12 +62,13 @@ my $trace_id   = AWS::XRay::new_trace_id();
 my $segment_id = AWS::XRay::new_id();
 
 test_psgi $app, sub {
+    reset;
     my $cb = shift;
     my $res = $cb->(
         GET '/',
         "X-Amzn-Trace-ID" => "Root=$trace_id",
     );
-    my ($segApp, $segPlack) = parse_buf(2);
+    my ($segApp, $segPlack) = segments();
     is $segPlack->{name}     => "myTest";
     is $segPlack->{trace_id} => $trace_id;
     is $segApp->{trace_id}   => $segPlack->{trace_id};
@@ -81,12 +79,13 @@ test_psgi $app, sub {
 };
 
 test_psgi $app, sub {
+    reset;
     my $cb = shift;
     my $res = $cb->(
         GET '/',
         "X-Amzn-Trace-ID" => "Parent=$segment_id;Root=$trace_id",
     );
-    my ($segApp, $segPlack) = parse_buf(2);
+    my ($segApp, $segPlack) = segments();
     is $segPlack->{name}      => "myTest";
     is $segPlack->{trace_id}  => $trace_id;
     is $segPlack->{parent_id} => $segment_id;
@@ -99,11 +98,3 @@ test_psgi $app, sub {
 
 done_testing;
 
-sub parse_buf {
-    my $expect = shift;
-    is $buf =~ s/{"format":"json","version":1}//g => $expect, "includes $expect segment headers";
-    my @seg = split /\n/, $buf;
-    shift @seg; # despose first ""
-    undef $buf;
-    return map { decode_json($_) } @seg;
-}

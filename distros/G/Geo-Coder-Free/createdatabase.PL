@@ -27,7 +27,7 @@ use Text::CSV;
 use CHI;
 use CHI::Driver::RawMemory;
 
-use	constant	MAX_INSERT_COUNT => 100;	# Maximum number of CSV rows to insert in a single statement
+use	constant	MAX_INSERT_COUNT => 250;	# Maximum number of CSV rows to insert in a single statement
 
 my %zipcodes = (
 	'04350' => { city => 'Litchfield', county => 'Kennebec' },
@@ -110,6 +110,8 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'MEDLARS DR',
 				'CITY' => 'BETHESDA',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 				'POSTCODE' => 20894,
 			}, {
 				'LAT' => 38.99698114,
@@ -117,6 +119,8 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'CENTER DR',
 				'CITY' => 'BETHESDA',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 			}, {
 				# Bold bite
 				'LAT' => 38.98939358,
@@ -124,6 +128,8 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'NORFOLK AVE',
 				'CITY' => 'BETHESDA',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 			}, {
 				'NAME' => 'ALBERT EINSTEIN HIGH SCHOOL',
 				'LAT' => 39.03869019,
@@ -132,6 +138,8 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'NEWPORT MILL RD',
 				'CITY' => 'KENSINGTON',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 				'POSTCODE' => 20895
 			}, {
 				'NAME' => 'POST OFFICE',
@@ -141,6 +149,8 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'KENSINGTON PKWY',
 				'CITY' => 'KENSINGTON',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 				'POSTCODE' => 20895
 			}, {
 				'NAME' => 'NEWPORT MILL MIDDLE SCHOOL',
@@ -150,6 +160,8 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'NEWPORT MILL RD',
 				'CITY' => 'KENSINGTON',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 				'POSTCODE' => 20895
 			}, {
 				'NAME' => 'SAFEWAY',
@@ -159,7 +171,19 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'HOWARD AVE',
 				'CITY' => 'KENSINGTON',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 				'POSTCODE' => 20895
+			}, {
+				'NAME' => 'HAIR CUTTERY',
+				'LAT' => 39.03323865,
+				'LON' => -77.07368044,
+				'NUMBER' => 3731,
+				'STREET' => 'CONNECTICUT AVE',
+				'CITY' => 'KENSINGTON',
+				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 			}, {
 				'NAME' => 'STROSNIDERS',
 				'LAT' => 39.02781493,
@@ -168,6 +192,8 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'CONNECTICUT AVE',
 				'CITY' => 'KENSINGTON',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 			}, {
 				'NAME' => 'SNIDERS',
 				'LAT' => 39.0088797,
@@ -176,6 +202,8 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'SEMINARY RD',
 				'CITY' => 'SILVER SPRING',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 				'POSTCODE' => 20910,
 			}, {
 				'NAME' => 'SILVER DINER',
@@ -185,6 +213,8 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'ROCKVILLE PIKE',
 				'CITY' => 'ROCKVILLE',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 				'POSTCODE' => 20852
 			}, {
 				# LF
@@ -194,6 +224,8 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'VIERS MILL ROAD',
 				'CITY' => 'ROCKVILLE',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 				'POSTCODE' => 20851
 			}, {
 				'LAT' => 39.0147541,
@@ -203,6 +235,8 @@ my %known_places = (	# Places I've checked with my GPS
 				'STREET' => 'FOREST GLEN ROAD',
 				'CITY' => 'SILVER SPRING',
 				'COUNTY' => 'MONTGOMERY',
+				'STATE' => 'MD',
+				'COUNTRY' => 'US',
 				'POSTCODE' => 20910
 			}
 		]
@@ -487,13 +521,14 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					'COUNTRY' => uc($country),
 					'POSTCODE' => $postcode,
 				};
-				$inserts += import(country => $country, state => $state, row => $row, file => $file, ua => $ua, dbh => $dbh, global => 1);
+				$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh, global => 1);
 				if($inserts >= MAX_INSERT_COUNT) {
 					flush_queue($dbh);
 					$inserts = 0;
 				}
 			}
 		}
+
 		# $dbh->commit();
 		# $dbh->disconnect();
 		# $wof_global_dbh->disconnect();
@@ -545,7 +580,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				# Import this state's hand curated data
 				if(my $k = $known_places{$f}) {
 					foreach my $row(@{$k}) {
-						$inserts += import(country => $country, state => $state, row => $row, file => $file, ua => $ua, dbh => $dbh, global => 1);
+						$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh, global => 1);
 						if($inserts >= MAX_INSERT_COUNT) {
 							flush_queue($dbh);
 							$inserts = 0;
@@ -632,11 +667,10 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 						if($number) {
 							$number = uc($number);
 						}
-						my $name = uc($properties->{'wof:name'});
 						my $row = {
 							'LAT' => $properties->{'geom:latitude'},
 							'LON' => $properties->{'geom:longitude'},
-							'NAME' => $name,
+							'NAME' => uc($properties->{'wof:name'}),
 							'NUMBER' => $number,
 							'STREET' => $street,
 							'CITY' => uc($city),
@@ -644,7 +678,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 							'COUNTRY' => uc($country),
 							'POSTCODE' => $postcode,
 						};
-						$inserts += import(country => $country, state => $state, row => $row, file => $file, ua => $ua, dbh => $dbh);
+						$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh);
 						if($inserts >= MAX_INSERT_COUNT) {
 							flush_queue($dbh);
 							$inserts = 0;
@@ -766,11 +800,10 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 							next;
 						}
 					}
-					my $name = uc($properties->{'wof:name'});
 					my $row = {
 						'LAT' => $properties->{'geom:latitude'},
 						'LON' => $properties->{'geom:longitude'},
-						'NAME' => uc($name),
+						'NAME' => uc($properties->{'wof:name'}),
 						'NUMBER' => uc($properties->{'addr:housenumber'}),
 						'STREET' => uc($street),
 						'CITY' => $city,
@@ -778,7 +811,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 						'COUNTRY' => $country,
 						'POSTCODE' => $postcode,
 					};
-					$inserts += import(country => $country, state => $state, row => $row, file => $file, ua => $ua, dbh => $dbh);
+					$inserts += import(row => $row, file => $file, ua => $ua, dbh => $dbh);
 					if($inserts >= MAX_INSERT_COUNT) {
 						flush_queue($dbh);
 						$inserts = 0;
@@ -808,7 +841,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				"'$country')";
 
 			# print "$query\n";
-			$dbh->prepare($query)->execute();
+			$dbh->do($query);
 		}
 
 		$| = 1;
@@ -875,10 +908,10 @@ sub import {
 		die 'import: no args';
 	}
 
-	my $country = $param{'country'} || die 'import: no country';
-	my $state = $param{'state'};	# Will come from $row->{'REGION'}
 	my $r = $param{'row'} || die 'import: no row';
 	my $row = { %{$r} };	# Take a copy of the hash because we're going to play with it
+	my $country = $param{'country'} || $row->{'COUNTRY'} || die 'import: no country';
+	my $state = $param{'state'} || $row->{'STATE'};	# Will come from $row->{'REGION'}
 	my $file = $param{'file'} || die 'import: no file';
 	my $ua = $param{'ua'} || die 'import: no ua';
 	my $dbh = $param{'dbh'} || die 'import: no dbh';
@@ -1079,7 +1112,9 @@ sub import {
 		my $name = $columns{'NAME'};
 		if($name) {
 			# TODO: more of these
-			if($name =~ /^(.+)\s+RESTAURANT/) {
+			# foreach my $classifier($properties->{'sg:classifier'}) {
+			#	Check if $name ends with uc($classifier->{category})
+			if($name =~ /^(.+)\s+RESTAURANT/i) {
 				$columns{'NAME'} = $1;
 				$inserts += insert($dbh, $global, \%columns);
 				# print "$1\n";
@@ -1093,7 +1128,7 @@ sub import {
 				# For when a name is known but not a street number
 				$columns{'NAME'} = $name;
 				$inserts += insert($dbh, $global, \%columns);
-				if($name =~ /^(.+)\s+RESTAURANT/) {
+				if($name =~ /^(.+)\s+RESTAURANT/i) {
 					$columns{'NAME'} = $1;
 					$inserts += insert($dbh, $global, \%columns);
 					# print "$1\n";
@@ -1107,6 +1142,11 @@ sub import {
 					# For when a name is known but not a street
 					$columns{'NAME'} = $name;
 					$inserts += insert($dbh, $global, \%columns);
+					if($name =~ /^(.+)\s+RESTAURANT/i) {
+						$columns{'NAME'} = $1;
+						$inserts += insert($dbh, $global, \%columns);
+						# print "$1\n";
+					}
 					delete($columns{'NAME'});
 				}
 				# Match somewhere in the city when street isn't known
@@ -1116,6 +1156,11 @@ sub import {
 			# For when a name is known but not a street
 			$columns{'NAME'} = $name;
 			$inserts += insert($dbh, $global, \%columns);
+			if($name =~ /^(.+)\s+RESTAURANT/i) {
+				$columns{'NAME'} = $1;
+				$inserts += insert($dbh, $global, \%columns);
+				# print "$1\n";
+			}
 		}
 	}
 	return $inserts;
@@ -1199,10 +1244,10 @@ sub insert {
 		}
 		if($digest = hash($global, Encode::encode_utf8($digest))) {
 			$queued_commits{$digest} = $columns;
+			return 2;
 		# } else {
 			# print "Ignore ", join(',', values(%{$columns})), "\n";
 		}
-		return 2;
 	}
 	return 1;
 }
@@ -1221,6 +1266,7 @@ sub flush_queue
 	my $query;
 
 	keys %queued_commits;
+	# print scalar(keys %queued_commits), "\n";
 	while(my($md5, $row) = each %queued_commits) {
 		if(!defined($query)) {
 			$query = 'INSERT INTO openaddresses(';
@@ -1247,10 +1293,10 @@ sub flush_queue
 		my $key = city_key($row->{'CITY'}, $row->{'COUNTY'}, $state, $country);
 		foreach my $column(@columns) {
 			if($row->{$column}) {
-				$row->{$column} =~ s/'/''/g;
 				if(($column eq 'LAT') || ($column eq 'LON') || ($column eq 'CITY')) {
 					$query .= $row->{$column} . ',';
 				} else {
+					$row->{$column} =~ s/'/''/g;
 					$query .= "'" . $row->{$column} . "',";
 				}
 			} else {
@@ -1263,7 +1309,10 @@ sub flush_queue
 
 	if($query) {
 		# print "$query\n";
-		$dbh->prepare($query)->execute();
+		# $| = 1;
+		# print '.';
+		# $| = 0;
+		$dbh->do($query);
 		%queued_commits = ();
 	}
 }
@@ -1323,14 +1372,11 @@ sub get_wof {
 	my $query = "SELECT body FROM geojson where id = $id LIMIT 1";
 	my $sth = $dbh->prepare($query);
 	$sth->execute() || die($query);
-	my $data = $sth->fetchrow_hashref();
-	if($data->{'body'}) {
-		$data = $data->{'body'};
-	}
-	return if((!defined($data)) || ref($data));
-	# print Data::Dumper->new([$data])->Dump();
+	my $data = $sth->fetchrow_arrayref();
+	return if(!defined($data));
+	# print Data::Dumper->new([@{$data}])->Dump();
 	# print $data, "\n", 'x' x 70, "\n";
-	$data = JSON->new()->utf8()->decode($data);
+	$data = JSON->new()->utf8()->decode(@{$data});
 	my $properties = $data->{'properties'};
 	return if(scalar(@{$properties->{'wof:superseded_by'}}));
 	# if($properties->{'wof:name'}) {

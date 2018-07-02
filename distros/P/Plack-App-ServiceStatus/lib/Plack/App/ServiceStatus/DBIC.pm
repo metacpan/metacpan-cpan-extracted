@@ -34,7 +34,7 @@ Plack::App::ServiceStatus::DBIC - Check DBIC connection
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 SYNOPSIS
 

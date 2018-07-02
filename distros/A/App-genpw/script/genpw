@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/genpw/genpw
 # and generated automatically using Perinci::CmdLine::Gen version 0.485
 
-our $DATE = '2018-05-01'; # DATE
+our $DATE = '2018-07-01'; # DATE
 our $DIST = 'App-genpw'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -21,7 +21,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Generate random password (support patterns + wordlists)
+# ABSTRACT: Generate random password, with patterns and wordlists
 # PODNAME: genpw
 
 __END__
@@ -32,11 +32,11 @@ __END__
 
 =head1 NAME
 
-genpw - Generate random password (support patterns + wordlists)
+genpw - Generate random password, with patterns and wordlists
 
 =head1 VERSION
 
-This document describes version 0.007 of genpw (from Perl distribution App-genpw), released on 2018-05-01.
+This document describes version 0.009 of genpw (from Perl distribution App-genpw), released on 2018-07-01.
 
 =head1 SYNOPSIS
 
@@ -55,26 +55,26 @@ characters followed by a symbol.
 
 =item * Use words from wordlists.
 
-=item * Use strong random source (L<Math::Random::Secure>) when available, otherwise
-fallback to Perl's builtin C<rand()>.
+=item * Use strong random source when available, otherwise fallback to Perl's builtin
+C<rand()>.
 
 =back
 
 Examples:
 
-By default generate letters/digits 8-20 characters long:
+By default generate base56 password 12-20 characters long (-p %12$20B):
 
  % genpw
- J9K3ZjBVR
+ Uk7Zim6pZeMTZQUyaM
 
 Generate 5 passwords instead of 1:
 
  % genpw 5
- wAYftKsS
- knaY7MOBbcvFFS3L1wyW
- oQGz62aF
- sG1A9reVOe
- Zo8GoFEq
+ igYiRhUb5t9d9f3J
+ b7D44pnxZHJGQzDy2eg
+ RXDtqjMvp2hNAdQ
+ Xz3DmAL94akqtZ5xb
+ 7TfANv9yxAaMGXm
 
 Generate random digits between 10 and 12 characters long:
 
@@ -101,7 +101,7 @@ Generate a random GUID:
 
 Like the above, but in uppercase:
 
- % genpw -p '%8h-%4h-%4h-%4h-%12h'
+ % genpw -p '%8h-%4h-%4h-%4h-%12h' -U
  22E13D9E-1187-CD95-1D05-2B92A09E740D
 
 Use configuration file to avoid typing the pattern every time, put this in

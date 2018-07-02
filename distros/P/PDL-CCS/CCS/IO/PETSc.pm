@@ -12,7 +12,7 @@ use Fcntl qw(:seek);	   ##-- for rewinding
 use Carp qw(confess);
 use strict;
 
-our $VERSION = '1.23.8';
+our $VERSION = '1.23.9';
 our @ISA = ('PDL::Exporter');
 our @EXPORT_OK =
   (

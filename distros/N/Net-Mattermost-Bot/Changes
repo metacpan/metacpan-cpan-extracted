@@ -10,3 +10,7 @@ Revision history for Perl extension Net::Mattermost::Bot.
 0.03  Mon Jun 18 11:10:45 2018
 	- specified List::Util version with "pairs"
 	- renamed events, added a generic catch-all for unknowns
+
+0.04  Mon Jun 18 11:10:45 2018
+	- added a "debug" flag for extra WebSocket connection debugging which
+	which is false by default

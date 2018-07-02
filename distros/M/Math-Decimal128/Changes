@@ -1,5 +1,15 @@
 Revision history for Perl module Math::Decimal128
 
+0.10
+    - Alter typedef of _Decimal128 for __MINGW64__ . (This became necessary with perl-5.28.0,
+      but I've applied it universally whenever __MINGW64__ is defined.)
+    - "use 5.008;" in Makefile.PL.
+    - In XS code, replace (where practical) dynamic allocation of string buffer with
+      static allocation.
+    - Prototype subroutines listed in 'use subs()'.
+    - Move POD out of Decimal128.pm and into (newly created) Decimal128.pod.
+
+
 0.09
     - Adjust _is_neg_zero() to circumvent gcc optimization bug.
       See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80692

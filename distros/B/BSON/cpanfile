@@ -4,6 +4,7 @@ requires "Digest::MD5" => "0";
 requires "Exporter" => "0";
 requires "List::Util" => "0";
 requires "MIME::Base64" => "0";
+requires "Math::BigFloat" => "0";
 requires "Math::BigInt" => "0";
 requires "Moo" => "2.002004";
 requires "Scalar::Util" => "0";

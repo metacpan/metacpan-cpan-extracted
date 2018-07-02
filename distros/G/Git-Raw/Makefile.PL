@@ -194,13 +194,13 @@ $def .= ' -DGIT_USE_STAT_MTIM_NSEC -DGIT_USE_NEC';
 
 if ($is_gcc) {
 	# gcc-like compiler
-	$ccflags .= ' -Wall -Wno-unused-variable';
+	$ccflags .= ' -Wall -Wno-unused-variable -Wno-pedantic -Wno-deprecated-declarations';
 
 	# clang compiler is pedantic!
 	if ($is_osx) {
 		# clang masquerading as gcc
 		if ($Config{gccversion} =~ /LLVM/) {
-			$ccflags .= ' -Wno-deprecated-declarations -Wno-unused-const-variable -Wno-unused-function';
+			$ccflags .= ' -Wno-unused-const-variable -Wno-unused-function';
 		}
 
 		# Secure transport (HTTPS)
@@ -214,7 +214,7 @@ if ($is_gcc) {
 
 	# building with a 32-bit perl on a 64-bit OS may require this (supported by cc and gcc-like compilers,
 	# excluding some ARM toolchains)
-	if ($Config{ptrsize} == 4 && $Config{archname} !~ /^armv/) {
+	if ($Config{ptrsize} == 4 && $Config{archname} !~ /arm/) {
 		$ccflags .= ' -m32';
 	}
 } elsif ($is_sunpro) {
@@ -298,6 +298,14 @@ sub MY::c_o {
 .c\$(OBJ_EXT):
 	\$(CCCMD) \$(CCCDLFLAGS) "-I\$(PERL_INC)" \$(PASTHRU_DEFINE) \$(DEFINE) \$*.c $out_switch\$@
 };
+
+	if ($is_gcc) {
+		# disable parallel builds
+		$line .= qq{
+
+.NOTPARALLEL:
+};
+	}
 	return $line;
 }
 
@@ -363,7 +371,7 @@ my %WriteMakefileArgs = (
     "Time::Local" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.80",
+  "VERSION" => "0.81",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -377,6 +385,9 @@ $WriteMakefileArgs{CCFLAGS} .= $Config{ccflags} . ' '. $ccflags;
 $WriteMakefileArgs{OBJECT}  .= ' ' . join ' ', @objs;
 $WriteMakefileArgs{dynamic_lib} = {
 	OTHERLDFLAGS => $otherldflags
+};
+$WriteMakefileArgs{clean} = {
+	FILES => "*.inc"
 };
 
 unless (eval { ExtUtils::MakeMaker->VERSION(6.56) }) {

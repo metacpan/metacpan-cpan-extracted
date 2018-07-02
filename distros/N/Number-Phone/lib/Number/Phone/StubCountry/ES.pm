@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221546;
+our $VERSION = 1.20180619214155;
 
 my $formatters = [
                 {
@@ -31,18 +31,31 @@ my $formatters = [
                   'pattern' => '([89]00)(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '([5-9]\\d{2})(\\d{2})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '
             [568]|
             [79][0-8]
           ',
-                  'format' => '$1 $2 $3 $4'
+                  'pattern' => '([5-9]\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
+                'mobile' => '
+          (?:
+            6\\d{6}|
+            7[1-48]\\d{5}|
+            9(?:
+              6906(?:
+                09|
+                10
+              )|
+              7390\\d{2}
+            )
+          )\\d{2}
+        ',
+                'specialrate' => '(90[12]\\d{6})|(80[367]\\d{6})|(51\\d{7})',
                 'pager' => '',
-                'personal_number' => '70\\d{7}',
                 'geographic' => '
           8(?:
             [1356]\\d|
@@ -76,20 +89,7 @@ my $validators = {
             )\\d{4}
           )
         ',
-                'mobile' => '
-          (?:
-            6\\d{6}|
-            7[1-48]\\d{5}|
-            9(?:
-              6906(?:
-                09|
-                10
-              )|
-              7390\\d{2}
-            )
-          )\\d{2}
-        ',
-                'specialrate' => '(90[12]\\d{6})|(80[367]\\d{6})|(51\\d{7})',
+                'personal_number' => '70\\d{7}',
                 'voip' => '',
                 'fixed_line' => '
           8(?:

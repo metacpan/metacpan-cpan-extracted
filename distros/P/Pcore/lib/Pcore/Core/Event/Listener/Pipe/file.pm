@@ -9,11 +9,11 @@ use Time::HiRes qw[];
 
 with qw[Pcore::Core::Event::Listener::Pipe];
 
-has tmpl => ( is => 'ro', isa => Str, default => '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>][<: $channel :>][<: $level :>] <: $title | raw :>' . $LF . '<: $text | raw :>' );
+has tmpl => '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>][<: $channel :>][<: $level :>] <: $title | raw :>' . $LF . '<: $text | raw :>';
 
-has _tmpl => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Template'], init_arg => undef );
-has _path => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Path'],     init_arg => undef );
-has _h    => ( is => 'ro', isa => InstanceOf ['IO::File'],              init_arg => undef );
+has _tmpl => ();    # isa => InstanceOf ['Pcore::Util::Tmpl'], init_arg => undef );
+has _path => ();    # isa => InstanceOf ['Pcore::Util::Path'],     init_arg => undef );
+has _h    => ();    # isa => InstanceOf ['IO::File'],              init_arg => undef );
 
 has _init => ( is => 'ro', isa => Bool, init_arg => undef );
 

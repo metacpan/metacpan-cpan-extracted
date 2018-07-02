@@ -20,7 +20,7 @@ if ( $@ ) {
 
 plan tests => 5;
 
-require "t/Event_RPC_Test_Server.pm";
+require "./t/Event_RPC_Test_Server.pm";
 my $PORT = Event_RPC_Test_Server->port;
 
 my $AUTH_USER = "foo";
@@ -54,7 +54,7 @@ ok($@, "ssl connection failed with wrong ca");
 
 # now correct ca to shut down server
 $client->set_ssl_ca_file("t/ssl/ca.crt");
-ok($client->connect, "connect with corract ca");
+ok($client->connect, "connect with correct ca");
 
 # disconnect client
 ok ($client->disconnect, "client disconnected");

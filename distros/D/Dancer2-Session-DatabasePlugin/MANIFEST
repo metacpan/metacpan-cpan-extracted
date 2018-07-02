@@ -1,0 +1,11 @@
+lib/Dancer2/Session/DatabasePlugin.pm
+lib/Dancer2/Plugin/SessionDatabase.pm
+t/Dancer2-Plugin-SessionDatabase.t
+t/Dancer2-Session-DatabasePlugin.t
+Makefile.PL
+MANIFEST
+Changes
+README
+INSTALL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

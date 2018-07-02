@@ -1,10 +1,22 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Class-STL-Containers
-version:      0.35
-version_from: lib/Class/STL/Containers.pm
-installdirs:  site
-requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+---
+abstract: 'Perl extension for STL-like object management'
+author:
+  - 'm gaffiero <gaffie@users.sourceforge.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Class-STL-Containers
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: '0.37'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

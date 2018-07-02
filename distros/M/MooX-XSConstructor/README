@@ -1,0 +1,70 @@
+NAME
+    MooX::XSConstructor - glue between Moo and Class::XSConstructor
+
+SYNOPSIS
+      package Foo;
+      use Moo;
+      use MooX::XSConstructor;
+  
+      # do normal Moo stuff here
+
+DESCRIPTION
+    MooX::XSConstructor will look at your class attributes, and see if it
+    could be built using the simple constructor that Class::XSConstructor is
+    able to provide.
+
+    If your class is too complicated, it is a no-op.
+
+    If your class is simple enough, you will hopefully get a faster
+    constructor.
+
+    Things that are deemed too complicated if they appear in *any* attributes
+    (even an inherited one):
+
+    *   Eager builders and defaults. (Lazy builders and defaults are fine.)
+
+    *   Type constraints. (Except Type::Tiny, which is fine.)
+
+    *   Type coercions.
+
+    *   Triggers.
+
+    *   Use of `init_arg`.
+
+    *   Use of `weak_ref`.
+
+    Also if your class has a `BUILDARGS` or `FOREIGNBUIDARGS` method, it will
+    be too complicated. (The default `BUILDARGS` inherited from Moo::Object is
+    fine.)
+
+    So what Moo features are okay?
+
+    Required versus optional attributes, Type::Tiny type constraints (but not
+    coercions), reader/writer/predicate/clearer, lazy defaults/builders, and
+    delegation (`handles`).
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-XSConstructor>.
+
+SEE ALSO
+    Moo, Class::XSConstructor.
+
+    You may also be interested in Class::XSAccessor. Moo already includes all
+    the glue to interface with that, so a MooX module like this one isn't
+    necessary.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2018 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

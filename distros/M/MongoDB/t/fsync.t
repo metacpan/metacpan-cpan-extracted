@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2012 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,8 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-
 
 use strict;
 use warnings;
@@ -22,13 +19,15 @@ use Test::Fatal;
 
 use Data::Dumper;
 
-use MongoDB::Timestamp; # needed if db is being run as master
 use MongoDB;
 
 use lib "t/lib";
 use MongoDBTest qw/skip_unless_mongod build_client server_type server_version/;
 
 skip_unless_mongod();
+
+plan skip_all => "Not supported on Atlas Free Tier"
+    if $ENV{ATLAS_PROXY};
 
 my $conn = build_client();
 my $server_type = server_type( $conn );

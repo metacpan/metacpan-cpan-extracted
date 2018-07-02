@@ -3,15 +3,15 @@ require 5.010001;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PL_FILES' => {},
-  'INSTALLDIRS' => 'site',
-  'NAME' => 'Math::Polynomial::Solve',
-  'PREREQ_PM' => {
-                   'Test::More' => 0,
-                   'Math::Complex' => '1.36',
-                   'Math::Utils' => '1.06'
-                 },
   'EXE_FILES' => [],
-  'VERSION_FROM' => 'lib/Math/Polynomial/Solve.pm'
+  'VERSION_FROM' => 'lib/Math/Polynomial/Solve.pm',
+  'NAME' => 'Math::Polynomial::Solve',
+  'PL_FILES' => {},
+  'PREREQ_PM' => {
+                   'Math::Utils' => '1.12',
+                   'Test::More' => 0,
+                   'Math::Complex' => '1.36'
+                 },
+  'INSTALLDIRS' => 'site'
 )
 ;

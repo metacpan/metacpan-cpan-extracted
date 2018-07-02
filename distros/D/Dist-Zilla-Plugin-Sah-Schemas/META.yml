@@ -23,6 +23,7 @@ requires:
   Data::Sah::Resolve: '0.003'
   Data::Sah::Util::Subschema: '0'
   Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::CheckPackageDeclared: '0'
   Dist::Zilla::Role::FileFinderUser: '0'
   Dist::Zilla::Role::FileGatherer: '0'
   Dist::Zilla::Role::FileMunger: '0'
@@ -39,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Sah-Schemas
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Sah-Schemas
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-Sah-Schemas.git
-version: '0.013'
+version: '0.014'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

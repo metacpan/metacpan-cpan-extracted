@@ -1,17 +1,20 @@
 #!/usr/bin/perl
 use 5.014 ; use strict ; use warnings ;  # the functions requires 5.10 for "state", 5.14 for srand. 
-use Getopt::Std ; getopts ':.:1d:g:m:s:v:', \my%o ;  
-use Math::Trig qw/pi/ ;
-use Scalar::Util qw/looks_like_number/ ;
+use Getopt::Std ; getopts ':.:@:1d:g:lm:s:v:', \my%o ;  
+use Math::Trig qw/pi/ ; # 5.4から
+use Scalar::Util qw/looks_like_number/ ; # 5.7.3から
 use Term::ANSIColor qw/:constants color/ ;  $Term::ANSIColor::AUTORESET = 1 ;
+use Time::HiRes qw/sleep usleep gettimeofday tv_interval/ ; # 5.7.3から
 
-$SIG{INT} = sub { exit 130 } ;
-END{ & SecondInfo } 
+$SIG{INT} = sub { & SecondInfo ; exit 130 } ;
 
+my $time0 = [ gettimeofday ] ;
 my ( $mu , $sd ) ;  #mu : 平均 , sd : 標準偏差
 my ( $s1 , $s2 )  = (0,0) ; # 1乗和 と 2乗和
+my $count = 0 ; # 出力した個数
 & init ; 
 & main ; 
+& SecondInfo ; 
 exit 0 ;
 
 sub init ( ) {   #オプションを使った設定
@@ -25,15 +28,20 @@ sub init ( ) {   #オプションを使った設定
 }
 
 sub main ( ) {  #  乱数の出力
+   sub getrand  ;
    sub boxmuller ( $$ ) ;  #ボックスミュラー法によるガウス乱数の作成
+   * getrand = * boxmuller ; 
+   * getrand = * lognormal if $o{l} ; 
 
-   for ( 1 .. $o{g} ) { 
-       my $x = boxmuller $mu, $sd ; 
+   while ( $count < $o{g} ) { 
+   	   sleep $o{'@'} if defined $o{'@'} ;
+       my $x = getrand $mu, $sd ; 
        $x = sprintf "% .$o{'.'}f" , $x if defined $o{'.'} ; # <-- May be efficientized. 
        $s1 += $x ; 
-       $s2 += $x **2 ; 
-       print "$_\t" if $o{':'} ;  # <-- Maybe effiecientized by other code structure.
+       $s2 += $x ** 2 ; 
+       print "$count\t" if $o{':'} ;  # <-- Maybe effiecientized by other code structure.
        print "$x\n" ; 
+       $count ++ ; # 出力個数を計数するので個々を選んだ。
    }
 
   sub boxmuller ( $$ ) {  #  ガウス乱数の生成
@@ -49,24 +57,37 @@ sub main ( ) {  #  乱数の出力
       ( my $t , $z ) = ( $r1R * $r2S , $r1R * $r2C ) ; 
       return $t * $_[1] + $_[0] ; 
   }
+
+  sub lognormal ( $$ ) { 
+  	return exp boxmuller $_[0], $_[1] ;
+  }
 }
 
 sub SecondInfo( ) {   #  処理したことについての二次情報を出力
     return if $o{1} ;
     use FindBin qw [ $Script ] ; 
+    my $cmd = "$Script -m $mu -d $sd" ; 
+    $cmd .= ' -l' if $o{l} ;
     print STDERR 
-       CYAN "printed lines: ", BRIGHT_CYAN $o{g} ,
+       CYAN "printed lines: ", BRIGHT_CYAN $count ,
        CYAN " , used random seed: " , BRIGHT_CYAN  $o{s} ,
+       CYAN " , elapsed seconds: " , BRIGHT_CYAN  tv_interval ($time0) ,
        RESET "\n" , 
        CYAN "sum = " , BRIGHT_CYAN  sprintf("%g", $s1 ) ,
        CYAN " , squared sum = " , BRIGHT_CYAN  sprintf( "%g" , $s2 ) , 
-       CYAN " ($Script) " , RESET "\n" ;
+       CYAN " ($cmd) " , RESET "\n" ;
  }
 
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  our $VERSION = 0.22 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+    # 0.22 : -g inf を指定可能とした。
+}  
 
-
-## ヘルプの扱い
-sub VERSION_MESSAGE {}
 sub HELP_MESSAGE {
     use FindBin qw[ $Script $Bin ] ;
     sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
@@ -88,11 +109,9 @@ sub HELP_MESSAGE {
                 print $_ if ! opt || m/^\s+\-/  ; 
             }
         } 
-        #print $_ if /^=head1/ .. /^=cut\b/ and opt ? m/^\s+\-/ : 1 and ( EnvJ && ! en xor s/^=begin $jd\b// .. s/^=end $jd\b// ) ;
     }
     close $FH ;
     exit 0 ;
-
 }
 
 =encoding utf8 
@@ -116,15 +135,19 @@ sub HELP_MESSAGE {
      -v N : Variance. Default is 1. -d is given more priority.
      -. N : The decimal places after the decimal point.
 
-     -g N : How many numbers you need. Default : 6
+     -g N : How many numbers you need. Default : 6　. "inf" can be given.
      -s N : Random seed specification. Seemingly the residual divided by 2^32 is essential.
+     -l   : Outputs variables by the log normal distribution instead of the normal distribution.
+
      -1   : Only output the random number without other secondary information.
-     -:   ; Entail serial number from 1. 
+     -:   ; Attach serial number from 1. 
+     -@ N : Waiting time in seconds (that can be spedicifed 6 digits under decimal points).
 
     --help : Print this online help manual of this command "'=SCRIPT='". Similar to "perldoc `which [-t] '=SCRIPT='` ".
     --help opt ..or..  --help options : Only shows the option helps. It is easy to read when you are in very necessary.
     --help ja : Shows Japanese online help manual. ; "'=script=' --help ja" で日本語のオンラインマニュアルを表示します。
     --help nopod : Print this online manual using the code insdide this program without using the function of Perl POD.
+    --version : Version information output.
 
 =begin JapaneseManual 
    プログラム名 : '=script='  ('=bin=')
@@ -144,15 +167,18 @@ sub HELP_MESSAGE {
    -d N : ガウス分布の標準偏差を指定する。未指定なら 1 stardard Deviation
    -. N : 出力する値の小数点以下の桁数を指定する。
 
-   -g N : 出力するガウス乱数の個数を指定する。未指定の場合 6
+   -g N : 出力するガウス乱数の個数を指定する。未指定の場合 6。無限大を意味する inf も指定可能。
    -s N : 乱数シードを指定する。(指定した数の 2**32=約43億で割った剰余が渡される)
+   -l   ; 対数正規分布で出力する様にする。
+
    -1   : 標準エラー出力へ出力される乱数シードなどの情報を表示しない。
-   -:   ; 1から順に連番も出力する。
+   -:   : 1から順に連番も出力する。
+   -@ N : 1個取り出す為に待つ秒数を指定したい場合に指定。小数点以下6桁迄指定が可能。 
 
   --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
   --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
   --help en : 英語版のオンラインヘルプマニュアルを出力。Online help in English version. 
-  
+  --version : このプログラムのバージョン情報を標準出力に出力する。
 
   開発上のメモ 
     * srand 関数の挙動が Perl 5.14 とそれ以前で異なる。その様子を検知するテストが必要と考えられる。

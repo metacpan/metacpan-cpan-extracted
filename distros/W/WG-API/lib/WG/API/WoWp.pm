@@ -10,11 +10,11 @@ WG::API::WoWp - Modules to work with Wargaming.net Public API for World of Warpl
 
 =head1 VERSION
 
-Version v0.8.8
+Version v0.9
 
 =cut
 
-our $VERSION = 'v0.8.8';
+our $VERSION = 'v0.9';
 
 use constant api_uri => '//api.worldofwarplanes.ru/';
 
@@ -234,6 +234,52 @@ sub ratings_dates {
 
 =back
 
+=head2 Aircraft
+
+=over 1
+
+=item B<planes_stats( [ %params ] )>
+
+Method returns statistics on player's aircraft.
+
+=over 2
+
+=item I<required fields:>
+
+    account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
+
+=cut
+
+sub planes_stats {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wowp/planes/stats/', [ 'account_id', 'access_token', 'fields', 'in_garage', 'language', 'plane_id' ], ['account_id'], @_ );
+}
+
+=item B<planes_achievements( [ %params ] )>
+
+Method returns achievements on player's aircraft.
+
+=over 2
+
+=item I<requires_fields:>
+
+        account_id - Account ID. Max limit is 100. Min value is 1.
+
+=back
+
+=cut
+
+sub planes_achievements {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wowp/planes/achievements/', [ 'account_id', 'fields', 'language', 'plane_id' ], ['account_id'], @_ );
+}
+
+=back
+
 =head1 BUGS
 
 Please report any bugs or feature requests to C<cynovg at cpan.org>, or through the web interface at L<https://gitlab.com/cynovg/WG-API/issues>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
@@ -248,7 +294,7 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: GitHub's request tracker (report bugs here)
+=item * RT: Gitlab's request tracker (report bugs here)
 
 L<https://gitlab.com/cynovg/WG-API/issues>
 

@@ -1,5 +1,20 @@
 Revision history for Perl extension File-ShareDir
 
+1.116	2018-06-24
+    - fix fail-test which incorrectly read without permission
+      ==> introduce new CI test proving this (Thanks to Ville
+          Skyttä <ville.skytta@iki.fi>)
+    - spelling fixes (Thanks to Ville Skyttä <ville.skytta@iki.fi>)
+    - fix author tests when run without recommended dependencies
+      (reported by Mohammed Anwar & Wesley Schwengle)
+    - add a test proving and reporting dependencies
+
+1.114	2018-06-21
+    - be more expressive regarding to prerequisites
+    - improve detection for situations where no permission test
+      can be done
+    - fix edge case for 5.8
+
 1.112	2018-06-18
     - Fix tests that fail when running as root (RT#125602,
       thanks Wesley Schwengle <wesley@schwengle.net>)
@@ -50,7 +65,7 @@ Revision history for Perl extension File-ShareDir
 1.102	2014-05-12
     - Fix RT#95572 "necessary test files not copied into blib"
       Thanks to Graham Knop for fixing and Zefram for reporting
-    - Explicitely require warnings as runtime prerequisite
+    - Explicitly require warnings as runtime prerequisite
       Thanks to Graham Knop for reporting
 
 1.101	2014-05-10

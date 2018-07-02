@@ -2,7 +2,7 @@ use 5.010001;
 use Test::More tests => 9;
 
 use Math::Complex;
-use Math::Polynomial::Solve qw(quadratic_roots ascending_order);
+use Math::Polynomial::Solve qw(:classical);
 use Math::Utils qw(:polynomial :compare);
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ my @case = (
 	[296, 61, 17],
 );
 
-ascending_order(1);
+coefficients order => 'ascending';
 
 foreach (@case)
 {

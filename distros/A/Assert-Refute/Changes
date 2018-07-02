@@ -1,5 +1,74 @@
 Revision history for Assert-Refute
 
+0.1201  Sun Jul 1 2018
+        - DOC Minor POD fixes
+
+0.12    Sun Jul 1 2018
+        - DOC Alpha status removed
+        - MOD Add experimental T::Tester with test_test condition
+        - API Improve get_result_details() greatly
+        - MOD Add experimental is_deeply_diff() with extra parameter
+        - API BREAK make is_deeply generate a limited, multiline report
+        - API BREAK Switch to Data::Dumper instead of homegrown to_scalar
+        - API Allow perl -MAssert::Refute={} -e '...' on CLI
+        - API BREAK Remove 'indent' argument in Report->new
+        - TST Add benchmark.pl script
+
+0.11    Fri Jun 29 2018
+        - API Add plan tests => nnn
+        - API BREAK Remove an extra failing test for interrupted execution
+        - API Add get_result_details()
+        - REF Arrayref in refute() is now interpreted as a multiline diag()
+        - BUG Forbid empty subcontract name
+        - REF Speed up things a bit
+
+0.10    Mon Jun 18 2018
+        - API BREAK Rename refute_these => try_refute, deprecate refute_these until 0.15
+        - API BREAK Change log levels: diag{1=>-1}, not ok{-1=>-2}, fail{-2=>-3}, note{2=>1}
+        - REF Rename Assert::Refute::{Exec->Report}
+
+0.09    Fri Mar 30 2018
+        - API BREAK refute_these requires explicit parameter hash in Assert::Refute, will just generate report in the future
+        - BUG warns_like ignored extra/absent warnings
+        - BUG Improve diagnostics in like and unlike MINOR
+
+0.08    Mon Jan 8 2018
+        - DRV Improve Driver::More getters
+        - MOD T::Scalar: add experimental maybe_is ($var, $cond)
+        - MOD T::Array: add experimental map_subtest, reduce_subtest
+        - DOC Improve documentation in A::R NOCODE
+        - API Add 'driver' param to configure/use
+        - BUG bugfix & tests
+
+0.07    Mon Jan 1 2018
+        - MOD Add T::Numeric with is_between, within_delta, and within_relative
+        - TST Add examples
+
+0.06    Sat Dec 30 2017
+        - TST Add cross-platform Test::More integration test
+        - DRV Add subcontract, done_testing to Driver::More
+        - MOD Redo T::Array, T::Hash with better build_refute
+        - BLD Add manual=>0|1 flag to simplify building sophisticated wrappers
+        - API Add A::R::Exec->do_run, subcontract accepts sub
+        - REF Speedup
+        - TST Upgrade tests to work on perl 5.6.2
+
+0.05    Mon Dec 25 2017
+        - API BREAK Importing is, ok, like & co REQUIRES :all or :basic keyword
+        - API Add refute_these for runtime assertions
+        - API Add configure for per-caller configuration of refute_these
+        - MOD T::Hash: keys_are(), values_are()
+        - MOD T::Array: is_sorted(), list_of()
+        - TST Add a use_ok test, finally
+        - API Add get_fail_count to get number of failed tests
+        - API BREAK done_testing(0) now means don't die if locked
+
+0.04    Tue Dec 19 2017
+        - API BREAK rename contract's own methods into get_*/set_*/do_*
+            The new names are:
+            is_done is_passing get_count get_tests get_result get_error
+            get_tap get_sign do_log get_log set_result
+
 0.0304  Sun Dec 17 2017
         - BUG Fix tests again - splitting t/602 in two didn't work
 

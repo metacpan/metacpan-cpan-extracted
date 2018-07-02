@@ -7,7 +7,7 @@ use Path::Tiny ();
 use Alien::Build::Util qw( _mirror );
 
 # ABSTRACT: Core download plugin
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 sub _hook
@@ -81,6 +81,10 @@ sub _hook
         my $to   = Path::Tiny->new("$tmp/@{[ $from->basename ]}");
         if(-d $res->{path})
         {
+          # Please note: _mirror and Alien::Build::Util are ONLY
+          # allowed to be used by core plugins.  If you are writing
+          # a non-core plugin it may be removed.  That is why it
+          # is private.
           _mirror $from, $to;
         }
         else
@@ -121,7 +125,7 @@ Alien::Build::Plugin::Core::Download - Core download plugin
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -194,7 +198,7 @@ Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2011-2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

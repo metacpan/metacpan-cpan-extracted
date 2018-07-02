@@ -96,7 +96,7 @@ _init(object, error_handler, maxdepth)
     self->auditf = NULL;
     self->error_handler = SvREFCNT_inc(error_handler);
     self->maxdepth = maxdepth;
-    pkgconf_client_init(&self->client, my_error_handler, self);
+    pkgconf_client_init(&self->client, my_error_handler, self, pkgconf_cross_personality_default());
     pkgconf_client_set_flags(&self->client, PKGCONF_PKG_PKGF_NONE);
     hv_store((HV*)SvRV(object), "ptr", 3, newSViv(PTR2IV(self)), 0);
 
@@ -270,7 +270,7 @@ _dir_list_build(self, env_only)
       old_flags = pkgconf_client_get_flags(&self->client);
       pkgconf_client_set_flags(&self->client, old_flags | PKGCONF_PKG_PKGF_ENV_ONLY);
     }
-    pkgconf_pkg_dir_list_build(&self->client);
+    pkgconf_client_dir_list_build(&self->client, pkgconf_cross_personality_default());
     if(env_only)
     {
       pkgconf_client_set_flags(&self->client, old_flags);

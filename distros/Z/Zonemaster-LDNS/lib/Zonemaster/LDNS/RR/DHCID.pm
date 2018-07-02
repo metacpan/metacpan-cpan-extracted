@@ -1,5 +1,7 @@
-
 package Zonemaster::LDNS::RR::DHCID;
+
+use strict;
+use warnings;
 
 use parent 'Zonemaster::LDNS::RR';
 

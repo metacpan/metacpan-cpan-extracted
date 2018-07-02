@@ -1,6 +1,6 @@
 {
-  "": null,
   "plain key": "in-line value",
+  "": null,
   "quoted key": [
     "entry"
   ]

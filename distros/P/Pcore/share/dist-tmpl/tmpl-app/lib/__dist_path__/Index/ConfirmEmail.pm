@@ -32,24 +32,26 @@ HTML
     if ( $req->{env}->{QUERY_STRING} && $req->{env}->{QUERY_STRING} =~ /id=([[:alnum:]]+)/sm ) {
         $token = $1;
 
-        $req->authenticate( sub($auth) {
-            $auth->api_call(
-                '/v1/Auth/confirm_email_by_token',
-                $token,
-                sub ($res) {
-                    if ($res) {
-                        $accept->();
-                    }
-                    else {
-                        $reject->();
-                    }
+        my $auth = $req->authenticate;
 
-                    return;
+        return $reject->() if !$auth;
+
+        $auth->api_call(
+            '/v1/Auth/confirm_email_by_token',
+            $token,
+            sub ($res) {
+                if ($res) {
+                    $accept->();
                 }
-            );
+                else {
+                    $reject->();
+                }
 
-            return;
-        } );
+                return;
+            }
+        );
+
+        return;
     }
     else {
         $reject->();

@@ -432,7 +432,7 @@ function requestURI(url, id, txt, bHistory, formData, method, bWaid) {
             } catch (e) {}
         }
     }
-    //     setCurrentTab(id,txt);
+
     m_txt = txt;
     visible('load');
     http_request.onreadystatechange = setContent;
@@ -441,7 +441,6 @@ function requestURI(url, id, txt, bHistory, formData, method, bWaid) {
         http_request.send(null);
     } else {
         http_request.open('POST', url, true);
-        http_request.setRequestHeader("Accept-Encoding", "UTF-8");
         http_request.setRequestHeader("Content-Type", "multipart/form-data");
         http_request.send(formData);
     }

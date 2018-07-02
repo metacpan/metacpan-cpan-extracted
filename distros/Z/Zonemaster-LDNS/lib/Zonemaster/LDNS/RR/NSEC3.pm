@@ -1,5 +1,8 @@
 package Zonemaster::LDNS::RR::NSEC3;
 
+use strict;
+use warnings;
+
 use parent 'Zonemaster::LDNS::RR';
 
 1;

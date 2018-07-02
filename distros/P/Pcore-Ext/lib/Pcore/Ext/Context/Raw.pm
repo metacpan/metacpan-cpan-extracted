@@ -3,13 +3,13 @@ package Pcore::Ext::Context::Raw;
 use Pcore -class;
 use Pcore::Util::Scalar qw[refaddr];
 
-has ext => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 1 );
+has ctx => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 1 );
 has js  => ();    #  ( is => 'ro', isa => Str, required => 1 );
 
 sub TO_JSON ( $self ) {
     my $id = refaddr $self;
 
-    $self->{ext}->{_js_gen_cache}->{$id} = $self->to_js;
+    $self->{ctx}->{_js_gen_cache}->{$id} = $self->to_js;
 
     return "__JS${id}__";
 }

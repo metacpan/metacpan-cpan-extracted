@@ -64,7 +64,7 @@ sub run ( $type, $args ) {
 
             return;
         },
-        on_rpc => Coro::unblock_sub sub ( $h, $req, $tx ) {
+        on_rpc => sub ( $h, $req, $tx ) {
             if ( !$h->{auth} ) {
                 $h->disconnect( res 401 );
 

@@ -8,7 +8,7 @@ WriteMakefile(
     DISTNAME            => 'Mojo-IRC-Server-Chinese',
     LICENSE             => "perl",
     PREREQ_PM         => {
-        "Mojolicious"           => '6.11',
+        "Mojolicious"           => '7.69',
         "Parse::IRC"            => '1.20',
         "Encode::Locale"        => '1.05',
     }, # e.g., Module::Name => 1.1

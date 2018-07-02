@@ -4,7 +4,7 @@ use warnings;
 
 use Test::More;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our $time = CORE::time();
 
 my $pkg = __PACKAGE__;
@@ -34,7 +34,15 @@ sub import {
 		} else {
 			CORE::sleep(shift);
 		}
-	}
+	};
+
+	*CORE::GLOBAL::localtime = sub(;$) {
+		my $arg = shift;
+		if (in_effect) {
+			$arg ||= $time;
+		}
+		return defined $arg ? CORE::localtime($arg) : CORE::localtime();
+	};
 };
 
 sub unimport {
@@ -67,8 +75,8 @@ Test::Time - Overrides the time() and sleep() core functions for testing
 =head1 DESCRIPTION
 
 Test::Time can be used to test modules that deal with time. Once you C<use> this 
-module, all references to C<time> and C<sleep> will be internalized. You can set
-custom time by passing time => number after the C<use> statement:
+module, all references to C<time>, C<localtime> and C<sleep> will be internalized.
+You can set custom time by passing time => number after the C<use> statement:
 
     use Test::Time time => 1;
 

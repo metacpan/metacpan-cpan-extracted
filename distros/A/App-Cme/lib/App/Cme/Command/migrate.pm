@@ -10,7 +10,7 @@
 # ABSTRACT: Migrate the configuration of an application
 
 package App::Cme::Command::migrate ;
-$App::Cme::Command::migrate::VERSION = '1.027';
+$App::Cme::Command::migrate::VERSION = '1.028';
 use strict;
 use warnings;
 use 5.10.1;
@@ -31,7 +31,6 @@ sub opt_spec {
     my ( $class, $app ) = @_;
     return (
         [ "backup:s"  => "Create a backup of configuration files before saving." ],
-        [ "quiet!" => "Suppress progress messages" ],
         $class->cme_global_options,
     );
 }
@@ -71,7 +70,7 @@ App::Cme::Command::migrate - Migrate the configuration of an application
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 

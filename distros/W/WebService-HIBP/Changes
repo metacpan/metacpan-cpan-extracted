@@ -1,0 +1,19 @@
+Revision history for WebService-HIBP
+
+0.06   Fri Jun 21 19:03:00 2018
+        Raised the minimum version of LWP::Protocol::https to 6.06 to cope with $ENV{HTTPS_PROXY}
+
+0.05   Fri Jun 21 06:45:00 2018
+        Improved test coverage
+
+0.04   Thu Jun 21 17:10:00 2018
+        Included LWP::Protocol::https as an explicit dependency
+
+0.03   Thu Jun 21 07:05:00 2018
+        Improved test suite debugging
+
+0.02   Thu Jun 21 02:36:00 2018
+        Corrected MANIFEST
+
+0.01   Wed Jun 20 21:21:00 2018
+        Initial release.

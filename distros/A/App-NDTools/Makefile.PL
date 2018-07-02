@@ -17,6 +17,7 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Capture::Tiny'         => 0,
+        'Cwd'                   => 0,
         'Data::Dumper'          => 0,
         'JSON::PP'              => 0, # required by YAML::XS
         'Test::File::Contents'  => 0.23,

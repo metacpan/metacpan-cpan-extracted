@@ -1,7 +1,7 @@
 package Finance::Currency::FiatX::Source::gmc;
 
-our $DATE = '2018-06-19'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-06-27'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -54,7 +54,11 @@ sub get_all_spot_rates {
 }
 
 sub get_spot_rate {
-    my ($from, $to, $type) = @_;
+    my %args = @_;
+
+    my $from = $args{from} or return [400, "Please specify from"];
+    my $to   = $args{to} or return [400, "Please specify to"];
+    my $type = $args{type} or return [400, "Please specify type"];
 
     return [501, "This source only provides buy/sell rate types"]
         unless $type =~ /\A(buy|sell)\z/;
@@ -114,7 +118,7 @@ Finance::Currency::FiatX::Source::gmc - Get currency conversion rates from GMC (
 
 =head1 VERSION
 
-This document describes version 0.005 of Finance::Currency::FiatX::Source::gmc (from Perl distribution Finance-Currency-FiatX), released on 2018-06-19.
+This document describes version 0.008 of Finance::Currency::FiatX::Source::gmc (from Perl distribution Finance-Currency-FiatX), released on 2018-06-27.
 
 =head1 DESCRIPTION
 

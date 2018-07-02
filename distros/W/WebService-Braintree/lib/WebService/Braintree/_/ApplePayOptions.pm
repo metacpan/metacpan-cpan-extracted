@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::ApplePayOptions;
-$WebService::Braintree::_::ApplePayOptions::VERSION = '1.5';
+$WebService::Braintree::_::ApplePayOptions::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,8 +17,8 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
-use MooseX::Aliases;
+use Moo;
+use MooX::Aliases;
 
 extends 'WebService::Braintree::_';
 

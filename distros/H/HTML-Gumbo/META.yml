@@ -8,7 +8,7 @@ configure_requires:
   Alien::LibGumbo: '0'
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,12 +17,12 @@ name: HTML-Gumbo
 provides:
   HTML::Gumbo:
     file: lib/HTML/Gumbo.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   Alien::LibGumbo: '0.03'
   XSLoader: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ruz/HTML-Gumbo
-version: '0.17'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

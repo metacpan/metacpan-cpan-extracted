@@ -22,82 +22,97 @@ sub set_locale ($locale = undef) {
 sub load_locale ( $locale ) : prototype($) {
     my $messages = $MESSAGES->{$locale} //= {};
 
-    my ( $plural_form, $domains, $msgid );
-
     for my $dist ( values $ENV->{_dist_idx}->%* ) {
         my $po_path = "$dist->{share_dir}l10n/$locale.po";
 
         next if !-f $po_path;
 
-        for my $line ( P->file->read_lines($po_path)->@* ) {
-            if ( $line =~ /\A#/sm ) {
-                if ( $line =~ /\A#:\s*(.+)/sm ) {
-                    undef $domains;
+        my ( $msg, $current_tag );
 
-                    my $references = $1;
+        for my $line ( P->file->read_lines( $po_path, empty_lines => 1 )->@* ) {
 
-                    while ( $references =~ /\s*([^:]+):\d+/smg ) {
-                        my $domain = $1;
+            # NOTE https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html
+            # #<space> - translator comments
+            # #. - extracted comments
+            # #: - references to the program’s source code
+            # #, - flags
+            # #| - previous untranslated string
+            # msgid
+            # msgstr
 
-                        $domain =~ s/[.]pm\z//sm;
-                        $domain =~ s[\Alib/][]sm;
-                        $domain =~ s[/][::]smg;
+            # end of block
+            if ( !$line ) {
+                if ( exists $msg->{msgstr} ) {
 
-                        $domains->{$domain} = 1;
+                    # header
+                    if ( !exists $msg->{msgid} ) {
+                        if ( $msg->{msgstr}->[0] =~ /\nPlural-Forms:.+?plural=[(](.+?)[)];\n/sm ) {
+                            my $exp = $1;
+
+                            if ( exists $LOCALE_PLURAL_FORM->{$locale}->{exp} ) {
+                                die qq[Plural form expression for locale "$locale" redefined] if $LOCALE_PLURAL_FORM->{$locale}->{exp} ne $exp;
+                            }
+                            else {
+                                $LOCALE_PLURAL_FORM->{$locale}->{exp} = $exp;
+                            }
+
+                            $exp =~ s/n/\$_[0]/smg;
+
+                            $LOCALE_PLURAL_FORM->{$locale}->{code} = eval "sub { return $exp }";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
+                        }
+                    }
+                    else {
+                        $messages->{ $msg->{msgid} } = $msg->{msgstr};
                     }
                 }
 
-                # skip comments
-                else {
-                    next;
+                undef $msg;
+                undef $current_tag;
+            }
+
+            # comment
+            elsif ( $line =~ /\A#/sm ) {
+                undef $current_tag;
+
+                if ( $line =~ /\A#:\s*(.+)/sm ) {
+                    my $refs = $1;
+
+                    while ( $refs =~ /\s*([^:]+):\d+/smg ) {
+                        my $ref = $1;
+
+                        $ref =~ s/[.]pm\z//sm;
+                        $ref =~ s[\Alib/][]sm;
+
+                        # $ref =~ s[/][::]smg;
+
+                        $msg->{refs}->{$ref} = 1;
+                    }
                 }
             }
 
-            # msgid
-            elsif ( $line =~ /\Amsgid\s"(.+?)"/sm ) {
-                $msgid = $1;
-            }
+            elsif ( $line =~ /\A([^"\s]+)?\s*"(.*)"\z/sm ) {
+                $current_tag = $1 if $1;
 
-            # skip msgid_plural
-            elsif ( $line =~ /\Amsgid_plural\s/sm ) {
-                next;
-            }
+                if ($current_tag) {
+                    my $str = $2;
 
-            # message
-            elsif ( $line =~ /\Amsgstr\s"(.+?)"/sm ) {
-                for my $domain ( keys $domains->%* ) {
-                    $messages->{$domain}->{$msgid}->[0] = $1;
+                    # unescape
+                    $str =~ s/\\"/"/smg;
+                    $str =~ s/\\n/\n/smg;
+
+                    if ( $str ne q[] ) {
+                        if ( $current_tag eq 'msgstr' ) {
+                            $msg->{msgstr}->[0] .= $str;
+                        }
+                        elsif ( $current_tag =~ /msgstr\[(\d+)\]/sm ) {
+                            $msg->{msgstr}->[$1] .= $str;
+                        }
+                        else {
+                            $msg->{$current_tag} .= $str;
+                        }
+                    }
                 }
             }
-
-            # message plural forms
-            elsif ( $line =~ /\Amsgstr\[(\d+)\]\s"(.+?)"/sm ) {
-                for my $domain ( keys $domains->%* ) {
-                    $messages->{$domain}->{$msgid}->[$1] = $2;
-                }
-            }
-
-            # plural form expression
-            elsif ( $line =~ /"(.+?):\s(.+?)\\n"/sm ) {
-                $plural_form = $2 if $1 eq 'Plural-Forms';
-            }
-        }
-    }
-
-    if ($plural_form) {
-        if ( $plural_form =~ /.+?;\s+plural=[(](.+?)[)];/sm ) {
-            my $exp = $1;
-
-            if ( exists $LOCALE_PLURAL_FORM->{$locale}->{exp} ) {
-                die qq[Plural form expression for locale "$locale" redefined] if $LOCALE_PLURAL_FORM->{$locale}->{exp} ne $exp;
-            }
-            else {
-                $LOCALE_PLURAL_FORM->{$locale}->{exp} = $exp;
-            }
-
-            $exp =~ s/n/\$_[0]/smg;
-
-            $LOCALE_PLURAL_FORM->{$locale}->{code} = eval "sub { return $exp }";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
         }
     }
 
@@ -106,7 +121,7 @@ sub load_locale ( $locale ) : prototype($) {
 
 sub l10n ( $msgid, $msgid_plural = undef, $num = undef ) : prototype($;$$) {
     return bless {
-        domain       => caller,
+        caller       => caller,
         msgid        => $msgid,
         msgid_plural => $msgid_plural,
         num          => $num // 1,
@@ -132,7 +147,7 @@ use overload    #
   },
   fallback => undef;
 
-has domain       => ();
+has caller       => ();
 has msgid        => ();
 has msgid_plural => ();
 has num          => ();
@@ -143,18 +158,16 @@ sub to_string ( $self, $num = undef ) {
     # load locale, if not loaded
     Pcore::Core::L10N::load_locale($LOCALE) if !exists $Pcore::Core::L10N::MESSAGES->{$LOCALE};
 
-    if ( my $domain = $Pcore::Core::L10N::MESSAGES->{$LOCALE}->{ $self->{domain} } ) {
-        if ( my $msg = $domain->{ $self->{msgid} } ) {
-            my $idx = 0;
+    if ( my $msg = $Pcore::Core::L10N::MESSAGES->{$LOCALE}->{ $self->{msgid} } ) {
+        my $idx = 0;
 
-            if ( $self->{msgid_plural} ) {
-                goto DEFAULT if !defined $LOCALE_PLURAL_FORM->{$LOCALE}->{code};
+        if ( $self->{msgid_plural} ) {
+            goto DEFAULT if !defined $LOCALE_PLURAL_FORM->{$LOCALE}->{code};
 
-                $idx = $LOCALE_PLURAL_FORM->{$LOCALE}->{code}->( $num // $self->{num} // 1 );
-            }
-
-            return $msg->[$idx] if defined $msg->[$idx];
+            $idx = $LOCALE_PLURAL_FORM->{$LOCALE}->{code}->( $num // $self->{num} // 1 );
         }
+
+        return $msg->[$idx] if defined $msg->[$idx];
     }
 
   DEFAULT:
@@ -174,7 +187,7 @@ sub TIEHASH ( $self, @args ) {
 
 sub FETCH {
     return bless {
-        domain => caller,
+        caller => caller,
         msgid  => $_[1],
       },
       'Pcore::Core::L10N::_deferred';
@@ -187,7 +200,9 @@ sub FETCH {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 22                   | Subroutines::ProhibitExcessComplexity - Subroutine "load_locale" with high complexity score (21)               |
+## |    3 | 22                   | Subroutines::ProhibitExcessComplexity - Subroutine "load_locale" with high complexity score (22)               |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 49, 52, 104          | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 14                   | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

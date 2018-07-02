@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::IdealPayment;
-$WebService::Braintree::_::IdealPayment::VERSION = '1.5';
+$WebService::Braintree::_::IdealPayment::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,11 +17,13 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
+use Moo;
 
 extends 'WebService::Braintree::_';
 
-use WebService::Braintree::_::IbanBankAccount;
+use WebService::Braintree::Types qw(
+    IbanBankAccount
+);
 
 =head1 ATTRIBUTES
 
@@ -65,7 +67,7 @@ This is the iban_bank_account for this ideal payment. This will be an object of 
 
 has iban_bank_account => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::IbanBankAccount',
+    isa => IbanBankAccount,
     coerce => 1,
 );
 

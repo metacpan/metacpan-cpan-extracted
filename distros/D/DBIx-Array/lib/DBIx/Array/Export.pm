@@ -3,12 +3,12 @@ use base qw{DBIx::Array};
 use strict;
 use warnings;
 
-our $VERSION='0.49';
+our $VERSION='0.58';
 our $PACKAGE=__PACKAGE__;
 
 =head1 NAME
 
-DBIx::Array::Export - This modules extends DBIx::Array with convenient export functions
+DBIx::Array::Export - Extends DBIx::Array with convenient export functions
 
 =head1 SYNOPSIS
 

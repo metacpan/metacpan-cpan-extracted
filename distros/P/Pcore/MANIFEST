@@ -27,6 +27,7 @@ lib/Pcore/App.pm
 lib/Pcore/App/API.pm
 lib/Pcore/App/API/Auth.pm
 lib/Pcore/App/API/Auth/Request.pm
+lib/Pcore/App/API/Base.pm
 lib/Pcore/App/API/Local.pm
 lib/Pcore/App/API/Local/pgsql.pm
 lib/Pcore/App/API/Local/sqlite.pm
@@ -34,7 +35,6 @@ lib/Pcore/App/API/LocalNoAuth.pm
 lib/Pcore/App/API/Map.pm
 lib/Pcore/App/API/RPC/Hash.pm
 lib/Pcore/App/API/Remote.pm
-lib/Pcore/App/API/Role.pm
 lib/Pcore/App/Controller.pm
 lib/Pcore/App/Controller/API.pm
 lib/Pcore/App/Controller/Index.pm
@@ -139,8 +139,8 @@ lib/Pcore/Src/Filter/JS.pm
 lib/Pcore/Src/Filter/Perl.pm
 lib/Pcore/Util/Bit.pm
 lib/Pcore/Util/CA.pm
+lib/Pcore/Util/Cfg.pm
 lib/Pcore/Util/Class.pm
-lib/Pcore/Util/Config.pm
 lib/Pcore/Util/Data.pm
 lib/Pcore/Util/Date.pm
 lib/Pcore/Util/Date/Duration.pm
@@ -157,6 +157,7 @@ lib/Pcore/Util/Hash.pm
 lib/Pcore/Util/Hash/LRU.pm
 lib/Pcore/Util/Hash/Multivalue.pm
 lib/Pcore/Util/Hash/RandKey.pm
+lib/Pcore/Util/Host.pm
 lib/Pcore/Util/IDN.pm
 lib/Pcore/Util/List.pm
 lib/Pcore/Util/Net.pm
@@ -171,7 +172,6 @@ lib/Pcore/Util/Scalar.pm
 lib/Pcore/Util/Sys.pm
 lib/Pcore/Util/Sys/ForkTmpl.pm
 lib/Pcore/Util/Sys/Proc.pm
-lib/Pcore/Util/Template.pm
 lib/Pcore/Util/Term.pm
 lib/Pcore/Util/Term/Progress.pm
 lib/Pcore/Util/Term/Progress/Indicator.pm
@@ -179,8 +179,8 @@ lib/Pcore/Util/Term/Progress/Indicator/Bar.pm
 lib/Pcore/Util/Text.pm
 lib/Pcore/Util/Text/Table.pm
 lib/Pcore/Util/Text/Table/Column.pm
+lib/Pcore/Util/Tmpl.pm
 lib/Pcore/Util/URI.pm
-lib/Pcore/Util/URI/Host.pm
 lib/Pcore/Util/URI/Path.pm
 lib/Pcore/Util/URI/file.pm
 lib/Pcore/Util/URI/ftp.pm

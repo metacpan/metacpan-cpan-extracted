@@ -34,4 +34,4 @@ resources:
   homepage: https://metacpan.org/module/DBIx::Result::Convert::JSONSchema
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Humanstate/p5-dbix-result-convert-jsonschema
-version: '0.02'
+version: '0.03'

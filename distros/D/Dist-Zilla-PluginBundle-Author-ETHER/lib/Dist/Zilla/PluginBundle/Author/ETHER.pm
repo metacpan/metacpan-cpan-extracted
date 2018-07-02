@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.140-2-g352c56d
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.141-5-ga8d2668
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.141';
+our $VERSION = '0.142';
 
 use Moose;
 with
@@ -239,7 +239,8 @@ sub configure
     warn '[@Author::ETHER] no "bash" executable found; skipping Run::AfterBuild command to update .ackrc', "\n"
         if not $INC{'Test/More.pm'} and not $self->_has_bash;
 
-    # NOTE! since the working directory has not changed to $zilla->root yet,
+    # NOTE! since the working directory has not changed to $zilla->root yet
+    # (and in future versions of Dist::Zilla, it may never change...)
     # if running this code via a different mechanism than dzil <command>, file
     # operations may be looking at the wrong directory! Take this into
     # consideration when running tests!
@@ -328,7 +329,8 @@ sub configure
         [ 'MojibakeTests'       => { ':version' => '0.8' } ],
         [ 'Test::ReportPrereqs' => { ':version' => '0.022', verify_prereqs => 1,
             version_extractor => ( ( any { $_ ne 'MakeMaker' } $self->installer ) ? 'Module::Metadata' : 'ExtUtils::MakeMaker' ),
-            include => [ sort ( qw(autodie Encode JSON::PP Sub::Name YAML), $self->_plugin_removed('PodCoverageTests') ? () : 'Pod::Coverage' ) ] } ],
+            include => [ sort qw(autodie Encode File::Temp JSON::PP Module::Runtime Sub::Name YAML),
+                    $self->_plugin_removed('PodCoverageTests') ? () : 'Pod::Coverage' ] } ],
         [ 'Test::Portability'   => { ':version' => '2.000007' } ],
         [ 'Test::CleanNamespaces' => { ':version' => '0.006' } ],
 
@@ -614,7 +616,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.141
+version 0.142
 
 =head1 SYNOPSIS
 
@@ -741,7 +743,9 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     verify_prereqs = 1
     version_extractor = Module::Metadata
     include = Encode
+    include = File::Temp
     include = JSON::PP
+    include = Module::Runtime
     include = Pod::Coverage
     include = Sub::Name
     include = YAML

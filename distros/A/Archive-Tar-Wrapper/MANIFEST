@@ -6,7 +6,6 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml			Module meta-data (added by MakeMaker)
-README
 t/001Basic.t
 t/002Mult.t
 t/003Dirs.t

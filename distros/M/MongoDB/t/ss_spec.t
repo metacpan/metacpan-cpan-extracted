@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -103,13 +101,18 @@ sub create_mock_topology {
     $type ||= 'Single';
 
     return MongoDB::_Topology->new(
-        uri                    => MongoDB::_URI->new( uri => $uri ),
+        uri                    => MongoDB::_URI->new( uri              => $uri ),
         type                   => $type,
+        min_server_version     => "0.0.0",
         max_wire_version       => 3,
         min_wire_version       => 0,
         heartbeat_frequency_ms => 3600000,
-        last_scan_time => time + 60,
-        credential => MongoDB::_Credential->new( mechanism => 'NONE' ),
+        last_scan_time         => time + 60,
+        credential             => MongoDB::_Credential->new(
+            mechanism => 'NONE',
+            monitoring_callback => undef,
+        ),
+        monitoring_callback    => undef,
     );
 }
 
@@ -154,7 +157,7 @@ sub run_ss_test {
             $address,
             $s->{avg_rtt_ms}/1000,
             type => $s->{type},
-            tags => $s->{tags},
+            tags => $s->{tags} || {},
         );
         $topo->servers->{$server->address} = $server;
         $topo->_update_ewma( $server->address, $server );
@@ -164,7 +167,7 @@ sub run_ss_test {
     if ( $plan->{operation} eq 'read' ) {
         my $read_pref = MongoDB::ReadPreference->new(
             mode     => $plan->{read_preference}{mode},
-            tag_sets => $plan->{read_preference}{tag_sets},
+            tag_sets => $plan->{read_preference}{tag_sets} || {},
         );
         my $mode = $read_pref ? lc $read_pref->mode : 'primary';
         my $method =

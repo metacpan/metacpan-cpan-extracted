@@ -31,7 +31,7 @@ if (($ENV{LANG} =~ /utf-?8/i) || ($ENV{LC_TYPE} =~ /utf-?8/i)) {
 	$Poincare  = "Henri Poincar\x{e9}";
 	$Schroedinger = "Erwin Schr\x{f6}dinger";
 }
-eval "require 'Term/Clui.pm'";
+eval "require './lib/Term/Clui.pm'";
 if (!$@) {
 	warn "using Term::Clui\n";
 } else {
@@ -49,7 +49,7 @@ if (!$@) {
 }
 import Term::Clui;
 
-eval "require './Term/Clui/FileSelect.pm'";
+eval "require './lib/Term/Clui/FileSelect.pm'";
 if ($@) { eval "require '../Clui/FileSelect.pm'"; }
 if ($@) { eval "require 'Clui/FileSelect.pm'"; }
 if ($@) {

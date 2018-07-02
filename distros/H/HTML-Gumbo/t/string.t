@@ -88,4 +88,18 @@ END
     is $res, $expected, 'very basic fragment parsing test';
 }
 
+
+{
+    my $input = <<'END';
+<div>&gt;&lt;&amp;t&gt;&lt;</div>
+END
+    my $expected = <<'END';
+<div>&gt;&lt;&amp;t&gt;&lt;</div>
+
+END
+    my $res = $parser->parse($input, fragment_namespace => 'HTML');
+    is $res, $expected, "make sure we don't turn text into html";
+}
+
+
 done_testing();

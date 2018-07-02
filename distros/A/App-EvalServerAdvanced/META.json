@@ -98,59 +98,59 @@
    "provides" : {
       "App::EvalServerAdvanced" : {
          "file" : "lib/App/EvalServerAdvanced.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Config" : {
          "file" : "lib/App/EvalServerAdvanced/Config.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::JobManager" : {
          "file" : "lib/App/EvalServerAdvanced/JobManager.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Log" : {
          "file" : "lib/App/EvalServerAdvanced/Log.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Sandbox" : {
          "file" : "lib/App/EvalServerAdvanced/Sandbox.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Sandbox::Internal" : {
          "file" : "lib/App/EvalServerAdvanced/Sandbox/Internal.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Sandbox::Plugin::Perlbot" : {
          "file" : "lib/App/EvalServerAdvanced/Sandbox/Plugin/Perlbot.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Sandbox::Plugin::PerlbotEggs" : {
          "file" : "lib/App/EvalServerAdvanced/Sandbox/Plugin/PerlbotEggs.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Seccomp" : {
          "file" : "lib/App/EvalServerAdvanced/Seccomp.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Seccomp::Plugin::Constants::LinuxClone" : {
          "file" : "lib/App/EvalServerAdvanced/Seccomp/Plugin/Constants/LinuxClone.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Seccomp::Plugin::Constants::POSIX" : {
          "file" : "lib/App/EvalServerAdvanced/Seccomp/Plugin/Constants/POSIX.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Seccomp::Plugin::ExecWrapper" : {
          "file" : "lib/App/EvalServerAdvanced/Seccomp/Plugin/ExecWrapper.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Seccomp::Profile" : {
          "file" : "lib/App/EvalServerAdvanced/Seccomp/Profile.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       },
       "App::EvalServerAdvanced::Seccomp::Syscall" : {
          "file" : "lib/App/EvalServerAdvanced/Seccomp/Syscall.pm",
-         "version" : "0.022"
+         "version" : "0.023"
       }
    },
    "release_status" : "stable",
@@ -164,7 +164,7 @@
          "web" : "https://github.com/perlbot/App-EvalServerAdvanced"
       }
    },
-   "version" : "0.022",
+   "version" : "0.023",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -343,12 +343,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.022",
+                  "tag" : "v0.023",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.2",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -373,7 +373,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.16.2",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },

@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::QueryResult;
 # ABSTRACT: An iterator for Mongo query results
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 use MongoDB::Error;
@@ -30,17 +28,19 @@ use MongoDB::Op::_GetMore;
 use MongoDB::Op::_KillCursors;
 use MongoDB::_Types qw(
     BSONCodec
+    ClientSession
     HostAddress
+    Intish
+    Numish
+    Stringish
 );
 use Types::Standard qw(
     Maybe
     ArrayRef
     Any
     InstanceOf
-    Int
     HashRef
-    Num
-    Str
+    Overload
 );
 use namespace::clean;
 
@@ -66,7 +66,7 @@ has _address => (
 has _full_name => (
     is       => 'ro',
     required => 1,
-    isa => Str,
+    isa => Stringish
 );
 
 has _bson_codec => (
@@ -78,12 +78,17 @@ has _bson_codec => (
 has _batch_size => (
     is       => 'ro',
     required => 1,
-    isa      => Int,
+    isa      => Intish,
 );
 
 has _max_time_ms => (
     is       => 'ro',
-    isa      => Num,
+    isa      => Numish,
+);
+
+has _session => (
+    is => 'rwp',
+    isa => Maybe[ClientSession],
 );
 
 # attributes for tracking progress
@@ -91,7 +96,7 @@ has _max_time_ms => (
 has _cursor_at => (
     is       => 'ro',
     required => 1,
-    isa      => Num,
+    isa      => Numish,
 );
 
 sub _inc_cursor_at { $_[0]{_cursor_at}++ }
@@ -99,7 +104,7 @@ sub _inc_cursor_at { $_[0]{_cursor_at}++ }
 has _limit => (
     is       => 'ro',
     required => 1,
-    isa      => Num,
+    isa      => Numish,
 );
 
 # attributes from actual results
@@ -116,7 +121,7 @@ has _cursor_start => (
     is       => 'ro',
     required => 1,
     writer   => '_set_cursor_start',
-    isa      => Num,
+    isa      => Numish,
 );
 
 has _cursor_flags => (
@@ -129,10 +134,10 @@ has _cursor_flags => (
 has _cursor_num => (
     is       => 'ro',
     required => 1,
-    isa      => Num,
+    isa      => Numish,
 );
 
-sub _inc_cursor_num { $_[0]{_cursor_num}++ }
+sub _inc_cursor_num { $_[0]{_cursor_num} += $_[1] }
 
 has _docs => (
     is       => 'ro',
@@ -243,6 +248,8 @@ sub _get_more {
         cursor_id  => $self->_cursor_id,
         batch_size => $want,
         ( $self->_max_time_ms ? ( max_time_ms => $self->_max_time_ms ) : () ),
+        session             => $self->_session,
+        monitoring_callback => $self->_client->monitoring_callback,
     );
 
     my $result = $self->_client->send_direct_op( $op, $self->_address );
@@ -277,11 +284,14 @@ sub _kill_cursor {
 
     my ($db_name, $coll_name) = split(/\./, $self->_full_name, 2);
     my $op = MongoDB::Op::_KillCursors->_new(
-        db_name    => $db_name,
-        coll_name  => $coll_name,
-        full_name  => $self->_full_name,
-        bson_codec => $self->_bson_codec,
-        cursor_ids => [$cursor_id],
+        db_name             => $db_name,
+        coll_name           => $coll_name,
+        full_name           => $self->_full_name,
+        bson_codec          => $self->_bson_codec,
+        cursor_ids          => [$cursor_id],
+        client              => $self->_client,
+        session             => $self->_session,
+        monitoring_callback => $self->_client->monitoring_callback,
     );
     $self->_client->send_direct_op( $op, $self->_address );
     $self->_set_cursor_id(0);
@@ -329,6 +339,12 @@ sub DEMOLISH {
 #pod When a C<MongoDB::QueryResult> object is destroyed, a cursor termination
 #pod request will be sent to the originating server to free server resources.
 #pod
+#pod =head2 Multithreading
+#pod
+#pod Iterators are cloned in threads, but not reset.  Iterating from multiple
+#pod threads will give unpredictable results.  Only iterate from a single
+#pod thread.
+#pod
 #pod =cut
 
 1;
@@ -345,7 +361,7 @@ MongoDB::QueryResult - An iterator for Mongo query results
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -383,6 +399,12 @@ are recommended:
 
 When a C<MongoDB::QueryResult> object is destroyed, a cursor termination
 request will be sent to the originating server to free server resources.
+
+=head2 Multithreading
+
+Iterators are cloned in threads, but not reset.  Iterating from multiple
+threads will give unpredictable results.  Only iterate from a single
+thread.
 
 =head1 METHODS
 

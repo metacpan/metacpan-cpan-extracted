@@ -1,12 +1,13 @@
 package XML::XPathScript::Stylesheet::DocBook2LaTeX;
+our $AUTHORITY = 'cpan:YANICK';
+$XML::XPathScript::Stylesheet::DocBook2LaTeX::VERSION = '1.55';
+# ABSTRACT: Transforms DocBook into LaTeX
 
 use warnings;
 use strict;
 
 use XML::XPathScript::Processor;
 use Carp;
-
-our $VERSION = '1.54';
 
 our $processor;
 
@@ -75,11 +76,11 @@ our %uniconvs=(
 		# Those are Latin1 and have no business here, except that
 		# we use them to quote things to protect during the
 		# quoting process (elegant hack if I may)
-		ord('<') => '{<}', # Also prevents kerning into "«"
+		ord('<') => '{<}', # Also prevents kerning into "Â«"
 		ord('>') => '{>}',
 
 		# TeX's shenanigans
-	    ord('µ') => '\ensuremath{µ}',
+	    ord('Âµ') => '\ensuremath{Âµ}',
 	    ord('_') => '\_',
 	    ord('^') => '{\^\relax}',
 	    ord('$') => '\$',
@@ -287,8 +288,8 @@ sub tc_quote {
 			$t->{pre}=" ``";
 			$t->{post}="''";
 		} else {
-			$t->{pre}=" «";
-			$t->{post}="»";
+			$t->{pre}=" Â«";
+			$t->{post}="Â»";
 		};
 	} else {
 		if ($nested) {
@@ -961,11 +962,1033 @@ $is_footnote_blocker=sub {
 };
 1;
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+XML::XPathScript::Stylesheet::DocBook2LaTeX - Transforms DocBook into LaTeX
+
+=head1 VERSION
+
+version 1.55
+
+=head1 SYNOPSIS
+
+    use XML::XPathScript;
+    use XML::XPathScript::Stylesheet::DocBook2LaTeX;
+
+    my $latex = $xps->transform( 
+        $docbook => XML::XPathScript::Stylesheet::DocBook2LaTeX::stylesheet
+    );
+
+=head1 WARNING
+
+This module is still in a very beta-ish stage.
+We heavily recommend to wait till we tell you to to use it. 
+But if you are in an adventurous mode, by all means, go ahead. :-)
+
+=begin devel
+
+=head1 NAME
+
+docbook2latex.xps - an XPathScript stylesheet for LaTeX.
+
+=head1 SYNOPSIS
+
+  xpathscript yourdoc.xml docbook2latex.xps > yourdoc.tex
+
+=head1 DESCRIPTION
+
+This is docbook2latex.xps version number $Revision: 32928 $, by IDEALX
+(http://www.idealx.org/docbook2latex/).
+
+Using Matt Sergeant's XPathScript framework (see L<SEE ALSO>), this stylesheet
+translates Docbook XML into LaTeX for beautiful typesetting of Docbook
+articles (reports, books and other kinds of whole documents defined by
+the DTD are not supported yet).
+
+Provided you have the Perl dependencies installed (XML::XPathScript,
+from CPAN, as well as all sub-dependencies of those), the command
+shown in the synopsis will turn any (DTD-conformant) C<mydoc.xml> into
+pure LaTeX (that is, using only packages included in the TeTeX
+distribution to compile). Every unknown Unicode character or XML tag
+present in the document will trigger appropriate warnings, but the
+stylesheet will recover nicely and still produce a valid LaTeX output.
+
+This stylesheet supports french and english typesetting, on a per-tag basis.
+
+Of course, I bet you won't be pleased with the aesthetics of the result,
+or maybe there are some tags (from the 400+ in Docbook) or characters (from
+the 30000+ in Unicode) that aren't typeset and that you absolutely want. So
+read on...
+=head1 USER DOCUMENTATION
+
+=head1 CUSTOMIZING AND ADDING FUNCTIONALITY
+
+You could just modify the stylesheet: there are plenty of comments,
+but grasping the big picture at once can be difficult. Fortunately,
+XPathScript allows for overload-oriented customization; the same
+philosophy is followed throughout this stylesheet, so that there are a
+number graft points (beside whole XML tags, as specified in the
+XPathScript documentation) where you can modify part of the stylesheet
+behaviour without interfering with the overall functionality. Working
+knowledge of XPathScript is assumed (see L<SEE ALSO>).
+
+=head2 An example
+
+Cut-and-paste the following text into test.xps, then run
+C<xpathscript mydoc.xml test.xps>:
+
+E<32>E<32><% our $inhibitOutput; $inhibitOutput++; %I<>>
+
+E<32>E<32><!--#I<>include file="docbook2latex.xps"-->
+
+E<32>E<32><% $inhibitOutput--; %I<>>
+
+  <%
+  # Change the style to add fancy headers and the word "draft" behind
+  # every page
+  push(@packages,"fancyhdr");
+  push(@packages,[ "draftcopy" => "all", "english" ]);
+
+  # override the varname tag to display as sans-serif
+  delete $t->{varname}; $t->{varname}->{testcode}=sub {
+	  my ($self, $return)=@_;
+	  $return->{pre}='\textss{';
+	  $return->{post}='}';
+	  return 0;
+  };
+
+  # double the ruler on top of each table.
+  our $typeset_tableframe;
+  my $ORIG_typeset_tableframe=$typeset_tableframe;
+  $typeset_tableframe=sub {
+     return '\hline'.($ORIG_typeset_tableframe(@_));
+  }
+
+E<32>E<32>%I<>>
+
+E<32>E<32><%= $inhibitOutput ? "" : apply_templates()  %I<>>
+=head2 Modification points
+
+The modification points fall into 3 categories: configuration variables,
+overridable templates and overridable function references. The example
+above shows how to override all three.
+
+=over 4
+
+=item Environment variables
+
+There is no standard method yet for passing arguments to an
+XML::XPathScript stylesheet. Waiting for something better, the UNIX
+environment is used instead. At present, no environment variable is
+recognized and any customization must be done by a cascading
+stylesheet (but in order to get customization e.g. for outputting
+variadic documents, said stylesheet may need to read the environment).
+
+=item Configuration variables
+
+There are package-global variables that are read at runtime to
+customize the stylesheet's behaviour. Examples are C<$fancytables> (if
+true, use the C<longtable> package to typeset tables) and C<@packages>
+(the list of TeX packages to invoke in the preamble).  The list of
+such configuration variables is shown in L</REFERENCE MANUAL>.
+
+=item Overridable templates
+
+As stated in the XPathScript documentation, the $t variable (which is
+in scope from every < % ... % > construct) holds a reference to a hash
+of XML element handlers keyed by element name, which can be replaced
+with your own (see C<<
+http://axkit.org/docs/xpathscript/guide.dkb?section=6 >>). The code in
+the templates is fully context-dependent, in that it only ever reads
+data from the XML document to reach a typesetting decision, and does
+not use any muddy global variables to pass sticky state information
+around (the only exception is that a function is allowed to cache its
+results). This means it is perfectly OK to replace only some of the
+element handlers with your own, without messing up with the way the
+others work. Beware though that some tags are not rendered as part of
+the C<apply_templates()> mechanism, but are treated in an ad-hoc way
+by the stylesheet - for example, <title> tags are always rendered in
+TeX as part of the parent <section>, <table>, <figure> or such.
+
+The rule of thumb for overriding templates is: B<a template for some
+tag is overridable if and only if it C<exist()s> in the C<$t> hash,
+and is not listed in the C<@abstracttags> variable> provided by the
+stylesheet as package-global for this purpose.
+=item Overridable function references
+
+In some particularly tedious places of the stylesheet (e.g. for
+tables), there is a function reference in a package-global variable
+that holds a function that will be called for typesetting
+something. For example, C<&$typeset_tablerow(something)> will be
+called to typeset a row in a table.  The list of such function
+references and their prototypes and expected semantics is described in
+L</REFERENCE MANUAL>, so that you may code your own replacements for
+those in use in this stylesheet.
+
+=back
+
+=head2 Unicode guidelines
+
+By far the greatest pain when enhancing this stylesheet (and even
+before, when writing it...) is Unicode support. XML input through
+I<XML::Parser> always happens in Unicode, as per the XML standard;
+Perl stores the result in its new polymorphic strings (with UTF-8 as
+the in-memory representation) which exhibit the "contamination
+problem" (see L</XML::XPathScript::Toys::translate_node>). LaTeX barfs
+on Unicode input, of course. Therefore, there needs to be a kind of
+"unicode firewall" throughout the stylesheet(s) that correctly
+transcodes every kind of Unicode input into LaTeX (which for our
+purpose is a subset of Latin1 since we use the C<inputenc> package).
+
+=over 4
+
+=item *
+
+Text nodes explicitly computed by user code should be converted using
+extra utf8tolatin1() or utf8totex() calls (which see) :
+
+  $t->{pre}.=findnodes("/article/articleinfo/title/text()"); # WRONG
+
+would produce a bogus C<XML::XPath::Node::Text=SCALAR(0xdeadbeef)>, while
+
+  $t->{pre}.=findvalue("/article/articleinfo/title/text()"); # WRONG
+
+as suggested by the XPathScript documentation, would UTF8-taint the result.
+
+Use this instead:
+
+  my ($node)=findnodes("/article/articleinfo/title/text()"); # WARNING,
+     # scalar context would not work - see Quirks.
+  $t->{pre}=utf8totex($node);
+
+or even simpler, use L</apply_templates_under> that was created for this
+very purpose:
+
+  my $rendered=apply_templates_under("/article/articleinfo/title");
+=item *
+
+Element nodes should never be converted to text directly:
+
+    $t->{pre}.=findnodes("/some/path",$self);  # WRONG, as
+     # would be any variation thereof with findvalue() or such
+
+Use something like L</apply_templates_under> instead to recurse into
+their substructure. The rationale is that outputting stringified
+element nodes only has meaning if the output is XML too, or tagless UTF-8
+at the very least, and has no meaning for TeX.
+=item *
+
+XPath values that are not nodes should be dealt with using the
+UTF8-to-something-else functions:
+
+  $t->{pre}.=utf8totex(findvalue('@url',$self));
+
+  my $filename=utf8tolatin1(findvalue('@fileref',$graphicnode));
+
+=item *
+
+If you don't copy the part of the document into the output but are
+merely testing something about it, then Unicode won't hurt you. For
+example, in
+
+   $t->{pre}.="\\textbf{" if (findvalue("@role",$self) eq "strong");
+
+Here C<findvalue("@role",$self)> is UTF-8 but you won't ever have
+to bother since it does not make its way to the output stream. The
+test works as expected ("strong" is promoted to Unicode but this does
+not change its value), the Boolean test result is not tainted (it
+never is), and therefore the result, "\\textbf{" is Latin1 as it
+should.
+=back
+
+=head2 Quirks
+
+Bugs and oddities were spotted in various places of the Perl XML support
+software (XML::XPath version 1.12), and the following workarounds were used
+to circumvent them. You may find it useful to do likewise in
+your own extensions:
+
+=over 4
+
+=item *
+
+the clever object model in I<XML::XPath> with shadow objets geared at
+good garbage collection gets in the way for the I<matches()> function,
+which only works toward ancestors of the node (as of version 1.12);
+
+=item *
+
+findnodes() in scalar context returns an object which is I<not> a node,
+but an I<XML::XPath::NodeSet>. Be careful to always call it in list
+context if you are interested in nodes and not NodeSets; if you just
+want one node, say
+
+   my ($attrnode)=findnodes('@url',$xrefnode);
+=item *
+
+apply_templates() with no arguments does what the spec does, which is
+exactly what you don't want (re-render the whole document through the
+stylesheet!). Use apply_templates_under instead:
+
+   $t->{pre}.=apply_templates(findnodes("para",$node)); # WRONG if
+                    # findnodes() yields no results
+
+   $t->{pre}.=apply_templates_under("para",$node); # OK
+=item *
+
+findnodes() performed on a backward axis (ex 'preceding::') in array
+context should return the value in reverse document order (according
+to the XPath spec and reasonable expectation), but doesn't in versions
+1.12 and 1.13. The manpage is not clear as to whether this is a bug or
+a feature. In order to accomodate both possible outcomes of this
+behaviour (stays the same or is reversed) in future versions of
+I<XML::XPath>, the I<reorder_backaxis()> function compensates this
+(see L</reorder_backaxis>).
+
+=back
+
+See also L</Unicode guidelines> which may, as a whole, be considered
+as a big quirk of its own, and also L<XML::XPathScript/Stylesheet
+Guidelines>.
+
+=head1 PROGRAMMING FAQ
+
+=over 4
+
+=item I<I get a strange error about an XPath query with pieces of LaTeX
+inside, which is nowhere to be found in my source...>
+
+This is because your {testcode} routine did not return a satisfactory
+value. Remember: you have to return -1 ("do not render the subtree of
+this node, I did it already, just output $t->{pre} and $t->{post} side
+by side"), 1 ("please render the subtree in full"), 0 ("render
+nothing at all please") or an XPath expression ("only render those
+subnodes that match this expression").
+
+Forgetting the C<return> altogether is a common mistake: in the
+following code, "\end{stuff}" would be the return value, thus causing
+the reported behaviour:
+
+$t->{sometag}->{testcode}=sub {
+   my ($node,$t)=@_;
+   $t->{pre}="\\begin{stuff}";
+   $t->{post}="\\end{stuff}";
+};
+=item I<I get an internal error in an XML::XPath module. What next?>
+
+Please keep in mind that some XPath expressions, although
+syntactically correct, lead to errors. Consider the following snippet:
+
+   my $targetname=findvalue("name(id($label))");
+
+It is an error for the XPath function name() to be called with
+anything but one stringifiable argument. Thus, if $label does not
+exist, you are screwed - and the evaluation of the XPath expression
+will produce a most cryptic error. Rewrite your code into this:
+
+   my ($targetnode)=findnodes("id($label)");
+   return "" if (! $targetnode);
+   my $targetname=findvalue("name()",$targetnode);
+
+(but the real solution in this particular case is of course to
+validate your document against the DTD beforehand - that would have
+spotted the inexisting reference $label was supposed to point to.)
+=back
+
+=head1 REFERENCE MANUAL
+
+=head2 Support functions and global variables
+
+This stylesheet defines a number of convenience functions and global
+variables that can be reused inside your own extensions.
+
+=head3 Basic pipework
+
+=over 4
+
+=item warn_at($node, $message);
+
+=item die_at($node, $message);
+
+Same as warn() and die(), but produce appropriate messages indicating the
+point of the error, using get_xpath_of_node().
+
+=item my $text=framederror($error);
+
+=item my $text=centerederror($error);
+
+Typesets an error text in a 0.4\columnwidth wide framed box, which
+provides fancy error messages in place of missing images, bogus
+tables, etc. instead of quitting the stylesheet abruptly. The
+centerederror() function adds a centering environment around the box.
+
+=item @nodes=reorder_backaxis("forward",@nodes);
+
+=item @nodes=reorder_backaxis("backward",@nodes);
+
+Assuming that @nodes was obtained through a call to I<findnodes> on a
+backward axis (which has ordering issues, see L</Quirks>), Do The
+Right Thing and reverse them if needed (e.g. when you want your nodes
+backwards w.r.t. document order and the I<XML::XPath> du jour provides
+them forwards, or vice versa). Will die if the behaviour of the
+XML::XPath version in use is unknown (right now, we are backward
+compatible, pun intended, with all versions up to 1.13).
+
+=item my $outputtext=apply_templates_under( [ $xpath ] , [ $node ] );
+
+Same as L<XML::XPathScript/apply_templates>, but allows for "skipping"
+node types that are not handled directly (for example because they are
+abstract - see L<@abstracttags>). C<apply_templates_under($node)>
+applies the templates to all children of $node (excluding $node
+itself), and returns the concatenation of all results;
+C<apply_templates_under($xpath, $node)> applies the templates to those
+nodes that match C<$xpath> starting from C<$node>, and returns the
+concatenation of all results.
+
+=item call_template($node,$t,$template);
+
+Calls a template from a "testcode" routine, and updates $t accordingly
+as if calling the appropriate "testcode" entry in $template, a
+standard XML::XPathScript template structure. Returns the same value
+as said testcode would. This function is useful for overloading
+templates in cascaded stylesheets:
+
+  my $oldtemplate=delete $t->{someelement};
+  $t->{someelement}->{testcode}=sub {
+     my ($node,$t)=@_;
+     return call_template($node,$t,$oldtemplate);
+  };
+
+(the above example is trivial, as it does exactly the same thing as
+the old template would. But you get the idea).
+
+If $template has no "testcode" tag, the functionality is emulated
+(e.g. $t->{pre} is set from $template->{pre} etc.)
+=item %uniconvs
+
+A hash whose keys are numeric Unicode codes (see L</SEE ALSO>) and whose
+values are the corresponding LaTeX sequences to render the character.
+%uniconvs need not contain space, tab, newline nor any Latin1 character
+(those are done automatically), but it doesn't hurt if it does.
+
+One must call reload_uniconvs() after modifying this variable.
+=item $uniunknown
+
+The sequence of characters rendered in place of an unknown character.
+
+=item reload_uniconvs();
+
+Refreshes the internal variables of this stylesheet (namely, a regexp
+cache). To be called whenever %uniconvs is modified.
+
+=item my $textinlatin1 = utf8tolatin1($textinunicode);
+
+Returns a Unicode-untainted, Latin1-only copy of its input (which may
+be a text node or a stringifiable object). Unicode characters above
+0x0fe in $textinunicode are removed.
+
+=item my $textinlatex = utf8totex($textinunicode, $significantspace);
+
+=item my $textinlatex = utf8totex($textinunicode, $translations);
+
+Converts an UTF8-encoded string, stringifiable object or text node
+(that is, most kinds of stuff coming down from the XML data model)
+into a form that is GROKked by LaTeX using the C<inputenc> package
+(most Latin1 characters are supported directly). This function first
+uses the C<%uniconvs> configuration variable (see above), then a
+direct Latin1 mapping if the character is either whitespace or in
+Latin1 range. If this also fails, C<$uniunknown> is rendered and an
+appropriate warning is emitted.  Unless $significantspace is set to a
+true value, sequences of consecutive whitespace are collapsed to one
+and purely whitespace strings are converted to the empty string.
+
+If $translations is additionnally a hash reference, it may supply
+additional character transliterations that will override those in
+L<%uniconvs>. This is most useful for verbatim modes.
+=item my $labelstring = langofnode($node);
+
+Returns the language that prevails in node $node (as defined by the closest
+ancestor having a "lang" tag). Returns the empty string if no ancestor has
+a "lang" tag.
+
+=item my $text= flatten_textnodes ($node);
+
+=item my $text= flatten_textnodes ($node,$xpath);
+
+Returns a text version of $node's content, obtained by concatenating
+all text subnodes in $node, normalizing all whitespace to just one
+space, and suppressing ISO Latin1 accents. The return value is in
+Latin1. This is used for example in the <indexterm> template, to get
+alphabetic sorting right in C<makeindex>. $xpath, if specified, is an
+XPath expression to filter the right text subnodes in $node (the
+default is ".//text()").
+
+=back
+
+=head3 General LaTeX support
+
+Functions and global variables in there deal with day-to-day LaTeX,
+excluding character set issues (dealt with in L</Basic pipework>) and
+tables (see L</LaTeX tables>).
+
+=over 4
+
+=item $documentclass
+
+=item @documentclass_args
+
+The arguments to the opening \documentclass{} macro call. By default,
+docbook2latex produces a 11pt, twoside, a4paper report (that is,
+C<$documentclass="report"> and C<< @documentclass_args = ("11pt",
+"twoside", "a4paper") >>).
+
+=item $dvidriver or $ENV{DVIDRIVER}
+
+The name of the DVI driver used for rendering this document, such as
+C<dvipdfm> or C<dvips>. This variable also helps making decisions for
+rendering images (the <graphic> tag for example). This stylesheet
+indeed has support for both PostScriptÂ® and PDF document rendering,
+but unfortunately not through the same TeX output file (due to
+restrictions on LaTeX's side) so the DVI driver has to be chosen at
+XML-to-LaTeX conversion time.
+
+As a not-really-functional-style but oh-so-convenient temporary kludge
+(pending a standard means of passing stylesheet arguments on the
+xpathscript command line), $ENV{DVIDRIVER} is the default value of
+$dvidriver, that is, one can change this parameter through the
+environment, without even altering the stylesheet.
+=item @abstracttags
+
+The list of tags that are abstract, that is, that should never have
+apply_templates() applied to them directly. An example is <title>
+tags that cannot be rendered properly alone, but only as part of their
+parent <section>, <table> or the like. This variable is read-only and
+only serves as a convenience to the programmer (``is it of any use
+for me to overload this tag in $t ?''), modifying it has no effect.
+
+=item $fancytables
+
+If set to a true value (the default), tables are typeset using the
+C<longtable> and C<multirows> LaTeX packages. If set to a false value,
+plain C<tabular>s are used instead.
+
+=item $glosstermsinindex
+
+If set to a true value (the default), then <glossterm> nodes that do
+not appear in a <glosslist> will be included automatically in the
+index with a status of preferred entries (equivalent to <indexterm
+significance="preferred">).
+
+=item @packages
+
+The list of packages to be included into the LaTeX preamble. This array
+may contain plain strings, or references to sub-arrays for packages that
+want options (the package name comes first in the sub-array, then the
+function - see L</An example>).
+
+=item @sectionnames
+
+The sequence of section-like TeX macros, from highest (e.g. 'part') to lowest
+(e.g. 'subparagraph'). Customizing this is likely to be a priority for
+those not satisfied with the aesthetics.
+
+=item @tablesatbeginning
+
+The macros for the table(s) to be generated at the beginning of the
+document (without the backslash). By Default "tableofcontents" is
+always first and then "listoffigures" and "listoftables" (in that
+order) are appended iff there is at least one figure (resp. table) in
+the document.
+
+=item @tablesatend
+
+The macros for the table(s) to be generated at the end of the document
+(without the backslash). Defaults to empty, or just "printindex" if
+there is at least one <indexterm> in the document.
+
+=item $TeXkludges
+
+The set of macro definitions that has to be present in the document in order
+to get it to process. We tried very hard to keep this to a minimum - but there
+still was quite a bit of Knuth cursing going on at IDEALX during the making
+of this stylesheet. If you have solutions without those, let us know.
+
+=item $TeXpreamble
+
+A variable to append to to your liking to include TeX directives
+into the LaTeX preamble.
+
+=item $TeXbegindocument
+
+A variable to set to your liking to include TeX directives just after
+the LaTeX \begin{document}. Initially set to some general typesetting
+directives.
+
+=item $inhibitOutput
+
+If set to one, this stylesheet doesn't apply_templates() by itself. Useful
+if you want to overload it (see L</An example>)
+
+=item %boxlabels
+
+=item %boxstyles
+
+Both variables govern the rendering of I<tip>, I<remark>, I<note>,
+I<example>, I<warning>, I<important> and I<caution> elements. Entries
+in %boxstyles are keyed by element names, and the matching values are
+the LaTeX command that is used to wrap them, without the backslash
+(fancybox macros are set up by default, see the LaTeX Companion page
+278).
+
+%boxlabels holds the translations of the default titles for those
+environments. it is a hash of hashes, whose outermost keys are
+two-letter language abbreviations (e.g. "en" and "fr"), and whose
+innermost keys are the element names.
+=item my $TeXlength = TeXlength($docbooklength);
+
+=item my $TeXlength = TeXlength($docbooklength, $starlength);
+
+Returns the conversion of $docbooklength into a LaTeX length. If
+$starlength is specified, this is the value of "1*" (default is
+\fill).
+
+=item my $TeXlength = multiply_TeX_dimension($TeXlength, $factor);
+
+As the name implies, multiplies a TeX dimension by the given factor.
+
+=item my $label = id2label($node [, $labelname ] );
+
+Takes the attribute named $labelname ("id" by default) from $node and
+turns it into a string that is "more or less" unique and may be used
+as the argument of a \label{} or \ref{} command in TeX (e.g. bogus
+characters stripped). Returns undef if $node has no id (or no
+attribute named $labelname).
+
+=item my $labelstring = thelabel($node);
+
+Supports cross-referencing in LaTeX. If C<$node> has an C<id> tag,
+returns C<\label{id}>, else returns the empty string. The function id2label()
+above is used for this purpose.
+
+=item my $titleornothing = listtitle($node);
+
+Returns a typeset title as "\paragraph*{Title}", or the empty string,
+depending on whether $node has a <title> child. Appropriate for
+paragraph-like elements that may have a title, such as <itemizedlist>,
+<orderedlist>, <formalpara> etc.
+
+=item my $n = section_nesting_depth($node);
+
+Returns the depth of the current section nesting, in terms of an index
+into @sectionnames that would be appropriate for placing a sectionning macro
+for $node if it were itself a section.
+
+=item my $author_or_authors = render_authors($rendermode, $node);
+
+When $node is an <article> or <book> node, returns the typeset string
+of the author(s) of the article or book. $rendermode is the rendering
+style; recognizes modes for now are "stack" (returns multiple authors
+as a tabular that stacks authors vertically) and "ampersand" (returns
+a string of the form "Johnson, Johnson \& Johnson").
+
+=item my $author_or_authors = render_authors($rendermode, @author_names);
+
+When @author_names are already typeset author names (typically using
+the template for C<author>), returns the typeset string of the group
+of said authors according to $rendermode (see above).
+
+=item my $text=render_graphic($node);
+
+=item my $text=render_graphic($node, $scale);
+
+If $node is a <graphic> or <inlinegraphic> element node object, then
+render the appropriate \includegraphics{} command for it (but not the
+surrounding TeX material for centering or making a float of it). This
+is shared code for <graphic> and <inlinegraphic> templates. $scale is
+an optional scale factor (default is 1) to multiply the
+document-specified dimensions with (using L</multiply_TeX_dimension>).
+
+=back
+
+=head3 LaTeX footnotes
+
+Mostly every time some kind of tabular or minipage environment is
+used, the \footnote{} macro becomes nonfunctional inside it. It is
+still possible to typeset footnotes; the trick is page 71 of the LaTeX
+Companion - you have to look for it, though: instead of
+
+  \begin{table}{|c|}
+  foo\footnote{bar}
+  \end{table}
+
+one says
+
+  \begin{table}{|c|}
+  foo\footnotemark{}
+  \end{table}
+  \footnotetext{bar}
+
+This looks like too tough a job for a pure context-dependent
+stylesheet paradigm right? Wrong :-).
+=over 4
+
+=item @footnote_blockers
+
+The list of element names that may typeset themselves in such a way that
+the \footnote{} macro does not work inside them. Stylesheet extension
+writers should add (or subtract, why not?) elements there according to
+their LaTeX design.
+
+=item my $latex = render_footnote($node, $text)
+
+Returns an appropriate LaTeX snippet for signalling a footnote as part
+of $node's rendering, containing $text as the text.  Appropriate for
+implementing the templates of <footnote>, <ulink> et al. This function
+is not as trivial as it seems, because it handles the necessary magic
+of \footnotemark / \footnotetext in minipages environments
+(e.g. tables) where normal footnotes cannot be used because of
+limitations in LaTeX.
+
+=item collect_trapped_footnotes($node)
+
+=item collect_trapped_footnotes($node, @children)
+
+Returns a string made up of all \footnotetext{}'s that are to appear
+below $node's rendering, assuming it blocks footnotes. This list is
+collected by rendering @children again (by default, all of $node's
+children) using a skewed definition of render_footnote().
+
+=back
+
+=head3 LaTeX tables
+
+=over 4
+
+=item my $x = table_getcolXbyname($row, $name);
+
+=item my ($xstart, $xend) = table_getspanXbyname($row, $name);
+
+Returns the 1-based x coordinate(s) of a column / span in the column
+/span set of a table, or dies if the named column / span does not
+exist. These functions cache results. $row is a C<row> node object,
+and $name must match a C<colname> attribute in an applicable
+C<colspec>, resp. a C<spanname> attribute in an applicable C<spanspec>
+(see the CALS table model in L<SEE ALSO>). C<table_getcolXbyname>
+applies C<colspec> overloading according to the CALS semantics (see
+L</table_getcolspecbyX>).
+
+=item my $colspec = table_getcolspecbyX($row_or_entry, $x)
+
+Returns the C<colspec> in vigor for the specified, 1-based X
+coordinate, or undef if no such C<colspec> is in the
+document. Overloading of <colspec> sub-elements in C<thead> or
+C<tfoot> is handled according to the CALS specification, that is, if
+there is any C<colspec> at C<thead> or C<tfoot> model, they shadow the
+above ones at C<tgroup> level entirely, and only the inner set is then
+taken into account (e.g. shadowing, not merging, occurs when
+overloading).
+
+Note that CALS dictates that there should not be more than one colspec
+for a given column, so there is no discussion of list context for this
+function.
+=item my $spanspec = table_getspanspecbyX($row_or_entry, $xstart, $xend)
+
+=item my @several_spanspecs = table_getspanspecbyX($row_or_entry, $xstart, $xend)
+
+Returns the. C<spanspec> in vigor for the specified, 1-based X
+coordinates, or undef if no such C<spanspec> is in the document. In
+list context, I<table_getspanspecbyX()> may return several different
+spanspecs, in document order - in scalar context, in case of a tie,
+this function would only return the last relevant one in document
+order.
+
+=item my $colspec = table_getspecbyentry($entry, $leftcolumn);
+
+=item my $colspec = table_getspecbyentry($entry, $leftcolumn, $nojusthappen);
+
+Returns the "best" (see below) <colspec> or <spanspec> element node
+object associated with the column or group of columns spanned by
+$entry, or undef if there is no such colspec or spanspec. $leftcolumn
+(mandatory) is to be the 1-based column number at which $entry starts
+(the caller, which is typically L</typeset_tablerow>, must know
+this). Useful for querying style parameters from the parent column.
+
+$entry may either refer to the result by an explicit C<colname> or
+C<spanname> attribute in the document, or alternatively, unless
+$nojusthappen is set to a true value, it may also "just happen" to
+occupy the same column set.
+
+In case of multiple possible outcomes to this function, the
+"nominative" specs have priority over the "just happening" ones, the
+spanspecs have priority over the colspecs, and C<spanspec>s coming
+last in document order have priority in the "just happening" mode.
+=back
+
+=head2 Overridable function references
+
+Extension authors may wish to re-use part of this stylesheet's
+functionality at a sub-template level: typically, one may want to
+alter the outlook of tables without having to duplicate the tedious,
+stateful table filling algorithm that transcodes XML CALS tables into
+LaTeX. This stylesheet supports that by defining overridable function
+references at appropriate points, that extension authors may replace
+with their own implementation (see L</Modification points>).
+
+=head3 Pluggable LaTeX
+
+=over 4
+
+=item my $outputtext = &$typeset_pageref($node,$linkend);
+
+Typesets a reference containing a page number, to be put right after
+the \ref{$linkend} in the typesetting of $node, wich is an <xref>,
+without an intervening space. Possible values are " (page
+\pageref{$linkend})" (mind the leading space) or something like that,
+or the empty string if you don't want pagerefs. The default function
+tries to be smart and avoid the double closing parentheses problem
+when the <xref> is itself between parentheses. $linkend will be passed
+properly escaped, in such a way that outputting it to TeX in forms
+such as "\\ref{$linkend}" and "\\pageref{$linkend}" without any further
+transformation will produce the correct links.
+
+=item my $outputtext = &$maketitle($title,\@subtitles,@authors);
+
+This function shall typeset a titlepage (to be put just after the
+\begin{document}). If not set, the standard \title, \author,
+\maketitle mechanism of LaTeX will be used instead. zero, one or more
+subtitles may be passed as a list reference in the second argument.
+
+=item &$typeset_bibentry($node,$t,$lang);
+
+This function shall typeset a <biblioentry> or <biblioset>, ignoring the
+<biblioset> children. $node is the node to typeset in language $lang. There
+is a concept of $t->{pre} and $t->{post} analogous to the second argument
+of a testcode function; the semantics is that when an article and its
+proceedings are to be typeset together, the result will be made up with
+$tarticle->{pre}, $tproceedings->{pre}, $tproceedings->{post} and
+$tarticle->{post} (which is the normal way in french and in english, so
+that page numbers and the like appear last).
+
+The return value is ignored. Unrecognized element children should be
+appropriately warned.
+=back
+
+=head3 Pluggable table rendering
+
+=over 4
+
+=item my $outputtext = &$typeset_tablerow($style,@row);
+
+This function shall typeset a row in a table, given a style (which is
+either 'thead', 'tbody' or 'tfoot' --- typesetting happens in that
+order), and a list of hashrefs containing a description of the cells
+in this line: $row[0]->{height} and $row[0]->{width} contain the
+dimensions of the cell, and $row[0]->{cell} contains either undef (a
+blank cell - in this case height and width are always 1) or a
+reference to the XML::XPath::Element::Node object for this cell (an
+<entry> tag - <entrytbl>s are not supported yet).
+
+The entries are positionned according to their upper left corner;
+elements in @row that have an undef ->{cell} represent coordinate
+points under a multiple-cell entry, to be skipped. @row is guaranteed
+to be of the same width as the whole table. Warning, though, many
+XPath functions (and functions in this stylesheet) start numbering at
+1, while Perl starts numbering at 0; the code for your very own
+version of &$typeset_tablerow should therefore probably start like
+this:
+
+    my ($style, @row)=@_;
+	for(my $colnum=1; $colnum <= (scalar @row); $colnum++) {
+		my $elem=$row[$colnum - 1];
+        # Do stuff
+    }
+
+=item my $outputtext = &$typeset_tablerule($style,\@rowbefore,\@rowafter);
+
+This function shall typeset a separator between two rows. It also gets
+called before the first row in a group (the second parameter is then undef),
+and after the last row in a group (the first parameter is undef). A I<group>
+is the amount of rows represented by a whole <thead>, <tbody> or <tfoot>
+element. The contents of the lists pointed to by the second and third
+parameters (if defined) are not to be modified, and have the same structure
+as @row above. $style is as above.
+
+=item my $outputtext = &$typeset_tableframe($tgroup,$headtxt,$bodytxt,$foottxt);
+
+This function shall re-order $headtxt, $bodytxt and $foottxt (which
+are rendered TeX snippets for their respective parts of the $tgroup
+element node object, or undef if said <tgroup> lacks one of them) and
+eventually produce a valid overall TeX code for the whole table. This
+function is B<not> responsible for outputting the C<\begin{table}> or
+C<\end{table}> stuff; on the other hand, it shall render the table
+caption and the cross-reference label(s) (in $fancytables mode
+only). It had better pay attention to the value of the global variable
+$fancytables, since the surrounding TeX table frame will be very
+different according to its boolean value (tabular vs. longtable).
+
+By default, the function Does The Right Thing for multipage tables to
+work properly with longtable (if enabled).
+=item my $outputtext= &$typeset_tablecolumnpattern($node,$kind,$tgroup,$width);
+
+This function shall typeset the TeX column specification, this is, the
+"c|" part of "\begin{table}{c|}". The "|" after the "c" is meant:
+indeed, the CALS specification dictates that columns, spans and
+entries specify the rulings which lie on their right, except for the
+rightmost column (that you need not worry about; the stylesheet will
+take care of removing any separator material at the end of your column
+pattern if needed).
+
+This function shall apply both to <colspec> nodes (in order to render
+the TeX table header), <spanspec> nodes (for \multicolumn patterns
+inside the table) and <entry> nodes (for another, one-column
+\multicolumn that is the only way in TeX to typeset one cell centered,
+for example, when all the others in the same column are
+left-justified). $kind will be set to either "colspec", "spanspec" or
+"entry", respectively. The first argument may be undef for columns
+that don't have a colspec, and for multicolumn cells that do not
+specify a spanspec. In this case, it is still possible to get
+typesetting data using $tgroup, which always contains an element node
+object pointing to the table's <tgroup> element.
+
+By default, &$typeset_tablecolumnpattern() handles the 'colwidth' and
+'align' attributes only. A width may also be specified by caller using
+the optional $width argument, in which case
+&$typeset_tablecolumnpattern() should attempt to honor it by priority.
+=back
+
+=head2 Self-test
+
+The I<integrationtest()> function tests the behaviour of foreign
+packages that this stylesheet depends on (namely Perl itself
+for the UTF8-tainting issues, and I<XML::XPath> for minor API
+issues). The following derived stylesheet, when run on any document,
+will produce a text output compatible with L<Test::Harness>:
+
+E<32>E<32><% our $inhibitOutput; $inhibitOutput++; %I<>>
+
+E<32>E<32><!--#I<>include file="docbook2latex.xps"-->
+
+E<32>E<32><% integrationtest() %I<>>
+=head1 DOCBOOK EXTENSIONS
+
+The I<tgroupstyle> attribute of <tgroup> nodes is interpreted as a
+comma-separated list of LaTeX commands to wrap all cells with. A
+useful example is "footnotesize", for large tables.
+
+=head1 NONSTANDARD DOCBOOK CONSTRUCTIONS
+
+When using a format attribute "linespecific" in a <graphic> element,
+the LaTeX mechanism of selecting a file by trying various extensions
+is used. In this case, and contrary to what the DTD documentation
+says, one should omit the extension in the "fileref" attribute.
+
+Cross references are rendered in a context-sensitive way which is much
+more like Perl's DWIM (Do What I Mean) than XML's OTFA
+(One Template Fits All): the stylesheet parses the surrounding text to
+determine which one of "Figure 3.2, page 42", "Figure 3.2 (page 42)"
+or "3.2 (page 42)" is the correct rendering for <xref linkend="FIG-3-2">.
+This is to overcome a design limitation in the DTD spec, which make
+<xref>s inappropriate for any language but english.
+
+The words "TeX" and "LaTeX" are rendered as you might imagine they
+should. This is the only form of "semantic kerning" that should occur
+in the stylesheet, though (e.g. "---" really produces 3 dashes in the
+DVI and is not he same as "&mdash;" in the XML source).
+=head1 BUGS / TODO / LIMITATIONS
+
+Only a subset of DocBook is implemented. Adding tags is easy most of
+the time though.
+
+MediaObject's are the only portable, kosher way of dealing with
+multi-format graphics (such as PostScriptÂ® vs. PNG in PDF's). They are
+not implemented.
+
+Bibliography support is far from optimal and will result in bogus
+punctuation and label spacing every so often.
+
+There is no support for variadic typesetting of characters according
+to the language (for example, &hellip; is rendered the same way under
+french and english, but shouldn't). Using additional character
+packages on-demand (that is, usepackage'ing them only when some
+Unicode characters are present in the input) isn't possible. Both
+restrictions stem from the flat Unicode character space in XML that
+disregards the level of strangeness of character entities (e.g. it is
+impossible to construct an XPath formula meaning "give me all strange
+characters in this document"). Building a list of all characters in
+the document from Perl would be a solution, although I cannot think of
+an efficient way of doing that.
+=head1 SEE ALSO
+
+XPathScript documentation:
+
+  http://axkit.org/docs/xpathscript/guide.dkb
+
+XPath documentation from W3C:
+
+  http://www.w3.org/TR/xpath
+
+The Docbook DTD:
+
+  http://www.docbook.org/tdg/en/html/docbook.html
+
+The CALS table model:
+
+      http://www.oasis-open.org/specs/a502.htm
+
+Unicode character table (needed to add more character support into a
+stylesheet):
+
+  http://www.unicode.org/charts/charindex.html
+
+Ditto, less complete but more LaTeX-friendly:
+
+  http://www.bitjungle.com/~isoent/
+=head1 COPYRIGHT
+
+This program is copyright (C) Dominique Quatravaux
+<dom@idealx.com>, all rights reserved. This program is free software; you
+can redistribute it and/or modify it under the same terms as Perl itself.
+
+
+
+=end devel
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=item *
+
+Dominique Quatravaux <domq@cpan.org>
+
+=item *
+
+Matt Sergeant <matt@sergeant.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2008, 2007 by Matt Sergeant.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
 __END__
 <% # -*-perl-*-
 
 # XPathScript stylesheet for Docbook 4.1.2, LaTeX output.
-# ©-IDEALX
+# Ã‚Â©-IDEALX
 # http://www.idealx.org/DocBkXML2LaTeX/
 #
 # >; # Help Emacs out
@@ -1146,7 +2169,7 @@ sub integrationtest {
 
 	print "ok 1\n" if ! is_utf8_tainted(" ");
 
-	my $utf8=do { use utf8; "Ã©" }; # literal e acute in UTF-8
+	my $utf8=do { use utf8; "ÃƒÂƒÃ‚Â©" }; # literal e acute in UTF-8
 	print "ok 2\n" if is_utf8_tainted($utf8);
 
 	require Unicode::String;
@@ -1157,13 +2180,13 @@ sub integrationtest {
 
 	print "ok 4\n" if !is_utf8_tainted($utf8);
 
-	print "ok 5\n" if ($utf8 eq "é");
+	print "ok 5\n" if ($utf8 eq "ÃƒÂ©");
 
 	print "ok 6\n" if $XML::XPath::VERSION le '1.13'; # see reorder_backaxis()
 
 	# Regression tests
 	print "ok 7\n" if 
-	  (!is_utf8_tainted("Documentation d<39>administration de IDX<45>ReverseProxyé"));
+	  (!is_utf8_tainted("Documentation d<39>administration de IDX<45>ReverseProxyÃƒÂ©"));
 
 	print "ok 8\n" if (is_utf8_tainted("\x{263A}"));
 
@@ -1270,7 +2293,7 @@ sub flatten_textnodes {
 					   (findnodes(($path or ".//text()"),$self)));
 	$plaintext =~ s/\s+/ /gs;
 	$plaintext =~ s/^ //; $plaintext =~ s/ $//;
-	$plaintext =~ tr/ÁÀÂÄÇÉÈÊËÍÌÎÏÑÓÒÔÖÚÙÛÜÝáàâäçéèêëíìîïñóòôöúùûüýÿ/AAAACEEEEIIIINOOOOUUUUYaaaaceeeeiiiinoooouuuuyy/;
+	$plaintext =~ tr/ÃƒÂÃƒÂ€ÃƒÂ‚ÃƒÂ„ÃƒÂ‡ÃƒÂ‰ÃƒÂˆÃƒÂŠÃƒÂ‹ÃƒÂÃƒÂŒÃƒÂŽÃƒÂÃƒÂ‘ÃƒÂ“ÃƒÂ’ÃƒÂ”ÃƒÂ–ÃƒÂšÃƒÂ™ÃƒÂ›ÃƒÂœÃƒÂÃƒÂ¡ÃƒÂ ÃƒÂ¢ÃƒÂ¤ÃƒÂ§ÃƒÂ©ÃƒÂ¨ÃƒÂªÃƒÂ«ÃƒÂ­ÃƒÂ¬ÃƒÂ®ÃƒÂ¯ÃƒÂ±ÃƒÂ³ÃƒÂ²ÃƒÂ´ÃƒÂ¶ÃƒÂºÃƒÂ¹ÃƒÂ»ÃƒÂ¼ÃƒÂ½ÃƒÂ¿/AAAACEEEEIIIINOOOOUUUUYaaaaceeeeiiiinoooouuuuyy/;
 	return $plaintext;
 }
 
@@ -1281,7 +2304,7 @@ sub flatten_textnodes {
 
 $t->{'*'}->{showtag}=0;  # This also suppresses an Unicode effect
 
-# The default behaviour is to output a warning but still process the
+#Ã‚Â The default behaviour is to output a warning but still process the
 # contents.
 
 {
@@ -1822,7 +2845,7 @@ $t->{abstract}->{testcode}=sub {
 $t->{legalnotice}->{testcode}=sub {
 	my ($self, $t)=@_;
 	my $legalname = (langofnode($self) =~ m/^fr/i) ?
-	  "Informations légales" :
+	  "Informations lÃƒÂ©gales" :
 		"Legal information";
 	$t->{pre}="{\\def\\abstractname{$legalname}\\begin{abstract}\n";
 	$t->{post}="\\end{abstract}}\n";
@@ -2778,7 +3801,7 @@ $t->{xref}->{testcode}=sub {
 		$theregexp=q/tab(le|leau|)/;
 	} elsif ($targetelementname =~ m/^sect/) {
 		$theword=($lang eq "fr" ? "le chapitre": "Chapter");
-		$theregexp=q/(chap(itre|ter|)|sect(ion|)|par(a|agraph|agraphe|t|tie|)|§)/;
+		$theregexp=q/(chap(itre|ter|)|sect(ion|)|par(a|agraph|agraphe|t|tie|)|Ã‚Â§)/;
 	}
 elsif ($targetelementname =~ m/^appendix/) {
 		$theword=($lang eq "fr" ? "l'annexe": "Appendix");
@@ -2948,7 +3971,7 @@ our $typeset_bibentry=sub {
 			my $typesettitle=(
 				 ($role =~ m/^(proceedings|conference)$/i)?
 				   "\\emph{$title}":
-				   "«$title»");
+				   "Ã‚Â«$titleÃ‚Â»");
 			$t->{pre}=join(", ",($t->{pre} ? $t->{pre}:()),$typesettitle);
 		};
 
@@ -2978,7 +4001,7 @@ our $typeset_bibentry=sub {
 
 	if ($lang =~ m/^fr/i) {
 		$t->{post}=join(", ",($t->{post}?$t->{post}:()),
-						utf8totex("n° $issuenum")) if ($edition);
+						utf8totex("nÃ‚Â° $issuenum")) if ($edition);
 	} else {
 		$t->{post}=join(", ",($t->{post}?$t->{post}:()),
 						utf8totex("# $issuenum")) if ($edition);
@@ -3086,1027 +4109,9 @@ __END__
 #########################################################################
 #########################################################################
 
-=head1 NAME
 
-XML::XPathScript::Stylesheet::DocBook2LaTeX - Transforms DocBook into LaTeX
-
-=head1 WARNING
-
-This module is still in a very beta-ish stage.
-We heavily recommend to wait till we tell you to to use it. 
-But if you are in an adventurous mode, by all means, go ahead. :-)
-
-=head1 SYNOPSIS
-
-    use XML::XPathScript;
-    use XML::XPathScript::Stylesheet::DocBook2LaTeX;
-
-    my $latex = $xps->transform( 
-        $docbook => XML::XPathScript::Stylesheet::DocBook2LaTeX::stylesheet
-    );
-
-=head1 AUTHORS
-
-This module is a port of Dominique Quatravaux's original I<docbook2latex.xps> 
-stylesheet, also part of the XML::XPathScript's distibution. Yanick Champoux
-did the porting.
-
-=begin devel
-
-=head1 NAME
-
-docbook2latex.xps - an XPathScript stylesheet for LaTeX.
-
-=head1 SYNOPSIS
-
-  xpathscript yourdoc.xml docbook2latex.xps > yourdoc.tex
-
-=head1 DESCRIPTION
-
-This is docbook2latex.xps version number $Revision: 32928 $, by IDEALX
-(http://www.idealx.org/docbook2latex/).
-
-Using Matt Sergeant's XPathScript framework (see L<SEE ALSO>), this stylesheet
-translates Docbook XML into LaTeX for beautiful typesetting of Docbook
-articles (reports, books and other kinds of whole documents defined by
-the DTD are not supported yet).
-
-Provided you have the Perl dependencies installed (XML::XPathScript,
-from CPAN, as well as all sub-dependencies of those), the command
-shown in the synopsis will turn any (DTD-conformant) C<mydoc.xml> into
-pure LaTeX (that is, using only packages included in the TeTeX
-distribution to compile). Every unknown Unicode character or XML tag
-present in the document will trigger appropriate warnings, but the
-stylesheet will recover nicely and still produce a valid LaTeX output.
-
-This stylesheet supports french and english typesetting, on a per-tag basis.
-
-Of course, I bet you won't be pleased with the aesthetics of the result,
-or maybe there are some tags (from the 400+ in Docbook) or characters (from
-the 30000+ in Unicode) that aren't typeset and that you absolutely want. So
-read on...
-
-=head1 USER DOCUMENTATION
-
-
-=head1 CUSTOMIZING AND ADDING FUNCTIONALITY
-
-You could just modify the stylesheet: there are plenty of comments,
-but grasping the big picture at once can be difficult. Fortunately,
-XPathScript allows for overload-oriented customization; the same
-philosophy is followed throughout this stylesheet, so that there are a
-number graft points (beside whole XML tags, as specified in the
-XPathScript documentation) where you can modify part of the stylesheet
-behaviour without interfering with the overall functionality. Working
-knowledge of XPathScript is assumed (see L<SEE ALSO>).
-
-=head2 An example
-
-Cut-and-paste the following text into test.xps, then run
-C<xpathscript mydoc.xml test.xps>:
-
-E<32>E<32><% our $inhibitOutput; $inhibitOutput++; %I<>>
-
-E<32>E<32><!--#I<>include file="docbook2latex.xps"-->
-
-E<32>E<32><% $inhibitOutput--; %I<>>
-
-  <%
-  # Change the style to add fancy headers and the word "draft" behind
-  # every page
-  push(@packages,"fancyhdr");
-  push(@packages,[ "draftcopy" => "all", "english" ]);
-
-  # override the varname tag to display as sans-serif
-  delete $t->{varname}; $t->{varname}->{testcode}=sub {
-	  my ($self, $return)=@_;
-	  $return->{pre}='\textss{';
-	  $return->{post}='}';
-	  return 0;
-  };
-
-  # double the ruler on top of each table.
-  our $typeset_tableframe;
-  my $ORIG_typeset_tableframe=$typeset_tableframe;
-  $typeset_tableframe=sub {
-     return '\hline'.($ORIG_typeset_tableframe(@_));
-  }
-
-E<32>E<32>%I<>>
-
-E<32>E<32><%= $inhibitOutput ? "" : apply_templates()  %I<>>
-
-=head2 Modification points
-
-The modification points fall into 3 categories: configuration variables,
-overridable templates and overridable function references. The example
-above shows how to override all three.
-
-=over 4
-
-=item Environment variables
-
-There is no standard method yet for passing arguments to an
-XML::XPathScript stylesheet. Waiting for something better, the UNIX
-environment is used instead. At present, no environment variable is
-recognized and any customization must be done by a cascading
-stylesheet (but in order to get customization e.g. for outputting
-variadic documents, said stylesheet may need to read the environment).
-
-=item Configuration variables
-
-There are package-global variables that are read at runtime to
-customize the stylesheet's behaviour. Examples are C<$fancytables> (if
-true, use the C<longtable> package to typeset tables) and C<@packages>
-(the list of TeX packages to invoke in the preamble).  The list of
-such configuration variables is shown in L</REFERENCE MANUAL>.
-
-=item Overridable templates
-
-As stated in the XPathScript documentation, the $t variable (which is
-in scope from every < % ... % > construct) holds a reference to a hash
-of XML element handlers keyed by element name, which can be replaced
-with your own (see C<<
-http://axkit.org/docs/xpathscript/guide.dkb?section=6 >>). The code in
-the templates is fully context-dependent, in that it only ever reads
-data from the XML document to reach a typesetting decision, and does
-not use any muddy global variables to pass sticky state information
-around (the only exception is that a function is allowed to cache its
-results). This means it is perfectly OK to replace only some of the
-element handlers with your own, without messing up with the way the
-others work. Beware though that some tags are not rendered as part of
-the C<apply_templates()> mechanism, but are treated in an ad-hoc way
-by the stylesheet - for example, <title> tags are always rendered in
-TeX as part of the parent <section>, <table>, <figure> or such.
-
-The rule of thumb for overriding templates is: B<a template for some
-tag is overridable if and only if it C<exist()s> in the C<$t> hash,
-and is not listed in the C<@abstracttags> variable> provided by the
-stylesheet as package-global for this purpose.
-
-=item Overridable function references
-
-In some particularly tedious places of the stylesheet (e.g. for
-tables), there is a function reference in a package-global variable
-that holds a function that will be called for typesetting
-something. For example, C<&$typeset_tablerow(something)> will be
-called to typeset a row in a table.  The list of such function
-references and their prototypes and expected semantics is described in
-L</REFERENCE MANUAL>, so that you may code your own replacements for
-those in use in this stylesheet.
-
-=back
-
-=head2 Unicode guidelines
-
-By far the greatest pain when enhancing this stylesheet (and even
-before, when writing it...) is Unicode support. XML input through
-I<XML::Parser> always happens in Unicode, as per the XML standard;
-Perl stores the result in its new polymorphic strings (with UTF-8 as
-the in-memory representation) which exhibit the "contamination
-problem" (see L</XML::XPathScript::Toys::translate_node>). LaTeX barfs
-on Unicode input, of course. Therefore, there needs to be a kind of
-"unicode firewall" throughout the stylesheet(s) that correctly
-transcodes every kind of Unicode input into LaTeX (which for our
-purpose is a subset of Latin1 since we use the C<inputenc> package).
-
-=over 4
-
-=item *
-
-Text nodes explicitly computed by user code should be converted using
-extra utf8tolatin1() or utf8totex() calls (which see) :
-
-  $t->{pre}.=findnodes("/article/articleinfo/title/text()"); # WRONG
-
-would produce a bogus C<XML::XPath::Node::Text=SCALAR(0xdeadbeef)>, while
-
-  $t->{pre}.=findvalue("/article/articleinfo/title/text()"); # WRONG
-
-as suggested by the XPathScript documentation, would UTF8-taint the result.
-
-Use this instead:
-
-  my ($node)=findnodes("/article/articleinfo/title/text()"); # WARNING,
-     # scalar context would not work - see Quirks.
-  $t->{pre}=utf8totex($node);
-
-or even simpler, use L</apply_templates_under> that was created for this
-very purpose:
-
-  my $rendered=apply_templates_under("/article/articleinfo/title");
-
-=item *
-
-Element nodes should never be converted to text directly:
-
-    $t->{pre}.=findnodes("/some/path",$self);  # WRONG, as
-     # would be any variation thereof with findvalue() or such
-
-Use something like L</apply_templates_under> instead to recurse into
-their substructure. The rationale is that outputting stringified
-element nodes only has meaning if the output is XML too, or tagless UTF-8
-at the very least, and has no meaning for TeX.
-
-=item *
-
-XPath values that are not nodes should be dealt with using the
-UTF8-to-something-else functions:
-
-  $t->{pre}.=utf8totex(findvalue('@url',$self));
-
-  my $filename=utf8tolatin1(findvalue('@fileref',$graphicnode));
-
-
-=item *
-
-If you don't copy the part of the document into the output but are
-merely testing something about it, then Unicode won't hurt you. For
-example, in
-
-   $t->{pre}.="\\textbf{" if (findvalue("@role",$self) eq "strong");
-
-Here C<findvalue("@role",$self)> is UTF-8 but you won't ever have
-to bother since it does not make its way to the output stream. The
-test works as expected ("strong" is promoted to Unicode but this does
-not change its value), the Boolean test result is not tainted (it
-never is), and therefore the result, "\\textbf{" is Latin1 as it
-should.
-
-=back
-
-=head2 Quirks
-
-Bugs and oddities were spotted in various places of the Perl XML support
-software (XML::XPath version 1.12), and the following workarounds were used
-to circumvent them. You may find it useful to do likewise in
-your own extensions:
-
-=over 4
-
-=item *
-
-the clever object model in I<XML::XPath> with shadow objets geared at
-good garbage collection gets in the way for the I<matches()> function,
-which only works toward ancestors of the node (as of version 1.12);
-
-=item *
-
-findnodes() in scalar context returns an object which is I<not> a node,
-but an I<XML::XPath::NodeSet>. Be careful to always call it in list
-context if you are interested in nodes and not NodeSets; if you just
-want one node, say
-
-   my ($attrnode)=findnodes('@url',$xrefnode);
-
-=item *
-
-apply_templates() with no arguments does what the spec does, which is
-exactly what you don't want (re-render the whole document through the
-stylesheet!). Use apply_templates_under instead:
-
-   $t->{pre}.=apply_templates(findnodes("para",$node)); # WRONG if
-                    # findnodes() yields no results
-
-   $t->{pre}.=apply_templates_under("para",$node); # OK
-
-=item *
-
-findnodes() performed on a backward axis (ex 'preceding::') in array
-context should return the value in reverse document order (according
-to the XPath spec and reasonable expectation), but doesn't in versions
-1.12 and 1.13. The manpage is not clear as to whether this is a bug or
-a feature. In order to accomodate both possible outcomes of this
-behaviour (stays the same or is reversed) in future versions of
-I<XML::XPath>, the I<reorder_backaxis()> function compensates this
-(see L</reorder_backaxis>).
-
-=back
-
-See also L</Unicode guidelines> which may, as a whole, be considered
-as a big quirk of its own, and also L<XML::XPathScript/Stylesheet
-Guidelines>.
-
-=head1 PROGRAMMING FAQ
-
-=over 4
-
-=item I<I get a strange error about an XPath query with pieces of LaTeX
-inside, which is nowhere to be found in my source...>
-
-This is because your {testcode} routine did not return a satisfactory
-value. Remember: you have to return -1 ("do not render the subtree of
-this node, I did it already, just output $t->{pre} and $t->{post} side
-by side"), 1 ("please render the subtree in full"), 0 ("render
-nothing at all please") or an XPath expression ("only render those
-subnodes that match this expression").
-
-Forgetting the C<return> altogether is a common mistake: in the
-following code, "\end{stuff}" would be the return value, thus causing
-the reported behaviour:
-
-$t->{sometag}->{testcode}=sub {
-   my ($node,$t)=@_;
-   $t->{pre}="\\begin{stuff}";
-   $t->{post}="\\end{stuff}";
-};
-
-=item I<I get an internal error in an XML::XPath module. What next?>
-
-Please keep in mind that some XPath expressions, although
-syntactically correct, lead to errors. Consider the following snippet:
-
-   my $targetname=findvalue("name(id($label))");
-
-It is an error for the XPath function name() to be called with
-anything but one stringifiable argument. Thus, if $label does not
-exist, you are screwed - and the evaluation of the XPath expression
-will produce a most cryptic error. Rewrite your code into this:
-
-   my ($targetnode)=findnodes("id($label)");
-   return "" if (! $targetnode);
-   my $targetname=findvalue("name()",$targetnode);
-
-(but the real solution in this particular case is of course to
-validate your document against the DTD beforehand - that would have
-spotted the inexisting reference $label was supposed to point to.)
-
-=back
-
-=head1 REFERENCE MANUAL
-
-=head2 Support functions and global variables
-
-This stylesheet defines a number of convenience functions and global
-variables that can be reused inside your own extensions.
-
-=head3 Basic pipework
-
-=over 4
-
-=item warn_at($node, $message);
-
-=item die_at($node, $message);
-
-Same as warn() and die(), but produce appropriate messages indicating the
-point of the error, using get_xpath_of_node().
-
-=item my $text=framederror($error);
-
-=item my $text=centerederror($error);
-
-Typesets an error text in a 0.4\columnwidth wide framed box, which
-provides fancy error messages in place of missing images, bogus
-tables, etc. instead of quitting the stylesheet abruptly. The
-centerederror() function adds a centering environment around the box.
-
-=item @nodes=reorder_backaxis("forward",@nodes);
-
-=item @nodes=reorder_backaxis("backward",@nodes);
-
-Assuming that @nodes was obtained through a call to I<findnodes> on a
-backward axis (which has ordering issues, see L</Quirks>), Do The
-Right Thing and reverse them if needed (e.g. when you want your nodes
-backwards w.r.t. document order and the I<XML::XPath> du jour provides
-them forwards, or vice versa). Will die if the behaviour of the
-XML::XPath version in use is unknown (right now, we are backward
-compatible, pun intended, with all versions up to 1.13).
-
-=item my $outputtext=apply_templates_under( [ $xpath ] , [ $node ] );
-
-Same as L<XML::XPathScript/apply_templates>, but allows for "skipping"
-node types that are not handled directly (for example because they are
-abstract - see L<@abstracttags>). C<apply_templates_under($node)>
-applies the templates to all children of $node (excluding $node
-itself), and returns the concatenation of all results;
-C<apply_templates_under($xpath, $node)> applies the templates to those
-nodes that match C<$xpath> starting from C<$node>, and returns the
-concatenation of all results.
-
-=item call_template($node,$t,$template);
-
-Calls a template from a "testcode" routine, and updates $t accordingly
-as if calling the appropriate "testcode" entry in $template, a
-standard XML::XPathScript template structure. Returns the same value
-as said testcode would. This function is useful for overloading
-templates in cascaded stylesheets:
-
-  my $oldtemplate=delete $t->{someelement};
-  $t->{someelement}->{testcode}=sub {
-     my ($node,$t)=@_;
-     return call_template($node,$t,$oldtemplate);
-  };
-
-(the above example is trivial, as it does exactly the same thing as
-the old template would. But you get the idea).
-
-If $template has no "testcode" tag, the functionality is emulated
-(e.g. $t->{pre} is set from $template->{pre} etc.)
-
-=item %uniconvs
-
-A hash whose keys are numeric Unicode codes (see L</SEE ALSO>) and whose
-values are the corresponding LaTeX sequences to render the character.
-%uniconvs need not contain space, tab, newline nor any Latin1 character
-(those are done automatically), but it doesn't hurt if it does.
-
-One must call reload_uniconvs() after modifying this variable.
-
-=item $uniunknown
-
-The sequence of characters rendered in place of an unknown character.
-
-=item reload_uniconvs();
-
-Refreshes the internal variables of this stylesheet (namely, a regexp
-cache). To be called whenever %uniconvs is modified.
-
-=item my $textinlatin1 = utf8tolatin1($textinunicode);
-
-Returns a Unicode-untainted, Latin1-only copy of its input (which may
-be a text node or a stringifiable object). Unicode characters above
-0x0fe in $textinunicode are removed.
-
-=item my $textinlatex = utf8totex($textinunicode, $significantspace);
-
-=item my $textinlatex = utf8totex($textinunicode, $translations);
-
-Converts an UTF8-encoded string, stringifiable object or text node
-(that is, most kinds of stuff coming down from the XML data model)
-into a form that is GROKked by LaTeX using the C<inputenc> package
-(most Latin1 characters are supported directly). This function first
-uses the C<%uniconvs> configuration variable (see above), then a
-direct Latin1 mapping if the character is either whitespace or in
-Latin1 range. If this also fails, C<$uniunknown> is rendered and an
-appropriate warning is emitted.  Unless $significantspace is set to a
-true value, sequences of consecutive whitespace are collapsed to one
-and purely whitespace strings are converted to the empty string.
-
-If $translations is additionnally a hash reference, it may supply
-additional character transliterations that will override those in
-L<%uniconvs>. This is most useful for verbatim modes.
-
-=item my $labelstring = langofnode($node);
-
-Returns the language that prevails in node $node (as defined by the closest
-ancestor having a "lang" tag). Returns the empty string if no ancestor has
-a "lang" tag.
-
-=item my $text= flatten_textnodes ($node);
-
-=item my $text= flatten_textnodes ($node,$xpath);
-
-Returns a text version of $node's content, obtained by concatenating
-all text subnodes in $node, normalizing all whitespace to just one
-space, and suppressing ISO Latin1 accents. The return value is in
-Latin1. This is used for example in the <indexterm> template, to get
-alphabetic sorting right in C<makeindex>. $xpath, if specified, is an
-XPath expression to filter the right text subnodes in $node (the
-default is ".//text()").
-
-=back
-
-=head3 General LaTeX support
-
-Functions and global variables in there deal with day-to-day LaTeX,
-excluding character set issues (dealt with in L</Basic pipework>) and
-tables (see L</LaTeX tables>).
-
-=over 4
-
-=item $documentclass
-
-=item @documentclass_args
-
-The arguments to the opening \documentclass{} macro call. By default,
-docbook2latex produces a 11pt, twoside, a4paper report (that is,
-C<$documentclass="report"> and C<< @documentclass_args = ("11pt",
-"twoside", "a4paper") >>).
-
-=item $dvidriver or $ENV{DVIDRIVER}
-
-The name of the DVI driver used for rendering this document, such as
-C<dvipdfm> or C<dvips>. This variable also helps making decisions for
-rendering images (the <graphic> tag for example). This stylesheet
-indeed has support for both PostScript® and PDF document rendering,
-but unfortunately not through the same TeX output file (due to
-restrictions on LaTeX's side) so the DVI driver has to be chosen at
-XML-to-LaTeX conversion time.
-
-As a not-really-functional-style but oh-so-convenient temporary kludge
-(pending a standard means of passing stylesheet arguments on the
-xpathscript command line), $ENV{DVIDRIVER} is the default value of
-$dvidriver, that is, one can change this parameter through the
-environment, without even altering the stylesheet.
-
-=item @abstracttags
-
-The list of tags that are abstract, that is, that should never have
-apply_templates() applied to them directly. An example is <title>
-tags that cannot be rendered properly alone, but only as part of their
-parent <section>, <table> or the like. This variable is read-only and
-only serves as a convenience to the programmer (``is it of any use
-for me to overload this tag in $t ?''), modifying it has no effect.
-
-=item $fancytables
-
-If set to a true value (the default), tables are typeset using the
-C<longtable> and C<multirows> LaTeX packages. If set to a false value,
-plain C<tabular>s are used instead.
-
-=item $glosstermsinindex
-
-If set to a true value (the default), then <glossterm> nodes that do
-not appear in a <glosslist> will be included automatically in the
-index with a status of preferred entries (equivalent to <indexterm
-significance="preferred">).
-
-=item @packages
-
-The list of packages to be included into the LaTeX preamble. This array
-may contain plain strings, or references to sub-arrays for packages that
-want options (the package name comes first in the sub-array, then the
-function - see L</An example>).
-
-=item @sectionnames
-
-The sequence of section-like TeX macros, from highest (e.g. 'part') to lowest
-(e.g. 'subparagraph'). Customizing this is likely to be a priority for
-those not satisfied with the aesthetics.
-
-=item @tablesatbeginning
-
-The macros for the table(s) to be generated at the beginning of the
-document (without the backslash). By Default "tableofcontents" is
-always first and then "listoffigures" and "listoftables" (in that
-order) are appended iff there is at least one figure (resp. table) in
-the document.
-
-=item @tablesatend
-
-The macros for the table(s) to be generated at the end of the document
-(without the backslash). Defaults to empty, or just "printindex" if
-there is at least one <indexterm> in the document.
-
-=item $TeXkludges
-
-The set of macro definitions that has to be present in the document in order
-to get it to process. We tried very hard to keep this to a minimum - but there
-still was quite a bit of Knuth cursing going on at IDEALX during the making
-of this stylesheet. If you have solutions without those, let us know.
-
-=item $TeXpreamble
-
-A variable to append to to your liking to include TeX directives
-into the LaTeX preamble.
-
-=item $TeXbegindocument
-
-A variable to set to your liking to include TeX directives just after
-the LaTeX \begin{document}. Initially set to some general typesetting
-directives.
-
-=item $inhibitOutput
-
-If set to one, this stylesheet doesn't apply_templates() by itself. Useful
-if you want to overload it (see L</An example>)
-
-=item %boxlabels
-
-=item %boxstyles
-
-Both variables govern the rendering of I<tip>, I<remark>, I<note>,
-I<example>, I<warning>, I<important> and I<caution> elements. Entries
-in %boxstyles are keyed by element names, and the matching values are
-the LaTeX command that is used to wrap them, without the backslash
-(fancybox macros are set up by default, see the LaTeX Companion page
-278).
-
-%boxlabels holds the translations of the default titles for those
-environments. it is a hash of hashes, whose outermost keys are
-two-letter language abbreviations (e.g. "en" and "fr"), and whose
-innermost keys are the element names.
-
-=item my $TeXlength = TeXlength($docbooklength);
-
-=item my $TeXlength = TeXlength($docbooklength, $starlength);
-
-Returns the conversion of $docbooklength into a LaTeX length. If
-$starlength is specified, this is the value of "1*" (default is
-\fill).
-
-=item my $TeXlength = multiply_TeX_dimension($TeXlength, $factor);
-
-As the name implies, multiplies a TeX dimension by the given factor.
-
-=item my $label = id2label($node [, $labelname ] );
-
-Takes the attribute named $labelname ("id" by default) from $node and
-turns it into a string that is "more or less" unique and may be used
-as the argument of a \label{} or \ref{} command in TeX (e.g. bogus
-characters stripped). Returns undef if $node has no id (or no
-attribute named $labelname).
-
-=item my $labelstring = thelabel($node);
-
-Supports cross-referencing in LaTeX. If C<$node> has an C<id> tag,
-returns C<\label{id}>, else returns the empty string. The function id2label()
-above is used for this purpose.
-
-=item my $titleornothing = listtitle($node);
-
-Returns a typeset title as "\paragraph*{Title}", or the empty string,
-depending on whether $node has a <title> child. Appropriate for
-paragraph-like elements that may have a title, such as <itemizedlist>,
-<orderedlist>, <formalpara> etc.
-
-=item my $n = section_nesting_depth($node);
-
-Returns the depth of the current section nesting, in terms of an index
-into @sectionnames that would be appropriate for placing a sectionning macro
-for $node if it were itself a section.
-
-=item my $author_or_authors = render_authors($rendermode, $node);
-
-When $node is an <article> or <book> node, returns the typeset string
-of the author(s) of the article or book. $rendermode is the rendering
-style; recognizes modes for now are "stack" (returns multiple authors
-as a tabular that stacks authors vertically) and "ampersand" (returns
-a string of the form "Johnson, Johnson \& Johnson").
-
-=item my $author_or_authors = render_authors($rendermode, @author_names);
-
-When @author_names are already typeset author names (typically using
-the template for C<author>), returns the typeset string of the group
-of said authors according to $rendermode (see above).
-
-=item my $text=render_graphic($node);
-
-=item my $text=render_graphic($node, $scale);
-
-If $node is a <graphic> or <inlinegraphic> element node object, then
-render the appropriate \includegraphics{} command for it (but not the
-surrounding TeX material for centering or making a float of it). This
-is shared code for <graphic> and <inlinegraphic> templates. $scale is
-an optional scale factor (default is 1) to multiply the
-document-specified dimensions with (using L</multiply_TeX_dimension>).
-
-=back
-
-=head3 LaTeX footnotes
-
-Mostly every time some kind of tabular or minipage environment is
-used, the \footnote{} macro becomes nonfunctional inside it. It is
-still possible to typeset footnotes; the trick is page 71 of the LaTeX
-Companion - you have to look for it, though: instead of
-
-  \begin{table}{|c|}
-  foo\footnote{bar}
-  \end{table}
-
-one says
-
-  \begin{table}{|c|}
-  foo\footnotemark{}
-  \end{table}
-  \footnotetext{bar}
-
-This looks like too tough a job for a pure context-dependent
-stylesheet paradigm right? Wrong :-).
-
-=over 4
-
-=item @footnote_blockers
-
-The list of element names that may typeset themselves in such a way that
-the \footnote{} macro does not work inside them. Stylesheet extension
-writers should add (or subtract, why not?) elements there according to
-their LaTeX design.
-
-=item my $latex = render_footnote($node, $text)
-
-Returns an appropriate LaTeX snippet for signalling a footnote as part
-of $node's rendering, containing $text as the text.  Appropriate for
-implementing the templates of <footnote>, <ulink> et al. This function
-is not as trivial as it seems, because it handles the necessary magic
-of \footnotemark / \footnotetext in minipages environments
-(e.g. tables) where normal footnotes cannot be used because of
-limitations in LaTeX.
-
-=item collect_trapped_footnotes($node)
-
-=item collect_trapped_footnotes($node, @children)
-
-Returns a string made up of all \footnotetext{}'s that are to appear
-below $node's rendering, assuming it blocks footnotes. This list is
-collected by rendering @children again (by default, all of $node's
-children) using a skewed definition of render_footnote().
-
-=back
-
-=head3 LaTeX tables
-
-=over 4
-
-=item my $x = table_getcolXbyname($row, $name);
-
-=item my ($xstart, $xend) = table_getspanXbyname($row, $name);
-
-Returns the 1-based x coordinate(s) of a column / span in the column
-/span set of a table, or dies if the named column / span does not
-exist. These functions cache results. $row is a C<row> node object,
-and $name must match a C<colname> attribute in an applicable
-C<colspec>, resp. a C<spanname> attribute in an applicable C<spanspec>
-(see the CALS table model in L<SEE ALSO>). C<table_getcolXbyname>
-applies C<colspec> overloading according to the CALS semantics (see
-L</table_getcolspecbyX>).
-
-=item my $colspec = table_getcolspecbyX($row_or_entry, $x)
-
-Returns the C<colspec> in vigor for the specified, 1-based X
-coordinate, or undef if no such C<colspec> is in the
-document. Overloading of <colspec> sub-elements in C<thead> or
-C<tfoot> is handled according to the CALS specification, that is, if
-there is any C<colspec> at C<thead> or C<tfoot> model, they shadow the
-above ones at C<tgroup> level entirely, and only the inner set is then
-taken into account (e.g. shadowing, not merging, occurs when
-overloading).
-
-Note that CALS dictates that there should not be more than one colspec
-for a given column, so there is no discussion of list context for this
-function.
-
-=item my $spanspec = table_getspanspecbyX($row_or_entry, $xstart, $xend)
-
-=item my @several_spanspecs = table_getspanspecbyX($row_or_entry, $xstart, $xend)
-
-Returns the. C<spanspec> in vigor for the specified, 1-based X
-coordinates, or undef if no such C<spanspec> is in the document. In
-list context, I<table_getspanspecbyX()> may return several different
-spanspecs, in document order - in scalar context, in case of a tie,
-this function would only return the last relevant one in document
-order.
-
-=item my $colspec = table_getspecbyentry($entry, $leftcolumn);
-
-=item my $colspec = table_getspecbyentry($entry, $leftcolumn, $nojusthappen);
-
-Returns the "best" (see below) <colspec> or <spanspec> element node
-object associated with the column or group of columns spanned by
-$entry, or undef if there is no such colspec or spanspec. $leftcolumn
-(mandatory) is to be the 1-based column number at which $entry starts
-(the caller, which is typically L</typeset_tablerow>, must know
-this). Useful for querying style parameters from the parent column.
-
-$entry may either refer to the result by an explicit C<colname> or
-C<spanname> attribute in the document, or alternatively, unless
-$nojusthappen is set to a true value, it may also "just happen" to
-occupy the same column set.
-
-In case of multiple possible outcomes to this function, the
-"nominative" specs have priority over the "just happening" ones, the
-spanspecs have priority over the colspecs, and C<spanspec>s coming
-last in document order have priority in the "just happening" mode.
-
-=back
-
-=head2 Overridable function references
-
-Extension authors may wish to re-use part of this stylesheet's
-functionality at a sub-template level: typically, one may want to
-alter the outlook of tables without having to duplicate the tedious,
-stateful table filling algorithm that transcodes XML CALS tables into
-LaTeX. This stylesheet supports that by defining overridable function
-references at appropriate points, that extension authors may replace
-with their own implementation (see L</Modification points>).
-
-=head3 Pluggable LaTeX
-
-=over 4
-
-=item my $outputtext = &$typeset_pageref($node,$linkend);
-
-Typesets a reference containing a page number, to be put right after
-the \ref{$linkend} in the typesetting of $node, wich is an <xref>,
-without an intervening space. Possible values are " (page
-\pageref{$linkend})" (mind the leading space) or something like that,
-or the empty string if you don't want pagerefs. The default function
-tries to be smart and avoid the double closing parentheses problem
-when the <xref> is itself between parentheses. $linkend will be passed
-properly escaped, in such a way that outputting it to TeX in forms
-such as "\\ref{$linkend}" and "\\pageref{$linkend}" without any further
-transformation will produce the correct links.
-
-=item my $outputtext = &$maketitle($title,\@subtitles,@authors);
-
-This function shall typeset a titlepage (to be put just after the
-\begin{document}). If not set, the standard \title, \author,
-\maketitle mechanism of LaTeX will be used instead. zero, one or more
-subtitles may be passed as a list reference in the second argument.
-
-=item &$typeset_bibentry($node,$t,$lang);
-
-This function shall typeset a <biblioentry> or <biblioset>, ignoring the
-<biblioset> children. $node is the node to typeset in language $lang. There
-is a concept of $t->{pre} and $t->{post} analogous to the second argument
-of a testcode function; the semantics is that when an article and its
-proceedings are to be typeset together, the result will be made up with
-$tarticle->{pre}, $tproceedings->{pre}, $tproceedings->{post} and
-$tarticle->{post} (which is the normal way in french and in english, so
-that page numbers and the like appear last).
-
-The return value is ignored. Unrecognized element children should be
-appropriately warned.
-
-=back
-
-=head3 Pluggable table rendering
-
-=over 4
-
-=item my $outputtext = &$typeset_tablerow($style,@row);
-
-This function shall typeset a row in a table, given a style (which is
-either 'thead', 'tbody' or 'tfoot' --- typesetting happens in that
-order), and a list of hashrefs containing a description of the cells
-in this line: $row[0]->{height} and $row[0]->{width} contain the
-dimensions of the cell, and $row[0]->{cell} contains either undef (a
-blank cell - in this case height and width are always 1) or a
-reference to the XML::XPath::Element::Node object for this cell (an
-<entry> tag - <entrytbl>s are not supported yet).
-
-The entries are positionned according to their upper left corner;
-elements in @row that have an undef ->{cell} represent coordinate
-points under a multiple-cell entry, to be skipped. @row is guaranteed
-to be of the same width as the whole table. Warning, though, many
-XPath functions (and functions in this stylesheet) start numbering at
-1, while Perl starts numbering at 0; the code for your very own
-version of &$typeset_tablerow should therefore probably start like
-this:
-
-    my ($style, @row)=@_;
-	for(my $colnum=1; $colnum <= (scalar @row); $colnum++) {
-		my $elem=$row[$colnum - 1];
-        # Do stuff
-    }
-
-
-=item my $outputtext = &$typeset_tablerule($style,\@rowbefore,\@rowafter);
-
-This function shall typeset a separator between two rows. It also gets
-called before the first row in a group (the second parameter is then undef),
-and after the last row in a group (the first parameter is undef). A I<group>
-is the amount of rows represented by a whole <thead>, <tbody> or <tfoot>
-element. The contents of the lists pointed to by the second and third
-parameters (if defined) are not to be modified, and have the same structure
-as @row above. $style is as above.
-
-=item my $outputtext = &$typeset_tableframe($tgroup,$headtxt,$bodytxt,$foottxt);
-
-This function shall re-order $headtxt, $bodytxt and $foottxt (which
-are rendered TeX snippets for their respective parts of the $tgroup
-element node object, or undef if said <tgroup> lacks one of them) and
-eventually produce a valid overall TeX code for the whole table. This
-function is B<not> responsible for outputting the C<\begin{table}> or
-C<\end{table}> stuff; on the other hand, it shall render the table
-caption and the cross-reference label(s) (in $fancytables mode
-only). It had better pay attention to the value of the global variable
-$fancytables, since the surrounding TeX table frame will be very
-different according to its boolean value (tabular vs. longtable).
-
-By default, the function Does The Right Thing for multipage tables to
-work properly with longtable (if enabled).
-
-=item my $outputtext= &$typeset_tablecolumnpattern($node,$kind,$tgroup,$width);
-
-This function shall typeset the TeX column specification, this is, the
-"c|" part of "\begin{table}{c|}". The "|" after the "c" is meant:
-indeed, the CALS specification dictates that columns, spans and
-entries specify the rulings which lie on their right, except for the
-rightmost column (that you need not worry about; the stylesheet will
-take care of removing any separator material at the end of your column
-pattern if needed).
-
-This function shall apply both to <colspec> nodes (in order to render
-the TeX table header), <spanspec> nodes (for \multicolumn patterns
-inside the table) and <entry> nodes (for another, one-column
-\multicolumn that is the only way in TeX to typeset one cell centered,
-for example, when all the others in the same column are
-left-justified). $kind will be set to either "colspec", "spanspec" or
-"entry", respectively. The first argument may be undef for columns
-that don't have a colspec, and for multicolumn cells that do not
-specify a spanspec. In this case, it is still possible to get
-typesetting data using $tgroup, which always contains an element node
-object pointing to the table's <tgroup> element.
-
-By default, &$typeset_tablecolumnpattern() handles the 'colwidth' and
-'align' attributes only. A width may also be specified by caller using
-the optional $width argument, in which case
-&$typeset_tablecolumnpattern() should attempt to honor it by priority.
-
-=back
-
-=head2 Self-test
-
-The I<integrationtest()> function tests the behaviour of foreign
-packages that this stylesheet depends on (namely Perl itself
-for the UTF8-tainting issues, and I<XML::XPath> for minor API
-issues). The following derived stylesheet, when run on any document,
-will produce a text output compatible with L<Test::Harness>:
-
-E<32>E<32><% our $inhibitOutput; $inhibitOutput++; %I<>>
-
-E<32>E<32><!--#I<>include file="docbook2latex.xps"-->
-
-E<32>E<32><% integrationtest() %I<>>
-
-=head1 DOCBOOK EXTENSIONS
-
-The I<tgroupstyle> attribute of <tgroup> nodes is interpreted as a
-comma-separated list of LaTeX commands to wrap all cells with. A
-useful example is "footnotesize", for large tables.
-
-=head1 NONSTANDARD DOCBOOK CONSTRUCTIONS
-
-When using a format attribute "linespecific" in a <graphic> element,
-the LaTeX mechanism of selecting a file by trying various extensions
-is used. In this case, and contrary to what the DTD documentation
-says, one should omit the extension in the "fileref" attribute.
-
-Cross references are rendered in a context-sensitive way which is much
-more like Perl's DWIM (Do What I Mean) than XML's OTFA
-(One Template Fits All): the stylesheet parses the surrounding text to
-determine which one of "Figure 3.2, page 42", "Figure 3.2 (page 42)"
-or "3.2 (page 42)" is the correct rendering for <xref linkend="FIG-3-2">.
-This is to overcome a design limitation in the DTD spec, which make
-<xref>s inappropriate for any language but english.
-
-The words "TeX" and "LaTeX" are rendered as you might imagine they
-should. This is the only form of "semantic kerning" that should occur
-in the stylesheet, though (e.g. "---" really produces 3 dashes in the
-DVI and is not he same as "&mdash;" in the XML source).
-
-=head1 BUGS / TODO / LIMITATIONS
-
-Only a subset of DocBook is implemented. Adding tags is easy most of
-the time though.
-
-MediaObject's are the only portable, kosher way of dealing with
-multi-format graphics (such as PostScript® vs. PNG in PDF's). They are
-not implemented.
-
-Bibliography support is far from optimal and will result in bogus
-punctuation and label spacing every so often.
-
-There is no support for variadic typesetting of characters according
-to the language (for example, &hellip; is rendered the same way under
-french and english, but shouldn't). Using additional character
-packages on-demand (that is, usepackage'ing them only when some
-Unicode characters are present in the input) isn't possible. Both
-restrictions stem from the flat Unicode character space in XML that
-disregards the level of strangeness of character entities (e.g. it is
-impossible to construct an XPath formula meaning "give me all strange
-characters in this document"). Building a list of all characters in
-the document from Perl would be a solution, although I cannot think of
-an efficient way of doing that.
-
-=head1 SEE ALSO
-
-XPathScript documentation:
-
-  http://axkit.org/docs/xpathscript/guide.dkb
-
-XPath documentation from W3C:
-
-  http://www.w3.org/TR/xpath
-
-The Docbook DTD:
-
-  http://www.docbook.org/tdg/en/html/docbook.html
-
-The CALS table model:
-
-      http://www.oasis-open.org/specs/a502.htm
-
-Unicode character table (needed to add more character support into a
-stylesheet):
-
-  http://www.unicode.org/charts/charindex.html
-
-Ditto, less complete but more LaTeX-friendly:
-
-  http://www.bitjungle.com/~isoent/
-
-=head1 COPYRIGHT
-
-This program is copyright (C) Dominique Quatravaux
-<dom@idealx.com>, all rights reserved. This program is free software; you
-can redistribute it and/or modify it under the same terms as Perl itself.
-
-=cut
 
 %>
 
 <%= $inhibitOutput ? "" : apply_templates() %>
 
-=end devel

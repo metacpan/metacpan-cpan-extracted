@@ -8,7 +8,7 @@ package IO::Async::Loop::Epoll;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 use constant API_VERSION => '0.49';
 
 # Only Linux is known always to be able to report EOF conditions on
@@ -117,6 +117,8 @@ sub new
    $self->{signals} = {}; # {$name} => SignalWatch
    $self->{masks} = {};
 
+   $self->{pid} = $$;
+
    # epoll gets very upset if applications close() filehandles without telling
    # it, and then try to add that mask a second time. We can attempt to detect
    # this by storing the mapping from fileno to refaddr($fh)
@@ -164,6 +166,8 @@ sub loop_once
 {
    my $self = shift;
    my ( $timeout ) = @_;
+
+   $self->post_fork if $self->{pid} != $$;
 
    $self->_adjust_timeout( \$timeout );
 
@@ -233,6 +237,8 @@ sub watch_io
 {
    my $self = shift;
    my %params = @_;
+
+   $self->post_fork if $self->{pid} != $$;
 
    my $epoll = $self->{epoll};
 
@@ -318,6 +324,8 @@ sub unwatch_io
 {
    my $self = shift;
    my %params = @_;
+
+   $self->post_fork if $self->{pid} != $$;
 
    $self->__unwatch_io( %params );
 
@@ -411,6 +419,26 @@ sub unwatch_signal
    my $signum = $self->signame2num( $signal );
 
    sigprocmask( SIG_UNBLOCK, POSIX::SigSet->new( $signum ) );
+}
+
+sub post_fork
+{
+   my $self = shift;
+
+   $self->{epoll} = Linux::Epoll->new;
+   $self->{pid} = $$;
+
+   my $watches = $self->{iowatches} or return;
+
+   foreach my $watch ( values %$watches ) {
+      my ( $handle, $on_read_ready, $on_write_ready, $on_hangup ) = @$watch;
+      $self->watch_io(
+         handle         => $handle,
+         on_read_ready  => $on_read_ready,
+         on_write_ready => $on_write_ready,
+         on_hangup      => $on_hangup,
+      );
+   }
 }
 
 =head1 SEE ALSO

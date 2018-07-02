@@ -4,61 +4,11 @@ use strict;
 use warnings;
 use 5.008001;
 use Role::Tiny;
-use Storable ();
-use Carp ();
+use Alien::Base 1.45;
 
 # ABSTRACT: Alien::Base role that supports alternates
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
-
-sub alt
-{
-  my($old, $name) = @_;
-  my $new = ref $old ? (ref $old)->new : $old->new;
-
-  my $orig;
-  
-  if(ref($old) && defined $old->{_alt})
-  { $orig = $old->{_alt}->{orig} }
-  else
-  { $orig = $old->runtime_prop }
-  
-  my $runtime_prop = Storable::dclone($orig);
-  
-  if($runtime_prop->{alt}->{$name})
-  {
-    foreach my $key (keys %{ $runtime_prop->{alt}->{$name} })
-    {
-      $runtime_prop->{$key} = $runtime_prop->{alt}->{$name}->{$key};
-    }
-  }
-  else
-  {
-    Carp::croak("no such alt: $name");
-  }
-
-  $new->{_alt} = {
-    runtime_prop => $runtime_prop,
-    orig         => $orig,
-  };   
-  
-  $new;
-}
-
-around runtime_prop => sub {
-  my $orig = shift;
-
-  my($self) = @_;
-  
-  if(ref($self) && defined $self->{_alt})
-  {
-    return $self->{_alt}->{runtime_prop};
-  }
-  else
-  {
-    return $orig->($self);
-  }
-};
 
 1;
 
@@ -74,7 +24,7 @@ Alien::Role::Alt - Alien::Base role that supports alternates
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -86,7 +36,7 @@ From your L<alienfile>
    pkg_name => [ 'libfoo', 'libbar', ],
  );
 
-The in your base class:
+Then in your base class:
 
  package Alien::Libfoo;
  
@@ -105,6 +55,10 @@ Then you can use it:
  my $libs   = Alien::Libfoo->alt('foo1')->libs;
 
 =head1 DESCRIPTION
+
+B<NOTE>: The capabilities that used to be provided by this role have been
+moved into L<Alien::Base>'s core class.  This is an empty role provided
+for compatibility only.  New code should not be using this class.
 
 Some packages come with multiple libraries, and multiple C<.pc> files to
 use with them.  This L<Role::Tiny> role can be used with L<Alien::Base>

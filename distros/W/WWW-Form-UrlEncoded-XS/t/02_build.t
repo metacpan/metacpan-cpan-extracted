@@ -32,16 +32,16 @@ while ( @data ) {
     is( build_urlencoded(@$data), $test, JSON::encode_json($data));
 }
 
-is( build_urlencoded([ foo => "\xE5", bar => "\x{263A}" ]), 'foo=%E5&bar=%E2%98%BA'); 
-is( build_urlencoded_utf8([ foo => "\xE5", bar => "\x{263A}" ]), 'foo=%C3%A5&bar=%E2%98%BA'); 
-is( build_urlencoded_utf8([ "\xE5" => "foo", "\x{263A}" => "bar" ]), '%C3%A5=foo&%E2%98%BA=bar'); 
-is( build_urlencoded_utf8([ foo => "\x{263A}", bar => "\x{263A}" ],"\xE5"), 'foo=%E2%98%BAåbar=%E2%98%BA'); 
+is( build_urlencoded([ foo => "\xE5", bar => "\x{263A}" ]), 'foo=%E5&bar=%E2%98%BA');
+is( build_urlencoded_utf8([ foo => "\xE5", bar => "\x{263A}" ]), 'foo=%C3%A5&bar=%E2%98%BA');
+is( build_urlencoded_utf8([ "\xE5" => "foo", "\x{263A}" => "bar" ]), '%C3%A5=foo&%E2%98%BA=bar');
+is( build_urlencoded_utf8([ foo => "\x{263A}", bar => "\x{263A}" ],"\xE5"), 'foo=%E2%98%BAåbar=%E2%98%BA');
 
 for (1..10){
   like( build_urlencoded({aa => [ 1, undef, 3 ],bb => [ 1, 2, 3 ]}), qr!(aa=1&aa=&aa=3&bb=1&bb=2&bb=3|bb=1&bb=2&bb=3&aa=1&aa=&aa=3)!);
   like( build_urlencoded_utf8({aa => [ 1, undef, 3 ],bb => [ 1, 2, 3 ]}), qr!(aa=1&aa=&aa=3&bb=1&bb=2&bb=3|bb=1&bb=2&bb=3&aa=1&aa=&aa=3)!);
 }
 
+is( build_urlencoded( 'Test' => ( 'x' x 50003 ) ), 'Test='.('x'x50003) );
 
 done_testing;
-

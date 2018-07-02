@@ -1,3 +1,18 @@
+0.007 2018-06-20 21:36:26+02:00
+
+    - Support .inf/.nan
+    - Always output decimal point when dumping floats
+    - YAML directive needs space
+    - Improve emitter
+    - Output multiline strings as literal block scalars
+    - Fix regex for integers in Core Schema
+    - Fix dumping of dualvars
+    - Fix emitting of empty strings
+    - Improve emitter scalar styles
+    - Allow zero indented sequences for complex mapping keys/values
+    - Fix parsing empty quoted strings
+
+
 0.006 2018-04-01 22:59:31+02:00
 
     - Support YAML Failsafe, JSON and Core Schema

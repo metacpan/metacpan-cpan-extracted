@@ -1,5 +1,17 @@
 Revision history for Geo-Coder-CA
 
+0.09	Tue Jun 26 08:39:52 EDT 2018
+	Remove provides statement from Makefile.PL
+	Only run live tests when RELEASE_TESTING is set
+
+0.08	Tue May  8 15:32:03 EDT 2018
+	Fixed RT#125249
+
+0.07	Sun 29 Apr 11:12:04 EDT 2018
+	Better integration with HTML::GoogleMaps::V3, but loss of some funcionality as a result
+	Check $rc exists before deferencing to get 'error' value
+	Change tests for changing results from geocode.ca
+
 0.06	Sat Oct 28 10:07:39 EDT 2017
 	Allow CA.pm to be run from the command line
 	Fix http://www.cpantesters.org/cpan/report/161e11f8-bb9a-11e7-a1cf-bb670eaac09d

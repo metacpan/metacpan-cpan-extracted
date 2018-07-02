@@ -2,7 +2,7 @@ NAME
     Path::Iterator::Rule - Iterative, recursive file finder
 
 VERSION
-    version 1.012
+    version 1.014
 
 SYNOPSIS
       use Path::Iterator::Rule;
@@ -52,6 +52,10 @@ DESCRIPTION
 
     As a convenience, the PIR module is an empty subclass of this one that
     is less arduous to type for one-liners.
+
+    Note: paths are constructed with unix-style forward-slashes for
+    efficiency rather than using File::Spec. If proper path separators are
+    needed, call canonpath on the search results.
 
 USAGE
   Constructors
@@ -730,6 +734,10 @@ AUTHOR
 
 CONTRIBUTORS
     *   David Steinbrunner <dsteinbrunner@pobox.com>
+
+    *   Diab Jerius <djerius@cfa.harvard.edu>
+
+    *   Edward Betts <edward@4angle.com>
 
     *   Gian Piero Carrubba <gpiero@butterfly.fdc.rm-rf.it>
 

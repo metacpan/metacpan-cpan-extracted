@@ -1,5 +1,5 @@
 ---
-abstract: 'Provides a geocoding functionality using http:://geocoder.ca for both Canada and the US.'
+abstract: 'Provides a Geo-Coding functionality using http:://geocoder.ca for both Canada and the US.'
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
@@ -9,10 +9,11 @@ build_requires:
   Test::Most: '0'
   Test::NoWarnings: '0'
   Test::Number::Delta: '0'
+  Test::Script: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,5 +34,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-CA
   repository: git://github.com/nigelhorne/Geo-Coder-CA.git
-version: '0.06'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

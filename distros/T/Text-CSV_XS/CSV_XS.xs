@@ -110,6 +110,7 @@
 #define CACHE_ID__has_hooks		36
 #define CACHE_ID_formula		38
 #define CACHE_ID_strict			42
+#define CACHE_ID_undef_str		46
 
 #define	byte	unsigned char
 #define ulng	unsigned long
@@ -171,6 +172,8 @@ typedef struct {
     byte	utf8;
     byte	has_ahead;
     byte	eolx;
+    byte	undef_flg;
+    byte *	undef_str;
     int		eol_pos;
     STRLEN	size;
     STRLEN	used;
@@ -446,6 +449,18 @@ static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
 	    csv->eol_is_cr = len == 1 && *cp == CH_CR ? 1 : 0;
 	    break;
 
+	case CACHE_ID_undef_str:
+	    if (*cp) {
+		csv->undef_str = (byte *)cp;
+		if (SvUTF8 (val))
+		    csv->undef_flg = 3;
+		}
+	    else {
+		csv->undef_str = NULL;
+		csv->undef_flg = 0;
+		}
+	    break;
+
 	default:
 	    warn ("Unknown cache index %d ignored\n", idx);
 	}
@@ -595,13 +610,24 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
 		csv->eol_is_cr = 1;
 	    }
 
+	csv->undef_flg = 0;
+	if ((svp = hv_fetchs (self, "undef_str",      FALSE)) && *svp && SvOK (*svp)) {
+		/*if (sv && (SvOK (sv) || (
+			(SvGMAGICAL (sv) && (mg_get (sv), 1) && SvOK (sv))))) {*/
+	    csv->undef_str = (byte *)SvPV_nolen (*svp);
+	    if (SvUTF8 (*svp))
+		csv->undef_flg = 3;
+	    }
+	else
+	    csv->undef_str = NULL;
+
 	if ((svp = hv_fetchs (self, "_types",         FALSE)) && *svp && SvOK (*svp)) {
 	    csv->types = SvPV (*svp, len);
 	    csv->types_len = len;
 	    }
 
 	if ((svp = hv_fetchs (self, "_is_bound",      FALSE)) && *svp && SvOK (*svp))
-	    csv->is_bound = SvIV(*svp);
+	    csv->is_bound = SvIV (*svp);
 	if ((svp = hv_fetchs (self, "callbacks",      FALSE)) && _is_hashref (*svp)) {
 	    HV *cb = (HV *)SvRV (*svp);
 	    if ((svp = hv_fetchs (cb, "after_parse",  FALSE)) && _is_coderef (*svp))
@@ -836,7 +862,9 @@ static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
 	}
 
     for (i = 0; i <= n; i++) {
-	SV    *sv;
+	SV     *sv;
+	STRLEN  len = 0;
+	char   *ptr = NULL;
 
 	if (i > 0) {
 	    CSV_PUT (csv, dst, CH_SEP);
@@ -854,15 +882,13 @@ static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
 	    sv = svp && *svp ? *svp : NULL;
 	    }
 
-	if (sv) {
-	    STRLEN  len;
-	    char   *ptr;
+	if (sv && (SvOK (sv) || (
+		(SvGMAGICAL (sv) && (mg_get (sv), 1) && SvOK (sv))))) {
+
 	    int	    quoteMe;
 
-	    unless ((SvOK (sv) || (
-		    (SvGMAGICAL (sv) && (mg_get (sv), 1) && SvOK (sv)))
-		    )) continue;
 	    ptr = SvPV (sv, len);
+
 	    if (*ptr == '=' && csv->formula) {
 		unless (ptr = _formula (csv, sv, &len, i))
 		    continue;
@@ -947,6 +973,20 @@ static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
 		    for (x = 1; x < (int)csv->quo_len; x++)
 			CSV_PUT (csv, dst, csv->quo[x]);
 		    }
+		}
+	    }
+	else {
+	    if (csv->undef_str) {
+		byte  *ptr = csv->undef_str;
+		STRLEN len = strlen ((char *)ptr);
+
+		if (csv->undef_flg) {
+		    csv->utf8   = 1;
+		    csv->binary = 1;
+		    }
+
+		while (len--)
+		    CSV_PUT (csv, dst, *ptr++);
 		}
 	    }
 	}
@@ -1873,8 +1913,8 @@ static int hook (pTHX_ HV *hv, char *cb_name, AV *av) {
 	ENTER;
 	SAVETMPS;
 	PUSHMARK (SP);
-	XPUSHs (newRV_noinc ((SV *)hv));
-	XPUSHs (newRV_noinc ((SV *)av));
+	mXPUSHs (newRV_inc ((SV *)hv));
+	mXPUSHs (newRV_inc ((SV *)av));
 	PUTBACK;
 	res = call_sv (*svp, G_SCALAR);
 	SPAGAIN;

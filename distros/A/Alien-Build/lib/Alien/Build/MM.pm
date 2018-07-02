@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.46'; # VERSION
 
 
 sub new
@@ -205,7 +205,7 @@ sub mm_postamble
   $postamble .= "alien_prop_install :\n" .
                 "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e dumpprop install\n\n";
   $postamble .= "alien_prop_runtime :\n" .
-                "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e dumpprop install\n\n";
+                "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e dumpprop runtime\n\n";
   
   $postamble;
 }
@@ -353,7 +353,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.43
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -511,7 +511,7 @@ Shawn Laffan (SLAFFAN)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2011-2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

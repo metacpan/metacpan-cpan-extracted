@@ -4,7 +4,7 @@ use Test::More;
 use File::Temp qw( tempdir );
 use List::Util qw( sum );
 use URI;
-use HTTP::Date qw( str2time );
+use HTTP::Date qw( time2str );
 use Wallflower;
 
 # setup test data
@@ -127,6 +127,7 @@ push @tests, [
     ],
 ];
 
+my $last_modified = time2str( time - 10 );
 push @tests, [
     'app supporting If-Modified-Since',
     tempdir( CLEANUP => 1 ),
@@ -134,19 +135,26 @@ push @tests, [
         my %date;
         sub {
             my $env = shift;
-            $date{ $env->{REQUEST_URI} } ||= time;
-            my $since = str2time( $env->{HTTP_IF_MODIFIED_SINCE} ) || 0;
-            return $date{ $env->{REQUEST_URI} } <= $since
-                ? [ 304, [], '' ]
-                : [
-                    200,
-                    [ 'Content-Type' => 'text/plain', 'Content-Length' => 13 ],
-                    ['Hello, World!']
+            my $since = $env->{HTTP_IF_MODIFIED_SINCE} || '';
+            return $last_modified eq $since
+              ? [ 304, [], '' ]
+              : [ 200,
+                  [
+                    'Content-Type'   => 'text/plain',
+                    'Content-Length' => 13,
+                    'Last-Modified'  => $last_modified,
+                  ],
+                  ['Hello, World!']
                 ];
         };
     },
-    [   '/' => 200,
-        [ 'Content-Type' => 'text/plain', 'Content-Length' => 13 ],
+    [
+        '/' => 200,
+        [
+            'Content-Type'   => 'text/plain',
+            'Content-Length' => 13,
+            'Last-Modified'  => $last_modified
+        ],
         'index.html',
         'Hello, World!'
     ],

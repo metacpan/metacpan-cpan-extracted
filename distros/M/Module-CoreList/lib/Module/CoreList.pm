@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20180420';
+our $VERSION = '5.20180626';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -333,6 +333,8 @@ sub changes_between {
     5.024004 => '2018-04-14',
     5.026002 => '2018-04-14',
     5.027011 => '2018-04-20',
+    5.028000 => '2018-06-22',
+    5.029000 => '2018-06-26',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -14691,7 +14693,6 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'SelfLoader'            => '1.25',
             'Socket'                => '2.020_04',
             'Storable'              => '2.65',
-            'Storable::__Storable__'=> '2.65',
             'Test'                  => '1.31',
             'Test2'                 => '1.302111',
             'Test2::API'            => '1.302111',
@@ -15090,7 +15091,6 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'PerlIO::encoding'      => '0.26',
             'Storable'              => '3.06',
             'Storable::Limit'       => undef,
-            'Storable::__Storable__'=> '3.06',
             'Test2'                 => '1.302122',
             'Test2::API'            => '1.302122',
             'Test2::API::Breakage'  => '1.302122',
@@ -15429,6 +15429,40 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'vars'                  => '1.04',
             'version'               => '0.9923',
             'version::regex'        => '0.9923',
+        },
+        removed => {
+        }
+    },
+    5.028000 => {
+        delta_from => 5.027011,
+        changed => {
+            'Archive::Tar'          => '2.28',
+            'Archive::Tar::Constant'=> '2.28',
+            'Archive::Tar::File'    => '2.28',
+            'B::Op_private'         => '5.028000',
+            'Config'                => '5.028',
+            'Module::CoreList'      => '5.20180622',
+            'Module::CoreList::Utils'=> '5.20180622',
+            'Storable'              => '3.08',
+            'XS::APItest'           => '0.98',
+            'feature'               => '1.52',
+        },
+        removed => {
+        }
+    },
+    5.029000 => {
+        delta_from => 5.028,
+        changed => {
+            'Archive::Tar'          => '2.30',
+            'Archive::Tar::Constant'=> '2.30',
+            'Archive::Tar::File'    => '2.30',
+            'B::Op_private'         => '5.029000',
+            'Config'                => '5.029',
+            'Module::CoreList'      => '5.20180626',
+            'Module::CoreList::Utils'=> '5.20180626',
+            'Unicode::UCD'          => '0.71',
+            'XS::APItest'           => '0.99',
+            'feature'               => '1.53',
         },
         removed => {
         }
@@ -16322,6 +16356,20 @@ sub is_core
         removed => {
         }
     },
+    5.028000 => {
+        delta_from => 5.027011,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.029000 => {
+        delta_from => 5.028,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -16915,7 +16963,7 @@ sub is_core
     'File::Fetch'           => undef,
     'File::GlobMapper'      => undef,
     'File::Path'            => undef,
-    'File::Temp'            => 'http://rt.cpan.org/Public/Dist/Display.html?Name=File-Temp',
+    'File::Temp'            => 'https://rt.cpan.org/Public/Dist/Display.html?Name=File-Temp',
     'Filter::Util::Call'    => undef,
     'Getopt::Long'          => undef,
     'HTTP::Tiny'            => 'https://github.com/chansen/p5-http-tiny/issues',

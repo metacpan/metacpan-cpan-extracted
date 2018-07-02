@@ -1,5 +1,15 @@
 Revision history for Data-Fake
 
+0.004     2018-06-20 14:40:25-06:00 America/Denver
+
+    [ADDED]
+
+    - fake_flatten to flatten hash or array generators to a list
+
+    [DOCS]
+
+    - Fixed an example involving dates
+
 0.003     2016-08-20 21:25:58-04:00 America/New_York
 
     [DOCS]

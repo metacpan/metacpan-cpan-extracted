@@ -1,14 +1,24 @@
-0.2304    2013-10-10 09:16:27 America/New_York
+0.2306    2018-06-24 19:33:47Z
+          - switch from 'use vars' to 'our'
+
+0.2305    2018-04-19 11:58:49Z (TRIAL RELEASE)
+          - documentation updates for what versions contain what features
+            (thanks, Brian Mowrey! RT#101518)
+          - fix bad use of skip() in tests (RT#95922)
+          - Fall back to CSIDL_LOCAL_APPDATA under taint on Windows (RT#60340)
+          - update distribution tooling
+
+0.2304    2013-10-10 13:16:27Z
 
         * List all detectable dependencies for completeness. (Test::More had
           been unintentionally omitted in the last release and many core
           dependencies had never been listed.)
 
-0.2303    2013-10-09 09:57:21 America/New_York
+0.2303    2013-10-09 13:57:21Z
 
         * Remove compile test and associated dependencies
 
-0.2302    2013-09-26 09:45:35 America/New_York
+0.2302    2013-09-26 13:45:35Z
 
         * Drop minimum Perl version back to 5.6 (erroneously bumped by dzil)
         * Do not inherit from Exporter (requires Exporter 5.57) (thanks to
@@ -16,14 +26,12 @@
         * 'use base ...' => 'use parent ...' as parent is lighter (thanks to
           Olivier Mengué)
 
-0.2301    2013-04-11 16:30:05 Europe/London
+0.2301    2013-04-11 15:30:05Z
 
         * dist.ini: Managed with Dist::Zilla now; generates Makefile.PL
           to avoid circular dependency when using Build.PL
 
-2013-03-14 Tim Jenness <tjenness@cpan.org>
-
-	---- Release V0.23 CPAN ----
+0.23      2013-03-14 Tim Jenness <tjenness@cpan.org>
 
 	* Build.PL: Use Module::Build
 
@@ -51,16 +59,12 @@
         * Temp.pm: Overload numify with refaddr() in same manner as IO::File
           (closes RT #47397 from Kevin Ryde)
 
-2009-06-28  Tim Jenness <tjenness@cpan.org>
-
-	---- Release V0.22 CPAN ----
+0.22      2009-06-28  Tim Jenness <tjenness@cpan.org>
 
 	* t/fork.t: Fix portability problems in fork.t and remove left
 	over file (RT #41557)
 
-2008-11-12  Tim Jenness  <tjenness@cpan.org>
-
-	---- Release V0.21 CPAN ----
+0.21      2008-11-12  Tim Jenness  <tjenness@cpan.org>
 
 	* Temp.pm: Clean out $FILES_CREATED_BY_OBJECT when the destructor
 	runs. Otherwise memory does not get returned. Really bad idea for 
@@ -81,31 +85,21 @@
 	if you attempt to remove a directory that you are inside. (debian bug
 	479317 and RT #35779).
 	
-2008-03-15 Tim Jenness <tjenness@cpan.org>
-
 	* Temp.pm: Localize special variables in END blocks and destructors.
 	
-2007-12-20  Tim Jenness  <tjenness@cpan.org>
-
-	---- Release V0.20 CPAN ----
+0.20      2007-12-20  Tim Jenness  <tjenness@cpan.org>
 	
 	* t/lock.t: Fix logic problem with BEGIN block that was causing grief on some
 	systems (thanks to Steve Peters for patch).
 
-2007-11-19  Tim Jenness  <tjenness@cpan.org>
+0.19      2007-11-19  Tim Jenness  <tjenness@cpan.org>
 
-	----- Release V0.19 CPAN -----
-	
 	* Temp.pm (tempfile): Add EXLOCK option which can be used to disable O_EXLOCK
 
 	* t/lock.t: Test ability to disable O_EXLOCK
 	
-2007-11-16  Tim Jenness  <tjenness@cpan.org>
-
 	* Temp.pm (newdir): Add object oriented interface to "tempdir". Use
 	File::Temp->newdir()
-
-2007-11-15  Tim Jenness  <tjenness@cpan.org>
 
 	* Temp.pm (tempdir): Add a note to the tempdir documentation to
 	clarify that the default is for the directory not to be temporary
@@ -116,8 +110,6 @@
 
 	* Temp.pm: Add note  about File::Tempdir module
 	
-2007-11-14  Tim Jenness  <tjenness@cpan.org>
-
 	* Temp.pm (new): Track pid used when file created and make sure
 	object destructor deletes the file only when the current pid
 	matches the original pid (RT#11067 again - thanks to Grousse)
@@ -125,16 +117,12 @@
 
 	* t/seekable.t: Add tests to verify fix for RT#22052
 	
-2007-11-01  Tim Jenness  <tjenness@cpan.org>
-
 	* Temp.pm (_is_safe): Correct cluck message to match uid check
 	(thanks to Alexey Tourbin RT #14218)
 
 	* Temp.pm: Add note on use of binmode to modify encoding. (prompted
 	by Wolfgang Husmann)
 	
-2007-10-31  Tim Jenness  <tjenness@cpan.org>
-
 	* Temp.pm (tempfile): Add TMPDIR flag to simplify 
 	    tempdir(template, DIR => File::Spec->tmpdir) and to remove confusion
 	for tempdir interface. (thanks to Brendan O'Dea - debian bug #351373)
@@ -146,15 +134,11 @@
 	* Makefile.PL: Support LICENSE in newer ExtUtils::MakeMaker implementations
 	(thanks to Alexandr Ciornii RT #23524)
 
-2007-10-31  Tim Jenness  <tjenness@cpan.org>
-
 	* t/seekable.t: Skip seek test on older IO::Seekable versions.
 	(thanks to Sebastien Aperghis-Tramoni RT #23524)
 	
 	* Temp.pm: Allow XXX replacement to run on perl 5.005 and 5.004.
 	(thanks to Sebastien Aperghis-Tramoni RT #23524)
-
-2007-10-29  Tim Jenness  <tjenness@cpan.org>
 
 	* Temp.pm: Fix range of random character determination such that the last character
 	in the list (_) will appear occassionally. (Thanks to Peter Dintelmann perl RT# 41345)
@@ -169,10 +153,8 @@
 	* Temp.pm: Replace "new File::Temp" with "File::Temp->new" at the behest of H. Merijn 
 	Brand
 	
-2007-01-21 Tim Jenness <tjenness@cpan.org>
+0.18      2007-01-21 Tim Jenness <tjenness@cpan.org>
 
-	--- RELEASE 0.18 CPAN ---
-	
 	* Temp.pm: Provide "cmp" overloading so File::Temp object can
 	be compared to filename directly. (Rafael Garcia-Suarez)
 	
@@ -183,10 +165,8 @@
 
 	* Temp.pm: Export SEEK_* constants (Matt Lawrence RT #22052)
 	
-2006-08-18  Tim Jenness  <tjenness@cpan.org>
+0.17      2006-08-18  Tim Jenness  <tjenness@cpan.org>
 
-	--- RELEASE 0.17 CPAN ----
-	
 	* Temp.pm: Also inherit from IO::Seekable so that seek and tell
 	methods can work on filehandles (thanks to Rick Myers and Toby Corkindale).
 
@@ -210,23 +190,17 @@
 	called by tempfile() and File::Temp->new if a problem occurs (thanks to Steve
 	Hay for pointing this out).
 
-2005-09-01  Tim Jenness  <tjenness@cpan.org>
-
 	* Temp.pm: Sebastien Aperghis-Tramoni indicates that File::Temp
 	works with perl 5.004 so change the minimum perl version. (RT #14149)
 
 	* Temp.pm: Use effective uid rather than real uid (Alexey Tourbin RT #14218)
 
-2005-02-22  Tim Jenness  <tjenness@cpan.org>
+0.16      2005-02-22  Tim Jenness  <tjenness@cpan.org>
 
-	--- RELEASE V0.16 ---
-	
 	* Temp.pm: Remove spurious debug statement
 
-2005-02-21  Tim Jenness  <tjenness@cpan.org>
+0.15      2005-02-21  Tim Jenness  <tjenness@cpan.org>
 
-	--- RELEASE V0.15 ---
-	
 	* Temp.pm (unlink_on_destroy): Add post-object creation method to
 	control whether the temp file will be unlinked when the object
 	goes out of scope.
@@ -268,9 +242,7 @@
 
 	* Temp.pm: Add note on binmode usage
 	
-2003-08-16  Tim Jenness  <tjenness@cpan.org>
-
-	--- RELEASE V0.14 ---
+0.14      2003-08-16  Tim Jenness  <tjenness@cpan.org>
 
 	* t/object.t: Add test of OO interface and switch to Test::More
 
@@ -278,9 +250,7 @@
 	
 	* Temp.pm: mpeix fixes from Ken Hirsch <hirschk@labcorp.com>
 
-2003-08-15  Tim Jenness  <tjenness@cpan.org>
-	
-	--- RELEASE V0.13 ---
+0.13      2003-08-15  Tim Jenness  <tjenness@cpan.org>
 	
 	* Temp.pm: Integrate doc fixes from bleadperl (Slaven Rezic and
 	Jeffrey Friedl)
@@ -288,14 +258,10 @@
 	* Makefile.PL: Add INSTALLDIRS switch on perl version so that the
 	module installs into the correct place for perl 5.6.1 and newer.
 
-2002-08-28  Tim Jenness  <tjenness@cpan.org>
-
 	* Temp.pm: Synch with perl 5.8.0 v0.13 MacOS fixes (Chris Nandor)
 
-2001-02-22  Tim Jenness  <tjenness@cpan.org>
+0.12      2001-02-22  Tim Jenness  <tjenness@cpan.org>
 
-	--- RELEASE V0.12 ---
-	
 	* t/posix.t: The unlink0 tests now skip on failure
 
 	* t/mktemp.t: The unlink0 tests now skip on failure
@@ -303,16 +269,12 @@
 	* Temp.pm (tmpfile): tmpfile returns undef on failure rather than
 	croaking.
 
-2001-02-21  Tim Jenness  <tjenness@cpan.org>
-
 	* Temp.pm: 
 	      -Add fix for CGI::Carp 
                   [Thanks to John Labovitz <johnl@valiha.inside.sealabs.com>]
               - Use error string to propogate reason rather than a carp
 
-2000-11-24  Tim Jenness  <tjenness@cpan.org>
-
-        --- RELEASE V0.11 ----
+0.11      2000-11-24  Tim Jenness  <tjenness@cpan.org>
 
 	* t/tempfile.t: Add a test to make sure the file is present after
 	close and another to use tempfile in a scalar context.
@@ -320,8 +282,6 @@
 	* Temp.pm: Fix bug on NT with O_TEMPORARY causing the file to be
 	removed before the program exits. 
 
-        ---- RELEASE V0.10 ----
-	
 	* Temp.pm: Incorporate fixes up to bleedperl 7825. Cross platform
 	fixes.
 
@@ -329,36 +289,24 @@
 	cross platform support and more skips on the basis that this is
 	not testing your system security, just the module.
 
-2000-08-16  Tim Jenness  <tjenness@cpan.org>
-
 	* Temp.pm (_gettemp): Dont use VMS::Stdio if we want the file
 	to remain after closing.
 
-2000-08-15  Tim Jenness  <tjenness@cpan.org>
-
 	* Temp.pm (_can_do_level): cygwin patch
-
-2000-08-14  Tim Jenness  <tjenness@cpan.org>
 
 	* Temp.pm: Add OPENTEMPFLAGS to support UNLINK=>0
 		More tweaks to VMS support (now uses VMS::Stdio)
 
-2000-07-26  Tim Jenness  <tjenness@cpan.org>
+0.09      2000-07-26  Tim Jenness  <tjenness@cpan.org>
 
-	* Release V0.09 to CPAN
-	
 	* README: Update for V0.09
-
-2000-07-25  Tim Jenness  <tjenness@cpan.org>
 
 	* t/security.t: OS/2 can not do the security tests.
 
 	* Temp.pm: Add Support for VMS and OS/2 
 
-2000-05-15  Tim Jenness  <tjenness@cpan.org>
+0.08      2000-05-15  Tim Jenness  <tjenness@cpan.org>
 
-        * Release V0.08 to CPAN
-	
 	* t/mktemp.t: Skip the test for unlink0 if it fails since in most
 	cases this indicates an NFS problem.
 
@@ -368,8 +316,6 @@
 	to change 
 	(END): Change order of cleanup so that files are removed ahead of
 	temp dirs (since files may be in the temp dirs) 
-
-2000-05-08  Tim Jenness  <tjenness@cpan.org>
 
 	* Temp.pm: Reorganize END block 
 
@@ -385,14 +331,10 @@
 
 	* t/security.t: Add # to print output
 
-2000-04-28  Tim Jenness  <tjenness@cpan.org>
-
 	* Temp.pm: Calculate OPENFLAGS outside of subroutine. This
 	improves speed of the commands by nearly a factor of 3.
 	(_replace_XX): Inline the character replacement code rather than
 	using _randchar subroutine. Improves performance by an additional 8%.
-
-2000-04-27  Tim Jenness  <tjenness@cpan.org>
 
 	* t/posix.t: Add explicit autoflush on filehandle
 
@@ -432,6 +374,6 @@
 
 	* t/tempfile.t: Add test
 
-2000-03-14  Tim Jenness  <tjenness@cpan.org>
+0.05      2000-03-14  Tim Jenness  <tjenness@cpan.org>
 
 	* Release v0.05 to CPAN

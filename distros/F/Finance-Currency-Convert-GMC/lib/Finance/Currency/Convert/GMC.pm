@@ -1,7 +1,7 @@
 package Finance::Currency::Convert::GMC;
 
-our $DATE = '2018-06-17'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-06-24'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -64,8 +64,7 @@ sub get_currencies {
         my $tx = $ua->get($url);
         unless ($tx->success) {
             my $err = $tx->error;
-            return [500, "Can't retrieve GMC page ($url): ".
-                        "$err->{code} - $err->{message}"];
+            return [500, "Can't retrieve GMC page ($url): $err->{message}"];
         }
         $page = $tx->res->body;
     }
@@ -214,7 +213,7 @@ Finance::Currency::Convert::GMC - Convert currency using GMC (Golden Money Chang
 
 =head1 VERSION
 
-This document describes version 0.004 of Finance::Currency::Convert::GMC (from Perl distribution Finance-Currency-Convert-GMC), released on 2018-06-17.
+This document describes version 0.005 of Finance::Currency::Convert::GMC (from Perl distribution Finance-Currency-Convert-GMC), released on 2018-06-24.
 
 =head1 SYNOPSIS
 

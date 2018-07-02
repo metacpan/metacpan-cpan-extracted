@@ -66,7 +66,7 @@ neaf->run;
 
 __DATA__
 
-@@ [TT13] stat.html
+@@ stat.html view=TT13
 
 <html>
 <head>

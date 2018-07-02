@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use 5.10.0;
+
+use App::MarkFiles qw(each_path);
+use File::Basename;
+use File::Copy;
+use File::Spec;
+use Getopt::Long;
+
+each_path(sub {
+  my ($path) = @_;
+
+  unless (-e $path) {
+    say "No such file: $path";
+    return;
+  }
+
+  my ($source_basename, $source_path) = fileparse($path);
+  my $target = File::Spec->catfile('.', $source_basename);
+
+  if (-e $target) {
+    say "Warning: $path will overwrite $target";
+    # See mark-mv for some discussion of what happens if target exists.
+  }
+
+  if (copy($path, './')) {
+    say "Copied: $path";
+  } else {
+    say "Copy failed: $!"
+  }
+});

@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -22,11 +20,10 @@ package MongoDB::Op::_BulkWrite;
 # MongoDB::BulkWriteResult object
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
-use MongoDB::BSON;
 use MongoDB::Error;
 use MongoDB::BulkWriteResult;
 use MongoDB::UnacknowledgedResult;
@@ -40,6 +37,7 @@ use MongoDB::_Types qw(
 );
 use Types::Standard qw(
     ArrayRef
+    InstanceOf
 );
 use Safe::Isa;
 use Try::Tiny;
@@ -59,6 +57,18 @@ has ordered => (
     isa      => Boolish,
 );
 
+has client => (
+    is => 'ro',
+    required => 1,
+    isa => InstanceOf['MongoDB::MongoClient'],
+);
+
+has _retryable => (
+    is => 'rw',
+    isa => Boolish,
+    default => 1,
+);
+
 with $_ for qw(
   MongoDB::Role::_PrivateConstructor
   MongoDB::Role::_CollectionOp
@@ -67,6 +77,11 @@ with $_ for qw(
   MongoDB::Role::_InsertPreEncoder
   MongoDB::Role::_BypassValidation
 );
+
+sub _is_retryable {
+    my $self = shift;
+    return $self->write_concern->is_acknowledged && $self->_retryable;
+}
 
 sub has_collation {
     my $self = shift;
@@ -91,7 +106,7 @@ sub execute {
           if !$self->write_concern->is_acknowledged;
     }
 
-    my $use_write_cmd = $link->does_write_commands;
+    my $use_write_cmd = $link->supports_write_commands;
 
     # If using legacy write ops, then there will never be a valid modified_count
     # result so we set that to undef in the constructor; otherwise, we set it
@@ -162,9 +177,11 @@ sub _execute_write_command_batch {
 
     my @left_to_send = ($docs);
 
+    my $max_bson_size = $link->max_bson_object_size;
+    my $supports_document_validation = $link->supports_document_validation;
+
     while (@left_to_send) {
         my $chunk = shift @left_to_send;
-
         # for update/insert, pre-encode docs as they need custom BSON handling
         # that can't be applied to an entire write command at once
         if ( $cmd eq 'update' ) {
@@ -173,9 +190,9 @@ sub _execute_write_command_batch {
             # the update doc is already encoded; this also removes the 'is_replace'
             # field that needs to not be in the command sent to the server
             for ( my $i = 0; $i <= $#$chunk; $i++ ) {
-                next if ref( $chunk->[$i]{u} ) eq 'MongoDB::BSON::_EncodedDoc';
+                next if ref( $chunk->[$i]{u} ) eq 'BSON::Raw';
                 my $is_replace = delete $chunk->[$i]{is_replace};
-                $chunk->[$i]{u} = $self->_pre_encode_update( $link, $chunk->[$i]{u}, $is_replace );
+                $chunk->[$i]{u} = $self->_pre_encode_update( $max_bson_size, $chunk->[$i]{u}, $is_replace );
             }
         }
         elsif ( $cmd eq 'insert' ) {
@@ -183,8 +200,8 @@ sub _execute_write_command_batch {
             # field; since this might be called more than once if chunks are getting
             # split, check if the doc is already encoded
             for ( my $i = 0; $i <= $#$chunk; $i++ ) {
-                unless ( ref( $chunk->[$i] ) eq 'MongoDB::BSON::_EncodedDoc' ) {
-                    $chunk->[$i] = $self->_pre_encode_insert( $link, $chunk->[$i], '.' );
+                unless ( ref( $chunk->[$i] ) eq 'BSON::Raw' ) {
+                    $chunk->[$i] = $self->_pre_encode_insert( $max_bson_size, $chunk->[$i], '.' );
                 };
             }
         }
@@ -197,20 +214,26 @@ sub _execute_write_command_batch {
         ];
 
         if ( $cmd eq 'insert' || $cmd eq 'update' ) {
-            (undef, $cmd_doc) = $self->_maybe_bypass($link, $cmd_doc);
+            $cmd_doc = $self->_maybe_bypass( $supports_document_validation, $cmd_doc );
         }
 
         my $op = MongoDB::Op::_Command->_new(
-            db_name     => $db_name,
-            query       => $cmd_doc,
-            query_flags => {},
-            bson_codec  => $self->bson_codec,
+            db_name             => $db_name,
+            query               => $cmd_doc,
+            query_flags         => {},
+            bson_codec          => $self->bson_codec,
+            session             => $self->session,
+            retryable_write     => $self->retryable_write,
+            monitoring_callback => $self->monitoring_callback,
         );
 
         my $cmd_result = try {
-            $op->execute($link)
+            $self->_is_retryable
+              ? $self->client->send_retryable_write_op( $op )
+              : $self->client->send_write_op( $op );
         }
         catch {
+            # This error never touches the database!.... so is before any retryable writes errors etc.
             if ( $_->$_isa("MongoDB::_CommandSizeError") ) {
                 if ( @$chunk == 1 ) {
                     MongoDB::DocumentError->throw(
@@ -219,7 +242,7 @@ sub _execute_write_command_batch {
                     );
                 }
                 else {
-                    unshift @left_to_send, $self->_split_chunk( $link, $chunk, $_->size );
+                    unshift @left_to_send, $self->_split_chunk( $chunk, $_->size );
                 }
             }
             else {
@@ -252,7 +275,7 @@ sub _execute_write_command_batch {
 }
 
 sub _split_chunk {
-    my ( $self, $link, $chunk, $size ) = @_;
+    my ( $self, $chunk, $size ) = @_;
 
     my $avg_cmd_size       = $size / @$chunk;
     my $new_cmds_per_chunk = int( MAX_BSON_WIRE_SIZE / $avg_cmd_size );
@@ -340,37 +363,40 @@ sub _execute_legacy_batch {
         my $op;
         if ( $type eq 'insert' ) {
             $op = MongoDB::Op::_InsertOne->_new(
-                db_name       => $self->db_name,
-                coll_name     => $self->coll_name,
-                full_name     => $self->db_name . "." . $self->coll_name,
-                document      => $doc,
-                write_concern => $wc,
-                bson_codec    => $self->bson_codec,
+                db_name             => $self->db_name,
+                coll_name           => $self->coll_name,
+                full_name           => $self->db_name . "." . $self->coll_name,
+                document            => $doc,
+                write_concern       => $wc,
+                bson_codec          => $self->bson_codec,
+                monitoring_callback => $self->monitoring_callback,
             );
         }
         elsif ( $type eq 'update' ) {
             $op = MongoDB::Op::_Update->_new(
-                db_name       => $self->db_name,
-                coll_name     => $self->coll_name,
-                full_name     => $self->db_name . "." . $self->coll_name,
-                filter        => $doc->{q},
-                update        => $doc->{u},
-                multi         => $doc->{multi},
-                upsert        => $doc->{upsert},
-                write_concern => $wc,
-                is_replace    => $doc->{is_replace},
-                bson_codec    => $self->bson_codec,
+                db_name             => $self->db_name,
+                coll_name           => $self->coll_name,
+                full_name           => $self->db_name . "." . $self->coll_name,
+                filter              => $doc->{q},
+                update              => $doc->{u},
+                multi               => $doc->{multi},
+                upsert              => $doc->{upsert},
+                write_concern       => $wc,
+                is_replace          => $doc->{is_replace},
+                bson_codec          => $self->bson_codec,
+                monitoring_callback => $self->monitoring_callback,
             );
         }
         elsif ( $type eq 'delete' ) {
             $op = MongoDB::Op::_Delete->_new(
-                db_name       => $self->db_name,
-                coll_name     => $self->coll_name,
-                full_name     => $self->db_name . "." . $self->coll_name,
-                filter        => $doc->{q},
-                just_one      => !!$doc->{limit},
-                write_concern => $wc,
-                bson_codec    => $self->bson_codec,
+                db_name             => $self->db_name,
+                coll_name           => $self->coll_name,
+                full_name           => $self->db_name . "." . $self->coll_name,
+                filter              => $doc->{q},
+                just_one            => !!$doc->{limit},
+                write_concern       => $wc,
+                bson_codec          => $self->bson_codec,
+                monitoring_callback => $self->monitoring_callback,
             );
         }
 

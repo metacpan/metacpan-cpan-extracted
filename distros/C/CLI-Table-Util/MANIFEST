@@ -12,5 +12,6 @@ scripts/init.sh
 scripts/colsplit
 scripts/csv2tsv
 scripts/colsummary
+scripts/colgrep
 META.yml
 META.json

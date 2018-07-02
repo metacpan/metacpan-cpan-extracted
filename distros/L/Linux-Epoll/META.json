@@ -55,7 +55,7 @@
    "provides" : {
       "Linux::Epoll" : {
          "file" : "lib/Linux/Epoll.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/Leont/linux-epoll"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0215"
 }
 

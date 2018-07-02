@@ -1,3 +1,32 @@
+v0.70.0 2018-06-30T09:08:19Z
+ - ca file updated
+ - pcore util mapping improved
+ - P->progress removed
+ - Pcore::Util::URI::Host -> Pcore::Util::Host
+ - Pcore::Util::Template -> Pcore::Util::Tmpl
+ - Pcore::Util::Config -> Pcore::Util::Cfg
+ - P->ca removed
+
+v0.69.0 2018-06-26T00:52:29Z
+ - Dockerfile cleaned
+ - Dockerfile from centos
+
+v0.68.0 2018-06-25T21:19:15Z
+ - var renamed
+ - app get_default_locale method added
+ - perl-5.28
+ - Coro::unblock_sub reviewed
+ - api auth blocking
+ - server on_auth callback blocking
+ - l10n domains removed
+
+v0.67.2 2018-06-21T03:12:40Z
+ - websocket pcore ready state
+ - API attrs
+ - api namespace permissions:
+ - ext loader
+ - l10n .po parser fixed
+
 v0.67.1 2018-06-09T00:18:19Z
  - pause api fixed
  - invalid deref fixed

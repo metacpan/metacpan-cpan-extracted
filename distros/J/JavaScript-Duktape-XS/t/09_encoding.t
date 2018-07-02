@@ -10,7 +10,8 @@ BEGIN {
 
 use Data::Dumper;
 use Test::More;
-use JavaScript::Duktape::XS;
+
+my $CLASS = 'JavaScript::Duktape::XS';
 
 sub test_encoding {
     my %data = (
@@ -18,14 +19,14 @@ sub test_encoding {
         icelandic  => 'fjörð',
     );
 
-    my $duk = JavaScript::Duktape::XS->new();
-    ok($duk, "created JavaScript::Duktape::XS object");
+    my $vm = $CLASS->new();
+    ok($vm, "created $CLASS object");
 
     foreach my $key (sort keys %data) {
         my $expected = $data{$key};
-        $duk->set($key, $expected);
+        $vm->set($key, $expected);
 
-        my $got = $duk->get($key); # should get as UTF-8 always
+        my $got = $vm->get($key); # should get as UTF-8 always
         is_deeply($got, $expected, "got encoded data $key: $expected => $got");
     }
 }
@@ -38,17 +39,19 @@ sub test_hash {
     );
     # print Dumper(\%expected);
 
-    my $duk = JavaScript::Duktape::XS->new();
-    ok($duk, "created JavaScript::Duktape::XS object");
+    my $vm = $CLASS->new();
+    ok($vm, "created $CLASS object");
 
-    $duk->set('perl', \%expected);
-    my $got = $duk->get('perl');
+    $vm->set('perl', \%expected);
+    my $got = $vm->get('perl');
     # print Dumper($got);
 
     is_deeply($got, \%expected, "got UTF-8 data for keys and values in hash");
 }
 
 sub main {
+    use_ok($CLASS);
+
     test_encoding();
     test_hash();
     done_testing;

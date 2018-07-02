@@ -1,5 +1,15 @@
 Bio::DB::USeq Change Log
 
+0.24    * Implemented Interval Trees for much faster lookup of slices and 
+          observations when collecting data. The side effect is that observations 
+          may not be returned in the original genomic order. This will not affect 
+          statistical summaries and wiggle features.
+        * Added new low level method (observations) for directly retrieving 
+          observations without having to wrap the observations into SeqFeature 
+          objects as with the features() method.
+        * Fixed bug where statistical summaries would not count observations with 
+          a score of 0. 
+
 0.23    * Include script, USeqInfo.pl, for quick information about useq files.
         * Bug fixes to avoid division by zero errors.
         * Bug fix to parse sequence names with periods.

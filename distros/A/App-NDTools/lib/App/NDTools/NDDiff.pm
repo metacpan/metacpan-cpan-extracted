@@ -13,7 +13,7 @@ use Struct::Path 0.80 qw(path path_delta);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 use Term::ANSIColor qw(color);
 
-our $VERSION = '0.46';
+our $VERSION = '0.53';
 
 my $JSON = JSON->new->canonical->allow_nonref;
 my %COLOR;
@@ -31,8 +31,7 @@ sub arg_opts {
         'brief' => sub { $self->{OPTS}->{ofmt} = $_[0] },
         'colors!' => \$self->{OPTS}->{colors},
         'ctx-text=i' => \$self->{OPTS}->{'ctx-text'},
-        'full' => \$self->{OPTS}->{full}, # deprecated
-        'full-headers' => \$self->{OPTS}->{'full-headers'},
+        'full-headers' => \$self->{OPTS}->{'full-headers'}, # deprecated since 17 May 2018
         'grep=s@' => \$self->{OPTS}->{grep},
         'json' => sub { $self->{OPTS}->{ofmt} = $_[0] },
         'ignore=s@' => \$self->{OPTS}->{ignore},
@@ -59,6 +58,14 @@ sub configure {
     my $self = shift;
 
     $self->SUPER::configure();
+
+    if ($self->{OPTS}->{'full-headers'}) {
+        log_alert {
+            '--full-headers opt is deprecated and will be removed soon. ' .
+            '--nopretty should be used instead'
+        };
+        $self->{OPTS}->{pretty} = 0;
+    }
 
     $self->{OPTS}->{colors} = $self->{TTY}
         unless (defined $self->{OPTS}->{colors});
@@ -93,24 +100,6 @@ sub defaults {
     my $out = {
         %{$self->SUPER::defaults()},
         'ctx-text' => 3,
-        'term' => {
-            'head' => 'yellow',
-            'line' => {
-                'A' => 'green',
-                'D' => 'yellow',
-                'U' => 'white',
-                'R' => 'red',
-                '@' => 'magenta',
-            },
-            'sign' => {
-                'A' => '+ ',
-                'D' => '! ',
-                'U' => '  ',
-                'R' => '- ',
-                '@' => '  ',
-            },
-        },
-        'ofmt' => 'term',
         'diff' => {
             'A' => 1,
             'N' => 1,
@@ -118,26 +107,36 @@ sub defaults {
             'R' => 1,
             'U' => 0,
         },
+        'ofmt' => 'term',
+        'term' => {
+            'head' => 'yellow',
+            'indt' => '  ',
+            'line' => {
+                'A' => 'green',
+                'D' => 'yellow',
+                'N' => 'green',
+                'O' => 'red',
+                'U' => 'white',
+                'R' => 'red',
+                '@' => 'magenta',
+            },
+            'sign' => {
+                'A' => '+ ',
+                'D' => '! ',
+                'N' => '+ ',
+                'O' => '- ',
+                'U' => '  ',
+                'R' => '- ',
+                '@' => '  ',
+            },
+        },
     };
-
-    $out->{term}{line}{N} = $out->{term}{line}{A};
-    $out->{term}{line}{O} = $out->{term}{line}{R};
-    $out->{term}{sign}{N} = $out->{term}{sign}{A};
-    $out->{term}{sign}{O} = $out->{term}{sign}{R};
 
     return $out;
 }
 
 sub diff {
     my ($self, $old, $new) = @_;
-
-    if ($self->{OPTS}->{full}) {
-        log_alert {
-            '--full opt is deprecated and will be removed soon. ' .
-            '--U should be used instead'
-        };
-        map {$self->{OPTS}->{diff}->{$_} = 1 } keys %{$self->{OPTS}->{diff}};
-    }
 
     log_debug { "Calculating diff for structure" };
     my $diff = Struct::Diff::diff(
@@ -163,17 +162,18 @@ sub diff_term {
 
     log_debug { "Calculating diffs for text values" };
 
-    my $dref;       # ref to diff
+    my $dref; # ref to diff
     my @list = Struct::Diff::list_diff($diff);
 
     while (@list) {
         (undef, $dref) = splice @list, 0, 2;
 
         next unless (exists ${$dref}->{N});
+        next unless (defined ${$dref}->{O} and defined ${$dref}->{N});
         next if (ref ${$dref}->{O} or ref ${$dref}->{N});
 
-        my @old = split($/, ${$dref}->{O}, -1) if (${$dref}->{O});
-        my @new = split($/, ${$dref}->{N}, -1) if (${$dref}->{N});
+        my @old = split($/, ${$dref}->{O}, -1);
+        my @new = split($/, ${$dref}->{N}, -1);
 
         if (@old > 1 or @new > 1) {
             delete ${$dref}->{O};
@@ -306,7 +306,7 @@ sub dump_term {
 
     while (@list) {
         ($path, $dref) = splice @list, 0, 2;
-        for $tag (qw{R O N A T}) {
+        for $tag (qw{R O N A T U}) {
             $self->print_term_block(${$dref}->{$tag}, $path, $tag)
                 if (exists ${$dref}->{$tag});
         }
@@ -315,40 +315,49 @@ sub dump_term {
 
 sub exec {
     my $self = shift;
-    my @items;
+    my (@diffs, @files);
 
-    while (@{$self->{ARGV}}) {
-        my $name = shift @{$self->{ARGV}};
-        my $data = $self->load($name);
-
-        my $diff;
+    for (@{$self->{ARGV}}) {
+        push @files, { data => $self->load($_), name => $_ };
 
         if ($self->{OPTS}->{show}) {
-            $self->print_term_header($name);
-            $diff = $data->[0];
+            if (ref $files[0]->{data}->[0] eq 'ARRAY') { # ndproc's blame
+                for (@{$files[0]->{data}->[0]}) {
+                    push @diffs, $_->{diff},
+                        [ $files[0]->{name} . ', rule #' . $_->{rule_id} ];
+                }
+            } else { # regular diff dump
+                push @diffs, $files[0]->{data}->[0], [ $files[0]->{name} ];
+            }
+        } else { # one of the files to diff
+            next unless (@files > 1);
+            push @diffs, $self->diff($files[0]->{data}, $files[1]->{data});
+            push @diffs, [ $files[0]->{name}, $files[1]->{name} ];
+        }
 
-            if (my @errs = Struct::Diff::valid_diff($diff)) {
+        shift @files;
+
+        while (@diffs) {
+            my ($diff, $hdrs) = splice @diffs, 0, 2;
+
+            $self->print_term_header(@{$hdrs});
+
+            if (
+                $self->{OPTS}->{show} and
+                my @errs = Struct::Diff::valid_diff($diff)
+            ) {
                 while (@errs) {
                     my ($path, $type) = splice @errs, 0, 2;
-                    log_error { "$name: $type " . path2str($path) };
+                    log_error { "$type " . path2str($path) };
                 }
 
                 die_fatal "Diff validation failed", 1;
             }
-        } else {
-            push @items, { name => $name, data => $data };
-            next unless (@items > 1);
 
-            $self->print_term_header($items[0]->{name}, $items[1]->{name});
-
-            $diff = $self->diff($items[0]->{data}, $items[1]->{data});
-
-            shift @items;
+            $self->dump($diff) unless ($self->{OPTS}->{quiet});
+            $self->{status} = 8
+                unless (not keys %{$diff} or exists $diff->{U});
         }
-
-        $self->dump($diff) unless ($self->{OPTS}->{quiet});
-
-        $self->{status} = 8 unless (not keys %{$diff} or exists $diff->{U});
     }
 
     die_info "All done, no difference found", 0 unless ($self->{status});
@@ -376,11 +385,9 @@ sub print_brief_block {
 
     $status = 'D' if ($status eq 'N');
 
-    my $line = $self->{OPTS}->{term}->{sign}->{$status} .
-        $COLOR{U} . path2str([splice @{$path}, 0, -1]) . $COLOR{reset};
-    $line .= $COLOR{"B$status"} . path2str($path) . $COLOR{reset};
-
-    print $line . "\n";
+    print $self->{OPTS}->{term}->{sign}->{$status} . $COLOR{U} .
+        path2str([splice @{$path}, 0, -1]) . $COLOR{reset} .
+        $COLOR{"B$status"} . path2str($path) . $COLOR{reset} . "\n";
 }
 
 sub print_term_block {
@@ -390,26 +397,29 @@ sub print_term_block {
 
     my @lines;
     my $dsign = $self->{OPTS}->{term}->{sign}->{$status};
+    my $indent = $self->{OPTS}->{term}->{indt};
 
     # diff for path
     if (@{$path} and my @delta = path_delta($self->{'hdr_path'}, $path)) {
         $self->{'hdr_path'} = [@{$path}];
-        for (my $s = 0; $s < @{$path}; $s++) {
-            next if (not $self->{OPTS}->{'full-headers'} and $s < @{$path} - @delta);
+        my $s = $self->{OPTS}->{pretty} ? @{$path} - @delta : 0;
 
-            my $line = "  " x $s . path2str([$path->[$s]]);
+        while ($s < @{$path}) {
+            my $line = $indent x $s . path2str([$path->[$s]]);
+
             if (($status eq 'A' or $status eq 'R') and $s == $#{$path}) {
                 $line = $COLOR{"B$status"} . $dsign . $line . $COLOR{reset};
             } else {
-                $line = "  $line";
+                substr($line, 0, 0, $indent);
             }
 
             push @lines, $line;
+            $s++;
         }
     }
 
     # diff for value
-    push @lines, $self->term_value_diff($value, $status, "  " x @{$path});
+    push @lines, $self->term_value_diff($value, $status, $indent x @{$path});
 
     print join("\n", @lines) . "\n";
 }

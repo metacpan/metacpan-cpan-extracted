@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::Op::_FindAndDelete;
 # Encapsulate find_and_delete operation; atomically delete and return doc
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -65,19 +63,24 @@ sub execute {
         findAndModify   => $self->coll_name,
         query           => $self->filter,
         remove          => true,
-        ($link->accepts_wire_version(4) ?
+        ($link->supports_find_modify_write_concern ?
             (@{ $self->write_concern->as_args })
             : () ),
         %{ $self->options },
     ];
 
     my $op = MongoDB::Op::_Command->_new(
-        db_name         => $self->db_name,
-        query           => $command,
-        query_flags     => {},
-        bson_codec      => $self->bson_codec,
+        db_name             => $self->db_name,
+        query               => $command,
+        query_flags         => {},
+        bson_codec          => $self->bson_codec,
+        session             => $self->session,
+        retryable_write     => $self->retryable_write,
+        monitoring_callback => $self->monitoring_callback,
     );
 
+    # XXX more special error handling that will be a problem for
+    # command monitoring
     my $result;
     try {
         $result = $op->execute( $link, $topology );

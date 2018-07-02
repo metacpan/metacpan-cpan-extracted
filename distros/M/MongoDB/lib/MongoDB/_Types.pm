@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::_Types;
 # MongoDB type definitions
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Type::Library
   -base,
@@ -29,7 +27,12 @@ use Type::Library
   ArrayOfHashRef
   AuthMechanism
   Boolish
+  Booleanpm
   BSONCodec
+  BSONDoc
+  ClientSession
+  CompressionType
+  ZlibCompressionLevel
   ConnectType
   CursorType
   DBRefColl
@@ -40,15 +43,19 @@ use Type::Library
   HeartbeatFreq
   HostAddress
   HostAddressList
+  Intish
   IndexModel
   IndexModelList
   IxHash
   MaxStalenessNum
   MaybeHashRef
+  MongoDBClient
   MongoDBCollection
   MongoDBDatabase
+  BSONTimestamp
   NonEmptyStr
   NonNegNum
+  Numish
   OID
   OrderedDoc
   PairArrayRef
@@ -59,19 +66,24 @@ use Type::Library
   ServerType
   SingleChar
   SingleKeyHash
+  Stringish
   TopologyType
+  TransactionState
   WriteConcern
 );
 
 use Type::Utils -all;
 use Types::Standard qw(
     Any
+    Bool
     ArrayRef
     Dict
     HashRef
+    Int
     Maybe
     Num
     Optional
+    Overload
     Ref
     Str
     Undef
@@ -79,16 +91,16 @@ use Types::Standard qw(
 
 use Scalar::Util qw/reftype/;
 use boolean 0.25;
+use MongoDB::_Constants;
 require Tie::IxHash;
 
 #--------------------------------------------------------------------------#
 # Type declarations (without inherited coercions)
 #--------------------------------------------------------------------------#
 
-declare ArrayOfHashRef, as ArrayRef [HashRef];
+declare Stringish, as Str|Overload['""'];
 
-enum AuthMechanism,
-  [qw/NONE DEFAULT MONGODB-CR MONGODB-X509 GSSAPI PLAIN SCRAM-SHA-1/];
+declare Numish, as Num|Overload['0+'];
 
 # Types::Standard::Bool is overly restrictive, not allowing objects that
 # overload boolification, and Overload['bool'] doesn't detect objects that
@@ -96,13 +108,28 @@ enum AuthMechanism,
 # but allow any actual type.
 declare Boolish, as Any;
 
+declare ArrayOfHashRef, as ArrayRef [HashRef];
+
+enum AuthMechanism,
+  [qw/NONE DEFAULT MONGODB-CR MONGODB-X509 GSSAPI PLAIN SCRAM-SHA-1 SCRAM-SHA-256/];
+
 duck_type BSONCodec, [ qw/encode_one decode_one/ ];
+
+class_type BSONDoc, { class => 'BSON::Doc' };
+
+class_type ClientSession, { class => 'MongoDB::ClientSession' };
+
+enum CompressionType, [qw/zlib/];
+
+declare ZlibCompressionLevel, as Int,
+  where { $_ >= -1 && $_ <= 9 },
+  message { "zlib compression value must be value from -1 to 9" };
 
 enum ConnectType, [qw/replicaSet direct none/];
 
 enum CursorType, [qw/non_tailable tailable tailable_await/];
 
-declare ErrorStr, as Str, where { $_ }; # needs a true value
+declare ErrorStr, as Stringish, where { defined($_) && length($_) }; # needs a true value
 
 declare HashLike, as Ref, where { reftype($_) eq 'HASH' };
 
@@ -112,7 +139,7 @@ declare HeartbeatFreq, as Num,
 
 # XXX loose address validation for now.  Host part should really be hostname or
 # IPv4/IPv6 literals
-declare HostAddress, as Str,
+declare HostAddress, as Stringish,
   where { $_ =~ /^[^:]+:[0-9]+$/ and lc($_) eq $_ }, message {
     "Address '$_' either not lowercased or not formatted as 'hostname:port'"
   };
@@ -121,21 +148,27 @@ declare HostAddressList, as ArrayRef [HostAddress], message {
     "Address list <@$_> not all formatted as lowercased 'hostname:port' pairs"
 };
 
+declare Intish, as Numish, where { defined $_ and $_ == int($_) };
+
 class_type IxHash, { class => 'Tie::IxHash' };
 
 declare MaybeHashRef, as Maybe[ HashRef ];
+
+class_type MongoDBClient, { class => 'MongoDB::MongoClient' };
 
 class_type MongoDBCollection, { class => 'MongoDB::Collection' };
 
 class_type MongoDBDatabase, { class => 'MongoDB::Database' };
 
-declare NonEmptyStr, as Str, where { defined $_ && length $_ };
+class_type BSONTimestamp, { class => 'BSON::Timestamp' };
 
-declare NonNegNum, as Num,
+declare NonEmptyStr, as Stringish, where { defined $_ && length $_ };
+
+declare NonNegNum, as Numish,
   where { defined($_) && $_ >= 0 },
   message { "value must be a non-negative number" };
 
-declare MaxStalenessNum, as Num,
+declare MaxStalenessNum, as Numish,
   where { defined($_) && ( $_ > 0 || $_ == -1 ) },
   message { "value must be a positive number or -1" };
 
@@ -165,13 +198,16 @@ declare SingleChar, as Str, where { length $_ eq 1 };
 declare SingleKeyHash, as HashRef, where { 1 == scalar keys %$_ };
 
 enum TopologyType,
-  [qw/Single ReplicaSetNoPrimary ReplicaSetWithPrimary Sharded Unknown/];
+  [qw/Single ReplicaSetNoPrimary ReplicaSetWithPrimary Sharded Direct Unknown/];
+
+enum TransactionState,
+  [ TXN_NONE, TXN_STARTING, TXN_IN_PROGRESS, TXN_COMMITTED, TXN_ABORTED ];
 
 class_type WriteConcern, { class => 'MongoDB::WriteConcern' };
 
 # after SingleKeyHash, PairArrayRef and IxHash
-declare OrderedDoc, as PairArrayRef|IxHash|SingleKeyHash;
-declare Document, as HashRef|PairArrayRef|IxHash|HashLike;
+declare OrderedDoc, as BSONDoc|PairArrayRef|IxHash|SingleKeyHash;
+declare Document, as HashRef|BSONDoc|PairArrayRef|IxHash|HashLike;
 
 # after NonEmptyStr
 declare DBRefColl, as NonEmptyStr;
@@ -188,7 +224,7 @@ declare IndexModelList, as ArrayRef [IndexModel];
 coerce ArrayOfHashRef, from HashRef, via { [$_] };
 
 coerce BSONCodec, from HashRef,
-  via { require MongoDB::BSON; MongoDB::BSON->new($_) };
+  via { require BSON; BSON->new($_) };
 
 coerce Boolish, from Any, via { !!$_ };
 
@@ -205,6 +241,8 @@ coerce IxHash, from HashRef, via { Tie::IxHash->new(%$_) };
 coerce IxHash, from ArrayRef, via { Tie::IxHash->new(@$_) };
 
 coerce IxHash, from HashLike, via { Tie::IxHash->new(%$_) };
+
+coerce IxHash, from BSONDoc, via { Tie::IxHash->new(@$_) };
 
 coerce OID, from Str, via { lc $_ };
 

@@ -15,7 +15,7 @@ if ( not $depend_modules ) {
 
 plan tests => 6;
 
-require "t/Event_RPC_Test_Server.pm";
+require "./t/Event_RPC_Test_Server.pm";
 my $PORT = Event_RPC_Test_Server->port;
 
 my $AUTH_USER = "foo";

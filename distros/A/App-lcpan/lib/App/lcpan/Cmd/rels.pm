@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::rels;
 
-our $DATE = '2018-02-08'; # DATE
-our $VERSION = '1.022'; # VERSION
+our $DATE = '2018-06-21'; # DATE
+our $VERSION = '1.023'; # VERSION
 
 use 5.010;
 use strict;
@@ -35,7 +35,7 @@ App::lcpan::Cmd::rels - Alias for 'releases'
 
 =head1 VERSION
 
-This document describes version 1.022 of App::lcpan::Cmd::rels (from Perl distribution App-lcpan), released on 2018-02-08.
+This document describes version 1.023 of App::lcpan::Cmd::rels (from Perl distribution App-lcpan), released on 2018-06-21.
 
 =head1 FUNCTIONS
 
@@ -86,6 +86,11 @@ Defaults to C<~/cpan>.
 =item * B<index_name> => I<filename> (default: "index.db")
 
 Filename of index.
+
+If C<index_name> is a filename without any path, e.g. C<index.db> then index will
+be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
+C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
+using the C<index_name>.
 
 =item * B<latest> => I<bool>
 

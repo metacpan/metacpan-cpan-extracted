@@ -11,11 +11,11 @@ CLI::Coin::Toss - Several random number generators by CLI (Command Line Interfac
 
 =head1 VERSION
 
-Version 0.33
+Version 0.35
 
 =cut
 
-our $VERSION = '0.33';
+our $VERSION = '0.35';
 
 
 =head1 SYNOPSIS

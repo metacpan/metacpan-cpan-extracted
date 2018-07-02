@@ -14,7 +14,7 @@ use Params::Validate qw(:all);
 
 use base 'Exporter';
 our ( @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 @EXPORT      = qw();
 %EXPORT_TAGS = ();

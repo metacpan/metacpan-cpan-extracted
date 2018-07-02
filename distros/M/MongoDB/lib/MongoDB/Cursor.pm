@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2009 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -22,19 +20,18 @@ package MongoDB::Cursor;
 # ABSTRACT: A lazy cursor for Mongo query results
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
-use MongoDB;
-use MongoDB::BSON;
 use MongoDB::Error;
 use MongoDB::QueryResult;
 use MongoDB::ReadPreference;
 use MongoDB::_Protocol;
 use MongoDB::Op::_Explain;
-use MongoDB::_Types -types, 'to_IxHash';
+use MongoDB::_Types -types, qw/to_IxHash is_OrderedDoc/;
 use Types::Standard qw(
     InstanceOf
+    is_Str
 );
 use boolean;
 use Tie::IxHash;
@@ -80,6 +77,7 @@ has result => (
 # this does the query if it hasn't been done yet
 sub _build_result {
     my ($self) = @_;
+
     return $self->{client}->send_read_op( $self->_query );
 }
 
@@ -117,7 +115,7 @@ sub immortal {
     MongoDB::UsageError->throw("cannot set immortal after querying")
         if $self->started_iterating;
 
-    $self->_query->noCursorTimeout(!!$bool);
+    $self->_query->set_noCursorTimeout($bool);
     return $self;
 }
 
@@ -149,7 +147,7 @@ sub fields {
     MongoDB::UsageError->throw("not a hash reference")
       unless ref $f eq 'HASH' || ref $f eq 'Tie::IxHash';
 
-    $self->_query->projection($f);
+    $self->_query->set_projection($f);
     return $self;
 }
 
@@ -171,7 +169,7 @@ sub sort {
     MongoDB::UsageError->throw("cannot set sort after querying")
       if $self->started_iterating;
 
-    $self->_query->sort( to_IxHash($order) );
+    $self->_query->set_sort($order);
     return $self;
 }
 
@@ -190,7 +188,7 @@ sub limit {
     my ( $self, $num ) = @_;
     MongoDB::UsageError->throw("cannot set limit after querying")
       if $self->started_iterating;
-    $self->_query->limit($num);
+    $self->_query->set_limit($num);
     return $self;
 }
 
@@ -216,7 +214,7 @@ sub max_await_time_ms {
     MongoDB::UsageError->throw("can not set max_await_time_ms after querying")
       if $self->started_iterating;
 
-    $self->_query->maxAwaitTimeMS( $num );
+    $self->_query->set_maxAwaitTimeMS( $num );
     return $self;
 }
 
@@ -239,7 +237,7 @@ sub max_time_ms {
     MongoDB::UsageError->throw("can not set max_time_ms after querying")
       if $self->started_iterating;
 
-    $self->_query->maxTimeMS( $num );
+    $self->_query->set_maxTimeMS( $num );
     return $self;
 
 }
@@ -269,7 +267,7 @@ sub tailable {
     MongoDB::UsageError->throw("cannot set tailable after querying")
         if $self->started_iterating;
 
-    $self->_query->cursorType($bool ? 'tailable' : 'non_tailable');
+    $self->_query->set_cursorType($bool ? 'tailable' : 'non_tailable');
     return $self;
 }
 
@@ -293,7 +291,7 @@ sub tailable_await {
     MongoDB::UsageError->throw("cannot set tailable_await after querying")
         if $self->started_iterating;
 
-    $self->_query->cursorType($bool ? 'tailable_await' : 'non_tailable');
+    $self->_query->set_cursorType($bool ? 'tailable_await' : 'non_tailable');
     return $self;
 }
 
@@ -314,45 +312,24 @@ sub skip {
     MongoDB::UsageError->throw("cannot set skip after querying")
       if $self->started_iterating;
 
-    $self->_query->skip($num);
-    return $self;
-}
-
-#pod =head2 snapshot
-#pod
-#pod     $cursor->snapshot(1);
-#pod
-#pod Uses snapshot mode for the query.  Snapshot mode assures no duplicates are
-#pod returned due an intervening write relocating a document.  Note that if an
-#pod object is inserted, updated or deleted during the query, it may or may not
-#pod be returned when snapshot mode is enabled. Short query responses (less than
-#pod 1MB) are always effectively snapshotted.  Currently, snapshot mode may not
-#pod be used with sorting or explicit hints.
-#pod
-#pod Returns this cursor for chaining operations.
-#pod
-#pod =cut
-
-sub snapshot {
-    my ($self, $bool) = @_;
-
-    MongoDB::UsageError->throw("cannot set snapshot after querying")
-      if $self->started_iterating;
-
-    MongoDB::UsageError->throw("snapshot requires a defined, boolean argument")
-      unless defined $bool;
-
-    $self->_query->modifiers->{'$snapshot'} = $bool;
+    $self->_query->set_skip($num);
     return $self;
 }
 
 #pod =head2 hint
 #pod
-#pod     $cursor->hint({'x' => 1});
-#pod     $cursor->hint(['x', 1]);
-#pod     $cursor->hint('x_1');
+#pod Hint the query to use a specific index by name:
 #pod
-#pod Force Mongo to use a specific index for a query.
+#pod     $cursor->hint("index_name");
+#pod
+#pod Hint the query to use index based on individual keys and direction:
+#pod
+#pod     $cursor->hint([field_1 => 1, field_2 => -1, field_3 => 1]);
+#pod
+#pod Use of a hash reference should be avoided except for single key indexes.
+#pod
+#pod The hint must be a string or L<ordered document|MongoDB::Collection/Ordered
+#pod document>.
 #pod
 #pod Returns this cursor for chaining operations.
 #pod
@@ -362,16 +339,11 @@ sub hint {
     my ( $self, $index ) = @_;
     MongoDB::UsageError->throw("cannot set hint after querying")
       if $self->started_iterating;
+    MongoDB::UsageError->throw("hint must be string or ordered document, not '$index'")
+      if ! (is_Str($index) || is_OrderedDoc($index));
 
-    # $index must either be a string or a reference to an array, hash, or IxHash
-    if ( ref $index eq 'ARRAY' ) {
-        $index = Tie::IxHash->new(@$index);
-    }
-    elsif ( ref $index && !( ref $index eq 'HASH' || ref $index eq 'Tie::IxHash' ) ) {
-        MongoDB::UsageError->throw("not a hash reference");
-    }
+    $self->_query->set_hint( $index );
 
-    $self->_query->modifiers->{'$hint'} = $index;
     return $self;
 }
 
@@ -393,7 +365,7 @@ sub partial {
     MongoDB::UsageError->throw("cannot set partial after querying")
       if $self->started_iterating;
 
-    $self->_query->allowPartialResults( !! $value );
+    $self->_query->set_allowPartialResults( $value );
 
     # returning self is an API change but more consistent with other cursor methods
     return $self;
@@ -460,13 +432,15 @@ sub explain {
     my ($self) = @_;
 
     my $explain_op = MongoDB::Op::_Explain->_new(
-        db_name         => $self->_query->db_name,
-        coll_name       => $self->_query->coll_name,
-        full_name       => $self->_query->full_name,
-        bson_codec      => $self->_query->bson_codec,
-        query           => $self->_query->clone,
-        read_preference => $self->_query->read_preference,
-        read_concern    => $self->_query->read_concern,
+        db_name             => $self->_query->db_name,
+        coll_name           => $self->_query->coll_name,
+        full_name           => $self->_query->full_name,
+        bson_codec          => $self->_query->bson_codec,
+        query               => $self->_query,
+        read_preference     => $self->_query->read_preference,
+        read_concern        => $self->_query->read_concern,
+        session             => $self->_query->session,
+        monitoring_callback => $self->client->monitoring_callback,
     );
 
     return $self->_query->client->send_read_op($explain_op);
@@ -604,64 +578,21 @@ sub info {
 # Deprecated methods
 #--------------------------------------------------------------------------#
 
-sub count {
-    my ($self, $limit_skip) = @_;
+sub snapshot {
+    my ($self, $bool) = @_;
 
-    $self->_warn_deprecated(
-        'count' => "Use the 'count' method from MongoDB::Collection instead." );
+    $self->_warn_deprecated_method(
+        'snapshot' => "Snapshot is deprecated as of MongoDB 3.6" );
 
-    my $cmd = new Tie::IxHash(count => $self->_query->coll_name);
-
-    $cmd->Push(query => $self->_query->filter);
-
-    if ($limit_skip) {
-        $cmd->Push(limit => $self->_query->limit) if $self->_query->limit;
-        $cmd->Push(skip => $self->_query->skip) if $self->_query->skip;
-    }
-
-    if (my $hint = $self->_query->modifiers->{'$hint'}) {
-        $cmd->Push(hint => $hint);
-    }
-
-    my $result = try {
-        my $db = $self->_query->client->get_database( $self->_query->db_name );
-        $db->run_command( $cmd, $self->_query->read_preference );
-    }
-    catch {
-        # if there was an error, check if it was the "ns missing" one that means the
-        # collection hasn't been created or a real error.
-        die $_ unless /^ns missing/;
-    };
-
-    return $result ? $result->{n} : 0;
-}
-
-my $PRIMARY = MongoDB::ReadPreference->new;
-my $SEC_PREFERRED = MongoDB::ReadPreference->new( mode => 'secondaryPreferred' );
-
-sub slave_okay {
-    my ($self, $value) = @_;
-
-    $self->_warn_deprecated( 'slave_okay' => [qw/read_preference/] );
-
-    MongoDB::UsageError->throw("cannot set slave_ok after querying")
+    MongoDB::UsageError->throw("cannot set snapshot after querying")
       if $self->started_iterating;
 
-    if ($value) {
-        # if not 'primary', then slave_ok is already true, so leave alone
-        if ( $self->_query->read_preference->mode eq 'primary' ) {
-            # secondaryPreferred is how mongos interpretes slave_ok
-            $self->_query->read_preference( $SEC_PREFERRED );
-        }
-    }
-    else {
-        $self->_query->read_preference( $PRIMARY );
-    }
+    MongoDB::UsageError->throw("snapshot requires a defined, boolean argument")
+      unless defined $bool;
 
-    # returning self is an API change but more consistent with other cursor methods
+    $self->_query->set_snapshot($bool);
     return $self;
 }
-
 
 1;
 
@@ -681,7 +612,7 @@ MongoDB::Cursor - A lazy cursor for Mongo query results
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -827,26 +758,20 @@ Skips the first N results.
 
 Returns this cursor for chaining operations.
 
-=head2 snapshot
-
-    $cursor->snapshot(1);
-
-Uses snapshot mode for the query.  Snapshot mode assures no duplicates are
-returned due an intervening write relocating a document.  Note that if an
-object is inserted, updated or deleted during the query, it may or may not
-be returned when snapshot mode is enabled. Short query responses (less than
-1MB) are always effectively snapshotted.  Currently, snapshot mode may not
-be used with sorting or explicit hints.
-
-Returns this cursor for chaining operations.
-
 =head2 hint
 
-    $cursor->hint({'x' => 1});
-    $cursor->hint(['x', 1]);
-    $cursor->hint('x_1');
+Hint the query to use a specific index by name:
 
-Force Mongo to use a specific index for a query.
+    $cursor->hint("index_name");
+
+Hint the query to use index based on individual keys and direction:
+
+    $cursor->hint([field_1 => 1, field_2 => -1, field_3 => 1]);
+
+Use of a hash reference should be avoided except for single key indexes.
+
+The hint must be a string or L<ordered document|MongoDB::Collection/Ordered
+document>.
 
 Returns this cursor for chaining operations.
 

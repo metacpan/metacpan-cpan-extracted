@@ -20,7 +20,7 @@
 	(modified (buffer-modified-p)))
       (set-mark end)
       (goto-char begin)
-      (shell-command-on-region begin end "cdif --nocc --no256" t t nil t)
+      (shell-command-on-region begin end "cdif --nocc --no256 --cm OMARK=W/C,NMARK=W/M,DELETE=APPEND=R/W,OCHANGE=NCHANGE=B/W" t t nil t)
       (message "applying ansi-color. can take a while.")
       (ansi-color-apply-on-region (region-beginning) (region-end))
       (message "done.")

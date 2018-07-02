@@ -1,9 +1,17 @@
 Changes
 lib/MetaCPAN/Pod/XHTML.pm
+lib/Pod/Simple/Role/StripVerbatimIndent.pm
+lib/Pod/Simple/Role/XHTML/WithAccurateTargets.pm
+lib/Pod/Simple/Role/XHTML/WithErrata.pm
+lib/Pod/Simple/Role/XHTML/WithLinkMappings.pm
 maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
-t/basic.t
+t/accurate-targets.t
+t/errata.t
+t/link-mappings.t
+t/strip-indent.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

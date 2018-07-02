@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+use 5.001 ; use strict ; use warnings ; 
+
+use Getopt::Std ; getopts 'm:n:u' , \my %o  ; 
+use Encode qw [ encode_utf8 decode_utf8 ] ; 
+
+& main () ; 
+exit 0 ;
+
+
+sub uniq ( @ ) { my %seen ; grep { not $seen{$_}++ } @_ } ; # use More::Utils を使わない
+sub ngram ( $ ) {
+	my @ret ; 
+	my @c = split // , $_ , -1 ; ## <- $_ は $_[0] にすべきでは???
+	for my $i (0 .. @c - $o{n} )  { 
+		my $tmp = '' ; 
+		$tmp .= $c[ $i + $_ ] for  0 .. $o{n} - 1 ; 
+		push @ret , $tmp ;
+	}
+	return uniq @ret if $o{u} ; 
+	return @ret ;
+}
+
+
+sub main ( ) { 
+	$o{n} //=2 ; # n-gram の n を指定。
+	$o{m} //=12  ; # 最大いくつ出力するか
+	my %F = () ; # 全体の n-gram
+	#my %L = (); # 各行で n-gram を計算する。複数回出現しても、各行では出現したものについて1と数える。
+	while ( <> ) { 
+		chomp ; 
+		$_ = decode_utf8 ( $_ ) ; 
+		my @ngrams = ngram  $_   ; # 各行の n グラムを取り出す。
+		$F{$_} ++ for @ngrams ; 	
+	}
+
+	my $q = $o{m} ;
+	for ( sort { $F{$b} <=> $F{$a} } keys %F ) { 
+		print encode_utf8 ( "$F{$_}\t$_\n" )  ;
+		#print ( "$F{$_}\t$_\n" )  ;
+		-- $q or last ;
+	}
+}
+
+
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.01 ;
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+   # shuffler 
+   #  Produced by Toshiyuki Shimono in Tokyo, 2016-01-25 ~ 2016-10-13 ; 2018-03-25 English added.
+   # 目安: 
+   #   0.21 : 人になんとか提供できる段階で 0.21 を目安とする。
+   #   1.00 以上 : 英語版のヘルプをきちんと出すことが必要条件。
+   #   2.00 以上 : テストコードが含むことが必要条件。
+}  
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ;
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+ $0 
+   各行を読取り、UTF8を仮定して、文字単位n-gramのランキングを出力する。
+ 
+  -m ; 最大何個を取り出すかを指定( 未指定なら)
+  -n N : n-gramの長さ n を指定する。(未指定なら2と見なされる。)
+  -u : 各行で n-gram を算出し、各行で複数回出現しても 1 と数えて、集計する。
+
+ 開発上のメモ: 
+  * n-gram で最頻値をとると、m>n に対して、m文字の頻出パターンが、ランキング上 m-n+1回出現することを、うまく抑制したい。
+
+=cut

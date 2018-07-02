@@ -7,7 +7,7 @@ my $meta = {
   "abstract"       => "tie a variable to a type constraint",
   "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config" => 1,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640",
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"       => [],
   "license"        => ["perl_5"],
   "meta-spec"      => {
@@ -21,17 +21,25 @@ my $meta = {
                         runtime => {
                           recommends => { "Hash::FieldHash" => 0 },
                           requires   => { "Exporter::Tiny" => 0.026, "perl" => 5.008005 },
+                          suggests   => { "Types::Standard" => 0.004 },
                         },
                         test => {
-                          requires => { "Test::Fatal" => 0, "Test::More" => 0.96, "Test::Requires" => 0 },
+                          requires => { "Test::More" => 0.96 },
+                          suggests => {
+                                        "MooseX::Types::Moose" => 0,
+                                        "Test::Fatal"          => 0,
+                                        "Test::Requires"       => 0,
+                                        "Types::Standard"      => 0.004,
+                                      },
                         },
                       },
   "provides"       => {
-                        "Type::Tie"         => { file => "lib/Type/Tie.pm", version => 0.009 },
-                        "Type::Tie::ARRAY"  => { file => "lib/Type/Tie.pm", version => 0.009 },
-                        "Type::Tie::BASE"   => { file => "lib/Type/Tie.pm", version => 0.009 },
-                        "Type::Tie::HASH"   => { file => "lib/Type/Tie.pm", version => 0.009 },
-                        "Type::Tie::SCALAR" => { file => "lib/Type/Tie.pm", version => 0.009 },
+                        "Type::Nano"        => { file => "lib/Type/Nano.pm", version => 0.011 },
+                        "Type::Tie"         => { file => "lib/Type/Tie.pm", version => 0.011 },
+                        "Type::Tie::ARRAY"  => { file => "lib/Type/Tie.pm", version => 0.011 },
+                        "Type::Tie::BASE"   => { file => "lib/Type/Tie.pm", version => 0.011 },
+                        "Type::Tie::HASH"   => { file => "lib/Type/Tie.pm", version => 0.011 },
+                        "Type::Tie::SCALAR" => { file => "lib/Type/Tie.pm", version => 0.011 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -45,7 +53,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Type-Tie/project",
                       },
-  "version"        => 0.009,
+  "version"        => 0.011,
 };
 
 my %dynamic_config;

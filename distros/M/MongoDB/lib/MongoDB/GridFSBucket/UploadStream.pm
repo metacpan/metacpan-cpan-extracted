@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,14 +19,14 @@ package MongoDB::GridFSBucket::UploadStream;
 # ABSTRACT: File handle abstraction for uploading
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
+use BSON::Bytes;
+use BSON::OID;
+use BSON::Time;
 use Encode;
-use DateTime;
 use MongoDB::Error;
-use MongoDB::OID;
-use MongoDB::BSON::Binary;
 use Time::HiRes qw/time/;
 use Types::Standard qw(
   Str
@@ -134,7 +133,7 @@ has _bucket => (
 #pod The id of the file created by the stream.  It will be stored in the C<_id>
 #pod field of the file document on a successful upload.  Some upload methods
 #pod require specifying an id at upload time.  Defaults to a newly-generated
-#pod L<MongoDB::OID> or BSON codec specific equivalent.
+#pod L<BSON::OID> or BSON codec specific equivalent.
 #pod
 #pod =cut
 
@@ -145,7 +144,7 @@ has id => (
 sub _build_id {
     my $self = shift;
     my $creator = $self->_bucket->bson_codec->can("create_oid");
-    return $creator ? $creator->() : MongoDB::OID->_new_oid();
+    return $creator ? $creator->() : BSON::OID->new();
 }
 
 has _closed => (
@@ -236,7 +235,7 @@ sub _flush_chunks {
           {
             files_id => $self->id,
             n        => int( $self->_current_chunk_n ),
-            data     => MongoDB::BSON::Binary->new( { data => $data } ),
+            data     => BSON::Bytes->new( data => $data ),
           };
         $self->{_current_chunk_n} += 1;
     }
@@ -253,7 +252,7 @@ sub _write_data {
     Encode::_utf8_off($data); # force it to bytes for transmission
     $self->{_buffer} .= $data;
     $self->{_length} += length $data;
-    $self->_md5->add($data);
+    $self->_md5->add($data) unless $self->_bucket->disable_md5;
     $self->_flush_chunks if length $self->{_buffer} >= $self->_chunk_buffer_length;
 }
 
@@ -309,9 +308,9 @@ sub close {
         _id        => $self->id,
         length     => $self->_length,
         chunkSize  => $self->chunk_size_bytes,
-        uploadDate => DateTime->from_epoch( epoch => time ),
-        md5        => $self->_md5->hexdigest,
+        uploadDate => BSON::Time->new(),
         filename   => $self->filename,
+        ( $self->_bucket->disable_md5 ? () : (md5 => $self->_md5->hexdigest) ),
     };
     $filedoc->{'contentType'} = $self->content_type if $self->content_type;
     $filedoc->{'metadata'}    = $self->metadata     if $self->metadata;
@@ -457,7 +456,7 @@ MongoDB::GridFSBucket::UploadStream - File handle abstraction for uploading
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -532,7 +531,7 @@ document on a successful upload.
 The id of the file created by the stream.  It will be stored in the C<_id>
 field of the file document on a successful upload.  Some upload methods
 require specifying an id at upload time.  Defaults to a newly-generated
-L<MongoDB::OID> or BSON codec specific equivalent.
+L<BSON::OID> or BSON codec specific equivalent.
 
 =head2 fh
 

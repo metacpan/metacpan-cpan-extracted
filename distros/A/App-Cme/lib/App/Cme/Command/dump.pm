@@ -10,7 +10,7 @@
 # ABSTRACT: Dump the configuration of an application
 
 package App::Cme::Command::dump ;
-$App::Cme::Command::dump::VERSION = '1.027';
+$App::Cme::Command::dump::VERSION = '1.028';
 use strict;
 use warnings;
 use 5.10.1;
@@ -42,13 +42,12 @@ sub opt_spec {
             }
         ],
         [
-            "format=s" => "dump using specified format",
+            "format=s" => "dump using specified format (yaml json perl cml)",
             {
                 regex => qr/^(?:json|ya?ml|perl|cml|cds)$/i,
                 default => 'yaml'
             },
         ],
-        [ "quiet!"             => "Suppress progress messages" ],
         $class->cme_global_options,
     );
 }
@@ -105,7 +104,7 @@ App::Cme::Command::dump - Dump the configuration of an application
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 

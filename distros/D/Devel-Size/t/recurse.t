@@ -212,7 +212,22 @@ sub cmp_array_ro {
     is(@$got, @$want, "$desc (same element count)");
     my $i = @$want;
     while ($i--) {
-	is($got->[$i], $want->[$i], "$desc (element $i)");
+        # As of v5.28.0 there's an optimisation to avoid repeated creation of
+        # temporaries when putting a sparse array onto the stack. It does this
+        # by taking a different trade-off - the first time it happens it stores
+        # a sentinel value in the array for "does not exist" - a kind of
+        # "whiteout". A side effect of this is that (of course) the array gets
+        # bigger. This infrastructure was then also used to fix subtle bugs when
+        # nonexistent elements in arrays were passed to a subroutine.
+        # We had been triggering that behaviour in here - in our careful and
+        # (supposedly) read-only diagnostic code.
+        # So play (fragile) whack-a-mole with the core's internals - it seems
+        # that if we copy the values first, before passing them to is(), we
+        # don't trigger the optimisation, with the desired (non-)side-effect
+        # that the array remains the same size at the end of this subroutine.
+        my $ge = $got->[$i];
+        my $we = $want->[$i];
+	is($ge, $we, "$desc (element $i)");
     }
 }
 

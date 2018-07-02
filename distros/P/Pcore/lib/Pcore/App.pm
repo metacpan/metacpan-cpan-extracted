@@ -31,6 +31,10 @@ sub BUILD ( $self, $args ) {
     return;
 }
 
+sub get_default_locale ( $self, $req ) {
+    return 'en';
+}
+
 around run => sub ( $orig, $self ) {
     if ( $self->{api} ) {
 

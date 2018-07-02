@@ -22,30 +22,31 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
-                  'pattern' => '(2\\d)(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '2',
-                  'national_rule' => '0$1'
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
+                  'pattern' => '(2\\d)(\\d{3})(\\d{3})'
                 },
                 {
                   'pattern' => '([4-5])(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
-                  'leading_digits' => '[45]',
-                  'format' => '$1 $2 $3'
+                  'leading_digits' => '[45]'
                 },
                 {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
                   'national_rule' => '0$1',
-                  'leading_digits' => '[23578]',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+                  'leading_digits' => '[23578]'
                 }
               ];
 
 my $validators = {
+                'personal_number' => '',
                 'voip' => '',
                 'fixed_line' => '
           (?:
@@ -55,13 +56,18 @@ my $validators = {
         ',
                 'toll_free' => '',
                 'pager' => '',
-                'personal_number' => '',
                 'geographic' => '
           (?:
             2\\d{3}|
             33333
           )\\d{4}
         ',
+                'specialrate' => '(
+          332(?:
+            02|
+            [2-5]\\d
+          )\\d{4}
+        )',
                 'mobile' => '
           (?:
             20\\d{2}|
@@ -73,13 +79,7 @@ my $validators = {
             77\\d{2}|
             88\\d{2}
           )\\d{5}
-        ',
-                'specialrate' => '(
-          332(?:
-            02|
-            [2-5]\\d
-          )\\d{4}
-        )'
+        '
               };
 
     sub new {

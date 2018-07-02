@@ -8,15 +8,21 @@ use Algorithm::Cron;
 
 use Carp 'croak';
 
-our $VERSION = "0.025";
-use constant CRON_DIR => 'mojo_cron_dir';
+our $VERSION = "0.026";
+use constant CRON_DIR => 'mojo_cron_';
 my $crondir;
 
 sub register {
   my ($self, $app, $cronhashes) = @_;
   croak "No schedules found" unless ref $cronhashes eq 'HASH';
-  $crondir = path($app->config->{cron}{dir} // File::Spec->tmpdir)
-    ->child(CRON_DIR, $app->mode);
+
+# for *nix systems, getpwuid takes precedence
+# for win systems or wherever getpwuid is not implemented,
+# eval returns undef so getlogin takes precedence
+  $crondir
+    = path($app->config->{cron}{dir} // File::Spec->tmpdir)
+    ->child(CRON_DIR . (eval { scalar getpwuid($<) } || getlogin || 'nobody'),
+    $app->mode);
   Mojo::IOLoop->next_tick(sub {
     if (ref((values %$cronhashes)[0]) eq 'CODE') {
 

@@ -8,7 +8,7 @@ __END__
 
 =head1 NAME
 
-ndquery - get desired parts from nested data structure
+ndquery - query tool for nested data structures
 
 =head1 SYNOPSIS
 

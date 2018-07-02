@@ -36,7 +36,7 @@ sub app {
     if ($args{input_filename} eq '-') {
         $oth_args{source_str} = do {
             local $/;
-            binmode STDIN, ":utf8";
+            binmode STDIN, ":encoding(utf8)";
             scalar <STDIN>;
         };
     } else {
@@ -70,7 +70,7 @@ org2html-wp - Convert Org document to HTML
 
 =head1 VERSION
 
-This document describes version 0.46 of org2html-wp (from Perl distribution App-OrgUtils), released on 2017-07-10.
+This document describes version 0.470 of org2html-wp (from Perl distribution App-OrgUtils), released on 2018-06-30.
 
 =head1 SYNOPSIS
 
@@ -91,6 +91,10 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--browser>
+
+Instead of returning the HTML, show it in browser.
 
 =item B<--input-filename>=I<s>*, B<-i>
 
@@ -243,6 +247,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ browser (see --browser)
  format (see --format)
  input_filename (see --input-filename)
  naked (see --naked)
@@ -297,7 +302,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

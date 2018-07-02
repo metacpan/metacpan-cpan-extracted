@@ -1,3 +1,32 @@
+0.008   2018-06-27 (PERLANCAR)
+
+	[INCOMPATIBLE CHANGES]
+
+        - Source methods now also use hash arguments.
+
+        [ENHANCEMENTS]
+
+	- Expose and store all buy/sell rates (e.g. buy_er, buy_bn, buy_ttc for BCA).
+
+	[BUG FIXES]
+
+        - Fix type of max_age_cache.
+
+	- Fix Rinci metadata.
+
+
+0.007   2018-06-25 (PERLANCAR)
+
+	- To be more consistent, when asked for conversion from X to X,
+	  return payload {rate=>1} instead of payload=1.
+
+
+0.006   2018-06-24 (PERLANCAR)
+
+	- [Bugfix] database schema: Forgot to specify AUTO_INCREMENT for rate
+          table.
+
+
 0.005   2018-06-19 (PERLANCAR)
 
 	- No functional changes.

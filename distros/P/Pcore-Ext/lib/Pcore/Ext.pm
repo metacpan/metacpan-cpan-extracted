@@ -1,17 +1,15 @@
-package Pcore::Ext v0.16.1;
+package Pcore::Ext v0.17.4;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Base;
 use Pcore::Ext::Context;
 use Pcore::Resources;
 use Pcore::Util::Scalar qw[is_ref];
+use Package::Stash::XS qw[];
 
-our $APP;
+our ( $APP, $EXT );
 my $SCANNED;
 
-# TODO split by steps
-# TODO ext ver, type are hardcoded for lib classes
-# TODO mark classes, that are not belogs to app as is_lib
 sub scan ( $self, $app, @namespaces ) {
     return if $SCANNED;
 
@@ -22,8 +20,6 @@ sub scan ( $self, $app, @namespaces ) {
     # scan namespaces
     for my $root_namespace ( @namespaces, 'Pcore::Ext::Lib' ) {
         my $root_namespace_path = $root_namespace =~ s[::][/]smgr;
-
-        my $is_lib = $root_namespace eq 'Pcore::Ext::Lib' ? 1 : 0;
 
         for my $inc_path ( grep { !is_ref $_ } @INC ) {
             P->file->find(
@@ -39,7 +35,13 @@ sub scan ( $self, $app, @namespaces ) {
                         my $context_cfg = do {
                             no strict qw[refs];
 
+                            # configure namespace
                             push @{"$namespace\::ISA"}, 'Pcore::Ext::Base';
+                            *{"$namespace\::raw"}  = sub : prototype($) {die};
+                            *{"$namespace\::func"} = sub                {die};
+                            *{"$namespace\::api"}  = \undef;
+                            *{"$namespace\::class"} = \undef;
+                            *{"$namespace\::type"}  = \undef;
 
                             P->class->load($namespace);
 
@@ -50,29 +52,36 @@ sub scan ( $self, $app, @namespaces ) {
                             };
                         };
 
-                        die qq[\$EXT_MAP is not defined for "$namespace"] if !$context_cfg->{ext_map};
-
                         my $context_path = "$root_namespace_path/" . $path =~ s/[.]pm\z//smr;
 
-                        for my $name ( keys $context_cfg->{ext_map}->%* ) {
+                        for my $name ( grep {/\AEXT_/sm} Package::Stash::XS->new($namespace)->list_all_symbols('CODE') ) {
+                            my $ref = do {
+                                no strict qw[refs];
+
+                                *{"$namespace\::$name"}{CODE};
+                            };
+
+                            $name =~ s/\AEXT_//sm;
+
                             $tree->{"/$context_path/$name"} = {
                                 namespace       => $namespace,
                                 generator       => $name,
                                 class_path      => "/$context_path/$name",
                                 context_path    => "/$context_path/",
-                                extend          => $context_cfg->{ext_map}->{$name}->{extend},
+                                extend          => $context_cfg->{ext_map}->{$ref}->{extend},
+                                override        => $context_cfg->{ext_map}->{$ref}->{override},
                                 api_ver         => $context_cfg->{ext_api_ver},
-                                ext_class_name  => "$context_path/$name" =~ s[/][.]smgr,
-                                alias_namespace => $context_cfg->{ext_map}->{$name}->{type},
-                                is_lib          => $is_lib,
+                                ext_class_name  => $context_cfg->{ext_map}->{$ref}->{define} // "$context_path/$name" =~ s[/][.]smgr,
+                                alias_namespace => $context_cfg->{ext_map}->{$ref}->{type},
+                                ext_framework   => $context_cfg->{ext_map}->{$ref}->{ext},
                             };
                         }
 
                         # detect application
-                        if ( !$is_lib && ( ( my $app_name ) = $context_path =~ m[\A$root_namespace_path/([^/]+)\z]sm ) ) {
+                        if ( ( my $app_name ) = $context_path =~ m[\A$root_namespace_path/([^/]+)\z]sm ) {
                             die qq[Ext app "/$context_path" requires \$EXT_TYPE to be defined] if !$context_cfg->{ext_type};
                             die qq[Ext app "/$context_path" requires \$EXT_VER to be defined]  if !$context_cfg->{ext_ver};
-                            die qq[Viewport is not defined]                                    if !$context_cfg->{ext_map}->{viewport};
+                            die qq[Viewport is not defined]                                    if !$tree->{"/$context_path/viewport"};
 
                             $APP->{$app_name} = {
                                 name         => $app_name,
@@ -104,55 +113,72 @@ sub scan ( $self, $app, @namespaces ) {
     }
 
     # resolve extend, set alias namespace, alias
-    my ( $extjs, $resolved_extend );
+    $self->_resolve_extend( $app, $tree );
 
-    # TODO
+    $self->_build_classes( $app, $tree );
+
+    $self->_build_apps($tree);
+
+    $self->_build_ext($tree);
+
+    return;
+}
+
+sub _resolve_extend ( $self, $app, $tree ) {
+    my ( $extjs, $processed_classes );
+
     my $resolve_extend = sub ($class) {
-        return if $resolved_extend->{ $class->{class_path} };
+        return if $processed_classes->{ $class->{class_path} };
 
-        $resolved_extend->{ $class->{class_path} } = 1;
+        $processed_classes->{ $class->{class_path} } = 1;
 
-        # extend is undefined
-        return if !$class->{extend};
+        # extend is defined
+        if ( $class->{extend} ) {
 
-        # extend is ExtJS class name
-        if ( $class->{extend} =~ /[.]/sm ) {
+            # extend is ExtJS class name
+            if ( $class->{extend} =~ /[.]/sm ) {
 
-            my ( $ext_ver, $ext_type );
+                # alias namespace is not defined, try to inherit from the base class
+                # only for app classes, because lib classes doesn't contains framework information
+                if ( !$class->{alias_namespace} && $class->{app_name} ) {
+                    my $ext_ver  = $APP->{ $class->{app_name} }->{ext_ver};
+                    my $ext_type = $APP->{ $class->{app_name} }->{ext_type};
 
-            # TODO
-            if ( $class->{is_lib} ) {
-                $ext_ver  = 'v6.5.3';
-                $ext_type = 'modern';
+                    # load extjs config, if not loaded
+                    $extjs->{$ext_ver}->{$ext_type} = $ENV->{share}->read_cfg( 'Pcore-Resources', 'data', "ext-$ext_ver/$ext_type.json" ) if !exists $extjs->{$ext_ver}->{$ext_type};
+
+                    # base class is not exists
+                    die qq[Invalid ExtJS class name "$class->{extend}"] if !exists $extjs->{$ext_ver}->{$ext_type}->{ $class->{extend} };
+
+                    # inherit alias namespace from the base class
+                    $class->{alias_namespace} = $extjs->{$ext_ver}->{$ext_type}->{ $class->{extend} };
+                }
             }
+
+            # extend is internal class path
             else {
-                $ext_ver  = $APP->{ $class->{app_name} }->{ext_ver};
-                $ext_type = $APP->{ $class->{app_name} }->{ext_type};
+                my $ctx = Pcore::Ext::Context->new(
+                    app  => $app,
+                    tree => $tree,
+                    ctx  => $class,
+                );
+
+                my $base_class = $ctx->_resolve_class_path( $class->{extend} );
+
+                # register requires
+                $class->{requires}->{ $base_class->{class_path} } = undef;
+                $class->{extend} = $base_class->{ext_class_name};
+
+                # alias namespace is not defined, try to inherit from the base class
+                if ( !$class->{alias_namespace} ) {
+                    __SUB__->($base_class);
+
+                    $class->{alias_namespace} = $base_class->{alias_namespace};
+                }
             }
-
-            # load extjs config, if not loaded
-            $extjs->{$ext_ver}->{$ext_type} = $ENV->{share}->read_cfg( 'Pcore-Resources', 'data', "ext-$ext_ver/$ext_type.json" ) if !exists $extjs->{$ext_ver}->{$ext_type};
-
-            die qq[Invalid ExtJS class name "$class->{extend}"] if !exists $extjs->{$ext_ver}->{$ext_type}->{ $class->{extend} };
-
-            # inherit alias namespace from the base class, if not defined yet
-            $class->{alias_namespace} = $extjs->{$ext_ver}->{$ext_type}->{ $class->{extend} } if !$class->{alias_namespace};
         }
 
-        # extend is internal class path
-        else {
-            my $extend_class = $self->_resolve_class_path( $class, $class->{extend} );
-
-            die qq[Class path "$class->{extend}" can't be resolved] if !exists $tree->{$extend_class};
-
-            __SUB__->( $tree->{$extend_class} );
-
-            $class->{extend} = $tree->{$extend_class}->{ext_class_name};
-
-            $class->{alias_namespace} = $tree->{$extend_class}->{alias_namespace} if !$class->{alias_namespace} && $tree->{$extend_class}->{alias_namespace};
-        }
-
-        # set alias, if alias namespace is exists
+        # generate alias, if alias namespace is defined
         $class->{alias} = $class->{class_path} =~ s[/][_]smgr if $class->{alias_namespace};
 
         return;
@@ -161,10 +187,6 @@ sub scan ( $self, $app, @namespaces ) {
     for my $class ( values $tree->%* ) {
         $resolve_extend->($class);
     }
-
-    $self->_build_classes( $app, $tree );
-
-    $self->_build_apps($tree);
 
     return;
 }
@@ -203,7 +225,7 @@ sub _build_apps ( $self, $tree ) {
                 return;
             }
 
-            for my $require ( keys $class->{requires}->%* ) {
+            for my $require ( sort keys $class->{requires}->%* ) {
 
                 # skip external deps
                 next if !exists $tree->{$require};
@@ -217,8 +239,11 @@ sub _build_apps ( $self, $tree ) {
             # add content
             $app->{content} .= "$class->{content}->$*;\n";
 
+            # add app l10n msgid
+            $app->{l10n}->@{ keys $class->{l10n}->%* } = ();
+
             # add api map
-            for my $method_id ( keys $class->{api}->%* ) {
+            for my $method_id ( sort keys $class->{api}->%* ) {
                 next if exists $added_methods->{$method_id};
 
                 $added_methods->{$method_id} = undef;
@@ -226,15 +251,33 @@ sub _build_apps ( $self, $tree ) {
                 push $app->{api}->{ delete $class->{api}->{$method_id}->{action} }->@*, $class->{api}->{$method_id};
             }
 
-            # add locale domains
-            $app->{l10n_domain}->@{ keys $class->{l10n_domain}->%* } = ();
-
             return;
         };
 
         # sort deps
-        for my $class ( sort { $b->{ext_class_name} cmp $a->{ext_class_name} } grep { defined $_->{app_name} && $_->{app_name} eq $app->{name} } values $tree->%* ) {
+        for my $class ( sort { $a->{ext_class_name} cmp $b->{ext_class_name} } grep { defined $_->{app_name} && $_->{app_name} eq $app->{name} } values $tree->%* ) {
             $add_deps->($class);
+        }
+    }
+
+    return;
+}
+
+sub _build_ext ( $self, $tree ) {
+    for my $class ( sort { $a->{ext_class_name} cmp $b->{ext_class_name} } grep { $_->{ext_framework} } values $tree->%* ) {
+        if ( $class->{ext_framework} eq 'core' ) {
+            $EXT->{modern} .= "$class->{content}->$*;\n";
+
+            $EXT->{classic} .= "$class->{content}->$*;\n";
+        }
+        elsif ( $class->{ext_framework} eq 'modern' ) {
+            $EXT->{modern} .= "$class->{content}->$*;\n";
+        }
+        elsif ( $class->{ext_framework} eq 'classic' ) {
+            $EXT->{classic} .= "$class->{content}->$*;\n";
+        }
+        else {
+            die q[Invalid value for "Ext" attribute];
         }
     }
 
@@ -248,11 +291,7 @@ sub _build_apps ( $self, $tree ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 15                   | Subroutines::ProhibitExcessComplexity - Subroutine "scan" with high complexity score (29)                      |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 75                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 236                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    3 | 84                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.315';
+our $VERSION = '0.316';
 
 use Carp       qw( croak carp );
 use Encode     qw( encode );
@@ -48,6 +48,8 @@ sub new {
     }, $class;
     $self->__set_defaults();
     $self->{plugin} = $Plugin_Package->new();
+    my $backup_self = { map{ $_ => $self->{$_} } keys %$self };
+    $self->{backup_self} = $backup_self;
     return $self;
 }
 
@@ -117,14 +119,24 @@ sub __init_term {
 
 sub __reset_term {
     my ( $self, $hide_cursor ) = @_;
-    #delete $self->{i} if exists $self->{i};
     if ( defined $self->{plugin} ) {
         $self->{plugin}->__reset_mode( $hide_cursor );
+    }
+    if ( defined $self->{backup_self} ) {
+        my $backup_self = delete $self->{backup_self};
+        for my $key ( keys %$self ) {
+            if ( defined $backup_self->{$key} ) {
+                $self->{$key} = $backup_self->{$key};
+            }
+            else {
+                delete $self->{$key};
+            }
+        }
     }
 }
 
 
-sub config { # ### ###
+sub config { # DEPRECATED
     my ( $self, $opt ) = @_;
     if ( defined $opt ) {
         if ( ref $opt ne 'HASH' ) {
@@ -941,7 +953,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.315
+Version 0.316
 
 =cut
 
@@ -1008,7 +1020,9 @@ The C<new> method returns a C<Term::Form> object.
 
     my $new = Term::Form->new();
 
-=head2 config
+=head2 config DEPRECATED
+
+This method is deprecated and will be removed.
 
 The method C<config> overwrites the defaults for the current C<Term::Form> object.
 

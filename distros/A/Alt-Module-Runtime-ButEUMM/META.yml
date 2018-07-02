@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::Simple version 0.022, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Inkt::Profile::Simple version 0.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,9 @@ optional_features: {}
 provides:
   Alt::Module::Runtime::ButEUMM:
     file: lib/Alt/Module/Runtime/ButEUMM.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   perl: '5.006'
-version: '0.001'
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

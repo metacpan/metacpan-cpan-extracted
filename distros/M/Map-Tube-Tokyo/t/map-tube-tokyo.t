@@ -6,13 +6,13 @@ use warnings FATAL => 'all';
 use Test::More;
 
 my $min_ver = 0.35;
-eval "use Test::Map::Tube $min_ver tests => 3";
+eval "use Test::Map::Tube $min_ver tests => 4";
 plan skip_all => "Test::Map::Tube $min_ver required." if $@;
 
 use utf8;
 use Map::Tube::Tokyo;
 
-my $map = Map::Tube::Tokyo->new;
+my $map = new_ok('Map::Tube::Tokyo');
 ok_map($map);
 ok_map_functions($map);
 

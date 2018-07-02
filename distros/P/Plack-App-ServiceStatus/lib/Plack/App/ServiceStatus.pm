@@ -3,12 +3,12 @@ use 5.018;
 use strict;
 use warnings;
 
-our $VERSION = '0.902';
+our $VERSION = '0.903';
 
 # ABSTRACT: Check and report status of various services needed by your app
 
 use base 'Class::Accessor::Fast';
-__PACKAGE__->mk_accessors(qw(app checks));
+__PACKAGE__->mk_accessors(qw(app version checks));
 
 use Try::Tiny;
 use Plack::Response;
@@ -21,6 +21,7 @@ my $startup = time();
 sub new {
     my ( $class, %args ) = @_;
     my $app = delete $args{app};
+    my $version = delete $args{version};
     my @checks;
     while ( my ( $key, $value ) = each %args ) {
         my $module;
@@ -49,6 +50,7 @@ sub new {
 
     return bless {
         app    => $app,
+        version => $version,
         checks => \@checks
     }, $class;
 }
@@ -64,6 +66,7 @@ sub to_app {
             started_at => $startup,
             uptime     => time() - $startup,
         };
+        $json->{version} = $self->version,
 
         my @results = (
             {   name   => $self->app,
@@ -109,7 +112,7 @@ Plack::App::ServiceStatus - Check and report status of various services needed b
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 SYNOPSIS
 
@@ -119,6 +122,7 @@ version 0.902
 
   my $status_app = Plack::App::ServiceStatus->new(
       app           => 'your app',
+      version       => '1.42',
       DBIC          => [ $schema, 'select 1' ],
       Elasticsearch => $es, # instance of Search::Elasticsearch
   );
@@ -147,6 +151,7 @@ version 0.902
   curl http://localhost:3000/_status | json_pp
   {
      "app" : "Your app",
+     "version": "1.42",
      "started_at" : 1465823638,
      "uptime" : 42,
      "checks" : [

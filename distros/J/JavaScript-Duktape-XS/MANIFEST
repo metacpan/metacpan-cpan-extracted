@@ -54,6 +54,7 @@ t/12_instanceof.t
 t/13_module.t
 t/14_cyclic.t
 t/15_sandbox.t
+t/16_const.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

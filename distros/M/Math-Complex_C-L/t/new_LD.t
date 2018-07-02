@@ -10,6 +10,12 @@ if($@) {
   print "ok 1\n";
   exit 0;
 }
+elsif($Math::LongDouble::VERSION < 0.16) {
+  print "1..1\n";
+  warn "Skipping all tests - need at least version 0.16 of Math::LongDouble, have only ", $Math::LongDouble::VERSION, "\n";
+  print "ok 1\n";
+  exit 0;
+}
 
 print "1..8\n";
 

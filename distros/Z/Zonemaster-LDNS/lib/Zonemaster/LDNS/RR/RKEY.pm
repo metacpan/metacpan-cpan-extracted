@@ -1,5 +1,7 @@
-
 package Zonemaster::LDNS::RR::RKEY;
+
+use strict;
+use warnings;
 
 use parent 'Zonemaster::LDNS::RR';
 

@@ -2,14 +2,14 @@ use 5.010001;
 use Test::More tests => 8;
 
 use Math::Complex;
-use Math::Polynomial::Solve qw(laguerre ascending_order);
+use Math::Polynomial::Solve qw(:utility);
 use Math::Utils qw(:compare :polynomial);
 use strict;
 use warnings;
 
 my($eq, $ne) = generate_relational(2.5e-7);
 
-ascending_order(1);
+coefficients order => 'ascending';
 
 ok_laguerre([-12, -11, 2, 1], [-4.5, 0.5, 2.5]);
 ok_laguerre([-1, -2, 11, 12], [-0.5, 0.3, -5]);

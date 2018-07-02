@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+mark-ls - list the current set of marked files
+
+=head1 SYNOPSIS
+
+  mark-ls  lists the current set of marked files
+
+  USAGE:
+    mark ls
+
+=head1 AUTHOR
+
+Brennen Bearnes <bbearnes@gmail.com>
+
+=cut
+
+use strict;
+use warnings;
+use 5.10.0;
+
+use App::MarkFiles qw(each_path);
+use Getopt::Long;
+use Pod::Usage;
+
+GetOptions(
+  # 'config=s' => \$config_file,
+  help => sub { pod2usage(0) },
+) or pod2usage(2);
+
+each_path(sub {
+  my ($path) = @_;
+  say $path;
+});

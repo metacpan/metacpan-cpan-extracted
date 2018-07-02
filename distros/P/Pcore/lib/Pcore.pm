@@ -1,4 +1,4 @@
-package Pcore v0.67.1;
+package Pcore v0.70.0;
 
 use v5.26.0;
 use common::header;
@@ -33,31 +33,10 @@ our $P = sub : const {'Pcore'};
 
 # configure standard library
 our $UTIL = {
-    bit      => 'Pcore::Util::Bit',
-    ca       => 'Pcore::Util::CA',
-    cfg      => 'Pcore::Util::Config',
-    class    => 'Pcore::Util::Class',
-    data     => 'Pcore::Util::Data',
-    date     => 'Pcore::Util::Date',
-    digest   => 'Pcore::Util::Digest',
-    file     => 'Pcore::Util::File',
-    handle   => 'Pcore::Handle',
-    hash     => 'Pcore::Util::Hash',
-    host     => 'Pcore::Util::URI::Host',
-    http     => 'Pcore::HTTP',
-    list     => 'Pcore::Util::List',
-    net      => 'Pcore::Util::Net',
-    path     => 'Pcore::Util::Path',
-    perl     => 'Pcore::Util::Perl',
-    progress => 'Pcore::Util::Term::Progress',
-    random   => 'Pcore::Util::Random',
-    scalar   => 'Pcore::Util::Scalar',
-    sys      => 'Pcore::Util::Sys',
-    term     => 'Pcore::Util::Term',
-    text     => 'Pcore::Util::Text',
-    tmpl     => 'Pcore::Util::Template',
-    uri      => 'Pcore::Util::URI',
-    uuid     => 'Pcore::Util::UUID',
+    handle => 'Pcore::Handle',
+    http   => 'Pcore::HTTP',
+    uri    => 'Pcore::Util::URI',
+    uuid   => 'Pcore::Util::UUID',
 };
 
 sub import {
@@ -351,9 +330,9 @@ sub set_locale ( $self, $locale = undef ) {
 
 # AUTOLOAD
 sub AUTOLOAD ( $self, @ ) {    ## no critic qw[ClassHierarchies::ProhibitAutoloading]
-    my $util = our $AUTOLOAD =~ s/\A.*:://smr;
+    my $util = lc our $AUTOLOAD =~ s/\A.*:://smr;
 
-    die qq[Unregistered Pcore::Util "$util".] unless my $class = $UTIL->{$util};
+    my $class = $UTIL->{$util} // 'Pcore::Util::' . ucfirst $util;
 
     require $class =~ s[::][/]smgr . '.pm';
 
@@ -483,15 +462,15 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 86                   | Variables::ProtectPrivateVars - Private variable used                                                          |
+## |    3 | 65                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 226, 255, 258, 262,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 294, 297, 302, 305,  |                                                                                                                |
-## |      | 330, 356, 467        |                                                                                                                |
+## |    3 | 205, 234, 237, 241,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 273, 276, 281, 284,  |                                                                                                                |
+## |      | 309, 446             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 312                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
+## |    3 | 291                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_CORE_RUN' declared but not used    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 230                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 209                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,3 +1,28 @@
+1.028 2018-06-20
+
+  Documentation improvements:
+    * add bugs section in cme doc
+    * improve doc of modify command
+
+  Improve output of cme:
+    * check and modify commands are now silent when no problem is found.
+    * run and modify commands show detailed script actions on configuration
+      data in verbose mode
+    * dump command: indicate -format choices in usage output
+    * check command: show progress messages only in verbose mode.
+    * fix command: show "running fix" message only in verbose mode
+    * common: remove using xxx model message
+
+
+  Bash completion fixes:
+    * remove obsolete -backend option
+    * fix bash completion of run command
+
+  Other: 
+    * requires Config::Model 2.124
+    * run: allow untracked files when committing
+    * cme: Simplify verbose option
+
 1.027 2018-04-05
 
   Improve cme run script:

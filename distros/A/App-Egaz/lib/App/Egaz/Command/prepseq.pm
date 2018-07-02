@@ -94,7 +94,7 @@ sub execute {
         $cmd .= " $args->[0] stdout";
         if ( $opt->{gi} ) {
             $cmd .= " |";
-            $cmd .= q{ perl -p -e '/\>gi\|/ and s/gi\|\d+\|gb\|//'};
+            $cmd .= q{ perl -p -e '/\>gi\|/ and s/gi\|\d+\|\w+\|//'};
         }
         $cmd .= " |";
         if ( $opt->{about} ) {
@@ -118,7 +118,7 @@ sub execute {
             $cmd .= " $path stdout";
             if ( $opt->{gi} ) {
                 $cmd .= " |";
-                $cmd .= q{ perl -p -e '/\>gi\|/ and s/gi\|\d+\|gb\|//'};
+                $cmd .= q{ perl -p -e '/\>gi\|/ and s/gi\|\d+\|\w+\|//'};
             }
             $cmd .= " > $tempdir/$basename.fa";
             App::Egaz::Common::exec_cmd( $cmd, { verbose => $opt->{verbose}, } );

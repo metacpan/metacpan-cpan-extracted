@@ -1,0 +1,76 @@
+{
+   "abstract" : "A Perl debugger implemented as a REST service and accompanying browser program",
+   "author" : [
+      "Anthony Brummett <brummett@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-hdb",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Data::Transform::ExplicitMetadata" : "0",
+            "Devel::Chitin" : "0.15",
+            "Digest::MD5" : "0",
+            "Exception::Class" : "0",
+            "Exporter" : "0",
+            "HTTP::Server::PSGI" : "0",
+            "IO::File" : "0",
+            "IO::Socket::INET" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Plack::Request" : "0",
+            "Scalar::Util" : "0",
+            "Socket" : "0",
+            "Sub::Name" : "0",
+            "Sys::Hostname" : "0",
+            "Time::HiRes" : "0",
+            "URI::Escape" : "0",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Callsite" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Temp" : "0",
+            "HTML::TreeBuilder" : "0",
+            "IO::Socket" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/brummett/Devel-hdb.git",
+         "web" : "https://github.com/brummett/Devel-hdb"
+      }
+   },
+   "version" : "0.24",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

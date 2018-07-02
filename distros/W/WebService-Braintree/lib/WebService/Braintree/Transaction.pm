@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::Transaction;
-$WebService::Braintree::Transaction::VERSION = '1.5';
+$WebService::Braintree::Transaction::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -21,7 +21,7 @@ use WebService::Braintree::Transaction::Source;
 use WebService::Braintree::Transaction::Status;
 use WebService::Braintree::Transaction::Type;
 
-use Moose;
+use Moo;
 
 with 'WebService::Braintree::Role::Interface';
 

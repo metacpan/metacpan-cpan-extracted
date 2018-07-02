@@ -19,7 +19,7 @@
 #    lib/Config_git.pl
 #
 
-$VERSION = '6.24';
+$VERSION = '6.26';
 my $in_core;
 
 BEGIN {
@@ -166,20 +166,23 @@ if ($gperf_ok) {
     my @cannedkeys = qw(
 
 bin_ELF bootstrap_charset   canned_gperf    ccstdflags  ccwarnflags charsize
-config_argc config_args d_re_comp   d_regcmp    dlltool dtraceobject
-git_ancestor    git_commit_date git_remote_branch   git_unpushed
-hostgenerate    hostosname  hostperl    incpth  installhtmldir
-installhtmlhelpdir  ld_can_script   libdb_needs_pthread mad malloc_cflags
-sysroot targetdir   targetenv   targethost  targetmkdir targetport
-useversionedarchname
+config_argc config_args d_attribute_always_inline   d_attribute_used
+d_builtin_clz   d_builtin_ctz   d_builtin_prefetch  d_get_current_dir_name
+d_llabs d_re_comp   d_realpath  d_regcmp    d_setenv    dlltool dtraceobject
+fake_signatures getcwdnull  git_ancestor    git_commit_date git_remote_branch
+git_unpushed    hostgenerate    hostosname  hostperl    i_netinet_in_systm
+i_netinet_ip    i_netinet_ip6   incpth  installhtmldir  installhtmlhelpdir
+ld_can_script   libdb_needs_pthread mad malloc_cflags   sanitize_address
+sysincpth   syslibpth   sysroot targetdir   targetenv   targethost  targetmkdir
+targetport  useversionedarchname
 
       );
     unless ($in_core) { # cperl doesn't need these, CPAN does
         push @cannedkeys , qw(
 
-ARCH    BuiltWithPatchPerl  Mcc PATH    PERL_PATCHLEVEL ansi2knr
-ccflags_nolargefiles    charbits    config_heavy    d_accept4   d_acosh
-d_asctime64 d_asinh d_atanh d_attribut  d_attribute_deprecated
+ARCH    BuiltWithPatchPerl  Mcc PATH    PERL_PATCHLEVEL ansi2knr    arflags
+ccflags_nolargefiles    cf_epoch    charbits    config_heavy    d_accept4
+d_acosh d_asctime64 d_asinh d_atanh d_attribut  d_attribute_deprecated
 d_attribute_format  d_attribute_malloc  d_attribute_nonnull
 d_attribute_noreturn    d_attribute_pure    d_attribute_unused
 d_attribute_warn_unused_result  d_backtrace d_bcmp  d_bcopy
@@ -224,14 +227,14 @@ d_vsnprintf d_wcscmp    d_wcsxfrm   default_inc_excludes_dot    defvoidused
 dl_so_eq_ext    doop_cflags doubleinfbytes  doublekind  doublemantbits
 doublenanbytes  dtrace  dtracexnolibs   extern_C    found_libucb    from
 gccansipedantic git_branch  git_commit_id   git_commit_id_title git_describe
-git_uncommitted_changes gnulibc_version hash_func   html1dir    html1direxp
-html3dir    html3direxp i_assert    i_bfd   i_dld   i_execinfo  i_fenv  i_float
-i_gdbm_ndbm i_gdbmndbm  i_mallocmalloc  i_math  i_memory    i_mntent
-i_quadmath  i_sfio  i_stdarg    i_stdbool   i_stddef    i_stdint    i_sysmount
-i_syspoll   i_sysstatfs i_sysstatvfs    i_sysvfs    i_ustat i_values
-i_varargs   i_varhdr    i_wchar i_xlocale   ieeefp_h    initialinstalllocation
-installhtml1dir installhtml3dir installsitehtml1dir installsitehtml3dir
-installsiteman1dir  installsiteman3dir  installsitescript
+git_snapshot_date   git_uncommitted_changes gnulibc_version hash_func
+html1dir    html1direxp html3dir    html3direxp i_assert    i_bfd   i_dld
+i_execinfo  i_fenv  i_float i_gdbm_ndbm i_gdbmndbm  i_mallocmalloc  i_math
+i_memory    i_mntent    i_quadmath  i_sfio  i_stdarg    i_stdbool   i_stddef
+i_stdint    i_sysmount  i_syspoll   i_sysstatfs i_sysstatvfs    i_sysvfs
+i_ustat i_values    i_varargs   i_varhdr    i_wchar i_xlocale   ieeefp_h
+initialinstalllocation  installhtml1dir installhtml3dir installsitehtml1dir
+installsitehtml3dir installsiteman1dir  installsiteman3dir  installsitescript
 installvendorhtml1dir   installvendorhtml3dir   installvendorman1dir
 installvendorman3dir    installvendorscript ldflags_nolargefiles
 libs_nolargefiles   libswanted_nolargefiles longdblinfbytes longdblkind
@@ -243,8 +246,8 @@ sLOCALTIME_max  sLOCALTIME_min  sitehtml1dir    sitehtml1direxp sitehtml3dir
 sitehtml3direxp siteman1dir siteman1direxp  siteman3dir siteman3direxp
 sitescript  sitescriptexp   st_ino_sign st_ino_size targetsh    to  toke_cflags
 usecbacktrace   usecperl    usedevel    usedtrace   usekernprocpathname
-usensgetexecutablepath  usequadmath userelocatableinc   usesfio vaproto
-vendorhtml1dir  vendorhtml1direxp   vendorhtml3dir  vendorhtml3direxp
+uselanginfo usensgetexecutablepath  usequadmath userelocatableinc   usesfio
+vaproto vendorhtml1dir  vendorhtml1direxp   vendorhtml3dir  vendorhtml3direxp
 vendorman1dir   vendorman1direxp    vendorman3dir   vendorman3direxp
 vendorscript    vendorscriptexp voidflags   yacc    yaccflags
 
@@ -274,14 +277,38 @@ $h{byteorder} = $Config{byteorder};
 
 #these values are dynamically generated in ActivePerl::Config, freeze them
 if(defined &ActivePerl::PRODUCT && ! $ENV{ACTIVEPERL_CONFIG_DISABLE}){
-    $h{$_} = $Config{$_} foreach qw (
+    foreach (qw (
+        _a
+        _o
         ar
         cc
+        cccdlflags
+        ccflags
+        ccname
         ccversion
+        cpp
+        cppminus
+        cpprun
+        cppstdin
         dlltool
+        gccversion
+        i64type
         ld
+        lddlflags
+        ldflags
+        lib_ext
+        libc
+        libs
         make
-    );
+        obj_ext
+        optimize
+        perllibs
+        quadtype
+        u64type
+        uquadtype
+    )) {
+        $h{$_} = $Config{$_} if exists $Config{$_};
+    }
 }
 
 #Strawberry Perl's Portable.pm in Config.pm means parsing Config_heavy.pl
@@ -372,7 +399,7 @@ while (<$in>) {
                       if (PTRSIZE == 8);
                 } else {
                     $qv = join('', $qv, '0x', @h[4,3,2,1]);
-                    $qv = join('', $qv, ', (const char*)0x', @h[12,11,10,9,8,7,6,5])
+                    $qv = join('', $qv, ', (const char*)UINT64_C(0x', @h[12,11,10,9,8,7,6,5], ')')
                       if (PTRSIZE == 8);
                 }
             } else { # a regular C string
@@ -507,7 +534,7 @@ __inline
          {Config_lookup (register const char *str, register unsigned int len)};
 
         # fixup U16
-        s/\(int\)\((long|size_t)\)\&/(U16)($1)&/g;
+        s/\(int\)\((long|size_t)\)\&/(U16)(Size_t)&/g;
         s/\Qregister int o = wordlist[key].name\E/register U16 o = wordlist[key].name/;
         s/\Qif (o >= 0)\E\n/if (o != XCNAME_MAX)\n/;
 

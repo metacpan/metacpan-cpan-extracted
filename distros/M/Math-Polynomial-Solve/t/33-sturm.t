@@ -1,7 +1,7 @@
 use 5.010001;
 use Test::More tests => 5;
 
-use Math::Polynomial::Solve qw(:sturm :utility poly_roots ascending_order);
+use Math::Polynomial::Solve qw(:sturm :utility poly_roots);
 use Math::Utils qw(:polynomial :compare);
 use strict;
 use warnings;
@@ -16,7 +16,8 @@ my @case = (
 	[-1, 0, 5, 6, 2],
 );
 
-ascending_order(1);
+coefficients order => 'ascending';
+
 for my $cref (@case)
 {
 	my @polynomial = @$cref;

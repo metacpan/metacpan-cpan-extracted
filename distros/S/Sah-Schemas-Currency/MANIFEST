@@ -8,7 +8,9 @@ Makefile.PL
 README
 dist.ini
 lib/Sah/Schema/currency/code.pm
+lib/Sah/Schema/currency/pair.pm
 lib/Sah/SchemaR/currency/code.pm
+lib/Sah/SchemaR/currency/pair.pm
 lib/Sah/Schemas/Currency.pm
 t/00-compile.t
 t/author-critic.t

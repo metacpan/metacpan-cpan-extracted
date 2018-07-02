@@ -62,7 +62,7 @@
    "provides" : {
       "Net::Azure::NotificationHubs" : {
          "file" : "lib/Net/Azure/NotificationHubs.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Net::Azure::NotificationHubs::Request" : {
          "file" : "lib/Net/Azure/NotificationHubs/Request.pm"
@@ -82,7 +82,7 @@
          "web" : "https://github.com/ytnobody/p5-Net-Azure-NotifcationHubs"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_authority" : "cpan:YTURTLE",
    "x_contributors" : [
       "azuma.satoshi <azuma.satoshi@colon.ne.jp>",

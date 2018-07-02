@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::Merchant;
-$WebService::Braintree::Merchant::VERSION = '1.5';
+$WebService::Braintree::Merchant::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -15,7 +15,7 @@ This class provisions merchants from raw ApplePay.
 
 =cut
 
-use Moose;
+use Moo;
 
 with 'WebService::Braintree::Role::Interface';
 

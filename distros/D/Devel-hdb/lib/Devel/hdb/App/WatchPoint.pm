@@ -9,6 +9,8 @@ use Plack::Request;
 use Data::Transform::ExplicitMetadata;
 use URI::Escape qw(uri_escape);
 
+our $VERSION = '0.24';
+
 sub response_url_base() { '/watchpoints' };
 
 __PACKAGE__->add_route('put', qr{/watchpoints/(.+)}, 'set');
@@ -156,7 +158,7 @@ Returns 404 if there is no watchpoint with that expr.
 
 =head1 SEE ALSO
 
-Devel::hdb
+L<Devel::hdb>
 
 =head1 AUTHOR
 
@@ -164,5 +166,5 @@ Anthony Brummett <brummett@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2014, Anthony Brummett.  This module is free software. It may
+Copyright 2018, Anthony Brummett.  This module is free software. It may
 be used, redistributed and/or modified under the same terms as Perl itself.

@@ -22,29 +22,30 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221546;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[235]',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+                  'leading_digits' => '[235]'
                 },
                 {
-                  'leading_digits' => '[89]',
+                  'pattern' => '(\\d{3})(\\d{6})',
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{6})'
+                  'leading_digits' => '[89]'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(90\\d[1-9]\\d{5})',
                 'mobile' => '
           (?:
             222|
             55[15]
           )\\d{6}
         ',
+                'specialrate' => '(90\\d[1-9]\\d{5})',
+                'pager' => '',
                 'geographic' => '
           3(?:
             3(?:
@@ -55,8 +56,7 @@ my $validators = {
           )\\d{4}
         ',
                 'personal_number' => '',
-                'pager' => '',
-                'toll_free' => '80\\d[1-9]\\d{5}',
+                'voip' => '',
                 'fixed_line' => '
           3(?:
             3(?:
@@ -66,7 +66,7 @@ my $validators = {
             5\\d{2}[7-9]
           )\\d{4}
         ',
-                'voip' => ''
+                'toll_free' => '80\\d[1-9]\\d{5}'
               };
 my %areanames = (
   24033004 => "Bioko",

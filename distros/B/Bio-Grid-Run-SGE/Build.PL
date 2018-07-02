@@ -18,14 +18,14 @@ my %module_build_args = (
     "Joachim Bargsten <jwb\@cpan.org>"
   ],
   "dist_name" => "Bio-Grid-Run-SGE",
-  "dist_version" => "0.060",
+  "dist_version" => "0.064",
   "license" => "perl",
   "module_name" => "Bio::Grid::Run::SGE",
   "recursive_test_files" => 1,
   "requires" => {
     "AnyEvent" => 0,
     "AnyEvent::XMPP" => 0,
-    "Bio::Gonzales" => 0,
+    "Bio::Gonzales" => "0.068",
     "Capture::Tiny" => 0,
     "Clone" => 0,
     "Config::Auto" => 0,

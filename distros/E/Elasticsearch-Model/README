@@ -1,0 +1,218 @@
+NAME
+
+    Elasticsearch::Model
+
+DESCRIPTION
+
+    This module is meant to be used very much like ElasticSearchX::Model,
+    before it was deprecated. In fact, most of the code is borrowed from
+    that module.
+
+    All the changes I have made are aimed at two things:
+
+      1. Compatibility with Elasticsearch 6+
+      <https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html>
+
+      2. Mapping, period. Classes to index is all that this distribution
+      does. We do not take data from elasticsearch and wrap it in the
+      document type classes. We do not handle index aliasing, either, which
+      can be quite complicated. For aliasing, however, deploy_to will allow
+      you to specify the name of the index you will be creating, so that
+      you can make the alias more directly.
+
+SYNOPSIS
+
+    This is the simplest use case:
+
+        my $model = MyApplication::Elasticsearch::Model->new;
+    
+        $model->deploy;
+
+    This is probably the actual use case, in which you have an alias for a
+    versioned index name:
+
+        my $document_types = {
+            order => 'Order',
+            user  => 'User',
+            note  => 'Note',
+        };
+    
+        my $model = MyApplication::Elasticsearch::Model->new;
+    
+        for my $doc_type (keys %$document_types) {
+            my $index_object = $model->index($doc_type);
+            my $versioned_index_name = $doc_type . "_" . time(); # to get "order_12345859245"
+            $index_object->deploy_to(index_name => $versioned_index_name);
+    
+            # Get index currently point to by an alias
+            my $old_index_name = $model->es->cat->aliases(name => $doc_type, format => 'json')->[0]->{index};
+    
+            # Switch the alias to the new index, and remove the alias from the old one.
+            $model->es->indices->update_aliases(
+                body => {
+                    actions => [
+                        {add => {alias => $doc_type, index => $new_index_name}},
+                        (
+                            $old_index_name
+                            ? ({remove => {alias => $doc_type, index => $old_index_name}})
+                            : ()
+                        ),
+                    ],
+                },
+            );
+        }
+
+    To do either of the above, you start with a model.
+
+        package MyApplication::Elasticsearch::Model;
+    
+        use Moose;
+        use Elasticsearch::Model;
+    
+        my $document_types = {
+            order => 'Order',
+            user  => 'User',
+            note  => 'Note',
+        };
+    
+        for my $doc_type (keys %$document_types) {
+            index $doc_type => (
+                namespace => 'private',
+                type      => $document_types->{$doc_type},
+                traits    => ["MyApplication::Elasticsearch::DocTrait"],
+            );
+        }
+    
+        normalizer normie => (
+            type   => "custom",
+            filter => ["lowercase"],
+        );
+    
+        1;
+
+    Elasticsearch 6+ more or less requires one document type per index, so
+    this makes things simple for us. We define one document class per
+    document type, e.g., type user gets document class User.
+
+    We will, by default, search for these document classes underneath the
+    model class; in this case, we would search for
+    MyApplication::Elasticsearch::Model::User. You can, however, define a
+    document_namespace in your model class as follows:
+
+        ...
+    
+        has_document_namespace "MyApplication::ESDocumentClasses";
+        ...
+
+    This would mean that we look for
+    MyApplication::ESDocumentClasses::User.
+
+    You use index to define the indexes belonging to your model. Here is an
+    example of the Note document class.
+
+        package MyApplication::Elasticsearch::Model::Note;
+    
+        use Moose;
+        use Elasticsearch::Model::Document;
+    
+        has text => (
+            is   => 'ro',
+            isa  => 'Maybe[Str]',
+            type => 'text',
+        );
+    
+        has author_id => (
+            is   => 'ro',
+            isa  => 'Maybe[Int]',
+            type => 'integer',
+        );
+    
+        1;
+
+PUBLIC METHODS
+
+ index
+
+    This is an overloaded method that has 2 modes of operation:
+
+    1 Adds one single index to the model's metaclass.
+
+      This is a compile-time metaclass method that is called when you have
+      the following in your model class:
+
+          index addresses => (
+              type => 'Address',
+          );
+
+    2 Retrieves a single index object from the model instance.
+
+      This is a run-time instance method that is called when you do the
+      following:
+
+          my $index_object = $model->index($doc_type);
+
+ analyzer
+
+    This is a compile-time metaclass method that enables you to declare a
+    custom analyzer using the following syntax in your model class:
+
+        analyzer electro => (
+            type      => "custom",
+            tokenizer => "standard",
+            filter    => ["lowercase", "filtration"],
+        );
+
+ tokenizer
+
+    This is a compile-time metaclass method that enables you to declare a
+    custom tokenizer using the following syntax in your model class:
+
+        tokenizer splat => (
+            type    => "simple_pattern",
+            pattern => "[0123456789]{3}",
+        );
+
+ normalizer
+
+    This is a compile-time metaclass method that enables you to declare a
+    custom normalizer using the following syntax in your model class:
+
+        normalizer normie => (
+            type   => "custom",
+            filter => ["lowercase"],
+        );
+
+ filter
+
+    This is a compile-time metaclass method that enables you to declare a
+    custom filter using the following syntax in your model class:
+
+        filter filtration => (
+            type     => "edge_ngram",
+            min_gram => 1,
+            max_gram => 24,
+        );
+
+ has_document_namespace
+
+    This is a compile-time metaclass method that enables you to declare the
+    namespace in which to search for your document classes in your model
+    class:
+
+        has_document_namespace "MyApplication::Elasticsearch::DocumentClasses";
+
+PRIVATE METHODS
+
+ _apply_namespace
+
+    Takes the index name and the namespace, and constructs the
+    namespaced_name.
+
+    Used internally, when adding an index to the model's metaclass. See
+    Elasticsearch::Model::Role::Metaclass.
+
+ _add_index_for_name
+
+    Takes the name of an index and some arguments, and adds that index to
+    the model's metaclass. See Elasticsearch::Model::Role::Metaclass.
+

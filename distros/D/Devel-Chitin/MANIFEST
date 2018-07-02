@@ -27,6 +27,7 @@ lib/Devel/Chitin/OpTree/LOGOP.pm
 lib/Devel/Chitin/OpTree/LOGOP_AUX.pm
 lib/Devel/Chitin/OpTree/LOOP.pm
 lib/Devel/Chitin/OpTree/METHOP.pm
+lib/Devel/Chitin/OpTree/NULL.pm
 lib/Devel/Chitin/OpTree/PADOP.pm
 lib/Devel/Chitin/OpTree/PMOP.pm
 lib/Devel/Chitin/OpTree/PVOP.pm

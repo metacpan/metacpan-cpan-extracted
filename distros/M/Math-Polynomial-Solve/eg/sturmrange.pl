@@ -1,12 +1,11 @@
 #!/bin/perl
 #
 use Carp;
-use Math::Polynomial::Solve qw(:sturm ascending_order);
+use Math::Polynomial::Solve qw(:sturm);
 use strict;
 use warnings;
 
-my $ascending = 1;
-ascending_order($ascending);
+coefficients order => 'ascending';
 
 while (my $line = prompt("Polynomial: "))
 {

@@ -35,7 +35,7 @@
             "DBI" : "1.6",
             "DBIx::Mojo::Template" : "0.05",
             "Hash::Merge" : "0.2",
-            "Mojolicious" : "6",
+            "Mojolicious" : "7",
             "Mojolicious::Plugin::Authentication" : "1.29",
             "Mojolicious::Plugin::OAuth2::Che" : "1.539",
             "perl" : "5.014"
@@ -43,6 +43,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.841",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mche/Mojolicious-Plugin-RoutesAuthDBI.git",
+         "web" : "https://github.com/mche/Mojolicious-Plugin-RoutesAuthDBI"
+      }
+   },
+   "version" : "0.842",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

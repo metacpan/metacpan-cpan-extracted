@@ -10,7 +10,7 @@
 # ABSTRACT: Check the configuration of an application
 
 package App::Cme::Command::check ;
-$App::Cme::Command::check::VERSION = '1.027';
+$App::Cme::Command::check::VERSION = '1.028';
 use strict;
 use warnings;
 use 5.10.1;
@@ -32,7 +32,6 @@ sub opt_spec {
     my ( $class, $app ) = @_;
     return ( 
         [ "strict!" => "cme will exit 1 if warnings are found during check" ],
-        [ "quiet!"  => "Suppress progress messages" ],
         $class->cme_global_options,
     );
 }
@@ -53,17 +52,17 @@ sub execute {
 
     my ($model, $inst, $root) = $self->init_cme($opt,$args);
     my $check =  $opt->{force_load} ? 'no' : 'yes' ;
-    say "loading data" unless $opt->{quiet};
+    say "Loading data..." if $opt->{verbose};
 
     Config::Model::ObjTreeScanner->new(
         leaf_cb => sub { },
         check => $check,
     )->scan_node( undef, $root );
 
-    say "checking data" unless $opt->{quiet};
+    say "Checking data.." if $opt->{verbose};
     $root->dump_tree( mode => 'full' ); # light check (value per value)
     $root->deep_check; # consistency check
-    say "check done" unless $opt->{quiet};
+    say "Check done." if $opt->{verbose};
 
     my $ouch = $inst->has_warning;
 
@@ -88,7 +87,7 @@ App::Cme::Command::check - Check the configuration of an application
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 

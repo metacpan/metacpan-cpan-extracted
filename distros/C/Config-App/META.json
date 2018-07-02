@@ -71,7 +71,7 @@
          "web" : "https://github.com/gryphonshafer/Config-App"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

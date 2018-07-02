@@ -1,5 +1,8 @@
 Revision history for Perl extension Mojo::SMTP::Client
 
+0.16  Fri Jun 29 10:05:42 +07 2018
+    - Introduce `tls_verify' attribute, which is turned on by default (#rt125483)
+
 0.15  Fri Mar  2 19:53:40 +07 2018
     - Final fixes for compatibility with latest Mojo::IOLoop::Delay (#rt124562)
 

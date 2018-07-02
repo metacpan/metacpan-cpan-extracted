@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Render;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE};
 my $WS = '[\t ]';
@@ -74,11 +74,14 @@ sub render_quoted {
         my $last = $i == $#$lines;
         my $first = $i == 0;
         if ($line =~ s/^$WS*$/\n/) {
-            $addspace = 0;
-            if ($first or $last) {
-                $quoted .= " ";
+            if ($first) {
+                $addspace = 1;
+            }
+            elsif ($last) {
+                $quoted .= ' ' if $addspace;
             }
             else {
+                $addspace = 0;
                 $quoted .= "\n";
             }
             next;

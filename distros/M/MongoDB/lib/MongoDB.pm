@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2009 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,9 +11,8 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
-use 5.008;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -22,28 +20,20 @@ package MongoDB;
 # ABSTRACT: Official MongoDB Driver for Perl
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 # regexp_pattern was unavailable before 5.10, had to be exported to load the
 # function implementation on 5.10, and was automatically available in 5.10.1
 use if ($] eq '5.010000'), 're', 'regexp_pattern';
 
 use Carp ();
-use MongoDB::BSON;
 use MongoDB::MongoClient;
 use MongoDB::Database;
 use MongoDB::Collection;
-use MongoDB::DBRef;
-use MongoDB::OID;
-use MongoDB::Timestamp;
-use MongoDB::BSON::Binary;
-use MongoDB::BSON::Regexp;
 use MongoDB::BulkWrite;
 use MongoDB::_Link;
 use MongoDB::_Protocol;
 use BSON::Types;
-
-*read_documents = \&MongoDB::BSON::decode_bson;
 
 # regexp_pattern was unavailable before 5.10, had to be exported to load the
 # function implementation on 5.10, and was automatically available in 5.10.1
@@ -81,20 +71,6 @@ sub connect {
     return MongoDB::MongoClient->new( $options );
 }
 
-sub force_double {
-    if ( ref $_[0] ) {
-        Carp::croak("Can't force a reference into a double");
-    }
-    return $_[0] = unpack("d",pack("d", $_[0]));
-}
-
-sub force_int {
-    if ( ref $_[0] ) {
-        Carp::croak("Can't force a reference into an int");
-    }
-    return $_[0] = int($_[0]);
-}
-
 1;
 
 =pod
@@ -107,7 +83,7 @@ MongoDB - Official MongoDB Driver for Perl
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -168,20 +144,25 @@ L<MongoDB community website|http://www.mongodb.org/>.
 
 =head1 USAGE
 
-The MongoDB driver is organized into a set of classes representing different
-levels of abstraction and functionality.
+The MongoDB driver is organized into a set of classes representing
+different levels of abstraction and functionality.
 
-As a user, you first create and configure a L<MongoDB::MongoClient> object to
-connect to a MongoDB deployment.  From that client object, you can get
-a L<MongoDB::Database> object for interacting with a specific database.
+As a user, you first create and configure a L<MongoDB::MongoClient> object
+to connect to a MongoDB deployment.  From that client object, you can get a
+L<MongoDB::Database> object for interacting with a specific database.
 
-From a database object, you can get a L<MongoDB::Collection> object for CRUD
-operations on that specific collection, or a L<MongoDB::GridFS> object for
-working with an abstract file system hosted on the database.  Each of those
-classes may return other objects for specific features or functions.
+From a database object, you can get a L<MongoDB::Collection> object for
+CRUD operations on that specific collection, or a L<MongoDB::GridFSBucket>
+object for working with an abstract file system hosted on the database.
+Each of those classes may return other objects for specific features or
+functions.
 
 See the documentation of those classes for more details or the
 L<MongoDB Perl Driver Tutorial|MongoDB::Tutorial> for an example.
+
+L<MongoDB::ClientSession> objects are generated from a
+L<MongoDB::MongoClient> and allow for advanced consistency options, like
+causal-consistency and transactions.
 
 =head2 Error handling
 
@@ -210,9 +191,12 @@ For example, if the set name is "setA":
 
     $client = MongoDB->connect("mongodb://example.com/?replicaSet=setA");
 
-=for Pod::Coverage force_double
-force_int
-read_documents
+=begin Pod::Coverage
+
+
+
+
+=end Pod::Coverage
 
 =head1 SEMANTIC VERSIONING SCHEME
 
@@ -253,8 +237,7 @@ deprecation warning is issued once per call-site for deprecated methods.)
 
 =head1 THREADS
 
-Because of well-known bugs, use of threads on perls before v5.8.5 is
-not supported.
+Per L<threads> documentation, use of Perl threads is discouraged.
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -299,7 +282,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Page Andrey Khozov Ashley Willis Ask Bjørn Hansen Bernard Gorman Brendan W. McAdams Casey Rojas Christian Sturm Walde Colin Cyr Danny Raetzsch David Morrison Nadle Steinbrunner Storch diegok D. Ilmari Mannsåker Eric Daniels Gerard Goossen Glenn Fowler Graham Barr Hao Wu Jason Carey Toffaletti Johann Rolschewski John A. Kunze Joseph Harnish Josh Matthews Joshua Juran J. Stewart Kamil Slowikowski Ken Williams Matthew Shopsin Michael Langner Rotmanov Mike Dirolf Mohammad S Anwar Nickola Trupcheff Nigel Gregoire Niko Tyni Nuno Carvalho Orlando Vazquez Othello Maurer Pan Fan Pavel Denisov Rahul Dhodapkar Robin Lee Roman Yerin Ronald J Kimball Ryan Chipman Slaven Rezic Stephen Oberholtzer Steve Sanbeg Stuart Watt Uwe Voelker Whitney Jackson Xtreak Zhihong Zhang
+=for stopwords Andrew Page Andrey Khozov Ashley Willis Ask Bjørn Hansen Bernard Gorman Brendan W. McAdams Brian Moss Casey Rojas Christian Sturm Walde Colin Cyr Danny Raetzsch David Morrison Nadle Steinbrunner Storch diegok D. Ilmari Mannsåker Eric Daniels Gerard Goossen Glenn Fowler Graham Barr Hao Wu Harish Upadhyayula Jason Carey Toffaletti Johann Rolschewski John A. Kunze Joseph Harnish Josh Matthews Joshua Juran J. Stewart Kamil Slowikowski Ken Williams Matthew Shopsin Michael Langner Rotmanov Mike Dirolf Mohammad S Anwar Nickola Trupcheff Nigel Gregoire Niko Tyni Nuno Carvalho Orlando Vazquez Othello Maurer Pan Fan Pavel Denisov Rahul Dhodapkar Robert Sedlacek (Shadowcat Systems Ltd) Robin Lee Roman Yerin Ronald J Kimball Ryan Chipman Slaven Rezic Stephen Oberholtzer Steve Sanbeg Stuart Watt Thomas Bloor Tobias Leich Uwe Voelker Whitney Jackson Xavier Guimard Xtreak Zhihong Zhang
 
 =over 4
 
@@ -326,6 +309,10 @@ Bernard Gorman <bernard.gorman@mongodb.com>
 =item *
 
 Brendan W. McAdams <brendan@mongodb.com>
+
+=item *
+
+Brian Moss <kallimachos@gmail.com>
 
 =item *
 
@@ -394,6 +381,10 @@ Graham Barr <gbarr@pobox.com>
 =item *
 
 Hao Wu <echowuhao@gmail.com>
+
+=item *
+
+Harish Upadhyayula <hupadhyayula@dealersocket.com>
 
 =item *
 
@@ -493,6 +484,10 @@ Rahul Dhodapkar <rahul@mongodb.com>
 
 =item *
 
+Robert Sedlacek (Shadowcat Systems Ltd) <phaylon@cpan.org>
+
+=item *
+
 Robin Lee <cheeselee@fedoraproject.org>
 
 =item *
@@ -525,11 +520,23 @@ Stuart Watt <stuart@morungos.com>
 
 =item *
 
+Thomas Bloor (Shadowcat Systems Ltd) <tbsliver@cpan.org>
+
+=item *
+
+Tobias Leich <email@froggs.de>
+
+=item *
+
 Uwe Voelker <uwe.voelker@xing.com>
 
 =item *
 
 Whitney Jackson <whjackson@gmail.com>
+
+=item *
+
+Xavier Guimard <x.guimard@free.fr>
 
 =item *
 

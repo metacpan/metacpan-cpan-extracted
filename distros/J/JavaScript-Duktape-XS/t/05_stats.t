@@ -3,25 +3,26 @@ use warnings;
 
 use Data::Dumper;
 use Test::More;
-use JavaScript::Duktape::XS;
+
+my $CLASS = 'JavaScript::Duktape::XS';
 
 sub test_stats {
     my $fib = 'function fib(n) { if (n <= 1) { return 1; } else { return fib(n-1)+fib(n-2);}}';
     foreach my $gather_stats (@{[ undef, 0, 1 ]}) {
-        my $duk;
+        my $vm;
         if (!defined $gather_stats) {
-            $duk = JavaScript::Duktape::XS->new();
-            ok($duk, "created JavaScript::Duktape::XS object with default options");
+            $vm = $CLASS->new();
+            ok($vm, "created $CLASS object with default options");
         } else {
-            $duk = JavaScript::Duktape::XS->new({gather_stats => $gather_stats});
-            ok($duk, "created JavaScript::Duktape::XS object with gather_stats => $gather_stats");
+            $vm = $CLASS->new({gather_stats => $gather_stats});
+            ok($vm, "created $CLASS object with gather_stats => $gather_stats");
         }
 
-        $duk->eval($fib);
+        $vm->eval($fib);
 
         for (1..3) {
-            my $got = $duk->eval('fib(19);');
-            my $stats = $duk->get_stats();
+            my $got = $vm->eval('fib(19);');
+            my $stats = $vm->get_stats();
             # printf STDERR ("STATS: %s", Dumper($stats));
             foreach my $category (qw/ compile run /) {
                 if (!$gather_stats) {
@@ -44,6 +45,8 @@ sub test_stats {
 }
 
 sub main {
+    use_ok($CLASS);
+
     test_stats();
     done_testing;
     return 0;

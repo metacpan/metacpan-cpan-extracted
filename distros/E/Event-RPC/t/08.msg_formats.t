@@ -16,7 +16,7 @@ if ( not $depend_modules ) {
     plan skip_all => "Neither AnyEvent, Event nor Glib installed";
 }
 
-require "t/Event_RPC_Test_Server.pm";
+require "./t/Event_RPC_Test_Server.pm";
 my $PORT = Event_RPC_Test_Server->port;
 
 # determine available message formats (including the insecure)

@@ -2,7 +2,7 @@ package MVC::Neaf::Route::Null;
 
 use strict;
 use warnings;
-our $VERSION = 0.2501;
+our $VERSION = 0.2601;
 
 =head1 NAME
 
@@ -39,7 +39,14 @@ sub new {
     my $class = shift;
 
     return $class->SUPER::new(
-        method => 'GET', path => '/', code => $nobody_home, @_ );
+        method  => 'GET',
+        path    => '/',
+        code    => $nobody_home,
+        default => {},
+        hooks   => {},
+        helpers => {},
+        @_
+    );
 };
 
 =head2 post_setup
@@ -55,7 +62,7 @@ sub post_setup {
 
 Returns C<path> argument given to C<new()>, defaults to C<'/'>.
 
-=head2 path
+=head2 method
 
 Returns C<method> argument given to C<new()>, defaults to C<'GET'>.
 
@@ -71,6 +78,14 @@ returns "strict" parameter.
 
 Returns a "die 404" function by default.
 
+=head2 hooks
+
+Returns an empty hash by default.
+
+=head2 default
+
+Returns anempty hash by default.
+
 =cut
 
 make_getters (
@@ -78,6 +93,9 @@ make_getters (
     method   => 1,
     code     => 1,
     strict   => 1,
+    default  => 1,
+    hooks    => 1,
+    helpers  => 1,
 );
 
 =head2 get_form
@@ -97,16 +115,6 @@ sub get_form {
 sub get_view {
     my ($self, $name) = @_;
     croak "No view '$name' in null route";
-};
-
-=head2 helpers
-
-Returns empty hash - no helpers by default.
-
-=cut
-
-sub helpers {
-    +{};
 };
 
 =head2 parent

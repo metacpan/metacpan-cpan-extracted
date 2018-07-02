@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use 5.005;    # Need look-behind assertions
+
+use Getopt::Std;
+use Make;
+
+my %opt;
+
+getopts( 'Dgnpf:j:C:', \%opt );
+
+my $info = Make->new(
+    GNU      => $opt{'g'},
+    Override => { MAKE => "$^X $0" },
+    Makefile => $opt{'f'},
+    Jobs     => $opt{'j'},
+    Dir      => $opt{'C'}
+);
+
+if ( $opt{'D'} ) {
+    require Data::Dumper;
+    print Data::Dumper::DumperX($info);
+    exit;
+}
+
+if ( $opt{'p'} ) {
+    $info->Print(@ARGV);
+    exit;
+}
+if ( $opt{'n'} ) {
+    $info->Script(@ARGV);
+}
+else {
+    $info->Make(@ARGV);
+}
+
+=head1 NAME
+
+pure-perl-make - a perl 'make' replacement
+
+=head1 SYNOPSIS
+
+	pure-perl-make [-n] [-g] [-p] [-C directory] targets
+
+=head1 DESCRIPTION
+
+Performs the same function as make(1) but is written entirely in perl.
+A subset of GNU make extensions is supported.
+For details see L<Make> for the underlying perl module.
+
+=head1 BUGS
+
+=over
+
+=item *
+
+No B<-k> flag
+
+I strongly suspect there are lots more.
+
+=back
+
+=head1 SEE ALSO
+
+L<Make>, make(1)
+
+=head1 AUTHOR
+
+Nick Ing-Simmons
+
+=cut

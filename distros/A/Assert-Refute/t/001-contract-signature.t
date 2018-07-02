@@ -11,7 +11,7 @@ my $sig = eval {
     my $c = contract( sub {
         my $c = shift;
         $c->is($_, 42) for @_;
-    }, need_object => 1 )->apply(42, 137)->signature;
+    }, need_object => 1 )->apply(42, 137)->get_sign;
 };
 
 is $sig, "t1Nd", "Signature as expected" or do {

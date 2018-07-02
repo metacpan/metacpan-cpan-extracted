@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,9 +11,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
-use 5.008;
 use strict;
 use warnings;
 
@@ -23,7 +20,7 @@ package MongoDB::_Constants;
 # Common MongoDB driver constants
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Exporter 5.57 qw/import/;
 use Config;
@@ -45,12 +42,19 @@ BEGIN {
         MIN_HEARTBEAT_FREQUENCY_SEC  => .5,
         MIN_HEARTBEAT_FREQUENCY_USEC => 500_000,                    # 500ms, not configurable
         MIN_KEYED_DOC_LENGTH         => 8,
+        MIN_SERVER_VERSION           => "2.4.0",
         MIN_WIRE_VERSION             => 0,
         NO_JOURNAL_RE                => qr/^journaling not enabled/,
         NO_REPLICATION_RE          => qr/^no replication has been enabled/,
         P_INT32                    => $] lt '5.010' ? 'l' : 'l<',
         SMALLEST_MAX_STALENESS_SEC => 90,
         WITH_ASSERTS               => $ENV{PERL_MONGO_WITH_ASSERTS},
+        # Transaction state tracking
+        TXN_NONE                    => 'none',
+        TXN_STARTING                => 'starting',
+        TXN_IN_PROGRESS             => 'in_progress',
+        TXN_COMMITTED               => 'committed',
+        TXN_ABORTED                 => 'aborted',
     };
 }
 

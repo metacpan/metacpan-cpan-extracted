@@ -9,7 +9,7 @@ use namespace::clean;
 
 use List::Util 1.30 qw(sum0);
 
-our $VERSION = '0.0101';
+our $VERSION = '0.0102';
 
 
 has data => (
@@ -106,25 +106,23 @@ Statistics::Diversity::Shannon - Compute the Shannon diversity
 
 =head1 VERSION
 
-version 0.0101
+version 0.0102
 
 =head1 SYNOPSIS
 
   use Statistics::Diversity::Shannon;
-  my @raw_data  = qw( 60 10 25 1 4 );
-  my @prop_data = qw( .6 .1 .25 .01 .04 );
-  my $d = Statistics::Diversity::Shannon->new( data => \@raw_data );
-  $d = Statistics::Diversity::Shannon->new( freq => \@prop_data );
+  my @data = qw( 60 10 25 1 4 );
+  my $d = Statistics::Diversity::Shannon->new( data => \@data );
+  # OR
+  @data = qw( .6 .1 .25 .01 .04 );
+  $d = Statistics::Diversity::Shannon->new( freq => \@data );
   my $H = $d->index();
   my $E = $d->evenness();
 
 =head1 DESCRIPTION
 
-A C<Statistics::Diversity::Shannon> computes the Shannon diversity index and evenness metrics.
-
-=head1 NAME
-
-Statistics::Diversity::Shannon - Compute the Shannon diversity
+A C<Statistics::Diversity::Shannon> computes the Shannon diversity index and
+evenness metrics.
 
 =head1 METHODS
 
@@ -159,7 +157,11 @@ Return the Shannon diversity evenness metric.
 
 =head1 SEE ALSO
 
-The method test in this distribution.
+L<Moo>
+
+L<List::Util>
+
+The test in this distribution.
 
 L<https://en.wikipedia.org/wiki/Diversity_index#Shannon_index>
 

@@ -23,6 +23,7 @@
       "build" : {
          "requires" : {
             "Capture::Tiny" : "0",
+            "Cwd" : "0",
             "Data::Dumper" : "0",
             "JSON::PP" : "0",
             "Test::File::Contents" : "0.23",
@@ -68,5 +69,5 @@
          "url" : "https://github.com/mr-mixas/NDTools"
       }
    },
-   "version" : "v0.5.6"
+   "version" : "v0.5.7"
 }

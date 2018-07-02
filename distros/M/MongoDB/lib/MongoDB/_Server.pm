@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,14 +11,13 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
 package MongoDB::_Server;
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 use MongoDB::_Types qw(
@@ -34,6 +32,7 @@ use Types::Standard qw(
     HashRef
     Str
     Num
+    Maybe
 );
 use List::Util qw/first/;
 use Time::HiRes qw/time/;
@@ -79,6 +78,13 @@ has is_master => (
     is      => 'ro',
     isa     => HashRef,
     default => sub { {} },
+);
+
+# compressor: hashref with id/callback values for used compression
+
+has compressor => (
+    is => 'ro',
+    isa => Maybe[HashRef],
 );
 
 # type: a ServerType enum value. Default Unknown.  Definitions from the Server
@@ -137,7 +143,7 @@ for my $s (qw/hosts passives arbiters/) {
         builder => "_build_$s",
     );
 
-    no strict 'refs';
+    no strict 'refs'; ## no critic
     *{"_build_$s"} = sub {
         [ map { lc $_ } ( @{ $_[0]->is_master->{$s} || [] } ) ];
     };
@@ -208,8 +214,7 @@ has last_write_date => (
 sub _build_last_write_date {
     my ($self) = @_;
     return 0 unless exists $self->is_master->{lastWrite}{lastWriteDate};
-    # with dt_type undef, this should be floating point epoch seconds
-    return $self->is_master->{lastWrite}{lastWriteDate};
+    return $self->is_master->{lastWrite}{lastWriteDate}->epoch;
 }
 
 has is_available => (
@@ -249,6 +254,30 @@ sub _build_is_writable {
     my ($self) = @_;
     my $type = $self->type;
     return !! grep { $type eq $_ } qw/Standalone RSPrimary Mongos/;
+}
+
+has is_data_bearing => (
+    is => 'lazy',
+    isa => Boolish,
+    builder => "_build_is_data_bearing",
+);
+
+sub _build_is_data_bearing {
+    my ( $self ) = @_;
+    my $type = $self->type;
+    return !! grep { $type eq $_ } qw/Standalone RSPrimary RSSecondary Mongos/;
+}
+
+# logicalSessionTimeoutMinutes can be not set by a client
+has logical_session_timeout_minutes => (
+    is => 'lazy',
+    isa => Maybe [NonNegNum],
+    builder => "_build_logical_session_timeout_minutes",
+);
+
+sub _build_logical_session_timeout_minutes {
+    my ( $self ) = @_;
+    return $self->is_master->{logicalSessionTimeoutMinutes} || undef;
 }
 
 sub updated_since {

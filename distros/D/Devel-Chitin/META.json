@@ -59,7 +59,7 @@
          "web" : "https://github.com/brummett/Devel-Chitin"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

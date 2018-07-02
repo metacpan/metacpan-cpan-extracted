@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.836';
+our $VERSION = '1.838';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -26,7 +26,7 @@ $Carp::Internal{ (__PACKAGE__) }++;
 no overloading;
 
 use MCE::Shared::Server ();
-use Scalar::Util qw( blessed refaddr );
+use Scalar::Util qw( blessed );
 
 our @CARP_NOT = qw(
    MCE::Shared::Array    MCE::Shared::Hash     MCE::Shared::Queue
@@ -47,8 +47,6 @@ sub import {
 ## Share function.
 ##
 ###############################################################################
-
-my ($_count, %_lkup) = (0);
 
 sub share {
    shift if (defined $_[0] && $_[0] eq 'MCE::Shared');
@@ -72,15 +70,11 @@ sub share {
    }
 
    my $_params = ref $_[0] eq 'HASH' && ref $_[1] ? shift : {};
-   my ($_class, $_ra, $_item) = (blessed($_[0]), refaddr($_[0]));
+   my $_class  = blessed($_[0]);
+   my $_item;
 
    # class construction failed: e.g. share( class->new(...) )
    return '' if @_ && !$_[0] && $!;
-
-   # safety for circular references to not loop endlessly
-   return $_lkup{ $_ra } if defined $_ra && exists $_lkup{ $_ra };
-
-   $_count++;
 
    # blessed object, \@array, \%hash, or \$scalar
    if ( $_class ) {
@@ -93,21 +87,21 @@ sub share {
       if ( tied(@{ $_[0] }) && tied(@{ $_[0] })->can('SHARED_ID') ) {
          _incr_count(tied(@{ $_[0] })), return tied(@{ $_[0] });
       }
-      $_item = $_lkup{ $_ra } = MCE::Shared->array($_params, @{ $_[0] });
+      $_item = MCE::Shared->array($_params, @{ $_[0] });
       @{ $_[0] } = ();  tie @{ $_[0] }, 'MCE::Shared::Object', $_item;
    }
    elsif ( ref $_[0] eq 'HASH' ) {
       if ( tied(%{ $_[0] }) && tied(%{ $_[0] })->can('SHARED_ID') ) {
          _incr_count(tied(%{ $_[0] })), return tied(%{ $_[0] });
       }
-      $_item = $_lkup{ $_ra } = MCE::Shared->hash($_params, %{ $_[0] });
+      $_item = MCE::Shared->hash($_params, %{ $_[0] });
       %{ $_[0] } = ();  tie %{ $_[0] }, 'MCE::Shared::Object', $_item;
    }
    elsif ( ref $_[0] eq 'SCALAR' && !ref ${ $_[0] } ) {
       if ( tied(${ $_[0] }) && tied(${ $_[0] })->can('SHARED_ID') ) {
          _incr_count(tied(${ $_[0] })), return tied(${ $_[0] });
       }
-      $_item = $_lkup{ $_ra } = MCE::Shared->scalar($_params, ${ $_[0] });
+      $_item = MCE::Shared->scalar($_params, ${ $_[0] });
       undef ${ $_[0] }; tie ${ $_[0] }, 'MCE::Shared::Object', $_item;
    }
 
@@ -123,8 +117,6 @@ sub share {
       }
       _croak('Synopsis: blessed object, \@array, \%hash, or \$scalar');
    }
-
-   %_lkup = () unless --$_count;
 
    $_item;
 }
@@ -291,7 +283,7 @@ sub TIEHASH {
       }
    }
 
-   return MCE::Shared->cache(@_) if $_cache;
+   return MCE::Shared->cache(@_)   if $_cache;
    return MCE::Shared->ordhash(@_) if $_ordered;
    return MCE::Shared->hash(@_);
 }
@@ -309,8 +301,6 @@ sub TIESCALAR {
 ###############################################################################
 
 sub _croak {
-   $_count = 0, %_lkup = ();
-
    if ( $INC{'MCE.pm'} ) {
       goto &MCE::_croak;
    } else {
@@ -343,7 +333,31 @@ sub _tie {
    $_params->{class} = ':construct_module:';
    $_params->{tied } = 1;
 
-   my $_item = MCE::Shared::Server::_new($_params, [ @_, $_fcn ]);
+   my $_item;
+
+   if ( $_params->{'module'}->isa('MCE::Shared::Array') ) {
+      $_item = MCE::Shared::Server::_new($_params, [ (), $_fcn ]);
+      if ( @_ ) {
+         delete $_params->{module}; $_params->{_DEEPLY_} = 1;
+         for ( my $i = 0; $i <= $#_; $i += 1 ) {
+            &_share($_params, $_item, $_[$i]) if ref($_[$i]);
+         }
+         $_item->assign(@_);
+      }
+   }
+   elsif ( $_params->{'module'}->isa('MCE::Shared::Hash') ) {
+      $_item = MCE::Shared::Server::_new($_params, [ (), $_fcn ]);
+      if ( @_ ) {
+         delete $_params->{module}; $_params->{_DEEPLY_} = 1;
+         for ( my $i = 1; $i <= $#_; $i += 2 ) {
+            &_share($_params, $_item, $_[$i]) if ref($_[$i]);
+         }
+         $_item->assign(@_);
+      }
+   }
+   else {
+      $_item = MCE::Shared::Server::_new($_params, [ @_, $_fcn ]);
+   }
 
    if ( $_item && $_item->[2] ) {
       ##
@@ -416,7 +430,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.836
+This document describes MCE::Shared version 1.838
 
 =head1 SYNOPSIS
 

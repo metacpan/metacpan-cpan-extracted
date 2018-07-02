@@ -377,13 +377,13 @@ sub postProcessCfg {
     return $cfg;
 }
 
-=head2 instanciatePlugin(pluginName,userObj)
+=head2 instantiatePlugin(pluginName,userObj)
 
 create a new instance of this plugin prototype
 
 =cut
 
-sub instanciatePlugin {
+sub instantiatePlugin {
     my $self = shift;
     my $name = shift;
 
@@ -423,7 +423,7 @@ has configPlugins => sub {
     my @plugins;
     for my $name (@{$cfg->{PLUGIN}{list}}){
         my $obj = eval {
-            $self->instanciatePlugin($name,$user);
+            $self->instantiatePlugin($name,$user);
         } or next;
         push @plugins, $obj;
     }
@@ -462,9 +462,16 @@ sub getConfigBlob {
 
     my $zip = Archive::Zip->new();
     my $cfg = $self->cfgHash;
+    # flush all the changes in the database to the db file
+    my $dumpfile = '/tmp/cbdump'.$$;
+    unlink $dumpfile if -f $dumpfile;
+    open my $dump, '|-','/usr/bin/sqlite3',$cfg->{BACKEND}{cfg_db};
+    print $dump ".output $dumpfile\n";
+    print $dump ".dump\n";
+    close $dump; 
     $zip->addFile({
-        filename => $cfg->{BACKEND}{cfg_db},
-        zipName => '{DATABASE}',
+        filename => $dumpfile,
+        zipName => '{DATABASEDUMP}',
     });
     for my $obj (@{$self->configPlugins}){
         my $name = $obj->name;
@@ -509,9 +516,18 @@ sub restoreConfigBlob {
         for ($member->fileName){
             /^\{DATABASE\}$/ && do {
                 $self->log->warn("Restoring Database!");
+                unlink glob $cfg->{BACKEND}{cfg_db}.'*';
                 $member->extractToFileNamed($cfg->{BACKEND}{cfg_db});
-                open my $gen, '>', $cfg->{BACKEND}{cfg_db}.'.flush';
-                close $gen;
+                last;
+            };
+            /^\{DATABASEDUMP\}$/ && do {
+                $self->log->warn("Restoring Database Dump!");
+                unlink glob $cfg->{BACKEND}{cfg_db}.'*';
+                open my $sqlite, '|-', '/usr/bin/sqlite3',$cfg->{BACKEND}{cfg_db};
+                my $sql = $member->contents();
+                $sql =~ s/0$//; # for some reason the dump ends in 0
+                print $sqlite $sql;
+                close $sqlite;
                 last;
             };
             m/^\{PLUGINSTATE\.([^.]+)\}(.+)/ && do {
@@ -519,7 +535,7 @@ sub restoreConfigBlob {
                 my $file = $2;
                 if (not $stateFileCache{$plugin}){
                     my $obj = eval {
-                         $self->instanciatePlugin($plugin,$user);
+                         $self->instantiatePlugin($plugin,$user);
                     };
                     if (not $obj){
                         $self->log->warn("Ignoring $file from plugin $plugin since the plugin is not available here.");

@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -22,17 +20,17 @@ package MongoDB::Op::_BatchInsert;
 # MongoDB::InsertManyResult
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
 use MongoDB::InsertManyResult;
 use Tie::IxHash;
-use Types::Standard qw(
-    ArrayRef
-);
 use MongoDB::_Types qw(
     Boolish
+);
+use Types::Standard qw(
+    ArrayRef
 );
 
 use namespace::clean;
@@ -81,7 +79,7 @@ sub execute {
 
     my $last_idx = $#$documents;
     for ( my $i = 0; $i <= $last_idx; $i++ ) {
-        push @insert_docs, $self->_pre_encode_insert( $link, $documents->[$i], $invalid_chars );
+        push @insert_docs, $self->_pre_encode_insert( $link->max_bson_object_size, $documents->[$i], $invalid_chars );
         push @ids, $insert_docs[-1]{metadata}{_id};
     }
 
@@ -93,11 +91,12 @@ sub execute {
       ? (
         $self->_send_legacy_op_noreply( $link,
             MongoDB::_Protocol::write_insert( $self->full_name, join( "", map { $_->{bson} } @insert_docs ) ),
-            undef,
-            "MongoDB::UnacknowledgedResult"
+            \@insert_docs,
+            "MongoDB::UnacknowledgedResult",
+            "insert",
         )
       )
-      : $link->does_write_commands
+      : $link->supports_write_commands
       ? (
         $self->_send_write_command( $link,
             Tie::IxHash->new(
@@ -112,8 +111,9 @@ sub execute {
       : (
         $self->_send_legacy_op_with_gle( $link,
             MongoDB::_Protocol::write_insert( $self->full_name, join( "", map { $_->{bson} } @insert_docs ) ),
-            undef,
-            "MongoDB::InsertManyResult"
+            \@insert_docs,
+            "MongoDB::InsertManyResult",
+            "insert",
         )->assert
       );
 }

@@ -17,8 +17,6 @@ use warnings;
 
 use Try::Tiny;
 
-use Module::Load ();
-
 use Crypt::Perl::BigInt ();
 use Crypt::Perl::ECDSA::EncodedPoint ();
 use Crypt::Perl::ECDSA::Utils ();

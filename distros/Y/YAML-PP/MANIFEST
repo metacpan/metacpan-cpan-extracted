@@ -54,6 +54,7 @@ t/30.legacy.t
 t/31.schema.t
 t/32.cyclic-refs.t
 t/33.schema-dump.t
+t/34.emit-scalar-styles.t
 t/data/simple.yaml
 t/invalid/i032/===
 t/invalid/i032/in.yaml
@@ -297,6 +298,7 @@ yaml-test-suite/6CK3/===
 yaml-test-suite/6CK3/in.yaml
 yaml-test-suite/6CK3/test.event
 yaml-test-suite/6FWR/===
+yaml-test-suite/6FWR/emit.yaml
 yaml-test-suite/6FWR/in.json
 yaml-test-suite/6FWR/in.yaml
 yaml-test-suite/6FWR/out.yaml
@@ -335,6 +337,10 @@ yaml-test-suite/6M2F/in.json
 yaml-test-suite/6M2F/in.yaml
 yaml-test-suite/6M2F/out.yaml
 yaml-test-suite/6M2F/test.event
+yaml-test-suite/6PBE/===
+yaml-test-suite/6PBE/emit.yaml
+yaml-test-suite/6PBE/in.yaml
+yaml-test-suite/6PBE/test.event
 yaml-test-suite/6S55/===
 yaml-test-suite/6S55/error
 yaml-test-suite/6S55/in.yaml
@@ -762,6 +768,11 @@ yaml-test-suite/F3CP/in.json
 yaml-test-suite/F3CP/in.yaml
 yaml-test-suite/F3CP/out.yaml
 yaml-test-suite/F3CP/test.event
+yaml-test-suite/F6MC/===
+yaml-test-suite/F6MC/emit.yaml
+yaml-test-suite/F6MC/in.json
+yaml-test-suite/F6MC/in.yaml
+yaml-test-suite/F6MC/test.event
 yaml-test-suite/F8F9/===
 yaml-test-suite/F8F9/in.json
 yaml-test-suite/F8F9/in.yaml
@@ -948,6 +959,7 @@ yaml-test-suite/KMK3/in.json
 yaml-test-suite/KMK3/in.yaml
 yaml-test-suite/KMK3/test.event
 yaml-test-suite/KSS4/===
+yaml-test-suite/KSS4/emit.yaml
 yaml-test-suite/KSS4/in.json
 yaml-test-suite/KSS4/in.yaml
 yaml-test-suite/KSS4/out.yaml
@@ -1043,6 +1055,11 @@ yaml-test-suite/N782/===
 yaml-test-suite/N782/error
 yaml-test-suite/N782/in.yaml
 yaml-test-suite/N782/test.event
+yaml-test-suite/NAT4/===
+yaml-test-suite/NAT4/emit.yaml
+yaml-test-suite/NAT4/in.json
+yaml-test-suite/NAT4/in.yaml
+yaml-test-suite/NAT4/test.event
 yaml-test-suite/NHX8/===
 yaml-test-suite/NHX8/emit.yaml
 yaml-test-suite/NHX8/in.json
@@ -1053,6 +1070,10 @@ yaml-test-suite/NP9H/in.json
 yaml-test-suite/NP9H/in.yaml
 yaml-test-suite/NP9H/out.yaml
 yaml-test-suite/NP9H/test.event
+yaml-test-suite/NTY5/===
+yaml-test-suite/NTY5/error
+yaml-test-suite/NTY5/in.yaml
+yaml-test-suite/NTY5/test.event
 yaml-test-suite/P2AD/===
 yaml-test-suite/P2AD/in.json
 yaml-test-suite/P2AD/in.yaml
@@ -1224,6 +1245,7 @@ yaml-test-suite/T26H/in.yaml
 yaml-test-suite/T26H/out.yaml
 yaml-test-suite/T26H/test.event
 yaml-test-suite/T4YY/===
+yaml-test-suite/T4YY/emit.yaml
 yaml-test-suite/T4YY/in.json
 yaml-test-suite/T4YY/in.yaml
 yaml-test-suite/T4YY/out.yaml

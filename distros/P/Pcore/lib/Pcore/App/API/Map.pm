@@ -2,6 +2,7 @@ package Pcore::App::API::Map;
 
 use Pcore -class;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
+use Package::Stash::XS qw[];
 
 has app    => ();    # ( isa => ConsumerOf ['Pcore::App'], required => 1 );
 has method => ();    # ( isa => HashRef, init_arg => undef );
@@ -17,7 +18,7 @@ sub init ($self) {
         do {
             no strict qw[refs];
 
-            map { $_ => 1 } ${ ref( $self->{app} ) . '::APP_API_ROLES' }->@*;
+            map { $_ => 1 } ${ ref( $self->{app} ) . '::API_ROLES' }->@*;
           }
     };
 
@@ -67,12 +68,50 @@ sub init ($self) {
         }
     }
 
+    my $MODIFY_CODE_ATTRIBUTES = sub ( $pkg, $ref, @attrs ) {
+        my @bad;
+
+        for my $attr (@attrs) {
+            if ( $attr =~ /(Perms) [(] ([^)]*) [)]/smxx ) {
+                my ( $attr, $val ) = ( $1, $2 );
+
+                if ( $attr eq 'Perms' ) {
+
+                    # parse args
+                    my @val = split /\s*,\s*/sm, $val;
+
+                    # dequote
+                    for (@val) {s/['"]//smg}
+
+                    $val = \@val;
+                }
+
+                no strict qw[refs];
+
+                ${"$pkg\::_API_MAP"}->{$ref}->{ lc $attr } = $val;
+            }
+            else {
+                push @bad, $attr;
+            }
+        }
+
+        return @bad;
+    };
+
     for my $class_path ( sort keys $class->%* ) {
         my $class_name = $class->{$class_path};
 
-        P->class->load($class_name);
+        my $attrs = do {
+            no strict qw[refs];
 
-        die qq["$class_name" must be an instance of "Pcore::App::API::Role"] if !$class_name->isa('Pcore::App::API::Role');
+            local *{"$class_name\::MODIFY_CODE_ATTRIBUTES"} = $MODIFY_CODE_ATTRIBUTES;
+
+            P->class->load($class_name);
+
+            ${"$class_name\::_API_MAP"};
+        };
+
+        die qq["$class_name" must be an instance of "Pcore::App::API::Base"] if !$class_name->isa('Pcore::App::API::Base');
 
         # prepare API object route
         $class_path =~ s/\AV/v/sm;
@@ -80,37 +119,41 @@ sub init ($self) {
         # create API object and store in cache
         my $obj = $self->{obj}->{$class_name} = $class_name->new( { app => $self->{app} } );
 
-        my $obj_map = $obj->api_map;
-
         # parse API version
         my ($version) = $class_path =~ /\Av(\d+)/sm;
 
-        # validate obj API map
-        for my $method_name ( sort keys $obj_map->%* ) {
+        # scan api methods
+        for my $method_name ( grep {/\AAPI_/sm} Package::Stash::XS->new($class_name)->list_all_symbols('CODE') ) {
+
+            # get method permissions
+            my $perms = do {
+                no strict qw[refs];
+
+                my $ref = *{"$class_name\::$method_name"}{CODE};
+
+                $attrs->{$ref}->{perms} // ${"$class_name\::API_NAMESPACE_PERMS"};
+            };
+
+            my $local_method_name = $method_name;
+
+            $method_name =~ s/\AAPI_//sm;
+
             my $method_id = qq[/$class_path/$method_name];
 
-            my $local_method_name = "API_$method_name";
-
             $method->{$method_id} = {
-                $obj_map->{$method_name}->%*,
                 id                => $method_id,
                 version           => "v$version",
                 class_name        => $class_name,
                 class_path        => "/$class_path",
                 method_name       => $method_name,
                 local_method_name => $local_method_name,
+                permissions       => $perms,
             };
-
-            # method should exists
-            die qq[API method "$local_method_name" is not exists. By convention api methods should be prefixed with "API_" prefix] if !$obj->can($local_method_name);
-
-            # method description is required
-            die qq[API method "$method_id" requires description] if !$method->{$method_id}->{desc};
 
             # check method permissions
             if ( $method->{$method_id}->{permissions} ) {
 
-                # convert method permissions to ArrayRef
+                # convert to ArrayRef
                 $method->{$method_id}->{permissions} = [ $method->{$method_id}->{permissions} ] if !is_plain_arrayref $method->{$method_id}->{permissions};
 
                 # methods permissions are empty
@@ -154,7 +197,9 @@ sub get_method ( $self, $method_id ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 126, 132             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 13                   | Subroutines::ProhibitExcessComplexity - Subroutine "init" with high complexity score (22)                      |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 169, 175             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

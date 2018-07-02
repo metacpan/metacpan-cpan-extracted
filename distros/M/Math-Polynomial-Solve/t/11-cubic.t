@@ -2,10 +2,12 @@ use 5.010001;
 use Test::More tests => 13;
 
 use Math::Complex;
-use Math::Polynomial::Solve qw(cubic_roots ascending_order);
+use Math::Polynomial::Solve qw(:classical);
 use Math::Utils qw(:polynomial :compare);
 use strict;
 use warnings;
+
+coefficients order => 'ascending';
 
 my($eq, $ne) = generate_relational(2.5e-7);
 
@@ -24,8 +26,6 @@ my @case = (
 	[9, 1, -1, 729],
 	[-1/16, 7/8, -2.5, 1],
 );
-
-ascending_order(1);
 
 foreach (@case)
 {

@@ -5,7 +5,7 @@ use vars qw(@EXPORT @ISA $currentstring @formatString);
 use utf8;
 require Exporter;
 @HTML::Editor::Markdown::EXPORT  = qw(Markdown);
-@ISA                           = qw(Exporter);
+@ISA                             = qw(Exporter);
 $HTML::Editor::Markdown::VERSION = '1.09';
 use HTML::Entities;
 use Text::Markdown::Hoedown;
@@ -62,10 +62,10 @@ Markdown()
 sub Markdown {
     my $string = shift;
     utf8::decode($$string) unless utf8::is_utf8($$string);
-    $$string = encode_entities($$string);
+    $$string = encode_entities( $$string, '<>&' );
     $$string = markdown($$string);
-	$$string =~ s/\n/<br>/;
-}
+    $$string =~ s/\n/<br>/;
+} ## end sub Markdown
 
 =head1 AUTHOR
 
@@ -84,5 +84,4 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 =cut
-
 1;

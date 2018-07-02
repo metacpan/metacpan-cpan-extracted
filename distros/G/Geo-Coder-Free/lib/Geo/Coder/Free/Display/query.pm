@@ -34,7 +34,14 @@ sub html {
 	if(my $q = $params{'q'}) {
 		$rc = $geocoder->geocode(location => $q);
 
-		return '{ }' if(!defined($rc));
+		if(!defined($rc)) {
+			# Maybe the user didn't give a country, so let's add it
+			# and search again
+			if(my $country = $self->{_lingua}->country()) {
+				$rc = $geocoder->geocode(location => "$q, $country");
+			}
+			return '{}' if(!defined($rc));
+		}
 
 		delete $rc->{'md5'};
 		delete $rc->{'sequence'};
@@ -48,7 +55,7 @@ sub html {
 	} elsif(my $scantext = $params{'scantext'}) {
 		my @rc = $geocoder->geocode(scantext => $scantext);
 
-		return '{ }' if(scalar(@rc) == 0);
+		return '{}' if(scalar(@rc) == 0);
 
 		foreach my $l(@rc) {
 			delete $l->{'md5'};
@@ -62,7 +69,7 @@ sub html {
 		return encode_json \@rc;
 	}
 
-	return '{ }';
+	return '{}';
 }
 
 1;

@@ -1,16 +1,12 @@
 use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../";
+
 use AWS::XRay qw/ capture /;
 use Test::More;
-use IO::Scalar;
-use JSON::XS;
 use Time::HiRes qw/ sleep /;
-
-my $buf;
-no warnings 'redefine';
-
-*AWS::XRay::sock = sub {
-    IO::Scalar->new(\$buf);
-};
+use t::Util qw/ reset segments /;
 
 capture "myApp", sub {
     my $seg = shift;
@@ -23,12 +19,10 @@ capture "myApp", sub {
     $seg->{annotations}->{foo} = "bar";
 };
 
-is $buf =~ s/{"format":"json","version":1}//g => 4, "includes 4 segment headers";
-diag $buf;
-my @seg = split /\n/, $buf;
-shift @seg; # despose first ""
+my @seg = segments();
+ok @seg == 4;
 
-my $root = decode_json(pop @seg);
+my $root = pop @seg;
 is $root->{name}, "myApp";
 like $root->{trace_id} => qr/\A1-[0-9a-fA-F]{8}-[0-9a-fA-F]{24}\z/, "trace_id format";
 like $root->{id}       => qr/\A[0-9a-fA-F]{16}\z/;
@@ -40,7 +34,7 @@ my $trace_id = $root->{trace_id};
 my $root_id  = $root->{id};
 
 # remote1
-my $seg1 = decode_json(shift @seg);
+my $seg1 = shift @seg;
 like $seg1->{id}      => qr/\A[0-9a-fA-F]{16}\z/;
 is $seg1->{name}      => "remote1";
 is $seg1->{parent_id} => $root_id;
@@ -50,7 +44,7 @@ ok $seg1->{start_time} >= $root->{start_time};
 ok $seg1->{end_time}   <= $root->{end_time};
 
 # remote2
-my $seg2 = decode_json(pop @seg);
+my $seg2 = pop @seg;
 like $seg2->{id}      => qr/\A[0-9a-fA-F]{16}\z/;
 is $seg2->{name}      => "remote2";
 is $seg2->{parent_id} => $root_id;
@@ -60,7 +54,7 @@ ok $seg2->{start_time} >= $seg1->{start_time};
 ok $seg2->{end_time}   <= $root->{end_time};
 
 # remote3
-my $seg3 = decode_json(shift @seg);
+my $seg3 = shift @seg;
 like $seg3->{id}      => qr/\A[0-9a-fA-F]{16}\z/;
 is $seg3->{name}      => "remote3";
 is $seg3->{parent_id} => $seg2->{id};

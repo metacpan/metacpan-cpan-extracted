@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "AUTHOR" => "Mohammad S Anwar <mohammad.anwar\@yahoo.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
-    "File::ShareDir::Install" => "0.06"
+    "File::ShareDir::Install" => "0.13"
   },
   "DISTNAME" => "Map-Tube-Delhi",
   "LICENSE" => "artistic_2",
@@ -25,8 +25,8 @@ my %WriteMakefileArgs = (
   "NAME" => "Map::Tube::Delhi",
   "PREREQ_PM" => {
     "Data::Dumper" => 0,
-    "File::Share" => 0,
-    "Map::Tube" => "3.51",
+    "File::ShareDir" => "1.114",
+    "Map::Tube" => "3.53",
     "Moo" => "2.000000",
     "namespace::autoclean" => "0.28",
     "strict" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.73",
+  "VERSION" => "0.76",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,8 +44,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Dumper" => 0,
-  "File::Share" => 0,
-  "Map::Tube" => "3.51",
+  "File::ShareDir" => "1.114",
+  "Map::Tube" => "3.53",
   "Moo" => "2.000000",
   "Test::More" => 0,
   "namespace::autoclean" => "0.28",

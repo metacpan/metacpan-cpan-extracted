@@ -1,5 +1,14 @@
 Revision history for OpusVL-Preferences
 
+0.30      2018-06-19 12:51:23+01:00 Europe/London
+
+  * DEPRECATED. The changes below are for compatibility ONLY
+  * Converted to Dist::Zilla
+  * Now making use of FB11 brain architecture
+  * Now is a standalone component
+  * Returns its own Result objects, which contain the original object
+  * Added "GDPR erasure" stuff
+
 0.29      2018-05-09 15:35:17+01:00 Europe/London
 
   * Fix curiously deleted lines that made it not work

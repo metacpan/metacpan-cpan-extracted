@@ -17,7 +17,7 @@ sub main {
     add();
     rm();
     make();
-    list();
+    expand_and_list();
     watches();
 
     _setup_watch_lists();
@@ -91,16 +91,16 @@ sub make {
     );
 }
 
-sub list {
+sub expand_and_list {
     mkpath('new');
     t_module->add('new');
 
-    ok( ( t_capture( sub { t_module->list } ) )[0] eq "atd\n  atd/state\nnew\n", 'list (blank)' );
+    ok( ( t_capture( sub { t_module->list } ) )[0] eq "atd\n  atd/state\nnew\n", 'list' );
     ok(
         ( t_capture(
-            sub { t_module->list('atd/state') }
+            sub { t_module->expand('atd/state') }
         ) )[0] eq "atd/state/deploy atd/state/verify atd/state/revert\n",
-        'list (action)',
+        'expand',
     );
 
     t_module->rm('new');

@@ -55,7 +55,7 @@ See L<HTTP::Cookies>.
 
 The source is in GitHub:
 
-	https://github.com/briandfoy/HTTP-Cookies-Mozilla
+	https://github.com/briandfoy/http-cookies-mozilla
 
 =head1 AUTHOR
 
@@ -64,14 +64,16 @@ few material changes.
 
 Flavio Poletti added the SQLite support.
 
-maintained by brian d foy, C<< <bdfoy@cpan.org> >>
+Maintained by brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 1997-1999 Gisle Aas
+Parts Copyright 1997-1999 Gisle Aas.
+
+Other parts Copyright 2018 by brian d foy, <bdfoy@cpan.org>
 
 This library is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+modify it under the terms of the Artistic License 2.0.
 
 =cut
 
@@ -83,7 +85,7 @@ use Carp qw(carp);
 use constant TRUE  => 'TRUE';
 use constant FALSE => 'FALSE';
 
-$VERSION = '2.033';
+$VERSION = '2.034';
 $SQLITE = 'sqlite3';
 
 

@@ -1,13 +1,30 @@
+.perltidyrc
 .ship.conf
+.travis.yml
 Changes
 cpanfile
+examples/chat.pl
+examples/twitter.pl
 lib/Mojo/Redis.pm
-lib/Mojo/Redis/Subscription.pm
-LICENSE
+lib/Mojo/Redis/Cache.pm
+lib/Mojo/Redis/Connection.pm
+lib/Mojo/Redis/Cursor.pm
+lib/Mojo/Redis/Database.pm
+lib/Mojo/Redis/PubSub.pm
+lib/Mojo/Redis/Transaction.pm
 Makefile.PL
 MANIFEST			This list of files
-MANIFEST.SKIP
-README
 t/00-basic.t
+t/cache-offline.t
+t/cache.t
+t/connection-auth.t
+t/connection-unix.t
+t/connection.t
+t/cursor.t
+t/db.t
+t/method-coverage.t
+t/pubsub.t
+t/redis.t
+t/txn.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

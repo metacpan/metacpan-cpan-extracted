@@ -15,6 +15,11 @@ BEGIN {
     use_ok( 'App::BitBucketCli::Project' );
     use_ok( 'App::BitBucketCli::PullRequest' );
     use_ok( 'App::BitBucketCli::Repository' );
+    use_ok( 'App::BitBucketCli::Command::PullRequests' );
+    use_ok( 'App::BitBucketCli::Command::Repositories' );
+    use_ok( 'App::BitBucketCli::Command::Repository' );
+    use_ok( 'App::BitBucketCli::Command::Projects' );
+    use_ok( 'App::BitBucketCli::Command::Branches' );
 }
 
 diag( "Testing App::BitBucketCli $App::BitBucketCli::VERSION, Perl $], $^X" );

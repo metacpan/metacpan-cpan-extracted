@@ -1,5 +1,10 @@
 Revision history for MooseX-ClassCompositor
 
+0.009     2018-06-21 13:14:43-04:00 America/New_York
+        - role modules are allowed to fail to load; if they fail to be set up,
+          the process will still fail, but this permits roles embedded in other
+          module files
+
 0.008     2013-10-20 16:02:57 America/New_York
           replace Class::MOP::load_class with Class::Load
 

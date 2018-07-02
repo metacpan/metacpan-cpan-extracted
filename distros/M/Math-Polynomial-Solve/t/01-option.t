@@ -1,9 +1,11 @@
 use 5.010001;
 use Test::More tests => 7;
 
-use Math::Polynomial::Solve qw(:numeric);
+use Math::Polynomial::Solve qw(:numeric coefficients);
 use strict;
 use warnings;
+
+coefficients order => 'ascending';
 
 my @options = qw( hessenberg root_function varsubst);
 my %okeys = poly_option();

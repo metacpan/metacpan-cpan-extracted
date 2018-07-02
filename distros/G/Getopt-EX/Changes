@@ -1,5 +1,11 @@
 Revision history for Perl extension Getopt-EX
 
+v1.8.0 2018-06-26T06:08:06Z
+
+    - Change FG/BG color switching implementation.
+    - Introduce ->append method to Func object.
+    - Accept alternative names for builtin option.
+
 v1.7.3 2018-04-05T10:49:59Z
 
     - Update the colormap syntax.

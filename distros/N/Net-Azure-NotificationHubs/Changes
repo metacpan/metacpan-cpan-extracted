@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-Azure-NotificationHubs
 
+0.08 2018-06-29T06:36:09Z
+    - URLs for testing some requests became metacpan.org. [shagiwara]
+
 0.07 2018-06-12T00:57:10Z
     - Fixed POD formatting. [manwar]
     - Added missing license meta name. [manwar]

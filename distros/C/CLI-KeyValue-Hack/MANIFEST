@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/CLI/KeyValue/Hack.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/kvcmp
+scripts/polar
+scripts/colchop
+scripts/keyvalues
+scripts/wisejoin
+scripts/init.sh
+META.yml
+META.json

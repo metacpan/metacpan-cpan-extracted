@@ -1,5 +1,9 @@
 Revision history for Test-CleanNamespaces
 
+0.23      2018-06-26 00:00:13Z
+  - properly skip potentially-problematic tests when needed, due to circular
+    dependencies between Moose and Test::CleanNamespaces (RT#125678)
+
 0.22      2016-08-19 03:45:32Z
   - properly find the list of modules to test (regression since 0.19)
 

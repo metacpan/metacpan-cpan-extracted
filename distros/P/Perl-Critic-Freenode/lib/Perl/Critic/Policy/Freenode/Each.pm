@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use constant DESC => 'each() called';
 use constant EXPL => 'The each function may cause undefined behavior when operating on the hash while iterating. Use a foreach loop over the hash\'s keys or values instead.';

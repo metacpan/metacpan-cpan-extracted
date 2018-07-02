@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 10gen, Inc.
+#  Copyright 2010 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,8 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-
 
 # PODNAME: MongoDB::Examples
 # ABSTRACT: Some examples of MongoDB syntax
@@ -30,7 +27,7 @@ MongoDB::Examples - Some examples of MongoDB syntax
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 MAPPING SQL TO MONGODB
 
@@ -136,15 +133,15 @@ you see below.
 
 =item C<SELECT COUNT(*y) FROM users>
 
-    $db->get_collection( 'users' )->count;
+    $db->get_collection( 'users' )->count_documents;
 
 =item C<< SELECT COUNT(*y) FROM users where age > 30 >>
 
-    $db->get_collection( 'users' )->count( { "age" => { '$gt' => 30 } } );
+    $db->get_collection( 'users' )->count_documents( { "age" => { '$gt' => 30 } } );
 
 =item C<SELECT COUNT(age) from users>
 
-    $db->get_collection( 'users' )->count( { age => { '$exists' => 1 } } );
+    $db->get_collection( 'users' )->count_documents( { age => { '$exists' => 1 } } );
 
 =item C<UPDATE users SET a=1 WHERE b='q'>
 

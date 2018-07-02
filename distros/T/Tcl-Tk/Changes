@@ -1,5 +1,9 @@
 Revision history for Perl extension Tcl::Tk.
 
+1.06	23-jun-2018
+	- now on github
+	- get contribution from MaxPerl, etc
+
 1.04	20-feb-2011
 	- t/canvas.t new test file, t/* files improved
 	- demos/tcltkdb.pm moved out into separate module

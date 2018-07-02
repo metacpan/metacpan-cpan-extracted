@@ -16,7 +16,7 @@ use Try::Tiny;
 
 use Cwd qw/fastcwd/;
 
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 has [qw/config env/] => ( is => 'rw', required => 1 );
 has [qw/task/]       => ( is => 'rw', required => 1 );
@@ -141,22 +141,15 @@ sub run {
     my $task_time = time;
 
     #RUN TASK
-    my $return_status;
+    my $has_error;
     try {
-      $return_status = $self->task->( $result_prefix, @{$infiles} );
-    }
-    catch {
-      warn "caught error: $_";
-    };
-
-    unless ($return_status) {
-      $self->log_status("comp.task.exit.error:: $comb_idx");
-      # TODO document this
-    } elsif ( $return_status < 0 ) {
-      $self->log_status("comp.task.exit.skip:: $comb_idx");
-    } else {
+      $self->task->( $result_prefix, @{$infiles} );
       $self->log_status("comp.task.exit.success:: $comb_idx");
     }
+    catch {
+      $self->log->error( $_ );
+      $self->log_status("comp.task.exit.error:: $comb_idx");
+    };
 
     for ( my $i = 0; $i < @$infiles; $i++ ) {
       # delete the file only, if it was created by us.

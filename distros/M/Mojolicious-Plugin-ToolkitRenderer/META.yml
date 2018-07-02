@@ -10,13 +10,12 @@ build_requires:
   Test::Mojo: '0'
   Test::More: '0'
   Test::Most: '0'
-  blib: '1.01'
-  perl: '5.006'
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,11 +25,12 @@ requires:
   Mojo::Base: '0'
   Mojo::Exception: '0'
   Template: '0'
-  perl: '5.006'
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/gryphonshafer/Mojo-Plugin-Toolkit/issues
   homepage: https://github.com/gryphonshafer/Mojo-Plugin-Toolkit
   repository: https://github.com/gryphonshafer/Mojo-Plugin-Toolkit.git
-version: '1.07'
+version: '1.08'
+x_serialization_backend: 'YAML::Tiny version 1.73'

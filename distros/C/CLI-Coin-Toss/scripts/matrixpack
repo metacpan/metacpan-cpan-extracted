@@ -48,8 +48,15 @@ sub packing {
   }
 }
 
-## ヘルプの扱い
-sub VERSION_MESSAGE {}
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  our $VERSION = 0.11 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+    # 0.22 : -g inf を指定可能とした。
+}  
 sub HELP_MESSAGE {
     use FindBin qw[ $Script ] ; 
     $ARGV[1] //= '' ;
@@ -66,7 +73,7 @@ sub HELP_MESSAGE {
 
 =head1 
 
- $0 [-r] -(p|n) num1,num2,num3 ... < somefile
+ $0 [-r] -(p|!) num1,num2,num3 ... < somefile
 
   指定された数に応じて、入力の複数の行をまとめたり、先頭から指定の数だけ抽出したりする。
 
@@ -82,6 +89,7 @@ sub HELP_MESSAGE {
 
    --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
    --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+   --version : バージョン情報の表示
  
  開発上のメモ : 
   * -x の場合について、動作をよく確認せよ。説明が正しいか。プログラムに一貫性があるか確認すること。

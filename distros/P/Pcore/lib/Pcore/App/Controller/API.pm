@@ -26,33 +26,20 @@ sub run ( $self, $req ) {
         Pcore::WebSocket::pcore->new(
             max_message_size => $WS_MAX_MESSAGE_SIZE,
             compression      => $WS_COMPRESSION,
-            on_auth          => Coro::unblock_sub(
-                sub ( $h, $token, $cb ) {
-                    $self->{app}->{api}->authenticate(
-                        $token,
-                        sub ($auth) {
-                            $cb->($auth);
-
-                            return;
-                        }
-                    );
-
-                    return;
-                }
-            ),
+            on_auth          => sub ( $h, $token ) {
+                return $self->{app}->{api}->authenticate($token);
+            },
             on_subscribe => sub ( $h, $event ) {
                 return $self->on_subscribe_event( $h, $event );
             },
             on_event => sub ( $h, $ev ) {
                 return $self->on_event( $h, $ev );
             },
-            on_rpc => Coro::unblock_sub(
-                sub ( $h, $req, $tx ) {
-                    $h->{auth}->api_call_arrayref( $tx->{method}, $tx->{args}, $req );
+            on_rpc => sub ( $h, $req, $tx ) {
+                $h->{auth}->api_call_arrayref( $tx->{method}, $tx->{args}, $req );
 
-                    return;
-                }
-            ),
+                return;
+            }
         )->accept($req);
     }
 
@@ -97,30 +84,27 @@ sub run ( $self, $req ) {
         }
 
         # authenticate request
-        $req->authenticate( sub ( $auth ) {
-            $self->_http_api_router(
-                $auth, $msg,
-                sub ($res) {
-                    if ($CBOR) {
+        my $auth = $req->authenticate;
 
-                        # write HTTP response
-                        $req->( 200, [ 'Content-Type' => 'application/cbor' ], to_cbor $res )->finish;
-                    }
-                    else {
+        $self->_http_api_router(
+            $auth, $msg,
+            sub ($res) {
+                if ($CBOR) {
 
-                        # write HTTP response
-                        $req->( 200, [ 'Content-Type' => 'application/json' ], to_json $res)->finish;
-                    }
-
-                    # free HTTP request object
-                    undef $req;
-
-                    return;
+                    # write HTTP response
+                    $req->( 200, [ 'Content-Type' => 'application/cbor' ], to_cbor $res )->finish;
                 }
-            );
+                else {
 
-            return;
-        } );
+                    # write HTTP response
+                    $req->( 200, [ 'Content-Type' => 'application/json' ], to_json $res)->finish;
+                }
+
+                return;
+            }
+        );
+
+        return;
     }
 
     return;

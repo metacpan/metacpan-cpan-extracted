@@ -3,7 +3,7 @@ NAME
     system
 
 VERSION
-    version 0.010
+    version 0.011
 
 SYNOPSIS
     In your dist.ini:
@@ -11,17 +11,25 @@ SYNOPSIS
       [OSPrereqs / MSWin32]
       Win32API::File = 0.11
 
+    or
+
+      [OSPrereqs]
+      prereq_os = MSWin32
+      Win32API::File = 0.11
+
     Some prefixes are recognized, i.e. "!" (not), "~" (regex match), "!~"
     (regex non-match). Regex matches are done case-insensitively for
     convenience:
 
       ; require on non-Win32 system
-      [OSPrereqs / !MSWin32]
+      [OSPrereqs]
+      prereq_os = !MSWin32
       Proc::ProcessTable = 0.50
 
       ; require on BSD
-      [OSPrereqs / ~bsd]
-      BSD::Resource=0
+      [OSPrereqs]
+      prereq_os = ~bsd
+      BSD::Resource = 0
 
       ; require on non-Windows system
       [OSPrereqs / !~win]

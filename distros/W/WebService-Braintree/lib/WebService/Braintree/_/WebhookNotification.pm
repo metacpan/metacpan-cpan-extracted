@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::WebhookNotification;
-$WebService::Braintree::_::WebhookNotification::VERSION = '1.5';
+$WebService::Braintree::_::WebhookNotification::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,24 +17,25 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
-use MooseX::Aliases;
+use Moo;
+use MooX::Aliases;
 
 extends 'WebService::Braintree::_';
 
-use Hash::Inflator;
-
-use WebService::Braintree::ErrorResult;
-use WebService::Braintree::_::AccountUpdaterDailyReport;
-use WebService::Braintree::_::ConnectedMerchantPayPalStatusChanged;
-use WebService::Braintree::_::ConnectedMerchantStatusTransitioned;
-use WebService::Braintree::_::Disbursement;
-use WebService::Braintree::_::Dispute;
-use WebService::Braintree::_::GrantedPaymentInstrumentUpdate;
-use WebService::Braintree::_::IdealPayment;
-use WebService::Braintree::_::MerchantAccount;
-use WebService::Braintree::_::Subscription;
-use WebService::Braintree::_::Transaction;
+use WebService::Braintree::Types qw(
+    ErrorResult
+    HashInflator
+    AccountUpdaterDailyReport
+    ConnectedMerchantPayPalStatusChanged
+    ConnectedMerchantStatusTransitioned
+    Disbursement
+    Dispute
+    GrantedPaymentInstrumentUpdate
+    IdealPayment
+    MerchantAccount
+    Subscription
+    Transaction
+);
 
 =head1 ATTRIBUTES
 
@@ -61,7 +62,7 @@ C<< error_result() >> is an alias for this attribute.
 
 has api_error_response => (
     is => 'rw',
-    isa => 'WebService::Braintree::ErrorResult',
+    isa => ErrorResult,
     coerce => 1,
     alias => 'error_result',
 );
@@ -75,7 +76,7 @@ L<WebService::Braintree::_::ConnectedMerchantPayPalStatusChanged/>.
 
 has connected_merchant_paypal_status_changed => (
     is => 'rw',
-    isa => 'WebService::Braintree::_::ConnectedMerchantPayPalStatusChanged',
+    isa => ConnectedMerchantPayPalStatusChanged,
     coerce => 1,
 );
 
@@ -88,7 +89,7 @@ L<WebService::Braintree::_::ConnectedMerchantstatusTransitioned/>.
 
 has connected_merchant_status_transitioned => (
     is => 'rw',
-    isa => 'WebService::Braintree::_::ConnectedMerchantStatusTransitioned',
+    isa => ConnectedMerchantStatusTransitioned,
     coerce => 1,
 );
 
@@ -101,7 +102,7 @@ L<WebService::Braintree::_::Disbursement/>.
 
 has disbursement => (
     is => 'rw',
-    isa => 'WebService::Braintree::_::Disbursement',
+    isa => Disbursement,
     coerce => 1,
 );
 
@@ -114,7 +115,7 @@ L<WebService::Braintree::_::Dispute/>.
 
 has dispute => (
     is => 'rw',
-    isa => 'WebService::Braintree::_::Dispute',
+    isa => Dispute,
     coerce => 1,
 );
 
@@ -127,7 +128,7 @@ L<WebService::Braintree::_::GrantedPaymentInstrumentUpdate/>.
 
 has granted_payment_instrument_update => (
     is => 'rw',
-    isa => 'WebService::Braintree::_::GrantedPaymentInstrumentUpdate',
+    isa => GrantedPaymentInstrumentUpdate,
     coerce => 1,
 );
 
@@ -140,7 +141,7 @@ L<WebService::Braintree::_::IdealPayment/>.
 
 has ideal_payment => (
     is => 'rw',
-    isa => 'WebService::Braintree::_::IdealPayment',
+    isa => IdealPayment,
     coerce => 1,
 );
 
@@ -163,7 +164,7 @@ L<WebService::Braintree::_::MerchantAccount/>.
 
 has merchant_account => (
     is => 'rw',
-    isa => 'WebService::Braintree::_::MerchantAccount',
+    isa => MerchantAccount,
     coerce => 1,
 );
 
@@ -176,7 +177,7 @@ L<Hash::Inflator/>.
 
 has partner_merchant => (
     is => 'rw',
-    isa => 'Hash::Inflator',
+    isa => HashInflator,
     coerce => 1,
 );
 
@@ -189,7 +190,7 @@ L<WebService::Braintree::_::Subscription/>.
 
 has subscription => (
     is => 'rw',
-    isa => 'WebService::Braintree::_::Subscription',
+    isa => Subscription,
     coerce => 1,
 );
 
@@ -224,7 +225,7 @@ L<WebService::Braintree::_::Transaction/>.
 
 has transaction => (
     is => 'rw',
-    isa => 'WebService::Braintree::_::Transaction',
+    isa => Transaction,
     coerce => 1,
 );
 
@@ -242,12 +243,29 @@ sub BUILD {
         $wrapper = $wrapper->{api_error_response};
     }
 
-    my $meta = $self->meta;
-    foreach my $attr ($meta->get_all_attributes) {
-        my $name = $attr->name;
-        next unless exists $wrapper->{$name};
+    # Yes, this is a duplicate list of the attributes and could be
+    # retrieved with $self->meta->get_all_attributes(). But, we use
+    # Moo, not Moose, so there's no $self->meta.
+    foreach my $attr (qw(
+        account_updater_daily_report
+        api_error_response
+        connected_merchant_paypal_status_changed
+        connected_merchant_status_transitioned
+        disbursement
+        dispute
+        granted_payment_instrument_update
+        ideal_payment
+        kind
+        merchant_account
+        partner_merchant
+        subscription
+        subject
+        timestamp
+        transaction
+    )) {
+        next unless exists $wrapper->{$attr};
 
-        $self->$name($wrapper->{$name});
+        $self->$attr($wrapper->{$attr});
     }
 }
 

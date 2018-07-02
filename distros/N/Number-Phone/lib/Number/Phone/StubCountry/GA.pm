@@ -22,18 +22,18 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221546;
+our $VERSION = 1.20180619214156;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d)(\\d{2})(\\d{2})(\\d{2})',
                   'format' => '$1 $2 $3 $4',
                   'national_rule' => '0$1',
-                  'leading_digits' => '[2-7]',
-                  'pattern' => '(\\d)(\\d{2})(\\d{2})(\\d{2})'
+                  'leading_digits' => '[2-7]'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'format' => '$1 $2 $3 $4'
+                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
@@ -41,11 +41,11 @@ my $validators = {
                 'toll_free' => '',
                 'fixed_line' => '01\\d{6}',
                 'voip' => '',
-                'mobile' => '0?[2-7]\\d{6}',
-                'specialrate' => '',
-                'geographic' => '01\\d{6}',
                 'personal_number' => '',
-                'pager' => ''
+                'geographic' => '01\\d{6}',
+                'pager' => '',
+                'specialrate' => '',
+                'mobile' => '0?[2-7]\\d{6}'
               };
 my %areanames = (
   2410140 => "Kango",

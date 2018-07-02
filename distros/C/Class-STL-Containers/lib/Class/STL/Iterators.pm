@@ -30,8 +30,9 @@ package Class::STL::Iterators;
 require 5.005_62;
 use strict;
 use warnings;
-use vars qw( $VERSION $BUILD @EXPORT_OK %EXPORT_TAGS );
-use Exporter;
+use vars qw( $VERSION $BUILD @ISA @EXPORT_OK %EXPORT_TAGS );
+require Exporter;
+@ISA = 'Exporter';
 my @export_names = qw( 
 	iterator 
 	bidirectional_iterator 

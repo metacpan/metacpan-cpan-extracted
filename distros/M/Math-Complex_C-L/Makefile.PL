@@ -106,6 +106,10 @@ if(-e 'try2.exe' && !unlink('./try2.exe')) {
 
 if($open) {close WR or warn "Unable to close $log after writing: $!"}
 
+# Casting an extended precision inf to a __float128 may result in a nan
+$defines .= " -DNO_INF_CAST_TO_NV"
+  if ($Config{nvtype} eq '__float128' && ($Config{longdblkind} == 3 || $Config{longdblkind} == 4));
+
 my %options = %{
 {
   'NAME' => 'Math::Complex_C::L',

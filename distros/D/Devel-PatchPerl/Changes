@@ -1,6 +1,45 @@
 ==================================================
-Changes from 2012-02-14 00:00:00 +0000 to present.
+Changes from 2013-06-24 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.52 at 2018-06-23 09:12:01 +0000
+-----------------------------------------
+
+  Change: 9987ca085ff78e37d4fb0a118a16dc6b6b11ba79
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-06-23 10:12:01 +0000
+
+    Release engineering for 1.52 
+
+  Change: d4d87e4d9324316e1ab392619491a96885aa3fa1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-06-23 10:03:51 +0000
+
+    Updated hints 
+
+  Change: 95826fad7e96f573dad727374cfb9f4a8b1017ee
+  Author: Bram <bram-tvguho@mail.wizbit.be>
+  Date : 2017-12-08 12:56:34 +0000
+
+    Add patch for 'Perl_fp_class_denorm'
+
+    Patch error:
+
+    sv.o: In function `S_hextract':
+
+    sv.c:(.text+0xcfd): undefined reference to `Perl_fp_class_denorm'
+
+    perl5 commit message:
+
+    Fallbacks for Perl_fp_class_denorm().
+
+    These may be needed if the compiler doesn't expose the C99 math
+
+    without some special switches.
+
+    See also: - https://rt.perl.org/Public/Bug/Display.html?id=132255 -
+    perl5 commit 488307ffa67ce70fc9755e560a74dac04bdcb0e4 
 
 -----------------------------------------
 version 1.48 at 2017-02-12 18:32:39 +0000
@@ -478,198 +517,6 @@ version 0.92 at 2013-07-07 13:29:48 +0000
 
     Update Midnight BSD hints for 0.4-RELEASE 
 
------------------------------------------
-version 0.90 at 2013-05-18 22:58:06 +0000
------------------------------------------
-
-  Change: fe0a97026ae5a56374b1d9a5968554a0c9b693bc
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-18 23:58:06 +0000
-
-    Bumped version to 0.90 
-
-  Change: cc5a37b1298b45fe2e74a4db92e85561a12f1052
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-18 23:50:04 +0000
-
-    Added gcc m64 fixes for Solaris 11
-
-    http://perl5.git.perl.org/perl.git/commitdiff/1ddb6a4
-
-    http://perl5.git.perl.org/perl.git/commitdiff/767f54d 
-
-  Change: 815ff70a8a86c97742a0afdc5a092c590c729e80
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-18 22:04:29 +0000
-
-    Update hpux hints 
-
-  Change: 089592af98239448a956586cf8998dee7b2ab7b6
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-18 21:46:55 +0000
-
-    Added hints audit tool 
-
-  Change: 842e6a11a1dac1adfa253a4a9dbd60d53286fa8e
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-18 18:24:52 +0000
-
-    Added 'hints' function to Devel::PatchPerl::Hints 
-
------------------------------------------
-version 0.88 at 2013-05-16 12:02:55 +0000
------------------------------------------
-
-  Change: 7a381f7a969eeb683343ddc3511169298aa19889
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-16 13:02:55 +0000
-
-    Make determine_version() available in the public API
-
-    https://github.com/bingos/devel-patchperl/issues/12 
-
------------------------------------------
-version 0.86 at 2013-05-08 15:39:07 +0000
------------------------------------------
-
-  Change: 50d0a6e5c2b5f25de596463f219c78204e0ae477
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-08 16:39:07 +0000
-
-    Bump version 
-
-  Change: 09c3d04f1eddb60cdbba7b597a9c114c7396be2f
-  Author: Chris Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-08 08:11:48 +0000
-
-    Merge pull request #11 from hirose31/prevent-premature-hsplit
-
-    Add patch on prevent premature hsplit for Perl 5.8.[89], 5.10.1,
-    5.12.5 
-
-  Change: 19a38ec13e6634a4707bb5043da051b6c551c23f
-  Author: HIROSE Masaaki <hirose31@gmail.com>
-  Date : 2013-05-08 13:52:42 +0000
-
-    Add patch on prevent premature hsplit for Perl 5.8.[89], 5.10.1,
-    5.12.5 
-
------------------------------------------
-version 0.84 at 2013-03-08 21:35:14 +0000
------------------------------------------
-
-  Change: 7b5f0d6c51dbff9a22f250813e230816d3d36f08
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-03-08 21:35:14 +0000
-
-    Remove requirement on IPC::Cmd
-
-    This should make the perlbrew peeps happy 
-
------------------------------------------
-version 0.82 at 2013-02-25 21:38:08 +0000
------------------------------------------
-
-  Change: 3e146301433f8098460dc6fd5d1930fc48c2903a
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-02-25 21:38:08 +0000
-
-    Update Linux hints 
-
------------------------------------------
-version 0.80 at 2013-02-25 12:04:03 +0000
------------------------------------------
-
-  Change: ef4dfcccd90f7f786847998cba8891b69fd5a2e1
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-02-25 12:04:03 +0000
-
-    Bump version to 0.80 
-
-  Change: 4e3020edfa3b3adcb79dd4d3c8e410f8cb12bf53
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-02-25 12:02:09 +0000
-
-    Ensure that the linux hints file gets updated for kfreebsd as well 
-
-  Change: 52fde6650e6a6324c7817fb81d9d08260f73d96a
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-02-25 11:41:38 +0000
-
-    Add updated hints for gnukfreebsd 
-
------------------------------------------
-version 0.78 at 2013-02-17 16:58:31 +0000
------------------------------------------
-
-  Change: 0c2be36694492d5824f7704cf9d3473c28228d99
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-02-17 16:58:31 +0000
-
-    Added midnightbsd hints file which supports 0.4 
-
------------------------------------------
-version 0.76 at 2012-08-27 23:29:08 +0000
------------------------------------------
-
-  Change: 9f71defdd149f82f3a243dfd025802dcf0e34c2a
-  Author: Ruslan Zakirov <ruz@bestpractical.com>
-  Date : 2012-08-28 00:29:08 +0000
-
-    [rt.cpan.org #79223] bad patch for 5.8.9 in 0.74
-
-    Patch for perlio.c is for patch -p1 while module runs -p0.
-
-    Signed-off-by: Chris 'BinGOs' Williams <chris@bingosnet.co.uk> 
-
------------------------------------------
-version 0.74 at 2012-07-24 18:32:11 +0000
------------------------------------------
-
-  Change: b2b8a945b03d573501700db99ae6f2b32c2cabfc
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-07-24 19:32:11 +0000
-
-    Add v5.8.9 patch
-
-    [perl #63886] 5.8.9 binary incompatibility with PL_perlio_mutex
-
-    Applied as:
-
-    commit 03fe696d61d94bd59d878a9f81b0af85465d7e1e Author: From: Edward
-    Moy <emoy@apple.com> Date: Sun Jul 8 23:01:23 2012 -0700 
-
------------------------------------------
-version 0.72 at 2012-06-04 23:44:17 +0000
------------------------------------------
-
-  Change: fcfe67838eea00f8108f80ce0cecacd014df6407
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-06-05 00:44:17 +0000
-
-    Clarify in the POD, we only facilitate building not testing 
-
------------------------------------------
-version 0.70 at 2012-05-15 07:37:48 +0000
------------------------------------------
-
-  Change: 1e16483dc23a38624187dd4b1c65a6dff2914fad
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-05-15 08:37:48 +0000
-
-    Updated Linux hints which includes gcc search libraries localisation
-    fix 
-
------------------------------------------
-version 0.68 at 2012-04-03 09:06:44 +0000
------------------------------------------
-
-  Change: e261b60280ae83ce7a643f5ebf1e33628e3e5660
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-04-03 10:06:44 +0000
-
-    Updated hints files, includes support for NetBSD 6.* 
-
 =================================================
-Plus 33 releases after 2012-02-14 00:00:00 +0000.
+Plus 45 releases after 2013-06-24 00:00:00 +0000.
 =================================================

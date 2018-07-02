@@ -4,6 +4,10 @@
 
 Wallflower::Tutorial - Turn your Plack app into a static site
 
+=head1 VERSION
+
+version 1.008
+
 =head1 SYNOPSIS
 
     # do cool stuff using Plack-aware frameworks,
@@ -84,6 +88,24 @@ C<development>, while L<wallflower> sets it to C<deployment>.
 It's therefore possible to hide the dynamic parts of the application
 in the C<development> environment, while only the static elements are
 reachable from the C<deployment> environment.
+
+=head2 Speed up site regeneration by sending 304 responses
+
+As of version 1.008, if the application sends the C<Last-Modified> header,
+it we be used to set the modification time of the target file.
+
+Since version 1.002, if the target file exists, L<wallflower> will
+send the C<If-Modified-Since> header with its modification date. If the
+application sends a C<304 Not Modified> response, the target file will
+not be modified.
+
+Note that since L<wallflower> works without using the network, this
+feature is only really useful if the response generation takes time
+and it's possible to decide to send a C<304 Not Modified> I<without>
+computing the entire response content.
+
+See L<Plack::Middleware::ConditionalGET> for basic support of C<304>
+responses.
 
 =head2 Make all URLs eventually reachable from the root
 
@@ -190,15 +212,33 @@ Wallflower in the L<Perl Advent Calendar 2012|http://perladvent.pm.org/2012/>.
 
 =item *
 
-L<http://perltricks.com/article/102/2014/7/15/Generate-static-websites-from-dynamic-Perl-web-apps>
+L<https://www.perl.com/article/102/2014/7/15/Generate-static-websites-from-dynamic-Perl-web-apps/>
 
 A presentation of Wallflower by one of its users.
 
 =item *
 
-L<http://perltricks.com/article/103/2014/7/22/Create-static-web-apps-with-Wget>
+L<https://www.perl.com/article/103/2014/7/22/Create-static-web-apps-with-Wget/>
 
 A comparison of using Wget and Wallflower to generate static web sites.
+
+=back
+
+If you're interested in static web site generators, you can check:
+
+=over 4
+
+=item *
+
+L<https://github.com/bevry/staticsitegenerators-list>
+
+A list maintained by the open-company L<Bevry|https://bevry.me/>.
+
+=item *
+
+L<https://staticsitegenerators.net/>
+
+The definitive listing of Static Site Generators (according to the site).
 
 =back
 
@@ -208,10 +248,9 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2012-2015 by Philippe Bruhat (BooK).
+Copyright 2012-2018 by Philippe Bruhat (BooK).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

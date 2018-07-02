@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -26,6 +24,7 @@ use Time::HiRes qw/usleep/;
 
 use MongoDB;
 use MongoDB::GridFSBucket;
+use BSON::Time;
 use Path::Tiny;
 
 use lib "t/lib";
@@ -86,7 +85,7 @@ sub setup_gridfs {
     open( my $file, '<:raw', $txtfile ) or die $!;
     ok( my $id = $bucket->upload_from_stream( 'input.txt', $file ),
         'upload small file' );
-    my $time = DateTime->now;
+    my $time = BSON::Time->new();
     close $file;
 
     my @chunks = $bucket->_chunks->find( { files_id => $id } )->result->all;
@@ -116,7 +115,7 @@ sub setup_gridfs {
         ),
         'upload large file'
     );
-    $time = DateTime->now;
+    $time = BSON::Time->new();
     seek $file, 0, 0;
 
     my $chunks =
@@ -142,11 +141,11 @@ sub setup_gridfs {
         'upload large file uploadDate' );
     cmp_deeply(
         $filedoc->{metadata},
-        { airspeed_velocity => '11m/s' },
+        { airspeed_velocity => str('11m/s') },
         'upload large file metadta'
     );
     is( $filedoc->{'contentType'}, 'data.bin', 'upload large file content_type' );
-    cmp_deeply( $filedoc->{aliases}, ['screenshot.png'], 'upload large file aliases' );
+    cmp_deeply( $filedoc->{aliases}, [str('screenshot.png')], 'upload large file aliases' );
 
 }
 
@@ -171,9 +170,32 @@ sub setup_gridfs {
     my $doc2 = $uploadstream->close;
     is( $uploadstream->id, 6, "created file has correct custom file id" );
     my $doc3 = $bucket->find_id(6);
-    $doc3->{uploadDate} = ignore(); # DateTime objects internals can differ :-(
-    cmp_deeply( $doc2, $doc3, "finding file created with custom file id" );
+    for my $k ( sort keys %$doc2 ) {
+        is ( $doc2->{$k}, $doc3->{$k}, "$k" );
+    }
 }
+
+# test file upload without md5
+subtest "disable_md5" => sub {
+    setup_gridfs;
+    my $bucket = $testdb->get_gridfsbucket( {disable_md5 => 1 } );
+
+    # upload_from_stream_with_id()
+    open( my $file, '<:raw', $txtfile ) or die $!;
+    $bucket->upload_from_stream_with_id( 5, "file_5.txt", $file );
+    close $file;
+    my $doc = $bucket->find_id(5);
+    ok( !exists $doc->{"md5"}, "upload_from_stream_with_id: md5 omitted" );
+
+    # open_upload_stream_with_id()
+    my $uploadstream = $bucket->open_upload_stream_with_id( 6, "file_6.txt" );
+    $uploadstream->print( "a" x 12 );
+    $uploadstream->print( "b" x 8 );
+    my $doc2 = $uploadstream->close;
+    my $doc3 = $bucket->find_id(6);
+    ok( !exists $doc2->{"md5"}, "open_upload_stream_with_id: md5 omitted in returned doc" );
+    ok( !exists $doc3->{"md5"}, "open_upload_stream_with_id: md5 omitted in uploaded doc" );
+};
 
 # delete
 {
@@ -405,9 +427,10 @@ sub text_is {
     my $doc = $uploadstream->close;
     my $id = $uploadstream->id;
     my $doc2 = $bucket->find_id($id);
-    $doc2->{uploadDate} = ignore(); # DateTime objects internals can differ :-(
-    cmp_deeply( $doc, $doc2, "close returns file document" );
-    is( $bucket->_chunks->count( { files_id => $id } ),
+    for my $k ( sort keys %$doc ) {
+        is ( $doc->{$k}, $doc2->{$k}, "$k" );
+    }
+    is( $bucket->_chunks->count_documents( { files_id => $id } ),
         2, 'custom chunk size num chunks' );
     my @results = $bucket->_chunks->find( { files_id => $id } )->all;
     is( $results[0]->{data}, 'a' x 12, 'custom chunk size boundries 1' );
@@ -435,7 +458,7 @@ sub text_is {
     $uploadstream->close;
     is( fileno($fh), undef, "fileno on closed fh returns undef" );
     my $id = $uploadstream->id;
-    is( $bucket->_chunks->count( { files_id => $id } ), 2, 'unicode upload' );
+    is( $bucket->_chunks->count_documents( { files_id => $id } ), 2, 'unicode upload' );
     is( $bucket->_files->find_id($id)->{length}, $testlen, 'unicode upload file length' );
     my $str;
     is( $bucket->open_download_stream($id)->read( $str, 100 ),

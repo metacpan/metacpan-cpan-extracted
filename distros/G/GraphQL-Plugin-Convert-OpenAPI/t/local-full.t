@@ -41,7 +41,7 @@ subtest 'GraphQL with POST' => sub {
     '{"query":"{echo(arg: \"Yo\")}"}',
   )->json_is(
     { 'data' => { 'echo' => '{"arg":"Yo"}' } },
-  );
+  )->or(sub { diag explain shift->tx->res->json });
 };
 
 done_testing;

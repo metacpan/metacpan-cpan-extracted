@@ -34,6 +34,7 @@ my $data_common = [
     'x"y',
     'foo\bar',
     "string#",
+    !1,
 ];
 my $yaml_common = <<'EOM';
 ---
@@ -47,23 +48,29 @@ my $yaml_common = <<'EOM';
 - 'foo: bar'
 - '#no comment'
 - 'also #no comment'
-- "foo\nbar"
+- |-
+  foo
+  bar
 - "x\ty\rz"
 - 'string:'
 - 'string '
 - "string\t"
 - '''string'
-- "x\n\"y\\z"
+- |-
+  x
+  "y\z
 - string
 - ^string
 - x"y
 - foo\bar
 - string#
+- ''
 EOM
 
 my $data_failsafe = [
     1,
     3.14159,
+    42.0,
     undef,
     "~",
     "0",
@@ -82,6 +89,7 @@ my $yaml_failsafe = <<'EOM';
 ---
 - 1
 - 3.14159
+- 42
 - ''
 - ~
 - 0
@@ -102,6 +110,7 @@ my $yaml_json = <<'EOM';
 ---
 - 1
 - 3.14159
+- 42.0
 - null
 - ~
 - '0'
@@ -116,11 +125,17 @@ my $yaml_json = <<'EOM';
 - TRUE
 - False
 EOM
-my $data_core = $data_failsafe;
+my $data_core = [@$data_json];
+push @$data_core, (
+    0+"inf",
+    0-"inf",
+    0+"nan",
+);
 my $yaml_core = <<'EOM';
 ---
 - 1
 - 3.14159
+- 42.0
 - null
 - '~'
 - '0'
@@ -134,6 +149,9 @@ my $yaml_core = <<'EOM';
 - 'NULL'
 - 'TRUE'
 - 'False'
+- .inf
+- -.inf
+- .nan
 EOM
 
 my $yaml_boolean = <<'EOM';
@@ -144,11 +162,25 @@ EOM
 
 subtest common => sub {
     my $ypp = YAML::PP->new(
-        schema => ['Core'],
+        schema => ['Failsafe'],
     );
     my $yaml = $ypp->dump_string($data_common);
     #diag "YAML:\n$yaml";
-    cmp_ok($yaml, 'eq', $yaml_common, "Common quoted and unquoted scalars");
+    cmp_ok($yaml, 'eq', $yaml_common, "Common quoted and unquoted scalars (Failsafe)");
+
+    $ypp = YAML::PP->new(
+        schema => ['JSON'],
+    );
+    $yaml = $ypp->dump_string($data_common);
+    #diag "YAML:\n$yaml";
+    cmp_ok($yaml, 'eq', $yaml_common, "Common quoted and unquoted scalars (JSON)");
+
+    $ypp = YAML::PP->new(
+        schema => ['Core'],
+    );
+    $yaml = $ypp->dump_string($data_common);
+    #diag "YAML:\n$yaml";
+    cmp_ok($yaml, 'eq', $yaml_common, "Common quoted and unquoted scalars (Core)");
 };
 
 subtest failsafe => sub {

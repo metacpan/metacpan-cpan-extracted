@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -22,7 +20,7 @@ package MongoDB::Op::_ListCollections;
 # names
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo;
 
@@ -70,7 +68,7 @@ sub execute {
     my ( $self, $link, $topology ) = @_;
 
     my $res =
-        $link->accepts_wire_version(3)
+        $link->supports_list_commands
       ? $self->_command_list_colls( $link, $topology )
       : $self->_legacy_list_colls( $link, $topology );
 
@@ -104,10 +102,12 @@ sub _command_list_colls {
     );
 
     my $op = MongoDB::Op::_Command->_new(
-        db_name         => $self->db_name,
-        query           => $cmd,
-        query_flags     => {},
-        bson_codec      => $self->bson_codec,
+        db_name             => $self->db_name,
+        query               => $cmd,
+        query_flags         => {},
+        bson_codec          => $self->bson_codec,
+        session             => $self->session,
+        monitoring_callback => $self->monitoring_callback,
     );
 
     my $res = $op->execute( $link, $topology );
@@ -119,20 +119,8 @@ sub _legacy_list_colls {
     my ( $self, $link, $topology ) = @_;
 
     my $op = MongoDB::Op::_Query->_new(
-        modifiers           => {},
-        allowPartialResults => 0,
-        batchSize           => 0,
-        comment             => '',
-        cursorType          => 'non_tailable',
-        limit               => 0,
-        maxAwaitTimeMS      => 0,
-        maxTimeMS           => 0,
-        noCursorTimeout     => 0,
-        oplogReplay         => 0,
-        projection          => undef,
-        skip                => 0,
-        sort                => undef,
-        %{$self->options},
+        filter          => $self->filter,
+        options         => MongoDB::Op::_Query->precondition_options($self->options),
         db_name         => $self->db_name,
         coll_name       => 'system.namespaces',
         full_name       => $self->db_name . ".system.namespaces",
@@ -140,8 +128,8 @@ sub _legacy_list_colls {
         client          => $self->client,
         read_preference => MongoDB::ReadPreference->new,
         read_concern    => MongoDB::ReadConcern->new,
-        filter          => $self->filter,
-        post_filter => \&__filter_legacy_names
+        post_filter     => \&__filter_legacy_names,
+        monitoring_callback => $self->monitoring_callback,
     );
 
     return $op->execute( $link, $topology );

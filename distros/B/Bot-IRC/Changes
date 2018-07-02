@@ -1,5 +1,9 @@
 Revision history for Bot::IRC
 
+1.21      2018-06-23 14:34:52-07:00 America/Los_Angeles
+        - Update POD to be more clear with structure examples
+        - Update store-sqlite unit test
+
 1.20      2018-06-05 13:18:12-07:00 America/Los_Angeles
         - Adding Perl versions to test; annual general update for 2018
         - Alter how Greeting plugin can get its configuration; POD updates

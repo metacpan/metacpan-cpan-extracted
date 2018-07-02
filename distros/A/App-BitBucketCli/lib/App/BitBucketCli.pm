@@ -15,7 +15,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use App::BitBucketCli::Core;
 
-our $VERSION = 0.004;
+our $VERSION = 0.005;
 
 has core => (
     is      => 'ro',
@@ -40,122 +40,6 @@ around BUILDARGS => sub {
     return $class->$orig(%param);
 };
 
-sub projects {
-    my ($self) = @_;
-
-    my @projects = sort {
-            lc $a->name cmp lc $b->name;
-        }
-        $self->core->projects();
-
-    my %len;
-    for my $project (@projects) {
-        $len{name} = length $project->name if !$len{name} || $len{name} < length $project->name;
-        $len{key} = length $project->key if !$len{key} || $len{key} < length $project->key;
-    }
-    for my $project (@projects) {
-        if ( $self->opt->long ) {
-            my $desc = $project->description || '';
-            if ( $desc ) {
-                $desc =~ s/^\s+//xms;
-
-                $desc = join "\n" . ' ' x ( $len{name} + $len{key} + 2 ),
-                    split /\r?\n/, $desc;
-            }
-
-            printf "%-$len{name}s %-$len{key}s %s\n", $project->name, $project->key, $desc;
-        }
-        else {
-            print $project->name . "\n";
-        }
-    }
-}
-
-sub repositories {
-    my ($self) = @_;
-
-    my @repositories = sort {
-            lc $a->name cmp lc $b->name;
-        }
-        $self->core->repositories($self->opt->{project});
-
-    my %len;
-    for my $repository (@repositories) {
-        $len{name} = length $repository->name if !$len{name} || $len{name} < length $repository->name;
-        $len{state} = length $repository->state if !$len{state} || $len{state} < length $repository->state;
-    }
-    for my $repository (@repositories) {
-        if ( $self->opt->long ) {
-            printf "%-$len{name}s %-$len{state}s %s\n", $repository->name, $repository->state, $repository->self;
-        }
-        else {
-            print $repository->name . "\n";
-        }
-    }
-}
-
-sub repository {
-    my ($self) = @_;
-
-    my $details  = $self->core->repository($self->opt->{project}, $self->opt->{repository});
-    my $branches = @{ $self->core->get_branches($self->opt->{project}, $self->opt->{repository}) || [] };
-    my $prs_open     = @{ $self->core->get_pull_requests($self->opt->{project}, $self->opt->{repository}) || [] };
-    my $prs_merged   = @{ $self->core->get_pull_requests($self->opt->{project}, $self->opt->{repository}, 'merged') || [] };
-    my $prs_declined = @{ $self->core->get_pull_requests($self->opt->{project}, $self->opt->{repository}, 'declined') || [] };
-
-    print $self->opt->{repository}, "\n";
-    print "  $details->{description}\n" if $details->{description};
-    print "  git clone $details->{cloneUrl}\n";
-    print "  Pull Requests: $prs_open / $prs_merged / $prs_declined\n";
-    print "  Branches     : $branches\n";
-}
-
-sub pull_requests {
-    my ($self) = @_;
-
-    my @pull_requests = sort {
-            lc $a->id cmp lc $b->id;
-        }
-        $self->core->pull_requests($self->opt->{project}, $self->opt->{repository});
-
-    my @prs;
-    my %max;
-    for my $pull_request (@pull_requests) {
-        push @prs, {
-            id     => $pull_request->id,
-            title  => $pull_request->title,
-            author => $pull_request->author->{user}{displayName},
-            from   => $pull_request->fromRef->{displayId},
-            to     => $pull_request->toRef->{displayId},
-            tasks  => $pull_request->{openTasks}->[0] || 0,
-        };
-        chomp $prs[-1]{title};
-        for my $key (keys %{ $prs[-1] }) {
-            $max{$key} = length $prs[-1]{$key} if ! $max{$key} || $max{$key} < length $prs[-1]{$key};
-        }
-    }
-
-    for my $pr (@prs) {
-        printf "%-$max{id}s ", $pr->{id};
-        printf "%-$max{author}s ", $pr->{author};
-        printf "%-$max{tasks}s ", $pr->{tasks};
-        print "$pr->{title}\n";
-    }
-}
-
-sub branches {
-    my ($self) = @_;
-
-    my @pull_requests = sort {
-            lc $a->id cmp lc $b->id;
-        }
-        $self->core->branches($self->opt->{project}, $self->opt->{repository});
-
-    for my $pull_request (@pull_requests) {
-        print $pull_request->id . ' - ' . $pull_request->title . "\n";
-    }
-}
-
 1;
 
 __END__
@@ -166,7 +50,7 @@ App::BitBucketCli - Library for talking to BitBucket Server (or Stash)
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli version 0.004
+This documentation refers to App::BitBucketCli version 0.005
 
 =head1 SYNOPSIS
 

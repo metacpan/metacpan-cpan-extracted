@@ -1,7 +1,6 @@
 ---
 abstract: 'Perl wrapper for the ldns DNS library.'
 author:
-  - 'Calle Dybedahl <calle@init.se>'
   - 'Mattias P <mattias.paivarinta@iis.se>'
 build_requires:
   Devel::CheckLib: '0.4'
@@ -16,7 +15,7 @@ configure_requires:
   ExtUtils::ParseXS: 3.18
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.18'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,4 +33,4 @@ resources:
   bugtracker: https://github.com/dotse/zonemaster-ldns/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/dotse/zonemaster-ldns
-version: 1.0.2
+version: 1.1.0

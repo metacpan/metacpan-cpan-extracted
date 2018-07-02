@@ -1,5 +1,9 @@
 Revision history for App::TimeTracker::Command::Gitlab
 
+1.004	2018-06-27T14:51:33
+    - switch to gitlab api v4 (Klaus Ita)
+
+
 1.003   2018-04-30T16:00:20
     - during --start: assign to current user, reopen if closed, add/remove labels
     - dep on JSON::MaybeXS via json_maybexs.pl

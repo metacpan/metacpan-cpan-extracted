@@ -68,7 +68,6 @@ static int save_console_messages(duk_uint_t flags, void* data,
     Perl_sv_vcatpvf(aTHX_ message, fmt, &args_copy);
     save_msg(aTHX_ duk, target, message);
     return SvCUR(message);
-
 }
 
 int pl_console_init(Duk* duk)

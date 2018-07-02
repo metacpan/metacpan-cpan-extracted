@@ -2,7 +2,7 @@ use 5.010001;
 use Test::More tests => 7;
 
 use Math::Complex;
-use Math::Polynomial::Solve qw(quartic_roots ascending_order);
+use Math::Polynomial::Solve qw(:classical);
 use Math::Utils qw(:polynomial :compare);
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ my @case = (
 	[2, 4, -1, 6, 1],
 );
 
-ascending_order(1);
+coefficients order => 'ascending';
 
 foreach (@case)
 {

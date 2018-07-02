@@ -8,33 +8,33 @@ Archive::Tar::Wrapper - API wrapper around the 'tar' utility
 
     my $arch = Archive::Tar::Wrapper->new();
 
-    # Open a tarball, expand it into a temporary directory
+        # Open a tarball, expand it into a temporary directory
     $arch->read("archive.tgz");
 
-    # Iterate over all entries in the archive
+        # Iterate over all entries in the archive
     $arch->list_reset(); # Reset Iterator
-    # Iterate through archive
+                         # Iterate through archive
     while(my $entry = $arch->list_next()) {
         my($tar_path, $phys_path) = @$entry;
         print "$tar_path\n";
     }
 
-    # Get a huge list with all entries
+        # Get a huge list with all entries
     for my $entry (@{$arch->list_all()}) {
         my($tar_path, $real_path) = @$entry;
         print "Tarpath: $tar_path Tempfile: $real_path\n";
     }
 
-    # Add a new entry
+        # Add a new entry
     $arch->add($logic_path, $file_or_stringref);
 
-    # Remove an entry
+        # Remove an entry
     $arch->remove($logic_path);
 
-    # Find the physical location of a temporary file
+        # Find the physical location of a temporary file
     my($tmp_path) = $arch->locate($tar_path);
 
-    # Create a tarball
+        # Create a tarball
     $arch->write($tarfile, $compress);
 
 # DESCRIPTION
@@ -48,8 +48,8 @@ directory on disk.
 It differs from Archive::Tar in two ways:
 
 - Archive::Tar::Wrapper doesn't hold anything in memory. Everything is
-stored on disk. 
-- Archive::Tar::Wrapper is 100% compliant with the platform's `tar` 
+stored on disk.
+- Archive::Tar::Wrapper is 100% compliant with the platform's `tar`
 utility, because it uses it internally.
 
 # METHODS
@@ -67,8 +67,8 @@ utility, because it uses it internally.
 
         my $arch = Archive::Tar::Wrapper->new(tmpdir => '/path/to/tmpdir');
 
-    Tremendous performance increases can be achieved if the temporary 
-    directory is located on a ram disk. Check the "Using RAM Disks" 
+    Tremendous performance increases can be achieved if the temporary
+    directory is located on a ram disk. Check the "Using RAM Disks"
     section below for details.
 
     Additional options can be passed to the `tar` command by using the
@@ -99,8 +99,8 @@ utility, because it uses it internally.
 
     when the `write` method gets called.
 
-    By default, the `list_*()` functions will return only file entries. 
-    Directories will be suppressed. To have `list_*()` 
+    By default, the `list_*()` functions will return only file entries.
+    Directories will be suppressed. To have `list_*()`
     return directories as well, use
 
          my $arch = Archive::Tar::Wrapper->new(
@@ -127,7 +127,7 @@ utility, because it uses it internally.
 - **$arch->read("archive.tgz")**
 
     `read()` opens the given tarball, expands it into a temporary directory
-    and returns 1 on success und `undef` on failure. 
+    and returns 1 on success or `undef` on failure.
     The temporary directory holding the tar data gets cleaned up when `$arch`
     goes out of scope.
 
@@ -154,7 +154,7 @@ utility, because it uses it internally.
     Returns the next item in the tarfile. It returns a list of three scalars:
     the relative path of the item in the tarfile, the physical path
     to the unpacked file or directory on disk, and the type of the entry
-    (f=file, d=directory, l=symlink). Note that by default, 
+    (f=file, d=directory, l=symlink). Note that by default,
     Archive::Tar::Wrapper won't display directories, unless the `dirs`
     parameter is set when running the constructor.
 
@@ -181,15 +181,15 @@ utility, because it uses it internally.
     Add a new file to the tarball. `$logic_path` is the virtual path
     of the file within the tarball. `$file_or_stringref` is either
     a scalar, in which case it holds the physical path of a file
-    on disk to be transferred (i.e. copied) to the tarball. Or it is
+    on disk to be transferred (i.e. copied) to the tarball, or it is
     a reference to a scalar, in which case its content is interpreted
     to be the data of the file.
 
-    If no additional parameters are given, permissions and user/group 
+    If no additional parameters are given, permissions and user/group
     id settings of a file to be added are copied. If you want different
     settings, specify them in the options hash:
 
-        $arch->add($logic_path, $stringref, 
+        $arch->add($logic_path, $stringref,
                    { perm => 0755, uid => 123, gid => 10 });
 
     If $file\_or\_stringref is a reference to a Unicode string, the `binmode`
@@ -206,7 +206,7 @@ utility, because it uses it internally.
 - **$arch->locate($logic\_path)**
 
     Finds the physical location of a file, specified by `$logic_path`, which
-    is the virtual path of the file within the tarball. Returns a path to 
+    is the virtual path of the file within the tarball. Returns a path to
     the temporary file `Archive::Tar::Wrapper` created to manipulate the
     tarball on disk.
 
@@ -227,6 +227,12 @@ utility, because it uses it internally.
     Checks if the tar executable is a GNU tar by running 'tar --version'
     and parsing the output for "GNU".
 
+    Returns true or false (in Perl terms).
+
+- **$arch->is\_bsd()**
+
+    Same as `is_gnu()`, but for BSD.
+
 # Using RAM Disks
 
 On Linux, it's quite easy to create a RAM disk and achieve tremendous
@@ -236,15 +242,15 @@ create the RAM disk by hand by running
     # mkdir -p /mnt/myramdisk
     # mount -t tmpfs -o size=20m tmpfs /mnt/myramdisk
 
-and then feeding the ramdisk as a temporary directory to 
+and then feeding the ramdisk as a temporary directory to
 Archive::Tar::Wrapper, like
 
     my $tar = Archive::Tar::Wrapper->new( tmpdir => '/mnt/myramdisk' );
 
 or using Archive::Tar::Wrapper's built-in option 'ramdisk':
 
-    my $tar = Archive::Tar::Wrapper->new( 
-        ramdisk => { 
+    my $tar = Archive::Tar::Wrapper->new(
+        ramdisk => {
             type => 'tmpfs',
             size => '20m',   # 20 MB
         },
@@ -255,13 +261,13 @@ to be performed as root, which often isn't desirable for security reasons.
 For this reason, Archive::Tar::Wrapper offers a utility functions that
 mounts the ramdisk and returns the temporary directory it's located in:
 
-    # Create new ramdisk (as root):
+      # Create new ramdisk (as root):
     my $tmpdir = Archive::Tar::Wrapper->ramdisk_mount(
         type => 'tmpfs',
         size => '20m',   # 20 MB
     );
 
-    # Delete a ramdisk (as root):
+      # Delete a ramdisk (as root):
     Archive::Tar::Wrapper->ramdisk_unmount();
 
 Optionally, the `ramdisk_mount()` command accepts a `tmpdir` parameter
@@ -270,13 +276,13 @@ yourself instead of letting Archive::Tar::Wrapper create it automatically.
 
 # KNOWN LIMITATIONS
 
-- Currently, only `tar` programs supporting the `z` option (for 
+- Currently, only `tar` programs supporting the `z` option (for
 compressing/decompressing) are supported. Future version will use
 `gzip` alternatively.
 - Currently, you can't add empty directories to a tarball directly.
 You could add a temporary file within a directory, and then
 `remove()` the file.
-- If you delete a file, the empty directories it was located in 
+- If you delete a file, the empty directories it was located in
 stay in the tarball. You could try to `locate()` them and delete
 them. This will be fixed, though.
 - Filenames containing newlines are causing problems with the list
@@ -285,29 +291,59 @@ iterators. To be fixed.
 a temporary directory and then calls the system tar to wrap up that directory
 into a tarball.
 
-This approach has limitations when it comes to file permissions: if the file to
-be added belongs to a different user/group, Archive::Tar::Wrapper will adjust
-the uid/gid/permissions of the target file in the temporary directory to
-reflect the original file's settings, to make sure the system `tar` will add it
-like that to the tarball, just like a regular `tar` run on the original file
-would. But this will fail of course if the original file's uid is different
-from the current user's, unless the script is running with superuser rights.
-
-The `tar` program by itself (without Archive::Tar::Wrapper) works differently:
-it'll just make a note of a file's uid/gid/permissions in the tarball (which it
-can do without superuser rights) and upon extraction, it'll adjust the
-permissions of newly generated files if the `-p` option is given (default for
-superuser).
+    This approach has limitations when it comes to file permissions: If the file to
+    be added belongs to a different user/group, Archive::Tar::Wrapper will adjust
+    the uid/gid/permissions of the target file in the temporary directory to
+    reflect the original file's settings, to make sure the system tar will add it
+    like that to the tarball, just like a regular tar run on the original file
+    would. But this will fail of course if the original file's uid is different
+    from the current user's, unless the script is running with superuser rights.
+    The tar program by itself (without Archive::Tar::Wrapper) works differently:
+    It'll just make a note of a file's uid/gid/permissions in the tarball (which it
+    can do without superuser rights) and upon extraction, it'll adjust the
+    permissions of newly generated files if the -p option is given (default for
+    superuser).
 
 # BUGS
 
-Archive::Tar::Wrapper doesn't currently handle filenames with embedded newlines.
+Archive::Tar::Wrapper doesn't currently handle filenames with embedded
+newlines.
+
+## Microsoft Windows support
+
+Support on Microsoft Windows is limited.
+
+Version below Windows 10 will not be supported for desktops, and for servers from Windows 2012 and above.
+
+The GNU `tar.exe` program doesn't work properly with the current interface of Archive::Tar::Wrapper.
+You must use the `bsdtar.exe` and make sure it appears first in the `PATH` environment variable than
+the GNU tar (if it is installed). See [http://libarchive.org/](http://libarchive.org/) for details about how to download and
+install `bsdtar.exe`, or go to [http://gnuwin32.sourceforge.net/packages.html](http://gnuwin32.sourceforge.net/packages.html) for a direct download.
+
+Windows 10 might come already with bsdtar program installed. Check 
+[https://blogs.technet.microsoft.com/virtualization/2017/12/19/tar-and-curl-come-to-windows/](https://blogs.technet.microsoft.com/virtualization/2017/12/19/tar-and-curl-come-to-windows/) for 
+more details.
+
+Having spaces in the path string to the tar program might be an issue too. Although there is some effort
+in terms of workaround it, you best might avoid it completely by installing in a different path than
+`C:\Program Files`.
 
 # LEGALESE
 
-Copyright 2005 by Mike Schilli, all rights reserved.
-This program is free software, you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This software is copyright (c) 2005 of Mike Schilli.
+
+Archive-Tar-Wrapper is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+Archive-Tar-Wrapper is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+details.
+
+You should have received a copy of the GNU General Public License along with
+Archive-Tar-Wrapper. If not, see &lt;http://www.gnu.org/licenses/>.
 
 # AUTHOR
 

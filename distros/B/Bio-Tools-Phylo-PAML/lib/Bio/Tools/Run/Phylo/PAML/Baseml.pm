@@ -1,5 +1,5 @@
 package Bio::Tools::Run::Phylo::PAML::Baseml;
-$Bio::Tools::Run::Phylo::PAML::Baseml::VERSION = '1.7.2';
+$Bio::Tools::Run::Phylo::PAML::Baseml::VERSION = '1.7.3';
 use utf8;
 use strict;
 use warnings;
@@ -339,7 +339,7 @@ Bio::Tools::Run::Phylo::PAML::Baseml - Wrapper aroud the PAML program baseml
 
 =head1 VERSION
 
-version 1.7.2
+version 1.7.3
 
 =head1 SYNOPSIS
 

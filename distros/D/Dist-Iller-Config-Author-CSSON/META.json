@@ -38,7 +38,7 @@
             "Badge::Depot::Plugin::Kwalitee" : "0",
             "Badge::Depot::Plugin::Perl" : "0",
             "Badge::Depot::Plugin::Travis" : "0",
-            "Dist::Zilla" : "6.010",
+            "Dist::Zilla" : "6.012",
             "Dist::Zilla::Plugin::Authority" : "1.009",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : "0.008",
             "Dist::Zilla::Plugin::ChangeStats::Dependencies::Git" : "0.0200",
@@ -48,11 +48,11 @@
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0.170880",
             "Dist::Zilla::Plugin::DistIller::MetaGeneratedBy" : "0",
             "Dist::Zilla::Plugin::ExecDir" : "0",
-            "Dist::Zilla::Plugin::Git" : "2.041",
+            "Dist::Zilla::Plugin::Git" : "2.045",
             "Dist::Zilla::Plugin::Git::Check" : "0",
             "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" : "0.014",
             "Dist::Zilla::Plugin::Git::Commit" : "0",
-            "Dist::Zilla::Plugin::Git::Contributors" : "0.030",
+            "Dist::Zilla::Plugin::Git::Contributors" : "0.034",
             "Dist::Zilla::Plugin::Git::GatherDir" : "0",
             "Dist::Zilla::Plugin::Git::Push" : "0",
             "Dist::Zilla::Plugin::Git::Tag" : "0",
@@ -71,7 +71,7 @@
             "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
             "Dist::Zilla::Plugin::PodWeaver" : "4.006",
             "Dist::Zilla::Plugin::Prereqs" : "0",
-            "Dist::Zilla::Plugin::PromptIfStale" : "0.054",
+            "Dist::Zilla::Plugin::PromptIfStale" : "0.055",
             "Dist::Zilla::Plugin::Readme" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.163250",
             "Dist::Zilla::Plugin::RewriteVersion::Transitional" : "0.007",
@@ -112,7 +112,7 @@
          },
          "suggests" : {
             "Dist::Iller" : "0.1408",
-            "Dist::Iller::Config::Author::CSSON" : "0.0321"
+            "Dist::Iller::Config::Author::CSSON" : "0.0322"
          }
       },
       "runtime" : {
@@ -143,11 +143,11 @@
    "provides" : {
       "Dist::Iller::Config::Author::CSSON" : {
          "file" : "lib/Dist/Iller/Config/Author/CSSON.pm",
-         "version" : "0.0321"
+         "version" : "0.0322"
       },
       "Dist::Iller::Config::Author::CSSON::MapMetro" : {
          "file" : "lib/Dist/Iller/Config/Author/CSSON/MapMetro.pm",
-         "version" : "0.0321"
+         "version" : "0.0322"
       }
    },
    "release_status" : "stable",
@@ -162,7 +162,7 @@
          "web" : "https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON"
       }
    },
-   "version" : "0.0321",
+   "version" : "0.0322",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"
@@ -190,7 +190,7 @@
                }
             },
             "name" : "Git::GatherDir",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -205,7 +205,7 @@
                }
             },
             "name" : "PromptIfStale",
-            "version" : "0.054"
+            "version" : "0.055"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
@@ -388,12 +388,12 @@
                }
             },
             "name" : "Git::Check",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
             "name" : "GithubMeta",
-            "version" : "0.54"
+            "version" : "0.58"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
@@ -473,7 +473,7 @@
                }
             },
             "name" : "Git::Contributors",
-            "version" : "0.030"
+            "version" : "0.034"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee::Extra",
@@ -661,7 +661,7 @@
                }
             },
             "name" : "CommitBeforeTag",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -670,7 +670,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.0321",
+                  "tag" : "0.0322",
                   "tag_format" : "%v",
                   "tag_message" : "Release %v%n%n%c"
                },
@@ -683,7 +683,7 @@
                }
             },
             "name" : "Git::Tag",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallRelease",
@@ -732,7 +732,7 @@
                }
             },
             "name" : "CommitAfterRelease",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -749,7 +749,7 @@
                }
             },
             "name" : "Git::Push",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Clean",

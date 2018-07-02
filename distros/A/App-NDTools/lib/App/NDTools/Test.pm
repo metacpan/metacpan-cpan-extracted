@@ -5,9 +5,16 @@ use warnings FATAL => 'all';
 use parent qw(Exporter);
 
 use Capture::Tiny qw(capture);
+use Cwd qw(abs_path);
 use Data::Dumper;
 use Scalar::Util qw(blessed);
 use Test::More;
+
+BEGIN {
+    # relative path will be incorrect when `cd t_dir` used
+    # required by Pod::Usage
+    $0 = abs_path($0);
+}
 
 our @EXPORT = qw(
     run_ok

@@ -1,12 +1,12 @@
 package Text::Table::CSV;
 
-our $DATE = '2015-12-18'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2018-06-30'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 #IFUNBUILT
-# use 5.010001;
-# use strict;
-# use warnings;
+# # use 5.010001;
+# # use strict;
+# # use warnings;
 #END IFUNBUILT
 
 sub _encode {
@@ -19,13 +19,17 @@ sub table {
     my %params = @_;
     my $rows = $params{rows} or die "Must provide rows!";
 
+    my $header_row = defined $params{header_row} ? $params{header_row} : 1;
     my $max_index = _max_array_index($rows);
 
     # here we go...
     my @table;
 
     # then the data
+    my $i = 0;
     foreach my $row ( @{ $rows }[0..$#$rows] ) {
+        $i++;
+        next if $i==1 && !$header_row;
         push @table, join(
 	    ",",
 	    map { _encode(defined($row->[$_]) ? $row->[$_] : '') } (0..$max_index)
@@ -67,7 +71,7 @@ Text::Table::CSV - Generate CSV
 
 =head1 VERSION
 
-This document describes version 0.01 of Text::Table::CSV (from Perl distribution Text-Table-CSV), released on 2015-12-18.
+This document describes version 0.020 of Text::Table::CSV (from Perl distribution Text-Table-CSV), released on 2018-06-30.
 
 =head1 SYNOPSIS
 
@@ -116,12 +120,6 @@ each row is an array reference.
 
 =back
 
-=head1 SEE ALSO
-
-The de-facto module for handling CSV in Perl: L<Text::CSV>, L<Text::CSV_XS>.
-
-See also L<Bencher::Scenario::TextTableModules>.
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Text-Table-CSV>.
@@ -138,13 +136,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+The de-facto module for handling CSV in Perl: L<Text::CSV>, L<Text::CSV_XS>.
+
+See also L<Bencher::Scenario::TextTableModules>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

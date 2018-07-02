@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::AndroidPayCard;
-$WebService::Braintree::_::AndroidPayCard::VERSION = '1.5';
+$WebService::Braintree::_::AndroidPayCard::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,12 +17,15 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
-use MooseX::Aliases;
+use Moo;
+use MooX::Aliases;
 
 extends 'WebService::Braintree::_';
 
-use WebService::Braintree::_::Subscription;
+use Types::Standard qw(ArrayRef);
+use WebService::Braintree::Types qw(
+    Subscription
+);
 
 =head1 ATTRIBUTES
 
@@ -150,7 +153,7 @@ L<subscriptions|WebService::Braintree::_::Subscription/>.
 
 has subscriptions => (
     is => 'ro',
-    isa => 'ArrayRefOfSubscription',
+    isa => ArrayRef[Subscription],
     coerce => 1,
 );
 

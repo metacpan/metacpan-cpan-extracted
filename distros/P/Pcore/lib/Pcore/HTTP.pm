@@ -279,6 +279,8 @@ sub request {
 }
 
 sub _get_on_progress_cb (%args) {
+    state $init = !!require Pcore::Util::Term::Progress;
+
     return sub ( $res, $content_length, $bytes_received ) {
         state $indicator;
 
@@ -287,7 +289,7 @@ sub _get_on_progress_cb (%args) {
 
             $args{total} = $content_length;
 
-            $indicator = P->progress->get_indicator(%args);
+            $indicator = Pcore::Util::Term::Progress->get_indicator(%args);
         }
         else {
             $indicator->update( value => $bytes_received );

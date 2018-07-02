@@ -239,10 +239,10 @@ sub check_frame {
     my $callsite = delete $got_copy{callsite};
     if (has_callsite) {
         if (exists $expected_copy{callsite}) {
-            Test::More::is($callsite, $expected_copy{callsite}, 'callsite value');
+            Test::More::is($callsite, $expected_copy{callsite}, "callsite value for line $expected_copy{line}");
             delete $expected_copy{callsite};
         } else {
-            Test::More::ok($callsite, 'callsite has a value');
+            Test::More::ok($callsite, "callsite has a value for line $expected_copy{line}");
         }
     } else {
         delete $expected_copy{callsite};

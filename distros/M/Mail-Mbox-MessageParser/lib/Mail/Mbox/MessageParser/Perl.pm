@@ -1,25 +1,20 @@
 package Mail::Mbox::MessageParser::Perl;
 
-no strict;
-
-@ISA = qw( Exporter Mail::Mbox::MessageParser );
-
 use strict;
 use Carp;
 
 use Mail::Mbox::MessageParser;
 use Mail::Mbox::MessageParser::Config;
 
-use vars qw( $VERSION $DEBUG );
+use vars qw( $VERSION $_DEBUG @ISA );
+
+@ISA = qw( Exporter Mail::Mbox::MessageParser );
 
 $VERSION = sprintf "%d.%02d%02d", q/1.60.5/ =~ /(\d+)/g;
 
-*ENTRY_STILL_VALID = \&Mail::Mbox::MessageParser::MetaInfo::ENTRY_STILL_VALID;
-sub ENTRY_STILL_VALID;
-
-*DEBUG = \$Mail::Mbox::MessageParser::DEBUG;
-*dprint = \&Mail::Mbox::MessageParser::dprint;
-sub dprint;
+*_DEBUG = \$Mail::Mbox::MessageParser::_DEBUG;
+*_dprint = \&Mail::Mbox::MessageParser::_dprint;
+sub _dprint;
 
 #-------------------------------------------------------------------------------
 
@@ -91,7 +86,7 @@ sub _read_prologue
 {
   my $self = shift;
 
-  dprint "Reading mailbox prologue using Perl";
+  _dprint "Reading mailbox prologue using Perl";
 
   $self->_read_until_match(
     qr/$Mail::Mbox::MessageParser::Config{'from_pattern'}/m,0);
@@ -111,7 +106,7 @@ sub read_next_email
 {
   my $self = shift;
 
-  return undef if $self->end_of_file();
+  return undef if $self->end_of_file(); ## no critic (ProhibitExplicitReturnUndef)
 
   $self->{'email_line_number'} = $self->{'CURRENT_LINE_NUMBER'};
   $self->{'email_offset'} = $self->{'CURRENT_OFFSET'};
@@ -129,7 +124,7 @@ sub read_next_email
   {
     # Could issue a warning here, but I'm not sure how to do this cleanly for
     # a work-only module like this. Maybe something like CGI's cgi_error()?
-    dprint "Inconsistent multi-part message. Could not find ending for " .
+    _dprint "Inconsistent multi-part message. Could not find ending for " .
       "boundary \"" . $self->_multipart_boundary() . "\"";
 
     # Try to read the content length and use that
@@ -266,7 +261,7 @@ sub _multipart_boundary
     }
   }
 
-  return undef;
+  return undef; ## no critic (ProhibitExplicitReturnUndef)
 }
 
 #-------------------------------------------------------------------------------
@@ -483,6 +478,14 @@ is the opened file handle to the mailbox.
 
 Returns a reference to a Mail::Mbox::MessageParser object, or a string
 describing the error.
+
+=item end_of_file()
+
+=item reset()
+
+=item read_next_email()
+
+These methods are overridden in this subclass of Mail::Mbox::MessageParser.
 
 =back
 

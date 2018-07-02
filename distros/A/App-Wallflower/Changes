@@ -1,12 +1,17 @@
 Revision history for App-Wallflower
 
-1.007 Mon Nov 30 2015
+1.008 2018-07-02 BOOK
+    - fix some warnings when an error response is received
+    - add a --tap option to output TAP
+    - the target file modification date is set according to Last-Modified
+
+1.007 2015-11-30 BOOK
     - return a status code 999, warn, and continue processing,
       when there is a file/directory error
     - stop using PodWeaver to produce POD
     - generate META.json
 
-1.006 Wed Jun 24 2015
+1.006 2015-06-24 BOOK
     - added --errors and --verbose options to wallflower
     - added support for callbacks in App::Wallflower
       (mostly used in testing)
@@ -14,7 +19,7 @@ Revision history for App-Wallflower
     - fixed RT #104754 files not saved in binary mode under Win32
       (thanks to Alexander Becker (ASB) and Vincent Pit (VPIT))
 
-1.005 Sat Jan 24 2015
+1.005 2015-01-24 BOOK
     - added a url attribute to declare the URL of the live application
       (thanks to Masayuki Matsuki (SONGMU) for proposing the mount, scheme
       and server_name attributes which this one replaces)
@@ -22,31 +27,31 @@ Revision history for App-Wallflower
       (thanks to Masayuki Matsuki (SONGMU))
     - added more articles about Wallflower in the tutorial
 
-1.004 Thu Dec 27 2012
+1.004 2012-12-27 BOOK
     - previous release had no $VERSION, because I forgot to use
       the appropriate dzil plugin
     - listed all articles about Wallflower in the tutorial
 
-1.003 Thu Dec 27 2012
+1.003 2012-12-27 BOOK
     - Pau Amma did a thorough proofreading of the documentation,
       during Quack and Hack Europe 2012 in Paris, improving it
       almost in time to accompany my Perl Advent Calendar article
       http://perladvent.pm.org/2012/2012-12-22.html
     - switched to Dist::Zilla for maintaining the distribution
 
-1.002 Wed Oct 24 2012
+1.002 2012-10-24 BOOK
     - added a tutorial
     - added support for If-Modified-Since headers
     - limited following links to localhost only,
       extra hosts can be added with the --host option
 
-1.001 Fri Oct 12 2012
+1.001 2012-10-12 BOOK
     - moved the core of the code in Wallflower
     - Wallflower::Util adds the capability to extract links
     - wallflower is a one-liner built around App::Wallflower
     - wallflower does not behave as a filter by default any more
 
-1.000 Wed Sep  5 2012
+1.000 2012-09-05 BOOK
     - converted the Dancer-specific wallflower into
       one that supports any PSGI/Plack application
     - 94% test coverage

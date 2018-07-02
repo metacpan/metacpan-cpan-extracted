@@ -18,8 +18,8 @@ Test::Time - Overrides the time() and sleep() core functions for testing
 # DESCRIPTION
 
 Test::Time can be used to test modules that deal with time. Once you `use` this 
-module, all references to `time` and `sleep` will be internalized. You can set
-custom time by passing time => number after the `use` statement:
+module, all references to `time`, `localtime` and `sleep` will be internalized.
+You can set custom time by passing time => number after the `use` statement:
 
     use Test::Time time => 1;
 

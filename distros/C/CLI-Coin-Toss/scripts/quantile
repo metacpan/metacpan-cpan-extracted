@@ -164,6 +164,7 @@ sub intp_val ( $ ) {
 
   --help : ヘルプを出力。(この表示を出力する。)
   --help opt : $0 の引数の内のオフションスイッチ( - で始まる引数)についての解説を表示。
+  --version : バージョン情報の表示
 
  開発メモ : 
    * 出力する数の桁数の指定が必要そう。sprintf , printf を使わないようにしたい。
@@ -173,8 +174,14 @@ sub intp_val ( $ ) {
    * 保守のために、関数内の関数を活用しようか。
 =cut 
 
-## ヘルプの扱い
-sub VERSION_MESSAGE {}
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  our $VERSION = 0.11 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+}  
 sub HELP_MESSAGE{
     use FindBin qw[ $Script ] ; 
     $ARGV[1] //= '' ;

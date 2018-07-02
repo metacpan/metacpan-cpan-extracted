@@ -7,14 +7,14 @@ use lib $FindBin::RealBin;
 
 use Pcore;
 use Pcore::Util::CA;
-use Pcore::Util::URI::Host;
+use Pcore::Util::Host;
 
 sub CLI {
     return { arg => [ script => { isa => 'Str' } ] };
 }
 
 Pcore::Util::CA::update() or exit 3;
-Pcore::Util::URI::Host->update_all or exit 3;
+Pcore::Util::Host->update_all or exit 3;
 
 1;
 __END__

@@ -3,8 +3,8 @@ use utf8;
 use vars qw ( $m_hrSettings $skip $cwd $prefix );
 use Module::Build;
 my $class = Module::Build->subclass(
-                                    class => 'Module::Build::Custom',
-                                    code  => <<'END');
+    class => 'Module::Build::Custom',
+    code  => <<'END');
 use vars qw($m_hrSettings $cwd);
 use File::Copy;
 use File::Path;
@@ -292,40 +292,40 @@ sub saveSettings {
     }
 }
 END
-
 my $inctance = $class->new(
-  get_options => {
-		  skip => {store => \$skip},
-		},
-  module_name => 'MySQL::Admin',
-  requires    => {
-	      'HTML::Menu::TreeView' => '>=1.15',
-	      'Test::More'           => '>=0.7',
-	      'DBI'                  => '>=1.50',
-	      'CGI'                  => '>=3.48',
-	      'MD5'                  => '>=2.03',
-	      'URI'                  => '>=1.40',
-	      'CGI::QuickForm'       => '>=1.93',
-		  'JSON::XS'			 => '>=3.04',
-		  'XML::Simple'			 => '>=2.25',
-	      'perl'                 => '5.006000',
-    	  'Search::Tools::UTF8'  => '>=1.003',
-    	  'Authen::Captcha'      => '>=1.024',
-          'Frontier::RPC2' => '>=0.06',
-          'XML::XSLT' => '>=0.48',
-		  'Mail::Sendmail'      => '>=0.79',
-		  'Text::Markdown::Hoedown' => '>=1.02'
-	      },
-  ($] >= 5.005 ? (AUTHOR => 'Dirk Lindner <dirk.lze@gmail.com>') : ()),
-  dist_abstract      => 'Just a MySQL administration Web-App and CMS System',
-  license            => 'lgpl',
-  create_makefile_pl => 'passthrough',
-  meta_merge => { 
-  resources => {
-      repository => 'https://sourceforge.net/p/lindnerei/code/ci/master/tree/'
-  }
-  }
-#   ,sign =>1
+    get_options => {
+        skip => { store => \$skip },
+    },
+    module_name => 'MySQL::Admin',
+    requires    => {
+        'HTML::Menu::TreeView'    => '>=1.15',
+        'Test::More'              => '>=0.7',
+        'DBI'                     => '>=1.50',
+        'CGI'                     => '>=3.48',
+        'MD5'                     => '>=2.03',
+        'URI'                     => '>=1.40',
+        'CGI::QuickForm'          => '>=1.93',
+        'JSON::XS'                => '>=3.04',
+        'XML::Simple'             => '>=2.25',
+        'perl'                    => '5.006000',
+        'Search::Tools::UTF8'     => '>=1.003',
+        'Authen::Captcha'         => '>=1.024',
+        'Frontier::RPC2'          => '>=0.06',
+        'XML::XSLT'               => '>=0.48',
+        'Mail::Sendmail'          => '>=0.79',
+        'Text::Markdown::Hoedown' => '>=1.02'
+    },
+    ( $] >= 5.005 ? ( AUTHOR => 'Dirk Lindner <dirk.lze@gmail.com>' ) : () ),
+    dist_abstract      => 'Just a MySQL administration Web-App and CMS System',
+    license            => 'lgpl',
+    create_makefile_pl => 'passthrough',
+    meta_merge         => {
+        resources => {
+            repository => 'https://sourceforge.net/p/lindnerei/code/ci/master/tree/'
+        }
+      }
+
+      #   ,sign =>1
 );
 use Cwd;
 $cwd = cwd;
@@ -333,17 +333,14 @@ $prefix =
     $inctance->{phash}{runtime_params}{disk}{prefix}
   ? $inctance->{phash}{runtime_params}{disk}{prefix}
   : '';
-
 eval 'use lib qw(/var/www/cgi-bin/lib);' if -e '/var/www/cgi-bin/lib';
 eval 'use MySQL::Admin::Settings qw(loadSettings)';
-
 unless ($@) {
     *m_hrSettings = \$MySQL::Admin::Settings::m_hrSettings;
     loadSettings("$cwd/cgi-bin/config/settings.pl") unless -e $m_hrSettings->{cgi}{bin};
 } else {
     do "$cwd/cgi-bin/config/settings.pl";
-}
-
+} ## end else
 $inctance->{properties}{htd} =
   $m_hrSettings->{cgi}{DocumentRoot} ? $m_hrSettings->{cgi}{DocumentRoot} : '/var/www/htdocs';
 $inctance->{properties}{cgi} =
@@ -359,28 +356,25 @@ $inctance->{properties}{sqlhost} =
 $inctance->{properties}{dbpass} =
   $m_hrSettings->{database}{password} ? $m_hrSettings->{database}{password} : '';
 
-if ($^O ne 'MSWin32') {
-    open(IN, "/etc/apache2/envvars") or warn $!;
-    my ($user, $group);
+if ( $^O ne 'MSWin32' ) {
+    open( IN, "/etc/apache2/envvars" ) or warn $!;
+    my ( $user, $group );
     while (<IN>) {
         $user  = $1 if $_ =~ /APACHE_RUN_USER=(.*)/;
         $group = $1 if $_ =~ /APACHE_RUN_GROUP=(.*)/;
-    }
+    } ## end while (<IN>)
     $inctance->{properties}{group} =
       $m_hrSettings->{files}{group} ? $m_hrSettings->{files}{group} : $group;
     $inctance->{properties}{owner} =
       $m_hrSettings->{files}{owner} ? $m_hrSettings->{files}{owner} : $user;
     $inctance->{properties}{chmod} =
       $m_hrSettings->{files}{chmod} ? $m_hrSettings->{files}{chmod} : '0755';
-}
-
+} ## end if ( $^O ne 'MSWin32' )
 $inctance->{properties}{password} =
   $m_hrSettings->{admin}{pass} ? $m_hrSettings->{admin}{pass} : 'testpass';
-
 $inctance->{properties}{apacheconfig} =
   $m_hrSettings->{apacheconfig} ? $m_hrSettings->{apacheconfig} : '/etc/apache2/sites-enabled/';
 $inctance->{properties}{mod} = $m_hrSettings->{mod} ? $m_hrSettings->{mod} : 'n';
-
 $inctance->{properties}{dbname}  = $inctance->args('dbname')  if $inctance->args('dbname');
 $inctance->{properties}{dbuser}  = $inctance->args('dbuser')  if $inctance->args('dbuser');
 $inctance->{properties}{sqlhost} = $inctance->args('sqlhost') if $inctance->args('sqlhost');
@@ -388,20 +382,18 @@ $inctance->{properties}{dbpass}  = $inctance->args('dbpass')  if $inctance->args
 $inctance->{properties}{cgi}     = $inctance->args('cgi')     if $inctance->args('cgi');
 $inctance->{properties}{htd}     = $inctance->args('htd')     if $inctance->args('htd');
 
-if ($^O ne 'MSWin32') {
+if ( $^O ne 'MSWin32' ) {
     $inctance->{properties}{group} = $inctance->args('group') if $inctance->args('group');
     $inctance->{properties}{chmod} = $inctance->args('chmod') if $inctance->args('chmod');
     $inctance->{properties}{owner} = $inctance->args('owner') if $inctance->args('owner');
-}
+} ## end if ( $^O ne 'MSWin32' )
 $inctance->{properties}{server}   = $inctance->args('server')   if $inctance->args('server');
 $inctance->{properties}{password} = $inctance->args('password') if $inctance->args('password');
-
 $inctance->{properties}{install_path}{perl}  = $prefix . $inctance->{properties}{cgi};
 $inctance->{properties}{install_path}{rhtml} = $prefix . $inctance->{properties}{htd};
 
 #uncomment this to install the lib files inside the cgi-bin directory
 $inctance->{properties}{install_path}{lib} = $prefix . $inctance->{properties}{cgi} . '/lib/';
-
 unless ($skip) {
     my $an = Module::Build->prompt(
         "Should i use settings from previous previous version 
@@ -421,135 +413,127 @@ unless ($skip) {
         'yes'
     );
     $skip = $an eq 'yes' ? 1 : 0;
-}
-
+} ## end unless ($skip)
 unless ($skip) {
     $inctance->{properties}{cgi} =
       $inctance->{properties}{cgi} ? $inctance->{properties}{cgi} : '/srv/www/cgi-bin';
     $inctance->{properties}{htd} =
       $inctance->{properties}{htd} ? $inctance->{properties}{htd} : '/srv/www/htdocs';
     $inctance->{properties}{htd} =
-      Module::Build->prompt('Where is your Document root ?', $inctance->{properties}{htd});
+      Module::Build->prompt( 'Where is your Document root ?', $inctance->{properties}{htd} );
     $inctance->{properties}{cgi} =
-      Module::Build->prompt('Where is your cgi-bin directory ?', $inctance->{properties}{cgi});
+      Module::Build->prompt( 'Where is your cgi-bin directory ?', $inctance->{properties}{cgi} );
     $inctance->{properties}{server} =
       $inctance->{properties}{server} ? $inctance->{properties}{server} : 'http://localhost';
     $inctance->{properties}{server} =
-      Module::Build->prompt('Enter your Server Name', $inctance->{properties}{server});
+      Module::Build->prompt( 'Enter your Server Name', $inctance->{properties}{server} );
     $inctance->{properties}{sqlhost} =
       $inctance->{properties}{sqlhost} ? $inctance->{properties}{sqlhost} : 'localhost';
     $inctance->{properties}{sqlhost} =
-      Module::Build->prompt('Enter your Mysql Server host', $inctance->{properties}{sqlhost});
+      Module::Build->prompt( 'Enter your Mysql Server host', $inctance->{properties}{sqlhost} );
     $inctance->{properties}{dbuser} =
       $inctance->{properties}{dbuser} ? $inctance->{properties}{dbuser} : 'root';
     $inctance->{properties}{dbuser} =
-      Module::Build->prompt('Enter your Mysql user name', $inctance->{properties}{dbuser});
+      Module::Build->prompt( 'Enter your Mysql user name', $inctance->{properties}{dbuser} );
     $inctance->{properties}{dbpass} =
       $inctance->{properties}{dbpass} ? $inctance->{properties}{dbpass} : "";
     $inctance->{properties}{dbpass} =
-      Module::Build->prompt('Enter your Mysql password', $inctance->{properties}{dbpass});
+      Module::Build->prompt( 'Enter your Mysql password', $inctance->{properties}{dbpass} );
     $inctance->{properties}{dbname} =
       $inctance->{properties}{dbname} ? $inctance->{properties}{dbname} : 'MYSQL_ADMIN';
     $inctance->{properties}{dbname} =
-      Module::Build->prompt('Enter your Mysql Database Name', $inctance->{properties}{dbname});
+      Module::Build->prompt( 'Enter your Mysql Database Name', $inctance->{properties}{dbname} );
 
-    if ($^O ne 'MSWin32') {
+    if ( $^O ne 'MSWin32' ) {
         $inctance->{properties}{owner} =
-          Module::Build->prompt('Enter your File Owner', $inctance->{properties}{owner});
+          Module::Build->prompt( 'Enter your File Owner', $inctance->{properties}{owner} );
         $inctance->{properties}{owner} =
           $inctance->{properties}{owner} ? $inctance->{properties}{owner} : 'www-data';
         $inctance->{properties}{group} =
           $inctance->{properties}{group} ? $inctance->{properties}{group} : 'www-data';
         $inctance->{properties}{group} =
-          Module::Build->prompt('Enter your File Owner Group', $inctance->{properties}{group});
+          Module::Build->prompt( 'Enter your File Owner Group', $inctance->{properties}{group} );
         $inctance->{properties}{chmod} =
           $inctance->{properties}{chmod} ? $inctance->{properties}{chmod} : '755';
         $inctance->{properties}{chmod} =
-          Module::Build->prompt('Enter your Chmod !', $inctance->{properties}{chmod});
-    }
-
+          Module::Build->prompt( 'Enter your Chmod !', $inctance->{properties}{chmod} );
+    } ## end if ( $^O ne 'MSWin32' )
     $inctance->{properties}{password} =
       $inctance->{properties}{password} ? $inctance->{properties}{password} : 'firststart';
     $inctance->{properties}{password} =
-      Module::Build->prompt('Enter Password for login!', $inctance->{properties}{password});
+      Module::Build->prompt( 'Enter Password for login!', $inctance->{properties}{password} );
     $inctance->{properties}{mod} =
       $inctance->{properties}{mod} ? $inctance->{properties}{mod} : 'n';
-    $inctance->{properties}{mod} = Module::Build->y_n('Use mod_perl ?', 'n');
-
-    if ($inctance->{properties}{mod}) {
+    $inctance->{properties}{mod} = Module::Build->y_n( 'Use mod_perl ?', 'n' );
+    if ( $inctance->{properties}{mod} ) {
         print qq|This script generate a virtual host config  ( mysql-admin.conf file ).$/|;
         $inctance->{properties}{apacheconfig} =
             $inctance->{properties}{apacheconfig} ? $inctance->{properties}{apacheconfig}
           : -e '/etc/apache2/sites-enabled/'      ? '/etc/apache2/sites-enabled/'
           :                                         "$inctance->{properties}{cgi}/config";
         $inctance->{properties}{apacheconfig} =
-          Module::Build->prompt(qq|Please enter the path to install the Apache config:|,
-                                '/etc/apache2/sites-enabled/');
-    }
-}
-
+          Module::Build->prompt( qq|Please enter the path to install the Apache config:|, '/etc/apache2/sites-enabled/' );
+    } ## end if ( $inctance->{properties...})
+} ## end unless ($skip)
 $m_hrSettings = {
     apacheconfig => $inctance->{properties}{apacheconfig},
     mod          => $inctance->{properties}{mod},
     config       => "$inctance->{properties}{cgi}/config/settings.pl",
     admin        => {
-              password => $inctance->{properties}{password},
-             },
+        password => $inctance->{properties}{password},
+    },
     cgi => {
-            expires      => '+1y',
-            cookiePath   => '/',
-            serverName   => $inctance->{properties}{server},
-            DocumentRoot => $inctance->{properties}{htd} =~/\/$/ ? $inctance->{properties}{htd} : $inctance->{properties}{htd}.'/',
-            bin          => $inctance->{properties}{cgi},
-            title        => 'MySQL::Admin',
-            style        => 'mysql',
-           },
-    language    => 'en',
-    version     => '1.14',
-    session     => "$inctance->{properties}{cgi}/config/session.pl",
-    actions     => "$inctance->{properties}{cgi}/config/actions.pl",
-    translate   => "$inctance->{properties}{cgi}/config/translate.pl",
-    database    => {
-                 name        => $inctance->{properties}{dbname},
-                 host        => $inctance->{properties}{sqlhost},
-                 user        => $inctance->{properties}{dbuser},
-                 password    => $inctance->{properties}{dbpass},
-                 CurrentDb   => $inctance->{properties}{dbname},
-                 CurrentHost => $inctance->{properties}{sqlhost},
-                 CurrentUser => $inctance->{properties}{dbuser},
-                 CurrentPass => $inctance->{properties}{dbpass},
-                },
+        expires      => '+1y',
+        cookiePath   => '/',
+        serverName   => $inctance->{properties}{server},
+        DocumentRoot => $inctance->{properties}{htd} =~ /\/$/ ? $inctance->{properties}{htd} : $inctance->{properties}{htd} . '/',
+        bin          => $inctance->{properties}{cgi},
+        title        => 'MySQL::Admin',
+        style        => 'mysql',
+    },
+    language  => 'en',
+    version   => '1.15',
+    session   => "$inctance->{properties}{cgi}/config/session.pl",
+    actions   => "$inctance->{properties}{cgi}/config/actions.pl",
+    translate => "$inctance->{properties}{cgi}/config/translate.pl",
+    database  => {
+        name        => $inctance->{properties}{dbname},
+        host        => $inctance->{properties}{sqlhost},
+        user        => $inctance->{properties}{dbuser},
+        password    => $inctance->{properties}{dbpass},
+        CurrentDb   => $inctance->{properties}{dbname},
+        CurrentHost => $inctance->{properties}{sqlhost},
+        CurrentUser => $inctance->{properties}{dbuser},
+        CurrentPass => $inctance->{properties}{dbpass},
+    },
     floodtime => 10,
     files     => {
-              chmod => $inctance->{properties}{chmod},
-              group => $inctance->{properties}{group},
-              owner => $inctance->{properties}{owner},
-             },
+        chmod => $inctance->{properties}{chmod},
+        group => $inctance->{properties}{group},
+        owner => $inctance->{properties}{owner},
+    },
     uploads => {
-                path      => "$inctance->{properties}{htd}/download",
-                maxlength => 2100000000000000,
-                chmod     => 0666,
-                right     => 2,
-                enabled   => 1
-               },
+        path      => "$inctance->{properties}{htd}/download",
+        maxlength => 2100000000000000,
+        chmod     => 0666,
+        right     => 2,
+        enabled   => 1
+    },
     tree => {
-             navigation => "$inctance->{properties}{cgi}/config/tree.pl",
-             links      => "$inctance->{properties}{cgi}/config/links.pl"
-            },
+        navigation => "$inctance->{properties}{cgi}/config/tree.pl",
+        links      => "$inctance->{properties}{cgi}/config/links.pl"
+    },
     news => {
-             messages  => '5',
-             captcha   => 3,
-             right     => 5,
-            },
+        messages => '5',
+        captcha  => 3,
+        right    => 5,
+    },
     defaultAction => 'ShowDatabases',
     size          => '16',
     htmlright     => '2',
     saveTranslate => '0',
-
 };
-
 saveSettings("$cwd/cgi-bin/config/settings.pl");
-
 $inctance->create_build_script;
 
 sub saveSettings {
@@ -560,8 +544,8 @@ sub saveSettings {
     my $rsas = $saveAs =~ /^(\S+)$/ ? $1 : 0;
     chmod 0644, $rsas if $^O ne 'MSWin32';
     if ($rsas) {
-        open(OUT, ">$rsas") or die "$/ saveSettings $/ $! $/ File: $rsas $/";
+        open( OUT, ">$rsas" ) or die "$/ saveSettings $/ $! $/ File: $rsas $/";
         print OUT $content;
         close OUT;
-    }
-}
+    } ## end if ($rsas)
+} ## end sub saveSettings

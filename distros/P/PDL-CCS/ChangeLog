@@ -1,3 +1,9 @@
+v1.23.9 Fri, 22 Jun 2018 13:55:35 +0200 moocow
+	+ ufunc.pd: avoid "|=" and "&=" operators (attmpet to get build working on ARM64, reported by L. Baillet)
+	  - see http://www.cpantesters.org/cpan/report/eaad8962-7102-11e8-905e-5ddc267117a8
+	  - see https://buildd.debian.org/status/package.php?p=libpdl-ccs-perl
+	+ more verbose diagnostics for failed pdlok() tests in t/common.plt
+
 v1.23.8 Fri, 15 Jun 2018 13:45:06 +0200 moocow
 	+ various fixes for debian packaging (RT bug #125587),
 	  patches provided by L. Baillet and G. Herrmann

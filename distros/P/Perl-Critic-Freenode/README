@@ -73,6 +73,10 @@ POLICIES
 
       Don't call methods indirectly
 
+    Perl::Critic::Policy::Freenode::LoopOnHash
+
+      Don't loop over hashes
+
     Perl::Critic::Policy::Freenode::ModPerl
 
       Don't use mod_perl to write web applications

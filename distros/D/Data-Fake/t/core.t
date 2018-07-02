@@ -216,6 +216,49 @@ subtest 'fake_join' => sub {
     like( $got, qr/^\d+,\d+$/, "got joined output ($got)" );
 };
 
+subtest 'fake_flatten' => sub {
+
+    my $fake_people_picker = fake_pick(qw/Larry Damian Randall/);
+    my $fake_pet_picker    = fake_pick(qw/Dog Cat Horse Hippopotamus/);
+
+    # with fake_array
+    my $factory = fake_flatten( fake_array( fake_int( 1, 5 ), $fake_people_picker ) );
+    for my $i ( 1 .. 5 ) {
+        my @got_array = $factory->();
+        ok( scalar @got_array > 0, 'array should have more than zero elements' );
+        ok( scalar @got_array < 6, 'array should have less than six elements' );
+    }
+
+    # chain the factory into a fake_join
+    $factory = fake_join( ',', $factory );
+    my $got = $factory->();
+    like( $got, qr/^(\w+,)*\w+$/, "got joined output ($got)" );
+
+    # with fake_hash
+    my $people_pet_factory = fake_hash(
+        {
+            name => $fake_people_picker,
+            pet  => $fake_pet_picker,
+        }
+    );
+
+    my $expected = {
+        name => re(qr/^(?:Larry|Damian|Randall)/),
+        pet  => re(qr/^(?:Dog|Cat|Horse|Hippopotamus)/)
+    };
+
+    for my $i ( 1 .. 5 ) {
+        my %flatten_hash = fake_flatten($people_pet_factory)->();
+        cmp_deeply( \%flatten_hash, $expected, "generated hash $i" );
+    }
+
+    # a fake_array with fake_hash
+    my $flatten_array_hash_generator =
+      fake_flatten( fake_array( fake_int( 3, 10 ), $people_pet_factory ) );
+    for my $hash_ref ( $flatten_array_hash_generator->() ) {
+        cmp_deeply( $hash_ref, $expected, "generated hash" );
+    }
+};
 done_testing;
 #
 # This file is part of Data-Fake

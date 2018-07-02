@@ -2,26 +2,30 @@ use strict;
 use warnings;
 
 use Test::More;
-use JavaScript::Duktape::XS;
+
+my $CLASS = 'JavaScript::Duktape::XS';
 
 sub test_run_gc {
+    my $vm = $CLASS->new();
+    ok($vm, "created $CLASS object");
+
     my $name = 'gonzo';
     my $count = 1_000;
-    my $duk = JavaScript::Duktape::XS->new();
-    ok($duk, "created JavaScript::Duktape::XS object");
 
-    $duk->set($name, {});
+    $vm->set($name, {});
     foreach my $index (1..$count) {
-        $duk->set("$name.value_$index", $index);
+        $vm->set("$name.value_$index", $index);
     }
-    ok($duk, "created $count slots under $name");
-    $duk->set($name, undef);
-    ok($duk, "set $name to undef");
-    my $got = $duk->run_gc();
+    ok($vm, "created $count slots under $name");
+    $vm->set($name, undef);
+    ok($vm, "set $name to undef");
+    my $got = $vm->run_gc();
     ok($got > 0, "ran GC with a non-zero number of passes ($got)");
 }
 
 sub main {
+    use_ok($CLASS);
+
     test_run_gc();
     done_testing;
 

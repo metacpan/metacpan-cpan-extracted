@@ -5,6 +5,7 @@ use strict;
 # For PRIVATE Module::Install extensions
 use lib 'private-lib';
 
+use lib '.';
 use inc::Module::Install;
 use Module::Install::GetProgramLocations;
 use File::Slurp;
@@ -35,6 +36,7 @@ requires(
 );
 
 test_requires(
+  'Test::Compile' => 0,
   'File::Slurp' => 0,
   'Test::More' => 0,
   'Text::Diff' => 0,
@@ -56,5 +58,7 @@ no_index 'directory' => 'private-lib';
 enable_verbose_cpan_testing();
 
 WriteAll();
+
+use_standard_tests;
 
 fix_sort_versions('inc/Sort/Versions.pm');

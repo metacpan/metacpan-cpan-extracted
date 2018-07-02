@@ -1,0 +1,11 @@
+# CHECKSUMS file written on Fri Jun  8 17:16:22 2018 GMT by CPAN::Checksums (v2.12)
+$cksum = {
+  'perl-5.27.3.tar.gz' => {
+    'md5' => '94a9757cf233c72e0028ddebb03767c7',
+    'md5-ungz' => '4f69e7fdc4f933009bbf023bb2fd35ab',
+    'mtime' => '2018-06-08',
+    'sha256' => '870ce471d6c8fcae6a97d3b99f334c39b19cf6cb16c087474584e0807a44791d',
+    'sha256-ungz' => '906f66642f8ac90673f1174ee6c4e7bf2e3f1b90a2f45bcba8c09fff0b7a4634',
+    'size' => 134
+  }
+};

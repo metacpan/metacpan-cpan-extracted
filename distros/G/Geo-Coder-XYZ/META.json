@@ -1,10 +1,10 @@
 {
-   "abstract" : "Provides a geocoding functionality using https://geocode.xyz",
+   "abstract" : "Provides a Geo-Coding functionality using L<https://geocode.xyz>",
    "author" : [
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Most" : "0",
-            "Test::NoWarnings" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -41,6 +40,12 @@
             "URI" : "0",
             "perl" : "5.006002"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -55,6 +60,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-XYZ"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

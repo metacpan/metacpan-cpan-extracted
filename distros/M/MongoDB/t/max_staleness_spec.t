@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2016 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -43,17 +41,22 @@ sub create_mock_topology {
     $type ||= 'Single';
 
     return MongoDB::_Topology->new(
-        uri              => MongoDB::_URI->new( uri              => $uri ),
-        type             => $type,
-        max_wire_version => 3,
-        min_wire_version => 0,
-        last_scan_time   => time + 60,
-        credential       => MongoDB::_Credential->new( mechanism => 'NONE' ),
+        uri                => MongoDB::_URI->new( uri => $uri ),
+        type               => $type,
+        min_server_version => "0.0.0",
+        max_wire_version   => 3,
+        min_wire_version   => 0,
+        last_scan_time     => time + 60,
+        credential         => MongoDB::_Credential->new(
+            mechanism           => 'NONE',
+            monitoring_callback => undef
+        ),
         (
             defined $heartbeat_frequency_ms
             ? ( heartbeat_frequency_sec => $heartbeat_frequency_ms / 1000 )
             : ()
         ),
+        monitoring_callback => undef,
     );
 }
 
@@ -69,9 +72,9 @@ sub create_mock_server {
     my ($s) = @_;
 
     my %is_master = %{ $is_master_tmpl{ $s->{type} } };
-    $is_master{lastWrite}{lastWriteDate} =
-      $s->{lastWrite}{lastWriteDate}{'$numberLong'} / 1000
-      if exists $s->{lastWrite}{lastWriteDate};
+    $is_master{lastWrite}{lastWriteDate} = BSON::Time->new(
+        value => $s->{lastWrite}{lastWriteDate}{'$numberLong'}
+    ) if exists $s->{lastWrite}{lastWriteDate};
     $is_master{minWireVersion} = 0;
     $is_master{maxWireVersion} = $s->{maxWireVersion} || 0;
     $is_master{tags}           = $s->{tags} if exists $s->{tags};

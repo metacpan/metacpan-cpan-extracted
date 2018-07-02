@@ -29,7 +29,7 @@ sub run ($self) {
 
                         return;
                     },
-                    on_auth => sub ( $h, $token, $cb ) {
+                    on_auth => sub ( $h, $token ) {
                         ( my $id, $token ) = $token->@*;
 
                         if ( $self->{token} && $self->{token} ne ( $token // q[] ) ) {
@@ -40,9 +40,7 @@ sub run ($self) {
 
                         $h->{_node_id} = $id;
 
-                        $cb->( res(200), forward => 'SWARM' );
-
-                        return;
+                        return res(200), forward => 'SWARM';
                     },
                     on_subscribe => sub ( $h, $event ) {
                         return;

@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 086d31c85834bf957577005866f69d63adce6198 AUTHOR_PLEDGE
+SHA1 351580dc856122b3a65d53b18d0273e80fac2592 CODE_OF_CONDUCT.md
+SHA1 f5bd2166080a0e71fe060bdc86ff753cbe5e79c3 CONTRIBUTORS
+SHA1 bd6162784146706bc506d0c3ab7a87cd51faf998 Changes
+SHA1 0ea3f9390f32e8280b90c58d8568e133299d6435 INSTALL
+SHA1 eb157f25f1e662b3d0a5085afbb8d20427d1348e LICENSE
+SHA1 f6fa6c990dac52571ada39ff196a95fa980081e2 MANIFEST
+SHA1 c6b1218202dd62f5f01aea4f16611145521ccff1 META.json
+SHA1 91f9d7c5170ebe15e7e445749b95be3f4b81f2ef META.yml
+SHA1 8b19baad8c759c669ff286b21d61cc813dffa579 Makefile.PL
+SHA1 94fc0a1ef5e7abc7d8a58dda2fc42c0ed1a282c6 README.mkdn
+SHA1 a87a8572bdf7456faab43c56f541c08d5cbe7af9 cpanfile
+SHA1 8d04ed3d18f6ad49301643f100751b82d82d29a9 doap.xml
+SHA1 f841f859b1951f8053fe0876406ac4e75fd1dfc0 lib/Dancer2/Plugin/Showterm.pm
+SHA1 d306946d524ec3dbc2a5682df09e0cf3c85a2130 t/00-compile.t
+SHA1 a58166f391b6f82af1395cccf22c6388bf15e876 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 ba5720e0b50b2c159699f044d42b927eaaf8c3e8 t/use.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlsq7DAACgkQ34Hwf+GwC4wLrgCglHBCeXY4jriqPZphvPdCoch6
+gPkAoKP8PnOV1W89wssL32MXpmiJRZSJ
+=Qk2L
+-----END PGP SIGNATURE-----

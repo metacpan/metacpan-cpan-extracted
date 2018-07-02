@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.014';
+our $VERSION = '2.015';
 
 use List::MoreUtils   qw( any );
 
@@ -341,10 +341,7 @@ sub group_by {
     GROUP_BY: while ( 1 ) {
         $ax->print_sql( $sql, [ $stmt_type ], $tmp );
         # Choose
-        my $col = $stmt_h->choose(
-            [ @pre, @{$sql->{cols}} ],
-            { no_spacebar => [ 0 .. $#pre ] }
-        );
+        my $col = $stmt_h->choose( [ @pre, @{$sql->{cols}} ] );
         if ( ! defined $col ) {
             if ( @{$tmp->{group_by_cols}} ) {
                 pop @{$tmp->{group_by_cols}};

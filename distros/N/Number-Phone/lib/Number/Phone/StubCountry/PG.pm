@@ -22,28 +22,51 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180410221547;
+our $VERSION = 1.20180619214157;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'format' => '$1 $2',
                   'leading_digits' => '
             [13-689]|
             27
-          ',
-                  'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{4})'
+          '
                 },
                 {
                   'pattern' => '(\\d{4})(\\d{4})',
+                  'format' => '$1 $2',
                   'leading_digits' => '
             20|
             7
-          ',
-                  'format' => '$1 $2'
+          '
                 }
               ];
 
 my $validators = {
+                'mobile' => '
+          7(?:
+            [0-689]\\d|
+            75
+          )\\d{5}
+        ',
+                'specialrate' => '',
+                'pager' => '',
+                'geographic' => '
+          (?:
+            3[0-2]\\d|
+            4[257]\\d|
+            5[34]\\d|
+            64[1-9]|
+            77(?:
+              [0-24]\\d|
+              30
+            )|
+            85[02-46-9]|
+            9[78]\\d
+          )\\d{4}
+        ',
+                'personal_number' => '',
                 'voip' => '
           2(?:
             0[0-47]|
@@ -64,30 +87,7 @@ my $validators = {
             9[78]\\d
           )\\d{4}
         ',
-                'toll_free' => '180\\d{4}',
-                'pager' => '',
-                'personal_number' => '',
-                'geographic' => '
-          (?:
-            3[0-2]\\d|
-            4[257]\\d|
-            5[34]\\d|
-            64[1-9]|
-            77(?:
-              [0-24]\\d|
-              30
-            )|
-            85[02-46-9]|
-            9[78]\\d
-          )\\d{4}
-        ',
-                'specialrate' => '',
-                'mobile' => '
-          7(?:
-            [0-689]\\d|
-            75
-          )\\d{5}
-        '
+                'toll_free' => '180\\d{4}'
               };
 my %areanames = (
   6753 => "NCD",

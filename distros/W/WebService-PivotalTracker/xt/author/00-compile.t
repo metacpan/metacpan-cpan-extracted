@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 13;
+plan tests => 14;
 
 my @module_files = (
     'WebService/PivotalTracker.pm',
@@ -18,6 +18,7 @@ my @module_files = (
     'WebService/PivotalTracker/Person.pm',
     'WebService/PivotalTracker/Project.pm',
     'WebService/PivotalTracker/ProjectIteration.pm',
+    'WebService/PivotalTracker/ProjectMembership.pm',
     'WebService/PivotalTracker/PropertyAttributes.pm',
     'WebService/PivotalTracker/Story.pm',
     'WebService/PivotalTracker/Types.pm'

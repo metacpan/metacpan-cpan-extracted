@@ -1,7 +1,13 @@
-SYNOPSIS
+NAME
+    Text::Table::Any - Generate text table using one of several backends
 
+VERSION
+    This document describes version 0.091 of Text::Table::Any (from Perl
+    distribution Text-Table-Any), released on 2018-07-02.
+
+SYNOPSIS
      use Text::Table::Any;
-    
+
      my $rows = [
          # header row
          ['Name', 'Rank', 'Serial'],
@@ -14,8 +20,7 @@ SYNOPSIS
                                    backend => 'Text::Table::Tiny');
 
 DESCRIPTION
-
-    This module provides a single function, table, which formats a
+    This module provides a single function, "table", which formats a
     two-dimensional array of data as text table, using one of several
     available backends. The interface is modelled after Text::Table::Tiny
     (0.3); Text::Table::Tiny also happens to be the default backend.
@@ -30,7 +35,7 @@ DESCRIPTION
      | carol | brig gen | 8745     |
      +-------+----------+----------+
 
-    When using Text::Table::Org backend, the result is something like:
+    When using "Text::Table::Org" backend, the result is something like:
 
      | Name  | Rank     | Serial   |
      |-------+----------+----------|
@@ -38,14 +43,14 @@ DESCRIPTION
      | bob   | cpl      | 98765321 |
      | carol | brig gen | 8745     |
 
-    When using Text::Table::CSV backend:
+    When using "Text::Table::CSV" backend:
 
      "Name","Rank","Serial"
      "alice","pvt","123456"
      "bob","cpl","98765321"
      "carol","brig gen","8745"
 
-    When using Text::ANSITable backend:
+    When using "Text::ANSITable" backend:
 
      .-------+----------+----------.
      | Name  | Rank     |   Serial |
@@ -55,7 +60,7 @@ DESCRIPTION
      | carol | brig gen |     8745 |
      `-------+----------+----------'
 
-    When using Text::ASCIITable backend:
+    When using "Text::ASCIITable" backend:
 
      .-----------------------------.
      | Name  | Rank     | Serial   |
@@ -65,14 +70,14 @@ DESCRIPTION
      | carol | brig gen |     8745 |
      '-------+----------+----------'
 
-    When using Text::FormatTable backend:
+    When using "Text::FormatTable" backend:
 
      Name |Rank    |Serial
      alice|pvt     |123456
      bob  |cpl     |98765321
      carol|brig gen|8745
 
-    When using Text::MarkdownTable backend:
+    When using "Text::MarkdownTable" backend:
 
      | Name  | Rank     | Serial   |
      |-------|----------|----------|
@@ -80,14 +85,14 @@ DESCRIPTION
      | bob   | cpl      | 98765321 |
      | carol | brig gen | 8745     |
 
-    When using Text::Table backend:
+    When using "Text::Table" backend:
 
      Name  Rank     Serial
      alice pvt        123456
      bob   cpl      98765321
      carol brig gen     8745
 
-    When using Text::TabularDisplay backend:
+    When using "Text::TabularDisplay" backend:
 
      +-------+----------+----------+
      | Name  | Rank     | Serial   |
@@ -98,61 +103,86 @@ DESCRIPTION
      +-------+----------+----------+
 
 FUNCTIONS
-
- table(%params) => str
-
- OPTIONS
-
-    The table function understands these arguments, which are passed as a
+  table(%params) => str
+  OPTIONS
+    The "table" function understands these arguments, which are passed as a
     hash.
 
-      * rows (aoaos)
+    *   rows (aoaos)
 
-      Required. Takes an array reference which should contain one or more
-      rows of data, where each row is an array reference.
+        Required. Takes an array reference which should contain one or more
+        rows of data, where each row is an array reference.
 
-      * backend (str, default Text::Table::Tiny)
+    *   backend (str, default "Text::Table::Tiny")
 
-      Optional. Pick a backend module. Supported backends:
+        Optional. Pick a backend module. Supported backends:
 
-	* Text::ANSITable
+        *   Text::ANSITable
 
-	* Text::ASCIITable
+        *   Text::ASCIITable
 
-	* Text::FormatTable
+        *   Text::FormatTable
 
-	* Text::MarkdownTable
+        *   Text::MarkdownTable
 
-	* Text::Table
+        *   Text::Table
 
-	* Text::Table::CSV
+        *   Text::Table::CSV
 
-	* Text::Table::HTML
+        *   Text::Table::TSV
 
-	* Text::Table::HTML::DataTables
+        *   Text::Table::LTSV
 
-	* Text::Table::Org
+        *   Text::Table::HTML
 
-	* Text::Table::Paragraph
+        *   Text::Table::HTML::DataTables
 
-	* Text::Table::Tiny
+        *   Text::Table::Org
 
-	* Text::Table::TinyColor
+        *   Text::Table::Paragraph
 
-	* Text::Table::TinyColorWide
+        *   Text::Table::Tiny
 
-	* Text::Table::TinyWide
+        *   Text::Table::TinyColor
 
-	* Text::TabularDisplay
+        *   Text::Table::TinyColorWide
 
-      * header_row (bool, default 0)
+        *   Text::Table::TinyWide
 
-      Optional. If given a true value, the first row in the data will be
-      interpreted as a header row, and separated visually from the rest of
-      the table (e.g. with a ruled line). But some backends won't display
-      differently.
+        *   Text::TabularDisplay
+
+    *   header_row (bool, default 0)
+
+        Optional. If given a true value, the first row in the data will be
+        interpreted as a header row, and separated visually from the rest of
+        the table (e.g. with a ruled line). But some backends won't display
+        differently.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-Table-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-Table-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Bencher::Scenario::TextTableModules
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

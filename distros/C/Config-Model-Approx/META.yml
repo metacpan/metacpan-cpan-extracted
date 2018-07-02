@@ -3,31 +3,35 @@ abstract: 'Approx configuration file editor'
 author:
   - 'Dominique Dumont'
 build_requires:
-  Config::Model::Tester: '2.042'
+  Config::Model::Tester: '3.006'
+  Config::Model::Tester::Setup: '0'
   Module::Build: '0.34'
   Test::More: '0'
 configure_requires:
-  Config::Model: '2.041'
-  Log::Log4perl: '1.11'
   Module::Build: '0.34'
-  Mouse: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Config-Model-Approx
 recommends:
-  Config::Model::CursesUI: '0'
+  App::Cme: '0'
   Config::Model::TkUI: '0'
 requires:
-  Config::Model: '2.041'
-  Log::Log4perl: '1.11'
-  perl: v5.10.1
+  Carp: '0'
+  Config::Model: '2.123'
+  Config::Model::Backend::Any: '0'
+  File::Copy: '0'
+  File::Path: '0'
+  Log::Log4perl: '0'
+  Mouse: '0'
+  perl: '5.010'
 resources:
   bugtracker: http://github.com/dod38fr/config-model-approx/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-approx.git
-version: '1.010'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.011'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

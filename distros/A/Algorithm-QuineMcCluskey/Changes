@@ -1,5 +1,12 @@
 Revision history for Algorithm-QuineMcCluskey
 
+0.17
+    2018-06-21
+	- Require latest version (0.428) of List::MoreUtils, as there seems
+	  to be a crash-worthy side-effect happening with its earlier version
+	  and Perl 5.26, as reported by Slaven Rezic.
+	- Upped the version req's of Tie::Cycle, namespace::autoclean, and
+	  Module::Build while I was at it.
 0.16
      2017-02-27
 	- The test in 24-solve.t, "A problem with sixteen possible covers",

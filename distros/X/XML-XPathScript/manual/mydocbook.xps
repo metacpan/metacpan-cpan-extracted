@@ -1,0 +1,56 @@
+<%
+
+require 'DocBook2LaTeX.pm';
+
+$XML::XPathScript::current->interpolating( 0 );
+
+$XML::XPathScript::Stylesheet::DocBook2LaTeX::numbered_sections = 0;
+
+$XML::XPathScript::trans =
+    $XML::XPathScript::Stylesheet::DocBook2LaTeX::template;
+
+$XML::XPathScript::Stylesheet::DocBook2LaTeX::firstpage = q#
+{
+\thispagestyle{empty}\pagestyle{empty}
+
+\noindent\rule{\textwidth}{1mm}
+
+\vspace{7mm}
+
+\sf
+
+\begin{flushright}
+\includegraphics[width=5in]{xps_logo.jpg}
+
+\vspace{1ex}
+{\LARGE{}version 1.45}
+\end{flushright}
+
+\vspace{7mm}
+
+\noindent\rule{\textwidth}{1mm}
+
+\vspace*{\fill}
+\begin{center}
+{ \huge
+\begin{tabular}{rl}
+by & Yanick Champoux \\\\
+   & Dominique Quatravaux \\\\
+   & Matt Sergeant \\\\
+\end{tabular}
+}
+\end{center}
+\vspace*{\fill}
+\begin{center}
+\LARGE
+\today
+\end{center}
+\rm
+
+\clearpage
+}
+#;
+
+%>
+
+<%~ / %>

@@ -3,11 +3,12 @@ use warnings;
 
 use Data::Dumper;
 use Test::More;
-use JavaScript::Duktape::XS;
+
+my $CLASS = 'JavaScript::Duktape::XS';
 
 sub test_cyclic_perl {
-    my $duk = JavaScript::Duktape::XS->new();
-    ok($duk, "created JavaScript::Duktape::XS object");
+    my $vm = $CLASS->new();
+    ok($vm, "created $CLASS object");
 
     my @array = qw/ 1 2 3 /;
     my %hash = ( "number" => 11, "string" => 'gonzo' );
@@ -17,11 +18,11 @@ sub test_cyclic_perl {
     push @array, \@array;
     # printf STDERR ("Perl: %s", Dumper({ array => \@array, hash => \%hash }));
 
-    $duk->set('perl_array', \@array);
-    $duk->set('perl_hash', \%hash);
+    $vm->set('perl_array', \@array);
+    $vm->set('perl_hash', \%hash);
 
-    my $got_array = $duk->get('perl_array');
-    my $got_hash = $duk->get('perl_hash');
+    my $got_array = $vm->get('perl_array');
+    my $got_hash = $vm->get('perl_hash');
     # printf STDERR ("Perl: %s", Dumper({ array => $got_array, hash => $got_hash }));
 
     is_deeply($got_array, \@array, "cyclic array roundtrip");
@@ -29,6 +30,8 @@ sub test_cyclic_perl {
 }
 
 sub main {
+    use_ok($CLASS);
+
     test_cyclic_perl();
     done_testing;
     return 0;

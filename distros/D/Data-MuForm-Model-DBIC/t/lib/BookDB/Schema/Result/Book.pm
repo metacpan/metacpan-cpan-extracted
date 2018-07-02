@@ -1,21 +1,6 @@
 package BookDB::Schema::Result::Book;
 
-use Moose;
-
 use base 'DBIx::Class';
-
-# following attribute is non useful, since it does
-# nothing that persists, but shows how you could
-# do something more complicated
-has 'comment' => ( isa => 'Str|Undef', is => 'rw',
-  trigger => \&set_extra );
-
-sub set_extra
-{
-   my ($self, $value) = @_;
-   $self->extra($value);
-}
-
 
 BookDB::Schema::Result::Book->load_components("Core");
 BookDB::Schema::Result::Book->table("book");

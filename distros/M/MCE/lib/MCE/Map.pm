@@ -11,7 +11,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized );
 
-our $VERSION = '1.835';
+our $VERSION = '1.836';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -75,10 +75,10 @@ sub import {
       _croak("Error: ($_argument) invalid module option");
    }
 
-   $_p->{MAX_WORKERS} = MCE::Util::_parse_max_workers($_p->{MAX_WORKERS});
+   $_p->{MAX_WORKERS} = MCE::_parse_max_workers($_p->{MAX_WORKERS});
 
-   _validate_number($_p->{MAX_WORKERS}, 'MAX_WORKERS');
-   _validate_number($_p->{CHUNK_SIZE}, 'CHUNK_SIZE')
+   MCE::_validate_number($_p->{MAX_WORKERS}, 'MAX_WORKERS', $_tag);
+   MCE::_validate_number($_p->{CHUNK_SIZE}, 'CHUNK_SIZE', $_tag)
       unless ($_p->{CHUNK_SIZE} eq 'auto');
 
    return;
@@ -258,7 +258,7 @@ sub run (&@) {
    }
 
    if (defined (my $_p = $_params->{$_pid})) {
-      $_max_workers = MCE::Util::_parse_max_workers($_p->{max_workers})
+      $_max_workers = MCE::_parse_max_workers($_p->{max_workers})
          if (exists $_p->{max_workers});
 
       delete $_p->{sequence}    if (defined $_input_data || scalar @_);
@@ -269,7 +269,7 @@ sub run (&@) {
       delete $_p->{gather}      if (exists $_p->{gather});
    }
 
-   my $_chunk_size = MCE::Util::_parse_chunk_size(
+   my $_chunk_size = MCE::_parse_chunk_size(
       $_def->{$_pkg}{CHUNK_SIZE}, $_max_workers, $_params->{$_pid},
       $_input_data, scalar @_
    );
@@ -419,21 +419,6 @@ sub _croak {
    goto &MCE::_croak;
 }
 
-sub _validate_number {
-
-   my ($_n, $_key) = @_;
-
-   _croak("$_tag: ($_key) is not valid") if (!defined $_n);
-
-   $_n =~ s/K\z//i; $_n =~ s/M\z//i;
-
-   if (!looks_like_number($_n) || int($_n) != $_n || $_n < 1) {
-      _croak("$_tag: ($_key) is not valid");
-   }
-
-   return;
-}
-
 1;
 
 __END__
@@ -450,7 +435,7 @@ MCE::Map - Parallel map model similar to the native map function
 
 =head1 VERSION
 
-This document describes MCE::Map version 1.835
+This document describes MCE::Map version 1.836
 
 =head1 SYNOPSIS
 

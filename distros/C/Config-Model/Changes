@@ -1,3 +1,17 @@
+2.125 2018-06-24
+
+  Bug fix:
+    * BackendMgr: remove close call on fh. This is now
+      handled by Path::Tiny
+
+  Breaking change:
+    * BackendMgr: remove code to read from stdin. This removes
+      the possibility to read a config file from STDIN. This was
+      deprecated since January and nobody complained.
+
+  Doc change:
+    * improve pod doc on Grab.pm
+
 2.124 2018-06-09
 
   The main change of this release should help people see what's going
@@ -14,7 +28,7 @@
     * display USER INFO log as plain message (no need of 'INFO:' prefix)
     * fix CheckList element handling when cme is run with -force option.
       (add check param to CheckList)
-    * Value: avoid warning when loading wrong boolean (gh #17)
+    * Value: avoid warning when loading wrong boolean (gh #19)
     * Avoid unneeded change notif when showing up a node that was
       previously hidden (gh #17)
     * improve error message about unknown element (gh #18)

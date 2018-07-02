@@ -1,6 +1,13 @@
 Revision history for Perl extension Devel::Size.
 
-0.81 2015-08-05 nicholas
+0.82 2018-06-23 nicholas
+  * Improve comment describing the fix in cmp_array_ro().
+  * Fix some dates in this file.
+
+0.81_50 2018-06-22 nicholas
+  * Attempt to avoid size changing side effects in cmp_array_ro().
+
+0.81 2017-08-05 nicholas
  [no changes]
 
 0.80_50 2017-06-21 nicholas

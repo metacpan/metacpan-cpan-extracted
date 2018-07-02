@@ -1,0 +1,79 @@
+{
+   "abstract" : "Lets you build groups of accessors",
+   "author" : [
+      "Matt S. Trout <mst@shadowcatsystems.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Class-Accessor-Grouped",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Class::XSAccessor" : "1.19",
+            "Pod::Coverage" : "0.14",
+            "Sub::Name" : "0.05",
+            "Test::CheckManifest" : "0.09",
+            "Test::NoTabs" : "0.03",
+            "Test::Pod" : "1.00",
+            "Test::Pod::Coverage" : "1.04",
+            "Test::Spelling" : "0.11",
+            "Test::Strict" : "0.05"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Class::XSAccessor" : "1.19",
+            "Sub::Name" : "0.05"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Module::Runtime" : "0.012",
+            "Scalar::Util" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.31",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Class-Accessor-Grouped@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Accessor-Grouped"
+      },
+      "homepage" : "https://metacpan.org/release/Class-Accessor-Grouped",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/p5sagit/Class-Accessor-Grouped.git",
+         "web" : "https://github.com/p5sagit/Class-Accessor-Grouped"
+      }
+   },
+   "version" : "0.10014",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

@@ -6,7 +6,7 @@ package # hide from pause
 use 5.010_001;
 use strictures 1;
 
-use Moose;
+use Moo;
 with 'WebService::Braintree::Role::MakeRequest';
 
 use Carp qw(confess);
@@ -23,8 +23,8 @@ sub generate {
         confess "ArgumentError" unless $self->_conditionally_verify_params($params);
         $params = {client_token => $params};
     }
-    my $result = $self->_make_request("/client_token", 'post', $params);
-    return $result->{"response"}->{"client_token"}->{"value"};
+    my $result = $self->_make_raw_request("/client_token", 'post', $params);
+    return $result->{client_token}{value};
 }
 
 

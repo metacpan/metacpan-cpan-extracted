@@ -1,0 +1,48 @@
+Sport::Analytics::NHL
+
+This is the library to access and process the data provided by the National
+Hockey League (NHL) as a public service. A variety of reports are provided
+as both HTML web pages and JSON data returned by API calls. Both are being
+utilized.
+
+This library currently contains the scraping mechanism only, but is expected
+to grow quickly beyond that.
+
+INSTALLATION
+
+Put your Mongo / path definitions in lib/Sports/Analytics/NHL/LocalConfig.pm.
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Sport::Analytics::NHL
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Sport::Analytics::NHL
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Sport::Analytics::NHL
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Sport::Analytics::NHL
+
+    Search CPAN
+        https://metacpan.org/release/Sport::Analytics::NHL
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2018 More Hockey Stats
+
+This program is released under the following license: gnu
+

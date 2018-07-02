@@ -13,20 +13,20 @@ my $gpl_lic = $class->new_from_short_name({
     holder => 'X. Ample'
 });
 
-isa_ok($gpl_lic,'Software::License::GPL_1',"license class");
+is($gpl_lic->license_class,'Software::License::GPL_1',"license class");
 
 # test fall back
 my $mit_lic = $class->new_from_short_name({
     short_name => 'MIT',
     holder => 'X. Ample'
 });
-isa_ok($mit_lic,'Software::License::MIT',"license class");
+is($mit_lic->license_class,'Software::License::MIT',"license class");
 
 my $apache_lic = $class->new_from_short_name({
     short_name => 'Apache-2.0',
     holder => 'X. Ample'
 });
-isa_ok($apache_lic,'Software::License::Apache_2_0',"license class");
+is($apache_lic->license_class,'Software::License::Apache_2_0',"license class");
 
 # kaboom test
 throws_ok {

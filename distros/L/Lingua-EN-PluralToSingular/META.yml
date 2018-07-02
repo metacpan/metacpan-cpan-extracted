@@ -23,7 +23,7 @@ resources:
   bugtracker: https://github.com/benkasminbullock/Lingua-EN-PluralToSingular/issues
   homepage: http://prepan.org/module/3Yz7PYrBN8
   repository: https://github.com/benkasminbullock/Lingua-EN-PluralToSingular
-version: '0.20'
+version: '0.21'
 x_contributors:
   - 'Xan Charbonnet'
   - H2CHANG

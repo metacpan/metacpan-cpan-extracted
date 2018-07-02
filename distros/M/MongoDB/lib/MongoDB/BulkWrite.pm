@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::BulkWrite;
 # ABSTRACT: MongoDB bulk write interface
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use MongoDB::Error;
 use MongoDB::Op::_BulkWrite;
@@ -121,8 +119,10 @@ sub _build__client {
     return $self->_database->_client;
 }
 
-with $_ for qw(
-  MongoDB::Role::_DeprecationWarner
+has _retryable => (
+    is => 'rw',
+    isa => Boolish,
+    default => 1,
 );
 
 #pod =method find
@@ -196,6 +196,10 @@ sub insert_one {
 #pod =method execute
 #pod
 #pod     my $result = $bulk->execute;
+#pod     # Optional write concern:
+#pod     my $result = $bulk->execute( $concern );
+#pod     # With options
+#pod     my $result = $bulk->execute( $concern, $options );
 #pod
 #pod Executes the queued operations.  The order and semantics depend on
 #pod whether the bulk object is ordered or unordered:
@@ -213,6 +217,17 @@ sub insert_one {
 #pod batches not exceeding 16MiB or 1000 items (for a version 2.6 or later server)
 #pod or individually (for legacy servers without write command support).
 #pod
+#pod A write concern is optional, and can either take a pre-constructed WriteConcern
+#pod object, or the arguments to construct one.  For information on write concerns,
+#pod see L<MongoDB::WriteConcern>.
+#pod
+#pod The options argument is an optional hashref which can contain the following
+#pod values:
+#pod
+#pod =for :list
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
+#pod
 #pod This method returns a L<MongoDB::BulkWriteResult> object if the bulk operation
 #pod executes successfully.
 #pod
@@ -229,10 +244,11 @@ sub insert_one {
 #pod B<NOTE>: it is an error to call C<execute> without any operations or
 #pod to call C<execute> more than once on the same bulk object.
 #pod
+#pod
 #pod =cut
 
 sub execute {
-    my ( $self, $write_concern  ) = @_;
+    my ( $self, $write_concern, $options ) = @_;
     $write_concern = to_WriteConcern($write_concern)
         if defined($write_concern) && ref($write_concern) ne 'MongoDB::WriteConcern';
 
@@ -249,8 +265,10 @@ sub execute {
 
     $write_concern ||= $self->collection->write_concern;
 
+    my $session = $self->_client->_get_session_from_hashref( $options );
 
     my $op = MongoDB::Op::_BulkWrite->_new(
+        client                   => $self->_client,
         db_name                  => $self->_database->name,
         coll_name                => $self->collection->name,
         full_name                => $self->collection->full_name,
@@ -259,21 +277,13 @@ sub execute {
         bypassDocumentValidation => $self->bypassDocumentValidation,
         bson_codec               => $self->collection->bson_codec,
         write_concern            => $write_concern,
+        session                  => $session,
+        monitoring_callback      => $self->_client->monitoring_callback,
+        _retryable               => $self->_retryable,
     );
 
+    # Op::_BulkWrite internally does retryable writes
     return $self->_client->send_write_op( $op );
-}
-
-#--------------------------------------------------------------------------#
-# Deprecated methods
-#--------------------------------------------------------------------------#
-
-sub insert {
-    my $self = shift;
-
-    $self->_warn_deprecated( 'insert' => [qw/insert_one/] );
-
-    return $self->insert_one(@_);
 }
 
 1;
@@ -290,7 +300,7 @@ MongoDB::BulkWrite - MongoDB bulk write interface
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -395,6 +405,10 @@ The method has an empty return on success; an exception will be thrown on error.
 =head2 execute
 
     my $result = $bulk->execute;
+    # Optional write concern:
+    my $result = $bulk->execute( $concern );
+    # With options
+    my $result = $bulk->execute( $concern, $options );
 
 Executes the queued operations.  The order and semantics depend on
 whether the bulk object is ordered or unordered:
@@ -414,6 +428,21 @@ unordered — operations are grouped by type and sent to the server in an unpred
 When grouping operations of a type, operations will be sent to the server in
 batches not exceeding 16MiB or 1000 items (for a version 2.6 or later server)
 or individually (for legacy servers without write command support).
+
+A write concern is optional, and can either take a pre-constructed WriteConcern
+object, or the arguments to construct one.  For information on write concerns,
+see L<MongoDB::WriteConcern>.
+
+The options argument is an optional hashref which can contain the following
+values:
+
+=over 4
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=back
 
 This method returns a L<MongoDB::BulkWriteResult> object if the bulk operation
 executes successfully.

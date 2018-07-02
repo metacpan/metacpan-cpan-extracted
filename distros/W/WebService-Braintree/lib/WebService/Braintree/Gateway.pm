@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::Gateway;
-$WebService::Braintree::Gateway::VERSION = '1.5';
+$WebService::Braintree::Gateway::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,7 +17,7 @@ In the object interface, this class provides the interface into the API.
 
 =cut
 
-use Moose;
+use Moo;
 use Class::Load qw(try_load_class);
 
 use WebService::Braintree::HTTP;

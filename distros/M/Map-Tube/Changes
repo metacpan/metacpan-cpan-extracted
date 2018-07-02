@@ -1,5 +1,13 @@
 Revision history for Map::Tube
 
+3.53  2018-06-27T12:00:00+00:00
+      - Patched issue RT #125685, thanks @TobyInk.
+
+3.52  2018-06-26T11:00:00+00:00
+      - Used File::ShareDir v1.114 instead of File::Share to cover the FAIL report.
+        http://www.cpantesters.org/cpan/report/548008f4-7312-11e8-9697-652b7347484a
+      - Upgraded min version File::ShareDir::Install v0.13.
+
 3.51  2018-05-30T00:12:10+00:00
       - Added test for map data structure.
 

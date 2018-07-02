@@ -1,0 +1,147 @@
+use XML::LibXML;
+use YAML::Loader;
+use XML::Writer;
+use Pod::DocBook;
+
+use utf8;
+
+open my $meta_fh, '<', '/home/yanick/work/xpathscript/trunk/META.yml' or die;
+
+our $doc = XML::Writer->new( NEWLINES => 1 );
+
+$doc->startTag( 'book' );
+
+do_bookinfo();
+
+do_podfile( '/home/yanick/work/xpathscript/trunk/lib/XML/XPathScript.pm' );
+
+do_podfile( $_ ) for qw{
+    /home/yanick/work/xpathscript/trunk/lib/XML/XPathScript/Stylesheet.pod
+/home/yanick/work/xpathscript/trunk/lib/XML/XPathScript/Processor.pm
+/home/yanick/work/xpathscript/trunk/lib/XML/XPathScript/Template.pm
+/home/yanick/work/xpathscript/trunk/lib/XML/XPathScript/Template/Tag.pm
+/home/yanick/work/xpathscript/trunk/lib_tomkit/Apache2/TomKit/Processor/XPathScript.pm
+/home/yanick/work/xpathscript/trunk/lib_axkit/Apache/AxKit/Language/YPathScript.pm
+/home/yanick/work/xpathscript/trunk/script/xpathscript
+};
+
+$doc->endTag;
+
+$doc->end;
+
+sub do_bookinfo {
+    my $loader = YAML::Loader->new;
+    my $meta;
+    {
+        local $/;
+        $meta = $loader->load( <$meta_fh> );
+    }
+
+    $doc->startTag( 'bookinfo' );
+    $doc->dataElement( 'title' => $meta->{name} );
+    $doc->dataElement( 'subtitle' => 'version '.$meta->{version} );
+    my @authors = @{$meta->{author}};
+    $doc->startTag( 'authorgroup' ) if @authors > 1;
+    process_author( $_ ) for @authors;
+    $doc->endTag                    if @authors > 1;
+    $doc->endTag( 'bookinfo' );
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+sub process_author {
+    my( $author ) = @_;
+
+    $author =~ s/<.*?>//;
+
+    my( $firstname, $surname ) = split ' ', $author;
+
+    $doc->startTag( 'author' );
+    $doc->dataElement( 'firstname' => $firstname );
+    $doc->dataElement( 'surname' => $surname );
+    $doc->endTag;
+
+    return;
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+sub do_podfile {
+    my( $filename ) = @_;
+
+    my $output;
+    open my $fh_out, '>', \$output;
+
+    my $parser = Pod::DocBook->new( doctype => 'chapter',
+                                        spaces => 3 );
+
+    $parser->parse_from_file( $filename, $fh_out );
+
+    $output =~ s#(<anchor.*?)>#$1 />#g;
+    $output =~ s/é/e/g;
+
+    use utf8;
+    utf8::encode( $output ) ;
+    my $doc = XML::LibXML->new->parse_string( $output );
+
+    $doc->setEncoding( 'utf8' );
+
+    my( $chapter ) = $doc->findnodes( '/chapter' );
+
+    my( $title_section ) = 
+        $chapter->findnodes( './section[title/text()="NAME"]' );
+
+    my( $title ) = $title_section ? 
+                        $title_section->findvalue( 'para/text()' )
+                        : ( undef );
+
+    my( $name,  $desc ) = split '-', $title;
+
+    my( $tn ) = $chapter->findnodes( './title' );
+    $tn->appendText( $title );
+
+    $chapter->removeChild( $title_section ) if $title_section;
+
+    my $abbrev = XML::LibXML::Element->new( 'titleabbrev' );
+    $chapter->appendChild( $abbrev );
+    $abbrev->appendText( $name );
+
+    move_description( $chapter );
+
+    remove_sections ( $chapter, 'BUGS', 'AUTHORS', 'AUTHOR' );
+
+    # move license to appendix
+
+    print $chapter->toString( 0, 'utf8'  );
+
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+sub remove_sections {
+    my $chapter = shift;
+
+    my @sections = map $chapter->findnodes( "section[title/text()='$_']" ), @_;
+
+    $chapter->removeChild( $_ ) for @sections;
+
+}
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+sub move_description {
+    my $chapter = shift;
+
+    my $first = $chapter->firstChild;
+
+    my( $description ) = $chapter->findnodes(
+    'section[title/text()="DESCRIPTION"]' );
+
+    return unless $description;
+    my( $title ) = $description->findnodes( 'title' );
+    $description->removeChild( $title );
+
+    $chapter->insertBefore( $_, $first ) for $description->childNodes;
+    $chapter->removeChild( $description );
+}
+

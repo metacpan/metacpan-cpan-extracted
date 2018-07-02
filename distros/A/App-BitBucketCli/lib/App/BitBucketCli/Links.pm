@@ -13,7 +13,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use App::BitBucketCli::Link;
 
-our $VERSION = 0.004;
+our $VERSION = 0.005;
 
 has [qw/
     clone
@@ -56,7 +56,7 @@ App::BitBucketCli::Links - Stores a projects details
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Links version 0.004
+This documentation refers to App::BitBucketCli::Links version 0.005
 
 =head1 SYNOPSIS
 

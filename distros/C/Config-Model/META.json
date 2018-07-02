@@ -98,7 +98,7 @@
          "web" : "http://github.com/dod38fr/config-model"
       }
    },
-   "version" : "2.124",
+   "version" : "2.125",
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }

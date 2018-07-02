@@ -46,10 +46,10 @@
             "Complete::Util" : "0.57",
             "DBD::SQLite" : "0",
             "DBI" : "0",
-            "Data::Sah::Coerce::perl::date::float_epoch" : "0",
-            "Data::Sah::Coerce::perl::date::obj_DateTime" : "0",
-            "Data::Sah::Coerce::perl::date::obj_TimeMoment" : "0",
-            "Data::Sah::Coerce::perl::date::str_iso8601" : "0",
+            "Data::Sah::Coerce::perl::date::float_epoch" : "0.025",
+            "Data::Sah::Coerce::perl::date::obj_DateTime" : "0.025",
+            "Data::Sah::Coerce::perl::date::obj_TimeMoment" : "0.025",
+            "Data::Sah::Coerce::perl::date::str_iso8601" : "0.025",
             "Data::Sah::Coerce::perl::str::str_normalize_perl_distname" : "0",
             "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" : "0",
             "Data::Sah::Coerce::perl::str::str_strip_trailing_slash" : "0",
@@ -75,26 +75,26 @@
             "Log::ger" : "0.023",
             "Logfile::Rotate" : "0",
             "Module::CoreList::More" : "0.04",
-            "Module::Patch" : "0.26",
+            "Module::Patch" : "0.270",
             "Module::XSOrPP" : "0",
             "OrePAN" : "0",
             "PERLANCAR::Module::List" : "0",
             "POSIX" : "0",
             "Parse::CPAN::Meta" : "0",
             "Perinci::CmdLine::Any" : "0.13",
-            "Perinci::CmdLine::Util::Config" : "1.71",
+            "Perinci::CmdLine::Util::Config" : "1.721",
             "Perinci::Object" : "0.26",
             "Perinci::Sub::DepChecker" : "0",
             "PerlIO::gzip" : "0",
             "Pod::Simple::Methody" : "0",
             "Proc::ChildError" : "0",
-            "SQL::Schema::Versioned" : "0.18",
+            "SQL::Schema::Versioned" : "0.234",
             "Sah::Schema::dirname" : "0",
             "Sah::Schema::filename" : "0",
             "Sah::Schema::perl::distname" : "0",
             "Sah::Schema::perl::modname" : "0",
             "Sah::Schema::posint" : "0",
-            "Version::Util" : "0",
+            "Version::Util" : "0.731",
             "base" : "0",
             "experimental" : "0",
             "parent" : "0",
@@ -126,10 +126,10 @@
          "web" : "https://github.com/perlancar/perl-App-lcpan"
       }
    },
-   "version" : "1.022",
+   "version" : "1.023",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026000"
+         "version" : "5.024000"
       },
       "plugins" : [
          {
@@ -305,67 +305,67 @@
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@Author::PERLANCAR/Name",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@Author::PERLANCAR/Version",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::PERLANCAR/prelude",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "SYNOPSIS",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "DESCRIPTION",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "OVERVIEW",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "ATTRIBUTES",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "METHODS",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Collect",
                         "name" : "FUNCTIONS",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@Author::PERLANCAR/Leftovers",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@Author::PERLANCAR/postlude",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Completion::GetoptLongComplete",
@@ -400,12 +400,12 @@
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@Author::PERLANCAR/Authors",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
                         "name" : "@Author::PERLANCAR/Legal",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
@@ -420,12 +420,12 @@
                      {
                         "class" : "Pod::Weaver::Plugin::EnsureUniqueSections",
                         "name" : "@Author::PERLANCAR/EnsureUniqueSections",
-                        "version" : "0.163250"
+                        "version" : "0.121550"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@Author::PERLANCAR/SingleEncoding",
-                        "version" : "4.015"
+                        "version" : "4.014"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
@@ -451,7 +451,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.13"
+            "version" : "0.142"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",
@@ -484,12 +484,11 @@
                   "script_finder" : [
                      ":PerlExecFiles"
                   ],
-                  "skips" : [],
-                  "switch" : []
+                  "skips" : []
                }
             },
             "name" : "@Author::PERLANCAR/Test::Compile",
-            "version" : "2.056"
+            "version" : "2.054"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
@@ -525,7 +524,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::EnsureVersion",
             "name" : "@Author::PERLANCAR/Prereqs::EnsureVersion",
-            "version" : "0.04"
+            "version" : "0.050"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::CheckCircular",
@@ -630,7 +629,7 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217",
    "x_static_install" : 1
 }
 

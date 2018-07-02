@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.014';
+our $VERSION = '2.015';
 
 use File::Basename        qw( fileparse );
 use File::Spec::Functions qw( catfile );

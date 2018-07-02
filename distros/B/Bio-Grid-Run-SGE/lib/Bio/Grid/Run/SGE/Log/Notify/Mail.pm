@@ -9,7 +9,7 @@ use Carp;
 use 5.010;
 use Bio::Grid::Run::SGE::Util qw/my_glob/;
 
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.064'; # VERSION
 use Email::Sender::Simple qw(sendmail);
 use Email::Simple;
 use Email::Simple::Creator;

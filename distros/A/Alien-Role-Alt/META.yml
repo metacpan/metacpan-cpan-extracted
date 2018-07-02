@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,14 +20,16 @@ no_index:
   directory:
     - corpus
 requires:
-  Alien::Base: '0.79'
+  Alien::Base: '1.45'
   Class::Method::Modifiers: '0'
   Role::Tiny: '1.003001'
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/plicease/Alien-Role-Alt/issues
+  bugtracker: https://github.com/Perl5-Alien/Alien-Role-Alt/issues
   homepage: https://metacpan.org/pod/Alien::Role::Alt
-  repository: git://github.com/plicease/Alien-Role-Alt.git
-version: '0.03'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  repository: git://github.com/Perl5-Alien/Alien-Role-Alt.git
+version: '0.04'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

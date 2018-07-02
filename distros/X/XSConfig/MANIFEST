@@ -6,6 +6,7 @@ Config_xs.out
 Config_xs.PL
 Config_xs_heavy.pl.PL
 Dummy.c
+DumpDotC.PL
 gperftest.in
 Makefile.PL
 MANIFEST			This list of files

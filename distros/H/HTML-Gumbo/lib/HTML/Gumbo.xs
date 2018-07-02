@@ -105,7 +105,7 @@ out_text(SV* out, const char* v) {
         if (i != prev)
             sv_catpvn(out, v+prev, i-prev);
         sv_catpv(out, v[i] == '&'? "&amp;": (v[i] == '<'? "&lt;" : "&gt;"));
-        prev = ++i;
+        prev = i + 1;
     }
     if (prev < len)
         sv_catpvn(out, v+prev, len-prev);

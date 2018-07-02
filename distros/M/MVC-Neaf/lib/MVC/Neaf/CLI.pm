@@ -2,7 +2,7 @@ package MVC::Neaf::CLI;
 
 use strict;
 use warnings;
-our $VERSION = 0.2501;
+our $VERSION = 0.2601;
 
 =head1 NAME
 
@@ -145,7 +145,7 @@ sub run_test {
 
     if (my $up =  delete $test{upload}) {
         foreach (@$up) {
-            /^(\w+)=(.+)$/ or croak "Usage: --upload key=/path/to/file";
+            /^(\S+?)=(.+)$/ or croak "Usage: --upload key=/path/to/file";
             my ($key, $file) = ($1, $2);
 
             open my $fd, "<", $file
@@ -159,7 +159,7 @@ sub run_test {
 
     if (my $cook = delete $test{cookie}) {
         foreach (@$cook) {
-            /^(\w+)=(.*)$/
+            /^(\S+?)=(.*)$/
                 or croak "Usage: --cookie name=value";
             $test{cookie}{$1} = $2;
         };

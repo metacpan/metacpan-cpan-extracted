@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+# Simple program to look up and print the information on a given address.
+#	e.g. "./address_lookup Fairfield Road, Broadstairs, Kent, UK"
+
+use warnings;
+use strict;
+use autodie qw(:all);
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+use Geo::Coder::Free;
+
+if(scalar(@ARGV) == 0) {
+	die "Usage: $0 location";
+}
+
+# print join(' ', @ARGV), "\n";
+if(my $rc = Geo::Coder::Free->new()->geocode(location => join(' ', @ARGV))) {
+	print Data::Dumper->new([$rc])->Dump();
+} else {
+	exit(1);
+}

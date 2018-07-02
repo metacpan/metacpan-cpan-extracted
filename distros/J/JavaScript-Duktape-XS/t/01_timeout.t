@@ -2,22 +2,13 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use Path::Tiny;
 use Test::More;
-use Test::Output;
-use JavaScript::Duktape::XS;
+use Test::Output qw/ stderr_like /;
 
-sub load_js_file {
-    my ($duk, $file) = @_;
-
-    my $path = Path::Tiny::path($file);
-    my $code = $path->slurp_utf8();
-    $duk->eval($code);
-    ok(1, "loaded file '$file'");
-}
+my $CLASS = 'JavaScript::Duktape::XS';
 
 sub test_js_timeout {
-    my ($duk) = @_;
+    my ($vm) = @_;
 
     my $js = <<JS;
 var perl_ret = 'EMPTY';
@@ -45,14 +36,14 @@ function main() {
     perl_ret += 4
 }
 JS
-    my $got_eval = $duk->eval($js);
-    my $got_run = $duk->dispatch_function_in_event_loop('main');
-    my $perl_ret = $duk->get('perl_ret');
+    my $got_eval = $vm->eval($js);
+    my $got_run = $vm->dispatch_function_in_event_loop('main');
+    my $perl_ret = $vm->get('perl_ret');
     is($perl_ret, 'EMPTY1234567', "timeouts dispatched correctly");
 }
 
 sub test_timeout_with_error {
-    my ($duk) = @_;
+    my ($vm) = @_;
 
     my $js = <<JS;
 function main() {
@@ -62,18 +53,20 @@ function main() {
     })
 }
 JS
-    my $got_eval = $duk->eval($js);
-    stderr_like sub { $duk->dispatch_function_in_event_loop('main'); },
+    my $got_eval = $vm->eval($js);
+    stderr_like sub { $vm->dispatch_function_in_event_loop('main'); },
                 qr/Error:/,
                 "got correct error from setTimeout";
 }
 
 sub main {
-    my $duk = JavaScript::Duktape::XS->new();
-    ok($duk, "created JavaScript::Duktape::XS object");
+    use_ok($CLASS);
 
-    test_js_timeout($duk);
-    test_timeout_with_error($duk);
+    my $vm = $CLASS->new();
+    ok($vm, "created $CLASS object");
+
+    test_js_timeout($vm);
+    test_timeout_with_error($vm);
 
     done_testing;
     return 0;

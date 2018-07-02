@@ -1,0 +1,53 @@
+#!perl
+# ABSTRACT: command line client for JIRA
+# PODNAME: jc.pl
+use strict;
+use warnings;
+use Try::Tiny;
+use Config::Any;
+use Data::Dumper;
+use App::JC::Client;
+
+my %options;
+my $cfg=Config::Any->load_stems({stems=>[$ENV{HOME}."/.jc"],use_ext=>1});
+
+for (@$cfg) {
+               my ($filename, $config) = %$_;
+               $options{url}=$config->{'url'} if defined($config->{'url'});
+               $options{user}=$config->{'user'} if defined($config->{'user'});
+               $options{pass}=$config->{'pass'} if defined($config->{'pass'});
+               $options{defaulttasktype}=$config->{'default'}->{'tasktype'} if defined($config->{'default'}->{'tasktype'});
+}
+
+
+$options{cfg}=$cfg;
+
+App::JC::Client->new_with_command(%options)->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+jc.pl - command line client for JIRA
+
+=head1 VERSION
+
+version 0.001
+
+=head1 AUTHOR
+
+Dominik Meyer <dmeyer@federationhq.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Dominik Meyer.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991
+
+=cut

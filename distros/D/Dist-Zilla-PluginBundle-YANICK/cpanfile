@@ -12,6 +12,7 @@ requires "Dist::Zilla::Plugin::Covenant" => "0";
 requires "Dist::Zilla::Plugin::DOAP" => "0";
 requires "Dist::Zilla::Plugin::Git" => "0";
 requires "Dist::Zilla::Plugin::Git::Contributors" => "0";
+requires "Dist::Zilla::Plugin::GitHubREADME::Badge" => "0.23";
 requires "Dist::Zilla::Plugin::GithubMeta" => "0";
 requires "Dist::Zilla::Plugin::HelpWanted" => "0";
 requires "Dist::Zilla::Plugin::InstallGuide" => "1.200000";

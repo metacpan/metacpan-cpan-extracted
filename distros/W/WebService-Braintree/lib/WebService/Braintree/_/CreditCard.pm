@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::CreditCard;
-$WebService::Braintree::_::CreditCard::VERSION = '1.5';
+$WebService::Braintree::_::CreditCard::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,10 +17,18 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
-use MooseX::Aliases;
+use Moo;
+use MooX::Aliases;
 
 extends 'WebService::Braintree::_';
+
+use Types::Standard qw(ArrayRef Undef);
+use WebService::Braintree::Types qw(
+    Address
+    CreditCardVerification
+    PaymentMethodNonce
+    Subscription
+);
 
 =head1 ATTRIBUTES
 
@@ -35,7 +43,7 @@ object of type L<WebService::Braintree::_::Address/>.
 
 has billing_address => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::Address',
+    isa => Address,
     coerce => 1,
 );
 
@@ -239,7 +247,7 @@ C<< nonce() >> is an alias for this attribute.
 
 has payment_method_nonce => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::PaymentMethodNonce|Undef',
+    isa => PaymentMethodNonce | Undef,
     coerce => 1,
     default => sub {
         my $self = shift;
@@ -288,7 +296,7 @@ associated with this credit card.
 
 has subscriptions => (
     is => 'ro',
-    isa => 'ArrayRefOfSubscription',
+    isa => ArrayRef[Subscription],
     coerce => 1,
 );
 
@@ -346,7 +354,7 @@ associated with this credit card.
 
 has verifications => (
     is => 'ro',
-    isa => 'ArrayRefOfCreditCardVerification',
+    isa => ArrayRef[CreditCardVerification],
     coerce => 1,
 );
 

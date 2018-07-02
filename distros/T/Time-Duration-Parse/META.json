@@ -4,7 +4,7 @@
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -44,6 +44,7 @@
          "web" : "https://github.com/neilb/Time-Duration-Parse"
       }
    },
-   "version" : "0.13"
+   "version" : "0.14",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

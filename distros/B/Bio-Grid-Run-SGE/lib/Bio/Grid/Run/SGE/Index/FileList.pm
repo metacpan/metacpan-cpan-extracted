@@ -10,7 +10,7 @@ use List::MoreUtils qw/uniq/;
 use Bio::Grid::Run::SGE::Util qw/glob_list/;
 extends 'Bio::Grid::Run::SGE::Index::List';
 
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.064'; # VERSION
 
 around 'create' => sub {
   my $orig = shift;

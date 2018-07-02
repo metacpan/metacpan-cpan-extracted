@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.124';
+$Config::Model::BackendMgr::VERSION = '2.125';
 use Mouse;
 use strict;
 use warnings;
@@ -298,29 +298,14 @@ sub try_read_backend {
         $logger->warn("suffix method is deprecated. you can remove it from backend $backend");
     }
 
-    my ($file_path, $fh);
+    my ( $file_ok, $file_path ) = $self->get_cfg_file_path(
+        @read_args,
+        skip_compute => $backend_obj->skip_open,
+    );
 
-    if ( defined $config_file_override and $config_file_override eq '-' ) {
-        $file_path = $config_file_override; # may be used in error messages
-        $logger->trace("auto_read: $backend override target file is STDIN");
-        $logger->warn("Using STDIN to read config (option -file '-') is deprecated and will be removed in June 2018. Please contact the author if you think this is a bad idea.");
-        $fh = IO::Handle->new();
-        if ($fh->fdopen( fileno(STDIN), "r" )) {
-            $fh->binmode(":utf8");
-        }
-        else {
-            return ( 0, '-');
-        }
-    }
-    else {
-        ( my $file_ok, $file_path ) = $self->get_cfg_file_path(
-            @read_args,
-            skip_compute => $backend_obj->skip_open,
-        );
-
-        if (not $backend_obj->skip_open and $file_ok) {
-            $fh = $self->open_read_file($file_path) ;
-        }
+    my $fh;
+    if (not $backend_obj->skip_open and $file_ok) {
+        $fh = $self->open_read_file($file_path) ;
     }
 
     my $f = $self->rw_config->{function} || 'read';
@@ -415,17 +400,7 @@ sub auto_write_init {
             ( $file_ok, $file_path ) = $self->get_cfg_file_path( @wr_args, %cb_args);
         }
 
-        if ($file_ok and $file_path eq '-' ) {
-            my $io = IO::Handle->new();
-            if ( $io->fdopen( fileno(STDOUT), "w" ) ) {
-                $file_ok = 1;
-                $io->binmode(':utf8');
-            }
-            else {
-                return ( 0, '-' );
-            }
-        }
-        elsif ($file_ok) {
+        if ($file_ok) {
             $fh = $self->open_file_to_write( $backend, $file_path, delete $cb_args{backup} );
         }
 
@@ -447,7 +422,7 @@ sub auto_write_init {
             my $error = $@;
             $logger->warn( "write backend $backend $backend_class" . '::' . "$f failed: $error" )
                 if $error;
-            $self->close_file_to_write( $error, $fh, $file_path, $rw_config->{file_mode} );
+            $self->close_file_to_write( $error, $file_path, $rw_config->{file_mode} );
 
             $self->auto_delete($file_path, \%backend_args)
                 if $rw_config->{auto_delete} and not $backend_class->skip_open ;
@@ -499,11 +474,9 @@ sub open_file_to_write {
 }
 
 sub close_file_to_write {
-    my ( $self, $error, $fh, $file_path, $file_mode ) = @_;
+    my ( $self, $error, $file_path, $file_mode ) = @_;
 
     return unless defined $file_path;
-
-    $fh->close;
 
     if ($error) {
         # restore backup and display error
@@ -528,7 +501,7 @@ sub is_auto_write_for_type {
 __PACKAGE__->meta->make_immutable;
 
 package Config::Model::DeprecatedHandle;
-$Config::Model::DeprecatedHandle::VERSION = '2.124';
+$Config::Model::DeprecatedHandle::VERSION = '2.125';
 our $AUTOLOAD;
 
 sub new {
@@ -543,11 +516,15 @@ sub AUTOLOAD {
     my $f = $AUTOLOAD;
     $f =~ s/.*:://;
     my ($package, $filename, $line) = caller;
-    $logger->warn("io_handle backend parameter is deprecated, please use file_path parameter. ",
-              "($filename:$line)") unless $package eq "Config::Model::BackendMgr";
 
     # $$self may not be defined during destruction
     if ($$self and $self->can($f)) {
+        $logger->warn(
+            "io_handle backend parameter is deprecated, ",
+            "please use file_path parameter. ",
+            "(called $f at $filename:$line)"
+        ) unless $package eq "Config::Model::BackendMgr";
+
         $$self->$f(@_);
     }
 }
@@ -567,7 +544,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.124
+version 2.125
 
 =head1 SYNOPSIS
 
@@ -720,9 +697,6 @@ name. For instance, with C<file> set to C<&element-&index.conf>:
      nodeA  # values of nodeA are stored in service.foo.conf
    bar      # hash index
      nodeB  # values of nodeB are  stored in service.bar.conf
-
-Alternatively, C<file> can be set to C<->, in which case, the
-configuration is read from STDIN.
 
 =item file_mode
 

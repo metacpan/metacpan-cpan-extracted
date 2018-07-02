@@ -2,9 +2,7 @@ use strict;
 use MySQL::Admin::Settings;
 use vars qw($m_hrSettings);
 *m_hrSettings = \$MySQL::Admin::Settings::m_hrSettings;
-$m_hrSettings = {
-                 config => "???config.pl",
-                };
+$m_hrSettings = { config => "???config.pl", };
 saveSettings("./config.pl");
 loadSettings("./config.pl");
 my $t1 = $m_hrSettings->{config};
@@ -13,8 +11,8 @@ saveSettings('./config.pl');
 loadSettings('./config.pl');
 my $t2 = $m_hrSettings->{config};
 use Test::More tests => 2;
-ok($t1 eq "???config.pl");
-ok($t2 eq "./config.pl");
+ok( $t1 eq "???config.pl" );
+ok( $t2 eq "./config.pl" );
 unlink('./config.pl');
 unlink('%CONFIG%');
 1;

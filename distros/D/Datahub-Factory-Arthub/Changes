@@ -1,5 +1,9 @@
 Revision history for Datahub-Factory-VKC
 
+0.98  2018-06-20 16:33:07 CEST
+
+    - Changed: updated KMSKA modules for TMS 2017.
+
 0.97  2018-05-03 15:27:40 CEST
 
     - Fixed: Fixes #2 Multiple LidoRecID's.

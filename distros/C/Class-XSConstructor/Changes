@@ -1,0 +1,60 @@
+Class-XSConstructor
+===================
+
+Created:      2018-06-19
+Home page:    <https://metacpan.org/release/Class-XSConstructor>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Class-XSConstructor>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.008	2018-06-21
+
+ [ Packaging ]
+ - Don't use old versions of Devel::PPPort.
+ - Perl 5.8.1 support didn't work; change required version of Perl to
+   5.8.8.
+
+0.007	2018-06-20
+
+ [ Packaging ]
+ - Allow installation on Perl 5.8.1.
+ - Devel::PPPort should be a configure recommentation, not a build
+   requirement.
+
+ [ Other ]
+ - Added: $Class::XSConstructor::REDEFINE to allow an existing `new` to be
+   redefined without a warning.
+
+0.006	2018-06-20
+
+ [ Bug Fixes ]
+ - Fix a bunch of XS compilation warnings.
+ - Fix buggy implementation of type constraints.
+ - XS stuff now works in threaded perls.
+
+ [ Documentation ]
+ - Document support for coderef type constraints.
+
+0.005	2018-06-20
+
+ [ Bug Fixes ]
+ - Fix support for Perl 5.8.
+
+0.004	2018-06-20
+
+ [ Bug Fixes ]
+ - Fix more broken assertions in XS code.
+
+0.003	2018-06-20
+
+ [ Packaging ]
+ - Add dep on MRO::Compat for Perl 5.8.
+
+0.002	2018-06-20
+
+ [ Bug Fixes ]
+ - Fix some broken assertions in XS code.
+
+ [ Documentation ]
+ - Add SEE ALSO section.
+
+0.001	2018-06-20	Initial release

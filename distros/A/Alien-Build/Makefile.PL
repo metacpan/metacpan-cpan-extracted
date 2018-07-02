@@ -81,6 +81,7 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Plugin/PkgConfig/PP.pm"             => "\$(INST_LIB)/Alien/Build/Plugin/PkgConfig/PP.pm",
     "lib/Alien/Build/Plugin/Prefer.pod"                  => "\$(INST_LIB)/Alien/Build/Plugin/Prefer.pod",
     "lib/Alien/Build/Plugin/Prefer/BadVersion.pm"        => "\$(INST_LIB)/Alien/Build/Plugin/Prefer/BadVersion.pm",
+    "lib/Alien/Build/Plugin/Prefer/GoodVersion.pm"       => "\$(INST_LIB)/Alien/Build/Plugin/Prefer/GoodVersion.pm",
     "lib/Alien/Build/Plugin/Prefer/SortVersions.pm"      => "\$(INST_LIB)/Alien/Build/Plugin/Prefer/SortVersions.pm",
     "lib/Alien/Build/Plugin/Probe.pod"                   => "\$(INST_LIB)/Alien/Build/Plugin/Probe.pod",
     "lib/Alien/Build/Plugin/Probe/CBuilder.pm"           => "\$(INST_LIB)/Alien/Build/Plugin/Probe/CBuilder.pm",
@@ -115,7 +116,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0"              => "0.000060"
   },
-  "VERSION" => "1.43",
+  "VERSION" => "1.46",
   "test"    => {
     "TESTS" => "t/*.t"
     }

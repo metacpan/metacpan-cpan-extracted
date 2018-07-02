@@ -9,13 +9,13 @@ build_requires:
   File::Spec: '0'
   Test::More: '0.62'
   lib: '0'
-  perl: '5.006'
+  perl: '5.008001'
   vars: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
-  perl: '5.006'
+  perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,23 +32,25 @@ no_index:
 provides:
   Getopt::Lucid:
     file: lib/Getopt/Lucid.pm
-    version: '1.08'
+    version: '1.09'
   Getopt::Lucid::Exception:
     file: lib/Getopt/Lucid/Exception.pm
-    version: '1.08'
+    version: '1.09'
 requires:
   Carp: '0'
   Exception::Class: '1.23'
   Exporter: '0'
+  File::Basename: '0'
+  List::Util: '0'
   Storable: '2.16'
-  perl: '5.006'
+  perl: '5.008001'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/dagolden/getopt-lucid/issues
-  homepage: https://github.com/dagolden/getopt-lucid
-  repository: https://github.com/dagolden/getopt-lucid.git
-version: '1.08'
+  bugtracker: https://github.com/dagolden/Getopt-Lucid/issues
+  homepage: https://github.com/dagolden/Getopt-Lucid
+  repository: https://github.com/dagolden/Getopt-Lucid.git
+version: '1.09'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'David Golden <xdg@xdg.me>'
@@ -57,4 +59,6 @@ x_contributors:
   - 'Kevin McGrath <kmcgrath@cpan.org>'
   - 'Nova Patch <patch@cpan.org>'
   - 'Robert Bohne <rbo@cpan.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  - 'thilp <thilp@thilp.net>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,18 @@
+1.0001
+  -- Inital Release
+1.0002
+  -- Unit test fixes, seems db testing was enabled by default
+  -- Pod updates
+1.0003
+  -- More pod updates
+1.0004
+  -- Fixed temp file locking issues in unit tests.
+1.0005
+  -- Remvoed custom hooks
+  -- DB Connection should actually be accessable
+  -- now use a simpler db cache
+  -- use static DBH
+  -- pod updates
+1.0006
+  -- Should now only reset our sth cache if it was our DBI connection
+  -- added unit tests to validate selective db cache clean up

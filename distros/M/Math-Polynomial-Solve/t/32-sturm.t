@@ -1,7 +1,7 @@
 use 5.010001;
 use Test::More tests => 17;
 
-use Math::Polynomial::Solve qw(:sturm ascending_order);
+use Math::Polynomial::Solve qw(:sturm);
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ my @case = (
 	[[-1/16, 7/8, -2.5, 1], 3],
 );
 
-ascending_order(1);
+coefficients order => 'ascending';
 
 for my $cref (@case)
 {

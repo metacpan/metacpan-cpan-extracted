@@ -1,0 +1,16 @@
+bin/mark
+bin/mark-add
+bin/mark-clear
+bin/mark-cp
+bin/mark-each
+bin/mark-ls
+bin/mark-ls-print0
+bin/mark-mv
+bin/mark-remove
+Build.PL
+example/barr/1
+lib/App/MarkFiles.pm
+MANIFEST			This list of files
+META.json
+META.yml
+t/.gitkeep

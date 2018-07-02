@@ -21,25 +21,19 @@ sub API_app_init ( $self, $req, $data = undef ) {
 }
 
 sub API_signin ( $self, $req, $data ) {
-    $self->{app}->{api}->authenticate(
-        [ $data->{user_name}, $data->{password} ],
-        Coro::unblock_sub sub ($auth) {
+    my $auth = $self->{app}->{api}->authenticate( [ $data->{user_name}, $data->{password} ] );
 
-            # authentication error
-            return $req->(401) if !$auth;
+    # authentication error
+    return $req->(401) if !$auth;
 
-            # create user session
-            my $session = $self->{app}->{api}->create_user_session( $auth->{user_id} );
+    # create user session
+    my $session = $self->{app}->{api}->create_user_session( $auth->{user_id} );
 
-            # user session creation error
-            return $req->(500) if !$session;
+    # user session creation error
+    return $req->(500) if !$session;
 
-            # user session created
-            return $req->( 200, { user_name => $data->{user_name}, token => $session->{data}->{token} } );
-        }
-    );
-
-    return;
+    # user session created
+    return $req->( 200, { user_name => $data->{user_name}, token => $session->{data}->{token} } );
 }
 
 sub API_signout ( $self, $req, @ ) {
@@ -64,7 +58,7 @@ sub API_signout ( $self, $req, @ ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 1, 5                 | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 72                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 76 does not match the package declaration       |
+## |    1 | 66                   | Documentation::RequirePackageMatchesPodName - Pod NAME on line 70 does not match the package declaration       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

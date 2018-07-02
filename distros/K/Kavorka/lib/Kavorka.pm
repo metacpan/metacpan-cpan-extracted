@@ -14,7 +14,7 @@ use Sub::Util ();
 package Kavorka;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.037';
+our $VERSION   = '0.038';
 
 our @ISA         = qw( Exporter::Tiny );
 our @EXPORT      = qw( fun method );
@@ -369,7 +369,11 @@ This can lead to delightfully hard to debug errors.
 
 =head1 BUGS
 
-Please report any bugs to
+If seeing test failures on threaded Perl 5.21+, it may be a bug in
+L<Devel::CallParser> 0.002.
+Try installing L<Alt::Devel::CallParser::ButWorking>.
+
+Please report any other bugs to
 L<http://rt.cpan.org/Dist/Display.html?Queue=Kavorka>.
 
 =head1 SUPPORT

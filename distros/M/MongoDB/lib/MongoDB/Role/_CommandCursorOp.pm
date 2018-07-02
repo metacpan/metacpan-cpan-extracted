@@ -1,5 +1,4 @@
-#
-#  Copyright 2014 MongoDB, Inc.
+#  Copyright 2014 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ package MongoDB::Role::_CommandCursorOp;
 # MongoDB interface for database commands with cursors
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use Moo::Role;
 
@@ -30,7 +28,7 @@ use MongoDB::QueryResult;
 
 use namespace::clean;
 
-requires qw/client bson_codec/;
+requires qw/session client bson_codec/;
 
 sub _build_result_from_cursor {
     my ( $self, $res ) = @_;
@@ -43,8 +41,19 @@ sub _build_result_from_cursor {
 
     my $max_time_ms = 0;
     if ($self->isa('MongoDB::Op::_Query') &&
-        $self->cursorType eq 'tailable_await') {
+        $self->options->{cursorType} eq 'tailable_await') {
+        $max_time_ms = $self->options->{maxAwaitTimeMS} if $self->options->{maxAwaitTimeMS};
+    }
+    elsif (
+        $self->isa('MongoDB::Op::_Aggregate') ||
+        $self->isa('MongoDB::Op::_ChangeStream')
+    ) {
         $max_time_ms = $self->maxAwaitTimeMS if $self->maxAwaitTimeMS;
+    }
+
+    my $limit = 0;
+    if ($self->isa('MongoDB::Op::_Query')) {
+        $limit = $self->options->{limit} if $self->options->{limit};
     }
 
     my $batch = $c->{firstBatch};
@@ -55,13 +64,14 @@ sub _build_result_from_cursor {
         _bson_codec   => $self->bson_codec,
         _batch_size   => scalar @$batch,
         _cursor_at    => 0,
-        _limit        => 0,
+        _limit        => $limit,
         _cursor_id    => $c->{id},
         _cursor_start => 0,
         _cursor_flags => {},
         _cursor_num   => scalar @$batch,
         _docs         => $batch,
         _max_time_ms  => $max_time_ms,
+        _session       => $self->session,
     );
 }
 

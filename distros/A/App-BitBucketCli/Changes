@@ -1,5 +1,26 @@
 Revision history for App-bitbucket-cli
 
+0.005   2018-06-24
+        Updating for release of version 0.005
+        Updating TODO (Ivan Wills)
+        Working on autocomplete (Ivan Wills)
+        Added dependency Module::Pluggable (Ivan Wills)
+        Fixed file names (Ivan Wills)
+        Adding new modules to tests (Ivan Wills)
+        Fixed moving incorrect method to branches (Ivan Wills)
+        Fixing POD and spelling (Ivan Wills)
+        Updating manifest with latest files (Ivan Wills)
+        Fixing file layout (Ivan Wills)
+        Making individual command help show for sub commands (Ivan Wills)
+        Fixed actually loading modules (Ivan Wills)
+        Fixed using wrong path name (Ivan Wills)
+        Sorted and removed duplicates (Ivan Wills)
+        Moved logic for sub commands to modules (Ivan Wills)
+        Moving command configs to modules (Ivan Wills)
+        Updating TODO to remind me what still needs to be done (Ivan Wills)
+        Starting to split commands into their own modules (Ivan Wills)
+        Increasing the number of terminals (Ivan Wills)
+
 0.004   2018-05-15
         Updating for release of version 0.004
         Adding latest perl version to travis builds (Ivan Wills)

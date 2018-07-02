@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::_::Transaction::UsBankAccountDetail;
-$WebService::Braintree::_::Transaction::UsBankAccountDetail::VERSION = '1.5';
+$WebService::Braintree::_::Transaction::UsBankAccountDetail::VERSION = '1.6';
 use 5.010_001;
 use strictures 1;
 
@@ -17,11 +17,13 @@ This class will only be created as part of a L<response|WebService::Braintree::R
 
 =cut
 
-use Moose;
+use Moo;
 
 extends 'WebService::Braintree::_';
 
-use WebService::Braintree::_::AchMandate;
+use WebService::Braintree::Types qw(
+    AchMandate
+);
 
 =head1 ATTRIBUTES
 
@@ -56,7 +58,7 @@ object of type L<WebService::Braintree::_::AchMandate/>.
 
 has ach_mandate => (
     is => 'ro',
-    isa => 'WebService::Braintree::_::AchMandate',
+    isa => AchMandate,
     coerce => 1,
 );
 

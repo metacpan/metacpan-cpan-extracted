@@ -1,5 +1,4 @@
-#
-#  Copyright 2009-2013 MongoDB, Inc.
+#  Copyright 2009 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -22,11 +20,10 @@ package MongoDB::Database;
 # ABSTRACT: A MongoDB Database
 
 use version;
-our $VERSION = 'v1.8.2';
+our $VERSION = 'v2.0.0';
 
 use MongoDB::CommandResult;
 use MongoDB::Error;
-use MongoDB::GridFS;
 use MongoDB::GridFSBucket;
 use MongoDB::Op::_Command;
 use MongoDB::Op::_DropDatabase;
@@ -38,6 +35,7 @@ use MongoDB::_Types qw(
     ReadPreference
     ReadConcern
     WriteConcern
+    is_OrderedDoc
 );
 use Types::Standard qw(
     InstanceOf
@@ -134,8 +132,8 @@ has max_time_ms => (
 #pod =attr bson_codec
 #pod
 #pod An object that provides the C<encode_one> and C<decode_one> methods, such as
-#pod from L<MongoDB::BSON>.  It may be initialized with a hash reference that will
-#pod be coerced into a new MongoDB::BSON object.  By default it will be inherited
+#pod from L<BSON>.  It may be initialized with a hash reference that will
+#pod be coerced into a new L<BSON> object.  By default it will be inherited
 #pod from a L<MongoDB::MongoClient> object.
 #pod
 #pod =cut
@@ -147,13 +145,23 @@ has bson_codec => (
     required => 1,
 );
 
-with $_ for qw(
-  MongoDB::Role::_DeprecationWarner
-);
-
 #--------------------------------------------------------------------------#
 # methods
 #--------------------------------------------------------------------------#
+
+#pod =method client
+#pod
+#pod     $client = $db->client;
+#pod
+#pod Returns the L<MongoDB::MongoClient> object associated with this
+#pod object.
+#pod
+#pod =cut
+
+sub client {
+    my ($self) = @_;
+    return $self->_client;
+}
 
 #pod =method list_collections
 #pod
@@ -185,6 +193,8 @@ with $_ for qw(
 #pod * C<batchSize> – the number of documents to return per batch.
 #pod * C<maxTimeMS> – the maximum amount of time in milliseconds to allow the
 #pod   command to run.  (Note, this will be ignored for servers before version 2.6.)
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod
 #pod =cut
 
@@ -200,12 +210,16 @@ sub list_collections {
         $options->{maxTimeMS} = $self->max_time_ms;
     }
 
+    my $session = $self->_client->_get_session_from_hashref( $options );
+
     my $op = MongoDB::Op::_ListCollections->_new(
-        db_name    => $self->name,
-        client     => $self->_client,
-        bson_codec => $self->bson_codec,
-        filter     => $filter,
-        options    => $options,
+        db_name             => $self->name,
+        client              => $self->_client,
+        bson_codec          => $self->bson_codec,
+        filter              => $filter,
+        options             => $options,
+        session             => $session,
+        monitoring_callback => $self->_client->monitoring_callback,
     );
 
     return $self->_client->send_primary_op($op);
@@ -224,6 +238,14 @@ sub list_collections {
 #pod documentation|http://docs.mongodb.org/manual/reference/command/listCollections/>
 #pod for more details on filtering for specific collections.
 #pod
+#pod A hashref of options may also be provided.
+#pod
+#pod Valid options include:
+#pod
+#pod =for :list
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
+#pod
 #pod B<Warning:> if the number of collections is very large, this may return
 #pod a very large result.  Either pass an appropriate filter, or use
 #pod L</list_collections> to iterate over collections instead.
@@ -231,18 +253,9 @@ sub list_collections {
 #pod =cut
 
 sub collection_names {
-    my ( $self, $filter ) = @_;
-    $filter ||= {};
+    my $self = shift;
 
-    my $op = MongoDB::Op::_ListCollections->_new(
-        db_name    => $self->name,
-        client     => $self->_client,
-        bson_codec => $self->bson_codec,
-        filter     => $filter,
-        options    => {},
-    );
-
-    my $res = $self->_client->send_primary_op($op);
+    my $res = $self->list_collections( @_ );
 
     return map { $_->{name} } $res->all;
 }
@@ -315,60 +328,35 @@ sub get_gridfsbucket {
 
 { no warnings 'once'; *gfs = \&get_gridfsbucket }
 
-#pod =method get_gridfs (DEPRECATED)
-#pod
-#pod     my $grid = $database->get_gridfs;
-#pod     my $grid = $database->get_gridfs("fs");
-#pod     my $grid = $database->get_gridfs("fs", $options);
-#pod
-#pod The L<MongoDB::GridFS> class has been deprecated in favor of the new MongoDB
-#pod driver-wide standard GridFS API, available via L<MongoDB::GridFSBucket> and
-#pod the C<get_gridfsbucket>/C<gfs> methods.
-#pod
-#pod This method returns a L<MongoDB::GridFS> for storing and retrieving files
-#pod from the database.  Default prefix is "fs", making C<$grid-E<gt>files>
-#pod "fs.files" and C<$grid-E<gt>chunks> "fs.chunks".
-#pod
-#pod It takes an optional hash reference of options that are passed to the
-#pod L<MongoDB::GridFS> constructor.
-#pod
-#pod See L<MongoDB::GridFS> for more information.
-#pod
-#pod =cut
-
-sub get_gridfs {
-    my ($self, $prefix, $options) = @_;
-    $prefix = "fs" unless $prefix;
-
-    $self->_warn_deprecated( 'get_gridfs' => [qw/get_gridfsbucket gfs/] );
-
-    return MongoDB::GridFS->new(
-        read_preference => $self->read_preference,
-        write_concern   => $self->write_concern,
-        max_time_ms     => $self->max_time_ms,
-        bson_codec      => $self->bson_codec,
-        ( $options ? %$options : () ),
-        # not allowed to be overridden by options
-        _database => $self,
-        prefix => $prefix
-    );
-}
-
 #pod =method drop
 #pod
 #pod     $database->drop;
 #pod
 #pod Deletes the database.
 #pod
+#pod A hashref of options may also be provided.
+#pod
+#pod Valid options include:
+#pod
+#pod =for :list
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
+#pod
 #pod =cut
 
 sub drop {
-    my ($self) = @_;
+    my ( $self, $options ) = @_;
+
+    my $session = $self->_client->_get_session_from_hashref( $options );
+
     return $self->_client->send_write_op(
         MongoDB::Op::_DropDatabase->_new(
-            db_name       => $self->name,
-            bson_codec    => $self->bson_codec,
-            write_concern => $self->write_concern,
+            client              => $self->_client,
+            db_name             => $self->name,
+            bson_codec          => $self->bson_codec,
+            write_concern       => $self->write_concern,
+            session             => $session,
+            monitoring_callback => $self->_client->monitoring_callback,
         )
     )->output;
 }
@@ -382,16 +370,30 @@ sub drop {
 #pod         { mode => 'secondaryPreferred' }
 #pod     );
 #pod
+#pod     my $output = $database->run_command(
+#pod         [ some_command => 1 ],
+#pod         $read_preference,
+#pod         $options
+#pod     );
+#pod
 #pod This method runs a database command.  The first argument must be a document
 #pod with the command and its arguments.  It should be given as an array reference
 #pod of key-value pairs or a L<Tie::IxHash> object with the command name as the
-#pod first key.  The use of a hash reference will only reliably work for commands
-#pod without additional parameters.
+#pod first key.  An error will be thrown if the command is not an
+#pod L<ordered document|MongoDB::Collection/Ordered document>.
 #pod
 #pod By default, commands are run with a read preference of 'primary'.  An optional
 #pod second argument may specify an alternative read preference.  If given, it must
 #pod be a L<MongoDB::ReadPreference> object or a hash reference that can be used to
 #pod construct one.
+#pod
+#pod A hashref of options may also be provided.
+#pod
+#pod Valid options include:
+#pod
+#pod =for :list
+#pod * C<session> - the session to use for these operations. If not supplied, will
+#pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod
 #pod It returns the output of the command (a hash reference) on success or throws a
 #pod L<MongoDB::DatabaseError|MongoDB::Error/MongoDB::DatabaseError> exception if
@@ -408,18 +410,25 @@ sub drop {
 #pod =cut
 
 sub run_command {
-    my ( $self, $command, $read_pref ) = @_;
+    my ( $self, $command, $read_pref, $options ) = @_;
+    MongoDB::UsageError->throw("command was not an ordered document")
+       if ! is_OrderedDoc($command);
 
     $read_pref = MongoDB::ReadPreference->new(
         ref($read_pref) ? $read_pref : ( mode => $read_pref ) )
       if $read_pref && ref($read_pref) ne 'MongoDB::ReadPreference';
 
+    my $session = $self->_client->_get_session_from_hashref( $options );
+
     my $op = MongoDB::Op::_Command->_new(
-        db_name     => $self->name,
-        query       => $command,
-        query_flags => {},
-        bson_codec  => $self->bson_codec,
-        read_preference => $read_pref,
+        client              => $self->_client,
+        db_name             => $self->name,
+        query               => $command,
+        query_flags         => {},
+        bson_codec          => $self->bson_codec,
+        read_preference     => $read_pref,
+        session             => $session,
+        monitoring_callback => $self->_client->monitoring_callback,
     );
 
     my $obj = $self->_client->send_read_op($op);
@@ -427,40 +436,115 @@ sub run_command {
     return $obj->output;
 }
 
-#--------------------------------------------------------------------------#
-# deprecated methods
-#--------------------------------------------------------------------------#
+sub _aggregate {
+    MongoDB::UsageError->throw("pipeline argument must be an array reference")
+      unless ref( $_[1] ) eq 'ARRAY';
 
-sub eval {
-    my ($self, $code, $args, $nolock) = @_;
+    my ( $self, $pipeline, $options ) = @_;
+    $options ||= {};
 
-    $self->_warn_deprecated( 'eval', "Run manually via run_command instead." );
+    my $session = $self->_client->_get_session_from_hashref( $options );
 
-    $nolock = boolean::false unless defined $nolock;
-
-    my $cmd = tie(my %hash, 'Tie::IxHash');
-    %hash = ('$eval' => $code,
-             'args' => $args,
-             'nolock' => $nolock);
-
-    my $output = $self->run_command($cmd);
-    if (ref $output eq 'HASH' && exists $output->{'retval'}) {
-        return $output->{'retval'};
+    # boolify some options
+    for my $k (qw/allowDiskUse explain/) {
+        $options->{$k} = ( $options->{$k} ? true : false ) if exists $options->{$k};
     }
-    else {
-        return $output;
+
+    # possibly fallback to default maxTimeMS
+    if ( ! exists $options->{maxTimeMS} && $self->max_time_ms ) {
+        $options->{maxTimeMS} = $self->max_time_ms;
     }
+
+    # read preferences are ignored if the last stage is $out
+    my ($last_op) = keys %{ $pipeline->[-1] };
+
+    my $op = MongoDB::Op::_Aggregate->_new(
+        pipeline        => $pipeline,
+        options         => $options,
+        read_concern    => $self->read_concern,
+        has_out         => $last_op eq '$out',
+        client          => $self->_client,
+        bson_codec      => $self->bson_codec,
+        db_name         => $self->name,
+        coll_name       => 1,                     # Magic not-an-actual-collection number
+        full_name       => $self->name . ".1",
+        read_preference => $self->read_preference,
+        write_concern   => $self->write_concern,
+        session         => $session,
+        monitoring_callback => $self->_client->monitoring_callback,
+    );
+
+    return $self->_client->send_read_op($op);
 }
 
-sub last_error {
-    my ( $self, $opt ) = @_;
+#pod =method watch
+#pod
+#pod Watches for changes on this database.
+#pod
+#pod Perform an aggregation with an implicit initial C<$changeStream> stage
+#pod and returns a L<MongoDB::ChangeStream> result which can be used to
+#pod iterate over the changes in the database. This functionality is
+#pod available since MongoDB 4.0.
+#pod
+#pod     my $stream = $db->watch();
+#pod     my $stream = $db->watch( \@pipeline );
+#pod     my $stream = $db->watch( \@pipeline, \%options );
+#pod
+#pod     while (1) {
+#pod
+#pod         # This inner loop will only run until no more changes are
+#pod         # available.
+#pod         while (my $change = $stream->next) {
+#pod             # process $change
+#pod         }
+#pod     }
+#pod
+#pod The returned stream will not block forever waiting for changes. If you
+#pod want to respond to changes over a longer time use C<maxAwaitTimeMS> and
+#pod regularly call C<next> in a loop.
+#pod
+#pod See L<MongoDB::Collection/watch> for details on usage and available
+#pod options.
+#pod
+#pod =cut
 
-    $self->_warn_deprecated(
-        'last_error' => "Use a write concern or manually run getlasterror with run_command." );
+sub watch {
+    my ( $self, $pipeline, $options ) = @_;
 
-    return $self->run_command( [ getlasterror => 1, ( $opt ? %$opt : () ) ] );
+    $pipeline ||= [];
+    $options ||= {};
+
+    my $session = $self->_client->_get_session_from_hashref( $options );
+
+    return MongoDB::ChangeStream->new(
+        exists($options->{startAtOperationTime})
+            ? (start_at_operation_time => delete $options->{startAtOperationTime})
+            : (),
+        exists($options->{fullDocument})
+            ? (full_document => delete $options->{fullDocument})
+            : (full_document => 'default'),
+        exists($options->{resumeAfter})
+            ? (resume_after => delete $options->{resumeAfter})
+            : (),
+        exists($options->{maxAwaitTimeMS})
+            ? (max_await_time_ms => delete $options->{maxAwaitTimeMS})
+            : (),
+        client => $self->_client,
+        pipeline => $pipeline,
+        session => $session,
+        options => $options,
+        op_args => {
+            read_concern => $self->read_concern,
+            bson_codec => $self->bson_codec,
+            db_name => $self->name,
+            coll_name => 1,                     # Magic not-an-actual-collection number
+            full_name => $self->name . ".1",
+            read_preference => $self->read_preference,
+            write_concern => $self->write_concern,
+            monitoring_callback => $self->_client->monitoring_callback,
+        },
+    );
 }
-
 
 1;
 
@@ -476,7 +560,7 @@ MongoDB::Database - A MongoDB Database
 
 =head1 VERSION
 
-version v1.8.2
+version v2.0.0
 
 =head1 SYNOPSIS
 
@@ -563,11 +647,18 @@ was when the C<$maxTimeMS> meta-operator was introduced.
 =head2 bson_codec
 
 An object that provides the C<encode_one> and C<decode_one> methods, such as
-from L<MongoDB::BSON>.  It may be initialized with a hash reference that will
-be coerced into a new MongoDB::BSON object.  By default it will be inherited
+from L<BSON>.  It may be initialized with a hash reference that will
+be coerced into a new L<BSON> object.  By default it will be inherited
 from a L<MongoDB::MongoClient> object.
 
 =head1 METHODS
+
+=head2 client
+
+    $client = $db->client;
+
+Returns the L<MongoDB::MongoClient> object associated with this
+object.
 
 =head2 list_collections
 
@@ -605,6 +696,10 @@ C<batchSize> – the number of documents to return per batch.
 
 C<maxTimeMS> – the maximum amount of time in milliseconds to allow the command to run.  (Note, this will be ignored for servers before version 2.6.)
 
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
 =back
 
 =head2 collection_names
@@ -619,6 +714,18 @@ description documents matching a filter expression to be returned.  See the
 L<listCollections command
 documentation|http://docs.mongodb.org/manual/reference/command/listCollections/>
 for more details on filtering for specific collections.
+
+A hashref of options may also be provided.
+
+Valid options include:
+
+=over 4
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=back
 
 B<Warning:> if the number of collections is very large, this may return
 a very large result.  Either pass an appropriate filter, or use
@@ -654,30 +761,23 @@ See L<MongoDB::GridFSBucket> for more information.
 
 The C<gfs> method is an alias for C<get_gridfsbucket>.
 
-=head2 get_gridfs (DEPRECATED)
-
-    my $grid = $database->get_gridfs;
-    my $grid = $database->get_gridfs("fs");
-    my $grid = $database->get_gridfs("fs", $options);
-
-The L<MongoDB::GridFS> class has been deprecated in favor of the new MongoDB
-driver-wide standard GridFS API, available via L<MongoDB::GridFSBucket> and
-the C<get_gridfsbucket>/C<gfs> methods.
-
-This method returns a L<MongoDB::GridFS> for storing and retrieving files
-from the database.  Default prefix is "fs", making C<$grid-E<gt>files>
-"fs.files" and C<$grid-E<gt>chunks> "fs.chunks".
-
-It takes an optional hash reference of options that are passed to the
-L<MongoDB::GridFS> constructor.
-
-See L<MongoDB::GridFS> for more information.
-
 =head2 drop
 
     $database->drop;
 
 Deletes the database.
+
+A hashref of options may also be provided.
+
+Valid options include:
+
+=over 4
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=back
 
 =head2 run_command
 
@@ -688,16 +788,34 @@ Deletes the database.
         { mode => 'secondaryPreferred' }
     );
 
+    my $output = $database->run_command(
+        [ some_command => 1 ],
+        $read_preference,
+        $options
+    );
+
 This method runs a database command.  The first argument must be a document
 with the command and its arguments.  It should be given as an array reference
 of key-value pairs or a L<Tie::IxHash> object with the command name as the
-first key.  The use of a hash reference will only reliably work for commands
-without additional parameters.
+first key.  An error will be thrown if the command is not an
+L<ordered document|MongoDB::Collection/Ordered document>.
 
 By default, commands are run with a read preference of 'primary'.  An optional
 second argument may specify an alternative read preference.  If given, it must
 be a L<MongoDB::ReadPreference> object or a hash reference that can be used to
 construct one.
+
+A hashref of options may also be provided.
+
+Valid options include:
+
+=over 4
+
+=item *
+
+C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
+
+=back
 
 It returns the output of the command (a hash reference) on success or throws a
 L<MongoDB::DatabaseError|MongoDB::Error/MongoDB::DatabaseError> exception if
@@ -711,20 +829,36 @@ There are a few examples of database commands in the
 L<MongoDB::Examples/"DATABASE COMMANDS"> section.  See also core documentation
 on database commands: L<http://dochub.mongodb.org/core/commands>.
 
+=head2 watch
+
+Watches for changes on this database.
+
+Perform an aggregation with an implicit initial C<$changeStream> stage
+and returns a L<MongoDB::ChangeStream> result which can be used to
+iterate over the changes in the database. This functionality is
+available since MongoDB 4.0.
+
+    my $stream = $db->watch();
+    my $stream = $db->watch( \@pipeline );
+    my $stream = $db->watch( \@pipeline, \%options );
+
+    while (1) {
+
+        # This inner loop will only run until no more changes are
+        # available.
+        while (my $change = $stream->next) {
+            # process $change
+        }
+    }
+
+The returned stream will not block forever waiting for changes. If you
+want to respond to changes over a longer time use C<maxAwaitTimeMS> and
+regularly call C<next> in a loop.
+
+See L<MongoDB::Collection/watch> for details on usage and available
+options.
+
 =for Pod::Coverage last_error
-
-=head1 DEPRECATIONS
-
-The methods still exist, but are no longer documented.  In a future version
-they will warn when used, then will eventually be removed.
-
-=over 4
-
-=item *
-
-last_error
-
-=back
 
 =head1 AUTHORS
 

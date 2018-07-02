@@ -2,6 +2,7 @@
 
 =for HTML
 <a href="https://travis-ci.org/choroba/syntactic-construct"><img src="https://api.travis-ci.org/choroba/syntactic-construct.png?branch=master" alt="travis-ci"></a>
+<a href="https://ci.appveyor.com/project/choroba/syntactic-construct/branch/master"><img src="https://ci.appveyor.com/api/projects/status/gp7uctbc0xp7skc6/branch/master?svg=true" alt="AppVeyor"></a>
 <a href="https://metacpan.org/pod/Syntax::Construct"><img src="https://badge.fury.io/pl/Syntax-Construct.svg" alt="CPAN"></a>
 <a href="http://cpants.cpanauthors.org/dist/Syntax-Construct"><img src="https://cpants.cpanauthors.org/dist/Syntax-Construct.png" alt="kwalitee"></a>
 

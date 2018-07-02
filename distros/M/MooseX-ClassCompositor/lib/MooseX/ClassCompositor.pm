@@ -1,9 +1,7 @@
 package MooseX::ClassCompositor;
-{
-  $MooseX::ClassCompositor::VERSION = '0.008';
-}
-use Moose;
 # ABSTRACT: a factory that builds classes from roles
+$MooseX::ClassCompositor::VERSION = '0.009';
+use Moose;
 
 use namespace::autoclean;
 
@@ -15,7 +13,55 @@ use MooseX::Types::Perl qw(PackageName);
 use Scalar::Util qw(refaddr);
 use String::RewritePrefix;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   my $comp = MooseX::ClassCompositor->new({
+#pod     class_basename  => 'MyApp::Class',
+#pod     class_metaroles => {
+#pod       class => [ 'MooseX::StrictConstructor::Trait::Class' ],
+#pod     },
+#pod     role_prefixes   => {
+#pod       ''  => 'MyApp::Role::',
+#pod       '=' => '',
+#pod     },
+#pod   });
+#pod
+#pod   my $class = $comp->class_for( qw( PieEater ContestWinner ) );
+#pod
+#pod   my $object = $class->new({
+#pod     pie_type => 'banana',
+#pod     place    => '2nd',
+#pod   });
+#pod
+#pod =head1 OVERVIEW
+#pod
+#pod A MooseX::ClassCompositor is a class factory.  If you think using a class
+#pod factory will make you feel like a filthy "enterprise" programmer, maybe you
+#pod should turn back now.
+#pod
+#pod The compositor has a C<L</class_for>> method that builds a class by combining a
+#pod list of roles with L<Moose::Object>, applying any supplied metaclass, and
+#pod producing an arbitrary-but-human-scannable name.  The metaclass is then
+#pod made immutable, the operation is memoized, and the class name is returned.
+#pod
+#pod In the L</SYNOPSIS> above, you can see all the major features used:
+#pod C<class_metaroles> to enable strict constructors, C<role_prefixes> to use
+#pod L<String::RewritePrefix> to expand role name shorthand, and C<class_basename>
+#pod to pick a namespace under which to put constructed classes.
+#pod
+#pod Not shown is the C<L</known_classes>> method, which returns a list of pairs
+#pod describing all the classes that the factory has constructed.  This method can
+#pod be useful for debugging and other somewhat esoteric purposes like
+#pod serialization.
+#pod
+#pod =cut
 
+#pod =attr class_basename
+#pod
+#pod This attribute must be given, and must be a valid Perl package name.
+#pod Constructed classes will all be under this namespace.
+#pod
+#pod =cut
 
 has class_basename => (
   is  => 'ro',
@@ -23,6 +69,13 @@ has class_basename => (
   required => 1,
 );
 
+#pod =attr class_metaroles
+#pod
+#pod This attribute, if given, must be a hashref of class metaroles that will be
+#pod applied to newly-constructed classes with
+#pod L<Moose::Util::MetaRole::apply_metaroles>.
+#pod
+#pod =cut
 
 has class_metaroles => (
   reader  => '_class_metaroles',
@@ -30,6 +83,13 @@ has class_metaroles => (
   default => sub {  {}  },
 );
 
+#pod =attr known_classes
+#pod
+#pod This attribute stores a mapping of class names to the parameters used to
+#pod construct them.  The C<known_classes> method returns its contents as a list of
+#pod pairs.
+#pod
+#pod =cut
 
 has known_classes => (
   reader   => '_known_classes',
@@ -43,6 +103,12 @@ has known_classes => (
   default  => sub {  {}  },
 );
 
+#pod =attr role_prefixes
+#pod
+#pod This attribute is used as the arguments to L<String::RewritePrefix> for
+#pod expanding role names passed to the compositor's L<class_for> method.
+#pod
+#pod =cut
 
 has role_prefixes => (
   reader  => '_role_prefixes',
@@ -55,6 +121,16 @@ sub _rewrite_roles {
   String::RewritePrefix->rewrite($self->_role_prefixes, @_);
 }
 
+#pod =attr fixed_roles
+#pod
+#pod This attribute may be initialized with an arrayref of role names and/or
+#pod L<Moose::Meta::Role> objects.  These roles will I<always> be composed in
+#pod the classes built by the compositor.
+#pod
+#pod Role names (but not Moose::Meta::Role objects) I<will> be rewritten by
+#pod the role prefixes.
+#pod
+#pod =cut
 
 has fixed_roles => (
   reader  => '_fixed_roles',
@@ -82,6 +158,16 @@ has memoization_table => (
   init_arg => undef,
 );
 
+#pod =attr forbid_meta_role_objects
+#pod
+#pod If true, an exception will be raised if a Moose::Meta::Role object is passed to
+#pod C<L</class_for>>.  This is only rarely useful, such as if it's a strict
+#pod requirement that the memoization table of the compositor be serializable and
+#pod its contents reproduceable.
+#pod
+#pod Probably you don't need this.
+#pod
+#pod =cut
 
 has forbid_meta_role_objects => (
   is  => 'ro',
@@ -89,6 +175,29 @@ has forbid_meta_role_objects => (
   default => 0,
 );
 
+#pod =method class_for
+#pod
+#pod   my $class = $compositor->class_for(
+#pod
+#pod     'Role::Name',          #  <-- will be expanded with role_prefixes
+#pod     Other::Role->meta,     #  <-- will not be touched
+#pod
+#pod     [
+#pod       'Param::Role::Name', #  <-- will be expanded with role_prefixes
+#pod       'ApplicationName',   #  <-- will not be touched
+#pod       { ...param... },
+#pod     ],
+#pod   );
+#pod
+#pod This method will return a class with the roles passed to it.  They can be given
+#pod either as names (which will be expanded according to C<L</role_prefixes>>), as
+#pod L<Moose::Meta::Role> objects, or as arrayrefs containing a role name,
+#pod application name, and hashref of parameters.  In the arrayref form, the
+#pod application name is just a name used to uniquely identify this application of
+#pod a parameterized role, so that they can be applied multiple times with each
+#pod application accounted for internally.
+#pod
+#pod =cut
 
 sub class_for {
   my ($self, @args) = @_;
@@ -148,7 +257,11 @@ sub class_for {
 
   @role_class_names = $self->_rewrite_roles(@role_class_names);
 
-  Class::Load::load_class($_) for @role_class_names;
+  # We only _try_ to load because in use, some of these are embedded in other
+  # packages.  While we'd like to stop relying on this, this is an expedient
+  # change.  After all, it'll fail during composition, if the role package is
+  # not properly set up.  -- rjbs, 2018-06-21
+  Class::Load::try_load_class($_) for @role_class_names;
 
   if ($name->can('meta')) {
     $name .= "_" . $self->next_serial;
@@ -204,6 +317,11 @@ sub __hash_to_string {
   join ", " => @k;
 }
 
+#pod =head1 THANKS
+#pod
+#pod Thanks to Pobox.com for sponsoring the development of this library.
+#pod
+#pod =cut
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -220,7 +338,7 @@ MooseX::ClassCompositor - a factory that builds classes from roles
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -346,6 +464,12 @@ Ricardo Signes <rjbs@cpan.org>
 Mark Jason Dominus <mjd@cpan.org>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords Toby Inkster
+
+Toby Inkster <tobyink@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

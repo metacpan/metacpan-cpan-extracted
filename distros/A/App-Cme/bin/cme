@@ -35,7 +35,7 @@ cme - Check or edit configuration data with Config::Model
 
 =head1 VERSION
 
-version 1.027
+version 1.028
 
 =head1 SYNOPSIS
 
@@ -223,14 +223,11 @@ When set, cme will exit 1 if warnings are found during check (of left after fix)
 
 =item -verbose
 
-Set to C<1>, C<2>, C<3> or C<info>, C<debug>, C<trace> to get more
-verbose output. These valiues can be abbreviated.
+Show more information about what's going on.
 
-Example:
+=item -quiet
 
- cme check ssh -v 1
- cme check ssh -v i
- cme check ssh -v info
+Suppress all output except error messages.
 
 =back
 
@@ -375,6 +372,25 @@ More categories will come.
 cme exits 0 when no errors are found. Exit 1 otherwise.
 
 =head1 BUGS
+
+=head2 Files may be re-ordered
+
+C<cme> imposes a specific ordering of the parameters of a configuration
+file. This ordering is derived from the documentation of the configuration, like
+L<ssh_confg>. C<cme> writes back files using this ordering.
+
+Thus, the diff between the original configuration files and the new
+version of the file may be more important than expected when C<cme> is
+used the first time.
+
+=head2 Comments may be dropped
+
+Comments are not supported in some applidations (like the one that use
+YAML in configuration files). Comments are dropped when using C<cme> to
+edit or modify such files. For more details, see
+L<Available
+backend|https://github.com/dod38fr/config-model/wiki/Available-models-and-backends#Available_backend>
+page.
 
 =head2 Configuration models can lag behind the target application
 

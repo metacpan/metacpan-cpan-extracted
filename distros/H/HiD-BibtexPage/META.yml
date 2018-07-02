@@ -1,0 +1,25 @@
+---
+abstract: 'HiD Bibtex publication list page generator'
+author:
+  - 'Dominik Meyer <dmeyer@federationhq.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HiD-BibtexPage
+requires:
+  HiD::Generator: '0'
+  HiD::Page: '0'
+  Moose: '0'
+  Text::BibTeX: '0'
+  Text::BibTeX::Bib: '0'
+resources:
+  repository: https://trac.federationhq.de/git/HiD-BibtexPage.git
+version: '0.001'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

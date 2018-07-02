@@ -69,7 +69,7 @@ subtest 'GraphQL with POST' => sub {
     j { query=>'{echo(arg: "Yo")}' },
   )->json_is(
     { data => { echo => 'Yo' } },
-  );
+  )->or(sub { diag explain shift->tx->res->json });
 };
 
 subtest 'GraphQL with "object"' => sub {
@@ -77,7 +77,7 @@ subtest 'GraphQL with "object"' => sub {
     j {query=>'mutation m {echoPost(body: [{key:"one", value:"two"}]) { key value }}'},
   )->json_is(
     { data => { echoPost => [{key=>"one", value=>"two"}] } },
-  );
+  )->or(sub { diag explain shift->tx->res->json });
 };
 
 subtest 'GraphQL op with spaces' => sub {
@@ -85,7 +85,7 @@ subtest 'GraphQL op with spaces' => sub {
     '{"query":"{query_with_space(id: 7)}"}',
   )->json_is(
     { 'data' => { 'query_with_space' => 7 } },
-  );
+  )->or(sub { diag explain shift->tx->res->json });
 };
 
 subtest 'GraphQL op with dots' => sub {
@@ -99,7 +99,7 @@ EOF
     data => {
       query_with_dots => { with_dots => "ARGH!?" },
     }
-  });
+  })->or(sub { diag explain shift->tx->res->json });
 };
 
 subtest 'GraphQL enum op' => sub {
@@ -113,7 +113,7 @@ EOF
     data => {
       enum_echo => [qw(EMPTY dot_space dot_space dot_space1 dot_space1 dot_space1)],
     }
-  });
+  })->or(sub { diag explain shift->tx->res->json });
 };
 
 done_testing;

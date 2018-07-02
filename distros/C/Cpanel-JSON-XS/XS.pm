@@ -1,5 +1,5 @@
 package Cpanel::JSON::XS;
-our $VERSION = '4.02';
+our $VERSION = '4.04';
 our $XS_VERSION = $VERSION;
 # $VERSION = eval $VERSION;
 
@@ -2223,6 +2223,10 @@ BEGIN {
       else {
         return $obj ? 1 == $op : 0 == $op;
       }
+    },
+    'ne'     => sub {
+      my ($obj, $op) = ref ($_[0]) ? ($_[0], $_[1]) : ($_[1], $_[0]);
+      return !($obj eq $op);
     },
     fallback => 1);
 }

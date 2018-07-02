@@ -2,7 +2,7 @@ package App::optex;
 use strict;
 use warnings;
 
-our $VERSION = "v0.0.15";
+our $VERSION = "v0.2";
 
 1;
 
@@ -16,14 +16,19 @@ optex - optex command module direcrtory
 
 =head1 SYNOPSIS
 
-    B<optex> command [B<-M>I<module>] ...
+B<optex> command [B<-M>I<module>] ...
 
-    or make symbolic link to B<optex> in the name of target command.
+or make symbolic link to B<optex> in the name of target command.
 
 =head1 DESCRIPTION
 
-This directory contains modules for B<optex> command.  Unlike others,
-these modules are loaded from top of package name space.
+This directory contains modules for B<optex> command.
+
+=head1 SEE ALSO
+
+L<github|http://kaz-utashiro.github.io/optex/>
+
+L<Getopt::EX>
 
 =head1 LICENSE
 

@@ -10,7 +10,12 @@ use MVC::Neaf;
 # NOTE! This is NOT about set_path_defaults being deprecated
 # This is about MVC::Neaf->method call being deprecated
 warnings_like {
-    MVC::Neaf->set_path_defaults( { foo => 42 } );
-} [ qr/MVC::Neaf->set_path_defaults.*DEPRECATED.*neaf.*new/ ], "Deprecated warning";
+    MVC::Neaf->add_route( '/neaf' => sub {} );
+} [ qr/MVC::Neaf->add_route.*DEPRECATED.*neaf.*new/ ], "Deprecated warning";
+
+eval {
+    MVC::Neaf::Route::Main->add_route( '/main' => sub { } );
+};
+like $@, qr#[Uu]nblessed#, "Everything EXCEPT default neaf just dies";
 
 done_testing;

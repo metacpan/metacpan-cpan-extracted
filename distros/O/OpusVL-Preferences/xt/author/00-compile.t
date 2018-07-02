@@ -6,10 +6,16 @@ use warnings;
 
 use Test::More;
 
-plan tests => 15;
+plan tests => 21;
 
 my @module_files = (
+    'OpusVL/FB11X/Model/PreferencesDB.pm',
+    'OpusVL/FB11X/Preferences.pm',
+    'OpusVL/FB11X/Preferences/Controller/Preferences.pm',
+    'OpusVL/FB11X/Preferences/Role/ParameterValueEditing.pm',
+    'OpusVL/FB11X/Preferences/Role/PreferencesController.pm',
     'OpusVL/Preferences.pm',
+    'OpusVL/Preferences/Hat/preferences.pm',
     'OpusVL/Preferences/RolesFor/Result/PrfOwner.pm',
     'OpusVL/Preferences/RolesFor/ResultSet/PrfOwner.pm',
     'OpusVL/Preferences/RolesFor/Schema.pm',

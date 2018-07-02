@@ -4,36 +4,33 @@ Module::Runtime - runtime module handling
 
 =head1 SYNOPSIS
 
-	use Module::Runtime qw(
-		$module_name_rx is_module_name check_module_name
-		module_notional_filename require_module
-	);
+    use Module::Runtime qw(
+	$module_name_rx is_module_name check_module_name
+	module_notional_filename require_module);
 
-	if($module_name =~ /\A$module_name_rx\z/o) { ...
-	if(is_module_name($module_name)) { ...
-	check_module_name($module_name);
+    if($module_name =~ /\A$module_name_rx\z/o) { ...
+    if(is_module_name($module_name)) { ...
+    check_module_name($module_name);
 
-	$notional_filename = module_notional_filename($module_name);
-	require_module($module_name);
+    $notional_filename = module_notional_filename($module_name);
+    require_module($module_name);
 
-	use Module::Runtime qw(use_module use_package_optimistically);
+    use Module::Runtime qw(use_module use_package_optimistically);
 
-	$bi = use_module("Math::BigInt", 1.31)->new("1_234");
-	$widget = use_package_optimistically("Local::Widget")->new;
+    $bi = use_module("Math::BigInt", 1.31)->new("1_234");
+    $widget = use_package_optimistically("Local::Widget")->new;
 
-	use Module::Runtime qw(
-		$top_module_spec_rx $sub_module_spec_rx
-		is_module_spec check_module_spec
-		compose_module_name
-	);
+    use Module::Runtime qw(
+	$top_module_spec_rx $sub_module_spec_rx
+	is_module_spec check_module_spec
+	compose_module_name);
 
-	if($spec =~ /\A$top_module_spec_rx\z/o) { ...
-	if($spec =~ /\A$sub_module_spec_rx\z/o) { ...
-	if(is_module_spec("Standard::Prefix", $spec)) { ...
-	check_module_spec("Standard::Prefix", $spec);
+    if($spec =~ /\A$top_module_spec_rx\z/o) { ...
+    if($spec =~ /\A$sub_module_spec_rx\z/o) { ...
+    if(is_module_spec("Standard::Prefix", $spec)) { ...
+    check_module_spec("Standard::Prefix", $spec);
 
-	$module_name =
-		compose_module_name("Standard::Prefix", $spec);
+    $module_name = compose_module_name("Standard::Prefix", $spec);
 
 =head1 DESCRIPTION
 
@@ -120,7 +117,7 @@ BEGIN { require 5.006; }
 BEGIN { ${^WARNING_BITS} = ""; }
 # Don't "use strict" here, to avoid dependencies.
 
-our $VERSION = "0.014";
+our $VERSION = "0.016";
 
 # Don't use Exporter here, to avoid dependencies.
 our @EXPORT_OK = qw(
@@ -362,6 +359,19 @@ of C<require>).  If the module cannot be found then it is assumed that
 the package was actually already loaded by other means, and no error
 is signalled.  That's the optimistic bit.
 
+I<Warning:> this optional module loading is liable to cause unreliable
+behaviour, including security problems.  It interacts especially badly
+with having C<.> in C<@INC>, which was the default state of affairs in
+Perls prior to 5.25.11.  If a package is actually defined by some means
+other than a module, then applying this function to it causes a spurious
+attempt to load a module that is expected to be non-existent.  If a
+module actually exists under that name then it will be unintentionally
+loaded.  If C<.> is in C<@INC> and this code is ever run with the current
+directory being one writable by a malicious user (such as F</tmp>), then
+the malicious user can easily cause the victim to run arbitrary code, by
+creating a module file under the predictable spuriously-loaded name in the
+writable directory.  Generally, optional module loading should be avoided.
+
 This is mostly the same operation that is performed by the L<base> pragma
 to ensure that the specified base classes are available.  The behaviour
 of L<base> was simplified in version 2.18, and later improved in version
@@ -492,7 +502,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, 2006, 2007, 2009, 2010, 2011, 2012, 2014
+Copyright (C) 2004, 2006, 2007, 2009, 2010, 2011, 2012, 2014, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

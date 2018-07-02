@@ -3,7 +3,7 @@ package RT::Client::CLI;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '4.2.11';
+our $VERSION = '4.4.3';
 
 1;
 __END__
@@ -31,7 +31,7 @@ version from which the included L<rt> was extracted.
 
 =head1 COPYRIGHT
 
-Copyright 2014 Best Practical Solutions, LLC
+Copyright 2014-2018 by Best Practical Solutions, LLC
 
 =head1 LICENSE
 

@@ -21,11 +21,11 @@ Net::Citadel - Citadel.org protocol coverage
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =cut
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 SYNOPSIS
 
@@ -774,7 +774,7 @@ Number of connected users on the system.  Only returned for type C<users>.
 
 =item HighMsg
 
-Higest message number on the system.  Only returned for type C<messages>.
+Highest message number on the system.  Only returned for type C<messages>.
 
 =item SystemUptime
 
@@ -860,7 +860,7 @@ Robert James Clay, E<lt>jame@rocasa.usE<gt>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2007-2008 by Robert Barta
-Copyright (C) 2012-2017 by Robert James Clay
+Copyright (C) 2012-2018 by Robert James Clay
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

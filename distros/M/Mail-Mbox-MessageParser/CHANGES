@@ -1,3 +1,15 @@
+Version 1.5106:
+- Add standard tests
+- Detect mailboxes that contain a mix of newline types. Complain about it, but
+  also allow the force option to continue processing. Thanks to Pali Rohár
+  <pali.rohar@gmail.com> for the bug report.
+- Avoid OO interface to File::Temp, which in some versions and on some operating
+  systems, deletes the file when it is closed. Thanks to Paul Howarth
+  <paul@city-fan.org> for the bug report.
+  https://rt.cpan.org/Public/Bug/Display.html?id=103835
+- Fix compatibility issue with newer versions of perl, which remove "." from
+  @INC. https://rt.cpan.org/Ticket/Display.html?id=121466
+
 Version 1.5105: Sat May 2 2015
 - Prevent CPAN from indexing private-lib
 

@@ -45,6 +45,7 @@ recommends 'Paws';
 recommends 'Perl::Critic';
 recommends 'Perl::Critic::Freenode';
 recommends 'Term::ReadLine::Gnu';
+recommends 'Test2::Suite';
 recommends 'Web::Query';
 
 on 'test' => sub {

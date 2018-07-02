@@ -3,29 +3,26 @@ package Pcore::Ext::Context::Func;
 use Pcore -class;
 use Pcore::Util::Scalar qw[refaddr];
 
-has ext       => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 1 );
-has func_name => ();    # ( is => 'ro', isa => Maybe [Str] );
+has ctx       => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::Ext::Context'], required => 1 );
 has func_args => ();    # ( is => 'ro', isa => Maybe [ArrayRef] );
 has func_body => ();    # ( is => 'ro', isa => Str, required => 1 );
 
 sub TO_JSON ( $self ) {
     my $id = refaddr $self;
 
-    $self->{ext}->{_js_gen_cache}->{$id} = $self->to_js;
+    $self->{ctx}->{_js_gen_cache}->{$id} = $self->to_js;
 
     return "__JS${id}__";
 }
 
 sub to_js ( $self ) {
-    my $js = 'function';
-
-    $js .= q[ ] . $self->{func_name} if $self->{func_name};
-
-    $js .= q[(];
+    my $js = 'function (';
 
     $js .= join q[,], $self->{func_args}->@* if $self->{func_args};
 
-    $js .= "){\n" . $self->{func_body} . "\n}";
+    my $body = "$self->{func_body}";
+
+    $js .= ") { $body }";
 
     return \$js;
 }

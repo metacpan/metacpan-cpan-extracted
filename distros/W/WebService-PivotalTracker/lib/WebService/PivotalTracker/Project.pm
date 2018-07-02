@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use WebService::PivotalTracker::PropertyAttributes;
 use WebService::PivotalTracker::Story;
@@ -62,6 +62,15 @@ has( @{$_} ) for props_to_attributes(
 
 with 'WebService::PivotalTracker::Entity';
 
+sub memberships {
+    my $self = shift;
+
+    return $self->_pt_api->project_memberships(
+        @_,
+        project_id => $self->id,
+    );
+}
+
 sub stories {
     my $self = shift;
 
@@ -109,7 +118,7 @@ WebService::PivotalTracker::Project - A single iteration in a project
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -200,6 +209,12 @@ The raw JSON used to create this object.
 =head1 METHODS
 
 This class provides the following methods:
+
+=head2 $project->memberships(...)
+
+This method returns an array reference of
+L<WebService::PivotalTracker::ProjectMembership> objects, one for each member
+of the project.
 
 =head2 $project->stories(...)
 

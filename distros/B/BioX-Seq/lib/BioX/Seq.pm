@@ -1,4 +1,4 @@
-package BioX::Seq 0.006005;
+package BioX::Seq 0.006007;
 
 use 5.012;
 use strict;

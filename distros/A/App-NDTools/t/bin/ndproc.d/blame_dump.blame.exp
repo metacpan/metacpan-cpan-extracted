@@ -1,17 +1,31 @@
 [
    {
-      "R" : [
-         {
-            "Edit" : [
-               null,
-               {
-                  "id" : "edit_find",
-                  "label" : "Find"
+      "diff" : {
+         "D" : [
+            {
+               "D" : {
+                  "Edit" : {
+                     "D" : [
+                        {
+                           "I" : 3,
+                           "R" : null
+                        },
+                        {
+                           "R" : {
+                              "id" : "edit_find",
+                              "label" : "Find"
+                           }
+                        },
+                        {
+                           "R" : null
+                        }
+                     ]
+                  }
                },
-               null
-            ]
-         }
-      ],
+               "I" : 1
+            }
+         ]
+      },
       "rule_id" : 0
    }
 ]

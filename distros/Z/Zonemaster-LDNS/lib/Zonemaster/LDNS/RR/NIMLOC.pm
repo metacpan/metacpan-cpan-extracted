@@ -1,5 +1,7 @@
-
 package Zonemaster::LDNS::RR::NIMLOC;
+
+use strict;
+use warnings;
 
 use parent 'Zonemaster::LDNS::RR';
 

@@ -40,7 +40,9 @@ METHODS
     Construct a new Sys::Linux::Namespace object. This collects all the
     options you want to enable, but does not engage them.
 
-    All arguments are passed in like a hash.
+    All arguments are passed in like a hash. This module uses Moo to build
+    up the object, so all the below attributes can also be accessed on the
+    instantiated object too.
 
     private_mount
      Setup a private mount namespace, this makes every currently mounted
@@ -87,15 +89,21 @@ METHODS
      semaphores without anyone else touching them.
 
   "setup"
-    Engage the namespaces with all the configured options.
+    Engage the namespaces with all the configured options. This does not
+    fork, and affects the existing process. The changes cannot be undone.
 
   "run"
     Engage the namespaces on an unsuspecting coderef. Arguments are passed
-    in like a hash
+    in like a hash. This will perform a fork to run the coderef in the new
+    namespaces
 
     code
      The coderef to run. It will receive all arguments passed to "->run()"
      as a hash.
+
+Debugging
+    If $Sys::Linux::Namespace::debug is set to a true value, then some
+    debugging messages will be sent to STDERR
 
 AUTHOR
     Ryan Voots simcop@cpan.org <mailto:SIMCOP@cpan.org>

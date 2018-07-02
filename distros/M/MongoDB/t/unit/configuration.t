@@ -1,5 +1,4 @@
-#
-#  Copyright 2015 MongoDB, Inc.
+#  Copyright 2015 - present MongoDB, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
 
 use strict;
 use warnings;
@@ -21,9 +19,6 @@ use Test::Fatal;
 
 use MongoDB;
 use MongoDB::MongoClient;
-use MongoDB::BSON;
-
-use constant HAS_DATETIME_TINY => eval { require DateTime::Tiny; 1 };
 
 sub _mc {
     return MongoDB::MongoClient->new(@_);
@@ -108,26 +103,10 @@ subtest "auth mechanism and properties" => sub {
         { bar => 2, SERVICE_NAME => 'mongodb' },
         "authMechanismProperties supersedes auth_mechanism_properties"
     );
-
-    $mc = _mc(
-        @up,
-        sasl           => 1,
-        sasl_mechanism => 'PLAIN',
-    );
-    is( $mc->auth_mechanism, 'PLAIN', "sasl+sasl_mechanism is auth_mechanism default" );
-
-    $mc = _mc(
-        @up,
-        auth_mechanism => 'MONGODB-CR',
-        sasl           => 1,
-        sasl_mechanism => 'PLAIN',
-    );
-    is( $mc->auth_mechanism, 'MONGODB-CR',
-        "auth_mechanism dominates sasl+sasl_mechanism" );
 };
 
 subtest bson_codec => sub {
-    my $codec = MongoDB::BSON->new( op_char => '-' );
+    my $codec = BSON->new( op_char => '-' );
 
     my $mc = _mc();
     ok( !$mc->bson_codec->prefer_numeric, "default bson_codec object" );
@@ -136,25 +115,15 @@ subtest bson_codec => sub {
     is( $mc->bson_codec->op_char, '-', "bson_codec object" );
 
     $mc = _mc( bson_codec => { prefer_numeric => 1 } );
-    isa_ok( $mc->bson_codec, 'MongoDB::BSON' );
+    isa_ok( $mc->bson_codec, 'BSON' );
     ok( $mc->bson_codec->prefer_numeric, "bson_codec coerced from hashref" );
-
-    if ( HAS_DATETIME_TINY ) {
-        $mc = _mc( dt_type => 'DateTime::Tiny' );
-        isa_ok( $mc->bson_codec, 'MongoDB::BSON' );
-        ok( $mc->bson_codec->dt_type, "legacy dt_type influences default codec" );
-    }
 };
 
 subtest connect_timeout_ms => sub {
     my $mc = _mc();
     is( $mc->connect_timeout_ms, 10000, "default connect_timeout_ms" );
 
-    $mc = _mc( timeout => 60000, );
-    is( $mc->connect_timeout_ms, 60000, "legacy 'timeout' as fallback" );
-
     $mc = _mc(
-        timeout            => 60000,
         connect_timeout_ms => 30000,
     );
     is( $mc->connect_timeout_ms, 30000, "connect_timeout_ms" );
@@ -292,11 +261,7 @@ subtest socket_timeout_ms => sub {
     my $mc = _mc();
     is( $mc->socket_timeout_ms, 30000, "default socket_timeout_ms" );
 
-    $mc = _mc( query_timeout => 60000, );
-    is( $mc->socket_timeout_ms, 60000, "explicit 'query_timeout' as fallback" );
-
     $mc = _mc(
-        query_timeout     => 60000,
         socket_timeout_ms => 40000,
     );
     is( $mc->socket_timeout_ms, 40000, "socket_timeout_ms" );

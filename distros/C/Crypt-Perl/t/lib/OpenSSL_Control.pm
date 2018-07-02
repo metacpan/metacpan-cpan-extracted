@@ -8,9 +8,9 @@ use Test::More;
 use Call::Context ();
 use File::Spec ();
 use File::Temp ();
+use File::Slurp ();
 use File::Which ();
 use IPC::Open3 ();
-use Module::Load ();
 
 use lib '../lib';
 
@@ -69,6 +69,32 @@ sub can_ecdsa {
     }
 
     return !$_ecdsa_test_err;
+}
+
+my $_has_ecdsa_verify_private_bug;
+
+# Certain old OpenSSL versions (0.9.8zg … maybe others?) fail to recognize
+# the ECDSA private key in dgst’s verification logic.
+#
+# The error is:
+#
+#   0606C06E:digital envelope routines:EVP_VerifyFinal:wrong public key type:/SourceCache/OpenSSL098/OpenSSL098-52.40.1/src/crypto/evp/p_verify.c:85
+#
+sub has_ecdsa_verify_private_bug {
+    if (!defined $_has_ecdsa_verify_private_bug) {
+        die "OpenSSL can’t even do ECDSA!" if !can_ecdsa();
+
+        my $t_dir = __FILE__;
+        $t_dir =~ s<[^/]+\z><..>;
+
+        my $key_pem = File::Slurp::read_file("$t_dir/assets/prime256v1.key");
+        my $msg = "hello";
+        my $sig = pack 'H*', '3045022100965e84d06031b2bb0c52fdc0d1ca148e4bdf0f91ae24ecf23dd76b294c68bda102207e35cc7334964151fcddd5b3dec51fad123c3fbab5ba40021003472222297f3e';
+
+        $_has_ecdsa_verify_private_bug = !verify_private($key_pem, $msg, 'sha1', $sig);
+    }
+
+    return $_has_ecdsa_verify_private_bug;
 }
 
 sub verify_private {
@@ -130,7 +156,7 @@ sub curve_oid {
 sub curve_data {
     my ($name) = @_;
 
-    Module::Load::load('Crypt::Perl::ECDSA::ECParameters');
+    require Crypt::Perl::ECDSA::ECParameters;
 
     my ($asn1, $out) = __ecparam( $name, 'explicit', Crypt::Perl::ECDSA::ECParameters::ASN1_ECParameters() );
 
@@ -140,7 +166,7 @@ sub curve_data {
 sub __ecparam {
     my ($name, $param_enc, $asn1_template) = @_;
 
-    Module::Load::load('Crypt::Perl::ASN1');
+    require Crypt::Perl::ASN1;
 
     my $bin = openssl_bin();
     my $out = qx<$bin ecparam -name $name -param_enc $param_enc -outform DER>;

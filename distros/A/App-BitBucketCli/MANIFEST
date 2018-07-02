@@ -4,6 +4,11 @@ Changes
 lib/App/BitBucketCli.pm
 lib/App/BitBucketCli/Base.pm
 lib/App/BitBucketCli/Branch.pm
+lib/App/BitBucketCli/Command/Branches.pm
+lib/App/BitBucketCli/Command/Projects.pm
+lib/App/BitBucketCli/Command/PullRequests.pm
+lib/App/BitBucketCli/Command/Repositories.pm
+lib/App/BitBucketCli/Command/Repository.pm
 lib/App/BitBucketCli/Core.pm
 lib/App/BitBucketCli/Link.pm
 lib/App/BitBucketCli/Links.pm

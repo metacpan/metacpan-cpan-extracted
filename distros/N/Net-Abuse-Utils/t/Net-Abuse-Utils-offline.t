@@ -1,3 +1,6 @@
+BEGIN { chdir 't' if -d 't' }
+use lib '../lib';
+
 use Test::More;
 BEGIN { use_ok('Net::Abuse::Utils') }
 

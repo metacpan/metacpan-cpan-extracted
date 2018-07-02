@@ -1,3 +1,9 @@
+0.06
+ - Replace /SvIV/SvUV/SvNV with SvIVX/SvUVX/SvNVX where appropriate
+ - Have the Makefile.PL define "NO_INF_CAST_TO_NV" if nvtype is __float128 &&
+   longdblkind is either 3 or 4.
+ - Change get_infl() and get_neg_infl() when NO_INF_CAST_TO_NV is defined
+
 0.05
  - Yet another attempt to have the Makefile.PL successfully weed out deficient
    dragonfly and netbsd cpan-tester systems.(Probably won't succeed, but should

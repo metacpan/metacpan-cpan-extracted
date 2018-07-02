@@ -3,7 +3,7 @@ package WebService::PivotalTracker::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Type::Library
     -base,
@@ -120,7 +120,7 @@ WebService::PivotalTracker::Types - Type definitions used in this distro
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 DESCRIPTION
 

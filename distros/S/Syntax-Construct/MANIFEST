@@ -7,11 +7,13 @@ t/00-load.t
 t/01-invalid.t
 t/02-constructs.t
 t/03-hooks.t
+t/04-extra.t
 t/05-functions.t
 t/changes.t
 t/completness.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
