@@ -1,0 +1,14 @@
+
+// Map the type of our custom class
+%typemap{V8Context*}{simple};
+
+// Map simple types
+%typemap{const char*}{simple};
+%typemap{int}{simple};
+%typemap{bool}{simple};
+%typemap{void}{simple};
+%typemap{bool}{simple};
+%typemap{SV*}{simple};
+%typemap{HV*}{simple};
+%typemap{AV*}{simple};
+

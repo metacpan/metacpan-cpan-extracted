@@ -1,5 +1,9 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+0.12 2018-07-02
+ - Fix editing with two conditions having the same value
+ - Prevent Error Message
+
 0.11 2018-06-12
  - Fix show conditioned CF when condition CF does not apply to current object
 

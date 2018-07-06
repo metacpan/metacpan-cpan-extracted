@@ -58,7 +58,6 @@ close WRITE or die $!;
 wait;
 
 # diag "Waited: $pid";
-opendir DIR, $dir or die $!;
 is_deeply( [ sort( listdir( $dir ) ) ],
 		[qw(bang.txt bug.txt)], 'rename - list' );
 

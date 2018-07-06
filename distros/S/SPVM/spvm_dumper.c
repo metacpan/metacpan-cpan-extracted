@@ -81,7 +81,7 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     }
     else if (id == SPVM_OP_C_ID_PACKAGE_VAR) {
       SPVM_PACKAGE_VAR* package_var = op_cur->uv.package_var;
-      printf(" \"%s\"", package_var->op_package_var_access->uv.package_var_access->op_name->uv.name);
+      printf(" \"%s\"", package_var->op_var->uv.var->op_name->uv.name);
       printf(" (id :%d)", package_var->id);
     }
     else if (id == SPVM_OP_C_ID_VAR) {
@@ -396,7 +396,7 @@ void SPVM_DUMPER_dump_field(SPVM_COMPILER* compiler, SPVM_FIELD* field) {
   if (field) {
     printf("      name => \"%s\"\n", field->op_name->uv.name);
     
-    printf("      index => \"%" PRId32 "\"\n", field->rel_id);
+    printf("      index => \"%" PRId32 "\"\n", field->index);
     
     SPVM_TYPE* type = field->op_type->uv.type;
     printf("      type => ");
@@ -404,7 +404,7 @@ void SPVM_DUMPER_dump_field(SPVM_COMPILER* compiler, SPVM_FIELD* field) {
     printf("\n");
     printf("      byte_size => \"%" PRId32 "\"\n", SPVM_FIELD_get_byte_size(compiler, field));
     
-    printf("      index => \"%" PRId32 "\"\n", field->rel_id);
+    printf("      index => \"%" PRId32 "\"\n", field->index);
   }
   else {
     printf("        None\n");

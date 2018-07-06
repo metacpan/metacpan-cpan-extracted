@@ -73,7 +73,7 @@
    "provides" : {
       "Test::Time::HiRes" : {
          "file" : "lib/Test/Time/HiRes.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -88,7 +88,7 @@
          "web" : "https://github.com/mjemmeson/Test-Time-HiRes"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

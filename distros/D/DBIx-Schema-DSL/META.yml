@@ -5,9 +5,9 @@ author:
 build_requires:
   Test::More: '0.98'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Minilla/v3.1.0, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   DBIx::Schema::DSL:
     file: lib/DBIx/Schema/DSL.pm
-    version: '0.12'
+    version: '1.0000'
   DBIx::Schema::DSL::Context:
     file: lib/DBIx/Schema/DSL/Context.pm
 requires:
@@ -34,13 +34,16 @@ requires:
   Clone: '0.06'
   Moo: '1.000003'
   SQL::Translator: '0.11019'
-  perl: '5.008001'
+  perl: '5.008005'
 resources:
   bugtracker: https://github.com/Songmu/p5-DBIx-Schema-DSL/issues
   homepage: https://github.com/Songmu/p5-DBIx-Schema-DSL
   repository: git://github.com/Songmu/p5-DBIx-Schema-DSL.git
-version: '0.12'
+version: '1.0000'
+x_authority: cpan:SONGMU
 x_contributors:
-  - 'tokubass <tomi21110@gmail.com>'
-  - 'tokubass <tokubass@cpan.org>'
   - 'karupanerura <karupa@cpan.org>'
+  - 'tokubass <tokubass@cpan.org>'
+  - 'tokubass <tomi21110@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

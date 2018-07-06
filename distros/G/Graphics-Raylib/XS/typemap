@@ -3,6 +3,7 @@ BoundingBox					T_OPAQUE_STRUCT
 Camera2D					T_OPAQUE_STRUCT
 Camera3D					T_OPAQUE_STRUCT
 Camera3D *					T_PTROBJ
+CharInfo *					T_PTROBJ
 Color						T_OPAQUE_STRUCT
 Color *						T_PTROBJ
 Font						T_OPAQUE_STRUCT
@@ -28,6 +29,7 @@ Vector2 *					T_PTROBJ
 Vector3						T_OPAQUE_STRUCT
 Vector3 *					T_PTROBJ
 Vector4						T_OPAQUE_STRUCT
+Vector4 *					T_PTROBJ
 VrDeviceInfo					T_OPAQUE_STRUCT
 Wave						T_OPAQUE_STRUCT
 Wave *						T_PTROBJ

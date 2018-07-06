@@ -7,7 +7,7 @@ package RPerl::Compiler;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.032_000;
+our $VERSION = 0.038_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::CompileUnit::Module::Class);
@@ -247,7 +247,7 @@ sub find_dependencies {
                 or ( $file_line =~ /use\s+RPerl::Class\s*;/ )
                 or ( $file_line =~ /use\s+RPerl::Config\s*;/ )
                 or ( $file_line =~ /use\s+RPerl::Exporter.*;/ )
-                or ( $file_line =~ /use\s+\w+Perl::Config\s*;/ )    # DEV NOTE, CORRELATION #rp027: MathPerl::Config, PhysicsPerl::Config, etc
+                or ( $file_line =~ /use\s+\w+Perl::Config\s*;/ )    # DEV NOTE, CORRELATION #rp027: RPerl::Config, MathPerl::Config, PhysicsPerl::Config, etc
                 or ( $file_line =~ /use\s+perlapinames_generated/ )
                 or ( $file_line =~ /use\s+parent/ )
                 or ( $file_line =~ /use\s+constant/ )
@@ -551,6 +551,7 @@ sub rperl_to_xsbinary__parse_generate_compile {
     ( my string $rperl_input_file_name, my string_hashref $cpp_output_file_name_group, my string_hashref $cpp_source_group, my string_hashref $modes ) = @ARG;
     my object $rperl_ast;
 
+#    RPerl::diag( 'in Compiler->rperl_to_xsbinary__parse_generate_compile(), received $cpp_output_file_name_group = ' . "\n" . Dumper($cpp_output_file_name_group) . "\n" );
 #    RPerl::diag( 'in Compiler->rperl_to_xsbinary__parse_generate_compile(), received $modes->{_symbol_table} = ' . "\n" . Dumper($modes->{_symbol_table}) . "\n" );
 
     # [[[ PARSE RPERL TO AST ]]]
@@ -606,10 +607,10 @@ sub generate_output_file_names {
     { my hashref_arrayref $RETURN_TYPE };
     ( my string_arrayref $input_file_names, my string_arrayref $output_file_name_prefixes, my integer $input_files_count, my string_hashref $modes ) = @ARG;
 
-    #    RPerl::diag('in Compiler::generate_output_file_names(), received $input_file_names = ' . "\n" . Dumper($input_file_names) . "\n");
-    #    RPerl::diag('in Compiler::generate_output_file_names(), received $output_file_name_prefixes = ' . "\n" . Dumper($output_file_name_prefixes) . "\n");
-    #    RPerl::diag('in Compiler::generate_output_file_names(), received $input_files_count = ' . $input_files_count . "\n");
-#    RPerl::diag( 'in Compiler::generate_output_file_names(), received $modes = ' . "\n" . Dumper($modes) . "\n" );
+#    RPerl::diag('in Compiler::generate_output_file_names(), received $input_file_names = ' . "\n" . Dumper($input_file_names) . "\n");
+#    RPerl::diag('in Compiler::generate_output_file_names(), received $output_file_name_prefixes = ' . "\n" . Dumper($output_file_name_prefixes) . "\n");
+#    RPerl::diag('in Compiler::generate_output_file_names(), received $input_files_count = ' . $input_files_count . "\n");
+#    RPerl::diag('in Compiler::generate_output_file_names(), received $modes = ' . "\n" . Dumper($modes) . "\n" );
 
     # NEED FIX: add string_hashref_arrayref type
     #    my string_hashref_arrayref $output_file_name_groups = [];
@@ -626,22 +627,38 @@ sub generate_output_file_names {
 
         # if output file prefix(es) provided, then use to generate output file name(s)
         if ( defined $output_file_name_prefixes->[$i] ) {
-
             # explicitly provided option should already be only prefix, but fileparse() to make sure
             ( $input_file_name_prefix, $input_file_name_path, $input_file_name_suffix ) = fileparse( $output_file_name_prefixes->[$i], qr/[.][^.]*/xms );
             if ( $input_file_name_prefix eq q{} ) {
                 die "ERROR EAR17: Invalid RPerl source code output file command-line argument specified, dying\n";
             }
+
+            # DEV NOTE: File::Basename::fileparse() wrongly (or at least stupidly) returns path './' intead of empty path '' when there is no leading path present, compensate 
+            if ((($input_file_name_path eq './') and ((substr $output_file_name_prefixes->[$i], 0, 2) ne './')) or 
+                (($input_file_name_path eq '.\\') and ((substr $output_file_name_prefixes->[$i], 0, 2) ne '.\\'))) {
+                $input_file_name_path = q{};
+            }
         }
 
         # if output file prefix(es) not provided, then generate output file name(s) from input file name(s)
         else {
-            #            RPerl::diag('in Compiler::generate_output_file_names(), have $input_file_name = ' . $input_file_name . "\n");
+#            RPerl::diag('in Compiler::generate_output_file_names(), no output file prefixes provided, have $input_file_name = ' . $input_file_name . "\n");
             # should not already be only prefix, fileparse() to isolate prefix
             ( $input_file_name_prefix, $input_file_name_path, $input_file_name_suffix ) = fileparse( $input_file_name, qr/[.][^.]*/xms );
+
+            # DEV NOTE: File::Basename::fileparse() wrongly (or at least stupidly) returns path './' intead of empty path '' when there is no leading path present, compensate 
+            if ((($input_file_name_path eq './') and ((substr $input_file_name, 0, 2) ne './')) or 
+                (($input_file_name_path eq '.\\') and ((substr $input_file_name, 0, 2) ne '.\\'))) {
+                $input_file_name_path = q{};
+            }
         }
 
         my string $output_file_name_path_prefix = $input_file_name_path . $input_file_name_prefix;
+
+#        RPerl::diag('in Compiler::generate_output_file_names(), have $input_file_name_path = ' . q{'} . $input_file_name_path . q{'} . "\n" );
+#        RPerl::diag('in Compiler::generate_output_file_names(), have $input_file_name_prefix = ' . q{'} . $input_file_name_prefix . q{'} . "\n" );
+#        RPerl::diag('in Compiler::generate_output_file_names(), have $input_file_name_suffix = ' . q{'} . $input_file_name_suffix . q{'} . "\n" );
+#        RPerl::diag('in Compiler::generate_output_file_names(), have $output_file_name_path_prefix = ' . q{'} . $output_file_name_path_prefix . q{'} . "\n" );
 
         # *.pl input files may generate *.o, *.a, *.so, *.exe, and/or non-suffix output files
         if ( $input_file_name =~ /[.]pl$/xms ) {
@@ -753,11 +770,14 @@ sub generate_output_file_names {
             }
         }
 
-        # all CPP ops modes require CPP output files; H output files may optionally be generated as needed
+        # all CPP ops modes require CPP output files; H output files may optionally be generated as needed for .pm input files only
         if ( $modes->{ops} eq 'CPP' ) {
             $output_file_name_groups->[$i]->{CPP}      = $output_file_name_path_prefix . $filename_suffixes_supported->{OUTPUT_SOURCE}->{CPP}->[0];
-            $output_file_name_groups->[$i]->{H}        = $output_file_name_path_prefix . $filename_suffixes_supported->{OUTPUT_SOURCE}->{H}->[0];
-            $output_file_name_groups->[$i]->{_H_label} = ' (if needed)';
+            # DEV NOTE, CORRELATION #rp039: programs never have header files
+            if ( $input_file_name =~ /[.]pm$/xms ) {
+                $output_file_name_groups->[$i]->{H}        = $output_file_name_path_prefix . $filename_suffixes_supported->{OUTPUT_SOURCE}->{H}->[0];
+                $output_file_name_groups->[$i]->{_H_label} = ' (if needed)';
+            }
             if ( $modes->{parallel} eq 'OPENMP' ) {
                 $output_file_name_groups->[$i]->{OPENMP_CPP} = $output_file_name_path_prefix . $filename_suffixes_supported->{OUTPUT_SOURCE}->{OPENMP_CPP}->[0];
             }
@@ -765,6 +785,8 @@ sub generate_output_file_names {
 
 #        RPerl::diag('in Compiler::generate_output_file_names(), bottom of loop ' . $i . ' of ' . ($input_files_count - 1) . ", have \$output_file_name_groups->[$i] = \n" . Dumper( $output_file_name_groups->[$i] ) . "\n");
     }
+
+#    RPerl::diag('in Compiler::generate_output_file_names(), returning $output_file_name_groups = ' . "\n" . Dumper($output_file_name_groups) . "\n" );
     return $output_file_name_groups;
 }
 
@@ -777,6 +799,7 @@ sub save_source_files {
 #    RPerl::diag( q{in Compiler::save_source_files(), received $file_name_group =} . "\n" . Dumper($file_name_group) . "\n" );
 #    RPerl::diag( 'in Compiler::save_source_files(), received $modes =' . "\n" . Dumper($modes) . "\n" );
 #    RPerl::diag( 'in Compiler::save_source_files(), received $modes->{_symbol_table} =' . "\n" . Dumper($modes->{_symbol_table}) . "\n" );
+#    RPerl::diag( 'in Compiler::save_source_files(), received $modes->{_input_file_name} =' . "\n" . Dumper($modes->{_input_file_name}) . "\n" );
 #    RPerl::diag( "\n" . 'in Compiler::save_source_files(), received $modes->{subcompile} =' . "\n" . Dumper($modes->{subcompile}) . "\n" );
 
     foreach my string $suffix_key ( sort keys %{$source_group} ) {
@@ -794,9 +817,14 @@ sub save_source_files {
         RPerl::verbose('SAVE  PHASE 0:      Final file modifications...    ');
 
         $source_group->{CPP} = post_processor_cpp__header_unneeded( $source_group );
-        $source_group->{CPP} = post_processor_cpp__header_or_cpp_path( $source_group->{CPP}, $file_name_group->{H} );
 
-        # MODULE POST-PROCESSING
+        # DEV NOTE, CORRELATION #rp039: programs never have header files
+        if (defined $file_name_group->{H}) {
+#            RPerl::diag( 'in Compiler::save_source_files(), about to call post_processor_cpp__header_or_cpp_path() w/ $file_name_group->{H} = ' . $file_name_group->{H} . "\n" );
+            $source_group->{CPP} = post_processor_cpp__header_or_cpp_path( $source_group->{CPP}, $file_name_group->{H} );
+        }
+
+        # MODULE POST-PROCESSING, only if primary input file is a module, thus requiring PMC file creation etc.
         if ( $modes->{_input_file_name} =~ /[.]pm$/xms ) {
             $source_group = post_processor_cpp__types_change( $source_group, $modes );
             post_processor_cpp__pmc_generate( $source_group, $file_name_group, $modes );
@@ -941,7 +969,8 @@ sub post_processor_cpp__header_or_cpp_path {
     return $source_CPP;
 }
 
-# remove leading library path if present, because it should already be enabled in RPerl/Inline.pm via -Ifoo subcompiler argument
+# remove leading lib or blib path if present, because it should already be enabled for C++ in RPerl/Inline.pm via -Ifoo subcompiler argument, 
+# and for Perl in the generated PMC files via $main::INCLUDE_PATH global var
 sub post_processor_cpp__lib_path_delete {
     { my string $RETURN_TYPE };
     ( my string $path ) = @ARG;
@@ -982,6 +1011,34 @@ sub post_processor_cpp__lib_path_delete {
 #    }
     elsif ( ( substr $path, 0, 11 ) eq './blib/lib/' ) {
         substr $path, 0, 11, q{};
+    }
+    return $path;
+}
+
+# remove leading blib path if present, because it should only be utilized during Makefile build phase
+sub post_processor_cpp__blib_path_delete {
+    { my string $RETURN_TYPE };
+    ( my string $path ) = @ARG;
+
+    # DEV NOTE: sometimes MS Windows OS has forward slashes in the 'blib/lib/' part of the path, so we do not differentiate by OS
+    # DEV NOTE: only delete the 'blib/' parts, not the entire 'blib/lib/' part, leave the 'lib/' in place
+    if ( ( substr $path, 0, 5 ) eq 'blib\\' ) {
+        substr $path, 0, 5, q{};
+    }
+#    elsif ( ( substr $path, 0, 6 ) eq '\\blib\\' ) {  # NEED ANSWER: is there ever a case where '/lib/' would appear instead of 'lib/' or './lib/' ???
+#        substr $path, 0, 6, q{};
+#    }
+    elsif ( ( substr $path, 0, 7 ) eq '.\\blib\\' ) {
+        substr $path, 0, 7, q{};
+    }
+    elsif ( ( substr $path, 0, 5 ) eq 'blib/' ) {
+        substr $path, 0, 5, q{};
+    }
+#    elsif ( ( substr $path, 0, 6 ) eq '/blib/' ) {  # NEED ANSWER: same question as above
+#        substr $path, 0, 6, q{};
+#    }
+    elsif ( ( substr $path, 0, 7 ) eq './blib/' ) {
+        substr $path, 0, 7, q{};
     }
     return $path;
 }
@@ -1255,38 +1312,26 @@ sub post_processor__current_directory_path_delete {
 sub post_processor_cpp__pmc_generate {
     { my void $RETURN_TYPE };
     ( my string_hashref $source_group, my string_hashref $file_name_group, my string_hashref $modes ) = @ARG;
-
-    # NEED FIX WIN32: handle back-slash for Win32 instead of forward-slash only for *NIX
-    my string $cpp_file_path = $file_name_group->{CPP};
-    $cpp_file_path = post_processor_cpp__lib_path_delete($cpp_file_path);
-
-    # DEV NOTE: barely-documented Inline::CPP bug, must have leading './' if no other directories in path
-    if ( $cpp_file_path !~ /\// ) {
-        if ( $OSNAME eq 'MSWin32' ) {
-            $cpp_file_path .= q{.\\};
-        }
-        else {
-            $cpp_file_path .= q{./};
-        }
-    }
+#    RPerl::diag( q{in Compiler::post_processor_cpp__pmc_generate(), top of surbroutine...} . "\n" );
+#    RPerl::diag( q{in Compiler::post_processor_cpp__pmc_generate(), received $file_name_group->{CPP} = } . $file_name_group->{CPP} . "\n" );
 
     # DEV NOTE: only generate PMC output file in dynamic (default) subcompile mode
     if ( $modes->{subcompile} eq 'DYNAMIC' ) {
         if ( ( exists $source_group->{PMC} ) and ( defined $source_group->{PMC} ) and ( $source_group->{PMC} ne q{} ) ) {
 
-            #            RPerl::diag( q{in Compiler::save_source_files(), have $source_group = } . Dumper($source_group) . "\n" );
+#            RPerl::diag( q{in Compiler::post_processor_cpp__pmc_generate(), have $source_group = } . Dumper($source_group) . "\n" );
             die 'ERROR ECOCOFI01, COMPILER, SAVE OUTPUT FILES, MODULE TEMPLATE COPY: Received non-empty PMC source, dying' . "\n";
         }
 
-#        RPerl::diag( q{in Compiler::save_source_files(), have %INC = } . Dumper(\%INC) . "\n" );
-#        RPerl::diag( q{in Compiler::save_source_files(), have @INC = } . Dumper(\@INC) . "\n" );
-#        RPerl::diag( q{in Compiler::save_source_files(), have $source_group->{_package_names_underscores} = } . Dumper($source_group->{_package_names_underscores}) . "\n" );
-#        RPerl::diag( q{in Compiler::save_source_files(), have $source_group->{_package_names} = } . Dumper($source_group->{_package_names}) . "\n" );
+#        RPerl::diag( q{in Compiler::post_processor_cpp__pmc_generate(), have %INC = } . Dumper(\%INC) . "\n" );
+#        RPerl::diag( q{in Compiler::post_processor_cpp__pmc_generate(), have @INC = } . Dumper(\@INC) . "\n" );
+#        RPerl::diag( q{in Compiler::post_processor_cpp__pmc_generate(), have $source_group->{_package_names_underscores} = } . Dumper($source_group->{_package_names_underscores}) . "\n" );
+#        RPerl::diag( q{in Compiler::post_processor_cpp__pmc_generate(), have $source_group->{_package_names} = } . Dumper($source_group->{_package_names}) . "\n" );
 
         my string_arrayref $module_names_split             = [ ( split /\n/, $source_group->{_package_names} ) ];
         my string_arrayref $module_names_underscores_split = [ ( split /\n/, $source_group->{_package_names_underscores} ) ];
 
-        #        RPerl::diag( q{in Compiler::save_source_files(), have $module_names_split = } . Dumper($module_names_split) . "\n" );
+        #        RPerl::diag( q{in Compiler::post_processor_cpp__pmc_generate(), have $module_names_split = } . Dumper($module_names_split) . "\n" );
 
         my integer $module_count           = scalar @{$module_names_split};
         my string $module_name             = shift @{$module_names_split};
@@ -1294,12 +1339,12 @@ sub post_processor_cpp__pmc_generate {
         my integer $i                      = 0;
 
 # deferred, finally insert constants shims
-#        RPerl::diag('in Compiler::save_source_files(), have $source_group->{_H_constants_shims}->{$module_name_underscores} = ' . $source_group->{_H_constants_shims}->{$module_name_underscores} . "\n");
+#        RPerl::diag('in Compiler::post_processor_cpp__pmc_generate(), have $source_group->{_H_constants_shims}->{$module_name_underscores} = ' . $source_group->{_H_constants_shims}->{$module_name_underscores} . "\n");
 
         while ( defined $module_name_underscores ) {
 
-            #            RPerl::diag( q{in Compiler::save_source_files(), have $cpp_file_path = } . $cpp_file_path . "\n" );
-            #            RPerl::diag( q{in Compiler::save_source_files(), have $module_name_underscores = } . $module_name_underscores . "\n" );
+#            RPerl::diag( q{in Compiler::post_processor_cpp__pmc_generate(), have $file_name_group->{CPP} = } . $file_name_group->{CPP} . "\n" );
+#            RPerl::diag( q{in Compiler::post_processor_cpp__pmc_generate(), have $module_name_underscores = } . $module_name_underscores . "\n" );
 
             # utilize modified copies of Module PMC template file
             my string $module_pmc_filename_manual;
@@ -1315,10 +1360,10 @@ sub post_processor_cpp__pmc_generate {
                 }
             }
 
-#            RPerl::diag( 'in Compiler::save_source_files(), have $module_pmc_filename_manual = ' . $module_pmc_filename_manual . "\n" );
-#            RPerl::diag( 'in Compiler::save_source_files(), have $source_group->{_PMC_accessors_mutators_shims} = ' . Dumper($source_group->{_PMC_accessors_mutators_shims}) . "\n" );
-#            RPerl::diag( 'in Compiler::save_source_files(), have $source_group->{_PMC_subroutines_shims} = ' . Dumper($source_group->{_PMC_subroutines_shims}) . "\n" );
-#            RPerl::diag( 'in Compiler::save_source_files(), have $source_group->{_PMC_includes} = ' . Dumper($source_group->{_PMC_includes}) . "\n" );
+#            RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $module_pmc_filename_manual = ' . $module_pmc_filename_manual . "\n" );
+#            RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $source_group->{_PMC_accessors_mutators_shims} = ' . Dumper($source_group->{_PMC_accessors_mutators_shims}) . "\n" );
+#            RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $source_group->{_PMC_subroutines_shims} = ' . Dumper($source_group->{_PMC_subroutines_shims}) . "\n" );
+#            RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $source_group->{_PMC_includes} = ' . Dumper($source_group->{_PMC_includes}) . "\n" );
 
             if ( not -f $module_pmc_filename_manual ) {
                 die 'ERROR ECOCOFI02, COMPILER, SAVE OUTPUT FILES, MODULE TEMPLATE COPY: File not found, ' . q{'}
@@ -1337,11 +1382,10 @@ sub post_processor_cpp__pmc_generate {
             my string $file_line;
             my string $file_string  = q{};
             my string $pm_file_path = $file_name_group->{PMC};
+            my boolean $has_rperl_config = 0;
             chop $pm_file_path;    # remove the 'c' from 'pmc' file suffix
             while ( $file_line = <$FILE_HANDLE> ) {
-
-                #                $file_line =~ s/lib\/RPerl\/CompileUnit\/Module\.cpp/$cpp_file_path/gxms;
-                $file_line =~ s/RPerl\/CompileUnit\/Module\.cpp/$cpp_file_path/gxms;
+#                $file_line =~ s/\/RPerl\/CompileUnit\/Module\.cpp/$cpp_file_path/gxms;  # replaced by auto-generated 'use Inline' code below
                 $file_line =~ s/RPerl::CompileUnit::Module/$module_name/gxms;
                 $file_line =~ s/RPerl__CompileUnit__Module/$module_name_underscores/gxms;
                 if ( $file_line eq
@@ -1368,9 +1412,223 @@ sub post_processor_cpp__pmc_generate {
                 elsif ( $file_line eq ( '# <<< CHANGE_ME: add OO ISA here >>>' . "\n" ) ) {
                     $file_line = 'our @ISA = qw(' . $source_group->{_parent_names}->{$module_name_underscores} . ');' . "\n";
                 }
+                # DEV NOTE, CORRELATION #rp027: RPerl::Config, MathPerl::Config, PhysicsPerl::Config, etc
                 elsif ( $file_line eq ( '# <<< CHANGE_ME: add distribution-specific config include here >>>' . "\n" ) ) {
                     my string $distribution_package = ( split /::/, $source_group->{_package_name} )[0];
-                    $file_line = 'use ' . $distribution_package . '::Config;' . "\n";
+                    my string $eval_line = q{};
+                    $eval_line .= 'use ' . $distribution_package . '::Config;  ';
+                    $eval_line .= 'if ((defined $' . $distribution_package . '::Config::IS_RPERL_CONFIG) and ($' . $distribution_package . '::Config::IS_RPERL_CONFIG)) { return q{YES_CONFIG}; } else { return 0; }';
+
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), checking for distribution-specific config file, have $eval_line = ', "\n", $eval_line, "\n" );
+                    
+                    my integer $eval_retval = eval $eval_line;
+
+                    if ($EVAL_ERROR ne q{}) {
+#                        RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), checking for distribution-specific config file, have non-empty $EVAL_ERROR = ', "\n", $EVAL_ERROR, "\n\n", 'no config file found' );
+#                        RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), checking for distribution-specific config file, have non-empty $EVAL_ERROR, no config file found', "\n" );
+                        # do not use any Config file if not provided by the distribution, no $main::INCLUDE_PATH will be utilized
+#                        $file_line = 'use RPerl::Config;' . "\n";
+                        $file_line = undef;
+                        $has_rperl_config = 0;
+                    }
+                    elsif (defined $eval_retval) {
+#                        RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), checking for distribution-specific config file, have $eval_retval = ', q{'}, $eval_retval, q{'}, "\n" );
+
+                        if (not $eval_retval) {
+#                            RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), checking for distribution-specific config file, have false $eval_retval, no config file found', "\n" );
+                            # do not use any Config file if not provided by the distribution, no $main::INCLUDE_PATH will be utilized
+#                            $file_line = 'use RPerl::Config;' . "\n";
+                            $file_line = undef;
+                            $has_rperl_config = 0;
+                        }
+                        elsif ($eval_retval eq 'YES_CONFIG') {
+#                            RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), checking for distribution-specific config file, have true $eval_retval, YES config file found, ', $distribution_package, '::Config', "\n" );
+                            $file_line = 'use ' . $distribution_package . '::Config;' . "\n";
+                            $has_rperl_config = 1;
+                        }
+                        else {
+                            die 'ERROR ECOCOFI11, COMPILER, SAVE OUTPUT FILES, MODULE TEMPLATE COPY: Attempt to check for distribution-specific config file  '
+                                . q{'} . $distribution_package . '::Config' . q{'} . ' returned invalid value:' . "\n" . $eval_retval . "\n" . 'dying' . "\n";
+                        }
+                    }
+                    else {
+                        die 'ERROR ECOCOFI11, COMPILER, SAVE OUTPUT FILES, MODULE TEMPLATE COPY: Attempt to check for distribution-specific config file  '
+                            . q{'} . $distribution_package . '::Config' . q{'} . ' returned undefined value, dying' . "\n";
+                    }
+                }
+                elsif ( $file_line eq ( '# <<< CHANGE_ME: add use Inline path & args here >>>' . "\n" ) ) {
+                    # common to all options
+                    $file_line  = '        my $eval_string = <<"EOF";' . "\n";
+                    $file_line .= 'package main;' . "\n";
+                    $file_line .= 'use RPerl::Inline;' . "\n";
+
+=DISABLE_hardcoded_example__absolute_or_relative_with_dots
+        my $eval_string = <<"EOF";
+package main;
+use RPerl::Inline;
+# ---vvv---
+BEGIN { RPerl::diag("[[[ BEGIN 'use Inline' STAGE for '/foo/MyClass.pm' ]]]\n" x 1); }
+use Inline (CPP => '/foo/MyClass.pm', \%RPerl::Inline::ARGS);
+RPerl::diag("[[[ END   'use Inline' STAGE for '/foo/MyClass.pm' ]]]\n" x 1);
+# ---^^^---
+1;
+EOF
+=cut
+
+=DISABLE_hardcoded_example__relative_without_dots__has_rperl_config
+        my $eval_string = <<"EOF";
+package main;
+use RPerl::Inline;
+# ---vvv---
+BEGIN { RPerl::diag("[[[ BEGIN 'use Inline' STAGE for 'RPerl/MyClass.cpp' ]]]\n" x 1); }
+use Inline (CPP => '$main::INCLUDE_PATH' . '/' . 'RPerl/MyClass.cpp', \%RPerl::Inline::ARGS);
+RPerl::diag("[[[ END   'use Inline' STAGE for 'RPerl/MyClass.cpp' ]]]\n" x 1);
+# ---^^^---
+1;
+EOF
+=cut
+
+=DISABLE_hardcoded_example__relative_without_dots__no_rperl_config
+# ---vvv---
+        my $cpp_file_path = 'blib/lib/MyClass.cpp';
+        my $cpp_file_path_noblib = 'lib/MyClass.cpp';
+        if (not ((-e $cpp_file_path) and (-f $cpp_file_path))) { $cpp_file_path = $cpp_file_path_noblib; }  # fall back to non-blib, if blib does not exist
+# ---^^^---
+        my $eval_string = <<"EOF";
+package main;
+use RPerl::Inline;
+# ---vvv---
+BEGIN { RPerl::diag("[[[ BEGIN 'use Inline' STAGE for 'lib/MyClass.cpp' ]]]\\n" x 1); }
+use Inline (CPP => \$cpp_file_path, \%RPerl::Inline::ARGS);
+RPerl::diag("[[[ END   'use Inline' STAGE for 'lib/MyClass.cpp' ]]]\\n" x 1);
+# ---^^^---
+1;
+EOF
+=cut
+
+                    my string $cpp_file_path = $file_name_group->{CPP};
+                    my string $cpp_file_path_noblib = q{};
+                    my boolean $has_blib = 0;
+
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, have $cpp_file_path = ', q{'}, $cpp_file_path, q{'}, "\n" );
+
+                    # DEV NOTE: only call post_processor_cpp__lib_path_delete() if there is an RPerl config file which will provide the proper lib directory for us
+                    if ($has_rperl_config) {
+#                        RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, have true $has_rperl_config, about to call post_processor_cpp__lib_path_delete()...', "\n" );
+                        $cpp_file_path = post_processor_cpp__lib_path_delete($cpp_file_path);
+                    }
+                    # DEV NOTE: only call post_processor_cpp__blib_path_delete() if there is NOT an RPerl config file, due to Makefile build phase
+                    else {
+#                        RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, have false $has_rperl_config, about to call post_processor_cpp__blib_path_delete()...', "\n" );
+                        $cpp_file_path_noblib = post_processor_cpp__blib_path_delete($cpp_file_path);
+                        if ($cpp_file_path_noblib ne $cpp_file_path) {
+                            $has_blib = 1;
+                        }
+                    }
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, have possibly-modified $cpp_file_path = ', q{'}, $cpp_file_path, q{'}, "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, have $cpp_file_path_noblib = ', q{'}, $cpp_file_path_noblib, q{'}, "\n" );
+
+                    # $cpp_volume will be empty string q{} on *NIX & other non-volume operating systems
+                    (my string $cpp_volume, my string $cpp_directories, my string $cpp_file) = File::Spec->splitpath( $cpp_file_path, my boolean $no_file = 0 );
+#                    my string $cpp_file_full_recatted = File::Spec->catpath( $cpp_volume, $cpp_directories, $cpp_file );  # unused
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, have $has_rperl_config = ', $has_rperl_config, "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, have $has_blib = ', $has_blib, "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, have $cpp_volume = ', q{'}, $cpp_volume, q{'}, "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, have $cpp_directories = ', q{'}, $cpp_directories, q{'}, "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, have $cpp_file = ', q{'}, $cpp_file, q{'}, "\n" );
+
+                    my string $cpp_directories_char0 = substr $cpp_directories, 0, 1;
+
+                    # absolute path; OR
+                    if ((($cpp_volume ne q{}) or ($cpp_directories_char0 eq '/') or ($cpp_directories_char0 eq '\\')) or
+                    # relative path, w/ leading dots
+                    ($cpp_directories_char0 eq '.')) {
+                        # prepend nothing, even if $has_rperl_config or $has_blib
+                        # DEV NOTE, CORRELATION #rp036: handle input file names with leading dots
+                        # we should have already stripped all leading single-dots in rperl::accept_and_verify_input_files(),
+                        # so all leading-dot $cpp_directories here should be double-dots, although the same logic here should also apply to single-dots,
+                        # because the point is not to prepend INCLUDE_PATH to anything which has dots at all, which is almost certainly wrong;
+                        # also, the Makefile build phase prepends non-absolute non-relative-w/-dots 'blib/' which should not trigger this section
+#                        RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, absolute path or relative path w/ leading dots, PREPEND NOTHING', "\n" );
+                        $file_line .= q<BEGIN { RPerl::diag("[[[ BEGIN 'use Inline' STAGE for '> . $cpp_file_path . q<' ]]]\n" x 1); }> . "\n";
+                        $file_line .= q{use Inline (CPP => '} . $cpp_file_path . q{', \%RPerl::Inline::ARGS);} . "\n";
+                        $file_line .= q{RPerl::diag("[[[ END   'use Inline' STAGE for '} . $cpp_file_path . q{' ]]]\n" x 1);} . "\n";
+                    }
+                    # relative path, w/out leading dots
+                    else {
+                        # relative path, w/out leading dots, has RPerl config
+                        if ($has_rperl_config) {
+                            # prepend INCLUDE_PATH and forward slash
+                            # NEED ANSWER WIN32: forward slash has been a valid path separator since MS-DOS v2.0, but can NOT be used as a path separator in the DOS shell command line because it is used for command switches instead
+                            # so is it truly necessary to use backslash for WIN32 just to be safe??? 
+#                            RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, relative path w/out leading dots and true $has_rperl_config, PREPEND INCLUDE_PATH', "\n" );
+                            if ( $OSNAME eq 'MSWin32' ) {
+                                $file_line .= q<BEGIN { RPerl::diag("[[[ BEGIN 'use Inline' STAGE for '> . $cpp_file_path . q<' ]]]\n" x 1); }> . "\n";
+                                # NEED ANSWER WIN32: should the backslash below itself be backslash escaped (double backslash), or not???
+                                $file_line .= q{use Inline (CPP => '$main::INCLUDE_PATH' . '\\' . '} . $cpp_file_path . q{', \%RPerl::Inline::ARGS);} . "\n";
+                                $file_line .= q{RPerl::diag("[[[ END   'use Inline' STAGE for '} . $cpp_file_path . q{' ]]]\n" x 1);} . "\n";
+                            }
+                            else {
+                                $file_line .= q<BEGIN { RPerl::diag("[[[ BEGIN 'use Inline' STAGE for '> . $cpp_file_path . q<' ]]]\n" x 1); }> . "\n";
+                                $file_line .= q{use Inline (CPP => '$main::INCLUDE_PATH' . '/' . '} . $cpp_file_path . q{', \%RPerl::Inline::ARGS);} . "\n";
+                                $file_line .= q{RPerl::diag("[[[ END   'use Inline' STAGE for '} . $cpp_file_path . q{' ]]]\n" x 1);} . "\n";
+                            }
+                        }
+                        # relative path, w/out leading dots, no RPerl config
+                        else {
+#                            RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, relative path w/out leading dots and false $has_rperl_config', "\n" );
+                            if (not $has_blib) {
+                                # artificially prepend 'blib/' so we can prepend blib-handling logic below,
+                                # allowing for uniformity between normal `rperl` front-end invocation versus Makefile build phase
+#                                RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, relative path w/out leading dots and false $has_rperl_config, false $has_blib, artificially prepending to $cpp_file_path', "\n" );
+                                if ( $OSNAME eq 'MSWin32' ) {
+                                    $cpp_file_path = 'blib\\' . $cpp_file_path;
+                                }
+                                else {
+                                    $cpp_file_path = 'blib/' . $cpp_file_path;
+                                }
+                            }
+                            # DEV NOTE: barely-documented Inline::CPP bug, must have leading './' if no other directories in path
+                            if ( $cpp_file_path !~ /\// ) {
+                                # prepend './' to path before generating $file_line
+#                                RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, relative path w/out leading dots and false $has_rperl_config, $cpp_file_path has no slashes, prepending dot-slash', "\n" );
+                                if ( $OSNAME eq 'MSWin32' ) {
+                                    $cpp_file_path = q{.\\} . $cpp_file_path;
+                                }
+                                else {
+                                    $cpp_file_path = q{./} . $cpp_file_path;
+                                }
+                            }
+                            if ( $cpp_file_path_noblib !~ /\// ) {
+                                # prepend './' to path before generating $file_line
+#                                RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, relative path w/out leading dots and false $has_rperl_config, $cpp_file_path_noblib has no slashes, prepending dot-slash', "\n" );
+                                if ( $OSNAME eq 'MSWin32' ) {
+                                    $cpp_file_path_noblib = q{.\\} . $cpp_file_path_noblib;
+                                }
+                                else {
+                                    $cpp_file_path_noblib = q{./} . $cpp_file_path_noblib;
+                                }
+                            }
+
+                            # prepend blib-handling logic
+                            # DEV NOTE: for relative path w/out leading dots, we must always prepend blib-handling logic, in order to allow for uniformity
+#                            RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), setting use Inline path & args, relative path w/out leading dots and false $has_rperl_config, prepending blib-handling logic', "\n" );
+                            my $file_line_prepend = q{};
+                            $file_line_prepend .= q<        my $cpp_file_path = '> . $cpp_file_path . q<';> . "\n";
+                            $file_line_prepend .= q<        my $cpp_file_path_noblib = '> . $cpp_file_path_noblib . q<';> . "\n";
+                            $file_line_prepend .= q<        if (not ((-e $cpp_file_path) and (-f $cpp_file_path))) { $cpp_file_path = $cpp_file_path_noblib; }  # fall back to non-blib, if blib does not exist> . "\n";
+                            $file_line = $file_line_prepend . $file_line;
+
+                            # hard-code $cpp_file_path_noblib in debug statements for uniformity
+                            $file_line .= q<BEGIN { RPerl::diag("[[[ BEGIN 'use Inline' STAGE for '> . $cpp_file_path_noblib . q<' ]]]\n" x 1); }> . "\n";
+                            $file_line .= q{use Inline (CPP => \$cpp_file_path, \%RPerl::Inline::ARGS);} . "\n";
+                            $file_line .= q{RPerl::diag("[[[ END   'use Inline' STAGE for '} . $cpp_file_path_noblib . q{' ]]]\n" x 1);} . "\n";
+                        }
+                    }
+
+                    # common to all options
+                    $file_line .= '1;' . "\n";
+                    $file_line .= 'EOF' . "\n";
                 }
                 elsif ( $file_line eq ( '# <<< CHANGE_ME: add user-defined includes here >>>' . "\n" ) ) {
                     if (    ( exists $source_group->{_PMC_includes}->{$module_name_underscores} )
@@ -1381,11 +1639,11 @@ sub post_processor_cpp__pmc_generate {
                     else { $file_line = undef; }
                 }
                 elsif ( $file_line eq ( '        # <<< CHANGE_ME: enable optional SSE support here >>>' . "\n" ) ) {
-#                    RPerl::diag( 'in Compiler::save_source_files(), have $modes->{_enable_sse} = ' . Dumper($modes->{_enable_sse}) . "\n" );
-#                    RPerl::diag( 'in Compiler::save_source_files(), have $pm_file_path = ' . $pm_file_path . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $modes->{_enable_sse} = ' . Dumper($modes->{_enable_sse}) . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $pm_file_path = ' . $pm_file_path . "\n" );
                     $pm_file_path = post_processor__absolute_path_delete($pm_file_path);
                     $pm_file_path = post_processor__current_directory_path_delete($pm_file_path);
-#                    RPerl::diag( 'in Compiler::save_source_files(), have possibly-trimmed $pm_file_path = ' . $pm_file_path . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have possibly-trimmed $pm_file_path = ' . $pm_file_path . "\n" );
 
                     if (    ( exists $modes->{_enable_sse} )
                         and ( defined $modes->{_enable_sse} )
@@ -1401,11 +1659,11 @@ sub post_processor_cpp__pmc_generate {
                     else { $file_line = undef; }
                 }
                 elsif ( $file_line eq ( '        # <<< CHANGE_ME: enable optional GMP support here >>>' . "\n" ) ) {
-#                    RPerl::diag( 'in Compiler::save_source_files(), have $modes->{_enable_gmp} = ' . Dumper($modes->{_enable_gmp}) . "\n" );
-#                    RPerl::diag( 'in Compiler::save_source_files(), have $pm_file_path = ' . $pm_file_path . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $modes->{_enable_gmp} = ' . Dumper($modes->{_enable_gmp}) . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $pm_file_path = ' . $pm_file_path . "\n" );
                     $pm_file_path = post_processor__absolute_path_delete($pm_file_path);
                     $pm_file_path = post_processor__current_directory_path_delete($pm_file_path);
-#                    RPerl::diag( 'in Compiler::save_source_files(), have possibly-trimmed $pm_file_path = ' . $pm_file_path . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have possibly-trimmed $pm_file_path = ' . $pm_file_path . "\n" );
 
                     if (    ( exists $modes->{_enable_gmp} )
                         and ( defined $modes->{_enable_gmp} )
@@ -1422,11 +1680,11 @@ sub post_processor_cpp__pmc_generate {
                     else { $file_line = undef; }
                 }
                 elsif ( $file_line eq ( '        # <<< CHANGE_ME: enable optional GSL support here >>>' . "\n" ) ) {
-#                    RPerl::diag( 'in Compiler::save_source_files(), have $modes->{_enable_gsl} = ' . Dumper($modes->{_enable_gsl}) . "\n" );
-#                    RPerl::diag( 'in Compiler::save_source_files(), have $pm_file_path = ' . $pm_file_path . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $modes->{_enable_gsl} = ' . Dumper($modes->{_enable_gsl}) . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $pm_file_path = ' . $pm_file_path . "\n" );
                     $pm_file_path = post_processor__absolute_path_delete($pm_file_path);
                     $pm_file_path = post_processor__current_directory_path_delete($pm_file_path);
-#                    RPerl::diag( 'in Compiler::save_source_files(), have possibly-trimmed $pm_file_path = ' . $pm_file_path . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have possibly-trimmed $pm_file_path = ' . $pm_file_path . "\n" );
                     
                     if (    ( exists $modes->{_enable_gsl} )
                         and ( defined $modes->{_enable_gsl} )
@@ -1446,13 +1704,16 @@ sub post_processor_cpp__pmc_generate {
 
 
 
+# START HERE: what else remains to be done w/ MongoDB support here???
+# START HERE: what else remains to be done w/ MongoDB support here???
+# START HERE: what else remains to be done w/ MongoDB support here???
 
                 elsif ( $file_line eq ( '        # <<< CHANGE_ME: enable optional MongoDB support here >>>' . "\n" ) ) {
-#                    RPerl::diag( 'in Compiler::save_source_files(), have $modes->{_enable_mongodb} = ' . Dumper($modes->{_enable_mongodb}) . "\n" );
-#                    RPerl::diag( 'in Compiler::save_source_files(), have $pm_file_path = ' . $pm_file_path . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $modes->{_enable_mongodb} = ' . Dumper($modes->{_enable_mongodb}) . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have $pm_file_path = ' . $pm_file_path . "\n" );
                     $pm_file_path = post_processor__absolute_path_delete($pm_file_path);
                     $pm_file_path = post_processor__current_directory_path_delete($pm_file_path);
-#                    RPerl::diag( 'in Compiler::save_source_files(), have possibly-trimmed $pm_file_path = ' . $pm_file_path . "\n" );
+#                    RPerl::diag( 'in Compiler::post_processor_cpp__pmc_generate(), have possibly-trimmed $pm_file_path = ' . $pm_file_path . "\n" );
                     
                     if (    ( exists $modes->{_enable_mongodb} )
                         and ( defined $modes->{_enable_mongodb} )
@@ -1468,7 +1729,7 @@ sub post_processor_cpp__pmc_generate {
                         # error: expected ‘,’ or ‘...’    AND    note: in expansion of macro ‘exp’
                         $file_line .= q(        $RPerl::Inline::ARGS{auto_include} = [ @{ $RPerl::Inline::ARGS{auto_include} }, ) .
                                       q('#undef exp', '#include <mongocxx/client.hpp>', '#include <mongocxx/stdx.hpp>', '#include <mongocxx/uri.hpp>', ) .
-                                      q('#include <mongocxx/instance.hpp>', '#include <<bsoncxx/json.hpp>' ];    # enable MongoDB support) . "\n";
+                                      q('#include <mongocxx/instance.hpp>', '#include <bsoncxx/json.hpp>', '#include <bsoncxx/builder/stream/document.hpp>' ];    # enable MongoDB support) . "\n";
                     }
                     else { $file_line = undef; }
                 }
@@ -1671,7 +1932,7 @@ sub cpp_to_xsbinary__subcompile {
 
         $subcompile_command .= q{ } . '-I"' . $RPerl::BASE_PATH . '"';
         $subcompile_command .= q{ } . '-I"' . $RPerl::INCLUDE_PATH . '"'; # different than original Inline::CPP subcompile command, double-quotes added to encapsulate user-name directories
-        $subcompile_command .= q{ } . '-Ilib';
+        $subcompile_command .= q{ } . '-I. -Ilib';
 
         # DEV NOTE: must have $pl_file_path for support checking below; GMP, GSL, MongoDB 
 #        RPerl::diag( 'in Compiler::cpp_to_xsbinary__subcompile(), have $modes->{_enable_mongodb} = ' . Dumper($modes->{_enable_mongodb}) . "\n" );

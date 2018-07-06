@@ -8,7 +8,7 @@ package Devel::MAT;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Carp;
 use List::Util qw( first pairs );
@@ -444,9 +444,12 @@ sub print_table
    my $align = $opts{align} // "";
    $align = [ ( $align ) x $cols ] if !ref $align;
 
+   my $sep = $opts{sep} // " ";
+   $sep = [ ( $sep ) x ($cols - 1) ] if !ref $sep;
+
    my @leftalign = map { ($align->[$_]//"") ne "right" } 0 .. $cols-1;
 
-   my $format = join( $opts{sep} // " ",
+   my $format = join( "",
       ( map {
          my $col = $_;
          my $width = $colwidths[$col];
@@ -454,7 +457,7 @@ sub print_table
          # If final column should be left-aligned don't bother with width
          $width = "" if $col == $cols-1 and $leftalign[$col];
 
-         "%${flags}${width}s"
+         ( $col ? $sep->[$col-1] : "" ) . "%${flags}${width}s"
       } 0 .. $cols-1 ),
    ) . "\n";
 

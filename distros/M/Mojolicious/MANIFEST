@@ -196,6 +196,7 @@ t/mojo/ioloop_ipv6.t
 t/mojo/ioloop_tls.t
 t/mojo/json.t
 t/mojo/json_pointer.t
+t/mojo/json_xs.t
 t/mojo/lib/Mojo/.hidden.txt
 t/mojo/lib/Mojo/.test/hidden.txt
 t/mojo/lib/Mojo/BaseTest/Base1.pm

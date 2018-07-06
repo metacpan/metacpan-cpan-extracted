@@ -2,11 +2,6 @@ package Nexmo::SMS::MockLWP;
 
 # ABSTRACT: Module for the Nexmo SMS API!
 
-=head1 DESCRIPTION
-
-This module mocks POST requests. It exists only for the unit tests!
-
-=cut
 
 use LWP::UserAgent;
 use HTTP::Response;
@@ -66,6 +61,36 @@ our $VERSION = 0.01;
 };
 
 1;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Nexmo::SMS::MockLWP - Module for the Nexmo SMS API!
+
+=head1 VERSION
+
+version 0.10
+
+=head1 DESCRIPTION
+
+This module mocks POST requests. It exists only for the unit tests!
+
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
 
 __DATA__
 {

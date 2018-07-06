@@ -5,7 +5,7 @@ require 5.006_000;
 use constant WIN32  => $^O eq 'MSWin32';
 use constant PERL58 => $] > 5.007_000;
 require Encode if PERL58;
-$SVN::Notify::VERSION = '2.86';
+$SVN::Notify::VERSION = '2.87';
 
 # Make sure any output (such as from _dbpnt()) triggers no Perl warnings.
 if (PERL58) {
@@ -708,7 +708,9 @@ sub new {
                 $filters{$pkg} = {};
                 no strict 'refs';
                 while ( my ($k, $v) = each %{ "$pkg\::" } ) {
-                    my $code = *{$v}{CODE} or next;
+                    my $code = ref \$v eq 'GLOB' ? *{$v}{CODE}
+                             : ref  $v eq 'CODE' ? $v
+                             : *{ "$pkg\::$k" }{CODE} or next;
                     $filters{$pkg}->{$k} = $code;
                     $filts->{$k} ||= [];
                     push @{ $filts->{$k} }, $code;
@@ -1469,11 +1471,11 @@ sub output_headers {
     # Q-Encode the phrase part of recipient headers.
     my $norm;
     if (PERL58) {
-        require Email::Address;
+        require Email::Address::XS;
         $norm = sub {
             return join ', ' => map {
-                my ($addr) = Email::Address->parse($_);
-                if ($addr) {
+                my $addr = Email::Address::XS->parse($_);
+                if ($addr->is_valid()) {
                     if (my $phrase = $addr->phrase) {
                         $addr->phrase(Encode::encode( 'MIME-Q', $phrase ));
                     }
@@ -2375,7 +2377,7 @@ sub _read_pipe {
 # This method is used for debugging output in various verbose modes.
 ##############################################################################
 
-sub _dbpnt { print ref(shift), ': ', join ' ', @_; }
+sub _dbpnt { print ref(shift), ': ', join(' ', @_), "\n"; }
 
 ##############################################################################
 # This function is used to exit the program with an error if a parameter is
@@ -2403,7 +2405,7 @@ sub _usage {
 
 package SVN::Notify::SMTP;
 
-$SVN::Notify::SMTP::VERSION = '2.86';
+$SVN::Notify::SMTP::VERSION = '2.87';
 
 sub get_handle {
     my ($class, $notifier) = @_;

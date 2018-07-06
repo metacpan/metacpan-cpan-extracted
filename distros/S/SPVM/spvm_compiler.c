@@ -81,7 +81,7 @@ SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
   SPVM_RUNTIME_API_set_runtime(env, runtime);
   
   // Initialize Package Variables
-  runtime->package_var_accesss = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_VALUE) * (compiler->op_package_vars->length + 1));
+  runtime->package_vars = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_VALUE) * (compiler->op_package_vars->length + 1));
 
   // Arguments
   runtime->args = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_VALUE) * 255);
@@ -89,6 +89,9 @@ SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
   runtime->mortal_stack_capacity = 1;
 
   runtime->mortal_stack = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_OBJECT*) * runtime->mortal_stack_capacity);
+  
+  // Object alignment must be sizeof(SPVM_VALUE)
+  assert(sizeof(SPVM_OBJECT) % sizeof(SPVM_VALUE) == 0);
   
   return runtime;
 }

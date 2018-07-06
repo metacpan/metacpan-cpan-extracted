@@ -27,22 +27,22 @@ optional_features: {}
 provides:
   Moose::Meta::Attribute::Custom::Trait::Enum:
     file: lib/Moose/Meta/Attribute/Custom/Trait/Enum.pm
-    version: '0.006'
+    version: '0.008'
   Moose::Meta::Attribute::Custom::Trait::Enumeration:
     file: lib/Moose/Meta/Attribute/Custom/Trait/Enumeration.pm
-    version: '0.006'
+    version: '0.008'
   MooseX::Enumeration:
     file: lib/MooseX/Enumeration.pm
-    version: '0.006'
+    version: '0.008'
   MooseX::Enumeration::Meta::Attribute::Native::Trait::Enumeration:
     file: lib/MooseX/Enumeration/Meta/Attribute/Native/Trait/Enumeration.pm
-    version: '0.006'
+    version: '0.008'
   MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::assign:
     file: lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/assign.pm
-    version: '0.006'
+    version: '0.008'
   MooseX::Enumeration::Meta::Method::Accessor::Native::Enumeration::is:
     file: lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/is.pm
-    version: '0.006'
+    version: '0.008'
 recommends:
   Type::Tiny::Enum: '0.030'
   match::simple::XS: '0'
@@ -57,6 +57,6 @@ resources:
   homepage: https://metacpan.org/release/MooseX-Enumeration
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moosex-enumeration.git
-version: '0.006'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

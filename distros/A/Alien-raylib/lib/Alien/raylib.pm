@@ -3,7 +3,7 @@ use warnings;
 package Alien::raylib;
 
 # ABSTRACT: Alien distribution for Raylib
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 use parent 'Alien::Base';
 
@@ -18,7 +18,7 @@ Alien::raylib - Alien distribution for raylib video game engine
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 USAGE
 

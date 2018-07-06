@@ -1,5 +1,8 @@
 Revision history for App-boxmuller
 
+0.24    2018-07-03
+        English manual has been transported from raw text into POD text.
+
 0.23    2018-06-27 
         First version, released on an unsuspecting world.
 

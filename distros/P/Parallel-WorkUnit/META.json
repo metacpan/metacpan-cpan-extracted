@@ -14,11 +14,6 @@
    },
    "name" : "Parallel-WorkUnit",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::UseAllModules" : "0.17"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -26,7 +21,9 @@
       },
       "develop" : {
          "requires" : {
-            "Test::More" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::TrailingSpace" : "0.0203",
@@ -56,19 +53,24 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
             "Test2::Tools::Warnings" : "0",
             "Test2::V0" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "Test::UseAllModules" : "0.17"
+            "Test::UseAllModules" : "0.15"
          }
       }
    },
    "provides" : {
       "Parallel::WorkUnit" : {
          "file" : "lib/Parallel/WorkUnit.pm",
-         "version" : "1.201"
+         "version" : "2.181850"
       }
    },
    "release_status" : "stable",
@@ -82,7 +84,10 @@
          "web" : "https://github.com/jmaslak/Parallel-WorkUnit"
       }
    },
-   "version" : "1.201",
+   "version" : "2.181850",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

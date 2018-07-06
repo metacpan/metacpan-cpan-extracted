@@ -1,0 +1,9 @@
+removed t/repeatable/value.t and t/repeatable/subfields.t, because repetitive. already covered.
+removed t/form_setup/clone.t, because it mainly tested the 'tags' attribute. 
+removed t/form_setup/config.t because it demonstrats H::FH::Foo
+removed t/form_setup/no_update.t, not impementing no_update flag
+removed t/form_setup/render_roles.t.  Trivial and doesn't fit with new rendering.
+removed t/field_setup/checkbox.t  - option_wrapper??
+removed t/field_setup/missing.t  - not using 'missing' flag
+removed t/field_setup/update_fields.t  - not going to implement update_field_list. Users can do themselves.
+removed t/field_setup/compound_update_fields.t

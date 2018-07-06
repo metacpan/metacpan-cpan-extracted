@@ -53,5 +53,5 @@ $Res = $Defang->defang($H);
 ok(Encode::is_utf8($Res), "output2 is unicode");
 like($Res, qr{^<!--defang_p-->岡<!--/defang_p-->}, "defang2 preserves unicode");
 like($Res, qr{^<!--defang_a href="http://blah\.com/ø" defang_class="û"-->non-english href<!--/defang_a-->}m, "defang2 preserves unicode2");
-like($Res, qr(^<style><!--${CommentStartText}a { /\*color:redû;\*/ }${CommentEndText}--></style>)m, "style unicode correct");
+like($Res, qr(^<style><!--${CommentStartText}a \{ /\*color:redû;\*/ \}${CommentEndText}--></style>)m, "style unicode correct");
 

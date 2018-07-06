@@ -7,9 +7,8 @@ use Mojo::Redis::Cache;
 use Mojo::Redis::Cursor;
 use Mojo::Redis::Database;
 use Mojo::Redis::PubSub;
-use Mojo::Redis::Transaction;
 
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 
 $ENV{MOJO_REDIS_URL} ||= 'redis://localhost:6379';
 
@@ -36,9 +35,7 @@ has url => sub { Mojo::URL->new($ENV{MOJO_REDIS_URL}) };
 has _blocking_connection => sub { shift->_connection(ioloop => Mojo::IOLoop->new) };
 
 sub cache { Mojo::Redis::Cache->new(redis => shift, @_) }
-
 sub cursor { Mojo::Redis::Cursor->new(redis => shift, command => [@_ ? @_ : (scan => 0)]) }
-
 sub db { Mojo::Redis::Database->new(redis => shift) }
 
 sub new {
@@ -46,8 +43,6 @@ sub new {
   return $class->SUPER::new(url => Mojo::URL->new(shift), @_) if @_ % 2 and ref $_[0] ne 'HASH';
   return $class->SUPER::new(@_);
 }
-
-sub txn { Mojo::Redis::Transaction->new(redis => shift) }
 
 sub _connection {
   my ($self, %args) = @_;
@@ -204,12 +199,6 @@ L<Mojo::Redis::Cursor/new>. for possible commands.
 
 Object constructor. Can coerce a string into a L<Mojo::URL> and set L</url>
 if present.
-
-=head2 txn
-
-  $db = $self->txn;
-
-Returns an instance of L<Mojo::Redis::Transaction>.
 
 =head1 AUTHOR
 

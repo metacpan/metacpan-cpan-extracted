@@ -1,5 +1,5 @@
-#!perl
 use strict;
+use warnings;
 use Test::More tests => 33;
 use Test::Exception;
 

@@ -18,7 +18,7 @@ my %module_build_args = (
     "Joachim Bargsten <jwb\@cpan.org>"
   ],
   "dist_name" => "Bio-Grid-Run-SGE",
-  "dist_version" => "0.064",
+  "dist_version" => "0.065",
   "license" => "perl",
   "module_name" => "Bio::Grid::Run::SGE",
   "recursive_test_files" => 1,

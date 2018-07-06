@@ -1,0 +1,73 @@
+{
+   "abstract" : "merge multiple Perl::Critic profiles into one",
+   "author" : [
+      "Sven Kirmess <sven.kirmess@kzone.ch>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-MergeProfile",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::MockModule" : "0",
+            "Test::More" : "0.88",
+            "Test::TempDir::Tiny" : "0.017",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::MergeProfile" : {
+         "file" : "lib/Perl/Critic/MergeProfile.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skirmess/Perl-Critic-MergeProfile/issues"
+      },
+      "homepage" : "https://github.com/skirmess/Perl-Critic-MergeProfile",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skirmess/Perl-Critic-MergeProfile.git",
+         "web" : "https://github.com/skirmess/Perl-Critic-MergeProfile"
+      }
+   },
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

@@ -1,5 +1,8 @@
 Revision history for Mojo-Server-Threaded
 
+0.14    2018-07-03
+        - add option for running Elzar as Windows service
+        - only allow foreground operation
 0.13    2018-02-05
         - Fix missing threaded command
         - align upgrade timeout in Mojo::Server::Elzar with

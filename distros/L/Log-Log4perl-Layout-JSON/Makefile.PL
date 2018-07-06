@@ -30,14 +30,16 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Encode" => 0,
+    "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Log::Log4perl::MDC" => 0,
-    "Test::Compile" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
     "Test::Warnings" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.53",
+  "VERSION" => "0.54",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,13 +50,15 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::Tiny" => 0,
   "Encode" => 0,
+  "File::Spec" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
   "Log::Log4perl" => 0,
   "Log::Log4perl::Layout" => 0,
   "Log::Log4perl::Layout::PatternLayout" => 0,
   "Log::Log4perl::Level" => 0,
   "Log::Log4perl::MDC" => 0,
-  "Test::Compile" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
   "Test::Warnings" => 0,

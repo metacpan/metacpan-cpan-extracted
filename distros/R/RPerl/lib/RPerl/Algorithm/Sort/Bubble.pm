@@ -9,16 +9,17 @@ our $VERSION = 0.010_000;
 use parent qw(RPerl::Algorithm::Sort);
 use RPerl::Algorithm::Sort;
 
-# [[[ EXPORTS ]]]
-# <<< CHANGE_ME: delete for no exports, or replace with real names of subroutines (not methods) to be exported >>>
-use RPerl::Exporter qw(import);
-our @EXPORT = qw(integer_sort number_sort integer_bubblesort number_bubblesort uninherited__Bubble uninherited integer_bubblesort__typetest0 number_bubblesort__typetest0);
-#our @EXPORT_OK = qw(integer_sort number_sort integer_bubblesort number_bubblesort uninherited__Bubble uninherited integer_bubblesort__typetest0 number_bubblesort__typetest0);
-
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(ProhibitConstantPragma ProhibitMagicNumbers)  # USER DEFAULT 3: allow constants
+## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case & mixed-case package names
+## no critic qw(ProhibitAutomaticExportation)  # SYSTEM SPECIAL 14: allow global exports from Config.pm & elsewhere
+
+# [[[ EXPORTS ]]]
+use RPerl::Exporter qw(import);
+our @EXPORT = qw(integer_sort number_sort integer_bubblesort number_bubblesort uninherited_Bubble uninherited integer_bubblesort_typetest0 number_bubblesort_typetest0);
+#our @EXPORT_OK = qw(integer_sort number_sort integer_bubblesort number_bubblesort uninherited_Bubble uninherited integer_bubblesort_typetest0 number_bubblesort_typetest0);
 
 # [[[ CONSTANTS ]]]
 use constant TIME_BEST    => my string $TYPED_TIME_BEST    = 'O($n)';
@@ -102,32 +103,32 @@ sub number_bubblesort {
 
 # [ INHERITANCE TESTING ]
 
-sub inherited__Bubble {
+sub inherited_Bubble {
     { my void::method $RETURN_TYPE };
     ( my RPerl::Algorithm::Sort::Bubble $self, my string $person ) = @ARG;
-    RPerl::diag( 'in PERLOPS_PERLTYPES Bubble->inherited__Bubble(), have ::class($self) = ' . ::class($self) . ' and $person = ' . $person . ', FRIED' . "\n" );
+    RPerl::diag( 'in PERLOPS_PERLTYPES Bubble->inherited_Bubble(), have ::class($self) = ' . ::class($self) . ' and $person = ' . $person . ', FRIED' . "\n" );
     return;
 }
 
 # NEED UPGRADE, CORRELATION #rp023: Inline::CPP support for multiple inheritance
-#sub inherited__Bubble_bar_set {
+#sub inherited_Bubble_bar_set {
 #   { my void::method $RETURN_TYPE };
 #    ( my RPerl::Algorithm::Sort::Bubble $self, my string $bar_new ) = @ARG;
-#    RPerl::diag( 'in PERLOPS_PERLTYPES Bubble->inherited__Bubble_bar_set(), have ::class($self) = ' . ::class($self) . ' and $bar_new = ' . $bar_new . ', FRIED' . "\n" );
+#    RPerl::diag( 'in PERLOPS_PERLTYPES Bubble->inherited_Bubble_bar_set(), have ::class($self) = ' . ::class($self) . ' and $bar_new = ' . $bar_new . ', FRIED' . "\n" );
 #    $self->{bar} = $bar_new;
 #}
 
-sub inherited__Bubble_foo_get {
+sub inherited_Bubble_foo_get {
     { my string::method $RETURN_TYPE };
     ( my RPerl::Algorithm::Sort::Bubble $self ) = @ARG;
-    RPerl::diag( 'in PERLOPS_PERLTYPES Bubble->inherited__Bubble_foo_get(), have ::class($self) = ' . ::class($self) . ', FRIED' . "\n" );
+    RPerl::diag( 'in PERLOPS_PERLTYPES Bubble->inherited_Bubble_foo_get(), have ::class($self) = ' . ::class($self) . ', FRIED' . "\n" );
     return $self->{foo};
 }
 
-sub inherited__Bubble_foo_set {
+sub inherited_Bubble_foo_set {
     { my void::method $RETURN_TYPE };
     ( my RPerl::Algorithm::Sort::Bubble $self, my string $foo_new ) = @ARG;
-    RPerl::diag( 'in PERLOPS_PERLTYPES Bubble->inherited__Bubble_foo_set(), have ::class($self) = ' . ::class($self) . ' and $foo_new = ' . $foo_new . ', FRIED' . "\n" );
+    RPerl::diag( 'in PERLOPS_PERLTYPES Bubble->inherited_Bubble_foo_set(), have ::class($self) = ' . ::class($self) . ' and $foo_new = ' . $foo_new . ', FRIED' . "\n" );
     $self->{foo} = $foo_new;
     return;
 }
@@ -139,11 +140,11 @@ sub inherited {
     return;
 }
 
-sub uninherited__Bubble {
+sub uninherited_Bubble {
     { my string $RETURN_TYPE };
     ( my string $person ) = @ARG;
-    RPerl::diag( 'in PERLOPS_PERLTYPES Bubble::uninherited__Bubble(), received $person = ' . $person . ', MITOCHONDRIAL' . "\n" );
-    return 'Bubble::uninherited__Bubble() RULES! PERLOPS_PERLTYPES';
+    RPerl::diag( 'in PERLOPS_PERLTYPES Bubble::uninherited_Bubble(), received $person = ' . $person . ', MITOCHONDRIAL' . "\n" );
+    return 'Bubble::uninherited_Bubble() RULES! PERLOPS_PERLTYPES';
 }
 
 # DEV NOTE, CORRELATION #rp004: inheritance testing, manually enable uninherited() in exactly one of Algorithm.*, Inefficient.*, Sort.*, or Bubble.*
@@ -156,17 +157,17 @@ sub uninherited {
 
 # [ TYPE TESTING ]
 
-sub integer_bubblesort__typetest0 {
+sub integer_bubblesort_typetest0 {
     { my string $RETURN_TYPE };
     ( my integer_arrayref $lucky_integers ) = @ARG;
-    ::integer_arrayref_CHECKTRACE( $lucky_integers, '$lucky_integers', 'integer_bubblesort__typetest0()' );
+    ::integer_arrayref_CHECKTRACE( $lucky_integers, '$lucky_integers', 'integer_bubblesort_typetest0()' );
     return ( ::integer_arrayref_to_string( RPerl::Algorithm::Sort::Bubble::integer_bubblesort($lucky_integers) ) . 'PERLOPS_PERLTYPES' );
 }
 
-sub number_bubblesort__typetest0 {
+sub number_bubblesort_typetest0 {
     { my string $RETURN_TYPE };
     ( my number_arrayref $lucky_numbers ) = @ARG;
-    ::number_arrayref_CHECKTRACE( $lucky_numbers, '$lucky_numbers', 'number_bubblesort__typetest0()' );
+    ::number_arrayref_CHECKTRACE( $lucky_numbers, '$lucky_numbers', 'number_bubblesort_typetest0()' );
     return ( ::number_arrayref_to_string( RPerl::Algorithm::Sort::Bubble::number_bubblesort($lucky_numbers) ) . 'PERLOPS_PERLTYPES' );
 }
 

@@ -1,0 +1,175 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts '1g:m:s:' , \my %o ; 
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+
+$o{m} //= 1 ; # 生成するポアソン分布の母平均値
+$o{g} = do{ $o{g} //= 8 ; int $o{g} } ;   # 生成する乱数の個数 整数切り捨てとする。
+$o{s} = defined $o{s} ? srand $o{s} : srand ; # random seed の設定と取得   
+my $explambda = exp -($o{m}) ; # 計算上必要となる母平均値の、自然べき乗。
+my $c = 0 ; # 乱数の生成済みの個数
+
+die "$0 does not work \nif the number more than 600 is specified for the population average.\n" if $o{m} > 600 ; 
+& main ; 
+& info ; 
+exit 0 ; 
+
+sub main ( ) { 
+    $SIG{INT} = sub { & info ; exit 130 } ; 
+    my $until = $o{g} ; 
+
+    while ( $c ++ < $until ) { 
+      print & genPoisson , "\n" ;
+    }
+
+    $c -- ; # 調整のため
+} 
+
+sub genPoisson ( ) { 
+    my $x = -1 ; 
+    my $b = 1.0 ; 
+    while ( $b >= $explambda ) { 
+        $b *= 1 - rand () ; # 区間(0,1]の乱数を生成するため、あえて1から減算した。
+        $x += 1 ;
+    } 
+    return $x ; 
+} 
+
+sub info ( )  { 
+    return if $o{1} ; 
+    use FindBin qw [ $Script ] ; 
+    my $info = '' ; 
+    $info .= color('cyan') . "printed lines: " . color('bright_cyan') . $c ; 
+    $info .= color('cyan') . " ; used random seed: " . color('bright_cyan') . $o{s} ;
+    $info .= color('cyan') . " ($Script) " . color('reset') ; 
+    print STDERR $info , "\n" ; 
+}
+
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ;   
+  our $VERSION = 0.13 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+}  
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script $Bin ] ;
+    sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
+    sub en( ) { grep ( /^en(g(i(sh?)?)?)?/i , @ARGV ) ? 1 : 0 } # English という文字列を先頭から2文字以上を含むか 
+    sub ja( ) { grep ( /^jp$|^ja(p(a(n?)?)?)?/i , @ARGV ) ? 1 : 0 } # jp または japan という文字列を先頭から2文字以上を含むか 
+    sub opt( ) { grep (/^opt(i(o(ns?)?)?)?$/i, @ARGV ) ? 1 : 0 } # options という文字列を先頭から3文字以上含むから
+    sub noPOD ( ) { grep (/^no-?p(od?)?\b/i, @ARGV) ? 1 : 0 } # POD を使わないと言う指定がされているかどうか
+    my $jd = "JapaneseManual" ;
+    my $flagE = ! ja && ( en || ! EnvJ ) ; # 英語にするかどうかのフラグ
+    exec "perldoc $0" if $flagE &&  ! opt ; #&& ! noPOD   ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\Q'=script='\E/$Script/gi ;
+        s/\Q'=bin='\E/$Bin/gi ;
+        if ( s/^=head1\b\s*// .. s/^=cut\b\s*// ) { 
+            if ( s/^=begin\s+$jd\b\s*// .. s/^=end\s+$jd\b\s*// xor $flagE ) {
+                print $_ if ! opt || m/^\s+\-/  ; 
+            }
+        } 
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1 NAME
+
+horsekicks
+
+=head1 VERSION
+
+0.13 (2018-07-03)
+
+=head1 SYNOPSIS
+
+horsekicks [B<-m> mean] [B<-g> how_many] [B<-s> seed] [B<-1>]
+
+horsekicks [B<--help> [ja] ] [B<--version>]
+
+=head1 DESCRIPTION
+
+Generates Poisson random numbers (random variables obeying a Poisson distribution).
+
+=head1 OPTION
+
+=over 4
+
+=item B<-g> N 
+
+How many random numbers you want in an integer number. "Inf" can be specified. Default value: 8.
+
+=item B<-m> N
+
+The population mean (average). Default value: 1.0
+
+=item B<-s> N
+
+Random seed. The residual divided by 2*32 is essential.
+
+=item B<-1> 
+
+No secondary information such as random seed on STDERR.
+
+=item B<--help> 
+
+Help message similar appeared here.
+
+=item B<--help ja>
+
+Japanese manual of this program is shown.
+
+=item B<--version>
+
+The version information of this program is displayed.
+
+=back 
+
+=head1 REMARKS
+
+The calculation time costs proportional to the specified population mean. 
+And the population mean should be less than 700 because the internal
+calculation by this program causes exp(-750) = 0 . 
+
+=head1 AUTHOR
+
+Toshiyuki Shimono
+  bin4tsv@gmail.com
+
+=head1 HISTORY
+
+This program has been made since 2016-07-14 (Wed)
+as a part of TSV hacking toolset for table data.
+
+=begin JapaneseManual 
+
+  $0 -g 個数 -m 平均値 
+  ポアソン乱数の生成
+
+ 
+ オプション: 
+  -g num : 乱数を発生させる個数。基本的に整数を指定。Infも指定可能。
+  -m num : 母平均値。未指定なら 1.0 。
+  -s num : 乱数シードの設定 (基本的に10桁以内の数) 
+  -1 : 乱数シードなどの情報を出力しない。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+  --version このプログラムのバージョン情報を出力。
+
+注意: 
+   このポアソン乱数生成器は、計算時間が母平均値にほぼ比例する。
+   また、内部の計算における浮動小数点がexp(-750)の値はゼロとなるので、
+   指定する母平均は600を超えると望ましくない。
+
+   * 計算方法には高速化のため、改良の余地がある。2分木を使ったプログラムを採用することを考えている。
+   * 母平均が700を超える場合を適切に処理するようにしたい。
+=cut

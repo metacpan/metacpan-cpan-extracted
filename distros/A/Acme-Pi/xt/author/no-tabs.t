@@ -14,6 +14,7 @@ my @files = (
     't/02-import.t',
     't/03-mmd-eumm.t',
     'xt/author/00-compile.t',
+    'xt/author/changes_has_content.t',
     'xt/author/clean-namespaces.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
@@ -22,10 +23,10 @@ my @files = (
     'xt/author/pod-coverage.t',
     'xt/author/pod-spell.t',
     'xt/author/pod-syntax.t',
+    'xt/author/portability.t',
     'xt/release/changes_has_content.t',
     'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t',
-    'xt/release/portability.t'
+    'xt/release/distmeta.t'
 );
 
 notabs_ok($_) foreach @files;

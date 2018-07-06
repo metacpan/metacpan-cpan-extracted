@@ -50,9 +50,9 @@
             "Mojo::DOM" : "0",
             "Pod::Usage" : "0",
             "Term::ANSIScreen" : "0",
-            "Term::Choose" : "1.509",
-            "Term::Choose::LineFold" : "1.509",
-            "Term::Choose::Util" : "0.053",
+            "Term::Choose" : "1.600",
+            "Term::Choose::LineFold" : "1.600",
+            "Term::Choose::Util" : "0.064",
             "Term::Form" : "0",
             "Text::Unidecode" : "0",
             "Unicode::Normalize" : "0",
@@ -74,6 +74,6 @@
          "web" : "https://github.com/kuerbis/App-YTDL"
       }
    },
-   "version" : "0.301",
+   "version" : "0.302",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

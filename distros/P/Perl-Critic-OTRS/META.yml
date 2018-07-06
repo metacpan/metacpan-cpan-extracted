@@ -2,21 +2,74 @@
 abstract: 'A collection of handy Perl::Critic policies'
 author:
   - 'Renee Baecker <module@renee-baecker.de>'
-build_requires: {}
+build_requires:
+  Test::Warnings: '0'
+  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Perl-Critic-OTRS
+provides:
+  Perl::Critic::OTRS:
+    file: lib/Perl/Critic/OTRS.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::ProhibitDumper:
+    file: lib/Perl/Critic/Policy/OTRS/ProhibitDumper.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::ProhibitFetchrowHashref:
+    file: lib/Perl/Critic/Policy/OTRS/ProhibitFetchrowHashref.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::ProhibitLocaltime:
+    file: lib/Perl/Critic/Policy/OTRS/ProhibitLocaltime.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::ProhibitLowPrecedenceOps:
+    file: lib/Perl/Critic/Policy/OTRS/ProhibitLowPrecedenceOps.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::ProhibitOpen:
+    file: lib/Perl/Critic/Policy/OTRS/ProhibitOpen.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::ProhibitPushISA:
+    file: lib/Perl/Critic/Policy/OTRS/ProhibitPushISA.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::ProhibitRequire:
+    file: lib/Perl/Critic/Policy/OTRS/ProhibitRequire.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::ProhibitRmtree:
+    file: lib/Perl/Critic/Policy/OTRS/ProhibitRmtree.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::ProhibitSomeCoreFunctions:
+    file: lib/Perl/Critic/Policy/OTRS/ProhibitSomeCoreFunctions.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::RequireCamelCase:
+    file: lib/Perl/Critic/Policy/OTRS/RequireCamelCase.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::RequireParensWithMethods:
+    file: lib/Perl/Critic/Policy/OTRS/RequireParensWithMethods.pm
+    version: '0.08'
+  Perl::Critic::Policy::OTRS::RequireTrueReturnValueForModules:
+    file: lib/Perl/Critic/Policy/OTRS/RequireTrueReturnValueForModules.pm
+    version: '0.08'
 requires:
   Perl::Critic: '1.105'
   Readonly: '1.03'
+  perl: '5.006'
 resources:
   bugtracker: http://github.com/reneeb/Perl-Critic-OTRS/issues
   homepage: http://github.com/reneeb/Perl-Critic-OTRS
   repository: http://github.com/reneeb/Perl-Critic-OTRS.git
-version: '0.07'
+version: '0.08'
+x_contributors:
+  - 'Martin Gruner <martin.gruner@otrs.com>'
+  - 'Michiel Beijen <michiel.beijen@otrs.com>'
+  - 'openstrike <git@openstrike.co.uk>'
+  - 'Ramanan Balakrishnan <ramanan90@gmail.com>'
+  - 'reneeb <info@perl-services.de>'
+  - 'Renee <github@renee-baecker.de>'
+  - 'Renee <reb@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

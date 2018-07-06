@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.066';
+our $VERSION = '0.067';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -479,7 +479,7 @@ sub __choose_columns {
 
     while ( 1 ) {
         my @chosen_cols = @$col_idxs ?  @cols[@$col_idxs] : '*';
-        my $prompt = $init_prompt . join( ', ', @chosen_cols ) . '  (Spacebar)';
+        my $prompt = $init_prompt . join( ', ', @chosen_cols );
         my $choices = [ @pre, @cols ];
         my @idx = choose(
             $choices,
@@ -599,7 +599,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.066
+Version 0.067
 
 =cut
 

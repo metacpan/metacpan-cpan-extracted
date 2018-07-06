@@ -6,6 +6,22 @@ Home page:    <https://metacpan.org/release/MooseX-Enumeration>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Enumeration>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.008	2018-07-04
+
+ [ Test Suite ]
+ - Adopt already-passing test for potential precedence bug in lazy
+   attributes from MooX::Enumeration.
+ - Adopt already-passing tests for attribute triggers from
+   MooX::Enumeration.
+
+0.007	2018-07-04
+
+ [ Bug Fixes ]
+ - Delegated assign now works for lazy attributes.
+
+ [ Documentation ]
+ - Mention MooX::Enumeration.
+
 0.006	2018-05-10
 
  [ Bug Fixes ]

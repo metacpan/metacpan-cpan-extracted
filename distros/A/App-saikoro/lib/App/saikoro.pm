@@ -10,11 +10,11 @@ App::saikoro - A random number (matrix) generator of uniform distributions. Saik
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 =head1 SYNOPSIS
 
@@ -25,24 +25,67 @@ saikoro -g I,J  -y L..U   # I,J,L,U are all numbers.
 A random number(matrix) generator from uniform distributions.
 Generates random uniform variable. Discrete/uniform can be specified.
 
+
 =head1 OPTION
 
-   -g N     ; Get N random variables.
-   -g N1,N2 ; Get N1 times N2 variables. N1 for vertical, N2 for horizontal.
-   -~       ; Number specifications N1 and N2 are reversed.
-   -y N1,N2 ; Limit the values in [N1,N2].  Form "-y N1..N2" is also allowed. 
+=over 4
 
-   -. N     : Switch to continuous from discrete. N digits after decimal points by rounding.
-   -1       : Switch to no secondary information that would be output to STDOUT. (Quiet)
-   -s N     : Random seeed specification. Essentially the residual divided by 2**32 is used.
+=item B<-g N>
 
-   -/ char  : Specifies the horizontal separator character.
+Get N random variables.
 
-    --help : Print this online help manual of this command "saikoro". Similar to "perldoc `which [-t] saikoro` ".
-    --help opt : Only shows the option helps. It is easy to read when you are in very necessary.
-    --help ja : Shows Japanese online help manual. ; "saikoro --help ja" 
-    --help nopod : Print this online manual using the code insdide this program without using the function of Perl POD.
-    --version : Outputs version information of this program.
+=item B<-g N1,N2>
+
+Get N1 times N2 variables. N1 for vertical, N2 for horizontal.
+The form "B<-g N1xN2>" is allowed.
+
+=item B<-~   >
+
+The number specifications N1 and N2 are reversed.
+
+=item B<-y N1,N2>
+
+Limit the values into the number interval [N1,N2]. 
+The form "B<-y N1..N2>" is also allowed. 
+
+=item B<-. N>
+
+Switch to continuous from discrete. N digits after decimal points by rounding.
+N=0 means integers
+
+=item B<-1>
+
+Switch to no secondary information that would be output to STDOUT. 
+
+=item B<-s N>
+
+Random seed specification. Essentially the residual divided by 2**32 is used.
+
+=item B<-/ char>
+
+Specifies the horizontal separator character.
+
+=item B<--help>
+
+Print this online help manual of this command "saikoro". Similar to "perldoc `which [-t] saikoro` ".
+
+=item B<--help opt>
+
+Only shows the option helps. It is easy to read when you are in very necessary.
+
+=item B<--help ja>
+
+Shows Japanese online help manual. 
+
+=item B<--help nopod>
+
+Print this online manual using the code insdide this program without using the function of Perl POD.
+
+=item --version 
+
+Outputs version information of this program.
+
+=back
 
 =head1 EXAMPLES
 

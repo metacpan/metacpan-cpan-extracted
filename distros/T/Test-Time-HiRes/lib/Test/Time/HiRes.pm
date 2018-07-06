@@ -7,51 +7,58 @@ use Test::More;
 use Test::Time;
 use Time::HiRes ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our $time    = 0;    # epoch in microseconds
 our $seconds = 0;    # i.e. standard epoch
 
 my $in_effect = 1;
+my $imported  = 0;
 
 sub in_effect {
     $in_effect;
 }
 
-# assume time only goes forwards
-# take the highest as current epoch time
+sub set_time {
+    my ( $class, $arg ) = @_;
+
+    $Test::Time::time = $seconds = int($arg);    # epoch time in seconds
+    $time = $arg * 1_000_000;                    # epoch time in microseconds
+}
+
+# synchronise times so time is correct whether using sleep() or usleep().
+# - assume time only goes forwards
+# - take the highest as current epoch time
 sub _synchronise_times {
+
     if ( $seconds < $Test::Time::time ) {
+
+        # update seconds from Test::Time, but keep the fractional microsecond part
         my $microseconds = _microseconds();    # part after DP
         $seconds = $Test::Time::time;
         $time    = ( $seconds * 1_000_000 ) + $microseconds;
     }
-}
-
-sub _time {
-    _synchronise_times();
-    return $time;
-}
-
-sub _seconds {
-    _synchronise_times();
-    return $seconds;
+    elsif ( $seconds > $Test::Time::time ) {
+        $Test::Time::time = $seconds;
+    }
 }
 
 sub _microseconds {
     return 0 unless $time;
-    return $time - ( $seconds * 1_000_000 );
+    return $time % 1_000_000;
 }
 
 sub import {
     my ( $class, %opts ) = @_;
 
+    $in_effect = 1;
+
+    return if $imported;
+
     # If time set on import then use it and update
     # Test::Time, otherwise use $Test::Time::time
     if ( defined $opts{time} ) {
-        my $tmp = $opts{time};
-        $Test::Time::time = $seconds = int($tmp);
-        $time = $tmp * 1_000_000;
+        $class->set_time( $opts{time} );
     }
     else {
         $seconds = $Test::Time::time;
@@ -60,13 +67,16 @@ sub import {
 
     no warnings 'redefine';
 
-    my $sub_time         = *Time::HiRes::time;
-    my $sub_usleep       = *Time::HiRes::usleep;
-    my $sub_gettimeofday = *Time::HiRes::gettimeofday;
+    # keep copies of the original subroutines
+    my $sub_time         = \&Time::HiRes::time;
+    my $sub_usleep       = \&Time::HiRes::usleep;
+    my $sub_gettimeofday = \&Time::HiRes::gettimeofday;
 
     *Time::HiRes::time = sub() {
         if (in_effect) {
-            my $t = _time() / 1_000_000;
+            _synchronise_times();
+
+            my $t = $time / 1_000_000;
             return sprintf( "%.6f", $t );
         }
         else {
@@ -83,15 +93,14 @@ sub import {
         if (in_effect) {
             my $sleep = shift;
 
+            _synchronise_times();
+
             return 0 unless $sleep;
 
-            $time    = _time() + $sleep;
+            $time    = $time + $sleep;
             $seconds = int( $time / 1_000_000 );
 
-            # update Test::Time to keep our $time's in sync
-            if ( $seconds > $Test::Time::time ) {
-                $Test::Time::time = $seconds;
-            }
+            _synchronise_times();
 
             note "sleep $sleep";
 
@@ -104,12 +113,20 @@ sub import {
 
     *Time::HiRes::gettimeofday = sub() {
         if (in_effect) {
-            return ( _seconds(), _microseconds() );
+            _synchronise_times();
+            return ( $seconds, _microseconds() );
         }
         else {
             return $sub_gettimeofday->();
         }
     };
+
+    $imported++;
+}
+
+sub unimport {
+    $in_effect = 0;
+    Test::Time->unimport();
 }
 
 1;
@@ -136,6 +153,11 @@ Test::Time::HiRes - drop-in replacement for Test::Time to work with Time::HiRes
     # Return internal time incremented by 1.001s
     my $then       = time();
     my $then_hires = Time::HiRes::time();
+
+    # set/reset time
+    Test::Time::HiRes->set_time( 123.456789 );
+
+    Test::Time::HiRes->unimport(); # turn off behaviour
 
 =head1 DESCRIPTION
 

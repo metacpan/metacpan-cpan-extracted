@@ -14,34 +14,36 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 f7dbc4a5e5f39c88d629f32d14a311892faadd21 COPYRIGHT
+SHA1 47165ca18130b0cec20af5b31c5b0f9692e38a1f COPYRIGHT
 SHA1 56ddcb9c6e2d886be1fef4a193c23f08d817c6d4 CREDITS
-SHA1 b6ad158c13198abf0b71fc29e01b62b1d79899a2 Changes
+SHA1 f0148ce1dab326c1f0e41de0de7fccf310f92338 Changes
 SHA1 81ad0f4f9631fad11a4feb2bdc18ae4d42d95b5e INSTALL
 SHA1 4b7ceb6d8f98b8e378a50f11d2feb4e205aa68d8 LICENSE
-SHA1 531a4d59cdbc01b0f66b466a5d67442f9d0e19ff MANIFEST
-SHA1 59eeecb371c5570cfda49fb9a4b0b0e51091361a META.json
-SHA1 de2035198a4adafacc94aab8b36dff216491c710 META.yml
-SHA1 d8441660e41a4d1a8a442b1687b4bda300597abf Makefile.PL
-SHA1 5441589664d997fc457cdd4de2fa713139af6552 README
+SHA1 ef3959481d943e513ed7cd7514591a0fbc89e262 MANIFEST
+SHA1 8c0fc90229a069c841ebcb37a4dddf915e8c0a3c META.json
+SHA1 6d299b61cbc596abdb71a9236f040b3c28268404 META.yml
+SHA1 0bb9ecac5ac3462dc68d0217f9fee3e23f6a20ab Makefile.PL
+SHA1 f0652800d168c4b7114eea867e8f26049da566db README
 SHA1 20f1b5567ca8bc55ef9e464e36554d41182baf1c dist.ini
-SHA1 40f5e7294ac2cafdd21f7fd2d9f095d99cc26c8d doap.ttl
-SHA1 44a21e2d9129c1870e359556a8502727f4878997 lib/Moose/Meta/Attribute/Custom/Trait/Enum.pm
-SHA1 bce1af8015e393212edba3e32a8d71cf6052a8fb lib/Moose/Meta/Attribute/Custom/Trait/Enumeration.pm
-SHA1 efa900cfc5583377ab47b6cc1fc14db6ed5c4bb2 lib/MooseX/Enumeration.pm
-SHA1 6a60e67c16e4623fbf81f417b65687ffbdf41dd0 lib/MooseX/Enumeration/Meta/Attribute/Native/Trait/Enumeration.pm
-SHA1 4eaa5a8526fcb52306ccd08bc85fb2d7a12a09f0 lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/assign.pm
-SHA1 410f18355a767b3486bfef9958a10126448778b6 lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/is.pm
+SHA1 1395e734e9d446cd4f4545714a780a26c6dab948 doap.ttl
+SHA1 9ff7f653533268112b5a606a89d85776ef69d645 lib/Moose/Meta/Attribute/Custom/Trait/Enum.pm
+SHA1 cb371a90222ea2d7112bac3c1a17c186edabf1d6 lib/Moose/Meta/Attribute/Custom/Trait/Enumeration.pm
+SHA1 a2575371086e566ea8f8575a8c1c4b8ec7e79bb6 lib/MooseX/Enumeration.pm
+SHA1 fffc6a8c138c4fe6184c2ca6cf9a22b5d8329381 lib/MooseX/Enumeration/Meta/Attribute/Native/Trait/Enumeration.pm
+SHA1 8e139eafc44960a77fe1d3ef832d3678c6ef5844 lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/assign.pm
+SHA1 360b5a6f801ace2f7cf0aa8935d2aadea06e8746 lib/MooseX/Enumeration/Meta/Method/Accessor/Native/Enumeration/is.pm
 SHA1 6c7427f209d90b0bef56c08cd381d02832f9cf4d t/01basic.t
 SHA1 481bfd4f875e08e63607a649cbd02fbf7da6cf4b t/02moosey.t
 SHA1 c7624ccd78a990cf0fd1d155a80fb1990db1b30e t/03typetiny.t
 SHA1 df40c1d0ecbfb76516d23a4d0cf439f827f57174 t/04matchsimple.t
 SHA1 404f5ad5d131b4cdd0d17ff2c95cf04e63d3049d t/05assign.t
+SHA1 8c829b4e15bf8d92588026a77ed6ff705487784a t/06lazy.t
+SHA1 4f870cccb9831e0ef770683895880493ca5d614c t/07triggers.t
 SHA1 f8088d293a5b9ef78f6a452f77c3f8d46da74256 t/91exceptions.t
 SHA1 643027f72ce32a991e92bf5f0ceb9ea498d36b03 t/rt96312.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAlr0EiUACgkQzr+BKGoqfTkD2gCbBqbR2EASw+WFA72NWVXItn4A
-DsIAnjCWG59JLX+uiCnLl/wsFUEIdOGK
-=/3Lg
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCWzzRDQAKCRDOv4Eoaip9
+OXv1AKCggKCR1R+2qToUlYXmhgmDuvDEaACfWA/rTab3DGUob6bODd52ysVRIxA=
+=tRYr
 -----END PGP SIGNATURE-----

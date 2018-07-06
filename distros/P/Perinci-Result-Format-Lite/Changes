@@ -1,3 +1,9 @@
+0.274   2018-07-04 (PERLANCAR)
+
+	- Allow non-integer float for iso8601_date{,time} format, and show
+	  milliseconds in iso8601_datetime format.
+
+
 0.273   2018-06-27 (PERLANCAR)
 
 	- Introduce table.field_{format,align}_code,

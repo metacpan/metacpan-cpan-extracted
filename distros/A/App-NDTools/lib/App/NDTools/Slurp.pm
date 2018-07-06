@@ -83,6 +83,7 @@ sub _decode_yaml($) {
 
 sub _encode_yaml($) {
     require YAML::XS;
+    my $modern_yaml_xs = eval { YAML::XS->VERSION(0.67) };
 
     # replace booleans for YAML::XS (accepts only boolean and JSON::PP::Boolean
     # since 0.67 and PL_sv_yes/no in earlier versions). No roundtrip for
@@ -91,9 +92,9 @@ sub _encode_yaml($) {
 
     my ($false, $true) = (0, 1);
 
-    local $YAML::XS::Boolean = "JSON::PP" if ($YAML::XS::VERSION >= 0.67);
+    local $YAML::XS::Boolean = "JSON::PP" if ($modern_yaml_xs);
 
-    if ($YAML::XS::VERSION >= 0.67) {
+    if ($modern_yaml_xs) {
         return YAML::XS::Dump($_[0]) if (ref TRUE eq 'JSON::PP::Boolean');
 
         require JSON::PP;

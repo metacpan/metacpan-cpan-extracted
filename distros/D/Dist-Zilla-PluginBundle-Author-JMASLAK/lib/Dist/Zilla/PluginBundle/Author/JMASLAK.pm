@@ -11,7 +11,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::JMASLAK;
 # ABSTRACT: JMASLAK's Plugin Bundle
-$Dist::Zilla::PluginBundle::Author::JMASLAK::VERSION = '0.004';
+$Dist::Zilla::PluginBundle::Author::JMASLAK::VERSION = '1.181841';
 
 use Moose;
 use Dist::Zilla;
@@ -20,16 +20,14 @@ with 'Dist::Zilla::Role::PluginBundle::Easy';
 
 # For auto plugins
 AUTOPLUG: {
+    use Dist::Zilla::Plugin::AutoVersion;
+    use Dist::Zilla::Plugin::NextRelease;
     use Dist::Zilla::Plugin::AutoPrereqs;
     use Dist::Zilla::Plugin::ContributorCovenant;
     use Dist::Zilla::Plugin::ExecDir;
     use Dist::Zilla::Plugin::ExtraTests;
     use Dist::Zilla::Plugin::GatherDir;
     use Dist::Zilla::Plugin::GenerateFile::FromShareDir;
-    use Dist::Zilla::Plugin::Git::Check;
-    use Dist::Zilla::Plugin::Git::Commit;
-    use Dist::Zilla::Plugin::Git::Push;
-    use Dist::Zilla::Plugin::Git::Tag;
     use Dist::Zilla::Plugin::GitHub::Meta;
     use Dist::Zilla::Plugin::License;
     use Dist::Zilla::Plugin::ManifestSkip;
@@ -42,6 +40,7 @@ AUTOPLUG: {
     use Dist::Zilla::Plugin::PruneCruft;
     use Dist::Zilla::Plugin::ShareDir;
     use Dist::Zilla::Plugin::ReadmeAnyFromPod;
+    use Dist::Zilla::Plugin::Test::ChangesHasContent;
     use Dist::Zilla::Plugin::Test::EOL;
     use Dist::Zilla::Plugin::Test::Kwalitee::Extra;
     use Dist::Zilla::Plugin::Test::NoTabs;
@@ -58,27 +57,31 @@ AUTOPLUG: {
     use Dist::Zilla::Plugin::ConfirmRelease;
     use Dist::Zilla::Plugin::TestRelease;
     use Dist::Zilla::Plugin::UploadToCPAN;
+
+    use Dist::Zilla::Plugin::Git::Check;
+    use Dist::Zilla::Plugin::Git::Commit;
+    use Dist::Zilla::Plugin::Git::Push;
+    use Dist::Zilla::Plugin::Git::Tag;
 }
 
 sub configure {
     my ($self) = (@_);
 
-    $self->add_plugins($self->_contributing_plugin());
-    $self->add_plugins($self->_copy_files_from_build());
-    $self->add_plugins($self->_covenant_plugin());
-    $self->add_plugins($self->_mailmap_plugin());
-    $self->add_plugins($self->_todo_plugin());
-    $self->add_plugins($self->_travis_plugin());
+    $self->add_plugins( $self->_contributing_plugin() );
+    $self->add_plugins( $self->_copy_files_from_build() );
+    $self->add_plugins( $self->_covenant_plugin() );
+    $self->add_plugins( $self->_mailmap_plugin() );
+    $self->add_plugins( $self->_manifestskip_plugin() );
+    $self->add_plugins( $self->_todo_plugin() );
+    $self->add_plugins( $self->_travis_plugin() );
 
+    $self->add_plugins('AutoVersion');
+    $self->add_plugins('NextRelease');
     $self->add_plugins('AutoPrereqs');
     $self->add_plugins('ContributorCovenant');
     $self->add_plugins('ExecDir');
     $self->add_plugins('ExtraTests');
     $self->add_plugins('GatherDir');
-    $self->add_plugins('Git::Check');
-    $self->add_plugins('Git::Commit');
-    $self->add_plugins('Git::Push');
-    $self->add_plugins('Git::Tag');
     $self->add_plugins('GitHub::Meta');
     $self->add_plugins('License');
     $self->add_plugins('ManifestSkip');
@@ -91,6 +94,7 @@ sub configure {
     $self->add_plugins('PruneCruft');
     $self->add_plugins('ShareDir');
     $self->add_plugins( [ 'ReadmeAnyFromPod' => { type => 'pod', filename => 'README.pod' } ] );
+    $self->add_plugins('Test::ChangesHasContent');
     $self->add_plugins('Test::EOL');
     $self->add_plugins('Test::Kwalitee::Extra');
     $self->add_plugins('Test::NoTabs');
@@ -108,6 +112,13 @@ sub configure {
     $self->add_plugins('TestRelease');
     $self->add_plugins('UploadToCPAN');
 
+    $self->add_plugins(
+        [ 'Git::Check', => { allow_dirty => [ 'dist.ini', _changes_file(), 'README.pod' ] } ] );
+    $self->add_plugins(
+        [ 'Git::Commit', => { allow_dirty => [ 'dist.ini', _changes_file(), 'README.pod' ] } ] );
+    $self->add_plugins('Git::Push');
+    $self->add_plugins('Git::Tag');
+
     return;
 }
 
@@ -116,14 +127,37 @@ sub _copy_files_from_build {
 
     my (@files) = ('README.pod');
 
-    if (!-e 'CODE_OF_CONDUCT.md') {
+    if ( !-e 'CODE_OF_CONDUCT.md' ) {
         push @files, 'CODE_OF_CONDUCT.md';
     }
 
     return [
         'CopyFilesFromBuild' => {
-            copy => [ @files ],
+            copy => [@files],
         }
+    ];
+}
+
+sub _changes_file {
+    if ( -f 'Changes' )   { return 'Changes'; }
+    if ( -f 'CHANGES' )   { return 'CHANGES'; }
+    if ( -f 'ChangeLog' ) { return 'ChangeLog'; }
+    if ( -f 'CHANGELOG' ) { return 'CHANGELOG'; }
+
+    return 'Changes';
+}
+
+sub _changes_plugin {
+    my $self = shift;
+
+    if ( -f _changes_file() ) { return; }
+
+    return [
+        'GenerateFile::FromShareDir' => 'Generate Changes' => {
+            -dist     => ( __PACKAGE__ =~ s/::/-/gr ),
+            -filename => 'Changes',
+            -location => 'root',
+        },
     ];
 }
 
@@ -163,9 +197,23 @@ sub _mailmap_plugin {
 
     return [
         'GenerateFile::FromShareDir' => 'Generate .mailmap' => {
-            -dist     => ( __PACKAGE__ =~ s/::/-/gr ),
-            -filename => '.mailmap',
+            -dist            => ( __PACKAGE__ =~ s/::/-/gr ),
+            -filename        => '.mailmap',
             -source_filename => 'mailmap',
+            -location        => 'root',
+        },
+    ];
+}
+
+sub _manifestskip_plugin {
+    my $self = shift;
+
+    if ( -f 'MANIFEST.SKIP' ) { return; }
+
+    return [
+        'GenerateFile::FromShareDir' => 'Generate MANIFEST.SKIP' => {
+            -dist     => ( __PACKAGE__ =~ s/::/-/gr ),
+            -filename => 'MANIFEST.SKIP',
             -location => 'root',
         },
     ];
@@ -178,10 +226,10 @@ sub _travis_plugin {
 
     return [
         'GenerateFile::FromShareDir' => 'Generate .travis.yml' => {
-            -dist     => ( __PACKAGE__ =~ s/::/-/gr ),
-            -filename => '.travis.yml',
+            -dist            => ( __PACKAGE__ =~ s/::/-/gr ),
+            -filename        => '.travis.yml',
             -source_filename => 'travis.yml',
-            -location => 'root',
+            -location        => 'root',
         },
     ];
 }
@@ -193,10 +241,10 @@ sub _todo_plugin {
 
     return [
         'GenerateFile::FromShareDir' => 'Generate TODO' => {
-            -dist     => ( __PACKAGE__ =~ s/::/-/gr ),
-            -filename => 'TODO',
+            -dist            => ( __PACKAGE__ =~ s/::/-/gr ),
+            -filename        => 'TODO',
             -source_filename => 'TODO',
-            -location => 'root',
+            -location        => 'root',
         },
     ];
 }
@@ -217,7 +265,7 @@ Dist::Zilla::PluginBundle::Author::JMASLAK - JMASLAK's Plugin Bundle
 
 =head1 VERSION
 
-version 0.004
+version 1.181841
 
 =head1 DESCRIPTION
 
@@ -225,10 +273,12 @@ This is Joelle Maslak's plugin bundle, used for her modules.  If you're not
 her, you probably want to create your own plugin module because I may modify
 this module based on her needs, breaking third party modules that use this.
 
-All of the following are in this module as of v0.003.
+All of the following are in this module as of v1.181840.
 
 It is somewhat equivilent to:
 
+    [AutoVersion]
+    [NextRelease]
     [AutoPrereqs]
     [ConfirmRelease]
     [ContributorCovenant]
@@ -239,10 +289,6 @@ It is somewhat equivilent to:
     [ExecDir]
     [ExtraTests]
     [GatherDir]
-    [Git::Check]
-    [Git::Commit]
-    [Git::Push]
-    [Git::Tag]
     [GitHub::Meta]
     [License]
     [Manifest]
@@ -261,6 +307,7 @@ It is somewhat equivilent to:
     type     = pod
     filename = README.pod
 
+    [Test::ChangesHasContent]
     [Test::EOL]
     [Test::Kwalitee::Extra]
     [Test::NoTabs]
@@ -275,11 +322,27 @@ It is somewhat equivilent to:
     [TestRelease]
     [UploadToCPAN]
 
+    [Git::Check]
+    allow_dirty = dist.ini
+    allow_dirty = Changes
+    allow_dirty = README.pod
+
+    [Git::Commit]
+    allow_dirty = dist.ini
+    allow_dirty = Changes
+    allow_dirty = README.pod
+
+    [Git::Push]
+    [Git::Tag]
+
+This automatically numbers releases.
+
 This creates a C<CODE_OF_CONDUCT.md> from the awesome Contributor Covenant
-project, a C<TODO> file, an C<AUTHOR_PLEDGE> file that indicates CPAN admins
+project, a C<Changes> file, a C<CONTRIBUTING> file, a C<TODO> file,
+a C<MANIFEST_SKIP> file, an C<AUTHOR_PLEDGE> file that indicates CPAN admins
 can take ownership should the project become abandoned, and a C<.travis.yml>
-file that will probably need to be edited.  If these files exist already,
-they will not get overwritten.
+file that will probably need to be edited.  If these files exist already, they
+will not get overwritten.
 
 It also generates a C<.mailmap> base file suitable for Joelle, if one does
 not already exists.

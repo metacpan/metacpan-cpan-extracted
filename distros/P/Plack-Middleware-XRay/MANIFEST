@@ -10,6 +10,7 @@ t/00_compile.t
 t/01_xray.t
 t/02_sampling.t
 t/03_sampler.t
+t/04_response_filter.t
 t/Util.pm
 META.yml
 MANIFEST

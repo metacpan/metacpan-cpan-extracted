@@ -7,6 +7,7 @@ author/requires.cpanm
 cpanfile
 lib/DBIx/Schema/DSL.pm
 lib/DBIx/Schema/DSL/Context.pm
+minil.toml
 t/000_load.t
 t/001_basic.t
 t/002_dsl.t

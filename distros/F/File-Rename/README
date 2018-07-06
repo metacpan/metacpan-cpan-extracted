@@ -1,4 +1,4 @@
-File-Rename version 0.35
+File-Rename version 1.00
 ========================
 
 File::Rename provides an implementation of Larry Wall's eg/rename
@@ -18,6 +18,8 @@ has similar options to the revised script.
 For Windows, the script is called file-rename to avoid clashes with
 existing rename command.
 
+In 1.00, File::Require::Options is a separate module, 
+and is not made visible by C<require File::Rename>. 
 
 INSTALLATION
 

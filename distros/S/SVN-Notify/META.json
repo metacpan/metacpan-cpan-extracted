@@ -4,7 +4,7 @@
       "David E. Wheeler <david@justatheory.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4212",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,7 @@
             "Text::Trac" : "0.10"
          },
          "requires" : {
-            "Email::Address" : "1.897",
+            "Email::Address::XS" : "1.03",
             "Getopt::Long" : "2.34",
             "perl" : "5.006"
          }
@@ -46,7 +46,7 @@
    "provides" : {
       "SVN::Notify" : {
          "file" : "lib/SVN/Notify.pm",
-         "version" : "2.86"
+         "version" : "2.87"
       },
       "SVN::Notify::Alternative" : {
          "file" : "lib/SVN/Notify/Alternative.pm",
@@ -54,19 +54,19 @@
       },
       "SVN::Notify::Filter::Trac" : {
          "file" : "lib/SVN/Notify/Filter/Trac.pm",
-         "version" : "2.86"
+         "version" : "2.87"
       },
       "SVN::Notify::HTML" : {
          "file" : "lib/SVN/Notify/HTML.pm",
-         "version" : "2.86"
+         "version" : "2.87"
       },
       "SVN::Notify::HTML::ColorDiff" : {
          "file" : "lib/SVN/Notify/HTML/ColorDiff.pm",
-         "version" : "2.86"
+         "version" : "2.87"
       },
       "SVN::Notify::SMTP" : {
          "file" : "lib/SVN/Notify.pm",
-         "version" : "2.86"
+         "version" : "2.87"
       }
    },
    "release_status" : "stable",
@@ -82,5 +82,6 @@
          "url" : "http://github.com/theory/svn-notify/"
       }
    },
-   "version" : "2.86"
+   "version" : "2.87",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

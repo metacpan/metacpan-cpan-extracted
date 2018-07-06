@@ -5,31 +5,53 @@ use strict;
 use 5.010;
 use List::MoreUtils qw/firstidx/;
 
-use Getopt::Std;
+use Data::Dumper;
+use Carp;
 use Bio::Grid::Run::SGE::Util::ExampleEnvironment;
 use Capture::Tiny 'capture';
+use Getopt::Long;
 
-my $hold_idx = firstidx { $_ eq '-hold_jid' } @ARGV;
-splice @ARGV, $hold_idx, 2 if ( $hold_idx >= 0 );
+Getopt::Long::Configure(qw(pass_through no_ignore_case));
 
-our ( $opt_N, $opt_S, $opt_e, $opt_o, $opt_t, $opt_l );
-getopt('N:S:e:o:t:l:');
+my @spec = (
+  'a=s',           'ac=s',   'ar=s',      'A=s',     'b=s',    'binding=s{1,2}',
+  'c=s',           'ckpt=s', 'clear',     'cwd',     'C=s',    'dc=s',
+  'dl=s',          'e=s',    'h',         'hard',    'help',   'hold_jid=s',
+  'hold_jid_ad=s', 'i=s',    'j=s',       'js=s',    'jsv=s',  'l=s',
+  'M=s',           'm=s',    'masterq=s', 'N=s',     'notify', 'now=s',
+  'o=s',           'P=s',    'p=s',       'pe=s{2}', 'pty=s',  'q=s',
+  'R=s',           'r=s',    'sc=s',      'shell=s', 'soft',   'sync=s',
+  'S=s',           't=s',    'tc=s',      'terse',   'v=s',    'verify',
+  'V',             'w=s',    'wd=s',
+);
 
-my $name    = $opt_N // 'test_job';
-my $shell   = $opt_S;
-my $err_dir = $opt_e;
-my $out_dir = $opt_o;
+my %opt = ();
+{
+  my $cmd_input_from_file_idx = firstidx { $_ eq '-@' } @ARGV;
+  if ($cmd_input_from_file_idx >= 0) {
+    $opt{'@'} = splice @ARGV, $cmd_input_from_file_idx, 2;
+    die "missing argument for -\@ option" if ($opt{'@'} && $opt{'@'} =~ /^-/);
+  }
+}
 
+GetOptions(\%opt, @spec) or die "usage error";
+
+my $name    = $opt{N} // 'test_job';
+my $shell   = $opt{S};
+my $err_dir = $opt{e};
+my $out_dir = $opt{o};
 
 my $job_id = time;
 
-if ($opt_t) {
+my %ORIG_ENV = %ENV;
+
+if ($opt{t}) {
   #stepsize is not implemented
-  $opt_t =~ s/:\d+$//;
+  $opt{t} =~ s/:\d+$//;
 
-  my @range = split( /-/, $opt_t );
+  my @range = split(/-/, $opt{t});
 
-  for ( my $i = $range[0]; $i <= $range[1]; $i++ ) {
+  for (my $i = $range[0]; $i <= $range[1]; $i++) {
     %ENV = %{
       get_array_env(
         {
@@ -42,9 +64,11 @@ if ($opt_t) {
           #verbose    => 1,
         }
       )
-      };
-    my @cmd = ( $opt_S, @ARGV );
-    sys_redirect(\@cmd, $ENV{SGE_STDOUT_PATH}, $ENV{SGE_STDERR_PATH}) == 0 or die "system @cmd failed: $?";
+    };
+    my @cmd = ($opt{S}, @ARGV);
+
+    sys_redirect(\@cmd, $ENV{SGE_STDOUT_PATH}, $ENV{SGE_STDERR_PATH}) == 0
+      or die "system @cmd $ENV{SGE_STDOUT_PATH} $ENV{SGE_STDERR_PATH} failed: $?";
   }
 } else {
   %ENV = %{
@@ -58,9 +82,9 @@ if ($opt_t) {
         #verbose    => 1
       }
     )
-    };
+  };
 
-  my @cmd = ( $opt_S, @ARGV );
+  my @cmd = ($opt{S}, @ARGV);
   sys_redirect(\@cmd, $ENV{SGE_STDOUT_PATH}, $ENV{SGE_STDERR_PATH}) == 0 or die "system @cmd failed: $?";
 
 }
@@ -69,15 +93,15 @@ say "Your job $job_id (\"$name\") has been submitted";
 sub sys_redirect {
   my ($cmd_args, $stdout_f, $stderr_f) = @_;
 
-  my ( $stdout, $stderr, $exit ) = capture {
+  my ($stdout, $stderr, $exit) = capture {
     system(@$cmd_args);
   };
 
-  open my $ofh, '>', $stdout_f or die "Can't open filehandle: $!";
+  open my $ofh, '>', $stdout_f or confess "Can't open filehandle: $! ($stdout_f)";
   print $ofh $stdout;
   close $ofh;
 
-  open my $efh, '>', $stderr_f or die "Can't open filehandle: $!";
+  open my $efh, '>', $stderr_f or confess "Can't open filehandle: $!";
   print $efh $stderr;
   close $efh;
 

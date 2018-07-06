@@ -51,19 +51,26 @@ int32_t SPVM_RUNTIME_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args) {
   SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
   SPVM_SUB* sub = op_sub->uv.sub;
   
+  int32_t exception_flag = 0;
   if (sub->have_native_desc) {
     int32_t original_mortal_stack_top = SPVM_RUNTIME_API_enter_scope(env);
-    int32_t exception_flag = SPVM_RUNTIME_call_sub_native(env, sub_id, args);
+    exception_flag = SPVM_RUNTIME_call_sub_native(env, sub_id, args);
     SPVM_RUNTIME_API_leave_scope(env, original_mortal_stack_top);
-    
-    return exception_flag;
   }
   else if (sub->is_compiled) {
-    return SPVM_RUNTIME_call_sub_precompile(env, sub_id, args);
+    exception_flag = SPVM_RUNTIME_call_sub_precompile(env, sub_id, args);
   }
   else {
-    return SPVM_RUNTIME_call_sub_vm(env, sub_id, args);
+    exception_flag = SPVM_RUNTIME_call_sub_vm(env, sub_id, args);
   }
+  
+  // Set default exception message
+  if (exception_flag && runtime->exception == NULL) {
+    void* exception = env->new_string_raw(env, "Error", 0);
+    env->set_exception(env, exception);
+  }
+  
+  return exception_flag;
 }
 
 int32_t SPVM_RUNTIME_call_sub_precompile(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args) {
@@ -99,9 +106,6 @@ int32_t SPVM_RUNTIME_call_sub_native(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
   // Subroutine is native
   assert(sub->have_native_desc);
 
-  // Set exception to NULL at start of subroutine
-  env->set_exception(env, NULL);
-  
   // Call native subrotuine
   int32_t (*native_address)(SPVM_ENV*, SPVM_VALUE*) = sub->native_address;
   return (*native_address)(env, args);
@@ -279,7 +283,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         void* object = *(void**)&vars[opcode->operand0];
 
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_type = SPVM_LIST_fetch(package->op_types, rel_id);
+        SPVM_OP* op_type = SPVM_LIST_fetch(sub->op_types, rel_id);
         int32_t basic_type_id = op_type->uv.type->basic_type->id;
         int32_t dimension = op_type->uv.type->dimension;
         
@@ -764,7 +768,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         break;
       case SPVM_OPCODE_C_ID_GET_CONSTANT_LONG: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_constant = SPVM_LIST_fetch(package->op_constants, rel_id);
+        SPVM_OP* op_constant = SPVM_LIST_fetch(sub->op_constants, rel_id);
         *(SPVM_VALUE_long*)&vars[opcode->operand0] = *(SPVM_VALUE_long*)&op_constant->uv.constant->value;
         break;
       }
@@ -773,7 +777,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         break;
       case SPVM_OPCODE_C_ID_GET_CONSTANT_DOUBLE: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_constant = SPVM_LIST_fetch(package->op_constants, rel_id);
+        SPVM_OP* op_constant = SPVM_LIST_fetch(sub->op_constants, rel_id);
         *(SPVM_VALUE_double*)&vars[opcode->operand0] = *(SPVM_VALUE_double*)&op_constant->uv.constant->value;
         break;
       }
@@ -1058,7 +1062,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           }
           else {
             SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN(
-              (void**)((intptr_t)array + (intptr_t)env->object_header_byte_size + sizeof(SPVM_OBJECT*) * index),
+              (void**)((intptr_t)array + (intptr_t)env->object_header_byte_size + sizeof(void*) * index),
               *(void**)&vars[opcode->operand2]
             );
           }
@@ -1082,7 +1086,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           }
           else {
             SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN(
-              (void**)((intptr_t)array + (intptr_t)env->object_header_byte_size + sizeof(SPVM_OBJECT*) * index),
+              (void**)((intptr_t)array + (intptr_t)env->object_header_byte_size + sizeof(void*) * index),
               NULL
             );
           }
@@ -1136,7 +1140,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
       }
       case SPVM_OPCODE_C_ID_NEW_OBJECT: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_type = SPVM_LIST_fetch(package->op_types, rel_id);
+        SPVM_OP* op_type = SPVM_LIST_fetch(sub->op_types, rel_id);
         int32_t basic_type_id = op_type->uv.type->basic_type->id;
         
         void* object = env->new_object_raw(env, basic_type_id);
@@ -1214,7 +1218,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
       }
       case SPVM_OPCODE_C_ID_NEW_OBJECT_ARRAY: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_type = SPVM_LIST_fetch(package->op_types, rel_id);
+        SPVM_OP* op_type = SPVM_LIST_fetch(sub->op_types, rel_id);
         int32_t basic_type_id = op_type->uv.type->basic_type->id;
         
         // length
@@ -1228,7 +1232,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
       }
       case SPVM_OPCODE_C_ID_NEW_MULTI_ARRAY: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_type = SPVM_LIST_fetch(package->op_types, rel_id);
+        SPVM_OP* op_type = SPVM_LIST_fetch(sub->op_types, rel_id);
         int32_t basic_type_id = op_type->uv.type->basic_type->id;
         int32_t element_dimension = op_type->uv.type->dimension - 1;
         
@@ -1243,7 +1247,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
       }
       case SPVM_OPCODE_C_ID_NEW_STRING: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_constant = SPVM_LIST_fetch(package->op_constants, rel_id);
+        SPVM_OP* op_constant = SPVM_LIST_fetch(sub->op_constants, rel_id);
         SPVM_CONSTANT* constant = op_constant->uv.constant;
         
         void* string = env->new_string_raw(env, constant->value.oval, constant->string_length);
@@ -1265,8 +1269,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         break;
       case SPVM_OPCODE_C_ID_GET_FIELD_BYTE: {
         int32_t rel_id = opcode->operand2;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
 
         void* object = *(void**)&vars[opcode->operand1];
         
@@ -1276,14 +1280,14 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(SPVM_VALUE_byte*)&vars[opcode->operand0] = *(SPVM_VALUE_byte*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id);
+          *(SPVM_VALUE_byte*)&vars[opcode->operand0] = *(SPVM_VALUE_byte*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index);
         }
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_SHORT: {
         int32_t rel_id = opcode->operand2;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
 
         void* object = *(void**)&vars[opcode->operand1];
 
@@ -1293,14 +1297,14 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(SPVM_VALUE_short*)&vars[opcode->operand0] = *(SPVM_VALUE_short*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id);
+          *(SPVM_VALUE_short*)&vars[opcode->operand0] = *(SPVM_VALUE_short*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index);
         }
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_INT: {
         int32_t rel_id = opcode->operand2;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
 
         void* object = *(void**)&vars[opcode->operand1];
         
@@ -1310,14 +1314,14 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(SPVM_VALUE_int*)&vars[opcode->operand0] = *(SPVM_VALUE_int*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id);
+          *(SPVM_VALUE_int*)&vars[opcode->operand0] = *(SPVM_VALUE_int*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index);
         }
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_LONG: {
         int32_t rel_id = opcode->operand2;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
 
         void* object = *(void**)&vars[opcode->operand1];
         
@@ -1327,14 +1331,14 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(SPVM_VALUE_long*)&vars[opcode->operand0] = *(SPVM_VALUE_long*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id);
+          *(SPVM_VALUE_long*)&vars[opcode->operand0] = *(SPVM_VALUE_long*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index);
         }
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_FLOAT: {
         int32_t rel_id = opcode->operand2;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
 
         void* object = *(void**)&vars[opcode->operand1];
         
@@ -1344,14 +1348,14 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(float*)&vars[opcode->operand0] = *(float*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id);
+          *(float*)&vars[opcode->operand0] = *(float*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index);
         }
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_DOUBLE: {
         int32_t rel_id = opcode->operand2;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
 
         void* object = *(void**)&vars[opcode->operand1];
         
@@ -1361,14 +1365,14 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(double*)&vars[opcode->operand0] = *(double*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id);
+          *(double*)&vars[opcode->operand0] = *(double*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index);
         }
         break;
       }
       case SPVM_OPCODE_C_ID_GET_FIELD_OBJECT: {
         int32_t rel_id = opcode->operand2;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
 
         void* object = *(void**)&vars[opcode->operand1];
         
@@ -1378,7 +1382,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], *(void**)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id));
+          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], *(void**)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index));
         }
         break;
       }
@@ -1386,8 +1390,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         void* object = *(void**)&vars[opcode->operand0];
 
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
         
         if (__builtin_expect(object == NULL, 0)) {
           void* exception = env->new_string_raw(env, "Object must be not undef.", 0);
@@ -1395,7 +1399,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(SPVM_VALUE_byte*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id) = *(SPVM_VALUE_byte*)&vars[opcode->operand2];
+          *(SPVM_VALUE_byte*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index) = *(SPVM_VALUE_byte*)&vars[opcode->operand2];
         }
         break;
       }
@@ -1403,8 +1407,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         void* object = *(void**)&vars[opcode->operand0];
 
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
         
         if (__builtin_expect(object == NULL, 0)) {
           void* exception = env->new_string_raw(env, "Object must be not undef.", 0);
@@ -1412,7 +1416,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(SPVM_VALUE_short*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id) = *(SPVM_VALUE_short*)&vars[opcode->operand2];
+          *(SPVM_VALUE_short*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index) = *(SPVM_VALUE_short*)&vars[opcode->operand2];
         }
         break;
       }
@@ -1420,8 +1424,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         void* object = *(void**)&vars[opcode->operand0];
 
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
         
         if (__builtin_expect(object == NULL, 0)) {
           void* exception = env->new_string_raw(env, "Object must be not undef.", 0);
@@ -1429,7 +1433,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(SPVM_VALUE_int*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id) = *(SPVM_VALUE_int*)&vars[opcode->operand2];
+          *(SPVM_VALUE_int*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index) = *(SPVM_VALUE_int*)&vars[opcode->operand2];
         }
         break;
       }
@@ -1437,8 +1441,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         void* object = *(void**)&vars[opcode->operand0];
 
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
         
         if (__builtin_expect(object == NULL, 0)) {
           void* exception = env->new_string_raw(env, "Object must be not undef.", 0);
@@ -1446,7 +1450,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(SPVM_VALUE_long*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id) = *(SPVM_VALUE_long*)&vars[opcode->operand2];
+          *(SPVM_VALUE_long*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index) = *(SPVM_VALUE_long*)&vars[opcode->operand2];
         }
         break;
       }
@@ -1454,8 +1458,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         void* object = *(void**)&vars[opcode->operand0];
 
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
         
         if (__builtin_expect(object == NULL, 0)) {
           void* exception = env->new_string_raw(env, "Object must be not undef.", 0);
@@ -1463,7 +1467,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(float*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id) = *(float*)&vars[opcode->operand2];
+          *(float*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index) = *(float*)&vars[opcode->operand2];
         }
         break;
       }
@@ -1471,8 +1475,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         void* object = *(void**)&vars[opcode->operand0];
 
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
         
         if (__builtin_expect(object == NULL, 0)) {
           void* exception = env->new_string_raw(env, "Object must be not undef.", 0);
@@ -1480,7 +1484,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           exception_flag = 1;
         }
         else {
-          *(double*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id) = *(double*)&vars[opcode->operand2];
+          *(double*)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index) = *(double*)&vars[opcode->operand2];
         }
         break;
       }
@@ -1488,8 +1492,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         void* object = *(void**)&vars[opcode->operand0];
 
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
 
         if (__builtin_expect(object == NULL, 0)) {
           void* exception = env->new_string_raw(env, "Object must be not undef.", 0);
@@ -1498,7 +1502,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         }
         else {
           SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN(
-            (void**)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id),
+            (void**)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index),
             *(void**)&vars[opcode->operand2]
           );
         }
@@ -1508,8 +1512,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         void* object = *(void**)&vars[opcode->operand0];
 
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
 
         if (__builtin_expect(object == NULL, 0)) {
           void* exception = env->new_string_raw(env, "Object must be not undef.", 0);
@@ -1518,7 +1522,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         }
         else {
           SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN(
-            (void**)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_rel_id),
+            (void**)((intptr_t)object + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * field_index),
             NULL
           );
         }
@@ -1528,14 +1532,11 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         void* object = *(void**)&vars[opcode->operand0];
 
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_field_access = SPVM_LIST_fetch(package->op_field_accesses, rel_id);
-        int32_t field_rel_id = op_field_access->uv.field_access->field->rel_id;
+        SPVM_OP* op_field_access = SPVM_LIST_fetch(sub->op_field_accesses, rel_id);
+        int32_t field_index = op_field_access->uv.field_access->field->index;
         
-        env->weaken_object_field(env, object, field_rel_id);
-        
-        if (env->get_exception(env)) {
-          exception_flag = 1;
-        }
+        exception_flag = env->weaken_object_field(env, object, field_index);
+
         break;
       }
       case SPVM_OPCODE_C_ID_CONCAT: {
@@ -1571,136 +1572,136 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
       }
       case SPVM_OPCODE_C_ID_GET_PACKAGE_VAR_BYTE: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(SPVM_VALUE_byte*)&vars[opcode->operand0] = *(SPVM_VALUE_byte*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id];
+        *(SPVM_VALUE_byte*)&vars[opcode->operand0] = *(SPVM_VALUE_byte*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id];
         
         break;
       }
       case SPVM_OPCODE_C_ID_GET_PACKAGE_VAR_SHORT: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(SPVM_VALUE_short*)&vars[opcode->operand0] = *(SPVM_VALUE_short*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id];
+        *(SPVM_VALUE_short*)&vars[opcode->operand0] = *(SPVM_VALUE_short*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id];
         
         break;
       }
       case SPVM_OPCODE_C_ID_GET_PACKAGE_VAR_INT: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(SPVM_VALUE_int*)&vars[opcode->operand0] = *(SPVM_VALUE_int*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id];
+        *(SPVM_VALUE_int*)&vars[opcode->operand0] = *(SPVM_VALUE_int*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id];
         
         break;
       }
       case SPVM_OPCODE_C_ID_GET_PACKAGE_VAR_LONG: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(SPVM_VALUE_long*)&vars[opcode->operand0] = *(SPVM_VALUE_long*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id];
+        *(SPVM_VALUE_long*)&vars[opcode->operand0] = *(SPVM_VALUE_long*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id];
         
         break;
       }
       case SPVM_OPCODE_C_ID_GET_PACKAGE_VAR_FLOAT: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(float*)&vars[opcode->operand0] = *(float*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id];
+        *(float*)&vars[opcode->operand0] = *(float*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id];
         
         break;
       }
       case SPVM_OPCODE_C_ID_GET_PACKAGE_VAR_DOUBLE: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(double*)&vars[opcode->operand0] = *(double*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id];
+        *(double*)&vars[opcode->operand0] = *(double*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id];
         
         break;
       }
       case SPVM_OPCODE_C_ID_GET_PACKAGE_VAR_OBJECT: {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], *(void**)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id]);
+        SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], *(void**)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id]);
         
         break;
       }
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_BYTE: {
         int32_t rel_id = opcode->operand0;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(SPVM_VALUE_byte*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id] = *(SPVM_VALUE_byte*)&vars[opcode->operand1];
+        *(SPVM_VALUE_byte*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id] = *(SPVM_VALUE_byte*)&vars[opcode->operand1];
         
         break;
       }
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_SHORT: {
         int32_t rel_id = opcode->operand0;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(SPVM_VALUE_short*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id] = *(SPVM_VALUE_short*)&vars[opcode->operand1];
+        *(SPVM_VALUE_short*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id] = *(SPVM_VALUE_short*)&vars[opcode->operand1];
         
         break;
       }
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_INT: {
         int32_t rel_id = opcode->operand0;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(SPVM_VALUE_int*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id] = *(SPVM_VALUE_int*)&vars[opcode->operand1];
+        *(SPVM_VALUE_int*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id] = *(SPVM_VALUE_int*)&vars[opcode->operand1];
         
         break;
       }
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_LONG: {
         int32_t rel_id = opcode->operand0;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(SPVM_VALUE_long*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id] = *(SPVM_VALUE_long*)&vars[opcode->operand1];
+        *(SPVM_VALUE_long*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id] = *(SPVM_VALUE_long*)&vars[opcode->operand1];
         
         break;
       }
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_FLOAT: {
         int32_t rel_id = opcode->operand0;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(float*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id] = *(float*)&vars[opcode->operand1];
+        *(float*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id] = *(float*)&vars[opcode->operand1];
         
         break;
       }
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_DOUBLE: {
         int32_t rel_id = opcode->operand0;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        *(double*)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id] = *(double*)&vars[opcode->operand1];
+        *(double*)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id] = *(double*)&vars[opcode->operand1];
         
         break;
       }
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_OBJECT: {
         int32_t rel_id = opcode->operand0;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id], *(void**)&vars[opcode->operand1]);
+        SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id], *(void**)&vars[opcode->operand1]);
         
         break;
       }
       case SPVM_OPCODE_C_ID_SET_PACKAGE_VAR_UNDEF: {
         int32_t rel_id = opcode->operand0;
-        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(package->op_package_var_accesses, rel_id);
+        SPVM_OP* op_package_var_access = SPVM_LIST_fetch(sub->op_package_var_accesses, rel_id);
         int32_t package_var_id = op_package_var_access->uv.package_var_access->op_package_var->uv.package_var->id;
         
-        SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&(*(SPVM_VALUE**)(env->get_runtime(env) + offsetof(SPVM_RUNTIME, package_var_accesss)))[package_var_id], NULL);
+        SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&(*(SPVM_VALUE**)(env->get_runtime(env) + (intptr_t)env->runtime_package_vars_byte_offset))[package_var_id], NULL);
         
         break;
       }
@@ -1765,7 +1766,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         void* object = *(void**)&vars[opcode->operand1];
 
         int32_t rel_id = opcode->operand2;
-        SPVM_OP* op_type = SPVM_LIST_fetch(package->op_types, rel_id);
+        SPVM_OP* op_type = SPVM_LIST_fetch(sub->op_types, rel_id);
         int32_t cast_basic_type_id = op_type->uv.type->basic_type->id;
         int32_t cast_type_dimension = op_type->uv.type->dimension;
         
@@ -1785,7 +1786,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
       case SPVM_OPCODE_C_ID_CALL_INTERFACE_METHOD:
       {
         int32_t rel_id = opcode->operand1;
-        SPVM_OP* op_call_sub = SPVM_LIST_fetch(package->op_call_subs, rel_id);
+        SPVM_OP* op_call_sub = SPVM_LIST_fetch(sub->op_call_subs, rel_id);
         int32_t decl_sub_id = op_call_sub->uv.call_sub->sub->id;
 
         // Declare subroutine
@@ -1806,7 +1807,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         }
         else if (opcode->id == SPVM_OPCODE_C_ID_CALL_INTERFACE_METHOD) {
           void* object = *(void**)&vars[opcode->operand2];
-          call_sub_id = env->get_sub_id_method_call(env, object, decl_sub->op_name->uv.name);
+          call_sub_id = env->get_sub_id_method_call(env, object, decl_sub->signature);
         }
         else {
           assert(0);
@@ -1934,7 +1935,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
       case SPVM_OPCODE_C_ID_LOOKUP_SWITCH: {
 
         int32_t rel_id = opcode->operand2;
-        SPVM_OP* op_switch_info = SPVM_LIST_fetch(package->op_switch_infos, rel_id);
+        SPVM_OP* op_switch_info = SPVM_LIST_fetch(sub->op_switch_infos, rel_id);
         SPVM_SWITCH_INFO* switch_info = op_switch_info->uv.switch_info;
         SPVM_LIST* op_cases = switch_info->op_cases_ordered;
         
@@ -2008,8 +2009,6 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         SPVM_RUNTIME_C_INLINE_DEC_REF_COUNT_ONLY(*(void**)&args[0]);
       }
     }
-    
-    env->set_exception(env, NULL);
   }
   
   SPVM_RUNTIME_ALLOCATOR_free(runtime, vars);
@@ -2025,7 +2024,7 @@ void SPVM_RUNTIME_free(SPVM_RUNTIME* runtime) {
   
   free(runtime->args);
   
-  free(runtime->package_var_accesss);
+  free(runtime->package_vars);
   
   free(runtime);
 }

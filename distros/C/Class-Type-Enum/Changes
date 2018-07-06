@@ -1,4 +1,13 @@
-0.009 2017-04-02T19:23:37
+0.011 2018-07-04T02:15:46
+ - Fix up prereqs (Meredith Howard)
+
+0.010 2018-07-03T03:58:32Z
+ - Add type_constraint - Resolves #5 (Thanks TOBYINK!) (Meredith Howard)
+ - Add list_is_methods - Resolves #4 (Thanks TOBYINK!) (Meredith Howard)
+ - Do away with hashref representation (Meredith Howard)
+ - Make 5.8 compatible - Resolves #3 (Thanks TOBYINK!) (Meredith Howard)
+
+0.009 2017-04-02T19:23:37Z
  - Switch to croaks so entry points are more apparent (Meredith Howard)
  - Make string comparison work in terms of the enumeration (Meredith
    Howard)

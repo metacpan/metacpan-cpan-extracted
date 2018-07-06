@@ -12,8 +12,6 @@
 # B::Parse in turn is based on the module of the same name by Malcolm Beattie,
 # but essentially none of his code remains.
 
-use v5.16;
-
 use rlib '../..';
 
 package B::DeparseTree::P518;
@@ -34,17 +32,17 @@ use B::Deparse;
 *begin_is_use = *B::Deparse::begin_is_use;
 *const_sv = *B::Deparse::const_sv;
 *escape_extended_re = *B::Deparse::escape_extended_re;
+*find_our_type = *B::Deparse::find_our_type;
 *find_scope_en = *B::Deparse::find_scope_en;
+*gv_name = *B::Deparse::gv_name;
 *padany = *B::Deparse::padany;
 *padname = *B::Deparse::padname;
-*gv_name = *B::Deparse::gv_name;
 *padname_sv = *B::Deparse::padname_sv;
 *padval = *B::Deparse::padval;
 *populate_curcvlex = *B::Deparse::populate_curcvlex;
-*find_our_type = *B::Deparse::find_our_type;
 *re_flags = *B::Deparse::re_flags;
+*rv2gv_or_string = *B::Deparse::rv2gv_or_string;
 *stash_variable = *B::Deparse::stash_variable;
-*stash_variable_name = *B::Deparse::stash_variable_name;
 *tr_chr = *B::Deparse::tr_chr;
 
 use strict;
@@ -96,32 +94,6 @@ my %globalnames;
 BEGIN { map($globalnames{$_}++, "SIG", "STDIN", "STDOUT", "STDERR", "INC",
 	    "ENV", "ARGV", "ARGVOUT", "_"); }
 
-sub gv_name {
-    my $self = shift;
-    my $gv = shift;
-    my $raw = shift;
-    Carp::confess() unless ref($gv) eq "B::GV";
-    my $stash = $gv->STASH->NAME;
-    my $name = $raw ? $gv->NAME : $gv->SAFENAME;
-    if ($stash eq 'main' && $name =~ /^::/) {
-	$stash = '::';
-    }
-    elsif (($stash eq 'main'
-	    && ($globalnames{$name} || $name =~ /^[^A-Za-z_:]/))
-	or ($stash eq $self->{'curstash'} && !$globalnames{$name}
-	    && ($stash eq 'main' || $name !~ /::/))
-	  )
-    {
-	$stash = "";
-    } else {
-	$stash = $stash . "::";
-    }
-    if (!$raw and $name =~ /^(\^..|{)/) {
-        $name = "{$name}";       # ${^WARNING_BITS}, etc and ${
-    }
-    return $stash . $name;
-}
-
 my %feature_keywords = (
   # keyword => 'feature',
     state   => 'state',
@@ -143,7 +115,28 @@ my %strong_proto_keywords = map { $_ => 1 } qw(
     scalar
     study
     undef
-);
+    );
+
+# stash_variable_name is modified from B::Deparse Perl version 5.18. Perl 5.14 doesn't
+# have this.
+
+# Return just the name, without the prefix.  It may be returned as a quoted
+# string.  The second return value is a boolean indicating that.
+sub stash_variable_name {
+    my($self, $prefix, $gv) = @_;
+    my $name = $self->gv_name($gv, 1);
+    $name = $self->maybe_qualify($prefix,$name);
+    if ($name =~ /^(?:\S|(?!\d)[\ca-\cz]?(?:\w|::)*|\d+)\z/) {
+	$name =~ s/^([\ca-\cz])/'^'.($1|'@')/e;
+	$name =~ /^(\^..|{)/ and $name = "{$name}";
+	return $name, 0; # not quoted
+    }
+    else {
+	$self->single_delim(undef, "q", "'", $name), 1; # quoted
+    }
+}
+
+
 
 # FIXME: These we don't seem to be able to put in a table.
 sub pp_closedir { unop(@_, "closedir") }
@@ -182,131 +175,11 @@ sub keyword {
 
 { no strict 'refs'; *{"pp_r$_"} = *{"pp_$_"} for qw< keys each values >; }
 
-sub pp_readline {
-    my $self = shift;
-    my($op, $cx) = @_;
-    my $kid = $op->first;
-    $kid = $kid->first if $kid->name eq "rv2gv"; # <$fh>
-    if (B::Deparse::is_scalar($kid)) {
-	my $body = [$self->deparse($kid, 1, $op)];
-	return info_from_list($op, $self, ['<', $body->[0]{text}, '>'], '',
-			      'readline_scalar', {body=>$body});
-    }
-    return $self->unop($op, $cx, "readline");
-}
-
-sub pp_rcatline {
-    my $self = shift;
-    my($op) = @_;
-    return info_from_list($op, $self, ["<", $self->gv_name($self->gv_or_padgv($op)), ">"],
-			  '', 'rcatline', {});
-}
-
-sub pp_smartmatch {
-    my ($self, $op, $cx) = @_;
-    if ($op->flags & OPf_SPECIAL) {
-	return $self->deparse($op->last, $cx, $op);
-    }
-    else {
-	binop(@_, "~~", 14);
-    }
-}
-
-sub bin_info_join($$$$$$$) {
-    my ($self, $op, $lhs, $rhs, $mid, $sep, $type) = @_;
-    my $texts = [$lhs->{text}, $mid, $rhs->{text}];
-    return info_from_list($op, $self, $texts, ' ', $type, {})
-}
-
-sub bin_info_join_maybe_parens($$$$$$$$$) {
-    my ($self, $op, $lhs, $rhs, $mid, $sep, $cx, $prec, $type) = @_;
-    my $info = bin_info_join($self, $op, $lhs, $rhs, $mid, $sep, $type);
-    $info->{text} = $self->maybe_parens($info->{text}, $cx, $prec);
-    return $info;
-}
-
-sub range {
-    my $self = shift;
-    my ($op, $cx, $type) = @_;
-    my $left = $op->first;
-    my $right = $left->sibling;
-    $left = $self->deparse($left, 9, $op);
-    $right = $self->deparse($right, 9, $op);
-    return info_from_list($op, $self, [$left, $type, $right], ' ', 'range',
-			  {maybe_parens => [$self, $cx, 9]});
-}
-
-sub pp_substr {
-    my ($self,$op,$cx) = @_;
-    if ($op->private & OPpSUBSTR_REPL_FIRST) {
-	my $left = listop($self, $op, 7, "substr", $op->first->sibling->sibling);
-	my $right = $self->deparse($op->first->sibling, 7, $op);
-	return info_from_list($op, $self,[$left, '=', $right], ' ',
-			      'substr_repl_first', {});
-    }
-    return maybe_local(@_, listop(@_, "substr"))
-}
-sub pp_formline { listop(@_, "formline") } # see also deparse_format
-sub pp_unpack { listop(@_, "unpack") }
-sub pp_splice { listop(@_, "splice") }
-sub pp_socket { listop(@_, "socket") }
-sub pp_seekdir { listop(@_, "seekdir") }
-
-sub for_loop {
-    my $self = shift;
-    my($op, $cx, $parent) = @_;
-    my $init = $self->deparse($op, 1, $parent);
-    my $s = $op->sibling;
-    my $ll = $s->name eq "unstack" ? $s->sibling : $s->first->sibling;
-    return $self->loop_common($ll, $cx, $init);
-}
-
-sub pp_padsv {
-    my $self = shift;
-    my($op, $cx, $forbid_parens) = @_;
-    return $self->maybe_my($op, $cx, $self->padname($op->targ),
-			   $forbid_parens);
-}
-
 my @threadsv_names = B::threadsv_names;
 sub pp_threadsv {
     my $self = shift;
     my($op, $cx) = @_;
     return $self->maybe_local_str($op, $cx, "\$" .  $threadsv_names[$op->targ]);
-}
-
-sub gv_or_padgv {
-    my $self = shift;
-    my $op = shift;
-    if (class($op) eq "PADOP") {
-	return $self->padval($op->padix);
-    } else { # class($op) eq "SVOP"
-	return $op->gv;
-    }
-}
-
-sub pp_aelemfast_lex
-{
-    my($self, $op, $cx) = @_;
-    my $name = $self->padname($op->targ);
-    $name =~ s/^@/\$/;
-    return info_from_list($op, $self, [$name, "[", ($op->private + $self->{'arybase'}), "]"],
-		      '', 'pp_aelemfast_lex', {});
-}
-
-sub pp_aelemfast
-{
-    my($self, $op, $cx) = @_;
-    # optimised PADAV, pre 5.15
-    return $self->pp_aelemfast_lex(@_) if ($op->flags & OPf_SPECIAL);
-
-    my $gv = $self->gv_or_padgv($op);
-    my($name,$quoted) = $self->stash_variable_name('@',$gv);
-    $name = $quoted ? "$name->" : '$' . $name;
-    my $i = $op->private;
-    $i -= 256 if $i > 127;
-    return info_from_list($op, $self, [$name, "[", ($op->private + $self->{'arybase'}), "]"],
-		      '', 'pp_aelemfast', {});
 }
 
 sub pp_rv2sv { maybe_local(@_, rv2x(@_, "\$")) }
@@ -347,7 +220,7 @@ sub list_const($$$) {
 	    $prec = 9;
 	}
     }
-    return info_from_list($op, $self, \@texts,  '', $type,
+    return info_from_list('const', $self, \@texts,  '', $type,
 	{maybe_parens => [$self, $cx, $prec]});
 }
 
@@ -429,30 +302,6 @@ sub elem_or_slice_single_index($$)
     return info_from_text($idx_info->{op}, $self, $idx_str,
 			  'elem_or_slice_single_index',
 			  {body => [$idx_info]});
-}
-
-sub pp_gelem
-{
-    my($self, $op, $cx) = @_;
-    my($glob, $part) = ($op->first, $op->last);
-    $glob = $glob->first; # skip rv2gv
-    $glob = $glob->first if $glob->name eq "rv2gv"; # this one's a bug
-    my $scope = B::Deparse::is_scope($glob);
-    $glob = $self->deparse($glob, 0);
-    $part = $self->deparse($part, 1);
-    return "*" . ($scope ? "{$glob}" : $glob) . "{$part}";
-}
-
-sub pp_lslice
-{
-    my ($self, $op, $cs) = @_;
-    my $idx = $op->first;
-    my $list = $op->last;
-    my(@elems, $kid);
-    my $list_info = $self->deparse($list, 1, $op);
-    my $idx_info = $self->deparse($idx, 1, $op);
-    return info_from_list($op, $self, ['(', $list_info->{text}, ')', '[', $idx_info->{text}, ']'],
-	'', 'lslice', {body=>[$list_info, $idx_info]});
 }
 
 sub _method
@@ -641,32 +490,6 @@ sub check_proto {
     return ('', \@reals);
 }
 
-sub pp_enterwrite { unop(@_, "write") }
-
-# Split a floating point number into an integer mantissa and a binary
-# exponent. Assumes you've already made sure the number isn't zero or
-# some weird infinity or NaN.
-sub split_float {
-    my($f) = @_;
-    my $exponent = 0;
-    if ($f == int($f)) {
-	while ($f % 2 == 0) {
-	    $f /= 2;
-	    $exponent++;
-	}
-    } else {
-	while ($f != int($f)) {
-	    $f *= 2;
-	    $exponent--;
-	}
-    }
-    my $mantissa = sprintf("%.0f", $f);
-    return ($mantissa, $exponent);
-}
-
-# OP_STRINGIFY is a listop, but it only ever has one arg
-sub pp_stringify { maybe_targmy(@_, \&dquote) }
-
 # Like dq(), but different
 sub re_dq {
     my $self = shift;
@@ -810,10 +633,6 @@ sub regcomp
     return ($self->deparse($kid, $cx, $op), 0, $op);
 }
 
-sub pp_match { matchop(@_, "m", "/") }
-sub pp_pushre { matchop(@_, "m", "/") }
-sub pp_qr { matchop(@_, "qr", "") }
-
 sub pp_split
 {
     my($self, $op, $cx) = @_;
@@ -867,82 +686,6 @@ sub pp_split
 
     }
     return info_from_list($op, $self, \@expr_texts, $sep, $type, $opts);
-}
-
-# Kind of silly, but we prefer, subst regexp flags joined together to
-# make words. For example: s/a/b/xo => s/a/b/ox
-
-# oxime -- any of various compounds obtained chiefly by the action of
-# hydroxylamine on aldehydes and ketones and characterized by the
-# bivalent grouping C=NOH [Webster's Tenth]
-
-my %substwords;
-map($substwords{join "", sort split //, $_} = $_, 'ego', 'egoism', 'em',
-    'es', 'ex', 'exes', 'gee', 'go', 'goes', 'ie', 'ism', 'iso', 'me',
-    'meese', 'meso', 'mig', 'mix', 'os', 'ox', 'oxime', 'see', 'seem',
-    'seg', 'sex', 'sig', 'six', 'smog', 'sog', 'some', 'xi', 'rogue',
-    'sir', 'rise', 'smore', 'more', 'seer', 'rome', 'gore', 'grim', 'grime',
-    'or', 'rose', 'rosie');
-
-unless (caller) {
-    eval "use Data::Printer;";
-
-    eval {
-	our($Fileparse_fstype);
-	sub fib($) {
-	    my $x = shift;
-	    return 1 if $x <= 1;
-	    return(fib($x-1) + fib($x-2))
-	}
-	sub fileparse {
-	    no strict;
-  # my($fullname,@suffices) = @_;
-
-  my $tail   = '';
-  $tail = $1 . $tail;
-
-  # Ensure taint is propagated from the path to its pieces.
-  $tail .= $taint;
-  wantarray ? ($basename .= $taint, $dirpath .= $taint, $tail)
-            : ($basename .= $taint);
-}
-	sub baz {
-	    no strict;
-	    if ($basename =~ s/$pat//s) {
-	    }
-	}
-    };
-
-    my $deparse = __PACKAGE__->new("-l", "-c");
-    my $info = $deparse->coderef2info(\&fileparse);
-    # my $info = $deparse->coderef2info(\&baz);
-    import Data::Printer colored => 0;
-    Data::Printer::p($info);
-    print "\n", '=' x 30, "\n";
-    # print $deparse->($deparse->deparse_subname('fib')->{text});
-    # print "\n", '=' x 30, "\n";
-    # print "\n", '-' x 30, "\n";
-    while (my($key, $value) = each %{$deparse->{optree}}) {
-	my $parent_op_name = 'undef';
-	if ($value->{parent}) {
-	    my $parent = $deparse->{optree}{$value->{parent}};
-	    $parent_op_name = $parent->{op}->name if $parent->{op};
-	}
-	if (eval{$value->{op}->name}) {
-	    printf("0x%x %s/%s of %s |\n%s",
-		   $key, $value->{op}->name, $value->{type},
-		   $parent_op_name, $deparse->{text});
-	} else {
-	    printf("0x%x %s of %s |\n",
-		   $key, $value->{type},
-		   $parent_op_name);
-	}
-	printf " ## line %s\n", $value->{cop} ? $value->{cop}->line : 'undef';
-	print '-' x 30, "\n";
-    }
-    # use B::Deparse;
-    # my $deparse_old = B::Deparse->new("-l", "-sC");
-    # print $deparse_old->coderef2text(\&baz);
 }
 
 1;

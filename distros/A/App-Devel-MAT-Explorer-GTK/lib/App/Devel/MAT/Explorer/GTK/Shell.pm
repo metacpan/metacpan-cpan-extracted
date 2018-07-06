@@ -1,23 +1,26 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
 
 package App::Devel::MAT::Explorer::GTK::Shell;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Glib qw( TRUE FALSE );
-use Text::ParseWords;
+use String::Tagged 0.15;  # sprintf
+use Commandable::Invocation;
+
+Devel::MAT->VERSION( '0.35' ); # Commandable::Invocation
 
 # The perl bindings don't make this very easy
 use constant PANGO_WEIGHT_BOLD => 700;
 
-my ( $pmat, $buffer, $textview, $endmark, $scrolledwindow );
-my ( @styletags, $errortag, $svtag );
+my ( $pmat, $buffer, $textview, $endmark, $scrolledwindow, $prompt );
+my ( @styletags, $errortag, $svtag, $valuetag, $symboltag );
 
 sub build_widget
 {
@@ -43,7 +46,7 @@ sub build_widget
       weight     => PANGO_WEIGHT_BOLD,
    );
 
-   foreach my $colour ( '#0000FF', '#00A000', '#8000C0' ) {
+   foreach my $colour ( '#0000C0', '#008000', '#8000C0' ) {
       push @styletags, $buffer->create_tag( undef,
          foreground => $colour,
          style      => 'italic',
@@ -54,11 +57,25 @@ sub build_widget
       foreground => "#0000D0",
    );
 
+   $valuetag = $buffer->create_tag( undef,
+      foreground => "#B000B0",
+   );
+
+   $symboltag = $buffer->create_tag( undef,
+      foreground => "#00B000",
+   );
+
    $endmark = $buffer->create_mark( 'end', $buffer->get_end_iter, FALSE );
+
+   $vbox->pack_start( my $hbox = Gtk2::HBox->new, FALSE, FALSE, 0 );
+
+   $prompt = Gtk2::Label->new( "pmat>" );
+
+   $hbox->pack_start( $prompt, FALSE, FALSE, 0 );
 
    my $entry = Gtk2::Entry->new;
 
-   $vbox->pack_start( $entry, FALSE, FALSE, 0 );
+   $hbox->pack_start( $entry, TRUE, TRUE, 0 );
 
    $entry->modify_font( Gtk2::Pango::FontDescription->from_string( 'monospace' ) );
 
@@ -76,20 +93,23 @@ sub invoke_command
 {
    my ( $line ) = @_;
 
-   my ( $cmd, @args ) = Text::ParseWords::shellwords( $line );
+   my $inv = Commandable::Invocation->new( $line );
+   my $cmd = $inv->pull_token;
 
-   append_output( join( " ", "pmat>", $cmd, @args ) . "\n" );
+   append_output( join( " ", "pmat>", $cmd, $inv->remaining ) . "\n" );
 
    eval {
       $pmat->load_tool_for_command( $cmd,
          progress => \&::progress,
-      )->run_cmd( @args );
+      )->run_cmd( $inv );
       1;
    } or do {
       my $err = $@;
       chomp $err;
       append_output( "ERR: $err\n", $errortag );
    };
+
+   $prompt->set_text( sprintf "pmat%s>", Devel::MAT::Tool::more->can_more ? " [more]" : "" );
 }
 
 my $linefeed_pending;
@@ -121,15 +141,24 @@ sub Devel::MAT::Cmd::printf
 {
    shift;
    my ( $fmt, @args ) = @_;
-   append_output( sprintf( $fmt, @args ) );
+
+   my $str = String::Tagged->from_sprintf( $fmt, @args );
+
+   $str->iter_substr_nooverlap( sub {
+      my ( $s, %tags ) = @_;
+      append_output( $s, @{ $tags{tags} // [] } );
+   });
 }
 
-sub Devel::MAT::Cmd::print_note
+sub Devel::MAT::Cmd::format_note
 {
    shift;
    my ( $str, $idx ) = @_;
    $idx //= 0;
-   append_output( $str, $styletags[$idx % 3] );
+   return String::Tagged->new_tagged(
+      $str,
+      tags => [ $styletags[$idx % 3] ]
+   );
 }
 
 sub _make_navtag
@@ -148,22 +177,51 @@ sub _make_navtag
    return $navtag;
 }
 
-sub Devel::MAT::Cmd::print_sv
+sub Devel::MAT::Cmd::format_sv
 {
    shift;
    my ( $sv ) = @_;
 
-   my $len = append_output( $sv->desc, $svtag );
+   my $ret = String::Tagged->new
+      ->append_tagged( $sv->desc, tags => [ $svtag ] );
 
    if( my $blessed = $sv->blessed ) {
-      $len += append_output( "=" );
-      $len += append_output( $blessed->stashname, $svtag, _make_navtag( $blessed ) );
+      $ret->append( "=" );
+      $ret->append_tagged( $blessed->stashname, tags => [ $svtag, _make_navtag( $blessed ) ] );
    }
 
-   $len += append_output( " at " );
-   $len += append_output( sprintf( "%#x", $sv->addr ), $svtag, _make_navtag( $sv ) );
+   $ret->append( " at " );
+   $ret->append_tagged( sprintf( "%#x", $sv->addr ), tags => [ $svtag, _make_navtag( $sv ) ] );
 
-   return $len;
+   if( my $rootname = $sv->rootname ) {
+      $ret->append( "=" );
+      $ret->append_tagged( $rootname, tags => [ $styletags[1] ] );
+   }
+
+   return $ret;
+}
+
+sub Devel::MAT::Cmd::_format_value
+{
+   shift;
+   my ( $val ) = @_;
+
+   return String::Tagged->new_tagged(
+      $val,
+      tags => [ $valuetag ],
+   );
+}
+
+sub Devel::MAT::Cmd::format_symbol
+{
+   shift;
+   my ( $name, $sv ) = @_;
+
+   $sv or die "TODO: Will have to look up '$name' symbol";
+
+   return String::Tagged->new_tagged( $name,
+      tags => [ $symboltag, _make_navtag( $sv ) ],
+   );
 }
 
 0x55AA;

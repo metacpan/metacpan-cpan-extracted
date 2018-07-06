@@ -1,0 +1,34 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Webservice::Judobase - Access the www.judobase.org API in perl.
+
+=for HTML
+<a href=https://travis-ci.org/lancew/Webservice-Judobase><img src=https://api.travis-ci.org/lancew/Webservice-Judobase.svg?branch=master></a>
+<a href=https://coveralls.io/github/lancew/Webservice-Judobase><img src=https://coveralls.io/repos/lancew/Webservice-Judobase/badge.svg?branch=master></a>
+<a href=https://metacpan.org/pod/Webservice-Judobase><img src="https://badge.fury.io/pl/Webservice-Judobase.svg"></a>
+<a href=https://github.com/lancew/Webservice-Judobase/issues><img src=https://img.shields.io/github/issues/lancew/Webservice-Judobase.svg></a>
+
+=head1 DESCRIPTION
+
+Simple wrapper around the www.judobase.org API to make working with the
+Judobase API easier
+
+=head1 SYNOPSIS
+
+To be written.
+
+=head1 AUTHOR
+
+Lance Wicks <lancew@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Lance Wicks.
+
+=head1 SEE ALSO
+

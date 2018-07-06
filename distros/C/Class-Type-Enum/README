@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.009
+    version 0.011
 
 SYNOPSIS
 
@@ -16,20 +16,17 @@ SYNOPSIS
         use Moo;
     
         has status => (
-          is     => 'rw',
-          coerce => sub {
-            Toast::Status->coerce_symbol(shift)
-          },
-          isa    => sub {
-            $_[0]->isa('Toast::Status') or die "Toast calamity!"
-          },
+          is      => 'rw',
+          isa     => Toast::Status->type_constraint,
+          coerce  => 1,
+          handles => [ Toast::Status->list_is_methods ],
         );
       }
     
       my @toast = map { Toast->new(status => $_) } qw( toast burnt bread bread toasting toast );
     
-      my @trashcan = grep { $_->status->is_burnt } @toast;
-      my @plate    = grep { $_->status->is_toast } @toast;
+      my @trashcan = grep { $_->is_burnt } @toast;
+      my @plate    = grep { $_->is_toast } @toast;
     
       my $ready_status   = Toast::Status->new('toast');
       my @eventual_toast = grep { $_->status < $ready_status } @toast;
@@ -115,6 +112,17 @@ METHODS
 
     Returns an arrayref of valid symbolic values, in order.
 
+ $class->list_is_methods
+
+    Returns a list of is_ methods defined for each symbolic value for the
+    class.
+
+ $class->type_constraint
+
+    This method requires the optional dependency Type::Tiny.
+
+    Returns a type constraint suitable for use with Moo and friends.
+
  $class->test_symbol($value)
 
     Test whether or not the given value is a valid symbol in this enum
@@ -188,7 +196,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Meredith Howard.
+    This software is copyright (c) 2018 by Meredith Howard.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

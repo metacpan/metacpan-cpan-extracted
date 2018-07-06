@@ -2,7 +2,6 @@
 
 # Add the following conversion methods:
 
-    as_rat   [?]
     in_base  [?]
 
 # Add the following functions (maybe):

@@ -12,7 +12,7 @@
 const char* const SPVM_PACKAGE_C_CATEGORY_NAMES[] = {
   "class",
   "interface",
-  "struct",
+  "pointer",
 };
 
 SPVM_PACKAGE* SPVM_PACKAGE_new(SPVM_COMPILER* compiler) {
@@ -26,20 +26,19 @@ SPVM_PACKAGE* SPVM_PACKAGE_new(SPVM_COMPILER* compiler) {
   package->op_package_vars = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   package->op_package_var_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
 
-  package->method_signature_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
+  package->sub_signatures = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
+  package->sub_signature_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
+  package->field_signatures = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
+  package->field_signature_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
+  package->package_var_signatures = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
+  package->package_var_signature_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
+
   package->has_interface_cache_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
   package->op_subs = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   package->op_sub_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
   package->op_package_vars = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   package->op_package_var_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
-  package->object_field_rel_ids = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-
-  package->op_package_var_accesses = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  package->op_field_accesses = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  package->op_types = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  package->op_call_subs = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  package->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-  package->op_switch_infos = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
+  package->object_field_indexes = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   
   return package;
 }

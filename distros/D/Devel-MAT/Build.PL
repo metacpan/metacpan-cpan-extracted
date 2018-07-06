@@ -6,6 +6,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Devel::MAT',
    requires => {
+      'Commandable::Invocation' => 0,
       'File::ShareDir' => 0,
       'File::Spec' => 0,
       'List::Util' => '1.44', # uniq

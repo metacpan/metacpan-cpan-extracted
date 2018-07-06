@@ -874,7 +874,7 @@ It returns the numerical index (so you can inject the id).
 
 sub add_to_table_of_contents {
     my ($self, $level, $string) = @_;
-    return unless ($level and defined($string) and $string ne '');
+    return unless ($level and defined($string));
     unless (defined $self->{_toc_entries}) {
         $self->{_toc_entries} = [];
     }

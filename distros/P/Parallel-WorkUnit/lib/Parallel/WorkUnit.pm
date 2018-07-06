@@ -4,7 +4,7 @@
 #
 
 package Parallel::WorkUnit;
-$Parallel::WorkUnit::VERSION = '1.201';
+$Parallel::WorkUnit::VERSION = '2.181850';
 use v5.8;
 
 # ABSTRACT: Provide multi-paradigm forking with ability to pass back data
@@ -885,7 +885,7 @@ Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back da
 
 =head1 VERSION
 
-version 1.201
+version 2.181850
 
 =head1 SYNOPSIS
 

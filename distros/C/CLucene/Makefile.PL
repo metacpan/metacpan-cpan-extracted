@@ -25,6 +25,7 @@ WriteMakefile(
 # Commands needed to build wrapper on Redhat Linux
 #perl check.pl
 #swig -perl clucene.i
+#mv CLuceneWrap.pm FulltextSearch/
 #cc -c clucene_wrap.c -I../../src -I. -I/usr/lib/perl5/5.8.0/i386-linux-thread-multi/CORE -Dbool=char -D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -DDEBUGGING -fno-strict-aliasing -I/usr/local/include -I/usr/include/gdbm -fpic
 #cc -shared -L../../build/gcc/src/.libs -lclucene /usr/lib/clucene_dll.o clucene_wrap.o -o CLuceneWrap.so -lstdc++ -Xlinker -rpath /usr/lib -Xlinker -rpath /usr/local/lib
 
@@ -43,7 +44,7 @@ sub MY::postamble
 {
 	return <<EOM ;
 
-OS := \$(shell perl ./check.pl -os)
+OS := \$(shell $^X ./check.pl -os)
 PERLCORE := \$(shell perl check.pl -perl)
 
 ifeq ("cygwin","\$(OS)") # cygwin
@@ -55,6 +56,16 @@ else
    LINKOPTS=-Xlinker -rpath /usr/lib -Xlinker -rpath /usr/local/lib
 endif
 
+INSTLIBDIR=/usr/lib
+INSTHDRDIR=/usr/include
+MACHINE := \$(shell uname -m)
+ifeq ("\$(MACHINE)", "x86_64")
+  INSTLIBDIR = /usr/lib
+endif
+#ifeq ("\$(MACHINE)", "i686")
+#INSTLIBDIR = /usr/lib
+#endif
+
 SWIG=swig
 INCDIR=-I../../src -I.
 INCCL=\$(INCDIR)
@@ -63,8 +74,8 @@ LDFLAGS=-lstdc++
 LIBCL=-L\$(LIBDIR) -lclucene
 LIBCLUCENE=-L\$(LIBDIR) -lclucene
 SWIGCFLAGS=-D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -DDEBUGGING -fno-strict-aliasing -I/usr/local/include -I/usr/include/gdbm -fpic
-CLUCENEDLLO=/usr/lib/clucene_dll.o
-CLUCENEDLLH=/usr/include/clucene_dllp.h
+CLUCENEDLLO=\$(INSTLIBDIR)/clucene_dll.o
+CLUCENEDLLH=\$(INSTHDRDIR)/clucene_dllp.h
 
 # build perl interface via DLL to CLucene shared library
 # CLucene.pm -> CLuceneWrap.pm -> CLuceneWrap.so -> clucene_wrap.o -> clucene_dll.o -> libclucene.so
@@ -75,22 +86,19 @@ CLuceneWrap.so: \$(CLUCENEDLLO) \$(CLUCENEDLLH) clucene_wrap.o
 	\${CC} -shared \$(LIBCLUCENE) \$(CLUCENEDLLO) clucene_wrap.o -o CLuceneWrap.so \$(LDFLAGS) \$(LINKOPTS)
 
 # or for cygwin
-cygwin: \$(CLUCENEDLLO) \$(CLUCENEDLLH) clucene_wrap.o
-	\${CC} \${LIBCLUCENE} \$(LDFLAGS) /usr/bin/cygperl5_8_2.dll /usr/bin/cygcrypt-0.dll \$(CLUCENEDLLO) clucene_wrap.o -o CLuceneWrap.so
+cygwin: clucene_dll.o clucene_dllp.h clucene_wrap.o
+	\${CC} \${LIBCLUCENE} \$(LDFLAGS) /usr/bin/cygperl5_8_2.dll /usr/bin/cygcrypt-0.dll clucene_dll.o clucene_wrap.o -o CLuceneWrap.so
 
 # swig perl/C wrapper to DLL interface
 clucene_wrap.o: clucene.i clucene_perl.h
 	\@perl check.pl
 	\$(SWIG) -perl clucene.i
+	#mv CLuceneWrap.pm FulltextSearch/
 	\${CC} -c clucene_wrap.c \$(CFLAGS) -I\${PERLCORE} -Dbool=char \${SWIGCFLAGS}
 
 # run test perl program against perl wrapper
 testwrapper: CLuceneWrap.so
 	LD_LIBRARY_PATH=\$(LIBDIR) perl clucene_test.pl
-
-# test C wrapper to DLL interface, equivalent to perl test program but easier to debug against
-testc: testc.o \$(CLUCENEDLLO)
-	c++ -o testc testc.o \$(CLUCENEDLLO) \$(LIBCL) \$(LDFLAGS)
 
 EOM
 }
@@ -100,7 +108,7 @@ sub MY::clean
    return <<EOM ;
 
 clean:
-	rm -fr ./blib *.o testc pm_to_blib clucene_wrap.* CLuceneWrap.* swig.ver Makefile CLuceneWrap.pm
+	rm -fr ./blib *.o clucene_wrap.* CLuceneWrap.* swig.ver Makefile FulltextSearch/CLuceneWrap.pm
 
 EOM
 }

@@ -10,57 +10,132 @@ App::boxmuller - Provides the command which produces Gaussian distributed random
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 
-our $VERSION = '0.23';
-
+our $VERSION = '0.24';
 
 =head1 SYNOPSIS
 
-  The online help can be seen by :  boxmuller --help 
-  Followings are similar to the online help.
+boxmuller [B<-m> mean] [B<-v> variance | B<-d> standard_deviation] 
+[B<-g> how_many_you_want] [B<-.> digits_after_decimal_point] [B<-s> random_seed] 
+[B<-L>(log normal)] [B<-@> seconds] [B<-1>] [B<-:>]
+
+boxmuller [B<--help> [ja|en] [opt] [nopod]] [B<--version>]
+
+=head1 DESCRIPTION
+
+Generates Gaussian random variables by Box-Muller method.
+The used random seed and the sums of the generated numbers and the square of them are also 
+provided to STDERR.
+
+=head1 OPTION
+
+=over 4
+
+=item -m N 
+
+Population B<Mean (average)>. Default value is 0.
 
 
-   Program name : boxmuller 
+=item -d N 
 
-   Function : generating Gaussian random variables by Box-Muller method.
+Population B<Standard Deviation>. Default value is 1.
 
-   Output to STDOUT :  
-      1. The generated Gaussian random number(s).
+=item -v N 
 
-   Output to STDERR : 
-      2. The random seed used. 
-      3. The sums of the generated numbers and the square of them.
+Population B<Variance>. Default value is 1. If -d is given, -v would be nullified.
 
-   Options : 
-     -m N : Mean (average). Default value is 0.
-     -d N : Standard Deviation. Default value is 1.
-     -v N : Variance. Default value is 1. If -d is given, -v would be nullified.
-     -. N : The digits to be shown after the decimal point.
+=item -. N 
 
-     -g N : How many numbers you need. Default : 6. "inf" can be given.
-     -s N : Random seed specification. Seemingly the residual divided by 2**32 is essential.
-     -L   : Outputs variables by the log normal distribution instead of the normal distribution.
+The digits to be shown after the decimal point. Without this specification 
+14 digits after the decimal point may be shown.
 
-     -1   : Only output the random number without other secondary information.
-     -:   ; Attach serial number from 1. 
-     -@ N : Waiting time in seconds (that can be spedicifed 6 digits under decimal points).
+=item -g N 
 
-    --help : Print this online help manual of this command "boxmuller". Similar to "perldoc `which [-t] boxmuller` ".
-    --help opt : Only shows the option helps. It is easy to read when you are in very necessary.
-    --help nopod : Print this online manual using the code insdide this program without using the function of Perl POD.
-    --version : Version information output.
- 
+How many numbers to be produced. Default value is 6. "Inf" (Infinity) can be given.
+
+=item -s N 
+
+Random B<seed> specification. The residual divided by 2**32 is essential.
+
+=item -L 
+
+Outputs variables from the B<log normal distribution> instead of the normal distribution.
+
+=item -1
+
+Only output the random number without other secondary information.
+
+=item -: 
+
+Attaches serial number beginning from 1. 
+
+=item -@ N 
+
+Waiting time in B<seconds> for each output line, that can be spedicifed 6 digits after the decimal points
+(microsecond).
+
+=item --help 
+
+Print this online help manual of this command "boxmuller". Similar to "perldoc `which [-t] boxmuller` ".
+
+=item --help opt 
+
+Only shows the option helps. It is easy to read when you are in very necessary.
+
+=item --help ja
+
+Shows Japanese online help manual. 
+
+=item --help nopod 
+
+Print this online manual using the code insdide this program without using the function of Perl POD.
+
+=item --version 
+
+Version information output.
+
+=back
+
+=head1 EXAMPLE
+
+=over 4
+
+=item boxmuller
+
+# Generates some random numbers from the stardard normal distribution.
+
+=item boxmuller -m 10 -d 2 -g 12
+
+# Generates 12 random numbers from the normal distribution with the
+population mean 10, the population variance 2.
+
+=item boxmuller B<-L> -m 3 -d 2
+
+# Generates B<Log normal distribution>. In this case the popular median is exp(3) = 20.09. 
+
+=item boxmuller B<-g Inf -@ 0.3>
+
+# Generate each random number every 0.3 seconds.
+
+=back
+
+
+=head1 AUTHOR
+
+Toshiyuki Shimono
+  bin4tsv@gmail.com
+
+=head1 HISTORY
+
+This program has been made since 2016-07-07 (Thu)
+as a part of TSV hacking toolset for table data.
 
 =head1 EXPORT
 
   Nothing would be exported.
-
-=head1 AUTHOR
-
-"Toshiyuki Shimono", C<< <bin4tsv at gmail.com> >>
 
 =head1 BUGS
 

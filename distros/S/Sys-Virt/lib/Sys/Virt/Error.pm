@@ -816,6 +816,14 @@ The libSSH operation failed
 
 Libvirt fail to find the desired device.
 
+=item Sys::Virt::Error::ERR_INVALID_NWFILTER_BINDING
+
+Invalid nwfilter binding
+
+=item Sys::Virt::Error::ERR_NO_NWFILTER_BINDING
+
+No nwfilter binding
+
 =back
 
 =head1 AUTHORS

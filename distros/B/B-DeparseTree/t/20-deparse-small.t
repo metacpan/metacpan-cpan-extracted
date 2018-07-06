@@ -6,7 +6,7 @@ use warnings; use strict;
 use File::Temp qw/ tempfile tempdir /;
 
 if ($] < 5.018 || $] > 5.0269) {
-    plan skip_all => 'Customized to Perl 5.22 - 5.26 interpreters';
+    plan skip_all => 'Customized to Perl 5.18 - 5.26 interpreters';
 }
 
 if ($ENV{'CIRCLECI'}) {
@@ -23,12 +23,7 @@ my %deparse;
 $/ = "\n####\n";
 my $eval_but_skip = $tests+1;
 
-my @test_files;
-if ($] >= 5.018 && $] <= 5.0249) {
-    @test_files = ('subst.pm', 'P524-short.pm');
-} else {
-    @test_files = ('subst.pm', 'P526-short.pm');
-}
+my @test_files = ('subst.pm', 'small.pm');
 
 use constant MAX_ERROR_COUNT => 2;
 my $error_count = 0;

@@ -3,11 +3,13 @@ abstract: 'Provide multi-paradigm forking with ability to pass back data'
 author:
   - 'Joelle Maslak <jmaslak@antelope.net>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   Test2::Tools::Warnings: '0'
   Test2::V0: '0'
   Test::Exception: '0'
   Test::More: '0'
-  Test::UseAllModules: '0.17'
+  Test::UseAllModules: '0.15'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -20,7 +22,7 @@ name: Parallel-WorkUnit
 provides:
   Parallel::WorkUnit:
     file: lib/Parallel/WorkUnit.pm
-    version: '1.201'
+    version: '2.181850'
 recommends:
   AnyEvent: '7.14'
 requires:
@@ -42,5 +44,7 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Parallel-WorkUnit/issues
   repository: git://github.com/jmaslak/Parallel-WorkUnit.git
-version: '1.201'
+version: '2.181850'
+x_contributor_covenant:
+  version: 0.02
 x_serialization_backend: 'YAML::Tiny version 1.70'

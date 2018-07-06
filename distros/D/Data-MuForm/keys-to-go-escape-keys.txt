@@ -1,0 +1,5 @@
+fn + home (upper left square icon)
+cmd + backtick
+ctrl + [
+
+

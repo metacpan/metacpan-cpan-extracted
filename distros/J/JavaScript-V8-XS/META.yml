@@ -1,0 +1,32 @@
+---
+abstract: 'Perl XS binding for the V8 JavaScript engine'
+author:
+  - 'Gonzalo Diethelm (gonzus@cpan.org)'
+build_requires:
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  Path::Tiny: '0'
+  Test::More: '0'
+  Test::Output: '0'
+  Text::Trim: '0'
+  Time::HiRes: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JavaScript-V8-XS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::XSpp: '0.11'
+  XSLoader: '0'
+  perl: '5.018'
+resources:
+  repository: https://github.com/gonzus/JavaScript-V8-XS
+version: '0.000002'

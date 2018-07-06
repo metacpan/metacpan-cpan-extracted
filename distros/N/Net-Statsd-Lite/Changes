@@ -1,5 +1,12 @@
 Revision history for Net-Statsd-Lite
 
+v0.4.4    2018-07-02 18:17:31+01:00 Europe/London
+  [Bug Fixes]
+  - fix inlined type constraints, #1 (thanks @tobyink).
+
+  [Toolchain]
+  - Added keywords to distribution metadata.
+
 v0.4.3    2018-05-21 21:55:30+01:00 Europe/London
   [Documentation]
   - Fixed minor typo in POD.

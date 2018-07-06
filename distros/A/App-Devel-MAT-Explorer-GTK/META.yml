@@ -13,31 +13,32 @@ name: App-Devel-MAT-Explorer-GTK
 provides:
   App::Devel::MAT::Explorer::GTK:
     file: lib/App/Devel/MAT/Explorer/GTK.pm
-    version: '0.04'
+    version: '0.06'
   App::Devel::MAT::Explorer::GTK::Resources:
     file: lib/App/Devel/MAT/Explorer/GTK/Resources.pm
-    version: '0.04'
+    version: '0.06'
   App::Devel::MAT::Explorer::GTK::SVDetail:
     file: lib/App/Devel/MAT/Explorer/GTK/SVDetail.pm
-    version: '0.04'
+    version: '0.06'
   App::Devel::MAT::Explorer::GTK::Shell:
     file: lib/App/Devel/MAT/Explorer/GTK/Shell.pm
-    version: '0.04'
+    version: '0.06'
   App::Devel::MAT::Explorer::GTK::Utils:
     file: lib/App/Devel/MAT/Explorer/GTK/Utils.pm
   App::Devel::MAT::Explorer::GTK::Widgets:
     file: lib/App/Devel/MAT/Explorer/GTK/Widgets.pm
-    version: '0.04'
+    version: '0.06'
 requires:
-  Devel::MAT: '0.23'
+  Devel::MAT: '0.31'
   File::ShareDir: '0'
   Glib: '0'
   Gtk2: '0'
   Gtk2::SimpleList: '0'
   List::Util: '1.29'
   List::UtilsBy: '0'
+  String::Tagged: '0.15'
   Struct::Dumb: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -5,7 +5,7 @@ use warnings;
 
 =head1 NAME
 
-App::NDTools - command line tools for nested structures
+App::NDTools - Command line tools for nested structures
 
 =begin html
 
@@ -17,11 +17,11 @@ App::NDTools - command line tools for nested structures
 
 =head1 VERSION
 
-Version 0.5.7
+Version 0.5.9
 
 =cut
 
-our $VERSION = "0.5.7";
+our $VERSION = "0.5.9";
 
 =head1 DESCRIPTION
 

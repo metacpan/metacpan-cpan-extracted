@@ -1,0 +1,120 @@
+
+Sun Sep 6 13:30:12
+   t/time_hmf.pl
+       HTML::MuForm - Elapsed: 0.40991  ( .004 ms per form )
+       (Note: this timeing was really fast because of a bug in meta field loading)
+   t/time_hfh.pl
+       HTML::FormHandler - Elapsed: 3.731829 ( .037 ms per form )
+
+Sat Sep 12, 1:37
+       FormHandler - Elapsed: 3.714311
+       MuForm - Elapsed: 0.68342
+
+Tuesday, Sep 27, 2016
+Had added Locale::TextDomain::OO and the timings were about
+equal, so I ripped it out and created my own localizer from the pieces.
+
+Fri Sep 30, 2016
+
+Original version, no params (->new plus ->process( params => {} ) )
+About 4.6 times faster
+
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 0.833269
+~/Code/MuForm $ perl t/time_hfh.pl
+Elapsed: 3.851732
+
+Added params to process call:
+About 4x faster
+
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 1.114636   (11 ms per form)
+~/Code/MuForm $ perl t/time_hfh.pl
+Elapsed: 4.552238   (46 ms per form)
+
+
+Wed, Oct 5, 2016
+with process call:
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 1.137891
+~/Code/MuForm $ perl -Ilib t/time_hfh.pl
+Elapsed: 4.750582
+
+without process call:
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 0.781496
+~/Code/MuForm $ perl -Ilib t/time_hfh.pl
+Elapsed: 3.515626
+
+
+Fri Oct 7
+
+# no ->process
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 0.877434
+~/Code/MuForm $ perl -Ilib t/time_hfh.pl
+Elapsed: 3.480535
+
+# with ->process
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 1.238963
+~/Code/MuForm $ perl -Ilib t/time_hfh.pl
+Elapsed: 4.659696
+
+
+# with ->new once, outside of loop
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 0.407241
+~/Code/MuForm $ perl -Ilib t/time_hfh.pl
+Elapsed: 1.248227
+
+
+Sun Oct 9
+with process new in loop.
+
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 1.264947
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 1.287427
+~/Code/MuForm $ perl -Ilib t/time_hfh.pl
+Elapsed: 4.809408
+~/Code/MuForm $ perl -Ilib t/time_hfh.pl
+Elapsed: 4.783883
+
+
+Tues Oct 11
+new, process
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 1.293055
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 1.351198
+~/Code/MuForm $ perl -Ilib t/time_hfh.pl
+Elapsed: 4.801007
+~/Code/MuForm $ perl -Ilib t/time_hfh.pl
+Elapsed: 4.815011
+
+new outside loop, ->process inside
+~/Code/MuForm $ perl -Ilib t/time_dmf.pl
+Elapsed: 0.390054
+~/Code/MuForm $ perl -Ilib t/time_hfh.pl
+Elapsed: 1.250428
+
+
+Monday, Oct 17, 2016
+
+MuForm
+With just new in loop: ~ 9.4 - 9.7
+Add ->process        : ~ 13.6 - 13.8
+Add ->render         : ~ 23.9   (about the same time to render as FH)
+only render elements : ~ 20.0
+->new outside loop, only process: ~4.0
+->new outside loop, proces + render: ~11.8
+    Strangely a few ms less than how much rendering adds with ->new inside loop.
+    Maybe things are instantiated just once?
+
+Sunday, Oct 23, 2016
+
+With new & process in loop: ~ 13.8 - 14.0
++ render: 23.5
+With new outside loop, process & render: 11.0 - 11.4
+

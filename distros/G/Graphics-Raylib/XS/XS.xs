@@ -674,6 +674,14 @@ GenImageColor(width, height, color)
     Color    color
 
 Image
+GenImageFontAtlas(chars, fontSize, charsCount, padding, packMethod)
+    CharInfo *    chars
+    int    fontSize
+    int    charsCount
+    int    padding
+    int    packMethod
+
+Image
 GenImageGradientH(width, height, left, right)
     int    width
     int    height
@@ -886,6 +894,10 @@ Color *
 GetImageData(image)
     Image    image
 
+Vector4 *
+GetImageDataNormalized(image)
+    Image    image
+
 int
 GetKeyPressed()
 
@@ -1023,6 +1035,12 @@ ImageColorInvert(image)
     Image *    image
 
 void
+ImageColorReplace(image, color, replace)
+    Image *    image
+    Color    color
+    Color    replace
+
+void
 ImageColorTint(image, color)
     Image *    image
     Color    color
@@ -1100,10 +1118,27 @@ ImageResize(image, newWidth, newHeight)
     int    newHeight
 
 void
+ImageResizeCanvas(image, newWidth, newHeight, offsetX, offsetY, color)
+    Image *    image
+    int    newWidth
+    int    newHeight
+    int    offsetX
+    int    offsetY
+    Color    color
+
+void
 ImageResizeNN(image, newWidth, newHeight)
     Image *    image
     int    newWidth
     int    newHeight
+
+void
+ImageRotateCCW(image)
+    Image *    image
+
+void
+ImageRotateCW(image)
+    Image *    image
 
 Image
 ImageText(text, fontSize, color)
@@ -1251,6 +1286,14 @@ Font
 LoadFont(fileName)
     const char *    fileName
 
+CharInfo *
+LoadFontData(fileName, fontSize, fontChars, charsCount, sdf)
+    const char *    fileName
+    int    fontSize
+    int *    fontChars
+    int    charsCount
+    bool    sdf
+
 Font
 LoadFontEx(fileName, fontSize, charsCount, fontChars)
     const char *    fileName
@@ -1367,6 +1410,7 @@ LoadImageFromAV(array_ref, color_cb)
         ST(0) = RETVALSV;
     }
     XSRETURN(1);
+
 
 
 Material

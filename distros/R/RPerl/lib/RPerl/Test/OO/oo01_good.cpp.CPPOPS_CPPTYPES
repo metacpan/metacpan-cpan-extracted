@@ -34,7 +34,7 @@
 
 
 // [[[ INCLUDES ]]]
-#include "RPerl/Test/OO/oo01_good.h"
+#include "RPerl/Test/OO/MyClass01Good.cpp"
 int main() {
     // [[[ OPERATIONS HEADER ]]]
 

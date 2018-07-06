@@ -1,7 +1,7 @@
 using std::cout;  using std::cerr;  using std::endl;
 
 #ifndef __CPP__INCLUDED__RPerl__DataType__String_h
-#define __CPP__INCLUDED__RPerl__DataType__String_h 0.010_000
+#define __CPP__INCLUDED__RPerl__DataType__String_h 0.012_000
 
 // [[[ TYPEDEFS ]]]
 # ifndef __CPP__INCLUDED__RPerl__DataType__String_h__typedefs
@@ -117,10 +117,13 @@ typedef long integer;  // default
 #define __CPP__INCLUDED__RPerl__DataType__Number_h__typedefs 1
 #  ifdef __TYPE__NUMBER__DOUBLE
 typedef double number;
+#define NUMBER "f"
 #  elif defined __TYPE__NUMBER__LONG__DOUBLE
 typedef long double number;
+#define NUMBER "Lf"  // assume format code 'Lf' exists if type 'long double' exists
 #  else
 typedef double number;  // default
+#define NUMBER "f"
 #  endif
 # endif
 # ifndef __CPP__INCLUDED__RPerl__DataType__Character_h__typedefs
@@ -144,6 +147,9 @@ typedef char character;
 			(not(SvPOKp(possible_string)) ? \
 					croak("\nERROR EPV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring value expected but non-string value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name) : \
 					(void)0))
+
+// [[[ GENERAL FUNCTIONS ]]]
+string escape_backslash_singlequote(string unescaped_string);
 
 // [[[ TYPE CHECKING ]]]
 // DEPRECATED, SEE MACROS ABOVE
@@ -217,11 +223,11 @@ string string_to_string(string input_string);
 
 // [[[ TYPE TESTING ]]]
 # ifdef __PERL__TYPES
-SV* string__typetest0();
-SV* string__typetest1(SV* lucky_string);
+SV* string_typetest0();
+SV* string_typetest1(SV* lucky_string);
 # elif defined __CPP__TYPES
-string string__typetest0();
-string string__typetest1(string lucky_string);
+string string_typetest0();
+string string_typetest1(string lucky_string);
 # endif
 
 #endif

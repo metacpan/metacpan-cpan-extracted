@@ -6,15 +6,14 @@
 
 package B::DeparseTree::PP_OPtable;
 
+use B::DeparseTree::OPflags;
+
 use warnings; use strict;
 our($VERSION, @EXPORT, @ISA);
 $VERSION = '3.2.0';
 @ISA = qw(Exporter);
 
 use vars qw(%PP_MAPFNS);
-
-use constant ASSIGN => 2; # operation OP has a =OP variant
-
 
 # In the HASH below, the key is the operation name with the leading pp_ stripped.
 # so "die" refers to function "pp_die". The value can be several things.
@@ -73,11 +72,20 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
 
 
 %PP_MAPFNS = (
-     # 'avalues'    => ['unop', 'value'],
-     # 'values'     => 'unop', # FIXME
-     # 'sselect'    => 'listop',  FIXME: is used in PPfns
-     # 'sockpair'   => 'listop', ""
+    # 'avalues'     => ['unop', 'value'],
+    # 'values'      => 'unop', # FIXME
+    # 'sselect'     => 'listop',  FIXME: is used in PPfns
+    # 'sockpair'    => 'listop', ""
+    # 'exec'        => ['maybe_targmy', 'unop'],
+    # 'exp'         => ['maybe_targmy', 'listop'],
+    # 'or'          => ['logop', 'or', 2, '//', 10, "unless"],
+    # 'preinc'      => ['maybe_targmy', 'pfixop', "++", 23],
+    # 'print'       => ['indirop'],
+    # 'prtf'        => ['indirop', 'printf'],
+    # 'xor'         => ['logop', 'xor', 2, '', 0, ''],
 
+    'aassign'     => ['binop', '=', 7, SWAP_CHILDREN | LIST_CONTEXT, 'array assign'],
+    'abs'         => ['maybe_targmy', 'unop'],
     'accept'      => 'listop',
     'add'         => ['maybe_targmy', 'binop', '+', 18, ASSIGN],
     'aeach'       => ['unop', 'each'],
@@ -97,12 +105,19 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
     'caller'      => 'unop',
     'chdir'       => ['maybe_targmy', 'unop'], # modified below
     'chr'         => ['maybe_targmy', 'unop'],
+    'chmod'       => ['maybe_targmy', 'listop'],
+    'chomp'       => ['maybe_targmy', 'unop'],
+    'chop'        => ['maybe_targmy', 'unop'],
+    'chown'       => ['maybe_targmy', 'listop'],
     'chroot'      => ['maybe_targmy', 'unop'],
     'close'       => 'unop',
     'closedir'    => 'unop',
     'connect'     => 'listop',
+    'complement'  => ['maybe_targmy', 'pfixop', '~', 21],
     'concat'      => ['maybe_targmy', 'concat'],
     'continue'    => 'unop',
+    'cos'         => ['maybe_targmy', 'unop'],
+    'crypt'       => ['maybe_targmy', 'listop'],
 
     'db_open'     => 'listop',
     'dbmclose'    => 'unop',
@@ -111,6 +126,7 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
     'defined'     => 'unop',
     'die'         => 'listop',
     'divide'      => ['maybe_targmy', 'binop', "/", 19, ASSIGN],
+    'dor'         => ['logop', 'or', '//', 10],
     'dorassign'   => ['logassignop', '//='],
     'dump'        => ['loopex', "CORE::dump"],
 
@@ -118,6 +134,7 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
     'egrent'      => ['baseop', 'endgrent'],
     'ehostent'    => ['baseop', "endhostent"],
     'enetent'     => ['baseop', "endnetent"],
+    'enterwrite'  => ['unop', "write"],
     'eof'         => 'unop',
     'eprotoent'   => ['baseop', "endprotoent"],
     'epwent'      => ['baseop', "endpwent"],
@@ -127,6 +144,7 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
     'fc'          => 'unop',
     'fcntl'       => 'listop',
     'fileno'      => 'unop',
+    'flock'       => ['maybe_targmy', 'listop'],
     'fork'        => 'baseop',
     'formline'    => 'listop', # see also deparse_format
     'ftatime'     => ['filetest', "-A"],
@@ -161,6 +179,8 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
     'getlogin'    => 'baseop',
     'getpeername' => 'unop',
     'getpgrp'     => ['maybe_targmy', 'unop'],
+    'getppid'     => ['maybe_targmy', 'baseop'],
+    'getpriority' => ['maybe_targmy', 'listop'],
     'getsockname' => 'unop',
     'ggrent'      => ['baseop', "getgrent"],
     'ggrgid'      => ['unop',   "getgrgid"],
@@ -180,29 +200,44 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
     'gpwnam'      => ['unop',   "getpwnam"],
     'gpwuid'      => ['unop',   "getpwuid"],
     'grepstart'   => ['baseop', "grep"],
+    'grepwhile'   => ['mapop', 'grep'],
     'gsbyname'    => ['listop', 'getservbyname'],
     'gsbyport'    => ['listop', 'getservbyport'],
     'gservent'    => ['baseop', "getservent"],
     'gsockopt'    => ['listop', 'getsockopt'],
 
+    'hex'         => ['maybe_targmy', 'unop'],
+
     'i_add'       => ['maybe_targmy', 'binop', "+", 18, ASSIGN],
     'i_divide'    => ['maybe_targmy', 'binop', "/", 19, ASSIGN],
     'i_modulo'    => ['maybe_targmy', 'binop', "%", 19, ASSIGN],
     'i_multiply'  => ['maybe_targmy', 'binop', "*", 19, ASSIGN],
+    'i_predec'    => ['maybe_targmy', 'pfixop', "--", 23],
+    'i_preinc'    => ['maybe_targmy', 'pfixop', "++", 23],
     'i_subtract'  => ['maybe_targmy', 'binop', "-", 18, ASSIGN],
+    'index'       => ['maybe_targmy', 'listop'],
+    'int'         => ['maybe_targmy', 'unop'],
     'ioctl'       => 'listop',
+
+    'join'        => ['maybe_targmy', 'listop'],
     'keys'        => 'unop',
+    'kill'        => ['maybe_targmy', 'listop'],
 
     'last'        => 'loopex',
     'lc'          => 'dq_unop',
     'lcfirst'     => 'dq_unop',
     'left_shift'  => ['maybe_targmy', 'binop', "<<", 17, ASSIGN],
     'length'      => ['maybe_targmy', 'unop'],
+    'link'        => ['maybe_targmy', 'listop'],
     'listen'      => 'listop',
     'localtime'   => 'unop',
     'lock'        => 'unop',
+    'log'         => ['maybe_targmy', 'unop'],
     'lstat'       => 'filetest',
 
+    'mapwhile'    => ['mapop', 'map'],
+    'match'       => ['matchop', 'm', "/"],
+    'mkdir'       => ['maybe_targmy', 'listop'],
     'modulo'      => ['maybe_targmy', 'binop', "%", 19, ASSIGN],
     'msgctl'      => 'listop',
     'msgget'      => 'listop',
@@ -216,8 +251,10 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
     'next'        => 'loopex',
     'nextstate'   => 'cops',
 
+    'oct'         => ['maybe_targmy', 'unop'],
     'ord'         => ['maybe_targmy', 'unop'],
     'open'        => 'listop',
+    'open_dir'    => ['listop', 'opendir'],
     'orassign'    => ['logassignop', '||='],
 
     'padav'       => 'pp_padsv',
@@ -225,26 +262,37 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
     'pack'        => 'listop',
     'pipe_op'     => ['listop', 'pipe'],
     'pop'         => 'unop',
+    'postdec'     => ['maybe_targmy', 'pfixop', "--", 23, POSTFIX],
+    'postinc'     => ['maybe_targmy', 'pfixop', "++", 23, POSTFIX],
     'pow'         => ['maybe_targmy', 'binop', "**", 22, ASSIGN],
     'prototype'   => 'unop',
+    'push'        => ['maybe_targmy', 'listop'],
+#    'pushre'      => ['matchop', 'm', '/'],
 
     'quotemeta'   => ['maybe_targmy', 'dq_unop'],
+#    'qr'          => ['matchop', 'qr', '/'],
 
+    'rand'        => ['maybe_targmy', 'unop'],
     'read'        => 'listop',
     'readdir'     => 'unop',
     'readlink'    => 'unop',
     'recv'        => 'listop',
     'redo'        => 'loopex',
     'ref'         => 'unop',
+    'rename'      => ['maybe_targmy', 'listop'],
     'repeat'      => ['maybe_targmy', 'repeat'], # modified below
     'reset'       => 'unop',
+    'return'      => ['listop', 'return', undef, 1],
     'reverse'     => 'listop',
     'rewinddir'   => 'unop',
     'right_shift' => ['maybe_targmy', 'binop', ">>", 17, ASSIGN],
+    'rindex'      => ['maybe_targmy', 'listop'],
     'rmdir'       => ['maybe_targmy', 'unop'],
     'runcv'       => ['unop', '__SUB__'],
 
     'say'         => 'indirop',
+    'schomp'      => ['maybe_targmy', 'unop', 'chomp'],
+    'schop'       => ['maybe_targmy', 'unop', 'chop'],
     'seek'        => 'listop',
     'seekdir'     => 'listop',
     'select'      => 'listop',
@@ -253,6 +301,8 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
     'semop'       => 'listop',
     'send'        => 'listop',
     'setstate'    => 'nextstate',
+    'setpgrp'     => ['maybe_targmy', 'listop'],
+    'setpriority' => ['maybe_targmy', 'listop'],
     'sgrent'      => ['baseop', "setgrent"],
     'shift'       => 'unop',
     'shmctl'      => 'listop',
@@ -261,13 +311,16 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
     'shmwrite'    => 'listop',
     'shostent'    => ['unop',   "sethostent"],
     'shutdown'    => 'listop',
+    'sin'         => ['maybe_targmy', 'unop'],
     'sleep'       => ['maybe_targmy', 'unop'],
     'snetent'     => ['unop',   "setnetent"],
     'socket'      => 'listop',
     'sort'        => "indirop",
     'splice'      => 'listop',
+    'sprintf'     => ['maybe_targmy', 'listop'],
     'sprotoent'   => ['unop',   "setprotoent"],
     'spwent'      => ['baseop', "setpwent"],
+    'sqrt'        => ['maybe_targmy', 'unop'],
     'srand'       => 'unop',
     'sselect'     => ['listop', "select"],
     'sservent'    => ['unop',   "setservent"],
@@ -276,24 +329,33 @@ use constant ASSIGN => 2; # operation OP has a =OP variant
     'study'       => 'unop',
     'subtract'    => ['maybe_targmy', 'binop', "-", 18, ASSIGN],
     'syscall'     => 'listop',
+    'symlink'     => ['maybe_targmy', 'listop'],
     'sysopen'     => 'listop',
     'sysread'     => 'listop',
     'sysseek'     => 'listop',
+    'system'      => ['maybe_targmy', 'listop'],
     'syswrite'    => 'listop',
 
     'tell'        => 'unop',
     'telldir'     => 'unop',
     'tie'         => 'listop',
     'tied'        => 'unop',
+    'time'        => ['maybe_targmy', 'baseop'],
     'tms'         => ['baseop', 'times'],
 
     'uc'          => 'dq_unop',
     'ucfirst'     => 'dq_unop',
     'umask'       => 'unop',
     'undef'       => 'unop',
+    'unlink'      => ['maybe_targmy', 'listop'],
     'unpack'      => 'listop',
+    'unshift'     => ['maybe_targmy', 'listop'],
     'untie'       => 'unop',
+    'utime'       => ['maybe_targmy', 'listop'],
 
+    'wait'        => ['maybe_targmy', 'baseop'],
+    'waitpid'     => ['maybe_targmy', 'listop'],
+    'wantarray'   => 'baseop',
     'warn'        => 'listop',
     );
 
@@ -305,8 +367,26 @@ my $is_cperl = $Config::Config{usecperl};
 if ($] >= 5.015000) {
     # FIXME is it starting in cperl 5.26+ which add this?
     $PP_MAPFNS{'srefgen'} = 'pp_refgen';
+
+    if ($] <= 5.023 && $] >= 5.020) {
+	# Something is up in 5.20 - 5.22 where there is reach and rkeys
+	$PP_MAPFNS{'reach'} = ['unop', 'each'];
+	$PP_MAPFNS{'rkeys'} = ['unop', 'keys'];
+    }
+    if ($] >= 5.022) {
+	$PP_MAPFNS{'scomplement'} = ['maybe_targmy', 'pfixop', "~.", 21];
+	$PP_MAPFNS{'ncomplement'} = ['maybe_targmy', 'pfixop', '~', 21];
+    }
 }
+
 if ($is_cperl) {
+    $PP_MAPFNS{'s_cmp'} = ['maybe_targmy', 'binop', "cmp", 14];
+    $PP_MAPFNS{'s_eq'} = ['binop', "eq", 14];
+    $PP_MAPFNS{'s_ge'} = ['binop', "ge", 15];
+    $PP_MAPFNS{'s_gt'} = ['binop', "gt", 15];
+    $PP_MAPFNS{'s_le'} = ['binop', "le", 15];
+    $PP_MAPFNS{'s_lt'} = ['binop', "lt", 15];
+    $PP_MAPFNS{'s_ne'} = ['binop', "ne", 14];
     # FIXME reconcile differences in cperl. Maybe cperl is right?
     delete $PP_MAPFNS{'chdir'};
 }

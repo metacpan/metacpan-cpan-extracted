@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.2701'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4212, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,22 +18,22 @@ name: SVN-Notify
 provides:
   SVN::Notify:
     file: lib/SVN/Notify.pm
-    version: '2.86'
+    version: '2.87'
   SVN::Notify::Alternative:
     file: lib/SVN/Notify/Alternative.pm
     version: '1.0'
   SVN::Notify::Filter::Trac:
     file: lib/SVN/Notify/Filter/Trac.pm
-    version: '2.86'
+    version: '2.87'
   SVN::Notify::HTML:
     file: lib/SVN/Notify/HTML.pm
-    version: '2.86'
+    version: '2.87'
   SVN::Notify::HTML::ColorDiff:
     file: lib/SVN/Notify/HTML/ColorDiff.pm
-    version: '2.86'
+    version: '2.87'
   SVN::Notify::SMTP:
     file: lib/SVN/Notify.pm
-    version: '2.86'
+    version: '2.87'
 recommends:
   File::Spec: '0'
   HTML::Entities: '0'
@@ -43,7 +43,7 @@ recommends:
   Test::Pod::Coverage: '1.06'
   Text::Trac: '0.10'
 requires:
-  Email::Address: '1.897'
+  Email::Address::XS: '1.03'
   Getopt::Long: '2.34'
   perl: '5.006'
 resources:
@@ -51,4 +51,5 @@ resources:
   homepage: http://search.cpan.org/dist/SVN-Notify/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/theory/svn-notify/
-version: '2.86'
+version: '2.87'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

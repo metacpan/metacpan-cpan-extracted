@@ -29,7 +29,7 @@
    "provides" : {
       "Mojolicious::Plugin::SecurityHeader" : {
          "file" : "lib/Mojolicious/Plugin/SecurityHeader.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -44,7 +44,7 @@
          "web" : "http://github.com/reneeb/Mojolicious-Plugin-SecurityHeader"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

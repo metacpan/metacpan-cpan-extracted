@@ -1,0 +1,24 @@
+The <datalist> element
+
+This element extends the existing widgets by providing preset values for given widgets. The most known use case for this is an autocompletion list for text fields. The values available are set with <option> elements within the <datalist> element.
+
+To bind a widget with a <datalist> element, you have to use the list attribute on the target widget; this specifies the id attribute of the <datalist> element to use with that widget.
+
+The  <datalist> element is a very recent addition to HTML forms, so there are still some browsers that don't support it. To handle this, here is a little trick to have a nice fallback for those browsers:
+
+<form>
+  <p>
+    <label for="myFruit">What is your favorite fruit?</label>
+    <input type="text" id="myFruit" name="fruit" list="fruitList" />
+    
+    <datalist id="fruitList">
+      <label for="suggestion">or pick a fruit</label>
+      <select id="suggestion" name="altFruit">
+        <option value="banana">Banana</option>
+        <option value="cherry">Cherry</option>
+        <option value="strawberry">Strawberry</option>
+      </select>
+    </datalist>
+  </p>
+</form>
+On the one hand, browsers that support the <datalist> element will ignore all the elements that are not <option> elements and will work as expected. On the other hand, browsers that do not support the <datalist> element will display the label and the select box. Of course, there are other ways to handle the lack of support for the <datalist> element, but that require the use of JavaScript, which is not necessarily always a good option.

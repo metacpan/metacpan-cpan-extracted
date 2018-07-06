@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict; use warnings;
 
-use File::Basename 'dirname';
+use File::Basename;
 use File::Path 'rmtree';
 use File::Spec;
 use English;
@@ -14,21 +14,25 @@ chdir  $base_dir || die "can't cd to ${base_dir}: $!";
 chomp($base_dir = `pwd`);
 rmtree("tmp");
 mkdir("tmp");
+system('cp test.pl tmp');
 
 use Cwd 'abs_path';
 my $libdir = abs_path(File::Spec->catfile('..', '..', 'lib'));
 my @subdirs = ();
-foreach my $dir (glob '*') {
+my $short_version = substr($], 0, 5);
+foreach my $dir ((glob "$short_version/*"), ) {
     next if $dir eq 'tmp';
     next unless -d $dir;
 
-    mkdir "tmp/$dir";
+    my $short_dir = File::Basename::basename($dir);
+    mkdir "tmp/$short_dir";
     # Test programs need to be run from the directory they reside in
     chdir  "$base_dir/$dir" || die "can't cd to ${base_dir}/${dir}: $!";
     push @subdirs, $dir;
 
     foreach my $test_prog (glob('*.t')) {
-	my $outfile = File::Spec->catfile("..", "tmp", $dir, $test_prog);
+	my $outfile = File::Spec->catfile("..", "..", "tmp", $short_dir,
+					  $test_prog);
 
 	# See if the command checks on its own out before we muck with it...
 	my $cmd = "$EXECUTABLE_NAME $test_prog >$outfile";
@@ -50,7 +54,8 @@ foreach my $dir (glob '*') {
     # Test programs need to be run from the directory they reside in
     chdir  "$base_dir/tmp" || die "can't cd to ${base_dir}/${dir}: $!";
     foreach my $dir (@subdirs) {
-	chdir  "$base_dir/tmp/$dir" || die "can't cd to ${base_dir}/tmp/${dir}: $!";
+	chdir  "$base_dir/tmp/$short_dir" ||
+	    die "can't cd to ${base_dir}/tmp/${short_dir}: $!";
 	foreach my $test_prog (glob('*.t')) {
 	    my $cmd = "$EXECUTABLE_NAME -c $test_prog";
 	    system($cmd);
@@ -63,5 +68,6 @@ foreach my $dir (glob '*') {
 	# To run some of the tests we need to in the directory of the test.
 	system("prove  .");
     }
+    chdir  "$base_dir" || die "can't cd to ${base_dir}: $!";
 
 }

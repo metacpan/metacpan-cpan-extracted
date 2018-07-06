@@ -4,7 +4,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 # VERSION
 
-version v0.4.3
+version v0.4.4
 
 # SYNOPSIS
 
@@ -230,6 +230,10 @@ Robert Rothenberg <rrwo@cpan.org>
 
 The initial development of this module was sponsored by Science Photo
 Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
+
+# CONTRIBUTOR
+
+Toby Inkster <tobyink@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

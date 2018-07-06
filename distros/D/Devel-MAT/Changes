@@ -1,5 +1,13 @@
 Revision history for Devel-MAT
 
+0.35    2018-07-03 14:58:53
+        [CHANGES]
+         * Various improvements to 'count' command
+         * Remove 'sizes' command because 'count' does the same thing now
+         * Added new 'size' command for individual SVs
+         * Added new 'packages' command for walking the symbol table
+         * Support pagination of long-output commands via 'more'
+
 0.34    2018-04-02 18:39:36
         [CHANGES]
          * Have 'show' on a PAD use ->format_sv_with_value and ->format_note

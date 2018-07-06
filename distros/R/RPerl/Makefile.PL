@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = 0.032_000;
+our $VERSION = 0.036_000;
 use 5.010;  # NEED ANSWER, CORRELATION #rp000: is RPerl truly incompatible with Perl v5.8 and earlier?
 
 use ExtUtils::MakeMaker;
@@ -95,9 +95,10 @@ WriteMakefile(
 #    MAKE             => 'gmake',   # CORRELATION #rp200, Windows + EU::MM + GNU makef
     CONFIGURE_REQUIRES => {
         # DEV NOTE, CORRELATION #rp061: prioritize installation of all dists which are (or may be) prerequisites for other dists or components
-        'IO::Socket::SSL'     => '2.043',     # (infamously problematic) pre-prerequisite for Alien::astyle
-        'Alien::GMP'          => '1.07',      # prerequisite for Math::BigInt::GMP
-        'Alien::GSL'          => '1.01',      # prerequisite for Math::GSL
+        'IO::Socket::SSL'          => '2.043',     # (infamously problematic) pre-prerequisite for Alien::astyle
+        'Alien::Base::ModuleBuild' => '1.02',      # prerequisite for Alien::GSL etc, v1.02 allows setting download protocol via env var as workaround for Alien::GSL
+        'Alien::GMP'               => '1.08',      # prerequisite for Math::BigInt::GMP, v1.08 uses http intead of ftp, no env var workaround required
+        'Alien::GSL'               => '1.01',      # prerequisite for Math::GSL, set env var ALIEN_GSL_REPO_FTP_PROTOCOL=http in .travis.yml as workaround fix to avoid Travis network failures
     },
     PREREQ_PM        => {
         # RPERL USER DEPENDENCIES
@@ -146,9 +147,14 @@ WriteMakefile(
         # mst says we need to set data type package names without using 'package FOO;' like how Lexical::Types works
         no_index => {
 
-            # DEV NOTE: the following package namespaces are already controlled by some other PAUSE owner on CPAN,
-            # their indexing is double-disabled in that they are both listed here and also given newlines-in-package-declarations
-            package => [ 'array', 'boolean', 'hash', 'integer', 'method', 'number', 'object', 'ref', 'string', 'unknown' ],
+            # indexing of the following packages is double-disabled, both here and also newlines-in-package-declarations
+            package => [ 
+                # DEV NOTE: the following package namespaces are already controlled by some other PAUSE owner on CPAN,
+                'array', 'boolean', 'hash', 'integer', 'method', 'number', 'object', 'ref', 'string', 'unknown', 
+                # DEV NOTE, CORRELATION #rp045: identifiers containing underscores may be reserved by C++
+                # the following packages must exist outside of the RPerl::Test namespace for testing purposes
+                'MyClass_Good', '_MyClass_Bad'
+            ],
 
             # DEV NOTE: disable indexing of all test package namespaces
             namespace => ['RPerl::Test'],

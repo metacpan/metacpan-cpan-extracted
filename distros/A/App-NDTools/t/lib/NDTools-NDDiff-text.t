@@ -18,6 +18,7 @@ is_deeply($got, $exp, "Diff same texts") || diag t_ab_cmp($got, $exp);
 
 $bin = App::NDTools::NDDiff->new('foo', 'bar');
 $got = $bin->diff($bin->load('text-123.json'), $bin->load('text-456.json'));
+$bin->diff_term($got);
 $exp = {T => ['@',[1,3,1,3],'R',['1','2','3'],'A',['4','5','6']]};
 is_deeply($got, $exp, "Diff totally different texts") || diag t_ab_cmp($got, $exp);
 
@@ -26,6 +27,7 @@ push @{$bin->{OPTS}->{ignore}}, '{some}{path}';
 $got = eval {
     $bin->diff($bin->load('text-123.json'), $bin->load('text-456.json'))
 };
+$bin->diff_term($got);
 is($@, '', "Check lib avoid attempts to traverse through scalar");
 $exp = {T => ['@',[1,3,1,3],'R',['1','2','3'],'A',['4','5','6']]};
 is_deeply($got, $exp, "Diff totally different texts") || diag t_ab_cmp($got, $exp);

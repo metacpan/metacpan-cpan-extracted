@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::Count;
 
@@ -9,10 +9,14 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use constant CMD => "count";
 use constant CMD_DESC => "Count the various kinds of SV";
+
+use List::Util qw( sum );
+use List::UtilsBy qw( rev_nsort_by );
+use Struct::Dumb;
 
 =head1 NAME
 
@@ -24,73 +28,129 @@ This C<Devel::MAT> tool counts the different kinds of SV in the heap.
 
 =cut
 
-=head1 METHODS
-
-=cut
-
-=head2 count_svs
-
-   ( $kinds, $blessed ) = $count->count_svs( $df )
-
-Counts the different kinds of SV in the heap of the given
-L<Devel::MAT::Dumpfile> and returns two HASH references containing totals. The
-first counts every SV, split by type. The second counts those SVs that are
-blessed into some package; that is, SVs that are objects.
-
-=cut
-
-sub count_svs
-{
-   shift;
-   my ( $df ) = @_;
-
-   my %kinds;
-   my %blessed_kinds;
-
-   foreach my $sv ( $df->heap ) {
-      $kinds{ref $sv}++;
-      $blessed_kinds{ref $sv}++ if $sv->blessed;
-   }
-
-   # Strip Devel::MAT::SV:: prefix from keys
-   foreach my $k ( keys %kinds ) {
-      ( my $new_k = $k ) =~ s/^Devel::MAT::SV:://;
-      $kinds        {$new_k} = delete $kinds        {$k};
-      $blessed_kinds{$new_k} = delete $blessed_kinds{$k};
-   }
-
-   return \%kinds, \%blessed_kinds;
-}
-
 =head1 COMMANDS
 
 =head2 count
 
    pmat> count
-     Kind                 Count      (blessed) 
-     ARRAY                134                  
-     CODE                 133                  
+     Kind       Count (blessed)        Bytes (blessed)
+     ARRAY        170         0     15.1 KiB          
+     CODE         166         0     20.8 KiB          
 
 Prints a summary of the count of each type of object.
 
 =cut
 
+use constant CMD_OPTS => (
+   blessed => { help => "classify blessed references per package",
+                alias => "b" },
+   struct  => { help => "sum SVs by structural size" },
+   owned   => { help => "sum SVs by owned size" },
+);
+
+struct Counts => [qw( svs bytes blessed_svs blessed_bytes )];
+
 sub run
 {
    my $self = shift;
+   my %opts = %{ +shift };
 
-   my ( $kinds, $blessed ) = $self->count_svs( $self->df );
+   # TODO: consider options for
+   #   sorting
+   #   filtering
 
-   Devel::MAT::Cmd->print_table(
-      [
-         [ "  Kind", "Count", "(blessed)" ],
-         map {
-            [ "  $_", $kinds->{$_}, $blessed->{$_} // "" ]
-         } sort keys %$kinds
-      ],
-      sep   => "    ",
-      align => [ undef, "right", "right" ],
+   my $size_meth = $opts{owned}  ? "owned_size" :
+                   $opts{struct} ? "structure_size" :
+                   "size";
+
+   my %counts;
+   my %counts_per_package;
+
+   foreach my $sv ( $self->df->heap ) {
+      my $c = $counts{ref $sv} //= Counts( ( 0 ) x 4 );
+      my $bytes = $sv->$size_meth;
+
+      $c->svs++;
+      $c->bytes += $bytes;
+
+      $sv->blessed or next;
+
+      $c->blessed_svs++;
+      $c->blessed_bytes += $bytes;
+
+      $opts{blessed} or next;
+
+      $c = $counts_per_package{ref $sv}{ $sv->blessed->stashname } //= Counts( ( 0 ) x 4 );
+      $c->blessed_svs++;
+      $c->blessed_bytes += $bytes;
+   }
+
+   my @table = (
+      [ "  Kind", "Count", "(blessed)", "Bytes", "(blessed)" ],
    );
+
+   foreach ( sort keys %counts ) {
+      my $kind = $_ =~ s/^Devel::MAT::SV:://r;
+      my $c = $counts{$_};
+
+      push @table, [ "  $kind", $c->svs, $c->blessed_svs // "",
+            Devel::MAT::Cmd->format_bytes( $c->bytes ),
+            $c->blessed_bytes ? Devel::MAT::Cmd->format_bytes( $c->blessed_bytes ) : "" ];
+
+      push @table, _gen_package_breakdown( $counts_per_package{$_} ) if $opts{blessed};
+   }
+
+   push @table, [ "  -----", ( "" ) x 4 ];
+
+   my $total = Counts( ( 0 ) x 4 );
+   foreach my $method (qw( svs bytes blessed_svs blessed_bytes )) {
+      $total->$method = sum map { $_->$method } values %counts;
+   }
+
+   push @table, [ "  (total)", $total->svs, $total->blessed_svs // "",
+            Devel::MAT::Cmd->format_bytes( $total->bytes ),
+            $total->blessed_bytes ? Devel::MAT::Cmd->format_bytes( $total->blessed_bytes ) : "" ];
+
+   Devel::MAT::Cmd->print_table( \@table,
+      sep   => [ "    ", " ", "    ", " " ],
+      align => [ undef, "right", "right", "right", "right" ],
+   );
+}
+
+sub _gen_package_breakdown
+{
+   my ( $counts ) = @_;
+
+   my @packages = rev_nsort_by { $counts->{$_}->blessed_svs } sort keys %$counts;
+
+   my @ret;
+
+   my $count;
+   while( @packages ) {
+      my $package = shift @packages;
+
+      push @ret,
+         [
+            "    " . Devel::MAT::Cmd->format_symbol( $package ),
+            "", $counts->{$package}->blessed_svs,
+            "", Devel::MAT::Cmd->format_bytes( $counts->{$package}->blessed_bytes ),
+         ];
+
+      $count++;
+      last if $count >= 10;
+   }
+
+   my $remaining = Counts( ( 0 ) x 4 );
+   foreach my $method (qw( blessed_svs blessed_bytes )) {
+      $remaining->$method = sum map { $counts->{$_}->$method } @packages;
+   }
+
+   push @ret,
+      [ "    " . Devel::MAT::Cmd->format_note( "(others)" ),
+         "", $remaining->blessed_svs,
+         "", Devel::MAT::Cmd->format_bytes( $remaining->blessed_bytes ) ] if @packages;
+
+   return @ret;
 }
 
 =head1 AUTHOR

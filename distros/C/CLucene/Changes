@@ -1,6 +1,10 @@
-Revision history for Perl extension CLucene.
+Revision history for Perl extension FulltextSearch::CLucene.
 
+1.03  Wed Jul  4 12:49:00 2018
+        - merge in change to allow using non-system perl from DLAMBLEY
+1.01  Mon Apr 18 11:00:00 2016
+        - add support in Makefile.PL for x86_64 64 bit Linux target /usr/lib64
 1.00  Mon May  9 18:21:39 2005
 	- original version; created by h2xs 1.22 with options
-		-AXn CLucene --use-new-tests --skip-exporter -v 1.00
+		-AXn FulltextSearch::CLucene --use-new-tests --skip-exporter -v 1.00
 

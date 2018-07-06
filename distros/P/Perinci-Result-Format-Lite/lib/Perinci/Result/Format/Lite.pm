@@ -1,7 +1,7 @@
 package Perinci::Result::Format::Lite;
 
-our $DATE = '2018-06-27'; # DATE
-our $VERSION = '0.273'; # VERSION
+our $DATE = '2018-07-04'; # DATE
+our $VERSION = '0.274'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -185,12 +185,13 @@ sub __gen_table {
                 next unless $fmt_name;
                 my $fmt_opts = $fmt_opts [$j];
                 if ($fmt_name eq 'iso8601_datetime' || $fmt_name eq 'iso8601_date') {
-                    if ($row->[$j] =~ /\A[0-9]+\z/) {
+                    if ($row->[$j] =~ /\A[0-9]+(\.[0-9]*)?\z/) {
+                        my $frac = $1 ? "0$1"+0 : 0;
                         my @t = gmtime($row->[$j]);
                         if ($fmt_name eq 'iso8601_datetime') {
                             $row->[$j] = sprintf(
-                                "%04d-%02d-%02dT%02d:%02d:%02dZ",
-                                $t[5]+1900, $t[4]+1, $t[3], $t[2], $t[1], $t[0]);
+                                "%04d-%02d-%02dT%02d:%02d:".($frac ? "%06.3f" : "%02d")."Z",
+                                $t[5]+1900, $t[4]+1, $t[3], $t[2], $t[1], $t[0]+$frac);
                         } else {
                             $row->[$j] = sprintf(
                                 "%04d-%02d-%02d",
@@ -529,7 +530,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.273 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2018-06-27.
+This document describes version 0.274 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2018-07-04.
 
 =head1 SYNOPSIS
 

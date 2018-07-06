@@ -33,6 +33,6 @@ severity = 4
 
 # Testing for found words
 [BadStrings]
-words = Joel Maslak
+words = Joel Maslak || Joel C. Maslak || J. Maslak
 severity = 4
 

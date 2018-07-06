@@ -50,9 +50,9 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	FLAG_MSAA_4X_HINT
 	FLAG_SHOW_LOGO
 	FLAG_VSYNC_HINT
-	FLAG_WINDOW_DECORATED
 	FLAG_WINDOW_RESIZABLE
 	FLAG_WINDOW_TRANSPARENT
+	FLAG_WINDOW_UNDECORATED
 	GAMEPAD_PLAYER1
 	GAMEPAD_PLAYER2
 	GAMEPAD_PLAYER3
@@ -361,6 +361,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	GenImageCellular
 	GenImageChecked
 	GenImageColor
+	GenImageFontAtlas
 	GenImageGradientH
 	GenImageGradientRadial
 	GenImageGradientV
@@ -404,6 +405,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	GetGesturePinchVector
 	GetGlyphIndex
 	GetImageData
+	GetImageDataNormalized
 	GetKeyPressed
 	GetMatrixModelview
 	GetMousePosition
@@ -439,6 +441,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	ImageColorContrast
 	ImageColorGrayscale
 	ImageColorInvert
+	ImageColorReplace
 	ImageColorTint
 	ImageCopy
 	ImageCrop
@@ -452,7 +455,10 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	ImageFormat
 	ImageMipmaps
 	ImageResize
+	ImageResizeCanvas
 	ImageResizeNN
+	ImageRotateCCW
+	ImageRotateCW
 	ImageText
 	ImageTextEx
 	ImageToPOT
@@ -487,6 +493,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	IsWindowMinimized
 	IsWindowReady
 	LoadFont
+	LoadFontData
 	LoadFontEx
 	LoadImage
 	LoadImageEx
@@ -631,9 +638,9 @@ our @EXPORT = qw(
 	FLAG_MSAA_4X_HINT
 	FLAG_SHOW_LOGO
 	FLAG_VSYNC_HINT
-	FLAG_WINDOW_DECORATED
 	FLAG_WINDOW_RESIZABLE
 	FLAG_WINDOW_TRANSPARENT
+	FLAG_WINDOW_UNDECORATED
 	GAMEPAD_PLAYER1
 	GAMEPAD_PLAYER2
 	GAMEPAD_PLAYER3
@@ -931,9 +938,9 @@ None by default.
   FLAG_MSAA_4X_HINT
   FLAG_SHOW_LOGO
   FLAG_VSYNC_HINT
-  FLAG_WINDOW_DECORATED
   FLAG_WINDOW_RESIZABLE
   FLAG_WINDOW_TRANSPARENT
+  FLAG_WINDOW_UNDECORATED
   GAMEPAD_PLAYER1
   GAMEPAD_PLAYER2
   GAMEPAD_PLAYER3
@@ -1245,6 +1252,7 @@ None by default.
   Image GenImageCellular(int width, int height, int tileSize)
   Image GenImageChecked(int width, int height, int checksX, int checksY, Color col1, Color col2)
   Image GenImageColor(int width, int height, Color color)
+  Image GenImageFontAtlas(CharInfo *chars, int fontSize, int charsCount, int padding, int packMethod)
   Image GenImageGradientH(int width, int height, Color left, Color right)
   Image GenImageGradientRadial(int width, int height, float density, Color inner, Color outer)
   Image GenImageGradientV(int width, int height, Color top, Color bottom)
@@ -1288,6 +1296,7 @@ None by default.
   Vector2 GetGesturePinchVector(void)
   int GetGlyphIndex(Font font, int character)
   Color *GetImageData(Image image)
+  Vector4 *GetImageDataNormalized(Image image)
   int GetKeyPressed(void)
   Matrix GetMatrixModelview()
   Vector2 GetMousePosition(void)
@@ -1323,6 +1332,7 @@ None by default.
   void ImageColorContrast(Image *image, float contrast)
   void ImageColorGrayscale(Image *image)
   void ImageColorInvert(Image *image)
+  void ImageColorReplace(Image *image, Color color, Color replace)
   void ImageColorTint(Image *image, Color color)
   Image ImageCopy(Image image)
   void ImageCrop(Image *image, Rectangle crop)
@@ -1336,7 +1346,10 @@ None by default.
   void ImageFormat(Image *image, int newFormat)
   void ImageMipmaps(Image *image)
   void ImageResize(Image *image, int newWidth, int newHeight)
-  void ImageResizeNN(Image *image,int newWidth,int newHeight)
+  void ImageResizeCanvas(Image *image, int newWidth, int newHeight, int offsetX, int offsetY, Color color)
+  void ImageResizeNN(Image *image, int newWidth,int newHeight)
+  void ImageRotateCCW(Image *image)
+  void ImageRotateCW(Image *image)
   Image ImageText(const char *text, int fontSize, Color color)
   Image ImageTextEx(Font font, const char *text, float fontSize, float spacing, Color tint)
   void ImageToPOT(Image *image, Color fillColor)
@@ -1371,6 +1384,7 @@ None by default.
   bool IsWindowMinimized(void)
   bool IsWindowReady(void)
   Font LoadFont(const char *fileName)
+  CharInfo *LoadFontData(const char *fileName, int fontSize, int *fontChars, int charsCount, bool sdf)
   Font LoadFontEx(const char *fileName, int fontSize, int charsCount, int *fontChars)
   Image LoadImage(const char *fileName)
   Image LoadImageEx(Color *pixels, int width, int height)

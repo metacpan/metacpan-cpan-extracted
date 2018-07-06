@@ -16,7 +16,7 @@ use Try::Tiny;
 
 use Cwd qw/fastcwd/;
 
-our $VERSION = '0.064'; # VERSION
+our $VERSION = '0.065'; # VERSION
 
 has [qw/config env/] => ( is => 'rw', required => 1 );
 has [qw/task/]       => ( is => 'rw', required => 1 );

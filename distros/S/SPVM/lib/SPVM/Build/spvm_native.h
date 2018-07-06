@@ -36,7 +36,6 @@ typedef void* SPVM_VALUE_object;
 
 
 
-
 struct SPVM_env {
   int32_t (*get_array_length)(SPVM_ENV*, void*);
   int8_t* (*get_byte_array_elements)(SPVM_ENV*, void*);
@@ -47,7 +46,7 @@ struct SPVM_env {
   double* (*get_double_array_elements)(SPVM_ENV*, void*);
   void* (*get_object_array_element)(SPVM_ENV*, void*, int32_t index);
   void (*set_object_array_element)(SPVM_ENV*, void*, int32_t index, void* value);
-  int32_t (*get_field_rel_id)(SPVM_ENV*, const char*, const char*);
+  int32_t (*get_field_index)(SPVM_ENV*, const char*, const char*);
   int8_t (*get_byte_field)(SPVM_ENV*, void*, int32_t);
   int16_t (*get_short_field)(SPVM_ENV*, void*, int32_t);
   int32_t (*get_int_field)(SPVM_ENV*, void*, int32_t);
@@ -55,7 +54,7 @@ struct SPVM_env {
   float (*get_float_field)(SPVM_ENV*, void*, int32_t);
   double (*get_double_field)(SPVM_ENV*, void*, int32_t);
   void* (*get_object_field)(SPVM_ENV*, void*, int32_t);
-  void* (*get_struct)(SPVM_ENV*, void*);
+  void* (*get_pointer)(SPVM_ENV*, void*);
   void (*set_byte_field)(SPVM_ENV*, void*, int32_t, int8_t);
   void (*set_short_field)(SPVM_ENV*, void*, int32_t, int16_t);
   void (*set_int_field)(SPVM_ENV*, void*, int32_t, int32_t);
@@ -63,7 +62,7 @@ struct SPVM_env {
   void (*set_float_field)(SPVM_ENV*, void*, int32_t, float);
   void (*set_double_field)(SPVM_ENV*, void*, int32_t, double);
   void (*set_object_field)(SPVM_ENV*, void*, int32_t, void*);
-  int32_t (*get_sub_id)(SPVM_ENV*, const char*);
+  int32_t (*get_sub_id)(SPVM_ENV*, const char*, const char*);
   int32_t (*get_sub_id_method_call)(SPVM_ENV*, void* object, const char*);
   int32_t (*get_basic_type_id)(SPVM_ENV*, const char*);
   void* (*new_object_raw)(SPVM_ENV*, int32_t);
@@ -76,7 +75,7 @@ struct SPVM_env {
   void* (*new_object_array_raw)(SPVM_ENV*, int32_t, int32_t);
   void* (*new_multi_array_raw)(SPVM_ENV*, int32_t, int32_t, int32_t);
   void* (*new_string_raw)(SPVM_ENV* env, char* bytes, int32_t length);
-  void* (*new_struct_raw)(SPVM_ENV*, int32_t basic_type_id, void* ptr);
+  void* (*new_pointer_raw)(SPVM_ENV*, int32_t basic_type_id, void* ptr);
   void* (*get_exception)(SPVM_ENV* env);
   void (*set_exception)(SPVM_ENV* env, void* exception);
   int32_t (*get_ref_count)(SPVM_ENV* env, void* object);
@@ -90,7 +89,7 @@ struct SPVM_env {
   int32_t (*isweak)(SPVM_ENV* env, void* object);
   void (*unweaken)(SPVM_ENV* env, void** object_address);
   void* (*concat)(SPVM_ENV* env, void* string1, void* string2);
-  void (*weaken_object_field)(SPVM_ENV* env, void* object, int32_t field_rel_id);
+  int32_t (*weaken_object_field)(SPVM_ENV* env, void* object, int32_t field_rel_id);
   void* (*create_exception_stack_trace)(SPVM_ENV* env, void* excetpion, const char* package_name, const char* sub_name, const char* file, int32_t line);
   int32_t (*check_cast)(SPVM_ENV* env, int32_t cast_basic_type_id, int32_t cast_type_dimension, void* object);
   void* object_header_byte_size;
@@ -112,6 +111,8 @@ struct SPVM_env {
   void* (*new_object_array)(SPVM_ENV*, int32_t, int32_t);
   void* (*new_multi_array)(SPVM_ENV*, int32_t, int32_t, int32_t);
   void* (*new_string)(SPVM_ENV* env, char* bytes, int32_t length);
-  void* (*new_struct)(SPVM_ENV*, int32_t basic_type_id, void* ptr);
+  void* (*new_pointer)(SPVM_ENV* env, int32_t basic_type_id, void* ptr);
+  int32_t (*get_package_var_id)(SPVM_ENV* env, const char* package_name, const char* signature);
+  void* runtime_package_vars_byte_offset;
 };
 #endif

@@ -1,0 +1,42 @@
+MooX-Enumeration
+================
+
+Created:      2018-07-03
+Home page:    <https://metacpan.org/release/MooX-Enumeration>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Enumeration>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.006	2018-07-04
+
+ [ Packaging ]
+ - Depend on Type::Tiny::Enum instead of Types::Standard. (The latter is
+   still used for test suite.)
+
+0.005	2018-07-04
+
+ [ Bug Fixes ]
+ - Fix precendence issue with lazy defaults/builders.
+
+ [ Packaging ]
+ - Add explicit dependency on Eval::TypeTiny (which has been required since
+   0.004).
+
+0.004	2018-07-04
+
+ [ Bug Fixes ]
+ - Properly support attributes with triggers and lazy defaults/builders.
+
+0.003	2018-07-04
+
+ [ Packaging ]
+ - Add missing dependency on match::simple.
+   Fixes RT#125748.
+   Slaven Rezić++
+   <https://rt.cpan.org/Ticket/Display.html?id=125748>
+
+0.002	2018-07-03
+
+ [ Documentation ]
+ - Can haz docs?.
+
+0.001	2018-07-03	Initial release

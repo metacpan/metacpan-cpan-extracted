@@ -6,6 +6,9 @@ use warnings;
 use Devel::MAT;
 use String::Tagged 0.15;  # sprintf
 use String::Tagged::Terminal;
+use Commandable::Invocation;
+
+use constant CAN_COLOUR => -t STDOUT;
 
 # Some tools might want to draw pretty graphs with line drawing / similar
 STDOUT->binmode( ":encoding(UTF-8)" );
@@ -13,7 +16,7 @@ STDOUT->autoflush(1);
 
 my $file = shift @ARGV or die "Need dumpfile\n";
 
-my $progress = ( -t STDOUT ?
+my $progress = ( CAN_COLOUR ?
    sub { print "\r\e[K" . ( shift // "" ); } :
    undef
 );
@@ -36,7 +39,7 @@ sub Devel::MAT::Cmd::printf
 
    my $str = String::Tagged::Terminal->from_sprintf( $fmt, @args );
 
-   print $str->build_terminal;
+   print CAN_COLOUR ? $str->build_terminal : "$str";
 
    return length $str;
 }
@@ -86,18 +89,29 @@ sub Devel::MAT::Cmd::format_symbol
 if( @ARGV ) {
    my $cmd = shift @ARGV;
 
+   # We'll have to synthesize a suitable string
+   my $text = join " ", map { m/\s/ ? qq("$_") : $_ } @ARGV;
+
    $pmat->load_tool_for_command( $cmd,
       progress => $progress,
-   )->run_cmd( @ARGV );
+   )->run_cmd( Commandable::Invocation->new( $text ) );
+
+   # Finish the pagination output
+   Devel::MAT::Tool::more->run while Devel::MAT::Tool::more->can_more;
+
    exit
 }
 
 require Term::ReadLine;
-require Text::ParseWords;
 
 my $rl = Term::ReadLine->new( 'pmat' );
-while( defined( my $line = $rl->readline( 'pmat> ') ) ) {
-   my ( $cmd, @args ) = Text::ParseWords::shellwords( $line );
+while( defined( my $line = $rl->readline(
+         sprintf 'pmat%s> ', Devel::MAT::Tool::more->can_more ? " [more]" : ""
+      ) ) ) {
+   my $inv = Commandable::Invocation->new( $line );
+   my $cmd = $inv->pull_token;
+   $cmd //= "more" if Devel::MAT::Tool::more->can_more;
+
    next unless defined $cmd; # blank line
 
    last if $cmd eq "exit";
@@ -110,7 +124,7 @@ while( defined( my $line = $rl->readline( 'pmat> ') ) ) {
 
       $pmat->load_tool_for_command( $cmd,
          progress => $progress,
-      )->run_cmd( @args );
+      )->run_cmd( $inv );
       1;
    } or
       print STDERR "$@";

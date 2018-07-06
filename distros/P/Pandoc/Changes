@@ -1,5 +1,8 @@
 Revision history for Pandoc Perl module
 
+0.8.6  2018-07-04 09:39:52 CEST
+    - Change license to EUPL 1.2
+
 0.8.5  2018-06-20 23:11:29 CEST
     - Add method to symlink executable
 

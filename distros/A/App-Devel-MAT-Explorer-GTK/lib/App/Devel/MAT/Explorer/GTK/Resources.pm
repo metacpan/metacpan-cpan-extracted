@@ -8,7 +8,7 @@ package App::Devel::MAT::Explorer::GTK::Resources;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use File::ShareDir qw( module_file );
 use Gtk2;

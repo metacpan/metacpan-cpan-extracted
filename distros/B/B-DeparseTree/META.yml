@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4214'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,14 +17,18 @@ name: B-DeparseTree
 provides:
   B::DeparseTree:
     file: lib/B/DeparseTree.pm
-    version: v3.2.0
+    version: v3.3.0
   B::DeparseTree::Fragment:
     file: lib/B/DeparseTree/Fragment.pm
-  B::DeparseTree::Node:
-    file: lib/B/DeparseTree/Node.pm
+  B::DeparseTree::OPflags:
+    file: lib/B/DeparseTree/OPflags.pm
     version: v3.2.0
-  B::DeparseTree::NodeDemo:
-    file: lib/B/DeparseTree/Node.pm
+  B::DeparseTree::P514:
+    file: lib/B/DeparseTree/P514.pm
+    version: v3.2.0
+  B::DeparseTree::P516:
+    file: lib/B/DeparseTree/P516.pm
+    version: v3.2.0
   B::DeparseTree::P518:
     file: lib/B/DeparseTree/P518.pm
     version: v3.2.0
@@ -43,6 +47,9 @@ provides:
   B::DeparseTree::P526c:
     file: lib/B/DeparseTree/P526c.pm
     version: v3.2.0
+  B::DeparseTree::P528:
+    file: lib/B/DeparseTree/P528.pm
+    version: v3.2.0
   B::DeparseTree::PP:
     file: lib/B/DeparseTree/PP.pm
     version: v3.2.0
@@ -58,12 +65,17 @@ provides:
   B::DeparseTree::SyntaxTree:
     file: lib/B/DeparseTree/SyntaxTree.pm
     version: v3.2.0
+  B::DeparseTree::TreeNode:
+    file: lib/B/DeparseTree/TreeNode.pm
+    version: v3.2.0
+  B::DeparseTree::TreeNodeDemo:
+    file: lib/B/DeparseTree/TreeNode.pm
 requires:
   Data::Printer: '0.40'
-  perl: '5.016000'
+  perl: '5.014000'
   rlib: '0.02'
   version: '0'
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: v3.2.0
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: v3.3.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

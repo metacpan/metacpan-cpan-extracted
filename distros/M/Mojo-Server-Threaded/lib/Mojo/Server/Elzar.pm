@@ -1,6 +1,7 @@
 package Mojo::Server::Elzar;
 use Mojo::Base -base;
 
+use File::Basename qw(dirname);
 use Mojo::File 'path';
 use Mojo::Server::Threaded;
 use Mojo::Util 'steady_time';
@@ -11,6 +12,8 @@ our $VERSION = $Mojo::Server::Threaded::VERSION;
 
 has threaded => sub { Mojo::Server::Threaded->new(listen => ['http://*:8080']) };
 has upgrade_timeout => 180;
+
+my $trace = $ENV{MOJO_SERVER_ELZAR_TRACE};
 
 sub configure {
   my ($self, $name, $fallback_name) = @_;
@@ -42,17 +45,6 @@ sub run {
   # This is a production server
   $ENV{MOJO_MODE} ||= 'production';
 
-  # Clean start (to make sure everything works)
-  unless (
-       $ENV{ELZAR_FOREGROUND}
-    || $ENV{ELZAR_COMMAND}
-    || $ENV{ELZAR_STOP}
-    || $ENV{ELZAR_TEST}
-    || $ENV{ELZAR_REV}++
-  ) {
-    die "Can't exec: $!" unless exec $^X, $ENV{ELZAR_EXE};
-  }
-
   my $threaded = $self->threaded->cleanup(0);
 
   $threaded->register_command(
@@ -66,7 +58,10 @@ sub run {
   $threaded->load_app($app)->config->{elzar}{pid_file}
     //= path($ENV{ELZAR_APP})->sibling('elzar.pid')->to_string;
   $self->configure('elzar', 'hypnotoad');
-  #weaken $self;
+
+  _exit($self->_svc_install) if $ENV{ELZAR_SVC_INST};
+  _exit($self->_svc_run)     if $ENV{ELZAR_SVC_RUN};
+
   $threaded->on(wait   => sub { $self->_manage });
   $threaded->on(reap   => sub { $self->_cleanup(pop) });
   $threaded->on(finish => sub { $self->_finish });
@@ -116,6 +111,7 @@ sub _finish {
 
 sub _hot_deploy {
   my $self = shift;
+
   # Make sure server is running
   return unless my $pid = $self->threaded->check_pid;
 
@@ -148,14 +144,8 @@ sub _manage {
     my $ut = $self->upgrade_timeout;
     unless ($self->{new}) {
       $log->info("Starting zero downtime software upgrade ($ut seconds)");
-      Win32::Process::Create(
-        my $obj,
-        $^X,
-        qq("$^X" "$ENV{ELZAR_EXE}"),
-        0,
-        NORMAL_PRIORITY_CLASS,
-        ".",
-      ) || die Win32::FormatMessage(Win32::GetLastError());
+      my $obj = _new_proc(_elzar_cmd())
+        or die Win32::FormatMessage(Win32::GetLastError());
       $self->{new} = $obj->GetProcessID();
       $log->info($$ . " new: $self->{new}");
     }
@@ -175,6 +165,137 @@ sub _stop {
     unless my $pid = $self->threaded->check_pid;
   $self->threaded->send_command('QUIT');
   _exit("Stopping Elzar server $pid gracefully.");
+}
+
+sub _elzar_cmd {
+  my $mx = $ENV{ELZAR_EXE} =~ /(?:\.bat|\.cmd)$/i ? '-x' : '';
+  return qq("$^X" $mx "$ENV{ELZAR_EXE}");
+}
+
+sub _svc_install {
+  my $self = shift;
+
+  require Win32::Daemon;
+  Win32::Daemon->import();
+
+  my $mx = $ENV{ELZAR_EXE} =~ /(?:\.bat|\.cmd)$/i ? '-x' : '';
+  my $display = my $name = $ENV{ELZAR_SVC_INST};
+  $name =~ s/\s+/_/g;
+  my $desc = "Elzar Webserver for $ENV{ELZAR_APP} listening on "
+    . join(' ', @{$self->threaded->listen});
+
+  Win32::Daemon::CreateService({
+    name        => $name,
+    display     => $display,
+    path        => qq("$^X"),
+    parameters  => qq($mx "$ENV{ELZAR_EXE}" -r "$ENV{ELZAR_APP}"),
+    start_type  => SERVICE_DEMAND_START(),
+    description => $desc,
+  }) or return "Installation failed, ", Win32::FormatMessage(Win32::GetLastError());
+  return "Installation successful";
+}
+
+sub _svc_run {
+  my $self = shift;
+
+  delete $ENV{ELZAR_SVC_RUN};
+
+  require Win32::Daemon;
+  Win32::Daemon->import();
+
+  my $log = $self->threaded->app->log;
+  *STDERR = $log->handle;
+  my %ctx = (
+    log      => $log,
+    threaded => $self->threaded,
+    timeout  => $self->threaded->graceful_timeout,
+  );
+
+  Win32::Daemon::RegisterCallbacks( {
+      start =>  sub {
+        my($ev, $ctx) = @_;
+        $ctx->{log}->info("service: starting manager process");
+        my $proc = _new_proc(_elzar_cmd()) or do {
+          my $msg = Win32::FormatMessage(Win32::GetLastError());
+          $ctx->{log}->error("Error starting manager process, $msg");
+          Win32::Daemon::State(SERVICE_STOPPED());
+          Win32::Daemon::StopService();
+          return;
+        };
+        my $pid = $proc->GetProcessID();
+        $ctx->{log}->info("service: manager process $pid started");
+        Win32::Daemon::State(SERVICE_RUNNING());
+      },
+
+      stop =>  sub {
+        my($ev, $ctx) = @_;
+        Win32::Daemon::State( SERVICE_STOP_PENDING(), $ctx->{timeout} * 1000 );
+        $ctx->{log}->info("service: stopping manager process");
+        if ( my $pid = $ctx->{threaded}->check_pid ) {
+          if ( Win32::Process::Open(my $proc, $pid, 0) ) {
+            if ( $ctx->{threaded}->send_command('QUIT') ) {
+              my $start = steady_time;
+              my $ec;
+              while ( $start + $ctx->{timeout} > steady_time ) {
+                $proc->GetExitCode($ec);
+                last if $ec != Win32::Process::STILL_ACTIVE();
+                sleep(1);
+              }
+              if ( $ec == Win32::Process::STILL_ACTIVE() ) {
+                $ctx->{log}->info("service: graceful timeout reached, killing manager $pid");
+                $proc->Kill(99);
+              }
+            } else {
+              $ctx->{log}->error("service: error sending QUIT to manager $pid");
+              $ctx->{log}->info("service: killing manager $pid");
+              $proc->Kill(98);
+            }
+          }
+        }
+        $ctx->{log}->info("service: stopping service process");
+        Win32::Daemon::State(SERVICE_STOPPED());
+        Win32::Daemon::StopService();
+      },
+
+      pause => sub {
+        my($ev, $ctx) = @_;
+        $ctx->{log}->info("service: sending DEPLOY to manager");
+        unless ( $ctx->{threaded}->send_command('DEPLOY') ) {
+          $ctx->{log}->error("service: error sending DEPLOY to manager");
+        }
+        Win32::Daemon::State(SERVICE_RUNNING());
+      },
+
+      timer => sub {
+        my($ev, $ctx) = @_;
+        $trace && $ctx->{log}->debug("service: in timer callback, checking manager");
+        if ( SERVICE_RUNNING() == Win32::Daemon::State() ) {
+          my $keep_running = 0;
+          my $pid = $ctx->{threaded}->check_pid;
+          if ( $pid ) {
+            Win32::Process::Open(my $proc, $pid, 0);
+            if ( $proc ) {
+              $proc->GetExitCode(my $ec);
+              if (!$ec or $ec == Win32::Process::STILL_ACTIVE() ) {
+                return;
+              }
+            }
+          }
+          $ctx->{log}->info("service: manager process not found, stopping");
+          Win32::Daemon::State(SERVICE_STOPPED());
+          Win32::Daemon::StopService();
+        }
+      },
+  } );
+
+  $log->info("starting service event loop");
+  Win32::Daemon::StartService(\%ctx, 5000);
+}
+
+sub _new_proc {
+  my $cmd = shift;
+  Win32::Process::Create(my $p, $^X, $cmd, 0, NORMAL_PRIORITY_CLASS, ".");
+  return $p;
 }
 
 1;
@@ -205,17 +326,35 @@ To start applications with it you can use the L<elzar> script, which
 listens on port C<8080> and defaults to C<production> mode for L<Mojolicious>
 and L<Mojolicious::Lite> applications.
 
-  $ elzar ./myapp.pl
+  > elzar ./myapp.pl
 
 You can run the same command again for automatic hot deployment.
 
-  $ elzar ./myapp.pl
+  > elzar ./myapp.pl
   Starting hot deployment for Elzar server 31841.
 
 This second invocation will load the application again, detect the process id
 file with it, and send a "DEPLOY" command to the already running server.
 
 See L<Mojolicious::Guides::Cookbook/"DEPLOYMENT"> for more.
+
+=head1 Running as Windows Service
+
+You can install elzar as Windows service. This has an additional dependency
+on the module L<Win32::Daemon>. To install use:
+
+  > elzar -i MyService ./myapp.pl
+
+This will install a manually startable service under the local system account.
+The user should of course be changed to a lesser privileged account.
+
+Hot deploy can be triggered as usual by doing:
+
+  > elzar ./myapp.pl
+
+or by pausing the service via Service Control (Computer Management). Pausing
+the service will only start the hot deploy but will not pause processing.
+Service Control will state that it couldn't pause the service.
 
 =head1 MANAGER SIGNALS
 
@@ -257,6 +396,6 @@ L<https://github.com/tomk3003/mojo-server-threaded/issues>
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

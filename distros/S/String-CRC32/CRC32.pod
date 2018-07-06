@@ -12,10 +12,10 @@ String::CRC32 - Perl interface for cyclic redundancy check generation
     $somestring = "some string";
     $crc = crc32($somestring);
 
-    open(SOMEFILE, "location/of/some.file");
-    binmode SOMEFILE;
-    $crc = crc32(*SOMEFILE);
-    close(SOMEFILE);
+    open my $fh, '<', 'location/of/some.file' or die $!;
+    binmode $fh;
+    $crc = crc32($fh);
+    close $fh;
 
 =head1 DESCRIPTION
 
@@ -38,10 +38,10 @@ This is useful for subsequent CRC checking of substrings.
 
 You may even check files:
 
-    open(SOMEFILE, "location/of/some.file");
-    binmode SOMEFILE;
-    $crc = crc32(*SOMEFILE);
-    close(SOMEFILE);
+    open my $fh, '<', 'location/of/some.file' or die $!;
+    binmode $fh;
+    $crc = crc32($fh);
+    close $fh;
 
 A init value may also have been supplied in the above example.
 

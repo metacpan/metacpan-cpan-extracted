@@ -60,7 +60,7 @@ Mojolicious::Command::threaded - threaded command
     -C, --command "<command>"            Send command to running server
     -c, --clients <number>               Maximum number of concurrent
                                          connections, defaults to 1000
-    -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 20.
+    -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 120.
     -I, --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5
     -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 20
     -h, --help                           Show this summary of available options
@@ -126,6 +126,6 @@ Run this command.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

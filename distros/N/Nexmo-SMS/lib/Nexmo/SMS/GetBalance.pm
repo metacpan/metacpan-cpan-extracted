@@ -27,10 +27,83 @@ for my $attr ( keys %attrs ) {
     };
 }
 
+
+sub new {
+    my ($class,%param) = @_;
+    
+    my $self = bless {}, $class;
+    
+    for my $attr ( keys %attrs ) {
+        if ( exists $param{$attr} ) {
+            $self->$attr( $param{$attr} );
+        }
+    }
+    
+    $self->user_agent(
+        LWP::UserAgent->new(
+            agent => 'Perl module ' . __PACKAGE__ . ' ' . $VERSION,
+        ),
+    );
+    
+    return $self;
+}
+
+
+sub user_agent {
+    my ($self,$ua) = @_;
+    
+    $self->{__ua__} = $ua if @_ == 2;
+    return $self->{__ua__};
+}
+
+
+sub get_balance {
+    my ($self) = shift;
+    
+    my $url = sprintf "%saccount/get-balance/%s/%s",
+        $self->server,
+        $self->username,
+        $self->password;
+    
+    my $ua = $self->user_agent;
+    $ua->default_header( 'Accept' => 'application/json' );
+    
+    my $response = $ua->get(
+        $url,
+    );
+    
+    if ( !$response || !$response->is_success ) {
+        return;
+    }
+    
+    my $json  = $response->content;
+    my $coder = JSON::PP->new->utf8->pretty->allow_nonref;
+    my $perl  = $coder->decode( $json );
+    
+    return if !$perl || ref $perl ne 'HASH';    
+    return $perl->{'value'};
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Nexmo::SMS::GetBalance - Module to ask for the balance for the Nexmo SMS API!
+
+=head1 VERSION
+
+version 0.10
+
 =head1 SYNOPSIS
 
 This module simplifies sending SMS through the Nexmo API.
-
 
     use Nexmo::SMS::GetBalance;
 
@@ -60,28 +133,6 @@ This method recognises these parameters:
     username          => 'required',
     password          => 'required',
 
-=cut
-
-sub new {
-    my ($class,%param) = @_;
-    
-    my $self = bless {}, $class;
-    
-    for my $attr ( keys %attrs ) {
-        if ( exists $param{$attr} ) {
-            $self->$attr( $param{$attr} );
-        }
-    }
-    
-    $self->user_agent(
-        LWP::UserAgent->new(
-            agent => 'Perl module ' . __PACKAGE__ . ' ' . $VERSION,
-        ),
-    );
-    
-    return $self;
-}
-
 =head2 user_agent
 
 Getter/setter for the user_agent attribute of the object. By default a new
@@ -91,49 +142,11 @@ is compatible to LWP::UserAgent.
   $sms->user_agent( MyUserAgent->new );
   my $ua = $sms->user_agent;
 
-=cut
-
-sub user_agent {
-    my ($self,$ua) = @_;
-    
-    $self->{__ua__} = $ua if @_ == 2;
-    return $self->{__ua__};
-}
-
 =head2 get_balance
 
 This actually calls the Nexmo SMS API. It returns the balance of the account.
 
    my $balance = $object->get_balance;
-
-=cut
-
-sub get_balance {
-    my ($self) = shift;
-    
-    my $url = sprintf "%saccount/get-balance/%s/%s",
-        $self->server,
-        $self->username,
-        $self->password;
-    
-    my $ua = $self->user_agent;
-    $ua->default_header( 'Accept' => 'application/json' );
-    
-    my $response = $ua->get(
-        $url,
-    );
-    
-    if ( !$response || !$response->is_success ) {
-        return;
-    }
-    
-    my $json  = $response->content;
-    my $coder = JSON::PP->new->utf8->pretty->allow_nonref;
-    my $perl  = $coder->decode( $json );
-    
-    return if !$perl || ref $perl ne 'HASH';    
-    return $perl->{'value'};
-}
 
 =head1 Attributes
 
@@ -153,7 +166,16 @@ attribute there is a getter/setter:
 
 =back
 
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
 =cut
-
-1;
-

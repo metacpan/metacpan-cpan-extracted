@@ -3,7 +3,7 @@ package RPerl::CompileUnit::Module::Header;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.005_000;
+our $VERSION = 0.006_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::GrammarRule);
@@ -44,11 +44,24 @@ sub ast_to_rperl__generate {
     my string $our_keyword              = $self->{children}->[5]->{children}->[3];    # PERLOPS only
     my string $version_number           = $self->{children}->[5]->{children}->[4];
 
-    # CREATE SYMBOL TABLE ENTRY
+    # DEV NOTE, CORRELATION #rp045: identifiers containing underscores may be reserved by C++
+    # DEV NOTE: all fully-scoped package & class names are naturally global in scope, 
+    # so we do not check the symbol table for any namespace or subroutine in the first conditional block below (ECOGEASCP184a), 
+    # thus there is no differentiation between ECOGEASRP184a and ECOGEASRP184b, so ECOGEASRP184b is disabled & unused below
     if ((substr $package_name, 0, 1) eq '_') {
-        die 'ERROR ECOGEASRP07, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: package name ' . ($package_name)
-                . ' must not start with underscore, dying' . "\n";
+        die 'ERROR ECOGEASRP184a, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL:' . "\n" . 'package or class name ' . q{'} . $package_name . q{'} .
+            ' must not start with an underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
     }
+#    elsif ($package_name =~ m/^_[A-Z]/gxms) {
+#        die 'ERROR ECOGEASRP184b, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL:' . "\n" . 'package or class name ' . q{'} . $package_name . q{'} .
+#            ' must not start with an underscore followed by an uppercase letter, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+#    }
+    elsif ($package_name =~ m/__/gxms) {
+        die 'ERROR ECOGEASRP184c, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL:' . "\n" . 'package or class name ' . q{'} . $package_name . q{'} .
+            ' must not include a double-underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+    }
+
+    # CREATE SYMBOL TABLE ENTRY
     $modes->{_symbol_table}->{_namespace} = $package_name . '::';  # set current namespace
     
 #    RPerl::diag( 'in Header->ast_to_cpp__generate_begin__PERLOPS_PERLTYPES(), have $modes->{_symbol_table} = ' . "\n" . Dumper($modes->{_symbol_table}) . "\n" );
@@ -110,11 +123,24 @@ sub ast_to_cpp__generate_begin__CPPOPS_CPPTYPES {
     my object $package_name   = $self->{children}->[3]->{children}->[0];
     my string $version_number = $self->{children}->[5]->{children}->[4];
 
-    # CREATE SYMBOL TABLE ENTRY
+    # DEV NOTE, CORRELATION #rp045: identifiers containing underscores may be reserved by C++
+    # DEV NOTE: all fully-scoped package & class names are naturally global in scope, 
+    # so we do not check the symbol table for any namespace or subroutine in the first conditional block below (ECOGEASCP184a), 
+    # thus there is no differentiation between ECOGEASCP184a and ECOGEASCP184b, so ECOGEASCP184b is disabled & unused below
     if ((substr $package_name, 0, 1) eq '_') {
-        die 'ERROR ECOGEASCP07, CODE GENERATOR, ABSTRACT SYNTAX TO C++: package name ' . ($package_name)
-                . ' must not start with underscore, dying' . "\n";
+        die 'ERROR ECOGEASCP184a, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'package or class name ' . q{'} . $package_name . q{'} .
+            ' must not start with an underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
     }
+#    elsif ($package_name =~ m/^_[A-Z]/gxms) {
+#        die 'ERROR ECOGEASCP184b, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'package or class name ' . q{'} . $package_name . q{'} .
+#            ' must not start with an underscore followed by an uppercase letter, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+#    }
+    elsif ($package_name =~ m/__/gxms) {
+        die 'ERROR ECOGEASCP184c, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'package or class name ' . q{'} . $package_name . q{'} .
+            ' must not include a double-underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+    }
+
+    # CREATE SYMBOL TABLE ENTRY
     $modes->{_symbol_table}->{_namespace} = $package_name . '::';  # set current namespace
  
 #    RPerl::diag( 'in Header->ast_to_cpp__generate_begin__CPPOPS_CPPTYPES(), have $modes->{_symbol_table} = ' . "\n" . Dumper($modes->{_symbol_table}) . "\n" );

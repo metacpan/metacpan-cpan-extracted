@@ -1,6 +1,564 @@
+2018-07-03  Rocky Bernstein <rocky@cpan.org>
+
+	* admin/how-to-make-a-release.md, lib/B/DeparseTree.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/TreeMain.pm: Get ready
+	for release 3.3.0
+
+2018-07-01  Rocky Bernstein <rocky@cpan.org>
+
+	* t/roundtrip/5.016/base/cond.t, t/roundtrip/5.016/base/if.t,
+	t/roundtrip/5.016/base/translate.t, t/roundtrip/5.016/base/while.t: 
+	Add 5.016 roundtrip test files
+
+2018-06-30  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, t/roundtrip/5.014/base/cond.t,
+	t/roundtrip/5.014/base/if.t, t/roundtrip/5.014/base/lex-short1.t,
+	t/roundtrip/5.014/base/lex-short2.t, t/roundtrip/5.014/base/num.t,
+	t/roundtrip/5.014/base/pat.t, t/roundtrip/5.014/base/rs.t,
+	t/roundtrip/5.014/base/term.t, t/roundtrip/5.014/base/translate.t,
+	t/roundtrip/5.014/base/while.t,
+	t/roundtrip/5.014/mro/basic_04_dfs.t,
+	t/roundtrip/5.018/mro/basic_04_dfs.t,
+	t/roundtrip/5.020/base/cond.t, t/roundtrip/5.020/base/if.t,
+	t/roundtrip/5.020/base/lex-short1.t,
+	t/roundtrip/5.020/base/lex-short2.t, t/roundtrip/5.020/base/num.t,
+	t/roundtrip/5.020/base/pat.t, t/roundtrip/5.020/base/rs.t,
+	t/roundtrip/5.020/base/term.t, t/roundtrip/5.020/base/translate.t,
+	t/roundtrip/5.020/base/while.t,
+	t/roundtrip/5.020/mro/basic_04_dfs.t,
+	t/roundtrip/5.022/mro/basic_04_dfs.t,
+	t/roundtrip/5.024/base/cond.t, t/roundtrip/5.024/base/if.t,
+	t/roundtrip/5.024/base/lex-short1.t,
+	t/roundtrip/5.024/base/lex-short2.t, t/roundtrip/5.024/base/num.t,
+	t/roundtrip/5.024/base/pat.t, t/roundtrip/5.024/base/rs.t,
+	t/roundtrip/5.024/base/term.t, t/roundtrip/5.024/base/translate.t,
+	t/roundtrip/5.024/base/while.t,
+	t/roundtrip/5.024/mro/basic_04_dfs.t,
+	t/roundtrip/5.026/base/cond.t, t/roundtrip/5.026/base/if.t,
+	t/roundtrip/5.026/base/lex-short1.t,
+	t/roundtrip/5.026/base/lex-short2.t, t/roundtrip/5.026/base/num.t,
+	t/roundtrip/5.026/base/pat.t, t/roundtrip/5.026/base/rs.t,
+	t/roundtrip/5.026/base/term.t, t/roundtrip/5.026/base/translate.t,
+	t/roundtrip/5.026/base/while.t,
+	t/roundtrip/5.026/mro/basic_04_dfs.t, t/roundtrip/base/cond.t,
+	t/roundtrip/base/if.t, t/roundtrip/base/lex-short1.t,
+	t/roundtrip/base/lex-short2.t, t/roundtrip/base/lex.t-notyet,
+	t/roundtrip/base/num.t, t/roundtrip/base/pat.t,
+	t/roundtrip/base/rs.t, t/roundtrip/base/term.t,
+	t/roundtrip/base/translate.t, t/roundtrip/base/while.t,
+	t/roundtrip/mro/basic_04_dfs.t, t/roundtrip/runtests.pl: Break out
+	tests for specific perl versions
+
+2018-06-29  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL: Put back in passthrough for now
+
+2018-06-29  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, t/roundtrip/base/lex-short1.t: Forgot to add new test
+
+2018-06-29  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/PPfns.pm: Fix bug in dq
+
+2018-06-29  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/TreeMain.pm: Fix bug
+	introduced in last commit
+
+2018-06-29  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P514.pm, lib/B/DeparseTree/P518.pm,
+	lib/B/DeparseTree/P526c.pm, lib/B/DeparseTree/PPfns.pm,
+	lib/B/DeparseTree/TreeMain.pm: Misc version-specific compatability
+	bugs
+
+2018-06-29  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/PPfns.pm,
+	lib/B/DeparseTree/TreeMain.pm, t/roundtrip/base/lex-short2.t: Adapt
+	print_protos to extract_protos
+
+2018-06-28  Rocky Bernstein <rocky@cpan.org>
+
+	* t/roundtrip/base/lex.t-notyet: Start contemplating more tests
+
+2018-06-28  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST: Administrivia
+
+2018-06-28  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit 4111165c274a726cd1d1d2cf8f5253c0531d1c5e Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Thu Jun 28 14:53:07 2018 -0400
+
+2018-06-28  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm: set rv2x other_ops more often
+
+2018-06-28  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm: Bug if rv2x
+
+2018-06-28  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm, lib/B/DeparseTree/TreeMain.pm,
+	lib/B/DeparseTree/TreeNode.pm: Bang on parent pointers of blocks
+
+2018-06-27  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Fragment.pm, lib/B/DeparseTree/PPfns.pm: Bang on
+	scope ops. Better Fragment error handling
+
+2018-06-27  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Fragment.pm, lib/B/DeparseTree/TreeMain.pm: Was
+	smashing prev_expr
+
+2018-06-27  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm, lib/B/DeparseTree/TreeMain.pm: 
+	Populate prev_expr in indirops
+
+2018-06-26  Rocky Bernstein <rocky@cpan.org>
+
+	* circle.yml: Remove CircleCI 1.0
+
+2018-06-25  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST.SKIP: Another CircleCI attempt
+
+2018-06-25  Rocky Bernstein <rocky@cpan.org>
+
+	* .circleci/config.yml: Try CircleCI 2.0
+
+2018-06-25  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit 24c2852db69170f786bd8440ac5e36a7debb8aaf Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Mon Jun 25 05:49:53 2018 -0400
+
+2018-06-22  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, t/05-listops.t, t/testdata/core-ops.pm,
+	t/testdata/listops.pm: listops testing is its own test now
+
+2018-06-21  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, MANIFEST, lib/B/DeparseTree/P514.pm,
+	lib/B/DeparseTree/P516.pm, lib/B/DeparseTree/P518.pm,
+	lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PPfns.pm,
+	lib/B/DeparseTree/TreeMain.pm: Some tolerance for Perl 5.14
+
+2018-06-21  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST: Update MANIFEST
+
+2018-06-21  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm, t/04-mapops.t, t/helper.pm,
+	t/testdata/core-ops.pm, t/testdata/mapops.pm: Fix mapops and split
+	out its tests
+
+2018-06-21  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm, t/testdata/indirops.pm: Fix another
+	indirop bug
+
+2018-06-21  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm: Tidy one indirop branch
+
+2018-06-21  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/PPfns.pm, t/04-indirops.t,
+	t/helper.pm, t/testdata/baseops.pm, t/testdata/core-ops.pm,
+	t/testdata/indirops.pm: Start fixing indirop bugs
+
+2018-06-21  Rocky Bernstein <rocky@cpan.org>
+
+	* t/04-baseops.t, t/04-indirops.t, t/05-unops.t, t/10-core.t,
+	t/testdata/core-ops.pm, t/testdata/indirops.pm: Split off indirops
+	...  All of them need fixing though.
+
+2018-06-21  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, t/04-baseops.t, t/05-core-unops.t, t/05-unops.t,
+	t/testdata/baseops.pm, t/testdata/core-ops.pm,
+	t/testdata/core-unops.pm, t/testdata/unops.pm: Separate baseops from
+	core tests
+
+2018-06-21  Rocky Bernstein <rocky@cpan.org>
+
+	* t/testdata/core-ops.pm, t/testdata/core-unops.pm: More unop
+	isolation
+
+2018-06-21  Rocky Bernstein <rocky@cpan.org>
+
+	* admin/test-all.sh, t/helper.pm: 5.16 tolerance
+
+2018-06-21  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit f7c396eb2e14670a96b22dd833eba70217c09d97 Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Thu Jun 21 12:52:26 2018 -0400
+
+2018-06-18  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P526.pm: Remove one more pp_stringify
+
+2018-06-18  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree/P526c.pm, lib/B/DeparseTree/PP.pm,
+	lib/B/DeparseTree/PPfns.pm: DRY pp_stringify
+
+2018-06-17  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm, lib/B/DeparseTree/TreeMain.pm,
+	t/testdata/small.pm: Go over filetest
+
+2018-06-17  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm: more info_to_text -> info_to_string
+	conversions
+
+2018-06-17  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm: Some unop prev_op bugs
+
+2018-06-17  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm, lib/B/DeparseTree/TreeMain.pm,
+	lib/B/DeparseTree/TreeNode.pm: better unop and prev_expr tracking
+
+2018-06-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm, lib/B/DeparseTree/TreeMain.pm: 
+	Slightly better -> method tagging
+
+2018-06-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PPfns.pm, t/testdata/small.pm: Fix indirop bug,
+	but skip a new test
+
+2018-06-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PPfns.pm,
+	lib/B/DeparseTree/SyntaxTree.pm, t/testdata/small.pm: Fix some bugs
+
+2018-06-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P526.pm,
+	lib/B/DeparseTree/P526c.pm, lib/B/DeparseTree/PPfns.pm: Reduce
+	duplication of _method and e_method
+
+2018-06-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P526.pm: Reduce
+	duplication in advance of combining code
+
+2018-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P526.pm: Chip away at e_method and _method
+
+2018-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P526.pm: Inch
+	e_method along
+
+2018-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/TreeNode.pm: Add a custom TreeNode printing
+	routine
+
+2018-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml, lib/B/DeparseTree/P516.pm,
+	lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree/P524.pm, lib/B/DeparseTree/P526.pm,
+	t/20-deparse-small.t: See if travis can handle 5.18 and...  fix breakage from last commit
+
+2018-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/PP.pm: More code
+	reduction
+
+2018-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm: Fix breakage from last commit
+
+2018-06-15  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PPfns.pm,
+	lib/B/DeparseTree/TreeMain.pm: Redice P520-P522 change in
+	preparation for merger
+
+2018-06-14  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P516.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree/P524.pm: P522 and P524 are the same now...  With the possibility of differences through OO?
+
+2018-06-14  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/PPfns.pm: Reduce differences between P522.pm and
+	P524.pm ...  with an eye towards subclassing one into the other.
+
+2018-06-13  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PPfns.pm: Baby step
+	towards getting entersub under control
+
+2018-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/TreeMain.pm: Use B::Deparse::split_float
+
+2018-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PP_OPtable.pm: Put matchop pp's into PP_Optable
+
+2018-06-11  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP.pm: Tiniest of entersub migration
+
+2018-06-10  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/OPflags.pm, lib/B/DeparseTree/PPfns.pm: Wrong
+	value for SVpad_TYPED
+
+2018-06-10  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP.pm: Small tweak
+
+2018-06-10  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/OPflags.pm,
+	lib/B/DeparseTree/P516.pm, lib/B/DeparseTree/P518.pm,
+	lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree/PPfns.pm, lib/B/DeparseTree/TreeMain.pm: Start to
+	split off 5.16 support
+
+2018-06-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/TreeMain.pm: Twiddle next_sub
+
+2018-06-09  Rocky Bernstein <rocky@cpan.org>
+
+	* scripts/Makefile: Better marking of [ in anonlist
+
+2018-06-09  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/PPfns.pm,
+	t/roundtrip/mro/basic_04_dfs.t, t/roundtrip/runtests.pl,
+	t/roundtrip/test.pl: Fix anonhash_or_list
+
+2018-06-09  Rocky Bernstein <rocky@cpan.org>
+
+	* doc/demo-notes.md, lib/B/DeparseTree/PPfns.pm,
+	lib/B/DeparseTree/TreeMain.pm: subroutine call bug
+
+2018-06-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PPfns.pm: remove maybe_my for 5.26.2{c}...  CPerl is closer but not working for some my's
+
+2018-06-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PP_OPtable.pm, lib/B/DeparseTree/TreeMain.pm: Fix
+	some of the cperl bugs
+
+2018-06-09  Rocky Bernstein <rocky@cpan.org>
+
+	* t/testdata/small.pm: Reinstate more tests
+
+2018-06-08  Rocky Bernstein <rocky@cpan.org>
+
+	* t/testdata/small.pm: Add back in more tests
+
+2018-06-08  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PP.pm: Move p_elem and pp_lslice
+
+2018-06-08  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PP_OPtable.pm: Remove pp_enterwrite diff
+
+2018-06-08  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PPfns.pm: Fix problems
+	introduced by last commit
+
+2018-06-08  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm: One more dup
+
+2018-06-08  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PPfns.pm: remove pp_padsv
+	dups
+
+2018-06-08  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PPfns.pm: Reduce code
+
+2018-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* README.md: Docs again
+
+2018-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* README.md, lib/B/DeparseTree.pod: Docs again
+
+2018-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* README.md, lib/B/DeparseTree.pod, lib/B/DeparseTree/Fragment.pm: 
+	Go over docs
+
+2018-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/TreeMain.pm: Code
+	reduction
+
+2018-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/TreeMain.pm: Code
+	reduction
+
+2018-06-06  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm: pp_substr
+	removal in P5xx.
+
+2018-06-06  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PP_OPtable.pm, lib/B/DeparseTree/PPfns.pm,
+	t/testdata/small.pm: Remove no-longer-used functions...  Isolate bitops to 5.22 and later
+
+2018-06-06  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP_OPtable.pm: A small comment change
+
+2018-06-06  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, admin/test-all.sh, lib/B/DeparseTree/P518.pm,
+	lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree/P524.pm, lib/B/DeparseTree/P526.pm,
+	lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PP_OPtable.pm,
+	lib/B/DeparseTree/PPfns.pm, t/20-deparse-small.t,
+	t/testdata/P518-short.pm, t/testdata/P522-short.pm,
+	t/testdata/P524-short.pm, t/testdata/P526-short.pm,
+	t/testdata/small.pm: DRY test data, and pp_readline
+
+2018-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/TreeNode.pm: Forgot to add TreeNode.pm
+
+2018-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/Fragment.pm,
+	lib/B/DeparseTree/Node.pm, lib/B/DeparseTree/PP.pm,
+	lib/B/DeparseTree/PPfns.pm, lib/B/DeparseTree/Printer.pm,
+	lib/B/DeparseTree/SyntaxTree.pm, lib/B/DeparseTree/TreeMain.pm,
+	t/unit/02-node.t, t/unit/03-treemain.t: DeparseTree::Node ->
+	DeparseTree::TreeNode ..  So that in the future we can have a StringNode.
+
+2018-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/OPflags.pm,
+	lib/B/DeparseTree/P526c.pm, lib/B/DeparseTree/PP.pm,
+	lib/B/DeparseTree/PP_OPtable.pm, lib/B/DeparseTree/PPfns.pm: 
+	PP->Optable motion. Add PPflags
+
+2018-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PP_OPtable.pm: Some PP
+	-> PP_OPtable motion
+
+2018-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PP_OPtable.pm: More PP
+	-> Optable moves
+
+2018-06-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PP_OPtable.pm: More PP
+	-> Optable moves
+
 2018-06-04  Rocky Bernstein <rocky@cpan.org>
 
-	* lib/B/DeparseTree.pm, lib/B/DeparseTree/Node.pm,
+	* lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PP_OPtable.pm: 
+	PP->optable
+
+2018-06-04  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PP_OPtable.pm: More PP
+	-> Optable
+
+2018-06-04  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PP_OPtable.pm: More
+	PP.pm -> optable entries
+
+2018-06-04  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PP_OPtable.pm: Tidy
+	more
+
+2018-06-04  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, admin/how-to-make-a-release.md,
+	lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/PP.pm: Remove duplicates of pp_smartmatch
+
+2018-06-04  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pod: Minor doc tweak.
+
+2018-06-04  Rocky Bernstein <rocky@cpan.org>
+
+	* admin/how-to-make-a-release.md, lib/B/DeparseTree.pod,
+	lib/B/DeparseTree/Fragment.pm, lib/B/DeparseTree/TreeMain.pm: Add
+	shell script to test everything. Revise documention and add
+	dump_relations().
+
+2018-06-04  Rocky Bernstein <rocky@cpan.org>
+
+	* NEWS, lib/B/DeparseTree.pm, lib/B/DeparseTree/Node.pm,
 	lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
 	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
 	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,

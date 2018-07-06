@@ -5,6 +5,9 @@ use warnings;
 use RPerl::AfterSubclass;
 our $VERSION = 0.001_000;
 
+# [[[ OO INHERITANCE ]]]
+our @ISA = qw(RPerl::Algorithm);
+
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitStringyEval)  # SYSTEM DEFAULT 1: allow eval()
 
@@ -15,8 +18,8 @@ use RPerl::Config;
 # [[[ SUBROUTINES ]]]
 
 # <<< OO PROPERTIES, SUBROUTINES, SHIMS >>>
-undef &RPerl::Algorithm::Sort::uninherited__Sort;
-*RPerl::Algorithm::Sort::uninherited__Sort = sub { return main::RPerl__Algorithm__Sort__uninherited__Sort(@ARG); };
+undef &RPerl::Algorithm::Sort::uninherited_Sort;
+*RPerl::Algorithm::Sort::uninherited_Sort = sub { return main::RPerl__Algorithm__Sort__uninherited_Sort(@ARG); };
 
 # <<< C++ LOADER >>>
 sub cpp_load {
@@ -44,7 +47,7 @@ sub cpp_load {
 package main;
 use RPerl::Inline;
 BEGIN { RPerl::diag("[[[ BEGIN 'use Inline' STAGE for 'RPerl/Algorithm/Sort.cpp' ]]]\n" x 1); }
-use Inline (CPP => '$main::INCLUDE_PATH' . '/RPerl/Algorithm/Sort.cpp', \%RPerl::Inline::ARGS);
+use Inline (CPP => '$main::INCLUDE_PATH' . '/' . 'RPerl/Algorithm/Sort.cpp', \%RPerl::Inline::ARGS);
 RPerl::diag("[[[ END   'use Inline' STAGE for 'RPerl/Algorithm/Sort.cpp' ]]]\n" x 1);
 1;
 EOF

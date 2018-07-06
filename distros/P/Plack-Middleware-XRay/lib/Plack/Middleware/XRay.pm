@@ -6,8 +6,9 @@ use warnings;
 use parent "Plack::Middleware";
 
 use AWS::XRay qw/ capture_from /;
+use Time::HiRes ();
 
-our $VERSION           = "0.04";
+our $VERSION           = "0.05";
 our $TRACE_HEADER_NAME = "X-Amzn-Trace-ID";
 (my $trace_header_key  = uc("HTTP_${TRACE_HEADER_NAME}")) =~ s/-/_/g;
 
@@ -22,7 +23,12 @@ sub call {
         AWS::XRay->sampling_rate($self->{sampling_rate} // 1);
     }
 
-    return capture_from $env->{$trace_header_key}, $self->{name}, sub {
+    if ($self->{response_filter}) {
+        AWS::XRay->auto_flush(0);
+    }
+
+    my $t0 = [ Time::HiRes::gettimeofday ];
+    my $res = capture_from $env->{$trace_header_key}, $self->{name}, sub {
         my $segment = shift;
 
         # fill annotations and metadata
@@ -70,6 +76,13 @@ sub call {
 
         return $res;
     };
+
+    if (my $func = $self->{response_filter}) {
+        my $elapsed = Time::HiRes::tv_interval($t0);
+        $func->($env, $res, $elapsed) && AWS::XRay->sock->flush();
+        AWS::XRay->sock->close();
+    }
+    return $res;
 }
 
 sub url {
@@ -127,6 +140,19 @@ Plack::Middleware::XRay - Plack middleware for AWS X-Ray tracing
           $app;
       };
 
+      # example of response filter
+      builder {
+          enable "XRay"
+              name            => "myApp",
+              response_filter => sub {
+                  my ($env, $res, $elapsed) = @_;
+                 # true if server error or slow response.
+                 return $res->[0] >= 500 || $elapsed >= 1.5;
+              },
+          ;
+          $app;
+      };
+
 =head1 DESCRIPTION
 
 Plack::Middleware::XRay is a middleware for AWS X-Ray.
@@ -165,6 +191,12 @@ Code ref to generate an annotations hashref.
 =head2 metadata_buidler
 
 Code ref to generate a metadata hashref.
+
+=head2 response_filter
+
+When response_filter defined, call the coderef with ($env, $res, $elapsed) after $app run.
+
+Segment data are sent to xray daemon only when the coderef returns true.
 
 =head1 LICENSE
 

@@ -18,5 +18,6 @@ t/author-signature.t
 t/basic.t
 t/context.t
 t/empty-last-field.t
+t/format-prefix.t
 t/max-length.t
 t/warp.t

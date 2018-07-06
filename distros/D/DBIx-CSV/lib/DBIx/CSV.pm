@@ -1,7 +1,7 @@
 package DBIx::CSV;
 
-our $DATE = '2018-07-02'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-07-03'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -47,7 +47,7 @@ DBIx::CSV - Generate CSV from SQL query result
 
 =head1 VERSION
 
-This document describes version 0.002 of DBIx::CSV (from Perl distribution DBIx-CSV), released on 2018-07-02.
+This document describes version 0.003 of DBIx::CSV (from Perl distribution DBIx-CSV), released on 2018-07-03.
 
 =head1 SYNOPSIS
 
@@ -74,7 +74,7 @@ Sample result:
 
 Generating all rows (with header):
 
- print $dbh->selectrow_csv("SELECT * FROM member");
+ print $dbh->selectall_csv("SELECT * FROM member");
 
 Sample result:
 
@@ -85,7 +85,7 @@ Sample result:
 
 Generating all rows (without header):
 
- print $dbh->selectrow_csv("SELECT * FROM member");
+ print $dbh->selectall_csv_noheader("SELECT * FROM member");
 
 Statement handle versions:
 

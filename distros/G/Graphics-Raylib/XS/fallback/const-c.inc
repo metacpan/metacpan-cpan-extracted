@@ -1918,13 +1918,13 @@ static int
 constant_21 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     FILTER_ANISOTROPIC_4X FILTER_ANISOTROPIC_8X FLAG_WINDOW_DECORATED
-     FLAG_WINDOW_RESIZABLE GAMEPAD_PS3_BUTTON_L1 GAMEPAD_PS3_BUTTON_L2
-     GAMEPAD_PS3_BUTTON_PS GAMEPAD_PS3_BUTTON_R1 GAMEPAD_PS3_BUTTON_R2
-     GAMEPAD_PS3_BUTTON_UP GAMEPAD_XBOX_BUTTON_A GAMEPAD_XBOX_BUTTON_B
-     GAMEPAD_XBOX_BUTTON_X GAMEPAD_XBOX_BUTTON_Y LOC_MATRIX_PROJECTION
-     LOC_VERTEX_TEXCOORD01 LOC_VERTEX_TEXCOORD02 UNCOMPRESSED_R4G4B4A4
-     UNCOMPRESSED_R5G5B5A1 UNCOMPRESSED_R8G8B8A8 */
+     FILTER_ANISOTROPIC_4X FILTER_ANISOTROPIC_8X FLAG_WINDOW_RESIZABLE
+     GAMEPAD_PS3_BUTTON_L1 GAMEPAD_PS3_BUTTON_L2 GAMEPAD_PS3_BUTTON_PS
+     GAMEPAD_PS3_BUTTON_R1 GAMEPAD_PS3_BUTTON_R2 GAMEPAD_PS3_BUTTON_UP
+     GAMEPAD_XBOX_BUTTON_A GAMEPAD_XBOX_BUTTON_B GAMEPAD_XBOX_BUTTON_X
+     GAMEPAD_XBOX_BUTTON_Y LOC_MATRIX_PROJECTION LOC_VERTEX_TEXCOORD01
+     LOC_VERTEX_TEXCOORD02 UNCOMPRESSED_R4G4B4A4 UNCOMPRESSED_R5G5B5A1
+     UNCOMPRESSED_R8G8B8A8 */
   /* Offset 20 gives the best switch position.  */
   switch (name[20]) {
   case '1':
@@ -2012,17 +2012,6 @@ constant_21 (pTHX_ const char *name, IV *iv_return) {
     /*                                   B      */
 #ifdef GAMEPAD_XBOX_BUTTON_B
       *iv_return = GAMEPAD_XBOX_BUTTON_B;
-      return PERL_constant_ISIV;
-#else
-      return PERL_constant_NOTDEF;
-#endif
-    }
-    break;
-  case 'D':
-    if (memEQ(name, "FLAG_WINDOW_DECORATE", 20)) {
-    /*                                   D      */
-#ifdef FLAG_WINDOW_DECORATED
-      *iv_return = FLAG_WINDOW_DECORATED;
       return PERL_constant_ISIV;
 #else
       return PERL_constant_NOTDEF;
@@ -2173,8 +2162,9 @@ static int
 constant_23 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     FLAG_WINDOW_TRANSPARENT GAMEPAD_PS3_AXIS_LEFT_X GAMEPAD_PS3_AXIS_LEFT_Y
-     GAMEPAD_PS3_BUTTON_DOWN GAMEPAD_PS3_BUTTON_LEFT UNCOMPRESSED_GRAY_ALPHA */
+     FLAG_WINDOW_TRANSPARENT FLAG_WINDOW_UNDECORATED GAMEPAD_PS3_AXIS_LEFT_X
+     GAMEPAD_PS3_AXIS_LEFT_Y GAMEPAD_PS3_BUTTON_DOWN GAMEPAD_PS3_BUTTON_LEFT
+     UNCOMPRESSED_GRAY_ALPHA */
   /* Offset 22 gives the best switch position.  */
   switch (name[22]) {
   case 'A':
@@ -2182,6 +2172,17 @@ constant_23 (pTHX_ const char *name, IV *iv_return) {
     /*                                     A      */
       *iv_return = UNCOMPRESSED_GRAY_ALPHA;
       return PERL_constant_ISIV;
+    }
+    break;
+  case 'D':
+    if (memEQ(name, "FLAG_WINDOW_UNDECORATE", 22)) {
+    /*                                     D      */
+#ifdef FLAG_WINDOW_UNDECORATED
+      *iv_return = FLAG_WINDOW_UNDECORATED;
+      return PERL_constant_ISIV;
+#else
+      return PERL_constant_NOTDEF;
+#endif
     }
     break;
   case 'N':
@@ -2491,8 +2492,8 @@ use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 my $types = {map {($_, 1)} qw(IV)};
 my @names = (qw(DEG2RAD FLAG_FULLSCREEN_MODE FLAG_MSAA_4X_HINT FLAG_SHOW_LOGO
-	       FLAG_VSYNC_HINT FLAG_WINDOW_DECORATED FLAG_WINDOW_RESIZABLE
-	       FLAG_WINDOW_TRANSPARENT GAMEPAD_PLAYER1 GAMEPAD_PLAYER2
+	       FLAG_VSYNC_HINT FLAG_WINDOW_RESIZABLE FLAG_WINDOW_TRANSPARENT
+	       FLAG_WINDOW_UNDECORATED GAMEPAD_PLAYER1 GAMEPAD_PLAYER2
 	       GAMEPAD_PLAYER3 GAMEPAD_PLAYER4 GAMEPAD_PS3_AXIS_L2
 	       GAMEPAD_PS3_AXIS_LEFT_X GAMEPAD_PS3_AXIS_LEFT_Y
 	       GAMEPAD_PS3_AXIS_R2 GAMEPAD_PS3_AXIS_RIGHT_X

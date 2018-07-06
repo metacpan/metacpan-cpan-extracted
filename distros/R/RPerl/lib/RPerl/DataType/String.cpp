@@ -1,7 +1,7 @@
 using std::cout;  using std::cerr;  using std::endl;
 
 #ifndef __CPP__INCLUDED__RPerl__DataType__String_cpp
-#define __CPP__INCLUDED__RPerl__DataType__String_cpp 0.007_000
+#define __CPP__INCLUDED__RPerl__DataType__String_cpp 0.011_000
 
 // [[[ INCLUDES ]]]
 #include <RPerl/DataType/String.h>		// -> NULL (relies on native C type)
@@ -11,9 +11,30 @@ using std::cout;  using std::cerr;  using std::endl;
 #include <RPerl/DataType/Number.cpp>  // -> Number.h
 #include <RPerl/DataType/Character.cpp>  // -> Character.h
 
+// [[[ GENERAL FUNCTIONS ]]]
+
 // [[[ TYPE CHECKING ]]]
 // [[[ TYPE CHECKING ]]]
 // [[[ TYPE CHECKING ]]]
+
+// NEED ANSWER: does this change the original string via move semantics, or make a copy?
+// escape all back-slash \ and single-quote ' characters with a back-slash \ character
+string escape_backslash_singlequote(string unescaped_string) {
+    string escaped_string = unescaped_string;
+    size_t escaped_string_pos = 0;
+    while((escaped_string_pos = escaped_string.find("\\", escaped_string_pos)) != string::npos)
+    {
+        escaped_string.replace(escaped_string_pos, 1, "\\\\");
+        escaped_string_pos += 2;
+    }
+    escaped_string_pos = 0;
+    while((escaped_string_pos = escaped_string.find("'", escaped_string_pos)) != string::npos)
+    {
+        escaped_string.replace(escaped_string_pos, 1, "\\'");
+        escaped_string_pos += 2;
+    }
+    return escaped_string;
+}
 
 // TYPE-CHECKING SUBROUTINES DEPRECATED IN FAVOR OF EQUIVALENT MACROS
 /*
@@ -285,30 +306,30 @@ string string_to_string(string input_string)
 
 # ifdef __PERL__TYPES
 
-SV* string__typetest0() {
-//fprintf(stderr, "in CPPOPS_PERLTYPES string__typetest0()\n");
+SV* string_typetest0() {
+//fprintf(stderr, "in CPPOPS_PERLTYPES string_typetest0()\n");
 	return(newSVpv("Spice CPPOPS_PERLTYPES", 0));
 }
 
-SV* string__typetest1(SV* lucky_string) {
+SV* string_typetest1(SV* lucky_string) {
 //	string_CHECK(lucky_string);
-	string_CHECKTRACE(lucky_string, "lucky_string", "string__typetest1()");
-//cout << "in CPPOPS_PERLTYPES string__typetest1(), received lucky_string '" << SvPV_nolen(lucky_string) << "'" << '\n';  cout.flush();  // DEV NOTE: must flush buffer to avoid endl over-flushing and out-of-order printing
-//cerr << "in CPPOPS_PERLTYPES string__typetest1(), received lucky_string '" << SvPV_nolen(lucky_string) << "'" << '\n';  // DEV NOTE: cerr doesn't have a buffer to flush
-//fprintf(stderr, "in CPPOPS_PERLTYPES string__typetest1(), received lucky_string = '%s'\n", SvPV_nolen(lucky_string));
+	string_CHECKTRACE(lucky_string, "lucky_string", "string_typetest1()");
+//cout << "in CPPOPS_PERLTYPES string_typetest1(), received lucky_string '" << SvPV_nolen(lucky_string) << "'" << '\n';  cout.flush();  // DEV NOTE: must flush buffer to avoid endl over-flushing and out-of-order printing
+//cerr << "in CPPOPS_PERLTYPES string_typetest1(), received lucky_string '" << SvPV_nolen(lucky_string) << "'" << '\n';  // DEV NOTE: cerr doesn't have a buffer to flush
+//fprintf(stderr, "in CPPOPS_PERLTYPES string_typetest1(), received lucky_string = '%s'\n", SvPV_nolen(lucky_string));
 	return(newSVpvf("%s%s", SvPV_nolen(string_to_string(lucky_string)), " CPPOPS_PERLTYPES"));
 }
 
 # elif defined __CPP__TYPES
 
-string string__typetest0() {
+string string_typetest0() {
 	string retval = "Spice CPPOPS_CPPTYPES";
-//fprintf(stderr, "in CPPOPS_CPPTYPES string__typetest0(), have retval = '%s'\n", retval.c_str());
+//fprintf(stderr, "in CPPOPS_CPPTYPES string_typetest0(), have retval = '%s'\n", retval.c_str());
 	return retval;
 }
 
-string string__typetest1(string lucky_string) {
-//fprintf(stderr, "in CPPOPS_CPPTYPES string__typetest1(), received lucky_string = '%s'\n", lucky_string.c_str());
+string string_typetest1(string lucky_string) {
+//fprintf(stderr, "in CPPOPS_CPPTYPES string_typetest1(), received lucky_string = '%s'\n", lucky_string.c_str());
 	return(string_to_string(lucky_string) + " CPPOPS_CPPTYPES");
 }
 

@@ -1,5 +1,6 @@
 use strict; use warnings;
 BEGIN {
+  require './inc/probebad.pl';
   unless(eval q{ use 5.008001; 1}) {
     print "Perl 5.008001 or better required\n";
     exit;
@@ -15,7 +16,9 @@ my %WriteMakefileArgs = (
   "ABSTRACT"           => "Build external dependencies for use in CPAN",
   "AUTHOR"             => "Graham Ollis <plicease\@cpan.org>, Joel Berger <joel.a.berger\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
+    "ExtUtils::CBuilder"  => 0,
     "ExtUtils::MakeMaker" => 0,
+    "ExtUtils::ParseXS"   => "3.30",
     "File::Which"         => 0
   },
   "DISTNAME"         => "Alien-Build",
@@ -116,7 +119,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0"              => "0.000060"
   },
-  "VERSION" => "1.46",
+  "VERSION" => "1.48",
   "test"    => {
     "TESTS" => "t/*.t"
     }

@@ -19,6 +19,11 @@ SYNOPSIS
         # Return internal time incremented by 1.001s
         my $then       = time();
         my $then_hires = Time::HiRes::time();
+    
+        # set/reset time
+        Test::Time::HiRes->set_time( 123.456789 );
+    
+        Test::Time::HiRes->unimport(); # turn off behaviour
 
 DESCRIPTION
 

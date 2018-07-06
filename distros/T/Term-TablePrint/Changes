@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.067   2018-07-03
+        - "Term::Choose": minimum verson "1.600".
+        - "Term::Choose::Util": minimum version "0.065".
+
 0.066   2018-06-17
         - Changed 'no_spacebar' to 'meta_items'.
         - Removed deprecated option 'add_header'

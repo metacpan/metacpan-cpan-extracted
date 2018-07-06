@@ -127,11 +127,11 @@ our @ISA = ('Exporter');
 %EXPORT_TAGS = (all => [qw(@FormTags DEFANG_NONE DEFANG_ALWAYS DEFANG_DEFAULT)]);
 Exporter::export_ok_tags('all');
 
-use 5.010;
+use 5.008;
 use strict;
 use warnings;
 
-our $VERSION=1.06;
+our $VERSION=1.07;
 
 use constant DEFANG_NONE => 0;
 use constant DEFANG_ALWAYS => 1;
@@ -168,7 +168,7 @@ my $Executables = '([^@]\.com|'.
                   '.*\.(exe|cmd|bat|pif|scr|sys|sct|lnk|dll'.
                   '|vbs?|vbe|hta|shb|shs|hlp|chm|eml|wsf|wsh|js'.
                   '|asx|wm.|mdb|mht|msi|msp|cpl|lib|reg))';
-my $SrcBanStd      = qr/^([A-Za-z]*script|.*\&{|mocha|about|opera|mailto:|hcp:|\/(dev|proc)|\\|file|smb|cid:${Executables}(@|\?|$))/i;
+my $SrcBanStd      = qr/^([A-Za-z]*script|.*\&\{|mocha|about|opera|mailto:|hcp:|\/(dev|proc)|\\|file|smb|cid:${Executables}(@|\?|$))/i;
 
 my %Rules = 
 (
@@ -806,7 +806,7 @@ sub new {
   my $Self = {
     defang_string => 'defang_',
     defang_re => qr/^defang_/,
-    defang_default => ($Opts{defang_default} // DEFANG_DEFAULT),
+    defang_default => (defined $Opts{defang_default} ? $Opts{defang_default} : DEFANG_DEFAULT),
     allow_double_defang => $Opts{allow_double_defang},
     tags_to_callback => \%tags_to_callback,
     tags_callback => $Opts{tags_callback},
@@ -1895,7 +1895,7 @@ sub defang_stylerule {
         my ($KeyPilot, $Separator, $QuoteStart, $QuoteEnd, $ValueEnd, $ValueTrail) = @$v;
 
         # Always need a separator
-        $v->[1] //= ':';
+        $v->[1] = defined $v->[1] ? $v->[1] : ':';
         # If an intermediate style property-value pair doesn't have a terminating semi-colon, add it
         if ($k < @$KeyValueRules - 1) {
           $v->[4] .= ";" if !defined $v->[4] || $v->[4] !~ m/;/;
@@ -1997,7 +1997,7 @@ sub defang_attributes {
   for my $Attr (@$Attributes) {
     my ($AttrKey, $AttrValR) = ($Attr->[0], \$Attr->[4]);
 
-    my $lcAttrKey = $Attr->[7] = lc($AttrKey // "");
+    my $lcAttrKey = $Attr->[7] = defined $AttrKey ? lc($AttrKey) : "";
 
     # Get the attribute value cleaned up
     $$AttrValR = $Self->cleanup_attribute($$AttrValR);
@@ -2307,7 +2307,7 @@ sub close_tag {
     my $LastTagPos = rindex($$OutR, '<');
     while ($LastTagPos >= 0) {
       pos($$OutR) = $LastTagPos;
-      my $RE = ($RECache{$lcTag} //= qr/\G<${lcTag}\b[^<>]*>\s*(?:<|$)/);
+      my $RE = (defined $RECache{$lcTag} ? $RECache{$lcTag} : qr/\G<${lcTag}\b[^<>]*>\s*(?:<|$)/);
       if ($$OutR =~ /$RE/gc) {
         substr($$OutR, $LastTagPos) = '';
         ($AddOutput, $Result) = (0, DEFANG_ALWAYS);

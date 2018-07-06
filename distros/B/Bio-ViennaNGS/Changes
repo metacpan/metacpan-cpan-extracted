@@ -201,3 +201,15 @@ Revision history for Perl extension Bio::ViennaNGS.
 	- added dump()method to Bio::ViennaNGS::FeatureInterval,
 	  Bio::ViennaNGS::MinimalFeature and Bio::ViennaNGS::Feature
 	- make all attributes of Bio::ViennaNGS::FeatureInterval rw
+
+0.18.1 Thu 24 May 2018
+	- ignore case in regex match in fasta_regex.pl
+	- allow keeping temporary bedGraph files in BAM to bigWig and
+	  BED to bigWig conversion
+	- refactored temporary file handling in Bio::ViennaNGS::Peak
+	- ignore case in regex match in scripts/fasta_regex.pl
+	- refactored scripts/bed2bedGraph.pl
+	- argument error checks in Fasta.pm
+
+0.19 Tue 3 Jul 2018     
+        - added Bio::ViennaNGS::FeatureIntervalN

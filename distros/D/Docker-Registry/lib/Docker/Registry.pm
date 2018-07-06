@@ -1,5 +1,5 @@
 package Docker::Registry;
-  our $VERSION = '0.03';
+  our $VERSION = '0.05';
 
 1;
 
@@ -56,6 +56,8 @@ L<Docker::Registry::GCE>
 
 L<Docker::Registry::ECR>
 
+L<Docker::Registry::Gitlab>
+
 for details
 
 =head1 SEE ALSO
@@ -67,6 +69,10 @@ L<https://docs.docker.com/registry/spec/api/>
     Jose Luis Martinez
     CAPSiDE
     jlmartinez@capside.com
+
+=head1 Contributors
+
+Wesley Schwengle (waterkip) has implemented the GitLab provider, as well as refactored code
 
 =head1 BUGS and SOURCE
 

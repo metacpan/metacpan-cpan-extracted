@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.064';
+our $VERSION = '0.065';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -601,7 +601,7 @@ sub print_hash {
     my $prompt       = defined $opt->{prompt}       ? $opt->{prompt}       : ( defined $opt->{preface} ? '' : 'Close with ENTER' );
     my $preface      = $opt->{preface};
     #-----------------------------------------------------------------#
-    my $line_fold = defined $opt->{lf} ? $opt->{lf} : { Charset => 'utf-8', Newline => "\n", OutputCharset => '_UNICODE_', Urgent => 'FORCE' };
+    #my $line_fold = defined $opt->{lf} ? $opt->{lf} : { Charset => 'utf-8', Newline => "\n", OutputCharset => '_UNICODE_', Urgent => 'FORCE' }; ##
     my $term_width = term_width();
     if ( ! $maxcols || $maxcols > $term_width  ) {
         $maxcols = $term_width - $right_margin;
@@ -702,7 +702,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.064
+Version 0.065
 
 =cut
 

@@ -8,7 +8,7 @@ package Devel::MAT::InternalTools;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 package Devel::MAT::Tool::help;
 
@@ -18,7 +18,8 @@ use constant CMD => "help";
 use constant CMD_DESC => "Display a list of available commands";
 
 use constant CMD_ARGS => (
-   { name => "cmdname", help => "name of a command to display more help" },
+   { name => "cmdname", help => "name of a command to display more help",
+     slurpy => 1 },
 );
 
 sub run
@@ -135,11 +136,43 @@ sub help_cmd
          [ map {
             my $arg = $_;
 
-            [ "  \$\U$arg->{name}", $arg->{help} ],
+            [ "  \$\U$arg->{name}" . ( $arg->{slurpy} ? "..." : "" ), $arg->{help} ],
          } @argspec ],
          sep => "    ",
       );
    }
+}
+
+package Devel::MAT::Tool::more;
+
+use base qw( Devel::MAT::Tool );
+
+use constant CMD => "more";
+use constant CMD_DESC => "Continue the previous listing";
+
+my $more;
+
+sub run
+{
+   if( $more ) {
+      $more->() or undef $more;
+   }
+   else {
+      Devel::MAT::Cmd->printf( "%s\n", Devel::MAT::Cmd->format_note( "No more" ) );
+   }
+}
+
+sub paginate
+{
+   shift;
+   ( $more ) = @_;
+
+   $more->() or undef $more;
+}
+
+sub can_more
+{
+   return defined $more;
 }
 
 0x55AA;

@@ -108,23 +108,14 @@ sub connect_http ( $self, $uri, @args ) {
     return;
 }
 
-sub connect_https ( $self, $uri, @args ) {
-    my $cb = pop @args;
-
+sub connect_https ( $self, $uri, %args ) {
     $uri = P->uri($uri) if !is_ref $uri;
 
     $self->start_thread;
 
     Pcore::AE::Handle->new(
-        @args,
+        %args,
         connect => $self->{uri},
-        on_connect_error => sub ( $h, $reason ) {
-            $self->finish_thread;
-
-            $cb->( undef, res [ 600, $reason ] );
-
-            return;
-        },
         on_connect => sub ( $h, $host, $port, $retry ) {
             my $buf = 'CONNECT ' . $uri->host->name . q[:] . $uri->connect_port . q[ HTTP/1.1] . $CRLF;
 
@@ -138,9 +129,7 @@ sub connect_https ( $self, $uri, @args ) {
                 headers => 0,
                 sub ( $h1, $res, $error_reason ) {
                     if ($error_reason) {
-                        $self->finish_thread;
-
-                        $cb->( undef, res [ 600, 'Invalid proxy connect response' ] );
+                        $args{on_error}->( $h, 1, 'Invalid proxy connect response' );
                     }
                     else {
                         if ( $res->{status} == 200 ) {
@@ -148,12 +137,10 @@ sub connect_https ( $self, $uri, @args ) {
                             $h->{proxy_type} = $PROXY_TYPE_HTTPS;
                             $h->{peername}   = $uri->host;
 
-                            $cb->( $h, res 200 );
+                            $args{on_connect}->($h);
                         }
                         else {
-                            $self->finish_thread;
-
-                            $cb->( undef, res [ $res->{status}, $res->{reason} ] );
+                            $args{on_error}->( $h, 1, $res->{reason} );
                         }
                     }
 
@@ -445,11 +432,11 @@ sub finish_thread ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 204, 277, 282, 299,  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |      | 349, 352, 355        |                                                                                                                |
+## |    2 | 191, 264, 269, 286,  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |      | 336, 339, 342        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 209, 349, 352, 355,  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
-## |      | 361                  |                                                                                                                |
+## |    1 | 196, 336, 339, 342,  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |      | 348                  |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

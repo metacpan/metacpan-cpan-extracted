@@ -1,3 +1,10 @@
+Version 0.7108:
+- Add standard tests
+- Fix compatibility issue with newer versions of perl, which remove "." from
+  @INC. https://rt.cpan.org/Ticket/Display.html?id=121015
+- Fix no_index declaration for delta.pl.
+  https://rt.cpan.org/Ticket/Display.html?id=112477
+
 Version 0.7107: Sat May 2 2015
 - Prevent CPAN from indexing private-lib
 

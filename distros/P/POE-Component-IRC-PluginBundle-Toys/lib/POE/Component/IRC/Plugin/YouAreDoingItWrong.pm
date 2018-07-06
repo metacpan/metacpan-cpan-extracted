@@ -3,7 +3,7 @@ package POE::Component::IRC::Plugin::YouAreDoingItWrong;
 use warnings;
 use strict;
 
-our $VERSION = '1.001001'; # VERSION
+our $VERSION = '1.001002'; # VERSION
 
 use POE qw(Component::WWW::DoingItWrongCom::RandImage);
 use POE::Component::IRC::Plugin qw(:ALL);

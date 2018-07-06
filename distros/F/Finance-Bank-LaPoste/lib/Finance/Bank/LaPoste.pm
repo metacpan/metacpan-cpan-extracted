@@ -10,7 +10,7 @@ use HTML::Parser;
 use HTML::Form;
 use Digest::MD5();
 
-our $VERSION = '8.01';
+our $VERSION = '8.02';
 
 # $Id: $
 # $Log: LaPoste.pm,v $
@@ -163,11 +163,16 @@ sub _rel_url {
 	$base =~ m!([^/]*//[^/]*)! && "$1$rel";
     } else {
 	$base =~ s/\?.*//;
-	my $s = "$base/../$rel";
-	while ($s =~ s![^/]*/\.\./!!) {}
-	$s;
+	_rel_fullurl("$base/../$rel");
     }
 }
+
+sub _rel_fullurl {
+    my ($s) = @_;
+    while ($s =~ s![^/]*/\.\./!!) {}
+    $s;
+}
+
 
 sub _output { my $f = shift; open(my $F, ">$f") or die "output in file $f failed: $!\n"; print $F $_ foreach @_; 1 }
 
@@ -317,6 +322,14 @@ sub new {
     exists $self->{username} or croak "Must provide a username";
 
     $self->{ua} ||= LWP::UserAgent->new(agent => 'Mozilla');
+
+    $self->{ua}->add_handler(request_preprepare => sub {
+        my ($request, $ua, $h) = @_;
+        if ($request->uri =~ m!/\.\./!) {
+            $request->uri(_rel_fullurl($request->uri));
+        }
+        #print $request->uri . "\n";
+    });
 
     _login($self);
     $self;

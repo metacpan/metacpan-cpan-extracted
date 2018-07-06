@@ -1,9 +1,9 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2018-02-15 12:52:17 mtw>
+# Last changed Time-stamp: <2018-07-03 15:38:30 mtw>
 
 package Bio::ViennaNGS;
 use Exporter;
-use version; our $VERSION = version->declare("v0.18");
+use version; our $VERSION = version->declare("v0.19");
 our @ISA = qw(Exporter);
 our @EXPORT = ($VERSION);
 1;
@@ -55,6 +55,9 @@ chaining gene annotation features.
 
 =item L<Bio::ViennaNGS::FeatureInterval>: A L<Moose> interface for
 handling elementary genomic intervals, corresponding to BED3.
+
+=item L<Bio::ViennaNGS::FeatureIntervalN>: A L<Moose> interface for
+handling named genomic intervals.
 
 =item L<Bio::ViennaNGS::FeatureIO>: A L<Moose> interface for efficient
 input/output handling of genomic annotation formats.
@@ -201,10 +204,13 @@ Please ensure that all third-party utilities are available on your
 system, and that hey can be found and executed by the Perl
 interpreter.
 
-=head1 SOURCE AVAILABILITY
+=head1 SOFTWARE AVAILABILITY
 
 Source code for this distribution is available from the L<ViennaNGS
 Github repository|https://github.com/mtw/Bio-ViennaNGS>.
+
+A pre-compiled binary distribution for Linux and MacOS is available
+from Bioconda, e.g. via I<conda install perl-bio-viennangs>.
 
 =head1 PAPERS
 
@@ -212,12 +218,12 @@ If the L<Bio::ViennaNGS> suite is useful for your work or if you use
 any component of the distribution in a custom pipeline, please cite
 the following publication:
 
-B<"ViennaNGS - A toolbox for building efficient next-generation sequencing
-analysis pipelines">
+ "ViennaNGS - A toolbox for building efficient next-generation
+ sequencing analysis pipelines"
+ Michael T. Wolfinger, Joerg Fallmann, Florian Eggenhofer and Fabian
+ Amman; F1000Research (2015), 4:50
 
-I<Michael T. Wolfinger, Joerg Fallmann, Florian Eggenhofer and Fabian Amman>
-
-F1000Research 2015, 4:50 (doi: L<10.12688E<sol>f1000research.6157.2|http://dx.doi.org/10.12688/f1000research.6157.2>)
+doi: L<10.12688E<sol>f1000research.6157.2|http://dx.doi.org/10.12688/f1000research.6157.2>)
 
 =head1 NOTES
 
@@ -288,7 +294,7 @@ test Windows compatibility.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2017 Michael T. Wolfinger
+Copyright (C) 2014-2018 Michael T. Wolfinger
 E<lt>michael@wolfinger.euE<gt>
 
 This library is free software; you can redistribute it and/or modify

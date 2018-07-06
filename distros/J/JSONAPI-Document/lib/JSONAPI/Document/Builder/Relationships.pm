@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Relationships;
-$JSONAPI::Document::Builder::Relationships::VERSION = '1.7';
+$JSONAPI::Document::Builder::Relationships::VERSION = '2.0';
 =head1 NAME
 
 JSONAPI::Document::Builder::Relationships - Related Resource Document builder
 
 =head1 VERSION
 
-version 1.7
+version 2.0
 
 =head1 DESCRIPTION
 
@@ -98,10 +98,7 @@ sub build_links_document {
         Carp::confess('Missing required argument: api_url');
     }
 
-    my $relationship_type = lc $relationship;
-    if ($self->kebab_case_attrs) {
-        $relationship_type =~ s/_/-/g;
-    }
+    my $relationship_type = $self->document_type($relationship);
 
     my $data;
     my $rel_info = $row->result_source->relationship_info($relationship);
@@ -115,7 +112,8 @@ sub build_links_document {
         if (my $related_row = $row->$relationship) {
             $data = {
                 id   => $related_row->id,
-                type => $self->document_type($relationship) };
+                type => $relationship_type
+            };
         }
     }
 
@@ -123,8 +121,12 @@ sub build_links_document {
 
     return {
         links => {
-            self    => $self->api_url . '/' . $row_type . '/' . $row->id . "/relationships/$relationship_type",
-            related => $self->api_url . '/' . $row_type . '/' . $row->id . "/$relationship_type",
+            self => $self->api_url . '/'
+                . $row_type . '/'
+                . $row->id
+                . '/relationships/'
+                . $self->format_type($relationship),
+            related => $self->api_url . '/' . $row_type . '/' . $row->id . '/' . $self->format_type($relationship),
         },
         data => $data,
     };

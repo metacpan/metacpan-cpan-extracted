@@ -1,5 +1,8 @@
 Revision history for Role-Markup-XML
 
+0.08    Sun, 11 Feb 2018 20:37:38 -0800
+        - added _LOAD method, a proxy to XML::LibXML->load_xml
+
 0.07    Tue, 12 Sep 2017 17:27:12 -0700
         - added _XPC accessor for handy-dandy xpath context
         - fixed a stupid one-character bug that was breaking namespace

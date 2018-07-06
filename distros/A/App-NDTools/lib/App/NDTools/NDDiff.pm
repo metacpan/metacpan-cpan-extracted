@@ -13,7 +13,7 @@ use Struct::Path 0.80 qw(path path_delta);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 use Term::ANSIColor qw(color);
 
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 
 my $JSON = JSON->new->canonical->allow_nonref;
 my %COLOR;
@@ -151,8 +151,6 @@ sub diff {
     } elsif (exists $diff->{U}) {
         $diff->{U} = $diff->{U}->[0];
     }
-
-    $self->diff_term($diff) if ($self->{OPTS}->{ofmt} eq 'term');
 
     return $diff;
 }
@@ -354,7 +352,11 @@ sub exec {
                 die_fatal "Diff validation failed", 1;
             }
 
-            $self->dump($diff) unless ($self->{OPTS}->{quiet});
+            unless ($self->{OPTS}->{quiet}) {
+                $self->diff_term($diff) if ($self->{OPTS}->{ofmt} eq 'term');
+                $self->dump($diff);
+            }
+
             $self->{status} = 8
                 unless (not keys %{$diff} or exists $diff->{U});
         }

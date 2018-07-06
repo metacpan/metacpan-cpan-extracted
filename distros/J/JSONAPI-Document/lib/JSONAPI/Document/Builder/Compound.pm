@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Compound;
-$JSONAPI::Document::Builder::Compound::VERSION = '1.7';
+$JSONAPI::Document::Builder::Compound::VERSION = '2.0';
 =head1 NAME
 
 JSONAPI::Document::Builder::Compound - Compound Resource Document builder
 
 =head1 VERSION
 
-version 1.7
+version 2.0
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,8 @@ sub build_document {
     foreach my $relationship (@{ $self->primary_relationships },
         map { $_ } map { keys(%$_) } @{ $self->nested_relationships })
     {
-        $relationships{$relationship} = $self->build_relationship($relationship);
+        my $relationship_type = $self->format_type($relationship);
+        $relationships{$relationship_type} = $self->build_relationship($relationship);
     }
     if (values(%relationships)) {
         $document->{relationships} = \%relationships;

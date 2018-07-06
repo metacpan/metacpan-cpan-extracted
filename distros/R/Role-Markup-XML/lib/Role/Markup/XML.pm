@@ -64,11 +64,11 @@ Role::Markup::XML - Moo(se) role for bolt-on lazy XML markup
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 
@@ -641,7 +641,7 @@ sub _XML {
         return $p{$adj};
     }
     elsif ($ref eq 'CODE') {
-        return $self->_XML(spec   => $p{spec}->($self, @{$p{args}}),
+        return $self->_XML(spec   => [$p{spec}->($self, @{$p{args}})],
                            $adj   => $p{$adj},
                            doc    => $p{doc},
                            args   => $p{args});
@@ -784,19 +784,28 @@ The C<href> attribute of the C<E<lt>baseE<gt>> element.
 =item ns
 
 A mapping of namespace prefixes to URIs, which by default will appear
-as I<both> XML namespaces I<and> the C<prefix> attribute.
+as I<both> XML namespaces I<and> the C<prefix> attribute. If this
+element is present but false, all namespaces (including the default
+XHTML namespace and any C<xml:lang> attribute) will be left off.
 
 =item prefix
 
-Also a mapping of prefixes to URIs. If this is set rather than C<ns>,
-then the XML namespaces will I<not> be set. Conversely, if this
-parameter is defined but false, then I<only> the contents of C<ns>
-will appear in the conventional C<xmlns:foo> way.
+Also a mapping of namespace prefixes to URIs. This will occupy the
+C<prefix> attribute in the root element. This element can be used to
+specify RDF prefixes distinct from XML namespaces of the actual
+document. If this element is not specified, then the contents of
+L</ns> will be duplicated into the C<prefix> attribute. If it is
+present but false, the C<prefix> attribute will be left off.
 
 =item vocab
 
 This will specify a default C<vocab> attribute in the
 C<E<lt>htmlE<gt>> element, like L<http://www.w3.org/1999/xhtml/vocab/>.
+
+=item lang
+
+This sets a default language via the C<lang> or C<xml:lang>
+attributes, depending on whether namespaces are set.
 
 =item title
 
@@ -1203,6 +1212,9 @@ sub _strip_ns {
         return { map +($_, $ns->namespace_uri($_)->uri_value->uri_value),
                  $ns->list_prefixes };
     }
+    elsif (!defined $ns) {
+        return {};
+    }
     else {
         return $ns;
     }
@@ -1214,8 +1226,14 @@ sub _XHTML {
 
     # ns is empty if prefix has stuff in it
     my $nstemp = _strip_ns($p{ns} || {});
-    my %ns = map +("xmlns:$_" => $nstemp->{$_}), keys %{$nstemp || {}}
-        unless $p{prefix};
+    my $no_ns  = exists $p{ns} && !$p{ns};
+    my %ns;
+
+    unless ($no_ns) {
+        %ns = map +("xmlns:$_" => $nstemp->{$_}), keys %{$nstemp || {}};
+        $ns{xmlns} = XHTMLNS;
+    }
+
 
     # deal with fancy metadata
     my @link = _handle_links($p{link}, $p{uri});
@@ -1231,20 +1249,27 @@ sub _XHTML {
     my %body = (-name => 'body', %{$p{attr} || {}});
     $body{-content} = $p{content} if defined $p{content};
 
+    my %lang = (sprintf('%slang', $no_ns ? '' : 'xml:') => $p{lang})
+        if defined $p{lang};
+
     my @spec = (
         { -doctype => 'html' },
-        { -name => 'html', xmlns => XHTMLNS, %ns,
+        { -name => 'html', %ns, %lang,
           -content => [
               { -name => 'head',
                 -content => [\%title, $base, @link, @meta, @head] }, \%body ] }
     );
 
     # prefix is empty if it is defined but false, otherwise overrides ns
-    my $pfxtemp = _strip_ns($p{prefix}) if $p{prefix};
-    $spec[1]{prefix} = $pfxtemp ? $pfxtemp : defined $pfxtemp ? {} : $nstemp;
+    unless (exists $p{prefix} and !$p{prefix}) {
+        my $pfxtemp = _strip_ns($p{prefix});
+        my $pfxok   = scalar keys %$pfxtemp;
+        $spec[1]{prefix} = $pfxok ? $pfxtemp : $nstemp
+            if $pfxok or keys %$nstemp;
+    }
 
     # add a default vocab too
-    $spec[1]{vocab} = $p{vocab} if $p{vocab};
+    $spec[1]{vocab} = $p{vocab} if defined $p{vocab};
 
     # add transform if present
     unshift @spec, { -pi => 'xml-stylesheet', type => 'text/xsl',
@@ -1259,6 +1284,19 @@ sub _XHTML {
 
     return wantarray ? ($body, $doc) : $body;
 }
+
+=head2 _LOAD %PARAMS|\%PARAMS
+
+This is just a convenience method for L<XML::LibXML/load_xml>. All
+parameters get passed straight through without any modification.
+
+=cut
+
+sub _LOAD {
+    my $self = shift;
+    XML::LibXML->load_xml(@_);
+}
+
 
 =head1 AUTHOR
 

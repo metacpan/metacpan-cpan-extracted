@@ -40,10 +40,47 @@ my %status_map = (
     12 => [ 'Message too long',	'Applies to Binary submissions, where the length of the UDF and the message body combined exceed 140 octets' ],
 );
 
+
+sub new {
+    my ($class,%param) = @_;
+    
+    my $self = bless {}, $class;
+    
+    for my $attr ( @attrs ) {
+        (my $key = $attr) =~ tr/_/-/;
+        $self->$attr( $param{$key} );
+    }
+    
+    my $status = $param{status};
+    
+    if ( exists $status_map{$status} ) {
+        my $info = $status_map{$status};
+        $self->status_text( $info->[0] );
+        $self->status_desc( $info->[1] );
+    }
+    
+    return $self;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Nexmo::SMS::Response::Message - Module that represents a single message in the response from Nexmo SMS API!
+
+=head1 VERSION
+
+version 0.10
+
 =head1 SYNOPSIS
 
 This module represents a single message in a response from Nexmo.
-
 
     use Nexmo::SMS::Response::Message;
 
@@ -78,31 +115,6 @@ create a new object
               }',
     );
 
-=cut
-
-sub new {
-    my ($class,%param) = @_;
-    
-    my $self = bless {}, $class;
-    
-    for my $attr ( @attrs ) {
-        (my $key = $attr) =~ tr/_/-/;
-        $self->$attr( $param{$key} );
-    }
-    
-    my $status = $param{status};
-    
-    if ( exists $status_map{$status} ) {
-        my $info = $status_map{$status};
-        $self->status_text( $info->[0] );
-        $self->status_desc( $info->[1] );
-    }
-    
-    return $self;
-}
-
-1;
-
 =head1 ATTRIBUTES
 
 These attributes are available for C<Nexmo::SMS::TextMessage> objects:
@@ -128,3 +140,16 @@ These attributes are available for C<Nexmo::SMS::TextMessage> objects:
 
 =back
 
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

@@ -31,19 +31,40 @@ Version:        @VERSION@
 Release:        1%{?dist}
 Summary:        Represent and manage a libvirt hypervisor connection
 License:        GPLv2+ or Artistic
-Group:          Development/Libraries
-URL:            http://search.cpan.org/dist/Sys-Virt/
-Source0:        http://www.cpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v%{version}.tar.gz
+URL:            https://metacpan.org/release/Sys-Virt
+Source0:        https://cpan.metacpan.org/authors/id/D/DA/DANBERR/Sys-Virt-v%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+# Build
+BuildRequires:  coreutils
+BuildRequires:  findutils
+BuildRequires:  gcc
+BuildRequires:  libvirt-devel >= %{version}
+BuildRequires:  make
+BuildRequires:  perl-devel
+%if 0%{?fedora} || 0%{?rhel} > 7
+BuildRequires:  perl-interpreter
+BuildRequires:  perl-generators
+%endif
 BuildRequires:  perl(ExtUtils::CBuilder)
 BuildRequires:  perl(Module::Build)
-BuildRequires:  perl(Test::Pod)
-BuildRequires:  perl(Test::Pod::Coverage)
-BuildRequires:  perl(Test::CPAN::Changes)
-BuildRequires:  perl(XML::XPath)
+BuildRequires:  sed
+# Runtime
+BuildRequires:  perl(overload)
+BuildRequires:  perl(strict)
+BuildRequires:  perl(warnings)
+BuildRequires:  perl(XSLoader)
+# Tests only
+BuildRequires:  perl(base)
+BuildRequires:  perl(Sys::Hostname)
+BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Time::HiRes)
-BuildRequires:  libvirt-devel >= %{version}
-Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+BuildRequires:  perl(XML::XPath)
+BuildRequires:  perl(XML::XPath::XMLParser)
+# Optional tests only
+BuildRequires:  perl(Test::CPAN::Changes)
+BuildRequires:  perl(Test::Pod) >= 1.00
+BuildRequires:  perl(Test::Pod::Coverage) >= 1.00
+Requires:       perl(:MODULE_COMPAT_%(eval "$(perl -V:version)"; echo $version))
 
 %description
 The Sys::Virt module provides a Perl XS binding to the libvirt virtual
@@ -61,18 +82,14 @@ virtualization containers to be managed with a consistent API.
 %install
 ./Build install destdir=$RPM_BUILD_ROOT create_packlist=0
 
-#find $RPM_BUILD_ROOT -type f \( -name .packlist -o -name '*.bs' -empty \) |
-#	xargs rm -f
-#find $RPM_BUILD_ROOT -depth -type d -empty -exec rmdir {} \;
-
 %{_fixperms} $RPM_BUILD_ROOT/*
 
 %check
 ./Build test
 
 %files
-%defattr(-,root,root,-)
-%doc AUTHORS Changes LICENSE README examples/
+%license LICENSE
+%doc AUTHORS Changes README examples/
 %{perl_vendorarch}/auto/*
 %{perl_vendorarch}/Sys*
 %{_mandir}/man3/*

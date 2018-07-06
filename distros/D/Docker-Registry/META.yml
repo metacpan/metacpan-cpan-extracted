@@ -3,12 +3,15 @@ abstract: 'A client for talking to Docker Registries'
 author:
   - 'Jose Luis Martínez <joseluis.martinez@capside.com>'
 build_requires:
+  Import::Into: '1.002003'
+  Sub::Override: '0'
   Test::Exception: '0'
   Test::More: '0'
+  Test::Most: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +19,7 @@ meta-spec:
 name: Docker-Registry
 optional_features:
   ecr-registry:
-    description: 'Support for ECR'
+    description: 'support for ecr'
     requires:
       Paws: '0'
   gcr-registry:
@@ -24,17 +27,21 @@ optional_features:
     requires:
       Crypt::JWT: '0'
       Path::Class: '0'
+      URI: '0'
+  gitlab-registry:
+    description: 'support for gitlab'
 requires:
   HTTP::Headers: '0'
   HTTP::Tiny: '0'
   IO::Socket::SSL: '0'
   JSON::MaybeXS: '0'
   Moose: '0'
+  MooseX::Types::Moose: '0'
   Throwable::Error: '0'
   perl: '5.014001'
 resources:
   bugtracker: https://github.com/pplu/docker-registry/issues
   repository: https://github.com/pplu/docker-registry.git
-version: '0.03'
-x_generated_by_perl: v5.20.2
+version: '0.05'
+x_generated_by_perl: v5.22.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

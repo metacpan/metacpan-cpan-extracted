@@ -69,7 +69,7 @@
          "web" : "https://github.com/ology/Lingua-EN-Opinion"
       }
    },
-   "version" : "0.1203",
+   "version" : "0.1300",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

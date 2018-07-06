@@ -41,6 +41,7 @@ use B qw(class
 
 use Carp;
 use B::Deparse;
+use B::DeparseTree::OPflags;
 use B::DeparseTree::PP_OPtable;
 use B::DeparseTree::SyntaxTree;
 
@@ -50,12 +51,12 @@ use B::DeparseTree::SyntaxTree;
 *gv_name = *B::Deparse::gv_name;
 *lex_in_scope = *B::Deparse::lex_in_scope;
 *padname = *B::Deparse::padname;
-*rv2gv_or_string = *B::Deparse::rv2gv_or_string;
 *stash_subs = *B::Deparse::stash_subs;
 *stash_variable = *B::Deparse::stash_variable;
+*todo = *B::Deparse::todo;
 
 our($VERSION, @EXPORT, @ISA);
-$VERSION = '3.2.0';
+$VERSION = '3.3.0';
 @ISA = qw(Exporter);
 @EXPORT = qw(
     %globalnames
@@ -73,18 +74,19 @@ $VERSION = '3.2.0';
     new
     next_todo
     pragmata
-    print_protos
     seq_subs
     style_opts
+    todo
     );
 
 use Config;
 my $is_cperl = $Config::Config{usecperl};
 
 my $module;
-if ($] >= 5.016 and $] < 5.018) {
-    # 5.16 and 5.18 are the same for now
-    $module = "P518";
+if ($] >= 5.014 and $] < 5.016) {
+    $module = "P514";
+} elsif ($] >= 5.016 and $] < 5.018) {
+    $module = "P516";
 } elsif ($] >= 5.018 and $] < 5.020) {
     $module = "P518";
 } elsif ($] >= 5.020 and $] < 5.022) {
@@ -163,11 +165,8 @@ sub new {
     # OP for that. FIXME: remove this
     $self->{optree} = {};
 
-    # Extra opcode information: parent_op
-    $self->{ops} = {};
-
-    # For B::DeparseTree::Node's that are created and don't have real OPs associated
-    # with them, we assign a fake address;
+    # For B::DeparseTree::TreeNode's that are created and don't have
+    # real OPs associated with them, we assign a fake address;
     $self->{'last_fake_addr'} = 0;
 
     $self->init();
@@ -227,9 +226,12 @@ sub init {
     delete $self->{'subs_declared'};
 }
 
-BEGIN { for (qw[ pushmark ]) {
-    eval "sub OP_\U$_ () { " . opnumber($_) . "}"
-}}
+BEGIN {
+    for (qw[ pushmark ])
+    {
+	eval "sub OP_\U$_ () { " . opnumber($_) . "}"
+    }
+}
 
 sub main2info
 {
@@ -242,18 +244,29 @@ sub main2info
 sub coderef2info
 {
     my ($self, $coderef, $start_op) = @_;
-    croak "Usage: ->coderef2info(CODEREF)" unless UNIVERSAL::isa($coderef, "CODE");
-    $self->init();
-    return $self->deparse_sub(svref_2object($coderef), $start_op);
+    my $cv = svref_2object ( $coderef );
+    my $gv = $cv->GV;
+    if ($gv->NAME eq 'main') {
+	return $self->main2info();
+    } else {
+	croak "Usage: ->coderef2info(CODEREF)"
+	    unless UNIVERSAL::isa($coderef, "CODE");
+	$self->init();
+	return $self->deparse_sub($cv, $start_op);
+    }
 }
 
 sub coderef2text
 {
     my ($self, $func) = @_;
-    croak "Usage: ->coderef2text(CODEREF)" unless UNIVERSAL::isa($func, "CODE");
-
-    $self->init();
-    my $info = $self->coderef2info($func);
+    my $info;
+    if ($func eq 'main::main') {
+	$info = $self->main2info();
+    } else {
+	croak "Usage: ->coderef2text(CODEREF)" unless UNIVERSAL::isa($func, "CODE");
+	$self->init();
+	$info = $self->coderef2info($func);
+    }
     return $self->info2str($info);
 }
 
@@ -266,16 +279,17 @@ sub const {
     if (class($sv) eq "SPECIAL") {
 	# sv_undef, sv_yes, sv_no
 	my $text = ('undef', '1', $self->maybe_parens("!1", $cx, 21))[$$sv-1];
-	return info_from_text($sv, $self, $text, 'const_special', {});
+	return $self->info_from_string('const: special', $sv, $text);
     }
     if (class($sv) eq "NULL") {
-	return info_from_text($sv, $self, 'undef', 'const_NULL', {});
+	return $self->info_from_string('const: NULL', $sv, 'undef');
     }
     # convert a version object into the "v1.2.3" string in its V magic
     if ($sv->FLAGS & SVs_RMG) {
 	for (my $mg = $sv->MAGIC; $mg; $mg = $mg->MOREMAGIC) {
 	    if ($mg->TYPE eq 'V') {
-		return info_from_text($sv, $self, $mg->PTR, 'const_magic', {});
+		return $self->info_from_string('const_magic', $sv,
+					       $mg->PTR);
 	    }
 	}
     }
@@ -283,27 +297,32 @@ sub const {
     if ($sv->FLAGS & SVf_IOK) {
 	my $str = $sv->int_value;
 	$str = $self->maybe_parens($str, $cx, 21) if $str < 0;
-	return $self->info_from_string("integer constant $str", $sv, $str);
+	return $self->info_from_string("const: integer $str", $sv, $str);
     } elsif ($sv->FLAGS & SVf_NOK) {
 	my $nv = $sv->NV;
 	if ($nv == 0) {
 	    if (pack("F", $nv) eq pack("F", 0)) {
 		# positive zero
-		return info_from_text($sv, $self, "0", 'constant float positive 0', {});
+		return $self->info_from_string('const: float positive 0',
+					       $sv,
+					       "0");
 	    } else {
 		# negative zero
-		return info_from_text($sv, $self, $self->maybe_parens("-.0", $cx, 21),
-				 'constant float negative 0', {});
+		return $self->info_from_string('const: float negative 0',
+					       $sv, $self,
+					       $self->maybe_parens("-.0", $cx, 21));
 	    }
 	} elsif (1/$nv == 0) {
 	    if ($nv > 0) {
 		# positive infinity
-		return info_from_text($sv, $self, $self->maybe_parens("9**9**9", $cx, 22),
-				 'constant float +infinity', {});
+		return $self->info_from_string('const: float +infinity',
+					       $sv,
+					       $self->maybe_parens("9**9**9", $cx, 22));
 	    } else {
 		# negative infinity
-		return info_from_text($sv, $self, $self->maybe_parens("-9**9**9", $cx, 21),
-				 'constant float -infinity', {});
+		return $self->info_from_string('const: float -infinity',
+					       $sv,
+					       $self->maybe_parens("-9**9**9", $cx, 21));
 	    }
 	} elsif ($nv != $nv) {
 	    # NaN
@@ -313,12 +332,12 @@ sub const {
 	    } elsif (pack("F", $nv) eq pack("F", -sin(9**9**9))) {
 		# the inverted kind
 		return info_from_text($sv, $self, $self->maybe_parens("-sin(9**9**9)", $cx, 21),
-				 'constant float Nan invert', {});
+				 'const: float Nan invert', {});
 	    } else {
 		# some other kind
 		my $hex = unpack("h*", pack("F", $nv));
 		return info_from_text($sv, $self, qq'unpack("F", pack("h*", "$hex"))',
-				 'constant Na na na', {});
+				 'const: Na na na', {});
 	    }
 	}
 	# first, try the default stringification
@@ -330,9 +349,9 @@ sub const {
 	    if ($str != $nv) {
 		# not representable in decimal with whatever sprintf()
 		# and atof() Perl is using here.
-		my($mant, $exp) = split_float($nv);
+		my($mant, $exp) = B::Deparse::split_float($nv);
 		return info_from_text($sv, $self, $self->maybe_parens("$mant * 2**$exp", $cx, 19),
-				 'constant float not-sprintf/atof-able', {});
+				 'const: float not-sprintf/atof-able', {});
 	    }
 	}
 	$str = $self->maybe_parens($str, $cx, 21) if $nv < 0;
@@ -394,7 +413,7 @@ sub const {
 	    return $self->single_delim($sv, "q", "'", B::Deparse::unback $str);
 	}
     } else {
-	return info_from_text($sv, $self, "undef", 'constant undef', {});
+	return $self->info_from_string('const: undef', $sv, "undef");
     }
 }
 
@@ -407,9 +426,10 @@ sub const_dumper
     $dumper->Purity(1)->Terse(1)->Deparse(1)->Indent(0)->Useqq(1)->Sortkeys(1);
     my $str = $dumper->Dump();
     if ($str =~ /^\$v/) {
+	# FIXME: ???
         return info_from_text($sv, $self, ['${my', $str, '\$v}'], 'const_dumper_my', {});
     } else {
-        return info_from_text($sv, $self, $str, 'constant dumper', {});
+        return $self->info_from_string("constant string", $sv, $str);
     }
 }
 
@@ -436,10 +456,7 @@ sub deparse_root {
 	$info->{type} = $op->name;
 	$info->{op} = $op;
 
-	# FIXME: this is going away...
 	$self->{optree}{$$op} = $info;
-	# in favor of...
-	$self->{ops}{$$op}{info} = $info;
 
 	$info->{text} = $text;
 	$info->{parent} = $$parent if $parent;
@@ -462,8 +479,10 @@ sub update_node($$$$)
 {
     my ($self, $node, $prev_expr, $op) = @_;
     $node->{prev_expr} = $prev_expr;
-    $self->{optree}{$$op} = $node if $op;
-    $self->{ops}{$$op}{info} = $node if $op;
+    my $addr = $prev_expr->{addr};
+    if ($addr && ! exists $self->{optree}{$addr}) {
+	$self->{optree}{$addr} = $node if $op;
+    }
 }
 
 sub walk_lineseq
@@ -478,12 +497,10 @@ sub walk_lineseq
 	if (B::Deparse::is_state $kids[$i]) {
 	    $expr = ($self->deparse($kids[$i], 0, $op));
 	    $callback->(\@body, $i, $expr, $op);
-	    $self->update_node($expr, $prev_expr, $op);
 	    $prev_expr = $expr;
 	    if ($fix_cop) {
 		$fix_cop->{text} = $expr->{text};
 	    }
-
 	    $i++;
 	    if ($i > $#kids) {
 		last;
@@ -494,7 +511,6 @@ sub walk_lineseq
 	    $callback->(\@body,
 			$i += $kids[$i]->sibling->name eq "unstack" ? 2 : 1,
 			$loop_expr);
-	    $self->update_node($expr, $prev_expr, $op);
 	    $prev_expr = $expr;
 	    next;
 	}
@@ -503,7 +519,9 @@ sub walk_lineseq
 	# Perform semantic action on $expr accumulating the result
 	# in @body. $op is the parent, and $i is the child position
 	$callback->(\@body, $i, $expr, $op);
-	$self->update_node($expr, $prev_expr, $op);
+	unless (exists $expr->{prev_expr}) {
+	    $self->update_node($expr, $prev_expr, $op);
+	}
 	$prev_expr = $expr;
 	if ($fix_cop) {
 	    $fix_cop->{text} = $expr->{text};
@@ -559,30 +577,11 @@ sub lineseq {
 	    $info->{parent} = $$parent ;
 	}
 
-	# FIXME: remove optree?
 	$self->{optree}{$$op} = $info;
-	$self->{ops}{$$op}{info} = $info;
 
 	push @$exprs, $info;
     };
     return $self->walk_lineseq($root, \@ops, $fn);
-}
-
-sub todo
-{
-    my $self = shift;
-    my($cv, $is_form, $name) = @_;
-    my $cvfile = $cv->FILE//'';
-    return unless ($cvfile eq $0 || exists $self->{files}{$cvfile});
-    my $seq;
-    if ($cv->OUTSIDE_SEQ) {
-	$seq = $cv->OUTSIDE_SEQ;
-    } elsif (!B::Deparse::null($cv->START) and B::Deparse::is_state($cv->START)) {
-	$seq = $cv->START->cop_seq;
-    } else {
-	$seq = 0;
-    }
-    push @{$self->{'subs_todo'}}, [$seq, $cv, $is_form, $name];
 }
 
 # _pessimise_walk(): recursively walk the optree of a sub,
@@ -701,22 +700,6 @@ sub pessimise {
     $self->_pessimise_walk_exe($start, \%visited);
 }
 
-sub print_protos {
-    my $self = shift;
-    my $ar;
-    my @ret;
-    foreach $ar (@{$self->{'protos_todo'}}) {
-	my $proto = defined $ar->[1]
-		? ref $ar->[1]
-		    ? " () {\n    " . $self->const($ar->[1]->RV,0) . ";\n}"
-		    : " (". $ar->[1] . ");"
-		: ";";
-	push @ret, "sub " . $ar->[0] .  "$proto\n";
-    }
-    delete $self->{'protos_todo'};
-    return @ret;
-}
-
 sub style_opts
 {
     my ($self, $opts) = @_;
@@ -736,6 +719,36 @@ sub style_opts
 	    $self->{'ex_const'} = $1;
 	}
     }
+}
+
+# B::Deparse name is print_protos
+sub extract_prototypes($)
+{
+    my $self = shift;
+    my $ar;
+    my @ret;
+    foreach $ar (@{$self->{'protos_todo'}}) {
+	my $body;
+	if (defined $ar->[1]) {
+	    if (ref $ar->[1]) {
+		# FIXME: better optree tracking?
+		# And use formatting markup?
+		my $node = $self->const($ar->[1]->RV,0);
+		my $body_node =
+		    $self->info_from_template("protos", undef,
+					      "() {\n    %c;\n}",
+					      undef, [$node]);
+		$body = $body_node->{text};
+	    } else {
+		$body = sprintf " (%s);", $ar->[1];
+	    }
+	} else {
+	    $body = ";";
+	}
+	push @ret, sprintf "sub %s%s\n", $ar->[0], $body;
+    }
+    delete $self->{'protos_todo'};
+    return @ret;
 }
 
 # This gets called automatically when option:
@@ -766,7 +779,7 @@ sub compile {
 	my @ENDs    = B::end_av->isa("B::AV") ? B::end_av->ARRAY : ();
 	if ($] < 5.020) {
 	    for my $block (@BEGINs, @UNITCHECKs, @CHECKs, @INITs, @ENDs) {
-		$self->todo($block, 0);
+		$self->B::Deparse::todo($block, 0);
 	    }
 	} else {
 	    my @names = qw(BEGIN UNITCHECK CHECK INIT END);
@@ -778,7 +791,7 @@ sub compile {
 		}
 	    }
         }
-	$self->stash_subs();
+	$self->B::Deparse::stash_subs();
 	local($SIG{"__DIE__"}) =
 	    sub {
 		if ($self->{'curcop'}) {
@@ -792,7 +805,7 @@ sub compile {
 	    };
 	$self->{'curcv'} = main_cv;
 	$self->{'curcvlex'} = undef;
-	print $self->print_protos;
+	print $self->extract_prototypes;
 	@{$self->{'subs_todo'}} =
 	  sort {$a->[0] <=> $b->[0]} @{$self->{'subs_todo'}};
 	my $root = main_root;
@@ -924,7 +937,7 @@ sub deparse
 
     Carp::confess("nonref return for $meth deparse: $info") if !ref($info);
     Carp::confess("not B::DeparseTree:Node returned for $meth: $info")
-	if !$info->isa("B::DeparseTree::Node");
+	if !$info->isa("B::DeparseTree::TreeNode");
     $info->{parent} = $$parent if $parent;
     $info->{cop} = $self->{'curcop'};
     my $got_op = $info->{op};
@@ -942,15 +955,15 @@ sub deparse
 	foreach my $other (@{$info->{other_ops}}) {
 	    if (!ref $other) {
 		Carp::confess "$meth returns invalid other $other";
-	    } elsif ($other->isa("B::DeparseTree::Node")) {
+	    } elsif ($other->isa("B::DeparseTree::TreeNode")) {
 		# "$other" has been set up to mark a particular portion
 		# of the info.
 		$self->{optree}{$other->{addr}} = $other;
 		$other->{parent} = $$op;
 	    } else {
-		# "$other" is just the OP. Have it mark everything
-		# or "info".
-		$self->{optree}{$$other} = $info;
+	    	# "$other" is just the OP. Have it mark everything
+	    	# or "info".
+	    	$self->{optree}{$$other} = $info;
 	    }
 	}
     }
@@ -1002,17 +1015,17 @@ sub deparse_sub($$$$)
 	    my $scope_en = $self->find_scope_en($lineseq);
 	}
 	elsif ($start_op) {
-	    $body = $self->deparse($start_op, 0, $root);
+	    $body = $self->deparse($start_op, 0, $lineseq);
 	} else {
-	    $body = $self->deparse($root->first, 0, $root);
+	    $body = $self->deparse($root->first, 0, $lineseq);
 	}
 
 	my $fn_name = $cv->GV->NAME;
 	$node = $self->info_from_template("sub $fn_name$proto",
-					  $root,
+					  $lineseq,
 					  "$proto\n%|{\n%+%c\n%-}",
 					  [0], [$body]);
-
+	$body->{parent} = $$lineseq;
 	$self->{optree}{$$lineseq} = $node;
 
     } else {
@@ -1028,6 +1041,9 @@ sub deparse_sub($$$$)
 	}
     }
 
+
+    # Should we create a real node for this instead of the copy?
+    $self->{optree}{$$root} = $node;
 
     # Add additional DeparseTree tracking info
     if ($start_op) {
@@ -1047,10 +1063,50 @@ sub next_todo
 {
     my ($self, $parent) = @_;
     my $ent = shift @{$self->{'subs_todo'}};
-    my $cv = $ent->[1];
+    my ($seq, $cv, $is_form, $name) = @$ent;
+
+    # any 'use strict; package foo' that should come before the sub
+    # declaration to sync with the first COP of the sub
+
+    ## FIXME: $self->pragmata messes scoping up, although I don't know
+    ## how it does that.
+    # my $pragmata = '';
+    # if ($cv and !B::Deparse::null($cv->START) and B::Deparse::is_state($cv->START))  {
+    #     $pragmata = $self->B::Deparse::pragmata($cv->START);
+    # }
+
+    # if (ref $name) { # lexical sub
+    # 	# emit the sub.
+    # 	my @text;
+    # 	my $flags = $name->FLAGS;
+    # 	push @text,
+    # 	    !$cv || $seq <= $name->COP_SEQ_RANGE_LOW
+    # 		? $self->keyword($flags & B::SVpad_OUR
+    # 				    ? "our"
+    # 				    : $flags & SVpad_STATE
+    # 					? "state"
+    # 					: "my") . " "
+    # 		: "";
+    # 	# XXX We would do $self->keyword("sub"), but ‘my CORE::sub’
+    # 	#     doesn’t work and ‘my sub’ ignores a &sub in scope.  I.e.,
+    # 	#     we have a core bug here.
+    # 	push @text, "sub " . substr $name->PVX, 1;
+    # 	my $text = join('', @text);
+    # 	if ($cv) {
+    # 	    # my sub foo { }
+    # 	    my $cv_node = $self->deparse_sub($cv);
+    # 	    my $fmt = sprintf("%s%s%%c", $pragmata, $text);
+    # 	    return $self->info_from_template("sub", $cv,
+    # 					     $fmt, undef,
+    # 					     [$cv_node]);
+    # 	} else {
+    # 	    return $self->info_from_string("sub no body", $cv, $text);
+    # 	}
+    # }
+
     my $gv = $cv->GV;
-    my $name = $self->gv_name($gv);
-    if ($ent->[2]) {
+    $name //= $self->gv_name($gv);
+    if ($is_form) {
 	my $node = $self->deparse_format($ent->[1], $cv);
 	return $self->info_from_template("format $name",
 					 "format $name = %c",
@@ -1088,7 +1144,10 @@ sub next_todo
 	}
 	my $node = $self->deparse_sub($cv, $parent);
 	$fmt .= '%c';
-	return $self->info_from_template($type, $cv, $fmt, [0], [$node]);
+	my $sub_node = $self->info_from_template($type, $cv, $fmt, [0], [$node]);
+	$node->{parent} = $sub_node->{addr};
+	$self->{optree}{$$cv} = $sub_node;
+	return $sub_node;
     }
 }
 
@@ -1098,8 +1157,10 @@ sub deparse_subname($$)
     my ($self, $funcname) = @_;
     my $cv = svref_2object(\&$funcname);
     my $info = $self->deparse_sub($cv);
-    return $self->info_from_template("sub $funcname", $cv, "sub $funcname %c",
-				 undef, [$info]);
+    my $sub_node =  $self->info_from_template("sub $funcname", $cv, "sub $funcname %c",
+					      undef, [$info]);
+    $self->{optree}{$$cv} = $sub_node;
+    return $sub_node;
 }
 
 # Return a list of info nodes for "use" and "no" pragmas.
@@ -1136,8 +1197,12 @@ my %rev_feature;
 
 sub declare_hinthash {
     my ($self, $from, $to, $indent, $hints) = @_;
-    my $doing_features =
-	($hints & $feature::hint_mask) == $feature::hint_mask;
+    my $doing_features;
+    if ($] >= 5.016) {
+	$doing_features = ($hints & $feature::hint_mask) == $feature::hint_mask;
+    } else {
+	$doing_features = 0;
+    }
     my @decls;
     my @features;
     my @unfeatures; # bugs?
@@ -1146,6 +1211,10 @@ sub declare_hinthash {
 	my $is_feature = $key =~ /^feature_/ && $^V ge 5.15.6;
 	next if $is_feature and not $doing_features;
 	if (!exists $from->{$key} or $from->{$key} ne $to->{$key}) {
+	    if ($is_cperl){
+		next if $key eq 'feature_lexsubs';
+		next if $key eq 'feature_signatures';
+	    }
 	    push(@features, $key), next if $is_feature;
 	    push @decls,
 		qq(\$^H{) . single_delim($self, "q", "'", $key, "'") . qq(} = )
@@ -1282,18 +1351,16 @@ sub declare_warnings
     my ($self, $from, $to) = @_;
     if (($to & WARN_MASK) eq (warnings::bits("all") & WARN_MASK)) {
 	my $type = $self->keyword("use") . " warnings";
-	return $self->info_from_template($type, undef, "$type;\n",
-					 [], []);
+	return $self->info_from_string($type, undef, "$type");
     }
     elsif (($to & WARN_MASK) eq ("\0"x length($to) & WARN_MASK)) {
 	my $type = $self->keyword("no") . " warnings";
-	return $self->info_from_template($type, undef, "$type;\n",
-					 [], []);
+	return $self->info_from_string($type, undef, "$type");
     }
     my $bit_expr = join('', map { sprintf("\\x%02x", ord $_) } split "", $to);
     my $str = "BEGIN {\n%+\${^WARNING_BITS} = \"$bit_expr;\n%-";
     return $self->info_from_template('warning bits begin', undef,
-				     "%|$str\n", [], [], {omit_next_semicolon=>1});
+				   "$str", [], [], {omit_next_semicolon=>1});
 }
 
 # Iterate over $self->{subs_todo} picking up the

@@ -18,6 +18,7 @@ META.yml
 README
 t/00-load.t
 t/01-basic.t
+t/02-xhtml.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

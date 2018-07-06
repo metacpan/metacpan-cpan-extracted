@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,23 +17,24 @@ name: Class-Type-Enum
 provides:
   Class::Type::Enum:
     file: lib/Class/Type/Enum.pm
-    version: '0.009'
+    version: '0.011'
   DBIx::Class::InflateColumn::ClassTypeEnum:
     file: lib/DBIx/Class/InflateColumn/ClassTypeEnum.pm
-    version: '0.009'
+    version: '0.011'
 requires:
   Carp: '0'
   Class::Method::Modifiers: '0'
-  Function::Parameters: '2'
   List::Util: '1.33'
+  Moo: '1.00600'
   Scalar::Util: '0'
   namespace::clean: '0'
   overload: '0'
-  perl: v5.12.0
+  perl: v5.8.6
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/merrilymeredith/p5-Class-Type-Enum/issues
   homepage: http://metacpan.org/release/Class-Type-Enum/
   repository: git://github.com/merrilymeredith/p5-Class-Type-Enum.git
-version: '0.009'
+version: '0.011'
+x_serialization_backend: 'YAML::Tiny version 1.70'

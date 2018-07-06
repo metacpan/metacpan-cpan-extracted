@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.015';
+our $VERSION = '2.016';
 
 use Term::Form qw();
 

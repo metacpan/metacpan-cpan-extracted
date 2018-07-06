@@ -5,13 +5,14 @@ WriteMakefile
   'NAME' => 'App::Devel::MAT::Explorer::GTK',
   'VERSION_FROM' => 'lib/App/Devel/MAT/Explorer/GTK.pm',
   'PREREQ_PM' => {
-                   'Devel::MAT' => '0.23',
+                   'Devel::MAT' => '0.31',
                    'File::ShareDir' => 0,
                    'Glib' => 0,
                    'Gtk2' => 0,
                    'Gtk2::SimpleList' => 0,
                    'List::Util' => '1.29',
                    'List::UtilsBy' => 0,
+                   'String::Tagged' => '0.15',
                    'Struct::Dumb' => 0
                  },
   'INSTALLDIRS' => 'site',

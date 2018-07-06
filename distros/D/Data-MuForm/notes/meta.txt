@@ -1,0 +1,16 @@
+[14:33]             * | mst thought has_field created an attribute and some other stuff
+[14:33]        gshank | https://github.com/gshank/html-formhandler/blob/master/lib/HTML/FormHandler/Moose.pm
+[14:34] < mst> right, so it's attached to the meta object, which is about 99% of the way to just being a special sort of class data
+[14:35]        gshank | yeah. I got a first attempt working at class data, but it all gets put into my role class, and then the next form to get build 
+          has the wrong fields
+[14:35] < mst> so, the trick there is that you build it up as around modifiers
+[14:35] < mst> sub field_info {}
+[14:36] < mst> around field_info => sub { my ($orig, $self) = (shift, shift); { %{$self->$orig()}, %local } };
+[14:36] < mst> and then your has_field export can close over %local too
+[14:37]        «Quit» | kentnl (~kentnl@203.86.205.69) has signed off (Ping timeout: 360 seconds)
+[14:37]             * | mst starts to think that's enough of a pattern it deserves a blog post
+[14:37]        gshank | :-)
+[14:38] < mst> MooX::Options does something like that IIRC
+[14:38]        gshank | I'll take a look at that
+[14:40] < mst> yeah, it installs basic C3 methods so you can do multiple inheritance -as well- then around()s them
+

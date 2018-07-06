@@ -1220,6 +1220,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   
                   return DESCRIPTOR;
                 }
+                else if (strcmp(keyword, "pointer") == 0) {
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_POINTER, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
+                  
+                  return DESCRIPTOR;
+                }
                 break;
               case 'r' :
                 if (strcmp(keyword, "return") == 0) {
@@ -1257,12 +1263,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   
                   return SCALAR;
                 }
-                else if (strcmp(keyword, "struct") == 0) {
-                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_STRUCT, compiler->cur_file, compiler->cur_line);
-                  yylvalp->opval = op_descriptor;
-                  
-                  return DESCRIPTOR;
-                }
                 break;
               case 'u' :
                 if (strcmp(keyword, "undef") == 0) {
@@ -1297,6 +1297,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
                 break;
             }
+          }
+          
+          // Symbol name can't conatain __
+          if (strstr(keyword, "__")) {
+            fprintf(stderr, "Symbol name can't contain __ at %s line %" PRId32 "\n", compiler->cur_file, compiler->cur_line);
+            exit(1);
           }
           
           SPVM_OP* op_name = SPVM_OP_new_op_name(compiler, keyword, compiler->cur_file, compiler->cur_line);

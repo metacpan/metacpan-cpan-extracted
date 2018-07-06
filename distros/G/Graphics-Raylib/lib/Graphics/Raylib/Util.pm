@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Util;
 
 # ABSTRACT: Utility functions for use with Graphics::Raylib::XS
-our $VERSION = '0.019'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use List::Util qw(reduce);
 use Graphics::Raylib::XS qw(:all);
@@ -37,13 +37,13 @@ Graphics::Raylib::Util - Utility functions for use With Graphics::Raylib::XS
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
     use Graphics::Raylib::Util;
 
-    # returns Graphics::Raylib::XS::{Vector2,Vector3} depending on scalar @coords
+    # returns Graphics::Raylib::XS::{Vector2,Vector3, Vector4} depending on scalar @coords
     my $vector = Graphics::Raylib::Util::vector(@coords);
 
 =head1 DESCRIPTION
@@ -56,7 +56,7 @@ Raylib deals a lot in value-passed structs. This module builds these structs.
 
 =item vector(@coords)
 
-Constructs a C<Graphics::Raylib::XS::Vector2> or C<Graphics::Raylib::XS::Vector3> depending on number of arguments. Croaks otherwise.
+Constructs a C<Graphics::Raylib::XS::Vector2>, C<Graphics::Raylib::XS::Vector3> or C<Graphics::Raylib::XS::Vector4> depending on number of arguments. Croaks otherwise.
 
     typedef struct Vector2 {
         float x;
@@ -67,6 +67,13 @@ Constructs a C<Graphics::Raylib::XS::Vector2> or C<Graphics::Raylib::XS::Vector3
         float x;
         float y;
         float z;
+    } Vector3;
+
+    typedef struct Vector4 {
+        float x;
+        float y;
+        float z;
+        float w;
     } Vector3;
 
 =cut
@@ -80,17 +87,20 @@ sub vector {
         } elsif (blessed($obj)) {
             return $obj if $obj->isa("Graphics::Raylib::XS::Vector2");
             return $obj if $obj->isa("Graphics::Raylib::XS::Vector3");
+            return $obj if $obj->isa("Graphics::Raylib::XS::Vector4");
         }
     }
 
     my $vector = @coords == 2 ? __vector2(pack("f2", @coords))
                : @coords == 3 ? __vector3(pack("f3", @coords))
-               : croak "Only Graphics::Raylib::XS::{Vector2,Vector3} types may be constructed";
+               : @coords == 4 ? __vector4(pack("f4", @coords))
+               : croak "Only Graphics::Raylib::XS::Vector{2,3,4} types may be constructed";
 
     return $vector;
 }
 sub __vector2 { my $binstr = shift; bless \$binstr, 'Graphics::Raylib::XS::Vector2' }
 sub __vector3 { my $binstr = shift; bless \$binstr, 'Graphics::Raylib::XS::Vector3' }
+sub __vector4 { my $binstr = shift; bless \$binstr, 'Graphics::Raylib::XS::Vector4' }
 
 sub vabs { sqrt reduce { $a + $b } map({ $_ ** 2 } $_[0]->components) }
 
@@ -133,6 +143,27 @@ sub vabs { sqrt reduce { $a + $b } map({ $_ ** 2 } $_[0]->components) }
     }
     use overload fallback => 1, '""' => 'stringify', '+' => 'add', '==' => 'equal', 'abs' => 'Graphics::Raylib::Util::vabs';
     use constant Zero => Graphics::Raylib::Util::vector(0,0,0);
+
+    package Graphics::Raylib::XS::Vector4;
+    sub x { return unpack(      "f", ${$_[0]}) }
+    sub y { return unpack("x[f]  f", ${$_[0]}) }
+    sub z { return unpack("x[ff] f", ${$_[0]}) }
+    sub w { return unpack("x[fff]f", ${$_[0]}) }
+    sub components { return unpack("f4", ${$_[0]}) }
+    sub stringify {
+        my ($self) = @_;
+        return sprintf '(%d, %d, %d, %d)', $self->components;
+    }
+    sub add {
+        my ($self, $other, $swap) = @_;
+        return Graphics::Raylib::Util::vector($self->x + $other->x, $self->y + $other->y, $self->z + $other->z, $self->w + $other->w);
+    }
+    sub equal {
+        my ($self, $other) = @_;
+        $$self eq $$other
+    }
+    use overload fallback => 1, '""' => 'stringify', '+' => 'add', '==' => 'equal', 'abs' => 'Graphics::Raylib::Util::vabs';
+    use constant Zero => Graphics::Raylib::Util::vector(0,0,0,0);
 }
 
 

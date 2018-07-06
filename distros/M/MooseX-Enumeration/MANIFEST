@@ -22,5 +22,7 @@ t/02moosey.t
 t/03typetiny.t
 t/04matchsimple.t
 t/05assign.t
+t/06lazy.t
+t/07triggers.t
 t/91exceptions.t
 t/rt96312.t

@@ -2014,6 +2014,20 @@ at the moment when the threshold was reached.
 Changes the actions of lifecycle events for domain represented as
 <on_$type>$action</on_$type> in the domain XML.
 
+=item $info = $dom->get_launch_security_info($flags=0)
+
+Get information about the domaim launch security policy. C<$flags>
+is currently unused and defaults to zero. The returned hash may
+contain the following keys
+
+=over 4
+
+=item Sys::Virt::Domain::LAUNCH_SECURITY_SEV_MEASUREMENT
+
+The AMD SEV launch measurement
+
+=back
+
 =back
 
 =head1 CONSTANTS
@@ -4111,6 +4125,10 @@ Require that all requested stats fields are returned
 =item Sys::Virt::Domain::GET_ALL_STATS_BACKING
 
 Get stats for image backing files too
+
+=item Sys::Virt::Domain::GET_ALL_STATS_NOWAIT
+
+Skip stats if they can't be acquired without waiting
 
 =back
 

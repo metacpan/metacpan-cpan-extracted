@@ -1,0 +1,63 @@
+{
+   "abstract" : "Emulate Class::Accessor::Fast behavior using Moose attributes",
+   "author" : [
+      "Guillermo Roditi (groditi) <groditi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MooseX-Emulate-Class-Accessor-Fast",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0.84",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-MooseX-Emulate-Class-Accessor-Fast@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Emulate-Class-Accessor-Fast"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/moose/MooseX-Emulate-Class-Accessor-Fast.git",
+         "web" : "https://github.com/moose/MooseX-Emulate-Class-Accessor-Fast"
+      },
+      "x_IRC" : "irc://irc.perl.org/#moose"
+   },
+   "version" : "0.009032",
+   "x_authority" : "cpan:HAARG",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

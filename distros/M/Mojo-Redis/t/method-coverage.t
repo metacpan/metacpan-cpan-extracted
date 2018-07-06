@@ -4,17 +4,16 @@ use Mojo::Util 'trim';
 use Mojo::Redis::Cursor;
 use Mojo::Redis::Database;
 use Mojo::Redis::PubSub;
-use Mojo::Redis::Transaction;
 use Mojo::UserAgent;
 
 plan skip_all => 'CHECK_METHOD_COVERAGE=1' unless $ENV{CHECK_METHOD_COVERAGE};
 
 my $methods = Mojo::UserAgent->new->get('https://redis.io/commands')->res->dom->find('[data-name]');
-my @classes = qw(Mojo::Redis::Database Mojo::Redis::PubSub Mojo::Redis::Transaction);
+my @classes = qw(Mojo::Redis::Database Mojo::Redis::PubSub);
 my (%doc, %skip);
 
 $skip{method}{$_} = 1 for qw(auth hscan quit migrate pubsub scan select sscan swapdb wait zscan);
-$skip{group}{$_}  = 1 for qw(cluster scripting server stream);
+$skip{group}{$_}  = 1 for qw(cluster server stream);
 
 $methods = $methods->map(sub {
   $doc{$_->{'data-name'}} = [
@@ -41,6 +40,7 @@ for my $t (sort { "@$a" cmp "@$b" } @$methods) {
 
   $method = 'listen'   if $method =~ /subscribe$/;
   $method = 'unlisten' if $method =~ /unsubscribe$/;
+  $method = 'script'   if $method =~ /^script_/;
 
 REDIS_CLASS:
   for my $class (@classes) {
@@ -55,7 +55,12 @@ if (open my $SRC, '<', $INC{'Mojo/Redis/Database.pm'}) {
   my %has_doc;
   /^=head2 (\w+)/ and $has_doc{$1} = 1 for <$SRC>;
 
-  for my $method (sort @Mojo::Redis::Database::BASIC_COMMANDS, @Mojo::Redis::Database::BLOCKING_COMMANDS) {
+  for my $method (
+    sort @Mojo::Redis::Database::BASIC_COMMANDS,
+    @Mojo::Redis::Database::BLOCKING_COMMANDS,
+    qw(exec discard multi watch unwatch)
+    )
+  {
     next if $has_doc{$method} or !$doc{$method};
     my ($summary, $args) = @{$doc{$method}};
     $summary .= '.' unless $summary =~ /\W$/;

@@ -5,7 +5,7 @@ some useful directions that could help with this module.
 
 If you want to help:
 
-  * Don't change the public interface.  You can add to it, but don't
+  * Don't break the public interface.  You can add to it, but don't
     break code that already depends on this interface.
   * I'll take bug reports however you want to send them (RT, Github
     issue, email, etc).  My preference is for Github issues.

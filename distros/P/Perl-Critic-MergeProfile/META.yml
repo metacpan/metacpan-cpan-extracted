@@ -1,0 +1,44 @@
+---
+abstract: 'merge multiple Perl::Critic profiles into one'
+author:
+  - 'Sven Kirmess <sven.kirmess@kzone.ch>'
+build_requires:
+  Test::Fatal: '0'
+  Test::MockModule: '0'
+  Test::More: '0.88'
+  Test::TempDir::Tiny: '0.017'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-MergeProfile
+no_index:
+  directory:
+    - corpus
+    - t
+    - xt
+provides:
+  Perl::Critic::MergeProfile:
+    file: lib/Perl/Critic/MergeProfile.pm
+    version: '0.002'
+requires:
+  Carp: '0'
+  Config::Tiny: '0'
+  Scalar::Util: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/skirmess/Perl-Critic-MergeProfile/issues
+  homepage: https://github.com/skirmess/Perl-Critic-MergeProfile
+  repository: https://github.com/skirmess/Perl-Critic-MergeProfile.git
+version: '0.002'
+x_generated_by_perl: v5.24.0
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,115 @@
+{
+   "abstract" : "A collection of handy Perl::Critic policies",
+   "author" : [
+      "Renee Baecker <module@renee-baecker.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-OTRS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic" : "1.105",
+            "Readonly" : "1.03",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Warnings" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::OTRS" : {
+         "file" : "lib/Perl/Critic/OTRS.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::ProhibitDumper" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/ProhibitDumper.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::ProhibitFetchrowHashref" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/ProhibitFetchrowHashref.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::ProhibitLocaltime" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/ProhibitLocaltime.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::ProhibitLowPrecedenceOps" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/ProhibitLowPrecedenceOps.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::ProhibitOpen" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/ProhibitOpen.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::ProhibitPushISA" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/ProhibitPushISA.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::ProhibitRequire" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/ProhibitRequire.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::ProhibitRmtree" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/ProhibitRmtree.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::ProhibitSomeCoreFunctions" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/ProhibitSomeCoreFunctions.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::RequireCamelCase" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/RequireCamelCase.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::RequireParensWithMethods" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/RequireParensWithMethods.pm",
+         "version" : "0.08"
+      },
+      "Perl::Critic::Policy::OTRS::RequireTrueReturnValueForModules" : {
+         "file" : "lib/Perl/Critic/Policy/OTRS/RequireTrueReturnValueForModules.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Perl-Critic-OTRS/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Perl-Critic-OTRS",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Perl-Critic-OTRS.git",
+         "web" : "http://github.com/reneeb/Perl-Critic-OTRS"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "Martin Gruner <martin.gruner@otrs.com>",
+      "Michiel Beijen <michiel.beijen@otrs.com>",
+      "openstrike <git@openstrike.co.uk>",
+      "Ramanan Balakrishnan <ramanan90@gmail.com>",
+      "reneeb <info@perl-services.de>",
+      "Renee <github@renee-baecker.de>",
+      "Renee <reb@perl-services.de>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

@@ -1,5 +1,5 @@
-#!perl
 use strict;
+use warnings;
 use Test::More tests => 9;
 
 require_ok("MooseX::Adopt::Class::Accessor::Fast");

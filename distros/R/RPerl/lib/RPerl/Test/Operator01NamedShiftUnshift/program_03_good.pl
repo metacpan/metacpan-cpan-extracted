@@ -1,10 +1,10 @@
 #!/usr/bin/perl
 
 # [[[ PREPROCESSOR ]]]
-# <<< EXECUTE_SUCCESS: 'have $bar = [21]' >>>
+# <<< EXECUTE_SUCCESS: 'have $bar = [ 21 ]' >>>
 # <<< EXECUTE_SUCCESS: 'have $bar_length = 1' >>>
 # <<< EXECUTE_SUCCESS: 'have $bar_shift = 21' >>>
-# <<< EXECUTE_SUCCESS: 'have $bar = []' >>>
+# <<< EXECUTE_SUCCESS: 'have $bar = [ ]' >>>
 # <<< EXECUTE_SUCCESS: 'have $bar_length = 0' >>>
 
 # [[[ HEADER ]]]

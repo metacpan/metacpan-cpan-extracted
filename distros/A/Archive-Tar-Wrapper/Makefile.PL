@@ -3,6 +3,10 @@ use strict;
 use ExtUtils::MakeMaker;
 use File::Which;
 
+if ( $^O eq 'solaris') {
+    die "OS unsupported\n";
+}
+
 if ( $^O eq 'MSWin32' ) {
     require Win32;
     my $product_info = Win32::GetOSDisplayName();
@@ -12,7 +16,7 @@ if ( $^O eq 'MSWin32' ) {
     unless ( $major >= 6 ) {
         warn
 "Too old Microsoft Windows to be supported, major version must be equal or higher 6.\n";
-        die "OS unsupported, too old version\n";
+        die "OS unsupported\n";
     }
 
     # double quoting is required on Windows if there are spaces in the path
@@ -67,10 +71,10 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.50 ) {
 
 # Test::More::is_deeply is required for testing
 if ( $ExtUtils::MakeMaker::VERSION >= 6.64 ) {
-    $WriteMakefileArgs{TEST_REQUIRES} = { 'Test::Simple' => 1.302073 };
+    $WriteMakefileArgs{TEST_REQUIRES}->{'Test::Simple'}= 1.302073 ;
 }
 else {
-    $WriteMakefileArgs{PREREQ_PM} = { 'Test::Simple' => 1.302073 };
+    $WriteMakefileArgs{PREREQ_PM}->{'Test::Simple'}= 1.302073;
 }
 
 if ( $ExtUtils::MakeMaker::VERSION >= 6.52 ) {

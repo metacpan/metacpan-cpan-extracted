@@ -1,4 +1,16 @@
+2.0       2018-07-02 23:44:40+01:00 Europe/London
+
+1.9       2018-07-02 21:32:35+01:00 Europe/London
+- Update readme
+
+1.8       2018-07-02 21:27:14+01:00 Europe/London
+- Fixed bug where requesting relationships for compound documents whose relationship
+names contained underscores were not producing the right document type.
+
 1.7       2018-06-24 16:44:22+01:00 Europe/London
+- Fixed a bug where I was type checking for DBIx::Class::ResultSet, which made fetching
+nested relationships not work for applications that layer over a dbix resultset. Made
+the check less strict so now the overlaying class should just provide the "all" method.
 
 1.6       2018-06-08 00:17:54+01:00 Europe/London
 - Add missing dependency Test::MockObject

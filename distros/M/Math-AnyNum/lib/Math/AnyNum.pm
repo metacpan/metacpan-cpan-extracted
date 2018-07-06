@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -202,12 +202,27 @@ use overload
         lucas     => \&lucas,
         fibonacci => \&fibonacci,
 
+        fibmod   => \&fibmod,
+        lucasmod => \&lucasmod,
+
+        chebyshevT => \&chebyshevT,
+        chebyshevU => \&chebyshevU,
+
+        laguerreL => \&laguerreL,
+        legendreP => \&legendreP,
+
+        hermiteH  => \&hermiteH,
+        hermiteHe => \&hermiteHe,
+
         faulhaber_sum => \&faulhaber_sum,
         geometric_sum => \&geometric_sum,
 
         bernfrac => \&bernfrac,
         harmfrac => \&harmfrac,
         harmonic => \&harmfrac,
+
+        secant_number  => \&secant_number,
+        tangent_number => \&tangent_number,
 
         euler     => \&euler,
         bernoulli => \&bernfrac,
@@ -2619,7 +2634,7 @@ sub add {    # used in overloading
 
 sub __sub__ {
     my ($x, $y) = @_;
-    goto(join('__', ref($x), ref($y) || 'Scalar') =~ tr/:/_/rs);
+    goto(join('__', ref($x) || 'Scalar', ref($y) || 'Scalar') =~ tr/:/_/rs);
 
     #
     ## GMPq
@@ -2659,6 +2674,15 @@ sub __sub__ {
         return $r;
     }
 
+  Scalar__Math_GMPq: {
+        my $r = Math::GMPq::Rmpq_init();
+        $x < 0
+          ? Math::GMPq::Rmpq_set_si($r, $x, 1)
+          : Math::GMPq::Rmpq_set_ui($r, $x, 1);
+        Math::GMPq::Rmpq_sub($r, $r, $y);
+        return $r;
+    }
+
     #
     ## GMPz
     #
@@ -2673,6 +2697,17 @@ sub __sub__ {
         $y < 0
           ? Math::GMPz::Rmpz_add_ui($r, $x, -$y)
           : Math::GMPz::Rmpz_sub_ui($r, $x, $y);
+        return $r;
+    }
+
+  Scalar__Math_GMPz: {
+        my $r = Math::GMPz::Rmpz_init();
+        $x < 0
+          ? do {
+            Math::GMPz::Rmpz_add_ui($r, $y, -$x);
+            Math::GMPz::Rmpz_neg($r, $r);
+          }
+          : Math::GMPz::Rmpz_ui_sub($r, $x, $y);
         return $r;
     }
 
@@ -2725,6 +2760,14 @@ sub __sub__ {
         return $r;
     }
 
+  Scalar__Math_MPFR: {
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+        $x < 0
+          ? Math::MPFR::Rmpfr_si_sub($r, $x, $y, $ROUND)
+          : Math::MPFR::Rmpfr_ui_sub($r, $x, $y, $ROUND);
+        return $r;
+    }
+
   Math_MPFR__Math_GMPq: {
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_sub_q($r, $x, $y, $ROUND);
@@ -2761,6 +2804,17 @@ sub __sub__ {
         return $r;
     }
 
+  Scalar__Math_MPC: {
+        my $r = Math::MPC::Rmpc_init2($PREC);
+        $x < 0
+          ? do {
+            Math::MPC::Rmpc_add_ui($r, $y, -$x, $ROUND);
+            Math::MPC::Rmpc_neg($r, $r, $ROUND);
+          }
+          : Math::MPC::Rmpc_ui_sub($r, $x, $y, $ROUND);
+        return $r;
+    }
+
   Math_MPC__Math_MPFR: {
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set_fr($r, $y, $ROUND);
@@ -2781,10 +2835,33 @@ sub __sub__ {
         Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
         return $r;
     }
+
+  Scalar__Scalar: {
+        my $r = (
+                 $x < 0
+                 ? Math::GMPz::Rmpz_init_set_si($x)
+                 : Math::GMPz::Rmpz_init_set_ui($x)
+                );
+
+        $y < 0
+          ? Math::GMPz::Rmpz_add_ui($r, $r, -$y)
+          : Math::GMPz::Rmpz_sub_ui($r, $r, $y);
+
+        return $r;
+    }
 }
 
 sub sub {    # used in overloading
     my ($x, $y) = @_;
+
+    if (!ref($x) and CORE::int($x) eq $x and $x < ULONG_MAX and $x > LONG_MIN) {
+
+        if (ref($y) eq __PACKAGE__) {
+            return bless \__sub__($x, $$y);
+        }
+
+        return bless \__sub__($x, ref($y) ? _star2obj($y) : _str2obj($y));
+    }
 
     $x =
         ref($x) eq __PACKAGE__ ? $$x
@@ -4508,7 +4585,11 @@ sub __ilog__ {
         my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || goto &_nan) - 1;
 
         if ($e > 0) {
-            Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
+
+            $y == 2
+              ? Math::GMPz::Rmpz_setbit($t, $e)
+              : Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
+
             Math::GMPz::Rmpz_cmp($t, $x) > 0 and --$e;
         }
 
@@ -6488,13 +6569,14 @@ sub __irand__ {
 }
 
 #
-## Fibonacci
+## n-th Fibonacci number of k-th order
 #
+
 sub fibonacci ($;$) {
     my ($n, $k) = @_;
 
     if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
-        ## `x` is a native unsigned integer
+        ## `n` is a native unsigned integer
     }
     elsif (ref($n) eq __PACKAGE__) {
         $n = _any2ui($$n) // goto &nan;
@@ -6503,7 +6585,7 @@ sub fibonacci ($;$) {
         $n = _any2ui(_star2obj($n)) // goto &nan;
     }
 
-    # N-th k-th order Fibonacci number
+    # N-th Fibonacci number of k-th order
     if (defined($k)) {
 
         if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
@@ -6556,44 +6638,400 @@ sub fibonacci ($;$) {
 }
 
 #
-## Lucas
+## n-th Lucas number
 #
-sub lucas ($) {
-    my ($x) = @_;
 
-    if (!ref($x) and CORE::int($x) eq $x and $x >= 0 and $x < ULONG_MAX) {
-        ## `x` is a native unsigned integer
+sub lucas ($) {
+    my ($n) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
     }
-    elsif (ref($x) eq __PACKAGE__) {
-        $x = _any2ui($$x) // goto &nan;
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
     }
     else {
-        $x = _any2ui(_star2obj($x)) // goto &nan;
+        $n = _any2ui(_star2obj($n)) // goto &nan;
     }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_lucnum_ui($r, $x);
+    Math::GMPz::Rmpz_lucnum_ui($r, $n);
     bless \$r;
+}
+
+sub __fibmod__ {
+    my ($n, $m, $T1, $T2) = @_;
+
+    # T1 = 0, T2 = 1 for Fibonacci numbers
+    # T1 = 2, T2 = 1 for Lucas numbers
+
+    $n = Math::GMPz::Rmpz_init_set($n);
+
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    state $u = Math::GMPz::Rmpz_init_nobless();
+
+    my $f = Math::GMPz::Rmpz_init_set_ui($T1 // 0);
+    my $g = Math::GMPz::Rmpz_init_set_ui($T2 // 1);
+
+    my $A = Math::GMPz::Rmpz_init_set_ui(0);
+    my $B = Math::GMPz::Rmpz_init_set_ui(1);
+
+    for (; ;) {
+
+        if (Math::GMPz::Rmpz_odd_p($n)) {
+
+            # (f, g) = (f*a + g*b, f*b + g*(a+b))  mod m
+
+            Math::GMPz::Rmpz_mul($u, $g, $B);
+            Math::GMPz::Rmpz_mul($t, $f, $A);
+            Math::GMPz::Rmpz_mul($g, $g, $A);
+
+            Math::GMPz::Rmpz_add($t, $t, $u);
+            Math::GMPz::Rmpz_add($g, $g, $u);
+
+            Math::GMPz::Rmpz_addmul($g, $f, $B);
+
+            Math::GMPz::Rmpz_mod($f, $t, $m);
+            Math::GMPz::Rmpz_mod($g, $g, $m);
+        }
+
+        # (a, b) = (a*a + b*b, a*b + b*(a+b))  mod m
+
+        Math::GMPz::Rmpz_div_2exp($n, $n, 1);
+        Math::GMPz::Rmpz_sgn($n) || last;
+
+        Math::GMPz::Rmpz_mul($t, $A, $A);
+        Math::GMPz::Rmpz_mul($u, $B, $B);
+        Math::GMPz::Rmpz_mul($B, $B, $A);
+
+        Math::GMPz::Rmpz_mul_2exp($B, $B, 1);
+
+        Math::GMPz::Rmpz_add($B, $B, $u);
+        Math::GMPz::Rmpz_add($t, $t, $u);
+
+        Math::GMPz::Rmpz_mod($A, $t, $m);
+        Math::GMPz::Rmpz_mod($B, $B, $m);
+    }
+
+    return $f;
+}
+
+#
+## fibonacci(n) mod m
+#
+
+sub fibmod ($$) {
+    my ($n, $m) = @_;
+
+    $n = $$n if (ref($n) eq __PACKAGE__);
+    $m = $$m if (ref($m) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    if (ref($m) ne 'Math::GMPz') {
+        $m = _star2mpz($m) // goto &nan;
+    }
+
+    Math::GMPz::Rmpz_sgn($n) < 0  and goto &nan;
+    Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
+
+    bless \__fibmod__($n, $m, 0, 1);
+}
+
+#
+## lucas(n) mod m
+#
+
+sub lucasmod ($$) {
+    my ($n, $m) = @_;
+
+    $n = $$n if (ref($n) eq __PACKAGE__);
+    $m = $$m if (ref($m) eq __PACKAGE__);
+
+    if (ref($n) ne 'Math::GMPz') {
+        $n = _star2mpz($n) // goto &nan;
+    }
+
+    if (ref($m) ne 'Math::GMPz') {
+        $m = _star2mpz($m) // goto &nan;
+    }
+
+    Math::GMPz::Rmpz_sgn($n) < 0  and goto &nan;
+    Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
+
+    bless \__fibmod__($n, $m, 2, 1);
+}
+
+#
+## Chebyshev polynomials: T_n(x)
+#
+
+sub chebyshevT ($$) {
+    my ($n, $x) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n > LONG_MIN and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2si($$n) // goto &nan;
+    }
+    else {
+        $n = _any2si(_star2obj($n)) // goto &nan;
+    }
+
+    $x = _star2obj($x);
+
+    $n = -$n if $n < 0;
+    $n == 0 and goto &one;
+    $n == 1 and return bless \$x;
+
+    state $ONE = ${one()};
+
+    my $t = __add__($x, $x);
+    my ($u, $v) = ($ONE, $x);
+
+    foreach my $i (2 .. $n) {
+        ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+    }
+
+    bless \$v;
+}
+
+#
+## Chebyshev polynomials: U_n(x)
+#
+
+sub chebyshevU ($$) {
+    my ($n, $x) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n > LONG_MIN and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2si($$n) // goto &nan;
+    }
+    else {
+        $n = _any2si(_star2obj($n)) // goto &nan;
+    }
+
+    $n == 0 and goto &one;
+
+    my $negative = 0;
+
+    if ($n < 0) {
+
+        $n == -1 and goto &zero;
+        $n == -2 and goto &mone;
+
+        $n        = -$n - 2;
+        $negative = 1;
+    }
+
+    $x = _star2obj($x);
+
+    state $ONE = ${one()};
+
+    my $t = __add__($x, $x);
+    my ($u, $v) = ($ONE, $t);
+
+    foreach my $i (2 .. $n) {
+        ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+    }
+
+    $v = __neg__($v) if $negative;
+    bless \$v;
+}
+
+#
+## Laguerre polynomials: L_n(x)
+#
+
+sub laguerreL ($$) {
+    my ($n, $x) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    $x = _star2obj($x);
+
+    $n == 0 and goto &one;                       # L_0(x) = 1
+    $n == 1 and return bless \__sub__(1, $x);    # L_1(x) = 1-x
+
+    my $t = Math::GMPz::Rmpz_init();
+    my $u = Math::GMPz::Rmpz_init_set_ui(1);
+
+    my @terms;
+    foreach my $k (0 .. $n) {
+        Math::GMPz::Rmpz_bin_uiui($t, $n, $k);
+        Math::GMPz::Rmpz_neg($t, $t) if ($k & 1);
+        push @terms, __div__(__mul__(__pow__($x, $k), $t), $u);
+        Math::GMPz::Rmpz_mul_ui($u, $u, $k + 1);
+    }
+
+    bless \_binsplit(\@terms, \&__add__);
+}
+
+#
+## Legendre polynomials: P_n(x)
+#
+
+sub legendreP ($$) {
+    my ($n, $x) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    $x = _star2obj($x);
+
+    $n == 0 and goto &one;
+    $n == 1 and return bless \$x;
+
+    my $x1 = __dec__($x);
+    my $x2 = __inc__($x);
+
+    my $t = Math::GMPz::Rmpz_init();
+
+    my @terms;
+    foreach my $k (0 .. $n) {
+        Math::GMPz::Rmpz_bin_uiui($t, $n, $k);
+        Math::GMPz::Rmpz_mul($t, $t, $t);
+        push @terms, __mul__(__mul__(__pow__($x1, $n - $k), __pow__($x2, $k)), $t);
+    }
+
+    my $sum = _binsplit(\@terms, \&__add__);
+
+    Math::GMPz::Rmpz_set_ui($t, 0);
+    Math::GMPz::Rmpz_setbit($t, $n);
+
+    bless \__div__($sum, $t);
+}
+
+#
+## The physicists' Hermite polynomials H_n(x)
+#
+
+sub hermiteH ($$) {
+    my ($n, $x) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    $x = _star2obj($x);
+    $x = __add__($x, $x);
+
+    $n == 0 and goto &one;
+    $n == 1 and return bless \$x;
+
+    my $t = Math::GMPz::Rmpz_init();
+    my $u = Math::GMPz::Rmpz_init_set_ui(1);
+
+    my $v = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_fac_ui($v, $n);
+
+    my @terms;
+    foreach my $m (0 .. $n >> 1) {
+        Math::GMPz::Rmpz_mul($t, $v, $u);
+        Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
+
+        push @terms, __div__(__pow__($x, $n - ($m << 1)), $t);
+
+        my $d = ($n - ($m << 1)) * ($n - ($m << 1) - 1);
+        Math::GMPz::Rmpz_divexact_ui($v, $v, $d) if $d;
+        Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
+    }
+
+    my $sum = _binsplit(\@terms, \&__add__);
+    Math::GMPz::Rmpz_fac_ui($v, $n);
+    bless \__mul__($sum, $v);
+}
+
+#
+## The probabilists' Hermite polynomials He_n(x)
+#
+
+sub hermiteHe ($$) {
+    my ($n, $x) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    $x = _star2obj($x);
+
+    $n == 0 and goto &one;
+    $n == 1 and return bless \$x;
+
+    my $t = Math::GMPz::Rmpz_init();
+    my $u = Math::GMPz::Rmpz_init_set_ui(1);
+
+    my $v = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_fac_ui($v, $n);
+
+    my @terms;
+    foreach my $m (0 .. $n >> 1) {
+        Math::GMPz::Rmpz_mul($t, $v, $u);
+        Math::GMPz::Rmpz_mul_2exp($t, $t, $m);
+        Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
+
+        push @terms, __div__(__pow__($x, $n - ($m << 1)), $t);
+
+        my $d = ($n - ($m << 1)) * ($n - ($m << 1) - 1);
+        Math::GMPz::Rmpz_divexact_ui($v, $v, $d) if $d;
+        Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
+    }
+
+    my $sum = _binsplit(\@terms, \&__add__);
+    Math::GMPz::Rmpz_fac_ui($v, $n);
+    bless \__mul__($sum, $v);
 }
 
 #
 ## Primorial
 #
 sub primorial ($) {
-    my ($x) = @_;
+    my ($n) = @_;
 
-    if (!ref($x) and CORE::int($x) eq $x and $x >= 0 and $x < ULONG_MAX) {
-        ## `x` is a native unsigned integer
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
     }
-    elsif (ref($x) eq __PACKAGE__) {
-        $x = _any2ui($$x) // goto &nan;
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
     }
     else {
-        $x = _any2ui(_star2obj($x)) // goto &nan;
+        $n = _any2ui(_star2obj($n)) // goto &nan;
     }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_primorial_ui($r, $x);
+    Math::GMPz::Rmpz_primorial_ui($r, $n);
     bless \$r;
 }
 
@@ -6617,6 +7055,8 @@ sub _secant_numbers {
     if ($n <= $#cache) {
         return @cache;
     }
+
+    $n <<= 1 if ($n <= 250);
 
     my @S = (Math::GMPz::Rmpz_init_set_ui(1));
 
@@ -6643,6 +7083,8 @@ sub _tangent_numbers {
     if ($n <= $#cache) {
         return @cache;
     }
+
+    $n <<= 1 if ($n <= 250);
 
     my @T = (Math::GMPz::Rmpz_init_set_ui(1));
 
@@ -6920,6 +7362,41 @@ sub euler ($;$) {
     my $e = Math::GMPz::Rmpz_init_set((_secant_numbers($n >> 1))[$n >> 1]);
     Math::GMPz::Rmpz_neg($e, $e) if (($n >> 1) & 1);
     bless \$e;
+}
+
+sub secant_number ($) {
+    my ($n) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    my @E = _secant_numbers($n);
+    bless \Math::GMPz::Rmpz_init_set($E[$n]);
+}
+
+sub tangent_number ($) {
+    my ($n) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is a native unsigned integer
+    }
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
+    }
+    else {
+        $n = _any2ui(_star2obj($n)) // goto &nan;
+    }
+
+    $n || goto &zero;
+    my @T = _tangent_numbers($n);
+    bless \Math::GMPz::Rmpz_init_set($T[$n - 1]);
 }
 
 #
@@ -7366,30 +7843,30 @@ sub dfactorial ($) {
 #
 
 sub mfactorial ($$) {
-    my ($x, $y) = @_;
+    my ($n, $k) = @_;
 
-    if (!ref($x) and CORE::int($x) eq $x and $x >= 0 and $x < ULONG_MAX) {
-        ## `x` is an unsigned native integer
+    if (!ref($n) and CORE::int($n) eq $n and $n >= 0 and $n < ULONG_MAX) {
+        ## `n` is an unsigned native integer
     }
-    elsif (ref($x) eq __PACKAGE__) {
-        $x = _any2ui($$x) // goto &nan;
+    elsif (ref($n) eq __PACKAGE__) {
+        $n = _any2ui($$n) // goto &nan;
     }
     else {
-        $x = _any2ui(_star2obj($x)) // goto &nan;
+        $n = _any2ui(_star2obj($n)) // goto &nan;
     }
 
-    if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y < ULONG_MAX) {
-        ## `y` is an unsigned native integer
+    if (!ref($k) and CORE::int($k) eq $k and $k >= 0 and $k < ULONG_MAX) {
+        ## `k` is an unsigned native integer
     }
-    elsif (ref($y) eq __PACKAGE__) {
-        $y = _any2ui($$y) // goto &nan;
+    elsif (ref($k) eq __PACKAGE__) {
+        $k = _any2ui($$k) // goto &nan;
     }
     else {
-        $y = _any2ui(_star2obj($y)) // goto &nan;
+        $k = _any2ui(_star2obj($k)) // goto &nan;
     }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_mfac_uiui($r, $x, $y);
+    Math::GMPz::Rmpz_mfac_uiui($r, $n, $k);
     bless \$r;
 }
 
@@ -8472,7 +8949,11 @@ sub powmod ($$$) {
     }
 
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_powm($r, $n, $k, $z);
+
+    Math::GMPz::Rmpz_fits_ulong_p($k)
+      ? Math::GMPz::Rmpz_powm_ui($r, $n, Math::GMPz::Rmpz_get_ui($k), $z)
+      : Math::GMPz::Rmpz_powm($r, $n, $k, $z);
+
     bless \$r;
 }
 

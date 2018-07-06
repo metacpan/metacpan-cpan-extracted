@@ -27,7 +27,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( create_thumbnail );
 
-our $VERSION = 'v0.1.2';
+our $VERSION = 'v0.1.3';
 
 require XSLoader;
 XSLoader::load('Ithumb::XS', $VERSION);

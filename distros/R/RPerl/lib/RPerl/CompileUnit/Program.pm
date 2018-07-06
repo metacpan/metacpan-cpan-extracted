@@ -3,7 +3,7 @@ package RPerl::CompileUnit::Program;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.006_000;
+our $VERSION = 0.007_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::CompileUnit);
@@ -27,6 +27,12 @@ sub ast_to_rperl__generate {
 #    RPerl::diag( 'in Program->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 #    RPerl::diag('in Program->ast_to_rperl__generate(), received $modes = ' . "\n" . Dumper($modes) . "\n");
 
+    # all programs begin in the 'main::' Perl namespace, which is equivalent to an empty C++ namespace
+    $modes->{_symbol_table}->{_namespace} = q{};
+
+    # all programs begin in no Perl subroutine, which is equivalent to the C++ 'main()' function
+    $modes->{_symbol_table}->{_subroutine} = q{};
+
     my string $self_class = ref $self;
 
     # unwrap Program_18 from CompileUnit_4
@@ -37,7 +43,7 @@ sub ast_to_rperl__generate {
 
     if ( ($self_class) ne 'Program_18' ) {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ($self_class) . ' found where Program_18 expected, dying' )
+            'ERROR ECOGEASRP000, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ($self_class) . ' found where Program_18 expected, dying' )
             . "\n";
     }
 
@@ -107,6 +113,9 @@ sub ast_to_rperl__generate {
         RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
     }
 
+    # after processing includes, all programs return to the 'main::' Perl namespace, which is equivalent to an empty C++ namespace
+    $modes->{_symbol_table}->{_namespace} = q{};
+
     if ( exists $constant_star->{children}->[0] ) {
         if ( $modes->{label} eq 'ON' ) {
             $rperl_source_group->{PMC} .= "\n" . '# [[[ CONSTANTS ]]]' . "\n";
@@ -129,6 +138,9 @@ sub ast_to_rperl__generate {
         $rperl_source_subgroup = $subroutine->ast_to_rperl__generate($modes);
         RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
     }
+
+    # after processing subroutines, all programs return to being in no Perl subroutine, which is equivalent to the C++ 'main()' function
+    $modes->{_symbol_table}->{_subroutine} = q{};
 
     if ( $modes->{label} eq 'ON' ) {
         $rperl_source_group->{PMC} .= "\n" . '# [[[ OPERATIONS ]]]' . "\n";
@@ -167,12 +179,18 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
     { my string_hashref::method $RETURN_TYPE };
     ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{} };
-#    my string_hashref $cpp_source_group = { CPP => q{}, H => q{} };  # NEED ANSWER, CORRELATION #rp111: do we need a .h output file for a stand-alone *.pl input file???
+#    my string_hashref $cpp_source_group = { CPP => q{}, H => q{} };  # DEV NOTE, CORRELATION #rp039: programs never have header files
     my string_hashref $cpp_source_subgroup;
     my integer $cpp_source_group_CPP_line_count = 0;
 
 #    RPerl::diag( 'in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 #    RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $modes = ' . "\n" . Dumper($modes) . "\n");
+
+    # all programs begin in the 'main::' Perl namespace, which is equivalent to an empty C++ namespace
+    $modes->{_symbol_table}->{_namespace} = q{};
+
+    # all programs begin in no Perl subroutine, which is equivalent to the C++ 'main()' function
+    $modes->{_symbol_table}->{_subroutine} = q{};
 
     my string $self_class = ref $self;
 
@@ -184,7 +202,7 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
 
     if ( ($self_class) ne 'Program_18' ) {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ($self_class) . ' found where Program_18 expected, dying' )
+            'ERROR ECOGEASRP000, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ($self_class) . ' found where Program_18 expected, dying' )
             . "\n";
     }
 
@@ -247,8 +265,7 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
     if ( ( exists $modes->{_enable_sse} ) and ( defined $modes->{_enable_sse} ) ) {
         foreach my string $enabled_file_name ( keys %{ $modes->{_enable_sse} } ) {
             if ( ( $enabled_file_name =~ /$pl_file_path$/xms ) and ( $modes->{_enable_sse}->{$enabled_file_name} ) ) {
-#                $cpp_source_group->{H_INCLUDES} .= '#include <RPerl/Support/SSEStandAlone.h>' . "\n";  # NEED ANSWER, CORRELATION #rp111: do we need a .h output file for a stand-alone *.pl input file???
-                $cpp_source_group->{CPP} .= '#include <RPerl/Support/SSEStandAlone.h>' . "\n";
+                $cpp_source_group->{CPP} .= '#include <RPerl/Support/SSEStandAlone.h>' . "\n";  # DEV NOTE, CORRELATION #rp039: programs never have header files, append to CPP instead of H
             }
         }
     }
@@ -257,8 +274,7 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
     if ( ( exists $modes->{_enable_gmp} ) and ( defined $modes->{_enable_gmp} ) ) {
         foreach my string $enabled_file_name ( keys %{ $modes->{_enable_gmp} } ) {
             if ( ( $enabled_file_name =~ /$pl_file_path$/xms ) and ( $modes->{_enable_gmp}->{$enabled_file_name} ) ) {
-#                $cpp_source_group->{H_INCLUDES} .= '#include <RPerl/Support/GMPStandAlone.h>' . "\n";  # NEED ANSWER, CORRELATION #rp111: do we need a .h output file for a stand-alone *.pl input file???
-                $cpp_source_group->{CPP} .= '#include <RPerl/Support/GMPStandAlone.h>' . "\n";
+                $cpp_source_group->{CPP} .= '#include <RPerl/Support/GMPStandAlone.h>' . "\n";  # DEV NOTE, CORRELATION #rp039: programs never have header files, append to CPP instead of H
             }
         }
     }
@@ -267,8 +283,7 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
     if ( ( exists $modes->{_enable_gsl} ) and ( defined $modes->{_enable_gsl} ) ) {
         foreach my string $enabled_file_name ( keys %{ $modes->{_enable_gsl} } ) {
             if ( ( $enabled_file_name =~ /$pl_file_path$/xms ) and ( $modes->{_enable_gsl}->{$enabled_file_name} ) ) {
-#                $cpp_source_group->{H_INCLUDES} .= '#include <RPerl/Support/GSLStandAlone.h>' . "\n";  # NEED ANSWER, CORRELATION #rp111: do we need a .h output file for a stand-alone *.pl input file???
-                $cpp_source_group->{CPP} .= '#include <RPerl/Support/GLSStandAlone.h>' . "\n";
+                $cpp_source_group->{CPP} .= '#include <RPerl/Support/GLSStandAlone.h>' . "\n";  # DEV NOTE, CORRELATION #rp039: programs never have header files, append to CPP instead of H
             }
         }
     }
@@ -278,8 +293,7 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
         foreach my string $enabled_file_name ( keys %{ $modes->{_enable_mongodb} } ) {
             if ( ( $enabled_file_name =~ /$pl_file_path$/xms ) and ( $modes->{_enable_mongodb}->{$enabled_file_name} ) ) {
 #                RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_enable_mongodb}->{' . $enabled_file_name . '} = TRUE' . "\n");
-#                $cpp_source_group->{H_INCLUDES} .= '#include <RPerl/Support/MongoDB.h>' . "\n";  # NEED ANSWER, CORRELATION #rp111: do we need a .h output file for a stand-alone *.pl input file???
-                $cpp_source_group->{CPP} .= '#include <RPerl/Support/MongoDBStandAlone.h>' . "\n";
+                $cpp_source_group->{CPP} .= '#include <RPerl/Support/MongoDBStandAlone.h>' . "\n";  # DEV NOTE, CORRELATION #rp039: programs never have header files, append to CPP instead of H
             }
         }
     }
@@ -313,10 +327,22 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
     foreach my object $include ( @{ $include_star->{children} } ) { ## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
 #        RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $include = ' . "\n" . RPerl::Parser::rperl_ast__dump($include) . "\n");
         $cpp_source_subgroup = $include->ast_to_cpp__generate__CPPOPS_CPPTYPES('main', $modes);
-        RPerl::Generator::source_group_append( $cpp_source_group, $cpp_source_subgroup );
+
+        # DEV NOTE, CORRELATION #rp039: programs never have header files, due to the following reasons:
+        # 1.  all Perl subroutines (C++ functions) are declared before the C++ main() function is executed, which serves the dual purpose of defining the C++ functions as well, so no C++ function prototypes are necessary, which would normall be in the header file
+        # 2.  programs never contain class definitions, so again there is no class declaration or definition code which needs to go into a header file
+#        RPerl::Generator::source_group_append( $cpp_source_group, $cpp_source_subgroup );
+        if (defined $cpp_source_subgroup->{H}) {
+            $cpp_source_group->{CPP} .= $cpp_source_subgroup->{H};
+        }
     }
 #    RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $cpp_source_group = ' . "\n" . RPerl::Parser::rperl_ast__dump($cpp_source_group) . "\n");
-    $cpp_source_group->{CPP} .= '#include "__NEED_HEADER_PATH"' . "\n";  # DEV NOTE, CORRELATION #rp033: defer setting header include path until files are saved in Compiler
+
+    # DEV NOTE, CORRELATION #rp039: programs never have header files
+#    $cpp_source_group->{CPP} .= '#include "__NEED_HEADER_PATH"' . "\n";  # DEV NOTE, CORRELATION #rp033: defer setting header include path until files are saved in Compiler
+
+    # after processing includes, all programs return to the 'main::' Perl namespace, which is equivalent to an empty C++ namespace
+    $modes->{_symbol_table}->{_namespace} = q{};
 
     if ( exists $constant_star->{children}->[0] ) {
         if ( $modes->{label} eq 'ON' ) {
@@ -337,10 +363,15 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
         @{ $subroutine_star->{children} }
         )
     {
+#        RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $subroutine = ' . "\n" . RPerl::Parser::rperl_ast__dump($subroutine) . "\n");
+
         $cpp_source_subgroup = $subroutine->ast_to_cpp__generate__CPPOPS_CPPTYPES($modes);
         RPerl::Generator::source_group_append( $cpp_source_group, $cpp_source_subgroup );
         $cpp_source_group->{CPP} .= "\n\n";
     }
+
+    # after processing subroutines, all programs return to being in no Perl subroutine, which is equivalent to the C++ 'main()' function
+    $modes->{_symbol_table}->{_subroutine} = q{};
 
     # BEGIN C++ main() function wrapper, to contain all operations which are not inside a subroutine
     $cpp_source_group->{CPP} .= 'int main() {';
@@ -407,27 +438,7 @@ Purposefully_die_from_a_compile-time_error,_due_to____PERL__TYPES_being_defined.
 #endif
 EOF
 
-
-
-
-
-=DISABLED_NEED_ANSWER
-    # NEED ANSWER, CORRELATION #rp111: do we need a .h output file for a stand-alone *.pl input file???
-    # deferred, prepend possibly-updated H_INCLUDES to H, discarding duplicates
-    my string $H_INCLUDES_UNIQUE = '';
-    foreach my string $H_INCLUDE ( split /\n/, $cpp_source_group->{H_INCLUDES} ) {
-        if ( $H_INCLUDES_UNIQUE !~ /$H_INCLUDE/ ) {
-            $H_INCLUDES_UNIQUE .= $H_INCLUDE . "\n";
-        }
-    }
-    $cpp_source_group->{H} = $H_INCLUDES_UNIQUE . $cpp_source_group->{H};
-    delete $cpp_source_group->{H_INCLUDES};
-=cut
-
-
-
-
-
+#    RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), bottom of subroutine, have $modes->{_symbol_table} = ' . "\n" . Dumper($modes->{_symbol_table}) . "\n");
 #    RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), about to return $cpp_source_group = ' . "\n" . RPerl::Parser::rperl_ast__dump($cpp_source_group) . "\n");
     return $cpp_source_group;
 }

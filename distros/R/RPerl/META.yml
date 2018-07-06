@@ -5,7 +5,8 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  Alien::GMP: '1.07'
+  Alien::Base::ModuleBuild: '1.02'
+  Alien::GMP: '1.08'
   Alien::GSL: '1.01'
   IO::Socket::SSL: '2.043'
 dynamic_config: 1
@@ -39,6 +40,8 @@ no_index:
     - ref
     - string
     - unknown
+    - MyClass_Good
+    - _MyClass_Bad
 requires:
   Alien::JPCRE2: '0.012'
   Alien::PCRE2: '0.015'
@@ -78,5 +81,5 @@ resources:
   homepage: http://www.rperl.org
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/rperl.git
-version: '3.601000'
+version: '4.000000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

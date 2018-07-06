@@ -4,12 +4,15 @@ use 5.006;
 use strict;
 use warnings;
 use URI::Escape;
-our $VERSION = '0.02';
 use base qw(Module::Install::Base);
+
+our $VERSION = sprintf "%d.%02d%02d", q/0.3.0/ =~ /(\d+)/g;
 
 sub auto_set_bugtracker {
     my $self = shift;
     if ($self->name) {
+        $self->configure_requires('URI::Escape', 0);
+
         $self->bugtracker(
             sprintf 'http://rt.cpan.org/Public/Dist/Display.html?Name=%s',
             uri_escape($self->name),
@@ -21,5 +24,5 @@ sub auto_set_bugtracker {
 1;
 __END__
 
-#line 92
+#line 100
 

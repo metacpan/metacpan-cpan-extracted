@@ -1,0 +1,13 @@
+
+my $render_structure = [
+  {  wrapper => 'abc', render_list => ['foo', bar' ] },
+  {  wrapper => 'cba',
+     class => ['abc', 'cde' ],
+     render_list => [
+      'foo2',
+      { wrapper => 'abc', render_list => ['fld1', 'fld2'] }
+     ],
+   }
+];
+
+What about blocks of text? Chunks of html like help or hints...

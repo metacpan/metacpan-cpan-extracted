@@ -3,7 +3,7 @@ package RPerl::CompileUnit::Include;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.006_000;
+our $VERSION = 0.007_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::GrammarRule);
@@ -26,10 +26,12 @@ sub ast_to_rperl__generate {
 #    RPerl::diag( 'in Include->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 #    RPerl::diag( 'in Include->ast_to_rperl__generate(), have ::class($self) = ' . ::class($self) . "\n" );
 
+    my string $module_name;
+
     if ( ref $self eq 'Include_54' ) {
         # Include -> USE WordScoped OPTIONAL-22 ';'
         my string $use_keyword = $self->{children}->[0];
-        my string $module_name = $self->{children}->[1]->{children}->[0];
+                  $module_name = $self->{children}->[1]->{children}->[0];
         my string $qw = q{};
         if (defined $self->{children}->[2]->{children}->[0]) {
             $qw = $self->{children}->[2]->{children}->[0]->{attr};
@@ -42,7 +44,7 @@ sub ast_to_rperl__generate {
         # Include -> 'INIT' LBRACE WordScoped OP02_METHOD_THINARROW_IMP OPTIONAL-23 ')' ';' '}'
         my string $init_keyword = $self->{children}->[0];
         my string $left_brace = $self->{children}->[1];
-        my string $module_name = $self->{children}->[2]->{children}->[0];
+                  $module_name = $self->{children}->[2]->{children}->[0];
         my string $thinarrow_import_left_parentheses = $self->{children}->[3];
         my string $qw = q{};
         if (defined $self->{children}->[4]->{children}->[0]) {
@@ -61,11 +63,29 @@ sub ast_to_rperl__generate {
     }
     else {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
+            'ERROR ECOGEASRP000, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                 . ( ref $self )
                 . ' found where Include_54 or Include_55 expected, dying' )
             . "\n";
     }
+
+    # DEV NOTE, CORRELATION #rp045: identifiers containing underscores may be reserved by C++
+    # DEV NOTE: all includes reference fully-scoped package & class names which are naturally global in scope, 
+    # so we do not check the symbol table for any namespace or subroutine in the first conditional block below (ECOGEASRP185a), 
+    # thus there is no differentiation between ECOGEASRP185a and ECOGEASRP185b, so ECOGEASRP185b is disabled & unused below
+    if ((substr $module_name, 0, 1) eq '_') {
+        die 'ERROR ECOGEASRP185a, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL:' . "\n" . 'included package or class name ' . q{'} . $module_name . q{'} .
+            ' must not start with an underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+    }
+#    elsif ($module_name =~ m/^_[A-Z]/gxms) {
+#        die 'ERROR ECOGEASRP185b, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL:' . "\n" . 'included package or class name ' . q{'} . $module_name . q{'} .
+#            ' must not start with an underscore followed by an uppercase letter, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+#    }
+    elsif ($module_name =~ m/__/gxms) {
+        die 'ERROR ECOGEASRP185c, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL:' . "\n" . 'included package or class name ' . q{'} . $module_name . q{'} .
+            ' must not include a double-underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+    }
+
     return $rperl_source_group;
 }
 
@@ -103,6 +123,23 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
             $module_name = $self->{children}->[2]->{children}->[0];
         }
 
+        # DEV NOTE, CORRELATION #rp045: identifiers containing underscores may be reserved by C++
+        # DEV NOTE: all includes reference fully-scoped package & class names which are naturally global in scope, 
+        # so we do not check the symbol table for any namespace or subroutine in the first conditional block below (ECOGEASCP185a), 
+        # thus there is no differentiation between ECOGEASCP185a and ECOGEASCP185b, so ECOGEASCP185b is disabled & unused below
+        if ((substr $module_name, 0, 1) eq '_') {
+            die 'ERROR ECOGEASCP185a, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'included package or class name ' . q{'} . $module_name . q{'} .
+                ' must not start with an underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+        }
+#        elsif ($module_name =~ m/^_[A-Z]/gxms) {
+#            die 'ERROR ECOGEASCP185b, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'included package or class name ' . q{'} . $module_name . q{'} .
+#                ' must not start with an underscore followed by an uppercase letter, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+#        }
+        elsif ($module_name =~ m/__/gxms) {
+            die 'ERROR ECOGEASCP185c, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'included package or class name ' . q{'} . $module_name . q{'} .
+                ' must not include a double-underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+        }
+
         # DEV NOTE, CORRELATION #rp044: shared logic between class parent includes and misc user includes, always check both when changing either
         my boolean $is_rperl_system = 0;
         my boolean $is_rperl_test = 0;
@@ -115,7 +152,7 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
             }
         }
 
-        if ( $module_name =~ /^\w+Perl::Config$/ ) { # DEV NOTE, CORRELATION #rp027: MathPerl::Config, PhysicsPerl::Config, etc
+        if ( $module_name =~ /^\w+Perl::Config$/ ) { # DEV NOTE, CORRELATION #rp027: RPerl::Config, MathPerl::Config, PhysicsPerl::Config, etc
 #            RPerl::diag('in CompileUnit::Include->ast_to_cpp__generate__CPPOPS_CPPTYPES(), skipping system config file $module_name = ' . $module_name . "\n");
         }
         elsif ( $is_rperl_test or (not $is_rperl_system) ) {
@@ -140,7 +177,7 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
         }
     }
     else {
-        die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule ' . ( ref $self ) . ' found where Include_54 or Include_55 expected, dying' ) . "\n";
+        die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCP000, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule ' . ( ref $self ) . ' found where Include_54 or Include_55 expected, dying' ) . "\n";
     }
     
 #    RPerl::diag( 'in Include->ast_to_cpp__generate__CPPOPS_CPPTYPES(), about to return $cpp_source_group = ' . "\n" . RPerl::Parser::rperl_ast__dump($cpp_source_group) . "\n" );

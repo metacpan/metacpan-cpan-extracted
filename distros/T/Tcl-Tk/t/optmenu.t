@@ -3,17 +3,16 @@ BEGIN { $|=1; $^W=1; }
 use strict;
 use Test;
 
-BEGIN
-  {
-   plan test => 22-2;
-  };
-
 use Tcl::Tk qw/:perlTk/;
 
-my $mw;
-eval {$mw = MainWindow->new();};
-ok($@, "", "can't create MainWindow");
-ok(Tcl::Tk::Exists($mw), 1, "MainWindow creation failed");
+my $mw = MainWindow->new();
+
+if (!$mw->interp->pkg_require('snit')) {
+    print "1..0 # skip: no snit extension available\n";
+    exit;
+}
+
+plan test => 20, todo=>[12,20];
 
 my $foo = 12;
 my @opt = (0..20);
@@ -44,7 +43,7 @@ ok($@, "", "can't create Optionmenu");
 ok(Tcl::Tk::Exists($opt3), 1, "Optionmenu creation failed");
 
 ok($ {$opt3->cget(-variable)}, $foo3, "setting of -variable failed");
-#TODO ok($bar3, "Label $foo3", "textvariable set to wrong value");
+ok($bar3, "Label $foo3", "textvariable set to wrong value");
 my $opt3menu = $opt3->cget(-menu);
 ok($opt3menu ne "", 1, "can't get menu from Optionmenu");
 ok($opt3menu->entrycget("last", -label), "Label 20", "wrong label");
@@ -62,8 +61,7 @@ my $opt2menu = $opt2->cget(-menu);
 ok($opt2menu ne "", 1, "can't get menu from Optionmenu");
 ok($opt2menu->entrycget("last", -label), "Label 20", "wrong label");
 
-#TODO ok($ {$opt2->cget(-textvariable)}, "Label $foo2", "wrong label");
+ok($ {$opt2->cget('-variable')}, "Label $foo2", "wrong label");
 
-$mw->after(1000,sub{$mw->destroy});
+$mw->after(3000,sub{$mw->destroy});
 MainLoop;
-__END__

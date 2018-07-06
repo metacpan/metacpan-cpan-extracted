@@ -203,16 +203,21 @@ sub _connect ( $args, $runtime, $cb ) {
 
         $args->{proxy}->connect(
             $args->{url},
-            timeout => $args->{timeout},
-            tls_ctx => $args->{tls_ctx},
-            bind_ip => $args->{bind_ip},
-            sub ( $h, $res ) {
-                if ( !$res ) {
-                    $runtime->{finish}->( $runtime->{on_error_status}, $res->{reason} );
-                }
-                else {
-                    $cb->($h);
-                }
+            timeout          => $args->{timeout},
+            tls_ctx          => $args->{tls_ctx},
+            bind_ip          => $args->{bind_ip},
+            on_connect_error => sub ( $h, $reason ) {
+                $runtime->{finish}->( $runtime->{on_error_status}, $reason, 1 );
+
+                return;
+            },
+            on_error => sub ( $h, $fatal, $reason ) {
+                $runtime->{finish}->( $runtime->{on_error_status}, $reason ) if $runtime->{finish};
+
+                return;
+            },
+            on_connect => sub ( $h ) {
+                $cb->($h);
 
                 return;
             }
@@ -646,10 +651,10 @@ sub _read_body ( $args, $runtime, $cb ) {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
 ## |      | 26                   | * Subroutine "http_request" with high complexity score (26)                                                    |
-## |      | 251                  | * Subroutine "_write_request" with high complexity score (28)                                                  |
-## |      | 375                  | * Subroutine "_read_body" with high complexity score (67)                                                      |
+## |      | 256                  | * Subroutine "_write_request" with high complexity score (28)                                                  |
+## |      | 380                  | * Subroutine "_read_body" with high complexity score (67)                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 587                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 592                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

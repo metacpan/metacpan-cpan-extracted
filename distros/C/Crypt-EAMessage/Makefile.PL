@@ -34,10 +34,13 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec" => 0,
     "Test2::V0" => "0.000111",
+    "Test::More" => 0,
     "Test::UseAllModules" => "0.17"
   },
-  "VERSION" => "1.007",
+  "VERSION" => "1.181840",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,11 +51,14 @@ my %FallbackPrereqs = (
   "Bytes::Random::Secure" => 0,
   "Carp" => 0,
   "Crypt::AuthEnc::CCM" => 0,
+  "ExtUtils::MakeMaker" => 0,
+  "File::Spec" => 0,
   "MIME::Base64" => 0,
   "Moose" => 0,
   "Moose::Util::TypeConstraints" => 0,
   "Storable" => 0,
   "Test2::V0" => "0.000111",
+  "Test::More" => 0,
   "Test::UseAllModules" => "0.17",
   "autodie" => 0,
   "feature" => 0,

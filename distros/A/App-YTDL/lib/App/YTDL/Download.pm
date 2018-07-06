@@ -19,7 +19,7 @@ END { print SHOW_CURSOR }
 
 
 sub _choose_fmt {
-    my ( $opt, $info, $ex, $video_id, $keep_chosen ) = @_;
+    my ( $opt, $info, $ex, $video_id ) = @_;
     my $fmt_to_info = $info->{$ex}{$video_id}{fmt_to_info};
     my ( @choices, @format_ids );
     if ( $ex eq 'youtube' ) {
@@ -115,7 +115,7 @@ sub download_youtube {
                 }
 
                 if ( $ask_fmt ) {
-                    $fmt_str = _choose_fmt( $opt, $info, $ex, $video_id, $choice eq $keep );
+                    $fmt_str = _choose_fmt( $opt, $info, $ex, $video_id );
                     if ( ! defined $fmt_str ) {
                         print $info->{$ex}{$video_id}{count} . '/' . $total . ' skipped' . "\n";
                         next VIDEO;

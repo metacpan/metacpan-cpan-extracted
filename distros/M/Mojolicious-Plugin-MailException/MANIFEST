@@ -3,6 +3,7 @@ Makefile.PL
 MANIFEST
 README
 t/010-tplugun.t
+t/020-maildir.t
 debian/changelog
 debian/compat
 debian/control

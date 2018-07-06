@@ -1,0 +1,141 @@
+Revision history for App-csv2tsv
+
+0.52    2018-07-05 Thu.
+        Escaping mechanism introduced.
+        Reverse function greatly changed.
+        Infomation showing in a more concise way.
+
+0.51    2018-07-04 Wed.
+        First version, released on an unsuspecting world.
+
+
+Before appearing on CPAN: 
+
+ 2015-09-28 : Firstly created on a whim.    
+ 2016-07-06 : Some options are added such as -2.    
+ 2016-08-03 : Response to tab and enter characgers.     
+ 2018-06-24 : Once realeased on CPAN for the sake of Table::Hack.    
+ 2018-07-04 : Refinements to options. English manual is added. 
+
+
+Log on the author's private repository: 
+
+ hg log -f */csv2tsv | cat
+changeset:   1313:a83cdce7c716
+tag:         tip
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Wed Jul 04 16:21:27 2018 +0900
+summary:     csv2tsv 英文マニュアルを加え、それをPODで書いた。
+
+changeset:   1312:0bf70100883b
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Wed Jul 04 15:18:09 2018 +0900
+summary:     csv2tsv 今日思いついたことは一通り実装。一応動作は確認済み。
+
+changeset:   1311:5e84a01b423d
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Wed Jul 04 14:08:01 2018 +0900
+summary:     csv2tsv しばらく入力が最初から何も無かった場合の注意を表示する工夫について、機能を少し洗練した。今までは、いつでも注意が出ていた。入力が始まるまで1秒ごとにピリオドを出すようにした。
+
+changeset:   1310:7daea3829150
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Wed Jul 04 13:49:59 2018 +0900
+summary:     csv2tsv いくつかの@Fを@$xに
+
+changeset:   1309:5d0565a4f69d
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Wed Jul 04 13:45:05 2018 +0900
+summary:     csv2tsv 軽くリファクタ
+
+changeset:   1191:b29a75932d1e
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Fri Jun 08 20:59:03 2018 +0900
+summary:     csv2tsv 大幅に簡素化、-t -n -! -2 として、逆変換 -~ を実装した。
+
+changeset:   1173:bc54db826b99
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Mon Jun 04 15:05:55 2018 +0900
+summary:     csv2tsv シェバンに-Tを追加
+
+changeset:   767:cefee57329e1
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Tue Oct 04 15:50:55 2016 +0900
+summary:     csv2tsv -c の指定を -n の非指定 となるように書換
+
+changeset:   761:059dc2527df5
+parent:      759:f0f267692e6c
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Tue Oct 04 13:50:08 2016 +0900
+summary:     88個のファイルについて、先頭行の/usr/bin/env perl -T にしていた729番目のコミットを backout して、元に戻した
+
+changeset:   729:ee10a89adbe9
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Tue Aug 09 21:00:02 2016 +0900
+summary:     107個のファイルについて、1行目を書換。env と -T  を使う様にした。
+
+changeset:   696:3adefbbe837b
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Mon Aug 08 16:23:36 2016 +0900
+summary:     ヘルプの動作を最新化した。9ファイルについて
+
+changeset:   687:2c5c9760de4c
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Wed Aug 03 15:35:58 2016 +0900
+summary:     csv2tsv ヘルプを少し書き換えた。なんとか表現という言葉でごまかした面があるので改善したい。
+
+changeset:   686:58b321f36ec9
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Wed Aug 03 15:26:22 2016 +0900
+summary:     csv2tsv タブと改行文字の置換アルゴリズムの改善と、置換個数の表示情報の逓増
+
+changeset:   685:d4b81d825d24
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Wed Aug 03 15:25:26 2016 +0900
+summary:     csv2tsv タブと改行文字の置換アルゴリズムの改善と、置換個数の表示情報の逓増
+
+changeset:   684:1657432afd48
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Wed Aug 03 13:24:24 2016 +0900
+summary:     csv2tsv 入力のレコード中にタブ文字や改行文字が含まれる場合の対策をほどこした
+
+changeset:   608:e35036ee2d7e
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Fri Jul 15 20:33:04 2016 +0900
+summary:     csv2tsv.pl を csv2tsv に改名。さらに、キーボードから入力時に黄色で注意を与えるようにした。
+
+changeset:   557:6bfe1b4f47ef
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Wed Jul 06 18:56:04 2016 +0900
+summary:     csv2tsv.pl 引数にファイル名が与えられた場合に対応。pipeを使った。さらに実験的に-2のオプションを実装。
+
+changeset:   556:779b5505653a
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Wed Jul 06 18:12:35 2016 +0900
+summary:     csv2tsv.pl ヘルプの部分をリファクタ
+
+changeset:   222:d9e9cadc6949
+user:        Toshiyuki Shimono
+date:        Wed Feb 17 15:53:53 2016 +0900
+summary:     ファイル編成の変更中
+
+changeset:   64:52376bff271d
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Mon Oct 19 14:33:57 2015 +0900
+summary:     外で作ったファイルを3個加えた。csv2tsv.pl は動作上重大な修正を加え。binmodeが2個あっても優先されるのは前の方。
+
+changeset:   46:94a2719216d8
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Mon Sep 28 02:49:48 2015 +0000
+summary:     csv2tsv.pl edited online with Bitbucket
+
+changeset:   44:4b88da9f8f6b
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Sun Sep 27 07:30:09 2015 +0000
+summary:     csv2tsv.pl edited online with Bitbucket
+
+changeset:   43:9eb840543e0f
+user:        Toshiyuki Shimono <tulamili@gmail.com>
+date:        Sun Sep 27 07:24:21 2015 +0000
+summary:     scsv2utsv.pl edited online with Bitbucket
+        
+

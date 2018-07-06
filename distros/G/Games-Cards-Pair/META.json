@@ -46,15 +46,15 @@
    "provides" : {
       "Games::Cards::Pair" : {
          "file" : "lib/Games/Cards/Pair.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Games::Cards::Pair::Card" : {
          "file" : "lib/Games/Cards/Pair/Card.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       },
       "Games::Cards::Pair::Params" : {
          "file" : "lib/Games/Cards/Pair/Params.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -65,6 +65,6 @@
          "web" : "https://github.com/manwar/Games-Cards-Pair"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -21,7 +21,7 @@ jQuery(function() {
         var conditionedby_vals = ["<% join('", "', @conditioned_by_vals) |n%>"];
         var condition_met = 0;
         jQuery.each(conditionedby_vals, function(i, conditioned_by_val) {
-            if (jQuery('input[value="'+conditioned_by_val+'"]').is(':checked')) {
+            if (jQuery('input[name="'+conditionedby_name+'"][value="'+conditioned_by_val+'"]').is(':checked')) {
                 condition_met = 1;
             }
         });

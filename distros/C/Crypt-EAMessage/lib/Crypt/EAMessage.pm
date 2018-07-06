@@ -4,7 +4,7 @@
 #
 
 package Crypt::EAMessage;
-$Crypt::EAMessage::VERSION = '1.007';
+$Crypt::EAMessage::VERSION = '1.181840';
 use v5.22;
 
 # ABSTRACT: Simple-to-use Abstraction of Encrypted Authenticated Messages
@@ -191,7 +191,7 @@ Crypt::EAMessage - Simple-to-use Abstraction of Encrypted Authenticated Messages
 
 =head1 VERSION
 
-version 1.007
+version 1.181840
 
 =head1 SYNOPSIS
 

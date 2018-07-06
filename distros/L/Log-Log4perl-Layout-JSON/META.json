@@ -25,6 +25,7 @@
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::Git::Tag" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
             "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Software::License::Perl_5" : "0",
@@ -50,8 +51,10 @@
       "test" : {
          "requires" : {
             "Encode" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Log::Log4perl::MDC" : "0",
-            "Test::Compile" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
             "Test::Warnings" : "0",
@@ -60,19 +63,25 @@
          }
       }
    },
+   "provides" : {
+      "Log::Log4perl::Layout::JSON" : {
+         "file" : "lib/Log/Log4perl/Layout/JSON.pm",
+         "version" : "0.54"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-log-log4perl-layout-json at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Log-Log4perl-Layout-JSON"
+         "web" : "https://github.com/mschout/Log-Log4perl-Layout-JSON/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Log-Log4perl-Layout-JSON/",
+      "homepage" : "https://github.com/mschout/Log-Log4perl-Layout-JSON",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mschout/Log-Log4perl-Layout-JSON"
+         "url" : "https://github.com/mschout/Log-Log4perl-Layout-JSON.git",
+         "web" : "https://github.com/mschout/Log-Log4perl-Layout-JSON"
       }
    },
-   "version" : "0.53",
+   "version" : "0.54",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

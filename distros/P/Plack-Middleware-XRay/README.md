@@ -38,6 +38,19 @@ Plack::Middleware::XRay - Plack middleware for AWS X-Ray tracing
           $app;
       };
 
+      # example of response filter
+      builder {
+          enable "XRay"
+              name            => "myApp",
+              response_filter => sub {
+                  my ($env, $res, $elapsed) = @_;
+                 # true if server error or slow response.
+                 return $res->[0] >= 500 || $elapsed >= 1.5;
+              },
+          ;
+          $app;
+      };
+
 # DESCRIPTION
 
 Plack::Middleware::XRay is a middleware for AWS X-Ray.
@@ -76,6 +89,12 @@ Code ref to generate an annotations hashref.
 ## metadata\_buidler
 
 Code ref to generate a metadata hashref.
+
+## response\_filter
+
+When response\_filter defined, call the coderef with ($env, $res, $elapsed) after $app run.
+
+Segment data are sent to xray daemon only when the coderef returns true.
 
 # LICENSE
 

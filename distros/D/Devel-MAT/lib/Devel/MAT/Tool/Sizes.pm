@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use constant FOR_UI => 1;
 
@@ -184,48 +184,40 @@ sub Devel::MAT::SV::owned_size
 
 =cut
 
-=head2 sizes
+=head2 size
+
+Prints the sizes of a given SV
+
+   pmat> size defstash
+   STASH(61) at 0x556e47243e10=defstash consumes:
+     2.1 KiB directly
+     11.2 KiB structurally
+     54.2 KiB including owned referrants
 
 =cut
 
-use constant CMD => "sizes";
-use constant CMD_DESC => "Summarize object and byte counts across different SV types";
+use constant CMD => "size";
+use constant CMD_DESC => "Show the size of a given SV";
 
-use constant CMD_OPTS => (
-   struct => { help => "sum SVs by structural size" },
-   owned  => { help => "sum SVs by owned size" },
-);
+use constant CMD_ARGS_SV => 1;
 
 sub run
 {
    my $self = shift;
-   my %opts = %{ +shift };
+   my ( $sv ) = @_;
 
-   my %total_svs;
-   my %total_bytes;
+   Devel::MAT::Cmd->printf( "%s consumes:\n",
+      Devel::MAT::Cmd->format_sv( $sv )
+   );
 
-   my $meth = $opts{owned}  ? "owned_size" :
-              $opts{struct} ? "structure_size" :
-              "size";
-
-   foreach my $sv ( $self->df->heap ) {
-      my $type = $sv->blessed ? sprintf( "%s(%s)", $sv->type, $sv->blessed->stashname ) 
-                              : $sv->type;
-
-      $total_svs{$type}   += 1;
-      $total_bytes{$type} += $sv->$meth;
-   }
-
-   Devel::MAT::Cmd->print_table(
-      [
-         [qw( Type SVs Bytes )],
-         map {
-            my $type = $_;
-            [ $type, $total_svs{$type}, $total_bytes{$type} ];
-         } rev_nsort_by { $total_bytes{$_} } keys %total_svs,
-      ],
-      sep   => " | ",
-      align => [ undef, "right", "right" ],
+   Devel::MAT::Cmd->printf( "  %s directly\n",
+      Devel::MAT::Cmd->format_bytes( $sv->size )
+   );
+   Devel::MAT::Cmd->printf( "  %s structurally\n",
+      Devel::MAT::Cmd->format_bytes( $sv->structure_size )
+   );
+   Devel::MAT::Cmd->printf( "  %s including owned referrants\n",
+      Devel::MAT::Cmd->format_bytes( $sv->owned_size )
    );
 }
 

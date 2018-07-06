@@ -47,9 +47,9 @@
             "HTTP::Message" : "0",
             "HTTP::Request" : "0",
             "JSON" : "0",
+            "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "Net::Azure::Authorization::SAS" : "0.03",
-            "Net::SSLeay" : "0",
             "Try::Tiny" : "0",
             "URI" : "0",
             "perl" : "5.008001"
@@ -65,7 +65,7 @@
    "provides" : {
       "Net::Azure::EventHubs" : {
          "file" : "lib/Net/Azure/EventHubs.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Net::Azure::EventHubs::Request" : {
          "file" : "lib/Net/Azure/EventHubs/Request.pm"
@@ -85,5 +85,5 @@
          "web" : "https://github.com/ytnobody/p5-Net-Azure-EventHubs"
       }
    },
-   "version" : "0.06"
+   "version" : "0.07"
 }

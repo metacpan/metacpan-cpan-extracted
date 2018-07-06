@@ -1,0 +1,31 @@
+
+Create "shortcut" keys to set render_args in field definitions:
+
+has_field 'foo' => ( 'ra.element_attr.class' => [ 'mb10', 'cs33' ] }
+has_field 'foo' => ( 'ra.ea.class' => [ 'mb10', 'cs33' ] }
+
+render_args = 'ra'
+element_attr = 'ea'
+label_attr = 'la'
+wrapper_attr = 'wa' ... which wrapper?
+
+Wrapping.
+
+What's the difference between a layout and a wrapper...
+ok, a layout has the order of things and intermediate stuff like the bootstrap controls
+a wrapper just wraps other content
+
+a wrapper just wraps, usually with a div, but could be a fieldset or something
+
+Do we want element wrappers? um... what other kind of wrappers?
+
+tomboh: the code base I'm currently working on uses lots of "wrapper_class" and "wrapper_tag" and some "element_class" and "element_attr"
+
+ra.wa.class  ra.wa.tag  ra.ea.class  ra.ea.<whatever>
+
+
+There's a problem with the whole Repeatable 'contains' thing. It behaves very strangely. Maybe discourage or remove it in favor of the List field?
+Anyway, if it stays, should fix the id on the repeatable instance container, and don't use the stupid 0 label, so render without a label for
+the elements of the array, and *with* a label for the "field".
+
+

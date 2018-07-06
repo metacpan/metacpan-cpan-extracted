@@ -4,8 +4,10 @@ use strict;
 use warnings;
 use Mojolicious::Lite;
 use Mojo::JSON qw(decode_json);
-use Path::Tiny;
 use Net::Statsite::Client;
+use Mojo::File qw(path);
+use File::Spec;
+use File::stat;
 use Log::Dispatch;
 use MojoX::Log::Dispatch::Simple;
 
@@ -13,7 +15,7 @@ use Stor;
 
 $ENV{MOJO_MAX_MESSAGE_SIZE} = 524288000;    #the size of message: 500 MB
 
-my $cfg = load_config();
+my $cfg      = load_config();
 my $statsite = Net::Statsite::Client->new(%{ $cfg->{statsite} });
 
 my $logger = MojoX::Log::Dispatch::Simple->new(
@@ -44,19 +46,34 @@ app->config(hypnotoad => { clients => $ENV{HYPNOTOAD_CLIENTS} // 100 });
 app->log($logger);
 
 
-get  '/'       => sub { $stor->about(@_)  };
-get  '/status' => sub { $stor->status(@_) };
-get  '/:sha'   => sub { $stor->get(@_)    };
-post '/:sha'   => sub { $stor->post(@_)   };
+start_cleanup_tempdir_task();
 
-app->secrets([$cfg->{secret}]);
+get '/'       => sub { $stor->about(@_) };
+get '/status' => sub { $stor->status(@_) };
+get '/:sha'   => sub { $stor->get(@_) };
+post '/:sha'  => sub { $stor->post(@_) };
+
+app->secrets([ $cfg->{secret} ]);
 app->start;
-
 
 sub load_config {
     die 'CONFIG_FILE environment variable not set'
-        if !defined $ENV{CONFIG_FILE};
+      if !defined $ENV{CONFIG_FILE};
 
-    return decode_json(path($ENV{CONFIG_FILE})->slurp())
+    return decode_json(path($ENV{CONFIG_FILE})->slurp());
+}
+
+# cleanup old temp files
+sub start_cleanup_tempdir_task {
+    my $cleanup_tempdir_period = $cfg->{cleanup_tempdir_period} // 60 * 30;    #default 30m
+    Mojo::IOLoop->recurring(
+        $cleanup_tempdir_period => sub {
+            path(File::Spec->tmpdir)
+              ->list()
+              ->grep(sub { $_->basename =~ /^mojo\.tmp/ })
+              ->grep(sub { stat($_)->mtime < (time - $cleanup_tempdir_period)})
+              ->each(sub { $_->remove_tree });
+        }
+    );
 }
 

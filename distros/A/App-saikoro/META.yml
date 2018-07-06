@@ -16,8 +16,8 @@ name: App-saikoro
 provides:
   App::saikoro:
     file: lib/App/saikoro.pm
-    version: '0.22'
+    version: '0.23'
 resources:
   license: http://www.gnu.org/licenses/gpl-3.0.txt
-version: '0.22'
+version: '0.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

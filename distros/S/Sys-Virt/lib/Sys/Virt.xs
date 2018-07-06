@@ -2398,6 +2398,23 @@ get_node_security_model(con)
    OUTPUT:
       RETVAL
 
+HV *
+get_node_sev_info(conn, flags=0)
+      virConnectPtr conn;
+      unsigned int flags;
+  PREINIT:
+      virTypedParameterPtr params;
+      int nparams;
+    CODE:
+      if (virNodeGetSEVInfo(conn, &params, &nparams, flags) < 0) {
+          _croak_error();
+      }
+
+      RETVAL = vir_typed_param_to_hv(params, nparams);
+      free(params);
+  OUTPUT:
+      RETVAL
+
 void
 get_node_cpu_map(con, flags=0)
       virConnectPtr con;
@@ -3044,6 +3061,27 @@ list_all_nwfilters(con, flags=0)
           PUSHs(nwfilterrv);
       }
       free(nwfilters);
+
+
+void
+list_all_nwfilter_bindings(con, flags=0)
+      virConnectPtr con;
+      unsigned int flags;
+ PREINIT:
+      virNWFilterBindingPtr *bindings;
+      int i, nbinding;
+      SV *bindingrv;
+  PPCODE:
+      if ((nbinding = virConnectListAllNWFilterBindings(con, &bindings, flags)) < 0)
+          _croak_error();
+
+      EXTEND(SP, nbinding);
+      for (i = 0 ; i < nbinding ; i++) {
+          bindingrv = sv_newmortal();
+          sv_setref_pv(bindingrv, "Sys::Virt::NWFilterBinding", bindings[i]);
+          PUSHs(bindingrv);
+      }
+      free(bindings);
 
 
 void
@@ -4941,6 +4979,23 @@ set_perf_events(dom, newparams, flags=0)
       if (virDomainSetPerfEvents(dom, params, nparams, flags) < 0)
           _croak_error();
       Safefree(params);
+
+
+HV *
+get_launch_security_info(dom, flags=0)
+      virDomainPtr dom;
+      unsigned int flags;
+  PREINIT:
+      virTypedParameterPtr params;
+      int nparams;
+    CODE:
+      if (virDomainGetLaunchSecurityInfo(dom, &params, &nparams, flags) < 0) {
+          _croak_error();
+      }
+      RETVAL = vir_typed_param_to_hv(params, nparams);
+      free(params);
+  OUTPUT:
+      RETVAL
 
 
 unsigned long
@@ -7804,6 +7859,88 @@ DESTROY(filter_rv)
       }
 
 
+MODULE = Sys::Virt::NWFilterBinding  PACKAGE = Sys::Virt::NWFilterBinding
+
+
+virNWFilterBindingPtr
+_create_xml(con, xml, flags=0)
+      virConnectPtr con;
+      const char *xml;
+      unsigned int flags;
+    CODE:
+      if (!(RETVAL = virNWFilterBindingCreateXML(con, xml, flags)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+virNWFilterBindingPtr
+_lookup_by_port_dev(con, name)
+      virConnectPtr con;
+      const char *name;
+    CODE:
+      if (!(RETVAL = virNWFilterBindingLookupByPortDev(con, name)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+const char *
+get_port_dev(binding)
+      virNWFilterBindingPtr binding;
+    CODE:
+      if (!(RETVAL = virNWFilterBindingGetPortDev(binding)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+const char *
+get_filter_name(binding)
+      virNWFilterBindingPtr binding;
+    CODE:
+      if (!(RETVAL = virNWFilterBindingGetFilterName(binding)))
+          _croak_error();
+  OUTPUT:
+      RETVAL
+
+
+SV *
+get_xml_description(binding, flags=0)
+      virNWFilterBindingPtr binding;
+      unsigned int flags;
+  PREINIT:
+      char *xml;
+    CODE:
+      if (!(xml = virNWFilterBindingGetXMLDesc(binding, flags)))
+          _croak_error();
+
+      RETVAL = newSVpv(xml, 0);
+      free(xml);
+  OUTPUT:
+      RETVAL
+
+
+void
+delete(binding)
+      virNWFilterBindingPtr binding;
+    PPCODE:
+      if (virNWFilterBindingDelete(binding) < 0)
+          _croak_error();
+
+void
+DESTROY(binding_rv)
+      SV *binding_rv;
+ PREINIT:
+      virNWFilterBindingPtr binding;
+  PPCODE:
+      binding = (virNWFilterBindingPtr)SvIV((SV*)SvRV(binding_rv));
+      if (binding) {
+          virNWFilterBindingFree(binding);
+          sv_setiv((SV*)SvRV(binding_rv), 0);
+      }
+
+
 MODULE = Sys::Virt::DomainSnapshot  PACKAGE = Sys::Virt::DomainSnapshot
 
 
@@ -8461,6 +8598,12 @@ BOOT:
       REGISTER_CONSTANT(VIR_NODE_ALLOC_PAGES_ADD, NODE_ALLOC_PAGES_ADD);
       REGISTER_CONSTANT(VIR_NODE_ALLOC_PAGES_SET, NODE_ALLOC_PAGES_SET);
 
+
+      REGISTER_CONSTANT_STR(VIR_NODE_SEV_CBITPOS, SEV_CBITPOS);
+      REGISTER_CONSTANT_STR(VIR_NODE_SEV_CERT_CHAIN, SEV_CERT_CHAIN);
+      REGISTER_CONSTANT_STR(VIR_NODE_SEV_PDH, SEV_PDH);
+      REGISTER_CONSTANT_STR(VIR_NODE_SEV_REDUCED_PHYS_BITS, SEV_REDUCED_PHYS_BITS);
+
       stash = gv_stashpv( "Sys::Virt::Event", TRUE );
 
       REGISTER_CONSTANT(VIR_EVENT_HANDLE_READABLE, HANDLE_READABLE);
@@ -8658,6 +8801,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_CONNECT_GET_ALL_DOMAINS_STATS_RUNNING, GET_ALL_STATS_RUNNING);
       REGISTER_CONSTANT(VIR_CONNECT_GET_ALL_DOMAINS_STATS_SHUTOFF, GET_ALL_STATS_SHUTOFF);
       REGISTER_CONSTANT(VIR_CONNECT_GET_ALL_DOMAINS_STATS_TRANSIENT, GET_ALL_STATS_TRANSIENT);
+      REGISTER_CONSTANT(VIR_CONNECT_GET_ALL_DOMAINS_STATS_NOWAIT, GET_ALL_STATS_NOWAIT);
       REGISTER_CONSTANT(VIR_CONNECT_GET_ALL_DOMAINS_STATS_ENFORCE_STATS, GET_ALL_STATS_ENFORCE_STATS);
       REGISTER_CONSTANT(VIR_CONNECT_GET_ALL_DOMAINS_STATS_BACKING, GET_ALL_STATS_BACKING);
 
@@ -9182,6 +9326,9 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_LIFECYCLE_ACTION_COREDUMP_DESTROY, LIFECYCLE_ACTION_COREDUMP_DESTROY);
       REGISTER_CONSTANT(VIR_DOMAIN_LIFECYCLE_ACTION_COREDUMP_RESTART, LIFECYCLE_ACTION_COREDUMP_RESTART);
 
+
+      REGISTER_CONSTANT_STR(VIR_DOMAIN_LAUNCH_SECURITY_SEV_MEASUREMENT, LAUNCH_SECURITY_SEV_MEASUREMENT);
+
       stash = gv_stashpv( "Sys::Virt::DomainSnapshot", TRUE );
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_DELETE_CHILDREN, DELETE_CHILDREN);
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_DELETE_METADATA_ONLY, DELETE_METADATA_ONLY);
@@ -9591,4 +9738,6 @@ BOOT:
       REGISTER_CONSTANT(VIR_ERR_AGENT_UNSYNCED, ERR_AGENT_UNSYNCED);
       REGISTER_CONSTANT(VIR_ERR_LIBSSH, ERR_LIBSSH);
       REGISTER_CONSTANT(VIR_ERR_DEVICE_MISSING, ERR_DEVICE_MISSING);
+      REGISTER_CONSTANT(VIR_ERR_INVALID_NWFILTER_BINDING, ERR_INVALID_NWFILTER_BINDING);
+      REGISTER_CONSTANT(VIR_ERR_NO_NWFILTER_BINDING, ERR_NO_NWFILTER_BINDING);
     }

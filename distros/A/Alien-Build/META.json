@@ -24,7 +24,9 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "ExtUtils::CBuilder" : "0",
             "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::ParseXS" : "3.30",
             "File::Which" : "0",
             "perl" : "5.008001"
          }
@@ -91,7 +93,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.46",
+   "version" : "1.48",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -120,7 +122,7 @@
       "Shoichi Kaji (SKAJI)",
       "Shawn Laffan (SLAFFAN)"
    ],
-   "x_generated_by_perl" : "v5.28.0",
+   "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
    "x_use_unsafe_inc" : 0
 }

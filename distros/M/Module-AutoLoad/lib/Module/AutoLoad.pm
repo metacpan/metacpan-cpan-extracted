@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Exporter);
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 our $last_fetched = "";
 our $lib = "lib";
@@ -137,10 +137,11 @@ sub inc {
     $dist =~ s{/+}{-}g;
     $mod  =~ s{/+}{::}g;
 
-    my $mapper = $ENV{AUTOLOAD_SRC} || "http://search.cpan.org/dist";
+    my $mapper = $ENV{AUTOLOAD_SRC} || "http://fastapi.metacpan.org/v1/release";
     my $search = fetch("$mapper/$dist/");
-    if ($search =~ m{href="([^<>]+)">Browse<}) {
-      my $src = full($1);
+    warn "DEBUG: Probed: $last_fetched\n" if $ENV{AUTOLOAD_DEBUG};
+    if ($search =~ m{download_url.*?(\w+/[\w\d\-\.]+)\.tar.gz}) {
+      my $src = full("/source/$1/");
       if (my $MANIFEST = fetch "$src/MANIFEST") {
         $src = $1 if $last_fetched =~ m{^(.*?)/+MANIFEST};
         if ($MANIFEST =~ m{^lib/}m) {
@@ -349,7 +350,7 @@ Wom Baht (wombaht@gmail.com) - RCX Obfuscation Framework to get the code snippet
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2015 by Rob Brown
+Copyright (C) 2011-2018 by Rob Brown
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

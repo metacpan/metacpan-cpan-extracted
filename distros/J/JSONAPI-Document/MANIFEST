@@ -21,6 +21,7 @@ t/002-documents.t
 t/003-attributes.t
 t/004-kebab.t
 t/005-fieldsets.t
+t/006-types.t
 t/author-pod-syntax.t
 t/etc/schema.json
 t/lib/Test/JSONAPI.pm

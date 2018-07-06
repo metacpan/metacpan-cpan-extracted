@@ -1,5 +1,11 @@
 Revision history for Perl extension AWS-XRay
 
+0.06 2018-07-05T06:58:37Z
+    - Fix segment data lost in 0.05 and auto_flush(0).
+
+0.05 2018-07-05T01:50:46Z
+    - Add auto_flush()
+
 0.04 2018-06-22T15:05:03Z
     - Add sampler()
 

@@ -1,16 +1,16 @@
 package DBIx::Class::InflateColumn::ClassTypeEnum;
 # ABSTRACT: Inflate enum-like columns to your Class::Type::Enum classes
-$DBIx::Class::InflateColumn::ClassTypeEnum::VERSION = '0.009';
+$DBIx::Class::InflateColumn::ClassTypeEnum::VERSION = '0.011';
 
 use warnings;
 use strict;
 
-use Function::Parameters 2;
 use Carp ();
 
 
 
-method register_column ($column, $info) {
+sub register_column {
+  my ($self, $column, $info) = @_;
   $self->next::method(@_);
 
   return unless $info->{extra} and my $class = $info->{extra}{enum_class};
@@ -26,11 +26,13 @@ method register_column ($column, $info) {
   if ($info->{extra}{enum_ordinal_storage}) {
     $self->inflate_column(
       $column => {
-        inflate => fun ($ord = undef, @) {
+        inflate => sub {
+          my ($ord) = @_;
           return unless defined $ord;
           $class->inflate_ordinal($ord);
         },
-        deflate => fun ($enum = undef, @) {
+        deflate => sub {
+          my ($enum) = @_;
           return unless defined $enum;
           $enum->numify;
         },
@@ -41,11 +43,13 @@ method register_column ($column, $info) {
   else {
     $self->inflate_column(
       $column => {
-        inflate => fun ($val = undef, @) {
+        inflate => sub {
+          my ($val) = @_;
           return unless defined $val;
           $class->inflate_symbol($val);
         },
-        deflate => fun ($enum = undef, @) {
+        deflate => sub {
+          my ($enum) = @_;
           return unless defined $enum;
           $enum->stringify;
         },
@@ -69,7 +73,7 @@ DBIx::Class::InflateColumn::ClassTypeEnum - Inflate enum-like columns to your Cl
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -137,7 +141,7 @@ Meredith Howard <mhoward@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Meredith Howard.
+This software is copyright (c) 2018 by Meredith Howard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

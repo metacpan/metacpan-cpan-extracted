@@ -1,0 +1,146 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "match::simple::XS"^^doap-deps:CpanId ], [
+		doap-deps:on "MooseX::Enumeration"^^doap-deps:CpanId;
+	];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Util 1.40"^^doap-deps:CpanId ], [
+		doap-deps:on "Type::Tiny::Enum 0.030"^^doap-deps:CpanId;
+	], [ doap-deps:on "match::simple"^^doap-deps:CpanId ], [ doap-deps:on "Eval::TypeTiny"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [
+		doap-deps:on "MooseX::Enumeration"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [
+		doap-deps:on "Types::Standard 0.030"^^doap-deps:CpanId;
+	], [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=MooX-Enumeration>;
+	doap:created         "2018-07-03"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/MooX-Enumeration>;
+	doap:homepage        <https://metacpan.org/release/MooX-Enumeration>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "MooX-Enumeration";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-moox-enumeration>;
+	];
+	doap:shortdesc       "shortcuts for working with enum attributes in Moo".
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "MooX-Enumeration-0.001"^^xsd:string;
+	dc:issued            "2018-07-03"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Enumeration-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "MooX-Enumeration-0.002"^^xsd:string;
+	dc:issued            "2018-07-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Can haz docs?.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Enumeration-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "MooX-Enumeration-0.003"^^xsd:string;
+	dc:issued            "2018-07-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add missing dependency on match::simple.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/125748>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/srezic>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Enumeration-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "MooX-Enumeration-0.004"^^xsd:string;
+	dc:issued            "2018-07-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Properly support attributes with triggers and lazy defaults/builders.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Enumeration-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "MooX-Enumeration-0.005"^^xsd:string;
+	dc:issued            "2018-07-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix precendence issue with lazy defaults/builders.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Add explicit dependency on Eval::TypeTiny (which has been required since 0.004).";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Enumeration-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "MooX-Enumeration-0.006"^^xsd:string;
+	dc:issued            "2018-07-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Depend on Type::Tiny::Enum instead of Types::Standard. (The latter is still used for test suite.)";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Enumeration-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/srezic>
+	a                    foaf:Person;
+	foaf:name            "Slaven Rezić";
+	foaf:nick            "SREZIC";
+	foaf:page            <https://metacpan.org/author/SREZIC>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/125748>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "125748"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=125748>.
+

@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unrestricted"
    ],
@@ -29,9 +29,6 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
-      },
-      "runtime" : {
-         "requires" : {}
       }
    },
    "release_status" : "stable",
@@ -47,5 +44,6 @@
          "url" : "https://github.com/leejo/string-crc32"
       }
    },
-   "version" : "1.6"
+   "version" : 1.7,
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

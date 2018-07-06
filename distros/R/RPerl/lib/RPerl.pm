@@ -6,10 +6,10 @@ use strict;
 use warnings;
 
 # DEV NOTE, CORRELATION #rp016: CPAN's underscore-is-beta (NOT RPerl's underscore-is-comma) numbering scheme utilized here, to preserve trailing zeros
-our $VERSION = '3.601000';
+our $VERSION = '4.000000';
 
-#our $VERSION = 20180307;    # NON-RELEASE VERSION NUMBER, OFFICIAL LONGDATE
-#our $VERSION = 2018.066;    # NON-RELEASE VERSION NUMBER, OFFICIAL STARDATE
+#our $VERSION = 20180704;    # NON-RELEASE VERSION NUMBER, OFFICIAL LONGDATE
+#our $VERSION = 2018.185;    # NON-RELEASE VERSION NUMBER, OFFICIAL STARDATE
 
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
@@ -77,10 +77,25 @@ sub filter {
     # pre-generate $inc_skip to use in this file and in Module::ScanDeps::scan_deps()
     foreach my $included_filename_short ( sort keys %INC ) {
 #        print {*STDERR} 'in RPerl::filter(), $rand_serial = ' . $rand_serial . ', top of $inc_skip loop, have $included_filename_short = ' . $included_filename_short . "\n";
+
+        # skip AutoSplit index files
+        if ((substr $included_filename_short, -12, 12) eq 'autosplit.ix') {
+#            print {*STDERR} 'in RPerl::filter(),     skipping Autosplit file, have $included_filename_short = ' . $included_filename_short . "\n";
+            $inc_skip->{$included_filename_short} = $INC{$included_filename_short};
+            next;
+        }
+
+        # do NOT skip files which have been explicitly named as "Compilable"
+        if ((substr $included_filename_short, -13, 13) eq 'Compilable.pm'){
+#            print {*STDERR} 'in RPerl::filter(), not skipping explicitly named Compilable file, have $included_filename_short = ' . $included_filename_short . "\n";
+            next;
+        }
+
         $namespace_root = filename_short_to_namespace_root_guess($included_filename_short);
 #        print {*STDERR} 'in RPerl::filter(), $rand_serial = ' . $rand_serial . ', in $inc_skip loop, have $namespace_root = ' . $namespace_root . "\n";
         if (( $namespace_root ne q{} )
-            and (  ( exists $rperlnamespaces_generated::CORE->{$namespace_root} )
+            and (  ( exists $rperlnamespaces_generated::NONCOMPILED->{$namespace_root} )
+                or ( exists $rperlnamespaces_generated::CORE->{$namespace_root} )
                 or ( exists $rperlnamespaces_generated::RPERL_DEPS->{$namespace_root} )
                 or ( exists $rperlnamespaces_generated::RPERL->{$namespace_root} ) )
             )
@@ -137,11 +152,24 @@ sub filter {
 
 #    print {*STDERR} "\n" . 'in RPerl::filter(), have pre-modification $input = ' . "\n" . '<<<<<<<<<<<<<<<<================ BEGIN INPUT FILE ================>>>>>>>>>>>>>>' . "\n" . $input . "\n" . '<<<<<<<<<<<<<<<<================ END INPUT FILE ================>>>>>>>>>>>>>>' . "\n\n";
 
+    # 'package' statement may be split across 2 lines
+    my $input_line_partial = q{};
+
     # look for all user-defined classes, create subclasses
     foreach my $input_line ( split /\n/, $input ) {
 #        print {*STDERR} 'in RPerl::filter(), have $input_line = ' . $input_line . "\n";
+#        print {*STDERR} 'in RPerl::filter(), have $input_line_partial = ' . $input_line_partial . "\n";
+
+        if ($input_line_partial ne q{}) {
+            $input_line = $input_line_partial . q{ } . $input_line;
+            $input_line_partial = q{};
+        }
         
-        if ( $input_line =~ /^\s*package\s+(.*)\s*;/xms ) {
+        # partial package line, allow to be split over 2 lines to disable CPAN indexing, discard comments
+        if ( $input_line =~ /^\s*(package)\s*(?:\#.*)?\s*$/xms ) {
+            $input_line_partial = $1;
+        }
+        elsif ( $input_line =~ /^\s*package\s+(.*)\s*;/xms ) {
             if ($package ne q{}) {
                 # multiple packages in one module file
                 $output .= $post_package_lines;

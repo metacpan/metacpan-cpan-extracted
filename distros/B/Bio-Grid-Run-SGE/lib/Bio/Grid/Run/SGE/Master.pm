@@ -25,7 +25,7 @@ use Bio::Gonzales::Util qw/sys_fmt/;
 use FindBinNew qw($Bin $Script);
 FindBinNew::again();
 
-our $VERSION = '0.064'; # VERSION
+our $VERSION = '0.065'; # VERSION
 
 has 'env'    => ( is => 'rw', required => 1 );
 has 'config' => ( is => 'rw', required => 1 );

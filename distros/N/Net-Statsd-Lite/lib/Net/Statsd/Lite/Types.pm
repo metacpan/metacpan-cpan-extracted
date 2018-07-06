@@ -12,28 +12,32 @@ use Type::Utils -all;
 
 BEGIN { extends "Types::Standard" }
 
-our $VERSION = 'v0.4.3';
+our $VERSION = 'v0.4.4';
 
+
+# See also Types::Common::Numeric PositiveOrZeroInt
 
 declare "PosInt", as Int,
   where { $_ >= 0 },
-  inline_as { my $n = $_[1]; "$n >= 0" };
+  inline_as { my $n = $_[1]; (undef, "$n >= 0") };
+
+# See also Types::Common::Numeric PositiveOrZeroNum
 
 declare "PosNum", as StrictNum,
   where { $_ >= 0 },
-  inline_as { my $n = $_[1]; "$n >= 0" };
+  inline_as { my $n = $_[1]; (undef, "$n >= 0") };
 
 declare "Port", as "PosInt",
   where { $_ >= 0 && $_ <= 65535 },
-  inline_as { my $port = $_[1]; "$port >= 0 && $port <= 65535" };
+  inline_as { my $port = $_[1]; (undef, "$port <= 65535") };
 
 declare "Rate", as StrictNum,
   where { $_ >= 0 && $_ <= 1 },
-  inline_as { my $n = $_[1]; "$n >= 0 && $n <= 1" };
+  inline_as { my $n = $_[1]; (undef, "$n >= 0 && $n <= 1") };
 
 declare "Gauge", as Str,
   where { $_ =~ /\A[\-\+]?\d+\z/ },
-  inline_as { my $n = $_[1]; "$n =~ /\\A[\\-\\+]?\\d+\\z/" };
+  inline_as { my $n = $_[1]; (undef, "$n =~ /\\A[\\-\\+]?\\d+\\z/") };
 
 
 1;
@@ -50,7 +54,7 @@ Net::Statsd::Lite::Types - A type library for Net::Statsd::Lite
 
 =head1 VERSION
 
-version v0.4.3
+version v0.4.4
 
 =head1 DESCRIPTION
 

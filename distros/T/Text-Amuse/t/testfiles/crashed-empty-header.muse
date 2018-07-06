@@ -1,0 +1,14 @@
+#title Crash on empty header
+#slides 1
+
+** Bug title
+
+This text should be displayed
+
+** <verbatim></verbatim>
+
+After an empty header
+
+** Again
+
+Here gain

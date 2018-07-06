@@ -5,9 +5,9 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 37;
+plan tests => 41;
 
-use Math::AnyNum qw(:overload sum binomial bernoulli bernreal lnbern euler faulhaber_sum irand);
+use Math::AnyNum qw(:overload sum binomial bernoulli bernreal lnbern euler faulhaber_sum irand secant_number tangent_number);
 
 # Bernoulli numbers
 {
@@ -32,11 +32,13 @@ use Math::AnyNum qw(:overload sum binomial bernoulli bernreal lnbern euler faulh
         is(Math::AnyNum->new($i)->bernfrac->stringify, $results{$i});
     }
 
-    is((-2)->bernfrac, NaN);    # make sure we check for even correctly
+    is((-2)->bernfrac,  NaN);    # make sure we check for even correctly
+    is(bernoulli('-2'), NaN);    # make sure we check for even correctly
 
 #<<<
-    is(bernoulli(52), '-801165718135489957347924991853/1590');
-    is(bernoulli(106), '36373903172617414408151820151593427169231298640581690038930816378281879873386202346572901/642');
+    is(bernoulli('41'), '0');
+    is(bernoulli('52'), '-801165718135489957347924991853/1590');
+    is(bernoulli('106'), '36373903172617414408151820151593427169231298640581690038930816378281879873386202346572901/642');
 #>>>
 
     #
@@ -82,3 +84,6 @@ is(euler(-2), NaN);
 is(join(', ', map { my $n = $_; euler($n) } 0 .. 10), "1, 0, -1, 0, 5, 0, -61, 0, 1385, 0, -50521");
 is(join(', ', map { my $n = $_; 2 * $n * euler(2 * $n - 1, 0) } 1 .. 10), "-1, 1, -3, 17, -155, 2073, -38227, 929569, -28820619, 1109652905");
 #>>>
+
+is(join(', ', map { secant_number($_) } 0 .. 9),  '1, 1, 5, 61, 1385, 50521, 2702765, 199360981, 19391512145, 2404879675441');
+is(join(', ', map { tangent_number($_) } 0 .. 9), '0, 1, 2, 16, 272, 7936, 353792, 22368256, 1903757312, 209865342976');

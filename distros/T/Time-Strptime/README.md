@@ -68,7 +68,7 @@ tp(cached)  270033/s 12909%  8393%      4016%       238%  125%         --
 This module is fast and not require XS. but, support epoch `strptime` only.
 [DateTime](https://metacpan.org/pod/DateTime) is very useful and stable! but, It is slow.
 [Time::Piece](https://metacpan.org/pod/Time::Piece) is fast and useful! but, treatment of time zone is confusing. and, require XS.
-[Time::Moment](https://metacpan.org/pod/Time::Moment) is very fast and useful! but, not support `strptime`. and, require XS.
+[Time::Moment](https://metacpan.org/pod/Time::Moment) is very fast and useful! but, does not support `strptime`. and, require XS.
 
 ## How to specify a time zone?
 

@@ -1,6 +1,12 @@
 ######################################################################
 Revision history for Perl extension Archive::Tar::Wrapper
 
+0.31 (2018/07/03):
+    Enabled performance testing to acquire from different setups which scheme is faster to remove dots when reading directories.
+    Disabled Solaris OS until issues are fixed.
+    Fixed bug introduced in Makefile.PL due changes of release 0.30 (thanks to David Cantrell <david@cantrell.org.uk>).
+    Updated documentation.
+
 0.30 (2018/06):
     Keeping track of changes per request https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/7.
     Fixing proper handling of File::Which when checking on Microsoft Windows.

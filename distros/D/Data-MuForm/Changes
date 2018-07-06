@@ -1,5 +1,8 @@
 Revision history for Perl module Data::MuForm
 
+0.05 2018-07-02
+ -  Typo in text field
+
 0.04 2017-02-05
  - allow $option->{attributes}
  - add Data::MuForm::Manual::Hooks

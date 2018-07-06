@@ -15,7 +15,7 @@
 # B::Deparse.
 package B::DeparseTree::SyntaxTree;
 
-use B::DeparseTree::Node;
+use B::DeparseTree::TreeNode;
 
 our($VERSION, @EXPORT, @ISA);
 $VERSION = '3.2.0';
@@ -49,7 +49,7 @@ sub combine($$$)
 	if (ref $item) {
 	    if (ref $item eq 'ARRAY' and scalar(@$item) == 2) {
 		$add = [$item->[0], $item->[1]];
-	    } elsif (eval{$item->isa("B::DeparseTree::Node")}) {
+	    } elsif (eval{$item->isa("B::DeparseTree::TreeNode")}) {
 		$add = [$item->{text}, $item->{addr}];
 		# First item is text and second item is op address.
 	    } else {
@@ -74,7 +74,7 @@ sub combine2str($$$)
 	    if (ref $item eq 'ARRAY' and scalar(@$item) == 2) {
 		# First item is text and second item is op address.
 		$result .= $self->info2str($item->[0]);
-	    } elsif (eval{$item->isa("B::DeparseTree::Node")}) {
+	    } elsif (eval{$item->isa("B::DeparseTree::TreeNode")}) {
 		if (exists $item->{fmt}) {
 		    $result .= $self->template2str($item);
 		} else {
@@ -85,8 +85,8 @@ sub combine2str($$$)
 	    }
 	} else {
 	    # FIXME: add this and remove errors
-	    if (index($item, '@B::DeparseTree::Node') > 0) {
-	    	Carp::confess("\@B::DeparseTree::Node as an item is probably wrong");
+	    if (index($item, '@B::DeparseTree::TreeNode') > 0) {
+	    	Carp::confess("\@B::DeparseTree::TreeNode as an item is probably wrong");
 	    }
 	    $result .= $item;
 	}
@@ -158,7 +158,7 @@ sub info2str($$)
 	    # This code is going away...
 	    Carp::confess("fixme");
 	    $result = $item->[0];
-	} elsif (eval{$item->isa("B::DeparseTree::Node")}) {
+	} elsif (eval{$item->isa("B::DeparseTree::TreeNode")}) {
 	    if (exists $item->{fmt}) {
 		$result .= $self->template2str($item);
 		if ($item->{maybe_parens}) {
@@ -180,8 +180,8 @@ sub info2str($$)
 	}
     } else {
 	# FIXME: add this and remove errors
-	if (index($item, '@B::DeparseTree::Node') > 0) {
-		Carp::confess("\@B::DeparseTree::Node as an item is probably wrong");
+	if (index($item, '@B::DeparseTree::TreeNode') > 0) {
+		Carp::confess("\@B::DeparseTree::TreeNode as an item is probably wrong");
 	}
 	$result = $item;
     }
@@ -196,7 +196,7 @@ sub info_from_list($$$$$$)
 
     # Set undef in "texts" argument position because we are going to create
     # our own text from the $texts.
-    my $info = B::DeparseTree::Node->new($op, $self, $texts, undef,
+    my $info = B::DeparseTree::TreeNode->new($op, $self, $texts, undef,
 					 $type, $opts);
     $info->{sep} = $sep;
     my $text = '';
@@ -204,7 +204,7 @@ sub info_from_list($$$$$$)
 	$text .= $sep if $text and $sep;
 	if(ref($item) eq 'ARRAY'){
 	    $text .= $item->[0];
-	} elsif (eval{$item->isa("B::DeparseTree::Node")}) {
+	} elsif (eval{$item->isa("B::DeparseTree::TreeNode")}) {
 	    $text .= $item->{text};
 	} else {
 	    $text .= $item;
@@ -214,7 +214,7 @@ sub info_from_list($$$$$$)
     $info->{text} = $text;
     if ($opts->{maybe_parens}) {
 	my ($obj, $context, $precedence) = @{$opts->{maybe_parens}};
-	my $parens = B::DeparseTree::Node::parens_test($obj, $context, $precedence);
+	my $parens = B::DeparseTree::TreeNode::parens_test($obj, $context, $precedence);
 	$self->{maybe_parens} = {
 	    context => $context,
 	    precedence => $precedence,
@@ -231,8 +231,11 @@ sub info_from_list($$$$$$)
 sub info_from_template($$$$$) {
     my ($self, $type, $op, $fmt, $indexes, $args, $opts) = @_;
     $opts = {} unless defined($opts);
+    # if (ref($args) ne "ARRAY") {
+    # 	use Enbugger "trepan"; Enbugger->stop;
+    # }
     my @args = @$args;
-    my $info = B::DeparseTree::Node->new($op, $self, $args, undef, $type, $opts);
+    my $info = B::DeparseTree::TreeNode->new($op, $self, $args, undef, $type, $opts);
 
     $indexes = [0..$#args] unless defined $indexes;
     $info->{'indexes'} = $indexes;
@@ -249,13 +252,13 @@ sub info_from_template($$$$$) {
     if ($opts->{'relink_children'}) {
 	# FIXME we should specify which children to relink
 	for (my $i=0; $i < scalar @$args; $i++) {
-	    if ($args[$i]->isa("B::DeparseTree::Node")) {
+	    if ($args[$i]->isa("B::DeparseTree::TreeNode")) {
 		$args[$i]{parent} = $info->{addr};
 	    }
 	}
     }
 
-    # Link the parent of Deparse::Tree::Nodes to this node.
+    # Link the parent of Deparse::Tree::TreeNodes to this node.
     if ($opts->{'synthesized_nodes'}) {
 	foreach my $node (@{$opts->{'synthesized_nodes'}}) {
 	    $node->{parent} = $info->{addr};
@@ -266,8 +269,8 @@ sub info_from_template($$$$$) {
     # as it was passed a ref ARRAY rather than a string.
     if ($opts->{maybe_parens}) {
 	my ($obj, $context, $precedence) = @{$opts->{maybe_parens}};
-	my $parens = B::DeparseTree::Node::parens_test($obj,
-						       $context, $precedence);
+	my $parens = B::DeparseTree::TreeNode::parens_test($obj,
+							   $context, $precedence);
 	$info->{maybe_parens} = {
 	    context => $context,
 	    precedence => $precedence,
@@ -285,8 +288,8 @@ sub info_from_string($$$$$)
 {
     my ($self, $type, $op, $str, $opts) = @_;
     $opts ||= {};
-    return B::DeparseTree::Node->new($op, $self, $str, undef,
-				     $type, $opts);
+    return B::DeparseTree::TreeNode->new($op, $self, $str, undef,
+					 $type, $opts);
 }
 
 # OBSOLETE: Create an info structure from a single string

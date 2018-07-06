@@ -1,4 +1,4 @@
-use Test::More tests => 38;
+use Test::More tests => 47;
 
 BEGIN {
     use_ok 'Graphics::Raylib::Util', ':objects';
@@ -23,6 +23,23 @@ is $vector3->x, $vector3[0];
 is $vector3->y, $vector3[1];
 is $vector3->z, $vector3[2];
 is abs($vector3), sqrt(10**2 + (-12)**2 + 9**2);
+
+my $vector2to3 = vector(@vector2, 0);
+my $sum = $vector2to3 + $vector3;
+is $sum, vector(20, -24, 9);
+
+{
+    my @vector4 = (10, -12, 9, 2);
+    my $vector4 = vector(@vector4);
+    is ref($vector4), 'Graphics::Raylib::XS::Vector4';
+    is length $$vector4, 16;
+    is "$vector4", '(10, -12, 9, 2)';
+    is $vector4->x, $vector4[0];
+    is $vector4->y, $vector4[1];
+    is $vector4->z, $vector4[2];
+    is $vector4->w, $vector4[3];
+    is abs($vector4), sqrt(10**2 + (-12)**2 + 9**2 + 2**2);
+}
 
 my $vector4 = vector($vector3);
 is length $$vector4, 12;

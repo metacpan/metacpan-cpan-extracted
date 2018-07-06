@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.8.5';
+our $VERSION = '0.8.6';
 
 # core modules since 5.014
 use HTTP::Tiny;

@@ -21,28 +21,33 @@ Purposefully_die_from_a_compile-time_error,_due_to____PERL__TYPES_being_defined.
 
 void RPerl__Algorithm__Sort__Bubble::integer_sort() {
     this->integer_data = RPerl__Algorithm__Sort__Bubble__integer_bubblesort(this->integer_data);
+    return;
 }
 
 void RPerl__Algorithm__Sort__Bubble::number_sort() {
     this->number_data = RPerl__Algorithm__Sort__Bubble__number_bubblesort(this->number_data);
+    return;
 }
 
-void RPerl__Algorithm__Sort__Bubble::inherited__Bubble(string person) {
-    RPerl__diag((const string) "in CPPOPS_CPPTYPES Bubble->inherited__Bubble(), have ::class($self) = " + classname(this) + (const string) " and $person = " + person + (const string) ", FRIED" + (const string) "\n");
+void RPerl__Algorithm__Sort__Bubble::inherited_Bubble(string person) {
+    RPerl__diag((const string) "in CPPOPS_CPPTYPES Bubble->inherited_Bubble(), have ::class($self) = " + classname(this) + (const string) " and $person = " + person + (const string) ", FRIED" + (const string) "\n");
+    return;
 }
 
-string RPerl__Algorithm__Sort__Bubble::inherited__Bubble_foo_get() {
-    RPerl__diag((const string) "in CPPOPS_CPPTYPES Bubble->inherited__Bubble_foo_get(), have ::class($self) = " + classname(this) + (const string) ", FRIED" + (const string) "\n");
+string RPerl__Algorithm__Sort__Bubble::inherited_Bubble_foo_get() {
+    RPerl__diag((const string) "in CPPOPS_CPPTYPES Bubble->inherited_Bubble_foo_get(), have ::class($self) = " + classname(this) + (const string) ", FRIED" + (const string) "\n");
     return this->foo;
 }
 
-void RPerl__Algorithm__Sort__Bubble::inherited__Bubble_foo_set(string foo_new) {
-    RPerl__diag((const string) "in CPPOPS_CPPTYPES Bubble->inherited__Bubble_foo_set(), have ::class($self) = " + classname(this) + (const string) " and $foo_new = " + foo_new + (const string) ", FRIED" + (const string) "\n");
+void RPerl__Algorithm__Sort__Bubble::inherited_Bubble_foo_set(string foo_new) {
+    RPerl__diag((const string) "in CPPOPS_CPPTYPES Bubble->inherited_Bubble_foo_set(), have ::class($self) = " + classname(this) + (const string) " and $foo_new = " + foo_new + (const string) ", FRIED" + (const string) "\n");
     this->foo = foo_new;
+    return;
 }
 
 void RPerl__Algorithm__Sort__Bubble::inherited(string person) {
     RPerl__diag((const string) "in CPPOPS_CPPTYPES Bubble->inherited(), have ::class($self) = " + classname(this) + (const string) " and $person = " + person + (const string) ", ILLOGICAL" + (const string) "\n");
+    return;
 }
 
 integer_arrayref RPerl__Algorithm__Sort__Bubble__integer_bubblesort(integer_arrayref integer_data) {
@@ -87,9 +92,9 @@ number_arrayref RPerl__Algorithm__Sort__Bubble__number_bubblesort(number_arrayre
     return number_data;
 }
 
-string RPerl__Algorithm__Sort__Bubble__uninherited__Bubble(string person) {
-    RPerl__diag((const string) "in CPPOPS_CPPTYPES Bubble::uninherited__Bubble(), received $person = " + person + (const string) ", MITOCHONDRIAL" + (const string) "\n");
-    return (const string) "Bubble::uninherited__Bubble() RULES! CPPOPS_CPPTYPES";
+string RPerl__Algorithm__Sort__Bubble__uninherited_Bubble(string person) {
+    RPerl__diag((const string) "in CPPOPS_CPPTYPES Bubble::uninherited_Bubble(), received $person = " + person + (const string) ", MITOCHONDRIAL" + (const string) "\n");
+    return (const string) "Bubble::uninherited_Bubble() RULES! CPPOPS_CPPTYPES";
 }
 
 string RPerl__Algorithm__Sort__Bubble__uninherited(string person) {
@@ -97,11 +102,11 @@ string RPerl__Algorithm__Sort__Bubble__uninherited(string person) {
     return (const string) "Bubble::uninherited() ROCKS! CPPOPS_CPPTYPES";
 }
 
-string RPerl__Algorithm__Sort__Bubble__integer_bubblesort__typetest0(integer_arrayref lucky_integers) {
+string RPerl__Algorithm__Sort__Bubble__integer_bubblesort_typetest0(integer_arrayref lucky_integers) {
     return (integer_arrayref_to_string(RPerl__Algorithm__Sort__Bubble__integer_bubblesort(lucky_integers)) + (const string) "CPPOPS_CPPTYPES");
 }
 
-string RPerl__Algorithm__Sort__Bubble__number_bubblesort__typetest0(number_arrayref lucky_numbers) {
+string RPerl__Algorithm__Sort__Bubble__number_bubblesort_typetest0(number_arrayref lucky_numbers) {
     return (number_arrayref_to_string(RPerl__Algorithm__Sort__Bubble__number_bubblesort(lucky_numbers)) + (const string) "CPPOPS_CPPTYPES");
 }
 

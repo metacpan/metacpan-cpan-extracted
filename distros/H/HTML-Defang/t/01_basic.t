@@ -483,7 +483,7 @@ $H = <<EOF;
 EOF
 $Res = $Defang->defang($H);
 
-like($Res, qr{<!--$CommentStartText\[if gte mso 10\]> <mce:style><!    /\* Style Definitions \*/  table.MsoNormalTable	{mso-fareast-font-family:"Times New Roman";}  $CommentEndText--> <!--$CommentStartText\[endif\]$CommentEndText--></p>
+like($Res, qr{<!--$CommentStartText\[if gte mso 10\]> <mce:style><!    /\* Style Definitions \*/  table.MsoNormalTable	\{mso-fareast-font-family:"Times New Roman";\}  $CommentEndText--> <!--$CommentStartText\[endif\]$CommentEndText--></p>
 <p>&nbsp;<span style="font-size: medium;">I need your help now!</span></p>}, "IE conditional comment without appropriate closing tag");
 
 $H = <<'EOF';

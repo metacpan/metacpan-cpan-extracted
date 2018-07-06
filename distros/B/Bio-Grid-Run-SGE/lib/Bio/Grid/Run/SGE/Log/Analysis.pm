@@ -17,7 +17,7 @@ use Data::Dumper;
 
 use Sys::Hostname;
 
-our $VERSION = '0.064'; # VERSION
+our $VERSION = '0.065'; # VERSION
 
 has config              => ( is => 'rw', required   => 1 );
 has env                 => ( is => 'rw', required   => 1 );

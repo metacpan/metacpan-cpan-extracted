@@ -29,8 +29,9 @@ use rlib '../..';
 package B::DeparseTree::PP;
 
 use B::DeparseTree::SyntaxTree;
+use B::DeparseTree::OPflags;
 use B::DeparseTree::PPfns;
-use B::DeparseTree::Node;
+use B::DeparseTree::TreeNode;
 use B::Deparse;
 our($VERSION, @EXPORT, @ISA);
 $VERSION = '3.2.0';
@@ -39,6 +40,7 @@ $VERSION = '3.2.0';
 
 # Copy unchanged functions from B::Deparse
 *lex_in_scope = *B::Deparse::lex_in_scope;
+*gv_or_padgv = *B::Deparse::gv_or_padgv;
 *padany = *B::Deparse::padany;
 *padname = *B::Deparse::padname;
 *pp_anonhash = *B::Deparse::pp_anonhash;
@@ -46,7 +48,6 @@ $VERSION = '3.2.0';
 *pp_i_negate = *B::Deparse::pp_i_negate;
 *pp_negate = *B::Deparse::pp_negate;
 *real_negate = *B::Deparse::real_negate;
-
 use B qw(
     OPf_MOD OPpENTERSUB_AMPER
     OPf_SPECIAL
@@ -63,54 +64,38 @@ use B qw(
 
 @EXPORT = qw(
     feature_enabled
-    pp_aassign
-    pp_abs
+    gv_or_padgv
     pp_aelem
+    pp_aelemfast
+    pp_aelemfast_lex
     pp_and
     pp_anonhash
     pp_anonlist
     pp_aslice
-    pp_atan2
     pp_avalues
     pp_backtick
     pp_boolkeys
-    pp_chmod
-    pp_chomp
-    pp_chop
-    pp_chown
     pp_clonecv
     pp_cmp
-    pp_complement
     pp_cond_expr
     pp_connect
     pp_const
-    pp_cos
-    pp_crypt
-    pp_dbmopen
     pp_delete
     pp_dofile
-    pp_dor
     pp_entereval
     pp_entersub
     pp_eq
     pp_exec
     pp_exists
     pp_exp
-    pp_flock
     pp_flop
-    pp_formline
     pp_ge
-    pp_getppid
-    pp_getpriority
+    pp_gelem
     pp_glob
-    pp_gnbyaddr
-    pp_gpbynumber
-    pp_grepwhile
     pp_gt
     pp_gv
     pp_gvsv
     pp_helem
-    pp_hex
     pp_hslice
     pp_i_cmp
     pp_i_eq
@@ -120,14 +105,7 @@ use B qw(
     pp_i_lt
     pp_i_ne
     pp_i_negate
-    pp_i_predec
-    pp_i_preinc
-    pp_index
-    pp_int
     pp_introcv
-    pp_ioctl
-    pp_join
-    pp_kill
     pp_kvaslice
     pp_kvhslice
     pp_le
@@ -137,84 +115,53 @@ use B qw(
     pp_leavetry
     pp_leavewhen
     pp_lineseq
-    pp_link
     pp_list
-    pp_log
+    pp_lslice
     pp_lt
     pp_mapstart
-    pp_mapwhile
-    pp_mkdir
-    pp_msgsnd
     pp_ne
     pp_negate
     pp_not
     pp_null
-    pp_oct
     pp_once
     pp_open_dir
     pp_or
     pp_padcv
     pp_pos
-    pp_pos
-    pp_postdec
-    pp_postinc
-    pp_predec
     pp_preinc
     pp_print
     pp_prtf
-    pp_push
-    pp_rand
-    pp_ref
+    pp_pushre
+    pp_qr
+    pp_rcatline
+    pp_readline
     pp_refgen
-    pp_rename
-    pp_repeat
     pp_require
-    pp_return
-    pp_rindex
     pp_rv2cv
     pp_sassign
     pp_scalar
-    pp_schomp
-    pp_schop
     pp_scmp
     pp_scope
-    pp_seekdir
     pp_seq
-    pp_setpgrp
-    pp_setpriority
     pp_sge
     pp_sgt
-    pp_sin
     pp_sle
     pp_slt
     pp_sne
     pp_sockpair
-    pp_slice
-    pp_sprintf
-    pp_sqrt
-    pp_sselect
-    pp_ssockopt
+    pp_split
+    pp_smartmatch
+    pp_stringify
     pp_stub
     pp_subst
     pp_substr
-    pp_symlink
-    pp_sysread
-    pp_sysseek
-    pp_system
-    pp_time
     pp_trans
     pp_transr
     pp_truncate
-    pp_unlink
-    pp_unpack
-    pp_unshift
     pp_unstack
-    pp_utime
     pp_values
     pp_vec
-    pp_wait
     pp_waitpid
-    pp_wantarray
     pp_xor
     );
 
@@ -245,6 +192,22 @@ sub feature_enabled {
 	return $hh && $hh->{"feature_$feature_keywords{$name}"}
 }
 
+# FIXME: These don't seem to be able to go into the table.
+# PPfns calls pp_sockpair for example?
+sub pp_avalues  { unop(@_, "values") }
+sub pp_exec     { maybe_targmy(@_, \&listop, "exec") }
+sub pp_exp      { maybe_targmy(@_, \&unop, "exp") }
+sub pp_leave    { scopeop(1, @_); }
+sub pp_lineseq  { scopeop(0, @_); }
+sub pp_or       { logop(@_, "or",  2, "||", 10, "unless") }
+sub pp_preinc   { pfixop(@_, "++", 23) }
+sub pp_print    { indirop(@_, "print") }
+sub pp_prtf     { indirop(@_, "printf") }
+sub pp_sockpair { listop(@_, "socketpair") }
+sub pp_values   { unop(@_, "values") }
+sub pp_pushre   { matchop(@_, "m", "/") }  # Is also in OP_PP table
+sub pp_qr       { matchop(@_, "qr", "") }  # Is also in OP_PP table
+
 # Convert these to table entries...
 sub pp_aelem { maybe_local(@_, elem(@_, "[", "]", "padav")) }
 sub pp_aslice   { maybe_local(@_, slice(@_, "[", "]", "rv2av", "padav")) }
@@ -267,12 +230,8 @@ sub pp_le { binop(@_, "<=", 15) }
 sub pp_lt { binop(@_, "<", 15) }
 sub pp_ne { binop(@_, "!=", 14) }
 
-# Note that we need to add undef and 1 (nollr)
-sub pp_return { listop(@_, "return", undef, 1) } # llafr does not apply
-
 sub pp_sassign { binop(@_, "=", 7, SWAP_CHILDREN) }
 sub pp_scmp { binop(@_, "cmp", 14) }
-sub pp_seekdir { listop(@_, "seekdir") }
 sub pp_seq { binop(@_, "eq", 14) }
 sub pp_sge { binop(@_, "ge", 15) }
 sub pp_sgt { binop(@_, "gt", 15) }
@@ -280,16 +239,29 @@ sub pp_sle { binop(@_, "le", 15) }
 sub pp_slt { binop(@_, "lt", 15) }
 sub pp_sne { binop(@_, "ne", 14) }
 
-# FIXME: These don't seem to be able to go into the table.
-# PPfns calls pp_sockpair for example?
-sub pp_sockpair { listop(@_, "socketpair") }
-sub pp_values { unop(@_, "values") }
-sub pp_avalues { unop(@_, "values") }
+sub pp_aelemfast
+{
+    my($self, $op, $cx) = @_;
+    # optimised PADAV, pre 5.15
+    return $self->pp_aelemfast_lex(@_) if ($op->flags & OPf_SPECIAL);
 
+    my $gv = $self->gv_or_padgv($op);
+    my($name,$quoted) = $self->stash_variable_name('@',$gv);
+    $name = $quoted ? "$name->" : '$' . $name;
+    my $i = $op->private;
+    $i -= 256 if $i > 127;
+    return info_from_list($op, $self, [$name, "[", ($op->private + $self->{'arybase'}), "]"],
+		      '', 'pp_aelemfast', {});
+}
 
-
-sub pp_aassign { binop(@_, "=", 7, SWAP_CHILDREN | LIST_CONTEXT, 'array assign') }
-sub pp_abs   { maybe_targmy(@_, \&unop, "abs") }
+sub pp_aelemfast_lex
+{
+    my($self, $op, $cx) = @_;
+    my $name = $self->padname($op->targ);
+    $name =~ s/^@/\$/;
+    return info_from_list($op, $self, [$name, "[", ($op->private + $self->{'arybase'}), "]"],
+		      '', 'pp_aelemfast_lex', {});
+}
 
 sub pp_backtick
 {
@@ -309,11 +281,6 @@ sub pp_boolkeys
     unop(@_,"");
 }
 
-sub pp_chmod { maybe_targmy(@_, \&listop, "chmod") }
-sub pp_chown { maybe_targmy(@_, \&listop, "chown") }
-sub pp_cos { maybe_targmy(@_, \&unop, "cos") }
-sub pp_crypt { maybe_targmy(@_, \&listop, "crypt") }
-
 sub pp_dofile
 {
     my $code = unop(@_, "do", 1); # llafr does not apply
@@ -321,22 +288,39 @@ sub pp_dofile
     $code;
 }
 
-sub pp_exec { maybe_targmy(@_, \&listop, "exec") }
-sub pp_exp { maybe_targmy(@_, \&unop, "exp") }
-sub pp_flock { maybe_targmy(@_, \&listop, "flock") }
-sub pp_getpriority { maybe_targmy(@_, \&listop, "getpriority") }
-sub pp_hex { maybe_targmy(@_, \&unop, "hex") }
-sub pp_index { maybe_targmy(@_, \&listop, "index") }
-sub pp_int { maybe_targmy(@_, \&unop, "int") }
-sub pp_join { maybe_targmy(@_, \&listop, "join") }
-sub pp_kill { maybe_targmy(@_, \&listop, "kill") }
-sub pp_link { maybe_targmy(@_, \&listop, "link") }
+sub pp_gelem
+{
+    my($self, $op, $cx) = @_;
+    my($rv2gv, $part) = ($op->first, $op->last);
+    my $glob = $rv2gv->first; # skip rv2gv
+    $glob = $glob->first if $glob->name eq "rv2gv"; # this one's a bug
+    my $scope = B::Deparse::is_scope($glob);
+    my $glob_node = $self->deparse($glob, 0);
+    my $part_node = $self->deparse($part, 1);
+    my $fmt = ($scope ? '*{%c}{%c}' : '*%c{%c}');
+    # FIXME: fill in $rv2gv and possibly other node skipped above.
+    return $self->info_from_template("gelem *", $fmt, undef,
+				     [$glob_node, $part_node],
+				     {other_ops => [$rv2gv]});
+}
 
 sub pp_leavegiven { givwhen(@_, $_[0]->keyword("given")); }
 sub pp_leavewhen  { givwhen(@_, $_[0]->keyword("when")); }
 
-sub pp_log { maybe_targmy(@_, \&unop, "log") }
-sub pp_mkdir { maybe_targmy(@_, \&listop, "mkdir") }
+sub pp_lslice
+{
+    my ($self, $op, $cs) = @_;
+    my $idx = $op->first;
+    my $list = $op->last;
+    my(@elems, $kid);
+    my $list_info = $self->deparse($list, 1, $op);
+    my $idx_info = $self->deparse($idx, 1, $op);
+    return $self->info_from_template('lslice ()[]',
+				     $op, '(%c)[%c]', undef,
+				     [$list_info, $idx_info]);
+}
+
+sub pp_pos { maybe_local(@_, unop(@_, "pos")) }
 
 sub pp_not
 {
@@ -348,13 +332,6 @@ sub pp_not
     }
 }
 
-
-sub pp_oct { maybe_targmy(@_, \&unop, "oct") }
-sub pp_open_dir { listop(@_, "opendir") }
-sub pp_pos { maybe_local(@_, unop(@_, "pos")) }
-sub pp_push { maybe_targmy(@_, \&listop, "push") }
-sub pp_rename { maybe_targmy(@_, \&listop, "rename") }
-sub pp_rindex { maybe_targmy(@_, \&listop, "rindex") }
 
 # skip down to the old, ex-rv2cv
 sub pp_rv2cv {
@@ -381,13 +358,20 @@ sub pp_scalar
     $self->unop($op, $cx, "scalar");
 }
 
-sub pp_setpgrp { maybe_targmy(@_, \&listop, "setpgrp") }
-sub pp_setpriority { maybe_targmy(@_, \&listop, "setpriority") }
-sub pp_sin { maybe_targmy(@_, \&unop, "sin") }
-sub pp_sprintf { maybe_targmy(@_, \&listop, "sprintf") }
-sub pp_sqrt { maybe_targmy(@_, \&unop, "sqrt") }
-sub pp_symlink { maybe_targmy(@_, \&listop, "symlink") }
-sub pp_system { maybe_targmy(@_, \&listop, "system") }
+sub pp_smartmatch {
+    my ($self, $op, $cx) = @_;
+    if ($op->flags & OPf_SPECIAL) {
+	my $child = $self->deparse($op->last, $cx, $op);
+	return $self->info_from_template('~~ special',
+					 '%c', undef, [$child]);
+    } else {
+	binop(@_, "~~", 14);
+    }
+}
+
+# Truncate is special because OPf_SPECIAL makes a bareword first arg
+# be a filehandle. This could probably be better fixed in the core
+# by moving the GV lookup into ck_truc.
 
 sub pp_truncate
 {
@@ -415,12 +399,7 @@ sub pp_truncate
     }
 }
 
-sub pp_unlink { maybe_targmy(@_, \&listop, "unlink") }
-sub pp_unshift { maybe_targmy(@_, \&listop, "unshift") }
-sub pp_utime { maybe_targmy(@_, \&listop, "utime") }
-
 sub pp_vec { maybe_local(@_, listop(@_, "vec")) }
-sub pp_waitpid { maybe_targmy(@_, \&listop, "waitpid") }
 
 sub pp_glob
 {
@@ -442,28 +421,28 @@ sub pp_glob
 	    $text = $kid_info->{text};
 	    $opts->{body} = $body;
 	    if ($cx >= 5 || $self->{'parens'}) {
+		# FIXME: turn into template
 		return info_from_list($op, $self, [$keyword, '(', $text, ')'], '',
 				      'glob_paren', $opts);
 	    } else {
+		# FIXME: turn into template
 		return info_from_list($op, $self, [$keyword, $text], ' ',
 				      'glob_space', $opts);
 	    }
 	} else {
-	    return info_from_list($op, $self, ['<', $text, '>'], '', 'glob_angle', $opts);
+	    return $self->info_from_template('<FH>', $op, '<%c>', undef,
+					     [$kid_info], $opts);
 	}
     }
-    return info_from_list($op, $self, ['<', '>'], '', 'glob_angle', $opts);
+    return $self->info_from_string("<>", $op, $opts);
 }
-
-sub pp_chomp { maybe_targmy(@_, \&unop, "chomp") }
-sub pp_chop { maybe_targmy(@_, \&unop, "chop") }
 
 sub pp_clonecv {
     my $self = shift;
     my($op, $cx) = @_;
     my $sv = $self->padname_sv($op->targ);
     my $name = substr $sv->PVX, 1; # skip &/$/@/%, like $self->padany
-    return info_from_list($op, $self, ['my', 'sub', $name], ' ', 'clonev', {});
+    return $self->info_from_string("clonev my sub",  $op, "my sub  $name");
 }
 
 sub pp_delete($$$)
@@ -521,7 +500,6 @@ sub pp_introcv
     return info_from_text($op, $self, '', 'introcv', {});
 }
 
-sub pp_leave { scopeop(1, @_); }
 sub pp_leaveloop { shift->loop_common(@_, undef); }
 
 sub pp_leavetry {
@@ -531,8 +509,6 @@ sub pp_leavetry {
 				     undef, [$leave_info]);
 }
 
-sub pp_lineseq { scopeop(0, @_); }
-
 sub pp_list
 {
     my($self, $op, $cx) = @_;
@@ -540,10 +516,11 @@ sub pp_list
 
     my $pushmark_op = $op->first;
     my $kid = $pushmark_op->sibling; # skip a pushmark
+    my @other_ops = ($pushmark_op);
 
     if (class($kid) eq 'NULL') {
 	return info_from_text($op, $self, '', 'list_null',
-			      {other_ops => [$pushmark_op]});
+			      {other_ops => \@other_ops});
     }
     my $lop;
     my $local = "either"; # could be local(...), my(...), state(...) or our(...)
@@ -598,6 +575,7 @@ sub pp_list
     for (; !B::Deparse::null($kid); $kid = $kid->sibling) {
 	if ($local) {
 	    if (class($kid) eq "UNOP" and $kid->first->name eq "gvsv") {
+		push @other_ops, $kid;
 		$lop = $kid->first;
 	    } else {
 		$lop = $kid;
@@ -614,19 +592,18 @@ sub pp_list
     if ($local) {
 	return $self->info_from_template("$local ()", $op,
 					 "$local(%C)", [[0, $#exprs, ', ']],
-					 \@exprs,
-					 {other_ops => [$pushmark_op]});
+					 \@exprs, {other_ops => \@other_ops});
 
     } else {
 	return $self->info_from_template("list", $op,
 					 "%C", [[0, $#exprs, ', ']],
 					 \@exprs,
 					 {maybe_parens => [$self, $cx, 6],
-					 other_ops => [$pushmark_op]});
+					 other_ops => \@other_ops});
     }
 }
 
-sub pp_padcv {
+sub pp_padcv($$$) {
     my($self, $op, $cx) = @_;
     return info_from_text($op, $self, $self->padany($op), 'padcv', {});
 }
@@ -690,10 +667,7 @@ sub pp_require
 }
 
 
-sub pp_schomp { maybe_targmy(@_, \&unop, "chomp") }
-sub pp_schop { maybe_targmy(@_, \&unop, "chop") }
 sub pp_scope { scopeop(0, @_); }
-
 sub pp_and { logop(@_, "and", 3, "&&", 11, "if") }
 
 sub pp_cond_expr
@@ -767,7 +741,7 @@ sub pp_const {
     return $self->const($sv, $cx);;
 }
 
-# Handle subroutien calls. These are a bit complicated.
+# Handle subroutine calls. These are a bit complicated.
 # NOTE: this is not right for CPerl, so it needs to be split out.
 sub pp_entersub
 {
@@ -776,17 +750,20 @@ sub pp_entersub
         unless B::Deparse::null $op->first->sibling;
     my $prefix = "";
     my $amper = "";
-    my($kid, @exprs);
+    my($kid, @exprs, @args_spec);
     if ($op->flags & OPf_SPECIAL && !($op->flags & OPf_MOD)) {
 	$prefix = "do ";
     } elsif ($op->private & OPpENTERSUB_AMPER) {
 	$amper = "&";
     }
+
     $kid = $op->first;
 
     my $other_ops = [$kid, $kid->first];
     $kid = $kid->first->sibling; # skip ex-list, pushmark
 
+    my $kid_start = $kid;
+    # FIXME: phase this out.
     for (; not B::Deparse::null $kid->sibling; $kid = $kid->sibling) {
 	push @exprs, $kid;
     }
@@ -837,7 +814,8 @@ sub pp_entersub
 	$subname_info = $self->deparse($kid, 24, $op);
     } else {
 	$prefix = "";
-	my $arrow = is_subscriptable($kid->first) || $kid->first->name eq "padcv" ? "" : "->";
+	my $arrow = B::Deparse::is_subscriptable($kid->first)
+	    || $kid->first->name eq "padcv" ? "" : "->";
 	$subname_info = $self->deparse($kid, 24, $op);
 	$subname_info->{text} .= $arrow;
     }
@@ -862,18 +840,19 @@ sub pp_entersub
 	}
     }
 
-    my (@texts, @body, $type);
-    @body = ();
+    my (@texts, @nodes, $type);
+    @nodes = ();
     if ($declared and defined $proto and not $amper) {
 	my $args;
 	($amper, $args) = $self->check_proto($op, $proto, @exprs);
 	if ($amper eq "&") {
-	    @body = map($self->deparse($_, 6, $op), @exprs);
+	    $self->deparse_op_siblings(\@nodes, $kid_start, $op, 6);
 	} else {
-	    @body = @$args if @$args;
+	    @nodes = @$args if @$args;
 	}
     } else {
-	@body  = map($self->deparse($_, 6, $op), @exprs);
+	$self->deparse_op_siblings(\@nodes, $kid_start, $op, 6);
+	@nodes  = map($self->deparse($_, 6, $op), @exprs);
     }
 
     if ($prefix or $amper) {
@@ -883,10 +862,10 @@ sub pp_entersub
 	    $subname_info->{text} = join('', $subname_info->{texts});
 	}
 	if ($op->flags & OPf_STACKED) {
-	    $type = 'prefix- or &-stacked call()';
-	    @texts = ($prefix, $amper, $subname_info, "(", $self->combine2str(', ', \@body), ")");
+	    $type = "$prefix$amper call()";
+	    @texts = ($prefix, $amper, $subname_info, "(", $self->combine2str(', ', \@nodes), ")");
 	} else {
-	    $type = 'prefix or &- call';
+	    $type = "$prefix$amper call";
 	    @texts = ($prefix, $amper, $subname_info);
 	}
     } else {
@@ -896,11 +875,21 @@ sub pp_entersub
 	$subname_info->{text} =~ s/^CORE::GLOBAL:://;
 	my $dproto = defined($proto) ? $proto : "undefined";
         if (!$declared) {
-	    $type = 'call (no prior declaration)';
-	    @texts = dedup_parens_func($self, $subname_info, \@body);
-	    my $node = B::DeparseTree::Node->new($op, $self, \@texts,
-						 '', $type,
+	    $type = 'call (fn without prototype)';
+	    my ($fmt, $args_spec);
+	    my $first_param_text = (@nodes > 0) ? $nodes[0]->{text} : '';
+	    unshift @nodes, $subname_info;
+	    if ($self->dedup_func_parens(\@nodes)) {
+		$fmt = "%c %c";
+		$args_spec = undef;
+	    } else {
+		$fmt = "%c(%C)";
+		$args_spec = [0, [1, $#nodes, ', ']];
+	    }
+	    my $node = $self->info_from_template($type, $op, $fmt, $args_spec,
+						 \@nodes,
 						 {other_ops => $other_ops});
+
 
 	    # Take the subname_info portion of $node and use that as the
 	    # part of the parent, null, pushmark ops.
@@ -926,19 +915,21 @@ sub pp_entersub
 	    # really, we should be comparing to the precedence of the
 	    # top operator of $exprs[0] (ala unop()), but that would
 	    # take some major code restructuring to do right.
-	    @texts = $self->maybe_parens_func($sub_name, $self->combine2str(', ', \@body), $cx, 16);
+	    @texts = $self->maybe_parens_func($sub_name,
+					      $self->combine2str(', ', \@nodes), $cx, 16);
 	} elsif ($dproto ne '$' and defined($proto) || $simple) { #'
 	    $type = "call $sub_name having prototype";
-	    @texts = $self->maybe_parens_func($sub_name, $self->combine2str(', ', \@body), $cx, 5);
-	    return B::DeparseTree::Node->new($op, $self, \@texts,
-					     '', $type,
-					     {other_ops => $other_ops});
+	    @texts = $self->maybe_parens_func($sub_name,
+					      $self->combine2str(', ', \@nodes), $cx, 5);
+	    return B::DeparseTree::TreeNode->new($op, $self, \@texts,
+						 '', $type,
+						 {other_ops => $other_ops});
 	} else {
 	    $type = 'call';
-	    @texts = dedup_parens_func($self, $subname_info, \@body);
-	    return B::DeparseTree::Node->new($op, $self, \@texts,
-					     '', $type,
-					     {other_ops => $other_ops});
+	    @texts = dedup_parens_func($self, $subname_info, \@nodes);
+	    return B::DeparseTree::TreeNode->new($op, $self, \@texts,
+						 '', $type,
+						 {other_ops => $other_ops});
 	}
     }
     my $node = $self->info_from_template($type, $op,
@@ -1010,37 +1001,78 @@ sub pp_once
     return $self->deparse($true, $cx);
 }
 
-sub pp_print { indirop(@_, "print") }
-sub pp_prtf { indirop(@_, "printf") }
-
-sub pp_rand { maybe_targmy(@_, \&unop, "rand") }
-
 sub pp_or  { logop(@_, "or",  2, "||", 10, "unless") }
 sub pp_dor { logop(@_, "//", 10) }
 
 sub pp_mapwhile { mapop(@_, "map") }
 sub pp_grepwhile { mapop(@_, "grep") }
 
-sub pp_complement { maybe_targmy(@_, \&pfixop, "~", 21) }
-sub pp_getppid { maybe_targmy(@_, \&baseop, "getppid") }
-sub pp_postdec { maybe_targmy(@_, \&pfixop, "--", 23, POSTFIX) }
-sub pp_postinc { maybe_targmy(@_, \&pfixop, "++", 23, POSTFIX) }
-sub pp_time { maybe_targmy(@_, \&baseop, "time") }
-
 sub pp_preinc { pfixop(@_, "++", 23) }
 sub pp_predec { pfixop(@_, "--", 23) }
 sub pp_i_preinc { pfixop(@_, "++", 23) }
 sub pp_i_predec { pfixop(@_, "--", 23) }
 
+sub pp_rcatline {
+    my ($self, $op) = @_;
+    return $self->info_from_string('rcatline <$fh>', $op,
+				   sprintf "<%s>", $self->gv_name($self->gv_or_padgv($op)));
+}
+
+sub pp_readline {
+    my $self = shift;
+    my($op, $cx) = @_;
+    my $first_kid = $op->first;
+    my $kid = $first_kid;
+    my @other_ops;
+    # Do we have <$fh>?
+    if ($first_kid->name eq "rv2gv") {
+	push @other_ops, $kid;
+	$kid  = $first_kid->first;
+    }
+    if (B::Deparse::is_scalar($kid) and
+	($] < 5.021 or
+	 ($op->flags & OPf_SPECIAL))) {
+	my $kid_node = $self->deparse($kid, 1, $op);
+	if ($kid_node->{text} eq 'ARGV') {
+	    if (@other_ops) {
+		# skipped first node, also add $kid_node.
+		push @other_ops, $kid_node;
+	    } else {
+		# upgrade @other_ops from an op to a node
+		@other_ops = ($kid_node);
+	    }
+	    return $self->info_from_string('readline <<>>', $op, '<<>>',
+					   {other_ops => [$first_kid, $kid_node]});
+	} else {
+	    return $self->info_from_template('readline <$fh>', $op, "<%c>",
+					     undef, [$kid_node],
+					     {other_ops => @other_ops});
+	}
+    }
+    my $node = $self->unop($op, $cx, "readline");
+    push @{$node->{other_ops}}, $first_kid;
+    return $node
+}
+
+sub pp_split {
+    # 5.20 might drop "maybe_targmy?"
+    maybe_targmy(@_, \&split, "split");
+}
+
+sub pp_stringify {
+    $] < 5.022 ? stringify_older(@_) : stringify_newer(@_);
+}
+
 sub pp_subst {
-{
     $] < 5.022 ? subst_older(@_) : subst_newer(@_);
 }
-}
+
+# Perl 5.14 doesn't have this
+use constant OPpSUBSTR_REPL_FIRST => 16;
 
 sub pp_substr {
     my ($self,$op,$cx) = @_;
-    if ($op->private & B::Deparse::OPpSUBSTR_REPL_FIRST) {
+    if ($op->private & OPpSUBSTR_REPL_FIRST) {
 	my $left = listop($self, $op, 7, "substr", $op->first->sibling->sibling);
 	my $right = $self->deparse($op->first->sibling, 7, $op);
 	return info_from_list($op, $self,[$left, '=', $right], ' ',
@@ -1048,6 +1080,7 @@ sub pp_substr {
     }
     return maybe_local(@_, listop(@_, "substr"))
 }
+
 # FIXME:
 # Different between 5.20 and 5.22. We've used 5.22 though.
 # Go over and make sure this is okay.
@@ -1055,8 +1088,6 @@ sub pp_stub {
     my ($self, $op) = @_;
     $self->info_from_string('stub ()', $op, '()')
 };
-
-sub pp_symlink { maybe_targmy(@_, \&listop, "symlink") }
 
 sub pp_trans {
     my $self = shift;
@@ -1085,18 +1116,17 @@ sub pp_transr {
     my $self = $_[0];
     my $op = $_[1];
     my $info = pp_trans(@_);
-    return info_from_text($op, $self, $info->{text} . 'r', 'pp_transr',
-			  {body => [$info]});
+    # FIXME: thrn into template as below
+    return $self->info_from_string('pp_transr', $op, $info->{text} . 'r',
+				   {other_ops => [$info]});
+    # return $self->info_from_template("trans r", "%cr", undef, [$info]);
 }
 
 sub pp_unstack {
     my ($self, $op) = @_;
     # see also leaveloop
-    return info_from_text($op, $self, '', 'unstack', {});
+    return $self->info_from_string("unstack", $op, '');
 }
-
-sub pp_wait { maybe_targmy(@_, \&baseop, "wait") }
-sub pp_wantarray { baseop(@_, "wantarray") }
 
 # xor is syntactically a logop, but it's really a binop (contrary to
 # old versions of opcode.pl). Syntax is what matters here.

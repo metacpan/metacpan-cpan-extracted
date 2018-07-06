@@ -1,6 +1,6 @@
 package B::DeparseTree;
 use warnings; use strict;
-our $VERSION = '3.2.0';
+our $VERSION = '3.3.0';
 
 use rlib '.';
 

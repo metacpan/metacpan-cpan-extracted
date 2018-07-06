@@ -1,0 +1,13 @@
+* Figure out what to do with bin files, which are required:
+
+     64K natives_blob.bin
+    592K snapshot_blob.bin
+    564K snapshot_blob_trusted.bin (only when running trusted code?)
+
+  When not present, the errors are:
+    Failed to open startup resource 'natives_blob.bin'.
+    Failed to open startup resource 'snapshot_blob.bin'.
+
+* Figure out what to do with dat files, which are required:
+
+    9.8M icudtl.dat (only when using ICU?)

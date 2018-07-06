@@ -67,4 +67,29 @@ is_deeply( $form->field('jix')->options, $expected, 'got expected options for do
 $expected = [{ value => 1, label => 'array1', order => 0 }, { value => 2, label => 'array2', order => 1 }, { value => 3, label => 'array3', order => 2 }];
 is_deeply( $form->field('mox')->options, $expected, 'got expected options for array from sub' );
 
+{
+    package MyApp::Form::Test3;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+    has_field 'foo' => ( type => 'Select' );
+    sub options_foo {
+       [ 1 => 'aref1', 2 => 'aref2', 3 => 'aref3' ]
+    }
+    has_field 'bar' => ( type => 'Select' );
+    sub options_bar {
+        [ { value => 1, label => 'href1', 'data-org' => 1, attributes => { 'data-field' => 1 } },
+          { value => 2, label => 'href2', 'data-org' => 1, attributes => { 'data-field' => 2 } }
+        ]
+    }
+}
+
+$form = MyApp::Form::Test3->new;
+ok( $form );
+
+my $rendered_select = $form->field('bar')->render;
+unlike( $rendered_select, qr/attributes/, 'no "attributes" string in rendering' );
+
+
 done_testing;

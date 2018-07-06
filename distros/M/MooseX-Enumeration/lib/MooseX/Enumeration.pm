@@ -5,7 +5,7 @@ use warnings;
 package MooseX::Enumeration;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.008';
 
 {
 	my $impl;
@@ -79,7 +79,7 @@ Yay!
 =head1 DESCRIPTION
 
 This attribute trait makes it easier to work with enumerated types in
-L<Moose>. (Hopefully a L<Moo> implementation will follow soon.)
+L<Moose>.
 
 It will only work on attributes which have an enum type constraint.
 This may be a L<Type::Tiny::Enum> or may be a type constraint defined
@@ -241,6 +241,8 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Enumeration>.
 
 =head1 SEE ALSO
 
+L<MooX::Enumeration> — implementation of this for L<Moo>.
+
 L<Moose::Meta::TypeConstraint::Enum>,
 L<Type::Tiny::Enum>,
 L<Moose::Meta::Attribute::Native>.
@@ -251,7 +253,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2014 by Toby Inkster.
+This software is copyright (c) 2014, 2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

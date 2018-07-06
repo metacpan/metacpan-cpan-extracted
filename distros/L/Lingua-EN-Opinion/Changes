@@ -1,5 +1,8 @@
 Revision history for Lingua-EN-Opinion
 
+0.1300 2018-07-04 11:41:42
+    - Modularize sentence gathering into a common routine.
+
 0.1203 2018-03-23 20:48:26
     - Lowercase the words in tokenize.
 

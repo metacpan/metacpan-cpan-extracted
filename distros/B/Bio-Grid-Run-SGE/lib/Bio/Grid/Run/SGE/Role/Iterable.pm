@@ -5,7 +5,7 @@ use Mouse::Role;
 use warnings;
 use strict;
 
-our $VERSION = '0.064'; # VERSION
+our $VERSION = '0.065'; # VERSION
 
 has indices => (is => 'rw', required => 1, isa => 'ArrayRef'); 
 has _iterating => (is => 'rw');

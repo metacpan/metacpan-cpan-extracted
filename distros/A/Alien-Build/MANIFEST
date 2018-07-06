@@ -117,6 +117,8 @@ example/user/xs-mm/t/lzma_example.t
 example/wrapper.pl
 example/xz-manual.alienfile
 example/xz.alienfile
+inc/probebad.pl
+inc/trivial.xs
 lib/Alien/Base.pm
 lib/Alien/Base/Authoring.pod
 lib/Alien/Base/FAQ.pod

@@ -1,5 +1,8 @@
-.PHONY: test
+.PHONY: test all
 #: Run full file decompile tests
+all:
+	$(MAKE) -C .. $@
+
 test:
 	mkdir -p tmp/base || true
 	mkdir -p tmp/opbasic || true

@@ -24,6 +24,7 @@ on 'test' => sub {
     requires 'Test::Mock::Cmd', '0.7';
     requires 'HTTP::Request';
     requires 'Test::Mojo';
+    requires 'Port::Selector', '0.1.6';
 };
 
 on 'develop' => sub {

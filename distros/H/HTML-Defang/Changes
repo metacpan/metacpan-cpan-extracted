@@ -1,5 +1,9 @@
 Revision history for Perl extension HTML::Defang.
 
+1.07  Tue Jul 3 15:30:00 2018
+  - More fixes for 5.26 (\{ in regexp)
+  - Fixes for perl 5.8 (thanks Michael McClimon)
+
 1.06  Mon Jun 26 14:30:00 2018
   - Fix for 5.26 (\{ in regexp)
   - Require at least perl 5.10

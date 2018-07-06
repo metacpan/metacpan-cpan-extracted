@@ -1,6 +1,6 @@
 package Games::Cards::Pair::Card;
 
-$Games::Cards::Pair::Card::VERSION   = '0.17';
+$Games::Cards::Pair::Card::VERSION   = '0.18';
 $Games::Cards::Pair::Card::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Games::Cards::Pair::Card - Object representation of a card.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 

@@ -40,7 +40,9 @@
          "object",
          "ref",
          "string",
-         "unknown"
+         "unknown",
+         "MyClass_Good",
+         "_MyClass_Bad"
       ]
    },
    "prereqs" : {
@@ -51,7 +53,8 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::GMP" : "1.07",
+            "Alien::Base::ModuleBuild" : "1.02",
+            "Alien::GMP" : "1.08",
             "Alien::GSL" : "1.01",
             "IO::Socket::SSL" : "2.043"
          }
@@ -109,6 +112,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#perl11"
    },
-   "version" : "3.601000",
+   "version" : "4.000000",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

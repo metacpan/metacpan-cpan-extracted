@@ -1,6 +1,13 @@
 Release history for Perl::Critic::OTRS
 ======================================
 
+0.08  2018-07-03
+
+  [IMPROVEMENTS]
+  * Generate Meta.json
+  * Add list of provided modules
+  * use PodWeaver to generate pod
+
 0.07  2015-01-25
 
   [TESTS]

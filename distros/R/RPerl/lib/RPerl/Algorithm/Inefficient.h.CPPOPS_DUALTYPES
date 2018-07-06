@@ -42,11 +42,11 @@ public:
     const SV* USEFULNESS() { return RPerl__Algorithm__Inefficient__USEFULNESS; }
 
     // <<< USER-DEFINED METHODS >>>
-    void inherited__Inefficient(SV* person);
-    SV* inherited__Inefficient_bar_get();
-    void inherited__Inefficient_bar_set(SV* bar_new);
-    SV* inherited__Inefficient_foo_get();
-    void inherited__Inefficient_foo_set(SV* foo_new);
+    void inherited_Inefficient(SV* person);
+    SV* inherited_Inefficient_bar_get();
+    void inherited_Inefficient_bar_set(SV* bar_new);
+    SV* inherited_Inefficient_foo_get();
+    void inherited_Inefficient_foo_set(SV* foo_new);
     void inherited(SV* person);
 };  // end of class
 
@@ -58,10 +58,10 @@ typedef std::unordered_map<string, RPerl__Algorithm__Inefficient_ptr> RPerl__Alg
 typedef std::unordered_map<string, RPerl__Algorithm__Inefficient_ptr>::iterator RPerl__Algorithm__Inefficient_hashref_iterator;
 
 // [[[ SUBROUTINES ]]]
-SV* RPerl__Algorithm__Inefficient__uninherited__Inefficient(SV* person);
+SV* RPerl__Algorithm__Inefficient__uninherited_Inefficient(SV* person);
 
 // <<< SHIM MACROS >>>
-#define uninherited__Inefficient(person) RPerl__Algorithm__Inefficient__uninherited__Inefficient(person)
+#define uninherited_Inefficient(person) RPerl__Algorithm__Inefficient__uninherited_Inefficient(person)
 
 // <<< OPERATIONS & DATA TYPES REPORTER >>>
 SV* RPerl__Algorithm__Inefficient__MODE_ID() { return newSViv(1); }  // CPPOPS_PERLTYPES is 1
@@ -104,11 +104,11 @@ public:
     const string USEFULNESS() { return RPerl__Algorithm__Inefficient__USEFULNESS; }
 
     // <<< USER-DEFINED METHODS >>>
-    void inherited__Inefficient(string person);
-    string inherited__Inefficient_bar_get();
-    void inherited__Inefficient_bar_set(string bar_new);
-    string inherited__Inefficient_foo_get();
-    void inherited__Inefficient_foo_set(string foo_new);
+    void inherited_Inefficient(string person);
+    string inherited_Inefficient_bar_get();
+    void inherited_Inefficient_bar_set(string bar_new);
+    string inherited_Inefficient_foo_get();
+    void inherited_Inefficient_foo_set(string foo_new);
     void inherited(string person);
 };  // end of class
 
@@ -120,10 +120,10 @@ typedef std::unordered_map<string, RPerl__Algorithm__Inefficient_ptr> RPerl__Alg
 typedef std::unordered_map<string, RPerl__Algorithm__Inefficient_ptr>::iterator RPerl__Algorithm__Inefficient_hashref_iterator;
 
 // [[[ SUBROUTINES ]]]
-string RPerl__Algorithm__Inefficient__uninherited__Inefficient(string person);
+string RPerl__Algorithm__Inefficient__uninherited_Inefficient(string person);
 
 // <<< SHIM MACROS >>>
-#define uninherited__Inefficient(person) RPerl__Algorithm__Inefficient__uninherited__Inefficient(person)
+#define uninherited_Inefficient(person) RPerl__Algorithm__Inefficient__uninherited_Inefficient(person)
 
 // <<< OPERATIONS & DATA TYPES REPORTER >>>
 integer RPerl__Algorithm__Inefficient__MODE_ID() { return 2; }  // CPPOPS_CPPTYPES is 2

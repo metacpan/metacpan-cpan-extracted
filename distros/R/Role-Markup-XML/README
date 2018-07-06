@@ -2,7 +2,7 @@ NAME
     Role::Markup::XML - Moo(se) role for bolt-on lazy XML markup
 
 VERSION
-    Version 0.07
+    Version 0.09
 
 SYNOPSIS
         package My::MarkupEnabled;
@@ -284,17 +284,26 @@ METHODS
     uri The "href" attribute of the "<base>" element.
 
     ns  A mapping of namespace prefixes to URIs, which by default will
-        appear as *both* XML namespaces *and* the "prefix" attribute.
+        appear as *both* XML namespaces *and* the "prefix" attribute. If
+        this element is present but false, all namespaces (including the
+        default XHTML namespace and any "xml:lang" attribute) will be left
+        off.
 
     prefix
-        Also a mapping of prefixes to URIs. If this is set rather than "ns",
-        then the XML namespaces will *not* be set. Conversely, if this
-        parameter is defined but false, then *only* the contents of "ns"
-        will appear in the conventional "xmlns:foo" way.
+        Also a mapping of namespace prefixes to URIs. This will occupy the
+        "prefix" attribute in the root element. This element can be used to
+        specify RDF prefixes distinct from XML namespaces of the actual
+        document. If this element is not specified, then the contents of
+        "ns" will be duplicated into the "prefix" attribute. If it is
+        present but false, the "prefix" attribute will be left off.
 
     vocab
         This will specify a default "vocab" attribute in the "<html>"
         element, like <http://www.w3.org/1999/xhtml/vocab/>.
+
+    lang
+        This sets a default language via the "lang" or "xml:lang"
+        attributes, depending on whether namespaces are set.
 
     title
         This can either be a literal title string, or "CODE" reference, or
@@ -377,6 +386,10 @@ METHODS
 
     args
         Same as "args" in "_XML".
+
+  _LOAD %PARAMS|\%PARAMS
+    This is just a convenience method for "load_xml" in XML::LibXML. All
+    parameters get passed straight through without any modification.
 
 AUTHOR
     Dorian Taylor, "<dorian at cpan.org>"

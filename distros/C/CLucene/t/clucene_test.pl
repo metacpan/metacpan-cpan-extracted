@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # clucene_test.pl - test program for CLucene perl wrapper
 #
-# Copyright(c) 2005 Peter Edwards <peterdragon@users.sourceforge.net>
+# Copyright(c) 2005 Peter Edwards peterdragon@users.sourceforge.net
 # All rights reserved. This package is free software; you can redistribute
 # it and/or modify it under the same terms as Perl itself.
 

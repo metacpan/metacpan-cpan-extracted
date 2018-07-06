@@ -1,0 +1,23 @@
+---
+abstract: 'Perl interface to CLucene C++ search engine'
+author:
+  - 'Peter Edwards <peterdragon@users.sourceforge.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CLucene
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1'
+  File::Path: '1'
+version: '1.03'

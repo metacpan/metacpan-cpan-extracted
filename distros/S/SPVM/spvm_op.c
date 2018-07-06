@@ -1309,31 +1309,37 @@ const char* SPVM_OP_create_abs_name(SPVM_COMPILER* compiler, const char* package
   return abs_name;
 }
 
-const char* SPVM_OP_create_method_signature(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
-  
-  assert(sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_METHOD);
+const char* SPVM_OP_create_sub_signature(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
   
   int32_t length = 0;
   
   // Calcurate signature length
   {
-    // Return type
+    // (
+    length += 1;
+
+    // Return type basic type
     length += strlen(sub->op_return_type->uv.type->basic_type->name);
     
+    // Return type dimension
     length += sub->op_return_type->uv.type->dimension * 2;
     
-    // Space
+    // )
     length += 1;
     
     // Subroutine name
     length += strlen(sub->op_name->uv.name);
     
-    // (self,
-    length += 6;
+    // (
+    length += 1;
     
-    if (sub->op_args->length > 1) {
-      int32_t arg_index;
-      for (arg_index = 1; arg_index < sub->op_args->length; arg_index++) {
+    int32_t arg_index;
+    for (arg_index = 0; arg_index < sub->op_args->length; arg_index++) {
+      if (sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_METHOD && arg_index == 0) {
+        // self
+        length += 4;
+      }
+      else {
         SPVM_OP* op_arg_sub = SPVM_LIST_fetch(sub->op_args, arg_index);
         SPVM_TYPE* type_arg_sub = SPVM_OP_get_type(compiler, op_arg_sub);
         
@@ -1342,11 +1348,10 @@ const char* SPVM_OP_create_method_signature(SPVM_COMPILER* compiler, SPVM_SUB* s
         
         // Dimension
         length += type_arg_sub->dimension * 2;
-        
-        // ,
-        if (arg_index != sub->op_args->length - 1) {
-          length += 1;
-        }
+      }
+      // ,
+      if (arg_index != sub->op_args->length - 1) {
+        length += 1;
       }
     }
     
@@ -1354,11 +1359,15 @@ const char* SPVM_OP_create_method_signature(SPVM_COMPILER* compiler, SPVM_SUB* s
     length += 1;
   }
   
-  char* method_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
+  char* sub_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
   
-  // Calcurate signature length
-  char* bufptr = method_signature;
+  // Calcurate sub signature length
+  char* bufptr = sub_signature;
   {
+    // (
+    memcpy(bufptr, "(", 1);
+    bufptr += 1;
+
     // Return type
     memcpy(bufptr, sub->op_return_type->uv.type->basic_type->name, strlen(sub->op_return_type->uv.type->basic_type->name));
     bufptr += strlen(sub->op_return_type->uv.type->basic_type->name);
@@ -1369,21 +1378,26 @@ const char* SPVM_OP_create_method_signature(SPVM_COMPILER* compiler, SPVM_SUB* s
       bufptr += 2;
     }
     
-    // Space
-    memcpy(bufptr, " ", 1);
+    // )
+    *bufptr = ')';
     bufptr += 1;
 
     // Subroutine name
     memcpy(bufptr, sub->op_name->uv.name, strlen(sub->op_name->uv.name));
     bufptr += strlen(sub->op_name->uv.name);
     
-    if (sub->op_args->length > 1) {
-      // (self,
-      memcpy(bufptr, "(self,", 6);
-      bufptr += 6;
+    // (
+    *bufptr = '(';
+    bufptr += 1;
     
-      int32_t arg_index;
-      for (arg_index = 1; arg_index < sub->op_args->length; arg_index++) {
+    int32_t arg_index;
+    for (arg_index = 0; arg_index < sub->op_args->length; arg_index++) {
+      // self
+      if (sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_METHOD && arg_index == 0) {
+        memcpy(bufptr, "self", 4);
+        bufptr += 4;
+      }
+      else {
         SPVM_OP* op_arg_sub = SPVM_LIST_fetch(sub->op_args, arg_index);
         SPVM_TYPE* type_arg_sub = SPVM_OP_get_type(compiler, op_arg_sub);
         
@@ -1396,18 +1410,13 @@ const char* SPVM_OP_create_method_signature(SPVM_COMPILER* compiler, SPVM_SUB* s
           memcpy(bufptr, "[]", 2);
           bufptr += 2;
         }
-        
-        // ,
-        if (arg_index != sub->op_args->length - 1) {
-          memcpy(bufptr, ",", 1);
-          bufptr += 1;
-        }
       }
-    }
-    else {
-      // (self,
-      memcpy(bufptr, "(self", 5);
-      bufptr += 5;
+
+      // ,
+      if (arg_index != sub->op_args->length - 1) {
+        memcpy(bufptr, ",", 1);
+        bufptr += 1;
+      }
     }
     
     // )
@@ -1415,7 +1424,113 @@ const char* SPVM_OP_create_method_signature(SPVM_COMPILER* compiler, SPVM_SUB* s
     bufptr += 1;
   }
   
-  return method_signature;
+  return sub_signature;
+}
+
+const char* SPVM_OP_create_field_signature(SPVM_COMPILER* compiler, SPVM_FIELD* field) {
+  
+  int32_t length = 0;
+  
+  // Calcurate signature length
+  {
+    // (
+    length += 1;
+
+    // Return type basic type
+    length += strlen(field->op_type->uv.type->basic_type->name);
+    
+    // Return type dimension
+    length += field->op_type->uv.type->dimension * 2;
+    
+    // )
+    length += 1;
+    
+    // Subroutine name
+    length += strlen(field->op_name->uv.name);
+  }
+  
+  char* field_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
+  
+  // Calcurate field signature length
+  char* bufptr = field_signature;
+  {
+    // (
+    memcpy(bufptr, "(", 1);
+    bufptr += 1;
+
+    // Return type
+    memcpy(bufptr, field->op_type->uv.type->basic_type->name, strlen(field->op_type->uv.type->basic_type->name));
+    bufptr += strlen(field->op_type->uv.type->basic_type->name);
+    
+    int32_t dim_index;
+    for (dim_index = 0; dim_index < field->op_type->uv.type->dimension; dim_index++) {
+      memcpy(bufptr, "[]", 2);
+      bufptr += 2;
+    }
+    
+    // )
+    *bufptr = ')';
+    bufptr += 1;
+
+    // Subroutine name
+    memcpy(bufptr, field->op_name->uv.name, strlen(field->op_name->uv.name));
+    bufptr += strlen(field->op_name->uv.name);
+  }
+  
+  return field_signature;
+}
+
+const char* SPVM_OP_create_package_var_signature(SPVM_COMPILER* compiler, SPVM_PACKAGE_VAR* package_var) {
+  
+  int32_t length = 0;
+  
+  // Calcurate signature length
+  {
+    // (
+    length += 1;
+
+    // Return type basic type
+    length += strlen(package_var->op_type->uv.type->basic_type->name);
+    
+    // Return type dimension
+    length += package_var->op_type->uv.type->dimension * 2;
+    
+    // )
+    length += 1;
+    
+    // Subroutine name
+    length += strlen(package_var->op_var->uv.var->op_name->uv.name);
+  }
+  
+  char* package_var_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
+  
+  // Calcurate package_var signature length
+  char* bufptr = package_var_signature;
+  {
+    // (
+    memcpy(bufptr, "(", 1);
+    bufptr += 1;
+
+    // Return type
+    memcpy(bufptr, package_var->op_type->uv.type->basic_type->name, strlen(package_var->op_type->uv.type->basic_type->name));
+    bufptr += strlen(package_var->op_type->uv.type->basic_type->name);
+    
+    int32_t dim_index;
+    for (dim_index = 0; dim_index < package_var->op_type->uv.type->dimension; dim_index++) {
+      memcpy(bufptr, "[]", 2);
+      bufptr += 2;
+    }
+    
+    // )
+    *bufptr = ')';
+    bufptr += 1;
+
+    // Subroutine name
+    memcpy(bufptr, package_var->op_var->uv.var->op_name->uv.name, strlen(package_var->op_var->uv.var->op_name->uv.name));
+    bufptr += strlen(package_var->op_var->uv.var->op_name->uv.name);
+  }
+  
+  return package_var_signature;
 }
 
 const char* SPVM_OP_create_package_var_access_abs_name(SPVM_COMPILER* compiler, const char* package_name, const char* name) {
@@ -1471,8 +1586,8 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         case SPVM_DESCRIPTOR_C_ID_INTERFACE:
           package->category = SPVM_PACKAGE_C_CATEGORY_INTERFACE;
           break;
-        case SPVM_DESCRIPTOR_C_ID_STRUCT:
-          package->category = SPVM_PACKAGE_C_CATEGORY_STRUCT;
+        case SPVM_DESCRIPTOR_C_ID_POINTER:
+          package->category = SPVM_PACKAGE_C_CATEGORY_POINTER;
           break;
         case SPVM_DESCRIPTOR_C_ID_PRIVATE:
           package->is_private = 1;
@@ -1525,15 +1640,15 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   {
     int32_t i;
     for (i = 0; i < package->op_fields->length; i++) {
-      if (package->category == SPVM_PACKAGE_C_CATEGORY_STRUCT) {
-        SPVM_yyerror_format(compiler, "Struct package can't have field at %s line %d\n", op_decl->file, op_decl->line);
+      if (package->category == SPVM_PACKAGE_C_CATEGORY_POINTER) {
+        SPVM_yyerror_format(compiler, "Pointer package can't have field at %s line %d\n", op_decl->file, op_decl->line);
         continue;
       }
 
       SPVM_OP* op_field = SPVM_LIST_fetch(package->op_fields, i);
       
       SPVM_FIELD* field = op_field->uv.field;
-      field->rel_id = i;
+      field->index = i;
       const char* field_name = field->op_name->uv.name;
       const char* field_abs_name = SPVM_OP_create_abs_name(compiler, package_name, field_name);
       field->abs_name = field_abs_name;
@@ -1559,7 +1674,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       }
       
       if (SPVM_TYPE_is_object(compiler, field->op_type->uv.type)) {
-        SPVM_LIST_push(package->object_field_rel_ids, (void*)(intptr_t)field->rel_id);
+        SPVM_LIST_push(package->object_field_indexes, (void*)(intptr_t)field->index);
       }
     }
   }
@@ -1572,24 +1687,26 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       
       SPVM_PACKAGE_VAR* package_var = op_package_var->uv.package_var;
       package_var->rel_id = i;
-      const char* package_var_access_name = package_var->op_package_var_access->uv.package_var_access->op_name->uv.name;
+      const char* package_var_name = package_var->op_var->uv.var->op_name->uv.name;
+      const char* package_var_abs_name = SPVM_OP_create_abs_name(compiler, package_name, package_var_name);
+      package_var->abs_name = package_var_abs_name;
       
-      SPVM_OP* found_op_package_var = SPVM_HASH_fetch(package->op_package_var_symtable, package_var_access_name, strlen(package_var_access_name));
+      SPVM_OP* found_op_package_var = SPVM_HASH_fetch(package->op_package_var_symtable, package_var_name, strlen(package_var_name));
       
       if (found_op_package_var) {
-        SPVM_yyerror_format(compiler, "Redeclaration of package variable \"%s::%s\" at %s line %d\n", package_name, package_var_access_name, op_package_var->file, op_package_var->line);
+        SPVM_yyerror_format(compiler, "Redeclaration of package variable \"%s::%s\" at %s line %d\n", package_name, package_var_name, op_package_var->file, op_package_var->line);
       }
       else if (package->op_package_vars->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
         SPVM_yyerror_format(compiler, "Too many package variable declarations at %s line %d\n", op_package_var->file, op_package_var->line);
         
       }
       else {
-        const char* package_var_access_abs_name = SPVM_OP_create_package_var_access_abs_name(compiler, package_name, package_var_access_name);
+        const char* package_var_access_abs_name = SPVM_OP_create_package_var_access_abs_name(compiler, package_name, package_var_name);
         package_var->id = compiler->op_package_vars->length;
         SPVM_LIST_push(compiler->op_package_vars, op_package_var);
         SPVM_HASH_insert(compiler->op_package_var_symtable, package_var_access_abs_name, strlen(package_var_access_abs_name), op_package_var);
 
-        SPVM_HASH_insert(package->op_package_var_symtable, package_var_access_name, strlen(package_var_access_name), op_package_var);
+        SPVM_HASH_insert(package->op_package_var_symtable, package_var_name, strlen(package_var_name), op_package_var);
         
         // Add op package
         package_var->op_package = op_package;
@@ -1687,21 +1804,48 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   SPVM_LIST_push(compiler->op_packages, op_package);
   SPVM_HASH_insert(compiler->op_package_symtable, package_name, strlen(package_name), op_package);
 
-  // Register method signature symtable
+  // Register sub signature
   {
     int32_t i;
     for (i = 0; i < package->op_subs->length; i++) {
       SPVM_OP* op_sub = SPVM_LIST_fetch(package->op_subs, i);
       SPVM_SUB* sub = op_sub->uv.sub;
       
-      if (sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_METHOD) {
-        const char* method_signature = SPVM_OP_create_method_signature(compiler, sub);
-        sub->method_signature = method_signature;
-        SPVM_HASH_insert(sub->op_package->uv.package->method_signature_symtable, method_signature, strlen(method_signature), sub);
-      }
+      const char* sub_signature = SPVM_OP_create_sub_signature(compiler, sub);
+      sub->signature = sub_signature;
+      SPVM_LIST_push(sub->op_package->uv.package->sub_signatures, (char*)sub_signature);
+      SPVM_HASH_insert(sub->op_package->uv.package->sub_signature_symtable, sub_signature, strlen(sub_signature), sub);
     }
   }
-  
+
+  // Register field signature
+  {
+    int32_t i;
+    for (i = 0; i < package->op_fields->length; i++) {
+      SPVM_OP* op_field = SPVM_LIST_fetch(package->op_fields, i);
+      SPVM_FIELD* field = op_field->uv.field;
+      
+      const char* field_signature = SPVM_OP_create_field_signature(compiler, field);
+      field->signature = field_signature;
+      SPVM_LIST_push(field->op_package->uv.package->field_signatures, (char*)field_signature);
+      SPVM_HASH_insert(field->op_package->uv.package->field_signature_symtable, field_signature, strlen(field_signature), field);
+    }
+  }
+
+  // Register package_var signature
+  {
+    int32_t i;
+    for (i = 0; i < package->op_package_vars->length; i++) {
+      SPVM_OP* op_package_var = SPVM_LIST_fetch(package->op_package_vars, i);
+      SPVM_PACKAGE_VAR* package_var = op_package_var->uv.package_var;
+      
+      const char* package_var_signature = SPVM_OP_create_package_var_signature(compiler, package_var);
+      package_var->signature = package_var_signature;
+      SPVM_LIST_push(package_var->op_package->uv.package->package_var_signatures, (char*)package_var_signature);
+      SPVM_HASH_insert(package_var->op_package->uv.package->package_var_signature_symtable, package_var_signature, strlen(package_var_signature), package_var);
+    }
+  }
+
   return op_package;
 }
 
@@ -1765,15 +1909,15 @@ SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_v
   return op_var;
 }
 
-SPVM_OP* SPVM_OP_build_package_var(SPVM_COMPILER* compiler, SPVM_OP* op_package_var_access, SPVM_OP* op_type) {
+SPVM_OP* SPVM_OP_build_package_var(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type) {
   
-  SPVM_OP* op_package_var = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PACKAGE_VAR, op_package_var_access->file, op_package_var_access->line);
+  SPVM_OP* op_package_var = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PACKAGE_VAR, op_var->file, op_var->line);
   SPVM_PACKAGE_VAR* package_var = SPVM_PACKAGE_VAR_new(compiler);
   
-  const char* name = SPVM_OP_get_var_name(compiler, op_package_var_access);
+  const char* name = SPVM_OP_get_var_name(compiler, op_var);
   
   _Bool invalid_name = 0;
-  if (op_package_var_access->id != SPVM_OP_C_ID_PACKAGE_VAR_ACCESS) {
+  if (op_var->id != SPVM_OP_C_ID_PACKAGE_VAR_ACCESS) {
     invalid_name = 1;
   }
   else {
@@ -1783,11 +1927,11 @@ SPVM_OP* SPVM_OP_build_package_var(SPVM_COMPILER* compiler, SPVM_OP* op_package_
   }
   
   if (invalid_name) {
-    SPVM_yyerror_format(compiler, "Invalid package variable name %s at %s line %d\n", name, op_package_var_access->file, op_package_var_access->line);
+    SPVM_yyerror_format(compiler, "Invalid package variable name %s at %s line %d\n", name, op_var->file, op_var->line);
     
   }
   
-  package_var->op_package_var_access = op_package_var_access;
+  package_var->op_var = op_var;
   package_var->op_type = op_type;
   op_package_var->uv.package_var = package_var;
   

@@ -335,4 +335,38 @@ is_deeply(
     'compound resource document with plural primary relation and its singular nested relationship'
 );
 
+is_deeply(
+    $t->compound_resource_document($t->schema->resultset('Author')->find(1), { includes => [qw/email_templates/] }),
+    {
+        data => {
+            id         => 1,
+            type       => 'authors',
+            attributes => {
+                name => 'John Doe',
+                age  => 28,
+            },
+            relationships => {
+                'email-templates' => {
+                    links => {
+                        self    => 'http://example.com/api/authors/1/relationships/email-templates',
+                        related => 'http://example.com/api/authors/1/email-templates'
+                    },
+                    data => [{ type => 'email-templates', id => 1, }],
+                },
+            },
+        },
+        included => [{
+                id         => 1,
+                type       => 'email-templates',
+                attributes => {
+                    author_id => 1,
+                    name      => 'Test Template',
+                    body      => 'Test template body',
+                },
+            },
+        ],
+    },
+    'compound resource document with underscore case primary relationship'
+);
+
 done_testing;

@@ -24,11 +24,12 @@ The following named C<%ops> may be supplied:
 
 =over 4
 
-=item sep => STRING
+=item sep => ARRAY[STRING] or STRING
 
-Separator string to print between columns. Will default to a single space if
-not supplied. Note that this string is interpolated into a C<sprintf> format
-string, so any C<%> marks it may contain should be doubled.
+A list of strings per column (or one single string to apply equally to them
+all) specifying the separator string to print after each columns. Will default
+to a single space if not supplied. Note that this string is interpolated into
+a C<sprintf> format string, so any C<%> marks it may contain should be doubled.
 
 =item align => ARRAY[STRING] or STRING
 

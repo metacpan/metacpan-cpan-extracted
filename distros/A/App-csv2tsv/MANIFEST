@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/App/csv2tsv.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+scripts/csv2tsv
+META.yml
+META.json

@@ -27,13 +27,13 @@ sub ast_to_rperl__generate {
 #    RPerl::diag( 'in ArrayDereference->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
     my string $self_class = ref $self;
-    # unwrap ArrayDereference_220 and ArrayDereference_221 from SubExpression_160
+    # unwrap ArrayDereference_221 and ArrayDereference_222 from SubExpression_160
     if ( $self_class eq 'SubExpression_160' ) {  # SubExpression -> ArrayDereference
         $self = $self->{children}->[0];
     }
 
     $self_class = ref $self;
-    if ( $self_class eq 'ArrayDereference_220' ) {  # ArrayDereference -> '@{' Variable '}'
+    if ( $self_class eq 'ArrayDereference_221' ) {  # ArrayDereference -> '@{' Variable '}'
         my string $at_left_brace = $self->{children}->[0];
         my object $variable = $self->{children}->[1];
         my string $right_brace = $self->{children}->[2];
@@ -43,7 +43,7 @@ sub ast_to_rperl__generate {
         RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
         $rperl_source_group->{PMC} .= q{ } . $right_brace;
     }
-    elsif ( $self_class eq 'ArrayDereference_221' ) {  # ArrayDereference -> '@{' OPTIONAL-47 ArrayReference '}'
+    elsif ( $self_class eq 'ArrayDereference_222' ) {  # ArrayDereference -> '@{' OPTIONAL-47 ArrayReference '}'
         my string $at_left_brace = $self->{children}->[0];
         my object $type_inner_optional = $self->{children}->[1];
         my object $array_reference = $self->{children}->[2];
@@ -61,9 +61,9 @@ sub ast_to_rperl__generate {
     }
     else {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
+            'ERROR ECOGEASRP000, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                 . $self_class
-                . ' found where ArrayDereference_220 or ArrayDereference_221 expected, dying'
+                . ' found where ArrayDereference_221 or ArrayDereference_222 expected, dying'
         ) . "\n";
     }
     return $rperl_source_group;
@@ -84,8 +84,8 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
     my string_hashref $cpp_source_group = { CPP => q{// <<< RP::O::E::SE::AD __DUMMY_SOURCE_CODE CPPOPS_CPPTYPES >>>} . "\n" };
 
 #    RPerl::diag( 'in ArrayDereference->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
-    # DEV NOTE, CORRELATION #rp031: NEED ANSWER: are array dereferences allowed in CPPOPS or not???
-#    die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCPxe, CODE GENERATOR, ABSTRACT SYNTAX TO C++: array dereference not supported in CPPOPS_CPPTYPES mode, dying' ) . "\n";
+    # DEV NOTE, CORRELATION #rp031: NEED UPGRADE: implement proper @array vs $arrayref, %hash vs $hashref, dereferencing, etc.
+
     return $cpp_source_group;
 }
 

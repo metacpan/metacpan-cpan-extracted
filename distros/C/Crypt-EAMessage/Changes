@@ -1,0 +1,41 @@
+1.181840  2018-07-02 20:58:55-06:00 America/Denver
+ * Added code of conduct
+
+1.007 - Jun 16, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Aded encrypt_auth_urlsafe() method to produce output without line
+   feeds or characters that might need to be escaped in a URL
+ * Included additional documentation about reporting bugs
+ * Add CONTRIBUTING and TODO docs
+
+1.006 - June 15, 2018
+ * Trial version released to validate 1.007 changes
+
+1.005 - Jun 14, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Improve testing
+ * Make module pass Critic
+ * Enable TravisCI
+ * Fix error message for wrong key length (s/bits/bytes/)
+ * Allow ASCII cypertext line endings to be configurable
+ * Most changes previously released as version 1.004-TRIAL
+
+1.004 - June 14, 2018
+ * Trial version released to validate 1.005 changes
+
+1.003 - Aug 19, 2017
+Joelle Maslak <jmaslak@antelope.net>
+ * Update author information only
+
+1.002 - Oct 17, 2016
+Joelle Maslak <jmaslak@antelope.net>
+ * Don't re-initialize Crypt::Bytes::Random after initial initialization
+
+1.001 - Oct 09, 2016
+Joelle Maslak <jmaslak@antelope.net>
+ * One test was pulling in JCM::Boilerplate which is EXTREMELY heavy
+   on dependencies.  Removed!
+
+1.000 - Oct 03, 2016
+Joelle Maslak <jmaslak@antelope.net>
+ * Initial Version

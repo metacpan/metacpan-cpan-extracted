@@ -1,0 +1,5 @@
+name = "DBIx-Schema-DSL"
+badges = ["travis", "coveralls"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"

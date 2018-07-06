@@ -169,7 +169,7 @@ $H = <<EOF;
 <style>em{color:red};\@import url(&#34;style.css&#34;);</style>
 EOF
 $Res = $Defang->defang($H);
-like($Res, qr{^<style><!--${CommentStartText}em{color:red}${CommentEndText}--></style>$}, "Test 26");
+like($Res, qr{^<style><!--${CommentStartText}em\{color:red\}${CommentEndText}--></style>$}, "Test 26");
 
 $H = <<EOF;
 <style>\@import url(&#34;style.css&#34;);</style>

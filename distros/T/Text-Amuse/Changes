@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+1.11 2018-07-04
+
+ - Add Indonesian language support
+ - Fix GH#40 (crash on corner case)
+
 1.10 2018-04-24
 
  - Improve anchors restoring compatibility with Emacs Muse (#39)

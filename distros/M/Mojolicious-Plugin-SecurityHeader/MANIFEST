@@ -10,6 +10,9 @@ README
 dist.ini
 lib/Mojolicious/Plugin/SecurityHeader.pm
 t/basic.t
+t/csp/default.t
+t/csp/invalid.t
+t/csp/valid.t
 t/cto/default.t
 t/cto/invalid.t
 t/cto/valid.t

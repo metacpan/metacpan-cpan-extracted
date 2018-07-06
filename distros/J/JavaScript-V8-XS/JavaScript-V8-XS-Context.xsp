@@ -1,0 +1,25 @@
+%module{JavaScript::V8::XS};
+
+%name{JavaScript::V8::XS} class V8Context
+{
+    V8Context(HV* opt = 0);
+    ~V8Context();
+
+    SV* get(const char* name);
+    SV* exists(const char* name);
+    SV* typeof(const char* name);
+    SV* instanceof(const char* oname, const char* cname);
+
+    void set(const char* name, SV* value);
+    SV* eval(const char* code, const char* file = 0);
+
+    SV* dispatch_function_in_event_loop(const char* func);
+
+    int run_gc();
+
+    HV* get_stats();
+    void reset_stats();
+
+    HV* get_msgs();
+    void reset_msgs();
+};

@@ -1,5 +1,9 @@
 Revision history for Perl extension Plack-Middleware-XRay
 
+0.05 2018-07-05T08:11:10Z
+    - Add response_filter
+    - follow to AWS::XRay 0.06
+
 0.04 2018-06-23T06:14:22Z
     - Add sampler
     - follow to AWS::XRay 0.04

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,72 +14,91 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-SHA1 775ad0c2b5da40d57186b6eb27f9ac95db66278e Changes
-SHA1 e19fced15eebe1efb8a90faa054427e8942afbab INSTALL
-SHA1 cc04adc5f67a6cde18f42efbe9da7f71e584ccf3 LICENSE
-SHA1 1bd8baf862a8ed62371cee5308c6ecc859f2131e MANIFEST
-SHA1 04cb1b11b8604575f7860784b9051920e3b36499 META.json
-SHA1 a0353ec9319e1627a4d8fb59f033099709f6c183 META.yml
-SHA1 3d25adb87111e76133145c83e613481a8e8c38c5 Makefile.PL
-SHA1 20062732382fb74f9c7f870d2ad2ede7ed5779ce README
+SHA1 136d28861bed22d91d7148299dd41b38a491826c 1
+SHA1 5f56bb43088a8fa5937a6e51aa97561cc9ef6bb2 Changes
+SHA1 54e5d14f7cce54c362d9c700d2beb498ed9f8e43 INSTALL
+SHA1 260e79e34ae1c1c5bcc0732a491513f2fc2e646a LICENSE
+SHA1 cd3beb5f4bf12cc8b09fae22bcb534c3285c6f0d MANIFEST
+SHA1 6bf8654be45d6412c2b9a918d0bf6af19cd5a0ad META.json
+SHA1 24d4840afa746c3e0b58466265889b30b7263d64 META.yml
+SHA1 286c915a505fbd227a5192a98936ef1dd77e35e5 Makefile.PL
+SHA1 585953feab933576c0d287a76db81e3fccd26b6f README
 SHA1 26741f8f026d5f95b1bab71872a81d51fd8de3c9 README.md
-SHA1 0831217e21848c1926b4f51075e6b32440143c5a dist.ini
-SHA1 608b5d5434109e9c06950d52809a706424c5a215 lib/Data/MuForm.pm
-SHA1 abc6a3ceba3b9eb14032ae7bbf9be4e0ba3c2177 lib/Data/MuForm/Common.pm
-SHA1 c203e3b3ca2dd14708b0dc614bf25d9f055b44ba lib/Data/MuForm/Field.pm
-SHA1 bd38ff50184bd1caef45b83cf0daf958f9cfe6fc lib/Data/MuForm/Field/Boolean.pm
-SHA1 97d622737dfc2098d9f68750b10bca261b6c43a0 lib/Data/MuForm/Field/Button.pm
-SHA1 e30f0a287bc0d15c97a0926e1755bbff7d831e80 lib/Data/MuForm/Field/Checkbox.pm
-SHA1 441e8fd88350dd77f4eb3c910830cf5b3471e736 lib/Data/MuForm/Field/Compound.pm
-SHA1 076b3e15447a6b88c4472400ad6042b8f50a9d6a lib/Data/MuForm/Field/CompoundDateTime.pm
-SHA1 fec88aa381838be1b7d7a15c1d6bc02871674eac lib/Data/MuForm/Field/Currency.pm
-SHA1 de27c03b21523d65123650918d6941ea0b4b84b7 lib/Data/MuForm/Field/Date.pm
-SHA1 249ec76229c885c3c17cb98a4c2be8b12e34392b lib/Data/MuForm/Field/Display.pm
-SHA1 f9092b52d89b99e94e5d3addb05daff1520469c6 lib/Data/MuForm/Field/Email.pm
-SHA1 4f7e09e7fc4a244a72293119b80ea4f0217ed270 lib/Data/MuForm/Field/Float.pm
-SHA1 057da9b25c7abe73a4406331b3835055a80ecffa lib/Data/MuForm/Field/Hidden.pm
-SHA1 63c5ae030f9786b4a01c7dcf34a8ecb50106cf6f lib/Data/MuForm/Field/Integer.pm
-SHA1 c657f77305e0ee9f441562c62c0f2ade5a1eec1d lib/Data/MuForm/Field/List.pm
-SHA1 f5478a11df769bd19131fcc8a9e76ae89baabe82 lib/Data/MuForm/Field/Multiple.pm
-SHA1 5cfaeebcf5a47c024572df3a7cc7c1b6617f801f lib/Data/MuForm/Field/Password.pm
-SHA1 ab133ed4778c6b79c6bff61df87f16a71b8b05d5 lib/Data/MuForm/Field/PrimaryKey.pm
-SHA1 c0f25ab13efee2574dd4cc6f9e7681165bd36be2 lib/Data/MuForm/Field/Repeatable.pm
-SHA1 467ee0a55a0536892e3844d93404d19ea1f154a9 lib/Data/MuForm/Field/Repeatable/Instance.pm
-SHA1 a6179435e45a2754407eecb43baf69ddfd3b80aa lib/Data/MuForm/Field/Reset.pm
-SHA1 733e518c186e8bcfcf31b4a59477064c5a0ea433 lib/Data/MuForm/Field/Select.pm
-SHA1 8583e08fc32343c6f4efa41151f42c1d37030cbb lib/Data/MuForm/Field/Submit.pm
-SHA1 a8627f06d74627ad800f255409b028bdf2437618 lib/Data/MuForm/Field/Text.pm
-SHA1 5eec8db435d5f59b8ca22ff1fa6c1aa94eb3c91c lib/Data/MuForm/Field/Textarea.pm
-SHA1 57daa72e97e6c2b2212b892980fe08cda6bb9094 lib/Data/MuForm/Field/Time.pm
-SHA1 4ce7aa8b4c09015c975908d13262868f3b46b2bd lib/Data/MuForm/Field/URL.pm
-SHA1 79d600d3b7c64a60278505da51704ca2c803d1c2 lib/Data/MuForm/Field/Upload.pm
-SHA1 010eaa59a9c24605d7fae4fd1908d835a490b06b lib/Data/MuForm/Fields.pm
-SHA1 a39cde43dec4edf4c28521a75043ad198bc33256 lib/Data/MuForm/Localizer.pm
-SHA1 36a6e8cb17c160eb35d668663829700afb21e961 lib/Data/MuForm/Manual.pod
-SHA1 bf6ddeb3c5c1c0d5cd9e0a97acec81c8cca71721 lib/Data/MuForm/Manual/Cookbook.pod
-SHA1 cab9ea012b4f03ba922aab1223fce6205904cf1b lib/Data/MuForm/Manual/Defaults.pod
-SHA1 c799e3cfbfdfa74a4f2eb259a42ef3fb76c8db1c lib/Data/MuForm/Manual/Errors.pod
-SHA1 763b43fb5bb658f6ac1ec9b02b9c6d5f277b0cf4 lib/Data/MuForm/Manual/Fields.pod
-SHA1 7196e46a88ba22761502f67870911ed8990b6868 lib/Data/MuForm/Manual/FormHandlerDiff.pod
-SHA1 c0e27396096841cffd6af3fca7395f1ed81675df lib/Data/MuForm/Manual/Hooks.pod
-SHA1 838daa0ff564c975af48e7afb6f02c0ad4255d8f lib/Data/MuForm/Manual/Intro.pod
-SHA1 ea887113f2bfbb8b83925ddbb57d101aa329f973 lib/Data/MuForm/Manual/Reference.pod
-SHA1 5b73dec84cd1a028f9ec299377706b7b921f6c54 lib/Data/MuForm/Manual/Rendering.pod
-SHA1 0295a7c8f807cc38bf9b67afe0b03b434ed8389d lib/Data/MuForm/Manual/Testing.pod
-SHA1 e8ab4d643c3b9c0993222691ff1484dbfa38284e lib/Data/MuForm/Manual/Transformations.pod
-SHA1 194fd2165d477de139d95bc4ff2d469868de6e26 lib/Data/MuForm/Manual/Validation.pod
-SHA1 6ca7a01b90041d467386004a254f74740c7d1e12 lib/Data/MuForm/Merge.pm
+SHA1 f75718e155229df9323bb2d65d28901f1f4ee892 dist.ini
+SHA1 c3293be322ef9e5fe9e98f7290f56401ec166a61 foundation
+SHA1 9cd4e1ba6846b84c90dec665c5460b41d407dffe keys-to-go-escape-keys.txt
+SHA1 699f698545918e3eef52325ab886efc76e6defcc lib/Data/MuForm.pm
+SHA1 6d435109fc3f1b598fc15605988a1f64e683635e lib/Data/MuForm/Common.pm
+SHA1 89032ecca41181bf5a71280213ac1336c1a56f34 lib/Data/MuForm/Field.pm
+SHA1 6bb5d9a08bba6dd7789dabc9f90de281a32133d5 lib/Data/MuForm/Field/Boolean.pm
+SHA1 23976e79a823979a9a4d378df7dc5b6fec98db38 lib/Data/MuForm/Field/Button.pm
+SHA1 6cde5df47fd13d07d0b94e5d03a64e6a7fd101ea lib/Data/MuForm/Field/Checkbox.pm
+SHA1 9ef2d0b72aefa56e133c37d9dd95d5ac121c9855 lib/Data/MuForm/Field/Compound.pm
+SHA1 47e441010bfaf1d121cd35f58e8c90038c3a1a6c lib/Data/MuForm/Field/CompoundDateTime.pm
+SHA1 bbef8976e36f6bcf78cd60fd1442be08fed3c0fd lib/Data/MuForm/Field/Currency.pm
+SHA1 193dbeae5bd884e545eef9fd09adf048ce34ccef lib/Data/MuForm/Field/Date.pm
+SHA1 3c5a3e830b1012bfa0a49eabbc7cfa7c81f2f5a9 lib/Data/MuForm/Field/Display.pm
+SHA1 2d27ed055eb9f256e3f09f3ddff69248276fe671 lib/Data/MuForm/Field/Email.pm
+SHA1 3e1817ed6b06d45ac846370ba01966934bbe3d2b lib/Data/MuForm/Field/Float.pm
+SHA1 17c2a60d6a701246a57f4a863fc5aa2ccc11f569 lib/Data/MuForm/Field/Hidden.pm
+SHA1 b2baa933e7e3cc5d5d170942ab01636d24e2c6ce lib/Data/MuForm/Field/Integer.pm
+SHA1 faa98d3e3947393d004b65c86b7051673dc4dd7a lib/Data/MuForm/Field/List.pm
+SHA1 0d81a6a7334401c3eb3d8fff3a2f95325468d175 lib/Data/MuForm/Field/Multiple.pm
+SHA1 73a1cc6d40d9c96d5e3d15e339cc05e32e325ca8 lib/Data/MuForm/Field/Password.pm
+SHA1 8276fbd23e7aa7a2922db3a34164ccc891fb975d lib/Data/MuForm/Field/PrimaryKey.pm
+SHA1 216f08e0a75ecf49906ebb0398ca2685eda39b4d lib/Data/MuForm/Field/Repeatable.pm
+SHA1 7098660844c504451302c7468eff3f979efa522c lib/Data/MuForm/Field/Repeatable/Instance.pm
+SHA1 606662f41f35d86f42a7f02324296627342955b9 lib/Data/MuForm/Field/Reset.pm
+SHA1 7dc5c11f5f90a8e9a0e3e9802be97453f503a4e6 lib/Data/MuForm/Field/Select.pm
+SHA1 c67b48262a9ae9ae9b0b9160c07677399ff7a9e9 lib/Data/MuForm/Field/Submit.pm
+SHA1 71690b882e271edc1a2577b930d905f5501c987a lib/Data/MuForm/Field/Text.pm
+SHA1 a132f0ed671a146a6ac15d3ccbfa31318a020691 lib/Data/MuForm/Field/Textarea.pm
+SHA1 652f1346a4e23bc0002211b78d2740ff61216535 lib/Data/MuForm/Field/Time.pm
+SHA1 2299517162f1f88278a622ba4671c6dce0bf23dd lib/Data/MuForm/Field/URL.pm
+SHA1 ba0eeb892f5712e37a373e8df6217ae9f25707a7 lib/Data/MuForm/Field/Upload.pm
+SHA1 bbe941d67f903d2ea703c49d8dbe831f721bb91c lib/Data/MuForm/Fields.pm
+SHA1 bd5e5ce36cf2c100bd14b3dd1ea7bfc25e9ad568 lib/Data/MuForm/Localizer.pm
+SHA1 4be99393e9ff3634bd24020efd99993b34701784 lib/Data/MuForm/Manual.pod
+SHA1 b349d25ccc62152cdcd42a28707722b3ce687d85 lib/Data/MuForm/Manual/Cookbook.pod
+SHA1 86e95a66dc9c262a678540738deac7af7d9e09d8 lib/Data/MuForm/Manual/Defaults.pod
+SHA1 48dd15c099b1e8c3b4fc5fe8381d6d723b5a92d5 lib/Data/MuForm/Manual/Errors.pod
+SHA1 05f1e9396fb8f64a2aee907c7f0323377013bf2a lib/Data/MuForm/Manual/Fields.pod
+SHA1 bb887b127b9d0b778f8d2b921d5ba2928950ff0e lib/Data/MuForm/Manual/FormHandlerDiff.pod
+SHA1 cb95f865925e2cc1bde3a48e8cff1c7b15dc9fd2 lib/Data/MuForm/Manual/Hooks.pod
+SHA1 2147d58743dba3ab9e1cf0f06240655aca08d59f lib/Data/MuForm/Manual/Intro.pod
+SHA1 215201e9727ceba0cfc494c69135bc47e35b629d lib/Data/MuForm/Manual/Reference.pod
+SHA1 4bdca6325b92eb4630ec7e32226588f141bacd39 lib/Data/MuForm/Manual/Rendering.pod
+SHA1 12ef14579445316d03fe49cf32794d2f1e376793 lib/Data/MuForm/Manual/Testing.pod
+SHA1 578a3f16884c6ff1bcf9b39b98eab21fb2fd72b0 lib/Data/MuForm/Manual/Transformations.pod
+SHA1 d613a56073815011f7579aa080d69e3888d64aec lib/Data/MuForm/Manual/Validation.pod
+SHA1 da0f62fe458ee655ff8e936f7fe03ea93241f238 lib/Data/MuForm/Merge.pm
 SHA1 026440df11711232f77e406d1cb689eade96aa4d lib/Data/MuForm/Messages/en.po
-SHA1 57017c4927527e21fdb81b879e862aad44b35ae5 lib/Data/MuForm/Meta.pm
-SHA1 a9637e89edab03f62218a5f4ffb5a515ffd59997 lib/Data/MuForm/Model.pm
-SHA1 f159deb7b7ec1cb2e61899c1e54778e9cf147e4d lib/Data/MuForm/Model/Object.pm
-SHA1 5317134457b8659cdb180eff22e8f54cfb28666b lib/Data/MuForm/Params.pm
-SHA1 cdc9452214900d25381aae43234e68110674b23b lib/Data/MuForm/Renderer/Base.pm
-SHA1 816d8a67ff58ae0e489da46dad6cc0eeabd584be lib/Data/MuForm/Role/RequestToken.pm
-SHA1 190fe24040a5c25237341316ea5e20c5ff2e828a lib/Data/MuForm/Test.pm
-SHA1 f5644aa5c2098ccc70646c5e8266e2b808a2c196 lib/Data/MuForm/Types.pm
+SHA1 080cf815f9fa2d172760cb3a350c9acbe859c981 lib/Data/MuForm/Meta.pm
+SHA1 b8edc9b39bd4521bacc6706e775ce5cd4ff10b62 lib/Data/MuForm/Model.pm
+SHA1 28b0da140e2094d15dfedeb8bc04e5a1c2bfe6b4 lib/Data/MuForm/Model/Object.pm
+SHA1 14421eafa4d15f8ce50027b507569416a22ee968 lib/Data/MuForm/Params.pm
+SHA1 955aba1b74e577b2e01dd2cf4f96879121fe1a6f lib/Data/MuForm/Renderer/Base.pm
+SHA1 1fc7b34872d332708f57aa3041952e2441b02854 lib/Data/MuForm/Role/RequestToken.pm
+SHA1 94fd15c02f0d7207c7e6e5420e2209968b5c2cf2 lib/Data/MuForm/Test.pm
+SHA1 721730df20cd8f354a66467299b6722350a626e6 lib/Data/MuForm/Types.pm
+SHA1 39cc744690278b40988ca57e1e464639058f2828 location.pl
+SHA1 d29164081fff0b13b681a07295f6b2d987360009 notes/KLS.pm
+SHA1 57fabcf3c3e1bac134f5cfd09622517eb3e5daf2 notes/changes.txt
+SHA1 871020f1a5b3fc681978653d6281dbd4eae32307 notes/datalist.txt
+SHA1 0dfb248f1a7cc6cabda569b9b1892d7a775cf342 notes/field_methods.txt
+SHA1 5696f9680d3d89aafb9ba8f5aa977cd7fd8f7956 notes/meta.txt
+SHA1 c75ad31ce6bc2745defc00ed47a7eacc7516ba8d notes/rendering.txt
+SHA1 cf81beabaf553db381c65acb16b90769b4a1f086 notes/rendering_structure.txt
+SHA1 287c502c5450815f871892197965fbaa387a5fdf notes/templates.txt
+SHA1 07bb797982ff1936504c01a39da5a52e330de438 notes/tests
+SHA1 3988c332e6ae088feb70166a90a1fb0558621d96 notes/timing.log
+SHA1 623a3356698c9b13134491e7b9c29f47044b66ff notes/todo.txt
+SHA1 3b4244daf9e22fe45ca1e8ea9a7e97f2e09f7b1c notes/values.txt
+SHA1 233153f2a417e6e0c510efe820fa33ce5f8b27e4 signup_form.html
+SHA1 f4d9450b7b6297306cd0327584521d31485cd5da signup_form.yml
 SHA1 4db5b67934ec2488c48daf1a73cdc0e1b23ccebc t/01app.t
-SHA1 1d87140bfd16de6086f3d6b58e45f360551e0af9 t/author-eol.t
+SHA1 aa152486f75649c5f9e9aed6a09bbe3e4a45dd6e t/author-eol.t
+SHA1 fa32c608edfd07ca4b431dd2d812af5dc0a703b8 t/author-no-tabs.t
 SHA1 79eaeb3ed0257b659c595c62a5ed30116104af7f t/basic.t
 SHA1 be7c2833598216bf29b0a26106b1cf598a42d87e t/compound/basic.t
 SHA1 29ecd82b61a9998453f8435002f4fb546ba8b021 t/compound/default.t
@@ -111,7 +130,7 @@ SHA1 a5c451b199022eb464b5cbd9f1d861bb6806a604 t/fields/list.t
 SHA1 aeff20045153accf3b01c6e902106aaef4557242 t/fields/multiple.t
 SHA1 c0c468be2f817bdf8973ab6590b49523e00453c2 t/fields/password.t
 SHA1 07c8f9445729fa749f11c56d882c8778cdd625d0 t/fields/select.t
-SHA1 ea2eb4fec5db7a32fe425d698cb2f60fe7361a4d t/fields/select_options.t
+SHA1 48a777faa9a3921adcd14c390080423a7f80e579 t/fields/select_options.t
 SHA1 cc8333ca8adb1f9a25bb3d1185da93b03685c946 t/fields/text.t
 SHA1 c46cd671212ee9c14119fda1708022f087dfc014 t/fields/textarea.t
 SHA1 07b7037fdfd717415d9ad795d476f805f40dae33 t/fields/time.t
@@ -144,7 +163,6 @@ SHA1 ec9e19c99a2712364af6981b90f43f8774deeb3d t/localizer/extract_header.t
 SHA1 b9e79b8d70481ae6a983bff4de174a8ae962e162 t/memory_cycles.t
 SHA1 396e61cf11b0316f23aa5a3b223cd5ab2160b0c7 t/meta_fields.t
 SHA1 388aeadab28f866a241a8871b4e4a65308860bdd t/methods.t
-SHA1 fd22b151e7c87feda8285b5f04cf21873169672a t/release-no-tabs.t
 SHA1 f54775f43b69beffc3e4b84fb1c6e9cde2609d93 t/render/actions.t
 SHA1 2e4f263f22e5ea11311ac2b88d89a30d288f4ce8 t/render/base.t
 SHA1 d832a106a576306e424449f0003a7808b3cc9d9a t/render/basic.t
@@ -155,6 +173,7 @@ SHA1 150b37c371f186d94582041c2edf44dbdb47529a t/render/html5.t
 SHA1 a0d2267b6d8d4a7ba996723d1a09ab053b2f75a5 t/render/list.t
 SHA1 5804757ab13f8efa9d38e425ad9d2835c3659f48 t/render/optgroup.t
 SHA1 e43707549ed5477f2a8f41415e85fb63fa78d287 t/render/radio_group.t
+SHA1 6c1b4e9ba21fa0c3fe6758bf21dd88b95e7ce175 t/render/signup_form.t
 SHA1 ba74107dfc6e74d65c33f2af0ebf5b02d1ebae93 t/render/standard.t
 SHA1 c8992bf11243368d6a2f6bf159f412832f2ddc19 t/repeatable/basic.t
 SHA1 aacb78e834544afa9e23be13766a20f5fe1b1660 t/repeatable/defaults.t
@@ -188,13 +207,17 @@ SHA1 fac922f117d8927d9d5522ae8792a147063c19e7 t/validation/types.t
 SHA1 2fb5da9c061e47e028b533239aae8094615e0a5d t/validation/validate_coderef.t
 SHA1 e20818724ef0896b97682c2f43ffca357de92ef6 t/validation/when.t
 SHA1 ac612424a60caf8262a6b0599f46a2c369154771 t/values.t
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/var/en.po
+SHA1 7b6899461d8e6e22e4574888c5c94af07cb440be template.t
+SHA1 3e3f442f89a968d2a0330f5e52f1c5213f403b00 time_dmf.pl
+SHA1 42e58b02f6a40f412147d2e8d8e2498a6d73e69c time_hfh.pl
 SHA1 0c5b1e6e07f2133c2df75cde111e24635174d9e2 xt/moose_types.t
 SHA1 adef1ed9b7b63b5697761b0a7054fd18357247fa xt/request_token.t
 SHA1 ae59d250e29098eab15a7f8cfc3ba82c84a0fb04 xt/upload.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG/MacGPG2 v2.0.22 (Darwin)
 
-iF4EAREIAAYFAliX0k0ACgkQlX0ZOkgCucilLgD+K0dnvv12clih31eqWU6TY/eE
-P6F1dTwr+fzyaApeJwEA/1rePFs0vilCyFdWDPsd3VLlnpr3t91Hhh1TtNyYvwuA
-=h89W
+iF4EAREIAAYFAls6i4wACgkQlX0ZOkgCucgiRQD/bOj+srULCX22uYEJ/+/bm7re
+f9dQdSv/RIIMndMeGgYA/RPgsDI0qNLaVXuUUcW34VzpYX8QNE+W6XT5LbYLzcV4
+=67d7
 -----END PGP SIGNATURE-----

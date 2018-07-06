@@ -20,13 +20,13 @@ no_index:
 provides:
   Games::Cards::Pair:
     file: lib/Games/Cards/Pair.pm
-    version: '0.17'
+    version: '0.18'
   Games::Cards::Pair::Card:
     file: lib/Games/Cards/Pair/Card.pm
-    version: '0.17'
+    version: '0.18'
   Games::Cards::Pair::Params:
     file: lib/Games/Cards/Pair/Params.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   Attribute::Memoize: '1.01'
   List::MoreUtils: '0.33'
@@ -38,5 +38,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Games-Cards-Pair.git
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

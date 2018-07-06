@@ -1,7 +1,6 @@
 package Mojo::IOLoop::Subprocess;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp 'croak';
 use Config;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
@@ -15,17 +14,26 @@ has serialize   => sub { \&Storable::freeze };
 sub pid { shift->{pid} }
 
 sub run {
+  my ($self, @args) = @_;
+  $self->ioloop->next_tick(sub { $self->_start(@args) });
+  return $self;
+}
+
+sub _start {
   my ($self, $child, $parent) = @_;
 
   # No fork emulation support
-  croak 'Subprocesses do not support fork emulation' if $Config{d_pseudofork};
+  return $self->$parent('Subprocesses do not support fork emulation')
+    if $Config{d_pseudofork};
 
   # Pipe for subprocess communication
-  pipe(my $reader, my $writer) or croak "Can't create pipe: $!";
+  return $self->$parent("Can't create pipe: $!")
+    unless pipe(my $reader, my $writer);
   $writer->autoflush(1);
 
   # Child
-  croak "Can't fork: $!" unless defined(my $pid = $self->{pid} = fork);
+  return $self->$parent("Can't fork: $!")
+    unless defined(my $pid = $self->{pid} = fork);
   unless ($pid) {
     $self->ioloop->reset;
     my $results = eval { [$self->$child] } || [];
@@ -36,7 +44,7 @@ sub run {
   # Parent
   my $me     = $$;
   my $stream = Mojo::IOLoop::Stream->new($reader)->timeout(0);
-  $self->ioloop->stream($stream);
+  $self->emit('spawn')->ioloop->stream($stream);
   my $buffer = '';
   $stream->on(read => sub { $buffer .= pop });
   $stream->on(
@@ -47,7 +55,6 @@ sub run {
       $self->$parent(shift(@$results) // $@, @$results);
     }
   );
-  return $self;
 }
 
 1;
@@ -84,6 +91,26 @@ Mojo::IOLoop::Subprocess - Subprocesses
 
 L<Mojo::IOLoop::Subprocess> allows L<Mojo::IOLoop> to perform computationally
 expensive operations in subprocesses, without blocking the event loop.
+
+=head1 EVENTS
+
+L<Mojo::IOLoop::Subprocess> inherits all events from L<Mojo::EventEmitter> and
+can emit the following new ones.
+
+=head2 spawn
+
+  $subprocess->on(spawn => sub {
+    my $subprocess = shift;
+    ...
+  });
+
+Emitted in the parent process when the subprocess has been spawned.
+
+  $subprocess->on(spawn => sub {
+    my $subprocess = shift;
+    my $pid = $subprocess->pid;
+    say "Performing work in process $pid";
+  });
 
 =head1 ATTRIBUTES
 
@@ -124,7 +151,7 @@ L<Storable>.
 
 =head1 METHODS
 
-L<Mojo::IOLoop::Subprocess> inherits all methods from L<Mojo::Base> and
+L<Mojo::IOLoop::Subprocess> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
 
 =head2 pid

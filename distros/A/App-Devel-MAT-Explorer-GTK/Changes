@@ -1,5 +1,20 @@
 Revision history for App-Devel-MAT-Explorer-GTK
 
+0.06    2018-07-03 15:00:54
+        [CHANGES]
+         * Updates for Devel::MAT 0.35:
+            + Use of 'Commandable::Invocation'
+            + Show 'pmat>' or 'pmat [more]>' prompt
+
+        [BUGFIXES]
+         * Fix for ->symname method
+
+0.05    2017-10-10 01:00:55
+        [CHANGES]
+         * Implement the new Devel::MAT::Cmd integration methods for
+           Devel::MAT version 0.28
+         * Quiet the warning about large numbers being nonportable for hex()
+
 0.04    2017-09-29 19:15:21
         [CHANGES]
          * Add a 'pmat'-style REPL shell

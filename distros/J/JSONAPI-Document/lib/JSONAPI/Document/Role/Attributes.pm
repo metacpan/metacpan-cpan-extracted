@@ -1,12 +1,12 @@
 package JSONAPI::Document::Role::Attributes;
-$JSONAPI::Document::Role::Attributes::VERSION = '1.7';
+$JSONAPI::Document::Role::Attributes::VERSION = '2.0';
 =head1 NAME
 
 JSONAPI::Document::Role::Attributes - Consumable role to build resource attributes
 
 =head1 VERSION
 
-version 1.7
+version 2.0
 
 =head1 DESCRIPTION
 

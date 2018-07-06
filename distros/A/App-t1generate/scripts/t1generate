@@ -1,0 +1,171 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ;  # the functions requires 5.10 for "state", 5.14 for srand. 
+use Getopt::Std ; getopts '1.:g:s:', \my%o ;  
+use Math::Trig qw/pi tan/ ;
+use Term::ANSIColor qw/:constants color/ ;  $Term::ANSIColor::AUTORESET = 1 ;
+
+sub cauchydist {  state $pi = atan2(1,1)* 4 ; tan ( $pi * rand() ) }
+
+my ($s1,$s2) ; # 1乗和と2乗和
+
+& init ; 
+& main ; 
+& SecondInfo unless $o{1} ; 
+exit 0 ;
+
+sub init ( ) {   #オプションを使った設定
+   $o{g} //= 6 ;   #出力要素数  
+   $o{s} = defined $o{s} ? srand $o{s} : srand ; # 乱数シードの保管/設定
+}
+
+sub main ( ) {  #  乱数の出力
+   for ( 1 .. $o{g} ) { 
+       my $x = cauchydist ; 
+       $x = sprintf "% .$o{'.'}f" , $x if defined $o{'.'} ; # <-- May be efficientized. 
+       $s1 += $x ; 
+       $s2 += $x ** 2 ; 
+       print "$x\n" ; 
+   }
+}
+
+sub SecondInfo( ) {   #  処理したことについての二次情報を出力
+    use FindBin qw [ $Script ] ; 
+    print STDERR 
+       CYAN "[$Script] " , 
+       CYAN "random numbers generated = ", BRIGHT_CYAN $o{g} ,
+       CYAN ", sum = " , BRIGHT_CYAN  sprintf("%g", $s1 ) ,
+       CYAN ", squared sum = " , BRIGHT_CYAN  sprintf( "%g" , $s2 ) , 
+       CYAN ", used random seed = " , BRIGHT_CYAN  $o{s} ,
+       CYAN "\n" ;
+ }
+
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+  our $VERSION = 0.23 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+    # 0.23 : 英文ヘルプをPODにした。
+}  
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script $Bin ] ;
+    sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
+    sub en( ) { grep ( /^en(g(i(sh?)?)?)?/i , @ARGV ) ? 1 : 0 } # English という文字列を先頭から2文字以上を含むか 
+    sub ja( ) { grep ( /^jp$|^ja(p(a(n?)?)?)?/i , @ARGV ) ? 1 : 0 } # jp または japan という文字列を先頭から2文字以上を含むか 
+    sub opt( ) { grep (/^opt(i(o(ns?)?)?)?$/i, @ARGV ) ? 1 : 0 } # options という文字列を先頭から3文字以上含むから
+    sub noPOD ( ) { grep (/^no-?pod\b/i, @ARGV) ? 1 : 0 } # POD を使わないと言う指定がされているかどうか
+    my $jd = "JapaneseManual" ;
+    my $flagE = ! ja && ( en || ! EnvJ ) ; # 英語にするかどうかのフラグ
+
+    exec "perldoc $0" if $flagE &&  ! opt && ! noPOD   ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\Q'=script='\E/$Script/gi ;
+        s/\Q'=bin='\E/$Bin/gi ;
+        if ( s/^=head1\b\s*// .. s/^=cut\b\s*// ) { 
+            if ( s/^=begin\s+$jd\b\s*// .. s/^=end\s+$jd\b\s*// xor $flagE ) {
+                print $_ if ! opt || m/^\s+\-/  ; 
+            }
+        } 
+        #print $_ if /^=head1/ .. /^=cut\b/ and opt ? m/^\s+\-/ : 1 and ( EnvJ && ! en xor s/^=begin $jd\b// .. s/^=end $jd\b// ) ;
+    }
+    close $FH ;
+    exit 0 ;
+
+}
+
+=encoding utf8 
+
+=head1 NAME
+
+t1generate
+
+=head1 VERSION
+
+0.23
+
+=head1 SYNOPSIS
+
+t1generate [B<-g> how_many] [B<-s> seed] [B<-.> digits] [B<-1>]
+
+t1generate [B<--help> [ja] ] [B<--version>] 
+
+=head1 DESCRIPTION
+
+Generates random variables obeying the Cauchy distribution (same to the t distribution with df = 1).
+
+=head1 OPTION
+
+=over 4
+
+=item B<-g> N 
+
+The number of variables to be generated.
+
+=item B<-s> N
+
+Random seed specification.
+
+=item B<-.> N
+
+Digits after decimal points in the output.
+
+=item B<-1> 
+
+No secondary information such as seed and sums in the output.
+
+=item B<--help> 
+
+Print this online help manual of this command "t1generate". Similar to "perldoc `which [-t] t1generate` ".
+
+=item B<--help ja>
+
+Shows Japanese online help manual. 
+
+=item B<--version> 
+
+Shows the version information of this program.
+
+=back 
+
+=head1 HISTORY
+
+This program has been made since 2016-08-16 (Tue)
+as a part of TSV hacking toolset for table data.
+
+=head1 AUTHOR
+
+"Toshiyuki Shimono", C<< <bin4tsv at gmail.com> >>
+
+=begin JapaneseManual 
+   プログラム名 : '=script='  ('=bin=')
+
+    コーシー分布に従う乱数を生成する。
+
+ 標準出力への出力 :  
+   1. 生成した乱数 (生成個数は -n で指定する。)
+
+ 標準エラー出力への出力 :
+   2. 乱数シード  
+   3. 一乗和と二乗和 
+
+ オプション: 
+   -g N : 出力する乱数の個数を指定する。未指定の場合 6
+   -s N : 乱数シードを指定する。(指定した数の 2**32=約43億で割った剰余が渡される)
+
+   -. N : 出力する値の小数点以下の桁数を指定する。
+   -1   : 標準エラー出力へ出力される乱数シードなどの情報を表示しない。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+  --help en : 英語版のオンラインヘルプマニュアルを出力。Online help in English version. 
+  --version : バージョン情報の表示  
+
+  開発上のメモ 
+    * srand 関数の挙動が Perl 5.14 とそれ以前で異なる。その様子を検知するテストが必要と考えられる。
+ 
+=end JapaneseManual
+=cut

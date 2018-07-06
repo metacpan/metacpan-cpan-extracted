@@ -3,7 +3,7 @@ package RPerl::DataType::String;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.013_000;
+our $VERSION = 0.014_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::DataType::Scalar);
@@ -43,17 +43,17 @@ use POSIX qw(floor);
 
 # DEV NOTE: do not put inside INIT{} block, because it will be "too late to run INIT block" in some cases, such as inside Catalyst
 # DEV NOTE, CORRELATION #rp040: fix recursive dependencies of String.pm & HelperFunctions_cpp.pm, as triggered by ingy's Inline::create_config_file() system() call
-# NEED REMOVE: this code no longer appears to be necessary?
+# DEV NOTE, DO NOT REMOVE!  [error] Caught exception in ShinyCMS::Controller::Code->run_command "Undefined subroutine &main::RPerl_SvPOKp called at /home/wbraswell/github_repos/rperl-latest/lib/RPerl/DataType/String.pm line 82."
 #if (not ((exists $ARGV[0]) and (defined $ARGV[0]) and ((substr $ARGV[0], -7, 7) eq '_Inline'))) {
 #if (0) {
-#    use RPerl::HelperFunctions_cpp;  # main::RPerl_SvPOKp
-#    RPerl::HelperFunctions_cpp::cpp_load();
+    use RPerl::HelperFunctions_cpp;  # main::RPerl_SvPOKp
+    RPerl::HelperFunctions_cpp::cpp_load();
 #}
 
 # [[[ EXPORTS ]]]
 use RPerl::Exporter 'import';
 our @EXPORT = qw(string_CHECK string_CHECKTRACE string_to_boolean string_to_unsigned_integer string_to_integer string_to_number string_to_character string_to_string);
-our @EXPORT_OK = qw(string__typetest0 string__typetest1);
+our @EXPORT_OK = qw(string_typetest0 string_typetest1);
 
 # [[[ TYPE CHECKING ]]]
 sub string_CHECK {
@@ -161,21 +161,21 @@ sub string_to_string {
 }
 
 # [[[ TYPE TESTING ]]]
-sub string__typetest0 {
+sub string_typetest0 {
     { my string $RETURN_TYPE };
     my string $retval = 'Spice PERLOPS_PERLTYPES';
 
-#    RPerl::diag("in PERLOPS_PERLTYPES string__typetest0(), have \$retval = '$retval'\n");
+#    RPerl::diag("in PERLOPS_PERLTYPES string_typetest0(), have \$retval = '$retval'\n");
     return ($retval);
 }
-sub string__typetest1 {
+sub string_typetest1 {
     { my string $RETURN_TYPE };
     ( my string $lucky_string ) = @ARG;
 #    string_CHECK($lucky_string);
     string_CHECKTRACE( $lucky_string, '$lucky_string',
-        'string__typetest1()' );
+        'string_typetest1()' );
 
-#    RPerl::diag("in PERLOPS_PERLTYPES string__typetest1(), received \$lucky_string = '$lucky_string'\n");
+#    RPerl::diag("in PERLOPS_PERLTYPES string_typetest1(), received \$lucky_string = '$lucky_string'\n");
     return ( string_to_string($lucky_string) . ' PERLOPS_PERLTYPES' );
 }
 

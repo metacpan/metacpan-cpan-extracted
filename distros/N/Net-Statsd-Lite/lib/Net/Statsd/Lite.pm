@@ -16,7 +16,7 @@ use Net::Statsd::Lite::Types -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.3';
+our $VERSION = 'v0.4.4';
 
 
 has host => (
@@ -212,7 +212,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.4.3
+version v0.4.4
 
 =head1 SYNOPSIS
 
@@ -421,6 +421,12 @@ Robert Rothenberg <rrwo@cpan.org>
 
 The initial development of this module was sponsored by Science Photo
 Library L<https://www.sciencephoto.com>.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Toby Inkster
+
+Toby Inkster <tobyink@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

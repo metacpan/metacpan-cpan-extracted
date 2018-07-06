@@ -45,7 +45,7 @@
             "List::Util" : "1.45",
             "Number::Format::BigFloat" : "0",
             "Sort::BySpec" : "0.03",
-            "Text::Table::Any" : "0",
+            "Text::Table::Any" : "0.091",
             "Text::Table::Tiny" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Result-Format-Lite"
       }
    },
-   "version" : "0.273",
+   "version" : "0.274",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

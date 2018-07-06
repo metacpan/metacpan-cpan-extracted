@@ -4,7 +4,7 @@
       "karupanerura <karupa@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.14",
+   "generated_by" : "Minilla/v3.0.16",
    "license" : [
       "perl_5"
    ],
@@ -68,11 +68,11 @@
    "provides" : {
       "Time::Strptime" : {
          "file" : "lib/Time/Strptime.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Time::Strptime::Format" : {
          "file" : "lib/Time/Strptime/Format.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "Time::Strptime::TimeZone" : {
          "file" : "lib/Time/Strptime/TimeZone.pm"
@@ -89,10 +89,11 @@
          "web" : "https://github.com/karupanerura/Time-Strptime"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_authority" : "cpan:KARUPA",
    "x_contributors" : [
-      "Kenichi Ishigaki <ishigaki@cpan.org>"
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1

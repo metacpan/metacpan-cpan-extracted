@@ -29,3 +29,31 @@ sub violates {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perl::Critic::Policy::OTRS::ProhibitDumper - Check module for use of "Dumper"
+
+=head1 VERSION
+
+version 0.08
+
+=head1 AUTHOR
+
+Renee Baecker <module@renee-baecker.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

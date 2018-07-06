@@ -18,7 +18,7 @@ using std::cout;  using std::cerr;  using std::endl;
 class RPerl__Algorithm : public RPerl__CompileUnit__Module__Class__CPP {
 public:
 // [[[ OO METHODS ]]]
-    void inherited__Algorithm(SV* person);
+    void inherited_Algorithm(SV* person);
 //    void inherited(SV* person);
 
     // <<< CONSTRUCTOR & DESTRUCTOR >>>
@@ -31,7 +31,7 @@ public:
 
 // [[[ SUBROUTINES ]]]
 
-SV* uninherited__Algorithm(SV* person);
+SV* uninherited_Algorithm(SV* person);
 //SV* uninherited(SV* person);
 
 // <<< OPERATIONS & DATA TYPES REPORTER >>>
@@ -51,7 +51,7 @@ SV* RPerl__Algorithm__MODE_ID() { return newSViv(1); }  // CPPOPS_PERLTYPES is 1
 class RPerl__Algorithm : public RPerl__CompileUnit__Module__Class__CPP {
 public:
 // [[[ OO METHODS ]]]
-    void inherited__Algorithm(string person);
+    void inherited_Algorithm(string person);
 //    void inherited(string person);
 
     // <<< CONSTRUCTOR & DESTRUCTOR >>>
@@ -64,7 +64,7 @@ public:
 
 // [[[ SUBROUTINES ]]]
 
-string uninherited__Algorithm(string person);
+string uninherited_Algorithm(string person);
 //string uninherited(string person);
 
 // <<< OPERATIONS & DATA TYPES REPORTER >>>

@@ -24,7 +24,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-CSV
   homepage: https://metacpan.org/release/DBIx-CSV
   repository: git://github.com/perlancar/perl-DBIx-CSV.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

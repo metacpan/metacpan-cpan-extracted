@@ -101,6 +101,14 @@ Set/Get a code ref to sample for capture().
         }
     });
 
+## auto\_flush($mode)
+
+Set/Get auto flush mode.
+
+When $mode is 1 (default), segment data will be sent to xray daemon immediately after capture() called.
+
+When $mode is 0, segment data are buffered in memory. You should call AWS::XRay->sock->flush() to send the buffered segment data or call AWS::XRay->sock->close() to discard the buffer.
+
 ## AWS\_XRAY\_DAEMON\_ADDRESS environment variable
 
 Set the host and port of the X-Ray daemon. Default 127.0.0.1:2000

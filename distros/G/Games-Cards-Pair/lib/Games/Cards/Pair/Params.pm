@@ -1,6 +1,6 @@
 package Games::Cards::Pair::Params;
 
-$Games::Cards::Pair::Params::VERSION   = '0.17';
+$Games::Cards::Pair::Params::VERSION   = '0.18';
 $Games::Cards::Pair::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Games::Cards::Pair::Params - Placeholder for parameters for Games::Cards::Pair.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
@@ -18,7 +18,7 @@ use strict; use warnings;
 use Data::Dumper;
 
 use Type::Library -base, -declare => qw(ZeroOrOne Suit Value Card Cards);
-use Types::Standard qw(Str Object ArrayRef);
+use Types::Standard qw(Str InstanceOf ArrayRef);
 use Type::Utils;
 
 my $SUITS  = { 'C' => 1, 'D' => 1, 'H' => 1, 'S' => 1 };
@@ -43,8 +43,7 @@ declare 'Value',
     message { "isa check for 'value' failed." };
 
 declare 'Card',
-    as Object,
-    where   { ref($_[0]) eq 'Games::Cards::Pair::Card' };
+    as InstanceOf['Games::Cards::Pair::Card'];
 
 declare 'Cards',
     as ArrayRef[Card],

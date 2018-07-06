@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use constant CMD => "symbols";
 use constant CMD_DESC => "Display a list of the symbol table";
@@ -78,7 +78,7 @@ sub _show_symbol
    my ( $name, $sv ) = @_;
 
    Devel::MAT::Cmd->printf( "%s at %s\n",
-      $name,
+      Devel::MAT::Cmd->format_symbol( $name, $sv ),
       Devel::MAT::Cmd->format_sv( $sv ),
    );
 }
@@ -114,22 +114,70 @@ sub run
       @queue = grep { $_->[1] !~ m/^_</ } @queue;
    }
 
-   while( @queue ) {
-      $_ = shift @queue;
-      if( $_->[0]->isa( "Devel::MAT::SV::GLOB" ) ) {
-         my ( $gv, $name ) = @$_;
-         _show_symbol( '$' . $name, $gv->scalar ) if $gv->scalar;
-         _show_symbol( '@' . $name, $gv->array  ) if $gv->array;
-         _show_symbol( '%' . $name, $gv->hash   ) if $gv->hash;
-         _show_symbol( '&' . $name, $gv->code   ) if $gv->code;
+   Devel::MAT::Tool::more->paginate( sub {
+      my $count = 30;
+      while( $count and @queue ) {
+         $_ = shift @queue;
+         if( $_->[0]->isa( "Devel::MAT::SV::GLOB" ) ) {
+            my ( $gv, $name ) = @$_;
+            _show_symbol( '$' . $name, $gv->scalar ), $count-- if $gv->scalar;
+            _show_symbol( '@' . $name, $gv->array  ), $count-- if $gv->array;
+            _show_symbol( '%' . $name, $gv->hash   ), $count-- if $gv->hash;
+            _show_symbol( '&' . $name, $gv->code   ), $count-- if $gv->code;
 
-         unshift @queue, [ $gv->hash, $name ] if $gv->hash;
+            unshift @queue, [ $gv->hash, $name ] if $gv->hash;
+         }
+         elsif( $opts{recurse} and $_->[0]->isa( "Devel::MAT::SV::STASH" ) ) {
+            my ( $stash, $prefix ) = @$_;
+            unshift @queue, extract_symbols( $stash, $prefix );
+         }
       }
-      elsif( $opts{recurse} and $_->[0]->isa( "Devel::MAT::SV::STASH" ) ) {
-         my ( $stash, $prefix ) = @$_;
-         unshift @queue, extract_symbols( $stash, $prefix );
+
+      return !!@queue;
+   } );
+}
+
+package Devel::MAT::Tool::Symbols::_packages;
+
+use base qw( Devel::MAT::Tool );
+
+use constant CMD => "packages";
+use constant CMD_DESC => "Display a list of the packages in the symbol table";
+
+=head2 packages
+
+=cut
+
+sub run
+{
+   my $self = shift;
+
+   my @queue = grep { $_->[1] ne "main::" }
+      Devel::MAT::Tool::Symbols::extract_symbols( $self->df->defstash, "" );
+
+   Devel::MAT::Tool::more->paginate( sub {
+      my $count = 30;
+
+      while( $count and @queue ) {
+         $_ = shift @queue;
+         my ( $gv, $name ) = @$_;
+         next unless my $stash = $gv->hash;
+         next unless $stash->isa( "Devel::MAT::SV::STASH" );
+
+         Devel::MAT::Cmd->printf( "%s %s at %s\n",
+            Devel::MAT::Cmd->format_note( "package" ),
+            Devel::MAT::Cmd->format_symbol( $name =~ s/::$//r, $stash ),
+            Devel::MAT::Cmd->format_sv( $stash ),
+         );
+         $count--;
+
+         unshift @queue, grep {
+            $_->[0]->isa( "Devel::MAT::SV::GLOB" )
+         } Devel::MAT::Tool::Symbols::extract_symbols( $stash, $name );
       }
-   }
+
+      return !!@queue;
+   } );
 }
 
 =head1 AUTHOR

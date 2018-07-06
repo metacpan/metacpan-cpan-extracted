@@ -1,0 +1,32 @@
+Thinking of renaming 'item' and 'init_object'. 
+Also - there are sooo many ways of getting 'defaults' in. And specifying the behavior.
+
+has 'use_defaults_over_obj' => ( is => 'rw', isa => 'Bool', clearer => 'clear_use_defaults_over_obj' );
+has 'use_init_obj_over_item' => ( is => 'rw', isa => 'Bool', clearer => 'clear_use_init_obj_over_item' );
+has 'use_init_obj_when_no_accessor_in_item' => ( is => 'rw', isa => 'Bool' );
+has 'use_fields_for_input_without_param' => ( is => 'rw', isa => 'Bool' );
+
+I'm thinking it might be better to make them swap things out...
+
+rename 'item' to 'model' ?  then 'update_model' makes sense :)
+and rename init_object to.... 'defaults'. or 'init_value' ?
+
+
+ok, lifecyle of an html form:
+
+Initially presented with no params. What is presented is derived from a db row (model) or other object
+  or 'defaults' in fields, or 'init_object'. There was all, in FH, 'defaults' which actually updated the 'default' attribute. Sigh.
+The programmer might want to override a db value or suppress what's presented in various circumstances.
+  use 'default_to_value' transform?
+Sometimes there are additional fields that aren't in the db object which should be able to be provided with defaults via init_obj 
+
+When the form is submitted, in principle all the displayed/processed values come from the params. There are some tricky
+bits associated with transforms and validation, where you might want to validate an objectified "value" and where you want
+to save a different format than the params presents you with.
+
+What about non-html validation:
+   params named 'input'?
+
+
+
+

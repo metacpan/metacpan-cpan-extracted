@@ -9,6 +9,7 @@ t/File-Rename-E.t
 t/File-Rename-files.t
 t/File-Rename-import.t
 t/File-Rename-no-order.t
+t/File-Rename-Options.t
 t/File-Rename-script.t
 t/File-Rename-list.t
 t/File-Rename-list-null.t
@@ -18,6 +19,7 @@ t/pod.t
 t/pod-coverage.t
 t/testlib.pl
 lib/File/Rename.pm
+lib/File/Rename/Options.pm
 rename.PL
 examples/rename.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)

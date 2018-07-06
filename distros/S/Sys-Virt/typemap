@@ -5,6 +5,7 @@ virConnectPtr O_OBJECT_connect
 virDomainPtr O_OBJECT_domain
 virNetworkPtr O_OBJECT_network
 virNWFilterPtr O_OBJECT_nwfilter
+virNWFilterBindingPtr O_OBJECT_nwfilter_binding
 virInterfacePtr O_OBJECT_interface
 virStoragePoolPtr O_OBJECT_storagepool
 virStorageVolPtr O_OBJECT_storagevol
@@ -137,6 +138,20 @@ O_OBJECT_nwfilter
 OUTPUT
 O_OBJECT_nwfilter
         sv_setref_pv( $arg, "Sys::Virt::NWFilter", (void*)$var );
+
+
+INPUT
+O_OBJECT_nwfilter_binding
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = INT2PTR($type, SvIV((SV*)SvRV( $arg )));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT_nwfilter_binding
+        sv_setref_pv( $arg, "Sys::Virt::NWFilterBinding", (void*)$var );
 
 
 INPUT

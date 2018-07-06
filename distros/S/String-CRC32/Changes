@@ -1,5 +1,8 @@
 Revision history for String::CRC32
 
+1.700     2017-07-02
+        - Perldoc tweaks, GH #2, thanks to choroba
+
 1.600     2017-06-23
         - New maintainer: LEEJO
         - Add Changes file

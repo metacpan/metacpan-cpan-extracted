@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use List::Util qw( max );
 
@@ -455,23 +455,23 @@ sub run
    my @keys = sort $hv->keys;
    splice @keys, 0, $skipcount if $skipcount;
 
-   my @rows;
-   my $count = 0;
-   foreach my $key ( @keys ) {
-      last if $count == $opts{count};
-      my $sv = $hv->value( $key );
-      push @rows, [
-         "  " . Devel::MAT::Cmd->format_value( $key, key => 1,
-               stash => ( $type eq "STASH" ) ),
-         $sv ? Devel::MAT::Cmd->format_sv_with_value( $sv ) : "NULL",
-      ];
-      $count++;
-   }
+   Devel::MAT::Tool::more->paginate( sub {
+      my @rows;
+      foreach my $key ( splice @keys, 0, $opts{count} ) {
+         my $sv = $hv->value( $key );
+         push @rows, [
+            "  " . Devel::MAT::Cmd->format_value( $key, key => 1,
+                  stash => ( $type eq "STASH" ) ),
+            $sv ? Devel::MAT::Cmd->format_sv_with_value( $sv ) : "NULL",
+         ];
+      }
 
-   Devel::MAT::Cmd->print_table( \@rows );
+      Devel::MAT::Cmd->print_table( \@rows );
 
-   my $morecount = @keys - $count;
-   Devel::MAT::Cmd->printf( "  ... (%d more)\n", $morecount ) if $morecount;
+      my $morecount = @keys;
+      Devel::MAT::Cmd->printf( "  ... (%d more)\n", $morecount ) if $morecount;
+      return $morecount;
+   } );
 }
 
 =head1 AUTHOR

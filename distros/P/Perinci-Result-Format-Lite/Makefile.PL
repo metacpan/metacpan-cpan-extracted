@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "List::Util" => "1.45",
     "Number::Format::BigFloat" => 0,
     "Sort::BySpec" => "0.03",
-    "Text::Table::Any" => 0,
+    "Text::Table::Any" => "0.091",
     "Text::Table::Tiny" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.273",
+  "VERSION" => "0.274",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %FallbackPrereqs = (
   "Number::Format::BigFloat" => 0,
   "Sort::BySpec" => "0.03",
   "Test::More" => "0.98",
-  "Text::Table::Any" => 0,
+  "Text::Table::Any" => "0.091",
   "Text::Table::Tiny" => 0,
   "strict" => 0,
   "warnings" => 0

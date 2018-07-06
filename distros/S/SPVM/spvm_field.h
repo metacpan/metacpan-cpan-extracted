@@ -9,8 +9,9 @@ struct SPVM_field {
   SPVM_OP* op_name;
   SPVM_OP* op_type;
   const char* abs_name;
+  const char* signature;
   int32_t id;
-  int32_t rel_id;
+  int32_t index;
   _Bool is_private;
 };
 

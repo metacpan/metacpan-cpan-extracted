@@ -1,5 +1,21 @@
 Revision history for Math-AnyNum
 
+0.27    2018-07-04
+
+        [ADDITIONS]
+
+        - Added the `laguerreL(n,x)` function for computing the Laguerre polynomials: `L_n(x)`.
+        - Added the `legendreP(n,x)` function for computing the Legendre polynomials: `P_n(x)`.
+        - Added the `chebyshevT(n,x)` and `chebyshevU(n,x)` functions for computing the Chebyshev polynomials of 1st and 2nd kind.
+        - Added the `hermiteH(n,x)` and `hermiteHe(n,x)` functions for computing the physicists' and probabilists' Hermite polynomials: `H_n(x)` and `He_n(x)`.
+        - Added the `secant_number(n)` and `tangent_number(n)` functions for computing the secant/zig numbers (A000364) and the tangent/zag numbers (A000182).
+        - Added the `fibmod(n,m)` and `lucasmod(n,m)` functions for efficiently computing the n-th Fibonacci and n-th Lucas number modulo m.
+
+        [IMPROVEMENTS]
+
+        - Optimized the case `sub(Scalar, Object)` by using the `*_ui_sub()` functions from Math::{GMPz,MPFR,MPC}.
+        - Use `mpz_powm_ui()` in `powmod(n, k, m)` when `k` fits inside an unsigned native integer, as it is considerably faster than `mpz_powm()` for small `k`.
+
 0.26    2018-05-30
 
         [CHANGES]

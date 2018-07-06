@@ -1,0 +1,55 @@
+Form
+----------------
+'posted' flag renamed to 'submitted'
+instead of html_prefix => 1, field_prefix => 'prefix-string'
+
+No 'result' objects. No 'run' method (as an alternative to 'process');
+
+->process is automatically run at the end of BUILD, so it's not necessary to
+   run ->process( params => {} ) immediately after constructing an object.
+
+Some differences in what is returned for $form->value at intermediate
+processing points (not validated, etc, because of result
+object removal. The final value hashref after successfully processing
+is the same.
+
+Renamed initialization methods:
+   _result_from_object => 'fill_from_object'
+   _result_from_input => 'fill_from_params'
+   _result_from_fields  => 'fill_from_fields'
+
+A number of attributes that used to return arrays from methods, now
+return arrayrefs by default. There is usally also an 'all_' method
+which will return an array.
+    'errors' 'error_fields'
+
+Change in 'required' behavior for Compound/Repeatable fields..?
+
+Setting value/input - _set_value => value,  _set_input => input
+
+No 'has_many' support for Select field
+
+
+Fields
+-----------------
+no 'unique_message'   =>    $messages->{ unique => '...' }
+no 'required_message'  =>   $messages->{ required => '...' }
+no 'widget' attribute
+
+no html5 attributes.
+
+Fields not provided
+-------------------
+Duration
+
+processing hooks
+-----------------
+
+in middle of setup method (formerly setup_form) -  'in_setup'
+   (used to be a modifier of 'set_active')
+
+
+
+Rendering
+==============
+This is entirely different. No more widgets.

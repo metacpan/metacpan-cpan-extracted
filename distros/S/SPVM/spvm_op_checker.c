@@ -206,11 +206,17 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       }
                       
                       if (add_constant) {
-                        if (package->op_constants->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                        if (sub->op_constants->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
                           SPVM_yyerror_format(compiler, "Too many constant at %s line %d\n", op_cur->file, op_cur->line);
                         }
-                        op_cur->uv.constant->rel_id = package->op_constants->length;
-                        SPVM_LIST_push(package->op_constants, op_cur);
+                        op_cur->uv.constant->sub_rel_id = sub->op_constants->length;
+                        SPVM_LIST_push(sub->op_constants, op_cur);
+
+                        if (sub->op_constants->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                          SPVM_yyerror_format(compiler, "Too many constant at %s line %d\n", op_cur->file, op_cur->line);
+                        }
+                        op_cur->uv.constant->sub_rel_id = sub->op_constants->length;
+                        SPVM_LIST_push(sub->op_constants, op_cur);
                       }
                       
                       break;
@@ -255,11 +261,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       
                       SPVM_LIST_pop(op_switch_stack);
 
-                      if (package->op_switch_infos->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                      if (sub->op_switch_infos->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
                         SPVM_yyerror_format(compiler, "Too many switch at %s line %d\n", op_cur->file, op_cur->line);
                       }
-                      op_cur->uv.switch_info->rel_id = package->op_switch_infos->length;
-                      SPVM_LIST_push(package->op_switch_infos, op_cur);
+                      op_cur->uv.switch_info->sub_rel_id = sub->op_switch_infos->length;
+                      SPVM_LIST_push(sub->op_switch_infos, op_cur);
                     
                       break;
                     }
@@ -699,7 +705,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                           if (package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE) {
                             SPVM_yyerror_format(compiler, "Can't create object of interface package at %s line %d\n", op_cur->file, op_cur->line);
                           }
-                          else if (package->category == SPVM_PACKAGE_C_CATEGORY_STRUCT) {
+                          else if (package->category == SPVM_PACKAGE_C_CATEGORY_POINTER) {
                             SPVM_yyerror_format(compiler, "Can't create object of struct package at %s line %d\n", op_cur->file, op_cur->line);
                           }
                           else if (package->is_private) {
@@ -712,11 +718,17 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                           assert(0);
                         }
                         
-                        if (package->op_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                        if (sub->op_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
                           SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_cur->file, op_cur->line);
                         }
-                        op_type->uv.type->rel_id = package->op_types->length;
-                        SPVM_LIST_push(package->op_types, op_type);
+                        op_type->uv.type->sub_rel_id = sub->op_types->length;
+
+                        if (sub->op_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                          SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_cur->file, op_cur->line);
+                        }
+                        op_type->uv.type->sub_rel_id = sub->op_types->length;
+
+                        SPVM_LIST_push(sub->op_types, op_type);
                       }
                       else if (op_cur->first->id == SPVM_OP_C_ID_CONSTANT) {
                         // Constant string
@@ -786,11 +798,17 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         return;
                       }
 
-                      if (package->op_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                      if (sub->op_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
                         SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_cur->file, op_cur->line);
                       }
-                      op_type->uv.type->rel_id = package->op_types->length;
-                      SPVM_LIST_push(package->op_types, op_type);
+                      op_type->uv.type->sub_rel_id = sub->op_types->length;
+
+                      if (sub->op_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                        SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_cur->file, op_cur->line);
+                      }
+                      op_type->uv.type->sub_rel_id = sub->op_types->length;
+
+                      SPVM_LIST_push(sub->op_types, op_type);
                       
                       break;
                     }
@@ -1688,11 +1706,17 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         sub->call_sub_arg_stack_max = call_sub_args_count;
                       }
 
-                      if (package->op_call_subs->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                      if (sub->op_call_subs->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
                         SPVM_yyerror_format(compiler, "Too many call sub at %s line %d\n", op_cur->file, op_cur->line);
                       }
-                      op_cur->uv.call_sub->rel_id = package->op_call_subs->length;
-                      SPVM_LIST_push(package->op_call_subs, op_cur);
+                      op_cur->uv.call_sub->sub_rel_id = sub->op_call_subs->length;
+                      SPVM_LIST_push(sub->op_call_subs, op_cur);
+                      
+                      if (sub->op_call_subs->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                        SPVM_yyerror_format(compiler, "Too many call sub at %s line %d\n", op_cur->file, op_cur->line);
+                      }
+                      op_cur->uv.call_sub->sub_rel_id = sub->op_call_subs->length;
+                      SPVM_LIST_push(sub->op_call_subs, op_cur);
                       
                       break;
                     }
@@ -1707,11 +1731,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         return;
                       }
                       
-                      if (package->op_package_var_accesses->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
-                        SPVM_yyerror_format(compiler, "Too many package var access at %s line %d\n", op_cur->file, op_cur->line);
+                      if (sub->op_package_var_accesses->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                        SPVM_yyerror_format(compiler, "Too many package variable access at %s line %d\n", op_cur->file, op_cur->line);
                       }
-                      op_cur->uv.package_var_access->rel_id = package->op_package_var_accesses->length;
-                      SPVM_LIST_push(package->op_package_var_accesses, op_cur);
+                      op_cur->uv.package_var_access->sub_rel_id = sub->op_package_var_accesses->length;
+                      SPVM_LIST_push(sub->op_package_var_accesses, op_cur);
                       
                       break;
                     }
@@ -1753,11 +1777,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         }
                       }
                       
-                      if (package->op_field_accesses->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                      if (sub->op_field_accesses->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
                         SPVM_yyerror_format(compiler, "Too many field access at %s line %d\n", op_cur->file, op_cur->line);
                       }
-                      op_cur->uv.field_access->rel_id = package->op_field_accesses->length;
-                      SPVM_LIST_push(package->op_field_accesses, op_cur);
+                      op_cur->uv.field_access->sub_rel_id = sub->op_field_accesses->length;
+                      SPVM_LIST_push(sub->op_field_accesses, op_cur);
                       
                       break;
                     }
@@ -1829,11 +1853,17 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         return;
                       }
 
-                      if (package->op_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                      if (sub->op_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
                         SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_cur->file, op_cur->line);
                       }
-                      op_type->uv.type->rel_id = package->op_types->length;
-                      SPVM_LIST_push(package->op_types, op_type);
+                      op_type->uv.type->sub_rel_id = sub->op_types->length;
+
+                      if (sub->op_types->length >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+                        SPVM_yyerror_format(compiler, "Too many types at %s line %d\n", op_cur->file, op_cur->line);
+                      }
+                      op_type->uv.type->sub_rel_id = sub->op_types->length;
+
+                      SPVM_LIST_push(sub->op_types, op_type);
                     }
                     break;
                   }
@@ -2142,7 +2172,7 @@ _Bool SPVM_OP_CHECKER_has_interface(SPVM_COMPILER* compiler, SPVM_PACKAGE* packa
             SPVM_OP* op_sub_package = SPVM_LIST_fetch(op_subs_package, sub_index_package);
             SPVM_SUB* sub_package = op_sub_package->uv.sub;
             
-            if (strcmp(sub_interface->method_signature, sub_package->method_signature) == 0) {
+            if (strcmp(sub_interface->signature, sub_package->signature) == 0) {
               found = 1;
             }
           }

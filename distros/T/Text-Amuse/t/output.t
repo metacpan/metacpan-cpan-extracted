@@ -18,7 +18,7 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 151;
+plan tests => 153;
 
 foreach my $testfile (qw/comments
                          inline
@@ -92,6 +92,7 @@ foreach my $testfile (qw/comments
                          prova
                          recursiv
                          broken-inline
+                         crashed-empty-header
                          splat
                          labels
                          anchors-2

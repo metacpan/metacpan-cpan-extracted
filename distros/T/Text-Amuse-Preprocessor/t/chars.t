@@ -5,7 +5,7 @@ use warnings;
 
 use Text::Amuse::Preprocessor::TypographyFilters;
 
-use Test::More tests => 8 * 15;
+use Test::More tests => 8 * 16;
 
 my $builder = Test::More->builder;
 binmode $builder->output,         ":encoding(UTF-8)";

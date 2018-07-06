@@ -54,6 +54,6 @@
          "web" : "https://github.com/tomk3003/mojo-server-threaded"
       }
    },
-   "version" : 0.13,
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : 0.15,
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

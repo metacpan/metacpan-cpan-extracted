@@ -2,7 +2,7 @@
 using std::cout;  using std::cerr;  using std::endl;
 
 #ifndef __CPP__INCLUDED__RPerl__Algorithm__Inefficient_h
-#define __CPP__INCLUDED__RPerl__Algorithm__Inefficient_h 0.011_000
+#define __CPP__INCLUDED__RPerl__Algorithm__Inefficient_h 0.012_000
 
 // [[[ INCLUDES & OO INHERITANCE INCLUDES ]]]
 #include <RPerl.cpp>  // -> RPerl.h -> (rperltypes_mode.h; rperloperations.h; rperltypes.h; HelperFunctions.cpp)
@@ -30,10 +30,10 @@ public:
     // [[[ OO METHODS ]]]
 
     // <<< OO PROPERTIES, ACCESSORS & MUTATORS >>>
-    string get_bar() { return this->bar; }
-    void set_bar(string bar_new) { this->bar = bar_new; }
-    string get_foo() { return this->foo; }
-    void set_foo(string foo_new) { this->foo = foo_new; }
+    string get_bar() { return bar; }
+    void set_bar(string bar_new) { bar = bar_new; }
+    string get_foo() { return foo; }  // inherited from RPerl::Algorithm::
+    void set_foo(string foo_new) { foo = foo_new; }  // inherited from RPerl::Algorithm::
 
     // <<< CONSTRUCTOR & DESTRUCTOR >>>
     RPerl__Algorithm__Inefficient() {}
@@ -46,11 +46,11 @@ public:
     const string USEFULNESS() { return RPerl__Algorithm__Inefficient__USEFULNESS; }
 
     // <<< USER-DEFINED METHODS >>>
-    void inherited__Inefficient(string person);
-    string inherited__Inefficient_bar_get();
-    void inherited__Inefficient_bar_set(string bar_new);
-    string inherited__Inefficient_foo_get();
-    void inherited__Inefficient_foo_set(string foo_new);
+    void inherited_Inefficient(string person);
+    string inherited_Inefficient_bar_get();
+    void inherited_Inefficient_bar_set(string bar_new);
+    string inherited_Inefficient_foo_get();
+    void inherited_Inefficient_foo_set(string foo_new);
     void inherited(string person);
 };  // end of class
 
@@ -61,11 +61,23 @@ typedef std::vector<RPerl__Algorithm__Inefficient_ptr> RPerl__Algorithm__Ineffic
 typedef std::unordered_map<string, RPerl__Algorithm__Inefficient_ptr> RPerl__Algorithm__Inefficient_hashref;
 typedef std::unordered_map<string, RPerl__Algorithm__Inefficient_ptr>::iterator RPerl__Algorithm__Inefficient_hashref_iterator;
 
+// [[[ OO CONSTRUCTOR WRAPPER CLASS ]]]
+class NEW_RPerl__Algorithm__Inefficient {
+public:
+    RPerl__Algorithm__Inefficient_ptr wrapped_object;
+    NEW_RPerl__Algorithm__Inefficient() : wrapped_object{new RPerl__Algorithm__Inefficient()} {}
+    RPerl__Algorithm__Inefficient_ptr&& NEW() { return std::move(wrapped_object); }
+
+    // <<< OO PROPERTIES, INITIALIZERS >>>
+    NEW_RPerl__Algorithm__Inefficient& bar(string bar_init) { wrapped_object->bar = bar_init; return *this; }
+    NEW_RPerl__Algorithm__Inefficient& foo(string foo_init) { wrapped_object->foo = foo_init; return *this; }  // inherited from RPerl::Algorithm::
+};
+
 // [[[ SUBROUTINES ]]]
-string RPerl__Algorithm__Inefficient__uninherited__Inefficient(string person);
+string RPerl__Algorithm__Inefficient__uninherited_Inefficient(string person);
 
 // <<< SHIM MACROS >>>
-#define uninherited__Inefficient(person) RPerl__Algorithm__Inefficient__uninherited__Inefficient(person)
+#define uninherited_Inefficient(person) RPerl__Algorithm__Inefficient__uninherited_Inefficient(person)
 
 // <<< OPERATIONS & DATA TYPES REPORTER >>>
 integer RPerl__Algorithm__Inefficient__MODE_ID() { return 2; }  // CPPOPS_CPPTYPES is 2

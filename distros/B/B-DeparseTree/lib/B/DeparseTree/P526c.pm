@@ -19,8 +19,7 @@ use rlib '../..';
 package B::DeparseTree::P526c;
 use Carp;
 
-use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
-
+use B qw(
     CVf_METHOD
     MDEREF_ACTION_MASK
     MDEREF_AV_gvav_aelem
@@ -51,13 +50,13 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
     OPf_STACKED
     OPpCONST_BARE
     OPpENTERSUB_AMPER
-    OPpSLICE
     OPpLVAL_INTRO
     OPpMULTIDEREF_DELETE
     OPpMULTIDEREF_EXISTS
     OPpOUR_INTRO
     OPpPADRANGE_COUNTSHIFT
     OPpSIGNATURE_FAKE
+    OPpSLICE
     OPpSPLIT_ASSIGN
     OPpSPLIT_LEX
     OPpTRANS_COMPLEMENT
@@ -93,6 +92,13 @@ use B qw(class main_root main_start main_cv svref_2object opnumber perlstring
     SVf_ROK SVpad_OUR
     SVpad_TYPED
     SVs_SMG
+    class
+    main_cv
+    main_root
+    main_start
+    opnumber
+    perlstring
+    svref_2object
     );
 
 use B::DeparseTree::PPfns;
@@ -113,7 +119,10 @@ use B::Deparse;
 *padany = *B::Deparse::padany;
 *padname = *B::Deparse::padname;
 *padname_sv = *B::Deparse::padname_sv;
+*padval = *B::Deparse::padval;
+*populate_curcvlex = *B::Deparse::populate_curcvlex;
 *re_flags = *B::Deparse::re_flags;
+*rv2gv_or_string = *B::Deparse::rv2gv_or_string;
 *stash_variable = *B::Deparse::stash_variable;
 *stash_variable_name = *B::Deparse::stash_variable_name;
 *tr_chr = *B::Deparse::tr_chr;
@@ -214,119 +223,11 @@ sub pp_require
     Carp::confess("unhandled condition in pp_require");
 }
 
-sub pp_readline {
-    my $self = shift;
-    my($op, $cx) = @_;
-    my $kid = $op->first;
-    $kid = $kid->first if $kid->name eq "rv2gv"; # <$fh>
-    if (B::Deparse::is_scalar($kid)
-	and $op->flags & OPf_SPECIAL
-	and $self->deparse($kid, 1) eq 'ARGV') {
-	my $body = [$self->deparse($kid, 1, $op)];
-	return info_from_list($op, $self, ['<', $body->[0]{text}, '>'], '',
-			      'readline_scalar', {body=>$body});
-    }
-    return $self->unop($op, $cx, "readline");
-}
-
-sub pp_rcatline {
-    my $self = shift;
-    my($op) = @_;
-    return info_from_list($op, $self, ["<", $self->gv_name($self->gv_or_padgv($op)), ">"],
-			  '', 'rcatline', {});
-}
-
-sub ASSIGN () { 2 } # has OP= variant
-
-sub pp_smartmatch {
-    my ($self, $op, $cx) = @_;
-    if ($op->flags & OPf_SPECIAL) {
-	return $self->deparse($op->last, $cx, $op);
-    }
-    else {
-	binop(@_, "~~", 14);
-    }
-}
-
-sub bin_info_join($$$$$$$) {
-    my ($self, $op, $lhs, $rhs, $mid, $sep, $type) = @_;
-    my $texts = [$lhs->{text}, $mid, $rhs->{text}];
-    return info_from_list($op, $self, $texts, ' ', $type, {})
-}
-
-sub bin_info_join_maybe_parens($$$$$$$$$) {
-    my ($self, $op, $lhs, $rhs, $mid, $sep, $cx, $prec, $type) = @_;
-    my $info = bin_info_join($self, $op, $lhs, $rhs, $mid, $sep, $type);
-    $info->{text} = $self->maybe_parens($info->{text}, $cx, $prec);
-    return $info;
-}
-
-sub range {
-    my $self = shift;
-    my ($op, $cx, $type) = @_;
-    my $left = $op->first;
-    my $right = $left->sibling;
-    $left = $self->deparse($left, 9, $op);
-    $right = $self->deparse($right, 9, $op);
-    return info_from_list($op, $self, [$left, $type, $right], ' ', 'range',
-			  {maybe_parens => [$self, $cx, 9]});
-}
-
-sub for_loop {
-    my $self = shift;
-    my($op, $cx, $parent) = @_;
-    my $init = $self->deparse($op, 1, $parent);
-    my $s = $op->sibling;
-    my $ll = $s->name eq "unstack" ? $s->sibling : $s->first->sibling;
-    return $self->loop_common($ll, $cx, $init);
-}
-
-sub pp_padsv {
-    my $self = shift;
-    my($op, $cx, $forbid_parens) = @_;
-    return $self->maybe_my($op, $cx, $self->padname($op->targ),
-			   $forbid_parens);
-}
-
 my @threadsv_names = B::threadsv_names;
 sub pp_threadsv {
     my $self = shift;
     my($op, $cx) = @_;
     return $self->maybe_local_str($op, $cx, "\$" .  $threadsv_names[$op->targ]);
-}
-
-sub gv_or_padgv {
-    my $self = shift;
-    my $op = shift;
-    if (class($op) eq "PADOP") {
-	return $self->padval($op->padix);
-    } else { # class($op) eq "SVOP"
-	return $op->gv;
-    }
-}
-
-sub pp_aelemfast_lex
-{
-    my($self, $op, $cx) = @_;
-    my $name = $self->padname($op->targ);
-    $name =~ s/^@/\$/;
-    return info_from_list($op, $self, [$name, "[", ($op->private + $self->{'arybase'}), "]"],
-		      '', 'pp_aelemfast_lex', {});
-}
-
-sub pp_aelemfast
-{
-    my($self, $op, $cx) = @_;
-    # optimised PADAV, pre 5.15
-    return $self->pp_aelemfast_lex(@_) if ($op->flags & OPf_SPECIAL);
-
-    my $gv = $self->gv_or_padgv($op);
-    my($name,$quoted) = $self->stash_variable_name('@',$gv);
-    $name = $quoted ? "$name->" : '$' . $name;
-    my $i = $op->private;
-    $i -= 256 if $i > 127;
-    return info_from_list($op, $self, [$name, "[", ($op->private + $self->{'arybase'}), "]"],
-		      '', 'pp_aelemfast', {});
 }
 
 sub pp_rv2sv { maybe_local_str(@_, rv2x(@_, "\$")) }
@@ -595,139 +496,6 @@ sub pp_signature {
     return $self->info_from_string("signature", $op, '');
 }
 
-sub pp_gelem
-{
-    my($self, $op, $cx) = @_;
-    my($glob, $part) = ($op->first, $op->last);
-    $glob = $glob->first; # skip rv2gv
-    $glob = $glob->first if $glob->name eq "rv2gv"; # this one's a bug
-    my $scope = B::Deparse::is_scope($glob);
-    $glob = $self->deparse($glob, 0);
-    $part = $self->deparse($part, 1);
-    return "*" . ($scope ? "{$glob}" : $glob) . "{$part}";
-}
-
-sub pp_lslice
-{
-    my ($self, $op, $cs) = @_;
-    my $idx = $op->first;
-    my $list = $op->last;
-    my(@elems, $kid);
-    my $list_info = $self->deparse($list, 1, $op);
-    my $idx_info = $self->deparse($idx, 1, $op);
-    return info_from_list($op, $self, ['(', $list_info->{text}, ')', '[', $idx_info->{text}, ']'],
-	'', 'lslice', {body=>[$list_info, $idx_info]});
-}
-
-sub _method
-{
-    my($self, $op, $cx) = @_;
-    my @other_ops = ($op->first);
-    my $kid = $op->first->sibling; # skip pushmark
-    my($meth, $obj, @exprs);
-    if ($kid->name eq "list" and B::Deparse::want_list $kid) {
-	# When an indirect object isn't a bareword but the args are in
-	# parens, the parens aren't part of the method syntax (the LLAFR
-	# doesn't apply), but they make a list with OPf_PARENS set that
-	# doesn't get flattened by the append_elem that adds the method,
-	# making a (object, arg1, arg2, ...) list where the object
-	# usually is. This can be distinguished from
-	# '($obj, $arg1, $arg2)->meth()' (which is legal if $arg2 is an
-	# object) because in the later the list is in scalar context
-	# as the left side of -> always is, while in the former
-	# the list is in list context as method arguments always are.
-	# (Good thing there aren't method prototypes!)
-	$meth = $kid->sibling;
-	push  @other_ops, $kid->first;
-	$kid = $kid->first->sibling; # skip pushmark
-	$obj = $kid;
-	$kid = $kid->sibling;
-	for (; not B::Deparse::null $kid; $kid = $kid->sibling) {
-	    push @exprs, $kid;
-	}
-    } else {
-	$obj = $kid;
-	$kid = $kid->sibling;
-	for (; !B::Deparse::null ($kid->sibling) && $kid->name!~/^method(?:_named)?\z/;
-	     $kid = $kid->sibling) {
-	    push @exprs, $kid
-	}
-	$meth = $kid;
-    }
-
-    if ($meth->name eq "method_named") {
-	$meth = $self->meth_sv($meth)->PV;
-    } elsif ($meth->name eq "method_super") {
-	$meth = "SUPER::".$self->meth_sv($meth)->PV;
-    } elsif ($meth->name eq "method_redir") {
-        $meth = $self->meth_rclass_sv($meth)->PV.'::'.$self->meth_sv($meth)->PV;
-    } elsif ($meth->name eq "method_redir_super") {
-        $meth = $self->meth_rclass_sv($meth)->PV.'::SUPER::'.
-                $self->meth_sv($meth)->PV;
-    } else {
-	$meth = $meth->first;
-	if ($meth->name eq "const") {
-	    # As of 5.005_58, this case is probably obsoleted by the
-	    # method_named case above
-	    $meth = $self->const_sv($meth)->PV; # needs to be bare
-	}
-    }
-
-    return {
-	method => $meth,
-	variable_method => ref($meth),
-	object => $obj,
-	args => \@exprs,
-	other_ops => \@other_ops
-    }, $cx;
-}
-
-sub e_method {
-    my ($self, $op, $minfo, $cx) = @_;
-    my $obj = $self->deparse($minfo->{object}, 24, $op);
-    my @body = ($obj);
-    my $other_ops = $minfo->{other_ops};
-
-    my $meth = $minfo->{method};
-    my $meth_info;
-    if ($minfo->{variable_method}) {
-	$meth_info = $self->deparse($meth, 1, $op);
-	push @body, $meth_info;
-    }
-    my @args = map { $self->deparse($_, 6, $op) } @{$minfo->{args}};
-    push @body, @args;
-    my @args_texts = map $_->{text}, @args;
-    my $args = join(", ", @args_texts);
-
-    my $opts = {body => \@body, other_ops => $other_ops};
-    my @texts = ();
-    my $type;
-
-    if ($minfo->{object}->name eq 'scope' && B::Deparse::want_list $minfo->{object}) {
-	# method { $object }
-	# This must be deparsed this way to preserve list context
-	# of $object.
-	my $need_paren = $cx >= 6;
-	if ($need_paren) {
-	    @texts = ('(', $meth,  substr($obj,2),
-		      $args, ')');
-	    $type = 'e_method_list_paren';
-	} else {
-	    @texts = ($meth,  substr($obj,2), $args);
-	    $type = 'e_method_list';
-	}
-	return info_from_list($op, $self, \@texts, '', $type, $opts);
-    }
-    if (length $args) {
-	@texts = ($obj->{text}, '->', $meth, '(', $args, ')');
-	$type = 'e_method_args';
-    } else {
-	@texts = ($obj->{text}, '->', $meth);
-	$type = 'e_method_null';
-    }
-    return info_from_list($op, $self, \@texts, '', $type, $opts);
-}
-
 # returns "&"  and the argument bodies if the prototype doesn't match the args,
 # or ("", $args_after_prototype_demunging) if it does.
 sub check_proto {
@@ -927,7 +695,7 @@ sub pp_enterxssub { goto &pp_entersub; }
 # 	$prefix = "";
 # 	my $grandkid = $kid->first;
 # 	my $arrow = ($lexical = $grandkid->name eq "padcv")
-# 		 || is_subscriptable($grandkid)
+# 		 || B::Deparse::is_subscriptable($grandkid)
 # 		    ? ""
 # 		    : "->";
 # 	$kid = $self->deparse($kid, 24) . $arrow;
@@ -1011,52 +779,6 @@ sub pp_enterxssub { goto &pp_entersub; }
 # 	}
 #     }
 # }
-
-sub pp_enterwrite { unop(@_, "write") }
-
-# Split a floating point number into an integer mantissa and a binary
-# exponent. Assumes you've already made sure the number isn't zero or
-# some weird infinity or NaN.
-sub split_float {
-    my($f) = @_;
-    my $exponent = 0;
-    if ($f == int($f)) {
-	while ($f % 2 == 0) {
-	    $f /= 2;
-	    $exponent++;
-	}
-    } else {
-	while ($f != int($f)) {
-	    $f *= 2;
-	    $exponent--;
-	}
-    }
-    my $mantissa = sprintf("%.0f", $f);
-    return ($mantissa, $exponent);
-}
-
-# OP_STRINGIFY is a listop, but it only ever has one arg
-sub pp_stringify {
-    my ($self, $op, $cx) = @_;
-    my $kid = $op->first->sibling;
-    my @other_ops = ();
-    while ($kid->name eq 'null' && !B::Deparse::null($kid->first)) {
-        push(@other_ops, $kid);
-	$kid = $kid->first;
-    }
-    my $info;
-    if ($kid->name =~ /^(?:const|padsv|rv2sv|av2arylen|gvsv|multideref
-			  |aelemfast(?:_lex)?|[ah]elem|join|concat)\z/x) {
-	$info = maybe_targmy(@_, \&dquote);
-    }
-    else {
-	# Actually an optimised join.
-	my $info = listop(@_,"join");
-	$info->{text} =~ s/join([( ])/join$1$self->{'ex_const'}, /;
-    }
-    push @{$info->{other_ops}}, @other_ops;
-    return $info;
-}
 
 # Only used by tr///, so backslashes hyphens
 sub pchr { # ASCII
@@ -1419,15 +1141,6 @@ sub regcomp
     return ($self->deparse($kid, $cx, $op), 0, $op);
 }
 
-sub pp_match { matchop(@_, "m", "/") }
-sub pp_pushre { matchop(@_, "m", "/") }
-sub pp_qr { matchop(@_, "qr", "") }
-
-# FIXME: I guessed these. Are they right?
-sub pp_s_cmp { binop(@_, "cmp", 14) }
-sub pp_s_eq { binop(@_, "cmp", 14) }
-sub pp_s_ne { binop(@_, "cmp", 14) }
-
 sub pp_split
 {
     my($self, $op, $cx) = @_;
@@ -1617,9 +1330,5 @@ sub pp_chdir {
 	maybe_targmy(@_, \&unop, "chdir")
     }
 }
-
-# Not in Perl 5.20 and presumeably < 5.20. No harm in adding to 5.20?
-*pp_ncomplement = *pp_complement;
-sub pp_scomplement { maybe_targmy(@_, \&pfixop, "~.", 21) }
 
 1;

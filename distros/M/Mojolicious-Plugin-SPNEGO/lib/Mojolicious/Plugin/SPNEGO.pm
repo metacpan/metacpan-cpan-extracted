@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 use IO::Socket::Timeout;
 use Mojo::Util qw(b64_decode);
-our $VERSION = '0.3.7';
+our $VERSION = '0.3.8';
 
 my %cCache;
 
@@ -50,7 +50,7 @@ sub register {
                         my $mesg = $ldap->bind_type1($AuthBase64);
                         if ($mesg->{ntlm_type2_base64}){
                             $c->res->headers->header( ($cfg->{web_proxy_mode} ? 'Proxy' : 'WWW' ) . '-Authenticate' => 'NTLM '.$mesg->{ntlm_type2_base64});
-                            $c->render( text => 'Waiting for Type3 NTLM Token', status => 401);
+                            $c->render( text => 'Waiting for Type3 NTLM Token', status => $cfg->{web_proxy_mode} ? 407 : 401);
                             $cCache->{status} = 'expectType3';
                             return 0;
                         }
@@ -75,7 +75,7 @@ sub register {
                 }
             }
             $c->res->headers->header( ($cfg->{web_proxy_mode} ? 'Proxy' : 'WWW') . '-Authenticate' => 'NTLM' );
-            $c->render( text => 'Waiting for Type 1 NTLM Token', status => 401 );
+            $c->render( text => 'Waiting for Type 1 NTLM Token', status => $cfg->{web_proxy_mode} ? 407 : 401 );
             $cCache->{status} = 'expectType1';
             return 0;
         }

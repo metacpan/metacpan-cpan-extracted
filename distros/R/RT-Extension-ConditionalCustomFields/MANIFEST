@@ -68,8 +68,8 @@ xt/ticket_display.t
 xt/ticket_modify_dropdown.t
 xt/ticket_modify_list.t
 xt/ticket_modify_selectbox.t
+xt/two_conditions_same_value.t
 xt/user_modify_dropdown.t
 xt/user_modify_list.t
 xt/user_modify_selectbox.t
 xt/user_summary.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

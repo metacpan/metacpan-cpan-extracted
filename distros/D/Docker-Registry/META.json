@@ -4,7 +4,7 @@
       "Jose Luis Mart\u00ednez <joseluis.martinez@capside.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "apache_2_0"
    ],
@@ -15,7 +15,7 @@
    "name" : "Docker-Registry",
    "optional_features" : {
       "ecr-registry" : {
-         "description" : "Support for ECR",
+         "description" : "support for ecr",
          "prereqs" : {
             "runtime" : {
                "requires" : {
@@ -30,10 +30,15 @@
             "runtime" : {
                "requires" : {
                   "Crypt::JWT" : "0",
-                  "Path::Class" : "0"
+                  "Path::Class" : "0",
+                  "URI" : "0"
                }
             }
          }
+      },
+      "gitlab-registry" : {
+         "description" : "support for gitlab",
+         "prereqs" : {}
       }
    },
    "prereqs" : {
@@ -45,6 +50,7 @@
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild::Filtered" : "0",
             "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
             "Dist::Zilla::Plugin::VersionFromModule" : "0",
             "Dist::Zilla::PluginBundle::Git" : "0"
@@ -57,14 +63,18 @@
             "IO::Socket::SSL" : "0",
             "JSON::MaybeXS" : "0",
             "Moose" : "0",
+            "MooseX::Types::Moose" : "0",
             "Throwable::Error" : "0",
             "perl" : "5.014001"
          }
       },
       "test" : {
          "requires" : {
+            "Import::Into" : "1.002003",
+            "Sub::Override" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Most" : "0"
          }
       }
    },
@@ -79,8 +89,8 @@
          "web" : "https://github.com/pplu/docker-registry"
       }
    },
-   "version" : "0.03",
-   "x_generated_by_perl" : "v5.20.2",
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.22.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

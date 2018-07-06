@@ -24,6 +24,7 @@ my @files = (
     't/author-no-tabs.t',
     't/author-pod-syntax.t',
     't/author-test-version.t',
+    't/release-changes_has_content.t',
     't/release-kwalitee.t',
     't/release-trailing-space.t',
     't/release-unused-vars.t'

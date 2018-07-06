@@ -34,7 +34,6 @@ lib/Devel/MAT/UI.pod
 lib/Devel/MAT/UserGuide.pod
 lib/Devel/MAT/UserGuide/IdentifyingAnSV.pod
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml

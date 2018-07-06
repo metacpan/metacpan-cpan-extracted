@@ -1,10 +1,11 @@
+[![Build Status](https://travis-ci.org/Songmu/p5-DBIx-Schema-DSL.svg?branch=master)](https://travis-ci.org/Songmu/p5-DBIx-Schema-DSL) [![Coverage Status](https://img.shields.io/coveralls/Songmu/p5-DBIx-Schema-DSL/master.svg?style=flat)](https://coveralls.io/r/Songmu/p5-DBIx-Schema-DSL?branch=master)
 # NAME
 
 DBIx::Schema::DSL - DSL for Database schema declaration
 
 # VERSION
 
-This document describes DBIx::Schema::DSL version 0.12.
+This document describes DBIx::Schema::DSL version 1.0000.
 
 # SYNOPSIS
 

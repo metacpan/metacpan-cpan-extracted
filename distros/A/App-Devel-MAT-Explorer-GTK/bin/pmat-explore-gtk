@@ -103,7 +103,10 @@ my $inrefs_mth = "inrefs";
             my( $self, $path, $column ) = @_;
             my $data = $self->get_row_data_from_path( $path );
 
-            my $addr = hex $data->[2];
+            my $addr = do {
+               no warnings 'portable';
+               hex $data->[2];
+            };
             my $sv = $df->sv_at( $addr );
             history_nav( $sv );
          });

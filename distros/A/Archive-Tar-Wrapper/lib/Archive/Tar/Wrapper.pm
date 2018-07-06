@@ -18,7 +18,7 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 my $logger = get_logger();
 
 sub _acquire_tar_info {
@@ -632,44 +632,44 @@ Archive::Tar::Wrapper - API wrapper around the 'tar' utility
 
     my $arch = Archive::Tar::Wrapper->new();
 
-        # Open a tarball, expand it into a temporary directory
+    # Open a tarball, expand it into a temporary directory
     $arch->read("archive.tgz");
 
-        # Iterate over all entries in the archive
+    # Iterate over all entries in the archive
     $arch->list_reset(); # Reset Iterator
-                         # Iterate through archive
+    # Iterate through archive
     while(my $entry = $arch->list_next()) {
         my($tar_path, $phys_path) = @$entry;
         print "$tar_path\n";
     }
 
-        # Get a huge list with all entries
+    # Get a huge list with all entries
     for my $entry (@{$arch->list_all()}) {
         my($tar_path, $real_path) = @$entry;
         print "Tarpath: $tar_path Tempfile: $real_path\n";
     }
 
-        # Add a new entry
+    # Add a new entry
     $arch->add($logic_path, $file_or_stringref);
 
-        # Remove an entry
+    # Remove an entry
     $arch->remove($logic_path);
 
-        # Find the physical location of a temporary file
+    # Find the physical location of a temporary file
     my($tmp_path) = $arch->locate($tar_path);
 
-        # Create a tarball
+    # Create a tarball
     $arch->write($tarfile, $compress);
 
 =head1 DESCRIPTION
 
-Archive::Tar::Wrapper is an API wrapper around the 'tar' command line
-utility. It never stores anything in memory, but works on temporary
+Archive::Tar::Wrapper is an API wrapper around the C<tar> command line
+program. It never stores anything in memory, but works on temporary
 directory structures on disk instead. It provides a mapping between
 the logical paths in the tarball and the 'real' files in the temporary
 directory on disk.
 
-It differs from Archive::Tar in two ways:
+It differs from L<Archive::Tar> in two ways:
 
 =over 4
 
@@ -681,7 +681,7 @@ stored on disk.
 =item *
 
 Archive::Tar::Wrapper is 100% compliant with the platform's C<tar>
-utility, because it uses it internally.
+utility because it uses it internally.
 
 =back
 
@@ -998,7 +998,7 @@ FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 details.
 
 You should have received a copy of the GNU General Public License along with
-Archive-Tar-Wrapper. If not, see <http://www.gnu.org/licenses/>.
+Archive-Tar-Wrapper. If not, see L<http://www.gnu.org/licenses/>.
 
 =head1 AUTHOR
 

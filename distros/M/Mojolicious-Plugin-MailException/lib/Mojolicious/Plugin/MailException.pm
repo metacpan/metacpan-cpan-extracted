@@ -51,6 +51,15 @@ Hash with headers that have to be added to mail
 
 Stack size for crash mail. Default is C<20>.
 
+=item maildir
+
+This option saves (stores) messages in the maildir instead of
+sending them. If you catch too many crashes, then their sending
+probably uses too much of the CPU, so by using this option you
+may save your messages instead of sending them.
+
+The option is ignored if C<send> option is defined.
+
 =item send
 
 Subroutine that can be used to send the mail, example:
@@ -97,7 +106,7 @@ at your option, any later version of Perl 5 you may have available.
 
 package Mojolicious::Plugin::MailException;
 
-our $VERSION = '0.21';
+our $VERSION = '0.24';
 use 5.008008;
 use strict;
 use warnings;
@@ -108,6 +117,7 @@ use Mojo::Exception;
 use Carp;
 use MIME::Lite;
 use MIME::Words ':all';
+use File::Spec::Functions 'rel2abs', 'catfile';
 
 
 my $mail_prepare = sub {
@@ -195,13 +205,53 @@ my $mail_prepare = sub {
     return $mail;
 };
 
+use Fcntl;
+
+my $store_maildir = sub {
+    my ($dir, $mail) = @_;
+            
+    unless (-x $dir and -d $dir and -w $dir) {
+        warn "Directory `$dir' does not exists or accessible\n";
+        return;
+    }
+
+    my $now = time;
+    for (my $i = 0; $i < 1000; $i++) {
+        my $fname = catfile $dir, sprintf '%d.%05d', $now, $i;
+
+        my $fh;
+
+        if (sysopen $fh, $fname, O_CREAT | O_WRONLY) {
+            binmode $fh => ':raw';
+
+            my $str = $mail->as_string;
+            if (utf8::is_utf8 $str) {
+                utf8::encode $str;
+            }
+            print $fh $str;
+            close $fh;
+            last;
+        }
+    }
+};
+
 
 sub register {
     my ($self, $app, $conf) = @_;
 
     my $stack_depth = $conf->{stack} || 20;
 
-    my $cb = $conf->{send} || sub { $_[0]->send };
+    my $cb = $conf->{send};
+    
+    unless ('CODE' eq ref $cb) {
+        $cb = sub { $_[0]->send };
+        if (my $dir = $conf->{maildir}) {
+            warn "Directory `$dir' does not exists or accessible"
+                unless -x $dir and -d $dir and -w $dir;
+            $dir = rel2abs $dir;
+            $cb = sub { $store_maildir->($dir, shift)  };
+        }
+    }
     croak "Usage: app->plugin('ExceptionMail'[, send => sub { ... })'"
         unless 'CODE' eq ref $cb;
 

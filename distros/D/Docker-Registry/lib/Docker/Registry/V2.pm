@@ -28,10 +28,12 @@ package Docker::Registry::V2;
     require Docker::Registry::IO::Simple;
     Docker::Registry::IO::Simple->new;  
   });
-  has auth => (is => 'ro', does => 'Docker::Registry::Auth', default => sub {
+  has auth => (is => 'ro', does => 'Docker::Registry::Auth', lazy => 1, builder => 'build_auth' );
+
+  sub build_auth {
     require Docker::Registry::Auth::None;
     Docker::Registry::Auth::None->new; 
-  });
+  };
 
   use JSON::MaybeXS qw//;
   has _json => (is => 'ro', default => sub {

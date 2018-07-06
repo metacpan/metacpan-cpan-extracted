@@ -312,7 +312,7 @@ run_ok(
     name => $test,
     cmd => [ @cmd, '--ofmt', 'yaml', "_bool.a.json" ],
     stdout => sub { file_contents_eq_or_diff(
-        ($YAML::XS::VERSION < 0.67 ? "$test.num.exp" : "$test.exp"), shift, $test
+        (eval { YAML::XS->VERSION(0.67) } ? "$test.exp" : "$test.num.exp"), shift, $test
     )},
 );
 
@@ -321,7 +321,7 @@ run_ok(
     name => $test,
     cmd => [ @cmd, '--ofmt', 'yaml', "$test.json" ],
     stdout => sub { file_contents_eq_or_diff(
-        ($YAML::XS::VERSION < 0.67 ? "$test.num.exp" : "$test.exp"), shift, $test
+        (eval { YAML::XS->VERSION(0.67) } ? "$test.exp" : "$test.num.exp"), shift, $test
     )},
 );
 
@@ -330,7 +330,7 @@ run_ok(
     name => $test,
     cmd => [ @cmd, '--ofmt', 'yaml', "$test.json" ],
     stdout => sub { file_contents_eq_or_diff(
-        ($YAML::XS::VERSION < 0.67 ? "$test.num.exp" : "$test.exp"), shift, $test
+        (eval { YAML::XS->VERSION(0.67) } ? "$test.exp" : "$test.num.exp"), shift, $test
     )},
 );
 

@@ -1,11 +1,11 @@
 using std::cout;  using std::cerr;  using std::endl;
 
 #ifndef __CPP__INCLUDED__RPerl__DataType__GMPInteger_h
-#define __CPP__INCLUDED__RPerl__DataType__GMPInteger_h 0.005_000
+#define __CPP__INCLUDED__RPerl__DataType__GMPInteger_h 0.006_000
 
 // NEED FIX: remove duplicate code
 // DEV NOTE, CORRELATION #rp026: can't figure out how to get GMPInteger.cpp to include HelperFunctions.cpp without redefining errors
-#define SvHROKp(input_hv_ref) (SvROK(input_hv_ref) && (SvTYPE(SvRV(input_hv_ref)) == SVt_PVHV))
+#define SvHROKp(input_hvref) (SvROK(input_hvref) && (SvTYPE(SvRV(input_hvref)) == SVt_PVHV))
 
 # ifndef __CPP__INCLUDED__RPerl__DataType__GMPInteger_h__typedefs
 #define __CPP__INCLUDED__RPerl__DataType__GMPInteger_h__typedefs 1
@@ -129,10 +129,13 @@ typedef long integer;  // default
 #define __CPP__INCLUDED__RPerl__DataType__Number_h__typedefs 1
 #  ifdef __TYPE__NUMBER__DOUBLE
 typedef double number;
+#define NUMBER "f"
 #  elif defined __TYPE__NUMBER__LONG__DOUBLE
 typedef long double number;
+#define NUMBER "Lf"  // assume format code 'Lf' exists if type 'long double' exists
 #  else
 typedef double number;  // default
+#define NUMBER "f"
 #  endif
 # endif
 # ifndef __CPP__INCLUDED__RPerl__DataType__Character_h__typedefs
@@ -229,11 +232,11 @@ gmp_integer_retval string_to_gmp_integer(string input_string);
 
 // [[[ TYPE TESTING ]]]
 # ifdef __PERL__TYPES
-SV* gmp_integer__typetest0();
-SV* gmp_integer__typetest1(SV* lucky_gmp_integer);
+SV* gmp_integer_typetest0();
+SV* gmp_integer_typetest1(SV* lucky_gmp_integer);
 # elif defined __CPP__TYPES
-gmp_integer_retval gmp_integer__typetest0();
-gmp_integer_retval gmp_integer__typetest1(gmp_integer_retval lucky_gmp_integer_retval);
+gmp_integer_retval gmp_integer_typetest0();
+gmp_integer_retval gmp_integer_typetest1(gmp_integer_retval lucky_gmp_integer_retval);
 # endif
 
 #endif

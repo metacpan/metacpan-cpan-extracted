@@ -17,71 +17,133 @@ B::DeparseTree
 
 =head2 Synopsis
 
-   use B::DeparseTree;
-   my $deparse = B::DeparseTree->new();
+    use B::DeparseTree;
+    my $deparse = B::DeparseTree->new();
 
-   # create a subroutine to deparse...
-   sub my_abs($) {
-       return -$a < 0 ? -$a : $a;
-   };
+    # create a subroutine to deparse...
+    sub my_abs($) {
+        return $a < 0 ? -$a : $a;
+    };
 
-   my $deparse_tree = B::DeparseTree->new();
-   my $tree_node = $deparse_tree->coderef2info(\&my_abs);
-   print $tree_node->{text};
+    my $deparse_tree = B::DeparseTree->new();
+    my $tree_node = $deparse_tree->coderef2info(\&my_abs);
+    print $tree_node->{text};
 
 The above produces:
 
     ($)
     {
-        return -$a < 0 ? -$a : $a
+        return $a < 0 ? -$a : $a
     }
 
 but the result are reconstructed purely from the OPnode tree. To show
 parent-child information in the tree:
 
-   use B::DeparseTree;
+   use B::DeparseTree::Fragment;
    B::DeparseTree::Fragment::dump_relations($deparse_tree);
 
-which produces in abbreviated form...
+which produces:
 
-   ...
-   3--------------------------------------------------
-   Child info:
-   	addr: 0x263b710, parent: 0x263b748
-   	op: pushmark
-   	text: return -$a < 0 ? -$a : $a
+    0: ==================================================
+    Child info:
+         addr: 0x23065a0, parent: 0x23d9720
+         op: negate
+         text: -$a
 
-   return -$a < 0 ? -$a : $a
-   ||||||
-   3--------------------------------------------------
-   4--------------------------------------------------
-   Child info:
-   	addr: 0x263b748, parent: 0x263b628
-   	op: return
-   	text: return -$a < 0 ? -$a : $a
-
-   return -$a < 0 ? -$a : $a
-   -------------------------
-   4--------------------------------------------------
-   5--------------------------------------------------
-   Child info:
-   	addr: 0x263b790, parent: 0x263b748
-   	op: cond_expr
-   	text: -$a < 0 ? -$a : $a
-
-   return -$a < 0 ? -$a : $a
-          ------------------
-   5--------------------------------------------------
-   ...
-   9--------------------------------------------------
-   Child info:
-   	addr: 0x263b898, parent: 0x263b7d0
-   	op: negate
-   	text: -$a
-
-   return -$a < 0 ? -$a : $a
+    return $a < 0 ? -$a : $a
                     ---
-   9--------------------------------------------------
+    0: ==================================================
+    1: ==================================================
+    Child info:
+         addr: 0x23065f0, parent: 0x23065a0
+         op: gvsv
+         text: $a
+
+    return $a < 0 ? -$a : $a
+                     --
+    1: ==================================================
+    2: ==================================================
+    Child info:
+         addr: 0x2306630, parent: 0x23065a0
+         op: gvsv
+         text: $a
+
+    return $a < 0 ? -$a : $a
+                     --
+    2: ==================================================
+    3: ==================================================
+    Child info:
+         addr: 0x2306670, parent: 0x23d9720
+         op: lt
+         text: $a < 0
+
+    return $a < 0 ? -$a : $a
+           ------
+    3: ==================================================
+    4: ==================================================
+    Child info:
+         addr: 0x23066b8, parent: 0x2306670
+         op: B::IV=SCALAR(0x2fdb5b8)
+         text: 0
+
+    return $a < 0 ? -$a : $a
+                -
+    4: ==================================================
+    5: ==================================================
+    Child info:
+         addr: 0x23066f8, parent: 0x2306670
+         op: gvsv
+         text: $a
+
+    return $a < 0 ? -$a : $a
+           --
+    5: ==================================================
+    6: ==================================================
+    Child info:
+         addr: 0x2306738, parent: 0x2306670
+         op: gvsv
+         text: $a
+
+    return $a < 0 ? -$a : $a
+           --
+    6: ==================================================
+    9: ==================================================
+    Child info:
+         addr: 0x23d9600, parent: 0x23d9578
+         op: nextstate
+         text:
+
+    return $a < 0 ? -$a : $a
+
+    9: ==================================================
+    10: ==================================================
+    Child info:
+         addr: 0x23d9660, parent: 0x23d9698
+         op: pushmark
+         text: return $a < 0 ? -$a : $a
+
+    return $a < 0 ? -$a : $a
+    ||||||
+    10: ==================================================
+    11: ==================================================
+    Child info:
+         addr: 0x23d9698, parent: 0x23d9578
+         op: return
+         text: return $a < 0 ? -$a : $a
+
+    return $a < 0 ? -$a : $a
+    ------------------------
+    11: ==================================================
+    12: ==================================================
+    Child info:
+         addr: 0x23d96e0, parent: 0x23d9698
+         op: cond_expr
+         text: $a < 0 ? -$a : $a
+
+    return $a < 0 ? -$a : $a
+           -----------------
+    12: ==================================================
+    ....
 
 The subroutine C<extract_node_info> is what produces the text with its underline.
 

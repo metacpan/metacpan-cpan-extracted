@@ -6,7 +6,7 @@ use Carp;
 use Time::HiRes qw( gettimeofday tv_interval );
 
 use vars qw($VERSION);
-$VERSION = sprintf "%d.%02d%02d", q/0.71.7/ =~ /(\d+)/g;
+$VERSION = sprintf "%d.%02d%02d", q/0.71.8/ =~ /(\d+)/g;
 
 use constant BEFORE     => 0;
 use constant ELAPSED    => 1;
@@ -97,7 +97,7 @@ sub reset {
         # Demand load the module we need. We could just
         # require people to install it...
         croak 'Could not load the Statistics::PointEstimation module'
-          unless eval "require Statistics::PointEstimation";
+          unless eval {require Statistics::PointEstimation};
     }
 
     if(%args) {
@@ -255,12 +255,12 @@ sub _report {
     if ($n == 1)
     {
       $report .= sprintf "\%d trial of \%s (\%s total)\n",
-        $n, $tag, timestr($total);
+        $n, $tag, _timestr($total);
     }
     else
     {
       $report .= sprintf "\%d trials of \%s (\%s total), \%s/trial\n",
-        $n, $tag, timestr($total), timestr($total / $n);
+        $n, $tag, _timestr($total), _timestr($total / $n);
     }
 
     if (defined $self->[STAT]->{$tag})
@@ -324,17 +324,17 @@ sub data {
 # ------------------------------------------------------------------------
 # Internal utility subroutines
 
-# timestr($sec) takes a floating-point number of seconds and formats
+# _timestr($sec) takes a floating-point number of seconds and formats
 # it in a sensible way, commifying large numbers of seconds, and
 # converting to milliseconds if it makes sense. Since Time::HiRes has
 # at most microsecond resolution, no attempt is made to convert into
 # anything below that. A unit string is appended to the number.
 
-sub timestr {
+sub _timestr {
     my $sec = shift;
     my $retstr;
     if($sec >= 1_000) {
-        $retstr = commify(int $sec) . 's';
+        $retstr = _commify(int $sec) . 's';
     } elsif($sec >= 1) {
         $retstr = sprintf $sec == int $sec ? '%ds' : '%0.3fs', $sec;
     } elsif($sec >= 0.001) {
@@ -350,11 +350,11 @@ sub timestr {
 }
 
 
-# commify($num) inserts a grouping comma according to en-US standards
+# _commify($num) inserts a grouping comma according to en-US standards
 # for numbers larger than 1000. For example, the integer 123456 would
 # be written 123,456. Any fractional part is left untouched.
 
-sub commify {
+sub _commify {
     my $num = shift;
     return unless $num =~ /\d/;
     return $num if $num < 1_000;

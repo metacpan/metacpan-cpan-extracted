@@ -6,7 +6,7 @@ use Exporter 'import';
 use vars qw(@EXPORT_OK %EXPORT_TAGS);
 
 @Tcl::Tk::ISA = qw(Tcl);
-$Tcl::Tk::VERSION = '1.06';
+$Tcl::Tk::VERSION = '1.10';
 
 sub WIDGET_CLEANUP() {0}
 
@@ -2148,24 +2148,28 @@ package require snit
 	menu $win.menu -tearoff 0
 	set menu $win.menu
         installhull $win
+	set [myvar perlvar] "(undef)"
         # Apply an options passed at creation time.
 	$self configurelist $args
+	puts "warning: more to be done here;"
     }
     method configurevariable {opt val} {
-	#puts "configurevariable... $opt=$val;"
-	# TODO following line write better
-	set perlvar $val
-	set "var$win" [eval "return $$val"]
+	# puts "configurevariable... $opt=$val;"
+	set [myvar perlvar] $val
     }
     method cgetvariable {opt} {
-	#puts "cgetvariable... $opt;$perlvar"
-	return $perlvar
+	# puts "cgetvariable... $opt;$perlvar"
+	return [myvar perlvar]
     }
     method cgetmenu {args} {return $menu}
     method configureoptions {opt vals} {
+	# puts "opt=$opt vals=$vals"
+	# puts "self=$self win=$win myvar=[myvar perlvar]"
+	# puts [$self info vars]
 	# this configure method is rather bogus TODO
+	# puts "vavalr=[set [myvar perlvar]];;"
 	foreach item $vals {
-	    $menu add radiobutton -label [lindex $item 0] -value [lindex $item 1] -variable $perlvar
+	    $menu add radiobutton -label [lindex $item 0] -value [lindex $item 1] -variable [myvar perlvar]"
 	}
     }
 }

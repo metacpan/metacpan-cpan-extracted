@@ -42,7 +42,7 @@ Data::MuForm::Test - provides is_html method used in tests
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ Gerda Shank
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gerda Shank.
+This software is copyright (c) 2018 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

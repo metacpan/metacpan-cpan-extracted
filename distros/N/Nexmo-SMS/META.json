@@ -1,0 +1,93 @@
+{
+   "abstract" : "Module for the Nexmo SMS API!",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Nexmo-SMS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Response" : "5.836",
+            "JSON::PP" : "2.26000",
+            "LWP::Protocol::https" : "6.04",
+            "LWP::UserAgent" : "5.835",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Nexmo::SMS" : {
+         "file" : "lib/Nexmo/SMS.pm",
+         "version" : "0.10"
+      },
+      "Nexmo::SMS::BinaryMessage" : {
+         "file" : "lib/Nexmo/SMS/BinaryMessage.pm",
+         "version" : "0.10"
+      },
+      "Nexmo::SMS::GetBalance" : {
+         "file" : "lib/Nexmo/SMS/GetBalance.pm",
+         "version" : "0.10"
+      },
+      "Nexmo::SMS::MockLWP" : {
+         "file" : "lib/Nexmo/SMS/MockLWP.pm",
+         "version" : "0.10"
+      },
+      "Nexmo::SMS::Response" : {
+         "file" : "lib/Nexmo/SMS/Response.pm",
+         "version" : "0.10"
+      },
+      "Nexmo::SMS::Response::Message" : {
+         "file" : "lib/Nexmo/SMS/Response/Message.pm",
+         "version" : "0.10"
+      },
+      "Nexmo::SMS::TextMessage" : {
+         "file" : "lib/Nexmo/SMS/TextMessage.pm",
+         "version" : "0.10"
+      },
+      "Nexmo::SMS::WAPPushMessage" : {
+         "file" : "lib/Nexmo/SMS/WAPPushMessage.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/perl-Nexmo-SMS/issues"
+      },
+      "homepage" : "http://github.com/reneeb/perl-Nexmo-SMS",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/perl-Nexmo-SMS.git",
+         "web" : "http://github.com/reneeb/perl-Nexmo-SMS"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "Jui-Nan Lin <jnlin@pixnet.tw>",
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>",
+      "Shlomi Fish <shlomif@shlomifish.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

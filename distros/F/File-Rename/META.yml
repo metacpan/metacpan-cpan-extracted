@@ -17,10 +17,10 @@ name: File-Rename
 provides:
   File::Rename:
     file: lib/File/Rename.pm
-    version: '0.35'
+    version: '1.00'
   File::Rename::Options:
-    file: lib/File/Rename.pm
-    version: '0.33'
+    file: lib/File/Rename/Options.pm
+    version: '1.00'
 recommends:
   File::Spec: '0.82'
   Getopt::Long: '2.24'
@@ -31,5 +31,5 @@ requires:
   perl: '5'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.35'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

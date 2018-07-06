@@ -1,6 +1,7 @@
 package MooseX::Adopt::Class::Accessor::Fast;
 
-our $VERSION = '0.00200';
+our $VERSION = '0.009032';
+$VERSION =~ tr/_//d;
 
 $INC{'Class/Accessor/Fast.pm'} = __FILE__;
 

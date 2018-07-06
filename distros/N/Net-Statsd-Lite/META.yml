@@ -19,6 +19,11 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - client
+  - StatsD
+  - metrics
+  - monitoring
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,10 +32,10 @@ name: Net-Statsd-Lite
 provides:
   Net::Statsd::Lite:
     file: lib/Net/Statsd/Lite.pm
-    version: v0.4.3
+    version: v0.4.4
   Net::Statsd::Lite::Types:
     file: lib/Net/Statsd/Lite/Types.pm
-    version: v0.4.3
+    version: v0.4.4
 recommends:
   Type::Tiny::XS: '0'
 requires:
@@ -46,6 +51,8 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Net-Statsd-Lite/issues
   repository: git://github.com/robrwo/Net-Statsd-Lite.git
-version: v0.4.3
+version: v0.4.4
 x_authority: cpan:RRWO
+x_contributors:
+  - 'Toby Inkster <tobyink@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

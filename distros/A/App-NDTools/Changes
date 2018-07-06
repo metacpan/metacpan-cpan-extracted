@@ -1,5 +1,12 @@
 Revision history for App-NDTools
 
+0.5.9   2018-07-03
+        - tests fixed (YAML::XS version check)
+
+0.5.8   2018-07-02
+        - all: fix crashes on YAML::XS version comparsion
+        - nddiff: texts diff rendering fixed for --show mode
+
 0.5.7   2018-06-28
         - nddiff: obsolete --full opt removed
         - nddiff: --full-headers opt deprecated

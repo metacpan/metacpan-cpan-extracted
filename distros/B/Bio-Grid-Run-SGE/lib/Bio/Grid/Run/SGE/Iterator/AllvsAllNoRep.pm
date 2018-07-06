@@ -12,7 +12,7 @@ use constant {
     BEYOND_LAST_ELEMENT => -2,
 };
 
-our $VERSION = '0.064'; # VERSION
+our $VERSION = '0.065'; # VERSION
 
 has cur_comb_idx => ( is => 'rw', lazy_build => 1 );
 

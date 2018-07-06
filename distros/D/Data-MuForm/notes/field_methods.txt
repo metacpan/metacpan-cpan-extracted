@@ -1,0 +1,14 @@
+build_id_method - hmmm. Needed for error messages hashes by id.
+build_label_method : Used in non-rendering messages, etc.
+--- all these transforms will be renamed ---
+default_method
+inflate_method
+deflate_method
+inflate_default_method
+deflate_value_method
+validate_method
+
+--- put in renderer? ---
+wrap_label_method
+trim
+render_filter/html_filter

@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.54 2018-07-04
+
+ - Add support for Bahasa Indonesia
+
 0.53 2018-06-10
 
  - Add support for dutch

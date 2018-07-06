@@ -1,3 +1,11 @@
+Version 1.1008:
+- Prevent CPAN from indexing private-lib
+- Add standard tests
+- Fix compatibility issue with newer versions of perl, which remove "." from
+  @INC.
+- Add missing URI::Escape dependency.
+  https://rt.cpan.org/Ticket/Display.html?id=118700
+
 Version 1.1007: Mon Apr 20 2015
 - Clarify licensing terms
 - Move verbose testing to a private module, and implement it in a way that

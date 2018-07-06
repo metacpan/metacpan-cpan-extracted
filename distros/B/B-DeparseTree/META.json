@@ -4,7 +4,7 @@
       "Rocky Bernstein <rocky@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "gpl_1"
    ],
@@ -22,7 +22,7 @@
       "runtime" : {
          "requires" : {
             "Data::Printer" : "0.40",
-            "perl" : "5.016000",
+            "perl" : "5.014000",
             "rlib" : "0.02",
             "version" : "0"
          }
@@ -37,17 +37,22 @@
    "provides" : {
       "B::DeparseTree" : {
          "file" : "lib/B/DeparseTree.pm",
-         "version" : "v3.2.0"
+         "version" : "v3.3.0"
       },
       "B::DeparseTree::Fragment" : {
          "file" : "lib/B/DeparseTree/Fragment.pm"
       },
-      "B::DeparseTree::Node" : {
-         "file" : "lib/B/DeparseTree/Node.pm",
+      "B::DeparseTree::OPflags" : {
+         "file" : "lib/B/DeparseTree/OPflags.pm",
          "version" : "v3.2.0"
       },
-      "B::DeparseTree::NodeDemo" : {
-         "file" : "lib/B/DeparseTree/Node.pm"
+      "B::DeparseTree::P514" : {
+         "file" : "lib/B/DeparseTree/P514.pm",
+         "version" : "v3.2.0"
+      },
+      "B::DeparseTree::P516" : {
+         "file" : "lib/B/DeparseTree/P516.pm",
+         "version" : "v3.2.0"
       },
       "B::DeparseTree::P518" : {
          "file" : "lib/B/DeparseTree/P518.pm",
@@ -73,6 +78,10 @@
          "file" : "lib/B/DeparseTree/P526c.pm",
          "version" : "v3.2.0"
       },
+      "B::DeparseTree::P528" : {
+         "file" : "lib/B/DeparseTree/P528.pm",
+         "version" : "v3.2.0"
+      },
       "B::DeparseTree::PP" : {
          "file" : "lib/B/DeparseTree/PP.pm",
          "version" : "v3.2.0"
@@ -92,6 +101,13 @@
       "B::DeparseTree::SyntaxTree" : {
          "file" : "lib/B/DeparseTree/SyntaxTree.pm",
          "version" : "v3.2.0"
+      },
+      "B::DeparseTree::TreeNode" : {
+         "file" : "lib/B/DeparseTree/TreeNode.pm",
+         "version" : "v3.2.0"
+      },
+      "B::DeparseTree::TreeNodeDemo" : {
+         "file" : "lib/B/DeparseTree/TreeNode.pm"
       }
    },
    "release_status" : "stable",
@@ -100,6 +116,6 @@
          "http://opensource.org/licenses/gpl-license.php"
       ]
    },
-   "version" : "v3.2.0",
+   "version" : "v3.3.0",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

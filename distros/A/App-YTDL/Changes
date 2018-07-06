@@ -1,6 +1,10 @@
 Revision history for App-YTDL
 
 
+0.302   2018-07-02
+        - "Term::Choose" minimum version is "1.600".
+        - "Term::Choose-Util" minimum version is "0.064".
+
 0.301   2018-06-23
         - Bugfix in video quality "manually".
         - Update option info output.

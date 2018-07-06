@@ -1,8 +1,11 @@
 TODO Perl Interface to CLucene 
 ==============================
 
-2005-May-11
+2005-April-06
 
+Write documentation in CLucene.pm.
 More testing.
-Improve to compile on a wider range of platforms.
+
+Rewrite Makefile/perl to use h2xs and ExtUtils::MakeMaker so it compiles on
+a wider range of platforms.
 

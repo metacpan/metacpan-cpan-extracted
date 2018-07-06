@@ -2531,6 +2531,10 @@ package Sidef::Types::Array::Array {
 
         require Algorithm::Combinatorics;
 
+        if (not defined($block) and ref($k) eq 'Sidef::Types::Block::Block') {
+            ($block, $k) = ($k, undef);
+        }
+
         my $iter = do {
             local $SIG{__WARN__} = sub { };
             Algorithm::Combinatorics::partitions([@$self], defined($k) ? CORE::int($k) : ());
@@ -2913,6 +2917,43 @@ package Sidef::Types::Array::Array {
     }
 
     *msub = \&matrix_sub;
+
+    sub matrix_pow {
+        my ($A, $pow) = @_;
+
+        $pow = CORE::int($pow);
+
+        my $neg = 0;
+
+        if ($pow < 0) {
+            $neg = 1;
+            $pow = -$pow;
+        }
+
+#<<<
+        my $n = $#$A;
+        my $B = bless [map {
+            my $i = $_;
+            bless [map {
+                $i == $_
+                    ? Sidef::Types::Number::Number::ONE
+                    : Sidef::Types::Number::Number::ZERO
+            } 0 .. $n]
+        } 0 .. $n];
+#>>>
+
+        return $B if ($pow == 0);
+
+        while (1) {
+            $B = $B->mmul($A) if ($pow & 1);
+            $pow >>= 1 or last;
+            $A = $A->mmul($A);
+        }
+
+        $neg ? $B->inv : $B;
+    }
+
+    *mpow = \&matrix_pow;
 
     sub cartesian {
         my ($self, $block) = @_;
@@ -3322,6 +3363,7 @@ package Sidef::Types::Array::Array {
 
         *{__PACKAGE__ . '::' . '&'}   = \&and;
         *{__PACKAGE__ . '::' . '*'}   = \&mul;
+        *{__PACKAGE__ . '::' . '**'}  = \&mpow;
         *{__PACKAGE__ . '::' . '<<'}  = \&append;
         *{__PACKAGE__ . '::' . '«'}  = \&append;
         *{__PACKAGE__ . '::' . '>>'}  = \&assign_to;

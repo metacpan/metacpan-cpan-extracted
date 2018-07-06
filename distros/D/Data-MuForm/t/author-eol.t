@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -70,6 +70,7 @@ my @files = (
     'lib/Data/MuForm/Types.pm',
     't/01app.t',
     't/author-eol.t',
+    't/author-no-tabs.t',
     't/basic.t',
     't/compound/basic.t',
     't/compound/default.t',
@@ -134,7 +135,6 @@ my @files = (
     't/memory_cycles.t',
     't/meta_fields.t',
     't/methods.t',
-    't/release-no-tabs.t',
     't/render/actions.t',
     't/render/base.t',
     't/render/basic.t',
@@ -145,6 +145,7 @@ my @files = (
     't/render/list.t',
     't/render/optgroup.t',
     't/render/radio_group.t',
+    't/render/signup_form.t',
     't/render/standard.t',
     't/repeatable/basic.t',
     't/repeatable/defaults.t',
@@ -177,7 +178,8 @@ my @files = (
     't/validation/types.t',
     't/validation/validate_coderef.t',
     't/validation/when.t',
-    't/values.t'
+    't/values.t',
+    't/var/en.po'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

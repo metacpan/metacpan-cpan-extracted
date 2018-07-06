@@ -1,0 +1,159 @@
+<div class="modal-content">
+
+<form action="/post-a-job" class="user_create_form user_create_form_min_2 hiddenLabels" id="user_create_form" method="post" novalidate="novalidate">
+  <div class="cryptorequesttoken">
+    <input name="_token" type="hidden" value="U2FsdGVkX1+MOVrYadNXtXBPlzwEUER/RiuFKsou2rdrOfuWlD+uxXXwz4UxngeiFimOQJqapvMKmPTrvmPuWrD8ypuBTFXX">
+  </div>
+  <div class="step_2_container pb25" id="step_2_container">
+    <div id="step_2_header">
+      <div class="onrampNav for_modal">
+        <div class="simple-checkout-top">
+          <h2 class="simple-checkout-header path_title">Create Your Free Employer Account</h2>
+          <ul class="progress-indicator">
+            <li class="completed last"> <span class="line"></span> <span class="bubble"></span> <span class="step_txt">About You</span> </li>
+            <li> <span class="line"></span> <span class="bubble"></span> <span class="step_txt">Job Details</span> </li>
+            <li> <span class="line"></span> <span class="bubble"></span> <span class="step_txt">Free Trial</span> </li>
+            <li> <span class="line"></span> <span class="bubble"></span> <span class="step_txt">Candidates</span> </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="user_create_form_min_inputs">
+      <div class="type_text text label js-float-labels-wrapper">
+        <label for="name_user_create_form">Your Name</label>
+        <input name="name" type="text" class="type_text" id="name_user_create_form" placeholder="">
+      </div>
+      <div class="type_text email label js-float-labels-wrapper filled">
+        <label for="email_address_user_create_form">Email</label>
+        <input name="email_address" type="email" id="email_address_user_create_form" placeholder="">
+      </div>
+      <div class="email_hint_text" id="hint">
+      </div>
+      <div>
+        <div class="type_text password label js-float-labels-wrapper filled">
+          <label for="password">Create Password</label>
+          <input name="password" type="password" class="required w95pPhone pt0Phone pb0Phone font13Phone lh15Phone mb6Phone type_text" id="password" minlength="6" placeholder="">
+        </div>
+      </div>
+      <div class="type_text tel label js-float-labels-wrapper">
+        <label for="phone_number_user_create_form">Phone Number</label>
+        <input name="phone_number" type="tel" id="phone_number_user_create_form" placeholder="">
+      </div>
+      <div class="select label">
+        <label for="position_user_create_form">- Your Current Title -</label>
+        <select name="position" id="position_user_create_form">
+          <option value="">- Your Current Title -</option>
+          <option value="admin">Admin</option>
+          <option value="hr / talent professional">HR / Talent Professional</option>
+          <option value="manager / head of department">Manager / Head of Department</option>
+          <option value="director / vp">Director / VP</option>
+          <option value="c-level">C-Level</option>
+          <option value="business owner">Business Owner</option>
+          <option value="recruiting/staffing firm">Recruiting/Staffing Firm</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="type_text text label js-float-labels-wrapper">
+        <label for="org_name_user_create_form">Company Name</label>
+        <input name="org_name" type="text" id="org_name_user_create_form" placeholder="" autocomplete="off">
+      </div>
+      <div class="type_text text label js-float-labels-wrapper">
+        <label for="zipcode">Zip Code</label>
+        <input name="zipcode" type="text" id="zipcode" maxlength="11" placeholder="">
+      </div>
+      <div class="type_text text label js-float-labels-wrapper">
+        <label for="website_user_create_form">Company Website (optional)</label>
+        <input name="website" type="text" id="website_user_create_form" placeholder="">
+      </div>
+      <input name="org_type" type="hidden" id="org_type_user_create_form" value="medium-company-20">
+      <div class="select label" style="display: none;">
+        <label for="org_ats_user_create_form">What ATS do you use?</label>
+          <select name="org_ats" id="org_ats_user_create_form">
+          <option value="">- What ATS do you use? -</option>
+          <option value="adp">ADP</option>
+          <option value="greenhouse">Greenhouse</option>
+          <option value="icims">iCIMS</option>
+          <option value="jobvite">Jobvite</option>
+          <option value="kenexabrassring">Kenexa Brassring</option>
+          <option value="lever">Lever</option>
+          <option value="silkroad">Silkroad</option>
+          <option value="successfactors">SuccessFactors</option>
+          <option value="taleo">Taleo</option>
+          <option value="ultipro">Ultipro</option>
+          <option value="other">Other</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+      <div class="select label" style="display: none;">
+        <label for="org_hire_budget_user_create_form">What is your hiring budget?</label>
+        <select name="org_hire_budget" id="org_hire_budget_user_create_form">
+          <option value="">- What's your monthly hiring budget? -</option>
+          <option value="<500">Less than $500</option>
+          <option value="500-2500">$500 - $2,500</option>
+          <option value="2501-5000">$2,501 - $5,000</option>
+          <option value="5000+">$5,000+</option>
+        </select>
+      </div>
+      <div class="select label">
+        <label for="requested_plan_user_create_form">Number of Jobs</label>
+        <select name="requested_plan" id="requested_plan_user_create_form">
+          <option value="">- How many jobs do you need to fill? -</option>
+          <option value="starter#1">1 job</option>
+          <option value="starter">2 to 3 jobs</option>
+          <option value="team">4 to 10 jobs</option>
+          <option value="company">11 to 20 jobs</option>
+          <option value="big_50">21 to 50 jobs</option>
+          <option value="big_100">50 to 100 jobs</option>
+          <option value="big_250">100 to 250 jobs</option>
+          <option value="big_250_plus">250+ jobs</option>
+        </select>
+      </div>
+      <div class="select label">
+        <label for="source_type_user_reported">How did you hear about us?</label>
+        <select name="source_type_user_reported" class="source_type_user_reported" data-where-field="source_type_user_reported_specific" id="source_type_user_reported">
+          <option value="">- How did you hear about us? -</option>
+          <option value="streaming" data-where="Which streaming service did you hear us on? (optional)">Streaming Audio (e.g. Spotify)</option>
+          <option value="tv" data-where="Which TV station did you see us on? (optional)">TV</option>
+          <option value="search_engine">Search Engine</option>
+          <option value="mail" data-where="Offer code (optional)">In the Mail</option>
+          <option value="radio_or_podcast" data-where="Which radio station did you hear us on? (optional)">Radio (AM/FM/XM)</option>
+          <option value="magazine_ad" data-where="Offer code (optional)">Magazine ad / insert</option>
+          <option value="podcast" data-where="Which podcast did you hear us on? (optional)">Podcast</option>
+          <option value="billboard">Billboard</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="type_text source_type_user_reported_specific_wrapper text label js-float-labels-wrapper" style="display:none;">
+        <label for="source_type_user_reported_specific_user_create_form">Radio/TV station or mail offer code (optional)</label>
+        <input name="source_type_user_reported_specific" type="text" class="source_type_user_reported_specific" id="source_type_user_reported_specific_user_create_form" placeholder="">
+      </div>
+      <div class="submit">
+        <input name="submitted" type="submit" value="Continue" class="create_submit_button" id="submitted_user_create_form">
+      </div>
+      <div class="checkbox label" style="display:none;">
+        <label for="agrees_to_terms_user_create_form"><span class="terms_links_label">By clicking 'Continue' I agree to the ZipRecruiter <a href="/terms" target="_blank">Terms of Use</a> and acknowledge I have read the <a href="/privacy" target="_blank">Privacy Policy</a>.</span></label>
+        <input name="agrees_to_terms" type="checkbox" value="1" checked="checked" id="agrees_to_terms_user_create_form">
+      </div>
+      <div id="agrees_to_tcpa_terms_wrapper_bottom" style="padding-top: 20px;">
+        <div class="checkbox label" style="margin-bottom: 0">
+        <label for="agrees_to_tcpa_terms_user_create_form"><span class="tcpa-terms">I agree to let ZipRecruiter contact me by phone at the number above <a href="javascript:void(0);" data-tooltip-placement="top" rel="tooltip" title="With your free trial, you can receive offers for ZipRecruiter services by phone or text at the number you provided when you signed up.  We might contact you using an automatic telephone dialing system or leave a prerecorded message if we can’t reach you.  We find that customers appreciate receiving these offers, though consent is not required as a condition of signing up for service or purchasing anything from ZipRecruiter.  You can also revoke consent at any time by e-mailing businessaffairs@ziprecruiter.com and including &quot;Revocation of Telephone Consent&quot; in the subject line."></a></span></label>
+        <input name="agrees_to_tcpa_terms" type="checkbox" value="1" checked="checked" id="agrees_to_tcpa_terms_user_create_form">
+        </div>
+        <div class="agrees_to_terms_alert info">
+          <div>By opting out of calls you may miss out on help optimizing your job ads, certain promotional offers, and/or other account management communications.</div>
+        </div>
+      </div>
+      <div class="agrees_to_terms_wrapper">
+        <div id="terms_and_privacy">
+        <span class="terms_links_label">By clicking 'Continue' I agree to the ZipRecruiter <a href="/terms" target="_blank">Terms of Use</a> and acknowledge I have read the <a href="/privacy" target="_blank">Privacy Policy</a>.</span>
+        </div>
+      </div>
+    </div>
+    <input name="get_newsletter" type="hidden" value="1">
+    <input name="submitted" type="hidden" value="1">
+    <div class="autocomplete-suggestions " style="top: 479.797px; left: 30.7969px; width: 538px;"></div>
+  </div>
+</form>
+
+<button class="modal-close">Close</button>
+</div>

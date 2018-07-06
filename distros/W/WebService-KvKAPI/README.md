@@ -1,0 +1,71 @@
+# DESCRIPTION
+
+Query the KvK API via their OpenAPI definition.
+
+# SYNOPSIS
+
+    use WebService::KvKAPI;
+    my $api = WebService::KvKAPI->new(
+        api_key => 'foobar',
+    );
+
+    $api->search();
+    $api->search_all();
+    $api->search_max();
+
+# ATTRIBUTES
+
+## api\_key
+
+The KvK API key. You can request one at [https://developers.kvk.nl/](https://developers.kvk.nl/).
+
+## client
+
+An [OpenAPI::Client](https://metacpan.org/pod/OpenAPI::Client) object. Build for you.
+
+# METHODS
+
+## api\_call
+
+Directly do an API call towards the KvK API. Returns the JSON datastructure as an `HashRef`.
+
+## profile
+
+Retreive detailed information of one company. Dies when the company
+cannot be found. Make sure to call `search` first in case you don't
+want to die.
+
+## search
+
+Search the KVK, only retrieves the first 10 entries.
+
+    my $results = $self->search(kvkNumber => 12345678, ...);
+    foreach (@$results) {
+        ...;
+    }
+
+## search\_all
+
+Search the KVK, retreives ALL entries. Potentially a very expensive call
+(money wise). Don't lookup the Albert Heijn KvK number, do more specific
+searches
+
+    my $results = $self->search_all(kvkNumber => 12345678, ...);
+    foreach (@$results) {
+        ...;
+    }
+
+## search\_max
+
+Search the KVK, retreives a maximum of X results up the the nearest 10, eg 15 as a max returns 20 items.
+
+    my $results = $self->search_max(15, kvkNumber => 12345678, ...);
+    foreach (@$results) {
+        ...;
+    }
+
+# SEE ALSO
+
+The KvK also has test endpoints. While they are supported via the direct
+`api_call` method, you can instantiate a model that works only in
+spoofmode: [WebService::KvKAPI::Spoof](https://metacpan.org/pod/WebService::KvKAPI::Spoof)

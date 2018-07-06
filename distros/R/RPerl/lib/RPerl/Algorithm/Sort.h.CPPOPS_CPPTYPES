@@ -2,7 +2,7 @@
 using std::cout;  using std::cerr;  using std::endl;
 
 #ifndef __CPP__INCLUDED__RPerl__Algorithm__Sort_h
-#define __CPP__INCLUDED__RPerl__Algorithm__Sort_h 0.010_000
+#define __CPP__INCLUDED__RPerl__Algorithm__Sort_h 0.011_000
 
 // [[[ INCLUDES & OO INHERITANCE INCLUDES ]]]
 #include <RPerl.cpp>  // -> RPerl.h -> (rperltypes_mode.h; rperloperations.h; rperltypes.h; HelperFunctions.cpp)
@@ -24,8 +24,8 @@ public:
     // [[[ OO METHODS ]]]
 
     // <<< OO PROPERTIES, ACCESSORS & MUTATORS >>>
-    string get_foo() { return this->foo; }
-    void set_foo(string foo_new) { this->foo = foo_new; }
+    string get_foo() { return foo; }  // inherited from RPerl::Algorithm::
+    void set_foo(string foo_new) { foo = foo_new; }  // inherited from RPerl::Algorithm::
 
     // <<< CONSTRUCTOR & DESTRUCTOR >>>
     RPerl__Algorithm__Sort() {}
@@ -35,9 +35,9 @@ public:
     virtual string myclassname() { return (const string) "RPerl::Algorithm::Sort"; }
 
     // <<< USER-DEFINED METHODS >>>
-    void inherited__Sort(string person);
-    string inherited__Sort_foo_get();
-    void inherited__Sort_foo_set(string foo_new);
+    void inherited_Sort(string person);
+    string inherited_Sort_foo_get();
+    void inherited_Sort_foo_set(string foo_new);
 };  // end of class
 
 // [[[ OO SUBCLASSES ]]]
@@ -47,11 +47,22 @@ typedef std::vector<RPerl__Algorithm__Sort_ptr> RPerl__Algorithm__Sort_arrayref;
 typedef std::unordered_map<string, RPerl__Algorithm__Sort_ptr> RPerl__Algorithm__Sort_hashref;
 typedef std::unordered_map<string, RPerl__Algorithm__Sort_ptr>::iterator RPerl__Algorithm__Sort_hashref_iterator;
 
+// [[[ OO CONSTRUCTOR WRAPPER CLASS ]]]
+class NEW_RPerl__Algorithm__Sort {
+public:
+    RPerl__Algorithm__Sort_ptr wrapped_object;
+    NEW_RPerl__Algorithm__Sort() : wrapped_object{new RPerl__Algorithm__Sort()} {}
+    RPerl__Algorithm__Sort_ptr&& NEW() { return std::move(wrapped_object); }
+
+    // <<< OO PROPERTIES, INITIALIZERS >>>
+    NEW_RPerl__Algorithm__Sort& foo(string foo_init) { wrapped_object->foo = foo_init; return *this; }  // inherited from RPerl::Algorithm::
+};
+
 // [[[ SUBROUTINES ]]]
-string RPerl__Algorithm__Sort__uninherited__Sort(string person);
+string RPerl__Algorithm__Sort__uninherited_Sort(string person);
 
 // <<< SHIM MACROS >>>
-#define uninherited__Sort(person) RPerl__Algorithm__Sort__uninherited__Sort(person)
+#define uninherited_Sort(person) RPerl__Algorithm__Sort__uninherited_Sort(person)
 
 // <<< OPERATIONS & DATA TYPES REPORTER >>>
 integer RPerl__Algorithm__Sort__MODE_ID() { return 2; }  // CPPOPS_CPPTYPES is 2

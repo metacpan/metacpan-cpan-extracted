@@ -1,8 +1,9 @@
 package t::Util;
 
+use 5.012000;
 use strict;
 use warnings;
-use AWS::XRay;
+use AWS::XRay 0.05;
 use Exporter 'import';
 use Test::More;
 use IO::Scalar;
@@ -10,11 +11,15 @@ use JSON::XS;
 
 our @EXPORT_OK = qw/ reset segments /;
 
+my $sock;
 my $buf;
 no warnings 'redefine';
 
 *AWS::XRay::sock = sub {
-    IO::Scalar->new(\$buf);
+    $sock //= AWS::XRay::Buffer->new(
+        IO::Scalar->new(\$buf),
+        AWS::XRay->auto_flush,
+    );
 };
 
 sub reset {

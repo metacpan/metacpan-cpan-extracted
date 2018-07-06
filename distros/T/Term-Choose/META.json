@@ -39,7 +39,6 @@
             "Carp" : "0",
             "Exporter" : "0",
             "Term::ReadKey" : "0",
-            "Unicode::GCString" : "0",
             "constant" : "0",
             "perl" : "5.008003",
             "strict" : "0",
@@ -55,6 +54,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose"
       }
    },
-   "version" : "1.518",
+   "version" : "1.600",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

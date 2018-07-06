@@ -1,0 +1,21 @@
+  {text}
+    @@ -2,12  +2,12 @@
+    another common line.
+    And one more common line.
+    Still a common line, but last, next will be different.
+-   First string for a.
+-   Second striing for a.
+-   Third string, belongs to file a.
+-   And fourth. Again to a.
++   First string for b.
++   Second striing for b.
++   Third string, belongs to file b.
++   And fourth. Again to b.
+    Wow! Common strings began! =)
+    Another common line.
+-   Different line. AAaaaaa!!
+-   Aaaaa!!
+-   A!
++   Different line. BBbbbbb!!
++   Bbbbb!!
++   B!

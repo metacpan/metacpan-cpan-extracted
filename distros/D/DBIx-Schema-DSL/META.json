@@ -4,7 +4,7 @@
       "Masayuki Matsuki <y.songmu@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.3.0",
+   "generated_by" : "Minilla/v3.1.0",
    "license" : [
       "perl_5"
    ],
@@ -26,14 +26,9 @@
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0.98"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -51,14 +46,19 @@
             "Clone" : "0.06",
             "Moo" : "1.000003",
             "SQL::Translator" : "0.11019",
-            "perl" : "5.008001"
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
          }
       }
    },
    "provides" : {
       "DBIx::Schema::DSL" : {
          "file" : "lib/DBIx/Schema/DSL.pm",
-         "version" : "0.12"
+         "version" : "1.0000"
       },
       "DBIx::Schema::DSL::Context" : {
          "file" : "lib/DBIx/Schema/DSL/Context.pm"
@@ -75,10 +75,13 @@
          "web" : "https://github.com/Songmu/p5-DBIx-Schema-DSL"
       }
    },
-   "version" : "0.12",
+   "version" : "1.0000",
+   "x_authority" : "cpan:SONGMU",
    "x_contributors" : [
-      "tokubass <tomi21110@gmail.com>",
+      "karupanerura <karupa@cpan.org>",
       "tokubass <tokubass@cpan.org>",
-      "karupanerura <karupa@cpan.org>"
-   ]
+      "tokubass <tomi21110@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

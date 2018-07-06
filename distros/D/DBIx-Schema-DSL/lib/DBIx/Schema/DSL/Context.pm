@@ -3,9 +3,9 @@ use 5.008_001;
 use strict;
 use warnings;
 
-use Moo;
-use Clone qw/clone/;
-use SQL::Translator;
+use Moo 1.000003;
+use Clone 0.06 qw/clone/;
+use SQL::Translator 0.11019;
 
 has name => (
     is  => 'rw',

@@ -6,7 +6,9 @@ build_requires:
   ExtUtils::MakeMaker: 6.36
   File::Slurp: 0
   File::Spec::Functions: 0
+  Test::Compile: 0
   Test::More: 0
+  UNIVERSAL::require: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
   URI::Escape: 0

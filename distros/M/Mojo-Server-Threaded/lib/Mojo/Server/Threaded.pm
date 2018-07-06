@@ -1,7 +1,7 @@
 package Mojo::Server::Threaded;
 use Mojo::Base 'Mojo::Server::Daemon';
 
-our $VERSION = 0.13;
+our $VERSION = 0.15;
 
 use threads('stack_size' => 64*4096);
 use Thread::Queue;
@@ -295,6 +295,7 @@ sub _worker {
       delete $self->{QUIT};
       $trace && $log->debug("Worker $tid: got QUIT");
       $self->max_requests(1);
+      $self->close_connections if $self->can('close_connections');
       $loop->stop_gracefully;
       $finished = 1;
       $trace && $log->debug("Worker $tid: loop should end");
@@ -471,7 +472,7 @@ and implements the following new ones.
 
   $threaded->on(command => sub {
     my($threaded, $command, @params) = @_;
-    say "got command $command on mamagement port";
+    say "got command $command on management port";
     ...
   });
 
@@ -549,6 +550,6 @@ Once running this should not affect performance too much.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

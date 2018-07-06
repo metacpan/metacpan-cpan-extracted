@@ -5,11 +5,11 @@ use warnings;
 use Carp;
 use Path::Tiny ();
 use Scalar::Util qw/blessed/;
-use Capture::Tiny 0.17 qw/capture_merged/;
+use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '1.46'; # VERSION
+our $VERSION = '1.48'; # VERSION
 
 
 sub import {
@@ -187,7 +187,7 @@ sub _pkgconfig_keyword {
     my $command = Alien::Base::PkgConfig->pkg_config_command . " @{[ $static ? '--static' : '' ]} --\L$keyword\E $name";
 
     $! = 0;
-    chomp ( my $pcdata = capture_merged { system( $command ) } );
+    chomp ( my $pcdata = capture_stdout { system( $command ) } );
 
     # if pkg-config fails for whatever reason, then we try to
     # fallback on alien_provides_*
@@ -515,7 +515,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 1.46
+version 1.48
 
 =head1 SYNOPSIS
 

@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Role::Type;
-$JSONAPI::Document::Builder::Role::Type::VERSION = '1.7';
+$JSONAPI::Document::Builder::Role::Type::VERSION = '2.0';
 =head1 NAME
 
 JSONAPI::Document::Builder::Role::Type - Normalizer for document types
 
 =head1 VERSION
 
-version 1.7
+version 2.0
 
 =head1 DESCRIPTION
 
@@ -39,7 +39,7 @@ sub format_type {
     unless ($type) {
         Carp::confess('Missing argument: type');
     }
-    $type =~ s/_/-/g;
+    $type =~ s/[_-]+/-/g;
     return lc $type;
 }
 
@@ -60,7 +60,7 @@ sub document_type {
             unless (scalar(@words) > 0) {
                 push @words, $noun->plural;
             }
-            @words = map { $_ } grep { $_ =~ m/\A(?:[A-Za-z]+)\z/ } @words;
+            @words = map { $_ } grep { $_ =~ m/\A(?:[A-Za-z_]+)\z/ } @words;
             return $self->format_type(join('-', @words));
         });
     return $result;

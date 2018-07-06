@@ -15,17 +15,17 @@ using std::cout;  using std::cerr;  using std::endl;
 
 // [[[ SUBROUTINES & OO METHODS ]]]
 
-void RPerl__Algorithm__Sort::inherited__Sort(SV* person) {
-    cout << "in CPPOPS_PERLTYPES Sort->inherited__Sort(), have ::class($self) = " << SvPV_nolen(classname(this)) << " and $person = " << SvPV_nolen(person) << ", FISH\n";
+void RPerl__Algorithm__Sort::inherited_Sort(SV* person) {
+    cout << "in CPPOPS_PERLTYPES Sort->inherited_Sort(), have ::class($self) = " << SvPV_nolen(classname(this)) << " and $person = " << SvPV_nolen(person) << ", FISH\n";
 }
 
 //void RPerl__Algorithm__Sort::inherited(SV* person) {
 //    cout << "in CPPOPS_PERLTYPES Sort->inherited(), have ::class($self) = " << SvPV_nolen(classname(this)) << " and $person = " << SvPV_nolen(person) << ", IN\n";
 //}
 
-SV* uninherited__Sort(SV* person) {
-    cout << "in CPPOPS_PERLTYPES Sort::uninherited__Sort(), received $person = " << SvPV_nolen(person) << ", MY\n";
-    return newSVpv("Sort::uninherited__Sort() RULES! CPPOPS_PERLTYPES", 0);
+SV* uninherited_Sort(SV* person) {
+    cout << "in CPPOPS_PERLTYPES Sort::uninherited_Sort(), received $person = " << SvPV_nolen(person) << ", MY\n";
+    return newSVpv("Sort::uninherited_Sort() RULES! CPPOPS_PERLTYPES", 0);
 }
 
 //SV* uninherited(SV* person) {
@@ -45,17 +45,17 @@ SV* uninherited__Sort(SV* person) {
 
 // [[[ SUBROUTINES & OO METHODS ]]]
 
-void RPerl__Algorithm__Sort::inherited__Sort(string person) {
-    RPerl::diag((const string) "in CPPOPS_CPPTYPES Sort->inherited__Sort(), have ::class($self) = " + classname(this) + (const string) " and $person = " + person + (const string) ", FISH" + (const string) "\n");
+void RPerl__Algorithm__Sort::inherited_Sort(string person) {
+    RPerl::diag((const string) "in CPPOPS_CPPTYPES Sort->inherited_Sort(), have ::class($self) = " + classname(this) + (const string) " and $person = " + person + (const string) ", FISH" + (const string) "\n");
 }
 
 //void RPerl__Algorithm__Sort::inherited(string person) {
 //    RPerl::diag((const string) "in CPPOPS_CPPTYPES Sort->inherited(), have ::class($self) = " + classname(this) + (const string) " and $person = " + person + (const string) ", IN" + (const string) "\n");
 //}
 
-string uninherited__Sort(string person) {
-    RPerl::diag((const string) "in CPPOPS_CPPTYPES Sort::uninherited__Sort(), received $person = " + person + (const string) ", MY" + (const string) "\n");
-    return (const string) "Sort::uninherited__Sort() RULES! CPPOPS_CPPTYPES";
+string uninherited_Sort(string person) {
+    RPerl::diag((const string) "in CPPOPS_CPPTYPES Sort::uninherited_Sort(), received $person = " + person + (const string) ", MY" + (const string) "\n");
+    return (const string) "Sort::uninherited_Sort() RULES! CPPOPS_CPPTYPES";
 }
 
 //string uninherited(string person) {

@@ -51,5 +51,5 @@ requires:
   XML::LibXML: '0'
   parent: '0'
   perl: '5.010'
-version: '0.064'
+version: '0.065'
 x_serialization_backend: 'YAML::Tiny version 1.70'

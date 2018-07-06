@@ -1,12 +1,12 @@
 # CLucene.pm
 #
-# Copyright(c) 2005 Peter Edwards <peterdragon@users.sourceforge.net>
+# Copyright(c) 2005 Peter Edwards peterdragon@users.sourceforge.net
 # All rights reserved. This package is free software; you can redistribute
 # it and/or modify it under the same terms as Perl itself.
 
 package CLucene;
 
-our $VERSION = '1.00';
+our $VERSION = '1.03';
 
 use CLuceneWrap;
 

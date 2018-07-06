@@ -3,66 +3,16 @@ package File::Rename;
 use strict;
 BEGIN { eval { require warnings; warnings->import } }
 
-use base qw(Exporter);
-use vars qw(@EXPORT_OK $VERSION);
+our @EXPORT_OK = qw( rename );
+our $VERSION = '1.00';
 
-@EXPORT_OK = qw( rename );
-$VERSION = '0.35';
-
-package File::Rename::Options;
-
-use vars qw($VERSION);
-$VERSION = '0.33';
-
-use Getopt::Long ();
-
-eval{ Getopt::Long::Configure qw(
-	posix_default
-	no_ignore_case
-	no_require_order
-); 1 } or warn $@;
-
-sub GetOptions {
-    my @expression;
-    Getopt::Long::GetOptions(
-	'-v|verbose'	=> \my $verbose,
-	'-0|null'	=> \my $null,
-	'-n|nono'	=> \my $nono,
-	'-f|force'	=> \my $force,
-	'-h|?|help'	=> \my $help,
-	'-m|man'	=> \my $man,
-	'-V|version'	=> \my $version,
-	'-e=s'		=> \@expression,
-	'-E=s'		=>
-	    sub {
-		my(undef, $e) = @_;
-		$e .= ';'; 
-		push @expression, $e; 
-	    },
-    ) or return;
-
-    my $options = {
-	verbose 	=> $verbose,
-	input_null	=> $null,
-	no_action	=> $nono,
-	over_write	=> $force,
-	show_help	=> $help,
-	show_manual	=> $man,
-	show_version	=> $version,
-    };
-    return $options if $help or $man or $version;
-	 
-    if( @expression ) {
-	$options->{_code} = join "\n", @expression;
-    }
-    else { 
-	return unless @ARGV;
-	$options->{_code} = shift @ARGV;
-    } 
-    return $options;
+sub import {
+    require Exporter;
+    our @ISA = qw(Exporter);
+    my( $pack ) = @_;
+    $pack->export_to_level(1, @_);
+    require File::Rename::Options;
 }
- 
-package File::Rename;
 
 sub rename_files {
     my $code = shift;
@@ -116,17 +66,20 @@ sub rename {
     my($argv, $code, $verbose) = @_;
     if( ref $code ) {
 	if( 'HASH' eq ref $code ) {
-	    require Carp;
 	    if(defined $verbose ) {
+	        require Carp;
 		Carp::carp(<<CARP);
 File::Rename::rename: third argument ($verbose) ignored
 CARP
 	    } 
 	    $verbose = $code;
-	    $code = delete $verbose->{_code}
-	    	or Carp::carp(<<CARP);
+	    $code = delete $verbose->{_code};
+	    unless ( $code ) {
+	    	require Carp;
+		Carp::carp(<<CARP);
 File::Rename::rename: no _code in $verbose
 CARP
+	    }
 
 	}	
     } 
@@ -210,7 +163,7 @@ for C<rename> must be an ARRAY reference
 
 Subroutine to change file names,
 for C<rename> can be a string,
-otherside a code reference
+otherwise it is a code reference
 
 =item VERBOSE
 

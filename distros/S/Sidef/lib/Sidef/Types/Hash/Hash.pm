@@ -97,7 +97,7 @@ package Sidef::Types::Hash::Hash {
         my $sub = sub {
             my ($h1, $h2) = @_;
 
-            scalar(%$h1) eq scalar(%$h2)
+            scalar(CORE::keys(%$h1)) == scalar(CORE::keys(%$h2))
               or return (Sidef::Types::Bool::Bool::FALSE);
 
             my $refaddr1 = Scalar::Util::refaddr($h1);
@@ -143,7 +143,7 @@ package Sidef::Types::Hash::Hash {
         my ($self, $obj) = @_;
 
         if (ref($self) ne ref($obj)
-            or %$self ne %{$obj}) {
+            or scalar(CORE::keys(%$self)) != scalar(CORE::keys(%{$obj}))) {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 

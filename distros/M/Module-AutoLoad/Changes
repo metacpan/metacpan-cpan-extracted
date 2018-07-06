@@ -1,5 +1,11 @@
 Revision history for Perl extension Module::AutoLoad.
 
+0.06  Tue Jul  3 14:30 2018
+ - Avoid using st.aticpan.org
+
+0.05  Tue Jul  3 14:00 2018
+ - Ported to use the new fastapi.metacpan.org
+
 0.04  Sun Feb  8 10:00 2015
  - More accurate t/01_network.t test for HTTP/0.9 support.
  - Shortened MAGIC a few more characters.

@@ -9,11 +9,11 @@ package Docker::Registry::ECR;
     sprintf 'https://%s.dkr.ecr.%s.amazonaws.com', $self->account_id, $self->region;
   });
 
-  has '+auth' => (lazy => 1, default => sub {
+  override build_auth => sub {
     my $self = shift;
     require Docker::Registry::Auth::ECR;
     Docker::Registry::Auth::ECR->new(region => $self->region);
-  });
+  };
 
   has account_id => (is => 'ro', isa => 'Str');
   has region => (is => 'ro', isa => 'Str');

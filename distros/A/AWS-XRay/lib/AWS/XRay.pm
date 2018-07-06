@@ -8,11 +8,12 @@ use Crypt::URandom ();
 use IO::Socket::INET;
 use Time::HiRes ();
 use AWS::XRay::Segment;
+use AWS::XRay::Buffer;
 
 use Exporter 'import';
 our @EXPORT_OK = qw/ new_trace_id capture capture_from trace /;
 
-our $VERSION = "0.04";
+our $VERSION = "0.06";
 
 our $TRACE_ID;
 our $SEGMENT_ID;
@@ -20,6 +21,7 @@ our $ENABLED;
 our $SAMPLED;
 our $SAMPLING_RATE = 1;
 our $SAMPLER       = sub { rand() < $SAMPLING_RATE };
+our $AUTO_FLUSH    = 1;
 
 our $DAEMON_HOST = "127.0.0.1";
 our $DAEMON_PORT = 2000;
@@ -46,12 +48,28 @@ sub sampler {
     $SAMPLER;
 }
 
+sub auto_flush {
+    my $class = shift;
+    if (@_) {
+        my $auto_flush = shift;
+        if ($auto_flush != $AUTO_FLUSH) {
+            $Sock->close if $Sock && $Sock->can("close");
+            undef $Sock; # regenerate
+        }
+        $AUTO_FLUSH = $auto_flush;
+    }
+    $AUTO_FLUSH;
+}
+
 sub sock {
-    $Sock //= IO::Socket::INET->new(
-        PeerAddr => $DAEMON_HOST || "127.0.0.1",
-        PeerPort => $DAEMON_PORT || 2000,
-        Proto    => "udp",
-    );
+    $Sock //= AWS::XRay::Buffer->new(
+            IO::Socket::INET->new(
+                PeerAddr => $DAEMON_HOST || "127.0.0.1",
+                PeerPort => $DAEMON_PORT || 2000,
+                Proto    => "udp",
+            ),
+            $AUTO_FLUSH,
+        );
 }
 
 sub new_trace_id {
@@ -258,6 +276,14 @@ Set/Get a code ref to sample for capture().
            return 0;
         }
     });
+
+=head2 auto_flush($mode)
+
+Set/Get auto flush mode.
+
+When $mode is 1 (default), segment data will be sent to xray daemon immediately after capture() called.
+
+When $mode is 0, segment data are buffered in memory. You should call AWS::XRay->sock->flush() to send the buffered segment data or call AWS::XRay->sock->close() to discard the buffer.
 
 =head2 AWS_XRAY_DAEMON_ADDRESS environment variable
 

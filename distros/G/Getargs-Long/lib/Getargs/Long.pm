@@ -6,7 +6,7 @@ use 5.005;
 package Getargs::Long;
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = sprintf "%d.%02d%02d", q/1.10.7/ =~ /(\d+)/g;
+$VERSION = sprintf "%d.%02d%02d", q/1.10.8/ =~ /(\d+)/g;
 
 BEGIN
 {
@@ -67,7 +67,7 @@ my %subcache = ();
 # Optional arguments with no default return undef.  Mandatory arguments cannot
 # be undefined.
 #
-sub getargs (\@@) { _getargs(scalar(caller), 0, "", @_) }
+sub getargs (\@@) { _getargs(scalar(caller), 0, "", @_) } ## no critic (ProhibitSubroutinePrototypes)
 
 #
 # cgetargs
@@ -77,7 +77,7 @@ sub getargs (\@@) { _getargs(scalar(caller), 0, "", @_) }
 # When called from within an eval, caching is not possible, so this routine
 # must not be called.
 #
-sub cgetargs (\@@) {
+sub cgetargs (\@@) { ## no critic (ProhibitSubroutinePrototypes)
 	my $sub = (caller(1))[3];	# Anomaly in caller(), will also get pkg name
 	logcroak "can't call cgetargs from within an eval"
 		if $sub =~ /^\(eval/;
@@ -90,7 +90,7 @@ sub cgetargs (\@@) {
 # Like getargs(), but with extended specifications allowing to specify
 # defaults for non-mandatory arguments.
 #
-sub xgetargs (\@@) { _getargs(scalar(caller), 1, "", @_) }
+sub xgetargs (\@@) { _getargs(scalar(caller), 1, "", @_) } ## no critic (ProhibitSubroutinePrototypes)
 
 #
 # cxgetargs
@@ -102,7 +102,7 @@ sub xgetargs (\@@) { _getargs(scalar(caller), 1, "", @_) }
 # When called from within an eval, caching is not possible, so this routine
 # must not be called.
 #
-sub cxgetargs (\@@) {
+sub cxgetargs (\@@) { ## no critic (ProhibitSubroutinePrototypes)
 	my $sub = (caller(1))[3];	# Anomaly in caller(), will also get pkg name
 	logcroak "can't call cxgetargs from within an eval"
 		if $sub =~ /^\(eval/;
@@ -293,7 +293,7 @@ sub _getargs {
 
 	if ($subname ne '') {
 		my $lc = $case_insensitive ? 'lc' : '';
-		my $sub = &q(<<'EOS');
+		my $sub = &_q(<<'EOS');
 :sub {
 :	my $aref_orig = shift;
 :	my @result;
@@ -303,7 +303,7 @@ sub _getargs {
 :	local $Getargs::Long::dflt;
 :	my $i = 0;
 EOS
-		$sub .= &q(<<EOS);
+		$sub .= &_q(<<EOS);
 :	logxcroak 3, "expected an even number of arguments" if \@\$aref_orig % 2;
 :
 :	my \%args = map {
@@ -311,25 +311,25 @@ EOS
 EOS
 
 		# Sanity check: no argument can be given twice
-		$sub .= &q(<<EOS);
-:	spot_dups(\$aref_orig, $case_insensitive, 3)
+		$sub .= &_q(<<EOS);
+:	_spot_dups(\$aref_orig, $case_insensitive, 3)
 :		if 2 * scalar(keys \%args) != \@\$aref_orig;
 :
 EOS
 		# Work on a copy if extra and no inplace
 		if ($extra && !$inplace) {
-			$sub .= &q(<<'EOS');
+			$sub .= &_q(<<'EOS');
 :	my $aref = [@$aref_orig];
 EOS
 		} else {
-			$sub .= &q(<<'EOS');
+			$sub .= &_q(<<'EOS');
 :	my $aref = $aref_orig;
 EOS
 		}
 
 		# Index arguments if inplace editing or extra
 		if ($inplace || $extra) {
-			$sub .= &q(<<'EOS');
+			$sub .= &_q(<<'EOS');
 :
 :	my $idx;
 :	my %idx;
@@ -337,10 +337,10 @@ EOS
 :		my $key = $aref->[$j];
 :		$key =~ s/^-//;
 EOS
-			$sub .= &q(<<'EOS') if $case_insensitive;
+			$sub .= &_q(<<'EOS') if $case_insensitive;
 :		$key = lc($key);
 EOS
-			$sub .= &q(<<'EOS');
+			$sub .= &_q(<<'EOS');
 :		$idx{$key} = $j;
 :	}
 :
@@ -351,7 +351,7 @@ EOS
 			my ($name, $type, $optional, $dflt) = @$arg;
 			my $has_default = defined $dflt;
 			local $^W = 0;		# Shut up Test::Harness
-			$sub .= &q(<<EOS);
+			$sub .= &_q(<<EOS);
 :	# Argument [name=$name, type=$type, optional=$optional, dflt=$dflt]
 :	\$cur = undef;
 :	\$isthere = 0;
@@ -360,22 +360,22 @@ EOS
 :		my \$val = delete \$args{$name};
 :		\$cur = \\\$val;
 EOS
-			$sub .= &q(<<EOS) if $inplace || $extra;
+			$sub .= &_q(<<EOS) if $inplace || $extra;
 :		# Splice argument out
 :		\$idx = \$idx{$name};
 EOS
-			$sub .= &q(<<'EOS') if $inplace || $extra;
+			$sub .= &_q(<<'EOS') if $inplace || $extra;
 :		splice(@$aref, $idx, 2);
 :		while (my ($k, $v) = each %idx) {
 :			$idx{$k} -= 2 if $v > $idx;
 :		}
 EOS
-			$sub .= &q(<<'EOS');
+			$sub .= &_q(<<'EOS');
 :	}
 EOS
 			if ($optional) {
 				if ($has_default) {
-					$sub .= &q(<<EOS);
+					$sub .= &_q(<<EOS);
 :	else {
 :		eval {
 :			package Getargs::Long::_;
@@ -385,38 +385,38 @@ EOS
 					my $obj = Data::Dumper->new([$dflt], []);
 					$obj->Purity(1);
 					$sub .= $obj->Dumpxs;
-					$sub .= &q(<<'EOS');
+					$sub .= &_q(<<'EOS');
 :		};
 :		$cur = \$Getargs::Long::dflt;
 :	}
 EOS
 				}
 			} else {
-				$sub .= &q(<<EOS);
+				$sub .= &_q(<<EOS);
 :	logxcroak 3, "mandatory argument '$name' missing" unless \$isthere;
 EOS
 			}
 			if ($type ne '') {
 				if ($optional) {
-					$sub .= &q(<<EOS);
+					$sub .= &_q(<<EOS);
 :	logxcroak 3, "argument '$name' cannot be undef"
 :		if \$isthere && !defined \$\$cur;
 EOS
 				} else {
-					$sub .= &q(<<EOS);
+					$sub .= &_q(<<EOS);
 :	logxcroak 3, "argument '$name' cannot be undef" unless defined \$\$cur;
 EOS
 				}
 				my $opt_is_there = $optional ? "\$isthere &&" : "";
 				if ($type =~ /^[isn]$/) {		# Make sure it's a scalar
 					# XXX Check that i is integer, s string and n natural
-					$sub .= &q(<<EOS);
+					$sub .= &_q(<<EOS);
 :	logxcroak 3,
 :		"argument '$name' must be scalar (type '$type') but is \$\$cur"
 :		if $opt_is_there ref \$\$cur;
 EOS
 				} else {
-					$sub .= &q(<<EOS);
+					$sub .= &_q(<<EOS);
 :	\$ctype = \$isthere ? ref \$\$cur : undef;
 :	logxcroak 3, "argument '$name' must be of type $type but is \$ctype"
 :		if $opt_is_there (UNIVERSAL::isa(\$\$cur, 'UNIVERSAL') ?
@@ -425,29 +425,29 @@ EOS
 EOS
 				}
 			}
-			$sub .= &q(<<'EOS');
+			$sub .= &_q(<<'EOS');
 :	push(@result, defined($cur) ? $$cur : undef);
 :
 EOS
 		}
 
 		# If we're strict, we must report unprocessed switches
-		$sub .= &q(<<'EOS') if $strict;
+		$sub .= &_q(<<'EOS') if $strict;
 :
-:	spot_unknown(\%args, 3) if scalar keys %args;
+:	_spot_unknown(\%args, 3) if scalar keys %args;
 :
 EOS
 
 		# Add extra unprocessed switches to the result list
-		$sub .= &q(<<'EOS') if $extra;
+		$sub .= &_q(<<'EOS') if $extra;
 :	push(@result, @$aref);
 EOS
-		$sub .= &q(<<'EOS');
+		$sub .= &_q(<<'EOS');
 :	return @result;
 :}
 EOS
 		logdbg 'debug', "anonymous subroutine: $sub";
-		my $code = eval $sub;
+		my $code = eval $sub; ## no critic (ProhibitStringyEval)
 		if (chop($@)) {
 			logerr "can't create subroutine for checking args of $subname: $@";
 			logwarn "ignoring caching directive for $subname";
@@ -487,7 +487,7 @@ EOS
 	}
 
 	# Sanity check: no argument can be given twice
-	spot_dups($args, $case_insensitive, 2)
+	_spot_dups($args, $case_insensitive, 2)
 		if 2 * scalar(keys %args) != @$args;
 
 	# Index arguments if inplace editing or extra
@@ -552,7 +552,7 @@ EOS
 	}
 
 	# If we're strict, we must report unprocessed switches
-	spot_unknown(\%args, 2) if $strict && scalar keys %args;
+	_spot_unknown(\%args, 2) if $strict && scalar keys %args;
 
 	# Add extra unprocessed switches to the result list
 	push(@result, @$args) if $extra;
@@ -561,12 +561,12 @@ EOS
 }
 
 #
-# spot_dups
+# _spot_dups
 #
 # Given a list of arguments in $aref, where we know there are duplicate "keys",
 # identify them and croak by listing the culprits.
 #
-sub spot_dups {
+sub _spot_dups {
 	my ($aref, $ignorecase, $level) = @_;
 	my %seen;
 	my @duplicates;
@@ -582,18 +582,18 @@ sub spot_dups {
 }
 
 #
-# spot_unknown
+# _spot_unknown
 #
 # Report keys held in supplied hashref as unknown switches.
 #
-sub spot_unknown {
+sub _spot_unknown {
 	my ($href, $level) = @_;
 	my @unprocessed = map { "-$_" } keys %$href;
 	my $es = @unprocessed == 1 ? '' : 'es';
 	logxcroak ++$level, "unknown switch$es: " . join(", ", @unprocessed);
 }
 
-sub q {
+sub _q {
 	local $_ = shift;
 	s/^://gm;
 	return $_;
@@ -899,6 +899,12 @@ On subsequent calls to cgetargs() for the same routine, the cached argument
 parsing routine is re-used to analyze the arguments.  For frequently called
 routines, this might be a win, even though Perl still needs to construct the
 argument list to cgetargs() and call it.
+
+=item cxgetargs I<same args as getargs>
+
+Like cgetargs(), but with extended specifications allowing to specify defaults
+for non-mandatory arguments. Be careful: those defaults are deep-cloned and
+"frozen", so to speak.
 
 =back
 

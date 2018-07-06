@@ -1,5 +1,11 @@
 Revision history for Acme-Pi
 
+3.1415926  2018-07-02 17:03:09Z
+          - added new export, a constant sub named π
+          - re-introduce all uses of PPI, now that encoding issues are fixed
+            (done at the 2016 QA Hackathon in Rugby, UK)
+          - added $𝝿 variable and 𝝿 constant
+
 3.141592  2016-03-14 18:04:51Z
           - truncate $VERSION to 16 chars, to work with PAUSE's new sanity
             checks (see https://github.com/andk/pause/issues/203)
@@ -24,4 +30,4 @@ Revision history for Acme-Pi
           - re-released to get π into the meta keywords
 
 3         2014-03-14 13:04:25Z
-          - Initial release.
+          - Initial release, via the 2014 QA Hackathon in Lyon, France.

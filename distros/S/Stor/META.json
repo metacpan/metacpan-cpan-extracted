@@ -68,6 +68,7 @@
          "requires" : {
             "HTTP::Request" : "0",
             "Mock::Quick" : "0",
+            "Port::Selector" : "v0.1.6",
             "Test::Exception" : "0",
             "Test::Mock::Cmd" : "0.7",
             "Test::Mojo" : "0",
@@ -78,7 +79,7 @@
    "provides" : {
       "Stor" : {
          "file" : "lib/Stor.pm",
-         "version" : "v1.2.0"
+         "version" : "v1.4.0"
       }
    },
    "release_status" : "stable",
@@ -92,14 +93,14 @@
          "web" : "https://github.com/avast/Stor"
       }
    },
-   "version" : "1.2.0",
+   "version" : "1.4.0",
    "x_contributors" : [
       "Jan Seidl <janseidl@volny.cz>",
       "Jan Seidl <seidl@avast.com>",
-      "Mohelníková Lucie <mohelnikova@avast.com>",
       "Rudolf Plíva <pliva@avast.com>",
       "Tomas Pavlik <savlik5@gmail.com>",
-      "Tomas Pavlik <tomas.pavlik@avast.com>"
+      "Tomas Pavlik <tomas.pavlik@avast.com>",
+      "luckamohelnikova <mohelnikova@avast.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

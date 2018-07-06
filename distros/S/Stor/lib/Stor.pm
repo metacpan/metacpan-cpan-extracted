@@ -1,7 +1,7 @@
 package Stor;
 use v5.20;
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.4.0';
 
 use Mojo::Base -base, -signatures;
 use Syntax::Keyword::Try;
@@ -67,12 +67,7 @@ sub get_from_old_storages ($self, $c, $sha) {
     else {
         $self->statsite->increment('cache.miss');
         my $paths = $self->_lookup($sha);
-        failure::stor::filenotfound->throw(
-            {
-                msg     => "File '$sha' not found",
-                payload => { statsite_key => 'error.get.not_found_old.count' },
-            }
-        ) if !@$paths;
+        return 0 if !@$paths;
 
         $path = $paths->[0];
         $c->chi->set($sha => $path);
@@ -82,8 +77,11 @@ sub get_from_old_storages ($self, $c, $sha) {
     $c->res->headers->content_length($path_stat->size);
     $c->res->headers->last_modified(time2str($path_stat->mtime));
 
-    $self->_stream_found_file($c, $path);
-    $self->statsite->increment('success.get.ok_old.count');
+    my $server_name = $self->_get_server_name_from_path($path, $sha);
+
+    $self->_stream_found_file($c, $path, $server_name);
+    $self->statsite->increment("success.get.ok_old.$server_name.count");
+    return 1;
 }
 
 sub get_from_s3 ($self, $c, $sha) {
@@ -108,6 +106,7 @@ sub get_from_s3 ($self, $c, $sha) {
     )->http_request;
 
     # build Mojo request inside transaction for proper streaming
+    $c->app->ua->max_response_size(0);
     my $tx = $c->app->ua->build_tx(GET => $http_request->uri->as_string);
     for my $header_key ('authorization', 'date') {
         $tx->req->headers->header($header_key => $http_request->headers->header($header_key));
@@ -153,10 +152,21 @@ sub get ($self, $c) {
             payload => { statsite_key => 'error.get.malformed_sha.count' },
         }) if $sha !~ /^[A-Fa-f0-9]{64}$/;
 
+        my $found = 0;
+        if ($self->s3_enabled && $self->get_from_s3($c, $sha)) {
+            $found = 1;
+        }
+        elsif ($self->get_from_old_storages($c, $sha)) {
+            $found = 1;
+        }
 
-        if (!$self->s3_enabled || !$self->get_from_s3($c, $sha)) {
-            $self->get_from_old_storages($c, $sha);
-            #when you remove calling this function, add failure::stor::filenotfound
+        if (!$found) {
+            failure::stor::filenotfound->throw(
+                {
+                    msg     => "File '$sha' not found",
+                    payload => { statsite_key => 'error.get.not_found_old.count' },
+                }
+            )
         }
     }
     catch {
@@ -325,23 +335,33 @@ sub _sha_to_filepath($self, $sha) {
     return join '/', @subdir, $filename
 }
 
+sub _get_server_name_from_path ($self, $path, $sha) {
+    my $file_path = $self->_path_with_dat($sha);
 
-sub _stream_found_file($self, $c, $path) {
+    $path =~ s/$file_path//g;
+    $path =~ s/[^a-zA-Z0-9]/-/g;
+    $path =~ s/(^-+|-+$)//g;
+
+    return $path;
+}
+
+sub _stream_found_file($self, $c, $path, $server_name) {
     my $fh = $path->openr_raw();
+    my $time = time;
+    my $total_size = 0;
     my $drain; $drain = sub {
         my ($c) = @_;
 
         my $chunk;
-        my $tm_chunk = time;
         my $size = read($fh, $chunk, 1024 * 1024);
+        $total_size += $size;
         if (!$size) {
             close($fh);
             $drain = undef;
+            $self->statsite->update("success.get.ok_old.$server_name.size", $total_size);
+            $self->statsite->timing("success.get.ok_old.$server_name.time", (time - $time) * 1000);
         }
-
         $c->write($chunk, $drain);
-        $self->statsite->update('success.get.ok_old.size', $size);
-        $self->statsite->timing('success.get.ok_old.time', (time - $tm_chunk) * 1000);
     };
     $c->$drain;
 }

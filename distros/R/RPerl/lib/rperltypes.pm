@@ -5,7 +5,7 @@ package  # hide from PAUSE indexing
 use strict;
 use warnings;
 use RPerl::Config;
-our $VERSION = 0.012_000;
+our $VERSION = 0.017_000;
 
 # NEED UPGRADE: create GrammarComponents
 #use parent qw(RPerl::GrammarComponent)
@@ -45,9 +45,15 @@ use RPerl::DataType::FileHandle;
 # [[[ DATA STRUCTURES ]]]
 use RPerl::DataStructure::Array;
 use RPerl::DataStructure::Array::SubTypes;
+use RPerl::DataStructure::Array::SubTypes1D;
+use RPerl::DataStructure::Array::SubTypes2D;
+use RPerl::DataStructure::Array::SubTypes3D;
 use RPerl::DataStructure::Array::Reference;
 use RPerl::DataStructure::Hash;
 use RPerl::DataStructure::Hash::SubTypes;
+use RPerl::DataStructure::Hash::SubTypes1D;
+use RPerl::DataStructure::Hash::SubTypes2D;
+use RPerl::DataStructure::Hash::SubTypes3D;
 use RPerl::DataStructure::Hash::Reference;
 
 #use RPerl::DataStructure::LinkedList;
@@ -72,7 +78,13 @@ our @EXPORT = (
     @RPerl::DataType::Scalar::EXPORT,
     @RPerl::DataType::Unknown::EXPORT,
     @RPerl::DataStructure::Array::SubTypes::EXPORT,
-    @RPerl::DataStructure::Hash::SubTypes::EXPORT
+    @RPerl::DataStructure::Array::SubTypes1D::EXPORT,
+    @RPerl::DataStructure::Array::SubTypes2D::EXPORT,
+    @RPerl::DataStructure::Array::SubTypes3D::EXPORT,
+    @RPerl::DataStructure::Hash::SubTypes::EXPORT,
+    @RPerl::DataStructure::Hash::SubTypes1D::EXPORT,
+    @RPerl::DataStructure::Hash::SubTypes2D::EXPORT,
+    @RPerl::DataStructure::Hash::SubTypes3D::EXPORT
 );
 our @EXPORT_OK = (
     @RPerl::DataType::Void::EXPORT_OK,
@@ -85,16 +97,22 @@ our @EXPORT_OK = (
     @RPerl::DataType::Scalar::EXPORT_OK,
     @RPerl::DataType::Unknown::EXPORT_OK,
     @RPerl::DataStructure::Array::SubTypes::EXPORT_OK,
-    @RPerl::DataStructure::Hash::SubTypes::EXPORT_OK
+    @RPerl::DataStructure::Array::SubTypes1D::EXPORT_OK,
+    @RPerl::DataStructure::Array::SubTypes2D::EXPORT_OK,
+    @RPerl::DataStructure::Array::SubTypes3D::EXPORT_OK,
+    @RPerl::DataStructure::Hash::SubTypes::EXPORT_OK,
+    @RPerl::DataStructure::Hash::SubTypes1D::EXPORT_OK,
+    @RPerl::DataStructure::Hash::SubTypes2D::EXPORT_OK,
+    @RPerl::DataStructure::Hash::SubTypes3D::EXPORT_OK
 );
 
 # [[[ OBJECT-ORIENTED ]]]
 use RPerl::Object;
 use RPerl::CodeBlock::Subroutine::Method;    # Method is the only item that is both a Data Type & a Grammar Rule???
 
+# DEV NOTE, CORRELATION #rp051: hard-coded list of RPerl data types and data structures
 # these types are currently implemented for the 2 primary RPerl modes: PERLOPS_PERLTYPES, CPPOPS_CPPTYPES
 # MISSING: boolean, unsigned_integer, character, *_arrayref, *_hashref
-# DEV NOTE, CORRELATION #rp051: hard-coded list of RPerl data types and data structures
 our string_arrayref $SUPPORTED = [
     qw(
         void
@@ -109,14 +127,20 @@ our string_arrayref $SUPPORTED = [
         integer_hashref
         number_hashref
         string_hashref
-        )
+        integer_arrayref_hashref
+        number_arrayref_hashref
+        string_arrayref_hashref
+        integer_arrayref_hashref_hashref
+        number_arrayref_hashref_hashref
+        string_arrayref_hashref_hashref
+    )
 ];
 our string_arrayref $SUPPORTED_SPECIAL = [
     qw(
         sse_number_pair
         gmp_integer
         gsl_matrix
-        )
+    )
 ];
 
 # DEV NOTE, CORRELATION #rp008: export to_string(), class(), type() and types() to main:: namespace;
@@ -565,7 +589,7 @@ sub types_enable {
     { my void $RETURN_TYPE };
     ( my $types_input ) = @ARG;
 
-#	RPerl::diag('in rperltypes::types_enable(), received $types_input = ' . $types_input . "\n");
+#    RPerl::diag('in rperltypes::types_enable(), received $types_input = ' . $types_input . "\n");
 
     if (($types_input ne 'PERL') and ($types_input ne 'CPP')) {
         croak q{ERROR ERPTY00: Invalid RPerl types '} . $types_input . q{' specified where PERL or CPP expected, croaking};
@@ -573,8 +597,9 @@ sub types_enable {
 
     $RPerl::TYPES_CCFLAG = ' -D__' . $types_input . '__TYPES';
 
-#	RPerl::diag('in rperltypes::types_enable(), set $RPerl::TYPES_CCFLAG = ' . $RPerl::TYPES_CCFLAG . "\n");
+#    RPerl::diag('in rperltypes::types_enable(), set $RPerl::TYPES_CCFLAG = ' . $RPerl::TYPES_CCFLAG . "\n");
     return;
 }
 
 1;  # end of package
+

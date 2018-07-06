@@ -37,6 +37,7 @@ __END__
 
 use strict;
 require File::Rename;
+require File::Rename::Options;
 use Pod::Usage;
 
 main() unless caller;

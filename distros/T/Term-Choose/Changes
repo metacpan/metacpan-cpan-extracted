@@ -1,6 +1,11 @@
 Revision history for Term::Choose
 
 
+1.600   2018-07-02
+        - "Term::Choose" uses now its own function to determine the print width of a character.
+        - Charater widths are now cached.
+        - Code refactoring.
+
 1.518   2018-06-20
         - Removed 'pad_one_row' info.
         - Removed deprecated method 'config'.

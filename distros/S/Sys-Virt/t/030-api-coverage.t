@@ -69,6 +69,8 @@ virFreeError
 virResetLastError
 virSaveLastError
 virGetLastErrorMessage
+virGetLastErrorCode
+virGetLastErrorDomain
 
 virConnectAuthCallbackPtr
 virConnectOpen

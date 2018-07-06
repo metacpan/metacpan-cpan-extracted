@@ -13,6 +13,7 @@ use RPerl::Algorithm;
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(ProhibitConstantPragma ProhibitMagicNumbers)  # USER DEFAULT 3: allow constants
+## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case & mixed-case package names
 
 # [[[ CONSTANTS ]]]
 use constant USEFULNESS => my string $TYPED_USEFULNESS = '<<< UNKNOWN >>>';
@@ -26,39 +27,39 @@ our hashref $properties = {
 
 # [ INHERITANCE TESTING ]
 
-sub inherited__Inefficient {
+sub inherited_Inefficient {
     { my void::method $RETURN_TYPE };
     ( my RPerl::Algorithm::Inefficient $self, my string $person ) = @ARG;
-    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient->inherited__Inefficient(), have ::class($self) = ' . ::class($self) . ' and $person = ' . $person . ', FLUFFY' . "\n" );
+    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient->inherited_Inefficient(), have ::class($self) = ' . ::class($self) . ' and $person = ' . $person . ', FLUFFY' . "\n" );
     return;
 }
 
-sub inherited__Inefficient_bar_get {
+sub inherited_Inefficient_bar_get {
     { my string::method $RETURN_TYPE };
     ( my RPerl::Algorithm::Inefficient $self ) = @ARG;
-    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient->inherited__Inefficient_bar_get(), have ::class($self) = ' . ::class($self) . ', FLUFFY' . "\n" );
+    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient->inherited_Inefficient_bar_get(), have ::class($self) = ' . ::class($self) . ', FLUFFY' . "\n" );
     return $self->{bar};
 }
 
-sub inherited__Inefficient_bar_set {
+sub inherited_Inefficient_bar_set {
     { my void::method $RETURN_TYPE };
     ( my RPerl::Algorithm::Inefficient $self, my string $bar_new ) = @ARG;
-    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient->inherited__Inefficient_bar_set(), have ::class($self) = ' . ::class($self) . ' and $bar_new = ' . $bar_new . ', FLUFFY' . "\n" );
+    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient->inherited_Inefficient_bar_set(), have ::class($self) = ' . ::class($self) . ' and $bar_new = ' . $bar_new . ', FLUFFY' . "\n" );
     $self->{bar} = $bar_new;
     return;
 }
 
-sub inherited__Inefficient_foo_get {
+sub inherited_Inefficient_foo_get {
     { my string::method $RETURN_TYPE };
     ( my RPerl::Algorithm::Inefficient $self ) = @ARG;
-    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient->inherited__Inefficient_foo_get(), have ::class($self) = ' . ::class($self) . ', FLUFFY' . "\n" );
+    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient->inherited_Inefficient_foo_get(), have ::class($self) = ' . ::class($self) . ', FLUFFY' . "\n" );
     return $self->{foo};
 }
 
-sub inherited__Inefficient_foo_set {
+sub inherited_Inefficient_foo_set {
     { my void::method $RETURN_TYPE };
     ( my RPerl::Algorithm::Inefficient $self, my string $foo_new ) = @ARG;
-    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient->inherited__Inefficient_foo_set(), have ::class($self) = ' . ::class($self) . ' and $foo_new = ' . $foo_new . ', FLUFFY' . "\n" );
+    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient->inherited_Inefficient_foo_set(), have ::class($self) = ' . ::class($self) . ' and $foo_new = ' . $foo_new . ', FLUFFY' . "\n" );
     $self->{foo} = $foo_new;
     return;
 }
@@ -82,11 +83,11 @@ sub inherited {
 #RPerl::Algorithm::Inefficient->uninherited("Mad Scientist");  # ignores "Mad Scientist"
 #RPerl::diag("LATERZ FROM Inefficient.pm\n");
 
-sub uninherited__Inefficient {
+sub uninherited_Inefficient {
     { my string $RETURN_TYPE };
     ( my string $person ) = @ARG;
-    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient::uninherited__Inefficient(), received $person = ' . $person . ', MESSY' . "\n" );
-    return 'Inefficient::uninherited__Inefficient() RULES! PERLOPS_PERLTYPES';
+    RPerl::diag( 'in PERLOPS_PERLTYPES Inefficient::uninherited_Inefficient(), received $person = ' . $person . ', MESSY' . "\n" );
+    return 'Inefficient::uninherited_Inefficient() RULES! PERLOPS_PERLTYPES';
 }
 
 # DEV NOTE, CORRELATION #rp004: inheritance testing, manually enable uninherited() in exactly one of Algorithm.*, Inefficient.*, Sort.*, or Bubble.*

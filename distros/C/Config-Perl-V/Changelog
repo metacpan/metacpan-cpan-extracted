@@ -1,3 +1,8 @@
+0.30	- 04 Jul 2018, H.Merijn Brand
+    * It's 2018
+    * Add test for 5.27.11 (r is for rsync checkout)
+    * Add test for 5.28.0
+
 0.29	- 12 Oct 2017, H.Merijn Brand
     * It's 2017
     * Add test for 5.26.1-RC1

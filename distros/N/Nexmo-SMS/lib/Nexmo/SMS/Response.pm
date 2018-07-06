@@ -25,10 +25,90 @@ for my $attr ( @attrs ) {
     };
 }
 
+
+sub new {
+    my ($class,%param) = @_;
+    
+    my $self = bless {}, $class;
+    
+    return $self if !$param{json};
+    
+    # decode json
+    my $coder = JSON::PP->new->utf8->pretty->allow_nonref;
+    my $perl  = $coder->decode( $param{json} );
+    
+    $self->message_count( $perl->{'message-count'} );
+    $self->status( 0 );
+    
+    # for each message create a new message object
+    for my $message ( @{ $perl->{messages} || [] } ) {
+        $self->_add_message(
+            Nexmo::SMS::Response::Message->new( %{$message || {}} )
+        );
+    }
+    
+    return $self;
+}
+
+
+sub messages {
+    my ($self) = @_;
+    
+    return @{ $self->{__messages__} || [] };
+}
+
+sub _add_message {
+    my ($self,$message) = @_;
+    
+    if ( @_ == 2 and $message->isa( 'Nexmo::SMS::Response::Message' ) ) {
+        push @{$self->{__messages__}}, $message;
+        if ( $message->status != 0 ) {
+            $self->status(1);
+            $self->errstr( $message->status_text . ' (' . $message->status_desc . ')' );
+        }
+    }
+}
+
+
+
+sub errstr {
+    my ($self,$message) = @_;
+    
+    $self->{__errstr__} = $message if @_ == 2;
+    return $self->{__errstr__};
+}
+
+
+sub is_success {
+    my ($self) = @_;
+    return !$self->status;
+}
+
+
+sub is_error {
+    my ($self) = @_;
+    return $self->status;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Nexmo::SMS::Response - Module that represents a response from Nexmo SMS API!
+
+=head1 VERSION
+
+version 0.10
+
 =head1 SYNOPSIS
 
 This module represents a response from Nexmo.
-
 
     use Nexmo::SMS::Response;
 
@@ -74,32 +154,6 @@ create a new object
         }',
     );
 
-=cut
-
-sub new {
-    my ($class,%param) = @_;
-    
-    my $self = bless {}, $class;
-    
-    return $self if !$param{json};
-    
-    # decode json
-    my $coder = JSON::PP->new->utf8->pretty->allow_nonref;
-    my $perl  = $coder->decode( $param{json} );
-    
-    $self->message_count( $perl->{'message-count'} );
-    $self->status( 0 );
-    
-    # for each message create a new message object
-    for my $message ( @{ $perl->{messages} || [] } ) {
-        $self->_add_message(
-            Nexmo::SMS::Response::Message->new( %{$message || {}} )
-        );
-    }
-    
-    return $self;
-}
-
 =head2 messages
 
 returns the list of messages included in the response. Each element is an
@@ -107,65 +161,19 @@ object of L<Nexmo::SMS::Response::Message>.
 
     my @messages = $response->messages;
 
-=cut
-
-sub messages {
-    my ($self) = @_;
-    
-    return @{ $self->{__messages__} || [] };
-}
-
-sub _add_message {
-    my ($self,$message) = @_;
-    
-    if ( @_ == 2 and $message->isa( 'Nexmo::SMS::Response::Message' ) ) {
-        push @{$self->{__messages__}}, $message;
-        if ( $message->status != 0 ) {
-            $self->status(1);
-            $self->errstr( $message->status_text . ' (' . $message->status_desc . ')' );
-        }
-    }
-}
-
 =head2 errstr
 
 return the "last" error as string.
 
     print $response->errstr;
 
-=cut
-
-
-sub errstr {
-    my ($self,$message) = @_;
-    
-    $self->{__errstr__} = $message if @_ == 2;
-    return $self->{__errstr__};
-}
-
 =head2 is_success
 
 returns 1 if all messages have a status = 0, C<undef> otherwise.
 
-=cut
-
-sub is_success {
-    my ($self) = @_;
-    return !$self->status;
-}
-
 =head2 is_error
 
 Returns 1 if an error occured, 0 otherwise...
-
-=cut
-
-sub is_error {
-    my ($self) = @_;
-    return $self->status;
-}
-
-1;
 
 =head1 ATTRIBUTES
 
@@ -184,3 +192,16 @@ These attributes are available for C<Nexmo::SMS::TextMessage> objects:
 
 =back
 
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

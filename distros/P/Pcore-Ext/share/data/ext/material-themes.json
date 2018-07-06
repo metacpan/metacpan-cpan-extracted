@@ -1,38 +1,38 @@
 {
-   "120° Compliments": {
-      "accentColor": "deep-purple",
-      "baseColor": "green"
-   },
-   "America's Captain": {
-      "accentColor": "blue",
-      "baseColor": "red"
-   },
-   "Bubble Gum": {
-      "accentColor": "light-blue",
-      "baseColor": "pink"
-   },
-   "Creamsicle": {
-      "accentColor": "grey",
-      "baseColor": "deep-orange"
-   },
-   "Daylight & Tungsten": {
-      "accentColor": "orange",
-      "baseColor": "light-blue"
-   },
-   "Dry Shores": {
-      "accentColor": "grey",
-      "baseColor": "blue-grey"
-   },
-   "Mocha Pop": {
-      "accentColor": "blue-grey",
-      "baseColor": "brown"
-   },
-   "Roboto House": {
-      "accentColor": "blue-grey",
-      "baseColor": "grey"
-   },
-   "Royal Appeal": {
-      "accentColor": "indigo",
-      "baseColor": "deep-purple"
-   }
+    "120° Compliments": {
+        "accent": "deep-purple",
+        "base": "green"
+    },
+    "America's Captain": {
+        "accent": "blue",
+        "base": "red"
+    },
+    "Bubble Gum": {
+        "accent": "light-blue",
+        "base": "pink"
+    },
+    "Creamsicle": {
+        "accent": "grey",
+        "base": "deep-orange"
+    },
+    "Daylight & Tungsten": {
+        "accent": "orange",
+        "base": "light-blue"
+    },
+    "Dry Shores": {
+        "accent": "grey",
+        "base": "blue-grey"
+    },
+    "Mocha Pop": {
+        "accent": "blue-grey",
+        "base": "brown"
+    },
+    "Roboto House": {
+        "accent": "blue-grey",
+        "base": "grey"
+    },
+    "Royal Appeal": {
+        "accent": "indigo",
+        "base": "deep-purple"
+    }
 }

@@ -1,5 +1,8 @@
 Revision history for Perl extension Ithumb::XS.
 
+v0.1.3  Tue Jul 3 11:30:00 MSK 2018
+	- Improve XS code
+
 v0.1.2  Wed Mar 14 08:00:00 2018
 	- Fixed CPAN Kwalitee Issues
 

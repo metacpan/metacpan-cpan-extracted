@@ -1,10 +1,8 @@
-#!/usr/bin/perl
 # check.pl - Makefile helper utility to make perl wrapper for CLucene
-# usage: check.pl -> checks that SWIG is 1.3 or later or gives an error
 # usage: check.pl -perl -> prints location of perl CORE directory
-# usage: check.pl -os -> prints operating system e.g. linux
+# usage: check.pl -> checks that SWIG is 1.3 or later or gives an error
 #
-# Copyright(c) 2005 Peter Edwards <peterdragon@users.sourceforge.net>
+# Copyright(c) 2005 Peter Edwards peterdragon@users.sourceforge.net
 # All rights reserved. This package is free software; you can redistribute
 # it and/or modify it under the same terms as Perl itself.
 
@@ -23,25 +21,24 @@ if ( $#ARGV >= 0 && $ARGV[0] eq "-perl" )
 }
 if ( $#ARGV >= 0 && $ARGV[0] eq "-os" )
 {
-	print "$^O";
-	#my $UNAME=`uname -s`;
-	#my $REDHATVER=`rpm -q redhat-release`;
-	#if ( $REDHATVER =~ m/^redhat-/ )
-	#{
-	#	print "redhat";
-	#}
-	#elsif ( $UNAME =~ m/^Linux/ )
-	#{
-	#	print "linux";
-	#}
-	#elsif ( $UNAME =~ m/^CYGWIN/i )
-	#{
-	#	print "cygwin";
-	#}
-	#else
-	#{
-	#	print "unknown";
-	#}
+	my $UNAME=`uname -s`;
+	my $REDHATVER=`rpm -q redhat-release`;
+	if ( $REDHATVER =~ m/^redhat-/ )
+	{
+		print "redhat";
+	}
+	elsif ( $UNAME =~ m/^Linux/ )
+	{
+		print "linux";
+	}
+	elsif ( $UNAME =~ m/^CYGWIN/i )
+	{
+		print "cygwin";
+	}
+	else
+	{
+		print "unknown";
+	}
 	exit(0);
 }
 if ( $#ARGV >= 0 && $ARGV[0] eq "-osver" )

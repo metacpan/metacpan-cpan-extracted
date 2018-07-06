@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 605;
+plan tests => 625;
 
 {
     use Math::AnyNum;
@@ -121,6 +121,31 @@ plan tests => 605;
     is(8 - $c,    3);
     is(6.5 - $c,  1.5);
     is((-7) - $c, -12);
+
+    is(-1 - Math::AnyNum->new_si(-5), 4);
+    is(1 - Math::AnyNum->new_si(-5),  6);
+    is(-1 - Math::AnyNum->new_si(5),  -6);
+    is(1 - Math::AnyNum->new_si(5),   -4);
+
+    is(-1 - Math::AnyNum->new_q(-5), 4);
+    is(1 - Math::AnyNum->new_q(-5),  6);
+    is(-1 - Math::AnyNum->new_q(5),  -6);
+    is(1 - Math::AnyNum->new_q(5),   -4);
+
+    is(-1 - Math::AnyNum->new_f(-5), 4);
+    is(1 - Math::AnyNum->new_f(-5),  6);
+    is(-1 - Math::AnyNum->new_f(5),  -6);
+    is(1 - Math::AnyNum->new_f(5),   -4);
+
+    is(-1 - Math::AnyNum->new_c(-5), 4);
+    is(1 - Math::AnyNum->new_c(-5),  6);
+    is(-1 - Math::AnyNum->new_c(5),  -6);
+    is(1 - Math::AnyNum->new_c(5),   -4);
+
+    is(-1 + Math::AnyNum->new(-5), -6);
+    is(1 + Math::AnyNum->new(-5),  -4);
+    is(-1 + Math::AnyNum->new(5),  4);
+    is(1 + Math::AnyNum->new(5),   6);
 
     #
     ## Multiplication

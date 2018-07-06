@@ -1,7 +1,7 @@
 using std::cout;  using std::cerr;  using std::endl;
 
 #ifndef __CPP__INCLUDED__RPerl__DataType__Integer_h
-#define __CPP__INCLUDED__RPerl__DataType__Integer_h 0.007_100
+#define __CPP__INCLUDED__RPerl__DataType__Integer_h 0.008_000
 
 // [[[ TYPEDEFS ]]]
 // DEV NOTE: must use "integer" typedef because "int" is already defined by Inline's default typemap, even if we put our own integer entry into typemap.rperl;
@@ -114,10 +114,13 @@ typedef unsigned long int unsigned_integer;
 #define __CPP__INCLUDED__RPerl__DataType__Number_h__typedefs 1
 #  ifdef __TYPE__NUMBER__DOUBLE
 typedef double number;
+#define NUMBER "f"
 #  elif defined __TYPE__NUMBER__LONG__DOUBLE
 typedef long double number;
+#define NUMBER "Lf"  // assume format code 'Lf' exists if type 'long double' exists
 #  else
 typedef double number;  // default
+#define NUMBER "f"
 #  endif
 # endif
 # ifndef __CPP__INCLUDED__RPerl__DataType__Character_h__typedefs
@@ -206,11 +209,11 @@ string integer_to_string_CPPTYPES(integer input_integer);
 
 // [[[ TYPE TESTING ]]]
 # ifdef __PERL__TYPES
-SV* integer__typetest0();
-SV* integer__typetest1(SV* lucky_integer);
+SV* integer_typetest0();
+SV* integer_typetest1(SV* lucky_integer);
 # elif defined __CPP__TYPES
-integer integer__typetest0();
-integer integer__typetest1(integer lucky_integer);
+integer integer_typetest0();
+integer integer_typetest1(integer lucky_integer);
 # endif
 
 #endif

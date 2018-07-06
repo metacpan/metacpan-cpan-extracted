@@ -30,7 +30,7 @@ sub base_render_args {
     my $args = $self->next::method(@_);
     $args->{element_attr}->{size} = $self->size if $self->size;
     $args->{element_attr}->{maxlength} = $self->maxlength if $self->maxlength;
-    $args->{element_attr}->{minlength} = $self->minlenght if $self->minlength;
+    $args->{element_attr}->{minlength} = $self->minlength if $self->minlength;
     return $args;
 }
 
@@ -87,7 +87,7 @@ Data::MuForm::Field::Text - Text field
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 
@@ -95,7 +95,7 @@ Gerda Shank
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gerda Shank.
+This software is copyright (c) 2018 by Gerda Shank.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

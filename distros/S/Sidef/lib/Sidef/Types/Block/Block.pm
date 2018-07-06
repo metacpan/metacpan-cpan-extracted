@@ -378,16 +378,16 @@ package Sidef::Types::Block::Block {
             my ($type, $str) = $obj->_dump();
 
             if ($type eq 'int' and $str >= 0 and $str < Sidef::Types::Number::Number::ULONG_MAX) {
-                return scalar {dump => ($ref . "->_set_uint('$str')")};
+                return scalar {dump => ($ref . "->_set_uint('${str}')")};
             }
             elsif ($type eq 'int' and $str < 0 and $str > Sidef::Types::Number::Number::LONG_MIN) {
-                return scalar {dump => ($ref . "->_set_int('$str')")};
+                return scalar {dump => ($ref . "->_set_int('${str}')")};
             }
 
-            return scalar {dump => ($ref . "->_set_str('$type', '$str')")};
+            return scalar {dump => ($ref . "->_set_str('${type}', '${str}')")};
         }
         elsif ($ref eq 'Sidef::Types::Block::Block') {
-            die "[ERROR] Blocks cannot be serialized by Block.ffork()!";
+            die "[ERROR] Blocks cannot be serialized!";
         }
 
         return;
@@ -413,6 +413,8 @@ package Sidef::Types::Block::Block {
         $fork->{pid} = $pid;
         $fork;
     }
+
+    *start = \&ffork;
 
     sub fork {
         my ($self, @args) = @_;
@@ -494,15 +496,7 @@ package Sidef::Types::Block::Block {
 
     sub for {
         my ($self, @objs) = @_;
-
-        my $block = $self->{code};
-
-        _iterate(
-            sub {
-                $block->(@_);
-            },
-            @objs
-                );
+        _iterate($self->{code}, @objs);
     }
 
     *each    = \&for;

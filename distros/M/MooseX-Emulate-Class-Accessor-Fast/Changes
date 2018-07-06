@@ -1,3 +1,13 @@
+Revision history for MooseX-Emulate-Class-Accessor-Fast
+
+0.009032 - 2018-07-03
+          - Releasing as stable
+
+0.009_031 - 2018-06-22
+          - Repackaged with ExtUtils::MakeMaker (and Distar) rather than
+            Module::Install
+          - enabled previously TODO test for attribute named meta
+
 0.00903    Sept 15, 2009
           - Silence a test warning from Moose 0.90 (Dave Rolsky).
 

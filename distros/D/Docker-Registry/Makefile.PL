@@ -22,13 +22,17 @@ my %WriteMakefileArgs = (
     "IO::Socket::SSL" => 0,
     "JSON::MaybeXS" => 0,
     "Moose" => 0,
+    "MooseX::Types::Moose" => 0,
     "Throwable::Error" => 0
   },
   "TEST_REQUIRES" => {
+    "Import::Into" => "1.002003",
+    "Sub::Override" => 0,
     "Test::Exception" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Test::Most" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,10 +43,14 @@ my %FallbackPrereqs = (
   "HTTP::Headers" => 0,
   "HTTP::Tiny" => 0,
   "IO::Socket::SSL" => 0,
+  "Import::Into" => "1.002003",
   "JSON::MaybeXS" => 0,
   "Moose" => 0,
+  "MooseX::Types::Moose" => 0,
+  "Sub::Override" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Test::Most" => 0,
   "Throwable::Error" => 0
 );
 

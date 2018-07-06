@@ -8,7 +8,7 @@ Dist::Zilla::PluginBundle::Author::JMASLAK - JMASLAK's Plugin Bundle
 
 =head1 VERSION
 
-version 0.004
+version 1.181841
 
 =head1 DESCRIPTION
 
@@ -16,10 +16,12 @@ This is Joelle Maslak's plugin bundle, used for her modules.  If you're not
 her, you probably want to create your own plugin module because I may modify
 this module based on her needs, breaking third party modules that use this.
 
-All of the following are in this module as of v0.003.
+All of the following are in this module as of v1.181840.
 
 It is somewhat equivilent to:
 
+    [AutoVersion]
+    [NextRelease]
     [AutoPrereqs]
     [ConfirmRelease]
     [ContributorCovenant]
@@ -30,10 +32,6 @@ It is somewhat equivilent to:
     [ExecDir]
     [ExtraTests]
     [GatherDir]
-    [Git::Check]
-    [Git::Commit]
-    [Git::Push]
-    [Git::Tag]
     [GitHub::Meta]
     [License]
     [Manifest]
@@ -52,6 +50,7 @@ It is somewhat equivilent to:
     type     = pod
     filename = README.pod
 
+    [Test::ChangesHasContent]
     [Test::EOL]
     [Test::Kwalitee::Extra]
     [Test::NoTabs]
@@ -66,11 +65,27 @@ It is somewhat equivilent to:
     [TestRelease]
     [UploadToCPAN]
 
+    [Git::Check]
+    allow_dirty = dist.ini
+    allow_dirty = Changes
+    allow_dirty = README.pod
+
+    [Git::Commit]
+    allow_dirty = dist.ini
+    allow_dirty = Changes
+    allow_dirty = README.pod
+
+    [Git::Push]
+    [Git::Tag]
+
+This automatically numbers releases.
+
 This creates a C<CODE_OF_CONDUCT.md> from the awesome Contributor Covenant
-project, a C<TODO> file, an C<AUTHOR_PLEDGE> file that indicates CPAN admins
+project, a C<Changes> file, a C<CONTRIBUTING> file, a C<TODO> file,
+a C<MANIFEST_SKIP> file, an C<AUTHOR_PLEDGE> file that indicates CPAN admins
 can take ownership should the project become abandoned, and a C<.travis.yml>
-file that will probably need to be edited.  If these files exist already,
-they will not get overwritten.
+file that will probably need to be edited.  If these files exist already, they
+will not get overwritten.
 
 It also generates a C<.mailmap> base file suitable for Joelle, if one does
 not already exists.

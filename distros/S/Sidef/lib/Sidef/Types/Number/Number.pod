@@ -653,6 +653,26 @@ Return the
 
 =cut
 
+=head2 chebyshev_T
+
+Number.chebyshev_T() -> I<Obj>
+
+Return the
+
+Aliases: I<chebyshevt>, I<chebyshevT>
+
+=cut
+
+=head2 chebyshev_U
+
+Number.chebyshev_U() -> I<Obj>
+
+Return the
+
+Aliases: I<chebyshevu>, I<chebyshevU>
+
+=cut
+
 =head2 chr
 
 Number.chr() -> I<Obj>
@@ -790,6 +810,16 @@ Return the
 Number.csch() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 cyclotomic
+
+Number.cyclotomic() -> I<Obj>
+
+Return the
+
+Aliases: I<cyclotomic_polynomial>
 
 =cut
 
@@ -1063,6 +1093,16 @@ Aliases: I<fibonacci>
 
 =cut
 
+=head2 fibmod
+
+Number.fibmod() -> I<Obj>
+
+Return the
+
+Aliases: I<fibonacci_mod>, I<fibonaccimod>
+
+=cut
+
 =head2 flipbit
 
 Number.flipbit() -> I<Obj>
@@ -1126,6 +1166,26 @@ Aliases: I<harmfrac>, I<harmonic>, I<harmonic_number>
 Number.harmreal() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 hermite_H
+
+Number.hermite_H() -> I<Obj>
+
+Return the
+
+Aliases: I<hermiteH>, I<hermite_polynomial_H>, I<hermite_polynomialH>
+
+=cut
+
+=head2 hermite_He
+
+Number.hermite_He() -> I<Obj>
+
+Return the
+
+Aliases: I<hermiteHe>, I<hermite_polynomial_He>, I<hermite_polynomialHe>
 
 =cut
 
@@ -1669,6 +1729,16 @@ Return the
 
 =cut
 
+=head2 laguerre
+
+Number.laguerre() -> I<Obj>
+
+Return the
+
+Aliases: I<laguerreL>, I<laguerre_polynomial>
+
+=cut
+
 =head2 lambert_w
 
 Number.lambert_w() -> I<Obj>
@@ -1690,6 +1760,16 @@ Return the
 Number.legendre() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 legendre_P
+
+Number.legendre_P() -> I<Obj>
+
+Return the
+
+Aliases: I<legendrep>, I<legendreP>, I<legendre_polynomial>
 
 =cut
 
@@ -1831,19 +1911,33 @@ Return the
 
 =cut
 
-=head2 lucasu
+=head2 lucas_mod
 
-Number.lucasu() -> I<Obj>
+Number.lucas_mod() -> I<Obj>
 
 Return the
+
+Aliases: I<lucasmod>
 
 =cut
 
-=head2 lucasv
+=head2 lucas_U
 
-Number.lucasv() -> I<Obj>
+Number.lucas_U() -> I<Obj>
 
 Return the
+
+Aliases: I<lucasu>, I<lucasU>
+
+=cut
+
+=head2 lucas_V
+
+Number.lucas_V() -> I<Obj>
+
+Return the
+
+Aliases: I<lucasv>, I<lucasV>
 
 =cut
 
@@ -2201,6 +2295,14 @@ Return the
 
 =cut
 
+=head2 ramanujan_sum
+
+Number.ramanujan_sum() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ramanujan_tau
 
 Number.ramanujan_tau() -> I<Obj>
@@ -2338,6 +2440,14 @@ Aliases: I<roundf>
 =head2 sec
 
 Number.sec() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 secant_number
+
+Number.secant_number() -> I<Obj>
 
 Return the
 
@@ -2515,6 +2625,14 @@ Return the
 
 =cut
 
+=head2 tangent_number
+
+Number.tangent_number() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 tanh
 
 Number.tanh() -> I<Obj>
@@ -2556,6 +2674,32 @@ Number.tuples_with_repetition() -> I<Obj>
 Return the
 
 Aliases: I<variations_with_repetition>
+
+=cut
+
+=head2 udivisors
+
+Number.udivisors() -> I<Obj>
+
+Return the
+
+Aliases: I<unitary_divisors>
+
+=cut
+
+=head2 usigma
+
+Number.usigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 usigma0
+
+Number.usigma0() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -2657,7 +2801,7 @@ Number.μ() -> I<Obj>
 
 Return the
 
-Aliases: I<mobius>, I<moebius>
+Aliases: I<mobius>, I<möbius>, I<moebius>
 
 =cut
 
@@ -2707,7 +2851,7 @@ Number.ϕ() -> I<Obj>
 
 Return the
 
-Aliases: I<totient>, I<euler_phi>, I<euler_totient>
+Aliases: I<totient>, I<euler_phi>, I<eulerphi>, I<euler_totient>
 
 =cut
 

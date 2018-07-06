@@ -74,8 +74,19 @@ $threaded->on(finish => sub { $graceful = pop });
 $log = '';
 $cb = $threaded->app->log->on(message => sub { $log .= pop });
 is $threaded->healthy, 0, 'no healthy workers';
-
+my @server;
+my $can_server = $threaded->app->can('server');
+$threaded->app->hook(
+  before_server_start => sub {
+    my ($server, $app) = @_;
+    push @server, $server->workers, $app->mode;
+  }
+) if $can_server;
 $threaded->run;
+SKIP: {
+    skip "before_server_start hook not available" if !$can_server;
+    is_deeply \@server, [4, 'development'], 'hook has been emitted once';
+}
 is scalar @spawn, 4, 'four workers spawned';
 is scalar @reap,  4, 'four workers reaped';
 (my $wok) = grep { $worker eq $_ } @spawn;

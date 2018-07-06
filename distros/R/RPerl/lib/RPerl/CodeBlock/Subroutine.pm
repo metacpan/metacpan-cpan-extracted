@@ -3,7 +3,7 @@ package RPerl::CodeBlock::Subroutine;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.021_000;
+our $VERSION = 0.025_000;
 
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
@@ -56,7 +56,7 @@ sub ast_to_rperl__generate {
 
     if ( ( ref $self ) ne 'Subroutine_61' ) {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ( ref $self ) . ' found where Subroutine_61 expected, dying' )
+            'ERROR ECOGEASRP000, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ( ref $self ) . ' found where Subroutine_61 expected, dying' )
             . "\n";
     }
 
@@ -75,16 +75,25 @@ sub ast_to_rperl__generate {
     my object $operations_star         = $self->{children}->[10];
     my string $right_brace             = $self->{children}->[11];
 
-    if ((substr $name, 0, 1) eq '_') {
-        die 'ERROR ECOGEASRP08, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: subroutine name ' . ($name)
-                . ' must not start with underscore, dying' . "\n";
+    # DEV NOTE, CORRELATION #rp045: identifiers containing underscores may be reserved by C++
+    if (((substr $name, 0, 1) eq '_') and ($modes->{_symbol_table}->{_namespace} eq q{})) {
+        die 'ERROR ECOGEASRP181a, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL:' . "\n" . 'global subroutine name ' . q{'} . $name . q{()'} .
+            ' must not start with an underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+    }
+    elsif ($name =~ m/^_[A-Z]/gxms) {
+        die 'ERROR ECOGEASRP181b, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL:' . "\n" . 'subroutine name ' . q{'} . $name . q{()'} .
+            ' must not start with an underscore followed by an uppercase letter, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+    }
+    elsif ($name =~ m/__/gxms) {
+        die 'ERROR ECOGEASRP181c, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL:' . "\n" . 'subroutine name ' . q{'} . $name . q{()'} .
+            ' must not include a double-underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
     }
 
     if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$name}) or
         (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$name}) or
         (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$name}) or
         (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$name})) {
-        die 'ERROR ECOGEASRP44, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Perl API name conflict, subroutine name ' . q{'}
+        die 'ERROR ECOGEASRP044, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Perl API name conflict, subroutine name ' . q{'}
             . $name . q{'}
             . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
     }
@@ -145,16 +154,25 @@ sub ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES {
 
     my string_arrayref $arguments = [];
 
-    if ((substr $name, 0, 1) eq '_') {
-        die 'ERROR ECOGEASCP08, CODE GENERATOR, ABSTRACT SYNTAX TO C++: subroutine name ' . ($name)
-                . ' must not start with underscore, dying' . "\n";
+    # DEV NOTE, CORRELATION #rp045: identifiers containing underscores may be reserved by C++
+    if (((substr $name, 0, 1) eq '_') and ($modes->{_symbol_table}->{_namespace} eq q{})) {
+        die 'ERROR ECOGEASCP181a, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'global subroutine name ' . q{'} . $name . q{()'} .
+            ' must not start with an underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+    }
+    elsif ($name =~ m/^_[A-Z]/gxms) {
+        die 'ERROR ECOGEASCP181b, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'subroutine name ' . q{'} . $name . q{()'} .
+            ' must not start with an underscore followed by an uppercase letter, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+    }
+    elsif ($name =~ m/__/gxms) {
+        die 'ERROR ECOGEASCP181c, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'subroutine name ' . q{'} . $name . q{()'} .
+            ' must not include a double-underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
     }
 
     if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$name}) or
         (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$name}) or
         (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$name}) or
         (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$name})) {
-        die 'ERROR ECOGEASCP44, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, subroutine name ' . q{'}
+        die 'ERROR ECOGEASCP044, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, subroutine name ' . q{'}
             . $name . q{'}
             . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
     }
@@ -194,6 +212,8 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
     ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{} };
 
+#RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have $modes->{_symbol_table}->{_namespace} = ' . q{'} . $modes->{_symbol_table}->{_namespace}. q{'} . "\n" );
+
     # unwrap Subroutine_61 from SubroutineOrMethod_93, only if needed
     if ((ref $self) eq 'SubroutineOrMethod_93') { $self = $self->{children}->[0]; }
 
@@ -202,23 +222,52 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
     my object $arguments_optional      = $self->{children}->[9];
     my object $operations_star         = $self->{children}->[10];
 
+# DEV NOTE, CORRELATION #rp045: identifiers containing underscores may be reserved by C++
+# as of March 2018, the latest draft of the C++ standard, section 5.10 on pages 13-14, states:
+#  3  In addition, some identifiers are reserved for use by C ++ implementations and shall not be used otherwise; no diagnostic is required.
+# (3.1) — Each identifier that contains a double underscore __ or begins with an underscore followed by an uppercase letter is reserved to the implementation for any use.
+# (3.2) — Each identifier that begins with an underscore is reserved to the implementation for use as a name in the global namespace.
+# http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/n4727.pdf
+
+# because "no diagnostic is required", we may emit a warning or error here instead of relying on possibly-non-existent C++ compiler errors;
+# the last thing we want is undefined behavior, which is exactly what we get if using reserved C++ identifiers;
+# AFAICT, identifiers (including subroutine names) beginning with a single underscore are still valid, if and only if within a non-global namespace (such as a C++ class)
+
+    # DEV NOTE, CORRELATION #rp045: identifiers containing underscores may be reserved by C++
+    if (((substr $name, 0, 1) eq '_') and ($modes->{_symbol_table}->{_namespace} eq q{})) {
+        die 'ERROR ECOGEASCP181a, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'global subroutine name ' . q{'} . $name . q{()'} .
+            ' must not start with an underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+    }
+    elsif ($name =~ m/^_[A-Z]/gxms) {
+        die 'ERROR ECOGEASCP181b, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'subroutine name ' . q{'} . $name . q{()'} .
+            ' must not start with an underscore followed by an uppercase letter, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+    }
+    elsif ($name =~ m/__/gxms) {
+        die 'ERROR ECOGEASCP181c, CODE GENERATOR, ABSTRACT SYNTAX TO C++:' . "\n" . 'subroutine name ' . q{'} . $name . q{()'} .
+            ' must not include a double-underscore, forbidden by C++ specification as a reserved identifier, dying' . "\n";
+    }
+
     if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$name}) or
         (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$name}) or
         (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$name}) or
         (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$name})) {
-        die 'ERROR ECOGEASCP44, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, subroutine name ' . q{'}
+        die 'ERROR ECOGEASCP044, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, subroutine name ' . q{'}
             . $name . q{'}
             . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
     }
 
+    # SYMBOL TABLE ENTRY ALREADY CREATED in ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES() above, must set current subroutine/method name to avoid false errors
+    # ERROR ECOGEASCP012, CODE GENERATOR, ABSTRACT SYNTAX TO C++: variable 'foo' already declared in this scope, namespace '', subroutine/method '()'
+    $modes->{_symbol_table}->{_subroutine} = $name;  # set current subroutine/method
+
     my string_arrayref $arguments = [];
     my object $cpp_source_subgroup;
- 
+
 #RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have $arguments_optional = ' . "\n" . RPerl::Parser::rperl_ast__dump($arguments_optional) . "\n" );
 #RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have $return_type = ' . "\n" . RPerl::Parser::rperl_ast__dump($return_type) . "\n" );
 
     $return_type = RPerl::Generator::type_convert_perl_to_cpp($return_type, 1);  # $pointerify_classes = 1
-    
+
     # DEV NOTE: must prefix subroutine names with namespace-underscores to simulate Perl's behavior of not exporting subroutines by default
     my string $namespace_underscores = q{};
     if ((exists $modes->{_symbol_table}->{_namespace}) and (defined $modes->{_symbol_table}->{_namespace})) {
@@ -241,12 +290,31 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
     foreach my object $operation ( @{ $operations_star->{children} } ) {
 
 #        RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have $operation = ' . "\n" . RPerl::Parser::rperl_ast__dump($operation) . "\n" );
-# disable *_CHECK() and *_CHECKTRACE() data checking routines in CPPOPS_CPPTYPES mode, this is instead handled in xs_unpack_*() called by typemap.rperl
-        if (( exists $operation->{children}->[0]->{children}->[0]->{children}->[0] )
-            and (  ( ( substr $operation->{children}->[0]->{children}->[0]->{children}->[0], -6, 6 ) eq '_CHECK' )
-                or ( ( substr $operation->{children}->[0]->{children}->[0]->{children}->[0], -11, 11 ) eq '_CHECKTRACE' ) )
+#        RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have ref $operation->{children}->[0] = ', q{'}, (ref $operation->{children}->[0]), q{'}, "\n" );
+#        RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have ref $operation->{children}->[0]->{children}->[0] = ', q{'}, (ref $operation->{children}->[0]->{children}->[0]), q{'}, "\n" );
+#        RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have     $operation->{children}->[0]->{children}->[0]->{children}->[0] = ', q{'}, $operation->{children}->[0]->{children}->[0]->{children}->[0], q{'}, "\n" );
+#        RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have ( substr $operation->{children}->[0]->{children}->[0]->{children}->[0], -6, 6 ) = ', q{'}, ( substr $operation->{children}->[0]->{children}->[0]->{children}->[0], -6, 6 ), q{'}, "\n" );
+#        RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have ( substr $operation->{children}->[0]->{children}->[0]->{children}->[0], -11, 11 ) = ', q{'}, ( substr $operation->{children}->[0]->{children}->[0]->{children}->[0], -11, 11 ), q{'}, "\n" );
+#        RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have ( ref $operation->{children}->[0] ) = ', q{'}, ( ref $operation->{children}->[0] ), q{'}, "\n" );
+
+        # disable *_CHECK() and *_CHECKTRACE() data checking routines in CPPOPS_CPPTYPES mode, this is instead handled in xs_unpack_*() called by typemap.rperl
+        if (
+            (exists  $operation->{children}) and
+            (defined $operation->{children}) and
+            (defined $operation->{children}->[0]) and
+            ((ref    $operation->{children}->[0]) ne q{}) and
+            (exists  $operation->{children}->[0]->{children}) and
+            (defined $operation->{children}->[0]->{children}) and
+            (defined $operation->{children}->[0]->{children}->[0]) and
+            ((ref    $operation->{children}->[0]->{children}->[0]) ne q{}) and
+            (exists  $operation->{children}->[0]->{children}->[0]->{children}) and
+            (defined $operation->{children}->[0]->{children}->[0]->{children}) and
+            (defined $operation->{children}->[0]->{children}->[0]->{children}->[0]) and
+                ( ( ( substr $operation->{children}->[0]->{children}->[0]->{children}->[0], -6, 6 ) eq '_CHECK' ) or
+                   ( ( substr $operation->{children}->[0]->{children}->[0]->{children}->[0], -11, 11 ) eq '_CHECKTRACE' ) )
             )
         {
+#            RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), DISABLING *_CHECK() & *_CHECKTRACE()', "\n" );
             next;
         }
         $cpp_source_subgroup = $operation->ast_to_cpp__generate__CPPOPS_CPPTYPES($modes);
@@ -287,11 +355,6 @@ sub ast_to_cpp__generate_shims__CPPOPS_CPPTYPES {
 
 #RPerl::diag( 'in Subroutine->ast_to_cpp__generate_shims__CPPOPS_CPPTYPES(), have $arguments_optional = ' . "\n" . RPerl::Parser::rperl_ast__dump($arguments_optional) . "\n" );
 #RPerl::diag( 'in Subroutine->ast_to_cpp__generate_shims__CPPOPS_CPPTYPES(), have $return_type = ' . "\n" . RPerl::Parser::rperl_ast__dump($return_type) . "\n" );
- 
-    if ((substr $name, 0, 1) eq '_') {
-        die 'ERROR ECOGEASCP08, CODE GENERATOR, ABSTRACT SYNTAX TO C++: subroutine name ' . ($name)
-                . ' must not start with underscore, dying' . "\n";
-    }
 
     # DEV NOTE, CORRELATION #rp022: must create shims to un-prefix subroutine names with namespace-underscores to un-simulate Perl's behavior of not exporting subroutines by default
     my string $namespace_colons = q{};

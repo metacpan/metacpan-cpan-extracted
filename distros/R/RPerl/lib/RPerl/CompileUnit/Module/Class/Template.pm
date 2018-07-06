@@ -45,10 +45,11 @@ use RPerl::CompileUnit::Module::Class;
 ## no critic qw(ProhibitUselessNoCritic PodSpelling)  # DEVELOPER DEFAULT 1a: allow unreachable & POD-commented code, must be on line 1
 ## no critic qw(ProhibitUnreachableCode RequirePodSections RequirePodAtEnd)  # DEVELOPER DEFAULT 1b: allow POD & unreachable or POD-commented code, must be after line 1
 ## no critic qw(ProhibitStringySplit ProhibitInterpolationOfLiterals)  # DEVELOPER DEFAULT 2: allow string test values
+## no critic qw(ProhibitUnusedPrivateSubroutines)  # DEVELOPER DEFAULT 3: allow uncalled subroutines
 
 ## no critic qw(ProhibitStringyEval)  # SYSTEM DEFAULT 1: allow eval()
 ## no critic qw(ProhibitCascadingIfElse)  # SYSTEM DEFAULT 2: allow argument-handling logic
-## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
+## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case & mixed-case package names
 ## no critic qw(RequireCheckingReturnValueOfEval)  # SYSTEM DEFAULT 4: allow eval() test code blocks
 
 ## no critic qw(ProhibitBooleanGrep)  # SYSTEM SPECIAL 1: allow grep
@@ -107,8 +108,12 @@ use constant PIE => my string $TYPED_PIE = 'pecan';
 our hashref $properties = {
     plugh => my integer $TYPED_plugh         = 23,
     xyzzy => my string $TYPED_xyzzy          = 'twenty-three',
-    thud  => my integer_arrayref $TYPED_thud = [ 2, 4, 6, 8 ],
-    yyz => my number_hashref $TYPED_yyz = { a => 3.1, b => 6.2, c => 9.3 }
+    thub  => my integer_arrayref $TYPED_thub = undef,                    # no  initial size, no  initial values 
+    thud  => my integer_arrayref $TYPED_thud = [ 2, 4, 6, 8 ],           # no  initial size, yes initial values
+    thuj  => my integer_arrayref $TYPED_thuj->[4 - 1] = undef,           # yes initial size, no  initial values
+    thuv  => my integer_arrayref $TYPED_thuv->[4 - 1] = [ 2, 4, 6, 8 ],  # yes initial size, yes initial values; NEED ANSWER, DOES THIS CURRENTLY WORK???
+    yyx   => my number_hashref $TYPED_yyx = undef,
+    yyz   => my number_hashref $TYPED_yyz = { a => 3.1, b => 6.2, c => 9.3 }  # NEED FIX, DOES NOT CURRENTLY WORK
 };
 
 # [[[ SUBROUTINES & OO METHODS ]]]

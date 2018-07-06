@@ -1,7 +1,7 @@
 using std::cout;  using std::cerr;  using std::endl;
 
 #ifndef __CPP__INCLUDED__RPerl__DataType__UnsignedInteger_h
-#define __CPP__INCLUDED__RPerl__DataType__UnsignedInteger_h 0.006_000
+#define __CPP__INCLUDED__RPerl__DataType__UnsignedInteger_h 0.007_000
 
 // [[[ TYPEDEFS ]]]
 # ifndef __CPP__INCLUDED__RPerl__DataType__UnsignedInteger_h__typedefs
@@ -110,14 +110,15 @@ typedef long integer;  // default
 # endif
 # ifndef __CPP__INCLUDED__RPerl__DataType__Number_h__typedefs
 #define __CPP__INCLUDED__RPerl__DataType__Number_h__typedefs 1
-
-
 #  ifdef __TYPE__NUMBER__DOUBLE
 typedef double number;
+#define NUMBER "f"
 #  elif defined __TYPE__NUMBER__LONG__DOUBLE
 typedef long double number;
+#define NUMBER "Lf"  // assume format code 'Lf' exists if type 'long double' exists
 #  else
 typedef double number;  // default
+#define NUMBER "f"
 #  endif
 # endif
 # ifndef __CPP__INCLUDED__RPerl__DataType__Character_h__typedefs
@@ -202,11 +203,11 @@ string unsigned_integer_to_string_CPPTYPES(unsigned_integer input_unsigned_integ
 /*
 // [[[ TYPE TESTING ]]]
 # ifdef __PERL__TYPES
-SV* unsigned_integer__typetest0();
-SV* unsigned_integer__typetest1(SV* lucky_unsigned_integer);
+SV* unsigned_integer_typetest0();
+SV* unsigned_integer_typetest1(SV* lucky_unsigned_integer);
 # elif defined __CPP__TYPES
-unsigned_integer unsigned_integer__typetest0();
-unsigned_integer unsigned_integer__typetest1(unsigned_integer lucky_unsigned_integer);
+unsigned_integer unsigned_integer_typetest0();
+unsigned_integer unsigned_integer_typetest1(unsigned_integer lucky_unsigned_integer);
 # endif
 */
 

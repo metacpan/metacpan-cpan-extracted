@@ -1,3 +1,7 @@
+use Mojo::Base -strict;
+
+BEGIN { $ENV{MOJO_NO_JSON_XS} = 1 }
+
 package JSONTest;
 use Mojo::Base -base;
 
@@ -10,7 +14,6 @@ use Mojo::Base -base;
 use overload '&' => sub {die}, '""' => sub {'works!'};
 
 package main;
-use Mojo::Base -strict;
 
 use Test::More;
 use Mojo::ByteStream 'b';
@@ -218,10 +221,6 @@ is_deeply $array, ["\x{10346}"], 'successful roundtrip';
 $array = decode_json '["\\ud800\\udf46"]';
 is_deeply $array, ["\x{10346}"], 'decode [\"\\ud800\\udf46\"]';
 
-# Decode object with duplicate keys
-$hash = decode_json '{"foo": 1, "foo": 2}';
-is_deeply $hash, {foo => 2}, 'decode {"foo": 1, "foo": 2}';
-
 # Complicated roudtrips
 $bytes = '{"":""}';
 $hash  = decode_json $bytes;
@@ -249,12 +248,10 @@ is_deeply $hash, {foo => 'c:\progra~1\mozill~1\firefox.exe'},
 $bytes = encode_json(['a' x 32768]);
 is_deeply decode_json($bytes), ['a' x 32768], 'successful roundtrip';
 
-# u2028, u2029 and slash
-$bytes = encode_json ["\x{2028}test\x{2029}123</script>"];
-is $bytes, '["\u2028test\u2029123<\/script>"]',
-  'escaped u2028, u2029 and slash';
-is_deeply decode_json($bytes), ["\x{2028}test\x{2029}123</script>"],
-  'successful roundtrip';
+# Slash
+$bytes = encode_json ['123</script>'];
+is $bytes, '["123<\/script>"]', 'escaped slash';
+is_deeply decode_json($bytes), ['123</script>'], 'successful roundtrip';
 
 # JSON without UTF-8 encoding
 is_deeply from_json('["♥"]'), ['♥'], 'characters decoded';
@@ -272,19 +269,12 @@ $bytes = encode_json(JSONTest->new(
   something => {just => 'works'}, else => {not => 'working'}));
 is_deeply decode_json($bytes), {just => 'works'}, 'successful roundtrip';
 
+# Unknown reference
+is_deeply encode_json(sub { }), 'null', 'unknown reference';
+
 # Boolean shortcut
 is encode_json({true  => \1}), '{"true":true}',   'encode {true => \1}';
 is encode_json({false => \0}), '{"false":false}', 'encode {false => \0}';
-$bytes = 'some true value';
-is encode_json({true => \!!$bytes}), '{"true":true}',
-  'encode true boolean from double negated reference';
-is encode_json({true => \$bytes}), '{"true":true}',
-  'encode true boolean from reference';
-$bytes = '';
-is encode_json({false => \!!$bytes}), '{"false":false}',
-  'encode false boolean from double negated reference';
-is encode_json({false => \$bytes}), '{"false":false}',
-  'encode false boolean from reference';
 
 # Booleans in different contexts
 ok true, 'true';
@@ -319,8 +309,6 @@ my $dual = dualvar 23, 'twenty three';
 is encode_json([$dual]), '["twenty three"]', 'dualvar stringified';
 
 # Other reference types
-my $sub = sub { };
-is encode_json([$sub]), "[\"$sub\"]", 'code reference stringified';
 is encode_json([JSONTest2->new]), "[\"works!\"]", 'object stringified';
 
 # Ensure numbers and strings are not upgraded

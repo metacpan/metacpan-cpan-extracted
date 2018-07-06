@@ -46,13 +46,13 @@ sub ast_to_rperl__generate {
 
     my string $self_class = ref $self;
 
-    # unwrap HashReference_231 & HashReference_232 from SubExpression_161
+    # unwrap HashReference_232 & HashReference_233 from SubExpression_161
     if ( $self_class eq 'SubExpression_161' ) {
         $self = $self->{children}->[0];
         $self_class = ref $self;
     }
 
-    if ( $self_class eq 'HashReference_231' ) { # HashReference -> LBRACE HashEntry STAR-50 '}'
+    if ( $self_class eq 'HashReference_232' ) { # HashReference -> LBRACE HashEntry STAR-50 '}'
         my string $left_brace        = $self->{children}->[0];
         my object $hash_entry        = $self->{children}->[1];
         my object $hash_entries_star = $self->{children}->[2];
@@ -68,7 +68,7 @@ sub ast_to_rperl__generate {
             if ( ref $hash_entry_star eq 'TERMINAL' ) {
                 if ( $hash_entry_star->{attr} ne q{,} ) {
                     die RPerl::Parser::rperl_rule__replace(
-                        q{ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '}
+                        q{ERROR ECOGEASRP000, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '}
                             . $hash_entry_star->{attr}
                             . q{' found where OP21_LIST_COMMA ',' expected, dying}
                     ) . "\n";
@@ -86,16 +86,16 @@ sub ast_to_rperl__generate {
 
         $rperl_source_group->{PMC} .= $right_brace;
     }
-    elsif ( $self_class eq 'HashReference_232' ) { # HashReference -> LBRACE '}'
+    elsif ( $self_class eq 'HashReference_233' ) { # HashReference -> LBRACE '}'
         my string $left_brace  = $self->{children}->[0];
         my string $right_brace = $self->{children}->[1];
         $rperl_source_group->{PMC} .= $left_brace . $right_brace;
     }
     else {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
+            'ERROR ECOGEASRP000, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                 . ($self_class)
-                . ' found where HashReference_231, HashReference_232, or SubExpression_161 expected, dying'
+                . ' found where HashReference_232, HashReference_233, or SubExpression_161 expected, dying'
         ) . "\n";
     }
     return $rperl_source_group;
@@ -123,13 +123,13 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
 
     my string $self_class = ref $self;
 
-    # unwrap HashReference_231 & HashReference_232 from SubExpression_161
+    # unwrap HashReference_232 & HashReference_233 from SubExpression_161
     if ( $self_class eq 'SubExpression_161' ) {
         $self = $self->{children}->[0];
         $self_class = ref $self;
     }
 
-    if ( $self_class eq 'HashReference_231' ) { # HashReference -> LBRACE HashEntry STAR-50 '}'
+    if ( $self_class eq 'HashReference_232' ) { # HashReference -> LBRACE HashEntry STAR-50 '}'
         my object $hash_entry        = $self->{children}->[1];
         my object $hash_entries_star = $self->{children}->[2];
 
@@ -141,7 +141,7 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
             if ( ref $hash_entry_star eq 'TERMINAL' ) {
                 if ( $hash_entry_star->{attr} ne q{,} ) {
                     die RPerl::Parser::rperl_rule__replace(
-                        q{ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '}
+                        q{ERROR ECOGEASCP000, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '}
                             . $hash_entry_star->{attr}
                             . q{' found where OP21_LIST_COMMA ',' expected, dying}
                     ) . "\n";
@@ -156,14 +156,14 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
 
         $cpp_source_group->{CPP} .= ' }';
     }
-    elsif ( $self_class eq 'HashReference_232' ) { # HashReference -> LBRACE '}'
+    elsif ( $self_class eq 'HashReference_233' ) { # HashReference -> LBRACE '}'
         $cpp_source_group->{CPP} .= '{}';
     }
     else {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
+            'ERROR ECOGEASCP000, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
                 . ($self_class)
-                . ' found where HashReference_231, HashReference_232, or SubExpression_161 expected, dying'
+                . ' found where HashReference_232, HashReference_233, or SubExpression_161 expected, dying'
         ) . "\n";
     }
     return $cpp_source_group;
@@ -179,13 +179,13 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES__bson_build {
 
     my string $self_class = ref $self;
 
-    # unwrap HashReference_231 & HashReference_232 from SubExpression_161
+    # unwrap HashReference_232 & HashReference_233 from SubExpression_161
     if ( $self_class eq 'SubExpression_161' ) {
         $self = $self->{children}->[0];
         $self_class = ref $self;
     }
 
-    if ( $self_class eq 'HashReference_231' ) { # HashReference -> LBRACE HashEntry STAR-50 '}'
+    if ( $self_class eq 'HashReference_232' ) { # HashReference -> LBRACE HashEntry STAR-50 '}'
         my object $hash_entry        = $self->{children}->[1];
         my object $hash_entries_star = $self->{children}->[2];
 
@@ -206,7 +206,7 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES__bson_build {
             if ( ref $hash_entry_star eq 'TERMINAL' ) {
                 if ( $hash_entry_star->{attr} ne q{,} ) {
                     die RPerl::Parser::rperl_rule__replace(
-                        q{ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '}
+                        q{ERROR ECOGEASCP000, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '}
                             . $hash_entry_star->{attr}
                             . q{' found where OP21_LIST_COMMA ',' expected, dying}
                     ) . "\n";
@@ -228,14 +228,14 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES__bson_build {
             $cpp_source_group->{CPP} .= ' << bson_hashref_end';
         }
     }
-    elsif ( $self_class eq 'HashReference_232' ) { # HashReference -> LBRACE '}'
+    elsif ( $self_class eq 'HashReference_233' ) { # HashReference -> LBRACE '}'
 #        $cpp_source_group->{CPP} .= '{}';
     }
     else {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
+            'ERROR ECOGEASCP000, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
                 . ($self_class)
-                . ' found where HashReference_231, HashReference_232, or SubExpression_161 expected, dying'
+                . ' found where HashReference_232, HashReference_233, or SubExpression_161 expected, dying'
         ) . "\n";
     }
 

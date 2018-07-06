@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx::Schema::DSL
 
+1.0000 2018-07-05T09:12:56Z
+    - The create_table function returns true value obviously
+
 0.12 2015-07-24T04:18:04Z
     - fix test only (karupanerura++)
 

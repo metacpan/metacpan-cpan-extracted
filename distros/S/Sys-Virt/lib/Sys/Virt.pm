@@ -78,7 +78,7 @@ use Sys::Virt::NWFilter;
 use Sys::Virt::DomainSnapshot;
 use Sys::Virt::Stream;
 
-our $VERSION = '4.4.0';
+our $VERSION = '4.5.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -396,6 +396,24 @@ sub create_interface {
 
     return Sys::Virt::Interface->_new(connection => $self, xml => $xml);
 }
+
+
+=item my $binding = $conn->create_nwfilter_binding($xml);
+
+Create a new network filter binding based on the XML description passed into the C<$xml>
+parameter. The returned object is an instance of the L<Sys::Virt::NWFilterBinding>
+class.
+
+=cut
+
+sub create_nwfilter_binding {
+    my $self = shift;
+    my $xml = shift;
+
+    return Sys::Virt::NWFilterBinding->_new(connection => $self, xml => $xml);
+}
+
+
 
 =item my $iface = $conn->define_interface($xml);
 
@@ -897,6 +915,12 @@ Return a list of all nwfilters currently known to the hypervisor. The elements
 in the returned list are instances of the L<Sys::Virt::NWFilter> class.
 The C<$flags> parameter is currently unused and defaults to zero.
 
+=item my @bindings = $conn->list_all_nwfilter_bindings($flags)
+
+Return a list of all nwfilter bindings currently known to the hypervisor. The
+elements in the returned list are instances of the L<Sys::Virt::NWFilterBinding>
+class. The C<$flags> parameter is currently unused and defaults to zero.
+
 =item $conn->define_save_image_xml($file, $dxml, $flags=0)
 
 Update the XML associated with a virtual machine's save image. The C<$file>
@@ -1199,6 +1223,21 @@ sub get_nwfilter_by_uuid {
 
     return Sys::Virt::NWFilter->_new(connection => $self, uuid => $uuid);
 }
+
+=item my $binding = $conn->get_nwfilter_binding_by_port_dev($name)
+
+Return the network filter binding for the port device C<$name>. The returned object is
+an instance of the L<Sys::Virt::NWFilterBinding> class.
+
+=cut
+
+sub get_nwfilter_binding_by_port_dev {
+    my $self = shift;
+    my $name = shift;
+
+    return Sys::Virt::NWFilterBinding->_new(connection => $self, portdev => $name);
+}
+
 
 =item my $xml = $conn->find_storage_pool_sources($type, $srcspec[, $flags])
 
@@ -1507,6 +1546,32 @@ C<$params> should be a hash reference whose keys are one
 of the MEMORY PARAMETERS constants. The C<$flags>
 parameter is currently unused, and defaults to 0 if omitted.
 
+
+=item $info = $conn->get_node_sev_info($flags=0)
+
+Get the AMD SEV information for the host. C<$flags> is
+currently unused and defaults to 0 if omitted. The returned
+hash contains the following keys:
+
+=over 4
+
+=item Sys::Virt::SEV_CBITPOS
+
+The CBit position
+
+=item Sys::Virt::SEV_CERT_CHAIN
+
+The certificate chain
+
+=item Sys::Virt::SEV_PDH
+
+Platform diffie-hellman key
+
+=item Sys::Virt::SEV_REDUCED_PHYS_BITS
+
+The number of physical address bits used by SEV
+
+=back
 
 =item $conn->node_suspend_for_duration($target, $duration, $flags=0)
 

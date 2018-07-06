@@ -1,0 +1,14 @@
+Revision history for perl module Webservice::Judobase
+
+0.02 2018-07-03
+
+ - Moved tests that hit API to xt from t
+ - Added Changes file
+
+0.01 2018-07-02
+
+ - Initial public release
+
+0.01 Dev 2017-08-26
+
+ - Test release for YAPC::EU 2017

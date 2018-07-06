@@ -25,7 +25,6 @@ t/memory_leak.t
 t/multiple_handles.t
 t/new.t
 t/overridden_pipe.t
-t/pod.t
 t/seek.t
 t/tell.t
 t/ungetc.t
@@ -43,6 +42,7 @@ inc/Module/Install/GithubMeta.pm
 inc/Module/Install/Include.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
+inc/Module/Install/StandardTests.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm

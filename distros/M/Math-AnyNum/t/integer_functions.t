@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 428;    # be careful
+plan tests => 482;
 
 use Math::AnyNum qw(:ntheory);
 use Math::GMPz::V qw();
@@ -36,6 +36,108 @@ is(fibonacci($o->new(12)), '144');
 is(join(' ', map { fibonacci($_, 3) } 0 .. 14),                                             '0 0 1 1 2 4 7 13 24 44 81 149 274 504 927');
 is(join(' ', map { fibonacci(Math::AnyNum->new_ui($_), Math::AnyNum->new_ui(4)) } 0 .. 14), '0 0 0 1 1 2 4 8 15 29 56 108 208 401 773');
 #>>>
+
+{
+    my $t = ipow2(127) - 1;
+    is(lucasmod($t, $t), 1);
+    is(fibmod($t, $t), $t - 1);
+}
+
+{
+    my $t = ipow10(15);
+    is(fibmod(105, $t), fibonacci(105) % $t);
+    is(lucasmod(105, $t), lucas(105) % $t);
+}
+
+is(fibmod(1234, 987654), fibonacci(1234) % 987654);
+is(lucasmod(1234, 987654), lucas(1234) % 987654);
+
+is(fibmod(-1, 1234), 'NaN');
+is(lucasmod(-1, 1234), 'NaN');
+
+is(fibmod(42, 0), 'NaN');
+is(lucasmod(42, 0), 'NaN');
+
+{
+    my $x = Math::AnyNum->new('1/3');
+
+    is(chebyshevT(0, $x), 1);
+    is(chebyshevT(1, $x), $x);
+    is(chebyshevT(2, $x), 2 * $x * $x - 1);
+
+    is(chebyshevU(0, $x), 1);
+    is(chebyshevU(1, $x), 2 * $x);
+    is(chebyshevU(2, $x), 4 * $x * $x - 1);
+
+    is(chebyshevT(4, -$x), (-1)**4 * chebyshevT(4, $x));
+    is(chebyshevT(5, -$x), (-1)**5 * chebyshevT(5, $x));
+
+    is(chebyshevU(4, -$x), (-1)**4 * chebyshevU(4, $x));
+    is(chebyshevU(5, -$x), (-1)**5 * chebyshevU(5, $x));
+
+    $x = Math::AnyNum->new('-7/11');
+
+    is(chebyshevT(Math::AnyNum->new(10), $x), '-21191511863/25937424601');
+    is(chebyshevT(Math::AnyNum->new(11), $x), '275243014193/285311670611');
+
+    is(chebyshevU(Math::AnyNum->new(10), $x), '-8853775501/25937424601');
+    is(chebyshevU(Math::AnyNum->new(11), $x), '337219442700/285311670611');
+
+    is(chebyshevT(-1,                    $x), '-7/11');
+    is(chebyshevT(-2,                    $x), '-23/121');
+    is(chebyshevT(-3,                    $x), '1169/1331');
+    is(chebyshevT(Math::AnyNum->new(-4), $x), '-13583/14641');
+
+    is(chebyshevU(-1,                    $x), 0);
+    is(chebyshevU(-2,                    $x), -1);
+    is(chebyshevU(-3,                    $x), '14/11');
+    is(chebyshevU(Math::AnyNum->new(-4), $x), '-75/121');
+
+    is(chebyshevT(4, -$x), (-1)**4 * chebyshevT(4, $x));
+    is(chebyshevT(5, -$x), (-1)**5 * chebyshevT(5, $x));
+
+    is(chebyshevU(4, -$x), (-1)**4 * chebyshevU(4, $x));
+    is(chebyshevU(5, -$x), (-1)**5 * chebyshevU(5, $x));
+
+    is(chebyshevT(4.7, -$x), (-1)**4 * chebyshevT(4, $x));    # 4.7 gets truncated to 4
+    is(chebyshevU(4.7, -$x), (-1)**4 * chebyshevU(4, $x));    # =//=
+
+    is(chebyshevT(Math::AnyNum->new(4.7), -$x), (-1)**4 * chebyshevT(4, $x));    # 4.7 gets truncated to 4
+    is(chebyshevU(Math::AnyNum->new(4.7), -$x), (-1)**4 * chebyshevU(4, $x));    # =//=
+
+    is(chebyshevT(5, cos($x)), cos($x * 5));
+    is(chebyshevU(5, cos($x)), sin(6 * $x) / sin($x));
+}
+
+{
+    # LaguerreL(n,x)
+    my $x = Math::AnyNum->new('7/5');
+    my $y = Math::AnyNum->new('-5/9');
+    my $t = Math::AnyNum->new(12);
+
+    is(join(', ', map { laguerreL($_, $x) } 0 .. 5), '1, -2/5, -41/50, -269/375, -5839/15000, -3341/187500');
+    is(join(', ', map { laguerreL($_, $y) } 0 .. 5), '1, 14/9, 367/162, 6907/2187, 671809/157464, 3987263/708588');
+
+    is(laguerreL($t, 5) * factorial(12), '-693883775');
+
+    # LegendreP(n,x)
+    is(join(', ', map { legendreP($_, $x) } 0 .. 5), '1, 7/5, 61/25, 119/25, 1229/125, 65527/3125');
+    is(join(', ', map { legendreP($_, $y) } 0 .. 5), '1, -5/9, -1/27, 295/729, -2399/6561, 275/6561');
+
+    is(legendreP($t, 5), '143457011569');
+
+    # HermiteH(n,x)
+    is(join(', ', map { hermiteH($_, $x) } 0 .. 5), '1, 14/5, 146/25, 644/125, -12884/625, -309176/3125');
+    is(join(', ', map { hermiteH($_, $y) } 0 .. 5), '1, -10/9, -62/81, 3860/729, -8468/6561, -2416600/59049');
+
+    is(hermiteH($t, 5), '171237081280');
+
+    # HermiteHe(n, x)
+    is(join(', ', map { hermiteHe($_, $x) } 0 .. 5), '1, 7/5, 24/25, -182/125, -3074/625, -3318/3125');
+    is(join(', ', map { hermiteHe($_, $y) } 0 .. 5), '1, -5/9, -56/81, 1090/729, 8158/6561, -393950/59049');
+
+    is(hermiteHe($t, 5), '-5939480');
+}
 
 is(binomial(12,           5),           '792');
 is(binomial(0,            0),           '1');

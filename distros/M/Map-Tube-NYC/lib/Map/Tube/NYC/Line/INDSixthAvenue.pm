@@ -1,6 +1,6 @@
 package Map::Tube::NYC::Line::INDSixthAvenue;
 
-$Map::Tube::NYC::Line::INDSixthAvenue::VERSION   = '0.56';
+$Map::Tube::NYC::Line::INDSixthAvenue::VERSION   = '0.57';
 $Map::Tube::NYC::Line::INDSixthAvenue::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::NYC::Line::INDSixthAvenue - NYC Subway Map: IND Sixth Avenue Line.
 
 =head1 VERSION
 
-Version 0.56
+Version 0.57
 
 =head1 DESCRIPTION
 

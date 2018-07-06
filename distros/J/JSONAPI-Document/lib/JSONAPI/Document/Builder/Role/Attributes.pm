@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Role::Attributes;
-$JSONAPI::Document::Builder::Role::Attributes::VERSION = '1.7';
+$JSONAPI::Document::Builder::Role::Attributes::VERSION = '2.0';
 =head1 NAME
 
 JSONAPI::Document::Builder::Role::Attributes - Utility role for JSON API attributes
 
 =head1 VERSION
 
-version 1.7
+version 2.0
 
 =head1 DESCRIPTION
 

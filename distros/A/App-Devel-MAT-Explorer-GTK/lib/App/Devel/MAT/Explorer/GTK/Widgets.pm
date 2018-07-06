@@ -8,7 +8,7 @@ package App::Devel::MAT::Explorer::GTK::Widgets;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Glib qw( TRUE FALSE );
 use Gtk2;

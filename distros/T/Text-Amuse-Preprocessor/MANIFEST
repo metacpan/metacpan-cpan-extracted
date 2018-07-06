@@ -59,6 +59,7 @@ t/testfiles/fr.muse
 t/testfiles/full.in.muse
 t/testfiles/full.out.muse
 t/testfiles/hr.muse
+t/testfiles/id.muse
 t/testfiles/infile.muse
 t/testfiles/it.muse
 t/testfiles/mk.muse

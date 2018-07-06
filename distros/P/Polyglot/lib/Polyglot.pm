@@ -60,7 +60,7 @@ use autouse 'Data::Dumper' => 'Dumper';
 use Carp qw(carp);
 use Text::ParseWords qw( quotewords );
 
-$VERSION = '1.002';
+our $VERSION = '1.003';
 
 my $Debug = $ENV{DEBUG} || 0;
 
@@ -74,8 +74,7 @@ Creates a new Polyglot object and returns it.
 
 =cut
 
-sub new
-	{
+sub new {
 	my( $class, @args )  = @_;
 
 	my $self = bless {}, $class;
@@ -107,8 +106,7 @@ has mucked with it.
 
 =cut
 
-sub run
-	{
+sub run {
 	my $self = shift;
 
 	my $prompt = "$0> ";
@@ -116,8 +114,7 @@ sub run
 	print "H: Waiting for commands on standard input\n$prompt"
 		unless @ARGV;
 
-	while( <> )
-		{
+	while( <> ) {
 		print "$ARGV\[$.]: $_";
 		chomp;
 		next if /^\s*#?$/;
@@ -171,8 +168,7 @@ HELP string for this DIRECTIVE.
 
 =cut
 
-sub add
-	{
+sub add {
 	my( $self, $name, $state, $sub, $value, $help ) = @_;
 
 	$self->{$name} = [ $state, $sub, $help ];
@@ -186,8 +182,7 @@ Returns the value for DIRECTIVE, or sets it if you specify VALUE.
 
 =cut
 
-sub value
-	{
+sub value {
 	my( $self, $name, $value ) = @_;
 	carp "Setting $name with $value\n" if $Debug;
 
@@ -210,8 +205,7 @@ line.
 
 =cut
 
-sub add_action
-	{
+sub add_action {
 	my $self = shift;
 	my $name = uc shift;
 	my( $sub, $value, $help ) = @_;
@@ -228,8 +222,7 @@ Use this for a directive that can set a value.
 
 =cut
 
-sub add_state
-	{
+sub add_state {
 	my $self = shift;
 	my $name = uc shift;
 	my( $value, $help ) = @_;
@@ -247,8 +240,7 @@ Use this for a value that can be either "on" or "off".
 
 =cut
 
-sub add_toggle
-	{
+sub add_toggle {
 	my $self = shift;
 	my $name = uc shift;
 	my( $value, $help ) = @_;
@@ -260,8 +252,7 @@ sub add_toggle
 			my $value = lc shift;
 			warn "saw $name with value [$value]\n";
 
-			unless( $value eq 'on' or $value eq 'off' )
-				{
+			unless( $value eq 'on' or $value eq 'off' ) {
 				warn "$name can be only 'on' or 'off', line $.\n";
 				return
 				}
@@ -282,8 +273,7 @@ Returns a help message: you want to override this.
 
 =cut
 
-sub help
-	{
+sub help {
 	my $self = shift;
 	my $name = uc shift;
 
@@ -298,8 +288,7 @@ Returns a list of directives.
 
 =cut
 
-sub directives
-	{
+sub directives {
 	my $self = shift;
 
 	return sort keys %$self;
@@ -357,7 +346,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2017, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

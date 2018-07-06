@@ -1,0 +1,56 @@
+Template::Like
+   Looks like TT. Has a bunch of directives. Last updated in 2013.
+
+Template::Tiny  Adam Kennedy
+   Has 5 likes in metacpan
+   reimplementation of a subset of the functionality from Template Toolkit in as few lines of code as possible.
+   Last updated in 2011
+   FOREACH but no WHILE. Only simple IF tests
+
+Text::MicroTemplate  Kazuho Oku  last updated June 2015
+   part of the inspiration for Xslate. Based on Mojo::Template
+   Uses embedded Perl. Marked with <?  ?> or a single question mark at the beginning of a line
+   Also - Text::MicroTemplate::Extended
+          Text::MicroTemplate::DataSection
+
+my Template::Snippets (template-minimal)
+   borrowed from Template::Teeny (konobi)
+
+
+Text::Template  -  mjd. 13 likes.
+   written originally back in 2003? uses all upper case for options like HASH => { }
+   kinda strange functionality, but workable. Variables come from package or our variables or
+      can be passed in with HASH =>. 
+   MicroTemplate seems simpler
+
+HTML::Template::Compiled  3 likes, some reviews, originally written back in 2004/5. Updated Jul 2015
+   Like HTML::Template (?)
+
+Jemplate - turns TT templates into javascript. Ingy.
+   written 2006. updated in 2014.
+
+
+Text::CAML - a mustache templating engine. 5 likes. written in 
+
+Text::Hogan - A mustache templating engine statement-for-statement cloned from hogan.js
+   new. written in 2015. Interesting because could also be used in javascript
+   Also: https://github.com/pvande/Template-Mustache. Except for a cluster of commits on Mar 4, had
+        not been touched since 201
+
+
+Text::Template::Simple - originally written in 2004. Burak Gursoy. Last updated 2012.
+   Uses Perl as the language. Multiple kinds of delimiters for different purposes.
+
+Tenjin - Ido Perlmutter. Last updated 2011.
+   Documentaiton sucks. Couldn't find anything on actually creating a template.
+    <h1>Hello, World! This is Dancer [= $dancer_version =]!</h1>
+    <p>
+      <?pl if ((localtime)[2] < 12) { ?>
+        Good morning!
+      <?pl } else { ?>
+        Good afternoon!
+      <?pl } ?>
+    </p>
+    <p>
+      Current time is: [== DateTime->now->hms =]
+    </p>

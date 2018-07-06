@@ -9,6 +9,7 @@ use Digest::SHA qw(sha256_hex);
 use Path::Tiny;
 use Syntax::Keyword::Try;
 use Mojo::JSON qw(encode_json);
+use Port::Selector;
 
 my @storages = (
     Path::Tiny->tempdir(),
@@ -37,6 +38,8 @@ my $cfg_file = Path::Tiny->tempfile();
 
 $cfg_file->spew(encode_json($cfg));
 
+my $port = Port::Selector->new()->port();
+
 my $pid = fork();
 die "fork() failed: $!" unless defined $pid;
 
@@ -47,15 +50,15 @@ if ($pid) { # parent
         my $content = 'Content!' . rand;
         my $sha = sha256_hex($content);
 
-        my $tx = $ua->post("http://localhost:3000/$sha" => {} => $content);
+        my $tx = $ua->post("http://localhost:$port/$sha" => {} => $content);
         is($tx->res->code, 401, 'basic authorization');
 
-        $tx = $ua->post("http://user:pass\@localhost:3000/$sha" => {} => $content);
+        $tx = $ua->post("http://user:pass\@localhost:$port/$sha" => {} => $content);
         is($tx->res->code, 201, 'file created');
-        my $res = $ua->get("http://localhost:3000/$sha")->res;
+        my $res = $ua->get("http://localhost:$port/$sha")->res;
         is($res->body, $content, 'received what we had sent');
         like($res->headers->last_modified, qr/\w+, \d+ \w+ \d+ \d+:\d+:\d+ GMT/, 'Last-Modified header exists');
-        $tx = $ua->get("http://localhost:3000/" . ('0' x 64));
+        $tx = $ua->get("http://localhost:$port/" . ('0' x 64));
         is($tx->res->code, 404, 'zero hash not found');
     }
     catch {
@@ -67,6 +70,6 @@ if ($pid) { # parent
 }
 else {      # child
     setpgrp(0, 0); #process group (to enable killing whole process tree)
-    exec "CONFIG_FILE=$cfg_file PERL5LIB=\$PWD/lib:\$PERL5LIB script/stor daemon";
+    exec "CONFIG_FILE=$cfg_file PERL5LIB=\$PWD/lib:\$PERL5LIB $^X script/stor daemon -l http://*:$port";
     die 'Exec failed';
 }

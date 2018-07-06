@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.26
+Version 0.27
 
 =head1 SYNOPSIS
 
@@ -63,12 +63,22 @@ Additionally, each Math::AnyNum object is B<immutable>.
     lucas(n)                  n-th Lucas number
     fibonacci(n)              n-th Fibonacci number
     fibonacci(n,k)            n-th Fibonacci number of k-th order
+    fibmod(n,m)               n-th Fibonacci number modulo m
+    lucasmod(n,m)             n-th Lucas number modulo m
     polygonal(n,k)            n-th k-gonal number
     harmonic(n)               n-th harmonic numbers: 1+1/2+...+1/n
+    secant_number(n)          n-th secant/zig number
+    tangent_number(n)         n-th tangent/zag number
     euler(n)                  n-th Euler number: E_n
     bernoulli(n)              n-th Bernoulli number: B_n
-    euler(n,x)                Euler polynomial: E_n(x)
-    bernoulli(n,x)            Bernoulli polynomial: B_n(x)
+    euler(n,x)                Euler polynomials: E_n(x)
+    bernoulli(n,x)            Bernoulli polynomials: B_n(x)
+    laguerreL(n,x)            Laguerre polynomials: L_n(x)
+    legendreP(n,x)            Legendre polynomials: P_n(x)
+    hermiteH(n,x)             Physicists' Hermite polynomials: H_n(x)
+    hermiteHe(n,x)            Probabilists' Hermite polynomials: He_n(x)
+    chebyshevT(n,x)           Chebyshev polynomials of the 1st kind: T_n(x)
+    chebyshevU(n,x)           Chebyshev polynomials of the 2nd kind: U_n(x)
     faulhaber_sum(n,k)        sum of powers: 1^k + 2^k + ... + n^k
     geometric_sum(n,r)        geometric sum: r^0 + r^1 + ... + r^n
     kronecker(n,k)            Kronecker (Jacobi) symbol
@@ -809,40 +819,10 @@ The Lambert-W function. When the value of C<x> is less than C<-1/e>, it returns 
 
 It also accepts a complex number as input.
 
-Identities (assumming x>0):
+Identities (assuming x>0):
 
      LambertW(exp(x)*x) = x
      LambertW(log(x)*x) = log(x)
-
-=head2 bernoulli_polynomial
-
-    bernoulli_polynomial(n, x)                    #=> Any
-
-Returns the n-th Bernoulli polynomial: C<B_n(x)>.
-
-=head2 euler_polynomial
-
-    euler_polynomial(n, x)                        #=> Any
-
-Returns the n-th Euler polynomial: C<E_n(x)>.
-
-=head2 bernoulli / bernfrac
-
-    bernoulli(n)                                  #=> Rat | NaN
-    bernoulli(n, x)                               #=> Any
-
-Returns the n-th Bernoulli number C<B_n> as an exact fraction, with C<bernoulli(1) = 1/2>.
-
-When an additional argument is provided, it returns the the n-th Bernoulli polynomial: C<B_n(x)>.
-
-=head2 euler
-
-    euler(n)                                      #=> Rat | NaN
-    euler(n, x)                                   #=> Any
-
-Returns the n-th Euler number C<E_n>, starting with C<euler(0) = 1>.
-
-When an additional argument is provided, it returns the the n-th Euler polynomial: C<E_n(x)>.
 
 =head2 bernreal
 
@@ -855,15 +835,6 @@ Returns the n-th Bernoulli number, as a floating-point approximation, with C<ber
     lnbern(n)                                     #=> Float | Complex
 
 Returns the natural logarithm of the n-th Bernoulli number.
-
-=head2 harmonic / harmfrac
-
-    harmonic(n)                                   #=> Rat | NaN
-
-Returns the n-th Harmonic number C<H_n>. The harmonic numbers are the sum of
-reciprocals of the first C<n> natural numbers: C<1 + 1/2 + 1/3 + ... + 1/n>.
-
-For values greater than 7000, binary splitting (Fredrik Johansson's elegant formulation) is used.
 
 =head2 harmreal
 
@@ -907,7 +878,7 @@ Natural logarithm of the absolute value of the Gamma function.
 
     lngamma(x)                                    #=> Float
 
-Natural logarithm of the Gamma function on C<x>.
+Natural logarithm of the Gamma function for which the logarithm is a real number. Returns NaN otherwise.
 
 =head2 lnsuperfactorial
 
@@ -1004,13 +975,13 @@ Exponential integral of C<x>. Returns -Inf when C<x> is zero, and NaN when C<x> 
     Li(x)                                         #=> Float
 
 The logarithmic integral of C<x>, defined as: C<Ei(ln(x))>.
-Returns -Inf when C<x> is 1, and NaN when C<x> is less than or equal to 0.
+Returns -Inf when C<x> is 1, and NaN when C<x> is less than or equal to C<0>.
 
 =head2 Li2
 
     Li2(x)                                        #=> Float
 
-The dilogarithm function, defined as the integral of C<-log(1-t)/t> from 0 to C<x>.
+The dilogarithm function, defined as the integral of C<-log(1-t)/t> from C<0> to C<x>.
 
 =head1 TRIGONOMETRIC FUNCTIONS
 
@@ -1186,7 +1157,7 @@ Returns C<(NaN,NaN)> when a real root does not exists.
 
 The integer part of the logarithm of C<n> to base C<m> or base I<e> when C<m> is not specified.
 
-C<n> must be greater than 0 and C<m> must greater than 1. Returns NaN otherwise.
+C<n> must be greater than 0 and C<m> must be greater than 1. Returns NaN otherwise.
 
 =head2 ilog2 / ilog10
 
@@ -1264,6 +1235,57 @@ Example:
 
     geometric_sum(5, 8) = 8^0 + 8^1 + 8^2 + 8^3 + 8^4 + 8^5 = 37449
 
+=head2 harmonic / harmfrac
+
+    harmonic(n)                                   #=> Rat | NaN
+
+Returns the n-th Harmonic number C<H_n>. The harmonic numbers are the sum of
+reciprocals of the first C<n> natural numbers: C<1 + 1/2 + 1/3 + ... + 1/n>.
+
+For values greater than 7000, binary splitting (Fredrik Johansson's elegant formulation) is used.
+
+=head2 secant_number
+
+    secant_number(n)                              #=> Int
+
+Returns the n-th secant number (A000364), starting with C<secant_number(0) = 1>.
+
+=head2 tangent_number
+
+    tangent_number(n)                             #=> Int
+
+Returns the n-th tangent number (A000182), starting with C<tangent_number(1) = 1>.
+
+=head2 bernoulli_polynomial
+
+    bernoulli_polynomial(n, x)                    #=> Any
+
+Returns the n-th Bernoulli polynomial: C<B_n(x)>.
+
+=head2 euler_polynomial
+
+    euler_polynomial(n, x)                        #=> Any
+
+Returns the n-th Euler polynomial: C<E_n(x)>.
+
+=head2 bernoulli / bernfrac
+
+    bernoulli(n)                                  #=> Rat | NaN
+    bernoulli(n, x)                               #=> Any
+
+Returns the n-th Bernoulli number C<B_n> as an exact fraction, with C<bernoulli(1) = 1/2>.
+
+When an additional argument is provided, it returns the the n-th Bernoulli polynomial: C<B_n(x)>.
+
+=head2 euler
+
+    euler(n)                                      #=> Rat | NaN
+    euler(n, x)                                   #=> Any
+
+Returns the n-th Euler number C<E_n>, starting with C<euler(0) = 1>.
+
+When an additional argument is provided, it returns the the n-th Euler polynomial: C<E_n(x)>.
+
 =head2 lucas
 
     lucas(n)                                      #=> Int | NaN
@@ -1284,6 +1306,66 @@ Example:
     say fibonacci(100, 3);        # 100th Tribonacci number
     say fibonacci(100, 4);        # 100th Tetranacci number
     say fibonacci(100, 5);        # 100th Pentanacci number
+
+=head2 fibmod
+
+    fibmod(n, m)                                  #=> Int | NaN
+
+Efficiently compute the n-th Fibonacci number modulo m.
+
+=head2 lucasmod
+
+    lucasmod(n, m)                                #=> Int | NaN
+
+Efficiently compute the n-th Lucas number modulo m.
+
+=head2 chebyshevT
+
+    chebyshevT(n, x)                              #=> Any
+
+Compute the Chebyshev polynomials of the first kind: C<T_n(x)>, where C<n> must be a native integer.
+
+Defined as:
+
+    T(0, x) = 1
+    T(1, x) = x
+    T(n, x) = 2*x*T(n-1, x) - T(n-2, x)
+
+=head2 chebyshevU
+
+    chebyshevU(n, x)                              #=> Any
+
+Compute the Chebyshev polynomials of the second kind: C<U_n(x)>, where C<n> must be a native integer.
+
+Defined as:
+
+    U(0, x) = 1
+    U(1, x) = 2*x
+    U(n, x) = 2*x*U(n-1, x) - U(n-2, x)
+
+=head2 laguerreL
+
+    laguerreL(n, x)                               #=> Any
+
+Compute the Laguerre polynomials: C<L_n(x)>, where C<n> must be a non-negative native integer.
+
+=head2 legendreP
+
+    legendreP(n, x)                               #=> Any
+
+Compute the Legendre polynomials: C<P_n(x)>, where C<n> must be a non-negative native integer.
+
+=head2 hermiteH
+
+    hermiteH(n, x)                                #=> Any
+
+Compute the physicists' Hermite polynomials: C<H_n(x)>, where C<n> must be a non-negative native integer.
+
+=head2 hermiteHe
+
+    hermiteHe(n, x)                               #=> Any
+
+Compute the probabilists' Hermite polynomials: C<He_n(x)>, where C<n> must be a non-negative native integer.
 
 =head2 factorial
 
@@ -1648,7 +1730,7 @@ Returns a pseudorandom floating-point value. When an additional argument is prov
 it returns a number between C<x> (inclusive) and C<y> (exclusive). Otherwise, returns a number between
 C<0> (inclusive) and C<x> (exclusive).
 
-If C<x> is greater than C<y>, the returned value will be in the range "[y, x)".
+If C<x> is greater than C<y>, the returned value will be in the range C<[y, x)>.
 
 The PRNG behind this function is called the "Mersenne Twister". Although it generates pseudorandom
 numbers of very good quality, B<it is NOT cryptographically secure>. You should not rely on it in
@@ -2323,7 +2405,7 @@ See his great presentation at: L<https://www.youtube.com/watch?v=Dhl4_Chvm_g>.
 The main aim of this module is to provide a fast and correct alternative to L<Math::BigInt>,
 L<Maht::BigFloat> and L<Math::BigRat>, as well as to L<bigint>, L<bignum> and L<bigrat> pragmas.
 
-The original project was called C<Math::BigNum>, but because of some design flaws, the project
+The original project was called C<Math::BigNum>, but because of some design flaws, that project
 was abandoned and much of its code ended up in this module.
 
 =head1 AUTHOR

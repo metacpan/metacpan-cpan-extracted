@@ -1,18 +1,22 @@
 use strict;
 use warnings;
-package Acme::Pi;
-# ABSTRACT: Mmm, pie
+package Acme::Pi; # git description: v3.141592-16-gb99df53
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
+# ABSTRACT: Mmm, pie
+# KEYWORDS: pi π
 
 use utf8;
 
 my $version = atan2(1,1) * 4; $Acme::Pi::VERSION = substr("$version", 0, 16);
 
 use Exporter 5.57 'import';
-our @EXPORT = ('$π');
-our $π = atan2(1,1) * 4;
+our @EXPORT = ('$π', '$𝝿', 'π', '𝝿');
+our $π = our $𝝿 = atan2(1,1) * 4;
+use constant π => atan2(1,1) * 4;
+use constant 𝝿 => π;
 
 1;
+
 __END__
 
 =pod
@@ -32,17 +36,20 @@ version 3.14159265358979
     use Acme::Pi;
 
     my $area = $π * $radius**2;
+    my $volume = 4 * π / 3 * $radius**3;
 
 =head1 DESCRIPTION
 
 This distribution was created to celebrate L<Pi Day|http://www.piday.org/> 2014,
 as well as to demonstrate yet another example of a pathological C<$VERSION>.
 
-Additionally, it exports a single variable, C<$π>, defined as:
+Additionally, it exports two variables: C<$π> and C<$𝝿>,
+and two constants, C<π> and C<𝝿>, defined as:
 
     atan2(1,1) * 4;
 
-This module also defines its own C<$VERSION> as π.
+This module also defines its own C<$VERSION> as a fixed-point value approximating
+π (using as many digits as is supported on the local machine).
 It is intended that version parsers in the toolchain (L<Module::Metadata>,
 L<ExtUtils::MakeMaker>'s C<< MM->parse_version >>, L<Parse::PMFile>) should
 be capable of statically parsing this package's C<$VERSION>.
@@ -117,7 +124,7 @@ I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2014 by Karen Etheridge.
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-Azure-EventHubs
 
+0.07 2018-07-03T03:29:58Z
+    - Fix misdirected dependency (for netbsd)
+
 0.06 2018-07-02T06:08:44Z
     - Change URLs to 'metacpan.org' in test files that was directs 'search.cpan.org' 
 

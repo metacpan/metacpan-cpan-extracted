@@ -1,0 +1,7 @@
+Revision history for App-horsekicks
+
+0.13    2018-07-03
+        App-horsekicks first release. The program horsekick 
+        is firstly copied from "scripts/poisson" of CLI::Coin::Toss
+        and updated a lot.
+

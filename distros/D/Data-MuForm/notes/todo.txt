@@ -1,0 +1,464 @@
+
+the js in Repeatable is broken. remove or fix?
+
+
+
+Finish the localizer add_error_xx methods, create more tests, allow adding your own translation file
+
+
+
+
+Should the 'data' be allowed to be an object? new 'fill_input_from_object'?
+   Fill from object, then copy values to params?
+
+Altreus complaining about setting a default value for DBIC row that's undef
+wanted a way of using the default if undefined...
+
+
+---hooks----
+
+Form: 'in_setup', 'after_setup', 'after_build_fields', 'validate', 'validate_model'
+   'after_update_model' = used by reload code, but can override?
+
+
+----behavior-----
+What about compound fields that aren't required with required child values?
+
+The $form->value used to skip fields with no result. (not submitted and not checkboxes etc).
+But now we're not building results so...  ! ->has_input doesn't work because of checkboxes and selects.
+Just give up and always set the value? Why weren't we providing it, anyway?
+
+----transforms------
+For a bunch of builders, I've done:  methods => { 'build_id' => sub { { }
+What about: transforms => { 'input_to_value' => sub {} }?
+rename 'methods' hashref to 'builders'?
+
+better names/ways to do transforms - transform_after_validate  etc?
+    skip the whole inflate/deflate thing, which is just confusing
+
+    # inflated => 'inflate_method'   'transform_input_to_value'
+    # deflated => 'deflate_method'   'tranform_value_to_fif'
+         # add new transform:        'transform_param_to_input'
+    # inflated(d) => 'inflate_default_method'  'transform_default_to_value'
+    # deflated(v) => 'deflate_value_method'  'transform_value_after_validate'
+
+----methods-----
+
+Separate out builders?
+
+build_id
+build_label
+build_options (Select field)
+
+default (? . currently 'default')
+validate
+
+
+
+---- rendering -----
+Simple method of setting the element types for all form fields and for individual fields
+
+
+TextArea only adds 'cols' and 'row', which are rendering pieces
+    has_field 'some_text' => (
+        render_args => {
+            form_element => 'textarea',
+            cols => 40, rows => 50,
+        }
+    );
+# Hmm. Instinct was to have a Textarea field.
+
+# Field types... Decouple somewhat from form element types?
+   CheckboxGroup = 'Select' multiple,
+   RadioGroup = 'Select' single
+
+Allow to define field 'Type' in some other way... HashRef? At form level.
+    Integer => { apply => [ Int ] }
+
+Could do some recursive thing with the message gathering, just like _meta_fields?
+
+Meanwhile, switch to Locale::TextDomain, Locale::Simple? Some work to do on plurals and how theyre
+passed in. Still need MF message system because people may change messages on field defs.
+Q: How would people customize the messages? How do people localize Type::Tiny validations?
+
+Verify that order of loading of fields is correct.
+
+
+Component Fields
+----------------
+Compound
+Repeatable
+
+Just different rendering
+------------------------
+Hidden
+NonEditable
+Reset
+AddElement
+RmElement
+File
+
+Validation attributes set to particular values
+-----------------------------------------------
+Hour
+Minute
+Month
+MonthDay
+MonthName (options)
+Second
+Weekday (options)
+Year
+BoolSelect (options)
+DateMDY - date format
+
+Simple validation
+-----------------
+PosInteger
+Integer - validation
+
+
+Different behavior
+------------------
+Select  - complicated behavior
+Checkbox - no field name if unchecked
+Submit - special processing
+Captcha  - complicated rendering/validation
+Date - complicated validation
+Display - rendering field. Needed.
+Email - complicated validation. extra attributes.
+Float - complicated validation.
+PrimaryKey - symbolic value
+Money - validation ? drop?
+SelectCSV - transforms. Need to be able to specify transforms in Field def
+TextCSV - transforms, tweak to validation
+Upload - validation, extra attributes
+NoValue - behavior differences for display and submit fields
+
+Multiple - Select with sort_options and multiple flag set
+
+Nested?? what does this do?
+
+Not important or irritating. Drop.
+-------------
+Duration - multiple subfields. does anybody use this?
+DateTime - complicated rendering. nobody does it this way.
+Password  - special processing
+PasswordConf - ""
+IntRange - extra validation attributes
+
+form elements
+-------------
+input
+select
+textarea
+button (don't do on forms? also needs type)
+
+html5 elements
+--------------
+<datalist>
+<keygen>
+<output>
+
+# form input types
+-----------------------
+text
+password
+submit
+radio
+checkbox
+button
+
+html5 input types
+-----------------
+color
+date
+datetime
+datetime-local
+email
+month
+number
+range
+search
+tel
+time
+url
+week
+
+
+===== DOCUMENTED ======
+added alias 'data' to 'params'
+added 'check' method which doesn't do model_update
+
+renamed 'field_name_space' to 'field_namespace'
+
+Regularized arrayref/array returns from some attributes, such as 'fields' and 'options'
+Standard is arrayref. Use 'all_' to get array.
+
+Altreus complaining about setting a default value for DBIC row that's undef
+wanted a way of using the default if undefined...
+
+straighten out use of  of field_validate, validate, inner_validate in field classes
+     _inner_validate = 'base_validate'  .... why do we need this? also makes value an  arrayref...
+
+instead of 'posted' flag we have 'submitted' flag
+
+
+There's a 'filled' attribute being passed along in the fill_from_ methods. I think it was just
+to simplify converting from results. Should I do something with it? fill with values? or just
+pull it out? Might be a debug tool to record the fill? except... could fill input or value...
+
+Re-implement active, inactive arrayrefs, and 'set_active' method.
+   switched from "is_active" to 'active'. Is that what I want?  Added back 'is_active' and 'is_inactive'
+
+okay, there's a problem with indexing of repeatables, I think. When they're built?
+   I *think* that what's going on is that the 'contains' of the Repeatable is indexed, and the subfields, but
+     the field names won't match the "instantiated" fields, so they walk... I guess that's okay.
+
+Don't copy 'use_fields_for_input_without_param'. Can achieve the same thing with 'input_without_param', plus
+   'transform_param_to_input'
+
+Don't copy 'use_init_obj_when_no_accessor_in_item'. Confusing and difficult to implement properly. Doesn't work
+   when only an init_object.  Do this automatically.
+
+Don't do 'no_update' flag. Use -check method instead of ->process
+
+active => [] and inactive => [] only work in the temporary way. Set them in a hook if you want
+
+no update_field_list. users can implement their own custom update.
+
+'trim' is just a coderef, applied before 'apply_actions' instead of first in apply.
+
+---hooks----
+
+Form: 'in_setup', 'after_setup', 'after_build_fields', 'validate', 'validate_model'
+   'after_update_model' = used by reload code, but can override?
+
+
+----behavior-----
+What about compound fields that aren't required with required child values?
+
+The $form->value used to skip fields with no result. (not submitted and not checkboxes etc).
+But now we're not building results so...  ! ->has_input doesn't work because of checkboxes and selects.
+Just give up and always set the value? Why weren't we providing it, anyway?
+
+No 'no-update' flag. If the don't want to update the database, create an empty update_model. Use 'check'
+
+----transforms------
+For a bunch of builders, I've done:  methods => { 'build_id' => sub { { }
+What about: transforms => { 'input_to_value' => sub {} }?
+rename 'methods' hashref to 'builders'?
+
+better names/ways to do transforms - transform_after_validate  etc?
+    skip the whole inflate/deflate thing, which is just confusing
+
+    # inflated => 'inflate_method'   'transform_input_to_value'
+    # deflated => 'deflate_method'   'tranform_value_to_fif'
+         # add new transform:        'transform_param_to_input'
+    # inflated(d) => 'inflate_default_method'  'transform_default_to_value'
+    # deflated(v) => 'deflate_value_method'  'transform_value_after_validate'
+
+----methods-----
+
+Separate out builders?
+
+build_id
+build_label
+build_options (Select field)
+
+default (? . currently 'default')
+validate
+
+
+
+---- rendering -----
+Simple method of setting the element types for all form fields and for individual fields
+
+
+TextArea only adds 'cols' and 'row', which are rendering pieces
+    has_field 'some_text' => (
+        render_args => {
+            form_element => 'textarea',
+            cols => 40, rows => 50,
+        }
+    );
+# Hmm. Instinct was to have a Textarea field.
+
+# Field types... Decouple somewhat from form element types?
+   CheckboxGroup = 'Select' multiple,
+   RadioGroup = 'Select' single
+
+Allow to define field 'Type' in some other way... HashRef? At form level.
+    Integer => { apply => [ Int ] }
+
+Could do some recursive thing with the message gathering, just like _meta_fields?
+
+Meanwhile, switch to Locale::TextDomain, Locale::Simple? Some work to do on plurals and how theyre
+passed in. Still need MF message system because people may change messages on field defs.
+Q: How would people customize the messages? How do people localize Type::Tiny validations?
+
+Verify that order of loading of fields is correct.
+
+
+Component Fields
+----------------
+Compound
+Repeatable
+
+Just different rendering
+------------------------
+Hidden
+NonEditable
+Reset
+AddElement
+RmElement
+File
+
+Validation attributes set to particular values
+-----------------------------------------------
+Hour
+Minute
+Month
+MonthDay
+MonthName (options)
+Second
+Weekday (options)
+Year
+BoolSelect (options)
+DateMDY - date format
+
+Simple validation
+-----------------
+PosInteger
+Integer - validation
+
+
+Different behavior
+------------------
+Select  - complicated behavior
+Checkbox - no field name if unchecked
+Submit - special processing
+Captcha  - complicated rendering/validation
+Date - complicated validation
+Display - rendering field. Needed.
+Email - complicated validation. extra attributes.
+Float - complicated validation.
+PrimaryKey - symbolic value
+Money - validation ? drop?
+SelectCSV - transforms. Need to be able to specify transforms in Field def
+TextCSV - transforms, tweak to validation
+Upload - validation, extra attributes
+NoValue - behavior differences for display and submit fields
+
+Multiple - Select with sort_options and multiple flag set
+
+Nested?? what does this do?
+
+Not important or irritating. Drop.
+-------------
+Duration - multiple subfields. does anybody use this?
+DateTime - complicated rendering. nobody does it this way.
+Password  - special processing
+PasswordConf - ""
+IntRange - extra validation attributes
+
+form elements
+-------------
+input
+select
+textarea
+button (don't do on forms? also needs type)
+
+html5 elements
+--------------
+<datalist>
+<keygen>
+<output>
+
+# form input types
+-----------------------
+text
+password
+submit
+radio
+checkbox
+button
+
+html5 input types
+-----------------
+color
+date
+datetime
+datetime-local
+email
+month
+number
+range
+search
+tel
+time
+url
+week
+
+
+===== DOCUMENTED ======
+added alias 'data' to 'params'
+added 'check' method which doesn't do model_update
+Renamed 'field_name_space' to 'field_namespace'
+
+Regularized arrayref/array returns from some attributes, such as 'fields' and 'options'
+Standard is arrayref. Use 'all_' to get array.
+
+straighten out use of  of field_validate, validate, inner_validate in field classes
+     _inner_validate = 'base_validate'  .... why do we need this? also makes value an  arrayref...
+
+
+instead of 'posted' flag we have 'submitted' flag
+
+
+Don't copy 'use_fields_for_input_without_param'. Can achieve the same thing with 'input_without_param', plus
+   'transform_param_to_input'
+
+Don't copy 'use_init_obj_when_no_accessor_in_item'. Confusing and difficult to implement properly. Doesn't work
+   when only an init_object.  Do this automatically.
+
+active => [] and inactive => [] only work in the temporary way. Set them in a hook if you want
+
+'trim' is just a coderef, applied before 'apply_actions' instead of first in apply.
+
+no update_field_list. users can implement their own custom update.
+
+==== DONE ======
+
+There's a 'filled' attribute being passed along in the fill_from_ methods. I think it was just
+to simplify converting from results. Should I do something with it? fill with values? or just
+pull it out? Might be a debug tool to record the fill? except... could fill input or value...
+
+Re-implement active, inactive arrayrefs, and 'set_active' method.
+   switched from "is_active" to 'active'. Is that what I want?  Added back 'is_active' and 'is_inactive'
+
+okay, there's a problem with indexing of repeatables, I think. When they're built?
+   I *think* that what's going on is that the 'contains' of the Repeatable is indexed, and the subfields, but
+     the field names won't match the "instantiated" fields, so they walk... I guess that's okay.
+
+Don't do 'no_update' flag. Use -check method instead of ->process
+
+Complete implementation of 'add_field'
+
+No persistent item across ->process.
+
+Allow shortcuts in field.render
+
+Merging methods => { } in field with methods-> in field definition
+   Did with a trigger in the 'methods' attribute
+
+shortcut for methods: 'meth.default' ?
+
+wrap_label_method ? 'html_label'?  'display_label'?  Added 'display_label' to renderer.
+
+Allow importing roles of fields in place in the form? would need another Meta thing
+   Not possible because a role file creates metafields and can be used in multiple forms
+Should submit and reset buttons be in ->fif ? no
+
+html_5
+
+Form attributes: form_attr?

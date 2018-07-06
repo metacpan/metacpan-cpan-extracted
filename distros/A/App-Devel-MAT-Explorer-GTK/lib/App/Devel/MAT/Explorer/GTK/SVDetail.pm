@@ -10,7 +10,7 @@ use warnings;
 use feature qw( switch );
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Devel::MAT 0.23; # ->ifileno, ->ofileno on IO SVs
 
@@ -112,7 +112,7 @@ sub display_sv_in_table
 
    given( $type ) {
       when([ "SCALAR", "REF", "ARRAY", "HASH", "STASH", "CODE" ]) {
-         table_add( $table, "Name", textarea( $sv->name ) ) if defined $sv->name;
+         table_add( $table, "Symbol name", textarea( $sv->symname ) ) if defined $sv->symname;
       }
    }
 

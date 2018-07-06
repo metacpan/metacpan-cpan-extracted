@@ -4,33 +4,49 @@ use Mojo::Base -strict;
 use Carp 'croak';
 use Exporter 'import';
 use JSON::PP ();
-use Mojo::Util;
+use Mojo::Util qw(decode encode monkey_patch);
 use Scalar::Util 'blessed';
+
+# For better performance Cpanel::JSON::XS is required
+use constant JSON_XS => $ENV{MOJO_NO_JSON_XS}
+  ? 0
+  : eval { require Cpanel::JSON::XS; Cpanel::JSON::XS->VERSION('4.04'); 1 };
 
 our @EXPORT_OK = qw(decode_json encode_json false from_json j to_json true);
 
-# Escaped special character map (with u2028 and u2029)
+# Escaped special character map
 my %ESCAPE = (
-  '"'     => '"',
-  '\\'    => '\\',
-  '/'     => '/',
-  'b'     => "\x08",
-  'f'     => "\x0c",
-  'n'     => "\x0a",
-  'r'     => "\x0d",
-  't'     => "\x09",
-  'u2028' => "\x{2028}",
-  'u2029' => "\x{2029}"
+  '"'  => '"',
+  '\\' => '\\',
+  '/'  => '/',
+  'b'  => "\x08",
+  'f'  => "\x0c",
+  'n'  => "\x0a",
+  'r'  => "\x0d",
+  't'  => "\x09"
 );
 my %REVERSE = map { $ESCAPE{$_} => "\\$_" } keys %ESCAPE;
 for (0x00 .. 0x1f) { $REVERSE{pack 'C', $_} //= sprintf '\u%.4X', $_ }
+
+# Replace pure-Perl fallbacks if Cpanel::JSON::XS is available
+if (JSON_XS) {
+  my $BINARY = Cpanel::JSON::XS->new->utf8;
+  my $TEXT   = Cpanel::JSON::XS->new;
+  $_->canonical->allow_nonref->allow_unknown->allow_blessed->convert_blessed
+    ->stringify_infnan->escape_slash
+    for $BINARY, $TEXT;
+  monkey_patch __PACKAGE__, 'encode_json', sub { $BINARY->encode($_[0]) };
+  monkey_patch __PACKAGE__, 'decode_json', sub { $BINARY->decode($_[0]) };
+  monkey_patch __PACKAGE__, 'to_json',     sub { $TEXT->encode($_[0]) };
+  monkey_patch __PACKAGE__, 'from_json',   sub { $TEXT->decode($_[0]) };
+}
 
 sub decode_json {
   my $err = _decode(\my $value, shift);
   return defined $err ? croak $err : $value;
 }
 
-sub encode_json { Mojo::Util::encode 'UTF-8', _encode_value(shift) }
+sub encode_json { encode('UTF-8', _encode_value(shift)) }
 
 sub false () {JSON::PP::false}
 
@@ -57,7 +73,7 @@ sub _decode {
     die "Missing or empty input\n" unless length(local $_ = shift);
 
     # UTF-8
-    $_ = Mojo::Util::decode 'UTF-8', $_ unless shift;
+    $_ = decode('UTF-8', $_) unless shift;
     die "Input is not UTF-8 encoded\n" unless defined;
 
     # Value
@@ -219,7 +235,7 @@ sub _encode_object {
 
 sub _encode_string {
   my $str = shift;
-  $str =~ s!([\x00-\x1f\x{2028}\x{2029}\\"/])!$REVERSE{$1}!gs;
+  $str =~ s!([\x00-\x1f\\"/])!$REVERSE{$1}!gs;
   return "\"$str\"";
 }
 
@@ -240,8 +256,8 @@ sub _encode_value {
     return $value  ? 'true' : 'false' if $ref eq 'JSON::PP::Boolean';
 
     # Everything else
-    return _encode_string($value)
-      unless blessed $value && (my $sub = $value->can('TO_JSON'));
+    return 'null' unless blessed $value;
+    return _encode_string($value) unless my $sub = $value->can('TO_JSON');
     return _encode_value($value->$sub);
   }
 
@@ -319,10 +335,13 @@ their values are true or false.
   \1 -> true
   \0 -> false
 
-The two Unicode whitespace characters C<u2028> and C<u2029> will always be
-escaped to make JSONP easier, and the character C</> to prevent XSS attacks.
+The character C</> will always be escaped to prevent XSS attacks.
 
-  "\x{2028}\x{2029}</script>" -> "\u2028\u2029<\/script>"
+  "</script>" -> "<\/script>"
+
+For better performance the optional module L<Cpanel::JSON::XS> (4.04+) will be
+used automatically if possible. This can also be disabled with the
+C<MOJO_NO_JSON_XS> environment variable.
 
 =head1 FUNCTIONS
 

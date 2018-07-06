@@ -3,8 +3,41 @@ DONE
 
 DOING
 
-    MongoDB C++ driver in installer 
+    test $return_whole_value accessors & mutators for RPerl-defined data types in Class INIT block
+    test $return_whole_value accessors & mutators for  user-defined data types in Class INIT block
+
+    Installer, CentOS 7 Support, copy from LAMP Installer to RPerl Installer
+    MongoDB C++ driver in installer
     MongoDB documentation
+
+    manual IS file changes
+
+    3D data structures
+        *_arrayref_hashref_hashref
+            stringify
+            typetest
+            t/06_hash
+        *_*ref_*ref_hashref
+        *_*ref_*ref_arrayref
+
+    2D data structures
+        *_*ref_*ref
+        To_string() for each data structure in C++, to_string() in Perl
+
+    # DEV NOTE, CORRELATION #rp031: NEED UPGRADE: implement proper @array vs $arrayref, %hash vs $hashref, dereferencing, etc.
+    Scalar.pm, ArrayDereference.pm, Keys.pm, HashDereference.pm, etc.
+    add support for non-reference @arrays and %hashes
+        re-align PERLOPS_PERLTYPES w/ CPPOPS_CPPTYPES behavior for pass-by-value vs pass-by-reference
+        figure out how to add data types to PERLOPS_PERLTYPES @array and %hash variable declarations
+        std::vector should be array and std::unique_ptr<std::vector> should be arrayref, etc.
+        ArrayDereference & HashDerefence operators should actually dereference (unwrap) std::unique_ptr in CPPOPS_CPPTYPES, deref AVRV to AV in CPPOPS_PERLTYPES, etc. 
+        implement pertinent operators: scalar, keys, values
+
+    foreach() loop and keys() operator in CPPOPS_CPPTYPES
+
+    .travis.yml, disable dev version of Alien::Base::ModuleBuild v1.01_01, update min version required in Makefile.PL
+    .travis.yml, disable Alien::GSL testing, update min version required in Makefile.PL
+
 
     META files in MANIFEST.SKIP???
 
@@ -106,6 +139,14 @@ DOING
     uncompile delete EXE files
     disable variable declaration w/out initial value, grammar & tests & docs
     Learning RPerl
+                              names can NOT include double-underscore, C++ standard
+                              names can NOT start with     underscore uppercase, C++ standard
+                   variable   names can NOT start with     underscore, defined by VARIABLE_SYMBOL in Grammar.eyp
+            global subroutine names can NOT start with     underscore, C++ standard
+        non-global subroutine names can     start with     underscore, C++ standard
+                   method     names ???
+                   property   names ???
+        
         upgrade install instructions
         add chapter 1 bonus exercise, create stand-alone executable for Hello World
         add missing operator tables as with 2.4.13 chop & chomp, etc
@@ -148,6 +189,10 @@ DOING
     split author tests (checking Changes file, etc) into xt/ directory, 
         split deps in Makefile.PL, possibly utilize AUTHOR_TESTING in travis-perl/helpers
 
+
+CLOUDFORFREE.ORG
+
+    release Apache2::FileManager v0.3 based on current github code
 
 
 INSTALLERS
@@ -201,10 +246,6 @@ LEARNING RPERL
     publish
     video series
 
-CLOUDATCOST.COM
-    new 8-core machine web server
-    cluster compute nodes
-
 BOOK OF RPERL
     chapter 5
 
@@ -237,12 +278,12 @@ TESTS
     array size declaration compensation
     package/subroutine/method names starting w/ underscore
     variable redeclaration (masking)
-    properties & hash type-inner type-vs-key name mismatch (ECOGEASRP21: PERLOPS Class.pm properties accessors/mutators; CPPOPS entry & entrytyped)
+    properties & hash type-inner type-vs-key name mismatch (ECOGEASRP021: PERLOPS Class.pm properties accessors/mutators; CPPOPS entry & entrytyped)
     accessors/mutators including get_*_element() & get_*_value()
     subclasses Foo_raw type
     $properties & VariableDeclaration array size on non-arrayref type
     $properties array size PERLOPS_PERLTYPES generation
-    variable & retrieval type mismatches, etc (including ECOGEASCP30?)
+    variable & retrieval type mismatches, etc (including ECOGEASCP030?)
     get_raw() & set_raw()
     t/13_compile_execute.t (?) for proper functionality
     *_arrayref_arrayref_arrayref
@@ -250,13 +291,13 @@ TESTS
     <$FILEHANDLE>
     @ARGV
     %ENV
-    ERROR ECOGEASRP16... named operator [SOMEOP] requires exactly one argument, dying
-    ERROR ECOGEASRP17... named operator [SOMEOP] requires one or more arguments, dying
+    ERROR ECOGEASRP016... named operator [SOMEOP] requires exactly one argument, dying
+    ERROR ECOGEASRP017... named operator [SOMEOP] requires one or more arguments, dying
     all currently-implemented named ops
     all currently-implemented named_unary ops
-    invalid hash key starting with non-lowercase-letter ECOGEASRP23
-    invalid OO property name (hash key) starting with non-lowercase-letter ECOGEASRP24
-    invalid type inner redundant name starting with non-lowercase-letter ECOGEASRP25
+    invalid hash key starting with non-lowercase-letter ECOGEASRP023
+    invalid OO property name (hash key) starting with non-lowercase-letter ECOGEASRP024
+    invalid type inner redundant name starting with non-lowercase-letter ECOGEASRP025
     CONSTANT_CALL_SCOPED
     *_to_*() data type conversion functions
     text literals, backslash vs double-backslash
@@ -266,6 +307,7 @@ TESTS
     fix RPerl/Test/Expression/program_*_good.pl.DISABLED_NEED_FIX
     fix lib/RPerl/Test/OperatorVoid01NamedVoidReturn/*.DISABLED_NEED_FIX
     	https://github.com/wbraswell/rperl/issues/25
+    t/04 t/05 t/06 directly test *_CHECKTRACE() and *_CHECK() 
 
 KICKSTARTER
     determine remaining items
@@ -395,6 +437,9 @@ DATA TYPES & STRUCTURES
             for :const I added the MODIFY_SCALAR_ATTRIBUTE function (into xsutils.c?)
             also MODIFY_HASH_ATTRIBUTE and so on, for every reftype, _ARRAY_, _CODE_, …
 
+VARIABLES
+    allow block-scoped variables; currently supported for unique variable names, triggers false error ECOGEASCP012 "already declared in this scope" for non-unique variable names in the same subroutine
+
 PERL::CRITIC BUGS
     Eclipse EPIC Integration, Silent Failure    https://github.com/Perl-Critic/Perl-Critic/issues/582
     ProhibitMagicNumbers False Positive    https://github.com/Perl-Critic/Perl-Critic/issues/631
@@ -402,8 +447,10 @@ PERL::CRITIC BUGS
     ControlStructures::ProhibitPostfixControls False Positives on Typed Loop Iterator    https://github.com/Perl-Critic/Perl-Critic/issues/639
     Argument "-" isn't numeric in exponentiation (**) at .../PPI/Token/Number/Exp.pm line 55    https://github.com/Perl-Critic/Perl-Critic/issues/665
     InputOutput::RequireCheckedSyscalls False Positive On Typed Loop Iterator Without Final Newline    https://github.com/Perl-Critic/Perl-Critic/issues/671
+    Perl::Critic::Policy::Subroutines::ProtectPrivateSubs, false trigger on 'my Foo::Bar::_MyClass $foo;', presumably thinks _MyClass is a private sub
 
 INLINE::CPP BUGS
+    remove all usage of double-underscore in identifiers, including auto-generated class names where '::' is replaced by '__'
     file bug, I::CPP comments, 7 lines okay, 8 lines broken
     file bug, I::CPP std::array
     file bug, I::CPP when attempting to return object type, CORRELATION #pp04
@@ -422,15 +469,16 @@ PERLOPS_PERLTYPES
 
 ERROR CODES
     RPerl::CompileUnit::Module::Class (global base class) needs error codes added for all croak() or die() statements
+    fix all mis-matching *RPxx vs *CPxx error codes, compare all numeric error codes to ensure RPerl matches C++
+    sort all error codes according to dev_notes.txt code ranges
 
 GRAMMAR
     allow comments with 3 or more chained octothorpe characters ### like this comment
     undef values, either remove from all possible locations in grammar for C++ compatibility, OR enable in C++ by special strings, numeric values, etc.
     fix 'x' string repeat operator vs 'x' string or bareword hash key, already fixed???
-    decide if we will allow '#!/usr/bin/env perl' as a SHEBANG, or only allow '#!/usr/bin/perl' style and allow EU::MM to mangle shebang on install?
-        https://perlbrew.pl/Dealing-with-shebangs.html
     add WORD_LPAREN & WORD_SCOPED_LPAREN to become WordScopedLParen, and friends, to disallow space between subroutine name and parens in subroutine call
         update Learning RPerl section 4.2.1 & lib/RPerl/Test/Subroutine/program_* accordingly
+    should VARIABLE_SYMBOL be allowing scoped variable identifiers, since these are not currently supported by the compiler?
 
 COMPILER
     uncompile, store list of compiled dependencies inside compiled files themselves, for optional use during uncompile

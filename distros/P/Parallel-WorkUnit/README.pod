@@ -1,0 +1,261 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Parallel::WorkUnit - Provide multi-paradigm forking with ability to pass back data
+
+=head1 VERSION
+
+version 2.181850
+
+=head1 SYNOPSIS
+
+  #
+  # Standard Interface
+  #
+  my $wu = Parallel::WorkUnit->new();
+  $wu->async( sub { ... }, \&callback );
+
+  $wu->waitall();
+
+
+  #
+  # Limiting Maximum Parallelization
+  #
+  $wu->max_children(5);
+  $wu->queue( sub { ... }, \&callback );
+  $wu->waitall();
+
+
+  #
+  # Ordered Responses
+  #
+  my $wu = Parallel::WorkUnit->new();
+  $wu->async( sub { ... } );
+
+  @results = $wu->waitall();
+
+  #
+  # Spawning off X number of workers
+  # (Ordered Response paradigm shown with 10 children)
+  #
+  my $wu = Parallel::WorkUnit->new();
+  $wu->asyncs( 10, sub { ... } );
+
+  @results = $wu->waitall();
+
+
+  #
+  # AnyEvent Interface
+  #
+  use AnyEvent;
+  my $wu = Parallel::WorkUnit->new();
+
+  $wu->use_anyevent(1);
+  $wu->async( sub { ... }, \&callback );
+  $wu->waitall();  # Not strictly necessary
+
+=head1 DESCRIPTION
+
+This is a very simple forking implementation of parallelism, with the
+ability to pass data back from the asyncronous child process in a
+relatively efficient way (with the limitation of using a pipe to pass
+the information, serialized, back).  It was designed to be very simple
+for a developer to use, with the ability to pass reasonably large amounts
+of data back to the parent process.
+
+This module is also designed to work with AnyEvent when desired.
+
+There are many other Parallel::* applications in CPAN - it would be worth
+any developer's time to look through those and choose the best one.
+
+=head1 ATTRIBUTES
+
+=head2 use_anyevent
+
+  $wu->use_anyevent(1);
+
+If set to a value that is true, creates AnyEvent watchers for each
+asyncronous or queued job.  The equivilent of an C<AnyEvent> condition
+variable C<recv()>, used when all processes finish executing, is the
+C<waitall()> method.  However, the processes are integrated into a
+standard C<AnyEvent> loop, so it isn't strictly necessary to call C<waitall()>.
+In addition, a call to C<waitall()> will execute other processes in
+the C<AnyEvent> event loop.
+
+The default value is false.
+
+=head2 max_children
+
+  $wu->max_children(5);
+  $wu->max_children(undef);
+
+  say "Max number of children: " . $wu->max_children();
+
+If set to a value other than zero or undef, limits the number of outstanding
+queue children (created by the C<queue()> method) that can be executing
+at any given time.
+
+This defaults to 5.
+
+This attribute does not impact the C<async()> method's ability to
+create children, but these children will count against the limit used
+by C<queue()>.
+
+Calling without any parameters will return the number of children.
+
+=head1 METHODS
+
+=head2 new
+
+Create a new workunit class.  Optionally, takes a list that corresponds
+to a hashref, in the form of key and value.  This accepts the key
+C<max_children>, which, if present (and not undef) will limit the
+number of spawned subprocesses that can be active when using the
+C<queue()> method.  Defaults to 5.  See the C<max_children> method
+for additional information.
+
+=head2 async( sub { ... }, \&callback )
+
+  $wu->async( sub { return 1 }, \&callback );
+
+  # To get back results in "ordered" return mode
+  $wu->async( sub { return 1 } );
+  @results = $wu->waitall();
+
+Spawns work on a new forked process.  The forked process inherits
+all Perl state from the parent process, as would be expected with
+a standard C<fork()> call.  The child shares nothing with the
+parent, other than the return value of the work done.
+
+The work is specified either as a subroutine reference or an
+anonymous sub (C<sub { ... }>) and should return a scalar.  Any
+scalar that L<Storable>'s C<freeze()> method can deal with
+is acceptable (for instance, a hash reference or C<undef>).
+
+The result is serialized and streamed back to the parent process
+via a pipe.  The parent, in a C<waitall()> call, will call the
+callback function (if provided) with the unserialized return value.
+
+If a callback is not provided, the parent, in the C<waitall()> call,
+will gather these results and return them as an ordered list.
+
+In all modes, should the child process C<die>, the parent process
+will also die (inside the C<waitall()> method).
+
+The PID of the child is returned to the parent process when
+this method is executed.
+
+The C<max_children> attribute is not examined in this method - you
+can spawn a new child regardless of the number of children already
+spawned. However, you children started with this method still count
+against the limit used by C<queue()>.
+
+Note: on Windows with threaded Perl, if C<AnyEvent> is not installed,
+threads instead of forks are used.  See C<thread> for the caveats
+that apply.  The PID returned is instead a meaningless (outside of
+this module) counter, not associated with any Windows thread identifier.
+
+=head2 asyncs( $children, sub { ... }, \&callback )
+
+  $wu->asyncs( 10, sub { return 1 }, \&callback );
+
+  # To get back results in "ordered" return mode
+  $wu->asyncs( 10, sub { return 1 } );
+  @results = $wu->waitall();
+
+Added in 1.117.
+
+This functions similarly to the C<async()> method, with a couple
+key differences.
+
+First, it takes an additional parameter, C<$children>, that specifies
+the number of child threads to spawn.  Like the C<async()> method,
+the children are spawned immediately, regardless of the value of
+the C<max_children> attribute.
+
+In addition, when the sub/coderef is executed, it is called with a
+single parameter representing the child number in that particular
+instance (between zero to C<$children-1>).
+
+Returns the number of children spawned.
+
+See C<async()> for more details on how this function works.
+
+=head2 waitall()
+
+Called from the parent method while waiting for the children
+to exit.  This method handles children that C<die()> or return
+a serializable data structure.  When all children return, this
+method will return.
+
+If a child dies unexpectedly, this method will C<die()> and propagate a
+modified exception.
+
+In the standard (not ordered) mode, I.E. where a callback was passed
+to C<async()>, this will return nothing.
+
+In the ordered mode, I.E. where no callbacks were provided to C<async()>,
+this will return the results of the async calls in an ordered list.  The
+list will be ordered by the order in which the async calls were executed.
+
+=head2 waitone()
+
+This method similarly to C<waitall()>, but only waits for
+a single PID.  It will return after any PID exits.
+
+If this method is called when there is no processes executing,
+it will simply return undef. Otherwise, it will wait and then
+return 1.
+
+=head2 wait($pid)
+
+This functions simiarly to C<waitone()>, but waits only for
+a specific PID.  See the C<waitone()> documentation above
+for details.
+
+If C<wait()> is called on a process that is already done
+executing, it simply returns.  Otherwise, it waits until the
+child process's work unit is complete and executes the callback
+routine, then returns.
+
+=head2 count()
+
+This method returns the number of currently outstanding
+threads (in either a running state or a waiting to send their
+output).
+
+=head2 queue( sub { ... }, \&callback )
+
+Spawns work on a new forked process, doing so immediately if less
+than C<max_children> are running.  If there are already
+C<max_children> are running, this will run the process once a slot
+becomes available.
+
+This method should be treated as nearly identical to C<async()>,
+with the only difference being the above behavior (limiting to
+C<max_children>) and not returning a PID.  Instead, a value of 1
+is returned if the process is immediately started, C<undef>
+otherwise.
+
+The result is serialized and streamed back to the parent process
+via a pipe.  The parent, in a C<waitall()> call, will call the
+callback function (if provided) with the unserialized return value.
+
+If a callback is not provided, the parent, in the C<waitall()> call,
+will gather these results and return them as an ordered list.
+
+=head1 AUTHOR
+
+Joelle Maslak <jmaslak@antelope.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Joelle Maslak.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

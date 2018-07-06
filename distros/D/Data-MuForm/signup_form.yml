@@ -1,0 +1,219 @@
+elements:
+  - type: Text
+    name: name
+    auto_id: "%n_%f"
+    label: "Your Name"
+    filters:
+      - type: TrimEdges
+      - type: +StarterView::FormFu::Filter::Normalize
+    constraints:
+      - Required
+      - type: Regex
+        regex: '\S'
+        message: 'Please enter your name'
+    container_attributes:
+      class: type_text
+    attributes:
+      placeholder: "Your Name"
+      class: type_text
+  - type: Email
+    name: email_address
+    auto_id: "%n_%f"
+    label: "Email"
+    filters:
+      - type: TrimEdges
+      - type: +StarterView::FormFu::Filter::Normalize
+    constraints:
+      - Required
+      - type: Callback
+        message: 'Email address must be specified and not already signed up. <a href="/login">Click here to log in or recover your password.</a>'
+      - Email
+    container_attributes:
+      class: type_text
+    attributes:
+      placeholder: "Your Email Address"
+  - type: Block
+    id: hint
+    attributes:
+      class: email_hint_text
+
+  - type: Block
+    load_config_file: user/password-field.yml
+
+  - type: Tel
+    name: phone_number
+    auto_id: "%n_%f"
+    label: "Phone Number"
+    filters:
+      - type: TrimEdges
+      - type: +StarterView::FormFu::Filter::Normalize
+    container_attributes:
+      class: type_text
+    constraints:
+      - Required
+      - type: Regex
+        regex: '\d{3}.*\d{3}.*\d{4}'
+        message: 'Please enter phone number with area code (eg. xxx-xxx-xxxx).'
+    attributes:
+      placeholder: "Your Phone Number"
+  - type: Select
+    name: position
+    auto_id: "%n_%f"
+    label: "- Your Current Title -"
+    load_config_file: common/options/org/positions.yml
+  - type: Text
+    name: org_name
+    auto_id: "%n_%f"
+    label: "Company Name"
+    filters:
+      - type: TrimEdges
+      - type: +StarterView::FormFu::Filter::Normalize
+    constraints:
+      - Required
+    attributes:
+      placeholder: "Your Company Name"
+    container_attributes:
+      class: type_text
+  - type: Text
+    name: zipcode
+    id: zipcode
+    name: zipcode
+    label_loc: common.form.business_zipcode.label
+    filters:
+      - type: TrimEdges
+      - type: +StarterView::FormFu::Filter::Normalize
+    constraints:
+      - Required
+    placeholder_loc: common.form.business_zipcode.placeholder
+    attributes:
+      maxlength: 11
+    container_attributes:
+      class: type_text
+  - type: Text
+    name: website
+    auto_id: "%n_%f"
+    label: "Company Website (optional)"
+    filters:
+      - type: TrimEdges
+      - type: +StarterView::FormFu::Filter::Normalize
+    attributes:
+      placeholder: "Your Company Website"
+    container_attributes:
+      class: type_text
+# Value populated via Jquery within app/view/user/common/create-form-base.html
+  - type: Hidden
+    name: org_type
+    auto_id: "%n_%f"
+
+  - type: Select
+    name: org_ats
+    auto_id: "%n_%f"
+    label: "What ATS do you use?"
+    # options below shouldn't matter as they are replaced by StarterView::Util::Text::ATS_list
+    options:
+      - ['', '- What ATS do you use? -']
+      - ['adp', 'ADP']
+      - ['greenhouse', 'Greenhouse']
+      - ['icims', 'iCIMS']
+      - ['jobvite', 'Jobvite']
+      - ['kenexabrassring', 'Kenexa Brassring']
+      - ['lever', 'Lever']
+      - ['silkroad', 'Silkroad']
+      - ['successfactors', 'SuccessFactors']
+      - ['taleo', 'Taleo']
+      - ['ultipro', 'Ultipro']
+      - ['other', 'Other']
+      - ['none', 'None']
+    container_attributes:
+      style: "display: none;"
+
+  - type: Select
+    name: org_hire_budget
+    auto_id: "%n_%f"
+    label: "What is your hiring budget?"
+    # options:
+      # - ['', '- What''s your monthly hiring budget? -']
+      # - ['<500', 'Less than $500']
+      # - ['500-2500', '$500 - $2,500']
+      # - ['2501-5000', '$2,501 - $5,000']
+      # - ['5000+', '$5,000+']
+    container_attributes:
+      style: "display: none;"
+
+  - type: Select
+    name: requested_plan
+    auto_id: "%n_%f"
+    label: 'Number of Jobs'
+    load_config_file: common/options/org/plans.yml
+
+  - type: Select
+    name: source_type_user_reported
+    id: source_type_user_reported
+    attributes:
+      class: source_type_user_reported
+      data-where-field: source_type_user_reported_specific
+    label: "How did you hear about us?"
+
+  - type: Text
+    name: source_type_user_reported_specific
+    auto_id: "%n_%f"
+    filters:
+      - type: TrimEdges
+      - type: +StarterView::FormFu::Filter::Normalize
+    label: "Radio/TV station or mail offer code (optional)"
+    attributes:
+      class: source_type_user_reported_specific
+    container_attributes:
+      style: 'display:none;'
+      class: type_text source_type_user_reported_specific_wrapper
+
+  - type: Submit
+    name: submitted
+    auto_id: "%n_%f"
+    value: "Continue"
+    attributes:
+      class: create_submit_button
+  - type: Checkbox
+    name: agrees_to_terms
+    auto_id: "%n_%f"
+    label_loc: common.tos.user.create_min_step2_number_jobs
+    value: 1
+    default: 0
+    constraints:
+      - Required
+    container_attributes:
+      style: 'display:none;'
+    attributes:
+      checked: checked
+
+  - type: Block
+    id: agrees_to_tcpa_terms_wrapper_bottom
+    attributes:
+      style: "padding-top: 20px;"
+    elements:
+    - type: Checkbox
+      name: agrees_to_tcpa_terms
+      auto_id: "%n_%f"
+      value: 1
+      default: 0
+      label_xml: "<span class='tcpa-terms'>I agree to let ZipRecruiter contact me by phone at the number above <a href='javascript:void(0);' data-tooltip-placement='top' rel='tooltip' title='With your free trial, you can receive offers for ZipRecruiter services by phone or text at the number you provided when you signed up.  We might contact you using an automatic telephone dialing system or leave a prerecorded message if we can’t reach you.  We find that customers appreciate receiving these offers, though consent is not required as a condition of signing up for service or purchasing anything from ZipRecruiter.  You can also revoke consent at any time by e-mailing businessaffairs@ziprecruiter.com and including &quot;Revocation of Telephone Consent&quot; in the subject line.'></a></span>"
+      attributes:
+        checked: checked
+      container_attributes:
+        style: "margin-bottom: 0"
+    - type: Block
+      name: agrees_to_tcpa_terms_alert
+      tag: div
+      attributes:
+        class: agrees_to_terms_alert info
+      content_xml: "<div>By opting out of calls you may miss out on help optimizing your job ads, certain promotional offers, and/or other account management communications.</div>"
+
+  - type: Block
+    tag: div
+    attributes:
+      class: agrees_to_terms_wrapper
+    elements:
+    - type: Block
+      id: 'terms_and_privacy'
+      content_loc: common.tos.user.create_min_step2_number_jobs
+

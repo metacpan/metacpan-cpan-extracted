@@ -45,7 +45,7 @@ $info = info_from_list(main_root, $deparse, \@texts, '', 'test2',
 		       {maybe_parens => [$deparse, 16, 16]});
 is $info->{text}, 'def', 'special-case UNARY_PRECIDENCE';
 
-foreach my $cx (keys %B::DeparseTree::Node::UNARY_PRECEDENCES) {
+foreach my $cx (keys %B::DeparseTree::TreeNode::UNARY_PRECEDENCES) {
     $info = info_from_list(main_root, $deparse, \@texts, '', 'test2',
 		       {maybe_parens => [$deparse, $cx, $cx]});
     is $info->{text}, 'def';

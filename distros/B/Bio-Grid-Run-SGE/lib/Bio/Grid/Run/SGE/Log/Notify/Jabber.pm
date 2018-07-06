@@ -11,7 +11,7 @@ use Carp;
 
 use 5.010;
 
-our $VERSION = '0.064'; # VERSION
+our $VERSION = '0.065'; # VERSION
 
 has jid       => ( is => 'rw', required   => 1 );
 has password  => ( is => 'rw', required   => 1 );

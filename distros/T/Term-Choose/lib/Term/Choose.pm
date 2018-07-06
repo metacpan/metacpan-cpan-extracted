@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.518';
+our $VERSION = '1.600';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -495,6 +495,12 @@ sub __choose {
                 if ( $self->{include_highlighted} == 1 ) {
                     $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = 1;
                 }
+                elsif ( $self->{include_highlighted} == 2 ) {
+                    my $chosen = $self->__marked_rc2idx();
+                    if ( ! @$chosen ) {
+                        $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = 1;
+                    }
+                }
                 elsif ( defined $self->{meta_items} ) {
                     for my $meta_item ( @{$self->{meta_items}} ) {
                         if ( $meta_item == $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]] ) {
@@ -504,9 +510,6 @@ sub __choose {
                     }
                 }
                 my $chosen = $self->__marked_rc2idx();
-                if ( ! @$chosen && $self->{include_highlighted} == 2 ) {
-                    $chosen = [ $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]] ];
-                }
                 $self->__reset_term( 1 );
                 return $index ? @$chosen : @{$orig_list_ref}[@$chosen];
             }
@@ -959,7 +962,7 @@ sub __print_columns {       #hae
 
 sub __unicode_trim {        #hae
     #my $self = $_[0];
-    cut_to_printwidth( $_[1], $_[2] );
+    cut_to_printwidth( $_[1], $_[2] ); # , 0
 }
 
 sub __unicode_sprintf {
@@ -1075,7 +1078,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.518
+Version 1.600
 
 =cut
 
@@ -1266,11 +1269,8 @@ White-spaces in elements are replaced with simple spaces.
 
 =item *
 
-If the length of an element is greater than the width of the screen the element is cut.
-
-    $element = substr( $element, 0, $allowed_length - 3 ) . '...';*
-
-* It is used a function to cut strings which uses C<columns> from L<Unicode::GCString> to determine the string length.
+If the length of an element is greater than the width of the screen the element is cut and at the end of the string are
+added three dots.
 
 =back
 
@@ -1463,8 +1463,6 @@ If I<ll> is set, then C<choose> doesn't calculate the length of the longest elem
 with this option.
 
 I<length> refers here to the number of print columns the element will use on the terminal.
-
-A way to determine the number of print columns is the use of C<columns> from L<Unicode::GCString>.
 
 The length of undefined elements depends on the value of the option I<undef>.
 

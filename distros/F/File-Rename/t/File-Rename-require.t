@@ -13,11 +13,9 @@ BEGIN { require_ok('File::Rename') };
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
-TODO: { local $TODO = 'fixed when File::Rename::Options is separate file';
 # require File::Rename should not include File::Rename::Options
 my $ok = !eval { local @ARGV = (1); File::Rename::Options::GetOptions(); 1 };
 ok($ok, 'not imported File::Rename::Options::GetOptions' );
-}
 
 # eval will fail if rename is CORE::rename
 my $ok = eval q{ rename [1], 1, 1; 1; };

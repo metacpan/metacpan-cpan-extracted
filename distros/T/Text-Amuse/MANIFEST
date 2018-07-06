@@ -22,6 +22,7 @@ t/broken.t
 t/caching.t
 t/changes.t
 t/context-parsing.t
+t/crash-40.t
 t/crash-on-loops.t
 t/description-lists.t
 t/directives.t
@@ -99,6 +100,9 @@ t/testfiles/complete.muse
 t/testfiles/crashed-1.exp.html
 t/testfiles/crashed-1.exp.ltx
 t/testfiles/crashed-1.muse
+t/testfiles/crashed-empty-header.exp.html
+t/testfiles/crashed-empty-header.exp.ltx
+t/testfiles/crashed-empty-header.muse
 t/testfiles/desc-lists-2.exp.html
 t/testfiles/desc-lists-2.exp.ltx
 t/testfiles/desc-lists-2.muse

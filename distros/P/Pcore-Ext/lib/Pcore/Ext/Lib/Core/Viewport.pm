@@ -17,9 +17,11 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
         },
 
         # MATERIAL THEME
-        baseColor   => undef,
-        accentColor => undef,
-        darkMode    => \0,
+        theme => {
+            accent   => undef,
+            base     => undef,
+            darkMode => \0
+        },
 
         defaultMask => {
             transparent => \0,
@@ -51,11 +53,7 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
             }
 
             // set material theme
-            me.setTheme(localStorage.theme != null ? JSON.parse(localStorage.theme) : {
-                darkMode: me.darkMode,
-                base: me.baseColor,
-                accent: me.accentColor
-            });
+            me.setTheme(me.theme, true);
 
             Ext.util.History.hashbang = true;
 
@@ -77,10 +75,12 @@ JS
             me.doSignin(null, null, function(res) {
                 if (res.isSuccess()) {
 
-                    var session = me.checkSession(res.data);
-
-                    // store session data
+                    // store session
+                    var session = me.checkSession(res.data.session);
                     me.getViewModel().set('session', session);
+
+                    // store app settings
+                    me.getViewModel().set('settings', res.data.settings);
 
                     me.setLocale(session.locale, function () {
                         Ext.route.Router.resume();
@@ -125,23 +125,31 @@ JS
 
             if (!session.locale) session.locale = localStorage.locale || session.default_locale;
 
-            session.theme = JSON.parse(localStorage.theme);
+            session.theme = this.theme;
 
             return session;
 JS
 
         # MATERIAL THEME
-        setTheme => func ['theme'], <<"JS",
+        setTheme => func [ 'newTheme', 'isDefaultTheme' ], <<"JS",
             if (Ext.theme.Material) {
                 Ext.manifest.material = Ext.manifest.material || {};
                 Ext.manifest.material.toolbar = Ext.manifest.material.toolbar || {};
                 Ext.manifest.material.toolbar.dynamic = true;
 
-                if (localStorage.theme != null) theme = Ext.apply(JSON.parse(localStorage.theme), theme);
+                var userTheme = localStorage.theme ? JSON.parse(localStorage.theme) : {},
+                    currentTheme = this.theme;
 
-                localStorage.theme = JSON.stringify(theme);
+                if (isDefaultTheme) {
+                    this.theme = Ext.apply(newTheme, userTheme, currentTheme);
+                }
+                else {
+                    localStorage.theme = JSON.stringify(newTheme);
 
-                Ext.theme.Material.setColors(theme);
+                    this.theme = Ext.apply(currentTheme, newTheme, userTheme);
+                }
+
+                Ext.theme.Material.setColors(this.theme);
             }
 JS
 
@@ -258,7 +266,12 @@ JS
 
                 if (res.isSuccess()) {
 
-                    var session = me.checkSession(res.data);
+                    // store app settings
+                    me.getViewModel().set('settings', res.data.settings);
+
+                    // store session
+                    var session = me.checkSession(res.data.session);
+                    me.getViewModel().set('session', session);
 
                     // not authenticated
                     if (!session.is_authenticated) {
@@ -272,9 +285,6 @@ JS
 
                     // set token and disconnect
                     APP.getApplication().api.auth(session.token);
-
-                    // store session data
-                    me.getViewModel().set('session', session);
 
                     me.setLocale(session.locale, function () {
                         me.clearInterface();

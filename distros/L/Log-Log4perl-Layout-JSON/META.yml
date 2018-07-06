@@ -4,8 +4,10 @@ author:
   - 'Michael Schout <mschout@cpan.org>'
 build_requires:
   Encode: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Log::Log4perl::MDC: '0'
-  Test::Compile: '0'
   Test::More: '0'
   Test::Most: '0'
   Test::Warnings: '0'
@@ -21,6 +23,10 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Log-Log4perl-Layout-JSON
+provides:
+  Log::Log4perl::Layout::JSON:
+    file: lib/Log/Log4perl/Layout/JSON.pm
+    version: '0.54'
 requires:
   Carp: '0'
   Class::Tiny: '0'
@@ -34,8 +40,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Log-Log4perl-Layout-JSON
-  homepage: http://search.cpan.org/dist/Log-Log4perl-Layout-JSON/
-  repository: git://github.com/mschout/Log-Log4perl-Layout-JSON
-version: '0.53'
+  bugtracker: https://github.com/mschout/Log-Log4perl-Layout-JSON/issues
+  homepage: https://github.com/mschout/Log-Log4perl-Layout-JSON
+  repository: https://github.com/mschout/Log-Log4perl-Layout-JSON.git
+version: '0.54'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,3 +1,13 @@
+3.3.0 2018 07 03 Independence - 1
+
+- Major refactoring cleanup
+- Better roundtrip testing and version isolation in testing
+- Better Perl version difference isolation
+- More OPtable entries
+- Allow 5.28.0 (although buggy)
+- We now go back to perl 5.014
+- Lots of bugs fixed; many still remain.
+
 3.2.0 2018 06 04 Wife of Rocket Scientist
 
 Major revision after the previous major revision...

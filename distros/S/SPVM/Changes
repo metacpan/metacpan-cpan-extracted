@@ -1,3 +1,50 @@
+0.0355 2018-07-05
+  - Symbol name can't conatain __
+  - Object alignment must be sizeof(SPVM_VALUE)
+  - rename strcut descripter to pointer
+  - rename env->new_struct to env->new_pointer
+  - rename env->get_struct to env->get_pointer
+  - remove object null check from env->get/set_xxx_field
+  - fix env->get/set_xxx_field bugs
+  - fix array store undef bug in precompile code
+0.0354 2018-07-03
+  - Get and check field index in top of subroutine in precompile
+  - Get and check package variable id in top of subroutine in precompile
+  - Get and check sub id in top of subroutine in precompile
+0.0353 2018-06-30
+  - env->get_sub_id receive package name and signature
+      [Before]
+      int32_t sub_id = env->get_sub_id(env, sub_abs_name);
+      [After]
+      int32_t sub_id = env->get_sub_id(env, package_name, signature);
+      
+      Signature contains return type, subroutine name, and argument types
+      For example
+      
+        (int)foo(double,long)
+
+  - rename env->get_field_rel_id to env->get_field_index and receive package name and signature
+      [Before]
+      int32_t field_index = env->get_field_rel_id(env, name);
+      [After]
+      int32_t field_index = env->get_field_index(env, package_name, signature);
+      
+      Signature contains field type and field name
+      For example
+      
+        (int)x
+
+  - add env->get_package_var_id
+
+      int32_t package_var_id = env->get_field_index(env, package_name, signature);
+      
+      Signature contains package variable type and package variable name
+      For example
+      
+        (int)$FOO
+        
+  - improve exception logic
+  - improve precompile symbol name check
 0.0352 2018-06-27
   - Separate mortal API and raw API
     raw API create object which reference count is zero.

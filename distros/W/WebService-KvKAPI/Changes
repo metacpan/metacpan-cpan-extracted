@@ -1,0 +1,11 @@
+Revision history for Webservice-KvKAPI
+
+0.002     2018-07-02 19:23:43Z
+
+    * Implement spoofmode module: WebService::KvKAPI::Spoof
+    * Improve testsuite, get coverage to 100%
+    * Fill META.json with correct repository
+
+0.001     2018-07-02 13:43:22Z
+
+    * Initial release of Zaaksysteem fork to CPAN

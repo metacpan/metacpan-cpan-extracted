@@ -10,6 +10,7 @@ use vars qw(@ISA @EXPORT);
              get_addr_info
              get_parent_addr_info get_parent_op
              get_prev_addr_info
+             get_prev_info
              trim_line_pair
              underline_parent
     );
@@ -265,7 +266,7 @@ sub extract_node_info($)
 
     if (!exists $parent_info->{fmt}
 	and scalar(@texts) == 1
-	and eval{$texts[0]->isa("B::DeparseTree::Node")}) {
+	and eval{$texts[0]->isa("B::DeparseTree::TreeNode")}) {
 	$parent_info = $texts[0];
     }
     if (exists $parent_info->{fmt} || exists $parent_info->{position}) {
@@ -275,6 +276,7 @@ sub extract_node_info($)
 	       && $parent_info->{parent}
 	       && $deparsed->{optree}{$parent_info->{parent}}
 	    ) {
+	    last if ! exists $deparsed->{optree}{$parent_info->{parent}};
 	    $parent_info = $deparsed->{optree}{$parent_info->{parent}};
 	}
 	my $fmt = $parent_info->{fmt};
@@ -286,6 +288,7 @@ sub extract_node_info($)
 	# Keep gathering parent text until we have at least one full line.
 	while (index($str, "\n") == -1 && $parent_info->{parent}) {
 	    $child_addr = $parent_info->{addr};
+	    last if ! exists $deparsed->{optree}{$parent_info->{parent}};
 	    $parent_info = $deparsed->{optree}{$parent_info->{parent}};
 	    $fmt = $parent_info->{fmt};
 	    $indexes = $parent_info->{indexes};
@@ -380,7 +383,7 @@ sub dump($) {
     my ($deparse_tree) = @_;
     my @addrs = sort keys %{$deparse_tree->{optree}};
     for (my $i=0; $i < $#addrs; $i++) {
-	print $i, '-' x 50, "\n";
+	printf("%d: %s\n", $i, ('=' x 50));
 	my $info = get_addr_info($deparse_tree, $addrs[$i]);
 	if ($info) {
 	    printf "0x%0x\n", $addrs[$i];
@@ -396,7 +399,7 @@ sub dump($) {
 		}
 	    }
 	}
-	print $i, '-' x 50, "\n";
+	printf("%d: %s\n", $i, ('=' x 50));
     }
 }
 
@@ -410,7 +413,7 @@ sub dump_relations($) {
 	next unless $info && $info->{parent};
 	my $parent = get_parent_addr_info($info);
 	next unless $parent;
-	print $i, '-' x 50, "\n";
+	printf("%d: %s\n", $i, ('=' x 50));
 	print "Child info:\n";
 	printf "\taddr: 0x%0x, parent: 0x%0x\n", $addrs[$i], $parent->{addr};
 	printf "\top: %s\n", $info->{op}->can('name') ? $info->{op}->name : $info->{op} ;
@@ -420,7 +423,7 @@ sub dump_relations($) {
 	if ($texts) {
 	    print join("\n", @$texts), "\n";
 	}
-	print $i, '-' x 50, "\n";
+	printf("%d: %s\n", $i, ('=' x 50));
     }
 }
 
@@ -434,7 +437,7 @@ sub dump_tree($$) {
 	    if (ref($child_info)) {
 		if (ref($child_info) eq 'ARRAY') {
 		    p $child_info;
-		} elsif (ref($child_info) eq 'B::DeparseTree::Node') {
+		} elsif (ref($child_info) eq 'B::DeparseTree::TreeNode') {
 		    dump_tree($deparse_tree, $child_info)
 		} else {
 		    printf "Unknown child_info type %s\n", ref($child_info);

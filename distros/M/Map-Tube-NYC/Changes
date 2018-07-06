@@ -1,5 +1,8 @@
 Revision history for Map::Tube::NYC
 
+0.57  Tue Jul 03 12:25:00 2018
+      - Updated dependency on Map::Tube v3.53.
+
 0.56  Wed Jun 20 18:10:00 2018
       - Used new_ok() in test script.
 

@@ -29,34 +29,29 @@ use B qw(
     );
 
 use B::Deparse;
+use B::DeparseTree::OPflags;
+
+# Copied from B/const-xs.inc. Perl 5.16 doesn't have this
+use constant SVpad_STATE => 11;
+use constant SVpad_TYPED => 8;
+
+# FIXME: DRY $is_cperl
+# Version specific modification are next...
+use Config;
+my $is_cperl = $Config::Config{usecperl};
 
 # Copy unchanged functions from B::Deparse
 *balanced_delim = *B::Deparse::balanced_delim;
 *double_delim = *B::Deparse::double_delim;
 *escape_extended_re = *B::Deparse::escape_extended_re;
-*escape_re = *B::Deparse::escape_re;
-*lex_in_scope = *B::Deparse::lex_in_scope;
-*rv2gv_or_string = *B::Deparse::rv2gv_or_string;
 
 use B::DeparseTree::SyntaxTree;
-
-# Various operator flag bits
-use constant POSTFIX => 1;        # operator can be used as postfix operator
-use constant SWAP_CHILDREN => 1;  # children of op should be reversed
-use constant ASSIGN =>  2;        # has OP= variant
-use constant LIST_CONTEXT => 4;   # Assignment is in list context
-
-
 
 our($VERSION, @EXPORT, @ISA);
 $VERSION = '3.2.0';
 @ISA = qw(Exporter);
 @EXPORT = qw(
     %strict_bits
-    ASSIGN
-    LIST_CONTEXT
-    POSTFIX
-    SWAP_CHILDREN
     ambient_pragmas
     anon_hash_or_list
     baseop
@@ -64,6 +59,7 @@ $VERSION = '3.2.0';
     code_list
     concat
     cops
+    dedup_func_parens
     dedup_parens_func
     deparse_binop_left
     deparse_binop_right
@@ -74,11 +70,14 @@ $VERSION = '3.2.0';
     dq_unop
     dquote
     e_anoncode
+    e_method
     elem
     filetest
+    for_loop
     func_needs_parens
     givwhen
     indirop
+    is_lexical_subs
     is_list_newer
     is_list_older
     listop
@@ -97,19 +96,25 @@ $VERSION = '3.2.0';
     maybe_parens_unop
     maybe_qualify
     maybe_targmy
+    _method
     null_newer
     null_older
     pfixop
+    pp_padsv
     range
     repeat
     rv2x
     scopeop
     single_delim
     slice
+    split
+    stringify_newer
+    stringify_older
     subst_newer
     subst_older
     unop
     );
+
 
 # The BEGIN {} is used here because otherwise this code isn't executed
 # when you run B::Deparse on itself.
@@ -289,21 +294,29 @@ sub anon_hash_or_list($$$)
     my($pre, $post) = @{{"anonlist" => ["[","]"],
 			 "anonhash" => ["{","}"]}->{$name}};
     my($expr, @exprs);
-    my $other_ops = [$op->first];
-    $op = $op->first->sibling; # skip pushmark
+    my $first_op = $op->first;
+    $op = $first_op->sibling; # skip pushmark
     for (; !B::Deparse::null($op); $op = $op->sibling) {
 	$expr = $self->deparse($op, 6, $op);
-	push @exprs, [$expr, $op];
+	push @exprs, $expr;
     }
-    if ($pre eq "{" and $cx < 1) {
-	# Disambiguate that it's not a block
-	$pre = "+{";
-    }
-    my $texts = [$pre, $self->combine(", ", \@exprs), $post];
-    return info_from_list($op, $self, $texts, '', $name,
-			  {body => \@exprs,
-			   other_ops => $other_ops
-			  });
+    # if ($pre eq "{" and $cx < 1) {
+    # 	# Disambiguate that it's not a block
+    # 	$pre = "+{";
+    # }
+
+    my $node = $self->info_from_template("$name $pre $post", $op,
+					 "$pre%C$post",
+					 [[0, $#exprs, ', ']], \@exprs);
+
+    # Set the skipped op as the opener of the list.
+    my $position = [0, 1];
+    my $first_node = $self->info_from_string($first_op->name, $first_op,
+					     $node->{text},
+					     {position => $position});
+    $node->update_other_ops($first_node);
+    return $node;
+
 }
 
 sub assoc_class {
@@ -356,7 +369,7 @@ sub binop
 	($left, $right) = ($right, $left);
     }
     my $lhs = $self->deparse_binop_left($op, $left, $prec);
-    if ($flags & B::Deparse::LIST_CONTEXT
+    if ($flags & LIST_CONTEXT
 	&& $lhs->{text} !~ /^(my|our|local|)[\@\(]/) {
 	$lhs->{maybe_parens} ||= {};
 	$lhs->{maybe_parens}{force} = 'true';
@@ -392,8 +405,10 @@ BEGIN {
 	     'subtract' => 18, 'i_subtract' => 18,
 	     'concat' => 18,
 	     'left_shift' => 17, 'right_shift' => 17,
-	     'bit_and' => 13,
+	     'bit_and' => 13, 'nbit_and' => 13, 'sbit_and' => 13,
 	     'bit_or' => 12, 'bit_xor' => 12,
+	     'sbit_or' => 12, 'sbit_xor' => 12,
+	     'nbit_or' => 12, 'nbit_xor' => 12,
 	     'and' => 3,
 	     'or' => 2, 'xor' => 2,
 	    );
@@ -449,25 +464,28 @@ sub concat {
 	$prec = 7;
     }
     my $lhs = $self->deparse_binop_left($op, $left, $prec);
-    my $rhs  = $self->deparse_binop_right($op, $right, $prec);
-    return $self->bin_info_join_maybe_parens($op, $lhs, $rhs, ".$eq", " ", $cx, $prec,
-					     'concat');
+    my $rhs = $self->deparse_binop_right($op, $right, $prec);
+    return $self->info_from_template(".$eq", $op,
+				     "%c .$eq %c", undef, [$lhs, $rhs],
+				     {maybe_parens => [$self, $cx, $prec]});
 }
 
 # Handle pp_dbstate, and pp_nextstate and COP ops.
 #
 # Notice how subs and formats are inserted between statements here;
 # also $[ assignments and pragmas.
+
 sub cops
 {
     my ($self, $op, $cx, $name) = @_;
     $self->{'curcop'} = $op;
-    my @texts;
+    my @texts = ();
     my $opts = {};
     my @args_spec = ();
     my $fmt = '%;';
 
     push @texts, $self->B::Deparse::cop_subs($op);
+
     if (@texts) {
 	# Special marker to swallow up the semicolon
 	$opts->{'omit_next_semicolon'} = 1;
@@ -663,6 +681,17 @@ sub deparse_format($$$)
     return $info;
 }
 
+sub dedup_func_parens($$)
+{
+    my $self = shift;
+    my ($args_ref) = @_;
+    my @args = @$args_ref;
+    return (
+	scalar @args == 1 &&
+	substr($args[0]->{text}, 0, 1) eq '(' &&
+	substr($args[0]->{text}, 0, 1) eq ')');
+}
+
 sub dedup_parens_func($$$)
 {
     my $self = shift;
@@ -751,11 +780,12 @@ sub dq($$$)
 	my $first = $self->dq($op->first, $op);
 	my $last  = $self->dq($op->last, $op);
 
+	# FIXME: convert to newer conventions
 	# Disambiguate "${foo}bar", "${foo}{bar}", "${foo}[1]", "$foo\::bar"
-	($last =~ /^[A-Z\\\^\[\]_?]/ &&
-	    $first =~ s/([\$@])\^$/${1}{^}/)  # "${^}W" etc
-	    || ($last =~ /^[:'{\[\w_]/ && #'
-		$first =~ s/([\$@])([A-Za-z_]\w*)$/${1}{$2}/);
+	($last->{text} =~ /^[A-Z\\\^\[\]_?]/ &&
+	    $first->{text} =~ s/([\$@])\^$/${1}{^}/)  # "${^}W" etc
+	    || ($last->{text} =~ /^[:'{\[\w_]/ && #'
+		$first->{text} =~ s/([\$@])([A-Za-z_]\w*)$/${1}{$2}/);
 
 	return info_from_list($op, $self, [$first->{text}, $last->{text}], '', 'dq_concat',
 			      {body => [$first, $last]});
@@ -899,19 +929,38 @@ sub filetest
 	}
 	return $self->maybe_parens_unop($name, $op->first, $cx, $op);
     } elsif (B::class($op) =~ /^(SV|PAD)OP$/) {
-	# FIXME redo after maybe_parens_func returns a string.
-	my @list = $self->maybe_parens_func($name, $self->pp_gv($op, 1), $cx, 16);
-	return info_from_list($op, $self, \@list, ' ', "filetest list $name", {});
+	my ($fmt, $type);
+	my $gv_node = $self->pp_gv($op, 1);
+	if ($self->func_needs_parens($gv_node->{text}, $cx, 16)) {
+	    $fmt = "$name(%c)";
+	    $type = "filetest $name()";
+	} else {
+	    $fmt = "$name %c";
+	    $type = "filetest $name";
+	}
+	return $self->info_from_template($type, $op, $fmt, undef, [$gv_node]);
     } else {
 	# I don't think baseop filetests ever survive ck_filetest, but...
-	return info_from_text($op, $self, $name, 'unop', {});
+	return $self->info_from_string("filetest $name", $op, $name);
     }
 }
 
+sub for_loop($$$$) {
+    my ($self, $op, $cx, $parent) = @_;
+    my $init = $self->deparse($op, 1, $parent);
+    my $s = $op->sibling;
+    my $ll = $s->name eq "unstack" ? $s->sibling : $s->first->sibling;
+    return $self->loop_common($ll, $cx, $init);
+}
+
+# Returns in function (whose name is not passed as a parameter) will
+# need to surround its argements (the first argument is $first_param)
+# in parenthesis. To determine this, we also pass in the operator
+# precedence, $prec, and the current expression context value, $cx
 sub func_needs_parens($$$$)
 {
     my($self, $first_param, $cx, $prec) = @_;
-    return ($prec <= $cx and substr($first_param, 0, 1) ne "(") || $self->{'parens'};
+    return ($prec <= $cx) || (substr($first_param, 0, 1) eq "(") || $self->{'parens'};
 }
 
 sub givwhen
@@ -948,12 +997,13 @@ sub indirop
     my($self, $op, $cx, $name) = @_;
     my($expr, @exprs);
     my $firstkid = my $kid = $op->first->sibling;
-    my $indir_info;
+    my $indir_info = undef;
     my $type = $name;
     my $first_op = $op->first;
     my @skipped_ops = ($first_op);
     my @indir = ();
-    my @args_spec = ();
+    my @args_spec;
+
     my $fmt = '';
 
     if ($op->flags & OPf_STACKED) {
@@ -965,25 +1015,23 @@ sub indirop
 		$fmt = '{;}';
 	    } else {
 		$fmt = '{%c}';
-		push @args_spec, $indir_info;
 	    }
 	} elsif ($indir_op->name eq "const" && $indir_op->private & OPpCONST_BARE) {
 	    $fmt = $self->const_sv($indir_op)->PV;
 	} else {
 	    $indir_info = $self->deparse($indir_op, 24, $op);
 	    $fmt = '%c';
-	    push @args_spec, $indir_info;
 	}
 	$fmt .= ' ';
 	$kid = $kid->sibling;
     }
 
     if ($name eq "sort" && $op->private & (OPpSORT_NUMERIC | OPpSORT_INTEGER)) {
-	$type = 'sort numeric or integer';
+	$type = 'indirop sort numeric or integer';
 	$fmt = ($op->private & OPpSORT_DESCEND)
 	    ? '{$b <=> $a} ': '{$a <=> $b} ';
     } elsif ($name eq "sort" && $op->private & OPpSORT_DESCEND) {
-	$type = 'sort_descend';
+	$type = 'indirop sort descend';
 	$fmt = '{$b cmp $a} ';
     }
 
@@ -1018,12 +1066,14 @@ sub indirop
     if ($name eq "sort" && ($op->private & OPpSORT_INPLACE)) {
 	$fmt = "%c = $name2 $fmt %c";
 	# FIXME: do better with skipped ops
-	return $self->info_from_template($name2, $op,
-					     [0, 0], \@exprs, {other_ops => \@skipped_ops});
+	return $self->info_from_template("indirop sort inplace", $op, $fmt,
+					 [0, 0], \@exprs,
+	                                 {prev_expr => $prev_expr});
     }
 
 
     my $node;
+    $prev_expr = $exprs[-1];
     if ($fmt ne "" && $name eq "sort") {
 	# We don't want to say "sort(f 1, 2, 3)", since perl -w will
 	# give bareword warnings in that case. Therefore if context
@@ -1039,38 +1089,57 @@ sub indirop
 					     other_ops => \@skipped_ops,
 					     maybe_parens => {
 						 context => $cx,
-						 precedence => 5}});
+						 precedence => 5},
+					     prev_expr => $prev_expr
+					 });
 
     } elsif (!$fmt && $name eq "sort"
 	     && !B::Deparse::null($op->first->sibling)
 	     && $op->first->sibling->name eq 'entersub' ) {
 	# We cannot say sort foo(bar), as foo will be interpreted as a
 	# comparison routine.  We have to say sort(...) in that case.
-	$node = $self->info_from_template("$name2()", $op,
+	$node = $self->info_from_template("indirop $name2()", $op,
 					  "$name2(%C)",
 					  [[0, $#exprs, ', ']],
 					  \@exprs,
-					  {other_ops => \@skipped_ops});
+					  {other_ops => \@skipped_ops,
+					   prev_expr => $prev_expr});
 
     } else {
 	if (@exprs) {
-	    my $fmt;
+	    my $type = "indirop";
+	    my $args_fmt;
 	    if ($self->func_needs_parens($exprs[0]->{text}, $cx, 5)) {
-		$fmt = "$name2(%C)"
+		$type = "indirop $name2()";
+		$args_fmt = "(%C)";
 	    } else {
-		$fmt = "$name2 %C"
+		$type = "indirop $name2";
+		$args_fmt = "%C";
 	    }
-	    $node = $self->info_from_template($name2, $first_op, $fmt,
-					      [[0, $#exprs, ', ']],
-					      \@exprs,
-					      {other_ops => \@skipped_ops,
-					       maybe_parens => [$self, $cx, 5]});
+	    @args_spec = ([0, $#exprs, ', ']);
+	    if ($fmt) {
+		$fmt = "${name2} ${fmt}${args_fmt}";
+		if ($indir_info) {
+		    unshift @exprs, $indir_info;
+		    @args_spec = (0, [1, $#exprs, ', ']);
+		}
+	    } else {
+		if (substr($args_fmt, 0, 1) eq '(') {
+		    $fmt = "${name2}$args_fmt";
+		} else {
+		    $fmt = "${name2} $args_fmt";
+		}
+		@args_spec = [0, $#exprs, ', '];
+	    }
 
+	    $node = $self->info_from_template($type, $op, $fmt,
+					      \@args_spec, \@exprs,
+                                              {prev_expr => $prev_expr});
 	} else {
-	    $type="indirect $name2";
+	    $type="indirop $name2";
+	    # Should this be maybe_parens()?
 	    $type .= '()' if (7 < $cx);  # FIXME - do with format specifier
-	    $node = $self->info_from_string($first_op, $name2,
-					    {other_ops => \@skipped_ops})
+	    $node = $self->info_from_string($type, $op, $name2);
 	}
     }
 
@@ -1086,6 +1155,16 @@ sub indirop
     $node->{other_ops} = \@new_ops;
     return $node;
     }
+
+# 5.16 doesn't have this so we include it, even though it's not
+# going to get used?
+sub is_lexical_subs {
+    my (@ops) = shift;
+    for my $op (@ops) {
+        return 0 if $op->name !~ /\A(?:introcv|clonecv)\z/;
+    }
+    return 1;
+}
 
 # The version of null_op_list after 5.22
 # Note: this uses "op" not "kid"
@@ -1215,9 +1294,18 @@ sub listop
     $self->deparse_op_siblings(\@exprs, $kid, $op, 6);
 
     if ($name eq "reverse" && ($op->private & B::OPpREVERSE_INPLACE)) {
-	my $texts =  [$exprs[0->{text}], '=',
-		      $fullname . ($parens ? "($exprs[0]->{text})" : " $exprs[0]->{text}")];
-	return info_from_list($op, $self, $texts, ' ', 'listop_reverse', {});
+	my $fmt;
+	my $type;
+	if ($parens) {
+	    $fmt = "%c = $fullname(%c)";
+	    $type = "listop reverse ()"
+	} else {
+	    $fmt = "%c = $fullname(%c)";
+	    $type = "listop reverse"
+	}
+	my @nodes = ($exprs[0], $exprs[0]);
+	return $self->info_from_template($type, $op, $fmt, undef,
+					 [$exprs[0], $exprs[0]]);
     }
 
     my $opts = {};
@@ -1261,6 +1349,7 @@ sub listop
     my $node = $self->info_from_template($type, $op, $fmt,
 					 [[0, $#exprs, ', ']], \@exprs,
 					 $opts);
+    $node->{prev_expr} = $exprs[-1];
     if (@skipped_ops) {
 	# if we have skipped ops like pushmark, we will use $full name
 	# as the part it represents.
@@ -1479,7 +1568,8 @@ sub loopex
 			      "loop $name $op->pv", $opts);
     } elsif (B::class($op) eq "OP") {
 	# no-op
-	return info_from_text($op, $self, $name, "loopex $name", $opts);
+	return $self->info_from_string("loopex op $name",
+				       $op, $name,  $opts);
     } elsif (B::class($op) eq "UNOP") {
 	(my $kid_info = $self->deparse($op->first, 7)) =~ s/^\cS//;
 	# last foo() is a syntax error. So we might surround it with parens.
@@ -1488,10 +1578,12 @@ sub loopex
 	    $text = "($text)" if $text =~ /^(?!\d)\w/;
 	    return $text;
 	};
-	return $self->info_from_template("loop $name", $op, "$name %F",
+	return $self->info_from_template("loopex unop $name",
+					 $op, "$name %F",
 					 undef, [$kid_info], $opts);
     } else {
-	return info_from_text($op, $self, $name, "loop $name", $opts);
+	return $self->info_from_string("loop $name",
+				       $op, $name, "loop $name", $opts);
     }
     Carp::confess("unhandled condition in lopex");
 }
@@ -1561,21 +1653,33 @@ sub mapop
 	$is_block = 0;
     }
     push @nodes, $code_block_node;
-
+    $self->{optree}{$code_block_node->{addr}} = $code_block_node;
 
     push @skipped_ops, $kid;
     $kid = $kid->sibling;
     $self->deparse_op_siblings(\@nodes, $kid, $op, 6);
     push @args_spec, [1, $#nodes, ', '];
 
-    if ($self->func_needs_parens($nodes[1]->{text}, $cx, 5)) {
-	$fmt = "$name $first_arg_fmt (%C)";
+    my $suffix = '';
+    if ($self->func_needs_parens($nodes[0]->{text}, $cx, 5)) {
+	$fmt = "$name($first_arg_fmt";
+	$suffix = ')';
     } else {
-	$fmt = "$name $first_arg_fmt %C";
+	$fmt = "$name $first_arg_fmt";
     }
+    if (@nodes > 1) {
+	if ($is_block) {
+	    $fmt .= " ";
+	} else {
+	    $fmt .= ", ";
+	}
+	$fmt .= "%C";
+    }
+    $fmt .= $suffix;
     my $node = $self->info_from_template($type, $op, $fmt,
 					 \@args_spec, \@nodes,
 					 {other_ops => \@skipped_ops});
+    $code_block_node->{parent} = $node->{addr};
 
     # Handle skipped ops
     my @new_ops;
@@ -1664,7 +1768,7 @@ sub matchop_newer
     } elsif ($kid->name ne 'regcomp') {
         if ($op->name eq 'split') {
             # split has other kids, not just regcomp
-            $re = re_uninterp(escape_re(re_unback($op->precomp)));
+            $re = re_uninterp(B::Deparse::escape_re(re_unback($op->precomp)));
         } else {
 	    carp("found ".$kid->name." where regcomp expected");
 	}
@@ -1811,7 +1915,7 @@ sub map_texts($$)
 sub maybe_local {
     my($self, $op, $cx, $var_info) = @_;
     $var_info->{parent} = $$op;
-    return maybe_local_str($self, $op, $cx, $var_info->{text});
+    return maybe_local_str($self, $op, $cx, $var_info);
 }
 
 # Handles "our", "local", "my" variables (and possibly no
@@ -1825,7 +1929,7 @@ sub maybe_local_str
 {
     my($self, $op, $cx, $info) = @_;
     my ($text, $is_node);
-    if (ref $info && $info->isa("B::DeparseTree::Node")) {
+    if (ref $info && $info->isa("B::DeparseTree::TreeNode")) {
 	$text = $self->info2str($info);
 	$is_node = 1;
     } else {
@@ -1888,7 +1992,7 @@ sub maybe_local_str
 	    return $self->info_from_template($type, $op, $fmt, undef, [$info]);
 	}
     } else {
-	if (ref $info && $info->isa("B::DeparseTree::Node")) {
+	if (ref $info && $info->isa("B::DeparseTree::TreeNode")) {
 	    return $info;
 	} else {
 	    return $self->info_from_string('not local', $op, $text);
@@ -1896,7 +2000,52 @@ sub maybe_local_str
     }
 }
 
-sub maybe_my {
+sub maybe_my
+{
+    $] >= 5.026 ? goto &maybe_my_newer : goto &maybe_my_older;
+}
+
+sub maybe_my_newer
+{
+    my $self = shift;
+    my($op, $cx, $text, $padname, $forbid_parens) = @_;
+    # The @a in \(@a) isn't in ref context, but only when the
+    # parens are there.
+    my $need_parens = !$forbid_parens && $self->{'in_refgen'}
+		   && $op->name =~ /[ah]v\z/
+		   && ($op->flags & (B::OPf_PARENS|B::OPf_REF)) == B::OPf_PARENS;
+    # The @a in \my @a must not have parens.
+    if (!$need_parens && $self->{'in_refgen'}) {
+	$forbid_parens = 1;
+    }
+    if ($op->private & B::OPpLVAL_INTRO and not $self->{'avoid_local'}{$$op}) {
+	# Check $padname->FLAGS for statehood, rather than $op->private,
+	# because enteriter ops do not carry the flag.
+	unless (defined($padname)) {
+	    Carp::confess("undefine padname $padname");
+	}
+
+	my $my =
+	    $self->keyword($padname->FLAGS & SVpad_STATE ? "state" : "my");
+	if ($padname->FLAGS & SVpad_TYPED) {
+	    $my .= ' ' . $padname->SvSTASH->NAME;
+	}
+	if ($need_parens) {
+	    return $self->info_from_string("$my()", $op, "$my($text)");
+	} elsif ($forbid_parens || B::Deparse::want_scalar($op)) {
+	    return $self->info_from_string("$my", $op, "$my $text");
+	} elsif ($self->func_needs_parens($text, $cx, 16)) {
+	    return $self->info_from_string("$my()", $op, "$my($text)");
+	} else {
+	    return $self->info_from_string("$my", $op, "$my $text");
+	}
+    } else {
+	return $self->info_from_string("not my", $op, $need_parens ? "($text)" : $text);
+    }
+}
+
+sub maybe_my_older
+{
     my $self = shift;
     my($op, $cx, $text, $forbid_parens) = @_;
     if ($op->private & OPpLVAL_INTRO and not $self->{'avoid_local'}{$$op}) {
@@ -1920,7 +2069,7 @@ sub maybe_my {
 sub maybe_parens($$$$)
 {
     my($self, $text, $cx, $prec) = @_;
-    if (B::DeparseTree::Node::parens_test($self, $cx, $prec)) {
+    if (B::DeparseTree::TreeNode::parens_test($self, $cx, $prec)) {
 	$text = "($text)";
 	# In a unop, let parent reuse our parens; see maybe_parens_unop
 	# FIXME:
@@ -1947,8 +2096,8 @@ sub maybe_parens_func($$$$$)
 # the 'if it looks like a function' rule.
 sub maybe_parens_unop($$$$$)
 {
-    my $self = shift;
-    my($name, $op, $cx, $parent) = @_;
+    my ($self, $name, $op, $cx, $parent, $opts) = @_;
+    $opts = {} unless $opts;
     my $info =  $self->deparse($op, 1, $parent);
     my $fmt;
     my @exprs = ($info);
@@ -1961,8 +2110,10 @@ sub maybe_parens_unop($$$$$)
     }
     $name = $self->keyword($name);
     if ($cx > 16 or $self->{'parens'}) {
-	return $self->info_from_template("$name()", $op,
-					 "$name(%c)",[0], \@exprs);
+	my $node = $self->info_from_template(
+	    "$name()", $parent, "$name(%c)",[0], \@exprs, $opts);
+	$node->{prev_expr} = $exprs[0];
+	return $node;
     } else {
 	# FIXME: we don't do \cS
 	# if (substr($text, 0, 1) eq "\cS") {
@@ -1970,15 +2121,18 @@ sub maybe_parens_unop($$$$$)
 	#     return info_from_list($op, $self,[$name, substr($text, 1)],
 	# 			  '',  'maybe_parens_unop_cS', {body => [$info]});
 	# } else
+	my $node;
 	if (substr($info->{text}, 0, 1) eq "(") {
 	    # avoid looks-like-a-function trap with extra parens
 	    # ('+' can lead to ambiguities)
-	    return $self->info_from_template("$name(())", $op,
-					     "$name(%c)", [0], \@exprs);
+	    $node = $self->info_from_template(
+		"$name(()) dup remove", $parent, "$name(%c)", [0], \@exprs, $opts);
 	} else {
-	    return $self->info_from_template("$name <args>", $op,
-					     "$name %c", [0], \@exprs);
+	    $node = $self->info_from_template(
+		"$name <args>", $parent, "$name %c", [0], \@exprs, $opts);
 	}
+	$node->{prev_expr} = $exprs[0];
+	return $node;
     }
     Carp::confess("unhandled condition in maybe_parens_unop");
 }
@@ -1993,8 +2147,8 @@ sub maybe_qualify {
 	 && $v    !~ /^\$[ab]\z/	 # not $a or $b
 	 && !$globalnames{$name}         # not a global name
 	 && $self->{hints} & $strict_bits{vars}  # strict vars
-	 && !$self->lex_in_scope($v,1)   # no "our"
-      or $self->lex_in_scope($v);        # conflicts with "my" variable
+	 && !$self->B::Deparse::lex_in_scope($v,1)   # no "our"
+      or $self->B::Deparse::lex_in_scope($v);        # conflicts with "my" variable
     return $name;
 }
 
@@ -2014,6 +2168,147 @@ sub maybe_targmy
 	return $self->$func($op, $cx, @args);
     }
 }
+
+sub _method
+{
+    my($self, $op, $cx) = @_;
+    my @other_ops = ($op->first);
+    my $kid = $op->first->sibling; # skip pushmark
+    my($meth, $obj, @exprs);
+    if ($kid->name eq "list" and B::Deparse::want_list $kid) {
+	# When an indirect object isn't a bareword but the args are in
+	# parens, the parens aren't part of the method syntax (the LLAFR
+	# doesn't apply), but they make a list with OPf_PARENS set that
+	# doesn't get flattened by the append_elem that adds the method,
+	# making a (object, arg1, arg2, ...) list where the object
+	# usually is. This can be distinguished from
+	# '($obj, $arg1, $arg2)->meth()' (which is legal if $arg2 is an
+	# object) because in the later the list is in scalar context
+	# as the left side of -> always is, while in the former
+	# the list is in list context as method arguments always are.
+	# (Good thing there aren't method prototypes!)
+	$meth = $kid->sibling;
+	push  @other_ops, $kid->first;
+	$kid = $kid->first->sibling; # skip pushmark
+	$obj = $kid;
+	$kid = $kid->sibling;
+	for (; not B::Deparse::null $kid; $kid = $kid->sibling) {
+	    push @exprs, $kid;
+	}
+    } else {
+	$obj = $kid;
+	$kid = $kid->sibling;
+	for (; !B::Deparse::null ($kid->sibling) && $kid->name!~/^method(?:_named)?\z/;
+	     $kid = $kid->sibling) {
+	    push @exprs, $kid
+	}
+	$meth = $kid;
+    }
+
+    my $method_name = undef;
+    my $type = 'method';
+    if ($meth->name eq "method_named") {
+	if ($] < 5.018) {
+	    $method_name = $self->const_sv($meth)->PV;
+	} else {
+	    $method_name = $self->meth_sv($meth)->PV;
+	}
+	$type = 'named method';
+    } elsif ($meth->name eq "method_super") {
+	$method_name = "SUPER::".$self->meth_sv($meth)->PV;
+	$type = 'SUPER:: method';
+    } elsif ($meth->name eq "method_redir") {
+        $method_name = $self->meth_rclass_sv($meth)->PV.'::'.$self->meth_sv($meth)->PV;
+	$type = 'method redirected ::';
+    } elsif ($meth->name eq "method_redir_super") {
+	$type = '::SUPER:: redirected method';
+        $method_name = $self->meth_rclass_sv($meth)->PV.'::SUPER::'.
+                $self->meth_sv($meth)->PV;
+    } else {
+	$meth = $meth->first;
+	if ($meth->name eq "const") {
+	    # As of 5.005_58, this case is probably obsoleted by the
+	    # method_named case above
+	    $method_name = $self->const_sv($meth)->PV; # needs to be bare
+	    $type = 'contant method';
+	}
+    }
+
+    my $meth_node = undef;
+    if ($method_name) {
+	$meth_node = $self->info_from_string($type,
+					     $meth, $method_name,
+					     {other_ops => \@other_ops});
+	$self->{optree}{$$meth} = $meth_node;
+	$meth_node->{parent} = $$op if $op;
+
+    }
+    return {
+	method_node => $meth_node,
+	method => $meth,
+	object => $obj,
+	args => \@exprs,
+    }, $cx;
+}
+
+sub e_method {
+    my ($self, $op, $minfo, $cx) = @_;
+    my $obj = $self->deparse($minfo->{object}, 24, $op);
+    my @body = ($obj);
+    my $other_ops = $minfo->{other_ops};
+
+    my $meth_info = $minfo->{method_node};
+    unless ($minfo->{method_node}) {
+	$meth_info = $self->deparse($minfo->{meth}, 1, $op);
+    }
+    my @args = map { $self->deparse($_, 6, $op) } @{$minfo->{args}};
+    my @args_texts = map $_->{text}, @args;
+    my $args = join(", ", @args_texts);
+
+    my $opts = {other_ops => $other_ops,
+                prev_expr => $meth_info};
+    my $type;
+
+    if ($minfo->{object}->name eq 'scope' && B::Deparse::want_list $minfo->{object}) {
+	# method { $object }
+	# This must be deparsed this way to preserve list context
+	# of $object.
+	# FIXME
+	my @texts = ();
+	my $need_paren = $cx >= 6;
+	if ($need_paren) {
+	    @texts = ('(', $meth_info->{text},  substr($obj,2),
+		      $args, ')');
+	    $type = 'e_method list ()';
+	} else {
+	    @texts = ($meth_info->{text},  substr($obj,2), $args);
+	    $type = 'e_method list, no ()';
+	}
+	return info_from_list($op, $self, \@texts, '', $type, $opts);
+    }
+
+    my @nodes = ($obj, $meth_info);
+    my $fmt;
+    my @args_spec = (0, 1);
+    if (@{$minfo->{args}}) {
+	my $prev_expr = undef;
+	foreach my $arg (@{$minfo->{args}}) {
+	    my $expr = $self->deparse($arg, 6, $op);
+	    $expr->{prev_expr} = $prev_expr;
+	    push @nodes, $expr;
+	}
+	$fmt = "%c->%c(%C)";
+	push @args_spec, [2, $#nodes, ', '];
+	$type = '$obj->method()';
+    } else {
+	$type = '$obj->method';
+	$fmt = "%c->%c";
+    }
+    return $self->info_from_template($type, $op, $fmt, \@args_spec, \@nodes, $opts);
+}
+
+# Perl 5.14 doesn't have this
+use constant OP_GLOB => 25;
 
 sub null_older
 {
@@ -2044,7 +2339,7 @@ sub null_older
 	return $self->pp_scope($kid, $cx);
     } elsif ($op->targ == B::Deparse::OP_STRINGIFY) {
 	return $self->dquote($op, $cx);
-    } elsif ($op->targ == B::Deparse::OP_GLOB) {
+    } elsif ($op->targ == OP_GLOB) {
 	my @other_ops = ($kid, $kid->first, $kid->first->first);
 	my $info = $self->pp_glob(
 	    $kid    # entersub
@@ -2123,10 +2418,18 @@ sub null_newer
 {
     my($self, $op, $cx) = @_;
     my $node;
+
+    # might be 'my $s :Foo(bar);'
+    if ($] >= 5.028 && $op->targ == B::Deparse::OP_LIST) {
+	Carp::confess("Can't handle var attr yet");
+        # my $my_attr = maybe_var_attr($self, $op, $cx);
+        # return $my_attr if defined $my_attr;
+    }
+
     if (B::class($op) eq "OP") {
 	# If the Perl source constant value can't be recovered.
 	# We'll use the 'ex_const' value as a substitute
-	return $self->info_from_string("constant_unrecoverable",$op, $self->{'ex_const'})
+	return $self->info_from_string("null - constant_unrecoverable",$op, $self->{'ex_const'})
 	    if $op->targ == B::Deparse::OP_CONST;
 	return $self->dquote($op, $cx) if $op->targ == B::Deparse::OP_STRINGIFY;
     } elsif (B::class($op) eq "COP") {
@@ -2146,7 +2449,7 @@ sub null_newer
 	} elsif ($op->targ == B::Deparse::OP_STRINGIFY) {
 	    # This case is duplicated the below "else". Can it ever happen?
 	    $node =  $self->dquote($op, $cx);
-	} elsif ($op->targ == B::Deparse::OP_GLOB) {
+	} elsif ($op->targ == OP_GLOB) {
 	    my @other_ops = ($kid, $kid->first, $kid->first->first);
 	    my $info = $self->pp_glob(
 		$kid    # entersub
@@ -2163,7 +2466,7 @@ sub null_newer
 		 $kid->sibling->flags & OPf_STACKED) {
 	    my $lhs = $self->deparse($kid, 7, $op);
 	    my $rhs = $self->deparse($kid->sibling, 7, $kid);
-	    $node = $self->info_from_template("readline = ", $op,
+	    $node = $self->info_from_template("null: readline = ", $op,
 					      "%c = %c", undef, [$lhs, $rhs],
 					      {maybe_parens => [$self, $cx, 7],
 					       prev_expr => $rhs});
@@ -2172,13 +2475,13 @@ sub null_newer
 		 $kid->sibling->flags & OPf_STACKED) {
 	    my $lhs = $self->deparse($kid, 20, $op);
 	    my $rhs = $self->deparse($kid->sibling, 20, $op);
-	    $node = $self->info_from_template("trans =~",$op,
+	    $node = $self->info_from_template("null: trans =~",$op,
 					      "%c =~ %c", undef, [$lhs, $rhs],
 					      { maybe_parens => [$self, $cx, 7],
 						prev_expr => $rhs });
 	} elsif ($op->flags & OPf_SPECIAL && $cx < 1 && !$op->targ) {
 	    my $kid_info = $self->deparse($kid, $cx, $op);
-	    $node = $self->info_from_template("do { }", $op,
+	    $node = $self->info_from_template("null: do { }", $op,
 					     "do {\n%+%c\n%-}", undef, [$kid_info]);
 	} elsif (!B::Deparse::null($kid->sibling) and
 		 $kid->sibling->name eq "null" and
@@ -2187,13 +2490,14 @@ sub null_newer
 		 $kid->sibling->first->name eq "rcatline") {
 	    my $lhs = $self->deparse($kid, 18, $op);
 	    my $rhs = $self->deparse($kid->sibling, 18, $op);
-	    $node = $self->info_from_template("rcatline =",$op,
+	    $node = $self->info_from_template("null: rcatline =",$op,
 					      "%c = %c", undef, [$lhs, $rhs],
 					      { maybe_parens => [$self, $cx, 20],
 						prev_expr => $rhs });
 	} else {
 	    my $node = $self->deparse($kid, $cx, $op);
-	    return $self->info_from_template($op->name, $op,
+	    my $type = "null: " . $op->name;
+	    return $self->info_from_template($type, $op,
 					     "%c", undef, [$node]);
 	}
 	my $position = pushmark_position($node);
@@ -2207,6 +2511,26 @@ sub null_newer
 	return $node;
     }
     Carp::confess("unhandled condition in null");
+}
+
+sub pp_padsv {
+    $] >= 5.026 ? goto &pp_padsv_newer : goto &pp_padsv_older;
+}
+
+sub pp_padsv_newer {
+    my $self = shift;
+    my($op, $cx, $forbid_parens) = @_;
+    my $targ = $op->targ;
+    return $self->maybe_my($op, $cx, $self->padname($targ),
+			   $self->padname_sv($targ),
+			   $forbid_parens);
+}
+
+sub pp_padsv_older
+{
+    my ($self, $op, $cx, $forbid_parens) = @_;
+    return $self->maybe_my($op, $cx, $self->padname($op->targ),
+			   $forbid_parens);
 }
 
 # This is the 5.26 version. It is different from earlier versions.
@@ -2282,6 +2606,33 @@ sub repeat {
     }
 
     return $node;
+}
+
+sub stringify_older {
+    maybe_targmy(@_, \&dquote)
+}
+
+# OP_STRINGIFY is a listop, but it only ever has one arg
+sub stringify_newer {
+    my ($self, $op, $cx) = @_;
+    my $kid = $op->first->sibling;
+    my @other_ops = ();
+    while ($kid->name eq 'null' && !B::Deparse::null($kid->first)) {
+        push(@other_ops, $kid);
+	$kid = $kid->first;
+    }
+    my $info;
+    if ($kid->name =~ /^(?:const|padsv|rv2sv|av2arylen|gvsv|multideref
+			  |aelemfast(?:_lex)?|[ah]elem|join|concat)\z/x) {
+	$info = maybe_targmy(@_, \&dquote);
+    }
+    else {
+	# Actually an optimised join.
+	my $info = listop(@_,"join");
+	$info->{text} =~ s/join([( ])/join$1$self->{'ex_const'}, /;
+    }
+    push @{$info->{other_ops}}, @other_ops;
+    return $info;
 }
 
 # Kind of silly, but we prefer, subst regexp flags joined together to
@@ -2418,6 +2769,75 @@ sub slice
 				     \@elems),
 }
 
+sub split
+{
+    my($self, $op, $cx) = @_;
+    my($kid, @exprs, $ary_info, $expr);
+    my $ary = '';
+    my @body = ();
+    my @other_ops = ();
+    $kid = $op->first;
+
+    # For our kid (an OP_PUSHRE), pmreplroot is never actually the
+    # root of a replacement; it's either empty, or abused to point to
+    # the GV for an array we split into (an optimization to save
+    # assignment overhead). Depending on whether we're using ithreads,
+    # this OP* holds either a GV* or a PADOFFSET. Luckily, B.xs
+    # figures out for us which it is.
+    my $replroot = $kid->pmreplroot;
+    my $gv = 0;
+    my $stacked = $op->flags & OPf_STACKED;
+    if (ref($replroot) eq "B::GV") {
+	$gv = $replroot;
+    } elsif (!ref($replroot) and $replroot > 0) {
+	$gv = $self->padval($replroot);
+    } elsif ($kid->targ) {
+	$ary = $self->padname($kid->targ)
+    } elsif ($stacked) {
+	$ary_info = $self->deparse($op->last, 7, $op);
+	push @body, $ary_info;
+	$ary = $ary_info->{text};
+    }
+    $ary_info = $self->maybe_local(@_,
+			      $self->stash_variable('@',
+						     $self->gv_name($gv),
+						     $cx))
+	if $gv;
+
+    # Skip the last kid when OPf_STACKED is set, since it is the array
+    # on the left.
+    for (; !B::Deparse::null($stacked ? $kid->sibling : $kid);
+	 $kid = $kid->sibling) {
+	push @exprs, $self->deparse($kid, 6, $op);
+    }
+
+    my $opts = {body => \@exprs};
+
+    my @args_texts = map $_->{text}, @exprs;
+    # handle special case of split(), and split(' ') that compiles to /\s+/
+    # Under 5.10, the reflags may be undef if the split regexp isn't a constant
+    # Under 5.17.5-5.17.9, the special flag is on split itself.
+    $kid = $op->first;
+    if ( $op->flags & OPf_SPECIAL ) {
+	$exprs[0]->{text} = "' '";
+    }
+
+    my $sep = '';
+    my $type;
+    my @expr_texts;
+    if ($ary) {
+	@expr_texts = ("$ary", '=', join(', ', @args_texts));
+	$sep = ' ';
+	$type = 'split_array';
+	$opts->{maybe_parens} = [$self, $cx, 7];
+    } else {
+	@expr_texts = ('split', '(', join(', ', @args_texts), ')');
+	$type = 'split';
+
+    }
+    return info_from_list($op, $self, \@expr_texts, $sep, $type, $opts);
+}
+
 sub subst_newer
 {
     my($self, $op, $cx) = @_;
@@ -2459,7 +2879,7 @@ sub subst_newer
     if (not B::Deparse::null my $code_list = $op->code_list) {
 	$re = $self->code_list($code_list);
     } elsif (B::Deparse::null $kid) {
-	$re = B::Deparse::re_uninterp(escape_re(B::Deparse::re_unback($op->precomp)));
+	$re = B::Deparse::re_uninterp(B::Deparse::escape_re(B::Deparse::re_unback($op->precomp)));
     } else {
 	my ($re_info, $junk) = $self->regcomp($kid, 1);
 	$re = $re_info->{text};
@@ -2494,33 +2914,40 @@ sub unop
 {
     my($self, $op, $cx, $name, $nollafr) = @_;
     my $kid;
+    my $opts = {};
     if ($op->flags & B::OPf_KIDS) {
+	my $parent = $op;
 	$kid = $op->first;
  	if (not $name) {
  	    # this deals with 'boolkeys' right now
- 	    return $self->deparse($kid, $cx, $op);
+	    my $kid_node = $self->deparse($kid, $cx, $parent);
+	    $opts->{prev_expr} = $kid_node;
+	    return $self->info_from_template("unop, see child", $op, "%c",
+					     undef, [$kid_node], $opts);
  	}
 	my $builtinname = $name;
 	$builtinname =~ /^CORE::/ or $builtinname = "CORE::$name";
 	if (defined prototype($builtinname)
 	   && $builtinname ne 'CORE::readline'
 	   && prototype($builtinname) =~ /^;?\*/
-	   && $kid->name eq "rv2gv") {
+	    && $kid->name eq "rv2gv") {
+	    my $rv2gv = $kid;
+	    $parent = $rv2gv;
 	    $kid = $kid->first;
+	    $opts->{other_ops} = [$rv2gv];
 	}
 
 	if ($nollafr) {
-	    $kid = $self->deparse($kid, 16, $op);
-	    my $opts = {
-		maybe_parens => [$self, $cx, 16],
-	    };
+	    $kid = $self->deparse($kid, 16, $parent);
+	    $opts->{maybe_parens} = [$self, $cx, 16],
 	    my $fullname = $self->keyword($name);
 	    return $self->info_from_template("unary operator $name noallafr", $op,
 					     "$fullname %c", undef, [$kid], $opts);
 	}
-	return $self->maybe_parens_unop($name, $kid, $cx, $op);
+	return $self->maybe_parens_unop($name, $kid, $cx, $parent, $opts)
+
     } else {
-	my $opts = {maybe_parens => [$self, $cx, 16]};
+	$opts->{maybe_parens} = [$self, $cx, 16];
 	my $fullname = ($self->keyword($name));
 	my $fmt = "$fullname";
 	$fmt .= '()' if $op->flags & B::OPf_SPECIAL;
@@ -2573,7 +3000,7 @@ sub range {
 
 sub rv2x
 {
-    my($self, $op, $cx, $type) = @_;
+    my($self, $op, $cx, $sigil) = @_;
     if (B::class($op) eq 'NULL' || !$op->can("first")) {
 	carp("Unexpected op in pp_rv2x");
 	return info_from_text($op, $self, 'XXX', 'bad_rv2x', {});
@@ -2582,8 +3009,8 @@ sub rv2x
     my $kid = $op->first;
     $kid_info = $self->deparse($kid, 0, $op);
     if ($kid->name eq "gv") {
-	my $transform_fn = sub {$self->stash_variable($type, $self->info2str(shift), $cx)};
-	return $self->info_from_template("rv2x $type", undef, "%F", [[0, $transform_fn]], [$kid_info])
+	my $transform_fn = sub {$self->stash_variable($sigil, $self->info2str(shift), $cx)};
+	return $self->info_from_template("rv2x $sigil", undef, "%F", [[0, $transform_fn]], [$kid_info])
     } elsif (B::Deparse::is_scalar $kid) {
 	my $str = $self->info2str($kid_info);
 	my $fmt = '%c';
@@ -2602,14 +3029,17 @@ sub rv2x
 	    $fmt = '%F';
 	    @args_spec = (0, $transform);
 	}
-	return $self->info_from_template("scalar $str", $op, $fmt, \@args_spec, {})
+	return $self->info_from_template("scalar $str", $op, $fmt, undef, \@args_spec, {});
     } else {
-	my $str = "$type" . '{}';
-	return info_from_text($op, $self, $str, $str, {other_ops => [$kid_info]});
+	my $fmt = "$sigil\{%c\}";
+	my $type = "rv2x: $sigil\{}";
+	return $self->info_from_template($type, $op, $fmt, undef, [$kid_info]);
     }
     Carp::confess("unhandled condition in rv2x");
 }
 
+# Handle ops that can introduce blocks or scope. "while", "do", "until", and
+# possibly "map", and "grep" are examples such things.
 sub scopeop
 {
     my($real_block, $self, $op, $cx) = @_;
@@ -2617,8 +3047,10 @@ sub scopeop
     my @kids;
 
     local(@$self{qw'curstash warnings hints hinthash'})
-		= @$self{qw'curstash warnings hints hinthash'} if $real_block;
+	= @$self{qw'curstash warnings hints hinthash'} if $real_block;
+    my @other_ops = ();
     if ($real_block) {
+	push @other_ops, $op->first;
 	$kid = $op->first->sibling; # skip enter
 	if (B::Deparse::is_miniwhile($kid)) {
 	    my $top = $kid->first;
@@ -2629,18 +3061,19 @@ sub scopeop
 		$name = $self->keyword("until");
 	    } else { # no conditional -> while 1 or until 0
 		my $body = $self->deparse($top->first, 1, $top);
-		return info_from_list $op, $self, [$body, 'while', '1'],
-				      ' ', "$name 1", {};
+		return $self->info_from_template("scopeop: $name 1", $op,
+						 "%c while 1", undef, [$body],
+						 {other_ops => \@other_ops});
 	    }
 	    my $cond = $top->first;
-	    my $skipped_ops = [$cond->sibling];
+	    push @other_ops, $cond->sibling;
 	    my $body = $cond->sibling->first; # skip lineseq
 	    my $cond_info = $self->deparse($cond, 1, $top);
 	    my $body_info = $self->deparse($body, 1, $top);
-	    return  info_from_list($op, $self,
-				   [$body_info, $name, $cond_info], ' ',
-				   "$name",
-				   {other_ops => $skipped_ops});
+	    return $self->info_from_template("scopeop: $name",
+					     $op,"%c $name %c",
+					     undef, [$body_info, $cond_info],
+					     {other_ops => \@other_ops});
 	}
     } else {
 	$kid = $op->first;
@@ -2648,25 +3081,29 @@ sub scopeop
     for (; !B::Deparse::null($kid); $kid = $kid->sibling) {
 	push @kids, $kid;
     }
+    my $node;
     if ($cx > 0) {
 	# inside an expression, (a do {} while for lineseq)
 	my $body = $self->lineseq($op, 0, @kids);
 	my $text;
-	if (B::Deparse::is_lexical_subs(@kids)) {
-	    return $self->info_from_template("scoped do", $op,
+	if (is_lexical_subs(@kids)) {
+	    $node = $self->info_from_template("scoped do", $op,
 					     'do {\n%+%c\n%-}',
 					     [0], [$body]);
 
 	} else {
-	    return $self->info_from_template("scoped expression", $op,
-					     '%c',[0], [$body]);
+	    $node = $self->info_from_template("scoped expression", $op,
+					      '%c',[0], [$body]);
 	}
     } else {
-	return $self->lineseq($op, $cx, @kids);
+	$node = $self->lineseq($op, $cx, @kids);
     }
+    $node->{other_ops} = \@other_ops if @other_ops;
+    return $node;
 }
 
-sub single_delim($$$$$) {
+sub single_delim($$$$$)
+{
     my($self, $op, $q, $default, $str) = @_;
 
     return $self->info_from_template("string $default .. $default (default)", $op,

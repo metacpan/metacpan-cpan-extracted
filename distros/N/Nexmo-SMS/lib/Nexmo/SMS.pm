@@ -11,49 +11,9 @@ use Nexmo::SMS::GetBalance;
 
 # ABSTRACT: Module for the Nexmo SMS API!
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 
-=head1 SYNOPSIS
-
-This module simplifies sending SMS through the Nexmo API.
-
-
-    use Nexmo::SMS;
-
-    my $nexmo = Nexmo::SMS->new(
-        server   => 'https://rest.nexmo.com/sms/json',
-        username => 'testuser1',
-        password => 'testpasswd2',
-    );
-    
-    my $sms = $nexmo->sms(
-        text     => 'This is a test',
-        from     => 'Test02',
-        to       => '452312432',
-    ) or die $nexmo->errstr;
-    
-    my $response = $sms->send || die $sms->errstr;
-    
-    if ( $response->is_success ) {
-        print "SMS was sent...\n";
-    }
-
-=head1 METHODS
-
-=head2 new
-
-create a new object
-
-    my $foo = Nexmo::SMS->new(
-        server   => 'https://rest.nexmo.com/sms/json',
-        username => 'testuser1',
-        password => 'testpasswd2',
-    );
-
-Those parameters are optional and they are used as defaults for the message objects
-
-=cut
 
 my @attrs = qw(server username password);;
 
@@ -84,27 +44,6 @@ sub new {
     return $self;
 }
 
-=head2 sms
-
-Create a new message object or returns C<undef>.
-
-    my $sms = $nexmo->sms(
-        text     => 'This is a test',
-        from     => 'Test02',
-        to       => '452312432',
-    ) or die $nexmo->errstr;
-
-Send a binary message
-
-    my $binary = $nexmo->sms(
-        type     => 'binary',
-        udh      => '06050415811581',   # hex encoded udh
-        body     => '0011223344556677', # hex encoded body
-        from     => 'Test02',
-        to       => '452312432',
-    ) or die $nexmo->errstr;
-
-=cut
 
 sub sms {
     my ($self,%param) = @_;
@@ -152,13 +91,6 @@ sub sms {
     return $message;
 }
 
-=head2 errstr
-
-return the "last" error as string.
-
-    print $nexmo->errstr;
-
-=cut
 
 sub errstr {
     my ($self,$message) = @_;
@@ -167,11 +99,6 @@ sub errstr {
     return $self->{__errstr__};
 }
 
-=head2 get_balance
-
-  my $balance = $nexmo->get_balance;
-
-=cut
 
 sub get_balance {
     my ($self,%param) = @_;
@@ -187,16 +114,100 @@ sub get_balance {
     return $balance->get_balance;
 }
 
-=head2 get_pricing
-
-Not implemented yet...
-
-=cut
 
 sub get_pricing {
     warn "not implemented yet\n";
     return;
 }
+
+
+1; # End of Nexmo::SMS
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Nexmo::SMS - Module for the Nexmo SMS API!
+
+=head1 VERSION
+
+version 0.10
+
+=head1 SYNOPSIS
+
+This module simplifies sending SMS through the Nexmo API.
+
+    use Nexmo::SMS;
+
+    my $nexmo = Nexmo::SMS->new(
+        server   => 'https://rest.nexmo.com/sms/json',
+        username => 'testuser1',
+        password => 'testpasswd2',
+    );
+    
+    my $sms = $nexmo->sms(
+        text     => 'This is a test',
+        from     => 'Test02',
+        to       => '452312432',
+    ) or die $nexmo->errstr;
+    
+    my $response = $sms->send || die $sms->errstr;
+    
+    if ( $response->is_success ) {
+        print "SMS was sent...\n";
+    }
+
+=head1 METHODS
+
+=head2 new
+
+create a new object
+
+    my $foo = Nexmo::SMS->new(
+        server   => 'https://rest.nexmo.com/sms/json',
+        username => 'testuser1',
+        password => 'testpasswd2',
+    );
+
+Those parameters are optional and they are used as defaults for the message objects
+
+=head2 sms
+
+Create a new message object or returns C<undef>.
+
+    my $sms = $nexmo->sms(
+        text     => 'This is a test',
+        from     => 'Test02',
+        to       => '452312432',
+    ) or die $nexmo->errstr;
+
+Send a binary message
+
+    my $binary = $nexmo->sms(
+        type     => 'binary',
+        udh      => '06050415811581',   # hex encoded udh
+        body     => '0011223344556677', # hex encoded body
+        from     => 'Test02',
+        to       => '452312432',
+    ) or die $nexmo->errstr;
+
+=head2 errstr
+
+return the "last" error as string.
+
+    print $nexmo->errstr;
+
+=head2 get_balance
+
+  my $balance = $nexmo->get_balance;
+
+=head2 get_pricing
+
+Not implemented yet...
 
 =head1 Attributes
 
@@ -221,6 +232,16 @@ attribute there is a getter/setter:
 Jui-Nan Lin added support for Unicode messages, thanks!
 (see https://github.com/reneeb/perl-Nexmo-SMS/pull/1/files)
 
-=cut
+=head1 AUTHOR
 
-1; # End of Nexmo::SMS
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

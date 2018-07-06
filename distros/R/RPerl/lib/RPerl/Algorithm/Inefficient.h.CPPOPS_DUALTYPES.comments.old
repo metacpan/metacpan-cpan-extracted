@@ -19,7 +19,7 @@ class RPerl__Algorithm__Inefficient : public RPerl__Algorithm
 {
 public:
 // [[[ OO METHODS ]]]
-    void inherited__Inefficient(SV* person);
+    void inherited_Inefficient(SV* person);
     void inherited(SV* person);
 
     // <<< CONSTRUCTOR & DESTRUCTOR >>>
@@ -32,7 +32,7 @@ public:
 
 // [[[ SUBROUTINES ]]]
 
-SV* uninherited__Inefficient(SV* person);
+SV* uninherited_Inefficient(SV* person);
 
 // DEV NOTE, CORRELATION #rp004: inheritance testing, manually enable uninherited() in exactly one of Algorithm.*, Inefficient.*, Sort.*, or Bubble.*
 //SV* uninherited(SV* person);
@@ -54,7 +54,7 @@ SV* RPerl__Algorithm__Inefficient__MODE_ID() { return newSViv(1); }  // CPPOPS_P
 class RPerl__Algorithm__Inefficient : public RPerl__Algorithm {
 public:
 // [[[ OO METHODS ]]]
-    void inherited__Inefficient(string person);
+    void inherited_Inefficient(string person);
     void inherited(string person);
 
     // <<< CONSTRUCTOR & DESTRUCTOR >>>
@@ -67,7 +67,7 @@ public:
 
 // [[[ SUBROUTINES ]]]
 
-string uninherited__Inefficient(string person);
+string uninherited_Inefficient(string person);
 
 // DEV NOTE, CORRELATION #rp004: inheritance testing, manually enable uninherited() in exactly one of Algorithm.*, Inefficient.*, Sort.*, or Bubble.*
 //string uninherited(string person);

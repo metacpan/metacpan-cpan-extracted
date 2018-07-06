@@ -5,7 +5,24 @@ use strict;
 
 # ABSTRACT: A collection of handy Perl::Critic policies
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
+
+
+1; # End of Perl::Critic::OTRS
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perl::Critic::OTRS - A collection of handy Perl::Critic policies
+
+=head1 VERSION
+
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -39,7 +56,7 @@ reported problems with it on some database systems.
 =head2 L<Perl::Critic::Policy::OTRS::RequireCamelCase>
 
 =head2 L<Perl::Critic::Policy::OTRS::RequireParensWithMethods>
- 
+
 =head2 L<Perl::Critic::Policy::OTRS::RequireTrueReturnValueForModules>
 
 =head1 WHY A COLLECTION OF OTRS POLICIES?
@@ -63,10 +80,22 @@ Thanks to
 
 =item * L<Michiel Beijen|https://github.com/mbeijen> for improvements for this module
 
+=item * L<Pete Houston|https://github.com/openstrike> for lots of pull requests that improve the quality/kwalitee of the module
+
 =item * L<Ramanan Balakrishnan|https://github.com/ramananbalakrishnan> for fixing test failures
 
 =back
 
-=cut
+=head1 AUTHOR
 
-1; # End of Perl::Critic::OTRS
+Renee Baecker <module@renee-baecker.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

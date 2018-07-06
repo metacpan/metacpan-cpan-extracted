@@ -1,4 +1,4 @@
-CLucene version 1.00
+CLucene version 1.03
 ====================
 
 A perl interface to the CLucene C++ port of the Java Lucene free text search engine.
@@ -22,7 +22,11 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  CLucene engine from the RPM available at http://sourceforge.net/projects/clucene.
+  CLucene engine.
+  Old Redhat 9 RPM is available at http://sourceforge.net/projects/clucene
+  Newer RedHat Enterprise Linux 7 SRPM at http://pause.perl.org/pub/PAUSE/authors/id/P/PE/PEDWARDS/clucene-0.9.1a-1.src.rpm
+  see the INSTALL file for instructions.
+
   Carp.
   File::Path.
 
@@ -32,3 +36,4 @@ Copyright(c) 2005 Peter Edwards <peterdragon@users.sourceforge.net>
 
 All rights reserved. This package is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
+

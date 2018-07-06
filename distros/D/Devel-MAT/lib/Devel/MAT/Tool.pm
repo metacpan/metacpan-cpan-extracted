@@ -8,9 +8,8 @@ package Devel::MAT::Tool;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
-use Getopt::Long qw( GetOptionsFromArray );
 use List::Util qw( any );
 
 sub new
@@ -47,16 +46,14 @@ sub report_progress
    $self->{progress}->( @_ ) if $self->{progress};
 }
 
-sub get_sv_from_args
+sub get_sv_from_inv
 {
    my $self = shift;
-   my ( $args ) = @_;
+   my ( $inv ) = @_;
 
    my $sv = Devel::MAT::UI->can( "current_sv" ) && Devel::MAT::UI->current_sv;
 
-   if( @$args ) {
-      my $addr = shift @$args;
-
+   if( defined( my $addr = $inv->pull_token ) ) {
       # Acccept any root name symbolically
       if( any { $addr eq $_ } Devel::MAT::Dumpfile->ROOTS ) {
          $sv = $self->df->$addr;
@@ -105,44 +102,75 @@ sub find_subcommand
 sub run_cmd
 {
    my $self = shift;
-   my ( @args ) = @_;
+   my ( $inv ) = @_;
 
    # TODO: consider what happens if parent commands have CMD_OPTS
    if( my @subs = $self->CMD_SUBS ) {
-      my $subcmd = @args ? shift @args : $subs[0];
-      return $self->find_subcommand( $subcmd )->run_cmd( @args );
+      my $subcmd = $inv->pull_token // $subs[0];
+      return $self->find_subcommand( $subcmd )->run_cmd( $inv );
    }
 
    my %optspec = $self->CMD_OPTS;
 
    my %opts;
-   my %getopts;
+   my %aliases;
 
    foreach my $name ( keys %optspec ) {
       my $spec = $optspec{$name};
 
       $opts{$name} = $spec->{default};
 
-      my $getopt = $name;
-      $getopt .= join "|", "", $spec->{alias} if defined $spec->{alias};
-
-      $getopt =~ s/_/-/g;
-
-      $getopt .= "=$spec->{type}" if $spec->{type};
-
-      $getopts{$getopt} = \$opts{$name};
+      $aliases{ $spec->{alias} } = $name if defined $spec->{alias};
    }
 
-   GetOptionsFromArray( \@args, %getopts ) or return;
+   my @args;
+
+   if( %optspec ) {
+      my @remaining;
+
+      while( defined( my $opt = $inv->pull_token ) ) {
+         last if $opt eq "--";
+         push @remaining, $opt and next unless $opt =~ m/^-/;
+
+         if( $opt =~ m/^--(.*)$/ ) {
+            $opt = $1;
+         }
+         if( $opt =~ m/^-(.)$/ ) {
+            $opt = $aliases{$1} or die "No such option '$opt'\n";
+         }
+         my $spec = $optspec{$opt} or die "No such option '--$opt'\n";
+
+         for( $spec->{type} // "" ) {
+            m/^$/ and $opts{$opt} = 1, last;
+            m/^[si]$/ and $opts{$opt} = $inv->pull_token, last; # TODO: check number
+            die "TODO: unrecognised type $_\n";
+         }
+      }
+      while( defined( my $opt = $inv->pull_token ) ) {
+         push @remaining, $opt;
+      }
+
+      push @args, \%opts;
+
+      # This is a bit ugly :/
+      $inv = Commandable::Invocation->new( join " ", map { m/\s/ ? qq("$_") : $_ } @remaining );
+   }
 
    if( $self->CMD_ARGS_SV ) {
-      my $sv = $self->get_sv_from_args( \@args );
-      unshift @args, $sv;
+      my $sv = $self->get_sv_from_inv( $inv );
+      push @args, $sv;
    }
 
-   # TODO: parsing/checking of ARGS?
+   foreach my $argspec ( $self->CMD_ARGS ) {
+      defined( my $val = $inv->pull_token ) or last;
+      # TODO: mandatory arguments
+      push @args, $val;
+      if( $argspec->{slurpy} ) {
+         push @args, $inv->pull_token while length $inv->remaining;
+      }
+   }
 
-   $self->run( %optspec ? \%opts : (), @args );
+   $self->run( @args );
 }
 
 0x55AA;

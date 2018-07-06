@@ -2,7 +2,7 @@
 package RPerl::Inline;
 use strict;
 use warnings;
-our $VERSION = 0.011_000;
+our $VERSION = 0.017_000;
 
 #use RPerl;  # ERROR: Too late to run INIT block at ...
 #use Config;
@@ -25,7 +25,7 @@ use IPC::Run3 qw(run3);
 
 #our $mongodb_include_dir = File::Spec->catpath(q{}, q{FOO}, q{include});  # NOT USED, replaced by pkg-config at compile time as in Compiler.pm
 
-my string $pkgconfig_path = undef;
+my $pkgconfig_path = undef;
 $pkgconfig_path = can_run('pkg-config');
  
 # NEED ENABLE: uncomment when Alien::PkgConfig dependency is added
@@ -110,6 +110,31 @@ my $is_msvc_compiler = ($Config::Config{cc} =~ /cl/);
 our $CCFLAGSEX = $is_msvc_compiler ? '-DNO_XSLOCKS'
     : '-Wno-unused-variable -DNO_XSLOCKS -Wno-deprecated -std=c++11 -Wno-reserved-user-defined-literal -Wno-literal-suffix';
 
+# DEV NOTE, POSSIBLE ALTERNATIVE STRATEGY:  '-L' . $Config{archlibexp} . '/CORE'
+# for support of dynamic linking to libperl.so
+if (defined $Config::Config{ccdlflags}) {
+    my $ccdlflags = $Config::Config{ccdlflags};
+
+# for testing paths containing space characters, for example somewhere in the '/home' directory, create a symlink '/ho\ me' which points to '/home', then use the debug code below
+# ln -s /home /ho\ me
+#$ccdlflags = '-Wl,-E -Wl,-rpath,/ho\ me/FOO/BAR/lib/perl5/5.22.1/x86_64-linux/CORE';  # TMP DEBUG
+#print "\n\n", q{<<< DEBUG >>> in RPerl::Inline, have $ccdlflags = '}, $ccdlflags, q{'}, "\n\n";
+
+    # subcompile dynamic linking flags, may include '-rpath' directory containing 'libperl.so'; if present, '-rpath' removes need for ldconfig; 
+    # not enclosed by quotes, so leave backslash-escaped characters as-is
+    $CCFLAGSEX .= ' ' . $ccdlflags;
+
+    if ($ccdlflags =~ m/.*\-Wl,\-rpath,([\w\-\.\\\/](?:\\\ |[\w:\-\.\\\/])*)/gxms) {  # find -Wl,rpath,/DIR_CONTAINING_libperl.so; allow backslash-escaped spaces
+#    if ($ccdlflags =~ m/.*\-Wl,\-rpath,([\w:\-\.\\\/]+)/gxms) {  # find -Wl,rpath,/DIR_CONTAINING_libperl.so
+        my $libperl_lib_dir = $1;
+        if ($libperl_lib_dir =~ m/\\\ /gxms) {
+            $libperl_lib_dir =~ s/\\\ /\ /gxms;  # replace backslash-escaped space with just space, for compatibility with double-quote enclosing -L"..." below
+        }
+        $CCFLAGSEX .= ' -L"' . $libperl_lib_dir . '"';
+#print "\n\n", q{<<< DEBUG >>> in RPerl::Inline, have $libperl_lib_dir = '}, $libperl_lib_dir, q{'}, "\n\n";
+    }
+}
+
 # for regex support
 $CCFLAGSEX .= ' -L"' . $pcre2_lib_dir . '"';
 
@@ -133,9 +158,9 @@ our %ARGS = (
     optimize => $optimize,
 
 # NEED UPGRADE: strip C++ incompat CFLAGS
-#  ccflags => $Config{ccflags} . ' -DNO_XSLOCKS -Wno-deprecated -std=c++0x -Wno-reserved-user-defined-literal -Wno-literal-suffix',
+#  ccflags => $Config::Config{ccflags} . ' -DNO_XSLOCKS -Wno-deprecated -std=c++0x -Wno-reserved-user-defined-literal -Wno-literal-suffix',
 #    force_build => 1,  # debug use only
-    inc               => '-I' . $RPerl::INCLUDE_PATH . ' -Ilib -I' . $pcre2_include_dir . ' -I' . $jpcre2_include_dir,
+    inc               => '-I' . $RPerl::INCLUDE_PATH . ' -I. -Ilib -I' . $pcre2_include_dir . ' -I' . $jpcre2_include_dir,
     build_noisy       => ( $ENV{RPERL_DEBUG} or $RPerl::DEBUG ),  # suppress or display actual g++ compiler commands
     clean_after_build => 0, # used by Inline::C(PP) to cache build, also used by Inline::Filters to save Filters*.c files for use in gdb debugging
     warnings          => (((not defined $ENV{RPERL_WARNINGS}) or $ENV{RPERL_WARNINGS}) and $RPerl::WARNINGS),  # suppress or display Inline warnings
@@ -153,6 +178,12 @@ our %ARGS = (
         '#include <vector>',
         '#include <math.h>',
         '#include <unordered_map>', # DEV NOTE: unordered_map may require '-std=c++0x' in CCFLAGS above
+
+        # NEED UPGRADE: only include when actually benchmarking
+        # benchmarking, for std::chrono::high_resolution_clock::now
+        '#include <ctime>',
+        '#include <ratio>',
+        '#include <chrono>',
 
         # for regex support
         # DEV NOTE, CORRELATION #rp024: sync include files & other preprocessor directives in both RPerl/Inline.pm and rperlstandalone.h

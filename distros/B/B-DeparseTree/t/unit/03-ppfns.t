@@ -14,10 +14,10 @@ use_ok( 'B::DeparseTree::PPfns' );
 
 my $self = {parens=>0};
 
-ok !B::DeparseTree::PPfns::func_needs_parens($self, '(abc', 0.5, 5);
-ok !B::DeparseTree::PPfns::func_needs_parens($self, '(abc', 5, 0);
+ok B::DeparseTree::PPfns::func_needs_parens($self, '(abc', 0.5, 5);
+ok !B::DeparseTree::PPfns::func_needs_parens($self, 'abc', 0.5, 5);
+ok B::DeparseTree::PPfns::func_needs_parens($self, '(abc', 5, 0);
 ok B::DeparseTree::PPfns::func_needs_parens($self, 'abc', 5, 0);
-
 
 $self = {parens=>1};
 ok B::DeparseTree::PPfns::func_needs_parens($self, '(abc', 0.5, 5);

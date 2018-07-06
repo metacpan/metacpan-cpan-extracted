@@ -8,7 +8,6 @@ README		Introduction to the Tcl::Tk extension
 lib/Tcl/Tk.pm	Tcl::Tk extension module
 lib/Tcl/Tk/Widget/Balloon.pm	Balloon Tix widget perlTk compatibility
 lib/Tcl/Tk/Widget/Text.pm	some Text widget methods for perlTk compatibility
-META.yml
 t/after.t
 t/optmenu.t	adopted file from perlTk suite
 t/photo.t
@@ -121,3 +120,5 @@ tk-demos/widtrib/plop.pl
 tk-demos/widtrib/progress.pl         
 tk-demos/widtrib/TEMPLATE.pl         
 tk-demos/widtrib/Tiler.pl            
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

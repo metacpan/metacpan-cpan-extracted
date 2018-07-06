@@ -1,13 +1,12 @@
 package Class::Type::Enum;
 # ABSTRACT: Build Enum-like classes
-$Class::Type::Enum::VERSION = '0.009';
+$Class::Type::Enum::VERSION = '0.011';
 
 use strict;
 use warnings;
 
 use Carp qw(croak);
 use Class::Method::Modifiers qw(install_modifier);
-use Function::Parameters 2;
 use List::Util 1.33;
 use Scalar::Util qw(blessed);
 
@@ -22,7 +21,9 @@ use overload (
 
 
 
-method import ($class: %params) {
+sub import {
+  my ($class, %params) = @_;
+
   # import is inherited, but we don't want to do all this to everything that
   # uses a subclass of Class::Type::Enum.
   return unless $class eq __PACKAGE__;
@@ -51,63 +52,96 @@ method import ($class: %params) {
   install_modifier $target, 'fresh', sym_to_ord => sub { \%values };
   install_modifier $target, 'fresh', ord_to_sym => sub { +{ reverse(%values) } };
 
-  install_modifier $target, 'fresh', values => method () {
-    my $ord = $self->sym_to_ord;
+  install_modifier $target, 'fresh', values => sub {
+    my $ord = $_[0]->sym_to_ord;
     [ sort { $ord->{$a} <=> $ord->{$b} } keys %values ];
   };
 
   for my $value (keys %values) {
-    install_modifier $target, 'fresh', "is_$value" => method () { $self->is($value) };
+    install_modifier $target, 'fresh', "is_$value" => sub { $_[0]->is($value) };
   }
 }
 
 
 
-method new ($class: $value) {
-  (blessed($class)// $class)->inflate_symbol($value);
+sub new {
+  my ($class, $value) = @_;
+
+  (blessed($class) || $class)->inflate_symbol($value);
 }
 
 
-method inflate_symbol ($class: $symbol) {
-  bless {
-    ord => $class->sym_to_ord->{$symbol}
-        // croak "Value [$symbol] is not valid for enum $class"
-  }, $class;
+sub inflate_symbol {
+  my ($class, $symbol) = @_;
+
+  my $ord = $class->sym_to_ord->{$symbol};
+
+  croak "Value [$symbol] is not valid for enum $class"
+    unless defined $ord;
+
+  bless \$ord, $class;
 }
 
 
-method inflate_ordinal ($class: $ord) {
+sub inflate_ordinal {
+  my ($class, $ord) = @_;
+
   croak "Ordinal [$ord] is not valid for enum $class"
-    if !exists $class->ord_to_sym->{$ord};
-  bless { ord => $ord }, $class;
+    unless exists $class->ord_to_sym->{$ord};
+
+  bless \$ord, $class;
 }
 
 
-method test_symbol ($class: $value) {
+sub list_is_methods {
+  my ($class) = @_;
+
+  map "is_$_", @{$class->values};
+}
+
+
+sub type_constraint {
+  my ($class) = @_;
+
+  require Type::Tiny::Class;
+  require Types::Standard;
+  Type::Tiny::Class->new(class => blessed($class) || $class)
+    ->plus_constructors(Types::Standard::Str(), 'inflate_symbol');
+}
+
+
+sub test_symbol {
+  my ($class, $value) = @_;
+
   exists($class->sym_to_ord->{$value})
 }
 
 
-method test_ordinal ($class: $value) {
+sub test_ordinal {
+  my ($class, $value) = @_;
+
   exists($class->ord_to_sym->{$value})
 }
 
 
-method coerce_symbol ($class: $value) {
+sub coerce_symbol {
+  my ($class, $value) = @_;
   return $value if eval { $value->isa($class) };
 
   $class->inflate_symbol($value);
 }
 
 
-method coerce_ordinal ($class: $value) {
+sub coerce_ordinal {
+  my ($class, $value) = @_;
   return $value if eval { $value->isa($class) };
 
   $class->inflate_ordinal($value);
 }
 
 
-method coerce_any ($class: $value) {
+sub coerce_any {
+  my ($class, $value) = @_;
   return $value if eval { $value->isa($class) };
 
   for my $method (qw( inflate_ordinal inflate_symbol )) {
@@ -119,37 +153,54 @@ method coerce_any ($class: $value) {
 
 
 
-method is ($value) {
-  $self->{ord} == ($self->sym_to_ord->{$value} // croak "Value [$value] is not valid for enum ". blessed($self))
+sub is {
+  my ($self, $value) = @_;
+  my $ord = $self->sym_to_ord->{$value};
+
+  croak "Value [$value] is not valid for enum " . blessed($self)
+    unless defined $ord;
+
+  $$self == $ord;
 }
 
 
 
-method stringify ($, $) {
-  $self->ord_to_sym->{$self->{ord}};
+sub stringify {
+  my ($self) = @_;
+  $self->ord_to_sym->{$$self};
 }
 
 
-method numify ($, $) {
-  $self->{ord}
+sub numify {
+  my ($self) = @_;
+  $$self;
 }
 
 
-method cmp ($other, $reversed = undef) {
+sub cmp {
+  my ($self, $other, $reversed) = @_;
   return -1 * $self->cmp($other) if $reversed;
 
-  $self <=> (ref $other
-    ? $other
-    : $self->sym_to_ord->{$other} // croak "Cannot compare to invalid symbol [$other] for " . blessed($self))
+  return $$self <=> $other if blessed($other);
+
+  my $ord = $self->sym_to_ord->{$other};
+  croak "Cannot compare to invalid symbol [$other] for " . blessed($self)
+    unless defined $ord;
+
+  return $$self <=> $ord;
 }
 
 
-method any (@cases) {
+sub any {
+  my ($self, @cases) = @_;
+
   List::Util::any { $self->is($_) } @cases;
 }
 
 
-method none (@cases) {
+sub none {
+  my ($self, @cases) = @_;
+
   List::Util::none { $self->is($_) } @cases;
 }
 
@@ -169,7 +220,7 @@ Class::Type::Enum - Build Enum-like classes
 
 =head1 VERSION
 
-version 0.009
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -181,20 +232,17 @@ version 0.009
     use Moo;
 
     has status => (
-      is     => 'rw',
-      coerce => sub {
-        Toast::Status->coerce_symbol(shift)
-      },
-      isa    => sub {
-        $_[0]->isa('Toast::Status') or die "Toast calamity!"
-      },
+      is      => 'rw',
+      isa     => Toast::Status->type_constraint,
+      coerce  => 1,
+      handles => [ Toast::Status->list_is_methods ],
     );
   }
 
   my @toast = map { Toast->new(status => $_) } qw( toast burnt bread bread toasting toast );
 
-  my @trashcan = grep { $_->status->is_burnt } @toast;
-  my @plate    = grep { $_->status->is_toast } @toast;
+  my @trashcan = grep { $_->is_burnt } @toast;
+  my @plate    = grep { $_->is_toast } @toast;
 
   my $ready_status   = Toast::Status->new('toast');
   my @eventual_toast = grep { $_->status < $ready_status } @toast;
@@ -286,6 +334,16 @@ Returns a hashref keyed by ordinal, with symbols as values.
 
 Returns an arrayref of valid symbolic values, in order.
 
+=head2 $class->list_is_methods
+
+Returns a list of C<is_> methods defined for each symbolic value for the class.
+
+=head2 $class->type_constraint
+
+This method requires the optional dependency L<Type::Tiny>.
+
+Returns a type constraint suitable for use with L<Moo> and friends.
+
 =head2 $class->test_symbol($value)
 
 Test whether or not the given value is a valid symbol in this enum class.
@@ -366,7 +424,7 @@ Meredith Howard <mhoward@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Meredith Howard.
+This software is copyright (c) 2018 by Meredith Howard.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

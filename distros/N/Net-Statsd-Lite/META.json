@@ -5,6 +5,12 @@
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "client",
+      "StatsD",
+      "metrics",
+      "monitoring"
+   ],
    "license" : [
       "artistic_2"
    ],
@@ -75,11 +81,11 @@
    "provides" : {
       "Net::Statsd::Lite" : {
          "file" : "lib/Net/Statsd/Lite.pm",
-         "version" : "v0.4.3"
+         "version" : "v0.4.4"
       },
       "Net::Statsd::Lite::Types" : {
          "file" : "lib/Net/Statsd/Lite/Types.pm",
-         "version" : "v0.4.3"
+         "version" : "v0.4.4"
       }
    },
    "release_status" : "stable",
@@ -93,8 +99,11 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Lite"
       }
    },
-   "version" : "v0.4.3",
+   "version" : "v0.4.4",
    "x_authority" : "cpan:RRWO",
+   "x_contributors" : [
+      "Toby Inkster <tobyink@cpan.org>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

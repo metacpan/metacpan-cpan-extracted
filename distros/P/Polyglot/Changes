@@ -1,5 +1,8 @@
 Revision history for Perl module Polyglot
 
+1.003 2018-07-03T01:17:37Z
+	* Update for the Artistic License 2.0
+
 1.002 2017-01-07T21:16:13Z
 	* Remove prereq test because the nature of Test::Prereq has 
 	changed to something that can happen by static analysis.

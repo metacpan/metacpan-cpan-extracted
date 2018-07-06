@@ -9,7 +9,7 @@
 MODULE = Ithumb::XS		PACKAGE = Ithumb::XS
 
 int
-create_thumbnail(src_path, w=0, h=0, dst_path)
+create_thumbnail(src_path, w, h, dst_path)
 	const char *src_path
 	const char *dst_path
 	int w
@@ -19,6 +19,10 @@ create_thumbnail(src_path, w=0, h=0, dst_path)
 
 	CODE:
 	{
+
+	 if (w <= 0 || h <= 0)
+		 Perl_croak(aTHX_ "Ithumb::XS value error: invalid width or height");
+	 
 	 float aspect;
 	 int width=0, height=0, crop_x = 0, crop_y = 0, new_width = 0, new_height = 0;
 	 Imlib_Load_Error err;
@@ -26,21 +30,17 @@ create_thumbnail(src_path, w=0, h=0, dst_path)
 
 	 src_img = imlib_load_image_with_error_return(src_path, &err);
 	
-	 if (err == IMLIB_LOAD_ERROR_FILE_DOES_NOT_EXIST) {
+	 if (err == IMLIB_LOAD_ERROR_FILE_DOES_NOT_EXIST)
 		 Perl_croak(aTHX_ "Ithumb::XS load error: File '%s' does not exist", src_path);
-	 }
 
-	 if (err == IMLIB_LOAD_ERROR_FILE_IS_DIRECTORY) {
+	 if (err == IMLIB_LOAD_ERROR_FILE_IS_DIRECTORY)
 		 Perl_croak(aTHX_ "Ithumb::XS load error: File '%s' is directory", src_path);
-	 }
 
-	 if (err == IMLIB_LOAD_ERROR_PERMISSION_DENIED_TO_READ) {
+	 if (err == IMLIB_LOAD_ERROR_PERMISSION_DENIED_TO_READ)
 		 Perl_croak(aTHX_ "Ithumb::XS load error: Permission denied");
-	 }
 
-	 if (err == IMLIB_LOAD_ERROR_NO_LOADER_FOR_FILE_FORMAT) {
+	 if (err == IMLIB_LOAD_ERROR_NO_LOADER_FOR_FILE_FORMAT)
 		 Perl_croak(aTHX_ "Ithumb::XS load error: No loader for file format");
-	 }
 	
 	 imlib_context_set_image(src_img);
 
@@ -62,17 +62,15 @@ create_thumbnail(src_path, w=0, h=0, dst_path)
 
 	 scaled_img = imlib_create_cropped_scaled_image(0, 0, width, height, new_width,	new_height);
 
-	 if (!scaled_img) {
+	 if (!scaled_img)
 		 Perl_croak(aTHX_ "Ithumb::XS error: image can not be scaled");
-	 }
 
 	 imlib_context_set_image(scaled_img);
 
 	 croped_img = imlib_create_cropped_image(crop_x, crop_y, w, h);
 
-	 if (!croped_img) {
+	 if (!croped_img)
 		 Perl_croak(aTHX_ "Ithumb::XS error: image can not be croped");
-	 }
 
 	 imlib_context_set_image(croped_img);
 	

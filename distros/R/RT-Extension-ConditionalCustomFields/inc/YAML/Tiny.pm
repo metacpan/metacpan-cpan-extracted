@@ -2,12 +2,12 @@
 use 5.008001; # sane UTF-8 support
 use strict;
 use warnings;
-package YAML::Tiny; # git description: v1.69-8-g2c1e266
+package YAML::Tiny; # git description: v1.68-2-gcc5324e
 # XXX-INGY is 5.8.1 too old/broken for utf8?
 # XXX-XDG Lancaster consensus was that it was sufficient until
 # proven otherwise
 
-our $VERSION = '1.70';
+our $VERSION = '1.69';
 
 #####################################################################
 # The YAML::Tiny API.
@@ -570,8 +570,10 @@ sub _dump_file {
     if ( _can_flock() ) {
         # Open without truncation (truncate comes after lock)
         my $flags = Fcntl::O_WRONLY()|Fcntl::O_CREAT();
-        sysopen( $fh, $file, $flags )
-            or $self->_error("Failed to open file '$file' for writing: $!");
+        sysopen( $fh, $file, $flags );
+        unless ( $fh ) {
+            $self->_error("Failed to open file '$file' for writing: $!");
+        }
 
         # Use no translation and strict UTF-8
         binmode( $fh, ":raw:encoding(UTF-8)");
@@ -869,4 +871,4 @@ delete $YAML::Tiny::{refaddr};
 
 __END__
 
-#line 1487
+#line 1489

@@ -2,8 +2,8 @@ NAME
     DBIx::CSV - Generate CSV from SQL query result
 
 VERSION
-    This document describes version 0.002 of DBIx::CSV (from Perl
-    distribution DBIx-CSV), released on 2018-07-02.
+    This document describes version 0.003 of DBIx::CSV (from Perl
+    distribution DBIx-CSV), released on 2018-07-03.
 
 SYNOPSIS
      use DBI;
@@ -29,7 +29,7 @@ SYNOPSIS
 
     Generating all rows (with header):
 
-     print $dbh->selectrow_csv("SELECT * FROM member");
+     print $dbh->selectall_csv("SELECT * FROM member");
 
     Sample result:
 
@@ -40,7 +40,7 @@ SYNOPSIS
 
     Generating all rows (without header):
 
-     print $dbh->selectrow_csv("SELECT * FROM member");
+     print $dbh->selectall_csv_noheader("SELECT * FROM member");
 
     Statement handle versions:
 

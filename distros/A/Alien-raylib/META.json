@@ -72,7 +72,7 @@
    "provides" : {
       "Alien::raylib" : {
          "file" : "lib/Alien/raylib.pm",
-         "version" : "0.018"
+         "version" : "0.019"
       }
    },
    "release_status" : "stable",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/athreef/Alien-raylib"
       }
    },
-   "version" : "0.018",
+   "version" : "0.019",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -340,7 +340,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.018",
+                  "tag" : "v0.019",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
