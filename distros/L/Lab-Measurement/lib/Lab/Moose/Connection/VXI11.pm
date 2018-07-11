@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::VXI11;
-$Lab::Moose::Connection::VXI11::VERSION = '3.653';
+$Lab::Moose::Connection::VXI11::VERSION = '3.660';
 #ABSTRACT: Connection backend to VXI-11 (Lan/TCP)
 
 use 5.010;
@@ -204,7 +204,7 @@ Lab::Moose::Connection::VXI11 - Connection backend to VXI-11 (Lan/TCP)
 
 =head1 VERSION
 
-version 3.653
+version 3.660
 
 =head1 SYNOPSIS
 

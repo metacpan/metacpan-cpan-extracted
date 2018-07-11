@@ -1,0 +1,251 @@
+#!/usr/bin/perl -t 
+use 5.008 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts 'c:e:l:n:s:t:034/:' , \my%o ; 
+use Term::ANSIColor qw[ color ] ;
+
+my $isep = $o{'/'} // "\t" ;  # 入力の区切り文字
+my %except ; # 処理をしない(そのままにする)行
+my $RESET = color 'reset' ;
+my @nCol = map{color $_} qw[cyan green yellow] ; # 数に塗る色。
+$o{n} = $o{3} ? 3 : $o{4} ? 4 : $o{n} ; # -3 または -4 が指定された場合の処理
+
+& main ; 
+exit 0 ;
+
+sub main ( ) {
+	$except {$_} = 1 for split /,/ , $o{e}//'' ; # .. (範囲指定)　や / (一定幅ジャンプ)による処理を加えたいかも。
+	while ( <> ) { 
+		do { print $_ ; next } if $except{$.} ; 
+    chomp ;
+		& ColorNullify if $o{0} ; # 色情報の消去
+    & ColorRegex  if defined $o{s} ; 
+    & ColorLines if defined $o{l} ; 
+    & ColorTabbing if defined $o{t} ; 
+	 	& ColorDigits if $o{n} ; 
+	 	print "$_\n" ;
+	}
+}
+
+sub ColorNullify ( ) {  s{ \e\[ [\d;]* m }{}xmsg  }  ## アスキーカラーコードの除去。ここは Term::ANSIColor の最近のバージョンからコピペ。
+sub ColorRegex ( ) { my $ADD = color $o{c} // 'red' ; s/($o{s})/$ADD$1$RESET/g } #指定正規表現文字列に着色
+sub ColorLines ( ) { $_ = color( $o{c} // 'on_blue') . $_ . $RESET if $. % $o{l} == 1 } # サイクリックに行で着色
+
+# 5列おきとかに色をつける。
+sub ColorTabbing ( ) { 
+	my @F = split /$isep/ , $_ , -1  ;
+  do { my $t = $_ * 2 * $o{t}  ; $F[ $t ] = $RESET . $F[ $t ] } for 1 .. $#F / $o{t} / 2 ; 
+  do { my $t = ( $_*2 + 1 ) * $o{t} ; $F[ $t ] = color ($o{c}//'on_blue') . $F[ $t ] } for 0 .. ($#F/$o{t}-1) / 2 ; 
+	$_ = join ( $isep , @F ) . $RESET ;
+}
+
+## 数字に色をつける。
+sub ColorDigits ( ) { 
+  $_ =  join '' , map { & nColor ( $_ ) } & nSplit ( $_ ) ; 
+  return ; 
+
+  # 数字の連続と，それ以外の連続、および、アスキーカラーシーケンスで分ける。
+  sub nSplit ( $ )  { 
+  my @str = split /( \e\[ [\d;]* m )/xms , $_[0], 0 ; # この行と次の行で、色が付く所は、ばらばらにしないようにする。  
+    do{ splice @str , $_ , 1 , grep { $_ ne '' } $str[$_] =~ m/(\d*)(\D*)/g if $str [ $_ ] !~ /^\e/ } for reverse 0 .. $#str ;
+    return @str ;
+  }
+  # 数にのみ色をつける。
+  sub nColor ( $ ) {
+    return $_[0] if $_[0] !~ m/^\d/  ;
+    my @parts ; push @parts , substr $_[0] , -$o{n} , $o{n} , '' while $_[0] ne '' ; # 下位から $o{n}桁ずつ分割する。
+    my $outstr = '' ; $outstr .= $nCol[ $_ % 3 ] . $parts[$_] for reverse 0 .. $#parts ;
+    return $outstr . $RESET ;
+  }
+}
+
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.31 ;
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+   ## colorplus.pl
+   ##  2015-06-18 下野寿之 ; 2018-03-28 
+}  
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script $Bin ] ;
+    sub EnvJ ( ) { $ENV{LANG} =~ m/^ja_JP/ ? 1 : 0 } ; # # ja_JP.UTF-8 
+    sub en( ) { grep ( /^en(g(i(sh?)?)?)?/i , @ARGV ) ? 1 : 0 } # English という文字列を先頭から2文字以上を含むか 
+    sub ja( ) { grep ( /^jp$|^ja(p(a(n?)?)?)?/i , @ARGV ) ? 1 : 0 } # jp または japan という文字列を先頭から2文字以上を含むか 
+    sub opt( ) { grep (/^opt(i(o(ns?)?)?)?$/i, @ARGV ) ? 1 : 0 } # options という文字列を先頭から3文字以上含むから
+    sub noPOD ( ) { grep (/^no-?p(od?)?\b/i, @ARGV) ? 1 : 0 } # POD を使わないと言う指定がされているかどうか
+    my $jd = "JapaneseManual" ;
+    my $flagE = ! ja && ( en || ! EnvJ ) ; # 英語にするかどうかのフラグ
+    exec "perldoc $0" if $flagE &&  ! opt ; #&& ! noPOD   ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\Q'=script='\E/$Script/gi ;
+        s/\Q'=bin='\E/$Bin/gi ;
+        if ( s/^=head1\b\s*// .. s/^=cut\b\s*// ) { 
+            if ( s/^=begin\s+$jd\b\s*// .. s/^=end\s+$jd\b\s*// xor $flagE ) {
+                print $_ if ! opt || m/^\s+\-/  ; 
+            }
+        } 
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1 NAME 
+
+colorplus
+
+=head1 VERSION
+
+0.31  (2018-07-10)
+
+=head1 SYNOPSIS
+
+ colorplus [-0] [-n N|-3|-4] [-c colorname] [-e N[,N[,N..]]] [-l N] [-s REGEX] [-t N] [-/ char]
+ colorplus [--help [opt|en]] [--version]
+
+=head1 DESCRIPTION
+
+Put colors (ASCII color escape sequnces) parts on text data such as numerical parts, 
+columns cyclically, text matching specific regular expressions. Useful to look around
+CSV/TSV files with a pager LESS (less -R).
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-0> 
+
+Remove colors (remove all the ASCII color escape sequences). 
+
+=item B<-n> N
+
+Put colors on numerical characters. Every neighboring N digits from the bottom of a numerical 
+character sequence has a same color. Cyan, green, yellow are used to colorize. 
+
+=item B<-3>
+
+Same as the specification B<-n 3>.
+
+=item B<-4>
+
+Same as the specification B<-n 4>.
+
+=item B<-c> colorname
+
+Speficy the colorname. It can be "blue", "red", "yellow", and also "on_while", "underline" and so on.
+See the ASCII color escape sequences.
+
+=item B<-e> N,N,...
+
+Any operation by "colorplus" is exemplified on the lines specified by the number(s) beginning from 1. 
+-0 is also cancelled on the specified lines, thus in this case, the input color on the specified line 
+will survive.
+
+=item B<-l> N
+
+One line from every N lines are colored. The default color : "on_blue".
+
+=item B<-s> REGEX
+
+The matched charcter string by the regular expression specified will be colored.
+
+=item B<-t> N
+
+Every neighboring N column(s) has a same color such as "untouched" and "on_blue". 
+"On_blue" can be changed by the colorname specified by "-b". 
+
+=item B<-/> string
+
+The column delimiter. Default value is a tab character (\x{09}). IF '' (empty string) is 
+specified, each character in the input text is regarded as a column.
+
+=item B<--help>
+
+Show this help.
+
+=item B<--help ja>
+
+Show Japanese help manual.
+
+=item B<--version>
+
+Show the version of this program.
+
+=back
+
+=head1 EXAMPLE
+
+B<colorplus -n 3>  # Every number is colorized 3 digits by 3 digits.
+
+B<colorplus -t 5>  # Every 5 columns is cyclically colorized.
+
+B<colorplus -s> "hello" B<-b> bright_yellow  # Specific character string is colorized.
+
+
+=head1 AUTHOR
+
+Toshiyuki Shimono <bin4tsv@gmail.com> 
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2018 "Toshiyuki Shimono".
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+=begin JapaneseManual 
+
+  colorplus
+
+ テキストデータに対して、指定文字列、数値、タブ文字による区切りごとに着色をして見やすくするための処理をする。
+
+ -0  : 入力からアスキーカラーシーケンスコードによる着色を除去する。普通のテキストになる。
+ -n N : 数字を下位からN桁ごとに塗り分ける。右からシアン、緑、黄色の繰り返しになる。
+ -3  : -n 3 と同じ。西洋式の3桁ごとの数の区切りになる(千、百万、十億、兆、千兆、百京..)
+ -4  : -n 4 と同じ。数値を万、億、兆、京、.. で区切る。
+
+ -c colorname : 追加する色を指定(-lと-tと-sの場合)。背景色を on_blue 以外にしたいときなどに設定。on_bright_yellow など。
+ -e N,N,.. : コンマ(,)区切りの数を並べると、それにより指定された行については表示はするが着色処理はしない。-0も指定行に対して無効になる。
+ -l N     :  N行周期で最初の行に背景を青くする。
+ -s REGEX : 指定された正規表現にマッチする文字列を赤色で着色。
+ -t N     : タブ区切り N 列ごとに青の背景色をつける。
+
+ -/ REGEX : 列の塗り分けをする際に、列の区切りを 正規表現で指定する。未指定なら、タブ文字。空文字列 '' の指定で1文字ごとの処理に。
+ 
+  --help : この colorplus のヘルプメッセージを出す。 
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+  --version : このプログラムのバージョン情報を表示する。
+
+ 利用上のヒント: 
+  下線を引く指定は -c underline 。行末に空白文字が無いか知るのに便利。
+  less を使う場合にless -R を使うと色情報はうまく表示される。
+
+ 開発上のメモ: 
+  * コマンドのウィンドウ内で表示が下端に達すると、 -l の表示がおかしくなる場合がある。
+  * -e の except する行番号の指定について、範囲指定や飛び飛びのしていなど、もう少し器用な指定ができるようにしたい。
+  * Term::ANSIColorのバージョンが古いと動作しない可能性がある。 use Term::ANSIColor 4.0  等の指定が必要と考えられる。
+  * もともと色がついていると、-3などでレイアウトが崩れる。Term::ANSIColorの関数をうまく使いたい。
+
+=end JapaneseManual
+
+=cut
+
+

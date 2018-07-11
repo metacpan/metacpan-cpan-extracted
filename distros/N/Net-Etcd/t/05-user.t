@@ -19,7 +19,7 @@ if ( $ENV{ETCD_TEST_HOST} and $ENV{ETCD_TEST_PORT} ) {
     $config->{key_file}  = $ENV{ETCD_CLIENT_KEY_FILE} || "$dir/t/tls/client-key.pem";
     $config->{cert_file} = $ENV{ETCD_CLIENT_CERT_FILE} || "$dir/t/tls/client.pem";
     $config->{ssl}       = 1;
-    plan tests => 19;
+    plan tests => 21;
 }
 else {
     plan skip_all =>
@@ -69,7 +69,7 @@ lives_ok(
     sub {
         $role =
           $etcd->role_perm(
-            { name => 'myrole', key => 'foo', permType => 'READ' } )->grant;
+            { name => 'myrole', key => 'foo', permType => 'READ', range_end => "\0" } )->grant;
     },
     "role_perm grant"
 );
@@ -77,6 +77,20 @@ lives_ok(
 #print STDERR Dumper($role);
 
 cmp_ok( $role->is_success, '==', 1, "role_perm grant success" );
+
+lives_ok(
+    sub {
+        $role =
+          $etcd->role_perm(
+            { name => 'myrole', key => 'bar', permType => 'READ', prefix => 1 } )->grant;
+    },
+    "role_perm grant with prefix"
+);
+
+#print STDERR Dumper($role);
+
+cmp_ok( $role->is_success, '==', 1, "role_perm grant with prefix success" );
+
 
 # grant role
 lives_ok(

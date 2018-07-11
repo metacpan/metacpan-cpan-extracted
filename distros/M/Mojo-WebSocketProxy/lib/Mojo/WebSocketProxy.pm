@@ -3,7 +3,7 @@ package Mojo::WebSocketProxy;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 1;
 
@@ -13,7 +13,7 @@ __END__
 
 Mojo::WebSocketProxy - WebSocket proxy for JSON-RPC 2.0 server
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
     # lib/your-application.pm
 
@@ -48,8 +48,8 @@ Or to manually call RPC server:
                         {
                             instead_of_forward => sub {
                                 shift->call_rpc({
-                                    args => $args,
-                                    method => $rpc_method, # it'll call 'http://rpc-host.com:8080/rpc_method'
+                                    args   => [ qw(args here) ],
+                                    method => 'json_key', # it'll call 'http://rpc-host.com:8080/json_key'
                                     rpc_response_cb => sub {...}
                                 });
                             }
@@ -73,7 +73,7 @@ You can use Mojolicious stash to store data between messages in one connection.
 
 =head1 Proxy responses
 
-The plugin sends websocket messages to clietn with RPC response data.
+The plugin sends websocket messages to client with RPC response data.
 If RPC reponse looks like this:
 
     {status => 1}
@@ -96,7 +96,7 @@ Plugin returns common response like this:
         msg_type  => $msg_type,
     }
 
-You can customize ws porxy response using 'response' hook.
+You can customize ws proxy response using 'response' hook.
 
 =head1 Plugin parameters
 
@@ -104,7 +104,7 @@ The plugin understands the following parameters.
 
 =head2 actions
 
-A pointer to array of action details, which contain stash_params,
+A reference to array of action details, which contain stash_params,
 request-response callbacks, other call parameters.
 
     $self->plugin(
@@ -114,6 +114,19 @@ request-response callbacks, other call parameters.
                 ['action2_json_key']
             ]
         });
+
+=head2 backends
+
+An optional reference to a hash of alternate backends to pick for certain RPC
+calls. Hash keys are names of backends, and values are themselves hash
+references containing backend parameters. Currently only the C<url> key is
+supported.
+
+    backends => {
+        server2 => {url => "http://server2.rpc-host:8080/"},
+    }
+
+Alternate backends are selected by using the C<backend> action option.
 
 =head2 before_forward
 
@@ -231,11 +244,18 @@ Hook which will run if RPC returns value with error key, e.g.
 Hook which will run every time when success or error callbacks is running.
 It good place to modify API response format.
 
+=head2 backend
+
+Selects an alternative backend to forward requests onto, rather than the
+default.
+
+    backend => "server2"
+
 =head1 SEE ALSO
 
 L<Mojolicious::Plugin::WebSocketProxy>,
 L<Mojo::WebSocketProxy>
-L<Mojo::WebSocketProxy::CallingEngine>,
+L<Mojo::WebSocketProxy::Backend>,
 L<Mojo::WebSocketProxy::Dispatcher>,
 L<Mojo::WebSocketProxy::Config>
 L<Mojo::WebSocketProxy::Parser>

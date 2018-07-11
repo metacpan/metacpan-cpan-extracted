@@ -426,6 +426,13 @@ load_scalar(perl_yaml_loader_t *loader)
         if (strEQ(tag, YAML_STR_TAG)) {
             style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
         }
+        else if (
+            strEQ(tag, YAML_NULL_TAG)
+            &&
+            (strEQ(string, "~") || strEQ(string, "null") || strEQ(string, ""))
+        ) {
+            return newSV(0);
+        }
         else {
             char *class;
             char *prefix = TAG_PERL_PREFIX "regexp";
@@ -441,8 +448,10 @@ load_scalar(perl_yaml_loader_t *loader)
             if (loader->load_blessed)
                 scalar = sv_setref_pvn(newSV(0), class, string, strlen(string));
             else
-                scalar = sv_setref_pvn(newSV(0), NULL, string, strlen(string));
+                scalar = newSVpvn(string, length);
             SvUTF8_on(scalar);
+            if (anchor)
+                hv_store(loader->anchors, anchor, strlen(anchor), SvREFCNT_inc(scalar), 0);
             return scalar;
         }
     }

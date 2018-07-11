@@ -1,16 +1,15 @@
 ---
-abstract: 'Perl library for working with L<Kayako REST API|https://kayako.atlassian.net/wiki/display/DEV/Kayako+REST+API>'
+abstract: 'Perl library for working with L<Kayako REST API|https://kayako.atlassian.net/wiki/display/DEV/Kayako+REST+API>. Tested with'
 author:
   - 'Pavel Serikov <pavelsr@cpan.org>'
 build_requires:
   Test::More: '0'
-  perl: '5.006'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/pavelsr/Kayako-RestAPI/issues
   repository: git://github.com/pavelsr/Kayako-RestAPI.git
-version: '0.01'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.70'

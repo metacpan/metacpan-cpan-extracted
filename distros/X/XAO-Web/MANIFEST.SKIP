@@ -1,5 +1,5 @@
 ^.gitignore$
-^.config$
+^.config
 ^Makefile$
 ^MYMETA.json$
 ^MYMETA.yml$
@@ -7,12 +7,12 @@
 ^PageSupport/MYMETA.json$
 ^PageSupport/MYMETA.yml$
 .*\.old$
+^\.git/
 blib/
 blibdirs
 pm_to_blib
-^CVS/
-/CVS/
-^ta/
+^t/.*\.xt
+^t/.*\.pl
 PageSupport/.gitignore
 PageSupport/PageSupport.bs
 PageSupport/PageSupport.c
@@ -20,3 +20,4 @@ PageSupport/PageSupport.o
 ^misc/samplesite/.config-cache$
 ^misc/samplesite/bin/build-structure$
 ^misc/samplesite/objects/Config.pm$
+t/xao/projects/test/web-mailer.tmp

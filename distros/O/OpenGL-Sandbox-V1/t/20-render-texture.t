@@ -10,7 +10,8 @@ use Log::Any::Adapter 'TAP';
 use OpenGL::Sandbox qw/ make_context get_gl_errors /;
 use OpenGL::Sandbox::Texture;
 
-my $ctx= make_context();
+my $c= try { make_context; }
+	or plan skip_all => "Can't test without context";
 
 subtest render => \&test_render;
 sub test_render {

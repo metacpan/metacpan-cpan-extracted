@@ -7,9 +7,10 @@ package Net::Etcd;
 use strict;
 use warnings;
 
-use Moo;
 use JSON;
 use MIME::Base64;
+use Types::Standard qw(Str Int Bool HashRef);
+
 use Net::Etcd::Auth;
 use Net::Etcd::Auth::RolePermission;
 use Net::Etcd::Config;
@@ -18,10 +19,9 @@ use Net::Etcd::Lease;
 use Net::Etcd::Maintenance;
 use Net::Etcd::Member;
 use Net::Etcd::User;
-use Types::Standard qw(Str Int Bool HashRef);
 
+use Moo;
 with('Net::Etcd::KV');
-
 use namespace::clean;
 
 =encoding utf8
@@ -32,7 +32,7 @@ Net::Etcd - etcd v3 REST API.
 
 =cut
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 =head1 SYNOPSIS
 
@@ -193,7 +193,6 @@ has cacert => (
     default => $ENV{ETCD_CLIENT_CACERT_FILE}
 );
 
-
 =head2 ssl
 
 To enable set to 1
@@ -312,6 +311,9 @@ sub role {
 See L<Net::Etcd::Auth::RolePermission>
 
 Grants or revoke permission of a specified key or range to a specified role.
+
+    $etcd->role_perm(
+        { name => 'myrole', key => 'bar', permType => 'READ', prefix => 1 } )->grant;
 
 =cut
 

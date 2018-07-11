@@ -41,10 +41,12 @@ inc/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm
 inc/Module/Install/ReadmeFromPod.pm
 inc/Module/Install/ReadmeMarkdownFromPod.pm
 inc/Module/Install/Repository.pm
+inc/Module/Install/StandardTests.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/Pod/Markdown.pm
 inc/Test/Builder/Module.pm
+inc/Test/Kwalitee.pm
 inc/Test/More.pm
 
 # Private Module::Install extensions

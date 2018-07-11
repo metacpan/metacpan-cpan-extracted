@@ -12,13 +12,13 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Hash: SHA1
 
-SHA1 10b7b0fa2788adc9b362c336b5c320e8b7757e76 Changes
+SHA1 1eb5942cf52f9399a5d927322f901da5b33b6c75 Changes
 SHA1 5299d2f6f75a4cc2437911028d6e9c9fb260ec0e MANIFEST
-SHA1 f9ea097c33920784dfbc920c647c997e5e7de4e0 META.yml
+SHA1 797a8a39f6476e84bb0e3cdbdf9db2f8dc3a526c META.yml
 SHA1 33a6bcea4f92d8d3eed198b512aa538e74c8d961 Makefile.PL
-SHA1 e99df3350c16dd737dd5630cbe1d0d94eb134ed7 README
+SHA1 aef292185dddec537ac759bf7b97f4c88d213a1d README
 SHA1 146b3a6b4aaea6dc4a1dbceca2fc17e177de9e47 TODO
 SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
 SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
@@ -34,8 +34,8 @@ SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.p
 SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
 SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
 SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
-SHA1 1bb8b3e76788e691f83dacdee5a2c02aacf1222a inc/YAML/Tiny.pm
-SHA1 50261a7bc26076aaa6a5de3f6c62118c4fd0f6be lib/RT/Extension/REST2.pm
+SHA1 61eb6159a86c81ec77f4a7ae9a177e187cad4634 inc/YAML/Tiny.pm
+SHA1 6114092bc1ac78446c7ddb45cb8993e62ec75f7b lib/RT/Extension/REST2.pm
 SHA1 14088b4223ec9394f6b076ebcc794216f0024fcf lib/RT/Extension/REST2/Dispatcher.pm
 SHA1 1b812daf32fde4252fae54dbcb35528b6ae8a3a0 lib/RT/Extension/REST2/Middleware/Auth.pm
 SHA1 70199496b833c026743d3720c709e5f28171b171 lib/RT/Extension/REST2/Middleware/ErrorAsJSON.pm
@@ -58,7 +58,7 @@ SHA1 71b6c1161e8ec2433ea58c83862d13f7b4f09795 lib/RT/Extension/REST2/Resource/Cu
 SHA1 cf9499b539346eacf01243a0401dc9ff51aa938c lib/RT/Extension/REST2/Resource/CustomRoles.pm
 SHA1 57dac3c0cdf6fb67a7519901e7807e63eb461751 lib/RT/Extension/REST2/Resource/Group.pm
 SHA1 0b289c6831e20459207cabe4e27a420988694a0f lib/RT/Extension/REST2/Resource/Groups.pm
-SHA1 58a77a5a7e0350ec34f674a28badbd79a7e2d449 lib/RT/Extension/REST2/Resource/Message.pm
+SHA1 f75713696204e33f2222f5b68297ebea0ab2b562 lib/RT/Extension/REST2/Resource/Message.pm
 SHA1 46ba84515815083705840bbeef5ba8a226723a79 lib/RT/Extension/REST2/Resource/Queue.pm
 SHA1 61f2bfb0f6b436bba6250c1320cb68618bd04ac4 lib/RT/Extension/REST2/Resource/Queues.pm
 SHA1 dae21844f6969b5fe3afeb4e12fde71bbbdc275f lib/RT/Extension/REST2/Resource/RT.pm
@@ -68,7 +68,7 @@ SHA1 384f21e3e2fcbceb1d88c1a1914b92c74b1d943b lib/RT/Extension/REST2/Resource/Re
 SHA1 0db8623e90385eecd7959421c943f91b249fcee4 lib/RT/Extension/REST2/Resource/Record/Hypermedia.pm
 SHA1 4e40814ada51de4ab2fcaf2a6993f0d81ee364f3 lib/RT/Extension/REST2/Resource/Record/Readable.pm
 SHA1 eed6315e2e96ed427f661bd2f9f3d44df3145a5a lib/RT/Extension/REST2/Resource/Record/WithETag.pm
-SHA1 f31d0495da4ffbc13c26b4a1686c79c2a6e2da3d lib/RT/Extension/REST2/Resource/Record/Writable.pm
+SHA1 c372b04cde6f5915f2d5828192c26e1c7f0a3ded lib/RT/Extension/REST2/Resource/Record/Writable.pm
 SHA1 3725a5f4b09e5f6d73875d14dff487647f080791 lib/RT/Extension/REST2/Resource/Role/RequestBodyIsJSON.pm
 SHA1 c74f9cc27306d2a9808f8fb45a5c7268c6831c76 lib/RT/Extension/REST2/Resource/Root.pm
 SHA1 7c11425587353189bb130471f7fef409e8fbea66 lib/RT/Extension/REST2/Resource/Ticket.pm
@@ -99,12 +99,11 @@ SHA1 6e349b8bd6ea66639c9ed7a1fee0559064b21e26 t/transactions.t
 SHA1 ee5b34efb131d01ec3e2abd6b998cd61aaa0a649 t/user-customfields.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEFelFwSnB+u9xCpouFedxUadmpRQFAlqsAXcACgkQFedxUadm
-pRRH4ggAnfeYjSANqKIQJcTfNc6XAXnwWRwWtUuS2XpgvoBwHfejjA/D0IGOh8VN
-5UCc09lsptjGi/cOU1tZszh3Uk3ZY/QT0EieBIwGlb8zhKA69AeU5kdLnhPsU5cp
-dDpKuNpCXhdGif6TKFgAHwcSus6HuVbj/Chp7Gf0nzcH7kLixwvGgZUYefukcrlS
-Eer/bbV2iEh9VGdU7ze/9yOvsdhUP+b8d+TBsooK6nqd0EMvUSa7rKe0e4yVqUZg
-1kWd8YloYHxVQzvnDoqyNHLynCA4hTOiGgYOTF49P9DVAVBkjysvmS8Kot8wuJy3
-GhkZKhY786Ii8iu/1I7mIQ+gG4aOwg==
-=kkEu
+iQEcBAEBAgAGBQJbP69PAAoJEBXncVGnZqUUp7cH/3JTWl8xfPFGjjh4lXD4qCb9
+GM2yLAYQ5gCruHsXOfshk1rxs2vnLMesJs26df24i9CF/CKUsrCPF2d3+kPshwCt
+QZLNLqs/2OAOUmaJgHzl2eAfxdf0PxdYwTNfh2m0+uTO9RDnVI34tMYQEo0TrN/c
+m8jr9HT/hdQgYkD2BwPt2fmrigcXFyc0Hjkh6fDeVQkAsC1ZWvet7R786MvbJ37M
+UMckC1vcqB+8ono0bWpI6xGl1SsE4x4V4K2MYF5LTj9v4F4+GW6aTzgSRo+hMBw0
+RSdURehudc/6byABJtt2nvKM7fglzDGw6VjbrkFb9hEwCXvxWNl+gFPbm5r1dQQ=
+=dSz9
 -----END PGP SIGNATURE-----

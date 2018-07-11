@@ -10,3 +10,5 @@ demo/demo_Max.pl
 demo/demo_Odder.pl
 demo/demo_Primes.pl
 demo/diskfree
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

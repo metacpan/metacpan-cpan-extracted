@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-# Copyright [2015-2017] EMBL-European Bioinformatics Institute
-#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -35,8 +33,8 @@ my $builder = Alien::Base::ModuleBuild->new(
         protocol       => 'https',
         host           => 'github.com',
         location       => 'dpryan79/libBigWig/archive/',
-        exact_filename => '0.3.3.tar.gz',
-        exact_version  => '0.3.3',
+        exact_filename => '0.4.2.tar.gz',
+        exact_version  => '0.4.2',
     },
     alien_build_commands   => ["make lib CC=$Config{cc} CFLAGS=\"-fPIC -g -Wall -O2\""],
     alien_install_commands => [

@@ -1,10 +1,9 @@
 package OpenGL::Sandbox::V1::DisplayList;
-BEGIN { $OpenGL::Sandbox::V1::DisplayList::VERSION = '0.02'; }
+BEGIN { $OpenGL::Sandbox::V1::DisplayList::VERSION = '0.03'; }
 use strict;
 use warnings;
 use overload '""' => sub { ${ shift() } };
-use OpenGL ();
-use OpenGL::Sandbox::V1;
+use OpenGL::Sandbox 'glDeleteLists';
 
 # ABSTRACT: Wrapper class for display lists
 
@@ -25,7 +24,7 @@ sub new {
 
 sub DESTROY {
 	my $self= shift;
-	OpenGL::glDeleteLists($$self, 1)
+	glDeleteLists($$self, 1)
 		if defined $$self;
 }
 
@@ -43,7 +42,7 @@ OpenGL::Sandbox::V1::DisplayList - Wrapper class for display lists
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 ATTRIBUTES
 

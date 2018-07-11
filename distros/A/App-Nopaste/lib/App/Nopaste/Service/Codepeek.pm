@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Codepeek;
 # ABSTRACT: (DEPRECATED) Service for Codepeek - http://codepeek.com
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 
 use parent 'App::Nopaste::Service';
 
@@ -51,15 +51,11 @@ App::Nopaste::Service::Codepeek - (DEPRECATED) Service for Codepeek - http://cod
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 DEPRECATION NOTICE
 
 L<http://codepeek.com> is now offline, so this service no longer works.
-
-=head1 AUTHOR
-
-Justin Hunter, C<< <justin.d.hunter@gmail.com> >>
 
 =head1 SUPPORT
 
@@ -68,7 +64,7 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 =head1 AUTHOR
 
-Shawn M Moore, <sartak@gmail.com>
+Justin Hunter, <justin.d.hunter@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -10,7 +10,7 @@ use Alien::Build::Plugin::Extract::Directory;
 use PerlX::Maybe qw( maybe );
 
 # ABSTRACT: Alien::Build plugin to download from git
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 has filter => undef;
@@ -54,7 +54,7 @@ Alien::Build::Plugin::Download::Git - Alien::Build plugin to download from git
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

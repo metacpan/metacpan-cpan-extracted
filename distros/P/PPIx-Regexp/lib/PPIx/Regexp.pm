@@ -170,7 +170,7 @@ use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 
 =head2 new
 

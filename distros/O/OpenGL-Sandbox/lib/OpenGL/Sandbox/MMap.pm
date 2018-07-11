@@ -1,5 +1,5 @@
 package OpenGL::Sandbox::MMap;
-BEGIN { $OpenGL::Sandbox::MMap::VERSION = '0.02'; }
+BEGIN { $OpenGL::Sandbox::MMap::VERSION = '0.03'; }
 use strict;
 use warnings;
 use File::Map 'map_file';
@@ -31,7 +31,7 @@ OpenGL::Sandbox::MMap - Wrapper around a memory-mapped scalar ref
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

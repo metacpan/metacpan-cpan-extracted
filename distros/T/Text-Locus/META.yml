@@ -1,0 +1,31 @@
+---
+abstract: 'text file locations'
+author:
+  - 'Sergey Poznyakoff <gray@gnu.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Locus
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Text::Locus:
+    file: lib/Text/Locus.pm
+    version: '1.01'
+requires:
+  Carp: '0'
+  Clone: '0'
+  Scalar::Util: '0'
+  perl: '5.006'
+resources:
+  repository: git://git.gnu.org.ua/text-locus.git
+version: '1.01'

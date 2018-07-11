@@ -1,3 +1,22 @@
+See https://github.com/amaltsev/Spreadsheet-Write for the most recent changes.
+
+---------------------------------------------------------------------
+
+1.01 - 07-Jul-2018
+    * Added a license, bumped to 1.x
+
+0.08 - 05-Jul-2018
+    * Updated to Test::Unit::Lite
+    * Cleaned up, removed unneeded dependencies
+    * Removed unused and untested drivers, they can be
+      in separate modules if necessary.
+    * Getting ready to push to CPAN once again. Not convenient to
+      install from github only.
+
+0.04 - 28-May-2007
+    * Accepting IO::Handle as 'file' argument to allow for instance
+      building spreadsheets in memory (using IO::Scalar).
+
 0.03 - 25-May-2007
     * Formats are cached to improve performance in Excel
     * 'content' in extended cell info blocks can be an array to simplify

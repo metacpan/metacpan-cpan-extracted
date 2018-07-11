@@ -1,7 +1,8 @@
 package Test::Elasticsearch::Model::Index;
 
 use Test::Class::Most parent => 'Test';
-use Data::Printer;
+use Test::Warnings qw/:all/;
+
 
 sub basics :Tests(no_plan) {
     my $self = shift;
@@ -22,6 +23,7 @@ sub basics :Tests(no_plan) {
             traits
             type
             type_meta
+            index_settings
         /);
     }
 }
@@ -79,6 +81,26 @@ sub deploy_to :Tests(no_plan) {
             lives_ok { $index->delete(index => $versioned_index_name) } "I can delete the index by giving the specific index name";
         }
     };
+}
+
+sub deprecated_attributes :Tests(no_plan) {
+    my $self = shift;
+    {
+        local $ENV{TESTING_ELASTICSEARCH_MODEL} = 0;
+        my $model = TestModel->new;
+        for my $name (qw/a b c/) {
+            my $index;
+            cmp_deeply(
+                [warnings { $index = $model->index($name) }],
+                bag(
+                    re(qr/shards is deprecated; please use index_settings instead/),
+                    re(qr/replicas is deprecated; please use index_settings instead/),
+                    re(qr/refresh_interval is deprecated; please use index_settings instead/),
+                ),
+                "I got the expected deprecation warnings for index $name"
+            );
+        }
+    }
 }
 
 1;

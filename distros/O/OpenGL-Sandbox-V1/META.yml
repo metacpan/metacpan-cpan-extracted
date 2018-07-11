@@ -13,9 +13,8 @@ build_requires:
 configure_requires:
   Devel::CheckLib: '1.03'
   ExtUtils::MakeMaker: '0'
-  Inline::MakeMaker: '0.45'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,9 +24,7 @@ requires:
   Carp: '0'
   Cwd: '0'
   Exporter: '0'
-  Inline: '0'
   Math::Trig: '0'
-  OpenGL: '0'
   OpenGL::Sandbox: '0'
   Try::Tiny: '0'
   overload: '0'
@@ -38,4 +35,4 @@ requires:
 resources:
   bugtracker: https://github.com/nrdvana/perl-OpenGL-Sandbox
   repository: https://github.com/nrdvana/perl-OpenGL-Sandbox.git
-version: '0.02'
+version: '0.03'

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use lib qw(blib/lib blib/arch);
 use Audio::Scan;

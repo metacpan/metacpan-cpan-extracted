@@ -16,8 +16,8 @@ use App::ElasticSearch::Utilities qw(:default);
 my %opt;
 GetOptions(\%opt,
     'all',
-    'config:s',
-    'skip:s',
+    'config=s',
+    'skip=s',
     # Basic options
     'help|h',
     'manual|m',
@@ -188,7 +188,7 @@ es-alias-manager.pl - Allow easy alias management for daily indexes
 
 =head1 VERSION
 
-version 5.6
+version 5.7
 
 =head1 SYNOPSIS
 

@@ -19,9 +19,6 @@ use strict;
 use Encode;
 use XAO::Utils;
 use XAO::Objects;
-use CGI;
-
-use base qw(CGI);
 
 ###############################################################################
 
@@ -30,17 +27,47 @@ sub new ($%) {
     my $args=get_args(\@_);
 
     my $cgi;
-    if($args->{'query'}) {
+    if($args->{'cgi'}) {
+        $cgi=$args->{'cgi'};
+    }
+    elsif($args->{'query'}) {
+        require CGI;
         $cgi=CGI->new($args->{'query'});
     }
     elsif($args->{'no_cgi'}) {
+        require CGI;
         $cgi=CGI->new('foo=bar');
     }
     else {
+        require CGI;
         $cgi=CGI->new();
     }
 
-    bless $cgi,ref($proto) || $proto;
+    my $self={
+        cgi => $cgi,
+    };
+
+    bless $self,ref($proto) || $proto;
+}
+
+###############################################################################
+
+our $AUTOLOAD;
+
+sub AUTOLOAD {
+    my $self=shift;
+    my @mpath=split('::',$AUTOLOAD);
+    my $method=$mpath[$#mpath];
+    my $code=$self->{'cgi'}->can($method) ||
+        die "No method $method on $self->{'cgi'}";
+    return $code->($self->{'cgi'},@_);
+}
+
+###############################################################################
+
+sub can {
+    my ($self,$method)=@_;
+    return $self->SUPER::can($method) || $self->{'cgi'}->can($method);
 }
 
 ###############################################################################
@@ -54,7 +81,7 @@ sub cookie ($@) {
             eprint "Using CGI::cookie() method is deprecated, consider switching to \$config->get_cookie() in ".join(':',map { $_ || '<undef>' } ($c0[1],$c0[2]));
         }
     }
-    return $self->SUPER::cookie(@_);
+    return $self->{'cgi'}->cookie(@_);
 }
 
 ###############################################################################
@@ -84,20 +111,20 @@ sub param ($;$) {
 
     if(!$charset) {
         if(wantarray) {
-            return $self->SUPER::multi_param(@_);
+            return $self->{'cgi'}->multi_param(@_);
         }
         else {
-            return $self->SUPER::param(@_);
+            return $self->{'cgi'}->param(@_);
         }
     }
     else {
         if(wantarray) {
             return map {
                 ref($_) ? $_ : Encode::decode($charset,$_)
-            } $self->SUPER::multi_param(@_);
+            } $self->{'cgi'}->multi_param(@_);
         }
         else {
-            my $value=$self->SUPER::param(@_);
+            my $value=$self->{'cgi'}->param(@_);
             return ref($value) ? $value : Encode::decode($charset,$value);
         }
     }

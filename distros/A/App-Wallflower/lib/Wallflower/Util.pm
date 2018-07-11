@@ -1,5 +1,5 @@
 package Wallflower::Util;
-$Wallflower::Util::VERSION = '1.008';
+$Wallflower::Util::VERSION = '1.009';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ my $css_regexp = qr{
 sub _links_from_css {
     my ( $file, $url ) = @_;
 
-    my $content = do { local ( @ARGV, $/ ) = ("$file"); <> };
+    my $content = do { local ( *ARGV, $/ ); @ARGV = ("$file"); <> };
     return map URI->new_abs( $_, $url ), grep defined,
         $content =~ /$css_regexp/gc;
 }
@@ -70,7 +70,7 @@ Wallflower::Util - Utility functions for Wallflower
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 

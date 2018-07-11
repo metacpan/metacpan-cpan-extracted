@@ -3,7 +3,7 @@
 #
 # This file is part of Pod-Markdown
 #
-# This software is copyright (c) 2004 by Marcel Gruenauer.
+# This software is copyright (c) 2011 by Randy Stauner.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -13,15 +13,14 @@ use strict;
 use warnings;
 
 package Pod::Markdown;
-# git description: v2.001-2-gadb8327
-$Pod::Markdown::VERSION = '2.002';
-BEGIN {
-  $Pod::Markdown::AUTHORITY = 'cpan:RWSTAUNER';
-}
-# ABSTRACT: Convert POD to Markdown
+# git description: v3.004-0-g69a7b15
 
-use Pod::Simple 3.14 (); # external links with text
+our $AUTHORITY = 'cpan:RWSTAUNER';
+# ABSTRACT: Convert POD to Markdown
+$Pod::Markdown::VERSION = '3.005';
+use Pod::Simple 3.27 (); # detected_encoding and keep_encoding bug fix
 use parent qw(Pod::Simple::Methody);
+use Encode ();
 
 our %URL_PREFIXES = (
   sco      => 'http://search.cpan.org/perldoc?',
@@ -30,6 +29,78 @@ our %URL_PREFIXES = (
 );
 $URL_PREFIXES{perldoc} = $URL_PREFIXES{metacpan};
 
+#{
+  our $HAS_HTML_ENTITIES;
+
+  # Stolen from Pod::Simple::XHTML 3.28. {{{
+
+  BEGIN {
+    $HAS_HTML_ENTITIES = eval "require HTML::Entities; 1";
+  }
+
+  my %entities = (
+    q{>} => 'gt',
+    q{<} => 'lt',
+    q{'} => '#39',
+    q{"} => 'quot',
+    q{&} => 'amp',
+  );
+
+  sub encode_entities {
+    my $self = shift;
+    my $ents = $self->html_encode_chars;
+    return HTML::Entities::encode_entities( $_[0], $ents ) if $HAS_HTML_ENTITIES;
+    if (defined $ents) {
+        $ents =~ s,(?<!\\)([]/]),\\$1,g;
+        $ents =~ s,(?<!\\)\\\z,\\\\,;
+    } else {
+        $ents = join '', keys %entities;
+    }
+    my $str = $_[0];
+    $str =~ s/([$ents])/'&' . ($entities{$1} || sprintf '#x%X', ord $1) . ';'/ge;
+    return $str;
+  }
+
+  # }}}
+
+  # Add a few very common ones for consistency and readability
+  # (in case HTML::Entities isn't available).
+  %entities = (
+    # Pod::Markdown has always required 5.8 so unicode_to_native will be available.
+    chr(utf8::unicode_to_native(0xA0)) => 'nbsp',
+    chr(utf8::unicode_to_native(0xA9)) => 'copy',
+    %entities
+  );
+
+  sub __entity_encode_ord_he {
+    my $chr = chr $_[0];
+    # Skip the encode_entities() logic and go straight for the substitution
+    # since we already have the char we know we want replaced.
+    # Both the hash and the function are documented as exportable (so should be reliable).
+    return $HTML::Entities::char2entity{ $chr } || HTML::Entities::num_entity( $chr );
+  }
+  sub __entity_encode_ord_basic {
+    return '&' . ($entities{chr $_[0]} || sprintf '#x%X', $_[0]) . ';';
+  }
+
+  # From HTML::Entities 3.69
+  my $DEFAULT_ENTITY_CHARS = '^\n\r\t !\#\$%\(-;=?-~';
+
+#}
+
+# Use hash for simple "exists" check in `new` (much more accurate than `->can`).
+my %attributes = map { ($_ => 1) }
+  qw(
+    html_encode_chars
+    match_encoding
+    output_encoding
+    man_url_prefix
+    perldoc_url_prefix
+    perldoc_fragment_format
+    markdown_fragment_format
+    include_meta_tags
+  );
+
 
 sub new {
   my $class = shift;
@@ -37,19 +108,36 @@ sub new {
 
   my $self = $class->SUPER::new();
   $self->preserve_whitespace(1);
+  $self->nbsp_for_S(1);
   $self->accept_targets(qw( markdown html ));
 
-  my $data = $self->_private;
   while( my ($attr, $val) = each %args ){
-    $data->{ $attr } = $val;
+    # NOTE: Checking exists on a private var means we don't allow Pod::Simple
+    # attributes to be set this way.  It's not very consistent, but I think
+    # I'm ok with that for now since there probably aren't many Pod::Simple attributes
+    # being changed besides `output_*` which feel like API rather than attributes.
+    # We'll see.
+    # This is currently backward-compatible as we previously just put the attribute
+    # into the private stash so anything unknown was silently ignored.
+    # We could open this up to `$self->can($attr)` in the future if that seems better
+    # but it tricked me when I was testing a misspelled attribute name
+    # which also happened to be a Pod::Simple method.
+
+    exists $attributes{ $attr } or
+      # Provide a more descriptive message than "Can't locate object method".
+      warn("Unknown argument to ${class}->new(): '$attr'"), next;
+
+    # Call setter.
+    $self->$attr($val);
   }
 
+    # TODO: move this logic to setter (and call _prepare_fragment_format).
     for my $type ( qw( perldoc man ) ){
         my $attr  = $type . '_url_prefix';
         # Use provided argument or default alias.
         my $url = $self->$attr || $type;
         # Expand alias if defined (otherwise use url as is).
-        $data->{ $attr } = $URL_PREFIXES{ $url } || $url;
+        $self->$attr( $URL_PREFIXES{ $url } || $url );
     }
 
     $self->_prepare_fragment_formats;
@@ -60,25 +148,47 @@ sub new {
 ## Attribute accessors ##
 
 
-my @attr = qw(
-  man_url_prefix
-  perldoc_url_prefix
-  perldoc_fragment_format
-  markdown_fragment_format
-  include_meta_tags
-);
+sub html_encode_chars {
+  my $self  = shift;
+  my $stash = $self->_private;
 
-{
-  no strict 'refs'; ## no critic
-  foreach my $attr ( @attr ){
-    *$attr = sub { return $_[0]->_private->{ $attr } };
+  # Setter.
+  if( @_ ){
+    # If false ('', 0, undef), disable.
+    if( !$_[0] ){
+      delete $stash->{html_encode_chars};
+      $stash->{encode_amp}  = 1;
+      $stash->{encode_lt}   = 1;
+    }
+    else {
+      # Special case boolean '1' to mean "all".
+      # If we have HTML::Entities, undef will use the default.
+      # Without it, we need to specify so that we use the same list (for consistency).
+      $stash->{html_encode_chars} = $_[0] eq '1' ? ($HAS_HTML_ENTITIES ? undef : $DEFAULT_ENTITY_CHARS) : $_[0];
+
+      # If [char] doesn't get encoded, we need to do it ourselves.
+      $stash->{encode_amp}  = ($self->encode_entities('&') eq '&');
+      $stash->{encode_lt}   = ($self->encode_entities('<') eq '<');
+    }
+    return;
   }
+
+  # Getter.
+  return $stash->{html_encode_chars};
 }
+
+
+# I prefer ro-accessors (immutability!) but it can be confusing
+# to not support the same API as other Pod::Simple classes.
+
+# NOTE: Pod::Simple::_accessorize is not a documented public API.
+# Skip any that have already been defined.
+__PACKAGE__->_accessorize(grep { !__PACKAGE__->can($_) } keys %attributes);
 
 sub _prepare_fragment_formats {
   my ($self) = @_;
 
-  foreach my $attr ( @attr ){
+  foreach my $attr ( keys %attributes ){
     next unless $attr =~ /^(\w+)_fragment_format/;
     my $type = $1;
     my $format = $self->$attr;
@@ -113,7 +223,7 @@ sub _prepare_fragment_formats {
       unless $self->can($prefix . $format);
 
     # Save it.
-    $self->_private->{ $attr } = $format;
+    $self->$attr($format);
   }
 
   return;
@@ -129,6 +239,10 @@ sub _prepare_fragment_formats {
 # so we don't want to start now.
 sub parse_from_file {
   my ($self, $file) = @_;
+
+  # TODO: Check that all dependent cpan modules use the Pod::Simple API
+  # then add a deprecation warning here to avoid confusion.
+
   $self->output_string(\($self->{_as_markdown_}));
   $self->parse_file($file);
 }
@@ -146,6 +260,8 @@ sub _private {
     stacks      => [],
     states      => [{}],
     link        => [],
+    encode_amp  => 1,
+    encode_lt   => 1,
   };
 }
 
@@ -184,6 +300,9 @@ sub _save {
 
 sub _save_line {
   my ($self, $text) = @_;
+
+  $text = $self->_process_escapes($text);
+
   $self->_save($text . $/);
 }
 
@@ -217,6 +336,9 @@ sub _indent {
 
   return $text;
 }
+
+# as_markdown() exists solely for backward compatibility
+# and requires having called parse_from_file() to be useful.
 
 
 sub as_markdown {
@@ -269,6 +391,7 @@ sub _build_markdown_head {
 # just the ones that start a line (likewise for plus and dot).
 # (Those will all be handled by _escape_paragraph_markdown).
 
+
 # Backslash escape markdown characters to avoid having them interpreted.
 sub _escape_inline_markdown {
   local $_ = $_[1];
@@ -298,17 +421,134 @@ sub _escape_paragraph_markdown {
     return $_;
 }
 
+
+# Additionally Markdown allows inline html so we need to escape things that look like it.
+# While _some_ Markdown processors handle backslash-escaped html,
+# [Daring Fireball](http://daringfireball.net/projects/markdown/syntax) states distinctly:
+# > In HTML, there are two characters that demand special treatment: < and &...
+# > If you want to use them as literal characters, you must escape them as entities, e.g. &lt;, and &amp;.
+
+# It goes on to say:
+# > Markdown allows you to use these characters naturally,
+# > taking care of all the necessary escaping for you.
+# > If you use an ampersand as part of an HTML entity,
+# > it remains unchanged; otherwise it will be translated into &amp;.
+# > Similarly, because Markdown supports inline HTML,
+# > if you use angle brackets as delimiters for HTML tags, Markdown will treat them as such.
+
+# In order to only encode the occurrences that require it (something that
+# could be interpreted as an entity) we escape them all so that we can do the
+# suffix test later after the string is complete (since we don't know what
+# strings might come after this one).
+
+my %_escape =
+  map {
+    my ($k, $v) = split /:/;
+    # Put the "code" marker before the char instead of after so that it doesn't
+    # get confused as the $2 (which is what requires us to entity-encode it).
+    # ( "XsX", "XcsX", "X(c?)sX" )
+    my ($s, $code, $re) = map { "\0$_$v\0" } '', map { ($_, '('.$_.'?)') } 'c';
+
+    (
+      $k         => $s,
+      $k.'_code' => $code,
+      $k.'_re'   => qr/$re/,
+    )
+  }
+    qw( amp:& lt:< );
+
+# Make the values of this private var available to the tests.
+sub __escape_sequences { %_escape }
+
+
+# HTML-entity encode any characters configured by the user.
+# If that doesn't include [&<] then we escape those chars so we can decide
+# later if we will entity-encode them or put them back verbatim.
+sub _encode_or_escape_entities {
+  my $self  = $_[0];
+  my $stash = $self->_private;
+  local $_  = $_[1];
+
+  if( $stash->{encode_amp} ){
+    if( exists($stash->{html_encode_chars}) ){
+      # Escape all amps for later processing.
+      # Pass intermediate strings to entity encoder so that it doesn't
+      # process any of the characters of our escape sequences.
+      # Use -1 to get "as many fields as possible" so that we keep leading and
+      # trailing (possibly empty) fields.
+      $_ = join $_escape{amp}, map { $self->encode_entities($_) } split /&/, $_, -1;
+    }
+    else {
+      s/&/$_escape{amp}/g;
+    }
+  }
+  elsif( exists($stash->{html_encode_chars}) ){
+    $_ = $self->encode_entities($_);
+  }
+
+  s/</$_escape{lt}/g
+    if $stash->{encode_lt};
+
+  return $_;
+}
+
+# From Markdown.pl version 1.0.1 line 1172 (_DoAutoLinks).
+my $EMAIL_MARKER = qr{
+#   <                  # Opening token is in parent regexp.
+        (?:mailto:)?
+    (
+      [-.\w]+
+      \@
+      [-a-z0-9]+(\.[-a-z0-9]+)*\.[a-z]+
+    )
+    >
+}x;
+
+# Process any escapes we put in the text earlier,
+# now that the text is complete (end of a block).
+sub _process_escapes {
+  my $self  = $_[0];
+  my $stash = $self->_private;
+  local $_  = $_[1];
+
+  # The patterns below are taken from Markdown.pl 1.0.1 _EncodeAmpsAndAngles().
+  # In this case we only want to encode the ones that Markdown won't.
+  # This is overkill but produces nicer looking text (less escaped entities).
+  # If it proves insufficent then we'll just encode them all.
+
+  # $1: If the escape was in a code sequence, simply replace the original.
+  # $2: If the unescaped value would be followed by characters
+  #     that could be interpreted as html, entity-encode it.
+  # else: The character is safe to leave bare.
+
+  # Neither currently allows $2 to contain '0' so bool tests are sufficient.
+
+  if( $stash->{encode_amp} ){
+    # Encode & if succeeded by chars that look like an html entity.
+    s,$_escape{amp_re}((?:#?[xX]?(?:[0-9a-fA-F]+|\w+);)?),
+      $1 ? '&'.$2 : $2 ? '&amp;'.$2 : '&',egos;
+  }
+
+  if( $stash->{encode_lt} ){
+    # Encode < if succeeded by chars that look like an html tag.
+    # Leave email addresses (<foo@bar.com>) for Markdown to process.
+    s,$_escape{lt_re}((?=$EMAIL_MARKER)|(?:[a-z/?\$!])?),
+      $1 ? '<'.$2 : $2 ?  '&lt;'.$2 : '<',egos;
+  }
+
+  return $_;
+}
+
+
 ## Parsing ##
 
 sub handle_text {
-  my ($self, $text) = @_;
+  my $self  = $_[0];
+  my $stash = $self->_private;
+  local $_  = $_[1];
 
-  # Markdown is for html, so use html entities.
-  $text =~ s/ /&nbsp;/g
-    if $self->_private->{nbsp};
-
-  # Unless we're in a code span or verbatim block.
-  unless( $self->_private->{no_escape} ){
+  # Unless we're in a code span, verbatim block, or formatted region.
+  unless( $stash->{no_escape} ){
 
     # We could, in theory, alter what gets escaped according to context
     # (for example, escape square brackets (but not parens) inside link text).
@@ -317,11 +557,22 @@ sub handle_text {
     # For now just escape everything.
 
     # Don't let literal characters be interpreted as markdown.
-    $text = $self->_escape_inline_markdown($text);
+    $_ = $self->_escape_inline_markdown($_);
+
+    # Entity-encode (or escape for later processing) necessary/desired chars.
+    $_ = $self->_encode_or_escape_entities($_);
 
   }
+  # If this _is_ a code section, do limited/specific handling.
+  else {
+    # Always escaping these chars ensures that we won't mangle the text
+    # in the unlikely event that a sequence matching our escape occurred in the
+    # input stream (since we're going to escape it and then unescape it).
+    s/&/$_escape{amp_code}/gos if $stash->{encode_amp};
+    s/</$_escape{lt_code}/gos  if $stash->{encode_lt};
+  }
 
-  $self->_save($text);
+  $self->_save($_);
 }
 
 sub start_Document {
@@ -343,7 +594,36 @@ sub   end_Document {
     unshift @doc, $self->_build_markdown_head, ($/ x 2);
   }
 
-  print { $self->{output_fh} } @doc;
+  if( my $encoding = $self->_get_output_encoding ){
+    # Do the check outside the loop(s) for efficiency.
+    my $ents = $HAS_HTML_ENTITIES ? \&__entity_encode_ord_he : \&__entity_encode_ord_basic;
+    # Iterate indices to avoid copying large strings.
+    for my $i ( 0 .. $#doc ){
+      print { $self->{output_fh} } Encode::encode($encoding, $doc[$i], $ents);
+    }
+  }
+  else {
+    print { $self->{output_fh} } @doc;
+  }
+}
+
+sub _get_output_encoding {
+  my ($self) = @_;
+
+  # If 'match_encoding' is set we need to return an encoding.
+  # If pod has no =encoding, Pod::Simple will guess if it sees a high-bit char.
+  # If there are no high-bit chars, encoding is undef.
+  # Use detected_encoding() rather than encoding() because if Pod::Simple
+  # can't use whatever encoding was specified, we probably can't either.
+  # Fallback to 'o_e' if no match is found.  This gives the user the choice,
+  # since otherwise there would be no reason to specify 'o_e' *and* 'm_e'.
+  # Fallback to UTF-8 since it is a reasonable default these days.
+
+  return $self->detected_encoding || $self->output_encoding || 'UTF-8'
+    if $self->match_encoding;
+
+  # If output encoding wasn't specified, return false.
+  return $self->output_encoding;
 }
 
 ## Blocks ##
@@ -458,7 +738,8 @@ sub   _end_head {
 
 ## Lists ##
 
-# TODO: over_empty
+# With Pod::Simple->parse_empty_lists(1) there could be an over_empty event,
+# but what would you do with that?
 
 sub _start_list {
   my ($self) = @_;
@@ -479,7 +760,6 @@ sub   _end_list {
   # but don't end with a double newline.
   my $text = $self->_chomp_all($self->_pop_stack_text);
 
-  # FIXME:
   $_[0]->_save_line($text . $/);
 }
 
@@ -513,7 +793,11 @@ sub _start_item {
 
 sub   _end_item {
   my ($self, $marker) = @_;
-  $self->_save_line($self->_indent($marker . ' ' . $self->_pop_stack_text));
+  my $text = $self->_pop_stack_text;
+  $self->_save_line($self->_indent($marker .
+    # Add a space only if there is text after the marker.
+    (defined($text) && length($text) ? ' ' . $text : '')
+  ));
 
   # Store any possible contents in a new stack (like a sub-document).
   $self->_increase_indent;
@@ -649,9 +933,6 @@ sub   end_C {
 # Use code spans for F<>.
 sub start_F { shift->start_C(@_); }
 sub   end_F { shift  ->end_C(@_); }
-
-sub start_S { $_[0]->_private->{nbsp}++; }
-sub   end_S { $_[0]->_private->{nbsp}--; }
 
 sub start_L {
   my ($self, $flags) = @_;
@@ -812,24 +1093,15 @@ sub format_fragment_markdown {
   # The strings gets passed through encode_entities() before idify().
   # If we don't do it here the substitutions below won't operate consistently.
 
-  # encode_entities {
-    my %entities = (
-      q{>} => 'gt',
-      q{<} => 'lt',
-      q{'} => '#39',
-      q{"} => 'quot',
-      q{&} => 'amp',
-    );
-
-    my
-      $ents = join '', keys %entities;
-  # }
-
   sub format_fragment_pod_simple_xhtml {
     my ($self, $t) = @_;
 
     # encode_entities {
-      $t =~ s/([$ents])/'&' . ($entities{$1} || sprintf '#x%X', ord $1) . ';'/ge;
+      # We need to use the defaults in case html_encode_chars has been customized
+      # (since the purpose is to match what external sources are doing).
+
+      local $self->_private->{html_encode_chars};
+      $t = $self->encode_entities($t);
     # }
 
     # idify {
@@ -879,4 +1151,4 @@ sub format_fragment_sco      { shift->format_fragment_pod_simple_html(@_);  }
 
 __END__
 
-#line 1265
+#line 1609

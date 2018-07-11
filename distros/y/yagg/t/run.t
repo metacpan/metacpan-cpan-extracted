@@ -8,7 +8,7 @@ use Test::Utils;
 use File::Find;
 use File::Path;
 use File::Spec::Functions qw( :ALL );
-use File::Slurp;
+use File::Slurper qw(read_text);
 
 my %tests = (
   "yagg -r 2 -o $TEMPDIR/output t/grammars/infinite_loop.yg" =>
@@ -84,8 +84,8 @@ sub TestIt
 
   if ($? && !defined $error_expected)
   {
-    my $stdout = read_file($test_stdout);
-    my $stderr = read_file($test_stderr);
+    my $stdout = read_text($test_stdout, undef, 1);
+    my $stderr = read_text($test_stderr, undef, 1);
 
     ok(0, "Encountered an error executing the test when one was not expected.\n" .
       "STDOUT:\n$stdout\nSTDERR:\n$stderr\n");

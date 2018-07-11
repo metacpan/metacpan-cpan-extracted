@@ -11,7 +11,7 @@ use OpenGL::Sandbox qw(
 	make_context $res tex glEnable glBlendFunc glClear glClearColor get_gl_errors
 	glBlendFunc
 	GL_TEXTURE_2D GL_BLEND GL_SRC_ALPHA GL_ONE GL_CLAMP GL_REPEAT GL_COLOR_BUFFER_BIT
-	GL_DEPTH_BUFFER_BIT GL_MODULATE GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	GL_DEPTH_BUFFER_BIT GL_MODULATE GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA GL_DEPTH_TEST
 );
 use OpenGL::Sandbox::V1 ':all';
 
@@ -58,7 +58,7 @@ show {};
 glClearColor(0,0,1,1);
 show {};
 
-#subtest textures => \&test_textures;
+subtest textures => \&test_textures;
 sub test_textures {
 	# Render texture at 0,0
 	glEnable(GL_TEXTURE_2D);
@@ -92,7 +92,7 @@ sub test_textures {
 	};
 };
 
-#subtest coordinate_sys => \&test_coordinate_sys;
+subtest coordinate_sys => \&test_coordinate_sys;
 sub test_coordinate_sys {
 	# Render a coordinate system
 	spin {
@@ -118,6 +118,25 @@ sub test_projection {
 	show { draw_boundbox( -10, -10, 10, 10 ) };
 	setup_projection(left => -11, right => 11, z => 2, aspect => .5);
 	show { draw_boundbox( -10, -10, 10, 10 ) };
+}
+
+subtest quadrics => \&test_quadrics;
+sub test_quadrics {
+	setup_projection(height => 2, z => 10);
+	setup_sunlight;
+	glEnable GL_DEPTH_TEST;
+	spin {
+		sphere(1,40,40);
+	};
+	spin {
+		local_matrix { rotate x => 90; trans 0,0,-1; cylinder(.35,.35,2,50,1); };
+		local_matrix { rotate y => 90; trans 0,0,-1; cylinder(.35,.35,2,50,1); };
+	};
+	my $q= OpenGL::Sandbox::V1::Quadric->new->flat_normals;
+	spin {
+		local_matrix { rotate x => 90; trans 0,0,-1; $q->cylinder(.35,.35,2,4,1); };
+		local_matrix { rotate y => 90; trans 0,0,-1; $q->cylinder(.35,.35,2,4,1); };
+	};
 }
 
 undef $c;

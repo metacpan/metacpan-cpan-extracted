@@ -20,6 +20,11 @@ pod_spelling_system:
     - YANICK
     - Yanick
     - ito
+    - FAYLAND
+    - Fayland
+    - Kamil
+    - Kozar
+    - xavery
 
 pod_coverage:
   # format is "Class#method" or "Class", regex allowed

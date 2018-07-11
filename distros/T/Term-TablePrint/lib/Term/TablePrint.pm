@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.067';
+our $VERSION = '0.068';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -47,6 +47,7 @@ sub __validate_options {
         binary_filter   => '[ 0 1 ]',
         grid            => '[ 0 1 ]',
         keep_header     => '[ 0 1 ]',
+        squash_spaces   => '[ 0 1 ]',
         table_expand    => '[ 0 1 2 ]',
         mouse           => '[ 0 1 2 3 4 ]',
         binary_string   => '',
@@ -78,6 +79,7 @@ sub __set_defaults {
     $self->{choose_columns} = 0      if ! defined $self->{choose_columns};
     $self->{grid}           = 0      if ! defined $self->{grid};
     $self->{keep_header}    = 1      if ! defined $self->{keep_header};
+    $self->{squash_spaces}  = 1      if ! defined $self->{squash_spaces};
     $self->{max_rows}       = 50000  if ! defined $self->{max_rows};
     $self->{min_col_width}  = 30     if ! defined $self->{min_col_width};
     $self->{mouse}          = 0      if ! defined $self->{mouse};
@@ -515,23 +517,21 @@ sub __header_sep {
 
 sub __sanitize_string {
     my ( $self, $str ) = @_; # copy
-    if ( ! defined $str ) {
-        $str = $self->{undef};
-    }
-    elsif ( ref $str ) {
-        $str = $self->__handle_reference( $str );
-    }
-    elsif ( $self->{binary_filter} && substr( $str, 0, 100 ) =~ $self->{binray_regexp} ) {
-        $str = $self->{binary_string};
-    }
-    else {
+    return $self->{undef}                    if ! defined $str;
+    return $self->__handle_reference( $str ) if ref $str;
+    return $self->{binary_string}            if $self->{binary_filter} && substr( $str, 0, 100 ) =~ $self->{binray_regexp};
+    if ( $self->{squash_spaces} ) {
         $str =~ s/^\p{Space}+//;
         $str =~ s/\p{Space}+\z//;
         $str =~ s/\p{Space}+/ /g;
-        $str =~ s/\p{C}//g;
     }
-    return $str; #
+    else {
+        $str =~ s/\p{Space}/ /g;
+    }
+    $str =~ s/\p{C}//g;
+    return $str;
 }
+
 
 sub __handle_reference {
     my ( $self, $ref ) = @_;
@@ -599,7 +599,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.067
+Version 0.068
 
 =cut
 
@@ -785,6 +785,13 @@ If I<keep_header> is set to 1, the table header is shown on top of each page.
 If I<keep_header> is set to 0, the table header is shown on top of the first page.
 
 Default: 1
+
+=head3 squash_spaces
+
+If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and leading and trailing spaces are
+removed.
+
+Default: 0
 
 =head3 max_rows
 

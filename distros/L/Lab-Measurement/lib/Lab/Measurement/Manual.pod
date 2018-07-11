@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.653
+version 3.660
 
 =head1 OVERVIEW
 
@@ -369,6 +369,10 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 =head3 Examples
 
 =over
+
+=item * L<Lab::XPRESS::Examples::Example1_Simple_IV>
+
+=item * L<Lab::XPRESS::Examples::Example2_Gate_IV_scan>
 
 =item * L<Lab::XPRESS::Examples::Example3_2samples_2files>
 

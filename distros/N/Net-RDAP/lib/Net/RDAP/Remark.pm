@@ -6,13 +6,19 @@ use strict;
 
 =head1 NAME
 
-L<Net::RDAP::Notice> - an RDAP remark
+L<Net::RDAP::Remark> - an RDAP remark
 
 =head1 DESCRIPTION
 
 This module represents a remark attached to an RDAP response.
 
-The available methods are:
+Any object which inherits from L<Net::RDAP::Object> will have a
+C<remarks()> method which will return an array of zero or more
+L<Net::RDAP::Remark> objects.
+
+=head1 METHODS
+
+=head2 Remark Title
 
 	$title = $remark->title;
 
@@ -23,6 +29,8 @@ Returns the textual description of the remark.
 sub title { $_[0]->{'title'} }
 
 =pod
+
+=head2 Remark Type
 
 	$type = $link->type;
 
@@ -41,6 +49,8 @@ sub type { $_[0]->{'type'} }
 
 =pod
 
+=head2 Remark Description
+
 	my @description = $link->description;
 
 Returns an array containing lines of text.
@@ -50,6 +60,8 @@ Returns an array containing lines of text.
 sub description { $_[0]->{'description'} ? @{$_[0]->{'description'}} : () }
 
 =pod
+
+=head2 Remark Links
 
 	$links = $remark->links;
 

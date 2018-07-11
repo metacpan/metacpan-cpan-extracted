@@ -1,5 +1,5 @@
 package kayako;
-$kayako::VERSION = '0.01';
+$kayako::VERSION = '0.04';
 # ABSTRACT: command line utility for working and testing kayako API
 
 
@@ -64,7 +64,7 @@ kayako - command line utility for working and testing kayako API
 
 =head1 VERSION
 
-version 0.01
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -80,7 +80,7 @@ Pavel Serikov <pavelsr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Pavel Serikov.
+This software is copyright (c) 2018 by Pavel Serikov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

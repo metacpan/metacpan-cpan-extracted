@@ -15,6 +15,8 @@ sub set_up {
     #
     $self->SUPER::set_up();
 
+    return if $self->{'skip_db_tests'};
+
     $self->{'odb'}->disconnect;
     undef $self->{'odb'};
 

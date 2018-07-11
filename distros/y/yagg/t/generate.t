@@ -7,7 +7,7 @@ use Test::Utils;
 use Test::More;
 use File::Find;
 use File::Spec::Functions qw( :ALL );
-use File::Slurp;
+use File::Slurper qw(read_text);
 
 my @tests = (
   "yagg -f -o $TEMPDIR/output examples/logical_expressions_simple/logical_expression.yg examples/logical_expressions_simple/logical_expression.lg",
@@ -60,8 +60,8 @@ sub TestIt
 
   if ($?)
   {
-    my $stdout = read_file($test_stdout);
-    my $stderr = read_file($test_stderr);
+    my $stdout = read_text($test_stdout, undef, 1);
+    my $stderr = read_text($test_stderr, undef, 1);
 
     ok(0, "Encountered an error executing the test.\nSTDOUT:\n$stdout\nSTDERR:\n$stderr\n");
   }

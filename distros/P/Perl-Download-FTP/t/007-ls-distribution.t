@@ -11,20 +11,20 @@ unless ($ENV{PERL_ALLOW_NETWORK_TESTING}) {
 else {
     plan tests => (7 * 3);
 }
-use Test::RequiresInternet ('ftp.cpan.org' => 21);
+use Test::RequiresInternet ('ftp.funet.fi' => 21);
 
 my ($self, $host, $dir);
 my (@allreleases, $sample);
-my $default_host = 'ftp.cpan.org';
-my $default_dir  = 'pub/CPAN/modules/by-module';
+$host = 'ftp.funet.fi';
+$dir  = '/pub/languages/perl/CPAN/modules/by-module';
 
 # Because the distribution versions available on CPAN are going to change over
 # time, we cannot hard-code distribution names into our test expectations.
 # So we'll be content to print out results and eyeball for plausibility.
 
 my $basic_args = {
-    host            => $default_host,
-    dir             => $default_dir,
+    host            => $host,
+    dir             => $dir,
 };
 
 $sample = 'Test-Smoke';

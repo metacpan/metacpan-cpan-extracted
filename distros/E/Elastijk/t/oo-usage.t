@@ -14,7 +14,6 @@ sub Hijk::request {
 }
 use warnings;
 
-
 subtest "The request structure for single-document APIs" => sub {
     my $es = Elastijk->new( host => "es.example.com", port => 9200 );
 
@@ -24,6 +23,7 @@ subtest "The request structure for single-document APIs" => sub {
         port => 9200,
         method => "GET",
         path  => "/foo/bar/kk",
+        head => [ 'Content-Type' => 'application/json' ]
     });
 
     $es->delete(index => "foo", type => "bar", id => "kk");
@@ -32,6 +32,7 @@ subtest "The request structure for single-document APIs" => sub {
         port => 9200,
         method => "DELETE",
         path  => "/foo/bar/kk",
+        head => [ 'Content-Type' => 'application/json' ],
     });
 
     $es->index(index => "foo", type => "bar", id => "kk", body => { z => 1 });
@@ -40,7 +41,8 @@ subtest "The request structure for single-document APIs" => sub {
         port => 9200,
         method => "PUT",
         path  => "/foo/bar/kk",
-        body => '{"z":1}'
+        body => '{"z":1}',
+        head => [ 'Content-Type' => 'application/json' ],
     });
 
 };
@@ -58,6 +60,7 @@ subtest "The request structure for _search command" => sub {
         method => "GET",
         path  => "/foo/bar/_search",
         body  => $q_json,
+        head => [ 'Content-Type' => 'application/json' ],
     });
 
     $es->search(body => $q);
@@ -67,6 +70,7 @@ subtest "The request structure for _search command" => sub {
         method => "GET",
         path  => "/_search",
         body  => $q_json,
+        head => [ 'Content-Type' => 'application/json' ],
     });
 
     $es->search(index => "foo,baz", body => $q);
@@ -76,6 +80,7 @@ subtest "The request structure for _search command" => sub {
         method => "GET",
         path  => '/foo%2Cbaz/_search',
         body  => $q_json,
+        head => [ 'Content-Type' => 'application/json' ],
     });
 
     $es->search(index => "foo", uri_param => { q => "bar" });
@@ -85,6 +90,7 @@ subtest "The request structure for _search command" => sub {
         method => "GET",
         path  => "/foo/_search",
         query_string => "q=bar",
+        head => [ 'Content-Type' => 'application/json' ],
     });
 };
 
@@ -96,6 +102,7 @@ subtest "{indices,type} exists api" => sub {
         port => 9200,
         method => "HEAD",
         path  => "/foo",
+        head => [ 'Content-Type' => 'application/json' ],
     });
 
     $es->exists(index => "foo", type => "baz");
@@ -104,6 +111,7 @@ subtest "{indices,type} exists api" => sub {
         port => 9200,
         method => "HEAD",
         path  => "/foo/baz",
+        head => [ 'Content-Type' => 'application/json' ],
     });
 
     # https://www.elastic.co/guide/guide/en/elasticsearch/guide/current/doc-exists.html#doc-exists
@@ -113,6 +121,7 @@ subtest "{indices,type} exists api" => sub {
         port => 9200,
         method => "HEAD",
         path  => "/foo/baz/15",
+        head => [ 'Content-Type' => 'application/json' ],
     });
 };
 
@@ -124,6 +133,7 @@ subtest "{indices,type} exists api, with 'index' name coming from object." => su
         port => 9200,
         method => "HEAD",
         path  => "/foo",
+        head => [ 'Content-Type' => 'application/json' ],
     });
 
     $es->exists(type => "baz");
@@ -132,6 +142,7 @@ subtest "{indices,type} exists api, with 'index' name coming from object." => su
         port => 9200,
         method => "HEAD",
         path  => "/foo/baz",
+        head => [ 'Content-Type' => 'application/json' ],
     });
 
     # https://www.elastic.co/guide/guide/en/elasticsearch/guide/current/doc-exists.html#doc-exists
@@ -141,10 +152,8 @@ subtest "{indices,type} exists api, with 'index' name coming from object." => su
         port => 9200,
         method => "HEAD",
         path  => "/foo/baz/15",
+        head => [ 'Content-Type' => 'application/json' ],
     });
 };
-
-
-
 
 done_testing;

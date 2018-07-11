@@ -34,13 +34,13 @@ subtest 'simple' => sub{
     is $uri->auth, 'www.test.com', 'auth';
     is $uri->path, '', 'path';
     is [$uri->path], [], 'path';
-    ok !$uri->query, 'query';
-    ok !$uri->frag, 'frag';
+    is $uri->query, '', 'query';
+    is $uri->frag, '', 'frag';
 
-    ok !$uri->usr, 'usr';
-    ok !$uri->pwd, 'pwd';
+    is $uri->usr, '', 'usr';
+    is $uri->pwd, '', 'pwd';
     is $uri->host, 'www.test.com', 'host';
-    ok !$uri->port, 'port';
+    is $uri->port, '', 'port';
   }
 };
 
@@ -143,20 +143,6 @@ subtest 'auth' => sub{
     $uri->path('');
     is "$uri", 'http://www.example.com', 'scheme + host';
   };
-};
-
-subtest 'path' => sub{
-  ok my $uri = uri($uris[2]), 'ctor';
-  is $uri->path, '/some/path', 'get (scalar)';
-  is [$uri->path], [qw(some path)], 'get (list)';
-
-  is $uri->path('/foo/bar'), '/foo/bar', 'set (scalar)';
-  is $uri->path, '/foo/bar', 'get (scalar)';
-  is [$uri->path], [qw(foo bar)], 'get (list)';
-
-  is $uri->path([qw(baz bat)]), '/baz/bat', 'set (array)';
-  is $uri->path, '/baz/bat', 'get (scalar)';
-  is [$uri->path], [qw(baz bat)], 'get (list)';
 };
 
 subtest 'query' => sub{

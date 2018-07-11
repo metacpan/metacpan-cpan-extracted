@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.016';
+our $VERSION = '2.018';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -184,7 +184,7 @@ sub run {
         my ( $user_dbs, $sys_dbs ) = ( [], [] ); #
         if ( ! eval {
             ( $user_dbs, $sys_dbs ) = $plui->get_databases( $odb->connect_parameter( $db_opt ) );
-            $prefix = -f $user_dbs->[0] ? '' : '- ';
+            $prefix = defined $user_dbs->[0] && -f $user_dbs->[0] ? '' : '- ';
             if ( $prefix ) {
                 @databases = ( map( $prefix . $_, @$user_dbs ), $sf->{o}{G}{meta} ? map( '  ' . $_, @$sys_dbs ) : () );
             }
@@ -701,7 +701,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.016
+Version 2.018
 
 =head1 DESCRIPTION
 

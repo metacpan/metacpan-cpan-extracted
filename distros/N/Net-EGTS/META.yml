@@ -1,0 +1,39 @@
+---
+abstract: 'Perl Interface to EGTS protocol. GOST R 56360-2015.'
+author:
+  - 'Dmitry E. Oboukhov <unera@debian.org>,'
+  - 'Roman V. Nikolaev <rshadow@rambler.ru>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Compile: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-EGTS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Date::Parse: '0'
+  Digest::CRC: '0'
+  Encode: '0'
+  IO::Socket::INET: '0'
+  List::MoreUtils: '0'
+  Mouse: '0'
+  POSIX: '0'
+  namespace::autoclean: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/dr-co/Net-EGTS/issues
+  homepage: https://github.com/dr-co/Net-EGTS
+  repository: https://github.com/dr-co/Net-EGTS
+version: 0.03
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

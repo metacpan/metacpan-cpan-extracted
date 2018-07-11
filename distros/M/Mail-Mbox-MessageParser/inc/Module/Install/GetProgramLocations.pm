@@ -20,7 +20,7 @@ use Module::Install::Base;
               &get_bzip2_version
             );
 
-$VERSION = sprintf "%d.%02d%02d", q/0.30.8/ =~ /(\d+)/g;
+$VERSION = sprintf "%d.%02d%02d", q/0.30.10/ =~ /(\d+)/g;
 
 # ---------------------------------------------------------------------------
 
@@ -380,7 +380,7 @@ sub get_gnu_version
     $version_message = `$command`;
   }
 
-  return undef unless
+  return undef unless ## no critic (ProhibitExplicitReturnUndef)
     $version_message =~ /\b(GNU|Free\s+Software\s+Foundation)\b/s;
 
   my ($program_version) = $version_message =~ /^.*?([\d]+\.[\d.a-z]+)/s;

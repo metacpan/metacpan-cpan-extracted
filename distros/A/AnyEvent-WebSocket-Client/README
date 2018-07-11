@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.48
+    version 0.49
 
 SYNOPSIS
 
@@ -242,6 +242,8 @@ AUTHOR
     Yanick Champoux (YANICK)
 
     Fayland Lam (FAYLAND)
+
+    Daniel Kamil Kozar (xavery)
 
 COPYRIGHT AND LICENSE
 

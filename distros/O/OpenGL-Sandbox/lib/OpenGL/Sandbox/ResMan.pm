@@ -1,5 +1,5 @@
 package OpenGL::Sandbox::ResMan;
-BEGIN { $OpenGL::Sandbox::ResMan::VERSION = '0.02'; }
+BEGIN { $OpenGL::Sandbox::ResMan::VERSION = '0.03'; }
 use Moo;
 use Try::Tiny;
 use Carp;
@@ -225,7 +225,7 @@ OpenGL::Sandbox::ResMan - Resource manager for OpenGL prototyping
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

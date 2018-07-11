@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.143     2018-07-08 03:46:21Z
+          - allow the document to provide its own AUTHOR pod section,
+            overriding what we would normally weave into the document
+
 0.142     2018-07-01 22:40:53Z
           - always report installed version of Module::Runtime in
             t/00-report-prereqs.t, as recent versions are incompatible with

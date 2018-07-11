@@ -63,8 +63,7 @@ use XAO::Utils qw(:args :debug :html);
 use XAO::Errors qw(XAO::DO::Web::FilloutForm);
 use base XAO::Objects->load(objname => 'Web::Page');
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: FilloutForm.pm,v 2.29 2008/05/12 19:23:45 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION='2.029';
 
 sub setup ($%);
 sub field_desc ($$;$);
@@ -555,7 +554,7 @@ sub display ($;%) {
                 ''  => 'Select Month',
                 (map { sprintf('%02u',$_) => sprintf('%02u - %s',$_,$cl[$_-1]) } (1..12)),
             ];
-            $selcompare=sub { return $_[0] == $_[1] };
+            $selcompare=sub { return defined $_[0] && length $_[0] && length $_[1] && $_[0] == $_[1] };
         }
         elsif($style eq 'year' && !$fdata->{'maxlength'} && $fdata->{'minyear'} && $fdata->{'maxyear'}) {
             my $minyear=$self->calculate_year($fdata->{'minyear'});
@@ -564,7 +563,7 @@ sub display ($;%) {
                 ''  => 'Select Year',
                 (map { sprintf('%04u',$_) => sprintf('%04u',$_) } ($minyear..$maxyear)),
             ];
-            $selcompare=sub { return $_[0] == $_[1] };
+            $selcompare=sub { return defined $_[0] && length $_[0] && length $_[1] && $_[0] == $_[1] };
         }
         elsif($style eq 'checkbox') {
             $fdata->{'html'}=$obj->expand(
@@ -674,7 +673,9 @@ sub display ($;%) {
             # HTML_OPTIONS
             #
             if(!$has_empty) {
-                $html='<option value="">Please select</option>'.$html;
+                $html='<option value="">' .
+                    t2ht($self->Tx('Please select')) .
+                    '</option>'.$html;
             }
 
             # Final <select>...</select> code

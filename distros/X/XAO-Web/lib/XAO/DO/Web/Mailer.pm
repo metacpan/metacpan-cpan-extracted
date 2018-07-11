@@ -97,13 +97,13 @@ parameter for the object, `default' is used as the key.
 ###############################################################################
 package XAO::DO::Web::Mailer;
 use strict;
+use Encode;
 use MIME::Lite 2.117;
-use XAO::Utils;
 use XAO::Objects;
+use XAO::Utils;
 use base XAO::Objects->load(objname => 'Web::Page');
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: Mailer.pm,v 2.11 2009/01/13 02:19:27 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION='2.011';
 
 sub display ($;%) {
     my $self=shift;
@@ -196,6 +196,34 @@ sub display ($;%) {
         $subject=$subject.($subject_suffix=~/\s$/ ? '':' ').$subject_suffix;
     }
 
+    # Charset for outgoing mail. Either /mailer/charset or /charset
+    #
+    my $charset=$config->{'charset'} || $self->siteconfig->get('charset') || undef;
+    ### dprint "...mailer charset=",$charset;
+
+    # Subject might contain 8-bit characters, but being a header it
+    # needs to be 7-bit. MIME::Lite does not do that.
+    #
+    if(Encode::is_utf8($subject)) {
+        $subject=Encode::encode('MIME-Q',$subject);
+
+        # The output from MIME-Q is a multi-line string separated by \r\n
+        # and that \r appears to be duplicated by some MTA implementations.
+        # The rest of MIME::Lite headers are output with \n, so sticking to
+        # that.
+        #
+        $subject=~s/\r//sg;
+    }
+
+    # Encoding by default in MIME::Lite is "binary", which means no
+    # processing at all. That might break on some gateway and MIME
+    # validator at https://tools.ietf.org/tools/msglint/ balks
+    # at it. Keeping "binary" here for compatibility with older
+    # deployments, but allowing to override it.
+    #
+    my $transfer_encoding=$config->{'transfer_encoding'} || 'binary';
+    ### dprint "...mailer transfer_encoding=",$transfer_encoding;
+
     # Getting common args from the parent template if needed.
     #
     my $common=$self->pass_args($args->{'pass'});
@@ -221,6 +249,9 @@ sub display ($;%) {
         });
     }
 
+    defined $text || defined $html ||
+        throw $self "- no text for either html or text part";
+
     # Preparing attachments if any
     #
     my @attachments;
@@ -241,12 +272,13 @@ sub display ($;%) {
                 $objargs->{$1}=$args->{$kk};
             }
 
+            my $content;
             if($args->{'attachment.'.$id.'.unparsed'}) {
                 if(defined $args->{'attachment.'.$id.'.template'}) {
-                    $data{'Data'}=$args->{'attachment.'.$id.'.template'};
+                    $content=$args->{'attachment.'.$id.'.template'};
                 }
                 elsif(defined $args->{'attachment.'.$id.'.path'}) {
-                    $data{'Data'}=$self->object->expand(
+                    $content=$self->object->expand(
                         path        => $args->{'attachment.'.$id.'.path'},
                         unparsed    => 1,
                     );
@@ -260,85 +292,118 @@ sub display ($;%) {
                     $objargs=$self->pass_args($args->{'attachment.'.$id.'.pass'},$objargs);
                 }
 
-                $data{'Data'}=$obj->expand($objargs);
+                $content=$obj->expand($objargs);
             }
+
+            # The content should be bytes, but if it is in
+            # characters it needs to be converted or MIME::Lite will
+            # croak.
+            #
+            $content=Encode::encode($charset || 'utf8',$content) if utf8::is_utf8($content);
+
+            $data{'Data'}=$content;
         }
         elsif($args->{'attachment.'.$id.'.file'}) {
-            throw $self "display - attaching files not implemented";
+            throw $self "- attaching files not implemented";
         }
         else {
-            throw $self "display - no path/template/file given for attachment '$id'";
+            throw $self "- no path/template/file given for attachment '$id'";
         }
 
         push(@attachments,\%data);
     }
 
-    # Charset for outgoing mail. Either /mailer/charset or /charset
+    # Preparing mailer and storing content in.
     #
-    my $charset=$config->{'charset'} || $self->siteconfig->get('charset') || undef;
-
-    # Preparing mailer and storing content in
+    # MIME::Lite does not do anything with encoding and does not really
+    # support perl unicode. It does not apply any filtering to its
+    # output streams. With that in mind, we need to supply it with
+    # bytes, so doing our own encoding.
     #
-    my $mailer;
+    # Thanks Brian Mielke for catching this!
+    #
+    # TODO: Switch to Email::MIME instead of MIME::Lite!
+    #
     my @stdhdr=(
         From        => $from_hdr,
         FromSender  => $from,
         To          => $to,
-        Subject     => $subject,
+        Subject     => $charset && utf8::is_utf8($subject) ? Encode::encode($charset,$subject) : $subject,
     );
 
     push(@stdhdr,@ovhdr);
 
-    if($html && !$text) {
+    my $mailer;
+
+    # Simple case, HTML only, no attachments
+    #
+    if(defined $html && !defined $text && !@attachments) {
         $mailer=MIME::Lite->new(
             @stdhdr,
-            Data        => $html,
             Type        => 'text/html',
+            Data        => $charset && utf8::is_utf8($html) ? Encode::encode($charset,$html) : $html,
             Datestamp   => 0,
+            Encoding    => $transfer_encoding,
         );
         $mailer->attr('content-type.charset' => $charset) if $charset;
     }
-    elsif($text && !$html) {
+
+    # TEXT only, no attachments
+    #
+    elsif(defined $text && !defined $html && !@attachments) {
         $mailer=MIME::Lite->new(
             @stdhdr,
-            Data        => $text,
             Type        => 'text/plain',
+            Data        => $charset && utf8::is_utf8($text) ? Encode::encode($charset,$text) : $text,
             Datestamp   => 0,
+            Encoding    => $transfer_encoding,
         );
         $mailer->attr('content-type.charset' => $charset) if $charset;
     }
-    elsif($text && $html) {
+
+    # HTML, TEXT, and/or attachments
+    #
+    else {
+        my $text_part;
+        if(defined $text) {
+            $text_part=MIME::Lite->new(
+                Type        => 'text/plain',
+                Data        => $charset && utf8::is_utf8($text) ? Encode::encode($charset,$text) : $text,
+                Encoding    => $transfer_encoding,
+            );
+
+            $text_part->delete('X-Mailer');
+            $text_part->delete('Date');
+
+            $text_part->attr('content-type.charset' => $charset) if $charset;
+        }
+
+        my $html_part;
+        if(defined $html) {
+            $html_part=MIME::Lite->new(
+                Type        => 'text/html',
+                Data        => $charset && utf8::is_utf8($html) ? Encode::encode($charset,$html) : $html,
+                Encoding    => $transfer_encoding,
+            );
+
+            $html_part->delete('X-Mailer');
+            $html_part->delete('Date');
+
+            $html_part->attr('content-type.charset' => $charset) if $charset;
+        }
+
         $mailer=MIME::Lite->new(
             @stdhdr,
             Type        => @attachments ? 'multipart/mixed' : 'multipart/alternative',
             Datestamp   => 0,
         );
 
-        my $text_part=MIME::Lite->new(
-            Type        => 'text/plain',
-            Data        => $text,
-        );
-
-        $text_part->delete('X-Mailer');
-        $text_part->delete('Date');
-
-        $text_part->attr('content-type.charset' => $charset) if $charset;
-
-        my $html_part=MIME::Lite->new(
-            Type        => 'text/html',
-            Data        => $html,
-        );
-
-        $html_part->delete('X-Mailer');
-        $html_part->delete('Date');
-
-        $html_part->attr('content-type.charset' => $charset) if $charset;
-
-        if(@attachments) {
+        if($text_part && $html_part && @attachments) {
             my $alt_part=MIME::Lite->new(
                 Type        => 'multipart/alternative',
                 Datestamp   => 0,
             );
+
             $alt_part->delete('X-Mailer');
             $alt_part->delete('Date');
 
@@ -348,24 +413,21 @@ sub display ($;%) {
             $mailer->attach($alt_part);
         }
         else {
-            $mailer->attach($text_part);
-            $mailer->attach($html_part);
+            $mailer->attach($text_part) if $text_part;
+            $mailer->attach($html_part) if $html_part;
         }
-    }
-    else {
-        throw $self "- no text for either html or text part";
+
+        # Adding attachments if any
+        #
+        foreach my $adata (@attachments) {
+            $mailer->attach(%$adata);
+        }
     }
 
     $mailer->add(Date => $args->{'date'}) if $args->{'date'};
     $mailer->add(Cc => $cc) if $cc;
     $mailer->add(Bcc => $bcc) if $bcc;
     $mailer->add('Reply-To' => $args->{'replyto'}) if $args->{'replyto'};
-
-    # Adding attachments if any
-    #
-    foreach my $adata (@attachments) {
-        $mailer->attach(%$adata);
-    }
 
     # Sending
     #

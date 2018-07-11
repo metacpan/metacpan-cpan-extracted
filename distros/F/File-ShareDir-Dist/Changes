@@ -1,5 +1,11 @@
 Revision history for File-ShareDir-Dist
 
+0.06      2018-07-08 04:20:50 -0400
+  - App::Yath::Plugin::ShareDirDist inherits from App::Yath::Plugin
+    if installed.  (the only way the plugin is useful is if it is
+    installed, but Test2::Harness shouldn't be a dependency for this
+    module).
+
 0.05      2017-09-15 14:11:08 -0400
   - Add App::Yath::Plugin::ShareDirDist
 

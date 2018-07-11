@@ -15,8 +15,8 @@ lib/PPIx/QuoteLike/Token/Interpolation.pm
 lib/PPIx/QuoteLike/Token/String.pm
 lib/PPIx/QuoteLike/Token/Structure.pm
 lib/PPIx/QuoteLike/Token/Unknown.pm
-lib/PPIx/QuoteLike/Utils.pm
 lib/PPIx/QuoteLike/Token/Whitespace.pm
+lib/PPIx/QuoteLike/Utils.pm
 LICENSES/Artistic
 LICENSES/Copying
 Makefile.PL
@@ -26,6 +26,7 @@ t/basic.t
 t/dump.t
 t/parse.t
 t/version.t
+xt/author/carp_not.t
 xt/author/changes.t
 xt/author/critic.t
 xt/author/executable.t

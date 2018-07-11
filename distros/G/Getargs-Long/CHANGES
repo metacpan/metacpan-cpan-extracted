@@ -1,3 +1,12 @@
+Version 1.1011:
+- Updating META.yml
+
+Version 1.1010:
+- Trying once again to fix the compile test on windows
+
+Version 1.1009:
+- Check in standard tests, including one that skips the compile check on Windows
+
 Version 1.1008:
 - Prevent CPAN from indexing private-lib
 - Add standard tests

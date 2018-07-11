@@ -8,7 +8,7 @@ use base qw{ Exporter };
 # CAVEAT: do not include any other PPIx-Regexp modules in this one, or
 # you will end up with a circular dependency.
 
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 
 our @EXPORT_OK = qw{
     ARRAY_REF
@@ -31,6 +31,7 @@ our @EXPORT_OK = qw{
     REGEXP_REF
     SCALAR_REF
     STRUCTURE_UNKNOWN
+    SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS
     TOKEN_LITERAL
     TOKEN_UNKNOWN
     TRUE
@@ -157,6 +158,8 @@ use constant NODE_UNKNOWN	=> 'PPIx::Regexp::Node::Unknown';
 use constant RE_CAPTURE_NAME => ' [_[:alpha:]] \w* ';
 
 use constant STRUCTURE_UNKNOWN	=> 'PPIx::Regexp::Structure::Unknown';
+
+use constant SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS => $] ge '5.008003';
 
 use constant TOKEN_LITERAL	=> 'PPIx::Regexp::Token::Literal';
 use constant TOKEN_UNKNOWN	=> 'PPIx::Regexp::Token::Unknown';
@@ -307,6 +310,15 @@ This is the result of C<ref \0>.
 
 The name of the class that represents an unknown structure. That is,
 L<PPIx::Regexp::Structure::Unknown|PPIx::Regexp::Structure::Unknown>.
+
+=head2 SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS
+
+A Boolean which is true if the running version of Perl has UTF-8 support
+sufficient for our purposes.
+
+Currently that means C<5.8.3> or greater, with the specific requirements
+being C<use open qw{ :std :encoding(utf-8) }>, C</\p{Mark}/>, and the
+ability to parse things like C<qr \N{U+FFFF}foo\N{U+FFFF}>.
 
 =head2 TOKEN_LITERAL
 

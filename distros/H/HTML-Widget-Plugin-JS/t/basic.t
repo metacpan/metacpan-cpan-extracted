@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 use HTML::Widget::Factory;
 use HTML::Widget::Plugin::JS;
@@ -24,4 +24,10 @@ is(
   $factory->js_var({ a => "</script>pwned</script>" }),
   q{var a = "\u003c/script>pwned\u003c/script>";},
   "we 'encode' end tags",
+);
+
+is(
+  $factory->js_anon([ 1, 2, "three" ]),
+  q{[ 1, 2, "three" ]},
+  "arrays work",
 );

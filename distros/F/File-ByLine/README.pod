@@ -1,0 +1,444 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+File::ByLine - Line-by-line file access loops
+
+=head1 VERSION
+
+version 1.181861
+
+=head1 SYNOPSIS
+
+  use File::ByLine;
+
+  #
+  # Procedural Interface (Simple!)
+  #
+
+  # Execute a routine for each line of a file
+  dolines { say "Line: $_" } "file.txt";
+  forlines "file.txt", sub { say "Line: $_" };
+
+  # Grep (match) lines of a file
+  my (@result) = greplines { m/foo/ } "file.txt";
+
+  # Apply a function to each line and return result
+  my (@result) = maplines { lc($_) } "file.txt";
+
+  # Parallelized forlines/dolines routines
+  # (Note: Requires Parallel::WorkUnit to be installed)
+  parallel_dolines { foo($_) } "file.txt", 10;
+  parallel_forlines "file.txt", 10, sub { foo($_); };
+
+  # Parallelized maplines and greplines
+  my (@result) = parallel_greplines { m/foo/ } "file.txt", 10;
+  my (@result) = parallel_maplines  { lc($_) } "file.txt", 10;
+
+  # Read an entire file, split into lines
+  my (@result) = readlines "file.txt";
+
+
+  #
+  # Functional Interface
+  #
+
+  # Execute a routine for each line of a file
+  my $byline = File::ByLine->new();
+  $byline->do( sub { say "Line: $_" }, "file.txt");
+
+  # Grep (match) lines of a file
+  my $byline = File::ByLine->new();
+  my (@result) = $byline->grep( sub { m/foo/ }, "file.txt");
+
+  # Apply a function to each line and return result
+  my $byline = File::ByLine->new();
+  my (@result) = $byline->map( sub { lc($_) }, "file.txt");
+
+  # Parallelized routines
+  # (Note: Requires Parallel::WorkUnit to be installed)
+  my $byline = File::ByLine->new();
+  $byline->processes(10);
+  $byline->do( sub { foo($_) }, "file.txt");
+  my (@grep_result) = $byline->grep( sub { m/foo/ }, "file.txt");
+  my (@map_result)  = $byline->map( sub { lc($_) }, "file.txt");
+
+  # Skip the header line
+  my $byline = File::ByLine->new();
+  $byline->skip_header(1);
+  $byline->do( sub { foo($_) }, "file.txt");
+  my (@grep_result) = $byline->grep( sub { m/foo/ }, "file.txt");
+  my (@map_result)  = $byline->map( sub { lc($_) }, "file.txt");
+
+  # Process the header line
+  my $byline = File::ByLine->new();
+  $byline->header_handler( sub { say $_; } );
+  $byline->do( sub { foo($_) }, "file.txt");
+  my (@grep_result) = $byline->grep( sub { m/foo/ }, "file.txt");
+  my (@map_result)  = $byline->map( sub { lc($_) }, "file.txt");
+
+  # Read an entire file, split into lines
+  my (@result) = readlines "file.txt";
+
+  # Alternative way of specifying filenames
+  my $byline = File::ByLine->new();
+  $byline->file("file.txt")
+  $byline->do( sub { foo($_) } );
+  my (@grep_result) = $byline->grep( sub { m/foo/ } );
+  my (@map_result)  = $byline->map( sub { lc($_) } );
+
+=head1 DESCRIPTION
+
+Finding myself writing the same trivial loops to read files, or relying on
+modules like C<Perl6::Slurp> that didn't quite do what I needed (abstracting
+the loop), it was clear something easy, simple, and sufficiently Perl-ish was
+needed.
+
+=head1 FUNCTIONS
+
+=head2 dolines
+
+  dolines { say "Line: $_" } "file.txt";
+  dolines \&func, "file.txt";
+
+This function calls a coderef once for each line in the file.  The file is read
+line-by-line, removes the newline character(s), and then executes the coderef.
+
+Each line (without newline) is passed to the coderef as the first parameter and
+only parameter to the coderef.  It is also placed into C<$_>.
+
+This function returns the number of lines in the file.
+
+This is similar to C<forlines()>, except for order of arguments.  The author
+recommends this form for short code blocks - I.E. a coderef that fits on
+one line.  For longer, multi-line code blocks, the author recommends
+the C<forlines()> syntax.
+
+=head2 forlines
+
+  forlines "file.txt", sub { say "Line: $_" };
+  forlines "file.txt", \&func;
+
+This function calls a coderef once for each line in the file.  The file is read
+line-by-line, removes the newline character(s), and then executes the coderef.
+
+Each line (without newline) is passed to the coderef as the first parameter and
+only parameter to the coderef.  It is also placed into C<$_>.
+
+This function returns the number of lines in the file.
+
+This is similar to C<dolines()>, except for order of arguments.  The author
+recommends this when using longer, multi-line code blocks, even though it is
+not orthogonal with the C<maplines()>/C<greplines()> routines.
+
+=head2 parallel_dolines
+
+  my (@result) = parallel_dolines { foo($_) } "file.txt", 10;
+
+Requires L<Parallel::WorkUnit> to be installed.
+
+Three parameters are requied: a codref, a filename, and number of simultanious
+child threads to use.
+
+This function performs similar to C<dolines()>, except that it does its'
+operations in parallel using C<fork()> and L<Parallel::WorkUnit>.  Because
+the code in the coderef is executed in a child process, any changes it makes
+to variables in high scopes will not be visible outside that single child.
+In general, it will be safest to not modify anything that belongs outside
+this scope.
+
+Note that the file will be read in several chunks, with each chunk being
+processed in a different thread.  This means that the child threads may be
+operating on very different sections of the file simultaniously and no specific
+order of execution of the coderef should be expected!
+
+Because of the mechanism used to split the file into chunks for processing,
+each thread may process a somewhat different number of lines.  This is
+particularly true if there are a mix of very long and very short lines.  The
+splitting routine splits the file into roughly equal size chunks by byte
+count, not line count.
+
+Otherwise, this function is identical to C<dolines()>.  See the documentation
+for C<dolines()> or C<forlines()> for information about how this might differ
+from C<parallel_forlines()>.
+
+=head2 parallel_forlines
+
+  my (@result) = parallel_forlines "file.txt", 10, sub { foo($_) };
+
+Requires L<Parallel::WorkUnit> to be installed.
+
+Three parameters are requied: a filename, a codref, and number of simultanious
+child threads to use.
+
+This function performs similar to C<forlines()>, except that it does its'
+operations in parallel using C<fork()> and L<Parallel::WorkUnit>.  Because
+the code in the coderef is executed in a child process, any changes it makes
+to variables in high scopes will not be visible outside that single child.
+In general, it will be safest to not modify anything that belongs outside
+this scope.
+
+Note that the file will be read in several chunks, with each chunk being
+processed in a different thread.  This means that the child threads may be
+operating on very different sections of the file simultaniously and no specific
+order of execution of the coderef should be expected!
+
+Because of the mechanism used to split the file into chunks for processing,
+each thread may process a somewhat different number of lines.  This is
+particularly true if there are a mix of very long and very short lines.  The
+splitting routine splits the file into roughly equal size chunks by byte
+count, not line count.
+
+Otherwise, this function is identical to C<forlines()>.  See the documentation
+for C<forlines()> or C<dolines()> for information about how this might differ
+from C<parallel_dolines()>.
+
+=head2 greplines
+
+  my (@result) = greplines { m/foo/ } "file.txt";
+
+Requires L<Parallel::WorkUnit> to be installed.
+
+This function calls a coderef once for each line in the file, and, based on
+the return value of that coderef, returns only the lines where the coderef
+evaluates to true.  This is similar to the C<grep> built-in function, except
+operating on file input rather than array input.
+
+Each line (without newline) is passed to the coderef as the first parameter and
+only parameter to the coderef.  It is also placed into C<$_>.
+
+This function returns the lines for which the coderef evaluates as true.
+
+=head2 parallel_greplines
+
+  my (@result) = parallel_greplines { m/foo/ } "file.txt", 10;
+
+Three parameters are requied: a coderef, filename, and number of simultanious
+child threads to use.
+
+This function performs similar to C<greplines()>, except that it does its'
+operations in parallel using C<fork()> and L<Parallel::WorkUnit>.  Because
+the code in the coderef is executed in a child process, any changes it makes
+to variables in high scopes will not be visible outside that single child.
+In general, it will be safest to not modify anything that belongs outside
+this scope.
+
+If a large amount of data is returned, the overhead of passing the data
+from child to parents may exceed the benefit of parallelization.  However,
+if there is substantial line-by-line processing, there likely will be a speedup,
+but trivial loops will not speed up.
+
+Note that the file will be read in several chunks, with each chunk being
+processed in a different thread.  This means that the child threads may be
+operating on very different sections of the file simultaniously and no specific
+order of execution of the coderef should be expected!  However, the results
+will be returned in the same order as C<greplines()> would return them.
+
+Because of the mechanism used to split the file into chunks for processing,
+each thread may process a somewhat different number of lines.  This is
+particularly true if there are a mix of very long and very short lines.  The
+splitting routine splits the file into roughly equal size chunks by byte
+count, not line count.
+
+Otherwise, this function is identical to C<greplines()>.
+
+=head2 maplines
+
+  my (@result) = maplines { lc($_) } "file.txt";
+
+This function calls a coderef once for each line in the file, and, returns
+an array of return values from those calls.  This follows normal Perl rules -
+basically if the coderef returns a list, all elements of that list are added
+as distinct elements to the return value array.  If the coderef returns an
+empty list, no elements are added.
+
+Each line (without newline) is passed to the coderef as the first parameter and
+only parameter to the coderef.  It is also placed into C<$_>.
+
+This is meant to be similar to the built-in C<map> function.
+
+Because of the mechanism used to split the file into chunks for processing,
+each thread may process a somewhat different number of lines.  This is
+particularly true if there are a mix of very long and very short lines.  The
+splitting routine splits the file into roughly equal size chunks by byte
+count, not line count.
+
+This function returns the lines for which the coderef evaluates as true.
+
+=head2 parallel_maplines
+
+  my (@result) = parallel_maplines { lc($_) } "file.txt", 10;
+
+Three parameters are requied: a coderef, filename, and number of simultanious
+child threads to use.
+
+This function performs similar to C<maplines()>, except that it does its'
+operations in parallel using C<fork()> and L<Parallel::WorkUnit>.  Because
+the code in the coderef is executed in a child process, any changes it makes
+to variables in high scopes will not be visible outside that single child.
+In general, it will be safest to not modify anything that belongs outside
+this scope.
+
+If a large amount of data is returned, the overhead of passing the data
+from child to parents may exceed the benefit of parallelization.  However,
+if there is substantial line-by-line processing, there likely will be a speedup,
+but trivial loops will not speed up.
+
+Note that the file will be read in several chunks, with each chunk being
+processed in a different thread.  This means that the child threads may be
+operating on very different sections of the file simultaniously and no specific
+order of execution of the coderef should be expected!  However, the results
+will be returned in the same order as C<maplines()> would return them.
+
+Otherwise, this function is identical to C<maplines()>.
+
+=head2 readlines
+
+  my (@result) = readlines "file.txt";
+
+This function simply returns an array of lines (without newlines) read from
+a file.
+
+=head1 OBJECT ORIENTED INTERFACE
+
+The object oriented interface was implemented in version 1.181860.
+
+=head2 new
+
+  my $byline = File::ByLine->new();
+
+Constructs a new object, suitable for the object oriented calls below.
+
+=head2 ATTRIBUTES
+
+=head3 file
+
+  my $current_file = $byline->file();
+  $byline->file("abc.txt");
+
+Gets and sets the default filename used by the methods in the object oriented
+interface.  The default value is C<undef> which indicates that no default
+filename is provided.
+
+=head3 header_skip
+
+  $byline->header_skip(1);
+
+Gets and sets whether the object oriented methods will skip the first line
+in the file (which you might want to do for a line that is a header).  This
+defaults to false.  Any true value will cause the header line to be skipped.
+
+You cannot set this to true while a C<header_handler> value is set.
+
+=head3 header_handler
+
+  $byline->header_handler( sub { ... } );
+
+Specifies code that should be executed on the header row of the input file.
+This defaults to C<undef>, which indicates no header handler is specified.
+When a header handler is specified, the first row of the file is sent to this
+handler, and is not sent to the code provided to the various do/grep/map/lines
+methods in the object oriented interface.
+
+The code is called with one parameter, the header line.  The header line is
+also stored in C<$_>.
+
+When set, this is always executed in the parent process, not in the child
+processes that are spawned (in the case of C<processes> being greater than
+one).
+
+You cannot set this to true while a C<header_skip> value is set.
+
+=head3 processes
+
+  my $procs = $byline->processes();
+  $byline->processes(10);
+
+This gets and sets the degree of parallelism most methods will use.  The
+default degree is C<1>, which indicates all tasks should only use a single
+process.  Specifying C<2> or greater will use multiple processes to operate
+on the file (see documentation for the parallel_* functions described above
+for more details).
+
+=head2 METHODS
+
+=head3 do
+
+  $byline->do( sub { ... }, "file.txt" );
+
+This performs the C<dolines> functionality, calling the code provided.  If
+the filename is not provided, the C<file> attribute is used for this.  See the
+C<dolines> and C<parallel_dolines> functions for more information on how this
+functions.
+
+The code is called with one parameter, the header line.  The header line is
+also stored in C<$_>.
+
+=head3 grep
+
+  my (@output) = $byline->grep( sub { ... }, "file.txt" );
+
+This performs the C<greplines> functionality, calling the code provided.  If
+the filename is not provided, the C<file> attribute is used for this.  See the
+C<greplines> and C<parallel_greplines> functions for more information on how
+this functions.
+
+The code is called with one parameter, the header line.  The header line is
+also stored in C<$_>.
+
+The output is a list of all input lines where the code reference produces a
+true result.
+
+=head3 map
+
+  my (@output) = $byline->map( sub { ... }, "file.txt" );
+
+This performs the C<maplines> functionality, calling the code provided.  If
+the filename is not provided, the C<file> attribute is used for this.  See the
+C<maplines> and C<parallel_maplines> functions for more information on how
+this functions.
+
+The code is called with one parameter, the header line.  The header line is
+also stored in C<$_>.
+
+The output is the list produced by calling the passed-in code repeatively
+for each line of input.
+
+=head3 lines
+
+  my (@output) = $byline->lines( "file.txt" );
+
+This performs the C<readlines> functionality.  If the filename is not provided,
+the C<file> attribute is used for this.  See the C<readlines> function for more
+information on how this functions.
+
+The output is a list of all input lines.
+
+Note that this function is unaffected by the value of the C<processes>
+attribute - it always executes in the parent process.
+
+=head1 SUGGESTED DEPENDENCY
+
+The L<Parallel::WorkUnit> module is a recommended dependency.  It is required
+to use the C<parallel_*> functions - all other functionality works fine without
+it.
+
+Some CPAN clients will automatically try to install recommended dependency, but
+others won't (L<cpan> often, but not always, will; L<cpanm> will not by
+default).  In the cases where it is not automatically installed, you need to
+install L<Parallel::WorkUnit> to get this functionality.
+
+=head1 AUTHOR
+
+Joelle Maslak <jmaslak@antelope.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Joelle Maslak.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

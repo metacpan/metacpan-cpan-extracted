@@ -1,5 +1,7 @@
 package XAO::Web;
+use warnings;
 use strict;
+use Encode;
 use Error qw(:try);
 use XAO::Utils;
 use XAO::Projects;
@@ -13,7 +15,7 @@ use XAO::Errors qw(XAO::Web);
 # XAO::Web version number. Hand changed with every release!
 #
 use vars qw($VERSION);
-$VERSION='1.47';
+$VERSION='1.70';
 
 ###############################################################################
 
@@ -141,7 +143,6 @@ sub analyze ($$;$$) {
     unshift(@$patharr,'');
     my $path=join('/',@$patharr);
 
-    ##
     # Looking for the object matching the path.
     #
     my $siteconfig=$self->config;
@@ -297,12 +298,17 @@ sub execute ($%) {
     my $self=shift;
     my $args=get_args(\@_);
 
-    # Setting dprint/eprint to Apache methods if needed
+    # Setting dprint/eprint to Apache or PSGI methods if needed
     #
     my $old_logprint_handler;
     if($args->{'apache'}) {
         $old_logprint_handler=XAO::Utils::set_logprint_handler(sub {
             $args->{'apache'}->server->warn($_[0]);
+        });
+    }
+    elsif($args->{'psgi'}) {
+        $old_logprint_handler=XAO::Utils::set_logprint_handler(sub {
+            $args->{'psgi'}->{'psgi.errors'}->print($_[0]."\n");
         });
     }
 
@@ -372,8 +378,19 @@ sub execute ($%) {
     # expected to print out the page. This is almost always true except
     # when page includes something like Redirect object.
     #
+    my $result;
     if(defined $header) {
-        if(my $r=$args->{'apache'}) {
+        if(my $env=$args->{'psgi'}) {
+
+            # Can't use $header, need an array that includes header_args
+            # and cookies.
+            #
+            $result=[
+                $args->{'cgi'}->psgi_header({ $self->config->header_array() }),
+                [ $pagetext ],
+            ];
+        }
+        elsif(my $r=$args->{'apache'}) {
             my $h=$self->config->header_args;
 
             if($mod_perl::VERSION && $mod_perl::VERSION >= 1.99) {
@@ -410,6 +427,10 @@ sub execute ($%) {
     # Restoring the default dprint/eprint handling
     #
     XAO::Utils::set_logprint_handler($old_logprint_handler) if $old_logprint_handler;
+
+    # Only really needed for PSGI
+    #
+    return $result;
 }
 
 ###############################################################################
@@ -480,13 +501,20 @@ sub _expand_list ($$) {
         return '';
     }
     elsif(ref($autolist) eq 'ARRAY') {
+        my $clipboard=$self->config->clipboard;
+
         for(my $i=0; $i<@$autolist; $i+=2) {
             my ($objname,$objargs)=@{$autolist}[$i,$i+1];
             my $obj=XAO::Objects->new(objname => $objname);
             $content.=$obj->expand($objargs);
+
+            # Not processing any more if there was a final output.
+            #
+            last if $clipboard->get('_no_more_output');
         }
     }
     elsif(ref($autolist) eq 'HASH') {
+        eprint "Using HASH auto-list is deprecated, use an ordered array";
         foreach my $objname (keys %{$autolist}) {
             my $obj=XAO::Objects->new(objname => $objname);
             $content.=$obj->expand($autolist->{$objname});
@@ -516,6 +544,7 @@ sub process ($%) {
     my $args=get_args(\@_);
 
     my $siteconfig=$self->config;
+    my $clipboard=$siteconfig->clipboard;
     my $sitename=$self->sitename;
 
     # Making sure path starts from a slash
@@ -552,6 +581,8 @@ sub process ($%) {
     my $apache=$args->{'apache'};
     my $cgi=$args->{'cgi'};
     if(!$cgi) {
+        !$args->{'psgi'} ||
+            throw XAO::E::Web "- need to have a CGI with PSGI";
         $cgi=XAO::Objects->new(objname => 'CGI', no_cgi => $pd->{'no_cgi'});
     }
     if($apache) {
@@ -606,20 +637,18 @@ sub process ($%) {
         $active_url_secure=$active_url;
     }
 
-    ##
     # Storing active URLs
     #
-    $siteconfig->clipboard->put(active_url => $active_url);
-    $siteconfig->clipboard->put(active_url_secure => $active_url_secure);
+    $clipboard->put(active_url => $active_url);
+    $clipboard->put(active_url_secure => $active_url_secure);
 
-    ##
     # Checking if we have base_url, assuming active_url if not.
     # Ensuring that URL does not end with '/'.
     #
     if($siteconfig->defined('base_url')) {
         my $url=$siteconfig->get('base_url');
         $url=~/^http:/i ||
-            throw XAO::E::Web "process - bad base_url ($url) for sitename=$sitename";
+            throw XAO::E::Web "- bad base_url ($url) for sitename=$sitename";
         my $nu=$url;
         chop($nu) while $nu =~ /\/$/;
         $siteconfig->put(base_url => $nu) if $nu ne $url;
@@ -642,13 +671,14 @@ sub process ($%) {
     # Checking if we're running under mod_perl
     #
     my $mod_perl=($apache || $ENV{'MOD_PERL'}) ? 1 : 0;
-    $siteconfig->clipboard->put(mod_perl => $mod_perl);
-    $siteconfig->clipboard->put(mod_perl_request => $apache);
+    $clipboard->put(mod_perl => $mod_perl);
+    $clipboard->put(mod_perl_request => $apache);
 
     # Checking if a charset is known for the site. If it is, setting
     # it up for CGI-params decoding and for output.
     #
-    if(my $charset=$siteconfig->get('charset')) {
+    my $charset=$siteconfig->get('charset');
+    if($charset) {
         if($cgi->can('set_param_charset')) {
             $cgi->set_param_charset($charset);
         }
@@ -669,7 +699,6 @@ sub process ($%) {
     $siteconfig->cgi($cgi);
     $siteconfig->embedded('web')->disable_special_access;
 
-    ##
     # Traditionally URLs that do not end with .foo are considered
     # directories and get an internal redirect to path/index.html
     # Sometimes it is desirable to be able to pass down any URLs without
@@ -699,7 +728,6 @@ sub process ($%) {
         eprint "Unknown urlstyle '$urlstyle' for $path";
     }
 
-    ##
     # Separator for the error_log :)
     #
     if(XAO::Utils::get_debug() && !$args->{'quieter'}) {
@@ -710,14 +738,9 @@ sub process ($%) {
                "path='$path', translated='$pd->{path}'";
     }
 
-    ##
     # Putting path decription into the site clipboard
     #
-    $siteconfig->clipboard->put(pagedesc => $pd);
-
-    # We accumulate page content here
-    #
-    my $pagetext='';
+    $clipboard->put(pagedesc => $pd);
 
     # Setting expiration time in the page header to immediate
     # expiration. If that's not what the page wants -- it can override
@@ -731,31 +754,57 @@ sub process ($%) {
     # Do we need to run any objects before executing? A good place to
     # turn on debug mode if required using Debug object.
     #
-    $pagetext.=$self->_expand_list($siteconfig->get('auto_before'));
+    my $pageheader=$self->_expand_list($siteconfig->get('auto_before'));
 
-    # Preparing object arguments out of standard ones, object specific
-    # once from template paths and supplied hash (in that order of
-    # preference).
+    # If the header issued a final output (commonly a redirect), then
+    # nothing else needs to be done.
     #
-    my $objargs={
-        path        => $pd->{'path'},
-        fullpath    => $pd->{'fullpath'},
-        prefix      => $pd->{'prefix'},
-    };
-    $objargs=merge_refs($objargs,$pd->{'objargs'},$args->{'objargs'});
+    my $pagebody='';
+    my $pagefooter='';
+    if(!$clipboard->get('_no_more_output')) {
 
-    # Loading page displaying object and executing it.
-    #
-    my $obj=XAO::Objects->new(objname => 'Web::' . $pd->{'objname'});
-    $pagetext.=$obj->expand($objargs);
+        # Preparing object arguments out of standard ones, object specific
+        # once from template paths and supplied hash (in that order of
+        # preference).
+        #
+        my $objargs={
+            path        => $pd->{'path'},
+            fullpath    => $pd->{'fullpath'},
+            prefix      => $pd->{'prefix'},
+        };
 
-    # Do we need to run any objects after executing? A good place to
-    # dump benchmark statistics for example.
-    #
-    $pagetext.=$self->_expand_list($siteconfig->get('auto_after'));
+        $objargs=merge_refs($objargs,$pd->{'objargs'},$args->{'objargs'});
 
-    # Done!
+        # Loading page displaying object and executing it.
+        #
+        my $obj=XAO::Objects->new(objname => 'Web::' . $pd->{'objname'});
+        $pagebody=$obj->expand($objargs);
+
+        # Do we need to run any objects after executing? A good place to
+        # dump benchmark statistics for example.
+        #
+        $pagefooter=$self->_expand_list($siteconfig->get('auto_after'));
+    }
+
+    # Done! Somewhat convoluted way of joining strings is here because
+    # the page header would be a unicode character string (even if
+    # it is really an empty string) and that would contaminate the
+    # concatenation and convert the resulting page text into a character
+    # string. That is not desirable if the output is a binary document.
     #
+    my $pagetext=join('',map {
+        Encode::is_utf8($_) ?  Encode::encode($charset || 'utf8',$_) : $_;
+    } ($pageheader,$pagebody,$pagefooter));
+
+    ### dprint "---length(pageheader)=".length($pageheader).", utf8=".Encode::is_utf8($pageheader);
+    ### dprint "---length(pagebody)=  ".length($pagebody).", utf8=".Encode::is_utf8($pagebody);
+    ### dprint "---length(pagefooter)=".length($pagefooter).", utf8=".Encode::is_utf8($pagefooter);
+    ### dprint "---length(pagetext)=  ".length($pagetext).", utf8=".Encode::is_utf8($pagetext);
+
+    $siteconfig->header_args(
+         -content_length    => length($pagetext),
+    );
+
     return $pagetext;
 }
 
@@ -765,10 +814,6 @@ sub process ($%) {
 
 Creates or loads a context for the named site. The only required
 argument is 'sitename' which provides the name of the site.
-
-Additionally `cgi' argument can point to a CGI object -- this is useful
-mostly in test cases when one does not want to use execute(), but new()
-comes handy.
 
 =cut
 
@@ -819,7 +864,7 @@ sub new ($%) {
     # CGI in args is not supported any more, needs to be passed in execute
     #
     $args->{'cgi'} &&
-        throw XAO::E::Web "new - 'cgi' argument to 'new' is not supported, pass it to 'execute'";
+        throw XAO::E::Web "- 'cgi' argument to 'new' is not supported, pass it to 'execute'";
 
     # This helps Mailer to be called outside of web context.
     # TODO: Probably need some better initialization strategy, this does

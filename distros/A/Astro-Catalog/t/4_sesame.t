@@ -70,7 +70,7 @@ SKIP: {
     }
 
     my $star2 = new Astro::Catalog::Star( id => 'V* HT Cas',
-                                          coords => new Astro::Coords( ra => '01 10 13.13',
+                                          coords => new Astro::Coords( ra => '01 10 13.12',
                                                                        dec => '+60 04 35',
                                                                        type => 'J2000' ),
                                         );

@@ -56,23 +56,23 @@
    "provides" : {
       "Module::Spec" : {
          "file" : "lib/Module/Spec.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.9.0"
       },
       "Module::Spec::OO" : {
          "file" : "lib/Module/Spec/OO.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.9.0"
       },
       "Module::Spec::V0" : {
          "file" : "lib/Module/Spec/V0.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.9.0"
       },
       "Module::Spec::V1" : {
          "file" : "lib/Module/Spec/V1.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.9.0"
       },
       "Module::Spec::V2" : {
          "file" : "lib/Module/Spec/V2.pm",
-         "version" : "v0.8.0"
+         "version" : "v0.9.0"
       }
    },
    "release_status" : "stable",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/aferreira/cpan-Module-Spec"
       }
    },
-   "version" : "0.8.0",
+   "version" : "0.9.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

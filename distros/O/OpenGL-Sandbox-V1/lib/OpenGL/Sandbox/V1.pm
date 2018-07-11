@@ -1,5 +1,5 @@
 package OpenGL::Sandbox::V1;
-BEGIN { $OpenGL::Sandbox::V1::VERSION = '0.02'; }
+BEGIN { $OpenGL::Sandbox::V1::VERSION = '0.03'; }
 use v5.14;
 use strict;
 use warnings;
@@ -12,6 +12,7 @@ use OpenGL::Sandbox qw/
 	glLoadIdentity glPushAttrib glPopAttrib glEnable glDisable glOrtho glFrustum glMatrixMode
 	glFrontFace glTranslated
 	GL_CURRENT_BIT GL_ENABLE_BIT GL_TEXTURE_2D GL_PROJECTION GL_CW GL_CCW GL_MODELVIEW
+	GL_LIGHTING GL_LIGHT0
 /;
 our @EXPORT_OK= qw(
 	local_matrix load_identity setup_projection scale trans trans_scale rotate mirror local_gl
@@ -19,60 +20,62 @@ our @EXPORT_OK= qw(
 	vertex plot_xy plot_xyz plot_st_xy plot_st_xyz plot_norm_st_xyz plot_rect plot_rect3
 	cylinder sphere disk partial_disk
 	compile_list call_list 
-	setcolor color_parts color_mult
+	setcolor color_parts color_mult set_light_ambient set_light_diffuse set_light_specular
+	set_light_position setup_sunlight
 	draw_axes_xy draw_axes_xyz draw_boundbox
-	get_viewport_rect
+	get_viewport_rect get_matrix
 );
 our %EXPORT_TAGS= (
 	all => \@EXPORT_OK,
 );
 
-use Inline
+use OpenGL::Sandbox::V1::Inline
 	CPP => do { my $x= __FILE__; $x =~ s|\.pm|\.cpp|; Cwd::abs_path($x) },
-	(defined $OpenGL::Sandbox::V1::VERSION? (
-		NAME => __PACKAGE__,
-		VERSION => __PACKAGE__->VERSION
-	) : () ),
 	LIBS => '-lGL -lGLU',
 	CCFLAGSEX => '-Wall -g3 -Os';
+
+use OpenGL::Sandbox::V1::DisplayList;
+# No ned to include Quadric.pm because it doesn't have any code in it, currently.
+# use OpenGL::Sandbox::V1::Quadric;
 
 # ABSTRACT: Various OpenGL tools and utilities that depend on the OpenGL 1.x API
 
 
 sub setup_projection {
 	my %args= @_ == 1 && ref($_[0]) eq 'HASH'? %{ $_[0] } : @_;
-	my ($ortho, $l, $r, $t, $b, $near, $far, $x, $y, $z, $aspect, $mirror_x, $mirror_y)
-		= delete @args{qw/ ortho left right top bottom near far x y z aspect mirror_x mirror_y /};
+	my ($ortho, $l, $r, $t, $b, $near, $far, $x, $y, $z, $w, $h, $aspect, $mirror_x, $mirror_y)
+		= delete @args{qw/ ortho left right top bottom near far x y z width height aspect mirror_x mirror_y /};
 	croak "Unexpected arguments to setup_projection"
 		if keys %args;
-	my $have_w= defined $l && defined $r;
-	my $have_h= defined $t && defined $b;
-	unless ($have_h && $have_w) {
+	$w= $r - $l if defined $l && defined $r;
+	$h= $t - $b if defined $t && defined $b;
+	unless (defined $w && defined $h) {
 		if (!$aspect or $aspect eq 'auto') {
-			my ($x, $y, $w, $h)= get_viewport_rect();
-			$aspect= $h / $h;
+			my ($x, $y, $vw, $vh)= get_viewport_rect();
+			$aspect= $vw && $vh? $vw / $vh : 1;
 		}
-		if (!$have_w) {
-			if (!$have_h) {
-				$t= (defined $b? -$b : 1) unless defined $t;
-				$b= -$t unless defined $b;
-			}
-			my $w= ($t - $b) * $aspect;
-			$r= (defined $l? $l + $w : $w / 2) unless defined $r;
-			$l= $r - $w unless defined $l;
+		# If neither, get creative.  Fall back to a Y-axis of -1..1
+		if (!defined $w && !defined $h) {
+			if    (defined $l) { $r= -$l; $w= $r-$l; }
+			elsif (defined $r) { $l= -$r; $w= $r-$l; }
+			elsif (defined $t) { $b= -$t; $h= $t-$b; }
+			elsif (defined $b) { $t= -$b; $h= $t-$b; }
+			else { $b= -1; $t= 1; $h= 2; }
 		}
-		else {
-			my $h= ($r - $l) / $aspect;
-			$t= (defined $b? $b + $h : $h / 2) unless defined $t;
-			$b= $t - $h unless defined $b;
-		}
+		# So now, we have height or have width.  Calc other from aspect.
+		$w //= $h * $aspect;
+		$h //= $w / $aspect;
 	}
-	($l, $r)= ($r, $l) if $mirror_x;
-	($t, $b)= ($b, $t) if $mirror_y;
-	$near= 1 unless defined $near;
-	$far= 1000 unless defined $far;
-	defined $_ or $_= 0
-		for ($x, $y, $z);
+	$r //= defined $l? $l + $w : $w / 2;
+	$l //= $r - $w;
+	$t //= defined $b? $b + $h : $h / 2;
+	$b //= $t - $h;
+	
+	$near //= $ortho? -1 : 1; # Frustum needs a positive near clipping plane.  Ortho can stay with GL default.
+	$far  //= 1000;
+	$x //= 0;
+	$y //= 0;
+	$z //= 0;
 	
 	# If Z is specified, then the left/right/top/bottom are interpreted to be the
 	# edges of the screen at this position.  Only matters for Frustum.
@@ -84,21 +87,20 @@ sub setup_projection {
 		$b *= $scale;
 	}
 	
+	# Apply mirror
+	($l, $r)= ($r, $l) if $mirror_x;
+	($t, $b)= ($b, $t) if $mirror_y;
+	# If mirror is in effect, need to tell OpenGL which winding means front-face
+	glFrontFace(!$mirror_x eq !$mirror_y? GL_CCW : GL_CW);
+	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	
-	#print "l=$l r=$r b=$b t=$t near=$near far=$far\n";
 	$ortho? glOrtho($l, $r, $b, $t, $near, $far)
 	      : glFrustum($l, $r, $b, $t, $near, $far);
-	
 	glTranslated(-$x, -$y, -$z)
 		if $x or $y or $z;
-	
-	# If mirror is in effect, need to tell OpenGL which way the camera is
-	glFrontFace(!$mirror_x eq !$mirror_y? GL_CCW : GL_CW);
 	glMatrixMode(GL_MODELVIEW);
 }
-
 
 
 sub local_matrix(&) { goto &_local_matrix }
@@ -123,11 +125,23 @@ sub cylinder        { default_quadric->cylinder(@_)     }
 sub sphere          { default_quadric->sphere(@_)       }
 sub disk            { default_quadric->disk(@_)         }
 sub partial_disk    { default_quadric->partial_disk(@_) }
+END { undef $default_quadric; } # cleanup before global destruction
 
 
 sub compile_list(&) { OpenGL::Sandbox::V1::DisplayList->new->compile(shift); }
 
 *call_list= *_displaylist_call;
+
+
+sub setup_sunlight {
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	load_identity();
+	set_light_ambient(GL_LIGHT0, 0.8, 0.8, 0.8, 0);
+ 	set_light_diffuse(GL_LIGHT0, 1.0, 1.0, 0.8, 0);
+	set_light_specular(GL_LIGHT0, 0.8, 0.8, 0.8, 0);
+	set_light_position(GL_LIGHT0, 0, 1, 0, 0);
+}
 
 
 sub draw_axes_xy {
@@ -273,6 +287,7 @@ sub draw_boundbox {
 	glPopAttrib();
 }
 
+
 1;
 
 __END__
@@ -287,7 +302,7 @@ OpenGL::Sandbox::V1 - Various OpenGL tools and utilities that depend on the Open
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 
@@ -306,11 +321,73 @@ Alias for glLoadIdentity
 
 =head3 setup_projection
 
+The default OpenGL context projects with a lower-left of (-1,-1) and upper-right of (1,1),
+with near and far clipping planes of (-1 .. 1).  This isn't terribly useful.
+
+  setup_projection( %opts )
+
+This function assists with setting up a coordinate system (either glOrtho or glFrustum) where
+the aspect ratio of the screen is preserved, and the Z coordinate is pre-translated to
+something in front of the near clipping plane.
+
+That last bit is hard to describe, but consider that you want a 3D frustum where the left edge
+of the screen is C<(-10,0,0)> and right edge of the screen is C<(10,0,0)>, and the top is at
+something that matches the aspect ration (like say, C<(0,.6,0)>) and near clipping
+plane is at C<z = -10>.  For that, simply call
+
+  setup_projection( left => -10, right => 10, near => 1, z => 11 );
+
+(near must be greater than zero, and 1 is a good choice.  So set C<Z = Near + 10>).
+If you had tried the similar
+
+  glFrustum(-10, 10, -.6, .6, 1, 1000);
+  glTranslate(0,0,-10);
+
+the left and right edges wouldn't be where you wanted after the call to glTranslate.  This
+method corrects for that.
+
+Options:
+
+=over
+
+=item C<left>, C<right>, C<top>, C<bottom>, C<width>, C<height>
+
+The edges of the screen at the near clipping plane.  Missing values will be calculated from
+others (such as C<left> from C<width> and C<right>) and as a last resort, the aspect ratio of
+the viewport.  (and viewport defaults to same dimensions as screen)  If nothing is given,
+it starts with a bottom of -1 and top of 1 and the rest from viewport aspect ratio.
+
+=item C<near>, C<far>
+
+The near and far clipping plane.  The near clipping plane is the pre-translation value passed
+to glOrtho or glFrustum.  The default C<far> is 1000.  The default C<near> is 1 for furstum
+and -1 for ortho.
+
+=item C<ortho>
+
+If true, calls glOrtho.  Else calls glFrustum.
+
+=item C<x>, C<y>, C<z>
+
+Coordinates of the desired origin, after setting up the ortho/frustum.
+
+=item C<apect>
+
+Override the aspect ratio used to calculate default width/height.
+
+=item C<mirror_x>, C<mirror_y>
+
+Set these (boolean) to flip the orientation of that axis.  If only one axis is flipped, then
+this also updates the value of C<glFrontFace> to C<GL_CW>.  Else it sets the value of
+C<glFrontFace> to C<GL_CCW> (the default).
+
+=back
+
 =head3 local_matrix
 
   local_matrix { ... };
 
-Wrap a block of code with glPushmatrix/glPopMatrix.  This wrapper also checks the matrix stack
+Wrap a block of code with glPushMatrix/glPopMatrix.  This wrapper also checks the matrix stack
 depth before and after the call, warns if they don't match, and performs any missing
 glPopMatrix calls.
 
@@ -328,7 +405,7 @@ Scale all axes (one argument), the x and y axes (2 arguments), or a normal call 
   trans $x, $y;
   trans $x, $y, $z;
 
-Translate along x,y or x,y,z axes.  Calls either glTranslate2f or glTranslate3f.
+Translate by x,y or x,y,z.  C<$z> defaults to 0 if not supplied.
 
 =head3 trans_scale
 
@@ -336,7 +413,7 @@ Translate along x,y or x,y,z axes.  Calls either glTranslate2f or glTranslate3f.
   trans_scale $x, $y, $x, $sx, $sy; # $sz=1
   trans_scale $x, $y, $x, $sx, $sy, $sz;
 
-Combination of glTranslate, then glScale.
+Combination of L</trans> then L</scale>.
 
 =head3 rotate
 
@@ -366,11 +443,17 @@ This is expensive, and should probably only be used for debugging.
 
 =head3 lines
 
-  lines { ... };  # wraps code with glBegin(GL_LINES); ... glEnd();
+  lines { ... };
+
+Wraps code with C<glBegin(GL_LINES);> ... C<glEnd();>, and also temporarily disables
+C<GL_TEXTURE_2D>.
 
 =head3 line_strip
 
-  line_strip { ... };  # wraps code with glBegin(GL_LINE_STRIP); ... glEnd();
+  line_strip { ... };
+
+Wraps code with C<glBegin(GL_LINE_STRIP);> ... C<glEnd();>, and also temporarily disables
+C<GL_TEXTURE_2D>.
 
 =head3 quads
 
@@ -488,7 +571,7 @@ Shortcut for L<OpenGL::Sandbox::V1::Quadric/sphere> on the L<default_quadric|Ope
 
   disk($inner_rad, $outer_rad, $slices, $stacks);
 
-Plot a disk around the Z axis with specified inner and outer radius.
+Plot a disk on XY plane around the Z axis with specified inner and outer radius.
 Shortcut for L<OpenGL::Sandbox::V1::Quadric/disk> on the L<default_quadric|OpenGL::Sandbox::ResMan/quadric>.
 
 =head3 partial_disk
@@ -541,6 +624,12 @@ formats as setcolor.
 
 Multiply each component of color1 by that component of color2.
 
+=head3 setup_sunlight
+
+This function enables a generic overhead light source similar to sunlight.  Light0 is set to
+a directional light source from above (+Y downward) with a slight yellow tinge and large
+ambient factor.  This is mostly useful for quick one-liner scripts to inspect shapes.
+
 =head2 MISC DRAWING
 
 =head3 draw_axes_xy
@@ -551,8 +640,8 @@ Multiply each component of color1 by that component of color2.
 Renders the X and Y axis as lines from C<-$range> to C<+$range>, with a thinner lines
 making a grid of C<$unit_size> squares on the X/Y plane.
 
-$range defaults to C<1>.  C<$unit_size> defaults to C<0.1>.  C<$color> defaults to the current
-color.
+$range defaults to C<1>.  C<$unit_size> defaults to C<0.1>.  C<$color> defaults to Red for the
+X axis and Green for the Y axis.
 
 Automatically disables textures for this operation.
 
@@ -570,6 +659,19 @@ Renders each of the X,Y,Z axes and the XY, XZ, YZ planes.
 Draw lines around a rectangle, and also a line from each corner to the origin, and the section
 of the X and Y axes that are within the bounds of the rectangle.
 This is useful for marking a 2D widget relative to the current coordinate system.
+
+=head2 GETs
+
+In general, "Get" is bad because if the data is coming from the graphics card it can be slow.
+However, they can be valuable for debugging.  These are perl-ified versions of glGetxxx:
+
+=head3 get_viewport_rect
+
+  my ($x, $y, $w, $h)= get_viewport_rect;
+
+=head3 get_matrix
+
+  my @matrix4x4= get_matrix(GL_MODELVIEW_MATRIX);
 
 =head1 AUTHOR
 

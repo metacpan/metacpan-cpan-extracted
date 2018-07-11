@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.600';
+our $VERSION = '1.601';
 
 use Exporter qw( import );
 
@@ -744,12 +744,13 @@ sub cut_to_printwidth {
             $cache->[$c] = char_width( $c )
         }
         if ( ( $total = $total + $cache->[$c] ) > $_[1] ) {
-            if ( $cache->[$c] == 1 ) {
-                return substr( $_[0], 0, $count ), substr( $_[0], $count ) if $_[2];
-                return substr( $_[0], 0, $count );
+            if ( ( $total - $cache->[$c] ) < $_[1] ) {
+                return substr( $_[0], 0, $count ) . ' ', substr( $_[0], $count ) if $_[2];
+                return substr( $_[0], 0, $count ) . ' ';
             }
-            return substr( $_[0], 0, $count ) . ' ', substr( $_[0], $count ) if $_[2];
-            return substr( $_[0], 0, $count ) . ' ';
+            return substr( $_[0], 0, $count ), substr( $_[0], $count ) if $_[2];
+            return substr( $_[0], 0, $count );
+
         }
         ++$count;
     }

@@ -8,6 +8,7 @@ MANIFEST.SKIP
 README
 t/01all.t
 t/02fail.t
+t/03-test-perl-file.t
 t/04cover.t
 t/00-load.t
 t/90-pod.t

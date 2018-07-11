@@ -14,7 +14,7 @@ use AnyEvent::WebSocket::Connection;
 use PerlX::Maybe qw( maybe provided );
 
 # ABSTRACT: WebSocket client for AnyEvent
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 
 has timeout => (
@@ -224,7 +224,7 @@ AnyEvent::WebSocket::Client - WebSocket client for AnyEvent
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -486,6 +486,8 @@ Kivanc Yazan (KYZN)
 Yanick Champoux (YANICK)
 
 Fayland Lam (FAYLAND)
+
+Daniel Kamil Kozar (xavery)
 
 =head1 COPYRIGHT AND LICENSE
 

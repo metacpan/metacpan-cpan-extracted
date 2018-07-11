@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SR830;
-$Lab::Moose::Instrument::SR830::VERSION = '3.653';
+$Lab::Moose::Instrument::SR830::VERSION = '3.660';
 #ABSTRACT: Stanford Research SR830 Lock-In Amplifier
 
 use 5.010;
@@ -19,10 +19,19 @@ with qw(
     Lab::Moose::Instrument::Common
 );
 
+has empty_buffer_count =>
+    ( is => 'ro', isa => 'Lab::Moose::PosInt', default => 1 );
+
 sub BUILD {
     my $self = shift;
     $self->clear();
     $self->cls();
+
+    # When killing a script with Ctrl-C, garbage might remain in the output
+    # buffer. Try read and catch possible timeout exception with eval.
+    for ( 1 .. $self->empty_buffer_count ) {
+        eval { $self->read( timeout => 1 ); };
+    }
 }
 
 
@@ -396,7 +405,7 @@ Lab::Moose::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.653
+version 3.660
 
 =head1 SYNOPSIS
 

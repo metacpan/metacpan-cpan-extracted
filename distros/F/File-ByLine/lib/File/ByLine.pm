@@ -6,7 +6,7 @@
 #
 
 package File::ByLine;
-$File::ByLine::VERSION = '1.005';
+$File::ByLine::VERSION = '1.181861';
 use v5.10;
 
 # ABSTRACT: Line-by-line file access loops
@@ -17,6 +17,11 @@ use autodie;
 
 use Carp;
 use Fcntl;
+use File::ByLine::Object;
+use Scalar::Util qw(reftype);
+
+# Object with default options
+our $OBJ = File::ByLine::Object->new();
 
 
 #
@@ -37,19 +42,18 @@ our @EXPORT_OK =
 sub dolines (&$) {
     my ( $code, $file ) = @_;
 
-    return _forlines_chunk( $code, $file, 1, 0 );
+    return $OBJ->do( $code, $file );
 }
 
 
 sub forlines ($&) {
     my ( $file, $code ) = @_;
 
-    return _forlines_chunk( $code, $file, 1, 0 );
+    return $OBJ->do( $code, $file );
 }
 
 
 sub parallel_dolines (&$$) {
-    _require_parallel();
     my ( $code, $file, $procs ) = @_;
 
     if ( !defined($procs) ) {
@@ -58,21 +62,14 @@ sub parallel_dolines (&$$) {
 
     if ( $procs <= 0 ) { croak("Number of processes must be >= 1"); }
 
-    my $wu = Parallel::WorkUnit->new();
-    $wu->asyncs( $procs, sub { return _forlines_chunk( $code, $file, $procs, $_[0] ); } );
-    my (@linecounts) = $wu->waitall();
+    my $byline = File::ByLine::Object->new();
+    $byline->processes($procs);
 
-    my $total_lines = 0;
-    foreach my $cnt (@linecounts) {
-        $total_lines += $cnt;
-    }
-
-    return $total_lines;
+    return $byline->do( $code, $file );
 }
 
 
 sub parallel_forlines ($$&) {
-    _require_parallel();
     my ( $file, $procs, $code ) = @_;
 
     if ( !defined($procs) ) {
@@ -81,29 +78,21 @@ sub parallel_forlines ($$&) {
 
     if ( $procs <= 0 ) { croak("Number of processes must be >= 1"); }
 
-    my $wu = Parallel::WorkUnit->new();
-    $wu->asyncs( $procs, sub { return _forlines_chunk( $code, $file, $procs, $_[0] ); } );
-    my (@linecounts) = $wu->waitall();
+    my $byline = File::ByLine::Object->new();
+    $byline->processes($procs);
 
-    my $total_lines = 0;
-    foreach my $cnt (@linecounts) {
-        $total_lines += $cnt;
-    }
-
-    return $total_lines;
+    return $byline->do( $code, $file );
 }
 
 
 sub greplines (&$) {
     my ( $code, $file ) = @_;
 
-    my $lines = _grep_chunk( $code, $file, 1, 0 );
-    return @$lines;
+    return $OBJ->grep( $code, $file );
 }
 
 
 sub parallel_greplines (&$$) {
-    _require_parallel();
     my ( $code, $file, $procs ) = @_;
 
     if ( !defined($procs) ) {
@@ -112,17 +101,17 @@ sub parallel_greplines (&$$) {
 
     if ( $procs <= 0 ) { croak("Number of processes must be >= 1"); }
 
-    my $wu = Parallel::WorkUnit->new();
-    $wu->asyncs( $procs, sub { return _grep_chunk( $code, $file, $procs, $_[0] ); } );
-    return map { @$_ } $wu->waitall();
+    my $byline = File::ByLine::Object->new();
+    $byline->processes($procs);
+
+    return $byline->grep( $code, $file );
 }
 
 
 sub maplines (&$) {
     my ( $code, $file ) = @_;
 
-    my $mapped_lines = _map_chunk( $code, $file, 1, 0 );
-    return @$mapped_lines;
+    return $OBJ->map( $code, $file );
 }
 
 
@@ -135,211 +124,27 @@ sub parallel_maplines (&$$) {
 
     if ( $procs <= 0 ) { croak("Number of processes must be >= 1"); }
 
-    my $wu = Parallel::WorkUnit->new();
-    $wu->asyncs( $procs, sub { return _map_chunk( $code, $file, $procs, $_[0] ); } );
-    return map { @$_ } $wu->waitall();
+    my $byline = File::ByLine::Object->new();
+    $byline->processes($procs);
+
+    return $byline->map( $code, $file );
 }
 
 
 sub readlines ($) {
     my ($file) = @_;
 
-    my @lines;
-
-    open my $fh, '<', $file or die($!);
-
-    while (<$fh>) {
-        chomp;
-        push @lines, $_;
-    }
-
-    close $fh;
-
-    return @lines;
+    return $OBJ->lines($file);
 }
 
-# Internal function to perform a for loop on a single chunk of the file.
 #
-# Procs should be >= 1.  It represents the number of chunks the file
-# has.
+# Object Oriented Interface
 #
-# Part should be >= 0 and < Procs.  It represents the zero-indexed chunk
-# number this invocation is processing.
-sub _forlines_chunk {
-    my ( $code, $file, $procs, $part ) = @_;
 
-    my ( $fh, $end ) = _open_and_seek( $file, $procs, $part );
+sub new {
+    shift;    # Remove the first parameter because we want to specify the class.
 
-    my $lineno = 0;
-    while (<$fh>) {
-        $lineno++;
-
-        chomp;
-        $code->($_);
-
-        # If we're reading multi-parts, do we need to end the read?
-        if ( ( $end > 0 ) && ( tell($fh) > $end ) ) { last; }
-    }
-
-    close $fh;
-
-    return $lineno;
-}
-
-# Internal function to perform a grep on a single chunk of the file.
-#
-# Procs should be >= 1.  It represents the number of chunks the file
-# has.
-#
-# Part should be >= 0 and < Procs.  It represents the zero-indexed chunk
-# number this invocation is processing.
-sub _grep_chunk {
-    my ( $code, $file, $procs, $part ) = @_;
-
-    my ( $fh, $end ) = _open_and_seek( $file, $procs, $part );
-
-    my @lines;
-    while (<$fh>) {
-        chomp;
-
-        if ( $code->($_) ) {
-            push @lines, $_;
-        }
-
-        # If we're reading multi-parts, do we need to end the read?
-        if ( ( $end > 0 ) && ( tell($fh) > $end ) ) { last; }
-    }
-
-    close $fh;
-    return \@lines;
-}
-
-# Internal function to perform a map on a single chunk of the file.
-#
-# Procs should be >= 1.  It represents the number of chunks the file
-# has.
-#
-# Part should be >= 0 and < Procs.  It represents the zero-indexed chunk
-# number this invocation is processing.
-sub _map_chunk {
-    my ( $code, $file, $procs, $part ) = @_;
-
-    my ( $fh, $end ) = _open_and_seek( $file, $procs, $part );
-
-    my @mapped_lines;
-    while (<$fh>) {
-        chomp;
-        push @mapped_lines, $code->($_);
-
-        # If we're reading multi-parts, do we need to end the read?
-        if ( ( $end > 0 ) && ( tell($fh) > $end ) ) { last; }
-    }
-
-    close $fh;
-    return \@mapped_lines;
-}
-
-# Internal function to facilitate reading a file in chunks.
-#
-# If parts == 1, this basically just opens the file (and returns -1 for
-# end, to be discussed later)
-#
-# If parts > 1, then this divides the file (by byte count) into that
-# many parts, and then seeks to the first character at the start of a
-# new line in that part (lines are attributed to the part in which they
-# end).
-#
-# It also returns an end position - no line starting *after* the end
-# position is in the relevant chunk.
-#
-# part_number is zero indexed.
-#
-# For part_number >= 1, the first valid character is actually start + 1
-# If a line actually starts at the first position, we treat it as
-# part of the previous chunk.
-#
-# If no lines would start in a given chunk, this seeks to the end of the
-# file (so it gives an EOF on the first read)
-sub _open_and_seek {
-    my ( $file, $parts, $part_number ) = @_;
-
-    if ( !defined($parts) )       { $parts       = 1; }
-    if ( !defined($part_number) ) { $part_number = 0; }
-
-    if ( $parts <= $part_number ) {
-        confess("Part Number must be greater than number of parts");
-    }
-    if ( $parts <= 0 ) {
-        confess("Number of parts must be > 0");
-    }
-    if ( $part_number < 0 ) {
-        confess("Part Number must be greater or equal to 0");
-    }
-
-    open my $fh, '<', $file or die($!);
-
-    # If this is a single part request, we are done here.
-    # We use -1, not size, because it's possible the read is from a
-    # terminal or pipe or something else that can grow.
-    if ( $parts == 0 ) {
-        return ( $fh, -1 );
-    }
-
-    # This is a request for part of a multi-part document.  How big is
-    # it?
-    seek( $fh, 0, Fcntl::SEEK_END );
-    my $size = tell($fh);
-
-    # Special case - more threads than needed.
-    if ( $parts > $size ) {
-        if ( $part_number > $size ) { return ( $fh, -1 ) }
-
-        # We want each part to be one byte, basically.  Not fractiosn of
-        # a byte.
-        $parts = $size;
-    }
-
-    # Figure out start and end size
-    my $start = int( $part_number * ( $size / $parts ) );
-    my $end = int( $start + ( $size / $parts ) );
-
-    # Seek to start position
-    seek( $fh, $start, Fcntl::SEEK_SET );
-
-    # Read and discard junk to the end of line.
-    # But ONLY for parts other than the first one.  We basically assume
-    # all parts > 1 are starting mid-line.
-    if ( $part_number > 0 ) {
-        scalar(<$fh>);
-    }
-
-    # Special case - allow file to have grown since first read to end
-    if ( ( $parts - 1 ) == $part_number ) {
-        return ( $fh, -1 );
-    }
-
-    # Another special case...  If we're already past the end, seek to
-    # the end.
-    if ( tell($fh) > $end ) {
-        seek( $fh, 0, Fcntl::SEEK_END );
-    }
-
-    # We return the file at this position.
-    return ( $fh, $end );
-}
-
-sub _require_parallel {
-    if ( scalar(@_) != 0 ) { confess 'invalid call'; }
-
-    require Parallel::WorkUnit
-      or die("You must install Parallel::WorkUnit to use the parallel_* methods");
-
-    if ( $Parallel::WorkUnit::VERSION < 1.117 ) {
-        die( "Parallel::WorkUnit version 1.117 or newer required. You have "
-              . $Parallel::WorkUnit::Version );
-    }
-
-    return;
+    return File::ByLine::Object->new(@_);
 }
 
 
@@ -357,45 +162,86 @@ File::ByLine - Line-by-line file access loops
 
 =head1 VERSION
 
-version 1.005
+version 1.181861
 
 =head1 SYNOPSIS
 
   use File::ByLine;
 
   #
-  # Execute a routine for each line of a file
+  # Procedural Interface (Simple!)
   #
-  dolines { say "Line: $_" } "file.txt";
-  forlines "file.txt", { say "Line: $_" };
 
-  #
+  # Execute a routine for each line of a file
+  dolines { say "Line: $_" } "file.txt";
+  forlines "file.txt", sub { say "Line: $_" };
+
   # Grep (match) lines of a file
-  #
   my (@result) = greplines { m/foo/ } "file.txt";
 
-  #
   # Apply a function to each line and return result
-  #
   my (@result) = maplines { lc($_) } "file.txt";
 
-  #
   # Parallelized forlines/dolines routines
   # (Note: Requires Parallel::WorkUnit to be installed)
-  #
   parallel_dolines { foo($_) } "file.txt", 10;
-  parallel_forlines "file.txt", 10, { foo($_); };
+  parallel_forlines "file.txt", 10, sub { foo($_); };
 
-  #
   # Parallelized maplines and greplines
-  #
   my (@result) = parallel_greplines { m/foo/ } "file.txt", 10;
   my (@result) = parallel_maplines  { lc($_) } "file.txt", 10;
 
-  #
   # Read an entire file, split into lines
-  #
   my (@result) = readlines "file.txt";
+
+
+  #
+  # Functional Interface
+  #
+
+  # Execute a routine for each line of a file
+  my $byline = File::ByLine->new();
+  $byline->do( sub { say "Line: $_" }, "file.txt");
+
+  # Grep (match) lines of a file
+  my $byline = File::ByLine->new();
+  my (@result) = $byline->grep( sub { m/foo/ }, "file.txt");
+
+  # Apply a function to each line and return result
+  my $byline = File::ByLine->new();
+  my (@result) = $byline->map( sub { lc($_) }, "file.txt");
+
+  # Parallelized routines
+  # (Note: Requires Parallel::WorkUnit to be installed)
+  my $byline = File::ByLine->new();
+  $byline->processes(10);
+  $byline->do( sub { foo($_) }, "file.txt");
+  my (@grep_result) = $byline->grep( sub { m/foo/ }, "file.txt");
+  my (@map_result)  = $byline->map( sub { lc($_) }, "file.txt");
+
+  # Skip the header line
+  my $byline = File::ByLine->new();
+  $byline->skip_header(1);
+  $byline->do( sub { foo($_) }, "file.txt");
+  my (@grep_result) = $byline->grep( sub { m/foo/ }, "file.txt");
+  my (@map_result)  = $byline->map( sub { lc($_) }, "file.txt");
+
+  # Process the header line
+  my $byline = File::ByLine->new();
+  $byline->header_handler( sub { say $_; } );
+  $byline->do( sub { foo($_) }, "file.txt");
+  my (@grep_result) = $byline->grep( sub { m/foo/ }, "file.txt");
+  my (@map_result)  = $byline->map( sub { lc($_) }, "file.txt");
+
+  # Read an entire file, split into lines
+  my (@result) = readlines "file.txt";
+
+  # Alternative way of specifying filenames
+  my $byline = File::ByLine->new();
+  $byline->file("file.txt")
+  $byline->do( sub { foo($_) } );
+  my (@grep_result) = $byline->grep( sub { m/foo/ } );
+  my (@map_result)  = $byline->map( sub { lc($_) } );
 
 =head1 DESCRIPTION
 
@@ -426,7 +272,7 @@ the C<forlines()> syntax.
 
 =head2 forlines
 
-  forlines "file.txt", { say "Line: $_" };
+  forlines "file.txt", sub { say "Line: $_" };
   forlines "file.txt", \&func;
 
 This function calls a coderef once for each line in the file.  The file is read
@@ -474,7 +320,7 @@ from C<parallel_forlines()>.
 
 =head2 parallel_forlines
 
-  my (@result) = parallel_forlines "file.txt", 10, { foo($_) };
+  my (@result) = parallel_forlines "file.txt", 10, sub { foo($_) };
 
 Requires L<Parallel::WorkUnit> to be installed.
 
@@ -608,6 +454,124 @@ Otherwise, this function is identical to C<maplines()>.
 
 This function simply returns an array of lines (without newlines) read from
 a file.
+
+=head1 OBJECT ORIENTED INTERFACE
+
+The object oriented interface was implemented in version 1.181860.
+
+=head2 new
+
+  my $byline = File::ByLine->new();
+
+Constructs a new object, suitable for the object oriented calls below.
+
+=head2 ATTRIBUTES
+
+=head3 file
+
+  my $current_file = $byline->file();
+  $byline->file("abc.txt");
+
+Gets and sets the default filename used by the methods in the object oriented
+interface.  The default value is C<undef> which indicates that no default
+filename is provided.
+
+=head3 header_skip
+
+  $byline->header_skip(1);
+
+Gets and sets whether the object oriented methods will skip the first line
+in the file (which you might want to do for a line that is a header).  This
+defaults to false.  Any true value will cause the header line to be skipped.
+
+You cannot set this to true while a C<header_handler> value is set.
+
+=head3 header_handler
+
+  $byline->header_handler( sub { ... } );
+
+Specifies code that should be executed on the header row of the input file.
+This defaults to C<undef>, which indicates no header handler is specified.
+When a header handler is specified, the first row of the file is sent to this
+handler, and is not sent to the code provided to the various do/grep/map/lines
+methods in the object oriented interface.
+
+The code is called with one parameter, the header line.  The header line is
+also stored in C<$_>.
+
+When set, this is always executed in the parent process, not in the child
+processes that are spawned (in the case of C<processes> being greater than
+one).
+
+You cannot set this to true while a C<header_skip> value is set.
+
+=head3 processes
+
+  my $procs = $byline->processes();
+  $byline->processes(10);
+
+This gets and sets the degree of parallelism most methods will use.  The
+default degree is C<1>, which indicates all tasks should only use a single
+process.  Specifying C<2> or greater will use multiple processes to operate
+on the file (see documentation for the parallel_* functions described above
+for more details).
+
+=head2 METHODS
+
+=head3 do
+
+  $byline->do( sub { ... }, "file.txt" );
+
+This performs the C<dolines> functionality, calling the code provided.  If
+the filename is not provided, the C<file> attribute is used for this.  See the
+C<dolines> and C<parallel_dolines> functions for more information on how this
+functions.
+
+The code is called with one parameter, the header line.  The header line is
+also stored in C<$_>.
+
+=head3 grep
+
+  my (@output) = $byline->grep( sub { ... }, "file.txt" );
+
+This performs the C<greplines> functionality, calling the code provided.  If
+the filename is not provided, the C<file> attribute is used for this.  See the
+C<greplines> and C<parallel_greplines> functions for more information on how
+this functions.
+
+The code is called with one parameter, the header line.  The header line is
+also stored in C<$_>.
+
+The output is a list of all input lines where the code reference produces a
+true result.
+
+=head3 map
+
+  my (@output) = $byline->map( sub { ... }, "file.txt" );
+
+This performs the C<maplines> functionality, calling the code provided.  If
+the filename is not provided, the C<file> attribute is used for this.  See the
+C<maplines> and C<parallel_maplines> functions for more information on how
+this functions.
+
+The code is called with one parameter, the header line.  The header line is
+also stored in C<$_>.
+
+The output is the list produced by calling the passed-in code repeatively
+for each line of input.
+
+=head3 lines
+
+  my (@output) = $byline->lines( "file.txt" );
+
+This performs the C<readlines> functionality.  If the filename is not provided,
+the C<file> attribute is used for this.  See the C<readlines> function for more
+information on how this functions.
+
+The output is a list of all input lines.
+
+Note that this function is unaffected by the value of the C<processes>
+attribute - it always executes in the parent process.
 
 =head1 SUGGESTED DEPENDENCY
 

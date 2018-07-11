@@ -1,0 +1,17 @@
+Revision history for perl distribution CellBIS-SQL-Abstract
+
+0.5       2018-07-07 10:05:29+08:00 Asia/Makassar
+          Abstract.pm - Remove "say" on subroutine "select"
+
+0.4       2018-07-07 09:13:36+08:00 Asia/Makassar
+          Fixed bugs on "select" method and update "02-select.t"
+
+0.3       2018-07-06 10:29:32+08:00 Asia/Makassar
+          - Fixed bug dependency
+
+0.2       2018-07-06 08:28:04+08:00 Asia/Makassar
+          - Fixed bugs for Perl 5.10.1
+          - Add unit test file for "select-join", "insert", "update" and "delete"
+
+0.1       2018-07-05 22:09:15+08:00 Asia/Makassar
+          First Release CellBIS::SQL::Abstract

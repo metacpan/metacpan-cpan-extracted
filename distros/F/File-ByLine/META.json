@@ -26,7 +26,9 @@
       },
       "develop" : {
          "requires" : {
-            "Test::More" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::TrailingSpace" : "0.0203",
@@ -41,6 +43,7 @@
             "Carp" : "0",
             "Exporter" : "0",
             "Fcntl" : "0",
+            "Scalar::Util" : "0",
             "autodie" : "0",
             "perl" : "v5.10.0",
             "strict" : "0",
@@ -48,10 +51,16 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
             "File::Temp" : "0",
             "Test2::Require::Module" : "0",
             "Test2::V0" : "0",
+            "Test::More" : "0",
             "Test::UseAllModules" : "0.17"
          }
       }
@@ -59,7 +68,11 @@
    "provides" : {
       "File::ByLine" : {
          "file" : "lib/File/ByLine.pm",
-         "version" : "1.005"
+         "version" : "1.181861"
+      },
+      "File::ByLine::Object" : {
+         "file" : "lib/File/ByLine/Object.pm",
+         "version" : "1.181861"
       }
    },
    "release_status" : "stable",
@@ -73,7 +86,10 @@
          "web" : "https://github.com/jmaslak/File-ByLine"
       }
    },
-   "version" : "1.005",
+   "version" : "1.181861",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -39,7 +39,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.141",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.143",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -324,15 +324,15 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/ETHER.pm",
-         "version" : "0.142"
+         "version" : "0.143"
       },
       "Dist::Zilla::PluginBundle::Author::ETHER" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/ETHER.pm",
-         "version" : "0.142"
+         "version" : "0.143"
       },
       "Pod::Weaver::PluginBundle::Author::ETHER" : {
          "file" : "lib/Pod/Weaver/PluginBundle/Author/ETHER.pm",
-         "version" : "0.142"
+         "version" : "0.143"
       }
    },
    "release_status" : "stable",
@@ -350,7 +350,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.142",
+   "version" : "0.143",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -546,6 +546,7 @@
                      "CONTRIBUTING",
                      "INSTALL",
                      "LICENCE",
+                     "META.json",
                      "README.pod"
                   ],
                   "exclude_match" : [],
@@ -904,6 +905,11 @@
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@Author::ETHER/Authors",
                         "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::AllowOverride",
+                        "name" : "@Author::ETHER/allow override AUTHOR",
+                        "version" : "0.05"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Contributors",
@@ -1361,7 +1367,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.142",
+                  "tag" : "v0.143",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },

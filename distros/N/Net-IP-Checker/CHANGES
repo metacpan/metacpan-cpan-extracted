@@ -1,0 +1,60 @@
+==================================================
+Changes from 2017-07-09 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.02 at 2018-07-09 11:16:34 +0000
+-----------------------------------------
+
+  Change: 370d3bbfb39dc05f3ae9e4f300ff6d009feae884
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-09 14:16:04 +0000
+
+    Fixed pod 
+
+  Change: 8a9c360ea49a8aa387fad050aba98f5aefb4e28c
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-09 13:43:05 +0000
+
+    Fixed some pod and Dist::Zilla::Plugin::GithubMeta 
+
+  Change: 392a33668660a1bc7a793c47c507f10b3d2521af
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-09 13:17:12 +0000
+
+    Refactoring to Net::IP::Checker and adding more tests 
+
+  Change: cdf80687d77bcef707132a08e3c3efbf601163c9
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-11-28 15:50:44 +0000
+
+    Incorporate changes from Net::IP 1.26 
+
+  Change: 29428016b6fc07a7e97ae0b421429df7f66466e8
+  Author: Jon Portnoy <avenj@cpan.org>
+  Date : 2012-09-13 10:06:16 +0000
+
+    [rt.cpan.org #79612] s/_ip_is_ipv4/ip_is_ipv4/ on line 53
+
+    Just a leading '_' on line 53 (_ip_is_ipv4), manifests when checking
+    v4-in-v6 addresses:
+
+    use Test::Simple tests => 1;
+
+    use strict; use warnings FATAL => 'all';
+
+    use Net::IP::Minimal 'ip_is_ipv6';
+
+    ok( ip_is_ipv6( '::ff00:192.0.0.1' ), 'v6-encapsulated v4' );
+
+    Signed-off-by: Chris 'BinGOs' Williams <chris@bingosnet.co.uk> 
+
+  Change: bbb800f8a37dd75b564690c8a45e1c097f9ec2f8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-11-17 15:34:11 +0000
+
+    Are you chicken, boy. 
+
+================
+End of releases.
+================

@@ -38,6 +38,10 @@ Allows you to set page type to something different then default
 "text/html". If you set type the template would not be displayed! If you
 still need it - call Header again without "type" argument.
 
+Setting type to anything other than text/... switches the output to byte
+mode, the same as calling $config->force_byte_output(1). It also removes
+the "charset" extention on the Content-Type header.
+
 =back
 
 Would pass the folowing arguments to the template:
@@ -89,8 +93,7 @@ use XAO::Utils qw(:args :debug :html);
 use XAO::Objects;
 use base XAO::Objects->load(objname => 'Web::Page');
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: Header.pm,v 2.4 2005/12/27 04:10:22 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION='2.004';
 
 ###############################################################################
 # Displaying HTML header.
@@ -99,8 +102,18 @@ sub display ($;%) {
     my $self=shift;
     my $args=get_args(\@_);
 
-    if($args->{'type'}) {
-        $self->siteconfig->header_args(-type => $args->{type});
+    if(my $content_type=$args->{'type'}) {
+        $self->siteconfig->header_args(-type => $content_type);
+
+        # For older code compatibility, whenever the page content type is
+        # switched away from text/* the default output is in bytes, not
+        # characters.
+        #
+        if($content_type !~ /^text\//) {
+            $self->siteconfig->force_byte_output(1);
+            $self->siteconfig->header_args(-charset => '');
+        }
+
         return;
     }
 

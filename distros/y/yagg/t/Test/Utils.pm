@@ -5,7 +5,7 @@ use Exporter;
 use Test::More;
 use FileHandle;
 use File::Temp;
-use File::Slurp;
+use File::Slurper qw(read_text write_text);
 
 use vars qw( @EXPORT @ISA );
 
@@ -51,11 +51,11 @@ sub Do_Diff
 
   $exclude_pattern = '' unless defined $exclude_pattern;
 
-  my @data1 = read_file($filename);
+  my @data1 = read_text($filename, undef, 1);
   s/$exclude_pattern//g foreach @data1;
   @data1 = grep { $_ ne '' } @data1;
 
-  my @data2 = read_file($output_filename);
+  my @data2 = read_text($output_filename, undef, 1);
 
   is_deeply(\@data1,\@data2,"$filename compared to $output_filename");
 }
@@ -106,7 +106,7 @@ sub Broken_Pipe
   my $script_path = catfile($TEMPDIR,'broken_pipe.pl');
   my $dev_null = devnull();
 
-  write_file($script_path, <<EOF);
+  write_text($script_path, <<EOF, undef, 1);
 unless (open B, '-|')
 {
   open(F, "|$^X -pe 'print' 2>$dev_null");

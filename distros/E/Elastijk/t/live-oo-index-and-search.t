@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Test::More;
+use Test2::V0;
 
 unless ($ENV{TEST_LIVE}) {
     plan skip_all => "Set env TEST_LIVE=1 to run this test."
@@ -16,9 +16,18 @@ my $test_index_name = "test_index_$$".rand();
 my $es = Elastijk->new(
     host => 'localhost',
     port => '9200',
-    index => $test_index_name,
 );
 
+$res = $es->get(path => '/');
+my $es_server_version = $res->{version}{number};
+my $es_version_5_or_newer = ($es_server_version ge '5.0.0');
+
+$es->{index} = $test_index_name;
+
+my $Str = { type => "string" };
+if ($es_version_5_or_newer) {
+    $Str = { type => 'text' };
+}
 
 ## create the index, and index some documents.
 $res = $es->put(
@@ -33,14 +42,14 @@ $res = $es->put(
         mappings => {
             cafe => {
                 properties => {
-                    name => { type => "string" },
-                    address => { type => "string" }
+                    name => $Str,
+                    address => $Str,
                 }
             }
         }
     }
 );
-ok $es->exists( index => $test_index_name ), "The newly created index doe exist.";
+ok $es->exists( index => $test_index_name ), "The newly created index do exist.";
 
 subtest "index 2 documents" => sub {
     my $sources = [{
@@ -62,9 +71,15 @@ subtest "index 2 documents" => sub {
     for(my $i = 0; $i < @$sources; $i++) {
         my $source = $sources->[$i];
         my ($action, $res2) = (%{$res->{items}[$i]});
-        is $action, 'create';
+
+        if ($es_version_5_or_newer) {
+            is $action, 'index';
+        } else {
+            is $action, 'create';
+        }
+
         my $res3 = $es->get( type => "cafe", id => $res2->{_id} );
-        is_deeply($res3->{_source}, $source);
+        is($res3->{_source}, $source);
     }
 };
 
@@ -105,7 +120,7 @@ subtest "index a single document, then get it." => sub {
     ok defined($id), "the new document id is found.";
 
     $res = $es->get( type => "cafe", id => $id );
-    is_deeply($res->{_source}, $source, "The _source match our original document.");
+    is($res->{_source}, $source, "The _source match our original document.");
 };
 
 subtest "index 2 documents with the value of 'type' attribute in the object." => sub {
@@ -135,9 +150,15 @@ subtest "index 2 documents with the value of 'type' attribute in the object." =>
     for(my $i = 0; $i < @$sources; $i++) {
         my $source = $sources->[$i];
         my ($action, $res2) = (%{$res->{items}[$i]});
-        is $action, 'create';
+
+        if ($es_version_5_or_newer) {
+            is $action, 'index';
+        } else {
+            is $action, 'create';
+        }
+
         my $res3 = $es->get( type => "cafe", id => $res2->{_id} );
-        is_deeply($res3->{_source}, $source);
+        is($res3->{_source}, $source);
     }
 };
 

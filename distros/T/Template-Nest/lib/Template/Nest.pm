@@ -6,7 +6,7 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new{
 	my ($class,%opts) = @_;
@@ -186,11 +186,12 @@ sub _fill_in{
 
 
     my @frags = split( /\\\\/, $template );
+    my $tda = $self->{token_delims}[0];
+    my $tdb = $self->{token_delims}[1];
+
     foreach my $param_name (keys %$param){
 
         my $param_val = $param->{$param_name};
-        my $tda = $self->{token_delims}[0];
-        my $tdb = $self->{token_delims}[1];
         
         my $replaced = 0;
         for my $i (0..$#frags){
@@ -199,6 +200,13 @@ sub _fill_in{
 
         }
         confess "Could not replace template param '$param_name': token does not exist in template '$template_name'" unless $replaced;
+
+    }
+
+    # replace any params that weren't specified with ''
+    for my $i (0..$#frags){
+
+        $frags[$i] =~ s/(?<!\\)$tda.*?$tdb//g;
 
     }
 

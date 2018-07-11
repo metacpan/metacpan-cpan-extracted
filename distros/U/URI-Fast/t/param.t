@@ -35,6 +35,18 @@ subtest 'param' => sub{
         is $uri->query, "fnord=slack${sep}foo=bar${sep}foo=baz${sep}qux=corge", 'updated: query';
       };
 
+      subtest 'whitespace in value' => sub{
+        my $uri = uri;
+        $uri->param('foo', 'bar baz');
+        is $uri->param('foo'), 'bar baz', 'param: expected result';
+        is $uri->query, 'foo=bar%20baz', 'param: expected result from query';
+
+        $uri = uri;
+        $uri->add_param('foo', 'bar baz');
+        is $uri->param('foo'), 'bar baz', 'add_param: expected result from param';
+        is $uri->query, 'foo=bar%20baz', 'add_param: expected result from query';
+      };
+
       subtest 'edge cases' => sub {
         subtest 'empty parameter' => sub {
           my $uri = uri 'http://www.test.com?foo=';

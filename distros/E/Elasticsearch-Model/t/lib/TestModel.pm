@@ -9,10 +9,26 @@ my $document_types = {
     c => 'DocumentTypeC',
 };
 
+my $index_settings = {
+    number_of_shards   => 2,
+    number_of_replicas => 2,
+    refresh_interval   => '2s',
+    blocks => {
+        read_only_allow_delete => 'false',
+    },
+    max_result_window => 100000,
+};
 for my $document_type (keys %$document_types) {
     index $document_type => (
         namespace => 'test_elasticsearch_model',
         type => $document_types->{$document_type},
+        shards   => 1,
+        replicas => 1,
+        refresh_interval   => '1s',
+        blocks => {
+            read_only_allow_delete => 'false',
+        },
+        index_settings => $index_settings,
     );
 }
 

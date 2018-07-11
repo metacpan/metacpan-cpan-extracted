@@ -238,14 +238,14 @@ L<XAO::DO::Web::Utility>.
 
 =cut
 
+###############################################################################
 package XAO::DO::Web::MultiPageNav;
 use strict;
 use XAO::Utils;
 use XAO::Errors qw(XAO::DO::Web::MultiPageNav);
 use base XAO::Objects->load(objname => 'Web::Page');
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: MultiPageNav.pm,v 2.2 2005/09/14 22:05:43 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION='2.002';
 
 ###############################################################################
 # Displaying multi page navigation display

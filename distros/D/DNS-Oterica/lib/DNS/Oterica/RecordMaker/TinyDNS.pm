@@ -1,8 +1,8 @@
-use strict;
-use warnings;
 package DNS::Oterica::RecordMaker::TinyDNS;
 # ABSTRACT: a tinydns recordmaker for DNSO.
-$DNS::Oterica::RecordMaker::TinyDNS::VERSION = '0.304';
+$DNS::Oterica::RecordMaker::TinyDNS::VERSION = '0.311';
+use Moose;
+
 #pod =head1 DESCRIPTION
 #pod
 #pod This role provides logic for generating lines for the F<tinydns-data> program
@@ -10,10 +10,25 @@ $DNS::Oterica::RecordMaker::TinyDNS::VERSION = '0.304';
 #pod
 #pod =cut
 
+has suppress_duplicate_a => (
+  is  => 'ro',
+  isa => 'Bool',
+  default => 1,
+);
+
+has _a_cache => (
+  is => 'ro',
+  default => sub {  {}  },
+);
+
 sub _default_ttl { 1800 }
 
 sub _serial_number {
-  return($ENV{DNS_OTERICA_SN} || $^T)
+  return($ENV{DNS_OTERICA_SN} || '')
+}
+
+sub _timestamp {
+  return($ENV{DNS_OTERICA_TS} || '')
 }
 
 #pod =method comment
@@ -61,14 +76,24 @@ sub __ip_locode_pairs {
 sub _generic {
   my ($self, $op, $rec) = @_;
 
+  my $cache = $self->_a_cache;
+
   my @lines;
-  for my $if ($self->__ip_locode_pairs($rec)) {
+  INTERFACE: for my $if ($self->__ip_locode_pairs($rec)) {
+    if ($op eq '+') {
+      my $key = join q{/}, $rec->{name}, @$if;
+      if ($cache->{$key}++) {
+        push @lines, $self->comment("skipped duplicate + for $key");
+        next INTERFACE;
+      }
+    }
+
     push @lines, sprintf "%s%s:%s:%s:%s:%s\n",
       $op,
       $rec->{name},
       $if->[0],
       $rec->{ttl} || $self->_default_ttl,
-      $self->_serial_number,
+      $self->_timestamp,
       $if->[1],
     ;
   }
@@ -88,7 +113,7 @@ sub a_and_ptr {
   my ($self, $rec) = @_;
 
   return (
-    $self->_generic(q{+}, $rec),
+    $self->a($rec),
     $self->ptr($rec),
   );
 }
@@ -118,13 +143,15 @@ sub ptr {
       $extended_arpa,
       $rec->{name},
       $rec->{ttl} || $self->_default_ttl,
-      $self->_serial_number,
+      $self->_timestamp,
       $if->[1] eq 'FB' ? '' : $if->[1];
   }
 
   return @lines;
 }
 
+# Zfqdn:mname:rname:ser:ref:ret:exp:min:ttl:timestamp:lo
+#
 # TODO find out why we generate Z and & records for our IPs and refactor this
 # to not duplicate effort with &ptr and the like. problem is that &a calls &ptr
 # so having the code there means it gets called for every time we generate a +
@@ -148,7 +175,7 @@ sub soa_and_ns_for_ip {
     $ns_1,
     $addr,
     $self->_default_ttl,
-    $self->_serial_number,
+    $self->_timestamp,
     '',
   ;
 
@@ -187,7 +214,7 @@ sub mx {
       $mx_name,
       $rec->{dist} || 10,
       $rec->{ttl} || $self->_default_ttl,
-      $self->_serial_number,
+      $self->_timestamp,
       $if->[1],
     ;
   }
@@ -209,7 +236,7 @@ sub domain {
     $rec->{ip} || '',
     $rec->{ns},
     $rec->{ttl} || $self->_default_ttl,
-    $self->_serial_number,
+    $self->_timestamp,
     '',
   ;
 
@@ -221,12 +248,13 @@ sub soa_and_ns {
 
   my @lines;
 
-  push @lines, sprintf "Z%s:%s:%s::::::%s:%s:%s\n",
+  push @lines, sprintf "Z%s:%s:%s:%s:::::%s:%s:%s\n",
     $rec->{domain},
     $rec->{ns} || '',
     $rec->{node}->hub->soa_rname,
-    $rec->{ttl} || $self->_default_ttl,
     $self->_serial_number,
+    $rec->{ttl} || $self->_default_ttl,
+    $self->_timestamp,
     '',
   ;
 
@@ -244,7 +272,7 @@ sub cname {
     $rec->{cname},
     $rec->{domain} || '',
     $rec->{ttl} || $self->_default_ttl,
-    $self->_serial_number,
+    $self->_timestamp,
     '',
   ;
 
@@ -266,7 +294,7 @@ sub txt {
     $name,
     _colon_safe($rec->{text}),
     $rec->{ttl} || $self->_default_ttl,
-    $self->_serial_number,
+    $self->_timestamp,
     '',
   ;
 
@@ -387,7 +415,8 @@ sub dkim {
     $rec->{ttl} || $self->_default_ttl;
 }
 
-1;
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 
@@ -401,7 +430,7 @@ DNS::Oterica::RecordMaker::TinyDNS - a tinydns recordmaker for DNSO.
 
 =head1 VERSION
 
-version 0.304
+version 0.311
 
 =head1 DESCRIPTION
 
@@ -476,7 +505,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

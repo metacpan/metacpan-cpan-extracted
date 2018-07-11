@@ -4,7 +4,7 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0.4"
+            "Test::More" : "0.4",
+            "perl" : "5.006"
          }
       }
    },
@@ -42,6 +43,6 @@
          "url" : "https://github.com/Corion/parent"
       }
    },
-   "version" : "0.236",
-   "x_serialization_backend" : "JSON::PP version 2.27202"
+   "version" : "0.237",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
 }

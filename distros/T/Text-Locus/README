@@ -1,0 +1,36 @@
+Text::Locus version 1.00
+========================
+
+Text::Locus provides a class for representing locations in text
+files. A simple location consists of file name and line number.
+e.g. "file:10". In its more complex form the location represents a
+text fragment spanning several lines, such as "file:10-45". Such a
+fragment need not be contiguous, a valid location can also look like
+this: "file:10-35,40-48". Moreover, it can span multiple files as
+well: "foo:10-35,40-48;bar:15,18".
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2018 by Sergey Poznyakoff
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+
+It is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this library. If not, see <http://www.gnu.org/licenses/>.    

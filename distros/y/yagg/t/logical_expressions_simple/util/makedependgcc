@@ -6,11 +6,11 @@
 # versions of gcc/g++. Call it like:
 # makedependgcc g++ -M -Idir1 -Idir2 input.cc -o input.o
 
-my $VERSION = 0.20;
-
 use strict;
 use Getopt::Std;
-use File::Slurp;
+use File::Slurper qw(read_text write_text);
+
+my $VERSION = 0.20;
 
 die usage() if !@ARGV || $ARGV[0] =~ /--help/;
 
@@ -28,14 +28,14 @@ unless ($opts{'f'})
 
 my $makefile_name = Get_Makefile_Name();
 
-my $makefile_text = read_file($makefile_name);
+my $makefile_text = read_text($makefile_name, undef, 1);
 
 $makefile_text = Remove_Old_Dependencies($makefile_text)
   unless $opts{'a'};
 
 if ($opts{'r'})
 {
-  write_file($makefile_name, $makefile_text);
+  write_text($makefile_name, $makefile_text, undef, 1);
   exit;
 }
 
@@ -43,7 +43,7 @@ Back_Up_Makefile($makefile_name) unless $opts{'B'};
 
 $makefile_text = Add_Dependencies($makefile_text, $dependencies);
 
-write_file($makefile_name, $makefile_text);
+write_text($makefile_name, $makefile_text, undef, 1);
 
 exit;
 
@@ -70,7 +70,10 @@ sub Get_Dependencies
 
   my $dependencies = `@commands`;
 
-  exit 1 if $?;
+  if ($?) {
+    warn "$0: compiler command failed";
+    exit 1;
+  }
 
   # New versions of g++ are buggy. They write the output to the file
   # specified by the -o flag instead of dumping to the screen. Plus the -o
@@ -80,7 +83,7 @@ sub Get_Dependencies
   {
     my ($output_filename) = "@commands" =~ /-o (\S+)/;
 
-    my $dependencies = read_file($output_filename);
+    my $dependencies = read_text($output_filename, undef, 1);
 
     unlink $output_filename;
 

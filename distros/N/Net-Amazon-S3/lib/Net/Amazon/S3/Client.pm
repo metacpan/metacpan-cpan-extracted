@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client;
-$Net::Amazon::S3::Client::VERSION = '0.80';
+$Net::Amazon::S3::Client::VERSION = '0.82';
 use Moose 0.85;
 use HTTP::Status qw(is_error status_message);
 use MooseX::StrictConstructor 0.16;
@@ -140,7 +140,7 @@ Net::Amazon::S3::Client - An easy-to-use Amazon S3 client
 
 =head1 VERSION
 
-version 0.80
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -163,7 +163,7 @@ version 0.80
   my $bucket = $client->create_bucket(
     name                => $bucket_name,
     acl_short           => 'private',
-    location_constraint => 'US',
+    location_constraint => 'us-east-1',
   );
 
   # or use an existing bucket
@@ -206,7 +206,7 @@ may change.
   my $bucket = $client->create_bucket(
     name                => $bucket_name,
     acl_short           => 'private',
-    location_constraint => 'US',
+    location_constraint => 'us-east-1',
   );
 
 =head2 bucket
@@ -223,11 +223,11 @@ may change.
 
 =head1 AUTHOR
 
-Rusty Conover <rusty@luckydinosaur.com>
+Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

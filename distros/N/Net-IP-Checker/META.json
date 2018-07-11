@@ -1,0 +1,49 @@
+{
+   "abstract" : "IPv4/IPv6 addresses validator",
+   "author" : [
+      "Pavel Serikov <pavelsr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-IP-Checker",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Regexp::IPv4" : "0",
+            "Regexp::IPv6" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/pavelsr/net-ip-minimal",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pavelsr/net-ip-minimal.git",
+         "web" : "https://github.com/pavelsr/net-ip-minimal"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
+}
+

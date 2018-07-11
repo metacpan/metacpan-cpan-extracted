@@ -1,5 +1,5 @@
 package Alien::LibBigWig;
-$Alien::LibBigWig::VERSION = '0.3.3';
+$Alien::LibBigWig::VERSION = '0.4.2';
 
 use strict;
 use warnings;
@@ -34,11 +34,9 @@ __END__
   well-known location, "File::ShareDir::dist_dir('Alien-LibBigWig')", from
   whence other packages can make use of them.
 
-  The version installed will be version 0.3.3.
+  The version installed will be version 0.4.2.
 
 =head1 COPYRIGHT AND LICENSE
-
-Copyright [2015-2017] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

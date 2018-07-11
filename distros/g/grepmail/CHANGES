@@ -1,3 +1,18 @@
+Version 5.3109:
+- Switch to File::Slurper
+
+Version 5.3108:
+- Disable "check redirect to input file" feature on Windows, where apparently it
+  doesn't work. 
+
+Version 5.3107:
+- Trying once again to fix the compile test on windows
+
+Version 5.3106:
+- Check in standard tests, including one that skips the compile check on Windows
+- Attempt to be more compatible with CPAN testing, which apparently doesn't
+  support symlinks
+
 Version 5.3105:
 - Add standard tests
 - Search headers of attachments, such as filename. Thanks Jim Diamond

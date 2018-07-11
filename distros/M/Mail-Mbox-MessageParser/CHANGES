@@ -1,3 +1,15 @@
+Version 1.5110:
+- Updating META.yml
+
+Version 1.5109:
+- Switch to File::Slurper
+
+Version 1.5108:
+- Trying once again to fix the compile test on windows
+
+Version 1.5107:
+- Check in standard tests, including one that skips the compile check on Windows
+
 Version 1.5106:
 - Add standard tests
 - Detect mailboxes that contain a mix of newline types. Complain about it, but

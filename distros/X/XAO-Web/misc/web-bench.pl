@@ -1,11 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # Quick-n-dirty script to benchmark web sites using ApacheBench, there
-# is much more to ApacheBench then this..
+# is much more to ApacheBench than this..
 # XAO Inc., Andrew Maltsev, am@xao.com
 
-use HTTPD::Bench::ApacheBench;
-
+use warnings;
 use strict;
+use HTTPD::Bench::ApacheBench;
 
 my $repeat=int(shift(@ARGV) || 100);
 my $thread=int(shift(@ARGV) || 5);

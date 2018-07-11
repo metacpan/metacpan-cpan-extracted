@@ -31,4 +31,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ferz/Catalyst--Helper--View--SemanticUI
-version: '0.0001'
+version: '0.0002'

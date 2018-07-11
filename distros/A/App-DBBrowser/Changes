@@ -1,6 +1,15 @@
 Revision history for App-DBBrowser
 
 
+2.018    2018-07-09
+        - Don't put Version in every pm.
+        - Bugfix join-menu.
+
+2.017    2018-07-06
+        - Bugfix undefined database.
+        - New option 'squash spaces'.
+        - Minimum version "Term::TablePrint" is "0.068".
+
 2.016    2018-07-03
         - Minimum version "Term::Choose" is "1.600".
         - Minimum version "Term::Choose::Util" is "0.065".

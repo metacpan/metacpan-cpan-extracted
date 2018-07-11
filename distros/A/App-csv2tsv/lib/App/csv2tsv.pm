@@ -10,11 +10,11 @@ App::csv2tsv - A command transforming from CSV to TSV handling tab/line-ends wit
 
 =head1 VERSION
 
-Version 0.52
+Version 0.56
 
 =cut
 
-our $VERSION = '0.52';
+our $VERSION = '0.56';
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,7 @@ csv2tsv [B<-t> str] [B<-n> str] [-v] [-Q] [-2] [B<-~>] file
 Transforms CSV formatted data (cf. RFC4180) into TSV formated data.
 Input is assumed to be UTF-8.
 (The input line ends can be both CRLF or LF. The output line ends are LF.)
-Warnings/erros would be properly printed on STDERR (as far as the author of
+Warnings/errors would be properly printed on STDERR (as far as the author of
 this program experienced).
 
 =head1 EXAMPLE 

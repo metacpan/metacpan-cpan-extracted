@@ -1,4 +1,0 @@
-name="Elastijk"
-authority="cpan:GUGOD"
-license="mit"
-badges = ['travis', 'coveralls']

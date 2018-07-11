@@ -35,6 +35,7 @@
          "requires" : {
             "DateTime::Format::Indonesian" : "0",
             "Exporter::Rinci" : "0",
+            "IO::Socket::SSL" : "2.009",
             "Log::ger" : "0.023",
             "Mojo::UserAgent" : "0",
             "Parse::Date::Month::ID" : "0",
@@ -72,7 +73,7 @@
          "web" : "https://github.com/perlancar/perl-Finance-Currency-Convert-BI"
       }
    },
-   "version" : "0.062",
+   "version" : "0.063",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -167,7 +168,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.592"
+            "version" : "0.593"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -198,6 +199,22 @@
             "class" : "Dist::Zilla::Plugin::CheckMetaResources",
             "name" : "@Author::PERLANCAR/CheckMetaResources",
             "version" : "0.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckSelfDependency",
+            "config" : {
+               "Dist::Zilla::Plugin::CheckSelfDependency" : {
+                  "finder" : [
+                     ":InstallModules"
+                  ]
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Author::PERLANCAR/CheckSelfDependency",
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",

@@ -10,11 +10,11 @@ App::saikoro - A random number (matrix) generator of uniform distributions. Saik
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ use utf8;
 use Test::BDD::Cucumber::Definitions qw(C Given When Then);
 use Test::BDD::Cucumber::Definitions::Var qw(Var);
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -78,6 +78,21 @@ sub import {
         qr/переменной сценария "(.+?)" присвоено случайное значение длиной "(.*)" символов/,
         sub {
         Var->scenario_var_random( $1, $2 );
+        };
+
+=pod
+
+Создание переменной с элементом структуры данных:
+
+    Given переменной сценария "user" присвоен элемент структуры данных "$.user"
+
+=cut
+
+    #        var scenario var "(.+?)" struct "(.*)"
+    Given
+        qr/переменной сценария "(.+?)" присвоен элемент структуры данных "(.*)"/,
+        sub {
+        Var->scenario_var_struct( $1, $2 );
         };
 
     return;

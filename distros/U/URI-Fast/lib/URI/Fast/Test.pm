@@ -35,7 +35,7 @@ sub isnt_same_uri {
 
 =head1 NAME
 
-URI::Fast::Test
+URI::Fast::Test - Unit test comparisons for URI::Fast objects
 
 =head1 SYNOPSIS
 
@@ -75,5 +75,17 @@ functions. The return value's structure is:
     query  => $uri->query_hash,
     frag   => $uri->frag,
   }
+
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Jeff Ober. This is free software; you
+can redistribute it and/or modify it under the same terms as the Perl 5
+programming language system itself.
+
+=cut
 
 =cut

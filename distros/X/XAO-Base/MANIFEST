@@ -23,21 +23,21 @@ misc/cache-benchmark
 misc/cache-benchmark.res-chain
 misc/cache-benchmark.res-hash
 test.pl
-testcases/Base/Cache.pm
-testcases/Base/DOConfig.pm
-testcases/Base/Errors.pm
-testcases/Base/Objects.pm
-testcases/Base/Projects.pm
-testcases/Base/SimpleHash.pm
-testcases/Base/Utils.pm
-testcases/Base/XAOBase.pm
-testcases/Base/base.pm
-testcases/testroot/XAO/DO/Test1.pm
-testcases/testroot/XAO/DO/Test2.pm
-testcases/testroot/projects/test/objects/Config.pm
-testcases/testroot/projects/test/objects/EmbeddableTest.pm
-testcases/testroot/projects/test/objects/LocalConf.pm
-testcases/testroot/projects/test/objects/Test1.pm
-testcases/testroot/projects/test/objects/Thrower.pm
+t/testcases/base.pm
+t/testcases/Cache.pm
+t/testcases/DOConfig.pm
+t/testcases/Errors.pm
+t/testcases/Objects.pm
+t/testcases/Projects.pm
+t/testcases/SimpleHash.pm
+t/testcases/Utils.pm
+t/testcases/XAOBase.pm
+t/xao/XAO/DO/Test1.pm
+t/xao/XAO/DO/Test2.pm
+t/xao/projects/test/objects/Config.pm
+t/xao/projects/test/objects/EmbeddableTest.pm
+t/xao/projects/test/objects/LocalConf.pm
+t/xao/projects/test/objects/Test1.pm
+t/xao/projects/test/objects/Thrower.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -15,6 +15,13 @@ notices are identical to remarks (they only differ in their position
 in RDAP responses), this module inherits everything from
 L<Net::RDAP::Remark>.
 
+Any object which inherits from L<Net::RDAP::Object> will have an
+C<notices()> method which will return an array of zero or more
+L<Net::RDAP::Notice> objects; however, only the top-most object in an
+RDAP response will have notices, since they relate to the RDAP
+I<service> rather than the specific object contained in the
+response.
+
 =head1 COPYRIGHT
 
 Copyright 2018 CentralNic Ltd. All rights reserved.

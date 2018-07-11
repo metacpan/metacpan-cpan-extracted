@@ -17,10 +17,14 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Role::Tiny' => '2.000005',
+                                      'Role::Tiny' => '2.000006',
                                       'Sub::Inject' => 'v0.3.0',
                                       'experimental' => '0',
-                                      'perl' => '5.018'
+                                      'feature' => '0',
+                                      'perl' => '5.018',
+                                      'strict' => '0',
+                                      'utf8' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -30,7 +34,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0.96'
+                                   'Test::More' => '0.96',
+                                   'constant' => '0'
                                  }
                  }
      };

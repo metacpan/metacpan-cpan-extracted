@@ -128,6 +128,9 @@ PUBLIC METHODS
     Grants or revoke permission of a specified key or range to a specified
     role.
 
+        $etcd->role_perm(
+            { name => 'myrole', key => 'bar', permType => 'READ', prefix => 1 } )->grant;
+
   user_role
     See Net::Etcd::User::Role
 

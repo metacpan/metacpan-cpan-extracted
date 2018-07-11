@@ -1,9 +1,35 @@
 ==================================================
-Changes from 2017-07-03 00:00:00 +0000 to present.
+Changes from 2017-07-10 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.020 at 2018-07-03 20:33:20 +0000
+version 0.021 at 2018-07-10 08:56:22 +0000
+------------------------------------------
+
+  Change: c3cb5f4fbb89e855aef9c90cf4b4836c48c0dbf5
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-07-04 14:16:40 +0000
+
+    Add ./snake.pl -s (silent) option to disable audio
+
+    audio doesn't work at the moment... 
+
+  Change: 0d8c4fd32b37fba0812c6da60349e5dc2ce26efd
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-07-04 13:25:52 +0000
+
+    Zero-extend shorter vectors in addition 
+
+  Change: 55d0ef7716f9540ec45379d12b0f93be45e183fe
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-07-04 10:22:57 +0000
+
+    Don't fail if Test::HexString is not available
+
+    fallback to Test::More::is instead. 
+
+------------------------------------------
+version 0.020 at 2018-07-03 20:26:25 +0000
 ------------------------------------------
 
   Change: 9de13b58b22af11a06a6654796227cf21eaea332
@@ -407,5 +433,5 @@ version 0.003 at 2017-10-04 14:27:50 +0000
     Bigger bitmaps ran into size limits before. 
 
 ================================================
-Plus 2 releases after 2017-07-03 00:00:00 +0000.
+Plus 2 releases after 2017-07-10 00:00:00 +0000.
 ================================================

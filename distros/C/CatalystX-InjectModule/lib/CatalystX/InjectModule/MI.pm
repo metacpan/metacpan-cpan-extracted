@@ -1,6 +1,6 @@
 use utf8;
 package CatalystX::InjectModule::MI;
-$CatalystX::InjectModule::MI::VERSION = '0.12';
+$CatalystX::InjectModule::MI::VERSION = '0.13';
 # This plugin is inspired by :
 # - CatalystX::InjectComponent
 # - Catalyst::Plugin::AutoCRUD
@@ -248,7 +248,7 @@ sub _merge_resolved_configs {
         # Merge all keys except these
         map { delete $mod_conf->{$_} } qw /name version deps catalyst_plugins dbix_fixtures /;
 
-        $self->ctx->config( Catalyst::Utils::merge_hashes($self->ctx->config, $mod_conf) );
+        $self->ctx->config( Catalyst::Utils::merge_hashes( $mod_conf, $self->ctx->config ) );
     }
 }
 
@@ -514,7 +514,7 @@ CatalystX::InjectModule::MI Catalyst Module injector
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

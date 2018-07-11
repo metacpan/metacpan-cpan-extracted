@@ -1,3 +1,8 @@
+0.153   2018-07-10 (PERLANCAR)
+
+	- Add prereq to IO::Socket::SSL 2.009 [CT].
+
+
 0.152   2018-06-27 (PERLANCAR)
 
 	- Rename module/dist from Finance::Currency::Convert::{KlikBCA,BCA}.

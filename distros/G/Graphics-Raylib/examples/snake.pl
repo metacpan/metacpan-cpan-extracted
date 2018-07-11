@@ -19,7 +19,10 @@ use Graphics::Raylib '+family';
 use Graphics::Raylib::XS ':all';
 use Graphics::Raylib::Util qw(vector rectangle);
 use Cwd 'abs_path';
+use Getopt::Std;
 use File::Basename 'dirname';
+
+getopts 's', \my %opts;
 
 use constant SNAKE_LENGTH => 256;
 use constant SQUARE_SIZE  =>  31;
@@ -35,8 +38,10 @@ my (%fruit, @snake, @snakePosition, $allowMove, %offset, $counterTail);
 # Initialization
 my $g = Graphics::Raylib->window(screenWidth, screenHeight);
 
-InitAudioDevice();
-$fruit{sound} = LoadSound("share/coin.wav");
+unless ($opts{s}) {
+    InitAudioDevice();
+    $fruit{sound} = LoadSound("share/coin.wav");
+}
 InitGame();
 
 $g->fps(60);
@@ -79,7 +84,7 @@ sub InitGame {
     $fruit{size}   = vector(SQUARE_SIZE, SQUARE_SIZE);
     $fruit{color}  = SKYBLUE;
     $fruit{active} = 0;
-    PlaySound($fruit{sound});
+    PlaySound($fruit{sound}) if defined $fruit{sound};
 }
 
 # Update game (one frame)
@@ -157,7 +162,7 @@ sub UpdateGame {
                 $snake[$counterTail]{position} = $snakePosition[$counterTail - 1];
                 $counterTail += 1;
                 $fruit{active} = 0;
-                PlaySound($fruit{sound});
+                PlaySound($fruit{sound}) if defined $fruit{sound};
             }
 
             $framesCounter++;
@@ -204,8 +209,10 @@ sub DrawGame {
 # Unload game variables
 sub UnloadGame {
     # TODO: Unload all dynamic loaded data (textures, sounds, models...)
-    UnloadSound($fruit{sound});
-    CloseAudioDevice();
+    if (defined $fruit{sound}) {
+        UnloadSound($fruit{sound});
+        CloseAudioDevice();
+    }
 }
 
 # Update and Draw (one frame)

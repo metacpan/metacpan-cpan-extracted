@@ -1,7 +1,7 @@
 package Dancer2::Plugin::Showterm;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Replay terminal typescript captures
-$Dancer2::Plugin::Showterm::VERSION = '0.0.1';
+$Dancer2::Plugin::Showterm::VERSION = '0.0.2';
 
 use strict;
 use warnings;
@@ -36,7 +36,7 @@ sub BUILD {
 
     $self->app->add_route(
         method => 'get',
-        regexp => qr/.*\.showterm\//,
+        regexp => qr/.*\.showterm/,
         code => sub {
             my $app = shift;
             ( my $file = $app->request->path ) =~ s/\.showterm$/\.typescript/;
@@ -77,7 +77,7 @@ Dancer2::Plugin::Showterm - Replay terminal typescript captures
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,7 @@ The plugin assumes that the captured screen is 80 columns by 24 rows.
     $ echo '---' | cat - timing >> typescript
     $ mv typescript /path/to/dancer/app/public/myscreen.typescript
 
-Note that the c<typescript> file the plugin uses is the concatenation of the
+Note that the C<typescript> file the plugin uses is the concatenation of the
 original produced typescript with its timing file, separated with a type dash 
 on a single line.
 

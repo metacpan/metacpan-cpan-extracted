@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-msdoc
 
+1.02 2018-07-09T16:46:59Z
+
+    - Add --separator option, default ' ' for .xlsx document.
+    - Better colors?
+
 1.01 2018-07-02T07:22:33Z
 
     - Trial buggy implementation using in-memory file.

@@ -5,8 +5,6 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.016';
-
 use Encode qw( encode );
 
 use Encode::Locale qw();

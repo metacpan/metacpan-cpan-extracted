@@ -21,4 +21,5 @@ WriteMakefile(
     INC               => join(' ', @INC),
     LIBS              => [ join(' ', @LIBS) ],
     depend            => { 'Scan.c' => "$inc_files $src_files" },
+    LICENSE           => 'gpl_2',
 );

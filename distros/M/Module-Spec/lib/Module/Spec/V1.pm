@@ -1,6 +1,6 @@
 
 package Module::Spec::V1;
-$Module::Spec::V1::VERSION = '0.8.0';
+$Module::Spec::V1::VERSION = '0.9.0';
 # ABSTRACT: Load modules based on V1 specifications
 use 5.012;
 
@@ -76,7 +76,8 @@ sub need_module {
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
-    return _need_module( $opts, $m, @v );
+    return _need_module( $opts, $m, @v ) unless $opts->{try};
+    return _try_module( $opts, $m, @v );
 }
 
 # generate_code($spec, \%opts);
@@ -110,6 +111,11 @@ sub need_modules {
         @_ = map { [ $_ => $_[0]{$_} ] } keys %{ $_[0] };
     }
     goto &$sub;
+}
+
+sub try_modules {
+    unshift @_, '-any';
+    goto &need_modules;
 }
 
 sub _need_all_modules {
@@ -202,6 +208,13 @@ sub _need_first_module {
 #pod and which should return true if the module should be loaded
 #pod with C<require> or false otherwise.
 #pod
+#pod =item try
+#pod
+#pod     try => 0    # default
+#pod     try => 1
+#pod
+#pod If C<try> is true, it behaves as L</"try_module">.
+#pod
 #pod =back
 #pod
 #pod =head2 need_modules
@@ -291,6 +304,16 @@ sub _need_first_module {
 #pod
 #pod =back
 #pod
+#pod =head2 try_modules
+#pod
+#pod     @modules = try_modules(@spec);
+#pod     @modules = try_modules(\%spec);
+#pod
+#pod Shortcut for
+#pod
+#pod     @modules = need_modules(-any => @spec);
+#pod     @modules = need_modules(-any => \%spec);
+#pod
 #pod =head1 CAVEATS
 #pod
 #pod =over 4
@@ -323,7 +346,7 @@ Module::Spec::V1 - Load modules based on V1 specifications
 
 =head1 VERSION
 
-version 0.8.0
+version 0.9.0
 
 =head1 SYNOPSIS
 
@@ -394,6 +417,13 @@ This option can also be specified as a subroutine which gets
 passed the module name and version requirement (if any)
 and which should return true if the module should be loaded
 with C<require> or false otherwise.
+
+=item try
+
+    try => 0    # default
+    try => 1
+
+If C<try> is true, it behaves as L</"try_module">.
 
 =back
 
@@ -483,6 +513,16 @@ and which should return true if the module should be loaded
 with C<require> or false otherwise.
 
 =back
+
+=head2 try_modules
+
+    @modules = try_modules(@spec);
+    @modules = try_modules(\%spec);
+
+Shortcut for
+
+    @modules = need_modules(-any => @spec);
+    @modules = need_modules(-any => \%spec);
 
 =head1 CAVEATS
 

@@ -1,10 +1,11 @@
 package Net::Amazon::S3::Request::PutPart;
-$Net::Amazon::S3::Request::PutPart::VERSION = '0.80';
+$Net::Amazon::S3::Request::PutPart::VERSION = '0.82';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request';
 
-has 'bucket'        => ( is => 'ro', isa => 'BucketName',      required => 1 );
+with 'Net::Amazon::S3::Role::Bucket';
+
 has 'key'           => ( is => 'ro', isa => 'Str',             required => 1 );
 has 'value'         => ( is => 'ro', isa => 'Str|CodeRef|ScalarRef',     required => 0 );
 has 'upload_id'     => ( is => 'ro', isa => 'Str',             required => 1 );
@@ -30,8 +31,7 @@ sub http_request {
             $self->copy_source_bucket.'/'.$self->copy_source_key;
     }
 
-    return Net::Amazon::S3::HTTPRequest->new(
-        s3      => $self->s3,
+    return $self->_build_http_request(
         method  => 'PUT',
         path    => $self->_uri($self->key) .
                    '?partNumber=' .
@@ -40,7 +40,7 @@ sub http_request {
                    $self->upload_id,
         headers => $headers,
         content => scalar( defined( $self->value ) ? $self->value : '' ),
-    )->http_request;
+    );
 }
 
 1;
@@ -55,7 +55,7 @@ Net::Amazon::S3::Request::PutPart - An internal class to put part of a multipart
 
 =head1 VERSION
 
-version 0.80
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -84,11 +84,11 @@ This method returns a HTTP::Request object.
 
 =head1 AUTHOR
 
-Rusty Conover <rusty@luckydinosaur.com>
+Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

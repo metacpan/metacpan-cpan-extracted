@@ -5,7 +5,7 @@ use warnings;
 use URI::Escape;
 use base qw(Module::Install::Base);
 
-our $VERSION = sprintf "%d.%02d%02d", q/0.3.1/ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%02d%02d", q/0.3.4/ =~ /(\d+)/g;
 
 sub auto_set_bugtracker {
     my $self = shift;

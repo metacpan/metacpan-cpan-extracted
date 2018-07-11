@@ -1,10 +1,10 @@
 {
    "abstract" : "A specialized Elasticsearch client.",
    "author" : [
-      "=over 4"
+      "Kang-min Liu <gugod@gugod.org> and Borislav Nikolov <jack@sofialondonmoskva.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.2",
+   "generated_by" : "App::ModuleBuildTiny version 0.023",
    "license" : [
       "mit"
    ],
@@ -13,31 +13,15 @@
       "version" : "2"
    },
    "name" : "Elastijk",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "xt",
-         "inc",
-         "share",
-         "eg",
-         "examples",
-         "author",
-         "builder"
-      ]
-   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.035"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
          "requires" : {
-            "Test::CPAN::Meta" : "0",
-            "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
-            "Test::Pod" : "1.41",
-            "Test::Spellunker" : "v0.2.7"
+            "App::ModuleBuildTiny" : "0"
          }
       },
       "runtime" : {
@@ -49,6 +33,7 @@
       },
       "test" : {
          "requires" : {
+            "Test2::V0" : "0",
             "Test::More" : "0.9"
          }
       }
@@ -56,7 +41,7 @@
    "provides" : {
       "Elastijk" : {
          "file" : "lib/Elastijk.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "Elastijk::oo" : {
          "file" : "lib/Elastijk/oo.pm"
@@ -69,14 +54,11 @@
       },
       "homepage" : "https://github.com/gugod/Elastijk",
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/gugod/Elastijk.git",
          "web" : "https://github.com/gugod/Elastijk"
       }
    },
-   "version" : "0.12",
-   "x_authority" : "cpan:GUGOD",
-   "x_contributors" : [
-      "borislav nikolov <jack@sofialondonmoskva.com>",
-      "Kang-min Liu <gugod@gugod.org>"
-   ]
+   "version" : "0.13",
+   "x_static_install" : 1
 }

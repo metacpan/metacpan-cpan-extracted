@@ -7,15 +7,7 @@ use File::Path;
 use Test::Utils;
 use CGI::Cache;
 
-# http://www.cpantesters.org/cpan/report/9373ce6a-e71a-11e4-9f23-cdc1e0bfc7aa
-BEGIN {
-  $SIG{__WARN__} = sub {
-    my $warning = shift;
-    warn $warning unless $warning =~ /Subroutine .* redefined at/;
-  };
-  use File::Slurp;
-  $SIG{__WARN__} = undef;
-};
+use File::Slurper qw(read_text write_text);
 
 use vars qw( $VERSION );
 
@@ -35,15 +27,7 @@ my $script = <<EOF;
 use lib '../blib/lib';
 use CGI::Cache;
 
-# http://www.cpantesters.org/cpan/report/9373ce6a-e71a-11e4-9f23-cdc1e0bfc7aa
-BEGIN {
-  \$SIG{__WARN__} = sub {
-    my \$warning = shift;
-    warn \$warning unless \$warning =~ /Subroutine .* redefined at/;
-  };
-  use File::Slurp;
-  \$SIG{__WARN__} = undef;
-};
+use File::Slurper qw(read_text);
 
 open FH, ">TEST.OUT";
 
@@ -58,7 +42,7 @@ CGI::Cache::stop();
 
 close FH;
 
-my \$results = read_file('TEST.OUT');
+my \$results = read_text('TEST.OUT', undef, 1);
 
 unlink "TEST.OUT";
 
@@ -67,7 +51,7 @@ EOF
 
 my (undef, $test_script_name) = File::Temp::tempfile('cgi_test.cgi.XXXXX');
 
-write_file($test_script_name, $script);
+write_text($test_script_name, $script);
 Setup_Cache($test_script_name,$script,1);
 
 my $expected_stdout = "RESULTS: Test output 1\n";
@@ -91,7 +75,7 @@ $TEMPDIR = File::Temp::tempdir();
 my $script = <<EOF;
 use lib '../blib/lib';
 use CGI::Cache;
-use File::Slurp;
+use File::Slurper qw(read_text);
 
 open FH, ">TEST.OUT";
 
@@ -106,7 +90,7 @@ CGI::Cache::stop();
 
 close FH;
 
-my \$results = read_file('TEST.OUT');
+my \$results = read_text('TEST.OUT', undef, 1);
 
 unlink "TEST.OUT";
 

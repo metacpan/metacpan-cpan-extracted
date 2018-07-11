@@ -66,7 +66,8 @@ print $MW ? "ok 3\n" : "not ok 3 ($@$? - image object not created (icon.xpm MISS
 		print "--SELECTED=".join('|', @v)."= vcnt=$#v= MODE=".$lbox->cget('-selectmode')."=\n";
 		for (my $i=0;$i<=$#v;$i++)
 		{
-			print "--selected($i)=".$lbox->get($v[$i])."=\n";
+			my $ent = $lbox->get($v[$i]);
+			print "--selected($i)=$ent= TEXT=".$ent->{'-text'}."=\n";
 		}
 	#PRINT WHETHER THE LAST ITEM IS CURRENTLY SELECTED (2 WAYS):
 		print "--select includes last one =".$lbox->selectionIncludes('end')."=\n";
@@ -89,7 +90,11 @@ print $MW ? "ok 3\n" : "not ok 3 ($@$? - image object not created (icon.xpm MISS
 		print "--anchor was=$anchorWas= now=$anchorNow= yview=".join('|',@yview)."=\n";
 		print "-reqheight=".$lbox->reqheight."= height=".$lbox->cget('-height')."= size=".$lbox->size."=\n";
 	#PRINT OUT THE VALUES OF THE TIED VARIABLES:
-		print "-scalar=".join('|',@{$scalar})."= array=".join('|',@array)."= other=".join('|',@{$other})."=\n";
+		print "-scalar=".join('|',@{$scalar})."=\n-array=".join('|',@array)."=\n-other=".join('|',@{$other})."=\n";
+		foreach my $e (@{$other}) {
+			my $ent = $lbox->get($e);
+			print "----selected index($e) text=".$ent->{'-text'}."=\n";
+		}
 	#RECONFIGURE 2ND ITEM TO FOREGROUND:=GREEN:
 		$lbox->itemconfigure(1,'-fg', 'green');
 	#FETCH THE HList STYLE OBJECT FOR 2ND ITEM:
@@ -99,9 +104,11 @@ print $MW ? "ok 3\n" : "not ok 3 ($@$? - image object not created (icon.xpm MISS
 	#FETCH THE "NEAREST" INDEX TO THE 2ND ITEM:
 		print "-nearest(1)=".$lbox->nearest(1)."=\n";
 	#ADD AN ELEMENT VIA THE TIED ARRAY:
-		push @array, {-image => $licon, -text => 'ArrayAdd!'};
+		push @array, {-image => $licon, -text => 'ArrayAdd0!'};
 	#DELETE THE LAST ITEM USING THE TIED ARRAY:
 		pop @array;
+	#ADD IT BACK VIA THE TIED ARRAY:
+		push @array, {-image => $licon, -text => 'ArrayAdd!'};
 	#FIND AND DISPLAY THE INDEX OF THE TEXT ENTRY "Y":
 		print "-Index of 'Y' =".$lbox->findIndex('Y')."=\n";
 	}

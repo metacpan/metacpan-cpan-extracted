@@ -1,0 +1,13 @@
+requires "Exporter" => "0";
+requires "Regexp::IPv4" => "0";
+requires "Regexp::IPv6" => "0";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};

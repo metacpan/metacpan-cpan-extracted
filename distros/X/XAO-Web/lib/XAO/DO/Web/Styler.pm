@@ -23,10 +23,9 @@ use XAO::Utils qw(:args fround);
 use XAO::Objects;
 use base XAO::Objects->load(objname => 'Web::Page');
 
-###############################################################################
+our $VERSION='2.003';
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: Styler.pm,v 2.3 2007/07/10 18:38:44 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+###############################################################################
 
 sub separate_thousands ($);
 
@@ -61,7 +60,7 @@ sub display ($;%) {
     my $real=$args->{format}
              ? sprintf($args->{format},$args->{real} || 0)
              : sprintf("%.2f",$args->{real} || 0);
-    $real=separate_thousands($real);         
+    $real=separate_thousands($real);
 
     ##
     # Percents

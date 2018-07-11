@@ -2,7 +2,7 @@ package Elasticsearch::Model::Role;
 
 use Moose::Role;
 use Module::Find;
-use Data::Printer;
+
 use Class::Load;
 use Search::Elasticsearch 6.00;
 use Try::Tiny;

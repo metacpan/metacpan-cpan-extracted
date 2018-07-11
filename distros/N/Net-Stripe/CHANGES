@@ -1,10 +1,153 @@
 ==================================================
-Changes from 2017-02-10 00:00:00 +0000 to present.
+Changes from 2017-07-06 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.34 at 2018-02-10 11:44:14 +0000
+version 0.35 at 2018-07-06 22:04:22 +0000
 -----------------------------------------
+
+  Change: 11c2e0c5ce4fc612f6d84bd33ca91f97ecb803e2
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-06 22:54:31 +0000
+
+    release notes 
+
+  Change: 95b5a622d795a001de4cd69220cc6f7ea2eeff31
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-06 22:47:00 +0000
+
+    Merge pull request #103 from sherrardb/retrieve_customer_by_email
+
+    add email argument to get_customers 
+
+  Change: d9e8ea17d070f5fdb76f42fd9da97fc48e23cb70
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-06 22:36:01 +0000
+
+    Merge pull request #102 from sherrardb/add_ending_before
+
+    add ending_before and tests for pagination arguments 
+
+  Change: 0fa8fcaf4652857707df4cd2a121348bec9e57be
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-06 22:29:04 +0000
+
+    Merge pull request #101 from sherrardb/add_customer_card_via_token
+
+    allow addition of new card to customer via passing of an existing
+    token 
+
+  Change: 56f14d0f85f49d66de4e69bac997bf0e348f1ea1
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-06 22:16:27 +0000
+
+    Merge branch 'sherrardb-add_address_city' 
+
+  Change: a6f426b6d2effb81fcc1c997e6096f8ff6468ac4
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-06 22:15:51 +0000
+
+    sherrardb-add_address_city fix merge conflict 
+
+  Change: e6c424407ba2d9ae4f652bc902f23cb2e30a4f5e
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-06 22:09:16 +0000
+
+    Merge pull request #98 from sherrardb/add_card_metadata
+
+    add metadata field for Net::Stripe::Card 
+
+  Change: 4763fb1f60c078d64892d2f9a4a83f657d7929cb
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-06 21:57:57 +0000
+
+    Merge pull request #97 from sherrardb/consistent_type_constraints
+
+    use consistent syntax for use Moose::Util::TypeConstraints 
+
+  Change: 0a1cf93bfca588302d1065bbb7c1c0caf6e7a463
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-06 21:47:48 +0000
+
+    Merge pull request #96 from sherrardb/extraneous_type_constraints
+
+    remove extraneous use Moose::Util::TypeConstraints 
+
+  Change: dca8c7cda603d05b98824bba2a51ba2b16287d22
+  Author: sherrardb <32931314+sherrardb@users.noreply.github.com>
+  Date : 2018-07-06 21:40:12 +0000
+
+    Charge receipt email (#95)
+
+    * Adds support for the `receipt_email` parameter on Charge objects
+
+    The `receipt_email` parameter is the email address to send this
+    charge's receipt to. The receipt will not be sent until the charge is
+    paid. If this charge is for a customer, the email address specified
+    here will override the customer's email address.
+
+    Receipts will not be sent for test mode charges.
+
+    If `receipt_email` is specified for a charge in live mode, a receipt
+    will be sent regardless of your email settings.
+
+    Signed-off-by: Zach Wick <zwick@stripe.com>
+
+    * cherry-pick updates to _hash_to_object because unit tests fail on
+    SubscriptionItem
+
+    * add receipt_email to form_fields for Net::Stripe::Charge
+
+    * add unit tests for receipt_email 
+
+  Change: 0abf9a23594386bdbc390b1a6aa462cd0b86caed
+  Author: Sherrard Burton <sburton@allafrica.com>
+  Date : 2018-04-17 14:37:40 +0000
+
+    remove debugging oversight 
+
+  Change: 5bc1eccc06c51feb0c29f965e1bec29de5a710ae
+  Author: Sherrard Burton <sburton@allafrica.com>
+  Date : 2018-04-09 22:22:34 +0000
+
+    add email argument to get_customers 
+
+  Change: 8430f694e2e68d205d653301d708223e0be6ffdb
+  Author: Sherrard Burton <sburton@allafrica.com>
+  Date : 2018-04-07 23:13:12 +0000
+
+    add ending_before and tests for pagination arguments 
+
+  Change: 31878a01ae8c9f5acc5636a15587d07c323dae91
+  Author: Sherrard Burton <sburton@allafrica.com>
+  Date : 2018-04-07 21:54:22 +0000
+
+    allow addition of new card to customer via passing of an existing
+    token 
+
+  Change: 3a88f821aabf8f43448b6dda2d962f3f1a7e58f4
+  Author: Sherrard Burton <sburton@allafrica.com>
+  Date : 2018-04-05 02:54:25 +0000
+
+    add address_city field for Net::Stripe::Card 
+
+  Change: 267f0b6462926b06644cc3505bef080528a83d50
+  Author: Sherrard Burton <sburton@allafrica.com>
+  Date : 2018-04-05 02:32:00 +0000
+
+    add metadata field for Net::Stripe::Card 
+
+  Change: f641063318d1263b3515db18b911d2efff9117e0
+  Author: Sherrard Burton <sburton@allafrica.com>
+  Date : 2018-04-03 23:02:59 +0000
+
+    use consistent syntax for use Moose::Util::TypeConstraints 
+
+  Change: 4b64aa87ff7cc48cdfa742fd5ae48dfa616f81f4
+  Author: Sherrard Burton <sburton@allafrica.com>
+  Date : 2018-04-03 22:44:36 +0000
+
+    remove extraneous use Moose::Util::TypeConstraints 
 
   Change: 56541b71e642bd871cf592fbfbd17cfc68b1a1f2
   Author: Andrew Solomon <andrew@geekuni.com>

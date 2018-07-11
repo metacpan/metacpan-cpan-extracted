@@ -1,3 +1,16 @@
+Version 0.1632:
+- Updating META.yml
+
+Version 0.1632:
+- Switch to File::Slurper
+
+Version 0.1631:
+- Trying once again to fix the compile test on windows
+
+Version 0.1630:
+- Check in standard tests, including one that skips the compile check on Windows
+- Add missing URI::Escape dependency
+
 Version 0.1629:
 - Add standard tests
 - Fix compatibility issue with newer versions of perl, which remove "." from

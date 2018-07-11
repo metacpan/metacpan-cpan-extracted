@@ -1,4 +1,5 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
+use warnings;
 use strict;
 use ExtUtils::MakeMaker;
 use ExtUtils::Manifest;
@@ -55,33 +56,53 @@ directory.
 EOT
         }
     }
-    $homedir='/usr/local/xao' unless $homedir;
-    print <<EOT;
-XAO::Base needs a directory for project specific configuration values,
-objects, templates etc.$notes
 
-EOT
-    print "Directory name ? [$homedir] ";
-    (my $hd=<STDIN>) =~ s/[\s\n\r]//sg;
-    $hd=~s/^\s*(.*?)\s*$/$1/;
-    $hd=~s/^~\//$ENV{HOME}\//;
-    if($hd && substr($hd,0,1) ne '/') {
-        print "\nBad path ($hd)!\n\n";
-        next;
+    # Externally set variable
+    #
+    if(!$homedir) {
+        $homedir=$ENV{'XAO_BASE_DIRECTORY'};
     }
-    $homedir=$hd if $hd;
 
-    print <<EOT;
+    # In cpanm/Carton/docker it's easier to pre-create a directory as a
+    # hint.
+    #
+    if(!$homedir) {
+        my @dirs=qw(/opt/xao /usr/local/xao);
+        my @dirh=$ENV{'HOME'} ? ($ENV{'HOME'}.'/perl5/xao',$ENV{'HOME'}.'/xao') : ();
+        my @d=grep { -d $_ } @dirh,@dirs;
+        $homedir=$d[0] || $dirs[0];
+    }
+
+    if($ENV{'PERL_MM_USE_DEFAULT'}) {
+        last;
+    }
+    else {
+        print <<EOT;
+XAO::Base needs a directory for project specific configuration values,
+objects, templates etc.
+$notes
+EOT
+        my $hd=prompt('Directory name ?',$homedir);
+        $hd=~s/^\s*(.*?)\s*$/$1/;
+        $hd=~s/^~\//$ENV{HOME}\//;
+        if($hd && substr($hd,0,1) ne '/') {
+            print "\nBad path ($hd)!\n\n";
+            next;
+        }
+        $homedir=$hd if $hd;
+
+        print <<EOT;
 
 The following directory structure will be used:
-$homedir/handlers  - web server handlers
-$homedir/projects  - projects root directory
-$homedir/templates - default templates
+
+    $homedir/handlers  - web server handlers
+    $homedir/projects  - projects root directory
+    $homedir/templates - default templates
 
 EOT
-    print "Is that OK? [Y/n] ";
-    (my $answer=<STDIN>) =~ s/[\s\r\n]//sg;
-    last unless lc(substr($answer,0,1)) eq 'n';
+        my $answer=prompt('Is that OK?','y');
+        last if lc(substr($answer,0,1)) eq 'y';
+    }
 }
 
 if(!$config_version || $config_version ne $version) {
@@ -92,59 +113,50 @@ if(!$config_version || $config_version ne $version) {
     print "\nConfiguration saved into .config\n\n";
 }
 
-##
-# This rather stupid workaround is here because for some reason
-# MakeMaker excludes /Config/ files from MAN3PODS
-#
-my %man3pods;
-foreach my $n (keys %{ExtUtils::Manifest::maniread()}) {
-    next unless $n =~ '^(\w+)\.(pm|pod)$' ||
-                $n =~ '^lib/XAO/(.*)\.(pm|pod)$';
-    my $man=$1;
-    $man=~s/\/+/::/g;
-    $man='XAO::' . $man;
-
-    open(F,$n) || die "Can't read $n: $!";
-    my $pod=0;
-    while(<F>) {
-        if(/^=(\w+)/) {
-            $pod=1;
-            last;
-        }
-    }
-    $pod || die "$n ($man) does not have documentation";
-
-    $man3pods{$n}='$(INST_MAN3DIR)/' . $man . '.3';
-}
-
 WriteMakefile(
     'NAME'          => 'XAO::Base',
-    'AUTHOR'        => 'Andrew Maltsev, http://ejelta.com/xao/',
+    'AUTHOR'        => 'Andrew Maltsev, https://ejelta.com/xao/',
     'ABSTRACT'      => 'Base support modules for the XAO Suite',
     'VERSION_FROM'  => 'Base.pm',
     'PREREQ_PM'     => {
-        'Error'         => '0.13',
-        'Test::Unit'    => '0.14',
-        'Clone'         => '0.34',
-        'Storable'      => '2.39',
+        'Clone'             => 0.39,
+        'Digest::SHA'       => 5.47,
+        'Encode'            => 2.42,
+        'Error'             => 0.17,
+        'File::Path'        => 2.09,
+        'JSON'              => 2.94,
+        'Storable'          => 2.53,
     },
     'PL_FILES'      => {
-        'BaseConfig.PL' => '$(INST_LIB)/XAO/BaseConfig.pm',
+        'BaseConfig.PL'     => '$(INST_LIB)/XAO/BaseConfig.pm',
     },
-    'MAN3PODS'      => \%man3pods,
-    'MIN_PERL_VERSION'  => '5.10.0',
+    TEST_REQUIRES   => {
+        'Test::Harness'     => '3.35',
+        'Test::Unit::Lite'  => '0.1202',
+    },
+    'MIN_PERL_VERSION'  => '5.10.1',
 );
 
 sub MY::postamble
 { <<EOT;
 
-config::	README
+all::
+\t\@if [ -d .git ]; then (\\
+\t\techo "https://github.com/amaltsev/XAO-Base";\\
+\t\techo "------------------------------------";\\
+\t\techo "";\\
+\t\tgit log -n 10 --no-color 2>/dev/null;\\
+\t\techo "") > CHANGES; fi
+
+config:: README
 
 README: Base.pm
-	pod2text Base.pm > README
+\tpod2text Base.pm > README
 
 install::
-	[ -d $homedir ] || mkdir $homedir && chmod 755 $homedir
+\t[ -d $homedir ] || mkdir -p $homedir && chmod 755 $homedir
 
+clean::
+\trm -f t/*.pl t/*.xt
 EOT
 }

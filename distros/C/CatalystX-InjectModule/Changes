@@ -1,5 +1,8 @@
 Revision history for CatalystX-InjectModule
 
+0.13 2018-07-09
+     - use Catalyst config (and local config) before modules config
+     
 0.12 2016-07-09
      - pass mi to uninstall to pass some tests
      - use travis

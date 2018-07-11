@@ -12,7 +12,7 @@ use HTTP::Tiny;
 use Test::BDD::Cucumber::Definitions qw(S :validator);
 use Test::More;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 our @EXPORT_OK = qw(HTTP);
 

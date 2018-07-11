@@ -42,44 +42,57 @@ Other interesting options include:
 
 =over 4
 
-=item B<-indicatoritemtype> => 'image'  #Specify an "indicator" image"
+=item B<-hidden> => 1 | 0 
 
-=item B<-indicatorimage => $image       #Special image to be displayed next to entry.
+Specifies whether or not the entry should be visible or hidden (0 (false) 
+for visible, 1 (true) for hidden) (default 0 - visible).
 
-=item B<-textanchor> => 'n', 's', 'e', 'w'  #Side of text the IMAGE is displayed on.  (Default: 'e')
+=item B<-indicatoritemtype> => 'image'
 
-=item B<-anchor> => 'e', 'w'  #Left or Right-justification of entry (Default: 'e')
+Specify an "indicator" image
 
-=item B<-style> => $ImageStyleObject    #Use an HList Style object (see ItemStyle())
+=item B<-indicatorimage => $image
 
-=item B<-sort, -user*> => 'value'       #These options not passed to functions, but retained with data, useful for saving info with an entry for one's own use.
+Special image to be displayed next to entry.
+
+=item B<-textanchor> => 'n', 's', 'e', 'w'
+
+Side of text the IMAGE is displayed on.  (Default: 'e' (East))
+
+=item B<-anchor> => 'e', 'w'
+
+Left or Right-justification of entry (Default: 'e')
+
+=item B<-style> => $ImageStyleObject
+
+Use an HList Style object (see Tk::ItemStyle and Tk::DItem)
+
+=item B<-sort>, B<-user> => 'value'
+
+These options not passed to functions, but retained with data, useful for saving info with an entry for one's own use.
 
 For example, one could put text in a I<-sort> option of say, an image-only entry and then retrieve it in a sort function like "sort { $a->{-sort} cmp $b->{-sort} }".
 
 =back
 
-=item Name:	B<itemType>
+=item Name:	B<browsecmd>
 
-=item Class:	B<ItemType>
+=item Class:	B<BrowseCmd>
 
-=item Switch:	B<-itemtype>
+=item Switch:	B<-browsecmd>
 
-Specifies the default type of display item.  Can be "text" or "imagetext".  
-The default is "text", though "imagetext" allows for either or both an 
-image or text.
+Specifies a perl/Tk L<callback|Tk::callbacks> to be executed when the user browses through the
+entries in the HList widget.
 
-=item Switch B<-indicator>
+=item Name:	B<command>
 
-Reserves space for and allows for another image next to the entry, which 
-HList calls an "indicator", which, unlike a normal "image" in an entry, 
-can be attached to a callback routine (-indicatorcmd) to be invoked when 
-the indicator image is clicked with the mouse, rather than the entry 
-simply being selected.  By default (if no I<-textanchor> option given, 
-the indicator image will appear to the left of the entry.
+=item Class:	B<Command>
 
-=item Switch B<-indicatorcmd>
+=item Switch:	B<-command>
 
-Subroutine reference to be invoked when an indicator image is clicked.
+Specifies the perl/Tk L<callback|Tk::callbacks> to be executed when the user invokes a list
+entry in the HList widget. Normally the user invokes a list
+entry by double-clicking it or pressing the Return key.
 
 =item Name:	B<height>
 
@@ -90,6 +103,52 @@ Subroutine reference to be invoked when an indicator image is clicked.
 Specifies the desired height for the window, in number of characters.
 If zero or less, then the desired height for the window is based on 
 the default for HList, which seems to be about 7 lines.
+
+=item Name:	B<indicator>
+
+=item Class:	B<Indicator>
+
+=item Switch B<-indicator>
+
+Reserves space for and allows for another image next to the entry, which 
+HList calls an "indicator", which, unlike a normal "image" in an entry, 
+can be attached to a callback routine (-indicatorcmd) to be invoked when 
+the indicator image is clicked with the mouse, rather than the entry 
+simply being selected.  By default (if no I<-textanchor> option given, 
+the indicator image will appear to the left of the entry.
+
+=item Name:	B<indicatorCmd>
+
+=item Class:	B<IndicatorCmd>
+
+=item Switch B<-indicatorcmd>
+
+Subroutine reference to be invoked when an indicator image is clicked.
+
+=item Name:	B<itemType>
+
+=item Class:	B<ItemType>
+
+=item Switch:	B<-itemtype>
+
+Specifies the default type of display item.  Can be "text", "image", or 
+"imagetext".  The default is "text", though "imagetext" allows for either 
+or both an image or text.
+
+=item Name:	B<listVariable>
+
+=item Class:	B<Variable>
+
+=item Switch:	B<-listvariable>
+
+Specifies the reference of a variable. The value of the variable is an array 
+to be displayed inside the widget; if the variable value changes then the 
+widget will automatically update itself to reflect the new value. Attempts 
+Attempts to unset a variable in use as a -listvariable may fail without error.
+
+The listvariable reference is "TIEd" to the HListbox widget just as if one 
+has done: "tie @listvariable, 'Tk::HListbox', $HListboxwidget, (ReturnType => 'index);" 
+immediately after defining $HListboxwidget using the "tie @array" feature. 
 
 =item Name:	B<selectMode>
 
@@ -135,35 +194,12 @@ large enough to hold all the elements in the listbox.
 
 =item Name:	B<activeStyle>
 
-=item Name:	B<listVariable>
+Ignored (not implemented in HList).
 
-=item Name: B<bbox>
-
-=item Name: B<Motion>
-
-=back
-
-=head1 HLISTBOX WIDGET-SPECIFIC OPTIONS NOT FOUND IN LISTBOX
-
-=over 4
-
-=item Name: B<ItemType>
-
-HListbox allows you to have entries containing either text, an image, 
-or both.  You can also include an "indicator" image (see B<Tk::HList>, 
-as well as additional Listbox and HList style options.  for more 
-details on item types.  Also see the B<EXAMPLES>!
-
-=item Method: B<findIndex>
-
-Given the text of an entry, return the index of the first 
-entry whose text matches the string, or I<<undef>> if no matches.
-
-
-=item Method: B<getEntry>
-
-Given an index, returns the HList "entry" value, only useful with 
-lower-level HList functions.  Returns I<<undef>> if no matches.
+For the most part, Tk::HListbox can be used as drop-in replacement 
+for the Tk::Listbox widget when you need to use images instead of or 
+in addition to text values, or need other Tk::HListbox - specific 
+features such as hidden or disabled entries, callbacks, etc.
 
 =back
 
@@ -215,11 +251,9 @@ to the first element in the listbox.
 =item B<active>
 
 Indicates the element that has the location cursor.  This element
-will be displayed with an underline when the listbox has the
-keyboard focus, and it is specified with the B<activate>
-method.  NOTE:  Unlike a standard Listbox, the underlying HList 
-widget does NOT support the concept of an "active" element, so 
-the "active" element is always the same as the "anchor" element.
+will be displayed with a dashed-line frame border when the listbox 
+has the keyboard focus, and it is specified with the B<activate>
+method.  
 
 =item B<anchor>
 
@@ -265,13 +299,11 @@ Sets the active element and the selection anchor
 to the one indicated by I<index>.
 If I<index> is outside the range of elements in the listbox
 then the closest element is activated.
-The active element is drawn as a "selected" element with a 
-thin hashed border, and its index may be retrieved with the
-index B<active> or B<anchor>.
+The active element is drawn similar to a "selected" element 
+with a thin hashed border, and its index may be retrieved 
+with the index B<active> or B<anchor>.
 
 =item I<$listbox>-E<gt>B<bbox>(I<index>)
-
-NOT CURRENTLY SUPPORTED.
 
 Returns a list of four numbers describing the bounding box of
 the text in the element given by I<index>.
@@ -320,6 +352,17 @@ forms for indices.
 
 Given an index, returns the HList "entry" value, only useful with 
 lower-level HList functions.  Returns I<<undef>> if no matches.
+
+=item I<$listbox>-E<gt>B<hide>([I<-entry> => ] I<index>)
+
+Given an index, sets the entry to "hidden" so that it does not 
+display in the listbox (but maintains it's index.  The "-entry" 
+argument is unnecessary, but retained for Tk::HList compatability.
+
+=item I<$listbox>-E<gt>B<show>([I<-entry> => ] I<index>)
+
+Given an index, sets the entry to "not hidden" (the default) so 
+that it is displayed in the listbox.
 
 =item I<$listbox>-E<gt>B<index>(I<index>)
 
@@ -1004,27 +1047,43 @@ value must match, e.g.
 
 would have the same effect as the previous examples.
 
-It should be noted that, despite being a reference to an array (or possibly a has), you still can not copy the tied variable without it being untied, instead
+It should be noted that, despite being a reference to an array (or possibly a hash), you still can not copy the tied variable without it being untied, instead
 you must pass a reference to the tied scalar between subroutines.
 
 =back
 
+=head1 AUTHOR
+
+Jim Turner, C<< <https://metacpan.org/author/TURNERJW> >>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015-2018 Jim Turner C<< <mailto://turnerjw784@yahoo.com> >>.
+All rights reserved.  
+
+This program is free software; you can redistribute 
+it and/or modify it under the same terms as Perl itself.
+
+This is a derived work from Tk::Listbox and Tk::HList.
+
 =head1 KEYWORDS
 
-hlistbox, listbox, hlist widget, tied
+hlistbox, listbox, hlist
 
 =head1 SEE ALSO
 
-L<Tk::HList>, L<Tk::Listbox>, L<Tk::DItem>.
+L<Tk::HList>, L<Tk::Listbox>, L<Tk::ItemStyle>, L<Tk::DItem>.
 
 =cut
+
+##### NOTE:  DO AN "export jwtlistboxhack=1" (env. variable) TO GET MY (MUCH BETTER) KEYBOARD FUNCTION BINDING!
 
 package Tk::HListbox;
 use Tk;
 use Tk::ItemStyle;
 use base qw(Tk::Derived Tk::HList);
-use vars qw($VERSION @Selection $Prev);
-$VERSION = '1.0';
+use vars qw($VERSION @Selection $Prev $tixIndicatorArmed);
+$VERSION = '2.0';
 
 Tk::Widget->Construct('HListbox');
 
@@ -1033,29 +1092,67 @@ sub ClassInit
 	my ($class,$mw) = @_;
 
 	$class->SUPER::ClassInit($mw);
+ # Standard Motif bindings:
+ $mw->bind($class,'<1>',[sub {
+		my $w = shift;
+		if (Tk::Exists($w)) {
+			$tixIndicatorArmed = -1;
+			$w->BeginSelect(@_);
+		}
+ }, Ev('index',Ev('@'))]);
+# $mw->bind($class, '<Double-1>' => \&Tk::NoOp);
+ $mw->bind($class,'<Double-1>' => ['DoubleButton1',Ev('index',Ev('@'))]);
+ $mw->bind($class,'<B1-Motion>',['Motion',Ev('index',Ev('@'))]);
+# $mw->bind($class,'<B1-Motion>',['Button1Motion']);
+ $mw->bind($class,'<ButtonRelease-1>','ButtonRelease_1');
+ $mw->bind($class,'<Shift-1>',['BeginExtend',Ev('index',Ev('@'))]);  #JWT:ADDED 20091020!
+ $mw->bind($class,'<Control-1>',['BeginToggle',Ev('index',Ev('@'))]);
+ $mw->bind($class,'<B1-Leave>',['AutoScan',Ev('x'),Ev('y')]);
+ $mw->bind($class,'<B1-Enter>','CancelRepeat');
+ $mw->bind($class,'<Up>',['UpDown',-1]);
+ $mw->bind($class,'<Shift-Up>',['ShiftUpDown',-1]);
+ $mw->bind($class,'<Down>',['UpDown',1]);
+ $mw->bind($class,'<Shift-Down>',['ShiftUpDown',1]);
+ $mw->XscrollBind($class);
+ $mw->bind($class,'<Prior>', sub {
+		my $w = shift;
+		$w->yview('scroll',-1,'pages');
+		$w->activate('@0,0');
+ });
+ $mw->bind($class,'<Next>',  sub {
+		my $w = shift;
+		$w->yview('scroll',1,'pages');
+		$w->activate('@0,0');
+ });
+#x	$mw->bind($class, '<Control-Prior>', ['Tk::HList::xview','scroll',-1, 'pages']);  #JWT:DIFFERENT FROM Listbox!:
+#x	$mw->bind($class, '<Control-Next>', ['Tk::HList::xview','scroll',1, 'pages']);
+	$mw->bind($class, '<Control-Prior>', ['CtrlPriorNext',-1]);  #JWT:DIFFERENT FROM Listbox!:
+	$mw->bind($class, '<Control-Next>', ['CtrlPriorNext',1]);
+ # <Home> and <End> defined in XscrollBind
+#	$mw->bind($class, '<Home>',  ['Tk::HList::xview','moveto',0]);
+#	$mw->bind($class, '<End>',   ['Tk::HList::xview','moveto',1]);
 	$mw->bind($class, '<Control-Home>','Cntrl_Home');
+ $mw->bind($class,'<Shift-Control-Home>',['DataExtend',0]);
 	$mw->bind($class, '<Control-End>','Cntrl_End');
-	$mw->bind($class, '<Shift-Control-Home>',['DataExtend',0]);
-	$mw->bind($class, '<Shift-Control-End>',['DataExtend','end']);
+ $mw->bind($class,'<Shift-Control-End>',['DataExtend','end']);
+ $mw->bind($class,'<space>',['SpaceSelect',Ev('index','active')]);
+ $mw->bind($class,'<Select>',['BeginSelect',Ev('index','active')]);
+
+ $mw->bind($class,'<Shift-space>',['ShiftSpace',Ev('index','active')]);  #JWT:ADDED 20091020!
+ $mw->bind($class,'<Shift-Select>',['BeginExtend',Ev('index','active')]);  #JWT:ADDED 20091020!
+	$mw->bind($class, '<Escape>', 'Cancel');
 	$mw->bind($class, '<Control-slash>','SelectAll');
 	$mw->bind($class, '<Control-backslash>','Cntrl_backslash');
-	$mw->bind($class, '<Home>',  ['Tk::HList::xview','moveto',0]);
-	$mw->bind($class, '<End>',   ['Tk::HList::xview','moveto',1]);
-	$mw->bind($class, '<Prior>',  ['Tk::HList::yview','scroll',-1,'pages']);
-	$mw->bind($class, '<Next>',   ['Tk::HList::yview','scroll',1,'pages']);
-	$mw->bind($class, '<Left>', ['Tk::HList::xview','scroll',-1, 'pages']);
-	$mw->bind($class, '<Right>', ['Tk::HList::xview','scroll',1, 'pages']);
-#	$mw->bind($class, '<Control-Prior>', ['Tk::HList::xview','scroll',-1, 'pages']);
-#	$mw->bind($class, '<Control-Next>', ['Tk::HList::xview','scroll',1, 'pages']);
-	$mw->bind($class, '<Control-Prior>', ['CtrlPriorNext',-1]);
-	$mw->bind($class, '<Control-Next>', ['CtrlPriorNext',1]);
-	$mw->bind($class, '<Escape>', 'Cancel');
-#	$mw->MouseWheelBind($class); # XXX Both needed?
-#	$mw->YMouseWheelBind($class);
+ # Additional Tk bindings that aren't part of the Motif look and feel:
  $mw->bind($class,'<2>',['scan','mark',Ev('x'),Ev('y')]);
  $mw->bind($class,'<B2-Motion>',['scan','dragto',Ev('x'),Ev('y')]);
- $mw->bind($class,'<space>',['BeginSelect',Ev('index','active')]);
- $mw->bind($class,'<Select>',['BeginSelect',Ev('index','active')]);
+ $mw->bind($class,'<Return>', ['InvokeCommand']);
+#x	$mw->bind($class, '<Prior>',  ['Tk::HList::yview','scroll',-1,'pages']);
+#x	$mw->bind($class, '<Next>',   ['Tk::HList::yview','scroll',1,'pages']);
+#	$mw->bind($class, '<Left>', ['Tk::HList::xview','scroll',-1, 'pages']);
+#	$mw->bind($class, '<Right>', ['Tk::HList::xview','scroll',1, 'pages']);
+	$mw->MouseWheelBind($class); # XXX Both needed?
+	$mw->YMouseWheelBind($class);
 
 	return $class; 
 }
@@ -1070,9 +1167,17 @@ sub Populate {
 			-updatecommand => ['CALLBACK'],
 			-xscancommand  => ['CALLBACK'],
 			-parent        => [qw/SELF parent parent/, undef],
-			-itemtype       => [qw/PASSIVE itemtype Itemtype text/],
+#			-itemtype       => [qw/PASSIVE itemtype Itemtype text/],
+			-itemtype       => [qw/PASSIVE itemType ItemType text/],
 			-indicatorcmd  =>  ['CALLBACK'],
+			-activestyle   => [qw/PASSIVE activeStyle ActiveStyle underline/],  #CURRENTLY IGNORED.
+			-listvariable  => [qw/PASSIVE listVariable Variable undef/],
 	);
+
+	#EMULATE "-listvariable" USING THE TIE FEATURE:
+	if (defined($args->{-listvariable}) && ref($args->{-listvariable})) {
+		tie @{$args->{-listvariable}}, 'Tk::HListbox', $w, (ReturnType => 'index');
+	}
 }
 
 sub selection {
@@ -1090,42 +1195,63 @@ sub selectionSet {   #THIS SHOULD TAKE HList "ENTRIES":
 	my ($w) = shift;
 
 	return  unless (defined($_[0]) && $_[0] =~ /\S/o);
-	my @range = $w->getEntryList(@_);
-	push(@range, $w->getEntry($_[0]))  unless (defined($range[1]) && $range[1] =~ /\S/o);
-	$w->Tk::HList::anchorSet($range[0])  if (scalar(@_) == 1);
-	$w->Tk::HList::selectionSet(@range);
+	my @args = @_;
+	for (my $i=0;$i<=$#args;$i++) {
+		$args[$i] = $w->index($args[$i])  if ($args[$i] =~ /\D/o);
+	}
+	my @indexRange = (@args);
+	@indexRange = ($args[1] < $args[0]) ? reverse($args[1]..$args[0]) : ($args[0]..$args[1])  if (defined($args[1]) && !defined($args[2]));
+	my @range;
+	my $ent;
+	#THE STUPID HList IS BROKEN - IT WILL SELECT ENTRIES THAT ARE DISABLED, SO WE HAVE TO FILTER 'EM OUT OURSELVES FIRST!: :(
+	for (my $i=0;$i<=$#indexRange;$i++) {
+		$ent = $w->getEntry($indexRange[$i]);
+		$indexRange[$i] = $w->index($indexRange[$i])  if ($indexRange[$i] =~ /\D/o);
+		push (@range, $ent)  unless ($w->entrycget($ent, '-state') eq 'disabled' || $w->info('hidden', $ent));
+	}
+	if ($range[0] =~ /\S/o) {
+#		$w->Tk::HList::anchorSet($range[0])  if (scalar(@_) == 1);
+		if ($#range < 2) {
+			$w->Tk::HList::selectionSet(@range);
+		} else {
+			foreach my $i (@range) {
+				$w->Tk::HList::selectionSet($i);
+			}
+		}
+	}
 }
 
 sub selectionClear {
 	my ($w) = shift;
 
-	my $anchor = $w->indexOf($w->info('anchor'));
+	my $active = $w->index('active');
 	my @range = $w->getEntryList(@_);
-	my $clearALL = (defined($_[0] && $_[0] == $anchor) || (defined($_[1]) && !$_[0] && $_[1] =~ /^end/o)) ? 1 : 0;
+
 	$w->Tk::HList::selectionClear(@range);
-	$w->Tk::HList::anchorClear()  if ($clearALL);
+	$w->activate($active);
 }
 
-sub anchorSet {
+sub anchorSet {  #HList's "anchor" is it's (active) cursor, so we use a "virtual anchor" for ours.
 	return  unless (defined($_[1]) && $_[1] =~ /\S/o);
-	$_[0]->Tk::HList::anchorSet($_[0]->getEntry($_[1]));
+
+	my $ent = $_[0]->getEntry($_[1]);
+	$_[0]->{'_vanchor'} = (!defined($ent) || $_[0]->entrycget($ent, '-state') eq 'disabled' || $_[0]->info('hidden', $ent))
+			? undef : $_[0]->index($_[1]);
 }
 
 sub anchorClear {
-	my ($w) = shift;
-
-	$w->Tk::HList::anchorClear();
+	$_[0]->{'_vanchor'} = undef;
 }
-sub selectionAnchor {
-	my ($w) = shift;
 
-	$w->anchorSet(@_);
+sub selectionAnchor {  #SET THE SELECTION ANCHOR (Listbox's version of HList's "anchorSet" function:
+	$_[0]->anchorSet($_[1]);
 }
-sub activate {
-	my ($w) = shift;;
+sub activate {    #HListbox "anchor" == Listbox "active"!
+	my ($w) = shift;
 	my @v = @_;
-	$w->Tk::HList::selectionSet($w->getEntryList(@v));
-	$w->Tk::HList::anchorSet($w->getEntry($v[0]));
+	my $ent = $w->getEntry($v[0]);
+	$w->Tk::HList::anchorSet($ent)
+			unless ($w->entrycget($ent, '-state') eq 'disabled' || $w->info('hidden', $ent));
 }
 
 sub curselection { 
@@ -1147,13 +1273,13 @@ sub see {
 sub yview {
 	my $w = shift;
 
-	if (defined($_[0]) && scalar(@_) == 1) {
-		return $w->Tk::HList::yview($w->getEntry($_[0]));
-	} elsif (!defined $_[0]) {
+	if (!defined $_[0]) {
 		my @v = $w->Tk::HList::yview;
 		push (@v, 1)  unless (defined $v[1]);  #JWT:FOR SOME REASON, HList.yview() DOES NOT SEEM TO WORK AS DOC'ED?!
 		return @v;
-	} else {
+	} elsif (scalar(@_) == 1) {
+		return $w->Tk::HList::yview($w->getEntry($_[0]));
+	} elsif (defined($_[1]) && $_[1]) {
 		$w->Tk::HList::yview(@_);
 	}
 }
@@ -1179,9 +1305,14 @@ sub SpaceSelect   #JWT:THIS WORKS SLIGHTLY DIFFERENT THAN NORMAL LISTBOX B/C THE
 {
 	my $w = shift;
 
-	eval { $w->Tk::HList::SpaceSelect(@_); };
-	return  unless ($@);
 	$w->BeginSelect(@_);
+	$w->Callback(-indicatorcmd => $_[0])  if ($w->cget('-indicator') && $w->indicator('exists', $w->getEntry($_[0])));
+	$w->activate($_[0]);
+	if ($w->cget('-selectmode') =~ /^(?:multiple|extended)/o) {
+		$w->Callback(-browsecmd);
+	} else {
+		$w->Callback(-browsecmd => $_[0]);
+	}
 }
 
 sub size {
@@ -1219,7 +1350,7 @@ sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 		@atIndexArgs = ('-at', $c->index($index));
 		@data = reverse @data;     #WE HAVE TO REVERSE THE LIST BEING ADDED IF THE INDEX IS NOT "end"!
 	}
-	my (@addArgs, @childData, $extraOpsHash, @dataParts, @indicatorOps, %styleOps, $haveStyle);
+	my (@addArgs, @childData, $extraOpsHash, @dataParts, @indicatorOps, %styleOps, $haveStyle, $hideit);
 	for (my $i=0;$i<=$#data;$i++) {
 		@addArgs = ();
 		@childData = ();
@@ -1228,17 +1359,18 @@ sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 		@indicatorOps = ();
 		%styleOps = ();
 		$haveStyle = 0;
+		$hideit = 0;
 		if (defined($data[$i]) && $data[$i] ne '') {
-			if ($data[$i] =~ /^Tk\:\:.*HASH\(.+\)$/o && $itemType =~ /^imagetext/o) {   #WE HAVE AN IMAGE:
+			if ($data[$i] =~ /^Tk\:\:.*HASH\(.+\)$/o && $itemType =~ /^image/o) {   #WE HAVE AN IMAGE:
 				@addArgs = ('-itemtype', $itemType, '-image', $data[$i]);
 			} elsif (ref($data[$i]) =~ /HASH/o) {    #WE HAVE A HASHREF (PBLY IMAGE+TEXT) OR ADDITIONAL HList OPTIONS:
 				@addArgs = ('-itemtype', $data[$i]->{'-itemtype'}||$itemType);
 				foreach my $op (keys %{$data[$i]}) {  #PUT EACH OBJECT IN IT'S PROPER BUCKET:
 					if ($op =~ /^\-(?:data|state)$/o) {  # => addchild(@childData)
 						push @childData, $op, $data[$i]->{$op};
-					} elsif ($op =~ /^\-(?:text|itemtype|image|underline)$/) {  # => ItemCreate(@addArgs)
+					} elsif ($op =~ /^\-(?:text|itemtype|image|underline)$/o) {  # => ItemCreate(@addArgs)
 						push @addArgs, $op, $data[$i]->{$op};
-					} elsif ($op =~ /^\-style$/) {  # => ItemCreate(@addArgs)
+					} elsif ($op =~ /^\-style$/o) {  # => ItemCreate(@addArgs)
 						push @addArgs, $op, $data[$i]->{$op};
 						$haveStyle = $data[$i]->{$op};
 					} elsif ($op =~ /^\-indicator(.*)$/o) {   # => indicator(@indicatorOps)
@@ -1248,7 +1380,9 @@ sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 						} else {                 #(SIMPLE) - JUST GAVE "-indicator $image" (SET UP BARE NEEDED OPTIONS):
 							push @indicatorOps, '-itemtype', 'image', '-image', $data[$i]->{$op};
 						}
-					} elsif ($op !~ /^\-(?:user|sort|hidden)/) {    #DATA OPTIONS WE WISH TO RETAIN BUT ARE NOT VALID FOR USE IN CREATING OBJECTS:
+					} elsif ($op =~ /^\-hidden$/o) {
+						$hideit = $data[$i]->{$op};
+					} elsif ($op !~ /^\-(?:user|sort)/o) {    #DATA OPTIONS WE WISH TO RETAIN BUT ARE NOT VALID FOR USE IN CREATING OBJECTS:
 						$styleOps{$op} = $data[$i]->{$op};
 					}
 				}
@@ -1265,9 +1399,11 @@ sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 		unless ($haveStyle && $haveStyle =~ /^Tk::ItemStyle/o) {  #WE ALSO HAVE AN ItemStyle, TRY RECONFIGURING IT:
 			if (keys(%styleOps) > 0) {   #WE HAVE "STYLE" OPTIONS, FILL IN ANY MISSING W/LISTBOX-WIDE OPTIONS AS DEFAULTS:
 				#THIS IS NEEDED B/C "-refwindow" DOESN'T SEEM TO DO WHAT IT SAYS:
-				foreach my $style (qw(-background -foreground -fg -font -selectforeground)) {
+				#CHGD TO NEXT 20180704 TO PREVENT ERROR IF itemtype==image:  foreach my $style (qw(-background -foreground -fg -selectforeground)) {
+				foreach my $style (qw(-background -foreground -fg -selectforeground)) {
 					$styleOps{$style} ||= $c->cget($style);
 				}
+				$styleOps{'-font'} ||= $c->cget('-font')  if ($itemType =~ /text/o);
 				push @addArgs, '-style', $c->ItemStyle(($data[$i]->{'-itemtype'}||$itemType), '-refwindow' => $c, %styleOps);
 			}
 		}
@@ -1275,6 +1411,7 @@ sub insert {     #INSERT ONE OR MORE ITEMS TO THE LIST:
 		if (@indicatorOps) {
 			$c->indicator('create', $child, @indicatorOps);   #WE HAVE AN "INDICATOR" IMAGE, CREATE IT TOO:
 		}
+		$c->hide(-entry => $child)  if ($hideit);
 	}
 	return '';
 }
@@ -1297,7 +1434,6 @@ sub delete {        #DELETE ONE OR MORE ITEMS FROM THE LIST:
 			$next = $n;
 		}
 	}
-#??	$w->_yscrollCallback;
 }
 
 sub findIndex {    #FIND THE INDEX THAT MATCHES 
@@ -1335,13 +1471,13 @@ sub getEntry {    #GIVEN A VALID LISTBOX "INDEX", RETURN THE EQUIVALENT HList "E
 	my $next = $w->getFirstEntry;
 	my $next0;
 	for (my $pos=0;$pos<$index;$pos++) {
-		unless ($next =~ /\S/o) {
+		unless (defined($next) && $next =~ /\S/o) {
 			return ($next0) ? $w->nearest($next0) : undef;
 		}
 		$next0 = $next;
 		$next = $w->info('next', $next);
 	}
-	unless ($next =~ /\S/o) {
+	unless (defined($next) && $next =~ /\S/o) {
 		return ($next0) ? $w->nearest($next0) : undef;
 	}
 	return $next;
@@ -1360,8 +1496,8 @@ sub getEntryList {    #CONVERT A LIST OF INDICIES TO HList "ENTRIES":
 sub indexOf {  #GIVEN A VALID HList "ENTRY", RETURN IT'S RELATIVE (TO ZERO=1ST) Listbox "INDEX":
 	my $next = $_[0]->getFirstEntry;
 	my $indx = '0';
-	while ($next =~ /\S/o) {
-		return $indx  if ($next == $_[1]);
+	while (defined($next) && $next =~ /\S/o) {
+		return $indx  if (!defined($_[1]) || $next == $_[1]);
 		$next = $_[0]->info('next', $next);
 		++$indx;
 	}
@@ -1376,7 +1512,7 @@ sub index {    #GIVEN A VALIE "LISTBOX INDEX", RETURN A ZERO-BASED "INDEX" (CONV
 	} elsif ($_[1] =~ /^end/io) {
 		return $_[0]->size-1;
 	} elsif ($_[1] =~ /^anchor/o) {
-		return $_[0]->indexOf($_[0]->info('anchor'));
+		return $_[0]->{'_vanchor'};
 	} elsif ($_[1] =~ /^active/o) {
 		return $_[0]->indexOf($_[0]->info('anchor'));
 	} elsif ($_[1] =~ /^\@\d+\,(\d+)/o) {
@@ -1387,497 +1523,270 @@ sub index {    #GIVEN A VALIE "LISTBOX INDEX", RETURN A ZERO-BASED "INDEX" (CONV
 
 sub Cntrl_Home {
 	my $w = shift;
-	$w->yview('moveto',0);
-	$w->xview('moveto',0);
-	$w->selectionClear();
-	$w->selectionSet('0');
+	my $Ev = $w->XEvent;
+
+	$w->activate(0);
+	$w->see(0);
+	$w->selectionClear(0,'end');
+	if (!$ENV{jwtlistboxhack}) {
+		$w->selectionSet(0);
+		$w->Callback(-browsecmd => 0);
+	}
 	$w->eventGenerate("<<ListboxSelect>>");
-	$w->Callback(-browsecmd => '0');
 }
 
 sub Cntrl_End {
 	my $w = shift;
+	my $Ev = $w->XEvent;
 
-	$w->yview('moveto',1);
-	$w->xview('moveto',0);
-	$w->selectionClear();
-	$w->selectionSet('end');
+	$w->activate('end');
+	$w->see('end');
+	$w->selectionClear(0,'end');
+	if (!$ENV{jwtlistboxhack}) {
+		$w->selectionSet('end');
+		$w->Callback(-browsecmd => $w->index('end'));
+	}
 	$w->eventGenerate("<<ListboxSelect>>");
-	$w->Callback(-browsecmd => $w->index('end'));
 }
 
 sub DataExtend {    #USER PRESSED Shift-Ctrl-Home/End, SELECT FROM ANCHOR TO TOP OR BOTTOM RESPECTIVELY:
 	my ($w, $el) = @_;
 
-	my $mode = $w->cget('-selectmode');
-	my $anchor = $w->index('anchor');
+	my $active = $w->index('active');
 	my $indx = $w->index($el);
-	if ($mode =~ /^(?:multi|extend)/o) {
+	if ($w->cget('-selectmode') =~ /^(?:multiple|extended)/o) {
 		$w->see($indx);
-		$w->selectionSet($w->index($indx), $anchor);
+		$w->selectionSet($indx, $active);
 		$w->eventGenerate("<<ListboxSelect>>");
 		$w->Callback(-browsecmd);
 	} else {
 		$w->selectionClear();
 		$w->see($indx);
-		$w->selectionSet($w->index($indx));
+		$w->selectionSet($indx);
+		$w->activate($indx);
 		$w->eventGenerate("<<ListboxSelect>>");
-		$w->Callback(-browsecmd => $w->index($indx));
+		$w->Callback(-browsecmd => $indx);
 	}
 }
 
 sub SelectAll {
 	my $w = shift;
 
-	if ($w->cget('-selectmode') =~ /^(?:multi|extend)/o) {
-		$w->selectionSet(0, $w->index('end'));
-		$w->eventGenerate("<<ListboxSelect>>");
+	if ($w->cget('-selectmode') =~ /^(?:single|browse)/) { 
+		$w->selectionClear(0,'end');
+		$w->selectionSet('active');
+		$w->Callback(-browsecmd => $w->index('active'));
+	} else {
+		$w->selectionSet(0,'end');
 		$w->Callback(-browsecmd);
 	}
+	$w->eventGenerate("<<ListboxSelect>>");
 }
 
 sub Cntrl_backslash {
 	my $w = shift;
-	if ($w->cget('-selectmode') =~ /^(?:multi|extend)/o) {
-		$w->selectionClear();
-		$w->anchorClear();
-		$w->eventGenerate("<<ListboxSelect>>");
-	}
+	my $Ev = $w->XEvent;
+
+	$w->selectionClear(0,'end');
+	$w->eventGenerate("<<ListboxSelect>>");
+	$w->Callback(-browsecmd);
 }
 
-sub Button1    #USER PRESSED LEFT MOUSE-BUTTON
+sub Button1    #USER PRESSED LEFT MOUSE-BUTTON or SPACEBAR
 {
-	my $Ev = $_[0]->XEvent;
-	delete $_[0]->{'shiftanchor'};
+	$_[0]->BeginSelect(@_);	
+}
 
-	$_[0]->focus() if($_[0]->cget('-takefocus'));
-
-	my $mode = $_[0]->cget('-selectmode');
-	if ($mode eq 'dragdrop') { 
-	
-		# $_[0]->Send_WaitDrag($Ev->y);
-		return;
-	}
-
-	my $ent = $_[0]->GetNearest($Ev->y, 1);
-	if (!defined($ent) || !length($ent)) { 
-		$_[0]->selectionClear;
-		$_[0]->anchorClear;
-		return;
-	}
-	my $indx = $_[0]->indexOf($ent);
-	my @info = $_[0]->info('item',$Ev->x, $Ev->y);
-	if (@info) { 
-		die 'Assert' unless $info[0] eq $ent;
-		$info[0] = $indx;
-	} else {
-		@info = $indx;
-	}
-	if (defined($info[1]) && $info[1] eq 'indicator') { 
-		$_[0]->{tixindicator} = $indx;
-		$_[0]->Callback(-indicatorcmd => $indx, '<Arm>');
-	} else {
-		if ($mode !~ /^(?:multi|extend)/o) { 
-			$_[0]->selectionClear();
-			$_[0]->selectionSet($indx);
-		} elsif ($mode eq 'multiple') { 
-			@Selection = $_[0]->curselection;
-			$Prev = $indx;
-			if ($_[0]->selectionIncludes($indx)) {
-				$_[0]->selectionClear($indx);
-				$_[0]->{'deselecting'} = 1;
-			} else {
-				$_[0]->selectionSet($indx);
-				$_[0]->anchorSet($indx);
-				$_[0]->{'deselecting'} = 0;
-			}
-		} elsif ($mode eq 'extended') { 
-			@Selection = $_[0]->curselection;
-			$Prev = $indx;	
-			$_[0]->selectionClear;
-			$_[0]->anchorSet($indx);  #JWT:ADDED TO PREVENT ANCHOR FROM BEING CLEARED BY PREV. LINE.
-			$_[0]->selectionSet($indx);
-		}
-		$_[0]->eventGenerate("<<ListboxSelect>>");
-		$_[0]->Callback(-browsecmd => $_[0]->index($indx));
-	}
+sub DoubleButton1    #USER DOUBLE-CLICKED LEFT MOUSE-BUTTON (has already done a single click)
+{
+	$_[0]->InvokeCommand;
+	$_[0]->selectionClear('0','end');
+	$_[0]->selectionSet($_[0]->index('active'));
+	$_[0]->eventGenerate("<<ListboxSelect>>");
 }
 
 sub ShiftButton1   #JWT:NOT SURE WHERE THIS IS BOUND, BUT IS *DOES* GET CALLED & IS NEEDED:
 {
- my $Ev = $_[0]->XEvent;
- my $to = $_[0]->GetNearest($Ev->y, 1);
-
- delete $_[0]->{'shiftanchor'};
- delete $_[0]->{tixindicator};
-
- return unless (defined($to) and length($to));
-
- my $mode = $_[0]->cget('-selectmode');
-
- if($mode eq 'extended')
-  {
-   my $from = $_[0]->info('anchor');
-   if(defined $from)
-    {
-    	@Selection = $_[0]->curselection;
-    	$Prev = $from;
-     $_[0]->selectionClear;
-     $_[0]->selectionSet($_[0]->indexOf($from), $_[0]->indexOf($to));
-     $_[0]->eventGenerate("<<ListboxSelect>>");
-     $_[0]->Callback(-browsecmd);
-    }
-   else
-    {
-    	my $indx = $_[0]->indexOf($to);
-     $_[0]->anchorSet($indx);
-     $_[0]->selectionClear;
-     $_[0]->selectionSet($indx);
-     @Selection = ();
-     $Prev = $indx;
-    }
-  }
- elsif($mode eq 'multiple')
-  {
-   my $indx = $_[0]->indexOf($to);
-    $_[0]->selectionSet($indx);
-    $_[0]->eventGenerate("<<ListboxSelect>>");
-    $_[0]->Callback(-browsecmd => $_[0]->index($indx));
-  }
- else
-  {
-     $Prev = (defined $from) ? $->indexOf($from) : $_[0]->indexOf($to);
-     $_[0]->selectionClear;
-     $_[0]->selectionSet($_[0]->indexOf($to));
-     $_[0]->eventGenerate("<<ListboxSelect>>");
-     $_[0]->Callback(-browsecmd => $_[0]->indexOf($to));
-  }
-}
-
-sub ButtonRelease_1 {
+	$_[0]->BeginExtend(@_);	
 }
 
 {
-my $lastItem;
-sub Button1Motion {
- my $Ev = $_[0]->XEvent;
+	my $lastItem;
+	sub Button1Motion {
+		my $Ev = $_[0]->XEvent;
 
- return unless defined $Ev;
+		return unless defined $Ev;
 
- delete $_[0]->{'shiftanchor'};
+# delete $_[0]->{'shiftanchor'};
 
- my $mode = $_[0]->cget('-selectmode');
- return  if ($mode eq 'single');
+		my $mode = $_[0]->cget('-selectmode');
+		return  if ($mode =~ /^(?:single|dragdrop)/o);
 
- if ($mode eq 'dragdrop')
-  {
-#   $_[0]->Send_StartDrag();
-   return;
-  }
+		#HANDLE THIS SILLY TIX STUFF:
+		my $ent;
+		if (defined $_[0]->info('anchor')) {
+			$ent = $_[0]->GetNearest($Ev->y);
+		} else {
+			$ent = $_[0]->GetNearest($Ev->y, 1);
+		}
+		return  unless (defined($ent) and length($ent));
 
- my $ent;
- if (defined $_[0]->info('anchor'))
-  {
-   $ent = $_[0]->GetNearest($Ev->y);
-  }
- else
-  {
-   $ent = $_[0]->GetNearest($Ev->y, 1);
-  }
- return unless (defined($ent) and length($ent));
+		if (exists $_[0]->{tixindicator}) {
+			my $event_type = $_[0]->{tixindicator} eq $ent ? '<Arm>' : '<Disarm>';
+			$_[0]->Callback(-indicatorcmd => $_[0]->{tixindicator}, $event_type );
+			return;
+		}
 
- if(exists $_[0]->{tixindicator})
-  {
-   my $event_type = $_[0]->{tixindicator} eq $ent ? '<Arm>' : '<Disarm>';
-   $_[0]->Callback(-indicatorcmd => $_[0]->{tixindicator}, $event_type );
-   return;
-  }
-
- my $indx = $_[0]->indexOf($ent);
- if ($mode eq 'browse')
-  {
-     $_[0]->selectionClear;
-     $_[0]->selectionSet($indx);
-     $_[0]->eventGenerate("<<ListboxSelect>>");
-     $_[0]->Callback(-browsecmd => $_[0]->index($indx));
-  }
- elsif ($mode =~ /^(?:multi|extend)/o)
-  {
-   my $from = $_[0]->info('anchor');
-   if(defined $from)
-    {
-    	if ($mode eq 'multiple') {
-	 	if ($_[0]->{'deselecting'}) {
-	 		$_[0]->selectionClear($indx);
-	 	} else {
-	 		$_[0]->selectionSet($_[0]->indexOf($from), $indx);
-	 	}
-    	} else {
-	     $_[0]->selectionClear()  if ($mode eq 'extended');
-	     $_[0]->selectionSet($_[0]->indexOf($from), $indx);
-	 }
-	 if ($lastItem != $indx) {
-	  $_[0]->eventGenerate("<<ListboxSelect>>");
- 	  $_[0]->Callback(-browsecmd);
- 	  $lastItem = $indx;
- 	 }
-    }
-   else      #no anchor set.
-    {
-	 if ($mode eq 'multiple') {
-	 	if ($_[0]->{'deselecting'}) {
-	 		$_[0]->selectionClear($indx);
-	 	} else {
-	 		$_[0]->selectionSet($indx);
-	 		$_[0]->anchorSet($indx);
-	 	}
-	 } else {
-        $_[0]->selectionClear()  if ($mode eq 'extended');
-        $_[0]->anchorSet($indx);
-        $_[0]->selectionSet($indx);
-     }
-    }
-  }
- else
-  {
-  	 $Prev = $_[0]->index('anchor');
-     $_[0]->selectionClear;
-     $_[0]->anchorSet($indx);
-     $_[0]->selectionSet($indx);
-     $_[0]->eventGenerate("<<ListboxSelect>>");
-     $_[0]->Callback(-browsecmd => $_[0]->index($indx));
-  }
-}
-
-sub Control_B1_Motion   #USER IS DRAGGING MOUSE WITH CONTROL-BUTTON HELD DOWN:
-{
- my $Ev = $_[0]->XEvent;
- return unless defined $Ev;
-
- delete $_[0]->{'shiftanchor'};
-
- my $mode = $_[0]->cget('-selectmode');
-
- if ($mode eq 'dragdrop')
-  {
-#   $_[0]->Send_StartDrag();
-   return;
-  }
-
- my $ent;
- if (defined $_[0]->info('anchor'))
-  {
-   $ent = $_[0]->GetNearest($Ev->y);
-  }
- else
-  {
-   $ent = $_[0]->GetNearest($Ev->y, 1);
-  }
- return unless (defined($ent) and length($ent));
- if(exists $_[0]->{tixindicator})
-  {
-   my $event_type = $_[0]->{tixindicator} eq $ent ? '<Arm>' : '<Disarm>';
-   $_[0]->Callback(-indicatorcmd => $_[0]->{tixindicator}, $event_type );
-   return;
-  }
-
- my $indx = $_[0]->indexOf($ent);
- if ($mode eq 'single')
-  {
-     $_[0]->selectionClear;
-     $_[0]->selectionSet($indx);
-     $_[0]->eventGenerate("<<ListboxSelect>>");
-     $_[0]->Callback(-browsecmd => $_[0]->index($indx));
-  }
- elsif ($mode =~ /^(?:multi|extend)/o)
-  {
-   my $from = $_[0]->info('anchor');
-   if(defined $from)
-    {
-	 	if ($_[0]->{'deselecting'}) {     #FIRST ITEM WAS ALREADY SELECTED WHEN WE PRESSED MOUSE, SO CLEAR EACH ITEM AS USER DRAGS MOUSE:
-	 		$_[0]->selectionClear($indx);
-	 	} else {                          #FIRST ITEM WAS NOT ALREADY SELECTED WHEN WE PRESSED MOUSE, SO SELECT EACH ITEM AS USER DRAGS MOUSE:
-	 		$_[0]->selectionSet($_[0]->indexOf($from), $indx);
-	 	}
-	    if ($lastItem != $indx) {
-             $_[0]->eventGenerate("<<ListboxSelect>>");
-             $_[0]->Callback(-browsecmd);
-             $lastItem = $indx;
-        }
-    }
-   else      #no anchor set.
-    {
-	 @Selection = $_[0]->curselection;
-	 	if ($_[0]->{'deselecting'}) {
-	 		$_[0]->selectionClear($indx);
-	 	} else {
-	 		$_[0]->selectionSet($indx);
-	 		$_[0]->anchorSet($indx);
-	 	}
-     $Prev = $_[0]->indexOf($from);
-    }
-  }
- else
-  {
-     $_[0]->selectionClear;
-     $_[0]->anchorSet($indx);
-     $_[0]->selectionSet($indx);
-     $_[0]->eventGenerate("<<ListboxSelect>>");
-     $_[0]->Callback(-browsecmd => $_[0]->index($indx));
-  }
-}
+		my $indx = $_[0]->indexOf($ent);
+		if ($mode =~ /^browse/o) {
+			$_[0]->selectionClear;
+			$_[0]->selectionSet($indx);
+			$_[0]->eventGenerate("<<ListboxSelect>>");
+			$_[0]->Callback(-browsecmd => $indx);
+		} elsif ($mode =~ /^(?:multiple|extended)/o) {
+			my $from = $_[0]->info('anchor');
+			if(defined $from) {
+				if ($mode =~ /^multiple/o) {
+					if ($_[0]->{'deselecting'}) {
+						$_[0]->selectionClear($indx);
+					} else {
+						$_[0]->selectionSet($_[0]->indexOf($from), $indx);
+					}
+				} else {
+					$_[0]->selectionClear()  if ($mode eq 'extended');
+					$_[0]->selectionSet($_[0]->indexOf($from), $indx);
+				}
+				if (!defined($lastItem) || $lastItem != $indx) {
+					$_[0]->eventGenerate("<<ListboxSelect>>");
+					$_[0]->Callback(-browsecmd);
+					$lastItem = $indx;
+				}
+			} else {      #no anchor set.
+				if ($mode =~ /^multiple/o) {
+					if ($_[0]->{'deselecting'}) {
+						$_[0]->selectionClear($indx);
+					} else {
+						$_[0]->selectionSet($indx);
+						$_[0]->anchorSet($indx);
+					}
+				} else {
+					$_[0]->selectionClear()  if ($mode =~ /^extended/o);
+					$_[0]->anchorSet($indx);
+					$_[0]->selectionSet($indx);
+				}
+				$_[0]->eventGenerate("<<ListboxSelect>>");
+			}
+		} else {
+			$Prev = $_[0]->index('anchor');
+			$_[0]->selectionClear;
+			$_[0]->anchorSet($indx);
+			$_[0]->selectionSet($indx);
+			$_[0]->eventGenerate("<<ListboxSelect>>");
+			$_[0]->Callback(-browsecmd => $indx);
+		}
+	}
 }
 
 sub ShiftUpDown {    #USER PRESSED UP OR DOWN ARROW WHILST HOLDING <SHIFT> KEY DOWN:
 	my $w = shift;
 	my $spec = shift;
+	$spec = ($1 >= 0) ? 'next' : 'prev'  if ($spec =~ /^([\+\-]?\d+)/o);
+	return $w->UpDown($spec)  if($w->cget('-selectmode') !~ /^extended/o);
 
-	my $mode = $w->cget('-selectmode');
+	my $amount = ($spec =~ /^prev/o) ? -1 : 1;
+	my $active = $w->index('active');
 
-	return $w->UpDown($spec)  if($mode !~ /^(?:multi|extend)/o);
+	if ($ENV{'jwtlistboxhack'}) {
+		if ($w->selectionIncludes($active)) {
+			$w->selectionClear($active);
+		} else {
+			$w->selectionSet($active);
+		}
+	} else {
+		if (!@Selection) {
+			$w->selectionSet($active);
+			@Selection = $w->curselection;
+		}
+	}
 
-	my $anchor = $w->info('anchor');
+	#BEFORE ADVANCING, SKIP OVER ANY ENTRIES THAT ARE DISABLED OR HIDDEN:
+	#(THIS ALWAYS ADVANCES AT LEAST ONE ENTRY!):
+	my $ent = $w->getEntry($active);
 
-	return $w->UpDown($spec)  unless (defined($anchor) and length($anchor));
-
-	my $done = 0;
-
-	$w->{'shiftanchor'} = $anchor unless( $w->{'shiftanchor'} =~ /\S/o);
-
-	my $ent = $w->{'shiftanchor'};
-	while( !$done ) { 
-	
+	while ( 1 ) { 
 		$ent = $w->info($spec, $ent);
-		last unless( defined $ent );
-		next if( $w->entrycget($ent, '-state') eq 'disabled' );
-		next if( $w->info('hidden', $ent) );
+		last  unless(defined $ent);
+		next  if( $w->entrycget($ent, '-state') eq 'disabled' );
+		next  if( $w->info('hidden', $ent) );
 		last;
 	}
 	unless( $ent =~ /\S/o ) {	
-		$w->yview('scroll', $spec eq 'prev' ? -1 : 1, 'unit');
+		$w->yview('scroll', $amount, 'unit');
+		$w->eventGenerate("<<ListboxSelect>>");
+		$w->Callback(-browsecmd => $active);
 		return;
 	}
-
-	$w->selectionClear;
-	my $indx = $w->indexOf($ent);
-	$w->selectionSet($w->indexOf($anchor), $indx);
-	if (!@Selection) {
-		@Selection = $w->curselection;
+	$active = $w->indexOf($ent);  #THE "NEXT" ENTRY.
+	$w->activate($active);
+	$w->see('active');
+	if ($ENV{'jwtlistboxhack'}) {
+		$w->selectionAnchor($active);
+		$w->eventGenerate("<<ListboxSelect>>");
+	} else {
+		$w->Motion($w->index('active'));
 	}
-	$w->see($w->indexOf($ent));
-	$Prev = $w->indexOf($indx);
-
-	$w->{'shiftanchor'} = $ent;
-
-    $w->eventGenerate("<<ListboxSelect>>");
-	$w->Callback(-browsecmd => $w->index($indx));
+	$w->Callback(-browsecmd => $active);
 }
 
-sub Double1    #USER DOUBLE-CLICKED AN ITEM:
+sub ExtendUpDown  #COMPATABILITY W/Listbox:
 {
- my $Ev = $_[0]->XEvent;
-
- delete $_[0]->{'shiftanchor'};
-
- my $ent = $_[0]->GetNearest($Ev->y, 1);
-
- return unless (defined($ent) and length($ent));
-
- my $indx = $_[0]->indexOf($ent);
- $_[0]->anchorSet($indx)
-	unless(defined $_[0]->info('anchor'));
-
- $_[0]->selectionSet($indx);
-
- $_[0]->Callback(-command => $indx);
+	$_[0]->ShiftUpDown(@_);
 }
 
 sub UpDown   #USER PRESSED AN UP OR DOWN ARROW KEY:
 {
 	my $w = shift;
 	my $spec = shift;
-
 	if ($spec =~ /^([\+\-]?\d+)/o) {
 		$spec = ($1 >= 0) ? 'next' : 'prev';
 	}
-	my $done = 0;
-	my $anchor = $w->info('anchor');
-	delete $w->{'shiftanchor'};
-	unless( defined $anchor ) { 
-	
-		$anchor = ($w->info('children'))[0];
-
-		return unless (defined($anchor) and length($anchor));
-		if($w->entrycget($anchor, '-state') ne 'disabled') { 
-			# That's a good anchor
-			$done = 1;
-		} else {
-			# We search for the first non-disabled entry (downward)
-			$spec = 'next';
-		}
-	}
-
-	my $ent = $anchor;
-
-	# Find the prev/next non-disabled entry
-	#	
-	while(!$done) { 
+	my $active = $w->index('active');
+	my $ent = $w->getEntry($active);
+	while ( 1 ) { 
 		$ent = $w->info($spec, $ent);
 		last unless( defined $ent );
 		next if( $w->entrycget($ent, '-state') eq 'disabled' );
 		next if( $w->info('hidden', $ent) );
 		last;
 	}
-	unless( defined $ent ) { 
-	
-		$w->yview('scroll', $spec eq 'prev' ? -1 : 1, 'unit');
+	unless (defined($ent) && $ent =~ /\S/o) {	
+		my $amount = ($spec =~ /^prev/o) ? -1 : 1;
+		$w->yview('scroll', $amount, 'unit');
 		return;
 	}
-	my $indx = $w->indexOf($ent);
-	$w->anchorSet($indx);
-	$w->see($indx);
-	$w->selectionClear();
-	$w->selectionSet($indx);
-	if($w->cget('-selectmode') !~ /^(?:single|dr)/o) { 
-	   $Prev = $indx;
-	   @Selection = ();
-		$w->eventGenerate("<<ListboxSelect>>");
-		$w->Callback(-browsecmd => $w->index($indx));
-	}
-}
-
-sub CtrlButton1    #USER PRESSED LEFT MOUSEBUTTON WHILST HOLDING THE <CONTROL> KEY DOWN:
-{
-	my $w = shift;
-
-	my $Ev = $w->XEvent;
-	delete $w->{'shiftanchor'};
-	my $ent = $w->GetNearest($Ev->y, 1);
-
-	return unless (defined($ent) and length($ent));
-
+	$active = $w->indexOf($ent);
+	$w->activate($active);
+	$w->see('active');
 	my $mode = $w->cget('-selectmode');
-	my $indx = $w->indexOf($ent);
-	if ($mode !~ /^(?:multi|extend)/o) {
-		$w->selectionClear;
-		$w->selectionSet($indx);
-	} else {
-		@Selection = $w->curselection();
-		$Prev = $indx;
-		$w->anchorSet($indx) unless( $mode eq 'browse' || defined($w->info('anchor')) );
-		if($w->select('includes', $ent)) { 
-			$w->selectionClear($indx);
-			$w->{'deselecting'} = 1;
-		} else {
-			$w->selectionSet($indx);
-			$w->{'deselecting'} = 0;
-		}
+	if ($mode =~ /^browse/o)
+	{
+		$w->selectionClear(0,'end');
+		$w->selectionSet('active');
+		$w->eventGenerate("<<ListboxSelect>>");
+		$w->Callback(-browsecmd => $active);
+	} elsif ($mode =~ /^extended/o && !$ENV{'jwtlistboxhack'}) {
+		$w->selectionClear(0,'end');
+		$w->selectionSet('active');
+		$w->selectionAnchor('active');
+		$Prev = $w->index('active');
+		@Selection = ();
+		$w->eventGenerate("<<ListboxSelect>>");
 	}
-	$w->eventGenerate("<<ListboxSelect>>");
-	$w->Callback(-browsecmd => $w->index($indx));
 }
 
 sub selectionIncludes {
+#print "-???- selectionIncludes($_[1]): Entry=".$_[0]->getEntry($_[1])."=\n";
+	return 0 unless ($_[0]->index($_[1]) =~ /\d/o);
 	return $_[0]->Tk::HList::selectionIncludes($_[0]->getEntry($_[1]));
 }
 
@@ -1921,58 +1830,50 @@ sub itemcget {   #GET PREVIOUSLY-SET OPTIONS ON INDIVIDUAL ITEMS:
 	}
 }
 
-sub Cancel    #USER PRESS <ESC> WHEN "-selectmode" == "extended":
+sub BeginSelect   #Mouse button-press (button 1)
 {
- my $w = shift;
+	my $w = shift;
+	my $el = shift;
 
- if ($w->cget('-selectmode') ne 'extended' || !defined $Prev)
-  {
-   return;
-  }
- my $first = $w->index('anchor');
- my $last = $Prev;
- if ($first > $last)
-  {
-   ($first, $last) = ($last, $first);
-  }
- $w->selectionClear($first,$last);
- while ($first <= $last)
-  {
-   if (Tk::lsearch(\@Selection,$first) >= 0)
-    {
-     $w->selectionSet($first)
-    }
-   $first++
-  }
- $w->see($w->index('anchor'));
- $w->eventGenerate("<<ListboxSelect>>");
-}
-
-sub BeginSelect
-{
- my $w = shift;
- my $el = shift;
-   if ($w->selectionIncludes($el))
-    {
-     $w->selectionClear($el);
-     $Prev = $el;
-     @Selection = ();
-    }
-   else
-    {
-     $w->selectionSet((($Prev =~ /\S/o) ? $Prev : $el));
-     $w->eventGenerate("<<ListboxSelect>>");
-    }
- $w->focus if ($w->cget('-takefocus'));
- $w->eventGenerate("<<ListboxSelect>>");
+	#HANDLE THIS SILLY "TIX" STUFF:
+	my $Ev = $w->XEvent;
+	my @info = $w->info('item',$Ev->x, $Ev->y);
+	if (defined($info[1]) && $info[1] eq 'indicator') { 
+		$w->{tixindicator} = $el;
+		$w->Callback(-indicatorcmd => $el, '<Arm>');
+		return;
+	}
+	#TOGGLE SELECTION STATUS, SET ANCHOR IF "extended":
+	if ($w->cget('-selectmode') =~ /^(?:multiple|extended)/o) {
+		if ($w->selectionIncludes($el)) {  #TOGGLE SELECT-STATUS OF ENTRY CLICKED ON:
+			$w->selectionClear($el);
+		} else {
+			$w->selectionSet($el);
+		}
+		$w->selectionAnchor($el);
+	} elsif ($ENV{'jwtlistboxhack'}) {  #WE ALLOW SELECTION TO BE EMPTY IN SINGLE/BROWSE MODES!:
+		if ($w->selectionIncludes($el)) {  #TOGGLE SELECT-STATUS OF ENTRY CLICKED ON:
+			$w->selectionClear(0,'end');
+		} else {
+			$w->selectionClear(0,'end');
+			$w->selectionSet($el);
+		}
+	} else {
+		$w->selectionClear(0,'end');
+		$w->selectionSet($el);
+		$w->selectionAnchor($el);
+	}
+	@Selection = ();
+	$Prev = $el;
+#	$w->focus  if ($w->cget('-takefocus'));
+	$w->eventGenerate("<<ListboxSelect>>");
 }
 
 sub CtrlPriorNext {   #USER PRESSED <CONTROL-<PgUp>/<PgDown>> - OUR SPECIAL SELECT NEXT SCREEN-FULL:
 	my $w = shift;
 	my $updown = shift;
-	if ($w->cget('-selectmode') =~ /^(?:multi|extend)/o) {
-		my $anchor = $w->info('anchor');
-		$anchor = (defined $anchor) ? $w->indexOf($anchor) : $w->indexOf($w->nearest(1));
+	if ($w->cget('-selectmode') =~ /^(?:multiple|extended)/o) {
+		my $anchor = $w->index('anchor');
 		$selectTo = $anchor + ($updown * $w->cget('-height'));
 		if ($updown >= 0) {
 			my $lastIndex = $w->index('end');
@@ -1982,10 +1883,14 @@ sub CtrlPriorNext {   #USER PRESSED <CONTROL-<PgUp>/<PgDown>> - OUR SPECIAL SELE
 		}
 		$w->selectionSet($anchor, $selectTo);
 		$w->anchorSet($selectTo);
+		$w->activate($selectTo);
+		$w->see($selectTo);
 		$w->eventGenerate("<<ListboxSelect>>");
-		$w->Callback(-browsecmd);
+		$w->Callback('-browsecmd');
+	} else {
+		#$w->Tk::HList::yview('scroll',$updown, 'pages');
+		$w->yview('scroll',$updown, 'pages');
 	}
-	$w->Tk::HList::yview('scroll',$updown, 'pages');
 }
 
 #THESE FUNCTIONS SUPPORT THE "TIED" STUFF - DON'T KNOW HOW ANY OF THIS WORKS, BUT I COPIED IT FROM LISTBOX AND IT JUST WORKS:
@@ -2013,7 +1918,6 @@ sub FETCH {
 
   my $self = ${$class->{OBJECT}};
   my %options = %{$class->{OPTION}} if defined $class->{OPTION};;
-
   # Define the return variable
   my $result;
 
@@ -2065,7 +1969,6 @@ sub FETCHSIZE {
 # If tied to an array we will modify the Listbox contents, while if tied
 # to a scalar we will select and clear elements.
 sub STORE {
-
   if ( scalar(@_) == 2 ) {
      # we have a tied scalar
      my ( $class, $selected ) = @_;
@@ -2117,19 +2020,34 @@ sub STORE {
      # check size of current contents list
      my $sizeof = $self->size();
 
-     if ( $index <= $sizeof ) {
-        # Change a current listbox entry
-        $self->delete($index);
-        $self->insert($index, $value);
-     } else {
+#THIS SOMETIMES FAILS CAUSING THE FIRST ELEMENT TO NOT BE ADDED?!     if ( $index <= $sizeof ) {
+#        # Change a current listbox entry
+#        $self->delete($index);
+#        $self->insert($index, $value);
+#     } else {
         # Add a new value
-        if ( defined $index ) {
-           $self->insert($index, $value);
-        } else {
+#        if ( defined $index ) {
+#           $self->insert($index, $value);
+#        } else {
            $self->insert("end", $value);
-        }
-     }
+#        }
+#     }
+     $self->activate('end')  unless ($self->index('active') =~ /\d/o); #MAKE SURE SOMETHING'S ACTIVE.
    }
+}
+
+sub STORESIZE
+{
+
+	my $class = shift;
+	my $w = ${$class->{OBJECT}};
+	my $newsz = shift;
+	my $cursz = $w->size;
+
+	return  if ($newsz >= $cursz);
+
+	${$class->{OBJECT}}->delete($newsz, $cursz);
+	$#{$class->{-ptr}} = $newsz - 1;
 }
 
 # CLEAR
@@ -2276,6 +2194,316 @@ sub SPLICE {
          return wantarray ? @elements : $elements[scalar(@elements)-1];
       }
    }
+}
+
+sub ButtonRelease_1
+{
+	my $w = shift;
+	my $Ev = $w->XEvent;
+
+	my $mode = $w->cget('-selectmode');
+	$w->CancelRepeat  if($mode !~ /^dragdrop/o);
+	my $ent = $w->indexOf($w->GetNearest($Ev->y));
+
+	return unless (defined($ent) and length($ent));  #BUTTON RELEASED OUTSIDE OF WIDGET? (PUNT)
+	if (exists $w->{tixindicator}) {  #HANDLE THIS SILLY "TIX" STUFF:
+		my @info = $w->info('item',$Ev->x,$Ev->y);
+
+		if (defined($info[1]) && $info[1] eq 'indicator' && $w->{tixindicator} eq $ent)  #WE'RE RELEASING ON THE INDICATOR:
+		{
+			$w->Callback(-indicatorcmd => $ent, '<Activate>');
+		} else {  #EITHER WE RELEASED OUTSIDE THE INDICATOR OR ON A DIFFERENT ENTRY:
+			$w->Callback(-indicatorcmd => $w->{tixindicator}, '<Disarm>');
+		}
+		delete $w->{tixindicator};
+		return;
+	}
+	$w->activate($Ev->xy);
+	if ($mode =~ /^(?:multiple|extended)/o) {
+		$w->Callback(-browsecmd);
+	} else {
+		(my $sel) = $w->curselection;
+		$w->Callback(-browsecmd => $sel)  if ($sel =~ /\d/o);
+	}
+}
+
+# Motion --
+#
+# This procedure is called to process mouse motion events while
+# button 1 is down. It may move or extend the selection, depending
+# on the listbox's selection mode.
+#
+# Arguments:
+# w - The listbox widget.
+# el - The element under the pointer (must be a number).
+sub Motion
+{
+	my $w = shift;
+	my $el = shift;
+	#HANDLE THIS SILLY "TIX" STUFF:
+	my $Ev = $w->XEvent;
+	my @info = $w->info('item',$Ev->x, $Ev->y);
+
+	return  if (exists($w->{tixindicator}));
+	return  unless (defined $el);
+	return  if (defined($Prev) && $el == $Prev);
+
+	my $anchor = $w->index('anchor');
+	if ($ENV{'jwtlistboxhack'}) {
+		unless (defined($anchor) && $anchor =~ /\d/o) {
+			$anchor = $el;
+			$w->selectionAnchor($anchor);
+			$w->selectionSet($el);
+		}
+	}
+	my $mode = $w->cget('-selectmode');
+	if ($mode =~ /^browse/o) {
+		$w->selectionClear(0,'end');
+		$w->selectionSet($el);
+		$Prev = $el;
+		$w->eventGenerate("<<ListboxSelect>>");
+	} elsif ($mode =~ /^extended/o) {
+		my $i = $Prev;
+		if (!defined $i || $i eq '') {
+			$i = $el;
+			$w->selectionSet($el);
+		}
+		if ($w->selectionIncludes('anchor')) {
+			$w->selectionClear($i,$el);
+			$w->selectionSet('anchor',$el)
+		} else {
+			$w->selectionClear($i,$el);
+			$w->selectionClear('anchor',$el);
+		}
+		if (!@Selection) {
+			@Selection = $w->curselection;
+		}
+		while ($i < $el && $i < $anchor) {
+			if (Tk::lsearch(\@Selection,$i) >= 0) {
+				$w->selectionSet($i);
+			}
+			$i++
+		}
+		while ($i > $el && $i > $anchor) {
+			if (Tk::lsearch(\@Selection,$i) >= 0) {
+				$w->selectionSet($i);
+			}
+			$i--;
+		}
+		$Prev = $el;
+		$w->eventGenerate("<<ListboxSelect>>");
+	}
+}
+# BeginExtend --
+#
+# This procedure is typically invoked on shift-button-1 presses. It
+# begins the process of extending a selection in the listbox. Its
+# exact behavior depends on the selection mode currently in effect
+# for the listbox; see the Motif documentation for details.
+#
+# Arguments:
+# w - The listbox widget.
+# el - The element for the selection operation (typically the
+# one under the pointer). Must be in numerical form.
+sub BeginExtend    #JWT: SELECT FROM ACTIVE TO THE ONE WE CLICKED ON (INCLUSIVE):
+{
+	my $w = shift;
+	my $el = shift;
+
+	if ($ENV{'jwtlistboxhack'}) {
+		if ($w->cget('-selectmode') =~ /^extended/o) {
+			my $active = $w->index('active');
+			if ($el == $active) {  #IF CLICKED ON ACTIVE, TOGGLE SELECT-STATUS:
+				if ($w->selectionIncludes($el))
+				{
+					$w->selectionClear($el);
+				}
+				else
+				{
+					$w->selectionSet($el);
+				}
+			} else {               #OTHERWISE SELECT FROM ACTIVE TO ONE WE CLICKED ON AND ACTIVE IT:
+				$w->selectionSet($active, $el);
+			}
+		} else {
+			# No selection yet; simulate the begin-select operation.
+			$w->BeginSelect($el);
+		}
+	} else {
+		if ($w->cget('-selectmode') =~ /^extended/o && $w->selectionIncludes('anchor')) {
+			$w->Motion($el)
+		} else {
+			# No selection yet; simulate the begin-select operation.
+			$w->BeginSelect($el);
+		}
+	}
+	$w->eventGenerate("<<ListboxSelect>>");
+}
+
+sub ShiftSpace  #Shift-spacebar pressed:  Select from anchor to active inclusive:
+{
+	my $w = shift;
+	my $el = shift;
+
+	my $anchor = $w->index('anchor');
+	my $mode = $w->cget('-selectmode');
+	$w->activate($el);
+	if (defined($anchor) && $mode =~ /^extended/o
+			&& ($anchor >= 0 && $anchor < $w->index('end'))) {
+		$w->selectionSet($anchor, $w->index('active'));
+		$w->Callback(-browsecmd);
+	} else {
+		if ($w->selectionIncludes($el))  #TOGGLE SELECT-STATUS OF ENTRY CLICKED ON:
+		{
+			$w->selectionClear($el);
+		}
+		else
+		{
+			$w->selectionSet($el);
+		}
+		if ($mode =~ /^multiple/o) {
+			$w->Callback(-browsecmd);
+		} else {
+			$w->Callback(-browsecmd => $el);
+		}
+	}
+	$w->selectionAnchor($el);
+	$w->eventGenerate("<<ListboxSelect>>");
+}
+
+# BeginToggle --
+#
+# This procedure is typically invoked on control-button-1 presses. It
+# begins the process of toggling a selection in the listbox. Its
+# exact behavior depends on the selection mode currently in effect
+# for the listbox; see the Motif documentation for details.
+#
+# Arguments:
+# w - The listbox widget.
+# el - The element for the selection operation (typically the
+# one under the pointer). Must be in numerical form.
+sub BeginToggle
+{
+ my $w = shift;
+ my $el = shift;
+ if ($w->cget('-selectmode') =~ /^extended/o)
+  {
+   @Selection = $w->curselection();
+   $Prev = $el;
+   $w->selectionAnchor($el);
+   $w->activate($el);  #FOR SOME REASON, Listbox ALWAYS ACTIVATES W/O CALLING THIS HERE?
+   if ($w->selectionIncludes($el))
+    {
+     $w->selectionClear($el)
+    }
+   else
+    {
+     $w->selectionSet($el)
+    }
+   $w->eventGenerate("<<ListboxSelect>>");
+  }
+}
+# AutoScan --
+# This procedure is invoked when the mouse leaves an entry window
+# with button 1 down. It scrolls the window up, down, left, or
+# right, depending on where the mouse left the window, and reschedules
+# itself as an "after" command so that the window continues to scroll until
+# the mouse moves back into the window or the mouse button is released.
+#
+# Arguments:
+# w - The entry window.
+# x - The x-coordinate of the mouse when it left the window.
+# y - The y-coordinate of the mouse when it left the window.
+sub AutoScan
+{
+ my $w = shift;
+ return if !Tk::Exists($w);
+ my $x = shift;
+ my $y = shift;
+ if ($y >= $w->height)
+  {
+   $w->yview('scroll',1,'units')
+  }
+ elsif ($y < 0)
+  {
+   $w->yview('scroll',-1,'units')
+  }
+ elsif ($x >= $w->width)
+  {
+   $w->xview('scroll',2,'units')
+  }
+ elsif ($x < 0)
+  {
+   $w->xview('scroll',-2,'units')
+  }
+ else
+  {
+   return;
+  }
+ $w->Motion($w->index("@" . $x . ',' . $y));
+ $w->RepeatId($w->after(50,'AutoScan',$w,$x,$y));
+}
+
+sub Cancel
+{
+	my $w = shift;
+
+	if ($ENV{'jwtlistboxhack'}) {
+		$w->selectionClear('0', 'end')  if ($w->cget('-selectmode') =~ /^(?:multiple|extended)/o);
+	} else {
+		return if ($w->cget('-selectmode') ne 'extended' || !defined $Prev);
+
+		my $first = $w->index('anchor');
+		my $active = $w->index('active');
+		my $last = $Prev;
+		($first, $last) = ($last, $first)  if ($first > $last);
+		$w->selectionClear($first,$last);
+		while ($first <= $last) {
+			if (Tk::lsearch(\@Selection,$first) >= 0) {
+				$w->selectionSet($first)
+			}
+			$first++
+		}
+		$w->activate($active);  #FOR SOME REASON THIS GETS CLEARED?!
+	}
+	$w->eventGenerate("<<ListboxSelect>>");
+}
+
+sub InvokeCommand  #USER PRESSED THE <RETURN> KEY, CALL CALLBACK.
+{
+	my $w = shift;
+	my $active = $w->index('active');
+
+	if ($w->cget('-selectmode') =~ /^(?:multiple|extended)/) {
+		my $SelectedRef = $w->curselection;
+		$w->Callback(-command => $active, $SelectedRef);
+	} else {
+		my ($Selected1) = $w->curselection;
+		$w->Callback(-command => $active, $Selected1)
+	}
+}
+
+sub show
+{
+	my $w = shift;
+	my @args = @_;
+	unshift @args, '-entry'  unless ($#args >= 1 && $args[0] =~ /^\-/);
+	$args[1] = $w->getEntry($args[1]);
+	$w->Tk::HList::show(@args);
+}
+
+sub hide
+{
+	my $w = shift;
+	my @args = @_;
+	unshift @args, '-entry'  unless ($#args >= 1 && $args[0] =~ /^\-/);
+	$args[1] = $w->getEntry($args[1]);
+	$w->Tk::HList::hide(@args);
+}
+
+sub bbox
+{
+	return $_[0]->infoBbox($_[0]->getEntry($_[1]));
 }
 
 1

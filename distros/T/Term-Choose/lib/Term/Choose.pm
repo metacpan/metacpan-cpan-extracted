@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.600';
+our $VERSION = '1.601';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -38,9 +38,8 @@ sub new {
         croak "new: the (optional) argument must be a HASH reference" if ref $opt ne 'HASH';
         $self->__validate_and_add_options( $opt );
     }
+    $self->{backup_opt} = { defined $opt ? %$opt : () };
     $self->{plugin} = $Plugin_Package->new();
-    my $backup_self = { map{ $_ => $self->{$_} } keys %$self };
-    $self->{backup_self} = $backup_self;
     return $self;
 }
 
@@ -174,11 +173,14 @@ sub __reset_term {
     if ( defined $self->{plugin} ) {
         $self->{plugin}->__reset_mode( $self->{mouse}, $self->{hide_cursor} );
     }
-    if ( defined $self->{backup_self} ) {
-        my $backup_self = delete $self->{backup_self};
+    if ( exists $self->{backup_opt} ) {
+        my $backup_opt = $self->{backup_opt};
         for my $key ( keys %$self ) {
-            if ( defined $backup_self->{$key} ) {
-                $self->{$key} = $backup_self->{$key};
+            if ( $key eq 'plugin' || $key eq 'backup_opt' ) {
+                next;
+            }
+            elsif ( exists $backup_opt->{$key} ) {
+                $self->{$key} = $backup_opt->{$key};
             }
             else {
                 delete $self->{$key};
@@ -1078,7 +1080,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.600
+Version 1.601
 
 =cut
 

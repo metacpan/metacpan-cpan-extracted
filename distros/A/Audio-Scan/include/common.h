@@ -69,6 +69,9 @@ typedef struct _GUID {
 
 #define CONVERT_INT32LE(b) \
 (i = (b[3] << 24) | (b[2] << 16) | b[1] << 8 | b[0], i)
+    
+#define CONVERT_INT16LE(b) \
+(i = (b[1] << 8) | b[0], i)
 
 int _check_buf(PerlIO *infile, Buffer *buf, int size, int min_size);
 void _split_vorbis_comment(char* comment, HV* tags);

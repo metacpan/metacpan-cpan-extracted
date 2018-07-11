@@ -1,8 +1,7 @@
 ############################################################################
 package XAO::FS;
 
-use vars qw($VERSION);
-$VERSION='1.16';
+our $VERSION='1.21';
 1;
 
 ############################################################################
@@ -10,12 +9,9 @@ __END__
 
 =head1 NAME
 
-XAO::FS - XAO Foundation Server
+XAO::FS - XAO framework database layer
 
 =head1 DESIGN REQUIREMENTS
-
-The following description summarizes a set of design meetings held by
-XAO Inc.
 
 Usually from both developer and management point of view it is easier to
 think of a data piece as of some kind of closed entity with some content

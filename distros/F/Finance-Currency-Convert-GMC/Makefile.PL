@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Finance::Currency::Convert::GMC",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
+    "IO::Socket::SSL" => "2.009",
     "Log::ger" => "0.023",
     "Mojo::DOM" => 0,
     "Mojo::UserAgent" => 0,
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "Perinci::Sub::Property::exit_on_error" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "FindBin" => 0,
   "IO::Handle" => 0,
+  "IO::Socket::SSL" => "2.009",
   "IPC::Open3" => 0,
   "Log::ger" => "0.023",
   "Mojo::DOM" => 0,

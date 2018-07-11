@@ -12,7 +12,7 @@ use Email::MIME 1.940;
 use Email::MIME::CreateHTML;
 use Email::Sender::Simple 'sendmail';
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 sub new {
     my $self = shift;
@@ -72,7 +72,7 @@ sub send {
                     attributes => {
                         disposition  => 'attachment',
                         content_type => $_->{ctype} || 'application/octet-stream',
-                        encoding     => 'quoted-printable',
+                        encoding     => $_->{encoding} // 'base64',
                         filename     => $_->{name} || $_->{filename} || $_->{source},
                         name         => $_->{name} || $_->{filename} || $_->{source},
                     },
@@ -142,7 +142,7 @@ Email::Mailer - Multi-purpose emailer for HTML, auto-text, attachments, and temp
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Email-Mailer.svg)](https://travis-ci.org/gryphonshafer/Email-Mailer)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Email-Mailer/badge.png)](https://coveralls.io/r/gryphonshafer/Email-Mailer)
@@ -203,9 +203,10 @@ version 1.07
                 source => 'file.pdf',
             },
             {
-                ctype   => 'application/pdf',
-                content => io('file.pdf')->binary->all,
-                name    => 'file.pdf',
+                ctype    => 'application/pdf',
+                content  => io('file.pdf')->binary->all,
+                encoding => 'base64',
+                name     => 'file.pdf',
             },
         ],
     );
@@ -386,12 +387,18 @@ filename of the attachment.
                 source => 'file.pdf',
             },
             {
-                ctype   => 'application/pdf',
-                content => io('file.pdf')->binary->all,
-                name    => 'file.pdf',
+                ctype    => 'application/pdf',
+                content  => io('file.pdf')->binary->all,
+                encoding => 'base64',
+                name     => 'file.pdf',
             },
         ],
     );
+
+An optional parameter of "encoding" can be supplied in a hashref to
+"attachments" to indicate what encoding the attachment should be encoded as.
+If not specified, the default is "base64" encoding, which works in most cases.
+Another popular choice is "quoted-printable".
 
 =head2 process
 
@@ -492,7 +499,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

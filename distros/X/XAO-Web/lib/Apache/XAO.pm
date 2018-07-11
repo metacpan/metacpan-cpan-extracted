@@ -13,7 +13,7 @@ In httpd.conf or <VirtualHost ..> section:
 
 =head1 DESCRIPTION
 
-Apache::XAO is provides a clean way to integrate XAO::Web based web
+Apache::XAO provides a clean way to integrate XAO::Web based web
 sites into mod_perl for maximum performance. The same site can still be
 used in CGI mode (see L<XAO::Web::Intro> for configuration samples).
 
@@ -25,7 +25,7 @@ usually happens with images -- /images or something similar) these
 areas need to be configured in the site's configuration. This is
 described in details below.
 
-As a convenience, there is also simple way to exclude certain locations
+As a convenience, there is also a simple way to exclude certain locations
 using Apache configuration only. Most common is ExtFilesMap:
 
  PerlSetVar         ExtFilesMap     /images
@@ -46,15 +46,15 @@ To achieve the same effect from the site configuration you need:
      },
  },
 
-More generic way is to just disable Apache::XAO from handling some area
-altogether:
+A more generic way is to just disable Apache::XAO from handling some
+area altogether:
 
  PerlSetVar         ExtFiles        /images
 
 In this case no mapping is performed and generally Apache::XAO does
 nothing and lets Apache handle the files.
 
-Site configuration equivalent is:
+A site configuration equivalent is:
 
  path_mapping_table => {
      '/images' => {
@@ -62,7 +62,7 @@ Site configuration equivalent is:
      },
  },
 
-More then one prefix can be listed using ':' as separator:
+More then one prefix can be listed using ':' as a separator:
 
  PerlSetVar         ExtFilesMap     /images:/icons:/ftp
 
@@ -72,7 +72,7 @@ Using Apache::XAO gives of course incomparable with CGI mode
 performance, but even in comparision with mod_rewrite/mod_perl
 combination we got 5 to 10 percent boost in performance in tests.
 
-Not to mention clearer looking config files and reduced server memory
+Not to mention cleaner looking config files and reduced server memory
 footprint -- no need to load mod_rewrite.
 
 For additional improvement in memory size it is recommended to add
@@ -82,7 +82,7 @@ VirtualHost):
  PerlModule XAO::PreLoad
 
 This way most of XAO modules will be pre-compiled and shared between all
-apache child thus saving memory and child startup time:
+apache child processes thus saving memory and child startup time.
 
 =cut
 
@@ -93,10 +93,9 @@ use warnings;
 use XAO::Utils;
 use XAO::Web;
 
-###############################################################################
+our $VERSION='2.01';    # Needed for CPAN
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: XAO.pm,v 2.10 2008/07/30 03:47:46 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+###############################################################################
 
 use vars qw($MP2);
 use vars qw($HAVE_SIZE_LIMIT);
@@ -176,7 +175,9 @@ Please use 'PerlSetVar sitename yoursitename' directive in the
 configuration.
 EOT
     }
-    my $web=XAO::Web->new(sitename => $sitename);
+    my $web=XAO::Web->new(sitename => $sitename, init_args => {
+        environment => 'web',
+    });
 
     # Checking access rules
     #

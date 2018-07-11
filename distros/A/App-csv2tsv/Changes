@@ -1,4 +1,22 @@
 Revision history for App-csv2tsv
+0.56    2018-07-10 Tue. 
+        Typos and option eplanation in English part slightly changed.
+
+
+0.55    2018-07-09 Mon.
+        Enabled to show the error input line invoked by Text::CSV_XS. 
+        -s and -a are implemented.
+        
+0.53    2018-07-06 Fri.
+        Information showing also for "reverse process". 
+        "binmode *STDERR , ':utf8'" added. 
+        Refactoring to gain concise looking the overall structure of this program.
+        Still leaves refatoring room, for when the quotemeta function is performed.
+
+0.53    2018-07-06 Fri. 
+        Debugged for extra escaping character problem.
+        Not fully but refactored significantly.
+        Option -@ is implemented. 
 
 0.52    2018-07-05 Thu.
         Escaping mechanism introduced.

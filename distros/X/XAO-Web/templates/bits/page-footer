@@ -1,4 +1,5 @@
-<HR>
-<FONT SIZE="1">Powered by <A HREF="http://www.xao.com/">XAO::Web</A>, version <%VERSION/h%></FONT>
-</BODY>
-</HTML>
+<div style="border-top: 1px solid #888; margin-top: 15px; padding-top: 15px">
+  <small>Powered by <a href="https://ejelta.com/xao/">XAO::Web</A>, version <$VERSION/h$></small>
+</div>
+</body>
+</html>

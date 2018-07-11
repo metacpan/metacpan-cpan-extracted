@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '5.6'; # VERSION
+our $VERSION = '5.7'; # VERSION
 
 use CLI::Helpers qw(:output);
 use Clone qw(clone);
@@ -272,7 +272,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 5.6
+version 5.7
 
 =head1 ATTRIBUTES
 
@@ -460,7 +460,7 @@ except one piece that shifts.  Imagine:
     $query->add_bool(must => { range => { attack_score => { gt => 10 }} });
 
     while( 1 ) {
-        $query->stash( must => { range => { timestamp => { gt => now() } } } );
+        $query->stash( must => { range => { timestamp => { gt => time() } } } );
         my @results = make_es_request( $query->request_body, $query->uri_params );
 
         # Long processing

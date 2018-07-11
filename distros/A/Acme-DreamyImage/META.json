@@ -1,0 +1,62 @@
+{
+   "abstract" : "Dreamy image generator",
+   "author" : [
+      "Kang-min Liu E<lt>gugod@gugod.orgE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.023",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Acme-DreamyImage",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.023"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA1" : "0",
+            "Imager" : "0.72",
+            "Object::Tiny" : "0",
+            "self" : "0.32"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::DreamyImage" : {
+         "file" : "lib/Acme/DreamyImage.pm",
+         "version" : "2.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Acme-DreamyImage/issues"
+      },
+      "homepage" : "https://github.com/gugod/Acme-DreamyImage",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gugod/Acme-DreamyImage.git",
+         "web" : "https://github.com/gugod/Acme-DreamyImage"
+      }
+   },
+   "version" : "2.0",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : "1"
+}

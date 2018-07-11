@@ -1,7 +1,9 @@
-^.cvsignore$
+^.gitignore$
 Makefile$
 .*\.old$
+testcases/out/format-.*-test\..*
 blib/
 pm_to_blib
-^CVS/
-/CVS/
+ta/
+.git/
+MYMETA\..*

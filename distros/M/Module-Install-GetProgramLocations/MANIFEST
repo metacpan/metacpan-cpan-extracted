@@ -11,7 +11,6 @@ lib/Module/Install/GetProgramLocations.pm
 # Tests
 t/basic.t
 t/dummy_program.pl
-t/pod.t
 t/versions.t
 
 # Module::Install extensions
@@ -26,6 +25,7 @@ inc/Module/Install/GithubMeta.pm
 inc/Module/Install/Include.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
+inc/Module/Install/StandardTests.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm

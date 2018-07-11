@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 33;
+use Test::More tests => 35;
 use Test::Exception;
 
 my $module = 'Test::MockObject::Extends';
@@ -155,3 +155,14 @@ package main;
 my $o = Test::MockObject::Extends->new('Obj')->set_always(
 	-class_method => 'FAKED RESULT' );
 is(  $o->class_method, 'FAKED RESULT', 'class method mocked' );
+
+# Don't reuse call info from destroyed object
+sub extend
+{
+    my $obj = bless {}, 'My';
+    $obj = Test::MockObject::Extends->new($obj);
+    ok ! $obj->call_pos(1), 'not called';
+    $obj->set_true('test');
+    $obj->test();
+}
+extend() for 1, 2;

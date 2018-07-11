@@ -226,6 +226,23 @@ explanation in L<Digest::Bcrypt::cost()> method. On an Intel i5-4670K
 CPU @ 3.40GHz the default cost 8 results in about 15ms per password
 encryption.
 
+=item pass_normalize
+
+Normalize password before encrypting it. The default is not to do any
+pre-processing, but for new development where Unicode passwords are a
+possibility it is a good idea to use a normalization.
+
+There are two supported values currently: 'saslprep' (using
+L<Authen::SASL::SASLprep> implementation of RFC-4013) and 'nfkc' (using
+L<Unicode::Normalize> NFKC normalization). For most unicode strings
+these are interchangable and using saslprep is recommended.
+
+Unicode characters that are left after normalization (or lack thereof)
+are encoded into UTF-8 bytes before being encrypted.
+
+B<Note:> Unicode normalization only works on passwords containing perl
+characters, not byte encoded strings.
+
 =item pass_pepper
 
 An optional string that is added to passwords when they are encrypted.
@@ -246,6 +263,13 @@ these parameters are present in the configuration on login success
 'IdentifyUser' object generates random key, stores it into user's
 profile, and creates a cookie named according to 'vf_key_cookie' with
 the value of the generated key.
+
+=item vf_key_length
+
+By default keys are 8 characters long. Use this option to set a custom
+key length. This only works for vf_key_prop single login keys. For
+key_list_uri based keys they are auto-generated based on the storage
+settings.
 
 =item vf_key_cookie
 
@@ -376,19 +400,21 @@ Now, let us look at some examples that show how each mode works.
 ###############################################################################
 package XAO::DO::Web::IdentifyUser;
 use strict;
+use Authen::SASL::SASLprep qw(saslprep);
 use Data::Entropy::Algorithms qw(rand_bits);
 use Digest::Bcrypt qw();
 use Digest::MD5 qw(md5_base64);
 use Digest::SHA qw(sha1_base64 sha256_base64);
+use Encode;
 use Error qw(:try);
 use MIME::Base64 qw(encode_base64 decode_base64);
-use XAO::Utils;
+use Unicode::Normalize qw(NFKC);
 use XAO::Errors qw(XAO::DO::Web::IdentifyUser);
 use XAO::Objects;
+use XAO::Utils;
 use base XAO::Objects->load(objname => 'Web::Action');
 
-use vars qw($VERSION);
-$VERSION=2.16;
+our $VERSION='2.16';
 
 ###############################################################################
 
@@ -477,6 +503,8 @@ sub check ($@) {
 
     my $cookie_domain=$config->{'domain'};
 
+    my $without_cookies=$args->{'without_cookies'};
+
     # These are useful for both verification and identification cookies.
     #
     my $vf_time_prop=$config->{'vf_time_prop'} ||
@@ -502,7 +530,9 @@ sub check ($@) {
         my $id_cookie=$config->{'id_cookie'} ||
             throw $self "- no 'id_cookie' in the configuration";
 
-        my $cookie_value=$self->siteconfig->get_cookie($id_cookie);
+        my $cookie_value=$without_cookies
+                ? $args->{'id_cookie_value'}
+                : $self->siteconfig->get_cookie($id_cookie);
 
         if(!$cookie_value) {
             return $self->display_results($args,'anonymous');
@@ -544,6 +574,7 @@ sub check ($@) {
                 id              => $user_id,
                 name            => $cookie_value,
                 key_object      => $key_object,
+                key             => $cookie_value,
             };
         }
 
@@ -625,14 +656,17 @@ sub check ($@) {
 
         # Updating cookie
         #
-        my $id_cookie_expire=$config->{'id_cookie_expire'} || 4*365*24*60*60;
-        $self->siteconfig->add_cookie(
-            -name    => $id_cookie,
-            -value   => $cookie_value,
-            -path    => '/',
-            -expires => '+' . $id_cookie_expire . 's',
-            -domain  => $cookie_domain,
-        );
+        unless($without_cookies) {
+            my $id_cookie_expire=$config->{'id_cookie_expire'} || 4*365*24*60*60;
+
+            $self->siteconfig->add_cookie(
+                -name    => $id_cookie,
+                -value   => $cookie_value,
+                -path    => '/',
+                -expires => '+' . $id_cookie_expire . 's',
+                -domain  => $cookie_domain,
+            );
+        }
     }
 
     # Checking clipboard to determine if 'verified' flag is set and
@@ -642,11 +676,18 @@ sub check ($@) {
     if(!$verified) {
         my $vcookie;
 
+        my $vf_key_cookie=$config->{'vf_key_cookie'};
+        my $key_cookie_value;
+        if($vf_key_cookie) {
+            $key_cookie_value=$without_cookies
+                                ? $args->{'key_cookie_value'}
+                                : $self->siteconfig->get_cookie($vf_key_cookie);
+        }
+
         # If we have a list of keys find the key that belongs to this
         # browser. If there is not one, assume at most 'identified'
         # status.
         #
-        my $vf_key_cookie=$config->{'vf_key_cookie'};
         my $key_expire_ext_prop=$config->{'key_expire_ext_prop'};
         my $extended;
         if(!$key_list_uri) {
@@ -659,11 +700,9 @@ sub check ($@) {
 
                 my $key_list=$self->odb->fetch($key_list_uri);
 
-                my $key_id=$self->siteconfig->get_cookie($vf_key_cookie);
-
-                if($key_id && $key_list->check_name($key_id)) {
+                if($key_cookie_value && $key_list->check_name($key_cookie_value)) {
                     try {
-                        $key_object=$key_list->get($key_id);
+                        $key_object=$key_list->get($key_cookie_value);
                     }
                     otherwise {
                         my $e=shift;
@@ -716,14 +755,12 @@ sub check ($@) {
             # appropriate field in the user profile
             #
             if(!$key_list_uri && $config->{'vf_key_prop'} && $vf_key_cookie) {
-                my $web_key=$self->siteconfig->get_cookie($vf_key_cookie) || '';
-                my $db_key=$user->get($config->{'vf_key_prop'}) || '';
-                if($web_key && $db_key eq $web_key) {
+                if($key_cookie_value && $key_cookie_value eq ($user->get($config->{'vf_key_prop'}) || '')) {
                     $verified=1;
 
                     $vcookie={
                         -name    => $config->{'vf_key_cookie'},
-                        -value   => $web_key,
+                        -value   => $key_cookie_value,
                         -path    => '/',
                         -expires => '+4y',
                         -domain  => $cookie_domain,
@@ -744,8 +781,11 @@ sub check ($@) {
                 object  => $user,
                 type    => $type,
             );
+
             if(!$errstr) {
                 $clipboard->put("$cb_uri/verified" => 1);
+
+                $clipboard->put("$cb_uri/key" => $key_cookie_value);
 
                 if($key_object) {
                     my $key_expire_prop=$config->{'key_expire_prop'} ||
@@ -763,7 +803,8 @@ sub check ($@) {
                 else {
                     $user->put($vf_time_prop => $current_time);
                 }
-                if($vcookie) {
+
+                if($vcookie && !$without_cookies) {
                     $self->siteconfig->add_cookie($vcookie);
                 }
             }
@@ -777,25 +818,27 @@ sub check ($@) {
     # That might help better track verification from browser side
     # applications and should not hurt anything else.
     #
-    my $expire_mode=$config->{'expire_mode'} || 'keep';
-    if(!$verified && $expire_mode eq 'clean') {
-        if($id_cookie_type eq 'key') {
-            $self->siteconfig->add_cookie(
-                -name    => $config->{'id_cookie'},
-                -value   => 0,
-                -path    => '/',
-                -expires => '-1d',
-                -domain  => $cookie_domain,
-            );
-        }
-        elsif($config->{'vf_key_cookie'}) {
-            $self->siteconfig->add_cookie(
-                -name    => $config->{'vf_key_cookie'},
-                -value   => 0,
-                -path    => '/',
-                -expires => '-1d',
-                -domain  => $cookie_domain,
-            );
+    unless($without_cookies) {
+        my $expire_mode=$config->{'expire_mode'} || 'keep';
+        if(!$verified && $expire_mode eq 'clean') {
+            if($id_cookie_type eq 'key') {
+                $self->siteconfig->add_cookie(
+                    -name    => $config->{'id_cookie'},
+                    -value   => 0,
+                    -path    => '/',
+                    -expires => '-1d',
+                    -domain  => $cookie_domain,
+                );
+            }
+            elsif($config->{'vf_key_cookie'}) {
+                $self->siteconfig->add_cookie(
+                    -name    => $config->{'vf_key_cookie'},
+                    -value   => 0,
+                    -path    => '/',
+                    -expires => '-1d',
+                    -domain  => $cookie_domain,
+                );
+            }
         }
     }
 
@@ -1131,6 +1174,8 @@ sub login ($;%) {
 
     my $data=$self->find_user($config,$username,$args->{'skip_user_condition'});
 
+    my $without_cookies=$args->{'without_cookies'};
+
     # Since MySQL is not case sensitive by default on text fields, there
     # was a glitch allowing people to log in with names like 'JOHN'
     # where the database entry would be keyed 'john'. Later on, if site
@@ -1321,23 +1366,25 @@ sub login ($;%) {
 
         # A failure to login resets existing key cookies
         #
-        if($id_cookie_type eq 'key') {
-            $self->siteconfig->add_cookie(
-                -name    => $id_cookie,
-                -value   => '0',
-                -path    => '/',
-                -expires => '-1d',
-                -domain  => $cookie_domain,
-            );
-        }
-        elsif($config->{'vf_key_cookie'}) {
-            $self->siteconfig->add_cookie(
-                -name    => $config->{'vf_key_cookie'},
-                -value   => '0',
-                -path    => '/',
-                -expires => '-1d',
-                -domain  => $cookie_domain,
-            );
+        unless($without_cookies) {
+            if($id_cookie_type eq 'key') {
+                $self->siteconfig->add_cookie(
+                    -name    => $id_cookie,
+                    -value   => '0',
+                    -path    => '/',
+                    -expires => '-1d',
+                    -domain  => $cookie_domain,
+                );
+            }
+            elsif($config->{'vf_key_cookie'}) {
+                $self->siteconfig->add_cookie(
+                    -name    => $config->{'vf_key_cookie'},
+                    -value   => '0',
+                    -path    => '/',
+                    -expires => '-1d',
+                    -domain  => $cookie_domain,
+                );
+            }
         }
 
         # Returning anonymouse, failed login verification
@@ -1379,33 +1426,56 @@ sub login ($;%) {
 
         $vf_expire_time=$vf_expire_ext_time if $extended && $vf_expire_ext_time;
 
-        my $key_id;
-        my $vf_key_cookie=$config->{'vf_key_cookie'};
-        if($id_cookie_type eq 'key') {
-            $key_id=$self->siteconfig->get_cookie($id_cookie);
-        }
-        elsif($vf_key_cookie) {
-            $key_id=$self->siteconfig->get_cookie($vf_key_cookie);
-        }
-        else {
-            throw $self "- id_cookie_type!=key and there is no vf_key_cookie";
-        }
-
         my $key_list=$self->odb->fetch($key_list_uri);
         my $key_obj;
-        if($key_id) {
-            try {
-                $key_obj=$key_list->get($key_id);
-                if($key_obj->get($key_ref_prop) ne $user->container_key) {
-                    $key_obj=undef;
+        my $key_id;
+
+        unless($without_cookies) {
+            my $vf_key_cookie=$config->{'vf_key_cookie'};
+            if($id_cookie_type eq 'key') {
+                $key_id=$self->siteconfig->get_cookie($id_cookie);
+            }
+            elsif($vf_key_cookie) {
+                $key_id=$self->siteconfig->get_cookie($vf_key_cookie);
+            }
+            else {
+                throw $self "- id_cookie_type!=key and there is no vf_key_cookie";
+            }
+
+            if($key_id) {
+                try {
+                    $key_obj=$key_list->get($key_id);
+                    if($key_obj->get($key_ref_prop) ne $user->container_key) {
+                        $key_obj=undef;
+                        $key_id=undef;
+                    }
+                }
+                otherwise {
+                    my $e=shift;
+                    dprint "IGNORED(OK): $e";
+                    $key_id=undef;
+                };
+            }
+
+            # The old default was to renew key expiration time when a
+            # login is issued over an existing key. The new default is
+            # to always issue a new key, and to invalidate the old key
+            # if present.
+            #
+            if($key_obj) {
+                my $key_renew_mode=$config->{'key_renew_mode'} || 'replace';
+                if($key_renew_mode eq 'replace') {
+                    $key_list->delete($key_id);
+                    $key_obj=$key_id=undef;
+                }
+                elsif($key_renew_mode ne 'update') {
+                    throw $self "- invalid key_renew_mode '$key_renew_mode'";
                 }
             }
-            otherwise {
-                my $e=shift;
-                dprint "IGNORED(OK): $e";
-            };
         }
 
+        # Creating or updating the key
+        #
         my $now=time;
         my %key_data=(
             $key_expire_prop    => $now+$vf_expire_time,
@@ -1433,28 +1503,31 @@ sub login ($;%) {
         }
 
         $data->{'key_object'}=$key_obj;
+        $data->{'key'}=$key_id;
 
-        if($id_cookie_type eq 'key') {
-            $self->siteconfig->add_cookie(
-                -name    => $id_cookie,
-                -value   => $key_id,
-                -path    => '/',
-                -expires => '+10y',
-                -domain  => $cookie_domain,
-            );
-            $data->{'cookie_value'}=$key_id;
-        }
-        elsif($config->{'vf_key_cookie'}) {
-            $self->siteconfig->add_cookie(
-                -name    => $config->{'vf_key_cookie'},
-                -value   => $key_id,
-                -path    => '/',
-                -expires => '+10y',
-                -domain  => $cookie_domain,
-            );
-        }
-        else {
-            throw $self "- either id_cookie_type=key or vf_key_cookie is needed with key_list_uri";
+        unless($without_cookies) {
+            if($id_cookie_type eq 'key') {
+                $self->siteconfig->add_cookie(
+                    -name    => $id_cookie,
+                    -value   => $key_id,
+                    -path    => '/',
+                    -expires => '+10y',
+                    -domain  => $cookie_domain,
+                );
+                $data->{'cookie_value'}=$key_id;
+            }
+            elsif($config->{'vf_key_cookie'}) {
+                $self->siteconfig->add_cookie(
+                    -name    => $config->{'vf_key_cookie'},
+                    -value   => $key_id,
+                    -path    => '/',
+                    -expires => '+10y',
+                    -domain  => $cookie_domain,
+                );
+            }
+            else {
+                throw $self "- either id_cookie_type=key or vf_key_cookie is needed with key_list_uri";
+            }
         }
 
         # Auto expiring some keys
@@ -1472,15 +1545,21 @@ sub login ($;%) {
         }
     }
     elsif($config->{'vf_key_prop'} && $config->{'vf_key_cookie'}) {
-        my $random_key=XAO::Utils::generate_key();
+        my $random_key=XAO::Utils::generate_key($config->{'vf_key_length'} || 8);
+
+        $data->{'key'}=$random_key;
+
         $user->put($config->{'vf_key_prop'} => $random_key);
-        $self->siteconfig->add_cookie(
-            -name    => $config->{'vf_key_cookie'},
-            -value   => $random_key,
-            -path    => '/',
-            -expires => '+10y',
-            -domain  => $cookie_domain,
-        );
+
+        unless($without_cookies) {
+            $self->siteconfig->add_cookie(
+                -name    => $config->{'vf_key_cookie'},
+                -value   => $random_key,
+                -path    => '/',
+                -expires => '+10y',
+                -domain  => $cookie_domain,
+            );
+        }
     }
 
     # Setting login time
@@ -1491,40 +1570,43 @@ sub login ($;%) {
 
     # Setting user name cookie depending on id_cookie_type parameter.
     #
-    my $expire=$config->{'id_cookie_expire'} ? "+$config->{'id_cookie_expire'}s"
-                                             : '+10y';
+    unless($without_cookies) {
+        my $expire=$config->{'id_cookie_expire'}
+                            ? "+$config->{'id_cookie_expire'}s"
+                            : '+10y';
 
-    if($id_cookie_type eq 'id') {
-        my $cookie_value=$data->{'id'};
-        my $r=$data;
-        while($r->{'list_prop'}) {
-            $r=$r->{$r->{'list_prop'}};
-            $cookie_value.="/$r->{'id'}";
-        };
-        $self->siteconfig->add_cookie(
-            -name    => $id_cookie,
-            -value   => $cookie_value,
-            -path    => '/',
-            -expires => $expire,
-            -domain  => $cookie_domain,
-        );
-        $data->{'cookie_value'}=$cookie_value;
-    }
-    elsif($id_cookie_type eq 'name') {
-        $self->siteconfig->add_cookie(
-            -name    => $id_cookie,
-            -value   => $username,
-            -path    => '/',
-            -expires => $expire,
-            -domain  => $cookie_domain,
-        );
-        $data->{'cookie_value'}=$username;
-    }
-    elsif($id_cookie_type eq 'key') {
-        # already set above
-    }
-    else {
-        throw $self "- unsupported id_cookie_type ($id_cookie_type)";
+        if($id_cookie_type eq 'id') {
+            my $cookie_value=$data->{'id'};
+            my $r=$data;
+            while($r->{'list_prop'}) {
+                $r=$r->{$r->{'list_prop'}};
+                $cookie_value.="/$r->{'id'}";
+            };
+            $self->siteconfig->add_cookie(
+                -name    => $id_cookie,
+                -value   => $cookie_value,
+                -path    => '/',
+                -expires => $expire,
+                -domain  => $cookie_domain,
+            );
+            $data->{'cookie_value'}=$cookie_value;
+        }
+        elsif($id_cookie_type eq 'name') {
+            $self->siteconfig->add_cookie(
+                -name    => $id_cookie,
+                -value   => $username,
+                -path    => '/',
+                -expires => $expire,
+                -domain  => $cookie_domain,
+            );
+            $data->{'cookie_value'}=$username;
+        }
+        elsif($id_cookie_type eq 'key') {
+            # already set above
+        }
+        else {
+            throw $self "- unsupported id_cookie_type ($id_cookie_type)";
+        }
     }
 
     # Yay! Verified.
@@ -1602,13 +1684,28 @@ sub logout ($@) {
 
     my ($config,$type)=$self->_get_config($args);
 
+    my $without_cookies=$args->{'without_cookies'};
     my $cookie_domain=$config->{'domain'};
 
     # Logging in the user first. Skipping if 'logged_in' to avoid
     # recursion when we need to log the user out after some failed
     # checks.
     #
-    $self->check(type => $type) unless $args->{'logged_in'};
+    unless($args->{'logged_in'}) {
+
+        # Need to reset templates to avoid contaminating the output from
+        # logout.
+        #
+        $self->check($args,{
+            'mode'                  => 'check',
+            'anonymous.path'        => undef,
+            'anonymous.template'    => undef,
+            'identified.path'       => undef,
+            'identified.template'   => undef,
+            'verified.path'         => undef,
+            'verified.template'     => undef,
+        });
+    }
 
     # Checking if we're currently logged in at all -- either verified or
     # identified.
@@ -1666,6 +1763,7 @@ sub logout ($@) {
     # Deleting verification status from the clipboard
     #
     $clipboard->delete("$cb_uri/verified");
+    $clipboard->delete("$cb_uri/key");
 
     # Not sure, but setting value to an empty string triggered a bug
     # somewhere, setting it to '0' instead and expiring it immediately.
@@ -1674,7 +1772,7 @@ sub logout ($@) {
     # to keep this cookie the user won't be in verified status any more
     # because last verification time was dropped to zero.
     #
-    if($vf_key_cookie) {
+    if(!$without_cookies && $vf_key_cookie) {
         $self->siteconfig->add_cookie(
             -name    => $vf_key_cookie,
             -value   => '0',
@@ -1694,16 +1792,18 @@ sub logout ($@) {
             $clipboard->delete("$cb_uri/key_object");
         }
 
-        my $id_cookie=$config->{'id_cookie'} ||
-            throw $self "- no 'id_cookie' in the configuration";
+        unless($without_cookies) {
+            my $id_cookie=$config->{'id_cookie'} ||
+                throw $self "- no 'id_cookie' in the configuration";
 
-        $self->siteconfig->add_cookie(
-            -name    => $id_cookie,
-            -value   => '0',
-            -path    => '/',
-            -expires => '-1d',
-            -domain  => $cookie_domain,
-        );
+            $self->siteconfig->add_cookie(
+                -name    => $id_cookie,
+                -value   => '0',
+                -path    => '/',
+                -expires => '-1d',
+                -domain  => $cookie_domain,
+            );
+        }
 
         return $self->display_results($args,'anonymous');
     }
@@ -1725,11 +1825,13 @@ sub data_password_check ($@) {
 
     my $pass_encrypt=$args->{'pass_encrypt'};
     my $pass_pepper=$args->{'pass_pepper'};
+    my $pass_normalize=$args->{'pass_normalize'};
 
-    if(!$pass_encrypt || !$pass_pepper) {
+    if(!defined $pass_encrypt || !defined $pass_pepper || !defined $pass_normalize) {
         my $config=$self->_get_config($args);
-        $pass_encrypt||=$config->{'pass_encrypt'};
-        $pass_pepper||=$config->{'pass_pepper'};
+        $pass_encrypt//=$config->{'pass_encrypt'};
+        $pass_pepper//=$config->{'pass_pepper'};
+        $pass_normalize//=$config->{'pass_normalize'};
     }
 
     my $password_stored=$args->{'password_stored'} ||
@@ -1742,8 +1844,9 @@ sub data_password_check ($@) {
     # It overrides whatever specs were given as that is what we need to
     # compare to.
     #
-    if((!$pass_encrypt || $pass_encrypt ne 'plaintext') && $password_stored=~/^\$([\w-]+)\$(.*?)\$.+/) {
+    if((!$pass_encrypt || $pass_encrypt ne 'plaintext') && $password_stored=~/^\$(\w+)(?:-(\w+))?\$(.*?)\$.+/) {
         $pass_encrypt=lc($1);
+        $pass_normalize=lc($2 // '');
     }
 
     # The legacy compatibility default.
@@ -1786,6 +1889,7 @@ sub data_password_check ($@) {
             $pwdata=$self->data_password_encrypt($args,{
                 pass_encrypt    => $pass_encrypt_v,
                 pass_pepper     => $pass_pepper_v,
+                pass_normalize  => $pass_normalize,
             });
 
             if($pwdata->{'encrypted'} eq $password_stored) {
@@ -1822,19 +1926,27 @@ sub data_password_encrypt ($@) {
 
     my $pass_encrypt=$args->{'pass_encrypt'};
     my $pass_pepper=$args->{'pass_pepper'};
+    my $pass_normalize=$args->{'pass_normalize'};
 
-    if((!defined($pass_encrypt) || !defined($pass_pepper)) && ($args->{'config'} || $args->{'type'})) {
+    if((!defined($pass_encrypt) || !defined($pass_pepper) || !defined($pass_normalize)) && ($args->{'config'} || $args->{'type'})) {
         my $config=$self->_get_config($args);
         $pass_encrypt=$config->{'pass_encrypt'} unless defined $pass_encrypt;
         $pass_pepper=$config->{'pass_pepper'} unless defined $pass_pepper;
+        $pass_normalize=$config->{'pass_normalize'} unless defined $pass_normalize;
     }
 
+    my $password=$args->{'password'};
+
+    defined $password ||
+        throw $self "- {{INTERNAL: No password argument}}";
+
     # When called to create a password we won't have a stored
-    # password. But when encrypting internally to check the password we
-    # do get a stored password and that password might have an algorithm
-    # and salt embedded in it. That overrides the configuration to make
-    # it possible to change the config later to a different hashing
-    # function without changing all database stored passwords.
+    # password. But when encrypting internally to check the password
+    # we do get a stored password and that password might have an
+    # algorithm, normalization, and salt embedded in it. That overrides
+    # the configuration to make it possible to change the config later
+    # to a different hashing function without changing all database
+    # stored passwords.
     #
     # In plaintext we don't analyze the stored password, to avoid
     # clashing with what might have been entered by the user.
@@ -1848,9 +1960,10 @@ sub data_password_encrypt ($@) {
         #
         #  $ALG$SALT$DIGEST
         #
-        if($password_stored=~/^\$([\w-]+)\$(.*?)\$.+/) {
+        if($password_stored=~/^\$(\w+)(?:-(\w+))?\$(.*?)\$.+/) {
             $pass_encrypt=lc($1);
-            $salt=$2;
+            $pass_normalize=lc($2 // '');
+            $salt=$3;
         }
 
         # Old MD5 based passwords were bare, not including salt. We
@@ -1882,7 +1995,7 @@ sub data_password_encrypt ($@) {
 
     # Pepper is empty by default
     #
-    $pass_pepper||='';
+    $pass_pepper//='';
 
     # The same story is with pepper -- we encrypt using the first value
     # if there is a list.
@@ -1894,14 +2007,33 @@ sub data_password_encrypt ($@) {
         $pass_pepper=$1;
     }
 
+    # Normalizing the password if required. Saslprep is follows RFC-4013
+    # and for the most part is equivalent to NFKC Unicode normalization.
+    #
+    if(Encode::is_utf8($password)) {
+        if(!$pass_normalize) {
+            # no-op
+        }
+        elsif($pass_normalize eq 'saslprep' || $pass_normalize eq 'sp') {
+            $password=saslprep($password);
+            $pass_normalize='sp';
+        }
+        elsif($pass_normalize eq 'nfkc' || $pass_normalize eq 'kc') {
+            $password=NFKC($password);
+            $pass_normalize='kc';
+        }
+        else {
+            throw $self "- {{INTERNAL:Unknown password normalization}} ($pass_normalize)";
+        }
+
+        # Password hashing expects bytes, not characters.
+        #
+        $password=Encode::encode('utf8',$password);
+    }
+
     # Encrypting (which is actually a misnomer, hashing would be a
     # better word, but it's already called "encrypt" everywhere else).
     #
-    my $password=$args->{'password'};
-
-    defined $password ||
-        throw $self "- {{INTERNAL: No password argument}}";
-
     my $encrypted;
 
     if($pass_encrypt eq 'plaintext') {
@@ -1917,8 +2049,8 @@ sub data_password_encrypt ($@) {
         $salt=substr($salt,0,2);
         $encrypted=crypt($password.$pass_pepper,$salt);
         $pass_wrap=0;
-        if(length($password)>8) {
-            eprint "Only first 8 characters of ".length($password)."-character password are used in 'crypt' mode";
+        if(length($password.$pass_pepper)>8 && !$args->{'no_length_warning'}) {
+            eprint "Only first 8 characters of ".length($password)."-character password ".(length $pass_pepper ? "and ".length($pass_pepper)."-character pepper " : '')."are used in 'crypt' mode";
         }
     }
     elsif($pass_encrypt eq 'md5') {
@@ -2001,7 +2133,7 @@ sub data_password_encrypt ($@) {
     # Wrapping to include salt and algorithm
     #
     if($pass_wrap) {
-        $encrypted='$'.$pass_encrypt.'$'.$salt.'$'.$encrypted;
+        $encrypted='$'.$pass_encrypt.($pass_normalize ? '-'.$pass_normalize : '').'$'.$salt.'$'.$encrypted;
     }
 
     return {

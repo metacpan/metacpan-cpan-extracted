@@ -10,7 +10,7 @@ unless ($ENV{PERL_ALLOW_NETWORK_TESTING}) {
     plan 'skip_all' => "Set PERL_ALLOW_NETWORK_TESTING to conduct live tests";
 }
 else {
-    plan tests => 10;
+    plan tests => 17;
 }
 use Test::RequiresInternet ('ftp.cpan.org' => 21);
 use Capture::Tiny qw( capture_stdout );
@@ -19,6 +19,8 @@ use File::Path qw( make_path remove_tree );
 use File::Spec;
 
 {
+    note("Download a specific development release");
+
     my ($self);
     my $default_host = 'ftp.cpan.org';
     my $default_dir  = '/pub/CPAN/src/5.0';
@@ -101,3 +103,55 @@ use File::Spec;
         qr|$release not found among releases at ftp://$self->{host}$self->{dir}|,
         "Got expected error message for non-existent release");
 }
+
+{
+    note("Download a specific RC release");
+
+    my ($self);
+    my $default_host = 'ftp.cpan.org';
+    my $default_dir  = '/pub/CPAN/src/5.0';
+
+    $self = Perl::Download::FTP->new( {
+        host        => $default_host,
+        dir         => $default_dir,
+        Passive     => 1,
+        verbose     => 1,
+    } );
+    ok(defined $self, "Constructor returned defined object when using default values");
+
+    isa_ok ($self, 'Perl::Download::FTP');
+    my $t = File::Spec->catdir(".", "tmp");
+    my $removed_count = remove_tree($t, { error  => \my $err_list, })
+        if (-d $t);
+
+    my ($tb, $tdir, $stdout);
+    ($tdir) = make_path($t, +{ mode => 0711 })
+        or croak "Unable to make_path for testing";
+
+    note("Downloading tarball via FTP; this may take a while");
+    my $release = 'perl-5.28.0-RC1.tar.gz';
+    $stdout = capture_stdout {
+        $tb = $self->get_specific_release( {
+            release     => $release,
+            path        => $tdir,
+        } );
+    };
+
+    ok(-f $tb, "Found downloaded release $tb");
+
+    like(
+        $stdout,
+        qr/Identified \d+ perl releases at ftp:\/\/\Q${default_host}${default_dir}\E/,
+        "ls(): Got expected verbose output"
+    );
+    like($stdout,
+        qr/Performing FTP 'get' call for/s,
+        "get_specific_release(): Got expected verbose output re starting FTP get");
+    like($stdout,
+        qr/Elapsed time for FTP 'get' call:\s+\d+\s+seconds/s,
+        "get_specific_release(): Got expected verbose output re elapsed time");
+    like($stdout,
+        qr/See:\s+\Q$tb\E/s,
+        "get_specific_release(): Got expected verbose output re download location");
+}
+

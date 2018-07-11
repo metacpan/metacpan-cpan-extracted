@@ -3,6 +3,19 @@ package Elasticsearch::Model::Index;
 use Moose;
 use Class::Load;
 
+around BUILDARGS => sub {
+    my ($orig, $self) = @_;
+    my %args                  = @_;
+    my $args                  = $self->$orig(@_);
+    my @deprecated_attributes = qw/shards replicas refresh_interval/;
+    for my $deprecated_attribute (@deprecated_attributes) {
+        warnings::warn("deprecated",
+            "$deprecated_attribute is deprecated; please use index_settings instead"
+        ) if defined $args->{$deprecated_attribute} and (not $ENV{TESTING_ELASTICSEARCH_MODEL} );
+    }
+    return $args;
+};
+
 has namespace => (
     is => 'ro',
     isa => 'Maybe[Str]',
@@ -15,19 +28,24 @@ has [qw/namespaced_name name/]=> (
 
 has refresh_interval => (
     is => 'ro',
+    isa => 'Str',
     default => '1s',
 );
 
-has [
-    qw(
-        shards
-        replicas
-        )
-    ] => (
+has [qw/
+    shards
+    replicas
+/] => (
     is      => 'ro',
     isa     => 'Int',
     default => 1,
-    );
+);
+
+has index_settings => (
+    is      => 'ro',
+    isa     => 'HashRef',
+    default => sub {{}},
+);
 
 has model => (
     is       => 'ro',
@@ -90,6 +108,7 @@ sub deployment_statement {
         blocks => {
             read_only_allow_delete => 'false',
         },
+        %{$self->index_settings},
     };
 
     return $deploy;

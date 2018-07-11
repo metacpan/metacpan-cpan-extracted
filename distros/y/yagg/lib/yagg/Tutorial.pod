@@ -227,46 +227,46 @@ with your own files, please let me know so that I can update this tutorial.)
 
 =over
 
-=item 1.
+=item (1)
 
 Copy F<lex.l> to F<lex.lg>
 
-=item 2.
+=item (2)
 
 Delete everything in the definitions section, except for an C<%{ ... %}> and
 C<%option prefix=...>, if they are there.
 
-=item 3.
+=item (3)
 
 In the rules section:
 
 =over
 
-=item 1.
+=item (1)
 
 Delete everything in the action blocks except any C<return TOKEN> statements
 
-=item 2.
+=item (2)
 
 Delete any start conditions from the rules
 
-=item 3.
+=item (3)
 
 Delete any rules with empty action blocks
 
-=item 4.
+=item (4)
 
 Replace any regular expressions in the rules with appropriate generators. (See
 above.)
 
 =back
 
-=item 4.
+=item (4)
 
 In the code header block, comment out the #include for the parser-generated
 header file. (This would normally by F<y.tab.h>, but you may have renamed it.)
 
-=item 5.
+=item (5)
 
 If you used the B<-Pfoo> flag to change the symbol prefix from I<yy>, you'll
 need to add an C<%option prefix=foo>.
@@ -277,11 +277,11 @@ need to add an C<%option prefix=foo>.
 
 =over
 
-=item 6.
+=item (6)
 
 Copy F<yacc.y> to F<yacc.yg>
 
-=item 7.
+=item (7)
 
 For any rule that has a side-effect, add another "unaction" block immediately
 following that reverses the effect. You don't need to worry about any changes
@@ -294,7 +294,7 @@ If you compare the F<.yg> file to the original F<.y> file, you'll see that I
 added only one undo block, because all the other action blocks only
 manipulated C<$$>.
 
-=item 8.
+=item (8)
 
 Any functions that you call should not have side effects. If they do, you'll
 need to reverse them in the unaction block(s).
@@ -305,11 +305,11 @@ need to reverse them in the unaction block(s).
 
 =over
 
-=item 9.
+=item (9)
 
 Create a directory like F<input_user_code_myproject/src/model>.
 
-=item 10.
+=item (10)
 
 Put all your source code in that directory, being careful to create proper
 subdirectories if you need them. For example, if you have
@@ -325,7 +325,7 @@ GNUmakefile and edit the value of CCFILEEXT.)
 
 =over
 
-=item 11.
+=item (11)
 
 Run the following command to create the C++ generator code.
 
@@ -337,7 +337,7 @@ Run the following command to create the C++ generator code.
 
 =over
 
-=item 12.
+=item (12)
 
 By default, the output is placed in the F<output/> directory. Change to that
 directory and run GNU make to compile it.
@@ -353,7 +353,7 @@ You can do this automatically by giving B<yagg> the -m flag
 
 =over
 
-=item 13.
+=item (13)
 
 Generate the strings by running the F<generate> program in the F<progs/>
 directory, giving it a positive integer for the length of the strings to

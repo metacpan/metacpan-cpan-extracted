@@ -4,7 +4,7 @@ use warnings;
 use t::TestWSP qw/test_wsp/;
 use Test::More;
 use Test::Mojo;
-use JSON::XS;
+use JSON::MaybeUTF8 ':v1';
 use Mojo::IOLoop;
 use Future;
 
@@ -33,8 +33,8 @@ test_wsp {
     my ($t) = @_;
     $t->websocket_ok('/api' => {});
     $t->send_ok({json => {success => 1}})->message_ok;
-    is decode_json($t->message->[1])->{success}, 'success-reply';
-    is_deeply $t::FrontEnd::STASH, [qw/stashed_data/];
+    is(decode_json_utf8($t->message->[1])->{success}, 'success-reply');
+    is_deeply($t::FrontEnd::STASH, [qw/stashed_data/]);
 }
 't::FrontEnd';
 

@@ -3,7 +3,7 @@ package Module::Install::PRIVATE::Fix_Sort_Versions;
 
 use strict;
 use warnings;
-use File::Slurp;
+use File::Slurper qw(read_text write_text);
 
 use vars qw( @ISA $VERSION );
 
@@ -21,9 +21,9 @@ sub fix_sort_versions {
 
   print "Fixing POD in $file\n";
 
-  my $code = read_file($file);
+  my $code = read_text($file, undef, 1);
   $code =~ s|^=encoding.*||m;
-  write_file($file, $code);
+  write_text($file, $code, undef, 1);
 }
 
 1;

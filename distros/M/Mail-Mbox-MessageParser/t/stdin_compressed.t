@@ -11,14 +11,14 @@ use File::Spec::Functions qw(:ALL);
 use Test::Utils;
 use Mail::Mbox::MessageParser::Config;
 use FileHandle;
-use File::Slurp;
+use File::Slurper qw(read_binary write_binary);
 
 my @files = <t/mailboxes/*.txt.*>;
 @files = grep { !/non-mailbox/ && !/malformed/ } @files;
 
 plan (tests => 1 * scalar (@files));
 
-my $test_program = read_file(\*DATA);
+my $test_program = do { local $/; <DATA> };
 
 foreach my $filename (@files) 
 {
@@ -68,9 +68,9 @@ sub TestImplementation
 
   local $/ = undef;
 
-  write_file($script_fn, {binmode => ':raw'}, $test_program);
+  write_binary($script_fn, $test_program);
 
-  my $mailbox = read_file($filename, { binmode => ':raw' });
+  my $mailbox = read_binary($filename);
 
   open PIPE, "|$^X -I" . catdir('blib','lib') . " $script_fn \"$output_fn\"";
   binmode PIPE;

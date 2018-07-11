@@ -9,7 +9,7 @@ use File::Spec;
 our @EXPORT_OK = qw( dist_share );
 
 # ABSTRACT: Locate per-dist shared files
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 # TODO: Works with PAR
@@ -108,7 +108,7 @@ File::ShareDir::Dist - Locate per-dist shared files
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

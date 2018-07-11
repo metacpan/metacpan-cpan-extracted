@@ -2,7 +2,7 @@ Changes
 lib/Parse/EDID.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 README
 t/edid/crt.13
 t/edid/crt.dell-d1626ht
@@ -25,6 +25,7 @@ t/edid/crt.SM550V
 t/edid/crt.sony-gdm400ps
 t/edid/crt.sony-gdm420
 t/edid/crt.test_box_lmontel
+t/edid/DON000e
 t/edid/IMP2262
 t/edid/lcd.20inches
 t/edid/lcd.acer-al19161.1
@@ -61,6 +62,9 @@ t/edid/lcd.samsung-191n
 t/edid/lcd.samsung-2494hm
 t/edid/lcd.tv.VQ32-1T
 t/edid/lcd.viewsonic-vx715
+t/edid/MEIc12c
+t/edid/MEIc302
+t/edid/ONK0e51
 t/find_edid.t
 t/kwalite.t
 t/parse_edid.t

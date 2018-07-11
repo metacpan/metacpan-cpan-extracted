@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "DateTime::Format::Indonesian" => 0,
     "Exporter::Rinci" => 0,
+    "IO::Socket::SSL" => "2.009",
     "Log::ger" => "0.023",
     "Mojo::UserAgent" => 0,
     "Parse::Date::Month::ID" => 0,
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.062",
+  "VERSION" => "0.063",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +54,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "FindBin" => 0,
   "IO::Handle" => 0,
+  "IO::Socket::SSL" => "2.009",
   "IPC::Open3" => 0,
   "Log::ger" => "0.023",
   "Mojo::UserAgent" => 0,

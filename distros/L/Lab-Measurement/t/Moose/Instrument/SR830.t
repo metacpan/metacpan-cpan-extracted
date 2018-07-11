@@ -18,8 +18,9 @@ use File::Spec::Functions 'catfile';
 my $log_file = catfile(qw/t Moose Instrument SR830.yml/);
 
 my $lia = mock_instrument(
-    type     => 'SR830',
-    log_file => $log_file,
+    type               => 'SR830',
+    log_file           => $log_file,
+    empty_buffer_count => 0,
 );
 
 isa_ok( $lia, 'Lab::Moose::Instrument::SR830' );
@@ -40,7 +41,7 @@ is_absolute_error( $rphi->{phi}, 0, 180,   "phi is in [-180,180]" );
 # Set/Get reference frequency
 
 set_get_test(
-    instr => $lia, getter => 'get_frq', setter => 'set_frq',
+    instr => $lia,         getter => 'get_frq', setter => 'set_frq',
     cache => 'cached_frq', values => [qw/1 10 1000 100000/]
 );
 

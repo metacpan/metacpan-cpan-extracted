@@ -1,5 +1,9 @@
 Revision history for Perl module Perl::Download::FTP
 
+0.05 Sat Jul  7 17:06:36 EDT 2018
+    - Implement handling of RC releases.  list_releases() can now take
+      'dev_or_rc' as value for 'type'
+
 0.04 Fri Mar  2 19:39:04 EST 2018
     - Add module Perl::Download::FTP::Distribution to provide
       FTP download of latest release of a CPAN library

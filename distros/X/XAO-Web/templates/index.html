@@ -1,25 +1,28 @@
 <%Header
-  title="XAO::Web Default Template"
-  keywords="xao e-commerce opensource perl dynamic template web service apache"
-  description="XAO::Web Default Template"
+  title='XAO::Web Default Template'
+  keywords='xao cgi psgi apache template framework'
+  description='XAO::Web Default Template'
 %>
 
-<STRONG>This is the default template for XAO::Web -- XAO Web Developer.
-</STRONG>
-<P>
+<h2>This is the default template for XAO::Web -- XAO Web Developer.</h2>
 
-If you see this page instead of a site then the site is probably misconfigured
--- XAO::Web engine works, but templates are not available.
-<P>
+<p>
+  If you see this page instead of a site then the site is probably misconfigured:
+  <a href="https://ejelta.com/xao/">XAO::Web</a> engine works, but templates
+  are not available.
+</p>
 
-The time now is <EM><%Date/h style="short"%></EM>.
-<BR>
-The current URL is <EM><%Utility/h mode="current-url"%></EM>.
-<P>
+<ul>
+  <li>The time now is <em><%Date/h style="short"%></em>.</li>
+  <li>The current URL is <em><%URL/h%></em>.</li>
+</ul>
 
-Here is the source of this page in case you're interested:
-<TABLE BORDER BGCOLOR="#DDDDDD"><TR><TD><PRE>
-<%Page/html path="/index.html" unparsed%>
-</PRE></TD></TR></TABLE>
+<p>
+  Here is the source of this page in case you're interested:
+</p>
+
+<pre style="padding: 15px; box-shadow: 0 1px 9px #888">
+<%Page/html path='/index.html' unparsed%>
+</pre>
 
 <%Footer%>

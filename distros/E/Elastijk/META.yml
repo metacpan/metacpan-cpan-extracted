@@ -1,32 +1,23 @@
 ---
 abstract: 'A specialized Elasticsearch client.'
 author:
-  - '=over 4'
+  - 'Kang-min Liu <gugod@gugod.org> and Borislav Nikolov <jack@sofialondonmoskva.com>'
 build_requires:
+  Test2::V0: '0'
   Test::More: '0.9'
 configure_requires:
-  Module::Build::Tiny: '0.035'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150001'
+generated_by: 'App::ModuleBuildTiny version 0.023, CPAN::Meta::Converter version 2.150001'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Elastijk
-no_index:
-  directory:
-    - t
-    - xt
-    - inc
-    - share
-    - eg
-    - examples
-    - author
-    - builder
 provides:
   Elastijk:
     file: lib/Elastijk.pm
-    version: '0.12'
+    version: '0.13'
   Elastijk::oo:
     file: lib/Elastijk/oo.pm
 requires:
@@ -37,8 +28,5 @@ resources:
   bugtracker: https://github.com/gugod/Elastijk/issues
   homepage: https://github.com/gugod/Elastijk
   repository: git://github.com/gugod/Elastijk.git
-version: '0.12'
-x_authority: cpan:GUGOD
-x_contributors:
-  - 'borislav nikolov <jack@sofialondonmoskva.com>'
-  - 'Kang-min Liu <gugod@gugod.org>'
+version: '0.13'
+x_static_install: 1

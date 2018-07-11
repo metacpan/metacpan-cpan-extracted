@@ -1,5 +1,5 @@
 package Test::MockObject::Extends;
-$Test::MockObject::Extends::VERSION = '1.20161202';
+$Test::MockObject::Extends::VERSION = '1.20180705';
 use strict;
 use warnings;
 
@@ -78,6 +78,7 @@ sub gen_package
     *{ $package . '::isa'           } = $class->gen_isa( $parent );
     *{ $package . '::AUTOLOAD'      } = $class->gen_autoload( $parent );
     *{ $package . '::__get_parents' } = $class->gen_get_parents( $parent );
+    *{ $package . '::DESTROY'       } = $class->gen_destroy( $parent );
 
     return $package;
 }
@@ -120,6 +121,19 @@ sub gen_can
     };
 }
 
+sub gen_destroy
+{
+    my ($class, $parent) = @_;
+    my $destroy;
+    $destroy = sub
+    {
+        my $self = shift;
+        my $parent_destroy = $parent->can( 'DESTROY' );
+        $self->$parent_destroy if $parent_destroy && $parent_destroy != $destroy;
+        $self->Test::MockObject::DESTROY;
+    }
+}
+
 sub gen_autoload
 {
     my ($class, $parent) = @_;
@@ -129,7 +143,6 @@ sub gen_autoload
         our $AUTOLOAD;
 
         my $method = substr( $AUTOLOAD, rindex( $AUTOLOAD, ':' ) +1 );
-        return if $method eq 'DESTROY';
 
         my $self   = shift;
 

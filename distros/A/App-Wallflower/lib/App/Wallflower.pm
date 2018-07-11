@@ -1,5 +1,5 @@
 package App::Wallflower;
-$App::Wallflower::VERSION = '1.008';
+$App::Wallflower::VERSION = '1.009';
 use strict;
 use warnings;
 
@@ -172,7 +172,8 @@ sub run {
 
 sub _process_args {
     my $self = shift;
-    local @ARGV = @_;
+    local *ARGV;
+    @ARGV = @_;
     while (<>) {
 
         # ignore blank lines and comments
@@ -240,7 +241,7 @@ App::Wallflower - Class performing the moves for the wallflower program
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 

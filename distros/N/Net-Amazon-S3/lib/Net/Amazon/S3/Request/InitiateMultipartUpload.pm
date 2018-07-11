@@ -1,10 +1,11 @@
 package Net::Amazon::S3::Request::InitiateMultipartUpload;
-$Net::Amazon::S3::Request::InitiateMultipartUpload::VERSION = '0.80';
+$Net::Amazon::S3::Request::InitiateMultipartUpload::VERSION = '0.82';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request';
 
-has 'bucket'     => ( is => 'ro', isa => 'BucketName',      required => 1 );
+with 'Net::Amazon::S3::Role::Bucket';
+
 has 'key'        => ( is => 'ro', isa => 'Str',             required => 1 );
 has 'acl_short'  => ( is => 'ro', isa => 'Maybe[AclShort]', required => 0 );
 has 'headers' =>
@@ -24,12 +25,11 @@ sub http_request {
         $headers->{'x-amz-server-side-encryption'} = $self->encryption;
     }
 
-    return Net::Amazon::S3::HTTPRequest->new(
-        s3      => $self->s3,
+    return $self->_build_http_request(
         method  => 'POST',
         path    => $self->_uri( $self->key ).'?uploads',
         headers => $self->headers,
-    )->http_request;
+    );
 }
 
 1;
@@ -44,7 +44,7 @@ Net::Amazon::S3::Request::InitiateMultipartUpload - An internal class to begin a
 
 =head1 VERSION
 
-version 0.80
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -68,11 +68,11 @@ This method returns a HTTP::Request object.
 
 =head1 AUTHOR
 
-Rusty Conover <rusty@luckydinosaur.com>
+Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

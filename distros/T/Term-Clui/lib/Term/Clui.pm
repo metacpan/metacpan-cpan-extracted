@@ -8,7 +8,7 @@
 #########################################################################
 
 package Term::Clui;
-our $VERSION = '1.72';
+our $VERSION = '1.73';
 my $stupid_bloody_warning = $VERSION;  # circumvent -w warning
 require Exporter;
 @ISA = qw(Exporter);
@@ -637,7 +637,7 @@ sub choose {  my $question = shift; local @list = @_;  # @list must be local
 			for (; $inew > 0; $inew--) {
 				last unless $icol[$inew];
 				$new_mid_col = $icol[$inew] + 0.5*length($list[$inew]);
-				last if $new_mid_col < $mid_col;		 # we're past it
+				last if $new_mid_col <= $mid_col;		 # we're past it
 				$right_of_target = $new_mid_col - $mid_col;
 			}
 			if (($mid_col - $new_mid_col) > $right_of_target) { $inew++; }

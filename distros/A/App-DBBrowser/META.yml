@@ -39,7 +39,7 @@ requires:
   Term::Choose::LineFold: '1.600'
   Term::Choose::Util: '0.065'
   Term::Form: '0.316'
-  Term::TablePrint: '0.067'
+  Term::TablePrint: '0.068'
   Text::CSV: '0'
   bytes: '0'
   if: '0'
@@ -49,5 +49,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-DBBrowser.git
-version: '2.016'
+version: '2.018'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -24,6 +24,7 @@ Autoconf
 charnames
 errstr
 expl
+graphemes
 hocery
 indices
 infeasible

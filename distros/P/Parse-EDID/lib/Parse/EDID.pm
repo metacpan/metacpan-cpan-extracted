@@ -21,7 +21,7 @@ use strict;
 use warnings;
 use base 'Exporter';
 
-our $VERSION = '1.0.6';
+our $VERSION = '1.0.7';
 
 our @EXPORT = qw(
      parse_edid
@@ -445,6 +445,10 @@ sub parse_edid {
             $dtd_offset -= 4;
 
             while ($dtd_offset > 0) {
+                if (!$v) {
+                    warn "parse_edid: DTD offset outside of available data\n" if $verbose;
+                    last;
+                }
                 my $h = _get_many_bits($v, 'cea_data_block_collection');
                 $dtd_offset -= $h->{size} + 1;
 
@@ -530,7 +534,9 @@ sub parse_edid {
             $edid{ratio_precision} = 'mm';
         }
 
-        $h->{bad_ratio} = 1 if abs($edid{ratio} - $h->{horizontal_active} / $h->{vertical_active}) > ($edid{ratio_precision} eq 'mm' ? 0.02 : 0.2);
+        $h->{bad_ratio} = 1 if
+            $edid{ratio_precision} &&
+            abs($edid{ratio} - $h->{horizontal_active} / $h->{vertical_active}) > ($edid{ratio_precision} eq 'mm' ? 0.02 : 0.2);
 
         if ($edid{max_size_vertical}) {
             $h->{vertical_dpi} = $h->{vertical_active} / $edid{max_size_vertical} * 2.54;
@@ -657,6 +663,11 @@ Parse::EDID - Extended display identification data (EDID) parser
 
 This module provides some function to parse Extended Display Identification
 Data binary data structures.
+
+Extended Display Identification Data (EDID) is a metadata format for
+display devices to describe their capabilities to a video source. The
+data format is defined by a standard published by the Video Electronics
+Standards Association (VESA).
 
 =head1 FUNCTIONS
 

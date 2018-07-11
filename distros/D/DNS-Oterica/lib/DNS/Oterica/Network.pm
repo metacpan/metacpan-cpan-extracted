@@ -1,6 +1,6 @@
 package DNS::Oterica::Network;
 # ABSTRACT: a network to which results are served
-$DNS::Oterica::Network::VERSION = '0.304';
+$DNS::Oterica::Network::VERSION = '0.311';
 use Moose;
 
 use Net::IP;
@@ -105,7 +105,7 @@ DNS::Oterica::Network - a network to which results are served
 
 =head1 VERSION
 
-version 0.304
+version 0.311
 
 =head1 OVERVIEW
 
@@ -130,7 +130,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

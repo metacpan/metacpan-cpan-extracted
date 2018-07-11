@@ -1,7 +1,7 @@
 package Elasticsearch::Model::Document;
 
 use Moose ();
-use Data::Printer;
+
 use Moose::Exporter;
 use Elasticsearch::Model::Document::Role::Metaclass;
 

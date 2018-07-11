@@ -1,0 +1,18 @@
+Changes
+lib/Config/HAProxy.pm
+lib/Config/HAProxy/Iterator.pm
+lib/Config/HAProxy/Node.pm
+lib/Config/HAProxy/Node/Comment.pm
+lib/Config/HAProxy/Node/Empty.pm
+lib/Config/HAProxy/Node/Root.pm
+lib/Config/HAProxy/Node/Section.pm
+lib/Config/HAProxy/Node/Statement.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/format.t
+t/select.t
+t/Test/HAProxy.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -31,8 +31,6 @@ from L<Net::RDAP::Base> and therefore provide a C<links()> method
 which will return a (potentially empty) array of L<Net::RDAP::Link>
 objects.
 
-The available methods are:
-
 =cut
 
 sub new {
@@ -42,6 +40,10 @@ sub new {
 }
 
 =pod
+
+=head1 METHODS
+
+=head2 Value
 
 	$value = $link->value;
 
@@ -54,6 +56,8 @@ represented in HTML.
 sub value { $_[0]->{'value'} }
 
 =pod
+
+=head2 Relationship
 
 	$rel = $link->rel;
 
@@ -72,6 +76,8 @@ sub rel { $_[0]->{'rel'} }
 
 =pod
 
+=head2 URL
+
 	$url = $link->href;
 
 Returns a L<URI> object corresponding to the target of the link.
@@ -81,6 +87,8 @@ Returns a L<URI> object corresponding to the target of the link.
 sub href { URI->new($_[0]->{'href'}) }
 
 =pod
+
+=head2 Language
 
 	@languages = $link->hreflang;
 
@@ -92,6 +100,8 @@ which describe the language that the target is available in.
 sub hreflang { $_[0]->{'hreflang'} ? @{$_[0]->{'hreflang'}} : undef }
 
 =pod
+
+=head2 Title
 
 	$title = $link->title;
 
@@ -105,6 +115,8 @@ sub title { $_[0]->{'title'} }
 
 =pod
 
+=head2 Media
+
 	$media = $link->media;
 
 Returns the "media" attribute of the link. This corresponds to the
@@ -115,6 +127,8 @@ media/device the target resource is optimized for.
 sub media { $_[0]->{'media'} }
 
 =pod
+
+=head2 Media Type
 
 	$type = $link->type;
 

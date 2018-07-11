@@ -12,7 +12,7 @@ use File::Temp qw(tempdir);
 use POSIX qw(SIGTERM WNOHANG);
 use Time::HiRes qw(sleep);
 
-our $VERSION = '1.0000';
+our $VERSION = '1.0010';
 
 our $errstr;
 our @SEARCH_PATHS = qw(/usr/local/mysql);
@@ -138,12 +138,20 @@ sub wait_for_setup {
         }
         sleep 0.1;
     }
-    { # create 'test' database
+
+    unless ($self->copy_data_from) { # create 'test' database
         my $dbh = DBI->connect($self->dsn(dbname => 'mysql'))
             or die $DBI::errstr;
+        # This 'DROP DATABASE' is only for MySQL8 or later.
+        # MySQL8 or later has "test" database by default and
+        # if `DROP DATABASE` is not done beforehand, `CREATE DATABASE` fails
+        # for some reason on MySQL8 even if `IF NOT EXISTS` notation is there.
+        $dbh->do('DROP DATABASE IF EXISTS test')
+            or die $dbh->errstr;
         $dbh->do('CREATE DATABASE IF NOT EXISTS test')
             or die $dbh->errstr;
     }
+    # XXX copy_data_from doesn't work on MySQL8
 }
 
 sub stop {
@@ -220,14 +228,9 @@ sub setup {
         if ($self->use_mysqld_initialize) {
             $cmd .= ' --initialize-insecure';
         } else {
-            my $mysql_base_dir = $self->mysql_install_db;
-            if (-l $mysql_base_dir) {
-                require File::Spec;
-                require File::Basename;
-                my $base = File::Basename::dirname($mysql_base_dir);
-                $mysql_base_dir = File::Spec->rel2abs(readlink($mysql_base_dir), $base);
-            }
-            if ($mysql_base_dir =~ s{/(?:bin|extra)/mysql_install_db$}{}) {
+            # `abs_path` resolves nested symlinks and returns canonical absolute path
+            my $mysql_base_dir = Cwd::abs_path($self->mysql_install_db);
+            if ($mysql_base_dir =~ s{/(?:bin|extra|scripts)/mysql_install_db$}{}) {
                 $cmd .= " --basedir='$mysql_base_dir'";
             }
         }

@@ -3,7 +3,7 @@ package Module::Install::PRIVATE::Configure_Programs;
 
 use strict;
 use warnings;
-use File::Slurp;
+use File::Slurper qw(read_binary write_binary);
 
 use lib 'inc';
 use Module::Install::GetProgramLocations;
@@ -21,7 +21,7 @@ sub configure_programs {
   my ($self, @args) = @_;
 
   $self->include('Module::Install::GetProgramLocations', 0);
-  $self->configure_requires('File::Slurp', 0);
+  $self->configure_requires('File::Slurper', 0);
 
   my %info = (
       'cat'      => { default => 'cat', argname => 'CAT' },
@@ -79,7 +79,7 @@ sub Update_Config
   my $filename = shift;
   my %locations = %{ shift @_ };
 
-  my $code = read_file($filename);
+  my $code = read_binary($filename);
 
   foreach my $program (keys %locations)
   {
@@ -110,5 +110,5 @@ sub Update_Config
     die "Couldn't find programs hash in $filename";
   }
 
-  write_file($filename, $code);
+  write_binary($filename, $code);
 }

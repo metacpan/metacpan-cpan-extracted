@@ -9,7 +9,7 @@ use Mojo::Promise;
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 my $BASE = __PACKAGE__;
 my $X_RE = qr{^x-};
@@ -19,7 +19,7 @@ has base_url => sub {
   my $schema  = $self->validator->schema;
   my $schemes = $schema->get('/schemes') || [];
 
-  return Mojo::URL->new->host($schema->get('/host') || 'localhost')->path($schema->get('/basePath') || '/')
+  return Mojo::URL->new->host_port($schema->get('/host') || 'localhost')->path($schema->get('/basePath') || '/')
     ->scheme($schemes->[0] || 'http');
 };
 
@@ -137,7 +137,7 @@ sub _generate_tx {
   my ($self, $http_method, $path_spec, $rules, $params, %args) = @_;
   my $v   = $self->validator;
   my $url = $self->base_url->clone;
-  my (%headers, %req, @body, @errors);
+  my (%headers, %req, @errors);
 
   push @{$url->path}, map { local $_ = $_; s,\{(\w+)\},{$params->{$1}//''},ge; $_ } @$path_spec;
 
@@ -165,7 +165,7 @@ sub _generate_tx {
       $url->query->param($name => $params->{$name}) if $in eq 'query';
     }
     elsif ($in eq 'header') {
-      $headers{$name} = $params->{$name} if $in eq 'header';
+      $headers{$name} = $params->{$name};
     }
     elsif ($in eq 'formData') {
       $req{form}{$name} = $params->{$name};
@@ -268,6 +268,18 @@ used to generate methods:
   # With parameters
   $tx = $client->listPets({limit => 10});
 
+See L<Mojo::Transaction> for more information about what you can do with the
+C<$tx> object, but you often just want something like this:
+
+  # Check for errors
+  die $tx->error->{message} if $tx->error;
+
+  # Extract data from the JSON responses
+  say $tx->res->json->{pets}[0]{name};
+
+Check out L<Mojo::Transaction/error>, L<Mojo::Transaction/req> and
+L<Mojo::Transaction/res> for some of the most used methods in that class.
+
 =head2 Customization
 
 If you want to request a different server than what is specified in
@@ -323,6 +335,14 @@ Used to either call an C<$operationId> that has an "invalid name", such as
 "list pets" instead of "listPets" or to call an C<$operationId> that you are
 unsure is supported yet. If it is not, an exception will be thrown,
 matching text "No such operationId".
+
+C<$operationId> is the name of the resource defined in the
+L<OpenAPI specification|https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object>.
+
+The first element in C<@args> can be a hash ref, where a key should match a
+named parameter in the L<OpenAPI specification|https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object>.
+
+C<$tx> is a L<Mojo::Transaction> object.
 
 =head2 call_p
 

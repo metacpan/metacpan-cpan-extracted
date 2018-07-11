@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package HTML::Widget::Plugin::JS;
-$HTML::Widget::Plugin::JS::VERSION = '0.006';
+$HTML::Widget::Plugin::JS::VERSION = '0.007';
 # ABSTRACT: a JavaScript variable declaration emitter
 
 use parent qw(HTML::Widget::Plugin);
@@ -12,6 +12,8 @@ sub provided_widgets { qw(js_var js_vars js_anon) }
 
 sub boolean_args {}
 sub attribute_args {}
+
+sub rewrite_arg { return $_[1] }
 
 #pod =head2 js_var
 #pod
@@ -94,7 +96,7 @@ HTML::Widget::Plugin::JS - a JavaScript variable declaration emitter
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head2 js_var
 

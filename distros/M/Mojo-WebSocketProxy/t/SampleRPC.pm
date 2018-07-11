@@ -5,7 +5,7 @@ use warnings;
 
 use MojoX::JSON::RPC::Service;
 use Mojo::Base 'Mojolicious';
-use JSON::XS;
+use JSON::MaybeXS;
 
 sub startup {
     my $self = shift;
@@ -21,7 +21,7 @@ sub startup {
             '/rpc/echo' => MojoX::JSON::RPC::Service->new->register(
                 'echo',
                 sub {
-                    $self->log->debug('$_[0]->{args} = ' . encode_json($_[0]->{args}));
+                    $self->log->debug('$_[0]->{args} = ' . JSON::MaybeXS->new->encode($_[0]->{args}));
                     return $_[0]->{args};
                 }
             ),

@@ -11,7 +11,7 @@ use vars qw( @ISA $VERSION );
 use Module::Install::Base;
 @ISA = qw( Module::Install::Base );
 
-$VERSION = sprintf "%d.%02d%02d", q/0.10.41/ =~ /(\d+)/g;
+$VERSION = sprintf "%d.%02d%02d", q/0.10.46/ =~ /(\d+)/g;
 
 # ---------------------------------------------------------------------------
 
@@ -47,4 +47,4 @@ sub check_custom_installation
 
 # ---------------------------------------------------------------------------
 
-#line 109
+#line 108

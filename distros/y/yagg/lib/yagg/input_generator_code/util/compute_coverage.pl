@@ -22,6 +22,7 @@ use File::Temp;
 use File::Find;
 use File::Path qw( rmtree mkpath );
 use Cwd qw( realpath getcwd);
+use File::Slurper qw(write_text);
 
 my $CWD;
 
@@ -136,7 +137,7 @@ sub save_or_delete_gcov_files {
 	my @dirsets = @{ shift @_ };
 	my $test_coverage_dir = shift;
 
-	my @gcov_files = <*.gcov>;
+	my @gcov_files = glob(*.gcov);
 
 	foreach my $gcov_file (@gcov_files) {
 		my ($dirset,$original_source_file) =
@@ -170,18 +171,18 @@ sub find_dirset_and_source_file {
 	my $build_dir = shift @_;
 	my @dirsets = @{ shift @_ };
 
-	open IN_GCOV, $input_gcov_file;
+	open(my $in_gcov, '<', $input_gcov_file);
 
 	my $original_relative_source_file;
 
-	while (my $line = <IN_GCOV>) {
+	while (my $line = <$in_gcov>) {
 		if ($line =~ /^\s*-:\s*0:Source:(.*)/) {
 			$original_relative_source_file = $1;
 			last;
 		}
 	}
 
-	close IN_GCOV;
+	close $in_gcov;
 
 	die "Couldn't find source file in preamble\n"
 		unless defined $original_relative_source_file;
@@ -194,7 +195,7 @@ sub find_dirset_and_source_file {
 			if is_subdirectory($original_abs_source_file,$dirset->{'build'});
 	}
 
-	return undef;
+	return undef; ## no critic (ProhibitExplicitReturnUndef)
 }
 
 #-------------------------------------------------------------------------------
@@ -206,13 +207,13 @@ sub make_merged_format_file {
 	my $output = '';
 	my $data_file;
 
-	open IN_GCOV, $gcov_file;
+	open(my $in_gcov, '<', $gcov_file);
 
-	while (my $line = <IN_GCOV>) {
+	while (my $line = <$in_gcov>) {
 		$output .= $line;
 
 		if ($line =~ /^\s*(\d+):\s*\d+-Data:/) {
-			close IN_GCOV;
+			close $in_gcov;
 			return;
 		} elsif ($line =~ /^\s*-:\s*0:Data:(.*)\n/) {
 			$data_file = $1;
@@ -222,11 +223,9 @@ sub make_merged_format_file {
 		}
 	}
 
-	close IN_GCOV;
+	close $in_gcov;
 
-	open OUT_GCOV, ">$gcov_file";
-	print OUT_GCOV $output;
-	close OUT_GCOV;
+  write_text($gcov_file, $output, undef, 1);
 }
 
 #-------------------------------------------------------------------------------
@@ -238,13 +237,13 @@ sub merge_into_existing_file {
 	my $data_file_1;
 	my $output = '';
 
-	open IN_GCOV, $input_gcov_file;
-	open IN_MERGED_GCOV, $target_gcov_file;
+	open(my $in_gcov, '<', $input_gcov_file);
+	open(my $in_merged_gcov, '<', $target_gcov_file);
 
-	my $line_1 = <IN_GCOV>;
-	my $line_2 = <IN_MERGED_GCOV>;
+	my $line_1 = <$in_gcov>;
+	my $line_2 = <$in_merged_gcov>;
 
-	while (!eof(IN_GCOV) && !eof(IN_MERGED_GCOV)) {
+	while (!eof($in_gcov) && !eof($in_merged_gcov)) {
 #print "----------------------------------------\n$line_1$line_2";
 		my ($marker_1,$line_number_1,$data_1) = $line_1 =~ /^([^:]+):([\d\s]+):(.*)/;
 		my ($marker_2,$line_number_2,$divider_2,$data_2) =
@@ -252,39 +251,39 @@ sub merge_into_existing_file {
 
 		if ($divider_2 eq '-') {
 			$output .= $line_2;
-			$line_2 = <IN_MERGED_GCOV>;
+			$line_2 = <$in_merged_gcov>;
 			next;
 		}
 
 		if ($line_number_2 == 0 && $data_2 =~ /^Source:/) {
 			$output .= $line_2;
-			$line_1 = <IN_GCOV>;
-			$line_2 = <IN_MERGED_GCOV>;
+			$line_1 = <$in_gcov>;
+			$line_2 = <$in_merged_gcov>;
 			next;
 		}
 
 		if ($line_number_2 == 0 && $data_2 =~ /^Graph:/) {
 			$output .= $line_2;
-			$line_2 = <IN_MERGED_GCOV>;
+			$line_2 = <$in_merged_gcov>;
 			next;
 		}
 
 		if ($line_number_1 == 0 && $data_1 =~ /^Graph:/) {
 			$output .= $line_1;
-			$line_1 = <IN_GCOV>;
+			$line_1 = <$in_gcov>;
 			next;
 		}
 
 		if ($line_number_2 == 0 && $data_2 =~ /^Data:/) {
 			$output .= $line_2;
-			$line_2 = <IN_MERGED_GCOV>;
+			$line_2 = <$in_merged_gcov>;
 			next;
 		}
 
 		if ($line_number_1 == 0 && $data_1 =~ /^Data:(.*)/) {
 			$data_file_1 = $1;
 			$output .= $line_1;
-			$line_1 = <IN_GCOV>;
+			$line_1 = <$in_gcov>;
 			next;
 		}
 
@@ -296,8 +295,8 @@ sub merge_into_existing_file {
 				my $new_num = sprintf('%' . length($num_2) . 's', $num_1 + $num_2);
 				$output .= "$marker_2:$line_number_2:Runs:$new_num\n";
 
-				$line_1 = <IN_GCOV>;
-				$line_2 = <IN_MERGED_GCOV>;
+				$line_1 = <$in_gcov>;
+				$line_2 = <$in_merged_gcov>;
 				next;
 			}
 
@@ -308,8 +307,8 @@ sub merge_into_existing_file {
 				my $new_num = sprintf('%' . length($num_2) . 's', $num_1 + $num_2);
 				$output .= "$marker_2:$line_number_2:Programs:$new_num\n";
 
-				$line_1 = <IN_GCOV>;
-				$line_2 = <IN_MERGED_GCOV>;
+				$line_1 = <$in_gcov>;
+				$line_2 = <$in_merged_gcov>;
 				next;
 			}
 		}
@@ -333,19 +332,17 @@ sub merge_into_existing_file {
 				$output .= $new_line;
 			}
 
-			$line_1 = <IN_GCOV>;
-			$line_2 = <IN_MERGED_GCOV>;
+			$line_1 = <$in_gcov>;
+			$line_2 = <$in_merged_gcov>;
 			next;
 		}
 
 		die "Unexpected state:\n\$line_1: $line_1\$line_2: $line_2\n";
 	}
 
-	close IN_GCOV;
+	close $in_gcov;
 
-	open OUT_GCOV, ">$target_gcov_file";
-	print OUT_GCOV $output;
-	close OUT_GCOV;
+  write_text($target_gcov_file, $output, undef, 1);
 }
 
 #-------------------------------------------------------------------------------
@@ -407,7 +404,7 @@ sub is_subdirectory {
 sub get_common_prefix_path {
 	my @paths = @_;
 
-	return undef unless @paths;
+	return undef unless @paths; ## no critic (ProhibitExplicitReturnUndef)
 
 	@paths = map { smart_canonpath($_) } @paths;
 

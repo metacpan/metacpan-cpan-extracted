@@ -177,6 +177,10 @@ It's possible to alter the defaults created by `Mew`:
 Simply prefix the attribute's name with a minus sign to avoid setting
 `required => 1`.
 
+Alternatively, use the `Optional` type provided by Types::Standard.
+
+    has _cust => Optional[Str];
+
 #### Modify other options
 
     has  _cust => Str, ( init arg => "bar" );

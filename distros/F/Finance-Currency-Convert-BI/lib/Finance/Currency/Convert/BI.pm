@@ -1,7 +1,7 @@
 package Finance::Currency::Convert::BI;
 
-our $DATE = '2018-06-24'; # DATE
-our $VERSION = '0.062'; # VERSION
+our $DATE = '2018-07-10'; # DATE
+our $VERSION = '0.063'; # VERSION
 
 use 5.010001;
 use strict;
@@ -174,7 +174,7 @@ Finance::Currency::Convert::BI - Get/convert currencies from website of Indonesi
 
 =head1 VERSION
 
-This document describes version 0.062 of Finance::Currency::Convert::BI (from Perl distribution Finance-Currency-Convert-BI), released on 2018-06-24.
+This document describes version 0.063 of Finance::Currency::Convert::BI (from Perl distribution Finance-Currency-Convert-BI), released on 2018-07-10.
 
 =head1 SYNOPSIS
 

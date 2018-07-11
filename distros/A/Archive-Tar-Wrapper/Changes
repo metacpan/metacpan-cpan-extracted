@@ -1,37 +1,54 @@
 ######################################################################
 Revision history for Perl extension Archive::Tar::Wrapper
 
+0.32 (2018/07/10):
+    Typo fixed by Mohammad S Anwar
+    (https://github.com/glasswalk3r/archive-tar-wrapper-perl/pull/10).
+    Refactored performance tests, and now they will run as TODO to test the
+    hypotesis that there is a better algorithm to write() method.
+
 0.31 (2018/07/03):
-    Enabled performance testing to acquire from different setups which scheme is faster to remove dots when reading directories.
+    Enabled performance testing to acquire from different setups which scheme is
+    faster to remove dots when reading directories.
     Disabled Solaris OS until issues are fixed.
-    Fixed bug introduced in Makefile.PL due changes of release 0.30 (thanks to David Cantrell <david@cantrell.org.uk>).
+    Fixed bug introduced in Makefile.PL due changes of release 0.30 (thanks to
+    David Cantrell <david@cantrell.org.uk>).
     Updated documentation.
 
 0.30 (2018/06):
-    Keeping track of changes per request https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/7.
+    Keeping track of changes per request
+    https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/7.
     Fixing proper handling of File::Which when checking on Microsoft Windows.
     Refactored troubleshooting messages on Microsoft Windows.
-    Bug fixes provided by Shoichi Kaji (skaji at cpan.org) in PRs https://github.com/glasswalk3r/archive-tar-wrapper-perl/pull/9
+    Bug fixes provided by Shoichi Kaji (skaji at cpan.org) in PRs
+    https://github.com/glasswalk3r/archive-tar-wrapper-perl/pull/9
     and https://github.com/glasswalk3r/archive-tar-wrapper-perl/pull/8
 
 0.29 (2018/06/25):
-    Added Microsoft Windows support with the help of Ingram Braun M.A. <me@ingram-braun.net>.
+    Added Microsoft Windows support with the help of Ingram Braun M.A.
+    <me@ingram-braun.net>.
 
 0.28 (2018/06/19)
-    Moving Test::Simple dependency to TEST_REQUIRES per issue https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/6.
+    Moving Test::Simple dependency to TEST_REQUIRES per issue
+    https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/6.
     Removed the README (completely replaced by README.md).
-    Fixed licensing declaration per https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/5.
+    Fixed licensing declaration per
+    https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/5.
     Refactored more debugging messages with proper use of Log::Log4perl.
-    Applied the usage of Test::More is_deeply() whenever possible to improve tests results in case of errors.
+    Applied the usage of Test::More is_deeply() whenever possible to improve
+    tests results in case of errors.
     Small refactorings.
 
 0.27 (2018/06/15)
-    Added Test::Simple 1.302073 as minimum version required to be able to use is_deeply().
-    Getting a logger from Log::Log4perl to be able to improve performance by avoiding doing expensive string
+    Added Test::Simple 1.302073 as minimum version required to be able to use
+    is_deeply().
+    Getting a logger from Log::Log4perl to be able to improve performance by
+    avoiding doing expensive string
     concatenation unless the log level allows it.
-    Reverted changes on list_reset() to go back reading and printing each line recovered instead of keeping it
-    in memory, instead following PBP.
-    Refactored t/001Basic.t by following PBP, using three arguments for open() and adding note() to include more information.
+    Reverted changes on list_reset() to go back reading and printing each line
+    recovered instead of keeping it in memory, instead of following PBP.
+    Refactored t/001Basic.t by following PBP, using three arguments for open()
+    and adding note() to include more information.
 
 
 0.26 (2018/06/09)
@@ -46,14 +63,17 @@ Revision history for Perl extension Archive::Tar::Wrapper
     Removed MYMETA files (see https://rt.cpan.org/Ticket/Display.html?id=108171).
     Improved Kwalitee by adding information to Makefile.PL
     Fixed tests under OpenBSD
-    Added some code to check for OpenBSD tar, which is not quite compatible to the command line options passed by this module.
-    Also made the method is_gnu() more robust, testing the return code and properly handling STDOUT and STDERR when trying "tar --version".
-    Dependencies added are those already available on standard perl (Config and IPC::Open3).
+    Added some code to check for OpenBSD tar, which is not quite compatible to
+    the command line options passed by this module.
+    Also made the method is_gnu() more robust, testing the return code and
+    properly handling STDOUT and STDERR when trying "tar --version".
+    Dependencies added are those already available on standard perl (Config and
+    IPC::Open3).
     Added a README.md for better formatting in Github project page.
     Small refactorings and code formating with perltidy.
 
 0.23  (2015/05/28)
-   (ms) Mark Gardner added separate skips in the test suite to deal 
+   (ms) Mark Gardner added separate skips in the test suite to deal
         with the absense of GNU tar:
         https://github.com/mschilli/archive-tar-wrapper-perl/pull/7
 
@@ -62,7 +82,7 @@ Revision history for Perl extension Archive::Tar::Wrapper
         tests and docs.
 
 0.21  (2014/10/16)
-   (ms) [rt.cpan.org 87536] Setting default umask to get predictable test 
+   (ms) [rt.cpan.org 87536] Setting default umask to get predictable test
         results regardless of local umask settings.
 
 0.20  (2014/09/29)
@@ -86,7 +106,7 @@ Revision history for Perl extension Archive::Tar::Wrapper
         directory permissions.
 
 0.15  (2011/12/20)
-   (ms) [RT 73046] Randy Stauner submitted a patch to reset the directory if a 
+   (ms) [RT 73046] Randy Stauner submitted a patch to reset the directory if a
         write() fails (e.g. because no files have been added).
         https://github.com/mschilli/archive-tar-wrapper-perl/pull/1
 
@@ -112,7 +132,7 @@ Revision history for Perl extension Archive::Tar::Wrapper
 
 0.09  2007/07/20
    (ms) Added utf8 support in add($dataref)
-   (ms) Fixed bug in add($ref) for adding string data, 
+   (ms) Fixed bug in add($ref) for adding string data,
         patch submitted by Karthik Joshi.
    (ms) Changed tempfile CLEANUP to UNLINK in test suite
 
@@ -144,7 +164,7 @@ Revision history for Perl extension Archive::Tar::Wrapper
    (ms) tarup() no longer uses "." as a directory, but globs for all
         top-level entries
    (ms) critical fix for location of tarred files
-   (ms) tmp dir cleanup now handled manually to avoid 
+   (ms) tmp dir cleanup now handled manually to avoid
         File::Temp warnings
 
 0.02  2005/04/20

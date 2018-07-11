@@ -1,4 +1,10 @@
 Revision history for Net::Etcd
+
+0.021
+[ ENHANCEMENTS ]
+* Add support for prefix => 'true'.
+* Add better handing of exceptions from from_json.
+
 0.020
 [ ENHANCEMENTS ]
 * Add support for full chain TLS. Fixes GH #42

@@ -3,7 +3,7 @@ package Module::Install::PRIVATE::Configure_Programs;
 
 use strict;
 use warnings;
-use File::Slurp;
+use File::Slurper qw(read_text write_text);
 
 use lib 'inc';
 use Module::Install::GetProgramLocations;
@@ -21,7 +21,7 @@ sub configure_programs {
   my ($self, @args) = @_;
 
   $self->include('Module::Install::GetProgramLocations', 0);
-  $self->configure_requires('File::Slurp', 0);
+  $self->configure_requires('File::Slurper', 0);
 
   print<<"EOF";
 yagg uses a number of external programs. For security reasons, it is best if
@@ -51,14 +51,14 @@ EOF
       'perl'      => { default => $^X, argname => 'PERL' },
       'dirname'   => { default => 'dirname', argname => 'DIRNAME' },
       'expr'      => { default => 'expr', argname => 'EXPR' },
-      'make'      => { default => ($^O eq 'freebsd' ? 'gmake' : 'make'), argname => 'MAKE',
+      'make'      => { default => (($^O eq 'freebsd' || $^O eq 'openbsd') ? 'gmake' : 'make'), argname => 'MAKE',
                        types    => {
                           'GNU' => { fetch => \&get_gnu_version,
                                      numbers => '[1.0,)', },
                        },
                      },
       'rm'        => { default => 'rm', argname => 'RM' },
-      'find'      => { default => 'find', argname => 'FIND',
+      'find'      => { default => (($^O eq 'freebsd' || $^O eq 'openbsd') ? 'gfind' : 'find'), argname => 'FIND',
                        types    => {
                           'Non-GNU' => { fetch => \&Get_NonGNU_Find_Version,
                                      numbers => '[0,)', },
@@ -82,7 +82,7 @@ EOF
         unless defined $locations{$program}{'path'};
     }
 
-    warn "You won't be able to use yapp to generate code without:\n" .
+    die "You won't be able to use yapp to generate code without:\n" .
       "@missing_programs\n"
       if @missing_programs;
   }
@@ -95,7 +95,7 @@ EOF
         unless defined $locations{$program}{'path'};
     }
 
-    warn "You won't be able to build the generated code without:\n" .
+    die "You won't be able to build the generated code without:\n" .
       "@missing_programs\n"
       if @missing_programs;
   }
@@ -118,7 +118,7 @@ sub Update_Config
   my $filename = shift;
   my %locations = %{ shift @_ };
 
-  my $code = read_file($filename);
+  my $code = read_text($filename, undef, 1);
 
   foreach my $program (keys %locations)
   {
@@ -149,7 +149,7 @@ sub Update_Config
     die "Couldn't find programs hash in $filename";
   }
 
-  write_file($filename, $code);
+  write_text($filename, $code, undef, 1);
 }
 
 # --------------------------------------------------------------------------
@@ -159,13 +159,13 @@ sub Update_Makefile
   my $filename = shift;
   my %locations = %{ shift @_ };
 
-  my $code = read_file($filename);
+  my $code = read_text($filename, undef, 1);
 
   $code = _Update_Makefile_Program_Locations($code, \%locations);
 
   $code = _Update_Makefile_Find_Code($code, $locations{'find'});
 
-  write_file($filename, $code);
+  write_text($filename, $code, undef, 1);
 }
 
 # --------------------------------------------------------------------------
@@ -235,6 +235,8 @@ sub _Update_Makefile_Find_Code
     my $prefix = $1;
     my $flag = $2;
     my $suffix = $3;
+
+    $flag = '' unless defined $flag;
 
     my $value = "$prefix$flag$suffix";
 

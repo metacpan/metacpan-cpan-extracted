@@ -13,6 +13,7 @@ my @files = (
     'lib/App/Nopaste/Service/Codepeek.pm',
     'lib/App/Nopaste/Service/Debian.pm',
     'lib/App/Nopaste/Service/Gist.pm',
+    'lib/App/Nopaste/Service/GitLab.pm',
     'lib/App/Nopaste/Service/Mojopaste.pm',
     'lib/App/Nopaste/Service/PastebinCom.pm',
     'lib/App/Nopaste/Service/Pastie.pm',
@@ -36,17 +37,18 @@ my @files = (
     't/004-10-ubuntu.t',
     't/004-service.t',
     'xt/author/00-compile.t',
+    'xt/author/changes_has_content.t',
     'xt/author/clean-namespaces.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
+    'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
     'xt/author/no-tabs.t',
     'xt/author/pod-spell.t',
     'xt/author/pod-syntax.t',
     'xt/author/portability.t',
     'xt/release/changes_has_content.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/minimum-version.t'
+    'xt/release/cpan-changes.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

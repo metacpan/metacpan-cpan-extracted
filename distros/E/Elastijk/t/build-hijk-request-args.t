@@ -9,11 +9,12 @@ my @base_arg = (
     port => "9200",
     method => "GET",
 );
+my @default = ( head => [ 'Content-Type' => 'application/json' ]);
 my @tests = (
-    [{}, { path => "/" }],
+    [{}, { path => "/", @default }],
     [
         { command => "_stats" },
-        { path => "/_stats" }
+        { path => "/_stats", @default }
     ],
     [
         { command => "_search",
@@ -21,7 +22,8 @@ my @tests = (
           body => '{"query":{"match_all":{}}}' },
         { path => "/_search",
           query_string => "search_type=count",
-          body => '{"query":{"match_all":{}}}' }
+          body => '{"query":{"match_all":{}}}',
+          @default }
     ],
 
     [
@@ -30,7 +32,8 @@ my @tests = (
           body => '{"query":{"match_all":{}}}'  },
         { path => "/_search",
           query_string => "search_type=scan",
-          body => '{"query":{"match_all":{}}}'  }
+          body => '{"query":{"match_all":{}}}',
+          @default }
     ],
 
     [
@@ -39,7 +42,8 @@ my @tests = (
           type  => "bar",
           id    => "42" },
         { path => "/foo/bar/42",
-          query_string => "timeout=3" }
+          query_string => "timeout=3",
+          @default }
     ],
 
     [{
@@ -49,6 +53,7 @@ my @tests = (
     },{
         path => "/foo/bar",
         method => "HEAD",
+        @default
     }],
 );
 

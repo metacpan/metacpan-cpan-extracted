@@ -148,6 +148,9 @@ See [Net::Etcd::Auth::RolePermission](https://metacpan.org/pod/Net::Etcd::Auth::
 
 Grants or revoke permission of a specified key or range to a specified role.
 
+    $etcd->role_perm(
+        { name => 'myrole', key => 'bar', permType => 'READ', prefix => 1 } )->grant;
+
 ## user\_role
 
 See [Net::Etcd::User::Role](https://metacpan.org/pod/Net::Etcd::User::Role)

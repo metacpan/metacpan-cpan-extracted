@@ -18,20 +18,25 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Jojo-Role",
-  "dist_version" => "0.4.0",
+  "dist_version" => "0.5.0",
   "license" => "perl",
   "module_name" => "Jojo::Role",
   "recursive_test_files" => 1,
   "requires" => {
-    "Role::Tiny" => "2.000005",
+    "Role::Tiny" => "2.000006",
     "Sub::Inject" => "v0.3.0",
     "experimental" => 0,
-    "perl" => "5.018"
+    "feature" => 0,
+    "perl" => "5.018",
+    "strict" => 0,
+    "utf8" => 0,
+    "warnings" => 0
   },
   "test_requires" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "Test::More" => "0.96"
+    "Test::More" => "0.96",
+    "constant" => 0
   }
 );
 
@@ -40,7 +45,8 @@ my %fallback_build_requires = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Module::Build" => "0.28",
-  "Test::More" => "0.96"
+  "Test::More" => "0.96",
+  "constant" => 0
 );
 
 

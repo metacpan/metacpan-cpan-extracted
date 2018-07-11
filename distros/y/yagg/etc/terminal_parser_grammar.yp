@@ -444,3 +444,22 @@ sub Parse {
     return \%parsed;
 }
 
+1;
+
+__END__
+
+# --------------------------------------------------------------------------
+
+=head1 NAME
+
+yagg::TerminalParser - An internal class for the yagg parser.
+
+=over 4
+
+=item new()
+
+=item Parse()
+
+=back
+
+=cut

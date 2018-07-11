@@ -17,7 +17,7 @@ use constant KILL_SLEEP_INTERVAL => $ENV{DBIX_TEMP_DB_KILL_SLEEP_INTERVAL} || 2;
 use constant MAX_NUMBER_OF_TRIES => $ENV{DBIX_TEMP_DB_MAX_NUMBER_OF_TRIES} || 20;
 use constant MAX_OPEN_FDS => eval { use POSIX qw(sysconf _SC_OPEN_MAX); sysconf(_SC_OPEN_MAX) } || 1024;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 our %SCHEMA_DATABASE = (pg => 'postgres', mysql => 'mysql');
 my $N = 0;
 
@@ -238,7 +238,7 @@ sub _generate_database_name {
          $self->{template} =~ s!\%T!!g
       or $self->{template} =~ s!\%H!!g
       or $self->{template} =~ s!\%X!!g
-      or confess "Uable to create shorter database anme.";
+      or confess "Uable to create shorter database name.";
     warn "!!! Database name '$name' is too long! Forcing a shorter template: $self->{template}"
       if !$ENV{HARNESS_ACTIVE} or $ENV{HARNESS_VERBOSE};
     return $self->_generate_database_name($n);
@@ -246,6 +246,7 @@ sub _generate_database_name {
 
   $name =~ s!^/+!!;
   $name =~ s!\W!_!g;
+  $name = lc $name;
 
   return $name if $self->url->canonical_engine ne 'sqlite';
   return File::Spec->catfile($self->_tempdir, "$name.sqlite");
@@ -386,7 +387,7 @@ DBIx::TempDB - Create a temporary database
 
 =head1 VERSION
 
-0.14
+0.15
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ Test::Strict - Check syntax, presence of use strict; and test coverage
 
 =head1 VERSION
 
-Version 0.45
+Version 0.47
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ use File::Find;
 use Config;
 
 our $COVER;
-our $VERSION = '0.45';
+our $VERSION = '0.47';
 our $PERL    = $^X || 'perl';
 our $COVERAGE_THRESHOLD = 50; # 50%
 our $UNTAINT_PATTERN    = qr|^(.*)$|;
@@ -495,6 +495,7 @@ sub all_cover_ok {
 }
 
 sub _is_perl_module {
+    return 0 if $_[0] =~ /\~$/;
     $_[0] =~ /\.pm$/i || $_[0] =~ /::/;
 }
 
@@ -502,6 +503,7 @@ sub _is_perl_module {
 sub _is_perl_script {
     my $file = shift;
 
+    return 0 if $file =~ /\~$/;
     return 1 if $file =~ /\.pl$/i;
     return 1 if $file =~ /\.t$/;
     open my $fh, '<', $file or return;

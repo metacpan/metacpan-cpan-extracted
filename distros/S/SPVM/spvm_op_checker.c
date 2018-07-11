@@ -37,12 +37,97 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
   
   // Check types
   SPVM_OP_CHECKER_check_types(compiler);
-  
+
   int32_t sub_id = 0;
   {
     int32_t package_index;
     for (package_index = 0; package_index < compiler->op_packages->length; package_index++) {
       SPVM_OP* op_package = SPVM_LIST_fetch(compiler->op_packages, package_index);
+      
+      SPVM_PACKAGE* package = op_package->uv.package;
+      const char* package_name = package->op_name->uv.name;
+      
+      // value_t package limitation
+      if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
+        // Can't have subroutines
+        if (package->op_subs->length > 0) {
+          SPVM_yyerror_format(compiler, "value_t package can't have subroutines at %s line %d\n", op_package->file, op_package->line);
+        }
+        // Can't have package variables
+        if (package->op_package_vars->length > 0) {
+          SPVM_yyerror_format(compiler, "value_t package can't have package variables at %s line %d\n", op_package->file, op_package->line);
+        }
+        
+        // At least have one field
+        if (package->op_fields->length == 0) {
+          SPVM_yyerror_format(compiler, "value_t package have at least one field at %s line %d\n", op_package->file, op_package->line);
+        }
+        else {
+          SPVM_LIST* op_fields = package->op_fields;
+          SPVM_OP* op_first_field = SPVM_LIST_fetch(op_fields, 0);
+          SPVM_TYPE* first_field_type = SPVM_OP_get_type(compiler, op_first_field);
+          if (!SPVM_TYPE_is_numeric(compiler, first_field_type)) {
+            SPVM_yyerror_format(compiler, "value_t package must have numeric field at %s line %d\n", op_first_field->file, op_first_field->line);
+          }
+          else {
+            int32_t field_index;
+            _Bool numeric_field_error = 0;
+            for (field_index = 0; field_index < package->op_fields->length; field_index++) {
+              SPVM_OP* op_field = SPVM_LIST_fetch(op_fields, field_index);
+              SPVM_TYPE* field_type = SPVM_OP_get_type(compiler, op_field);
+              if (!(field_type->basic_type->id == first_field_type->basic_type->id && field_type->dimension == first_field_type->dimension)) {
+                SPVM_yyerror_format(compiler, "field must have %s type at %s line %d\n", field_type->basic_type->name, op_field->file, op_field->line);
+                numeric_field_error = 1;
+              }
+            }
+            if (!numeric_field_error) {
+              // Check type name
+              char* tail_name = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, 255);
+              sprintf(tail_name, "_%s_%d", first_field_type->basic_type->name, op_fields->length);
+              int32_t tail_name_length = (int32_t)strlen(tail_name);
+              
+              char* found_pos_ptr = strstr(package_name, tail_name);
+              if (found_pos_ptr) {
+                if (*(found_pos_ptr + tail_name_length) != '\0') {
+                  SPVM_yyerror_format(compiler, "package name must end with %s at %s line %d\n", tail_name, op_package->file, op_package->line);
+                }
+              }
+              else {
+                SPVM_yyerror_format(compiler, "package name must end with %s at %s line %d\n", tail_name, op_package->file, op_package->line);
+              }
+            }
+          }
+        }
+      }
+      
+      // valut_t can't become field
+      {
+        int32_t field_index;
+        for (field_index = 0; field_index < op_package->uv.package->op_fields->length; field_index++) {
+          SPVM_OP* op_field = SPVM_LIST_fetch(op_package->uv.package->op_fields, field_index);
+          SPVM_TYPE* field_type = SPVM_OP_get_type(compiler, op_field);
+          _Bool is_value_t = SPVM_TYPE_is_value_t(compiler, field_type);
+          
+          if (is_value_t) {
+            SPVM_yyerror_format(compiler, "value_t type can't become field at %s line %d\n", op_field->file, op_field->line);
+          }
+        }
+      }
+      
+      // valut_t can't become package variable
+      {
+        int32_t package_var_index;
+        for (package_var_index = 0; package_var_index < op_package->uv.package->op_package_vars->length; package_var_index++) {
+          SPVM_OP* op_package_var = SPVM_LIST_fetch(op_package->uv.package->op_package_vars, package_var_index);
+          SPVM_TYPE* package_var_type = SPVM_OP_get_type(compiler, op_package_var);
+          _Bool is_value_t = SPVM_TYPE_is_value_t(compiler, package_var_type);
+          
+          if (is_value_t) {
+            SPVM_yyerror_format(compiler, "value_t type can't become package variable at %s line %d\n", op_package_var->file, op_package_var->line);
+          }
+        }
+      }
+
       SPVM_LIST* op_subs = op_package->uv.package->op_subs;
       {
         int32_t sub_index;
@@ -693,10 +778,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                             return;
                           }
                         }
-                        // 
+                        // Numeric type
                         else if (SPVM_TYPE_is_numeric(compiler, type)) {
                           SPVM_yyerror_format(compiler, "new operator can't receive numeric type at %s line %d\n", op_cur->file, op_cur->line);
                         }
+                        // Object type
                         else if (SPVM_TYPE_is_object(compiler, type)) {
                           SPVM_OP* op_package = SPVM_HASH_fetch(compiler->op_package_symtable, type->basic_type->name, strlen(type->basic_type->name));
                           assert(op_package);
@@ -707,6 +793,9 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                           }
                           else if (package->category == SPVM_PACKAGE_C_CATEGORY_POINTER) {
                             SPVM_yyerror_format(compiler, "Can't create object of struct package at %s line %d\n", op_cur->file, op_cur->line);
+                          }
+                          else if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
+                            SPVM_yyerror_format(compiler, "Can't create object of value_t package at %s line %d\n", op_cur->file, op_cur->line);
                           }
                           else if (package->is_private) {
                             if (strcmp(package->op_name->uv.name, sub->op_package->uv.package->op_name->uv.name) != 0) {
@@ -1017,8 +1106,18 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       SPVM_TYPE* to_type = SPVM_OP_get_type(compiler, op_term_to);
                       SPVM_TYPE* from_type = SPVM_OP_get_type(compiler, op_term_from);
                       
-                      if ((to_type->dimension == 0 && to_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_UNDEF) && (from_type->dimension == 0 && from_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_UNDEF)) {
-                        SPVM_yyerror_format(compiler, "undef can't be assigned to empty type at %s line %d\n", op_cur->file, op_cur->line);
+                      // From type is undef
+                      if (from_type->dimension == 0 && from_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_UNDEF) {
+                        // To type is undef
+                        if (to_type->dimension == 0 && to_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_UNDEF) { 
+                          SPVM_yyerror_format(compiler, "undef can't be assigned to undef at %s line %d\n", op_cur->file, op_cur->line);
+                        }
+                        else {
+                          _Bool to_type_is_value_t = SPVM_TYPE_is_value_t(compiler, to_type);
+                          if (to_type_is_value_t) {
+                            SPVM_yyerror_format(compiler, "undef can't be assigned to value_t type at %s line %d\n", op_cur->file, op_cur->line);
+                          }
+                        }
                       }
                       
                       // Check if source value can be assigned to distination value
@@ -2017,16 +2116,30 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
 
           assert(sub->file_name);
           
-          // Resolve my index
+          // Add op my if need
+          if (sub->op_package->uv.package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE) {
+            int32_t arg_index;
+            for (arg_index = 0; arg_index < sub->op_args->length; arg_index++) {
+              SPVM_OP* op_arg = SPVM_LIST_fetch(sub->op_args, arg_index);
+              SPVM_LIST_push(sub->op_mys, op_arg);
+            }
+          }
+          
+          // Resolve my var id
           {
             int32_t my_index;
+            int32_t my_var_id = 0;
             for (my_index = 0; my_index < sub->op_mys->length; my_index++) {
               SPVM_OP* op_my = SPVM_LIST_fetch(sub->op_mys, my_index);
               SPVM_MY* my = op_my->uv.my;
-              my->index = my_index;
-              if (my_index >= SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
+              SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_my);
+              
+              int32_t width = SPVM_TYPE_get_width(compiler, type);
+              if (my_var_id + (width - 1) > SPVM_LIMIT_C_OPCODE_OPERAND_VALUE_MAX) {
                 SPVM_yyerror_format(compiler, "Too many variable declarations at %s line %d\n", op_my->file, op_my->line);
               }
+              my->var_id = my_var_id;
+              my_var_id += width;
             }
           }
 
@@ -2079,8 +2192,9 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       SPVM_MY* my = op_cur->uv.my;
                       
                       SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_cur);
+                      _Bool type_is_value_t = SPVM_TYPE_is_value_t(compiler, type);
                       
-                      if (SPVM_TYPE_is_object(compiler, type)) {
+                      if (SPVM_TYPE_is_object(compiler, type) && !type_is_value_t) {
                         SPVM_OP* op_block_current = SPVM_LIST_fetch(op_block_stack, op_block_stack->length - 1);
                         op_block_current->uv.block->have_object_var_decl = 1;
                       }
@@ -2221,7 +2335,20 @@ _Bool SPVM_OP_CHECKER_can_assign(SPVM_COMPILER* compiler, int32_t assign_to_basi
       
       // To basic type is any object
       if (assign_to_basic_type_id == SPVM_BASIC_TYPE_C_ID_ANY_OBJECT) {
-        can_assign = 1;
+        if (assign_from_type_dimension == 0) {
+          SPVM_BASIC_TYPE* assign_from_basic_type = SPVM_LIST_fetch(compiler->basic_types, assign_from_basic_type_id);
+          SPVM_OP* assign_from_basic_type_op_package = SPVM_HASH_fetch(compiler->op_package_symtable, assign_from_basic_type->name, strlen(assign_from_basic_type->name));
+          SPVM_PACKAGE* package_assign_from_base = assign_from_basic_type_op_package->uv.package;
+          if (package_assign_from_base->category == SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
+            can_assign = 0;
+          }
+          else {
+            can_assign = 1;
+          }
+        }
+        else {
+          can_assign = 1;
+        }
       }
       else {
         if (assign_to_type_dimension != assign_from_type_dimension) {

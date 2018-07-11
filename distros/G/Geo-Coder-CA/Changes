@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-CA
 
+0.10	Thu Jul  5 08:50:21 EDT 2018
+	Fix http://www.cpantesters.org/cpan/report/0b994acc-7a03-11e8-a944-5f7713bf8fb6
+	Small cleanups
+
 0.09	Tue Jun 26 08:39:52 EDT 2018
 	Remove provides statement from Makefile.PL
 	Only run live tests when RELEASE_TESTING is set

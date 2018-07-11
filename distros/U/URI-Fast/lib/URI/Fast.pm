@@ -1,16 +1,18 @@
 package URI::Fast;
 
+our $XS_VERSION = our $VERSION = '0.38';
+$VERSION =~ tr/_//;
+
+use utf8;
 use strict;
 use warnings;
 no strict 'refs';
-
-our $VERSION = '0.35';
 
 use Carp;
 use Exporter;
 
 require XSLoader;
-XSLoader::load('URI::Fast', $VERSION);
+XSLoader::load('URI::Fast', $XS_VERSION);
 
 use Exporter 'import';
 
@@ -19,6 +21,8 @@ our @EXPORT_OK = qw(
   encode url_encode
   decode url_decode
 );
+
+require URI::Fast::IRI;
 
 use overload '""' => sub{ $_[0]->to_string },
              'eq' => sub{ $_[0]->compare($_[1]) };
@@ -55,10 +59,10 @@ sub auth {
 
   if (@_ == 2) {
     if (ref $val) {
-      $self->set_usr($val->{usr}   // '');
-      $self->set_pwd($val->{pwd}   // '');
-      $self->set_host($val->{host} // '');
-      $self->set_port($val->{port} // '');
+      $self->set_usr($val->{usr}   || '');
+      $self->set_pwd($val->{pwd}   || '');
+      $self->set_host($val->{host} || '');
+      $self->set_port($val->{port} || '');
     }
     else {
       $self->set_auth($val);
@@ -74,15 +78,17 @@ sub path {
   my ($self, $val) = @_;
 
   if (@_ == 2) {
-    $val = '/' . join '/', @$val if ref $val;
-    $self->set_path($val);
+    if (ref $val) {
+      $self->set_path_array($val);
+    } else {
+      $self->set_path($val);
+    }
   }
 
   if (wantarray) {
     @{ $self->split_path };
-  }
-  elsif (defined wantarray) {
-    decode($self->get_path);
+  } elsif (defined wantarray) {
+    $self->get_path;
   }
 }
 
@@ -106,9 +112,19 @@ sub query {
   return %{ $self->query_hash };            # list context
 }
 
-sub query_hash   { $_[0]->get_query_hash }
-sub query_keys   { keys %{ $_[0]->get_query_keys } }
-sub query_keyset { $_[0]->update_query_keyset($_[1], $_[2] || '&') }
+sub query_hash {
+  my $self = shift;
+  $self->query(@_) if @_;
+  $self->get_query_hash;
+}
+
+sub query_keys {
+  keys %{ $_[0]->get_query_keys };
+}
+
+sub query_keyset {
+  $_[0]->update_query_keyset($_[1], $_[2] || '&');
+}
 
 sub param {
   my ($self, $key, $val, $sep) = @_;
@@ -247,6 +263,12 @@ the URI segment to be both retrieved and modified.
 Each attribute further has a matching clearer method (C<clear_*>) which unsets
 its value.
 
+Note that because URIs are parsed into a fixed size struct, any method
+(including the constructor) attempting to set a value larger than the max
+allowable size cause the value to be truncated before croaking. If this error
+is caught in an eval, the URI will remain nominally usable in its updated,
+truncated state.
+
 =head2 scheme
 
 Gets or sets the scheme portion of the URI (e.g. C<http>), excluding C<://>.
@@ -327,9 +349,13 @@ Both '&' and ';' are treated as separators for key/value parameters.
 =head2 query_hash
 
 Scans the query string and returns a hash ref of key/value pairs. Values are
-returned as an array ref, as keys may appear multiple times.
+returned as an array ref, as keys may appear multiple times. Both '&' and ';'
+are treated as separators for key/value parameters.
 
-Both '&' and ';' are treated as separators for key/value parameters.
+May optionally be called with a new hash of parameters to replace the query
+string with, in which case keys may map to scalar values or arrays of scalar
+values. As with all query setter methods, a third parameter may be used to
+explicitly specify the separator to use when generating the new query string.
 
 =head2 param
 
@@ -424,20 +450,21 @@ Overloads the C<eq> operator.
 
 C<URI::Fast> tries to do the right thing in most cases with regard to reserved
 and non-ASCII characters. C<URI::Fast> will fully encode reserved and non-ASCII
-characters when setting C<individual> values. However, the "right thing" is a
+characters when setting I<individual> values. However, the "right thing" is a
 bit ambiguous when it comes to setting compound fields like L</auth>, L</path>,
 and L</query>.
 
 When setting these fields with a string value, reserved characters are expected
 to be present, and are therefore accepted as-is. However, any non-ASCII
 characters will be percent-encoded (since they are unambiguous and there is no
-risk of double-encoding them).
+risk of double-encoding them). Thus,
 
   $uri->auth('someone:secret@Ῥόδος.com:1234');
   print $uri->auth; # "someone:secret@%E1%BF%AC%CF%8C%CE%B4%CE%BF%CF%82.com:1234"
 
-On the other hand, when setting these fields with a I<reference> value, each
-field is fully percent-encoded:
+On the other hand, when setting these fields with a I<reference> value (assumed
+to be a hash ref for L</auth> and L</query> or an array ref for L</path>; see
+individual methods' docs for details), each field is fully percent-encoded:
 
   $uri->auth({usr => 'some one', host => 'somewhere.com'});
   print $uri->auth; # "some%20one@somewhere.com"
@@ -523,10 +550,6 @@ Thanks to L<ZipRecruiter|https://www.ziprecruiter.com> for encouraging their
 employees to contribute back to the open source ecosystem. Without their
 dedication to quality software development this distribution would not exist.
 
-=head1 AUTHOR
-
-Jeff Ober <sysread@fastmail.fm>
-
 =head1 CONTRIBUTORS
 
 The following people have contributed to this module with patches, bug reports,
@@ -549,17 +572,16 @@ fun of me for naming certain methods too generically.
 
 =back
 
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Jeff Ober.
-
-This is free software; you can redistribute it and/or modify it under the same
-terms as the Perl 5 programming language system itself.
+This software is copyright (c) 2018 by Jeff Ober. This is free software; you
+can redistribute it and/or modify it under the same terms as the Perl 5
+programming language system itself.
 
 =cut
 
-1;
-
-package URI::Fast::IRI;
-our @ISA = qw(URI::Fast);
 1;

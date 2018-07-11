@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::Nested;
 use strict;
 use warnings;
 
-our $VERSION = '5.6'; # VERSION
+our $VERSION = '5.7'; # VERSION
 
 use App::ElasticSearch::Utilities::QueryString;
 use CLI::Helpers qw(:output);
@@ -35,6 +35,7 @@ sub handle_token {
     my ($path,$remainder) = split /:"?/, shift @subtokens, 2;
 
     return if exists $Reserved{$path};
+    return unless $remainder;
 
     # If we're nested theres a second colon in there somewhere
     if( $remainder =~ /^[\w\.]+:.+/ ) {
@@ -66,7 +67,7 @@ App::ElasticSearch::Utilities::QueryString::Nested - Implement the proposed Elas
 
 =head1 VERSION
 
-version 5.6
+version 5.7
 
 =head1 SYNOPSIS
 

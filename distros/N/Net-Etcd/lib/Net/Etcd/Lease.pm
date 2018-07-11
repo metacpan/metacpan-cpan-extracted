@@ -20,7 +20,7 @@ Net::Etcd::Lease
 
 =cut
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 =head1 DESCRIPTION
 
@@ -99,7 +99,7 @@ sub grant {
 
 LeaseRevoke revokes a lease. All keys attached to the lease will expire and be deleted.
 
-    $etcd->lease({{ ID => 7587821338341002662 })->revoke
+    $etcd->lease({ ID => 7587821338341002662 })->revoke
 
 =cut
 
@@ -116,7 +116,7 @@ sub revoke {
 
 LeaseTimeToLive retrieves lease information.
 
-    $etcd->lease({{ ID => 7587821338341002662, keys => 1 })->ttl
+    $etcd->lease({ ID => 7587821338341002662, keys => 1 })->ttl
 
 =cut
 

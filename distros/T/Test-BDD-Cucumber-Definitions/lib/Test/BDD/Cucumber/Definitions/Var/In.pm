@@ -7,7 +7,7 @@ use utf8;
 use Test::BDD::Cucumber::Definitions qw(C Given When Then);
 use Test::BDD::Cucumber::Definitions::Var qw(Var);
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -23,6 +23,11 @@ sub import {
     #        var scenario var "(.+?)" random "(.*)"
     Given qr/var scenario var "(.+?)" random "(.*)"/, sub {
         Var->scenario_var_random( $1, $2 );
+    };
+
+    #        var scenario var "(.+?)" struct "(.*)"
+    Given qr/var scenario var "(.+?)" struct "(.*)"/, sub {
+        Var->scenario_var_struct( $1, $2 );
     };
 
     return;

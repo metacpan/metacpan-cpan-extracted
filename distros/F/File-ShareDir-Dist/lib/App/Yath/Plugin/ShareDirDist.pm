@@ -3,26 +3,25 @@ package App::Yath::Plugin::ShareDirDist;
 use strict;
 use warnings;
 use File::Spec;
-use File::Basename qw( basename );
+use File::Basename ();
 
 # ABSTRACT: A prove plugin that works with File::ShareDir::Dist
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
-
-sub options {}
 
 sub pre_init
 {
   if(-d "share")
   {
-    my $dist_name = basename(File::Spec->rel2abs("."));
+    my $dist_name = File::Basename::basename(File::Spec->rel2abs("."));
     $ENV{PERL_FILE_SHAREDIR_DIST} = "$dist_name=share";
   }
 }
 
-sub post_init {}
-sub find_files {}
-sub block_default_search {}
+if(eval { require App::Yath::Plugin })
+{
+  our @ISA = ('App::Yath::Plugin');
+}
 
 1;
 
@@ -38,7 +37,7 @@ App::Yath::Plugin::ShareDirDist - A prove plugin that works with File::ShareDir:
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

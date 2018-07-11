@@ -67,7 +67,7 @@ use Astro::FluxColor;
 use Astro::Fluxes;
 use Number::Uncertainty;
 
-$VERSION = '4.33';
+$VERSION = '4.34';
 $DEBUG = 0;
 
 # Controls whether we follow 'directory' config entries and recursively

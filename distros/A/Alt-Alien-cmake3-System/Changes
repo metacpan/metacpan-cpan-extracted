@@ -1,0 +1,7 @@
+Revision history for Alt-Alien-cmake3-System
+
+0.0402    2018-07-06 21:28:25 -0400
+  - Refuse to install unless cmake is in PATH
+
+0.0401    2018-07-06 20:44:25 -0400
+  - initial version

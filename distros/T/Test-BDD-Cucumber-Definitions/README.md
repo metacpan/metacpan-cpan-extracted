@@ -6,7 +6,7 @@ Driven Development
 
 # VERSION
 
-Version 0.40
+Version 0.41
 
 # SYNOPSIS
 

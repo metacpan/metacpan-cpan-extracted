@@ -11,7 +11,9 @@ my @files = (
     'lib/ew.pm',
     't/00-compile.t',
     't/01-mew.t',
-    't/Class1.pm'
+    't/02-optional.t',
+    't/Class1.pm',
+    't/Class2.pm'
 );
 
 notabs_ok($_) foreach @files;

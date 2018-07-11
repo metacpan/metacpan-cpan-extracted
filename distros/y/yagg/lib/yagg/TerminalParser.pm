@@ -1,6 +1,6 @@
 ####################################################################
 #
-#    This file was generated using Parse::Yapp version 1.05.
+#    This file was generated using Parse::Yapp version 1.21.
 #
 #        Don't edit this file, use source file instead.
 #
@@ -46,7 +46,7 @@ sub new {
         ref($class)
     and $class=ref($class);
 
-    my($self)=$class->SUPER::new( yyversion => '1.05',
+    my($self)=$class->SUPER::new( yyversion => '1.21',
                                   yystates =>
 [
 	{#State 0
@@ -63,13 +63,13 @@ sub new {
 	},
 	{#State 2
 		ACTIONS => {
-			'PROLOGUE' => 7,
-			"%%" => 5,
-			'OPTION_OP' => 4
+			'OPTION_OP' => 4,
+			'PROLOGUE' => 6,
+			"%%" => 8
 		},
 		GOTOS => {
-			'options' => 8,
-			'declaration' => 6
+			'declaration' => 5,
+			'options' => 7
 		}
 	},
 	{#State 3
@@ -82,32 +82,32 @@ sub new {
 		}
 	},
 	{#State 5
-		ACTIONS => {
-			'NUMBER' => 11,
-			"(" => 19,
-			"[" => 10,
-			'EOF_OP' => 14,
-			'CHAR' => 20,
-			'STRING' => 12
-		},
-		GOTOS => {
-			'pattern' => 18,
-			'value' => 17,
-			'rule' => 16,
-			'simple_alternation' => 22,
-			'equivalence_generator' => 15,
-			'rules' => 21,
-			'equivalence_alternation' => 13
-		}
-	},
-	{#State 6
 		DEFAULT => -2
 	},
-	{#State 7
+	{#State 6
 		DEFAULT => -5
 	},
-	{#State 8
+	{#State 7
 		DEFAULT => -4
+	},
+	{#State 8
+		ACTIONS => {
+			"(" => 17,
+			'CHAR' => 11,
+			'EOF_OP' => 21,
+			"[" => 20,
+			'NUMBER' => 22,
+			'STRING' => 15
+		},
+		GOTOS => {
+			'simple_alternation' => 10,
+			'pattern' => 16,
+			'equivalence_alternation' => 18,
+			'value' => 12,
+			'equivalence_generator' => 19,
+			'rule' => 13,
+			'rules' => 14
+		}
 	},
 	{#State 9
 		ACTIONS => {
@@ -119,81 +119,81 @@ sub new {
 		}
 	},
 	{#State 10
-		ACTIONS => {
-			'CHAR' => 20,
-			'STRING' => 12,
-			'GENERATOR_STRING' => 26,
-			'NUMBER' => 11
-		},
-		GOTOS => {
-			'alternation' => 27,
-			'value' => 25
-		}
+		DEFAULT => -16
 	},
 	{#State 11
-		DEFAULT => -26
+		DEFAULT => -25
 	},
 	{#State 12
-		DEFAULT => -24
-	},
-	{#State 13
-		DEFAULT => -17
-	},
-	{#State 14
-		DEFAULT => -14
-	},
-	{#State 15
-		DEFAULT => -18
-	},
-	{#State 16
-		DEFAULT => -11
-	},
-	{#State 17
 		DEFAULT => -15
 	},
-	{#State 18
+	{#State 13
+		DEFAULT => -11
+	},
+	{#State 14
+		ACTIONS => {
+			'CHAR' => 11,
+			"%%" => 25,
+			'STRING' => 15,
+			"(" => 17,
+			"[" => 20,
+			'EOF_OP' => 21,
+			'NUMBER' => 22
+		},
+		DEFAULT => -27,
+		GOTOS => {
+			'simple_alternation' => 10,
+			'pattern' => 16,
+			'equivalence_alternation' => 18,
+			'value' => 12,
+			'equivalence_generator' => 19,
+			'rule' => 26,
+			'epilogue_opt' => 27
+		}
+	},
+	{#State 15
+		DEFAULT => -24
+	},
+	{#State 16
 		ACTIONS => {
 			'RETURN' => 29,
 			"{" => 28
 		}
 	},
-	{#State 19
+	{#State 17
 		ACTIONS => {
-			'CHAR' => 20,
-			'STRING' => 12,
-			'NUMBER' => 11
+			'CHAR' => 11,
+			'NUMBER' => 22,
+			'STRING' => 15
 		},
 		GOTOS => {
 			'alternation' => 30,
-			'value' => 25
+			'value' => 31
 		}
+	},
+	{#State 18
+		DEFAULT => -17
+	},
+	{#State 19
+		DEFAULT => -18
 	},
 	{#State 20
-		DEFAULT => -25
-	},
-	{#State 21
 		ACTIONS => {
-			'CHAR' => 20,
-			"(" => 19,
-			'STRING' => 12,
-			'EOF_OP' => 14,
-			"%%" => 32,
-			"[" => 10,
-			'NUMBER' => 11
+			'CHAR' => 11,
+			'NUMBER' => 22,
+			'GENERATOR_STRING' => 33,
+			'STRING' => 15
 		},
-		DEFAULT => -27,
 		GOTOS => {
-			'pattern' => 18,
-			'epilogue_opt' => 33,
-			'equivalence_alternation' => 13,
-			'rule' => 31,
-			'simple_alternation' => 22,
-			'equivalence_generator' => 15,
-			'value' => 17
+			'alternation' => 32,
+			'value' => 31
 		}
 	},
+	{#State 21
+		DEFAULT => -14
+	},
 	{#State 22
-		DEFAULT => -16
+		DEFAULT => -26
 	},
 	{#State 23
 		ACTIONS => {
@@ -205,46 +205,46 @@ sub new {
 	},
 	{#State 25
 		ACTIONS => {
-			"|" => 35
+			'EPILOGUE' => 35
 		}
 	},
 	{#State 26
-		ACTIONS => {
-			"]" => 36
-		}
+		DEFAULT => -10
 	},
 	{#State 27
-		ACTIONS => {
-			"|" => 38,
-			"]" => 37
-		}
+		DEFAULT => -1
 	},
 	{#State 28
 		ACTIONS => {
-			'RETURN' => 39
+			'RETURN' => 36
 		}
 	},
 	{#State 29
 		ACTIONS => {
-			'IDENTIFIER' => 40
+			'IDENTIFIER' => 37
 		}
 	},
 	{#State 30
 		ACTIONS => {
 			"|" => 38,
-			")" => 41
+			")" => 39
 		}
 	},
 	{#State 31
-		DEFAULT => -10
+		ACTIONS => {
+			"|" => 40
+		}
 	},
 	{#State 32
 		ACTIONS => {
-			'EPILOGUE' => 42
+			"|" => 38,
+			"]" => 41
 		}
 	},
 	{#State 33
-		DEFAULT => -1
+		ACTIONS => {
+			"]" => 42
+		}
 	},
 	{#State 34
 		ACTIONS => {
@@ -252,63 +252,63 @@ sub new {
 		}
 	},
 	{#State 35
-		ACTIONS => {
-			'NUMBER' => 11,
-			'STRING' => 12,
-			'CHAR' => 20
-		},
-		GOTOS => {
-			'value' => 44
-		}
+		DEFAULT => -28
 	},
 	{#State 36
-		DEFAULT => -23
+		ACTIONS => {
+			'IDENTIFIER' => 44
+		}
 	},
 	{#State 37
-		DEFAULT => -22
+		ACTIONS => {
+			";" => 45
+		}
 	},
 	{#State 38
 		ACTIONS => {
-			'NUMBER' => 11,
-			'STRING' => 12,
-			'CHAR' => 20
+			'CHAR' => 11,
+			'NUMBER' => 22,
+			'STRING' => 15
 		},
 		GOTOS => {
-			'value' => 45
+			'value' => 46
 		}
 	},
 	{#State 39
-		ACTIONS => {
-			'IDENTIFIER' => 46
-		}
+		DEFAULT => -21
 	},
 	{#State 40
 		ACTIONS => {
-			";" => 47
+			'CHAR' => 11,
+			'NUMBER' => 22,
+			'STRING' => 15
+		},
+		GOTOS => {
+			'value' => 47
 		}
 	},
 	{#State 41
-		DEFAULT => -21
+		DEFAULT => -22
 	},
 	{#State 42
-		DEFAULT => -28
+		DEFAULT => -23
 	},
 	{#State 43
 		DEFAULT => -9
 	},
 	{#State 44
-		DEFAULT => -19
-	},
-	{#State 45
-		DEFAULT => -20
-	},
-	{#State 46
 		ACTIONS => {
 			";" => 48
 		}
 	},
-	{#State 47
+	{#State 45
 		DEFAULT => -13
+	},
+	{#State 46
+		DEFAULT => -20
+	},
+	{#State 47
+		DEFAULT => -19
 	},
 	{#State 48
 		ACTIONS => {
@@ -786,5 +786,24 @@ sub Parse {
     return \%parsed;
 }
 
+1;
+
+__END__
+
+# --------------------------------------------------------------------------
+
+=head1 NAME
+
+yagg::TerminalParser - An internal class for the yagg parser.
+
+=over 4
+
+=item new()
+
+=item Parse()
+
+=back
+
+=cut
 
 1;

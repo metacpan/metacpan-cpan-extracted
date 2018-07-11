@@ -29,6 +29,7 @@
 #include "mp4.c"
 #include "mpc.c"
 #include "ogg.c"
+#include "opus.c"
 #include "wav.c"
 #include "flac.c"
 #include "wavpack.c"
@@ -63,6 +64,7 @@ struct _types audio_types[] = {
   {"aac", {"aac", "adts", 0}},
   {"mp3", {"mp3", "mp2", 0}},
   {"ogg", {"ogg", "oga", 0}},
+  {"opus", {"opus", 0}},
   {"mpc", {"mpc", "mp+", "mpp", 0}},
   {"ape", {"ape", "apl", 0}},
   {"flc", {"flc", "flac", "fla", 0}},
@@ -79,6 +81,7 @@ static taghandler taghandlers[] = {
   { "aac", get_aacinfo, 0, 0, 0 },
   { "mp3", get_mp3tags, get_mp3fileinfo, mp3_find_frame, 0 },
   { "ogg", get_ogg_metadata, 0, ogg_find_frame, 0 },
+  { "opus", get_opus_metadata, 0, opus_find_frame, 0 },
   { "mpc", get_ape_metadata, get_mpcfileinfo, 0, 0 },
   { "ape", get_ape_metadata, get_macfileinfo, 0, 0 },
   { "flc", get_flac_metadata, 0, flac_find_frame, 0 },

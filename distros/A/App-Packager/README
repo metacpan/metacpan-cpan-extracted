@@ -13,5 +13,6 @@ provides fallback for unpackaged use.
 
 For example:
 
-    use App::Packager;
+    use App::Packager qw( :name My::App );
     print "My packager is: ", App::Packager::Packager(), "\n";
+    print getresource("README.txt");

@@ -22,6 +22,7 @@ meta-spec:
 name: Finance-Currency-Convert-BCA
 requires:
   Exporter: '5.57'
+  IO::Socket::SSL: '2.009'
   List::Util: '1.45'
   Log::ger: '0.023'
   Mojo::DOM: '0'
@@ -36,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Convert-BCA
   homepage: https://metacpan.org/release/Finance-Currency-Convert-BCA
   repository: git://github.com/perlancar/perl-Finance-Currency-Convert-BCA.git
-version: '0.152'
+version: '0.153'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

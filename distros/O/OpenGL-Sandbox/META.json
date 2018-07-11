@@ -4,25 +4,31 @@
       "Michael Conrad <mike@nrdvana.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OpenGL-Sandbox",
+   "no_index" : {
+      "package" : [
+         "OpenGL::Sandbox::Texture::Inline"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
             "Devel::CheckLib" : "1.03",
-            "ExtUtils::MakeMaker" : "0",
-            "Inline::MakeMaker" : "0.45"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
+            "Inline::C" : "0",
+            "Inline::Module" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::More" : "0.88",
             "Test::Pod" : "1.41",
@@ -37,7 +43,6 @@
             "File::Map" : "0",
             "File::Spec::Functions" : "0",
             "Image::PNG::Libpng" : "0",
-            "Inline" : "0",
             "Log::Any" : "0",
             "Moo" : "0",
             "Scalar::Util" : "0",
@@ -69,6 +74,6 @@
          "web" : "https://github.com/nrdvana/perl-OpenGL-Sandbox"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03"
 }
 

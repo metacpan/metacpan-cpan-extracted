@@ -9,9 +9,10 @@ use Log::Minimal;
 use Try::Tiny;
 use Time::HiRes qw/ sleep /;
 use Carp;
+use Digest::SHA qw/ sha1_hex /;
 use Guard ();
 
-our $VERSION              = "0.11";
+our $VERSION              = "0.12";
 our $DEFAULT_EXPIRES      = 86400;
 our $RETRY_INTERVAL       = 0.5;
 our $BLOCKING_KEY_POSTFIX = ":wait";
@@ -33,9 +34,11 @@ END_OF_SCRIPT
 
 use constant BLOCKING_UNLOCK_LUA_SCRIPT_TMPL => <<'END_OF_SCRIPT'
 if redis.call("get",KEYS[1]) == ARGV[1]
-then
-    redis.call("del",KEYS[1],KEYS[1].."%s")
-    return redis.call("lpush",KEYS[1].."%s",ARGV[1])
+    then
+    local q = KEYS[1].."%s"
+    redis.call("del", KEYS[1])
+    redis.call("expire", q, 60)
+    return redis.call("lpush", q, ARGV[1])
 else
     return 0
 end
@@ -43,7 +46,7 @@ END_OF_SCRIPT
     ;
 
 sub BLOCKING_UNLOCK_LUA_SCRIPT {
-    sprintf BLOCKING_UNLOCK_LUA_SCRIPT_TMPL, $BLOCKING_KEY_POSTFIX, $BLOCKING_KEY_POSTFIX;
+    sprintf BLOCKING_UNLOCK_LUA_SCRIPT_TMPL, $BLOCKING_KEY_POSTFIX;
 }
 
 sub parse_options {
@@ -190,16 +193,24 @@ sub release_lock {
     my ($redis, $opt, $key, $token) = @_;
     if ($opt->{keep}) {
         debugf "Keep lock key %s", $key;
+        return;
     }
-    else {
-        debugf "Release lock key %s", $key;
-        if ($WAIT_QUEUE) {
-            $redis->eval(BLOCKING_UNLOCK_LUA_SCRIPT, 1, $key, $token);
+
+    debugf "Release lock key %s", $key;
+    my $script = $WAIT_QUEUE ? BLOCKING_UNLOCK_LUA_SCRIPT : UNLOCK_LUA_SCRIPT;
+    my $sha1   = sha1_hex($script);
+    try {
+        $redis->evalsha($sha1, 1, $key, $token);
+    }
+    catch {
+        my $e = $_;
+        if ($e =~ /NOSCRIPT/) {
+            $redis->eval($script, 1, $key, $token);
         }
         else {
-            $redis->eval(UNLOCK_LUA_SCRIPT, 1, $key, $token);
+            croak $e;
         }
-    }
+    };
 }
 
 sub invoke_command {

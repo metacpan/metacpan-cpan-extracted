@@ -1,14 +1,18 @@
 Todo Items:
 
-  * OO Interface for more customization
-  * Ability to handle header differently than the rest of the file
-    * Should also be able to call something on the header in chlid
-      processes.
+  * Constructor should accept parameters
+  * Better checking of parameters for OO mode
   * UTF-8 and other encoding support
-  * SUpport CRLF line endings on all platforms (:crlf)
+  * Support CRLF line endings on all platforms (:crlf)
   * Documentation on parallel_ that these methods do a SEEK_EOF, so you
     shouldn't use them on things like terminal input.  There's a little
     note already, but it's not particularly clear.
   * A write routine wouldn't be a bad thing.
   * A more detailed CONTRIBUTING file
+  * Ability to lock the file before read (particularly for use with the
+    header option)
+  * Ability to automically read file (copy to temp file, read, delete
+    temp file)
+  * The header_handler function and header_skip should handle multi-line
+    headers.
 

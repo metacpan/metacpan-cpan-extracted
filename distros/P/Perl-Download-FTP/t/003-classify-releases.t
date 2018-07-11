@@ -10,7 +10,7 @@ unless ($ENV{PERL_ALLOW_NETWORK_TESTING}) {
     plan 'skip_all' => "Set PERL_ALLOW_NETWORK_TESTING to conduct live tests";
 }
 else {
-    plan tests =>  68;
+    plan tests =>  78;
 }
 use Test::RequiresInternet ('ftp.cpan.org' => 21);
 use List::Compare::Functional qw(
@@ -20,6 +20,7 @@ use Capture::Tiny qw( capture_stdout );
 
 my ($self, $host, $dir);
 my (@allarchives, $allcount, @gzips, @bzips, @xzs);
+my (@devgz, @rcgz);
 my $default_host = 'ftp.cpan.org';
 my $default_dir  = '/pub/CPAN/src/5.0';
 
@@ -44,12 +45,13 @@ is($classified_count, $allcount,
 
 my (@prod, @dev, @rc, @three_oldest);
 my (@prod1, @dev1, @rc1);
+my (@dev_or_rc);
 
 note("production releases");
 
 @prod = $self->list_releases( {
     type            => 'production',
-    compression     => 'gz',
+    compression     => undef, # Ensure that _compression_check() is exercised
 } );
 cmp_ok(scalar(@prod), '>=', 1, "Non-zero number of .gz tarballs listed");
 @three_oldest = (
@@ -104,6 +106,7 @@ cmp_ok(scalar(@dev), '>=', 1, "Non-zero number of .gz tarballs listed");
 for (my $i = 0; $i <= $#three_oldest; $i++) {
     is($dev[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
 }
+@devgz = map {$_} @dev;
 
 note("list_releases() default case: type: dev compression: gz");
 
@@ -158,6 +161,7 @@ cmp_ok(scalar(@rc), '>=', 1, "Non-zero number of .gz tarballs listed");
 for (my $i = 0; $i <= $#three_oldest; $i++) {
     is($rc[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
 }
+@rcgz = map {$_} @rc;
 
 @rc = $self->list_releases( {
     type            => 'rc',
@@ -187,6 +191,28 @@ cmp_ok(scalar(@rc), '>=', 1, "Non-zero number of .xz tarballs listed");
 for (my $i = 0; $i <= $#three_oldest; $i++) {
     is($rc[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
 }
+
+note("dev_or_rc releases");
+
+@dev_or_rc = $self->list_releases( {
+    type            => 'dev_or_rc',
+    compression     => 'gz',
+} );
+cmp_ok(scalar(@dev_or_rc), '>=', 1, "Non-zero number of .gz tarballs listed");
+
+@three_oldest = (
+    "perl5.004_02.tar.gz",
+    "perl5.004_01.tar.gz",
+    "perl5.003_07.tar.gz",
+);
+for (my $i = 0; $i <= $#three_oldest; $i++) {
+    is($dev_or_rc[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
+}
+
+ok(is_LsubsetR( [ \@devgz, \@dev_or_rc ] ),
+    "List of gz dev releases is subset of list of gz dev_or_rc releases");
+ok(is_LsubsetR( [ \@rcgz,  \@dev_or_rc ] ),
+    "List of gz rc  releases is subset of list of gz dev_or_rc releases");
 
 ###########################################################
 
@@ -251,6 +277,23 @@ cmp_ok(scalar(@rc), '>=', 1, "Non-zero number of .gz tarballs listed");
 );
 for (my $i = 0; $i <= $#three_oldest; $i++) {
     is($rc[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
+}
+
+note("dev_or_rc releases");
+
+@dev_or_rc = $self1->list_releases( {
+    type            => 'dev_or_rc',
+    compression     => 'gz',
+} );
+cmp_ok(scalar(@dev_or_rc), '>=', 1, "Non-zero number of .gz tarballs listed");
+
+@three_oldest = (
+    "perl5.004_02.tar.gz",
+    "perl5.004_01.tar.gz",
+    "perl5.003_07.tar.gz",
+);
+for (my $i = 0; $i <= $#three_oldest; $i++) {
+    is($dev_or_rc[$i-3], $three_oldest[$i], "Got $three_oldest[$i] where expected");
 }
 
 ###########################################################

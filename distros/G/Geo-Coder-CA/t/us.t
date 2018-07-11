@@ -14,7 +14,7 @@ BEGIN {
 US: {
 	SKIP: {
 		if(!-e 't/online.enabled') {
-			if(!$ENV{RELEASE_TESTING}) {
+			if(!$ENV{AUTHOR_TESTING}) {
 				diag('Author tests not required for installation');
 				skip('Author tests not required for installation', 13);
 			} else {
@@ -35,7 +35,7 @@ US: {
 		$location = $geocoder->geocode(location => 'Greene County, Indiana, USA');
 		ok(defined($location));
 		delta_ok($location->{latt}, 39.04);
-		delta_ok($location->{longt}, -86.96);
+		delta_ok($location->{longt}, -86.98);
 
 		# $location = $geocoder->geocode(location => 'Greene, Indiana, USA');
 		# ok(defined($location));

@@ -4,7 +4,7 @@ Dancer2::Plugin::Showterm - Replay terminal typescript captures
 
 # VERSION
 
-version 0.0.1
+version 0.0.2
 
 # SYNOPSIS
 
@@ -59,7 +59,7 @@ $ echo '---' | cat - timing >> typescript
 $ mv typescript /path/to/dancer/app/public/myscreen.typescript
 ```
 
-Note that the c<typescript> file the plugin uses is the concatenation of the
+Note that the `typescript` file the plugin uses is the concatenation of the
 original produced typescript with its timing file, separated with a type dash 
 on a single line.
 

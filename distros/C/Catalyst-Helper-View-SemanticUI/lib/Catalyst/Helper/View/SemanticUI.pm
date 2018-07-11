@@ -1,6 +1,6 @@
 package Catalyst::Helper::View::SemanticUI;
 
-our $VERSION = '0.0001';
+our $VERSION = '0.0002';
 $VERSION = eval $VERSION;
 
 use strict;
@@ -369,9 +369,9 @@ __site_html__
 
 [% IF Catalyst.debug; %]
   <!-- Latest compiled and mininied JavaScript -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.2/semantic.css">
 [% ELSE; %]
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.2/semantic.min.css">
 [% END; %]
 
   <style type="text/css">
@@ -394,13 +394,13 @@ __site_html__
   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
   crossorigin="anonymous"></script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.2/semantic.js" crossorigin="anonymous"></script>
 [% ELSE %]
 <script
   src="https://code.jquery.com/jquery-3.1.1.min.js"
   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
   crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.2/semantic.min.js" crossorigin="anonymous"></script>
 [% END %]
 
 <script>
@@ -540,12 +540,13 @@ i.icon.rocket:hover {
     <p>Semantic is a development framework that helps create beautiful, responsive layouts using human-friendly HTML.<br>
       Semantic UI treats words and classes as exchangeable concepts.<br>
       Classes use syntax from natural languages like noun/modifier relationships, word order, and plurality to link concepts intuitively.</p>
+    <p>I suggest you to include Semantic UI in your project using nodejs and npm to build it on your own instead to include from a CDN as I'm doing in this helper.</p>
     <p><a class="ui button basic" href="http://semantic-ui.com/" role="button">View details &raquo;</a></p>
   </div>
   <div class="four wide column">
     <h2>jQuery or Dojo</h2>
-    <p>jQuery is common, but DojoToolkit is powerful and clean, stable and asynchronous. I would like to substitute jQuery with Dojo 2.0 as soon as it'll be released in 2017.</p>
-    <p><a class="ui button basic" href="http://dojotoolkit.org/" role="button">View details &raquo;</a></p>
+    <p>jQuery is common, but Dojo2 is better. I would like to substitute jQuery with Dojo</p>
+    <p><a class="ui button basic" href="http://dojo.io/" role="button">View details &raquo;</a></p>
   </div>
 </div>
 

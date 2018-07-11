@@ -3,7 +3,7 @@ package Mojo::WebSocketProxy::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';    ## VERSION
+our $VERSION = '0.08';    ## VERSION
 
 sub parse_req {
     my ($c, $req_storage) = @_;
@@ -47,13 +47,9 @@ sub _check_sanity {
     }
 
     if (@failed) {
-        $c->app->log->warn("Sanity check failed: " . $failed[0] . " -> " . ($failed[1] // "undefined"));
         my $result = $c->wsp_error('sanity_check', 'SanityCheckFailed', 'Parameters sanity check failed.');
-        if (    $result->{error}
-            and $result->{error}->{code} eq 'SanityCheckFailed')
-        {
-            $req_storage->{args} = {};
-        }
+        # emit notification
+        $c->tx->emit(sanity_failed => \@failed);
         return $result;
     }
     return;
@@ -75,11 +71,11 @@ sub _failed_key_value {
         $key !~ /$key_regex/
         # !-~ to allow a range of acceptable characters. To find what is the range, look at ascii table
 
-        # \p{L} is to match utf-8 characters
+        # \p{L} is to ensure we include other Unicode letters outside the ASCII range
         # \p{Script=Common} is to match double byte characters in Japanese keyboards, eg: '１−１−１'
-        # refer: http://perldoc.perl.org/perlunicode.html
+        # refer: http://perldoc.perl.org/perlunicode.html and http://perldoc.perl.org/perluniprops.html
         # null-values are allowed
-        or ($value and $value !~ /^[\p{Script=Common}\p{L}\s\w\@_:!-~]{0,300}$/))
+        or ($value and $value !~ /^[\p{Script=Common}\p{Letter}\s\w\@_:!-~]{0,300}$/))
     {
         return ($key, $value);
     }
@@ -106,7 +102,7 @@ This module using for parse JSON websocket messages.
 
 L<Mojolicious::Plugin::WebSocketProxy>,
 L<Mojo::WebSocketProxy>,
-L<Mojo::WebSocketProxy::CallingEngine>,
+L<Mojo::WebSocketProxy::Backend>,
 L<Mojo::WebSocketProxy::Dispatcher>,
 L<Mojo::WebSocketProxy::Config>
 L<Mojo::WebSocketProxy::Parser>

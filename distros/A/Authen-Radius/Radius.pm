@@ -39,7 +39,7 @@ require Exporter;
             STATUS_SERVER
             COA_REQUEST COA_ACCEPT COA_REJECT COA_ACK COA_NAK);
 
-$VERSION = '0.26';
+$VERSION = '0.27';
 
 my (%dict_id, %dict_name, %dict_val, %dict_vendor_id, %dict_vendor_name );
 my ($request_id) = $$ & 0xff;   # probably better than starting from 0
@@ -380,7 +380,7 @@ sub _decode_enum {
     my ( $name, $value, $format ) = @_;
 
     $value = unpack( $format, $value );
-    if ( defined( $dict_val{$name}{$value} ) ) {
+    if ( defined $value && defined( $dict_val{$name}{$value} ) ) {
         $value = $dict_val{$name}{$value}{name};
     }
 
@@ -476,6 +476,11 @@ sub _decode_sublist {
     return join( '; ', @values );
 }
 
+sub _decode_octets {
+    my ( $self, $vendor, $id, $name, $value ) = @_;
+    return '0x'.unpack("H*", $value);
+}
+
 my %decoder = (
     # RFC2865
     string  => \&_decode_string,
@@ -483,6 +488,7 @@ my %decoder = (
     ipaddr  => \&_decode_ipaddr,
     date    => \&_decode_integer,
     time    => \&_decode_integer,
+    octets  => \&_decode_octets,
     # RFC3162
     ipv6addr   => \&_decode_ipv6addr,
     ipv6prefix => \&_decode_ipv6prefix,
@@ -870,7 +876,14 @@ sub add_attributes {
             print STDERR "Unable to encode attribute $a->{Name} ($id, $type, $vendor) with value '$a->{Value}'\n" if $debug;
             next;
         }
-        print STDERR "Adding attribute $a->{Name} ($id, $type, $vendor) with value '$a->{Value}'\n" if $debug;
+
+        if ($debug) {
+            printf STDERR "Adding attribute %s (%s, %s, %s) with value '%s'%s\n",
+                    $a->{Name}, $id, $type, $vendor,
+                    $a->{Value},
+                    ($a->{Tag} ? sprintf(' (tag:%d)', $a->{Tag}) : '');
+        }
+
         if ( $vendor eq NO_VENDOR ) {
             if ($need_tag) {
                 $self->{'attributes'} .= pack('C C C', $id, length($value) + 3, $a->{Tag} // 0) . $value;
@@ -1046,6 +1059,11 @@ sub load_dictionary {
             $dict_vendor_id{$id}{'name'} = $name;
         } elsif ($cmd eq 'begin-vendor') {
             $dict_def_vendor = $name;
+            if (! $freeradius_dict) {
+                # force format
+                $freeradius_dict = 1;
+                print STDERR "Detected BEGIN-VENDOR, switch to FreeRADIUS dictionary format\n" if $debug;
+            }
         } elsif ($cmd eq 'end-vendor') {
             $dict_def_vendor = NO_VENDOR;
         } elsif ($cmd eq 'begin-tlv') {
@@ -1060,7 +1078,7 @@ sub load_dictionary {
             my @path = split("/", $file);
             pop @path; # remove the filename at the end
             my $path = ( $name =~ /^\// ) ? $name : join("/", @path, $name);
-            load_dictionary('', $path);
+            load_dictionary('', $path, %opt);
         }
     }
     $fh->close;

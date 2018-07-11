@@ -81,7 +81,7 @@ use Astro::FluxColor;
 # Register an Astro::Catalog::Item warning category
 use warnings::register;
 
-$VERSION = "4.33";
+$VERSION = "4.34";
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (

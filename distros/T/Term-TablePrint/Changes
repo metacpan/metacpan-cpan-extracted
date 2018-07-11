@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.068   2018-07-06
+        - New option 'squash_spaces'
+
 0.067   2018-07-03
         - "Term::Choose": minimum verson "1.600".
         - "Term::Choose::Util": minimum version "0.065".

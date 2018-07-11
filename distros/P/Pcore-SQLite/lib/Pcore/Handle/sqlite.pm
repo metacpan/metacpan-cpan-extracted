@@ -166,7 +166,7 @@ SQL
 }
 
 # QUOTE
-sub _get_sqlite_type ($type) : prototype($) {
+sub _get_sqlite_type : prototype($) ($type) {
 
     # use TEXT as default type
     if ( !defined $type || !exists $TYPE_TO_SQLITE->{$type} ) {

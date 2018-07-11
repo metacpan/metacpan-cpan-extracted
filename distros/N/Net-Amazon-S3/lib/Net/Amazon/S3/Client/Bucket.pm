@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Bucket;
-$Net::Amazon::S3::Client::Bucket::VERSION = '0.80';
+$Net::Amazon::S3::Client::Bucket::VERSION = '0.82';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Data::Stream::Bulk::Callback;
@@ -14,6 +14,12 @@ has 'creation_date' =>
     ( is => 'ro', isa => DateTime, coerce => 1, required => 0 );
 has 'owner_id'           => ( is => 'ro', isa => 'OwnerId', required => 0 );
 has 'owner_display_name' => ( is => 'ro', isa => 'Str',     required => 0 );
+has 'region' => (
+    is => 'ro',
+    lazy => 1,
+    default => sub { $_[0]->location_constraint },
+);
+
 
 __PACKAGE__->meta->make_immutable;
 
@@ -64,7 +70,7 @@ sub location_constraint {
 
     my $lc = $xpc->findvalue('/s3:LocationConstraint');
     if ( defined $lc && $lc eq '' ) {
-        $lc = 'US';
+        $lc = 'us-east-1';
     }
     return $lc;
 }
@@ -75,6 +81,7 @@ sub list {
     my ( $self, $conf ) = @_;
     $conf ||= {};
     my $prefix = $conf->{prefix};
+    my $delimiter = $conf->{delimiter};
 
     my $marker = undef;
     my $end    = 0;
@@ -89,6 +96,7 @@ sub list {
                 bucket => $self->name,
                 marker => $marker,
                 prefix => $prefix,
+                delimiter => $delimiter,
             )->http_request;
 
             my $xpc = $self->client->_send_request_xpc($http_request);
@@ -111,7 +119,7 @@ sub list {
                     client => $self->client,
                     bucket => $self,
                     key    => $xpc->findvalue( './s3:Key', $node ),
-                    last_modified =>
+                    last_modified_raw =>
                         $xpc->findvalue( './s3:LastModified', $node ),
                     etag => $etag,
                     size => $xpc->findvalue( './s3:Size', $node ),
@@ -190,7 +198,7 @@ Net::Amazon::S3::Client::Bucket - An easy-to-use Amazon S3 client bucket
 
 =head1 VERSION
 
-version 0.80
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -258,6 +266,11 @@ This module represents buckets.
   # or list by a prefix
   my $prefix_stream = $bucket->list( { prefix => 'logs/' } );
 
+  # you can emulate folders by using prefix with delimiter
+  # which shows only entries starting with the prefix but
+  # not containing any more delimiter (thus no subfolders).
+  my $folder_stream = $bucket->list( { prefix => 'logs/', delimiter => '/' } );
+
 =head2 location_constraint
 
   # return the bucket location constraint
@@ -288,11 +301,11 @@ This module represents buckets.
 
 =head1 AUTHOR
 
-Rusty Conover <rusty@luckydinosaur.com>
+Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

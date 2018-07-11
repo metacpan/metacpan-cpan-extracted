@@ -28,13 +28,13 @@ Method details:
 ###############################################################################
 package XAO::TestUtils;
 use strict;
-use Test::Harness;
 use XAO::Utils;
 use File::Path;
 use File::Basename;
 use File::Copy;
 use File::Find;
 use ExtUtils::Manifest qw(fullcheck maniread);
+use Test::Harness;
 
 require Exporter;
 
@@ -64,28 +64,51 @@ Test execution is the same as for run_tests() method, see below.
 
 =cut
 
-sub xao_test_all ($;@) {
+sub xao_test_all (;$@) {
     XAO::Utils::set_debug(shift @_) if $_[0]=~/^\d+$/;
 
     my %tests;
+
+    my $diradd=sub {
+        my ($dir,$namespace)=@_;
+        opendir(D,"$dir") || die "Can't open directory $dir: $!\n";
+        while(my $file=readdir(D)) {
+            next if $file eq 'base.pm' || $file eq 'Common';
+            next unless $file =~ /^(.*)\.pm$/;
+            $tests{$namespace . $1}=1;
+        }
+        closedir(D);
+    };
+
+    # A namespace allows packages to pre-define test cases and for
+    # another package to reuse them (for example storage drivers for
+    # XAO::FS reuse the tests defined in XAO::FS).
+    #
     foreach my $namespace (@_) {
-        ##
+
         # Scanning @INC to find directory holding these tests
         #
         (my $namedir=$namespace)=~s/::/\//g;
         foreach my $dir (@INC) {
             next unless -d "$dir/$namedir";
-            opendir(D,"$dir/$namedir") || die "Can't open directory $dir: $!\n";
-            while(my $file=readdir(D)) {
-                next if $file eq 'base.pm';
-                next unless $file =~ /^(.*)\.pm$/;
-                $tests{$namespace . '::' . $1}=1;
-            }
-            closedir(D);
+            $diradd->("$dir/$namedir",$namespace.'::');
         }
     }
 
-    ##
+    # More common is to have tests in t/testcases directory
+    #
+    if(-d 't/testcases') {
+        find({
+            no_chdir    => 1,
+            wanted      => sub {
+                return unless -d $File::Find::name;
+                (my $cp=$File::Find::name)=~s|/|::|g;
+                $cp=~s/^t:://;
+                $diradd->($File::Find::name,$cp.'::');
+            },
+        },'t/testcases');
+    }
+
     # Randomizing tests list order to make sure that tests do not depend on
     # each other.
     #
@@ -95,6 +118,7 @@ sub xao_test_all ($;@) {
     }
 
     dprint "Tests: ".join(',',@tests);
+
     xao_test(@tests);
 }
 
@@ -105,7 +129,7 @@ sub xao_test_all ($;@) {
 Runs given tests in the given sequence. Tests are given as corresponding
 unit package names. Example:
 
- xao_test('testcases::basic','testcases::lists');
+    xao_test('Basic','XAO::testcases::FS::Lists');
 
 It will create 'ta' directory in the current directory and will
 store two files for each test case in there - one suitable for 'make
@@ -119,14 +143,14 @@ Common prefix will be automatically removed from files.
 =cut
 
 sub xao_test (@) {
-    my $testdir='ta';
+    my $testdir='t';
+
     -d $testdir || mkdir "$testdir",0755 ||
         die "Can't create '$testdir' directory: $!\n";
 
     my $prefix_count;
     my $prefix;
     foreach my $test (@_) {
-        dprint "test=$test";
         my @p=split(/::/,$test);
         if(defined $prefix) {
             while($prefix_count) {
@@ -141,9 +165,7 @@ sub xao_test (@) {
         }
         last if $prefix_count<0;
         $prefix=join('::',@p[0..$prefix_count]);
-        dprint "prefix=$prefix test=$test";
     }
-    dprint "prefix=$prefix, prefix_count=$prefix_count";
 
     $prefix_count++;
     my %fnames;
@@ -152,12 +174,20 @@ sub xao_test (@) {
         my $testfile=join('_',@p[$prefix_count..$#p]);
         $fnames{$test}=$testfile;
         dprint "Test: $test file=$testfile";
-        open(F,"> $testdir/$testfile.t") || die "Can't create test script ($testdir/$test.t): $!\n";
+
+        # Non-standard name (.xt vs .t) to avoid double executing by the
+        # standard build code.
+        #
+        my $tatest="$testdir/$testfile.xt";
+        open(F,"> $tatest") || die "Can't create test script ($tatest): $!\n";
         print F <<EOT;
 #!$^X
 #### GENERATED AUTOMATICALLY, DO NOT EDIT ####
 use strict;
-use Test::Unit::HarnessUnit;
+use warnings;
+use Test::Unit::Lite;
+
+unshift(\@INC,'t') if -d 't';
 
 my \$r=Test::Unit::HarnessUnit->new();
 \$r->start('$test');
@@ -165,18 +195,22 @@ my \$r=Test::Unit::HarnessUnit->new();
 EOT
         close(F);
 
-        my $use_blib=(-d 'blib' ? 'use blib;' : '');
-
-        open(F,"> $testdir/$testfile.pl") || die "Can't create test script ($testdir/$test.pl): $!\n";
+        # Human friendlier output version
+        #
+        my $pltest="$testdir/$testfile.pl";
+        open(F,"> $pltest") || die "Can't create test script ($pltest): $!\n";
         print F <<EOT;
 #!$^X
 #### GENERATED AUTOMATICALLY, DO NOT EDIT ####
 use strict;
-$use_blib
+use warnings;
+use blib;
+use Test::Unit::Lite;
 use XAO::Utils;
-use Test::Unit::TestRunner;
 
 XAO::Utils::set_debug(1);
+
+unshift(\@INC,'t') if -d 't';
 
 my \$r=Test::Unit::TestRunner->new();
 \$r->start('$test');
@@ -184,28 +218,30 @@ print "\\n";
 #### GENERATED AUTOMATICALLY, DO NOT EDIT ####
 EOT
         close(F);
+
         chmod 0755, '$testdir/$testfile.pl';
     }
 
-    ##
     # Executing tests
     #
-    print STDERR <<'END_OF_WARNING';
-===============================================================
-Some of the tests may take up to a couple of minutes to run.
-Please be patient.
-
+    print <<'END_OF_WARNING';
+===========================================================
 If you see that a test failed, please run it as follows:
 
-   perl -w ta/failed_test_name.pl
+   perl t/failed_test_name.pl
 
-That will show you details about the failure. Send the output
-to the module author along with your perl version and a short
-description of what you think might be the reason.
-===============================================================
+Send the output to the module author along with your perl
+version and a note of what you think might be the reason.
+-----------------------------------------------------------
 END_OF_WARNING
+
     ### dprint join(",",(map { "$testdir/$fnames{$_}.t" } @_));
-    runtests(map { "$testdir/$fnames{$_}.t" } @_);
+
+    runtests(map { "$testdir/$fnames{$_}.xt" } @_);
+
+    print <<EOT;
+===========================================================
+EOT
 }
 
 ###############################################################################

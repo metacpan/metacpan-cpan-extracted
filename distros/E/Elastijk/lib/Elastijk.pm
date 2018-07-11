@@ -1,7 +1,7 @@
 package Elastijk;
 use strict;
 use warnings;
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 use JSON ();
 use URI::Escape qw(uri_escape_utf8);
@@ -12,7 +12,7 @@ our $JSON = JSON->new->utf8;
 sub _build_hijk_request_args {
     my $args = $_[0];
     my ($path, $qs, $uri_param);
-    $path = "/". join("/", (map { defined($_) ? ( uri_escape_utf8($_) ) : () } @{$args}{qw(index type id)}), (exists $args->{command} ? $args->{command} : ()));
+    $path = (exists $args->{path}) ? $args->{path} : ("/". join("/", (map { defined($_) ? ( uri_escape_utf8($_) ) : () } @{$args}{qw(index type id)}), (exists $args->{command} ? $args->{command} : ())));
     if ($args->{uri_param}) {
         $qs =  join('&', map { uri_escape_utf8($_) . "=" . uri_escape_utf8($args->{uri_param}{$_}) } keys %{$args->{uri_param}});
     }
@@ -21,8 +21,12 @@ sub _build_hijk_request_args {
         host   => $args->{host}   || 'localhost',
         port   => $args->{port}   || '9200',
         path   => $path,
+        head   => [
+            'Content-Type' => 'application/json',
+            ( (exists $args->{head}) ? (@{$args->{head}}) : ()),
+        ],
         $qs?( query_string => $qs) :(),
-        (map { (exists $args->{$_})?( $_ => $args->{$_} ) :() } qw(connect_timeout read_timeout head body socket_cache on_connect)),
+        (map { (exists $args->{$_})?( $_ => $args->{$_} ) :() } qw(connect_timeout read_timeout body socket_cache on_connect)),
     }
 }
 
@@ -72,7 +76,7 @@ Elastijk - A specialized Elasticsearch client.
         type => "article",
         command => "_search",
 
-        uri_param => { search_type => "dfs_query_then_fetch" }
+        uri_param => { search_type => "dfs_query_then_fetch" },
         body => {
             query => { match => { "body" => "cpan" } }
         }
@@ -276,18 +280,18 @@ to check the existence of different things:
     type:     index => "foo", type => "bar"
     index:    index => "foo"
 
-See also L<https://www.elastic.co/guide/guide/en/elasticsearch/reference/current/indices-exists.html> ,
-L<https://www.elastic.co/guide/guide/en/elasticsearch/reference/current/indices-types-exists.html#indices-types-exists> , and L<https://www.elastic.co/guide/guide/en/elasticsearch/guide/current/doc-exists.html>
+=head2 search_scroll( ..., on_response => sub {} )
 
-=head2 scan_scroll( ..., on_response => sub {} )
+This method helps using the
+L<scroll|https://www.elastic.co/guide/en/elasticsearch/reference/2.1/search-request-scroll.html> URI
+parameter of the search API. In essense, a initial search request with an extra parameter named
+scroll is sent, and subsequent special requests is than sent to page through the entire resultset.
 
-A way to perform L<scan and scroll|https://www.elastic.co/guide/guide/en/elasticsearch/guide/current/scan-scroll.html>.
+The boilerplate to use this method is something like this:
 
-The boilerplate to use it is something like:
-
-    $es->scan_scroll(
+    $es->search_scroll(
         index => "tweet",
-        body => { query => { match_all => {} }, size => 1000 },
+        body => { query => { match_all => {} } },
         on_response => sub {
             my ($status,$res) = @_;
             for my $hit (@{ $res->{hits}{hits} }) {
@@ -296,11 +300,13 @@ The boilerplate to use it is something like:
         }
     );
 
-The "search_type" is forced to be "scan" in this method.
-
 The very last value to the C<on_response> key is a callback subroutine that is
 called after each HTTP request. The arguments are HTTP status code and response
 body hash just like other methods.
+
+Note: this method was called L<scan_scroll>, but the "scan" search type was removed at Elasticsearch
+2.1.0 and the method name makes little sense. The 'scan_scroll' method still exists and useful
+with Elasticsearch pre-2.1.0, and it will be removed in a distanced future.
 
 =head2 bulk( ..., body => ArrayRef[ HashRef ], ... )
 
@@ -318,13 +324,7 @@ as a whole, but just a naive concatenation of multiple JSON documents.
 
 =head1 AUTHORS
 
-=over 4
-
-=item Kang-min Liu <gugod@gugod.org>
-
-=item Borislav Nikolov <jack@sofialondonmoskva.com>
-
-=back
+Kang-min Liu <gugod@gugod.org> and Borislav Nikolov <jack@sofialondonmoskva.com>
 
 =head1 COPYRIGHT
 

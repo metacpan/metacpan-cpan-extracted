@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 $VERSION = '1.00';
 
 use strict;
+use warnings;
 use FileHandle;
 
 #-------------------------------------------------------------------------------

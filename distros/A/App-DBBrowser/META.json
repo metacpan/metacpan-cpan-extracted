@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-DBBrowser",
    "no_index" : {
@@ -53,7 +53,7 @@
             "Term::Choose::LineFold" : "1.600",
             "Term::Choose::Util" : "0.065",
             "Term::Form" : "0.316",
-            "Term::TablePrint" : "0.067",
+            "Term::TablePrint" : "0.068",
             "Text::CSV" : "0",
             "bytes" : "0",
             "if" : "0",
@@ -72,6 +72,6 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.016",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "2.018",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

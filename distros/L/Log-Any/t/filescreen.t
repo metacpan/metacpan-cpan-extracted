@@ -4,7 +4,7 @@ use Test::More;
 use File::Temp qw(tempdir);
 use Log::Any::Adapter::Util qw(cmp_deeply read_file);
 
-plan tests => 27;
+plan tests => 33;
 my $__FILE__ = quotemeta __FILE__;
 
 require Log::Any::Adapter;
@@ -49,6 +49,13 @@ require Log::Any::Adapter;
         like( scalar( read_file($file) ), qr/\x{263A} \x{263B}$/ms, "warn logged raw to file" );
         like $warnings[0], qr{Wide character in print}, 'got warning printing UTF-8 as raw';
     }
+
+    { # Test that File adapter allows critical log_level
+        Log::Any::Adapter->set( {lexically => \my $lex}, 'File', $file, log_level => 'emergency' );
+        my $log = Log::Any->get_logger();
+        ok $log->is_emergency, 'emergency log level file will log emergency';
+        ok !$log->is_alert, 'emergency log level file will not log alert';
+    }
 }
 
 {
@@ -79,6 +86,13 @@ require Log::Any::Adapter;
             qr{Invalid log level "FOOBAR"\. Defaulting to "trace" at $__FILE__ line \d+},
             'warning is correct';
     }
+
+    { # Test that Stdout adapter allows critical log_level
+        Log::Any::Adapter->set( {lexically => \my $lex}, 'Stdout', log_level => 'emergency' );
+        my $log = Log::Any->get_logger();
+        ok $log->is_emergency, 'emergency log level file will log emergency';
+        ok !$log->is_alert, 'emergency log level file will not log alert';
+    }
 }
 
 {
@@ -108,6 +122,13 @@ require Log::Any::Adapter;
         like $warnings[0],
             qr{Invalid log level "FOOBAR"\. Defaulting to "trace" at $__FILE__ line \d+},
             'warning is correct';
+    }
+
+    { # Test that Stderr adapter allows critical log_level
+        Log::Any::Adapter->set( {lexically => \my $lex}, 'Stderr', log_level => 'emergency' );
+        my $log = Log::Any->get_logger();
+        ok $log->is_emergency, 'emergency log level file will log emergency';
+        ok !$log->is_alert, 'emergency log level file will not log alert';
     }
 }
 

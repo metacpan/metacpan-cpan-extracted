@@ -1,5 +1,9 @@
 Revision history for App-Wallflower
 
+1.009 2018-07-06 BOOK
+    - fixed a bug with the --filter option, which made it visit only
+      the first link in the input
+
 1.008 2018-07-02 BOOK
     - fix some warnings when an error response is received
     - add a --tap option to output TAP

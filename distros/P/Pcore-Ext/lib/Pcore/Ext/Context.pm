@@ -99,7 +99,7 @@ sub to_js ( $self ) {
     my ( $data, $on_create_func ) = do {
         my $method = "EXT_$self->{ctx}->{generator}";
 
-        my $l10n = sub ( $msgid, $msgid_plural = undef, $num = undef ) : prototype($;$$) {
+        my $l10n = sub : prototype($;$$) ( $msgid, $msgid_plural = undef, $num = undef ) {
 
             # register msgid in ctx
             $self->{ctx}->{l10n}->{$msgid} = 1;
@@ -111,10 +111,10 @@ sub to_js ( $self ) {
               'Pcore::Ext::Context::L10N';
         };
 
-        no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+        no strict qw[refs];
         no warnings qw[redefine];
 
-        local *{"$self->{ctx}->{namespace}\::raw"} = sub ($js) : prototype($) {
+        local *{"$self->{ctx}->{namespace}\::raw"} = sub : prototype($) ($js) {
             return bless {
                 ctx => $self,
                 js  => $js,
@@ -229,6 +229,8 @@ package Pcore::Ext::Context::_l10n {
 ## |      | 60                   | * Private subroutine/method '_ext_type' declared but not used                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 135, 136, 137, 145   | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 102, 117             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

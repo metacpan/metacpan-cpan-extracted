@@ -51,13 +51,13 @@ my @optargs = (
     "N|newline!" => \$opt_newline,
     "colormap|cm=s" => \@opt_colormap,
     "p|plain" => sub { $opt_date = $opt_newline = 0 },
-    "h|help" => sub { pod2usage() },
+    "h|help" => sub { usage() },
     "H|man" => sub { pod2usage( {-verbose => 2} ) },
     );
 
 use Getopt::EX::Long;
 Getopt::Long::Configure(qw(bundling require_order));
-GetOptions(@optargs) || pod2usage();
+GetOptions(@optargs) || usage({status => 1});
 
 my %colormap;
 pairmap { $colormap{$a} = $b } qw(

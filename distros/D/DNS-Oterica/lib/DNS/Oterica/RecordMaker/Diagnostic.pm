@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package DNS::Oterica::RecordMaker::Diagnostic;
 # ABSTRACT: a collector of record generation requests, for testing
-$DNS::Oterica::RecordMaker::Diagnostic::VERSION = '0.304';
+$DNS::Oterica::RecordMaker::Diagnostic::VERSION = '0.311';
 use Sub::Install;
 
 #pod =head1 DESCRIPTION
@@ -54,7 +54,7 @@ DNS::Oterica::RecordMaker::Diagnostic - a collector of record generation request
 
 =head1 VERSION
 
-version 0.304
+version 0.311
 
 =head1 DESCRIPTION
 
@@ -69,7 +69,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

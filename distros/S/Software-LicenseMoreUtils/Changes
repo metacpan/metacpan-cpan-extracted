@@ -1,3 +1,7 @@
+1.001 2018-07-06
+
+  * add MPL short names (Debian #865472)
+
 0.005 2018-06-29
 
   * deprecate new_license_with_summary constructor in favor

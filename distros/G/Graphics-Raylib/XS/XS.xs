@@ -115,7 +115,7 @@ BeginVrDrawing()
 
 bool
 ChangeDirectory(dir)
-    const char *    dir
+    char *    dir
 
 bool
 CheckCollisionBoxSphere(box, centerSphere, radiusSphere)
@@ -635,12 +635,12 @@ EndVrDrawing()
 
 void
 ExportImage(fileName, image)
-    const char *    fileName
+    char *    fileName
     Image    image
 
 void
 ExportMesh(fileName, mesh)
-    const char *    fileName
+    char *    fileName
     Mesh    mesh
 
 Color
@@ -648,9 +648,9 @@ Fade(color, alpha)
     Color    color
     float    alpha
 
-const char *
+char *
 FormatText(text, ...)
-    const char *    text
+    char *    text
 
 Image
 GenImageCellular(width, height, tileSize)
@@ -833,20 +833,20 @@ GetColor(hexValue)
 Font
 GetDefaultFont()
 
-const char *
+char *
 GetDirectoryPath(fileName)
-    const char *    fileName
+    char *    fileName
 
-const char *
+char *
 GetExtension(fileName)
-    const char *    fileName
+    char *    fileName
 
 int
 GetFPS()
 
-const char *
+char *
 GetFileName(filePath)
-    const char *    filePath
+    char *    filePath
 
 float
 GetFrameTime()
@@ -863,7 +863,7 @@ GetGamepadAxisMovement(gamepad, axis)
 int
 GetGamepadButtonPressed()
 
-const char *
+char *
 GetGamepadName(gamepad)
     int    gamepad
 
@@ -952,7 +952,7 @@ GetShaderDefault()
 int
 GetShaderLocation(shader, uniformName)
     Shader    shader
-    const char *    uniformName
+    char *    uniformName
 
 Image
 GetTextureData(texture)
@@ -985,7 +985,7 @@ float *
 GetWaveData(wave)
     Wave    wave
 
-const char *
+char *
 GetWorkingDirectory()
 
 Vector2
@@ -1080,7 +1080,7 @@ void
 ImageDrawText(dst, position, text, fontSize, color)
     Image *    dst
     Vector2    position
-    const char *    text
+    char *    text
     int    fontSize
     Color    color
 
@@ -1089,7 +1089,7 @@ ImageDrawTextEx(dst, position, font, text, fontSize, spacing, color)
     Image *    dst
     Vector2    position
     Font    font
-    const char *    text
+    char *    text
     float    fontSize
     float    spacing
     Color    color
@@ -1142,14 +1142,14 @@ ImageRotateCW(image)
 
 Image
 ImageText(text, fontSize, color)
-    const char *    text
+    char *    text
     int    fontSize
     Color    color
 
 Image
 ImageTextEx(font, text, fontSize, spacing, tint)
     Font    font
-    const char *    text
+    char *    text
     float    fontSize
     float    spacing
     Color    tint
@@ -1197,8 +1197,8 @@ IsFileDropped()
 
 bool
 IsFileExtension(fileName, ext)
-    const char *    fileName
-    const char *    ext
+    char *    fileName
+    char *    ext
 
 bool
 IsGamepadAvailable(gamepad)
@@ -1227,7 +1227,7 @@ IsGamepadButtonUp(gamepad, button)
 bool
 IsGamepadName(gamepad, name)
     int    gamepad
-    const char *    name
+    char *    name
 
 bool
 IsGestureDetected(gesture)
@@ -1284,11 +1284,11 @@ IsWindowReady()
 
 Font
 LoadFont(fileName)
-    const char *    fileName
+    char *    fileName
 
 CharInfo *
 LoadFontData(fileName, fontSize, fontChars, charsCount, sdf)
-    const char *    fileName
+    char *    fileName
     int    fontSize
     int *    fontChars
     int    charsCount
@@ -1296,7 +1296,7 @@ LoadFontData(fileName, fontSize, fontChars, charsCount, sdf)
 
 Font
 LoadFontEx(fileName, fontSize, charsCount, fontChars)
-    const char *    fileName
+    char *    fileName
     int    fontSize
     int    charsCount
     int *    fontChars
@@ -1320,7 +1320,7 @@ LoadImagePro(data, width, height, format)
 
 Image
 LoadImageRaw(fileName, width, height, format, headerSize)
-    const char *    fileName
+    char *    fileName
     int    width
     int    height
     int    format
@@ -1415,18 +1415,18 @@ LoadImageFromAV(array_ref, color_cb)
 
 Material
 LoadMaterial(fileName)
-    const char *    fileName
+    char *    fileName
 
 Material
 LoadMaterialDefault()
 
 Mesh
 LoadMesh(fileName)
-    const char *    fileName
+    char *    fileName
 
 Model
 LoadModel(fileName)
-    const char *    fileName
+    char *    fileName
 
 Model
 LoadModelFromMesh(mesh)
@@ -1434,7 +1434,7 @@ LoadModelFromMesh(mesh)
 
 Music
 LoadMusicStream(fileName)
-    const char *    fileName
+    char *    fileName
 
 RenderTexture2D
 LoadRenderTexture(width, height)
@@ -1443,8 +1443,8 @@ LoadRenderTexture(width, height)
 
 Shader
 LoadShader(vsFileName, fsFileName)
-    const char *    vsFileName
-    const char *    fsFileName
+    char *    vsFileName
+    char *    fsFileName
 
 Shader
 LoadShaderCode(vsCode, fsCode)
@@ -1453,7 +1453,7 @@ LoadShaderCode(vsCode, fsCode)
 
 Sound
 LoadSound(fileName)
-    const char *    fileName
+    char *    fileName
 
 Sound
 LoadSoundFromWave(wave)
@@ -1461,11 +1461,11 @@ LoadSoundFromWave(wave)
 
 char *
 LoadText(fileName)
-    const char *    fileName
+    char *    fileName
 
 Texture2D
 LoadTexture(fileName)
-    const char *    fileName
+    char *    fileName
 
 Texture2D
 LoadTextureFromImage(image)
@@ -1473,7 +1473,7 @@ LoadTextureFromImage(image)
 
 Wave
 LoadWave(fileName)
-    const char *    fileName
+    char *    fileName
 
 Wave
 LoadWaveEx(data, sampleCount, sampleRate, sampleSize, channels)
@@ -1485,13 +1485,13 @@ LoadWaveEx(data, sampleCount, sampleRate, sampleSize, channels)
 
 int
 MeasureText(text, fontSize)
-    const char *    text
+    char *    text
     int    fontSize
 
 Vector2
 MeasureTextEx(font, text, fontSize, spacing)
     Font    font
-    const char *    text
+    char *    text
     float    fontSize
     float    spacing
 
@@ -1703,7 +1703,7 @@ SetWindowSize(width, height)
 
 void
 SetWindowTitle(title)
-    const char *    title
+    char *    title
 
 void
 ShowCursor()
@@ -1732,15 +1732,15 @@ StorageSaveValue(position, value)
     int    position
     int    value
 
-const char *
+char *
 SubText(text, position, length)
-    const char *    text
+    char *    text
     int    position
     int    length
 
 void
 TakeScreenshot(fileName)
-    const char *    fileName
+    char *    fileName
 
 void
 ToggleFullscreen()
@@ -1751,7 +1751,7 @@ ToggleVrMode()
 void
 TraceLog(logType, text, ...)
     int    logType
-    const char *    text
+    char *    text
 
 void
 UnloadFont(font)

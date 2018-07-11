@@ -28,6 +28,8 @@ use XAO::Cache;
 use POSIX qw(mktime);
 use XAO::Errors qw(XAO::DO::Web::Config);
 
+our $VERSION='2.004';
+
 # Prototypes
 #
 sub add_cookie ($@);
@@ -38,16 +40,13 @@ sub cookies ($);
 sub disable_special_access ($);
 sub embeddable_methods ($);
 sub enable_special_access ($);
+sub force_byte_output ($;$);
 sub header ($@);
 sub header_args ($@);
+sub header_array ($);
+sub header_printed ($);
 sub get_cookie ($$;$);
 sub new ($@);
-
-##
-# Package version for checks and reference
-#
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: Config.pm,v 2.4 2007/12/05 23:49:21 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
 
 ###############################################################################
 
@@ -235,6 +234,7 @@ sub cleanup ($) {
     delete $self->{'clipboard'};
     delete $self->{'cookies'};
     delete $self->{'header_args'};
+    delete $self->{'force_byte_output'};
     delete $self->{'header_printed'};
     delete $self->{'special_access'};
 }
@@ -250,8 +250,8 @@ between different XAO::Web objects. Cleaned up for every session.
 
 sub clipboard ($) {
    my $self=shift;
-   $self->{clipboard}=XAO::SimpleHash->new() unless $self->{clipboard};
-   $self->{clipboard};
+   $self->{'clipboard'}=XAO::SimpleHash->new() unless $self->{'clipboard'};
+   return $self->{'clipboard'};
 }
 
 ###############################################################################
@@ -297,12 +297,15 @@ sub disable_special_access ($) {
 
 Used internally by global Config object, returns an array with all
 embeddable method names -- add_cookie(), cgi(), clipboard(), cookies(),
-header(), header_args().
+force_byte_output(), header(), header_args().
 
 =cut
 
 sub embeddable_methods ($) {
-    qw(add_cookie cgi clipboard cookies header header_args get_cookie);
+    qw(
+        add_cookie cgi clipboard cookies force_byte_output
+        header header_args header_array get_cookie
+    );
 }
 
 ###############################################################################
@@ -323,6 +326,27 @@ Example:
 sub enable_special_access ($) {
     my $self=shift;
     $self->{special_access}=1;
+}
+
+###############################################################################
+
+=item force_byte_output ()
+
+If the site is configured to run in character mode it might still be
+necessary to output some content as is, without character processing
+(e.g. for generated images or spreadsheets).
+
+This method is called automatically when content type is set to a
+non-text value, so normally there is no need to call it directly.
+
+=cut
+
+sub force_byte_output ($;$) {
+    my ($self,$value)=@_;
+    if(defined $value) {
+        $self->{'force_byte_output'}=$value;
+    }
+    return $self->{'force_byte_output'};
 }
 
 ###############################################################################
@@ -351,7 +375,16 @@ sub header ($@) {
     return undef if $self->{'header_printed'};
 
     $self->header_args(@_) if @_;
+
     $self->{'header_printed'}=1;
+
+    return $self->cgi->header($self->header_array());
+}
+
+###############################################################################
+
+sub header_array ($) {
+    my $self=shift;
 
     # There is a silly bug (or a truly misguided undocumented feature)
     # in CGI. It works with headers correctly only if the first header
@@ -379,12 +412,11 @@ sub header ($@) {
     # Using the always present '-cookie' header to fill the front row.
     #
     my $header_args=$self->{'header_args'} || { };
-    my @headers=(
+
+    return (
         '-cookie'   => ($header_args->{'-cookie'} || $header_args->{'Cookie'} || $self->cookies || []),
         %$header_args,
     );
-
-    return $self->cgi->header(@headers);
 }
 
 ###############################################################################
@@ -435,7 +467,8 @@ it would return the value as set, not the value as it was originally
 received.
 
 B<NOTE:> The path and domain of cookies is ignored when checking for
-earlier set cookies!
+earlier set cookies and the last cookie stored with that name is
+returned!
 
 =cut
 
@@ -453,7 +486,7 @@ sub get_cookie ($$;$) {
     my $value;
 
     if(!$original) {
-        foreach my $c (@{$self->{'cookies'}}) {
+        foreach my $c (reverse @{$self->{'cookies'} || []}) {
             my $cookie=CGI::Cookie->new($c);
 
             if($cookie->name() eq $name) {

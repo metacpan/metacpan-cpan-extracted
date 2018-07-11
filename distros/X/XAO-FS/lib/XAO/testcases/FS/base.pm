@@ -2,11 +2,13 @@ package XAO::testcases::FS::base;
 use strict;
 use XAO::Utils;
 use XAO::Objects;
+use XAO::testcases::base;
 
-use base qw(Test::Unit::TestCase);
+use base qw(XAO::testcases::base);
 
-sub set_up ($) {
-    my $self=shift;
+sub new ($) {
+    my $proto=shift;
+    my $self=$proto->SUPER::new(@_);
 
     # Reading configuration
     #
@@ -18,23 +20,56 @@ sub set_up ($) {
         eval $t;
     }
 
-    $self->assert($d{'test_dsn'},
+    (!$@ && $d{'test_dsn'}) ||
+        die "Invalid config, re-run 'perl Makefile.PL'\n";
+
+    $self->{'dbconfig'}=\%d;
+
+    if($d{'test_dsn'} eq 'none') {
+        dprint "No DSN configured, skipping all tests";
+        $self->{'skip_db_tests'}=1;
+        return;
+    }
+
+    return $self;
+}
+
+sub list_tests ($) {
+    my $self=shift;
+
+    if($self->{'skip_db_tests'}) {
+        return wantarray ? () : [];
+    }
+    else {
+        return $self->SUPER::list_tests(@_);
+    }
+}
+
+sub set_up ($) {
+    my $self=shift;
+
+    ### $self->SUPER::set_up(@_);
+
+    my $dbconfig=$self->{'dbconfig'};
+
+    $self->assert($dbconfig->{'test_dsn'},
                   "No test configuration available (no .config)");
 
     $self->{'odb'}=XAO::Objects->new(
         objname             => 'FS::Glue',
-        dsn                 => $d{'test_dsn'},
-        user                => $d{'test_user'},
-        password            => $d{'test_password'},
+        dsn                 => $dbconfig->{'test_dsn'},
+        user                => $dbconfig->{'test_user'},
+        password            => $dbconfig->{'test_password'},
         empty_database      => 'confirm',
         check_consistency   => 1,
     );
+
     $self->assert($self->{odb}, "Can't connect to the FS database");
 
     $self->{'odb_args'}={
-        dsn         => $d{'test_dsn'},
-        user        => $d{'test_user'},
-        password    => $d{'test_password'},
+        dsn         => $dbconfig->{'test_dsn'},
+        user        => $dbconfig->{'test_user'},
+        password    => $dbconfig->{'test_password'},
     };
 
     my $global=$self->{'odb'}->fetch('/');
@@ -71,6 +106,9 @@ sub set_up ($) {
 
 sub tear_down {
     my $self=shift;
+
+    ### $self->SUPER::tear_down(@_);
+
     $self->{odb}=undef;
 }
 
@@ -79,18 +117,6 @@ sub get_odb {
     my $odb=$self->{'odb'};
     $self->assert(defined($odb) && ref($odb), 'No object database handler');
     $odb;
-}
-
-sub timestamp ($$) {
-    my $self=shift;
-    time;
-}
-
-sub timediff ($$$) {
-    my $self=shift;
-    my $t1=shift;
-    my $t2=shift;
-    $t1-$t2;
 }
 
 use vars qw(*SE);

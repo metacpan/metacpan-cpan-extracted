@@ -1,0 +1,144 @@
+Revision history for App-colorplus
+
+0.31    2018-07-10 Tue. 
+        Debugged on "-t" option. A large refactoring also performed.
+
+
+changeset:   1345:d2a009000e1f
+
+date:        Tue Jul 10 2018 +0900
+summary:     colorplus color resetをひとつの変数にした。-b を -c に。不使用と思われる -1 を除去。
+
+changeset:   1344:63cb323dbfbc
+date:        Tue Jul 10 2018 +0900
+summary:     colorplus 日本語マニュアルにいろいろ手を入れた
+
+changeset:   1343:f5e0382012ae
+date:        Tue Jul 10 2018 +0900
+summary:     colorplus chompと改行文字の処理を工夫。いくつかの関数内でそれぞれ行うのではなくて、一箇所にまとめた。その他、いろいろリファクタ
+
+changeset:   1342:01ea382d6fc7
+date:        Tue Jul 10 2018 +0900
+summary:     colorplus 各関数について、変数を明示して渡さないようにした。リファクタである。
+
+changeset:   1341:de5ed040451e
+date:        Tue Jul 10 2018 +0900
+summary:     colorplus -^を除去。これに伴い LineHEad関数も除去
+
+changeset:   1340:6864a53bbbd5
+date:        Tue Jul 10 2018 +0900
+summary:     colorplus nSplit関数をリファクタ。13行が3行に。
+
+changeset:   1337:04ea27ee2459
+date:        Mon Jul 09 2018 +0900
+summary:     colorplus -3 と -s が干渉しないようにした。
+
+changeset:   1336:04c6fa9f8c12
+date:        Mon Jul 09 2018 +0900
+summary:     colorplus 0.31 デバグ。-t でタブが消えるバグがあった。
+
+changeset:   1091:4aedc1a4f0f2
+date:        Wed Mar 28 2018 +0900
+summary:     colorplus -/ へ -, から変更。そのほかいろいろリファクタ
+
+
+changeset:   696:3adefbbe837b
+date:        Mon Aug 08 2016 +0900
+summary:     ヘルプの動作を最新化した。9ファイルについて
+
+
+changeset:   585:120f6667bfe2
+date:        Thu Jul 14 2016 +0900
+summary:     colorplus コメントを追加した。
+
+changeset:   583:c5f9d226768c
+date:        Thu Jul 14 2016 +0900
+summary:     colorplus -0 が getopts からなぜか消されていたので、追加。他、5.001で動作することを確認
+
+changeset:   554:6d70b8fcf920
+date:        Wed Jul 06 2016 +0900
+summary:     colorplus -^ num を実装
+
+changeset:   550:8d6c5cab4a89
+date:        Tue Jul 05 2016 +0900
+summary:     colorplus ヘルプを少し書換
+
+changeset:   519:bb6a517657fc
+date:        Sat Jun 18 2016 +0900
+summary:     colopplus デバグ。関数の引数宣言のミスマッチ
+
+changeset:   518:d0be4e092579
+date:        Sat Jun 18 2016 +0900
+summary:     colorplus に -b と -s を実装。およびリファクタ
+
+changeset:   514:b60b5cfcd43e
+date:        Thu Jun 16 2016 +0900
+summary:     colorplus white -> reset
+
+
+changeset:   443:ff38f8cce021
+date:        Wed Apr 13 2016 +0900
+summary:     colorplus 指定文字列に赤で着色したいことをヘルプに書き加えた。
+
+changeset:   441:819f15a193d5
+date:        Wed Apr 13 2016 +0900
+summary:     colorplus について、-lのデバグ。colored関数の除去。on_blackを使わないようにした。
+
+changeset:   423:d33fe0d001cc
+date:        Tue Apr 05 2016 +0900
+summary:     colorplus --helpの機能を付けた。
+
+changeset:   388:de4aa5879f6b
+date:        Sun Mar 20 2016 +0900
+summary:     colorplus デバグ。colorstrip関数のインポートし忘れの解除
+
+
+changeset:   272:170e929c77a1
+date:        Sat Feb 27 2016 +0900
+summary:     colorplus 少し修正。効率が悪くなったかも。
+
+changeset:   271:57c4803b8971
+date:        Sat Feb 27 2016 +0900
+summary:     colorplus 4桁ごと色変更 -4
+
+changeset:   270:da863fc63bf0
+date:        Sat Feb 27 2016 +0900
+summary:     colorplus 4桁ごと色変更 -4
+
+changeset:   252:d9cd2e37dd0a
+date:        Mon Feb 22 2016 +0900
+summary:     colorsをcolorplusに改名
+
+changeset:   223:cb7a299a8303
+date:        Wed Feb 17 2016 +0900
+summary:     ディレクトリ編成の変更
+
+changeset:   204:d425ee0de466
+date:        Mon Feb 15 2016 +0900
+summary:     colors に指定された行数ごとに背景に青をつけるオプションを作った。
+
+changeset:   180:ecda7e3bcdbf
+date:        Fri Feb 12 2016 +0900
+summary:     changed the names of some files.
+
+changeset:   103:4467cbcf9167
+date:        Tue Feb 02 2016 +0900
+summary:     color.pl について-eの解説を加えた。$| の動作も決めたが確認出来ず。あと、4桁ごと色づけをしたい。
+
+changeset:   87:44fd10f824e7
+date:        Sat Jan 30 2016 +0900
+summary:     color.pl と crosstable.pl を大きく書き換えた。
+
+changeset:   75:83e948d70d81
+date:        Mon Jan 25 2016 +0900
+summary:     colorCanceller.plをrenameした。さらに3桁色分け機能を加えようとした。
+
+changeset:   33:f15d1006d791
+date:        Mon Jun 08 2015 +0000
+summary:     colorCanceller.pl created online with Bitbucket
+
+
+
+
+
+

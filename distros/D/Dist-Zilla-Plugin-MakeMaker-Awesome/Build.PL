@@ -88,7 +88,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "Dist-Zilla-Plugin-MakeMaker-Awesome",
-      "dist_version" => "0.45",
+      "dist_version" => "0.46",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::MakeMaker::Awesome",
       "recursive_test_files" => 1,
@@ -97,6 +97,7 @@ EOW
         "Dist::Zilla" => "4.300039",
         "Dist::Zilla::File::InMemory" => 0,
         "Dist::Zilla::Plugin::MakeMaker" => "5.001",
+        "Dist::Zilla::Role::BeforeBuild" => 0,
         "Dist::Zilla::Role::FileGatherer" => 0,
         "List::Util" => "1.29",
         "Moose" => 0,

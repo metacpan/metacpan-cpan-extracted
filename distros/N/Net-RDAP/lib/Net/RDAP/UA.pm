@@ -63,7 +63,7 @@ sub new {
 sub request {
 	my ($self, $request) = @_;
 
-	$request->header('Accept' => 'application/rdap+json, application/json');
+	$request->header('Accept' => 'application/rdap+json');
 
 	print STDERR $request->as_string if (1 == $ENV{'NET_RDAP_UA_DEBUG'});
 

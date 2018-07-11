@@ -1,10 +1,10 @@
 {
-   "abstract" : "XAO Foundation Server (OO database layer)",
+   "abstract" : "XAO Database Layer",
    "author" : [
-      "Andrew Maltsev, http://ejelta.com/xao/"
+      "Andrew Maltsev, https://ejelta.com/xao/"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Pod::Usage" : "1.12",
+            "XAO::Base" : "1.20"
          }
       },
       "configure" : {
@@ -35,13 +36,11 @@
             "DBD::mysql" : "2.0414",
             "DBI" : "1.13",
             "Error" : "0.15",
-            "Pod::Usage" : "1.12",
-            "Test::Unit" : "0.15",
-            "XAO::Base" : "1.06"
+            "XAO::Base" : "1.20",
+            "perl" : "5.010001"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.16",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.21"
 }

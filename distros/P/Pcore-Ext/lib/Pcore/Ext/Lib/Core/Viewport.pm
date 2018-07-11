@@ -44,6 +44,10 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
             },
         },
 
+        routes => {    #
+            'change-password/:{token}(/.*)' => 'routeChangePassword',
+        },
+
         init => func ['view'], <<"JS",
             var me = this;
 
@@ -380,6 +384,17 @@ JS
         doRecoverPassword => func [ 'username', 'cb' ], <<"JS",
             this.api.recoverPassword(username, cb);
 JS
+
+        # ROUTES HANDLERS
+        routeChangePassword => func ['values'], <<"JS",
+            Ext.create({
+                xtype: "$type->{'/Pcore/Ext/Lib/Core/Viewport/change_password'}",
+                token: values.token,
+                redirectOnClose: ''
+            }).show();
+
+            this.unmask();
+JS
     };
 }
 
@@ -538,6 +553,7 @@ sub EXT_change_password : Extend('Ext.Dialog') : Type('widget') {
         title        => { text => l10n('PASSWORD CHANGING') },
         defaultFocus => 'passwordfield[name=password]',
         draggable    => \0,
+        closable     => \1,
         width        => 320,
 
         keyMap => { ENTER => 'submit', },

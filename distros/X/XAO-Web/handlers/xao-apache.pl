@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #
 # Finds out what project it was called for. Switches operational
 # parameters to this projects and then loads and displays requested
@@ -7,6 +7,7 @@
 # Site name must be the first name in path. Rewrite module should put it
 # there if it's not set as part of path already.
 #
+use warnings;
 use strict;
 use Error qw(:try);
 use CGI;
@@ -43,8 +44,10 @@ try {
 
     # Loading or creating site object.
     #
-    my $web=XAO::Web->new(sitename => $sitename);
-  
+    my $web=XAO::Web->new(sitename => $sitename, init_args => {
+        environment => 'web',
+    });
+
     # Checking access control rules (path_deny_table in the config)
     #
     my $path=join('/','',@path);

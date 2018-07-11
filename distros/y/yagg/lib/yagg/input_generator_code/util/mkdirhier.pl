@@ -2,7 +2,7 @@
 
 use strict;
 
-die "usage: $0 directory ...\n" unless @ARGV;
+die "usage: $0 directory ...\n" if @ARGV == 0 || grep { $_ eq '--help' } @ARGV;
 
 foreach my $dir (@ARGV)
 {

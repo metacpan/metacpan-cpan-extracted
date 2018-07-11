@@ -75,11 +75,18 @@ SYNOPSIS
             note  => 'Note',
         };
     
+        my $index_settings = {
+            refresh_interval   => '2s',
+            number_of_shards   => 4,
+            number_of_replicas => 3,
+        };
+    
         for my $doc_type (keys %$document_types) {
             index $doc_type => (
-                namespace => 'private',
-                type      => $document_types->{$doc_type},
-                traits    => ["MyApplication::Elasticsearch::DocTrait"],
+                namespace      => 'private',
+                type           => $document_types->{$doc_type},
+                traits         => ["MyApplication::Elasticsearch::DocTrait"],
+                index_settings => $index_settings,
             );
         }
     

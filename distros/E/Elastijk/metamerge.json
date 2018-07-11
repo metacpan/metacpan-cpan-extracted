@@ -1,0 +1,13 @@
+{
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Elastijk/issues"
+      },
+      "homepage" : "https://github.com/gugod/Elastijk",
+      "repository" : {
+         "url" : "git://github.com/gugod/Elastijk.git",
+         "web" : "https://github.com/gugod/Elastijk"
+      }
+   },
+    "x_static_install" : 1
+}

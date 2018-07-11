@@ -1,5 +1,8 @@
 Revision history for perl distribution OpenAPI-Client
 
+0.16 2018-07-06T16:08:35+0800
+ - Fix "host" can contain port #12
+
 0.15 2018-02-15T22:35:36+0100
  - Require JSON::Validator 2.03
 

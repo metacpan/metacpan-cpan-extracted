@@ -1,44 +1,69 @@
-1.07 -
-    * XAO::Utils - added t2hj for javascript translations
+https://github.com/amaltsev/XAO-Base
+------------------------------------
 
-1.06 - 11-Jan-2005
-    * XAO::Utils - set_logprint_handler()
-    * XAO::TestUtils - 'use blib' is optional now
-    * XAO::Utils - get_debug() added
-    * XAO::TestUtils - support for package building
-      (xao_mf_check_consistency & xao_mf_fix_permissions)
-    * Changed from SleepyCat based proprietary open source compatible
-      license to the standard "Artistic".
-    * Internal CVS version numbers bumped to >=2.1 and the way VERSION
-      is generated is changed. Otherwise CPAN thinks that 1.13 is
-      smaller than 1.4
+commit f8d10f78a8fd2b5a452641206d6d9142be227642
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Sat Jul 7 09:12:11 2018 -0700
 
-1.05 - 12-Nov-2003
-    * XAO::Utils - get_args works as merge_refs on multiple hash refs
-    * XAO::TestUtils - new module, automated testing for XAO packages
-    * XAO::DO::Embeddable - optional base class for embeddable configs
-    * XAO::Utils - fround() function added
+    1.21 Fixed a stupid build bug
+    
+    The idea of making CHANGES from a git log back fired in CPAN
+    distribution. Fixed now hopefully.
 
-1.04 - 9-Aug-2002
-    * XAO::Utils - t2hq() now escapes semicolon
-    * Minor changes to support XAO::Web and XAO::FS improvements
+commit 58301c175d84be27c6f74a7650d61e3b117c47b8
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Jul 6 19:01:41 2018 -0700
 
-1.03 - 18-Mar-2002
-    * XAO::Cache - generic cache interface (new)
-    * XAO::DO::Cache::Memory - memory cache (new)
-    * XAO::DO::Atom - suggested base class (new)
-    * XAO::Errors - added support for throwing by known class name
+    Made dist archive use 1.20 instead of 1.2
 
-1.02 - 3-Jan-2002
-    * minor fixes
-    * line counter in Objects.pm fixed, was off by one line in
-      error messages
+commit 4fdf3649f464669c5f8e776b22fd49b7feeeb05d
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Jul 6 18:51:30 2018 -0700
 
-1.01 - 4-Dec-2001
-    * fixed SimpleHash->new
-    * added cleanup() method to XAO::DO::Config
-    * fixed XAO::Projects::get_project() method
-    * Config::init() now calls init() on all embedded objects
+    Removed unnecessary man page building
 
-1.0 - 2-Nov-2001
-    * Initial public release
+commit d468cbd7a4e677df63c036e91359f09b5102bdd1
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Jul 6 18:47:20 2018 -0700
+
+    Version bump
+
+commit ebd4413d9d980225d5a6cfe5a8de0180620f6048
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Jul 6 18:46:12 2018 -0700
+
+    1.20 Removed unnecessary dependencies
+
+commit 0091282b7673760af583a05965ff17f13e3ee01c
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Jul 6 17:17:40 2018 -0700
+
+    Forced CHANGES rebuild
+
+commit 16bbd0704b39a7b7dd094974cf88241deeafa01d
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Jul 6 16:59:49 2018 -0700
+
+    1.19 Recursion on auto tests
+    
+    Added sub-directory scanning on tests in t/testcases and fixed a stray
+    dependency bug introduced in 1.18.
+
+commit 1fde5b69f326524d64380d87139792bf749f7d85
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Jul 6 08:45:48 2018 -0700
+
+    1.18 Tests updated to Test::Unit::Lite
+
+commit 5b7df5e54fd4da94c30b806fd2fad3472872eb63
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Tue Jun 12 20:29:43 2018 -0700
+
+    1.17 version bump
+
+commit 46801d8d3829806f53796b1fe8d580f02c9c6956
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Tue Jun 12 18:41:03 2018 -0700
+
+    More cpanm compatibility changes
+

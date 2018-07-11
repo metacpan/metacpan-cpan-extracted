@@ -16,8 +16,8 @@ name: App-csv2tsv
 provides:
   App::csv2tsv:
     file: lib/App/csv2tsv.pm
-    version: '0.52'
+    version: '0.56'
 resources:
   license: http://www.gnu.org/licenses/gpl-3.0.txt
-version: '0.52'
+version: '0.56'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

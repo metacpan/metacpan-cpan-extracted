@@ -43,12 +43,13 @@ no_index:
 provides:
   Dist::Zilla::Plugin::MakeMaker::Awesome:
     file: lib/Dist/Zilla/Plugin/MakeMaker/Awesome.pm
-    version: '0.45'
+    version: '0.46'
 requires:
   CPAN::Meta::Requirements: '2.121'
   Dist::Zilla: '4.300039'
   Dist::Zilla::File::InMemory: '0'
   Dist::Zilla::Plugin::MakeMaker: '5.001'
+  Dist::Zilla::Role::BeforeBuild: '0'
   Dist::Zilla::Role::FileGatherer: '0'
   List::Util: '1.29'
   Moose: '0'
@@ -64,7 +65,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-MakeMaker-Awesome
   homepage: https://github.com/avar/dist-zilla-plugin-makemaker-awesome
   repository: https://github.com/avar/dist-zilla-plugin-makemaker-awesome.git
-version: '0.45'
+version: '0.46'
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -394,6 +395,10 @@ x_Dist_Zilla:
               name: '@Author::ETHER/Authors'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::AllowOverride
+              name: '@Author::ETHER/allow override AUTHOR'
+              version: '0.05'
+            -
               class: Pod::Weaver::Section::Contributors
               name: '@Author::ETHER/Contributors'
               version: '0.009'
@@ -489,9 +494,8 @@ x_Dist_Zilla:
           make_path: make
           version: '6.012'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.45'
+          version: '0.46'
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 9
           version: '6.012'
       name: '@Author::ETHER/MakeMaker::Fallback'
       version: '0.027'
@@ -590,7 +594,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20180622'
+          Module::CoreList: '5.20180626'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -753,7 +757,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.45
+          tag: v0.46
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

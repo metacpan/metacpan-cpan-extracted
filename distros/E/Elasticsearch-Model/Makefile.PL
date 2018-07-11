@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
   "NAME" => "Elasticsearch::Model",
   "PREREQ_PM" => {
     "Class::Load" => 0,
-    "Data::Printer" => 0,
     "List::AllUtils" => 0,
     "Module::Find" => 0,
     "Moose" => 0,
@@ -36,9 +35,10 @@ my %WriteMakefileArgs = (
     "Test::Class::Load" => 0,
     "Test::Class::Most" => 0,
     "Test::Moose" => 0,
+    "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.0.1",
+  "VERSION" => "0.1.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +47,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Class::Load" => 0,
-  "Data::Printer" => 0,
   "DateTime" => 0,
   "IO::Socket::INET" => 0,
   "List::AllUtils" => 0,
@@ -63,6 +62,7 @@ my %FallbackPrereqs = (
   "Test::Class::Load" => 0,
   "Test::Class::Most" => 0,
   "Test::Moose" => 0,
+  "Test::Warnings" => 0,
   "Try::Tiny" => 0,
   "lib" => 0
 );

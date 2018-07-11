@@ -45,7 +45,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::ContributorCovenant" : {
          "file" : "lib/Dist/Zilla/Plugin/ContributorCovenant.pm",
-         "version" : "0.02"
+         "version" : "1.004001"
       }
    },
    "release_status" : "stable",
@@ -60,11 +60,15 @@
          "web" : "https://github.com/kyzn/Dist-Zilla-Plugin-ContributorCovenant"
       }
    },
-   "version" : "0.02",
+   "version" : "1.004001",
    "x_contributor_covenant" : {
       "version" : 0.02
    },
+   "x_contributors" : [
+      "Joelle Maslak <jmaslak@antelope.net>",
+      "Kivanc Yazan <kyzn@users.noreply.github.com>"
+   ],
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Encode ();
 use List::Util ();
-use PPIx::QuoteLike::Constant qw{ MINIMUM_PERL VARIABLE_RE };
+use PPIx::QuoteLike::Constant qw{ MINIMUM_PERL VARIABLE_RE @CARP_NOT };
 use PPIx::QuoteLike::Token::Control;
 use PPIx::QuoteLike::Token::Delimiter;
 use PPIx::QuoteLike::Token::Interpolation;
@@ -18,10 +18,9 @@ use PPIx::QuoteLike::Token::Unknown;
 use PPIx::QuoteLike::Token::Whitespace;
 use Scalar::Util ();
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
-use constant ARRAY	=> ref [];
-use constant CODE	=> ref sub {};
+use constant CODE_REF	=> ref sub {};
 
 use constant ILLEGAL_FIRST	=>
     'Tokenizer found illegal first characters';
@@ -62,8 +61,12 @@ $PPIx::QuoteLike::DEFAULT_POSTDEREF = 1;
 	    and warn "Initial match of $string\n";
 
 	# q<>, qq<>, qx<>
-	if ( $string =~ m/ \A \s* ( q [qx]? ) ( \s* ) ( \W ) /smxgc ) {
+	if ( $string =~ m/ \A \s* ( q [qx]? ) ( \s* ) ( . ) /smxgc ) {
 	    ( $type, $gap, $start_delim ) = ( $1, $2, $3 );
+	    not $gap
+		and $start_delim =~ m< \A \w \z >smx
+		and return $self->_link_elems( $self->_unknown(
+		    $string, ILLEGAL_FIRST ) );
 	    $arg{trace}
 		and warn "Initial match '$type$start_delim'\n";
 	    $self->{interpolates} = 'qq' eq $type ||
@@ -269,7 +272,7 @@ sub failures {
 sub find {
     my ( $self, $target ) = @_;
 
-    my $check = CODE eq ref $target ? $target :
+    my $check = CODE_REF eq ref $target ? $target :
     ref $target ? croak 'find() target may not be ' . ref $target :
     sub { $_[0]->isa( $target ) };
     my @found;
@@ -1053,7 +1056,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Thomas R. Wyant, III
+Copyright (C) 2016-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

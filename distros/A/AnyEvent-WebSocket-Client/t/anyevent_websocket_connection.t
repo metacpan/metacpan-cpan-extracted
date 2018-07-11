@@ -524,4 +524,51 @@ subtest 'close codes' => sub {
 
 };
 
+subtest 'next_message callback can be set from within a next_message callback' => sub {
+  my($a,$b) = create_connection_pair;
+  my($first_msg, $second_msg);
+
+  my $round_trip = sub {
+    my $done = AnyEvent->condvar;
+    
+    $b->on(next_message => sub {
+      my(undef, $message) = @_;
+      $first_msg = $message;
+      $a->send('second');
+      $b->on(next_message => sub {
+        my(undef, $message) = @_;
+        $second_msg = $message;
+        $done->send;
+      });
+    });
+    
+    $a->send('first');
+    $done->recv;
+  };
+
+  my $quit_cv = AnyEvent->condvar;
+  $b->on(finish => sub { $quit_cv->send; });
+  $round_trip->();
+
+  is(
+    $first_msg,
+    object {
+      call decoded_body => 'first';
+    },
+    'first message',
+  );
+
+  is(
+    $second_msg,
+    object {
+      call decoded_body => 'second';
+    },
+    'second message',
+  );
+  
+  $a->close;
+  
+  $quit_cv->recv;
+};
+
 done_testing;

@@ -3,7 +3,7 @@ package Elasticsearch::Model::Document::Mapper;
 use Moose;
 use Moose::Util::TypeConstraints;
 use List::AllUtils qw/any/;
-use Data::Printer;
+
 
 my %allowable_types_for_mapping_parameter = (
     analyzer               => ["text"],

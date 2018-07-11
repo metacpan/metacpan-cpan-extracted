@@ -15,14 +15,14 @@ use Ref::Util qw(is_hashref is_arrayref);
 # Argument Collection
 my %opt;
 GetOptions(\%opt,
-    'ignore:s',
-    'carbon-base:s',
-    'carbon-proto:s',
-    'carbon-server:s',
-    'carbon-port:i',
+    'ignore=s',
+    'carbon-base=s',
+    'carbon-proto=s',
+    'carbon-server=s',
+    'carbon-port=i',
     'with-indices',
     'with-cluster',
-    'prefix:s',
+    'prefix=s',
     'no-prefix',
     'help|h',
     'manual|m',
@@ -196,7 +196,7 @@ es-graphite-dynamic.pl - Dynamically gather metrics and send to graphite
 
 =head1 VERSION
 
-version 5.6
+version 5.7
 
 =head1 SYNOPSIS
 

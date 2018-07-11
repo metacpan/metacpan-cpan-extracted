@@ -158,13 +158,15 @@ lives_ok(
             html    => '<p>This is a generic message for <b>testing purposes only</b>.</p>',
             attachments => [
                 {
-                    ctype  => 'image/gif',
-                    source => dirname($0) . '/blank.gif',
+                    ctype    => 'image/gif',
+                    source   => dirname($0) . '/blank.gif',
+                    encoding => 'quoted-printable',
                 },
                 {
-                    ctype  => 'image/gif',
-                    content => io( dirname($0) . '/blank.gif' )->binary->all,
-                    name    => 'blank.gif',
+                    ctype    => 'image/gif',
+                    content  => io( dirname($0) . '/blank.gif' )->binary->all,
+                    name     => 'blank.gif',
+                    encoding => 'quoted-printable',
                 },
             ],
         )

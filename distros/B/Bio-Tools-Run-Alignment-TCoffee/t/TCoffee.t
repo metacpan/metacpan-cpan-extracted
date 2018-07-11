@@ -44,7 +44,8 @@ $factory->quiet($bequiet);  # Suppress tcoffee messages to terminal
 my $inputfilename = test_input_file('cysprot.fa');
 my $aln;
 
-my $version = $factory->version;
+my $version = $factory->_major_minor_version;
+
 cmp_ok ($version, '>=', 1.22, "Code tested only on t_coffee versions > 1.22" );
 $aln = $factory->align($inputfilename);
 ok($aln);

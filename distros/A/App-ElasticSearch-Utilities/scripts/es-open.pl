@@ -13,7 +13,6 @@ use Pod::Usage;
 # Argument Parsing
 my %OPT;
 GetOptions(\%OPT,
-    'attributes|attr:s',
     'help|h',
     'manual|m',
 );
@@ -46,7 +45,7 @@ es-open.pl - Open any closed indices matching your paramters.
 
 =head1 VERSION
 
-version 5.6
+version 5.7
 
 =head1 SYNOPSIS
 

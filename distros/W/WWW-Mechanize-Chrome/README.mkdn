@@ -2,6 +2,9 @@
 [![Travis Build Status](https://travis-ci.org/Corion/WWW-Mechanize-Chrome.svg?branch=master)](https://travis-ci.org/Corion/WWW-Mechanize-Chrome)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/WWW-Mechanize-Chrome?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/WWW-Mechanize-Chrome)
 
+CONTRIBUTING
+
+See lib/WWW/Mechanize/Chrome/Contributing.pod
 
 # NAME
 
@@ -141,6 +144,10 @@ WWW::Mechanize::Chrome - automate the Chrome browser
     If set to 1, after each request tests for Javascript errors and warns. Useful
     for testing with `use warnings qw(fatal)`.
 
+- **mute\_audio**
+
+    Mutes the audio output. This setting is enabled by default.
+
 - **background\_networking**
 - **client\_side\_phishing\_detection**
 - **component\_update**
@@ -152,6 +159,7 @@ WWW::Mechanize::Chrome - automate the Chrome browser
 - **infobars**
 - **default\_apps**
 - **popup\_blocking**
+- **hide\_scrollbars**
 
 You can override the class to implement the transport from the outside by
 setting `$ENV{WWW_MECHANIZE_CHROME_TRANSPORT}` to the transport class.
@@ -211,7 +219,7 @@ Allow or disallow execution of Javascript
 
     # Go offline
     $mech->emulateNetworkConditions(
-        offline => JSON::PP::true,
+        offline => JSON::true,
         latency => 10, # ms ping
         downloadThroughput => 0, # bytes/s
         uploadThroughput => 0, # bytes/s
@@ -274,8 +282,8 @@ a safe place.
     my @matches = $mech->searchInResponseBody(
         requestId     => $request_id,
         query         => 'rumpelstiltskin',
-        caseSensitive => JSON::PP::true,
-        isRegex       => JSON::PP::false,
+        caseSensitive => JSON::true,
+        isRegex       => JSON::false,
     );
     for( @matches ) {
         print $_->{lineNumber}, ":", $_->{lineContent}, "\n";
@@ -557,6 +565,25 @@ event loop.
     print "We are at " . $mech->uri;
 
 Returns the current document URI.
+
+## `$mech->infinite_scroll( [$wait_time_in_seconds] )`
+
+    $new_content_found = $mech->infinite_scroll(3);
+
+Loads content into pages that have "infinite scroll" capabilities by scrolling
+to the bottom of the web page and waiting up to the number of seconds, as set by
+the optional `$wait_time_in_seconds` argument, for the browser to load more
+content. The default is to wait up to 20 seconds. For reasonbly fast sites,
+the wait time can be set much lower.
+
+The method returns a boolean `true` if new content is loaded, `false`
+otherwise. You can scroll to the end (if there is one) of an infinitely
+scrolling page like so:
+
+    while( $mech->infinite_scroll ) {
+        # Tests for exiting the loop earlier
+        last if $count++ >= 10;
+    }
 
 # CONTENT METHODS
 
@@ -1350,22 +1377,82 @@ they make little sense in the context of Chrome.
 
 ## Install the `chrome` executable
 
-Test it has been installed on your system:
+`WWW::Mechanize::Chrome` requires that you have the Chrome browser installed
+on your system. If Chrome is not installed, please consult
+[Google's instructions](https://support.google.com/chrome/answer/95346) for
+help installing the Chrome browser.
 
-On unixish systems, the executable is named `chrome-browser`. Check
-that Chrome starts:
+`WWW::Mechanize::Chrome` will do its best to locate Chrome's executable file
+on your system. With any luck, it will find the executable you want to use. If
+`WWW::Mechanize::Chrome` does not find Chrome on your system or you want to
+use a different executable, you can use the `launch_exe` constructor argument
+to tell `WWW::Mechanize::Chrome` where to find it. You can alse set the
+`CHROME_BIN` environment variable to the absolute path of the executable.
+
+## Test the `chrome` executable
+
+You should verify that Chrome's executable is working properly. On Ubuntu, the
+executable is typically named `chrome-browser` and so you can test Chrome's
+installation with:
 
 `chrome-browser --version`
 
+and you should see something like `Google Chrome 67.0.3396.99` returned.
+
+Note that the command you run will vary based on your operating sytem and
+possibly the version of Chrome installed.
+
+On a Debian system, for example, the command will most likely be something
+like:
+
+`google-chrome-stable --version` or
+`google-chrome-beta --version` or
+`google-chrome-unstable --version`
+
 On Windows, the executable is named `chrome.exe` and doesn't output
-information to the console. Check that Chrome starts:
+information to the console but you can check that Chrome starts by running:
 
 `chrome`
+
+in the terminal.
+
+On MacOS, the executable can usually be be found inside the `Google Chrome.app`
+package in the `/Applications` directory and its installation can be
+tested with something like the following:
+
+`/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version`
+
+or, if Chrome is installed for a single user:
+
+`/Users/<user_name>/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version`
+
+If you are having trouble finding, installing, or running Chrome on your
+system, please consult the appropriate documentation or a knowledgeable expert.
 
 ## Chrome versions
 
 Note that the Chrome version numbers do not denote availability of features.
 Features can still be added to Chrome v62 when Chrome v64 is already out.
+
+If you are serious about automating a website, use a separate copy of Chrome
+and disable its automatic updates.
+
+## Module prerequisites on OSX
+
+### [Imager::File::PNG](https://metacpan.org/pod/Imager::File::PNG)
+
+This module relies on [Imager](https://metacpan.org/pod/Imager) for processing screenshots. If you don't need
+this functionality, you can ignore the [Imager](https://metacpan.org/pod/Imager) and [Imager::File::PNG](https://metacpan.org/pod/Imager::File::PNG)
+installation and use this module with the system Perl provided by Apple.
+
+The installation of [Imager::File::PNG](https://metacpan.org/pod/Imager::File::PNG) works on OSX using the Homebrew tool
+and the Perl installable through Homebrew:
+
+    brew install perl-5.28
+    brew install libpng
+    cpan Imager::File::PNG
+
+I haven't been able to make it work using the system Perl.
 
 # RUNNING THE TEST SUITE
 
@@ -1431,9 +1518,25 @@ Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Chrome](https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Chrome)
 or via mail to [www-mechanize-Chrome-Bugs@rt.cpan.org](mailto:www-mechanize-Chrome-Bugs@rt.cpan.org).
 
+# CONTRIBUTING
+
+Please see [WWW::Mechanize::Chrome::Contributing](https://metacpan.org/pod/WWW::Mechanize::Chrome::Contributing).
+
+# KNOWN ISSUES
+
+When Chrome is run in headless mode, Chrome throws a `Lost UI shared context`
+error. This error can be ignored and does not affect the operation of this
+module.
+
 # AUTHOR
 
 Max Maischein `corion@cpan.org`
+
+# CONTRIBUTORS
+
+Andreas König `andk@cpan.org`
+Tobias Leich `froggs@cpan.org`
+Steven Dondley `s@dondley.org`
 
 # COPYRIGHT (c)
 

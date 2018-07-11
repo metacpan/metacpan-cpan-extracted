@@ -22,7 +22,6 @@
       "runtime" : {
          "requires" : {
             "Class::Load" : "0",
-            "Data::Printer" : "0",
             "List::AllUtils" : "0",
             "Module::Find" : "0",
             "Moose" : "0",
@@ -43,6 +42,7 @@
             "Test::Class::Load" : "0",
             "Test::Class::Most" : "0",
             "Test::Moose" : "0",
+            "Test::Warnings" : "0",
             "lib" : "0"
          }
       }
@@ -55,7 +55,7 @@
          "web" : "http://github.com/amiri/Elasticsearch-Model"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.1.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

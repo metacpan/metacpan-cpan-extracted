@@ -28,7 +28,7 @@
    "provides" : {
       "App::saikoro" : {
          "file" : "lib/App/saikoro.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       }
    },
    "release_status" : "stable",
@@ -37,6 +37,6 @@
          "http://www.gnu.org/licenses/gpl-3.0.txt"
       ]
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

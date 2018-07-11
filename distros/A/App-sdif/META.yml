@@ -36,7 +36,7 @@ provides:
     file: lib/App/cdif/default.pm
   App::sdif:
     file: lib/App/sdif.pm
-    version: v4.3.2
+    version: v4.4.0
   App::sdif::LabelStack:
     file: lib/App/sdif/LabelStack.pm
   App::sdif::autocolor:
@@ -59,7 +59,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/sdif-tools/issues
   homepage: https://github.com/kaz-utashiro/sdif-tools
   repository: git://github.com/kaz-utashiro/sdif-tools.git
-version: 4.3.2
+version: 4.4.0
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

@@ -28,7 +28,7 @@ Moose::Exporter->setup_import_methods(
     as_is => [qw/get_options/],
 );
 
-our $VERSION = version->new('0.4.7');
+our $VERSION = version->new('0.4.8');
 our $EXIT    = 1;
 
 has options => (
@@ -367,6 +367,15 @@ sub process {
             $self->files( $sub_obj->files );
         }
     }
+    elsif ( $self->sub_command && $self->sub_command =~ /^[A-Z].*::$/
+        && (
+            ! $self->auto_complete
+            || ( $self->cmd && $self->sub_command->{ $self->cmd } )
+        )
+    ) {
+        # object based subcommands
+        my $run = $self->sub_module_method || 'run';
+    }
 
     if ( $self->help_package ) {
         if ( $self->opt->{version} ) {
@@ -525,7 +534,7 @@ Getopt::Alt - Command line option passing with with lots of features
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt version 0.4.7.
+This documentation refers to Getopt::Alt version 0.4.8.
 
 =head1 SYNOPSIS
 
@@ -818,7 +827,7 @@ file to get auto-completion.
     }
     complete -F _eg eg
 
-B<Note>: This is different from version 0.4.7 and earlier
+B<Note>: This is different from version 0.4.8 and earlier
 
 =head1 DIAGNOSTICS
 

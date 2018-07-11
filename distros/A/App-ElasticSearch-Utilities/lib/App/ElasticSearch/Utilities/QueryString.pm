@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString;
 use strict;
 use warnings;
 
-our $VERSION = '5.6'; # VERSION
+our $VERSION = '5.7'; # VERSION
 
 use App::ElasticSearch::Utilities qw(:config);
 use App::ElasticSearch::Utilities::Query;
@@ -12,19 +12,34 @@ use CLI::Helpers qw(:output);
 use Module::Pluggable::Object;
 use Moo;
 use Ref::Util qw(is_arrayref);
-use Types::Standard qw(ArrayRef);
+use Types::Standard qw(ArrayRef Enum);
 
 use namespace::autoclean;
 
 
-my %LEADING  = map { $_ => 1 } qw( AND OR );
+my %JOINING  = map { $_ => 1 } qw( AND OR );
 my %TRAILING = map { $_ => 1 } qw( AND OR NOT );
+
+
+has 'context' => (
+    is      => 'rw',
+    isa     => Enum[qw(query filter)],
+    lazy    => 1,
+    default => sub { 'query' },
+);
 
 
 has search_path => (
     is      => 'rw',
     isa     => ArrayRef,
     default => sub {[]},
+);
+
+
+has default_join => (
+    is      => 'rw',
+    isa     => Enum[qw(AND OR)],
+    default => sub { 'AND' },
 );
 
 
@@ -55,6 +70,7 @@ sub expand_query_string {
     debug({color=>"magenta"}, "Processed parts");
     debug_var({color=>"magenta"},\@processed);
 
+    my $context = $self->context eq 'query' ? 'must' : 'filter';
     my $invert=0;
     my @dangling=();
     my @qs=();
@@ -67,7 +83,7 @@ sub expand_query_string {
             @dangling=(),
         }
         elsif( exists $part->{condition} ) {
-            my $target = $invert ? 'must_not' : 'must';
+            my $target = $invert ? 'must_not' : $context;
             $query->add_bool( $target => $part->{condition} );
             @dangling=();
         }
@@ -81,10 +97,25 @@ sub expand_query_string {
     }
     if(@qs)  {
         pop   @qs while @qs && exists $TRAILING{$qs[-1]};
-        shift @qs while @qs && exists $LEADING{$qs[0]};
+        shift @qs while @qs && exists $JOINING{$qs[0]};
+
+        # Ensure there's a joining token, otherwise use our default
+        if( @qs > 1 ) {
+            my $prev_query = 0;
+            my @joined = ();
+            foreach my $part ( @qs ) {
+                if( $prev_query ) {
+                    push @joined, $self->default_join() unless exists $JOINING{$part};
+                }
+                push @joined, $part;
+                # Here we include AND, NOT, OR
+                $prev_query = exists $TRAILING{$part} ? 0 : 1;
+            }
+            @qs = @joined;
+        }
     }
     # $query->add_aggregation();
-    $query->add_bool(must => { query_string => { query => join(' ', @qs) } }) if @qs;
+    $query->add_bool($context => { query_string => { query => join(' ', @qs) } }) if @qs;
 
     return $query;
 }
@@ -123,7 +154,7 @@ App::ElasticSearch::Utilities::QueryString - CLI query string fixer
 
 =head1 VERSION
 
-version 5.6
+version 5.7
 
 =head1 SYNOPSIS
 
@@ -131,6 +162,11 @@ This class provides a pluggable architecture to expand query strings on the
 command-line into complex Elasticsearch queries.
 
 =head1 ATTRIBUTES
+
+=head2 context
+
+Defaults to 'query', but can also be set to 'filter' so the elements will be
+added to the 'must' or 'filter' parameter.
 
 =head2 search_path
 
@@ -145,6 +181,12 @@ This will search:
     My::Company::QueryString::*
 
 For query processing plugins.
+
+=head2 default_join
+
+When fixing up the query string, if two tokens are found next to eachother
+missing a joining token, join using this token.  Can be either C<AND> or C<OR>,
+and defaults to C<AND>.
 
 =head2 plugins
 
@@ -215,6 +257,31 @@ The following barewords are transformed:
 If a field is an IP address uses CIDR Notation, it's expanded to a range query.
 
     src_ip:10.0/8 => src_ip:[10.0.0.0 TO 10.255.255.255]
+
+=head2 App::ElasticSearch::Utilities::Range
+
+This plugin translates some special comparison operators so you don't need to
+remember them anymore.
+
+Example:
+
+    price:<100
+
+Will translate into a:
+
+    { range: { price: { lt: 100 } } }
+
+And:
+
+    price:>50,<100
+
+Will translate to:
+
+    { range: { price: { gt: 50, lt: 100 } } }
+
+=head3 Supported Operators
+
+B<gt> via E<gt>, B<gte> via E<gt>=, B<lt> via E<lt>, B<lte> via E<lt>=
 
 =head2 App::ElasticSearch::Utilities::Underscored
 

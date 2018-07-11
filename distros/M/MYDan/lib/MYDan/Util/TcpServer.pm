@@ -102,6 +102,7 @@ sub run
                         {
                             $data->{handle}->on_drain(undef);
                             $data->{handle}->push_shutdown;
+                            $data->{handle}->destroy() unless $data->{handle}->destroyed();
                             return;
                         }
                         my ( $n, $buf );
@@ -146,6 +147,7 @@ sub run
             else
             {
                 $data->{handle}->push_shutdown;
+                $data->{handle}->destroy() unless $data->{handle}->destroyed();
             }
         }
 

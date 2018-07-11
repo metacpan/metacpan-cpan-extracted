@@ -7,7 +7,7 @@ use Net::FTP;
 use File::Copy;
 use Cwd;
 use File::Spec;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -190,6 +190,14 @@ sub new {
     my @compressions = (qw| gz bz2 xz |);
     $data->{eligible_compressions}  = { map { $_ => 1 } @compressions };
     $data->{compression_string}     = join('|' => @compressions);
+    $data->{eligible_types} = {
+        production      => 'prod',
+        prod            => 'prod',
+        development     => 'dev',
+        dev             => 'dev',
+        rc              => 'rc',
+        dev_or_rc       => 'dev_or_rc',
+    };
 
     return bless $data, $class;
 }
@@ -428,8 +436,10 @@ Available values:
     production      prod
     development     dev
     rc
+    dev_or_rc
 
-Defaults to C<dev>.
+Defaults to C<dev>.  Selecting C<dev_or_fc> will return any release which is
+either C<development|dev> or C<rc>.
 
 =back
 
@@ -460,18 +470,11 @@ sub list_releases {
     $args ||= {};
     croak "Argument to method must be hashref"
         unless ref($args) eq 'HASH';
-    my %eligible_types = (
-        production      => 'prod',
-        prod            => 'prod',
-        development     => 'dev',
-        dev             => 'dev',
-        rc              => 'rc',
-    );
     my $type;
     if (defined $args->{type}) {
         croak "Bad value for 'type': $args->{type}"
-            unless $eligible_types{$args->{type}};
-        $type = $eligible_types{$args->{type}};
+            unless $self->{eligible_types}->{$args->{type}};
+        $type = $self->{eligible_types}->{$args->{type}};
     }
     else {
         $type = 'dev';
@@ -487,33 +490,68 @@ sub list_releases {
         if $self->{verbose};
     my @these_releases;
     if ($type eq 'prod') {
-        @these_releases =
-            grep { /\.${compression}$/ } sort {
-            $self->{versions}->{$type}{$b}{major} <=> $self->{versions}->{$type}{$a}{major} ||
-            $self->{versions}->{$type}{$b}{minor} <=> $self->{versions}->{$type}{$a}{minor}
-        } keys %{$self->{versions}->{$type}};
+        @these_releases = $self->_get_prod_or_dev($compression, $type);
         $self->{"${compression}_${type}_releases"} = \@these_releases;
         return @these_releases;
     }
     elsif ($type eq 'dev') {
-        @these_releases =
+        @these_releases = $self->_get_prod_or_dev($compression, $type);
+        $self->{"${compression}_${type}_releases"} = \@these_releases;
+        return @these_releases;
+    }
+    elsif ($type eq 'rc') {
+        @these_releases = $self->_get_rc($compression, $type);
+        $self->{"${compression}_${type}_releases"} = \@these_releases;
+        return @these_releases;
+    }
+    else { # $type eq dev_or_rc
+        my @dev_releases = grep { /\.${compression}$/ }
+            keys %{$self->{versions}->{dev}};
+        my @rc_releases  = grep { /\.${compression}$/ }
+            keys %{$self->{versions}->{rc}};
+        my %in;
+        for my $r (@dev_releases, @rc_releases) {
+            my ($stem) = $r =~ m/^(.*?)\.tar/;
+            my ($core) = $stem =~ m/^perl-?5\.(.*)/;
+            if ($core =~ m/^00(\d)_(\d+)$/) {
+                my ($minor, $patch) = ($1,$2);
+                ($in{$r}{minor}, $in{$r}{patch}) = ($minor, $patch + 0);
+            }
+            elsif ($core =~ m/^(\d+)\.(.*?)(?:-((?:TRIAL|RC)\d+))?$/) {
+                my ($minor, $patch, $rc) = ($1,$2, $3);
+                ($in{$r}{minor}, $in{$r}{patch}, $in{$r}{rc}) = ($minor, $patch, $rc || '');
+            }
+        }
+        @these_releases = sort {
+            $in{$b}{minor}  <=> $in{$a}{minor} ||
+            $in{$b}{patch}  <=> $in{$a}{patch} ||
+            $in{$b}{rc}     cmp $in{$a}{rc}
+        } keys %in;
+
+        $self->{"${compression}_${type}_releases"} = \@these_releases;
+        return @these_releases;
+    }
+}
+
+sub _get_prod_or_dev {
+    my ($self, $compression, $type) = @_;
+    my @these_releases =
             grep { /\.${compression}$/ } sort {
             $self->{versions}->{$type}{$b}{major} <=> $self->{versions}->{$type}{$a}{major} ||
             $self->{versions}->{$type}{$b}{minor} <=> $self->{versions}->{$type}{$a}{minor}
         } keys %{$self->{versions}->{$type}};
-        $self->{"${compression}_${type}_releases"} = \@these_releases;
-        return @these_releases;
-    }
-    else { # $type eq rc
-        @these_releases =
+    return @these_releases;
+}
+
+sub _get_rc {
+    my ($self, $compression, $type) = @_;
+    my @these_releases =
             grep { /\.${compression}$/ } sort {
             $self->{versions}->{$type}{$b}{major} <=> $self->{versions}->{$type}{$a}{major} ||
             $self->{versions}->{$type}{$b}{minor} <=> $self->{versions}->{$type}{$a}{minor} ||
             $self->{versions}->{$type}{$b}{rc}    cmp $self->{versions}->{$type}{$a}{rc}
         } keys %{$self->{versions}->{$type}};
-        $self->{"${compression}_${type}_releases"} = \@these_releases;
-        return @these_releases;
-    }
+    return @these_releases;
 }
 
 =head2 C<get_latest_release()>
@@ -533,6 +571,8 @@ Download the latest release via FTP.
         verbose         => 1,
     } );
 
+Possible values for C<compression> and C<type> are the same as for C<list_releases()>.
+
 =item * Return Value
 
 Scalar holding path to download of tarball.
@@ -545,18 +585,11 @@ sub get_latest_release {
     my ($self, $args) = @_;
     croak "Argument to method must be hashref"
         unless ref($args) eq 'HASH';
-    my %eligible_types = (
-        production      => 'prod',
-        prod            => 'prod',
-        development     => 'dev',
-        dev             => 'dev',
-        rc              => 'rc',
-    );
     my $type;
     if (defined $args->{type}) {
         croak "Bad value for 'type': $args->{type}"
-            unless $eligible_types{$args->{type}};
-        $type = $eligible_types{$args->{type}};
+            unless $self->{eligible_types}->{$args->{type}};
+        $type = $self->{eligible_types}->{$args->{type}};
     }
     else {
         $type = 'dev';

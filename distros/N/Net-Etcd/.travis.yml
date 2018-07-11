@@ -7,7 +7,7 @@ addons:
 env:
   global:
     - PATH=$PATH:/tmp/test-etcd/
-    - ETCD_VER=v3.3.3
+    - ETCD_VER=v3.3.8
     - ETCDCTL_API=3
     - ETCD_TEST_HOST=etcd1
     - ETCD_TEST_PORT=2379
@@ -30,6 +30,8 @@ env:
     - ETCD_PEER_CLIENT_CERT_AUTH=1
 language: perl
 perl:
+  - "5.28"
+  - "5.26"
   - "5.24"
   - "5.22"
   - "5.20"
@@ -40,8 +42,10 @@ perl:
   - "5.10"
 matrix:
   include:
-    - perl: 5.24
+    - perl: 5.26
       env: COVERAGE=1   # enables coverage+coveralls reporting
+  allow_failures:
+    - perl: "5.28"
 before_install:
   - curl https://coreos.com/dist/pubkeys/app-signing-pubkey.gpg | sudo apt-key add -
   - wget https://github.com/coreos/etcd/releases/download/${ETCD_VER}/etcd-${ETCD_VER}-linux-amd64.tar.gz -O /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
@@ -62,4 +66,4 @@ script:
   - sleep 3
   - perl Makefile.PL
   - make
-  - make test 
+  - make test

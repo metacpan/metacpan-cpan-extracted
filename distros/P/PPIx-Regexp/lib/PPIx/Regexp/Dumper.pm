@@ -48,7 +48,7 @@ use PPIx::Regexp::Constant qw{
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 
 =head2 new
 
@@ -274,6 +274,13 @@ This method simply prints the result of L</string> to standard out.
 
 sub print : method {	## no critic (ProhibitBuiltinHomonyms)
     my ( $self ) = @_;
+    # Non-characters and Non-Unicode code points are explicitly allowed
+    # as delimiters, at least as of 5.29.0, which is where unassigned
+    # and combining code points became illegal. Unfortunately the
+    # warnings below were not introduced until 5.14, so have to go for
+    # the next-higher warning category.
+    # no warnings qw{ nonchar non_unicode };	## no critic (ProhibitNoWarnings)
+    no warnings qw{ utf8 };	## no critic (ProhibitNoWarnings)
     print $self->string();
     return;
 }

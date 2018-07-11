@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service;
 # ABSTRACT: base class for nopaste services
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 
 use WWW::Mechanize;
 
@@ -109,7 +109,7 @@ App::Nopaste::Service - base class for nopaste services
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 
@@ -183,10 +183,6 @@ and submit it.
 This should look at C<< WWW::Mechanize->content >> to find the URI to the
 pasted text.
 
-=head1 AUTHOR
-
-Shawn M Moore, C<< <sartak at gmail.com> >>
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=App-Nopaste>
@@ -194,7 +190,7 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 =head1 AUTHOR
 
-Shawn M Moore, <sartak@gmail.com>
+Shawn M Moore, <sartak at gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

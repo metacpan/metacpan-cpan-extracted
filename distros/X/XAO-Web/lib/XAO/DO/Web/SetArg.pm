@@ -13,7 +13,7 @@ Sets argument in parent object.
 To be used in situations like the following to set default values. Or in
 general to set or modify current arguments.
 
-Master template: 
+Master template:
 
   <%Page path="/bits/image-template" NAME="abc"%>
   <%Page path="/bits/image-template" NAME="def" WIDTH=123%>
@@ -34,7 +34,7 @@ Actual output would be:
 I<Note:> Because of extra new-line characters in the template after both
 SetArg lines actual output would be slightly different. Pay attention to
 this if your HTML code is space-sensitive.
- 
+
 By default it does not override existing values. Use non-zero "override"
 argument to override.
 
@@ -53,12 +53,10 @@ use XAO::Errors qw(XAO::DO::Web::SetArg);
 use XAO::Objects;
 use base XAO::Objects->load(objname => 'Web::Page');
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: SetArg.pm,v 2.2 2007/09/13 00:17:51 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION='2.002';
 
 ###############################################################################
 
-##
 # Setting arguments. Actual merging is done in Page object. We just set
 # merge_args here.
 #

@@ -1,3 +1,14 @@
+0.006		2018-07-09	T. R. Wyant
+    Only standalone graphemes and non-characters allowed as delimiters
+    starting with Perl 5.29.0.
+    
+    Non-ASCII delimiters started working in 5.8.3, so that is what
+    perl_version_introduced() returns for them.
+
+    Collateral with all this, accept word characters as delimiters, but
+    only with at least one space between the operator and the expression
+    -- that is, 'qq xyx' is OK, but 'qqxyx' is not.
+
 0.005		2016-06-23	T. R. Wyant
   Fix problem handling nested brackets.
 

@@ -122,6 +122,91 @@ EOF
 
 {
     #
+    # Basic 1D sweep with points/steps
+    #
+
+    my $source = dummysource();
+    my $sweep  = sweep(
+        type       => 'Step::Voltage',
+        instrument => $source,
+        points     => [ 0, 1, 2 ],
+        steps => [ 0.5, 0.2 ],
+    );
+
+    my $datafile = sweep_datafile( columns => [qw/level value/] );
+
+    my $value = 0;
+    my $meas  = sub {
+        my $sweep = shift;
+        $sweep->log( level => $source->get_level, value => $value++ );
+    };
+    $sweep->start(
+        measurement => $meas,
+        datafile    => $datafile,
+        folder      => $dir,
+
+        # use default datafile_dim and point_dim
+    );
+
+    my $expected = <<"EOF";
+# level\tvalue
+0\t0
+0.5\t1
+1\t2
+1\t3
+1.2\t4
+1.4\t5
+1.6\t6
+1.8\t7
+2\t8
+EOF
+    my $path = catfile( $sweep->foldername, 'data.dat' );
+    file_ok( $path, $expected, "basic 1D sweep with list: datafile" );
+}
+
+{
+    #
+    # Basic 1D sweep with points/step
+    #
+
+    my $source = dummysource();
+    my $sweep  = sweep(
+        type       => 'Step::Voltage',
+        instrument => $source,
+        points     => [ 0, 1, 2 ],
+        step       => 0.5
+    );
+
+    my $datafile = sweep_datafile( columns => [qw/level value/] );
+
+    my $value = 0;
+    my $meas  = sub {
+        my $sweep = shift;
+        $sweep->log( level => $source->get_level, value => $value++ );
+    };
+    $sweep->start(
+        measurement => $meas,
+        datafile    => $datafile,
+        folder      => $dir,
+
+        # use default datafile_dim and point_dim
+    );
+
+    my $expected = <<"EOF";
+# level\tvalue
+0\t0
+0.5\t1
+1\t2
+1\t3
+1.5\t4
+2\t5
+EOF
+    my $path = catfile( $sweep->foldername, 'data.dat' );
+    file_ok( $path, $expected, "basic 1D sweep with list: datafile" );
+}
+
+{
+    #
     # Basic 1D sweep with 2 datafiles
     #
 

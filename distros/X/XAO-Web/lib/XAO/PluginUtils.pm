@@ -21,6 +21,7 @@ packages.
 
 =cut
 
+###############################################################################
 package XAO::PluginUtils;
 use strict;
 use XAO::Base qw($homedir);
@@ -28,15 +29,13 @@ use File::Path;
 use File::Basename;
 use File::Copy;
 
+our $VERSION='2.001';
+
 require Exporter;
 
-use vars qw(@ISA @EXPORT_OK @EXPORT $VERSION);
-
-@ISA=qw(Exporter);
-@EXPORT_OK=qw(install_templates);
-@EXPORT=();
-
-$VERSION=(0+sprintf('%u.%03u',(q$Id: PluginUtils.pm,v 2.1 2005/01/14 01:39:56 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our @ISA=qw(Exporter);
+our @EXPORT_OK=qw(install_templates);
+our @EXPORT=();
 
 sub install_templates ($;$) {
     my $manifest=shift || 'MANIFEST';

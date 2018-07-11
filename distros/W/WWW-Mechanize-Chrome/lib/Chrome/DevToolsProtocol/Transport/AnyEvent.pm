@@ -11,8 +11,12 @@ use AnyEvent;
 use AnyEvent::WebSocket::Client;
 use AnyEvent::Future qw(as_future_cb);
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 our @CARP_NOT = ();
+
+=head1 NAME
+
+Chrome::DevToolsProtocol::Transport::AnyEvent - AnyEvent backend for Chrome communication
 
 =head1 SYNOPSIS
 
@@ -41,17 +45,17 @@ sub connect( $self, $handler, $got_endpoint, $logger ) {
     local @CARP_NOT = (@CARP_NOT, 'Chrome::DevToolsProtocol::Transport');
 
     croak "Need an endpoint to connect to" unless $got_endpoint;
+    $self->close;
 
-    my $client;
     $got_endpoint->then( sub( $endpoint ) {
         die "Got an undefined endpoint" unless defined $endpoint;
 
         my $res = $self->future;
         $logger->('debug',"Connecting to $endpoint");
-        $client = AnyEvent::WebSocket::Client->new(
+        $self->{ws_client} = AnyEvent::WebSocket::Client->new(
             max_payload_size => 0, # allow unlimited size for messages
         );
-        $client->connect( $endpoint )->cb( sub {
+        $self->{ws_client}->connect( $endpoint )->cb( sub {
             $res->done( @_ )
         });
         $res
@@ -87,6 +91,7 @@ sub close( $self ) {
     my $c = delete $self->{connection};
     $c->close
         if $c;
+    delete $self->{ws_client};
 }
 
 sub future {

@@ -4,7 +4,7 @@ use Moose;
 use Moose::Exporter;
 use Elasticsearch::Model::Index;
 
-our $VERSION = '0.0.1'; # VERSION
+our $VERSION = '0.1.3'; # VERSION
 
 # ABSTRACT: Does one thing only: helps to deploy a Moose model and accompanying document classes to Elasticsearch.
 
@@ -85,11 +85,18 @@ To do either of the above, you start with a model.
         note  => 'Note',
     };
 
+    my $index_settings = {
+        refresh_interval   => '2s',
+        number_of_shards   => 4,
+        number_of_replicas => 3,
+    };
+
     for my $doc_type (keys %$document_types) {
         index $doc_type => (
-            namespace => 'private',
-            type      => $document_types->{$doc_type},
-            traits    => ["MyApplication::Elasticsearch::DocTrait"],
+            namespace      => 'private',
+            type           => $document_types->{$doc_type},
+            traits         => ["MyApplication::Elasticsearch::DocTrait"],
+            index_settings => $index_settings,
         );
     }
 

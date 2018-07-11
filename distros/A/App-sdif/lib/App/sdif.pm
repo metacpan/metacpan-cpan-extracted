@@ -3,7 +3,23 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "4.3.2";
+use Exporter 'import';
+our @EXPORT      = qw(usage);
+our %EXPORT_TAGS = ();
+our @EXPORT_OK   = qw();
+
+our $VERSION = "4.4.0";
+
+use Pod::Usage;
+
+sub usage {
+    my $opt = ref($_[0]) eq 'HASH' ? shift : {};
+    select STDERR;
+    print @_;
+    pod2usage(-verbose => 0, -exitval => "NOEXIT");
+    print "Version: $VERSION\n";
+    exit($opt->{status} // 0);
+}
 
 1;
 

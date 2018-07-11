@@ -1,0 +1,204 @@
+#!perl
+
+our $DATE = '2018-07-07'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config bundling no_ignore_case);
+use POSIX qw(ceil);
+
+my %Opts = (
+    mode => 'line',
+    ignore_case => 0,
+    # XXX options to limit memory usage, e.g. max keys, max line length, --md5 (like in nauniq), ...
+);
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'bytes|c'   => sub { $Opts{mode} = 'byte' },
+        'chars|m'   => sub { $Opts{mode} = 'char' },
+        'words|w'   => sub { $Opts{mode} = 'word' },
+        'lines|l'   => sub { $Opts{mode} = 'line' },
+        'number|n'  => sub { $Opts{mode} = 'number' },
+        'integer|i' => sub { $Opts{mode} = 'integer' },
+        'ignore-case|f' => \$Opts{ignore_case},
+        'help|h'  => sub {
+            print <<USAGE;
+Usage:
+  freqtable [OPTIONS]... < INPUT
+  freqtable --help (or -h)
+Options:
+  --bytes, -c
+  --chars, -m
+  --words, -w
+  --lines, -l
+  --number, -n
+  --integer, -i
+  --ignore-case, -f
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub run {
+    my $fh = select();
+
+    my %occurences;
+    my $numeric;
+
+    if ($Opts{mode} eq 'byte' || $Opts{mode} eq 'char') {
+        if ($Opts{mode} eq 'byte') {
+            binmode $fh, ":encoding(bytes)";
+        } else {
+            binmode $fh, ":encoding(utf8)";
+        }
+        while (1) {
+            read $fh, my $block, 4096;
+            last if !length $block;
+            for (split //, $block) {
+                if ($Opts{ignore_case}) {
+                    $occurences{lc $_}++;
+                } else {
+                    $occurences{$_}++;
+                }
+            }
+        }
+    } elsif ($Opts{mode} eq 'word') {
+        while (defined(my $line = <>)) {
+            chomp $line;
+            while (my $line =~ /(\w+)/g) {
+                if ($Opts{ignore_case}) {
+                    $occurences{lc $1}++;
+                } else {
+                    $occurences{$1}++;
+                }
+            }
+        }
+    } elsif ($Opts{mode} eq 'line') {
+        while (defined(my $line = <>)) {
+            chomp $line;
+            if ($Opts{ignore_case}) {
+                $occurences{lc $line}++;
+            } else {
+                $occurences{$line}++;
+            }
+        }
+    } elsif ($Opts{mode} eq 'number' || $Opts{mode} eq 'integer') {
+        $numeric++;
+        while (defined(my $line = <>)) {
+            my $num = $Opts{mode} eq 'integer' ? int($line) : $line + 0;
+            $occurences{$num}++;
+        }
+    } else {
+        die "BUG: Unknown mode '$Opts{mode}'";
+    }
+
+    my $fmt;
+    for my $k (sort {
+        $occurences{$b} <=> $occurences{$a} ||
+            ($numeric ? $a <=> $b : $a cmp $b)
+    } keys %occurences) {
+        my $n = $occurences{$k};
+        unless (defined $fmt) {
+            $fmt = "%" . ceil(log($n)/log(10)) . "s\t%s\n";
+        }
+        printf $fmt, $n, $k;
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Print frequency table of lines/words/characters/bytes/numbers
+# PODNAME: freqtable
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+freqtable - Print frequency table of lines/words/characters/bytes/numbers
+
+=head1 VERSION
+
+This document describes version 0.001 of freqtable (from Perl distribution App-freqtable), released on 2018-07-07.
+
+=head1 SYNOPSIS
+
+ freqtable [OPTIONS] < INPUT
+
+=head1 DESCRIPTION
+
+=head1 EXIT CODES
+
+0 on success.
+
+255 on I/O error.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item * --bytes, -c
+
+=item * --chars, -m
+
+=item * --words, -w
+
+=item * --lines, -l
+
+=item * --number, -n
+
+=item * --integer, -i
+
+=item * --ignore-case, -f
+
+=back
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-freqtable>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-freqtable>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-freqtable>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+B<wc>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

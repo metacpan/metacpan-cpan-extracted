@@ -4,7 +4,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 # VERSION
 
-version 0.80
+version 0.82
 
 # SYNOPSIS
 
@@ -102,9 +102,7 @@ in buckets. Bucket names are global.
 Note: This is the legacy interface, please check out
 [Net::Amazon::S3::Client](https://metacpan.org/pod/Net::Amazon::S3::Client) instead.
 
-Development of this code happens here: http://github.com/pfig/net-amazon-s3/
-
-Homepage for the project (just started) is at http://pfig.github.com/net-amazon-s3/
+Development of this code happens here: https://github.com/rustyconover/net-amazon-s3
 
 # METHODS
 
@@ -145,6 +143,8 @@ Create a new S3 client object. Takes some arguments:
     Set this to `1` if you want to use SSL-encrypted connections when talking
     to S3. Defaults to `0`.
 
+    To use SSL-encrypted connections, LWP::Protocol::https is required.
+
 - timeout
 
     How many seconds should your script wait before bailing on a request to S3? Defaults
@@ -160,6 +160,23 @@ Create a new S3 client object. Takes some arguments:
 
     The S3 host endpoint to use. Defaults to 's3.amazonaws.com'. This allows
     you to connect to any S3-compatible host.
+
+- use\_virtual\_host
+
+    Use the virtual host method ('bucketname.s3.amazonaws.com') instead of specifying the
+    bucket at the first part of the path. This is particularily useful if you want to access
+    buckets not located in the US-Standard region (such as EU, Asia Pacific or South America).
+    See [http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html](http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html) for the pros and cons.
+
+### Notes
+
+When using [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3) in child processes using fork (such as in
+combination with the excellent [Parallel::ForkManager](https://metacpan.org/pod/Parallel::ForkManager)) you should create the
+S3 object in each child, use a fresh LWP::UserAgent in each child, or disable
+the [LWP::ConnCache](https://metacpan.org/pod/LWP::ConnCache) in the parent:
+
+    $s3->ua( LWP::UserAgent->new( 
+        keep_alive => 0, requests_redirectable => [qw'GET HEAD DELETE PUT POST'] );
 
 ## buckets
 
@@ -395,11 +412,19 @@ Pedro Figueiredo <me@pedrofigueiredo.org> - since 0.54
 
 # AUTHOR
 
-Rusty Conover <rusty@luckydinosaur.com>
+Leo Lapworth <llap@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 172:
+
+    '=item' outside of any '=over'

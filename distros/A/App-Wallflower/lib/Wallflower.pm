@@ -1,5 +1,5 @@
 package Wallflower;
-$Wallflower::VERSION = '1.008';
+$Wallflower::VERSION = '1.009';
 use strict;
 use warnings;
 
@@ -183,7 +183,7 @@ Wallflower - Stick Plack applications to the wallpaper
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 

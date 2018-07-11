@@ -176,21 +176,21 @@ for my $driver (keys %drivers) {
             @results = $ct->get_query('array',$select);
             is(scalar(@results),1,'.. got a result with valid SQL');
             eval { @results = $ct->get_query('array','SELECT') };
-            like($@,qr/You have an error in your SQL syntax|syntax error/,'.. bad SQL spotted');
+            like($@,qr/You have an error in your SQL syntax|syntax error|incomplete input/,'.. bad SQL spotted');
 
             my $next = $ct->iterator('array','');
             is($next,undef,'.. empty SQL to iterator');
             $next = $ct->iterator('array',$select);
             isnt($next,undef,'.. got a result with valid SQL');
             eval { $next = $ct->iterator('array','SELECT') };
-            like($@,qr/You have an error in your SQL syntax|syntax error/,'.. bad SQL spotted');
+            like($@,qr/You have an error in your SQL syntax|syntax error|incomplete input/,'.. bad SQL spotted');
 
             $next = $ct->do_query('');
             is($next,undef,'.. empty SQL to do_query');
             $next = $ct->do_query($insert,'ABC456');
             is($next,1,'.. got a result with valid SQL');
             eval { $next = $ct->do_query('array','SELECT') };
-            like($@,qr/You have an error in your SQL syntax|syntax error/,'.. bad SQL spotted');
+            like($@,qr/You have an error in your SQL syntax|syntax error|incomplete input/,'.. bad SQL spotted');
 
             my $id = $ct->id_query('');
             is($id,undef,'.. empty SQL to id_query');

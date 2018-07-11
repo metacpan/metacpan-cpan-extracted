@@ -2,6 +2,12 @@ Revision history for Audio::Scan
 
 Note: Bug numbers refer to bugs at http://bugs.slimdevices.com
 
+1.01    2018-07-09
+        - Added Opus codec support. (Jeff Muizelaar)
+        - ADTS: RT #124525, fixed incorrect duration calcuation due to off-by-one error
+          in frame counter.
+        - Added missing license meta name. (manwar)
+
 1.00    2018-04-21
         - Fixed parsing of DSF files with more than 2 channels.
 

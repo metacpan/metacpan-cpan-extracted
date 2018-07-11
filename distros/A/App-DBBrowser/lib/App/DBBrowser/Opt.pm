@@ -6,8 +6,6 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.016';
-
 use File::Basename        qw( fileparse );
 use File::Spec::Functions qw( catfile );
 use FindBin               qw( $RealBin $RealScript );
@@ -71,6 +69,7 @@ sub defaults {
             min_col_width        => 30,
             tab_width            => 2,
             grid                 => 0,
+            squash_spaces        => 1,
             undef                => '',
             binary_string        => 'BNRY',
             binary_filter        => 0,
@@ -302,6 +301,7 @@ sub __menus {
             { name => 'keep_header',   text => "- Keep Header",   section => 'table' },
             { name => 'undef',         text => "- Undef",         section => 'table' },
             { name => 'binary_filter', text => "- Binary filter", section => 'table' },
+            { name => 'squash_spaces', text => "- Squash spaces", section => 'table' },
         ],
     };
     return $menus->{$group};
@@ -428,13 +428,19 @@ sub set_options {
             elsif ( $opt eq 'keep_header' ) {
                 my $prompt = '"Header each Page"';
                 my $list = [ 'NO', 'YES' ];
-                my $sub_menu = [ [ $opt, "  Keep Header", $list ] ];
+                my $sub_menu = [ [ $opt, "  Keep header", $list ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'binary_filter' ) {
                 my $prompt = 'Print "BNRY" instead of binary data';
                 my $list = [ 'NO', 'YES' ];
                 my $sub_menu = [ [ $opt, "  Binary filter", $list ] ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq 'squash_spaces' ) {
+                my $prompt = '"Remove leading and trailing spaces and squash consecutive spaces"';
+                my $list = [ 'NO', 'YES' ];
+                my $sub_menu = [ [ $opt, "  Squash spaces", $list ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'min_col_width' ) {
@@ -462,7 +468,7 @@ sub set_options {
             elsif ( $opt eq 'lock_stmt' ) {
                 my $prompt = 'SQL statement: ';
                 my $list = [ 'Lk0', 'Lk1' ];
-                my $sub_menu = [ [ $opt, "  Lock Mode", $list ] ];
+                my $sub_menu = [ [ $opt, "  Lock mode", $list ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'meta' ) {

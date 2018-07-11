@@ -19,9 +19,6 @@ if ( $ENV{ETCD_TEST_HOST} and $ENV{ETCD_TEST_PORT} ) {
     $config->{ca_file}   = $ENV{ETCD_CLIENT_CA_FILE} || "$dir/t/tls/ca.pem";
     $config->{key_file}  = $ENV{ETCD_CLIENT_KEY_FILE} || "$dir/t/tls/client-key.pem";
     $config->{cert_file} = $ENV{ETCD_CLIENT_CERT_FILE} || "$dir/t/tls/client.pem";
-    $config->{ca_file}   = "$dir/t/tls/ca.pem";
-    $config->{key_file}  = "$dir/t/tls/client-key.pem";
-    $config->{cert_file} = "$dir/t/tls/client.pem";
     $config->{ssl}       = 1;
     plan tests => 16;
 }

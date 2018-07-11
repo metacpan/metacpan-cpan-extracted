@@ -12,22 +12,22 @@ unless ($ENV{PERL_ALLOW_NETWORK_TESTING}) {
 else {
     plan tests => 38;
 }
-use Test::RequiresInternet ('ftp.cpan.org' => 21);
+use Test::RequiresInternet ('ftp.funet.fi' => 21);
 use Capture::Tiny qw( capture_stdout );
 use Carp;
 use File::Temp qw( tempdir );
 
 
-my $default_host = 'ftp.cpan.org';
-my $default_dir  = 'pub/CPAN/modules/by-module';
+my $host = 'ftp.funet.fi';
+my $dir  = '/pub/languages/perl/CPAN/modules/by-module';
 my $sample = 'Test-Smoke';
 
 {
     my ($self, $tb, $stdout, $tdir);
     $self = Perl::Download::FTP::Distribution->new( {
         distribution    => $sample,
-        host            => $default_host,
-        dir             => $default_dir,
+        host            => $host,
+        dir             => $dir,
         Passive         => 1,
         verbose         => 1,
     } );
@@ -68,8 +68,8 @@ my $sample = 'Test-Smoke';
     my ($self, $tb, $stdout, $tdir);
     $self = Perl::Download::FTP::Distribution->new( {
         distribution    => $sample,
-        host            => $default_host,
-        dir             => $default_dir,
+        host            => $host,
+        dir             => $dir,
         Passive         => 1,
         verbose         => 1,
     } );
@@ -108,8 +108,8 @@ my $sample = 'Test-Smoke';
     my ($self, $tb, $stdout, $tdir);
     $self = Perl::Download::FTP::Distribution->new( {
         distribution    => $sample,
-        host            => $default_host,
-        dir             => $default_dir,
+        host            => $host,
+        dir             => $dir,
         Passive         => 1,
         verbose         => 1,
     } );
@@ -130,8 +130,8 @@ my $sample = 'Test-Smoke';
 #####
 
 my $basic_args = {
-    host            => $default_host,
-    dir             => $default_dir,
+    host            => $host,
+    dir             => $dir,
 };
 
 $sample = 'Text-CSV_XS';

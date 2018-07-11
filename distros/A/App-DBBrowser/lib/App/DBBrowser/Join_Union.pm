@@ -6,8 +6,6 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.016';
-
 use List::MoreUtils qw( any );
 
 use Term::Choose           qw( choose );
@@ -342,7 +340,7 @@ sub join_tables {
                 # Choose
                 my $pk_col = $stmt_v->choose(
                     [ @pre, map( "- $_", sort keys %avail_pk_cols ) ],
-                    { prompt => 'Choose PRIMARY KEY column:', undef => $sf->{i}{_reset} }
+                    { prompt => 'Choose PRIMARY KEY column:', index => 0, undef => $sf->{i}{_reset} }
                 );
                 if ( ! defined $pk_col ) {
                     $join = $backup_join;
@@ -363,7 +361,7 @@ sub join_tables {
                 # Choose
                 my $fk_col = $stmt_v->choose(
                     [ undef, map( "- $_", sort keys %avail_fk_cols ) ],
-                    { prompt => 'Choose FOREIGN KEY column:', undef => $sf->{i}{_reset} }
+                    { prompt => 'Choose FOREIGN KEY column:', index => 0, undef => $sf->{i}{_reset} }
                 );
                 if ( ! defined $fk_col ) {
                     $join = $backup_join;

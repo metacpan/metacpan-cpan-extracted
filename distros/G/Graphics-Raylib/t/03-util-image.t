@@ -1,5 +1,8 @@
 use Test::More tests => 10;
-use Test::HexString;
+eval 'use Test::HexString';
+if ($@) {
+     sub is_hexstr($$;$) { goto &is; }
+}
 
 BEGIN {
     use_ok 'Graphics::Raylib::Util', ':objects';

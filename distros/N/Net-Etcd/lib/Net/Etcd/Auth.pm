@@ -8,15 +8,13 @@ use warnings;
 
 =cut
 
-use Moo;
 use JSON;
 use Carp;
-use Types::Standard qw(Str Int Bool HashRef ArrayRef);
+use Types::Standard qw(Str);
 use Net::Etcd::Auth::Role;
-use Data::Dumper;
 
+use Moo;
 with 'Net::Etcd::Role::Actions';
-
 use namespace::clean;
 
 
@@ -26,7 +24,7 @@ Net::Etcd::Auth
 
 =cut
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 =head1 DESCRIPTION
 
@@ -36,17 +34,19 @@ Authentication
 
 =head1 SYNOPSIS
 
-    # enable auth
-    $etcd->user_add
+Steps to enable authentication.
 
     # add user
-    $etcd->user_add( { name => 'samba', password =>'P@$$' });
+    $etcd->user({ name => 'root', password => 'toor' })->add;
 
     # add role
-    $etcd->role( { name => 'myrole' })->add;
+    $etcd->role({ name => 'root' })->add;
 
     # grant role
-    $etcd->user_role( { user => 'samba', role => 'myrole' })->grant;
+    $etcd->user_role({ user => 'root', role => 'root' })->grant;
+
+    # enable auth
+    $etcd->auth()->enable;
 
 =cut
 
@@ -97,19 +97,31 @@ sub _build_password {
 
 =head2 authenticate
 
-Returns token with valid authentication.
+Returns token with valid authentication. The token must then be passed in the Authorization header.
+The module handles passing, storing and refreshing of the token for you as long as you define a name
+and password.
 
-    my $token = $etcd->auth({ name => $user, password => $pass })->authenticate;
+    # authenticate etcd as root
+    $etcd = Net::Etcd->new({ name => 'root', password => 'toor' });
+
+    # switch to non root user
+    $etcd->auth({ name => $user, password => $pass })->authenticate;
 
 =cut
 
 sub authenticate {
     my ( $self, $options ) = @_;
+    local $@;
     $self->{endpoint} = '/auth/authenticate';
     return unless ($self->password && $self->name);
     $self->request;
-    my $auth = from_json($self->{response}{content});
-    if ($auth && defined  $auth->{token}) {
+    my $auth;
+    eval { $auth = from_json($self->{response}{content}) };
+    if ($@) {
+        $self->{response}{content} = 'error: ' . $@;
+        return;
+    }
+    if ($auth && defined $auth->{token}) {
         $self->etcd->{auth_token} = $auth->{token};
     }
     return;
@@ -138,7 +150,7 @@ sub enable {
 
 Disable authentication, this requires a valid root password.
 
-    $etcd->auth({ name => 'root', $password => $pass })->disable;
+    $etcd->auth({ name => 'root', password => $pass })->disable;
 
 =cut
 

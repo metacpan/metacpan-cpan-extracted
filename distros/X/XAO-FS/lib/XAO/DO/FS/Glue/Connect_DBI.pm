@@ -100,6 +100,7 @@ sub sql_disconnect ($) {
     my $self=shift;
 
     $self->{'sql'}->disconnect if $self->{'sql'};
+    $self->{'sql'}=undef;
 }
 
 ###############################################################################

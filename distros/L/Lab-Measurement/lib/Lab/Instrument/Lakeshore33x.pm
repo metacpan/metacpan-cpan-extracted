@@ -1,6 +1,6 @@
 package Lab::Instrument::Lakeshore33x;
 #ABSTRACT: Lakeshore 33x Temperature controller
-$Lab::Instrument::Lakeshore33x::VERSION = '3.653';
+$Lab::Instrument::Lakeshore33x::VERSION = '3.660';
 use strict;
 use Lab::Instrument;
 use warnings;
@@ -934,7 +934,7 @@ Lab::Instrument::Lakeshore33x - Lakeshore 33x Temperature controller
 
 =head1 VERSION
 
-version 3.653
+version 3.660
 
 =head1 SYNOPSIS
 

@@ -8,14 +8,7 @@ use Config;
 use File::Temp;
 
 # http://www.cpantesters.org/cpan/report/9373ce6a-e71a-11e4-9f23-cdc1e0bfc7aa
-BEGIN {
-  $SIG{__WARN__} = sub {
-    my $warning = shift;
-    warn $warning unless $warning =~ /Subroutine .* redefined at/;
-  };
-  use File::Slurp;
-  $SIG{__WARN__} = undef;
-};
+use File::Slurper qw(read_text write_text);
 
 use vars qw( @EXPORT @ISA $VERSION );
 
@@ -50,7 +43,7 @@ sub Init_For_Run
   my $script = shift;
   my $clear_cache = shift;
 
-  write_file($test_script_name, $script);
+  write_text($test_script_name, $script);
   Setup_Cache($test_script_name,$script,$clear_cache);
 }
 
@@ -129,7 +122,7 @@ sub Run_Script
   }
 
   {
-    my $script_errors = read_file($stderr_redirected);
+    my $script_errors = read_text($stderr_redirected, undef, 1);
 
     if (defined $expected_stderr)
     {

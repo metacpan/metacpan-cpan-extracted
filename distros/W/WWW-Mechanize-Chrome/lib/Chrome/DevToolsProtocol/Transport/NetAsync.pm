@@ -9,11 +9,11 @@ use IO::Async::Loop;
 use Net::Async::WebSocket::Client;
 Net::Async::WebSocket::Client->VERSION(0.12); # fixes some errors with masked frames
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 NAME
 
-Chrome::DevToolsProtocol::Transport::NetAsync - IO::Async backend
+Chrome::DevToolsProtocol::Transport::NetAsync - IO::Async backend for Chrome communication
 
 =head1 SYNOPSIS
 

@@ -27,32 +27,34 @@ GetOptions(\%OPT, qw(
     all
     asc
     bases
-    by:s
+    by=s
     desc
-    exists:s
+    exists=s
     fields
-    format:s
+    filter
+    format=s
     help|h
     manual|m
     match-all
-    missing:s
+    missing=s
     no-header
-    prefix:s@
+    prefix=s@
     pretty
-    show:s@
-    size|n:i
-    sort:s
+    show=s@
+    size|n=i
+    sort=s
     tail
-    timestamp:s
-    top:s
-    interval:s
-    with:s@
+    timestamp=s
+    top=s
+    interval=s
+    with=s@
 ));
 
 # Search string is the rest of the argument string
-my $qs = App::ElasticSearch::Utilities::QueryString->new();
+my $context = $OPT{filter} ? 'filter' : 'must';
+my $qs = App::ElasticSearch::Utilities::QueryString->new( $OPT{filter} ? (qw(context filter)) : () );
 my $q = exists $OPT{'match-all'} && $OPT{'match-all'}
-            ? App::ElasticSearch::Utilities::Query->new(must => { match_all => {} })
+            ? App::ElasticSearch::Utilities::Query->new($context => { match_all => {} })
             : $qs->expand_query_string(@ARGV);
 
 $q->set_timeout('10s');
@@ -62,7 +64,7 @@ if( exists $OPT{prefix} ){
     foreach my $prefix (@{ $OPT{prefix} }) {
         my ($f,$v) = split /:/, $prefix, 2;
         next unless $f && $v;
-        $q->add_bool( must => { prefix => { $f => $v } } );
+        $q->add_bool( $context => { prefix => { $f => $v } } );
     }
 }
 
@@ -73,6 +75,12 @@ pod2usage(-exitval => 0, -verbose => 2) if $OPT{manual};
 my $unknown_options = join ', ', grep /^--/, @ARGV;
 pod2usage({-exitval => 1, -sections => 'SYNOPSIS', -msg =>"Unknown option(s): $unknown_options"}) if $unknown_options;
 
+#--------------------------------------------------------------------------#
+# Information Gathering Routines
+if( $OPT{bases} ) {
+    show_bases();
+    exit 0;
+}
 #--------------------------------------------------------------------------#
 # App Config
 my %CONFIG = (
@@ -99,7 +107,12 @@ foreach my $index (sort by_index_age keys %indices) {
 debug_var(\%by_age);
 my @AGES = sort { $ORDER eq 'asc' ? $b <=> $a : $a <=> $b } keys %by_age;
 debug({color=>"cyan"}, "Fields discovered.");
-debug_var(\%FIELDS);
+
+if( $OPT{fields} ) {
+    show_fields();
+    exit 0;
+}
+
 
 # Which fields to show
 my @SHOW = ();
@@ -119,14 +132,6 @@ if( exists $OPT{sort} && length $OPT{sort} ) {
 }
 $q->set_sort($SORT);
 
-if( $OPT{bases} ) {
-    show_bases();
-    exit 0;
-}
-if( $OPT{fields} ) {
-    show_fields();
-    exit 0;
-}
 # Improper Usage
 pod2usage({-exitval=>1, -verbose=>0, -sections=>'SYNOPSIS', -msg=>'No search string specified'})
     unless keys %{ $q->query };
@@ -142,7 +147,7 @@ pod2usage({-exitval=>1, -verbose=>0, -sections=>'SYNOPSIS', -msg=>'Please specif
 # Process extra parameters
 if( exists $OPT{exists} ) {
     foreach my $field (split /[,:]/, $OPT{exists}) {
-        $q->add_bool( must => { exists => { field => $field } } );
+        $q->add_bool( $context => { exists => { field => $field } } );
     }
 }
 if( exists $OPT{missing} ) {
@@ -182,18 +187,20 @@ if( exists $OPT{top} ) {
         foreach my $with ( @with )  {
             my @attrs = split /:/, $with;
             # Process Args from Right to Left
-            my $size  = $attrs[-1] =~ /^\d+$/ ? pop @attrs : 3;
+            my $pcts  = $attrs[-1] =~ /^\d{1,2}(?:\.\d+)?(?:,\d{1,2}(?:\.\d+)?)*$/ ? pop @attrs : '25,50,75,90,95,99';
+            my $size  = $pcts =~ /^\d+$/ ? $pcts : 3;
             my $field = exists $FIELDS{$attrs[-1]} ? pop @attrs : undef;
             my $type  = @attrs ? pop @attrs : 'terms';
             # Skip invalid elements
             next unless defined $field and defined $size and $size > 0;
 
-            my $id = exists $sub_agg{$field} ? "$field.$type" : $field;
+            my $id = "$type.$field";
 
             $sub_agg{$id} = {
                 $type => {
                     field => $field,
-                    size  => $size,
+                    $type =~ /terms/ ? (size  => $size) : (),
+                    $type eq 'percentiles' ? ( percents => [split /,/, $pcts] ) : (),
                 }
             };
         }
@@ -258,7 +265,7 @@ AGES: while( !$DONE && @AGES ) {
     $last_hit_ts ||= strftime('%Y-%m-%dT%H:%M:%S%z',localtime($start-30));
 
     # If we're tailing, bump the @query with a timestamp range
-    $q->stash( must => {range => { $CONFIG{timestamp} => {gte => $last_hit_ts}}} ) if $OPT{tail};
+    $q->stash( filter => {range => { $CONFIG{timestamp} => {gte => $last_hit_ts}}} ) if $OPT{tail};
 
     # Header
     if( !exists $AGES_SEEN{$age} ) {
@@ -352,7 +359,7 @@ AGES: while( !$DONE && @AGES ) {
                                         my @elms = ();
                                         next unless exists $subagg->{key};
                                         push @elms, $subagg->{key};
-                                        foreach my $dk (qw(doc_count score bg_count)) {
+                                        foreach my $dk (qw(score doc_count bg_count)) {
                                             next unless exists $subagg->{$dk};
                                             my $v = delete $subagg->{$dk};
                                             push @elms, defined $v ? ($dk eq 'score' ? sprintf "%0.3f", $v : $v ) : '-';
@@ -360,6 +367,30 @@ AGES: while( !$DONE && @AGES ) {
                                         push @sub, \@elms;
                                     }
                                     $subaggs{$k} = \@sub if @sub;
+                                }
+                                # Simple Numeric Aggs
+                                elsif( $agg->{$k}{value} ) {
+                                    $subaggs{$k} = [ [ $agg->{$k}{value} ] ];
+                                }
+                                # Percentiles
+                                elsif( $agg->{$k}{values} ) {
+                                    my @pcts;
+                                    foreach my $pctl (sort { $a <=> $b } keys %{ $agg->{$k}{values} }) {
+                                        push @pcts, "p$pctl", $agg->{$k}{values}{$pctl};
+                                    }
+                                    $subaggs{$k} = [ \@pcts ];
+                                }
+                                # Statistics
+                                elsif( $agg->{$k}{avg} ) {
+                                    my @stats;
+                                    my %alias = qw( variance var std_deviation stdev );
+                                    foreach my $stat (qw(count min avg max sum variance std_deviation)) {
+                                        next unless exists $agg->{$k}{$stat};
+                                        my $v = $agg->{$k}{$stat} =~ /\./ ? sprintf "%0.3f", $agg->{$k}{$stat}
+                                                                          : $agg->{$k}{$stat};
+                                        push @stats, $alias{$stat} || $stat => $v;
+                                    }
+                                    $subaggs{$k} = [ \@stats ];
                                 }
                             }
                         }
@@ -441,7 +472,9 @@ AGES: while( !$DONE && @AGES ) {
                 foreach my $f (@always,@SHOW) {
                     my $v = '-';
                     if( exists $record->{$f} && defined $record->{$f} ) {
-                        $v = is_ref($record->{$f}) ? to_json($record->{$f},{allow_nonref=>1,canonical=>1}) : $record->{$f};
+                        $v = is_arrayref($record->{$f}) && @{ $record->{$f} } == 1 ? $record->{$f}[0]
+                           : is_ref($record->{$f}) ? to_json($record->{$f},{allow_nonref=>1,canonical=>1})
+                           : $record->{$f};
                     }
                     push @cols,$v;
                 }
@@ -529,7 +562,7 @@ sub show_fields {
 
 sub show_bases {
     output({color=>'cyan'}, 'Bases available for search:' );
-    my @all   = es_indices(_all => 1);
+    my @all   = es_indices(check_date => 0);
     my %bases = ();
 
     foreach my $index (@all) {
@@ -581,7 +614,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 5.6
+version 5.7
 
 =head1 SYNOPSIS
 
@@ -591,6 +624,7 @@ Options:
 
     --help              print help
     --manual            print full manual
+    --filter            Force filter context for all query elements
     --show              Comma separated list of fields to display, default is ALL, switches to tab output
     --tail              Continue the query until CTRL+C is sent
     --top               Perform an aggregation on the fields, by a comma separated list of up to 2 items
@@ -689,6 +723,10 @@ Print this message and exit
 
 Print detailed help with examples
 
+=item B<filter>
+
+Forces filter context for all query parameters, the default is using query context.
+
 =item B<show>
 
 Comma separated list of fields to display in the dump of the data
@@ -725,6 +763,11 @@ Perform an aggregation returning the top field.  Limited to a single field at th
 This option is not available when using --tail.
 
     --top src_ip
+
+You can override the default of the C<terms> bucket aggregation by prefixing
+the parameter with the required buck aggregation, i.e.:
+
+    --top significant_terms:src_ip
 
 =item B<by>
 
@@ -800,6 +843,19 @@ Produces:
 
 You may sub aggregate using any L<bucket agggregation|https://www.elastic.co/guide/en/elasticsearch/reference/master/search-aggregations-bucket.html>
 as long as the aggregation provides a B<key> element.  Additionally, doc_count, score, and bg_count will be reported in the output.
+
+Other examples:
+
+    --with significant_terms:crime
+    --with cardinality:accts
+    --with min:out_bytes
+    --with max:out_bytes
+    --with avg:out_bytes
+    --with sum:out_bytes
+    --with stats:out_bytes
+    --with extended_stats:out_bytes
+    --with percentiles:out_bytes
+    --with percentiles:out_bytes:50,95,99
 
 =item B<interval>
 
@@ -896,6 +952,31 @@ The following barewords are transformed:
 If a field is an IP address uses CIDR Notation, it's expanded to a range query.
 
     src_ip:10.0/8 => src_ip:[10.0.0.0 TO 10.255.255.255]
+
+=head2 App::ElasticSearch::Utilities::Range
+
+This plugin translates some special comparison operators so you don't need to
+remember them anymore.
+
+Example:
+
+    price:<100
+
+Will translate into a:
+
+    { range: { price: { lt: 100 } } }
+
+And:
+
+    price:>50,<100
+
+Will translate to:
+
+    { range: { price: { gt: 50, lt: 100 } } }
+
+=head3 Supported Operators
+
+B<gt> via E<gt>, B<gte> via E<gt>=, B<lt> via E<lt>, B<lte> via E<lt>=
 
 =head2 App::ElasticSearch::Utilities::Underscored
 

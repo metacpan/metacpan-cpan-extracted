@@ -1,12 +1,26 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Spreadsheet-Write
-version:      0.03
-version_from: lib/Spreadsheet/Write.pm
-installdirs:  site
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  Encode: '2.90'
+  ExtUtils::MakeMaker: '0'
+  Test::Unit::Lite: '0.1202'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Spreadsheet-Write
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    Spreadsheet::WriteExcel:       2.15
-    Text::CSV:                     0.01
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  Spreadsheet::WriteExcel: '2.15'
+  Text::CSV: '1.18'
+  perl: '5.008009'
+version: '1.01'

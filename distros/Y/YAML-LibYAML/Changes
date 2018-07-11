@@ -1,3 +1,9 @@
+0.72 Sun Jul  8 17:03:08 CEST 2018
+ - Update to libyaml 0.2.1 (tinita) It's forbidden now to escape single
+   quotes inside double quotes
+ - When disabling $LoadBlessed, return scalars not refs (tinita)
+ - Save anchors also for blessed scalars (tinita)
+
 0.70 Sat Jun  9 21:53:05 CEST 2018
  - Fix format specifier/argument mismatch PR#79 @a3f++
  - Travis CI: Test on Perl 5.26 PR#80 @a3f++

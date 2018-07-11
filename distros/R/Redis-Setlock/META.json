@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Digest::SHA" : "0",
             "Getopt::Long" : "2.42",
             "Guard" : "0",
             "Log::Minimal" : "0",
@@ -64,7 +65,7 @@
    "provides" : {
       "Redis::Setlock" : {
          "file" : "lib/Redis/Setlock.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -78,6 +79,6 @@
          "web" : "https://github.com/fujiwara/Redis-Setlock"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

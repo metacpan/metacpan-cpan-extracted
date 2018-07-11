@@ -4,7 +4,7 @@ use warnings;
 use t::TestWSP qw/test_wsp/;
 use Test::More;
 use Test::Mojo;
-use JSON::XS;
+use JSON::MaybeUTF8 ':v1';
 use Mojo::IOLoop;
 use Future;
 
@@ -26,7 +26,7 @@ test_wsp {
     my ($t) = @_;
     $t->websocket_ok('/api' => {});
     $t->send_ok({json => {non_existing_action => 1}})->message_ok;
-    is decode_json($t->message->[1])->{"error"}->{"code"}, 'UnrecognisedRequest';
+    is(decode_json_utf8($t->message->[1])->{"error"}->{"code"}, 'UnrecognisedRequest');
 }
 't::FrontEnd';
 

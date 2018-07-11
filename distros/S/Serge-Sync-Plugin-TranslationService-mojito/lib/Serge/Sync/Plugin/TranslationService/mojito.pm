@@ -6,10 +6,10 @@ use parent Serge::Sync::Plugin::Base::TranslationService, Serge::Interface::SysC
 
 use strict;
 
-use Serge::Util qw(subst_macros culture_from_lang);
+use Serge::Util qw(subst_macros culture_from_lang locale_from_lang);
 use version;
 
-our $VERSION = qv('0.900.1');
+our $VERSION = qv('0.901.2');
 
 sub name {
     return 'Mojito translation server (http://www.mojito.global/) synchronization plugin';
@@ -33,7 +33,9 @@ sub init {
         file_type              => 'STRING',
         status_equal_target    => 'STRING',
         status_pull            => 'STRING',
-        destination_locales    => 'STRING'
+        destination_locales    => 'ARRAY',
+        # JAVA_HOME environment variable
+        java_home              => 'STRING',
     });
 }
 
@@ -52,6 +54,8 @@ sub validate_data {
     $self->{data}->{file_type} = subst_macros($self->{data}->{file_type});
     $self->{data}->{status_equal_target} = subst_macros($self->{data}->{status_equal_target});
     $self->{data}->{status_pull} = subst_macros($self->{data}->{status_pull});
+    $self->{data}->{destination_locales} = subst_macros($self->{data}->{destination_locales});
+    $self->{data}->{java_home} = subst_macros($self->{data}->{java_home});
 
     die "'project_id' not defined" unless defined $self->{data}->{project_id};
 
@@ -65,12 +69,16 @@ sub validate_data {
     die "'localized_files_path' not defined" unless defined $self->{data}->{localized_files_path};
     die "'localized_files_path', which is set to '$self->{data}->{localized_files_path}', does not point to a valid directory.\n" unless -d $self->{data}->{localized_files_path};
 
+    if (defined $self->{data}->{java_home}) {
+        die "'java_home', which is set to '$self->{data}->{java_home}', does not point to a valid dir.\n" unless -d $self->{data}->{java_home};
+    }
+
     $self->{data}->{import_translations} = 1 unless defined $self->{data}->{import_translations};
     $self->{data}->{source_language} = 'en' unless defined $self->{data}->{source_language};
     $self->{data}->{inheritance_mode} = 'REMOVE_UNTRANSLATED' unless defined $self->{data}->{inheritance_mode};
     $self->{data}->{status_pull} = 'ACCEPTED' unless defined $self->{data}->{status_pull};
 
-    if (!exists $self->{destination_locales} or scalar(@{$self->{destination_locales}}) == 0) {
+    if (!exists $self->{data}->{destination_locales} or scalar(@{$self->{data}->{destination_locales}}) == 0) {
         die "the list of destination languages is empty";
     }
 }
@@ -102,6 +110,10 @@ sub run_mojito_cli {
 
     $command = 'mojito '.$command;
     print "Running '$command'...\n";
+
+    if (defined $self->{data}->{java_home}) {
+        $ENV{'JAVA_HOME'} = $self->{data}->{java_home};
+    }
 
     return $self->run_cmd($command, $capture);
 }
@@ -151,7 +163,7 @@ sub get_langs {
     my ($self, $langs) = @_;
 
     if (!$langs) {
-        $langs = @{$self->{destination_locales}};
+        $langs = $self->{data}->{destination_locales};
     }
 
     return $langs;

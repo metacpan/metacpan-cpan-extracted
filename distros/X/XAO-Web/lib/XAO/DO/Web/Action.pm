@@ -279,7 +279,7 @@ sub json ($) {
 
     return $json if $json;
 
-    $json=JSON->new;
+    $json=JSON->new->utf8;
 
     if($self->siteconfig->get('test_site')) {
         $json->pretty->canonical;
@@ -310,7 +310,13 @@ sub display_data ($@) {
         $self->finaltextout($self->json->encode($data));
     }
     elsif($format eq 'js' || $format eq 'json-embed') {
-        $self->textout($self->json->encode($data));
+
+        # The trick with embedded JSON is that it is printed as
+        # part of a larger page and as such has to be in characters that
+        # are then encoded into bytes of the page final encoding.
+        # JSON's to_json() call is exactly that, character output.
+        #
+        $self->textout(to_json($data));
     }
     elsif($format eq 'xml' || $format eq 'xml-embed') {
         my $xml_sub=$self->get_mode_sub('xml',$args->{'xmlmode'} || $args->{'mode'},$args->{'mode'});

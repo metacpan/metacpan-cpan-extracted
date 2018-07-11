@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include "fast.h"
 
 static
 size_t strnspn(const char *s, size_t s_len, const char *c)

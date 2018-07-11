@@ -3,7 +3,10 @@ Changes
 eg/auto-complete.pl
 eg/auto-complete.sh
 eg/simple.pl
+eg/sub-command-modules.pl
 eg/sub-command.pl
+eg/SubModules/First.pm
+eg/SubModules/Second.pm
 lib/Getopt/Alt.pm
 lib/Getopt/Alt/Command.pm
 lib/Getopt/Alt/CookBook.pod
@@ -21,6 +24,7 @@ t/.other.yml
 t/00-load.t
 t/argv-invalid.t
 t/argv-valid.t
+t/auto_complete.t
 t/boilerplate.t
 t/critic.t
 t/get_options.t

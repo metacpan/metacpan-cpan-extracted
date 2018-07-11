@@ -4,7 +4,7 @@ msdoc - Greple module for access MS office docx/pptx/xlsx documents
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # SYNOPSIS
 
@@ -23,9 +23,13 @@ these data and replaces the search target.
 By default, text part from XML data is extracted.  This process is
 done by very simple method and may include redundant information.
 
+Strings are simply connected into paragrap for _.docx_ and _.pptx_
+document.  For _.xlsx_ document, single space is inserted between
+them.  Use **--separator** option to change this behavior.
+
 After every paragraph, single newline is inserted for _.pptx_ and
 _.xlsx_ file, and double newlines for _.docx_ file.  Use
-**--space** option to change this behavior.
+**--space** option to change.
 
 # OPTIONS
 
@@ -40,6 +44,10 @@ _.xlsx_ file, and double newlines for _.docx_ file.  Use
 
     Specify number of newlines inserted after every paragraph.  Any
     non-negative integer is allowed including zero.
+
+- **--separator**=_string_
+
+    Specify the separator string placed between each component strings.
 
 - **--indent**
 

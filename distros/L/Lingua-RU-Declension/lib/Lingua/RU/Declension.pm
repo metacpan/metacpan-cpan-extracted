@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package Lingua::RU::Declension;
-$Lingua::RU::Declension::VERSION = '0.005';
+$Lingua::RU::Declension::VERSION = '0.006';
 use Text::CSV 1.91 qw(csv);
 use File::Share qw(dist_file);
 use Carp qw(confess);
@@ -245,7 +245,7 @@ Lingua::RU::Declension - Decline Russian pronouns, adjectives and nouns
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

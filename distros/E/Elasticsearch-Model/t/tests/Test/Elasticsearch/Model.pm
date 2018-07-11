@@ -1,7 +1,7 @@
 package Test::Elasticsearch::Model;
 
 use Test::Class::Most parent => 'Test';
-use Data::Printer;
+
 use Test::Moose;
 
 sub metaclass_methods : Tests(no_plan) {

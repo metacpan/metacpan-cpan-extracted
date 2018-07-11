@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Proxy::Null;
 
 # ABSTRACT: Log::Any generator proxy for no adapters
-our $VERSION = '1.705';
+our $VERSION = '1.706';
 
 use Log::Any::Adapter::Util ();
 use Log::Any::Proxy;
@@ -57,7 +57,7 @@ Log::Any::Proxy::Null - Log::Any generator proxy for no adapters
 
 =head1 VERSION
 
-version 1.705
+version 1.706
 
 =head1 AUTHORS
 

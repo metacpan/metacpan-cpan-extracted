@@ -250,6 +250,9 @@ PUBLIC METHODS
         Changes 'scale' on 'real' type fields. Can go from unscaled REAL to
         a scaled DECIMAL.
 
+    _default_change (%)
+        Changes default values for fields.
+
     _class_description ()
         Returns hash reference describing fields of the class name given.
 

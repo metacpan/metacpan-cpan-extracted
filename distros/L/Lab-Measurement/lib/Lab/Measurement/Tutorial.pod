@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.653
+version 3.660
 
 =head1 How to read the documentation
 
@@ -545,7 +545,15 @@ names by providing a B<filename extension> in the gate sweep:
 
 =head3 Higher dimensional sweeps
 
-If we create sweeps setups with dimension > 2, the maximum data file dimension
+Sweeps setups with dimension > 2 can be created by using a C<slaves> array
+parameter in C<sweep_start> instead of C<slave>:
+
+ $outer_sweep->start(
+     slaves => [$middle_sweep, $inner_sweep],
+     datafile => ...
+ );
+
+The maximum data file dimension
 remains 2. E.g. if we create a 3D sweep [Temperature, Gate, Bias], a 2D
 data file will be created for each value of the temperature sweep.
 If we set C<datafile_dim> to 1, a subfolder will be created for each value of

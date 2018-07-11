@@ -1,14 +1,12 @@
 package XAO::PageSupport;
-require 5.005;
+require 5.010;
 use strict;
+use warnings;
 
 require DynaLoader;
 
-use vars qw(@ISA $VERSION);
-
-@ISA = qw(DynaLoader);
-
-($VERSION)=(q$Id: PageSupport.pm,v 2.1 2005/01/14 01:39:56 am Exp $ =~ /(\d+\.\d+)/);
+our $VERSION = 2.3;
+our @ISA = qw(DynaLoader);
 
 bootstrap XAO::PageSupport $VERSION;
 

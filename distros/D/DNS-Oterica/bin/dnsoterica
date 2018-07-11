@@ -1,7 +1,11 @@
 #!/icg/bin/perl
 # ABSTRACT: run dns-o!
+
+# This goofy linebreak prevents PAUSE from indexing this package.  The
+        # package statement is here to help Pod::Weaver. -- rjbs, 2017-08-02
 package
   dnsoterica;
+
 use strict;
 use warnings;
 use lib 'lib'; # XXX: temporary for now -- rjbs, 2009-01-30
@@ -51,7 +55,7 @@ dnsoterica - run dns-o!
 
 =head1 VERSION
 
-version 0.304
+version 0.311
 
 =head1 AUTHOR
 
@@ -59,7 +63,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

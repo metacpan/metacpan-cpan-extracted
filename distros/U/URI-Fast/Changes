@@ -1,4 +1,25 @@
-0.35 2018-06-??
+0.38 2018-07-09
+-behavior: uri_t->path increased from 1024 bytes to 2048
+-behavior: setters now croak when an input string is truncated to fit within the uri_t struct
+-bugfix: authority section ignored when no scheme present during construction (credit: martin)
+-optimization: fixed slowness in encode/decode
+
+0.37 2018-07-05
+-cpan indexer issue with URI::Fast::IRI addressed
+
+0.36 2018-07-05
+-behavior: query_hash now accepts hash ref as a parameter
+-bugfix: correctly count and skip utf8 bytes when encoding an IRI
+-bugfix: drop invalid whitespace skipping scheme (credit: aeruder)
+-bugfix: drop logic incompatible with bsd make
+-bugfix: encode non-utf8 input strings in new() and uri_split()
+-bugfix: increase some member sizes to allow room for utf8 sequences
+-bugfix: path correctly handles forward slashes in segments when set with array
+-bugfix: set utf8 flag in compound iri accessors
+-optimization: use memcpy instead of strncpy in some cases
+-optimization: xs setters return void
+
+0.35 2018-06-28
 -behavior: all query scanning functions now treat '&' and ';' as valid separators
 -behavior: explicitly specifying a separator in a query setter replaces existing separators in the query
 -behavior: skip whitespace surrounding parsed uris

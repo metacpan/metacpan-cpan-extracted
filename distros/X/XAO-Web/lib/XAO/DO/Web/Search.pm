@@ -37,17 +37,17 @@ and treated as a logical 'or'.
 Comparison operator to be used in matching index to value.
 Supported comparison operators are:
     eq  True if equal.
-    
+
     ge  True if greater or equal.
-    
+
     gt  True if greater.
-    
+
     le  True if less or equal.
-    
+
     lt  True if less.
 
     ne  True if not equal.
-    
+
     gtlt True if greater than             'a' and less than 'b'
 
     gtle True if greater than             'a' and less than or equal to 'b'
@@ -55,9 +55,9 @@ Supported comparison operators are:
     gelt True if greater than or equal to 'a' and less than             'b'
 
     gele True if greater than or equal to 'a' and less than or equal to 'b'
-    
+
     wq  (word equal)True if contains given word completely.
-    
+
     ws  (word start) True if contains word that starts with the given string.
 
     cs  (contains string) True if contains string.
@@ -158,8 +158,7 @@ use XAO::Utils;
 use XAO::Objects;
 use base XAO::Objects->load(objname => 'Web::Page');
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: Search.pm,v 2.2 2007/09/13 00:17:51 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION='2.002';
 
 ###############################################################################
 sub display ($;%)
@@ -356,7 +355,7 @@ sub _create_query
     {
       my $self = shift;
       my ($ra_expr_ra, $expression, $r_i, $i1, $i2, $i3, $regex) = @_;
-    
+
       $ra_expr_ra->[$$r_i] = [ $ra_expr_ra->[$i1], $i2, $ra_expr_ra->[$i3] ];
       #dprint "  ## $$r_i = [ $i1 $i2 $i3 ]";
       $expression =~ s/\[\s*$i1\s+$i2\s+$i3\s*\]/$$r_i/;

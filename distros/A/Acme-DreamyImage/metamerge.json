@@ -1,0 +1,13 @@
+{
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Acme-DreamyImage/issues"
+      },
+      "homepage" : "https://github.com/gugod/Acme-DreamyImage",
+      "repository" : {
+         "url" : "git://github.com/gugod/Acme-DreamyImage.git",
+         "web" : "https://github.com/gugod/Acme-DreamyImage"
+      }
+   },
+    "x_static_install": true
+}

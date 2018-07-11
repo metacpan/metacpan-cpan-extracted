@@ -14,10 +14,12 @@ L<Net::RDAP::Event> - object representing an RDAP event.
 
 RDAP objects and records may have zero or more "events"
 associated with them. The C<events()> method of various
-C<Net::RDAP::> modules may return an array of
+C<Net::RDAP::Object::> modules may return an array of
 L<Net::RDAP::Event> objects.
 
-L<Net::RDAP::Event> objects have the following methods:
+=head1 METHODS
+
+=head2 Event Action
 
 	$action = $event->action;
 
@@ -36,6 +38,8 @@ sub action { $_[0]->{'eventAction'} }
 
 =pod
 
+=head2 Event Actor
+
 	$actor = $event->actor;
 
 Returns a string containing the handle of the entity
@@ -46,6 +50,8 @@ responsible for causing the event.
 sub actor { $_[0]->{'eventActor'} }
 
 =pod
+
+=head2 Event Date
 
 	$date = $event->date;
 

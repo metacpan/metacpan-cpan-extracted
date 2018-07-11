@@ -1,7 +1,7 @@
 package Finance::Currency::Convert::GMC;
 
-our $DATE = '2018-06-24'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-07-10'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -213,7 +213,7 @@ Finance::Currency::Convert::GMC - Convert currency using GMC (Golden Money Chang
 
 =head1 VERSION
 
-This document describes version 0.005 of Finance::Currency::Convert::GMC (from Perl distribution Finance-Currency-Convert-GMC), released on 2018-06-24.
+This document describes version 0.006 of Finance::Currency::Convert::GMC (from Perl distribution Finance-Currency-Convert-GMC), released on 2018-07-10.
 
 =head1 SYNOPSIS
 

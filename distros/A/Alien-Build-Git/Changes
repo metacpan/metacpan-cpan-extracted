@@ -1,5 +1,8 @@
 Revision history for Alien-Build-Git
 
+0.07      2018-07-09 11:00:57 -0400
+  - MSWin32 (Strawberry Perl) fixes
+
 0.06      2017-11-11 08:15:04 -0500
   - Fix testing fail when Sort::Versions is not installed
 

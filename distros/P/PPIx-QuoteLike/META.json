@@ -4,13 +4,13 @@
       "Thomas R. Wyant, III F<wyant at cpan dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PPIx-QuoteLike",
    "no_index" : {
@@ -46,51 +46,51 @@
    "provides" : {
       "PPIx::QuoteLike" : {
          "file" : "lib/PPIx/QuoteLike.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "PPIx::QuoteLike::Constant" : {
          "file" : "lib/PPIx/QuoteLike/Constant.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "PPIx::QuoteLike::Dumper" : {
          "file" : "lib/PPIx/QuoteLike/Dumper.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "PPIx::QuoteLike::Token" : {
          "file" : "lib/PPIx/QuoteLike/Token.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "PPIx::QuoteLike::Token::Control" : {
          "file" : "lib/PPIx/QuoteLike/Token/Control.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "PPIx::QuoteLike::Token::Delimiter" : {
          "file" : "lib/PPIx/QuoteLike/Token/Delimiter.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "PPIx::QuoteLike::Token::Interpolation" : {
          "file" : "lib/PPIx/QuoteLike/Token/Interpolation.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "PPIx::QuoteLike::Token::String" : {
          "file" : "lib/PPIx/QuoteLike/Token/String.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "PPIx::QuoteLike::Token::Structure" : {
          "file" : "lib/PPIx/QuoteLike/Token/Structure.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "PPIx::QuoteLike::Token::Unknown" : {
          "file" : "lib/PPIx/QuoteLike/Token/Unknown.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "PPIx::QuoteLike::Token::Whitespace" : {
          "file" : "lib/PPIx/QuoteLike/Token/Whitespace.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "PPIx::QuoteLike::Utils" : {
          "file" : "lib/PPIx/QuoteLike/Utils.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -108,6 +108,6 @@
          "web" : "https://github.com/trwyant/perl-PPIx-QuoteLike"
       }
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

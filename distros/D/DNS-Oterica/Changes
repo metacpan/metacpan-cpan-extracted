@@ -1,5 +1,10 @@
 Revision history for DNS-Oterica
 
+0.311     2018-07-09 14:48:04-04:00 America/New_York
+        - timestamp field is empty by default
+        - env vars for control of timestamp and serial number
+        - TinyDNS now suppresses duplicate A records by default
+
 0.304     2016-10-10 16:27:44-04:00 America/New_York
         - DKIM version tag now always come first
 

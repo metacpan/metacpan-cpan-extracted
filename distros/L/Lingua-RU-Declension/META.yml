@@ -31,5 +31,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-RU-Declension
   homepage: https://metacpan.org/dist/lingua-ru-declension
   repository: git://github.com/mrallen1/lingua-ru-declension.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'YAML::Tiny version 1.70'

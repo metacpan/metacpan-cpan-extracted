@@ -4,7 +4,7 @@ package Pod::Weaver::PluginBundle::Author::ETHER;
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.142';
+our $VERSION = '0.143';
 
 use namespace::autoclean -also => ['_exp'];
 use Pod::Weaver::Config::Assembler;
@@ -30,8 +30,8 @@ sub configure
         # equivalent to [@CorePrep]
         [ '-EnsurePod5' ],
         [ '-H1Nester' ],
-
         '-SingleEncoding',
+
         [ '-Transformer' => List => { transformer => 'List' } ],
         [ '-Transformer' => Verbatim => { transformer => 'Verbatim' } ],
 
@@ -42,6 +42,7 @@ sub configure
         [ 'Generic' => 'SYNOPSIS' ],
         [ 'Generic' => 'DESCRIPTION' ],
         [ 'Generic' => 'OVERVIEW' ],
+
         [ 'Collect' => 'ATTRIBUTES' => { command => 'attr' } ],
         [ 'Collect' => 'METHODS'    => { command => 'method' } ],
         [ 'Collect' => 'FUNCTIONS'  => { command => 'func' } ],
@@ -92,6 +93,13 @@ SUPPORT
         ],
 
         'Authors',
+        [ 'AllowOverride' => 'allow override AUTHOR' => {
+               header_re => '^AUTHORS?\b',
+               action => 'replace',
+               match_anywhere => 0,
+            },
+        ],
+
         [ 'Contributors' => { ':version' => '0.008' } ],
         [ 'Legal' => { ':version' => '4.011', header => 'COPYRIGHT AND ' . $licence_filename } ],
         [ 'Region' => 'footer' ],
@@ -178,7 +186,7 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.142
+version 0.143
 
 =head1 SYNOPSIS
 
@@ -205,7 +213,6 @@ following F<weaver.ini>, minus some optimizations:
 
     [-EnsurePod5]
     [-H1Nester]
-
     [-SingleEncoding]
 
     [-Transformer / List]
@@ -245,11 +252,16 @@ following F<weaver.ini>, minus some optimizations:
     main_module_only = 0
     text = <template>
     [AllowOverride / allow override SUPPORT]
-    header_re = ^(SUPPORT|BUGS)
+    header_re = ^(SUPPORT|BUGS)\b
     action = prepend
     match_anywhere = 0
 
     [Authors]
+    [AllowOverride / allow override AUTHOR]
+    header_re = ^AUTHORS?\b
+    action = replace
+    match_anywhere = 0
+
     [Contributors]
     :version = 0.008
 
@@ -281,6 +293,7 @@ This is also equivalent (other than section ordering) to:
     action = prepend
     match_anywhere = 0
 
+    [Authors]
     [Contributors]
     :version = 0.008
 

@@ -49,7 +49,7 @@ use PPIx::Regexp::Token::Whitespace		();
 use PPIx::Regexp::Util qw{ __is_ppi_regexp_element __instance };
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF
@@ -834,13 +834,21 @@ sub __PPIX_TOKENIZER__init {
     my ( $self ) = @_;
 
     $self->find_regexp(
-	qr{ \A ( \s* ) ( qr | m | s )? ( \s* ) (?: [^\w\s] ) }smx )
+	qr{ \A ( \s* ) ( qr | m | s )? ( \s* ) ( . ) }smx )
 	or return $self->__init_error();
 
-    my ( $leading_white, $type, $next_white ) = $self->capture();
+    my ( $leading_white, $type, $next_white, $delim_start ) = $self->capture();
 
     defined $type
 	or $type = '';
+
+    $type
+	or $delim_start =~ m< \A [/?] \z >smx
+	or return $self->__init_error();
+    $type
+	and not $next_white
+	and $delim_start =~ m< \A \w \z >smx
+	and return $self->__init_error();
 
     $self->{type} = $type;
 
@@ -855,13 +863,10 @@ sub __PPIX_TOKENIZER__init {
 	and push @tokens, $self->make_token( length $next_white,
 	'PPIx::Regexp::Token::Whitespace' );
 
-    $self->{delimiter_start} = substr
-	$self->{content},
-	$self->{cursor_curr},
-	1;
+    $self->{delimiter_start} = $delim_start;
 
     $self->{trace}
-	and warn "Tokenizer found regexp start delimiter '$self->{delimiter_start}' at $self->{cursor_curr}\n";
+	and warn "Tokenizer found regexp start delimiter '$delim_start' at $self->{cursor_curr}\n";
 
     if ( my $offset = $self->find_matching_delimiter() ) {
 	my $cursor_limit = $self->{cursor_curr} + $offset;

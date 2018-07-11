@@ -1,29 +1,31 @@
 ---
 abstract: 'Dreamy image generator'
 author:
-  - 'Kang-min Liu <gugod@gugod.org>'
+  - 'Kang-min Liu E<lt>gugod@gugod.orgE<gt>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 0.97'
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.023, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Acme-DreamyImage
-no_index:
-  directory:
-    - inc
-    - t
-    - xt
+provides:
+  Acme::DreamyImage:
+    file: lib/Acme/DreamyImage.pm
+    version: '2.0'
 requires:
-  Digest::SHA1: 0
-  Imager: 0.72
-  Object::Tiny: 0
-  common::sense: 0
-  self: 0.32
+  Digest::SHA1: '0'
+  Imager: '0.72'
+  Object::Tiny: '0'
+  self: '0.32'
 resources:
-  license: http://opensource.org/licenses/mit-license.php
-version: 1.1
+  bugtracker: https://github.com/gugod/Acme-DreamyImage/issues
+  homepage: https://github.com/gugod/Acme-DreamyImage
+  repository: git://github.com/gugod/Acme-DreamyImage.git
+version: '2.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: '1'

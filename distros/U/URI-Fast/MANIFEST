@@ -1,7 +1,9 @@
 Changes
+fast.h
 Fast.xs
 lib/URI/Fast.pm
 lib/URI/Fast/Benchmarks.pod
+lib/URI/Fast/IRI.pm
 lib/URI/Fast/Test.pm
 Makefile.PL
 MANIFEST
@@ -18,8 +20,10 @@ t/iri.t
 t/memory.t
 t/param.t
 t/parsing.t
+t/path.t
 t/query_keyset.t
 t/test.t
 t/tied.t
+urlencode.c
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

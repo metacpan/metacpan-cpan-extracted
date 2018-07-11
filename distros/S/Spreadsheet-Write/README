@@ -1,5 +1,6 @@
 NAME
-    Spreadsheet::Write - Simplified writer for CSV or XLS (MS Excel) files
+    Spreadsheet::Write - Simplified writer for CSV or XLS (MS Excel'97)
+    files
 
 SYNOPSIS
         # EXCEL spreadsheet
@@ -21,6 +22,7 @@ SYNOPSIS
             style           => 'money',
             font_weight     => 'bold',
             font_color      => 42,
+            bg_color        => 'gray',
             font_face       => 'Times New Roman',
             font_size       => 20,
             align           => 'center',
@@ -43,12 +45,13 @@ SYNOPSIS
         $h->addrow('foo','bar');
 
 DESCRIPTION
-    "Spreadsheet::Write" writes files in CSV or XLS (Microsoft Excel)
-    formats. It is especially suitable for building various dumps and
-    reports where rows are built in sequence, one after another.
+    "Spreadsheet::Write" writes files in CSV, XLS (Microsoft Excel 97), and
+    potentially other formats. It is especially suitable for building
+    various dumps and reports where rows are built in sequence, one after
+    another.
 
 METHODS
-  new()
+  new ()
         $spreadsheet = Spreadsheet::Write->new(
             file            => 'table.xls',
             styles          => {
@@ -59,34 +62,43 @@ METHODS
     Creates a new spreadsheet object. It takes a list of options. The
     following are valid:
 
-        file        filename of the new spreadsheet (mandatory)
+        file        filename of the new spreadsheet or an IO handle (mandatory)
         encoding    encoding of output file (optional, csv format only)
-        format      format of spreadsheet - 'csv', 'xls', or 'auto' (default).
-        sheet       Sheet name (optional, xls format only)
+        format      format of spreadsheet - 'csv', 'xls', or 'auto' (default)
+        sheet       Sheet name (optional, not supported by some formats)
         styles      Defines cell formatting shortcuts (optional)
 
     If file format is 'auto' (or omitted), the format is guessed from the
     filename extention. If impossible to guess the format defaults to 'csv'.
 
+    An IO-like handle can be given as 'file' argument (IO::File, IO::Scalar,
+    etc). In this case the format argument is mandatory.
+
+    Default styles are: header => { font_weight => 'bold', type => 'string',
+    }, ntext => { format => '@', type => 'string', }, money => { format =>
+    '$#,##0.00;-$#,##0.00', },
+
   addrow(arg1,arg2,...)
     Adds a row into the spreadsheet. Takes arbitrary number of arguments.
-    Arguments represent column values and may be strings or hash references.
-    If an argument is a hash reference, additional optional parameters may
-    be passed:
+    Arguments represent cell values and may be strings or hash references.
+    If an argument is a hash reference, it takes the following structure:
 
-        content         value to put into column
-        style           formatting style, as defined in new()
+        content         value to put into the cell
+        style           formatting style, as defined in new(), scalar or array-ref
         type            type of the content (defaults to 'auto')
         format          number format (see Spreadsheet::WriteExcel for details)
         font_weight     weight of font. Only valid value is 'bold'
         font_style      style of font. Only valid value is 'italic'
-        font_decoration 'underline' or 'strikeout'
+        font_decoration 'underline' or 'strikeout' (or both, space separated)
         font_face       font of column; default is 'Arial'
         font_color      color of font (see Spreadsheet::WriteExcel for color values)
         font_size       size of font
+        bg_color        color of background (see Spreadsheet::WriteExcel for color values)
         align           alignment
         valign          vertical alignment
         width           column width, excel units (only makes sense once per column)
+        height          row height, excel units (only makes sense once per row)
+        comment         hidden comment for the cell, where supported
 
     Styles can be used to assign default values for any of these formatting
     parameters thus allowing easy global changes. Other parameters specified
@@ -128,7 +140,16 @@ METHODS
             }
         );
 
-    For CSV format all extra arguments are safely ignored.
+    Not all styling options are supported in all formats. Where they are not
+    supported they are safely ignored.
+
+  addrows([$cell1A,$cell1B,...],[$cell2A,$cell2B,...],...)
+    Shortcut for adding multiple rows.
+
+    Each argument is an arrayref representing a row.
+
+    Any argument that is not a reference (i.e. a scalar) is taken to be the
+    title of a new worksheet.
 
   addsheet(name)
     Adds a new sheet into the document and makes it active. Subsequent
@@ -141,6 +162,22 @@ METHODS
     Sets a freeze-pane at the given position, equivalent to
     Spreadsheet::WriteExcel->freeze_panes(). Ignored for CSV files.
 
+  close ()
+    Finalizes the spreadsheet and closes the file. It is a good idea to call
+    this method explicitly instead of relying on perl's garbage collector
+    because for many formats the file may be in an unusable state until this
+    method is called.
+
+    Once a spreadsheet is closed, calls to addrow() will fail.
+
+LICENSE
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
 AUTHORS
-    Nick Eremeev <nick.eremeev@gmail.com> http://ejelta.com/
+    Written by Nick Eremeev <nick.eremeev@gmail.com>; Andrew Maltsev
+    <am@ejelta.com>; <https://ejelta.com/>
+
+    Multiple backends implementation and other patches by Toby Inkster
+    <tobyink@cpan.org> (see also a full fork at Spreadsheet::Wright).
 

@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Util;
 
 # ABSTRACT: Utility functions for use with Graphics::Raylib::XS
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 use List::Util qw(reduce);
 use Graphics::Raylib::XS qw(:all);
@@ -37,7 +37,7 @@ Graphics::Raylib::Util - Utility functions for use With Graphics::Raylib::XS
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -85,9 +85,9 @@ sub vector {
         if (ref($obj) eq 'ARRAY') {
             @coords = @$obj;
         } elsif (blessed($obj)) {
-            return $obj if $obj->isa("Graphics::Raylib::XS::Vector2");
-            return $obj if $obj->isa("Graphics::Raylib::XS::Vector3");
-            return $obj if $obj->isa("Graphics::Raylib::XS::Vector4");
+            foreach my $type (map { "Graphics::Raylib::XS::Vector$_" } qw(2 3 4) ) {
+                return vector($obj->components) if $obj->isa($type);
+            }
         }
     }
 
@@ -102,12 +102,17 @@ sub __vector2 { my $binstr = shift; bless \$binstr, 'Graphics::Raylib::XS::Vecto
 sub __vector3 { my $binstr = shift; bless \$binstr, 'Graphics::Raylib::XS::Vector3' }
 sub __vector4 { my $binstr = shift; bless \$binstr, 'Graphics::Raylib::XS::Vector4' }
 
-sub vabs { sqrt reduce { $a + $b } map({ $_ ** 2 } $_[0]->components) }
-
+sub vabs  { sqrt reduce { $a + $b } map({ $_ ** 2 } $_[0]->components) }
+sub equal {
+    my ($v1, $v2) = @_;
+    return $v1->x == $v2->x && $v1->y == $v2->y && $v1->z == $v2->z && $v1->w == $v2->w
+}
 {
     package Graphics::Raylib::XS::Vector2;
     sub x { return unpack(     "f", ${$_[0]}) }
     sub y { return unpack("x[f] f", ${$_[0]}) }
+    sub z { 0 }
+    sub w { 0 }
     sub components { return unpack("f2", ${$_[0]}) }
     sub stringify {
         my ($self) = @_;
@@ -115,19 +120,17 @@ sub vabs { sqrt reduce { $a + $b } map({ $_ ** 2 } $_[0]->components) }
     }
     sub add {
         my ($self, $other, $swap) = @_;
+        return $other + $self if $self->components < $other->components;
         return Graphics::Raylib::Util::vector($self->x + $other->x, $self->y + $other->y);
     }
-    sub equal {
-        my ($self, $other) = @_;
-        $$self eq $$other
-    }
-    use overload fallback => 1, '""' => 'stringify', '+' => 'add', '==' => 'equal', 'abs' => 'Graphics::Raylib::Util::vabs';
+    use overload fallback => 1, '""' => 'stringify', '+' => 'add', '==' => 'Graphics::Raylib::Util::equal', 'abs' => 'Graphics::Raylib::Util::vabs';
     use constant Zero => Graphics::Raylib::Util::vector(0,0);
 
     package Graphics::Raylib::XS::Vector3;
     sub x { return unpack(     "f", ${$_[0]}) }
     sub y { return unpack("x[f] f", ${$_[0]}) }
     sub z { return unpack("x[ff]f", ${$_[0]}) }
+    sub w { 0 }
     sub components { return unpack("f3", ${$_[0]}) }
     sub stringify {
         my ($self) = @_;
@@ -135,13 +138,10 @@ sub vabs { sqrt reduce { $a + $b } map({ $_ ** 2 } $_[0]->components) }
     }
     sub add {
         my ($self, $other, $swap) = @_;
+        return $other + $self if $self->components < $other->components;
         return Graphics::Raylib::Util::vector($self->x + $other->x, $self->y + $other->y, $self->z + $other->z);
     }
-    sub equal {
-        my ($self, $other) = @_;
-        $$self eq $$other
-    }
-    use overload fallback => 1, '""' => 'stringify', '+' => 'add', '==' => 'equal', 'abs' => 'Graphics::Raylib::Util::vabs';
+    use overload fallback => 1, '""' => 'stringify', '+' => 'add', '==' => 'Graphics::Raylib::Util::equal', 'abs' => 'Graphics::Raylib::Util::vabs';
     use constant Zero => Graphics::Raylib::Util::vector(0,0,0);
 
     package Graphics::Raylib::XS::Vector4;
@@ -156,13 +156,10 @@ sub vabs { sqrt reduce { $a + $b } map({ $_ ** 2 } $_[0]->components) }
     }
     sub add {
         my ($self, $other, $swap) = @_;
+        return $other + $self if $self->components < $other->components;
         return Graphics::Raylib::Util::vector($self->x + $other->x, $self->y + $other->y, $self->z + $other->z, $self->w + $other->w);
     }
-    sub equal {
-        my ($self, $other) = @_;
-        $$self eq $$other
-    }
-    use overload fallback => 1, '""' => 'stringify', '+' => 'add', '==' => 'equal', 'abs' => 'Graphics::Raylib::Util::vabs';
+    use overload fallback => 1, '""' => 'stringify', '+' => 'add', '==' => 'Graphics::Raylib::Util::equal', 'abs' => 'Graphics::Raylib::Util::vabs';
     use constant Zero => Graphics::Raylib::Util::vector(0,0,0,0);
 }
 

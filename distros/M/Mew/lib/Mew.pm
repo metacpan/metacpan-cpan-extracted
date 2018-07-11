@@ -2,7 +2,7 @@ package Mew;
 
 use strictures 2;
 
-our $VERSION = '1.001006'; # VERSION
+our $VERSION = '1.002001'; # VERSION
 
 use Import::Into;
 use Moo;
@@ -23,13 +23,22 @@ sub import {
         my @name_proto = ref $name_proto eq 'ARRAY'
             ? @$name_proto : $name_proto;
 
+        my $req = 1;
         my $mew_type;
         $mew_type = shift if @_ % 2 != 0;
+        if ($mew_type and $mew_type->is_parameterized and $mew_type->parent == Types::Standard::Optional()) {
+            $req = 0;
+            $mew_type = $mew_type->type_parameter;
+        }
+        elsif ($mew_type and $mew_type == Types::Standard::Optional()) {
+            $req = 0;
+            $mew_type = Types::Standard::Any();
+        }
         for my $attr ( @name_proto ) {
             my %spec = @_;
             if ( $mew_type ) {
                 my %mew_spec;
-                $mew_spec{required} = 1 unless $attr =~ s/^-//;
+                $mew_spec{required} = $req unless $attr =~ s/^-//;
                 ( $mew_spec{init_arg} = $attr ) =~ s/^_//
                     unless exists $spec{init_arg};
 
@@ -230,6 +239,10 @@ It's possible to alter the defaults created by C<Mew>:
 
 Simply prefix the attribute's name with a minus sign to avoid setting
 C<< required => 1 >>.
+
+Alternatively, use the C<Optional> type provided by Types::Standard.
+
+    has _cust => Optional[Str];
 
 =head4 Modify other options
 

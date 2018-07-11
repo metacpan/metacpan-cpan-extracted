@@ -3,7 +3,7 @@ use FileHandle::Unget;
 use File::Spec::Functions qw(:ALL);
 use Test::More tests => 12;
 use File::Temp;
-use File::Slurp ();
+use File::Slurper qw(read_text);
 
 my $tmp = File::Temp->new();
 close $tmp;
@@ -20,7 +20,7 @@ close $tmp;
   syswrite $fh, "second line\n";
   FileHandle::Unget::close($fh);
 
-  my $results = File::Slurp::read_file($tmp->filename);
+  my $results = read_text($tmp->filename, undef, 1);
 
   # 1
   is($results, "first line\nsecond line\n", 'syswrite()');

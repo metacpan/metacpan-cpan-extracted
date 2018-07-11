@@ -4,7 +4,7 @@ use Moose::Role;
 use Moose::Util::TypeConstraints;
 use MooseX::Types::Moose qw(ArrayRef HashRef);
 use Elasticsearch::Model::Document::Mapper;
-use Data::Printer;
+
 
 has basic_serialization => (
     is      => 'ro',

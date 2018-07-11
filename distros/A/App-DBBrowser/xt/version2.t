@@ -75,14 +75,14 @@ while ( my $line = <$fh3> ) {
 }
 close $fh3;
 
-my $opt = 'lib/App/DBBrowser/Opt.pm';
-open my $fh4, '<', $opt or die $!;
-while ( my $line = <$fh4> ) {
-    if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
-        $v_opt = $1;
-    }
-}
-close $fh4;
+#my $opt = 'lib/App/DBBrowser/Opt.pm';
+#open my $fh4, '<', $opt or die $!;
+#while ( my $line = <$fh4> ) {
+#    if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
+#        $v_opt = $1;
+#    }
+#}
+#close $fh4;
 
 my $db = 'lib/App/DBBrowser/DB.pm';
 open my $fh5, '<', $db or die $!;
@@ -98,41 +98,41 @@ while ( my $line = <$fh5> ) {
 }
 close $fh5;
 
-my $tbl = 'lib/App/DBBrowser/Table.pm';
-open my $fh6, '<', $tbl or die $!;
-while ( my $line = <$fh6> ) {
-    if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
-        $v_tbl = $1;
-    }
-}
-close $fh6;
+#my $tbl = 'lib/App/DBBrowser/Table.pm';
+#open my $fh6, '<', $tbl or die $!;
+#while ( my $line = <$fh6> ) {
+#    if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
+#        $v_tbl = $1;
+#    }
+#}
+#close $fh6;
 
-my $ju = 'lib/App/DBBrowser/Join_Union.pm';
-open my $fh7, '<', $ju or die $!;
-while ( my $line = <$fh7> ) {
-    if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
-        $v_ju = $1;
-    }
-}
-close $fh7;
+#my $ju = 'lib/App/DBBrowser/Join_Union.pm';
+#open my $fh7, '<', $ju or die $!;
+#while ( my $line = <$fh7> ) {
+#    if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
+#        $v_ju = $1;
+#    }
+#}
+#close $fh7;
 
-my $ut = 'lib/App/DBBrowser/Auxil.pm';
-open my $fh8, '<', $ut or die $!;
-while ( my $line = <$fh8> ) {
-    if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
-        $v_ut = $1;
-    }
-}
-close $fh8;
+#my $ut = 'lib/App/DBBrowser/Auxil.pm';
+#open my $fh8, '<', $ut or die $!;
+#while ( my $line = <$fh8> ) {
+#    if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
+#        $v_ut = $1;
+#    }
+#}
+#close $fh8;
 
-my $insert = 'lib/App/DBBrowser/Table/Insert.pm';
-open my $fh9, '<', $insert or die $!;
-while ( my $line = <$fh9> ) {
-    if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
-        $v_insert = $1;
-    }
-}
-close $fh9;
+#my $insert = 'lib/App/DBBrowser/Table/Insert.pm';
+#open my $fh9, '<', $insert or die $!;
+#while ( my $line = <$fh9> ) {
+#    if ( $line =~ /^our\ \$VERSION\ =\ '(\d\.\d\d\d(?:_\d\d)?)';/ ) {
+#        $v_insert = $1;
+#    }
+#}
+#close $fh9;
 
 open my $fh_ch, '<', 'Changes' or die $!;
 while ( my $line = <$fh_ch> ) {
@@ -155,13 +155,13 @@ is( $v_lib,        $v_bin,         'Version in "' . basename( $bin ) .       '" 
 is( $v_lib,        $v_bin_pod,     'Version in "' . basename( $bin ) .   '" POD OK');
 is( $v_lib,        $v_browser,     'Version in "App::DBBrowser::Browser"        OK');
 is( $v_lib,        $v_browser_pod, 'Version in "App::DBBrowser::Browser"    POD OK');
-is( $v_lib,        $v_opt,         'Version in "App::DBBrowser::Opt"            OK');
+#is( $v_lib,        $v_opt,         'Version in "App::DBBrowser::Opt"            OK');
 is( $v_lib,        $v_db,          'Version in "App::DBBrowser::DB"             OK');
 is( $v_lib,        $v_db_pod,      'Version in "App::DBBrowser::DB"         POD OK');
-is( $v_lib,        $v_tbl,         'Version in "App::DBBrowser::Table"          OK');
-is( $v_lib,        $v_ju,          'Version in "App::DBBrowser::Join_Union"     OK');
-is( $v_lib,        $v_ut,          'Version in "App::DBBrowser::Auxil"          OK');
-is( $v_lib,        $v_insert,      'Version in "App::DBBrowser::Table::Insert"  OK');
+#is( $v_lib,        $v_tbl,         'Version in "App::DBBrowser::Table"          OK');
+#is( $v_lib,        $v_ju,          'Version in "App::DBBrowser::Join_Union"     OK');
+#is( $v_lib,        $v_ut,          'Version in "App::DBBrowser::Auxil"          OK');
+#is( $v_lib,        $v_insert,      'Version in "App::DBBrowser::Table::Insert"  OK');
 is( $release_date, $today,         'Release date in Changes is date from today'   );
 
 

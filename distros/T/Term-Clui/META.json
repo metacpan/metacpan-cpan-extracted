@@ -52,6 +52,6 @@
          "web" : "https://github.com/plicease/Term-Clui"
       }
    },
-   "version" : "1.72",
+   "version" : "1.73",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

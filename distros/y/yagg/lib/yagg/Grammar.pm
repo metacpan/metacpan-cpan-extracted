@@ -6,14 +6,17 @@
 # (see the pod text in Parse::Yapp module for use and distribution rights)
 #
 package yagg::Grammar;
-@ISA=qw( Parse::Yapp::Options );
+
+use strict;
+use Carp;
+use Parse::Yapp::Options;
+use yagg::NonterminalParser;
 
 require 5.004;
 
-use Carp;
-use strict;
-use Parse::Yapp::Options;
-use yagg::NonterminalParser;
+use vars qw( @ISA );
+
+@ISA=qw( Parse::Yapp::Options );
 
 ###############
 # Constructor #
@@ -392,3 +395,31 @@ sub _ReduceGrammar {
 }#_ReduceGrammar
 
 1;
+
+__END__
+
+# --------------------------------------------------------------------------
+
+=head1 NAME
+
+yagg::Grammar - An internal grammar class
+
+=over 4
+
+=item new()
+
+=item ShowRules()
+
+=item Warnings()
+
+=item Summary()
+
+=item RulesTable()
+
+=item Head()
+
+=item Tail()
+
+=back
+
+=cut

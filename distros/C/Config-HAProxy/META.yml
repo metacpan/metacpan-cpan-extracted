@@ -1,0 +1,50 @@
+---
+abstract: 'Parser for HAProxy configuration file'
+author:
+  - 'Sergey Poznyakoff <gray@gnu.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-HAProxy
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Config::HAProxy:
+    file: lib/Config/HAProxy.pm
+    version: '1.00'
+  Config::HAProxy::Iterator:
+    file: lib/Config/HAProxy/Iterator.pm
+  Config::HAProxy::Node:
+    file: lib/Config/HAProxy/Node.pm
+  Config::HAProxy::Node::Comment:
+    file: lib/Config/HAProxy/Node/Comment.pm
+  Config::HAProxy::Node::Empty:
+    file: lib/Config/HAProxy/Node/Empty.pm
+  Config::HAProxy::Node::Root:
+    file: lib/Config/HAProxy/Node/Root.pm
+  Config::HAProxy::Node::Section:
+    file: lib/Config/HAProxy/Node/Section.pm
+  Config::HAProxy::Node::Statement:
+    file: lib/Config/HAProxy/Node/Statement.pm
+  Config::HAProxy::VirtualHost:
+    file: lib/Config/HAProxy/VirtualHost.pm
+requires:
+  Carp: '0'
+  Clone: '0'
+  File::Basename: '0'
+  File::Temp: '0'
+  Text::Locus: '1'
+  Text::ParseWords: '0'
+  perl: '5.006'
+resources:
+  repository: git://git.gnu.org.ua/config-haproxy.git
+version: '1.00'

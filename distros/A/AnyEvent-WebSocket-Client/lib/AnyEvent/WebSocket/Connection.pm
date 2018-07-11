@@ -12,7 +12,7 @@ use PerlX::Maybe qw( maybe provided );
 use Carp ();
 
 # ABSTRACT: WebSocket connection for AnyEvent
-our $VERSION = '0.48'; # VERSION
+our $VERSION = '0.49'; # VERSION
 
 
 has handle => (
@@ -190,8 +190,14 @@ sub _process_message
   
   if($received_message->is_text || $received_message->is_binary)
   {
-    $_->($self, $received_message) for @{ $self->_next_message_cb };
+    # make a copy in order to allow specifying new callbacks inside the
+    # currently executed next_callback itself. otherwise, any next_callback
+    # added inside the currently executed callback would be added to the end
+    # of the array and executed for the currently processed message instead of
+    # actually the next one.
+    my @next_callbacks = @{ $self->_next_message_cb };
     @{ $self->_next_message_cb } = ();
+    $_->($self, $received_message) for @next_callbacks;
 
     # make a copy in case one of the callbacks get
     # unregistered in the middle of the loop
@@ -334,7 +340,7 @@ AnyEvent::WebSocket::Connection - WebSocket connection for AnyEvent
 
 =head1 VERSION
 
-version 0.48
+version 0.49
 
 =head1 SYNOPSIS
 
@@ -463,6 +469,13 @@ the active listeners when invoked.
 
 Called only for the next message received from the WebSocket.
 
+[0.49]
+
+Adding a next_message callback from within a next_message callback will
+result in a callback called on the next message instead of the current
+one. There was a bug in previous versions where the callback would be
+called immediately after current set of callbacks with the same message.
+
 =head3 parse_error
 
  $cb->($connection, $text_error_message)
@@ -544,6 +557,8 @@ Kivanc Yazan (KYZN)
 Yanick Champoux (YANICK)
 
 Fayland Lam (FAYLAND)
+
+Daniel Kamil Kozar (xavery)
 
 =head1 COPYRIGHT AND LICENSE
 

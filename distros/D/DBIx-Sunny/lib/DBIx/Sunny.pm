@@ -5,7 +5,8 @@ use warnings;
 use 5.008005;
 use DBI 1.615;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
+our $SKIP_CALLER_REGEX = qr/^(:?DBIx?|DBD|Try::Tiny|Context::Preserve)\b/;
 
 use parent qw/DBI/;
 
@@ -23,6 +24,9 @@ sub connect {
     if ($dsn =~ /^(?i:dbi):mysql:/ && ! exists $attr->{mysql_enable_utf8} && ! exists $attr->{mysql_enable_utf8mb4} ) {
         $attr->{mysql_enable_utf8} = 1;
     }
+    if ($dsn =~ /^(?i:dbi):Pg:/ && ! exists $attr->{pg_enable_utf8}) {
+        $attr->{pg_enable_utf8} = 1;
+    }
     $class->SUPER::connect($dsn, $user, $pass, $attr);
 }
 
@@ -31,6 +35,7 @@ our @ISA = qw(DBI::db);
 
 use DBIx::TransactionManager;
 use Scalar::Util qw/weaken blessed/;
+use SQL::NamedPlaceholder 0.10;
 
 sub connected {
     my $dbh = shift;
@@ -65,7 +70,7 @@ sub txn_scope {
     if ( ! $self->{private_txt_manager} ) {
         $self->{private_txt_manager} = DBIx::TransactionManager->new($self);
         weaken($self->{private_txt_manager}->{dbh});
-    } 
+    }
     $self->{private_txt_manager}->txn_scope(
         caller => [caller(0)]
     );
@@ -80,8 +85,8 @@ sub __set_comment {
     while ( my @caller = caller($i) ) {
         my $file = $caller[1];
         $file =~ s!\*/!*\//!g;
-        $trace = "/* $file line $caller[2] */"; 
-        last if $caller[0] ne ref($self) && $caller[0] !~ /^(:?DBIx?|DBD|Try::Tiny|Context::Preserve)\b/;
+        $trace = "/* $file line $caller[2] */";
+        last if $caller[0] ne ref($self) && $caller[0] !~ $SKIP_CALLER_REGEX;
         $i++;
     }
     $query =~ s! ! $trace !;
@@ -104,6 +109,13 @@ sub __fill_arrayref {
     my $self = shift;
     my ($query, @bind) = @_;
     return if ! defined $query;
+
+    if (@bind == 1 && ref $bind[0] eq 'HASH') {
+        ($query, my $bind) = SQL::NamedPlaceholder::bind_named($query, $bind[0]);
+        my $maybe_typed = scalar(grep { ref($_) } @$bind);
+        return ($query, $maybe_typed, @$bind);
+    }
+
     my @bind_param;
     $query =~ s{
         \?
@@ -252,9 +264,9 @@ DBIx::Sunny supports only SQLite and MySQL.
 
 DBIx::Sunny sets AutoInactiveDestroy as true.
 
-=item [SQLite/MySQL] Auto encode/decode utf-8
+=item [SQLite/MySQL/Pg] Auto encode/decode utf-8
 
-DBIx::Sunny sets sqlite_unicode and mysql_enable_utf8 automatically.
+DBIx::Sunny sets sqlite_unicode, mysql_enable_utf8 and pg_enable_utf8 automatically.
 
 =item [SQLite] Performance tuning
 
@@ -284,8 +296,19 @@ DBIx::Sunny's last_insert_id needs no arguments. It's shortcut for mysql_inserti
 select_(one|row|all) and  query methods support auto-expanding arrayref bind parameters.
 
   $dbh->select_all('SELECT * FROM id IN (?)', [1 2 3])
-  #SQL: 'SELECT * FROM id IN (?,?,")'
+  #SQL: 'SELECT * FROM id IN (?,?,?)'
   #@BIND: (1, 2, 3)
+
+=item Named placeholder
+
+select_(one|row|all) and query methods support named placeholder.
+
+  $dbh->select_all('SELECT * FROM users WHERE id IN (:ids) AND status = :status', {
+      ids    => [1,2,3],
+      status => 'active',
+  });
+  #SQL: 'SELECT * FROM users WHERE id IN (?,?,?) AND status = ?'
+  #@BIND: (1, 2, 3, 'active')
 
 =item Typed bind parameters
 

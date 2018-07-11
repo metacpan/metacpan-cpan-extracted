@@ -1,3 +1,8 @@
+0.13 2018-07-08T01:28:12+0900
+
+  - Elastijk::oo - add 'search_scroll' method, which is for
+    surpporting the scrolling API and deprecates the 'scan_scroll' method.
+
 0.12 2016-07-04T13:08:16Z
 
   - Elastijk::oo - passthru more useful parameters down to Hijk.

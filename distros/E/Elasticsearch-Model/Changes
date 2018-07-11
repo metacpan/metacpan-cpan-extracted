@@ -1,0 +1,13 @@
+Revision history for Elasticsearch-Model
+
+
+0.1.3    2018-07-06
+    - Repair uninit error in index_settings
+
+0.1.2    2018-07-05
+    - Deprecate setting specific index-level settings
+    - Create new index_settings attribute to replace those specific index-level settings
+    - Remove unneeded dep on Data::Printer
+
+0.0.1    2018-06-22
+    - Initial release. Hello world!

@@ -3,9 +3,9 @@ NAME
     Indonesian Central Bank (BI)
 
 VERSION
-    This document describes version 0.062 of Finance::Currency::Convert::BI
+    This document describes version 0.063 of Finance::Currency::Convert::BI
     (from Perl distribution Finance-Currency-Convert-BI), released on
-    2018-06-24.
+    2018-07-10.
 
 SYNOPSIS
      use Finance::Currency::Convert::BI qw(get_currencies get_jisdor_rates);

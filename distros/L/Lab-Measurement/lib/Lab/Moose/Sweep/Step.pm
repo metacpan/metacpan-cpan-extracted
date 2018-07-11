@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step;
-$Lab::Moose::Sweep::Step::VERSION = '3.653';
+$Lab::Moose::Sweep::Step::VERSION = '3.660';
 #ABSTRACT: Base class for step/list sweeps
 
 
@@ -7,6 +7,7 @@ use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints 'enum';
 use MooseX::Params::Validate;
+use Data::Dumper;
 
 # Do not import all functions as they clash with the attribute methods.
 use Lab::Moose 'linspace';
@@ -24,6 +25,10 @@ has to   => ( is => 'ro', isa => 'Num', predicate => 'has_to' );
 has step =>
     ( is => 'ro', isa => 'Lab::Moose::PosNum', predicate => 'has_step' );
 
+has points =>
+    ( is => 'ro', isa => 'ArrayRef[Num]', predicate => 'has_points' );
+has steps => ( is => 'ro', isa => 'ArrayRef[Num]', predicate => 'has_steps' );
+
 has list => (
     is     => 'ro', isa => 'ArrayRef[Num]', predicate => 'has_list',
     writer => '_list'
@@ -36,7 +41,7 @@ has setter => ( is => 'ro', isa => 'CodeRef', required => 1 );
 # Private attributes used internally
 #
 
-has points => (
+has _points => (
     is => 'ro', isa => 'ArrayRef[Num]', lazy => 1, init_arg => undef,
     builder => '_build_points', traits => ['Array'],
     handles => { get_point => 'get', num_points => 'count' },
@@ -55,19 +60,20 @@ has current_value => (
 my $error_msg = <<"EOF";
 give either (from => ..., to => ..., step => ...)
 or (list => [...])
+or (points => [...], steps => [....])
+or (points => [...], step => )
+
 EOF
 
 sub _build_points {
     my $self = shift;
     my $has_from_to_step
-        = $self->has_from
-        and $self->has_to
-        and $self->has_step;
-    my $has_list = $self->has_list;
-    if ( $has_from_to_step and $has_list ) {
-        croak $error_msg;
-    }
-    if ( not $has_list and not $has_from_to_step ) {
+        = $self->has_from && $self->has_to && $self->has_step;
+    my $has_list         = $self->has_list;
+    my $has_points_steps = $self->has_points && $self->has_steps;
+    my $has_points_step  = $self->has_points && $self->has_step;
+    if ( $has_from_to_step + $has_list + $has_points_steps + $has_points_step
+        != 1 ) {
         croak $error_msg;
     }
 
@@ -79,12 +85,39 @@ sub _build_points {
             croak "list needs at least 1 point";
         }
     }
-    else {
+    elsif ($has_from_to_step) {
         @points = linspace(
             from => $self->from,
             to   => $self->to,
             step => $self->step
         );
+    }
+    else {
+        # points_steps or points_step
+        my @steps;
+        my @corner_points = @{ $self->points };
+        if ( @corner_points < 2 ) {
+            croak "points array needs at least two elements";
+        }
+
+        if ($has_points_steps) {
+            @steps = @{ $self->steps };
+        }
+        else {
+            @steps = ( $self->step );
+        }
+        if ( @steps >= @corner_points ) {
+            croak "steps array exceeds points array";
+        }
+        push @steps, map { $steps[-1] } ( 1 .. @corner_points - @steps - 1 );
+        my ( $p1, $p2 );
+        $p1 = shift @corner_points;
+        while (@corner_points) {
+            my $p2   = shift @corner_points;
+            my $step = shift @steps;
+            push @points, linspace( from => $p1, to => $p2, step => $step );
+            $p1 = $p2;
+        }
     }
 
     if ( $self->backsweep ) {
@@ -167,7 +200,7 @@ Lab::Moose::Sweep::Step - Base class for step/list sweeps
 
 =head1 VERSION
 
-version 3.653
+version 3.660
 
 =head1 SYNOPSIS
 
@@ -269,6 +302,24 @@ define a linear range of points.
 =item * list
 
 alternative to from/to/step, give an arbitrary arrayref of points.
+
+=item * points/steps
+
+alternative to from/to/step. Lets define multiple segments with different steps, e.g.
+
+ points => [0,1,2],
+ steps => [0.5, 0.2],
+
+is equivalent to
+
+ list => [0, 0.5, 1, 1, 1.2, 1.4, 1.6, 1.8, 2]
+
+If C<steps> has fewer elements than segments provided in C<points>, reuse the last value in C<steps>.
+
+=item * points/step
+
+ points => [...],
+ step => $x, # equivalent to steps => [$x]
 
 =item * backsweep
 

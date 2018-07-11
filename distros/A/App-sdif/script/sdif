@@ -237,15 +237,6 @@ if (@ARGV == 2) {
 my $readfile =
     ($OLD and $NEW) && !$opt_s && !(grep { /^-[cuCU]/ } @opt_diffopts);
 
-sub usage {
-    my $opt = ref($_[0]) eq 'HASH' ? shift : {};
-    select STDERR;
-    print @_;
-    pod2usage(-verbose => 0, -exitval => "NOEXIT");
-    print "Version: $version\n";
-    exit($opt->{status} // 0);
-}
-
 use constant {
     RIGHT => 'right',
     LEFT  => 'left',
@@ -260,7 +251,7 @@ my %markpos = (
     );
 unless ($markpos{$opt_mark}) {
     my @keys = sort keys %markpos;
-    usage "Use one from (@keys) for option --mark\n\n"
+    usage "Use one from (@keys) for option --mark\n\n";
 }
 my @markpos = @{$markpos{$opt_mark}};
 my($omarkpos, $nmarkpos, $mmarkpos) = @markpos;

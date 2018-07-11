@@ -4,7 +4,6 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 use File::Spec;
-use WWW::Mechanize::Plugin::Selector;
 use HTTP::Response;
 use HTTP::Headers;
 use Scalar::Util qw( blessed weaken);
@@ -14,13 +13,17 @@ use WWW::Mechanize::Link;
 use IO::Socket::INET;
 use Chrome::DevToolsProtocol;
 use WWW::Mechanize::Chrome::Node;
-use JSON::PP;
+use JSON;
 use MIME::Base64 'decode_base64';
 use Data::Dumper;
+use Time::HiRes qw(usleep);
 use Storable 'dclone';
+use HTML::Selector::XPath 'selector_to_xpath';
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 our @CARP_NOT;
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -162,6 +165,10 @@ A premade L<Chrome::DevToolsProtocol> object.
 If set to 1, after each request tests for Javascript errors and warns. Useful
 for testing with C<use warnings qw(fatal)>.
 
+=item B<mute_audio>
+
+Mutes the audio output. This setting is enabled by default.
+
 =item B<background_networking>
 
 =item B<client_side_phishing_detection>
@@ -183,6 +190,8 @@ for testing with C<use warnings qw(fatal)>.
 =item B<default_apps>
 
 =item B<popup_blocking>
+
+=item B<hide_scrollbars>
 
 =back
 
@@ -218,8 +227,24 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--profile-directory=$options->{ profile }";
     };
 
-    if( ! exists $options->{enable_first_run}) {
+    if( ! exists $options->{enable_first_run} || ! $options->{enable_first_run}) {
         push @{ $options->{ launch_arg }}, "--no-first-run";
+    };
+
+    if( ! exists $options->{mute_audio} || $options->{mute_audio}) {
+        push @{ $options->{ launch_arg }}, "--mute-audio";
+    };
+
+    if( ! exists $options->{no_zygote} || $options->{no_zygote}) {
+        push @{ $options->{ launch_arg }}, "--no-zygote";
+    };
+
+    if( ! exists $options->{no_zygote} || $options->{no_sandbox}) {
+        push @{ $options->{ launch_arg }}, "--no-sandbox";
+    };
+
+    if( $options->{hide_scrollbars}) {
+        push @{ $options->{ launch_arg }}, "--hide-scrollbars";
     };
 
     if( ! exists $options->{disable_prompt_on_repost}) {
@@ -240,6 +265,7 @@ sub build_command_line {
         infobars
         default_apps
         popup_blocking
+        gpu
     )) {
         (my $optname = $option) =~ s!_!-!g;
         if( ! exists $options->{$option}) {
@@ -251,14 +277,13 @@ sub build_command_line {
 
     push @{ $options->{ launch_arg }}, "--headless"
         if $options->{ headless };
-    push @{ $options->{ launch_arg }}, "--disable-gpu"; # temporarily needed for now
 
     push @{ $options->{ launch_arg }}, "$options->{start_url}"
         if exists $options->{start_url};
 
     my $program = ($^O =~ /mswin/i and $options->{ launch_exe } =~ /[\s|<>&]/)
-                  ? qq("$options->{ launch_exe }")
-                  : $options->{ launch_exe };
+        ?  qq("$options->{ launch_exe }")
+        :  $options->{ launch_exe };
 
     my @cmd=( $program, @{ $options->{launch_arg}} );
 
@@ -284,8 +309,9 @@ the C<launch_exe> option.
 =cut
 
 sub find_executable( $class, $program=undef, @search ) {
-    $program ||= $^O =~ /mswin/i
-        ? 'chrome.exe'
+    $program ||=
+          $^O =~ /mswin/i ? 'chrome.exe'
+        : $^O =~ /darwin/i ? 'Google Chrome'
         : 'google-chrome';
 
     push @search, File::Spec->path();
@@ -298,7 +324,13 @@ sub find_executable( $class, $program=undef, @search ) {
              $ENV{'ProgramFiles(x86)'},
              $ENV{"ProgramFilesW6432"},
             );
-    };
+    } elsif( $^O =~ /darwin/i ) {
+        my $path = '/Applications/Google Chrome.app/Contents/MacOS';
+        push @search,
+            $path,
+            $ENV{"HOME"} . "/$path";
+    }
+
 
     my $found;
     for my $path (@search) {
@@ -570,6 +602,9 @@ sub chrome_version_from_stdout( $self ) {
     my @cmd = $self->build_command_line({ launch_arg => ['--version'], headless => 1, port => undef });
 
     $self->log('trace', "Retrieving version via [@cmd]" );
+    if ($^O =~ /darwin/) {
+      s/ /\\ /g for @cmd;
+    }
     my $v = readpipe(join " ", @cmd);
 
     # Chromium 58.0.3029.96 Built on Ubuntu , running on Ubuntu 14.04
@@ -649,7 +684,7 @@ sub allow {
 
     my @await;
     if( exists $options{ javascript } ) {
-        my $disabled = !$options{ javascript } ? JSON::PP::true : JSON::PP::false;
+        my $disabled = !$options{ javascript } ? JSON::true : JSON::false;
         push @await,
             $self->driver->send_message('Emulation.setScriptExecutionDisabled', value => $disabled );
     };
@@ -661,7 +696,7 @@ sub allow {
 
   # Go offline
   $mech->emulateNetworkConditions(
-      offline => JSON::PP::true,
+      offline => JSON::true,
       latency => 10, # ms ping
       downloadThroughput => 0, # bytes/s
       uploadThroughput => 0, # bytes/s
@@ -671,7 +706,7 @@ sub allow {
 =cut
 
 sub emulateNetworkConditions_future( $self, %options ) {
-    $options{ offline } //= JSON::PP::false,
+    $options{ offline } //= JSON::false,
     $options{ latency } //= -1,
     $options{ downloadThroughput } //= -1,
     $options{ uploadThroughput } //= -1,
@@ -779,8 +814,8 @@ sub on_request_intercepted( $self, $cb ) {
   my @matches = $mech->searchInResponseBody(
       requestId     => $request_id,
       query         => 'rumpelstiltskin',
-      caseSensitive => JSON::PP::true,
-      isRegex       => JSON::PP::false,
+      caseSensitive => JSON::true,
+      isRegex       => JSON::false,
   );
   for( @matches ) {
       print $_->{lineNumber}, ":", $_->{lineContent}, "\n";
@@ -844,7 +879,7 @@ Closes the current Javascript dialog. Depending on
 =cut
 
 sub handle_dialog( $self, $accept, $prompt = undef ) {
-    my $v = $accept ? JSON::PP::true : JSON::PP::false;
+    my $v = $accept ? JSON::true : JSON::false;
     $self->log('debug', sprintf 'Dismissing Javascript dialog with %d', $accept);
     my $f;
     $f = $self->driver->send_message(
@@ -1965,6 +2000,69 @@ sub uri( $self ) {
     URI->new( $d->{root}->{documentURL} )
 }
 
+=head2 C<< $mech->infinite_scroll( [$wait_time_in_seconds] ) >>
+
+    $new_content_found = $mech->infinite_scroll(3);
+
+Loads content into pages that have "infinite scroll" capabilities by scrolling
+to the bottom of the web page and waiting up to the number of seconds, as set by
+the optional C<$wait_time_in_seconds> argument, for the browser to load more
+content. The default is to wait up to 20 seconds. For reasonbly fast sites,
+the wait time can be set much lower.
+
+The method returns a boolean C<true> if new content is loaded, C<false>
+otherwise. You can scroll to the end (if there is one) of an infinitely
+scrolling page like so:
+
+    while( $mech->infinite_scroll ) {
+        # Tests for exiting the loop earlier
+        last if $count++ >= 10;
+    }
+
+=cut
+
+sub infinite_scroll {
+    my $self        = shift;
+    my $wait_time   = shift || 20;
+
+    my $current_height = $self->_get_body_height;
+    $self->log('debug', "Current page body height: $current_height");
+
+    $self->_scroll_to_bottom;
+
+    my $new_height = $self->_get_body_height;
+    $self->log('debug', "New page body height: $new_height");
+
+    my $start_time = time();
+    while (!($new_height > $current_height)) {
+
+        # wait for new elements to load until $wait_time is reached
+        if (time() - $start_time > $wait_time) {
+          return 0;
+        }
+
+        # wait 1/10th sec for new elements to load
+        usleep 100000;
+        $new_height = $self->_get_body_height;
+    }
+    return 1;
+}
+
+sub _get_body_height {
+    my $self = shift;
+
+    my ($height) = $self->eval( 'document.body.scrollHeight' );
+    return $height;
+}
+
+sub _scroll_to_bottom {
+    my $self = shift;
+
+    # scroll to bottom and wait for some content to load
+    $self->eval( 'window.scroll(0,document.body.scrollHeight + 200)' );
+    usleep 100000;
+}
+
 =head1 CONTENT METHODS
 
 =head2 C<< $mech->document_future() >>
@@ -2264,10 +2362,17 @@ This takes the same options that C<< ->xpath >> does.
 This method is implemented via L<WWW::Mechanize::Plugin::Selector>.
 
 =cut
-{
-    no warnings 'once';
-    *selector = \&WWW::Mechanize::Plugin::Selector::selector;
-}
+
+sub selector {
+    my ($self,$query,%options) = @_;
+    $options{ user_info } ||= "CSS selector '$query'";
+    if ('ARRAY' ne (ref $query || '')) {
+        $query = [$query];
+    };
+    my $root = $options{ node } ? './' : '';
+    my @q = map { selector_to_xpath($_, root => $root) } @$query;
+    $self->xpath(\@q, %options);
+};
 
 =head2 C<< $mech->find_link_dom( %options ) >>
 
@@ -3551,7 +3656,7 @@ function() {
 }
 JS
                     arguments => [],
-                    returnByValue => JSON::PP::true)->get->{result};
+                    returnByValue => JSON::true)->get->{result};
 
             my @values = @{$arr->{value}};
             if (wantarray) {
@@ -4190,7 +4295,7 @@ sub viewport_size_future( $self, $new={} ) {
     my $params = dclone $new;
     if( keys %$params) {
         my %reset = (
-            mobile => $JSON::PP::false,
+            mobile => JSON::false,
             width  => 0,
             height => 0,
             deviceScaleFactor => 0,
@@ -4199,7 +4304,7 @@ sub viewport_size_future( $self, $new={} ) {
             screenHeight => 0,
             positionX => 0,
             positionY => 0,
-            dontSetVisibleSize => $JSON::PP::false,
+            dontSetVisibleSize => JSON::false,
             screenOrientation => {
                 type => 'landscapePrimary',
                 angle => 0,
@@ -4310,7 +4415,7 @@ towards rendering HTML.
 
 sub element_coordinates {
     my ($self, $element) = @_;
-    my $cliprect = $self->driver->send_message('Runtime.callFunctionOn', objectId => $element->objectId, functionDeclaration => <<'JS', arguments => [], returnByValue => JSON::PP::true)->get->{result}->{value};
+    my $cliprect = $self->driver->send_message('Runtime.callFunctionOn', objectId => $element->objectId, functionDeclaration => <<'JS', arguments => [], returnByValue => JSON::true)->get->{result}->{value};
     function() {
         var r = this.getBoundingClientRect();
         return {
@@ -4606,22 +4711,82 @@ This module does not yet support POST requests
 
 =head2 Install the C<chrome> executable
 
-Test it has been installed on your system:
+C<WWW::Mechanize::Chrome> requires that you have the Chrome browser installed
+on your system. If Chrome is not installed, please consult
+L<Google's instructions|https://support.google.com/chrome/answer/95346> for
+help installing the Chrome browser.
 
-On unixish systems, the executable is named C<chrome-browser>. Check
-that Chrome starts:
+C<WWW::Mechanize::Chrome> will do its best to locate Chrome's executable file
+on your system. With any luck, it will find the executable you want to use. If
+C<WWW::Mechanize::Chrome> does not find Chrome on your system or you want to
+use a different executable, you can use the C<launch_exe> constructor argument
+to tell C<WWW::Mechanize::Chrome> where to find it. You can alse set the
+C<CHROME_BIN> environment variable to the absolute path of the executable.
 
-C<< chrome-browser --version >>
+=head2 Test the C<chrome> executable
+
+You should verify that Chrome's executable is working properly. On Ubuntu, the
+executable is typically named C<chrome-browser> and so you can test Chrome's
+installation with:
+
+C<chrome-browser --version>
+
+and you should see something like C<Google Chrome 67.0.3396.99> returned.
+
+Note that the command you run will vary based on your operating sytem and
+possibly the version of Chrome installed.
+
+On a Debian system, for example, the command will most likely be something
+like:
+
+C<google-chrome-stable --version> or
+C<google-chrome-beta --version> or
+C<google-chrome-unstable --version>
 
 On Windows, the executable is named C<chrome.exe> and doesn't output
-information to the console. Check that Chrome starts:
+information to the console but you can check that Chrome starts by running:
 
-C<< chrome >>
+C<chrome>
+
+in the terminal.
+
+On MacOS, the executable can usually be be found inside the C<Google Chrome.app>
+package in the C</Applications> directory and its installation can be
+tested with something like the following:
+
+C</Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version>
+
+or, if Chrome is installed for a single user:
+
+C</Users/<user_nameE<gt>/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version>
+
+If you are having trouble finding, installing, or running Chrome on your
+system, please consult the appropriate documentation or a knowledgeable expert.
 
 =head2 Chrome versions
 
 Note that the Chrome version numbers do not denote availability of features.
 Features can still be added to Chrome v62 when Chrome v64 is already out.
+
+If you are serious about automating a website, use a separate copy of Chrome
+and disable its automatic updates.
+
+=head2 Module prerequisites on OSX
+
+=head3 L<Imager::File::PNG>
+
+This module relies on L<Imager> for processing screenshots. If you don't need
+this functionality, you can ignore the L<Imager> and L<Imager::File::PNG>
+installation and use this module with the system Perl provided by Apple.
+
+The installation of L<Imager::File::PNG> works on OSX using the Homebrew tool
+and the Perl installable through Homebrew:
+
+    brew install perl-5.28
+    brew install libpng
+    cpan Imager::File::PNG
+
+I haven't been able to make it work using the system Perl.
 
 =head1 RUNNING THE TEST SUITE
 
@@ -4708,9 +4873,25 @@ Please report bugs in this module via the RT CPAN bug queue at
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Chrome>
 or via mail to L<www-mechanize-Chrome-Bugs@rt.cpan.org|mailto:www-mechanize-Chrome-Bugs@rt.cpan.org>.
 
+=head1 CONTRIBUTING
+
+Please see L<WWW::Mechanize::Chrome::Contributing>.
+
+=head1 KNOWN ISSUES
+
+When Chrome is run in headless mode, Chrome throws a C<Lost UI shared context>
+error. This error can be ignored and does not affect the operation of this
+module.
+
 =head1 AUTHOR
 
 Max Maischein C<corion@cpan.org>
+
+=head1 CONTRIBUTORS
+
+Andreas König C<andk@cpan.org>
+Tobias Leich C<froggs@cpan.org>
+Steven Dondley C<s@dondley.org>
 
 =head1 COPYRIGHT (c)
 

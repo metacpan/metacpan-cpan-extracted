@@ -98,7 +98,7 @@ my @optargs = (
     "markcolor|mc!" => \$opt_markcolor,
     "textcolor|tc!" => \$opt_textcolor,
     "colormap|cm=s" => \@opt_colormap,
-    "h|help" => sub { pod2usage() },
+    "h|help" => sub { usage() },
     "man" => sub { pod2usage({-verbose => 2}) },
     "env!" => \$opt_env,
     "stat!" => \$opt_stat,
@@ -126,7 +126,7 @@ my @optargs = (
 
 use Getopt::EX::Long;
 Getopt::Long::Configure("bundling");
-GetOptions(@optargs) || pod2usage();
+GetOptions(@optargs) || usage({status => 1});
 
 my %opt_d;
 if ($opt_d) {
@@ -516,6 +516,14 @@ sub compare {
     1;
 }
 
+use Getopt::EX::Colormap qw(colorize);
+
+sub debug_list {
+    my $i = 0;
+    my @cmap = qw( K/444 K/333 );
+    join "", map { colorize $cmap[$i++ % @cmap], $_ } @_;
+}
+
 sub context {
     my($old, $new) = @_;
     local $_;
@@ -535,9 +543,9 @@ sub context {
 
     if ($opt_d{w}) {
 	print STDERR "****************************** Comparing ...\n";
-	print STDERR join ',', @owlist;
+	print STDERR debug_list @owlist;
 	print STDERR "****************************** and\n";
-	print STDERR join ',', @nwlist;
+	print STDERR debug_list @nwlist;
 	print STDERR "****************************** .\n";
     }
 
@@ -581,6 +589,7 @@ sub maketmp {
   MECAB:
 
     goto NORMAL unless $opt_mecab;
+    goto NORMAL unless $text =~ /\P{ASCII}/;
 
     my $pid = open(MECAB, '|-');
     goto NORMAL if not defined $pid;
@@ -593,8 +602,13 @@ sub maketmp {
     } else {
 	open(STDOUT, ">&", $tmpfile->fh) or die;
 	for ("disabling unreach warning") {
-	    exec('mecab',
-		 '--node-format', '%M\\n', '--eos-format', "$eos\\n");
+	    my @mecab = (
+		'mecab',
+		'--node-format', '%M\\n',
+		'--eos-format',  "$eos\\n",
+		);
+	    warn "EXEC: @mecab\n" if $opt_d{m};
+	    exec @mecab;
 	}
 	while ($text =~ /($w_pattern)/g) {
 	    my $w = $1;
@@ -606,9 +620,10 @@ sub maketmp {
     close MECAB;
     $tmpfile->rewind;
     while (my $s = $tmpfile->fh->getline) {
+	warn "MECAB: $s" if $opt_d{m};
 	chomp $s;
 	$s =~ s/$eos/\n/;
-	push(@words, $s);
+	push @words, $s;
     }
     goto DONE;
 
@@ -619,14 +634,14 @@ sub maketmp {
 	if ($opt_w) {
 	    push(@notspace, !/\s/);
 	    if (shift(@notspace) && $notspace[0]) {
-		push(@words, '');
+		push @words, '';
 		$tmpfile->write("\n");
 	    }
 	}
 	if (s/^(\s*)\n/\n/ && (length($1) || $opt_b || $opt_w)) {
 	    #     ^ This have to be *.  Don't change to +.
 	    $tmpfile->write(($opt_b || $opt_w) ? "\n" : "$1\n");
-	    push(@words, $1);
+	    push @words, $1;
 	}
 	push @words, $_;
 	$tmpfile->write($_);

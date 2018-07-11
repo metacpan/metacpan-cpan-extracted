@@ -6,10 +6,25 @@ use strict;
 use warnings;
 
 use PPIx::QuoteLike;
+use PPIx::QuoteLike::Constant qw{
+    SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS
+};
 use PPIx::QuoteLike::Token::Control;
+use PPIx::QuoteLike::Token::Delimiter;
 use PPIx::QuoteLike::Token::Interpolation;
 use PPIx::QuoteLike::Token::String;
+
+BEGIN {
+    if ( SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS ) {
+	# Have to prevent Perl from parsing 'open' as 'CORE::open'.
+	require 'open.pm';
+	'open'->import( qw{ :std :encoding(utf-8) } );
+    }
+}
+
 use Test::More 0.88;	# Because of done_testing();
+
+use charnames qw{ :full };
 
 my $tok;
 
@@ -27,6 +42,47 @@ $tok = PPIx::QuoteLike::Token::Control->__new( content => '\F' );
 is $tok->perl_version_introduced(), '5.015008',
     '\\F was introduced in 5.15.8';
 is $tok->perl_version_removed(), undef, '\\F is still here';
+
+$tok = PPIx::QuoteLike::Token::Delimiter->__new( content => q<'> );
+is $tok->perl_version_introduced(), '5.000',
+    q{Delimiter q<'> was introduced in 5.0};
+is $tok->perl_version_removed(), undef, q{Delimiter q<'> is still here};
+
+SKIP: {
+    SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS
+	or skip 'Weird delimiters test requires Perl 5.8.3 or above', 2;
+
+    $tok = PPIx::QuoteLike::Token::Delimiter->__new( content =>
+	qq<\N{COMBINING CIRCUMFLEX ACCENT}> );
+    is $tok->perl_version_introduced(), '5.008003',
+	q[Delimiter qq<\N{COMBINING CIRCUMFLEX ACCENT}> was introduced in 5.8.3 (kinda)];
+    is $tok->perl_version_removed(), '5.029',
+	q[Delimiter qq<\N{COMBINING CIRCUMFLEX ACCENT}> removed in 5.029];
+}
+
+SKIP: {
+    SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS
+	or skip 'Truly weird delimiters test requires Perl 5.8.3 or above', 2;
+
+    $ENV{AUTHOR_TESTING}
+	or skip 'Truly weird delimiters are noisy, therefore author tests', 2;
+
+    no warnings qw{ utf8 };	# Because of truly weird characters
+
+    $tok = PPIx::QuoteLike::Token::Delimiter->__new( content =>
+	qq<\N{U+FFFE}> );	# permanent noncharacter
+    is $tok->perl_version_introduced(), '5.008003',
+	q[Delimiter qq<\N{U+FFFE}> was introduced in 5.8.3 (kinda)];
+    is $tok->perl_version_removed(), undef,
+	q[Delimiter qq<\N{U+FFFE}> is still here];
+
+    $tok = PPIx::QuoteLike::Token::Delimiter->__new( content =>
+	qq<\N{U+11FFFF}> );	# illegal character
+    is $tok->perl_version_introduced(), '5.008003',
+	q[Delimiter qq<\N{U+11FFFF}> was introduced in 5.8.3 (kinda)];
+    is $tok->perl_version_removed(), undef,
+	q[Delimiter qq<\N{U+11FFFF}> is still here];
+}
 
 $tok = PPIx::QuoteLike::Token::Interpolation->__new( content => '$x' );
 is $tok->perl_version_introduced(), '5.000',

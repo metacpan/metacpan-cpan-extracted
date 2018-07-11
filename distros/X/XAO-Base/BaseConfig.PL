@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 #
 # Builds BaseConfig.pm according to the configuration in .config.
 #
@@ -7,6 +7,7 @@
 # indexers see that Base.pm exists and let other modules include it in
 # their dependencies.
 #
+use warnings;
 use strict;
 
 ##
@@ -95,7 +96,7 @@ $projectsdir='<%PROJECTSDIR%>';
 #
 sub set_root ($) {
     my $dir=shift || '';
-    $dir=~/^\// || 
+    $dir=~/^\// ||
         throw XAO::E::BaseConfig "set_root - $dir must be an absolute path";
     -d $dir ||
         throw XAO::E::BaseConfig "set_root - directory $dir does not exists";

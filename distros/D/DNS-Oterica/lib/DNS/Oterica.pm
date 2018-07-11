@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package DNS::Oterica;
 # ABSTRACT: build dns configuration more easily
-$DNS::Oterica::VERSION = '0.304';
+$DNS::Oterica::VERSION = '0.311';
 #pod =head1 WARNING
 #pod
 #pod B<HIGHLY EXPERIMENTAL>
@@ -69,7 +69,7 @@ DNS::Oterica - build dns configuration more easily
 
 =head1 VERSION
 
-version 0.304
+version 0.311
 
 =head1 OVERVIEW
 
@@ -125,15 +125,25 @@ There's a lot of stuff to do.
 
 Ricardo SIGNES <rjbs@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Chris Nehren
+=for stopwords Chris Nehren Joel Shea
+
+=over 4
+
+=item *
 
 Chris Nehren <apeiron@cpan.org>
 
+=item *
+
+Joel Shea <jshea@fastmail.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

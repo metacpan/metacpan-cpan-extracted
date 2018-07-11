@@ -4,7 +4,7 @@ author:
   - 'David Coppit <david@coppit.org>.'
 build_requires:
   ExtUtils::MakeMaker: 6.36
-  File::Slurp: 0
+  File::Slurper: 0
   File::Spec::Functions: 0
   Test::Compile: 0
   Test::More: 0
@@ -14,7 +14,7 @@ configure_requires:
   URI::Escape: 0
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.14'
+generated_by: 'Module::Install version 1.19'
 license: gpl2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,4 +34,4 @@ resources:
   homepage: https://github.com/coppit/filehandle-unget/
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/coppit/filehandle-unget.git
-version: '0.1628'
+version: '0.1633'

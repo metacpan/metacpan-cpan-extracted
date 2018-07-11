@@ -26,4 +26,4 @@ requires:
   IO: '1.12'
   Net::IP: '1.26'
   perl: v5.10.0
-version: '0.26'
+version: '0.27'

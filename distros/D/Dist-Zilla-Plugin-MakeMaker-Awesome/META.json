@@ -39,7 +39,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.141",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.143",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -75,6 +75,7 @@
             "Dist::Zilla" : "4.300039",
             "Dist::Zilla::File::InMemory" : "0",
             "Dist::Zilla::Plugin::MakeMaker" : "5.001",
+            "Dist::Zilla::Role::BeforeBuild" : "0",
             "Dist::Zilla::Role::FileGatherer" : "0",
             "List::Util" : "1.29",
             "Moose" : "0",
@@ -192,7 +193,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
          "file" : "lib/Dist/Zilla/Plugin/MakeMaker/Awesome.pm",
-         "version" : "0.45"
+         "version" : "0.46"
       }
    },
    "release_status" : "stable",
@@ -210,7 +211,7 @@
       "x_IRC" : "irc://irc.perl.org/#distzilla",
       "x_MailingList" : "http://dzil.org/#mailing-list"
    },
-   "version" : "0.45",
+   "version" : "0.46",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -630,6 +631,11 @@
                         "version" : "4.015"
                      },
                      {
+                        "class" : "Pod::Weaver::Section::AllowOverride",
+                        "name" : "@Author::ETHER/allow override AUTHOR",
+                        "version" : "0.05"
+                     },
+                     {
                         "class" : "Pod::Weaver::Section::Contributors",
                         "name" : "@Author::ETHER/Contributors",
                         "version" : "0.009"
@@ -756,10 +762,9 @@
                   "version" : "6.012"
                },
                "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
-                  "version" : "0.45"
+                  "version" : "0.46"
                },
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 9,
                   "version" : "6.012"
                }
             },
@@ -896,7 +901,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20180622"
+                  "Module::CoreList" : "5.20180626"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1113,7 +1118,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.45",
+                  "tag" : "v0.46",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v%t"
                },

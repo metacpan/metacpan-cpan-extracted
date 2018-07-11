@@ -8,9 +8,20 @@ my $document_types = {
     magazine => 'DocumentTypeB',
 };
 
+my $index_settings = {
+    number_of_shards   => 1,
+    number_of_replicas => 1,
+    refresh_interval   => '1s',
+    blocks => {
+        read_only_allow_delete => 'false',
+    },
+    max_result_window => 100000,
+};
+
 for my $document_type (keys %$document_types) {
     index $document_type => (
         type => $document_types->{$document_type},
+        index_settings => $index_settings,
     );
 }
 

@@ -15,6 +15,7 @@ include/mp3.h
 include/mp4.h
 include/mpc.h
 include/ogg.h
+include/opus.h
 include/pinttypes.h
 include/ppport.h
 include/pstdint.h
@@ -47,6 +48,7 @@ src/mp3.c
 src/mp4.c
 src/mpc.c
 src/ogg.c
+src/opus.c
 src/wav.c
 src/wavpack.c
 t/01use.t
@@ -56,6 +58,7 @@ t/04critic.rc
 t/04critic.t
 t/aac.t
 t/aac/id3v2.aac
+t/aac/heaac-3frame.aac
 t/aac/leading-junk.aac
 t/aac/mono.aac
 t/aac/stereo.aac
@@ -163,8 +166,8 @@ t/mp3/v2.3-no-audio-frames.mp3
 t/mp3/v2.3-null-bytes.mp3
 t/mp3/v2.3-rgad.mp3
 t/mp3/v2.3-sylt.mp3
-t/mp3/v2.3-unsync.mp3
 t/mp3/v2.3-unsync-apic-bad-offset.mp3
+t/mp3/v2.3-unsync.mp3
 t/mp3/v2.3-utf16any.mp3
 t/mp3/v2.3-utf16be.mp3
 t/mp3/v2.3-utf16le.mp3
@@ -234,6 +237,14 @@ t/ogg/old1.ogg
 t/ogg/old2.ogg
 t/ogg/tachos_melody.ogg
 t/ogg/test.ogg
+t/opus.t
+t/opus/broken.phobosstream.opus
+t/opus/broken.testvector01.bit.opus
+t/opus/failure-end_gp_before_last_packet1.opus
+t/opus/test-1-mono.opus
+t/opus/test-2-stereo.opus
+t/opus/test-8-7.1.opus
+t/opus/tron.6ch.tinypkts.opus
 t/util.t
 t/wav.t
 t/wav/8kmp38.wav

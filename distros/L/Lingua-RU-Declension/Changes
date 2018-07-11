@@ -1,8 +1,12 @@
 Revision history for Lingua-RU-Declension
 
+0.006       2018-07-06
+            Switch to openrussian for word lookup
+            Fix plural noun generation
+
 0.005       2018-06-05
             Add links to forvo for pronunciation
-	    on flash cards
+            on flash cards
 
 0.004       2018-05-12
             Add все and то to data files

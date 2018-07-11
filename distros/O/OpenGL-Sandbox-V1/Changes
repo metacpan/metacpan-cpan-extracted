@@ -1,0 +1,9 @@
+Version 0.03 - 2018-07-09
+  - Use Inline::Module, to avoid depending on Inline at runtime
+  - Improved implementation of setup_projection, with tests
+  - Fix various broken XS callback details
+  - Much more test coverage, and conditional dependencies in tests
+  - Add more glGet and lighting functions.
+
+Version 0.02 - 2018-06-18
+  - Initial public release

@@ -71,7 +71,8 @@ subtest 'fetch without tag' => sub {
           field filename => '0.01';
           field url      => url {
             url_component scheme   => 'file';
-            url_component host     => 'localhost';
+            url_component host     => 'localhost' if $^O ne 'MSWin32';
+            url_component host     => ''          if $^O eq 'MSWin32';
             url_component path     => $example1;
             url_component fragment => '0.01';
           };
@@ -80,7 +81,8 @@ subtest 'fetch without tag' => sub {
           field filename => '0.02';
           field url      => url {
             url_component scheme   => 'file';
-            url_component host     => 'localhost';
+            url_component host     => 'localhost' if $^O ne 'MSWin32';
+            url_component host     => ''          if $^O eq 'MSWin32';
             url_component path     => $example1;
             url_component fragment => '0.02';
           };
@@ -89,7 +91,8 @@ subtest 'fetch without tag' => sub {
           field filename => '0.03';
           field url      => url {
             url_component scheme   => 'file';
-            url_component host     => 'localhost';
+            url_component host     => 'localhost' if $^O ne 'MSWin32';
+            url_component host     => ''          if $^O eq 'MSWin32';
             url_component path     => $example1;
             url_component fragment => '0.03';
           };

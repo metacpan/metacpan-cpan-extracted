@@ -19,6 +19,7 @@ my @module_files = (
     'App/ElasticSearch/Utilities/QueryString/IP.pm',
     'App/ElasticSearch/Utilities/QueryString/Nested.pm',
     'App/ElasticSearch/Utilities/QueryString/Plugin.pm',
+    'App/ElasticSearch/Utilities/QueryString/Ranges.pm',
     'App/ElasticSearch/Utilities/QueryString/Underscored.pm',
     'App/ElasticSearch/Utilities/VersionHacks.pm',
     'Types/ElasticSearch.pm'
@@ -30,13 +31,12 @@ my @scripts = (
     'scripts/es-copy-index.pl',
     'scripts/es-daily-index-maintenance.pl',
     'scripts/es-graphite-dynamic.pl',
-    'scripts/es-graphite-static.pl',
     'scripts/es-nagios-check.pl',
     'scripts/es-nodes.pl',
     'scripts/es-open.pl',
     'scripts/es-search.pl',
     'scripts/es-status.pl',
-    'scripts/es-storage-data.pl'
+    'scripts/es-storage-overview.pl'
 );
 
 # fake home for cpan-testers

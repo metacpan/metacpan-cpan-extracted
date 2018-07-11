@@ -1,5 +1,8 @@
 Revision history for Mew
 
+1.002001  2018-07-05
+  - [tobyink] Implement support for Optional[`a] PR #4
+
 1.001006  2016-08-11
   - Bump Moo prereqs to avoid test failures (mst++)
 

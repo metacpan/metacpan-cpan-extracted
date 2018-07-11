@@ -1,10 +1,10 @@
 {
-   "abstract" : "XAO Web templating system",
+   "abstract" : "XAO Web Framework",
    "author" : [
       "Andrew Maltsev, http://ejelta.com/xao/"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -22,23 +22,27 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "XAO::Base" : "1.21"
          }
       },
       "configure" : {
          "requires" : {
-            "XAO::Base" : "1.13"
+            "XAO::Base" : "1.21"
          }
       },
       "runtime" : {
          "requires" : {
+            "Authen::SASL::SASLprep" : "1.1",
             "CGI" : "4.14",
             "CGI::Cookie" : "4.14",
+            "CGI::PSGI" : "0.15",
             "Crypt::Rijndael" : "1.13",
             "Data::Entropy::Algorithms" : "0.007",
             "Digest::Bcrypt" : "1.203",
             "Digest::MD5" : "2.13",
             "Digest::SHA" : "5.63",
+            "Encode" : "2.93",
             "Error" : "0.15",
             "HTML::Entities" : "3.69",
             "HTTP::Response" : "6.04",
@@ -48,12 +52,13 @@
             "POSIX" : "1.16",
             "Text::FormatTable" : "0.01",
             "Time::HiRes" : "1.9719",
-            "XAO::Base" : "1.13",
-            "XAO::FS" : "1.06"
+            "Unicode::Normalize" : "1.18",
+            "XAO::Base" : "1.21",
+            "XAO::FS" : "1.21",
+            "perl" : "5.010001"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.47",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.70"
 }

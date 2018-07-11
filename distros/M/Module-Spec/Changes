@@ -1,51 +1,58 @@
 
 Release history for Module-Spec
 
-0.8.0     2018-02-11 17:51:47-08:00 America/Los_Angeles
+0.9.0     2018-07-07 20:17:01-07:00 America/Los_Angeles
 
-    - Fix need_modules(-oneof => @specs)
 
-v0.7     2018-01-27 18:26:15-08:00 America/Los_Angeles
+v0.9      2018-07-07 20:14:08-07:00 America/Los_Angeles
 
-    - "M~V" specs renamed from V1 to V2
-    - V1 is V2 without "M~V" notation
-    - Implementation of need_modules()
+   - try_modules(@args) ≡ need_modules(-all => @args)
+   - need_module( $spec, { try => $bool })
 
-v0.6     2018-01-11 17:34:07-08:00 America/Los_Angeles
+v0.8      2018-02-11 17:51:47-08:00 America/Los_Angeles
 
-    - On try_module, only forgive "M version V required" version errors
-    - A few more tests
+   - Fix need_modules(-oneof => @specs)
 
-v0.5.2     2018-01-11 13:04:34-08:00 America/Los_Angeles
+v0.7      2018-01-27 18:26:15-08:00 America/Los_Angeles
 
-    - Bump Perl requirement to 5.12.0
+   - "M~V" specs renamed from V1 to V2
+   - V1 is V2 without "M~V" notation
+   - Implementation of need_modules()
 
-v0.5.1     2018-01-05 08:41:58-08:00 America/Los_Angeles
+v0.6      2018-01-11 17:34:07-08:00 America/Los_Angeles
 
-    - Add a note about the current status of the code (alpha quality)
+   - On try_module, only forgive "M version V required" version errors
+   - A few more tests
 
-v0.5     2018-01-04 15:57:01-08:00 America/Los_Angeles
+v0.5.2    2018-01-11 13:04:34-08:00 America/Los_Angeles
 
-    - More param checking for Module::Spec->new()
-    - Fix a test, reducing requirement to Perl 5.10.1
+   - Bump Perl requirement to 5.12.0
 
-v0.4     2018-01-03 12:34:13-08:00 America/Los_Angeles
+v0.5.1    2018-01-05 08:41:58-08:00 America/Los_Angeles
 
-    - On try_module, only forgive "Can't locate " missing module errors
-    - Document that exceptions are not throw from the perspective of the caller
-    - Document that single quotes are not accepted as package separators
-    - Extend and improve tests
+   - Add a note about the current status of the code (alpha quality)
 
-v0.3     2018-01-02 21:34:58-08:00 America/Los_Angeles
+v0.5      2018-01-04 15:57:01-08:00 America/Los_Angeles
 
-    - Implement need_module($spec, { require => $r })
-    - Implement try_module($spec, { require => $r })
+   - More param checking for Module::Spec->new()
+   - Fix a test, reducing requirement to Perl 5.10.1
 
-v0.2     2018-01-02 19:55:20-08:00 America/Los_Angeles
+v0.4      2018-01-03 12:34:13-08:00 America/Los_Angeles
 
-    - Don't use "zim" in tests
+   - On try_module, only forgive "Can't locate " missing module errors
+   - Document that exceptions are not throw from the perspective of the caller
+   - Document that single quotes are not accepted as package separators
+   - Extend and improve tests
 
-v0.1     2018-01-02 17:26:00-08:00 America/Los_Angeles (TRIAL RELEASE)
+v0.3      2018-01-02 21:34:58-08:00 America/Los_Angeles
 
-    - Initial version
+   - Implement need_module($spec, { require => $r })
+   - Implement try_module($spec, { require => $r })
 
+v0.2      2018-01-02 19:55:20-08:00 America/Los_Angeles
+
+   - Don't use "zim" in tests
+
+v0.1      2018-01-02 17:26:00-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+   - Initial version

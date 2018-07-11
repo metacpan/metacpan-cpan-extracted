@@ -1,0 +1,10 @@
+Version 0.03 - 2018-07-09
+  - Removed accidental dependency on X11::GLX
+  - Added more options to make_context
+  - Documented existing options to make_context
+  - Export local gl* methods if available
+    (useful for monkey-patch debugging)
+  - Use Inline::Module, to avoid depending on Inline at runtime
+
+Version 0.02 - 2018-06-18
+  - Initial public release

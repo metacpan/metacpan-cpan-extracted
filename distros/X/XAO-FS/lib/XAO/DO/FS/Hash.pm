@@ -364,6 +364,7 @@ sub build_structure ($%) {
 
     my %changed_charset;
     my %changed_scale;
+    my %changed_default;
 
     $self->_consistency_checked ||
         throw $self "- can't build_structure without 'check_consistency' on loading";
@@ -372,6 +373,12 @@ sub build_structure ($%) {
         my %ph;
         @ph{keys %{$args->{$name}}}=values %{$args->{$name}};
         $ph{'name'}=$name;
+
+        my $type=$ph{'type'};
+
+        if($type ne 'list' && !defined $ph{'default'}) {
+            $ph{'default'}//=$self->_field_default($name,\%ph);
+        }
 
         my $desc=$self->describe($name);
         if($desc) {
@@ -388,6 +395,7 @@ sub build_structure ($%) {
 
                     if($v ne ($dbv || '')) {
                         $changed_charset{$name}=$v;
+                        dprint "..changed charset for '$name': '$dbv' => '$v'";
                     }
                 }
                 elsif($n eq 'scale') {
@@ -398,6 +406,14 @@ sub build_structure ($%) {
                     }
                     elsif($v>$dbv) {
                         $changed_scale{$name}=$v;
+                        dprint "..changed scale for '$name': '$dbv' => '$v'";
+                    }
+                }
+                elsif($n eq 'default') {
+                    my $match=$type eq 'text' || $type eq 'blob' ? ($v eq $dbv) : ($v == $dbv && $dbv ne '' && $dbv !~ /[a-z]/i);
+                    if(!$match) {
+                        $changed_default{$name}=$v;
+                        dprint "..changed default for '$name': '$dbv' => '$v'";
                     }
                 }
                 elsif(!defined $dbv || (defined $dbv && $dbv ne $v)) {
@@ -418,11 +434,11 @@ sub build_structure ($%) {
         }
     }
 
-    if(keys %changed_charset) {
+    if(%changed_charset) {
         my $debug_status=XAO::Utils::get_debug();
         XAO::Utils::set_debug(1);
 
-        dprint "Some text fields in ".$$self->{'class'}." have changed charset values.";
+        dprint "Some text fields in ".$$self->{'class'}." have changed charset values (".join(', ',sort keys %changed_charset).").";
         dprint "An automatic conversion will be attempted in 10 seconds. Interrupt to abort.";
         sleep 10;
         dprint "Converting...";
@@ -431,15 +447,28 @@ sub build_structure ($%) {
         XAO::Utils::set_debug($debug_status);
     }
 
-    if(keys %changed_scale) {
+    if(%changed_scale) {
         my $debug_status=XAO::Utils::get_debug();
         XAO::Utils::set_debug(1);
 
-        dprint "Some 'real' fields in ".$$self->{'class'}." have changed scale values.";
+        dprint "Some 'real' fields in ".$$self->{'class'}." have changed scale values (".join(', ',sort keys %changed_scale).").";
         dprint "An automatic conversion will be attempted in 10 seconds. Interrupt to abort.";
         sleep 10;
         dprint "Converting...";
         $self->_scale_change(\%changed_scale);
+
+        XAO::Utils::set_debug($debug_status);
+    }
+
+    if(%changed_default) {
+        my $debug_status=XAO::Utils::get_debug();
+        XAO::Utils::set_debug(1);
+
+        dprint "Some 'default' values in ".$$self->{'class'}." have changed (".join(', ',sort keys %changed_default).").";
+        dprint "An automatic conversion will be attempted in 10 seconds. Interrupt to abort.";
+        sleep 10;
+        dprint "Converting...";
+        $self->_default_change(\%changed_default);
 
         XAO::Utils::set_debug($debug_status);
     }
@@ -863,7 +892,7 @@ sub get ($$) {
     else {
 
         my $fields=$self->_class_description->{'fields'} ||
-            $self->throw("get - internal data problem");
+            $self->throw("- internal data problem");
 
         my @datanames=map {
             my $f=$fields->{$_} || $self->throw("get - unknown property ($_)");
@@ -872,7 +901,7 @@ sub get ($$) {
 
         if($$self->{'detached'}) {
             scalar(@datanames) == scalar(@_) ||
-                $self->throw("get - retrieval of lists on detached objects not implemented yet");
+                $self->throw("- retrieval of lists on detached objects not implemented yet");
 
             return map {
                 my $value=$$self->{'data'}->{$_};
@@ -1168,6 +1197,16 @@ sub put ($$$) {
         }
         elsif($type eq 'integer' || $type eq 'real') {
             $data->{$name}=$value=$self->_field_default($name,$field) if $value eq '';
+
+            if($type eq 'integer') {
+                $data->{$name}=$value=int($value);
+            }
+            elsif(defined $field->{'scale'}) {
+                $data->{$name}=$value=($value!=0 ? sprintf('%0.*f',$field->{'scale'},$value) : 0);
+            }
+            else {
+                $data->{$name}=($value+=0);
+            }
 
             !defined($field->{'minvalue'}) || $value>=$field->{'minvalue'} ||
                 $self->throw("- {{INPUT:Value ($value) is less then $field->{'minvalue'} for $name}}");

@@ -846,6 +846,34 @@ sub _scale_change ($%) {
 
 ###############################################################################
 
+=item _default_change (%)
+
+Changes default values for fields.
+
+=cut
+
+sub _default_change ($%) {
+    my $self=shift;
+    my $flist=get_args(\@_);
+
+    my $desc=$self->_class_description;
+    my $table=$desc->{'table'};
+
+    my $driver=$self->_driver;
+
+    foreach my $name (keys %$flist) {
+        my $fdesc=$self->describe($name) || throw $self "- something went wrong";
+
+        my $uid=$driver->unique_id('Global_Fields','field_name',$name,'table_name',$table);
+        dprint "...$table:$uid $name -> '$flist->{$name}'";
+        $driver->update_fields('Global_Fields',$uid,{ default => $flist->{$name} });
+    }
+
+    dprint "...done";
+}
+
+###############################################################################
+
 =item _class_description ()
 
 Returns hash reference describing fields of the class name given.
@@ -964,33 +992,60 @@ description hash reference if it is available in calling context.
 =cut
 
 sub _field_default ($$) {
-    my $self=shift;
-    my $field=shift;
+    my ($self,$field,$desc,$check)=@_;
 
-    my $desc=shift || $self->_field_description($field);
+    $desc//=$self->_field_description($field);
 
-    return $desc->{'default'} if defined($desc->{'default'});
+    my $default=$desc->{'default'};
+    if(defined $default) {
+        return $default unless $check;
 
+        my $type=$desc->{'type'};
+        if($type eq 'text' || $type eq 'blob') {
+            !defined $desc->{'minlength'} || length $default >= $desc->{'minlength'} ||
+                throw $self "- default '$default' is shorter than minlength $desc->{'minlength'} for $field";
+            !defined $desc->{'maxlength'} || length $default <= $desc->{'maxlength'} ||
+                throw $self "- default '$default' is longer than maxlength $desc->{'maxlength'} for $field";
+        }
+        elsif($type eq 'integer' || $type eq 'real') {
+            if($type eq 'integer') {
+                $default=~/^-?\d+$/ ||
+                    throw $self "- default '$default' is not an integer for $field";
+            }
+            elsif($type eq 'real') {
+                $default=~/^-?\d+(?:\.\d+)?$/ || $default=~/^-?\.\d+$/ ||
+                    throw $self "- default '$default' is not a number for $field";
+            }
+            !defined $desc->{'minvalue'} || $default >= $desc->{'minvalue'} ||
+                throw $self "- default $default is below minvalue $desc->{'minvalue'} for $field";
+            !defined $desc->{'maxvalue'} || $default <= $desc->{'maxvalue'} ||
+                throw $self "- default $default is above maxvalue $desc->{'maxvalue'} for $field";
+        }
+
+        return $default;
+    }
+
+    # Undefined, calculating a default default.
+    #
     my $type=$desc->{'type'};
-    my $default;
     if($type eq 'text' || $type eq 'blob') {
         $default='';
     }
     elsif($type eq 'integer' || $type eq 'real') {
-        if(!defined $desc->{'minvalue'}) {
-            $default=0;
+        my $minvalue=$desc->{'minvalue'};
+        my $maxvalue=$desc->{'maxvalue'};
+        if(!defined $minvalue) {
+            $default=!defined $maxvalue || $maxvalue>=0 ? 0 : $maxvalue;
         }
-        elsif($desc->{'minvalue'} <= 0 &&
-              (!defined($desc->{'maxvalue'}) || $desc->{'maxvalue'} >= 0)) {
-            $default=0;
+        elsif(!defined $maxvalue) {
+            $default=$minvalue<0 ? 0 : $minvalue;
         }
         else {
-            $default=$desc->{'minvalue'};
+            $default=$minvalue;
         }
     }
     else {
-        eprint "Wrong type for trying to get default (name=$field, type=$type)";
-        $default='';
+        throw $self "- wrong type for trying to get default (name=$field, type=$type)";
     }
 
     $desc->{'default'}=$default;
@@ -2221,12 +2276,12 @@ sub _add_data_placeholder ($%) {
 
     # Checking or setting the default value.
     #
-    $fdesc{'default'}=$self->_field_default($name,\%fdesc);
+    $fdesc{'default'}=$self->_field_default($name,\%fdesc,1);
 
     # Adding...
     #
     if($type eq 'words') {
-        throw $self "_add_data_placeholder - 'words' not supported any more";
+        throw $self "- 'words' not supported any more";
     }
     elsif ($type eq 'text') {
         if(!$fdesc{'maxlength'}) {
@@ -2238,42 +2293,49 @@ sub _add_data_placeholder ($%) {
 
         my $dl=length($fdesc{'default'});
         $dl <= 30 ||
-            throw $self "_add_data_placeholder - default text is longer than 30 characters";
+            throw $self "- default text for '$name' is longer than 30 characters";
         $dl <= $fdesc{'maxlength'} ||
-            throw $self "_add_data_placeholder - default text is longer than maxlength ($fdesc{'maxlength'})";
+            throw $self "- default text for '$name' is longer than maxlength ($fdesc{'maxlength'})";
 
         $driver->add_field_text($table,$name,$fdesc{'index'},$fdesc{'unique'},
                                 $fdesc{'maxlength'},$fdesc{'default'},$fdesc{'charset'},$connected);
     }
     elsif ($type eq 'blob') {
         my $maxlength=$fdesc{'maxlength'} ||
-            throw $self "_add_data_placeholder($name) - no blob maxlength specified";
+            throw $self "($name) - no blob maxlength specified";
 
         my $dl=length($fdesc{'default'});
         $dl <= 30 ||
-            throw $self "_add_data_placeholder($name) - default blob is longer than 30 characters";
+            throw $self "- default blob for '$name' is longer than 30 characters";
         $dl <= $maxlength ||
-            throw $self "_add_data_placeholder($name) - default blob is longer than maxlength ($maxlength)";
+            throw $self "- default blob for '$name' is longer than maxlength ($maxlength)";
 
         $driver->add_field_text($table,$name,$fdesc{'index'},$fdesc{'unique'},
                                 $maxlength,$fdesc{'default'},'binary',$connected);
     }
     elsif ($type eq 'integer') {
-        $fdesc{'minvalue'}=-0x80000000 unless defined($fdesc{'minvalue'});
-        if(!defined($fdesc{'maxvalue'})) {
-            $fdesc{'maxvalue'}=$fdesc{'minvalue'}<0 ? 0x7FFFFFFF : 0xFFFFFFFF;
-        }
+        $fdesc{'minvalue'}//=-0x80000000;
+
+        $fdesc{'maxvalue'}//=$fdesc{'minvalue'}<0 ? 0x7FFFFFFF : 0xFFFFFFFF;
+
+        $fdesc{'minvalue'} <= $fdesc{'maxvalue'} ||
+            throw $self "- minvalue $fdesc{'minvalue'} is above maxvalue $fdesc{'maxvalue'} for $name";
+
         $driver->add_field_integer($table,$name,$fdesc{'index'},$fdesc{'unique'},
                                    $fdesc{'minvalue'},$fdesc{'maxvalue'},$fdesc{'default'},$connected);
     }
     elsif ($type eq 'real') {
         $fdesc{'minvalue'}+=0 if defined($fdesc{'minvalue'});
         $fdesc{'maxvalue'}+=0 if defined($fdesc{'maxvalue'});
+
+        !defined $fdesc{'minvalue'} || !defined $fdesc{'maxvalue'} || $fdesc{'minvalue'} <= $fdesc{'maxvalue'} ||
+            throw $self "- minvalue $fdesc{'minvalue'} is above maxvalue $fdesc{'maxvalue'} for $name";
+
         $driver->add_field_real($table,$name,$fdesc{'index'},$fdesc{'unique'},
                                 $fdesc{'minvalue'},$fdesc{'maxvalue'},$fdesc{'scale'},$fdesc{'default'},$connected);
     }
     else {
-        $self->throw("_add_data_placeholder - unknown type ($type)");
+        $self->throw("- unknown type '$type'");
     }
 
     ##
@@ -2297,7 +2359,6 @@ sub _add_data_placeholder ($%) {
                        });
 }
 
-##
 # Adds list placeholder to the Hash object.
 #
 # It gets here when name was already checked for being correct and

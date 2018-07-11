@@ -1,7 +1,7 @@
 package Test::Elasticsearch::Model::Document::Role;
 
 use Test::Class::Most parent => 'Test';
-use Data::Printer;
+
 
 sub basics :Tests(no_plan) {
     my $self = shift;

@@ -19,11 +19,11 @@ Geo::Coder::CA - Provides a Geo-Coding functionality using http:://geocoder.ca f
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -68,9 +68,13 @@ sub new {
 
 sub geocode {
 	my $self = shift;
-
 	my %param;
-	if (@_ % 2 == 0) {
+
+	if(ref($_[0]) eq 'HASH') {
+		%param = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: geocode(location => $location)');
+	} elsif(@_ % 2 == 0) {
 		%param = @_;
 	} else {
 		$param{location} = shift;
@@ -202,7 +206,7 @@ sub run {
 
 Nigel Horne <njh@bandsman.co.uk>
 
-Based on L<Geo::Coder::Coder::Googleplaces>.
+Based on L<Geo::Coder::Googleplaces>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

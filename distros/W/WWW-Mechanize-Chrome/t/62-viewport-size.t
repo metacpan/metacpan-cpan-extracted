@@ -10,14 +10,7 @@ use Data::Dumper;
 
 use t::helper;
 
-# (re)set the log level
-if (my $lv = $ENV{TEST_LOG_LEVEL}) {
-    if( $lv eq 'trace' ) {
-        Log::Log4perl->easy_init($TRACE)
-    } elsif( $lv eq 'debug' ) {
-        Log::Log4perl->easy_init($DEBUG)
-    }
-}
+Log::Log4perl->easy_init($ERROR);
 
 # What instances of Chrome will we try?
 my $instance_port = 9222;
@@ -131,7 +124,7 @@ t::helper::run_across_instances(\@instances, $instance_port, \&new_mech, 6, sub 
     $resized = get_viewport_size( $mech );
     is_deeply [@{$resized}{qw(width height)}], [@{$start_size}{qw(width height)}],
               "We restored the old window metrics"
-        or diag Dumper $resized;
+        or diag Dumper [$start_size,$resized];
 
     undef $mech;
 });

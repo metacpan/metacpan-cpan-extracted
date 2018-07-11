@@ -68,16 +68,15 @@ my %module = (
         'URI::file'          => 0,    # For URL handling, just to be explicit
         'Future::HTTP'       => 0.06, # fixes Mojolicious error handling
         'JSON'               => 0,
-        'JSON::PP'           => 0, # for JSON::PP::true and JSON::PP::false
         'Moo'                => 2, # for some hashes-as-objects
 
-        'WWW::Mechanize::Plugin::Selector' => 0,
         'HTTP::Response'                   => 0,
         'HTTP::Headers'                    => 0,
         'Scalar::Util'                     => 0, # we need 'weaken' and 'blessed'
 		'MIME::Base64'                     => 0,
         'File::Basename'                   => 0,
         'WWW::Mechanize::Link'             => 0,
+        'HTML::Selector::XPath'            => 0,
         'IO::Socket::INET'                 => 0,
         'Storable'                         => 0, # for dclone
         'Object::Import'                   => 0,
@@ -174,7 +173,11 @@ Should you wish to install this module manually, the procedure is
 INSTALL
             pod_section($_[0], 'REPOSITORY'),
             pod_section($_[0], 'SUPPORT'),
+            pod_section($_[0], 'TALKS'),
+            pod_section($_[0], 'KNOWN ISSUES'),
             pod_section($_[0], 'BUG TRACKER'),
+            pod_section($_[0], 'CONTRIBUTING'),
+            pod_section($_[0], 'SEE ALSO'),
             pod_section($_[0], 'AUTHOR'),
             pod_section($_[0], 'LICENSE' ),
             pod_section($_[0], 'COPYRIGHT' ),
@@ -196,6 +199,9 @@ INSTALL
 [![Travis Build Status](https://travis-ci.org/Corion/$distbase.svg?branch=master)](https://travis-ci.org/Corion/$distbase)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/$distbase?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/$distbase)
 
+CONTRIBUTING
+
+See lib/WWW/Mechanize/Chrome/Contributing.pod
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );

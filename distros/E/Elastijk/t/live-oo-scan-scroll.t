@@ -11,6 +11,13 @@ use Elastijk;
 
 my $test_index_name = "test_index_$$".rand();
 my $es = Elastijk->new(host => 'localhost', port => '9200', index => $test_index_name );
+
+my $res = $es->get(path => "/");
+if ($res->{version}{number} ge '2.1.0') {
+    plan skip_all => "scan_scroll does not make sense with Elasticsearch 2.1.0 or latter";
+    exit;
+}
+
 ## create the index, and index some documents.
 $es->put(
     body => {

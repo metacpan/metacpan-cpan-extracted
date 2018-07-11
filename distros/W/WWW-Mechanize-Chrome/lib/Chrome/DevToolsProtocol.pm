@@ -13,8 +13,14 @@ use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 our @CARP_NOT;
+
+=head1 NAME
+
+Chrome::DevToolsProtocol - asynchronous dispatcher for the DevTools protocol
+
+=cut
 
 sub _build_log( $self ) {
     require Log::Log4perl;

@@ -28,8 +28,18 @@ sub siteconfig {
 sub set_up {
     my $self=shift;
 
-    chomp(my $root=`pwd`);
-    $root.='/testcases/testroot';
+    chomp(my $pwd=`pwd`);
+
+    my $root;
+    foreach my $d ("$pwd/t/xao","$pwd/t/testcases/testroot","$pwd/testcases/testroot") {
+        if(-d $d) {
+            $root=$d;
+            last;
+        }
+    }
+
+    $root||="$pwd/t/xao";
+
     XAO::Base::set_root($root);
 
     push @INC,$root;

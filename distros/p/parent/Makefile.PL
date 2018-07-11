@@ -1,10 +1,3 @@
-# A template for Makefile.PL.
-# - Set the $PACKAGE variable to the name of your module.
-# - Set $LAST_API_CHANGE to reflect the last version you changed the API
-#   of your module.
-# - Fill in your dependencies in PREREQ_PM
-# Alternatively, you can say the hell with this and use h2xs.
-
 use ExtUtils::MakeMaker;
 
 WriteMakefile1(
@@ -23,6 +16,7 @@ WriteMakefile1(
             'repository' => 'https://github.com/Corion/parent',
         },
     },
+    MIN_PERL_VERSION => '5.006', # We use "our" in some places
 );
 
 1;
@@ -61,10 +55,7 @@ sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21.
         push @perls, qw(bleadperl
                         perl5.6.1
                         perl5.6.0
-                        perl5.005_03
-                        perl5.004_05
-                        perl5.004_04
-                        perl5.004)
+          )
           if $ENV{PERL_TEST_ALL};
 
         my $out;

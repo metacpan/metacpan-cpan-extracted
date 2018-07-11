@@ -1,6 +1,6 @@
 package DNS::Oterica::NodeFamily;
 # ABSTRACT: a group of hosts that share common functions
-$DNS::Oterica::NodeFamily::VERSION = '0.304';
+$DNS::Oterica::NodeFamily::VERSION = '0.311';
 use Moose;
 
 #pod =attr nodes
@@ -73,7 +73,7 @@ DNS::Oterica::NodeFamily - a group of hosts that share common functions
 
 =head1 VERSION
 
-version 0.304
+version 0.311
 
 =head1 ATTRIBUTES
 
@@ -101,7 +101,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

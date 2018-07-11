@@ -20,11 +20,11 @@ Net::Etcd::Maintenance
 
 =cut
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 =head1 SYNOPSIS
 
     # list members
-    $defrag = $etcd->member()->list;
+    $members = $etcd->member()->list;
 
 =head1 DESCRIPTION
 

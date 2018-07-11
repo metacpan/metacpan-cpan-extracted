@@ -1,0 +1,39 @@
+sudo: false
+
+language: perl
+perl:
+  - "5.28"
+  - "5.26"
+  - "5.24"
+  - "5.22"
+  - "5.20"
+  - "5.20-shrplib"
+  - "5.18"
+  - "5.18-shrplib"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+
+env:
+  - TEST_LIVE=1
+
+services:
+  - elasticsearch
+
+before_script:
+  - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
+  - source ~/travis-perl-helpers/init
+  - build-perl
+  - perl -V
+  - cpanm -n Devel::Cover::Report::Coveralls Test2::Harness
+  - cpanm --installdeps .
+
+script:
+  - curl http://localhost:9200/
+  - PERL5OPT=-MDevel::Cover yath test && cover -report coveralls
+
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#chupei.pm"
+    use_notice: true

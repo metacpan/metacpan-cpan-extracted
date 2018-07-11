@@ -1,6 +1,6 @@
 {
     "name": "CPAN-Testers-Common-DBUtils",
-    "version": "0.11",
+    "version": "0.12",
     "abstract": "Basic Database Wrapper used by CPAN Testers modules",
     "author": [
         "Barbie (BARBIE) <barbie@cpan.org>"
@@ -57,7 +57,7 @@
 
     "resources": {
         "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
-        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Testers-Common-DBUtils" },
+        "bugtracker": { "web": "https://github.com/cpan-testers/cpan-testers-common-dbutils/issues" },
         "repository": {
             "url": "git://github.com/barbie/cpan-testers-common-dbutils.git",
             "web": "http://github.com/barbie/cpan-testers-common-dbutils",

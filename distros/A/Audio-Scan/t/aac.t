@@ -2,7 +2,7 @@ use strict;
 
 use File::Spec::Functions;
 use FindBin ();
-use Test::More tests => 39;
+use Test::More tests => 44;
 use Test::Warn;
 
 use Audio::Scan;
@@ -28,12 +28,12 @@ use Audio::Scan;
 
     is( $info->{audio_offset}, 0, 'Audio offset ok' );
     is( $info->{audio_size}, 2053, 'Audio size ok' );
-    is( $info->{bitrate}, 37000, 'Bitrate ok' );
+    is( $info->{bitrate}, 35000, 'Bitrate ok' );
     is( $info->{channels}, 1, 'Channels ok' );
     is( $info->{file_size}, 2053, 'File size ok' );
     is( $info->{profile}, 'LC', 'Profile ok' );
     is( $info->{samplerate}, 44100, 'Samplerate ok' );
-    is( $info->{song_length_ms}, 441, 'Duration ok' );
+    is( $info->{song_length_ms}, 464, 'Duration ok' );
     is( $info->{dlna_profile}, 'AAC_ADTS_192', 'DLNA profile AAC_ADTS_192 ok' );
 }
 
@@ -44,11 +44,11 @@ use Audio::Scan;
     my $info = $s->{info};
 
     is( $info->{audio_offset}, 0, 'Stereo ADTS audio offset ok' );
-    is( $info->{bitrate}, 59000, 'Stereo ADTS bitrate ok' );
+    is( $info->{bitrate}, 58000, 'Stereo ADTS bitrate ok' );
     is( $info->{channels}, 2, 'Stereo ADTS channels ok' );
     is( $info->{profile}, 'LC', 'Stereo ADTS profile ok' );
     is( $info->{samplerate}, 44100, 'Stereo ADTS samplerate ok' );
-    is( $info->{song_length_ms}, 1369, 'Stereo ADTS duration ok' );
+    is( $info->{song_length_ms}, 1393, 'Stereo ADTS duration ok' );
 }
 
 # ADTS with ID3v2 tags
@@ -61,11 +61,11 @@ use Audio::Scan;
     is( $info->{audio_offset}, 2182, 'ID3v2 audio offset ok' );
     is( $info->{audio_size}, 2602, 'ID3v2 audio_size ok' );
     is( $info->{audio_md5}, 'f84210edefebcd92792fd1b3d21860d5', 'ID3v2 audio_md5 ok' );
-    is( $info->{bitrate}, 149000, 'ID3v2 bitrate ok' );
+    is( $info->{bitrate}, 128000, 'ID3v2 bitrate ok' );
     is( $info->{channels}, 2, 'ID3v2 channels ok' );
     is( $info->{profile}, 'LC', 'ID3v2 profile ok' );
     is( $info->{samplerate}, 44100, 'ID3v2 samplerate ok' );
-    is( $info->{song_length_ms}, 139, 'ID3v2 duration ok' );
+    is( $info->{song_length_ms}, 162, 'ID3v2 duration ok' );
     is( $info->{id3_version}, 'ID3v2.3.0', 'ID3v2 version ok' );
 
     is( $tags->{TPE1}, 'Calibration Level', 'ID3v2 TPE1 ok' );
@@ -83,7 +83,7 @@ use Audio::Scan;
     my $info = $s->{info};
 
     is( $info->{audio_offset}, 638, 'Leading junk offset ok' );
-    is( $info->{bitrate}, 128000, 'Leading junk bitrate ok' );
+    is( $info->{bitrate}, 64000, 'Leading junk bitrate ok' );
     is( $info->{channels}, 2, 'Leading junk channels ok' );
     is( $info->{profile}, 'LC', 'Leading junk profile ok' );
     is( $info->{samplerate}, 44100, 'Leading junk samplerate ok' );
@@ -97,10 +97,24 @@ use Audio::Scan;
     my $info = $s->{info};
 
     is( $info->{audio_offset}, 26, 'Truncated offset ok' );
-    is( $info->{bitrate}, 52000, 'Truncated bitrate ok' );
+    is( $info->{bitrate}, 48000, 'Truncated bitrate ok' );
     is( $info->{channels}, 2, 'Truncated channels ok' );
     is( $info->{profile}, 'LC', 'Truncated profile ok' );
     is( $info->{samplerate}, 44100, 'Truncated samplerate ok' );
+}
+
+# Off-by-one frame count bug
+# https://rt.cpan.org/Public/Bug/Display.html?id=124525
+{
+    my $s = Audio::Scan->scan( _f('heaac-3frame.aac') );
+
+    my $info = $s->{info};
+
+    is( $info->{audio_offset}, 0, 'Audio offset ok' );
+    is( $info->{audio_size}, 876, 'Audio size ok' );
+    is( $info->{bitrate}, 55000, 'Bitrate ok' );
+    is( $info->{samplerate}, 48000, 'Samplerate ok' );
+    is( $info->{song_length_ms}, 128, 'Duration ok' );
 }
 
 sub _f {

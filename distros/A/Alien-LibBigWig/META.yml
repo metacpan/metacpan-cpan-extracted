@@ -19,10 +19,10 @@ name: Alien-LibBigWig
 provides:
   Alien::LibBigWig:
     file: lib/Alien/LibBigWig.pm
-    version: v0.3.3
+    version: v0.4.2
 requires:
   Alien::Base: '0'
   File::ShareDir: '1.00'
   perl: v5.8.1
-version: v0.3.3
+version: v0.4.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

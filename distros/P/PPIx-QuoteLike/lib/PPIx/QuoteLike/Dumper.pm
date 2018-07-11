@@ -9,9 +9,12 @@ use Carp;
 use PPI::Document;
 use PPI::Dumper;
 use PPIx::QuoteLike;
+use PPIx::QuoteLike::Constant qw{ @CARP_NOT };
 use Scalar::Util ();
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
+
+use constant SCALAR_REF	=> ref \0;
 
 {
     my $default = {
@@ -256,7 +259,7 @@ sub _source_to_dumpers {
 		and return $class->new( $path, %arg );
 	}
     } elsif ( my $ref = ref $path ) {
-	'SCALAR' eq $ref
+	SCALAR_REF eq $ref
 	    or return;
 	return $class->_doc_to_dumper( $path, %arg );
     } else {
@@ -479,7 +482,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Thomas R. Wyant, III
+Copyright (C) 2016-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

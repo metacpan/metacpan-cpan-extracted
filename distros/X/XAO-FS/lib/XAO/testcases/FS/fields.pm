@@ -439,6 +439,272 @@ sub test_real {
         "Expected zero value to be a logical false, got '$got'");
 }
 
+sub test_defaults {
+    my $self=shift;
+
+    my $odb=$self->get_odb();
+
+    my $list=$odb->fetch('/Customers');
+
+    my %tests=(
+        t001 => {
+            field   => {
+                type        => 'text',
+                maxlength   => 20,
+            },
+            expect  => '',
+            vlist   => [
+                ''      => '',
+                'aaa'   => 'aaa',
+                '0.0'   => '0.0',
+                '0000'  => '0000',
+            ],
+        },
+        t100 => {
+            field   => {
+                type        => 'integer',
+                default     => 'foo',
+            },
+            expect_error => 1,
+        },
+        t101 => {
+            field   => {
+                type        => 'integer',
+            },
+            expect  => 0,
+            vlist   => [
+                0       => 0,
+                1       => 1,
+                -99     => -99,
+                ''      => 0,
+                '00'    => 0,
+                -0      => 0,
+                -007    => -7,
+                1.4     => 1,
+                1.5     => 1,
+                '1.50'  => 1,
+                1.99    => 1,
+                -1.99   => -1,
+                -77.7   => -77,
+            ],
+        },
+        t102 => {
+            field   => {
+                type        => 'integer',
+                default     => 7,
+            },
+            expect  => 7,
+        },
+        t103 => {
+            field   => {
+                type        => 'integer',
+                minvalue    => 7,
+            },
+            expect  => 7,
+        },
+        t104 => {
+            field   => {
+                type        => 'integer',
+                maxvalue    => 777,
+            },
+            expect  => 0,
+        },
+        t105 => {
+            field   => {
+                type        => 'integer',
+                maxvalue    => -777,
+            },
+            expect  => -777,
+        },
+        t106 => {
+            field   => {
+                type        => 'integer',
+                minvalue    => -999,
+                maxvalue    => -777,
+            },
+            expect  => -999,
+        },
+        t107 => {
+            field   => {
+                type        => 'integer',
+                minvalue    => 999,
+                maxvalue    => -777,
+            },
+            expect_error => 1,
+        },
+        t108 => {
+            field   => {
+                type        => 'integer',
+                minvalue    => 111,
+                maxvalue    => 333,
+                default     => 222,
+            },
+            expect => 222,
+        },
+        t109 => {
+            field   => {
+                type        => 'integer',
+                minvalue    => 111,
+                maxvalue    => 333,
+                default     => 444,
+            },
+            expect_error => 1,
+        },
+        #
+        t200 => {
+            field   => {
+                type        => 'real',
+                default     => 'foo',
+            },
+            expect_error => 1,
+        },
+        t201 => {
+            field   => {
+                type        => 'real',
+            },
+            expect  => 0,
+            vlist   => [
+                0       => 0,
+                1       => 1,
+                -99     => -99,
+                ''      => 0,
+                '00'    => 0,
+                -0      => 0,
+                -007    => -7,
+                1.4     => 1.4,
+                1.5     => 1.5,
+                '1.50'  => 1.5,
+                1.99    => 1.99,
+                -1.99   => -1.99,
+                -77.7   => -77.7,
+            ],
+        },
+        t202 => {
+            field   => {
+                type        => 'real',
+                scale       => 2,
+            },
+            expect  => 0,
+            vlist   => [
+                1       => '1.00',
+                -99     => '-99.00',
+                -007    => '-7.00',
+                1.4     => '1.40',
+                1.5     => '1.50',
+                '1.50'  => '1.50',
+                1.99    => '1.99',
+                -1.99   => '-1.99',
+                -77.7   => '-77.70',
+                '.123'  => '0.12',
+                '-1.456'=> '-1.46',
+            ],
+        },
+        t203 => {
+            field   => {
+                type        => 'real',
+                default     => 1.234,
+            },
+            expect => 1.234,
+        },
+        t204 => {
+            field   => {
+                type        => 'real',
+                minvalue    => -10,
+            },
+            expect => 0,
+        },
+        t205 => {
+            field   => {
+                type        => 'real',
+                minvalue    => 10,
+            },
+            expect => 10,
+        },
+    );
+
+    foreach my $tname (keys %tests) {
+        my $tdata=$tests{$tname};
+
+        my $fdesc=$tdata->{'field'};
+        $fdesc->{'name'}||=$tname;
+        my $name=$fdesc->{'name'};
+
+        if($tdata->{'expect_error'}) {
+            my $errored;
+            try {
+                $list->get_new->add_placeholder($fdesc);
+            }
+            otherwise {
+                dprint "Expected error: ".shift;
+                $errored=1;
+            };
+            $self->assert($errored,
+                "Expected $tname to error, but passed successfully");
+            next;
+        }
+        else {
+            $list->get_new->add_placeholder($fdesc);
+        }
+
+        # Unattached object
+        #
+        my $expect=$tdata->{'expect'};
+        my $nobj=$list->get_new;
+        my $got=$nobj->get($name);
+        $self->assert($got eq $expect,
+            "Expected $name to be $expect, got ".($got//'<undef>')." for $tname (unattached-1, initial)");
+
+        # Storing as is, without modification or values
+        #
+        my $id=$list->put($nobj);
+
+        $got=$nobj->get($name);
+        $self->assert($got eq $expect,
+            "Expected $name to be $expect, got ".($got//'<undef>')." for $tname (unattached-2, initial)");
+
+        $got=$list->get($id)->get($name);
+        $self->assert($got eq $expect,
+            "Expected $name to be $expect, got ".($got//'<undef>')." for $tname (stored, initial)");
+
+        $list->delete($id);
+
+        # Storing values, validating them as received.
+        #
+        my $vlist=$tdata->{'vlist'} || [];
+        for(my $i=0; $i<scalar @$vlist; $i+=2) {
+            my $v=$vlist->[$i];
+            $expect=$vlist->[$i+1];
+
+            $nobj=$list->get_new;
+            $nobj->put($name => $v);
+
+            $got=$nobj->get($name);
+            $self->assert($got eq $expect,
+                "Expected $name to be '$expect', got '".($got//'<undef>')."' after putting '$v' for $tname (unattached-1, vlist)");
+
+            $id=$list->put($nobj);
+
+            $got=$nobj->get($name);
+            $self->assert($got eq $expect,
+                "Expected $name to be '$expect', got '".($got//'<undef>')."' after putting '$v' for $tname (unattached-2, vlist)");
+
+            $got=$list->get($id)->get($name);
+            $self->assert($got eq $expect,
+                "Expected $name to be '$expect', got '".($got//'<undef>')."' after putting '$v' for $tname (stored-1, vlist)");
+
+            $list->delete($id);
+            $id=$list->put($list->get_new);
+            $list->get($id)->put($name => $v);
+
+            $got=$list->get($id)->get($name);
+            $self->assert($got eq $expect,
+                "Expected $name to be '$expect', got '".($got//'<undef>')."' after putting '$v' for $tname (stored-2, vlist)");
+        }
+
+        $list->get_new->drop_placeholder($name);
+    }
+}
+
 sub test_unique {
     my $self=shift;
     my $odb=$self->get_odb();

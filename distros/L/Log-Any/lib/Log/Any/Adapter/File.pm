@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Adapter::File;
 
 # ABSTRACT: Simple adapter for logging to files
-our $VERSION = '1.705';
+our $VERSION = '1.706';
 
 use Config;
 use Fcntl qw/:flock/;
@@ -27,13 +27,13 @@ sub init {
     my $self = shift;
     if ( exists $self->{log_level} && $self->{log_level} =~ /\D/ ) {
         my $numeric_level = Log::Any::Adapter::Util::numeric_level( $self->{log_level} );
-        if ( !$numeric_level ) {
+        if ( !defined($numeric_level) ) {
             require Carp;
             Carp::carp( sprintf 'Invalid log level "%s". Defaulting to "%s"', $self->{log_level}, 'trace' );
         }
         $self->{log_level} = $numeric_level;
     }
-    if ( !$self->{log_level} ) {
+    if ( !defined $self->{log_level} ) {
         $self->{log_level} = $trace_level;
     }
     my $file = $self->{file};
@@ -80,7 +80,7 @@ Log::Any::Adapter::File - Simple adapter for logging to files
 
 =head1 VERSION
 
-version 1.705
+version 1.706
 
 =head1 SYNOPSIS
 

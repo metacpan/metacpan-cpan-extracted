@@ -2,7 +2,7 @@ package Test::Elasticsearch::Model::Role::Metaclass;
 
 use Test::Class::Most parent => 'Test';
 use Test::Moose;
-use Data::Printer;
+
 
 sub basics : Tests(no_plan) {
     my $self       = shift;

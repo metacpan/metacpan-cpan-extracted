@@ -1,5 +1,9 @@
 Revision history for perl distribution DBIx-TempDB
 
+0.15 2018-07-08T18:57:16+0800
+ - Guarantee that database names are lower case #9
+   Contributor: Christopher Eveland <chris@eyeson.ai>
+
 0.14 2016-10-25T22:48:20+0200
  - Removed EXPERIMENTAL notice
 

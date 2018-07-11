@@ -30,7 +30,9 @@ post '/pets' => sub {
 
 plugin OpenAPI => {url => 'data://main/test.json'};
 
-is(OpenAPI::Client->new('data://main/test.json')->base_url, 'http://api.example.com/v1', 'base_url');
+is(OpenAPI::Client->new('data://main/test.json')->base_url,       'http://api.example.com:3000/v1', 'base_url');
+is(OpenAPI::Client->new('data://main/test.json')->base_url->host, 'api.example.com',                'base_url host');
+is(OpenAPI::Client->new('data://main/test.json')->base_url->port, '3000',                           'base_url port');
 
 my $client = OpenAPI::Client->new('data://main/test.json', app => app);
 my ($obj, $tx);
@@ -86,7 +88,7 @@ __DATA__
   "swagger": "2.0",
   "info": { "version": "0.8", "title": "Test client spec" },
   "schemes": [ "http" ],
-  "host": "api.example.com",
+  "host": "api.example.com:3000",
   "basePath": "/v1",
   "paths": {
     "x-whatever": [],

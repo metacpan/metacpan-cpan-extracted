@@ -13,7 +13,7 @@ use File::chdir;
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Alien::Build plugin to fetch from git
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub init
@@ -36,7 +36,14 @@ sub init
       else
       {
         my $tmp = URI::file->new_abs(".");
-        $tmp->host('localhost');
+        if($^O eq 'MSWin32')
+        {
+          $tmp->host('');
+        }
+        else
+        {
+          $tmp->host('localhost');
+        }
         if($url =~ s/#(.*)$//)
         {
           $tmp->fragment($1);
@@ -144,7 +151,7 @@ Alien::Build::Plugin::Fetch::Git - Alien::Build plugin to fetch from git
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

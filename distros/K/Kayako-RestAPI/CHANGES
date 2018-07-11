@@ -1,0 +1,41 @@
+==================================================
+Changes from 2017-07-08 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.04 at 2018-07-08 19:05:50 +0000
+-----------------------------------------
+
+  Change: 9027ecab2820010c5e81d7cea00ff1521f7d206b
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-08 22:05:22 +0000
+
+    Fixed pod 
+
+  Change: eeac0b436e64a4765142c63b00a87283b5a5a70d
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-08 14:16:26 +0000
+
+    Added test for filter_fields and fixed pod 
+
+  Change: ceb8080fe4931461bf7c31c90241e485620718f0
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-08 14:00:16 +0000
+
+    Added test for Kayako::RestAPI::_prepare_request 
+
+  Change: ae7aa8f7281cc5c5c4f9eca48ab409d765523629
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-08 13:44:28 +0000
+
+    Added some pod 
+
+  Change: 98e616f00c23bd047ea9435ca78d783baefb1e7b
+  Author: Pavel Serikov <pavel@serikov.xyz>
+  Date : 2016-11-16 22:37:05 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

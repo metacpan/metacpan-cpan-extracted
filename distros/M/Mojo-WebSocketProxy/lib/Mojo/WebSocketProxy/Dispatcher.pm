@@ -6,26 +6,25 @@ use warnings;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::WebSocketProxy::Parser;
 use Mojo::WebSocketProxy::Config;
-use Mojo::WebSocketProxy::CallingEngine;
 
 use Class::Method::Modifiers;
 
-use Mojo::JSON qw(encode_json);
-use Future::Utils qw/fmap/;
+use JSON::MaybeUTF8 qw(encode_json_utf8);
+use Unicode::Normalize ();
+use Future::Mojo 0.004;    # ->new_timeout
+use Future::Utils qw(fmap);
 use Scalar::Util qw(blessed);
-use Variable::Disposition qw(dispose retain retain_future);
 
 use constant TIMEOUT => $ENV{MOJO_WEBSOCKETPROXY_TIMEOUT} || 15;
 
-our $VERSION = '0.06';    ## VERSION
-
+our $VERSION = '0.08';     ## VERSION
 around 'send' => sub {
     my ($orig, $c, $api_response, $req_storage) = @_;
 
     my $config = $c->wsp_config->{config};
 
     my $max_response_size = $config->{max_response_size};
-    if ($max_response_size && length(JSON::to_json($api_response)) > $max_response_size) {
+    if ($max_response_size && length(encode_json_utf8($api_response)) > $max_response_size) {
         $api_response->{json} = $c->wsp_error('error', 'ResponseTooLarge', 'Response too large.');
     }
 
@@ -49,7 +48,7 @@ sub open_connection {
     my ($c) = @_;
 
     my $log = $c->app->log;
-    $log->debug("opening a websocket for " . $c->tx->remote_address);
+    $log->debug("accepting a websocket connection from " . $c->tx->remote_address);
 
     # Enable permessage-deflate
     $c->tx->with_compression;
@@ -61,7 +60,21 @@ sub open_connection {
 
     $config->{opened_connection}->($c) if $config->{opened_connection};
 
-    $c->on(json => \&on_message);
+    $c->on(
+        message => sub {
+            my ($c, $msg) = @_;
+            # Incoming data will be JSON-formatted text, as a Unicode string.
+            # We normalize the entire string before decoding.
+            my $args = Mojo::JSON::decode_json(Unicode::Normalize::NFC($msg));
+            on_message($c, $args);
+        });
+
+    $c->on(
+        binary => sub {
+            my ($d, $bytes) = @_;
+            $config->{binary_frame}(@_) if $bytes and exists($config->{binary_frame});
+        });
+
     $c->on(finish => $config->{finish_connection}) if $config->{finish_connection};
 
     return;
@@ -75,67 +88,51 @@ sub on_message {
     my $req_storage = {};
     $req_storage->{args} = $args;
 
-    my $result = Mojo::WebSocketProxy::Parser::parse_req($c, $req_storage);
+    # We still want to run any hooks even for invalid requests.
+    if (my $err = Mojo::WebSocketProxy::Parser::parse_req($c, $req_storage)) {
+        $c->send({json => $err}, $req_storage);
+        return $c->_run_hooks($config->{after_dispatch} || [])->retain;
+    }
 
-    my $result_f = $result ? Future->fail($result) : Future->done;
+    my $action = $c->dispatch($args) or do {
+        my $err = $c->wsp_error('error', UnrecognisedRequest => 'Unrecognised request');
+        $c->send({json => $err}, $req_storage);
+        return $c->_run_hooks($config->{after_dispatch} || [])->retain;
+    };
+
+    @{$req_storage}{keys %$action} = (values %$action);
+    $req_storage->{method} = $req_storage->{name};
 
     # main processing pipeline
-    my $f = $result_f->then(
-        sub {
-            my $action = $c->dispatch($args);
-            Future->fail($result = $c->wsp_error('error', 'UnrecognisedRequest', 'Unrecognised request'))
-                unless $action;
-            Future->done($action);
+    my $f = $c->before_forward($req_storage)->transform(
+        done => sub {
+            # Note that we completely ignore the return value of ->before_forward here.
+            return $req_storage->{instead_of_forward}->($c, $req_storage) if $req_storage->{instead_of_forward};
+            return $c->forward($req_storage);
         }
-        )->then(
+    )->then(
         sub {
-            my $action = shift;
-
-            %$req_storage = (%$req_storage, %$action);
-            $req_storage->{method} = $req_storage->{name};
-
-            my $f = $c->before_forward($req_storage)->then(
-                sub {
-                    my $next =
-                        $req_storage->{instead_of_forward}
-                        ? sub { $req_storage->{instead_of_forward}->($c, $req_storage) }
-                        : sub { $c->forward($req_storage) };
-                    Future->done($next->());
-                }
-                )->else(
-                sub {
-                    $result = shift;
-                    Future->fail;
-                });
-        }
-        )->then(
+            my $result = shift;
+            return $c->after_forward($result, $req_storage)->transform(done => sub { $result });
+        },
         sub {
-            $result = shift;
-            $c->after_forward($result, $req_storage)->then(
-                sub {
-                    Future->done;
-                });
+            my $result = shift;
+            Future->done($result);
         });
 
-    # timeout guard
-    my $timer_id = Mojo::IOLoop->timer(
-        TIMEOUT,
-        sub {
-            $c->app->log->warn("$0 ($$) timeout, args: " . encode_json($args));
-            $result = $c->wsp_error('error', 'Timeout', 'Timeout');
-            $f->fail($result);
-        });
-
-    # post-process pipeline, always response
-    retain_future(
-        $f->followed_by(
+    return Future->wait_any(
+        Future::Mojo->new_timeout(TIMEOUT)->else(
             sub {
-                Mojo::IOLoop->remove($timer_id);
-                $c->send({json => $result}, $req_storage) if $result;
-                return $c->_run_hooks($config->{after_dispatch} || []);
-            }));
-
-    return;
+                return Future->done($c->wsp_error('error', Timeout => 'Timeout'));
+            }
+        ),
+        $f
+    )->then(
+        sub {
+            my ($result) = @_;
+            $c->send({json => $result}, $req_storage) if $result;
+            return $c->_run_hooks($config->{after_dispatch} || []);
+        })->retain;
 }
 
 sub before_forward {
@@ -143,11 +140,15 @@ sub before_forward {
 
     my $config = $c->wsp_config->{config};
 
-    # Should first call global hooks
-    my $before_forward_hooks = [
-        ref($config->{before_forward}) eq 'ARRAY'      ? @{$config->{before_forward}}             : $config->{before_forward},
-        ref($req_storage->{before_forward}) eq 'ARRAY' ? @{delete $req_storage->{before_forward}} : delete $req_storage->{before_forward},
-    ];
+    my $before_forward_hooks = [];
+
+    # Global hooks are always first
+    for ($config, $req_storage) {
+        push @$before_forward_hooks, ref($_->{before_forward}) eq 'ARRAY' ? @{$_->{before_forward}} : $_->{before_forward};
+    }
+
+    # We always want to clear these after every request.
+    delete $req_storage->{before_forward};
 
     return $c->_run_hooks($before_forward_hooks, $req_storage);
 }
@@ -166,10 +167,9 @@ sub _run_hooks {
 
     my $result_f = fmap {
         my $hook = shift;
-        my $result = $hook->($c, @hook_params);
-        !$result ? Future->done()
-            : (blessed($result) && $result->isa('Future')) ? $result
-            :                                                Future->fail($result);
+        my $result = $hook->($c, @hook_params) or return Future->done;
+        return $result if blessed($result) && $result->isa('Future');
+        return Future->fail($result);
     }
     foreach        => [grep { defined } @$hooks],
         concurrent => 1;
@@ -195,9 +195,6 @@ sub forward {
 
     my $config = $c->wsp_config->{config};
 
-    $req_storage->{url} ||= $config->{url};
-    die 'No url found' unless $req_storage->{url};
-
     for my $hook (qw/ before_call before_get_rpc_response after_got_rpc_response /) {
         $req_storage->{$hook} = [
             grep { $_ } (ref $config->{$hook} eq 'ARRAY'      ? @{$config->{$hook}}      : $config->{$hook}),
@@ -205,7 +202,12 @@ sub forward {
         ];
     }
 
-    Mojo::WebSocketProxy::CallingEngine::call_rpc($c, $req_storage);
+    my $backend_name = $req_storage->{backend} // "default";
+    my $backend      = $c->wsp_config->{backends}{$backend_name}
+        or die "Cannot dispatch request - no backend named '$backend_name'";
+
+    $backend->call_rpc($c, $req_storage);
+
     return;
 }
 
@@ -226,14 +228,18 @@ See L<Mojo::WebSocketProxy> for details on how to use hooks and parameters.
 
 =head2 open_connection
 
-Run while openning new wss connection.
+Run while opening new wss connection.
 Run hook when connection is opened.
 Set finish connection callback.
 
 =head2 on_message
 
 Handle message - parse and dispatch request messages.
-Dispatching action and forward to RPC server.
+Dispatching action and forward to RPC server. Note that all
+incoming JSON messages are first normalised using
+L<NFC|https://www.w3.org/International/articles/unicode-migration/#normalization>.
+ 
+
 
 =head2 before_forward
 
@@ -259,7 +265,7 @@ Or if there is instead_of_forward action.
 
 L<Mojolicious::Plugin::WebSocketProxy>,
 L<Mojo::WebSocketProxy>,
-L<Mojo::WebSocketProxy::CallingEngine>,
+L<Mojo::WebSocketProxy::Backend>,
 L<Mojo::WebSocketProxy::Dispatcher>,
 L<Mojo::WebSocketProxy::Config>
 L<Mojo::WebSocketProxy::Parser>

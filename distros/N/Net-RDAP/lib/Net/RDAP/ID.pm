@@ -12,8 +12,13 @@ response.
 RDAP objects may have zero or more "public identifiers", which map a
 public identifier to an object class.
 
-L<Net::RDAP::ID> represents these IDs. Each object has the following
-methods:
+Any object which inherits from L<Net::RDAP::Object> will have an
+C<ids()> method which will return an array of zero or more
+L<Net::RDAP::ID> objects.
+
+=head1 METHODS
+
+=head2 ID Type
 
 	$type = $id->type;
 
@@ -24,6 +29,8 @@ Returns a string containing the type of public identifier.
 sub type { $_[0]->{'type'} }
 
 =pod
+
+=head2 Identifier
 
 	$identifier = $id->identifier;
 

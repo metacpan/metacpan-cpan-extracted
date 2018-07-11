@@ -1,10 +1,10 @@
 {
    "abstract" : "Base support modules for the XAO Suite",
    "author" : [
-      "Andrew Maltsev, http://ejelta.com/xao/"
+      "Andrew Maltsev, https://ejelta.com/xao/"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -22,7 +22,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Harness" : "3.35",
+            "Test::Unit::Lite" : "0.1202"
          }
       },
       "configure" : {
@@ -32,15 +34,17 @@
       },
       "runtime" : {
          "requires" : {
-            "Clone" : "0.34",
-            "Error" : "0.13",
-            "Storable" : "2.39",
-            "Test::Unit" : "0.14",
-            "perl" : "5.010000"
+            "Clone" : "0.39",
+            "Digest::SHA" : "5.47",
+            "Encode" : "2.42",
+            "Error" : "0.17",
+            "File::Path" : "2.09",
+            "JSON" : "2.94",
+            "Storable" : "2.53",
+            "perl" : "5.010001"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 1.16,
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.21"
 }

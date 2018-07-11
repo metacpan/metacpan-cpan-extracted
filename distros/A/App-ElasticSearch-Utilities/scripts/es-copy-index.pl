@@ -22,13 +22,13 @@ use Time::HiRes qw(time);
 my %OPT;
 GetOptions(\%OPT, qw(
     from=s
-    to:s
+    to=s
     source=s
-    destination:s
+    destination=s
     append|A
-    block:i
-    mapping:s
-    settings:s
+    block=i
+    mapping=s
+    settings=s
     help|h
     manual|m
 ));
@@ -228,7 +228,7 @@ es-copy-index.pl - Copy an index from one cluster to another
 
 =head1 VERSION
 
-version 5.6
+version 5.7
 
 =head1 SYNOPSIS
 
@@ -411,6 +411,31 @@ The following barewords are transformed:
 If a field is an IP address uses CIDR Notation, it's expanded to a range query.
 
     src_ip:10.0/8 => src_ip:[10.0.0.0 TO 10.255.255.255]
+
+=head2 App::ElasticSearch::Utilities::Range
+
+This plugin translates some special comparison operators so you don't need to
+remember them anymore.
+
+Example:
+
+    price:<100
+
+Will translate into a:
+
+    { range: { price: { lt: 100 } } }
+
+And:
+
+    price:>50,<100
+
+Will translate to:
+
+    { range: { price: { gt: 50, lt: 100 } } }
+
+=head3 Supported Operators
+
+B<gt> via E<gt>, B<gte> via E<gt>=, B<lt> via E<lt>, B<lte> via E<lt>=
 
 =head2 App::ElasticSearch::Utilities::Underscored
 

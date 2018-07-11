@@ -61,17 +61,17 @@ and treated as a logical 'or'.
 Comparison operator to be used in matching index to value.
 Supported comparison operators are:
     eq  True if equal.
-    
+
     ge  True if greater or equal.
-    
+
     gt  True if greater.
-    
+
     le  True if less or equal.
-    
+
     lt  True if less.
 
     ne  True if not equal.
-    
+
     gtlt True if greater than             'a' and less than 'b'
 
     gtle True if greater than             'a' and less than or equal to 'b'
@@ -79,9 +79,9 @@ Supported comparison operators are:
     gelt True if greater than or equal to 'a' and less than             'b'
 
     gele True if greater than or equal to 'a' and less than or equal to 'b'
-    
+
     wq  (word equal) True if contains given word completely.
-    
+
     ws  (word start) True if contains word that starts with the given string.
 
     cs  (contains string) True if contains string.
@@ -184,8 +184,7 @@ use XAO::Errors qw(XAO::DO::Web::FS);
 use XAO::Objects;
 use base XAO::Objects->load(objname => 'Web::Action');
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: FS.pm,v 2.4 2008/03/15 02:59:06 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION='2.004';
 
 ###############################################################################
 
@@ -237,7 +236,7 @@ sub get_object ($%) {
 
     my $uri=$args->{uri};
     if($object && $uri && $uri !~ /^\//) {
-        
+
         ##
         # XXX - This should be done in FS
         #
@@ -616,7 +615,7 @@ sub search ($;%) {
         );
     }
     else {
-        
+
         $page->display(merge_refs($args, {
             template        => $args->{'header.template'},
             path            => $args->{'header.path'},
@@ -719,9 +718,11 @@ sub search ($;%) {
             TOTAL_ITEMS     => $total,
             LIMIT_REACHED   => $limit_reached,
         })) if $args->{'footer.path'} || $args->{'footer.template'};
-    }   
+    }
 }
+
 ###############################################################################
+
 sub _create_query {
 
     my $self=shift;

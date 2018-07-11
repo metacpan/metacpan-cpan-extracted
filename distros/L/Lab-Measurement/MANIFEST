@@ -256,6 +256,8 @@ lib/Lab/SCPI.pm
 lib/Lab/XPRESS/Data/XPRESS_DataFile.pm
 lib/Lab/XPRESS/Data/XPRESS_logger.pm
 lib/Lab/XPRESS/Data/XPRESS_plotter.pm
+lib/Lab/XPRESS/Examples/Example1_Simple_IV.pod
+lib/Lab/XPRESS/Examples/Example2_Gate_IV_scan.pod
 lib/Lab/XPRESS/Examples/Example3_2samples_2files.pod
 lib/Lab/XPRESS/Examples/Example4_3d_scan.pod
 lib/Lab/XPRESS/Sweep.pm

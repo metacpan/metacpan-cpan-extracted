@@ -31,7 +31,9 @@ check_custom_installation();
 install_script('grepmail');
 
 configure_requires(
-  'File::Slurp' => 0,
+  'File::Slurper' => 0,
+  # Module::Install::Bugtracker needs this
+  'URI::Escape' => 0,
 );
 
 requires(
@@ -46,7 +48,7 @@ requires(
 test_requires(
   'Test::Compile' => 0,
   'Test::More' => 0,
-  'File::Slurp' => 0,
+  'File::Slurper' => 0,
 );
 
 check_optional('Digest::MD5' => 0, "Digest::MD5 reduces memory consumption for the -u (unique) option\n");
@@ -57,7 +59,7 @@ check_optional('Benchmark::Timer' => 0, "Benchmark::Timer is required for speed 
 
 Add_Test_Target('testspeed', 't/speed.pl');
 
-license 'gpl2';
+license 'gpl';
 auto_license(holder => 'David Coppit');
 
 no_index 'directory' => 'private-lib';
@@ -65,6 +67,32 @@ no_index 'directory' => 'private-lib';
 enable_verbose_cpan_testing();
 
 WriteAll();
+
+# ---- Workaround for broken module ----
+# https://rt.cpan.org/Ticket/Display.html?id=125772
+{
+  package Module::Install::StandardTests;
+
+  sub write_standard_test_compile {
+      my $self = shift;
+      $self->write_test_file('000_standard__compile.t', q/
+          BEGIN {
+            if ($^O eq 'MSWin32') {
+              require Test::More;
+              Test::More->import(skip_all =>
+                  "Test::Compile doesn't work properly on Windows");
+            } else {
+              require Test::More;
+              Test::More->import();
+              eval "use Test::Compile";
+              Test::More->builder->BAIL_OUT(
+                  "Test::Compile required for testing compilation") if $@;
+              all_pm_files_ok();
+            }
+          }
+      /);
+  }
+}
 
 use_standard_tests;
 

@@ -17,17 +17,17 @@ $VERSION = 0.01;
     'date' => '/usr/local/opt/coreutils/libexec/gnubin/date',
     'dirname' => '/usr/local/opt/coreutils/libexec/gnubin/dirname',
     'expr' => '/usr/local/opt/coreutils/libexec/gnubin/expr',
-    'find' => '/usr/bin/find',
+    'find' => '/usr/local/bin/find',
     'grep' => '/usr/bin/grep',
     'ln' => '/usr/local/opt/coreutils/libexec/gnubin/ln',
     'make' => '/usr/bin/make',
     'mkdir' => '/usr/local/opt/coreutils/libexec/gnubin/mkdir',
     'mv' => '/usr/local/opt/coreutils/libexec/gnubin/mv',
-    'perl' => '/usr/bin/perl',
+    'perl' => '/Users/coppit/perl5/perlbrew/perls/perl-5.8.8/bin/perl',
     'rm' => '/usr/local/opt/coreutils/libexec/gnubin/rm',
     'rsync' => '/usr/local/bin/rsync',
     'ssh' => '/usr/bin/ssh',
-    'yapp' => '/usr/local/bin/yapp',
+    'yapp' => '/Users/coppit/perl5/perlbrew/perls/perl-5.8.8/bin/yapp',
   },
 );
 
@@ -38,3 +38,13 @@ $yagg::Config{'template_path'} =~ s/\/Grammar.pm//;
 $yagg::Config{'template_path'} .= '/input_generator_code';
 
 1;
+
+__END__
+
+# --------------------------------------------------------------------------
+
+=head1 NAME
+
+yagg::Config - An internal configuration class
+
+=cut

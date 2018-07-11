@@ -212,7 +212,7 @@ METHODS
             WHERE event_date >= '2/13/99' AND event_date <= '4/24/03'
 
         The logic can also be changed locally by inserting a modifier in
-        front of an arrayref :
+        front of an arrayref:
 
             @where = (-and => [event_date => {'>=', '2/13/99'},
                                event_date => {'<=', '4/24/03'} ]);
@@ -396,15 +396,13 @@ METHODS
 
   select($source, $fields, $where, $order)
     This returns a SQL SELECT statement and associated list of bind values,
-    as specified by the arguments :
+    as specified by the arguments:
 
     $source
         Specification of the 'FROM' part of the statement. The argument can
         be either a plain scalar (interpreted as a table name, will be
         quoted), or an arrayref (interpreted as a list of table names,
-        joined by commas, quoted), or a scalarref (literal table name, not
-        quoted), or a ref to an arrayref (list of literal table names,
-        joined by commas, not quoted).
+        joined by commas, quoted), or a scalarref (literal SQL, not quoted).
 
     $fields
         Specification of the list of fields to retrieve from the source. The
@@ -707,7 +705,7 @@ WHERE CLAUSES
         status => [ -or => {'=', 'assigned'}, {'=', 'in-progress'}]
         status => [ {'=', 'assigned'}, {'=', 'in-progress'} ]
 
-  Special operators : IN, BETWEEN, etc.
+  Special operators: IN, BETWEEN, etc.
     You can also use the hashref format to compare a list of fields using
     the "IN" comparison operator, by specifying the list as an arrayref:
 
@@ -725,8 +723,8 @@ WHERE CLAUSES
     same way.
 
     If the argument to "-in" is an empty array, 'sqlfalse' is generated (by
-    default : "1=0"). Similarly, "-not_in => []" generates 'sqltrue' (by
-    default : "1=1").
+    default: "1=0"). Similarly, "-not_in => []" generates 'sqltrue' (by
+    default: "1=1").
 
     In addition to the array you can supply a chunk of literal sql or
     literal sql with bind:
@@ -788,7 +786,7 @@ WHERE CLAUSES
         @bind = (1, 2, 1, 2, 'stuff');
 
     These are the two builtin "special operators"; but the list can be
-    expanded : see section "SPECIAL OPERATORS" below.
+    expanded: see section "SPECIAL OPERATORS" below.
 
   Unary operators: bool
     If you wish to test against boolean columns or functions within your
@@ -848,7 +846,7 @@ WHERE CLAUSES
         @bind = ('nwiger', 'pending', 'dispatched', 'robot', 'unassigned');
 
     Clauses in hashrefs or arrayrefs can be prefixed with an "-and" or "-or"
-    to change the logic inside :
+    to change the logic inside:
 
         my @where = (
              -and => [
@@ -871,7 +869,7 @@ WHERE CLAUSES
     "Important note": when connecting several conditions, the "-and-"|"-or"
     operator goes "outside" of the nested structure; whereas when connecting
     several constraints on one column, the "-and" operator goes "inside" the
-    arrayref. Here is an example combining both features :
+    arrayref. Here is an example combining both features:
 
        my @where = (
          -and => [a => 1, b => 2],
@@ -886,20 +884,20 @@ WHERE CLAUSES
                 OR ( e LIKE ? AND e LIKE ? ) ) )
 
     This difference in syntax is unfortunate but must be preserved for
-    historical reasons. So be careful : the two examples below would seem
+    historical reasons. So be careful: the two examples below would seem
     algebraically equivalent, but they are not
 
       { col => [ -and =>
         { -like => 'foo%' },
         { -like => '%bar' },
       ] }
-      # yields : WHERE ( ( col LIKE ? AND col LIKE ? ) )
+      # yields: WHERE ( ( col LIKE ? AND col LIKE ? ) )
 
       [ -and =>
         { col => { -like => 'foo%' } },
         { col => { -like => '%bar' } },
       ]
-      # yields : WHERE ( ( col LIKE ? OR col LIKE ? ) )
+      # yields: WHERE ( ( col LIKE ? OR col LIKE ? ) )
 
   Literal SQL and value type operators
     The basic premise of SQL::Abstract is that in WHERE specifications the
@@ -1006,7 +1004,7 @@ WHERE CLAUSES
         )
 
     Literal SQL is especially useful for nesting parenthesized clauses in
-    the main SQL query. Here is a first example :
+    the main SQL query. Here is a first example:
 
       my ($sub_stmt, @sub_bind) = ("SELECT c1 FROM t1 WHERE c2 < ? AND c3 LIKE ?",
                                    100, "foo%");
@@ -1015,7 +1013,7 @@ WHERE CLAUSES
         bar => \["IN ($sub_stmt)" => @sub_bind],
       );
 
-    This yields :
+    This yields:
 
       $stmt = "WHERE (foo = ? AND bar IN (SELECT c1 FROM t1
                                                  WHERE c2 < ? AND c3 LIKE ?))";
@@ -1035,7 +1033,7 @@ WHERE CLAUSES
 
     In the examples above, the subquery was used as an operator on a column;
     but the same principle also applies for a clause within the main %where
-    hash, like an EXISTS subquery :
+    hash, like an EXISTS subquery:
 
       my ($sub_stmt, @sub_bind)
          = $sql->select("t1", "*", {c1 => 1, c2 => \"> t0.c0"});
@@ -1051,7 +1049,7 @@ WHERE CLAUSES
       @bind = (1234, 1);
 
     Observe that the condition on "c2" in the subquery refers to column
-    "t0.c0" of the main query : this is *not* a bind value, so we have to
+    "t0.c0" of the main query: this is *not* a bind value, so we have to
     express it through a scalar ref. Writing "c2 => {">" => "t0.c0"}" would
     have generated "c2 > ?" with bind value "t0.c0" ... not exactly what we
     wanted here.
@@ -1171,7 +1169,7 @@ SPECIAL OPERATORS
        ]);
 
     A "special operator" is a SQL syntactic clause that can be applied to a
-    field, instead of a usual binary operator. For example :
+    field, instead of a usual binary operator. For example:
 
        WHERE field IN (?, ?, ?)
        WHERE field BETWEEN ? AND ?
@@ -1363,7 +1361,7 @@ CHANGES
     that was relying on some dark areas of "SQL::Abstract" v1.* might behave
     differently in v1.50.
 
-    The main changes are :
+    The main changes are:
 
     *   support for literal SQL through the "\ [ $sql, @bind ]" syntax.
 
@@ -1375,7 +1373,7 @@ CHANGES
 
     *   optional support for array datatypes
 
-    *   defensive programming : check arguments
+    *   defensive programming: check arguments
 
     *   fixed bug with global logic, which was previously implemented
         through global variables yielding side-effects. Prior versions would

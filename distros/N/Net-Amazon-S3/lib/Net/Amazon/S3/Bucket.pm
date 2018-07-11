@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Bucket;
-$Net::Amazon::S3::Bucket::VERSION = '0.80';
+$Net::Amazon::S3::Bucket::VERSION = '0.82';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Carp;
@@ -9,6 +9,12 @@ use IO::File 1.14;
 has 'account' => ( is => 'ro', isa => 'Net::Amazon::S3', required => 1 );
 has 'bucket'  => ( is => 'ro', isa => 'Str',             required => 1 );
 has 'creation_date' => ( is => 'ro', isa => 'Maybe[Str]', required => 0 );
+
+has 'region' => (
+    is => 'ro',
+    lazy => 1,
+    default => sub { $_[0]->_head_region },
+);
 
 __PACKAGE__->meta->make_immutable;
 
@@ -130,6 +136,20 @@ sub head_key {
 }
 
 
+sub query_string_authentication_uri {
+    my ( $self, $key, $expires_at ) = @_;
+
+    my $request = Net::Amazon::S3::Request::GetObject->new(
+        s3     => $self->account,
+        bucket => $self,
+        key    => $key,
+        method => 'GET',
+    );
+
+    return $request->query_string_authentication_uri( $expires_at );
+}
+
+
 sub get_key {
     my ( $self, $key, $method, $filename ) = @_;
     $filename = $$filename if ref $filename;
@@ -177,6 +197,37 @@ sub get_key_filename {
 
 
 # returns bool
+sub delete_multi_object {
+    my $self = shift;
+    my @objects = @_;
+    return unless( scalar(@objects) );
+
+    # Since delete can handle up to 1000 requests, be a little bit nicer
+    # and slice up requests and also allow keys to be strings
+    # rather than only objects.
+    my $last_result;
+    while (scalar(@objects) > 0) {
+        my $http_request = Net::Amazon::S3::Request::DeleteMultiObject->new(
+            s3      => $self->account,
+            bucket  => $self,
+            keys    => [map {
+                if (ref($_)) {
+                    $_->key
+                } else {
+                    $_
+                }
+            } splice @objects, 0, ((scalar(@objects) > 1000) ? 1000 : scalar(@objects))]
+        )->http_request;
+
+        my $xpc = $self->account->_send_request($http_request);
+
+        return undef
+            unless $xpc && !$self->account->_remember_errors($xpc);
+    }
+
+    return 1;
+}
+
 sub delete_key {
     my ( $self, $key ) = @_;
     croak 'must specify key' unless defined $key && length $key;
@@ -285,8 +336,12 @@ sub get_location_constraint {
     return undef unless $xpc && !$self->account->_remember_errors($xpc);
 
     my $lc = $xpc->findvalue("//s3:LocationConstraint");
+
+    # S3 documentation: https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGETlocation.html
+    # When the bucket's region is US East (N. Virginia),
+    # Amazon S3 returns an empty string for the bucket's region
     if ( defined $lc && $lc eq '' ) {
-        $lc = undef;
+        $lc = 'us-east-1';
     }
     return $lc;
 }
@@ -341,6 +396,31 @@ sub _content_sub {
     };
 }
 
+sub _head_region {
+    my ($self) = @_;
+
+    my $protocol = $self->account->secure ? 'https' : 'http';
+    my $host = $self->account->host;
+    my $path = $self->bucket;
+
+    if ($self->account->use_virtual_host) {
+        $host = "$path.$host";
+        $path = '';
+    }
+
+    my $request = HTTP::Request->new( HEAD => "${protocol}://${host}/$path" );
+
+    # Disable redirects
+    my $requests_redirectable = $self->account->ua->requests_redirectable;
+    $self->account->ua->requests_redirectable( [] );
+
+    my $response = $self->account->_do_http( $request );
+
+    $self->account->ua->requests_redirectable( $requests_redirectable );
+
+    return $response->header( 'x-amz-bucket-region' );
+}
+
 1;
 
 __END__
@@ -355,7 +435,7 @@ Net::Amazon::S3::Bucket - convenience object for working with Amazon S3 buckets
 
 =head1 VERSION
 
-version 0.80
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -499,6 +579,11 @@ The new configuration hash to use
 
 Takes the name of a key in this bucket and returns its configuration hash
 
+=head2 query_string_authentication_uri KEY, EXPIRES_AT
+
+Takes key and expiration time (epoch time) and returns uri signed
+with query parameter
+
 =head2 get_key $key_name [$method]
 
 Takes a key name and an optional HTTP method (which defaults to C<GET>.
@@ -628,11 +713,11 @@ L<Net::Amazon::S3>
 
 =head1 AUTHOR
 
-Rusty Conover <rusty@luckydinosaur.com>
+Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,10 +3,11 @@ use warnings;
 package App::Nopaste::Service::Gist;
 # ABSTRACT: Service provider for GitHub gist - http://gist.github.com/
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 
 use parent 'App::Nopaste::Service';
 
+use LWP::UserAgent;
 use JSON::MaybeXS;
 use Module::Runtime 'use_module';
 use Path::Tiny;
@@ -171,7 +172,7 @@ App::Nopaste::Service::Gist - Service provider for GitHub gist - http://gist.git
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =for stopwords SIGNES gists oauth plaintext
 
@@ -202,10 +203,6 @@ You can also simply store your credentials in plaintext in F<~/.github> as in:
 
 That's it!
 
-=head1 AUTHOR
-
-Ricardo SIGNES, C<< <rjbs@cpan.org> >>
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=App-Nopaste>
@@ -213,7 +210,7 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 =head1 AUTHOR
 
-Shawn M Moore, <sartak@gmail.com>
+Ricardo SIGNES, <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

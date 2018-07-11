@@ -1,5 +1,5 @@
 package OpenGL::Sandbox::V1::Quadric;
-BEGIN { $OpenGL::Sandbox::V1::Quadric::VERSION = '0.02'; }
+BEGIN { $OpenGL::Sandbox::V1::Quadric::VERSION = '0.03'; }
 require OpenGL::Sandbox::V1; # automatically loads Quadric via XS
 
 # ABSTRACT - Rendering parameters for various geometric shapes
@@ -16,7 +16,7 @@ OpenGL::Sandbox::V1::Quadric
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -94,16 +94,16 @@ Plot a sphere around the origin with specified dimensions.
 
 =head2 cylinder
 
-  $q->cyliner($base, $top, $height, $slices, $stacks);
+  $q->cyliner($base_rad, $top_rad, $height, $slices, $stacks);
 
-Plot a cylinder along the Z axis with the specified dimensions.
+Plot a hollow cylinder (without ends) along the Z axis with the specified dimensions.
 
 =head2 disk
 
-  $q->disk($inner, $outer, $slices, $stacks);
+  $q->disk($inner_rad, $outer_rad, $slices, $loops);
 
-"disk" is slightly misleading; it is a cylinder with a hole through the center.
-A solid disk would actually be generated with the L</cylinder> method.
+Plot a flat circle around the Z axis along the XY plane.  Nonzero inner radius
+"subtracts" a circle from the center.
 
 =head2 partial_disk
 

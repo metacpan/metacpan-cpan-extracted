@@ -1,5 +1,5 @@
 package OpenGL::Sandbox::Texture;
-BEGIN { $OpenGL::Sandbox::Texture::VERSION = '0.02'; }
+BEGIN { $OpenGL::Sandbox::Texture::VERSION = '0.03'; }
 use Moo;
 use Carp;
 use Try::Tiny;
@@ -150,12 +150,8 @@ sub convert_png {
 }
 
 # Pull in the C file and make sure it has all the C libs available
-use Inline
+use OpenGL::Sandbox::Texture::Inline
 	C => do { my $x= __FILE__; $x =~ s|\.pm|\.c|; Cwd::abs_path($x) },
-	(defined $OpenGL::Sandbox::Texture::VERSION? (
-		NAME => __PACKAGE__,
-		VERSION => __PACKAGE__->VERSION
-	) : () ),
 	INC => '-I'.do{ my $x= __FILE__; $x =~ s|/[^/]+$|/|; Cwd::abs_path($x) }.' -I/usr/include/ffmpeg',
 	LIBS => '-lGL -lswscale',
 	CCFLAGSEX => '-Wall -g3 -Os';
@@ -174,7 +170,7 @@ OpenGL::Sandbox::Texture - Wrapper object for OpenGL texture
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 ATTRIBUTES
 

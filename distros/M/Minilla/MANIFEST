@@ -108,6 +108,7 @@ t/project/detect_source_path.t
 t/project/dist_name.t
 t/project/format_tag.t
 t/project/from.t
+t/project/in_submodule.t
 t/project/license.t
 t/project/meta.t
 t/project/meta_no_index.t

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Object;
-$Net::Amazon::S3::Client::Object::VERSION = '0.80';
+$Net::Amazon::S3::Client::Object::VERSION = '0.82';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use DateTime::Format::HTTP;
@@ -27,7 +27,9 @@ has 'key'  => ( is => 'ro', isa => 'Str',  required => 1 );
 has 'etag' => ( is => 'ro', isa => 'Etag', required => 0 );
 has 'size' => ( is => 'ro', isa => 'Int',  required => 0 );
 has 'last_modified' =>
-    ( is => 'ro', isa => DateTime, coerce => 1, required => 0 );
+    ( is => 'ro', isa => DateTime, coerce => 1, required => 0, default => sub { shift->last_modified_raw }, lazy => 1 );
+has 'last_modified_raw' =>
+    ( is => 'ro', isa => 'Str', required => 0 );
 has 'expires' => ( is => 'rw', isa => DateTime, coerce => 1, required => 0 );
 has 'acl_short' =>
     ( is => 'ro', isa => 'AclShort', required => 0, default => 'private' );
@@ -100,10 +102,11 @@ sub _get {
     my $content       = $http_response->content;
     $self->_load_user_metadata($http_response);
 
-    my $md5_hex = md5_hex($content);
     my $etag = $self->etag || $self->_etag($http_response);
-    confess 'Corrupted download'
-        if( !$self->_is_multipart_etag($etag) && $etag ne $md5_hex);
+    unless ($self->_is_multipart_etag($etag)) {
+        my $md5_hex = md5_hex($content);
+        confess 'Corrupted download' if $etag ne $md5_hex;
+    }
 
     return $http_response;
 }
@@ -149,10 +152,11 @@ sub get_filename {
 
     $self->_load_user_metadata($http_response);
 
-    my $md5_hex = file_md5_hex($filename);
     my $etag = $self->etag || $self->_etag($http_response);
-    confess 'Corrupted download'
-        if( !$self->_is_multipart_etag($etag) && $etag ne $md5_hex);
+    unless ($self->_is_multipart_etag($etag)) {
+        my $md5_hex = file_md5_hex($filename);
+        confess 'Corrupted download' if $etag ne $md5_hex;
+    }
 }
 
 sub _load_user_metadata {
@@ -221,7 +225,7 @@ sub _put {
 
     my $etag = $self->_etag($http_response);
 
-    confess 'Corrupted upload' if $etag ne $md5_hex;
+    confess "Corrupted upload got $etag expected $md5_hex" if $etag ne $md5_hex;
 }
 
 sub put_filename {
@@ -331,13 +335,13 @@ sub uri {
 }
 
 sub query_string_authentication_uri {
-    my $self = shift;
+    my ($self, $query_form) = @_;
     return Net::Amazon::S3::Request::GetObject->new(
         s3     => $self->client->s3,
         bucket => $self->bucket->name,
         key    => $self->key,
         method => 'GET',
-    )->query_string_authentication_uri( $self->expires->epoch );
+    )->query_string_authentication_uri( $self->expires->epoch, $query_form );
 }
 
 sub _content_sub {
@@ -412,7 +416,7 @@ Net::Amazon::S3::Client::Object - An easy-to-use Amazon S3 client object
 
 =head1 VERSION
 
-version 0.80
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -528,6 +532,15 @@ This module represents objects in buckets.
   my $object = $bucket->object( key => 'images/my_hat.jpg' );
   $object->get_filename('hat_backup.jpg');
 
+=head2 last_modified, last_modified_raw
+
+  # get the last_modified data as DateTime (slow)
+  my $dt = $obj->last_modified;
+  # or raw string in form '2015-05-15T10:12:40.000Z' (fast)
+  # use this form if you are working with thousands of objects and
+  # do not actually need an expensive DateTime for each of them
+  my $raw = $obj->last_modified_raw;
+
 =head2 key
 
   # show the key
@@ -583,12 +596,14 @@ C<user_metadata>.
 
 =head2 query_string_authentication_uri
 
-  # use query string authentication
+  # use query string authentication, forcing download with custom filename
   my $object = $bucket->object(
     key          => 'images/my_hat.jpg',
     expires      => '2009-03-01',
   );
-  my $uri = $object->query_string_authentication_uri();
+  my $uri = $object->query_string_authentication_uri({
+    'response-content-disposition' => 'attachment; filename=abc.doc',
+  });
 
 =head2 size
 
@@ -649,11 +664,11 @@ ethods set the contents of C<user_metadata> to the same format.
 
 =head1 AUTHOR
 
-Rusty Conover <rusty@luckydinosaur.com>
+Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

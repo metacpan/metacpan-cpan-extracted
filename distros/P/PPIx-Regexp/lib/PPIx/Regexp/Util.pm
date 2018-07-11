@@ -17,7 +17,7 @@ our @EXPORT_OK = qw{
     __ns_can __to_ordinal_en
 };
 
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 
 {
 

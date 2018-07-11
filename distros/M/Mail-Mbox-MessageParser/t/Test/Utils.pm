@@ -8,7 +8,7 @@ use FileHandle::Unget;
 use File::Path qw( remove_tree );
 use File::Spec::Functions qw( :ALL );
 use File::Temp;
-use File::Slurp;
+use File::Slurper qw(write_text);
 
 use vars qw( @EXPORT @ISA );
 use Mail::Mbox::MessageParser;
@@ -45,7 +45,7 @@ sub CheckDiffs
 
     if ($numdiffs != 0)
     {
-      write_file("$output_filename.diff", "diff \"$output_filename\" \"$filename\"\n", @diffs);
+      write_text("$output_filename.diff", "diff \"$output_filename\" \"$filename\"\n" . join("", @diffs), undef, 1);
     
       print "Failed, with $numdiffs differences.\n";
       print "  See $output_filename.diff.\n";
@@ -154,7 +154,7 @@ sub Broken_Pipe
   my $script_path = catfile($TEMPDIR,'broken_pipe.pl');
   my $dev_null = devnull();
 
-  write_file($script_path, <<EOF);
+  write_text($script_path, <<EOF, undef, 1);
 unless (open B, '-|')
 {
   open(F, "|$^X -pe 'print' 2>$dev_null");

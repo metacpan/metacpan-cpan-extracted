@@ -1,0 +1,189 @@
+#! /usr/bin/python3
+
+#########################################################################
+#       This Python script is Copyright (c) 2002, Peter J Billam        #
+#               c/o P J B Computing, www.pjb.com.au                     #
+#                                                                       #
+#     This script is free software; you can redistribute it and/or      #
+#           modify it under the same terms as Python itself.            #
+#########################################################################
+from TermClui import *
+import sys
+# import TermClui::FileSelect
+colour = ""
+paint = ""
+name = ""
+text = ""
+
+def main():
+    while True:
+        task = choose('Test which TermClui.py function ?',
+            ['ask','choose','confirm','edit','view','select_file']
+        );
+        if not task:
+            sys.exit()
+        eval('test_'+task+'()')
+
+def test_choose():
+    colours = ['Red','Orange','Black','Grey','Blue']
+    paints  = [
+     'Bizzare extremely long name that certainly will never occur on any real artist pallette',
+     'Alizarin Crimson', 'Burnt Sienna', 'Cadmium Yellow', 'Cobalt Blue',
+     'Flake White', 'Indian Red', 'Indian Yellow', 'Ivory Black',
+     'Lemon Yellow',
+     'Naples Yellow', 'Prussian Blue', 'Raw Sienna', 'Raw Umber', 'Red Ochre',
+     'Rose Madder', 'Ultramarine Blue', 'Vandyke Brown', 'Viridian Green',
+     'Yellow Ochre'
+    ]
+    scientists = [
+    'Luis Alvarez', 'Alain Aspect', 'Michael Barnsley', 'Johann Bernouilli',
+    'Nicolas Bernouilli', 'Friedrich Wilhelm Bessel', 'John Bell',
+    'Antoine Becquerel', 'Hans Bethe', 'David Bohm', 'Niels Bohr',
+    'Ludwig Boltzmann', 'Hermann Bondi', 'George Boole', 'Max Born',
+    'Satyendra Bose', 'Robert Boyle', 'Léon Brillouin', 'Eugenio Calabi',
+    'Georg Cantor', 'James Chadwick', 'Gregory Chaitin',
+    'Subrahmanyan Chandrasekar', 'Geoffrey Chew', 'Alonzo Church',
+    'John Horton Conway', 'Francis Crick', 'Marie Curie', 'Charles Darwin',
+    'Humphrey Davy', 'Richard Dawkins', 'Louis de Broglie', 'Max Delbrück',
+    'René Descartes', 'Willem de Sitter', 'Bruce DeWitt', 'Paul Dirac',
+    'Freeman Dyson', 'Arthur Stanley Eddington', 'Albert Einstein',
+    'Leonhard Euler', 'Hugh Everett', 'Michael Faraday', 'Pierre Fatou',
+    'Mitchell Feigenbaum', 'Pierre de Fermat', 'Enrico Fermi', 'Richard Feynman',
+    'Joseph Fraunhofer', 'Galileo Galilei', 'Evariste Galois', 'George Gamov',
+    'Carl Friedrich Gauss', 'Murray Gell-Mann', 'Kurt Gödel', 'Alan Guth',
+    'Stephen Hawking', 'Felix Hausdorff', 'Werner Heisenberg', 'Charles Hermite',
+    'Peter Higgs', 'David Hilbert', 'Fred Hoyle', 'Edwin Hubble',
+    'Christian Huygens', 'David Hilbert', 'Edwin Hubble', 'Pascual Jordan',
+    'Gaston Julia', 'Marc Kac', 'Theodor Kaluza', 'Stuart Kauffman',
+    'William Lord Kelvin', 'Gustav Robert Kirchhoff', 'Oskar Klein',
+    'Helge von Kock', 'Willis Lamb', 'Lev Davidovich Landau', 'Paul Langevin',
+    'Pierre Simon de Laplace', 'Gottfried Wilhelm Leibnitz', 'Paul Lévy',
+    'Hendrik Lorentz', 'James Clark Maxwell', 'Marston Morse',
+    'Benoit Mandelbrot', 'Gregor Mendel', 'Dmitri Mendeleev', 'Robert Millikan',
+    'Hermann Minkowski', 'John von Neumann', 'Isaac Newton', 'Emmy Noether',
+    'Hans Christian Oersted', 'Lars Onsager', 'Robert Oppenheimer',
+    'Abraham Pais', 'Heinz Pagels', 'Vilfredo Pareto', 'Louis Pasteur',
+    'Wolfgang Pauli', 'Linus Pauling', 'Guiseppe Peano', 'Rudolf Peierls',
+    'Roger Penrose', 'Arno Penzias', 'Jean Perrin', 'Max Planck',
+    'Boris Podolsky', 'Henri Poincaré', 'Isidor Rabi', 'Srinivasa Ramanujan',
+    'Lord Rayleigh', 'Lewis Fry Richardson', 'B. Riemann', 'Nathan Rosen',
+    'Ernest Rutherford', 'Abdus Salam', 'Erwin Schrödinger',
+    'Karl Schwarzschild', 'Julian Schwinger', 'Claude Shannon',
+    'Waclaw Sierpinski', 'Leo Szilard', 'Kip Thorne', 'Alan Turning',
+    'Sin-itro Tomonaga', 'Stanislaw Ulam', 'James Watson', 'Karl Weierstrauss',
+    'Hermann Weyl', 'Steven Weinberg', 'John Wheeler', 'Charles Weiner',
+    'Norbert Wiener', 'Eugene Wigner', 'Robert Wilson', 'Edward Witten',
+    'Shing-Tung Yau', 'Chen-Ning Yang', 'Hideki Yukawa', 'George Kingsley Zipf',
+    ]
+
+    multi = choose('Mode ?', ['Single-choice', 'Multi-choice'])
+    if not multi:
+        return False
+    if (multi == 'Single-choice'):
+        paint = choose ("Your favourite paint ?\n"+help_text(''), paints)
+        scientist = choose ("Your favourite scientist ?", scientists)
+        multiline_question = r'''Your favourite colour ?
+
+This tests how the 'choose' subroutine handles multi-line
+questions. After you choose, all but the first line should disappear,
+leaving the question and answer on the screen as a record of the dialogue.
+The other lines should only get displayed if there is room.
+'''
+        colour = choose (multiline_question, colours);
+        print('paint='+str(paint)+', scientist='+str(scientist)+', colour='+str(colour))
+    else:
+        fav_paints = choose("Your favourite paints ?\n"+help_text('multi'), paints, multichoice=True);
+        fav_scientists = choose("Your favourite scientists ?", scientists, multichoice=True);
+        print("paints = "+', '.join(fav_paints) +
+            "\nscientists = "+', '.join(fav_scientists))
+    return
+
+
+def test_confirm():
+    multiline_question = r'''OK to proceed with the test ?
+
+This step checks the 'confirm' subroutine and whether it handles
+a multiline question OK.  After you choose Yes or No all but the
+first line should disappear,  leaving the question and answer on
+the screen as a record of the dialogue.
+'''
+    if not confirm (multiline_question):
+        return False
+    confirm('Did the text vanish except for the 1st line ?')
+
+name = ''
+colour = ''
+paint = ''
+text = ''
+def test_ask():
+    global name, colour, paint
+    multiline_question = r'''Enter a string :
+
+The point of this test is to check out the behaviour of &ask
+with multi-line questions; subsequent lines after the initial
+question should be formatted within the window width ...
+
+'''
+    string = ask(multiline_question+help_text('ask'))
+
+    colours = ['Red','Orange','Black','Grey','Blue']
+    colour = choose('Your favourite colour ?', colours)
+    if not colour:
+        return False
+    names = dict(
+        Red='Fred', Orange='Solange', Black='Jack', Grey='May', Blue='Sue'
+    )
+    name = ask("Choose a name which rhymes with "+colour+" :", names[colour])
+    print('string='+string+', name='+name)
+
+def test_edit():
+    global name, colour, paint, text
+    text = r'''
+ There was a brave soul called {0},
+ Whose favourite colour was {1};
+   But some {2}
+   ...
+ And that was the end of {0}.
+'''.format(name, colour, paint)
+    text = edit('Your limerick', text);
+    print('text='+text)
+
+def test_view():
+    global text
+    view('Your limerick:', text or 'try testing "ask" and "edit" first :-)')
+
+def test_select_file():
+    bool_opts = ['Chdir','Create','ShowAll','DisableShowAll',
+        'SelDir','TextFile','Readable','Writeable','Executable','Owned',
+        'Directory']
+    text_opts = ('FPat','File','Path','Title','TopDir')
+    multiple = choose('Select',['Single file','Multiple files'])
+    if multiple == 'Multiple files':
+        bool_opts.pop(0)
+        bool_opts.pop(0)
+    opts = dict()
+    for bool_opt in bool_opts:
+        opts[bool_opt] = choose("option "+bool_opt+" ?",['default','0','1'])
+        if not opts[bool_opt]:
+            return False
+        if opts[bool_opt] == 'default':
+            del(opts[bool_opt])
+        elif opts[bool_opt] == '0':
+            opts[bool_opt] = False
+        elif opts[bool_opt] == '1':
+            opts[bool_opt] = True
+    for text_opt in text_opts:
+        opts[text_opt] = ask("option "+text_opt+" ?", opts.get(text_opt, ''));
+        if not opts[text_opt]:
+            del(opts[text_opt])
+    if multiple == 'Multiple files':
+        # files = select_file(-Chdir=0, opts);
+        opts['Chdir'] = False
+        opts['multichoice'] = True
+        files = select_file(**opts)
+        print("You selected "+str(files), file=sys.stderr)
+    else:
+        # given the dict, how can I put together an arg-by-name call ?
+        print("You selected " +str(select_file(**opts)), file=sys.stderr)
+
+main()

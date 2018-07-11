@@ -1,3 +1,21 @@
+Version 1.4011:
+- Updating META.yml
+
+Version 1.4010:
+- Switch to File::Slurper
+
+Version 1.4009:
+- Trying once again to fix the compile test on windows
+- Reorder the Makefile to avoid a warning about missing parser files
+
+Version 1.4008:
+- Add standard tests
+- Fix compatibility issue with newer versions of perl, which remove "." from
+  @INC.
+- Check in standard tests, including one that skips the compile check on Windows
+- Strengthen the programs check, forcing Makefile.PL to fail if they are missing.
+  Hopefully this will address false failures from CPAN testers.
+
 Version 1.4007: May 2 2015
 - Prevent CPAN from indexing private-lib
 

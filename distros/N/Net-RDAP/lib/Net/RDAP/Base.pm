@@ -74,8 +74,11 @@ L<Net::RDAP::Base> - base module for some L<Net::RDAP>:: modules.
 =head1 DESCRIPTION
 
 You don't use L<Net::RDAP::Base> directly, instead, various other
-modules extend it. All submodules of L<Net::RDAP::Base> have access
-to the following method:
+modules extend it.
+
+=head1 METHODS
+
+=head2 Links
 
 	@links = $object->links;
 
@@ -87,9 +90,11 @@ sub links { $_[0]->objects('Net::RDAP::Link', $_[0]->{'links'}) }
 
 =pod
 
+=head2 "Self" Link
+
 	$self = $object->self;
 
-Returns a L<Net::RDAP::Link> object corresponding to the "self"
+Returns a L<Net::RDAP::Link> object corresponding to the C<self>
 link of this object (if one is available).
 
 =cut

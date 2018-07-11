@@ -21,7 +21,7 @@ Net::Etcd::Auth::RolePermission
 
 =cut
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 =head1 DESCRIPTION
 
@@ -91,7 +91,19 @@ valid options are READ, WRITE, and READWRITE
 
 =cut
 
-has permType =>(  
+has permType =>(
+    is       => 'ro',
+    isa      => Str,
+);
+
+=head2 prefix
+
+This is a helper accessor which is an alias for range_end => "\0" if passed a true value.
+If range_end is also passed prefix will superceed it's value.
+
+=cut
+
+has prefix =>(
     is       => 'ro',
     isa      => Str,
 );
@@ -109,11 +121,14 @@ has perm => (
 sub _build_perm {
     my ($self) = @_;
     my $perm;
-    for my $key ( keys %{$self} ) { 
-        unless ( $key =~ /(?:name|etcd|cb|endpoint)$/ ) { 
+    if ($self->{prefix}) {
+        $self->{range_end} = encode_base64( "\0", '' );
+    }
+    for my $key ( keys %{$self} ) {
+        unless ( $key =~ /(?:prefix|name|etcd|cb|endpoint)$/ ) {
             $perm->{$key} = $self->{$key};
         }
-    }   
+    }
     return $perm;
 }
 

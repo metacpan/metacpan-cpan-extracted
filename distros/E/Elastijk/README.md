@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/gugod/Elastijk.svg?branch=master)](https://travis-ci.org/gugod/Elastijk) [![Coverage Status](https://img.shields.io/coveralls/gugod/Elastijk/master.svg?style=flat)](https://coveralls.io/r/gugod/Elastijk?branch=master)
 # NAME
 
 Elastijk - A specialized Elasticsearch client.
@@ -16,7 +15,7 @@ Elastijk - A specialized Elasticsearch client.
         type => "article",
         command => "_search",
 
-        uri_param => { search_type => "dfs_query_then_fetch" }
+        uri_param => { search_type => "dfs_query_then_fetch" },
         body => {
             query => { match => { "body" => "cpan" } }
         }
@@ -220,9 +219,6 @@ to check the existence of different things:
     type:     index => "foo", type => "bar"
     index:    index => "foo"
 
-See also [https://www.elastic.co/guide/guide/en/elasticsearch/reference/current/indices-exists.html](https://www.elastic.co/guide/guide/en/elasticsearch/reference/current/indices-exists.html) ,
-[https://www.elastic.co/guide/guide/en/elasticsearch/reference/current/indices-types-exists.html#indices-types-exists](https://www.elastic.co/guide/guide/en/elasticsearch/reference/current/indices-types-exists.html#indices-types-exists) , and [https://www.elastic.co/guide/guide/en/elasticsearch/guide/current/doc-exists.html](https://www.elastic.co/guide/guide/en/elasticsearch/guide/current/doc-exists.html)
-
 ## scan\_scroll( ..., on\_response => sub {} )
 
 A way to perform [scan and scroll](https://www.elastic.co/guide/guide/en/elasticsearch/guide/current/scan-scroll.html).
@@ -261,8 +257,7 @@ as a whole, but just a naive concatenation of multiple JSON documents.
 
 # AUTHORS
 
-- Kang-min Liu <gugod@gugod.org>
-- Borislav Nikolov <jack@sofialondonmoskva.com>
+Kang-min Liu <gugod@gugod.org> and Borislav Nikolov <jack@sofialondonmoskva.com>
 
 # COPYRIGHT
 

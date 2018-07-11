@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 ###############################################################################
 
 =head1 NAME
@@ -62,6 +62,7 @@ Andrew Maltsev <am@xao.com>
 =cut
 
 ###############################################################################
+use warnings;
 use strict;
 use Getopt::Long;
 use Pod::Usage;

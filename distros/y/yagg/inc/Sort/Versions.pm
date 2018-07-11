@@ -1,6 +1,6 @@
 #line 1
 package Sort::Versions;
-$Sort::Versions::VERSION = '1.60';
+$Sort::Versions::VERSION = '1.62';
 # Copyright (c) 1996, Kenneth J. Albanowski. All rights reserved.  This
 # program is free software; you can redistribute it and/or modify it under
 # the same terms as Perl itself.
@@ -14,7 +14,7 @@ our @ISA        = qw(Exporter);
 our @EXPORT     = qw(&versions &versioncmp);
 our @EXPORT_OK  = qw();
 
-sub versioncmp( $$ ) {
+sub versioncmp ($$) {
     my @A = ($_[0] =~ /([-.]|\d+|[^-.\d]+)/g);
     my @B = ($_[1] =~ /([-.]|\d+|[^-.\d]+)/g);
 
@@ -49,7 +49,7 @@ sub versioncmp( $$ ) {
     @A <=> @B;
 }
 
-sub versions() {
+sub versions () {
     my $callerpkg = (caller)[0];
     my $caller_a = "${callerpkg}::a";
     my $caller_b = "${callerpkg}::b";

@@ -24,7 +24,7 @@ Net::Etcd::Role::Actions
 
 =cut
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 has etcd => (
     is  => 'ro',
@@ -250,8 +250,11 @@ returns single decoded value or the first.
 
 sub get_value {
     my ($self)   = @_;
+    local $@;
     my $response = $self->response;
-    my $content  = from_json( $response->{content} );
+    my $content;
+    eval { $content = from_json( $response->{content} ) };
+    return if $@;
 
     #print STDERR Dumper($content);
     my $value = $content->{kvs}->[0]->{value};
@@ -277,8 +280,11 @@ where key and value have been decoded for your pleasure.
 
 sub all {
     my ($self)   = @_;
+    local $@;
     my $response = $self->response;
-    my $content  = from_json( $response->{content} );
+    my $content;
+    eval { $content = from_json( $response->{content} ) };
+    return if $@;
     my $kvs      = $content->{kvs};
     for my $row (@$kvs) {
         $row->{value} = decode_base64( $row->{value} );
@@ -310,8 +316,11 @@ returns JSON decoded content hash
 
 sub content {
     my ($self)   = @_;
+    local $@;
     my $response = $self->response;
-    my $content  = from_json( $response->{content} );
+    my $content;
+    eval { $content = from_json( $response->{content} ) };
+    return if $@;
     return $content if $content;
     return;
 }

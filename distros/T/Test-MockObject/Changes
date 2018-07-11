@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::MockObject.
 
+1.20180705 2018-07-05 16:47:18-07:00 America/Los_Angeles
+    - added destructor to clear counters (choroboa PR #15, RT #71831)
+
 1.20161202 2016-12-02 15:12:41-08:00 America/Los_Angeles
     - renamed README.pod to README (RT #118831)
 

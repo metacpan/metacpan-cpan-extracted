@@ -5,6 +5,7 @@ use strict;
 # For PRIVATE Module::Install extensions
 use lib 'private-lib';
 
+use lib '.';
 use inc::Module::Install;
 
 include 'Module::AutoInstall';
@@ -22,17 +23,14 @@ test_requires(
   'Test::More' => '1.001002',
 );
 extra_tests;
-author_requires 'ShipIt';
-author_requires 'ShipIt::Step::DistClean';
-author_requires 'ShipIt::Step::DistTestExtra';
-author_requires 'ShipIt::Step::Manifest';
-author_requires 'ShipIt::Step::Twitter';
 author_requires 'Test::Compile';
 author_requires 'Test::Perl::Critic';
 author_requires 'Test::Pod';
 author_requires 'Test::Spelling';
 author_requires 'Pod::Wordlist::hanekomu';
 author_requires 'Test::Pod::Coverage';
+
+test_requires 'Test::Kwalitee';
 
 # author_requires 'Test::Kwalitee';  # # Attempt to free unreferenced scalar
 author_requires 'Test::YAML::Meta';
@@ -47,3 +45,31 @@ no_index 'directory' => 'private-lib';
 enable_verbose_cpan_testing();
 
 WriteAll;
+
+# ---- Workaround for broken module ----
+# https://rt.cpan.org/Ticket/Display.html?id=125772
+{
+  package Module::Install::StandardTests;
+
+  sub write_standard_test_compile {
+      my $self = shift;
+      $self->write_test_file('000_standard__compile.t', q/
+          BEGIN {
+            if ($^O eq 'MSWin32') {
+              require Test::More;
+              Test::More->import(skip_all =>
+                  "Test::Compile doesn't work properly on Windows");
+            } else {
+              require Test::More;
+              Test::More->import();
+              eval "use Test::Compile";
+              Test::More->builder->BAIL_OUT(
+                  "Test::Compile required for testing compilation") if $@;
+              all_pm_files_ok();
+            }
+          }
+      /);
+  }
+}
+
+use_standard_tests;

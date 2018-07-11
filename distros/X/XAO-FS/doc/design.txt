@@ -1,10 +1,7 @@
 NAME
-    XAO::FS - XAO Foundation Server
+    XAO::FS - XAO framework database layer
 
 DESIGN REQUIREMENTS
-    The following description summarizes a set of design meetings held by
-    XAO Inc.
-
     Usually from both developer and management point of view it is easier to
     think of a data piece as of some kind of closed entity with some content
     and probably some methods for manipulating that content. This is what is

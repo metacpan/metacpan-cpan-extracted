@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Ubuntu;
 # ABSTRACT: Service provider for Ubuntu - https://paste.ubuntu.com/
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 
 use parent 'App::Nopaste::Service';
 
@@ -248,16 +248,9 @@ App::Nopaste::Service::Ubuntu - Service provider for Ubuntu - https://paste.ubun
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =for stopwords Niebur
-
-=head1 AUTHOR
-
-gregor herrmann, C<< <gregoa@debian.org> >>
-
-(Based on App::Nopaste::Service::Debian, written by
-Ryan Niebur, C<< <ryanryan52@gmail.com> >>)
 
 =head1 SUPPORT
 
@@ -266,7 +259,10 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 =head1 AUTHOR
 
-Shawn M Moore, <sartak@gmail.com>
+gregor herrmann, <gregoa@debian.org>
+
+(Based on App::Nopaste::Service::Debian, written by
+Ryan Niebur, C<< <ryanryan52@gmail.com> >>)
 
 =head1 COPYRIGHT AND LICENSE
 

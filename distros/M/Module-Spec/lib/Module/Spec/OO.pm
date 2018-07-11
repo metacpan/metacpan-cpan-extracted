@@ -1,6 +1,6 @@
 
 package Module::Spec::OO;
-$Module::Spec::OO::VERSION = '0.8.0';
+$Module::Spec::OO::VERSION = '0.9.0';
 # ABSTRACT: OO support for Module::Spec
 use 5.012;
 use warnings;
@@ -52,7 +52,7 @@ Module::Spec::OO - OO support for Module::Spec
 
 =head1 VERSION
 
-version 0.8.0
+version 0.9.0
 
 =head1 AUTHOR
 

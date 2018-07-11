@@ -20,6 +20,7 @@ my @files = (
     't/09-missing-file.t',
     't/10-content-from-file.t',
     't/11-eumm_version-numification.t',
+    't/12-multiple-makemakers.t',
     't/zzz-check-breaks.t'
 );
 

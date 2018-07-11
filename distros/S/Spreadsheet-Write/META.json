@@ -1,0 +1,45 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Spreadsheet-Write",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Encode" : "2.90",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Unit::Lite" : "0.1202"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Spreadsheet::WriteExcel" : "2.15",
+            "Text::CSV" : "1.18",
+            "perl" : "5.008009"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01"
+}

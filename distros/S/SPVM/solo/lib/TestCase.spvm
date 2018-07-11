@@ -11,6 +11,8 @@ package TestCase {
   use TestCase::ImplementInterface2;
   use TestCase::Comparator;
   use TestCase::Pointer;
+  use TestCase::Complex_double_2;
+  use TestCase::ComplexCalc;
 
 =pod
 
@@ -50,6 +52,44 @@ SPVM::Test - SPVM test module
   sub DOUBLE_PRECICE : double () { return 2147483647.0; }
   
   sub main : int ($mvar : int) {
+    {
+      my $z1 : TestCase::Complex_double_2;
+      $z1->{re} = 0.5;
+      $z1->{im} = 0.25;
+      
+      my $z2 : TestCase::Complex_double_2;
+      $z2->{re} = 1.0;
+      $z2->{im} = 0.5;
+      
+      my $z3 = TestCase::ComplexCalc->add($z1, $z2);
+      
+      my $z3_re = $z3->{re};
+      my $z3_im = $z3->{im};
+
+      print((string)$z3_re . "\n");
+      print((string)$z3_im . "\n");
+    }
+
+    {
+      my $z : TestCase::Complex_double_2;
+      $z->{re} = 0.5;
+      $z->{im} = 0.25;
+      
+      my $re = $z->{re};
+      my $im = $z->{im};
+      
+      print((string)$re . "\n");
+      print((string)$im . "\n");
+      
+      my $z2 = $z;
+      
+      my $z2_re = $z2->{re};
+      my $z2_im = $z2->{im};
+
+      print((string)$z2_re . "\n");
+      print((string)$z2_im . "\n");
+    }
+    
     {
       my $total = sum0(sum0(1, 2), sum0(3, 4));
     }

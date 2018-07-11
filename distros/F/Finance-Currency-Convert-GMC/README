@@ -3,9 +3,9 @@ NAME
     Money Changer) website
 
 VERSION
-    This document describes version 0.005 of Finance::Currency::Convert::GMC
+    This document describes version 0.006 of Finance::Currency::Convert::GMC
     (from Perl distribution Finance-Currency-Convert-GMC), released on
-    2018-06-24.
+    2018-07-10.
 
 SYNOPSIS
      use Finance::Currency::Convert::GMC qw(convert_currency);

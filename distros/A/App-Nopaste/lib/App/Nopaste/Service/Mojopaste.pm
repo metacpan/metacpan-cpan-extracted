@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Mojopaste;
 # ABSTRACT: Service provider for mojopaste
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 
 use parent 'App::Nopaste::Service';
 
@@ -57,7 +57,7 @@ App::Nopaste::Service::Mojopaste - Service provider for mojopaste
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 USAGE
 
@@ -71,10 +71,6 @@ For example:
   # export NOPASTE_MOJOPASTE_WEBPATH=http://paste.local
   # cat /proc/cpuinfo | nopaste -s Mojopaste
 
-=head1 AUTHOR
-
-Dean Hamstead, C<< <dean@bytefoundry.com.au> >>
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=App-Nopaste>
@@ -82,7 +78,7 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 =head1 AUTHOR
 
-Shawn M Moore, <sartak@gmail.com>
+Dean Hamstead, <dean@bytefoundry.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 

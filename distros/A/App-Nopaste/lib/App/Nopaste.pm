@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package App::Nopaste; # git description: 1.010-5-ge64d42a
+package App::Nopaste; # git description: 1.011-7-gc9be2f6
 # ABSTRACT: Easy access to any pastebin
 # KEYWORDS: application executable paste output pastebin debugging
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 
 use 5.008003;
 use Module::Pluggable search_path => 'App::Nopaste::Service', sub_name => '_plugins';
@@ -101,7 +101,7 @@ App::Nopaste - Easy access to any pastebin
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =head1 SYNOPSIS
 
@@ -181,10 +181,6 @@ L<WebService::NoPaste>, L<WWW::Pastebin::PastebinCom::Create>, L<Devel::REPL::Pl
 
 L<http://perladvent.org/2011/2011-12-14.html>
 
-=head1 AUTHOR
-
-Shawn M Moore, C<sartak@gmail.com>
-
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2008- Shawn M Moore.
@@ -203,7 +199,7 @@ Shawn M Moore, <sartak@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Shawn M Moore Karen Etheridge Thomas Sibley François Gannaz Ricardo Signes Justin Hunter Kevin Falcone Zoffix Znet Sergey Romanov David Golden Jesse Luehrs Dean Hamstead Rafael Kitover gregor herrmann vti Ævar Arnfjörð Bjarmason Сергей Романов Andrew Rodland יובל קוג'מן (Yuval Kogman) Arthur Axel 'fREW' Schmidt Dan Book Darian Anthony Patrick Bremner J. Shultz Graham Knop Jason Mills John Goulah Maximilian Gass Sebastian Paaske Tørholm Tatsuhiko Miyagawa Zakariyya Mughal
+=for stopwords Shawn M Moore Karen Etheridge Thomas Sibley Ricardo Signes François Gannaz Justin Hunter Kevin Falcone Zoffix Znet David Golden Sergey Romanov Jesse Luehrs Rafael Kitover Dean Hamstead gregor herrmann vti Ævar Arnfjörð Bjarmason Сергей Романов Andrew Rodland יובל קוג'מן (Yuval Kogman) Arthur Axel 'fREW' Schmidt Dan Book Darian Anthony Patrick Bremner J. Shultz Graham Knop Jason Mills John Goulah Maximilian Gass Sebastian Paaske Tørholm Tatsuhiko Miyagawa Zakariyya Mughal
 
 =over 4
 
@@ -221,11 +217,11 @@ Thomas Sibley <tsibley@cpan.org>
 
 =item *
 
-François Gannaz <francois.gannaz@silecs.info>
+Ricardo Signes <rjbs@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+François Gannaz <francois.gannaz@silecs.info>
 
 =item *
 
@@ -241,11 +237,11 @@ Zoffix Znet <cpan@zoffix.com>
 
 =item *
 
-Sergey Romanov <complefor@rambler.ru>
+David Golden <dagolden@cpan.org>
 
 =item *
 
-David Golden <dagolden@cpan.org>
+Sergey Romanov <complefor@rambler.ru>
 
 =item *
 
@@ -253,11 +249,11 @@ Jesse Luehrs <doy@tozt.net>
 
 =item *
 
-Dean Hamstead <dean@fragfest.com.au>
+Rafael Kitover <rkitover@cpan.org>
 
 =item *
 
-Rafael Kitover <rkitover@cpan.org>
+Dean Hamstead <dean@fragfest.com.au>
 
 =item *
 

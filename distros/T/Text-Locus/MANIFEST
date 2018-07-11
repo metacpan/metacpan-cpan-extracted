@@ -1,0 +1,12 @@
+Changes
+lib/Text/Locus.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00format.t
+t/10add.t
+t/20fixup.t
+t/30ovr.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

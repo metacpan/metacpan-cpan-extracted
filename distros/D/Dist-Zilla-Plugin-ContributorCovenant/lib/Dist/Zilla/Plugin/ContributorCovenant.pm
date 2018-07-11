@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::ContributorCovenant;
-$Dist::Zilla::Plugin::ContributorCovenant::VERSION = '0.02';
+$Dist::Zilla::Plugin::ContributorCovenant::VERSION = '1.004001';
 =head1 NAME
 
 Dist::Zilla::Plugin::ContributorCovenant - Add Contributor Covenant as Code of Conduct
@@ -25,6 +25,10 @@ You can add following lines to your dist.ini as well.
 
 Note that this plugin will prune other CODE_OF_CONDUCT.md files, to
 avoid multiple CODE_OF_CONDUCT.md preventing the build.
+
+The version of this module will match the version of the Contributor
+Covenant used.  For instance, version 1.004001 will use Contributor
+Covenant version 1.4.1.
 
 =cut
 
@@ -103,9 +107,9 @@ sub contributor_covenant_template {
 In the interest of fostering an open and welcoming environment, we as
 contributors and maintainers pledge to making participation in our project and
 our community a harassment-free experience for everyone, regardless of age, body
-size, disability, ethnicity, gender identity and expression, level of experience,
-education, socio-economic status, nationality, personal appearance, race,
-religion, or sexual identity and orientation.
+size, disability, ethnicity, sex characteristics, gender identity and expression,
+level of experience, education, socio-economic status, nationality, personal
+appearance, race, religion, or sexual identity and orientation.
 
 ## Our Standards
 
@@ -182,6 +186,10 @@ __END__
 =head1 AUTHOR
 
 Kivanc Yazan C<< <kyzn at cpan.org> >>
+
+=head1 CONTRIBUTORS
+
+Joelle Maslak C<< <jmaslak at antelope.net> >>
 
 =head1 COPYRIGHT AND LICENSE
 

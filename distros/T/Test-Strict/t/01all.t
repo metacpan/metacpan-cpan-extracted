@@ -15,7 +15,7 @@ if ($^O =~ /MSWin/i) { # Load Win32 if we are under Windows and if module is ava
   }
 }
 
-my $tests = 55;
+my $tests = 57;
 $tests += 2 if -e 'blib/lib/Test/Strict.pm';
 plan  tests => $tests;
 
@@ -277,4 +277,3 @@ use v5.12;
 
 $x = 23;
 ---------
-

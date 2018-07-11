@@ -9,3 +9,6 @@ Revision history for Perl extension Template::Nest.
 
 0.03  Mon Mar 26 11:10:16 2018
     - Correct bug when reporting a missing template param
+
+0.04  Sun Jul  8 11:05:21 2018
+	- non specified parameters now render as empty strings  

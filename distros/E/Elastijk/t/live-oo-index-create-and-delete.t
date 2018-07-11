@@ -11,13 +11,22 @@ unless ($ENV{TEST_LIVE}) {
 use Elastijk;
 
 my $es = Elastijk->new( host => "localhost", port => "9200" );
+
+my $res = $es->get(path => '/');
+my $es_server_version = $res->{version}{number};
+my $es_version_6_or_newer = ($es_server_version ge '6.0.0');
+
 my $test_index_name = "test_index_$$";
-my $res;
 
 subtest "create an index with settings and mappings" => sub {
     # Check if the index exists
     $res = $es->exists( index => $test_index_name );
     ok !$res, "The index $test_index_name should not exist because we have not created it yet.";
+
+    my $Str = { type => "string" };
+    if ($es_version_6_or_newer) {
+        $Str = { type => 'text' };
+    }
 
     # Create an index with settings and mappings.
     $res = $es->put(
@@ -32,8 +41,8 @@ subtest "create an index with settings and mappings" => sub {
             mappings => {
                 cafe => {
                     properties => {
-                        name => { type => "string" },
-                        address => { type => "string" }
+                        name => $Str,
+                        address => $Str,
                     }
                 }
             }

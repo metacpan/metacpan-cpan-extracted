@@ -1,7 +1,7 @@
 package Elasticsearch::Model::Document::Role::Metaclass;
 
 use Moose::Role;
-use Data::Printer;
+
 
 has shortname => (
     is      => 'ro',

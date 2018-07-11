@@ -6,6 +6,10 @@ For more detail please see the commit log at
 
   https://github.com/timj/perl-Astro-Catalog
 
+v4.34
+
+  + Updated reference coordinates for 4_sesame.t test.
+
 v4.33
 
   + Updated the test scripts to work with the latest release

@@ -1,6 +1,7 @@
 #! /usr/bin/env perl
 use strict;
 use warnings;
+no warnings 'once';
 use Try::Tiny;
 use Test::More;
 

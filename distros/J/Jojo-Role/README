@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Jojo-Role,
-version 0.4.0:
+version 0.5.0:
 
   Role::Tiny + lexical "with"
 
-This software is copyright (c) 2017 by Adriano Ferreira.
+This software is copyright (c) 2017-2018 by Adriano Ferreira.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

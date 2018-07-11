@@ -10,7 +10,7 @@ my @uris = (
   'https://user:pwd@192.168.0.1:8000/foo/bar?baz=bat&slack=fnord&asdf=the+quick%20brown+fox+%26+hound#foofrag',
 );
 
-ok(uri($_), 'uri') foreach @uris;
+ok(uri($_), "uri: $_") foreach @uris;
 
 is uri(undef), '', 'undef';
 is uri(''), '', 'empty string';
@@ -77,24 +77,24 @@ subtest 'split_path' => sub{
 };
 
 subtest 'overruns' => sub{
-   # scheme: 16
-   # auth:   267
-   # path:   256
-   # query:  1024
-   # frag:   32
-   # usr:    64
-   # pwd:    64
-   # host:   128
+   # scheme: 32
+   # path:   2048
+   # query:  2048
+   # frag:   128
+   # usr:    128
+   # pwd:    128
+   # host:   512
    # port:   8
-   ok uri(sprintf('%s://www.test.com', 'x' x 17)), 'scheme';
-   ok uri(sprintf('http://%s', 'x' x 265)), 'auth';
-   ok uri(sprintf('http://%s:foo@www.test.com', 'x' x 65)), 'usr';
-   ok uri(sprintf('http://someone:%s@www.test.com', 'x' x 65)), 'pwd';
-   ok uri(sprintf('http://%s', 'x' x 129)), 'host';
-   ok uri('http://www.test.com:1234567890'), 'port';
-   ok uri(sprintf('http://www.test.com/%s', 'x' x 257)), 'path';
-   ok uri(sprintf('http://www.test.com/foo/?%s', 'x' x 1025)), 'query';
-   ok uri(sprintf('http://www.test.com/foo#%s', 'x' x 33)), 'frag';
+   # auth:   779 = 128 (usr) + 128 (pwd) + 512 (host) + 8 (port) + 3 (separator chars)
+   ok dies{ uri(sprintf('%s://www.test.com', 'x' x 33)) }, 'scheme';
+   ok dies{ uri(sprintf('http://%s', 'x' x 780)) }, 'auth';
+   ok dies{ uri(sprintf('http://%s:foo@www.test.com', 'x' x 129)) }, 'usr';
+   ok dies{ uri(sprintf('http://someone:%s@www.test.com', 'x' x 129)) }, 'pwd';
+   ok dies{ uri(sprintf('http://%s', 'x' x 513)) }, 'host';
+   ok dies{ uri('http://www.test.com:1234567890') }, 'port';
+   ok dies{ uri(sprintf('http://www.test.com/%s', 'x' x 2049)) }, 'path';
+   ok dies{ uri(sprintf('http://www.test.com/foo/?%s', 'x' x 2049)) }, 'query';
+   ok dies{ uri(sprintf('http://www.test.com/foo#%s', 'x' x 129)) }, 'frag';
 };
 
 done_testing;

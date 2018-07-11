@@ -15,7 +15,7 @@ sub new {
 
 sub __fleshen_request_args {
     my ($self, $args) = @_;
-    $args->{$_} ||= $self->{$_} for grep { exists $self->{$_} } qw(host port index type head socket_cache on_connect connect_timeout read_timeout);
+    $args->{$_} ||= $self->{$_} for grep { defined $self->{$_} } qw(host port index type head socket_cache on_connect connect_timeout read_timeout);
 }
 
 sub request {
@@ -61,8 +61,26 @@ sub post {
 }
 
 sub exists {
-    my $self = shift;
-    my ($status,$res) = $self->request(method => "HEAD", @_);
+    my ($self, %args) = @_;
+    my $index = exists($args{index}) ? $args{index} : $self->{index};
+
+    my ($status,$res);
+
+    if ($index && exists($args{type}) && !exists($args{id})) {
+        # Type exists API
+        # https://www.elastic.co/guide/en/elasticsearch/reference/6.0/indices-types-exists.html
+
+        $res = $self->request( method => 'GET', path => '/', index => undef );
+        if ( ($res->{version}{number} || '') ge '5') {
+            my $path = '/' . $index . '/_mappings/' . $args{type};
+            ($status,$res) = $self->request(method => "GET", path => $path);
+        } else {
+            ($status,$res) = $self->request(method => "HEAD", %args);
+        }
+    } else {
+        ($status,$res) = $self->request(method => "HEAD", %args);
+    }
+
     return ($status,'2' eq substr($status,0,1));
 }
 
@@ -104,6 +122,37 @@ sub scan_scroll {
         ($status,$res) = $self->get(
             index => "_search", type => "scroll", #WTF
             uri_param => { scroll => $uri_param{scroll}, scroll_id => $scroll_id }
+        );
+        if (substr($status,0,1) eq '2' && @{$res->{hits}{hits}} > 0) {
+            my $r = $on_response_callback->($status, $res);
+            last if defined($r) && !$r;
+            $scroll_id = $res->{_scroll_id};
+        } else {
+            last;
+        }
+    }
+}
+
+sub search_scroll {
+    my ($self, %args) = @_;
+    my $on_response_callback = delete $args{on_response};
+
+    my %uri_param = %{ delete($args{uri_param}) || {} };
+    $uri_param{scroll} ||= "10m";
+    my $scroll_id;
+    my ($status, $res) = $self->post(%args, command => "_search", uri_param => \%uri_param);
+    if (substr($status,0,1) ne '2') {
+        return;
+    }
+
+    my $r = $on_response_callback->($status, $res);
+    return if defined($r) && !$r;
+
+    while (1) {
+        $scroll_id = $res->{_scroll_id};
+        ($status,$res) = $self->post(
+            path => "/_search/scroll",
+            body => { scroll => $uri_param{scroll}, scroll_id => $scroll_id }
         );
         if (substr($status,0,1) eq '2' && @{$res->{hits}{hits}} > 0) {
             my $r = $on_response_callback->($status, $res);

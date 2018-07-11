@@ -1077,12 +1077,12 @@ SPVM_OP* SPVM_OP_get_target_op_var(SPVM_COMPILER* compiler, SPVM_OP* op) {
   return op_var;
 }
 
-int32_t SPVM_OP_get_my_index(SPVM_COMPILER* compiler, SPVM_OP* op) {
+int32_t SPVM_OP_get_my_var_id(SPVM_COMPILER* compiler, SPVM_OP* op) {
   (void)compiler;
   
   SPVM_OP* op_var = SPVM_OP_get_target_op_var(compiler, op);
   
-  return op_var->uv.var->op_my->uv.my->index;
+  return op_var->uv.var->op_my->uv.my->var_id;
 }
 
 
@@ -1201,6 +1201,13 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     }
     case SPVM_OP_C_ID_PACKAGE_VAR_ACCESS: {
       SPVM_PACKAGE_VAR* package_var = op->uv.package_var_access->op_package_var->uv.package_var;
+      if (package_var->op_type) {
+        type = package_var->op_type->uv.type;
+      }
+      break;
+    }
+    case SPVM_OP_C_ID_PACKAGE_VAR: {
+      SPVM_PACKAGE_VAR* package_var = op->uv.package_var;
       if (package_var->op_type) {
         type = package_var->op_type->uv.type;
       }
@@ -1578,6 +1585,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   package->op_name = op_name_package;
 
   // Package is interface
+  int32_t duplicate_descriptors = 0;
   if (op_list_descriptors) {
     SPVM_OP* op_descriptor = op_list_descriptors->first;
     while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
@@ -1585,9 +1593,15 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       switch (descriptor->id) {
         case SPVM_DESCRIPTOR_C_ID_INTERFACE:
           package->category = SPVM_PACKAGE_C_CATEGORY_INTERFACE;
+          duplicate_descriptors++;
           break;
         case SPVM_DESCRIPTOR_C_ID_POINTER:
           package->category = SPVM_PACKAGE_C_CATEGORY_POINTER;
+          duplicate_descriptors++;
+          break;
+        case SPVM_DESCRIPTOR_C_ID_VALUE_T:
+          package->category = SPVM_PACKAGE_C_CATEGORY_VALUE_T;
+          duplicate_descriptors++;
           break;
         case SPVM_DESCRIPTOR_C_ID_PRIVATE:
           package->is_private = 1;
@@ -1599,6 +1613,10 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
           SPVM_yyerror_format(compiler, "Invalid package descriptor %s at %s line %d\n", SPVM_DESCRIPTOR_C_ID_NAMES[descriptor->id], op_package->file, op_package->line);
       }
     }
+  }
+  
+  if (duplicate_descriptors > 1) {
+    SPVM_yyerror_format(compiler, "Invalid descriptor combination at %s line %d\n", op_list_descriptors->file, op_list_descriptors->line);
   }
   
   // Divide declarations to field, sub, enum, package variable, use
@@ -1845,7 +1863,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       SPVM_HASH_insert(package_var->op_package->uv.package->package_var_signature_symtable, package_var_signature, strlen(package_var_signature), package_var);
     }
   }
-
+  
   return op_package;
 }
 

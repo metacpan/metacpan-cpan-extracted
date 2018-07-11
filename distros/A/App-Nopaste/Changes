@@ -1,5 +1,8 @@
 Revision history for App-Nopaste
 
+1.012   2018-07-08 03:56:39Z
+        - add GitLab service
+
 1.011   2017-08-26 20:31:37Z
         - fix formatting of script pod
 

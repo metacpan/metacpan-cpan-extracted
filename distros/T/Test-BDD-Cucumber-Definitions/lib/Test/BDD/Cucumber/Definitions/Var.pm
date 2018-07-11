@@ -8,7 +8,7 @@ use Exporter qw(import);
 use Test::BDD::Cucumber::Definitions qw(S :validator);
 use Test::More;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 our @EXPORT_OK = qw(Var);
 
@@ -40,6 +40,19 @@ sub scenario_var_random {
     $str =~ s/X(?=X*\z)/$CHARS[ int( rand( @CHARS ) ) ]/gex;
 
     S->{_Var}->{scenario}->{vars}->{$name} = $str;
+
+    return 1;
+}
+
+sub scenario_var_struct {
+    my $self = shift;
+    my ( $name, $jsonpath ) = validator_ns->(@_);
+
+    S->{Var} = __PACKAGE__;
+
+    my $value = S->{Struct}->data_element($jsonpath);
+
+    S->{_Var}->{scenario}->{vars}->{$name} = $value;
 
     return 1;
 }

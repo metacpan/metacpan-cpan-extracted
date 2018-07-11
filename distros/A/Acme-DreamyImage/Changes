@@ -1,8 +1,7 @@
 Revision history for Perl extension Acme::DreamyImage
 
-1.1:
-- Fix small blank images
+2.0     Mon Jul  9 23:27:07 JST 2018
+        - crazier version
 
-1.0:
-- The release.
-
+0.01    Fri May 21 08:10:08 2010
+        - original version

@@ -8,7 +8,7 @@ env:
   - "HARNESS_OPTIONS=j9"
 install:
   - "cpanm -n https://github.com/jhthorsen/json-validator/archive/master.tar.gz"
-  - "cpanm -n https://github.com/jhthorsen/mojolicious-plugin-openapi/master.tar.gz"
+  - "cpanm -n https://github.com/jhthorsen/mojolicious-plugin-openapi/archive/master.tar.gz"
   - "cpanm -n Test::Pod Test::Pod::Coverage IO::Socket::SSL"
   - "cpanm -n --installdeps ."
 notifications:

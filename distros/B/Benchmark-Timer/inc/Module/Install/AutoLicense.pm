@@ -6,7 +6,7 @@ use warnings;
 use base qw(Module::Install::Base);
 use vars qw($VERSION);
 
-$VERSION = '0.08';
+$VERSION = '0.10';
 
 my %licenses = (
     perl         => 'Software::License::Perl_5',

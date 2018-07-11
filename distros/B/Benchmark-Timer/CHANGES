@@ -1,3 +1,13 @@
+Version 0.7111:
+- Update META.yml
+
+Version 0.7110:
+- Trying once again to fix the compile test on windows
+
+Version 0.7109:
+- Add missing URI::Escape dependency
+- Check in standard tests, including one that skips the compile check on Windows
+
 Version 0.7108:
 - Add standard tests
 - Fix compatibility issue with newer versions of perl, which remove "." from

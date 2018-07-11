@@ -157,7 +157,7 @@ appreciated.
 
 =head2 usage
 
-  $str = $self->description;
+  $str = $self->usage;
 
 =head1 METHODS
 

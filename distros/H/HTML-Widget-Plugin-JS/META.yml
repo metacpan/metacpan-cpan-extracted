@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/rjbs/HTML-Widget-Plugin-JS/issues
   homepage: https://github.com/rjbs/HTML-Widget-Plugin-JS
   repository: https://github.com/rjbs/HTML-Widget-Plugin-JS.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -143,7 +143,7 @@ x_Dist_Zilla:
           version_by_branch: 1
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.18.0
           repo_root: .
       name: '@RJBS/Git::NextVersion'
       version: '2.045'
@@ -287,7 +287,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.18.0
           repo_root: .
       name: '@RJBS/@Git/Check'
       version: '2.045'
@@ -304,7 +304,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.18.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -317,11 +317,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.006'
+          tag: '0.007'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.18.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -336,7 +336,7 @@ x_Dist_Zilla:
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.18.0
           repo_root: .
       name: '@RJBS/@Git/Push'
       version: '2.045'
@@ -344,7 +344,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.17.1
+          git_version: 2.18.0
           include_authors: 0
           include_releaser: 1
           order_by: name

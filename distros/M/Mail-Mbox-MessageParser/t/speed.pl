@@ -7,7 +7,7 @@
 use strict;
 use warnings 'all';
 use Config;
-use File::Slurp;
+use File::Slurper qw(read_text);
 
 use lib 't';
 use Test::Utils;
@@ -78,7 +78,7 @@ sub CreateInputFiles
   {
     print "Making input file ($MAILBOX_SIZE bytes).\n";
 
-    my $data = read_file('t/mailboxes/mailarc-1.txt');
+    my $data = read_text('t/mailboxes/mailarc-1.txt', undef, 1);
 
     open FILE, ">$filename";
 

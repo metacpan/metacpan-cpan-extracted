@@ -10,7 +10,7 @@ use strict;
 use Carp;
 use Class::Multimethods;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 sub import
 {
@@ -898,7 +898,7 @@ It is, however, possible to define a different
 meta-semantics for logical operations between superpositions; one that preserves the 
 intuitive logic of comparisons but also gives 
 limited access to the states that cause those 
-comparsions to succeed. 
+comparisons to succeed. 
 
 The key is to deviate from the arithmetic view 
 of superpositional comparison (namely, that a 

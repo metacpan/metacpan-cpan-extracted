@@ -46,13 +46,13 @@ sub main ( ) {
 sub info ( ) {
     exit 0 if $o{1} ;
     $0 =~ s|.*/||;
-    print STDERR CYAN "used random seed = $o{s} ($0 -s $o{s} -g ${r}x${c} -y $d..$u" . 
-       (defined $o{'.'} ? " -. $o{'.'}" : '' ) .")\n" ;
+    print STDERR CYAN "[$0 -g ${r}x${c} -y $d..$u" . 
+       (defined $o{'.'} ? " -. $o{'.'}" : '' ) ."] used random seed = $o{s}\n" ;
 }
 
 ## ヘルプとバージョン情報
 BEGIN {
-  our $VERSION = 0.23 ;
+  our $VERSION = 0.24 ;
   $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
   grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
     # 最初は 0.21 を目安とする。
@@ -60,6 +60,7 @@ BEGIN {
     # 2.00 以上とする必要条件はテストコードが含むこと。
    # 0.22 : 英文マニュアルをPOD形式にする。
    # 0.23 : 英文マニュアルのPOD形式の部分をさらに増やした。
+   # 0.24 : 英文マニュアルを少し書き加え。
 }  
 sub HELP_MESSAGE {
     use FindBin qw[ $Script $Bin ] ;
@@ -94,11 +95,11 @@ saikoro
 
 =head1 VERSION 
 
-0.23 (2018-07-03)
+0.24 (2018-07-10)
 
 =head1 SYNOPSIS
 
-saikoro B<-g I,J  -y L..U>   # I,J,L,U are all numbers.
+saikoro B<[-g N1[,N2]] [-y N3[..N4]]>   # N1, N2, N3 and N4 are all numbers.
 
 =head1 DESCRIPTION
 
@@ -109,9 +110,9 @@ Generates random uniform variable. Discrete/uniform can be specified.
 
 =over 4
 
-=item B<-g N>
+=item B<-g N1>
 
-Get N random variables.
+Get N1 random variables. N1 is a positive interger.
 
 =item B<-g N1,N2>
 
@@ -120,17 +121,21 @@ The form "B<-g N1xN2>" is allowed.
 
 =item B<-~   >
 
-The number specifications N1 and N2 are reversed.
+The number specifications N1 and N2 are reversed, so N1 for horizontal, N2 for vertical.
 
-=item B<-y N1,N2>
+=item B<-y N3,N4>
 
-Limit the values into the number interval [N1,N2]. 
-The form "B<-y N1..N2>" is also allowed. 
+Limit the values into the number interval [N3,N4]. 
+The form "B<-y N3..N4>" is also allowed. 
+
+=item B<-y N3> 
+
+Similar to -y 1..N3. When -. N is simultaneously set, similar to -y 0..N3. 
 
 =item B<-. N>
 
-Switch to continuous from discrete. N digits after decimal points by rounding.
-N=0 means integers
+N digits after decimal points by rounding(, switching from merely discrete integers to continuous). 
+If N=0, the outputs are integers.
 
 =item B<-1>
 

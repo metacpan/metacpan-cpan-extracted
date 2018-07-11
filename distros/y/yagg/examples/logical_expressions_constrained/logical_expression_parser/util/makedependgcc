@@ -6,10 +6,11 @@
 # versions of gcc/g++. Call it like:
 # makedependgcc g++ -M -Idir1 -Idir2 input.cc -o input.o
 
-my $VERSION = 0.20;
-
 use strict;
 use Getopt::Std;
+use File::Slurper qw(read_text write_text);
+
+my $VERSION = 0.20;
 
 die usage() if !@ARGV || $ARGV[0] =~ /--help/;
 
@@ -27,14 +28,14 @@ unless ($opts{'f'})
 
 my $makefile_name = Get_Makefile_Name();
 
-my $makefile_text = Get_Makefile_Text($makefile_name);
+my $makefile_text = read_text($makefile_name, undef, 1);
 
 $makefile_text = Remove_Old_Dependencies($makefile_text)
   unless $opts{'a'};
 
 if ($opts{'r'})
 {
-  Write_Makefile_Text($makefile_name, $makefile_text);
+  write_text($makefile_name, $makefile_text, undef, 1);
   exit;
 }
 
@@ -42,7 +43,7 @@ Back_Up_Makefile($makefile_name) unless $opts{'B'};
 
 $makefile_text = Add_Dependencies($makefile_text, $dependencies);
 
-Write_Makefile_Text($makefile_name, $makefile_text);
+write_text($makefile_name, $makefile_text, undef, 1);
 
 exit;
 
@@ -69,7 +70,10 @@ sub Get_Dependencies
 
   my $dependencies = `@commands`;
 
-  exit 1 if $?;
+  if ($?) {
+    warn "$0: compiler command failed";
+    exit 1;
+  }
 
   # New versions of g++ are buggy. They write the output to the file
   # specified by the -o flag instead of dumping to the screen. Plus the -o
@@ -79,11 +83,7 @@ sub Get_Dependencies
   {
     my ($output_filename) = "@commands" =~ /-o (\S+)/;
 
-    open OUTPUT, $output_filename
-      or die "Can't read dependencies from $output_filename: $!";
-    local $/ = undef;
-    $dependencies = <OUTPUT>;
-    close OUTPUT;
+    my $dependencies = read_text($output_filename, undef, 1);
 
     unlink $output_filename;
 
@@ -146,21 +146,6 @@ sub Back_Up_Makefile
 
 # ----------------------------------------------------------------------------
 
-sub Get_Makefile_Text
-{
-  my $makefile_name = shift;
-
-  open MAKEFILE, "$makefile_name"
-    or die "Couldn't open $makefile_name: $!\n";
-  local $/ = undef;
-  my $makefile_text = <MAKEFILE>;
-  close MAKEFILE;
-
-  return $makefile_text;
-}
-
-# ----------------------------------------------------------------------------
-
 sub Remove_Old_Dependencies
 {
   my $makefile_text = shift;
@@ -183,17 +168,3 @@ sub Add_Dependencies
 
   return $makefile_text;
 }
-
-# ----------------------------------------------------------------------------
-
-sub Write_Makefile_Text
-{
-  my $makefile_name = shift;
-  my $makefile_text = shift;
-
-  open MAKEFILE, ">$makefile_name"
-    or die "Couldn't open $makefile_name for writing: $!\n";
-  print MAKEFILE $makefile_text;
-  close MAKEFILE;
-}
-

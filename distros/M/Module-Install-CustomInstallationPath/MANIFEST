@@ -10,7 +10,6 @@ lib/Module/Install/CustomInstallationPath.pm
 
 # Tests
 t/01-basic.t
-t/pod.t
 
 # Module::Install extensions
 inc/Module/Install.pm
@@ -24,6 +23,7 @@ inc/Module/Install/GithubMeta.pm
 inc/Module/Install/Include.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
+inc/Module/Install/StandardTests.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm

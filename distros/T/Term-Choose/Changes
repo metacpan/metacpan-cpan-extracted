@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.601   2018-07-10
+        - Bugfix backup self.
+        - Bugfix in 'cut_to_printwidth'.
+
 1.600   2018-07-02
         - "Term::Choose" uses now its own function to determine the print width of a character.
         - Charater widths are now cached.

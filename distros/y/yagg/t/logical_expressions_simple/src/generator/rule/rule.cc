@@ -112,7 +112,10 @@ ostream& operator<< (ostream& in_ostream, const vector<Rule*>& in_rule_list)
     {
       if (a_rule != in_rule_list.begin())
         in_ostream << ',';
-      in_ostream << Utility::readable_type_name(typeid(**a_rule));
+
+      // Work around "expression with side effects will be evaluated despite being used as an operand to 'typeid' [-Wpotentially-evaluated-expression]"
+      Rule& dereferenced_rule = **a_rule;
+      in_ostream << Utility::readable_type_name(typeid(dereferenced_rule));
 //      in_ostream << *a_rule <<
 //        "(" << Utility::readable_type_name(typeid(**a_rule)) << ")";
     }
@@ -136,7 +139,9 @@ ostream& operator<< (ostream& in_ostream,
     {
       if (a_rule != in_rule_list.begin())
         in_ostream << ',';
-      in_ostream << Utility::readable_type_name(typeid(**a_rule));
+      // Work around "expression with side effects will be evaluated despite being used as an operand to 'typeid' [-Wpotentially-evaluated-expression]"
+      const Rule& dereferenced_rule = **a_rule;
+      in_ostream << Utility::readable_type_name(typeid(dereferenced_rule));
 //      in_ostream << *a_rule <<
 //        "(" << Utility::readable_type_name(typeid(**a_rule)) << ")";
     }
@@ -159,7 +164,9 @@ ostream& operator<< (ostream& in_ostream, const list<Rule*>& in_rule_list)
     {
       if (a_rule != in_rule_list.begin())
         in_ostream << ',';
-      in_ostream << Utility::readable_type_name(typeid(**a_rule));
+      // Work around "expression with side effects will be evaluated despite being used as an operand to 'typeid' [-Wpotentially-evaluated-expression]"
+      Rule& dereferenced_rule = **a_rule;
+      in_ostream << Utility::readable_type_name(typeid(dereferenced_rule));
 //      in_ostream << *a_rule <<
 //        "(" << Utility::readable_type_name(typeid(**a_rule)) << ")";
     }
@@ -183,7 +190,9 @@ ostream& operator<< (ostream& in_ostream,
     {
       if (a_rule != in_rule_list.begin())
         in_ostream << ',';
-      in_ostream << Utility::readable_type_name(typeid(**a_rule));
+      // Work around "expression with side effects will be evaluated despite being used as an operand to 'typeid' [-Wpotentially-evaluated-expression]"
+      const Rule& dereferenced_rule = **a_rule;
+      in_ostream << Utility::readable_type_name(typeid(dereferenced_rule));
 //      in_ostream << *a_rule <<
 //        "(" << Utility::readable_type_name(typeid(**a_rule)) << ")";
     }

@@ -3,9 +3,12 @@ abstract: 'Line-by-line file access loops'
 author:
   - 'Joelle Maslak <jmaslak@antelope.net>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   File::Temp: '0'
   Test2::Require::Module: '0'
   Test2::V0: '0'
+  Test::More: '0'
   Test::UseAllModules: '0.17'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -19,13 +22,17 @@ name: File-ByLine
 provides:
   File::ByLine:
     file: lib/File/ByLine.pm
-    version: '1.005'
+    version: '1.181861'
+  File::ByLine::Object:
+    file: lib/File/ByLine/Object.pm
+    version: '1.181861'
 recommends:
   Parallel::WorkUnit: '1.117'
 requires:
   Carp: '0'
   Exporter: '0'
   Fcntl: '0'
+  Scalar::Util: '0'
   autodie: '0'
   perl: v5.10.0
   strict: '0'
@@ -33,5 +40,7 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/File-ByLine/issues
   repository: git://github.com/jmaslak/File-ByLine.git
-version: '1.005'
+version: '1.181861'
+x_contributor_covenant:
+  version: 0.02
 x_serialization_backend: 'YAML::Tiny version 1.70'

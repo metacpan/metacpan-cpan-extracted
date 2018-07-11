@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::Debian;
 # ABSTRACT: Service provider for Debian - https://paste.debian.net/
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 
 use parent 'App::Nopaste::Service';
 
@@ -290,13 +290,9 @@ App::Nopaste::Service::Debian - Service provider for Debian - https://paste.debi
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =for stopwords Niebur
-
-=head1 AUTHOR
-
-Ryan Niebur, C<< <ryanryan52@gmail.com> >>
 
 =head1 SUPPORT
 
@@ -305,7 +301,7 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 =head1 AUTHOR
 
-Shawn M Moore, <sartak@gmail.com>
+Ryan Niebur, <ryanryan52@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -43,6 +43,7 @@
       },
       "test" : {
          "requires" : {
+            "IPC::System::Simple" : "0",
             "Test::Carp" : "0",
             "Test::LWP::UserAgent" : "0",
             "Test::Most" : "0",
@@ -64,6 +65,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-CA"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

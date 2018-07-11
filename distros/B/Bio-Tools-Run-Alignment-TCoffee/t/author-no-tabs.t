@@ -15,7 +15,6 @@ use Test::More 0.88;
 use Test::NoTabs;
 
 my @files = (
-    'lib/Bio/Installer/TCoffee.pm',
     'lib/Bio/Tools/Run/Alignment/TCoffee.pm',
     't/00-compile.t',
     't/TCoffee.t',

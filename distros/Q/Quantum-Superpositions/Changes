@@ -50,3 +50,7 @@ Revision history for Perl extension Quantum::Superpositions.
 2.01	Tue Apr 22 17:45:31 CDT 2003
 
 - Added diskfree to the demos.
+
+2.0.2   Sun Jul  8 15:28:31 CDT 2018
+
+- POD, thanks for Florian Schlichting

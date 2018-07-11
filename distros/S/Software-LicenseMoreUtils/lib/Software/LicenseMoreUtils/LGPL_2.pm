@@ -9,7 +9,7 @@
 use strict;
 use warnings;
 package Software::LicenseMoreUtils::LGPL_2;
-$Software::LicenseMoreUtils::LGPL_2::VERSION = '0.005';
+$Software::LicenseMoreUtils::LGPL_2::VERSION = '1.001';
 use base 'Software::License';
 # ABSTRACT: GNU Library General Public License, Version 2
 
@@ -32,7 +32,7 @@ Software::LicenseMoreUtils::LGPL_2 - GNU Library General Public License, Version
 
 =head1 VERSION
 
-version 0.005
+version 1.001
 
 =head1 NAME
 

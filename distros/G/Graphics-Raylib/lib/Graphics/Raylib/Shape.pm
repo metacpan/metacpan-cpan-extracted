@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Shape;
 
 # ABSTRACT: Collection of drawable shapes
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 use List::Util qw(min max);
 use Graphics::Raylib::XS qw(:all);
@@ -24,7 +24,7 @@ Graphics::Raylib::Shape - Collection of drawable shapes
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

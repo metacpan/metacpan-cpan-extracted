@@ -35,7 +35,7 @@ CFLAGS		= -Wall -pedantic -O3
 FFLAGS		= -g -C
 
 # Linker flags. Use -lg2c if you're calling Fortran from C/C++
-LDFLAGS		= 
+LDFLAGS		=
 
 # Appear on the end of the link line
 LIB_FLAGS :=
@@ -57,7 +57,7 @@ CP          = '/usr/local/opt/coreutils/libexec/gnubin/cp'
 RM          = '/usr/local/opt/coreutils/libexec/gnubin/rm'
 MV          = '/usr/local/opt/coreutils/libexec/gnubin/mv'
 BASH        = bash
-FIND        = '/usr/bin/find'
+FIND        = '/usr/local/bin/find'
 GREP        = '/usr/bin/grep'
 CHMOD	    = '/usr/local/opt/coreutils/libexec/gnubin/chmod'
 CC          = gcc
@@ -75,10 +75,9 @@ ZIP         = zip
 DIFF        = diff
 MKDIRHIER   = $(PERL) $(UTILSDIR)/mkdirhier.pl
 DATE        = '/usr/local/opt/coreutils/libexec/gnubin/date'
-PERL        = '/usr/bin/perl'
+PERL        = '/Users/coppit/perl5/perlbrew/perls/perl-5.8.8/bin/perl'
 MAKEDEPEND  = $(PERL) $(UTILSDIR)/makedependgcc
 COLORS      = $(PERL) $(UTILSDIR)/colors
-BASEDIR     = $(PERL) $(UTILSDIR)/basedir
 DIRNAME     = '/usr/local/opt/coreutils/libexec/gnubin/dirname'
 EXPR        = '/usr/local/opt/coreutils/libexec/gnubin/expr'
 
@@ -149,7 +148,7 @@ LDFLAGS         := -L$(LIBDIR) $(LDFLAGS)
 PROGRAMS    = $(CP) $(RM) $(MV) $(FIND) $(GREP) $(CXX) $(LD) $(FC) \
               $(AR) $(LEX) $(UNIX2DOS) $(YACC) $(MKDIR) $(TAR) $(GZIP) \
               $(ZIP) $(DIFF) $(MKDIRHIER) $(DATE) $(PERL) $(MAKEDEPEND) \
-              $(CHMOD) $(BASH) $(LN) $(DIRNAME) $(BASEDIR) $(EXPR)
+              $(CHMOD) $(BASH) $(LN) $(DIRNAME) $(EXPR)
 
 # -----------------------------------------------------------------------------
 
@@ -166,7 +165,7 @@ LIB_FLAGS := -l$(LIBRARY_NAME) $(LIB_FLAGS)
 EMPTY =
 SPACE = $(EMPTY) $(EMPTY)
 COMMA = ,
-make_pattern = ($(subst $(SPACE),|,$(1)))
+make_pattern = \($(subst $(SPACE),\|,$(1))\)
 
 SRC_FILE_EXTS = \
   $(CFILEEXT) $(CCFILEEXT) $(FFILEEXT) $(LEXFILEEXT) $(YACCFILEEXT)
@@ -185,19 +184,19 @@ SRC_DIRS_PATTERN = $(call make_pattern,$(call compute_subdirs_with_sources))
 # Some subroutines to find source files and compute their corresponding object
 # files
 find_source_files = \
-  $(shell $(FIND)                  -E $(SRCDIR) -regex '$(SRCDIR)/$(1)/.*\.$(SRC_FILE_EXTS_PATTERN)')
+  $(shell $(FIND) $(SRCDIR) -regex '$(SRCDIR)/$(1)/.*\.$(SRC_FILE_EXTS_PATTERN)')
 
 find_shell_scripts = \
-  $(shell $(FIND)                  -E $(SRCDIR) -regex '$(SRCDIR)/$(1)/.*\.$(SCRIPTFILEEXT)')
+  $(shell $(FIND) $(SRCDIR) -regex '$(SRCDIR)/$(1)/.*\.$(SCRIPTFILEEXT)')
 
 # In case we need this later
 #find_nonsource_files = \
 #  $(filter-out \
-#    $(shell $(FIND)                  -E $(SRCDIR) -regex '$(SRCDIR)/$(1)/.*\.$(SRC_FILE_EXTS_PATTERN)'), \
-#    $(shell $(FIND)                  -E $(SRCDIR) -regex '$(SRCDIR)/$(1)/.*'))
+#    $(shell $(FIND) $(SRCDIR) -regex '$(SRCDIR)/$(1)/.*\.$(SRC_FILE_EXTS_PATTERN)'), \
+#    $(shell $(FIND) $(SRCDIR) -regex '$(SRCDIR)/$(1)/.*'))
 
 find_gen_source_files = \
-  $(shell $(FIND)                  -E $(SRCDIR) -regex '$(SRCDIR)/$(1)/.*\.$(GENERATED_SRC_FILE_EXTS_PATTERN)')
+  $(shell $(FIND) $(SRCDIR) -regex '$(SRCDIR)/$(1)/.*\.$(GENERATED_SRC_FILE_EXTS_PATTERN)')
 
 compute_subdirs_with_sources = $(filter-out progs tests progs/% tests/%, \
   $(sort $(subst $(SRCDIR)/,, \
@@ -355,10 +354,10 @@ make_directory = @ \
 	    echo '--' Creating directory $(STORAGE_DIRECTORY)/$(1)...; \
 	    echo $(MKDIRHIER) $(STORAGE_DIRECTORY)/$(1); \
 	    $(MKDIRHIER) $(STORAGE_DIRECTORY)/$(1); \
-	    if test ! -e `$(BASEDIR) $(1)`; then \
-	      echo '--' Making symbolic link from $(STORAGE_DIRECTORY)/`$(BASEDIR) $(1)` to `$(BASEDIR) $(1)`...; \
-	      echo $(LN) -s $(STORAGE_DIRECTORY)/`$(BASEDIR) $(1)` `$(BASEDIR) $(1)`; \
-	      $(LN) -s $(STORAGE_DIRECTORY)/`$(BASEDIR) $(1)` `$(BASEDIR) $(1)`; \
+	    if test ! -e `$(DIRNAME) $(1)`; then \
+	      echo '--' Making symbolic link from $(STORAGE_DIRECTORY)/`$(DIRNAME) $(1)` to `$(DIRNAME) $(1)`...; \
+	      echo $(LN) -s $(STORAGE_DIRECTORY)/`$(DIRNAME) $(1)` `$(DIRNAME) $(1)`; \
+	      $(LN) -s $(STORAGE_DIRECTORY)/`$(DIRNAME) $(1)` `$(DIRNAME) $(1)`; \
 	    fi; \
 	  else \
 	    echo '--' Creating directory $(1)...; \
@@ -413,9 +412,14 @@ error_msg = \
 
 check_programs : check_programs_message $(patsubst %,%.checkprogram,$(PROGRAMS))
 
+expr.checkprogram:
+	@if (expr 0 '&' 1 2>&1 > /dev/null); then \
+	  $(call warning_msg,Could not execute program expr. You may not need it--check the makefile.); \
+	fi
+
 %.checkprogram:
 	@if !($* --help 2>&1 | $(GREP) -i '\(usage\|option\|invalid\)' > /dev/null); then \
-	  $(call warning_msg,Could not find program $*. You may not need it--check the makefile.); \
+	  $(call warning_msg,Could not execute program $*. You may not need it--check the makefile.); \
 	fi
 
 # -----------------------------------------------------------------------------

@@ -1,10 +1,11 @@
 Build.PL
 Changes
+cpanfile
 lib/Alien/LibBigWig.pm
 LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
 README
 t/basic.t
 t/compile.t
-META.yml
-META.json

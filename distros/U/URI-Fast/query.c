@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "fast.h"
 
 typedef enum {
   KEY   = 1,

@@ -95,25 +95,9 @@ sub get_url {
 	}
 }
 
-=pod
-
-C<Net::RDAP::Registry-E<gt>get_url()> is just a wrapper to the
-following methods:
-
-=cut
-
-=pod
-
-	$url = Net::RDAP::Registry->ip($ip);
-
-This method returns a L<URI> object corresponding to the authoritative
-RDAP URL for C<$ip>, which is a L<Net::IP> object corresponding to an
-IPv4 or IPv6 address or address range.
-
-If no URL can be found in the IANA registry, then C<undef> is returned.
-
-=cut
-
+#
+# get URL for IP
+#
 sub ip {
 	my ($package, $ip) = @_;
 	croak(sprintf('Argument to %s->ip() must be a Net::IP', $package)) unless ('Net::IP' eq ref($ip));
@@ -142,18 +126,9 @@ sub ip {
 	return $package->assemble_url($package->get_best_url(@urls), 'ip', $ip->prefix);
 }
 
-=pod
-
-	$url = Net::RDAP::Registry->autnum($autnum);
-
-This method returns a L<URI> object corresponding to the authoritative
-RDAP URL for C<$autnum>, which is a L<Net::ASN> object corresponding
-to an Autonymous System number.
-
-If no URL can be found in the IANA registry, then C<undef> is returned.
-
-=cut
-
+#
+# get URL for AS Number
+#
 sub autnum {
 	my ($package, $autnum) = @_;
 	croak(sprintf('Argument to %s->autnum() must be a Net::ASN', $package)) unless ('Net::ASN' eq ref($autnum));
@@ -195,22 +170,9 @@ sub autnum {
 	return $package->assemble_url($package->get_best_url(@urls), 'autnum', $autnum->toasplain);
 }
 
-=pod
-
-	$url = Net::RDAP::Registry->domain($domain);
-
-This method returns a L<URI> object corresponding to the authoritative
-RDAP URL for C<$domain>, which is a L<Net::DNS::Domain> object
-corresponding to a fully-qualified domain name.
-
-C<$domain> may either represent a "forward" name such as
-C<example.com>, or a "reverse" domain such as
-C<168.192.in-addr.arpa>.
-
-If no URL can be found in the IANA registry, then C<undef> is returned.
-
-=cut
-
+#
+# get URL for domain
+#
 sub domain {
 	my ($package, $domain) = @_;
 	croak(sprintf('Argument to %s->domain() must be a Net::DNS::Domain', $package)) unless ('Net::DNS::Domain' eq ref($domain));

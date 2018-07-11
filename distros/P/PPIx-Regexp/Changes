@@ -1,3 +1,14 @@
+0.061		2018-07-09	T. R. Wyant
+    Only standalone graphemes and non-characters allowed as delimiters
+    starting with Perl 5.29.0.
+    
+    Non-ASCII delimiters started working in 5.8.3, so that is what
+    perl_version_introduced() returns for them.
+
+    Collateral with all this, accept word characters as delimiters, but
+    only with at least one space between the operator and the expression
+    -- that is, 'qr xyx' is OK, but 'qrxyx' is not.
+
 0.060		2018-06-16	T. R. Wyant
     \N{} now parses as the unknown token, not NoOp, regardless of the
     setting of 'use re qw< strict >;'. \N{} became unconditionally fatal

@@ -4,7 +4,7 @@ msdoc - Greple module for access MS office docx/pptx/xlsx documents
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -23,9 +23,13 @@ these data and replaces the search target.
 By default, text part from XML data is extracted.  This process is
 done by very simple method and may include redundant information.
 
+Strings are simply connected into paragrap for I<.docx> and I<.pptx>
+document.  For I<.xlsx> document, single space is inserted between
+them.  Use B<--separator> option to change this behavior.
+
 After every paragraph, single newline is inserted for I<.pptx> and
 I<.xlsx> file, and double newlines for I<.docx> file.  Use
-B<--space> option to change this behavior.
+B<--space> option to change.
 
 =head1 OPTIONS
 
@@ -42,6 +46,10 @@ and they will be highlighted inside whole text.
 
 Specify number of newlines inserted after every paragraph.  Any
 non-negative integer is allowed including zero.
+
+=item B<--separator>=I<string>
+
+Specify the separator string placed between each component strings.
 
 =item B<--indent>
 
@@ -76,7 +84,7 @@ Kazumasa Utashiro
 
 package App::Greple::msdoc;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use strict;
 use warnings;
@@ -94,23 +102,18 @@ use Data::Dumper;
 
 our $indent_mark = "| ";
 our $opt_space = undef;
+our $opt_separator = undef;
 our $opt_type;
 our $default_format = 'text';
 
-my $eop;	# end of paragraph
-
-# push @EXPORT, '&extract_text';
 sub extract_text {
     my %arg = @_;
     my $file = delete $arg{&FILELABEL} or die;
     my($suffix) = $file =~ /\.(\w+)$/;
     my $type = $opt_type || $suffix;
 
-    $eop = "\n" x do {
-	if    (defined $opt_space) { $opt_space }
-	elsif ($type =~ /^docx$/)  { 2 }
-	else                       { 1 }
-    };
+    $opt_space     //= ($type eq 'docx') ? 2 : 1;
+    $opt_separator //= ($type eq 'xlsx') ? " " : "";
 
     my $xml_re = qr/<\?xml\b[^>]*\?>\s*/;
     return unless /$xml_re/;
@@ -128,17 +131,16 @@ sub _xml2text {
 	while ($p =~ m{<(?<tag>(?:[apw]:)?t)\b[^>]*>(?<text>[^<]*?)</\g{tag}>}sg) {
 	    push @s, $+{text} if $+{text} ne '';
 	}
-	push @p, join('', @s, $eop) if @s;
+	@s or next;
+	push @p, join($opt_separator, @s) . ("\n" x $opt_space);
     }
     join '', @p;
 }
 
-# push @EXPORT, '&separate_xml';
 sub separate_xml {
     s{ (?<=>) ([^<]*) }{ $1 ? "\n$1\n" : "\n" }gex;
 }
 
-# push @EXPORT, '&indent_xml';
 sub indent_xml {
     my %arg = @_;
     my $file = delete $arg{&FILELABEL} or die;
@@ -233,6 +235,7 @@ __DATA__
 
 help	default		ignore
 help	--space		Number of newlines after paragraph
+help	--separator	Separator between each strings
 help	--indent	Indent XML data
 help	--indent-mark	Specify text for indentation
 help	--type		Specify document type (docx, pptx, xlsx)
@@ -250,6 +253,7 @@ option default \
 	--if '/\.(docx|pptx|xlsx)$/:&__PACKAGE__::extract'
 
 builtin space=i $opt_space
+builtin separator=s $opt_separator
 builtin type=s $opt_type
 builtin msdoc-format=s $default_format
 
@@ -264,6 +268,9 @@ builtin indent-mark=s $indent_mark
 ##
 ## --dump
 ##
-option --dump --le &sub{} --need 0 --all --epilogue 'sub{exit(0)}'
+option --dump \
+	-Mcolors --cm x --bright --face +D \
+	--le &sub{} --need 0 --all \
+	--epilogue 'sub{exit(0)}'
 
 #  LocalWords:  msdoc Greple greple Mmsdoc docx ppt xml pptx xlsx xl

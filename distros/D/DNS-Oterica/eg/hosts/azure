@@ -1,6 +1,7 @@
 hostname: azure
 domain: example.com
 location: microport
+aliases: [ azure.example.com ]
 ttl: 1234
 ip:
   ALL: 10.99.88.77

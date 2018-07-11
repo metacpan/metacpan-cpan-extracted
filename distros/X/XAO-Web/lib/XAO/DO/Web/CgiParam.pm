@@ -22,9 +22,7 @@ use XAO::Utils;
 use XAO::Errors qw(XAO::DO::Web::CgiParam);
 use base XAO::Objects->load(objname => 'Web::Page');
 
-use vars qw($VERSION);
-$VERSION='2.2';
-### $VERSION=(0+sprintf('%u.%03u',(q$Id: CgiParam.pm,v 2.1 2005/01/14 01:39:57 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION='2.2';
 
 sub display ($;%) {
     my $self=shift;

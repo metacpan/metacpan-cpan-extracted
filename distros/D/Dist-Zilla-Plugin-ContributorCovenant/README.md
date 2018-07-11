@@ -24,9 +24,17 @@ You can add following lines to your dist.ini as well.
 Note that this plugin will prune other CODE\_OF\_CONDUCT.md files, to
 avoid multiple CODE\_OF\_CONDUCT.md preventing the build.
 
+The version of this module will match the version of the Contributor
+Covenant used.  For instance, version 1.004001 will use Contributor
+Covenant version 1.4.1.
+
 # AUTHOR
 
 Kivanc Yazan `<kyzn at cpan.org>`
+
+# CONTRIBUTORS
+
+Joelle Maslak `<jmaslak at antelope.net>`
 
 # COPYRIGHT AND LICENSE
 

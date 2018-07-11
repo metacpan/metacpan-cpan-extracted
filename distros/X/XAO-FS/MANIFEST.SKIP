@@ -1,10 +1,10 @@
 Makefile(\.old)?$
-MYMETA.json
-MYMETA.yml
+MYMETA\..*
 ^\.config
-CVS/.*
 \.gitignore
 ^blib/.*
-^ta/.*
 pm_to_blib
 .*\.(c|o|bs)$
+.git/
+t/.*\.xt
+t/.*\.pl

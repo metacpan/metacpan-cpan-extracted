@@ -16,7 +16,38 @@ my $nest = Template::Nest->new(
     token_delims => ['<!--%','%-->']
 );
 
+
+
+
+#check any params not specified render as empty strings
 my $table = {
+    NAME => 'table',
+    rows => [{
+        NAME => 'tr',
+        cols => {
+            NAME => 'td',
+            #no contents
+        }
+    },{
+        NAME => 'tr',
+        cols => {
+            NAME => 'td',
+            #no contents
+        }
+    }]
+};
+
+my $html = $nest->render( $table );
+$html =~ s/\s//gs;
+my $x_html = "<table><tr><td></td></tr><tr><td></td></tr></table>";
+
+is( $html, $x_html, "html correct unspecified paramters" );
+
+
+
+
+
+$table = {
     NAME => 'table',
     rows => [{
         NAME => 'tr',
@@ -34,8 +65,8 @@ my $table = {
 };
 
 
-my $html = $nest->render( $table );
-my $x_html = "<table><tr><td>1</td></tr><tr><td>2</td></tr></table>";
+$html = $nest->render( $table );
+$x_html = "<table><tr><td>1</td></tr><tr><td>2</td></tr></table>";
 
 ok( $html, "html is returned" );
 is( ref($html),'',"returned html is a scalar" );
@@ -43,6 +74,9 @@ is( ref($html),'',"returned html is a scalar" );
 $html =~ s/\s//gs;
 
 is( $html, $x_html, "returned html is correct" );
+
+
+
 
 
 $nest->comment_delims("<!--","-->");
@@ -54,6 +88,8 @@ $html =~ s/\s//gs;
 $x_html = "<!--BEGINtable--><table><!--BEGINtr--><tr><!--BEGINtd--><td>1</td><!--ENDtd--></tr><!--ENDtr--><!--BEGINtr--><tr><!--BEGINtd--><td>2</td><!--ENDtd--></tr><!--ENDtr--></table><!--ENDtable-->";
 
 is( $html, $x_html, "html correct with show_labels=1" );
+
+
 
 
 

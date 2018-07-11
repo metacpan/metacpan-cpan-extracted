@@ -32,10 +32,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Role::Tiny" : "2.000005",
+            "Role::Tiny" : "2.000006",
             "Sub::Inject" : "v0.3.0",
             "experimental" : "0",
-            "perl" : "5.018"
+            "feature" : "0",
+            "perl" : "5.018",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -45,14 +49,15 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "Test::More" : "0.96"
+            "Test::More" : "0.96",
+            "constant" : "0"
          }
       }
    },
    "provides" : {
       "Jojo::Role" : {
          "file" : "lib/Jojo/Role.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.5.0"
       }
    },
    "release_status" : "stable",
@@ -67,10 +72,7 @@
          "web" : "https://github.com/aferreira/cpan-Jojo-Role"
       }
    },
-   "version" : "0.4.0",
-   "x_contributors" : [
-      "Adriano Ferreira <a.r.ferreira@gmail.com>"
-   ],
+   "version" : "0.5.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

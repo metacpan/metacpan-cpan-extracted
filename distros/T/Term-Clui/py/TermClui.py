@@ -952,7 +952,7 @@ pressed is also selected), and choose() returns a list of strings.
                 if not _icol_a[inew]:
                     break
                 new_mid_col = _icol_a[inew] + int(0.5*len(_list[inew]))
-                if new_mid_col < mid_col:         # we're past it
+                if new_mid_col <= mid_col:         # we're past it or aligned
                     break
                 right_of_target = new_mid_col - mid_col
                 inew-=1

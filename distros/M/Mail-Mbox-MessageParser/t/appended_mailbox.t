@@ -12,7 +12,7 @@ use Mail::Mbox::MessageParser::Config;
 use File::Spec::Functions qw(:ALL);
 use Test::Utils;
 use FileHandle;
-use File::Slurp;
+use File::Slurper qw(read_text write_text);
 
 eval 'require Storable;';
 
@@ -100,9 +100,9 @@ sub InitializeMailbox1
   my $source_filename = shift;
   my $mailbox_filename = shift;
 
-  my $mail = read_file($source_filename);
+  my $mail = read_text($source_filename);
 	my ($firstpart) = $mail =~ /(.*)From .*/s;
-  write_file($mailbox_filename, $firstpart);
+  write_text($mailbox_filename, $firstpart);
 }
 
 # ---------------------------------------------------------------------------
@@ -112,9 +112,9 @@ sub InitializeMailbox2
   my $source_filename = shift;
   my $mailbox_filename = shift;
 
-  my $mail = read_file($source_filename);
+  my $mail = read_text($source_filename);
 	my ($firstpart) = $mail =~ /(..*?)From .*/s;
-  write_file($mailbox_filename, $firstpart);
+  write_text($mailbox_filename, $firstpart);
 }
 
 # ---------------------------------------------------------------------------
@@ -177,7 +177,7 @@ sub GetSecondPart1
 {
   my $source_filename = shift;
 
-  my $mail = read_file($source_filename);
+  my $mail = read_text($source_filename, undef, 1);
 	my ($secondpart) = $mail =~ /.*(From .*)/s;
 
 	return $secondpart;
@@ -189,7 +189,7 @@ sub GetSecondPart2
 {
   my $source_filename = shift;
 
-  my $mail = read_file($source_filename);
+  my $mail = read_text($source_filename, undef, 1);
 	my ($secondpart) = $mail =~ /..*?(From .*)/s;
 
 	return $secondpart;
@@ -202,5 +202,7 @@ sub AppendToMailbox
   my $mailbox_filename = shift;
   my $email = shift;
 
-  append_file($mailbox_filename, $email);
+  my $mailbox = read_text($mailbox_filename);
+  $mailbox .= $email;
+  write_text($mailbox_filename, $mailbox);
 }

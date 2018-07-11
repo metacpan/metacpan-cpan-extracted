@@ -1,5 +1,16 @@
 Revision history for Dancer2-Plugin-Showterm
 
+0.0.2 2018-07-06
+  [ BUG FIXES ]
+    - I forgot to put the shared files in the distro. (GH#2)
+    - regex for path had typo. (tinita)
+
+  [ DOCUMENTATION ]
+    - Fixed minor typo. (Mohammad S Anwar, GH#1)
+
+  [ STATISTICS ]
+    - code churn: 15 files changed, 14074 insertions(+), 2 deletions(-)
+
 0.0.1 2018-06-20
   - First version, unleashed on an unsuspecting world.
 

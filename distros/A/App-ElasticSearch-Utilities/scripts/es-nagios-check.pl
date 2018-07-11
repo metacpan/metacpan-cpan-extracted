@@ -13,10 +13,10 @@ use Getopt::Long qw(:config no_ignore_case no_ignore_case_always);
 # Option Parsing
 my %OPT=();
 GetOptions(\%OPT,
-    'nodes|n:i',
+    'nodes|n=i',
     'check-indices|c',
     'shard-state',
-    'max-segments:i',
+    'max-segments=i',
     'help|h',
     'manual|m',
 );
@@ -219,7 +219,7 @@ es-nagios-check.pl - ElasticSearch Nagios Checks
 
 =head1 VERSION
 
-version 5.6
+version 5.7
 
 =head1 SYNOPSIS
 

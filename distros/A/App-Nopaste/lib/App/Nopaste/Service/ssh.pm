@@ -3,7 +3,7 @@ use warnings;
 package App::Nopaste::Service::ssh;
 # ABSTRACT: Copies files to your server using scp
 
-our $VERSION = '1.011';
+our $VERSION = '1.012';
 
 use parent 'App::Nopaste::Service';
 use File::Temp;
@@ -77,7 +77,7 @@ App::Nopaste::Service::ssh - Copies files to your server using scp
 
 =head1 VERSION
 
-version 1.011
+version 1.012
 
 =for stopwords dir
 
@@ -125,12 +125,6 @@ It prevents common means of script execution so that C<.pl> and C<.cgi>
 files won't run and defaults the character set to UTF-8 so browsers
 don't have to guess wrong.
 
-=head1 AUTHOR
-
-Kevin Falcone C<< <falcone@cpan.org> >>
-
-Thomas Sibley C<< <trs@bestpractical.com> >>
-
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=App-Nopaste>
@@ -138,7 +132,9 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 
 =head1 AUTHOR
 
-Shawn M Moore, <sartak@gmail.com>
+Kevin Falcone <falcone@cpan.org
+
+Thomas Sibley <trs@bestpractical.com>
 
 =head1 COPYRIGHT AND LICENSE
 

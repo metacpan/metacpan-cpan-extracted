@@ -204,6 +204,40 @@ into the string matching pairs of {' and '} can be used:
 =back
 
 
+=head2 BINARY vs UNICODE
+
+By default expanded templates and object arguments are bytes, not
+Unicode characters. This does not mean that they cannot be used in
+Unicode (or other encoding) web sites, but it does mean that objects
+need to convert arguments and expansion results into characters where
+and as needed.
+
+Starting with version 1.48 it is possible to switch the engine
+into returning perl characters from template expansion and for
+passing characters in object arguments. This is achieved by setting
+/xao/page/character_mode configuration parameter to '1'.
+
+One exception allowing to retrieve byte data is when a template is
+expanded with 'unparsed' qualifier. This is typically used to pass
+binary data such as images and spreadsheets to objects such as
+L<XAO::DO::Web::Mailer>.
+
+There is an important caveat for using 'unparsed' with binary data in
+character mode. A template like the one below wou pass perl characters
+in 'data' argument when executing Process.
+
+  <%Process
+    data={<%Page
+            path='/binary/data.bin'
+            unparsed
+          %>}
+  %>
+
+There is no way to mix byte and character processing mode. Pick one
+depending on your needs. Character mode allows a more natural processing
+in Perl while byte mode allows more granular control over the data flow.
+
+
 =head2 EMBEDDING SPECIAL CHARACTERS
 
 Sometimes it is necessary to include various special symbols into
@@ -491,7 +525,9 @@ from Page unless overwritten) are:
 
 ###############################################################################
 package XAO::DO::Web::Page;
+use warnings;
 use strict;
+use utf8;
 use Digest::SHA qw(sha1_hex);
 use Encode;
 use Time::HiRes qw(gettimeofday tv_interval);
@@ -628,7 +664,7 @@ sub _do_display ($@) {
     #
     my $benchmark=$self->benchmark_enabled();
 
-    # We need to bookmark buffer position to analyze content data later
+    # We need to bookmark buffer position to analyze content data
     # for cacheability later.
     #
     my $bookmark=$benchmark ? XAO::PageSupport::bookmark() : 0;
@@ -681,10 +717,8 @@ sub _do_display ($@) {
     # Template processing itself. Pretty simple, huh? :)
     #
     foreach my $item (@$parsed) {
-
         my $stop_after;
         my $itemflag;
-
         my $text;
 
         if(exists $item->{'text'}) {
@@ -757,7 +791,6 @@ sub _do_display ($@) {
                 # with the text anyway. This way we avoid push/pop and at
                 # least two extra memcpy's.
                 #
-                delete $self->{'merge_args'};
                 if($itemflag && $itemflag ne 't') {
                     $text=$obj->expand(\%objargs);
                 }
@@ -774,41 +807,51 @@ sub _do_display ($@) {
                 #
                 if($self->{'merge_args'}) {
                     @{$args}{keys %{$self->{'merge_args'}}}=values %{$self->{'merge_args'}};
+                    delete $self->{'merge_args'};
                 }
             }
         }
 
-        # Safety conversion - q for query, h - for html, s - for
-        # nbsp'ced html, f - for tag fields, u - for URLs, t - for text
-        # as is (default).
-        #
-        if(defined($text) && $itemflag && $itemflag ne 't') {
-            if($itemflag eq 'h') {
-                $text=XAO::Utils::t2ht($text);
-            }
-            elsif($itemflag eq 's') {
-                $text=(defined $text && length($text)) ? XAO::Utils::t2ht($text) : "&nbsp;";
-            }
-            elsif($itemflag eq 'q') {
-                $text=XAO::Utils::t2hq($text);
-            }
-            elsif($itemflag eq 'f') {
-                $text=XAO::Utils::t2hf($text);
-            }
-            elsif($itemflag eq 'u') {
-                $text=XAO::Utils::t2hq($text);
-            }
-            elsif($itemflag eq 'j') {
-                $text=XAO::Utils::t2hj($text);
-            }
-            else {
-                eprint "Unsupported translation flag '$itemflag', objname=",$item->{'objname'};
-            }
-        }
+        if(defined $text) {
 
-        # Sending out the text
-        #
-        $self->textout($text) if defined($text);
+            # When the text is from an external argument like \xe9
+            # it might be stored in a platform encoding and not in
+            # Unicode. Upgrading it.
+            #
+            utf8::upgrade($text) if $self->_character_mode && !$item->{'binary'};
+
+            # Safety conversion - q for query, h - for html, s - for
+            # nbsp'ced html, f - for tag fields, u - for URLs, t - for text
+            # as is (default).
+            #
+            if($itemflag && $itemflag ne 't') {
+                if($itemflag eq 'h') {
+                    $text=XAO::Utils::t2ht($text);
+                }
+                elsif($itemflag eq 's') {
+                    $text=(defined $text && length($text)) ? XAO::Utils::t2ht($text) : "&nbsp;";
+                }
+                elsif($itemflag eq 'q') {
+                    $text=XAO::Utils::t2hq($text);
+                }
+                elsif($itemflag eq 'f') {
+                    $text=XAO::Utils::t2hf($text);
+                }
+                elsif($itemflag eq 'u') {
+                    $text=XAO::Utils::t2hq($text);
+                }
+                elsif($itemflag eq 'j') {
+                    $text=XAO::Utils::t2hj($text);
+                }
+                else {
+                    eprint "Unsupported translation flag '$itemflag', objname=",$item->{'objname'};
+                }
+            }
+
+            # Sending out the text
+            #
+            $self->textout($text);
+        }
 
         # Checking if this object required to stop processing
         #
@@ -820,10 +863,10 @@ sub _do_display ($@) {
     #
     my $content=undef;
     if($from_cache_retrieve) {
-        $content=XAO::PageSupport::pop();
+        $content=XAO::PageSupport::pop($self->_character_mode && !$args->{'unparsed'});
     }
     elsif($benchmark_tag) {
-        $content=XAO::PageSupport::peek($bookmark);
+        $content=XAO::PageSupport::peek($bookmark,$self->_character_mode && !$args->{'unparsed'});
     }
 
     # When benchmarking we stop the timer and we also remember the
@@ -837,6 +880,20 @@ sub _do_display ($@) {
     # This will be an undef if the call is not from cache. That is fine.
     #
     return $content;
+}
+
+###############################################################################
+
+sub _character_mode ($) {
+    my $self=shift;
+
+    return $self->{'character_mode'} if exists $self->{'character_mode'};
+
+    my $character_mode=$self->siteconfig->get('/xao/page/character_mode') ? 1 : 0;
+
+    $self->{'character_mode'}=$character_mode;
+
+    return $character_mode;
 }
 
 ###############################################################################
@@ -1013,7 +1070,7 @@ sub display ($%) {
                 force_update    => ($self->page_clipboard->{'render_cache_update'} || $args->{'xao.uncached'}),
             });
 
-            XAO::PageSupport::addtext($content);
+            $self->textout($content);
 
             return;
         }
@@ -1037,6 +1094,7 @@ the same arguments as display(). Here is an example:
 
 sub expand ($%) {
     my $self=shift;
+    my $args=get_args(\@_);
 
     # First it prepares a place in stack for new text (push) and after
     # display it calls pop to get back whatever was written. The sole
@@ -1067,11 +1125,11 @@ sub expand ($%) {
     # benchmark results.
     #
     eval {
-        $self->display(@_);
+        $self->display($args);
     };
 
     if($@) {
-        XAO::PageSupport::pop();
+        XAO::PageSupport::pop(0);
 
         if($@->can('throw')) {
             throw $@;
@@ -1081,7 +1139,14 @@ sub expand ($%) {
         }
     }
 
-    return XAO::PageSupport::pop();
+    # Text pages are converted into perl characters, otherwise returning
+    # bytes.
+    #
+    my $chmode=$self->_character_mode &&
+        !$args->{'unparsed'} &&
+        !$self->siteconfig->force_byte_output;
+
+    return XAO::PageSupport::pop($chmode ? 1 : 0);
 }
 
 ###############################################################################
@@ -1173,23 +1238,22 @@ sub parse ($%) {
     # within the site context. Global scope uniqueness is dealt with by
     # cache implementations below.
     #
-    my $template;
     my $path;
     my $cache_key;
     if(defined($args->{'template'})) {
-        $template=$args->{'template'};
+        my $template=$args->{'template'};
 
         if(ref($template)) {
             return $template;       # Pre-parsed as an argument of some upper class
         }
 
-        $template=Encode::encode('utf8',$template) if Encode::is_utf8($template);
+        my $tbytes=Encode::is_utf8($template) ? Encode::encode_utf8($template) : $template;
 
-        if(length $template < 80) {
-            $cache_key=($unparsed ? 'T' : 't').':'.$template;
+        if(length $tbytes < 80) {
+            $cache_key=($unparsed ? 'T' : 't').':'.$tbytes;
         }
         else {
-            $cache_key=($unparsed ? 'H' : 'h').':'.sha1_hex($template);
+            $cache_key=($unparsed ? 'H' : 'h').':'.sha1_hex($tbytes);
         }
     }
     else {
@@ -1203,6 +1267,10 @@ sub parse ($%) {
     #
     my $cache_key_ref=$args->{'cache_key_ref'};
     $$cache_key_ref=$cache_key if $cache_key_ref;
+
+    # Encoding also matters
+    #
+    $cache_key.=':'.$self->_character_mode;
 
     # With uncached we don't even try to use any caches.
     #
@@ -1288,13 +1356,12 @@ sub parse_retrieve ($@) {
 
     my $path=$args->{'path'};
     my $template=$args->{'template'};
-    my $unparsed=$args->{'unparsed'};
 
     # Reading and parsing.
     #
     if($path && !defined $template) {
         if($self->debug_check('show-read')) {
-            dprint $self->{'objname'}."::parse - read path='$path'";
+            dprint $self->objname."- read path='$path'";
         }
 
         $template=XAO::Templates::get(path => $path);
@@ -1303,37 +1370,67 @@ sub parse_retrieve ($@) {
             throw $self "- no template found (path=$path)";
     }
 
-    # Unless we need an unparsed template - parse it
+    # An unparsed template is very simple. But it might include binary
+    # data. We don't encode/decode it regardless of encoding settings.
+    #
+    if($args->{'unparsed'}) {
+        return [ { text => $template, binary => 1 } ];
+    }
+
+    # Logging the template or path if requested.
+    #
+    if($self->debug_check('show-parse')) {
+        if($path) {
+            dprint $self->objname."- parsing path='$path'"
+        }
+        else {
+            my $te=substr($template,0,20);
+            $te=~s/\r/\\r/sg;
+            $te=~s/\n/\\n/sg;
+            $te=~s/\t/\\t/sg;
+            $te.='...' if length($template)>20;
+            dprint $self->objname."- parsing template='$te'";
+        }
+    }
+
+    # Parsing.
     #
     my $parsed;
-    if($unparsed) {
-        $parsed=[ { text => $template } ];
-    }
-    else {
+    if($self->_character_mode) {
 
-        # Logging the template or path if requested.
+        # We might get a latin1 string like \xe9 that is meant to
+        # be a Unicode, but is not. Unless all code is switched to
+        # use 'unicode_strings' feature this can easily happen.
         #
-        if($self->debug_check('show-parse')) {
-            if($path) {
-                dprint $self->{'objname'}."::parse - parsing path='$path'"
+        # BUT! We can also get an already UTF-8 encoded byte string,
+        # in which case upgrade would break it.
+        #
+        # Using shameful black magic :(
+        #
+        if(!Encode::is_utf8($template)) {
+            Encode::_utf8_on($template);
+
+            # UTF-8 encoded bytes or plain ASCII
+            #
+            if(Encode::is_utf8($template,1)) {
+                # No-op
             }
             else {
-                my $te=substr($template,0,20);
-                $te=~s/\r/\\r/sg;
-                $te=~s/\n/\\n/sg;
-                $te=~s/\t/\\t/sg;
-                $te.='...' if length($template)>20;
-                dprint $self->{'objname'}."::parse - parsing template='$te'";
+                Encode::_utf8_off($template);
+                utf8::upgrade($template);
             }
         }
 
-        # Parsing. If a scalar is returned it is an indicator of an error.
-        #
-        $parsed=XAO::PageSupport::parse($template);
-
-        ref $parsed ||
-            throw $self "- $parsed";
+        $parsed=XAO::PageSupport::parse($template,1);
     }
+    else {
+        $parsed=XAO::PageSupport::parse($template,0);
+    }
+
+    # If a scalar is returned it is an indicator of an error.
+    #
+    ref $parsed ||
+        throw $self "- $parsed";
 
     return $parsed;
 }
@@ -1342,7 +1439,7 @@ sub parse_retrieve ($@) {
 
 =item object (%)
 
-Creates new displayable object correctly tied to the current one. You
+Creates a new displayable object correctly tied to the current one. You
 should always get a reference to a displayable object by calling this
 method, not by using XAO::Objects' new() method. Currently most
 of the objects would work fine even if you do not, but this is not
@@ -1428,13 +1525,23 @@ object. Although it is not recommended to do so.
 
 sub textout ($%) {
     my $self=shift;
+
     return unless @_;
+
+    my $text;
     if(@_ == 1) {
-        XAO::PageSupport::addtext($_[0]);
+        $text=$_[0];
     }
     else {
         my %args=@_;
-        XAO::PageSupport::addtext($args{text});
+        $text=$args{'text'} // '';
+    }
+
+    if(Encode::is_utf8($text)) {
+        XAO::PageSupport::addtext(Encode::encode_utf8($text));
+    }
+    else {
+        XAO::PageSupport::addtext($text);
     }
 }
 
@@ -1670,26 +1777,6 @@ sub pageurl ($;%) {
     $uri="/".$uri unless substr($uri,0,1) eq '/';
 
     return $url.$uri;
-}
-
-###############################################################################
-
-=item decode_charset ($) {
-
-If there is 'charset' defined in the site configuration then decodes the
-argument using that charset. Otherwise returns the string unchanged.
-
-=cut
-
-sub decode_charset ($$) {
-    my ($self,$text)=@_;
-    return $text if Encode::is_utf8($text);
-    if(my $charset=$self->siteconfig->get('charset')) {
-        return Encode::decode($charset,$text);
-    }
-    else {
-        return $text;
-    }
 }
 
 ###############################################################################

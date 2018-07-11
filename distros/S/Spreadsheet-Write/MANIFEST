@@ -1,7 +1,15 @@
 CHANGES
+LICENSE
 MANIFEST
 MANIFEST.SKIP
 Makefile.PL
 README
 lib/Spreadsheet/Write.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+lib/Spreadsheet/Write/WriteCSV.pm
+lib/Spreadsheet/Write/WriteXLS.pm
+t/all_tests.t
+t/tlib/Common.pm
+t/tlib/WriteCSVTest.pm
+t/tlib/WriteXLSTest.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

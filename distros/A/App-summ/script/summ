@@ -1,0 +1,260 @@
+#!perl
+
+our $DATE = '2018-07-07'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config bundling no_ignore_case);
+
+my %Opts = (
+    calc_count    => 1,
+    calc_mode     => 1,
+    calc_min      => 1,
+    calc_max      => 1,
+    calc_mean     => 1,
+    calc_median   => 1,
+    calc_variance => 1,
+    calc_stddev   => 1,
+    calc_percentiles => [25, 75],
+    calc_covariance => 0,
+    calc_correlation => 0,
+);
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'count!'    => \$Opts{calc_count},
+        'mode!'     => \$Opts{calc_mode},
+        'max!'      => \$Opts{calc_max},
+        'min!'      => \$Opts{calc_min},
+        'mean!'     => \$Opts{calc_mean},
+        'median!'   => \$Opts{calc_median},
+        'variance!' => \$Opts{calc_variance},
+        'stddev!'   => \$Opts{calc_stddev},
+        'no-percentile|P' => sub { $Opts{calc_percentiles} = [] },
+        'percentile|p=s'  => sub {
+            my $p = int($_[1]);
+            die "summ: Invalid percentile $p, must be between 0 and 100\n"
+                if $p < 0 || $p > 100;
+            push @{ $Opts{calc_percentiles} }, $p
+                unless grep { $p == $_ } @{ $Opts{calc_percentiles} };
+        },
+        'covariance!'  => \$Opts{calc_covariance},
+        'correlation!' => \$Opts{calc_correlation},
+        'help|h' => sub {
+            print <<USAGE;
+Usage:
+  summ [OPTIONS]... [INPUT]...
+  summ --help
+
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+        'version|v' => sub {
+            no warnings 'once';
+            print "summ version ".($main::VERSION // 'dev'), "\n";
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub run {
+    my (@nums, @nums2);
+    while (<>) {
+        chomp;
+        if ($Opts{calc_covariance} || $Opts{calc_correlation}) {
+            my ($n, $n2) = split /\s+/, $_, 2;
+            defined $n2 or die "summ:$.: Please supply two numbers: $_\n";
+            push @nums, $n+0;
+            push @nums2, $n2+0;
+        } else {
+            push @nums, $_+0;
+        }
+    }
+    die "summ: Please specify at least 1 number\n" unless @nums;
+
+    require Statistics::Discrete;
+    my $sd = Statistics::Discrete->new;
+    $sd->add_data(@nums);
+
+    if ($Opts{calc_count}) {
+        printf "Count: %s\n", $sd->count;
+    }
+    if ($Opts{calc_mode}) {
+        require Statistics::Basic;
+        require Statistics::Basic::Mode;
+        printf "Mode: %s\n", Statistics::Basic::mode(@nums);
+    }
+    if ($Opts{calc_min}) {
+        printf "Minimum: %s\n", $sd->minimum;
+    }
+    if ($Opts{calc_max}) {
+        printf "Maximum: %s\n", $sd->maximum;
+    }
+    if ($Opts{calc_mean}) {
+        printf "Mean: %s\n", $sd->mean;
+    }
+    if ($Opts{calc_median}) {
+        printf "Median: %s\n", $sd->median;
+    }
+    if ($Opts{calc_variance}) {
+        printf "Variance: %s\n", $sd->variance;
+    }
+    if ($Opts{calc_stddev}) {
+        printf "Std. dev.: %s\n", $sd->standard_deviation;
+    }
+    if (@{ $Opts{calc_percentiles} }) {
+        require Lingua::EN::Numbers::Ordinate;
+        for my $p (sort { $a <=> $b } @{ $Opts{calc_percentiles} }) {
+            printf "%s percentile: %s\n",
+                Lingua::EN::Numbers::Ordinate::ordinate($p),
+                  $sd->percentile($p);
+        }
+    }
+    if ($Opts{calc_covariance}) {
+        require Statistics::Basic;
+        printf "Covariance: %s\n", Statistics::Basic::covariance(
+            \@nums, \@nums2);
+    }
+    if ($Opts{calc_correlation}) {
+        require Statistics::Basic;
+        printf "Correlation: %s\n", Statistics::Basic::correlation(
+            \@nums, \@nums2) + 0;
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Print summary statistics of a series of numbers
+# PODNAME: summ
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+summ - Print summary statistics of a series of numbers
+
+=head1 VERSION
+
+This document describes version 0.001 of summ (from Perl distribution App-summ), released on 2018-07-07.
+
+=head1 SYNOPSIS
+
+ summ [OPTION]... [FILE]...
+
+=head1 DESCRIPTION
+
+=head1 EXIT CODES
+
+0 on success.
+
+255 on I/O error.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item * --no-count
+
+Do not calculate count.
+
+=item * --no-mode
+
+Do not calculate mode.
+
+=item * --no-max
+
+Do not calculate maximum.
+
+=item * --no-min
+
+Do not calculate minimum.
+
+=item * --no-mean
+
+Do not calculate mean.
+
+=item * --no-median
+
+Do not calculate median.
+
+=item * --no-variance
+
+Do not calculate variance.
+
+=item * --no-stddev
+
+Do not calculate standard deviation.
+
+=item * --no-percentile, -P
+
+Do not calculate any percentiles. The default is to calculate 25th and 75th
+percentiles.
+
+=item * --percentile=P, -p P
+
+Add a percentile to calculate, for example: C<-p 5 -p 95> to add calculating 5th
+and 95th percentiles. The default is to only calculate 25th and 75th
+percentiles.
+
+=item * --covariance
+
+Calculate covariance. This requires every line to contain two numbers intead of
+one.
+
+=item * --correlation
+
+Calculate correlation. This requires every line to contain two numbers intead of
+one.
+
+=back
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-summ>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-summ>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-summ>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Statistics::Basic>
+
+L<Statistics::Discrete>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

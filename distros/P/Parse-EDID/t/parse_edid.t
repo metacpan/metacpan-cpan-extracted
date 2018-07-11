@@ -5,6 +5,7 @@ use warnings;
 
 use English qw(-no_match_vars);
 use Test::More;
+use Test::Warn;
 use Parse::EDID;
 
 my %tests = (
@@ -692,20 +693,71 @@ my %tests = (
         max_size_vertical   => 29,
         diagonal_size       => 21.7428366480
     },
+    'DON000e' => {
+        manufacturer_name   => 'DON',
+        monitor_name        => 'DENON-AVAMP',
+        EISA_ID             => 'DON000e',
+        serial_number       => '16843009',
+        serial_number2      => undef,
+        VertRefresh         => '48-62',
+        HorizSync           => '15-70',
+        max_size_horizontal => 64,
+        max_size_vertical   => 36,
+        diagonal_size       => 28.9095429145
+    },
+    'MEIc302' => {
+        manufacturer_name   => 'MEI',
+        monitor_name        => 'Panasonic-TV',
+        EISA_ID             => 'MEIc302',
+        serial_number       => '16843009',
+        serial_number2      => undef,
+        VertRefresh         => '23-61',
+        HorizSync           => '15-68',
+        max_size_horizontal => 0,
+        max_size_vertical   => 0,
+        diagonal_size       => 0.0000000000
+    },
+    'MEIc12c' => {
+        manufacturer_name   => 'MEI',
+        monitor_name        => 'Panasonic-TV',
+        EISA_ID             => 'MEIc12c',
+        serial_number       => '16843009',
+        serial_number2      => undef,
+        VertRefresh         => '23-61',
+        HorizSync           => '15-68',
+        max_size_horizontal => 0,
+        max_size_vertical   => 0,
+        diagonal_size       => 0.0000000000
+    },
+    'ONK0e51' => {
+        manufacturer_name   => 'ONK',
+        monitor_name        => 'TX-NR535',
+        EISA_ID             => 'ONK0e51',
+        serial_number       => '0',
+        serial_number2      => undef,
+        VertRefresh         => '23-240',
+        HorizSync           => '15-126',
+        max_size_horizontal => 0,
+        max_size_vertical   => 0,
+        diagonal_size       => 0.0000000000
+    }
 );
 
-plan tests => 2 * scalar keys %tests;
+plan tests => 3 * scalar keys %tests;
 
 foreach my $test (sort keys %tests) {
     my $edid = read_file("t/edid/$test");
-    my $parsed_edid = parse_edid($edid);
+    my $parsed_edid;
+    warnings_are {
+        $parsed_edid = parse_edid($edid);
+    } [], "$test: no warnings";
+
     my $message = check_parsed_edid($parsed_edid);
     is($message, "", "$test: parsing succesful");
 
     subtest "$test: expected results" => sub {
         check_result($parsed_edid, $tests{$test});
     };
-
 }
 
 

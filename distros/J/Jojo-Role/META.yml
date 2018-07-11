@@ -7,6 +7,7 @@ build_requires:
   File::Spec: '0'
   Module::Build: '0.28'
   Test::More: '0.96'
+  constant: '0'
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
@@ -19,17 +20,19 @@ name: Jojo-Role
 provides:
   Jojo::Role:
     file: lib/Jojo/Role.pm
-    version: v0.4.0
+    version: v0.5.0
 requires:
-  Role::Tiny: '2.000005'
+  Role::Tiny: '2.000006'
   Sub::Inject: v0.3.0
   experimental: '0'
+  feature: '0'
   perl: '5.018'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/aferreira/cpan-Jojo-Role/issues
   homepage: https://github.com/aferreira/cpan-Jojo-Role
   repository: https://github.com/aferreira/cpan-Jojo-Role.git
-version: 0.4.0
-x_contributors:
-  - 'Adriano Ferreira <a.r.ferreira@gmail.com>'
+version: 0.5.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

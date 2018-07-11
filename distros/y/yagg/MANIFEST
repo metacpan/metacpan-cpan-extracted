@@ -66,7 +66,6 @@ lib/yagg/input_generator_code/src/tests/generator/terminal_rules/constant_termin
 lib/yagg/input_generator_code/src/tests/generator/terminal_rules/dependent_terminal.cc
 lib/yagg/input_generator_code/src/tests/generator/terminal_rules/finite_terminal.cc
 lib/yagg/input_generator_code/src/tests/generator/terminal_rules/independent_terminal.cc
-lib/yagg/input_generator_code/util/basedir
 lib/yagg/input_generator_code/util/colors
 lib/yagg/input_generator_code/util/compute_coverage.pl
 lib/yagg/input_generator_code/util/ensure_progress
@@ -79,7 +78,6 @@ t/Test/Utils.pm
 # Tests
 t/compile.t
 t/generate.t
-t/pod.t
 t/run.t
 
 # Test input files
@@ -128,7 +126,6 @@ t/logical_expressions_simple/src/tests/generator/terminal_rules/constant_termina
 t/logical_expressions_simple/src/tests/generator/terminal_rules/dependent_terminal.cc
 t/logical_expressions_simple/src/tests/generator/terminal_rules/finite_terminal.cc
 t/logical_expressions_simple/src/tests/generator/terminal_rules/independent_terminal.cc
-t/logical_expressions_simple/util/basedir
 t/logical_expressions_simple/util/colors
 t/logical_expressions_simple/util/compute_coverage.pl
 t/logical_expressions_simple/util/ensure_progress
@@ -161,8 +158,9 @@ examples/ab/ab_parser/src/ab_parser/ab_parser_includes.h
 examples/ab/ab_parser/src/ab_parser/ab_scanner.lex
 examples/ab/ab_parser/src/progs/ab_parser.cc
 examples/ab/ab_parser/src/progs/ab_scanner.cc
-examples/ab/ab_parser/util/basedir
 examples/ab/ab_parser/util/colors
+examples/ab/ab_parser/util/compute_coverage.pl
+examples/ab/ab_parser/util/ensure_progress
 examples/ab/ab_parser/util/makedependgcc
 examples/ab/ab_parser/util/mkdirhier.pl
 
@@ -241,8 +239,9 @@ examples/logical_expressions_constrained/logical_expression_parser/src/logical_e
 examples/logical_expressions_constrained/logical_expression_parser/src/logical_expression_parser/logical_expression_scanner.lex
 examples/logical_expressions_constrained/logical_expression_parser/src/progs/logical_expression_parser.cc
 examples/logical_expressions_constrained/logical_expression_parser/src/progs/logical_expression_scanner.cc
-examples/logical_expressions_constrained/logical_expression_parser/util/basedir
 examples/logical_expressions_constrained/logical_expression_parser/util/colors
+examples/logical_expressions_constrained/logical_expression_parser/util/compute_coverage.pl
+examples/logical_expressions_constrained/logical_expression_parser/util/ensure_progress
 examples/logical_expressions_constrained/logical_expression_parser/util/makedependgcc
 examples/logical_expressions_constrained/logical_expression_parser/util/mkdirhier.pl
 
@@ -272,16 +271,6 @@ examples/reliability_block_diagrams/user_code/src/model/rbd_textual_parser/rbd_t
 
 # Module::Install extensions
 inc/File/HomeDir.pm
-inc/File/HomeDir/Darwin.pm
-inc/File/HomeDir/Darwin/Carbon.pm
-inc/File/HomeDir/Darwin/Cocoa.pm
-inc/File/HomeDir/Driver.pm
-inc/File/HomeDir/FreeDesktop.pm
-inc/File/HomeDir/MacOS9.pm
-inc/File/HomeDir/Test.pm
-inc/File/HomeDir/Unix.pm
-inc/File/HomeDir/Windows.pm
-inc/File/Temp.pm
 inc/File/Which.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoLicense.pm
@@ -297,9 +286,9 @@ inc/Module/Install/Include.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Scripts.pm
+inc/Module/Install/StandardTests.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-inc/Scalar/Util.pm
 inc/Sort/Versions.pm
 inc/Module/Install/PRIVATE/Configure_Programs.pm
 inc/Module/Install/PRIVATE/Fix_Sort_Versions.pm

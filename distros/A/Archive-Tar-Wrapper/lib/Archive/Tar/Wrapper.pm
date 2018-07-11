@@ -18,7 +18,7 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 my $logger = get_logger();
 
 sub _acquire_tar_info {
@@ -782,7 +782,7 @@ C<read()> will fail.
 =item B<$arch-E<gt>list_reset()>
 
 Resets the list iterator. To be used before the first call to
-B<$arch->list_next()>.
+B<$arch-E<gt>list_next()>.
 
 =item B<my($tar_path, $phys_path, $type) = $arch-E<gt>list_next()>
 
@@ -975,8 +975,8 @@ You must use the C<bsdtar.exe> and make sure it appears first in the C<PATH> env
 the GNU tar (if it is installed). See L<http://libarchive.org/> for details about how to download and
 install C<bsdtar.exe>, or go to L<http://gnuwin32.sourceforge.net/packages.html> for a direct download.
 
-Windows 10 might come already with bsdtar program installed. Check 
-L<https://blogs.technet.microsoft.com/virtualization/2017/12/19/tar-and-curl-come-to-windows/> for 
+Windows 10 might come already with bsdtar program installed. Check
+L<https://blogs.technet.microsoft.com/virtualization/2017/12/19/tar-and-curl-come-to-windows/> for
 more details.
 
 Having spaces in the path string to the tar program might be an issue too. Although there is some effort

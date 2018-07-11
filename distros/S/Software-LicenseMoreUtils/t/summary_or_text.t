@@ -8,7 +8,7 @@ use Test::More;
 my $class = 'Software::LicenseMoreUtils';
 require_ok($class);
 
-foreach my $short (qw/GPL-2 LGPL-2 Apache_2_0 Artistic_1_0/) {
+foreach my $short (qw/GPL-2 LGPL-2 Apache_2_0 Artistic_1_0 CC0-1.0/) {
     my $license = $class->new_from_short_name({
         short_name => $short,
         holder => 'X. Ample'

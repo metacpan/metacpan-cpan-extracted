@@ -13,7 +13,7 @@ use Pod::Usage;
 # Argument Parsing
 my %OPT;
 GetOptions(\%OPT,
-    'attributes|attr:s',
+    'attributes|attr=s',
     'help|h',
     'manual|m',
 );
@@ -63,7 +63,7 @@ es-nodes.pl - Listing the nodes in a cluster with some details
 
 =head1 VERSION
 
-version 5.6
+version 5.7
 
 =head1 SYNOPSIS
 

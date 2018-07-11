@@ -8,6 +8,8 @@ use IPC::System::Simple qw(system capture);
 use DNS::Oterica;
 
 my $records = {};
+my $timestamps = {};
+my $serials = {};
 
 my %collect_dispatch = (
   '+' => \&collect_plus,
@@ -52,34 +54,49 @@ sub records {
   return $records;
 }
 
+sub timestamps {
+  return $timestamps;
+}
+
+sub serials {
+  return $serials;
+}
+
 sub collect_plus {
   my @parts = @_;
   push @{$records->{$parts[0]}{'+'}}, $parts[1];
+  push @{$timestamps->{$parts[0]}{'+'}}, $parts[3];
 }
 
 sub collect_at {
   my @parts = @_;
   push @{$records->{$parts[0]}{'@'}}, $parts[2];
+  push @{$timestamps->{$parts[0]}{'@'}}, $parts[5];
 }
 
 sub collect_cname {
   my @parts = @_;
   push @{$records->{$parts[0]}{'C'}}, $parts[1];
+  push @{$timestamps->{$parts[0]}{'C'}}, $parts[3];
 }
 
 sub collect_z {
   my @parts = @_;
   push @{$records->{$parts[0]}{'Z'}}, $parts[1];
+  push @{$serials->{$parts[0]}{'Z'}}, $parts[4];
+  push @{$timestamps->{$parts[0]}{'Z'}}, $parts[9];
 }
 
 sub collect_amp {
   my @parts = @_;
   push @{$records->{$parts[0]}{'&'}}, $parts[2];
+  push @{$timestamps->{$parts[0]}{'&'}}, $parts[4];
 }
 
 sub collect_colon {
   my @parts = @_;
   push @{$records->{$parts[0]}{':'}}, $parts[2];
+  push @{$timestamps->{$parts[0]}{':'}}, $parts[4];
 }
 
 sub collect_percent {
@@ -90,6 +107,7 @@ sub collect_percent {
 sub collect_period {
   my @parts = @_;
   push @{$records->{$parts[0]}{'.'}}, $parts[2];
+  push @{$timestamps->{$parts[0]}{'.'}}, $parts[4];
 }
 
 sub collect_ptr {
@@ -97,11 +115,13 @@ sub collect_ptr {
   my @bytes = split /\./, $parts[1];
   my $reverse = join '.', reverse(@bytes), 'in-addr', 'arpa';
   push @{$records->{$parts[0]}{'^'}}, $parts[1] ;
+  push @{$timestamps->{$parts[0]}{'^'}}, $parts[3] ;
 }
 
 sub collect_tick {
   my @parts = @_;
   push @{$records->{$parts[0]}{"'"}}, $parts[1];
+  push @{$timestamps->{$parts[0]}{"'"}}, $parts[3];
 }
 
 1;

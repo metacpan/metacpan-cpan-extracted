@@ -1,4 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+use strict;
+use warnings;
 use XAO::TestUtils;
 
 use lib qw(testdata);

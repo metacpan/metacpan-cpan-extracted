@@ -19,42 +19,50 @@ public:
 		if (q) gluDeleteQuadric(q), q= NULL;
 	}
 	
-	/* Return 'this' for chaining convenience */
-	SV* draw_style(int style) {
+	// Return 'this' for chaining convenience
+	void draw_style(int style) {
 		Inline_Stack_Vars;
-		(void)items; /* silence arning */
+		(void)items; // silence warning
 		gluQuadricDrawStyle(q, style);
-		return Inline_Stack_Item(0);
+		Inline_Stack_Reset;
+		Inline_Stack_Push(Inline_Stack_Item(0));
+		Inline_Stack_Done;
 	}
-	SV* draw_fill()       { return draw_style(GLU_FILL); }
-	SV* draw_line()       { return draw_style(GLU_LINE); }
-	SV* draw_silhouette() { return draw_style(GLU_SILHOUETTE); }
-	SV* draw_point()      { return draw_style(GLU_POINT); }
+	void draw_fill()       { draw_style(GLU_FILL); }
+	void draw_line()       { draw_style(GLU_LINE); }
+	void draw_silhouette() { draw_style(GLU_SILHOUETTE); }
+	void draw_point()      { draw_style(GLU_POINT); }
 	
-	SV* normals(int normals) {
+	void normals(int normals) {
 		Inline_Stack_Vars;
-		(void)items; /* silence arning */
+		(void)items; // silence warning
 		gluQuadricNormals(q, normals == 0? GLU_NONE : normals);
-		return Inline_Stack_Item(0);
+		Inline_Stack_Reset;
+		Inline_Stack_Push(Inline_Stack_Item(0));
+		Inline_Stack_Done;
 	}
-	SV* no_normals()     { return normals(GLU_NONE); }
-	SV* flat_normals()   { return normals(GLU_FLAT); }
-	SV* smooth_normals() { return normals(GLU_SMOOTH); }
+	void no_normals()     { normals(GLU_NONE); }
+	void flat_normals()   { normals(GLU_FLAT); }
+	void smooth_normals() { normals(GLU_SMOOTH); }
 	
-	SV* orientation(int orient) {
+	void orientation(int orient) {
 		Inline_Stack_Vars;
-		(void)items; /* silence arning */
+		(void)items; // silence warning
 		gluQuadricOrientation(q, orient);
-		return Inline_Stack_Item(0);
+		Inline_Stack_Reset;
+		Inline_Stack_Push(Inline_Stack_Item(0));
+		Inline_Stack_Done;
 	}
-	SV* inside()  { return orientation(GLU_INSIDE); }
-	SV* outside() { return orientation(GLU_OUTSIDE); }
+	void inside()  { orientation(GLU_INSIDE); }
+	void outside() { orientation(GLU_OUTSIDE); }
 	
-	SV* texture(bool enabled) {
+	void texture(bool enabled) {
 		Inline_Stack_Vars;
-		(void)items; /* silence arning */
+		(void)items; // silence warning
 		gluQuadricTexture(q, enabled? GLU_TRUE : GLU_FALSE);
-		return Inline_Stack_Item(0);
+		Inline_Stack_Reset;
+		Inline_Stack_Push(Inline_Stack_Item(0));
+		Inline_Stack_Done;
 	}
 	
 	void cylinder(double base, double top, double height, int slices, int stacks) {
@@ -76,7 +84,7 @@ void _local_gl(SV *code) {
 	glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &orig_depth);
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glPushMatrix();
-	call_sv(code, G_ARRAY|G_EVAL);
+	call_sv(code, G_NOARGS|G_DISCARD|G_ARRAY|G_EVAL);
 	glPopMatrix();
 	glPopAttrib();
 	glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &depth);
@@ -92,7 +100,7 @@ void _local_matrix(SV *code) {
 	GLint orig_depth, depth;
 	glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &orig_depth);
 	glPushMatrix();
-	call_sv(code, G_ARRAY|G_EVAL);
+	call_sv(code, G_NOARGS|G_DISCARD|G_ARRAY|G_EVAL);
 	glPopMatrix();
 	glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &depth);
 	if (depth > orig_depth) {
@@ -174,35 +182,35 @@ void mirror(const char* axis) {
 
 void _quads(SV *code) {
 	glBegin(GL_QUADS);
-	call_sv(code, G_ARRAY|G_EVAL);
+	call_sv(code, G_NOARGS|G_DISCARD|G_ARRAY|G_EVAL);
 	glEnd();
 	if (SvTRUE(ERRSV)) croak(NULL);
 }
 
 void _quad_strip(SV *code) {
 	glBegin(GL_QUAD_STRIP);
-	call_sv(code, G_ARRAY|G_EVAL);
+	call_sv(code, G_NOARGS|G_DISCARD|G_ARRAY|G_EVAL);
 	glEnd();
 	if (SvTRUE(ERRSV)) croak(NULL);
 }
 
 void _triangles(SV* code) {
 	glBegin(GL_TRIANGLES);
-	call_sv(code, G_ARRAY|G_EVAL);
+	call_sv(code, G_NOARGS|G_DISCARD|G_ARRAY|G_EVAL);
 	glEnd();
 	if (SvTRUE(ERRSV)) croak(NULL);
 }
 
 void _triangle_fan(SV *code) {
 	glBegin(GL_TRIANGLE_FAN);
-	call_sv(code, G_ARRAY|G_EVAL);
+	call_sv(code, G_NOARGS|G_DISCARD|G_ARRAY|G_EVAL);
 	glEnd();
 	if (SvTRUE(ERRSV)) croak(NULL);
 }
 
 void _triangle_strip(SV *code) {
 	glBegin(GL_TRIANGLE_STRIP);
-	call_sv(code, G_ARRAY|G_EVAL);
+	call_sv(code, G_NOARGS|G_DISCARD|G_ARRAY|G_EVAL);
 	glEnd();
 	if (SvTRUE(ERRSV)) croak(NULL);
 }
@@ -211,7 +219,7 @@ void _lines(SV *code) {
 	glPushAttrib(GL_CURRENT_BIT | GL_ENABLE_BIT);
 	glDisable(GL_TEXTURE_2D);
 	glBegin(GL_LINES);
-	call_sv(code, G_ARRAY|G_EVAL);
+	call_sv(code, G_NOARGS|G_DISCARD|G_ARRAY|G_EVAL);
 	glEnd();
 	glPopAttrib();
 	if (SvTRUE(ERRSV)) croak(NULL);
@@ -221,7 +229,7 @@ void _line_strip(SV *code) {
 	glPushAttrib(GL_CURRENT_BIT | GL_ENABLE_BIT);
 	glDisable(GL_TEXTURE_2D);
 	glBegin(GL_LINE_STRIP);
-	call_sv(code, G_ARRAY|G_EVAL);
+	call_sv(code, G_NOARGS|G_DISCARD|G_ARRAY|G_EVAL);
 	glEnd();
 	glPopAttrib();
 	if (SvTRUE(ERRSV)) croak(NULL);
@@ -354,7 +362,8 @@ void _setcolor(SV *thing, ...) {
 	Inline_Stack_Void;
 }
 
-SV * _displaylist_compile(SV *self, SV *code) {
+void _displaylist_compile(SV *self, SV *code) {
+	Inline_Stack_Vars;
 	int list_id;
 	if (SvROK(self) && SvIOK(SvRV(self)))
 		list_id= SvIV(SvRV(self));
@@ -368,10 +377,15 @@ SV * _displaylist_compile(SV *self, SV *code) {
 	}
 	
 	glNewList(list_id, GL_COMPILE);
-	call_sv(code, G_ARRAY|G_EVAL);
+	PUSHMARK(SP);
+	PUTBACK;
+	call_sv(code, G_NOARGS|G_DISCARD|G_ARRAY|G_EVAL);
 	glEndList();
 	if (SvTRUE(ERRSV)) croak(NULL);
-	return self;
+	
+	Inline_Stack_Reset;
+	Inline_Stack_Push(self);
+	Inline_Stack_Done;
 }
 
 void _displaylist_call(SV *self, ...) {
@@ -389,7 +403,9 @@ void _displaylist_call(SV *self, ...) {
 			sv_setref_iv(self, "OpenGL::Sandbox::V1::DisplayList", list_id);
 		
 		glNewList(list_id, GL_COMPILE_AND_EXECUTE);
-		call_sv(code, G_ARRAY|G_EVAL);
+		PUSHMARK(SP);
+		PUTBACK;
+		call_sv(code, G_NOARGS|G_DISCARD|G_ARRAY|G_EVAL);
 		glEndList();
 		if (SvTRUE(ERRSV)) croak(NULL);
 	}
@@ -480,6 +496,23 @@ static void _parse_color(SV *c, double *rgba) {
 		for (i=0; i < 4; i++)
 			rgba[i]= hex_rgba[i] / 255.0;
 	}
+}
+
+void set_light_ambient(int light_i, float r, float g, float b, float a) {
+	GLfloat v[4]= { r, g, b, a };
+	glLightfv(light_i, GL_AMBIENT, v);
+}
+void set_light_diffuse(int light_i, float r, float g, float b, float a) {
+	GLfloat v[4]= { r, g, b, a };
+	glLightfv(light_i, GL_DIFFUSE, v);
+}
+void set_light_specular(int light_i, float r, float g, float b, float a) {
+	GLfloat v[4]= { r, g, b, a };
+	glLightfv(light_i, GL_SPECULAR, v);
+}
+void set_light_position(int light_i, float x, float y, float z, float w) {
+	GLfloat v[4]= { x, y, z, w };
+	glLightfv(light_i, GL_POSITION, v);
 }
 
 void _texture_render(HV *self, ...) {
@@ -578,9 +611,22 @@ void get_viewport_rect(...) {
 	Inline_Stack_Vars;
 	GLint rect[4];
 	int i;
+	memset(rect, 0, sizeof(rect));
 	glGetIntegerv(GL_VIEWPORT, rect);
 	Inline_Stack_Reset;
 	for (i=0; i < 4; i++)
 		Inline_Stack_Push(sv_2mortal(newSViv(rect[i])));
+	Inline_Stack_Done;
+}
+
+void get_matrix(int matrix_id) {
+	Inline_Stack_Vars;
+	GLdouble model[16];
+	int i;
+	memset(model, 0, sizeof(model));
+	glGetDoublev(matrix_id, model);
+	Inline_Stack_Reset;
+	for (i= 0; i < 16; i++)
+		Inline_Stack_Push(sv_2mortal(newSVnv(model[i])));
 	Inline_Stack_Done;
 }

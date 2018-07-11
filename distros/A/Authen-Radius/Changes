@@ -1,5 +1,10 @@
 Revision history for Perl extension Radius.
 
+0.27 Fri Jul 06 12:28:42 2018
+    - Force FreeRADIUS dictionary format when BEGIN-VENDOR directive is found
+    - Load included files using the requested format
+    - Added full support for octets type
+
 0.26 Mon Dec 12 13:12:32 2016
     - Tag 0.25.1 as 0.26, because 0.25.1 is considered as 0.025001 (less than existing 0.25)
 

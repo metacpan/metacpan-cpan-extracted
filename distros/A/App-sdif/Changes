@@ -1,5 +1,11 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.4.0 2018-07-07T02:50:04Z
+
+    - Do not call `mecab' for ASCII text.
+    - Easy-to-see debug message.
+    - Move &usage to lib/sdif.pm and share.
+
 4.3.2 2018-06-22T09:40:47Z
 
     - Pass -w option to cdif when -b or -w was given.

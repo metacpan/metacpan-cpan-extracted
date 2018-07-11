@@ -39,7 +39,7 @@
 #include "spvm_switch_info.h"
 #include "spvm_case_info.h"
 
-int32_t SPVM_RUNTIME_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args) {
+int32_t SPVM_RUNTIME_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
   (void)env;
   
   // Runtime
@@ -54,14 +54,14 @@ int32_t SPVM_RUNTIME_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args) {
   int32_t exception_flag = 0;
   if (sub->have_native_desc) {
     int32_t original_mortal_stack_top = SPVM_RUNTIME_API_enter_scope(env);
-    exception_flag = SPVM_RUNTIME_call_sub_native(env, sub_id, args);
+    exception_flag = SPVM_RUNTIME_call_sub_native(env, sub_id, stack);
     SPVM_RUNTIME_API_leave_scope(env, original_mortal_stack_top);
   }
   else if (sub->is_compiled) {
-    exception_flag = SPVM_RUNTIME_call_sub_precompile(env, sub_id, args);
+    exception_flag = SPVM_RUNTIME_call_sub_precompile(env, sub_id, stack);
   }
   else {
-    exception_flag = SPVM_RUNTIME_call_sub_vm(env, sub_id, args);
+    exception_flag = SPVM_RUNTIME_call_sub_vm(env, sub_id, stack);
   }
   
   // Set default exception message
@@ -73,7 +73,7 @@ int32_t SPVM_RUNTIME_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args) {
   return exception_flag;
 }
 
-int32_t SPVM_RUNTIME_call_sub_precompile(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args) {
+int32_t SPVM_RUNTIME_call_sub_precompile(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
   (void)env;
   
   // Runtime
@@ -89,10 +89,10 @@ int32_t SPVM_RUNTIME_call_sub_precompile(SPVM_ENV* env, int32_t sub_id, SPVM_VAL
   
   // Call precompile subroutine
   int32_t (*precompile_address)(SPVM_ENV*, SPVM_VALUE*) = sub->precompile_address;
-  return (*precompile_address)(env, args);
+  return (*precompile_address)(env, stack);
 }
 
-int32_t SPVM_RUNTIME_call_sub_native(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args) {
+int32_t SPVM_RUNTIME_call_sub_native(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
   (void)env;
   
   // Runtime
@@ -108,43 +108,34 @@ int32_t SPVM_RUNTIME_call_sub_native(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
 
   // Call native subrotuine
   int32_t (*native_address)(SPVM_ENV*, SPVM_VALUE*) = sub->native_address;
-  return (*native_address)(env, args);
+  return (*native_address)(env, stack);
 }
 
-int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args) {
+int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
   (void)env;
   
   // Runtime
   SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_get_runtime(env);
   SPVM_COMPILER* compiler = runtime->compiler;
 
-  // Constant pool sub
+  // Subroutine
   SPVM_OP* op_sub = SPVM_LIST_fetch(compiler->op_subs, sub_id);
   SPVM_SUB* sub = op_sub->uv.sub;
-  
-  SPVM_OP* op_package = sub->op_package;
-  SPVM_PACKAGE* package = op_package->uv.package;
 
   // Subroutine return type
   SPVM_TYPE* sub_return_type = sub->op_return_type->uv.type;
+  int32_t sub_return_type_width = SPVM_TYPE_get_width(compiler, sub_return_type);
   
-  int32_t sub_return_type_is_object = SPVM_TYPE_is_object(compiler, sub_return_type);
-  
-  // Args length
-  int32_t args_length = sub->op_args->length;
-  
-  // Bytecodes
-  SPVM_OPCODE* opcodes = compiler->opcode_array->values;
-  
-  // Opcode base
-  int32_t sub_opcode_base = sub->opcode_base;
-  
-  // Variables
-  SPVM_VALUE* vars = SPVM_RUNTIME_ALLOCATOR_alloc(runtime, sizeof(SPVM_VALUE) * (sub->op_mys->length + 1));
+  // Package
+  SPVM_OP* op_package = sub->op_package;
+  SPVM_PACKAGE* package = op_package->uv.package;
 
-  // Mortal stack
-  SPVM_VALUE* mortal_stack = SPVM_RUNTIME_ALLOCATOR_alloc(runtime, sizeof(SPVM_VALUE) * (sub->mortal_stack_max + 1));
-  int32_t mortal_stack_top = 0;
+  // Operation codes
+  SPVM_OPCODE* opcodes = compiler->opcode_array->values;
+  register int32_t opcode_rel_index = 0;
+  
+  // Operation code base
+  int32_t sub_opcode_base = sub->opcode_base;
 
   // Call subroutine argument stack top
   int32_t call_sub_arg_stack_top = 0;
@@ -155,25 +146,47 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
   // Croak flag
   int32_t exception_flag = 0;
   
-  char tmp_string[30];
-
-  register int32_t opcode_rel_index = 0;
-
+  // Buffer for string convertion
+  char string_convert_buffer[30];
+  
+  // Variables
+  SPVM_VALUE* vars = NULL;
+  int32_t var_alloc_length = SPVM_SUB_get_var_alloc_length(compiler, sub);
+  if (var_alloc_length > 0) {
+    vars = SPVM_RUNTIME_ALLOCATOR_alloc(runtime, sizeof(SPVM_VALUE) * var_alloc_length);
+  }
+  
   // Copy arguments to variables
-  memcpy(vars, args, args_length * sizeof(SPVM_VALUE));
+  if (vars) {
+    int32_t arg_alloc_length = SPVM_SUB_get_arg_alloc_length(compiler, sub);
+    if (arg_alloc_length > 0) {
+      memcpy(vars, stack, sizeof(SPVM_VALUE) * arg_alloc_length);
+    }
+  }
   
   // If arg is object, increment reference count
   {
-    int32_t index;
-    for (index = 0; index < sub->object_arg_ids->length; index++) {
-      int32_t object_arg_index = (intptr_t)SPVM_LIST_fetch(sub->object_arg_ids, index);
-      
-      void* object = *(void**)&vars[object_arg_index];
-      if (object != NULL) {
-        SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(object);
+    int32_t arg_index;
+    for (arg_index = 0; arg_index < sub->op_args->length; arg_index++) {
+      SPVM_OP* op_arg = SPVM_LIST_fetch(sub->op_args, arg_index);
+      SPVM_TYPE* arg_type = op_arg->uv.my->op_type->uv.type;
+      _Bool arg_type_is_value_t = SPVM_TYPE_is_value_t(compiler, arg_type);
+      if (SPVM_TYPE_is_object(compiler, arg_type) && !arg_type_is_value_t) {
+        SPVM_MY* my_arg = op_arg->uv.my;
+        void* object = *(void**)&vars[my_arg->var_id];
+        if (object != NULL) {
+          SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(object);
+        }
       }
     }
   }
+  
+  // Mortal stack
+  int32_t* mortal_stack = NULL;
+  if (sub->mortal_stack_max > 0) {
+    mortal_stack = SPVM_RUNTIME_ALLOCATOR_alloc(runtime, sizeof(int32_t) * sub->mortal_stack_max);
+  }
+  int32_t mortal_stack_top = 0;
   
   while (1) {
     SPVM_OPCODE* opcode = &(opcodes[sub_opcode_base + opcode_rel_index]);
@@ -636,27 +649,27 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
       {
         switch (opcode->id) {
           case SPVM_OPCODE_C_ID_CONVERT_BYTE_TO_STRING:
-            sprintf(tmp_string, "%" PRId8, *(SPVM_VALUE_byte*)&vars[opcode->operand1]);
+            sprintf(string_convert_buffer, "%" PRId8, *(SPVM_VALUE_byte*)&vars[opcode->operand1]);
             break;
           case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_STRING:
-            sprintf(tmp_string, "%" PRId16, *(SPVM_VALUE_short*)&vars[opcode->operand1]);
+            sprintf(string_convert_buffer, "%" PRId16, *(SPVM_VALUE_short*)&vars[opcode->operand1]);
             break;
           case SPVM_OPCODE_C_ID_CONVERT_INT_TO_STRING:
-            sprintf(tmp_string, "%" PRId32, *(SPVM_VALUE_int*)&vars[opcode->operand1]);
+            sprintf(string_convert_buffer, "%" PRId32, *(SPVM_VALUE_int*)&vars[opcode->operand1]);
             break;
           case SPVM_OPCODE_C_ID_CONVERT_LONG_TO_STRING:
-            sprintf(tmp_string, "%" PRId64, *(SPVM_VALUE_long*)&vars[opcode->operand1]);
+            sprintf(string_convert_buffer, "%" PRId64, *(SPVM_VALUE_long*)&vars[opcode->operand1]);
             break;
           case SPVM_OPCODE_C_ID_CONVERT_FLOAT_TO_STRING:
-            sprintf(tmp_string, "%g", *(SPVM_VALUE_float*)&vars[opcode->operand1]);
+            sprintf(string_convert_buffer, "%g", *(SPVM_VALUE_float*)&vars[opcode->operand1]);
             break;
           case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_TO_STRING:
-            sprintf(tmp_string, "%g", *(SPVM_VALUE_double*)&vars[opcode->operand1]);
+            sprintf(string_convert_buffer, "%g", *(SPVM_VALUE_double*)&vars[opcode->operand1]);
             break;
         }
         
-        int32_t string_length = strlen(tmp_string);
-        void* string = env->new_string_raw(env, tmp_string, string_length);
+        int32_t string_length = strlen(string_convert_buffer);
+        void* string = env->new_string_raw(env, string_convert_buffer, string_length);
         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], string);
 
         break;
@@ -685,8 +698,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
               int32_t index;
               for (index = 0; index < length; index++) {
                 SPVM_VALUE_byte value = *(SPVM_VALUE_byte*)((intptr_t)numeric_array + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE_byte) * index);
-                sprintf(tmp_string, "%" PRId8, value);
-                void* string = env->new_string_raw(env, tmp_string, strlen(tmp_string));
+                sprintf(string_convert_buffer, "%" PRId8, value);
+                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
                 SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
                 *(void**)((intptr_t)string_array + (intptr_t)env->object_header_byte_size + sizeof(void*) * index) = string;
               }
@@ -696,8 +709,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
               int32_t index;
               for (index = 0; index < length; index++) {
                 SPVM_VALUE_short value = *(SPVM_VALUE_short*)((intptr_t)numeric_array + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE_short) * index);
-                sprintf(tmp_string, "%" PRId16, value);
-                void* string = env->new_string_raw(env, tmp_string, strlen(tmp_string));
+                sprintf(string_convert_buffer, "%" PRId16, value);
+                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
                 SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
                 *(void**)((intptr_t)string_array + (intptr_t)env->object_header_byte_size + sizeof(void*) * index) = string;
               }
@@ -707,8 +720,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
               int32_t index;
               for (index = 0; index < length; index++) {
                 SPVM_VALUE_int value = *(SPVM_VALUE_int*)((intptr_t)numeric_array + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE_int) * index);
-                sprintf(tmp_string, "%" PRId32, value);
-                void* string = env->new_string_raw(env, tmp_string, strlen(tmp_string));
+                sprintf(string_convert_buffer, "%" PRId32, value);
+                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
                 SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
                 *(void**)((intptr_t)string_array + (intptr_t)env->object_header_byte_size + sizeof(void*) * index) = string;
               }
@@ -718,8 +731,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
               int32_t index;
               for (index = 0; index < length; index++) {
                 SPVM_VALUE_long value = *(SPVM_VALUE_long*)((intptr_t)numeric_array + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE_long) * index);
-                sprintf(tmp_string, "%" PRId64, value);
-                void* string = env->new_string_raw(env, tmp_string, strlen(tmp_string));
+                sprintf(string_convert_buffer, "%" PRId64, value);
+                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
                 SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
                 *(void**)((intptr_t)string_array + (intptr_t)env->object_header_byte_size + sizeof(void*) * index) = string;
               }
@@ -729,8 +742,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
               int32_t index;
               for (index = 0; index < length; index++) {
                 SPVM_VALUE_float value = *(SPVM_VALUE_float*)((intptr_t)numeric_array + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE_float) * index);
-                sprintf(tmp_string, "%g", value);
-                void* string = env->new_string_raw(env, tmp_string, strlen(tmp_string));
+                sprintf(string_convert_buffer, "%g", value);
+                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
                 SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
                 *(void**)((intptr_t)string_array + (intptr_t)env->object_header_byte_size + sizeof(void*) * index) = string;
               }
@@ -740,8 +753,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
               int32_t index;
               for (index = 0; index < length; index++) {
                 SPVM_VALUE_double value = *(SPVM_VALUE_double*)((intptr_t)numeric_array + (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE_double) * index);
-                sprintf(tmp_string, "%g", value);
-                void* string = env->new_string_raw(env, tmp_string, strlen(tmp_string));
+                sprintf(string_convert_buffer, "%g", value);
+                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
                 SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
                 *(void**)((intptr_t)string_array + (intptr_t)env->object_header_byte_size + sizeof(void*) * index) = string;
               }
@@ -1114,8 +1127,11 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
       case SPVM_OPCODE_C_ID_MOVE_OBJECT:
         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], *(void**)&vars[opcode->operand1]);
         break;
+      case SPVM_OPCODE_C_ID_MOVE_VALUES:
+        memcpy(&vars[opcode->operand0], &vars[opcode->operand1], sizeof(SPVM_VALUE) * opcode->operand2);
+        break;
       case SPVM_OPCODE_C_ID_PUSH_MORTAL: {
-        *(int32_t*)&mortal_stack[mortal_stack_top] = opcode->operand0;
+        mortal_stack[mortal_stack_top] = opcode->operand0;
         mortal_stack_top++;
         
         break;
@@ -1124,7 +1140,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         int32_t original_mortal_stack_top = opcode->operand0;
         int32_t mortal_stack_index;
         for (mortal_stack_index = original_mortal_stack_top; mortal_stack_index < mortal_stack_top; mortal_stack_index++) {
-          int32_t var_index = mortal_stack[mortal_stack_index].ival;
+          int32_t var_index = mortal_stack[mortal_stack_index];
           
           if (*(void**)&vars[var_index] != NULL) {
             if (SPVM_RUNTIME_C_INLINE_GET_REF_COUNT(*(void**)&vars[var_index]) > 1) { SPVM_RUNTIME_C_INLINE_DEC_REF_COUNT_ONLY(*(void**)&vars[var_index]); }
@@ -1722,44 +1738,16 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_PUSH_ARG_BYTE:
-        *(SPVM_VALUE_byte*)&args[call_sub_arg_stack_top] = *(SPVM_VALUE_byte*)&vars[opcode->operand0];
-        call_sub_arg_stack_top++;
+      case SPVM_OPCODE_C_ID_PUSH_ARG: {
+        int32_t width = opcode->operand1;
+        memcpy(&stack[call_sub_arg_stack_top], &vars[opcode->operand0], sizeof(SPVM_VALUE) * width);
+        call_sub_arg_stack_top += width;
         
         break;
-      case SPVM_OPCODE_C_ID_PUSH_ARG_SHORT:
-        *(SPVM_VALUE_short*)&args[call_sub_arg_stack_top] = *(SPVM_VALUE_short*)&vars[opcode->operand0];
-        call_sub_arg_stack_top++;
-        
-        break;
-      case SPVM_OPCODE_C_ID_PUSH_ARG_INT:
-        *(SPVM_VALUE_int*)&args[call_sub_arg_stack_top] = *(SPVM_VALUE_int*)&vars[opcode->operand0];
-        call_sub_arg_stack_top++;
-        
-        break;
-      case SPVM_OPCODE_C_ID_PUSH_ARG_LONG:
-        *(SPVM_VALUE_long*)&args[call_sub_arg_stack_top] = *(SPVM_VALUE_long*)&vars[opcode->operand0];
-        call_sub_arg_stack_top++;
-        
-        break;
-      case SPVM_OPCODE_C_ID_PUSH_ARG_FLOAT:
-        *(SPVM_VALUE_float*)&args[call_sub_arg_stack_top] = *(SPVM_VALUE_float*)&vars[opcode->operand0];
-        call_sub_arg_stack_top++;
-        
-        break;
-      case SPVM_OPCODE_C_ID_PUSH_ARG_DOUBLE:
-        *(SPVM_VALUE_double*)&args[call_sub_arg_stack_top] = *(SPVM_VALUE_double*)&vars[opcode->operand0];
-        call_sub_arg_stack_top++;
-        
-        break;
-      case SPVM_OPCODE_C_ID_PUSH_ARG_OBJECT:
-        *(void**)&args[call_sub_arg_stack_top] = *(void**)&vars[opcode->operand0];
-        call_sub_arg_stack_top++;
-        
-        break;
+      }
       case SPVM_OPCODE_C_ID_PUSH_ARG_UNDEF:
-        *(void**)&args[call_sub_arg_stack_top] = NULL;
-        call_sub_arg_stack_top++;
+        *(void**)&stack[call_sub_arg_stack_top] = NULL;
+        call_sub_arg_stack_top += opcode->operand1;
         
         break;
       case SPVM_OPCODE_C_ID_CHECK_CAST: {
@@ -1796,6 +1784,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         // Declare subroutine return type
         SPVM_TYPE* decl_sub_return_type = decl_sub->op_return_type->uv.type;
         int32_t decl_sub_return_type_is_object = SPVM_TYPE_is_object(compiler, decl_sub_return_type);
+        int32_t decl_sub_return_type_is_value_t = SPVM_TYPE_is_value_t(compiler, decl_sub_return_type);
         
         // Declare subroutine argument length
         int32_t decl_sub_args_length = decl_sub->op_args->length;
@@ -1813,18 +1802,23 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
           assert(0);
         }
         
-        call_sub_arg_stack_top -= decl_sub_args_length;
+        call_sub_arg_stack_top -= SPVM_SUB_get_arg_alloc_length(compiler, decl_sub);
         
         // Call subroutine
-        exception_flag = env->call_sub(env, call_sub_id, args);
+        exception_flag = env->call_sub(env, call_sub_id, stack);
         if (!exception_flag) {
-          if (decl_sub_return_type_is_object) {
-            SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], args[0].oval);
+          if (decl_sub_return_type_is_value_t) {
+            int32_t decl_sub_return_type_width = SPVM_TYPE_get_width(compiler, decl_sub_return_type);
+            int32_t decl_sub_return_basic_type_id = decl_sub_return_type->basic_type->id;
+            memcpy(&vars[opcode->operand0], &stack[0], sizeof(SPVM_VALUE) * decl_sub_return_type_width);
+          }
+          else if (decl_sub_return_type_is_object) {
+            SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], stack[0].oval);
           }
           else {
             int32_t decl_sub_return_basic_type_id = decl_sub_return_type->basic_type->id;
             if (decl_sub_return_basic_type_id != SPVM_BASIC_TYPE_C_ID_VOID) {
-              vars[opcode->operand0] = args[0];
+              vars[opcode->operand0] = stack[0];
             }
           }
         }
@@ -1880,55 +1874,25 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
         opcode_rel_index = opcode->operand1;
         continue;
       }
-      case SPVM_OPCODE_C_ID_RETURN_BYTE:
+      case SPVM_OPCODE_C_ID_RETURN:
       {
-        *(SPVM_VALUE_byte*)&args[0] = *(SPVM_VALUE_byte*)&vars[opcode->operand0];
-        opcode_rel_index = opcode->operand1;
-        continue;
-      }
-      case SPVM_OPCODE_C_ID_RETURN_SHORT:
-      {
-        *(SPVM_VALUE_short*)&args[0] = *(SPVM_VALUE_short*)&vars[opcode->operand0];
-        opcode_rel_index = opcode->operand1;
-        continue;
-      }
-      case SPVM_OPCODE_C_ID_RETURN_INT:
-      {
-        *(SPVM_VALUE_int*)&args[0] = *(SPVM_VALUE_int*)&vars[opcode->operand0];
-        opcode_rel_index = opcode->operand1;
-        continue;
-      }
-      case SPVM_OPCODE_C_ID_RETURN_LONG:
-      {
-        *(SPVM_VALUE_long*)&args[0] = *(SPVM_VALUE_long*)&vars[opcode->operand0];
-        opcode_rel_index = opcode->operand1;
-        continue;
-      }
-      case SPVM_OPCODE_C_ID_RETURN_FLOAT:
-      {
-        *(SPVM_VALUE_float*)&args[0] = *(SPVM_VALUE_float*)&vars[opcode->operand0];
-        opcode_rel_index = opcode->operand1;
-        continue;
-      }
-      case SPVM_OPCODE_C_ID_RETURN_DOUBLE:
-      {
-        *(SPVM_VALUE_double*)&args[0] = *(SPVM_VALUE_double*)&vars[opcode->operand0];
+        memcpy(&stack[0], &vars[opcode->operand0], sizeof(SPVM_VALUE) * sub_return_type_width);
         opcode_rel_index = opcode->operand1;
         continue;
       }
       case SPVM_OPCODE_C_ID_RETURN_OBJECT:
       {
-        *(void**)&args[0] = *(void**)&vars[opcode->operand0];
+        *(void**)&stack[0] = *(void**)&vars[opcode->operand0];
         // Increment ref count of return value not to release by leave scope
-        if (*(void**)&args[0] != NULL) {
-          SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(*(void**)&args[0]);
+        if (*(void**)&stack[0] != NULL) {
+          SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(*(void**)&stack[0]);
         }
         opcode_rel_index = opcode->operand1;
         continue;
       }
       case SPVM_OPCODE_C_ID_RETURN_UNDEF:
       {
-        *(void**)&args[0] = NULL;
+        *(void**)&stack[0] = NULL;
         opcode_rel_index = opcode->operand1;
         continue;
       }
@@ -2003,10 +1967,14 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* args
     
   // Croak
   if (!exception_flag) {
+    
+    int32_t sub_return_type_is_object = SPVM_TYPE_is_object(compiler, sub_return_type);
+    _Bool sub_return_type_is_value_t = SPVM_TYPE_is_value_t(compiler, sub_return_type);
+    
     // Decrement ref count of return value
-    if (sub_return_type_is_object) {
-      if (*(void**)&args[0] != NULL) {
-        SPVM_RUNTIME_C_INLINE_DEC_REF_COUNT_ONLY(*(void**)&args[0]);
+    if (sub_return_type_is_object && !sub_return_type_is_value_t) {
+      if (*(void**)&stack[0] != NULL) {
+        SPVM_RUNTIME_C_INLINE_DEC_REF_COUNT_ONLY(*(void**)&stack[0]);
       }
     }
   }
@@ -2022,7 +1990,7 @@ void SPVM_RUNTIME_free(SPVM_RUNTIME* runtime) {
   // Free exception
   SPVM_RUNTIME_API_set_exception(runtime->env, NULL);
   
-  free(runtime->args);
+  free(runtime->stack);
   
   free(runtime->package_vars);
   

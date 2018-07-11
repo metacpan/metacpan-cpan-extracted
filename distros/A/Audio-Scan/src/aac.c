@@ -122,9 +122,9 @@ aac_parse_adts(PerlIO *infile, char *file, off_t audio_size, Buffer *buf, HV *in
   unsigned char *bptr;
 
   /* Read all frames to ensure correct time and bitrate */
-  for (frames = 0; /* */; frames++) {
+  for (frames = 1; /* */; frames++) {
     if ( !_check_buf(infile, buf, audio_size > AAC_BLOCK_SIZE ? AAC_BLOCK_SIZE : audio_size, AAC_BLOCK_SIZE) ) {
-      if (frames < 1)
+      if (frames < 2)
         return 0;
       else
         break;
@@ -136,7 +136,7 @@ aac_parse_adts(PerlIO *infile, char *file, off_t audio_size, Buffer *buf, HV *in
     if (!((bptr[0] == 0xFF)&&((bptr[1] & 0xF6) == 0xF0)))
       break;
 
-    if (frames == 0) {
+    if (frames == 1) {
       profile = (bptr[2] & 0xc0) >> 6;
       samplerate = adts_sample_rates[(bptr[2]&0x3c)>>2];
       channels = ((bptr[2] & 0x1) << 2) | ((bptr[3] & 0xc0) >> 6);
@@ -145,7 +145,7 @@ aac_parse_adts(PerlIO *infile, char *file, off_t audio_size, Buffer *buf, HV *in
     frame_length = ((((unsigned int)bptr[3] & 0x3)) << 11)
       | (((unsigned int)bptr[4]) << 3) | (bptr[5] >> 5);
 
-    if (frames == 0 && _check_buf(infile, buf, frame_length + 10, AAC_BLOCK_SIZE)) {
+    if (frames == 1 && _check_buf(infile, buf, frame_length + 10, AAC_BLOCK_SIZE)) {
       unsigned char *bptr2 = (unsigned char *)buffer_ptr(buf) + frame_length;
       int frame_length2;
       if (!((bptr2[0] == 0xFF)&&((bptr2[1] & 0xF6) == 0xF0))
@@ -186,7 +186,7 @@ aac_parse_adts(PerlIO *infile, char *file, off_t audio_size, Buffer *buf, HV *in
       break;
   }
 
-  if (frames < 1) {
+  if (frames < 2) {
     DEBUG_TRACE("False sync\n");
     return 0;
   }
@@ -203,6 +203,9 @@ aac_parse_adts(PerlIO *infile, char *file, off_t audio_size, Buffer *buf, HV *in
     length = (float)frames/frames_per_sec;
   else
     length = 1;
+
+  DEBUG_TRACE("ADTS frames=%d, frames_per_sec=%f, bytes_per_frame=%f, length=%f\n",
+    frames, frames_per_sec, bytes_per_frame, length);
 
   // DLNA profile detection
   // XXX Does not detect HEAAC_L3_ADTS

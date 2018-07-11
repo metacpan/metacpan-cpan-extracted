@@ -1,3 +1,21 @@
+Version 1.4212:
+- Update META.yml
+
+Version 1.4211:
+- Fix Windows issues with File::Slurper
+
+Version 1.4210:
+- Trying once again to fix File::Slurp redefined warnings
+  http://www.cpantesters.org/cpan/report/3bec3abc-81ac-11e8-ab91-fd87d1c819e4
+
+Version 1.4209:
+- Trying once again to fix the compile test on windows
+
+Version 1.4208:
+- Fix compatibility issue with newer versions of perl, which remove "." from
+  @INC.
+- Check in standard tests, including one that skips the compile check on Windows
+
 Version 1.4207: Sun May 3 2015
 - Fix bug introduced in user_specified_filehandle.t by last release
 - Add standard tests

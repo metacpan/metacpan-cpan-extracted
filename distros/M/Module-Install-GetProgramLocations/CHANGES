@@ -1,3 +1,15 @@
+Version 0.3011:
+- Updating META.yml
+
+Version 0.3010:
+- Trying once again to fix the compile test on windows
+
+Version 0.3009:
+- Add standard tests
+- Fix compatibility issue with newer versions of perl, which remove "." from
+  @INC.
+- Check in standard tests, including one that skips the compile check on Windows
+
 Version 0.3008: May 2 2015
 - Prevent CPAN from indexing private-lib
 - Add Module::Install requirement

@@ -11,14 +11,7 @@ use Test::HTTP::LocalServer;
 
 use t::helper;
 
-# (re)set the log level
-if (my $lv = $ENV{TEST_LOG_LEVEL}) {
-    if( $lv eq 'trace' ) {
-        Log::Log4perl->easy_init($TRACE)
-    } elsif( $lv eq 'debug' ) {
-        Log::Log4perl->easy_init($DEBUG)
-    }
-}
+Log::Log4perl->easy_init($ERROR);
 
 # What instances of Chrome will we try?
 my $instance_port = 9222;
@@ -157,7 +150,13 @@ HTML
     };
     my $err = $@;
     is $lived, undef, 'We died trying to connect to a non-existing tab';
-    like $err, q{/Couldn't find a tab matching/}, 'We got the correct error message';
+    if( $] < 5.014 ) {
+        SKIP: {
+            skip "Perl pre 5.14 destructor eval clears \$\@ sometimes", 1;
+        };
+    } else {
+        like $err, qr/Couldn't find a tab matching/, 'We got the correct error message';
+    };
 
     local $SIG{CHLD} = 'IGNORE';
     kill 'SIGKILL', $pid; # clean up, the hard way
