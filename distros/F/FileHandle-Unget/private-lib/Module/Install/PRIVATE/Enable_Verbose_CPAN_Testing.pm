@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use lib 'inc';
-use Module::Install::AutomatedTester();
 
 use vars qw( @ISA $VERSION );
 
@@ -23,6 +22,11 @@ sub enable_verbose_cpan_testing {
   # Tell Module::Install to include this, since we use it.
   $self->perl_version('5.005');
   $self->include_deps('Module::Install::AutomatedTester', 0);
+
+  # Avoid subroutine redefined errors
+  if (!defined(&Module::Install::AutomatedTester::auto_tester)) {
+    require Module::Install::AutomatedTester;
+  }
 
   return unless Module::Install::AutomatedTester::auto_tester();
 

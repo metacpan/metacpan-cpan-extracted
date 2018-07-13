@@ -1,5 +1,5 @@
 package Business::AuthorizeNet::CIM;
-$Business::AuthorizeNet::CIM::VERSION = '0.16';
+$Business::AuthorizeNet::CIM::VERSION = '0.17';
 # ABSTRACT: Authorize.Net Customer Information Manager (CIM) Web Services API
 
 use strict;
@@ -402,7 +402,7 @@ sub getCustomerProfile {
 }
 
 sub getCustomerPaymentProfileRequest {
-    my ($self, $customerProfileId, $customerPaymentProfileId, $unmaskExpirationDate) = @_;
+    my ($self, $customerProfileId, $customerPaymentProfileId, $args) = @_;
 
     my $xml;
     my $writer = XML::Writer->new(OUTPUT => \$xml);
@@ -413,7 +413,18 @@ sub getCustomerPaymentProfileRequest {
     $writer->endTag('merchantAuthentication');
     $writer->dataElement('customerProfileId',        $customerProfileId);
     $writer->dataElement('customerPaymentProfileId', $customerPaymentProfileId);
-    $writer->dataElement('unmaskExpirationDate',     'true') if $unmaskExpirationDate;
+    if ($args) {
+        # for backwards compatability, if a true non-hash value is passed through
+        # we want to act as though we were passed the legacy boolean flag for setting
+        # 'unmaskExpirationDate' directly.
+        if (ref($args) eq 'HASH') {
+            for my $dataElement (grep { exists $args->{$_} } qw(unmaskExpirationDate includeIssuerInfo)) {
+                $writer->dataElement($dataElement, $args->{$dataElement});
+            }
+        } else {
+            $writer->dataElement('unmaskExpirationDate', 'true');
+        }
+    }
     $writer->endTag('getCustomerPaymentProfileRequest');
 
     return $self->_send($xml);
@@ -799,7 +810,7 @@ Business::AuthorizeNet::CIM - Authorize.Net Customer Information Manager (CIM) W
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -816,15 +827,15 @@ version 0.16
 
 =head1 DESCRIPTION
 
-Authorize.Net Customer Information Manager (CIM) Web Services API features are described 
+Authorize.Net Customer Information Manager (CIM) Web Services API features are described
 at L<http://developer.authorize.net/api/reference/features/customer_profiles.html>, the API
 reference is at L<http://developer.authorize.net/api/reference/#customer-profiles>.
-Another useful (but deprecated) reference is L<http://www.authorize.net/support/CIM_XML_guide.pdf>, 
+Another useful (but deprecated) reference is L<http://www.authorize.net/support/CIM_XML_guide.pdf>,
 and the reference XML schema is at L<https://api.authorize.net/xml/v1/schema/AnetApiSchema.xsd>.
 
 =head2 METHODS
 
-=head3 CONSTRUCTION
+=head3 new
 
     my $cim = Business::AuthorizeNet::CIM->new(
         login => $cfg{login},
@@ -1126,10 +1137,13 @@ Retrieve an existing customer profile along with all the associated customer pay
 
 =head3 getCustomerPaymentProfileRequest
 
-Retrieve a customer payment profile for an existing customer profile. $unmaskExpirationDate is an optional boolean arg, if passed
-a true value it will return the expiration date in YYYY-MM format, else it will mask as XXXX.
+Retrieve a customer payment profile for an existing customer profile. Optionally, a hash
+reference of additonal arguments may be passed in, and will be added to the request.
 
-    $cim->getCustomerPaymentProfileRequest($customerProfileId, $customerPaymentProfileId, $unmaskExpirationDate);
+    $cim->getCustomerPaymentProfileRequest($customerProfileId, $customerPaymentProfileId, {
+        includeIssuerInfo    => 'true',
+        unmaskExpirationDate => 'true',
+    });
 
 =head3 getCustomerShippingAddressRequest
 
@@ -1263,9 +1277,9 @@ This section of the API must be enabled for the merchant in the portal.
 =head3 Paging and Sorting Options
 
 API methods that return lists are paged, and the default page size is
-the maximum (1000 records).  However, sorting and paging options can be 
-provided, as described in Authorize.Net's api documentation.  Sorting 
-and paging can be independently provided, but each requires that both 
+the maximum (1000 records).  However, sorting and paging options can be
+provided, as described in Authorize.Net's api documentation.  Sorting
+and paging can be independently provided, but each requires that both
 its key-value pairs be specified.
 
   sorting => { orderBy => 'id', orderDescending => 'false' },
@@ -1273,7 +1287,7 @@ its key-value pairs be specified.
 
 N.B. offsets begin at 1.
 
-=head3 getMerchantDetailsRequest 
+=head3 getMerchantDetailsRequest
 
 returns details about the merchant (payment methods, currencies, et al).
 
@@ -1283,7 +1297,7 @@ returns details about the merchant (payment methods, currencies, et al).
 
 =head3 getTransactionDetailsRequest
 
-Return details about a specific transaction: status, payment method, auth and settled amounts, 
+Return details about a specific transaction: status, payment method, auth and settled amounts,
 settle date, profile ids, et al.  transId is required.
 
   https://developer.authorize.net/api/reference/index.html#transaction-reporting-get-transaction-details
@@ -1296,7 +1310,7 @@ settle date, profile ids, et al.  transId is required.
 =head3 getTransactionListForCustomerRequest
 
 Get transactions for a specific customer profile or customer payment profile.
-customerProfileId is required.  If the payment profile id is omitted, 
+customerProfileId is required.  If the payment profile id is omitted,
 transactions for all payment profiles belonging to that customer are returned.
 Paging and sorting options can be specified.
 
@@ -1307,7 +1321,7 @@ Paging and sorting options can be specified.
         refId   => $refId,    # Optional
     );
 
-=head3 getUnsettledTransactionListRequest 
+=head3 getUnsettledTransactionListRequest
 
 Get data for unsettled transactions.  No parameters are required.
 Paging and sorting options can be specified.
@@ -1318,8 +1332,8 @@ Paging and sorting options can be specified.
 
 =head3 getSettledBatchListRequest
 
-returns Batch ID, Settlement Time, & Settlement State for all settled batches with 
-a range of dates. If you specify includeStatistics, you also receive batch 
+returns Batch ID, Settlement Time, & Settlement State for all settled batches with
+a range of dates. If you specify includeStatistics, you also receive batch
 statistics by payment type and batch totals.  All inputs are optional.
 
     my $resp = $cim->getSettledBatchListRequest(
@@ -1358,7 +1372,7 @@ Olaf Alders
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Fayland Lam.
+This software is copyright (c) 2018 by Fayland Lam.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

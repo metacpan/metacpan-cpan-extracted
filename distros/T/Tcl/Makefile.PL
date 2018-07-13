@@ -1,16 +1,13 @@
 #!perl -w
-
 # before running this script make sure you have 'tclsh' in your path, 
 # and this 'tcl' distribution is required one.
-# FreeBSD users may want to modify name of tcl interpreter with --tclsh=tclsh86
-# as long as 'tclsh' does not work in their case
 
 use strict;
 use Getopt::Long;
 use ExtUtils::MakeMaker;
 use Config;
 
-my $arch = "$^O";
+my $arch;
 my $stub = "tclstub8.4";
 
 # These need updating as more platforms are added to tcl-core/ area
@@ -24,7 +21,7 @@ if ($^O eq "MSWin32") {
     $arch = "$^O-x86" if ($Config{archname} =~ /86/);
     $arch = "$^O-sparc" if ($Config{archname} =~ /sun4/);
 } elsif ($^O eq "aix") {
-    # $arch = "$^O";
+    $arch = "$^O";
 } elsif ($^O eq "hpux") {
     $arch = "$^O-ia64" if ($Config{archname} =~ /ia64/i);
     $arch = "$^O-parisc" if ($Config{archname} =~ /pa-risc/i);
@@ -41,19 +38,29 @@ sub _die ($) {
     exit 0;
 }
 
+my $tclsh_default = 'tclsh';
+# for FreeBSD users, try to guess their name for tclsh; see ticket 6086
+if ($^O eq 'freebsd') {
+    for my $ver (qw(8.9 8.8 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0)) {
+       system "which tclsh$ver >/dev/null 2>&1";
+       if ($? == 0) {
+	    $tclsh_default = "tclsh$ver"; # ok will use that as default
+	    last;
+	}
+    }
+}
+
+
 GetOptions(
-   "tclsh=s",     \(my $tclsh='tclsh'),
+   "tclsh=s",     \(my $tclsh=$tclsh_default),
    "tclconfig=s", \ my $tclconfig,
-   "usestubs!",   \(my $usestubs = $^O =~ /^solaris|linux|hpux|darwin|cygwin|aix$/? 1 : 0),
+   "usestubs!",   \(my $usestubs = $^O =~ /^solaris|linux|hpux|darwin|cygwin|aix|freebsd|netbsd|openbsd$/? 1 : 0),
 	# we prefer usestubs, but on windows default is to not use them, because
 	# stubs lib that come with AS TCL is impossible to link with GCC which 
 	# comes with strawberry perl; Have a ticket for this; (XXX) VKON 27-06-2018
 	#
-	# ... also freebsd, which have problems with stubs currently
-	# http://www.cpantesters.org/cpan/report/0bb213fc-7a55-11e8-8df7-db842dc43508
-	#
-	# ... but also any other $^O which we do not have in 'tcl-core' dir
-	#
+	# ... also any other $^O which we do not have in 'tcl-core' dir
+	# except for freebsd and netbsd and openbsd
    "library=s",   \ my $libpath,
    "include=s",   \ my $incpath,
    "define=s",    \(my $defs=''),
@@ -67,27 +74,28 @@ Most common usage:
 
 Customised usage:
  perl Makefile.PL      \
+  [--nousestubs]       \ # (do not) use the Tcl stubs mechanism
   [--tclsh <path>]     \ # Use this tclsh executable as a base to find the lib info needed
   [--tclconfig <path>] \ # Use this Tcl config file (not tclConfig.sh from the tclsh above)
-  [--nousestubs]       \ # (do not) use the Tcl stubs mechanism
   [--library=...]      \ # Use this specific Tcl library
   [--include=...]      \ # Use this specific include path
   [--define=...]       \ # Use this specific set of defines
   [--help]             \ # --help
-  [<makemaker opts>]
+  [<makemaker opts>]     # e.g. LINKTYPE=STATIC
 
 For compilation against tcl at given specific location
  perl Makefile.PL --library=-l/path/to/tcl(stub).a         \
     --include=-I/path/to/tcl/include                       \
     --define="-DLIB_RUNTIME_DIR=... -DTCL_LIB_FILE=..."
+
+--tclsh option is mostly for FreeBSD users, who have tclsh86 or alike;
+however default autodetection should be fine with freebsd as well.
 EOT
 }
 
-my $buildtype = "";
 my @extraargs;
 if ($usestubs) {
     $defs .= " -DUSE_TCL_STUBS";
-    $buildtype = "stub";
 }
 
 # If using stubs, we will set the LIB_RUNTIME_DIR and TCL_LIB_FILE
@@ -113,7 +121,7 @@ if (defined($libpath) && defined($incpath)) {
         $tclconfig = $tclcfg{'tclConfig.sh'};
     }
 
-    if (!defined($tclconfig) && defined($arch) && $usestubs) {
+    if (!defined($tclconfig) && $arch && $usestubs) {
 	$incpath = "-Itcl-core/include";
 	$libpath = "-Ltcl-core/$arch -l$stub";
 	if ($^O eq 'darwin') {
@@ -129,18 +137,14 @@ if (defined($libpath) && defined($incpath)) {
 	$libpath = $usestubs ? $tclcfg{TCL_STUB_LIB_SPEC} : $tclcfg{TCL_LIB_SPEC};
 	$incpath = $tclcfg{TCL_INCLUDE_SPEC};
 	if ($usestubs) {
-	    if ($^O eq 'MSWin32') {
-		$defs .= " -DLIB_RUNTIME_DIR=\\\"$tclcfg{'TCL_EXEC_PREFIX'}\\\"";
-		$defs .= " -DTCL_LIB_FILE=\\\"$tclcfg{'TCL_DLL_FILE'}\\\""; 
-	    } elsif ($^O eq 'darwin' && $tclcfg{'TCL_STUB_LIB_PATH'} =~ /\.framework/ ) {
-		(my $fmk = $tclcfg{'TCL_STUB_LIB_PATH'}) =~ s/(?<=\.framework).*//;
+	    if ($^O eq 'darwin' && $tclcfg{TCL_STUB_LIB_PATH} =~ /\.framework/ ) {
+		(my $fmk = $tclcfg{TCL_STUB_LIB_PATH}) =~ s/(?<=\.framework).*//;
 		$defs .= " -DLIB_RUNTIME_DIR=\\\"$fmk\\\"";
-		$defs .= " -DTCL_LIB_FILE=\\\"$tclcfg{'TCL_LIB_FILE'}\\\"";
 		@extraargs = (dynamic_lib => {OTHERLDFLAGS => "-framework Carbon"});
 	    } else {
-		$defs .= " -DLIB_RUNTIME_DIR=\\\"$tclcfg{'TCL_EXEC_PREFIX'}/lib\\\"";
-		$defs .= " -DTCL_LIB_FILE=\\\"$tclcfg{'TCL_LIB_FILE'}\\\""; 
+		$defs .= " -DLIB_RUNTIME_DIR=\\\"$tclcfg{TCL_EXEC_PREFIX}/lib\\\"";
 	    }
+	    $defs .= " -DTCL_LIB_FILE=\\\"$tclcfg{TCL_LIB_FILE}\\\"";
 	}
     } else {
 	# no --tclconfig=... -> get values from ./tclcfg.tcl
@@ -157,18 +161,15 @@ if (defined($libpath) && defined($incpath)) {
 	    $tclver=~s/\.//;
 	    $defs .= " -DTCL_LIB_FILE=\\\"tcl$tclver.$Config{so}\\\"" if $usestubs; 
 	}
-	elsif ($^O eq 'freebsd' or $^O eq 'netbsd') {
+	elsif ($^O eq 'freebsd' or $^O eq 'openbsd' or $^O eq 'netbsd') {
 	    $tclver=~s/\.//;
 	    $tclsh=~/([\d.]+)$/ and $incpath .= " -I/usr/local/include/tcl$1";
 	    $defs .= " -DTCL_LIB_FILE=\\\"libtcl$tclver.$Config{so}\\\"" if $usestubs; 
 	}
-	elsif ($^O eq 'hpux') {
-	    $defs .= " -DTCL_LIB_FILE=\\\"libtcl$tclver.$Config{so}\\\"" if $usestubs;
-	}
 	else {
 	    $defs .= " -DTCL_LIB_FILE=\\\"libtcl$tclver.$Config{so}\\\"" if $usestubs; 
 	}
-	$libpath .= " -ltcl$buildtype$tclver";
+	$libpath .= " -ltcl" . ($usestubs?"stub":"") . $tclver;
     }
     # version must be 8.4+
     _die "Tcl requires Tcl v8.4 or greater, found '$tclcfg{tcl_version}'\n"
@@ -178,7 +179,7 @@ if (defined($libpath) && defined($incpath)) {
 print "LIBS   = $libpath\n";
 print "INC    = $incpath\n";
 print "DEFINE = $defs\n";
-print "tclConfig.sh = $tclconfig\n";
+print "tclConfig.sh = ", $tclconfig || "", "\n";
 
 if ($^O eq 'darwin') {
     # darwin has a broken ranlib that requires you to run it anytime
@@ -193,7 +194,6 @@ if ($^O eq 'darwin') {
     }
 }
 
-#print <<"#EOS";
 WriteMakefile(
     NAME => "Tcl",
     VERSION_FROM => 'Tcl.pm',
@@ -211,7 +211,6 @@ WriteMakefile(
     DEFINE => $defs,
     @extraargs,
 );
-#EOS
 
 sub process_tclconfig {
     # Process a tclConfig.sh file for build info

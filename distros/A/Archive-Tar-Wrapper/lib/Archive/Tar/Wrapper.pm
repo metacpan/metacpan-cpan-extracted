@@ -18,7 +18,7 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 my $logger = get_logger();
 
 sub _acquire_tar_info {

@@ -1,3 +1,13 @@
+0.000004    2018-07-11
+            * Add method reset() to reset the VM to pristine conditions.
+            * Add method global_objects().
+            * Add a comment regarding external dependencies.
+            * Improve perldoc.
+
+0.000003    2018-07-10
+            * Code that display source for errors now is similar to Duktape's.
+            * Clean up and expand perldoc.
+
 0.000002    2018-07-04
             * First public release.
 

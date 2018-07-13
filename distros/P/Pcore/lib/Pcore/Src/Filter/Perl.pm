@@ -21,7 +21,13 @@ sub decompress ( $self, % ) {
     # format heredocs
     $self->_format_heredoc;
 
-    state $init = !!require Perl::Tidy;
+    state $init = do {
+
+        # redefine $Coro::State::DIEHOOK, required under MSWin to handle Time::HiRes::utime import
+        local $SIG{__DIE__} = undef;
+
+        !!require Perl::Tidy;
+    };
 
     my $perltidy_argv = $self->src_cfg->{PERLTIDY};
 
@@ -356,9 +362,9 @@ sub cut_log ($self) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 9                    | Subroutines::ProhibitExcessComplexity - Subroutine "decompress" with high complexity score (27)                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 195                  | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## |    2 | 201                  | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 139                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 145                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

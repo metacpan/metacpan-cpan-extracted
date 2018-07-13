@@ -46,6 +46,7 @@ subtest "BSON type CODE" => sub {
 
     # MongoDB::Code (deprecated) -> BSON::Code
     SKIP: {
+        $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1;
         eval { require MongoDB::Code };
         skip( "MongoDB::Code not installed", 2 )
         unless $INC{'MongoDB/Code.pm'};
@@ -69,6 +70,7 @@ subtest "BSON type CODEWSCOPE" => sub {
 
     # MongoDB::Code (deprecated) -> BSON::Code
     SKIP: {
+        $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1;
         eval { require MongoDB::Code };
         skip( "MongoDB::Code not installed", 2 )
         unless $INC{'MongoDB/Code.pm'};

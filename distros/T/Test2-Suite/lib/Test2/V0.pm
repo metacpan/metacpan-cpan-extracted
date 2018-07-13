@@ -4,7 +4,7 @@ use warnings;
 
 use Importer;
 
-our $VERSION = '0.000114';
+our $VERSION = '0.000115';
 
 use Carp qw/croak/;
 
@@ -122,7 +122,7 @@ sub import {
     Test2::Tools::Target->import_into($caller, $target)
         if $target;
 
-    croak "Unknown option(s): " . join(', ', keys %options) if keys %options;
+    croak "Unknown option(s): " . join(', ', sort keys %options) if keys %options;
 
     Importer->import_into($class, $caller, @exports);
 }

@@ -41,12 +41,13 @@ get '/:username', sub ($c) {
   });
 }, 'profile';
 
-post '/:username', sub ($c) {
+post '/:username/add-post', sub ($c) {
   my $v = $c->validation;
   my $uid = $c->session('uid') or return $c->redirect_to('index');
 
   $v->required('message');
-  return $c->render(status => 400, posts => [], error => 'Missing input.') unless $v->is_valid;
+  return $c->render('profile', status => 400, posts => [], error => 'Missing input.', logged_in => 1)
+    unless $v->is_valid;
 
   $c->render_later;
   my $db = $c->redis->db;
@@ -55,17 +56,17 @@ post '/:username', sub ($c) {
     $post_id = shift;
     $db->hmset_p("twitter_clone:post:$post_id", uid => $uid, time => time, body => $v->param('message'));
   })->then(sub {
-    $db->lpush_p("twitter_clone:posts:$uid", $post_id);
-  })->then(sub {
-    $db->lpush_p("twitter_clone:timeline", $post_id);
-  })->then(sub {
-    $db->ltrim_p("twitter_clone:timeline", 0, 1000);
+    Mojo::Promise->all(
+      $db->lpush_p("twitter_clone:posts:$uid", $post_id),
+      $db->lpush_p("twitter_clone:timeline",   $post_id),
+      $db->ltrim_p("twitter_clone:timeline", 0, 1000),
+    );
   })->then(sub {
     $c->redirect_to('profile');
   })->catch(sub {
     $c->reply->exception(shift) unless $c->stash('status');
   });
-}, 'post';
+}, 'add_post';
 
 post '/login', sub ($c) {
   my $v = $c->validation;
@@ -108,10 +109,13 @@ sub add_dummy_user {
     $db->incr_p('twitter_clone:next_user_id');
   })->then(sub {
     $uid = shift;
-    $db->hmset_p("twitter_clone:user:$uid", username => 'batgirl', password => 's3cret')
-      ;    # Password should not be in plain text!
+
+    # Password should not be in plain text!
+    Mojo::Promise->alll(
+      $db->hmset_p("twitter_clone:user:$uid", username => 'batgirl', password => 's3cret'),
+      $db->hset_p('twitter_clone:users', batgirl => $uid),
+    );
   })->then(sub {
-    $db->hset_p('twitter_clone:users', batgirl => $uid);
     warn "--> User batgirl added.\n";
   })->catch(sub {
     warn $_[0];
@@ -129,19 +133,25 @@ __DATA__
   </label>
   <label>
     <span>Password</span>
-     %= password_field 'password', 's3cret'
+     %= password_field 'password', value => 's3cret'
   </label>
+  % if (my $error = stash 'error') {
+    <p class="alert"><%= $error %></p>
+  % }
   <button class="button">Login</button>
 % end
 @@ profile.html.ep
 <h1><%= $username %></h1>
 % if ($logged_in) {
-  %= form_for 'post', begin
+  %= form_for 'add_post', begin
     <label>
       <span>Message</span>
       %= text_field 'message', placeholder => "What's on your mind?"
-      <button class="button">Post</button>
     </label>
+    % if (my $error = stash 'error') {
+      <p class="alert"><%= $error %></p>
+    % }
+    <button class="button">Post</button>
   % end
 % }
 <ul class="posts">

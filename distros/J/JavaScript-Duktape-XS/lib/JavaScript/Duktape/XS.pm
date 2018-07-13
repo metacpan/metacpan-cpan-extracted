@@ -6,7 +6,7 @@ use parent 'Exporter';
 use Text::Trim qw(trim rtrim);
 use XSLoader;
 
-our $VERSION = '0.000067';
+our $VERSION = '0.000068';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 our @EXPORT_OK = qw[];
@@ -93,7 +93,6 @@ sub parse_js_stacktrace {
         else {
             push @contexts_normal, \%context;
         }
-
     }
     return [ @contexts_hiprio, @contexts_normal ];
 }
@@ -112,11 +111,11 @@ engine
 
 =head1 VERSION
 
-Version 0.000067
+Version 0.000068
 
 =head1 SYNOPSIS
 
-    my $duk = JavaScript::Duktape::XS->new();
+    my $vm = JavaScript::Duktape::XS->new();
 
     my $options = {
         gather_stats     => 1,
@@ -124,41 +123,43 @@ Version 0.000067
         max_memory_bytes => 256*1024,
         max_timeout_us   => 2*1_000_000,
     };
-    my $duk = JavaScript::Duktape::XS->new($options);
+    my $vm = JavaScript::Duktape::XS->new($options);
 
-    $duk->set('global_name', [1, 2, 3]);
-    my $aref = $duk->get('global_name');
+    $vm->set('global_name', [1, 2, 3]);
+    my $aref = $vm->get('global_name');
 
-    $duk->set('my.object.slot', { foo => [ 4, 5 ] });
-    my $href = $duk->get('my.object.slot');
+    $vm->set('my.object.slot', { foo => [ 4, 5 ] });
+    my $href = $vm->get('my.object.slot');
 
-    if ($duk->exists('my.object.slot')) { ... }
+    if ($vm->exists('my.object.slot')) { ... }
 
-    my $typeof = $duk->typeof('my.object.slot');
+    my $typeof = $vm->typeof('my.object.slot');
 
-    my $ok = $duk->instanceof('my.car.object', 'Car');
+    my $ok = $vm->instanceof('my.car.object', 'Car');
 
     # When function_name is called from JS, the arguments passed in
     # will be converted to Perl values; likewise, the value returned
     # from the Perl function will be converted to JS values.
-    $duk->set('function_name', sub { my @args = @_; return \@args; });
-    my $returned = $duk->eval('function_name(my.object.slot)');
+    $vm->set('function_name', sub { my @args = @_; return \@args; });
+    my $returned = $vm->eval('function_name(my.object.slot)');
 
-    $duk->dispatch_function_in_event_loop('function_name');
+    $vm->dispatch_function_in_event_loop('function_name');
 
-    my $stats_href = $duk->get_stats();
-    $duk->reset_stats();
+    my $stats_href = $vm->get_stats();
+    $vm->reset_stats();
 
-    my $msgs_href = $duk->get_msgs();
-    $duk->reset_msgs();
+    my $msgs_href = $vm->get_msgs();
+    $vm->reset_msgs();
 
-    my $context = $duk->parse_js_stacktrace($stacktrace_lines, 2);
+    my $globals = $vm->global_objects();
 
-    my $rounds = $duk->run_gc();
+    my $context = $vm->parse_js_stacktrace($stacktrace_lines, 2);
 
-    $duk->set('perl_module_resolve', \&module_resolve);
-    $duk->set('perl_module_load',    \&module_load);
-    $duk->eval('var badger = require("badger");');
+    my $rounds = $vm->run_gc();
+
+    $vm->set('perl_module_resolve', \&module_resolve);
+    $vm->set('perl_module_load',    \&module_load);
+    $vm->eval('var badger = require("badger");');
 
 =head1 DESCRIPTION
 
@@ -229,8 +230,8 @@ slot. Returns a boolean and avoids all JavaScript to Perl value conversions.
 
 Returns a string with the JavaScript type of a given variable.  Possible
 returned values are C<undefined>, C<null>, C<boolean>, C<number>, C<string>,
-C<array>, C<symbol>, C<function>, C<c_function>, C<lightfunc>, C<thread>,
-C<object>, C<pointer>, C<buffer>.
+C<array>, C<object>, C<symbol>, C<function>, C<pointer>, C<c_function>,
+C<lightfunc>, C<thread>, C<buffer>.
 
 This method returns C<null> for null values, which fixes the long-standing
 JavaScript bug of returning C<object> for null values.
@@ -277,6 +278,10 @@ object with option C<save_messages> set to true.
 
 Reset the accumulated messages, as if the XS object had just been created.
 
+=head2 global_objects
+
+Get an arrayref with the names of all global objects known to JavaScript.
+
 =head2 parse_js_stacktrace
 
 Parse a JavaScript stacktrace (usually returned via C<get_msgs>) and obtain
@@ -290,17 +295,18 @@ will appear first in the returned stacktrace information.
 
 =head2 run_gc
 
-Run at least one round of the Duktape garbage collector, and return the number
-of rounds that were effectively run.  The documentation recommends to run two
-rounds, so that's what we always do.
+Run at least one round of the JavaScript garbage collector, and return the
+number of rounds that were effectively run.
+
+The documentation recommends to run two rounds, so that's what we always do.
 
 =head1 MODULE SUPPORT
 
 There is support for managing JavaScript modules in the style of node.js.  In
 order to do this, you need to set two Perl callbacks:
 
-    $duk->set('perl_module_resolve', \&module_resolve);
-    $duk->set('perl_module_load',    \&module_load);
+    $vm->set('perl_module_resolve', \&module_resolve);
+    $vm->set('perl_module_load',    \&module_load);
 
 Please see
 L<https://github.com/svaarala/duktape/tree/master/extras/module-node> for more
@@ -308,7 +314,13 @@ details.
 
 =head1 SEE ALSO
 
-L<< https://metacpan.org/pod/JavaScript::Duktape >>
+=over 4
+
+=item * L<< https://metacpan.org/pod/JavaScript::Duktape >>
+
+=item * L<< https://metacpan.org/pod/JavaScript::V8::XS >>
+
+=back
 
 =head1 LICENSE
 
@@ -333,3 +345,5 @@ the terms of the MIT license.
 Duktape Javascript embeddable engine|http://duktape.org >>.
 
 =back
+
+=cut

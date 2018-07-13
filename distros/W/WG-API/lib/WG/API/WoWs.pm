@@ -10,11 +10,11 @@ WG::API::WoWs - Moduled for work with Wargaming.net Public API for Worlf of Wars
 
 =head1 VERSION
 
-Version v0.9
+Version v0.10
 
 =cut
 
-our $VERSION = 'v0.9';
+our $VERSION = 'v0.10';
 
 use constant api_uri => '//api.worldofwarships.ru/';
 
@@ -118,6 +118,8 @@ Method returns statistics slices by dates in specified time span.
 
 =back
 
+=back
+
 =cut
 
 sub account_statsbydate {
@@ -127,6 +129,195 @@ sub account_statsbydate {
         'get', 'wows/account/statsbydate/', [ 'language', 'fields', 'dates', 'access_token', 'extra', 'account_id' ],
         ['account_id'], @_
     );
+}
+
+=head2 Encyclopedia
+
+=over 1
+
+=item B<encyclopedia_info( [ %params ] )>
+
+Method returns information about encyclopedia.
+
+=cut
+
+sub encyclopedia_info {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/info/', [ 'fields', 'language' ], undef, @_ );
+}
+
+=item b<encyclopedia_ships( [ %params ] )
+
+Method returns list of ships available.
+
+=cut
+
+sub encyclopedia_ships {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/ships/', [ 'fields', 'language', 'limit', 'nation', 'page_no', 'ship_id', 'type' ], undef, @_ );
+}
+
+=item B<encyclopedia_achievements( [ %params ] )>
+
+Method returns information about achievements.
+
+=cut
+
+sub encyclopedia_achievements {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/achievements/', [ 'fields', 'language' ], undef, @_ );
+}
+
+=item B<encyclopedia_shipprofile( [ %params ] )>
+
+Method returns parameters of ships in all existing configurations.
+
+=over 2
+
+=item I<required fields>
+
+    ship_id - ship id
+
+=back
+
+=cut
+
+sub encyclopedia_shipprofile {
+    my $self = shift;
+
+    return $self->_request(
+        'get', 'wows/encyclopedia/shipprofile/',
+        [
+            'ship_id', 'artillery_id', 'dive_bomber_id',    'engine_id',
+            'fields',  'fighter_id',   'fire_control_id',   'flight_control_id',
+            'hull_id', 'language',     'torpedo_bomber_id', 'torpedoes_id'
+        ],
+        ['ship_id'],
+        @_
+    );
+}
+
+=item B<encyclopedia_modules( [ %params ] )>
+
+Method returns list of available modules that can be mounted on a ship (hull, engines, etc.).
+
+=cut
+
+sub encyclopedia_modules {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/modules/', [ 'fields', 'language', 'limit', 'module_id', 'page_no', 'type' ], undef, @_ );
+}
+
+=item B<encyclopedia_accountlevels( [ %params ] )>
+
+Method returns information about Service Record levels.
+
+=cut
+
+sub encyclopedia_accountlevels {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/accountlevels/', ['fields'], undef, @_ );
+}
+
+=item B<encyclopedia_crews( [ %params ] )>
+
+Method returns information about Commanders.
+
+=cut
+
+sub encyclopedia_crews {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/crews/', [ 'commander_id', 'fields', 'language' ], undef, @_ );
+}
+
+=item B<encyclopedia_crewskills( [ %params ] )>
+
+Method returns information about Commangers' skills.
+
+=cut
+
+sub encyclopedia_crewskills {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/crewskills/', [ 'fields', 'language', 'skill_id' ], undef, @_ );
+}
+
+=item B<encyclopedia_crewranks( [ %params ] )>
+
+Method returns information about Commanders' skills.
+
+=cut
+
+sub encyclopedia_crewranks {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/crewranks/', [ 'fields', 'language', 'nation' ], undef, @_ );
+}
+
+=item B<encyclopedia_battletypes( [ %params ] )>
+
+Method returns information about battle types.
+
+=cut
+
+sub encyclopedia_battletypes {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/battletypes/', [ 'fields', 'language' ], undef, @_ );
+}
+
+=item B<encyclopedia_consumables( [ %params ] )>
+
+Method returns information about consumables: camouflages, flags, and upgrades.
+
+=cut
+
+sub encyclopedia_consumables {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/consumables/', [ 'consumable_id', 'fields', 'language', 'limit', 'page_no', 'type' ], undef, @_ );
+}
+
+=item B<encyclopedia_collections( [ %params ] )>
+
+Method returns information about collections.
+
+=cut
+
+sub encyclopedia_collections {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/collections/', [ 'fields', 'language' ], undef, @_ );
+}
+
+=item B<encyclopedia_collectioncards( [ %params ] )>
+
+Method returns information about items that are included in the collection.
+
+=cut
+
+sub encyclopedia_collectioncards {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/collectioncards/', [ 'fields', 'language' ], undef, @_ );
+}
+
+=item B<encyclopedia_battlearenas( [ %params ] )>
+
+Method returns the information about maps.
+
+=cut
+
+sub encyclopedia_battlearenas {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wows/encyclopedia/battlearenas/', [ 'fields', 'language' ], undef, @_ );
 }
 
 =back

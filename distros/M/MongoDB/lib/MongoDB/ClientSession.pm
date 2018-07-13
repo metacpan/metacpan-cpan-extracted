@@ -19,7 +19,7 @@ package MongoDB::ClientSession;
 # ABSTRACT: MongoDB session and transaction management
 
 use version;
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use MongoDB::Error;
 
@@ -212,7 +212,7 @@ sub get_latest_cluster_time {
 #pod current cluster time, then the session will be updated to this provided value.
 #pod
 #pod Setting the C<$clusterTime> with a manually crafted value may cause a server
-#pod error. It is reccomended to only use C<$clusterTime> values retrieved from
+#pod error. It is recommended to only use C<$clusterTime> values retrieved from
 #pod database calls.
 #pod
 #pod =cut
@@ -244,7 +244,7 @@ sub advance_cluster_time {
 #pod updated to this provided value.
 #pod
 #pod Setting C<operation_time> with a manually crafted value may cause a server
-#pod error. It is recommended to only use an C<operation_time> retreived from
+#pod error. It is recommended to only use an C<operation_time> retrieved from
 #pod another session or directly from a database call.
 #pod
 #pod =cut
@@ -533,7 +533,7 @@ MongoDB::ClientSession - MongoDB session and transaction management
 
 =head1 VERSION
 
-version v2.0.0
+version v2.0.1
 
 =head1 SYNOPSIS
 
@@ -648,7 +648,7 @@ L</cluster_time>. If the cluster time provided is more recent than the sessions
 current cluster time, then the session will be updated to this provided value.
 
 Setting the C<$clusterTime> with a manually crafted value may cause a server
-error. It is reccomended to only use C<$clusterTime> values retrieved from
+error. It is recommended to only use C<$clusterTime> values retrieved from
 database calls.
 
 =head2 advance_operation_time
@@ -660,7 +660,7 @@ recent than the sessions current operation time, then the session will be
 updated to this provided value.
 
 Setting C<operation_time> with a manually crafted value may cause a server
-error. It is recommended to only use an C<operation_time> retreived from
+error. It is recommended to only use an C<operation_time> retrieved from
 another session or directly from a database call.
 
 =head2 start_transaction

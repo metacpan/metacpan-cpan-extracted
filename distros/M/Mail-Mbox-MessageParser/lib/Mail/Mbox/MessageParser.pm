@@ -20,7 +20,7 @@ use vars qw( $_CACHE $UPDATING_CACHE );
 
 @ISA = qw(Exporter);
 
-$VERSION = sprintf "%d.%02d%02d", q/1.51.10/ =~ /(\d+)/g;
+$VERSION = sprintf "%d.%02d%02d", q/1.51.11/ =~ /(\d+)/g;
 $_DEBUG = 0;
 
 #-------------------------------------------------------------------------------
@@ -561,7 +561,7 @@ sub _DO_WINDOWS_DECOMPRESSION
   my $filter_command = qq{"$Mail::Mbox::MessageParser::Config{'programs'}{$file_type}" -cd};
 
   my ($temp_file_handle, $temp_file_name) =
-    File::Temp::tempfile('mail-mbox-messageparser-XXXXXX', SUFFIX => '.tmp', UNLINK => 1);
+    File::Temp::tempfile('mail-mbox-messageparser-XXXXXX', SUFFIX => '.tmp', TMPDIR => 1, UNLINK => 1);
 
   while(my $line = <$file_handle>)
   {

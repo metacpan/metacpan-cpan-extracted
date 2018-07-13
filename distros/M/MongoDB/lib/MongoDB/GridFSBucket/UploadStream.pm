@@ -19,7 +19,7 @@ package MongoDB::GridFSBucket::UploadStream;
 # ABSTRACT: File handle abstraction for uploading
 
 use version;
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Moo;
 use BSON::Bytes;
@@ -293,7 +293,7 @@ sub abort {
 #pod   stream to also close.
 #pod * C<close> will be automatically called when a stream object is destroyed.
 #pod   When called this way, any errors thrown will not halt execution.
-#pod * Calling C<close> repeately will warn.
+#pod * Calling C<close> repeatedly will warn.
 #pod
 #pod =cut
 
@@ -456,7 +456,7 @@ MongoDB::GridFSBucket::UploadStream - File handle abstraction for uploading
 
 =head1 VERSION
 
-version v2.0.0
+version v2.0.1
 
 =head1 SYNOPSIS
 
@@ -586,7 +586,7 @@ C<close> will be automatically called when a stream object is destroyed. When ca
 
 =item *
 
-Calling C<close> repeately will warn.
+Calling C<close> repeatedly will warn.
 
 =back
 

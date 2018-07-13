@@ -44,6 +44,7 @@
       },
       "test" : {
          "requires" : {
+            "Dumbbench" : "0.111",
             "Test::Simple" : "1.302073"
          }
       }
@@ -59,6 +60,6 @@
          "web" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,6 +1,6 @@
 package Map::Tube::NYC;
 
-$Map::Tube::NYC::VERSION   = '0.57';
+$Map::Tube::NYC::VERSION   = '0.58';
 $Map::Tube::NYC::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,13 +9,13 @@ Map::Tube::NYC - Interface to the NYC Subway Map.
 
 =head1 VERSION
 
-Version 0.57
+Version 0.58
 
 =cut
 
 use 5.006;
 use Data::Dumper;
-use File::Share ':all';
+use File::ShareDir ':ALL';
 
 use Moo;
 use namespace::autoclean;

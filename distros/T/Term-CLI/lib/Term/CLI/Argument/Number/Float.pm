@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Argument::Number::Float  0.051002 {
+package Term::CLI::Argument::Number::Float  0.051003 {
 
 use Modern::Perl 1.20140107;
 use Scalar::Util 1.38 qw( looks_like_number );
@@ -51,13 +51,13 @@ Term::CLI::Argument::Number::Float - class for floating point arguments in Term:
 
 =head1 VERSION
 
-version 0.051002
+version 0.051003
 
 =head1 SYNOPSIS
 
  use Term::CLI::Argument::Number::Float;
 
- my $arg = Term::CLI::Argument::Number::Int->new(
+ my $arg = Term::CLI::Argument::Number::Float->new(
                 name => 'index',
                 min => -1.0,
                 max => +1.0,
@@ -96,8 +96,8 @@ Additionally:
 
 =item B<coerce_value> ( I<VALUE> )
 
-Overloaded to check for a valid numerical
-value (using L<Scalar::Util's looks_like_number|Scalar::Util/looks_like_number>).
+Overloaded to check for a valid numerical value (using
+L<Scalar::Util's looks_like_number|Scalar::Util/looks_like_number>).
 
 =back
 

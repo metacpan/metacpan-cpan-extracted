@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Compound;
-$JSONAPI::Document::Builder::Compound::VERSION = '2.0';
+$JSONAPI::Document::Builder::Compound::VERSION = '2.1';
 =head1 NAME
 
 JSONAPI::Document::Builder::Compound - Compound Resource Document builder
 
 =head1 VERSION
 
-version 2.0
+version 2.1
 
 =head1 DESCRIPTION
 

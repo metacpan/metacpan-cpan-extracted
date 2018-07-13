@@ -277,6 +277,10 @@ sub where {
             if ( $count == 0 ) {
                 $tmp->{where_stmt} = '';
             }
+            if ( $unclosed == 1 ) { # close an open parentheses automatically on OK
+                $tmp->{where_stmt} .= ")";
+                $unclosed = 0;
+            }
             return $tmp;
         }
         if ( $quote_col eq $sq_col ) {
@@ -395,6 +399,10 @@ sub having {
         if ( $aggr eq $sf->{i}{ok} ) {
             if ( $count == 0 ) {
                 $tmp->{having_stmt} = '';
+            }
+            if ( $unclosed == 1 ) { # close an open parentheses automatically on OK
+                $tmp->{having_stmt} .= ")";
+                $unclosed = 0;
             }
             return $tmp;
         }
@@ -670,6 +678,20 @@ sub __set_operator_sql {
         }
         elsif ( $operator =~ /REGEXP(_i)?\z/ ) {
             $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+            $tmp->{$stmt} =~ s/\s\Q$quote_col\E\z//;
+            my $do_not_match_regexp = $operator =~ /^NOT/       ? 1 : 0;
+            my $case_sensitive      = $operator =~ /REGEXP_i\z/ ? 0 : 1;
+            if ( ! eval {
+                my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+                $tmp->{$stmt} .= $plui->regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
+                push @{$tmp->{$args}}, '...';
+                1 }
+            ) {
+                $ax->print_error_message( $@, $operator );
+                $tmp->{$stmt} = $bu_stmt;
+                next OPERATOR;
+            }
+            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
             # Readline
             my $value = $trs->readline( 'Pattern: ' );
             if ( ! defined $value ) {
@@ -677,19 +699,8 @@ sub __set_operator_sql {
                 next OPERATOR;
             }
             $value = '^$' if ! length $value;
-            $tmp->{$stmt} =~ s/\s\Q$quote_col\E\z//;
-            my $do_not_match_regexp = $operator =~ /^NOT/       ? 1 : 0;
-            my $case_sensitive      = $operator =~ /REGEXP_i\z/ ? 0 : 1;
-            if ( ! eval {
-                my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-                $tmp->{$stmt} .= $plui->regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
-                push @{$tmp->{$args}}, $value;
-                1 }
-            ) {
-                $ax->print_error_message( $@, $operator );
-                $tmp->{$stmt} = $bu_stmt;
-                next OPERATOR;
-            }
+            pop @{$tmp->{$args}};
+            push @{$tmp->{$args}}, $value;
         }
         elsif ( $operator =~ /^IS\s(?:NOT\s)?NULL\z/ ) {
             $tmp->{$stmt} .= ' ' . $operator;

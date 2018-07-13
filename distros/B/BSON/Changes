@@ -1,5 +1,14 @@
 Revision history for BSON
 
+v1.6.7    2018-07-10 09:58:56-04:00 America/New_York
+
+    [Testing]
+
+    - PERL-954 Prevent deprecation warnings from use of deprecated MongoDB
+      v2.0.0 classes in test code.
+
+    - PERL-957 Remove tests for MongoDB::BSON::_EncodedDoc (legacy type)
+
 v1.6.6    2018-06-23 13:36:09-04:00 America/New_York
 
     [Bugs fixed]

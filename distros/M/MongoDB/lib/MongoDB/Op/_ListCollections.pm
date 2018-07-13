@@ -20,7 +20,7 @@ package MongoDB::Op::_ListCollections;
 # names
 
 use version;
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Moo;
 
@@ -37,6 +37,7 @@ use Types::Standard qw(
     Str
 );
 use Tie::IxHash;
+use boolean;
 
 use namespace::clean;
 
@@ -90,6 +91,14 @@ sub _command_list_colls {
         $options->{cursor} = {};
     }
 
+    # Normalize or delete 'nameOnly'
+    if ($options->{nameOnly}) {
+        $options->{nameOnly} = true;
+    }
+    else {
+        delete $options->{nameOnly};
+    }
+
     my $filter =
       ref( $self->filter ) eq 'ARRAY'
       ? { @{ $self->filter } }
@@ -98,6 +107,7 @@ sub _command_list_colls {
     my $cmd = Tie::IxHash->new(
         listCollections => 1,
         filter => $filter,
+        nameOnly => false,
         %{$self->options},
     );
 

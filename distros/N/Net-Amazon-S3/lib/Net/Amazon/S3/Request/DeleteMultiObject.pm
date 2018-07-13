@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::DeleteMultiObject;
-$Net::Amazon::S3::Request::DeleteMultiObject::VERSION = '0.82';
+$Net::Amazon::S3::Request::DeleteMultiObject::VERSION = '0.83';
 use Moose 0.85;
 use Digest::MD5 qw/md5 md5_hex/;
 use MIME::Base64;
@@ -65,7 +65,7 @@ Net::Amazon::S3::Request::DeleteMultiObject - An internal class to delete multip
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

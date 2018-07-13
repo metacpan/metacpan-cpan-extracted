@@ -8,7 +8,6 @@ use lib 'private-lib';
 use lib '.';
 use inc::Module::Install;
 use Module::Install::GetProgramLocations;
-use File::Slurper;
 
 BEGIN {
   my $commands = q{$(CP) t/mailboxes/*\\ * $(DISTVNAME)/t/mailboxes; $(CP) t/results/*\\ * $(DISTVNAME)/t/results};
@@ -26,8 +25,10 @@ all_from('lib/Mail/Mbox/MessageParser.pm');
 auto_set_bugtracker;
 githubmeta;
 
+# Perl 5.6 doesn't work with URI::Escape. We get an error about Exporter not exporting "import"
+perl_version '5.008';
+
 configure_requires(
-  'File::Slurper' => 0,
   # Module::Install::Bugtracker needs this
   'URI::Escape' => 0,
 );
@@ -53,13 +54,18 @@ Add_Test_Target('testspeed', 't/speed.pl');
 configure_programs();
 
 license 'gpl2';
+
+use_standard_tests;
+
 auto_license(holder => 'David Coppit');
 
 no_index 'directory' => 'private-lib';
 
 enable_verbose_cpan_testing();
 
-WriteAll();
+realclean_files('inc');
+
+WriteAll;
 
 # ---- Workaround for broken module ----
 # https://rt.cpan.org/Ticket/Display.html?id=125772
@@ -86,7 +92,5 @@ WriteAll();
       /);
   }
 }
-
-use_standard_tests;
 
 fix_sort_versions('inc/Sort/Versions.pm');

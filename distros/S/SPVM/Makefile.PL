@@ -4,12 +4,16 @@ use ExtUtils::MakeMaker;
 # If you edit yacc/spvm_yacc.y, spvm_yacc.c is re-generate by the folloing command before perl Makefile.PL
 #   yacc/bison.sh
 
+use strict;
+use warnings;
 use Config;
 use Getopt::Long;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use SPVM::Build::Util;
 use Getopt::Long 'GetOptions';
+use File::Basename 'basename';
+use File::Copy 'copy';
 
 my @defines;
 my $optimize;
@@ -42,6 +46,12 @@ my $build_setting = SPVM::Build::Util::default_build_setting;
 $optimize ||= $build_setting->get_config('optimize');
 my $ccflags = "$Config{ccflags} " . join(' ', @{$build_setting->get_extra_compiler_flags});
 
+my @csource_files;
+push @csource_files, 'SPVM.c';
+push @csource_files, glob('lib/SPVM/Build/src/*.c');
+
+my @object_files = map { my $object_file = $_; $object_file =~ s/\.c$/.o/; $object_file } @csource_files;
+
 WriteMakefile(
     NAME              => 'SPVM',
     VERSION_FROM      => 'lib/SPVM.pm', # finds $VERSION
@@ -51,13 +61,14 @@ WriteMakefile(
       (ABSTRACT_FROM  => 'lib/SPVM.pm', # retrieve abstract from module
        AUTHOR         => 'A. U. Thor <kimoto@sakura.ne.jp>') : ()),
     LIBS              => ['-lm'], # e.g., '-lm'
-    INC               => '-I. -Ilib/SPVM/Build', # e.g., '-I. -I/usr/include/other'
+    INC               => '-I. -Ilib/SPVM/Build/include', # e.g., '-I. -I/usr/include/other'
     CCFLAGS => $ccflags,
     OPTIMIZE => $optimize,
+    C => [@csource_files],
     OBJECT            => '$(O_FILES)', # link all the C files too
     test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
-    clean => {FILES => "spvm_build/src spvm_build/work spvm_build/lib t/spvm_build/src t/spvm_build/work t/spvm_build/lib"},
-    DEFINE => "@defines"
+    clean => {FILES => "spvm_build/src spvm_build/work spvm_build/lib t/spvm_build/src t/spvm_build/work t/spvm_build/lib @object_files"},
+    DEFINE => "@defines -o \$@",
 );
 
 

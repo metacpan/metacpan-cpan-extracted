@@ -1,3 +1,12 @@
+v0.71.1 2018-07-13T07:14:58Z
+ - File::Copy import under Coro fixed
+
+v0.71.0 2018-07-11T09:10:32Z
+ - perl-5.28
+ - http progress call fixed
+ - perl-modules
+ - handle Time::HiRes import error under windows
+
 v0.70.1 2018-07-02T22:06:52Z
  - http proxy improved
 

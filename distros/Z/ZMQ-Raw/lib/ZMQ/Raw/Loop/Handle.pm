@@ -1,8 +1,9 @@
 package ZMQ::Raw::Loop::Handle;
-$ZMQ::Raw::Loop::Handle::VERSION = '0.25';
+$ZMQ::Raw::Loop::Handle::VERSION = '0.26';
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util qw/weaken/;
 
 sub CLONE_SKIP { 1 }
 
@@ -13,7 +14,6 @@ BEGIN
 	@attributes = qw/
 		handle
 		timer
-		loop
 		timeout
 		on_readable
 		on_writable
@@ -38,7 +38,7 @@ ZMQ::Raw::Loop::Handle - Handle class
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 DESCRIPTION
 
@@ -124,6 +124,21 @@ sub new
 	};
 
 	return bless $self, $class;
+}
+
+
+
+sub loop
+{
+	my ($this, $loop) = @_;
+
+	if (scalar (@_) > 1)
+	{
+		$this->{loop} = $loop;
+		weaken ($this->{loop});
+	}
+
+	return $this->{loop};
 }
 
 =for Pod::Coverage handle timer loop timeout on_readable on_writable on_timeout

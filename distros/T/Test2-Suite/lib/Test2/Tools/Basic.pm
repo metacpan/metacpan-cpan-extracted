@@ -2,7 +2,7 @@ package Test2::Tools::Basic;
 use strict;
 use warnings;
 
-our $VERSION = '0.000114';
+our $VERSION = '0.000115';
 
 use Carp qw/croak/;
 use Test2::API qw/context/;
@@ -39,13 +39,13 @@ sub fail {
 
 sub diag {
     my $ctx = context();
-    $ctx->diag( join '', @_ );
+    $ctx->diag( join '', grep { defined $_ } @_ );
     $ctx->release;
 }
 
 sub note {
     my $ctx = context();
-    $ctx->note( join '', @_ );
+    $ctx->note( join '', grep { defined $_ } @_ );
     $ctx->release;
 }
 

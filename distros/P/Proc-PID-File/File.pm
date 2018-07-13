@@ -58,7 +58,7 @@ use strict;
 use vars qw($VERSION $RPM_Requires);
 use Fcntl qw(:DEFAULT :flock);
 
-$VERSION = "1.28";
+$VERSION = "1.29";
 $RPM_Requires = "procps";
 
 my $RUNDIR = "/var/run";
@@ -118,7 +118,7 @@ This parameter implements the second solution outlined in the WARNING section
 of this document and is used to verify that an existing I<pidfile> correctly
 represents a live process other than the current.  If set to a string, it will
 be interpreted as a I<regular expression> and used to search within the name
-of the running process.  Alternatively, a 1 may be passed: For Linux/FreeBSD,
+of the running process.  Alternatively, a 1 may be passed: For Linux/FreeBSD/macOS,
 this indicates that the value of I<$0> will be used (stripped of its full
 path); for Cygwin, I<$^X> (stripped of path and extension) will be used.
 
@@ -127,7 +127,7 @@ note that verification will only work for the operating systems
 listed below and that the OS will be auto-sensed.  See also DEPENDENCIES
 section below.
 
-Supported platforms: Linux, FreeBSD, Cygwin
+Supported platforms: Linux, FreeBSD, Cygwin, macOS
 
 =item I<debug>
 
@@ -243,7 +243,7 @@ sub verify {
 
 	my $ret = 0;
     $self->debug("verify(): OS = $^O");
-    if ($^O =~ /linux|freebsd|cygwin/i) {
+    if ($^O =~ /linux|freebsd|cygwin|darwin/i) {
         my $me = $self->{verify};
 		if (!$me || $me eq "1") {
 			$me = $ME;
@@ -355,10 +355,10 @@ Our gratitude also to Alan Ferrency <alan@pair.com> for fingering the boot-up pr
 
 =head1 DEPENDENCIES
 
-For Linux, FreeBSD and Cygwin, support of the I<verify> option requires
-availability of the B<ps> utility.  For Linux/FreeBSD This is typically
+For Linux, FreeBSD, Cygwin, and macOS, support of the I<verify> option requires
+availability of the B<ps> utility.  For Linux/FreeBSD this is typically
 found in the B<procps> package. Cygwin users need to run version 1.5.20
-or later for this to work.
+or later for this to work. B<ps> is included in macOS.
 
 =head1 WARNING
 

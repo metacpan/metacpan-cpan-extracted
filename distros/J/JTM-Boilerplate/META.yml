@@ -3,11 +3,14 @@ abstract: "Default Boilerplate for Joelle Maslak's Code"
 author:
   - 'Joelle Maslak <jmaslak@antelope.net>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   Test::More: '1.001014'
+  Test::UseAllModules: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,10 +19,10 @@ name: JTM-Boilerplate
 provides:
   JCM::Boilerplate:
     file: lib/JCM/Boilerplate.pm
-    version: '1.021'
+    version: '2.181940'
   JTM::Boilerplate:
     file: lib/JTM/Boilerplate.pm
-    version: '1.021'
+    version: '2.181940'
 requires:
   AnyEvent::Delay: '0.001'
   AnyEvent::Handle::UDP: '0.043'
@@ -78,7 +81,6 @@ requires:
   Net::LDAP: '0.65'
   Net::XMPP: '1.05'
   NetAddr::IP: '4.078'
-  PAR::Packer: '1.030'
   POSIX: '1.53'
   Parallel::WorkUnit: '1.009'
   Perl6::Slurp: '0.051005'
@@ -97,6 +99,7 @@ requires:
   Test::Fork: '0.002'
   Test::More: '1.001014'
   Test::Strict: '0.36'
+  Test::TrailingSpace: '0.0203'
   Time::HiRes: '1.9739'
   Try::Tiny: '0.24'
   UNIVERSAL: '1.12'
@@ -109,6 +112,10 @@ requires:
   re: '0'
   strict: '0'
   warnings: '0'
-version: '1.021'
-x_generated_by_perl: v5.26.2
-x_serialization_backend: 'YAML::Tiny version 1.73'
+resources:
+  repository: git://github.com/jmaslak/JTM-Boilerplate.git
+version: '2.181940'
+x_contributor_covenant:
+  version: 0.02
+x_generated_by_perl: v5.24.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

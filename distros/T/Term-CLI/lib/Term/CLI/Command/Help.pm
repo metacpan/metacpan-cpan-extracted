@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI::Command::Help  0.051002 {
+package Term::CLI::Command::Help  0.051003 {
 
 use Modern::Perl 1.20140107;
 use Pod::Text::Termcap 2.08;
@@ -340,7 +340,7 @@ Term::CLI::Command::Help - A generic 'help' command for Term::CLI
 
 =head1 VERSION
 
-version 0.051002
+version 0.051003
 
 =head1 SYNOPSIS
 

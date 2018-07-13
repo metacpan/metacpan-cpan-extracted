@@ -1,6 +1,7 @@
 Changes
 Config.pm
 Config_mini.pl.PL
+Config_pm.PL
 Config_xs.in
 Config_xs.out
 Config_xs.PL
@@ -13,6 +14,7 @@ MANIFEST			This list of files
 README
 regen/regen_lib.pl
 t/Config.t
+t/DynaLoader.t
 t/XSConfig.t
 typemap
 xsc_test.pl

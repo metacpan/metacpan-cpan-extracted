@@ -27,6 +27,7 @@ BEGIN {
       get_lldp_local_system_data
       get_lldp_loc_port_table
       get_lldp_rem_table
+      map_lldp_loc_portid2portnum
       /
   );
 }
@@ -74,7 +75,7 @@ Net::SNMP::Mixin::Dot1abLldp - mixin class for the Link Layer Discovery Protocol
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 =head1 SYNOPSIS
 
@@ -214,6 +215,36 @@ sub get_lldp_loc_port_table {
         $session->{$prefix}{lldpLocPortTbl}{$column}{$row};
     }
 
+  }
+
+  return $result;
+}
+
+=head2 B<< OBJ->map_lldp_loc_portid2portnum() >>
+
+Returns a hash reference with local portIds to local portNums:
+
+  {
+    ...
+    Te5/32 => 234,
+    ...
+  }
+
+=cut
+
+sub map_lldp_loc_portid2portnum {
+  my $session = shift;
+  my $agent   = $session->hostname;
+
+  Carp::croak "$agent: '$prefix' not initialized,"
+    unless $session->init_ok($prefix);
+
+  # stash for return values
+  my $result = {};
+
+  foreach my $portNum ( keys %{ $session->{$prefix}{lldpLocPortTbl}{lldpLocPortId} } ) {
+    my $portId = $session->{$prefix}{lldpLocPortTbl}{lldpLocPortId}{$portNum};
+    $result->{$portId} = $portNum;
   }
 
   return $result;
@@ -631,7 +662,7 @@ Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2016 Karl Gaissmaier, all rights reserved.
+Copyright 2008-2018 Karl Gaissmaier, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

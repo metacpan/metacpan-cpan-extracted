@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts ':=c:e:qrs:' , \my %o ; 
+use Term::ANSIColor qw[ :constants ] ; $Term::ANSIColor::AUTORESET = 1 ;
+
+sub printN ( @ ) { print $. , ":\t" , @_ }
+sub print0 ( @ ) { print @_ }
+* printN = * print0 if ! $o{':'} ;
+* main = $o{c} ? * cyclicsamp : * sampling ; 
+ 
+srand do{ $o{s}//=(1<<32).'!' ; $o{s} = int rand $1 if $o{s}=~s/(.*)!$// ; $o{s} } ; # 乱数シードの指定
+printN my $tmp = <>  if $o{'='} ; # ヘッダ行指定があった場合の処理
+main () ;
+print STDERR CYAN "Random Seed = $o{s}\n" unless $o{q} ;
+exit 0 ; 
+
+sub sampling { 
+	$o{e} //= 0.5 ;
+	$o{e} = $1/$2 if $o{e} =~ m/(.+)\/(.+)/ ; # 分数に対応できるようにした。eval を使わないようにした。 
+	my $p = $o{e} ; # 抽出確率
+	$p = 1 - 1/(1+$p) if $o{r} ; # 復元抽出を指定した場合。
+	$p = $p < 0 ? 0 : $p >= 1 ? 1 - 1e-12 : $p ; # [0,1]区間に収める。
+	my $coef = 1 / log ( 1 - $p )  ; 
+
+	my $c  = int $coef * log rand ; 
+	while ( <> ) { 
+		next if $c -- > 0 ; 
+		printN $_ ; 
+	    $c  = int $coef * log rand ; 
+	    redo if $o{r} ;
+	}
+}
+
+sub cyclicsamp { 
+	my $cycle = $o{c} ; 
+	my $c = rand () * $cycle   ; 
+	while ( <> ) {
+		next if   -- $c > 0 ; 
+		printN $_ ; 
+		$c += $cycle ;
+	}
+}
+
+# ヘルプの扱い
+
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.00_03 ;
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+}  
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+ 
+  $0
+
+    入力の各行を順次指定された確率で出力する。
+
+ オプション : 
+    -c N : 単にN行ごとに周期的に出力する。開始行は1行目からN御目のランダム。(Cyclic only)
+    -e N :各行について、非復元抽出の場合は抽出確率、復元抽出の場合は抽出回数の期待値を指定する。Default 0.5 (Expectation value of appearance number of each line.)
+    -e N1/N2 : The appearance expectation number can be specified by fraction.
+    -r ; 復元抽出であることをしている。この場合、各行が2回以上抽出されることがある。(With Replacement)
+    -s N[!] ; ランダムシードの指定。! を付加すると、0以上指定した数未満の数がランダムにシードとなる。(Random Seed)
+
+
+    -: ; 行番号を表示する。
+    -= ; 1行目をヘッダと見なして表示する。
+
+=cut

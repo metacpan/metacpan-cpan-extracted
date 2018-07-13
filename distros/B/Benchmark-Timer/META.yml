@@ -34,4 +34,4 @@ resources:
   homepage: https://github.com/coppit/benchmark-timer/
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/coppit/benchmark-timer.git
-version: '0.7111'
+version: '0.7112'

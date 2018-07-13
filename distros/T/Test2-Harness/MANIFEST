@@ -5,7 +5,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-POD_TEMPLATE.POD
 README
 README.md
 TODO
@@ -76,6 +75,11 @@ lib/Test2/Harness/Watcher.pm
 lib/Test2/Plugin/MemUsage.pm
 lib/Test2/Plugin/UUID.pm
 lib/Test2/Tools/HarnessTester.pm
+old/features.html
+old/index.html
+old/introduction.html
+old/output.html
+old/yath.html
 scripts/yath
 t/App/Yath.t
 t/App/Yath/Command.t

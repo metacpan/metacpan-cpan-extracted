@@ -19,7 +19,7 @@ package MongoDB::MongoClient;
 # ABSTRACT: A connection to a MongoDB server or multi-server deployment
 
 use version;
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Moo;
 use MongoDB::ClientSession;
@@ -36,7 +36,7 @@ use MongoDB::_Dispatcher;
 use MongoDB::_SessionPool;
 use MongoDB::_Topology;
 use MongoDB::_URI;
-use BSON 1.006005;
+use BSON 1.006006;
 use Digest::MD5;
 use UUID::URandom;
 use Tie::IxHash;
@@ -1003,7 +1003,7 @@ sub _build_read_concern_level {
 #pod * C<insert_many>
 #pod * C<bulk_write>
 #pod
-#pod The multi statment operations may be ether ordered or unordered. Note that for
+#pod The multi statement operations may be ether ordered or unordered. Note that for
 #pod C<bulk_write> operations, the request may not include update_many or
 #pod delete_many operations.
 #pod
@@ -1844,7 +1844,7 @@ MongoDB::MongoClient - A connection to a MongoDB server or multi-server deployme
 
 =head1 VERSION
 
-version v2.0.0
+version v2.0.1
 
 =head1 SYNOPSIS
 
@@ -2426,7 +2426,7 @@ C<bulk_write>
 
 =back
 
-The multi statment operations may be ether ordered or unordered. Note that for
+The multi statement operations may be ether ordered or unordered. Note that for
 C<bulk_write> operations, the request may not include update_many or
 delete_many operations.
 
@@ -2913,7 +2913,7 @@ Usage information for each mechanism is given below.
 
 =head2 MONGODB-CR and SCRAM-SHA-1 (for username/password)
 
-These mechnisms require a username and password, given either as
+These mechanisms require a username and password, given either as
 constructor attributes or in the C<host> connection string.
 
 If a username is provided and an authentication mechanism is not specified,
@@ -2933,7 +2933,7 @@ fall back to MONGODB-CR for older servers.
 Usernames and passwords will be UTF-8 encoded before use.  The password is
 never sent over the wire -- only a secure digest is used.  The SCRAM-SHA-1
 mechanism is the Salted Challenge Response Authentication Mechanism
-definedin L<RFC 5802|http://tools.ietf.org/html/rfc5802>.
+defined in L<RFC 5802|http://tools.ietf.org/html/rfc5802>.
 
 The default database for authentication is 'admin'.  If another database
 name should be used, specify it with the C<db_name> attribute or via the
@@ -2957,6 +2957,10 @@ specifying the "MONGODB-X509" authentication mechanism.
         },
         auth_mechanism => "MONGODB-X509",
     );
+
+B<Note>: Since MongoDB Perl driver v1.8.0, you no longer need to specify a
+C<username> parameter for X509 authentication; the username will be
+extracted automatically from the certificate.
 
 =head2 PLAIN (for LDAP)
 

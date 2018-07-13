@@ -25,7 +25,7 @@ DESCRIPTION
 
  METHODS
 
-  CONSTRUCTION
+  new
 
         my $cim = Business::AuthorizeNet::CIM->new(
             login => $cfg{login},
@@ -325,11 +325,13 @@ DESCRIPTION
   getCustomerPaymentProfileRequest
 
     Retrieve a customer payment profile for an existing customer profile.
-    $unmaskExpirationDate is an optional boolean arg, if passed a true
-    value it will return the expiration date in YYYY-MM format, else it
-    will mask as XXXX.
+    Optionally, a hash reference of additonal arguments may be passed in,
+    and will be added to the request.
 
-        $cim->getCustomerPaymentProfileRequest($customerProfileId, $customerPaymentProfileId, $unmaskExpirationDate);
+        $cim->getCustomerPaymentProfileRequest($customerProfileId, $customerPaymentProfileId, {
+            includeIssuerInfo    => 'true',
+            unmaskExpirationDate => 'true',
+        });
 
   getCustomerShippingAddressRequest
 

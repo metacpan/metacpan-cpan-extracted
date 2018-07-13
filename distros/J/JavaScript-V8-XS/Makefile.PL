@@ -31,6 +31,7 @@ WriteMakefile(
     PREREQ_PM      => {
         'ExtUtils::XSpp' => '0.11',
         'XSLoader'       => 0,
+        'Text::Trim'     => 0,
     },
     TEST_REQUIRES  => {
         'Data::Dumper'   => 0,

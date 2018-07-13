@@ -40,7 +40,7 @@ $EV::DIED = sub {
 $Coro::State::DIEHOOK = sub {
     my $e = Pcore::Core::Exception::Object->new( $_[0], level => 'ERROR', skip_frames => 1, with_trace => 1 );
 
-    # not in eval
+    # $^S: !defined - parsing module, eval, or main program, true - executing in eval
     if ( !$^S ) {
         {
             local $@;

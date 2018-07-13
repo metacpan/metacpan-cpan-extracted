@@ -2,7 +2,7 @@ package Test2::Harness;
 use strict;
 use warnings;
 
-our $VERSION = '0.001065';
+our $VERSION = '0.001066';
 
 use Carp qw/croak/;
 use List::Util qw/sum/;
@@ -108,7 +108,8 @@ sub iteration {
 
         # Track active watchers in a second hash, this avoids looping over all
         # watchers each iteration.
-        while(my ($job_id, $watcher) = each %{$self->{+ACTIVE}}) {
+        foreach my $job_id ( sort keys %{$self->{+ACTIVE}} ) {
+            my $watcher = $self->{+ACTIVE}->{$job_id};
             # Give it up to 5 seconds
             my $killed = $watcher->killed || 0;
             my $done = $watcher->complete || ($killed ? (time - $killed) > 5 : 0) || 0;

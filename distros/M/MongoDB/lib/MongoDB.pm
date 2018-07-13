@@ -20,7 +20,7 @@ package MongoDB;
 # ABSTRACT: Official MongoDB Driver for Perl
 
 use version;
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 # regexp_pattern was unavailable before 5.10, had to be exported to load the
 # function implementation on 5.10, and was automatically available in 5.10.1
@@ -57,7 +57,7 @@ if ( $] eq '5.010' ) {
 #pod If an error occurs, a L<MongoDB::Error> object will be thrown.
 #pod
 #pod B<NOTE>: To connect to a replica set, a replica set name must be provided.
-#pod For example, if the set name is "setA":
+#pod For example, if the set name is C<"setA">:
 #pod
 #pod     $client = MongoDB->connect("mongodb://example.com/?replicaSet=setA");
 #pod
@@ -83,7 +83,7 @@ MongoDB - Official MongoDB Driver for Perl
 
 =head1 VERSION
 
-version v2.0.0
+version v2.0.1
 
 =head1 SYNOPSIS
 
@@ -187,7 +187,7 @@ for L<MongoDB::MongoClient::new|MongoDB::MongoClient/ATTRIBUTES>.
 If an error occurs, a L<MongoDB::Error> object will be thrown.
 
 B<NOTE>: To connect to a replica set, a replica set name must be provided.
-For example, if the set name is "setA":
+For example, if the set name is C<"setA">:
 
     $client = MongoDB->connect("mongodb://example.com/?replicaSet=setA");
 
@@ -282,7 +282,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Page Andrey Khozov Ashley Willis Ask Bjørn Hansen Bernard Gorman Brendan W. McAdams Brian Moss Casey Rojas Christian Sturm Walde Colin Cyr Danny Raetzsch David Morrison Nadle Steinbrunner Storch diegok D. Ilmari Mannsåker Eric Daniels Gerard Goossen Glenn Fowler Graham Barr Hao Wu Harish Upadhyayula Jason Carey Toffaletti Johann Rolschewski John A. Kunze Joseph Harnish Josh Matthews Joshua Juran J. Stewart Kamil Slowikowski Ken Williams Matthew Shopsin Michael Langner Rotmanov Mike Dirolf Mohammad S Anwar Nickola Trupcheff Nigel Gregoire Niko Tyni Nuno Carvalho Orlando Vazquez Othello Maurer Pan Fan Pavel Denisov Rahul Dhodapkar Robert Sedlacek (Shadowcat Systems Ltd) Robin Lee Roman Yerin Ronald J Kimball Ryan Chipman Slaven Rezic Stephen Oberholtzer Steve Sanbeg Stuart Watt Thomas Bloor Tobias Leich Uwe Voelker Whitney Jackson Xavier Guimard Xtreak Zhihong Zhang
+=for stopwords Andrew Page Andrey Khozov Ashley Willis Ask Bjørn Hansen Bernard Gorman Brendan W. McAdams Brian Moss Casey Rojas Christian Sturm Walde Colin Cyr Danny Raetzsch David Morrison Nadle Steinbrunner Storch diegok D. Ilmari Mannsåker Eric Daniels Gerard Goossen Glenn Fowler Graham Barr Hao Wu Harish Upadhyayula Jason Carey Toffaletti Johann Rolschewski John A. Kunze Joseph Harnish Josh Matthews Joshua Juran J. Stewart Kamil Slowikowski Ken Williams Matthew Shopsin Matt S Trout Michael Langner Rotmanov Mike Dirolf Mohammad Anwar Nickola Trupcheff Nigel Gregoire Niko Tyni Nuno Carvalho Orlando Vazquez Othello Maurer Pan Fan Pavel Denisov Rahul Dhodapkar Robert Sedlacek (Shadowcat Systems Ltd) Robin Lee Roman Yerin Ronald J Kimball Ryan Chipman Slaven Rezic Stephen Oberholtzer Steve Sanbeg Stuart Watt Thomas Bloor Tobias Leich Uwe Voelker Whitney Jackson Xavier Guimard Xtreak Zhihong Zhang
 
 =over 4
 
@@ -429,6 +429,10 @@ Ken Williams <kwilliams@cpan.org>
 =item *
 
 Matthew Shopsin <matt.shopsin@mongodb.com>
+
+=item *
+
+Matt S Trout <mst@shadowcat.co.uk>
 
 =item *
 

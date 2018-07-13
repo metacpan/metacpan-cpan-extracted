@@ -31,7 +31,7 @@ sub test_sandbox_memory {
     ok($vm, "created $CLASS object with max_memory_bytes => 0");
 
     SKIP: {
-        skip 'sandboxing not (yet) supported in V8';
+        skip 'sandboxing not (yet) supported in V8', 1;
         my $combined;
         eval {
             # $combined = combined_from(sub { $vm->eval(get_js()); });
@@ -51,7 +51,7 @@ sub test_sandbox_runtime {
     ok($vm, "created $CLASS object with max_timeout_us => 0");
 
     SKIP: {
-        skip 'sandboxing not (yet) supported in V8';
+        skip 'sandboxing not (yet) supported in V8', 1;
         stderr_like sub { $vm->eval(get_js()); },
         qr/error: RangeError: execution timeout/,
         "got correct error from runtime sandbox";

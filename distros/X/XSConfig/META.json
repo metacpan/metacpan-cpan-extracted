@@ -23,7 +23,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "IO::Compress::Bzip2" : "0",
+            "MIME::Base64" : "0"
          }
       },
       "configure" : {
@@ -40,7 +41,7 @@
    "provides" : {
       "XSConfig" : {
          "file" : "Config.pm",
-         "version" : "6.26"
+         "version" : "6.27"
       }
    },
    "release_status" : "stable",
@@ -49,6 +50,6 @@
          "url" : "https://github.com/perl11/p5-Config"
       }
    },
-   "version" : "6.26",
+   "version" : "6.27",
    "x_serialization_backend" : "JSON version 2.97001"
 }

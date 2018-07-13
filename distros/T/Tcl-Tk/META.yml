@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 keywords:
   - Tk
   - Tcl/Tk/Tix
@@ -29,6 +29,5 @@ requires:
 resources:
   MailingList: mailto:tcltk@perl.org
   repository: http://github.com/vadrer/perl-tcl-tk
-version: '1.10'
-x_auto_regenerate: 0
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

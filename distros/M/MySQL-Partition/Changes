@@ -1,5 +1,11 @@
 Revision history for Perl extension MySQL-Partition
 
+1.0001 2018-07-13T07:51:35Z
+    - Drop ALPHA
+
+1.0000 2018-07-13T07:50:12Z
+    - This be 1.0!
+
 0.05 2015-11-19T08:27:10Z
     - support TRUNCATE PARTITION (shogo82148++)
 

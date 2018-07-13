@@ -28,6 +28,7 @@
  * a duktape context.  We will add other stuff here.
  */
 typedef struct Duk {
+    int inited;
     duk_context* ctx;
     int pagesize_bytes;
     unsigned long flags;
@@ -75,5 +76,7 @@ SV* pl_eval(pTHX_ Duk* duk, const char* js, const char* file);
 
 /* Run the Duktape GC */
 int pl_run_gc(Duk* duk);
+
+SV* pl_global_objects(Duk* duk);
 
 #endif

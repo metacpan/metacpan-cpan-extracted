@@ -12,8 +12,8 @@ my $methods = Mojo::UserAgent->new->get('https://redis.io/commands')->res->dom->
 my @classes = qw(Mojo::Redis::Database Mojo::Redis::PubSub);
 my (%doc, %skip);
 
-$skip{method}{$_} = 1 for qw(auth hscan quit migrate pubsub scan select sscan swapdb wait zscan);
-$skip{group}{$_}  = 1 for qw(cluster server stream);
+$skip{method}{$_} = 1 for qw(auth hscan quit monitor migrate pubsub scan select shutdown sscan sync swapdb wait zscan);
+$skip{group}{$_}  = 1 for qw(cluster);
 
 $methods = $methods->map(sub {
   $doc{$_->{'data-name'}} = [
@@ -26,7 +26,7 @@ $methods = $methods->map(sub {
 METHOD:
 for my $t (sort { "@$a" cmp "@$b" } @$methods) {
   my $method = $t->[1];
-  $method =~ s!\s!_!g;
+  $method =~ s![\s-]!_!g;
 
   if ($skip{method}{$t->[1]}) {
     note "Skipping @$t";
@@ -38,7 +38,12 @@ for my $t (sort { "@$a" cmp "@$b" } @$methods) {
     next METHOD;
   }
 
+  $method = 'client'   if $method =~ /^client_/;
+  $method = 'command'  if $method =~ /^command_/;
+  $method = 'config'   if $method =~ /^config_/;
+  $method = 'debug'    if $method =~ /^debug_/;
   $method = 'listen'   if $method =~ /subscribe$/;
+  $method = 'memory'   if $method =~ /^memory_/;
   $method = 'unlisten' if $method =~ /unsubscribe$/;
   $method = 'script'   if $method =~ /^script_/;
 

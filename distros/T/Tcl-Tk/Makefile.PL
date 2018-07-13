@@ -1,29 +1,41 @@
 #!perl -w
 sub _die ($) {
-    # some wisdom from tcl.pm, to workaround bogus FAIL reports:
-    # "now CPAN smokers report FAIL if Makefile.PL dies, it should exit with status 0"
+    # CPAN smokers report FAIL if Makefile.PL dies, it should exit with status 0
     my $err = shift;
     warn $err;
     exit 0;
 }
 
+use strict;
 use Getopt::Long;
 use ExtUtils::MakeMaker;
 
-my $tclshArg;
-my $tclsh = "tclsh";
-if ($^O eq 'freebsd') {$tclsh.='8.4'}
-
-GetOptions("tclsh=s", \$tclshArg) || _die <<'EOT';
-Usage: perl Makefile.PL [--tclsh <path>] [<makemaker opts>...]
-EOT
-
-# Allow the tclsh prog to be provided by env var or arg
-if ($tclshArg) {
-    $tclsh = $tclshArg;
-} elsif (defined($ENV{'TCLSH_PROG'})) {
-    $tclsh = $ENV{'TCLSH_PROG'};
+my $tclsh_default = 'tclsh';
+# for FreeBSD users, try to guess their name for tclsh; see ticket 6086
+if ($^O eq 'freebsd') {
+    for my $ver (qw(8.9 8.8 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0)) {
+       system "which tclsh$ver >/dev/null 2>&1";
+       if ($? == 0) {
+	    $tclsh_default = "tclsh$ver"; # ok will use that as default
+	    last;
+	}
+    }
 }
+
+GetOptions(
+    "tclsh=s", \(my $tclsh=$tclsh_default),
+    "help!",   \ my $help,   
+) || usage();
+usage() if $help;
+sub usage {
+    _die <<'EOT';
+Usage: perl Makefile.PL [--tclsh <path>] [<makemaker opts>...]
+
+--tclsh option is mostly for FreeBSD users, who have tclsh86 or alike;
+however default autodetection should be fine with freebsd as well.
+EOT
+}
+
 
 open TCLSH, "$tclsh test-for-tk.tcl|";
 my $res = join '', <TCLSH>;
@@ -68,8 +80,6 @@ WriteMakefile(
 	  directory=>[qw(demos tk-demos)]
 	},
 	keywords => [qw(Tk Tcl/Tk/Tix GUI)],
-	auto_regenerate => 0,
-	distribution_type => 'module',
     },
     PREREQ_PM => {
 	Tcl => 0.98,

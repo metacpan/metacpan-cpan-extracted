@@ -1,3 +1,9 @@
+Version 1.5111:
+- Ensure that temp file is created in temp dir
+- Fix Makefile.PL warning
+- Fix deleting of inc during release process
+- Better fix for AutomatedTester warning
+
 Version 1.5110:
 - Updating META.yml
 

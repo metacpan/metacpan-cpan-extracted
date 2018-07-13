@@ -20,7 +20,7 @@ package MongoDB::Database;
 # ABSTRACT: A MongoDB Database
 
 use version;
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use MongoDB::CommandResult;
 use MongoDB::Error;
@@ -193,12 +193,15 @@ sub client {
 #pod * C<batchSize> – the number of documents to return per batch.
 #pod * C<maxTimeMS> – the maximum amount of time in milliseconds to allow the
 #pod   command to run.  (Note, this will be ignored for servers before version 2.6.)
+#pod * C<nameOnly> - query and return names of the collections only. Defaults to
+#pod   false. (Note, this will be ignored for servers before version 4.0)
 #pod * C<session> - the session to use for these operations. If not supplied, will
 #pod   use an implicit session. For more information see L<MongoDB::ClientSession>
 #pod
+#pod B<NOTE>: When using C<nameOnly>, the filter query must be empty or must only
+#pod query the C<name> field or else no documents will be found.
+#pod
 #pod =cut
-
-my $list_collections_args;
 
 sub list_collections {
     my ( $self, $filter, $options ) = @_;
@@ -229,6 +232,7 @@ sub list_collections {
 #pod
 #pod     my @collections = $database->collection_names;
 #pod     my @collections = $database->collection_names( $filter );
+#pod     my @collections = $database->collection_names( $filter, $options );
 #pod
 #pod Returns the list of collections in this database.
 #pod
@@ -253,9 +257,16 @@ sub list_collections {
 #pod =cut
 
 sub collection_names {
-    my $self = shift;
+    my ( $self, $filter, $options ) = @_;
 
-    my $res = $self->list_collections( @_ );
+    $filter ||= {};
+    $options ||= {};
+
+    my @filter_keys = keys %$filter;
+    $options->{nameOnly} =
+      @filter_keys == 0 || ( @filter_keys == 1 && exists $filter->{name} );
+
+    my $res = $self->list_collections( $filter, $options );
 
     return map { $_->{name} } $res->all;
 }
@@ -560,7 +571,7 @@ MongoDB::Database - A MongoDB Database
 
 =head1 VERSION
 
-version v2.0.0
+version v2.0.1
 
 =head1 SYNOPSIS
 
@@ -698,14 +709,22 @@ C<maxTimeMS> – the maximum amount of time in milliseconds to allow the command
 
 =item *
 
+C<nameOnly> - query and return names of the collections only. Defaults to false. (Note, this will be ignored for servers before version 4.0)
+
+=item *
+
 C<session> - the session to use for these operations. If not supplied, will use an implicit session. For more information see L<MongoDB::ClientSession>
 
 =back
+
+B<NOTE>: When using C<nameOnly>, the filter query must be empty or must only
+query the C<name> field or else no documents will be found.
 
 =head2 collection_names
 
     my @collections = $database->collection_names;
     my @collections = $database->collection_names( $filter );
+    my @collections = $database->collection_names( $filter, $options );
 
 Returns the list of collections in this database.
 

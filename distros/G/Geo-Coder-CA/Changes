@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-CA
 
+0.11
+	Fix http://www.cpantesters.org/cpan/report/548cb7a4-7f04-11e8-9c78-3a8d13bf8fb6
+
 0.10	Thu Jul  5 08:50:21 EDT 2018
 	Fix http://www.cpantesters.org/cpan/report/0b994acc-7a03-11e8-a944-5f7713bf8fb6
 	Small cleanups

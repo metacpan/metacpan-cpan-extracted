@@ -1,7 +1,11 @@
 # very simplistic, must be much more complex soon
 
 use Test;
-BEGIN {plan tests=>1}
+if ($^O ne 'MSWin32' and !$ENV{DISPLAY}) {
+    print "1..0 # skip: no DISPLAY env var - how come?\n";
+    exit;
+}
+plan tests=>1;
 use Tcl::Tk;
 my $mw = Tcl::Tk::MainWindow->new;
 my $c = $mw->Canvas(qw/-relief flat -bd 0 -width 500 -height 350/)->pack(qw/-side top -fill both -expand 1/);

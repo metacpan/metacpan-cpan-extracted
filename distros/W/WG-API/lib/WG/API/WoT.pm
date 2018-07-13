@@ -10,11 +10,11 @@ WG::API::WoT - Modules to work with Wargaming.net Public API for World of Tanks
 
 =head1 VERSION
 
-Version v0.9
+Version v0.10
 
 =cut
 
-our $VERSION = 'v0.9';
+our $VERSION = 'v0.10';
 
 use constant api_uri => '//api.worldoftanks.ru/';
 
@@ -186,6 +186,185 @@ sub stronghold_clanreserves {
 
     return $self->_request( 'get', 'wot/stronghold/clanreserves/', [ 'access_token', 'fields', 'language' ], ['access_token'], @_ );
 }
+
+=head2 Encyclopedia
+
+=over 1
+
+=item B<encyclopedia_vehicles( [ %params ] )>
+
+Method returns list of available vehicles.
+
+=cut
+
+sub encyclopedia_vehicles {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/vehicles/', [ 'fields', 'language', 'limit', 'nation', 'page_no', 'tank_id', 'tier', 'type' ], undef, @_ );
+}
+
+=item B<encyclopedia_vehicleprofile( [ %params ] )>
+
+=over 2
+
+=item I<required fields>
+
+    tank_id - vehicle id
+
+=back
+
+=cut
+
+sub encyclopedia_vehicleprofile {
+    my $self = shift;
+
+    return $self->_request(
+        'get', 'wot/encyclopedia/vehicleprofile/',
+        [ 'tank_id', 'engine_id', 'fields', 'gun_id', 'language', 'profile_id', 'radio_id', 'suspension_id', 'turret_id' ],
+        ['tank_id'],
+        @_
+    );
+}
+
+=item B<encyclopedia_achievements( [ %params ] )>
+
+Method returns information about achievements.
+
+=cut
+
+sub encyclopedia_achievements {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/achievements/', [ 'fields', 'language' ], undef, @_ );
+}
+
+=item B<encyclopedia_info( [ %params ] )>
+
+Method returns information about Tankopedia.
+
+=cut
+
+sub encyclopedia_info {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/info/', [ 'fields', 'language' ], undef, @_ );
+}
+
+=item B<encyclopedia_arenas( [ %params ] )>
+
+Method returns information about maps.
+
+=cut
+
+sub encyclopedia_arenas {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/arenas/', [ 'fields', 'language' ], undef, @_ );
+}
+
+=item B<encyclopedia_provisions( [ %params ] )>
+
+Method returns a list of available equipment and consumables.
+
+=cut
+
+sub encyclopedia_provisions {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/provisions/', [ 'fields', 'language', 'limit', 'page_no', 'provision_id', 'type' ], undef, @_ );
+}
+
+=item B<encyclopedia_personalmissions( [ %params ] )>
+
+Method returns details on Personal Missions on the basis of specified campaign IDs, operation IDs, mission branch and tag IDs.
+
+=cut
+
+sub encyclopedia_personalmissions {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/personalmissions/', [ 'compaign_id', 'fields', 'language', 'operation_id', 'set_id', 'tag' ], undef, @_ );
+}
+
+=item B<encyclopedia_boosters( [ %params ] )>
+
+Method returns information about Personal Reserves.
+
+=cut
+
+sub encyclopedia_boosters {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/boosters/', [ 'fields', 'language' ], undef, @_ );
+}
+
+=item B<encyclopedia_vehicleprofiles( [ %params ] )>
+
+Method returns vehicle configuration characteristics.
+
+=over 2
+
+=item I<required fields>
+
+    tank_id - vehicle id.
+
+=back
+
+=cut
+
+sub encyclopedia_vehicleprofiles {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/vehicleprofiles/', [ 'tank_id', 'fields', 'language', 'order_by' ], ['tank_id'], @_ );
+}
+
+=item B<encyclopedia_modules( [ %params ] )>
+
+=cut
+
+sub encyclopedia_modules {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/modules/', [ 'extra', 'fields', 'language', 'limit', 'module_id', 'nation', 'page_no', 'type' ], undef, @_ );
+}
+
+=item B<encyclopedia_badges( [ %params ] )>
+
+Method returns list of available badges a player can gain in Ranked Battles.
+
+=cut
+
+sub encyclopedia_badges {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/badges/', [ 'fields', 'language' ], undef, @_ );
+}
+
+=item B<encyclopedia_crewroles( [ %params ] )>
+
+Method returns full description of all crew qualifications.
+
+=cut
+
+sub encyclopedia_crewroles {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/crewroles/', [ 'fields', 'language', 'role' ], undef, @_ );
+}
+
+=item B<encyclopedia_crewskills( [ %params ] )>
+
+Method returns full description of all crew skills.
+
+=cut
+
+sub encyclopedia_crewskills {
+    my $self = shift;
+
+    return $self->_request( 'get', 'wot/encyclopedia/crewskills/', [ 'fields', 'language', 'role', 'skill' ], undef, @_ );
+}
+
+=back
 
 =head2 Clan ratings
 

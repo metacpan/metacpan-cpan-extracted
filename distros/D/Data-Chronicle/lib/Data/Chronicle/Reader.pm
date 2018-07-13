@@ -4,6 +4,9 @@ use 5.014;
 use strict;
 use warnings;
 use Data::Chronicle;
+use Date::Utility;
+use JSON::MaybeUTF8 qw(decode_json_utf8);
+use Moose;
 
 =head1 NAME
 
@@ -11,7 +14,7 @@ Data::Chronicle::Reader - Provides reading from an efficient data storage for vo
 
 =cut
 
-our $VERSION = '0.16';    ## VERSION
+our $VERSION = '0.17';    ## VERSION
 
 =head1 DESCRIPTION
 
@@ -65,11 +68,11 @@ Given a category, name and timestamp returns version of data under "category::na
 
  my $chronicle_w = Data::Chronicle::Writer->new(
     cache_writer => $writer,
-    db_handle    => $dbh);
+    dbic         => $dbic);
 
  my $chronicle_r = Data::Chronicle::Reader->new(
     cache_reader => $reader,
-    db_handle    => $dbh);
+    dbic         => $dbic);
 
  my $chronicle_r2 = Data::Chronicle::Reader->new(
     cache_reader => $hash_ref);
@@ -86,18 +89,26 @@ Given a category, name and timestamp returns version of data under "category::na
 
 =cut
 
-use JSON;
-use Date::Utility;
-use Moose;
-
 =head2 cache_reader
 
-cahce_reader can be an object which has `get` method used to fetch data.
+cache_reader can be an object which has `get` method used to fetch data.
 or it can be a plain hash-ref.
 
 =cut
 
-has [qw(cache_reader db_handle)] => (
+has 'cache_reader' => (
+    is      => 'ro',
+    default => undef,
+);
+
+=head2 dbic
+
+dbic should be an object of DBIx::Connector.
+
+=cut
+
+has 'dbic' => (
+    isa     => 'Maybe[DBIx::Connector]',
     is      => 'ro',
     default => undef,
 );
@@ -114,13 +125,30 @@ sub get {
     my $category = shift;
     my $name     = shift;
 
-    my $key = $category . '::' . $name;
+    my @cached_data = $self->mget([[$category, $name]]);
+    return $cached_data[0] if @cached_data;
+
+    return undef;
+}
+
+=head3 C<< my $data = mget([["category1", "name1"], ["category2", "name2"], ...]) >>
+
+Query for the latest data under "category1::name1", "category2::name2", etc from the cache reader.
+Will return an arrayref containing results in the same ordering, with `undef` if the data does not exist.
+
+=cut
+
+sub mget {
+    my $self  = shift;
+    my $pairs = shift;
+
+    my @keys = map { $_->[0] . '::' . $_->[1] } @$pairs;
 
     if (blessed($self->cache_reader)) {
-        my $cached_data = $self->cache_reader->get($key);
-        return JSON::from_json($cached_data) if defined $cached_data;
+        my @cached_data = $self->cache_reader->mget(@keys);
+        return map { decode_json_utf8($_) if $_ } @cached_data;
     } else {
-        return $self->cache_reader->{$key};
+        return map { $self->cache_reader->{$_} } @keys;
     }
 
     return undef;
@@ -140,18 +168,20 @@ sub get_for {
 
     my $db_timestamp = Date::Utility->new($date_for)->db_timestamp;
 
-    die "Requesting for historical data without a valid DB connection [$category,$name,$date_for]" if not defined $self->db_handle;
+    die "Requesting for historical data without a valid DB connection [$category,$name,$date_for]" if not defined $self->dbic;
 
-    my $db_data =
-        $self->db_handle->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
-        'id', {}, $category, $name, $db_timestamp);
+    my $db_data = $self->dbic->run(
+        fixup => sub {
+            $_->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? order by timestamp desc limit 1},
+                'id', {}, $category, $name, $db_timestamp);
+        });
 
     return if not %$db_data;
 
     my $id_value = (sort keys %{$db_data})[0];
     my $db_value = $db_data->{$id_value}->{value};
 
-    return JSON::from_json($db_value);
+    return decode_json_utf8($db_value);
 }
 
 =head3 C<< my $data = get_for_period("category1", "name1", 1447401505, 1447401900) >>
@@ -170,12 +200,13 @@ sub get_for_period {
     my $start_timestamp = Date::Utility->new($start)->db_timestamp;
     my $end_timestamp   = Date::Utility->new($end)->db_timestamp;
 
-    die "Requesting for historical period data without a valid DB connection [$category,$name]" if not defined $self->db_handle;
+    die "Requesting for historical period data without a valid DB connection [$category,$name]" if not defined $self->dbic;
 
-    my $db_data =
-        $self->db_handle->selectall_hashref(
-        q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? AND timestamp >=? order by timestamp desc},
-        'id', {}, $category, $name, $end_timestamp, $start_timestamp);
+    my $db_data = $self->dbic->run(
+        fixup => sub {
+            $_->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? and timestamp<=? AND timestamp >=? order by timestamp desc},
+                'id', {}, $category, $name, $end_timestamp, $start_timestamp);
+        });
 
     return if not %$db_data;
 
@@ -184,10 +215,39 @@ sub get_for_period {
     for my $id_value (keys %$db_data) {
         my $db_value = $db_data->{$id_value}->{value};
 
-        push @result, JSON::from_json($db_value);
+        push @result, decode_json_utf8($db_value);
     }
 
     return \@result;
+}
+
+=head3 C<< my $data = get_history("category1", "name1", 1) >>
+
+Query Pg archive for the data under "category1::name1" at the provided number of revisions in the past.
+
+=cut
+
+sub get_history {
+    my $self     = shift;
+    my $category = shift;
+    my $name     = shift;
+    my $rev      = shift;
+
+    die "Revision must be >= 0" unless (defined $rev && $rev >= 0);
+    die "Requesting for historical data without a valid DB connection [$category,$name,$rev]" if not defined $self->dbic;
+
+    my $db_data = $self->dbic->run(
+        fixup => sub {
+            $_->selectall_hashref(q{SELECT * FROM chronicle where category=? and name=? order by timestamp desc limit 1 offset ?},
+                'id', {}, $category, $name, $rev);
+        });
+
+    return if not %$db_data;
+
+    my $id_value = (sort keys %{$db_data})[0];
+    my $db_value = $db_data->{$id_value}->{value};
+
+    return decode_json_utf8($db_value);
 }
 
 no Moose;

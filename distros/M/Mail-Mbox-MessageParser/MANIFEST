@@ -127,6 +127,7 @@ t/results/reset_newlines_at_beginning.stdout
 #t/results/reset_mailbox with space.stdout
 
 # Module::Install extensions
+inc/File/Slurper.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoLicense.pm
 inc/Module/Install/AutomatedTester.pm
@@ -140,14 +141,15 @@ inc/Module/Install/GithubMeta.pm
 inc/Module/Install/Include.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
-inc/Module/Install/StandardTests.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
-inc/Sort/Versions.pm
 inc/Module/Install/PRIVATE/Add_Test_Target.pm
 inc/Module/Install/PRIVATE/Configure_Programs.pm
 inc/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm
 inc/Module/Install/PRIVATE/Fix_Sort_Versions.pm
+inc/Module/Install/StandardTests.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Sort/Versions.pm
+inc/URI/Escape.pm
 
 # Private Module::Install extensions
 private-lib/Module/Install/PRIVATE/Add_Test_Target.pm

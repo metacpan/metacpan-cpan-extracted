@@ -132,3 +132,31 @@ Revision history for "ptkftp".
 	  delete_byvalue('value' [, 'value2'...]) to delete list items 
 	  by their displayed values; and reference() to return the displayed 
 	  list value for the given hash key (opposite of dereference()).
+4.9	- Add new callback option when user deletes an entry from the drop-down 
+	  menu with the [Delete] key, as permitted by the "-deleteok" option.
+	  The new callback option is "-deletecmd" which invokes a user-defined 
+	  function just before and again just after a menu entry is deleted.
+	  This was needed in order to update arrays in the main program that 
+	  are loaded and saved in "history" files in order to know when the 
+	  valid list choices had changed and apply them properly.  The first 
+	  call receives the entry index# (>0) being deleted, and can return 
+	  true if the deletion needs to be blocked, false or undef otherwise.
+	  This permits the programmer to block user-deletes, ie. for certain 
+	  entries, etc.  The subsequent call (with the parameter of -1), occurs 
+	  just after the deletion (if the first call did not return true) & can 
+	  be used to do something after a deletion has actually occured, ie. 
+	  as explained above.
+5.0	- * Fixed issues involving the -arrowimage / -farrowimage options not 
+	  always working properly, particularly on M$-Windows.
+	  * Added new PressButton() function to enable developers to 
+	  programattically "press" the dropdown list button.
+	  * Added new get_icursor() function to make fetching the cursor location 
+	  in the entry field.  Most useful arguments are: 'insert' and 'end'.
+	  * Added -deletecmd callback to allow user to properly update their 
+	  history files when feeding them to the drop-down list.
+	  * Added -altbinding options:  "Return=NoEmptyGo", "Return=SingleGo", 
+	  and "Down=Popup" as well as "Down=None", "Up=None", "Right=None", 
+	  "Esc=None", "Return=None", and "Space=None".
+	  * Adjusted dropdown menu's width to work better when -nobutton is set.
+	  * Cleaned up the code and documentation, including fixing some 
+	  "strict refs" errors and problems when a -default value is specified.

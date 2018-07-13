@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use IO::Async::Test;
 
 use Net::Async::Redis;
 use IO::Async::Loop;
@@ -9,44 +10,46 @@ use IO::Async::Loop;
 plan skip_all => 'set NET_ASYNC_REDIS_HOST env var to test' unless exists $ENV{NET_ASYNC_REDIS_HOST};
 
 my $loop = IO::Async::Loop->new;
-$loop->add(my $redis = Net::Async::Redis->new);
-$loop->add(my $sub = Net::Async::Redis->new);
+testing_loop($loop);
+
+$loop->add(my $publisher = Net::Async::Redis->new);
+$loop->add(my $subscriber = Net::Async::Redis->new);
 Future->needs_all(
-	$redis->connect(
+	$publisher->connect(
 		host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
 	),
-	$sub->connect(
+	$subscriber->connect(
 		host => $ENV{NET_ASYNC_REDIS_HOST} // '127.0.0.1',
 	)
 )->get;
 
-note 'keyspace notifications';
-my @notifications;
-$sub->watch_keyspace(
-	'testprefix-*',
-	sub {
-		push @notifications, { op => $_[0], key => $_[1] }
-	}
-)->get;
-
-note "Set key";
-$redis->set(xyz => 'test')->get;
-note "Get key";
-is($redis->get('xyz')->get, 'test');
-note "Delete key";
-is($redis->del('xyz')->get, 1, 'deleted a single key');
-note "Get key";
-ok(!$redis->exists('xyz')->get, 'no longer exists');
-is(@notifications, 0);
-
-$redis->set('testprefix-xyz' => 'test')->get;
-is($redis->get('testprefix-xyz')->get, 'test');
-is($redis->del('testprefix-xyz')->get, 1, 'deleted a single key');
-$loop->delay_future(after => 0.75)->get;
+my $s = $subscriber->psubscribe('testprefix::*')->get;
 {
-    local $TODO = 'needs further PSUBSCRIBE testing';
-    is(@notifications, 2);
+	ok($s, "Got subscription");
+
+	is($s->redis,   $subscriber,     '$s->redis');
+	is($s->channel, 'testprefix::*', '$s->channel');
 }
+
+my @messages;
+$s->events->each(sub {
+	my ( $message ) = @_;
+	push @messages, $message;
+});
+
+$publisher->publish('testprefix::123', 'the message')->get;
+
+wait_for { @messages > 0 };
+
+{
+	ok(my $msg = shift @messages, "Got a message");
+
+	is($msg->redis,        $subscriber,       '$msg->redis');
+	is($msg->subscription, $s,                '$msg->subscription');
+	is($msg->channel,      'testprefix::123', '$msg->channel');
+	is($msg->type,         'pmessage',        '$msg->type');
+
+	is($msg->payload,      'the message', '$msg->payload');
+}
+
 done_testing;
-
-

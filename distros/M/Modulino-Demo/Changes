@@ -1,20 +1,25 @@
-0.10_01 - Sat Jul 21 10:06:48 2012
-	* First release of a module to demonstrate various Modulino
-	concepts.
+Revision history for Perl module Modulino::Demo
 
-1.01 - Sat Aug 16 14:26:28 2014
-	* Fix up some docs
+1.002 2018-07-10T18:12:03Z
+	* Update version to one later than on CPAN (had a couple different
+	repos going).
 
-0.12 - Fri Jan  3 13:40:11 2014
+0.122 2018-05-25T16:02:01Z
+	* Update PREREQ_PM for the modules the code uses
+
+0.121 2018-05-25T14:35:44Z
+	* Update to Artistic License 2.0.
+
+0.12 - 2014-01-03
 	* MANIFEST fix. Oops.
 
-0.11 - Fri Jan  3 13:37:23 2014
+0.11 - 2014-01-03
 	* Get rid of MYMETA
 
-0.10_02 - Thu Aug 22 11:55:44 2013
+0.10_02 - 2013-08-22
 	* Fix distro for CPAN Testers
 
-0.10_01 - Wed Aug 21 01:18:31 2013
+0.10_01 - 2013-08-21
 	* First release. I'm still working on this idea I'm putting in
 	Mastering Perl.
 

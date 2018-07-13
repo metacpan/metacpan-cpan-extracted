@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2012,2018 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -234,7 +234,7 @@ sub check_router {
     my $routehash = $self->{routehash} or die "Uninitialized member";
     while (my($rid,$rv) = each %$routehash) {
 	my %colors;
-	my @areas = keys %{$rv->{areas}};
+	my @areas = sort keys %{$rv->{areas}};
 	if (@areas > 1) {
 	    $colors{black} = \@areas;
 	    if (my @badareas = map { $_->{area} || () }
@@ -286,11 +286,12 @@ sub create_router {
 	if (! $elem) {
 	    $routehash{$rid} = $elem = {};
 	    $elem->{graph} = {
-		N     => "router". $$index++,
+		N     => "router$$index",
 		label => $rid,
 		shape => "box",
 		style => $bits->{B} ? "bold" : "solid",
 	    };
+	    $elem->{index} = $$index++;
 	    if ($rid eq $routerid) {
 		$elem->{graph}{peripheries} = 2;
 	    }
@@ -377,16 +378,18 @@ sub add_missing_router {
     }
     my $routerid = $self->{ospf}{self}{routerid};
     my $routehash = $self->{routehash} or die "Uninitialized member";
-    while (my($rid,$rv) = each %rid2areas) {
+    foreach my $rid (sort keys %rid2areas) {
+	my $rv = $rid2areas{$rid};
 	my $elem = $routehash->{$rid};
 	if (! $elem) {
 	    $routehash->{$rid} = $elem = {};
 	    $elem->{graph} = {
-		N     => "router". $$index++,
+		N     => "router$$index",
 		label => $rid,
 		shape => "box",
 		style => "dotted",
 	    };
+	    $elem->{index} = $$index++;
 	    if ($rid eq $routerid) {
 		$elem->{graph}{peripheries} = 2;
 	    }
@@ -481,9 +484,13 @@ sub router2edges {
     my $linkhash = $self->{$type."hash"} or die "Uninitialized member";
     my $ifaddrs = $self->{ifaddrs};
     my @elements;
-    while (my($dstrid,$dv) = each %$linkhash) {
-	while (my($area,$ev) = each %$dv) {
-	    while (my($rid,$rv) = each %$ev) {
+    my $index = 0;
+    foreach my $dstrid (sort keys %$linkhash) {
+	my $dv = $linkhash->{$dstrid};
+	foreach my $area (sort keys %$dv) {
+	    my $ev = $dv->{$area};
+	    foreach my $rid (sort keys %$ev) {
+		my $rv = $ev->{$rid};
 		my %colors = (gray => $area);
 		my $src = $routehash->{$rid}{graph}{N};
 		my $dst = $routehash->{$dstrid}{graph}{N};
@@ -514,20 +521,24 @@ sub router2edges {
 			  "interface address $intf not unique.");
 		    }
 		    delete $colors{blue};
-		    if ($type eq "pointtopoint" and my @badrids =
+		    if ($type eq "pointtopoint" and my @badrids = sort
 		      grep { $_ ne $rid } keys %{$ifaddrs->{$intf}}) {
 			$self->error($colors{blue} =
 			  "$name link at router $rid to router $dstrid ".
 			  "interface address $intf also at router @badrids.");
 		    }
 		    my $metric = $link->{metric};
-		    push @elements, { graph => {
-			S         => $src,
-			D         => $dst,
-			label     => $intf,
-			style     => $style,
-			taillabel => $metric,
-		    }, colors => { %colors } };
+		    push @elements, {
+			graph => {
+			    S         => $src,
+			    D         => $dst,
+			    label     => $intf,
+			    style     => $style,
+			    taillabel => $metric,
+			},
+			colors => { %colors },
+			index => $index++,
+		    };
 		}
 	    }
 	}
@@ -563,13 +574,15 @@ sub check_transit {
     my($transitcluster) = @_;
     my $nethash = $self->{nethash} or die "Uninitialized member";
     my $transithash = $self->{transithash} or die "Uninitialized member";
-    while (my($addr, $av) = each %$transithash) {
+    foreach my $addr (sort keys %$transithash) {
+	my $av = $transithash->{$addr};
 	my %colors;
 	if (! $nethash->{$addr} && keys %$av > 1) {
 	    $self->error($colors{orange} =
 	      "Transit network $addr missing in multiple areas.");
 	}
-	while (my($area, $ev) = each %$av) {
+	foreach my $area (sort keys %$av) {
+	    my $ev = $av->{$area};
 	    $colors{gray} = $area;
 	    delete $colors{blue};
 	    if (! $nethash->{$addr} && keys %$ev > 1) {
@@ -577,7 +590,8 @@ sub check_transit {
 		  "Transit network $addr missing in area $area ".
 		  "at multiple routers.");
 	    }
-	    while (my($rid, $rv) = each %$ev) {
+	    foreach my $rid (sort keys %$ev) {
+		my $rv = $ev->{$rid};
 		next unless $rv->{graph};
 		delete @colors{qw(yellow red)};
 		if ($nethash->{$addr}) {
@@ -611,11 +625,12 @@ sub add_transit_value {
 	if (! $nethash->{$addr} || ! map { $_->{$area} ? 1 : () }
 	  map { values %$_ } values %{$nethash->{$addr}}) {
 	    $elem->{graph} = {
-	      N     => "transitnet". $$index++,
+	      N     => "transitnet$$index",
 	      label => $addr,
 	      shape => "ellipse",
 	      style => "dotted",
 	    };
+	    $elem->{index} = $$index++;
 	}
     }
     push @{$elem->{hashes}}, $link;
@@ -639,9 +654,13 @@ sub transit2edges {
     my $transithash = $self->{transithash} or die "Uninitialized member";
     my $ifaddrs = $self->{ifaddrs};
     my @elements;
-    while (my($addr,$av) = each %$transithash) {
-	while (my($area,$ev) = each %$av) {
-	    while (my($rid,$rv) = each %$ev) {
+    my $index = 0;
+    foreach my $addr (sort keys %$transithash) {
+	my $av = $transithash->{$addr};
+	foreach my $area (sort keys %$av) {
+	    my $ev = $av->{$area};
+	    foreach my $rid (sort keys %$ev) {
+		my $rv = $ev->{$rid};
 		my %colors = (gray => $area);
 		my $src = $routehash->{$rid}{graph}{N};
 		if (@{$rv->{hashes}} > 1) {
@@ -658,7 +677,7 @@ sub transit2edges {
 			  "interface address $intf not unique.");
 		    }
 		    delete $colors{blue};
-		    if (my @badrids = grep { $_ ne $rid }
+		    if (my @badrids = sort grep { $_ ne $rid }
 		      keys %{$ifaddrs->{$intf}}) {
 			$self->error($colors{blue} =
 			  "Transit link at router $rid to network $addr ".
@@ -672,17 +691,22 @@ sub transit2edges {
 		    delete $colors{tan};
 		    if ($rv->{graph}) {
 			my $dst = $rv->{graph}{N};
-			push @elements, { graph => {
-			    S         => $src,
-			    D         => $dst,
-			    headlabel => $intf,
-			    style     => $style,
-			    taillabel => $metric,
-			}, colors => { %colors } };
+			push @elements, {
+			    graph => {
+				S         => $src,
+				D         => $dst,
+				headlabel => $intf,
+				style     => $style,
+				taillabel => $metric,
+			    },
+			    colors => { %colors },
+			    index => $index++,
+			};
 			next;
 		    }
 		    my $av = $nethash->{$addr};
-		    while (my($mask,$mv) = each %$av) {
+		    foreach my $mask (sort keys %$av) {
+			my $mv = $av->{$mask};
 			my $nid = "$addr/$mask";
 			my $intfip = $intf;
 			foreach (split(/\./, $mask)) {
@@ -697,7 +721,8 @@ sub transit2edges {
 			      "not in network $nid.");
 			    $intfip = $intf;
 			}
-			while (my($netrid,$nv) = each %$mv) {
+			foreach my $netrid (sort keys %$mv) {
+			    my $nv = $mv->{$netrid};
 			    my $ev = $nv->{$area}
 			      or next;
 			    delete $colors{brown};
@@ -712,13 +737,17 @@ sub transit2edges {
 				  "is designated but network $nid is not.");
 			    }
 			    my $dst = $ev->{graph}{N};
-			    push @elements, { graph => {
-				S         => $src,
-				D         => $dst,
-				headlabel => $intfip,
-				style     => $style,
-				taillabel => $metric,
-			    }, colors => { %colors } };
+			    push @elements, {
+				graph => {
+				    S         => $src,
+				    D         => $dst,
+				    headlabel => $intfip,
+				    style     => $style,
+				    taillabel => $metric,
+				},
+				colors => { %colors },
+				index => $index++,
+			    };
 			}
 		    }
 		}
@@ -756,16 +785,20 @@ sub check_stub {
     my($netcluster) = @_;
     my $nethash = $self->{nethash} or die "Uninitialized member";
     my %netsmv;
-    while (my($addr,$av) = each %$nethash) {
-	while (my($mask,$mv) = each %$av) {
+    foreach my $addr (sort keys %$nethash) {
+	my $av = $nethash->{$addr};
+	foreach my $mask (sort keys %$av) {
+	    my $mv = $av->{$mask};
 	    my $net = _maskip($addr, $mask);
 	    push @{$netsmv{$net}{$mask}}, $mv;
 	}
     }
 
     my $stubhash = $self->{stubhash} or die "Uninitialized member";
-    while (my($net, $nv) = each %$stubhash) {
-	while (my($mask, $mv) = each %$nv) {
+    foreach my $net (sort keys %$stubhash) {
+	my $nv = $stubhash->{$net};
+	foreach my $mask (sort keys %$nv) {
+	    my $mv = $nv->{$mask};
 	    my %colors;
 	    my $nid = "$net/$mask";
 	    if ($netsmv{$net}{$mask}) {
@@ -777,7 +810,8 @@ sub check_stub {
 		$self->error($colors{orange} =
 		  "Stub network $nid in multiple areas.");
 	    }
-	    while (my($area, $ev) = each %$mv) {
+	    foreach my $area (sort keys %$mv) {
+		my $ev = $mv->{$area};
 		$colors{gray} = $area;
 		delete $colors{green};
 		if (keys %$ev > 1) {
@@ -785,14 +819,15 @@ sub check_stub {
 		      "Stub network $nid in area $area at multiple routers.");
 		}
 		delete $colors{magenta};
-		if ($netsmv{$net}{$mask} and my @otherareas =
+		if ($netsmv{$net}{$mask} and my @otherareas = sort
 		  grep { $_ ne $area } map { keys %$_ } map { values %$_ }
 		  @{$netsmv{$net}{$mask}}) {
 		    $self->error($colors{magenta} =
 		      "Stub network $nid in area $area ".
 		      "is also network in areas @otherareas.");
 		}
-		while (my($rid, $rv) = each %$ev) {
+		foreach my $rid (sort keys %$ev) {
+		    my $rv = $ev->{$rid};
 		    delete $colors{yellow};
 		    if ($netsmv{$net}{$mask} and grep { $_->{$rid} }
 		      @{$netsmv{$net}{$mask}}) {
@@ -821,11 +856,12 @@ sub add_stub_value {
     if (! $elem) {
 	$stubhash->{$net}{$mask}{$area}{$rid} = $elem = {};
 	$elem->{graph} = {
-	    N     => "stubnet". $$index++,
+	    N     => "stubnet$$index",
 	    label => "$net\\n$mask",
 	    shape => "ellipse",
 	    style => "solid",
 	};
+	$elem->{index} = $$index++;
     }
     push @{$elem->{hashes}}, $link;
 }
@@ -846,10 +882,15 @@ sub stub2edges {
     my $routehash = $self->{routehash} or die "Uninitialized member";
     my $stubhash = $self->{stubhash} or die "Uninitialized member";
     my @elements;
-    while (my($net,$nv) = each %$stubhash) {
-	while (my($mask,$mv) = each %$nv) {
-	    while (my($area,$ev) = each %$mv) {
-		while (my($rid,$rv) = each %$ev) {
+    my $index = 0;
+    foreach my $net (sort keys %$stubhash) {
+	my $nv = $stubhash->{$net};
+	foreach my $mask (sort keys %$nv) {
+	    my $mv = $nv->{$mask};
+	    foreach my $area (sort keys %$mv) {
+		my $ev = $mv->{$area};
+		foreach my $rid (sort keys %$ev) {
+		    my $rv = $ev->{$rid};
 		    my %colors = (gray => $area);
 		    my $src = $routehash->{$rid}{graph}{N};
 		    my $nid = "$net/$mask";
@@ -875,13 +916,17 @@ sub stub2edges {
 			    @headlabel = (headlabel => $intfip);
 			}
 			my $metric = $link->{metric};
-			push @elements, { graph => {
-			    S         => $src,
-			    D         => $dst,
-			    @headlabel,
-			    style     => "solid",
-			    taillabel => $metric,
-			}, colors => { %colors } };
+			push @elements, {
+			    graph => {
+				S         => $src,
+				D         => $dst,
+				@headlabel,
+				style     => "solid",
+				taillabel => $metric,
+			    },
+			    colors => { %colors },
+			    index => $index++,
+			};
 		    }
 		}
 	    }
@@ -931,13 +976,15 @@ sub check_network {
     my $nethash = $self->{nethash} or die "Uninitialized member";
     my $nets = $self->{nets} or die "Uninitialized member";
     my %colors;
-    while (my($addr,$av) = each %$nethash) {
+    foreach my $addr (sort keys %$nethash) {
+	my $av = $nethash->{$addr};
 	delete $colors{magenta};
 	if (keys %$av > 1) {
 	    $self->error($colors{magenta} =
 	      "Network $addr with multiple netmasks.");
 	}
-	while (my($mask,$mv) = each %$av) {
+	foreach my $mask (sort keys %$av) {
+	    my $mv = $av->{$mask};
 	    my $nid = "$addr/$mask";
 	    my $net = _maskip($addr, $mask);
 	    delete $colors{green};
@@ -950,13 +997,15 @@ sub check_network {
 		$self->error($colors{blue} =
 		  "Network $nid at multiple routers.");
 	    }
-	    while (my($rid, $rv) = each %$mv) {
+	    foreach my $rid (sort keys %$mv) {
+		my $rv = $mv->{$rid};
 		delete $colors{orange};
 		if (keys %$rv > 1) {
 		    $self->error($colors{orange} =
 		      "Network $nid at router $rid in multiple areas.");
 		}
-		while (my($area, $ev) = each %$rv) {
+		foreach my $area (sort keys %$rv) {
+		    my $ev = $rv->{$area};
 		    $colors{gray} = $area;
 		    delete $colors{yellow};
 		    if (@{$ev->{hashes}} > 1) {
@@ -1005,11 +1054,12 @@ sub create_network {
 	if (! $elem) {
 	    $nethash{$addr}{$mask}{$rid}{$area} = $elem = {};
 	    $elem->{graph} = {
-		N     => "network". $$index++,
+		N     => "network$$index",
 		label => "$net\\n$mask",
 		shape => "ellipse",
 		style => "bold",
 	    };
+	    $elem->{index} = $$index++;
 	}
 	push @{$elem->{hashes}}, $n;
 	foreach my $att (@{$n->{attachments}}) {
@@ -1044,16 +1094,21 @@ sub network2edges {
     my $routehash = $self->{routehash} or die "Uninitialized member";
     my $transithash = $self->{transithash} or die "Uninitialized member";
     my @elements;
-    while (my($addr,$av) = each %$nethash) {
-	while (my($mask,$mv) = each %$av) {
+    my $index = 0;
+    foreach my $addr (sort keys %$nethash) {
+	my $av = $nethash->{$addr};
+	foreach my $mask (sort keys %$av) {
+	    my $mv = $av->{$mask};
 	    my $nid = "$addr/$mask";
 	    my $intfip = $addr;
 	    foreach (split(/\./, $mask)) {
 		last if $_ ne 255;
 		$intfip =~ s/^\.?\d+//;
 	    }
-	    while (my($rid,$rv) = each %$mv) {
-		while (my($area,$ev) = each %$rv) {
+	    foreach my $rid (sort keys %$mv) {
+		my $rv = $mv->{$rid};
+		foreach my $area (sort keys %$rv) {
+		    my $ev = $rv->{$area};
 		    my $src = $ev->{graph}{N};
 		    foreach my $net (@{$ev->{hashes}}) {
 			my %attcolors;
@@ -1099,12 +1154,16 @@ sub network2edges {
 				$style = "bold";
 				@taillabel = (taillabel => $intfip);
 			    }
-			    push @elements, { graph => {
-				S     => $src,
-				D     => $dst,
-				style => $style,
-				@taillabel,
-			    }, colors => { %{$attcolors{$arid}} } };
+			    push @elements, {
+				graph => {
+				    S     => $src,
+				    D     => $dst,
+				    style => $style,
+				    @taillabel,
+				},
+				colors => { %{$attcolors{$arid}} },
+				index => $index++,
+			    };
 			}
 			if (! $attcolors{$rid}) {
 			    my $dst = $routehash->{$rid}{graph}{N}
@@ -1113,12 +1172,16 @@ sub network2edges {
 			    $self->error($attcolors{$rid}{red} =
 			      "Network $nid not attached ".
 			      "to designated router $rid in area $area.");
-			    push @elements, { graph => {
-				S         => $src,
-				D         => $dst,
-				style     => "bold",
-				taillabel => $intfip,
-			    }, colors => { %{$attcolors{$rid}} } };
+			    push @elements, {
+				graph => {
+				    S         => $src,
+				    D         => $dst,
+				    style     => "bold",
+				    taillabel => $intfip,
+				},
+				colors => { %{$attcolors{$rid}} },
+				index => $index++,
+			    };
 			}
 		    }
 		}
@@ -1171,11 +1234,13 @@ sub check_summary {
     my $netareas = $self->{netareas} or die "Uninitialized member";
     my $stubareas = $self->{stubareas} or die "Uninitialized member";
     my $sumhash = $self->{sumhash} or die "Uninitialized member";
-    while (my($net,$nv) = each %$sumhash) {
-	while (my($mask,$mv) = each %$nv) {
+    foreach my $net (sort keys %$sumhash) {
+	my $nv = $sumhash->{$net};
+	foreach my $mask (sort keys %$nv) {
+	    my $mv = $nv->{$mask};
 	    my %colors;
 	    my $nid = "$net/$mask";
-	    my @areas = keys %{$mv->{arearids}};
+	    my @areas = sort keys %{$mv->{arearids}};
 	    if (@areas > 1) {
 		$colors{black} = \@areas;
 	    } else {
@@ -1216,11 +1281,12 @@ sub create_summary {
 	if (! $elem) {
 	    $sumhash{$net}{$mask} = $elem = {};
 	    $elem->{graph} = {
-		N     => "summary". $index++,
+		N     => "summary$index",
 		label => "$net\\n$mask",
 		shape => "ellipse",
 		style => "dashed",
 	    };
+	    $elem->{index} = $index++;
 	}
 	push @{$elem->{hashes}}, $s;
 	$elem->{arearids}{$area}{$rid}++;
@@ -1244,8 +1310,11 @@ sub summary2edges {
     my $routehash = $self->{routehash} or die "Uninitialized member";
     my $sumhash = $self->{sumhash} or die "Uninitialized member";
     my @elements;
-    while (my($net,$nv) = each %$sumhash) {
-	while (my($mask,$mv) = each %$nv) {
+    my $index = 0;
+    foreach my $net (sort keys %$sumhash) {
+	my $nv = $sumhash->{$net};
+	foreach my $mask (sort keys %$nv) {
+	    my $mv = $nv->{$mask};
 	    my $nid = "$net/$mask";
 	    my $src = $mv->{graph} && $mv->{graph}{N};
 	    foreach my $s (@{$mv->{hashes}}) {
@@ -1279,6 +1348,7 @@ sub summary2edges {
 		    taillabel => $addrip,
 		};
 		$s->{colors} = \%colors;
+		$s->{index} = $index++;
 		# in case of aggregation src is undef
 		push @elements, $s if $src;
 	    }
@@ -1304,8 +1374,11 @@ sub create_sumaggr {
     # }
     my $sumhash = $self->{sumhash} or die "Uninitialized member";
     my %ridareanets;
-    while (my($net,$nv) = each %$sumhash) {
-	while (my($mask,$mv) = each %$nv) {
+    my $index = 0;
+    foreach my $net (sort keys %$sumhash) {
+	my $nv = $sumhash->{$net};
+	foreach my $mask (sort keys %$nv) {
+	    my $mv = $nv->{$mask};
 	    my $nid = "$net/$mask";
 	    # no not aggregate clustered graphs
 	    next if $mv->{graph}{C};
@@ -1321,6 +1394,7 @@ sub create_sumaggr {
 		if (! $elem) {
 		    $ridareanets{$rid}{$areaaggr}{$nid} = $elem = {
 			colors => { %$colors },
+			index  => $index++,
 		    };
 		} elsif (! $elem->{colors}{gray} || ! $colors->{gray} ||
 		  $elem->{colors}{gray} ne $colors->{gray}) {
@@ -1333,22 +1407,26 @@ sub create_sumaggr {
 	    delete $mv->{graph};
 	}
     }
-    my $index = 0;
     my %sumaggr;
-    while (my($rid,$rv) = each %ridareanets) {
-	while (my($area,$av) = each %$rv) {
+    $index = 0;
+    foreach my $rid (sort keys %ridareanets) {
+	my $rv = $ridareanets{$rid};
+	foreach my $area (sort keys %$rv) {
+	    my $av = $rv->{$area};
 	    my $netaggr = join('\n', sort _cmp_ip_net keys %$av);
 	    my $elem = $sumaggr{$netaggr};
 	    if (! $elem) {
 		$sumaggr{$netaggr} = $elem = {};
 		$elem->{graph} = {
-		    N     => "summaryaggregate". $index++,
+		    N     => "summaryaggregate$index",
 		    label => $netaggr,
 		    shape => "ellipse",
 		    style => "dashed",
 		};
+		$elem->{index} = $index++;
 	    }
-	    while (my($nid,$nv) = each %$av) {
+	    foreach my $nid (sort keys %$av) {
+		my $nv = $av->{$nid};
 		my $colors = $nv->{colors};
 		if (! $elem->{colors}) {
 		    %{$elem->{colors}} = %$colors;
@@ -1358,8 +1436,10 @@ sub create_sumaggr {
 		      (delete($elem->{colors}{gray}) || ()),
 		      ($colors->{gray} || ()), @{$colors->{black} || []};
 		}
-		while (my($area,$ev) = each %{$nv->{areas}}) {
-		    while (my($metric,$ss) = each %$ev) {
+		foreach my $area (sort keys %{$nv->{areas}}) {
+		    my $ev = $nv->{areas}{$area};
+		    foreach my $metric (sort keys %$ev) {
+			my $ss = $ev->{$metric};
 			push @{$elem->{routers}{$rid}{$area}{$metric}}, @$ss;
 		    }
 		}
@@ -1383,11 +1463,15 @@ sub sumaggr2edges {
     my OSPF::LSDB::View $self = shift;
     my $sumaggr = $self->{sumaggr} or die "Uninitialized member";
     my @elements;
-    while (my($netaggr,$nv) = each %$sumaggr) {
+    foreach my $netaggr (sort keys %$sumaggr) {
+	my $nv = $sumaggr->{$netaggr};
 	my $src = $nv->{graph}{N};
-	while (my($rid,$rv) = each %{$nv->{routers}}) {
-	    while (my($area,$av) = each %$rv) {
-		while (my($metric,$ss) = each %$av) {
+	foreach my $rid (sort keys %{$nv->{routers}}) {
+	    my $rv = $nv->{routers}{$rid};
+	    foreach my $area (sort keys %$rv) {
+		my $av = $rv->{$area};
+		foreach my $metric (sort keys %$av) {
+		    my $ss = $av->{$metric};
 		    my $aggrs;
 		    foreach my $s (@$ss) {
 			$s->{graph}{S} = $src;
@@ -1446,7 +1530,7 @@ sub check_boundary {
     my OSPF::LSDB::View $self = shift;
     my $boundhash = $self->{boundhash} or die "Uninitialized member";
     while (my($asbr,$bv) = each %$boundhash) {
-	my @areas = keys %{$bv->{arearids}};
+	my @areas = sort keys %{$bv->{arearids}};
 	if (@areas > 1) {
 	    $bv->{colors}{black} = \@areas;
 	} else {
@@ -1469,11 +1553,12 @@ sub create_boundary {
 	if (! $elem) {
 	    $boundhash{$asbr} = $elem = {};
 	    $elem->{graph} = {
-		N     => "boundary". $index++,
+		N     => "boundary$index",
 		label => $asbr,
 		shape => "box",
 		style => "dashed",
 	    };
+	    $elem->{index} = $index++;
 	}
 	push @{$elem->{hashes}}, $b;
 	$elem->{arearids}{$area}{$rid}++;
@@ -1496,7 +1581,9 @@ sub boundary2edges {
     my $routehash = $self->{routehash} or die "Uninitialized member";
     my $boundhash = $self->{boundhash} or die "Uninitialized member";
     my @elements;
-    while (my($asbr,$bv) = each %$boundhash) {
+    my $index = 0;
+    foreach my $asbr (sort keys %$boundhash) {
+	my $bv = $boundhash->{$asbr};
 	my $src;
 	if ($bv->{graph}) {
 	    $src = $bv->{graph}{N};
@@ -1535,6 +1622,7 @@ sub boundary2edges {
 		style     => "dashed",
 	    };
 	    $b->{colors} = \%colors;
+	    $b->{index} = $index++;
 	    # in case of aggregation src is undef
 	    push @elements, $b if $src;
 	}
@@ -1559,7 +1647,9 @@ sub create_boundaggr {
     # }
     my $boundhash = $self->{boundhash} or die "Uninitialized member";
     my %ridasbrs;
-    while (my($asbr,$bv) = each %$boundhash) {
+    my $index = 0;
+    foreach my $asbr (sort keys %$boundhash) {
+	my $bv = $boundhash->{$asbr};
 	# no not aggregate if ASBR has been deleted by create route
 	next unless $bv->{graph};
 	my $colors = $bv->{colors};
@@ -1573,6 +1663,7 @@ sub create_boundaggr {
 	    if (! $elem) {
 		$ridasbrs{$rid}{$asbr} = $elem = {
 		    colors => { %$colors },
+		    index  => $index++,
 		};
 	    } elsif (! $elem->{colors}{gray} || ! $colors->{gray} ||
 	      $elem->{colors}{gray} ne $colors->{gray}) {
@@ -1584,21 +1675,24 @@ sub create_boundaggr {
 	}
 	delete $bv->{graph};
     }
-    my $index = 0;
     my %boundaggr;
-    while (my($rid,$rv) = each %ridasbrs) {
+    $index = 0;
+    foreach my $rid (sort keys %ridasbrs) {
+	my $rv = $ridasbrs{$rid};
 	my $asbraggr = join('\n', sort _cmp_ip keys %$rv);
 	my $elem = $boundaggr{$asbraggr};
 	if (! $elem) {
 	    $boundaggr{$asbraggr} = $elem = {};
 	    $elem->{graph} = {
-		N     => "boundaryaggregate". $index++,
+		N     => "boundaryaggregate$index",
 		label => $asbraggr,
 		shape => "box",
 		style => "dashed",
 	    };
+	    $elem->{index} = $index++;
 	}
-	while (my($asbr,$bv) = each %$rv) {
+	foreach my $asbr (sort keys %$rv) {
+	    my $bv = $rv->{$asbr};
 	    $boundhash->{$asbr}{aggregate}{$asbraggr}++;
 	    my $colors = $bv->{colors};
 	    if (! $elem->{colors}) {
@@ -1609,8 +1703,10 @@ sub create_boundaggr {
 		  (delete($elem->{colors}{gray}) || ()),
 		  ($colors->{gray} || ()), @{$colors->{black} || []};
 	    }
-	    while (my($area,$ev) = each %{$bv->{areas}}) {
-		while (my($metric,$bs) = each %$ev) {
+	    foreach my $area (sort keys %{$bv->{areas}}) {
+		my $ev = $bv->{areas}{$area};
+		foreach my $metric (sort keys %$ev) {
+		    my $bs = $ev->{$metric};
 		    push @{$elem->{routers}{$rid}{$area}{$metric}}, @$bs;
 		}
 	    }
@@ -1633,11 +1729,15 @@ sub boundaggr2edges {
     my OSPF::LSDB::View $self = shift;
     my $boundaggr = $self->{boundaggr} or die "Uninitialized member";
     my @elements;
-    while (my($asbraggr,$bv) = each %$boundaggr) {
+    foreach my $asbraggr (sort keys %$boundaggr) {
+	my $bv = $boundaggr->{$asbraggr};
 	my $src = $bv->{graph}{N};
-	while (my($rid,$rv) = each %{$bv->{routers}}) {
-	    while (my($area,$av) = each %$rv) {
-		while (my($metric,$bs) = each %$av) {
+	foreach my $rid (sort keys %{$bv->{routers}}) {
+	    my $rv = $bv->{routers}{$rid};
+	    foreach my $area (sort keys %$rv) {
+		my $av = $rv->{$area};
+		foreach my $metric (sort keys %$av) {
+		    my $bs = $av->{$metric};
 		    my $aggrb;
 		    foreach my $b (@$bs) {
 			$b->{graph}{S} = $src;
@@ -1697,8 +1797,10 @@ sub check_external {
     my $stubs = $self->{stubs} or die "Uninitialized member";
     my $sums = $self->{sums};
     my $externhash = $self->{externhash} or die "Uninitialized member";
-    while (my($net,$nv) = each %$externhash) {
-	while (my($mask,$mv) = each %$nv) {
+    foreach my $net (sort keys %$externhash) {
+	my $nv = $externhash->{$net};
+	foreach my $mask (sort keys %$nv) {
+	    my $mv = $nv->{$mask};
 	    my %colors = (gray => "ase");
 	    my $nid = "$net/$mask";
 	    if ($nets->{$net}{$mask}) {
@@ -1735,11 +1837,12 @@ sub create_external {
 	if (! $elem) {
 	    $externhash{$net}{$mask} = $elem = {};
 	    $elem->{graph} = {
-		N     => "external". $index++,
+		N     => "external$index",
 		label => "$net\\n$mask",
 		shape => "egg",
 		style => "solid",
 	    };
+	    $elem->{index} = $index++;
 	}
 	push @{$elem->{hashes}}, $e;
 	$elem->{routers}{$rid}++;
@@ -1764,8 +1867,11 @@ sub external2edges {
     my $boundaggr = $self->{boundaggr};
     my $externhash = $self->{externhash} or die "Uninitialized member";
     my @elements;
-    while (my($net,$nv) = each %$externhash) {
-	while (my($mask,$mv) = each %$nv) {
+    my $index = 0;
+    foreach my $net (sort keys %$externhash) {
+	my $nv = $externhash->{$net};
+	foreach my $mask (sort keys %$nv) {
+	    my $mv = $nv->{$mask};
 	    my $nid = "$net/$mask";
 	    my $src = $mv->{graph}{N};
 	    my %dtm;  # when dst is aggregated, aggregate edges
@@ -1799,6 +1905,7 @@ sub external2edges {
 		    $e->{elems}{$dst} = {
 			graph  => \%graph,
 			colors => \%colors,
+			index  => $index++,
 		    };
 		    push @elements, $e->{elems}{$dst} if $src;
 		    next;
@@ -1811,17 +1918,20 @@ sub external2edges {
 		    $e->{elems}{$dst} = {
 			graph  => \%graph,
 			colors => \%colors,
+			index  => $index++,
 		    };
 		    push @elements, $e->{elems}{$dst} if $src;
 		    next;
 		}
-		while (my($asbraggr,$num) = each %$av) {
+		foreach my $asbraggr (sort keys %$av) {
+		    my $num = $av->{$asbraggr};
 		    my $dst = $boundaggr->{$asbraggr}{graph}{N}
 		      or die "No ASBR graph $asbraggr";
 		    $graph{D} = $dst;
 		    $e->{elems}{$dst} = {
 			graph  => { %graph },
 			colors => { %colors },
+			index  => $index++,
 		    };
 		    # no not aggregate graphs with errors
 		    if (grep { ! /^(gray|black)$/ } keys %colors) {
@@ -1854,8 +1964,11 @@ sub create_externaggr {
     #   types => { $type => { $metric => [ { ase hash } ] } }
     my $externhash = $self->{externhash} or die "Uninitialized member";
     my %ridnets;
-    while (my($net,$nv) = each %$externhash) {
-	while (my($mask,$mv) = each %$nv) {
+    my $index = 0;
+    foreach my $net (sort keys %$externhash) {
+	my $nv = $externhash->{$net};
+	foreach my $mask (sort keys %$nv) {
+	    my $mv = $nv->{$mask};
 	    my $nid = "$net/$mask";
 	    # no not aggregate clustered graphs
 	    next if $mv->{graph}{C};
@@ -1870,6 +1983,7 @@ sub create_externaggr {
 		if (! $elem) {
 		    $ridnets{$rid}{$nid} = $elem = {
 			colors => { %$colors },
+			index  => $index++,
 		    };
 		} elsif (! $elem->{colors}{gray} || ! $colors->{gray} ||
 		  $elem->{colors}{gray} ne $colors->{gray}) {
@@ -1882,21 +1996,24 @@ sub create_externaggr {
 	    delete $mv->{graph};
 	}
     }
-    my $index = 0;
     my %externaggr;
-    while (my($rid,$rv) = each %ridnets) {
+    $index = 0;
+    foreach my $rid (sort keys %ridnets) {
+	my $rv = $ridnets{$rid};
 	my $netaggr = join('\n', sort _cmp_ip_net keys %$rv);
 	my $elem = $externaggr{$netaggr};
 	if (! $elem) {
 	    $externaggr{$netaggr} = $elem = {};
 	    $elem->{graph} = {
-		N     => "externalaggregate". $index++,
+		N     => "externalaggregate$index",
 		label => $netaggr,
 		shape => "egg",
 		style => "solid",
 	    };
+	    $elem->{index} = $index++;
 	}
-	while (my($nid,$nv) = each %$rv) {
+	foreach my $nid (sort keys %$rv) {
+	    my $nv = $rv->{$nid};
 	    my $colors = $nv->{colors};
 	    if (! $elem->{colors}) {
 		%{$elem->{colors}} = %$colors;
@@ -1906,8 +2023,10 @@ sub create_externaggr {
 		  (delete($elem->{colors}{gray}) || ()),
 		  ($colors->{gray} || ()), @{$colors->{black} || []};
 	    }
-	    while (my($type,$tv) = each %{$nv->{types}}) {
-		while (my($metric,$es) = each %$tv) {
+	    foreach my $type (sort keys %{$nv->{types}}) {
+		my $tv = $nv->{types}{$type};
+		foreach my $metric (sort keys %$tv) {
+		    my $es = $tv->{$metric};
 		    push @{$elem->{routers}{$rid}{$type}{$metric}}, @$es;
 		}
 	    }
@@ -1930,27 +2049,34 @@ sub externaggr2edges {
     my OSPF::LSDB::View $self = shift;
     my $externaggr = $self->{externaggr} or die "Uninitialized member";
     my @elements;
-    while (my($netaggr,$nv) = each %$externaggr) {
+    my $index = 0;
+    foreach my $netaggr (sort keys %$externaggr) {
+	my $nv = $externaggr->{$netaggr};
 	my $src = $nv->{graph}{N};
 	my %dtm;
-	while (my($rid,$rv) = each %{$nv->{routers}}) {
-	    while (my($type,$tv) = each %$rv) {
-		while (my($metric,$es) = each %$tv) {
+	foreach my $rid (sort keys %{$nv->{routers}}) {
+	    my $rv = $nv->{routers}{$rid};
+	    foreach my $type (sort keys %$rv) {
+		my $tv = $rv->{$type};
+		foreach my $metric (sort keys %$tv) {
+		    my $es = $tv->{$metric};
 		    foreach my $e (@$es) {
-			while (my($dst,$elem) = each %{$e->{elems}}) {
+			foreach my $dst (sort keys %{$e->{elems}}) {
+			    my $elem = $e->{elems}{$dst};
 			    my %graph = %{$elem->{graph}};
 			    $graph{S} = $src;
 			    delete $graph{taillabel};
 			    my %colors = %{$elem->{colors}};
-			    my $elem = {
+			    my $newelem = {
 				graph  => \%graph,
 				colors => \%colors,
+				index  => $index++,
 			    };
 			    # no not aggregate graphs with errors
 			    if (grep { ! /^(gray|black)$/ } keys %colors) {
-				push @elements, $elem;
+				push @elements, $newelem;
 			    } else {
-				$dtm{$dst}{$type}{$metric} = $elem;
+				$dtm{$dst}{$type}{$metric} = $newelem;
 			    }
 			}
 		    }
@@ -1987,8 +2113,9 @@ sub graph_nodes {
 	$dot .= "\t";
 	$dot .= "subgraph \"cluster $cluster\" { " if $cluster;
 	$dot .= "$_->{N} [\n";
-	while (my($k,$v) = each %$_) {
+	foreach my $k (sort keys %$_) {
 	    next if $k eq 'C' || $k eq 'N';
+	    my $v = $_->{$k};
 	    $dot .= "\t\t$k=\"$v\"\n";
 	}
 	$dot .= "\t]";
@@ -2002,9 +2129,9 @@ sub graph_nodes {
 # return nodes or edges of dot graph
 sub elements2graphs {
     my OSPF::LSDB::View $self = shift;
-    my @elements = @_;
+    my @elements = sort { $a->{index} <=> $b->{index} } grep { $_->{graph} } @_;
     foreach my $elem (@elements) {
-	my $graph = $elem->{graph} or next;
+	my $graph = $elem->{graph};
 	my $color = $self->colors2string($elem->{colors});
 	my $message = $elem->{colors}{$color};
 	$graph->{color} = $color;
@@ -2033,8 +2160,9 @@ sub graph_edges {
     my $dot = "";
     foreach (@edges) {
 	$dot .= "\t$_->{S} -> $_->{D} [\n";
-	while (my($k,$v) = each %$_) {
+	foreach my $k (sort keys %$_) {
 	    next if $k eq 'S' || $k eq 'D';
+	    my $v = $_->{$k};
 	    $dot .= "\t\t$k=\"$v\"\n";
 	}
 	$dot .= "\t];\n";

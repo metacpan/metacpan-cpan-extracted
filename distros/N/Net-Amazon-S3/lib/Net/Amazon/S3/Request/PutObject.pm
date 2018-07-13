@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::PutObject;
-$Net::Amazon::S3::Request::PutObject::VERSION = '0.82';
+$Net::Amazon::S3::Request::PutObject::VERSION = '0.83';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request';
@@ -50,7 +50,7 @@ Net::Amazon::S3::Request::PutObject - An internal class to put an object
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

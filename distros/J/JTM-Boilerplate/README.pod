@@ -1,0 +1,47 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+JTM::Boilerplate - Default Boilerplate for Joelle Maslak's Code
+
+=head1 VERSION
+
+version 2.181940
+
+=head1 SYNOPSIS
+
+  use JTM::Boilerplate 'script';
+
+=head1 DESCRIPTION
+
+This module serves two purposes.  First, it sets some default imports,
+and turns on the strictures I've come to rely upon.  Secondly, it depends
+on a number of other modules to aid in setting up new environments (I can
+just do a "cpan JTM-Boilerplate" to install everything I need).
+
+This module optionally takes one of two parameters, 'script', 'class',
+or 'role'. If 'script' is specified, the module assumes that you do not
+need Moose or MooseX modules.
+
+=head1 WARNINGS
+
+This module makes significant changes in the calling package!
+
+In addition, this module should be incorporated into any project by
+copying it into the project's library tree. This protects the project from
+outside dependencies that may be undesired.
+
+=head1 AUTHOR
+
+Joelle Maslak <jmaslak@antelope.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015-2018 by Joelle Maslak.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

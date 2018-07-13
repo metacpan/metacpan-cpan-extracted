@@ -71,7 +71,7 @@ SV* pl_eval(pTHX_ V8Context* ctx, const char* code, const char* file)
 
     HandleScope handle_scope(ctx->isolate);
 
-    Local<Context> context = Local<Context>::New(ctx->isolate, ctx->persistent_context);
+    Local<Context> context = Local<Context>::New(ctx->isolate, *ctx->persistent_context);
     Context::Scope context_scope(context);
     ScriptOrigin* origin = 0;
 
@@ -140,7 +140,7 @@ int pl_run_function(V8Context* ctx, Persistent<Function>& func)
     dTHX;
 
     HandleScope handle_scope(ctx->isolate);
-    Local<Context> context = Local<Context>::New(ctx->isolate, ctx->persistent_context);
+    Local<Context> context = Local<Context>::New(ctx->isolate, *ctx->persistent_context);
     Context::Scope context_scope(context);
 
     TryCatch try_catch(ctx->isolate);

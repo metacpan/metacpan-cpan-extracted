@@ -1,5 +1,5 @@
 package JSONAPI::Document;
-$JSONAPI::Document::VERSION = '2.0';
+$JSONAPI::Document::VERSION = '2.1';
 # ABSTRACT: Turn DBIx results into JSON API documents.
 
 use Moo;
@@ -129,7 +129,7 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 =head1 VERSION
 
-version 2.0
+version 2.1
 
 =head1 SYNOPSIS
 

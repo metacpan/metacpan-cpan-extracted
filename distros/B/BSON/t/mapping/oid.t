@@ -85,6 +85,7 @@ is( $bson,             $expect,     "BSON correct" );
 
 # MongoDB::OID (deprecated) -> BSON::OID
 SKIP: {
+    $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1;
     eval { require MongoDB; require MongoDB::OID; };
     skip( "MongoDB::OID not installed", 2 )
       unless $INC{'MongoDB/OID.pm'};

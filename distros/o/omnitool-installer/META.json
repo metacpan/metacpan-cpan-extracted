@@ -72,8 +72,10 @@
             "Net::Server::SS::PreFork" : "0.05",
             "Number::Range" : "0.12",
             "Plack" : "1.0044",
+            "Plack::Handler::Gazelle" : "0.48",
             "Plack::Middleware::DBIx::DisconnectAll" : "0.02",
             "Plack::Middleware::ReverseProxy" : "0.15",
+            "Plack::Middleware::Timeout" : "0.09",
             "Proc::ProcessTable" : "0.53",
             "Scalar::Util" : "1.45",
             "Server::Starter" : "0.33",
@@ -100,7 +102,7 @@
    "provides" : {
       "omnitool::installer" : {
          "file" : "lib/omnitool/installer.pm",
-         "version" : "v1.0.10"
+         "version" : "v1.0.11"
       }
    },
    "release_status" : "stable",
@@ -114,7 +116,7 @@
          "web" : "https://github.com/ericschernoff/omnitool-installer"
       }
    },
-   "version" : "1.0.10",
+   "version" : "1.0.11",
    "x_contributors" : [
       "Eric Chernoff <echernof@cisco.com>",
       "Eric Chernoff <ericschernoff@gmail.com>",

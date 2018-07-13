@@ -1,0 +1,60 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "BLUHM <bluhm@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "OSPF-LSDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "Data::Validate" : "0",
+            "Data::Validate::Struct" : "0",
+            "File::Slurp" : "0",
+            "List::MoreUtils" : "0",
+            "Regexp::Common" : "0",
+            "Regexp::IPv6" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Pod" : "0",
+            "Test::Strict" : "0",
+            "YAML::Syck" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://sourceforge.net/projects/ospfview/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.code.sf.net/p/ospfview/code"
+      }
+   },
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

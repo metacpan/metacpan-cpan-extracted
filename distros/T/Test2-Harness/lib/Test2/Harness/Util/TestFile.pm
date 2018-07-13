@@ -2,13 +2,15 @@ package Test2::Harness::Util::TestFile;
 use strict;
 use warnings;
 
-our $VERSION = '0.001065';
+our $VERSION = '0.001066';
 
 use Carp qw/croak/;
 
 use Time::HiRes qw/time/;
 
 use File::Spec();
+
+use List::Util qw/uniq/;
 
 use Test2::Harness::Util qw/open_file/;
 
@@ -106,6 +108,10 @@ sub check_category {
 sub event_timeout    { $_[0]->headers->{timeout}->{event} }
 sub postexit_timeout { $_[0]->headers->{timeout}->{postexit} }
 
+sub conflicts_list {
+    return $_[0]->headers->{conflicts} || [];    # Assure conflicts is always an array ref.
+}
+
 sub headers {
     my $self = shift;
     $self->_scan unless $self->{+_SCANNED};
@@ -149,10 +155,21 @@ sub _scan {
             }
         }
 
-        next if $line =~ m/^\s*(use|require|BEGIN|package)\b/;
+        next if $line =~ m/^\s*#/ && $line !~ m/^\s*#\s*HARNESS-.+/;    # Ignore commented lines which aren't HARNESS-?
+        next if $line =~ m/^\s*(use|require|BEGIN|package)\b/;          # Only supports single line BEGINs
         last unless $line =~ m/^\s*#\s*HARNESS-(.+)$/;
 
-        my ($dir, @args) = split /[-\s]/, lc($1);
+        my ($dir, $rest) = split /[-\s]+/, lc($1), 2;
+        my @args;
+        if ($dir eq 'meta') {
+            @args = split /\s+/, $rest, 2;                              # Check for white space delimited
+            @args = split(/[-]+/, $rest, 2) if scalar @args == 1;       # Check for dash delimited
+            $args[1] =~ s/\s+(?:#.*)?$//;                               # Strip trailing white space and comment if present
+        }
+        else {
+            $rest =~ s/\s+(?:#.*)?$//;                                  # Strip trailing white space and comment if present
+            @args = split /[-\s]+/, $rest;
+        }
 
         if ($dir eq 'no') {
             my ($feature) = @args;
@@ -173,6 +190,20 @@ sub _scan {
         elsif ($dir eq 'category' || $dir eq 'cat') {
             my ($name) = @args;
             $headers{category} = $name;
+        }
+        elsif ($dir eq 'conflicts') {
+            my @conflicts_array;
+
+            foreach my $arg (@args) {
+                push @conflicts_array, $arg;
+            }
+
+            # Allow multiple lines with # HARNESS-CONFLICTS FOO
+            $headers{conflicts} ||= [];
+            push @{$headers{conflicts}}, @conflicts_array;
+
+            # Make sure no more than 1 conflict is ever present.
+            @{$headers{conflicts}} = uniq @{$headers{conflicts}};
         }
         elsif ($dir eq 'timeout') {
             my ($type, $num) = @args;
@@ -221,7 +252,7 @@ sub queue_item {
     my ($job_name) = @_;
 
     my $category = $self->check_category;
-    my $stage = $self->check_stage;
+    my $stage    = $self->check_stage;
 
     my $fork    = $self->check_feature(fork    => 1);
     my $preload = $self->check_feature(preload => 1);
@@ -242,10 +273,10 @@ sub queue_item {
         use_preload => $preload,
         use_stream  => $stream,
         use_timeout => $timeout,
+        conflicts   => $self->conflicts_list,
 
         event_timeout    => $self->event_timeout,
         postexit_timeout => $self->postexit_timeout,
-
         @{$self->{+QUEUE_ARGS}},
     };
 }
@@ -257,6 +288,7 @@ my %RANK = (
     general    => 4,
     isolation  => 5,
 );
+
 sub rank {
     my $self = shift;
     return $RANK{$self->check_category} || 1;

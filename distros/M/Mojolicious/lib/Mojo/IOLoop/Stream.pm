@@ -10,6 +10,9 @@ has reactor => sub { Mojo::IOLoop->singleton->reactor };
 
 sub DESTROY { Mojo::Util::_global_destruction() or shift->close }
 
+sub bytes_read    { shift->{read}    || 0 }
+sub bytes_written { shift->{written} || 0 }
+
 sub close {
   my $self = shift;
   return unless my $reactor = $self->reactor;
@@ -70,10 +73,16 @@ sub timeout {
   $reactor->remove(delete $self->{timer}) if $self->{timer};
   return $self unless my $timeout = $self->{timeout} = shift;
   weaken $self;
-  $self->{timer}
-    = $reactor->timer($timeout => sub { $self->emit('timeout')->close });
+  $self->{timer} = $reactor->timer(
+    $timeout => sub { delete $self->{timer}; $self->emit('timeout')->close });
 
   return $self;
+}
+
+sub transition {
+  my ($self, $new) = @_;
+  @{$new}{qw(read written)} = @{$self}{qw(read written)};
+  $self->emit(transition => $new);
 }
 
 sub write {
@@ -95,9 +104,10 @@ sub _again { $_[0]->reactor->again($_[0]{timer}) if $_[0]{timer} }
 sub _read {
   my $self = shift;
 
-  my $read = $self->{handle}->sysread(my $buffer, 131072, 0);
-  return $read == 0 ? $self->close : $self->emit(read => $buffer)->_again
-    if defined $read;
+  if (defined(my $read = $self->{handle}->sysread(my $buffer, 131072, 0))) {
+    $self->{read} += $read;
+    return $read == 0 ? $self->close : $self->emit(read => $buffer)->_again;
+  }
 
   # Retry
   return if $! == EAGAIN || $! == EINTR || $! == EWOULDBLOCK;
@@ -113,6 +123,7 @@ sub _write {
   my $handle = $self->{handle};
   if (length $self->{buffer}) {
     return unless defined(my $written = $handle->syswrite($self->{buffer}));
+    $self->{written} += $written;
     $self->emit(write => substr($self->{buffer}, 0, $written, ''))->_again;
   }
 
@@ -211,6 +222,15 @@ Emitted if new data arrives on the stream.
 Emitted if the stream has been inactive for too long and will get closed
 automatically.
 
+=head2 transition
+
+  $stream->on(transition => sub {
+    my ($stream, $new_stream) = @_;
+    ...
+  });
+
+Emitted if the stream has transitioned to a different class.
+
 =head2 write
 
   $stream->on(write => sub {
@@ -236,6 +256,20 @@ global L<Mojo::IOLoop> singleton.
 
 L<Mojo::IOLoop::Stream> inherits all methods from L<Mojo::EventEmitter> and
 implements the following new ones.
+
+=head2 bytes_read
+
+  my $num = $stream->bytes_read;
+
+Number of bytes received. Note that this method is EXPERIMENTAL and might change
+without warning!
+
+=head2 bytes_written
+
+  my $num = $stream->bytes_written;
+
+Number of bytes written. Note that this method is EXPERIMENTAL and might change
+without warning!
 
 =head2 close
 
@@ -301,6 +335,13 @@ Stop watching for new data on the stream.
 Maximum amount of time in seconds stream can be inactive before getting closed
 automatically, defaults to C<15>. Setting the value to C<0> will allow this
 stream to be inactive indefinitely.
+
+=head2 transition
+
+  $stream->transition($new_stream);
+
+Transition stream to a different class. Note that this method is EXPERIMENTAL
+and might change without warning!
 
 =head2 write
 

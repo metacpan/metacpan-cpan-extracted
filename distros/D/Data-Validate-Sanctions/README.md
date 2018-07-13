@@ -43,7 +43,7 @@ when one string is passed, please be sure last\_name is before first\_name.
 
 or you can pass first\_name, last\_name (last\_name, first\_name), we'll check both "$last\_name $first\_name" and "$first\_name $last\_name".
 
-return 1 for yes, 0 for no.
+return list name for yes, 0 for no.
 
 it will remove all non-alpha chars and compare with the list we have.
 

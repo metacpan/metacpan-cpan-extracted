@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.602   2018-07-12
+        - Refactoring table character-width.
+
 1.601   2018-07-10
         - Bugfix backup self.
         - Bugfix in 'cut_to_printwidth'.

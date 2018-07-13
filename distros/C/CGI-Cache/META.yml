@@ -38,4 +38,4 @@ resources:
   homepage: https://github.com/coppit/cgi-cache
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/coppit/cgi-cache
-version: '1.4212'
+version: '1.4214'

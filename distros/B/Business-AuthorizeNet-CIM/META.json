@@ -6,7 +6,7 @@
       "Olaf Alders"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -52,13 +52,14 @@
          "web" : "https://github.com/fayland/perl-Business-AuthorizeNet-CIM"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_contributors" : [
       "Michael Hamlin <mhamlin@liquidweb.com>",
       "Olaf Alders <olaf@wundersolutions.com>",
       "paulwelscott <paulwelscott@gmail.com>",
       "Rhesa Rozendaal <rhesa@cpan.org>",
-      "Ricardo Signes <rjbs@cpan.org>"
+      "Ricardo Signes <rjbs@cpan.org>",
+      "Sebastian Green-Husted <sgreenhusted@liquidweb.com>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
 }

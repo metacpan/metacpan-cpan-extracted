@@ -55,6 +55,7 @@ is( $bson, $expect, "BSON correct" );
 
 # MongoDB::BSON::Regexp (deprecated) -> BSON::Regex
 SKIP: {
+    $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1;
     eval { require MongoDB::BSON::Regexp };
     skip( "MongoDB::BSON::Regexp not installed", 2 )
       unless $INC{'MongoDB/BSON/Regexp.pm'};

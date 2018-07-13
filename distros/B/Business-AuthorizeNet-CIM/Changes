@@ -1,5 +1,10 @@
 Revision history for Perl extension Business-AuthorizeNet-CIM
 
+0.17    2018-07-11
+        add support for multiple optional fields being passed to
+        getCustomerPaymentProfileRequest, instead of only allowing
+        unmaskExpirationDate (ricecake)
+
 0.16    2017-06-26
         no code changes
 

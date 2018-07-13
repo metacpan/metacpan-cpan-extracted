@@ -1,6 +1,12 @@
 ######################################################################
 Revision history for Perl extension Archive::Tar::Wrapper
 
+0.33 (2018/07/10):
+    Skipping bzip2 testing if the program is not available
+    (https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/11).
+    Undeclared dependency of Dumbbench
+    (https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/12).
+
 0.32 (2018/07/10):
     Typo fixed by Mohammad S Anwar
     (https://github.com/glasswalk3r/archive-tar-wrapper-perl/pull/10).

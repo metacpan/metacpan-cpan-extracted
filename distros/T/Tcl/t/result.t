@@ -2,7 +2,7 @@ use Tcl;
 
 $| = 1;
 
-print "1..5\n";
+print "1..7\n";
 
 sub foo {
     my $interp = $_[1];
@@ -49,3 +49,22 @@ if ($i->SplitList('bad { format')) {
 } else {
     print "ok 5\n";
 }
+
+$i->ResetResult();
+
+eval {
+  $i->AppendResult([[0..3], [4..7]]);
+};
+
+if ($@) {
+  print "Not ok 6\n";
+} else {
+  print "ok 6\n";
+}
+
+if ($i->result eq q{{0 1 2 3} {4 5 6 7}}) {
+  print "ok 7\n";
+} else {
+  print "Not ok 7\n";
+}
+

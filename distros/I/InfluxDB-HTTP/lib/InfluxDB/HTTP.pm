@@ -16,16 +16,18 @@ use Method::Signatures;
 use Object::Result;
 use URI;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-method new ($class: Str :$host = 'localhost', Int :$port = 8086) {
+method new ($class: Str :$host = 'localhost', Int :$port = 8086, Int :$timeout = 180) {
     my $self = {
         host => $host,
         port => $port,
     };
 
-    $self->{lwp_user_agent} = LWP::UserAgent->new();
-    $self->{lwp_user_agent}->agent("InfluxDB-HTTP/$VERSION");
+    my $ua= LWP::UserAgent->new();
+    $ua->agent("InfluxDB-HTTP/$VERSION");
+    $ua->timeout($timeout);
+    $self->{lwp_user_agent} = $ua;
 
     bless $self, $class;
 
@@ -77,24 +79,36 @@ method query (Str|ArrayRef[Str] $query!, Str :$database, Int :$chunk_size, Str :
 
     chomp(my $content = $response->content());
 
-    my $data = decode_json($content);
+    my $error;
+    if ($response->is_success()) {
+        local $@;
+        my $data = eval { decode_json($content) };
+        $error = $@;
 
-    if (! $response->is_success()) {
-        result {
-            raw    { return $response; }
-            error  { return $data; }
-            <STR>  { return "Error executing query: $data->{error}"; }
-            <BOOL> { return; }
+        if ($data) {
+            $error = $data->{error};
         }
+
+        if (!$error) {
+            result {
+                raw         { return $response; }
+                data        { return $data; }
+                results     { return $data->{results}; }
+                request_id  { return $response->header('Request-Id'); }
+                <STR>       { return "Returned data: $content"; }
+                <BOOL>      { return 1; }
+            }
+        }
+    }
+    else {
+        $error = $content;
     }
 
     result {
-        raw         { return $response; }
-        data        { return $data; }
-        results     { return $data->{results}; }
-        request_id  { return $response->header('Request-Id'); }
-        <STR>       { return "Returned data: $content"; }
-        <BOOL>      { return 1; }
+        raw    { return $response; }
+        error  { return $error; }
+        <STR>  { return "Error executing query: $error"; }
+        <BOOL> { return; }
     }
 }
 
@@ -116,12 +130,15 @@ method write (Str|ArrayRef[Str] $measurement!, Str :$database!, :$precision wher
     chomp(my $content = $response->content());
 
     if ($response->code() != 204) {
-        my $data = decode_json($content);
+        local $@;
+        my $data = eval { decode_json($content) };
+        my $error = $@;
+        $error = $data->{error} if (!$error && $data);
 
         result {
             raw    { return $response; }
-            error  { return $data; }
-            <STR>  { return "Error executing write: $data->{error}"; }
+            error  { return $error; }
+            <STR>  { return "Error executing write: $error"; }
             <BOOL> { return; }
         }
     }
@@ -154,11 +171,11 @@ InfluxDB::HTTP - The Perl way to interact with InfluxDB!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
-InfluxDB::HTTP allows you top interact with the InfluxDB HTTP API. The module essentially provides
+InfluxDB::HTTP allows you to interact with the InfluxDB HTTP API. The module essentially provides
 one method per InfluxDB HTTP API endpoint, that is C<ping>, C<write> and C<query>.
 
     use InfluxDB::HTTP;
@@ -191,9 +208,10 @@ attribute C<error>:
 Furthermore, all result objects provide access to the C<HTTP::Response> object that is returned
 by InfluxDB in the attribute C<raw>.
 
-=head2 new host => 'localhost', port => 8086
+=head2 new host => 'localhost', port => 8086, timeout => 600
 
-Passing C<host> and/or C<port> is optional, defaulting to the InfluxDB defaults.
+Passing C<host>, C<port> and/or C<timeout> is optional, defaulting to the InfluxDB defaults or
+to 3 minutes for the timeout. The timeout is in seconds.
 
 Returns an instance of InfluxDB::HTTP.
 

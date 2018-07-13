@@ -1,3 +1,11 @@
+1.08 2018-07-11
+    - Add CGI prerequisite, it has been removed from base Perl.
+    - Sort keys when working with hashes.  This gives reproducible
+      results and the tests will pass everywhere.
+    - Store indices to get predictable results in output.
+    - Update meta information.
+    - Sourceforege no longer supports cvs, move to git repository.
+
 1.07 2012-09-19
     - I give up running perl -Tc on CPAN testers for all platforms.
       skip the -Tc subtest in syntax-cgi.t if it might create problems

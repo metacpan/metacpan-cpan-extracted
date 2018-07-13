@@ -5,6 +5,12 @@ use namespace::autoclean;
 use Mouse;
 extends qw(Exporter);
 
+=head1 NAME
+
+Net::EGTS::Codes - Constants.
+
+=cut
+
 our @EXPORT;
 
 # Packet types

@@ -20,7 +20,7 @@ use Module::Install::Base;
               &get_bzip2_version
             );
 
-$VERSION = sprintf "%d.%02d%02d", q/0.30.10/ =~ /(\d+)/g;
+$VERSION = sprintf "%d.%02d%02d", q/0.30.12/ =~ /(\d+)/g;
 
 # ---------------------------------------------------------------------------
 

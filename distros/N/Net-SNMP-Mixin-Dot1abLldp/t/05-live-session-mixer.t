@@ -14,8 +14,15 @@ plan skip_all =>
   "Net::SNMP::Mixin required for testing Net::SNMP::Mixin module"
   if $@;
 
-plan tests => 39;
+plan tests => 44;
 #plan 'no_plan';
+
+my @methods = qw/
+  get_lldp_local_system_data
+  get_lldp_loc_port_table
+  get_lldp_rem_table
+  map_lldp_loc_portid2portnum
+  /;
 
 my $builder        = Module::Build->current;
 my $snmp_agent     = $builder->notes('snmp_agent');
@@ -35,17 +42,10 @@ SKIP: {
   isa_ok( $session, 'Net::SNMP' );
 
   isa_ok( $session->mixer('Net::SNMP::Mixin::Dot1abLldp'), 'Net::SNMP' );
-  ok(
-    $session->can('get_lldp_local_system_data'),
-    'can $session->get_lldp_local_system_data'
-  );
-  ok(
-    $session->can('get_lldp_loc_port_table'),
-    'can $session->get_lldp_loc_port_table'
-  );
-  ok( $session->can('get_lldp_rem_table'),
-    'can $session->get_lldp_rem_table' );
 
+  foreach my $m (@methods) {
+    ok( $session->can($m), "can \$session->$m()" );
+  }
 
   eval { $session->init_mixins };
   ok( !$@, 'init_mixins without error' );
@@ -69,10 +69,13 @@ SKIP: {
     'pure instance method called as class method'
   );
 
-  my ($lldp_local_system_data, $lldp_loc_port_table, $lldp_rem_table);
+  my ($lldp_local_system_data, $lldp_loc_port_table, $lldp_rem_table, $map_lldp_loc_portid2portnum);
 
   eval { $lldp_local_system_data = $session->get_lldp_local_system_data };
   ok( !$@, 'get_lldp_local_system_data' );
+
+  eval { $map_lldp_loc_portid2portnum = $session->map_lldp_loc_portid2portnum };
+  ok( !$@, 'map_lldp_loc_portid2portnum' );
 
   eval { $lldp_loc_port_table = $session->get_lldp_loc_port_table };
   ok( !$@, 'get_lldp_loc_port_table' );
@@ -108,6 +111,9 @@ SKIP: {
   eval { $lldp_local_system_data = $session->get_lldp_local_system_data };
   ok( !$@, 'get_lldp_local_system_data' );
 
+  eval { $map_lldp_loc_portid2portnum = $session->map_lldp_loc_portid2portnum };
+  ok( !$@, 'map_lldp_loc_portid2portnum' );
+
   eval { $lldp_loc_port_table = $session->get_lldp_loc_port_table };
   ok( !$@, 'get_lldp_loc_port_table' );
 
@@ -138,6 +144,9 @@ SKIP: {
   );
 
   eval { $lldp_local_system_data = $session->get_lldp_local_system_data };
+  like( $@, qr/not initialized/, 'not initialized' );
+
+  eval { $map_lldp_loc_portid2portnum = $session->map_lldp_loc_portid2portnum };
   like( $@, qr/not initialized/, 'not initialized' );
 
   eval { $lldp_loc_port_table = $session->get_lldp_loc_port_table };
@@ -172,6 +181,9 @@ SKIP: {
   );
 
   eval { $lldp_local_system_data = $session->get_lldp_local_system_data };
+  like( $@, qr/not initialized/, 'not initialized' );
+
+  eval { $map_lldp_loc_portid2portnum = $session->map_lldp_loc_portid2portnum };
   like( $@, qr/not initialized/, 'not initialized' );
 
   eval { $lldp_loc_port_table = $session->get_lldp_loc_port_table };

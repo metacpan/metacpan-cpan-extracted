@@ -39,8 +39,6 @@ MySQL::Partition is utility module for MySQL partitions.
 This module creates a object for manipulating MySQL partitions.
 This is very useful that we no longer write complicated and MySQL specific SQL syntax any more.
 
-**THE SOFTWARE IS STILL ALPHA QUALITY. API MAY CHANGE WITHOUT NOTICE.**
-
 # INTERFACE
 
 ## Constructor

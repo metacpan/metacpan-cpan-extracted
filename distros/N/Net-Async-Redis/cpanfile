@@ -10,11 +10,13 @@ requires 'Log::Any', '>= 1.050';
 requires 'URI', 0;
 requires 'URI::redis', 0;
 requires 'Class::Method::Modifiers', 0;
+requires 'Math::Random::Secure', 0;
 
 on 'test' => sub {
     requires 'Test::More', '>= 0.98';
     requires 'Test::HexString', 0;
     requires 'Test::Deep', 0;
+    requires 'Variable::Disposition', '>= 0.004';
 };
 
 on 'develop' => sub {
@@ -22,4 +24,3 @@ on 'develop' => sub {
     requires 'Template';
     requires 'HTML::TreeBuilder';
 };
-

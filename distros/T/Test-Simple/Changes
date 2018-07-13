@@ -1,3 +1,11 @@
+1.302138  2018-07-11 09:29:51-07:00 America/Los_Angeles
+
+    - No changes since trial
+
+1.302137  2018-05-25 08:45:13-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Make it safe to fork before events in IPC
+
 1.302136  2018-04-19 05:40:11-07:00 America/Los_Angeles
 
     - Add test2_add_callback_testing_done to Test2::API

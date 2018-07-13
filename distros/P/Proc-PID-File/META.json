@@ -4,7 +4,7 @@
       "Erick Calder <ecalder@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -40,5 +40,5 @@
          "url" : "https://github.com/dtikhonov/Proc-PID-File"
       }
    },
-   "version" : "1.28"
+   "version" : "1.29"
 }

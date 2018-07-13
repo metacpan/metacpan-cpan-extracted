@@ -8,6 +8,7 @@ use lib 'private-lib';
 use lib '.';
 use inc::Module::Install;
 
+# To prevent MakeMaker from processing our old directory
 BEGIN { makemaker_args( NORECURS => 1 ) }
 
 print "\n", '-'x78, "\n\n";
@@ -20,12 +21,6 @@ all_from('yagg');
 auto_set_bugtracker;
 githubmeta;
 
-configure_requires(
-  'File::Slurper' => 0,
-  # Module::Install::Bugtracker needs this
-  'URI::Escape' => 0,
-);
-
 provides(
   'yagg' => {
     file => 'yagg',
@@ -33,9 +28,17 @@ provides(
   }
 );
 
+# Perl 5.6 doesn't work with URI::Escape. We get an error about Exporter not exporting "import"
+perl_version '5.008';
+
 check_custom_installation();
 
 install_script('yagg');
+
+configure_requires(
+  # Module::Install::Bugtracker needs this
+  'URI::Escape' => 0,
+);
 
 requires(
   'perl' => '5.005',
@@ -62,16 +65,30 @@ test_requires(
 
 my $locations = configure_programs();
 
+foreach my $program (keys %$locations)
+{
+  die "prerequisite program \"$program\" not found\n" unless defined $$locations{$program};
+}
+
 print "\n", '-'x78, "\n\n";
 
 clean_files('lib/yagg/TerminalParser.pm', 'lib/yagg/NonterminalParser.pm');
 
 license 'gpl2';
+
+use_standard_tests;
+
 auto_license(holder => 'David Coppit');
 
 no_index 'directory' => 'private-lib';
 
 enable_verbose_cpan_testing();
+
+make_parsers($$locations{'yapp'}{'path'});
+
+realclean_files('inc');
+
+WriteAll;
 
 # ---- Workaround for broken module ----
 # https://rt.cpan.org/Ticket/Display.html?id=125772
@@ -99,17 +116,6 @@ enable_verbose_cpan_testing();
   }
 }
 
-use_standard_tests;
-
-make_parsers($$locations{'yapp'}{'path'});
-
-WriteAll();
-
 print "\n", '-'x78, "\n\n";
-
-foreach my $program (keys %$locations)
-{
-  warn "prerequisite program \"$program\" not found\n" unless defined $$locations{$program};
-}
 
 fix_sort_versions('inc/Sort/Versions.pm');

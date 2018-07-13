@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Bucket;
-$Net::Amazon::S3::Client::Bucket::VERSION = '0.82';
+$Net::Amazon::S3::Client::Bucket::VERSION = '0.83';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Data::Stream::Bulk::Callback;
@@ -12,7 +12,7 @@ has 'client' =>
 has 'name' => ( is => 'ro', isa => 'Str', required => 1 );
 has 'creation_date' =>
     ( is => 'ro', isa => DateTime, coerce => 1, required => 0 );
-has 'owner_id'           => ( is => 'ro', isa => 'OwnerId', required => 0 );
+has 'owner_id'           => ( is => 'ro', isa => 'Str', required => 0 );
 has 'owner_display_name' => ( is => 'ro', isa => 'Str',     required => 0 );
 has 'region' => (
     is => 'ro',
@@ -198,7 +198,7 @@ Net::Amazon::S3::Client::Bucket - An easy-to-use Amazon S3 client bucket
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

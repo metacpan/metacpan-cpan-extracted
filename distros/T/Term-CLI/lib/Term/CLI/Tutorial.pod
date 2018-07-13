@@ -22,7 +22,7 @@ Term::CLI::Tutorial - tips, tricks, and examples for Term::CLI
 
 =head1 VERSION
 
-version 0.051002
+version 0.051003
 
 =head1 SYNOPSIS
 
@@ -247,7 +247,8 @@ L<Term::CLI>'s C<add_command> method.
         prompt   => 'bssh> ',           # A more descriptive prompt.
     );
 
-    $term->add_command, Term::CLI::Command->new(
+    $term->add_command(
+        Term::CLI::Command->new( ... ),
         ...
     );
 
@@ -279,8 +280,8 @@ You can also build a list first, and then call C<add_command>:
 
     $term->add_command(@commands);
 
-This is the method we'll use for this tutorial, and comes in
-handy further down the line.
+This is the method we'll use for this tutorial, and it coincidentally
+comes in handy further down the line.
 
 So, now that we have the basic mechanism out of the way, let's
 add our first command, the highly useful C<exit>.
@@ -419,7 +420,7 @@ moment to look at the built-in help features of L<Term::CLI>.
 
 By default, there is no help available in a L<Term::CLI> application:
 
-    bss> help
+    bssh> help
     ERROR: unknown command 'help'
 
 However, there is a special L<Term::CLI::Command::Help> class (derived

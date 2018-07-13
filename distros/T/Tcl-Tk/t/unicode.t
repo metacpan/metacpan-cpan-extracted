@@ -11,6 +11,10 @@
 use strict;
 use Test qw(plan ok);
 
+if ($^O ne 'MSWin32' and !$ENV{DISPLAY}) {
+    print "1..0 # skip: no DISPLAY env var - how come?\n";
+    exit;
+}
 plan tests => 1;
 
 use Tcl::Tk;

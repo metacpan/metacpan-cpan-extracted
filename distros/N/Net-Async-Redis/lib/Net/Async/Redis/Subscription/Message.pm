@@ -3,7 +3,7 @@ package Net::Async::Redis::Subscription::Message;
 use strict;
 use warnings;
 
-our $VERSION = '1.005'; # VERSION
+our $VERSION = '1.006'; # VERSION
 
 =head1 NAME
 
@@ -46,7 +46,7 @@ Accessor for the channel name.
 
 =cut
 
-sub channel { shift->subscription->channel }
+sub channel { shift->{channel} }
 
 =head2 type
 

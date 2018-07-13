@@ -1,0 +1,69 @@
+Revision history for Tk-JFileDialog
+
+1.00    Date/time
+        First version, released on an unsuspecting world.
+...
+1.5     Add <Alt-s> binding to file listbox to select current file 
+        (like <space>).
+        This is so that when selecting multiple files and keyboard focus is
+        on the File listbox and an item is already highlighted, one can 
+        select that item with the keyboard, since <space> will toggle the 
+        selection OFF.
+1.6     Added -SortButton and -SortButtonLabel options.
+1.61    Removed requirement for Tk::JDialog (use built-in Tk::Dialog instead).
+1.62    Changed 3 instances of special variable to "$_" at lines 723, 724, and 
+        726 to eliminate perl v5.20 warning:  "Use of literal control 
+        characters in variable names is deprecated".
+1.63    Clean up some window-manager grab and geometry issues.
+2.0     * Fixed and closed rt.cpan bugs# 125539, 125544, 125552, and 125555. 
+        * Fixed several problems with enforcement of -Create option, 
+        particularly on MS-Windows (closes bug# 125539).
+        * Fixed "-ShowAll" option / checkbox not showing hidden files / 
+        directories on M$-Windows (closes bug# 125544).  
+        * Fixed relative paths on Windows, ie. "C:FILE" by making JFileDialog 
+        "remember" the "CWD" for EACH drive-letter (Linux only has one CWD, 
+        closes bug# 125552). 
+        * Added options to show/hide the file and / or directory listboxes, 
+        and to forbid the user from changing directories.  (-SgiwFileList and 
+        -ShowDirList (replaces -Chdir)).
+        * Added a filter "list" (-FPatList) option and the ability to specify 
+        multiple file-extension filters in a single filter, separated by "|".
+        * Added an option (-FPatOnly) to force user to select a file who's 
+        extension matches the fie-extension filter in effect.
+        * Added a separate "Reset" button to restore the default path 
+        and / or file presented when opening the selection dialog and made 
+        these default values work properly.
+        * Added an option (-maxwidth) to prevent the widget from growing very 
+        wide when a long list of files are selected, then added to the 
+        history dropdown.  Default is 60 average character widths.
+        * -Path and -File can now be set to initial (default) files.
+        (Closes bug# 125555).
+        * -SelDir is no longer a boolean flag, but numeric:  Added options: 
+        -1 means user can't change directories, but must pick from the 
+        directory shown. 2 means user can select either files OR a directory.
+        (0 and 1 still mean select File(s) or select a directory, as before).
+        * -SelectMode = "single" or "browse" are now enforced when set, not 
+        allowing user to select more than one file.  They are also the same 
+        mode ("browse") in the listboxes.
+        * Converted the Filter entry to a JBrowseEntry to allow for a list 
+        of filters (new filter list option).
+        * On M$-Windows, one can also specify a "Windows Favorites"  
+        folder as the -PathFile argument so that the links in that folder 
+        become the "Favorite Paths" drop-down list in the "Path" field 
+        instead of specifying a text file containing a list of "favorite" 
+        paths. ie. "c:/Users/uname/AppData/Roaming/Microsoft/Windows/Recent/".
+        * Simplified window-appearance by combining the file / history and 
+        path / favorite path entry / dropdown lists by switching to 
+        JBrowseEntry widgets.  (Tk::JBrowseEntry is now a prerequisite!)
+        * Cleaned up some key bindings and default focusing for better 
+        keyboard usage.
+        The -Chdir option has been changed to "-ShowDirList", as there is 
+        now also a similar "-ShowFileList" option.  Developers using this 
+        option will need to change "-Chdir => 'YES'" to "-ShowDirList => 1).
+        The -EDlgText option (user-set file error dialog message) is now 
+        depreciated (ignored - so developers don't have to change code) 
+        as the error dialog can now have several different messages.
+        * The -DirLBCaption option now defaults to "Folders:" instead of 
+        "Directories:" on M$-Windows.
+2.01    * Fixed: "Changes" file missing from MANIFEST, thus missing from 
+        MetaCPAN.

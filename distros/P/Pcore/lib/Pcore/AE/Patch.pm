@@ -25,7 +25,7 @@ our $SOCKADDR_CACHE = {};
 
 # support for linux abstract UDS
 # cache requests
-sub resolve_sockaddr ( $node, $service, $proto, $family, $type, $cb ) : prototype($$$$$$) {
+sub resolve_sockaddr : prototype($$$$$$) ( $node, $service, $proto, $family, $type, $cb ) {
     state $callback = {};
 
     if ( $node eq 'unix/' ) {
@@ -78,7 +78,7 @@ sub resolve_sockaddr ( $node, $service, $proto, $family, $type, $cb ) : prototyp
 }
 
 # support for linux abstract UDS
-sub _tcp_bind ( $host, $service, $done, $prepare = undef ) : prototype($$$;$) {
+sub _tcp_bind : prototype($$$;$) ( $host, $service, $done, $prepare = undef ) {
 
     # hook for Linux abstract Unix Domain Sockets (UDS)
     if ( defined $host && $host eq 'unix/' && substr( $service, 0, 1 ) eq "\x00" ) {
@@ -116,8 +116,6 @@ sub _tcp_bind ( $host, $service, $done, $prepare = undef ) : prototype($$$;$) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 16, 23               | Variables::ProtectPrivateVars - Private variable used                                                          |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 28                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 108                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|

@@ -56,6 +56,7 @@ is( $hash->{A}->increment, $increment, "increment correct" );
 
 # MongoDB::Timestamp (deprecated) -> BSON::Timestamp
 SKIP: {
+    $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1;
     eval { require MongoDB::Timestamp };
     skip( "MongoDB::Timestamp not installed", 2 )
       unless $INC{'MongoDB/Timestamp.pm'};
@@ -89,6 +90,15 @@ my @cmp_cases = (
 for my $c (@cmp_cases) {
     my ($l, $r, $exp) = @$c;
     is( bson_timestamp(@$l) <=> bson_timestamp(@$r), $exp, "(@$l) <=> (@$r) == $exp" );
+}
+
+{
+    my @carping;
+    local $SIG{__WARN__} = sub { push @carping, @_ };
+    my $x;
+    is( $x <=> bson_timestamp(0,0), 0, "undef is treated like 0" );
+    is( $x <=> bson_timestamp(0,1), -1, "undef <=> bson_timestamp(0,1)" );
+    is( bson_timestamp(0,1) <=> $x, 1, "bson_timestamp(0,1) <=> undef" );
 }
 
 done_testing;

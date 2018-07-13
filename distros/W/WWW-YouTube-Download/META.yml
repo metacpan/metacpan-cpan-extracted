@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   WWW::YouTube::Download:
     file: lib/WWW/YouTube/Download.pm
-    version: '0.59'
+    version: '0.60'
 requires:
   HTML::Entities: '0'
   JSON: '0'
@@ -40,22 +40,24 @@ resources:
   bugtracker: https://github.com/xaicron/p5-www-youtube-download/issues
   homepage: https://github.com/xaicron/p5-www-youtube-download
   repository: git://github.com/xaicron/p5-www-youtube-download.git
-version: '0.59'
+version: '0.60'
 x_contributors:
-  - 'akiym <akiyama@8ant.org>'
-  - 'Maurice <mauricemengel@gmail.com>'
-  - 'ks <ks-for-git@live.jp>'
-  - 'Yusuke Wada <yusuke@kamawada.com>'
-  - 'Flavio Poletti <flavio@polettix.it>'
-  - 'TANIGUCHI Takaki <takaki@asis.media-as.org>'
-  - 'Neil Bowers <neil@bowers.com>'
   - 'Ahmad Syaltut <Isyaltut@gmail.com>'
+  - 'B. Estrade <estrabd@gmail.com>'
+  - 'Flavio Poletti <flavio@polettix.it>'
+  - 'Maurice <mauricemengel@gmail.com>'
   - 'Mikolaj Kucharski <mikolaj@kucharski.name>'
-  - 'isync <o.zucker@web.de>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Paulo Custodio <pauloscustodio@gmail.com>'
+  - 'TANIGUCHI Takaki <takaki@asis.media-as.org>'
   - 'Thomas Sibley <tsibley@cpan.org>'
   - 'Yuji Shimada <xaicron@gmail.com>'
+  - 'Yusuke Wada <yusuke@kamawada.com>'
+  - 'akiym <akiyama@8ant.org>'
+  - 'gregor herrmann <gregoa@debian.org>'
   - 'isync <O.Zucker@web.de>'
-  - 'Paulo Custodio <pauloscustodio@gmail.com>'
-  - 'B. Estrade <estrabd@gmail.com>'
-  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'isync <o.zucker@web.de>'
+  - 'ks <ks-for-git@live.jp>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

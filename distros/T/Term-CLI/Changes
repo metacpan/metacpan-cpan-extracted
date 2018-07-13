@@ -1,3 +1,33 @@
+0.051003 -- 2018-07-11
+
+    - POD fixes:
+        - Minor POD polishing.
+
+            Files modified:
+                lib/Term/CLI.pm
+                lib/Term/CLI/Command.pm
+                lib/Term/CLI/Intro.pod
+
+        - Fix ::Int -> ::Float in POD.
+
+            Files modified:
+                lib/Term/CLI/Argument/Number/Float.pm
+
+        - "bss>" -> "bssh>"
+
+            Files modified:
+                lib/Term/CLI/Tutorial.pod
+
+        - Fix examples.
+
+            Files modified:
+                lib/Term/CLI/Tutorial.pod
+
+        - fix missing comma on callback option
+
+            Files modified:
+                lib/Term/CLI.pm
+
 0.051002 -- 2018-03-16
 
     - Fix version number.

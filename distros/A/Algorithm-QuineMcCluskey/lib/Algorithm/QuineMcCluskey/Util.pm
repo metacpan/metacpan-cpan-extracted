@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use 5.010001;
 
-use List::MoreUtils qw(any pairwise indexes uniq firstidx);
+use List::MoreUtils qw(any indexes uniq);
 use List::Compare::Functional qw(is_LequivalentR is_LsubsetR);
 
 use Exporter;
@@ -21,9 +21,8 @@ our %EXPORT_TAGS = (
 	all => [ qw(
 		columns
 		countels
-		diffpos
 		find_essentials
-		hdist
+		hammingd1pos
 		least_covered
 		maskedmatch
 		matchcount
@@ -38,7 +37,7 @@ our @EXPORT_OK = (
 	@{ $EXPORT_TAGS{all} }
 );
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 DESCRIPTION
 
@@ -277,15 +276,20 @@ sub remels
 	for my $k (@kp)
 	{
 		my @pos = indexes { maskedmatch($el, $_) } @{$href->{$k}};
-		for my $pos (reverse @pos)
+
+		#
+		# If it turns out that all the elements in the array
+		# are to be removed, then just delete the entire
+		# array reference.
+		#
+		if (scalar @pos == scalar @{$href->{$k}})
 		{
-			if (scalar @{$href->{$k}} == 1)
-			{
-				delete $href->{$k};
-				$rems++;
-				last;
-			}
-			else
+			delete $href->{$k};
+			$rems += scalar @pos;
+		}
+		else
+		{
+			for my $pos (reverse @pos)
 			{
 				splice(@{$href->{$k}}, $pos, 1);
 				$rems++;
@@ -351,37 +355,34 @@ sub columns
 	return %r90;
 }
 
-=head3 diffpos()
+=head3 hammingd1pos()
 
-Find the location of the first difference between two strings
+Very specialized Hamming distance and position function.
 
-      my $p = diffpos($str1, $str2);
+Our calling code is only interested in Hamming distances of 1.
+In those cases return the string position where the two values differ.
+In all the other cases where the distance isn't one, return a -1.
 
-=cut
-
-sub diffpos
-{
-	return firstidx { $_ } pairwise { $a ne $b }
-			@{[ split(//, shift)]},
-			@{[ split(//, shift)]};
-}
-
-=head3 hdist()
-
-Return the Hamming distance between two strings.
-
-      $d = hdist($str1, $str2);
+      $idx = hammingd1pos($val1, $val2);
 
 =cut
 
-sub hdist
+sub hammingd1pos
 {
-	my $x = 0;
+	#
+	# Xor the strings. The result will be a string in the
+	# non-printing range (in fact equal characters will result
+	# in a null character), so to each character Or a '0'.
+	#
+	my $v = ($_[0] ^ $_[1]) | (qq(\x30) x length $_[0]);
 
-	pairwise { $x += ($a ne $b) }
-			@{[ split(//, shift)]},
-			@{[ split(//, shift)]};
-	return $x;
+	#
+	# Strings that don't have a Hamming distance of one are of no
+	# interest. Otherwise, return that character position.
+	#
+	return -1 unless(scalar(() = $v=~ m/[^0]/g) == 1);
+	$v =~ m/[^0]/g;
+	return pos($v) - 1;
 }
 
 =head1 SEE ALSO
@@ -391,6 +392,8 @@ L<Algorithm::QuineMcCluskey>
 =head1 AUTHOR
 
 Darren M. Kulp C<< <darren@kulp.ch> >>
+
+John M. Gamble B<jgamble@cpan.org> (current maintainer)
 
 =cut
 

@@ -195,6 +195,8 @@ my $tdir = tempdir(CLEANUP => 1);
 note("Set PERL_AUTHOR_TESTING_INSTALLED_PERL to run additional tests against installed 'perl' and 'cpanm'")
     unless $ENV{PERL_AUTHOR_TESTING_INSTALLED_PERL};
 
+# Must set above envvar to a complete path ending in /bin/perl.
+
 SKIP: {
     skip 'Test assumes installed perl and cpanm', 10
         unless $ENV{PERL_AUTHOR_TESTING_INSTALLED_PERL};
@@ -217,7 +219,10 @@ SKIP: {
     }
 
     my ($perl_version) = $good_path =~ s{^.*/([^/]*?)/bin/perl$}{$1}r;
-
+    # This test should be run with an installed bin/perl, installed bin/cpanm
+    # and created but empty .cpanm beneath, say, ~/tmp/perl-5.28.0/
+    #say "WWW: $good_path";
+    #say "XXX: $perl_version";
     {
         local $@;
         my $bad_application_dir = catdir('foo', 'bar');
@@ -306,7 +311,7 @@ SKIP: {
             map { catfile($cwd, 't', 'data', $_) }
             ( qw| Phony-PASS-0.01.tar.gz Phony-FAIL-0.01.tar.gz  | )
         ];
-        my ($IN, $file) = tempfile();
+        my ($IN, $file) = tempfile('004_files_for_cpanm_XXXXX', UNLINK => 1);
         open $IN, '>', $file or croak "Could not open $file for writing";
         say $IN $_ for @{$list};
         close $IN or croak "Could not close $file after writing";
@@ -314,7 +319,6 @@ SKIP: {
         $gzipped_build_log = $self->run_cpanm( {
             module_file => $file,
             title       => 'second-one-pass-one-fail',
-            verbose     => 1,
         } );
         unless ($@) {
             pass("run_cpanm operated as intended; see $expected_log for PASS/FAIL/etc.");

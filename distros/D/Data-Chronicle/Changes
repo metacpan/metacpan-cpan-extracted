@@ -1,5 +1,12 @@
 Revision history for Data-Chronicle
 
+0.17      2018-07-12 18:17:13+08:00 Asia/Manila
+        - Replace dbh with DBIx::Connector object
+        - Add mget and mset methods
+        - Add get_history method
+        - Add subscribe and unsubscribe methods
+        - Replace JSON::MaybeXS and Encode with JSON::MaybeUTF8
+
 0.16      2017-05-12 04:17:59+00:00 UTC
         Add TTL support for set()
 

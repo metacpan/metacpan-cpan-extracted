@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Role::Attributes;
-$JSONAPI::Document::Builder::Role::Attributes::VERSION = '2.0';
+$JSONAPI::Document::Builder::Role::Attributes::VERSION = '2.1';
 =head1 NAME
 
 JSONAPI::Document::Builder::Role::Attributes - Utility role for JSON API attributes
 
 =head1 VERSION
 
-version 2.0
+version 2.1
 
 =head1 DESCRIPTION
 
@@ -66,6 +66,10 @@ sub get_attributes {
 Takes the keys of the given row and dash cases
 them.
 
+Will not kebab case columns whose names start
+with an underscore, this is to allow private
+properties to be included.
+
 =cut
 
 sub kebab_case {
@@ -73,7 +77,9 @@ sub kebab_case {
     my %new_row;
     foreach my $column (keys(%row)) {
         my $value = $row{$column};
-        $column =~ s/_/-/g;
+        unless ($column =~ m/^_/) {
+            $column =~ s/_/-/g;
+        }
         $new_row{$column} = $value;
     }
     return %new_row;

@@ -10,6 +10,8 @@ $^W = 1;
 
 BEGIN { use lib './lib'; $| = 1; print "1..2\n"; use Tk::JFileDialog; $loaded = 1 }
 END {print "not ok 1\n" unless $loaded;}
+use Tk::JFileDialog;
+$loaded = 1;
 print "ok 1\n";
 
 ######################### End of black magic.

@@ -1,3 +1,4 @@
+BEGIN { push @INC, '.'; }
 use inc::Module::Install 1.06;
 
 if ( -e 'MANIFEST.SKIP' ) {

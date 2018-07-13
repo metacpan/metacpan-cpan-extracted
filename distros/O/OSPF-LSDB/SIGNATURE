@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,11 +14,12 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 069ef227ba17f3e4204bc8dff0ed1c1d113fd5b2 Changes
-SHA1 853bc855a00b9bdea9891a5531c4e22e2212936a LICENSE
-SHA1 1a50b2b530957cb2b7d6f52bda29bd3dcc1cae56 MANIFEST
-SHA1 ef41c3f37d8e5eb349788c961281c2951b2d4a8b META.yml
-SHA1 a6717f5cbe610f2b34f8a24b8f31b247edb2d8e3 Makefile.PL
+SHA1 955f15994b21193067d338cd5e8c95cc0cdf1eee Changes
+SHA1 5e7c8b0818527df453d7df995d5c86d042ccdaa2 LICENSE
+SHA1 854f39375e6daddf64d5fded4ab9e91e89512f46 MANIFEST
+SHA1 809b46e7e2435a26c90a025b0558b934d533b8c7 META.json
+SHA1 b1097530af39cf0fe337d118e3df2497f1c8864e META.yml
+SHA1 192fa2f8de7ec9bbfc9ea15cf80323741d7ea384 Makefile.PL
 SHA1 74af43af8c54daab6dc7d7bdf62cb919b3d48bcc README
 SHA1 428feb382a6bd2c283dd9d5bbf2285c1d07e36a2 THANKS
 SHA1 2ea12a0e3d657a996a4ae8f07c562d10080fc8e4 TODO
@@ -29,7 +30,7 @@ SHA1 c8d0dc0169eb4ff16c301ba5a0b7f4f038b88169 doc/ospfconvert.pod
 SHA1 4d7a0fe78ba05be7e9c8131bdf161f354e0b0164 doc/ospfd2yaml.pod
 SHA1 6a914dcc863fb1de246f3adf4cc644510c7adee0 doc/ospfview.cgi.pod
 SHA1 7a102b097a85ae67d3e50f57d32481657d97022c doc/ospfview.pod
-SHA1 b9077b3b6c54ad080a440375ee0577d659dcf049 example/all.dot
+SHA1 91555d48ad233538ef41637a8b118ff6749e4487 example/all.dot
 SHA1 0e7300936d62793b2059e46d874c6486904b6c36 example/all.yaml
 SHA1 ffa3a41aa24c68c6c4d5bdca1b25e3c9e43841fb example/ancient.yaml
 SHA1 412a39ea772d98fee7e01a2ec7f622cf86ed6615 example/cisco.boundary
@@ -43,10 +44,10 @@ SHA1 34d50246a15ea7cd115f8861057fa45950e17a4b example/current.yaml
 SHA1 41f5d7d2cb4283bf74d86150f3113fe4dfa981d1 example/gated.dump
 SHA1 377801955d3dfe031aee3146909f5996f66f03c8 example/gated.yaml
 SHA1 286f07941034af0779fd20ab48715827773dab14 example/icon.dot
-SHA1 5a762812fb925f94b49fb469e9ba21447970e0d3 example/legend.dot
-SHA1 c1ee8116707b0224bab20bf58af58e4fce87926c example/legend6.dot
+SHA1 d0a661f53ae9e01d86ff34b128491e8c2cda8ade example/legend.dot
+SHA1 c8d66faa285538535420aef42c8dd751f5565ebb example/legend6.dot
 SHA1 df46d43736e4b4b7d112c576c135ee95f4b88d2e example/old.yaml
-SHA1 a4160954708d55d3f2c18a6b19ee888f1f5d8077 example/ospf.dot
+SHA1 b3c631658137713ef52490bfad85e40254997870 example/ospf.dot
 SHA1 46c8694680b1e11a3b80f13709a1f73221e7b6a1 example/ospf.yaml
 SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 example/ospf6d.boundary
 SHA1 62d3c776e3dfb9c9852433d7eb2b4970469a4ca4 example/ospf6d.external
@@ -64,10 +65,10 @@ SHA1 260799c9a3a57daaa85b877c092b5254f244c26c example/ospfd.router
 SHA1 912aed5fc3f3885602127d146ad48449a3b0b22d example/ospfd.selfid
 SHA1 61dde319e34ba28fce0c982e7914f6eb92337f8d example/ospfd.summary
 SHA1 69b95cf455eb97fbdc143a779871deaf3aab09bd example/ospfd.yaml
-SHA1 7994798504695c2ba7096edb19d62c79ddd39eca lib/OSPF/LSDB.pm
+SHA1 e91e803db3b41aeb48f500c7a061e5c73dcf7486 lib/OSPF/LSDB.pm
 SHA1 548dbc66b4791bc85378694d033f525d3ff0fa78 lib/OSPF/LSDB/Cisco.pm
-SHA1 a9a90fb4e26590cff4619a1ec308f66bc8c64ee2 lib/OSPF/LSDB/View.pm
-SHA1 0cf50f0dda2fecd016e03b69d3faf374c8058c5b lib/OSPF/LSDB/View6.pm
+SHA1 e6341e429994c88029f3aa3da8f62313bd7577e7 lib/OSPF/LSDB/View.pm
+SHA1 31503b020c7320c5438f7495ff1a33bb5ac0dcd0 lib/OSPF/LSDB/View6.pm
 SHA1 5d17d0691a384a0463bff3c04edc0fa248a24141 lib/OSPF/LSDB/YAML.pm
 SHA1 57b8cc2830c4824ed7dcf6dda9e9ca56544f7ef1 lib/OSPF/LSDB/gated.pm
 SHA1 ab2fbfe349af702c8622cfd34234685f9bba2d70 lib/OSPF/LSDB/ospf6d.pm
@@ -116,9 +117,18 @@ SHA1 4a7635b7c037adffcaee91a53f97f0f0ba71535d t/validate.t
 SHA1 afdfcf406ac0e55546550572ecc16d9bf5c7bcbc t/yaml-file.t
 SHA1 4ee6c76a30bd5d21051110e08957dfe40a4611b8 t/yaml-string.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (OpenBSD)
 
-iEYEARECAAYFAlBZvToACgkQaO3jKFvkT5EfoACfcm996sPialTIhbkd+GHQmxHK
-k88An3FL2dp2KsYstdD8Z6A+9b6JEqBl
-=DCcI
+iQIcBAEBAgAGBQJbRl19AAoJEMX0g63e6GOAfWIP/RYrJYMo0M2EA8QwQRoYJGw+
+Id+qmJGE5rOI76xHdV1RAMNOEvKaE4BWWxU+hVxYZLH5cHFmCUyjez554gHTXMM5
+tZPq9g6uioOpsmb/2VWsq4KLKGCC3B/z0m45KqkM35JW+kiSIrFt1yciatUNA77t
+rdhCvFVRngEra8S62OfZBtAzxctY9vrv3Qvh/rxvhdZOPeTto7BLGiO977jEH5AF
+pns6C0Jdu5A//lN8npJlhHk+KEdC7e1PmqjjtUWmY9zB4/Hib71cfqcPfAuzWIqY
+2C8YjcmXXunM5eW60In5p3uPqjH5Q3QI0Z03RChA2a0xkyRKO3M6Rfrm4h18yUER
+LgrJaqsQucbxatqxuZj0wXJHMsYjtbGKTT9J+NHbMKqTbmYYH3Y+x108X34mZ22I
+zM8zAHrW0HSxm33A1fKlouAYA7bosq5hwhn8XPd14XHxRR3SquzAqQ3DUUtlMWKy
+97LQnVZMu1UjJrxYRuKWEwF+jdQ+faaBXRaUE1zrXyWMHV7/PBHb4gWpCbRd0++R
+mQBoQQvLecQ/n94ZAt0ZGAIPDONTDx9ZyknuooF7WvxHiUS2DeHcSjsL18bOfxgd
+w8nY2WP5CO5P0XcedqnxJIbhkXCSQiGFjWc1lpojbNxOhqiSfgUp2Yt7m7vEeNoo
+RnlXIeyPppK2PsCZf9GN
+=8vxd
 -----END PGP SIGNATURE-----

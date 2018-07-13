@@ -289,7 +289,7 @@ sub _get_on_progress_cb (%args) {
 
             $args{total} = $content_length;
 
-            $indicator = Pcore::Util::Term::Progress->get_indicator(%args);
+            $indicator = Pcore::Util::Term::Progress::get_indicator(%args);
         }
         else {
             $indicator->update( value => $bytes_received );

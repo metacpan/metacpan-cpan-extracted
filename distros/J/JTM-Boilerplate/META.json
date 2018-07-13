@@ -4,7 +4,7 @@
       "Joelle Maslak <jmaslak@antelope.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -21,9 +21,13 @@
       },
       "develop" : {
          "requires" : {
-            "Test::Kwalitee" : "1.21",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
-            "Test::Pod" : "1.41"
+            "Test::Pod" : "1.41",
+            "Test::TrailingSpace" : "0.0203",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -85,7 +89,6 @@
             "Net::LDAP" : "0.65",
             "Net::XMPP" : "1.05",
             "NetAddr::IP" : "4.078",
-            "PAR::Packer" : "1.030",
             "POSIX" : "1.53",
             "Parallel::WorkUnit" : "1.009",
             "Perl6::Slurp" : "0.051005",
@@ -104,6 +107,7 @@
             "Test::Fork" : "0.002",
             "Test::More" : "1.001014",
             "Test::Strict" : "0.36",
+            "Test::TrailingSpace" : "0.0203",
             "Time::HiRes" : "1.9739",
             "Try::Tiny" : "0.24",
             "UNIVERSAL" : "1.12",
@@ -119,24 +123,40 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "Test::More" : "1.001014"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "1.001014",
+            "Test::UseAllModules" : "0"
          }
       }
    },
    "provides" : {
       "JCM::Boilerplate" : {
          "file" : "lib/JCM/Boilerplate.pm",
-         "version" : "1.021"
+         "version" : "2.181940"
       },
       "JTM::Boilerplate" : {
          "file" : "lib/JTM/Boilerplate.pm",
-         "version" : "1.021"
+         "version" : "2.181940"
       }
    },
    "release_status" : "stable",
-   "version" : "1.021",
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jmaslak/JTM-Boilerplate.git",
+         "web" : "https://github.com/jmaslak/JTM-Boilerplate"
+      }
+   },
+   "version" : "2.181940",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
+   "x_generated_by_perl" : "v5.24.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0226"
 }
 

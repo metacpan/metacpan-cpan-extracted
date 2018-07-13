@@ -22,6 +22,8 @@ class V8Context {
         V8Context(HV* opt);
         ~V8Context();
 
+        void reset();
+
         SV* get(const char* name);
         SV* exists(const char* name);
         SV* typeof(const char* name);
@@ -32,6 +34,8 @@ class V8Context {
 
         SV* dispatch_function_in_event_loop(const char* func);
 
+        SV* global_objects();
+
         int run_gc();
 
         HV* get_stats();
@@ -41,8 +45,8 @@ class V8Context {
         void reset_msgs();
 
         Isolate* isolate;
-        Persistent<Context> persistent_context;
-        Persistent<ObjectTemplate> persistent_template;
+        Persistent<Context>* persistent_context;
+        Persistent<ObjectTemplate>* persistent_template;
 
         uint64_t flags;
         HV* stats;
@@ -54,15 +58,15 @@ class V8Context {
         static uint64_t GetTypeFlags(const Local<Value>& v);
     private:
         int inited;
-        void register_functions();
+        Isolate::CreateParams create_params;
 
-        static void initialize_v8(V8Context* self);
-        static void terminate_v8(V8Context* self);
+        static void initialize_v8();
+        static void terminate_v8();
         static int instance_count;
         static std::unique_ptr<Platform> platform;
 
-        char* program;
-        Isolate::CreateParams create_params;
+        void set_up();
+        void tear_down();
 };
 
 #endif

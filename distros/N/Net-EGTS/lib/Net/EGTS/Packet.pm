@@ -14,6 +14,12 @@ use Net::EGTS::Codes;
 
 require Net::EGTS::Record;
 
+=head1 NAME
+
+Net::EGTS::Packet - Packet common part
+
+=cut
+
 # Global packet identifier
 our $PID    = 0;
 

@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base -base;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -35,17 +35,22 @@ use JSON::RPC2::TwoWay 0.03; # for access to the request
 use JSON::MaybeXS;
 use MojoX::NetstringStream 0.06;
 
+
 has [qw(
-	actions address auth channels clientid conn daemon debug json lastping
+	actions address auth channels clientid conn daemon pidfile debug json lastping
 	log method ns ping_timeout port rpc timeout tls token who
 )];
 
 # keep in sync with the rpc-switch
 use constant {
-	RES_OK => 'RES_OK',
-	RES_WAIT => 'RES_WAIT',
-	RES_ERROR => 'RES_ERROR',
-	RES_OTHER => 'RES_OTHER', # 'dunno'
+	RES_OK                 => 'RES_OK',
+	RES_WAIT               => 'RES_WAIT',
+	RES_ERROR              => 'RES_ERROR',
+	RES_OTHER              => 'RES_OTHER', # 'dunno'
+	WORK_OK                => 0,           # exit codes for work method
+	WORK_PING_TIMEOUT      => 92,
+	WORK_CONNECTION_CLOSED => 91,
+
 };
 
 sub new {
@@ -113,7 +118,7 @@ sub new {
 		$ns->on(close => sub {
 			$conn->close;
 			$log->info('connection to rpcswitch closed');
-			$self->{_exit} = 91; # todo: doc
+			$self->{_exit} = WORK_CONNECTION_CLOSED; # todo: doc
 			Mojo::IOLoop->stop;
 		});
 	});
@@ -123,6 +128,7 @@ sub new {
 	$self->{channels} = {}; # per channel hash of waitids
 	$self->{clientid} = $clientid;
 	$self->{daemon} = $args{daemon} // 0;
+	$self->{pidfile} = $args{pidfile};
 	$self->{debug} = $args{debug} // 1;
 	$self->{json} = $json;
 	$self->{ping_timeout} = $args{ping_timeout} // 300;
@@ -396,22 +402,26 @@ sub ping {
 sub work {
 	my ($self) = @_;
 	if ($self->daemon) {
-		_daemonize();
+		_daemonize($self->pidfile);
+	} else {
+		_create_pidfile($self->pidfile);
 	}
 
 	my $pt = $self->ping_timeout;
-	my $tmr = Mojo::IOLoop->recurring($pt => sub {
+	my $tmr;
+	$tmr = Mojo::IOLoop->recurring($pt => sub {
 		my $ioloop = shift;
 		$self->log->debug('in ping_timeout timer: lastping: '
 			 . ($self->lastping // 0) . ' limit: ' . (time - $pt) );
 		return if ($self->lastping // 0) > time - $pt;
 		$self->log->error('ping timeout');
 		$ioloop->remove($self->clientid);
-		$self->{_exit} = 92; # todo: doc
+		$self->{_exit} = WORK_PING_TIMEOUT; # todo: doc
 		$ioloop->stop;
+		$ioloop->remove($tmr);
 	}) if $pt > 0;
 
-	$self->{_exit} = 0;
+	$self->{_exit} = WORK_OK;
 	$self->log->debug(blessed($self) . ' starting work');
 	Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 	$self->log->debug(blessed($self) . ' done?');
@@ -639,19 +649,62 @@ sub close {
 	%$self = ();
 }
 
-# copied from Mojo::Server
+# originally copied from Mojo::Server
 sub _daemonize {
+	my $pidfile = shift;
+
 	use POSIX;
+
+	# handles for IPC and checking success of child
+	pipe my ( $in, $out );
 
 	# Fork and kill parent
 	die "Can't fork: $!" unless defined(my $pid = fork);
-	exit 0 if $pid;
+
+	if ($pid) {
+
+		# read if child was successful before exiting
+
+		CORE::close $out;
+
+		my $success = readline $in;
+
+		CORE::close $in;
+
+		exit ($success ? 0 : 1);
+
+	} else {
+
+		# close the handle that the parent will read on
+		CORE::close $in;
+
+	}
+
+	_create_pidfile($pidfile);
+
 	POSIX::setsid or die "Can't start a new session: $!";
 
 	# Close filehandles
 	open STDIN,  '</dev/null';
 	open STDOUT, '>/dev/null';
 	open STDERR, '>&STDOUT';
+
+	say $out 1; # notify success 
+
+	CORE::close $out;
+}
+
+sub _create_pidfile {
+	my $pidfile = shift;
+
+	if ($pidfile) {
+		open my $pid_fh, '>', $pidfile 
+			or die "Unable to open pid file for writing '$pidfile': $!";
+
+		say $pid_fh $$;
+
+		CORE::close $pid_fh;
+	}
 }
 
 #sub DESTROY {

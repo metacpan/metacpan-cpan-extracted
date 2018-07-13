@@ -56,6 +56,7 @@ is( $hash->{A}->increment, $increment, "increment correct" );
 
 # MongoDB::Timestamp (deprecated) -> BSON::Timestamp
 SKIP: {
+    $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1;
     eval { require MongoDB::Timestamp };
     skip( "MongoDB::Timestamp not installed", 2 )
       unless $INC{'MongoDB/Timestamp.pm'};

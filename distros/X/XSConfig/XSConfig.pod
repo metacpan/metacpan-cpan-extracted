@@ -4,7 +4,7 @@ XSConfig - Fast XS drop-in replacement for Config.pm with perfect hashing.
 
 =head1 VERSION
 
-Version 6.26
+Version 6.27
 
 =head1 SYNOPSIS
 

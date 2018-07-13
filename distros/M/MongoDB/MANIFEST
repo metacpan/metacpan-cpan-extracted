@@ -725,9 +725,11 @@ t/unit/read_preference.t
 t/unit/uri.t
 t/unit/write_concern.t
 t/using_profiler.t
+xt/author/00-compile.t
 xt/author/circular-refs.t
 xt/author/critic.t
 xt/author/minimum-version.t
+xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/author/test-version.t
 xt/release/check-jira-in-changes.t

@@ -1,0 +1,31 @@
+Revision history for App-randskip
+
+0.00_03    2018-07-11
+        First version, released on an unsuspecting world.
+
+
+
+changeset:   936:5dde68d05dfb
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Thu Jan 12 11:44:06 2017 +0900
+summary:     randskip 分数への対応を 0-9以外の ピリオドや マイナス、e にも対応できるように任意の文字が使えるようにした
+
+changeset:   935:a0b4e12b3039
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Thu Jan 12 11:36:20 2017 +0900
+summary:     randskip へ randompick から改名。キーボードから入力しやすいコマンド名とした。したがって、 rand を再使用。
+
+changeset:   934:0642b23f9239
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Thu Jan 12 11:34:42 2017 +0900
+summary:     randompick 抽出確率を分数で指定可能とした。
+
+changeset:   913:9b7842784976
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Sat Dec 24 14:09:22 2016 +0900
+summary:     randompick -! と -: のオプションを追加
+
+changeset:   911:4b7a5fc1502c
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Fri Dec 23 15:05:48 2016 +0900
+summary:     randompick を作成。復元抽出はうまく行かず。2個のサンプリングの仕方を実装

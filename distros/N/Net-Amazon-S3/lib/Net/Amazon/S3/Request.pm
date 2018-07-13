@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request;
-$Net::Amazon::S3::Request::VERSION = '0.82';
+$Net::Amazon::S3::Request::VERSION = '0.83';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Moose::Util::TypeConstraints;
@@ -91,9 +91,15 @@ sub _uri {
     my ( $self, $key ) = @_;
     my $bucket = $self->bucket->bucket;
 
-    return (defined($key))
+    my $uri = (defined($key))
         ? $bucket . "/" . (join '/', map {$self->s3->_urlencode($_)} split /\//, $key)
         : $bucket . "/";
+
+    # Although Amazon's Signature 4 test suite explicitely handles // it appears
+    # it's inconsistent with their implementation so removing it here
+    $uri =~ s{//+}{/}g;
+
+    return $uri;
 }
 
 sub _build_signed_request {
@@ -126,7 +132,7 @@ Net::Amazon::S3::Request - Base class for request objects
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

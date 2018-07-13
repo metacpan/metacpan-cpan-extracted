@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client;
-$Net::Amazon::S3::Client::VERSION = '0.82';
+$Net::Amazon::S3::Client::VERSION = '0.83';
 use Moose 0.85;
 use HTTP::Status qw(is_error status_message);
 use MooseX::StrictConstructor 0.16;
@@ -8,8 +8,6 @@ use Moose::Util::TypeConstraints;
 # ABSTRACT: An easy-to-use Amazon S3 client
 
 type 'Etag' => where { $_ =~ /^[a-z0-9]{32}(?:-\d+)?$/ };
-
-type 'OwnerId' => where { $_ =~ /^[a-z0-9]{64}$/ };
 
 has 's3' => ( is => 'ro', isa => 'Net::Amazon::S3', required => 1 );
 
@@ -140,7 +138,7 @@ Net::Amazon::S3::Client - An easy-to-use Amazon S3 client
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

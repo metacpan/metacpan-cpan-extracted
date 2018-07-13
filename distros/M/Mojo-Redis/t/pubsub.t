@@ -49,8 +49,27 @@ my $conn = $pubsub->connection;
 is @{$conn->subscribers('response')}, 1, 'only one message subscriber';
 
 undef $pubsub;
-undef $redis->{pubsub};
+delete $redis->{pubsub};
 isnt $redis->db->connection, $conn, 'pubsub connection cannot be re-used';
+
+$redis  = Mojo::Redis->new('redis://localhost/5');
+$pubsub = $redis->pubsub;
+is $pubsub->_keyspace_key, '__keyevent@5__:* *', 'keyevent default wildcard';
+is $pubsub->_keyspace_key({type => 'key*'}), '__key*@5__:* *', 'keyboth wildcard listen';
+is $pubsub->_keyspace_key(foo => undef), '__keyspace@5__:foo *', 'keyspace foo';
+is $pubsub->_keyspace_key(undef, 'del'), '__keyevent@5__:del *', 'keyevent del';
+is $pubsub->_keyspace_key('foo', 'rename', {db => 1, key => 'x', op => 'y'}), '__keyspace@1__:foo rename',
+  'keyspace foo rename and db';
+is $pubsub->_keyspace_key({db => 0, key => 'foo', type => 'key*'}), '__key*@0__:foo *', 'key* db and type';
+
+my $cb = $pubsub->keyspace_listen(undef, 'del', {db => 1}, sub { });
+is ref($cb), 'CODE', 'keyspace_listen returns callback';
+is_deeply $pubsub->{chans}{'__keyevent@1__:del *'}, [$cb], 'callback is set up';
+is $pubsub->keyspace_unlisten(undef, 'del', {db => 1}, $cb), $pubsub, 'keyspace_unlisten with callback';
+ok !$pubsub->{chans}{'__keyevent@1__:del *'}, 'callback is removed';
+$pubsub->{chans}{'__keyevent@1__:del *'} = [$cb];
+is $pubsub->keyspace_unlisten(undef, 'del', {db => 1}), $pubsub, 'keyspace_unlisten without callback';
+ok !$pubsub->{chans}{'__keyevent@1__:del *'}, 'callback is removed';
 
 done_testing;
 

@@ -1,4 +1,5 @@
 package Config::HAProxy;
+use 5.010;
 use strict;
 use warnings;
 use Text::Locus;
@@ -13,7 +14,7 @@ use File::Temp qw(tempfile);
 use File::stat;
 use Carp;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 my %sections = (
     global => 1,
@@ -370,7 +371,8 @@ Saves the parse tree in the configuration file.
 
     $cfg->write($file, %hash);
 
-Writes configuration to the named file or file handle. If B<$file> is the
+Writes configuration to the named file or file handle. First argument
+can be a file name, file handle or a string reference. If it is the
 only argument, the original indentation is preserved. Otherwise, if
 B<%hash> controls the indentation of the output. It must contain at least
 the B<indent> key, which specifies the amount of indentation per nesting

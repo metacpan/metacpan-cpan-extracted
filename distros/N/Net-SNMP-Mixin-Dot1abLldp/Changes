@@ -1,4 +1,8 @@
 Revision history for Net-SNMP-Mixin-Dot1abLldp
+
+0.16	Tue, 10 Jul 2018 21:02:06 +0200
+	aad method map_loc_portid2portnum()
+
 0.15	Tue, 17 Apr 2018 11:15:05 +0200
 	check if lldpLocChassisId is defined in get_lldp_local_system_data
 

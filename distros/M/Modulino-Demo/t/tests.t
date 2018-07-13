@@ -7,12 +7,9 @@ my @classes = qw(
 	Modulino::Test
 	Modulino::TestWithBase
 	);
-	
+
 foreach my $class ( @classes ) {
-	subtest $class => sub {
-		ok( eval "require $class", "Loading $class" ) 
-			or warn "$class $@";
-		};
+	use_ok( $class ) or BAILOUT( "$class did not compile" );
 	}
 
 done_testing();

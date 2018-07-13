@@ -1,8 +1,15 @@
+Version 0.0306:
+- Set minimum perl version to fix CPAN testers failure
+
+Version 0.0305:
+- Use include_deps to help Module::Install find dependencies like URI::Escape
+  and include them in the distros.
+- Remove unnecessary files in inc/ in an attempt to fix CPAN testers errors.
+
 Version 0.0304:
 - Updating META.yml
 - Remove ShipIt dependencies. They don't seem to be necessary, and aren't
   installing properly on my system.
-- Add missing test dependency
 
 Version 0.0303:
 - Trying once again to fix the compile test on windows

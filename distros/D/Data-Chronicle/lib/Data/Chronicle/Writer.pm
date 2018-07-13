@@ -4,6 +4,9 @@ use 5.014;
 use strict;
 use warnings;
 use Data::Chronicle;
+use Date::Utility;
+use JSON::MaybeUTF8 qw(encode_json_utf8);
+use Moose;
 
 =head1 NAME
 
@@ -11,7 +14,7 @@ Data::Chronicle::Writer - Provides writing to an efficient data storage for vola
 
 =cut
 
-our $VERSION = '0.16';    ## VERSION
+our $VERSION = '0.17';    ## VERSION
 
 =head1 DESCRIPTION
 
@@ -45,12 +48,12 @@ to save data and another method to retrieve it. All the underlying complexities 
 
  my $chronicle_w = Data::Chronicle::Writer->new(
     cache_writer => $writer,
-    db_handle    => $dbh,
+    dbic         => $dbic,
     ttl          => 86400);
 
  my $chronicle_r = Data::Chronicle::Reader->new(
     cache_reader => $reader,
-    db_handle    => $dbh);
+    dbic         => $dbic);
 
 
  #store data into Chronicle - each time we call `set` it will also store
@@ -65,11 +68,13 @@ to save data and another method to retrieve it. All the underlying complexities 
 
 =cut
 
-use JSON;
-use Date::Utility;
-use Moose;
+has 'cache_writer' => (
+    is      => 'ro',
+    default => undef,
+);
 
-has [qw(cache_writer db_handle)] => (
+has 'dbic' => (
+    isa     => 'Maybe[DBIx::Connector]',
     is      => 'ro',
     default => undef,
 );
@@ -122,35 +127,117 @@ publish "category1::name1" in Redis if C<publish_on_set> is true.
 =cut
 
 sub set {
-    my $self     = shift;
-    my $category = shift;
-    my $name     = shift;
-    my $value    = shift;
-    my $rec_date = shift;
-    my $archive  = shift // 1;
-    my $ttl      = shift // $self->ttl;
+    my $self         = shift;
+    my $category     = shift;
+    my $name         = shift;
+    my $value        = shift;
+    my $rec_date     = shift;
+    my $archive      = shift // 1;
+    my $suppress_pub = shift // 0;
+    my $ttl          = shift // $self->ttl;
 
-    die "Recorded date is undefined" unless $rec_date;
-    die "Recorded date is not a Date::Utility object" if ref $rec_date ne 'Date::Utility';
-    die "Cannot store undefined values in Chronicle!" unless defined $value;
-    die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
+    $self->mset([[$category, $name, $value]], $rec_date, $archive, $suppress_pub, $ttl);
 
-    $value = JSON::to_json($value);
+    return 1;
+}
 
-    my $key    = $category . '::' . $name;
+=head2 mset
+
+Example:
+
+    $chronicle_writer->mset([["category1", "name1", $value1], ["category2, "name2", $value2], ...]);
+
+Store a piece of data "value1" under key "category1::name1", "category2::name2", etc in Pg and Redis. Will
+publish "category1::name1", "category2::name2", etc in Redis if C<publish_on_set> is true.
+
+=cut
+
+sub mset {
+    my $self         = shift;
+    my $entries      = shift;
+    my $rec_date     = shift;
+    my $archive      = shift // 1;
+    my $suppress_pub = shift // 0;
+    my $ttl          = shift // $self->ttl;
+
+    $self->_validate_value($_->[2]) foreach @$entries;
+    $self->_validate_rec_date($rec_date);
+
     my $writer = $self->cache_writer;
 
     # publish & set in transaction
     $writer->multi;
-    $writer->publish($key, $value) if $self->publish_on_set;
-    $writer->set(
-        $key => $value,
-        $ttl ? ('EX' => $ttl) : ());
+    foreach my $entry (@$entries) {
+        my $category = $entry->[0];
+        my $name     = $entry->[1];
+        my $value    = $entry->[2];
+
+        my $key = $self->_generate_key($category, $name);
+
+        my $encoded = encode_json_utf8($value);
+        $writer->publish($key, $encoded) if $self->publish_on_set && !$suppress_pub;
+        $writer->set(
+            $key => $encoded,
+            $ttl ? ('EX' => $ttl) : ());
+
+        $self->_archive($category, $name, $encoded, $rec_date) if $archive and $self->dbic;
+    }
     $writer->exec;
 
-    $self->_archive($category, $name, $value, $rec_date) if $archive and $self->db_handle;
-
     return 1;
+}
+
+=head2 subscribe
+
+Example:
+
+    $chronicle_writer->subscribe("category1", "name1", $code_ref);
+
+=cut
+
+sub subscribe {
+    my ($self, $category, $name, $subref) = @_;
+    die 'publish_on_set must be enabled to subscribe' unless $self->publish_on_set;
+    die 'Subscription requires a coderef' if ref $subref ne 'CODE';
+
+    my $key = $self->_generate_key($category, $name);
+    return $self->cache_writer->subscribe($key, $subref);
+}
+
+=head2 unsubscribe
+
+Example:
+
+    $chronicle_writer->unsubscribe("category1", "name1", $code_ref);
+
+=cut
+
+sub unsubscribe {
+    my ($self, $category, $name, $subref) = @_;
+    die 'publish_on_set must be enabled to unsubscribe' unless $self->publish_on_set;
+    die 'Unsubscription requires a coderef' if ref $subref ne 'CODE';
+
+    my $key = $self->_generate_key($category, $name);
+    return $self->cache_writer->unsubscribe($key, $subref);
+}
+
+sub _generate_key {
+    my ($self, $category, $name) = @_;
+    return $category . '::' . $name;
+}
+
+sub _validate_value {
+    my ($self, $value) = @_;
+    die "Cannot store undefined values in Chronicle!" unless defined $value;
+    die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
+    return;
+}
+
+sub _validate_rec_date {
+    my ($self, $rec_date) = @_;
+    die "Recorded date is undefined" unless $rec_date;
+    die "Recorded date is not a Date::Utility object" if ref $rec_date ne 'Date::Utility';
+    return;
 }
 
 sub _archive {
@@ -162,7 +249,9 @@ sub _archive {
 
     my $db_timestamp = $rec_date->db_timestamp;
 
-    return $self->db_handle->prepare(<<'SQL')->execute($category, $name, $value, $db_timestamp);
+    return $self->dbic->run(
+        fixup => sub {
+            $_->prepare(<<'SQL')->execute($category, $name, $value, $db_timestamp) });
 WITH ups AS (
     UPDATE chronicle
        SET value=$3

@@ -1,6 +1,7 @@
 .gitignore
 Changes
 JavaScript-V8-XS-Context.xsp
+bin/release.sh
 LICENSE
 MANIFEST
 MANIFEST.SKIP

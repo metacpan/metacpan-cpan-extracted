@@ -20,7 +20,7 @@
 
 use 5.014_001;
 
-package Term::CLI  0.051002 {
+package Term::CLI  0.051003 {
 
 use Modern::Perl 1.20140107;
 use Text::ParseWords 3.29 qw( parse_line );
@@ -469,7 +469,7 @@ Term::CLI - CLI interpreter based on Term::ReadLine
 
 =head1 VERSION
 
-version 0.051002
+version 0.051003
 
 =head1 SYNOPSIS
 
@@ -485,7 +485,7 @@ version 0.051002
         my ($self, %args) = @_;
         print Data::Dumper->Dump([\%args], ['args']);
         return %args;
-    }
+    },
     commands => [
         Term::CLI::Command->new(
             name => 'copy',
@@ -521,10 +521,10 @@ version 0.051002
 Implement an easy-to-use command line interpreter based on
 L<Term::ReadLine>(3p) and L<Term::ReadLine::Gnu>(3p).
 
-First-time users may want to read L<Term::CLI::Tutorial>
-and L<Term::CLI::Intro> first, and peruse the example scripts
-in the source distribution's F<examples> and F<tutorial>
-directories.
+First-time users may want to read L<Term::CLI::Tutorial>(3p)
+and L<Term::CLI::Intro>(3p) first, and peruse the example
+scripts in the source distribution's F<examples> and
+F<tutorial> directories.
 
 =head1 CLASS STRUCTURE
 
@@ -543,7 +543,7 @@ L<Term::CLI::Role::CommandSet>(3p).
 =item B<new> ( B<attr> => I<VAL> ... )
 X<new>
 
-Create a new Term::CLI object and return a reference to it.
+Create a new C<Term::CLI> object and return a reference to it.
 
 Valid attributes:
 

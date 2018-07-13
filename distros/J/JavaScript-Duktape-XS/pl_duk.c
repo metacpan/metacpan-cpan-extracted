@@ -529,6 +529,29 @@ int pl_run_gc(Duk* duk)
     return PL_GC_RUNS;
 }
 
+SV* pl_global_objects(Duk* duk)
+{
+    duk_context* ctx = duk->ctx;
+    int count = 0;
+    AV* values = newAV();
+
+    duk_push_global_object(ctx);
+    duk_enum(ctx, -1, 0);
+    while (duk_next(ctx, -1, 0)) { /* get keys only */
+        duk_size_t klen = 0;
+        const char* kstr = duk_get_lstring(ctx, -1, &klen);
+        SV* name = sv_2mortal(newSVpvn(kstr, klen));
+        SvUTF8_on(name); /* yes, always */
+        if (av_store(values, count, name)) {
+            SvREFCNT_inc(name);
+            ++count;
+        }
+        duk_pop(ctx); /* key */
+    }
+    duk_pop_2(ctx);  /* iterator and global object */
+    return newRV((SV*) values);
+}
+
 static duk_ret_t perl_caller(duk_context* ctx)
 {
     SV* func = 0;

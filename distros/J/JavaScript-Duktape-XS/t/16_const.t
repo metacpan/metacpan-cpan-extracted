@@ -7,7 +7,7 @@ use Test::More;
 
 my $CLASS = 'JavaScript::Duktape::XS';
 
-sub test_const {
+sub test_declarations {
     my %types = (
         const => 1,
         let   => 0,
@@ -37,7 +37,7 @@ sub test_const {
 sub main {
     use_ok($CLASS);
 
-    test_const();
+    test_declarations();
     done_testing;
     return 0;
 }

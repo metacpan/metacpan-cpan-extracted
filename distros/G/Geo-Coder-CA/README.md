@@ -5,13 +5,13 @@
 [![CPAN](https://img.shields.io/cpan/v/Geo-Coder-CA.svg)](http://search.cpan.org/~nhorne/Geo-Coder-CA/)
 [![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/8113837670534727/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/8113837670534727/heads/master/)
 
-# Geo::Coder::CA
+# NAME
 
-Provides a Geo-Coding functionality using http:://geocoder.ca for both Canada and the US.
+Geo::Coder::CA - Provides a Geo-Coding functionality using http:://geocoder.ca for both Canada and the US.
 
 # VERSION
 
-Version 0.09
+Version 0.11
 
 # SYNOPSIS
 
@@ -71,7 +71,7 @@ You can also run this module from the command line:
 
 Nigel Horne <njh@bandsman.co.uk>
 
-Based on [Geo::Coder::Coder::Googleplaces](https://metacpan.org/pod/Geo::Coder::Coder::Googleplaces).
+Based on [Geo::Coder::Googleplaces](https://metacpan.org/pod/Geo::Coder::Googleplaces).
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

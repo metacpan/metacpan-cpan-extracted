@@ -11,8 +11,9 @@ README.md
 bin/update_sanctions_csv
 cpanfile
 dist.ini
-lib/Data/Validate/Sanctions.csv
 lib/Data/Validate/Sanctions.pm
+lib/Data/Validate/Sanctions/Fetcher.pm
+share/sanctions.yml
 t/00-check-deps.t
 t/00-compile.t
 t/00-report-prereqs.dd

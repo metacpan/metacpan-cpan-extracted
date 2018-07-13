@@ -8,7 +8,7 @@ Data::Chronicle - Chronicle storage system
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 DESCRIPTION
 
@@ -32,9 +32,9 @@ In addition to caching every incoming data, it is also stored in PostgreSQL for 
 This modules hides all the details about caching, database structure and ... from developer. He only needs to call a method
 to save data and another method to retrieve it. All the underlying complexities are handled by the module.
 
-Note that you will need to pass `cache_writer`, `cache_reader` and `db_handle` to the `Data::Chronicle::Reader/Writer` modules. These three arguments, provide access to your Redis and PostgreSQL which will be used by Chronicle modules.
+Note that you will need to pass `cache_writer`, `cache_reader` and `dbic` to the `Data::Chronicle::Reader/Writer` modules. These three arguments, provide access to your Redis and PostgreSQL which will be used by Chronicle modules.
 
-`cache_writer` and `cache_reader` should be to be able to get/set given data under given key (both of type string). `db_handle` should be capable to store and retrieve data with `category`,`name` in addition to the timestamp of data insertion. So it should be able to retrieve data for a specific timestamp, category and name. Category, name and data are all string. This can easily be achieved by defining a table in you database containing these columns: `timestamp, category, name, value`.
+`cache_writer` and `cache_reader` should be to be able to get/set given data under given key (both of type string). `dbic` should be capable to store and retrieve data with `category`,`name` in addition to the timestamp of data insertion. So it should be able to retrieve data for a specific timestamp, category and name. Category, name and data are all string. This can easily be achieved by defining a table in you database containing these columns: `timestamp, category, name, value`.
 
 =head1 METHODS
 
@@ -74,11 +74,11 @@ Given a category, name, start_timestamp and end_timestamp returns an array-ref c
 
     my $chronicle_w = Data::Chronicle::Writer->new(
         cache_writer => $writer,
-        db_handle    => $dbh);
+        dbic         => $dbic);
 
     my $chronicle_r = Data::Chronicle::Reader->new(
         cache_reader => $reader,
-        db_handle    => $dbh);
+        dbic         => $dbic);
 
 
     #store data into Chronicle - each time we call `set` it will also store

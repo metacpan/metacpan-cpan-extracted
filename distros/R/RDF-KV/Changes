@@ -1,5 +1,8 @@
 Revision history for RDF-KV
 
+0.06    2018-07-10
+        Added direct access to add/remove triples in RDF::KV::Patch::apply
+
 0.05    2016-05-26
         Fixed failure due to changes in Moose.
 

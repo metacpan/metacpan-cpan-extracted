@@ -1,5 +1,16 @@
 Revision history for Perl module Test::Against::Dev
 
+0.09 Thu Jul 12 22:02:13 EDT 2018
+    - Introduce Test::Against::Commit.  Whereas Test::Against::Dev assesses
+      the impact of monthly development releases -- and now also RC releases
+      -- on selected sets of modules (e.g., the top of the CPAN river),
+      Test::Against::Commit assess the impact of individual commits to the
+      repository.  It should be particularly useful in measuring changes in
+      impact between two specific commits.
+
+    - Introduce Test::Against::Dev::Sort.  Provides methods for validating and
+      sorting lists of perl version strings.
+
 0.08 Tue Apr  3 11:55:09 EDT 2018
     - Correct some errors in test files.  No functional changes.
 

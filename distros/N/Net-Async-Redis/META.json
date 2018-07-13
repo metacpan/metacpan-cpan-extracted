@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,6 +42,7 @@
             "IO::Async" : "0",
             "List::Util" : "1.29",
             "Log::Any" : "1.050",
+            "Math::Random::Secure" : "0",
             "Ryu::Async" : "0.006",
             "Syntax::Keyword::Try" : "0.08",
             "URI" : "0",
@@ -63,7 +64,8 @@
             "Test::CheckDeps" : "0.010",
             "Test::Deep" : "0",
             "Test::HexString" : "0",
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Variable::Disposition" : "0.004"
          }
       }
    },
@@ -79,7 +81,8 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis"
       }
    },
-   "version" : "1.005",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "1.006",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.03"
 }
 

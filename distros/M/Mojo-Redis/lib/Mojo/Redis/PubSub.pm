@@ -9,6 +9,16 @@ sub channels_p {
   shift->_db_connection->write_p(qw(PUBSUB CHANNELS), @_)->then(sub { +[@_] });
 }
 
+sub keyspace_listen {
+  my ($self, $cb) = (shift, pop);
+  return $self->listen($self->_keyspace_key(@_), $cb);
+}
+
+sub keyspace_unlisten {
+  my ($self, $cb) = (shift, ref $_[-1] eq 'CODE' ? pop : undef);
+  return $self->unlisten($self->_keyspace_key(@_), $cb);
+}
+
 sub listen {
   my ($self, $name, $cb) = @_;
   my $op = $name =~ /\*/ ? 'PSUBSCRIBE' : 'SUBSCRIBE';
@@ -34,13 +44,27 @@ sub numpat_p {
 
 sub unlisten {
   my ($self, $name, $cb) = @_;
-  my $chan = $self->{chans}{$name};
-  my $op = $name =~ /\*/ ? 'PUNSUBSCRIBE' : 'UNSUBSCRIBE';
+  my $chans = $self->{chans}{$name};
 
-  @$chan = $cb ? grep { $cb ne $_ } @$chan : ();
-  $self->connection->write_p($op => $name) and delete $self->{chans}{$name} unless @$chan;
+  @$chans = $cb ? grep { $cb ne $_ } @$chans : ();
+  unless (@$chans) {
+    $self->connection->write_p(($name =~ /\*/ ? 'PUNSUBSCRIBE' : 'UNSUBSCRIBE'), $name);
+    delete $self->{chans}{$name};
+  }
 
   return $self;
+}
+
+sub _keyspace_key {
+  my $args = ref $_[-1] eq 'HASH' ? pop : {};
+  my $self = shift;
+
+  local $args->{key}  = $_[0] // $args->{key} // '*';
+  local $args->{op}   = $_[1] // $args->{op} // '*';
+  local $args->{type} = $args->{type} || ($args->{key} eq '*' ? 'keyevent' : 'keyspace');
+
+  return sprintf '__%s@%s__:%s %s', $args->{type}, $args->{db} // $self->redis->url->path->[0] // '',
+    $args->{type} eq 'keyevent' ? (@$args{qw(op key)}) : (@$args{qw(key op)});
 }
 
 sub _setup {
@@ -77,6 +101,9 @@ Mojo::Redis::PubSub - Publish and subscribe to Redis messages
   });
 
   $pubsub->notify("user:batboy:messages", "How are you doing?");
+
+See L<https://github.com/jhthorsen/mojo-redis/blob/master/examples/chat.pl>
+for example L<Mojolicious> application.
 
 =head1 DESCRIPTION
 
@@ -116,6 +143,53 @@ Holds a L<Mojo::Redis> object used to create the connections to talk with Redis.
 
 Lists the currently active channels. An active channel is a Pub/Sub channel
 with one or more subscribers (not including clients subscribed to patterns).
+
+=head2 keyspace_listen
+
+  $cb = $self->keyspace_listen($key, $op, sub { my ($self, $message) = @_ }) });
+  $cb = $self->keyspace_listen($key, $op, \%args, sub { my ($self, $message) = @_ }) });
+
+Used to listen for keyspace notifications. See L<https://redis.io/topics/notifications>
+for more details.
+
+C<$key> C<$op> and C<%args> are optional. C<$key> and C<$op> will default to
+"*" and C<%args> can have the following key values:
+
+The channel that will be subscribed to will look like one of these:
+
+  __keyspace@${db}__:$key $op
+  __keyevent@${db}__:$op $key
+
+=over 2
+
+=item * db
+
+Default database to listen for events is the database set in
+L<Mojo::Redis/url>. "*" is also a valid value, meaning listen for events
+happening in all databases.
+
+=item * key
+
+Alternative to passing in C<$key>. Default value is "*".
+
+=item * op
+
+Alternative to passing in C<$op>. Default value is "*".
+
+=item * type
+
+Will default to "keyevent" if C<$key> is "*", and "keyspace" if not. It can
+also be set to "key*" for listening to both "keyevent" and "keyspace" events.
+
+=back
+
+=head2 keyspace_unlisten
+
+  $self = $self->keyspace_unlisten(@args);
+  $self = $self->keyspace_unlisten(@args, $cb);
+
+Stop listening for keyspace events. See L</keyspace_listen> for details about
+keyspace events and what C<@args> can be.
 
 =head2 listen
 

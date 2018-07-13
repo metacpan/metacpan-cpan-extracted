@@ -1,6 +1,6 @@
 package Tcl;
 
-$Tcl::VERSION = '1.10';
+$Tcl::VERSION = '1.11';
 
 =head1 NAME
 
@@ -409,8 +409,17 @@ or "=gets sock9ac2b50"
 or "=fileevent sock9827430 writable"
 
 
-the TCLCODES created for that command will be kept at least untill a command with the same DESCRNAME is run again.
-Since many DESCRNAMES can reference the same TCLNAME only when the last TCLNAME is released is it purged.
+the TCLCODES created for that command will be kept at least untill a command with
+the same DESCRNAME and containing a subroutine reference is run again.
+Since many DESCRNAMES can reference the same TCLNAME only when
+the last DESCRNAME referencing a TCLNAME is released is the TCLNAME purged.
+
+NOTE:
+Since
+  $interp->call('fileevent','sock9827430','writable');
+does not contain a subroutine reference, it will not release/free the TCLNAME/DESCRNAME created by
+  $interp->call('fileevent','sock9827430','writable',sub{...});
+even though that is the way you deactivate a writable/readable callback in Tcl.
 
 =back
 
@@ -537,6 +546,10 @@ $TRACE_CREATECOMMAND = 0 unless defined $TRACE_CREATECOMMAND;
 our $SAVEALLCODES;         # simulate the v1.05 way of saving only last call
     $SAVEALLCODES  = 1 unless defined $SAVEALLCODES;
 
+our $SAVENOCODE ;          # simulate the v1.05 way of leaving any existing
+                           #  $anon_refs{$current_r} alone if new line has no coderefs
+    $SAVENOCODE    = 1 unless defined $SAVENOCODE;
+
 our $DL_PATH;
 unless (defined $DL_PATH) {
     $DL_PATH = $ENV{PERL_TCL_DL_PATH} || $ENV{PERL_TCL_DLL} || "";
@@ -605,12 +618,23 @@ sub _anon_refs_cheat { return \%anon_refs;}
 sub call {
     my $interp = shift;
     my @args = @_;
-    # add = so  as not to interfere with user define DESCRNAMEs
+    # add = so  as not to interfere with user defined DESCRNAMEs
     my $current_r = '='.join ' ', grep {defined} grep {!ref} @args;
     my @codes;
 
     my $lastcodes = $anon_refs{$current_r}; # could be an array, want to hold all for now so they can be reused
-    delete $anon_refs{$current_r};        # if old one had a call and new one doesnt make sure it goes away
+    unless  ($SAVENOCODE) {
+      unless  ($#args == 1 and $args[0] eq 'set') {
+          # this was to clean up things like
+          # Tkx::fileevent($remote, writable  => sub {...});
+          # when this was run later
+          # Tkx::fileevent($fh, writable  => '');
+          # but "set foo" doesnt clear its setting, it returns its value
+          # after busting the test in the Tkx tests for set foo
+          #  i decided to disable this for now
+          delete $anon_refs{$current_r};        # if old one had a call and new one doesnt make sure it goes away
+          }
+    }
     # Process arguments looking for special cases
     for (my $argcnt=0; $argcnt<=$#args; $argcnt++) {
 	my $arg = $args[$argcnt];
@@ -714,8 +738,14 @@ sub call {
 	    # i.e based on return value of tcl call
 	    my $newname='@'.$interp.';'.$id;
 	    $anon_refs{$newname} = \@codes;
-	    for my $code (@codes) { $anon_refs{$code->[2]}[1]{$newname}=1 ; } # save under new name
-	    delete $anon_refs{$anon_refs{  $current_r}[2]}[1]{$current_r};    # take this out
+	    for my $code (@codes) {
+              my $ridptr=$anon_refs{$code->[2]}[1];
+              $ridptr->{$newname}++ ;    # save under new name
+              $ridptr->{$current_r}-- ;  # maybe take out this name
+              unless ($ridptr->{$current_r}>0){
+                delete $ridptr->{$current_r}; # clean up old
+              }
+            }
 	    delete $anon_refs{$current_r};                                    # and now its clean
 	    for my $code (@codes) { $code->[3]=$newname;                    } # save under new name
 	    # this should trigger DESTROY unless a newer after or something else still holds a $tclname in the list
@@ -819,7 +849,7 @@ sub create_tcl_sub {
     bless( \@newtcl, 'Tcl::Code');
     $anon_refs{$rname} = \@newtcl;
     $anon_refs{$tclname}[0][3]++;      # push ref ct
-    $anon_refs{$tclname}[1]{$rname}=1; #register as user
+    $anon_refs{$tclname}[1]{$rname}++; #register as user
 
     my $gencode = $tclname;
 
@@ -934,7 +964,10 @@ sub DESTROY {
       delete $anon_refs{$tclname};               # kill the Cmdbase
     }
     else {
-      delete $anon_refs{$tclname}->[1]{$rname};  # unregister me
+      $anon_refs{$tclname}->[1]{$rname}--;
+      unless ( $anon_refs{$tclname}->[1]{$rname}>0) {
+          delete $anon_refs{$tclname}->[1]{$rname};  # unregister me
+      }
     }
 }
 
@@ -950,8 +983,10 @@ sub DESTROY {
     my $interp  = $_[0]->[0]->[1];
     my $tclname = $_[0]->[0]->[2];
     return unless ($tclname);
-    $interp->DeleteCommand($tclname) if defined $interp;
-    print "TCL::TRACE_DELETECOMMAND: $interp -> ( $tclname )\n" if ($Tcl::TRACE_DELETECOMMAND);
+    if (defined $interp) {
+      $interp->DeleteCommand($tclname);
+      print "TCL::TRACE_DELETECOMMAND: $interp -> ( $tclname )\n" if ($Tcl::TRACE_DELETECOMMAND);
+    }
 }
 
 package Tcl::List;

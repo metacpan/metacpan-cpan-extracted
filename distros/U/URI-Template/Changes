@@ -1,5 +1,10 @@
 Revision history for Perl extension URI::Template
 
+0.23 2018-07-10
+ - Fix Makefile.PL with no '.' in @INC (GH #5, RT #121036)
+ - Ensure we don't re-encode pre-encoded values for +var and #var 
+   (GH #7, GH #8)
+
 0.22 2015-04-04
  - Fix regression in variables() when called in list context (GH #4)
 

@@ -118,8 +118,9 @@ sub _menus {
         ],
 
         group_yt_dl_config_file => [
-            [ 'yt_dl_config_file',   "- yt-dl config file"        ],
-            [ 'yt_dl_ignore_config', "- Ignore yt-dl config file" ],
+            [ 'yt_dl_config_location',       "- set yt-dl config location"   ],
+            [ 'reset_yt_dl_config_location', "- reset yt-dl config location" ],
+            [ 'yt_dl_ignore_config',         "- Ignore yt-dl config file" ],
         ],
         group_avail_extractors => [
             [ '_avail_extractors',        "  List Extractors"        ],
@@ -374,7 +375,7 @@ sub set_options {
                 my $name = 'New: ';
                 _opt_number_range( $opt, $choice, $name, $info, $digits );
             }
-            elsif ( $choice eq "yt_dl_config_file" ) {
+            elsif ( $choice eq "yt_dl_config_location" ) {
                 my $info = "Youtube-dl Config File\nNow: ";
                 if ( defined $opt->{$choice} ) {
                     $info .= $opt->{$choice};
@@ -386,6 +387,18 @@ sub set_options {
                 }
                 my $name = 'New: ';
                 _opt_choose_a_file( $opt, $choice, $info, $name );
+            }
+            elsif ( $choice eq "reset_yt_dl_config_location" ) {
+                my $prompt = 'Reset the youtube-dl config location to default';
+                my $list = [
+                    'no',
+                    'yes'
+                ];
+                _opt_choose_from_list_idx( $opt, $choice, $prompt, $list );
+                if ( $opt->{reset_yt_dl_config_location} ) {
+                    $opt->{yt_dl_config_location} = undef;
+                    $opt->{reset_yt_dl_config_location} = 0;
+                }
             }
             elsif ( $choice eq "yt_dl_ignore_config" ) {
                 my $prompt = 'Ignore youtube-dl config file';

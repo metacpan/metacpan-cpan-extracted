@@ -6,7 +6,8 @@ do { my $x = {
                   },
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '6.48'
+                                        'ExtUtils::MakeMaker' => '6.48',
+                                        'File::ShareDir::Install' => '0.06'
                                       }
                       },
        'develop' => {
@@ -23,9 +24,20 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'DateTime::Format::Strptime' => '0',
+                                      'File::ShareDir' => '0',
                                       'File::Temp' => '0',
-                                      'LWP::UserAgent' => '0',
+                                      'File::stat' => '0',
+                                      'FindBin' => '0',
+                                      'IO::Uncompress::Unzip' => '0',
+                                      'List::Util' => '0',
+                                      'Mojo::UserAgent' => '0',
+                                      'Path::Tiny' => '0',
+                                      'Scalar::Util' => '0',
                                       'Text::CSV' => '0',
+                                      'Try::Tiny' => '0',
+                                      'XML::Fast' => '0',
+                                      'YAML::XS' => '0',
                                       'perl' => '5.014000'
                                     }
                     },

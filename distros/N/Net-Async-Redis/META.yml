@@ -11,11 +11,12 @@ build_requires:
   Test::Deep: '0'
   Test::HexString: '0'
   Test::More: '0.98'
+  Variable::Disposition: '0.004'
   perl: '5.014000'
 configure_requires:
   ExtUtils::MakeMaker: '6.48'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,6 +28,7 @@ requires:
   IO::Async: '0'
   List::Util: '1.29'
   Log::Any: '1.050'
+  Math::Random::Secure: '0'
   Ryu::Async: '0.006'
   Syntax::Keyword::Try: '0.08'
   URI: '0'
@@ -38,5 +40,6 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: http://search.cpan.org/perldoc?Net-Async-Redis
   repository: git://github.com/team-at-cpan/Net-Async-Redis.git
-version: '1.005'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.006'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

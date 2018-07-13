@@ -1,5 +1,9 @@
 Revision history for Perl extension Proc::PID::File.
 
+1.29 2016/07/10 Dmitri Tikhonov <dmitri@cpan.org>
+    - Support verify option in macOS (Darwin) by John Wittkoski.
+    - Fix hanging tests on Windows by Alexandr Ciornii.
+
 1.28 2016/07/28 Dmitri Tikhonov <dmitri@cpan.org>
     - Fix long-standing sysopen argument precedence bug, closing
       RT#62380 and RT#102536.

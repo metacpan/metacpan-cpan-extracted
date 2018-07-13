@@ -12,7 +12,7 @@ our $EXPORT = {
     V4     => [qw[uuid_v4 uuid_v4_bin uuid_v4_str uuid_v4_hex]],
 };
 
-sub looks_like_uuid ($str) : prototype($) {
+sub looks_like_uuid : prototype($) ($str) {
     return $str =~ /\A[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}\z/sm;
 }
 
@@ -69,15 +69,15 @@ sub v4_hex : prototype() {
 *uuid_from_str = \&from_str;
 *uuid_from_hex = \&from_hex;
 
-sub from_bin ($bin) : prototype($) {
+sub from_bin : prototype($) ($bin) {
     return bless { bin => $bin }, 'Pcore::Util::UUID::Obj';
 }
 
-sub from_str ($str) : prototype($) {
+sub from_str : prototype($) ($str) {
     return bless { str => $str }, 'Pcore::Util::UUID::Obj';
 }
 
-sub from_hex ($hex) : prototype($) {
+sub from_hex : prototype($) ($hex) {
     return bless { hex => $hex }, 'Pcore::Util::UUID::Obj';
 }
 

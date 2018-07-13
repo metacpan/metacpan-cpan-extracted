@@ -1,25 +1,32 @@
 ---
-abstract: 'A demonstration of various modulino ideas'
+abstract: 'A demonstration of module ideas'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  Test::More: '1'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.132830'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Modulino-Demo
 no_index:
   directory:
     - t
+    - inc
+    - t
 requires:
-  Test::More: 0
-  Test::Pod: 0
-  Test::Pod::Coverage: 0
+  Pod::Perldoc: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+  perl: '5.014'
 resources:
-  repository: https://github.com/briandfoy/modulino-demo
-version: 1.001
+  bugtracker: https://github.com/briandfoy/modulino-demo/issues
+  homepage: https://github.com/briandfoy/modulino-demo
+  repository: https://github.com/briandfoy/modulino-demo.git
+version: '1.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

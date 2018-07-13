@@ -2,7 +2,6 @@ package Mojolicious::Routes::Pattern;
 use Mojo::Base -base;
 
 use Carp 'croak';
-use Mojo::Util 'deprecated';
 
 has [qw(constraints defaults types)] => sub { {} };
 has [qw(placeholder_start type_start)] => ':';
@@ -163,11 +162,6 @@ sub _compile_req {
 
 sub _tokenize {
   my ($self, $pattern) = @_;
-
-  # DEPRECATED!
-  deprecated 'Placeholder quoting with "(placeholder)" is DEPRECATED'
-    . ' in favor of "<placeholder>"'
-    if $pattern =~ tr/()/<>/;
 
   my $quote_end   = $self->quote_end;
   my $quote_start = $self->quote_start;

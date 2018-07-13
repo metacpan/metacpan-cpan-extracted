@@ -13,5 +13,5 @@ WriteMakefile(
 #	  'Test::More'      => '0.47',
 	  'Tk'      => '0',
 	  'Tk::JBrowseEntry' => '4.63',
-	}
+	},
 );

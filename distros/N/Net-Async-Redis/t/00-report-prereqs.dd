@@ -27,6 +27,7 @@ do { my $x = {
                                       'IO::Async' => '0',
                                       'List::Util' => '1.29',
                                       'Log::Any' => '1.050',
+                                      'Math::Random::Secure' => '0',
                                       'Ryu::Async' => '0.006',
                                       'Syntax::Keyword::Try' => '0.08',
                                       'URI' => '0',
@@ -48,7 +49,8 @@ do { my $x = {
                                    'Test::CheckDeps' => '0.010',
                                    'Test::Deep' => '0',
                                    'Test::HexString' => '0',
-                                   'Test::More' => '0.98'
+                                   'Test::More' => '0.98',
+                                   'Variable::Disposition' => '0.004'
                                  }
                  }
      };

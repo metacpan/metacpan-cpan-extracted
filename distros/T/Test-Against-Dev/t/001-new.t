@@ -21,6 +21,13 @@ my $self;
 
 {
     local $@;
+    eval { $self = Test::Against::Dev->new(); };
+    like($@, qr/Argument to constructor must be hashref/,
+        "new: Got expected error message for no argument");
+}
+
+{
+    local $@;
     eval { $self = Test::Against::Dev->new({}); };
     like($@, qr/Hash ref must contain 'application_dir' element/,
         "new: Got expected error message; 'application_dir' element absent");

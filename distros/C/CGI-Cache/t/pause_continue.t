@@ -41,7 +41,7 @@ my $expected_stderr = '';
 my $expected_cached = "Test output 1\nTest output 2\n";
 my $message = 'pause() and continue()';
 
-my (undef, $test_script_name) = File::Temp::tempfile('cgi_test.cgi.XXXXX');
+my (undef, $test_script_name) = File::Temp::tempfile('cgi_test.cgi.XXXXX', TMPDIR=>1);
 
 Init_For_Run($test_script_name, $script, 1);
 Run_Script($test_script_name, $expected_stdout, $expected_stderr, $expected_cached, $message);
@@ -80,7 +80,7 @@ my $expected_stderr = '';
 my $expected_cached = "Test output 1\nTest output 2\n";
 my $message = 'pause() and continue() with filehandles';
 
-my (undef, $test_script_name) = File::Temp::tempfile('cgi_test.cgi.XXXXX');
+my (undef, $test_script_name) = File::Temp::tempfile('cgi_test.cgi.XXXXX', TMPDIR=>1);
 
 Init_For_Run($test_script_name, $script, 1);
 Run_Script($test_script_name, $expected_stdout, $expected_stderr, $expected_cached, $message);

@@ -15,7 +15,6 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
-    'lib/Bio/Installer/Clustalw.pm',
     'lib/Bio/Tools/Run/Alignment/Clustalw.pm',
     't/00-compile.t',
     't/Clustalw.t',

@@ -62,6 +62,6 @@
          "url" : "https://github.com/dr-co/Net-EGTS"
       }
    },
-   "version" : 0.03,
+   "version" : 0.04,
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

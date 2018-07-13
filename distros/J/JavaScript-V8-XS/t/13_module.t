@@ -51,7 +51,7 @@ sub test_module {
 
 
     SKIP: {
-        skip 'modules not (yet) supported in V8';
+        skip 'modules not (yet) supported in V8', 18;
 
         $vm->eval('var p = require("pig");');
         is($vm->typeof('p'), 'string', 'basic require()');

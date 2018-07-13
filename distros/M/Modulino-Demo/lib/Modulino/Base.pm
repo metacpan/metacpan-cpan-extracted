@@ -5,10 +5,19 @@ no warnings;
 
 use v5.10.1;
 
-use vars qw($VERSION);
 use Carp;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
+
+=encoding utf8
+
+=head1 NAME
+
+Modulino::Base - Common stuff for the modulino demonstrations
+
+=head1 SYNOPSIS
+
+=cut
 
 sub _running_under_tester { !! $ENV{CPANTEST} }
 

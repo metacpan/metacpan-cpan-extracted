@@ -1,8 +1,7 @@
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME		=> 'OSPF::LSDB',
-    AUTHOR		=> 'BLUHM (bluhm@cpan.org)',
+    AUTHOR		=> 'BLUHM <bluhm@cpan.org>',
     EXE_FILES		=> [qw(
 	script/ospf2dot
 	script/ospfd2yaml
@@ -12,6 +11,7 @@ WriteMakefile(
 	script/ospfview
 	script/ospfview.cgi
     )],
+    LICENSE	=> 'bsd',
     MAN1PODS		=> {
 	'doc/ospf2dot.pod'	=> 'blib/man1/ospf2dot.1',
 	'doc/ospfd2yaml.pod'	=> 'blib/man1/ospfd2yaml.1',
@@ -21,10 +21,20 @@ WriteMakefile(
 	'doc/ospfview.pod'	=> 'blib/man1/ospfview.1',
 	'doc/ospfview.cgi.pod'	=> 'blib/man1/ospfview.cgi.1',
     },
-    SIGN		=> 1,
-    VERSION_FROM	=> 'lib/OSPF/LSDB.pm',
+    META_MERGE	=> {
+	"meta-spec"	=> { version => 2 },
+	resources => {
+	    homepage	=> 'https://sourceforge.net/projects/ospfview/',
+	    repository	=> {
+		type	=> 'git',
+		url	=> 'git://git.code.sf.net/p/ospfview/code',
+	    },
+	},
+    },
     MIN_PERL_VERSION	=> '5.10.0',
+    NAME		=> 'OSPF::LSDB',
     PREREQ_PM		=> {
+	"CGI"				=> 0,
 	"Data::Validate"		=> 0,
 	"Data::Validate::Struct"	=> 0,
 	"File::Slurp"			=> 0,
@@ -36,4 +46,6 @@ WriteMakefile(
 	"Test::Strict"			=> 0,  # for test
 	"YAML::Syck"			=> 0,
     },
+    SIGN		=> 1,
+    VERSION_FROM	=> 'lib/OSPF/LSDB.pm',
 );

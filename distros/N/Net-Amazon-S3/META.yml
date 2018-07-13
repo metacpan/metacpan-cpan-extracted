@@ -64,7 +64,7 @@ requires:
 resources:
   bugtracker: https://github.com/rustyconover/net-amazon-s3/issues
   repository: https://github.com/rustyconover/net-amazon-s3
-version: '0.82'
+version: '0.83'
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'
   - 'Ali Anari <ali@anari.me>'

@@ -23,7 +23,7 @@ package MongoDB::Error;
 
 use version;
 
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use Moo;
 use Carp;
@@ -416,7 +416,7 @@ MongoDB::Error - MongoDB Driver Error classes
 
 =head1 VERSION
 
-version v2.0.0
+version v2.0.1
 
 =head1 SYNOPSIS
 
@@ -556,7 +556,7 @@ Attributes include:
 
 =item *
 
-result — response from a database command; this must impliement the C<last_errmsg> method
+result — response from a database command; this must implement the C<last_errmsg> method
 
 =item *
 

@@ -2,7 +2,7 @@ package App::Yath::Command::spawn;
 use strict;
 use warnings;
 
-our $VERSION = '0.001065';
+our $VERSION = '0.001066';
 
 use App::Yath::Util qw/find_yath/;
 use Test2::Util qw/pkg_to_file/;
@@ -33,7 +33,7 @@ sub name            { 'spawn' }
 
 my $TEST;
 
-sub init { confess(ref($_[0]) . " is not intended to be instanciated") }
+sub init { confess(ref($_[0]) . " is not intended to be instantiated") }
 sub run  { confess(ref($_[0]) . " does not implement run()") }
 
 sub import {

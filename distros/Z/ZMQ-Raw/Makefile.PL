@@ -271,6 +271,7 @@ my %WriteMakefileArgs = (
   "OBJECT" => "\$(O_FILES)",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Scalar::Util" => 0,
     "XSLoader" => 0,
     "constant" => 0,
     "overload" => 0,
@@ -285,10 +286,9 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => "0.0",
     "Test::Pod::Coverage" => "0.0",
-    "blib" => "1.01",
     "threads" => 0
   },
-  "VERSION" => "0.25",
+  "VERSION" => "0.26",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -315,7 +315,7 @@ Net::Amazon::S3::Signature::V4Implementation
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

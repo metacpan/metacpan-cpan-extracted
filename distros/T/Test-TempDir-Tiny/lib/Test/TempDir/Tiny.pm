@@ -5,7 +5,7 @@ use warnings;
 package Test::TempDir::Tiny;
 # ABSTRACT: Temporary directories that stick around when tests fail
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use Exporter 5.57 qw/import/;
 our @EXPORT = qw/tempdir in_tempdir/;
@@ -18,7 +18,7 @@ use Errno qw/EEXIST ENOENT/;
     use File::Path 2.07 qw/remove_tree/;
 }
 use File::Spec::Functions qw/catdir/;
-use File::Temp;
+use File::Temp 0.2308;
 
 my ( $ROOT_DIR, $TEST_DIR, %COUNTER );
 my ( $ORIGINAL_PID, $ORIGINAL_CWD, $TRIES, $DELAY, $SYSTEM_TEMP ) =
@@ -241,7 +241,7 @@ Test::TempDir::Tiny - Temporary directories that stick around when tests fail
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

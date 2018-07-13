@@ -91,6 +91,15 @@ MIXIN METHODS
     See also the Net::SNMP::Mixin::Dot1dBase for a mixin to get the mapping
     between the ifIndexes and the dot1dBasePorts if needed.
 
+  OBJ->map_lldp_loc_portid2portnum()
+    Returns a hash reference with local portIds to local portNums:
+
+      {
+        ...
+        Te5/32 => 234,
+        ...
+      }
+
   OBJ->get_lldp_rem_table()
     Returns the LLDP lldp_rem_table as a hash reference. The table is
     indexed by the LLDP local port numbers on which the remote system
@@ -162,7 +171,7 @@ AUTHOR
     Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
 
 COPYRIGHT & LICENSE
-    Copyright 2008-2016 Karl Gaissmaier, all rights reserved.
+    Copyright 2008-2018 Karl Gaissmaier, all rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

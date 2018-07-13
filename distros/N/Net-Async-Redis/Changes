@@ -1,5 +1,17 @@
 Revision history for Net-Async-Redis
 
+1.006     2018-07-12 22:39:10+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bug fixes:
+
+    - PSUBSCRIBE wasn't working (reported by Bill Marriott and leonerd, fix+tests by leonerd,
+    I did little more than hit the merge button - thanks!)
+
+    Dependencies:
+
+    - Math::Random::Secure dep was missing (thanks MANWAR!)
+
 1.005     2018-01-06 18:18:22+08:00 Asia/Kuala_Lumpur
     No new features.
 

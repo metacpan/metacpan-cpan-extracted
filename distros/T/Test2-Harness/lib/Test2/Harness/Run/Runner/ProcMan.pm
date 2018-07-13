@@ -15,7 +15,7 @@ use Test2::Harness::Util qw/write_file_atomic/;
 use Test2::Harness::Util::File::JSONL();
 use Test2::Harness::Run::Queue();
 
-our $VERSION = '0.001065';
+our $VERSION = '0.001066';
 
 use Test2::Harness::Util::HashBase qw{
     -pid
@@ -174,7 +174,7 @@ sub finish {
 }
 
 sub wait_on_jobs {
-    my $self = shift;
+    my $self   = shift;
     my %params = @_;
 
     for my $pid (keys %{$self->{+_PIDS}}) {
@@ -184,7 +184,7 @@ sub wait_on_jobs {
         next unless $check || $params{force_exit};
 
         my $params = delete $self->{+_PIDS}->{$pid};
-        my $cat = $params->{task}->{category};
+        my $cat    = $params->{task}->{category};
         $cat = 'long' if $cat eq 'medium';
         $self->{+SLOTS}->{$cat}++;
 
@@ -205,9 +205,9 @@ sub write_remaining_exits {
 }
 
 sub write_exit {
-    my $self = shift;
+    my $self   = shift;
     my %params = @_;
-    my $file = File::Spec->catfile($params{dir}, 'exit');
+    my $file   = File::Spec->catfile($params{dir}, 'exit');
     write_file_atomic($file, $params{exit});
 }
 
@@ -215,12 +215,15 @@ sub next {
     my $self = shift;
     my ($stage) = @_;
 
+    # Get a new task to run.
     my $task = $self->_next($stage);
 
+    # If there are no more tasks then wait on the remaining jobs to complete.
     unless ($task) {
         $self->wait_on_jobs() while keys %{$self->{+_PIDS}};
     }
 
+    # Return task or undef if we're done.
     return $task;
 }
 
@@ -266,15 +269,23 @@ sub _next {
 
     my $first = 1;
     while (@$list || !$self->{+QUEUE_ENDED}) {
-        return if $end_cb && $end_cb->();
+        return if $end_cb && $end_cb->();    # End loop callback.
+
+        # Delay this loop the first time we enter it polling for a task to run.
         sleep $wait_time unless $first;
         $first = 0;
 
+        # Check the job files for active and newly kicked off tasks.
+        # Updates $list which we use to decide if we need to keep looping.
         $self->poll_tasks;
+
+        # Reap any completed PIDs
         $self->wait_on_jobs;
 
+        # Make sure the lock file is still in place.
         next unless $self->lock;
 
+        # What jobs need running? If nothing then loop.
         $self->read_jobs;
         @$list = grep { !$jobs_seen->{$_->{job_id}} } @$list;
         unless (@$list) {
@@ -282,32 +293,56 @@ sub _next {
             next;
         }
 
+        # What categories are running and how many?
         my $running = 0;
         my %cats;
+        my %active_conflicts;
         for my $job (values %{$self->{+_PIDS}}) {
             $running++;
             $cats{$job->{task}->{category}}++;
+
+            # Mark all the conflicts which the actively jobs have asserted.
+            foreach my $conflict (@{$job->{task}->{conflicts}}) {
+                $active_conflicts{$conflict}++;
+
+                # This should never happen.
+                $active_conflicts{$conflict} < 2 or die("Unexpected parallel conflict '$conflict' ($active_conflicts{$conflict}) running at this time!");
+            }
         }
 
-        # At max jobs already
+        # No new jobs yet to kick off yet because too many are running.
+        # This also assures the additional ( $max - 1) long job isn't kicked off.
         next if $running >= $max;
 
-        # None if isolation is running
+        # Only 1 isolation job can be running and 1 is so let's
+        # wait for that pid to die.
         next if $cats{isolation};
 
+        # If we're only allowing 1 job at a time, then just give the
+        # next one on the list.
         return shift @$list if $max == 1;
 
         my $fallback;
-        for(my $i = 0; $i < @$list; $i++) {
+        for (my $i = 0; $i < @$list; $i++) {
             my $cat = $list->[$i]->{category};
             $cat = 'long' if $cat eq 'medium';
 
             die "Unknown category: $cat" unless defined $slots->{$cat};
 
+            # There's already something running so we're not allowed to kick off a isolation job.
+            # We can do last because the jobs are sorted with isolation at the end of the list.
+            next if $running && $cat eq 'isolation';
+
+            # If the job has a listed conflict and an existing job is running with that conflict, then pick another job.
+            my $job_conflicts = $list->[$i]->{conflicts};
+            next if first { $active_conflicts{$_} } @$job_conflicts;
+
+            # Set to current loop position if it's long.
             $fallback = $i if $cat eq 'long';
 
+            # There are no more allowed parallel jobs in this category.
             next unless $slots->{$cat};
-            $self->{+SLOTS}->{$cat}--;
+            $slots->{$cat}--;
             return scalar splice(@$list, $i, 1);
         }
 

@@ -13,7 +13,7 @@ use base qw(Exporter);
 
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS $DOC);
 
-$VERSION = '1.32';
+$VERSION = '1.40';
 $DOC = 0;
 
 # copy and update P::V's EXPORT* constants
@@ -36,8 +36,8 @@ foreach my $sub (@_of, 'exclusively') {
 }
 
 sub import {
-  # import all of P::V except validate()
-  Params::Validate->import(grep { $_ ne 'validate' } @Params::Validate::EXPORT_OK);
+  # import all of P::V except validate() and dvalidate_with()
+  Params::Validate->import(grep { ! /^validate(_with)?$/ } @Params::Validate::EXPORT_OK);
   # now export all that P::V would have exported, plus *_of
   __PACKAGE__->export_to_level(1, @_);
 }
@@ -121,7 +121,14 @@ Overrides and extends Params::Validate's function of the same name.
 =cut
 
 sub validate (\@@) {
-  my @args = @{shift()};
+  my @args;
+
+  my $p = shift;
+  if ( ref $p eq 'ARRAY' ) {
+    # First argument might have been a hash reference
+    @args = @{ ref $p->[0] ? [ %{ $p->[0] } ] : $p  };
+  }
+
   my $pv_spec;
   if(ref($_[0]) && ref($_[0]) =~ /HASH/) {
     $pv_spec = shift;
@@ -133,7 +140,34 @@ sub validate (\@@) {
   %rval = Params::Validate::validate(@args, $pv_spec) if($pv_spec);
 
   foreach (@coderefs) {
-    die("code-ref checking failed\n") unless($_->({@args}));
+    die 'code-ref checking failed: arguments were not ' . document($_) . "\n"
+        unless $_->({@args});
+  }
+
+  return wantarray ? %rval : \%rval;
+}
+
+=head2 validate_with
+
+Overrides and extends Params::Validate's function of the same name.
+
+The code-ref, or an array-ref of code-refs, are passed as the
+extra 'dependencies' argument.
+
+=cut
+
+sub validate_with {
+  my %args = @_;
+  my $params = [ @{$args{params}} ];
+
+  $args{dependencies} = [] unless defined $args{dependencies};
+  my $coderefs = delete $args{dependencies};
+  $coderefs = ref($coderefs) eq 'ARRAY' ? $coderefs : [ $coderefs ];
+
+  my %rval = Params::Validate::validate_with(@_);
+
+  foreach (@{$coderefs}) {
+    die('code-ref checking failed: arguments were not '.document($_)."\n") unless($_->({@{$params}}));
   }
 
   return wantarray ? %rval : \%rval;
@@ -324,8 +358,8 @@ going on, look at L<Params::Validate::Dependencies::Extending>.
 I like to know who's using my code.  All comments, including constructive
 criticism, are welcome.
 
-Please report any bugs either by email or using L<http://rt.cpan.org/>
-or at L<https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/issues>.
+Please report any bugs either by email or
+at L<https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/issues>.
 
 Any incompatibility with Params::Validate will be considered to be a bug,
 with the exception of minor differences in error messages.

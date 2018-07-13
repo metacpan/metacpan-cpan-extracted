@@ -5,6 +5,12 @@ use Mouse;
 use Mouse::Util::TypeConstraints;
 use namespace::autoclean;
 
+=head1 NAME
+
+Net::EGTS::Types - Data types.
+
+=cut
+
 subtype 'BOOLEAN',  as 'Bool';
 subtype 'BYTE',     as 'Int',   where { 0 <= $_ && $_ < 2 ** 8 };
 subtype 'USHORT',   as 'Int',   where { 0 <= $_ && $_ < 2 ** 16 };
@@ -27,7 +33,5 @@ subtype 'BIT5',     as 'Int',   where { 0 <= $_ && $_ < 2 ** 5 };
 subtype 'BIT6',     as 'Int',   where { 0 <= $_ && $_ < 2 ** 6 };
 subtype 'BIT7',     as 'Int',   where { 0 <= $_ && $_ < 2 ** 7 };
 subtype 'BIT8',     as 'Int',   where { 0 <= $_ && $_ < 2 ** 8 };
-
-subtype 'uInt',     as 'Int', where { 0 <= $_ };
 
 __PACKAGE__->meta->make_immutable();

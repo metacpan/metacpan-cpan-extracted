@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.013002;
 
-our $VERSION = '0.300002';
+our $VERSION = '0.300003';
 
 1;
 
@@ -22,7 +22,7 @@ MaxMind::DB::Writer - Create MaxMind DB database files
 
 =head1 VERSION
 
-version 0.300002
+version 0.300003
 
 =head1 SYNOPSIS
 
@@ -109,7 +109,7 @@ Mark Fowler <mfowler@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Florian Ragwitz Ilya Melamed Jan Bieron Thomas J Mather William Storey Will
+=for stopwords Florian Ragwitz Ilya Melamed Jan Bieron Narsimham Chelluri Thomas J Mather William Storey
 
 =over 4
 
@@ -127,15 +127,15 @@ Jan Bieron <jbieron+github@gmail.com>
 
 =item *
 
+Narsimham Chelluri <nchelluri@users.noreply.github.com>
+
+=item *
+
 Thomas J Mather <tjmather@maxmind.com>
 
 =item *
 
 William Storey <wstorey@maxmind.com>
-
-=item *
-
-Will Storey <will@summercat.com>
 
 =back
 

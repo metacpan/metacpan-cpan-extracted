@@ -1,3 +1,13 @@
+0.2308    2018-07-11 21:06:16Z
+          - remove File::Temp::Dir from the PAUSE index (it is not in its own
+            .pm file, so it is not 'use'able on its own)
+
+0.2307    2018-06-24 19:40:29Z (TRIAL RELEASE)
+          - change EXLOCK default from true to false; addresses RT#123959.
+            Note that this option was always a no-op on non-BSD platforms;
+            changing the default to false makes behaviour more predictable and
+            consistent across platforms.
+
 0.2306    2018-06-24 19:33:47Z
           - switch from 'use vars' to 'our'
 

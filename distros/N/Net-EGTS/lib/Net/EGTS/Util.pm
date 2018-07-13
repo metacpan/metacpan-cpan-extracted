@@ -20,6 +20,12 @@ our @EXPORT = qw(
     lon2mod mod2lon
 );
 
+=head1 NAME
+
+Net::EGTS::Util - Utility functions.
+
+=cut
+
 use constant TIMESTAMP_20100101_000000_UTC  => 1262304000;
 
 =head2 crc8 $bytes

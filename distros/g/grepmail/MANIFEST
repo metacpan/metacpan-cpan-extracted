@@ -128,17 +128,8 @@ t/results/unique_handy
 
 # Module::Install extensions
 inc/File/HomeDir.pm
-inc/File/HomeDir/Darwin.pm
-inc/File/HomeDir/Darwin/Carbon.pm
-inc/File/HomeDir/Darwin/Cocoa.pm
-inc/File/HomeDir/Driver.pm
-inc/File/HomeDir/FreeDesktop.pm
-inc/File/HomeDir/MacOS9.pm
-inc/File/HomeDir/Test.pm
-inc/File/HomeDir/Unix.pm
-inc/File/HomeDir/Windows.pm
-inc/File/Temp.pm
 inc/File/Which.pm
+inc/File/Slurper.pm
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoLicense.pm
@@ -157,11 +148,11 @@ inc/Module/Install/Scripts.pm
 inc/Module/Install/StandardTests.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-inc/Scalar/Util.pm
 inc/Module/Install/PRIVATE/Add_Test_Target.pm
 inc/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm
 inc/Module/Install/PRIVATE/Fix_Standard_Tests.pm
 inc/Module/Install/PRIVATE/Update_Test_Version.pm
+inc/URI/Escape.pm
 
 # Private Module::Install extensions
 private-lib/Module/Install/PRIVATE/Add_Test_Target.pm

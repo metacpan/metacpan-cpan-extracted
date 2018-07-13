@@ -9,6 +9,7 @@ use Test::EOL;
 my @files = (
     'bin/update_sanctions_csv',
     'lib/Data/Validate/Sanctions.pm',
+    'lib/Data/Validate/Sanctions/Fetcher.pm',
     't/00-check-deps.t',
     't/00-compile.t',
     't/00-report-prereqs.dd',

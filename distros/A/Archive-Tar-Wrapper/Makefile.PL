@@ -3,7 +3,7 @@ use strict;
 use ExtUtils::MakeMaker;
 use File::Which;
 
-if ( $^O eq 'solaris') {
+if ( $^O eq 'solaris' ) {
     die "OS unsupported\n";
 }
 
@@ -58,12 +58,15 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.50 ) {
         'meta-spec' => { version => 2 },
         'resources' => {
             'bugtracker' => {
-                'web' => 'https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues',
+                'web' =>
+'https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues',
             },
             'repository' => {
                 'type' => 'git',
-                'url' => 'https://github.com/glasswalk3r/archive-tar-wrapper-perl.git',
-                'web' => 'https://github.com/glasswalk3r/archive-tar-wrapper-perl',
+                'url' =>
+                  'https://github.com/glasswalk3r/archive-tar-wrapper-perl.git',
+                'web' =>
+                  'https://github.com/glasswalk3r/archive-tar-wrapper-perl',
             },
         },
     };
@@ -71,16 +74,18 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.50 ) {
 
 # Test::More::is_deeply is required for testing
 if ( $ExtUtils::MakeMaker::VERSION >= 6.64 ) {
-    $WriteMakefileArgs{TEST_REQUIRES}->{'Test::Simple'}= 1.302073 ;
+    $WriteMakefileArgs{TEST_REQUIRES}->{'Test::Simple'} = 1.302073;
+    $WriteMakefileArgs{TEST_REQUIRES}->{'Dumbbench'}    = 0.111;
 }
 else {
-    $WriteMakefileArgs{PREREQ_PM}->{'Test::Simple'}= 1.302073;
+    $WriteMakefileArgs{PREREQ_PM}->{'Test::Simple'} = 1.302073;
+    $WriteMakefileArgs{PREREQ_PM}->{'Dumbbench'}    = 0.111;
 }
 
 if ( $ExtUtils::MakeMaker::VERSION >= 6.52 ) {
     $WriteMakefileArgs{CONFIGURE_REQUIRES} = {
         'ExtUtils::MakeMaker' => 0,
-        'File::Which' => 0,
+        'File::Which'         => 0,
     };
 }
 

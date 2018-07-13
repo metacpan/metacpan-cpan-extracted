@@ -1,5 +1,9 @@
 Revision history for Perl extension Config::HAProxy.
 
+1.01  Thu Jul 12 09:04:28 2018
+        - set minimal required Perl version
+        - drop dependency on autodie
+
 1.00  Sun Jul  8 19:57:57 2018
 	- original revision
 

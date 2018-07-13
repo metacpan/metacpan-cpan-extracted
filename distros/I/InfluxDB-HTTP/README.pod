@@ -1,0 +1,129 @@
+=head1 NAME
+
+InfluxDB::HTTP - The Perl way to interact with InfluxDB!
+
+=head1 VERSION
+
+Version 0.03
+
+=head1 SYNOPSIS
+
+InfluxDB::HTTP allows you to interact with the InfluxDB HTTP API. The module essentially provides
+one method per InfluxDB HTTP API endpoint, that is C<ping>, C<write> and C<query>.
+
+    use InfluxDB::HTTP;
+
+    my $influx = InfluxDB::HTTP->new();
+
+    my $ping_result = $influx->ping();
+    print "$ping_result\n";
+
+    my $query = $influx->query(
+        [ 'SELECT Lookups FROM _internal.monitor.runtime WHERE time > '.(time - 60)*1000000000, 'SHOW DATABASES'],
+        epoch => 's',
+    );
+
+    print "$query\n";
+
+
+=head1 SUBROUTINES/METHODS
+
+=head2 RETURN VALUES AND ERROR HANDLING
+
+C<Object::Result> is relied upon for returning data from subroutines. The respective result
+object can always be used as string and evaluated on a boolean basis. A result object
+evaluating to false indicates an error and a corresponding error message is provided in the
+attribute C<error>:
+
+    my $ping = $influx->ping();
+    print $ping->error unless ($ping);
+
+Furthermore, all result objects provide access to the C<HTTP::Response> object that is returned
+by InfluxDB in the attribute C<raw>.
+
+=head2 new host => 'localhost', port => 8086, timeout => 600
+
+Passing C<host>, C<port> and/or C<timeout> is optional, defaulting to the InfluxDB defaults or
+to 3 minutes for the timeout. The timeout is in seconds.
+
+Returns an instance of InfluxDB::HTTP.
+
+=head2 ping
+
+Pings the InfluxDB instance configured in the constructor (i.e. by C<host> and C<port>).
+
+Returned object evaluates to true or false depending on whether the ping was successful or not.
+If true, then it contains a C<version> attribute that indicates the InfluxDB version running on
+the pinged server.
+
+The C<version> attribute is extracted from the C<X-Influxdb-Version> HTTP response header, which
+is part of the HTTP response from the pinged InfluxDB instance.
+
+    my $ping = $influx->ping();
+    print $ping->version if ($ping);
+
+=head2 query query, database => "DATABASE", chunk_size => CHUNK_SIZE, epoch => "ns"
+
+Used to query the InfluxDB instance. All parameters but the first one are optional. The
+C<query> parameter can either be a String or a Perl ArrayRef of Strings, where every String
+contains a valid InfluxDB query.
+
+If the returned object evaluates to true, indicating that the query was successful, then
+the returned object's C<data> attribute contains the entire response from InfluxDB as Perl
+hash. Additionally the attribute C<request_id> provides the request identifier as set in
+the HTTP reponse headers by InfluxDB. This can for example be useful for correlating
+requests with log files.
+
+=head2 write measurement, database => "DATABASE", precision => "ns", retention_policy => "RP"
+
+Writes data into InfluxDB. The parameter C<measurement> can either be a String or an
+ArrayRef of Strings, where each String contains one valid InfluxDB LineProtocol
+statement. All of those mesaurements are then sent to InfluxDB and the specified
+database. The returned object evaluates to true if the write was successful, and otherwise
+to false.
+
+The optional argument precision can be given if a precsion different than "ns" is used in
+the line protocol. InfluxDB docs suggest that using a coarser precision than ns can save
+space and processing. In many cases "s" or "m" might do.
+
+The optional argument retention_policy can be used to specify a retention policy other than
+the default retention policy of the selected database.
+
+=head2 get_lwp_useragent
+
+Returns the internally used LWP::UserAgent instance for possible modifications
+(e.g. to configure an HTTP proxy).
+
+=head1 AUTHOR
+
+Raphael Seebacher, C<< <raphael@seebachers.ch> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+L<https://github.com/raphaelthomas/InfluxDB-HTTP/issues>.
+
+=head1 LICENSE AND COPYRIGHT
+
+MIT License
+
+Copyright (c) 2016 Raphael Seebacher
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+

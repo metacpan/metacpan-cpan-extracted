@@ -17,7 +17,7 @@ WriteMakefile(
     MIN_PERL_VERSION   => 5.006,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker'     => 0,
-        'File::ShareDir::Install' => 0,
+        'File::ShareDir::Install' => '0.13',
     },
     BUILD_REQUIRES   => {
         'Test::More' => 0,
@@ -25,7 +25,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo'                  => '2.000000',
         'namespace::autoclean' => '0.28',
-        'File::Share'          => '0.25',
+        'File::ShareDir'       => '1.114',
         'Map::Tube'            => '3.53',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -33,9 +33,9 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::Madrid'           => { file => 'lib/Map/Tube/Madrid.pm'        , version => '0.10' },
-            'Map::Tube::Madrid::Line::L3' => { file => 'lib/Map/Tube/Madrid/Line/L3.pm', version => '0.10' },
-            'Map::Tube::Madrid::Line::L5' => { file => 'lib/Map/Tube/Madrid/Line/L5.pm', version => '0.10' },
+            'Map::Tube::Madrid'           => { file => 'lib/Map/Tube/Madrid.pm'        , version => '0.11' },
+            'Map::Tube::Madrid::Line::L3' => { file => 'lib/Map/Tube/Madrid/Line/L3.pm', version => '0.11' },
+            'Map::Tube::Madrid::Line::L5' => { file => 'lib/Map/Tube/Madrid/Line/L5.pm', version => '0.11' },
         },
         resources => {
             repository => {

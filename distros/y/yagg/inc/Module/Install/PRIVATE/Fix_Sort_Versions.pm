@@ -3,7 +3,6 @@ package Module::Install::PRIVATE::Fix_Sort_Versions;
 
 use strict;
 use warnings;
-use File::Slurper qw(read_text write_text);
 
 use vars qw( @ISA $VERSION );
 
@@ -17,7 +16,12 @@ $VERSION = sprintf "%d.%02d%02d", q/0.1.0/ =~ /(\d+)/g;
 sub fix_sort_versions {
   my ($self, $file) = @_;
 
-  $self->configure_requires('File::Slurper', 0);
+  $self->perl_version('5.005');
+
+  $self->include_deps('File::Slurper', 0);
+
+  require File::Slurper;
+  File::Slurper->import('read_text', 'write_text');
 
   print "Fixing POD in $file\n";
 

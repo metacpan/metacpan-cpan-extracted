@@ -166,7 +166,7 @@ has 'covers'	=> (
 	builder => 'generate_covers'
 );
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 sub BUILD
 {
@@ -462,7 +462,7 @@ sub generate_primes
 	}
 
 	#
-	# Now for each level, we look for terms that be absorbed into
+	# Now for each level, we look for terms that can be absorbed into
 	# simpler product terms (for example, _ab_c + ab_c can be simplified
 	# to b_c).
 	#
@@ -495,6 +495,8 @@ sub generate_primes
 			#
 			for my $lv (@{ $bits[$level][$low] })
 			{
+				my %nextlvlimp;
+
 				#
 				# Initialize the implicant as unused.
 				#
@@ -516,21 +518,35 @@ sub generate_primes
 					#
 					# If there are matching terms, save
 					# the new implicant at the next 'level',
-					# creating it if it doesn't exist.
+					# creating the level if it doesn't exist.
 					#
-					if (hdist($lv, $hv) == 1)
+					my $hd1pos = hammingd1pos($lv, $hv);
+					if ($hd1pos != -1)
 					{
 						my $new = $lv;	# or $hv
-						substr($new, diffpos($lv, $hv), 1) = $self->dc;
+						substr($new, $hd1pos, 1) = $self->dc;
 
+						#
+						### Compared: $lv
+						### to      : $hv
+						### pushing : $new
 						#
 						# Save the new implicant to the
 						# next level, then mark the two
 						# values as used.
 						#
-						push @{ $bits[$level + 1][$low + 1] }, $new;
+						push @{ $bits[$level + 1][$low + 1] }, $new unless (exists $nextlvlimp{$new});
+						$nextlvlimp{$new} = 1;
 						$implicant{$lv} = 1;
 						$implicant{$hv} = 1;
+					}
+					else
+					{
+						#
+						### Compared: $lv
+						### to      : $hv
+						### No push
+						#
 					}
 				}
 			}

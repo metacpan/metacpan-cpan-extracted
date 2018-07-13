@@ -159,6 +159,7 @@ sub create_shared_lib {
   # Default include path
   my $env_header_include_dir = $INC{"SPVM/Build.pm"};
   $env_header_include_dir =~ s/\.pm$//;
+  $env_header_include_dir .= '/include';
   push @$include_dirs, $env_header_include_dir;
   push @$include_dirs, $input_src_dir;
   
@@ -210,6 +211,7 @@ sub create_shared_lib {
     dl_func_list => $cfunc_names,
     extra_linker_flags => join(' ', @$extra_linker_flags),
   );
+  
 
   # Create shared lib blib directory
   my $shared_lib_dir = "$output_dir/$package_path";

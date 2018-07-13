@@ -63,6 +63,8 @@ int pl_set_global_or_property(pTHX_ V8Context* ctx, const char* name, SV* value)
  */
 int pl_run_gc(V8Context* ctx);
 
+SV* pl_global_objects(pTHX_ V8Context* ctx);
+
 #if 0
 /*
  * This is a generic dispatcher that allows calling any Perl function from JS.

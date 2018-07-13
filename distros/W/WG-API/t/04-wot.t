@@ -13,6 +13,13 @@ isa_ok( $wot, 'WG::API::WoT' );
 
 can_ok( $wot, qw/account_list account_info account_tanks account_achievements/ );
 can_ok( $wot, qw/stronghold_claninfo stronghold_clanreserves/ );
+can_ok(
+    $wot, qw/encyclopedia_vehicles encyclopedia_vehicleprofile encyclopedia_achievements
+        encyclopedia_info encyclopedia_arenas encyclopedia_provisions encyclopedia_personalmissions
+        encyclopedia_boosters encyclopedia_vehicleprofiles encyclopedia_modules
+        encyclopedia_badges encyclopedia_crewroles encyclopedia_crewskills
+        /
+);
 can_ok( $wot, qw/clanratings_dates clanratings_dates clanratings_clans clanratings_neighbors clanratings_top/ );
 can_ok( $wot, qw/tanks_stats tanks_achievements/ );
 
@@ -34,6 +41,32 @@ SKIP: {
         ok( !$wot->stronghold_claninfo, "can't get stronghold claninfo wo required fields" );
         ok( $wot->stronghold_claninfo( clan_id => _get_clan()->{clan_id} ), "get stronghold claninfo" );
         ok( !$wot->stronghold_clanreserves, "can't get stronghold clanreserves wo required fields" );
+    };
+
+    subtest 'encyclopedia' => sub {
+        my $tanks;
+        ok( $tanks = $wot->encyclopedia_vehicles( limit => 1 ), "get information about available vehicles" );
+
+        my ($tank_id) = keys %$tanks;
+        is( $wot->encyclopedia_vehicleprofile(), undef, "get vehicle configuration characteristics wo tank_id" );
+        is( $wot->encyclopedia_vehicleprofile( tank_id => 'XXX' ), undef, "get vehicle configuration w invalid tank_id" );
+        ok( $wot->encyclopedia_vehicleprofile( tank_id => $tank_id ), "get vehicle configuration w valid tank id" );
+
+        ok( $wot->encyclopedia_achievements(),     "get information about achievements" );
+        ok( $wot->encyclopedia_info(),             "get information about tankopedia" );
+        ok( $wot->encyclopedia_arenas(),           "get information about maps" );
+        ok( $wot->encyclopedia_provisions(),       "get information about available equipment" );
+        ok( $wot->encyclopedia_personalmissions(), "get information about personal missions" );
+        ok( $wot->encyclopedia_boosters(),         "get information about personal reserves" );
+
+        is( $wot->encyclopedia_vehicleprofiles(), undef, "get information about vehicle configurations wo tank id" );
+        is( $wot->encyclopedia_vehicleprofiles( tank_id => 'XXX' ), undef, "get information about vehicle configurations w invalid tank id" );
+        ok( $wot->encyclopedia_vehicleprofiles( tank_id => $tank_id ), "get information about vehicle configurations w valid tank id" );
+
+        ok( $wot->encyclopedia_modules(),    "get information about available modules" );
+        ok( $wot->encyclopedia_badges(),     "get information about available badgets" );
+        ok( $wot->encyclopedia_crewroles(),  "get full description of all crew qualifications" );
+        ok( $wot->encyclopedia_crewskills(), "get full description of all crew skills" );
     };
 
     subtest 'clan ratings' => sub {

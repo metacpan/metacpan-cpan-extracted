@@ -6,7 +6,7 @@ package BSON::PP;
 # ABSTRACT: Pure Perl BSON implementation
 
 use version;
-our $VERSION = 'v1.6.6';
+our $VERSION = 'v1.6.7';
 
 use B;
 use Carp;
@@ -812,7 +812,7 @@ BSON::PP - Pure Perl BSON implementation
 
 =head1 VERSION
 
-version v1.6.6
+version v1.6.7
 
 =head1 DESCRIPTION
 

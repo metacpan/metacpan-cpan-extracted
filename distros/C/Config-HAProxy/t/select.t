@@ -3,7 +3,6 @@ use lib qw(t lib);
 use strict;
 use warnings;
 use Test::More;
-use autodie;
 
 BEGIN {
     plan tests => 4; 

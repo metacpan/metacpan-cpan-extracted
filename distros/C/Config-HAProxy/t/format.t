@@ -3,7 +3,6 @@ use lib qw(t lib);
 use strict;
 use warnings;
 use Test::More;
-use autodie;
 
 BEGIN {
     plan tests => 6; 
@@ -14,9 +13,7 @@ my $hp = new Test::HAProxy;
 isa_ok($hp,'Test::HAProxy');
 
 my $s;
-open(my $fh, '>', \$s);
-$hp->write($fh);
-close $fh;
+$hp->write(\$s);
 
 is($s, q{global
 # comment
@@ -33,9 +30,7 @@ backend out
     server localhost http://127.0.0.1
 }, 'default write');
 
-open($fh, '>', \$s);
-$hp->write($fh, indent => 2);
-close $fh;
+$hp->write(\$s, indent => 2);
 
 is($s, q{global
 # comment
@@ -52,9 +47,7 @@ backend out
   server localhost http://127.0.0.1
 }, 'reindent');
 
-open($fh, '>', \$s);
-$hp->write($fh, indent => 2, reindent_comments => 1);
-close $fh;
+$hp->write(\$s, indent => 2, reindent_comments => 1);
 
 is($s, q{global
   # comment
@@ -71,9 +64,7 @@ backend out
   server localhost http://127.0.0.1
 }, 'reindent comments');
 
-open($fh, '>', \$s);
-$hp->write($fh, indent => 4, tabstop => [ 10, 24 ]);
-close $fh;
+$hp->write(\$s, indent => 4, tabstop => [ 10, 24 ]);
 
 is($s, q{global
 # comment

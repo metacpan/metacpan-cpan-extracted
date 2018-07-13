@@ -106,24 +106,24 @@ sub print_lldp {
     $session->hostname,
     $session->get_lldp_local_system_data->{lldpLocChassisId};
 
-  print '-' x 115, "\n";
+  print '-' x 166, "\n";
 
-  printf "%5s %5s %25.25s %25.25s %25.25s %25s\n", 'LPort', 'LDesc',
-    'RemSysName',
-    'RemPortId', 'RemPortDesc', 'RemChassisId';
+  printf "%10s %25.25s %25.25s %25.25s %25.25s %25.25s %25s\n",
+    'LPortNum', 'LPortId', 'LDesc', 'RemSysName', 'RemPortId', 'RemPortDesc', 'RemChassisId';
 
-  print '-' x 115, "\n";
+  print '-' x 166, "\n";
 
-  foreach my $lport ( sort { $a <=> $b } keys %$lldp_rem_tbl ) {
-    foreach my $idx ( sort { $a <=> $b } keys %{ $lldp_rem_tbl->{$lport} } ) {
-      my $ldesc            = $lldp_loc_port_tbl->{$lport}{lldpLocPortDesc};
-      my $lldpRemPortId    = $lldp_rem_tbl->{$lport}{$idx}{lldpRemPortId};
-      my $lldpRemPortDesc  = $lldp_rem_tbl->{$lport}{$idx}{lldpRemPortDesc};
-      my $lldpRemSysName   = $lldp_rem_tbl->{$lport}{$idx}{lldpRemSysName};
-      my $lldpRemChassisId = $lldp_rem_tbl->{$lport}{$idx}{lldpRemChassisId};
+  foreach my $lportnum ( sort { $a <=> $b } keys %$lldp_rem_tbl ) {
+    foreach my $idx ( sort { $a <=> $b } keys %{ $lldp_rem_tbl->{$lportnum} } ) {
+      my $lportid          = $lldp_loc_port_tbl->{$lportnum}{lldpLocPortId};
+      my $ldesc            = $lldp_loc_port_tbl->{$lportnum}{lldpLocPortDesc};
+      my $lldpRemPortId    = $lldp_rem_tbl->{$lportnum}{$idx}{lldpRemPortId};
+      my $lldpRemPortDesc  = $lldp_rem_tbl->{$lportnum}{$idx}{lldpRemPortDesc};
+      my $lldpRemSysName   = $lldp_rem_tbl->{$lportnum}{$idx}{lldpRemSysName};
+      my $lldpRemChassisId = $lldp_rem_tbl->{$lportnum}{$idx}{lldpRemChassisId};
 
-      printf "%5s %5s %25.25s %25.25s %25.25s %25s\n", $lport, $ldesc,
-        $lldpRemSysName, $lldpRemPortId, $lldpRemPortDesc, $lldpRemChassisId;
+      printf "%10s %25.25s %25.25s %25.25s %25.25s %25.25s %25s\n",
+        $lportnum, $lportid, $ldesc, $lldpRemSysName, $lldpRemPortId, $lldpRemPortDesc, $lldpRemChassisId;
     }
   }
 }

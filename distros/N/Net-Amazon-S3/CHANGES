@@ -1,5 +1,12 @@
 Revision history for Perl module Net::Amazon::S3:
 
+0.83 Tue 10 Jul 2018 22:30:23 BST
+     - All patches by Branislav Zahradník
+     - Use Signature 4 by default only for amazonaws host (issue #29)
+     - Relaxing constraint on owner id, accepting any string (issue #18)
+     - Enable secure by default (issue #23)
+     - Sanity object uris to avoid invalid signature (issue #28)
+
 0.82 Sat  7 Jul 2018 14:28:06 BST
      - Use HEAD request to determine bucket region (patch by Branislav Zahradník)
 

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   MySQL::Partition:
     file: lib/MySQL/Partition.pm
-    version: '0.05'
+    version: '1.0001'
   MySQL::Partition::Handle:
     file: lib/MySQL/Partition/Handle.pm
   MySQL::Partition::Type::List:
@@ -38,12 +38,14 @@ requires:
   Class::Accessor::Lite: '0'
   Module::Load: '0'
   parent: '0'
-  perl: '5.010001'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/Songmu/p5-MySQL-Partition/issues
   homepage: https://github.com/Songmu/p5-MySQL-Partition
   repository: git://github.com/Songmu/p5-MySQL-Partition.git
-version: '0.05'
+version: '1.0001'
 x_authority: cpan:SONGMU
 x_contributors:
   - 'Ichinose Shogo <shogo82148@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

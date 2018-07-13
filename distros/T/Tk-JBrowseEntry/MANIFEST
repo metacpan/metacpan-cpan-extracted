@@ -7,3 +7,4 @@ test.pl
 lib/Tk/JBrowseEntry.pm
 JBrowseEntry.htm
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -36,4 +36,4 @@ resources:
   homepage: https://github.com/coppit/module-install-getprogramlocations
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/coppit/module-install-getprogramlocations
-version: '0.3011'
+version: '0.3012'

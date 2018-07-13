@@ -3,6 +3,10 @@ use strict;
 use Test;
 use Tcl::Tk;
 
+if ($^O ne 'MSWin32' and !$ENV{DISPLAY}) {
+    print "1..0 # skip: no DISPLAY env var - how come?\n";
+    exit;
+}
 
 my $mw  = Tcl::Tk::MainWindow->new();
 $mw->geometry('+100+100');

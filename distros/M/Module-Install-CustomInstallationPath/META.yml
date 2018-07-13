@@ -33,4 +33,4 @@ resources:
   homepage: https://github.com/coppit/module-install-custominstallationpath
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/coppit/module-install-custominstallationpath
-version: '0.1047'
+version: '0.1048'

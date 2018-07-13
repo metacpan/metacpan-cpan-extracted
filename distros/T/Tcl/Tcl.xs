@@ -4,7 +4,7 @@
  *	This file contains XS code for the Perl's Tcl bridge module.
  *
  * Copyright (c) 1994-1997, Malcolm Beattie
- * Copyright (c) 2003-2004, Vadim Konovalov
+ * Copyright (c) 2003-2018, Vadim Konovalov
  * Copyright (c) 2004 ActiveState Corp., a division of Sophos PLC
  *
  */
@@ -657,7 +657,7 @@ TclObjFromSv(pTHX_ SV *sv)
 		/* XXX: Is this handling refcount on NewObj right? */
 		Tcl_ListObjAppendElement(NULL, objPtr, Tcl_NewObj());
 	    } else {
-		if ((AV *) SvRV(*svp) == av) {
+		if (SvROK(*svp) && (AV *) SvRV(*svp) == av) {
 		    /* XXX: Is this a proper check for cyclical reference? */
 		    croak("cyclical array reference found");
 		    abort();
@@ -786,8 +786,8 @@ int Tcl_EvalInPerl(ClientData clientData, Tcl_Interp *interp,
     }
     else {
 	if (count != 1) {
-	    croak("Perl sub bound to Tcl proc returned %d args, expected 1",
-		    count);
+	    croak("Perl sub bound to Tcl proc returned %ld args, expected 1",
+		    (long)count);
 	}
 	sv = POPs; /* pop the undef off the stack */
 
@@ -866,8 +866,8 @@ int Tcl_PerlCallWrapper(ClientData clientData, Tcl_Interp *interp,
     }
     else {
 	if (count != 1) {
-	    croak("Perl sub bound to Tcl proc returned %d args, expected 1",
-		    count);
+	    croak("Perl sub bound to Tcl proc returned %ld args, expected 1",
+		    (long)count);
 	}
 	sv = POPs; /* pop the undef off the stack */
 
@@ -1055,14 +1055,17 @@ Tcl_Eval(interp, script, flags = 0)
 	int     flags
 	SV *	interpsv = ST(0);
 	STRLEN	length = NO_INIT
-	char *cscript = NO_INIT
+	char *  cscript = NO_INIT
     PPCODE:
 	if (!initialized) { return; }
 	(void) sv_2mortal(SvREFCNT_inc(interpsv));
 	PUTBACK;
 	Tcl_ResetResult(interp);
-	/* sv_mortalcopy here prevents stringifying script - necessary ?? */
+	/* sv_mortalcopy here prevents stringifying script -
 	cscript = SvPV(sv_mortalcopy(script), length);
+        - but then we have problems when script is large,
+        case covered with t/eval.t, NOT ok 6 */
+	cscript = SvPV(script, length);
 	if (Tcl_EvalEx(interp, cscript, length, flags) != TCL_OK) {
 	    croak("%s", Tcl_GetStringResult(interp));
 	}

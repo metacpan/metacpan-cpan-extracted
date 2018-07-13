@@ -14,9 +14,16 @@ plan skip_all =>
   "Net::SNMP::Mixin required for testing Net::SNMP::Mixin module"
   if $@;
 
-plan tests => 14;
+plan tests => 16;
 
 #plan 'no_plan';
+
+my @methods = qw/
+  get_lldp_local_system_data
+  get_lldp_loc_port_table
+  get_lldp_rem_table
+  map_lldp_loc_portid2portnum
+  /;
 
 is( Net::SNMP->mixer('Net::SNMP::Mixin::Dot1abLldp'),
   'Net::SNMP', 'mixer returns the class name' );
@@ -37,16 +44,10 @@ SKIP: {
 
   ok( !$error, 'got snmp session for live tests' );
   isa_ok( $session, 'Net::SNMP' );
-  ok(
-    $session->can('get_lldp_local_system_data'),
-    'can $session->get_lldp_local_system_data'
-  );
-  ok(
-    $session->can('get_lldp_loc_port_table'),
-    'can $session->get_lldp_loc_port_table'
-  );
-  ok( $session->can('get_lldp_rem_table'),
-    'can $session->get_lldp_rem_table' );
+
+  foreach my $m (@methods) {
+    ok( $session->can($m), "can \$session->$m()" );
+  }
 
   eval { $session->init_mixins };
   ok( !$@, 'init_mixins without error' );
@@ -75,6 +76,10 @@ SKIP: {
   my $lldp_rem_table;
   eval { $lldp_rem_table = $session->get_lldp_rem_table };
   ok( !$@, 'get_lldp_rem_table' );
+
+  my $map_lldp_loc_portid2portnum;
+  eval { $map_lldp_loc_portid2portnum = $session->map_lldp_loc_portid2portnum };
+  ok( !$@, 'map_lldp_loc_portid2portnum' );
 }
 
 # vim: ft=perl sw=2

@@ -11,6 +11,11 @@ ok( $wowp && ref $wowp, 'create class' );
 isa_ok( $wowp, 'WG::API::WoWp' );
 
 can_ok( $wowp, qw/account_list account_info account_planes/ );
+can_ok(
+    $wowp, qw/encyclopedia_planes encyclopedia_planeinfo encyclopedia_planemodules encyclopedia_planeupgrades
+        encyclopedia_planespecification encyclopedia_achievements encyclopedia_info
+        /
+);
 can_ok( $wowp, qw/ratings_types ratings_accounts ratings_neighbors ratings_top ratings_dates/ );
 can_ok( $wowp, qw/planes_stats planes_achievements/ );
 
@@ -28,6 +33,32 @@ SKIP: {
         is( $wowp->account_planes, undef, 'get account planes without params' );
         ok( $wowp->account_planes( account_id => $accounts->[0]->{'account_id'} ), 'get account planes with valid params' );
         is( $wowp->account_planes( account_id => 'xxx' ), undef, 'get account planes with invalid params' );
+    };
+
+    subtest 'encylopedia' => sub {
+        my $planes;
+        ok( $planes = $wowp->encyclopedia_planes(), "get list of all aircrafts from Encyclopedia" );
+
+        my ($plane_id) = keys %$planes;
+        is( $wowp->encyclopedia_planeinfo(), undef, "get plane info wo plane_id" );
+        is( $wowp->encyclopedia_planeinfo( plane_id => 'XXX' ), undef, "get plane info w invalif plane id" );
+        ok( $wowp->encyclopedia_planeinfo( plane_id => $plane_id ), "get plane info w valid plane id" );
+
+        is( $wowp->encyclopedia_planemodules(), undef, "get plane configuration wo plane id" );
+        is( $wowp->encyclopedia_planemodules( plane_id => 'XXX' ), undef, "get plane configuration w invalid plane id" );
+        ok( $wowp->encyclopedia_planemodules( plane_id => $plane_id ), "get plane configuation w valid plane id" );
+
+        is( $wowp->encyclopedia_planeupgrades(), undef, "get plane tech tree wo plane id" );
+        is( $wowp->encyclopedia_planeupgrades( plane_id => 'XXX' ), undef, "get plane teche tree w invalid plane id" );
+        ok( $wowp->encyclopedia_planeupgrades( plane_id => $plane_id ), "get plane tech tree w valid plane id" );
+
+        is( $wowp->encyclopedia_planespecification(), undef, "get plane spec. wo plane id" );
+        is( $wowp->encyclopedia_planespecification( plane_id => 'XXX' ), undef, "get plane spec. w invalid plane id" );
+        ok( $wowp->encyclopedia_planespecification( plane_id => $plane_id ), "get plane spec. w valid plane id" );
+
+        ok( $wowp->encyclopedia_achievements(), "get dictionary of achievements" );
+
+        ok( $wowp->encyclopedia_info(), "get information about encyclopedia" );
     };
 
     subtest 'ratings' => sub {

@@ -4,6 +4,7 @@ author:
   - 'Mike Schilli <cpan@perlmeister.com>'
   - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
 build_requires:
+  Dumbbench: '0.111'
   ExtUtils::MakeMaker: '0'
   Test::Simple: '1.302073'
 configure_requires:
@@ -30,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues
   repository: https://github.com/glasswalk3r/archive-tar-wrapper-perl.git
-version: '0.32'
+version: '0.33'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

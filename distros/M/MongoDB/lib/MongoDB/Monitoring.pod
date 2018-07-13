@@ -30,7 +30,7 @@ MongoDB::Monitoring - Internal event monitoring API for instrumentation
 
 =head1 VERSION
 
-version v2.0.0
+version v2.0.1
 
 =head1 DESCRIPTION
 
@@ -71,7 +71,7 @@ databaseName: the name of the database to which the command applies
 
 =item *
 
-commandName: the name of the command being excuted; for legacy operations that don't use commands, the driver will convert them to appear as if they are in command form.
+commandName: the name of the command being executed; for legacy operations that don't use commands, the driver will convert them to appear as if they are in command form.
 
 =item *
 
@@ -105,7 +105,7 @@ type: "command_succeeded"
 
 =item *
 
-commandName: the name of the command being excuted
+commandName: the name of the command being executed
 
 =item *
 
@@ -141,7 +141,7 @@ type: "command_failed"
 
 =item *
 
-commandName: the name of the command being excuted
+commandName: the name of the command being executed
 
 =item *
 

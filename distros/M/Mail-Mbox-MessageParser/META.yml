@@ -5,13 +5,12 @@ author:
 build_requires:
   ExtUtils::MakeMaker: 6.36
   File::Path: 2.08
-  File::Slurper: 0
   Test::Compile: 0
   Test::More: 0
   Text::Diff: 0
+  UNIVERSAL::require: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
-  File::Slurper: 0
   URI::Escape: 0
 distribution_type: module
 dynamic_config: 1
@@ -36,4 +35,4 @@ resources:
   homepage: https://github.com/coppit/mail-mbox-messageparser
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/coppit/mail-mbox-messageparser
-version: '1.5110'
+version: '1.5111'

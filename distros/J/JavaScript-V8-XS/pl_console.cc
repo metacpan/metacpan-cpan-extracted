@@ -70,7 +70,7 @@ static int console_output(const FunctionCallbackInfo<Value>& args, unsigned int 
     HandleScope handle_scope(isolate);
     Local<External> v8_val = Local<External>::Cast(args.Data());
     V8Context* ctx = (V8Context*) v8_val->Value();
-    Local<Context> context = Local<Context>::New(isolate, ctx->persistent_context);
+    Local<Context> context = Local<Context>::New(isolate, *ctx->persistent_context);
     Context::Scope context_scope(context);
 
     SV* message = newSVpvs("");
@@ -179,7 +179,7 @@ int pl_register_console_functions(V8Context* ctx)
         { "console.dir"      , console_dir       },
     };
     HandleScope handle_scope(ctx->isolate);
-    Local<Context> context = Local<Context>::New(ctx->isolate, ctx->persistent_context);
+    Local<Context> context = Local<Context>::New(ctx->isolate, *ctx->persistent_context);
     Context::Scope context_scope(context);
     Local<Value> v8_ctx = External::New(ctx->isolate, ctx);
     int n = sizeof(data) / sizeof(data[0]);

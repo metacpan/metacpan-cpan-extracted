@@ -21,17 +21,17 @@ name: Algorithm-QuineMcCluskey
 provides:
   Algorithm::QuineMcCluskey:
     file: lib/Algorithm/QuineMcCluskey.pm
-    version: '0.17'
+    version: '0.18'
   Algorithm::QuineMcCluskey::Format:
     file: lib/Algorithm/QuineMcCluskey/Format.pm
     version: '0.17'
   Algorithm::QuineMcCluskey::Util:
     file: lib/Algorithm/QuineMcCluskey/Util.pm
-    version: '0.17'
+    version: '0.18'
 requires:
   Carp: '0'
   List::Compare::Functional: '0.53'
-  List::MoreUtils: '0.428'
+  List::MoreUtils: '0.401'
   Moose: '2.16'
   Tie::Cycle: '1.225'
   namespace::autoclean: '0.28'
@@ -39,5 +39,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/jgamble/Algorithm-QuineMcCluskey
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.019    2018-07-13
+        - Close an open parentheses automatically on OK.
+        - Regexp: show the operator already before entering the pattern.
+
 2.018    2018-07-09
         - Don't put Version in every pm.
         - Bugfix join-menu.

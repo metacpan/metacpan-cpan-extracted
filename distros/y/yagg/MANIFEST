@@ -271,6 +271,7 @@ examples/reliability_block_diagrams/user_code/src/model/rbd_textual_parser/rbd_t
 
 # Module::Install extensions
 inc/File/HomeDir.pm
+inc/File/Slurper.pm
 inc/File/Which.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoLicense.pm
@@ -294,6 +295,7 @@ inc/Module/Install/PRIVATE/Configure_Programs.pm
 inc/Module/Install/PRIVATE/Fix_Sort_Versions.pm
 inc/Module/Install/PRIVATE/Make_Parsers.pm
 inc/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm
+inc/URI/Escape.pm
 
 # Private Module::Install extensions
 private-lib/Module/Install/PRIVATE/Configure_Programs.pm

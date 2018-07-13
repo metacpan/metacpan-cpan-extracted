@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010000;
 
-our $VERSION = '0.302';
+our $VERSION = '0.303';
 
 
 1;
@@ -22,7 +22,7 @@ App::YTDL - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.302
+Version 0.303
 
 =cut
 

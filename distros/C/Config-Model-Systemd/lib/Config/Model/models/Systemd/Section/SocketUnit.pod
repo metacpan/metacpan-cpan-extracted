@@ -75,10 +75,12 @@ above. I< Optional. Type list of uniline.  >
 
 =head2 Requisite
 
-Similar to C<Requires>.
-However, if the units listed here are not started already,
-they will not be started and the transaction will fail
-immediately.
+Similar to C<Requires>. However, if the units listed here
+are not started already, they will not be started and the starting of this unit will fail
+immediately. C<Requisite> does not imply an ordering dependency, even if
+both units are started in the same transaction. Hence this setting should usually be
+combined with C<After>, to ensure this unit is not started before the other
+unit.
 
 When C<Requisite=b.service> is used on
 a.service, this dependency will show as
@@ -733,15 +735,13 @@ doesn't require its functionality. Use the various C<AssertArchitecture=>,
 C<AssertVirtualization=>, … options for a similar mechanism that puts the unit in a failure
 state and logs about the failed check (see below).
 
-C<ConditionSecurity=> may be used to
-check whether the given security module is enabled on the
+C<ConditionSecurity=> may be used to check
+whether the given security technology is enabled on the
 system. Currently, the recognized values are
-C<selinux>,
-C<apparmor>,
-C<tomoyo>,
-C<ima>,
-C<smack> and
-C<audit>. The test may be negated by
+C<selinux>, C<apparmor>,
+C<tomoyo>, C<ima>,
+C<smack>, C<audit> and
+C<uefi-secureboot>. The test may be negated by
 prepending an exclamation mark.
 
 If multiple conditions are specified, the unit will be
@@ -1560,7 +1560,7 @@ limit. This setting does not apply to slice, target, device, and scope units, si
 activation may either never fail, or may succeed only a single time.
 
 When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters are
-flushed out too. This means that configuring start rate limiting for a unit that is not referenced continously
+flushed out too. This means that configuring start rate limiting for a unit that is not referenced continuously
 has no effect. I< Optional. Type uniline.  > 
 
 =head2 StartLimitIntervalSec
@@ -1586,7 +1586,7 @@ limit. This setting does not apply to slice, target, device, and scope units, si
 activation may either never fail, or may succeed only a single time.
 
 When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters are
-flushed out too. This means that configuring start rate limiting for a unit that is not referenced continously
+flushed out too. This means that configuring start rate limiting for a unit that is not referenced continuously
 has no effect. I< Optional. Type uniline.  > 
 
 =head2 RebootArgument

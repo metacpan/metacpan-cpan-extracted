@@ -10,13 +10,16 @@ use Test::More;
 plan skip_all => "Disabled" if $ENV{NO_JIRA_CHECK};
 
 my @commits = split /\n/, <<'EOC';
-d9afb7fa PERL-951 Make await cursor test more robust
-24ca9401 PERL-640: remove flaky OID vs epoch time test
-965807e8 PERL-946 Expand docs on transactions plus other minor cleanup
-69da80bb PERL-945 Document operators that must change when upgrading count
-86e7080d PERL-908 Add transaction examples for docs
-b3a76f05 PERL-944 Add client method to Database
-78c52f3a PERL-948 Factor out op dispatching
+eb28fd35 (HEAD -> maint-v2.0, sandbox/maint-v2.0, origin/maint-v2.0, dagolden/maint-v2.0) PERL-959 Make Perl::Critic happy with the pvt construtor gen
+d79be6f2 PERL-967 Document that X509 doesn't need username
+0427b981 PERL-968 Re-enable release time spell check tests; fix more errors
+ca4fca0a PERL-968 Fix spelling errors
+61bd2f28 PERL-958 Don't require BSON::XS on Windows XP or earlier
+90a2882e PERL-897 Limit use of nameOnly for non-name filters
+3610cae7 PERL-897 Add nameOnly option to list_collections
+cff63d82 PERL-959 Undefer constructor in the private constructor
+a601807f PERL-953 Fix warning with default compression level
+2e722608 PERL-952 Show how to upgrade v2 over v1 without shadows
 
 EOC
 

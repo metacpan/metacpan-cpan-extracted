@@ -4,7 +4,7 @@
       "Songmu <y.songmu@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.0",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "perl_5"
    ],
@@ -45,7 +45,7 @@
             "Class::Accessor::Lite" : "0",
             "Module::Load" : "0",
             "parent" : "0",
-            "perl" : "5.010001"
+            "perl" : "5.008001"
          }
       },
       "test" : {
@@ -58,7 +58,7 @@
    "provides" : {
       "MySQL::Partition" : {
          "file" : "lib/MySQL/Partition.pm",
-         "version" : "0.05"
+         "version" : "1.0001"
       },
       "MySQL::Partition::Handle" : {
          "file" : "lib/MySQL/Partition/Handle.pm"
@@ -81,9 +81,11 @@
          "web" : "https://github.com/Songmu/p5-MySQL-Partition"
       }
    },
-   "version" : "0.05",
+   "version" : "1.0001",
    "x_authority" : "cpan:SONGMU",
    "x_contributors" : [
       "Ichinose Shogo <shogo82148@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

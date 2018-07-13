@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.302';
+our $VERSION = '0.303';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -92,7 +92,8 @@ my $opt = {
     list_sort_order             => 'Desc',
     show_view_count             => 0,
 
-    yt_dl_config_file           => undef,
+    yt_dl_config_location       => undef,
+    reset_yt_dl_config_location => 0,
     yt_dl_ignore_config         => 0,
 
     no_upload_datetime          => '0000-00-00T00:00:00',
@@ -109,13 +110,13 @@ $opt->{youtube_dl} = [ $youtube_dl ];
 read_config_file( $opt, $opt->{config_file} );
 set_options( $opt ) if $help;
 
-push @{$opt->{youtube_dl}}, '--config-location', $opt->{yt_dl_config_file} if $opt->{yt_dl_config_file};
-push @{$opt->{youtube_dl}}, '--ignore-config',                             if $opt->{yt_dl_ignore_config};
-push @{$opt->{youtube_dl}}, '--no-warnings'                                if $opt->{no_warnings};
-push @{$opt->{youtube_dl}}, '--user-agent',      $opt->{useragent}         if defined $opt->{useragent};
-push @{$opt->{youtube_dl}}, '--retries',         $opt->{retries}           if defined $opt->{retries};
-push @{$opt->{youtube_dl}}, '--socket-timeout',  $opt->{timeout}           if defined $opt->{timeout};
-push @{$opt->{youtube_dl}}, '--prefer-free-formats'                        if $opt->{prefer_free_formats};
+push @{$opt->{youtube_dl}}, '--config-location', $opt->{yt_dl_config_location}  if $opt->{yt_dl_config_location};
+push @{$opt->{youtube_dl}}, '--ignore-config',                                  if $opt->{yt_dl_ignore_config};
+push @{$opt->{youtube_dl}}, '--no-warnings'                                     if $opt->{no_warnings};
+push @{$opt->{youtube_dl}}, '--user-agent',      $opt->{useragent}              if defined $opt->{useragent};
+push @{$opt->{youtube_dl}}, '--retries',         $opt->{retries}                if defined $opt->{retries};
+push @{$opt->{youtube_dl}}, '--socket-timeout',  $opt->{timeout}                if defined $opt->{timeout};
+push @{$opt->{youtube_dl}}, '--prefer-free-formats'                             if $opt->{prefer_free_formats};
 
 
 local $| = 1;
@@ -184,7 +185,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.302
+Version 0.303
 
 =cut
 

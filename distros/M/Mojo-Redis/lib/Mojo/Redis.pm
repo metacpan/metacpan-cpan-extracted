@@ -8,7 +8,7 @@ use Mojo::Redis::Cursor;
 use Mojo::Redis::Database;
 use Mojo::Redis::PubSub;
 
-our $VERSION = '3.03';
+our $VERSION = '3.07';
 
 $ENV{MOJO_REDIS_URL} ||= 'redis://localhost:6379';
 
@@ -51,7 +51,7 @@ sub _connection {
   my $conn = Mojo::Redis::Connection->new(
     encoding => $self->encoding,
     protocol => $self->protocol_class->new(api => 1),
-    url      => $self->url,
+    url      => $self->url->clone,
     %args
   );
 
@@ -74,7 +74,7 @@ sub _dequeue {
 sub _enqueue {
   my ($self, $conn) = @_;
   my $queue = $self->{queue} ||= [];
-  push @$queue, $conn if $conn->is_connected;
+  push @$queue, $conn if $conn->is_connected and $conn->url eq $self->url;
   shift @$queue while @$queue > $self->max_connections;
 }
 
@@ -88,14 +88,34 @@ Mojo::Redis - Redis driver based on Mojo::IOLoop
 
 =head1 SYNOPSIS
 
-  use Mojo::Redis;
+=head2 Blocking
 
+  use Mojo::Redis;
   my $redis = Mojo::Redis->new;
+  warn $redis->db->get("mykey");
+
+=head2 Promises
 
   $redis->db->get_p("mykey")->then(sub {
     print "mykey=$_[0]\n";
   })->catch(sub {
     warn "Could not fetch mykey: $_[0]";
+  })->wait;
+
+=head2 Pipelining
+
+Pipelining is built into the API by sending a lot of commands and then use
+L<Mojo::Promise/all> to wait for all the responses.
+
+  Mojo::Promise->all(
+    $db->set_p($key, 10),
+    $db->incrby_p($key, 9),
+    $db->incr_p($key),
+    $db->get_p($key),
+    $db->incr_p($key),
+    $db->get_p($key),
+  )->then(sub {
+    @res = map {@$_} @_;
   })->wait;
 
 =head1 DESCRIPTION

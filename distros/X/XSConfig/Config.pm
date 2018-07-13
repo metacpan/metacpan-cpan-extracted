@@ -10,7 +10,7 @@ use strict;
 use warnings;
 our (%Config, $VERSION);
 
-$VERSION = '6.26';
+$VERSION = '6.27';
 
 # Skip @Config::EXPORT because it only contains %Config, which we special
 # case below as it's not a function. @Config::EXPORT won't change in the
@@ -59,6 +59,9 @@ sub import {
 sub DESTROY { }
 
 if (defined &DynaLoader::boot_DynaLoader) {
+    #next 2 lines are special matched in Makefile.PL, update that if changed
+    delete local $DynaLoader::{'VERSION'} if $] lt '5.009005';
+    delete local $DynaLoader::{'XS_VERSION'} if $] lt '5.009005';
     require XSLoader;
     XSLoader::load(__PACKAGE__, $VERSION);
     tie %Config, 'Config';

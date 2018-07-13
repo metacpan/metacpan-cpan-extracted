@@ -1,3 +1,10 @@
+0.000068    2018-07-11
+            * Add method reset() to reset the VM to pristine conditions.
+            * Add method global_objects().
+            * Make release script more generic -- Duktape vs V8.
+            * Minor test improvements.
+            * Update ppport.h.
+
 0.000067    2018-06-10
             * Be explicit about imports from Test::Output.
 

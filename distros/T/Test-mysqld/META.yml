@@ -27,7 +27,7 @@ no_index:
 provides:
   Test::mysqld:
     file: lib/Test/mysqld.pm
-    version: '1.0010'
+    version: '1.0011'
 requires:
   Class::Accessor::Lite: '0'
   DBD::mysql: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/kazuho/p5-test-mysqld/issues
   homepage: https://github.com/kazuho/p5-test-mysqld
   repository: git://github.com/kazuho/p5-test-mysqld.git
-version: '1.0010'
+version: '1.0011'
 x_authority: cpan:KAZUHO
 x_contributors:
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
@@ -50,8 +50,8 @@ x_contributors:
   - 'John Napiorkowski <jjn1056@yahoo.com>'
   - 'Kazuho Oku <kazuho@li1.kazuhooku.com>'
   - 'Kazuho Oku <kazuhooku@gmail.com>'
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
   - 'NAKAGAWA Masaki <masaki.nakagawa@gmail.com>'
-  - 'Songmu <y.songmu@gmail.com>'
   - 'Yusuke Watase <ywatase@gmail.com>'
   - 'Zhenjun Wang <zjwang0414@gmail.com>'
   - 'hiratara <hiratara@cpan.org>'

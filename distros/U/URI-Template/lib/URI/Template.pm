@@ -3,7 +3,7 @@ package URI::Template;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use URI;
 use URI::Escape        ();
@@ -36,9 +36,22 @@ sub new {
 sub _quote {
     my ( $val, $safe ) = @_;
     $safe ||= '';
+    my $unsafe = '^A-Za-z0-9\-\._' . $safe;
+
+    ## Where RESERVED are allowed to pass-through, so are
+    ## already-pct-encoded values
+    if( $safe ) {
+        my (@chunks) = split(/(%[0-9A-Fa-f]{2})/, $val);
+
+        # even chunks are not %xx, odd chunks are
+        return join '',
+            map { $_ % 2
+                  ? $chunks[$_]
+                  : URI::Escape::uri_escape_utf8( Unicode::Normalize::NFKC($chunks[$_]), $unsafe ) } 0..$#chunks;
+
+    }
 
     # try to mirror python's urllib quote
-    my $unsafe = '^A-Za-z0-9\-\._' . $safe;
     return URI::Escape::uri_escape_utf8( Unicode::Normalize::NFKC( $val ),
         $unsafe );
 }

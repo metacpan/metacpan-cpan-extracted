@@ -13,6 +13,9 @@ all_from('lib/FileHandle/Unget.pm');
 auto_set_bugtracker;
 githubmeta;
 
+# Perl 5.6 doesn't work with URI::Escape. We get an error about Exporter not exporting "import"
+perl_version '5.008';
+
 configure_requires(
   # Module::Install::Bugtracker needs this
   'URI::Escape' => 0,
@@ -29,10 +32,17 @@ test_requires(
 );
 
 license 'gpl2';
+
+use_standard_tests(without => 'pod_coverage');
+
 auto_license(holder => 'David Coppit');
 no_index 'directory' => 'private-lib';
 
 enable_verbose_cpan_testing();
+
+realclean_files('inc');
+
+WriteAll;
 
 # ---- Workaround for broken module ----
 # https://rt.cpan.org/Ticket/Display.html?id=125772
@@ -59,7 +69,3 @@ enable_verbose_cpan_testing();
       /);
   }
 }
-
-use_standard_tests(without => 'pod_coverage');
-
-WriteAll();

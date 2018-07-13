@@ -4,7 +4,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 # VERSION
 
-version 0.82
+version 0.83
 
 # SYNOPSIS
 
@@ -140,8 +140,8 @@ Create a new S3 client object. Takes some arguments:
 
 - secure
 
-    Set this to `1` if you want to use SSL-encrypted connections when talking
-    to S3. Defaults to `0`.
+    Set this to `0` if you don't want to use SSL-encrypted connections when talking
+    to S3. Defaults to `1`.
 
     To use SSL-encrypted connections, LWP::Protocol::https is required.
 
@@ -167,6 +167,14 @@ Create a new S3 client object. Takes some arguments:
     bucket at the first part of the path. This is particularily useful if you want to access
     buckets not located in the US-Standard region (such as EU, Asia Pacific or South America).
     See [http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html](http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html) for the pros and cons.
+
+- authorization\_method
+
+    Authorization implementation package name.
+
+    This library provides [Net::Amazon::S3::Signature::V2](https://metacpan.org/pod/Net::Amazon::S3::Signature::V2) and [Net::Amazon::S3::Signature::V4](https://metacpan.org/pod/Net::Amazon::S3::Signature::V4)
+
+    Default is Signature 4 if host is `s3.amazonaws.com`, Signature 2 otherwise
 
 ### Notes
 
@@ -420,11 +428,3 @@ This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Br
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 172:
-
-    '=item' outside of any '=over'

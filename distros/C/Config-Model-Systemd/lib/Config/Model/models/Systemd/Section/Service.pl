@@ -207,8 +207,9 @@ specified, then the service must have C<RemainAfterExit=yes> and at least one
 C<ExecStop> line set. (Services lacking both C<ExecStart> and
 C<ExecStop> are not valid.)
 
-For each of the specified commands, the first argument must be an absolute path to an
-executable. Optionally, this filename may be prefixed with a number of special characters:
+For each of the specified commands, the first argument must be either an absolute path to an executable
+or a simple file name without any slashes. Optionally, this filename may be prefixed with a number of special
+characters:
 
 C<@>, C<->, and one of
 C<+>/C<!>/C<!!> may be used together and they can appear in any
@@ -442,12 +443,12 @@ L<sd_notify(3)>).
       },
       'TimeoutStopSec',
       {
-        'description' => "Configures the time to wait for stop. If a
-service is asked to stop, but does not terminate in the
-specified time, it will be terminated forcibly via
-C<SIGTERM>, and after another timeout of
-equal duration with C<SIGKILL> (see
-C<KillMode> in
+        'description' => "This option serves two purposes. First, it configures the time to wait for each
+C<ExecStop> command. If any of them times out, subsequent C<ExecStop> commands
+are skipped and the service will be terminated by C<SIGTERM>. If no C<ExecStop>
+commands are specified, the service gets the C<SIGTERM> immediately. Second, it configures the time
+to wait for the service itself to stop. If it doesn't terminate in the specified time, it will be forcibly terminated
+by C<SIGKILL> (see C<KillMode> in
 L<systemd.kill(5)>).
 Takes a unit-less value in seconds, or a time span value such
 as \"5min 20s\". Pass C<infinity> to disable the
@@ -488,7 +489,7 @@ the runtime to be extended beyond C<RuntimeMaxSec>. The first receipt of this me
 must occur before C<RuntimeMaxSec> is exceeded, and once the runtime has exended beyond
 C<RuntimeMaxSec>, the service manager will allow the service to continue to run, provided
 the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified until the service
-shutdown is acheived by C<STOPPING=1> (or termination). (see
+shutdown is achieved by C<STOPPING=1> (or termination). (see
 L<sd_notify(3)>).
 ",
         'type' => 'leaf',
@@ -803,7 +804,10 @@ descriptor. Defaults to 0, i.e. no file descriptors may be stored in the service
 passed to the service manager from a specific service are passed back to the service\'s main process on the next
 service restart. Any file descriptors passed to the service manager are automatically closed when
 C<POLLHUP> or C<POLLERR> is seen on them, or when the service is fully
-stopped and no job is queued or being executed for it.',
+stopped and no job is queued or being executed for it. If this option is used, C<NotifyAccess>
+(see above) should be set to open access to the notification socket provided by systemd. If
+C<NotifyAccess> is not set, it will be implicitly set to
+C<main>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

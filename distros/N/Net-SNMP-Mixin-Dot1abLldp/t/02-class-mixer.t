@@ -8,23 +8,26 @@ eval "use Net::SNMP";
 plan skip_all => "Net::SNMP required for testing Net::SNMP::Mixin module"
   if $@;
 
+my @methods = qw/
+  get_lldp_local_system_data
+  get_lldp_loc_port_table
+  get_lldp_rem_table
+  map_lldp_loc_portid2portnum
+  /;
+
 eval "use Net::SNMP::Mixin";
 plan skip_all =>
   "Net::SNMP::Mixin required for testing Net::SNMP::Mixin module"
   if $@;
 
-plan tests => 11;
+plan tests => 17;
 
 is( Net::SNMP->mixer('Net::SNMP::Mixin::Dot1abLldp'),
   'Net::SNMP', 'mixer returns the class name' );
-ok(
-  Net::SNMP->can('get_lldp_local_system_data'),
-  'get_lldp_local_system_data() is now a class method'
-);
-ok(
-  Net::SNMP->can('get_lldp_rem_table'),
-  'get_lldp_rem_table() is now a class method'
-);
+
+foreach my $m (@methods) {
+  ok( Net::SNMP->can($m), "$m() is now a class method" );
+}
 
 eval {Net::SNMP->mixer('Net::SNMP::Mixin::Dot1abLldp')};
 like( $@, qr/already mixed into/, 'mixed in twice is an error' );
@@ -38,10 +41,17 @@ isa_ok( $session, 'Net::SNMP' );
 eval {$session->mixer("Net::SNMP::Mixin::Dot1abLldp")};
 like( $@, qr/already mixed into/, 'mixed in twice is an error' );
 
-ok( $session->can('get_lldp_local_system_data'), '$session can get_lldp_local_system_data' );
-ok( $session->can('get_lldp_rem_table'), '$session can get_lldp_rem_table' );
+foreach my $m (@methods) {
+  ok( $session->can($m), "\$session can $m()" );
+}
 
 eval {$session->get_lldp_local_system_data};
+like( $@, qr/not initialized/i, 'not initialized' );
+
+eval {$session->get_lldp_loc_port_table};
+like( $@, qr/not initialized/i, 'not initialized' );
+
+eval {$session->map_lldp_loc_portid2portnum};
 like( $@, qr/not initialized/i, 'not initialized' );
 
 eval {$session->get_lldp_rem_table};

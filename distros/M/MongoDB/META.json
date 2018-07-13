@@ -35,11 +35,17 @@
       "develop" : {
          "requires" : {
             "ExtUtils::HasCompiler" : "0.014",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Wordlist" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::MinimumVersion" : "0",
             "Test::More" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12",
             "Test::Version" : "1",
             "lib" : "0"
          }
@@ -54,7 +60,7 @@
          "requires" : {
             "Authen::SASL::SASLprep" : "0",
             "Authen::SCRAM::Client" : "0.011",
-            "BSON" : "1.006005",
+            "BSON" : "1.006006",
             "BSON::Bytes" : "0",
             "BSON::Code" : "0",
             "BSON::DBRef" : "0",
@@ -79,6 +85,7 @@
             "Safe::Isa" : "1.000007",
             "Scalar::Util" : "0",
             "Socket" : "0",
+            "Sub::Defer" : "0",
             "Sub::Quote" : "0",
             "Tie::IxHash" : "0",
             "Time::HiRes" : "0",
@@ -131,219 +138,219 @@
    "provides" : {
       "MongoDB" : {
          "file" : "lib/MongoDB.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::AuthError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::BSON::Binary" : {
          "file" : "lib/MongoDB/BSON/Binary.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::BSON::Regexp" : {
          "file" : "lib/MongoDB/BSON/Regexp.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::BulkWrite" : {
          "file" : "lib/MongoDB/BulkWrite.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::BulkWriteResult" : {
          "file" : "lib/MongoDB/BulkWriteResult.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::BulkWriteView" : {
          "file" : "lib/MongoDB/BulkWriteView.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::ChangeStream" : {
          "file" : "lib/MongoDB/ChangeStream.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::ClientSession" : {
          "file" : "lib/MongoDB/ClientSession.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::Code" : {
          "file" : "lib/MongoDB/Code.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::Collection" : {
          "file" : "lib/MongoDB/Collection.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::CommandResult" : {
          "file" : "lib/MongoDB/CommandResult.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::ConfigurationError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::ConnectionError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::Cursor" : {
          "file" : "lib/MongoDB/Cursor.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::CursorNotFoundError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::DBRef" : {
          "file" : "lib/MongoDB/DBRef.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::Database" : {
          "file" : "lib/MongoDB/Database.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::DatabaseError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::DecodingError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::DeleteResult" : {
          "file" : "lib/MongoDB/DeleteResult.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::DocumentError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::DuplicateKeyError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::Error" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::ExecutionTimeout" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::GridFSBucket" : {
          "file" : "lib/MongoDB/GridFSBucket.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::GridFSBucket::DownloadStream" : {
          "file" : "lib/MongoDB/GridFSBucket/DownloadStream.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::GridFSBucket::UploadStream" : {
          "file" : "lib/MongoDB/GridFSBucket/UploadStream.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::GridFSError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::HandshakeError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::IndexView" : {
          "file" : "lib/MongoDB/IndexView.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::InsertManyResult" : {
          "file" : "lib/MongoDB/InsertManyResult.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::InsertOneResult" : {
          "file" : "lib/MongoDB/InsertOneResult.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::InternalError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::InvalidOperationError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::MongoClient" : {
          "file" : "lib/MongoDB/MongoClient.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::NetworkError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::NetworkTimeout" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::NotMasterError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::OID" : {
          "file" : "lib/MongoDB/OID.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::ProtocolError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::QueryResult" : {
          "file" : "lib/MongoDB/QueryResult.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::QueryResult::Filtered" : {
          "file" : "lib/MongoDB/QueryResult/Filtered.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::ReadConcern" : {
          "file" : "lib/MongoDB/ReadConcern.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::ReadPreference" : {
          "file" : "lib/MongoDB/ReadPreference.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::SelectionError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::TimeoutError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::Timestamp" : {
          "file" : "lib/MongoDB/Timestamp.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::UnacknowledgedResult" : {
          "file" : "lib/MongoDB/UnacknowledgedResult.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::UpdateResult" : {
          "file" : "lib/MongoDB/UpdateResult.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::UsageError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::WriteConcern" : {
          "file" : "lib/MongoDB/WriteConcern.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::WriteConcernError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "MongoDB::WriteError" : {
          "file" : "lib/MongoDB/Error.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       }
    },
    "release_status" : "stable",
@@ -358,7 +365,7 @@
          "web" : "https://github.com/mongodb/mongo-perl-driver"
       }
    },
-   "version" : "v2.0.0",
+   "version" : "v2.0.1",
    "x_contributors" : [
       "Andrew Page <andrew@infosiftr.com>",
       "Andrey Khozov <avkhozov@gmail.com>",
@@ -396,6 +403,7 @@
       "Kamil Slowikowski <kslowikowski@gmail.com>",
       "Ken Williams <kwilliams@cpan.org>",
       "Matthew Shopsin <matt.shopsin@mongodb.com>",
+      "Matt S Trout <mst@shadowcat.co.uk>",
       "Michael Langner <langner@fch.de>",
       "Michael Rotmanov <rotmanov@sipgate.de>",
       "Mike Dirolf <mike@mongodb.com>",
@@ -426,7 +434,7 @@
       "Xtreak <tirkarthi@users.noreply.github.com>",
       "Zhihong Zhang <zzh_621@yahoo.com>"
    ],
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

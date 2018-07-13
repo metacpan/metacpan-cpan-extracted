@@ -358,7 +358,7 @@ int pl_register_eventloop_functions(V8Context* ctx)
         { "EventLoop.deleteTimer", delete_timer },
     };
     HandleScope handle_scope(ctx->isolate);
-    Local<Context> context = Local<Context>::New(ctx->isolate, ctx->persistent_context);
+    Local<Context> context = Local<Context>::New(ctx->isolate, *ctx->persistent_context);
     Context::Scope context_scope(context);
     int n = sizeof(data) / sizeof(data[0]);
     for (int j = 0; j < n; ++j) {

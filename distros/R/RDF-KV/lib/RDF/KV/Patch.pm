@@ -17,11 +17,11 @@ RDF::KV::Patch - Representation of RDF statements to be added or removed
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -327,11 +327,24 @@ sub dont_remove_this {
     my ($s, $p, $o, $g) = _validate(@_);
 }
 
-=head2 apply $model
+=head2 apply { $model | $remove, $add }
 
 Apply the patch to an L<RDF::Trine::Model> object. Statements are
 removed first, then added. Transactions
 (i.e. L<RDF::Trine::Model/begin_bulk_ops>) are your responsibility.
+
+Alternatively, supply the C<remove> and C<add> functions directly:
+
+  sub _remove_or_add {
+    my ($subject, $predicate, $object, $graph) = @_;
+
+    # do stuff ...
+
+    # return value is ignored
+  }
+
+Inputs will be either L<RDF::Trine::Node> objects, or C<undef>, in the
+case of C<remove>.
 
 =cut
 
@@ -377,7 +390,7 @@ sub _traverse {
     }
 }
 
-sub apply {
+sub _apply {
     my ($self, $model) = @_;
 
     $model->begin_bulk_ops;
@@ -387,10 +400,13 @@ sub apply {
                   # fuuuuuuck this quad semantics shit
                   my @n = map { $_[$_] } (0..3);
 
+                  #warn "found context $n[3]" if defined $n[3];
+
                   $model->remove_statements
                       (defined $n[3] ? @n[0..3] : @n[0..2]) });
     _traverse($self->_pos,
               sub {
+                  #warn "found context $_[3]" if defined $_[3];
                   my $stmt = defined $_[3] ?
                       RDF::Trine::Statement::Quad->new(@_)
                             : RDF::Trine::Statement->new(@_[0..2]);
@@ -399,6 +415,17 @@ sub apply {
               });
 
     $model->end_bulk_ops;
+
+    1;
+}
+
+sub apply {
+    my ($self, $remove, $add) = @_;
+    return $self->_apply($remove) if Scalar::Util::blessed($remove)
+        and $remove->isa('RDF::Trine::Model');
+
+    _traverse($self->_neg, $remove);
+    _traverse($self->_pos, $add);
 
     1;
 }

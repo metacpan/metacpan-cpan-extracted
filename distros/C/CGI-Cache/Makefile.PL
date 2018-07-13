@@ -13,6 +13,9 @@ all_from('lib/CGI/Cache.pm');
 auto_set_bugtracker;
 githubmeta;
 
+# Perl 5.6 doesn't work with URI::Escape. We get an error about Exporter not exporting "import"
+perl_version '5.008';
+
 configure_requires(
   # Module::Install::Bugtracker needs this
   'URI::Escape' => 0,
@@ -32,6 +35,10 @@ test_requires(
   'Error' => 0,
 );
 
+license 'gpl2';
+
+use_standard_tests;
+
 check_optional('Benchmark::Timer' => '0.7100',
   "Install Benchmark::Timer if you want to run \"make testspeed\"\n");
 
@@ -39,10 +46,13 @@ Add_Test_Target('testspeed', 't/speed.pl');
 
 no_index 'directory' => 'private-lib';
 
-license 'gpl2';
 auto_license(holder => 'David Coppit');
 
 enable_verbose_cpan_testing();
+
+realclean_files('inc');
+
+WriteAll;
 
 # ---- Workaround for broken module ----
 # https://rt.cpan.org/Ticket/Display.html?id=125772
@@ -69,7 +79,3 @@ enable_verbose_cpan_testing();
       /);
   }
 }
-
-use_standard_tests;
-
-WriteAll();

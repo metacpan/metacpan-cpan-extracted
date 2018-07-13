@@ -1,15 +1,24 @@
 use strict;
-use Test::More;
-use Test::Exception;
+use YAML::XS qw(Dump);
 use Path::Tiny qw(tempfile);
+use Test::Exception;
+use Test::More;
 
 my ($tmpa, $tmpb);
 
 BEGIN {
     $tmpa = tempfile;
-    $tmpa->spew(qw(TMPA));
+    $tmpa->spew(
+        Dump({
+                test1 => {
+                    updated => time,
+                    names   => ['TMPA']}}));
     $tmpb = tempfile;
-    $tmpb->spew(qw(TMPB));
+    $tmpb->spew(
+        Dump({
+                test1 => {
+                    updated => time,
+                    names   => ['TMPB']}}));
     $ENV{SANCTION_FILE} = "$tmpa";
 }
 use Data::Validate::Sanctions;

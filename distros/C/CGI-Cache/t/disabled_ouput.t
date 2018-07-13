@@ -40,7 +40,7 @@ my $expected_stderr = '';
 my $expected_cached = "Test output 1\n";
 my $message = 'Disabled output';
 
-my (undef, $test_script_name) = File::Temp::tempfile('cgi_test.cgi.XXXXX');
+my (undef, $test_script_name) = File::Temp::tempfile('cgi_test.cgi.XXXXX', TMPDIR=>1);
 
 Init_For_Run($test_script_name, $script, 1);
 Run_Script($test_script_name, $expected_stdout, $expected_stderr, $expected_cached, $message);

@@ -141,11 +141,13 @@ sub _parse_message_cb {
 
 sub _write {
   my $self = shift;
-  my $op   = shift @{$self->{write}} or return;
-  my $loop = $self->ioloop;
-  do { local $_ = $op->[0]; s!\r\n!\\r\\n!g; warn "[@{[$self->_id]}] <<< ($_)\n" } if DEBUG;
-  push @{$self->{waiting}}, $op->[1];
-  $self->{stream}->write($op->[0]);
+
+  while (my $op = shift @{$self->{write}}) {
+    my $loop = $self->ioloop;
+    do { local $_ = $op->[0]; s!\r\n!\\r\\n!g; warn "[@{[$self->_id]}] <<< ($_)\n" } if DEBUG;
+    push @{$self->{waiting}}, $op->[1];
+    $self->{stream}->write($op->[0]);
+  }
 }
 
 1;

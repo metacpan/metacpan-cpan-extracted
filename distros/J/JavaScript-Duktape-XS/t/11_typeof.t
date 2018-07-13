@@ -62,11 +62,14 @@ JS
         make => "string",
         model => "string",
         year => "number",
+        not_there => "undefined",
     );
     my $vm = $CLASS->new();
     ok($vm, "created $CLASS object");
 
     $vm->eval($js);
+    my $got = $vm->typeof("auto");
+    is($got, 'object', "got correct typeof for auto");
     foreach my $field (sort keys %fields) {
         my $got = $vm->typeof("auto.$field");
         is($got, $fields{$field}, "got correct typeof for field $field");

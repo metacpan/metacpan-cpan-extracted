@@ -1,6 +1,6 @@
 package Map::Tube::Madrid;
 
-$Map::Tube::Madrid::VERSION   = '0.10';
+$Map::Tube::Madrid::VERSION   = '0.11';
 $Map::Tube::Madrid::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,13 +9,13 @@ Map::Tube::Madrid - Interface to the Madrid Metro Map.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
 use 5.006;
 use Data::Dumper;
-use File::Share ':all';
+use File::ShareDir ':ALL';
 
 use Moo;
 use namespace::autoclean;

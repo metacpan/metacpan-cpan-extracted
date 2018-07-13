@@ -6,11 +6,18 @@ use 5.014000;
 
 use ExtUtils::MakeMaker 6.48;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Validate a name against sanctions lists",
   "AUTHOR" => "binary.com <BINARY\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.48"
+    "ExtUtils::MakeMaker" => "6.48",
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Data-Validate-Sanctions",
   "EXE_FILES" => [
@@ -20,9 +27,20 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Data::Validate::Sanctions",
   "PREREQ_PM" => {
+    "DateTime::Format::Strptime" => 0,
+    "File::ShareDir" => 0,
     "File::Temp" => 0,
-    "LWP::UserAgent" => 0,
-    "Text::CSV" => 0
+    "File::stat" => 0,
+    "FindBin" => 0,
+    "IO::Uncompress::Unzip" => 0,
+    "List::Util" => 0,
+    "Mojo::UserAgent" => 0,
+    "Path::Tiny" => 0,
+    "Scalar::Util" => 0,
+    "Text::CSV" => 0,
+    "Try::Tiny" => 0,
+    "XML::Fast" => 0,
+    "YAML::XS" => 0
   },
   "TEST_REQUIRES" => {
     "Class::Unload" => 0,
@@ -35,7 +53,7 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,17 +62,26 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Class::Unload" => 0,
+  "DateTime::Format::Strptime" => 0,
   "ExtUtils::MakeMaker" => 0,
+  "File::ShareDir" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
+  "File::stat" => 0,
   "FindBin" => 0,
   "IO::Handle" => 0,
+  "IO::Uncompress::Unzip" => 0,
   "IPC::Open3" => 0,
-  "LWP::UserAgent" => 0,
+  "List::Util" => 0,
+  "Mojo::UserAgent" => 0,
   "Path::Tiny" => 0,
+  "Scalar::Util" => 0,
   "Test::CheckDeps" => "0.010",
   "Test::More" => "0.96",
-  "Text::CSV" => 0
+  "Text::CSV" => 0,
+  "Try::Tiny" => 0,
+  "XML::Fast" => 0,
+  "YAML::XS" => 0
 );
 
 
@@ -68,3 +95,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

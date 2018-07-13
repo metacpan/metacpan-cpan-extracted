@@ -51,6 +51,7 @@ is( $bson, $expect, "BSON correct" );
 
 # MongoDB::BSON::Binary (deprecated) -> BSON::Bytes
 SKIP: {
+    $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1;
     eval { require MongoDB::BSON::Binary };
     skip( "MongoDB::BSON::Binary not installed", 2 )
       unless $INC{'MongoDB/BSON/Binary.pm'};

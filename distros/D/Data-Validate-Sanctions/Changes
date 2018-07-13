@@ -1,6 +1,14 @@
 Revision history for Data-Validate-Sanctions
 
+0.11      2018-07-11 14:40:36+08:00 Asia/Manila
+        Update cached list only on update any of the lists. Handle network errors.
+        Use YAML to store cached lists, to have some metadata. Store this file in `share` by default.
+        Use regex for name checking.
+        Added get_sanctioned_info to return detailed info on match.
+        Fix perlcritic warning
+
 0.10      2017-03-31 03:30:51+00:00 UTC
+          move scripts to bin directory
 
 0.09      2017-03-30 04:09:04+00:00 UTC
           check for undefined before processing

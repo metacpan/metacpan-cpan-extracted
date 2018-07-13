@@ -42,6 +42,8 @@ The following service exit codes are defined by the LSB specification
 The LSB specification suggests that error codes 200 and above are reserved for implementations. Some of them are
 used by the service manager to indicate problems during process invocation:
 
+
+Finally, the BSD operating systems define a set of exit codes, typically defined on Linux systems too:
 This configuration class was generated from systemd documentation.
 by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>
 ',
@@ -314,7 +316,7 @@ C<~>, all but the listed capabilities will be included, the effect of the assign
 inverted. Note that this option also affects the respective capabilities in the effective, permitted and
 inheritable capability sets. If this option is not used, the capability bounding set is not modified on process
 execution, hence no limits on the capabilities of the process are enforced. This option may appear more than
-once, in which case the bounding sets are merged by C<AND>, or by C<OR> if
+once, in which case the bounding sets are merged by C<OR>, or by C<AND> if
 the lines are prefixed with C<~> (see below). If the empty string is assigned to this option,
 the bounding set is reset to the empty capability set, and all prior settings have no effect.  If set to
 C<~> (without any further argument), the bounding set is reset to the full set of available
@@ -1266,7 +1268,8 @@ details.',
         ],
         'description' => 'Sets the I/O scheduling class for executed processes. Takes an integer between 0 and 3 or one
 of the strings C<none>, C<realtime>, C<best-effort> or
-C<idle>. See
+C<idle>. If the empty string is assigned to this option, all prior assignments to both
+C<IOSchedulingClass> and C<IOSchedulingPriority> have no effect. See
 L<ioprio_set(2)> for
 details.',
         'type' => 'leaf',
@@ -1276,7 +1279,9 @@ details.',
       {
         'description' => 'Sets the I/O scheduling priority for executed processes. Takes an integer between 0 (highest
 priority) and 7 (lowest priority). The available priorities depend on the selected I/O scheduling class (see
-above). See L<ioprio_set(2)> for
+above). If the empty string is assigned to this option, all prior assignments to both
+C<IOSchedulingClass> and C<IOSchedulingPriority> have no effect.
+See L<ioprio_set(2)> for
 details.',
         'max' => '7',
         'min' => '0',
@@ -1332,7 +1337,7 @@ is useful to hide home directories not relevant to the processes invoked by the 
 are still visible by combining with C<BindPaths> or C<BindReadOnlyPaths>.
 
 Setting this to C<yes> is mostly equivalent to set the three directories in
-C<InaccessiblePaths>. Similary, C<read-only> is mostly equivalent to
+C<InaccessiblePaths>. Similarly, C<read-only> is mostly equivalent to
 C<ReadOnlyPaths>, and C<tmpfs> is mostly equivalent to
 C<TemporaryFileSystem>.
 
@@ -1353,13 +1358,9 @@ calls, see below.',
       'RuntimeDirectory',
       {
         'description' => 'These options take a whitespace-separated list of directory names. The specified directory
-names must be relative, and may not include C<.> or C<..>. If set, one or more
-directories by the specified names will be created (including their parents) below /run
-(or C<$XDG_RUNTIME_DIR> for user services), /var/lib (or
-C<$XDG_CONFIG_HOME> for user services), /var/cache (or
-C<$XDG_CACHE_HOME> for user services), /var/log (or
-C<$XDG_CONFIG_HOME>/log for user services), or /etc
-(or C<$XDG_CONFIG_HOME> for user services), respectively, when the unit is started.
+names must be relative, and may not include C<..>. If set, one or more
+directories by the specified names will be created (including their parents) below the locations
+defined in the following table, when the unit is started.
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -1414,13 +1415,9 @@ when the service is stopped.',
       'StateDirectory',
       {
         'description' => 'These options take a whitespace-separated list of directory names. The specified directory
-names must be relative, and may not include C<.> or C<..>. If set, one or more
-directories by the specified names will be created (including their parents) below /run
-(or C<$XDG_RUNTIME_DIR> for user services), /var/lib (or
-C<$XDG_CONFIG_HOME> for user services), /var/cache (or
-C<$XDG_CACHE_HOME> for user services), /var/log (or
-C<$XDG_CONFIG_HOME>/log for user services), or /etc
-(or C<$XDG_CONFIG_HOME> for user services), respectively, when the unit is started.
+names must be relative, and may not include C<..>. If set, one or more
+directories by the specified names will be created (including their parents) below the locations
+defined in the following table, when the unit is started.
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -1475,13 +1472,9 @@ when the service is stopped.',
       'CacheDirectory',
       {
         'description' => 'These options take a whitespace-separated list of directory names. The specified directory
-names must be relative, and may not include C<.> or C<..>. If set, one or more
-directories by the specified names will be created (including their parents) below /run
-(or C<$XDG_RUNTIME_DIR> for user services), /var/lib (or
-C<$XDG_CONFIG_HOME> for user services), /var/cache (or
-C<$XDG_CACHE_HOME> for user services), /var/log (or
-C<$XDG_CONFIG_HOME>/log for user services), or /etc
-(or C<$XDG_CONFIG_HOME> for user services), respectively, when the unit is started.
+names must be relative, and may not include C<..>. If set, one or more
+directories by the specified names will be created (including their parents) below the locations
+defined in the following table, when the unit is started.
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -1536,13 +1529,9 @@ when the service is stopped.',
       'LogsDirectory',
       {
         'description' => 'These options take a whitespace-separated list of directory names. The specified directory
-names must be relative, and may not include C<.> or C<..>. If set, one or more
-directories by the specified names will be created (including their parents) below /run
-(or C<$XDG_RUNTIME_DIR> for user services), /var/lib (or
-C<$XDG_CONFIG_HOME> for user services), /var/cache (or
-C<$XDG_CACHE_HOME> for user services), /var/log (or
-C<$XDG_CONFIG_HOME>/log for user services), or /etc
-(or C<$XDG_CONFIG_HOME> for user services), respectively, when the unit is started.
+names must be relative, and may not include C<..>. If set, one or more
+directories by the specified names will be created (including their parents) below the locations
+defined in the following table, when the unit is started.
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -1597,13 +1586,9 @@ when the service is stopped.',
       'ConfigurationDirectory',
       {
         'description' => 'These options take a whitespace-separated list of directory names. The specified directory
-names must be relative, and may not include C<.> or C<..>. If set, one or more
-directories by the specified names will be created (including their parents) below /run
-(or C<$XDG_RUNTIME_DIR> for user services), /var/lib (or
-C<$XDG_CONFIG_HOME> for user services), /var/cache (or
-C<$XDG_CACHE_HOME> for user services), /var/log (or
-C<$XDG_CONFIG_HOME>/log for user services), or /etc
-(or C<$XDG_CONFIG_HOME> for user services), respectively, when the unit is started.
+names must be relative, and may not include C<..>. If set, one or more
+directories by the specified names will be created (including their parents) below the locations
+defined in the following table, when the unit is started.
 
 In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
 stopped. It is possible to preserve the specified directories in this case if
@@ -2041,8 +2026,8 @@ implied.',
       },
       'ProtectKernelModules',
       {
-        'description' => 'Takes a boolean argument. If true, explicit module loading will be denied. This allows to turn
-off module load and unload operations on modular kernels. It is recommended to turn this on for most services
+        'description' => 'Takes a boolean argument. If true, explicit module loading will be denied. This allows
+module load and unload operations to be turned off on modular kernels. It is recommended to turn this on for most services
 that do not need special file systems or extra kernel modules to work. Defaults to off. Enabling this option
 removes C<CAP_SYS_MODULE> from the capability bounding set for the unit, and installs a
 system call filter to block module system calls, also /usr/lib/modules is made
@@ -2120,7 +2105,9 @@ namespace type listed is made accessible to the unit's processes, access to name
 prohibited (whitelisting). By prepending the list with a single tilde character (C<~>) the
 effect may be inverted: only the listed namespace types will be made inaccessible, all unlisted ones are
 permitted (blacklisting). If the empty string is assigned, the default namespace restrictions are applied,
-which is equivalent to false. Internally, this setting limits access to the
+which is equivalent to false. This option may appear more than once, in which case the namespace types are
+merged by C<OR>, or by C<AND> if the lines are prefixed with
+C<~> (see examples below). Internally, this setting limits access to the
 L<unshare(2)>,
 L<clone(2)> and
 L<setns(2)> system calls, taking
@@ -2130,7 +2117,20 @@ setns() system call with a zero flags parameter is prohibited.  This setting is 
 supported on x86, x86-64, mips, mips-le, mips64, mips64-le, mips64-n32, mips64-le-n32, ppc64, ppc64-le, s390
 and s390x, and enforces no restrictions on other architectures. If running in user mode, or in system mode, but
 without the C<CAP_SYS_ADMIN> capability (e.g. setting C<User>),
-C<NoNewPrivileges=yes> is implied.  ",
+C<NoNewPrivileges=yes> is implied.
+
+Example: if a unit has the following,
+
+    RestrictNamespaces=cgroup ipc
+    RestrictNamespaces=cgroup net
+
+then C<cgroup>, C<ipc>, and C<net> are set.
+If the second line is prefixed with C<~>, e.g.,
+
+    RestrictNamespaces=cgroup ipc
+    RestrictNamespaces=~cgroup net
+
+then, only C<ipc> is set.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -2212,26 +2212,70 @@ stopped. This setting is implied if C<DynamicUser> is set.',
           'yes'
         ]
       },
+      'PrivateMounts',
+      {
+        'description' => "Takes a boolean parameter. If set, the processes of this unit will be run in their own private
+file system (mount) namespace with all mount propagation from the processes towards the host's main file system
+namespace turned off. This means any file system mount points established or removed by the unit's processes
+will be private to them and not be visible to the host. However, file system mount points established or
+removed on the host will be propagated to the unit's processes. See L<mount_namespaces(7)> for
+details on file system namespaces. Defaults to off.
+
+When turned on, this executes three operations for each invoked process: a new
+C<CLONE_NEWNS> namespace is created, after which all existing mounts are remounted to
+C<MS_SLAVE> to disable propagation from the unit's processes to the host (but leaving
+propagation in the opposite direction in effect). Finally, the mounts are remounted again to the propagation
+mode configured with C<MountFlags>, see below.
+
+File system namespaces are set up individually for each process forked off by the service manager. Mounts
+established in the namespace of the process created by C<ExecStartPre> will hence be cleaned
+up automatically as soon as that process exits and will not be available to subsequent processes forked off for
+C<ExecStart> (and similar applies to the various other commands configured for
+units). Similarly, C<JoinsNamespaceOf> does not permit sharing kernel mount namespaces between
+units, it only enables sharing of the /tmp/ and /var/tmp/
+directories.
+
+Other file system namespace unit settings \x{2014} C<PrivateMounts>,
+C<PrivateTmp>, C<PrivateDevices>, C<ProtectSystem>,
+C<ProtectHome>, C<ReadOnlyPaths>, C<InaccessiblePaths>,
+C<ReadWritePaths>, \x{2026} \x{2014} also enable file system namespacing in a fashion equivalent to this
+option. Hence it is primarily useful to explicitly request this behaviour if none of the other settings are
+used.",
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
       'MountFlags',
       {
-        'description' => 'Takes a mount propagation flag: C<shared>, C<slave> or
-C<private>, which control whether mounts in the file system namespace set up for this unit\'s
-processes will receive or propagate mounts and unmounts. See L<mount(2)> for
-details. Defaults to C<shared>. Use C<shared> to ensure that mounts and unmounts
-are propagated from systemd\'s namespace to the service\'s namespace and vice versa. Use C<slave>
-to run processes so that none of their mounts and unmounts will propagate to the host. Use
-C<private> to also ensure that no mounts and unmounts from the host will propagate into the unit
-processes\' namespace.  If this is set to C<slave> or C<private>, any mounts created
-by spawned processes will be unmounted after the completion of the current command line of
-C<ExecStartPre>, C<ExecStartPost>, C<ExecStart>, and
-C<ExecStopPost>. Note that C<slave> means that file systems mounted on the host
-might stay mounted continuously in the unit\'s namespace, and thus keep the device busy. Note that the file
-system namespace related options (C<PrivateTmp>, C<PrivateDevices>,
-C<ProtectSystem>, C<ProtectHome>, C<ProtectKernelTunables>,
-C<ProtectControlGroups>, C<ReadOnlyPaths>,
-C<InaccessiblePaths>, C<ReadWritePaths>) require that mount and unmount
-propagation from the unit\'s file system namespace is disabled, and hence downgrade C<shared> to
-C<slave>. ',
+        'description' => "Takes a mount propagation setting: C<shared>, C<slave> or
+C<private>, which controls whether file system mount points in the file system namespaces set up
+for this unit's processes will receive or propagate mounts and unmounts from other file system namespaces. See
+L<mount(2)>
+for details on mount propagation, and the three propagation flags in particular.
+
+This setting only controls the final propagation setting in effect on all mount
+points of the file system namespace created for each process of this unit. Other file system namespacing unit
+settings (see the discussion in C<PrivateMounts> above) will implicitly disable mount and
+unmount propagation from the unit's processes towards the host by changing the propagation setting of all mount
+points in the unit's file system namepace to C<slave> first. Setting this option to
+C<shared> does not reestablish propagation in that case. Conversely, if this option is set, but
+no other file system namespace setting is used, then new file system namespaces will be created for the unit's
+processes and this propagation flag will be applied right away to all mounts within it, without the
+intermediary application of C<slave>.
+
+If not set \x{2013} but file system namespaces are enabled through another file system namespace unit setting \x{2013}
+C<shared> mount propagation is used, but \x{2014} as mentioned \x{2014} as C<slave> is applied
+first, propagation from the unit's processes to the host is still turned off.
+
+It is not recommended to to use C<private> mount propagation for units, as this means
+temporary mounts (such as removable media) of the host will stay mounted and thus indefinitely busy in forked
+off processes, as unmount propagation events won't be received by the file system namespace of the unit.
+
+Usually, it is best to leave this setting unmodified, and use higher level file system namespacing
+options instead, in particular C<PrivateMounts>, see above.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -2282,12 +2326,16 @@ write, then write will be removed from the set.)
 
 As the number of possible system calls is large, predefined sets of system calls are provided.  A set
 starts with C<\@> character, followed by name of the set.
-Currently predefined system call setsSetDescription\@aioAsynchronous I/O (L<io_setup(2)>, L<io_submit(2)>, and related calls)\@basic-ioSystem calls for basic I/O: reading, writing, seeking, file descriptor duplication and closing (L<read(2)>, L<write(2)>, and related calls)\@chownChanging file ownership (L<chown(2)>, L<fchownat(2)>, and related calls)\@clockSystem calls for changing the system clock (L<adjtimex(2)>, L<settimeofday(2)>, and related calls)\@cpu-emulationSystem calls for CPU emulation functionality (L<vm86(2)> and related calls)\@debugDebugging, performance monitoring and tracing functionality (L<ptrace(2)>, L<perf_event_open(2)> and related calls)\@file-systemFile system operations: opening, creating files and directories for read and write, renaming and removing them, reading file properties, or creating hard and symbolic links.\@io-eventEvent loop system calls (L<poll(2)>, L<select(2)>, L<epoll(7)>, L<eventfd(2)> and related calls)\@ipcPipes, SysV IPC, POSIX Message Queues and other IPC (L<mq_overview(7)>, L<svipc(7)>)\@keyringKernel keyring access (L<keyctl(2)> and related calls)\@memlockLocking of memory into RAM (L<mlock(2)>, L<mlockall(2)> and related calls)\@moduleLoading and unloading of kernel modules (L<init_module(2)>, L<delete_module(2)> and related calls)\@mountMounting and unmounting of file systems (L<mount(2)>, L<chroot(2)>, and related calls)\@network-ioSocket I/O (including local AF_UNIX): L<socket(7)>, L<unix(7)>\@obsoleteUnusual, obsolete or unimplemented (L<create_module(2)>, L<gtty(2)>, \x{2026})\@privilegedAll system calls which need super-user capabilities (L<capabilities(7)>)\@processProcess control, execution, namespaceing operations (L<clone(2)>, L<kill(2)>, L<namespaces(7)>, \x{2026}\@raw-ioRaw I/O port access (L<ioperm(2)>, L<iopl(2)>, pciconfig_read(), \x{2026})\@rebootSystem calls for rebooting and reboot preparation (L<reboot(2)>, kexec(), \x{2026})\@resourcesSystem calls for changing resource limits, memory and scheduling parameters (L<setrlimit(2)>, L<setpriority(2)>, \x{2026})\@setuidSystem calls for changing user ID and group ID credentials, (L<setuid(2)>, L<setgid(2)>, L<setresuid(2)>, \x{2026})\@signalSystem calls for manipulating and handling process signals (L<signal(2)>, L<sigprocmask(2)>, \x{2026})\@swapSystem calls for enabling/disabling swap devices (L<swapon(2)>, L<swapoff(2)>)\@syncSynchronizing files and memory to disk: (L<fsync(2)>, L<msync(2)>, and related calls)\@timerSystem calls for scheduling operations by time (L<alarm(2)>, L<timer_create(2)>, \x{2026})
+Currently predefined system call setsSetDescription\@aioAsynchronous I/O (L<io_setup(2)>, L<io_submit(2)>, and related calls)\@basic-ioSystem calls for basic I/O: reading, writing, seeking, file descriptor duplication and closing (L<read(2)>, L<write(2)>, and related calls)\@chownChanging file ownership (L<chown(2)>, L<fchownat(2)>, and related calls)\@clockSystem calls for changing the system clock (L<adjtimex(2)>, L<settimeofday(2)>, and related calls)\@cpu-emulationSystem calls for CPU emulation functionality (L<vm86(2)> and related calls)\@debugDebugging, performance monitoring and tracing functionality (L<ptrace(2)>, L<perf_event_open(2)> and related calls)\@file-systemFile system operations: opening, creating files and directories for read and write, renaming and removing them, reading file properties, or creating hard and symbolic links.\@io-eventEvent loop system calls (L<poll(2)>, L<select(2)>, L<epoll(7)>, L<eventfd(2)> and related calls)\@ipcPipes, SysV IPC, POSIX Message Queues and other IPC (L<mq_overview(7)>, L<svipc(7)>)\@keyringKernel keyring access (L<keyctl(2)> and related calls)\@memlockLocking of memory into RAM (L<mlock(2)>, L<mlockall(2)> and related calls)\@moduleLoading and unloading of kernel modules (L<init_module(2)>, L<delete_module(2)> and related calls)\@mountMounting and unmounting of file systems (L<mount(2)>, L<chroot(2)>, and related calls)\@network-ioSocket I/O (including local AF_UNIX): L<socket(7)>, L<unix(7)>\@obsoleteUnusual, obsolete or unimplemented (L<create_module(2)>, L<gtty(2)>, \x{2026})\@privilegedAll system calls which need super-user capabilities (L<capabilities(7)>)\@processProcess control, execution, namespaceing operations (L<clone(2)>, L<kill(2)>, L<namespaces(7)>, \x{2026}\@raw-ioRaw I/O port access (L<ioperm(2)>, L<iopl(2)>, pciconfig_read(), \x{2026})\@rebootSystem calls for rebooting and reboot preparation (L<reboot(2)>, kexec(), \x{2026})\@resourcesSystem calls for changing resource limits, memory and scheduling parameters (L<setrlimit(2)>, L<setpriority(2)>, \x{2026})\@setuidSystem calls for changing user ID and group ID credentials, (L<setuid(2)>, L<setgid(2)>, L<setresuid(2)>, \x{2026})\@signalSystem calls for manipulating and handling process signals (L<signal(2)>, L<sigprocmask(2)>, \x{2026})\@swapSystem calls for enabling/disabling swap devices (L<swapon(2)>, L<swapoff(2)>)\@syncSynchronizing files and memory to disk: (L<fsync(2)>, L<msync(2)>, and related calls)\@system-serviceA reasonable set of system calls used by common system services, excluding any special purpose calls. This is the recommended starting point for whitelisting system calls for system services, as it contains what is typically needed by system services, but excludes overly specific interfaces. For example, the following APIs are excluded: C<\@clock>, C<\@mount>, C<\@swap>, C<\@reboot>.\@timerSystem calls for scheduling operations by time (L<alarm(2)>, L<timer_create(2)>, \x{2026})
 Note, that as new system calls are added to the kernel, additional system calls might be added to the groups
 above. Contents of the sets may also change between systemd versions. In addition, the list of system calls
 depends on the kernel version and architecture for which systemd was compiled. Use
 systemd-analyze\x{a0}syscall-filter to list the actual list of system calls in each
 filter.
+
+Generally, whitelisting system calls (rather than blacklisting) is the safer mode of operation. It is
+recommended to enforce system call whitelists for all long-running system services. Specifically, the
+following lines are a relatively safe basic choice for the majority of system services:
 
 It is recommended to combine the file system namespacing related options with
 C<SystemCallFilter=~\@mount>, in order to prohibit the unit's processes to undo the
@@ -2564,8 +2612,8 @@ in a similar way as the three options above but copy the output to the system co
 
 The C<file:path> option may be used to connect a specific file
 system object to standard output. The semantics are similar to the same option of
-C<StandardInputText>, see above. If standard input and output are directed to the same file
-path, it is opened only once, for reading as well as writing and duplicated. This is particular useful when the
+C<StandardInput>, see above. If standard input and output are directed to the same file path,
+it is opened only once, for reading as well as writing and duplicated. This is particular useful when the
 specified path refers to an C<AF_UNIX> socket in the file system, as in that case only a
 single stream connection is created for both input and output.
 
@@ -2621,7 +2669,7 @@ C<data>. Use this option to embed process input data directly in the unit file.
 
 C<StandardInputText> accepts arbitrary textual data. C-style escapes for special
 characters as well as the usual C<%>-specifiers are resolved. Each time this setting is used
-the the specified text is appended to the per-unit data buffer, followed by a newline character (thus every use
+the specified text is appended to the per-unit data buffer, followed by a newline character (thus every use
 appends a new line to the end of the buffer). Note that leading and trailing whitespace of lines configured
 with this option is removed. If an empty line is specified the buffer is cleared (hence, in order to insert an
 empty line, add an additional C<\\n> to the end or beginning of a line).
@@ -2649,7 +2697,7 @@ C<data>. Use this option to embed process input data directly in the unit file.
 
 C<StandardInputText> accepts arbitrary textual data. C-style escapes for special
 characters as well as the usual C<%>-specifiers are resolved. Each time this setting is used
-the the specified text is appended to the per-unit data buffer, followed by a newline character (thus every use
+the specified text is appended to the per-unit data buffer, followed by a newline character (thus every use
 appends a new line to the end of the buffer). Note that leading and trailing whitespace of lines configured
 with this option is removed. If an empty line is specified the buffer is cleared (hence, in order to insert an
 empty line, add an additional C<\\n> to the end or beginning of a line).
@@ -2679,7 +2727,7 @@ messages). See L<syslog(3)> for
 details. By default no filtering is applied (i.e. the default maximum log level is C<debug>). Use
 this option to configure the logging system to drop log messages of a specific service above the specified
 level. For example, set C<LogLevelMax>C<info> in order to turn off debug logging
-of a particularly chatty unit. Note that the the configured level is applied to any log messages written by any
+of a particularly chatty unit. Note that the configured level is applied to any log messages written by any
 of the processes belonging to this unit, sent via any supported logging protocol. The filtering is applied
 early in the logging pipeline, before any kind of further processing is done. Moreover, messages which pass
 through this filter successfully might still be dropped by filters applied at a later stage in the logging

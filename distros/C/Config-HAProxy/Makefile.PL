@@ -9,7 +9,7 @@ WriteMakefile(
     ABSTRACT_FROM     => 'lib/Config/HAProxy.pm',
     LICENSE           => 'gpl_3',
     AUTHOR            => 'Sergey Poznyakoff <gray@gnu.org>',
-    MIN_PERL_VERSION  => 5.006,
+    MIN_PERL_VERSION  => 5.010,
     PREREQ_PM         => {
 	'Carp'             => 0,
         'Clone'            => 0,

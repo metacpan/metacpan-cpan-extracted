@@ -3,6 +3,7 @@
 .travis.yml
 Changes
 cpanfile
+examples/cache.pl
 examples/chat.pl
 examples/twitter.pl
 lib/Mojo/Redis.pm
@@ -22,6 +23,7 @@ t/connection.t
 t/cursor.t
 t/db.t
 t/method-coverage.t
+t/pipelining.t
 t/pubsub.t
 t/redis.t
 t/scripting.t

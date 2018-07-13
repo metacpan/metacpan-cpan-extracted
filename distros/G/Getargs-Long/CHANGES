@@ -1,3 +1,8 @@
+Version 1.1012:
+- Fix Makefile.PL warning
+- Fix deleting of inc during release process
+- Better fix for AutomatedTester warning
+
 Version 1.1011:
 - Updating META.yml
 

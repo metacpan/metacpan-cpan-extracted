@@ -54,6 +54,7 @@ my $input = { A => $dbref };
 
 # MongoDB::DBRef -> BSON::Regex
 SKIP: {
+    $ENV{PERL_MONGO_NO_DEP_WARNINGS} = 1;
     eval { require MongoDB::DBRef };
     skip( "MongoDB::DBRef v1.0.0+ not installed", 4 )
       unless $INC{'MongoDB/DBRef.pm'} && eval {MongoDB::DBRef->VERSION("v1.0.0")};

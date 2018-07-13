@@ -1,6 +1,12 @@
 Summary of important user-visible changes for Bio-Tools-Run-Alignment-Clustawl
 ------------------------------------------------------------------------------
 
+1.7.4     2018-07-11 15:56:41+01:00 Europe/London
+  * Bio::Installer::Clustalw has been removed.  It was installing a
+    very old version of clustalw, many years out of date and UNIX
+    only, it was also unsecure.  Either install Clustal W via your
+    system package manager, or download it from upstream.
+
 1.7.3     2017-09-27 18:30:00+01:00 Europe/London
   * Replace requires_external.t with a check in the Makefile.PL for
     clustalw.  This ensures that the installation fails instead of

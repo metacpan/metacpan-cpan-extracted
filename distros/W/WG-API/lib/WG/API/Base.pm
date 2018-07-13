@@ -15,11 +15,11 @@ use URI::QueryParam;
 
 =head1 VERSION
 
-Version v0.9
+Version v0.10
 
 =cut
 
-our $VERSION = 'v0.9';
+our $VERSION = 'v0.10';
 
 =head1 SYNOPSIS
 

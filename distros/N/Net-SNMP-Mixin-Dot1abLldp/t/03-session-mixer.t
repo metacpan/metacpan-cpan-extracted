@@ -7,12 +7,19 @@ use Test::More;
 eval "use Net::SNMP";
 plan skip_all => "Net::SNMP required for testing Net::SNMP::Mixin" if $@;
 
+my @methods = qw/
+  get_lldp_local_system_data
+  get_lldp_loc_port_table
+  get_lldp_rem_table
+  map_lldp_loc_portid2portnum
+  /;
+
 eval "use Net::SNMP::Mixin";
 plan skip_all =>
   "Net::SNMP::Mixin required for testing Net::SNMP::Mixin module"
   if $@;
 
-plan tests => 13;
+plan tests => 15;
 #plan 'no_plan';
 
 my ( $session, $error ) =
@@ -23,11 +30,10 @@ isa_ok( $session, 'Net::SNMP' );
 
 eval { $session->mixer("Net::SNMP::Mixin::Dot1abLldp") };
 is( $@, '', 'Net::SNMP::Mixin::Dot1abLldp mixed in successful' );
-ok(
-  $session->can('get_lldp_local_system_data'),
-  '$session can get_lldp_local_system_data'
-);
-ok( $session->can('get_lldp_rem_table'), '$session can get_lldp_rem_table' );
+
+foreach my $m (@methods) {
+  ok( $session->can($m), "\$session can $m()" );
+}
 
 # try to mixin twice
 eval { $session->mixer("Net::SNMP::Mixin::Dot1abLldp") };

@@ -1,5 +1,9 @@
 Revision history for Net-EGTS
 
+0.04    12-07-2018
+    - Improved networking in simple client
+    - Fix pod
+
 0.03    10-07-2018
     - Fix timezone in tests
 

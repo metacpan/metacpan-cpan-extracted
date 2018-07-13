@@ -1,4 +1,5 @@
 MANIFEST
+Changes
 README
 lib/Tk/JFileDialog.pm
 Makefile.PL

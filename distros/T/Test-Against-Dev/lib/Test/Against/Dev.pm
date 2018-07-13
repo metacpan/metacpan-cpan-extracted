@@ -1,7 +1,7 @@
 package Test::Against::Dev;
 use strict;
 use 5.10.1;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use Carp;
 use Cwd;
 use File::Basename;
@@ -322,7 +322,7 @@ two directories:  F<testing> and F<results>.
 
 =cut
 
-our $PERL_VERSION_PATTERN = qr/^perl-5\.\d+\.\d{1,2}$/;
+our $PERL_VERSION_PATTERN = qr/^perl-5\.\d+\.\d{1,2}(?:-RC\d{1,2})?$/;
 
 sub new {
     my ($class, $args) = @_;
@@ -644,9 +644,8 @@ C<$self->get_lib_dir()>, respectively.
 sub configure_build_install_perl {
     my ($self, $args) = @_;
     my $cwd = cwd();
-    $args //= {};
     croak "configure_build_install_perl: Must supply hash ref as argument"
-        unless ref($args) eq 'HASH';
+        unless ( ( defined $args ) and ( ref($args) eq 'HASH' ) );
     my $verbose = delete $args->{verbose} || '';
 
     # What I want in terms of verbose output:
@@ -776,9 +775,8 @@ subsequently be accessed by calling C<$self->get_cpanm_dir()>.
 
 sub fetch_cpanm {
     my ($self, $args) = @_;
-    $args //= {};
     croak "fetch_cpanm: Must supply hash ref as argument"
-        unless ref($args) eq 'HASH';
+        unless ( ( defined $args ) and ( ref($args) eq 'HASH' ) );
     my $verbose = delete $args->{verbose} || '';
     my $uri = (exists $args->{uri} and length $args->{uri})
         ? $args->{uri}
@@ -942,9 +940,8 @@ The method guarantees the existence of several directories underneath the
 
 sub run_cpanm {
     my ($self, $args) = @_;
-    $args //= {};
     croak "run_cpanm: Must supply hash ref as argument"
-        unless ref($args) eq 'HASH';
+        unless ( ( defined $args ) and ( ref($args) eq 'HASH' ) );
     my $verbose = delete $args->{verbose} || '';
     my %eligible_args = map { $_ => 1 } ( qw|
         module_file module_list title
@@ -1078,9 +1075,8 @@ particular run of C<run_cpanm()>.
 
 sub analyze_cpanm_build_logs {
     my ($self, $args) = @_;
-    $args //= {};
     croak "analyze_cpanm_build_logs: Must supply hash ref as argument"
-        unless ref($args) eq 'HASH';
+        unless ( ( defined $args ) and ( ref($args) eq 'HASH' ) );
     my $verbose = delete $args->{verbose} || '';
 
     my $gzlog = $self->{gzlog};
@@ -1155,11 +1151,10 @@ files for a given run.
 
 sub analyze_json_logs {
     my ($self, $args) = @_;
-    $args //= {};
     croak "analyze_json_logs: Must supply hash ref as argument"
-        unless ref($args) eq 'HASH';
-    my $verbose = delete $args->{verbose} || '';
-    my $sep_char = delete $args->{sep_char} || '|';
+        unless ( ( defined $args ) and ( ref($args) eq 'HASH' ) );
+    my $verbose     = delete $args->{verbose}   || '';
+    my $sep_char    = delete $args->{sep_char}  || '|';
     croak "analyze_json_logs: Currently only pipe ('|') and comma (',') are supported as delimiter characters"
         unless ($sep_char eq '|' or $sep_char eq ',');
 
@@ -1314,9 +1309,8 @@ C<fetch_cpanm()> and go directly to C<run_cpanm()>.
 
 sub new_from_existing_perl_cpanm {
     my ($class, $args) = @_;
-    $args //= {};
     croak "new_from_existing_perl_cpanm: Must supply hash ref as argument"
-        unless ref($args) eq 'HASH';
+        unless ( ( defined $args ) and ( ref($args) eq 'HASH' ) );
     my $verbose = delete $args->{verbose} || '';
     for my $el ( qw| path_to_perl application_dir perl_version | ) {
         croak "Need '$el' element in arguments hash ref"

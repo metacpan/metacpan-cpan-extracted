@@ -1,3 +1,8 @@
+0.000115  2018-07-11 09:39:37-07:00 America/Los_Angeles
+
+    - Fix warning on undefined note/diag
+    - Improve an error message.
+
 0.000114  2018-04-19 08:39:56-07:00 America/Los_Angeles
 
     - Fix missing manual section

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::CreateBucket;
-$Net::Amazon::S3::Request::CreateBucket::VERSION = '0.82';
+$Net::Amazon::S3::Request::CreateBucket::VERSION = '0.83';
 use Moose 0.85;
 extends 'Net::Amazon::S3::Request';
 
@@ -53,7 +53,7 @@ Net::Amazon::S3::Request::CreateBucket - An internal class to create a bucket
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

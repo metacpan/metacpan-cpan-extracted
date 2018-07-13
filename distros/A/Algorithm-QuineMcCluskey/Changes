@@ -1,5 +1,21 @@
 Revision history for Algorithm-QuineMcCluskey
 
+0.18
+    2018-07-10
+	- Check for existence of next-level implicant before pushing it
+	  on the list. Which means the next loop runs shorter, saving time.
+	- Since we only consider Hamming distances of 1 when comparing
+	  covers, it doesn't make sense to have a separate Hamming
+	  distance function to find the sole difference position. Merged
+	  the code of hdist() and diffpos() into new function hammingd1pos(),
+	  which lets us skip the list-checking functions. Since this function
+	  is embedded four loops deep, this also saves time.
+	- Function remels() was checking item by item even in cases where
+	  the list items to remove were the entire list. Streamlined that.
+	- The Hamming distance change above meant pairwise() isn't needed
+	  now, which was the cause of the version requirement change of
+	  List::MoreUtils. Put the older version number back in the
+	  requirement.
 0.17
     2018-06-21
 	- Require latest version (0.428) of List::MoreUtils, as there seems

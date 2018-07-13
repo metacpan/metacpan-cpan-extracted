@@ -23,21 +23,32 @@ Note that you will need to pass `cache_writer`, `cache_reader` and `db_handle` t
 
 `cache_writer` and `cache_reader` should be to be able to get/set given data under given key (both of type string). `db_handle` should be capable to store and retrieve data with `category`,`name` in addition to the timestamp of data insertion. So it should be able to retrieve data for a specific timestamp, category and name. Category, name and data are all string. This can easily be achieved by defining a table in you database containing these columns: `timestamp, category, name, value`. 
 
-There are four important methods this module provides:
+There are seven important methods this module provides:
 
 * **set** (in Data::Chronicle::Writer):
 Given a category, name and value stores the JSONified value in Redis and PostgreSQL database under "category::name" group and also stores current
 system time as the timestamp for the data (Which can be used for future retrieval if we want to get data as of a specific time). Note that the value
 MUST be either hash-ref or array-ref.
 
+* **mset** (in Data::Chronicle::Writer):
+Given multiple categories, names and values atomically performs the set operation on each corresponding category, name, value set.
+
 * **get** (in Data::Chronicle::Reader):
 Given a category and name returns the latest version of the data according to current Redis cache
+
+* **mget** (in Data::Chronicle::Reader):
+Given multiple categories and name atomically performs the get operation on each corresponding category, name set.
 
 * **get_for** (in Data::Chronicle::Reader):
 Given a category, name and timestamp returns version of data under "category::name" as of the given date (using a DB lookup).
 
 * **get_for_period** (in Data::Chronicle::Reader):
 Given a category, name, start_timestamp and end_timestamp returns an array-ref containing all data stored between given period for the given "category::name" (using a DB lookup).
+
+* **get_history** (in Data::Chronicle::Reader):
+Given a category, name, and revision returns version of the data the specificied number of revisions in the past.
+If revision 0 is chosen, the latest verson of the data will be returned.
+If revision 1 is chosen, the previous version of the data will be returned.
 
 ## Examples ##
 

@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Tk",
       "Tcl/Tk/Tix",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Tcl-Tk",
    "no_index" : {
@@ -51,7 +51,6 @@
       },
       "x_MailingList" : "mailto:tcltk@perl.org"
    },
-   "version" : "1.10",
-   "x_auto_regenerate" : 0,
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.11",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

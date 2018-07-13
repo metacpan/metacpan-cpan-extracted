@@ -1,6 +1,9 @@
 Revision history for App-YTDL
 
 
+0.303   2018-07-13
+        - Option to reset the yt-dl config location to default.
+
 0.302   2018-07-02
         - "Term::Choose" minimum version is "1.600".
         - "Term::Choose-Util" minimum version is "0.064".

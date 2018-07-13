@@ -2,7 +2,7 @@ package Data::Chronicle::Mock;
 
 =head1 NAME
 
-Data::Chronicle::Mock - Mokcing utility to test chronicle based scenarios
+Data::Chronicle::Mock - Mocking utility to test chronicle based scenarios
 
 =cut
 
@@ -10,13 +10,13 @@ use 5.014;
 use strict;
 use warnings;
 
-use DBI;
+use DBIx::Connector;
 use Test::PostgreSQL;
 use Test::Mock::Redis;
 use Data::Chronicle::Reader;
 use Data::Chronicle::Writer;
 
-our $VERSION = '0.16';    ## VERSION
+our $VERSION = '0.17';    ## VERSION
 
 =head3 C<< my $ch = get_mocked_chronicle(); >>
 
@@ -28,8 +28,8 @@ sub get_mocked_chronicle {
     my $redis = Test::Mock::Redis->new(server => 'whatever');
 
     my $pgsql = Test::PostgreSQL->new();
-    my $dbh   = DBI->connect($pgsql->dsn);
-
+    my $dbic  = DBIx::Connector->new($pgsql->dsn);
+    $dbic->mode('ping');
     my $stmt = qq(CREATE TABLE chronicle (
       id bigserial,
       timestamp TIMESTAMP DEFAULT NOW(),
@@ -42,17 +42,17 @@ sub get_mocked_chronicle {
 
     {
         local $SIG{__WARN__} = sub { };
-        $dbh->do($stmt);
+        $dbic->run(sub { $_->do($stmt) });
     }
 
     my $chronicle_r = Data::Chronicle::Reader->new(
         cache_reader => $redis,
-        db_handle    => $dbh
+        dbic         => $dbic
     );
 
     my $chronicle_w = Data::Chronicle::Writer->new(
         cache_writer => $redis,
-        db_handle    => $dbh,
+        dbic         => $dbic,
         ttl          => 86400
     );
 

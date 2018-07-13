@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::AbortMultipartUpload;
-$Net::Amazon::S3::Request::AbortMultipartUpload::VERSION = '0.82';
+$Net::Amazon::S3::Request::AbortMultipartUpload::VERSION = '0.83';
 use Moose 0.85;
 use Digest::MD5 qw/md5 md5_hex/;
 use MIME::Base64;
@@ -37,7 +37,7 @@ Net::Amazon::S3::Request::AbortMultipartUpload - An internal class to complete a
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

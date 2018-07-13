@@ -1,5 +1,5 @@
 package Net::Amazon::S3;
-$Net::Amazon::S3::VERSION = '0.82';
+$Net::Amazon::S3::VERSION = '0.83';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -41,13 +41,15 @@ use URI::Escape qw(uri_escape_utf8);
 use XML::LibXML;
 use XML::LibXML::XPathContext;
 
+my $AMAZON_S3_HOST = 's3.amazonaws.com';
+
 has 'use_iam_role' => ( is => 'ro', isa => 'Bool', required => 0, default => 0);
 has 'aws_access_key_id'     => ( is => 'rw', isa => 'Str', required => 0 );
 has 'aws_secret_access_key' => ( is => 'rw', isa => 'Str', required => 0 );
-has 'secure' => ( is => 'ro', isa => 'Bool', required => 0, default => 0 );
+has 'secure' => ( is => 'ro', isa => 'Bool', required => 0, default => 1 );
 has 'timeout' => ( is => 'ro', isa => 'Num',  required => 0, default => 30 );
 has 'retry'   => ( is => 'ro', isa => 'Bool', required => 0, default => 0 );
-has 'host'    => ( is => 'ro', isa => 'Str',  required => 0, default => 's3.amazonaws.com' );
+has 'host'    => ( is => 'ro', isa => 'Str',  required => 0, default => $AMAZON_S3_HOST );
 has 'use_virtual_host' => (
     is => 'ro',
     isa => 'Bool',
@@ -64,7 +66,12 @@ has authorization_method => (
     is => 'ro',
     isa => 'Str',
     required => 0,
-    default => 'Net::Amazon::S3::Signature::V4',
+    lazy => 1,
+    default => sub {
+        $_[0]->host eq $AMAZON_S3_HOST
+            ? 'Net::Amazon::S3::Signature::V4'
+            : 'Net::Amazon::S3::Signature::V2'
+    },
 );
 
 __PACKAGE__->meta->make_immutable;
@@ -435,7 +442,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 
@@ -573,8 +580,8 @@ with a true value.
 
 =item secure
 
-Set this to C<1> if you want to use SSL-encrypted connections when talking
-to S3. Defaults to C<0>.
+Set this to C<0> if you don't want to use SSL-encrypted connections when talking
+to S3. Defaults to C<1>.
 
 To use SSL-encrypted connections, LWP::Protocol::https is required.
 
@@ -594,14 +601,20 @@ as recommended by Amazon. Defaults to off.
 The S3 host endpoint to use. Defaults to 's3.amazonaws.com'. This allows
 you to connect to any S3-compatible host.
 
-=back
-
 =item use_virtual_host
 
 Use the virtual host method ('bucketname.s3.amazonaws.com') instead of specifying the
 bucket at the first part of the path. This is particularily useful if you want to access
 buckets not located in the US-Standard region (such as EU, Asia Pacific or South America).
 See L<http://docs.aws.amazon.com/AmazonS3/latest/dev/VirtualHosting.html> for the pros and cons.
+
+=item authorization_method
+
+Authorization implementation package name.
+
+This library provides L<< Net::Amazon::S3::Signature::V2 >> and L<< Net::Amazon::S3::Signature::V4 >>
+
+Default is Signature 4 if host is C<< s3.amazonaws.com >>, Signature 2 otherwise
 
 =back
 

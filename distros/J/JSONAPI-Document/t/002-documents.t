@@ -40,15 +40,15 @@ is_deeply(
         relationships => {
             author => {
                 links => {
-                    self    => 'http://example.com/api/posts/1/relationships/author',
-                    related => 'http://example.com/api/posts/1/author'
+                    related => 'http://example.com/api/posts/1/relationships/author',
+                    self    => 'http://example.com/api/posts/1/author'
                 },
                 data => { type => 'authors', id => 1, }
             },
             comments => {
                 links => {
-                    self    => 'http://example.com/api/posts/1/relationships/comments',
-                    related => 'http://example.com/api/posts/1/comments'
+                    related => 'http://example.com/api/posts/1/relationships/comments',
+                    self    => 'http://example.com/api/posts/1/comments'
                 },
                 data => [{ type => 'comments', id => 1, }, { type => 'comments', id => 2, },] } }
     },
@@ -69,15 +69,15 @@ is_deeply(
             relationships => {
                 author => {
                     links => {
-                        self    => 'http://example.com/api/posts/1/relationships/author',
-                        related => 'http://example.com/api/posts/1/author'
+                        related => 'http://example.com/api/posts/1/relationships/author',
+                        self    => 'http://example.com/api/posts/1/author'
                     },
                     data => { type => 'authors', id => 1, }
                 },
                 comments => {
                     links => {
-                        self    => 'http://example.com/api/posts/1/relationships/comments',
-                        related => 'http://example.com/api/posts/1/comments'
+                        related => 'http://example.com/api/posts/1/relationships/comments',
+                        self    => 'http://example.com/api/posts/1/comments'
                     },
                     data => [{ type => 'comments', id => 1, }, { type => 'comments', id => 2, },] } }
         },
@@ -156,8 +156,8 @@ is_deeply(
             relationships => {
                 author => {
                     links => {
-                        self    => 'http://example.com/api/posts/1/relationships/author',
-                        related => 'http://example.com/api/posts/1/author'
+                        related => 'http://example.com/api/posts/1/relationships/author',
+                        self    => 'http://example.com/api/posts/1/author'
                     },
                     data => { type => 'authors', id => 1, }
                 },
@@ -203,8 +203,8 @@ is_deeply(
         relationships => {
             author => {
                 links => {
-                    self    => 'http://example.com/api/email-templates/1/relationships/author',
-                    related => 'http://example.com/api/email-templates/1/author'
+                    related => 'http://example.com/api/email-templates/1/relationships/author',
+                    self    => 'http://example.com/api/email-templates/1/author'
                 },
                 data => { type => 'authors', id => 1, }
 
@@ -227,8 +227,8 @@ is_deeply(
             relationships => {
                 author => {
                     links => {
-                        self    => 'http://example.com/api/posts/1/relationships/author',
-                        related => 'http://example.com/api/posts/1/author'
+                        related => 'http://example.com/api/posts/1/relationships/author',
+                        self    => 'http://example.com/api/posts/1/author'
                     },
                     data => { type => 'authors', id => 1, }
                 },
@@ -279,8 +279,8 @@ is_deeply(
             relationships => {
                 comments => {
                     links => {
-                        self    => 'http://example.com/api/posts/1/relationships/comments',
-                        related => 'http://example.com/api/posts/1/comments'
+                        related => 'http://example.com/api/posts/1/relationships/comments',
+                        self    => 'http://example.com/api/posts/1/comments'
                     },
                     data => [{ type => 'comments', id => 1, }, { type => 'comments', id => 2, },],
                 },
@@ -348,8 +348,8 @@ is_deeply(
             relationships => {
                 'email-templates' => {
                     links => {
-                        self    => 'http://example.com/api/authors/1/relationships/email-templates',
-                        related => 'http://example.com/api/authors/1/email-templates'
+                        related => 'http://example.com/api/authors/1/relationships/email-templates',
+                        self    => 'http://example.com/api/authors/1/email-templates'
                     },
                     data => [{ type => 'email-templates', id => 1, }],
                 },

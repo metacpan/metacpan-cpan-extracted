@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
   "NAME" => "BSON::XS",
   "OBJECT" => "xs/XS\$(OBJ_EXT) bson/bson-atomic\$(OBJ_EXT) bson/bson-clock\$(OBJ_EXT) bson/bson-context\$(OBJ_EXT) bson/bson-decimal128\$(OBJ_EXT) bson/bson-error\$(OBJ_EXT) bson/bson-iso8601\$(OBJ_EXT) bson/bson-iter\$(OBJ_EXT) bson/bson-keys\$(OBJ_EXT) bson/bson-md5\$(OBJ_EXT) bson/bson-memory\$(OBJ_EXT) bson/bson-oid\$(OBJ_EXT) bson/bson-reader\$(OBJ_EXT) bson/bson-string\$(OBJ_EXT) bson/bson-timegm\$(OBJ_EXT) bson/bson-utf8\$(OBJ_EXT) bson/bson-value\$(OBJ_EXT) bson/bson-version\$(OBJ_EXT) bson/bson-writer\$(OBJ_EXT) bson/bson\$(OBJ_EXT)",
   "PREREQ_PM" => {
-    "BSON" => "1.006003",
+    "BSON" => "1.006006",
     "XSLoader" => 0,
     "boolean" => 0,
     "strict" => 0,
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "B" => 0,
-    "BSON" => "1.006003",
+    "BSON" => "1.006006",
     "BSON::Types" => 0,
     "Carp" => 0,
     "Data::Dumper" => 0,
@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.4.2",
+  "VERSION" => "v0.4.3",
   "XS" => {
     "xs/XS.xs" => "xs/XS.c"
   },
@@ -67,7 +67,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "B" => 0,
-  "BSON" => "1.006003",
+  "BSON" => "1.006006",
   "BSON::Types" => 0,
   "Carp" => 0,
   "Data::Dumper" => 0,
@@ -94,7 +94,7 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
   delete $WriteMakefileArgs{TEST_REQUIRES};
   delete $WriteMakefileArgs{BUILD_REQUIRES};
   $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;

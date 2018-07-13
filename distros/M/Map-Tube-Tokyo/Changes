@@ -1,5 +1,9 @@
 Revision history for Map::Tube::Tokyo
 
+0.48  Thu Jul 12 16:20:00 2018
+      - Used File::ShareDir v1.114 instead of File::Share.
+      - Explicitly added configure prereq File::ShareDir::Install v0.13.
+
 0.47  Wed Jul 04 10:50:00 2018
       - Updated dependency on Map::Tube v3.53.
 

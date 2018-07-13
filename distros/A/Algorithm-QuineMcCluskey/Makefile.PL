@@ -3,19 +3,19 @@ require 5.010001;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'PL_FILES' => {},
+  'VERSION_FROM' => 'lib/Algorithm/QuineMcCluskey.pm',
+  'NAME' => 'Algorithm::QuineMcCluskey',
   'PREREQ_PM' => {
-                   'Test::More' => 0,
+                   'Moose' => '2.16',
+                   'List::MoreUtils' => '0.401',
                    'namespace::autoclean' => '0.28',
+                   'Carp' => 0,
                    'List::Compare::Functional' => '0.53',
                    'Tie::Cycle' => '1.225',
-                   'List::MoreUtils' => '0.428',
-                   'Carp' => 0,
-                   'Moose' => '2.16'
+                   'Test::More' => 0
                  },
-  'EXE_FILES' => [],
   'INSTALLDIRS' => 'site',
-  'NAME' => 'Algorithm::QuineMcCluskey',
-  'PL_FILES' => {},
-  'VERSION_FROM' => 'lib/Algorithm/QuineMcCluskey.pm'
+  'EXE_FILES' => []
 )
 ;

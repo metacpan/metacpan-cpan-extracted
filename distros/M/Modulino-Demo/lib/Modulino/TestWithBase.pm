@@ -5,7 +5,7 @@ use warnings;
 
 use v5.10.1;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 require Modulino::Base;
 
@@ -78,7 +78,7 @@ is wrapped in a C<Test::More> subtest.
 
 This source is in Github:
 
-	http://github.com/briandfoy/modulino-demo/
+	https://github.com/briandfoy/modulino-demo/
 
 =head1 AUTHOR
 
@@ -86,9 +86,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2013-2014, brian d foy, All Rights Reserved.
+Copyright © 2012-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

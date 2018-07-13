@@ -12,7 +12,7 @@ use File::Temp qw(tempdir);
 use POSIX qw(SIGTERM WNOHANG);
 use Time::HiRes qw(sleep);
 
-our $VERSION = '1.0010';
+our $VERSION = '1.0011';
 
 our $errstr;
 our @SEARCH_PATHS = qw(/usr/local/mysql);
@@ -142,12 +142,6 @@ sub wait_for_setup {
     unless ($self->copy_data_from) { # create 'test' database
         my $dbh = DBI->connect($self->dsn(dbname => 'mysql'))
             or die $DBI::errstr;
-        # This 'DROP DATABASE' is only for MySQL8 or later.
-        # MySQL8 or later has "test" database by default and
-        # if `DROP DATABASE` is not done beforehand, `CREATE DATABASE` fails
-        # for some reason on MySQL8 even if `IF NOT EXISTS` notation is there.
-        $dbh->do('DROP DATABASE IF EXISTS test')
-            or die $dbh->errstr;
         $dbh->do('CREATE DATABASE IF NOT EXISTS test')
             or die $dbh->errstr;
     }
@@ -190,15 +184,11 @@ sub setup {
         mkdir $self->base_dir . "/$subdir";
     }
 
-    # When using `mysql_install_db`, copy the data before setup db for quick bootstrap.
-    # But `mysqld --initialize-insecure` doesn't work while the data dir exists,
-    # so don't copy here and do after setup db.
-    if (!$self->use_mysqld_initialize && $self->copy_data_from) {
+    # copy the data before setup db for quick bootstrap.
+    if ($self->copy_data_from) {
         dircopy($self->copy_data_from, $self->my_cnf->{datadir})
-            or die(
-                "could not dircopy @{[$self->copy_data_from]} to "
-                    . "@{[$self->my_cnf->{datadir}]}:$!"
-                );
+            or die "could not dircopy @{[$self->copy_data_from]} to " .
+                "@{[$self->my_cnf->{datadir}]}:$!";
     }
     # my.cnf
     open my $fh, '>', $self->base_dir . '/etc/my.cnf'
@@ -227,6 +217,15 @@ sub setup {
 
         if ($self->use_mysqld_initialize) {
             $cmd .= ' --initialize-insecure';
+            if ($self->copy_data_from) {
+                opendir my $dh, $self->copy_data_from
+                    or die "failed to open copy_data_from directory @{[$self->copy_data_from]}: $!";
+                while (my $entry = readdir $dh) {
+                    next unless -d $self->copy_data_from . "/$entry";
+                    next if $entry =~ /^\.\.?$/;
+                    $cmd .= " --ignore-db-dir=$entry"
+                }
+            }
         } else {
             # `abs_path` resolves nested symlinks and returns canonical absolute path
             my $mysql_base_dir = Cwd::abs_path($self->mysql_install_db);
@@ -242,15 +241,7 @@ sub setup {
             $output .= $l;
         }
         close $fh
-            or die "*** mysql_install_db failed ***\n$output\n";
-    }
-    # copy data files
-    if ($self->use_mysqld_initialize && $self->copy_data_from) {
-        dircopy($self->copy_data_from, $self->my_cnf->{datadir})
-            or die(
-                "could not dircopy @{[$self->copy_data_from]} to "
-                    . "@{[$self->my_cnf->{datadir}]}:$!"
-                );
+            or die "*** mysql_install_db failed ***\n% $cmd\n$output\n";
     }
 }
 
@@ -283,15 +274,17 @@ sub _find_program {
     return;
 }
 
+sub _verbose_help {
+    my $self = shift;
+    $self->{_verbose_help} ||= `@{[$self->mysqld]} --verbose --help 2>/dev/null`;
+}
+
 # Detecting if the mysqld supports `--initialize-insecure` option or not from the
 # output of `mysqld --help --verbose`.
 # `mysql_install_db` command is obsoleted MySQL 5.7.6 or later and
 # `mysqld --initialize-insecure` should be used.
 sub _use_mysqld_initialize {
-    my $self = shift;
-
-    my $mysqld = $self->mysqld;
-    `$mysqld --verbose --help 2>/dev/null` =~ /--initialize-insecure/ms;
+    shift->_verbose_help =~ /--initialize-insecure/ms;
 }
 
 sub _get_path_of {

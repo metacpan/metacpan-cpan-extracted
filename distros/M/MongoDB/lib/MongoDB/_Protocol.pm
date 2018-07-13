@@ -19,7 +19,7 @@ use warnings;
 package MongoDB::_Protocol;
 
 use version;
-our $VERSION = 'v2.0.0';
+our $VERSION = 'v2.0.1';
 
 use MongoDB::_Constants;
 use MongoDB::Error;
@@ -125,7 +125,7 @@ sub get_compressor {
             callback => sub {
                 return Compress::Zlib::compress(
                     $_[0],
-                    defined($level) ? $level : (),
+                    defined($level) ? $level : Compress::Zlib::Z_DEFAULT_COMPRESSION(),
                 );
             },
         };

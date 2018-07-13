@@ -3,3 +3,4 @@
 icudtl.dat
 natives_blob.bin
 snapshot_blob.bin
+.*\.tar\.gz

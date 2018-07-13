@@ -2,7 +2,6 @@ package Module::Install::PRIVATE::Configure_Programs;
 
 use strict;
 use warnings;
-use File::Slurper qw(read_binary write_binary);
 
 use lib 'inc';
 use Module::Install::GetProgramLocations;
@@ -20,7 +19,10 @@ sub configure_programs {
   my ($self, @args) = @_;
 
   $self->include('Module::Install::GetProgramLocations', 0);
-  $self->configure_requires('File::Slurper', 0);
+  $self->include_deps('File::Slurper', 0);
+
+  require File::Slurper;
+  File::Slurper->import('read_binary', 'write_binary');
 
   my %info = (
       'cat'      => { default => 'cat', argname => 'CAT' },

@@ -6,12 +6,15 @@ push(@ExtUtils::MakeMaker::Overridable, qw(pm_to_blib));
 my $in_core = ! -d "regen";
 our $uninst;
 my $version = MM->parse_version('Config.pm');
+my $pre_6_5503 = eval($ExtUtils::MakeMaker::VERSION) < 6.5503;
 
 WriteMakefile(
     'ABSTRACT'		=> 'Fast XS drop-in replacement for Config.pm with perfect hashing',
     'AUTHOR'		=> ($ExtUtils::MakeMaker::VERSION >= '6.58'
                                 ? ['Daniel Dragan <bulkdd@cpan.org>', 'Reini Urban <rurban@cpan.org>']
                                 : 'Daniel Dragan <bulkdd@cpan.org>, Reini Urban <rurban@cpan.org>'),
+    ($pre_6_5503 ? 'PREREQ_PM' : 'BUILD_REQUIRES')
+        => {'MIME::Base64' => 0, 'IO::Compress::Bzip2' => 0},
     'DISTNAME'		=> 'XSConfig',
     'LICENSE'		=> 'perl',
     'NAME'		=> 'Config',
@@ -159,6 +162,7 @@ sub pm_to_blib {
     chomp($blib); #old EUMMs dont have a newline at the end, new ones do
     return $blib.'
 	$(NOECHO) $(CHMOD) $(PERM_RW) $(INST_ARCHLIBDIR)/Config.pm
+	$(NOECHO) $(PERLRUN) Config_pm.PL $(INST_ARCHLIBDIR)/Config.pm
 	$(NOECHO) $(EQUALIZE_TIMESTAMP) Config_pm_mtime $(INST_ARCHLIBDIR)/Config.pm';
 }
 

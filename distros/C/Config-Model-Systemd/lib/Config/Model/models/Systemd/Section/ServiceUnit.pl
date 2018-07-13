@@ -69,7 +69,7 @@ limit. This setting does not apply to slice, target, device, and scope units, si
 activation may either never fail, or may succeed only a single time.
 
 When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters are
-flushed out too. This means that configuring start rate limiting for a unit that is not referenced continously
+flushed out too. This means that configuring start rate limiting for a unit that is not referenced continuously
 has no effect.',
         'migrate_from' => {
           'formula' => '$service',
@@ -103,7 +103,7 @@ limit. This setting does not apply to slice, target, device, and scope units, si
 activation may either never fail, or may succeed only a single time.
 
 When a unit is unloaded due to the garbage collection logic (see above) its rate limit counters are
-flushed out too. This means that configuring start rate limiting for a unit that is not referenced continously
+flushed out too. This means that configuring start rate limiting for a unit that is not referenced continuously
 has no effect.',
         'migrate_from' => {
           'formula' => '$unit || $service',

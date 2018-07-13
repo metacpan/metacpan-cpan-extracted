@@ -6,7 +6,7 @@ package BSON::Timestamp;
 # ABSTRACT: BSON type wrapper for timestamps
 
 use version;
-our $VERSION = 'v1.6.6';
+our $VERSION = 'v1.6.7';
 
 use Carp ();
 
@@ -127,7 +127,7 @@ BSON::Timestamp - BSON type wrapper for timestamps
 
 =head1 VERSION
 
-version v1.6.6
+version v1.6.7
 
 =head1 SYNOPSIS
 

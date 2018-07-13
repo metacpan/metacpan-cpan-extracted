@@ -11,7 +11,7 @@ use File::Spec;
 
 use Test2::Harness::Util::DepTracer();
 
-our $VERSION = '0.001065';
+our $VERSION = '0.001066';
 
 use parent 'Test2::Harness::Run::Runner';
 use Test2::Harness::Util::HashBase qw{
@@ -137,7 +137,8 @@ sub check_monitored {
     my $sig = $self->{+SIGNAL};
 
     my $reaped = 0;
-    while(my ($cs, $pid) = each %$monitor) {
+    foreach my $cs (sort keys %$monitor) {
+        my $pid = $monitor->{$cs};
         kill($sig, $pid) or warn "$$ ($self->{+STAGE}) could not singal stage '$cs' pid $pid" if $sig;
         my $check = waitpid($pid, $sig ? 0 : WNOHANG);
         my $exit = $?;

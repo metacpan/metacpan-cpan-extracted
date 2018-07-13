@@ -1,3 +1,14 @@
+0.001066  2018-07-12 08:06:46-07:00 America/Los_Angeles
+
+    - Fix issue where isolation jobs were being kicked off too early. It needs to wait for all non-isolation jobs to finish first.
+    - New Feature: # HARNESS-CONFLICTS-XXX
+    - New documentation for HARNESS-CATEGORY-IMMISCIBLE
+    - New documentation for HARNESS-TIMEOUT-EVENT
+    - Get rid of the use of each when walking a hash.
+    - Allow comment only lines prior to HARNESS-XXX directives
+    - Accept binary TAP output that is not correctly formatted to UTF8
+    - Honor multiple spaces (or -) as a delimiter for # HARNESS directives
+
 0.001065  2018-04-22 03:26:57-07:00 America/Los_Angeles
 
     - Fix utf8 double encoding error

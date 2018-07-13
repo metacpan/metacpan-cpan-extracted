@@ -34,6 +34,7 @@ inc/Module/Install/StandardTests.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm
+inc/URI/Escape.pm
 
 # Private Module::Install extensions
 private-lib/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm

@@ -6,14 +6,12 @@ build_requires:
   Cwd: 0
   ExtUtils::MakeMaker: 6.36
   File::Find: 0
-  File::Slurper: 0
   File::Spec::Functions: 0
   Test::Compile: 0
   Test::More: 0
   UNIVERSAL::require: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
-  File::Slurper: 0
   URI::Escape: 0
 distribution_type: module
 dynamic_config: 1
@@ -32,7 +30,7 @@ no_index:
 provides:
   yagg:
     file: yagg
-    version: '1.4011'
+    version: '1.4012'
 requires:
   Carp: 0
   Data::Dumper: 0
@@ -50,4 +48,4 @@ resources:
   homepage: https://github.com/coppit/yagg
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/coppit/yagg
-version: '1.4011'
+version: '1.4012'

@@ -6,6 +6,7 @@ use lib 't';
 use Test::Utils;
 use File::Path;
 use CGI::Cache;
+use File::Basename;
 
 use vars qw( $VERSION );
 
@@ -43,10 +44,9 @@ CGI::Cache::start() or exit;
 die ("Good day to die\n");
 EOF
 
-my (undef, $test_script_name) = File::Temp::tempfile('cgi_test.cgi.XXXXX');
+my (undef, $test_script_name) = File::Temp::tempfile('cgi_test.cgi.XXXXX', TMPDIR=>1);
 
-my $short_script_name = $test_script_name;
-$short_script_name =~ s#.*/##;
+my $short_script_name = fileparse($test_script_name);
 
 my $expected_stdout = qr/Content-type: text\/html.*<pre>Good day to die/si;
 my $expected_stderr = qr/\[[^\]]+:[^\]]+\] $short_script_name: Good day to die/si;
@@ -85,7 +85,7 @@ my $expected_stderr = '';
 my $expected_cached = "Good day to live\n";
 my $message = "CGI::Carp caching with default attributes";
 
-my (undef, $test_script_name) = File::Temp::tempfile('cgi_test.cgi.XXXXX');
+my (undef, $test_script_name) = File::Temp::tempfile('cgi_test.cgi.XXXXX', TMPDIR=>1);
 
 Init_For_Run($test_script_name, $script, 1);
 Run_Script($test_script_name, $expected_stdout, $expected_stderr, $expected_cached, $message);

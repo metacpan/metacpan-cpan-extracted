@@ -132,7 +132,7 @@ going on, look at L<Params::Validate::Dependencies::Extending>.
 I like to know who's using my code.  All comments, including constructive
 criticism, are welcome.
 
-Please report any bugs either by email or using L<http://rt.cpan.org/>
+Please report any bugs either by email
 or at L<https://github.com/DrHyde/perl-modules-Params-Validate-Dependencies/issues>.
 
 Bug reports should contain enough detail that I can replicate the

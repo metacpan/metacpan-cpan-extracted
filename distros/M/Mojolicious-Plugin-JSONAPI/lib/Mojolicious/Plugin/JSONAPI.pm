@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::JSONAPI;
-$Mojolicious::Plugin::JSONAPI::VERSION = '1.8';
+$Mojolicious::Plugin::JSONAPI::VERSION = '1.9';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use JSONAPI::Document;
@@ -215,7 +215,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 =head1 VERSION
 
-version 1.8
+version 1.9
 
 =head1 SYNOPSIS
 

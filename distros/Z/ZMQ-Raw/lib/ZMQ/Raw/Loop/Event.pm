@@ -1,8 +1,9 @@
 package ZMQ::Raw::Loop::Event;
-$ZMQ::Raw::Loop::Event::VERSION = '0.25';
+$ZMQ::Raw::Loop::Event::VERSION = '0.26';
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util qw/weaken/;
 
 sub CLONE_SKIP { 1 }
 
@@ -13,7 +14,6 @@ BEGIN
 	@attributes = qw/
 		read_handle
 		write_handle
-		loop
 		timeout
 		timer
 		on_set
@@ -38,7 +38,7 @@ ZMQ::Raw::Loop::Event - Event class
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 DESCRIPTION
 
@@ -160,7 +160,7 @@ AGAIN:
 	goto AGAIN if (defined ($this->read_handle->recv (ZMQ::Raw->ZMQ_DONTWAIT)));
 }
 
-=for Pod::Coverage read_handle write_handle loop timeout timer on_set on_timeout
+=for Pod::Coverage read_handle write_handle timeout timer on_set on_timeout
 
 =head1 AUTHOR
 

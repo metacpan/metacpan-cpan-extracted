@@ -14,39 +14,16 @@ DESCRIPTION
 
 Build in the usual way for a perl extension:
 
-1. Tweak Makefile.PL is necessary only if your Tcl or Tk include files could
-not be found automatically by Makefile.PL script. Normally you just make
-sure you have right tcl/tk in your path at a moment of running Makefile.PL
-script.
-
-2. perl Makefile.PL
+   perl Makefile.PL
    make
    make test
    make install
 
-AUTHOR
-    Malcolm Beattie
+In some rare cases you may want to pass some parameters to Makefile.PL, you
+may see some explanations on them with
 
-MAINTAINERS
-    Vadim Konovalov
-    Jeff Hobbs
-    Gisle Aas
+   perl Makefile.PL --help
 
-LICENSE
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of either:
+See License, Authors sections in Tcl/Tk.pm, or with 'perldoc Tcl::Tk' - once it
+is installed - to have acknowledged on this type of information.
 
-        a) the GNU General Public License as published by the Free
-        Software Foundation; either version 1, or (at your option) any
-        later version, or
-
-        b) the "Artistic License" which comes with every Perl distribution.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
-    the GNU General Public License or the Artistic License for more details.
-
-	      Copyright (c) 1994-1997  Malcolm Beattie
-			All rights reserved.
-    

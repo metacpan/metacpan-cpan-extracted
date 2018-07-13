@@ -1,8 +1,8 @@
-package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.45-2-ga05f491
+package Dist::Zilla::Plugin::MakeMaker::Awesome; # git description: v0.46-2-g220bdb3
 # ABSTRACT: A more awesome MakeMaker plugin for L<Dist::Zilla>
 # KEYWORDS: plugin installer MakeMaker Makefile.PL toolchain customize override
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Moose;
 use MooseX::Types::Moose qw< Str ArrayRef HashRef >;
@@ -17,7 +17,7 @@ extends 'Dist::Zilla::Plugin::MakeMaker' => { -version => 5.001 };
 # avoid wiping out the method modifications to dump_config done by superclass
 with
     'Dist::Zilla::Role::FileGatherer' => { -excludes => 'dump_config' },
-    'Dist::Zilla::Role::BeforeBuild';
+    'Dist::Zilla::Role::BeforeBuild'  => { -excludes => 'dump_config' };
 
 sub mvp_multivalue_args { qw(WriteMakefile_arg_strs test_files exe_files header_strs footer_strs) }
 
@@ -520,7 +520,7 @@ Dist::Zilla::Plugin::MakeMaker::Awesome - A more awesome MakeMaker plugin for L<
 
 =head1 VERSION
 
-version 0.46
+version 0.47
 
 =head1 SYNOPSIS
 

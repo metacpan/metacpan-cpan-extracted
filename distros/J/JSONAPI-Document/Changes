@@ -1,4 +1,8 @@
+2.1       2018-07-12 20:09:22+01:00 Europe/London
+
 2.0       2018-07-02 23:44:40+01:00 Europe/London
+- Fixed bug where unusual words were stripped out that due to containing
+an underscore when formulating the documents resource type.
 
 1.9       2018-07-02 21:32:35+01:00 Europe/London
 - Update readme

@@ -5,6 +5,8 @@ use Test::More;
 use Test::Exception;
 use Data::Chronicle::Mock;
 use Date::Utility;
+use JSON::MaybeUTF8 qw(encode_json_utf8);
+use utf8;
 
 require Test::NoWarnings;
 
@@ -34,12 +36,41 @@ throws_ok {
 qr/Recorded date is not/, 'throws warning if recorded date is not Date::Utility object';
 is $chronicle_w->set("log", "syslog", $d, Date::Utility->new), 1, "data is stored without problem";
 is_deeply $chronicle_r->get("log", "syslog"), $d, "data retrieval works";
-is_deeply $chronicle_r->cache_reader->get("log::syslog"), JSON::to_json($d), "redis has stored correct data";
+is_deeply $chronicle_r->cache_reader->get("log::syslog"), encode_json_utf8($d), "redis has stored correct data";
 
 is $chronicle_w->set("log", "syslog-old", $d_old, Date::Utility->new(0)), 1, "data is stored without problem when specifying recorded date";
 
 my $old_data = $chronicle_r->get_for("log", "syslog-old", 0);
 is_deeply $old_data, $d_old, "data stored using recorded_date is retrieved successfully";
+
+subtest 'Get history tests' => sub {
+    $chronicle_w->set("testcat", "testname", ['value1'], Date::Utility->new);
+    sleep 1;
+    $chronicle_w->set("testcat", "testname", ['value2'], Date::Utility->new);
+    sleep 1;
+    $chronicle_w->set("testcat", "testname", ['value3'], Date::Utility->new);
+    sleep 1;
+    $chronicle_w->set("testcat", "testname", ['value4'], Date::Utility->new);
+    is_deeply ['value4'], $chronicle_r->get_history("testcat", "testname", 0), 'Revision is retrieved successfully';
+    is_deeply ['value3'], $chronicle_r->get_history("testcat", "testname", 1), 'Revision is retrieved successfully';
+    is_deeply ['value2'], $chronicle_r->get_history("testcat", "testname", 2), 'Revision is retrieved successfully';
+    is_deeply ['value1'], $chronicle_r->get_history("testcat", "testname", 3), 'Revision is retrieved successfully';
+    is undef, $chronicle_r->get_history("testcat", "testname", 4), 'Revision is retrieved successfully';
+};
+
+subtest 'Set and get items atomically' => sub {
+    subtest 'Atomic set test' => sub {
+        ok $chronicle_w->mset([["testcat", "testname", ['value5']], ["testcat2", "testname2", ['value10']]], Date::Utility->new),
+            'mset is successful';
+    };
+
+    subtest 'Atomic get test' => sub {
+        my @result = $chronicle_r->mget([["testcat", "testname"], ['wrong', 'wrong'], ["testcat2", "testname2"]]);
+        is_deeply $result[0], ['value5'], 'data is retrieved successfully';
+        is $result[1], undef, 'non-existent data is recognised correctly';
+        is_deeply $result[2], ['value10'], 'data is retrieved successfully';
+    };
+};
 
 my $d2 = $chronicle_r->get("log", "syslog");
 is_deeply $d, $d2, "data retrieval works";
@@ -59,6 +90,9 @@ my $hash_ref = {
     'C::D'       => 2,
     'Test::Data' => 0,
 };
+my $utf8_test = {'Ларри' => 'Уолл'};
+is $chronicle_w->set('utf8', 'test', $utf8_test, Date::Utility->new), 1, 'utf8 data stored';
+is_deeply $chronicle_r->get('utf8', 'test'), $utf8_test, 'utf8 data retrieved';
 
 $chronicle_r = Data::Chronicle::Reader->new({cache_reader => $hash_ref});
 

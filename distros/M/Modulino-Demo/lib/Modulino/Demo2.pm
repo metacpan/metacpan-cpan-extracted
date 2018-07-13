@@ -6,10 +6,7 @@ use v5.14.2;
 
 use warnings;
 
-use subs qw();
-use vars qw($VERSION);
-
-$VERSION = '1.001';
+our $VERSION = '1.002';
 
 UNITCHECK {
 sub _running_under_docreader {
@@ -38,7 +35,7 @@ __PACKAGE__->$method(@ARGV) if defined $method;
 
 =head1 NAME
 
-Modulino::Demo - A demonstration of modulino ideas
+Modulino::Demo2 - A demonstration of modulino ideas
 
 =head1 SYNOPSIS
 
@@ -157,7 +154,7 @@ sub _test_doc {
 
 This source is in Github:
 
-	http://github.com/briandfoy/modulino-demo/
+	https://github.com/briandfoy/modulino-demo/
 
 =head1 AUTHOR
 
@@ -165,9 +162,9 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2012-2014, brian d foy, All Rights Reserved.
+Copyright © 2012-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic License 2.0.
 
 =cut
 

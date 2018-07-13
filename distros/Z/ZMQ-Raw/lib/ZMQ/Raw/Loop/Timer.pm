@@ -1,7 +1,8 @@
 package ZMQ::Raw::Loop::Timer;
-$ZMQ::Raw::Loop::Timer::VERSION = '0.25';
+$ZMQ::Raw::Loop::Timer::VERSION = '0.26';
 use strict;
 use warnings;
+use Scalar::Util qw/weaken/;
 use Carp;
 
 sub CLONE_SKIP { 1 }
@@ -12,7 +13,6 @@ BEGIN
 {
 	@attributes = qw/
 		timer
-		loop
 		on_timeout
 	/;
 
@@ -34,7 +34,7 @@ ZMQ::Raw::Loop::Timer - Timer class
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 DESCRIPTION
 
@@ -110,6 +110,21 @@ sub new
 	};
 
 	return bless $self, $class;
+}
+
+
+
+sub loop
+{
+	my ($this, $loop) = @_;
+
+	if (scalar (@_) > 1)
+	{
+		$this->{loop} = $loop;
+		weaken ($this->{loop});
+	}
+
+	return $this->{loop};
 }
 
 

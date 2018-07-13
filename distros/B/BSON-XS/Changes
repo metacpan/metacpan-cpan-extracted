@@ -1,5 +1,18 @@
 Revision history for BSON-XS
 
+v0.4.3    2018-07-10 09:51:48-04:00 America/New_York
+
+    [Testing]
+
+    - PERL-954 Prevent deprecation warnings from use of deprecated MongoDB
+      v2.0.0 classes in test code.
+
+    - Synchronize tests with BSON.pm
+
+    [Prereqs]
+
+    - PERL-955 Windows requires Vista or later
+
 v0.4.2    2018-06-13 10:01:13-04:00 America/New_York
 
     [Bug fixes]

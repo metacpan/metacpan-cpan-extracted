@@ -1,0 +1,163 @@
+{
+   "abstract" : "MariaDB and MySQL driver for the Perl5 Database Interface (DBI)",
+   "author" : [
+      "Pali <pali@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBD-MariaDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "DBI" : "1.608",
+            "Data::Dumper" : "0",
+            "Devel::CheckLib" : "1.12",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.608",
+            "DynaLoader" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Proc::ProcessTable" : "0",
+            "TAP::Harness" : "3.31"
+         },
+         "requires" : {
+            "B" : "0",
+            "DBI" : "0",
+            "DBI::Const::GetInfoType" : "0",
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0.90",
+            "Time::HiRes" : "0",
+            "bigint" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         },
+         "suggests" : {
+            "Storable" : "0",
+            "Test::DistManifest" : "0",
+            "Test::Pod" : "1.41"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gooddata/DBD-MariaDB/issues"
+      },
+      "homepage" : "https://github.com/gooddata/DBD-MariaDB",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gooddata/DBD-MariaDB.git",
+         "web" : "https://github.com/gooddata/DBD-MariaDB"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dbi",
+      "x_MailingList" : "mailto:dbi-dev@perl.org"
+   },
+   "version" : "1.00",
+   "x_contributors" : [
+      "Alexandr Ciornii <alexchorny@gmail.com>",
+      "Alexey Molchanov <alexey.molchanov@portaone.com>",
+      "Amiri Barksdale at Home <amiri@roosterpirates.com>",
+      "Andrew Miller <ikari7789@yahoo.com>",
+      "Aran Deltac <bluefeet@gmail.com>",
+      "Bernt M. Johnsen <bernt.johnsen@oracle.com>",
+      "Branislav Zahradník <branislav.zahradnik@gooddata.com>",
+      "Chase Whitener <chase.whitener@infotechfl.com>",
+      "Chip Salzenberg <chip@topsy.com>",
+      "Chris Hammond <chrishammond@ymail.com>",
+      "Chris Weyl <cweyl@alumni.drew.edu>",
+      "Christian Walde <walde.christian@googlemail.com>",
+      "Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>",
+      "Daisuke Murase <typester@cpan.org>",
+      "Damyan Ivanov <dmn@debian.org>",
+      "Dan Book <grinnz@gmail.com>",
+      "Daniël van Eeden <daniel.vaneeden@booking.com>",
+      "Dave Lambley <davel@isosceles.(none)>",
+      "David Farrell <davidnmfarrell@gmail.com>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "Dominik Sauer <dominik.sauer@gooddata.com>",
+      "Giovanni Bechis <giovanni@bigio.snb.it>",
+      "Graham Ollis <plicease@cpan.org>",
+      "H.Merijn Brand - Tux <h.m.brand@xs4all.nl>",
+      "Hanno <hanno@gentoo.org>",
+      "James McCoy <jamessan@jamessan.com>",
+      "Jan Holcapek <jan.holcapek@gooddata.com>",
+      "Jim Winstead <jimw@trainedmonkey.com>",
+      "Juergen Weigert <jw@suse.com>",
+      "Kenny Gryp <kenny.gryp@percona.com>",
+      "Lu Shengliang <lushl9301@gmail.com>",
+      "Masahiro Chiba <chiba@everqueue.com>",
+      "Matthew Horsfall (alh) <WolfSage@gmail.com>",
+      "Michiel Beijen <michiel.beijen@gmail.com>",
+      "Mike Pomraning <mjp@pilcrow.madison.wi.us>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Pali <pali@cpan.org>",
+      "Patrick Galbraith <patg@patg.net>",
+      "Perlover <perlover@perlover.com>",
+      "Peter Botha <peterb@striata.com>",
+      "Petr Písař <ppisar@redhat.com>",
+      "Reini Urban <rurban@cpanel.net>",
+      "Rob Hoelz <rhoelz@inoc.com>",
+      "Rob Van Dam <rvandam00@gmail.com>",
+      "Rudy Lippan <rlippan@remotelinux.com>",
+      "Scimon <simon.proctor@gmail.com>",
+      "Sergey Zhuravlev <zhurs@ya.ru>",
+      "Sergiy Borodych <Sergiy.Borodych@gmail.com>",
+      "Sharif Nassar <mrwacky42+github@gmail.com>",
+      "Steffen Mueller <smueller@cpan.org>",
+      "Steven Hartland <steven.hartland@multiplay.co.uk>",
+      "Taro Kobayashi <9re.3000@gmail.com>",
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
+      "Tim Mullin <tim@cpanel.net>",
+      "Ville Skyttä <ville.skytta@iki.fi>",
+      "Vladimir Marek <vlmarek@volny.cz>",
+      "katyavoid <katyavoid@gmail.com>",
+      "kmx <kmx@cpan.org>",
+      "tokuhirom <tokuhirom@gmail.com>",
+      "zefram <zefram@fysh.org>",
+      "zentooo <ankerasoy@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

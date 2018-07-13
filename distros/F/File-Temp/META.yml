@@ -24,10 +24,7 @@ no_index:
 provides:
   File::Temp:
     file: lib/File/Temp.pm
-    version: '0.2306'
-  File::Temp::Dir:
-    file: lib/File/Temp.pm
-    version: '0.2306'
+    version: '0.2308'
 requires:
   Carp: '0'
   Carp::Heavy: '0'
@@ -52,7 +49,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Temp
   homepage: https://github.com/Perl-Toolchain-Gang/File-Temp
   repository: https://github.com/Perl-Toolchain-Gang/File-Temp.git
-version: '0.2306'
+version: '0.2308'
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -365,6 +362,10 @@ x_Dist_Zilla:
               name: '@Author::ETHER/Authors'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::AllowOverride
+              name: '@Author::ETHER/allow override AUTHOR'
+              version: '0.05'
+            -
               class: Pod::Weaver::Section::Contributors
               name: '@Author::ETHER/Contributors'
               version: '0.009'
@@ -453,7 +454,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.17.0
+          git_version: 2.18.0
           include_authors: 0
           include_releaser: 1
           order_by: commits
@@ -520,7 +521,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20180622'
+          Module::CoreList: '5.20180626'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -545,7 +546,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.18.0
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.045'
@@ -553,7 +554,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.18.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -561,7 +562,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.18.0
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -587,7 +588,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.18.0
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.045'
@@ -670,7 +671,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.18.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -683,11 +684,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.2306
+          tag: v0.2308
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.18.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -724,7 +725,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.18.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -746,7 +747,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.18.0
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.045'
@@ -889,20 +890,20 @@ x_authority: cpan:TJENNESS
 x_contributors:
   - 'David Golden <dagolden@cpan.org>'
   - 'Karen Etheridge <ether@cpan.org>'
+  - 'Slaven Rezic <slaven@rezic.de>'
+  - 'Peter Rabbitson <ribasushi@cpan.org>'
   - 'Olivier Mengue <dolmen@cpan.org>'
   - 'David Golden <xdg@xdg.me>'
-  - 'Peter Rabbitson <ribasushi@cpan.org>'
-  - 'Ben Tilly <btilly@gmail.com>'
   - 'Kevin Ryde <user42@zip.com.au>'
   - 'Peter John Acklam <pjacklam@online.no>'
   - 'Slaven Rezic <slaven.rezic@idealo.de>'
-  - 'Slaven Rezic <slaven@rezic.de>'
   - 'James E. Keenan <jkeen@verizon.net>'
   - 'Brian Mowrey <brian@drlabs.org>'
   - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
   - 'Ed Avis <eda@linux01.wcl.local>'
   - 'Guillem Jover <guillem@hadrons.org>'
+  - 'Ben Tilly <btilly@gmail.com>'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 0

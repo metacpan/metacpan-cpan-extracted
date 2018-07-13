@@ -1,0 +1,31 @@
+---
+abstract: 'Tool for Randomize characters in strings.'
+author:
+  - 'Achmad Yusri Afandi <yusrideb@cpan.org>'
+build_requires:
+  FindBin: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CellBIS-Random
+requires:
+  Carp: '0'
+  List::SomeUtils: '0'
+  Scalar::Util: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/CellBIS/CellBIS-Random/issues
+  repository: git://github.com/CellBIS/CellBIS-Random.git
+version: '0.1'
+x_generated_by_perl: v5.24.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

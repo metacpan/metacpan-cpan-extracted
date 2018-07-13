@@ -124,6 +124,9 @@ Mojo::Redis::Cache - Simple cache interface using Redis
     my $data = shift;
   });
 
+See L<https://github.com/jhthorsen/mojo-redis/blob/master/examples/cache.pl>
+for example L<Mojolicious> application.
+
 =head1 DESCRIPTION
 
 L<Mojo::Redis::Cache> provides a simple interface for caching data in the Redis

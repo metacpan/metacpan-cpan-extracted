@@ -6,7 +6,7 @@ use Carp;
 use Time::HiRes qw( gettimeofday tv_interval );
 
 use vars qw($VERSION);
-$VERSION = sprintf "%d.%02d%02d", q/0.71.11/ =~ /(\d+)/g;
+$VERSION = sprintf "%d.%02d%02d", q/0.71.12/ =~ /(\d+)/g;
 
 use constant BEFORE     => 0;
 use constant ELAPSED    => 1;

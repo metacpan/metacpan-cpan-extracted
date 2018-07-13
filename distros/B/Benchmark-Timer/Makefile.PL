@@ -13,6 +13,9 @@ all_from('lib/Benchmark/Timer.pm');
 auto_set_bugtracker;
 githubmeta;
 
+# Perl 5.6 doesn't work with URI::Escape. We get an error about Exporter not exporting "import"
+perl_version '5.008';
+
 configure_requires(
   # Module::Install::Bugtracker needs this
   'URI::Escape' => 0,
@@ -26,16 +29,23 @@ test_requires(
   'Test::More' => 0,
 );
 
+license 'gpl2';
+
+use_standard_tests;
+
+auto_license(holder => 'David Coppit');
+
 check_optional('Statistics::PointEstimation' => 0,
   "Install Statistics::PointEstimation for statistical sampling support\n");
 
 no_index 'file' => 'delta.pl';
 no_index 'directory' => 'private-lib';
 
-license 'gpl2';
-auto_license(holder => 'David Coppit');
-
 enable_verbose_cpan_testing();
+
+realclean_files('inc');
+
+WriteAll;
 
 # ---- Workaround for broken module ----
 # https://rt.cpan.org/Ticket/Display.html?id=125772
@@ -62,7 +72,3 @@ enable_verbose_cpan_testing();
       /);
   }
 }
-
-use_standard_tests;
-
-WriteAll();

@@ -25,6 +25,7 @@ no_index:
     - inc
     - private-lib
     - t
+    - xt
 requires:
   Module::AutoInstall: 0.88
   Module::Install: 0
@@ -34,4 +35,4 @@ resources:
   homepage: https://github.com/coppit/module-install-checkoptional/
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/coppit/module-install-checkoptional.git
-version: '0.1104'
+version: '0.1105'

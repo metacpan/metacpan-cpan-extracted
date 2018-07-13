@@ -30,7 +30,7 @@ MongoDB::Upgrading - Deprecations and behavior changes from v1 to v2
 
 =head1 VERSION
 
-version v2.0.0
+version v2.0.1
 
 =head1 DESCRIPTION
 
@@ -68,6 +68,24 @@ portability – the switch to an external library that has both pure-Perl and XS
 =back
 
 =head1 INSTALLATION AND DEPENDENCY CHANGES
+
+=head2 Installing v2 over v1
+
+Because the v2 driver is pure-Perl capable (see below), its Perl
+installation directory is different.  If upgrading, you need to be
+sure that the old version doesn't shadow the new one.
+
+That's easy with C<cpanm>:
+
+    cpanm --uninst-shadows MongoDB
+
+For the traditional CPAN client, you'll need to configure the
+C<make_install_arg> config argument like this:
+
+    $ perl -MCPAN -e shell
+    cpan> o conf make_install_arg UNINST=1
+    cpan> o conf commit
+    cpan> install MongoDB
 
 =head2 BSON library
 
@@ -137,7 +155,7 @@ or not users ultimately need or want objects of that type.
 
 The previously-deprecated  C<dt_type> configuration argument has been
 removed from L<MongoDB::MongoClient> and the default date type of the
-L<BSON> library is L<BSON::Time>, which is extremly lightweight and
+L<BSON> library is L<BSON::Time>, which is extremely lightweight and
 provides convenience methods to convert to various popular time classes.
 It also works well with L<Time::HiRes> for recording datetimes with
 millisecond precision.
@@ -223,7 +241,7 @@ Many users are unaware of these considerations in the use of C<count>.  As
 any change to C<count> could surprise users with unexpected differences in
 either performance or correctness, the C<count> method has been replaced
 with two new API methods, which more directly convey performance and
-correctness expections:
+correctness expectations:
 
 =over 4
 

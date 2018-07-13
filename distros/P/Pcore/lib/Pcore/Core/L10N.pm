@@ -19,7 +19,7 @@ sub set_locale ($locale = undef) {
     return $LOCALE;
 }
 
-sub load_locale ( $locale ) : prototype($) {
+sub load_locale : prototype($) ($locale) {
     my $messages = $MESSAGES->{$locale} //= {};
 
     for my $dist ( values $ENV->{_dist_idx}->%* ) {
@@ -119,7 +119,7 @@ sub load_locale ( $locale ) : prototype($) {
     return;
 }
 
-sub l10n ( $msgid, $msgid_plural = undef, $num = undef ) : prototype($;$$) {
+sub l10n : prototype($;$$) ( $msgid, $msgid_plural = undef, $num = undef ) {
     return bless {
         caller       => caller,
         msgid        => $msgid,

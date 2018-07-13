@@ -30,6 +30,8 @@ use lib "blib/lib";
 use Proc::PID::File;
 use Test::Simple tests => 12;
 use Config;
+use File::Spec;
+my $devnull = File::Spec->devnull;
 
 $|++; $\ = "\n";
 my %args = (name => "test", dir => ".", debug => $ENV{DEBUG} || "");
@@ -49,11 +51,26 @@ if ($cmd eq "--daemon") {
 exit() if $cmd eq "--short";
 
 my $pid;
+our $ProcessObj;
 sub rundaemon {
-	my $pipes = $args{debug} =~ /D/ ? "" : "> /dev/null 2>&1";
-	system qq|$^X $0 --daemon $pipes &|;
+	my $pipes = $args{debug} =~ /D/ ? "" : "> $devnull 2>&1";
+	if ($^O eq 'MSWin32') {
+		require Win32::Process;
+		require Win32;
+		$ProcessObj->Kill(0) if $ProcessObj;
+		Win32::Process::Create($ProcessObj,
+                            "$^X",
+                            "$^X $0 --daemon $pipes",
+                            0,
+                            32 + 134217728, #NORMAL_PRIORITY_CLASS + CREATE_NO_WINDOW
+                            ".") || die $^E;
+	} else {
+		system qq|$^X $0 --daemon $pipes &|;
+	}
 	sleep 1;
-	chomp($pid = qx|cat $args{dir}/$args{name}.pid|);
+	open my $fh, '<', "$args{dir}/$args{name}.pid" or die "Error reading $args{dir}/$args{name}.pid - $!";
+	$pid=<$fh>;
+	chomp($pid);
 	}
 
 # - thread-safety test -------------------------------------------------------
@@ -98,14 +115,19 @@ ok(1, "SKIPPED - simple: verified (false)") unless
 
 # - single instance test -----------------------------------------------------
 
-sleep 1 while kill 0, $pid;
+if ($ProcessObj) {
+	$ProcessObj->Wait(6000) or $ProcessObj->Kill(0);
+	$ProcessObj = undef;
+} else {
+	sleep 1 while kill 0, $pid;
+}
 
 $rc = Proc::PID::File->running(%args);
 ok(! $rc, "simple: single instance");
 
 # - destroy test -------------------------------------------------------------
 
-system qq|$^X $0 --short > /dev/null 2>&1|;
+system qq|$^X $0 --short > $devnull 2>&1|;
 ok(-f "test.pid", "simple: destroy");
 
 # - OO Interface tests -------------------------------------------------------
@@ -134,7 +156,11 @@ ok(! -f $c1->{path}, "oo: released");
 # - wait for daemon to exit --------------------------------------------------
 
 $\ = undef;
-print "waiting for daemon death";
-sleep 1, print "." while kill 0, $pid;
-print "\ndone\n";
-exit 0;
+print "#waiting for daemon death\n";
+if ($ProcessObj) {
+	$ProcessObj->Wait(1000) or $ProcessObj->Kill(0);
+} else {
+	sleep 1, print "." while kill 0, $pid;
+}
+#print "\ndone\n";
+#exit 0;

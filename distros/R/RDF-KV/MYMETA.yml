@@ -31,4 +31,4 @@ requires:
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
 version: '0.05'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

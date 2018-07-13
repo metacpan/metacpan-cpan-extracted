@@ -1,5 +1,11 @@
+use 5.14.0;
+use Devel::CheckBin;
+check_bin('git');
+if ($^O =~ m/mswin32/i) {
+    print STDERR "NA: Not yet tested on Windows\n";
+    exit 0;
+}
 use ExtUtils::MakeMaker;
-require 5.14.0;
 
 my $mm_ver = ExtUtils::MakeMaker->VERSION;
 
@@ -8,6 +14,10 @@ WriteMakefile(
     VERSION_FROM => 'lib/Test/Against/Dev.pm',
     AUTHOR       => 'James E Keenan (jkeenan@cpan.org)',
     ABSTRACT     => 'Test CPAN modules against Perl dev releases',
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => 0,
+        'Devel::CheckBin' => 0,
+    },
     MIN_PERL_VERSION => '5.14.0',
     PREREQ_PM    => {
                     # core
