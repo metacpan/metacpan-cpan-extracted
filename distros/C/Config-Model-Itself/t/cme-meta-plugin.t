@@ -6,21 +6,15 @@ use 5.10.1;
 
 use Test::More ;
 use Config::Model;
+use Config::Model::Tester::Setup qw/init_test/;
 use Path::Tiny;
 use Test::File::Contents;
-
-use File::Copy::Recursive qw(fcopy rcopy dircopy);
 
 use App::Cmd::Tester;
 use App::Cme ;
 use Tk;
 
-my $arg = shift || '';
-my ( $log, $show ) = (0) x 2;
-
-my $trace = $arg =~ /t/ ? 1 : 0;
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
+my ($model, $trace) = init_test();
 
 # edit and plugin need to be in separate test files. Otherwise the 2
 # Tk widgets created one after the other interacts badly and the save
@@ -52,7 +46,7 @@ SKIP: {
             '-dir' => $wr_test->stringify,
         );
 
-        say "test command: cme @test_args"if $trace;
+        say "test command: cme @test_args" if $trace;
         my $result = test_app( 'App::Cme' => \@test_args ) ;
 
         is($result->error, undef, 'threw no exceptions');

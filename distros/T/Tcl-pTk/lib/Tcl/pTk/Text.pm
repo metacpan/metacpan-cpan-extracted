@@ -3,7 +3,9 @@ use strict;
 
 package Tcl::pTk::Text;
 
-our ($VERSION) = ('0.92');
+use Text::Tabs;
+
+our ($VERSION) = ('0.93');
 
 # borrowed from Tk/Text.pm without any modifications
 
@@ -26,7 +28,12 @@ sub ClassInit
 {
  my ($class,$mw) = @_;
  $class->SUPER::ClassInit($mw, 'Text'); # Call with optional 'Text' Tag
- $mw->bind($class, '<3>', ['PostPopupMenu', Tcl::pTk::Ev('X'), Tcl::pTk::Ev('Y')]  ); # right-click menu
+ # right-click menu
+ $mw->bind(
+   $class,
+   $mw->windowingsystem eq 'aqua' ? '<2>' : '<3>',
+   ['PostPopupMenu', Tcl::pTk::Ev('X'), Tcl::pTk::Ev('Y')],
+  );
  
  # We use the 'Text' tag for the bindings below, because we are adding to the tcl text-widget
  #  bindings, which are under the 'Text' bindtag.
@@ -911,8 +918,9 @@ sub FindNext
  ## if backward, start search from start of selected block.
  ## dont want search to find currently selected text.
  ## tag 'sel' may not be defined, use eval loop to trap error
+ my $is_forward = $direction =~ m{^-f} && $direction eq substr("-forwards", 0, length($direction));
  eval {
-  if ($direction eq '-forward')
+  if ($is_forward)
    {
    $w->markSet('insert', 'sel.last');
    $w->markSet('current', 'sel.last');
@@ -964,7 +972,7 @@ sub FindNext
 
  $w->see($start_index);
 
- if ($direction eq '-forward')
+ if ($is_forward)
   {
   $w->markSet('insert', $end_index);
   $w->markSet('current', $end_index);

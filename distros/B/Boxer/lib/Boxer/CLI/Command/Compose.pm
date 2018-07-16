@@ -14,15 +14,15 @@ use Path::Tiny;
 use Module::Runtime qw/use_module/;
 use Boxer::CLI -command;
 
-use namespace::clean;
+use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.7
+Version v1.1.8
 
 =cut
 
-our $VERSION = version->declare("v1.1.7");
+our $VERSION = version->declare("v1.1.8");
 
 use constant {
 	abstract   => q[compose system recipe from reclass node],

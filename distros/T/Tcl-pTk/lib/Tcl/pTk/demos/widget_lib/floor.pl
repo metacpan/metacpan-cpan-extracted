@@ -74,12 +74,14 @@ sub floor {
 	$c->idletasks;
     });
     $c->bind('room', '<Leave>' => sub {$floor::current_room = ''});
-    $c->CanvasBind('<2>' => sub {
+    $c->CanvasBind(
+        $MW->windowingsystem ne 'aqua' ? '<2>' : '<3>' => sub {
 	my($c) = @_;
 	my $e = $c->XEvent;
 	$c->scanMark($e->x, $e->y);
     });
-    $c->CanvasBind('<B2-Motion>' => sub {
+    $c->CanvasBind(
+        $MW->windowingsystem ne 'aqua' ? '<B2-Motion>' : '<B3-Motion>' => sub {
 	my($c) = @_;
 	my $e = $c->XEvent;
 	$c->scanDragto($e->x, $e->y);

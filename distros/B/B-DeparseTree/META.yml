@@ -17,7 +17,7 @@ name: B-DeparseTree
 provides:
   B::DeparseTree:
     file: lib/B/DeparseTree.pm
-    version: v3.3.0
+    version: v3.4.0
   B::DeparseTree::Fragment:
     file: lib/B/DeparseTree/Fragment.pm
   B::DeparseTree::OPflags:
@@ -77,5 +77,5 @@ requires:
   version: '0'
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: v3.3.0
+version: v3.4.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

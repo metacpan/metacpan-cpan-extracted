@@ -2,7 +2,7 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2017 by Dominique Dumont.
+# This software is Copyright (c) 2007-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #

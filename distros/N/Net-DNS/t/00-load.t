@@ -1,4 +1,4 @@
-# $Id: 00-load.t 1611 2018-01-02 09:41:24Z willem $	-*-perl-*-
+# $Id: 00-load.t 1692 2018-07-06 08:55:39Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -19,7 +19,6 @@ my @module = qw(
 	IO::Select
 	IO::Socket
 	IO::Socket::INET
-	IO::Socket::INET6
 	IO::Socket::IP
 	MIME::Base64
 	Net::LibIDN

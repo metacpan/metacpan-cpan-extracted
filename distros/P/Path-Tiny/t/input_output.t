@@ -552,6 +552,8 @@ subtest "edit_lines" => sub {
 };
 
 done_testing;
+
+1;
 #
 # This file is part of Path-Tiny
 #

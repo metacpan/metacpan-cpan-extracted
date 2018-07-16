@@ -1,9 +1,9 @@
 package Net::DNS::Nameserver;
 
 #
-# $Id: Nameserver.pm 1608 2017-12-07 10:10:38Z willem $
+# $Id: Nameserver.pm 1692 2018-07-06 08:55:39Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1608 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1692 $)[1];
 
 
 =head1 NAME
@@ -40,13 +40,6 @@ See L</EXAMPLE> for an example.
 =cut
 
 use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1;';
-
-use constant USE_SOCKET_INET => defined eval 'require IO::Socket::INET';
-
-use constant USE_SOCKET_INET6 => defined eval 'require IO::Socket::INET6';
-
-use constant IPv6 => USE_SOCKET_IP || USE_SOCKET_INET6;
-
 
 use strict;
 use warnings;
@@ -230,14 +223,8 @@ sub ReplyHandler {
 #------------------------------------------------------------------------------
 
 sub inet_new {
-	return new IO::Socket::INET(@_) unless IPv6;
-
 	return new IO::Socket::IP(@_) if USE_SOCKET_IP;
-
-	my %param = @_;
-
-	return new IO::Socket::INET6(@_) if $param{LocalAddr} =~ /:/;
-	return new IO::Socket::INET(@_);
+	return new IO::Socket::INET(@_) unless USE_SOCKET_IP;
 }
 
 #------------------------------------------------------------------------------

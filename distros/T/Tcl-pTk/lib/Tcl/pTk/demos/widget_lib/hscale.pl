@@ -10,7 +10,7 @@ sub hscale {
     my($demo) = @_;
     $TOP = $MW->WidgetDemo(
         -name     => $demo,
-        -text     => 'An arrow and a horizontal scale are displayed below.  If you click or drag mouse button 1 in the scale, you can change the size of the arrow.',
+        -text     => 'An arrow and a horizontal scale are displayed below.  If you click or drag the left mouse button in the scale, you can change the size of the arrow.',
         -title    => 'Horizontal Scale Demonstration',
         -iconname => 'hscale',
     );

@@ -1,5 +1,5 @@
 package Net::Stripe;
-$Net::Stripe::VERSION = '0.35';
+$Net::Stripe::VERSION = '0.36';
 use Moose;
 use Class::Load;
 use Kavorka;
@@ -708,6 +708,10 @@ sub _defined_arguments {
 sub _hash_to_object {
     my $hash   = shift;
 
+    if ( exists( $hash->{deleted} ) && exists( $hash->{object} ) && $hash->{object} ne 'customer' ) {
+      delete( $hash->{object} );
+    }
+
     foreach my $k (grep { ref($hash->{$_}) } keys %$hash) {
         my $v = $hash->{$k};
         if (ref($v) eq 'HASH' && defined($v->{object})) {
@@ -754,7 +758,7 @@ Net::Stripe - API client for Stripe.com
 
 =head1 VERSION
 
-version 0.35
+version 0.36
 
 =head1 SYNOPSIS
 
@@ -804,54 +808,6 @@ You can set this to true to see extra debug info.
 You can set this to true to see the actual network requests.
 
 =back
-
-=head1 ATTRIBUTES
-
-=head2 api_base
-
-Reader: api_base
-
-Type: Str
-
-Additional documentation: This is the base part of the URL for every request made
-
-=head2 api_key
-
-Reader: api_key
-
-Type: Str
-
-This attribute is required.
-
-Additional documentation: You get this from your Stripe Account settings
-
-=head2 debug
-
-Reader: debug
-
-Writer: debug
-
-Type: Bool
-
-Additional documentation: The debug flag
-
-=head2 debug_network
-
-Reader: debug_network
-
-Writer: debug_network
-
-Type: Bool
-
-Additional documentation: The debug network request flag
-
-=head2 ua
-
-Reader: ua
-
-Type: Object
-
-Additional documentation: The LWP::UserAgent that is used for requests
 
 =head1 Balance Transaction Methods
 

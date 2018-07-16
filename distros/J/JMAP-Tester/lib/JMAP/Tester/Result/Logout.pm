@@ -3,7 +3,7 @@ use strict;
 
 package JMAP::Tester::Result::Logout;
 # ABSTRACT: a successful logout
-$JMAP::Tester::Result::Logout::VERSION = '0.018';
+$JMAP::Tester::Result::Logout::VERSION = '0.019';
 use Moo;
 with 'JMAP::Tester::Role::Result';
 
@@ -31,7 +31,7 @@ JMAP::Tester::Result::Logout - a successful logout
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 OVERVIEW
 

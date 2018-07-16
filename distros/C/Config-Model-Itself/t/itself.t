@@ -3,7 +3,7 @@
 use ExtUtils::testlib;
 use Test::More ;
 use Config::Model;
-use Log::Log4perl qw(:easy) ;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use Data::Dumper ;
 use Path::Tiny;
 
@@ -12,47 +12,19 @@ use File::Copy::Recursive qw(fcopy rcopy dircopy);
 use Test::Memory::Cycle;
 
 use warnings;
-no warnings qw(once);
-
 use strict;
 
-my $arg = shift || '';
-my ( $log, $show ) = (0) x 2;
-
-my $trace = $arg =~ /t/ ? 1 : 0;
-$log  = 1 if $arg =~ /l/;
-$show = 1 if $arg =~ /s/;
-
-my $home = $ENV{HOME} || "";
-my $log4perl_user_conf_file = "$home/.log4config-model";
-
-if ( $log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init( $log ? $WARN : $ERROR );
-}
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
+my ($meta_model, $trace) = init_test();
 
 # do search for the models created in this test
-use lib "wr_test/lib";
+use lib "wr_root/itself/lib";
 
-my $wr_test = path('wr_test') ;
+my $wr_test = setup_test_dir ;
 my $wr_conf1 = $wr_test->child("wr_conf1");
 my $wr_lib = $wr_test->child("lib");
 my $wr_model1 = $wr_lib->child("wr_model1");
 my $wr_model2 = $wr_lib->child("wr_model2");
 
-my $meta_model = Config::Model -> new ( ) ;
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-ok(1,"compiled");
-
-$wr_test->remove_tree if $wr_test->is_dir ;
-
-$wr_conf1->mkpath;
 $wr_model1->mkpath;
 $wr_model2->mkpath;
 $wr_conf1->child("etc/ssh")->mkpath;
@@ -61,7 +33,6 @@ $wr_conf1->child("etc/ssh")->mkpath;
 dircopy('data',$wr_model1->stringify) || die "cannot copy model data:$!" ;
 
 my $model = Config::Model->new(
-    legacy => 'ignore',
     model_dir => $wr_model1->child("models")->relative($wr_lib)->stringify
 ) ;
 ok(1,"loaded Master model") ;
@@ -155,8 +126,6 @@ print Dumper $map if $trace ;
 # check that deprecated backend specs are removed
 my $master_model = $meta_inst->grab('class:MasterModel');
 # check => skip prevents deprecation warnings
-is($master_model->grab(step => 'read_config', check => 'skip')->fetch_size, 0, "read_config was removed");
-is($master_model->grab(step => 'write_config', check => 'skip')->fetch_size, 0, "write_config was removed");
 is($master_model->grab_value('rw_config backend'), 'cds_file', "read_config data was migrated in rw_config");
 is($master_model->grab_value('rw_config file'), 'mymaster.cds', "write_config data was migrated in rw_config");
 
@@ -245,6 +214,7 @@ is(scalar @elt4,scalar @elt1,"Check number of elements of root4") ;
 
 # require Tk::ObjScanner; Tk::ObjScanner::scan_object($meta_model) ;
 
-memory_cycle_ok($model, "Check memory cycle");
+note("testing memory cycles. Please wait...");
+memory_cycle_ok($meta_model, "Check memory cycle");
 
 done_testing;

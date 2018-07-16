@@ -1,9 +1,9 @@
 package Net::DNS::RR::NSEC;
 
 #
-# $Id: NSEC.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: NSEC.pm 1692 2018-07-06 08:55:39Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1692 $)[1];
 
 
 use strict;
@@ -75,6 +75,39 @@ sub typelist {
 }
 
 
+sub typemap {
+	my $self = shift;
+
+	my $number = typebyname(shift);
+	my $window = $number >> 8;
+	my $bitnum = $number & 255;
+
+	my $typebm = $self->{typebm} || return;
+	my @bitmap;
+	my $index = 0;
+	while ( $index < length $typebm ) {
+		my ( $block, $size ) = unpack "\@$index C2", $typebm;
+		$bitmap[$block] = unpack "\@$index xxa$size", $typebm;
+		$index += $size + 2;
+	}
+
+	my @bit = split //, unpack 'B*', ( $bitmap[$window] || return );
+	return $bit[$bitnum];
+}
+
+
+sub covers {
+	my $self = shift;
+	my $name = join chr(0), reverse Net::DNS::DomainName->new(shift)->_wire;
+	my $this = join chr(0), reverse $self->{owner}->_wire;
+	my $next = join chr(0), reverse $self->{nxtdname}->_wire;
+	foreach ( $name, $this, $next ) {tr /\101-\132/\141-\172/}
+
+	return ( $name cmp $this ) + ( "$next\001" cmp $name ) == 2 unless $next gt $this;
+	return ( $name cmp $this ) + ( $next cmp $name ) == 2;
+}
+
+
 ########################################
 
 sub _type2bm {
@@ -143,7 +176,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name NSEC nxtdname typelist');
+    $rr = new Net::DNS::RR( 'name NSEC nxtdname typelist' );
 
 =head1 DESCRIPTION
 
@@ -173,14 +206,31 @@ or contains a delegation point NS RRset.
     @typelist = $rr->typelist;
     $typelist = $rr->typelist;
 
-The Type List identifies the RRset types that exist at the NSEC RR
+typelist() identifies the RRset types that exist at the NSEC RR
 owner name.  When called in scalar context, the list is interpolated
 into a string.
+
+=head2 typemap
+
+    $exists = $rr->typemap($rrtype);
+
+typemap() returns a Boolean true value if the specified RRtype occurs
+in the type bitmap of the NSEC record.
+
+=head2 covers
+
+    $covered = $rr->covers( 'example.foo' );
+
+covers() returns a Boolean true value if the canonical form of the name,
+or one of its ancestors, falls between the owner name and the nxtdname
+field of the NSEC record.
 
 
 =head1 COPYRIGHT
 
 Copyright (c)2001-2005 RIPE NCC.  Author Olaf M. Kolkman
+
+Portions Copyright (c)2018 Dick Franks
 
 All rights reserved.
 

@@ -1,5 +1,5 @@
 package Net::Stripe::Subscription;
-$Net::Stripe::Subscription::VERSION = '0.35';
+$Net::Stripe::Subscription::VERSION = '0.36';
 use Moose;
 use Kavorka;
 use Net::Stripe::Token;
@@ -54,119 +54,7 @@ Net::Stripe::Subscription - represent a Subscription object from Stripe
 
 =head1 VERSION
 
-version 0.35
-
-=head1 ATTRIBUTES
-
-=head2 cancel_at_period_end
-
-Reader: cancel_at_period_end
-
-Writer: cancel_at_period_end
-
-Type: Maybe[Bool]
-
-=head2 canceled_at
-
-Reader: canceled_at
-
-Type: Maybe[Int]
-
-=head2 card
-
-Reader: card
-
-Writer: card
-
-Type: Maybe[Net::Stripe::Card|Net::Stripe::Token|Str]
-
-=head2 coupon
-
-Reader: coupon
-
-Writer: coupon
-
-Type: Maybe[Net::Stripe::Coupon|Str]
-
-=head2 current_period_end
-
-Reader: current_period_end
-
-Type: Maybe[Int]
-
-=head2 current_period_start
-
-Reader: current_period_start
-
-Type: Maybe[Int]
-
-=head2 customer
-
-Reader: customer
-
-Type: Maybe[Str]
-
-=head2 ended_at
-
-Reader: ended_at
-
-Type: Maybe[Int]
-
-=head2 id
-
-Reader: id
-
-Type: Maybe[Str]
-
-=head2 plan
-
-Reader: plan
-
-Writer: plan
-
-Type: Maybe[Net::Stripe::Plan|Str]
-
-=head2 prorate
-
-Reader: prorate
-
-Writer: prorate
-
-Type: Maybe[Bool|Object]
-
-=head2 quantity
-
-Reader: quantity
-
-Writer: quantity
-
-Type: Maybe[Int]
-
-=head2 start
-
-Reader: start
-
-Type: Maybe[Int]
-
-=head2 status
-
-Reader: status
-
-Type: Maybe[Str]
-
-=head2 trial_end
-
-Reader: trial_end
-
-Writer: trial_end
-
-Type: Maybe[Int|Str]
-
-=head2 trial_start
-
-Reader: trial_start
-
-Type: Maybe[Str]
+version 0.36
 
 =head1 AUTHORS
 

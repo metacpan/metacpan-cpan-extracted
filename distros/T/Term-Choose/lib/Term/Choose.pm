@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.602';
+our $VERSION = '1.604';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -684,7 +684,7 @@ sub __write_first_screen {
     my ( $self ) = @_;
     ( $self->{term_width}, $self->{term_height} ) = $self->{plugin}->__get_term_size();
     ( $self->{avail_width}, $self->{avail_height} ) = ( $self->{term_width}, $self->{term_height} );
-    if ( $self->{length_longest} > $self->{avail_width} && $^O ne 'MSWin32' ) {
+    if ( $self->{length_longest} > $self->{avail_width} && $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
         $self->{avail_width} += WIDTH_CURSOR;
         # + WIDTH_CURSOR: use also the last terminal column if there is only one print-column;
         #                 with only one print-column the output doesn't get messed up if an item
@@ -1080,7 +1080,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.602
+Version 1.604
 
 =cut
 
@@ -1629,14 +1629,23 @@ C<new|choose> dies if passed invalid arguments.
 
 =head2 carp
 
-If after pressing a key L<Term::ReadKey>::ReadKey returns C<undef> C<choose> warns with C<EOT: $!> and returns
-I<undef> or an empty list in list context.
+If pressing a key results in an undefined value C<choose> warns with C<EOT: $!> and returns I<undef> or an empty list in
+list context.
 
 =head1 REQUIREMENTS
 
 =head2 Perl version
 
 Requires Perl version 5.8.3 or greater.
+
+=head2 Optional modules
+
+=head3 Term::ReadKey
+
+If L<Term::ReadKey> is available it is used the C<ReadKey> to read the user input and C<GetTerminalSize> to get the
+terminal size. Without C<Term::ReadKey> C<getc> is used to read the input and C<stty size> to get the terminal size.
+
+If the OS is MSWin32 it is always used L<Win32::Console> to read the user input and to get the terminal size.
 
 =head2 Decoded strings
 

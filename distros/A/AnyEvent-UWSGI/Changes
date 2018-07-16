@@ -1,5 +1,11 @@
 Revision history for Perl extension AnyEvent::UWSGI.
 
+0.04 Thu Jul 12 00:29:00 2018
+    - support different uwsgi modifiers
+
+0.03  Tue Sep 13 12:55:00 2016
+    - fix Makefile.PL
+
 0.02  Thu Aug 11 18:17:00 2016
     - fix HTTP headers parse
 

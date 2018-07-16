@@ -1,6 +1,14 @@
 Revision history for CPAN-Testers-Common-DBUtils
 ================================================
 
+0.13    2018-07-14
+        - moved author tests to xt/ directory as per new CPAN standards
+        - fixed META files reporting the wrong module version
+
+0.12    2018-07-06
+        - fixed tests checking for error message from new SQLite
+          versions
+
 0.11    2014-09-09
         - fixed license fields in META.json to be lists.
 

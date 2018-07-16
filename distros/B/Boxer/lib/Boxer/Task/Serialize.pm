@@ -21,15 +21,15 @@ use Types::Path::Tiny qw( Dir File Path );
 use Boxer::Types qw( SkelDir );
 extends 'Boxer::Task';
 
-use namespace::clean;
+use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.7
+Version v1.1.8
 
 =cut
 
-our $VERSION = version->declare("v1.1.7");
+our $VERSION = version->declare("v1.1.8");
 
 has world => (
 	is       => 'ro',

@@ -1,0 +1,1127 @@
+{
+   "abstract" : "ATOOMIC's plugin bundle",
+   "author" : [
+      "Nicolas R <atoomic@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-ATOOMIC",
+   "no_index" : {
+      "package" : [
+         "Dist::Zilla::Plugin::ATOOMIC::CheckChangesHasContent",
+         "Dist::Zilla::Plugin::ATOOMIC::Contributors",
+         "Dist::Zilla::Plugin::ATOOMIC::Git::CheckFor::CorrectBranch",
+         "Dist::Zilla::Plugin::ATOOMIC::License",
+         "Dist::Zilla::Plugin::ATOOMIC::TidyAll",
+         "Dist::Zilla::Plugin::ATOOMIC::VersionProvider"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.03"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::EOL" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "2.05"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Code::TidyAll::Config::INI::Reader" : "0.44",
+            "Devel::PPPort" : "3.42",
+            "Dist::Zilla" : "6.0",
+            "Dist::Zilla::Plugin::Authority" : "0",
+            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
+            "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
+            "Dist::Zilla::Plugin::CPANFile" : "0",
+            "Dist::Zilla::Plugin::CheckPrereqsIndexed" : "0",
+            "Dist::Zilla::Plugin::CheckSelfDependency" : "0",
+            "Dist::Zilla::Plugin::CheckStrictVersion" : "0",
+            "Dist::Zilla::Plugin::CheckVersionIncrement" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0.02",
+            "Dist::Zilla::Plugin::GenerateFile::FromShareDir" : "0.013",
+            "Dist::Zilla::Plugin::Git::Check" : "0",
+            "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" : "0",
+            "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts" : "0",
+            "Dist::Zilla::Plugin::Git::Commit" : "0",
+            "Dist::Zilla::Plugin::Git::Contributors" : "0",
+            "Dist::Zilla::Plugin::Git::GatherDir" : "0",
+            "Dist::Zilla::Plugin::Git::Push" : "0",
+            "Dist::Zilla::Plugin::Git::Tag" : "0",
+            "Dist::Zilla::Plugin::GitHub::Meta" : "0.45",
+            "Dist::Zilla::Plugin::GitHub::Update" : "0.45",
+            "Dist::Zilla::Plugin::InstallGuide" : "0",
+            "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0",
+            "Dist::Zilla::Plugin::Meta::Contributors" : "0",
+            "Dist::Zilla::Plugin::MetaConfig" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::MojibakeTests" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::PPPort" : "0",
+            "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::PromptIfStale" : "0.050",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
+            "Dist::Zilla::Plugin::RunExtraTests" : "0",
+            "Dist::Zilla::Plugin::SurgicalPodWeaver" : "0",
+            "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
+            "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" : "0",
+            "Dist::Zilla::Plugin::Test::CleanNamespaces" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::EOL" : "0.14",
+            "Dist::Zilla::Plugin::Test::NoTabs" : "0",
+            "Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable" : "0",
+            "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
+            "Dist::Zilla::Plugin::Test::Portability" : "0",
+            "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
+            "Dist::Zilla::Plugin::Test::Synopsis" : "0",
+            "Dist::Zilla::Plugin::Test::Version" : "0",
+            "Dist::Zilla::Plugin::VersionFromMainModule" : "0.02",
+            "Dist::Zilla::Role::BeforeBuild" : "0",
+            "Dist::Zilla::Role::LicenseProvider" : "0",
+            "Dist::Zilla::Role::Plugin" : "0",
+            "Dist::Zilla::Role::PluginBundle::Config::Slicer" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Dist::Zilla::Role::PluginBundle::PluginRemover" : "0",
+            "Dist::Zilla::Role::TextTemplate" : "0",
+            "File::Which" : "0",
+            "List::Util" : "1.45",
+            "Module::Runtime" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "PadWalker" : "0",
+            "Path::Class" : "0",
+            "Path::Iterator::Rule" : "0",
+            "Perl::Critic::Moose" : "1.05",
+            "Pod::Elemental::Transformer::List" : "0",
+            "Pod::Elemental::Transformer::Verbatim" : "0",
+            "Pod::Weaver::Config::Assembler" : "0",
+            "Pod::Weaver::Plugin::SingleEncoding" : "0",
+            "Pod::Weaver::Plugin::Transformer" : "0",
+            "Pod::Weaver::Section::AllowOverride" : "0",
+            "Pod::Weaver::Section::Authors" : "0",
+            "Pod::Weaver::Section::Collect" : "0",
+            "Pod::Weaver::Section::Contributors" : "0",
+            "Pod::Weaver::Section::GenerateSection" : "0",
+            "Pod::Weaver::Section::Generic" : "0",
+            "Pod::Weaver::Section::Leftovers" : "0",
+            "Pod::Weaver::Section::Legal" : "0",
+            "Pod::Weaver::Section::Name" : "0",
+            "Pod::Weaver::Section::Region" : "0",
+            "Pod::Weaver::Section::Version" : "0",
+            "Sort::ByExample" : "0",
+            "String::RewritePrefix" : "0",
+            "autodie" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::ATOOMIC::MakeMaker" : {
+         "file" : "lib/Dist/Zilla/Plugin/ATOOMIC/MakeMaker.pm",
+         "version" : "1.00"
+      },
+      "Dist::Zilla::Plugin::ATOOMIC::Role::CoreCounter" : {
+         "file" : "lib/Dist/Zilla/Plugin/ATOOMIC/Role/CoreCounter.pm",
+         "version" : "1.00"
+      },
+      "Dist::Zilla::Plugin::ATOOMIC::RunExtraTests" : {
+         "file" : "lib/Dist/Zilla/Plugin/ATOOMIC/RunExtraTests.pm",
+         "version" : "1.00"
+      },
+      "Dist::Zilla::Plugin::ATOOMIC::WeaverConfig" : {
+         "file" : "lib/Dist/Zilla/Plugin/ATOOMIC/WeaverConfig.pm",
+         "version" : "1.00"
+      },
+      "Dist::Zilla::PluginBundle::ATOOMIC" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/ATOOMIC.pm",
+         "version" : "1.00"
+      },
+      "Pod::Weaver::PluginBundle::ATOOMIC" : {
+         "file" : "lib/Pod/Weaver/PluginBundle/ATOOMIC.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {},
+      "homepage" : "http://metacpan.org/release/Dist-Zilla-PluginBundle-ATOOMIC",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/atoomic/Dist-Zilla-PluginBundle-ATOOMIC.git",
+         "web" : "https://github.com/atoomic/Dist-Zilla-PluginBundle-ATOOMIC"
+      }
+   },
+   "version" : "1.00",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.026001"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Git::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [
+                     "CODE_OF_CONDUCT.md",
+                     "CONTRIBUTING.md",
+                     "LICENSE",
+                     "Makefile.PL",
+                     "README.md",
+                     "cpanfile"
+                  ],
+                  "exclude_match" : [],
+                  "follow_symlinks" : 0,
+                  "include_dotfiles" : 0,
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               },
+               "Dist::Zilla::Plugin::Git::GatherDir" : {
+                  "include_untracked" : 0
+               }
+            },
+            "name" : "@ATOOMIC/Git::GatherDir",
+            "version" : "2.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@ATOOMIC/ManifestSkip",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@ATOOMIC/License",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@ATOOMIC/ExecDir",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@ATOOMIC/ShareDir",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@ATOOMIC/Manifest",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckVersionIncrement",
+            "name" : "@ATOOMIC/CheckVersionIncrement",
+            "version" : "0.121750"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@ATOOMIC/TestRelease",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@ATOOMIC/ConfirmRelease",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@ATOOMIC/UploadToCPAN",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::VersionFromMainModule",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@ATOOMIC/VersionFromMainModule",
+            "version" : "0.04"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@ATOOMIC/Authority",
+            "version" : "1.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@ATOOMIC/AutoPrereqs",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
+            "name" : "@ATOOMIC/CopyFilesFromBuild",
+            "version" : "0.170880"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GitHub::Meta",
+            "name" : "@ATOOMIC/GitHub::Meta",
+            "version" : "0.45"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GitHub::Update",
+            "config" : {
+               "Dist::Zilla::Plugin::GitHub::Update" : {
+                  "metacpan" : 1
+               }
+            },
+            "name" : "@ATOOMIC/GitHub::Update",
+            "version" : "0.45"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@ATOOMIC/MetaResources",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@ATOOMIC/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.012"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@ATOOMIC/MetaProvides::Package",
+            "version" : "2.004003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Meta::Contributors",
+            "name" : "@ATOOMIC/Meta::Contributors",
+            "version" : "0.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@ATOOMIC/MetaConfig",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@ATOOMIC/MetaJSON",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@ATOOMIC/MetaYAML",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@ATOOMIC/NextRelease",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "@ATOOMIC/Test::More with subtest",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "requires"
+               }
+            },
+            "name" : "@ATOOMIC/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PromptIfStale",
+            "config" : {
+               "Dist::Zilla::Plugin::PromptIfStale" : {
+                  "check_all_plugins" : 0,
+                  "check_all_prereqs" : 0,
+                  "modules" : [
+                     "Dist::Zilla::PluginBundle::ATOOMIC"
+                  ],
+                  "phase" : "build",
+                  "run_under_travis" : 0,
+                  "skip" : []
+               }
+            },
+            "name" : "@ATOOMIC/Dist::Zilla::PluginBundle::ATOOMIC",
+            "version" : "0.055"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PromptIfStale",
+            "config" : {
+               "Dist::Zilla::Plugin::PromptIfStale" : {
+                  "check_all_plugins" : 1,
+                  "check_all_prereqs" : 1,
+                  "modules" : [],
+                  "phase" : "release",
+                  "run_under_travis" : 0,
+                  "skip" : [
+                     "Dist::Zilla::Plugin::ATOOMIC::Contributors",
+                     "Dist::Zilla::Plugin::ATOOMIC::Git::CheckFor::CorrectBranch",
+                     "Dist::Zilla::Plugin::ATOOMIC::License",
+                     "Dist::Zilla::Plugin::ATOOMIC::WeaverConfig",
+                     "Pod::Weaver::PluginBundle::ATOOMIC"
+                  ]
+               }
+            },
+            "name" : "@ATOOMIC/PromptIfStale",
+            "version" : "0.055"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable",
+            "name" : "@ATOOMIC/Test::Pod::Coverage::Configurable",
+            "version" : "0.07"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::PodSpelling",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::PodSpelling" : {
+                  "directories" : [
+                     "bin",
+                     "lib"
+                  ],
+                  "spell_cmd" : "",
+                  "stopwords" : [
+                     "ATOOMIC",
+                     "ATOOMIC's",
+                     "PayPal",
+                     "Rolsky",
+                     "Rolsky's",
+                     "atoomic",
+                     "drolsky",
+                     "ini",
+                     "mailmap",
+                     "optimizations",
+                     "perlcriticrc",
+                     "perltidyrc",
+                     "tidyall"
+                  ],
+                  "wordlist" : "Pod::Wordlist"
+               }
+            },
+            "name" : "@ATOOMIC/Test::PodSpelling",
+            "version" : "2.007005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@ATOOMIC/PodSyntaxTests",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ATOOMIC::RunExtraTests",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 2
+               }
+            },
+            "name" : "@ATOOMIC/ATOOMIC::RunExtraTests",
+            "version" : "1.00"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MojibakeTests",
+            "name" : "@ATOOMIC/MojibakeTests",
+            "version" : "0.8"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::CleanNamespaces",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::CleanNamespaces" : {
+                  "filename" : "xt/author/clean-namespaces.t",
+                  "skips" : []
+               }
+            },
+            "name" : "@ATOOMIC/Test::CleanNamespaces",
+            "version" : "0.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::CPAN::Changes",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::CPAN::Changes" : {
+                  "changelog" : "Changes"
+               }
+            },
+            "name" : "@ATOOMIC/Test::CPAN::Changes",
+            "version" : "0.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON",
+            "name" : "@ATOOMIC/Test::CPAN::Meta::JSON",
+            "version" : "0.004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::EOL",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::EOL" : {
+                  "filename" : "xt/author/eol.t",
+                  "finder" : [
+                     ":ExecFiles",
+                     ":InstallModules",
+                     ":TestFiles"
+                  ],
+                  "trailing_whitespace" : 1
+               }
+            },
+            "name" : "@ATOOMIC/Test::EOL",
+            "version" : "0.19"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::NoTabs",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::NoTabs" : {
+                  "filename" : "xt/author/no-tabs.t",
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles",
+                     ":TestFiles"
+                  ]
+               }
+            },
+            "name" : "@ATOOMIC/Test::NoTabs",
+            "version" : "0.15"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Portability",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Portability" : {
+                  "options" : ""
+               }
+            },
+            "name" : "@ATOOMIC/Test::Portability",
+            "version" : "2.001000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Compile" : {
+                  "bail_out_on_fail" : 0,
+                  "fail_on_warning" : "author",
+                  "fake_home" : 0,
+                  "filename" : "xt/author/00-compile.t",
+                  "module_finder" : [
+                     ":InstallModules"
+                  ],
+                  "needs_display" : 0,
+                  "phase" : "develop",
+                  "script_finder" : [
+                     ":PerlExecFiles"
+                  ],
+                  "skips" : [],
+                  "switch" : []
+               }
+            },
+            "name" : "@ATOOMIC/Test::Compile",
+            "version" : "2.058"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
+            "name" : "@ATOOMIC/Test::ReportPrereqs",
+            "version" : "0.027"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Version",
+            "name" : "@ATOOMIC/Test::Version",
+            "version" : "1.09"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ATOOMIC::Contributors",
+            "name" : "@ATOOMIC/ATOOMIC::Contributors",
+            "version" : "1.00"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Contributors",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Contributors" : {
+                  "git_version" : "2.15.2 (Apple Git-101.1)",
+                  "include_authors" : 0,
+                  "include_releaser" : 1,
+                  "order_by" : "name",
+                  "paths" : []
+               }
+            },
+            "name" : "@ATOOMIC/Git::Contributors",
+            "version" : "0.034"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::SurgicalPodWeaver",
+            "config" : {
+               "Dist::Zilla::Plugin::PodWeaver" : {
+                  "config_plugins" : [
+                     "@ATOOMIC"
+                  ],
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles"
+                  ],
+                  "plugins" : [
+                     {
+                        "class" : "Pod::Weaver::Plugin::EnsurePod5",
+                        "name" : "@CorePrep/EnsurePod5",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::H1Nester",
+                        "name" : "@CorePrep/H1Nester",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
+                        "name" : "@ATOOMIC/SingleEncoding",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Transformer",
+                        "name" : "@ATOOMIC/List",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Transformer",
+                        "name" : "@ATOOMIC/Verbatim",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@ATOOMIC/header",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Name",
+                        "name" : "@ATOOMIC/Name",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Version",
+                        "name" : "@ATOOMIC/Version",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@ATOOMIC/prelude",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "SYNOPSIS",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "DESCRIPTION",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "OVERVIEW",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "ATTRIBUTES",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "METHODS",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "FUNCTIONS",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "TYPES",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Leftovers",
+                        "name" : "@ATOOMIC/Leftovers",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@ATOOMIC/postlude",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "@ATOOMIC/generate SUPPORT",
+                        "version" : "1.06"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::AllowOverride",
+                        "name" : "@ATOOMIC/allow override SUPPORT",
+                        "version" : "0.05"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "name" : "@ATOOMIC/generate SOURCE",
+                        "version" : "1.06"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Authors",
+                        "name" : "@ATOOMIC/Authors",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Contributors",
+                        "name" : "@ATOOMIC/Contributors",
+                        "version" : "0.009"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Legal",
+                        "name" : "@ATOOMIC/Legal",
+                        "version" : "4.015"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@ATOOMIC/footer",
+                        "version" : "4.015"
+                     }
+                  ]
+               }
+            },
+            "name" : "@ATOOMIC/SurgicalPodWeaver",
+            "version" : "0.0023"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ATOOMIC::WeaverConfig",
+            "name" : "@ATOOMIC/ATOOMIC::WeaverConfig",
+            "version" : "1.00"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "config" : {
+               "Dist::Zilla::Role::FileWatcher" : {
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@ATOOMIC/README.md in build",
+            "version" : "0.163250"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenerateFile::FromShareDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GenerateFile::FromShareDir" : {
+                  "destination_filename" : "CONTRIBUTING.md",
+                  "dist" : "Dist-Zilla-PluginBundle-ATOOMIC",
+                  "encoding" : "UTF-8",
+                  "has_xs" : 0,
+                  "location" : "build",
+                  "source_filename" : "CONTRIBUTING.md"
+               },
+               "Dist::Zilla::Role::RepoFileInjector" : {
+                  "allow_overwrite" : 1,
+                  "repo_root" : ".",
+                  "version" : "0.009"
+               }
+            },
+            "name" : "@ATOOMIC/Generate CONTRIBUTING.md",
+            "version" : "0.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenerateFile::FromShareDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GenerateFile::FromShareDir" : {
+                  "destination_filename" : "CODE_OF_CONDUCT.md",
+                  "dist" : "Dist-Zilla-PluginBundle-ATOOMIC",
+                  "encoding" : "UTF-8",
+                  "has_xs" : 0,
+                  "location" : "build",
+                  "source_filename" : "CODE_OF_CONDUCT.md"
+               },
+               "Dist::Zilla::Role::RepoFileInjector" : {
+                  "allow_overwrite" : 1,
+                  "repo_root" : ".",
+                  "version" : "0.009"
+               }
+            },
+            "name" : "@ATOOMIC/Generate CODE_OF_CONDUCT.md",
+            "version" : "0.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "name" : "@ATOOMIC/InstallGuide",
+            "version" : "1.200009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CPANFile",
+            "name" : "@ATOOMIC/CPANFile",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ATOOMIC::License",
+            "name" : "@ATOOMIC/ATOOMIC::License",
+            "version" : "1.00"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckStrictVersion",
+            "name" : "@ATOOMIC/CheckStrictVersion",
+            "version" : "0.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckSelfDependency",
+            "config" : {
+               "Dist::Zilla::Plugin::CheckSelfDependency" : {
+                  "finder" : [
+                     ":InstallModules"
+                  ]
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@ATOOMIC/CheckSelfDependency",
+            "version" : "0.011"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckPrereqsIndexed",
+            "name" : "@ATOOMIC/CheckPrereqsIndexed",
+            "version" : "0.020"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ATOOMIC::Git::CheckFor::CorrectBranch",
+            "config" : {
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.15.2 (Apple Git-101.1)",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@ATOOMIC/ATOOMIC::Git::CheckFor::CorrectBranch",
+            "version" : "1.00"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EnsureChangesHasContent",
+            "name" : "@ATOOMIC/EnsureChangesHasContent",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
+            "config" : {
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.15.2 (Apple Git-101.1)",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@ATOOMIC/Git::CheckFor::MergeConflicts",
+            "version" : "0.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Check" : {
+                  "untracked_files" : "die"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "CODE_OF_CONDUCT.md",
+                     "CONTRIBUTING.md",
+                     "Changes",
+                     "LICENSE",
+                     "Makefile.PL",
+                     "README.md",
+                     "cpanfile",
+                     "tidyall.ini"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.15.2 (Apple Git-101.1)",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@ATOOMIC/Git::Check",
+            "version" : "2.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [],
+                  "commit_msg" : "v%v%n%n%c"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "CODE_OF_CONDUCT.md",
+                     "CONTRIBUTING.md",
+                     "Changes",
+                     "LICENSE",
+                     "Makefile.PL",
+                     "README.md",
+                     "cpanfile",
+                     "tidyall.ini"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.15.2 (Apple Git-101.1)",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@ATOOMIC/Commit generated files",
+            "version" : "2.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Tag" : {
+                  "branch" : null,
+                  "changelog" : "Changes",
+                  "signed" : 0,
+                  "tag" : "v1.00",
+                  "tag_format" : "v%v",
+                  "tag_message" : "v%v"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.15.2 (Apple Git-101.1)",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@ATOOMIC/Git::Tag",
+            "version" : "2.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Push" : {
+                  "push_to" : [
+                     "origin"
+                  ],
+                  "remotes_must_exist" : 1
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.15.2 (Apple Git-101.1)",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@ATOOMIC/Git::Push",
+            "version" : "2.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
+            "config" : {
+               "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
+                  "finders" : [
+                     ":ExecFiles",
+                     ":InstallModules"
+                  ],
+                  "global" : 0,
+                  "munge_makefile_pl" : 1
+               }
+            },
+            "name" : "@ATOOMIC/BumpVersionAfterRelease",
+            "version" : "0.018"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [],
+                  "commit_msg" : "Bump version after release"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "Changes",
+                     "dist.ini"
+                  ],
+                  "allow_dirty_match" : [
+                     "(?^:.+)"
+                  ],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.15.2 (Apple Git-101.1)",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@ATOOMIC/Commit version bump",
+            "version" : "2.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Push" : {
+                  "push_to" : [
+                     "origin"
+                  ],
+                  "remotes_must_exist" : 1
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.15.2 (Apple Git-101.1)",
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@ATOOMIC/Push version bump",
+            "version" : "2.043"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ATOOMIC::MakeMaker",
+            "config" : {
+               "Dist::Zilla::Plugin::MakeMaker" : {
+                  "make_path" : "make",
+                  "version" : "6.012"
+               },
+               "Dist::Zilla::Plugin::MakeMaker::Awesome" : {
+                  "version" : "0.47"
+               },
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 2,
+                  "version" : "6.012"
+               }
+            },
+            "name" : "@ATOOMIC/ATOOMIC::MakeMaker",
+            "version" : "1.00"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "MetaNoIndex",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExtraTestFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":PerlExecFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@ATOOMIC/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "6.012"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "6.012"
+      }
+   },
+   "x_authority" : "cpan:ATOOMIC",
+   "x_contributors" : [
+      "Dave Rolsky <autarch@urth.org>",
+      "Mark Fowler <mark@twoshortplanks.com>",
+      "Nicolas Rochelemagne <rochelemagne@cpanel.net>"
+   ],
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+}
+

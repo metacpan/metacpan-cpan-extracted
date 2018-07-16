@@ -1,5 +1,5 @@
 package Test::POE::Client::TCP;
-$Test::POE::Client::TCP::VERSION = '1.18';
+$Test::POE::Client::TCP::VERSION = '1.22';
 #ABSTRACT: A POE Component providing TCP client services for test cases
 
 use strict;
@@ -14,7 +14,7 @@ our $GOT_SSL;
 BEGIN {
     eval {
         require POE::Component::SSLify;
-        import POE::Component::SSLify qw( Client_SSLify );
+        import POE::Component::SSLify qw( Client_SSLify SSLify_ContextCreate );
         $GOT_SSL = 1;
     };
 }
@@ -187,7 +187,17 @@ sub _socket_up {
 
   if ( $self->{usessl} && $GOT_SSL ) {
     eval {
-        $socket = Client_SSLify( $socket );
+        my $ctx;
+        if ($self->{sslctx}) {
+            $ctx = $self->{sslctx};
+        }
+        elsif ($self->{sslkey} && $self->{sslcert}) {
+            $ctx = SSLify_ContextCreate($self->{sslkey}, $self->{sslcert});
+        }
+        else {
+            $ctx = undef;
+        }
+        $socket = Client_SSLify( $socket, undef, undef, $ctx );
         if ( $@ ) {
            warn "Couldn't use an SSL socket: $@\n";
            $self->{usessl} = 0;
@@ -495,7 +505,7 @@ Test::POE::Client::TCP - A POE Component providing TCP client services for test 
 
 =head1 VERSION
 
-version 1.18
+version 1.22
 
 =head1 SYNOPSIS
 
@@ -650,6 +660,9 @@ Takes a number of optional arguments:
   'timeout', specify number of seconds to wait for socket timeouts;
   'context', anything that can fit into a scalar, such as a ref, etc.
   'usessl', enable SSL/TLS if POE::Component::SSLify is available;
+  'sslctx', set to a SSL Context to configure the SSL Connection;
+  'sslcert', set to a x509 Certificate(PEM encoded) to connect using a client cert;
+  'sslkey', set to a private Key(PEM encoded) to connect using a client cert;
 
 The semantics for C<filter>, C<inputfilter> and C<outputfilter> are the same as for L<POE::Component::Server::TCP> in that one
 may provide either a C<SCALAR>, C<ARRAYREF> or an C<OBJECT>.

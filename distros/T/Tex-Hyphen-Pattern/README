@@ -1,0 +1,41 @@
+TeX::Hyphen::Pattern version 0.100
+==================================
+
+This module can be used to provide TeX hyphenation patterns for use with
+TeX::Hyphen.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+The script tools/build_catalog_from_ctan.pl can be run to retrieve the current
+TeX hyphenation pattern sources and include them in the installation.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Moose
+  Encode
+  File::Temp
+  Log::Log4perl
+  Module::Pluggable
+  Readonly 		        1.03
+  Set::Scalar
+  Test::More		    0.86
+  Test::NoWarnings
+
+COPYRIGHT AND LICENCE
+
+TeX and OpenOffice.org pattern files copyrighted by their individual owners.
+
+Copyright (C) 2018 by Roland van Ipenburg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.

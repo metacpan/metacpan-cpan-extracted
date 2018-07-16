@@ -17,7 +17,8 @@ EMAILROOTDIR := set-of-emails
 PUBLICEMAILS := $(EMAILROOTDIR)/maildir/bsd
 DOSFORMATSET := $(EMAILROOTDIR)/maildir/dos
 MACFORMATSET := $(EMAILROOTDIR)/maildir/mac
-SPEEDTESTDIR := $(PUBLICEMAILS)
+PRIVATEMAILS := $(EMAILROOTDIR)/private
+SPEEDTESTDIR := tmp/emails-for-speed-test
 
 COMMANDARGVS := -I./lib -MSisimai
 TOBEEXECUTED := 'Sisimai->make(shift, delivered => 1)' $(PUBLICMAILS)
@@ -26,13 +27,19 @@ HOWMANYMAILS := $(PERL) $(COMMANDARGVS) -le 'print scalar @{ Sisimai->make(shift
 # -----------------------------------------------------------------------------
 .PHONY: clean
 
-speed-test:
+emails-for-speed-test:
+	@ rm -fr ./$(SPEEDTESTDIR)
+	@ $(MKDIR) $(SPEEDTESTDIR)
+	@ $(CP) -Rp $(PUBLICEMAILS)/*.eml $(SPEEDTESTDIR)/
+	@ test -d $(PRIVATEMAILS) && find $(PRIVATEMAILS) -type f -name '*.eml' -exec $(CP) -Rp {} $(SPEEDTESTDIR)/ \; || true
+
+speed-test: emails-for-speed-test
 	@ echo `$(HOWMANYMAILS) $(SPEEDTESTDIR)` emails in $(SPEEDTESTDIR)
 	@ echo -------------------------------------------------------------------
 	@ uptime
 	@ echo -------------------------------------------------------------------
 	@ n=1; while [ "$$n" -le "10" ]; do \
-		/usr/bin/time $(PERL) $(COMMANDARGVS) -lE $(TOBEEXECUTED) $(SPEEDTESTDIR) > /dev/null; \
+		time $(PERL) $(COMMANDARGVS) -lE $(TOBEEXECUTED) $(SPEEDTESTDIR) > /dev/null; \
 		sleep 2; \
 		n=`expr $$n + 1`; \
 	done
@@ -52,4 +59,5 @@ loc:
 
 clean:
 	find . -type f -name 'nytprof*' -ctime +1 -delete
+	rm -f -r $(SPEEDTESTDIR)
 

@@ -1,7 +1,7 @@
 package Finance::Currency::FiatX::Source::bca;
 
-our $DATE = '2018-06-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2018-07-15'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,8 +12,8 @@ use Role::Tiny;
 with 'Finance::Currency::FiatX::Role::Source';
 
 sub get_all_spot_rates {
-    require Finance::Currency::Convert::KlikBCA;
-    my $res = Finance::Currency::Convert::KlikBCA::get_currencies();
+    require Finance::Currency::Convert::BCA;
+    my $res = Finance::Currency::Convert::BCA::get_currencies();
 
     return $res unless $res->[0] == 200;
 
@@ -92,8 +92,8 @@ sub get_spot_rate {
     return [501, "This source only provides IDR/* or */IDR spot rates"]
         unless $from eq 'IDR' || $to eq 'IDR';
 
-    require Finance::Currency::Convert::KlikBCA;
-    my $res = Finance::Currency::Convert::KlikBCA::get_currencies();
+    require Finance::Currency::Convert::BCA;
+    my $res = Finance::Currency::Convert::BCA::get_currencies();
     return $res unless $res->[0] == 200;
 
     my $h = $res->[2]{currencies}{$to} || $res->[2]{currencies}{$from};
@@ -145,7 +145,7 @@ Finance::Currency::FiatX::Source::bca - Get currency conversion rates from BCA (
 
 =head1 VERSION
 
-This document describes version 0.008 of Finance::Currency::FiatX::Source::bca (from Perl distribution Finance-Currency-FiatX), released on 2018-06-27.
+This document describes version 0.009 of Finance::Currency::FiatX::Source::bca (from Perl distribution Finance-Currency-FiatX), released on 2018-07-15.
 
 =head1 DESCRIPTION
 

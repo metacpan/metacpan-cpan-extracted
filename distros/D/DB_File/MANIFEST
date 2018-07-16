@@ -26,7 +26,9 @@ ppport.h
 t/db-btree.t
 t/db-hash.t
 t/db-recno.t
+t/db-threads.t
 t/pod.t
 typemap
 version.c
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

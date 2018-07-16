@@ -14,38 +14,25 @@ my %module_build_args = (
     "ExtUtils::MakeMaker" => 0,
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "SQL Abstract",
+  "dist_abstract" => "SQL Query Generator",
   "dist_author" => [
     "Achmad Yusri Afandi <yusrideb\@cpan.org>"
   ],
   "dist_name" => "CellBIS-SQL-Abstract",
-  "dist_version" => "0.5",
+  "dist_version" => "0.7",
   "license" => "artistic_2",
   "module_name" => "CellBIS::SQL::Abstract",
   "recursive_test_files" => 1,
   "requires" => {
-    "Mojo::Base" => 0,
-    "Mojo::Util" => 0,
+    "Hash::MultiValue" => 0,
     "Mojolicious" => 0,
     "Scalar::Util" => 0
-  },
-  "test_requires" => {
-    "FindBin" => 0,
-    "Test::More" => 0,
-    "lib" => 0,
-    "strict" => 0,
-    "warnings" => 0
   }
 );
 
 
 my %fallback_build_requires = (
-  "FindBin" => 0,
-  "Module::Build" => "0.28",
-  "Test::More" => 0,
-  "lib" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "Module::Build" => "0.28"
 );
 
 

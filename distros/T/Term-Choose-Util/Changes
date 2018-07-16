@@ -1,6 +1,9 @@
 Revision history for Term::Choose::Util
 
 
+0.066   2018-07-14
+        - Use 'term_size' from "Term::Choose".
+
 0.065   2018-07-03
         - "Term::Choose": minimum version is "1.600".
 

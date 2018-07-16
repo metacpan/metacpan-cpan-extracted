@@ -39,7 +39,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Tcl" : "0.98",
+            "Tcl" : "1.11",
             "perl" : "5.006"
          }
       }
@@ -51,6 +51,6 @@
       },
       "x_MailingList" : "mailto:tcltk@perl.org"
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -6,24 +6,16 @@ use 5.10.1;
 
 use Test::More ;
 use Config::Model;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use Path::Tiny;
 use Test::File::Contents;
 
 use App::Cmd::Tester;
 use App::Cme ;
 
-my $arg = shift || '';
-my ( $log, $show ) = (0) x 2;
+my ($model, $trace) = init_test();
 
-my $trace = $arg =~ /t/ ? 1 : 0;
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-my $wr_test = path('wr_test/meta') ;
-
-$wr_test->remove_tree if $wr_test->is_dir;
-
-$wr_test->mkpath;
+my $wr_test = setup_test_dir ;
 
 SKIP: {
     skip "dev list does not yet work" ,1 ;

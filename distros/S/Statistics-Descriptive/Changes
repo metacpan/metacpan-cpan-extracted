@@ -1,5 +1,14 @@
 Revision history for Perl extension Statistics::Descriptive.
 
+3.0701      2018-07-14
+    - Typo corrections thanks to Debian
+
+3.0700      2018-07-13
+    - Typo corrections thanks to Debian
+    - Added the ->summary() method to Statistics::Descriptive::Full.
+        - https://rt.cpan.org/Public/Bug/Display.html?id=82852
+        - Thanks to Su-Shee
+
 3.0613      2018-05-02
     - Convert to Dist-Zilla.
 

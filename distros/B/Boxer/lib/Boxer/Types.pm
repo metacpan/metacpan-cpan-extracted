@@ -18,15 +18,15 @@ use Type::Utils -all;
 use Types::Common::String qw(NonEmptySimpleStr LowerCaseSimpleStr);
 use Types::Path::Tiny qw(Dir);
 
-use namespace::clean;
+use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.7
+Version v1.1.8
 
 =cut
 
-our $VERSION = version->declare("v1.1.7");
+our $VERSION = version->declare("v1.1.8");
 
 declare DataDir, as Dir, coercion => 1, message {
 	'Must be an existing directory containing directories for boxer classes and/or boxer nodes';

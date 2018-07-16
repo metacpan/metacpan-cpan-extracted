@@ -1,10 +1,29 @@
 Revision history for Perl module Test::Against::Dev
 
+0.10 Sun Jul 15 21:23:52 EDT 2018
+    - Introduce Test::Against::Dev::ProcessPSV.  This package provides methods
+      to consolidate monthly PSV files into the master PSV file as it grows
+      from one monthly dev release to the next.  t/007-process-ppv.t exercises
+      these methods.
+
+    - Add helper program scripts/unpack-log-json-gz.  This program can be used
+      to properly unpack the tarball of .log.json files created by method
+      analyze_json_logs() in each of Test::Against::Dev and Test::Against::Build.
+
+    - The tarball file created by analyze_json_logs() now defaults to
+      extension '.tar.gz' rather than simply '.gz'.  This better describes the
+      fact that the file is a gzipped tar file of '.json.log' files.
+
+    - For consistency, all .pm and .t files now 'use 5.14.0'.
+
+    - t/005-tab-new.t has been renamed t/005-test-against-build.t.  This
+      better documents what it actually tests.
+
 0.09 Thu Jul 12 22:02:13 EDT 2018
-    - Introduce Test::Against::Commit.  Whereas Test::Against::Dev assesses
+    - Introduce Test::Against::Build.  Whereas Test::Against::Dev assesses
       the impact of monthly development releases -- and now also RC releases
       -- on selected sets of modules (e.g., the top of the CPAN river),
-      Test::Against::Commit assess the impact of individual commits to the
+      Test::Against::Build assesses the impact of individual commits to the
       repository.  It should be particularly useful in measuring changes in
       impact between two specific commits.
 

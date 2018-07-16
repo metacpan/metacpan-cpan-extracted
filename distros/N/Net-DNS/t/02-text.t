@@ -1,4 +1,4 @@
-# $Id: 02-text.t 1555 2017-03-22 09:47:16Z willem $	-*-perl-*-
+# $Id: 02-text.t 1694 2018-07-16 04:19:40Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 37;
@@ -135,8 +135,8 @@ use_ok('Net::DNS::Text');
 	my %testcase = (
 		'202122232425262728292a2b2c2d2e2f' => q|" !\"#$%&'()*+,-./"|,
 		'303132333435363738393a3b3c3d3e3f' => '0123456789:\;<=>?',
-		'404142434445464748494a4b4c4d4e4f' => '\@ABCDEFGHIJKLMNO',
-		'505152535455565758595a5b5c5d5e5f' => 'PQRSTUVWXYZ[\\\\]^_',
+		'404142434445464748494a4b4c4d4e4f' => '@ABCDEFGHIJKLMNO',
+		'505152535455565758595a5b5c5d5e5f' => 'PQRSTUVWXYZ[\092]^_',
 		'606162636465666768696a6b6c6d6e6f' => '`abcdefghijklmno',
 		'707172737475767778797a7b7c7d7e7f' => 'pqrstuvwxyz{|}~\127'
 		);

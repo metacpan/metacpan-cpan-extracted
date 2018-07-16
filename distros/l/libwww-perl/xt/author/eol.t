@@ -44,6 +44,7 @@ my @files = (
     't/base/simple.t',
     't/base/ua.t',
     't/base/ua_handlers.t',
+    't/leak/no_leak.t',
     't/local/autoload-get.t',
     't/local/autoload.t',
     't/local/get.t',

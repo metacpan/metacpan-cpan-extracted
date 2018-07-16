@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   Compress::Zstd:
     file: lib/Compress/Zstd.pm
-    version: '0.13'
+    version: '0.14'
   Compress::Zstd::Compressor:
     file: lib/Compress/Zstd/Compressor.pm
   Compress::Zstd::Decompressor:
@@ -40,8 +40,9 @@ resources:
   bugtracker: https://github.com/spiritloose/Compress-Zstd/issues
   homepage: https://github.com/spiritloose/Compress-Zstd
   repository: git://github.com/spiritloose/Compress-Zstd.git
-version: '0.13'
+version: '0.14'
 x_contributors:
   - 'Jiro Nishiguchi <jiro@cpan.org>'
   - 'Jiro Nishiguchi <spiritloose@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

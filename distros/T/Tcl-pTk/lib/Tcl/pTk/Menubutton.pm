@@ -1,6 +1,6 @@
 package Tcl::pTk::Menubutton;
 
-our ($VERSION) = ('0.92');
+our ($VERSION) = ('0.93');
 
 # Simple Menu package.
 

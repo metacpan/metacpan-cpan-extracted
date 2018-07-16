@@ -1,0 +1,197 @@
+# perl
+use 5.14.0;
+use warnings;
+use Archive::Tar;
+use Data::Dump ( qw| dd pp| );
+use Carp;
+use Cwd;
+use File::Spec;
+use Getopt::Long;
+use JSON ( qw| decode_json | );
+use Path::Tiny;
+
+=head1 NAME
+
+unpack-log-json-gz - Correctly unpack a C<.log.json.tar.gz> file created by F<Test::Against::Dev>
+
+=head1 SYNOPSIS
+
+    perl scripts/unpack-log-json-gz \
+        --topdir=/home/username/tmp/scratch \
+        --gzfile=/home/username/var/tad/results/perl-5.29.0/storage/cpan-river-3000.perl-5.29.0.log.json.tar.gz
+
+=head1 DESCRIPTION
+
+When you use F<Test::Against::Dev> or F<Test::Against::Commit> methods to
+assess the impact of changes in the Perl 5 core distribution against selected
+subsets of CPAN modules, your program uses F<cpanm> to attempt to install
+those modules and the F<cpanm> F<build.log> file is parsed to create one
+F<.log.json> file in the F<.../results/E<lt>perl_versionE<gt>/analysis>
+directory for each distribution attempted.  Those files are then tarred up and
+gzipped-compressed and the resulting tarball is deposited in the corresponding
+F<.../results/E<lt>perl_versionE<gt>/storage> directory.
+
+Unpacking that tarball can be a bit tricky because there is a possibility that
+certain characters in the F<build.log> may result in malformed JSON.  This
+program unpacks the tarball but along the way provides a list of files with
+malformed JSON.
+
+=head1 USAGE
+
+=head2 Command-Line Invocation
+
+The program takes 3 command-line options, 2 of which are mandatory.
+
+    perl scripts/unpack-log-json-gz \
+        --topdir=/home/username/tmp/scratch \
+        --gzfile=/home/username/var/tad/results/perl-5.29.0/storage/cpan-river-3000.perl-5.29.0.log.json.tar.gz \
+        --verbose 1>output 2>&1
+
+=over 4
+
+=item * C<topdir>
+
+String holding path to directory underneath which the tarball will be
+unpacked.  Required.
+
+The files will in fact be found in an F<analysis> directory
+immediately beneath the directory provided to C<topdir>.
+
+=item * C<gzfile>
+
+String holding path to tarball of F<.log.json> files.  Required.
+
+=item * C<verbose>
+
+Extra information on F<STDOUT>.  Optional; should you use this you probably
+should redirect that output to a file for further review.
+
+=back
+
+=head2 Results
+
+The tarball will be unpacked as described above.
+
+Any file where an exception was recorded during the decoding of its JSON is placed in an internal data structure whose contents are dumped to F<STDOUT> at the conclusion of the program.
+
+    2 problematic .json files:
+    {
+      "analysis/AUTHORA.HTML-Widget-1.11.log.json"   => "malformed UTF-8 character in JSON string, at character offset 8516 (before \"\\x{fffd} /><input cl...\")",
+      "analysis/AUTHORB.IO-Util-1.5.log.json"        => "malformed UTF-8 character in JSON string, at character offset 5544 (before \"\\x{fffd}'. Assuming ...\")",
+    }
+
+If C<verbose> is requested on the command-line, you will in addition get:
+
+=over 4
+
+=item * The total number of files extracted.
+
+    Extracted 2961 files
+
+=item * A list -- probably a very large one -- of the files whose JSON was satisfactory.
+
+    2956 good .json files:
+    {
+      "analysis/AAR.Net-LDAP-Server-0.43.log.json"  => 1,
+      "analysis/ABELTJE.V-0.13.log.json"            => 1,
+      ...
+    }
+
+=item * An indication that the program has concluded successfully.
+
+    Finished!
+
+=back
+
+=cut
+
+my ($topdir, $gzfile) = (undef) x 2;
+my $verbose = '';
+
+GetOptions(
+    "topdir=s"      => \$topdir,
+    "gzfile=s"      => \$gzfile,
+    "verbose"       => \$verbose,
+) or croak "Unable to process command-line options";
+croak "Cannot locate $topdir" unless -d $topdir;
+croak "Cannot locate $gzfile" unless -f $gzfile;
+croak "Expect '.tgz', '.tar.gz' or '.gz' extension on $gzfile"
+    unless ($gzfile =~ m/(\.|\.tar\.|\.t)gz$/);
+
+chdir $topdir or croak "Unable to chdir to $topdir";
+my @extracted = Archive::Tar->extract_archive($gzfile, 1);
+say "Extracted ", scalar(@extracted), " files" if $verbose;
+my %good_json = ();
+my %bad_json = ();
+for my $log (@extracted) {
+    my $alog = File::Spec->catfile('analysis', $log);
+    validate_json($alog) or croak "Unable to process $alog";
+}
+if (scalar keys %bad_json) {
+    say scalar keys %bad_json, " problematic .json files:";
+    dd(\%bad_json);
+}
+if ($verbose) {
+    say scalar keys %good_json, " good .json files:";
+    dd(\%good_json);
+}
+
+say "\nFinished!" if $verbose;
+
+sub validate_json {
+    my $log = shift;
+    my $this_cwd = cwd();
+    my $flog = File::Spec->catfile($this_cwd, $log);
+    my $f = Path::Tiny::path($flog);
+	{
+        local $@;
+        my $decoded;
+        eval { $decoded = decode_json($f->slurp_utf8); };
+        if ($@) {
+            $bad_json{$log} = $@;
+        }
+        else {
+            $good_json{$log}++;
+        }
+    }
+    return 1;
+}
+
+=head1 PREREQUISITES
+
+=head2 Perl 5 Core Distribution
+
+    Archive::Tar
+    Carp
+    Cwd
+    File::Spec
+    Getopt::Long
+
+=head2 CPAN-only Distributions
+
+    Data::Dump
+    JSON
+    Path::Tiny
+
+=head1 NOTES
+
+As this is a helper script, not library code, the author reserves the right to
+change the interface and functionality of the program at any time.  The author
+has used this program satisfactorily but is not providing a test suite for it.
+
+While this program was designed to meet the needs of users of the
+F<Test-Against-Dev> CPAN distribution, it could probably be used to unpack any
+gzipped tarball of files in JSON format.  YMMV.
+
+Same copyright, licensing, etc., as other parts of the F<Test-Against-Dev>
+CPAN distribution.
+
+=cut
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 syntax=perl:
+

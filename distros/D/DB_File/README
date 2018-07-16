@@ -1,10 +1,10 @@
                                   DB_File
 
-                               Version 1.840
+                               Version 1.842
 
-                                29 Dec 2016
+                                14 July 2018
 
-     Copyright (c) 1995-2016 Paul Marquess. All rights reserved. This
+     Copyright (c) 1995-2018 Paul Marquess. All rights reserved. This
       program is free software; you can redistribute it and/or modify
                   it under the same terms as Perl itself.
 
@@ -286,6 +286,81 @@ There are a few options available.
 
     If your Berkeley DB library uses a 64-bit time_t, uncomment the first line.
     If your Berkeley DB library uses a 32-bit time_t, uncomment the second line.
+
+
+
+MacOS Notes
+-------------
+
+You are running MacOS 10.13 (or possibly later), and the test DB_File test harness file
+db-hash.t fails like this
+
+    t/db-btree.t .. ok       
+    t/db-hash.t ... Use of uninitialized value $value in string eq at t/db-hash.t line 224.
+    Use of uninitialized value $values[0] in string eq at t/db-hash.t line 224.
+    Use of uninitialized value $value in lc at t/db-hash.t line 224.
+    Use of uninitialized value $h{""} in string eq at t/db-hash.t line 243.
+    Use of uninitialized value in numeric eq (==) at t/db-hash.t line 252.
+    Use of uninitialized value in numeric eq (==) at t/db-hash.t line 252.
+    Use of uninitialized value in numeric eq (==) at t/db-hash.t line 252.
+    Use of uninitialized value in numeric eq (==) at t/db-hash.t line 252.
+    Use of uninitialized value in numeric eq (==) at t/db-hash.t line 252.
+    Use of uninitialized value in numeric eq (==) at t/db-hash.t line 252.
+    Use of uninitialized value in numeric eq (==) at t/db-hash.t line 252.
+    Use of uninitialized value in numeric eq (==) at t/db-hash.t line 252.
+    Use of uninitialized value $foo[18] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[36] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[48] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[58] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[59] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[60] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[62] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[63] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[92] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[114] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[140] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[187] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[188] in join or string at t/db-hash.t line 261.
+    Use of uninitialized value $foo[189] in join or string at t/db-hash.t line 261.
+    t/db-hash.t ... 1/166 Use of uninitialized value $h{"Fred"} in string eq at t/db-hash.t line 572.
+    Use of uninitialized value $v in concatenation (.) or string at t/db-hash.t line 748.
+    t/db-hash.t ... Dubious, test returned 25 (wstat 6400, 0x1900)
+    Failed 76/166 subtests 
+    t/db-recno.t .. ok       
+    t/pod.t ....... ok   
+
+
+It appears that MacOS 10.13 has a copy of BerkeleyDB version 1 included in
+/usr/lib/system/libsystem_c.dylib. It is not clear why this isn't working
+with this module. The following ticket has been reported to Apple
+https://discussions.apple.com/thread/8125401
+
+Solution
+
+It has been reported that this issue can be resolved by installing a
+separate version of the Berkeley DB library and configuring DB_File to use
+it.
+
+One option is to use a prebuild version of Berkeley DB. One is available at
+MacPorts (https://www.macports.org/). Once you have MacPorts installed, run
+this
+
+    sudo port install db48
+
+To get DB_File to use this library edit config.in and change the values for
+the LIB and include variables as follows
+
+    LIB        = /opt/local/lib/db48
+    INCLUDE    = /opt/local/include/db48
+
+Alternatively, set the two envornment variables DB_FILE_LIB and DB_FILE_INCLUDE
+as follows
+
+    export DB_FILE_LIB=/opt/local/lib/db48
+    export DB_FILE_INCLUDE=/opt/local/include/db48 
+
+Now rebuild DB_File from scratch.
+
 
 
 Solaris build fails with "language optional software package not installed"

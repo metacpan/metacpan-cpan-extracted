@@ -1,4 +1,23 @@
-$Id: Changes 1639 2018-02-09 11:08:24Z willem $                       -*-text-*-
+$Id: Changes 1695 2018-07-16 04:25:23Z willem $                       -*-text-*-
+
+
+**** 1.16 Jul 15, 2018
+
+Feature
+	New NSEC3 encloser(), nextcloser() and wildcard() instance
+	methods return closest encloser, "next closer" and putative
+	wildcard names respectively.
+
+Feature
+	Add new NSEC covers() instance method.
+
+Feature
+	New NSEC typemap() instance method interrogates type list.
+
+	IO::Socket::INET6 removed from recommended module metadata.
+	IPv6 requires IO::Socket::IP which is now a core package.
+
+	No requirement to escape @ in unquoted contiguous string.
 
 
 **** 1.15 Feb 9, 2018

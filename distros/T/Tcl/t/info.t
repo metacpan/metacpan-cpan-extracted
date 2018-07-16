@@ -11,6 +11,12 @@ use File::Spec::Functions;
 my $tcl = Tcl->new;
 
 ok($tcl);
+
+my $interp = $^X;
+if (!file_name_is_absolute($interp)) {
+    #TODO use File::Which;
+    #TODO $interp = which($interp);
+}
 if ($^O eq 'cygwin') {
     my $cpath = $tcl->Eval("info nameofexecutable");
     $cpath = `cygpath -u '$cpath'`;

@@ -3,7 +3,7 @@ use strict;
 
 package JMAP::Tester::Result::Download;
 # ABSTRACT: what you get when you download a blob
-$JMAP::Tester::Result::Download::VERSION = '0.018';
+$JMAP::Tester::Result::Download::VERSION = '0.019';
 use Moo;
 with 'JMAP::Tester::Role::Result';
 
@@ -41,7 +41,7 @@ JMAP::Tester::Result::Download - what you get when you download a blob
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 OVERVIEW
 

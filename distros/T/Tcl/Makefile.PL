@@ -136,6 +136,16 @@ if (defined($libpath) && defined($incpath)) {
 
 	$libpath = $usestubs ? $tclcfg{TCL_STUB_LIB_SPEC} : $tclcfg{TCL_LIB_SPEC};
 	$incpath = $tclcfg{TCL_INCLUDE_SPEC};
+
+	# https://www.cpantesters.org/cpan/report/18397198-6bf4-1014-85e5-4e79f459b9c5
+	# Tcl.xs:32:10: fatal error: tcl.h: No such file or directory
+	if ($incpath) {
+	    my @tclh = grep {-f "$_/tcl.h"} $incpath=~/-I(\S+)/g;
+	    if ($#tclh==-1) {
+		_die "incpath $incpath from your tclconfig $tclconfig does not provide tcl.h"
+	    }
+	} else {_die "can not figure out incpath from your tclconfig $tclconfig"}
+
 	if ($usestubs) {
 	    if ($^O eq 'darwin' && $tclcfg{TCL_STUB_LIB_PATH} =~ /\.framework/ ) {
 		(my $fmk = $tclcfg{TCL_STUB_LIB_PATH}) =~ s/(?<=\.framework).*//;

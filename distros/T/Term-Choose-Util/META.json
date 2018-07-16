@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Term-Choose-Util",
    "no_index" : {
@@ -39,13 +39,10 @@
             "File::Basename" : "0",
             "File::HomeDir" : "0",
             "File::Spec::Functions" : "0",
-            "List::MoreUtils" : "0",
             "List::Util" : "0",
             "Term::Choose" : "1.600",
             "Term::Choose::LineFold" : "1.600",
-            "Term::ReadKey" : "0",
-            "constant" : "0",
-            "if" : "0",
+            "Term::Choose::Linux" : "1.600",
             "perl" : "5.008003",
             "strict" : "0",
             "warnings" : "0"
@@ -60,6 +57,6 @@
          "web" : "https://github.com/kuerbis/Term-Choose-Util"
       }
    },
-   "version" : "0.065",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.066",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

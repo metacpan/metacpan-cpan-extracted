@@ -17,7 +17,7 @@ use Path::Tiny;
 use POSIX ":sys_wait_h";
 use App::MultiSsh qw/hosts_from_map is_host multi_run shell_quote/;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -54,7 +54,7 @@ sub main {
         'tmux_cmd|tmux-cmd|T=s',
         'tmux|m',
         'tmux_nested|tmux-nested|n',
-        'only|o!',
+        'only|only-hosts|o!',
         'test|t!',
         'verbose|v+',
         'man',
@@ -100,11 +100,16 @@ sub main {
     }
 
     # no command and not specified cssh or tmux
-    if ( !@ARGV && !($option{cssh} || $option{tmux}) ) {
+    if ( !@ARGV && !($option{cssh} || $option{tmux} || $option{tmux_nested}) ) {
         # pick cssh or tmux
         $option{cssh} = !!$option{cssh_cmd};
         $option{tmux} = !!$option{tmux_cmd};
     }
+
+    # --tmux-nested implies --tmux
+    if ( $option{tmux_nested} ) {
+         $option{tmux} = 1;
+     }
 
     # add any group hosts to the current hosts
     if ($option{group}) {
@@ -157,7 +162,7 @@ mssh - Multi host ssh executer
 
 =head1 VERSION
 
-This documentation refers to mssh version 0.21.
+This documentation refers to mssh version 0.22.
 
 =head1 SYNOPSIS
 
@@ -216,7 +221,8 @@ This documentation refers to mssh version 0.21.
                 Use this fag when running in an existing tmux session to split up
                 the current tmux window in the same fashion as running a sepperate
                 tmux session.
-  -o --only     No command passed (all arguments are hosts)
+  -o --only-hosts
+                No command passed (all arguments are hosts)
 
   -v --verbose  Show more detailed option
      --VERSION  Prints the version information

@@ -10,7 +10,7 @@ sub states {
     my($demo) = @_;
     $TOP = $MW->WidgetDemo(
         -name     => $demo,
-        -text     => 'A listbox containing the 50 states is displayed below, along with a scrollbar.  You can scan the list either using the scrollbar or by scanning.  To scan, press button 2 in the widget and drag up or down.',
+        -text     => 'A listbox containing the 50 states is displayed below, along with a scrollbar.  You can scan the list either using the scrollbar or by scanning.  To scan, press the middle mouse button in the widget and drag up or down.',
         -title    => 'Listbox Demonstration (50 states)',
         -iconname => 'states',
     );

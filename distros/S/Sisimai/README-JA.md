@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/sisimai/p5-Sisimai.svg)](https://coveralls.io/r/sisimai/p5-Sisimai)
 [![Build Status](https://travis-ci.org/sisimai/p5-Sisimai.svg?branch=master)](https://travis-ci.org/sisimai/p5-Sisimai) 
 [![Perl](https://img.shields.io/badge/perl-v5.10--v5.26-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v4.22.6-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v4.22.7-blue.svg)](https://metacpan.org/pod/Sisimai)
 
 - [**README(English)**](README.md)
 - [シシマイ? | What is Sisimai](#what-is-sisimai)
@@ -243,8 +243,8 @@ bounceHammer 2.7.13p3とSisimai(シシマイ)は下記のような違いがあ�
 | 商用MTAとMSP対応解析モジュール                 | 無し          | あり(同梱)  |
 | WebUIとAPI                                     | あり          | 無し        |
 | 解析済バウンスデータを保存するDBスキーマ       | あり          | 無し[1]     |
-| 解析精度の割合(2000通のメール)[2]              | 0.49          | 1.00        |
-| メール解析速度(1000通のメール)                 | 4.24秒        | 1.95秒      |
+| 解析精度の割合(2000通のメール)[2]              | 0.58          | 1.00        |
+| メール解析速度(1000通のメール)                 | 4.24秒        | 1.70秒[3]   |
 | 検出可能なバウンス理由の数                     | 19            | 29          |
 | 2件以上のバウンスがあるメールの解析            | 1件目だけ     | 全件解析可能|
 | FeedBack Loop/ARF形式のメール解析              | 非対応        | 対応済      |
@@ -254,12 +254,13 @@ bounceHammer 2.7.13p3とSisimai(シシマイ)は下記のような違いがあ�
 | cpan, cpanm, cpmコマンドでのインストール       | 非対応        | 対応済      |
 | 依存モジュール数(Perlのコアモジュールを除く)   | 24モジュール  | 2モジュール |
 | LOC:ソースコードの行数                         | 18200行       | 8600行      |
-| テスト件数(t/,xt/ディレクトリ)                 | 27365件       | 229000件    |
+| テスト件数(t/,xt/ディレクトリ)                 | 27365件       | 235000件    |
 | ライセンス                                     | GPLv2かPerl   | 二条項BSD   |
 | 開発会社によるサポート契約                     | 終売(EOS)     | 提供中      |
 
 1. DBIまたは好きなORMを使って自由に実装してください
 2. [./ANALYTICAL-PRECISION](https://github.com/sisimai/p5-Sisimai/blob/master/ANALYTICAL-PRECISION)を参照
+3. Xeon E5-2640 2.5GHz x 2 cores | 5000 bogomips | 1GB RAM | Perl 5.24.1
 
 Other spec of Sisimai
 -------------------------------------------------------------------------------

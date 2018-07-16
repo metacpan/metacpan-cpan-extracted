@@ -1,0 +1,141 @@
+{
+   "abstract" : "ATOOMIC's plugin bundle",
+   "author" : [
+      "Nicolas R <atoomic@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-PluginBundle-ATOOMIC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.03"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Code::TidyAll::Config::INI::Reader" : "0.44",
+            "Devel::PPPort" : "3.42",
+            "Dist::Zilla" : "6.0",
+            "Dist::Zilla::Plugin::Authority" : "0",
+            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
+            "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
+            "Dist::Zilla::Plugin::CPANFile" : "0",
+            "Dist::Zilla::Plugin::CheckPrereqsIndexed" : "0",
+            "Dist::Zilla::Plugin::CheckSelfDependency" : "0",
+            "Dist::Zilla::Plugin::CheckStrictVersion" : "0",
+            "Dist::Zilla::Plugin::CheckVersionIncrement" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0.02",
+            "Dist::Zilla::Plugin::GenerateFile::FromShareDir" : "0.013",
+            "Dist::Zilla::Plugin::Git::Check" : "0",
+            "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" : "0",
+            "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts" : "0",
+            "Dist::Zilla::Plugin::Git::Commit" : "0",
+            "Dist::Zilla::Plugin::Git::Contributors" : "0",
+            "Dist::Zilla::Plugin::Git::GatherDir" : "0",
+            "Dist::Zilla::Plugin::Git::Push" : "0",
+            "Dist::Zilla::Plugin::Git::Tag" : "0",
+            "Dist::Zilla::Plugin::GitHub::Meta" : "0.45",
+            "Dist::Zilla::Plugin::GitHub::Update" : "0.45",
+            "Dist::Zilla::Plugin::InstallGuide" : "0",
+            "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0",
+            "Dist::Zilla::Plugin::Meta::Contributors" : "0",
+            "Dist::Zilla::Plugin::MetaConfig" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::MojibakeTests" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::PPPort" : "0",
+            "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::PromptIfStale" : "0.050",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
+            "Dist::Zilla::Plugin::RunExtraTests" : "0",
+            "Dist::Zilla::Plugin::SurgicalPodWeaver" : "0",
+            "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
+            "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" : "0",
+            "Dist::Zilla::Plugin::Test::CleanNamespaces" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::EOL" : "0.14",
+            "Dist::Zilla::Plugin::Test::NoTabs" : "0",
+            "Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable" : "0",
+            "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
+            "Dist::Zilla::Plugin::Test::Portability" : "0",
+            "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
+            "Dist::Zilla::Plugin::Test::Synopsis" : "0",
+            "Dist::Zilla::Plugin::Test::Version" : "0",
+            "Dist::Zilla::Plugin::VersionFromMainModule" : "0.02",
+            "Dist::Zilla::Role::BeforeBuild" : "0",
+            "Dist::Zilla::Role::LicenseProvider" : "0",
+            "Dist::Zilla::Role::Plugin" : "0",
+            "Dist::Zilla::Role::PluginBundle::Config::Slicer" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Dist::Zilla::Role::PluginBundle::PluginRemover" : "0",
+            "Dist::Zilla::Role::TextTemplate" : "0",
+            "File::Which" : "0",
+            "List::Util" : "1.45",
+            "Module::Runtime" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "PadWalker" : "0",
+            "Path::Class" : "0",
+            "Path::Iterator::Rule" : "0",
+            "Perl::Critic::Moose" : "1.05",
+            "Pod::Elemental::Transformer::List" : "0",
+            "Pod::Elemental::Transformer::Verbatim" : "0",
+            "Pod::Weaver::Config::Assembler" : "0",
+            "Pod::Weaver::Plugin::SingleEncoding" : "0",
+            "Pod::Weaver::Plugin::Transformer" : "0",
+            "Pod::Weaver::Section::AllowOverride" : "0",
+            "Pod::Weaver::Section::Authors" : "0",
+            "Pod::Weaver::Section::Collect" : "0",
+            "Pod::Weaver::Section::Contributors" : "0",
+            "Pod::Weaver::Section::GenerateSection" : "0",
+            "Pod::Weaver::Section::Generic" : "0",
+            "Pod::Weaver::Section::Leftovers" : "0",
+            "Pod::Weaver::Section::Legal" : "0",
+            "Pod::Weaver::Section::Name" : "0",
+            "Pod::Weaver::Section::Region" : "0",
+            "Pod::Weaver::Section::Version" : "0",
+            "Sort::ByExample" : "0",
+            "String::RewritePrefix" : "0",
+            "autodie" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

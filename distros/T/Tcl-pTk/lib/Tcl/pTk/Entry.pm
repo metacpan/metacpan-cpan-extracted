@@ -3,7 +3,7 @@ use strict;
 
 package Tcl::pTk::Entry;
 
-our ($VERSION) = ('0.92');
+our ($VERSION) = ('0.93');
 
 # Entry widget is all auto-wrapped. 
 # This File primarily needed to keep from getting the double-paste problem seen, where pasting into an

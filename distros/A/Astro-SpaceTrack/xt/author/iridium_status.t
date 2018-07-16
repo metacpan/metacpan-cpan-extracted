@@ -56,8 +56,11 @@ my %known_inconsistent = (
 				# Kelso: Backup 30-May-2018
 #   24968 => { sladen => 1 },	# Sladen: failed 09-Dec-2017
 				# Decayed 26-May-2018
-    24969 => { sladen => 1 },	# Sladen: failed 09-Dec-2017
+#   24969 => { sladen => 1 },	# Sladen: failed 09-Dec-2017
 				# SpaceTrack: Decayed 08-Jan-2018
+#   25040 => { sladen => 1 },	# 20-Jun-2018: Kelso partly operational
+				# 26-Jun-2018: Sladen failed
+				# 28-Jun-2018: Kelso failed
 #   25042 => { sladen => 1 },	# 19-Aug-2016: Sladen - Failed on station?
 				# Kelso: Failed 30-May-2018
     25106 => { sladen => 1 },	# 06-May 2018: Sladen - Failed
@@ -75,25 +78,33 @@ my %known_inconsistent = (
     25287 => { sladen => 1 },	# 10-May-2018: Kelso partly operational
 				# 18-May-2018: Sladen failed
 				# Kelso: Backup 30-May-2018
+#   25288 => { sladen => 1 },	# 26-Jun-2018: Kelso partly operational
+				# 01-Jul-2018: Sladen failed
+				# 03-Jul-2018: Kelso failed
     25289 => { sladen => 1 },	# 10-May-2018: Kelso partly operational
 				# 18-May-2018: Sladen failed
 				# Kelso: Backup 30-May-2018
-    25290 => { sladen => 1 },	# 08-Jun-2018: Kelso partly operational
+#   25290 => { sladen => 1 },	# 08-Jun-2018: Kelso partly operational
 				# 11-Jun-2018: Sladen failed on station
+				# 20-Jun-2018: Kelso failed
 #   25291 => { sladen => 1 },	# 10-May-2018: Kelso partly operational
 				# 18-May-2018: Sladen failed
 				# Kelso: Failed 30-May-2018
 				# Space Track: Decayed 06-Jun-2018
     25342 => { sladen => 1 },	# 14-Jun-2018: Sladen failed.
     25343 => { sladen => 1 },	# 27-Apr-2018: Kelso partly operational
-    25346 => { sladen => 1 },	# 14-Jun-2018: Kelso partly operational
+#   25346 => { sladen => 1 },	# 14-Jun-2018: Kelso partly operational
 				# 15-Jun-2018: Sladen failed on station
+				# 22-Jun-2018: Kelso failed
 #   25431 => { sladen => 1 },	# 21-Jan-2018: Sladen failed.
     25431 => { sladen => 1 },	# Sladen: failed 09-Feb-2018
     25432 => { sladen => 1 },	# 10-Mar-2018: Sladen failed.
 				# Kelso: Backup 30-May-2018
-    25468 => { sladen => 1 },	# Sladen: failed 14-May-2017
+#   25468 => { sladen => 1 },	# Sladen: failed 14-May-2017
 				# Kelso: Backup 30-May-2018
+				# Kelso: Tumbling 20-Jun-2018
+    25469 => { sladen => 1 },	# 12-Jul-2018: Kelso partially operational
+				# 12-Jul-2018: Sladen failed
     25577 => { sladen => 1 },	# 14-Apr-2018: Sladen failed
 				# Kelso: Backup 30-May-2018
     25578 => { sladen => 1 },	# 26-Apr-2018: Sladen failed
@@ -107,6 +118,8 @@ my %known_inconsistent = (
 				# Kelso: Failed 30-May-2018
     27450 => { sladen => 1 },	# 10-Mar-2018: Sladen failed.
 				# Kelso: Backup 30-May-2018
+    27451 => { sladen => 1 },	# 06-Jul-2018: Kelso partly operational
+    				# 09-Jul-2018: Sladen failed
 );
 
 my $st = Astro::SpaceTrack->new();
@@ -179,7 +192,7 @@ foreach (
  24950   Iridium 31     [B]      
  24966   Iridium 35     [B]      
  24967   Iridium 36     [-]      Tumbling
- 25040   Iridium 41     [+]      
+ 25040   Iridium 41     [-]      Tumbling
  25041   Iridium 40     [-]      Tumbling
  25042   Iridium 39     [-]      Tumbling
  25043   Iridium 38     [-]      Tumbling
@@ -203,18 +216,16 @@ foreach (
  25285   Iridium 62     [B]      
  25286   Iridium 63     [-]      Tumbling
  25287   Iridium 64     [B]      
- 25288   Iridium 65     [+]      
+ 25288   Iridium 65     [-]      Tumbling
  25289   Iridium 66     [B]      
- 25290   Iridium 67     [P]      
  25319   Iridium 69     [-]      Tumbling
  25320   Iridium 71     [-]      Tumbling
  25342   Iridium 70     [+]      
  25344   Iridium 73     [-]      Tumbling
- 25346   Iridium 75     [P]      
  25432   Iridium 76     [B]      
  25467   Iridium 82     [-]      Tumbling
- 25468   Iridium 81     [P]      
- 25469   Iridium 80     [+]      
+ 25468   Iridium 81     [-]      Tumbling
+ 25469   Iridium 80     [P]      
  25527   Iridium 2      [-]      Tumbling
  25528   Iridium 86     [+]      
  25530   Iridium 84     [+]      
@@ -227,7 +238,7 @@ foreach (
  27375   Iridium 95     [+]      
  27376   Iridium 96     [-]      Tumbling
  27450   Iridium 97     [B]      
- 27451   Iridium 98     [+]      
+ 27451   Iridium 98     [P]      
 KELSO
 	["Rod Sladen's Iridium Constellation Status",
 	sladen => <<'SLADEN'],
@@ -256,7 +267,7 @@ KELSO
  24950   Iridium 31     [-]      Plane 3
  24966   Iridium 35     [-]      Plane 4
  24967   Iridium 36     [-]      Plane 4
- 25040   Iridium 41     [+]      Plane 6
+ 25040   Iridium 41     [-]      Plane 6 - Failed on station?
  25041   Iridium 40     [-]      Plane 6 - Failed on station?
  25042   Iridium 39     [-]      Plane 6 - Failed on station?
  25043   Iridium 38     [-]      Plane 6
@@ -280,18 +291,16 @@ KELSO
  25285   Iridium 62     [-]      Plane 1
  25286   Iridium 63     [-]      Plane 1 - Failed on station?
  25287   Iridium 64     [-]      Plane 1
- 25288   Iridium 65     [+]      Plane 1
+ 25288   Iridium 65     [-]      Plane 1 - Failed on station?
  25289   Iridium 66     [-]      Plane 1
- 25290   Iridium 67     [-]      Plane 1 - Failed on station?
  25319   Iridium 69     [-]      Plane 2
  25320   Iridium 71     [-]      Plane 2
  25342   Iridium 70     [-]      Plane 1
  25344   Iridium 73     [-]      Plane 1
- 25346   Iridium 75     [-]      Plane 1 - Failed on station?
  25432   Iridium 76     [-]      Plane 2
  25467   Iridium 82     [-]      Plane 6 - Failed on station?
  25468   Iridium 81     [-]      Plane 6 - Failed on station?
- 25469   Iridium 80     [+]      Plane 6
+ 25469   Iridium 80     [-]      Plane 6 - Failed on station?
  25527   Iridium 2      [-]      Plane 5
  25528   Iridium 86     [+]      Plane 5
  25530   Iridium 84     [+]      Plane 5
@@ -304,7 +313,7 @@ KELSO
  27375   Iridium 95     [+]      Plane 3
  27376   Iridium 96     [-]      Plane 4 - Failed on station?
  27450   Iridium 97     [-]      Plane 4
- 27451   Iridium 98     [+]      Plane 6
+ 27451   Iridium 98     [-]      Plane 6 - Failed on station?
 SLADEN
         $space_track_skip ? () :
 	[ "Space Track Iridium status",
@@ -372,7 +381,7 @@ SLADEN
  25287   Iridium 64     [?]      SpaceTrack
  25288   Iridium 65     [?]      SpaceTrack
  25289   Iridium 66     [?]      SpaceTrack
- 25290   Iridium 67     [?]      SpaceTrack
+ 25290   Iridium 67     [D]      Decayed 2018-07-02
  25291   Iridium 68     [D]      Decayed 2018-06-06
  25319   Iridium 69     [?]      SpaceTrack
  25320   Iridium 71     [?]      SpaceTrack
@@ -380,7 +389,7 @@ SLADEN
  25343   Iridium 72     [D]      Decayed 2018-05-14
  25344   Iridium 73     [?]      SpaceTrack
  25345   Iridium 74     [D]      Decayed 2017-06-11
- 25346   Iridium 75     [?]      SpaceTrack
+ 25346   Iridium 75     [D]      Decayed 2018-07-10
  25431   Iridium 03     [D]      Decayed 2018-02-08
  25432   Iridium 76     [?]      SpaceTrack
  25467   Iridium 82     [?]      SpaceTrack

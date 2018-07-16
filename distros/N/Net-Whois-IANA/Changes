@@ -1,4 +1,24 @@
-Revision history for Perl extension Net::Whois::IANA.
+0.44      2018-07-13 17:32:55-06:00 America/Denver
+
+    - Adjust duplicate copyrights
+    - Adjust flapping test for BR country
+    - Try to improve testsuite stability using travis
+    - improve IPv4 regex
+    - improve cidr regex rule
+    - whois_connect avoid the last sleep
+
+0.43      2018-07-13 14:26:35-06:00 America/Denver
+    - Skip results that are missing inetnum and inet6num
+    - fix duplicate country from apnic_read_query
+    - fix unit tests 'whois.registro.br' stop providing country
+    - accessors are defined at compile time and AUTOLOAD is not used
+anymore
+    - Skip data for 0.0.0.0 that is returned from APNIC
+    - Net::Whois::IANA should not import dependency symbols
+    - Refactor whois_connect and source_connect to avoid memory crash loop
+    - Add IPv6 Support to Net::Whois::IANA
+    - Ripe queries should include all whois data
+    - Fix spaces in descr field
 
 0.41  Fri Mar 29 12:11:19 PDT 2013
 	- Fixed bug causing infinite loops when connecting to servers

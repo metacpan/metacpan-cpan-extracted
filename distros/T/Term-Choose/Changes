@@ -1,6 +1,14 @@
 Revision history for Term::Choose
 
 
+1.604   2018-07-14
+        - Removed the optional module "Term::ReadKey" from the Makefile.PL.
+
+1.603   2018-07-14
+        - Make "Term::ReadKey" optional.
+        - "Term::Choose::Constants": new export tag 'screen'.
+
+
 1.602   2018-07-12
         - Refactoring table character-width.
 
@@ -10,7 +18,7 @@ Revision history for Term::Choose
 
 1.600   2018-07-02
         - "Term::Choose" uses now its own function to determine the print width of a character.
-        - Charater widths are now cached.
+        - Character widths are now cached.
         - Code refactoring.
 
 1.518   2018-06-20

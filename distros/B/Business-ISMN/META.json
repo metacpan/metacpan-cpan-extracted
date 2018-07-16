@@ -4,9 +4,9 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -54,5 +54,6 @@
          "web" : "https://github.com/briandfoy/business-ismn"
       }
    },
-   "version" : "1.131"
+   "version" : "1.132",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

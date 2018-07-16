@@ -24,12 +24,11 @@ no_index:
 requires:
   Carp: '0'
   Exporter: '0'
-  Term::ReadKey: '0'
   constant: '0'
   perl: '5.008003'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Choose.git
-version: '1.602'
+version: '1.604'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

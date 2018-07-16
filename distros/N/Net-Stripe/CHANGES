@@ -1,10 +1,35 @@
 ==================================================
-Changes from 2017-07-06 00:00:00 +0000 to present.
+Changes from 2017-07-14 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.35 at 2018-07-06 22:04:22 +0000
+version 0.36 at 2018-07-14 07:17:26 +0000
 -----------------------------------------
+
+  Change: 96dd910d23d6b144b0cce9f64824c05fb62dbdb0
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-14 07:26:55 +0000
+
+    Merge pull request #107 from sherrardb/fix_deleted_objects
+
+    avoid objectification for deleted objects 
+
+  Change: 01d385d00a6445148aaccf3b364ea4314fd9d169
+  Author: Sherrard Burton <sburton@allafrica.com>
+  Date : 2018-07-13 14:01:36 +0000
+
+    avoid objectification for deleted objects stripe now seems to be
+    passing back the object type for deleted objects. when we objectify
+    them in _hash_to_object() the deleted field is dropped since most
+    objects do not define that field explicitly. by manually deleteing
+    the object type from the returned hash, we can follow the previous
+    code path. 
+
+  Change: f6886edba269dbefd72d0b4b2e3aa7547c8708e9
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-07-06 23:07:15 +0000
+
+    Version 0.35 docs 
 
   Change: 11c2e0c5ce4fc612f6d84bd33ca91f97ecb803e2
   Author: Andrew Solomon <andrew@geekuni.com>

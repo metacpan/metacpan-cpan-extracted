@@ -3,9 +3,9 @@ NAME
     Central Asia)
 
 VERSION
-    This document describes version 0.153 of Finance::Currency::Convert::BCA
+    This document describes version 0.154 of Finance::Currency::Convert::BCA
     (from Perl distribution Finance-Currency-Convert-BCA), released on
-    2018-07-10.
+    2018-07-15.
 
 SYNOPSIS
      use Finance::Currency::Convert::BCA qw(convert_currency);

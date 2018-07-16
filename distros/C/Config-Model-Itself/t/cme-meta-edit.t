@@ -6,19 +6,16 @@ use 5.10.1;
 
 use Test::More ;
 use Config::Model;
+use Config::Model::Tester::Setup qw/init_test/;
 use Path::Tiny;
 use Test::File::Contents;
+use Getopt::Long;
 
 use App::Cmd::Tester;
 use App::Cme ;
 use Tk;
 
-my $arg = shift || '';
-my ( $log, $show ) = (0) x 2;
-
-my $trace = $arg =~ /t/ ? 1 : 0;
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
+init_test();
 
 # edit and plugin need to be in separate test files. Otherwise the 2
 # Tk widgets created one after the other interacts badly and the save

@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2017 by Dominique Dumont.
+# This software is Copyright (c) 2007-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 # ABSTRACT: Work on the configuration model of an application
 
 package App::Cme::Command::meta ;
-$App::Cme::Command::meta::VERSION = '2.013';
+$App::Cme::Command::meta::VERSION = '2.014';
 use strict ;
 use warnings ;
 use 5.10.1;
@@ -406,7 +406,7 @@ App::Cme::Command::meta - Work on the configuration model of an application
 
 =head1 VERSION
 
-version 2.013
+version 2.014
 
 =head1 SYNOPSIS
 
@@ -643,7 +643,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2007-2017 by Dominique Dumont.
+This software is Copyright (c) 2007-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 

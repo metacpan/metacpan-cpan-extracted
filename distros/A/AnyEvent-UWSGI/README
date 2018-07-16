@@ -13,6 +13,7 @@ DESCRIPTION
 METHODS
     uwsgi_request
         Like `AnyEvent::HTTP::http_request'
+        Also accepts `modifier1' and `modifier2' arguments
 
     uwsgi_get
         Like `AnyEvent::HTTP::http_get'

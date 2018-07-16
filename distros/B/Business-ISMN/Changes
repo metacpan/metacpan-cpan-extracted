@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISMN
 
+1.132 2018-07-14T00:59:12Z
+	* Clarify that it's the Artistic License 2.0
+
 1.131 2016-12-05T19:16:19Z
 	* Remove the prereq test, which I'll do locally instead of everywhere.
 

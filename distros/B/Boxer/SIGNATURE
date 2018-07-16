@@ -14,20 +14,20 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA512
 
-SHA1 7b9c867f682991d714b2fefd03e7d89d3e43d36a COPYRIGHT
+SHA1 20d39d4e647686f6e500d23e2cfccc308583db35 COPYRIGHT
 SHA1 6c20c21af1aee1cc223733f8ad611d6e78ef790b CREDITS
-SHA1 969f48a25cb5f16b34c2bfe5375242e871e3b3bf Changes
+SHA1 1a08398d67d1d4be3401c29904bdd45591bae3c8 Changes
 SHA1 b199daf5b34dc2f8f1a17edf821af560e72d7c54 INSTALL
-SHA1 669fff2c2aa740c31d6546341aa7627c248454c6 LICENSE
+SHA1 085744f46f8b6cce69e0a52e7909b5c52bb2f66f LICENSE
 SHA1 32f71780808987c77911be49c06b626328d71cf3 MANIFEST
-SHA1 aa2a588ee089b6d4c42ca077dd19d82af922094d META.json
-SHA1 35f3a52bb8104dc293af9a8a932b01c0da3cfb4c META.yml
-SHA1 d7e65dda8c0a00d7d8fe8ca8132a0329c16b25ba Makefile.PL
-SHA1 175334c9838fb4acdf4b388945d77886e446aedc README
+SHA1 0f88d8e2c3c62f7c3847fbc815e9bf1646729851 META.json
+SHA1 1f2acc993043c7863ae49b6f737c34726b9f2b0e META.yml
+SHA1 8fc5fdbfc039ec1883bb09cf9cde723de8f8ecfc Makefile.PL
+SHA1 c2860e413e77d9fb9d2f77db0c3a59d93b1c3348 README
 SHA1 718a2edfad84285e6b3ae8c676bd7aa5b93268c7 TODO
-SHA1 7b83eea519f65357760b51e036981cebd3c8088f bin/boxer
+SHA1 c84ad5ff8f19cdb7fe39ed7125714b64122b0d93 bin/boxer
 SHA1 c59760e54130231bcd42e193e41df8420a5d8bd9 dist.ini
-SHA1 470b4decbee40c0d711b7cb0587a1b4c842bca1d doap.ttl
+SHA1 da9f1102542aae76066114a8ba4b82b2595fd964 doap.ttl
 SHA1 f2f5df67593d316760b27e089157ab26ca1cc4e1 doc/boxer.svg
 SHA1 919d3b2bb4100a6a9731e85c91f70f957e42364d examples/README
 SHA1 bde3ca64437336189476c015b54fa4a627ada4f7 examples/classes/Admin/apt/auto/all.yml
@@ -216,24 +216,24 @@ SHA1 20c2af37df6d3a9ec0c44362949d1228f8d039f7 examples/classes/x11/lightdm/gtk.y
 SHA1 36575b4e55acc82830eaa1f53ef74130629b184f examples/classes/x11/lightdm/init.yml
 SHA1 b0e8e08c5b9e7726efa134a1ef081ff492f4c3ab examples/nodes/lxp5.yml
 SHA1 45e744814af30ccc792ce8042815f39f57da1804 examples/nodes/parl-greens.yml
-SHA1 85201fd7fdf52d6356eac9f2a0a3fafe394c13b2 lib/Boxer.pm
-SHA1 b975c410e1f647d23ab5168d5ce4eb7fa2a47ca6 lib/Boxer/CLI.pm
-SHA1 a34b771cd4eaa017d88314fd7c411153ac90048d lib/Boxer/CLI/Command.pm
-SHA1 8bfc21311e1cff9f6ab6d4dae52b57a9c3aa70b1 lib/Boxer/CLI/Command/About.pm
-SHA1 7974a17b747bd6cdb4a1a2744ab0c399d9cb8ceb lib/Boxer/CLI/Command/Aliases.pm
-SHA1 6c10f4f80f23c33d4a9c0e00f2d8f7b4b128d61d lib/Boxer/CLI/Command/Commands.pm
-SHA1 5518e755e7bec8aab62b9640a488678c890aebd2 lib/Boxer/CLI/Command/Compose.pm
-SHA1 f821fd83794efbde4a7ab756d2b32a1ec74ab903 lib/Boxer/File/WithSkeleton.pm
-SHA1 a213fe4752a457a41fc68bc91dc53fa924717cfc lib/Boxer/Part.pm
-SHA1 6d3483cc3f501e66a073e67cd2eefac4e7a8c5a0 lib/Boxer/Part/Reclass.pm
-SHA1 6975c109cecd250fb4d506546d9ad31ff2b62d3b lib/Boxer/Role/Interact.pm
-SHA1 fa282e9f0de81e6fa04be758ac1b3a47a4240ed2 lib/Boxer/Task.pm
-SHA1 327650d5865487248d0211753404ac0587ad9599 lib/Boxer/Task/Classify.pm
-SHA1 26985bcc07e378cbee94760e90d8ecb9319de356 lib/Boxer/Task/Serialize.pm
-SHA1 b4978767d3b1236a309c30b625923879525b8056 lib/Boxer/Types.pm
-SHA1 6a1e853f340cdb3e81868455325fa732f1c5332e lib/Boxer/World.pm
-SHA1 a82cc2f4a7f6effe744ccf96085c700d0d87aef8 lib/Boxer/World/Flat.pm
-SHA1 e5d71f0aa10ad22bc3c22c3e5060767c71445095 lib/Boxer/World/Reclass.pm
+SHA1 960f4fc4fb78f23ef90977aa73f452de14f4b953 lib/Boxer.pm
+SHA1 4a5344f4981cb75d81cc9c69423c5e8f5de64623 lib/Boxer/CLI.pm
+SHA1 cac04f5f3311ee41b5184cf60951f70cf47f2b12 lib/Boxer/CLI/Command.pm
+SHA1 09d246b27016873be0833caa6eba8ee8d8251392 lib/Boxer/CLI/Command/About.pm
+SHA1 4b06575afe93f620f0ab0c946c88de1b795e3de4 lib/Boxer/CLI/Command/Aliases.pm
+SHA1 fdf7f04dc7ae296b93000eb4bdeffdef0f346c28 lib/Boxer/CLI/Command/Commands.pm
+SHA1 85fe47207696c19625b03ec720df7a4736d0a55e lib/Boxer/CLI/Command/Compose.pm
+SHA1 e02812fc97f61bfaf874c47a2c8aa372588dca37 lib/Boxer/File/WithSkeleton.pm
+SHA1 5ee2a84db3a0f07bc5e8a1efbad49ffe4fadb1dd lib/Boxer/Part.pm
+SHA1 f0a1dcc41cbcac76f61ab6c31e1c50336f955c11 lib/Boxer/Part/Reclass.pm
+SHA1 f9196793ae1372718fb50b6fd61cc17e0da9d59f lib/Boxer/Role/Interact.pm
+SHA1 a5f1f3366d2892616956d3e312d1e0df4ca507e4 lib/Boxer/Task.pm
+SHA1 e7a2e9825defe666baa4e3f311a2bfa26d36854d lib/Boxer/Task/Classify.pm
+SHA1 c0acdf5e4e7deb7813b8c1c463aba8f73e4748fd lib/Boxer/Task/Serialize.pm
+SHA1 fe12006cc77da5779f283b578373f2995076a1b5 lib/Boxer/Types.pm
+SHA1 a4179d105ae3847275a5df62aac38fc656bfbd40 lib/Boxer/World.pm
+SHA1 63e7dc9e8c8cff9f6d9744508fcb08d412695db6 lib/Boxer/World/Flat.pm
+SHA1 9c23986de3afc9ea2b75932b115c0200694e5519 lib/Boxer/World/Reclass.pm
 SHA1 16ab646487dcc69478b20f7f11becb9f30bc01ee share/skel/preseed.cfg.in
 SHA1 888a9b47c3e1cdbc23d932d2ec0ef4bb0e671572 share/skel/script.sh.in
 SHA1 8653c7bc24881ffb021b65bf7c9c9dca6a71e1a5 t/00_compile.t
@@ -245,17 +245,17 @@ SHA1 a7dcc176ca5bedb047f328b71bc7638ad6f330b5 t/pod.t
 SHA1 0975601a515a4413e644f83b7bde12be352197e7 t/world.t
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEn+Ppw2aRpp/1PMaELHwxRsGgASEFAloAN+kACgkQLHwxRsGg
-ASHdxA//SO/gEH60z4TDJ+n0CBDeR06f/EdpMYCmgGImdUTPRbZGjyJf8B2qSRqD
-yWWgZYKM0hRA5sq/9KoKA41597sHNV7Yed3LKDPtF5qwz5jzHjE2JrgnsJ44E4nz
-W+GM+/yGBklDuAUXrnazPgTRRYb+qiv1XNbLSoawULxRQI7iM32jXfDulvueKjVu
-50GhnrN7Doa6r+bCrYnX0STWftEfTPKtCPr5bJfqvt4ZDPGi6oSY0xmbzPoKkW62
-rtnl4fLsFHHRYwTKDzmBHaFJTJsn0cVeh54jzr6RAI0ma6Hy7A82Rnm7Ice2V7WR
-ADKJbcP1A0zMYGI6vt7cgiyNjbgtT9zrV+e094Qiq4ynAOKlf3U20UuER7up8hg/
-omGs1PciAjIGbp00RdyqMMsVl2USwj9OKcxU3MAzNZ3nu5Cx9fVpC5F05Qyb9Qct
-Tric+ttk2maWqRUX4dLqLB3do81InkLMcWDLgwZN71oWmBXAHupMerAP4rKtir0u
-7wzftrn24zFWCx5456bNUvANmfc5lhqxLvNwXHKBCDuWX/HpmydeeYCr62nzWVxc
-BGNjQr2gSF3+MYXwl14gE8AANLAzHaE0vmTlU/M4VVMjPkOwKZDUalXPvs5SSY/P
-nyPugf7g1ijCOnwUl2ymLZ5BEKxY3tqMaSY9iXTMbzY9c4xLZ9g=
-=3o1D
+iQIzBAEBCgAdFiEEn+Ppw2aRpp/1PMaELHwxRsGgASEFAltIwAQACgkQLHwxRsGg
+ASGtEhAAiXBlaWYE9zGIDEXxhE4xEp7JZvmbcILybqnlOW6M80ebQJ6rkV2gCHUM
+G1QnYFa7GTW1JUMnGmX0oco2kEMLjWGbbo+s5dgf+MBhj0HsbJaMlk4ck2sE8x6j
+lmW4p2plTzAHPUalkI2bdXkuS7+a4w/XoSSUgZ9knN9MYKsUj2oz3nZFsBf97ZoN
+hy7VrBcPPNZMUaPaPmD65lP6fwPlTuwYwPES8F7PKpWSloBN7NEyqJH+8qFxuChv
+WWfjEg+6q3zo5xt43bKbslTU8KbDlJh5Yyn2dAiRk+wQQ03zcIKK2sjfTY8Sj46G
+qIyxgx3XieyLZJTX3bgiChd5qSXEi/zvOpSm7Xf70ItDf3/E1GQnL2FWIRq9hghL
+/EhopUF7XAJtWaVOJ8KRgziMfkeG71K6DCN/ISMA0mneKcekzRH2SIrsD7HYRDj3
+1rSCkfxxvLUNOtZn1xTWj1bnQBq1gUcADZTOLKxfaoBcQWmLeyzKte4nfreQWa+h
+/nV7daz6ETVd5iMnEZwENdsgczwgoDlpLEedyIbtcVZ24sklsogV01T/d7IJfmMj
+cXWn6E17/vx5nhCMvHDWD3vd/AGccYfMfAw7edZB12fmYBedvvkZFk0jrOAV0EX7
+G1ZZBMbp2Bm+VxZ8xj8U6qEyopA4OB3OC5p9JW7qV5ihQlvQWTU=
+=FrCX
 -----END PGP SIGNATURE-----

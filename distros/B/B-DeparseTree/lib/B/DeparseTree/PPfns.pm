@@ -80,6 +80,7 @@ $VERSION = '3.2.0';
     is_lexical_subs
     is_list_newer
     is_list_older
+    list_const
     listop
     logassignop
     logop
@@ -1232,6 +1233,36 @@ sub logop
 				     [0, 1], [$lhs, $rhs], $opts);
 }
 
+sub list_const
+{
+    my $self = shift;
+    my($op, $cx, @list) = @_;
+    my @a = map $self->const($_, 6), @list;
+    my $prec = 6;
+    if (@a == 0) {
+	return $self->info_from_string('list const ()', $op, '()');
+    }
+    if (@a == 1) {
+	return $self->info_from_template('list const: one item',
+					 $op, "(%c)", undef, [$a[0]]);
+    }
+
+    my @texts = map $_->{text}, @a;
+    if ( @a > 2 and !grep(!/^-?\d+$/, @texts)) {
+	# collapse a consecutive sequence like (-1,0,1,2) into a range like (-1..2)
+	my $first = $texts[0];
+	my $i = $first;
+	return $self->info_from_template('list const ..', $op,
+					 "%c..%c", undef,
+					 [$a[0], $a[-1]],
+					 {maybe_parens => [$self, $cx, 9]})
+	    unless grep $i++ != $_, @texts;
+    }
+    return $self->info_from_template('list const, more than one item',
+				     $op, "%C", [[0, $#a, ', ']], \@a,
+				     {maybe_parens => [$self, $cx, $prec]});
+}
+
 # This handle list ops: "open", "pack", "return" ...
 sub listop
 {
@@ -1445,11 +1476,11 @@ sub loop_common
 	    push @args_spec, scalar(@nodes), scalar(@nodes+1);
 	    push @nodes, ($self->deparse($ary->first->sibling, 9, $op),
 			 $self->deparse($ary->first->sibling->sibling, 9, $op));
-	    $ary_fmt = '(%c .. %c)';
+	    $ary_fmt = '(%c..%c)';
 
 	} else {
 	    push @nodes, $self->deparse($ary, 1, $op);
-	    $ary_fmt = "%c";
+	    $ary_fmt = "(%c)";
 	    push @args_spec, $#nodes;
 	}
 
@@ -1459,14 +1490,16 @@ sub loop_common
 
 	if (!B::Deparse::is_state $body->first
 	    and $body->first->name !~ /^(?:stub|leave|scope)$/) {
-	    # FIXME:
-	   #  Carp::confess("var ne \$_") unless join('', @var_text) eq '$_';
+	    # Loop of body should be over "$_".
+	    Carp::confess('var ne $_') unless $var_info->{text} eq '_';
 	    push @skipped_ops, $body->first;
+	    push @skipped_ops, $nodes[0];
+	    $var_fmt = '%c';
 	    $body = $body->first;
 	    my $body_info = $self->deparse($body, 2, $op);
-	    push @nodes, $body_info;
+	    $nodes[0] = $body_info;
 	    return $self->info_from_template("foreach", $op,
-					     "$var_fmt foreach ($ary_fmt)",
+					     "$var_fmt foreach $ary_fmt",
 					     \@args_spec, \@nodes,
 					     {other_ops => \@skipped_ops});
 	}
@@ -1484,7 +1517,7 @@ sub loop_common
 	@args_spec = (0);
     } elsif ($kid->name eq "stub") {
 	# bare and empty
-	return info_from_text($op, $self, '{;}', 'empty loop', {});
+	return $self->info_from_string('loop_common {;}', $op, '{;}');
     }
 
     # If there isn't a continue block, then the next pointer for the loop
@@ -1517,6 +1550,14 @@ sub loop_common
 	    and not B::Deparse::is_scope($cont)
 	    and $self->{'expand'} < 3) {
 	    my $cont_info = $self->deparse($cont, 1, $op);
+	    if ($body_info->{type} eq 'statements') {
+		Carp::confess('expecting statements to have only 1')
+		    unless scalar @{$body_info->{texts}} == 1;
+
+		# Use the last entry the lineseq for prev_expr
+		my $last_stmts_node = $body_info->{texts}[0]{texts}[-1];
+		$cont_info->{prev_expr} = $last_stmts_node;
+	    }
 	    my $init = defined($init) ? $init : ' ';
 	    @nodes = ($init, $cond_info, $cont_info);
 	    # @nodes_text = ('for', '(', "$init_text;", $cont_info->{text}, ')');
@@ -1532,7 +1573,7 @@ sub loop_common
 			  $cont_info->{text} , "\n\b}");
 	}
     } else {
-	return info_from_text($op, $self, '', 'loop_no_body', {})
+	return $self->info_from_string('loop no body',  $op, '')
 	    if !defined $body;
 	if (defined $init) {
 	    @nodes = ($init, $cond_info);
@@ -1768,7 +1809,7 @@ sub matchop_newer
     } elsif ($kid->name ne 'regcomp') {
         if ($op->name eq 'split') {
             # split has other kids, not just regcomp
-            $re = re_uninterp(B::Deparse::escape_re(re_unback($op->precomp)));
+            $re = B::Deparse::re_uninterp(B::Deparse::escape_re(B::Deparse::re_unback($op->precomp)));
         } else {
 	    carp("found ".$kid->name." where regcomp expected");
 	}
@@ -2153,6 +2194,7 @@ sub maybe_qualify {
 }
 
 # FIXME: need a way to pass in skipped_ops
+# FIXME: see if we can move to some 5.xx-specific module
 sub maybe_targmy
 {
     my($self, $op, $cx, $func, @args) = @_;
@@ -2167,6 +2209,132 @@ sub maybe_targmy
     } else {
 	return $self->$func($op, $cx, @args);
     }
+}
+
+# Note: this is used in 5.28 and later versions only.
+# FIXME: see if we can move to some 5.xx-specific module
+sub maybe_var_attr {
+    my ($self, $op, $cx) = @_;
+
+    my @skipped_ops = ($op->first);
+    my $kid = $op->first->sibling; # skip pushmark
+    return if B::class($kid) eq 'NULL';
+
+    my $lop;
+    my $type;
+
+    # Extract out all the pad ops and entersub ops into
+    # @padops and @entersubops. Return if anything else seen.
+    # Also determine what class (if any) all the pad vars belong to
+    my $class;
+    my $decl; # 'my' or 'state'
+    my (@padops, @entersubops);
+    for ($lop = $kid; !B::Deparse::null($lop); $lop = $lop->sibling) {
+	my $lopname = $lop->name;
+	my $loppriv = $lop->private;
+        if ($lopname =~ /^pad[sah]v$/) {
+            return unless $loppriv & B::Deparse::OPpLVAL_INTRO;
+
+            my $padname = $self->padname_sv($lop->targ);
+            my $thisclass = ($padname->FLAGS & SVpad_TYPED)
+                                ? $padname->B::Deparse::SvSTASH->NAME : 'main';
+
+            # all pad vars must be in the same class
+            $class //= $thisclass;
+            return unless $thisclass eq $class;
+
+            # all pad vars must be the same sort of declaration
+            # (all my, all state, etc)
+            my $this = ($loppriv & B::Deparse::OPpPAD_STATE) ? 'state' : 'my';
+            if (defined $decl) {
+                return unless $this eq $decl;
+            }
+            $decl = $this;
+
+            push @padops, $lop;
+        }
+        elsif ($lopname eq 'entersub') {
+            push @entersubops, $lop;
+        }
+        else {
+            return;
+        }
+    }
+
+    return unless @padops && @padops == @entersubops;
+
+    # there should be a balance: each padop has a corresponding
+    # 'attributes'->import() method call, in the same order.
+
+    my @varnames;
+    my $attr_text;
+
+    for my $i (0..$#padops) {
+        my $padop = $padops[$i];
+        my $esop  = $entersubops[$i];
+
+        push @varnames, $self->padname($padop->targ);
+
+        return unless ($esop->flags & B::Deparse::OPf_KIDS);
+
+	push @skipped_ops, $esop;
+        my $kid = $esop->first;
+        return unless $kid->type == OP_PUSHMARK;
+
+	push @skipped_ops, $kid;
+        $kid = $kid->sibling;
+        return unless $$kid && $kid->type == B::Deparse::OP_CONST;
+	return unless $self->const_sv($kid)->PV eq 'attributes';
+
+	push @skipped_ops, $kid;
+        $kid = $kid->sibling;
+        return unless $$kid && $kid->type == B::Deparse::OP_CONST; # __PACKAGE__
+
+	push @skipped_ops, $kid;
+        $kid = $kid->sibling;
+        return unless  $$kid
+                    && $kid->name eq "srefgen"
+                    && ($kid->flags & B::Deparse::OPf_KIDS)
+                    && ($kid->first->flags & B::Deparse::OPf_KIDS)
+                    && $kid->first->first->name =~ /^pad[sah]v$/
+                    && $kid->first->first->targ == $padop->targ;
+
+        $kid = $kid->sibling;
+        my @attr;
+	my @nodes = ();
+        while ($$kid) {
+            last if ($kid->type != B::Deparse::OP_CONST);
+	    push @nodes, $kid;
+            push @attr, $self->const_sv($kid)->PV;
+            $kid = $kid->sibling;
+        }
+        return unless @attr;
+
+	my $thisattr_node = $self->info_from_template("maybe var attr", $op,
+						      ":%C", [[0, $#nodes, ', ']],
+						      \@nodes);
+        my $thisattr = ":" . join(' ', @attr);
+        $attr_text //= $thisattr;
+        # all import calls must have the same list of attributes
+        return unless $attr_text eq $thisattr;
+
+        return unless $kid->name eq 'method_named';
+	return unless $self->meth_sv($kid)->PV eq 'import';
+
+        $kid = $kid->sibling;
+        return if $$kid;
+    }
+
+    my $fmt = $decl;
+    $fmt .= " $class " if $class ne 'main';
+    $fmt .=
+            (@varnames > 1)
+            ? "(" . join(', ', @varnames) . ')'
+            : " $varnames[0]";
+
+    $self->info_from_string('maybe_var_attr', $op,
+			    "$fmt $attr_text",
+			    {other_ops => @skipped_ops});
 }
 
 sub _method
@@ -2421,9 +2589,8 @@ sub null_newer
 
     # might be 'my $s :Foo(bar);'
     if ($] >= 5.028 && $op->targ == B::Deparse::OP_LIST) {
-	Carp::confess("Can't handle var attr yet");
-        # my $my_attr = maybe_var_attr($self, $op, $cx);
-        # return $my_attr if defined $my_attr;
+        my $my_attr = maybe_var_attr($self, $op, $cx);
+        return $my_attr if defined $my_attr;
     }
 
     if (B::class($op) eq "OP") {
@@ -3087,13 +3254,12 @@ sub scopeop
 	my $body = $self->lineseq($op, 0, @kids);
 	my $text;
 	if (is_lexical_subs(@kids)) {
-	    $node = $self->info_from_template("scoped do", $op,
-					     'do {\n%+%c\n%-}',
-					     [0], [$body]);
-
-	} else {
 	    $node = $self->info_from_template("scoped expression", $op,
 					      '%c',[0], [$body]);
+	} else {
+	    $node = $self->info_from_template("scoped do", $op,
+					     "do {\n%+%c\n%-}",
+					     [0], [$body]);
 	}
     } else {
 	$node = $self->lineseq($op, $cx, @kids);

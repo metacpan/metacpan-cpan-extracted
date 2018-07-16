@@ -1,4 +1,4 @@
-# $Id: 02-IDN.t 1601 2017-10-10 14:17:01Z willem $	-*-perl-*-
+# $Id: 02-IDN.t 1692 2018-07-06 08:55:39Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -46,7 +46,7 @@ plan skip_all => 'Encode: ASCII encoding not available' unless ASCII;
 
 plan skip_all => 'Encode: UTF-8 encoding not available' unless UTF8;
 
-plan skip_all => 'No LibIDN or LibIDN2 installed' unless LIBIDN || LIBIDN2;
+plan skip_all => 'Net::LibIDN2 not installed' unless LIBIDN || LIBIDN2;
 
 plan skip_all => 'Net::LibIDN not working' if LIBIDN && !LIBIDNOK;
 

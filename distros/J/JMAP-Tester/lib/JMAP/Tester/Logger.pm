@@ -1,5 +1,5 @@
 package JMAP::Tester::Logger;
-$JMAP::Tester::Logger::VERSION = '0.018';
+$JMAP::Tester::Logger::VERSION = '0.019';
 use Moo::Role;
 
 use JMAP::Tester::LogWriter;
@@ -24,8 +24,17 @@ has writer => (
     return JMAP::Tester::LogWriter::Code->new({ code => sub{} })
       if _SCALAR0($value) && ! defined $$value;
 
-    return JMAP::Tester::LogWriter::Filename->new({ filename_template => $value })
-      if defined $value && ! ref $value && length $value;
+    if (defined $value && ! ref $value && length $value) {
+      if ($value =~ /\A-([1-9][0-9]*)\z/) {
+        open my $handle, '>&', "$1"
+          or die "can't dup fd $1 for logger output: $!";
+        return JMAP::Tester::LogWriter::Handle->new({ handle => $handle });
+      }
+
+      return JMAP::Tester::LogWriter::Filename->new({
+        filename_template => $value
+      });
+    }
 
     return $value;
   },
@@ -60,7 +69,7 @@ JMAP::Tester::Logger
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 AUTHOR
 

@@ -34,7 +34,7 @@ use URI::Escape::XS ();
 
 use base Exporter::;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @EXPORT = qw(uwsgi_get uwsgi_post uwsgi_head uwsgi_request);
 
@@ -368,6 +368,7 @@ our %IDEMPOTENT = (
 =item uwsgi_request
 
 Like C<AnyEvent::HTTP::http_request>
+Also accepts C<modifier1> and C<modifier2> in C<%args>
 
 =cut
 sub uwsgi_request($$@) {
@@ -498,9 +499,9 @@ sub uwsgi_request($$@) {
       }
 
       my $req_buf = pack('C1v1C1',
-          5, # PSGI_MODIFIER1,
+          defined $arg{modifier1} ? $arg{modifier1} : 5, # default PSGI_MODIFIER1,
           length($data),
-          0, # PSGI_MODIFIER2,
+          defined $arg{modifier2} ? $arg{modifier2} : 0, # default PSGI_MODIFIER2,
       ) . $data;
 
       # send request

@@ -9,7 +9,7 @@ package Plot;
 #
 # Advertised Plot widgets:  canvas, entry, PostScript_button, view_button.
 
-our ($VERSION) = ('0.92');
+our ($VERSION) = ('0.93');
 
 require 5.005_03;
 
@@ -85,8 +85,14 @@ sub Populate {
     $c->bind('point', '<1>' => [sub {plot_down(@_)}, \%pinfo,  Ev('x'), Ev('y')]);
     $c->bind('point', '<ButtonRelease-1>' => sub {shift->dtag('selected')});
     $c->CanvasBind('<B1-Motion>' => [sub {plot_move(@_)}, \%pinfo, Ev('x'), Ev('y')]);
-    $c->CanvasBind('<2>' => [sub {area_down(@_)}, \%pinfo, Ev('x'), Ev('y')]);
-    $c->CanvasBind('<B2-Motion>' => [sub {area_move(@_)}, \%pinfo, Ev('x'), Ev('y')]);
+    $c->CanvasBind(
+        $cw->windowingsystem ne 'aqua' ? '<2>' : '<3>' =>
+            [sub {area_down(@_)}, \%pinfo, Ev('x'), Ev('y')]
+    );
+    $c->CanvasBind(
+        $cw->windowingsystem ne 'aqua' ? '<B2-Motion>' : '<B3-Motion>' =>
+            [sub {area_move(@_)}, \%pinfo, Ev('x'), Ev('y')]
+    );
 
     my $w_prcmd = $cw->Entry(
         -textvariable => \$pinfo{'prcmd'},

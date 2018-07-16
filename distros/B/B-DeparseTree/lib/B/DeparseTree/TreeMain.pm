@@ -507,11 +507,12 @@ sub walk_lineseq
 	    }
 	}
 	if (B::Deparse::is_for_loop($kids[$i])) {
+	    print "YYY for loop\n" if $ENV{'DEBUG_DEPARSETREE'};
 	    my $loop_expr = $self->for_loop($kids[$i], 0);
 	    $callback->(\@body,
 			$i += $kids[$i]->sibling->name eq "unstack" ? 2 : 1,
 			$loop_expr);
-	    $prev_expr = $expr;
+	    $prev_expr = $loop_expr;
 	    next;
 	}
 	$expr = $self->deparse($kids[$i], (@kids != 1)/2, $op);

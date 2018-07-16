@@ -6,7 +6,7 @@ use Test::More;
 use Test::Fatal;
 
 use lib 'lib';
-use Term::Choose qw( choose );
+use Term::Choose_HAE qw( choose );
 
 no warnings 'redefine';
 sub Term::Choose::__get_key { sleep 0.01; return 0x0d };
@@ -31,16 +31,15 @@ my $begin_errormessage = qr/^choose:/;
 my $int = {
     beep         => '[ 0 1 ]',
     clear_screen => '[ 0 1 ]',
-    fill_up      => '[ 0 1 ]',
     hide_cursor  => '[ 0 1 ]',
     index        => '[ 0 1 ]',
     justify      => '[ 0 1 2 ]',
+    fill_up      => '[ 0 1 2 ]',
     layout       => '[ 0 1 2 3 ]',
     mouse        => '[ 0 1 2 3 4 ]',
     order        => '[ 0 1 ]',
     page         => '[ 0 1 ]',
     keep         => '[ 1-9 ][ 0-9 ]*',
-    ll           => '[ 1-9 ][ 0-9 ]*',
     max_height   => '[ 1-9 ][ 0-9 ]*',
     max_width    => '[ 1-9 ][ 0-9 ]*',
     default      => '[ 0-9 ]+',

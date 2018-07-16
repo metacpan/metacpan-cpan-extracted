@@ -1,0 +1,65 @@
+Astro-Coord-ECI-TLE-Iridium is Copyright (C) 2005-2018 by Thomas R. Wyant, III
+
+DESCRIPTION
+
+This package contains Astro::Coord::ECI::TLE::Iridium. a subclass of
+Astro::Coord::ECI::TLE (not included) which predicts Iridium Classic
+flares.  It was split from the distribution containing
+Astro::Coord::ECI::TLE in anticipation of the retirement of the Iridium
+Classic satellites in favor of Iridium Next, which are not anticipated
+to flare, and in hope of better managing the many canned status changes
+involved in the retirement of the Iridium Classic satellites.
+
+INSTALLATION
+
+Most Perl users will want to install using their favorite of 'cpan',
+'cpanm', or 'cpanp'. For any of these, just install
+Astro::Coord::ECI::TLE::Iridium. ActivePerl users who use ActiveState's
+'ppi' should install Astro-Coord-ECI-TLE-Iridium.
+
+If for some reason neither of these works for you, you can download the
+distribution and expand it using something like
+
+    tar -xzf Astro-Coord-ECI-TLE-Iridium-9.999.tar.gz
+
+Users of MSWin32 (and perhaps other operating systems) may need to
+convert the line endings in the expanded files from Unix to their native
+system before proceeding.
+
+Then, issue one of the following two incantations:
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+or
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    sudo ./Build install
+
+You should substitute the appropriate program name for 'make', eg nmake
+(typically) under MSWin32, or mms or mmk under VMS. See
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake for MSWin32 if you need it.
+
+Unix users may want to use 'su' rather than 'sudo' for the install.
+Non-unix users may need to be logged in to an administrative or
+otherwise privileged accout, and turn on privileges (if applicable) for
+the install.
+
+Of course, since it's pure Perl, you can just expand the kit and drop
+the .pm files into the Astro/Coord/ECI/TLE directory (creating it if
+necessary) in the appropriate place in your @INC directories.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

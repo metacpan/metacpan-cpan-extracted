@@ -4,19 +4,48 @@
       "Mike Friedman <friedo@friedo.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-Plugin-UploadToStratopan",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
+         },
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::PluginBundle::Author::WATERKIP" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -25,8 +54,26 @@
             "LWP::Protocol::https" : "0",
             "Mojo::DOM" : "0",
             "Mojo::UserAgent" : "0",
-            "Moose" : "0"
+            "Moose" : "0",
+            "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Exception" : "0",
+            "Test::Mock::One" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::UploadToStratopan" : {
+         "file" : "lib/Dist/Zilla/Plugin/UploadToStratopan.pm",
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -37,6 +84,12 @@
          "web" : "https://github.com/friedo/dzil-upload-to-stratopan"
       }
    },
-   "version" : "0.012"
+   "version" : "0.013",
+   "x_contributors" : [
+      "Wesley Schwengle <wesley@schwengle.net>",
+      "Erik Carlsson <info@code301.com>"
+   ],
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

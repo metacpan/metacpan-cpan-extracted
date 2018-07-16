@@ -49,7 +49,7 @@ my %WriteMakefile = (
     'NAME'  	 	=> $module,
     'VERSION_FROM' 	=> $main_file,
 	'ABSTRACT_FROM' => $main_file,
-	'LICENSE'       => 'perl',
+	'LICENSE'       => 'artistic_2',
 	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
 
 	'CONFIGURE_REQUIRES' => {

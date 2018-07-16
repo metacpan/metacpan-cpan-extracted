@@ -6,13 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Statistics/Descriptive.pm',
+    'Statistics/Descriptive/Full.pm',
     'Statistics/Descriptive/Smoother.pm',
     'Statistics/Descriptive/Smoother/Exponential.pm',
-    'Statistics/Descriptive/Smoother/Weightedexponential.pm'
+    'Statistics/Descriptive/Smoother/Weightedexponential.pm',
+    'Statistics/Descriptive/Sparse.pm'
 );
 
 

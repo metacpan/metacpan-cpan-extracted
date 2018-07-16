@@ -1,4 +1,7 @@
-Revision history for Perinci-Examples-Bin-Lite
+0.060   2018-07-16 (PERLANCAR)
+
+	- Add script: peri-eg-hello-lite (for benchmarking).
+
 
 0.05    2015-09-03 (PERLANCAR)
 
@@ -31,4 +34,3 @@ Revision history for Perinci-Examples-Bin-Lite
 0.01     2014-10-24 (PERLANCAR)
 
          - First release.
-

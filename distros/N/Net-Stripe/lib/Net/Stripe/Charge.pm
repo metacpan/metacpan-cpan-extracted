@@ -1,5 +1,5 @@
 package Net::Stripe::Charge;
-$Net::Stripe::Charge::VERSION = '0.35';
+$Net::Stripe::Charge::VERSION = '0.36';
 use Moose;
 use Kavorka;
 extends 'Net::Stripe::Resource';
@@ -49,123 +49,7 @@ Net::Stripe::Charge - represent an Charge object from Stripe
 
 =head1 VERSION
 
-version 0.35
-
-=head1 ATTRIBUTES
-
-=head2 amount
-
-Reader: amount
-
-Type: Maybe[Int]
-
-This attribute is required.
-
-=head2 amount_refunded
-
-Reader: amount_refunded
-
-Type: Maybe[Int]
-
-=head2 application_fee
-
-Reader: application_fee
-
-Type: Maybe[Int]
-
-=head2 balance_transaction
-
-Reader: balance_transaction
-
-Type: Maybe[Str]
-
-=head2 captured
-
-Reader: captured
-
-Type: Maybe[Bool|Object]
-
-=head2 card
-
-Reader: card
-
-Type: Maybe[Net::Stripe::Card|Net::Stripe::Token|Str]
-
-=head2 created
-
-Reader: created
-
-Type: Maybe[Int]
-
-=head2 currency
-
-Reader: currency
-
-Type: Maybe[Str]
-
-This attribute is required.
-
-=head2 customer
-
-Reader: customer
-
-Type: Maybe[Str]
-
-=head2 description
-
-Reader: description
-
-Type: Maybe[Str]
-
-=head2 failure_code
-
-Reader: failure_code
-
-Type: Maybe[Str]
-
-=head2 failure_message
-
-Reader: failure_message
-
-Type: Maybe[Str]
-
-=head2 id
-
-Reader: id
-
-Type: Maybe[Str]
-
-=head2 invoice
-
-Reader: invoice
-
-Type: Maybe[Str]
-
-=head2 livemode
-
-Reader: livemode
-
-Type: Maybe[Bool|Object]
-
-=head2 metadata
-
-Reader: metadata
-
-Writer: metadata
-
-Type: Maybe[HashRef]
-
-=head2 paid
-
-Reader: paid
-
-Type: Maybe[Bool|Object]
-
-=head2 refunded
-
-Reader: refunded
-
-Type: Maybe[Bool|Object]
+version 0.36
 
 =head1 AUTHORS
 

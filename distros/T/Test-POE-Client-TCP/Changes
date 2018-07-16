@@ -1,6 +1,29 @@
 ==================================================
-Changes from 2013-07-03 00:00:00 +0000 to present.
+Changes from 2013-07-16 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.22 at 2018-07-15 12:24:13 +0000
+-----------------------------------------
+
+  Change: f3770138dd1fe7948ee2f7633a14dd661daa1267
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-07-15 13:24:13 +0000
+
+    Fixed problem when specifying ssl options 
+
+-----------------------------------------
+version 1.20 at 2018-07-13 18:06:30 +0000
+-----------------------------------------
+
+  Change: dedc0de6a3a6513ac32355393443ae5bee756ec8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-07-13 19:06:30 +0000
+
+    Added sslctx, sslcert and sslkey options
+
+    These allow manipulation of the SSL/TLS connection and to specify
+    client-side certificate, respectively. 
 
 -----------------------------------------
 version 1.18 at 2018-07-02 09:18:10 +0000
@@ -47,5 +70,5 @@ version 1.14 at 2018-05-29 08:22:21 +0000
     Added accessor for 'context' and update documentation 
 
 ================================================
-Plus 7 releases after 2013-07-03 00:00:00 +0000.
+Plus 7 releases after 2013-07-16 00:00:00 +0000.
 ================================================

@@ -1,5 +1,9 @@
 Revision history for Perl extension Tcl.
 
+1.11,12	2018-07-14
+	- fixed Eval('str > 500bytes') 
+	- yet more fixes to stub build
+
 1.06	2018-06-xx
 
 	- sjaluo fix to Tcl.xs/.pm; rt.cpan.org tickets 21181, 125408

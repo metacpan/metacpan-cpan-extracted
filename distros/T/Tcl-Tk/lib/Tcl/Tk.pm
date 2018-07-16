@@ -6,7 +6,7 @@ use Exporter 'import';
 use vars qw(@EXPORT_OK %EXPORT_TAGS);
 
 @Tcl::Tk::ISA = qw(Tcl);
-$Tcl::Tk::VERSION = '1.11';
+$Tcl::Tk::VERSION = '1.12';
 
 sub WIDGET_CLEANUP() {0}
 
@@ -54,6 +54,9 @@ widgets using C<tile>).
 For full functionality you need the Tcl packages "snit", which is part
 of the standard tcl library (see L<core.tcl.tk/tcllib>), and the standard 
 tk library (see L<https://core.tcl.tk/tklib/home>).
+
+Having correct installation of snit is much preferred. In case it isn't found -
+some predefined tcl/snit will be used.
 
 =head2 Access to the Tcl and Tcl::Tk extensions
 
@@ -196,7 +199,7 @@ object hierarchy presents. Interesting point about this object system -
 it is very dynamic. Initially no widgets objects and no widget classes present,
 but they immediately appear at the time when they needed.
 
-So they virtually exist, but come into actual existance dynamically. This
+So they virtually exist, but come into actual existence dynamically. This
 dynamic approach allows same usage of widget library without any mention from
 within C<Tcl::Tk> module at all.
 
@@ -409,7 +412,7 @@ with widget that has given path even if such path do not exists. In case it do
 not actually exist, you will receive an error from Tcl/Tk.
 
 To check if a widget with a given path exists use C<Tcl::Tk::Exists($widget)>
-subroutine. It queries Tcl/Tk for existance of said widget.
+subroutine. It queries Tcl/Tk for existence of said widget.
 
 =head3 C<widget_data> method
 
@@ -624,7 +627,7 @@ sub MainLoop {
 #
 # declare_widget, method of interpreter object
 # args:
-#   - a path of existing Tcl/Tk widget to declare its existance in Tcl::Tk
+#   - a path of existing Tcl/Tk widget to declare its existence in Tcl::Tk
 #   - (optionally) package name where this widget will be declared, default
 #     is 'Tcl::Tk::Widget', but could be 'Tcl::Tk::Widget::somewidget'
 sub declare_widget {
@@ -761,12 +764,11 @@ sub findINC {
 # 'rotext' widget to Tcl/Tk
 sub create_rotext {
     my $int = shift;
+    $int->ensure_snit();
     $int->Eval(<<'EOS');
 # got 'rotext' code from http://mini.net/tcl/3963 and modified a bit
 # (insertion cursor unchanged, unlike was proposed by author of original code)
 if {[info proc rotext]==""} {
-
-package require snit
 
 ::snit::widgetadaptor rotext {
 
@@ -797,10 +799,11 @@ EOS
 sub create_scrolled_widget {
     my $int = shift;
     my $lwtype = shift;
+    $int->ensure_scrolledwindow();
     $int->Eval(<<"EOS");
 if {[info proc scrolled_$lwtype]==""} {
 
-package require widget::scrolledwindow
+# package require widget::scrolledwindow
 
 ::snit::widgetadaptor scrolled_$lwtype {
     component widg
@@ -845,7 +848,7 @@ sub Declare {
 
 #
 # AUTOLOAD method for Tcl::Tk interpreter object, which will bring into
-# existance interpreter methods
+# existence interpreter methods
 sub AUTOLOAD {
     my $int = shift;
     my ($method,$package) = $Tcl::Tk::AUTOLOAD;
@@ -918,6 +921,27 @@ sub AUTOLOAD {
     no strict 'refs';
     *{"$package$fast$method0"} = $sub;
     return $sub->($int,@_);
+}
+
+# some tcl/tk pure-tcl modules, in case these aren't found in tcl/tk:
+sub ensure_snit {
+    my $int = shift;
+    eval{$int->icall('package','require','snit');};
+    if ($@) {
+	$int->Eval(require Tcl::Fallback::snit1);
+    }
+}
+sub ensure_scrolledwindow {
+    my $int = shift;
+    $int->ensure_snit();
+    eval{$int->icall('package','require','widget');};
+    if ($@) {
+	$int->Eval(require Tcl::Fallback::widget);
+    }
+    eval{$int->icall('package','require','widget::scrolledwindow');};
+    if ($@) {
+	$int->Eval(require Tcl::Fallback::scrollw);
+    }
 }
 
 ## ------------------------------------------------------------------------
@@ -2128,8 +2152,9 @@ sub Optionmenu {
     my %args = @_;
 
     if ($int->invoke(qw(info proc optionmenu)) eq '') {
+        $int->ensure_snit();
 	$int->Eval(<<'EOS'); # create proper Optionmenu megawidget with snit
-package require snit
+# package require snit
 ::snit::widgetadaptor optionmenu {
     option -variable -default dummy
     option -textvariable -default dummy
@@ -2224,7 +2249,7 @@ sub Declare {
 }
 
 # here we create Widget package, used for both standard cases like
-# 'Button', 'Label', and so on, and for all other widgets like Baloon
+# 'Button', 'Label', and so on, and for all other widgets like Balloon
 # returns 1 if actually package created, i.e. called first time
 # TODO : document better and provide as public way of doing things?
 my %created_w_packages; # (may be look in global stash %:: ?)

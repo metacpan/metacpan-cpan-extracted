@@ -435,10 +435,11 @@ sub template_engine($$$$)
 		    $len++ if exists $info->{maybe_parens} and $info->{maybe_parens}{parens};
 		    $find_pos = [length($result), length($str)];
 		}
-		if (!$str) {
-		    $result = $old_result;
-		} else {
+		# Note: $str eq 0 add to $result
+		if (defined $str && $str ne '') {
 		    $result .= $str
+		} else {
+		    $result = $old_result;
 		}
 	    }
 	    # # FIXME: Add the final ';' based on an option?

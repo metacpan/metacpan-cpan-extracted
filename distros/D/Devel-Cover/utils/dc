@@ -24,14 +24,14 @@ usage() {
     cat <<EOT
 $script --help
 $script --trace --verbose
-$script --cpancover_dir=/cover/staging_dev --image=pjcj/cpancover_dev cpancover-run
+$script --results_dir=/cover/dev --image=pjcj/cpancover_dev cpancover-run
 EOT
     exit 0
 }
 
 cleanup() {
     declare -r res=$?
-    ((verbose)) && pi "Cleaning up"
+    # ((verbose)) && pi "Cleaning up"
     exit $res
 }
 
@@ -43,9 +43,10 @@ PATH="$srcdir:$PATH"
 verbose=${CPANCOVER_VERBOSE:-}
 force=${CPANCOVER_FORCE:-}
 alocal=${CPANCOVER_LOCAL:-}
-cpancover_staging=${CPANCOVER_STAGING:-~/staging}
+results_dir=${CPANCOVER_RESULTS_DIR:-~/staging}
 docker=${CPANCOVER_DOCKER:-docker}
 docker_image=${CPANCOVER_IMAGE:-pjcj/cpancover}
+dryrun=${CPANCOVER_DRYRUN:-}
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -69,13 +70,17 @@ while [ $# -gt 0 ]; do
             alocal=1
             shift
             ;;
-        -d|--cpancover_dir)
-            cpancover_staging="$2"
+        -r|--results_dir)
+            results_dir="$2"
             shift 2
             ;;
         -i|--image)
             docker_image="$2"
             shift 2
+            ;;
+        -d|--dryrun)
+            dryrun=1
+            shift
             ;;
         *)
             break
@@ -86,12 +91,11 @@ done
 export CPANCOVER_VERBOSE=$verbose
 export CPANCOVER_FORCE=$force
 export CPANCOVER_LOCAL=$alocal
-export CPANCOVER_STAGING=$cpancover_staging
+export CPANCOVER_RESULTS_DIR=$results_dir
 export CPANCOVER_DOCKER=$docker
 export CPANCOVER_IMAGE=$docker_image
+export CPANCOVER_DRYRUN=$dryrun
 
-# TODO - clarify relationship between these two
-cpancover_dir=$cpancover_staging
 dcdir=$(readlink -f "$srcdir/..")
 
 main() {
@@ -143,23 +147,31 @@ main() {
         cpancover)
             shift;
             jobs=$($0 nice_cpus)
+            mkdir -p "$results_dir"
             if ((alocal)); then
                 root=
                 [ -d /dc ] && root=/dc/
-                cpancover="perl -Mblib=$root ${root}bin/cpancover -local"
+                cpancover="perl -Mblib=$root ${root}bin/cpancover --local"
             else
                 cpancover=cpancover
             fi
-            ((verbose)) && cpancover="$cpancover -verbose"
-            ((force))   && cpancover="$cpancover -force"
-            cmd="$cpancover -results_dir $cpancover_dir -workers $jobs $*"
+            ((verbose)) && cpancover="$cpancover --verbose"
+            ((force))   && cpancover="$cpancover --force"
+            ((dryrun))  && cpancover="$cpancover --dryrun"
+            cmd="$cpancover --results_dir $results_dir --workers $jobs $*"
             ((verbose)) && pi "$cmd"
             $cmd
             ;;
         cpancover-compress)
-            find "$cpancover_dir/" -name __failed__ -prune -o                 \
-                                -type f -not -name '*.gz' -not -name '*.json' \
-                                -exec gzip -f9 {} \;
+            find "$results_dir/" -name __failed__ -prune -o   \
+                -type f -not -name '*.gz' -not -name '*.json' \
+                -exec gzip -f9 {} \;
+            ;;
+        cpancover-uncompress-dir)
+            subdir="${2:?No subdir specified}"
+            find "$results_dir/$subdir/" -name __failed__ -prune -o \
+                -type f -name '*.gz'                                \
+                -exec gzip -d {} \;
             ;;
         cpancover-latest)
             $0 cpancover -latest
@@ -170,20 +182,20 @@ main() {
             $0 cpancover-compress
             ;;
         cpancover-docker-shell)
-            staging="${2:-$cpancover_dir}"
+            staging="${2:-$results_dir}"
             mkdir -p "$staging"
             # pd $name
-            $docker run -it                                      \
-                --volume="$dcdir:/dc:ro"                         \
-                --volume="$cpancover_staging:/remote_staging:rw" \
-                --workdir=/dc --rm=false                         \
-                --memory=1g                                      \
+            $docker run -it                            \
+                --volume="$dcdir:/dc:ro"               \
+                --volume="$staging:/remote_staging:rw" \
+                --workdir=/dc --rm=false               \
+                --memory=1g                            \
                 "$docker_image" /bin/bash
             ;;
         cpancover-docker-module)
             module="$2"
             name="$3"
-            staging="${4:-$cpancover_dir}"
+            staging="${4:-$results_dir}"
             mkdir -p "$staging"
             # pd "name: $name"
             l="";
@@ -192,7 +204,7 @@ main() {
             ((alocal)) && [ -d /dc ] && dir=/dc/
             container=$($docker run -d                                   \
                         --volume="$dcdir:/dc:ro"                         \
-                        --volume="$cpancover_staging:/remote_staging:ro" \
+                        --volume="$staging:/remote_staging:ro"           \
                         --workdir=/dc --rm=false --name="$name"          \
                         --memory=1g                                      \
                         "$docker_image"                                  \
@@ -225,9 +237,10 @@ main() {
         cpancover-generate-html)
             pi "Generating HTML at $(date)"
             # perl -V
+            $0 cpancover-compress-old-versions
             $0 cpancover -generate_html
             $0 cpancover-compress
-            json=$cpancover_dir/cpancover.json
+            json=$results_dir/cpancover.json
             tmp=$json-tmp-$$.gz
             pi "Compressing $json"
             pigz < "$json" > "$tmp" && mv "$tmp" "$json.gz"
@@ -244,11 +257,17 @@ main() {
                 sleep 600  # 10 minutes
             done
             ;;
+        cpancover-compress-old-versions)
+            keep="${2:-3}"
+            $0 cpancover --nobuild --compress_old_versions "$keep"
+            ;;
         cpancover-kill-docker)
-            $docker ps -a | tail -n +2 | awk '{ print $1 }' | xargs -r "$docker" kill
+            $docker ps -a | tail -n +2 | awk '{ print $1 }' \
+                          | xargs -r "$docker" kill
             ;;
         cpancover-rm-docker)
-            $docker ps -a | tail -n +2 | awk '{ print $1 }' | xargs -r "$docker" rm -f
+            $docker ps -a | tail -n +2 | awk '{ print $1 }' \
+                          | xargs -r "$docker" rm -f
             $docker system prune --force
             ;;
         sereal_each_bug)
@@ -264,7 +283,7 @@ main() {
             rm tests/change
             ;;
         options)
-            perl -nE 'say $1 =~ s/"//gr =~ s/\s*\|\s*/\n/gr' \
+            perl -nE 'say $1 =~ s/"//gr =~ s/\s*\|\s*/\n/gr'               \
                 -E 'if /^ {8}"?([a-zA-Z0-9_ "|\\-]+)"?(?:\)|\s*\|\s*\\)$/' \
                 -E '&& $1 !~ /^_/' < "$0"
             ;;

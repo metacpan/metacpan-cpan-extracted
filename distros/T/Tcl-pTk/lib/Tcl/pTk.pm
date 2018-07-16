@@ -1,6 +1,6 @@
 package Tcl::pTk;
 
-our ($VERSION) = ('0.92');
+our ($VERSION) = ('0.93');
 
 use strict;
 use Tcl;
@@ -146,8 +146,8 @@ for a simple example.
 
 =item *
 
-All the perl/tk widget demos work with minimal changes. Typically the only changes needed are just changing the "Use Tk;"
-to "Use Tcl::pTk" at the top of the file. See the I<widgetTclpTk> demo script included in the source distribution to run the demos.
+All the perl/tk widget demos work with minimal changes. Typically the only changes needed are just changing the C<use Tk;>
+to C<use Tcl::pTk;> at the top of the file. See the I<widgetTclpTk> demo script included in the source distribution to run the demos.
 
 =item *
 
@@ -218,7 +218,7 @@ but no existing perl/Tk codebase to support.
 
 Before you start using widgets, an interpreter (at least one) should be
 created, which will manage all things in Tcl. Creating an interpreter is created automatically
-my the call to the C<MainWindow> (or C<tkinit>) methods, but can also be created explicitly.
+by the call to the C<MainWindow> (or C<tkinit>) methods, but can also be created explicitly.
 
 B<Example showing perl/Tk compatible syntax:>
 For perl/tk syntax, the interpreter is created for you when you create the mainwindow.
@@ -298,7 +298,7 @@ The Widget path is a string starting with a dot and consisting of several
 names separated by dots. These names are individual widget-names that comprise
 a widget's hierarchy. As an example, if there exists a frame with a path
 C<.fram>, and you want to create a button on it and name it C<butt>, then
-you should specify name C<.fram.butt>. Widget paths are also refered in
+you should specify name C<.fram.butt>. Widget paths are also referred in
 other miscellaneous widget operations, like geometry management.
 
 At any time a widget's path can be retreived with C<< $widget->path; >>
@@ -359,7 +359,7 @@ C<Tcl::pTk> Widgets fall into the following basic categories, based on how they 
 =item Direct auto-wrapped widgets
 
 These types of widgets (for example the Entry, Button, Scrollbar, and Label widgets) have no special code written for them
-in C<Tcl::pTk>. Their creation and method calls (e.g. C<$button->configure(-text => 'ButtonText')> ) are handled
+in C<Tcl::pTk>. Their creation and method calls (e.g. C<< $button->configure(-text => 'ButtonText') >>) are handled
 by the wrapping code in the base Tcl::pTk::Widget package.
 
 =item Auto-wrapped widgets, with compatibility code
@@ -412,7 +412,7 @@ The second code line above calls the C<insert> method of the C<$entry> object.
 When invoked first time, a method (i.e. subref) C<insert> is 
 created in package C<Tcl::pTk::Entry>, which will end-up calling
 calling the C<invoke> method on the Tcl/Tk interpreter (i.e. 
-C<$entry->interp()->invoke($entry, 'insert', -text, 'text')
+C<< $entry->interp()->invoke($entry, 'insert', -text, 'text') >>).
 
 The first time C<insert> is called, the C<insert> method does not exist, so AUTOLOAD
 comes into play and creates the method. The second time C<insert> is called, the already-created
@@ -438,9 +438,9 @@ C<Tcl::pTk::Text>. This C<insert> method is already defined in the C<Tcl::pTk::T
 so it is called directly. 
 
 The third code line above calls the C<markNames> method on the C<$text> object. This method
-is not defined in the C<Tcl::pTk::Text> package, so the first time when C<makrNames> is called, 
+is not defined in the C<Tcl::pTk::Text> package, so the first time when C<markNames> is called, 
 AUTOLOAD in the L<Tcl::pTk> package comes into play and creates the method. 
-The second time C<makkNames> is called, the already-created
+The second time C<markNames> is called, the already-created
 method is called directly (i.e. not created again), thus saving execution time.
 
 =back
@@ -495,8 +495,8 @@ C<.path method submeth subsubmeth parameter1 parameter2> I<....>
 If you are sure that preprocessing of C<@parameters> in a method call aren't required
 (i.e. no parameters are Perl references to scalars, subroutines or arrays), then
 the preprocessing step described above can be skipped by calling the method with
-an underscore C<_> prepended to the name. (e.g call C<$text->_markNames()>, instead of
-C<$text->markNames()>). Calling the method this way means you are using an internal
+an underscore C<_> prepended to the name. (e.g call C<< $text->_markNames() >>, instead of
+C<< $text->markNames() >>). Calling the method this way means you are using an internal
 method that executes faster, but normally you should use a "public" (i.e. non-underscore) method, which includes all preprocessing.
 
 Example:
@@ -558,7 +558,7 @@ This means
 
  my $tab = $mw->BLTNoteBook;
 
-will create blt::tabnotebook widget. Effectively, this is equavalent to the following
+will create blt::tabnotebook widget. Effectively, this is equivalent to the following
 Tcl/Tk code:
 
   package require BLT # but invoked only once
@@ -604,8 +604,8 @@ invoke it in C<Tcl::pTk> like
 The C<$widget> variable in C<Tcl::pTk> is like the I<pathName> in the Tcl/Tk docs.
 
 Sometimes the Tcl/Tk method-name consists of two words (verb1 verb2). In this
-case there are two equivalent ways to invoke it, C< $widget->verb1('verb2',...); > or
-C< $widget->verb1Verb2(...)>; 
+case there are two equivalent ways to invoke it, C<< $widget->verb1('verb2',...); >> or
+C<< $widget->verb1Verb2(...); >>. 
 
 Widget options are used just like they are shown in the Tcl/Tk docs. There is no special translation needed
 for the widget options described in the Tcl/Tk docs for use in C<Tcl::pTk>.
@@ -868,7 +868,7 @@ sub MainLoop {
     # Tk_GetNumMainWindows C API.
     # This could optionally be implemented with 'vwait' on a specially
     # named variable that gets set when '.' is destroyed.
-    unless ($inMainLoop){     # Don't recursivly enter into a mainloop
+    unless ($inMainLoop){     # Don't recursively enter into a mainloop
         local $inMainLoop = 1;
     	my $int = (ref $_[0]?shift:$tkinterp);
     	my $mainwindow = $W{mainwindow};  
@@ -995,7 +995,7 @@ sub create_widget{
 #
 # declare_widget, method of interpreter object
 # args:
-#   - a path of existing Tcl/Tk widget to declare its existance in Tcl::pTk
+#   - a path of existing Tcl/Tk widget to declare its existence in Tcl::pTk
 #   - (optionally) package name where this widget will be declared, default
 #     is 'Tcl::pTk::Widget', but could be 'Tcl::pTk::somewidget'
 sub declare_widget {
@@ -1222,7 +1222,7 @@ sub Declare {
 
 #
 # AUTOLOAD method for Tcl::pTk interpreter object, which will bring into
-# existance interpreter methods
+# existence interpreter methods
 sub AUTOLOAD {
     my $int = shift;
     my ($method,$package) = $Tcl::pTk::AUTOLOAD;
@@ -1385,7 +1385,7 @@ sub SELECT_BG{
 }
 
 # Background error routine that calls Tcl::pTk::Error, similar to perltk calling Tk::Error
-#  Upon Tcl interp creation, this routine is created in Tcl (called the special name bgerror) so that this Tcl::pTk:;bgerror
+#  Upon Tcl interp creation, this routine is created in Tcl (called the special name bgerror) so that this Tcl::pTk:::bgerror
 #   will be called for background errors
 sub bgerror{
                 my ($what,$obj, $sub, $message) =  @_; 
@@ -1645,7 +1645,7 @@ __END__
 #   when the user supplies their own Error routine or Tcl::pTk::ErrorDialog is used.
 
 ## This is an adaptation (but very similar) of the standard Tk::Error sub in Tk.pm
-#    This routine is called by bgerror, similar to the way Tk:Error in called with perltk when a background error occurs
+#    This routine is called by bgerror, similar to the way Tk::Error in called with perltk when a background error occurs
 sub Error{
  my $w = shift;
  my $error = shift;

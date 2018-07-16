@@ -1,7 +1,7 @@
 package Test::Against::Dev;
 use strict;
-use 5.10.1;
-our $VERSION = '0.09';
+use 5.14.0;
+our $VERSION = '0.10';
 use Carp;
 use Cwd;
 use File::Basename;
@@ -1165,6 +1165,7 @@ sub analyze_json_logs {
         $self->{perl_version},
         'log',
         'json',
+        'tar',
         'gz'
     ) );
     my $foutput = File::Spec->catfile($self->{storage_dir}, $output);

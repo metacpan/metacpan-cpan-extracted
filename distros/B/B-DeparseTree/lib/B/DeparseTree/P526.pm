@@ -210,32 +210,6 @@ sub pp_av2arylen {
     }
 }
 
-sub list_const($$$) {
-    my $self = shift;
-    my($op, $cx, @list) = @_;
-    my @a = map $self->const($_, 6), @list;
-    my @texts = $self->map_texts(\@a);
-    my $type = 'list_const';
-    my $prec = 6;
-    if (@texts == 0) {
-	return info_from_list($op, $self, ['(', ')'], '', 'list_const_null', {});
-    } elsif (@texts == 1) {
-	return info_from_text($op, $self, $texts[0], 'list_const_one',
-	    {body => \@a});
-    } elsif ( @texts > 2 and !grep(!/^-?\d+$/, @texts)) {
-	# collapse (-1,0,1,2) into (-1..2)
-	my ($s, $e) = @texts[0,-1];
-	my $i = $s;
-	unless (grep $i++ != $_, @texts) {
-	    @texts = ($s, '..', $e);
-	    $type = 'list_const_range';
-	    $prec = 9;
-	}
-    }
-    return info_from_list($op, $self, \@texts,  '', $type,
-	{maybe_parens => [$self, $cx, $prec]});
-}
-
 sub pp_rv2av {
     my $self = shift;
     my($op, $cx) = @_;

@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -60,7 +60,7 @@
    "provides" : {
       "MooseX::Final" : {
          "file" : "lib/MooseX/Final.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-Final/project"
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

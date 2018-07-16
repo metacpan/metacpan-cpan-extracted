@@ -52,16 +52,17 @@ EOS
 unless ($res =~ /^ok2/m) {
   warn <<EOS;
 
-Your Tk installation fails to find 'snit' package. For full functionality
-this package is required. Make sure that it is installed within your Tcl/Tk.
+Your Tk installation fails to find 'snit' package.
+Some old copy of snit1 will be used. The correct one is prefered.
 EOS
 }
 
 unless ($res =~ /^ok3/m) {
   warn <<EOS;
 
-Your Tk installation fails to find 'tklib' package. For full functionality
-this package is required. Make sure that it is installed within your Tcl/Tk.
+Your Tk installation fails to find 'tklib' package. This package is recommended,
+otherwise we'll substitute some older version.
+Be informed on this and better have this package installed within your Tcl/Tk.
 EOS
 }
 
@@ -82,7 +83,7 @@ WriteMakefile(
 	keywords => [qw(Tk Tcl/Tk/Tix GUI)],
     },
     PREREQ_PM => {
-	Tcl => 0.98,
+	Tcl => 1.11, # this is required, otherwise $int->Eval(">500octets") silently misbehaves
     },
 );
 

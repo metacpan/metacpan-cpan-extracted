@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Convert-BCA
   homepage: https://metacpan.org/release/Finance-Currency-Convert-BCA
   repository: git://github.com/perlancar/perl-Finance-Currency-Convert-BCA.git
-version: '0.153'
+version: '0.154'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

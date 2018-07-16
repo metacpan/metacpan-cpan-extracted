@@ -12,15 +12,15 @@ use Role::Commons -all;
 
 use Boxer::CLI -command;
 
-use namespace::clean;
+use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.7
+Version v1.1.8
 
 =cut
 
-our $VERSION = version->declare("v1.1.7");
+our $VERSION = version->declare("v1.1.8");
 
 use constant {
 	abstract   => q[list which boxer plugins are installed],
@@ -51,7 +51,7 @@ sub execute
 		FORMAT_STR,
 		ref( $self->app ),
 		$self->app->VERSION,
-		$auth ? $self->app->$auth : '???',
+		$auth ? $self->app->$auth || '???' : '???',
 	);
 
 	foreach my $cmd ( sort $self->app->command_plugins ) {
@@ -60,7 +60,7 @@ sub execute
 			FORMAT_STR,
 			$cmd,
 			$cmd->VERSION,
-			$auth ? $cmd->$auth : '???',
+			$auth ? $cmd->$auth || '???' : '???',
 		);
 	}
 }

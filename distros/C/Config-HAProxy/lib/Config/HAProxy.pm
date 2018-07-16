@@ -14,7 +14,7 @@ use File::Temp qw(tempfile);
 use File::stat;
 use Carp;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 my %sections = (
     global => 1,

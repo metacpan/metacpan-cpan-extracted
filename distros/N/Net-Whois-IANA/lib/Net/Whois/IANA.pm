@@ -1,169 +1,216 @@
 package Net::Whois::IANA;
-
+$Net::Whois::IANA::VERSION = '0.44';
 use 5.006;
 
 use strict;
 use warnings;
 
-use Carp;
-use IO::Socket;
-
-use Net::CIDR;
-
-use base 'Exporter';
-
-our $WHOIS_PORT    = 43;
-our $WHOIS_TIMEOUT = 30;
-
-our %IANA = (
-	apnic   => [
-		[ 'whois.apnic.net',   $WHOIS_PORT, $WHOIS_TIMEOUT, \&apnic_query   ],
-	],
-	ripe    => [
-		[ 'whois.ripe.net',    $WHOIS_PORT, $WHOIS_TIMEOUT, \&ripe_query    ],
-	],
-	arin    => [
-		[ 'whois.arin.net',    $WHOIS_PORT, $WHOIS_TIMEOUT, \&arin_query    ],
-	],
-	lacnic  => [
-		[ 'whois.lacnic.net',  $WHOIS_PORT, $WHOIS_TIMEOUT, \&lacnic_query  ],
-	],
-	afrinic => [
-		[ 'whois.afrinic.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&afrinic_query ],
-	],
-);
+use Carp       ();
+use IO::Socket ();
+use Net::CIDR  ();
 
 use base 'Exporter';
 
-our $AUTOLOAD;
-our @IANA = keys %IANA;
+# ABSTRACT: Net::Whois::IANA - A universal WHOIS data extractor.
 
-our @EXPORT = qw(
-	@IANA
-	%IANA
-);
+our $WHOIS_PORT           = 43;
+our $WHOIS_TIMEOUT        = 30;
+our @DEFAULT_SOURCE_ORDER = qw(arin ripe apnic lacnic afrinic);
 
-our $VERSION = '0.41';
+our %IANA;
+our @IANA;
+
+BEGIN {
+    # populate the hash at compile time
+
+    %IANA = (
+        apnic => [
+            [ 'whois.apnic.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&apnic_query ],
+        ],
+        ripe => [ [ 'whois.ripe.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&ripe_query ], ],
+        arin => [ [ 'whois.arin.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&arin_query ], ],
+        lacnic => [
+            [ 'whois.lacnic.net', $WHOIS_PORT, $WHOIS_TIMEOUT, \&lacnic_query ],
+        ],
+        afrinic => [
+            [
+                'whois.afrinic.net', $WHOIS_PORT,
+                $WHOIS_TIMEOUT,      \&afrinic_query
+            ],
+        ],
+    );
+
+    @IANA = sort keys %IANA;
+
+    # accessors
+    # do not use AUTOLOAD - only accept lowercase function name
+    # define accessors at compile time
+    my @accessors = qw{country netname desc status source server inetnum inet6num cidr};
+
+    foreach my $accessor (@accessors) {
+        no strict 'refs';
+        *$accessor = sub {
+            my ($self) = @_;
+            die qq[$accessor is a method call] unless ref $self;
+            return unless $self->{QUERY};
+            return $self->{QUERY}->{$accessor};
+        };
+    }
+}
+
+our @EXPORT = qw( @IANA %IANA );
 
 sub new ($) {
 
     my $proto = shift;
     my $class = ref $proto || $proto;
-    my $self = {};
+    my $self  = {};
 
     bless $self, $class;
+
     return $self;
 }
 
-sub AUTOLOAD ($;@) {
-
-	my $self = shift;
-	my @params = @_;
-
-	my $method = $AUTOLOAD;
-	$method = lc $method;
-	my @path = split(/\:\:/, $method);
-	$method = pop @path;
-	return if $method =~ 'destroy';
-	carp "No such method or property $method\n"
-		unless exists $self->{QUERY} && exists $self->{QUERY}{$method};
-	return $self->{QUERY}{$method};
-}
-
 sub whois_connect ($;$$) {
+    my ( $host, $port, $timeout ) = @_;
 
-    my $host    = shift;
-	my $port;
-	my $timeout;
+    ( $host, $port, $timeout ) = @$host if ref $host;
 
-	if (ref $host && ref $host eq 'ARRAY') {
-		$port    = $host->[1] || $WHOIS_PORT;
-		$timeout = $host->[2] || $WHOIS_TIMEOUT;
-		$host    = $host->[0];
-	}
-	else {
-		$port    = shift || $WHOIS_PORT;
-		$timeout = shift || $WHOIS_TIMEOUT;
-	}
+    $port    ||= $WHOIS_PORT;
+    $timeout ||= $WHOIS_TIMEOUT;
 
-	my $retries = 2;
-	my $sleep   = 1;
-	my $r = 0;
-	my $sock;
+    #my $port    = $host_ref->[1] || $WHOIS_PORT;
+    #my $timeout = $host_ref->[2] || $WHOIS_TIMEOUT;
+    #my $host    = $host_ref->[0];
+    my $retries = 2;
+    my $sleep   = 2;
 
-	do {
-		if ($r) {
-			carp "Cannot connect to $host at port $port";
-			carp $@;
-			sleep $sleep;
-		}
-		$sock = IO::Socket::INET->new(
-			PeerAddr => $host,
-			PeerPort => $port,
-			Timeout  => $timeout,
-		);
-		$r++;
-	} until ($sock || $r == $retries);
+    my $sock;
 
-    return $sock || 0;
+    foreach my $iter ( 0 .. $retries ) {
+        local $@;
+
+        # catch errors
+        eval {
+            $sock = IO::Socket::INET->new(
+                PeerAddr => $host,
+                PeerPort => $port,
+                Timeout  => $timeout,
+            );
+            1;
+        } and return $sock;
+
+        Carp::carp "Cannot connect to $host at port $port";
+        Carp::carp $@;
+        sleep $sleep unless $iter == $retries;    # avoid the last sleep
+    }
+    return 0;
 }
 
+sub is_valid_ipv4 ($) {
+
+    my $ip = shift;
+
+    return $ip
+      && $ip =~ /^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)$/
+
+      # not absolutely correct
+      && ( ( $1 + 0 ) | ( $2 + 0 ) | ( $3 + 0 ) | ( $4 + 0 ) ) < 0x100;
+}
+
+sub is_valid_ipv6 {
+    my ($ip) = @_;
+
+    return
+      if $ip =~ /^:[^:]/
+      || $ip =~ /[^:]:$/;    # Can't have single : on front or back
+
+    my @seg = split /:/, $ip, -1;    # -1 to keep trailing empty fields
+                                     # Clean up leading/trailing double colon effects.
+    shift @seg if $seg[0] eq '';
+    pop @seg   if $seg[-1] eq '';
+
+    my $max = 8;
+    if ( $seg[-1] =~ tr/.// ) {
+        return unless is_valid_ipv4( pop @seg );
+        $max -= 2;
+    }
+
+    my $cmp;
+    for my $seg (@seg) {
+        if ( $seg eq '' ) {
+
+            # Only one compression segment allowed.
+            return if $cmp;
+            ++$cmp;
+            next;
+        }
+        return if $seg =~ /[^0-9a-fA-F]/;
+        return if length $seg == 0 || length $seg > 4;
+    }
+    if ($cmp) {
+
+        # If compressed, we need fewer than $max segments, but at least 1
+        return ( @seg && @seg < $max ) && 1;    # true returned as 1
+    }
+
+    # Not compressed, all segments need to be there.
+    return $max == @seg;
+}
+
+# Is valid IP v4 or IP v6 address.
 sub is_valid_ip ($) {
+    my ($ip) = @_;
 
-	my $ip = shift;
-
-	return $ip
-		&& $ip =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/
-		&& (($1+0)|($2+0)|($3+0)|($4+0)) < 0x100;
+    return unless defined $ip;                  # shortcut earlier
+    return index( $ip, ':' ) >= 0 ? is_valid_ipv6($ip) : is_valid_ipv4($ip);
 }
 
 sub set_source ($$) {
 
-	my $self   = shift;
-	my $source = shift;
+    my $self   = shift;
+    my $source = shift;
 
-	$self->{source} = {%IANA} || return 0 unless $source;
-	return 0 unless $source;
-	unless (ref $source) {
-		if($IANA{$source}) {
-			$self->{source} = {$source => $IANA{$source} };
-			return 0;
-		}
-		return 1;
-	}
-	return 2 unless ref $source eq 'HASH' && scalar grep {
-		ref $_ && ref $_ eq 'ARRAY' && @{$_} &&
-		ref $_->[0] && ref $_->[0] eq 'ARRAY' && @{$_->[0]} &&
-		$_->[0][0]
-	} values %{$source} == scalar keys %{$source};
-	$self->{source} = $source;
-	return 0;
+    $self->{source} = {%IANA} || return 0 unless $source;
+    return 0 unless $source;
+    unless ( ref $source ) {
+        if ( $IANA{$source} ) {
+            $self->{source} = { $source => $IANA{$source} };
+            return 0;
+        }
+        return 1;
+    }
+    return 2
+      unless ref $source eq 'HASH'
+      && scalar grep { ref $_ && ref $_ eq 'ARRAY' && @{$_} && ref $_->[0] && ref $_->[0] eq 'ARRAY' && @{ $_->[0] } && $_->[0][0] } values %{$source} == scalar keys %{$source};
+    $self->{source} = $source;
+    return 0;
 }
 
 sub init_query ($%) {
 
-    my $self = shift;
+    my $self  = shift;
     my %param = @_;
 
-    if (! is_valid_ip($param{-ip})) {
-		warn q{
+    if ( !is_valid_ip( $param{-ip} ) ) {
+        warn q{
 Method usage:
 $iana->whois_query(
 	-ip=>$ip,
 	-debug=>$debug, # optional
 	-whois=>$whois | -mywhois=>\%mywhois, # optional
 };
-		return {};
-	}
+        return {};
+    }
 
-	my $set_source = $self->set_source($param{-whois} || $param{-mywhois});
-	if ($set_source == 1) {
-		warn "Unknown whois server requested. Known servers are:\n";
-		warn join(", ", @IANA) . "\n";
-		return {};
-	}
-    elsif ($set_source == 2) {
-		warn q{
+    my $set_source = $self->set_source( $param{-whois} || $param{-mywhois} );
+    if ( $set_source == 1 ) {
+        warn "Unknown whois server requested. Known servers are:\n";
+        warn join( ", ", @IANA ) . "\n";
+        return {};
+    }
+    elsif ( $set_source == 2 ) {
+        warn q{
 Custom sources must be of form:
 %source = (
 	source_name1 => [
@@ -179,74 +226,72 @@ Custom sources must be of form:
 }
 
 sub source_connect ($$) {
+    my ( $self, $source_name ) = @_;
 
-	my $self = shift;
-	my $source_name = shift;
-	my $i = 0;
-	my $sock;
-	do {
-		$sock = whois_connect($self->{source}{$source_name}[$i]);
-		$self->{query_sub} =
-			ref $self->{source}{$source_name}[$i][3] &&
-			ref $self->{source}{$source_name}[$i][3] eq 'CODE' ?
-				$self->{source}{$source_name}[$i][3] : \&default_query;
-		$self->{whois_host} = $self->{source}{$source_name}[$i][0];
-		$i++;
-	} until ($sock || !defined $self->{source}{$source_name}[$i]);
-	return $sock;
+    foreach my $server_ref ( @{ $self->{source}{$source_name} } ) {
+        if ( my $sock = whois_connect($server_ref) ) {
+            my ( $whois_host, $whois_port, $whois_timeout, $query_code ) = @{$server_ref};
+            $self->{query_sub} = $query_code
+              && ref $query_code eq 'CODE' ? $query_code : \&default_query;
+            $self->{whois_host} = $whois_host;
+            return $sock;
+        }
+    }
+    return undef;
 }
 
 sub post_process_query (%) {
 
-	my %query = @_;
-	for my $qkey (keys %query) {
-		chomp $query{$qkey} if defined $query{$qkey};
-		$query{abuse} = $query{$qkey} and last
-			if $qkey =~ /abuse/i && $query{$qkey} =~ /\@/;
-	}
-	unless ($query{abuse}) {
-		if ($query{fullinfo} && $query{fullinfo} =~ /(\S*abuse\S*\@\S+)/m) {
-			$query{abuse} = $1;
-		}
-		elsif ($query{email} || $query{'e-mail'} || $query{orgtechemail}) {
-			$query{abuse} =
-				$query{email} || $query{'e-mail'} || $query{orgtechemail};
-		}
-	}
-	if (!ref $query{cidr}) {
-		if ($query{cidr} =~ /\,/) {
-			$query{cidr} = [split(/\, /, $query{cidr})];
-		}
-		else {
-			$query{cidr} = [ $query{cidr} ];
-		}
-	}
-	return %query;
+    my %query = @_;
+    for my $qkey ( keys %query ) {
+        chomp $query{$qkey} if defined $query{$qkey};
+        $query{abuse} = $query{$qkey} and last
+          if $qkey =~ /abuse/i && $query{$qkey} =~ /\@/;
+    }
+    unless ( $query{abuse} ) {
+        if ( $query{fullinfo} && $query{fullinfo} =~ /(\S*abuse\S*\@\S+)/m ) {
+            $query{abuse} = $1;
+        }
+        elsif ( $query{email} || $query{'e-mail'} || $query{orgtechemail} ) {
+            $query{abuse} =
+              $query{email} || $query{'e-mail'} || $query{orgtechemail};
+        }
+    }
+    if ( !ref $query{cidr} ) {
+        if ( defined $query{cidr} && $query{cidr} =~ /\,/ ) {
+            $query{cidr} = [ split( /\s*\,\s*/, $query{cidr} ) ];
+        }
+        else {
+            $query{cidr} = [ $query{cidr} ];
+        }
+    }
+
+    return %query;
 }
 
 sub whois_query ($%) {
+    my ( $self, %params ) = @_;
 
-	my $self = shift;
-	my %params = @_;
-
-	$self->init_query(%params);
-	my @source_names = keys %{$self->{source}};
+    $self->init_query(%params);
     $self->{QUERY} = {};
-    for my $source_name (@source_names) {
-		print STDERR "Querying $source_name ...\n" if $params{-debug};
-		my $sock = $self->source_connect($source_name) ||
-			carp "Connection failed to $source_name." && next;
-		my %query = $self->{query_sub}($sock, $params{-ip});
-		next if (! keys %query);
-		carp "Warning: permission denied at $source_name server $self->{whois_host}\n" and next
-			if $query{permission} eq 'denied';
-		$query{server} = uc $source_name;
-		$self->{QUERY} = {post_process_query(%query)};
-		return $self->{QUERY};
+
+    for my $source_name (@DEFAULT_SOURCE_ORDER) {
+        print STDERR "Querying $source_name ...\n" if $params{-debug};
+        my $sock = $self->source_connect($source_name)
+          || Carp::carp "Connection failed to $source_name." && next;
+        my %query = $self->{query_sub}( $sock, $params{-ip} );
+
+        next unless keys %query;
+        do { Carp::carp "Warning: permission denied at $source_name server $self->{whois_host}\n"; next }
+          if $query{permission} && $query{permission} eq 'denied';
+        $query{server} = uc $source_name;
+        $self->{QUERY} = { post_process_query(%query) };
+
+        return $self->{QUERY};
     }
+
     return {};
 }
-
 
 sub default_query ($$) {
 
@@ -255,328 +300,320 @@ sub default_query ($$) {
 
 sub ripe_read_query ($$) {
 
-	my $sock = shift;
-	my $ip = shift;
+    my ( $sock, $ip ) = @_;
 
-    my %query = (fullinfo => '');
+    my %query = ( fullinfo => '' );
     print $sock "-r $ip\n";
     while (<$sock>) {
-		$query{fullinfo} .= $_;
-		close $sock and return (permission => 'denied') if /ERROR:201/;
-		next if (/^(\%|\#)/ || !/\:/);
-		s/\s+$//;
-		my ($field,$value) = split(/:/);
-		$value =~ s/^\s+//;
-		$query{$field} .= $value;
-		last if (/^route/);
+        $query{fullinfo} .= $_;
+        close $sock and return ( permission => 'denied' ) if /ERROR:201/;
+        next if ( /^(\%|\#)/ || !/\:/ );
+        s/\s+$//;
+        my ( $field, $value ) = split( /:/, $_, 2 );
+        $value =~ s/^\s+//;
+        $query{ lc($field) } .= ( $query{ lc($field) } ? ' ' : '' ) . $value;
     }
     close $sock;
-	return %query;
+    return %query;
 }
 
 sub ripe_process_query (%) {
 
-	my %query = @_;
+    my %query = @_;
+
     if (
-		(
-			defined $query{remarks} &&
-			$query{remarks} =~ /The country is really world wide/
-		) || (
-			defined $query{netname} &&
-			$query{netname} =~ /IANA-BLK/
-		) || (
-			defined $query{netname} &&
-			$query{netname} =~ /AFRINIC-NET-TRANSFERRED/
-		) || (
-			defined $query{country} &&
-			$query{country} =~ /world wide/
-		)
-	) {
-		return ();
+        ( defined $query{remarks} && $query{remarks} =~ /The country is really world wide/ )
+        || ( defined $query{netname}
+            && $query{netname} =~ /IANA-BLK/ )
+        || ( defined $query{netname}
+            && $query{netname} =~ /AFRINIC-NET-TRANSFERRED/ )
+        || ( defined $query{country}
+            && $query{country} =~ /world wide/ )
+    ) {
+        return ();
+    }
+    elsif ( !$query{inet6num} && !$query{inetnum} ) {
+        return ();
     }
     else {
-		$query{permission} = 'allowed';
-        $query{cidr} = [ Net::CIDR::range2cidr($query{inetnum}) ];
+        $query{permission} = 'allowed';
+        $query{cidr} = [ Net::CIDR::range2cidr( uc( $query{inet6num} || $query{inetnum} ) ) ];
     }
     return %query;
 }
 
 sub ripe_query ($$) {
+    my ( $sock, $ip ) = @_;
 
-    my $sock = shift;
-    my $ip = shift;
-
-    my %query = ripe_read_query($sock, $ip);
+    my %query = ripe_read_query( $sock, $ip );
     return () unless defined $query{country};
-	return ripe_process_query(%query);
+    return ripe_process_query(%query);
 }
 
 sub apnic_read_query ($$) {
+    my ( $sock, $ip ) = @_;
 
-    my $sock = shift;
-    my $ip = shift;
-
-    my %query = (fullinfo => '');
-	my %tmp;
+    my %query = ( fullinfo => '' );
+    my %tmp;
     print $sock "-r $ip\n";
+    my $skip_block = 0;
     while (<$sock>) {
-		$query{fullinfo} .= $_;
-		close $sock and	return (permission => 'denied') if /^\%201/;
-		next if (/^\%/ || !/\:/);
-		s/\s+$//;
-		my ($field,$value) = split(/:/);
-		$value =~ s/^\s+//;
-		if ($field eq 'inetnum') {
-			%tmp = %query;
-			%query = ();
-			$query{fullinfo} = $tmp{fullinfo};
-		}
-		$query{$field} .= $value;
+        $query{fullinfo} .= $_;
+        close $sock and return ( permission => 'denied' ) if /^\%201/;
+        if (m{^\%}) {
+
+            # Always skip 0.0.0.0 data
+            # It looks like:
+            # % Information related to '0.0.0.0 - 255.255.255.255'
+            if (m{^\%.*0\.0\.0\.0\s+}) {
+                $skip_block = 1;
+                next;
+            }
+            $skip_block = 0;
+            next;
+        }
+        next if $skip_block;
+        next if ( !/\:/ );
+        s/\s+$//;
+        my ( $field, $value ) = split( /:/, $_, 2 );
+        $value =~ s/^\s+//;
+        if ( $field =~ /^inet6?num$/ ) {
+            next if $value =~ m{0\.0\.0\.0\s+};
+            %tmp             = %query;
+            %query           = ();
+            $query{fullinfo} = $tmp{fullinfo};
+        }
+        my $lc_field = lc($field);
+        next if $lc_field eq 'country' && defined $query{$lc_field};
+        $query{$lc_field} .= ( $query{$lc_field} ? ' ' : '' ) . $value;
     }
     close $sock;
-    for (keys %tmp) {
-		$query{$_} = $tmp{$_} if ! defined $query{$_};
+    for ( keys %tmp ) {
+        $query{$_} = $tmp{$_} if !defined $query{$_};
     }
-	return %query;
+    return %query;
 }
 
 sub apnic_process_query (%) {
+    my %query = @_;
 
-	my %query = @_;
     if (
-		(
-			defined $query{remarks} &&
-			$query{remarks} =~ /address range is not administered by APNIC/
-		) || (
-			defined $query{descr} &&
-			$query{descr} =~ /not allocated to|by APNIC|placeholder reference/i
-		)
-	) {
-		return ();
+        ( defined $query{remarks} && $query{remarks} =~ /address range is not administered by APNIC|This network in not allocated/ )
+        || ( defined $query{descr}
+            && $query{descr} =~ /not allocated to|by APNIC|placeholder reference/i )
+    ) {
+        return ();
+    }
+    elsif ( !$query{inet6num} && !$query{inetnum} ) {
+        return ();
     }
     else {
-    	$query{permission} = 'allowed';
-		$query{cidr} = [Net::CIDR::range2cidr($query{inetnum})];
+        $query{permission} = 'allowed';
+        $query{cidr} = [ Net::CIDR::range2cidr( uc( $query{inet6num} || $query{inetnum} ) ) ];
     }
+
     return %query;
 }
 
 sub apnic_query ($$) {
+    my ( $sock, $ip ) = @_;
 
-    my $sock = shift;
-    my $ip = shift;
-
-    my %query = apnic_read_query($sock, $ip);
-	return apnic_process_query(%query);
+    my %query = apnic_read_query( $sock, $ip );
+    return apnic_process_query(%query);
 }
 
 sub arin_read_query ($$) {
+    my ( $sock, $ip ) = @_;
 
-	my $sock = shift;
-	my $ip = shift;
-
-    my %query = (fullinfo => '');
-	my %tmp = ();
+    my %query = ( fullinfo => '' );
+    my %tmp = ();
 
     print $sock "+ $ip\n";
     while (<$sock>) {
-		$query{fullinfo} .= $_;
-		close $sock and return (permission => 'denied') if /^\#201/;
-		return () if /no match found for/i;
-		next if (/^\#/ || !/\:/);
-		s/\s+$//;
-		my ($field,$value) = split(/:/);
-		$value =~ s/^\s+//;
-		if ($field eq 'OrgName' ||
-				$field eq 'CustName') {
-			%tmp = %query;
-			%query = ();
-			$query{fullinfo} = $tmp{fullinfo};
-		}
-		$query{lc($field)} .= $value;
+        $query{fullinfo} .= $_;
+        close $sock and return ( permission => 'denied' ) if /^\#201/;
+        return () if /no match found for/i;
+        next if ( /^\#/ || !/\:/ );
+        s/\s+$//;
+        my ( $field, $value ) = split( /:/, $_, 2 );
+        $value =~ s/^\s+//;
+        if (   $field eq 'OrgName'
+            || $field eq 'CustName' ) {
+            %tmp             = %query;
+            %query           = ();
+            $query{fullinfo} = $tmp{fullinfo};
+        }
+        $query{ lc($field) } .= ( $query{ lc($field) } ? ' ' : '' ) . $value;
     }
     close $sock;
+
     $query{orgname} = $query{custname} if defined $query{custname};
-    for (keys %tmp) {
-		$query{$_} = $tmp{$_} unless defined $query{$_};
+
+    for ( keys %tmp ) {
+        $query{$_} = $tmp{$_} unless defined $query{$_};
     }
-	return %query;
-}
 
-sub arin_process_query (%) {
-
-	my %query = @_;
-
-    return () unless
-		$query{country} or
-		$query{nettype} !~ /allocated to/i or
-			$query{comment} &&
-			$query{comment} =~ /This IP address range is not registered in the ARIN/ or
-			$query{orgid} &&
-			$query{orgid} =~ /RIPE|LACNIC|APNIC|AFRINIC/;
-
-	$query{permission} = 'allowed';
-	$query{descr}   = $query{orgname};
-	$query{remarks} = $query{comment};
-	$query{status}  = $query{nettype};
-	$query{inetnum} = $query{netrange};
-	$query{source}  = 'ARIN';
-	if ($query{cidr} =~ /\,/) {
-		$query{cidr} = [split(/\, /,$query{cidr})];
-	}
-	else {
-		$query{cidr} = [$query{cidr}];
-	}
     return %query;
 }
 
+sub arin_process_query (%) {
+    my %query = @_;
+
+    return ()
+      if $query{orgid} && $query{orgid} =~ /^\s*RIPE|LACNIC|APNIC|AFRINIC\s*$/;
+
+    $query{permission} = 'allowed';
+    $query{descr}      = $query{orgname};
+    $query{remarks}    = $query{comment};
+    $query{status}     = $query{nettype};
+    $query{inetnum}    = $query{netrange};
+    $query{source}     = 'ARIN';
+    if ( defined $query{cidr} && $query{cidr} =~ /\,/ ) {
+        $query{cidr} = [ split( /\s*\,\s*/, $query{cidr} ) ];
+    }
+    else {
+        $query{cidr} = [ $query{cidr} ];
+    }
+
+    return %query;
+}
 
 sub arin_query ($$) {
+    my ( $sock, $ip ) = @_;
 
-    my $sock = shift;
-    my $ip = shift;
-    my %query = arin_read_query($sock, $ip);
-	return arin_process_query(%query);
+    my %query = arin_read_query( $sock, $ip );
+
+    return arin_process_query(%query);
 }
 
 sub lacnic_read_query ($$) {
+    my ( $sock, $ip ) = @_;
 
-    my $sock = shift;
-    my $ip = shift;
-    my %query = (fullinfo => '');
+    my %query = ( fullinfo => '' );
 
     print $sock "$ip\n";
 
     while (<$sock>) {
-		$query{fullinfo} .= $_;
-		close $sock and return (permission => 'denied') if
-			/^\%201/ ||
-			/^\% Query rate limit exceeded/ ||
-			/^\% Not assigned to LACNIC/ ||
-			/\% Permission denied/;
-		if (/^\% (\S+) resource:/) {
-			my $srv = $1;
-			close $sock and return () if $srv !~ /lacnic|brazil/i;
-		}
-		next if (/^\%/ || !/\:/);
-		s/\s+$//;
-		my ($field,$value) = split(/:/);
-		$value =~ s/^\s+//;
-		next if $field eq 'country' && $query{country};
-		$query{lc($field)} .= ( $query{lc($field)} ?  ' ' : '') . $value;
+        $query{fullinfo} .= $_;
+        close $sock
+          and return ( permission => 'denied' )
+          if /^\%201/ || /^\% Query rate limit exceeded/ || /^\% Not assigned to LACNIC/ || /\% Permission denied/;
+        if (/^\% (\S+) resource:/) {
+            my $srv = $1;
+            close $sock and return () if $srv !~ /lacnic|brazil/i;
+        }
+        next if ( /^\%/ || !/\:/ );
+        s/\s+$//;
+        my ( $field, $value ) = split( /:/, $_, 2 );
+        $value =~ s/^\s+//;
+        next if $field eq 'country' && $query{country};
+        $query{ lc($field) } .= ( $query{ lc($field) } ? ' ' : '' ) . $value;
     }
-	close $sock;
-	return %query;
+    close $sock;
+    return %query;
 }
 
 sub lacnic_process_query (%) {
+    my %query = @_;
 
-	my %query = @_;
-
-	$query{permission} = 'allowed';
-    $query{descr} = $query{owner};
-    $query{netname} = $query{ownerid};
-    $query{source} = 'LACNIC';
-	if ($query{inetnum}) {
-		$query{cidr} = $query{inetnum};
-		$query{inetnum} = (Net::CIDR::cidr2range($query{cidr}))[0];
-	}
-	unless ($query{country}) {
-		if ($query{nserver} && $query{nserver} =~ /\.(\w\w)$/) {
-			$query{country} = uc $1;
-		}
-		elsif ($query{descr} && $query{descr} =~ /\s(\w\w)$/) {
-			$query{country} = uc $1;
-		}
-		else {
-			return ();
-		}
-	}
+    $query{permission} = 'allowed';
+    $query{descr}      = $query{owner};
+    $query{netname}    = $query{ownerid};
+    $query{source}     = 'LACNIC';
+    if ( $query{inetnum} ) {
+        $query{cidr}    = $query{inetnum};
+        $query{inetnum} = ( Net::CIDR::cidr2range( $query{cidr} ) )[0];
+    }
+    unless ( $query{country} ) {
+        if ( $query{nserver} && $query{nserver} =~ /\.(\w\w)$/ ) {
+            $query{country} = uc $1;
+        }
+        elsif ( $query{descr} && $query{descr} =~ /\s(\w\w)$/ ) {
+            $query{country} = uc $1;
+        }
+        else {
+            return ();
+        }
+    }
     return %query;
 }
 
 sub lacnic_query ($$) {
+    my ( $sock, $ip ) = @_;
 
-    my $sock = shift;
-    my $ip = shift;
-    my %query = lacnic_read_query($sock, $ip);
-	return lacnic_process_query(%query);
+    my %query = lacnic_read_query( $sock, $ip );
+
+    return lacnic_process_query(%query);
 }
 
-sub afrinic_read_query ($$) {
-
-    my $sock = shift;
-    my $ip = shift;
-
-    my %query = (fullinfo => '');
-    print $sock "-r $ip\n";
-    while (<$sock>) {
-        $query{fullinfo} .= $_;
-        close $sock and return (permission => 'denied') if /^\%201/;
-        next if (/^\%/ || !/\:/);
-        s/\s+$//;
-        my ($field,$value) = split(/:/);
-        $value =~ s/^\s+//;
-        $query{$field} .= $value;
-    }
-    close $sock;
-	return %query;
-}
+*afrinic_read_query = *apnic_read_query;
 
 sub afrinic_process_query (%) {
+    my %query = @_;
 
-	my %query = @_;
+    return ()
+      if defined $query{remarks} && $query{remarks} =~ /country is really worldwide/
+      or defined $query{descr}   && $query{descr} =~ /Here for in-addr\.arpa authentication/;
 
-    return () if
-		defined $query{remarks} &&
-		$query{remarks} =~ /country is really worldwide/
-			or
-		defined $query{descr} &&
-		$query{descr} =~ /Here for in-addr\.arpa authentication/;
-	$query{permission} = 'allowed';
-	$query{cidr} = [ Net::CIDR::range2cidr($query{inetnum}) ];
+    if ( !$query{inet6num} && !$query{inetnum} ) {
+        return ();
+    }
+
+    $query{permission} = 'allowed';
+    $query{cidr} =
+      [ Net::CIDR::range2cidr( uc( $query{inet6num} || $query{inetnum} ) ) ];
     return %query;
 }
 
 sub afrinic_query ($$) {
+    my ( $sock, $ip ) = @_;
 
-    my $sock = shift;
-    my $ip = shift;
-    my %query = afrinic_read_query($sock, $ip);
-	return afrinic_process_query(%query);
+    my %query = afrinic_read_query( $sock, $ip );
+
+    return afrinic_process_query(%query);
 }
 
 sub is_mine ($$;@) {
-
-	my $self = shift;
-	my $ip   = shift;
-	my @cidr = @_;
+    my ( $self, $ip, @cidr ) = @_;
 
     return 0 unless is_valid_ip($ip);
-    @cidr = @{$self->cidr()} unless @cidr;
-	@cidr = map(split(/\s+/), @cidr);
-	@cidr = map {
-		my @dots = (split/\./);
-		my $pad = '.0' x (4 - @dots);
-		s|(/.*)|$pad$1|;
-		$_;
-	} @cidr;
-	return Net::CIDR::cidrlookup($ip, @cidr);
+    if ( !scalar @cidr ) {
+        my $out = $self->cidr();
+        @cidr = @$out if ref $out;
+    }
+
+    @cidr = map {
+        my @dots = ( split /\./ );
+        my $pad = '.0' x ( 4 - @dots );
+        s|(/.*)|$pad$1|;
+        $_;
+      }
+      map { split(/\s+/) } @cidr;
+
+    return Net::CIDR::cidrlookup( $ip, @cidr );
 }
 
 1;
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Net::Whois::IANA - A universal WHOIS data extractor.
+Net::Whois::IANA - Net::Whois::IANA - A universal WHOIS data extractor.
+
+=head1 VERSION
+
+version 0.44
 
 =head1 SYNOPSIS
 
   use Net::Whois::IANA;
   my $ip = '132.66.16.2';
-  my $iana = new Net::Whois::IANA;
+  my $iana = Net::Whois::IANA->new;
   $iana->whois_query(-ip=>$ip);
   print "Country: " , $iana->country()            , "\n";
   print "Netname: " , $iana->netname()            , "\n";
@@ -586,19 +623,6 @@ Net::Whois::IANA - A universal WHOIS data extractor.
   print "Server: "  , $iana->server()             , "\n";
   print "Inetnum: " , $iana->inetnum()            , "\n";
   print "CIDR: "    , join(",", $iana->cidr())    , "\n";
-
-
-=head1 ABSTRACT
-
-  This is a simple module to extract the descriptive whois
-information about various IPs as they are stored in the four
-regional whois registries of IANA - RIPE (Europe, Middle East)
-APNIC (Asia/Pacific), ARIN (North America), AFRINIC (Africa) 
-and LACNIC (Latin American & Caribbean).
-
-  It is designed to serve statistical harvesters of various
-access logs and likewise, therefore it only collects partial
-and [rarely] unprecise information.
 
 =head1 DESCRIPTION
 
@@ -706,6 +730,22 @@ being exported.
   candidate. This is not a very reliable thing, but sometimes it proves
   useful.
 
+=head1 NAME
+
+Net::Whois::IANA - A universal WHOIS data extractor.
+
+=head1 ABSTRACT
+
+  This is a simple module to extract the descriptive whois
+information about various IPs as they are stored in the four
+regional whois registries of IANA - RIPE (Europe, Middle East)
+APNIC (Asia/Pacific), ARIN (North America), AFRINIC (Africa)
+and LACNIC (Latin American & Caribbean).
+
+  It is designed to serve statistical harvesters of various
+access logs and likewise, therefore it only collects partial
+and [rarely] unprecise information.
+
 =head1 BUGS
 
   As stated many times before, this module is not completely
@@ -733,13 +773,13 @@ server sometimes. This redirection is not reflected yet by the package.
 
 =head1 AUTHOR
 
-Roman M. Parparov, E<lt>roman@parparov.com<gt>
+Roman M. Parparov <roman@parparov.com>, Nicolas R <atoomic@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003-2011 Bolet Consulting <bolet@parparov.com> and Roman M. Parparov
+This software is copyright (c) 2003-2013, 2018 by Bolet Consulting <bolet@parparov.com>.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

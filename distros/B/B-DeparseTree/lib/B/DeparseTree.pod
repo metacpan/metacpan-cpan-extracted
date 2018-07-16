@@ -176,7 +176,12 @@ L<B::Callsite> for one way to get opcode locations on the call stack
 
 =item *
 
-L<Exact Perl location with B::Deparse (and Devel::Callsite) |http://blogs.perl.org/users/rockyb/2015/11/exact-perl-location-with-bdeparse-and-develcallsite.html> for
+L<Rewriting B:Deparse and Reintroducing B::DeparseTree and (part 1) |http://blogs.perl.org/users/rockyb/2018/06/introducing-bdeparsetree-and-rewriting-bdeparse-part-1.html> for
 more information.
+
+=item *
+
+L<Exact Perl location with B::Deparse (and Devel::Callsite) |http://blogs.perl.org/users/rockyb/2015/11/exact-perl-location-with-bdeparse-and-develcallsite.html> for
+older information.
 
 =back

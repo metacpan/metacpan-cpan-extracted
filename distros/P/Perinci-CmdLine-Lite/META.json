@@ -49,7 +49,7 @@
             "Complete::Zsh" : "0",
             "Data::Clean::JSON" : "0.38",
             "Data::Dump" : "0",
-            "Data::Sah" : "0.84",
+            "Data::Sah" : "0.891",
             "Data::Sah::Util::Type" : "0.45",
             "Encode" : "0",
             "Fcntl" : "0",
@@ -67,7 +67,7 @@
             "Perinci::CmdLine::Help" : "0.15",
             "Perinci::CmdLine::Util::Config" : "1.721",
             "Perinci::Object" : "0.26",
-            "Perinci::Result::Format::Lite" : "0.271",
+            "Perinci::Result::Format::Lite" : "0.273",
             "Perinci::Sub::Complete" : "0.89",
             "Perinci::Sub::GetArgs::Argv" : "0.83",
             "Progress::Any::Output" : "0",
@@ -78,7 +78,7 @@
             "warnings" : "0"
          },
          "x_alt_for" : {
-            "Perinci::CmdLine::Classic" : "1.71"
+            "Perinci::CmdLine::Classic" : "1.770"
          }
       },
       "test" : {
@@ -104,7 +104,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Lite"
       }
    },
-   "version" : "1.813",
+   "version" : "1.815",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -204,7 +204,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.592"
+            "version" : "0.593"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -235,6 +235,22 @@
             "class" : "Dist::Zilla::Plugin::CheckMetaResources",
             "name" : "@Author::PERLANCAR/CheckMetaResources",
             "version" : "0.001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckSelfDependency",
+            "config" : {
+               "Dist::Zilla::Plugin::CheckSelfDependency" : {
+                  "finder" : [
+                     ":InstallModules"
+                  ]
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Author::PERLANCAR/CheckSelfDependency",
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
@@ -434,7 +450,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.13"
+            "version" : "0.142"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",

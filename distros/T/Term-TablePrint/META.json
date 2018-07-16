@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Term-TablePrint",
    "no_index" : {
@@ -36,9 +36,10 @@
             "Exporter" : "0",
             "List::Util" : "0",
             "Scalar::Util" : "0",
-            "Term::Choose" : "1.600",
-            "Term::Choose::LineFold" : "1.600",
-            "Term::Choose::Util" : "0.065",
+            "Term::Choose" : "1.604",
+            "Term::Choose::Constants" : "1.604",
+            "Term::Choose::LineFold" : "1.604",
+            "Term::Choose::Util" : "0.066",
             "Term::ProgressBar" : "0",
             "constant" : "0",
             "perl" : "5.008003",
@@ -55,6 +56,6 @@
          "web" : "https://github.com/kuerbis/Term-TablePrint"
       }
    },
-   "version" : "0.068",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.069",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

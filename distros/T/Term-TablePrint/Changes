@@ -1,11 +1,19 @@
 Revision history for Term::TablePrint
 
 
+0.069   2018-07-15
+        - Hide the cursor.
+        - Bugfix in backup self.
+        - The default for 'max_rows' is 100_000.
+        - With 'max_rows' set: give "Term::ProgressBar" the right total.
+        - "Term::Choose": minimum version "1.604".
+        - "Term::Choose-Util": minimum version "0.066".
+
 0.068   2018-07-06
         - New option 'squash_spaces'
 
 0.067   2018-07-03
-        - "Term::Choose": minimum verson "1.600".
+        - "Term::Choose": minimum version "1.600".
         - "Term::Choose::Util": minimum version "0.065".
 
 0.066   2018-06-17

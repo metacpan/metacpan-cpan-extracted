@@ -1,5 +1,11 @@
 Revision history for JMAP-Tester
 
+0.019     2018-07-15 20:57:09-04:00 America/Toronto
+        - allow "-X" with a numeric "X" as the output filename for Logger to
+          output to the numeric file descriptor
+        - fix insane non-cleanup of loggers; sorry about that
+        - make simple_auth and download actually, like, work
+
 0.018     2018-03-10 18:08:29-05:00 America/New_York
         - no longer use allow_blessed on the JSON codec
 

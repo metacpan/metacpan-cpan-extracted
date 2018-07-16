@@ -4,7 +4,6 @@ use warnings;
 use parent 'Config::HAProxy';
 use File::Basename;
 use File::Temp;
-use autodie;
 
 sub new {
     my $class = shift;

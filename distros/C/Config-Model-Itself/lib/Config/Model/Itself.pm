@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2017 by Dominique Dumont.
+# This software is Copyright (c) 2007-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Itself ;
-$Config::Model::Itself::VERSION = '2.013';
+$Config::Model::Itself::VERSION = '2.014';
 use Mouse ;
 use Config::Model 2.114;
 use 5.010;
@@ -17,6 +17,7 @@ use IO::File ;
 use Log::Log4perl 1.11;
 use Carp ;
 use Data::Dumper ;
+use Scalar::Util qw/weaken/;
 use File::Find ;
 use File::Path ;
 use File::Basename ;
@@ -152,6 +153,9 @@ sub _build_model_dir {
 
 sub BUILD {
     my $self = shift;
+
+    # avoid memory cycle
+    weaken($self);
 
     my $cb = sub {
         my %args = @_ ;
@@ -799,7 +803,7 @@ Config::Model::Itself - Model editor for Config::Model
 
 =head1 VERSION
 
-version 2.013
+version 2.014
 
 =head1 SYNOPSIS
 
@@ -933,7 +937,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2007-2017 by Dominique Dumont.
+This software is Copyright (c) 2007-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 
@@ -986,7 +990,7 @@ L<http://cpants.cpanauthors.org/dist/Config-Model-Itself>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/C/Config-Model-Itself>
 

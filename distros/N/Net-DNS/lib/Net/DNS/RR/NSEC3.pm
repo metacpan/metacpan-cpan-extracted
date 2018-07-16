@@ -1,9 +1,9 @@
 package Net::DNS::RR::NSEC3;
 
 #
-# $Id: NSEC3.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: NSEC3.pm 1694 2018-07-16 04:19:40Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1694 $)[1];
 
 
 use strict;
@@ -70,6 +70,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	$self->{hnxtname} = unpack "\@$offset x a$hsize", $$data;
 	$offset += 1 + $hsize;
 	$self->{typebm} = substr $$data, $offset, ( $limit - $offset );
+	$self->{hashfn} = _hashfn( @{$self}{qw(algorithm iterations saltbin)} );
 }
 
 
@@ -105,6 +106,7 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 	$self->salt($salt) unless $salt eq '-';
 	$self->hnxtname(shift);
 	$self->typelist(@_);
+	$self->{hashfn} = _hashfn( @{$self}{qw(algorithm iterations saltbin)} );
 }
 
 
@@ -177,38 +179,78 @@ sub hnxtname {
 }
 
 
-sub covered {
-	my $self = shift;
-	my $name = shift;
+sub covers {
+	my ( $self, $name ) = @_;
 
-	# first test if the domain name is in the NSEC3 zone.
-	my ( $owner, @zonelabels ) = $self->{owner}->_wire;
-	my @labels = new Net::DNS::DomainName( lc $name )->_wire;
-	foreach ( reverse @zonelabels ) {
-		tr /\101-\132/\141-\172/;
-		return 0 unless $_ eq ( pop(@labels) || '' );
-	}
-
+	my ( $owner, @zone ) = $self->{owner}->_wire;
 	my $ownerhash = _decode_base32hex($owner);
-	my $nexthash  = "$self->{hnxtname}";
+	my $nexthash  = $self->{hnxtname};
 
-	my $namehash = _hash( $self->algorithm, $name, $self->iterations, $self->saltbin );
+	my @label = new Net::DNS::DomainName($name)->_wire;
+	my @close = @label;
+	foreach (@zone) { pop(@close) }				# strip zone labels
+	return if lc($name) ne lc( join '.', @close, @zone );	# out of zone
 
-	my $c1 = $namehash cmp $ownerhash;
-	my $c2 = $nexthash cmp $namehash;
-	return ( $c1 + $c2 ) == 2;
+	my $hashfn = $self->{hashfn};
+
+	foreach (@close) {
+		my $hash = &$hashfn( join '.', @label );
+		my $cmp1 = $hash cmp $ownerhash;
+		last unless $cmp1;				# stop at provable encloser
+		return 1 if ( $cmp1 + ( $nexthash cmp $hash ) ) == 2;
+		shift @label;
+	}
+	return;
 }
 
 
-sub match {
-	my $self = shift;
-	my $name = shift;
+sub covered {				## historical
+	&covers;						# uncoverable pod
+}
+
+sub match {				## historical
+	my ( $self, $name ) = @_;				# uncoverable pod
 
 	my ($owner) = $self->{owner}->_wire;
 	my $ownerhash = _decode_base32hex($owner);
 
-	$ownerhash eq _hash( $self->algorithm, $name, $self->iterations, $self->saltbin );
+	my $hashfn = $self->{hashfn};
+	$ownerhash eq &$hashfn($name);
 }
+
+
+sub encloser {
+	my ( $self, $qname ) = @_;
+
+	my ( $owner, @zone ) = $self->{owner}->_wire;
+	my $ownerhash = _decode_base32hex($owner);
+	my $nexthash  = $self->{hnxtname};
+
+	my @label = new Net::DNS::DomainName($qname)->_wire;
+	my @close = @label;
+	foreach (@zone) { pop(@close) }				# strip zone labels
+	return if lc($qname) ne lc( join '.', @close, @zone );	# out of zone
+
+	my $hashfn = $self->{hashfn};
+
+	my $encloser = $qname;
+	shift @label;
+	foreach (@close) {
+		my $nextcloser = $encloser;
+		my $hash = &$hashfn( $encloser = join '.', @label );
+		shift @label;
+		next if $hash ne $ownerhash;
+		$self->{nextcloser} = $nextcloser;		# next closer name
+		$self->{wildcard} = join '.', '*', $encloser;	# wildcard at provable encloser
+		return $encloser;				# provable encloser
+	}
+	return;
+}
+
+
+sub nextcloser { return shift->{nextcloser}; }
+
+sub wildcard { return shift->{wildcard}; }
 
 
 ########################################
@@ -216,54 +258,66 @@ sub match {
 sub _decode_base32hex {
 	local $_ = shift || '';
 	tr [0-9A-Va-v\060-\071\101-\126\141-\166] [\000-\037\012-\037\000-\037\012-\037];
-	$_ = unpack 'B*', $_;
-	s/000(.....)/$1/g;
-	my $l = length;
-	$_ = substr $_, 0, $l & ~7 if $l & 7;
-	pack 'B*', $_;
+	my $l = ( 5 * length ) & ~7;
+	pack "B$l", join '', map unpack( 'x3a5', unpack 'B8', $_ ), split //;
 }
 
 
 sub _encode_base32hex {
-	local $_ = unpack 'B*', shift;
-	s/(.....)/000$1/g;
-	my $l = length;
-	my $x = substr $_, $l & ~7;
-	my $n = length $x;
-	substr( $_, $l & ~7 ) = join '', '000', $x, '0' x ( 5 - $n ) if $n;
-	$_ = pack( 'B*', $_ );
+	my @split = grep length, split /(\S{5})/, unpack 'B*', shift;
+	local $_ = join '', map pack( 'B*', "000$_" ), @split;
 	tr [\000-\037] [0-9a-v];
 	return $_;
 }
 
 
-sub _hash {
+my ( $cache1, $cache2, $limit ) = ( {}, {}, 10 );
+
+sub _hashfn {
 	my $hashalg    = shift;
-	my $name       = shift;
-	my $iterations = shift;
+	my $iterations = shift || 0;
 	my $salt       = shift || '';
 
-	my $arglist = $digest{$hashalg};
-	my ( $object, @argument ) = @$arglist;
-	my $hash = $object->new(@argument);
-
-	my $wirename = new Net::DNS::DomainName($name)->canonical;
+	my $key_adjunct = pack 'Cna*', $hashalg, $iterations, $salt;
 	$iterations++;
 
-	while ( $iterations-- ) {
-		$hash->add($wirename);
-		$hash->add($salt);
-		$wirename = $hash->digest;
-	}
+	my $instance = eval {
+		my $arglist = $digest{$hashalg};
+		my ( $class, @argument ) = @$arglist;
+		$class->new(@argument);
+	};
+	my $exception = $@;
 
-	return $wirename;
+	return $exception ? sub { croak $exception } : sub {
+		my $name  = new Net::DNS::DomainName(shift)->canonical;
+		my $key	  = join '', $name, $key_adjunct;
+		my $cache = $$cache1{$key} ||= $$cache2{$key};	# two layer cache
+		return $cache if defined $cache;
+		( $cache1, $cache2, $limit ) = ( {}, $cache1, 50 ) unless $limit--;    # recycle cache
+
+		my $hash = $name;
+		my $iter = $iterations;
+		$instance->reset;
+		while ( $iter-- ) {
+			$instance->add($hash);
+			$instance->add($salt);
+			$hash = $instance->digest;
+		}
+		return $$cache1{$key} = $hash;
+	};
 }
 
 
-sub name2hash { _encode_base32hex(&_hash); }			# uncoverable pod
-
-
 sub hashalgo { &algorithm; }					# uncoverable pod
+
+sub name2hash {
+	my $hashalg    = shift;					# uncoverable pod
+	my $name       = shift;
+	my $iterations = shift || 0;
+	my $salt       = pack 'H*', shift || '';
+	my $hash       = _hashfn( $hashalg, $iterations, $salt );
+	_encode_base32hex( &$hash($name) );
+}
 
 
 1;
@@ -314,8 +368,8 @@ to perform mnemonic and numeric code translation.
     $flags = $rr->flags;
     $rr->flags( $flags );
 
-The Flags field is represented as an unsigned decimal integer.
-The value has a maximum value of 255. 
+The Flags field is an unsigned decimal integer
+interpreted as eight concatenated Boolean values. 
 
 =over 4
 
@@ -369,35 +423,45 @@ authoritative data or contains a delegation point NS RRset.
     $typelist = $rr->typelist;
     $rr->typelist( @typelist );
 
-The Type List identifies the RRset types that exist at the domain name
+typelist() identifies the RRset types that exist at the domain name
 matched by the NSEC3 RR.  When called in scalar context, the list is
 interpolated into a string.
 
-=head2 covered, match
+=head2 typemap
 
-    print "covered" if $rr->covered{'example.foo'}
+    $exists = $rr->typemap($rrtype);
 
-covered() returns a nonzero value when the the domain name provided as argument
-is covered as defined in the NSEC3 specification:
+typemap() returns a Boolean true value if the specified RRtype occurs
+in the type bitmap of the NSEC3 record.
 
-   To cover:  An NSEC3 RR is said to "cover" a name if the hash of the
-      name or "next closer" name falls between the owner name and the
-      next hashed owner name of the NSEC3.  In other words, if it proves
-      the nonexistence of the name, either directly or by proving the
-      nonexistence of an ancestor of the name.
+=head2 covers
 
+    $covered = $rr->covers( 'example.foo' );
 
-Similarly matched() returns a nonzero value when the domainname in the argument
-matches as defined in the NSEC3 specification:
+covers() returns a Boolean true value if the hash of the domain name
+argument, or ancestor of that name, falls between the owner name and
+the next hashed owner name of the NSEC3 RR.
 
-   To match: An NSEC3 RR is said to "match" a name if the owner name
-      of the NSEC3 RR is the same as the hashed owner name of that
-      name.
+=head2 encloser, nextcloser, wildcard
+
+    $encloser = $rr->encloser( 'example.foo' );
+    print "encloser: $encloser\n" if $encloser;
+
+encloser() returns the name of a provable encloser of the query name
+argument obtained from the NSEC3 RR.
+
+nextcloser() returns the next closer name, which is one label longer
+than the closest encloser.
+This is only valid after encloser() has returned a valid domain name.
+
+wildcard() returns the unexpanded wildcard name from which the next
+closer name was possibly synthesised.
+This is only valid after encloser() has returned a valid domain name.
 
 
 =head1 COPYRIGHT
 
-Copyright (c)2017 Dick Franks
+Copyright (c)2017,2018 Dick Franks
 
 Portions Copyright (c)2007,2008 NLnet Labs.  Author Olaf M. Kolkman
 

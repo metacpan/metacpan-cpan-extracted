@@ -1,7 +1,7 @@
 package Finance::Currency::FiatX;
 
-our $DATE = '2018-06-27'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2018-07-15'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -674,7 +674,7 @@ Finance::Currency::FiatX - Fiat currency exchange rate library
 
 =head1 VERSION
 
-This document describes version 0.008 of Finance::Currency::FiatX (from Perl distribution Finance-Currency-FiatX), released on 2018-06-27.
+This document describes version 0.009 of Finance::Currency::FiatX (from Perl distribution Finance-Currency-FiatX), released on 2018-07-15.
 
 =head1 SYNOPSIS
 

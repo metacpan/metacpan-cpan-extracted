@@ -11,7 +11,7 @@ sub cscroll {
     my($demo) = @_;
     $TOP = $MW->WidgetDemo(
         -name     => $demo,
-        -text     => 'This window displays a canvas widget that can be scrolled either using the scrollbars or by dragging with button 2 in the canvas.  If you click button 1 on one of the rectangles, its indices will be printed on stdout.',
+        -text     => 'This window displays a canvas widget that can be scrolled either using the scrollbars or by dragging with the middle mouse button in the canvas.  If you click the left mouse button on one of the rectangles, its indices will be printed on stdout.',
         -title    => 'Scrollable Canvas Demonstration',
         -iconname => 'cscroll',
     );
@@ -41,8 +41,16 @@ sub cscroll {
     $c->bind('all', '<Any-Leave>' => [\&cscroll_leave, \$old_fill]);
     $c->bind('all', '<1>' => \&cscroll_button);
 
-    $c->CanvasBind('<2>' => [ scanMark => Ev('x'), Ev('y') ]);
-    $c->CanvasBind('<B2-Motion>' => [ scanDragto => Ev('x'), Ev('y') ]);
+    $c->CanvasBind(
+        $MW->windowingsystem ne 'aqua' ? '<2>' : '<3>' => [
+            scanMark => Ev('x'), Ev('y'),
+        ],
+    );
+    $c->CanvasBind(
+        $MW->windowingsystem ne 'aqua' ? '<B2-Motion>' : '<B3-Motion>' => [
+            scanDragto => Ev('x'), Ev('y'),
+        ],
+    );
 
 } # end cscroll
 

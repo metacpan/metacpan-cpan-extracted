@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2017 by Dominique Dumont.
+# This software is Copyright (c) 2007-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -63,8 +63,9 @@ my $build = $class->new
   'build_requires' => {
     'App::Cmd::Tester' => '0',
     'App::Cme' => '1.002',
-    'File::Copy' => '0',
+    'Config::Model::Tester::Setup' => '0',
     'File::Copy::Recursive' => '0',
+    'Getopt::Long' => '0',
     'Module::Build' => '0.34',
     'Test::Differences' => '0',
     'Test::File::Contents' => '0',
@@ -93,6 +94,7 @@ my $build = $class->new
     'Mouse::Util::TypeConstraints' => '0',
     'Path::Tiny' => '0.062',
     'Pod::POM' => '0',
+    'Scalar::Util' => '0',
     'Tk' => '0',
     'YAML::Tiny' => '0',
     'perl' => '5.010'

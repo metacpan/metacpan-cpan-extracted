@@ -6,14 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Finance/Currency/FiatX.pm',
     'Finance/Currency/FiatX/Role/Source.pm',
     'Finance/Currency/FiatX/Source/bca.pm',
     'Finance/Currency/FiatX/Source/bi.pm',
-    'Finance/Currency/FiatX/Source/gmc.pm'
+    'Finance/Currency/FiatX/Source/gmc.pm',
+    'Finance/Currency/FiatX/Source/mandiri.pm'
 );
 
 

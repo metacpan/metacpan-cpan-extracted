@@ -64,6 +64,7 @@ t/roundtrip/5.016/base/cond.t
 t/roundtrip/5.016/base/if.t
 t/roundtrip/5.016/base/translate.t
 t/roundtrip/5.016/base/while.t
+t/roundtrip/5.018/cmd/elsif.t
 t/roundtrip/5.018/mro/basic_04_dfs.t
 t/roundtrip/5.020/base/cond.t
 t/roundtrip/5.020/base/if.t
@@ -75,7 +76,11 @@ t/roundtrip/5.020/base/rs.t
 t/roundtrip/5.020/base/term.t
 t/roundtrip/5.020/base/translate.t
 t/roundtrip/5.020/base/while.t
+t/roundtrip/5.020/cmd/elsif.t
+t/roundtrip/5.020/cmd/for.t
 t/roundtrip/5.020/mro/basic_04_dfs.t
+t/roundtrip/5.022/cmd/elsif.t
+t/roundtrip/5.022/cmd/for.t
 t/roundtrip/5.022/mro/basic_04_dfs.t
 t/roundtrip/5.024/base/cond.t
 t/roundtrip/5.024/base/if.t
@@ -87,6 +92,8 @@ t/roundtrip/5.024/base/rs.t
 t/roundtrip/5.024/base/term.t
 t/roundtrip/5.024/base/translate.t
 t/roundtrip/5.024/base/while.t
+t/roundtrip/5.024/cmd/elsif.t
+t/roundtrip/5.024/cmd/for.t
 t/roundtrip/5.024/mro/basic_04_dfs.t
 t/roundtrip/5.026/base/cond.t
 t/roundtrip/5.026/base/if.t
@@ -98,7 +105,15 @@ t/roundtrip/5.026/base/rs.t
 t/roundtrip/5.026/base/term.t
 t/roundtrip/5.026/base/translate.t
 t/roundtrip/5.026/base/while.t
+t/roundtrip/5.026/cmd/elsif.t
+t/roundtrip/5.026/cmd/for.t
 t/roundtrip/5.026/mro/basic_04_dfs.t
+t/roundtrip/5.028/base/cond.t
+t/roundtrip/5.028/base/if.t
+t/roundtrip/5.028/base/pat.t
+t/roundtrip/5.028/base/translate.t
+t/roundtrip/5.028/base/while.t
+t/roundtrip/5.028/mro/basic_04_dfs.t
 t/roundtrip/Makefile
 t/roundtrip/README.md
 t/roundtrip/deparse.sh

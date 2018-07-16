@@ -4,7 +4,7 @@
 package Tcl::pTk::Clipboard;
 use strict;
 
-our ($VERSION) = ('0.92');
+our ($VERSION) = ('0.93');
 
 use Tcl::pTk;
 
@@ -39,7 +39,6 @@ sub clipboardCopy
   {
    $w->clipboardSet('--',$val);
   }
-  print "Copied $val\n";
  return $val;
 }
 

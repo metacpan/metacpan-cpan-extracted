@@ -14,7 +14,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.29'; # VERSION
+our $VERSION = '1.30'; # VERSION
 }
 
 use Devel::Cover::DB;
@@ -269,7 +269,7 @@ sub main {
         # touch the XS, C and H files so they rebuild
         if ($Options->{gcov}) {
             my $t = $] > 5.7 ? undef : time;
-            my $xs = sub { utime $t, $t, $_ if /\.(xs|cc?|hh?)$/ };
+            my $xs = sub { utime $t, $t, $_ if /\.(xs|cc?|cpp|hh?|hpp)$/ };
             File::Find::find({ wanted => $xs, no_chdir => 0 }, ".");
         }
         # print STDERR "$_: $ENV{$_}\n" for qw(PERL5OPT HARNESS_PERL_SWITCHES);
@@ -355,6 +355,7 @@ sub main {
         # print STDERR "Merging structure", Dumper($structure),
                      # "From ", Dumper($mst);
         $structure->merge($mst);
+        $db->set_structure($structure);
         # print STDERR "Merged structure", Dumper($structure);
     }
 
@@ -445,7 +446,7 @@ cover - report coverage statistics
 
 =head1 VERSION
 
-version 1.29
+version 1.30
 
 =head1 SYNOPSIS
 

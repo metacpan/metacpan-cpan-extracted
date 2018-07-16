@@ -1,3 +1,9 @@
+0.486   2018-07-16 (PERLANCAR)
+
+	- Bump generated prereq version: Perinci::CmdLine::{Base,Lite}
+	  1.810 -> 1.811.
+
+
 0.485   2018-02-25 (PERLANCAR)
 
 	- Bump generated prereq versions: Perinci::CmdLine::Classic ->

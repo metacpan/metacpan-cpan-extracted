@@ -10,7 +10,7 @@ sub colors {
     my($demo) = @_;
     $TOP = $MW->WidgetDemo(
         -name     => $demo,
-        -text     => 'A listbox containing several color names is displayed below, along with a scrollbar.  You can scan the list either using the scrollbar or by dragging in the listbox window with button 2 pressed.  If you double-click button 1 on a color, then the application\'s color palette will be set to match that color.',
+        -text     => 'A listbox containing several color names is displayed below, along with a scrollbar.  You can scan the list either using the scrollbar or by dragging in the listbox window with the middle mouse button pressed.  If you double-click the left mouse button on a color, then the application\'s color palette will be set to match that color.',
         -title    => 'Listbox Demonstration (colors)',
         -iconname => 'colors',
     );

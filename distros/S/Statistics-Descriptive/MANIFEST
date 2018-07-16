@@ -13,9 +13,11 @@ dist.ini
 examples/statistical-analysis.pl
 inc/Test/Run/Builder.pm
 lib/Statistics/Descriptive.pm
+lib/Statistics/Descriptive/Full.pm
 lib/Statistics/Descriptive/Smoother.pm
 lib/Statistics/Descriptive/Smoother/Exponential.pm
 lib/Statistics/Descriptive/Smoother/Weightedexponential.pm
+lib/Statistics/Descriptive/Sparse.pm
 scripts/bump-version-number.pl
 scripts/tag-release.pl
 t/00-compile.t
@@ -32,6 +34,7 @@ t/quantile.t
 t/smoother.t
 t/smoother_exponential.t
 t/smoother_weightedexponential.t
+t/summary.t
 weaver.ini
 xt/author/eol.t
 xt/author/no-tabs.t

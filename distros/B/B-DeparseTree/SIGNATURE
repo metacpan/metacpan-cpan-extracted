@@ -15,12 +15,12 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 7e4d0eadb2d6cbd57b8f70f315889e6b7159694e Build.PL
-SHA1 b9e6a5870fd4811b34d7c052db3419d150e20791 ChangeLog
-SHA1 1efc09e9b95c1938a7d5e381efd3cbd25756d459 MANIFEST
-SHA1 d25b36f2bd26d19efba93182f4a85773b27795e7 META.json
-SHA1 7e857e93dc6b32606ab421967fe12c88b02656b0 META.yml
+SHA1 1a02f12b7201540e3fb6651ef16f08a9fcdae4c0 ChangeLog
+SHA1 506728477d1ed39cefbc7e1f5c12a73487ddb2a2 MANIFEST
+SHA1 1a6b33db7beb6de97c9a11e5eb2536a77cfe921d META.json
+SHA1 95ae3322401a7781c46f2be9d95a325bbd028348 META.yml
 SHA1 1893890972181e19b1b36cbf507e82f5a2a6f50d Makefile.PL
-SHA1 b3bef90f2fb0399044835e2b7c6a177813c40f91 NEWS
+SHA1 510b13aac17c1875050c39c2bb8b6cb4366f0936 NEWS
 SHA1 1cef0236fbc52c9b37ec491f439a8e5da1da1fe0 README.md
 SHA1 84ac0838050be76f8603f5bb53c9607f832d7ffe TODO
 SHA1 71f15b3df285851ba0314cc99257f04e30f07b24 doc/OLD_CHANGES.md
@@ -29,25 +29,25 @@ SHA1 e46e5aa4f92b83244c3fc6e8f03dc6b3c3c33fcc doc/precedences.md
 SHA1 ae6956317767d3dda1873f2204ca9368746878d7 example/fib.pl
 SHA1 0973a5a713321739c0b8b1e592f615a827dc0a28 example/five.pl
 SHA1 a6b82a88e68d9e0bd337c784051000007c78b974 example/multiline.pl
-SHA1 91d10131a08c5c4e2dfd70b11c5dff0610fe7d6b lib/B/DeparseTree.pm
-SHA1 fc402ef18d7ed292e7f1987a67c410313980af8f lib/B/DeparseTree.pod
-SHA1 fb1cf79667cd869163b4d76619f7c0ed64171ef9 lib/B/DeparseTree/Fragment.pm
+SHA1 e3ff8d390cf13bf28267f9644494aaca41f63f03 lib/B/DeparseTree.pm
+SHA1 c2c1c5e0e22876c3f73f0d234e2df3d25d754117 lib/B/DeparseTree.pod
+SHA1 200ab3b286d6a6545abedf20937a9445877dde4c lib/B/DeparseTree/Fragment.pm
 SHA1 10ed2becf7b6dc39dfb93c7b07e32e4432e1cf7b lib/B/DeparseTree/OPflags.pm
 SHA1 8784267d01e0c87fcb7f50a3c1050e6b311009fd lib/B/DeparseTree/P514.pm
 SHA1 9fa0dea2f95cacdb8db12b130e50c59d8f44511c lib/B/DeparseTree/P516.pm
-SHA1 872eca3a9d6e8a30f893e1d81ed597259a654942 lib/B/DeparseTree/P518.pm
+SHA1 eb873043dfd57fa0de118722d14d74a9a2e314d2 lib/B/DeparseTree/P518.pm
 SHA1 829011ea74a2f71948a1af6b7972f4fcafb57732 lib/B/DeparseTree/P520.pm
-SHA1 1aeaefb8122506f9fe748ada34cc74f81bf4c993 lib/B/DeparseTree/P522.pm
+SHA1 b02b4f47476628a8261221c5c63de67decc43cb1 lib/B/DeparseTree/P522.pm
 SHA1 a73fb7162f9e6b3c1e6f1e31b00a883c9050ee72 lib/B/DeparseTree/P524.pm
-SHA1 3a9f66f8b2e8d6627cf723d33b743784d3f8a253 lib/B/DeparseTree/P526.pm
-SHA1 748609844b64097d6ccd8d9625637300ee98ab79 lib/B/DeparseTree/P526c.pm
-SHA1 ad510f818cfd7bc472aa5ff14842db9a7f3dee13 lib/B/DeparseTree/P528.pm
-SHA1 3fa1b356864e27c7b6b986a928bdfdddd301c04c lib/B/DeparseTree/PP.pm
+SHA1 afaae0105d58e9d64765bb9897ca82d1e4e8e0d8 lib/B/DeparseTree/P526.pm
+SHA1 91969f6789e8c39b378230f2f45aa5c0a075b412 lib/B/DeparseTree/P526c.pm
+SHA1 b3a3dfc11493a3ae84df8e2e14005576303a28c8 lib/B/DeparseTree/P528.pm
+SHA1 6061640a504ccac5c961464ab8857f27115d770e lib/B/DeparseTree/PP.pm
 SHA1 da7044e54c4147b49b469e21e3b3338d4d11c632 lib/B/DeparseTree/PP_OPtable.pm
-SHA1 01b52722989109130153d213d1aebdb545c7c08f lib/B/DeparseTree/PPfns.pm
+SHA1 2af2a1f7173ed4b8741dd77b305d0617dda2560a lib/B/DeparseTree/PPfns.pm
 SHA1 427ccc85398a70210a338cd52865c7951eb108e3 lib/B/DeparseTree/Printer.pm
-SHA1 0555c9da1ee6fa26d481347caae341b60175fbad lib/B/DeparseTree/SyntaxTree.pm
-SHA1 6277fbc21762288f6ef8a035ba941d1936ebebb5 lib/B/DeparseTree/TreeMain.pm
+SHA1 47da6724390d498db5d173a8d6d9f415a56345c9 lib/B/DeparseTree/SyntaxTree.pm
+SHA1 cbfb2dcb562d25233148d841b6d014844904691f lib/B/DeparseTree/TreeMain.pm
 SHA1 8cc0c268c0aa45fef7da45b84f56d7e5cd0282e9 lib/B/DeparseTree/TreeNode.pm
 SHA1 a45870a8a350f38fbb6959b4db62317d3b2a2bb0 scripts/Makefile
 SHA1 fe34a77c511e9e92ca70a23c0768348f6ee9f121 scripts/README.md
@@ -80,6 +80,7 @@ SHA1 ea65bdf23e169973a040a42e8aec6342afe55217 t/roundtrip/5.016/base/cond.t
 SHA1 d8c83a4759d79455cee13326bd4671516fd39dc0 t/roundtrip/5.016/base/if.t
 SHA1 cf53cb292ce69348474c00f0aa6d68a9150d17a6 t/roundtrip/5.016/base/translate.t
 SHA1 7a0440c46d40fefecfab9e73fe19ba5e3c5fd799 t/roundtrip/5.016/base/while.t
+SHA1 9e8b68a787b007f017be513d6e73bdb6ba88fe1e t/roundtrip/5.018/cmd/elsif.t
 SHA1 e882d4205c5c67f7876dc7984ceb474c96072253 t/roundtrip/5.018/mro/basic_04_dfs.t
 SHA1 ea65bdf23e169973a040a42e8aec6342afe55217 t/roundtrip/5.020/base/cond.t
 SHA1 d8c83a4759d79455cee13326bd4671516fd39dc0 t/roundtrip/5.020/base/if.t
@@ -91,7 +92,11 @@ SHA1 b9b0da6c80c023151cf804963a66f27886b03754 t/roundtrip/5.020/base/rs.t
 SHA1 9744f318150a318955869a81e1bd8e57ea69a7c5 t/roundtrip/5.020/base/term.t
 SHA1 cf53cb292ce69348474c00f0aa6d68a9150d17a6 t/roundtrip/5.020/base/translate.t
 SHA1 7a0440c46d40fefecfab9e73fe19ba5e3c5fd799 t/roundtrip/5.020/base/while.t
+SHA1 9e8b68a787b007f017be513d6e73bdb6ba88fe1e t/roundtrip/5.020/cmd/elsif.t
+SHA1 2e5a2f246426bb5a9283f73ce2b252044cfdbdda t/roundtrip/5.020/cmd/for.t
 SHA1 e882d4205c5c67f7876dc7984ceb474c96072253 t/roundtrip/5.020/mro/basic_04_dfs.t
+SHA1 9e8b68a787b007f017be513d6e73bdb6ba88fe1e t/roundtrip/5.022/cmd/elsif.t
+SHA1 2e5a2f246426bb5a9283f73ce2b252044cfdbdda t/roundtrip/5.022/cmd/for.t
 SHA1 e882d4205c5c67f7876dc7984ceb474c96072253 t/roundtrip/5.022/mro/basic_04_dfs.t
 SHA1 ea65bdf23e169973a040a42e8aec6342afe55217 t/roundtrip/5.024/base/cond.t
 SHA1 d8c83a4759d79455cee13326bd4671516fd39dc0 t/roundtrip/5.024/base/if.t
@@ -103,6 +108,8 @@ SHA1 b9b0da6c80c023151cf804963a66f27886b03754 t/roundtrip/5.024/base/rs.t
 SHA1 9744f318150a318955869a81e1bd8e57ea69a7c5 t/roundtrip/5.024/base/term.t
 SHA1 cf53cb292ce69348474c00f0aa6d68a9150d17a6 t/roundtrip/5.024/base/translate.t
 SHA1 7a0440c46d40fefecfab9e73fe19ba5e3c5fd799 t/roundtrip/5.024/base/while.t
+SHA1 9e8b68a787b007f017be513d6e73bdb6ba88fe1e t/roundtrip/5.024/cmd/elsif.t
+SHA1 2e5a2f246426bb5a9283f73ce2b252044cfdbdda t/roundtrip/5.024/cmd/for.t
 SHA1 e882d4205c5c67f7876dc7984ceb474c96072253 t/roundtrip/5.024/mro/basic_04_dfs.t
 SHA1 ea65bdf23e169973a040a42e8aec6342afe55217 t/roundtrip/5.026/base/cond.t
 SHA1 d8c83a4759d79455cee13326bd4671516fd39dc0 t/roundtrip/5.026/base/if.t
@@ -114,7 +121,15 @@ SHA1 b9b0da6c80c023151cf804963a66f27886b03754 t/roundtrip/5.026/base/rs.t
 SHA1 9744f318150a318955869a81e1bd8e57ea69a7c5 t/roundtrip/5.026/base/term.t
 SHA1 cf53cb292ce69348474c00f0aa6d68a9150d17a6 t/roundtrip/5.026/base/translate.t
 SHA1 7a0440c46d40fefecfab9e73fe19ba5e3c5fd799 t/roundtrip/5.026/base/while.t
+SHA1 9e8b68a787b007f017be513d6e73bdb6ba88fe1e t/roundtrip/5.026/cmd/elsif.t
+SHA1 2e5a2f246426bb5a9283f73ce2b252044cfdbdda t/roundtrip/5.026/cmd/for.t
 SHA1 e882d4205c5c67f7876dc7984ceb474c96072253 t/roundtrip/5.026/mro/basic_04_dfs.t
+SHA1 ea65bdf23e169973a040a42e8aec6342afe55217 t/roundtrip/5.028/base/cond.t
+SHA1 d8c83a4759d79455cee13326bd4671516fd39dc0 t/roundtrip/5.028/base/if.t
+SHA1 8586bae9ee20938c1d428686f2e890b48b76be65 t/roundtrip/5.028/base/pat.t
+SHA1 cf53cb292ce69348474c00f0aa6d68a9150d17a6 t/roundtrip/5.028/base/translate.t
+SHA1 7a0440c46d40fefecfab9e73fe19ba5e3c5fd799 t/roundtrip/5.028/base/while.t
+SHA1 e882d4205c5c67f7876dc7984ceb474c96072253 t/roundtrip/5.028/mro/basic_04_dfs.t
 SHA1 bd67912b36e0e77592a37cc65a87b2067dde9efb t/roundtrip/Makefile
 SHA1 2136a8e7ac9bd37c52f6aaa974e54f1ce5e9459f t/roundtrip/README.md
 SHA1 3057ad0f1fe1324cd7a3327aae1c37f2bf76a127 t/roundtrip/deparse.sh
@@ -142,9 +157,8 @@ SHA1 188bb91a1f05c2130f77eebf325bd1c6239d75dc t/unit/03-treemain.t
 SHA1 6b7559435defb6db081e870fb7e6adf90c6ebc7f t/unit/04-fragment.t
 SHA1 85370074ebc28c5bede6192ec64bcd0de4ab8cdf t/unit/05-load.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAls7/gMACgkQGo3lAIJ17CFCqwCfaAjYdsL4e7cMBWUSV19LZIvz
-hlcAoJTp9wgsbQy4o3++owMp7u+IODbu
-=DRtj
+iF0EARECAB0WIQTapjvCWCA0oCuSPVIajeUAgnXsIQUCW0tdlAAKCRAajeUAgnXs
+ISihAJ9hK6i6B11YfUre0Lf4ALmjTlEWCQCfVWwibiovZf6DUqciRbrgToNPU4g=
+=QN6v
 -----END PGP SIGNATURE-----

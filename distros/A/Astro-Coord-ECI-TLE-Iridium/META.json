@@ -1,0 +1,70 @@
+{
+   "abstract" : "Class to compute Iridium Classic flares",
+   "author" : [
+      "Tom Wyant (wyant at cpan dot org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Astro-Coord-ECI-TLE-Iridium",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Config" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "5.64",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Astro::Coord::ECI::TLE" : "0.091",
+            "Astro::Coord::ECI::Utils" : "0.091",
+            "Carp" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "perl" : "5.006002",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Astro::Coord::ECI::TLE::Iridium" : {
+         "file" : "lib/Astro/Coord/ECI/TLE/Iridium.pm",
+         "version" : "0.100"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium.git",
+         "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium"
+      }
+   },
+   "version" : "0.100",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

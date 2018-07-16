@@ -1,4 +1,4 @@
-# $Id: 05-NSEC3.t 1389 2015-09-09 13:09:43Z willem $	-*-perl-*-
+# $Id: 05-NSEC3.t 1694 2018-07-16 04:19:40Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -98,9 +98,13 @@ my $wire = '0101000c04aabbccdd14174eb2409fe28bcb4887a1836f957f0a8425e27b00072201
 
 {
 	my $rr = new Net::DNS::RR("$name $type @data");
+	eval { Net::DNS::RR::NSEC3::name2hash( 0, 1, '' ) };	# invalid algorithm
+	eval { $rr->covered('example.') };			# historical
+	eval { $rr->match('example.') };			# historical
+	eval { $rr->typebm('') };				# historical
+
 	$rr->print;
 }
 
 exit;
-
 

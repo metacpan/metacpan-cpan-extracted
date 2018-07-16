@@ -12,11 +12,6 @@ if ($^O ne 'MSWin32' and !$ENV{DISPLAY}) {
 
 my $mw = MainWindow->new();
 
-if (!$mw->interp->pkg_require('snit')) {
-    print "1..0 # skip: no snit extension available\n";
-    exit;
-}
-
 plan test => 20, todo=>[12,20];
 
 my $foo = 12;

@@ -11,7 +11,7 @@ sub plot {
     my($demo) = @_;
     $TOP = $MW->WidgetDemo(
         -name     => $demo,
-        -text     => "This window displays a canvas widget containing a simple 2-dimensional plot.  You can doctor the data by dragging any of the points with mouse button 1.\n\nYou can also select a printable area with the mouse button 2.",
+        -text     => "This window displays a canvas widget containing a simple 2-dimensional plot.  You can doctor the data by dragging any of the points with the left mouse button.\n\nYou can also select a printable area with the middle mouse button.",
         -title    => 'Plot Demonstration',
         -iconname => 'plot',
     );

@@ -10,7 +10,7 @@ package Devel::Cover::DB;
 use strict;
 use warnings;
 
-our $VERSION = '1.29'; # VERSION
+our $VERSION = '1.30'; # VERSION
 
 use Devel::Cover::Criterion;
 use Devel::Cover::DB::File;
@@ -210,10 +210,12 @@ sub is_valid {
     return 1 if !-e $self->{db};
     return 1 if -e "$self->{db}/$DB";
     opendir my $fh, $self->{db} or return 0;
+    my $ignore = join "|", qw(
+        runs structure debuglog digests .AppleDouble
+    );
     for my $file (readdir $fh) {
         next if $file eq "." || $file eq "..";
-        next if $file =~ /(?:runs|structure|debuglog|digests)|(?:\.lock)$/
-                && -e "$self->{db}/$file";
+        next if $file =~ /(?:$ignore)|(?:\.lock)$/ && -e "$self->{db}/$file";
         warn "found $file in $self->{db}";
         return 0;
     }
@@ -280,7 +282,7 @@ sub merge {
 }
 
 sub _merge_hash {
-    my ($into, $from) = @_;
+    my ($into, $from, $noadd) = @_;
     return unless $from;
     for my $fkey (keys %{$from}) {
         # print STDERR "key [$fkey]\n";
@@ -288,11 +290,11 @@ sub _merge_hash {
 
         if (defined $into->{$fkey} and
             UNIVERSAL::isa($into->{$fkey}, "ARRAY")) {
-            _merge_array($into->{$fkey}, $fval);
+            _merge_array($into->{$fkey}, $fval, $noadd);
         } elsif (defined $fval && UNIVERSAL::isa($fval, "HASH")) {
             if (defined $into->{$fkey} and
                 UNIVERSAL::isa($into->{$fkey}, "HASH")) {
-                _merge_hash($into->{$fkey}, $fval);
+                _merge_hash($into->{$fkey}, $fval, $noadd);
             } else {
                 $into->{$fkey} = $fval;
             }
@@ -305,22 +307,22 @@ sub _merge_hash {
 }
 
 sub _merge_array {
-    my ($into, $from) = @_;
+    my ($into, $from, $noadd ) = @_;
     for my $i (@$into) {
         my $f = shift @$from;
         if (UNIVERSAL::isa($i, "ARRAY") ||
             !defined $i && UNIVERSAL::isa($f, "ARRAY")) {
-            _merge_array($i, $f || []);
+            _merge_array($i, $f || [], $noadd);
         } elsif (UNIVERSAL::isa($i, "HASH") ||
               !defined $i && UNIVERSAL::isa($f, "HASH") ) {
-            _merge_hash($i, $f || {});
+            _merge_hash($i, $f || {}, $noadd);
         } elsif (UNIVERSAL::isa($i, "SCALAR") ||
               !defined $i && UNIVERSAL::isa($f, "SCALAR") ) {
             $$i += $$f;
         } else {
             if (defined $f) {
                 $i ||= 0;
-                if ($f =~ /^\d+$/ && $i =~ /^\d+$/) {
+                if (!$noadd && $f =~ /^\d+$/ && $i =~ /^\d+$/) {
                     $i += $f;
                 } elsif ($i ne $f) {
                     warn "<$i> does not match <$f> - using later value";
@@ -800,7 +802,8 @@ sub cover {
     my %files;    # processed files
     my $cover = $self->{cover} = {};
     my $uncoverable = {};
-    my $st = Devel::Cover::DB::Structure->new(base => $self->{base})->read_all;
+    my $st = $self->{_structure}
+        // Devel::Cover::DB::Structure->new(base => $self->{base})->read_all;
     # Sometimes the start value is undefined.  It's not yet clear why, but it
     # probably has something to do with the code under test forking.  We'll
     # just try to cope with that here.
@@ -892,6 +895,12 @@ sub runs {
     @{$self->{runs}}{$self->run_keys}
 }
 
+sub set_structure {
+    my $self = shift;
+    my ($structure) = @_;
+    $self->{_structure} = $structure;
+}
+
 package Devel::Cover::DB::Run;
 
 our $AUTOLOAD;
@@ -917,7 +926,7 @@ Devel::Cover::DB - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.29
+version 1.30
 
 =head1 SYNOPSIS
 

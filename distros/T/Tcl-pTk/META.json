@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Tk",
       "Tcl",
@@ -12,6 +12,7 @@
       "GUI"
    ],
    "license" : [
+      "unknown",
       "perl_5"
    ],
    "meta-spec" : {
@@ -42,10 +43,12 @@
       "runtime" : {
          "requires" : {
             "Class::ISA" : "0.36",
+            "Sub::Name" : "0.05",
             "Tcl" : "0.9"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.92"
+   "version" : "0.93",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

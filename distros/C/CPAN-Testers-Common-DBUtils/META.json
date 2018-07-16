@@ -1,6 +1,6 @@
 {
     "name": "CPAN-Testers-Common-DBUtils",
-    "version": "0.12",
+    "version": "0.13",
     "abstract": "Basic Database Wrapper used by CPAN Testers modules",
     "author": [
         "Barbie (BARBIE) <barbie@cpan.org>"
@@ -48,7 +48,7 @@
     "provides": {
         "CPAN::Testers::Common::DBUtils": {
             "file": "lib/CPAN/Testers/Common/DBUtils.pm",
-            "version": "0.11"
+            "version": "0.13"
         }
     },
     "no_index": {

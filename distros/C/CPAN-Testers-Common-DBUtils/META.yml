@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                CPAN-Testers-Common-DBUtils
-version:             0.12
+version:             0.13
 abstract:            Basic Database Wrapper used by CPAN Testers modules
 author:
   - Barbie <barbie@cpan.org>
@@ -27,7 +27,7 @@ build_requires:
 provides:
   CPAN::Testers::Common::DBUtils:
     file:     lib/CPAN/Testers/Common/DBUtils.pm
-    version:  0.11
+    version:  0.13
 
 resources:
   license:    http://www.perlfoundation.org/artistic_license_2_0

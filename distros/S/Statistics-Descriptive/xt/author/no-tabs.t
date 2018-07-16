@@ -8,9 +8,11 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Statistics/Descriptive.pm',
+    'lib/Statistics/Descriptive/Full.pm',
     'lib/Statistics/Descriptive/Smoother.pm',
     'lib/Statistics/Descriptive/Smoother/Exponential.pm',
     'lib/Statistics/Descriptive/Smoother/Weightedexponential.pm',
+    'lib/Statistics/Descriptive/Sparse.pm',
     't/00-compile.t',
     't/00-load.t',
     't/boilerplate.t',
@@ -24,7 +26,8 @@ my @files = (
     't/quantile.t',
     't/smoother.t',
     't/smoother_exponential.t',
-    't/smoother_weightedexponential.t'
+    't/smoother_weightedexponential.t',
+    't/summary.t'
 );
 
 notabs_ok($_) foreach @files;

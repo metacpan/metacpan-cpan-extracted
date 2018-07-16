@@ -3,7 +3,7 @@ use warnings;
 
 package JMAP::Tester;
 # ABSTRACT: a JMAP client made for testing JMAP servers
-$JMAP::Tester::VERSION = '0.018';
+$JMAP::Tester::VERSION = '0.019';
 use Moo;
 
 use Crypt::Misc qw(decode_b64u encode_b64u);
@@ -284,6 +284,10 @@ sub request {
 
   my $http_res = $self->ua->request($post);
 
+  # Clear our handler, or it will get called for
+  # any http request our ua makes!
+  $self->ua->set_my_handler(request_send => undef);
+
   unless ($http_res->is_success) {
     $self->_logger->log_jmap_response({
       http_response => $http_res,
@@ -374,6 +378,9 @@ sub upload {
     $$blob_ref,
   );
 
+  # Or our sub below leaks us
+  weaken $self;
+
   $self->ua->set_my_handler(request_send => sub {
     my ($req) = @_;
     $self->_logger->log_upload_request({
@@ -383,6 +390,10 @@ sub upload {
   });
 
   my $res = $self->ua->request($post);
+
+  # Clear our handler, or it will get called for
+  # any http request our ua makes!
+  $self->ua->set_my_handler(request_send => undef);
 
   unless ($res->is_success) {
     $self->_logger->log_upload_response({
@@ -487,8 +498,13 @@ sub download {
 
   my $get = HTTP::Request->new(
     GET => $uri,
-    $self->_maybe_auth_header,
+    [
+      $self->_maybe_auth_header,
+    ],
   );
+
+  # Or our sub below leaks us
+  weaken $self;
 
   $self->ua->set_my_handler(request_send => sub {
     my ($req) = @_;
@@ -499,6 +515,10 @@ sub download {
   });
 
   my $res = $self->ua->request($get);
+
+  # Clear our handler, or it will get called for
+  # any http request our ua makes!
+  $self->ua->set_my_handler(request_send => undef);
 
   $self->_logger->log_download_response({
     http_response => $res,
@@ -574,11 +594,9 @@ sub simple_auth {
 
   my $start_res = $self->ua->post(
     $self->authentication_uri,
-    [
-      'Content-Type' => 'application/json; charset=utf-8',
-      'Accept'       => 'application/json',
-      'Content'      => $start_json,
-    ],
+    'Content-Type' => 'application/json; charset=utf-8',
+    'Accept'       => 'application/json',
+    'Content'      => $start_json,
   );
 
   unless ($start_res->code == 200) {
@@ -605,11 +623,9 @@ sub simple_auth {
 
   my $next_res = $self->ua->post(
     $self->authentication_uri,
-    [
-      'Content-Type' => 'application/json; charset=utf-8',
-      'Accept'       => 'application/json',
-      'Content'      => $next_json,
-    ],
+    'Content-Type' => 'application/json; charset=utf-8',
+    'Accept'       => 'application/json',
+    'Content'      => $next_json,
   );
 
   unless ($next_res->code == 201) {
@@ -772,7 +788,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 OVERVIEW
 

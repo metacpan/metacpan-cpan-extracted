@@ -42,6 +42,7 @@
             "OptArgs2" : "v0.0.10",
             "Path::Tiny" : "0",
             "Perl::Tidy" : "0",
+            "Pod::Text" : "0",
             "Pod::Tidy" : "0"
          }
       },
@@ -57,6 +58,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "v0.11.6",
+   "version" : "v0.11.10",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

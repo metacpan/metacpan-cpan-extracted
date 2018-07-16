@@ -1,0 +1,118 @@
+NAME
+    Finance::Currency::Convert::Mandiri - Convert currency using Bank
+    Mandiri
+
+VERSION
+    This document describes version 0.001 of
+    Finance::Currency::Convert::Mandiri (from Perl distribution
+    Finance-Currency-Convert-Mandiri), released on 2018-07-15.
+
+SYNOPSIS
+     use Finance::Currency::Convert::Mandiri qw(convert_currency);
+
+     printf "1 USD = Rp %.0f\n", convert_currency(1, 'USD', 'IDR');
+
+DESCRIPTION
+    This module can extract currency rates from the Bank Mandiri website:
+
+     https://www.bankmandiri.co.id/kurs
+
+    Currently only conversions from a few currencies to Indonesian Rupiah
+    (IDR) are supported.
+
+FUNCTIONS
+  convert_currency
+    Usage:
+
+     convert_currency($n, $from, $to, $which) -> any
+
+    Convert currency using Bank Mandiri.
+
+    Currently can only handle conversion "to" IDR. Dies if given other
+    currency.
+
+    Will warn if failed getting currencies from the webpage.
+
+    Currency rate is not cached (retrieved from the website every time).
+    Employ your own caching.
+
+    Will return undef if no conversion rate is available for the requested
+    currency.
+
+    Use "get_currencies()", which actually retrieves and scrapes the source
+    web page, if you need the more complete result.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $from* => *str*
+
+    *   $n* => *float*
+
+    *   $to* => *str*
+
+    *   $which => *str* (default: "avg_sr")
+
+        Select which rate to use (default is average buy+sell for e-Rate).
+
+        {buy,sell,avg}_{bn,er,ttc}.
+
+    Return value: (any)
+
+  get_currencies
+    Usage:
+
+     get_currencies() -> [status, msg, result, meta]
+
+    Extract data from Bank Mandiri page.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+    Will return a hash containing key "currencies".
+
+    The currencies is a hash with currency symbols as keys and prices as
+    values.
+
+    Tha values is a hash with these keys: "buy_bn" and "sell_bn" (Bank Note
+    buy/sell rates), "buy_sr" and "sell_sr" (Special Rate buy/sell rates),
+    "buy_ttc" and "sell_ttc" (Telegraphic Transfer Counter buy/sell rates).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Finance-Currency-Convert-Mandiri>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Finance-Currency-Convert-Mandiri>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Conv
+    ert-Mandiri>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

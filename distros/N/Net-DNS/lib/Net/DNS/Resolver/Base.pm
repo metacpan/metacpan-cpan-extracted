@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1608 2017-12-07 10:10:38Z willem $
+# $Id: Base.pm 1692 2018-07-06 08:55:39Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1608 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1692 $)[1];
 
 
 #
@@ -11,7 +11,7 @@ our $VERSION = (qw$LastChangedRevision: 1608 $)[1];
 #
 #  In general we try to be gracious to those stacks that do not have IPv6 support.
 #  The socket code is conditionally compiled depending upon the availability of
-#  IO::Socket::IP or the deprecated IO::Socket::INET6 package.
+#  the IO::Socket::IP package.
 #
 #  We have chosen not to use mapped IPv4 addresses, there seem to be issues
 #  with this; as a result we use separate sockets for each family type.
@@ -23,17 +23,12 @@ our $VERSION = (qw$LastChangedRevision: 1608 $)[1];
 #  are provided to control IPv6 behaviour for test purposes.
 #
 # Olaf Kolkman, RIPE NCC, December 2003.
-# [Revised March 2016]
+# [Revised March 2016, June 2018]
 
 
 use constant USE_SOCKET_IP => defined eval 'use IO::Socket::IP 0.32; 1;';
 
-use constant USE_SOCKET_INET => defined eval 'require IO::Socket::INET';
-
-use constant USE_SOCKET_INET6 => defined eval 'require IO::Socket::INET6';
-
-use constant IPv4 => USE_SOCKET_IP || USE_SOCKET_INET;
-use constant IPv6 => USE_SOCKET_IP || USE_SOCKET_INET6;
+use constant IPv6 => USE_SOCKET_IP;
 
 
 # If SOCKSified Perl, use TCP instead of UDP and keep the socket open.
@@ -877,16 +872,6 @@ sub _create_tcp_socket {
 			if USE_SOCKET_IP;
 
 	unless (USE_SOCKET_IP) {
-		$socket = IO::Socket::INET6->new(
-			LocalAddr => $self->{srcaddr6},
-			LocalPort => $self->{srcport},
-			PeerAddr  => $ip,
-			PeerPort  => $self->{port},
-			Proto	  => 'tcp',
-			Timeout	  => $self->{tcp_timeout},
-			)
-				if USE_SOCKET_INET6 && $ip6_addr;
-
 		$socket = IO::Socket::INET->new(
 			LocalAddr => $self->{srcaddr4},
 			LocalPort => $self->{srcport} || undef,
@@ -922,14 +907,6 @@ sub _create_udp_socket {
 			if USE_SOCKET_IP;
 
 	unless (USE_SOCKET_IP) {
-		$socket = IO::Socket::INET6->new(
-			LocalAddr => $self->{srcaddr6},
-			LocalPort => $self->{srcport},
-			Proto	  => 'udp',
-			Type	  => SOCK_DGRAM
-			)
-				if USE_SOCKET_INET6 && $ip6_addr;
-
 		$socket = IO::Socket::INET->new(
 			LocalAddr => $self->{srcaddr4},
 			LocalPort => $self->{srcport} || undef,
@@ -956,15 +933,11 @@ sub _create_udp_socket {
 	my $ip4 = USE_SOCKET_IP ? {family => AF_INET,  @udp} : {};
 	my $ip6 = USE_SOCKET_IP ? {family => AF_INET6, @udp} : {};
 
-	my $inet6 = USE_SOCKET_INET6 ? [AF_INET6, SOCK_DGRAM, 0, Socket6::AI_NUMERICHOST()] : [];
-
 	sub _create_dst_sockaddr {	## create UDP destination sockaddr structure
 		my ( $self, $ip, $port ) = @_;
 
 		unless (USE_SOCKET_IP) {
 			return sockaddr_in( $port, inet_aton($ip) ) unless _ipv6($ip);
-			return ( Socket6::getaddrinfo( $ip, $port, @$inet6 ) )[3]
-					if USE_SOCKET_INET6;
 		}
 
 		( grep ref, Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $ip6 : $ip4 ), {} )[0]->{addr}

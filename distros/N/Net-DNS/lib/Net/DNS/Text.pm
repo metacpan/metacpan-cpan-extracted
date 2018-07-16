@@ -1,9 +1,9 @@
 package Net::DNS::Text;
 
 #
-# $Id: Text.pm 1601 2017-10-10 14:17:01Z willem $
+# $Id: Text.pm 1694 2018-07-16 04:19:40Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1601 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1694 $)[1];
 
 
 =head1 NAME
@@ -187,12 +187,12 @@ Conditionally quoted zone file representation of the text object.
 sub string {
 	my $self = shift;
 
-	my @s = map split( '', $_ ), @$self;			# escape non-printable
+	my @s = map split( '', $_ ), @$self;			# escape special and ASCII non-printable
 	my $string = _decode_utf8( join '', map $escape{$_}, @s );
 
-	return $string unless $string =~ /^$|[ \t\n\r\f]/;	# unquoted contiguous
+	return $string unless $string =~ /[ \t\n\r\f]|^$|;$/;	# unquoted contiguous
 
-	$string =~ s/\\([$();@])/$1/g;				# nothing special within quotes
+	$string =~ s/\\([^"0-9])/$1/g;				# unescape printable characters except \"
 	join '', '"', $string, '"';				# quoted string
 }
 
@@ -239,11 +239,11 @@ sub _encode_utf8 {			## perl internal encoding to UTF-8
 		$table{pack( 'C', $_ )} = pack 'C', $_;
 	}
 
-	foreach ( 34, 36, 40, 41, 59, 64, 92 ) {		# escape character
+	foreach ( 34, 40, 41, 59 ) {				# character escape	" ( ) ;
 		$table{pack( 'C', $_ )} = pack 'C2', 92, $_;
 	}
 
-	foreach my $n ( @C0, 127, @NA ) {			# \ddd
+	foreach my $n ( @C0, 92, 127, @NA ) {			# numerical escape
 		my $codepoint = sprintf( '%03u', $n );
 
 		# partial transliteration for non-ASCII character encodings

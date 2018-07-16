@@ -1,6 +1,6 @@
 package Map::Tube::Madrid;
 
-$Map::Tube::Madrid::VERSION   = '0.11';
+$Map::Tube::Madrid::VERSION   = '0.12';
 $Map::Tube::Madrid::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Madrid - Interface to the Madrid Metro Map.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -32,6 +32,8 @@ It currently only covers 2 metro lines.
 
 =over 4
 
+=item * L1
+
 =item * L<L3|Map::Tube::Madrid::Line::L3>
 
 =item * L<L5|Map::Tube::Madrid::Line::L5>
@@ -41,8 +43,6 @@ It currently only covers 2 metro lines.
 =head1 TODO (Metro Lines)
 
 =over 4
-
-=item * L1
 
 =item * L2
 

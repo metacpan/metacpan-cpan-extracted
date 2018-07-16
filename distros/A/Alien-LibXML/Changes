@@ -6,6 +6,15 @@ Home page:    <https://metacpan.org/release/Alien-LibXML>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Alien-LibXML>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.004	2018-07-16
+
+ [ Bug Fixes ]
+ - Explicit dependency on Alien::Base::ModuleBuild.
+   Fixes RT#125808.
+   Graham Ollis++
+   <https://rt.cpan.org/Ticket/Display.html?id=125808>
+   <https://github.com/tobyink/p5-alien-libxml/pull/5>
+
 0.003	2014-09-16
 
  [ Packaging ]

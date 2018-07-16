@@ -16,6 +16,14 @@ t/unicode.t		some unicode tests
 t/var.t			See if access to/from Tcl variables works
 t/export_to_tcl.t	test convenience sub export_to_tcl
 t/disposal-subs.t	check if code refs destroyed and removed from tcl
+t/disposal-subs-a.t
+t/disposal-subs-b.t
+t/disposal-subs-c.t
+t/disposal-subs-d.t
+t/disposal-subs-e.t
+t/disposal-subs-f.t
+t/memleak-a.t
+t/set-callback.t
 typemap			Tcl extension types
 tclcfg.tcl		Tcl script to discover TCL installation options
 tcl-core/aix/libtclstub8.4.a

@@ -14,7 +14,7 @@ use base "Devel::Cover::DB::IO::Base";
 
 use Storable;
 
-our $VERSION = '1.29'; # VERSION
+our $VERSION = '1.30'; # VERSION
 
 sub new {
     my $class = shift;
@@ -44,7 +44,7 @@ Devel::Cover::DB::IO::Storable - Storable based IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.29
+version 1.30
 
 =head1 SYNOPSIS
 

@@ -32,7 +32,8 @@ requires:
   OptArgs2: v0.0.10
   Path::Tiny: '0'
   Perl::Tidy: '0'
+  Pod::Text: '0'
   Pod::Tidy: '0'
 resources: {}
-version: v0.11.6
+version: v0.11.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

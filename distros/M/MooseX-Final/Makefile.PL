@@ -7,7 +7,7 @@ my $meta = {
   "abstract"         => "mark a class as \"final\" (cannot be inherited from)",
   "author"           => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"         => [],
   "license"          => ["perl_5"],
   "meta-spec"        => {
@@ -32,7 +32,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "MooseX::Final" => { file => "lib/MooseX/Final.pm", version => 0.001 },
+                          "MooseX::Final" => { file => "lib/MooseX/Final.pm", version => 0.002 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -48,7 +48,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooseX-Final/project",
                         },
-  "version"          => 0.001,
+  "version"          => 0.002,
   "x_static_install" => 1,
 };
 

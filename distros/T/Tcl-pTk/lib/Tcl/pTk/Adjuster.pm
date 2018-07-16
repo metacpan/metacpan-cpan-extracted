@@ -1,6 +1,6 @@
 package Tcl::pTk::Adjuster;
 
-our ($VERSION) = ('0.92');
+our ($VERSION) = ('0.93');
 
 ##### Implementation of Tk::Adjuster in Tcl::pTk ###########
 ## This code is incomplete for Tcl::pTk (because GeometryRequest method isn't supported)

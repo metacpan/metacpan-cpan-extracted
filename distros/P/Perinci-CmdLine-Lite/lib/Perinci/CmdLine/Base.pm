@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2018-05-29'; # DATE
-our $VERSION = '1.813'; # VERSION
+our $DATE = '2018-07-16'; # DATE
+our $VERSION = '1.815'; # VERSION
 
 use 5.010001;
 use strict;
@@ -534,6 +534,7 @@ sub do_dump {
 
     # check whether subcommand is defined. try to search from --cmd, first
     # command-line argument, or default_subcommand.
+    $self->hook_before_parse_argv($r);
     $self->_parse_argv1($r);
 
     if ($r->{read_env}) {
@@ -593,6 +594,7 @@ sub do_completion {
 
     # check whether subcommand is defined. try to search from --cmd, first
     # command-line argument, or default_subcommand.
+    $self->hook_before_parse_argv($r);
     $self->_parse_argv1($r);
 
     if ($r->{read_env}) {
@@ -1603,11 +1605,13 @@ sub run {
     } elsif (ref($r->{res}) ne 'ARRAY') {
         log_trace("[pericmd] res=%s", $r->{res}); #2
         $r->{res} = [500, "Bug in program: result not an array"];
-    } elsif (!$r->{res}[0] || $r->{res}[0] < 200 || $r->{res}[0] > 555) {
-        log_trace("[pericmd] res=%s", $r->{res}); #3
-        $r->{res} = [500, "Bug in program: invalid result status, ".
-                         "must be 200 <= x <= 555"];
     }
+
+    if (!$r->{res}[0] || $r->{res}[0] < 200 || $r->{res}[0] > 555) {
+        $r->{res}[3]{'x.orig_status'} = $r->{res}[0];
+        $r->{res}[0] = 555;
+    }
+
     $r->{format} //= $r->{res}[3]{'cmdline.default_format'};
     $r->{format} //= $r->{meta}{'cmdline.default_format'};
     my $restore_orig_result;
@@ -1680,7 +1684,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.813 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2018-05-29.
+This document describes version 1.815 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2018-07-16.
 
 =head1 DESCRIPTION
 

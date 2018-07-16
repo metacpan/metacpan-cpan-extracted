@@ -1,5 +1,5 @@
 package Net::Stripe::Plan;
-$Net::Stripe::Plan::VERSION = '0.35';
+$Net::Stripe::Plan::VERSION = '0.36';
 use Moose;
 use Moose::Util::TypeConstraints qw(subtype as where message);
 use Kavorka;
@@ -42,67 +42,7 @@ Net::Stripe::Plan - represent a Plan object from Stripe
 
 =head1 VERSION
 
-version 0.35
-
-=head1 ATTRIBUTES
-
-=head2 amount
-
-Reader: amount
-
-Type: Maybe[Int]
-
-This attribute is required.
-
-=head2 currency
-
-Reader: currency
-
-Type: Maybe[Str]
-
-This attribute is required.
-
-=head2 id
-
-Reader: id
-
-Type: Maybe[Str]
-
-This attribute is required.
-
-=head2 interval
-
-Reader: interval
-
-Type: Maybe[Str]
-
-This attribute is required.
-
-=head2 interval_count
-
-Reader: interval_count
-
-Type: Maybe[Int]
-
-=head2 name
-
-Reader: name
-
-Type: Maybe[Str]
-
-This attribute is required.
-
-=head2 statement_description
-
-Reader: statement_description
-
-Type: Maybe[StatementDescription]
-
-=head2 trial_period_days
-
-Reader: trial_period_days
-
-Type: Maybe[Int]
+version 0.36
 
 =head1 AUTHORS
 

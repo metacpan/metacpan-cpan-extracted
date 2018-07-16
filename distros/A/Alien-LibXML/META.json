@@ -4,7 +4,7 @@
       "Toby Inkster <tobyink@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "mit"
    ],
@@ -16,14 +16,13 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Alien::Base" : "0.001",
+            "Alien::Base::ModuleBuild" : "0.001",
             "Module::Build" : "0.38"
          }
       },
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0.005",
-            "File::ShareDir" : "1.00",
             "perl" : "v5.8.9"
          }
       },
@@ -36,7 +35,7 @@
    "provides" : {
       "Alien::LibXML" : {
          "file" : "lib/Alien/LibXML.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -52,8 +51,9 @@
          "url" : "git://github.com/tobyink/p5-alien-libxml.git"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_contributors" : [
       "Graham Ollis (PLICEASE) <plicease@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -6,6 +6,9 @@ MANIFEST	This list of files
 Makefile.PL	Tcl::Tk extension makefile writer
 README		Introduction to the Tcl::Tk extension
 lib/Tcl/Tk.pm	Tcl::Tk extension module
+lib/Tcl/Fallback/snit1.pm	pure-tcl code, in case it isn't found in tcl/tk
+lib/Tcl/Fallback/scrollw.pm	pure-tcl code, in case it isn't found in tcl/tk
+lib/Tcl/Fallback/widget.pm	pure-tcl code, in case it isn't found in tcl/tk
 lib/Tcl/Tk/Widget/Balloon.pm	Balloon Tix widget perlTk compatibility
 lib/Tcl/Tk/Widget/Text.pm	some Text widget methods for perlTk compatibility
 t/after.t

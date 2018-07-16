@@ -7,6 +7,21 @@ Home page:    <https://wiki.debian.org/Boxer>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Boxer>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v1.1.8	2018-07-13
+
+ [ Bug Fixes ]
+ - Fix subcommand about choking on authority implemented but undefined.
+ - Fix subcommand about listing authority: Use namespace::autoclean (not
+   namespace::clean, and use recent version to avoid Moo inflation to
+   Moose).
+ - Fix subcommand aliases help text to use valid example, and tone down
+   usage (only some not most subcommands have aliases).
+ - Fix syntax error resolving nonfree packages in Boxer::World::Reclass.
+
+ [ Documentation ]
+ - Fix changelog entry part of release v1.1.5.
+ - Fix typo in POD of module Boxer::World::Flat.
+
 v1.1.7	2017-11-06
 
  [ Bug Fixes ]
@@ -39,7 +54,7 @@ v1.1.5	2017-01-24
  - Add World and Part classes, with unit test.
  - Consistently use namespace::clean in modules. Order use by
    pragma/non-Moo/Moo/cleanup and (roughly) by specificity.
- - Drop unusued code in Boxer::CLI.
+ - Drop unused code in Boxer::CLI.
  - Modernize to use perl v5.14, utf8, and strictures 2.
  - Stop handle __PKGAUTOLIST__ in data (deprecated since 0.004).
  - Stop skip undefined args in Task::Serialize (needed only for

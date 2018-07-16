@@ -12,6 +12,7 @@ lib/Finance/Currency/FiatX/Role/Source.pm
 lib/Finance/Currency/FiatX/Source/bca.pm
 lib/Finance/Currency/FiatX/Source/bi.pm
 lib/Finance/Currency/FiatX/Source/gmc.pm
+lib/Finance/Currency/FiatX/Source/mandiri.pm
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

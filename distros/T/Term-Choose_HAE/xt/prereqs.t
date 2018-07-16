@@ -4,4 +4,4 @@ use strict;
 
 use Test::More;
 use Test::Prereq;
-prereq_ok( undef, undef, [ qw( Data_Test_Arguments Data_Test_Choose ) ] );
+prereq_ok( undef, [ 'Data_Test_Arguments' ] );

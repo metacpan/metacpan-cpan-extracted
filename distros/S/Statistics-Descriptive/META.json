@@ -53,6 +53,7 @@
             "List::Util" : "0",
             "POSIX" : "0",
             "base" : "0",
+            "parent" : "0",
             "perl" : "5.006",
             "strict" : "0",
             "vars" : "0",
@@ -75,27 +76,27 @@
    "provides" : {
       "Statistics::Descriptive" : {
          "file" : "lib/Statistics/Descriptive.pm",
-         "version" : "3.0613"
+         "version" : "3.0701"
       },
       "Statistics::Descriptive::Full" : {
-         "file" : "lib/Statistics/Descriptive.pm",
-         "version" : "3.0613"
+         "file" : "lib/Statistics/Descriptive/Full.pm",
+         "version" : "3.0701"
       },
       "Statistics::Descriptive::Smoother" : {
          "file" : "lib/Statistics/Descriptive/Smoother.pm",
-         "version" : "3.0613"
+         "version" : "3.0701"
       },
       "Statistics::Descriptive::Smoother::Exponential" : {
          "file" : "lib/Statistics/Descriptive/Smoother/Exponential.pm",
-         "version" : "3.0613"
+         "version" : "3.0701"
       },
       "Statistics::Descriptive::Smoother::Weightedexponential" : {
          "file" : "lib/Statistics/Descriptive/Smoother/Weightedexponential.pm",
-         "version" : "3.0613"
+         "version" : "3.0701"
       },
       "Statistics::Descriptive::Sparse" : {
-         "file" : "lib/Statistics/Descriptive.pm",
-         "version" : "3.0613"
+         "file" : "lib/Statistics/Descriptive/Sparse.pm",
+         "version" : "3.0701"
       }
    },
    "release_status" : "stable",
@@ -110,7 +111,7 @@
          "web" : "https://github.com/shlomif/perl-Statistics-Descriptive"
       }
    },
-   "version" : "3.0613",
+   "version" : "3.0701",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026002"
@@ -455,33 +456,6 @@
             "version" : "0.007"
          },
          {
-            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
-            "config" : {
-               "Dist::Zilla::Plugin::MetaProvides::Package" : {
-                  "finder_objects" : [
-                     {
-                        "class" : "Dist::Zilla::Plugin::FinderCode",
-                        "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.012"
-                     }
-                  ],
-                  "include_underscores" : 0
-               },
-               "Dist::Zilla::Role::MetaProvider::Provider" : {
-                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
-                  "inherit_missing" : 1,
-                  "inherit_version" : 1,
-                  "meta_noindex" : 1
-               },
-               "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000033",
-                  "version" : "0.006"
-               }
-            },
-            "name" : "MetaProvides::Package",
-            "version" : "2.004003"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::PruneFiles",
             "name" : "PruneFiles",
             "version" : "6.012"
@@ -581,11 +555,6 @@
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
             "version" : "6.012"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::FinderCode",
-            "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.012"
          }
       ],
       "zilla" : {
@@ -597,6 +566,6 @@
       }
    },
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

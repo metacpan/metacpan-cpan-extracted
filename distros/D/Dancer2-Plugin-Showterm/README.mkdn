@@ -4,7 +4,7 @@ Dancer2::Plugin::Showterm - Replay terminal typescript captures
 
 # VERSION
 
-version 0.0.2
+version 0.0.3
 
 # SYNOPSIS
 
@@ -48,7 +48,7 @@ pages via iframes:
 
 # CAPTURING THE ACTION
 
-The cli capture is done using the UNIX utility c<script>. 
+The cli capture is done using the UNIX utility `script`. 
 The plugin assumes that the captured screen is 80 columns by 24 rows.
 
 ```perl
@@ -104,6 +104,12 @@ If provided, will be added to the showterm page.
 # SEE ALSO
 
 - [http://showterm.io](http://showterm.io) - the original service
+- [asciinema](https://asciinema.org/)
+
+    Alternative solution. Arguably simpler to embed (see
+    [https://asciinema.org/docs/embedding](https://asciinema.org/docs/embedding)) as the project 
+    provides the required `css` and `js` files -- which mean it 
+    doesn't require any extra Dancer plugin like this one.
 
 # AUTHOR
 

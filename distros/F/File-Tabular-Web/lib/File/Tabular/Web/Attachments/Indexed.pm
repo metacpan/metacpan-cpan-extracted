@@ -61,7 +61,10 @@ sub before_search {
 
 
   # searches into the fulltext index are passed through param 'SFT'
-  $self->{search_fulltext} = $self->param('SFT') or return;
+  unless($self->{search_fulltext} = $self->param('SFT')) {
+    delete $self->{fulltext_result};
+    return;
+  }
 
   $self->{app}{indexer} ||= Search::Indexer->new( 
     dir          => $self->{app}{dir},

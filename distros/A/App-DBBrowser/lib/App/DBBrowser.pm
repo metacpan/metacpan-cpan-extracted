@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.019';
+our $VERSION = '2.020';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -701,7 +701,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.019
+Version 2.020
 
 =head1 DESCRIPTION
 

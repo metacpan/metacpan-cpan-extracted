@@ -3,7 +3,7 @@ use 5.008003;
 use warnings;
 use strict;
 
-use Term::Choose;
+use Term::Choose_HAE;
 
 use FindBin qw( $RealBin );
 use lib $RealBin;

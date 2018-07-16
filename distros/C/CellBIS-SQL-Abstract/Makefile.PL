@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "SQL Abstract",
+  "ABSTRACT" => "SQL Query Generator",
   "AUTHOR" => "Achmad Yusri Afandi <yusrideb\@cpan.org>",
   "BUILD_REQUIRES" => {
     "Module::Build" => "0.28"
@@ -20,36 +20,22 @@ my %WriteMakefileArgs = (
   "LICENSE" => "artistic_2",
   "NAME" => "CellBIS::SQL::Abstract",
   "PREREQ_PM" => {
-    "Mojo::Base" => 0,
-    "Mojo::Util" => 0,
+    "Hash::MultiValue" => 0,
     "Mojolicious" => 0,
     "Scalar::Util" => 0
   },
-  "TEST_REQUIRES" => {
-    "FindBin" => 0,
-    "Test::More" => 0,
-    "lib" => 0,
-    "strict" => 0,
-    "warnings" => 0
-  },
-  "VERSION" => "0.5",
+  "VERSION" => "0.7",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/02-query/*.t t/03-additional/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
-  "FindBin" => 0,
+  "Hash::MultiValue" => 0,
   "Module::Build" => "0.28",
-  "Mojo::Base" => 0,
-  "Mojo::Util" => 0,
   "Mojolicious" => 0,
-  "Scalar::Util" => 0,
-  "Test::More" => 0,
-  "lib" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "Scalar::Util" => 0
 );
 
 

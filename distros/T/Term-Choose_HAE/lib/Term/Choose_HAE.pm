@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -14,7 +14,7 @@ use Text::ANSI::WideUtil   qw( ta_mbtrunc );
 
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
-use Term::Choose::Constants qw( :choose :linux );
+use Term::Choose::Constants qw( :choose :screen :linux );
 use Term::Choose::LineFold qw( print_columns );
 
 use parent 'Term::Choose';
@@ -185,7 +185,7 @@ Term::Choose_HAE - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 0.054
+Version 0.055
 
 =cut
 

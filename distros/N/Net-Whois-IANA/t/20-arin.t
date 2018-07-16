@@ -4,13 +4,13 @@ use warnings;
 use Test::More tests => 4;
 use Net::Whois::IANA;
 
-my $iana = new Net::Whois::IANA;
-my $ip = '192.149.252.43';
+my $iana = Net::Whois::IANA->new;
+my $ip   = '192.149.252.43';
 
-$iana->whois_query(-ip => $ip, -whois => 'arin');
-ok(defined $iana);
-is($iana->country(), 'US');
+$iana->whois_query( -ip => $ip, -whois => 'arin' );
+ok( defined $iana );
+is( $iana->country(), 'US' );
 $ip = '192.228.29.1';
-$iana->whois_query(-ip => $ip, -whois => 'arin');
-ok(defined $iana);
-is($iana->country(), 'CA');
+$iana->whois_query( -ip => $ip, -whois => 'arin' );
+ok( defined $iana );
+is( $iana->country(), 'CA' );

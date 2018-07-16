@@ -1,46 +1,34 @@
 # -*- cperl -*-
 
 use ExtUtils::testlib;
-use Test::More tests => 5 ;
+use Test::More ;
 use Config::Model;
-use Log::Log4perl qw(:easy) ;
-use Data::Dumper ;
+use Config::Model::Tester::Setup qw/init_test/;
 use Test::Memory::Cycle;
 
 use warnings;
-no warnings qw(once);
-
 use strict;
 
-my $arg = shift || '' ;
-my $trace = $arg =~ /t/ ? 1 : 0 ;
-$::verbose          = 1 if $arg =~ /v/;
-$::debug            = 1 if $arg =~ /d/;
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
+my ($model, $trace) = init_test();
 
-Log::Log4perl->easy_init($arg =~ /l/ ? $DEBUG: $ERROR);
-
-my $model = Config::Model->new() ;
-
-$model ->create_config_class
-  (
+$model ->create_config_class (
    name => "Master",
-   'element'
-   => [ 
-       'backend' => { type => 'leaf',
-		      class => 'Config::Model::Itself::BackendDetector' ,
-		      value_type => 'enum',
-		      choice => [qw/cds_file perl_file ini_file custom/],
+   'element' => [
+       'backend' => {
+           type => 'leaf',
+           class => 'Config::Model::Itself::BackendDetector' ,
+           value_type => 'enum',
+           choice => [qw/cds_file perl_file ini_file custom/],
 
-		       help => {
-			       cds_file => "file ...",
-			       ini_file => "Ini file ...",
-			       perl_file => "file  perl",
-			       custom => "Custom format",
-			      }
-		    }
-      ],
-  );
+           help => {
+               cds_file => "file ...",
+               ini_file => "Ini file ...",
+               perl_file => "file  perl",
+               custom => "Custom format",
+           }
+       }
+   ],
+);
 
 ok(1,"test class created") ;
 
@@ -62,4 +50,6 @@ like($help,qr/provided by L<Config::Model::Backend::Yaml>/,
 $help = $backend->get_help('cds_file') ;
 is($help,"file ...", "cds_file help was kept") ;
 
-memory_cycle_ok($model);
+memory_cycle_ok($model, "memory cycle");
+
+done_testing;

@@ -11,7 +11,7 @@ sub sayings {
     my($demo) = @_;
     $TOP = $MW->WidgetDemo(
         -name     => $demo,
-        -text     => 'The listbox below contains a collection of well-known sayings.  You can scan the list using either of the scrollbars or by dragging in the listbox window with button 2 pressed.',
+        -text     => 'The listbox below contains a collection of well-known sayings.  You can scan the list using either of the scrollbars or by dragging in the listbox window with the middle mouse button pressed.',
         -title    => 'Listbox Demonstration (well-known sayings)',
         -iconname => 'sayings',
     );

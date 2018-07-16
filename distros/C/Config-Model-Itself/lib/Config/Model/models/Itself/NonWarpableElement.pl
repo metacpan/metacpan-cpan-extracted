@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Itself
 #
-# This software is Copyright (c) 2007-2017 by Dominique Dumont.
+# This software is Copyright (c) 2007-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -109,7 +109,8 @@
                 },
                 description =>
                   "points to an array or hash element in the configuration "
-                  . "tree using the path syntax. The available choice of this "
+                  . "tree using L<grab syntax|Config::Model::Role::Grab>. "
+                  . "The available choice of this "
                   . "reference value (or check list)is made from the available "
                   . "keys of the pointed hash element or the values of the pointed array element.",
             },

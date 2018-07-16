@@ -3,8 +3,8 @@ NAME
     framework
 
 VERSION
-    This document describes version 1.813 of Perinci::CmdLine::Lite (from
-    Perl distribution Perinci-CmdLine-Lite), released on 2018-05-29.
+    This document describes version 1.815 of Perinci::CmdLine::Lite (from
+    Perl distribution Perinci-CmdLine-Lite), released on 2018-07-16.
 
 SYNOPSIS
     In "gen-random-num" script:

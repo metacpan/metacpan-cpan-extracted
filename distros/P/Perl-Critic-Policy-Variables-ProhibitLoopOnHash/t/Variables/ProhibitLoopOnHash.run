@@ -99,3 +99,14 @@ END { $dbh->do("DROP TABLE $_") foreach %tables }
 { print foreach %{@y} }
 { print foreach %y; }
 print foreach %y;
+
+## name Variable attributes
+## failures 1
+## cut
+
+# this is fine
+for my Dog $foo (@bar) { }
+for my Foo::Bar $foo (@bar) { }
+
+# fails
+for my Foo::Bar $foo (%bar) { }

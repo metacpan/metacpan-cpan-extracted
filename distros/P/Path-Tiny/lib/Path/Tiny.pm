@@ -5,7 +5,7 @@ use warnings;
 package Path::Tiny;
 # ABSTRACT: File path utility
 
-our $VERSION = '0.104';
+our $VERSION = '0.106';
 
 # Dependencies
 use Config;
@@ -23,7 +23,6 @@ use constant {
     DIR      => 3,
     FILE     => 4,
     TEMP     => 5,
-    IS_BSD   => ( scalar $^O =~ /bsd$/ ),
     IS_WIN32 => ( $^O eq 'MSWin32' ),
 };
 
@@ -111,26 +110,26 @@ sub _symbolic_chmod {
     return $mode;
 }
 
-# flock doesn't work on NFS on BSD.  Since program authors often can't control
-# or detect that, we warn once instead of being fatal if we can detect it and
-# people who need it strict can fatalize the 'flock' category
+# flock doesn't work on NFS on BSD or on some filesystems like lustre.
+# Since program authors often can't control or detect that, we warn once
+# instead of being fatal if we can detect it and people who need it strict
+# can fatalize the 'flock' category
 
 #<<< No perltidy
-{ package flock; use if Path::Tiny::IS_BSD(), 'warnings::register' }
+{ package flock; use warnings::register }
 #>>>
 
-my $WARNED_BSD_NFS = 0;
+my $WARNED_NO_FLOCK = 0;
 
 sub _throw {
     my ( $self, $function, $file, $msg ) = @_;
-    if (   IS_BSD()
-        && $function =~ /^flock/
-        && $! =~ /operation not supported/i
+    if (   $function =~ /^flock/
+        && $! =~ /operation not supported|function not implemented/i
         && !warnings::fatal_enabled('flock') )
     {
-        if ( !$WARNED_BSD_NFS ) {
-            warnings::warn( flock => "No flock for NFS on BSD: continuing in unsafe mode" );
-            $WARNED_BSD_NFS++;
+        if ( !$WARNED_NO_FLOCK ) {
+            warnings::warn( flock => "Flock not available: '$!': continuing in unsafe mode" );
+            $WARNED_NO_FLOCK++;
         }
     }
     else {
@@ -503,8 +502,9 @@ sub absolute {
 #pod     path("foo.txt")->append_raw(@data);
 #pod     path("foo.txt")->append_utf8(@data);
 #pod
-#pod Appends data to a file.  The file is locked with C<flock> prior to writing.  An
-#pod optional hash reference may be used to pass options.  Valid options are:
+#pod Appends data to a file.  The file is locked with C<flock> prior to writing
+#pod and closed afterwards.  An optional hash reference may be used to pass
+#pod options.  Valid options are:
 #pod
 #pod =for :list
 #pod * C<binmode>: passed to C<binmode()> on the handle used for writing.
@@ -664,6 +664,11 @@ sub cached_temp {
 #pod Returns a new C<Path::Tiny> object relative to the original.  Works
 #pod like C<catfile> or C<catdir> from File::Spec, but without caring about
 #pod file or directories.
+#pod
+#pod B<WARNING>: because the argument could contain C<..> or refer to symlinks,
+#pod there is no guarantee that the new path refers to an actual descendent of
+#pod the original.  If this is important to you, transform parent and child with
+#pod L</realpath> and check them with L</subsumes>.
 #pod
 #pod Current API available since 0.001.
 #pod
@@ -1019,7 +1024,7 @@ sub filehandle {
     $binmode = "" unless defined $binmode;
 
     my ( $fh, $lock, $trunc );
-    if ( $HAS_FLOCK && $args->{locked} ) {
+    if ( $HAS_FLOCK && $args->{locked} && !$ENV{PERL_PATH_TINY_NO_FLOCK} ) {
         require Fcntl;
         # truncating file modes shouldn't truncate until lock acquired
         if ( grep { $opentype eq $_ } qw( > +> ) ) {
@@ -1337,7 +1342,7 @@ sub mkpath {
 #pod
 #pod Move the current path to the given destination path using Perl's
 #pod built-in L<rename|perlfunc/rename> function. Returns the result
-#pod of the C<rename> function.
+#pod of the C<rename> function (except it throws an exception if it fails).
 #pod
 #pod Current API available since 0.001.
 #pod
@@ -2138,7 +2143,7 @@ Path::Tiny - File path utility
 
 =head1 VERSION
 
-version 0.104
+version 0.106
 
 =head1 SYNOPSIS
 
@@ -2197,7 +2202,7 @@ All paths are forced to have Unix-style forward slashes.  Stringifying
 the object gives you back the path (after some clean up).
 
 File input/output methods C<flock> handles before reading or writing,
-as appropriate (if supported by the platform).
+as appropriate (if supported by the platform and/or filesystem).
 
 The C<*_utf8> methods (C<slurp_utf8>, C<lines_utf8>, etc.) operate in raw
 mode.  On Windows, that means they will not have CRLF translation from the
@@ -2371,8 +2376,9 @@ Current API available since 0.101.
     path("foo.txt")->append_raw(@data);
     path("foo.txt")->append_utf8(@data);
 
-Appends data to a file.  The file is locked with C<flock> prior to writing.  An
-optional hash reference may be used to pass options.  Valid options are:
+Appends data to a file.  The file is locked with C<flock> prior to writing
+and closed afterwards.  An optional hash reference may be used to pass
+options.  Valid options are:
 
 =over 4
 
@@ -2458,6 +2464,11 @@ Current API available since 0.101.
 Returns a new C<Path::Tiny> object relative to the original.  Works
 like C<catfile> or C<catdir> from File::Spec, but without caring about
 file or directories.
+
+B<WARNING>: because the argument could contain C<..> or refer to symlinks,
+there is no guarantee that the new path refers to an actual descendent of
+the original.  If this is important to you, transform parent and child with
+L</realpath> and check them with L</subsumes>.
 
 Current API available since 0.001.
 
@@ -2740,7 +2751,7 @@ Current API available since 0.001.
 
 Move the current path to the given destination path using Perl's
 built-in L<rename|perlfunc/rename> function. Returns the result
-of the C<rename> function.
+of the C<rename> function (except it throws an exception if it fails).
 
 Current API available since 0.001.
 
@@ -3097,7 +3108,7 @@ Current API available since 0.001.
 
 =for Pod::Coverage openr_utf8 opena_utf8 openw_utf8 openrw_utf8
 openr_raw opena_raw openw_raw openrw_raw
-IS_BSD IS_WIN32 FREEZE THAW TO_JSON abs2rel
+IS_WIN32 FREEZE THAW TO_JSON abs2rel
 
 =head1 EXCEPTION HANDLING
 
@@ -3129,6 +3140,14 @@ C<msg> — a string combining the above data and a Carp-like short stack trace
 
 Exception objects will stringify as the C<msg> field.
 
+=head1 ENVIRONMENT
+
+=head2 PERL_PATH_TINY_NO_FLOCK
+
+If the environment variable C<PERL_PATH_TINY_NO_FLOCK> is set to a true
+value then flock will NOT be used when accessing files (this is not
+recommended).
+
 =head1 CAVEATS
 
 =head2 Subclassing not supported
@@ -3142,17 +3161,26 @@ things to work properly.
 If flock is not supported on a platform, it will not be used, even if
 locking is requested.
 
+In situations where a platform normally would support locking, but the
+flock fails due to a filesystem limitation, Path::Tiny has some heuristics
+to detect this and will warn once and continue in an unsafe mode.  If you
+want this failure to be fatal, you can fatalize the 'flock' warnings
+category:
+
+    use warnings FATAL => 'flock';
+
 See additional caveats below.
 
 =head3 NFS and BSD
 
 On BSD, Perl's flock implementation may not work to lock files on an
-NFS filesystem.  Path::Tiny has some heuristics to detect this
-and will warn once and let you continue in an unsafe mode.  If you
-want this failure to be fatal, you can fatalize the 'flock' warnings
-category:
+NFS filesystem.  If detected, this situation will warn once, as described
+above.
 
-    use warnings FATAL => 'flock';
+=head3 Lustre
+
+The Lustre filesystem does not support flock.  If detected, this situation
+will warn once, as described above.
 
 =head3 AIX and locking
 
@@ -3269,13 +3297,17 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Efros Chris Williams Dave Rolsky David Steinbrunner Doug Bell Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis James Hunt John Karr Karen Etheridge Mark Ellis Martin Kjeldsen Michael G. Schwern Nigel Gregoire Philippe Bruhat (BooK) Regina Verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
+=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dave Rolsky David Steinbrunner Doug Bell Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin Kjeldsen Michael G. Schwern Nigel Gregoire Philippe Bruhat (BooK) Regina Verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
 
 =over 4
 
 =item *
 
 Alex Efros <powerman@powerman.name>
+
+=item *
+
+Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =item *
 
@@ -3320,6 +3352,10 @@ Graham Knop <haarg@haarg.org>
 =item *
 
 Graham Ollis <plicease@cpan.org>
+
+=item *
+
+Ian Sillitoe <ian@sillit.com>
 
 =item *
 

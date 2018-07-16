@@ -1,4 +1,4 @@
-# $Id: 61-SIG0-RSAMD5.t 1611 2018-01-02 09:41:24Z willem $	-*-perl-*-
+# $Id: 61-SIG0-RSAMD5.t 1679 2018-05-24 12:09:36Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -10,8 +10,6 @@ my @prerequisite = qw(
 		Net::DNS::RR::SIG
 		Net::DNS::SEC
 		Net::DNS::SEC::RSA
-		Crypt::OpenSSL::Bignum
-		Crypt::OpenSSL::RSA
 		);
 
 foreach my $package (@prerequisite) {

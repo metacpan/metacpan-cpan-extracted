@@ -12,7 +12,7 @@ use File::LibMagic;
 use Carp qw(confess);
 use Data::Dumper;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 our $CLIENT = "Net-JMAPTalk";
 our $AGENT = "$CLIENT/$VERSION";
@@ -187,7 +187,7 @@ sub Request {
 sub CallMethods {
   my ($Self, $MethodCalls, $Using, %Headers) = @_;
 
-  $Using ||= ['ietf:jmapmail'];
+  $Using ||= ['urn:ietf:params:jmap:core', 'urn:ietf:params:jmap:mail'];
 
   my $Request = { using => $Using, methodCalls => $MethodCalls };
 

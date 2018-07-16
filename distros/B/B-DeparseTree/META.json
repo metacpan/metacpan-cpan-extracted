@@ -37,7 +37,7 @@
    "provides" : {
       "B::DeparseTree" : {
          "file" : "lib/B/DeparseTree.pm",
-         "version" : "v3.3.0"
+         "version" : "v3.4.0"
       },
       "B::DeparseTree::Fragment" : {
          "file" : "lib/B/DeparseTree/Fragment.pm"
@@ -116,6 +116,6 @@
          "http://opensource.org/licenses/gpl-license.php"
       ]
    },
-   "version" : "v3.3.0",
+   "version" : "v3.4.0",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

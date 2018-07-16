@@ -4,7 +4,7 @@ package Boxer::World::Flat;
 
 =head1 NAME
 
-Boxer::World::Reclass - software for single use case
+Boxer::World::Flat - software for single use case
 
 =cut
 
@@ -20,21 +20,21 @@ extends 'Boxer::World';
 use Types::Standard qw(Maybe Bool Tuple);
 use Types::TypeTiny qw(StringLike ArrayLike);
 
-use namespace::clean;
+use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.7
+Version v1.1.8
 
 =cut
 
-our $VERSION = version->declare("v1.1.7");
+our $VERSION = version->declare("v1.1.8");
 
 =head1 DESCRIPTION
 
 Outside the box is a world of software.
 
-B<Boxer::World::Reclass> is a class describing a collection of software
+B<Boxer::World::Flat> is a class describing a collection of software
 available for installation into (or as) an operating system.
 
 =head1 SEE ALSO

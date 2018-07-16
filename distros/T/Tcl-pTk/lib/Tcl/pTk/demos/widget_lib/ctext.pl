@@ -13,8 +13,8 @@ sub ctext {
         -name     => $demo,
         -text     => ['This window displays a string of text to demonstrate the text facilities of canvas widgets.  You can click in the boxes to adijust the position of the text relative to its positioning point or change its justification.  The text also supports the following simple bindings for editing:
   1. You can point, click, and type.
-  2. You can also select with button 1.
-  3. You can copy the selection to the mouse position with button 2.
+  2. You can also select with the left mouse button.
+  3. You can copy the selection to the mouse position with the middle mouse button.
   4. Backspace and Control+h delete the selection if there is one;
      otherwise they delete the character just before the insertion cursor.
   5. Delete deletes the selection if there is one; otherwise it deletes
@@ -63,7 +63,7 @@ sub ctext {
 	eval {local $SIG{__DIE__}; $c->dchars(qw/text sel.first sel.last/)};
 	$c->dchars('text', 'insert');
     });
-    $c->bind(qw/text <2>/ => sub {
+    $c->bind('text', $MW->windowingsystem ne 'aqua' ? '<2>' : '<3>' => sub {
 	my($c) = @_;
         my $e = $c->XEvent;
 	$c->insert('text', $e->xy, $MW->SelectionGet);

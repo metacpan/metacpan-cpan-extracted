@@ -32,6 +32,17 @@
 #include <tcl.h>
 
 #ifdef USE_TCL_STUBS
+
+/* Let Tcl_Init() stub could be pointed by a function pointer.
+ * Since tcl8.5, Tcl_Init() is defined as a macro with an argument and
+ * unable to be assigned to a function pointer. We need to redefine it back
+ * to tcl8.4 style  .
+ */
+#ifdef Tcl_Init
+#  undef  Tcl_Init
+#  define Tcl_Init  (tclStubsPtr->tcl_Init)
+#endif
+
 /*
  * If we use the Tcl stubs mechanism, this provides us Tcl version
  * and direct dll independence, but we must force the loading of

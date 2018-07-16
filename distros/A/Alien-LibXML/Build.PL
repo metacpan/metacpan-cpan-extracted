@@ -7,7 +7,7 @@ my $builder = Alien::Base::ModuleBuild->new(
 	module_name => 'Alien::LibXML',
 	license => 'mit',
 	configure_requires => {
-		'Alien::Base'   => '0.001',
+		'Alien::Base::ModuleBuild'   => '0.001',
 		'Module::Build' => '0.38',
 	},
 	test_requires => {

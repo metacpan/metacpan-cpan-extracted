@@ -9,7 +9,7 @@ use Test::More 'no_plan';
 use SPVM 'TestCase::Array';
 
 # Start objects count
-my $start_objects_count = SPVM::get_objects_count();
+my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Array
 {
@@ -34,6 +34,7 @@ my $start_objects_count = SPVM::get_objects_count();
   ok(TestCase::Array->array_init_long());
   ok(TestCase::Array->array_init_float());
   ok(TestCase::Array->array_init_double());
+  ok(TestCase::Array->array_init_list());
 }
 
 # array - set and get array element, first element
@@ -64,5 +65,5 @@ my $start_objects_count = SPVM::get_objects_count();
 SPVM::set_exception_undef();
 
 # All object is freed
-my $end_objects_count = SPVM::get_objects_count();
-is($end_objects_count, $start_objects_count);
+my $end_memory_blocks_count = SPVM::get_memory_blocks_count();
+is($end_memory_blocks_count, $start_memory_blocks_count);

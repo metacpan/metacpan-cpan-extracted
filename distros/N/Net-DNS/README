@@ -46,7 +46,7 @@ See http://www.net-dns.org/blog/ for announcements about Net::DNS.
 You can get the latest version of Net::DNS from the Comprehensive Perl
 Archive Network (CPAN) or from the module's homepage:
 
-	http://search.cpan.org/dist/Net-DNS/
+	https://metacpan.org/release/Net-DNS
 
 or through
 
@@ -80,11 +80,9 @@ time. These are the core packages that need to be available:
 The availability of these optional packages is tested at runtime:
 
 	Digest::BubbleBabble
-	Digest::GOST
-	IO::Socket::INET6
 	IO::Socket::IP
 	Net::DNS::SEC
-	Net::LibIDN
+	Net::LibIDN2
 
 You can obtain the latest version of Perl from:
 
@@ -332,5 +330,5 @@ have always developed Net::DNS using open-source systems and I am proud
 to make Net::DNS freely available to the world.
 
 
----- $Id: README 1550 2017-03-08 13:14:14Z willem $
+---- $Id: README 1692 2018-07-06 08:55:39Z willem $
 

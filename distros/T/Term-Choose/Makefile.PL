@@ -11,12 +11,6 @@ if ( $^O eq 'MSWin32' ) {
         'Win32::Console' => 0,
     );
 }
-else {
-    %prereqs_os_specific = (
-        'Term::ReadKey'  => 0,
-    );
-}
-
 
 WriteMakefile(
     PL_FILES         => {},

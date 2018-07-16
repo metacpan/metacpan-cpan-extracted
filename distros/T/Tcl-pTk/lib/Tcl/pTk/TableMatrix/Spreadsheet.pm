@@ -1,6 +1,6 @@
 package Tcl::pTk::TableMatrix::Spreadsheet;
 
-our ($VERSION) = ('0.92');
+our ($VERSION) = ('0.93');
 
 =head1 NAME
 
@@ -210,8 +210,10 @@ sub ClassInit{
 		
 	);
 	
-	# Button2 release pastes from PRIMARY (control v pastes from clipboard
-	 $mw->bind($class,'<ButtonRelease-2>',
+	# middle mouse button release pastes from PRIMARY (control v pastes from clipboard)
+	 $mw->bind(
+		  $class,
+	 	  $mw->windowingsystem ne 'aqua' ? '<ButtonRelease-2>' : '<ButtonRelease-3>',
 		  [sub
 		   {
 		    my $w = shift;
@@ -296,8 +298,9 @@ sub Populate {
  
  
  
-    # Bind a sub for button 3 press
-    $cw->bind('<ButtonPress-3>', 
+    # Bind a sub for right mouse button press
+    $cw->bind(
+	$cw->windowingsystem ne 'aqua' ? '<ButtonPress-3>' : '<ButtonPress-2>', 
 
 	[ sub {
 	

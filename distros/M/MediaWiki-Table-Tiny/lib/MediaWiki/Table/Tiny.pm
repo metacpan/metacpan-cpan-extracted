@@ -1,7 +1,7 @@
 package MediaWiki::Table::Tiny;
 
-our $DATE = '2017-09-03'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2018-07-15'; # DATE
+our $VERSION = '0.021'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,7 +16,7 @@ sub table {
     my $border = ($args{border} // 1) ? 1 : 0;
     my @res;
 
-    push @res, '{| class="$class" style="$style" border="$border"', "\n";
+    push @res, "{| class=\"$class\" style=\"$style\" border=\"$border\"", "\n";
     push @res, '|+', $args{caption}, "\n" if $args{caption};
     push @res, '|-', "\n";
     my $i = 0;
@@ -48,7 +48,7 @@ MediaWiki::Table::Tiny - Generate MediaWiki table from table data
 
 =head1 VERSION
 
-This document describes version 0.020 of MediaWiki::Table::Tiny (from Perl distribution MediaWiki-Table-Tiny), released on 2017-09-03.
+This document describes version 0.021 of MediaWiki::Table::Tiny (from Perl distribution MediaWiki-Table-Tiny), released on 2018-07-15.
 
 =head1 SYNOPSIS
 
@@ -131,7 +131,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

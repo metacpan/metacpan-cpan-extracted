@@ -1,3 +1,10 @@
+3.4.0 2018 07 15 World Cup Final
+
+- Fix for loop bugs
+- Better 5.028 support
+- Many other bug fixes;
+- More roundtrip tests
+
 3.3.0 2018 07 03 Independence - 1
 
 - Major refactoring cleanup

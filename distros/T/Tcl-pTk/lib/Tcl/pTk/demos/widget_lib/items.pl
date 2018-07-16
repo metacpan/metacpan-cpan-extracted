@@ -12,7 +12,10 @@ sub items {
     my($demo) = @_;
     $TOP = $MW->WidgetDemo(
         -name     => $demo,
-        -text     => ["This window contains a canvas widget with examples of the various kinds of items supported by canvases.  The following operations are supported:\n  Button-1 drag:\tmoves item under pointer.\n  Button-2 drag:\trepositions view.\n  Button-3 drag:\tstrokes out area.\n Ctrl+f:\t\tdisplays items under area.", qw/-wraplength 5i/],
+        -text     => [
+            "This window contains a canvas widget with examples of the various kinds of items supported by canvases.  The following operations are supported:\n  Left mouse button drag:\tmoves item under pointer.\n  Middle mouse button drag:\trepositions view.\n  Right mouse button drag:\tstrokes out area.\n Ctrl+f:\t\tdisplays items under area.",
+            -wraplength => '5i',
+        ],
         -title    => 'Canvas Item Demonstration',
         -iconname => 'items',
     );
@@ -183,14 +186,24 @@ sub items {
  
     $c->CanvasBind('<B1-Motion>' => [\&items_drag, Ev('x'), Ev('y'), \%iinfo]);
 
-    $c->CanvasBind('<2>' => 
-            [sub {shift->scan('mark', shift, shift)}, Ev('x'), Ev('y') ] ); 
-    $c->CanvasBind('<B2-Motion>' =>
-        [ sub {shift->scan('dragto', shift, shift )}, Ev('x'), Ev('y') ] ); 
+    $c->CanvasBind(
+        $MW->windowingsystem ne 'aqua' ? '<2>' : '<3>' => 
+            [sub {shift->scan('mark', shift, shift)}, Ev('x'), Ev('y') ],
+    ); 
+    $c->CanvasBind(
+        $MW->windowingsystem ne 'aqua' ? '<B2-Motion>' : '<B3-Motion>' =>
+            [ sub {shift->scan('dragto', shift, shift )}, Ev('x'), Ev('y') ],
+    ); 
     
-    $c->CanvasBind('<3>' => [\&items_mark,  Ev('x'), Ev('y'), \%iinfo]);
+    $c->CanvasBind(
+        $MW->windowingsystem ne 'aqua' ? '<3>' : '<2>' =>
+            [\&items_mark,  Ev('x'), Ev('y'), \%iinfo],
+    );
 
-    $c->CanvasBind('<B3-Motion>' =>[\&items_stroke,  Ev('x'), Ev('y'), \%iinfo]);
+    $c->CanvasBind(
+        $MW->windowingsystem ne 'aqua' ? '<B3-Motion>' : '<B2-Motion>' =>
+            [\&items_stroke,  Ev('x'), Ev('y'), \%iinfo],
+    );
 
     $c->CanvasBind('<Control-f>' => [sub {
 	my($c, $iinfo) = @_;

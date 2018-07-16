@@ -1,5 +1,10 @@
 Revision history for App-MultiSsh
 
+0.22   2018-07-16
+        Updating for release of version 0.22
+        Getting nesting working properly (Ivan Wills)
+        Tiedied up config (Ivan Wills)
+
 0.21   2018-06-18
         Updating for release of version 0.21
         Adding in latest perl version for travis (Ivan Wills)

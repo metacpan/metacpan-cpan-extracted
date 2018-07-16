@@ -34,7 +34,7 @@ my $snmp_community = $builder->notes('snmp_community');
 my $snmp_version   = $builder->notes('snmp_version');
 
 SKIP: {
-  skip '-> no live tests', 13, unless $snmp_agent;
+  skip '-> no live tests', 15, unless $snmp_agent;
 
   my ( $session, $error ) = Net::SNMP->session(
     hostname  => $snmp_agent,

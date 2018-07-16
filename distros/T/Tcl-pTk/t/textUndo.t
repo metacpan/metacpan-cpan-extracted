@@ -43,7 +43,7 @@ things you can do to a text widget:",'hideable');
 
 $t->insert(end => "
 
-1. Insert text. Press mouse button 1 to set the insertion cursor, then
+1. Insert text. Press the left mouse button to set the insertion cursor, then
 type text.  What you type will be added to the widget.  You can backspace
 over what you've typed using either the backspace key, the delete key,
 or Control+h.
@@ -54,12 +54,12 @@ even number of characters high and wide.  Also, if you make the window
 narrow you can see that long lines automatically wrap around onto
 additional lines so that all the information is always visible.
 
-3. Scanning. Press mouse button 2 in the text window and drag up or down.
+3. Scanning. Press the middle mouse button in the text window and drag up or down.
 This will drag the text at high speed to allow you to scan its contents.
 
-4. Select. Press mouse button 1 and drag to select a range of characters.
+4. Select. Press the left mouse button and drag to select a range of characters.
 Once you've released the button, you can adjust the selection by pressing
-button 1 with the shift key down.  This will reset the end of the
+the left mouse button with the shift key down.  This will reset the end of the
 selection nearest the mouse cursor and you can drag that end of the
 selection by dragging the mouse before releasing the mouse button.
 You can double-click to select whole words, or triple-click to select
@@ -70,29 +70,44 @@ and type Control+d.
 
 6. Copy the selection. To copy the selection either from this window
 or from any other window or application, select what you want, click
-button 1 to set the insertion cursor, then type Control+v to copy the
+the left mouse button to set the insertion cursor, then type Control+v to copy the
 selection to the point of the insertion cursor.
 
-You can also bind commands to tags. Like press button 3 for menu ");
+You can also bind commands to tags. Like press the right mouse button for menu ");
 
 &insertwtag($t,"here","underline");
 
-$t->tagBind("underline","<3>", [sub { shift; shift->Post(@_)},$m,Ev(X),Ev(Y)] );
+$t->tagBind(
+    "underline",
+    $t->windowingsystem ne 'aqua' ? '<3>' : '<2>',
+    [sub { shift; shift->Post(@_)},$m,Ev(X),Ev(Y)],
+);
 
 
 # Check return of 2-arg bind for items
-my $bindRet = $t->tagBind('underline', '<3>');
+my $bindRet = $t->tagBind(
+    'underline',
+    $t->windowingsystem ne 'aqua' ? '<3>' : '<2>',
+);
 #print "bindRet = $bindRet\n";
 ok(ref($bindRet), 'Tcl::pTk::Callback', "text 2-arg tagBind returns callback");
 
-$bindRet = $t->tag('bind','underline', '<3>');
+$bindRet = $t->tag(
+    'bind',
+    'underline',
+    $t->windowingsystem ne 'aqua' ? '<3>' : '<2>',
+);
 #print "bindRet = $bindRet\n";
 ok(ref($bindRet), 'Tcl::pTk::Callback', "text 2-arg tag bind returns callback");
 
 # Check return of 1-arg tagBind for items
 my @bindRet = $t->tagBind('underline');
 #print "bindRet = $bindRet\n";
-ok(join(", ",@bindRet), '<Button-3>', "text 1-arg tagBind returns list of sequences");
+ok(
+    join(", ",@bindRet),
+    $t->windowingsystem ne 'aqua' ? '<Button-3>' : '<Button-2>',
+    "text 1-arg tagBind returns list of sequences",
+);
 
 
 
@@ -103,8 +118,13 @@ $t->Subwidget('textundo')->OnDestroy(sub {
         # print $t->get('1.0','end') # Doesn't work for Tcl/pTk 8.5
 });
 
-$t->tag("bind", "hideable","<2>", sub {
-    $t->tagConfigure(hideable => -elide => 1, -foreground => 'pink')}
+$t->tag(
+    "bind",
+    "hideable",
+    $t->windowingsystem ne 'aqua' ? '<2>' : '<3>',
+    sub {
+        $t->tagConfigure(hideable => -elide => 1, -foreground => 'pink');
+    },
 );
 
 $t->after(500, sub{ $t->Save("tempfile") });

@@ -1,11 +1,10 @@
 package Test::Against::Build;
 use strict;
 use 5.14.0;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Carp;
 use Cwd;
 use File::Basename;
-#use File::Fetch;
 use File::Path ( qw| make_path | );
 use File::Spec;
 use File::Temp ( qw| tempdir tempfile | );
@@ -14,7 +13,6 @@ use CPAN::cpanminus::reporter::RetainReports;
 use Data::Dump ( qw| dd pp | );
 use JSON;
 use Path::Tiny;
-#use Perl::Download::FTP;
 use Text::CSV_XS;
 
 =head1 NAME
@@ -648,6 +646,7 @@ sub analyze_json_logs {
         $self->{timestamp},
         'log',
         'json',
+        'tar',
         'gz'
     ) );
     my $foutput = File::Spec->catfile($self->get_storage_dir(), $output);

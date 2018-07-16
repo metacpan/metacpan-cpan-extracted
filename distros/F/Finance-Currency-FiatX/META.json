@@ -35,9 +35,10 @@
          "requires" : {
             "Complete::Module" : "0",
             "Complete::Util" : "0.57",
+            "Finance::Currency::Convert::BCA" : "0",
             "Finance::Currency::Convert::BI" : "0.05",
             "Finance::Currency::Convert::GMC" : "0.004",
-            "Finance::Currency::Convert::KlikBCA" : "0.150",
+            "Finance::Currency::Convert::Mandiri" : "0",
             "List::Util" : "1.45",
             "Log::ger" : "0.023",
             "PERLANCAR::Module::List" : "0",
@@ -71,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-Finance-Currency-FiatX"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

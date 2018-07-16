@@ -13,15 +13,15 @@ use Role::Commons -all;
 use Log::Any::Adapter qw<Screen>;
 use App::Cmd::Setup-command;
 
-use namespace::clean;
+use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.7
+Version v1.1.8
 
 =cut
 
-our $VERSION = version->declare("v1.1.7");
+our $VERSION = version->declare("v1.1.8");
 
 =head1 AUTHOR
 

@@ -1,5 +1,13 @@
 Revision history for Dancer2-Plugin-Showterm
 
+0.0.3 2018-07-15
+  [ DOCUMENTATION ]
+    - Fixed POD typo. (GH#3, Mohammad S Anwar)
+    - Mention asciinema, an alternate way to embed cli movies.
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 21 insertions(+), 4 deletions(-)
+
 0.0.2 2018-07-06
   [ BUG FIXES ]
     - I forgot to put the shared files in the distro. (GH#2)

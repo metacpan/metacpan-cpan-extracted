@@ -1,5 +1,5 @@
 package Net::Stripe::Customer;
-$Net::Stripe::Customer::VERSION = '0.35';
+$Net::Stripe::Customer::VERSION = '0.36';
 use Moose;
 use Kavorka;
 use Net::Stripe::Plan;
@@ -64,121 +64,7 @@ Net::Stripe::Customer - represent a Customer object from Stripe
 
 =head1 VERSION
 
-version 0.35
-
-=head1 ATTRIBUTES
-
-=head2 account_balance
-
-Reader: account_balance
-
-Type: Maybe[Int]
-
-=head2 card
-
-Reader: card
-
-Writer: card
-
-Type: Maybe[Net::Stripe::Card|Net::Stripe::Token|Str]
-
-=head2 cards
-
-Reader: cards
-
-Type: Net::Stripe::List
-
-=head2 coupon
-
-Reader: coupon
-
-Writer: coupon
-
-Type: Maybe[Net::Stripe::Coupon|Str]
-
-=head2 default_card
-
-Reader: default_card
-
-Type: Maybe[Net::Stripe::Card|Net::Stripe::Token|Str]
-
-=head2 deleted
-
-Reader: deleted
-
-Type: Maybe[Bool|Object]
-
-=head2 description
-
-Reader: description
-
-Writer: description
-
-Type: Maybe[Str]
-
-=head2 discount
-
-Reader: discount
-
-Writer: discount
-
-Type: Maybe[Net::Stripe::Discount]
-
-=head2 email
-
-Reader: email
-
-Writer: email
-
-Type: Maybe[Str]
-
-=head2 id
-
-Reader: id
-
-Type: Maybe[Str]
-
-=head2 metadata
-
-Reader: metadata
-
-Writer: metadata
-
-Type: Maybe[HashRef]
-
-=head2 plan
-
-Reader: plan
-
-Writer: plan
-
-Type: Maybe[Net::Stripe::Plan|Str]
-
-=head2 quantity
-
-Reader: quantity
-
-Writer: quantity
-
-Type: Maybe[Int]
-
-=head2 subscription
-
-Reader: subscription
-
-=head2 subscriptions
-
-Reader: subscriptions
-
-Type: Net::Stripe::List
-
-=head2 trial_end
-
-Reader: trial_end
-
-Writer: trial_end
-
-Type: Maybe[Int|Str]
+version 0.36
 
 =head1 AUTHORS
 

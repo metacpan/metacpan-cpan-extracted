@@ -13,9 +13,7 @@ enum {
 
 // SPVM_OBJECT
 struct SPVM_object {
-  // This is dummy data. SPVM max data size is sizeof(SPVM_VALUE)
-  // In SPVM, data is placed after SPVM_OBJECT, by this dummy, allignment is adjust
-  SPVM_VALUE dummy;
+  void* body;
   void** weaken_back_refs;
   int32_t weaken_back_refs_length;
   int32_t weaken_back_refs_capacity;
@@ -23,9 +21,9 @@ struct SPVM_object {
   int32_t basic_type_id;
   int32_t elements_length;
   uint8_t dimension;
-  unsigned has_destructor : 1;
-  unsigned in_destroy : 1;
-  unsigned category : 3;
+  uint8_t has_destructor;
+  uint8_t in_destroy;
+  uint8_t category;
 };
 
 #endif

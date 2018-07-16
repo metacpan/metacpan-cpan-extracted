@@ -1,7 +1,7 @@
 package Dancer2::Plugin::Showterm;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Replay terminal typescript captures
-$Dancer2::Plugin::Showterm::VERSION = '0.0.2';
+$Dancer2::Plugin::Showterm::VERSION = '0.0.3';
 
 use strict;
 use warnings;
@@ -77,7 +77,7 @@ Dancer2::Plugin::Showterm - Replay terminal typescript captures
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ pages via iframes:
 
 =head1 CAPTURING THE ACTION
 
-The cli capture is done using the UNIX utility c<script>. 
+The cli capture is done using the UNIX utility C<script>. 
 The plugin assumes that the captured screen is 80 columns by 24 rows.
 
     $ script -ttiming
@@ -165,6 +165,13 @@ If provided, will be added to the showterm page.
 =over
 
 =item L<http://showterm.io> - the original service
+
+=item L<asciinema|https://asciinema.org/>
+
+Alternative solution. Arguably simpler to embed (see
+L<https://asciinema.org/docs/embedding>) as the project 
+provides the required C<css> and C<js> files -- which mean it 
+doesn't require any extra Dancer plugin like this one.
 
 =back
 

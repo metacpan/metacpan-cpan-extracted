@@ -13,15 +13,15 @@ use Role::Commons -all;
 use match::simple qw(match);
 use Boxer::CLI -command;
 
-use namespace::clean;
+use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.7
+Version v1.1.8
 
 =cut
 
-our $VERSION = version->declare("v1.1.7");
+our $VERSION = version->declare("v1.1.8");
 
 use constant {
 	abstract   => q[show aliases for boxer commands],
@@ -31,10 +31,10 @@ use constant {
 sub description
 {
 	<<'DESCRIPTION'
-Most boxer commands can be invoked with shorter aliases.
+Some boxer commands can be invoked with shorter aliases.
 
-	boxer translate -s rdfxml input.ttl
-	boxer tr -s rdfxml input.ttl          # same thing
+	boxer version
+	boxer --version          # same thing
 
 The aliases command (which, ironically, has no shorter alias) shows existing
 aliases.

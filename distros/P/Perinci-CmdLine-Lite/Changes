@@ -1,3 +1,19 @@
+1.815   2018-07-16 (PERLANCAR)
+
+	- Invoke hook_before_parse_argv() in do_completion() and do_dump()
+	  so command-line options that might be introduced in this hook are
+	  also recognized.
+
+
+1.814   2018-06-14 (PERLANCAR)
+
+	- [ux] When response status is not between 200 and 555 (e.g. when
+	  we use HTTP::Tiny's HTTP response status 599 Internal Exception
+	  as response status), instead of complaining a 'bug' set response
+	  status to 555 and note the original response status in result
+	  meta's x.orig_status.
+
+
 1.813   2018-05-29 (PERLANCAR)
 
 	- [Bugfix] To check whether script uses -P, -c, -C we need to get

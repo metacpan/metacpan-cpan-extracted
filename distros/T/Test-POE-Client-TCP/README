@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.18
+    version 1.22
 
 SYNOPSIS
 
@@ -160,6 +160,9 @@ CONSTRUCTOR
         'timeout', specify number of seconds to wait for socket timeouts;
         'context', anything that can fit into a scalar, such as a ref, etc.
         'usessl', enable SSL/TLS if POE::Component::SSLify is available;
+        'sslctx', set to a SSL Context to configure the SSL Connection;
+        'sslcert', set to a x509 Certificate(PEM encoded) to connect using a client cert;
+        'sslkey', set to a private Key(PEM encoded) to connect using a client cert;
 
       The semantics for filter, inputfilter and outputfilter are the same
       as for POE::Component::Server::TCP in that one may provide either a

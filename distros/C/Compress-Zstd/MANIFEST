@@ -195,14 +195,7 @@ ext/zstd/doc/images/DSpeed3.png
 ext/zstd/doc/images/dict-cr.png
 ext/zstd/doc/images/dict-cs.png
 ext/zstd/doc/images/dict-ds.png
-ext/zstd/doc/images/ldmCspeed.png
-ext/zstd/doc/images/ldmDspeed.png
-ext/zstd/doc/images/linux-4.7-12-compress.png
-ext/zstd/doc/images/linux-4.7-12-decompress.png
-ext/zstd/doc/images/linux-4.7-12-mt-compress.png
-ext/zstd/doc/images/linux-git-compress.png
-ext/zstd/doc/images/linux-git-decompress.png
-ext/zstd/doc/images/linux-git-mt-compress.png
+ext/zstd/doc/images/zstd_cdict_v1_3_5.png
 ext/zstd/doc/images/zstd_logo86.png
 ext/zstd/doc/zstd_compression_format.md
 ext/zstd/doc/zstd_manual.html
@@ -222,6 +215,8 @@ ext/zstd/lib/README.md
 ext/zstd/lib/common/bitstream.h
 ext/zstd/lib/common/compiler.h
 ext/zstd/lib/common/cpu.h
+ext/zstd/lib/common/debug.c
+ext/zstd/lib/common/debug.h
 ext/zstd/lib/common/entropy_common.c
 ext/zstd/lib/common/error_private.c
 ext/zstd/lib/common/error_private.h
@@ -239,6 +234,8 @@ ext/zstd/lib/common/zstd_common.c
 ext/zstd/lib/common/zstd_errors.h
 ext/zstd/lib/common/zstd_internal.h
 ext/zstd/lib/compress/fse_compress.c
+ext/zstd/lib/compress/hist.c
+ext/zstd/lib/compress/hist.h
 ext/zstd/lib/compress/huf_compress.c
 ext/zstd/lib/compress/zstd_compress.c
 ext/zstd/lib/compress/zstd_compress_internal.h
@@ -359,6 +356,7 @@ ext/zstd/tests/gzip/zgrep-signal.sh
 ext/zstd/tests/gzip/znew-k.sh
 ext/zstd/tests/invalidDictionaries.c
 ext/zstd/tests/legacy.c
+ext/zstd/tests/libzstd_partial_builds.sh
 ext/zstd/tests/longmatch.c
 ext/zstd/tests/paramgrill.c
 ext/zstd/tests/playTests.sh

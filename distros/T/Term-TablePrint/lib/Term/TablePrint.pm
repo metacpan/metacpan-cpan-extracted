@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.068';
+our $VERSION = '0.069';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -13,12 +13,13 @@ use Carp         qw( carp croak );
 use List::Util   qw( sum );
 use Scalar::Util qw( looks_like_number );
 
-use Term::Choose           qw( choose );
-use Term::Choose::LineFold qw( line_fold cut_to_printwidth print_columns );
-use Term::Choose::Util     qw( term_size insert_sep unicode_sprintf );
-use Term::ProgressBar      qw();
+use Term::ProgressBar qw();
 
-use constant CLEAR_SCREEN => "\e[H\e[J"; #
+use Term::Choose            qw( choose );
+use Term::Choose::Constants qw( :screen );
+use Term::Choose::LineFold  qw( line_fold cut_to_printwidth print_columns );
+use Term::Choose::Util      qw( term_size insert_sep unicode_sprintf );
+
 
 
 sub new {
@@ -30,9 +31,14 @@ sub new {
         croak "new: The (optional) argument is not a HASH reference." if ref $opt ne 'HASH';
         $self->__validate_options( $opt );
     }
-    my $backup_self = { map{ $_ => $self->{$_} } keys %$self };
-    $self->{backup_self} = $backup_self;
+    $self->{backup_opt} = { defined $opt ? %$opt : () };
     return $self;
+}
+
+
+sub DESTROY {
+    #my ( $self ) = @_;
+    print SHOW_CURSOR;
 }
 
 
@@ -80,7 +86,7 @@ sub __set_defaults {
     $self->{grid}           = 0      if ! defined $self->{grid};
     $self->{keep_header}    = 1      if ! defined $self->{keep_header};
     $self->{squash_spaces}  = 1      if ! defined $self->{squash_spaces};
-    $self->{max_rows}       = 50000  if ! defined $self->{max_rows};
+    $self->{max_rows}       = 100000 if ! defined $self->{max_rows};
     $self->{min_col_width}  = 30     if ! defined $self->{min_col_width};
     $self->{mouse}          = 0      if ! defined $self->{mouse};
     $self->{progress_bar}   = 40000  if ! defined $self->{progress_bar};
@@ -96,7 +102,6 @@ sub __set_defaults {
 
 sub print_table {
     if ( ref $_[0] ne 'Term::TablePrint' ) {
-        #return Term::TablePrint->new( $_[1] )->print_table( $_[0] );
         return print_table( bless( {}, 'Term::TablePrint' ), @_ );
     }
     my $self = shift;
@@ -123,6 +128,7 @@ sub print_table {
     else {
         $self->{idx_last_row} = $#$table_ref;
     }
+    print HIDE_CURSOR;
     my $col_idxs = [];
     if ( $self->{choose_columns}  ) {
         $col_idxs = $self->__choose_columns( $table_ref->[0] );
@@ -142,18 +148,21 @@ sub print_table {
     }
     $self->__calc_col_width( $a_ref );
     $self->__win_size_dependet_code( $a_ref );
-    if ( defined $self->{backup_self} ) {
-        my $backup_self = delete $self->{backup_self};
+    if ( exists $self->{backup_opt} ) {
+        my $backup_opt = $self->{backup_opt};
         for my $key ( keys %$self ) {
-            if ( defined $backup_self->{$key} ) {
-                $self->{$key} = $backup_self->{$key};
+            if ( $key eq 'backup_opt' ) {
+                next;
+            }
+            elsif ( exists $backup_opt->{$key} ) {
+                $self->{$key} = $backup_opt->{$key};
             }
             else {
                 delete $self->{$key};
             }
         }
     }
-
+    print SHOW_CURSOR;
 }
 
 
@@ -207,7 +216,7 @@ sub __win_size_dependet_code {
         my $row = choose(
             $list,
             { prompt => $prompt, index => 1, default => $old_row, ll => $table_w, layout => 3,
-              clear_screen => 1, mouse => $self->{mouse} }
+              clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
         );
         if ( ! defined $row ) {
             return;
@@ -249,7 +258,7 @@ sub __win_size_dependet_code {
             if ( $self->{info_row} && $row == $#$list ) {
                 choose(
                     [ 'Close' ],
-                    { prompt => $self->{info_row}, clear_screen => 1, mouse => $self->{mouse} }
+                    { prompt => $self->{info_row}, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
                 );
                 next;
             }
@@ -295,7 +304,7 @@ sub __print_single_row {
     }
     choose(
         $row_data,
-        { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse} }
+        { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
     );
 }
 
@@ -303,7 +312,7 @@ sub __print_single_row {
 sub __calc_col_width {
     my ( $self, $a_ref ) = @_;
     my $show_progress = $self->{show_progress} >= 2 ? 1 : 0; #
-    my $total = @$a_ref;                      #
+    my $total = $self->{idx_last_row} + 1;    #
     my $next_update = 0;                      #
     my $c = 0;                                #
     my $progress;                             #
@@ -426,7 +435,7 @@ sub __calc_avail_col_width {
 
 sub _col_to_avail_col_width {
     my ( $self, $a_ref, $w_cols ) = @_;
-    my $total = @$a_ref;                      #
+    my $total = $self->{idx_last_row} + 1;    #
     my $next_update = 0;                      #
     my $c = 0;                                #
     my $progress;                             #
@@ -486,7 +495,7 @@ sub __choose_columns {
         my @idx = choose(
             $choices,
             { prompt => $prompt, lf => [ 0, $s_tab ], clear_screen => 1, undef => '<<',
-              meta_items => [ 0 .. $#pre ], index => 1, mouse => $self->{mouse}, include_highlighted => 2 }
+              meta_items => [ 0 .. $#pre ], index => 1, mouse => $self->{mouse}, include_highlighted => 2, hide_cursor => 0 }
         );
         if ( ! @idx || $idx[0] == 0 ) {
             if ( @$col_idxs ) {
@@ -563,12 +572,12 @@ sub __print_term_not_wide_enough_message {
     my $prompt_1 = 'To many columns - terminal window is not wide enough.';
     choose(
         [ 'Press ENTER to show the column names.' ],
-        { prompt => $prompt_1, clear_screen => 1, mouse => $self->{mouse} }
+        { prompt => $prompt_1, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
     );
     my $prompt_2 = 'Column names (close with ENTER).';
     choose(
         $col_names,
-        { prompt => $prompt_2, clear_screen => 1, mouse => $self->{mouse} }
+        { prompt => $prompt_2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
     );
 }
 
@@ -599,7 +608,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.068
+Version 0.069
 
 =cut
 

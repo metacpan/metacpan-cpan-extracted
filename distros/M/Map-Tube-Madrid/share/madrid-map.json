@@ -4,6 +4,7 @@
     {
         "line":
         [
+            { "id": "L1", "name": "L1", "color": "cyan"  },
             { "id": "L3", "name": "L3", "color": "red"   },
             { "id": "L5", "name": "L5", "color": "green" }
         ]
@@ -12,7 +13,41 @@
     {
         "station":
         [
-            { "id": "CALLAO", "name": "Callao", "line": "L3:14,L5:17", "link": "L5-16,L5-18,L3-13,L3-15" },
+            { "id": "CALLAO",            "name": "Callao",    "line": "L3:14,L5:17", "link": "L5-16,L5-18,L3-13,L3-15" },
+            { "id": "CHAMARTIN",         "name": "Chamartin", "line": "L1:3",        "link": "L1-02,PLAZA-DE-CASTILLA" },
+            { "id": "PLAZA-DE-CASTILLA", "name": "Plaza de Castilla", "line": "L1:4",  "link": "CHAMARTIN,L1-05" },
+            { "id": "CUATRO-CAMINOS",    "name": "Cuatro Caminos",    "line": "L1:9",  "link": "L1-08,L1-10"     },
+            { "id": "BILBAO",            "name": "Bilbao",            "line": "L1:12", "link": "L1-11,TRIBUNAL"  },
+            { "id": "TRIBUNAL",          "name": "Tribunal",          "line": "L1:13", "link": "BILBAO,GRAN-VIA" },
+            { "id": "GRAN-VIA",          "name": "Gran Vía",          "line": "L1:14", "link": "TRIBUNAL,SOL"    },
+            { "id": "SOL",               "name": "Sol",               "line": "L1:15", "link": "GRAN-VIA,L1-16"  },
+            { "id": "PACIFICO",          "name": "Pacífico",          "line": "L1:21", "link": "L1-20,L1-22"     },
+
+            { "id": "L1-01", "name": "Pinar de",            "line": "L1:1",   "link": "L1-02"                   },
+            { "id": "L1-02", "name": "Bambú",               "line": "L1:2",   "link": "L1-01,CHAMARTIN"         },
+            { "id": "L1-05", "name": "Valdeacederas",       "line": "L1:5",   "link": "PLAZA-DE-CASTILLA,L1-06" },
+            { "id": "L1-06", "name": "Tetuán",              "line": "L1:6",   "link": "L1-05,L1-07"             },
+            { "id": "L1-07", "name": "Estrecho",            "line": "L1:7",   "link": "L1-06,L1-08"             },
+            { "id": "L1-08", "name": "Alvarado",            "line": "L1:8",   "link": "L1-07,CUATRO-CAMINOS"    },
+            { "id": "L1-10", "name": "Ríos Rosas",          "line": "L1:10",  "link": "CUATRO-CAMINOS,L1-11"    },
+            { "id": "L1-11", "name": "Iglesia",             "line": "L1:11",  "link": "L1-10,BILBAO"            },
+            { "id": "L1-16", "name": "Tirso de Molina",     "line": "L1:16",  "link": "SOL,L1-17"               },
+            { "id": "L1-17", "name": "Antón Martín",        "line": "L1:17",  "link": "L1-16,L1-18"             },
+            { "id": "L1-18", "name": "Atocha",              "line": "L1:18",  "link": "L1-17,L1-19"             },
+            { "id": "L1-19", "name": "Atocha Renfe",        "line": "L1:19",  "link": "L1-18,L1-20"             },
+            { "id": "L1-20", "name": "Menéndez Pelayo",     "line": "L1:20",  "link": "L1-19,PACIFICO"          },
+            { "id": "L1-22", "name": "Puente de Vallecas",  "line": "L1:22",  "link": "PACIFICO,L1-23"          },
+            { "id": "L1-23", "name": "Nueva Numancia",      "line": "L1:23",  "link": "L1-22,L1-24"             },
+            { "id": "L1-24", "name": "Portazgo",            "line": "L1:24",  "link": "L1-23,L1-25"             },
+            { "id": "L1-25", "name": "Buenos Aires",        "line": "L1:25",  "link": "L1-24,L1-26"             },
+            { "id": "L1-26", "name": "Alto del Arenal",     "line": "L1:26",  "link": "L1-25,L1-27"             },
+            { "id": "L1-27", "name": "Miguel Hernández",    "line": "L1:27",  "link": "L1-26,L1-28"             },
+            { "id": "L1-28", "name": "Sierra de Guadalupe", "line": "L1:28",  "link": "L1-27,L1-29"             },
+            { "id": "L1-29", "name": "Villa de Vallecas",   "line": "L1:29",  "link": "L1-28,L1-30"             },
+            { "id": "L1-30", "name": "Congosto",            "line": "L1:30",  "link": "L1-29,L1-31"             },
+            { "id": "L1-31", "name": "La Gavia",            "line": "L1:31",  "link": "L1-30,L1-32"             },
+            { "id": "L1-32", "name": "Las Suertes",         "line": "L1:32",  "link": "L1-31,L1-33"             },
+            { "id": "L1-33", "name": "Valdecarros",         "line": "L1:33",  "link": "L1-32"                   },
 
             { "id": "L3-01", "name": "Villaverde Alto",        "line": "L3:1",  "link": "L3-02"        },
             { "id": "L3-02", "name": "San Cristóbal",          "line": "L3:2",  "link": "L3-01,L3-03"  },

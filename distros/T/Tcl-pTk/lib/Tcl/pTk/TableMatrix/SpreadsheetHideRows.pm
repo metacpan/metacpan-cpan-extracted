@@ -1,7 +1,7 @@
 package Tcl::pTk::TableMatrix::SpreadsheetHideRows;
 
 
-our ($VERSION) = ('0.92');
+our ($VERSION) = ('0.93');
 
 =head1 NAME
 

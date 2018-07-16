@@ -1,4 +1,4 @@
-# $Id: 33-NSEC3-hash.t 1561 2017-04-19 13:08:13Z willem $	-*-perl-*-
+# $Id: 33-NSEC3-hash.t 1679 2018-05-24 12:09:36Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -8,6 +8,7 @@ use Net::DNS;
 my @prerequisite = qw(
 		Digest::SHA
 		Net::DNS::RR::NSEC3
+		Net::DNS::RR::NSEC3PARAM
 		);
 
 foreach my $package (@prerequisite) {
@@ -19,13 +20,15 @@ foreach my $package (@prerequisite) {
 plan tests => 12;
 
 
-my $algorithm = 1;
-my $iteration = 12;
-my $salt      = pack 'H*', 'aabbccdd';
+my $nsec3param = new Net::DNS::RR('example NSEC3PARAM 1 0 12 aabbccdd');
+
+my $algorithm = $nsec3param->algorithm;
+my $iteration = $nsec3param->iterations;
+my $salt      = $nsec3param->salt;
 
 
 ok( Net::DNS::RR::NSEC3::name2hash( 1, 'example' ), "defaulted arguments" );
-ok( Net::DNS::RR::NSEC3::name2hash( 1, 'example', 12, $salt ), "explicit arguments" );
+ok( Net::DNS::RR::NSEC3::name2hash( 1, 'example', $iteration, $salt ), "explicit arguments" );
 
 
 my %testcase = (			## test vectors from RFC5155

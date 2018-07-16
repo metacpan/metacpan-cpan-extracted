@@ -343,6 +343,7 @@ t/tableMatrixSpreadsheet.t
 t/tclVersion.t
 t/text.t
 t/text2.t
+t/text2-old.t
 t/text3.t
 t/textEdit.t
 t/textRO.t

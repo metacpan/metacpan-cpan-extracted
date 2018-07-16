@@ -6,6 +6,8 @@
 struct SPVM_env;
 typedef struct SPVM_env SPVM_ENV;
 
+typedef union SPVM_value SPVM_VALUE;
+
 union SPVM_value {
   int8_t bval;
   int16_t sval;
@@ -14,8 +16,14 @@ union SPVM_value {
   float fval;
   double dval;
   void* oval;
+  int8_t* baval;
+  int16_t* saval;
+  int32_t* iaval;
+  int64_t* laval;
+  float* faval;
+  double* daval;
+  SPVM_VALUE* vaval;
 };
-typedef union SPVM_value SPVM_VALUE;
 
 typedef int8_t SPVM_VALUE_byte;
 typedef int16_t SPVM_VALUE_short;
@@ -83,7 +91,7 @@ struct SPVM_env {
   void (*inc_ref_count)(SPVM_ENV* env, void* object);
   void (*dec_ref_count)(SPVM_ENV* env, void* object);
   void (*inc_dec_ref_count)(SPVM_ENV* env, void* object);
-  int32_t (*get_objects_count)(SPVM_ENV* env);
+  int32_t (*get_memory_blocks_count)(SPVM_ENV* env);
   void* (*get_runtime)(SPVM_ENV* env);
   void (*dec_ref_count_only)(SPVM_ENV* env, void* object);
   void (*weaken)(SPVM_ENV* env, void** object_address);

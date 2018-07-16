@@ -4,6 +4,8 @@ use strict;
 use warnings;
 
 use App::cpm::DistNotation;
+use App::cpm::Distribution;
+use App::cpm::Logger::File;
 use App::cpm::Logger;
 use App::cpm::Master;
 use App::cpm::Requirement;
@@ -239,6 +241,8 @@ sub cmd_install {
     my $self = shift;
     die "Need arguments or cpanfile.\n"
         if !@{$self->{argv}} && (!$self->{cpanfile} || !-f $self->{cpanfile});
+
+    local %ENV = %ENV;
 
     File::Path::mkpath($self->{home}) unless -d $self->{home};
     my $logger = App::cpm::Logger::File->new("$self->{home}/build.log.@{[time]}");

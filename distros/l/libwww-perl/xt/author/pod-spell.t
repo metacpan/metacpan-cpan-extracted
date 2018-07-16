@@ -115,6 +115,7 @@ Joerg
 John
 Jr
 KONISHI
+Kaji
 Kaminsky
 Kapranoff
 Karaban
@@ -214,6 +215,7 @@ Schwern
 Sean
 Sergey
 Shirazi
+Shoichi
 Simple
 Sjogren
 Skyttä
@@ -362,6 +364,7 @@ sburke
 schwern
 shaohua
 shildreth
+skaji
 slaven
 sprout
 sromanov

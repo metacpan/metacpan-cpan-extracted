@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Madrid
 
+0.12  2018-07-14
+      - Added source data for line L1.
+
 0.11  2018-07-10
       - Used File::ShareDir v1.114 instead of File::Share.
       - Explicitly added configure prereq File::ShareDir::Install v0.13.

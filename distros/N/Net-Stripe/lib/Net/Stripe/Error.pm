@@ -1,5 +1,5 @@
 package Net::Stripe::Error;
-$Net::Stripe::Error::VERSION = '0.35';
+$Net::Stripe::Error::VERSION = '0.36';
 use Moose;
 with 'Throwable';
 use namespace::clean -except => 'meta';
@@ -33,41 +33,7 @@ Net::Stripe::Error - represent an error result from interacting with Stripe
 
 =head1 VERSION
 
-version 0.35
-
-=head1 ATTRIBUTES
-
-=head2 code
-
-Reader: code
-
-Type: Maybe[Str]
-
-=head2 message
-
-Reader: message
-
-Type: Maybe[Str]
-
-This attribute is required.
-
-=head2 param
-
-Reader: param
-
-Type: Maybe[Str]
-
-=head2 previous_exception
-
-Reader: previous_exception
-
-=head2 type
-
-Reader: type
-
-Type: Maybe[Str]
-
-This attribute is required.
+version 0.36
 
 =head1 AUTHORS
 

@@ -2,22 +2,40 @@
 abstract: 'Automate Stratopan releases with Dist::Zilla'
 author:
   - 'Mike Friedman <friedo@friedo.com>'
-build_requires: {}
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Exception: '0'
+  Test::Mock::One: '0'
+  Test::More: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-Plugin-UploadToStratopan
+provides:
+  Dist::Zilla::Plugin::UploadToStratopan:
+    file: lib/Dist/Zilla/Plugin/UploadToStratopan.pm
+    version: '0.013'
 requires:
   Dist::Zilla::Role::Releaser: '0'
   LWP::Protocol::https: '0'
   Mojo::DOM: '0'
   Mojo::UserAgent: '0'
   Moose: '0'
+  perl: '5.006'
 resources:
   repository: git://github.com/friedo/dzil-upload-to-stratopan.git
-version: '0.012'
+version: '0.013'
+x_contributors:
+  - 'Wesley Schwengle <wesley@schwengle.net>'
+  - 'Erik Carlsson <info@code301.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

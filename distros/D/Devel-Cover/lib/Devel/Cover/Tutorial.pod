@@ -6,7 +6,7 @@ Devel::Cover::Tutorial - An introduction to code coverage
 
 =head1 VERSION
 
-version 1.29
+version 1.30
 
 =head1 TUTORIAL
 

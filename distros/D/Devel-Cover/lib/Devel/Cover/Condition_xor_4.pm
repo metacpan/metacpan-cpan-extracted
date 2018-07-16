@@ -10,7 +10,7 @@ package Devel::Cover::Condition_xor_4;
 use strict;
 use warnings;
 
-our $VERSION = '1.29'; # VERSION
+our $VERSION = '1.30'; # VERSION
 
 use base "Devel::Cover::Condition";
 
@@ -27,7 +27,7 @@ Devel::Cover::Condition_xor_4 - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.29
+version 1.30
 
 =head1 SYNOPSIS
 

@@ -47,7 +47,7 @@ When set, a recurse copy of the value from the old object to the new object is a
 
 =head2 refer_to
 
-points to an array or hash element in the configuration tree using the path syntax. The available choice of this reference value (or check list)is made from the available keys of the pointed hash element or the values of the pointed array element. I< Optional. Type uniline.  > 
+points to an array or hash element in the configuration tree using L<grab syntax|Config::Model::Role::Grab>. The available choice of this reference value (or check list)is made from the available keys of the pointed hash element or the values of the pointed array element. I< Optional. Type uniline.  > 
 
 =head2 computed_refer_to
 

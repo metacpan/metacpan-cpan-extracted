@@ -1,5 +1,5 @@
 package Net::Stripe::Token;
-$Net::Stripe::Token::VERSION = '0.35';
+$Net::Stripe::Token::VERSION = '0.36';
 use Moose;
 use Kavorka;
 extends 'Net::Stripe::Resource';
@@ -39,53 +39,7 @@ Net::Stripe::Token - represent a Token object from Stripe
 
 =head1 VERSION
 
-version 0.35
-
-=head1 ATTRIBUTES
-
-=head2 amount
-
-Reader: amount
-
-Type: Maybe[Int]
-
-=head2 card
-
-Reader: card
-
-Type: Maybe[Net::Stripe::Card]
-
-This attribute is required.
-
-=head2 created
-
-Reader: created
-
-Type: Maybe[Int]
-
-=head2 currency
-
-Reader: currency
-
-Type: Maybe[Str]
-
-=head2 id
-
-Reader: id
-
-Type: Maybe[Str]
-
-=head2 livemode
-
-Reader: livemode
-
-Type: Maybe[Bool|Object]
-
-=head2 used
-
-Reader: used
-
-Type: Maybe[Bool|Object]
+version 0.36
 
 =head1 AUTHORS
 

@@ -12,7 +12,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.29'; # VERSION
+our $VERSION = '1.30'; # VERSION
 }
 
 use DynaLoader ();
@@ -231,8 +231,9 @@ if (0 && $Config{useithreads}) {
         my $sub       = shift;
         my $wantarray = wantarray;
 
-        $new->($class,
-               sub {
+        $new->(
+            $class,
+            sub {
                    print STDERR "Starting thread\n";
                    set_coverage(keys %Coverage);
                    my $ret = [ $sub->(@_) ];
@@ -240,9 +241,9 @@ if (0 && $Config{useithreads}) {
                    report() if $Initialised;
                    print STDERR "Ended thread\n";
                    $wantarray ? @{$ret} : $ret->[0];
-               },
-               @_
-              );
+            },
+            @_
+        );
     };
 }
 
@@ -1283,7 +1284,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.29
+version 1.30
 
 =head1 SYNOPSIS
 
@@ -1459,16 +1460,17 @@ In this example, Devel::Cover will be operating in silent mode.
  -db cover_db        - Store results in coverage db (default ./cover_db)
  -dir path           - Directory in which coverage will be collected (default
                        cwd)
- -ignore RE          - Set REs of files to ignore (default "/Devel/Cover\b")
- +ignore RE          - Append to REs of files to ignore
+ -ignore RE          - Set regular expressions for files to ignore (default
+                       "/Devel/Cover\b")
+ +ignore RE          - Append to regular expressions of files to ignore
  -inc path           - Set prefixes of files to include (default @INC)
- +inc path           - Append to prefixes of files to include
+ +inc path           - Append to prefixes of files regular expressionsto include
  -loose_perms val    - Use loose permissions on all files and directories in
                        the coverage db so that code changing EUID can still
                        write coverage information (default off)
  -merge val          - Merge databases, for multiple test benches (default on)
- -select RE          - Set REs of files to select (default none)
- +select RE          - Append to REs of files to select
+ -select RE          - Set regular expressions of files to select (default none)
+ +select RE          - Append to regular expressions of files to select
  -silent val         - Don't print informational messages (default off)
  -subs_only val      - Only cover code in subroutine bodies (default off)
  -replace_ops val    - Use op replacing rather than runops (default on)
@@ -1482,6 +1484,15 @@ the L<Pod::Coverage> constructor.  The extra options are separated by dashes,
 and you may specify as many as you wish.  For example, to specify that all
 subroutines containing xx are private, call Devel::Cover with the option
 -coverage,pod-also_private-xx.
+
+Or, to ignore all files in C<t/lib> as well as files ending in C<Foo.pm>:
+
+    cover -test -silent -ignore ^t/lib/,Foo.pm$
+
+Note that C<-ignore> replaces any default ignore regexes.  To preserve any
+ignore regexes which have already been set, use C<+ignore>:
+
+    cover -test -silent +ignore ^t/lib/,Foo.pm$
 
 =head1 SELECTING FILES TO COVER
 
@@ -1669,6 +1680,13 @@ The -silent option is turned on when Devel::Cover is invoked via
 $HARNESS_PERL_SWITCHES or $PERL5OPT.  Devel::Cover tries to do the right thing
 when $MOD_PERL is set.  $DEVEL_COVER_OPTIONS is appended to any options passed
 into Devel::Cover.
+
+Note that when Devel::Cover is invoked via an environment variable, any modules
+specified on the command line, such as via the -Mmodule option, will not be
+covered.  This is because the environment variables are processed after the
+command line and any code to be covered must appear after Devel::Cover has been
+loaded.  To work around this, Devel::Cover can also be specified on the command
+line.
 
 =head2 Developer variables
 

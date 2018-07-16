@@ -2,7 +2,7 @@ NAME
     Path::Tiny - File path utility
 
 VERSION
-    version 0.104
+    version 0.106
 
 SYNOPSIS
       use Path::Tiny;
@@ -59,7 +59,7 @@ DESCRIPTION
     the object gives you back the path (after some clean up).
 
     File input/output methods "flock" handles before reading or writing, as
-    appropriate (if supported by the platform).
+    appropriate (if supported by the platform and/or filesystem).
 
     The *_utf8 methods ("slurp_utf8", "lines_utf8", etc.) operate in raw
     mode. On Windows, that means they will not have CRLF translation from
@@ -226,9 +226,9 @@ METHODS
         path("foo.txt")->append_raw(@data);
         path("foo.txt")->append_utf8(@data);
 
-    Appends data to a file. The file is locked with "flock" prior to
-    writing. An optional hash reference may be used to pass options. Valid
-    options are:
+    Appends data to a file. The file is locked with "flock" prior to writing
+    and closed afterwards. An optional hash reference may be used to pass
+    options. Valid options are:
 
     *   "binmode": passed to "binmode()" on the handle used for writing.
 
@@ -302,6 +302,11 @@ METHODS
     Returns a new "Path::Tiny" object relative to the original. Works like
     "catfile" or "catdir" from File::Spec, but without caring about file or
     directories.
+
+    WARNING: because the argument could contain ".." or refer to symlinks,
+    there is no guarantee that the new path refers to an actual descendent
+    of the original. If this is important to you, transform parent and child
+    with "realpath" and check them with "subsumes".
 
     Current API available since 0.001.
 
@@ -572,7 +577,8 @@ METHODS
         path("foo.txt")->move("bar.txt");
 
     Move the current path to the given destination path using Perl's
-    built-in rename function. Returns the result of the "rename" function.
+    built-in rename function. Returns the result of the "rename" function
+    (except it throws an exception if it fails).
 
     Current API available since 0.001.
 
@@ -927,6 +933,12 @@ EXCEPTION HANDLING
 
     Exception objects will stringify as the "msg" field.
 
+ENVIRONMENT
+  PERL_PATH_TINY_NO_FLOCK
+    If the environment variable "PERL_PATH_TINY_NO_FLOCK" is set to a true
+    value then flock will NOT be used when accessing files (this is not
+    recommended).
+
 CAVEATS
   Subclassing not supported
     For speed, this class is implemented as an array based object and uses
@@ -937,15 +949,24 @@ CAVEATS
     If flock is not supported on a platform, it will not be used, even if
     locking is requested.
 
+    In situations where a platform normally would support locking, but the
+    flock fails due to a filesystem limitation, Path::Tiny has some
+    heuristics to detect this and will warn once and continue in an unsafe
+    mode. If you want this failure to be fatal, you can fatalize the 'flock'
+    warnings category:
+
+        use warnings FATAL => 'flock';
+
     See additional caveats below.
 
    NFS and BSD
     On BSD, Perl's flock implementation may not work to lock files on an NFS
-    filesystem. Path::Tiny has some heuristics to detect this and will warn
-    once and let you continue in an unsafe mode. If you want this failure to
-    be fatal, you can fatalize the 'flock' warnings category:
+    filesystem. If detected, this situation will warn once, as described
+    above.
 
-        use warnings FATAL => 'flock';
+   Lustre
+    The Lustre filesystem does not support flock. If detected, this
+    situation will warn once, as described above.
 
    AIX and locking
     AIX requires a write handle for locking. Therefore, calls that normally
@@ -1035,6 +1056,8 @@ AUTHOR
 CONTRIBUTORS
     *   Alex Efros <powerman@powerman.name>
 
+    *   Aristotle Pagaltzis <pagaltzis@gmx.de>
+
     *   Chris Williams <bingos@cpan.org>
 
     *   Dave Rolsky <autarch@urth.org>
@@ -1056,6 +1079,8 @@ CONTRIBUTORS
     *   Graham Knop <haarg@haarg.org>
 
     *   Graham Ollis <plicease@cpan.org>
+
+    *   Ian Sillitoe <ian@sillit.com>
 
     *   James Hunt <james@niftylogic.com>
 

@@ -20,7 +20,7 @@ no_index:
 provides:
   Config::HAProxy:
     file: lib/Config/HAProxy.pm
-    version: '1.01'
+    version: '1.02'
   Config::HAProxy::Iterator:
     file: lib/Config/HAProxy/Iterator.pm
   Config::HAProxy::Node:
@@ -47,4 +47,4 @@ requires:
   perl: '5.01'
 resources:
   repository: git://git.gnu.org.ua/config-haproxy.git
-version: '1.01'
+version: '1.02'

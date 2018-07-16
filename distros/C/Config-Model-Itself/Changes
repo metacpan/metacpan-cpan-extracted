@@ -1,3 +1,11 @@
+2.014 2018-07-15
+
+    * backend function parameter is deprecated
+    * improve inline doc on refer_to parameter
+    * add gist in ConfigRead and ConfigWrite
+    * remove deprecated read_config and write_config backend
+      parameters
+
 2.013 2017-11-19
 
   New feature:

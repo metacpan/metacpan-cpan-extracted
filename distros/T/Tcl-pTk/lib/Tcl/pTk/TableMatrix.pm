@@ -2,7 +2,7 @@
 
 package Tcl::pTk::TableMatrix;
 
-our ($VERSION) = ('0.92');
+our ($VERSION) = ('0.93');
 
 ###########################################################
 # Emulation of the perl/tk Tablematrix widget using Tcl::pTk
@@ -435,7 +435,9 @@ sub ClassInit
  $tkPriv{borderB1} = 1; # initialize borderB1
 
 
-$mw->bind($class,'<3>',
+$mw->bind(
+  $class,
+  $mw->windowingsystem ne 'aqua' ? '<3>' : '<2>',
   [sub
    {
     my $w = shift;
@@ -448,7 +450,11 @@ $mw->bind($class,'<3>',
  );
  
 
- $mw->bind($class,'<B3-Motion>',['border','dragto',Ev('x'),Ev('y')]);
+ $mw->bind(
+   $class,
+   $mw->windowingsystem ne 'aqua' ? '<B3-Motion>' : '<B2-Motion>',
+   ['border','dragto',Ev('x'),Ev('y')]
+ );
  $mw->bind($class,'<1>',
   [sub
    {
@@ -515,7 +521,9 @@ $mw->bind($class,'<3>',
    }, Ev('x'), Ev('y')
    ]
  );
- $mw->bind($class,'<2>',
+ $mw->bind(
+  $class,
+  $mw->windowingsystem ne 'aqua' ? '<2>' : '<3>',
   [sub
    {
     my $w = shift;
@@ -526,7 +534,9 @@ $mw->bind($class,'<3>',
    }, Ev('x'), Ev('y')
    ]
  );
- $mw->bind($class,'<B2-Motion>',
+ $mw->bind(
+  $class,
+  $mw->windowingsystem ne 'aqua' ? '<B2-Motion>' : '<B3-Motion>',
   [sub
    {
     my $w = shift;
@@ -536,7 +546,9 @@ $mw->bind($class,'<3>',
    }, Ev('x'), Ev('y')
    ]
  );
- $mw->bind($class,'<ButtonRelease-2>',
+ $mw->bind(
+  $class,
+  $mw->windowingsystem ne 'aqua' ? '<ButtonRelease-2>' : '<ButtonRelease-3>',
   [sub
    {
     my $w = shift;
@@ -806,7 +818,7 @@ sub BackSpace{
 
 # Button1 --
 #
-# This procedure is called to handle selecting with mouse button 1.
+# This procedure is called to handle selecting with mouse button 1 (left button).
 # It will distinguish whether to start selection or mark a border.
 #
 # Arguments:

@@ -6,7 +6,7 @@
 
 package Tcl::pTk::Widget;
 
-our ($VERSION) = ('0.92');
+our ($VERSION) = ('0.93');
 
 use IO::Handle; 
 
@@ -327,7 +327,7 @@ sub call{
 
     local $^W = 0; # Turn warnings off temporarily so we don't get 'use of undef value' messages    
     
-    # Translate any emtpy strings to undefs, for compatibility with perltk
+    # Translate any empty strings to undefs, for compatibility with perltk
     if( wantarray ){ 
             my @retvals =  $interp->$callMethod(@args);
             return map defined($_) && !ref($_) && ($_ eq '') ? undef : $_, @retvals;
@@ -778,7 +778,7 @@ sub bind {
 		}, $events);
     }
     else{
-            $tclsubName = ''; # Must be resetting a binding (i.e. supplying the empty string
+            $tclsubName = ''; # Must be resetting a binding (i.e. supplying the empty string)
     }
 
     # If this is just a widget binding (i.e. not a class binding), 
@@ -808,7 +808,7 @@ sub bind {
                 } 
             }");
     }
-    else{  # tclsubName is emtpy, must be resetting an existing binding
+    else{  # tclsubName is empty, must be resetting an existing binding
         if( defined($tag)){ # tag version of bind
                 $self->interp->call("bind",$tag, $sequence, $cbRef);
 
@@ -965,10 +965,16 @@ sub focusForce
 {
     my $self = shift;
     my $wp = $self->path;
-    my $val = $self->call('focus','-force', $self->path);
+    my $val = $self->call('focus','-force',$wp);
 
     return $val;
   
+}
+
+sub focusFollowsMouse {
+    my $self = shift;
+    my $interp = $self->interp;
+    $interp->icall('tk_focusFollowsMouse');
 }
 
 sub grabRelease {
@@ -1912,7 +1918,7 @@ sub setAutoWidgetISAs{
  
                 
 # here we create Widget package, used for both standard cases like
-# 'Button', 'Label', and so on, and for all other widgets like Baloon
+# 'Button', 'Label', and so on, and for all other widgets like Balloon
 # returns 1 if actually package created, i.e. called first time
 # TODO : document better and provide as public way of doing things?
 my %created_w_packages; # (may be look in global stash %:: ?)
@@ -2417,9 +2423,11 @@ sub MouseWheelBind
  # events on other platforms.
 
  $mw->bind($class, '<MouseWheel>',
-	       [ sub { $_[0]->yview('scroll',-int(($_[1]/120)),'units') }, Tcl::pTk::Ev("D")]);
+    $mw->windowingsystem eq 'aqua'
+	    ?  [ sub { $_[0]->yview('scroll',-($_[1]),'units') }, Tcl::pTk::Ev("D")]
+	    :  [ sub { $_[0]->yview('scroll',-int(($_[1]/120)),'units') }, Tcl::pTk::Ev("D")]);
 
- if ($Tcl::pTk::platform eq 'unix')
+ if ($mw->windowingsystem eq 'x11')
   {
    # Support for mousewheels on Linux/Unix commonly comes through mapping
    # the wheel to the extended buttons.  If you have a mousewheel, find

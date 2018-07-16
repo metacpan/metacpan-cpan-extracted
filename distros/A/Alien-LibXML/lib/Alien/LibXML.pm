@@ -2,7 +2,7 @@ package Alien::LibXML;
 use strict;
 use warnings;
 use parent 'Alien::Base';
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 __END__
 
@@ -35,7 +35,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT, LICENCE AND DISCLAIMER OF WARRANTIES
 
-Copyright (c) 2012-2014 Toby Inkster.
+Copyright (c) 2012-2014, 2018 Toby Inkster.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

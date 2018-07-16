@@ -3,8 +3,7 @@
 use ExtUtils::testlib;
 use Test::More ;
 use Config::Model;
-use Log::Log4perl qw(:easy) ;
-use Data::Dumper ;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use Config::Model::Itself ;
 
 use Tk ;
@@ -14,42 +13,20 @@ use File::Copy::Recursive qw(fcopy rcopy dircopy);
 use Test::Memory::Cycle;
 
 use warnings;
-no warnings qw(once);
-
 use strict;
 $File::Copy::Recursive::DirPerms = 0755;
 
 
-my ($log,$show) = (0) x 2 ;
-my $arg = $ARGV[0] || '' ;
-my $trace = $arg =~ /t/ ? 1 : 0 ;
-$log                = 1 if $arg =~ /l/;
-$show               = 1 if $arg =~ /[si]/;
+my ($meta_model, $trace, $args) = init_test('show','interactive');
 
-print "You can play with the widget if you run the test with 's' argument\n";
+note("You can play with the widget if you run the test with 's' argument");
 
-my $wr_test = path('wr_test') ;
+my $wr_test = setup_test_dir ;
 my $wr_conf1 = $wr_test->child("wr_conf1");
 my $wr_lib = $wr_test->child("lib");
 my $wr_model1 = $wr_lib->child("wr_model1");
 
-# do search for the models created in this test
-use lib "wr_test/lib";
-
-plan tests => 15 ;
-
-my $log4perl_user_conf_file = $ENV{HOME}.'/.log4config-model' ;
-
-if ($log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init($ERROR);
-}
-
-my $meta_model = Config::Model -> new ( ) ;
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
+use lib "wr_root/itself-editor/lib";
 
 {
     no warnings "redefine" ;
@@ -59,10 +36,6 @@ Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
     }
 }
 
-ok(1,"compiled");
-
-$wr_test->remove_tree if $wr_test->is_dir ;
-
 $wr_conf1->mkpath;
 $wr_model1->mkpath;
 $wr_conf1->child("etc/ssh")->mkpath;
@@ -70,15 +43,15 @@ $wr_conf1->child("etc/ssh")->mkpath;
 
 dircopy('data',$wr_model1->stringify) || die "cannot copy model data:$!" ;
 
+# cannot use $meta_model as the model dir are different
 my $model = Config::Model->new(
-    legacy => 'ignore',
     model_dir => $wr_model1->child("models")->relative($wr_lib)->stringify
 ) ;
 ok(1,"loaded Master model") ;
 
 # check that Master Model can be loaded by Config::Model
 my $inst1 = $model->instance (
-    root_class_name   => 'MasterModel', 
+    root_class_name   => 'MasterModel',
     instance_name     => 'test_orig',
     root_dir          => $wr_conf1->stringify,
 );
@@ -92,6 +65,7 @@ $root1->load("a_string=toto lot_of_checklist macro=AD - "
              ."                get_element=m_value_element m_value=Cv") ;
 ok($inst1,"loaded some data in master_model instance") ;
 
+# do search for the models created in this test
 my $meta_inst = $meta_model->instance(
     root_class_name => 'Itself::Model',
     instance_name   => 'itself_instance',
@@ -106,8 +80,6 @@ my $rw_obj = Config::Model::Itself -> new(
     model_object => $meta_root,
     cm_lib_dir => $wr_model1->stringify,
 ) ;
-
-
 
 my $map = $rw_obj->read_all(
     root_model => 'MasterModel',
@@ -154,7 +126,7 @@ SKIP: {
         exit                 => sub { $cmu->quit ; 1;}
     );
 
-    unless ($show) {
+    unless ($args->{show} || $args->{interactive}) {
         my $step = 0;
 
         # build a FILO queue of test subs
@@ -178,9 +150,11 @@ SKIP: {
     ok(1,"window launched") ;
 
     MainLoop ;                  # Tk's
-
 }
 
-memory_cycle_ok($model,"memory cycles");
+note("testing memory cycles. Please wait...");
+memory_cycle_ok($meta_model,"memory cycles");
+
+done_testing;
 
 

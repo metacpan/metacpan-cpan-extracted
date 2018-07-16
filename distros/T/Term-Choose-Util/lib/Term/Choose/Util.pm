@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.065';
+our $VERSION = '0.066';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -19,11 +19,16 @@ use Encode::Locale         qw();
 use File::HomeDir          qw();
 use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( line_fold cut_to_printwidth print_columns );
-use Term::ReadKey          qw( GetTerminalSize ReadKey ReadMode );
 
-use if $^O eq 'MSWin32', 'Win32::Console';
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
+BEGIN {
+    if ( $^O eq 'MSWin32' ) {
+        require Term::Choose::Win32;
+    }
+    else {
+        require Term::Choose::Linux;
+    }
+}
 
 sub choose_dirs {
     my ( $opt ) = @_;
@@ -601,7 +606,6 @@ sub print_hash {
     my $prompt       = defined $opt->{prompt}       ? $opt->{prompt}       : ( defined $opt->{preface} ? '' : 'Close with ENTER' );
     my $preface      = $opt->{preface};
     #-----------------------------------------------------------------#
-    #my $line_fold = defined $opt->{lf} ? $opt->{lf} : { Charset => 'utf-8', Newline => "\n", OutputCharset => '_UNICODE_', Urgent => 'FORCE' }; ##
     my $term_width = term_width();
     if ( ! $maxcols || $maxcols > $term_width  ) {
         $maxcols = $term_width - $right_margin;
@@ -646,12 +650,11 @@ sub print_hash {
 
 
 sub term_size {
-    my ( $handle_out ) = defined $_[0] ? $_[0] : \*STDOUT;
+    #my ( $handle_out ) = defined $_[0] ? $_[0] : \*STDOUT;
     if ( $^O eq 'MSWin32' ) {
-        my ( $width, $height ) = Win32::Console->new()->Size();
-        return $width - 1, $height;
+        return Term::Choose::Win32->__get_term_size();
     }
-    return( ( GetTerminalSize( $handle_out ) )[ 0, 1 ] );
+    return Term::Choose::Linux->__get_term_size();
 }
 
 
@@ -702,7 +705,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.065
+Version 0.066
 
 =cut
 

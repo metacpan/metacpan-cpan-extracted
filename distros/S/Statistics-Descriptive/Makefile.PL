@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "List::Util" => 0,
     "POSIX" => 0,
     "base" => 0,
+    "parent" => 0,
     "strict" => 0,
     "vars" => 0,
     "warnings" => 0
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "lib" => 0
   },
-  "VERSION" => "3.0613",
+  "VERSION" => "3.0701",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,6 +63,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.88",
   "base" => 0,
   "lib" => 0,
+  "parent" => 0,
   "strict" => 0,
   "vars" => 0,
   "warnings" => 0

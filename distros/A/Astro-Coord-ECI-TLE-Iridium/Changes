@@ -1,0 +1,11 @@
+0.100		2018-07-15	T. R. Wyant
+    Canned status update:
+
+    - Iridium 65 failed
+    - Iridium 67 decayed
+    - Iridium 75 decayed
+    - Iridium 80 spare (partial failure)
+    - Iridium 98 failed
+    - Iridium 98 spare
+
+    Pull out Astro::Coord::ECI::TLE::Iridium as separate distribution.

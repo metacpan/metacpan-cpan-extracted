@@ -1,5 +1,6 @@
 package B::DeparseTree::Fragment;
 
+use B::DeparseTree;
 use strict; use warnings;
 use Data::Printer;
 use vars qw(@ISA @EXPORT);

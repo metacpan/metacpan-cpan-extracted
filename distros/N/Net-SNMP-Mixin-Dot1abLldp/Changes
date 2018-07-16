@@ -1,5 +1,8 @@
 Revision history for Net-SNMP-Mixin-Dot1abLldp
 
+0.17	Fri, 13 Jul 2018 15:16:14 +0200
+	fiddling with test plan when skip
+
 0.16	Tue, 10 Jul 2018 21:02:06 +0200
 	aad method map_loc_portid2portnum()
 

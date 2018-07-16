@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               AnyEvent-UWSGI
-version:            0.03
+version:            0.04
 abstract:           non-blocking UWSGI client (based on L<AnyEvent::HTTP>)
 author:
     - Alexander Kazakov <voland.kot@gmail.com>

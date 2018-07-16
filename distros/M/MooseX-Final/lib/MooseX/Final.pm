@@ -7,7 +7,7 @@ package MooseX::Final;
 use Exporter::Tiny ();
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 our @ISA       = qw(Exporter::Tiny);
 our @EXPORT    = qw(assert_final);
 
@@ -55,12 +55,13 @@ MooseX::Final - mark a class as "final" (cannot be inherited from)
      ...;   # do other stuff here if required
    }
  }
-
+ 
  package Example::Phone::Mobile {
    use Moose;
+   extends "Example::Phone";
    sub send_sms { ... }
  }
-
+ 
  my $friend = Example::Phone::Mobile->new(number => 123);  # dies
 
 =head1 DESCRIPTION
@@ -99,6 +100,22 @@ class to be testing against at C<import> time.)
 
 =back
 
+=head2 Alternative Invocation Style
+
+The C<BUILD> method in the L</SYNOPSIS> could have been written as:
+
+   sub BUILD {
+     &assert_final;
+     my $self = shift;
+     ...;   # do other stuff here if required
+   }
+
+Note the ampersand before the function call and the lack of parentheses
+afterwards. This syntax may be less familiar to new Perl users, but is
+slightly more efficient because the Perl interpreter can avoid setting
+up a new C<< @_ >> array when it calls the function. See L<perlsub> for
+details.
+
 =head1 BUGS
 
 Please report any bugs to
@@ -114,7 +131,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2017 by Toby Inkster.
+This software is copyright (c) 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

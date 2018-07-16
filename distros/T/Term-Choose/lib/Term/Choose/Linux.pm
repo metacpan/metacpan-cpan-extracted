@@ -4,12 +4,18 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.602';
+our $VERSION = '1.604';
 
-use Term::ReadKey qw( GetTerminalSize ReadKey ReadMode );
+use Term::Choose::Constants qw( :screen :linux );
 
-use Term::Choose::Constants qw( :linux );
 
+my $Term_ReadKey = 1;
+BEGIN {
+    if ( ! eval { require Term::ReadKey; 1 } ) {
+        $Term_ReadKey = 0;
+    }
+}
+my $Stty = '';
 
 
 sub new {
@@ -17,12 +23,19 @@ sub new {
 }
 
 
+sub _getc_wrapper {
+    my ( $timeout ) = @_;
+    return Term::ReadKey::ReadKey( $timeout ) if $Term_ReadKey;
+    return getc();
+}
+
+
 sub __get_key_OS {
     my ( $self, $mouse ) = @_;
-    my $c1 = ReadKey( 0 );
+    my $c1 = _getc_wrapper( 0 );
     return if ! defined $c1;
     if ( $c1 eq "\e" ) {
-        my $c2 = ReadKey( 0.10 );
+        my $c2 = _getc_wrapper( 0.10 );
         if    ( ! defined $c2 ) { return KEY_ESC; } # unused
         #elsif ( $c3 eq 'A' ) { return VK_UP; }     vt 52
         #elsif ( $c3 eq 'B' ) { return VK_DOWN; }
@@ -30,7 +43,7 @@ sub __get_key_OS {
         #elsif ( $c3 eq 'D' ) { return VK_LEFT; }
         #elsif ( $c3 eq 'H' ) { return VK_HOME; }
          elsif ( $c2 eq 'O' ) {
-            my $c3 = ReadKey( 0 );
+            my $c3 = _getc_wrapper( 0 );
             if    ( $c3 eq 'A' ) { return VK_UP; }
             elsif ( $c3 eq 'B' ) { return VK_DOWN; }
             elsif ( $c3 eq 'C' ) { return VK_RIGHT; }
@@ -43,7 +56,7 @@ sub __get_key_OS {
             }
         }
         elsif ( $c2 eq '[' ) {
-            my $c3 = ReadKey( 0 );
+            my $c3 = _getc_wrapper( 0 );
             if    ( $c3 eq 'A' ) { return VK_UP; }
             elsif ( $c3 eq 'B' ) { return VK_DOWN; }
             elsif ( $c3 eq 'C' ) { return VK_RIGHT; }
@@ -52,7 +65,7 @@ sub __get_key_OS {
             elsif ( $c3 eq 'H' ) { return VK_HOME; }
             elsif ( $c3 eq 'Z' ) { return KEY_BTAB; }
             elsif ( $c3 =~ m/^[0-9]$/ ) {
-                my $c4 = ReadKey( 0 );
+                my $c4 = _getc_wrapper( 0 );
                 if ( $c4 eq '~' ) {
                     if    ( $c3 eq '2' ) { return VK_INSERT; } # unused
                     elsif ( $c3 eq '3' ) { return VK_DELETE; } # unused
@@ -67,14 +80,14 @@ sub __get_key_OS {
                     my $ry = $c4;
                     while ( $ry =~ m/^[0-9]$/ ) {
                         $abs_curs_y .= $ry;
-                        $ry = ReadKey( 0 );
+                        $ry = _getc_wrapper( 0 );
                     }
                     return NEXT_get_key if $ry ne ';';
                     my $abs_curs_x = '';
-                    my $rx = ReadKey( 0 );
+                    my $rx = _getc_wrapper( 0 );
                     while ( $rx =~ m/^[0-9]$/ ) {
                         $abs_curs_x .= $rx;
-                        $rx = ReadKey( 0 );
+                        $rx = _getc_wrapper( 0 );
                     }
                     if ( $rx eq 'R' ) {
                         #$self->{abs_cursor_x} = $abs_curs_x; # unused
@@ -88,9 +101,9 @@ sub __get_key_OS {
             }
             # http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
             elsif ( $c3 eq 'M' && $mouse ) {
-                my $event_type = ord( ReadKey( 0 ) ) - 32;
-                my $x          = ord( ReadKey( 0 ) ) - 32;
-                my $y          = ord( ReadKey( 0 ) ) - 32;
+                my $event_type = ord( _getc_wrapper( 0 ) ) - 32;
+                my $x          = ord( _getc_wrapper( 0 ) ) - 32;
+                my $y          = ord( _getc_wrapper( 0 ) ) - 32;
                 my $button = $self->__mouse_event_to_button( $event_type );
                 return NEXT_get_key if $button == NEXT_get_key;
                 return [ $self->{abs_cursor_y}, $button, $x, $y ];
@@ -98,19 +111,19 @@ sub __get_key_OS {
             elsif ( $c3 eq '<' && $mouse ) {  # SGR 1006
                 my $event_type = '';
                 my $m1;
-                while ( ( $m1 = ReadKey( 0 ) ) =~ m/^[0-9]$/ ) {
+                while ( ( $m1 = _getc_wrapper( 0 ) ) =~ m/^[0-9]$/ ) {
                     $event_type .= $m1;
                 }
                 return NEXT_get_key if $m1 ne ';';
                 my $x = '';
                 my $m2;
-                while ( ( $m2 = ReadKey( 0 ) ) =~ m/^[0-9]$/ ) {
+                while ( ( $m2 = _getc_wrapper( 0 ) ) =~ m/^[0-9]$/ ) {
                     $x .= $m2;
                 }
                 return NEXT_get_key if $m2 ne ';';
                 my $y = '';
                 my $m3;
-                while ( ( $m3 = ReadKey( 0 ) ) =~ m/^[0-9]$/ ) {
+                while ( ( $m3 = _getc_wrapper( 0 ) ) =~ m/^[0-9]$/ ) {
                     $y .= $m3;
                 }
                 return NEXT_get_key if $m3 !~ m/^[mM]$/;
@@ -194,7 +207,14 @@ sub __set_mode {
             }
         }
     }
-    Term::ReadKey::ReadMode( 'ultra-raw' );
+    if ( $Term_ReadKey ) {
+        Term::ReadKey::ReadMode( 'ultra-raw' );
+    }
+    else {
+        $Stty = `stty --save`;
+        chomp $Stty;
+        system( "stty -echo raw" ) == 0 or die $?;
+    }
     print HIDE_CURSOR if $hide_cursor;
     return $mouse;
 };
@@ -210,18 +230,44 @@ sub __reset_mode {
         print UNSET_ANY_EVENT_MOUSE_1003;
     }
     $self->__reset();
-    Term::ReadKey::ReadMode( 'restore' );
+    if ( $Term_ReadKey ) {
+        Term::ReadKey::ReadMode( 'restore' );
+    }
+    elsif ( $Stty ) {
+        system( "stty $Stty" ) == 0 or die $?;
+    }
+    else {
+        system( "stty sane" ) == 0 or die $?;
+    }
 }
 
 
 sub __get_term_size {
     #my ( $self ) = @_;
-    my ( $width, $height ) = ( GetTerminalSize() )[ 0, 1 ];
+    my ( $width, $height ) = ( 0, 0 );
+    if ( $Term_ReadKey ) {
+        ( $width, $height ) = ( Term::ReadKey::GetTerminalSize() )[ 0, 1 ];
+    }
+    else {
+        #if ( defined $ENV{COLUMNS} && defined $ENV{LINES} && $ENV{COLUMNS} > 1 && $ENV{LINES} > 1 ) {
+        #    $width  = $ENV{COLUMNS};
+        #    $height = $ENV{LINES};
+        #}
+        #else {
+            my $size = `stty size`;
+            if ( defined $size && $size =~ /(\d+)\s(\d+)/ ) {
+                $width  = $2;
+                $height = $1;
+            }
+        #}
+    }
     return $width - WIDTH_CURSOR, $height;
     # $width - WIDTH_CURSOR: don't let items reach the right edge of the terminal;
     #                        selecting an item which reaches the right edge of the terminal
     #                        messes up the output - maybe because the (hidden) terminal-cursor needs a space
 }
+
+
 
 
 sub __get_cursor_position {

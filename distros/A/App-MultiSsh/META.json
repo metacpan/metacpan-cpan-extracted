@@ -38,7 +38,7 @@
    "provides" : {
       "App::MultiSsh" : {
          "file" : "lib/App/MultiSsh.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "git://github.com/ivanwills/App-MultiSsh.git"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

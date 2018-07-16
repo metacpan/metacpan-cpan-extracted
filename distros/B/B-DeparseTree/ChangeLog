@@ -1,9 +1,53 @@
+2018-07-15  Rocky Bernstein <rocky@cpan.org>
+
+	* admin/how-to-make-a-release.md, lib/B/DeparseTree.pm: Get ready
+	for release 3.4.0
+
+2018-07-15  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Fragment.pm, lib/B/DeparseTree/PPfns.pm,
+	lib/B/DeparseTree/TreeMain.pm: For loop hacking....  - fix up prev for zz in in: "for (xx; yy; zz) { " - show loop in DEBUG_DEPARSETREE - set prev correctly for loops
+
+2018-07-11  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/P528.pm, lib/B/DeparseTree/PPfns.pm,
+	t/roundtrip/5.028/base/cond.t, t/roundtrip/5.028/base/if.t,
+	t/roundtrip/5.028/base/pat.t, t/roundtrip/5.028/base/translate.t,
+	t/roundtrip/5.028/base/while.t,
+	t/roundtrip/5.028/mro/basic_04_dfs.t: Bang on 5.028 support...  Add maybe_var_attr, add more 5.028 tests
+
+2018-07-11  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PPfns.pm,
+	lib/B/DeparseTree/SyntaxTree.pm, t/roundtrip/5.018/cmd/elsif.t,
+	t/roundtrip/5.020/cmd/elsif.t, t/roundtrip/5.020/cmd/for.t,
+	t/roundtrip/5.022/cmd/elsif.t, t/roundtrip/5.022/cmd/for.t,
+	t/roundtrip/5.024/cmd/elsif.t, t/roundtrip/5.024/cmd/for.t,
+	t/roundtrip/5.026/cmd/for.t: Fix a bug in handling %; templating...  add "for" tests in many versions
+
+2018-07-10  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/PPfns.pm, t/roundtrip/5.026/cmd/for.t: 
+	Fix some of the for loop and const list bugs...  but others remain
+
+2018-07-10  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
+	lib/B/DeparseTree/P528.pm, lib/B/DeparseTree/PP.pm,
+	lib/B/DeparseTree/PPfns.pm, t/roundtrip/5.026/cmd/elsif.t: Minor
+	improvements and bugfixes - DRY and improve list_const(). Fix up loop_common().  - Start adding cmd tests: elsif.t - More uses of info_from_string() and info_from_template()
+
 2018-07-03  Rocky Bernstein <rocky@cpan.org>
 
-	* admin/how-to-make-a-release.md, lib/B/DeparseTree.pm,
-	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
-	lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/TreeMain.pm: Get ready
-	for release 3.3.0
+	* lib/B/DeparseTree.pod: Update links
+
+2018-07-03  Rocky Bernstein <rocky@cpan.org>
+
+	* NEWS, README.md, admin/how-to-make-a-release.md,
+	lib/B/DeparseTree.pm, lib/B/DeparseTree/P526.pm,
+	lib/B/DeparseTree/P526c.pm, lib/B/DeparseTree/PP.pm,
+	lib/B/DeparseTree/TreeMain.pm: Get ready for release 3.3.0
 
 2018-07-01  Rocky Bernstein <rocky@cpan.org>
 
@@ -13,18 +57,18 @@
 
 2018-06-30  Rocky Bernstein <rocky@cpan.org>
 
-	* MANIFEST, t/roundtrip/5.014/base/cond.t,
-	t/roundtrip/5.014/base/if.t, t/roundtrip/5.014/base/lex-short1.t,
-	t/roundtrip/5.014/base/lex-short2.t, t/roundtrip/5.014/base/num.t,
-	t/roundtrip/5.014/base/pat.t, t/roundtrip/5.014/base/rs.t,
-	t/roundtrip/5.014/base/term.t, t/roundtrip/5.014/base/translate.t,
-	t/roundtrip/5.014/base/while.t,
-	t/roundtrip/5.014/mro/basic_04_dfs.t,
+	* MANIFEST, t/roundtrip/{ => 5.014}/base/cond.t, t/roundtrip/{ =>
+	5.014}/base/if.t, t/roundtrip/{ => 5.014}/base/lex-short1.t,
+	t/roundtrip/{ => 5.014}/base/lex-short2.t, t/roundtrip/{ =>
+	5.014}/base/num.t, t/roundtrip/{ => 5.014}/base/pat.t,
+	t/roundtrip/5.014/base/rs.t, t/roundtrip/{ => 5.014}/base/term.t,
+	t/roundtrip/{ => 5.014}/base/translate.t, t/roundtrip/{ =>
+	5.014}/base/while.t, t/roundtrip/{ => 5.014}/mro/basic_04_dfs.t,
 	t/roundtrip/5.018/mro/basic_04_dfs.t,
 	t/roundtrip/5.020/base/cond.t, t/roundtrip/5.020/base/if.t,
 	t/roundtrip/5.020/base/lex-short1.t,
 	t/roundtrip/5.020/base/lex-short2.t, t/roundtrip/5.020/base/num.t,
-	t/roundtrip/5.020/base/pat.t, t/roundtrip/5.020/base/rs.t,
+	t/roundtrip/5.020/base/pat.t, t/roundtrip/{ => 5.020}/base/rs.t,
 	t/roundtrip/5.020/base/term.t, t/roundtrip/5.020/base/translate.t,
 	t/roundtrip/5.020/base/while.t,
 	t/roundtrip/5.020/mro/basic_04_dfs.t,
@@ -42,13 +86,8 @@
 	t/roundtrip/5.026/base/pat.t, t/roundtrip/5.026/base/rs.t,
 	t/roundtrip/5.026/base/term.t, t/roundtrip/5.026/base/translate.t,
 	t/roundtrip/5.026/base/while.t,
-	t/roundtrip/5.026/mro/basic_04_dfs.t, t/roundtrip/base/cond.t,
-	t/roundtrip/base/if.t, t/roundtrip/base/lex-short1.t,
-	t/roundtrip/base/lex-short2.t, t/roundtrip/base/lex.t-notyet,
-	t/roundtrip/base/num.t, t/roundtrip/base/pat.t,
-	t/roundtrip/base/rs.t, t/roundtrip/base/term.t,
-	t/roundtrip/base/translate.t, t/roundtrip/base/while.t,
-	t/roundtrip/mro/basic_04_dfs.t, t/roundtrip/runtests.pl: Break out
+	t/roundtrip/5.026/mro/basic_04_dfs.t,
+	t/roundtrip/base/lex.t-notyet, t/roundtrip/runtests.pl: Break out
 	tests for specific perl versions
 
 2018-06-29  Rocky Bernstein <rocky@cpan.org>
@@ -184,10 +223,10 @@
 
 2018-06-21  Rocky Bernstein <rocky@cpan.org>
 
-	* MANIFEST, t/04-baseops.t, t/05-core-unops.t, t/05-unops.t,
+	* MANIFEST, t/04-baseops.t, t/{05-core-unops.t => 05-unops.t},
 	t/testdata/baseops.pm, t/testdata/core-ops.pm,
-	t/testdata/core-unops.pm, t/testdata/unops.pm: Separate baseops from
-	core tests
+	t/testdata/{core-unops.pm => unops.pm}: Separate baseops from core
+	tests
 
 2018-06-21  Rocky Bernstein <rocky@cpan.org>
 
@@ -479,8 +518,8 @@
 	lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PP_OPtable.pm,
 	lib/B/DeparseTree/PPfns.pm, t/20-deparse-small.t,
 	t/testdata/P518-short.pm, t/testdata/P522-short.pm,
-	t/testdata/P524-short.pm, t/testdata/P526-short.pm,
-	t/testdata/small.pm: DRY test data, and pp_readline
+	t/testdata/P524-short.pm, t/testdata/{P526-short.pm => small.pm}: 
+	DRY test data, and pp_readline
 
 2018-06-05  Rocky Bernstein <rocky@cpan.org>
 
@@ -653,9 +692,9 @@
 2018-06-02  Rocky Bernstein <rocky@cpan.org>
 
 	* MANIFEST, doc/demo-notes.md, doc/notes.md,
-	lib/B/DeparseTree/TreeMain.pm, t/unit/03-common.t,
-	t/unit/04-load.t, t/unit/04-treemain.t, t/unit/05-load.t: Go over
-	deparse_sub and next_todo Add previously omitted prototype in deparse_sub, improve $type
+	lib/B/DeparseTree/TreeMain.pm, t/unit/{03-common.t =>
+	04-treemain.t}, t/unit/{04-load.t => 05-load.t}: Go over deparse_sub
+	and next_todo Add previously omitted prototype in deparse_sub, improve $type
 	tagging on tree nodes, and use revised info_from_string and
 	info_from_tempate better.
 
@@ -720,13 +759,13 @@
 
 2018-05-30  rocky <rb@dustyfeet.com>
 
-	* MANIFEST, lib/B/DeparseTree.pm, lib/B/DeparseTree/Common.pm,
-	lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
-	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
-	lib/B/DeparseTree/P526.pm, lib/B/DeparseTree/P526c.pm,
-	lib/B/DeparseTree/PP.pm, lib/B/DeparseTree/PPfns.pm,
-	lib/B/DeparseTree/SyntaxTree.pm, lib/B/DeparseTree/TreeMain.pm,
-	t/unit/03-common.t: Start cleaning up OO hierarchy...  this has been a long-time coming...
+	* MANIFEST, lib/B/DeparseTree.pm, lib/B/DeparseTree/P518.pm,
+	lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree/P524.pm, lib/B/DeparseTree/P526.pm,
+	lib/B/DeparseTree/P526c.pm, lib/B/DeparseTree/PP.pm,
+	lib/B/DeparseTree/PPfns.pm, lib/B/DeparseTree/SyntaxTree.pm,
+	lib/B/DeparseTree/{Common.pm => TreeMain.pm}, t/unit/03-common.t: 
+	Start cleaning up OO hierarchy...  this has been a long-time coming...
 
 2018-05-30  rocky <rb@dustyfeet.com>
 
@@ -1313,13 +1352,12 @@
 2018-05-23  Rocky Bernstein <rocky@cpan.org>
 
 	* GNUmakefile, MANIFEST, MANIFEST.SKIP, scripts/README.md,
-	scripts/base/cond.t, scripts/base/if.t, scripts/base/num.t,
-	scripts/base/pat.t, scripts/base/term.t, scripts/base/translate.t,
-	scripts/base/while.t, scripts/runtests.pl, t/roundtrip/README.md,
-	t/roundtrip/base/cond.t, t/roundtrip/base/if.t,
-	t/roundtrip/base/num.t, t/roundtrip/base/pat.t,
-	t/roundtrip/base/term.t, t/roundtrip/base/translate.t,
-	t/roundtrip/base/while.t, t/roundtrip/runtests.pl,
+	t/roundtrip/README.md, {scripts => t/roundtrip}/base/cond.t,
+	{scripts => t/roundtrip}/base/if.t, {scripts =>
+	t/roundtrip}/base/num.t, {scripts => t/roundtrip}/base/pat.t,
+	{scripts => t/roundtrip}/base/term.t, {scripts =>
+	t/roundtrip}/base/translate.t, {scripts =>
+	t/roundtrip}/base/while.t, {scripts => t/roundtrip}/runtests.pl,
 	t/roundtrip/tmp/.gitignore: Administrivia...  Move round-trip tests under t. Futz with MANIFEST
 
 2018-05-22  rocky <rb@dustyfeet.com>
@@ -1477,8 +1515,8 @@
 	lib/B/DeparseTree/P524.pm, lib/B/DeparseTree/P526.pm,
 	lib/B/DeparseTree/P526c.pm, lib/B/DeparseTree/PP.pm, t/10-core.t,
 	t/20-core-516.t, t/testdata/P516-core.pm, t/testdata/P520-core.pm,
-	t/testdata/P526-core.pm, t/testdata/core-base.pm,
-	t/testdata/core-ops.pm: Bang on 5.16 support and some 5.26c
+	t/testdata/core-base.pm, t/testdata/{P526-core.pm => core-ops.pm}: 
+	Bang on 5.16 support and some 5.26c
 
 2018-05-19  Rocky Bernstein <rocky@cpan.org>
 
@@ -1503,7 +1541,7 @@
 
 	* MANIFEST, lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P518.pm,
 	t/20-deparse-518-small.t, t/20-deparse-522-small.t,
-	t/20-deparse-526-small.t, t/20-deparse-small.t,
+	t/{20-deparse-526-small.t => 20-deparse-small.t},
 	t/testdata/P524-short.pm: Clean up and reduce tests a little
 
 2018-05-18  rocky <rb@dustyfeet.com>
@@ -1639,8 +1677,8 @@
 
 2018-05-16  rocky <rb@dustyfeet.com>
 
-	* MANIFEST, t/10-core.t, t/20-core-522.t, t/20-core-524.t,
-	t/20-core-526.t: Start DRYing core op tess
+	* MANIFEST, t/{20-core-526.t => 10-core.t}, t/20-core-522.t,
+	t/20-core-524.t: Start DRYing core op tess
 
 2018-05-16  rocky <rb@dustyfeet.com>
 
@@ -1737,7 +1775,7 @@
 	lib/B/DeparseTree/P518.pm, lib/B/DeparseTree/P520.pm,
 	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
 	lib/B/DeparseTree/P526c.pm, lib/B/DeparseTree/PP.pm,
-	t/unit/00-load.t, t/unit/03-common.t, t/unit/04-load.t: Start
+	t/unit/03-common.t, t/unit/{00-load.t => 04-load.t}: Start
 	populating info_from_template
 
 2018-05-14  Rocky Bernstein <rocky@cpan.org>
@@ -1773,7 +1811,7 @@
 2018-05-13  rocky <rb@dustyfeet.com>
 
 	* MANIFEST, t/20-core-518.t, t/20-core-520.t, t/20-core-522.t,
-	t/20-deparse-518-small.t, t/20-deparse-518.small.t,
+	t/{20-deparse-518.small.t => 20-deparse-518-small.t},
 	t/20-deparse-522-small.t, t/20-deparse-522.t,
 	t/20-deparse-524-small.t, t/20-deparse-526-small.t, t/helper.pm: DRY
 	tests
@@ -2046,20 +2084,17 @@
 2018-05-07  Rocky Bernstein <rocky@cpan.org>
 
 	* MANIFEST, MANIFEST.SKIP, admin/how-to-make-a-release.md,
-	scripts/.gitignore, scripts/Makefile, scripts/README.md,
-	scripts/base/cond.t, scripts/base/if.t, scripts/base/lex.t,
-	scripts/base/num.t, scripts/base/pat.t, scripts/base/rs.t,
-	scripts/base/term.t, scripts/base/while.t, scripts/benchtests.pl,
-	scripts/bug-sample.pm, scripts/deparse.sh, scripts/fib.pl,
-	scripts/frag.pl, scripts/opbasic/arith.t,
-	scripts/opbasic/magic_phase.t, scripts/opbasic/qq.t,
-	scripts/runtests.pl, testdata/.gitignore, testdata/Makefile,
-	testdata/README.md, testdata/base/cond.t, testdata/base/if.t,
-	testdata/base/lex.t, testdata/base/num.t, testdata/base/pat.t,
-	testdata/base/rs.t, testdata/base/term.t, testdata/base/while.t,
-	testdata/bug-sample.pm, testdata/fib.pl, testdata/frag.pl,
-	testdata/opbasic/arith.t, testdata/opbasic/magic_phase.t,
-	testdata/opbasic/qq.t, testdata/runtests.pl: Reorganize
+	{testdata => scripts}/.gitignore, {testdata => scripts}/Makefile,
+	{testdata => scripts}/README.md, {testdata => scripts}/base/cond.t,
+	{testdata => scripts}/base/if.t, {testdata => scripts}/base/lex.t,
+	{testdata => scripts}/base/num.t, {testdata => scripts}/base/pat.t,
+	{testdata => scripts}/base/rs.t, {testdata => scripts}/base/term.t,
+	{testdata => scripts}/base/while.t, scripts/benchtests.pl,
+	{testdata => scripts}/bug-sample.pm, scripts/deparse.sh, {testdata
+	=> scripts}/fib.pl, {testdata => scripts}/frag.pl, {testdata =>
+	scripts}/opbasic/arith.t, {testdata =>
+	scripts}/opbasic/magic_phase.t, {testdata => scripts}/opbasic/qq.t,
+	{testdata => scripts}/runtests.pl: Reorganize
 
 2018-05-07  Rocky Bernstein <rocky@cpan.org>
 
@@ -2153,7 +2188,7 @@
 2018-05-07  Rocky Bernstein <rocky@cpan.org>
 
 	* MANIFEST, lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/P524.pm,
-	t/testdata/.gitignore, t/testdata/bug-sample.pm, t/testdata/bug.pm: 
+	t/testdata/.gitignore, t/testdata/{bug.pm => bug-sample.pm}: 
 	Administrivia: MANIFEST...  and some 5.24.pm fixes
 
 2018-05-06  Rocky Bernstein <rocky@cpan.org>
@@ -2332,8 +2367,8 @@
 	lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
 	lib/B/DeparseTree/P524.pm, lib/B/DeparseTree/P526.pm,
 	lib/B/DeparseTree/P526c.pm, lib/B/DeparseTree/PP.pm,
-	t/20-core-526.t, t/20-deparse-526.t, t/20-deparse-526c.t: WIP. More
-	coverage, start cperl tolerance
+	t/20-deparse-526.t, t/{20-core-526.t => 20-deparse-526c.t}: WIP.
+	More coverage, start cperl tolerance
 
 2017-07-26  Rocky Bernstein <rocky@cpan.org>
 
@@ -2770,8 +2805,8 @@
 2015-11-08  Rocky Bernstein <rocky@cpan.org>
 
 	* .gitignore, MANIFEST, lib/B/DeparseTree.pm,
-	lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
-	lib/B/DeparseTree520.pm, t/20-core-520.t, t/20-core-522.t,
+	lib/B/DeparseTree/P520.pm, lib/B/{DeparseTree520.pm =>
+	DeparseTree/P522.pm}, t/20-core-520.t, t/20-core-522.t,
 	t/20-deparse-520-small.t: Start Perl 5.22 support
 
 2015-11-08  Rocky Bernstein <rocky@cpan.org>
@@ -2781,11 +2816,10 @@
 
 2015-11-08  Rocky Bernstein <rocky@cpan.org>
 
-	* Build.PL, MANIFEST, lib/B/DeparseTree.pm, t/10subclass.t,
-	t/20-core-520.t, t/20-deparse-520-small.t,
-	t/Deparse-core-5.20-good.t, t/Deparse-core-5.20.t,
-	t/Deparse-subclass.t: standard style tests. Do lexical level 2
-	tests.
+	* Build.PL, MANIFEST, lib/B/DeparseTree.pm, t/{Deparse-subclass.t
+	=> 10subclass.t}, t/{Deparse-core-5.20-good.t => 20-core-520.t},
+	t/20-deparse-520-small.t, t/Deparse-core-5.20.t: standard style
+	tests. Do lexical level 2 tests.
 
 2015-11-08  Rocky Bernstein <rocky@cpan.org>
 
@@ -2888,12 +2922,12 @@
 
 2015-11-01  Rocky Bernstein <rocky@cpan.org>
 
-	* example/fib.pl, lib/B/Deparse.pm, lib/B/DeparseTree.pm: WIP first
+	* example/fib.pl, lib/B/{Deparse.pm => DeparseTree.pm}: WIP first
 	tests work
 
 2015-11-01  rocky <rb@dustyfeet.com>
 
-	* example/fib.pl, lib/B/Deparse.pm, lib/B/DeparseTree.pm: WIP first
+	* example/fib.pl, lib/B/{Deparse.pm => DeparseTree.pm}: WIP first
 	tests work
 
 2015-10-30  Rocky Bernstein <rocky@cpan.org>

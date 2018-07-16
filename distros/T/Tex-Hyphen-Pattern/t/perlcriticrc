@@ -1,0 +1,7 @@
+severity = 1
+[-CodeLayout::RequireASCII]
+[-Tics::ProhibitLongLines]
+[-Miscellanea::ProhibitUselessNoCritic]
+[-Compatibility::PodMinimumVersion]
+[Documentation::PodSpelling]
+stop_words = MERCHANTABILITY pluggable

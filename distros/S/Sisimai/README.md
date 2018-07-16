@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/sisimai/p5-Sisimai.svg)](https://coveralls.io/r/sisimai/p5-Sisimai)
 [![Build Status](https://travis-ci.org/sisimai/p5-Sisimai.svg?branch=master)](https://travis-ci.org/sisimai/p5-Sisimai) 
 [![Perl](https://img.shields.io/badge/perl-v5.10--v5.26-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v4.22.6-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v4.22.7-blue.svg)](https://metacpan.org/pod/Sisimai)
 
 - [**README-JA(日本語)**](README-JA.md)
 - [What is Sisimai](#what-is-sisimai)
@@ -247,8 +247,8 @@ and Sisimai. More information about differences are available at
 | Modules for Commercial MTAs and MPSs           | N/A           | Included    |
 | WebUI/API                                      | Included      | N/A         |
 | Database schema for storing parsed bounce data | Available     | N/A[1]      |
-| Analytical precision ratio(2000 emails)[2]     | 0.49          | 1.00        |
-| The speed of parsing email(1000 emails)        | 4.24s         | 1.95s       |
+| Analytical precision ratio(2000 emails)[2]     | 0.58          | 1.00        |
+| The speed of parsing email(1000 emails)        | 4.24s         | 1.70s[3]    |
 | The number of detectable bounce reasons        | 19            | 29          |
 | Parse 2 or more bounces in a single email      | Only 1st rcpt | ALL         |
 | Parse FeedBack Loop Message/ARF format mail    | Unable        | OK          |
@@ -258,12 +258,13 @@ and Sisimai. More information about differences are available at
 | Install using cpan, cpanm, or cpm command      | N/A           | OK          |
 | Dependencies (Except core modules of Perl)     | 24 modules    | 2 modules   |
 | LOC:Source lines of code                       | 18200 lines   | 8600 lines  |
-| The number of tests in t/, xt/ directory       | 27365 tests   | 229000 tests|
+| The number of tests in t/, xt/ directory       | 27365 tests   | 235000 tests|
 | License                                        | GPLv2 or Perl | 2 clause BSD|
 | Support Contract provided by Developer         | End Of Sales  | Available   |
 
 1. Implement yourself with using DBI or any O/R Mapper you like
 2. See [./ANALYTICAL-PRECISION](https://github.com/sisimai/p5-Sisimai/blob/master/ANALYTICAL-PRECISION)
+3. Xeon E5-2640 2.5GHz x 2 cores | 5000 bogomips | 1GB RAM | Perl 5.24.1
 
 Other specification of Sisimai
 -------------------------------------------------------------------------------

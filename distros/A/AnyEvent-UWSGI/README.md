@@ -17,6 +17,9 @@ Subroutines prefixed by `http_*` (like request, get, post, head) replaced by app
 - uwsgi\_request
 
     Like `AnyEvent::HTTP::http_request`
+    
+    Also accepts `modifier1` and `modifier2` arguments
+
 
 - uwsgi\_get
 

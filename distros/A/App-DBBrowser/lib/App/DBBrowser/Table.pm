@@ -6,9 +6,10 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-use Term::Choose     qw( choose );
-use Term::Form       qw();
-use Term::TablePrint qw( print_table );
+use Term::Choose            qw( choose );
+use Term::Choose::Constants qw( :screen );
+use Term::Form              qw();
+use Term::TablePrint        qw( print_table );
 
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
@@ -17,6 +18,9 @@ use App::DBBrowser::DB;
 use App::DBBrowser::Table::Functions;
 #use App::DBBrowser::Table::Insert;  # "require"-d
 use App::DBBrowser::Table::Substatements;
+
+
+END { print SHOW_CURSOR }
 
 
 sub new {
@@ -178,7 +182,8 @@ sub on_table {
             local $| = 1;
             print $sf->{i}{clear_screen};
             my $sth = $sf->{d}{dbh}->prepare( $select );
-            print 'Execute ...' . "\n" if $sf->{o}{table}{progress_bar};
+            print HIDE_CURSOR;
+            print 'Computing:' . "\n" if $sf->{o}{table}{progress_bar};
             $sth->execute( @arguments );
             my $col_names = $sth->{NAME}; # not quoted
             my $all_arrayref = $sth->fetchall_arrayref;

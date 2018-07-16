@@ -35,11 +35,12 @@ requires:
   Pod::Usage: '0'
   Scalar::Util: '0'
   Spreadsheet::Read: '0'
-  Term::Choose: '1.600'
-  Term::Choose::LineFold: '1.600'
-  Term::Choose::Util: '0.065'
+  Term::Choose: '1.604'
+  Term::Choose::Constants: '1.604'
+  Term::Choose::LineFold: '1.604'
+  Term::Choose::Util: '0.066'
   Term::Form: '0.316'
-  Term::TablePrint: '0.068'
+  Term::TablePrint: '0.069'
   Text::CSV: '0'
   bytes: '0'
   if: '0'
@@ -49,5 +50,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-DBBrowser.git
-version: '2.019'
+version: '2.020'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

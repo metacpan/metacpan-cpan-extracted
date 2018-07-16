@@ -1,23 +1,49 @@
-0.11.6 (2018-06-28)
+0.11.10 (2018-07-14)
+
+    Packaging:
+        - Return to the original distribution name of
+          App-githook-perltidy with a package name of
+          App::githook_perltidy. Seems that I can't change anything
+          without losing PAUSE history or permissions.
+
+0.11.9 (2018-07-13)
+
+    Packaging:
+        - Revert back to the old distribution name of
+          App::githook_perltidy. Otherwise CPAN/PAUSE would require
+          githook::perltidy to exist and I'm not sure the community
+          wants Apps in that namespace.
+
+0.11.8 (2018-07-13)
 
     API / Behaviour Changes:
-        - None.
-
-    New Features:
-        - None.
+        - Re-named .readme_from_pod -> .readme_from
 
     Enhancements:
-        - None.
+        - Minor documentation fixes.
+
+0.11.7_1 (2018-07-13)
+
+    API / Behaviour Changes:
+        - Remove documentation references to the MAKE ARGS feature
+          which will be depreciated in the future.
+
+    New Features:
+        - Automatic README generation from a tidied POD file
+
+    Enhancements:
+        - Easier to understand tests
+
+    Packaging:
+        - Change distribution name to githook-perltidy instead of
+          App::githook_perltidy. Not sure if CPAN allows that, but that
+          is what trail distributions are for.
+
+0.11.6 (2018-06-28)
 
     Bug Fixes:
         - Correctly generate usage message when passed an invalid
           COMMAND argument.
-
-    Dependencies:
-        - None.
-
-    Packaging:
-        - None.
 
 0.11.5 (2018-06-27)
 

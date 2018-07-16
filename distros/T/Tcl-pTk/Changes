@@ -1,6 +1,28 @@
 Summary of Changes to Tcl::pTk
 
-Release 0.92:  8/21/16
+Release 0.93:  2018-07-13
+
+ * Add missing module `Sub::Name` to PREREQ_PM (RT #116432)
+ * Replace corrupted teapot.ppm, mark as binary (RT #125421)
+ * Add focusFollowsMouse support (RT #125057)
+ * Adjust scrolling units on macOS aqua (RT #125048)
+ * Only use buttons 4 and 5 for scrolling on X11 (i.e. not macOS aqua)
+ * Use previously-unused variable $wp in Tcl::pTk::Widget::focusForce
+ * Add missing `use Text::Tabs;` to top of Text.pm (RT #125460)
+ * Remove "Copied $val\n" print debugging statement (RT #125442)
+ * Use empty string instead of `undef` to clear $status_bar
+   in menus2.pl demo to prevent warning (RT #125826)
+ * Keep textRO.t running if command line arg present (for debugging)
+ * Bind mouse buttons 2 and 3 appropriately on macOS aqua
+   since they are the opposite of what X11 and Windows use
+   (RT #125050, #125460)
+ * Use `catch` in test-for-tk.tcl to prevent skipping tests for packages
+ * Support newer Perl/Tk FindNext() $direction syntax (RT #125532)
+   by adapting the relevant Perl/Tk commit (the existing text2.t was
+   renamed to text2-old.t, and the new text2.t was copied)
+ * Various spelling and POD formatting fixes
+
+Release 0.92:  2016-08-21
 
  * Updated to work with Tcl.pm versions > 1.02. Tcl.pm versions > 1.02 broke compatibility
      with Tcl::pTk, so the Tcl 1.02 interface was moved to Tcl/pTk.pm 
@@ -11,7 +33,7 @@ Release 0.92:  8/21/16
  * Fix for a problem with the dialog box widget that would pop up off the screen if running from
    two displays. Added a test case for this condition.
            
-Release 0.90:  7/4/15
+Release 0.90:  2015-07-04
 
  * Updates to work with Tcl/Tk 8.6.
  * Added background error handling (including a ErrorDialog.pm file like perl/tk) that is
@@ -19,31 +41,31 @@ Release 0.90:  7/4/15
  * Fixed bug where a repeat call would create a TCL-command in TCL-land for each repeated event. 
    Changed to reuse the Tcl-command. Added test case (repeatSubReuse.t)
            
-Release 0.85:  11/5/10
+Release 0.85:  2010-11-05
 
  * Bug-fix Release. Tweaks to HList to support returning photo objects
    when calling entrycget with -image option.
 
-Release 0.84:  10/5/10
+Release 0.84:  2010-10-05
 
  * Bug-fix Release
 
-Release 0.83:  9/5/10
+Release 0.83:  2010-09-05
 
  * Minor updates to be more compatible with Tcl 8.4 installation (although Tcl 8.5 is preferred)
 
-Release 0.82:  8/25/10
+Release 0.82:  2010-08-25
 
  * Minor updates to remove the requirement for the tcl package snit. This is not needed anymore. 
 
-Release 0.81:  8/21/10
+Release 0.81:  2010-08-21
 
  * Minor updates so the CPAN indexer won't index demo directories. 
  * Changed order of execution in Makefile.PL so that CPAN testers will get the proper prereqs
    before the test-for-tk script is run.
 
 
-Release 0.8:  8/18/10
+Release 0.8:  2010-08-18
 
  * First Public Release.
 

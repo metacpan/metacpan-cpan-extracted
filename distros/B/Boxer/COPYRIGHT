@@ -234,8 +234,7 @@ Files: Changes
  META.yml
  bin/boxer
  doap.ttl
- t/world.t
-Copyright: Copyright 2017 Jonas Smedegaard.
+Copyright: Copyright 2018 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -244,27 +243,31 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: dist.ini
-Copyright: Copyright 2014 Jonas Smedegaard.
+Files: t/world.t
+Copyright: Copyright 2017 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/Boxer/Part/Reclass.pm
-Copyright: Copyright Â© 2016 Jonas Smedegaard.
+Files: dist.ini
+Copyright: Copyright 2014 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: lib/Boxer/Part/Reclass.pm
+Copyright: Copyright Â© 2016 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  

@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '3.0613';
+our $VERSION = '3.0701';
 
 sub instantiate {
     my ($class, $args) = @_;
@@ -64,7 +64,7 @@ Statistics::Descriptive::Smoother - Base module for smoothing statistical data
 
 =head1 VERSION
 
-version 3.0613
+version 3.0701
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ chosen smoothing algorithm.
 
 =head1 VERSION
 
-version 3.0613
+version 3.0701
 
 =head1 METHODS
 
