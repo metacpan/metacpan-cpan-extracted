@@ -1,5 +1,12 @@
 Revision history for Map::Tube::CLI
 
+0.49  Thu Jul 19 20:00:00 2018
+      - Updated pod w.r.t to the new command lines options.
+
+0.48  Wed Jul 18 18:40:00 2018
+      - Added command line options --line_mappings to generate line mappings.
+      - Added command line options --line_notes to generate line notes.
+
 0.47  Sat Apr 28 19:00:00 2018
       - Added support for map of Nuremberg.
 

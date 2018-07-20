@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/binary-com/perl-Math-Business-BlackScholesMerton/issues
   repository: git://github.com/binary-com/perl-Math-Business-BlackScholesMerton.git
-version: '1.23'
+version: '1.24'
 x_serialization_backend: 'YAML::Tiny version 1.66'

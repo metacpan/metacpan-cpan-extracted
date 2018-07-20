@@ -1,3 +1,51 @@
+1.181990  2018-07-17 21:42:27-06:00 America/Denver
+ * From 1.181981 Don't fail tests (04-attributes.t) when Parallel::WorkUnit not
+                 installed
+ * From 1.181980 Add skip_unreadable attribute, to skip over unreadable
+                 files.
+ * From 1.181980 Add short version of attribute names
+ * From 1.181951 Multifile Interface
+ * From 1.181951 Constructor accepts parameters now
+ * From 1.181951 Better attribute checking
+ * From 1.181951 Pass extended information hash (when extended_info is true)
+                 to all user provided code references.
+ * From 1.181950 Bugfix: Github Issue #5 - Don't allow non-coderef as
+                 header_handler
+
+1.181981  2018-07-16 21:34:26-06:00 America/Denver (TRIAL RELEASE)
+ * TRIAL/DEV RELEASE ONLY
+ * Don't fail tests (04-attributes.t) when Parallel::WorkUnit not
+   installed
+
+1.181980  2018-07-16 19:01:22-06:00 America/Denver (TRIAL RELEASE)
+ Joelle Maslak <jmaslak@antelope.net>
+ * TRIAL/DEV RELEASE ONLY
+ * Add skip_unreadable attribute, to skip over unreadable files
+ * Add short version of attribute names
+
+1.181962  2018-07-14 21:02:00-06:00 America/Denver (TRIAL RELEASE)
+ Joelle Maslak <jmaslak@antelope.net>
+ * TRIAL/DEV RELEASE ONLY
+ * Make tests more resiliant
+
+1.181951  2018-07-14 16:49:07-06:00 America/Denver (TRIAL RELEASE)
+ Joelle Maslak <jmaslak@antelope.net>
+ * TRIAL/DEV RELEASE ONLY
+ * Preserve ordering for parallel map/grep multifile interfaces
+ * Constructor accepts parameters now
+ * Combine grep & map code
+ * Can pass file() attribute either arrayref or list of files
+ * Better attribute checking
+ * Pass extended information hash (when extended_info is true) to all
+   user provided code references.
+ * Multifile Interface now allows header processing on a per-file basis
+
+1.181950  2018-07-13 21:14:47-06:00 America/Denver (TRIAL RELEASE)
+ Joelle Maslak <jmaslak@antelope.net>
+ * TRIAL/DEV RELEASE ONLY
+ * Bugfix: Github Issue #5 - Don't allow non-coderef as header_handler
+ * Multifile Interface
+
 1.181861  2018-07-05 07:42:19-06:00 America/Denver
  Joelle Maslak <jmaslak@antelope.net>
  * OO Interface

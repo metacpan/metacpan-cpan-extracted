@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::GetObject;
-$Net::Amazon::S3::Request::GetObject::VERSION = '0.83';
+$Net::Amazon::S3::Request::GetObject::VERSION = '0.84';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request';
@@ -48,7 +48,7 @@ Net::Amazon::S3::Request::GetObject - An internal class to get an object
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 

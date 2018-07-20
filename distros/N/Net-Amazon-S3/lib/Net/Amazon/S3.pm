@@ -1,5 +1,5 @@
 package Net::Amazon::S3;
-$Net::Amazon::S3::VERSION = '0.83';
+$Net::Amazon::S3::VERSION = '0.84';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -73,6 +73,19 @@ has authorization_method => (
             : 'Net::Amazon::S3::Signature::V2'
     },
 );
+
+sub BUILD {
+    my ($self) = @_;
+
+    if ($self->use_iam_role) {
+        eval "require VM::EC2::Security::CredentialCache" or die $@;
+        my $creds = VM::EC2::Security::CredentialCache->get();
+        defined($creds) || die("Unable to retrieve IAM role credentials");
+        $self->aws_access_key_id($creds->accessKeyId);
+        $self->aws_secret_access_key($creds->secretAccessKey);
+        $self->aws_session_token($creds->sessionToken);
+    }
+}
 
 __PACKAGE__->meta->make_immutable;
 
@@ -442,7 +455,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 

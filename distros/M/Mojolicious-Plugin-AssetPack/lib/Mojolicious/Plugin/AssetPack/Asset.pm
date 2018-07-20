@@ -6,6 +6,13 @@ use Mojo::URL;
 use Mojo::File;
 use Mojolicious::Plugin::AssetPack::Util qw(diag has_ro DEBUG);
 
+my %TAG_TEMPLATE;
+$TAG_TEMPLATE{css} = [qw(link rel stylesheet href)];
+$TAG_TEMPLATE{ico} = [qw(link rel icon href)];
+$TAG_TEMPLATE{js}  = [qw(script src)];
+$TAG_TEMPLATE{$_} = [qw(img src)]    for qw(gif jpg jpeg png svg);
+$TAG_TEMPLATE{$_} = [qw(source src)] for qw(mp3 mp4 ogg ogv webm);
+
 has checksum => sub { Mojolicious::Plugin::AssetPack::Util::checksum(shift->content) };
 has format => sub {
   my $self = shift;
@@ -18,6 +25,7 @@ has format => sub {
 };
 
 has minified => sub { shift->url =~ /\bmin\b/ ? 1 : 0 };
+has renderer => sub { \&_default_renderer };
 
 has _asset => sub {
   my $self = shift;
@@ -82,6 +90,15 @@ sub size { $_[0]->_asset->size }
 
 sub url_for { $_[1]->url_for(assetpack => $_[0]->TO_JSON); }
 
+sub _default_renderer {
+  my ($asset, $c, $args, @attrs) = @_;
+  my $url = $asset->url_for($c);
+  my @template = @{$TAG_TEMPLATE{$asset->format} || $TAG_TEMPLATE{css}};
+  splice @template, 1, 0, type => $c->app->types->type($asset->format)
+    if $template[0] eq 'source';
+  return $c->tag(@template, Mojo::URL->new("$args->{base_url}$url"), @attrs);
+}
+
 sub FROM_JSON {
   my ($self, $attrs) = @_;
   $self->$_($attrs->{$_}) for grep { defined $attrs->{$_} } qw(checksum format minified);
@@ -138,6 +155,35 @@ minified L</content>.
   $str = $self->name;
 
 Returns the basename of L</url>, without extension.
+
+=head2 renderer
+
+  $code = $self->renderer;
+  $self = $self->renderer(sub { my ($c, \%args, @attrs) = @_; return qq(<link rel="...">) });
+
+Used to register a custom renderer for this asset. The arguments passed in
+are:
+
+=over 2
+
+=item * C<$c>
+
+The L<Mojolicious::Controller> object used for this request.
+
+=item * C<%args>
+
+A hash-ref with "base_url" and
+L<topic|Mojolicious::Plugin::AssetPack::Pipe/topic>. See
+L<Mojolicious::Plugin::AssetPack::Guides::Cookbook/ASSETS FROM CUSTOM DOMAIN>
+of example "base_url".
+
+=item * C<@attrs>
+
+The HTML attributes passed in from the template.
+
+=item
+
+=back
 
 =head2 url
 

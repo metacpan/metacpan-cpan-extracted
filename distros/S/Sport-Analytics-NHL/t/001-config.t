@@ -6,7 +6,7 @@ use warnings FATAL => 'all';
 use experimental qw(smartmatch);
 
 use Test::More;
-plan tests => 191;
+plan tests => 201;
 
 use Sport::Analytics::NHL::Config;
 

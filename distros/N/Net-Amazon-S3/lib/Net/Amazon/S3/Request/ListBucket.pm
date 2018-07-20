@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::ListBucket;
-$Net::Amazon::S3::Request::ListBucket::VERSION = '0.83';
+$Net::Amazon::S3::Request::ListBucket::VERSION = '0.84';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use URI::Escape qw(uri_escape_utf8);
@@ -59,7 +59,7 @@ Net::Amazon::S3::Request::ListBucket - An internal class to list a bucket
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 

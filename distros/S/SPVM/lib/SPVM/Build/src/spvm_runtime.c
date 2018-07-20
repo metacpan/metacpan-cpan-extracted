@@ -170,8 +170,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
     for (arg_index = 0; arg_index < sub->op_args->length; arg_index++) {
       SPVM_OP* op_arg = SPVM_LIST_fetch(sub->op_args, arg_index);
       SPVM_TYPE* arg_type = op_arg->uv.my->op_type->uv.type;
-      _Bool arg_type_is_value_t = SPVM_TYPE_is_value_t(compiler, arg_type);
-      if (SPVM_TYPE_is_object(compiler, arg_type) && !arg_type_is_value_t) {
+      _Bool arg_type_is_value_t = SPVM_TYPE_is_value_type(compiler, arg_type);
+      if (SPVM_TYPE_is_object_type(compiler, arg_type) && !arg_type_is_value_t) {
         SPVM_MY* my_arg = op_arg->uv.my;
         void* object = *(void**)&vars[my_arg->var_id];
         if (object != NULL) {
@@ -671,105 +671,6 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         int32_t string_length = strlen(string_convert_buffer);
         void* string = env->new_string_raw(env, string_convert_buffer, string_length);
         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], string);
-
-        break;
-      }
-      case SPVM_OPCODE_C_ID_CONVERT_BYTE_ARRAY_TO_STRING_ARRAY:
-      case SPVM_OPCODE_C_ID_CONVERT_SHORT_ARRAY_TO_STRING_ARRAY:
-      case SPVM_OPCODE_C_ID_CONVERT_INT_ARRAY_TO_STRING_ARRAY:
-      case SPVM_OPCODE_C_ID_CONVERT_LONG_ARRAY_TO_STRING_ARRAY:
-      case SPVM_OPCODE_C_ID_CONVERT_FLOAT_ARRAY_TO_STRING_ARRAY:
-      case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_ARRAY_TO_STRING_ARRAY:
-      {
-        void* numeric_array = *(void**)&vars[opcode->operand1];
-
-        if (*(void**)&vars[opcode->operand1] == NULL) {
-          void* exception = env->new_string_raw(env, "Array must not be undef", 0);
-          env->set_exception(env, exception);
-          exception_flag = 1;
-        }
-        else {
-          int32_t length = *(SPVM_VALUE_int*)((intptr_t)*(void**)&vars[opcode->operand1] + (intptr_t)env->object_elements_length_byte_offset);
-          
-          void* string_array = env->new_multi_array_raw(env, SPVM_BASIC_TYPE_C_ID_BYTE, 1, length);
-          
-          switch (opcode->id) {
-            case SPVM_OPCODE_C_ID_CONVERT_BYTE_ARRAY_TO_STRING_ARRAY: {
-              int32_t index;
-              for (index = 0; index < length; index++) {
-                SPVM_VALUE_byte* byte_elements = env->get_byte_array_elements(env, numeric_array);
-                SPVM_VALUE_byte value = byte_elements[index];
-                sprintf(string_convert_buffer, "%" PRId8, value);
-                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
-                SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
-                env->set_object_array_element(env, string_array, index, string);
-              }
-              break;
-            }
-            case SPVM_OPCODE_C_ID_CONVERT_SHORT_ARRAY_TO_STRING_ARRAY: {
-              int32_t index;
-              for (index = 0; index < length; index++) {
-                SPVM_VALUE_short* short_elements = env->get_short_array_elements(env, numeric_array);
-                SPVM_VALUE_short value = short_elements[index];
-                sprintf(string_convert_buffer, "%" PRId16, value);
-                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
-                SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
-                env->set_object_array_element(env, string_array, index, string);
-              }
-              break;
-            }
-            case SPVM_OPCODE_C_ID_CONVERT_INT_ARRAY_TO_STRING_ARRAY: {
-              int32_t index;
-              for (index = 0; index < length; index++) {
-                SPVM_VALUE_int* int_elements = env->get_int_array_elements(env, numeric_array);
-                SPVM_VALUE_int value = int_elements[index];
-                sprintf(string_convert_buffer, "%" PRId32, value);
-                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
-                SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
-                env->set_object_array_element(env, string_array, index, string);
-              }
-              break;
-            }
-            case SPVM_OPCODE_C_ID_CONVERT_LONG_ARRAY_TO_STRING_ARRAY: {
-              int32_t index;
-              for (index = 0; index < length; index++) {
-                SPVM_VALUE_long* long_elements = env->get_long_array_elements(env, numeric_array);
-                SPVM_VALUE_long value = long_elements[index];
-                sprintf(string_convert_buffer, "%" PRId64, value);
-                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
-                SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
-                env->set_object_array_element(env, string_array, index, string);
-              }
-              break;
-            }
-            case SPVM_OPCODE_C_ID_CONVERT_FLOAT_ARRAY_TO_STRING_ARRAY: {
-              int32_t index;
-              for (index = 0; index < length; index++) {
-                SPVM_VALUE_float* float_elements = env->get_float_array_elements(env, numeric_array);
-                SPVM_VALUE_float value = float_elements[index];
-                sprintf(string_convert_buffer, "%g", value);
-                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
-                SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
-                env->set_object_array_element(env, string_array, index, string);
-              }
-              break;
-            }
-            case SPVM_OPCODE_C_ID_CONVERT_DOUBLE_ARRAY_TO_STRING_ARRAY: {
-              int32_t index;
-              for (index = 0; index < length; index++) {
-                SPVM_VALUE_double* double_elements = env->get_double_array_elements(env, numeric_array);
-                SPVM_VALUE_double value = double_elements[index];
-                sprintf(string_convert_buffer, "%g", value);
-                void* string = env->new_string_raw(env, string_convert_buffer, strlen(string_convert_buffer));
-                SPVM_RUNTIME_C_INLINE_INC_REF_COUNT_ONLY(string);
-                env->set_object_array_element(env, string_array, index, string);
-              }
-              break;
-            }
-          }
-          
-          SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], string_array);
-        }
 
         break;
       }
@@ -2340,7 +2241,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         call_sub_arg_stack_top += opcode->operand1;
         
         break;
-      case SPVM_OPCODE_C_ID_CHECK_CAST: {
+      case SPVM_OPCODE_C_ID_CAST: {
         void* object = *(void**)&vars[opcode->operand1];
 
         int32_t rel_id = opcode->operand2;
@@ -2348,8 +2249,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         int32_t cast_basic_type_id = op_type->uv.type->basic_type->id;
         int32_t cast_type_dimension = op_type->uv.type->dimension;
         
-        _Bool can_assign = env->check_cast(env, cast_basic_type_id, cast_type_dimension, object);
-        if (can_assign) {
+        _Bool can_cast = env->check_cast(env, cast_basic_type_id, cast_type_dimension, object);
+        if (can_cast) {
           SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], object);
         }
         else {
@@ -2373,8 +2274,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         
         // Declare subroutine return type
         SPVM_TYPE* decl_sub_return_type = decl_sub->op_return_type->uv.type;
-        int32_t decl_sub_return_type_is_object = SPVM_TYPE_is_object(compiler, decl_sub_return_type);
-        int32_t decl_sub_return_type_is_value_t = SPVM_TYPE_is_value_t(compiler, decl_sub_return_type);
+        int32_t decl_sub_return_type_is_object = SPVM_TYPE_is_object_type(compiler, decl_sub_return_type);
+        int32_t decl_sub_return_type_is_value_t = SPVM_TYPE_is_value_type(compiler, decl_sub_return_type);
         
         // Declare subroutine argument length
         int32_t decl_sub_args_length = decl_sub->op_args->length;
@@ -2467,6 +2368,7 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
       case SPVM_OPCODE_C_ID_RETURN:
       {
         memcpy(&stack[0], &vars[opcode->operand0], sizeof(SPVM_VALUE) * sub_return_type_width);
+        
         opcode_rel_index = opcode->operand1;
         continue;
       }
@@ -2558,8 +2460,8 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
   // Croak
   if (!exception_flag) {
     
-    int32_t sub_return_type_is_object = SPVM_TYPE_is_object(compiler, sub_return_type);
-    _Bool sub_return_type_is_value_t = SPVM_TYPE_is_value_t(compiler, sub_return_type);
+    int32_t sub_return_type_is_object = SPVM_TYPE_is_object_type(compiler, sub_return_type);
+    _Bool sub_return_type_is_value_t = SPVM_TYPE_is_value_type(compiler, sub_return_type);
     
     // Decrement ref count of return value
     if (sub_return_type_is_object && !sub_return_type_is_value_t) {

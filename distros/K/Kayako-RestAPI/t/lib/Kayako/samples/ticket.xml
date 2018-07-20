@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tickets>
+<ticket id="1000" flagtype="5">
+<displayid><![CDATA[1000]]></displayid>
+<departmentid><![CDATA[5]]></departmentid>
+<statusid><![CDATA[3]]></statusid>
+<priorityid><![CDATA[6]]></priorityid>
+<typeid><![CDATA[1]]></typeid>
+<userid><![CDATA[506]]></userid>
+<userorganization />
+<userorganizationid />
+<ownerstaffid><![CDATA[4]]></ownerstaffid>
+<ownerstaffname><![CDATA[Filipp TS]]></ownerstaffname>
+<fullname><![CDATA[John Smith]]></fullname>
+<email><![CDATA[js@example.com]]></email>
+<lastreplier><![CDATA[Filipp Michurin]]></lastreplier>
+<subject><![CDATA[I need loder with fw\ 000600E5 from WD ZEFHYR family.]]></subject>
+<creationtime><![CDATA[1372327626]]></creationtime>
+<lastactivity><![CDATA[1372345563]]></lastactivity>
+<laststaffreply><![CDATA[1372345563]]></laststaffreply>
+<lastuserreply><![CDATA[1372327626]]></lastuserreply>
+<slaplanid><![CDATA[0]]></slaplanid>
+<nextreplydue><![CDATA[0]]></nextreplydue>
+<resolutiondue><![CDATA[0]]></resolutiondue>
+<replies><![CDATA[1]]></replies>
+<ipaddress><![CDATA[192.168.0.1]]></ipaddress>
+<creator><![CDATA[2]]></creator>
+<creationmode><![CDATA[1]]></creationmode>
+<creationtype><![CDATA[1]]></creationtype>
+<isescalated><![CDATA[1]]></isescalated>
+<escalationruleid><![CDATA[1]]></escalationruleid>
+<templategroupid><![CDATA[1]]></templategroupid>
+<tags><![CDATA[escalated]]></tags>
+<templategroupname><![CDATA[Technical_Support]]></templategroupname>
+<note type="user" id="576" userid="506" notecolor="3" creatorstaffid="11" forstaffid="0" creatorstaffname="Sergey TS" creationdate="1525699384"><![CDATA[TS/2572 до 10.05.19]]></note>
+<posts>
+<post>
+<id><![CDATA[2949]]></id>
+<ticketpostid><![CDATA[2949]]></ticketpostid>
+<ticketid><![CDATA[1000]]></ticketid>
+<dateline><![CDATA[1372327626]]></dateline>
+<userid><![CDATA[506]]></userid>
+<fullname><![CDATA[John Smith]]></fullname>
+<email><![CDATA[js@example.com]]></email>
+<emailto />
+<ipaddress><![CDATA[192.168.0.1]]></ipaddress>
+<hasattachments><![CDATA[0]]></hasattachments>
+<creator><![CDATA[2]]></creator>
+<isthirdparty><![CDATA[0]]></isthirdparty>
+<ishtml><![CDATA[0]]></ishtml>
+<isemailed><![CDATA[0]]></isemailed>
+<staffid><![CDATA[0]]></staffid>
+<issurveycomment><![CDATA[0]]></issurveycomment>
+<contents><![CDATA[I need loder with fw\ 000600E5 from WD ZEFHYR family.
+the model WD7500BPVT - 22HXZT1
+please help me, its critical.]]></contents>
+<isprivate><![CDATA[0]]></isprivate>
+</post>
+<post>
+<id><![CDATA[3016]]></id>
+<ticketpostid><![CDATA[3016]]></ticketpostid>
+<ticketid><![CDATA[1000]]></ticketid>
+<dateline><![CDATA[1372345563]]></dateline>
+<userid><![CDATA[0]]></userid>
+<fullname><![CDATA[Filipp Michurin]]></fullname>
+<email><![CDATA[filip@example.com]]></email>
+<emailto />
+<ipaddress><![CDATA[192.168.0.1]]></ipaddress>
+<hasattachments><![CDATA[0]]></hasattachments>
+<creator><![CDATA[1]]></creator>
+<isthirdparty><![CDATA[0]]></isthirdparty>
+<ishtml><![CDATA[0]]></ishtml>
+<isemailed><![CDATA[0]]></isemailed>
+<staffid><![CDATA[4]]></staffid>
+<issurveycomment><![CDATA[0]]></issurveycomment>
+<contents><![CDATA[Hello John Smith.
+
+Unfortunatelly, we have't loader for this Drive.
+
+______________________
+With kind regards
+ACE Laboratory support team
+Filipp Michurin
+
+]]></contents>
+<isprivate><![CDATA[0]]></isprivate>
+</post>
+</posts>
+</ticket>
+</tickets>

@@ -2,7 +2,7 @@
 use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   NAME           => 'Mojolicious::Plugin::AssetPack',
-  AUTHOR         => 'Marcus Ramberg <marcus.ramberg@gmail.com>',
+  AUTHOR         => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/Mojolicious/Plugin/AssetPack.pm',
   VERSION_FROM   => 'lib/Mojolicious/Plugin/AssetPack.pm',

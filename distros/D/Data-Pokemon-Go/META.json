@@ -4,7 +4,7 @@
       "Yuki Yoshida <worthmine@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "perl_5"
    ],
@@ -62,7 +62,7 @@
    "provides" : {
       "Data::Pokemon::Go" : {
          "file" : "lib/Data/Pokemon/Go.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Data::Pokemon::Go::IV" : {
          "file" : "lib/Data/Pokemon/Go/IV.pm"
@@ -100,11 +100,12 @@
          "web" : "https://github.com/worthmine/Data-Pokemon-Go"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "AnaTofuZ <anatofuz@gmail.com>",
       "Yuki Yoshida <worthmine@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

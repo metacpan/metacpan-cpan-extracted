@@ -50,7 +50,7 @@ OpusVL::Preferences::Hat::preferences - Allows any FB11 component to do legacy P
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 DESCRIPTION
 

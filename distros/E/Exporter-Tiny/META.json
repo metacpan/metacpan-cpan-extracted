@@ -4,7 +4,7 @@
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -48,11 +48,11 @@
    "provides" : {
       "Exporter::Shiny" : {
          "file" : "lib/Exporter/Shiny.pm",
-         "version" : "1.000000"
+         "version" : "1.002001"
       },
       "Exporter::Tiny" : {
          "file" : "lib/Exporter/Tiny.pm",
-         "version" : "1.000000"
+         "version" : "1.002001"
       }
    },
    "release_status" : "stable",
@@ -72,6 +72,6 @@
       "x_IRC" : "irc://irc.perl.org/#moops",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Exporter-Tiny/project"
    },
-   "version" : "1.000000",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.002001",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

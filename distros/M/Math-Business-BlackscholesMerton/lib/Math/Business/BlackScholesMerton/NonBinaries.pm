@@ -6,7 +6,7 @@ use warnings;
 use List::Util qw(min max);
 use Math::CDF qw(pnorm);
 
-our $VERSION = '1.23';    ## VERSION
+our $VERSION = '1.24';    ## VERSION
 
 =head1 NAME
 
@@ -257,6 +257,38 @@ sub dnorm {    # Standard normal density function
     my $value = exp(-$x**2 / 2) / sqrt(2.0 * $pi);
 
     return $value;
+}
+
+=head2 callspread
+
+    USAGE
+    my $price = callspread($S, $U, $D, $t, $r_q, $mu, $sigmaU, $sigmaD);
+
+    DESCRIPTION
+    Price of a CALL SPREAD
+
+=cut
+
+sub callspread {
+    my ($S, $U, $D, $t, $r_q, $mu, $sigmaU, $sigmaD) = @_;
+
+    return vanilla_call($S, $D, $t, $r_q, $mu, $sigmaD) - vanilla_call($S, $U, $t, $r_q, $mu, $sigmaU);
+}
+
+=head2 putspread
+
+    USAGE
+    my $price = putspread($S, $U, $D, $t, $r_q, $mu, $sigmaU, $sigmaD);
+
+    DESCRIPTION
+    Price of a PUT SPREAD
+
+=cut
+
+sub putspread {
+    my ($S, $U, $D, $t, $r_q, $mu, $sigmaU, $sigmaD) = @_;
+
+    return vanilla_put($S, $U, $t, $r_q, $mu, $sigmaU) - vanilla_put($S, $D, $t, $r_q, $mu, $sigmaD);
 }
 
 1;

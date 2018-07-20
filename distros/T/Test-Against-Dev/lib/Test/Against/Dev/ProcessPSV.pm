@@ -1,7 +1,7 @@
 package Test::Against::Dev::ProcessPSV;
 use strict;
 use 5.14.0;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use Carp;
 use Data::Dump ( qw| dd pp | );
 use Text::CSV_XS;
@@ -158,9 +158,8 @@ sub read_one_psv {
 
     my @cols = @{$psv->getline($IN)};
     dd(\@cols) if $self->{verbose};
-    my $row = {};
-    $psv->bind_columns(\@{$row}{@cols});
-    while ($psv->getline($IN)) {
+    $psv->column_names(@cols);
+    while (my $row = $psv->getline_hr($IN)) {
         my $dist = $row->{dist};
         $self->{master_data}->{$dist}{$_} = $row->{$_} for keys %{$row};
     }

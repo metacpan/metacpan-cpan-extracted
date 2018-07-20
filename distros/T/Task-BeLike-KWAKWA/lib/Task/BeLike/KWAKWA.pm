@@ -3,7 +3,7 @@ package Task::BeLike::KWAKWA;
 use strict;
 use 5.008_005;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # ABSTRACT: Be more like KWAKWA - use the modules he likes!
 
@@ -23,13 +23,54 @@ Task::BeLike::KWAKWA - Be more like KWAKWA!
 
 =head3 L<App::Ack>
 
+    # search Perl related files (.pl, .pm, .t)
+    $ ack --perl foo
+
+    # search Perl files except .t
+    $ echo "--type-add=plpm=.pl,.pm" >> ~/.ackrc
+    $ ack --plpm foo
+
 =head3 L<App::ForkProve>
 
+=head3 L<Module::Version> for C<mversion>
+
+    $ mversion Mojolicious
+    7.61
+
+=head2 DateTime manipulation
+
+=head3 L<DateTime::Format::ISO8601>
+
+    my $dt = DateTime::Format::ISO8601->parse_datetime('2018-01-01T00:00:00Z');
+
+=head2 Filesystem
+
+=head2 L<File::chdir> more sensible way to change directories
+
+=head2 Module management
+
+=head3 L<Pod::Readme>
+
 =head2 Testing
+
+Testing is hard to get right. Consider when writing tests which category the
+test falls under and test and organise appropriately. Typically they can be
+categorized as integration tests (how major parts of a system work together),
+unit tests (exercising modules), functional/user acceptance tests (use case
+scenarios, BDD).
+
+Avoid using C<if> statements. If your tests have branches, your tests need
+tests.
+
+=head3 L<Test::BDD::Cucumber>
 
 =head3 L<Test::MockTime>
 
 =head3 L<Test::Mojo> can be used to test Dancer2 apps too.
+
+=head3 L<Test2::Suite> use L<Test2::V0>
+
+=head3 L<Test2::Tools::Exception>
 
 =head2 Web
 

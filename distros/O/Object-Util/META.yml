@@ -29,7 +29,7 @@ optional_features: {}
 provides:
   Object::Util:
     file: lib/Object/Util.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   List::Util: '1.29'
   Module::Runtime: '0'
@@ -43,5 +43,5 @@ resources:
   homepage: https://metacpan.org/release/Object-Util
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-object-util.git
-version: '0.008'
+version: '0.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

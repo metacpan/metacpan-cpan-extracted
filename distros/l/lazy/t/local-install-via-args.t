@@ -13,9 +13,6 @@ BEGIN {
 
 use local::lib qw( --no-create );
 
-# Install in local lib even if it's already installed elsewhere
-use lazy ( '-L', $dir, '--reinstall', '-v' );
-
 use Capture::Tiny qw( capture );
 use Test::More;
 use Test::RequiresInternet (
@@ -23,6 +20,11 @@ use Test::RequiresInternet (
     'cpanmetadb.plackperl.org' => 80,
     'fastapi.metacpan.org'     => 443,
 );
+
+# Install in local lib even if it's already installed elsewhere. However, we
+# will add lazy to @INC *after* all of the other use statements, so that we
+# don't accidentally try to install any test deps here.
+use lazy ( '-L', $dir, '--reinstall', '-v' );
 
 my ($cb) = grep { ref $_ eq 'CODE' } @INC;
 my ( $stdout, $stderr, @result )

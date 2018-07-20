@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Relationships;
-$JSONAPI::Document::Builder::Relationships::VERSION = '2.1';
+$JSONAPI::Document::Builder::Relationships::VERSION = '2.2';
 =head1 NAME
 
 JSONAPI::Document::Builder::Relationships - Related Resource Document builder
 
 =head1 VERSION
 
-version 2.1
+version 2.2
 
 =head1 DESCRIPTION
 
@@ -117,7 +117,7 @@ sub build_links_document {
         }
     }
 
-    my $row_type = $self->document_type(lc($row->result_source->source_name()));
+    my $row_type = $self->document_type($row->result_source->source_name());
 
     return {
         links => {

@@ -10,14 +10,18 @@ use Data::Pokemon::Go::Skill;
 
 my $skill = Data::Pokemon::Go::Skill->new();
 
-use Path::Tiny;
-#my $in_file = path( 'data', 'Pokemon.yaml' );
-my $in_file = path( 'data', 'Kanto.yaml' );
-
 use YAML::XS;
-my $data = YAML::XS::LoadFile($in_file);
-map{ $data->{$_}{name} = $_ } keys %$data;
-our @All = map{ $_->{name} } sort{ $a->{ID} cmp $b->{ID} } values %$data;
+use Path::Tiny;
+
+my $all = {};
+foreach my $region (qw|Kanto Johto Hoenn|){
+    my $in_file = path( 'data', "$region.yaml" );
+    my $data = YAML::XS::LoadFile($in_file);
+    map{ $data->{$_}{name} = $_ } keys %$data;
+    %$all = ( %$all, %$data );
+}
+
+our @All = map{ $_->{name} } sort{ $a->{ID} cmp $b->{ID} } values %$all;
 enum 'PokemonName' => \@All;
 has name => ( is => 'rw', isa => 'PokemonName' );
 
@@ -33,13 +37,13 @@ no Moose;
 sub exists {
     my $self = shift;
     my $name = shift;
-    return CORE::exists $data->{$name};
+    return CORE::exists $all->{$name};
 }
 
 sub id {
     my $self = shift;
     my $name = $self->name();
-    my $id = $data->{$name}{ID};
+    my $id = $all->{$name}{ID};
     carp "'ID' may be invalid: $id" unless $id =~ /^\d{3}$/;
     return $id;
 }
@@ -47,7 +51,7 @@ sub id {
 sub types {
     my $self = shift;
     my $name = $self->name();
-    my $typesref = $data->{$name}{Types};
+    my $typesref = $all->{$name}{Types};
     carp "'Types' may be invalid: $typesref" unless ref $typesref eq 'ARRAY';
     return $typesref;
 }
@@ -55,7 +59,7 @@ sub types {
 sub skill {
     my $self = shift;
     my $name = $self->name();
-    my $ref = $data->{$name}{Skill};
+    my $ref = $all->{$name}{Skill};
     my @skill;
     foreach my $name (@$ref) {
         $skill->name($name);
@@ -68,7 +72,7 @@ sub skill {
 sub special {
     my $self = shift;
     my $name = $self->name();
-    my $ref = $data->{$name}{Special};
+    my $ref = $all->{$name}{Special};
     my @skill;
     foreach my $name (@$ref) {
         $skill->name($name);
@@ -106,29 +110,55 @@ sub recommended {
 sub stamina {
     my $self = shift;
     my $name = $self->name();
-    croak "'Stamina' is undefined for $name" unless exists $data->{$name}{Stamina};
-    return $data->{$name}{Stamina};
+    croak "'Stamina' is undefined for $name" unless exists $all->{$name}{'Stamina'};
+    return $all->{$name}{Stamina};
 }
 
 sub attack {
     my $self = shift;
     my $name = $self->name();
-    croak "'Attack' is undefined for $name" unless exists $data->{$name}{Attack};
-    return $data->{$name}{Attack};
+    croak "'Attack' is undefined for $name" unless exists $all->{$name}{'Attack'};
+    return $all->{$name}{Attack};
 }
 
 sub defense {
     my $self = shift;
     my $name = $self->name();
-    croak "'Defense' is undefined for $name" unless exists $data->{$name}{Defense};
-    return $data->{$name}{Defense};
+    croak "'Defense' is undefined for $name" unless exists $all->{$name}{'Defense'};
+    return $all->{$name}{Defense};
 }
 
 sub hatchedMAX {
     my $self = shift;
     my $name = $self->name();
-    croak "'HatchedMAX' is undefined for $name" unless exists $data->{$name}{HatchedMAX};
-    return $data->{$name}{HatchedMAX};
+    croak "'HatchedMAX' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{'Hatched'};
+    return $all->{$name}{'MAXCP'}{'Hatched'};
+}
+
+sub rewardMAX {
+    my $self = shift;
+    my $name = $self->name();
+    croak "'HatchedMAX' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{'Reward'};
+    return $all->{$name}{'MAXCP'}{'Reward'};
+}
+
+sub boostedMAX {
+    my $self = shift;
+    my $name = $self->name();
+    croak "'HatchedMAX' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{'Boosted'};
+    return $all->{$name}{'MAXCP'}{'Boosted'};
+}
+
+sub isNotWild {
+    my $self = shift;
+    my $name = $self->name();
+    return $all->{$name}{'isNotWild'};
+}
+
+sub isNotAvailable {
+    my $self = shift;
+    my $name = $self->name();
+    return $all->{$name}{'isNotAvailable'};
 }
 
 1;

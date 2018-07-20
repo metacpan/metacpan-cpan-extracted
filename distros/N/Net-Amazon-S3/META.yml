@@ -20,6 +20,8 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-Amazon-S3
+recommends:
+  VM::EC2::Security::CredentialCache: '0'
 requires:
   Carp: '0'
   Data::Stream::Bulk::Callback: '0'
@@ -54,7 +56,6 @@ requires:
   URI: '0'
   URI::Escape: '0'
   URI::QueryParam: '0'
-  VM::EC2::Security::CredentialCache: '0'
   XML::LibXML: '0'
   XML::LibXML::XPathContext: '0'
   namespace::clean: '0'
@@ -64,7 +65,7 @@ requires:
 resources:
   bugtracker: https://github.com/rustyconover/net-amazon-s3/issues
   repository: https://github.com/rustyconover/net-amazon-s3
-version: '0.83'
+version: '0.84'
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'
   - 'Ali Anari <ali@anari.me>'

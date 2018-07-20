@@ -1,6 +1,19 @@
 Revision history for Term::Form
 
 
+0.321   2018-07-20
+        - Stringify gcstring explicitly.
+        - Update constants Win32.
+
+0.320   2018-07-19
+        - Bugfix in restore $self.
+        - Catch unused keys.
+        - "Term::ReadKey" is now optional.
+        - Removed deprecated method 'config'.
+        - "Term::Form" inherits form "Term::Choose".
+        - Use the constants form "Term::Choose".
+        - "Term::Choose" minimum version is "1.607".
+
 0.316   2018-06-19
         - Reset $self before leaving "readline"/"fill_form".
         - Method "config" deprecated.

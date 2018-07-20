@@ -1,6 +1,6 @@
 package OpusVL::FB11X::Preferences::Role::ParameterValueEditing;
 
-use 5.010;
+use v5.24;
 use Moose::Role;
 use Switch::Plain 'sswitch';
 
@@ -241,11 +241,16 @@ sub construct_form_fields_ex
                 type => 'Text',
                 label => $field->comment,
                 name => $name,
+                container_attributes => {
+                    class => [ 'form-group' ]
+                },
+                attributes => {
+                    class => [ 'form-control' ]
+                },
             };
             sswitch ($field->data_type)
             {
                 case 'email': {
-                    $details->{constraints} = [ { type => 'Email' } ];
                     $details->{filters} = [ { type => 'TrimEdges' } ];
                 }
                 case 'textarea': {
@@ -258,14 +263,16 @@ sub construct_form_fields_ex
                     $extra = '';
                 }
                 case 'boolean': {
-                    $details->{type} = 'Checkbox';
+                    $details->{type} = 'Select';
+                    $details->{empty_first} = !! $search;
+                    $details->{options} = [ [ 1 => 'Yes' ], [ 0 => 'No' ] ];
                     $extra = '';
                 }
                 case 'date': {
                     $details->{attributes} = {
                         autocomplete => 'off',
-                        class => 'date_picker',
                     };
+                    push $details->{attributes}->{class}->@*, 'date-picker';
                     $details->{size} = 12;
                     $details->{inflators} = {
                         type => 'DateTime',
@@ -292,9 +299,7 @@ sub construct_form_fields_ex
                     $extra = '';
                 }
             }
-            $details->{attributes} = {} unless exists $details->{attributes};
-            $details->{attributes}->{class} .= ' ' if($details->{attributes}->{class});
-            $details->{attributes}->{class} .= $name;
+            push $details->{attributes}->{class}->@*, $name;
             my %extra_field;
             if($search)
             {
@@ -337,6 +342,12 @@ sub construct_form_fields_ex
                     push @{$extra_field{constraints}}, { type => 'Equal', message => $missmatch_msg, others => $original_name };
                 }
             }
+            $details->{attributes}->{class} 
+                = join ' ', $details->{attributes}->{class}->@*
+                if $details->{attributes}->{class};
+            $details->{container_attributes}->{class}
+                = join ' ', $details->{container_attributes}->{class}->@*
+                if $details->{container_attributes}->{class};
             my $element = $global_fields->element($details);
             my $extra_element = $global_fields->element(\%extra_field) if %extra_field;
         }

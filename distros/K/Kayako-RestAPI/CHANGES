@@ -1,10 +1,48 @@
 ==================================================
-Changes from 2017-07-08 00:00:00 +0000 to present.
+Changes from 2017-07-17 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.04 at 2018-07-08 19:05:50 +0000
+version 0.06 at 2018-07-17 13:53:45 +0000
 -----------------------------------------
+
+  Change: d2262b934992760364caaee614ace94af8238c3e
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-17 16:53:24 +0000
+
+    Migration from XML::XML2JSON to XML::LibXML::Simple - updated
+    README.md 
+
+  Change: a0187ab0f660b82ffdf9186c664881f405f3a276
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-17 16:52:54 +0000
+
+    Migration from XML::XML2JSON to XML::LibXML::Simple 
+
+  Change: cb05bb5fb8f626ea3acd8ca4612f3aca975f8b29
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-17 13:59:38 +0000
+
+    Fixed misprint in test name 
+
+  Change: 2a02759b2091fdaa9693994044aad4a8a7c7a0fb
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-17 13:45:34 +0000
+
+    Fixed misprint and set v 0.05 in readme 
+
+  Change: af0bf41cdec07665da735ca2e17e81069d7b23d3
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-17 13:38:07 +0000
+
+    Added ticket.xml and test for get_ticket_hash method 
+
+  Change: 277bef799917e1e352928b5f7de31c57480a0746
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-17 13:13:58 +0000
+
+    Added some new private methods and sample data for testing and
+    migration from XML::XML2JSON to XML::LibXML::Simple 
 
   Change: 9027ecab2820010c5e81d7cea00ff1521f7d206b
   Author: Pavel Serikov <pavelsr@cpan.org>

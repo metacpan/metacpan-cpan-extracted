@@ -11,3 +11,9 @@ cpanfile
 dist.ini
 lib/Kayako/RestAPI.pm
 t/lib/Kayako/RestAPI.t
+t/lib/Kayako/samples/departments.xml
+t/lib/Kayako/samples/staff.xml
+t/lib/Kayako/samples/ticket.xml
+t/lib/Kayako/samples/ticket_priority.xml
+t/lib/Kayako/samples/ticket_status.xml
+t/lib/Kayako/samples/ticket_type.xml

@@ -1,4 +1,9 @@
+2.2       2018-07-18 23:04:28+01:00 Europe/London
+
 2.1       2018-07-12 20:09:22+01:00 Europe/London
+- Allow attributes starting with an underscore to not go through kebab casing
+- Fix bug where the relationship links were pointing to their origin in "related" and
+to their relationships link in "self", should have been the opposite.
 
 2.0       2018-07-02 23:44:40+01:00 Europe/London
 - Fixed bug where unusual words were stripped out that due to containing

@@ -3,12 +3,11 @@ abstract: 'dark magic, encrypted wallet'
 author:
   - 'Boris Däppen <bdaeppen.perl@gmail.com>'
 build_requires:
-  File::Copy: '0'
   Test::Script: '1.10'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +16,9 @@ name: App-Unding
 requires:
   Crypt::Blowfish: '0'
   Crypt::CBC: '0'
+  Cwd: '0'
   Data::Serializer: '0'
+  File::Copy: '0'
   File::Slurp: '0'
   Term::ReadKey: '0'
   perl: v5.6.0
@@ -26,6 +27,6 @@ requires:
 resources:
   homepage: https://gitlab.com/borisdaeppen/App-Unding
   repository: git://gitlab.com:borisdaeppen/App-Unding.git
-version: '0.005'
+version: '0.006'
 x_generated_by_perl: v5.22.4
 x_serialization_backend: 'YAML::Tiny version 1.70'

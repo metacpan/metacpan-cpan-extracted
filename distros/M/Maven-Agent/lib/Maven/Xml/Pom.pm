@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom;
-$Maven::Xml::Pom::VERSION = '1.14';
+$Maven::Xml::Pom::VERSION = '1.15';
 # ABSTRACT: Maven Pom element
 # PODNAME: Maven::Xml::Pom
 
@@ -113,6 +113,9 @@ sub _get_parser {
     elsif ( $name eq 'contributor' ) {
         return Maven::Xml::Pom::Contributor->new();
     }
+    elsif ( $name eq 'dependencyManagement' ) {
+        return Maven::Xml::Pom::DependencyManagement->new();
+    }
     elsif ( $name eq 'dependencies' ) {
         return Maven::Xml::Pom::Dependencies->new();
     }
@@ -173,7 +176,7 @@ Maven::Xml::Pom - Maven Pom element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

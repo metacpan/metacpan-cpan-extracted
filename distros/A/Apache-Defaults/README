@@ -1,0 +1,26 @@
+Apache::Defaults module
+=======================
+
+This module provides a mechanism for detecting version, default settings,
+and the preloaded modules of the Apache httpd server. It does so by locating
+the server binary, invoking it with appropriate options and analyzing the
+output it produces.
+
+Example usage:
+
+   $x = new Apache::Defaults;
+   printf("%s, version %s, built on %s\n",
+          $x->name, $x->version, $x->built->strftime('%c'));
+   printf("Server root directory: %s\n", $x->server_root);
+   printf("Configuration file: %s\n", $x->defines('SERVER_CONFIG_FILE'));
+
+Copying
+=======
+This package is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+See http://www.gnu.org/licenses.
+
+   

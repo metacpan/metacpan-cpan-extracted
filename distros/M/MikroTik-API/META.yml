@@ -33,4 +33,4 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=MikroTik-API
   license: http://www.opensource.org/licenses/mit-license.php
   repository: git://github.com/martin8883/MikroTik-API
-version: 1.0.4
+version: 1.0.5

@@ -3,26 +3,52 @@ abstract: 'client library for fastcgi protocol'
 author:
   - 'Tokuhiro Matsuno <tokuhirom @*(#RJKLFHFSDLJF gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.01'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: FCGI-Client
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  FCGI::Client:
+    file: lib/FCGI/Client.pm
+    version: '0.09'
+  FCGI::Client::Connection:
+    file: lib/FCGI/Client/Connection.pm
+  FCGI::Client::Constant:
+    file: lib/FCGI/Client/Constant.pm
+  FCGI::Client::Record:
+    file: lib/FCGI/Client/Record.pm
+  FCGI::Client::RecordFactory:
+    file: lib/FCGI/Client/RecordFactory.pm
+  FCGI::Client::RecordHeader:
+    file: lib/FCGI/Client/RecordHeader.pm
 requires:
-  Any::Moose: 0.13
-  IO::Socket::UNIX: 0
-  perl: 5.8.1
+  IO::Socket::UNIX: '0'
+  Moo: '2'
+  Type::Tiny: '0'
+  perl: '5.008001'
 resources:
-  license: http://dev.perl.org/licenses/
-version: 0.08
+  bugtracker: https://github.com/tokuhirom/p5-fcgi-client/issues
+  homepage: https://github.com/tokuhirom/p5-fcgi-client
+  repository: git://github.com/tokuhirom/p5-fcgi-client.git
+version: '0.09'
+x_authority: cpan:TOKUHIROM
+x_contributors:
+  - 'Peter Keen <peter.keen@bugsplat.info>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

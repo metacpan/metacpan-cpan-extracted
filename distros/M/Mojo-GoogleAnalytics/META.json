@@ -3,14 +3,14 @@
    "author" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojo-GoogleAnalytics",
    "no_index" : {
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -32,8 +30,14 @@
       },
       "runtime" : {
          "requires" : {
+            "Crypt::OpenSSL::RSA" : "0.30",
             "Mojo::JWT" : "0.05",
-            "Mojolicious" : "7.30"
+            "Mojolicious" : "7.80"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
@@ -44,9 +48,11 @@
       },
       "homepage" : "https://github.com/jhthorsen/mojo-googleanalytics",
       "repository" : {
-         "url" : "https://github.com/jhthorsen/mojo-googleanalytics.git"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/mojo-googleanalytics.git",
+         "web" : "https://github.com/jhthorsen/mojo-googleanalytics"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

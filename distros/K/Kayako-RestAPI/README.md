@@ -4,7 +4,7 @@ Kayako::RestAPI - Perl library for working with [Kayako REST API](https://kayako
 
 # VERSION
 
-version 0.04
+version 0.06
 
 # SYNOPSIS
 
@@ -44,6 +44,18 @@ version 0.04
       });
 
 You can test you controller with [API Test Controller](https://kayako.atlassian.net/wiki/display/DEV/API+Test+Controller)
+
+Attention: since version 0.06 (migration from XML::XML2JSON to XML::LibXML::Simple) response structure of following methods was changed from array to hash
+
+    get_ticket_hash
+    get_departements
+    get_ticket_statuses
+    get_ticket_priorities
+    get_ticket_types
+
+If you need to use old structure please add \_old suffix to method ;)
+
+WORK UNDER THIS MODULE IS IN PROGRESS, HELP WANTED, ESPECIALLY FOR WRITING DOCS
 
 # METHODS
 
@@ -92,14 +104,16 @@ Check a list of required arguments here: [https://kayako.atlassian.net/wiki/disp
 
 ## filter\_fields
 
-Filter fields of API request result and trim content\_key
+THIS METHOD LEFT HERE FOR COMPATIBILITY AND WILL BE REMOVED IN FUTURE RELEASES
+
+Filter fields of API request result and trim content\_key added by XML::XML2JSON
 
 By default leave only id, title and module fields
 
     my $arrayref = $kayako_api->get_hash('/Some/API/Endpoint');
     $kayako_api->filter_fields($arrayref); 
 
-## get\_departements
+## get\_departements\_old
 
     $kayako_api->get_departements();
 
@@ -120,7 +134,7 @@ Return an arrayref of hashes with title, module and id keys like
 
 API endpoint is /Base/Department/
 
-## get\_ticket\_statuses
+## get\_ticket\_statuses\_old
 
     $kayako_api->get_ticket_statuses(); 
 
@@ -143,7 +157,7 @@ Return an arrayref of hashes with title and id keys like
 
 API endpoint is /Tickets/TicketStatus/
 
-## get\_ticket\_priorities
+## get\_ticket\_priorities\_old
 
         $kayako_api->get_ticket_priorities();
 
@@ -162,7 +176,7 @@ Return an arrayref of hashes with title and id keys like
 
 API endpoint is /Tickets/TicketPriority/
 
-## get\_ticket\_types
+## get\_ticket\_types\_old
 
     $kayako_api->get_ticket_types();
 
@@ -185,7 +199,7 @@ Return an arrayref of hashes with title and id keys like
 
 API endpoint is /Tickets/TicketType/
 
-## get\_staff
+## get\_staff\_old
 
     $kayako_api->get_staff();
 
@@ -202,7 +216,7 @@ E.g.
             'lastname' => { 'text' => 'Serikov' },
             'enabledst' => { 'text' => '0'},
             'username' => { 'text' => 'pavelsr' },
-            'isenabled' => { 'text' => '1' }6,
+            'isenabled' => { 'text' => '1' },
             'staffgroupid' => { 'text' => '4' },
             'greeting' => {},
             'timezone' => {},

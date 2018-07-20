@@ -14,7 +14,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( html_to_muse html_file_to_muse );
 
-our $VERSION = '0.27';
+our $VERSION = '0.55';
 
 =encoding utf8
 
@@ -298,6 +298,7 @@ sub _cleanup_text_block {
   $parsed =~ s/\s+/ /gs;
   $parsed =~ s/\A\s+//;
   $parsed =~ s/\s+\z//;
+  $parsed =~ s/^\*/ */gm;
   # print ">>>$parsed<<<\n";
   return $parsed;
 }
@@ -320,13 +321,16 @@ sub _span_process_attr {
 
 sub _pars_process_attr {
   my ($tag, $attr) = @_;
-# warn Dumper($attr);
+  # warn Dumper($attr);
   if (my $style = $attr->{style}) {
     if ($style =~ m/text-align:\s*center/i) {
       $tag = 'center';
     }
     if ($style =~ m/text-align:\s*right/i) {
       $tag = 'right';
+    }
+    if ($style =~ m/padding-left:\s*\d/si) {
+      $tag = 'blockquote'
     }
   }
   if (my $align = $attr->{align}) {

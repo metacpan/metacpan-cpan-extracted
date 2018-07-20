@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Common::Repository;
-$Maven::Xml::Common::Repository::VERSION = '1.14';
+$Maven::Xml::Common::Repository::VERSION = '1.15';
 # ABSTRACT: Maven Repositories element
 # PODNAME: Maven::Xml::Common::Repository
 
@@ -31,7 +31,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Common::Repository::RepositoryPolicy;
-$Maven::Xml::Common::Repository::RepositoryPolicy::VERSION = '1.14';
+$Maven::Xml::Common::Repository::RepositoryPolicy::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -54,7 +54,7 @@ Maven::Xml::Common::Repository - Maven Repositories element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

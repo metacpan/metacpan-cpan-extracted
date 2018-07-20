@@ -1,0 +1,9 @@
+Revision history for App-matrixpack
+
+0.00_14 2018-07-18 
+        Enable delimter change. Also changed the beginning line of *.pm file to show the module introduction properly. 
+0.00_13 2018-07-18 
+        Proper treatment when 0 is specified. And other warnings and error displays. 
+0.00_12 2018-07-18 
+        Quick upload. Only Japanese help manual. 
+

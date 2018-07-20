@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::UseBuildPL;
-$Dist::Zilla::Plugin::UseBuildPL::VERSION = '0.2';
+$Dist::Zilla::Plugin::UseBuildPL::VERSION = '0.3';
 use Moose;
 with 'Dist::Zilla::Role::BuildPL';
 

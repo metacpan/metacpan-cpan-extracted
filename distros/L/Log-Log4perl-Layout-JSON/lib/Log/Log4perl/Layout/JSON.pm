@@ -1,5 +1,5 @@
 package Log::Log4perl::Layout::JSON;
-$Log::Log4perl::Layout::JSON::VERSION = '0.54';
+$Log::Log4perl::Layout::JSON::VERSION = '0.55';
 # ABSTRACT: Layout a log message as a JSON hash, including MDC data
 
 use 5.008;
@@ -263,7 +263,7 @@ sub render {
     my $prefix = $self->prefix;
 
     if ($self->format_prefix) {
-        return $self->_prefix_layout->render($message) . $json . "\n";
+        return $self->_prefix_layout->render($message, $category, $priority, $caller_level) . $json . "\n";
     }
     else {
         return $self->prefix . $json . "\n";
@@ -284,7 +284,7 @@ Log::Log4perl::Layout::JSON - Layout a log message as a JSON hash, including MDC
 
 =head1 VERSION
 
-version 0.54
+version 0.55
 
 =head1 SYNOPSIS
 
@@ -469,7 +469,7 @@ Originally created and maintained through v0.002003 by Tim Bunce.  Versions
 
 =head1 SOURCE
 
-The development version is on github at L<http://https://github.com/mschout/Log-Log4perl-Layout-JSON>
+The development version is on github at L<https://https://github.com/mschout/Log-Log4perl-Layout-JSON>
 and may be cloned from L<git://https://github.com/mschout/Log-Log4perl-Layout-JSON.git>
 
 =head1 BUGS

@@ -2,7 +2,7 @@ package Math::Business::BlackScholesMerton;
 
 use strict;
 use warnings;
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 # ABSTRACT: Algorithm of Math::Business::BlackScholesMerton for binary and non-binary options
 

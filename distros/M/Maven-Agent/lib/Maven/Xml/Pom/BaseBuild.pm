@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::BaseBuild;
-$Maven::Xml::Pom::BaseBuild::VERSION = '1.14';
+$Maven::Xml::Pom::BaseBuild::VERSION = '1.15';
 # ABSTRACT: Maven BaseBuild element
 # PODNAME: Maven::Xml::Pom::BaseBuild
 
@@ -60,7 +60,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Pom::BaseBuild::Resource;
-$Maven::Xml::Pom::BaseBuild::Resource::VERSION = '1.14';
+$Maven::Xml::Pom::BaseBuild::Resource::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -91,7 +91,7 @@ sub _add_value {
 }
 
 package Maven::Xml::Pom::BaseBuild::Plugins;
-$Maven::Xml::Pom::BaseBuild::Plugins::VERSION = '1.14';
+$Maven::Xml::Pom::BaseBuild::Plugins::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 
@@ -115,7 +115,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Pom::BaseBuild::Plugin;
-$Maven::Xml::Pom::BaseBuild::Plugin::VERSION = '1.14';
+$Maven::Xml::Pom::BaseBuild::Plugin::VERSION = '1.15';
 use Maven::Xml::Pom::Dependencies;
 
 use parent qw(Maven::Xml::XmlNodeParser);
@@ -166,7 +166,7 @@ sub _key {
 }
 
 package Maven::Xml::Pom::BaseBuild::Plugin::Execution;
-$Maven::Xml::Pom::BaseBuild::Plugin::Execution::VERSION = '1.14';
+$Maven::Xml::Pom::BaseBuild::Plugin::Execution::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -201,7 +201,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Pom::BaseBuild::PluginManagement;
-$Maven::Xml::Pom::BaseBuild::PluginManagement::VERSION = '1.14';
+$Maven::Xml::Pom::BaseBuild::PluginManagement::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -230,7 +230,7 @@ Maven::Xml::Pom::BaseBuild - Maven BaseBuild element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

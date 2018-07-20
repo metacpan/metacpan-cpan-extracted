@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Command;
-$Maven::Command::VERSION = '1.14';
+$Maven::Command::VERSION = '1.15';
 # ABSTRACT: A command builder for mvn
 # PODNAME: Maven::Command
 
@@ -69,7 +69,7 @@ Maven::Command - A command builder for mvn
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

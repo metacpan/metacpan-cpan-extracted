@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.604';
+our $VERSION = '1.608';
 
 use Win32::Console qw( STD_INPUT_HANDLE ENABLE_MOUSE_INPUT ENABLE_PROCESSED_INPUT STD_OUTPUT_HANDLE
                        RIGHT_ALT_PRESSED LEFT_ALT_PRESSED RIGHT_CTRL_PRESSED LEFT_CTRL_PRESSED SHIFT_PRESSED
@@ -48,17 +48,17 @@ sub __get_key_OS {
             if ( $ctrl_key_state & SHIFTED_MASK ) {
                 return NEXT_get_key;
             }
-            elsif ( $v_key_code == VK_PAGE_UP )   { return VK_PAGE_UP }
-            elsif ( $v_key_code == VK_PAGE_DOWN ) { return VK_PAGE_DOWN }
-            elsif ( $v_key_code == VK_END )       { return VK_END }
-            elsif ( $v_key_code == VK_HOME )      { return VK_HOME }
-            elsif ( $v_key_code == VK_LEFT )      { return VK_LEFT }
-            elsif ( $v_key_code == VK_UP )        { return VK_UP }
-            elsif ( $v_key_code == VK_RIGHT )     { return VK_RIGHT }
-            elsif ( $v_key_code == VK_DOWN )      { return VK_DOWN }
-            elsif ( $v_key_code == VK_INSERT )    { return VK_INSERT } # unused
-            elsif ( $v_key_code == VK_DELETE )    { return VK_DELETE } # unused
-            else                                  { return NEXT_get_key }
+            elsif ( $v_key_code == VK_CODE_PAGE_UP )   { return VK_PAGE_UP }
+            elsif ( $v_key_code == VK_CODE_PAGE_DOWN ) { return VK_PAGE_DOWN }
+            elsif ( $v_key_code == VK_CODE_END )       { return VK_END }
+            elsif ( $v_key_code == VK_CODE_HOME )      { return VK_HOME }
+            elsif ( $v_key_code == VK_CODE_LEFT )      { return VK_LEFT }
+            elsif ( $v_key_code == VK_CODE_UP )        { return VK_UP }
+            elsif ( $v_key_code == VK_CODE_RIGHT )     { return VK_RIGHT }
+            elsif ( $v_key_code == VK_CODE_DOWN )      { return VK_DOWN }
+            elsif ( $v_key_code == VK_CODE_INSERT )    { return VK_INSERT } # unused
+            elsif ( $v_key_code == VK_CODE_DELETE )    { return VK_DELETE } # unused
+            else                                       { return NEXT_get_key }
         }
     }
     elsif ( $mouse && $event_type == 2 ) {
@@ -199,6 +199,16 @@ sub __right {
     my ( $col, $row ) = $_[0]->__get_cursor_position;
     $_[0]->__set_cursor_position( $col + $_[1], $row );
 }
+
+
+sub __beep {
+    my ( $self, $beep ) = @_;
+    if ( $beep ) {
+    }
+}
+
+
+
 
 1;
 

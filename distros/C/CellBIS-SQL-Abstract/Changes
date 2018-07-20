@@ -1,9 +1,9 @@
 Revision history for perl distribution CellBIS-SQL-Abstract
 
+0.8       2018-07-20 05:54:31+08:00 Asia/Makassar
+          To support create table SQLite
+
 0.7       2018-07-15 21:09:29+08:00 Asia/Makassar
-
-
-0.7       2018-07-15 21:07:06+08:00 Asia/Makassar
           - Fixes POD
 
 0.6       2018-07-15 18:42:25+08:00 Asia/Makassar

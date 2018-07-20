@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Net::Amazon::S3::Signature::V4;
-$Net::Amazon::S3::Signature::V4::VERSION = '0.83';
+$Net::Amazon::S3::Signature::V4::VERSION = '0.84';
 use Moose;
 
 use Net::Amazon::S3::Signature::V4Implementation;
@@ -106,7 +106,7 @@ Net::Amazon::S3::Signature::V4
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 AUTHOR
 

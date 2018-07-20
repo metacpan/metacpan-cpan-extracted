@@ -14,3 +14,4 @@ CVS/
 ^Makefile$
 ^cvstest$
 ^blibdirs$
+^README.mkdn$

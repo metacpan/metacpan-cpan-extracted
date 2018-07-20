@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::Reporting;
-$Maven::Xml::Pom::Reporting::VERSION = '1.14';
+$Maven::Xml::Pom::Reporting::VERSION = '1.15';
 # ABSTRACT: Maven Reporting element
 # PODNAME: Maven::Xml::Pom::Reporting
 
@@ -39,7 +39,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Pom::Reporting::Plugin;
-$Maven::Xml::Pom::Reporting::Plugin::VERSION = '1.14';
+$Maven::Xml::Pom::Reporting::Plugin::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -72,7 +72,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Pom::Reporting::Plugin::ReportSet;
-$Maven::Xml::Pom::Reporting::Plugin::ReportSet::VERSION = '1.14';
+$Maven::Xml::Pom::Reporting::Plugin::ReportSet::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -117,7 +117,7 @@ Maven::Xml::Pom::Reporting - Maven Reporting element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

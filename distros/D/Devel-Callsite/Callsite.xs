@@ -12,9 +12,43 @@
 #  define MY_RETOP(c) ((UV)PL_retstack[(c)->blk_oldretsp - 1])
 #endif
 
+/* addr_to_op code provided by ikegami.
+   See https://www.perlmonks.org/?node_id=1218517
+ */
+static const char * const opclassnames[] = {
+  "B::NULL",
+  "B::OP",
+  "B::UNOP",
+  "B::BINOP",
+  "B::LOGOP",
+  "B::LISTOP",
+  "B::PMOP",
+  "B::SVOP",
+  "B::PADOP",
+  "B::PVOP",
+  "B::LOOP",
+  "B::COP",
+  "B::METHOP",
+  "B::UNOP_AUX"
+};
 MODULE = Devel::Callsite	PACKAGE = Devel::Callsite
 
 PROTOTYPES: DISABLE
+
+
+SV *
+addr_to_op(IV o_addr)
+  CODE:
+     const OP *o = INT2PTR(OP*, o_addr);
+     RETVAL = newSV(0);
+#if PERL_VERSION < 26
+     sv_setiv(newSVrv(RETVAL, "B::OP"), o_addr);
+#else
+     sv_setiv(newSVrv(RETVAL, opclassnames[op_class(o)]), o_addr);
+#endif
+  OUTPUT:
+     RETVAL
+
 
 SV *
 callsite(level = 0)

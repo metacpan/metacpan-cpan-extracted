@@ -7,10 +7,12 @@ lib/Mojo/GoogleAnalytics.pm
 lib/Mojo/GoogleAnalytics/Report.pm
 Makefile.PL
 MANIFEST			This list of files
-README
 t/00-basic.t
 t/auth.t
 t/batch_get.t
-t/get-report.t
+t/ga-batch-files/f61e746d527f1826e8b4cd30da74516c.json
+t/get_report.t
+t/mock.t
+t/query-translator.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

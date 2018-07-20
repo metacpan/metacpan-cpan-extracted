@@ -4,18 +4,15 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.316';
+our $VERSION = '0.321';
 
 use Carp       qw( croak carp );
-use Encode     qw( encode );
 use List::Util qw( any );
 
-use Encode::Locale    qw();
 use Unicode::GCString qw();
 
-use Term::Choose::LineFold qw( line_fold );
-
-use Term::Form::Constants qw( :rl );
+use Term::Choose::LineFold  qw( line_fold );
+use Term::Choose::Constants qw( :form );
 
 my $Plugin_Package;
 
@@ -48,8 +45,6 @@ sub new {
     }, $class;
     $self->__set_defaults();
     $self->{plugin} = $Plugin_Package->new();
-    my $backup_self = { map{ $_ => $self->{$_} } keys %$self };
-    $self->{backup_self} = $backup_self;
     return $self;
 }
 
@@ -62,8 +57,6 @@ sub DESTROY {
 
 sub __set_defaults {
     my ( $self ) = @_;
-    #$self->{compat}          = undef;
-    #$self->{reinit_encoding} = undef;
     #$self->{no_echo}         = undef;
     $self->{default}          = '';
     $self->{clear_screen}     = 0;
@@ -111,9 +104,6 @@ sub __validate_options {
 sub __init_term {
     my ( $self, $hide_cursor ) = @_;
     $self->{plugin}->__set_mode( $hide_cursor );
-    if ( $self->{reinit_encoding} ) {
-        Encode::Locale::reinit( $self->{reinit_encoding} );
-    }
 }
 
 
@@ -122,46 +112,15 @@ sub __reset_term {
     if ( defined $self->{plugin} ) {
         $self->{plugin}->__reset_mode( $hide_cursor );
     }
-    if ( defined $self->{backup_self} ) {
-        my $backup_self = delete $self->{backup_self};
-        for my $key ( keys %$self ) {
-            if ( defined $backup_self->{$key} ) {
-                $self->{$key} = $backup_self->{$key};
-            }
-            else {
-                delete $self->{$key};
-            }
+    for my $key ( keys %$self ) {
+        if ( $key eq 'plugin' || $key eq 'name' ) {
+            next;
+        }
+        else {
+            delete $self->{$key};
         }
     }
-}
-
-
-sub config { # DEPRECATED
-    my ( $self, $opt ) = @_;
-    if ( defined $opt ) {
-        if ( ref $opt ne 'HASH' ) {
-            croak "config: the (optional) argument must be a HASH reference";
-        }
-        my $valid = {
-            auto_up         => '[ 0 1 2 ]',
-            back            => '',
-            clear_screen    => '[ 0 1 ]',
-            compat          => '[ 0 1 ]',
-            confirm         => '',
-            default         => '',
-            info            => '',
-            no_echo         => '[ 0 1 2 ]',
-            mark_curr       => '[ 0 1 ]',   # experimental
-            prompt          => '',
-            reinit_encoding => '',
-            read_only       => 'ARRAY',
-            ro              => 'ARRAY', ##
-        };
-        $self->__validate_options( $opt, $valid );
-        for my $option ( keys %$opt ) {
-            $self->{$option} = $opt->{$option};
-        }
-    }
+    $self->__set_defaults();
 }
 
 
@@ -210,7 +169,7 @@ sub readline {
             $self->{plugin}->__beep();
             $self->{i}{beep} = 0;
         }
-        my ( $term_w, $term_h ) = $self->{plugin}->__term_buff_size();
+        my ( $term_w, $term_h ) = $self->{plugin}->__get_term_size();
         $self->{i}{avail_width} = $term_w - 1;
         if ( $self->{i}{len_longest_key} > $self->{i}{avail_width} / 3 ) {
             $self->{i}{len_longest_key} = int( $self->{i}{avail_width} / 3 );
@@ -224,7 +183,7 @@ sub readline {
             print "\r", $self->{i}{pre_text}, "\n";
         }
         $self->__print_readline( $opt, $list, $str, $pos );
-        my $key = $self->{plugin}->__get_key();
+        my $key = $self->{plugin}->__get_key_OS();
         if ( ! defined $key ) {
             $self->__reset_term();
             carp "EOT: $!";
@@ -305,7 +264,7 @@ sub readline {
                 $self->{i}{beep} = 1;
             }
         }
-        elsif ( $key == VK_UP || $key == VK_DOWN ) {
+        elsif ( $key == VK_UP || $key == VK_DOWN || $key == VK_PAGE_UP || $key == VK_PAGE_DOWN || $key == VK_INSERT ) {
             $self->{i}{beep} = 1;
         }
         else {
@@ -316,9 +275,6 @@ sub readline {
                 $self->{plugin}->__up( $self->{i}{pre_text_row_count} + 1 );
                 $self->{plugin}->__clear_lines_to_end_of_screen();
                 $self->__reset_term();
-                if ( $self->{compat} || ! defined $self->{compat} && $ENV{READLINE_SIMPLE_COMPAT} ) {
-                    return encode( 'console_in', $str->as_string );
-                }
                 return $str->as_string;
             }
             else {
@@ -334,6 +290,7 @@ sub __print_readline {
     my ( $self, $opt, $list, $str, $pos ) = @_;
     my $print_str = $str->copy;
     my $print_pos = $pos;
+
     my $n = 1;
     my ( $b, $e );
     while ( $print_str->columns > $self->{i}{avail_width_value} ) {
@@ -387,8 +344,7 @@ sub __length_longest_key {
     my $len = []; #
     my $longest = 0;
     for my $i ( 0 .. $#$list ) {
-        my $gcs = Unicode::GCString->new( $list->[$i][0] );
-        $len->[$i] = $gcs->columns;
+        $len->[$i] = Unicode::GCString->new( $list->[$i][0] )->columns;
         if ( $i < @{$self->{i}{pre}} ) {
             next;
         }
@@ -446,7 +402,7 @@ sub __prepare_size {
 }
 
 
-sub __gcstring_and_pos {
+sub __string_and_pos {
     my ( $self, $list ) = @_;
     my $default = $list->[$self->{i}{curr_row}][1];
     if ( ! defined $default ) {
@@ -589,10 +545,10 @@ sub fill_form {
     my $auto_up = $opt->{auto_up};
     $self->__init_term();
     local $| = 1;
-    my ( $maxcols, $maxrows ) = $self->{plugin}->__term_buff_size();
+    my ( $maxcols, $maxrows ) = $self->{plugin}->__get_term_size();
     $self->__prepare_size( $opt, $list, $maxcols, $maxrows );
     $self->__write_first_screen( $opt, $list, 0, $auto_up );
-    my ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+    my ( $str, $pos ) = $self->__string_and_pos( $list );
     my $k = 0;
 
     KEY: while ( 1 ) {
@@ -607,7 +563,7 @@ sub fill_form {
         else {
             $self->__print_current_row( $opt, $list, $str, $pos );
         }
-        my $key = $self->{plugin}->__get_key();
+        my $key = $self->{plugin}->__get_key_OS();
         if ( ! defined $key ) {
             $self->__reset_term();
             carp "EOT: $!";
@@ -615,13 +571,13 @@ sub fill_form {
         }
         next KEY if $key == NEXT_get_key;
         next KEY if $key == KEY_TAB;
-        my ( $tmp_maxcols, $tmp_maxrows ) = $self->{plugin}->__term_buff_size();
+        my ( $tmp_maxcols, $tmp_maxrows ) = $self->{plugin}->__get_term_size();
         if ( $tmp_maxcols != $maxcols || $tmp_maxrows != $maxrows && $tmp_maxrows < ( @$list + 1 ) ) {
             ( $maxcols, $maxrows ) = ( $tmp_maxcols, $tmp_maxrows );
             $self->__prepare_size( $opt, $list, $maxcols, $maxrows );
             $self->{plugin}->__clear_screen();
             $self->__write_first_screen( $opt, $list, 1, $auto_up ); # 1
-            ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+            ( $str, $pos ) = $self->__string_and_pos( $list );
         }
         if ( $key == KEY_BSPACE || $key == CONTROL_H ) {
             $k = 1;
@@ -675,9 +631,7 @@ sub fill_form {
                 }
             }
             else {
-                print "\n";
-                $self->__reset_term();
-                return;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == VK_RIGHT ) {
@@ -723,7 +677,7 @@ sub fill_form {
             }
             else {
                 $self->{i}{curr_row}--;
-                ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+                ( $str, $pos ) = $self->__string_and_pos( $list );
                 if ( $self->{i}{curr_row} >= $self->{i}{begin_row} ) {
                     $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} + 1 );
                     $self->{plugin}->__up( 1 );
@@ -740,7 +694,7 @@ sub fill_form {
             }
             else {
                 $self->{i}{curr_row}++;
-                ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+                ( $str, $pos ) = $self->__string_and_pos( $list );
                 if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {
                     $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} - 1 );
                     $self->{plugin}->__down( 1 );
@@ -751,7 +705,7 @@ sub fill_form {
                 }
             }
         }
-        elsif (  $key == VK_PAGE_UP || $key == CONTROL_B ) {
+        elsif ( $key == VK_PAGE_UP || $key == CONTROL_B ) {
             $k = 1;
             if ( $self->{i}{page} == 1 ) {
                 if ( $self->{i}{curr_row} == 0 ) {
@@ -761,17 +715,17 @@ sub fill_form {
                     $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} );
                     $self->{plugin}->__up( $self->{i}{curr_row} );
                     $self->{i}{curr_row} = 0;
-                    ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+                    ( $str, $pos ) = $self->__string_and_pos( $list );
                 }
             }
             else {
                 $self->{plugin}->__up( $self->{i}{curr_row} - $self->{i}{begin_row} );
                 $self->{i}{curr_row} = $self->{i}{begin_row} - $self->{i}{avail_height};
-                ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+                ( $str, $pos ) = $self->__string_and_pos( $list );
                 $self->__print_previous_page( $opt, $list );
             }
         }
-        elsif (  $key == VK_PAGE_DOWN || $key == CONTROL_F ) {
+        elsif ( $key == VK_PAGE_DOWN || $key == CONTROL_F ) {
             $k = 1;
             if ( $self->{i}{page} == $self->{i}{pages} ) {
                 if ( $self->{i}{curr_row} == $#$list ) {
@@ -781,15 +735,18 @@ sub fill_form {
                     $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} );
                     $self->{plugin}->__down( $self->{i}{end_row} - $self->{i}{curr_row} );
                     $self->{i}{curr_row} = $self->{i}{end_row};
-                    ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+                    ( $str, $pos ) = $self->__string_and_pos( $list );
                 }
             }
             else {
                 $self->{plugin}->__up( $self->{i}{curr_row} - $self->{i}{begin_row} );
                 $self->{i}{curr_row} = $self->{i}{end_row} + 1;
-                ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+                ( $str, $pos ) = $self->__string_and_pos( $list );
                 $self->__print_next_page( $opt, $list );
             }
+        }
+        elsif ( $key == VK_INSERT ) {
+            $self->{i}{beep} = 1;
         }
         else {
             $key = chr $key;
@@ -816,9 +773,6 @@ sub fill_form {
                     $self->{plugin}->__clear_lines_to_end_of_screen();
                     splice @$list, 0, @{$self->{i}{pre}};
                     $self->__reset_term();
-                    if ( $self->{compat} || ! defined $self->{compat} && $ENV{READLINE_SIMPLE_COMPAT} ) {
-                        return [ map { [ $_->[0], encode( 'console_in', $_->[1] ) ] } @$list ];
-                    }
                     return $list;
                 }
                 if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
@@ -826,14 +780,14 @@ sub fill_form {
                     $self->{plugin}->__clear_lines_to_end_of_screen();
                     my $cursor = 0; # cursor on {back}
                     $self->__write_first_screen( $opt, $list, $cursor, $auto_up );
-                    ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+                    ( $str, $pos ) = $self->__string_and_pos( $list );
                 }
                 elsif ( $self->{i}{curr_row} == $#$list ) {                                                             # if ENTER && {last row}: jumps to the {first data row/2}
                     $self->{plugin}->__up( $up );
                     $self->{plugin}->__clear_lines_to_end_of_screen();
                     my $cursor = scalar @{$self->{i}{pre}};                                                             # cursor on the first data row
                     $self->__write_first_screen( $opt, $list, $cursor, $auto_up );
-                    ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+                    ( $str, $pos ) = $self->__string_and_pos( $list );
                     $self->{i}{lock_ENTER} = 1;                                                                         # set lock_ENTER when jumped automatically from the {last row} to the {first data row/2}
                 }
                 else {
@@ -843,7 +797,7 @@ sub fill_form {
                         next KEY;
                     }
                      $self->{i}{curr_row}++;
-                    ( $str, $pos ) = $self->__gcstring_and_pos( $list );                                                # or go to the next row if not on the last row
+                    ( $str, $pos ) = $self->__string_and_pos( $list );                                                  # or go to the next row if not on the last row
                     if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {
                         $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} - 1 );
                         $self->{plugin}->__down( 1 );
@@ -953,7 +907,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.316
+Version 0.321
 
 =cut
 
@@ -988,7 +942,7 @@ The output is removed after leaving the method, so the user can decide what rema
 
 C<BackSpace> or C<Strg-H>: Delete the character behind the cursor.
 
-C<Delete> or C<Strg-D>: Delete  the  character at point. Return nothing if the input puffer is empty.
+C<Delete> or C<Strg-D>: Delete  the  character at point. C<readline>: return nothing if the input puffer is empty.
 
 C<Strg-U>: Delete the text backward from the cursor to the beginning of the line.
 
@@ -1019,46 +973,6 @@ C<Page-Down> or C<Strg-F>: Move forward one page.
 The C<new> method returns a C<Term::Form> object.
 
     my $new = Term::Form->new();
-
-=head2 config DEPRECATED
-
-This method is deprecated and will be removed.
-
-The method C<config> overwrites the defaults for the current C<Term::Form> object.
-
-    $new->config( \%options );
-
-The available options are: the options from C<readline> and C<fill_form> and
-
-=over
-
-=item
-
-compat
-
-If I<compat> is set to C<1>, the return value of C<readline> is not decoded else the return value of C<readline>
-is decoded. With C<fill_form> the second elements (values) of the arrays are returned encoded if I<compat> is set to
-C<1>, else they are returned decoded.
-
-Setting the environment variable READLINE_SIMPLE_COMPAT to a true value has the same effect as setting I<compat> to C<1>
-unless I<compat> is defined. If I<compat> is defined, READLINE_SIMPLE_COMPAT has no meaning.
-
-Allowed values: C<0> or C<1>.
-
-default: no set
-
-=item
-
-reinit_encoding
-
-To get the right encoding C<Term::Form> uses L<Encode::Locale>. Passing an encoding to I<reinit_encoding>
-changes the encoding reported by C<Encode::Locale>. See L<Encode::Locale/reinit-encoding> for more details.
-
-Allowed values: an encoding which is recognized by the L<Encode> module.
-
-default: not set
-
-=back
 
 =head2 readline
 

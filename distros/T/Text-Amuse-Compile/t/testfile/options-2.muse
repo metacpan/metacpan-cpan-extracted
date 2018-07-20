@@ -1,0 +1,30 @@
+#title Test
+#lang en
+
+* Part
+
+** Chap
+
+*** Section
+
+First [1]
+
+**** Subsection
+
+***** Subsubsection
+
+* Part
+
+** Chap
+
+*** Section
+
+Second [2]
+
+**** Subsection
+
+***** Subsubsection
+
+[1] First
+
+[2] Second

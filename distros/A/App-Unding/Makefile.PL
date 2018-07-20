@@ -22,17 +22,18 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Crypt::Blowfish" => 0,
     "Crypt::CBC" => 0,
+    "Cwd" => 0,
     "Data::Serializer" => 0,
+    "File::Copy" => 0,
     "File::Slurp" => 0,
     "Term::ReadKey" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "File::Copy" => 0,
     "Test::Script" => "1.10"
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Crypt::Blowfish" => 0,
   "Crypt::CBC" => 0,
+  "Cwd" => 0,
   "Data::Serializer" => 0,
   "File::Copy" => 0,
   "File::Slurp" => 0,

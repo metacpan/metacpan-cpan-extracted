@@ -1,5 +1,12 @@
 Revision history for App-Unding
  
+0.006     2018-07-18 23:27:53+02:00 Europe/Zurich
+ - warn before overwriting data
+ - ask password twice when writing
+ - show password prompt
+ - copy script to current working directory, if now writable
+ - updated minor details in docs
+
 0.005     2018-06-16 16:58:54+02:00 Europe/Zurich
  - use ReadLine form Term::ReadKey instead of <>
  - move source repository to gitlab

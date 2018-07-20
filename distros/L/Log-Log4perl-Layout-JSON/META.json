@@ -4,7 +4,7 @@
       "Michael Schout <mschout@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -66,7 +66,7 @@
    "provides" : {
       "Log::Log4perl::Layout::JSON" : {
          "file" : "lib/Log/Log4perl/Layout/JSON.pm",
-         "version" : "0.54"
+         "version" : "0.55"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,8 @@
          "web" : "https://github.com/mschout/Log-Log4perl-Layout-JSON"
       }
    },
-   "version" : "0.54",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.55",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

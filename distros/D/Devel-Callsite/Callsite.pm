@@ -3,10 +3,23 @@ use 5.005;
 use vars qw($VERSION);
 use XSLoader;
 use base qw(Exporter);
-$VERSION = '0.10';
-@EXPORT = qw/callsite context/;
+$VERSION = '1.0.1';
+if ($] >= 5.026) {
+    @EXPORT = qw/callsite context addr_to_op caller_nextop/;
+} else {
+    @EXPORT = qw/callsite context/;
+}
 
 XSLoader::load __PACKAGE__;
+
+BEGIN {
+    if ($] >= 5.026) {
+	sub caller_nextop {
+	    my $level = ($#_ ? shift : 0) + 1;
+	    return addr_to_op(callsite($level));
+	}
+    }
+}
 
 # Demo code
 unless (caller) {
@@ -14,7 +27,13 @@ unless (caller) {
   printf "OP location: 0x%x\n", $site->(); # prints caller OP location
   printf "OP location: 0x%x\n", $site->(); # prints a different OP location
 
-  print context(), "\n"; # prints the interpreter context, an unsigned number
+  if ($] >= 5.026) {
+      my $get_op = sub { return caller_nextop() };
+      printf "OP is: %s\n", $get_op->();
+
+      # prints the interpreter context, an unsigned number
+      print "Expression context is: ", context(), "\n";
+  }
 }
 
 1;
@@ -41,23 +60,39 @@ Devel::Callsite - Get caller return OP address and Perl interpreter context
 
   use Devel::Callsite;
   my $site = sub { return callsite() };
-  printf "OP location: 0x%x\n", $site->(); # prints caller OP location
+  my $op_addr = $site->();
+  printf "OP location: 0x%x\n", $op_addr;   # prints caller OP location
   printf "OP location: 0x%x\n", $site->(); # prints a different OP location
-
 
   sub foo { return callsite(1) };
   sub bar { foo() };
   # print this OP location even though it is 2 levels up the call chain.
   printf "OP location: 0x%x\n", bar();
 
+  if ($] >= 5.025) {
+    printf "OP is: %s\n", addr_to_op($addr);
+    my $get_op = sub { return caller_nextop() };
+    printf "OP is now: %s\n", $get_op->();
+  }
+
   print context(), "\n"; # prints the interpreter context, an unsigned number
+
+Running the above gives:
+
+  OP location: 0x5572e41f89f8
+  OP location: 0x5572e421f5b0
+  OP is: B::NULL=SCALAR(0x5572e41d0578)
+  OP location: 0x5572e421f010
+  OP is now: B::LISTOP=SCALAR(0x5572e41d0578)
+  93951941730912
+
 
 =head1 DESCRIPTION
 
 =head2 callsite
 
-    $callsite = callsite()
-    $callsite = callsite($level)
+    $callsite = callsite();
+    $callsite = callsite($level);
 
 This function returns the the OP address of the caller, a
 number. It can take an optional integer specifying the number of
@@ -79,6 +114,26 @@ list context, it will return two numbers. The first is the ordinary
 return value; the second is the 'true' call site of the function in
 question, which may be different if C<DB::sub> is in use.
 
+=head2 addr_to_op
+
+I<For now this is only in 5.026 or greater>.
+
+    $op = caller_nextop();
+    $op = caller_nextop($level);
+
+=head2 caller_nextop
+
+I<For now this is only in 5.026 or greater>.
+
+    $op = caller_nextop();
+    $op = caller_nextop($level);
+
+This function returns the the C<B::OP>, not the address,
+of the next OP to get run after the call is made. It is equivalent to:
+
+    addr_to_op(callsite($level));
+
+
 =head2 context
 
     $context = context()
@@ -94,6 +149,9 @@ Ben Morrow conceived this and posted it to perl5-porters. Ted Zlatanov
 then turned it into a CPAN module which he maintained for the first 3
 revisions. Ben also added the level parameter to callsite.
 
+ikegami provided the function to turn the address into a real
+C<B::OP>.
+
 It is currently maintained (or not) by Rocky Bernstein.
 
 =head1 SEE ALSO
@@ -107,10 +165,11 @@ inside the debugger.
 Rocky Bernstein <rocky@cpan.org> (current maintainer)
 Ted Zlatanov <tzz@lifelogs.com>
 Ben Morrow
+ikegami
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013 Rocky Bernstein <rocky@cpan.org>, Ted Zlatanov,
+Copyright (C) 2013, 2018 Rocky Bernstein <rocky@cpan.org>, Ted Zlatanov,
 <tzz@lifelogs.com>, Ben Morrow
 
 This program is distributed WITHOUT ANY WARRANTY, including but not

@@ -1,6 +1,12 @@
 Revision history for Elasticsearch-Model
 
 
+
+0.1.4    2018-07-16
+    - Add has_non_attribute_mapping facility, to do such things as set
+      _source => {excludes} on a particular index, i.e., importer of
+      Elasticsearch::Model::Document.
+
 0.1.3    2018-07-06
     - Repair uninit error in index_settings
 

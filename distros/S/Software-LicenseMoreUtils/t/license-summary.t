@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use 5.10.1;
 
 use Test::More;
 use Test::Exception;
@@ -11,6 +12,7 @@ require_ok($class);
 my %expected = (
     'GPL-1' => qr!can be found in '/usr/share/common-licenses/GPL-1'!,
     'GPL-2' => qr!can be found in '/usr/share/common-licenses/GPL-2'!,
+    'LGPL-2.1' => qr!can be found in '/usr/share/common-licenses/LGPL-2\.1'.$!,
     'MIT'   => qr/^$/,
     'GPL-1+' =>  qr!any later version!
 );
@@ -30,8 +32,8 @@ sub my_summary_test {
     }
 
     my $expected_regexp = $lic->distribution eq 'debian' ? $expected{$short_name} : qr/^$/ ;
-
-    like($lic->summary, $expected_regexp, "$short_name summary");
+    my $summary = $lic->summary;
+    like($summary, $expected_regexp, "$short_name summary");
 }
 
 foreach my $short_name (sort keys %expected) {

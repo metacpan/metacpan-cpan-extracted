@@ -13,7 +13,7 @@
 
 package IO::Socket::SSL;
 
-our $VERSION = '2.056';
+our $VERSION = '2.058';
 
 use IO::Socket;
 use Net::SSLeay 1.46;
@@ -335,19 +335,19 @@ BEGIN {
 	    return if $err;
 	    return ($host,$port);
 	};
-	1;
+	'Socket';
     } || eval {
 	require Socket6;
 	Socket6::inet_pton( AF_INET6(),'::1') && AF_INET6() or die;
 	Socket6->import( qw/inet_pton NI_NUMERICHOST NI_NUMERICSERV/ );
 	# behavior different to Socket::getnameinfo - wrap
 	*_getnameinfo = sub { return Socket6::getnameinfo(@_); };
-	1;
-    };
+	'Socket6';
+    } || undef;
 
     # try IO::Socket::IP or IO::Socket::INET6 for IPv6 support
     $family_key = 'Domain'; # traditional
-    if ( $ip6 ) {
+    if ($ip6) {
 	# if we have IO::Socket::IP >= 0.31 we will use this in preference
 	# because it can handle both IPv4 and IPv6
 	if ( eval { 
@@ -367,17 +367,19 @@ BEGIN {
 	    constant->import( CAN_IPV6 => "IO::Socket::INET6" );
 	    $IOCLASS = "IO::Socket::INET6";
 	} else {
-	    $ip6 = 0;
+	    $ip6 = ''
 	}
     }
 
     # fall back to IO::Socket::INET for IPv4 only
-    if ( ! $ip6 ) {
+    if (!$ip6) {
 	@ISA = qw(IO::Socket::INET);
 	$IOCLASS = "IO::Socket::INET";
 	constant->import(CAN_IPV6 => '');
-	constant->import(NI_NUMERICHOST => 1);
-	constant->import(NI_NUMERICSERV => 2);
+	if (!defined $ip6) {
+	    constant->import(NI_NUMERICHOST => 1);
+	    constant->import(NI_NUMERICSERV => 2);
+	}
     }
 
     #Make $DEBUG another name for $Net::SSLeay::trace
@@ -1427,11 +1429,12 @@ sub stop_SSL {
 	# destroy allocated objects for SSL and untie
 	# do not destroy CTX unless explicitly specified
 	Net::SSLeay::free($ssl);
-	delete ${*$self}{_SSL_object};
 	if (my $cert = delete ${*$self}{'_SSL_certificate'}) {
 	    Net::SSLeay::X509_free($cert);
 	}
+	delete ${*$self}{_SSL_object};
 	${*$self}{'_SSL_opened'} = 0;
+	delete $SSL_OBJECT{$ssl};
 	untie(*$self);
     }
 
@@ -1903,6 +1906,11 @@ sub get_sslversion_int {
     return Net::SSLeay::version($ssl);
 }
 
+sub get_session_reused {
+    return Net::SSLeay::session_reused(
+	shift()->_get_ssl_object || return);
+}
+
 if ($can_ocsp) {
     no warnings 'once';
     *ocsp_resolver = sub {
@@ -2007,11 +2015,12 @@ sub can_ticket_keycb { return $can_tckt_keycb }
 
 sub DESTROY {
     my $self = shift or return;
-    my $ssl = ${*$self}{_SSL_object} or return;
-    delete $SSL_OBJECT{$ssl};
-    if (!$use_threads or delete $CREATED_IN_THIS_THREAD{$ssl}) {
-	$self->close(_SSL_in_DESTROY => 1, SSL_no_shutdown => 1)
-	    if ${*$self}{'_SSL_opened'};
+    if (my $ssl = ${*$self}{_SSL_object}) {
+	delete $SSL_OBJECT{$ssl};
+	if (!$use_threads or delete $CREATED_IN_THIS_THREAD{$ssl}) {
+	    $self->close(_SSL_in_DESTROY => 1, SSL_no_shutdown => 1)
+		if ${*$self}{'_SSL_opened'};
+	}
     }
     delete @{*$self}{@all_my_keys};
 }

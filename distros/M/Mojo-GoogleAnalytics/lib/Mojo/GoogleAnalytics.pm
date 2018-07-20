@@ -5,12 +5,13 @@ use Mojo::Collection;
 use Mojo::File 'path';
 use Mojo::GoogleAnalytics::Report;
 use Mojo::JSON qw(decode_json false true);
+use Mojo::Promise;
 use Mojo::JWT;
 use Mojo::UserAgent;
 
 use constant DEBUG => $ENV{MOJO_GA_DEBUG} || 0;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 our %QUERY_SORT_ORDER = (asc => 'ASCENDING', desc => 'DESCENDING', x => 'SORT_ORDER_UNSPECIFIED');
 
@@ -34,38 +35,10 @@ has view_id => '';
 
 sub authorize {
   my ($self, $cb) = @_;
-  my $prev = $self->authorization;
-  my $time = time;
-  my ($jwt, @ua_args);
-
-  warn "[RG::Google] Authorization exp: @{[$prev->{exp} ? $prev->{exp} : -1]} < $time\n" if DEBUG;
-
-  if ($prev->{exp} and $time < $prev->{exp}) {
-    $self->$cb('') if $cb;
-    return $self;
-  }
-
-  $ua_args[0] = Mojo::URL->new($self->{token_uri});
-  $jwt = Mojo::JWT->new->algorithm('RS256')->secret($self->private_key);
-
-  $jwt->claims(
-    {
-      aud   => $ua_args[0]->to_string,
-      exp   => $time + 3600,
-      iat   => $time,
-      iss   => $self->client_email,
-      scope => $self->{auth_scope},
-    }
-  );
-
-  push @ua_args, (form => {grant_type => 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion => $jwt->encode});
-  warn "[RG::Google] Authenticating with $ua_args[0] ...\n", if DEBUG;
+  my @ua_args = $self->_authorize_ua_args or return $self;
 
   if ($cb) {
-    Mojo::IOLoop->delay(
-      sub { $self->ua->post(@ua_args, shift->begin) },
-      sub { $self->$cb($self->_process_authorize_response(pop)) },
-    );
+    $self->ua->post(@ua_args, sub { $self->$cb($self->_process_authorize_response($_[1])) });
   }
   else {
     my ($err, $res) = $self->_process_authorize_response($self->ua->post(@ua_args));
@@ -73,6 +46,16 @@ sub authorize {
   }
 
   return $self;
+}
+
+sub authorize_p {
+  my $self = shift;
+
+  return Mojo::Promise->new->resolve unless my @ua_args = $self->_authorize_ua_args;
+  return $self->ua->post_p(@ua_args)->then(sub {
+    my $err = $self->_process_authorize_response($_[0]);
+    return $err ? Mojo::Promise->new->reject($err) : ();
+  });
 }
 
 sub batch_get {
@@ -83,26 +66,30 @@ sub batch_get {
     json => {reportRequests => ref $query eq 'ARRAY' ? $query : [$query]});
 
   if ($cb) {
-    Mojo::IOLoop->delay(
-      sub { $self->authorize(shift->begin) },
-      sub {
-        my ($delay, $err) = @_;
-        return $self->$cb($err, {}) if $err;
-        warn "[RG::Google] Getting analytics data from $ua_args[0] ...\n", if DEBUG;
-        $ua_args[1] = {Authorization => $self->authorization->{header}};
-        $self->ua->post(@ua_args, $delay->begin);
-      },
-      sub { $self->$cb($self->_process_batch_get_response($query, pop)) }
-    );
-    return $self;
+    my $p = $self->authorize_p->then(sub {
+      warn "[GoogleAnalytics] Getting analytics data from $ua_args[0] ...\n", if DEBUG;
+      $ua_args[1] = {Authorization => $self->authorization->{header}};
+      return $self->ua->post_p(@ua_args);
+    })->then(sub {
+      my $res = $self->_process_batch_get_response($query, shift);
+      return ref $cb ? $self->$cb('', $res) : $res;
+    })->catch(sub {
+      return ref $cb ? $self->$cb(shift, {}) : shift;
+    });
+
+    return ref $cb ? $self : $p;
   }
   else {
     $ua_args[1] = {Authorization => $self->authorize->authorization->{header}};
-    warn "[RG::Google] Getting analytics data from $ua_args[0] ...\n", if DEBUG;
+    warn "[GoogleAnalytics] Getting analytics data from $ua_args[0] ...\n", if DEBUG;
     my ($err, $res) = $self->_process_batch_get_response($query, $self->ua->post(@ua_args));
     die $err if $err;
     return $res;
   }
+}
+
+sub batch_get_p {
+  shift->batch_get(shift, 1);
 }
 
 sub from_file {
@@ -122,18 +109,82 @@ sub get_report {
   return $self->batch_get($self->_query_translator(%$query), $cb);
 }
 
-sub new {
-  my $class = shift;
-  my $file = @_ % 2 ? shift : undef, my $self = $class->SUPER::new(@_);
-  $self->from_file($file) if $file;
-  return _defaults($self);
+sub get_report_p {
+  my ($self, $query) = @_;
+  $self->batch_get_p($self->_query_translator(%$query));
 }
 
-sub _defaults {
-  $_[0]->{token_uri}     ||= 'https://accounts.google.com/o/oauth2/token';
-  $_[0]->{auth_scope}    ||= 'https://www.googleapis.com/auth/analytics.readonly';
-  $_[0]->{batch_get_uri} ||= 'https://analyticsreporting.googleapis.com/v4/reports:batchGet';
-  $_[0];
+sub new {
+  my $class = shift;
+  my $file  = @_ % 2 ? shift : undef;
+  my $self  = $class->SUPER::new(@_);
+
+  $self->from_file($file) if $file;
+  $self->{token_uri}     ||= 'https://accounts.google.com/o/oauth2/token';
+  $self->{auth_scope}    ||= 'https://www.googleapis.com/auth/analytics.readonly';
+  $self->{batch_get_uri} ||= 'https://analyticsreporting.googleapis.com/v4/reports:batchGet';
+  $self->mock if $ENV{TEST_MOJO_GA_BATCH_GET_DIR};
+
+  return $self;
+}
+
+sub mock {
+  my ($self, $args) = @_;
+  $self->{batch_get_dir} = $args->{batch_get_dir} // $ENV{TEST_MOJO_GA_BATCH_GET_DIR} // File::Spec->tmpdir;
+
+  require Mojolicious;
+  my $server = $self->ua->server;
+  $server->app(Mojolicious->new) unless $server->app;
+
+  my $mock_r = $server->app->routes;
+  Scalar::Util::weaken($self);
+  for my $name (qw(batch_get_uri token_uri)) {
+    my $cb = $self->can("_mocked_action_$name");
+    $self->{$name} = sprintf '/mocked/ga%s', Mojo::URL->new($self->{$name})->path;
+    $mock_r->any($self->{$name} => $args->{$name} || sub { $self->$cb(@_) })->name($name) unless $mock_r->lookup($name);
+  }
+
+  return $self;
+}
+
+sub _authorize_ua_args {
+  my $self = shift;
+  my $time = time;
+  my $prev = $self->authorization;
+  my ($jwt, @ua_args);
+
+  warn "[GoogleAnalytics] Authorization exp: @{[$prev->{exp} ? $prev->{exp} : -1]} < $time\n" if DEBUG;
+  return if $prev->{exp} and $time < $prev->{exp};
+
+  $ua_args[0] = Mojo::URL->new($self->{token_uri});
+  $jwt = Mojo::JWT->new->algorithm('RS256')->secret($self->private_key);
+
+  $jwt->claims({
+    aud   => $ua_args[0]->to_string,
+    exp   => $time + 3600,
+    iat   => $time,
+    iss   => $self->client_email,
+    scope => $self->{auth_scope},
+  });
+
+  push @ua_args, (form => {grant_type => 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion => $jwt->encode});
+  warn "[GoogleAnalytics] Authenticating with $ua_args[0] ...\n", if DEBUG;
+
+  return @ua_args;
+}
+
+sub _mocked_action_batch_get_uri {
+  my ($self, $c) = @_;
+  my $file = Mojo::File::path($self->{batch_get_dir}, sprintf '%s.json', Mojo::Util::md5_sum($c->req->text));
+
+  warn "[GoogleAnalytics] Reading dummy response file $file (@{[-r $file ? 1 : 0]})\n" if DEBUG;
+  return $c->render(data => $file->slurp) if -r $file;
+  return $c->render(json => {error => {message => qq(Could not read dummy response file "$file".)}}, status => 500);
+}
+
+sub _mocked_action_token_uri {
+  my ($self, $c) = @_;
+  $c->render(json => {access_token => 'some-dummy-token', expires_in => 3600, token_type => 'Bearer'});
 }
 
 sub _process_authorize_response {
@@ -145,10 +196,10 @@ sub _process_authorize_response {
   if ($err) {
     $err = sprintf '%s >>> %s (%s)', $url, $res->{error_description} || $err->{message} || 'Unknown error',
       $err->{code} || 0;
-    warn "[RG::Google] $err\n", if DEBUG;
+    warn "[GoogleAnalytics] $err\n", if DEBUG;
   }
   else {
-    warn "[RG::Google] Authenticated with $url\n", if DEBUG;
+    warn "[GoogleAnalytics] Authenticated with $url\n", if DEBUG;
     $self->authorization(
       {exp => time + ($res->{expires_in} - 600), header => "$res->{token_type} $res->{access_token}"});
   }
@@ -236,7 +287,7 @@ Mojo::GoogleAnalytics - Extract data from Google Analytics using Mojo UserAgent
 
   my $ga     = Mojo::GoogleAnalytics->new("/path/to/credentials.json");
   my $report = $ga->batch_get({
-    viewId     => "ga:152749100",
+    viewId     => "ga:123456789",
     dateRanges => [{startDate => "7daysAgo", endDate => "1daysAgo"}],
     dimensions => [{name => "ga:country"}, {name => "ga:browser"}],
     metrics    => [{expression => "ga:pageviews"}, {expression => "ga:sessions"}],
@@ -297,7 +348,7 @@ Holds a L<Mojo::UserAgent> object.
 =head2 view_id
 
   $str = $self->view_id;
-  $self = $self->view_id("ga:152749100");
+  $self = $self->view_id("ga:123456789");
 
 Default C<viewId>, used by L</get_report>.
 
@@ -311,16 +362,28 @@ Default C<viewId>, used by L</get_report>.
 This method will set L</authorization>. Note that this method is automatically
 called from inside of L</batch_get>, unless already authorized.
 
+=head2 authorize_p
+
+  $promise = $self->authorize_p;
+
+Same as L</authorize>, but returns a L<Mojo::Promise>.
+
 =head2 batch_get
 
-  $report = $self->batch_get($query);
-  $self = $self->batch_get($query, sub { my ($self, $err, $report) = @_ });
+  $report = $self->batch_get(\%query);
+  $self = $self->batch_get(\%query, sub { my ($self, $err, $report) = @_ });
 
 Used to extract data from Google Analytics. C<$report> will be a
 L<Mojo::Collection> if C<$query> is an array ref, and a single
 L<Mojo::GoogleAnalytics::Report> object if C<$query> is a hash.
 
 C<$err> is a string on error and false value on success.
+
+=head2 batch_get_p
+
+  $promise = $self->batch_get_p(\%query);
+
+Same as L</batch_get>, but returns a L<Mojo::Promise>.
 
 =head2 from_file
 
@@ -345,8 +408,8 @@ listed above.
 
 =head2 get_report
 
-  $report = $self->get_report($query);
-  $self = $self->get_report($query, sub { my ($self, $err, $report) = @_ });
+  $report = $self->get_report(\%query);
+  $self = $self->get_report(\%query, sub { my ($self, $err, $report) = @_ });
 
 This method is the same as L</batch_get>, but will do some translations on the
 input queries before passing it on to L</batch_get>. Example:
@@ -427,6 +490,12 @@ C<viewId> will be set from L</view_id> if not present in the query.
 
 =back
 
+=head2 get_report_p
+
+  $promise = $selfg->get_report_p(\%query);
+
+Same as L</get_report>, but returns a L<Mojo::Promise>.
+
 =head2 new
 
   $self = Mojo::GoogleAnalytics->new(%attrs);
@@ -435,6 +504,41 @@ C<viewId> will be set from L</view_id> if not present in the query.
 
 Used to construct a new L<Mojo::GoogleAnalytics> object. Calling C<new()> with
 a single argument will cause L</from_file> to be called with that argument.
+
+=head2 mock
+
+  $self = $self->mock;
+  $self = $self->mock({batch_get_dir => "/path/to/some/dir"});
+  $self = $self->mock({batch_get_uri => sub { my ($self, $c) = @_; }, token_uri => sub { my ($self, $c) = @_; }});
+
+This method is useful when you want to test your application, but you don't
+want to ask Google for reports. C<mock()> will be automatically called by
+L</new> if the C<TEST_MOJO_GA_BATCH_GET_DIR> environment variable i set. The
+arguments passed on to this method can be:
+
+=over 2
+
+=item * batch_get_dir
+
+Need to be an absolute path to a directory with the dummy response files for
+L</batch_get>.
+
+Defaults to C<TEST_MOJO_GA_BATCH_GET_DIR> environment variable.
+
+=item * batch_get_uri
+
+A code ref that is used as an L<Mojolicious> action. The default code ref
+provided by this module will look for a response file in C<batch_get_dir> with
+the name C<$md5_sum.json>, where the MD5 sum is calculated from the JSON
+request body. It will respond with an error message with the full path of the
+expected file, unless the file could be read.
+
+=item * token_uri
+
+A code ref that is used as an L<Mojolicious> action. The default code ref will
+respond with a dummy bearer token and log you in.
+
+=back
 
 =head1 AUTHOR
 

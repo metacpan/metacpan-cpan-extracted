@@ -15,6 +15,12 @@ sub _build_shortname {
     return lc($name);
 }
 
+has non_attribute_mapping => (
+    is => 'rw',
+    isa => 'HashRef',
+    default => sub {{}},
+);
+
 has _all_properties => (
     is      => 'ro',
     lazy    => 1,
@@ -46,6 +52,7 @@ sub mapping {
     my $self   = shift;
     my $props  = { map { $_->mapping } $self->get_all_properties };
     return {
+        (keys %{$self->non_attribute_mapping} ? %{$self->non_attribute_mapping} : ()),
         properties => $props,
         map { $_->type_mapping } $self->get_all_properties,
     };

@@ -5,7 +5,7 @@
 
 package JCM::Boilerplate;
 # ABSTRACT: Default Boilerplate for Joelle Maslak's Code
-$JCM::Boilerplate::VERSION = '2.181940';
+$JCM::Boilerplate::VERSION = '2.182001';
 use strict;
 use warnings;
 
@@ -92,7 +92,7 @@ JCM::Boilerplate - Default Boilerplate for Joelle Maslak's Code
 
 =head1 VERSION
 
-version 2.181940
+version 2.182001
 
 =head1 SYNOPSIS
 

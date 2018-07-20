@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::SettingsLoader;
-$Maven::SettingsLoader::VERSION = '1.14';
+$Maven::SettingsLoader::VERSION = '1.15';
 # ABSTRACT: The loader for settings files
 # PODNAME: Maven::SettingsLoader
 
@@ -153,7 +153,7 @@ Maven::SettingsLoader - The loader for settings files
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

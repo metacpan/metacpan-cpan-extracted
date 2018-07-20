@@ -4,6 +4,7 @@ LICENSE
 META.json
 README.md
 cpanfile
+data/Hoenn.yaml
 data/Johto.yaml
 data/Kanto.yaml
 data/LV.yaml
@@ -21,8 +22,8 @@ lib/Data/Pokemon/Go/Skill.pm
 minil.toml
 t/00_compile.t
 t/01_relations.t
-t/02_IV.t
-t/03_skills.t
-t/04_pokemon.t
+t/02_skills.t
+t/03_pokemon.t
+t/04_IV.t
 META.yml
 MANIFEST

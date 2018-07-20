@@ -1,5 +1,11 @@
 Revision history for Devel-Callsite
 
+1.0.1 - July 17, 2018
+- Fixed botched release: caller_nextop and op_to_addr need Perl 5.26 or greater
+
+1.0.0 - July 17, 2018
+- Add: caller_nextop and op_to_addr
+
 0.10 - Mar 19, 2017
 
 - Botched 0.09 release - add ppport.h to

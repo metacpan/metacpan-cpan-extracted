@@ -1,9 +1,8 @@
 #!perl
 
+use v5.10.1;
 use strict;
 use warnings FATAL => 'all';
-
-use Getopt::Long qw(:config no_ignore_case bundling);
 
 use Sport::Analytics::NHL::LocalConfig;
 use Sport::Analytics::NHL;
@@ -20,8 +19,6 @@ my @accepts_args = (
 	}
 );
 
-use Data::Dumper;
-
 my $what_it_does = 'Scrape the NHL games and store them';
 my $opts = gopts($what_it_does, \@accepts_opts, \@accepts_args);
 my $hockeydb = Sport::Analytics::NHL->new($opts);
@@ -33,9 +30,8 @@ scrape - scrape the NHL website for games
 
 =head1 SYNOPSIS
 
- cognac: ~/RP/hockeydb>p1 scripts/scrape -h
  Scrape the NHL games and store them
- Usage: scripts/scrape [Options] Arguments
+ Usage: scrape [Options] Arguments
 
  Options:
 	-h|--help                       print this message and exit
@@ -46,10 +42,12 @@ scrape - scrape the NHL website for games
 	-S|--stop-season     SEASON     Stop at season SEASON (default 2018)
 	-T|--start-season    STAGE      Scrape stage STAGE (2: REGULAR, 3: PLAYOFF, default: 3
 	--no-database                   Do not use a MongoDB backend
-	-D|--database        DB         Use Mongo database DB (default hockey)
+	-D|--database        DB         Use Mongo database DB (default hockeytest)
+	-E|--data-dir        DIR        Data directory root (default /misc/nhl)
+	-f|--force                      override/overwrite existing data
+	--no-schedule-crawl             Try to use schedule already present in the system
  Arguments:
 	GAME_IDS             The NHL 10-digit game ids or HDB 9-digit game ids or YYYYMMDD dates
-
 
 =cut
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::DistributionManagement;
-$Maven::Xml::Pom::DistributionManagement::VERSION = '1.14';
+$Maven::Xml::Pom::DistributionManagement::VERSION = '1.15';
 # ABSTRACT: Maven DistributionManagement element
 # PODNAME: Maven::Xml::Pom::DistributionManagement
 
@@ -37,7 +37,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Pom::DistributionManagement::Repository;
-$Maven::Xml::Pom::DistributionManagement::Repository::VERSION = '1.14';
+$Maven::Xml::Pom::DistributionManagement::Repository::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -51,7 +51,7 @@ __PACKAGE__->mk_ro_accessors(
 );
 
 package Maven::Xml::Pom::DistributionManagement::Site;
-$Maven::Xml::Pom::DistributionManagement::Site::VERSION = '1.14';
+$Maven::Xml::Pom::DistributionManagement::Site::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -63,7 +63,7 @@ __PACKAGE__->mk_ro_accessors(
 );
 
 package Maven::Xml::Pom::DistributionManagement::Relocation;
-$Maven::Xml::Pom::DistributionManagement::Relocation::VERSION = '1.14';
+$Maven::Xml::Pom::DistributionManagement::Relocation::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -87,7 +87,7 @@ Maven::Xml::Pom::DistributionManagement - Maven DistributionManagement element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

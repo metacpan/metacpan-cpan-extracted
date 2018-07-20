@@ -1,4 +1,7 @@
 Release history for Test-Deep-HashRec
 
+0.002     2018-07-16 08:57:25-04:00 America/Toronto
+        - drop the package{...} form for the sake of ancient perls
+
 0.001     2018-07-15 09:17:49-04:00 America/Toronto
         - first release

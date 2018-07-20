@@ -1,7 +1,7 @@
 %define module File-Lock-ParentLock
 
 Name: perl-%module
-Version: 0.05
+Version: 0.08
 Release: alt1
 BuildArch: noarch
 Packager: Igor Yu. Vlasenko <viy@altlinux.org>
@@ -12,9 +12,9 @@ License: GPL or Artistic
 Source: http://www.cpan.org/modules/by-module/RPM/%module-%version.tar.gz
 Url: http://search.cpan.org/dist/%module
 
+BuildRequires: /proc
 # Automatically added by buildreq on Wed Nov 06 2002
 BuildRequires: perl-devel perl(Pod/Usage.pm) perl-Proc-ProcessTable perl-podlators perl(Module/Build/Tiny.pm) perl(Test/More.pm)
-BuildRequires: /proc
 
 %description
 File::Lock::ParentLock allows sharing a lock among child processes
@@ -39,6 +39,15 @@ parent - child relationship.
 %_man1dir/*
 
 %changelog
+* Thu Jul 19 2018 Igor Vlasenko <viy@altlinux.ru> 0.08-alt1
+- new version
+
+* Thu Jul 19 2018 Igor Vlasenko <viy@altlinux.ru> 0.07-alt1
+- new version
+
+* Mon Jul 16 2018 Igor Vlasenko <viy@altlinux.ru> 0.06-alt1
+- new version
+
 * Tue Oct 25 2016 Igor Vlasenko <viy@altlinux.ru> 0.05-alt1
 - new version
 

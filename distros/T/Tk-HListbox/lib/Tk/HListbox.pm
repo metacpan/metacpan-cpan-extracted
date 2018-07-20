@@ -144,7 +144,7 @@ or both an image or text.
 Specifies the reference of a variable. The value of the variable is an array 
 to be displayed inside the widget; if the variable value changes then the 
 widget will automatically update itself to reflect the new value. Attempts 
-Attempts to unset a variable in use as a -listvariable may fail without error.
+to unset a variable in use as a -listvariable may fail without error.
 
 The listvariable reference is "TIEd" to the HListbox widget just as if one 
 has done: "tie @listvariable, 'Tk::HListbox', $HListboxwidget, (ReturnType => 'index);" 
@@ -193,6 +193,10 @@ large enough to hold all the elements in the listbox.
 =over 4
 
 =item Name:	B<activeStyle>
+
+=item Class:	B<ActiveStyle>
+
+=item Switch:	B<-activestyle>
 
 Ignored (not implemented in HList).
 
@@ -1083,7 +1087,7 @@ use Tk;
 use Tk::ItemStyle;
 use base qw(Tk::Derived Tk::HList);
 use vars qw($VERSION @Selection $Prev $tixIndicatorArmed);
-$VERSION = '2.0';
+$VERSION = '2.1';
 
 Tk::Widget->Construct('HListbox');
 
@@ -1167,11 +1171,11 @@ sub Populate {
 			-updatecommand => ['CALLBACK'],
 			-xscancommand  => ['CALLBACK'],
 			-parent        => [qw/SELF parent parent/, undef],
-#			-itemtype       => [qw/PASSIVE itemtype Itemtype text/],
-			-itemtype       => [qw/PASSIVE itemType ItemType text/],
-			-indicatorcmd  =>  ['CALLBACK'],
+			-itemtype      => [qw/PASSIVE itemType ItemType text/],
+			-indicatorcmd  => ['CALLBACK'],
 			-activestyle   => [qw/PASSIVE activeStyle ActiveStyle underline/],  #CURRENTLY IGNORED.
 			-listvariable  => [qw/PASSIVE listVariable Variable undef/],
+			-state         => [qw/PASSIVE  state   State    normal/],
 	);
 
 	#EMULATE "-listvariable" USING THE TIE FEATURE:
@@ -1322,10 +1326,13 @@ sub size {
 
 sub get {
 	my ($w, @indx) = @_;
-	if (defined $indx[1]) {
+	if (!defined $indx[0]) {   #FORCE TO FAIL IF NO ARGS GIVEN, LIKE Tk::Listbox->get()!:
+		warn "HListbox.get() wrong # args: should be 1 or 2: (firstIndex ?lastIndex?)!";
+		return undef;
+	} elsif (defined $indx[1]) {   #WE HAVE 2 ARGUMENTS (INDICES), WILL RETURN A LIST:
 		my @colData = ();
 		my $first = $w->getEntry($indx[0]);
-		my $last = defined($indx[1]) ? $w->getEntry($indx[1]) : $first;
+		my $last = $w->getEntry($indx[1]);
 		$last = 999999  if ($last =~ /^end/io);
 		my $next = $first;
 		while ($w->info('exists', $next)) {
@@ -1333,8 +1340,9 @@ sub get {
 			$next = $w->info('next', $next);
 		}
 		return @colData;
-	} else {
-		return $w->info('data', $w->getEntry($indx[0]));
+	} else {   #WE HAVE ONLY 1 ARGUMENT (INDEX), RETURN VALID ENTRY OR '':
+		my $entry = $w->info('data', $w->getEntry($indx[0]));
+		return (defined $entry) ? $entry : '';
 	}
 }
 
@@ -1785,7 +1793,6 @@ sub UpDown   #USER PRESSED AN UP OR DOWN ARROW KEY:
 }
 
 sub selectionIncludes {
-#print "-???- selectionIncludes($_[1]): Entry=".$_[0]->getEntry($_[1])."=\n";
 	return 0 unless ($_[0]->index($_[1]) =~ /\d/o);
 	return $_[0]->Tk::HList::selectionIncludes($_[0]->getEntry($_[1]));
 }
@@ -1843,6 +1850,7 @@ sub BeginSelect   #Mouse button-press (button 1)
 		$w->Callback(-indicatorcmd => $el, '<Arm>');
 		return;
 	}
+
 	#TOGGLE SELECTION STATUS, SET ANCHOR IF "extended":
 	if ($w->cget('-selectmode') =~ /^(?:multiple|extended)/o) {
 		if ($w->selectionIncludes($el)) {  #TOGGLE SELECT-STATUS OF ENTRY CLICKED ON:
@@ -1865,7 +1873,6 @@ sub BeginSelect   #Mouse button-press (button 1)
 	}
 	@Selection = ();
 	$Prev = $el;
-#	$w->focus  if ($w->cget('-takefocus'));
 	$w->eventGenerate("<<ListboxSelect>>");
 }
 

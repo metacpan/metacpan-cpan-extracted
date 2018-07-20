@@ -2,7 +2,7 @@ package Math::Business::BlackScholesMerton::Binaries;
 use strict;
 use warnings;
 
-our $VERSION = '1.23';    ## VERSION
+our $VERSION = '1.24';    ## VERSION
 #
 my $SMALLTIME = 1 / (60 * 60 * 24 * 365);    # 1 second in years;
 

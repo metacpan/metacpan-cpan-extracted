@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.30'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,124 +17,127 @@ name: URI-db
 provides:
   URI::cassandra:
     file: lib/URI/cassandra.pm
-    version: '0.18'
+    version: '0.19'
   URI::couch:
     file: lib/URI/couch.pm
-    version: '0.18'
+    version: '0.19'
   URI::couchdb:
     file: lib/URI/couchdb.pm
-    version: '0.18'
+    version: '0.19'
   URI::cubrid:
     file: lib/URI/cubrid.pm
-    version: '0.18'
+    version: '0.19'
   URI::db:
     file: lib/URI/db.pm
-    version: '0.18'
+    version: '0.19'
   URI::db2:
     file: lib/URI/db2.pm
-    version: '0.18'
+    version: '0.19'
   URI::derby:
     file: lib/URI/derby.pm
-    version: '0.18'
+    version: '0.19'
   URI::exasol:
     file: lib/URI/exasol.pm
-    version: '0.18'
+    version: '0.19'
   URI::firebird:
     file: lib/URI/firebird.pm
-    version: '0.18'
+    version: '0.19'
   URI::hive:
     file: lib/URI/hive.pm
-    version: '0.18'
+    version: '0.19'
   URI::impala:
     file: lib/URI/impala.pm
-    version: '0.18'
+    version: '0.19'
   URI::informix:
     file: lib/URI/informix.pm
-    version: '0.18'
+    version: '0.19'
   URI::ingres:
     file: lib/URI/ingres.pm
-    version: '0.18'
+    version: '0.19'
   URI::interbase:
     file: lib/URI/interbase.pm
-    version: '0.18'
+    version: '0.19'
   URI::ldapdb:
     file: lib/URI/ldapdb.pm
-    version: '0.18'
+    version: '0.19'
   URI::maria:
     file: lib/URI/maria.pm
-    version: '0.18'
+    version: '0.19'
   URI::mariadb:
     file: lib/URI/mariadb.pm
-    version: '0.18'
+    version: '0.19'
   URI::max:
     file: lib/URI/max.pm
-    version: '0.18'
+    version: '0.19'
   URI::maxdb:
     file: lib/URI/maxdb.pm
-    version: '0.18'
+    version: '0.19'
   URI::monet:
     file: lib/URI/monet.pm
-    version: '0.18'
+    version: '0.19'
   URI::monetdb:
     file: lib/URI/monetdb.pm
-    version: '0.18'
+    version: '0.19'
   URI::mongo:
     file: lib/URI/mongo.pm
-    version: '0.18'
+    version: '0.19'
   URI::mongodb:
     file: lib/URI/mongodb.pm
-    version: '0.18'
+    version: '0.19'
   URI::mssql:
     file: lib/URI/mssql.pm
-    version: '0.18'
+    version: '0.19'
   URI::mysql:
     file: lib/URI/mysql.pm
-    version: '0.18'
+    version: '0.19'
   URI::oracle:
     file: lib/URI/oracle.pm
-    version: '0.18'
+    version: '0.19'
   URI::pg:
     file: lib/URI/pg.pm
-    version: '0.18'
+    version: '0.19'
   URI::pgsql:
     file: lib/URI/pgsql.pm
-    version: '0.18'
+    version: '0.19'
   URI::pgxc:
     file: lib/URI/pgxc.pm
-    version: '0.18'
+    version: '0.19'
   URI::postgres:
     file: lib/URI/postgres.pm
-    version: '0.18'
+    version: '0.19'
   URI::postgresql:
     file: lib/URI/postgresql.pm
-    version: '0.18'
+    version: '0.19'
   URI::postgresxc:
     file: lib/URI/postgresxc.pm
-    version: '0.18'
+    version: '0.19'
   URI::redshift:
     file: lib/URI/redshift.pm
-    version: '0.18'
+    version: '0.19'
+  URI::snowflake:
+    file: lib/URI/snowflake.pm
+    version: '0.19'
   URI::sqlite:
     file: lib/URI/sqlite.pm
-    version: '0.18'
+    version: '0.19'
   URI::sqlite3:
     file: lib/URI/sqlite3.pm
-    version: '0.18'
+    version: '0.19'
   URI::sqlserver:
     file: lib/URI/sqlserver.pm
-    version: '0.18'
+    version: '0.19'
   URI::sybase:
     file: lib/URI/sybase.pm
-    version: '0.18'
+    version: '0.19'
   URI::teradata:
     file: lib/URI/teradata.pm
-    version: '0.18'
+    version: '0.19'
   URI::unify:
     file: lib/URI/unify.pm
-    version: '0.18'
+    version: '0.19'
   URI::vertica:
     file: lib/URI/vertica.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   URI: '1.40'
   URI::Nested: '0.10'
@@ -144,4 +147,5 @@ resources:
   homepage: https://search.cpan.org/dist/URI-db/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/theory/uri-db/
-version: '0.18'
+version: '0.19'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

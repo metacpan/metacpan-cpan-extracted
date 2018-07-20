@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Repository;
-$Maven::Repository::VERSION = '1.14';
+$Maven::Repository::VERSION = '1.15';
 # ABSTRACT: An repository from which to resolve artifacts
 # PODNAME: Maven::Repository
 
@@ -137,7 +137,7 @@ Maven::Repository - An repository from which to resolve artifacts
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

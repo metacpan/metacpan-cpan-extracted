@@ -6,7 +6,6 @@ use warnings;
 use Test::More;
 
 use_ok( 'Devel::MAT::Context' );
-use_ok( 'Devel::MAT::Dumper' );
 use_ok( 'Devel::MAT::Dumpfile' );
 use_ok( 'Devel::MAT::Graph' );
 use_ok( 'Devel::MAT::SV' );

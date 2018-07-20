@@ -1,0 +1,27 @@
+bin/epfl-net-ipv6-test
+Changes
+CONTRIBUTING.md
+ignore.txt
+lib/EPFL/Net/ipv6Test.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/01-mocksite.t
+t/02-check-ua.t
+t/03-web-api.t
+t/boilerplate.t
+t/manifest.t
+t/MockSite.pm
+t/pod-coverage.t
+t/pod.t
+t/resources/ipv6-test/webaaaa-bad.json
+t/resources/ipv6-test/webaaaa-good.json
+t/resources/ipv6-test/webdns-bad.json
+t/resources/ipv6-test/webdns-good.json
+t/resources/ipv6-test/webserver-bad.json
+t/resources/ipv6-test/webserver-good.json
+META.yml
+META.json
+Makefile.PL

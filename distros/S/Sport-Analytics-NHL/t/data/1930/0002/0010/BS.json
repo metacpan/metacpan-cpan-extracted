@@ -1,0 +1,2595 @@
+{
+  "copyright" : "NHL and the NHL Shield are registered trademarks of the National Hockey League. NHL and NHL team marks are the property of the NHL and its teams. Â© NHL 2018. All Rights Reserved.",
+  "gamePk" : 1930020010,
+  "link" : "/api/v1/game/1930020010/feed/live",
+  "metaData" : {
+    "wait" : 10,
+    "timeStamp" : "20170920_100229"
+  },
+  "gameData" : {
+    "game" : {
+      "pk" : 1930020010,
+      "season" : "19301931",
+      "type" : "R"
+    },
+    "datetime" : {
+      "dateTime" : "1930-11-17T01:00:00Z"
+    },
+    "status" : {
+      "abstractGameState" : "Final",
+      "codedGameState" : "7",
+      "detailedState" : "Final",
+      "statusCode" : "7",
+      "startTimeTBD" : false
+    },
+    "teams" : {
+      "away" : {
+        "id" : 43,
+        "name" : "Montreal Maroons",
+        "link" : "/api/v1/teams/43",
+        "abbreviation" : "MMR",
+        "triCode" : "MMR",
+        "teamName" : "Maroons",
+        "locationName" : "Montreal",
+        "firstYearOfPlay" : "1924",
+        "division" : {
+          "id" : 7,
+          "name" : "Canadian",
+          "link" : "/api/v1/divisions/7"
+        },
+        "franchise" : {
+          "franchiseId" : 7,
+          "teamName" : "Maroons",
+          "link" : "/api/v1/franchises/7"
+        },
+        "franchiseId" : 7,
+        "active" : false
+      },
+      "home" : {
+        "id" : 44,
+        "name" : "New York Americans",
+        "link" : "/api/v1/teams/44",
+        "abbreviation" : "NYA",
+        "triCode" : "NYA",
+        "teamName" : "Americans",
+        "locationName" : "New York",
+        "firstYearOfPlay" : "1925",
+        "division" : {
+          "id" : 7,
+          "name" : "Canadian",
+          "link" : "/api/v1/divisions/7"
+        },
+        "franchise" : {
+          "franchiseId" : 8,
+          "teamName" : "Americans",
+          "link" : "/api/v1/franchises/8"
+        },
+        "franchiseId" : 8,
+        "active" : false
+      }
+    },
+    "players" : {
+      "ID8447827" : {
+        "id" : 8447827,
+        "fullName" : "Charley McVeigh",
+        "link" : "/api/v1/people/8447827",
+        "firstName" : "Charley",
+        "lastName" : "McVeigh",
+        "primaryNumber" : "7",
+        "birthDate" : "1898-03-29",
+        "birthCity" : "Kenora",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 6\"",
+        "weight" : 145,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "C",
+          "name" : "Center",
+          "type" : "Forward",
+          "abbreviation" : "C"
+        }
+      },
+      "ID8446559" : {
+        "id" : 8446559,
+        "fullName" : "John Gallagher",
+        "link" : "/api/v1/people/8446559",
+        "firstName" : "John",
+        "lastName" : "Gallagher",
+        "primaryNumber" : "5",
+        "birthDate" : "1909-01-19",
+        "birthCity" : "Kenora",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 11\"",
+        "weight" : 188,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "D",
+          "name" : "Defenseman",
+          "type" : "Defenseman",
+          "abbreviation" : "D"
+        }
+      },
+      "ID8445969" : {
+        "id" : 8445969,
+        "fullName" : "Red Dutton",
+        "link" : "/api/v1/people/8445969",
+        "firstName" : "Red",
+        "lastName" : "Dutton",
+        "primaryNumber" : "2",
+        "birthDate" : "1898-07-23",
+        "birthCity" : "Russell",
+        "birthStateProvince" : "MB",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "6' 0\"",
+        "weight" : 185,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "D",
+          "name" : "Defenseman",
+          "type" : "Defenseman",
+          "abbreviation" : "D"
+        }
+      },
+      "ID8447828" : {
+        "id" : 8447828,
+        "fullName" : "Jack McVicar",
+        "link" : "/api/v1/people/8447828",
+        "firstName" : "Jack",
+        "lastName" : "McVicar",
+        "primaryNumber" : "11",
+        "birthDate" : "1904-06-04",
+        "birthCity" : "Renfrew",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "6' 0\"",
+        "weight" : 160,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "D",
+          "name" : "Defenseman",
+          "type" : "Defenseman",
+          "abbreviation" : "D"
+        }
+      },
+      "ID8448383" : {
+        "id" : 8448383,
+        "fullName" : "Earl Roche",
+        "link" : "/api/v1/people/8448383",
+        "firstName" : "Earl",
+        "lastName" : "Roche",
+        "primaryNumber" : "19",
+        "birthDate" : "1910-02-22",
+        "birthCity" : "Prescott",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 11\"",
+        "weight" : 175,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "L",
+          "name" : "Left Wing",
+          "type" : "Forward",
+          "abbreviation" : "LW"
+        }
+      },
+      "ID8448141" : {
+        "id" : 8448141,
+        "fullName" : "Merlyn Phillips",
+        "link" : "/api/v1/people/8448141",
+        "firstName" : "Merlyn",
+        "lastName" : "Phillips",
+        "primaryNumber" : "12",
+        "birthDate" : "1899-05-24",
+        "birthCity" : "Richmond Hill",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 7\"",
+        "weight" : 160,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "C",
+          "name" : "Center",
+          "type" : "Forward",
+          "abbreviation" : "C"
+        }
+      },
+      "ID8450144" : {
+        "id" : 8450144,
+        "fullName" : "Flat Walsh",
+        "link" : "/api/v1/people/8450144",
+        "firstName" : "Flat",
+        "lastName" : "Walsh",
+        "primaryNumber" : "1",
+        "birthDate" : "1897-03-23",
+        "birthCity" : "Kingston",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 11\"",
+        "weight" : 180,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "G",
+          "name" : "Goalie",
+          "type" : "Goalie",
+          "abbreviation" : "G"
+        }
+      },
+      "ID8449077" : {
+        "id" : 8449077,
+        "fullName" : "Hooley Smith",
+        "link" : "/api/v1/people/8449077",
+        "firstName" : "Hooley",
+        "lastName" : "Smith",
+        "primaryNumber" : "7",
+        "birthDate" : "1903-01-07",
+        "birthCity" : "Toronto",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 10\"",
+        "weight" : 155,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "C",
+          "name" : "Center",
+          "type" : "Forward",
+          "abbreviation" : "C"
+        }
+      },
+      "ID8445255" : {
+        "id" : 8445255,
+        "fullName" : "Billy Burch",
+        "link" : "/api/v1/people/8445255",
+        "firstName" : "Billy",
+        "lastName" : "Burch",
+        "primaryNumber" : "4",
+        "birthDate" : "1900-11-20",
+        "birthCity" : "Yonkers",
+        "birthStateProvince" : "NY",
+        "birthCountry" : "USA",
+        "nationality" : "USA",
+        "height" : "6' 0\"",
+        "weight" : 200,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "C",
+          "name" : "Center",
+          "type" : "Forward",
+          "abbreviation" : "C"
+        }
+      },
+      "ID8445135" : {
+        "id" : 8445135,
+        "fullName" : "Georges Boucher",
+        "link" : "/api/v1/people/8445135",
+        "firstName" : "Georges",
+        "lastName" : "Boucher",
+        "primaryNumber" : "15",
+        "birthDate" : "1896-08-19",
+        "birthCity" : "Ottawa",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 9\"",
+        "weight" : 169,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "D",
+          "name" : "Defenseman",
+          "type" : "Defenseman",
+          "abbreviation" : "D"
+        }
+      },
+      "ID8449038" : {
+        "id" : 8449038,
+        "fullName" : "Babe Siebert",
+        "link" : "/api/v1/people/8449038",
+        "firstName" : "Babe",
+        "lastName" : "Siebert",
+        "primaryNumber" : "4",
+        "birthDate" : "1904-01-14",
+        "birthCity" : "Plattsville",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 10\"",
+        "weight" : 182,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "L",
+          "name" : "Left Wing",
+          "type" : "Forward",
+          "abbreviation" : "LW"
+        }
+      },
+      "ID8448421" : {
+        "id" : 8448421,
+        "fullName" : "Des Roche",
+        "link" : "/api/v1/people/8448421",
+        "firstName" : "Des",
+        "lastName" : "Roche",
+        "primaryNumber" : "18",
+        "birthDate" : "1909-02-01",
+        "birthCity" : "Kemptville",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 7\"",
+        "weight" : 165,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "R",
+          "name" : "Right Wing",
+          "type" : "Forward",
+          "abbreviation" : "RW"
+        }
+      },
+      "ID8447999" : {
+        "id" : 8447999,
+        "fullName" : "Mike Neville",
+        "link" : "/api/v1/people/8447999",
+        "firstName" : "Mike",
+        "lastName" : "Neville",
+        "primaryNumber" : "8",
+        "birthDate" : "1904-10-11",
+        "birthCity" : "Toronto",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 9\"",
+        "weight" : 168,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "C",
+          "name" : "Center",
+          "type" : "Forward",
+          "abbreviation" : "C"
+        }
+      },
+      "ID8447634" : {
+        "id" : 8447634,
+        "fullName" : "George Massecar",
+        "link" : "/api/v1/people/8447634",
+        "firstName" : "George",
+        "lastName" : "Massecar",
+        "primaryNumber" : "16",
+        "birthDate" : "1904-07-10",
+        "birthCity" : "Waterford",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 9\"",
+        "weight" : 165,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "L",
+          "name" : "Left Wing",
+          "type" : "Forward",
+          "abbreviation" : "LW"
+        }
+      },
+      "ID8446946" : {
+        "id" : 8446946,
+        "fullName" : "Al Huggins",
+        "link" : "/api/v1/people/8446946",
+        "firstName" : "Al",
+        "lastName" : "Huggins",
+        "primaryNumber" : "18",
+        "birthDate" : "1910-12-21",
+        "birthCity" : "Toronto",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "6' 0\"",
+        "weight" : 160,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "L",
+          "name" : "Left Wing",
+          "type" : "Forward",
+          "abbreviation" : "LW"
+        }
+      },
+      "ID8445514" : {
+        "id" : 8445514,
+        "fullName" : "Lionel Conacher",
+        "link" : "/api/v1/people/8445514",
+        "firstName" : "Lionel",
+        "lastName" : "Conacher",
+        "primaryNumber" : "3",
+        "birthDate" : "1901-05-24",
+        "birthCity" : "Toronto",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "6' 2\"",
+        "weight" : 195,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "D",
+          "name" : "Defenseman",
+          "type" : "Defenseman",
+          "abbreviation" : "D"
+        }
+      },
+      "ID8450153" : {
+        "id" : 8450153,
+        "fullName" : "Roy Worters",
+        "link" : "/api/v1/people/8450153",
+        "firstName" : "Roy",
+        "lastName" : "Worters",
+        "primaryNumber" : "1",
+        "birthDate" : "1900-10-19",
+        "birthCity" : "Toronto",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 3\"",
+        "weight" : 135,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "G",
+          "name" : "Goalie",
+          "type" : "Goalie",
+          "abbreviation" : "G"
+        }
+      },
+      "ID8449189" : {
+        "id" : 8449189,
+        "fullName" : "Nels Stewart",
+        "link" : "/api/v1/people/8449189",
+        "firstName" : "Nels",
+        "lastName" : "Stewart",
+        "primaryNumber" : "5",
+        "birthDate" : "1902-12-29",
+        "birthCity" : "Montreal",
+        "birthStateProvince" : "QC",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "6' 1\"",
+        "weight" : 195,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "C",
+          "name" : "Center",
+          "type" : "Forward",
+          "abbreviation" : "C"
+        }
+      },
+      "ID8448210" : {
+        "id" : 8448210,
+        "fullName" : "Ellie Pringle",
+        "link" : "/api/v1/people/8448210",
+        "firstName" : "Ellie",
+        "lastName" : "Pringle",
+        "primaryNumber" : "6",
+        "birthDate" : "1911-08-31",
+        "birthCity" : "Toronto",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "6' 2\"",
+        "weight" : 205,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "D",
+          "name" : "Defenseman",
+          "type" : "Defenseman",
+          "abbreviation" : "D"
+        }
+      },
+      "ID8449341" : {
+        "id" : 8449341,
+        "fullName" : "Jimmy Ward",
+        "link" : "/api/v1/people/8449341",
+        "firstName" : "Jimmy",
+        "lastName" : "Ward",
+        "primaryNumber" : "4",
+        "birthDate" : "1906-09-01",
+        "birthCity" : "Fort William",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 11\"",
+        "weight" : 167,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "R",
+          "name" : "Right Wing",
+          "type" : "Forward",
+          "abbreviation" : "RW"
+        }
+      },
+      "ID8449264" : {
+        "id" : 8449264,
+        "fullName" : "Dave Trottier",
+        "link" : "/api/v1/people/8449264",
+        "firstName" : "Dave",
+        "lastName" : "Trottier",
+        "primaryNumber" : "8",
+        "birthDate" : "1906-06-25",
+        "birthCity" : "Pembroke",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 10\"",
+        "weight" : 170,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "L",
+          "name" : "Left Wing",
+          "type" : "Forward",
+          "abbreviation" : "LW"
+        }
+      },
+      "ID8448098" : {
+        "id" : 8448098,
+        "fullName" : "George Patterson",
+        "link" : "/api/v1/people/8448098",
+        "firstName" : "George",
+        "lastName" : "Patterson",
+        "primaryNumber" : "8",
+        "birthDate" : "1906-05-22",
+        "birthCity" : "Kingston",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "6' 1\"",
+        "weight" : 176,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "L",
+          "name" : "Left Wing",
+          "type" : "Forward",
+          "abbreviation" : "LW"
+        }
+      },
+      "ID8446152" : {
+        "id" : 8446152,
+        "fullName" : "Hap Emms",
+        "link" : "/api/v1/people/8446152",
+        "firstName" : "Hap",
+        "lastName" : "Emms",
+        "primaryNumber" : "11",
+        "birthDate" : "1905-01-12",
+        "birthCity" : "Barrie",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "6' 0\"",
+        "weight" : 190,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "L",
+          "name" : "Left Wing",
+          "type" : "Forward",
+          "abbreviation" : "LW"
+        }
+      },
+      "ID8449007" : {
+        "id" : 8449007,
+        "fullName" : "Johnny Sheppard",
+        "link" : "/api/v1/people/8449007",
+        "firstName" : "Johnny",
+        "lastName" : "Sheppard",
+        "primaryNumber" : "4",
+        "birthDate" : "1903-07-23",
+        "birthCity" : "Montreal",
+        "birthStateProvince" : "QC",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 7\"",
+        "weight" : 165,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "L",
+          "name" : "Left Wing",
+          "type" : "Forward",
+          "abbreviation" : "LW"
+        }
+      },
+      "ID8449467" : {
+        "id" : 8449467,
+        "fullName" : "Archie Wilcox",
+        "link" : "/api/v1/people/8449467",
+        "firstName" : "Archie",
+        "lastName" : "Wilcox",
+        "primaryNumber" : "3",
+        "birthDate" : "1903-05-09",
+        "birthCity" : "Montreal",
+        "birthStateProvince" : "QC",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 11\"",
+        "weight" : 195,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "R",
+          "name" : "Right Wing",
+          "type" : "Forward",
+          "abbreviation" : "RW"
+        }
+      },
+      "ID8446877" : {
+        "id" : 8446877,
+        "fullName" : "Normie Himes",
+        "link" : "/api/v1/people/8446877",
+        "firstName" : "Normie",
+        "lastName" : "Himes",
+        "primaryNumber" : "7",
+        "birthDate" : "1903-04-13",
+        "birthCity" : "Galt",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 9\"",
+        "weight" : 145,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "C",
+          "name" : "Center",
+          "type" : "Forward",
+          "abbreviation" : "C"
+        }
+      },
+      "ID8446954" : {
+        "id" : 8446954,
+        "fullName" : "Albert Hughes",
+        "link" : "/api/v1/people/8446954",
+        "firstName" : "Albert",
+        "lastName" : "Hughes",
+        "primaryNumber" : "18",
+        "birthDate" : "1901-05-13",
+        "birthCity" : "Guelph",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 9\"",
+        "weight" : 165,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "C",
+          "name" : "Center",
+          "type" : "Forward",
+          "abbreviation" : "C"
+        }
+      },
+      "ID8446753" : {
+        "id" : 8446753,
+        "fullName" : "Paul Haynes",
+        "link" : "/api/v1/people/8446753",
+        "firstName" : "Paul",
+        "lastName" : "Haynes",
+        "primaryNumber" : "10",
+        "birthDate" : "1910-03-01",
+        "birthCity" : "Montreal",
+        "birthStateProvince" : "QC",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 10\"",
+        "weight" : 160,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "L",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "C",
+          "name" : "Center",
+          "type" : "Forward",
+          "abbreviation" : "C"
+        }
+      },
+      "ID8445203" : {
+        "id" : 8445203,
+        "fullName" : "Bill Brydge",
+        "link" : "/api/v1/people/8445203",
+        "firstName" : "Bill",
+        "lastName" : "Brydge",
+        "primaryNumber" : "3",
+        "birthDate" : "1901-10-22",
+        "birthCity" : "Renfrew",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 9\"",
+        "weight" : 195,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "D",
+          "name" : "Defenseman",
+          "type" : "Defenseman",
+          "abbreviation" : "D"
+        }
+      },
+      "ID8445346" : {
+        "id" : 8445346,
+        "fullName" : "Frank Carson",
+        "link" : "/api/v1/people/8445346",
+        "firstName" : "Frank",
+        "lastName" : "Carson",
+        "primaryNumber" : "9",
+        "birthDate" : "1902-01-12",
+        "birthCity" : "Bracebridge",
+        "birthStateProvince" : "ON",
+        "birthCountry" : "CAN",
+        "nationality" : "CAN",
+        "height" : "5' 7\"",
+        "weight" : 165,
+        "active" : false,
+        "rookie" : false,
+        "shootsCatches" : "R",
+        "rosterStatus" : "N",
+        "primaryPosition" : {
+          "code" : "R",
+          "name" : "Right Wing",
+          "type" : "Forward",
+          "abbreviation" : "RW"
+        }
+      }
+    }
+  },
+  "liveData" : {
+    "plays" : {
+      "allPlays" : [ {
+        "players" : [ {
+          "player" : {
+            "id" : 8448141,
+            "fullName" : "Merlyn Phillips",
+            "link" : "/api/v1/people/8448141"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA10000",
+          "eventTypeId" : "PENALTY",
+          "description" : "Merlyn Phillips Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 1,
+          "eventId" : 10000,
+          "period" : 1,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "1st",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 43,
+          "name" : "Montreal Maroons",
+          "link" : "/api/v1/teams/43",
+          "triCode" : "MMR"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8449264,
+            "fullName" : "Dave Trottier",
+            "link" : "/api/v1/people/8449264"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA20000",
+          "eventTypeId" : "PENALTY",
+          "description" : "Dave Trottier Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 2,
+          "eventId" : 20000,
+          "period" : 1,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "1st",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 43,
+          "name" : "Montreal Maroons",
+          "link" : "/api/v1/teams/43",
+          "triCode" : "MMR"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8445969,
+            "fullName" : "Red Dutton",
+            "link" : "/api/v1/people/8445969"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA30000",
+          "eventTypeId" : "PENALTY",
+          "description" : "Red Dutton Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 3,
+          "eventId" : 30000,
+          "period" : 1,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "1st",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8446954,
+            "fullName" : "Albert Hughes",
+            "link" : "/api/v1/people/8446954"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA40000",
+          "eventTypeId" : "PENALTY",
+          "description" : "Albert Hughes Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 4,
+          "eventId" : 40000,
+          "period" : 1,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "1st",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8448098,
+            "fullName" : "George Patterson",
+            "link" : "/api/v1/people/8448098"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA50000",
+          "eventTypeId" : "PENALTY",
+          "description" : "George Patterson Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 5,
+          "eventId" : 50000,
+          "period" : 1,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "1st",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8448098,
+            "fullName" : "George Patterson",
+            "link" : "/api/v1/people/8448098"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA60000",
+          "eventTypeId" : "PENALTY",
+          "description" : "George Patterson Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 6,
+          "eventId" : 60000,
+          "period" : 1,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "1st",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8449038,
+            "fullName" : "Babe Siebert",
+            "link" : "/api/v1/people/8449038"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA11200",
+          "eventTypeId" : "PENALTY",
+          "description" : "Babe Siebert Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 7,
+          "eventId" : 11200,
+          "period" : 2,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "2nd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 43,
+          "name" : "Montreal Maroons",
+          "link" : "/api/v1/teams/43",
+          "triCode" : "MMR"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8449038,
+            "fullName" : "Babe Siebert",
+            "link" : "/api/v1/people/8449038"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA21200",
+          "eventTypeId" : "PENALTY",
+          "description" : "Babe Siebert Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 8,
+          "eventId" : 21200,
+          "period" : 2,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "2nd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 43,
+          "name" : "Montreal Maroons",
+          "link" : "/api/v1/teams/43",
+          "triCode" : "MMR"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8445255,
+            "fullName" : "Billy Burch",
+            "link" : "/api/v1/people/8445255"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA31200",
+          "eventTypeId" : "PENALTY",
+          "description" : "Billy Burch Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 9,
+          "eventId" : 31200,
+          "period" : 2,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "2nd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8445969,
+            "fullName" : "Red Dutton",
+            "link" : "/api/v1/people/8445969"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA41200",
+          "eventTypeId" : "PENALTY",
+          "description" : "Red Dutton Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 10,
+          "eventId" : 41200,
+          "period" : 2,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "2nd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8448383,
+            "fullName" : "Earl Roche",
+            "link" : "/api/v1/people/8448383"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA12400",
+          "eventTypeId" : "PENALTY",
+          "description" : "Earl Roche Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 20,
+          "eventId" : 12400,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 43,
+          "name" : "Montreal Maroons",
+          "link" : "/api/v1/teams/43",
+          "triCode" : "MMR"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8448421,
+            "fullName" : "Des Roche",
+            "link" : "/api/v1/people/8448421"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA22400",
+          "eventTypeId" : "PENALTY",
+          "description" : "Des Roche Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 19,
+          "eventId" : 22400,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 43,
+          "name" : "Montreal Maroons",
+          "link" : "/api/v1/teams/43",
+          "triCode" : "MMR"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8449077,
+            "fullName" : "Hooley Smith",
+            "link" : "/api/v1/people/8449077"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA32400",
+          "eventTypeId" : "PENALTY",
+          "description" : "Hooley Smith Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 18,
+          "eventId" : 32400,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 43,
+          "name" : "Montreal Maroons",
+          "link" : "/api/v1/teams/43",
+          "triCode" : "MMR"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8445203,
+            "fullName" : "Bill Brydge",
+            "link" : "/api/v1/people/8445203"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA42400",
+          "eventTypeId" : "PENALTY",
+          "description" : "Bill Brydge Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 17,
+          "eventId" : 42400,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8445255,
+            "fullName" : "Billy Burch",
+            "link" : "/api/v1/people/8445255"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA52400",
+          "eventTypeId" : "PENALTY",
+          "description" : "Billy Burch Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 16,
+          "eventId" : 52400,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8445255,
+            "fullName" : "Billy Burch",
+            "link" : "/api/v1/people/8445255"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA62400",
+          "eventTypeId" : "PENALTY",
+          "description" : "Billy Burch Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 15,
+          "eventId" : 62400,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8445346,
+            "fullName" : "Frank Carson",
+            "link" : "/api/v1/people/8445346"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA72400",
+          "eventTypeId" : "PENALTY",
+          "description" : "Frank Carson Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 14,
+          "eventId" : 72400,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8446152,
+            "fullName" : "Hap Emms",
+            "link" : "/api/v1/people/8446152"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA82400",
+          "eventTypeId" : "PENALTY",
+          "description" : "Hap Emms Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 13,
+          "eventId" : 82400,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8446954,
+            "fullName" : "Albert Hughes",
+            "link" : "/api/v1/people/8446954"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA92400",
+          "eventTypeId" : "PENALTY",
+          "description" : "Albert Hughes Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 12,
+          "eventId" : 92400,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8448098,
+            "fullName" : "George Patterson",
+            "link" : "/api/v1/people/8448098"
+          },
+          "playerType" : "PenaltyOn"
+        } ],
+        "result" : {
+          "event" : "Penalty",
+          "eventCode" : "NYA102400",
+          "eventTypeId" : "PENALTY",
+          "description" : "George Patterson Minor",
+          "secondaryType" : "Minor",
+          "penaltyMinutes" : 2
+        },
+        "about" : {
+          "eventIdx" : 11,
+          "eventId" : 102400,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "00:00",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 0
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }, {
+        "players" : [ {
+          "player" : {
+            "id" : 8446877,
+            "fullName" : "Normie Himes",
+            "link" : "/api/v1/people/8446877"
+          },
+          "playerType" : "Scorer",
+          "seasonTotal" : 1
+        }, {
+          "player" : {
+            "id" : 8450144,
+            "fullName" : "Flat Walsh",
+            "link" : "/api/v1/people/8450144"
+          },
+          "playerType" : "Goalie"
+        } ],
+        "result" : {
+          "event" : "Goal",
+          "eventCode" : "NYA2467",
+          "eventTypeId" : "GOAL",
+          "description" : "Normie Himes (1) , assists: none",
+          "strength" : {
+            "code" : "EVEN",
+            "name" : "Even"
+          },
+          "gameWinningGoal" : true,
+          "emptyNet" : false
+        },
+        "about" : {
+          "eventIdx" : 0,
+          "eventId" : 2467,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "01:07",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 1
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      } ],
+      "scoringPlays" : [ 20 ],
+      "penaltyPlays" : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ],
+      "playsByPeriod" : [ {
+        "startIndex" : 0,
+        "plays" : [ 0, 1, 2, 3, 4, 5 ],
+        "endIndex" : 4
+      }, {
+        "startIndex" : 6,
+        "plays" : [ 6, 7, 8, 9 ],
+        "endIndex" : 8
+      }, {
+        "startIndex" : 10,
+        "plays" : [ 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ],
+        "endIndex" : 20
+      } ],
+      "currentPlay" : {
+        "players" : [ {
+          "player" : {
+            "id" : 8446877,
+            "fullName" : "Normie Himes",
+            "link" : "/api/v1/people/8446877"
+          },
+          "playerType" : "Scorer",
+          "seasonTotal" : 1
+        }, {
+          "player" : {
+            "id" : 8450144,
+            "fullName" : "Flat Walsh",
+            "link" : "/api/v1/people/8450144"
+          },
+          "playerType" : "Goalie"
+        } ],
+        "result" : {
+          "event" : "Goal",
+          "eventCode" : "NYA2467",
+          "eventTypeId" : "GOAL",
+          "description" : "Normie Himes (1) , assists: none",
+          "strength" : {
+            "code" : "EVEN",
+            "name" : "Even"
+          },
+          "gameWinningGoal" : true,
+          "emptyNet" : false
+        },
+        "about" : {
+          "eventIdx" : 0,
+          "eventId" : 2467,
+          "period" : 3,
+          "periodType" : "REGULAR",
+          "ordinalNum" : "3rd",
+          "periodTime" : "01:07",
+          "periodTimeRemaining" : "",
+          "dateTime" : "1930-11-17T01:00:00Z",
+          "goals" : {
+            "away" : 0,
+            "home" : 1
+          }
+        },
+        "coordinates" : { },
+        "team" : {
+          "id" : 44,
+          "name" : "New York Americans",
+          "link" : "/api/v1/teams/44",
+          "triCode" : "NYA"
+        }
+      }
+    },
+    "linescore" : {
+      "currentPeriod" : 3,
+      "currentPeriodOrdinal" : "3rd",
+      "currentPeriodTimeRemaining" : "Final",
+      "periods" : [ {
+        "periodType" : "REGULAR",
+        "num" : 1,
+        "ordinalNum" : "1st",
+        "home" : {
+          "goals" : 0,
+          "shotsOnGoal" : 0
+        },
+        "away" : {
+          "goals" : 0,
+          "shotsOnGoal" : 0
+        }
+      }, {
+        "periodType" : "REGULAR",
+        "num" : 2,
+        "ordinalNum" : "2nd",
+        "home" : {
+          "goals" : 0,
+          "shotsOnGoal" : 0
+        },
+        "away" : {
+          "goals" : 0,
+          "shotsOnGoal" : 0
+        }
+      }, {
+        "periodType" : "REGULAR",
+        "num" : 3,
+        "ordinalNum" : "3rd",
+        "home" : {
+          "goals" : 1,
+          "shotsOnGoal" : 0
+        },
+        "away" : {
+          "goals" : 0,
+          "shotsOnGoal" : 0
+        }
+      } ],
+      "shootoutInfo" : {
+        "away" : {
+          "scores" : 0,
+          "attempts" : 0
+        },
+        "home" : {
+          "scores" : 0,
+          "attempts" : 0
+        }
+      },
+      "teams" : {
+        "home" : {
+          "team" : {
+            "id" : 44,
+            "name" : "New York Americans",
+            "link" : "/api/v1/teams/44",
+            "abbreviation" : "NYA",
+            "triCode" : "NYA"
+          },
+          "goals" : 1,
+          "shotsOnGoal" : 0,
+          "goaliePulled" : false,
+          "numSkaters" : 0,
+          "powerPlay" : false
+        },
+        "away" : {
+          "team" : {
+            "id" : 43,
+            "name" : "Montreal Maroons",
+            "link" : "/api/v1/teams/43",
+            "abbreviation" : "MMR",
+            "triCode" : "MMR"
+          },
+          "goals" : 0,
+          "shotsOnGoal" : 0,
+          "goaliePulled" : false,
+          "numSkaters" : 0,
+          "powerPlay" : false
+        }
+      },
+      "powerPlayStrength" : "Even",
+      "hasShootout" : false,
+      "intermissionInfo" : {
+        "intermissionTimeRemaining" : 0,
+        "intermissionTimeElapsed" : 0,
+        "inIntermission" : false
+      }
+    },
+    "boxscore" : {
+      "teams" : {
+        "away" : {
+          "team" : {
+            "id" : 43,
+            "name" : "Montreal Maroons",
+            "link" : "/api/v1/teams/43",
+            "abbreviation" : "MMR",
+            "triCode" : "MMR"
+          },
+          "teamStats" : {
+            "teamSkaterStats" : {
+              "goals" : 0,
+              "pim" : 14,
+              "powerPlayGoals" : 0.0
+            }
+          },
+          "players" : {
+            "ID8446946" : {
+              "person" : {
+                "id" : 8446946,
+                "fullName" : "Al Huggins",
+                "link" : "/api/v1/people/8446946",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "18",
+              "position" : {
+                "code" : "L",
+                "name" : "Left Wing",
+                "type" : "Forward",
+                "abbreviation" : "LW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8445514" : {
+              "person" : {
+                "id" : 8445514,
+                "fullName" : "Lionel Conacher",
+                "link" : "/api/v1/people/8445514",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "2",
+              "position" : {
+                "code" : "D",
+                "name" : "Defenseman",
+                "type" : "Defenseman",
+                "abbreviation" : "D"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8446559" : {
+              "person" : {
+                "id" : 8446559,
+                "fullName" : "John Gallagher",
+                "link" : "/api/v1/people/8446559",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "17",
+              "position" : {
+                "code" : "D",
+                "name" : "Defenseman",
+                "type" : "Defenseman",
+                "abbreviation" : "D"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8447828" : {
+              "person" : {
+                "id" : 8447828,
+                "fullName" : "Jack McVicar",
+                "link" : "/api/v1/people/8447828",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "11",
+              "position" : {
+                "code" : "D",
+                "name" : "Defenseman",
+                "type" : "Defenseman",
+                "abbreviation" : "D"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8448383" : {
+              "person" : {
+                "id" : 8448383,
+                "fullName" : "Earl Roche",
+                "link" : "/api/v1/people/8448383",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "10",
+              "position" : {
+                "code" : "L",
+                "name" : "Left Wing",
+                "type" : "Forward",
+                "abbreviation" : "LW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 2
+                }
+              }
+            },
+            "ID8448141" : {
+              "person" : {
+                "id" : 8448141,
+                "fullName" : "Merlyn Phillips",
+                "link" : "/api/v1/people/8448141",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "12",
+              "position" : {
+                "code" : "C",
+                "name" : "Center",
+                "type" : "Forward",
+                "abbreviation" : "C"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 2
+                }
+              }
+            },
+            "ID8450144" : {
+              "person" : {
+                "id" : 8450144,
+                "fullName" : "Flat Walsh",
+                "link" : "/api/v1/people/8450144",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "1",
+              "position" : {
+                "code" : "G",
+                "name" : "Goalie",
+                "type" : "Goalie",
+                "abbreviation" : "G"
+              },
+              "stats" : {
+                "goalieStats" : {
+                  "timeOnIce" : "60:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "pim" : 0,
+                  "decision" : "L"
+                }
+              }
+            },
+            "ID8449189" : {
+              "person" : {
+                "id" : 8449189,
+                "fullName" : "Nels Stewart",
+                "link" : "/api/v1/people/8449189",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "5",
+              "position" : {
+                "code" : "C",
+                "name" : "Center",
+                "type" : "Forward",
+                "abbreviation" : "C"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8449341" : {
+              "person" : {
+                "id" : 8449341,
+                "fullName" : "Jimmy Ward",
+                "link" : "/api/v1/people/8449341",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "4",
+              "position" : {
+                "code" : "R",
+                "name" : "Right Wing",
+                "type" : "Forward",
+                "abbreviation" : "RW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8449077" : {
+              "person" : {
+                "id" : 8449077,
+                "fullName" : "Hooley Smith",
+                "link" : "/api/v1/people/8449077",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "7",
+              "position" : {
+                "code" : "C",
+                "name" : "Center",
+                "type" : "Forward",
+                "abbreviation" : "C"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 2
+                }
+              }
+            },
+            "ID8449264" : {
+              "person" : {
+                "id" : 8449264,
+                "fullName" : "Dave Trottier",
+                "link" : "/api/v1/people/8449264",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "8",
+              "position" : {
+                "code" : "L",
+                "name" : "Left Wing",
+                "type" : "Forward",
+                "abbreviation" : "LW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 2
+                }
+              }
+            },
+            "ID8445135" : {
+              "person" : {
+                "id" : 8445135,
+                "fullName" : "Georges Boucher",
+                "link" : "/api/v1/people/8445135",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "9",
+              "position" : {
+                "code" : "D",
+                "name" : "Defenseman",
+                "type" : "Defenseman",
+                "abbreviation" : "D"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8449038" : {
+              "person" : {
+                "id" : 8449038,
+                "fullName" : "Babe Siebert",
+                "link" : "/api/v1/people/8449038",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "6",
+              "position" : {
+                "code" : "L",
+                "name" : "Left Wing",
+                "type" : "Forward",
+                "abbreviation" : "LW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 4
+                }
+              }
+            },
+            "ID8448421" : {
+              "person" : {
+                "id" : 8448421,
+                "fullName" : "Des Roche",
+                "link" : "/api/v1/people/8448421",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "16",
+              "position" : {
+                "code" : "R",
+                "name" : "Right Wing",
+                "type" : "Forward",
+                "abbreviation" : "RW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 2
+                }
+              }
+            },
+            "ID8449467" : {
+              "person" : {
+                "id" : 8449467,
+                "fullName" : "Archie Wilcox",
+                "link" : "/api/v1/people/8449467",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "3",
+              "position" : {
+                "code" : "R",
+                "name" : "Right Wing",
+                "type" : "Forward",
+                "abbreviation" : "RW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8446753" : {
+              "person" : {
+                "id" : 8446753,
+                "fullName" : "Paul Haynes",
+                "link" : "/api/v1/people/8446753",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "14",
+              "position" : {
+                "code" : "C",
+                "name" : "Center",
+                "type" : "Forward",
+                "abbreviation" : "C"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            }
+          },
+          "goalies" : [ 8450144 ],
+          "skaters" : [ 8445514, 8449467, 8449341, 8449189, 8449038, 8449077, 8449264, 8445135, 8448383, 8447828, 8448141, 8446753, 8448421, 8446559, 8446946 ],
+          "onIce" : [ ],
+          "onIcePlus" : [ ],
+          "scratches" : [ ],
+          "penaltyBox" : [ ],
+          "coaches" : [ ]
+        },
+        "home" : {
+          "team" : {
+            "id" : 44,
+            "name" : "New York Americans",
+            "link" : "/api/v1/teams/44",
+            "abbreviation" : "NYA",
+            "triCode" : "NYA"
+          },
+          "teamStats" : {
+            "teamSkaterStats" : {
+              "goals" : 1,
+              "pim" : 26,
+              "powerPlayGoals" : 0.0
+            }
+          },
+          "players" : {
+            "ID8447827" : {
+              "person" : {
+                "id" : 8447827,
+                "fullName" : "Charley McVeigh",
+                "link" : "/api/v1/people/8447827",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "14",
+              "position" : {
+                "code" : "C",
+                "name" : "Center",
+                "type" : "Forward",
+                "abbreviation" : "C"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8445969" : {
+              "person" : {
+                "id" : 8445969,
+                "fullName" : "Red Dutton",
+                "link" : "/api/v1/people/8445969",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "2",
+              "position" : {
+                "code" : "D",
+                "name" : "Defenseman",
+                "type" : "Defenseman",
+                "abbreviation" : "D"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 4
+                }
+              }
+            },
+            "ID8450153" : {
+              "person" : {
+                "id" : 8450153,
+                "fullName" : "Roy Worters",
+                "link" : "/api/v1/people/8450153",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "1",
+              "position" : {
+                "code" : "G",
+                "name" : "Goalie",
+                "type" : "Goalie",
+                "abbreviation" : "G"
+              },
+              "stats" : {
+                "goalieStats" : {
+                  "timeOnIce" : "60:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "pim" : 0,
+                  "decision" : "W"
+                }
+              }
+            },
+            "ID8448210" : {
+              "person" : {
+                "id" : 8448210,
+                "fullName" : "Ellie Pringle",
+                "link" : "/api/v1/people/8448210",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "6",
+              "position" : {
+                "code" : "D",
+                "name" : "Defenseman",
+                "type" : "Defenseman",
+                "abbreviation" : "D"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8448098" : {
+              "person" : {
+                "id" : 8448098,
+                "fullName" : "George Patterson",
+                "link" : "/api/v1/people/8448098",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "8",
+              "position" : {
+                "code" : "L",
+                "name" : "Left Wing",
+                "type" : "Forward",
+                "abbreviation" : "LW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 6
+                }
+              }
+            },
+            "ID8446152" : {
+              "person" : {
+                "id" : 8446152,
+                "fullName" : "Hap Emms",
+                "link" : "/api/v1/people/8446152",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "12",
+              "position" : {
+                "code" : "L",
+                "name" : "Left Wing",
+                "type" : "Forward",
+                "abbreviation" : "LW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 2
+                }
+              }
+            },
+            "ID8445255" : {
+              "person" : {
+                "id" : 8445255,
+                "fullName" : "Billy Burch",
+                "link" : "/api/v1/people/8445255",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "9",
+              "position" : {
+                "code" : "C",
+                "name" : "Center",
+                "type" : "Forward",
+                "abbreviation" : "C"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 6
+                }
+              }
+            },
+            "ID8449007" : {
+              "person" : {
+                "id" : 8449007,
+                "fullName" : "Johnny Sheppard",
+                "link" : "/api/v1/people/8449007",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "15",
+              "position" : {
+                "code" : "L",
+                "name" : "Left Wing",
+                "type" : "Forward",
+                "abbreviation" : "LW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8447999" : {
+              "person" : {
+                "id" : 8447999,
+                "fullName" : "Mike Neville",
+                "link" : "/api/v1/people/8447999",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "10",
+              "position" : {
+                "code" : "C",
+                "name" : "Center",
+                "type" : "Forward",
+                "abbreviation" : "C"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8446877" : {
+              "person" : {
+                "id" : 8446877,
+                "fullName" : "Normie Himes",
+                "link" : "/api/v1/people/8446877",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "7",
+              "position" : {
+                "code" : "C",
+                "name" : "Center",
+                "type" : "Forward",
+                "abbreviation" : "C"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 1,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8446954" : {
+              "person" : {
+                "id" : 8446954,
+                "fullName" : "Albert Hughes",
+                "link" : "/api/v1/people/8446954",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "18",
+              "position" : {
+                "code" : "C",
+                "name" : "Center",
+                "type" : "Forward",
+                "abbreviation" : "C"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 4
+                }
+              }
+            },
+            "ID8447634" : {
+              "person" : {
+                "id" : 8447634,
+                "fullName" : "George Massecar",
+                "link" : "/api/v1/people/8447634",
+                "shootsCatches" : "L",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "16",
+              "position" : {
+                "code" : "L",
+                "name" : "Left Wing",
+                "type" : "Forward",
+                "abbreviation" : "LW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 0
+                }
+              }
+            },
+            "ID8445203" : {
+              "person" : {
+                "id" : 8445203,
+                "fullName" : "Bill Brydge",
+                "link" : "/api/v1/people/8445203",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "3",
+              "position" : {
+                "code" : "D",
+                "name" : "Defenseman",
+                "type" : "Defenseman",
+                "abbreviation" : "D"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 2
+                }
+              }
+            },
+            "ID8445346" : {
+              "person" : {
+                "id" : 8445346,
+                "fullName" : "Frank Carson",
+                "link" : "/api/v1/people/8445346",
+                "shootsCatches" : "R",
+                "rosterStatus" : "N"
+              },
+              "jerseyNumber" : "11",
+              "position" : {
+                "code" : "R",
+                "name" : "Right Wing",
+                "type" : "Forward",
+                "abbreviation" : "RW"
+              },
+              "stats" : {
+                "skaterStats" : {
+                  "timeOnIce" : "00:00",
+                  "assists" : 0,
+                  "goals" : 0,
+                  "penaltyMinutes" : 2
+                }
+              }
+            }
+          },
+          "goalies" : [ 8450153 ],
+          "skaters" : [ 8445969, 8445203, 8448210, 8446877, 8448098, 8445255, 8447999, 8445346, 8446152, 8447827, 8449007, 8447634, 8446954 ],
+          "onIce" : [ ],
+          "onIcePlus" : [ ],
+          "scratches" : [ ],
+          "penaltyBox" : [ ],
+          "coaches" : [ ]
+        }
+      },
+      "officials" : [ {
+        "official" : {
+          "fullName" : "Bert Corbeau",
+          "link" : "/api/v1/people/null"
+        },
+        "officialType" : "Referee"
+      }, {
+        "official" : {
+          "fullName" : "V.k. Wagner",
+          "link" : "/api/v1/people/null"
+        },
+        "officialType" : "Referee"
+      } ]
+    },
+    "decisions" : {
+      "winner" : {
+        "id" : 8450153,
+        "fullName" : "Roy Worters",
+        "link" : "/api/v1/people/8450153"
+      },
+      "loser" : {
+        "id" : 8450144,
+        "fullName" : "Flat Walsh",
+        "link" : "/api/v1/people/8450144"
+      }
+    }
+  }
+}

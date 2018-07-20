@@ -34,7 +34,7 @@ WSRF::Lite - Implementation of the Web Service Resource Framework
 
 =head1 VERSION
 
-This document refers to version 0.8.3.1 of WSRF::Lite released Feb, 2011
+This document refers to version 0.8.3.2 of WSRF::Lite released July, 2018
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ use strict;
 use vars qw{ $VERSION };
 
 BEGIN {
-	$VERSION = '0.8.3.1';
+	$VERSION = '0.8.3.2';
 }
 
 # WSRF uses WS-Address headers in the SOAP Header - by default
@@ -6137,7 +6137,7 @@ $WSRF::WSS::Sign{Body}                = 1;
 %WSRF::WSS::ID_Xpath = ();
 
 #XPaths to the parts of the SOAP message we want to sign
-$WSRF::WSS::sec_xpath = 
+$WSRF::WSS::sec_xpath =
 	  '(//. | //@* | //namespace::*)[ancestor-or-self::wsse:BinarySecurityToken]';
 
 #$WSRF::WSS::sec_xpath = 
@@ -6198,6 +6198,7 @@ $WSRF::WSS::body_xpath =
 
 $WSRF::WSS::priv_key = undef;
 $WSRF::WSS::pub_key  = undef;
+$WSRF::WSS::algorithm = 'sha1';
 
 sub load_priv_key {
 
@@ -6266,7 +6267,7 @@ sub sign {
 	my $for_signing =
 	    '<ds:SignedInfo xmlns:ds="' . $WSRF::Constants::DS . '">'
 	  . '<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" />'
-	  . '<ds:SignatureMethod Algorithm="' . $WSRF::Constants::DS . 'rsa-sha1"/>';
+	  . '<ds:SignatureMethod Algorithm="' . ($WSRF::WSS::algorithm eq 'sha256' ? 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256' : $WSRF::Constants::DS . 'rsa-sha1') . '"/>';
 
 	#search through the envelope for things to sign
 	foreach my $key ( keys(%WSRF::WSS::ID_Xpath) ) {
@@ -6333,6 +6334,10 @@ sub sign {
 #   print ">>>can_signed_info>>>>\n$can_signed_info\n<<<<<can_signed_info<<<<<\n";
 
 	my $rsa_priv  = WSRF::WSS::load_priv_key();
+	if ($WSRF::WSS::algorithm eq 'sha256') {
+		$rsa_priv->use_pkcs1_padding();
+		$rsa_priv->use_sha256_hash();
+	}
 	my $signature = $rsa_priv->sign($can_signed_info);
 	$signature = MIME::Base64::encode($signature);
 
@@ -6381,6 +6386,8 @@ sub make_token {
 	die "Failed to access class Digest::SHA1: $@" if $@;
 	eval { require MIME::Base64 };
 	die "Failed to access class MIME::Base64: $@" if $@;
+	eval { require Digest::SHA };
+	die "Failed to access class Digest::SHA: $@" if $@;
 
 	#   print "make_token $ID\n";
 	#   print "Xpath=> $Path\n";
@@ -6393,7 +6400,7 @@ sub make_token {
 #	print ">>>token-$ID>>>\n$can_token\n<<<token-$ID<<<<\n";
 
 	#take digest of token
-	my $token_digest = Digest::SHA1::sha1($can_token);
+	my $token_digest = $WSRF::WSS::algorithm eq 'sha256' ? Digest::SHA::sha256($can_token) : Digest::SHA1::sha1($can_token);
 
 	#base64 encode digest
 	$token_digest = MIME::Base64::encode($token_digest);
@@ -6406,7 +6413,7 @@ sub make_token {
 	  . '<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>'
 	  #. '</ds:Transform>'
 	  . '</ds:Transforms>'
-	  . '<ds:DigestMethod Algorithm= "' . $WSRF::Constants::DS . 'sha1"/>'
+	  . '<ds:DigestMethod Algorithm= "' . ($WSRF::WSS::algorithm eq 'sha256' ? 'http://www.w3.org/2001/04/xmlenc#sha256' : $WSRF::Constants::DS . 'sha1') . '"/>'
 	  . '<ds:DigestValue>'
 	  . $token_digest
 	  . '</ds:DigestValue>'

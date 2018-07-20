@@ -1,6 +1,7 @@
 package HTTP::Exception::Loader;
-$HTTP::Exception::Loader::VERSION = '0.04006';
+$HTTP::Exception::Loader::VERSION = '0.04007';
 use strict;
+use warnings;
 use warnings;
 
 use HTTP::Exception::Base;
@@ -33,8 +34,6 @@ sub _make_exceptions {
         $http_status                =~ s/^HTTP_//;
         # replace the last 2 digits with XX for basename creation
         $statuscode_range           =~ s/\d{2}$/XX/;
-        # poor mans escaping, because of HTTP: 418 / I'm a teapot :\
-        $http_status_message        =~ s/'/\\'/g;
 
         # only create requested classes
         next unless (exists $tags{$statuscode_range});
@@ -56,7 +55,7 @@ sub _make_exceptions {
 
             package $package_name_code;
             sub code            () { $statuscode }
-            sub _status_message () { '$http_status_message' }
+            sub _status_message () { q{$http_status_message} }
 
             package $package_name_message;
             use Scalar::Util qw(blessed);
@@ -75,6 +74,7 @@ sub _make_exceptions {
     {
         no warnings 'redefine';
         eval $code;
+        die "HTTP::Exception::Loader error: $@\n$code\n" if $@;
     }
     return @exception_classes;
 }
@@ -123,7 +123,7 @@ HTTP::Exception::Loader - Creates HTTP::Exception subclasses
 
 =head1 VERSION
 
-version 0.04006
+version 0.04007
 
 =head1 DESCRIPTION
 

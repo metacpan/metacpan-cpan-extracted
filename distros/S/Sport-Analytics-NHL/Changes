@@ -2,3 +2,9 @@ Revision history for Sport::Analytics::NHL
 
 1.00    Sun Jul 21 17:29:31 PDT 2018
 	scraper-only version
+
+1.10	Mon Jul 16 06:37:38 PDT 2018
+	Added report parsing and compile scripts
+
+1.11	Wed Jul 18 14:45:28 PDT 2018
+	Fixed MongoDB requirement configuration

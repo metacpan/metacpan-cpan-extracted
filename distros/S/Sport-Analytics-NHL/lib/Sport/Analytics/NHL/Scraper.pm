@@ -9,7 +9,7 @@ use parent 'Exporter';
 use Time::HiRes qw(time usleep);
 use POSIX qw(strftime);
 
-use JSON::XS;
+use JSON;
 use LWP::Simple;
 
 use Sport::Analytics::NHL::LocalConfig;
@@ -108,8 +108,9 @@ our @GAME_FILES = (
 			my $json = shift;
 			my $bs = Sport::Analytics::NHL::Report::BS->new($json);
 			return 0 unless $bs;
-			$bs->process();
-			#scalar(@{$bs->{events}});
+			1;
+#			$bs->compile();
+#			scalar(@{$bs->{events}});
 		},
 	},
 	{

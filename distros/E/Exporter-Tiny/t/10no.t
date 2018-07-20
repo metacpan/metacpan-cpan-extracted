@@ -21,7 +21,7 @@ the same terms as the Perl 5 programming language system itself.
 
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 9;
 
 use lib qw( examples ../examples );
 
@@ -52,3 +52,26 @@ ok( !Local::Pkg2->can('fibo'), 'tidied fibo' );
 }
 
 ok( Local::Pkg3->can('embiggen') && !Local::Pkg3->can('fib'), 'tidied by regexp' );
+
+BEGIN {
+	package Local::Pkg4;
+	use Exporter::Shiny qw( $Foo );
+	our $Foo = 42;
+};
+
+our ($xxx, $yyy);
+local $@;
+eval q{
+	use strict;
+	use warnings;
+	package Local::Pkg5;
+	use Local::Pkg4 qw( $Foo );
+	BEGIN { $::xxx = $Foo };   # why BEGIN needed???
+	no Local::Pkg4 qw( $Foo );
+	$::yyy = $Foo;
+};
+my $e = $@;
+
+
+is($xxx, 42, 'importing scalar works');
+like($e, qr/Unimporting non-code/, 'unimporting scalar works');  # TODO

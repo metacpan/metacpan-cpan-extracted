@@ -102,7 +102,7 @@ WIDGET-SPECIFIC OPTIONS
         Specifies the reference of a variable. The value of the variable is
         an array to be displayed inside the widget; if the variable value
         changes then the widget will automatically update itself to reflect
-        the new value. Attempts Attempts to unset a variable in use as a
+        the new value. Attempts to unset a variable in use as a
         -listvariable may fail without error.
 
         The listvariable reference is "TIEd" to the HListbox widget just as
@@ -138,6 +138,8 @@ WIDGET-SPECIFIC OPTIONS
 
 LISTBOX OPTIONS AND METHODS NOT (YET?) SUPPORTED BY HLISTBOX
     Name: activeStyle
+    Class: ActiveStyle
+    Switch: -activestyle
         Ignored (not implemented in HList).
 
         For the most part, Tk::HListbox can be used as drop-in replacement

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Common::Properties;
-$Maven::Xml::Common::Properties::VERSION = '1.14';
+$Maven::Xml::Common::Properties::VERSION = '1.15';
 # ABSTRACT: Maven Properties element
 # PODNAME: Maven::Xml::Common::Properties
 
@@ -21,7 +21,7 @@ Maven::Xml::Common::Properties - Maven Properties element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

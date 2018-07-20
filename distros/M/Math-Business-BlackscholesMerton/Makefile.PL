@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "Text::CSV::Slurp" => 0
   },
-  "VERSION" => "1.23",
+  "VERSION" => "1.24",
   "test" => {
     "TESTS" => "t/*.t"
   }

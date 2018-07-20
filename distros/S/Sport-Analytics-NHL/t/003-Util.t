@@ -19,3 +19,8 @@ is(-s $tmp_file, length($string), 'file written correctly');
 
 my $x = read_file($tmp_file);
 is($x, $string, 'file read back correctly');
+is(get_seconds('01:23'), 83, 'get seconds correct');
+my $ev = {a => 1};
+my $broken = {a => 2, b => 1};
+fill_broken($ev, $broken);
+is_deeply($ev, $broken, 'fill_broken correct');

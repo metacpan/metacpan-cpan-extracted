@@ -335,6 +335,19 @@ author/title/notes/source/site name.
 Move the notes, which are usually in the last page at the bottom and
 centered, on the second page, raggedright, in smaller size.
 
+=item * continuefootnotes
+
+Normally the footnotes are reset at chapter. With this option turned
+on, they will not reset.
+
+=item * centerchapter
+
+Center the chapter title instead of ragged
+
+=item * centersection
+
+Center all the sectioning titles, including the chapters.
+
 =item * sansfontsections
 
 Use the default komascript style where chapters and parts have sans
@@ -421,6 +434,11 @@ has nocoverpage => (is => 'rw', isa => Bool, default => sub { 0 });
 has notoc       => (is => 'rw', isa => Bool, default => sub { 0 });
 has nofinalpage => (is => 'rw', isa => Bool, default => sub { 0 });
 has impressum => (is => 'rw', isa => Bool, default => sub { 0 });
+
+has continuefootnotes   => (is => 'rw', isa => Bool, default => sub { 0 } );
+has centerchapter       => (is => 'rw', isa => Bool, default => sub { 0 } );
+has centersection       => (is => 'rw', isa => Bool, default => sub { 0 } );
+
 has sansfontsections => (is => 'rw', isa => Bool, default => sub { 0 });
 has secondary_footnotes_alpha => (is => 'rw', isa => Bool, default => sub { 0 });
 has nobold => (is => 'rw', isa => Bool, default => sub { 0 });
@@ -610,6 +628,9 @@ sub config_setters {
                secondary_footnotes_alpha
                nobold
                start_with_empty_page
+               continuefootnotes
+               centerchapter
+               centersection
                opening beamertheme beamercolortheme/);
 }
 

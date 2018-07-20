@@ -7,7 +7,7 @@ use experimental qw(smartmatch);
 
 use Test::More;
 
-use JSON::XS;
+use JSON;
 
 use Sport::Analytics::NHL::LocalConfig;
 use Sport::Analytics::NHL::Config;
@@ -52,6 +52,8 @@ for my $season (1930,2016,2017) {
 }
 ok(! @got_games, 'all files matched');
 system(qw(rm -rf t/tmp/data));
+__END__
+$ENV{HOCKEYDB_DEBUG} = 1;
 delete $opts->{no_schedule_crawl};
 @got_games = $nhl->scrape_games($opts, 19300202, 20160202, 20170202);
 for my $got_game (@got_games) {

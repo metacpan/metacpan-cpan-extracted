@@ -1,20 +1,26 @@
 Revision history for MikroTik-API
 
+1.0.5 20180717
+    - allow empty password string (as default RouterOS setting)
+    - added some more files to .gitignore
+    - change from recv to read for IO::Socket
+    - added error handling for socket send/recv
+    - added socket options to avoid blocking
+
 1.0.4 20170314
-        Bugfix: check for EOF, return retval=undef on EOF [by lavv17]
+    - bugfix: check for EOF, return retval=undef on EOF
 
 1.0.3 20160211
-        Bugfix: Made possible to query for values with '=' in it
+    - bugfix: Made possible to query for values with '=' in it
 
 1.0.2 20151218
-        Added META.yml to MANIFEST
+    - added META.yml to MANIFEST
 
 1.0.1 20151218
-        Added META.yml
+    - added META.yml
 
 1.0 20151218
-		Added timeout, probe_before_talk
+    - added timeout, probe_before_talk
 
 0.01 20151210
-        First version
-
+    - initial version

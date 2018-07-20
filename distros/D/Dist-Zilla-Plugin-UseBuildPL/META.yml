@@ -4,10 +4,12 @@ author:
   - 'Vernon Lyon <vlyon@cpan.org>'
 build_requires:
   Test::More: '0.96'
+  Test::Pod: '1.41'
 configure_requires:
   Module::Build::Tiny: '0.034'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,9 +25,11 @@ no_index:
     - xt
 requires:
   Dist::Zilla: '4.200006'
+  Moose: '0'
 resources:
   bugtracker: https://github.com/vlyon/Dist-Zilla-Plugin-UseBuildPL/issues
   homepage: https://github.com/vlyon/Dist-Zilla-Plugin-UseBuildPL
   repository: https://github.com/vlyon/Dist-Zilla-Plugin-UseBuildPL.git
-version: '0.2'
+version: '0.3'
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 1

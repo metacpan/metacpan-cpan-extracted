@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ticketpriorities>
+<ticketpriority>
+<id><![CDATA[1]]></id>
+<title><![CDATA[Normal]]></title>
+<displayorder><![CDATA[1]]></displayorder>
+<frcolorcode><![CDATA[#45991c]]></frcolorcode>
+<bgcolorcode />
+<type><![CDATA[public]]></type>
+<uservisibilitycustom><![CDATA[0]]></uservisibilitycustom>
+</ticketpriority>
+<ticketpriority>
+<id><![CDATA[3]]></id>
+<title><![CDATA[Urgent]]></title>
+<displayorder><![CDATA[2]]></displayorder>
+<frcolorcode><![CDATA[#000000]]></frcolorcode>
+<bgcolorcode><![CDATA[#ff9d00]]></bgcolorcode>
+<type><![CDATA[public]]></type>
+<uservisibilitycustom><![CDATA[0]]></uservisibilitycustom>
+</ticketpriority>
+<ticketpriority>
+<id><![CDATA[6]]></id>
+<title><![CDATA[CRITICAL]]></title>
+<displayorder><![CDATA[3]]></displayorder>
+<frcolorcode><![CDATA[#ffffff]]></frcolorcode>
+<bgcolorcode><![CDATA[#d6000e]]></bgcolorcode>
+<type><![CDATA[public]]></type>
+<uservisibilitycustom><![CDATA[0]]></uservisibilitycustom>
+</ticketpriority>
+</ticketpriorities>

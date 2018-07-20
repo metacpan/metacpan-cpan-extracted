@@ -1,0 +1,132 @@
+#!/usr/bin/env perl
+#
+# a light perl script to quickly draw chart within the terminal
+# input data can be piped to it
+#
+
+use strict;
+
+use Term::ANSIColor;
+use Term::ReadKey;
+use POSIX qw(floor);
+use Getopt::Long;
+
+my $VERSION = "1.0";
+
+$| = 1;
+
+my $help;
+my ($consolidate, $sort_on_vals);
+
+GetOptions(
+    consolidate  => \$consolidate,
+    sort_on_vals => \$sort_on_vals,
+    'h|help'     => \$help,
+);
+
+
+my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
+
+my $colWidth = floor(($wchar*80)/(100*4));
+my $maxVal = 0;
+my $maxLabelLen = 4;
+my $maxValLen;
+my @data;
+
+main();
+exit;
+
+sub main {
+    my @lines = <STDIN>;
+    my @data;
+
+    my %cache;
+
+    for my $line (@lines) {
+        $line =~ m/^(.*)\s+(\d+)$/ and $1 and $2 and do {
+            add_to_data(\@data, $1, $2, \%cache);
+        };
+    }
+
+    $maxValLen = length($maxVal);
+    @data = sort { $$a[1] <=> $$b[1] } @data if $sort_on_vals;
+    printGraphLine(@$_) for @data;
+}
+
+sub add_to_data {
+    my ($data, $label, $val, $cache) = @_;
+    if ($consolidate) {
+        if (!$cache->{$label}) {
+            push @$data, ($cache->{$label} = [$label, $val]);
+        } else {
+            $cache->{$label}[1] += $val;
+            $val = $cache->{$label}[1];
+        }
+    } else {
+        push @$data, [$label, $val];
+    }
+    $maxVal = $val if $val > $maxVal;
+    my $labelLen = length($label);
+    $maxLabelLen = $labelLen if $labelLen > $maxLabelLen;
+}
+
+sub printGraphLine {
+    my ($label, $count) = @_;
+
+    my $lenCount = length($count);
+    my $barWidth = sprintf('%d', ($count*$colWidth)/($maxVal||1));
+
+    print join('',
+        sprintf('%-'.$maxLabelLen.'s ', $label),
+        '.'x($colWidth-$barWidth),
+        $count ? color('black on_yellow') : '',
+        'o'x($barWidth),
+        $count ? color('reset') : '',
+        sprintf(' %'.$maxValLen.'s', $count),
+        "\n",
+    );
+}
+
+__END__
+
+=head1 SCRIPT CATEGORIES
+Charts
+Fun/Educational
+Educational
+
+=head1 NAME
+
+quick_term_chart - a light perl script to quickly draw chart within the terminal
+input data can be piped to it
+
+=head1 DESCRIPTION
+  plots charts quickly within the terminal itself - useful for visualizing tabular data
+
+  Some TIY (Try It Yourself :) ) fun examples:
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart
+  echo -e "chat\t23\nemail\t15\nsocial media\t33"          | quick_term_chart
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart --consolidate
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart --sort_on_vals
+
+=head1 README
+
+  plots charts quickly within the terminal itself - useful for visualizing tabular data
+
+  Some TIY (Try It Yourself :) ) fun examples:
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart
+  echo -e "chat\t23\nemail\t15\nsocial media\t33"          | quick_term_chart
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart --consolidate
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart --sort_on_vals
+
+
+=head1 PREREQUISITES
+
+This uses the C<strict>, C<Getopt::Long>, C<Term::ANSIColor>, C<Term::ReadKey>, and C<POSIX> modules.
+=pod SCRIPT CATEGORIES
+
+Charts
+Fun/Educational
+Educational
+
+=cut
+

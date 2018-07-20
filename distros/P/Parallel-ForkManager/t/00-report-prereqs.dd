@@ -7,9 +7,7 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Test::More' => '0.96',
-                                      'Test::PAUSE::Permissions' => '0',
-                                      'Test::Vars' => '0',
-                                      'warnings' => '0'
+                                      'Test::Vars' => '0'
                                     }
                     },
        'runtime' => {

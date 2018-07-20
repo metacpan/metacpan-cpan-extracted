@@ -4,7 +4,7 @@
       "Joelle Maslak <jmaslak@antelope.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -78,7 +78,6 @@
             "MIME::Base64" : "3.15",
             "Mail::Sender" : "v0.8.23",
             "Math::Random::ISAAC::XS" : "1.004",
-            "Mercury" : "0.008",
             "Mojolicious" : "6.65",
             "Moose" : "2.1604",
             "Moose::Util::TypeConstraints" : "2.1604",
@@ -137,26 +136,28 @@
    "provides" : {
       "JCM::Boilerplate" : {
          "file" : "lib/JCM/Boilerplate.pm",
-         "version" : "2.181940"
+         "version" : "2.182001"
       },
       "JTM::Boilerplate" : {
          "file" : "lib/JTM/Boilerplate.pm",
-         "version" : "2.181940"
+         "version" : "2.182001"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jmaslak/JTM-Boilerplate/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/jmaslak/JTM-Boilerplate.git",
          "web" : "https://github.com/jmaslak/JTM-Boilerplate"
       }
    },
-   "version" : "2.181940",
+   "version" : "2.182001",
    "x_contributor_covenant" : {
       "version" : 0.02
    },
-   "x_generated_by_perl" : "v5.24.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0226"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

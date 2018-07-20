@@ -28,12 +28,12 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "File::ShareDir::Install" : "0.09"
+            "File::ShareDir::Install" : "0.13"
          }
       },
       "runtime" : {
          "requires" : {
-            "File::Share" : "0.25",
+            "File::ShareDir" : "1.114",
             "Moo" : "2.000000",
             "autodie" : "2.26",
             "namespace::autoclean" : "0.28",
@@ -44,11 +44,11 @@
    "provides" : {
       "BankAccount::Validator::UK" : {
          "file" : "lib/BankAccount/Validator/UK.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "BankAccount::Validator::UK::Rule" : {
          "file" : "lib/BankAccount/Validator/UK/Rule.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/manwar/BankAccount-Validator-UK"
       }
    },
-   "version" : "0.40",
+   "version" : "0.41",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -1,0 +1,78 @@
+{
+   "abstract" : "Text folding with ANSI sequence and Asian wide characters.",
+   "author" : [
+      "=over"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.18",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-ANSI-Fold",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Text::VisualWidth::PP" : "0.05",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Text::ANSI::Fold" : {
+         "file" : "lib/Text/ANSI/Fold.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kaz-utashiro/Text-ANSI-Fold/issues"
+      },
+      "homepage" : "https://github.com/kaz-utashiro/Text-ANSI-Fold",
+      "repository" : {
+         "url" : "git://github.com/kaz-utashiro/Text-ANSI-Fold.git",
+         "web" : "https://github.com/kaz-utashiro/Text-ANSI-Fold"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:UTASHIRO",
+   "x_contributors" : [
+      "Kaz Utashiro <kaz@utashiro.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

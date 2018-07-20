@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Metadata;
-$Maven::Xml::Metadata::VERSION = '1.14';
+$Maven::Xml::Metadata::VERSION = '1.15';
 # ABSTRACT: Maven Metadata element
 # PODNAME: Maven::Xml::Metadata
 
@@ -36,7 +36,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Metadata::Versioning;
-$Maven::Xml::Metadata::Versioning::VERSION = '1.14';
+$Maven::Xml::Metadata::Versioning::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(qw(lastUpdated latest release snapshot snapshotVersions versions));
@@ -70,19 +70,19 @@ sub _get_parser {
 }
 
 package Maven::Xml::Metadata::SnapshotVersion;
-$Maven::Xml::Metadata::SnapshotVersion::VERSION = '1.14';
+$Maven::Xml::Metadata::SnapshotVersion::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(qw(classifier extension value updated));
 
 package Maven::Xml::Metadata::Snapshot;
-$Maven::Xml::Metadata::Snapshot::VERSION = '1.14';
+$Maven::Xml::Metadata::Snapshot::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(qw(timestamp buildNumber localCopy));
 
 package Maven::Xml::Metadata::Plugin;
-$Maven::Xml::Metadata::Plugin::VERSION = '1.14';
+$Maven::Xml::Metadata::Plugin::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(qw(name prefix artifactId));
@@ -99,7 +99,7 @@ Maven::Xml::Metadata - Maven Metadata element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

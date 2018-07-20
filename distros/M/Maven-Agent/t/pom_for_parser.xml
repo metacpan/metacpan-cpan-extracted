@@ -17,6 +17,16 @@
   <artifactId>my-project</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.pastdev</groupId>
+        <artifactId>managed</artifactId>
+        <version>1.0.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   
   <dependencies>
     <dependency>

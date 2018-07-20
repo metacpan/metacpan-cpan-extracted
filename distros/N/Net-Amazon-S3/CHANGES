@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Amazon::S3:
 
+0.84 Mon 16 Jul 2018 17:49:10 BST
+     - Put back credential cache code lost in Signature 4 patch (Branislav Zahradník)
+
 0.83 Tue 10 Jul 2018 22:30:23 BST
      - All patches by Branislav Zahradník
      - Use Signature 4 by default only for amazonaws host (issue #29)

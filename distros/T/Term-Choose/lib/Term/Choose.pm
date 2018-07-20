@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.604';
+our $VERSION = '1.608';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -283,7 +283,7 @@ sub __choose {
             if (     ! $self->{rc2idx}[$self->{pos}[ROW]+1]
                   || ! $self->{rc2idx}[$self->{pos}[ROW]+1][$self->{pos}[COL]]
             ) {
-                $self->__beep();
+                $self->{plugin}->__beep();
             }
             else {
                 $self->{pos}[ROW]++;
@@ -301,7 +301,7 @@ sub __choose {
         }
         elsif ( $key == KEY_k || $key == VK_UP ) {
             if ( $self->{pos}[ROW] == 0 ) {
-                $self->__beep();
+                $self->{plugin}->__beep();
             }
             else {
                 $self->{pos}[ROW]--;
@@ -321,7 +321,7 @@ sub __choose {
             if (    $self->{pos}[ROW] == $#{$self->{rc2idx}}
                  && $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]}
             ) {
-                $self->__beep();
+                $self->{plugin}->__beep();
             }
             else {
                 if ( $self->{pos}[COL] < $#{$self->{rc2idx}[$self->{pos}[ROW]]} ) {
@@ -348,7 +348,7 @@ sub __choose {
         }
         elsif ( $key == KEY_BSPACE || $key == CONTROL_H || $key == KEY_BTAB ) {
             if ( $self->{pos}[COL] == 0 && $self->{pos}[ROW] == 0 ) {
-                $self->__beep();
+                $self->{plugin}->__beep();
             }
             else {
                 if ( $self->{pos}[COL] > 0 ) {
@@ -375,7 +375,7 @@ sub __choose {
         }
         elsif ( $key == KEY_l || $key == VK_RIGHT ) {
             if ( $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]} ) {
-                $self->__beep();
+                $self->{plugin}->__beep();
             }
             else {
                 $self->{pos}[COL]++;
@@ -385,7 +385,7 @@ sub __choose {
         }
         elsif ( $key == KEY_h || $key == VK_LEFT ) {
             if ( $self->{pos}[COL] == 0 ) {
-                $self->__beep();
+                $self->{plugin}->__beep();
             }
             else {
                 $self->{pos}[COL]--;
@@ -395,7 +395,7 @@ sub __choose {
         }
         elsif ( $key == CONTROL_B || $key == VK_PAGE_UP ) {
             if ( $self->{p_begin} <= 0 ) {
-                $self->__beep();
+                $self->{plugin}->__beep();
             }
             else {
                 $self->{p_begin} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) - 1 );;
@@ -406,7 +406,7 @@ sub __choose {
         }
         elsif ( $key == CONTROL_F || $key == VK_PAGE_DOWN ) {
             if ( $self->{p_end} >= $#{$self->{rc2idx}} ) {
-                $self->__beep();
+                $self->{plugin}->__beep();
             }
             else {
                 $self->{p_begin} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) + 1 );
@@ -431,7 +431,7 @@ sub __choose {
         }
         elsif ( $key == CONTROL_A || $key == VK_HOME ) {
             if ( $self->{pos}[COL] == 0 && $self->{pos}[ROW] == 0 ) {
-                $self->__beep();
+                $self->{plugin}->__beep();
             }
             else {
                 $self->{pos}[ROW] = 0;
@@ -447,7 +447,7 @@ sub __choose {
                 if (    $self->{pos}[ROW] == $#{$self->{rc2idx}} - 1
                      && $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]}
                 ) {
-                    $self->__beep();
+                    $self->{plugin}->__beep();
                 }
                 else {
                     $self->{p_begin} = @{$self->{rc2idx}} - ( @{$self->{rc2idx}} % $self->{avail_height} || $self->{avail_height} );
@@ -467,7 +467,7 @@ sub __choose {
                 if (    $self->{pos}[ROW] == $#{$self->{rc2idx}}
                      && $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]}
                 ) {
-                    $self->__beep();
+                    $self->{plugin}->__beep();
                 }
                 else {
                     $self->{p_begin} = @{$self->{rc2idx}} - ( @{$self->{rc2idx}} % $self->{avail_height} || $self->{avail_height} );
@@ -534,7 +534,7 @@ sub __choose {
                     }
                 }
                 if ( $locked ) {
-                    $self->__beep();
+                    $self->{plugin}->__beep();
                 }
                 else {
                     $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = ! $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]];
@@ -555,11 +555,11 @@ sub __choose {
                 $self->__wr_screen();
             }
             else {
-                $self->__beep();
+                $self->{plugin}->__beep();
             }
         }
         else {
-            $self->__beep();
+            $self->{plugin}->__beep();
         }
     }
 }
@@ -627,12 +627,6 @@ sub __marked_rc2idx {
         }
     }
     return $idx;
-}
-
-
-sub __beep {
-    my ( $self ) = @_;
-    print BEEP if $self->{beep};
 }
 
 
@@ -1080,7 +1074,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.604
+Version 1.608
 
 =cut
 
@@ -1642,7 +1636,7 @@ Requires Perl version 5.8.3 or greater.
 
 =head3 Term::ReadKey
 
-If L<Term::ReadKey> is available it is used the C<ReadKey> to read the user input and C<GetTerminalSize> to get the
+If L<Term::ReadKey> is available it is used C<ReadKey> to read the user input and C<GetTerminalSize> to get the
 terminal size. Without C<Term::ReadKey> C<getc> is used to read the input and C<stty size> to get the terminal size.
 
 If the OS is MSWin32 it is always used L<Win32::Console> to read the user input and to get the terminal size.

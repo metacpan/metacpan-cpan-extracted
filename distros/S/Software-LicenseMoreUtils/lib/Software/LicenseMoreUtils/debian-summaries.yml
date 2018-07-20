@@ -60,12 +60,6 @@ LGPL_2_1: |
   
   On Debian systems, the complete text of version 2.1 of the GNU Lesser
   General Public License can be found in '/usr/share/common-licenses/LGPL-2.1'.
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of the GNU Library General Public License as published by the
-  Free Software Foundation; version 2 of the License{{$or_later_clause}}.
-  
-  On Debian systems, the complete text of version 2 of the GNU Library
-  General Public License can be found in '/usr/share/common-licenses/LGPL-2'.
 LGPL_3_0: |
   This program is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by the

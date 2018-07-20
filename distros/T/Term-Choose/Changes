@@ -1,6 +1,20 @@
 Revision history for Term::Choose
 
 
+1.608   2018-07-20
+        - Bugfix key codes Win32.
+
+1.607   2018-07-18
+        - Modified constant values.
+
+1.606   2018-07-18
+        - No timeout for 'getc' - would require non-blocking read.
+
+1.605   2018-07-18
+        - Bugfix "my $Term_ReadKey": don't assign a value.
+        - Timeout for 'getc' with "Time::HiRes".
+        - "Term::Choose::Constants": new tag 'form'.
+
 1.604   2018-07-14
         - Removed the optional module "Term::ReadKey" from the Makefile.PL.
 

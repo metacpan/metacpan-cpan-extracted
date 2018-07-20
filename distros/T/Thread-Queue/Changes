@@ -1,5 +1,8 @@
 Revision history for Perl extension Thread::Queue.
 
+3.13 Wed Jul 18 02:00:03 2018
+	- [rt.cpan.org #125868] Fix tests for Test::Simple 1.302138
+
 3.12 Thu Feb  9 18:42:45 2017
 	- Fix deadlock caused by combination of dequeue_nb, enqueue and
 		queue size limit (Bug #120157 - fix by Chad Fox)

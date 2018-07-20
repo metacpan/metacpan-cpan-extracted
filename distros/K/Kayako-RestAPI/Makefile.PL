@@ -21,8 +21,9 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Dumper" => 0,
     "Digest::SHA" => 0,
+    "File::Slurp" => 0,
     "Mojo::UserAgent" => 0,
-    "XML::XML2JSON" => 0,
+    "XML::LibXML::Simple" => 0,
     "common::sense" => 0,
     "utf8" => 0
   },
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/lib/Kayako/*.t"
   }
@@ -41,9 +42,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "Digest::SHA" => 0,
+  "File::Slurp" => 0,
   "Mojo::UserAgent" => 0,
   "Test::More" => 0,
-  "XML::XML2JSON" => 0,
+  "XML::LibXML::Simple" => 0,
   "common::sense" => 0,
   "strict" => 0,
   "utf8" => 0,

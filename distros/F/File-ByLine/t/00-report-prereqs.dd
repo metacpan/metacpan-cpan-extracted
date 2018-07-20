@@ -22,7 +22,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Parallel::WorkUnit' => '1.117'
+                                        'Parallel::WorkUnit' => '2.181850'
                                       },
                       'requires' => {
                                       'Carp' => '0',
@@ -46,7 +46,8 @@ do { my $x = {
                                    'Test2::Require::Module' => '0',
                                    'Test2::V0' => '0',
                                    'Test::More' => '0',
-                                   'Test::UseAllModules' => '0.17'
+                                   'Test::UseAllModules' => '0.17',
+                                   'overload' => '0'
                                  }
                  }
      };

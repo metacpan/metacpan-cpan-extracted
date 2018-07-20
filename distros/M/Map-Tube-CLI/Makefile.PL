@@ -30,14 +30,16 @@ WriteMakefile(
         'Map::Tube::Exception' => '3.12',
         'Map::Tube'            => '3.50',
         'Encode::Locale'       => '1.05',
+        'Text::ASCIITable'     => '0.22',
+        'utf8::all'            => '0.024',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Map-Tube-CLI-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::CLI'         => { file => 'lib/Map/Tube/CLI.pm'       , version => '0.47' },
-            'Map::Tube::CLI::Option' => { file => 'lib/Map/Tube/CLI/Option.pm', version => '0.47' },
+            'Map::Tube::CLI'         => { file => 'lib/Map/Tube/CLI.pm'       , version => '0.49' },
+            'Map::Tube::CLI::Option' => { file => 'lib/Map/Tube/CLI/Option.pm', version => '0.49' },
         },
         resources => {
             repository => {

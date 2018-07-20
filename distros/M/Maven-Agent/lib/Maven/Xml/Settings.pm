@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Settings;
-$Maven::Xml::Settings::VERSION = '1.14';
+$Maven::Xml::Settings::VERSION = '1.15';
 # ABSTRACT: Maven Settings element
 # PODNAME: Maven::Xml::Settings
 
@@ -80,7 +80,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Settings::Proxy;
-$Maven::Xml::Settings::Proxy::VERSION = '1.14';
+$Maven::Xml::Settings::Proxy::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -97,7 +97,7 @@ __PACKAGE__->mk_ro_accessors(
 );
 
 package Maven::Xml::Settings::Server;
-$Maven::Xml::Settings::Server::VERSION = '1.14';
+$Maven::Xml::Settings::Server::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -122,7 +122,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Settings::Mirror;
-$Maven::Xml::Settings::Mirror::VERSION = '1.14';
+$Maven::Xml::Settings::Mirror::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -137,7 +137,7 @@ __PACKAGE__->mk_ro_accessors(
 );
 
 package Maven::Xml::Settings::Profile;
-$Maven::Xml::Settings::Profile::VERSION = '1.14';
+$Maven::Xml::Settings::Profile::VERSION = '1.15';
 use parent qw(Maven::Xml::Common::BaseProfile);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -157,7 +157,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Settings::Profile::Properties;
-$Maven::Xml::Settings::Profile::Properties::VERSION = '1.14';
+$Maven::Xml::Settings::Profile::Properties::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 
@@ -173,7 +173,7 @@ Maven::Xml::Settings - Maven Settings element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

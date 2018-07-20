@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Agent;
-$Maven::Agent::VERSION = '1.14';
+$Maven::Agent::VERSION = '1.15';
 # ABSTRACT: A base agent for working with maven
 # PODNAME: Maven::Agent
 
@@ -99,7 +99,7 @@ sub _to_file {
 }
 
 package Maven::Agent::DownloadedFile;
-$Maven::Agent::DownloadedFile::VERSION = '1.14';
+$Maven::Agent::DownloadedFile::VERSION = '1.15';
 # Wraps a temp file to hold a reference so as to keep the destructor from
 # getting called.  It will provide the filename when used as a string.
 
@@ -131,7 +131,7 @@ Maven::Agent - A base agent for working with maven
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

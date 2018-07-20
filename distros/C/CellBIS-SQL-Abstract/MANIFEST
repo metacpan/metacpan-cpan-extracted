@@ -19,7 +19,9 @@ t/02-query/insert.t
 t/02-query/select-join.t
 t/02-query/select.t
 t/02-query/update.t
-t/03-additional/create-table-foreign.t
-t/03-additional/create-table.t
+t/03-additional/mysql/create-table-foreign.t
+t/03-additional/mysql/create-table.t
+t/03-additional/sqlite/create-table-foreign.t
+t/03-additional/sqlite/create-table.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

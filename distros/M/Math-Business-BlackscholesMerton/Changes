@@ -1,3 +1,9 @@
+1.24      2018-07-17 09:50:20+08:00 Asia/Manila
+
+    - Added call spread and put spread
+
 1.23      2018-05-07 09:17:16+00:00 UTC
-     Switch to dzil
+
+    - Switch to dzil
+
 1.22

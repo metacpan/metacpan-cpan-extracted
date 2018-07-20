@@ -1,0 +1,5 @@
+Revision history for BioSAILs-Command
+
+1.0  2018-07-17 11:50:52 EDT
+	- This library is a set of wrappers for BioX::Workflow::Command and HPC::Runner::Command
+	- Run `biosails -h` for more information

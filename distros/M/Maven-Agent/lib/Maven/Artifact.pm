@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Artifact;
-$Maven::Artifact::VERSION = '1.14';
+$Maven::Artifact::VERSION = '1.15';
 # ABSTRACT: An maven artifact definition
 # PODNAME: Maven::Artifact
 
@@ -121,7 +121,7 @@ Maven::Artifact - An maven artifact definition
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

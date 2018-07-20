@@ -1,0 +1,49 @@
+{
+   "abstract" : "Website IPv6 accessibility validator API",
+   "author" : [
+      "William Belle <william.belle@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "EPFL-Net-ipv6Test",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Copy::Recursive" : "0.44",
+            "File::Find::Rule" : "0.34",
+            "Test::Deep" : "1.128",
+            "Test::MockModule" : "0.15",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.97",
+            "LWP::UserAgent" : "6.34",
+            "Readonly" : "2.05",
+            "Term::ANSIColor" : "4.06"
+         }
+      }
+   },
+   "provides" : {
+      "EPFL::Net::ipv6Test" : {
+         "file" : "lib/EPFL/Net/ipv6Test.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

@@ -1,0 +1,10 @@
+#!perl
+
+use strict;
+use warnings FATAL => 'all';
+use utf8;
+package Main;
+
+use BioSAILs::Command;
+
+BioSAILs::Command->new_with_command()->execute();

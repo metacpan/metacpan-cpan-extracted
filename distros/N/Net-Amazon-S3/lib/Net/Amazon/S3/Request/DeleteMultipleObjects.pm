@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::DeleteMultipleObjects;
-$Net::Amazon::S3::Request::DeleteMultipleObjects::VERSION = '0.83';
+$Net::Amazon::S3::Request::DeleteMultipleObjects::VERSION = '0.84';
 use Moose 0.85;
 use Moose::Util::TypeConstraints;
 use XML::LibXML;
@@ -66,7 +66,7 @@ Net::Amazon::S3::Request::DeleteMultipleObjects - An internal class to delete mu
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 

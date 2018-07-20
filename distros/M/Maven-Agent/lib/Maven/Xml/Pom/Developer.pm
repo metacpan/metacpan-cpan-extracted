@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::Developer;
-$Maven::Xml::Pom::Developer::VERSION = '1.14';
+$Maven::Xml::Pom::Developer::VERSION = '1.15';
 # ABSTRACT: Maven Developer element
 # PODNAME: Maven::Xml::Pom::Developer
 
@@ -26,7 +26,7 @@ Maven::Xml::Pom::Developer - Maven Developer element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

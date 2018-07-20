@@ -1,7 +1,7 @@
 package Test::Against::Dev;
 use strict;
 use 5.14.0;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use Carp;
 use Cwd;
 use File::Basename;
@@ -127,7 +127,7 @@ So the output for particular CPAN libraries will look like this:
 
     dist|perl-5.27.0.author|perl-5.27.0.distname|perl-5.27.0.distversion|perl-5.27.0.grade|perl-5.27.1.author|perl-5.27.1.distname|perl-5.27.1.distversion|perl-5.27.1.grade|...
     Acme-CPANAuthors|ISHIGAKI|Acme-CPANAuthors-0.26|0.26|PASS|ISHIGAKI|Acme-CPANAuthors-0.26|0.26|PASS|...
-    Algorithm-C3|HAARG|Algorithm-C3-0.10|0.10|PASS|HAARG|Algorithm-C3-0.10|0.10|PASS|...
+    Algorithm-C3|HAARG|Algorithm-C3-0.11|0.11|PASS|HAARG|Algorithm-C3-0.11|0.11|PASS|...
 
 If a particular CPAN library receives a grade of C<PASS> one month and a grade
 of C<FAIL> month, it ought to be inspected for the cause of that breakage.

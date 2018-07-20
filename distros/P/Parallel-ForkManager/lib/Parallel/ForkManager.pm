@@ -1,7 +1,7 @@
 package Parallel::ForkManager;
 our $AUTHORITY = 'cpan:DLUX';
 # ABSTRACT:  A simple parallel processing fork manager
-$Parallel::ForkManager::VERSION = '1.19';
+$Parallel::ForkManager::VERSION = '1.20';
 use POSIX ":sys_wait_h";
 use Storable qw(store retrieve);
 use File::Spec;
@@ -111,11 +111,11 @@ sub wait_children {
 *reap_finished_children=*wait_children; # behavioral synonym for clarity
 
 sub wait_one_child {
-  my ($s,$par)=@_;
+  my ($s,$flag)=@_;
 
   my $kid;
   while (1) {
-    $kid = $s->_waitpid(-1,$par||=0);
+    $kid = $s->_waitpid($flag||=0);
 
     last unless defined $kid;
 
@@ -172,7 +172,7 @@ sub wait_for_available_procs {
     my( $self, $nbr ) = @_;
     $nbr ||= 1;
 
-    croak "nbr processes '$nbr' higher than the max nbr of processes (@{[ $self->max_procs ]})"
+    croak "number of processes '$nbr' higher than the max number of processes (@{[ $self->max_procs ]})"
         if $nbr > $self->max_procs;
 
     $self->wait_one_child until $self->max_procs - $self->running_procs >= $nbr;
@@ -238,7 +238,7 @@ sub waitpid_blocking_sleep {
 }
 
 sub _waitpid { # Call waitpid() in the standard Unix fashion.
-    my( $self, undef, $flag ) = @_;
+    my( $self, $flag ) = @_;
 
     return $flag ? $self->_waitpid_non_blocking : $self->_waitpid_blocking;
 }
@@ -300,7 +300,7 @@ Parallel::ForkManager - A simple parallel processing fork manager
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =head1 SYNOPSIS
 
@@ -818,6 +818,16 @@ process whatever is retrieved.
 
 =for example end
 
+=head1 USING RAND() IN FORKED PROCESSES
+
+A caveat worth noting is that all forked processes will use the
+same random seed, so potentially providing the same results (see
+L<http://blogs.perl.org/users/brian_phillips/2010/06/when-rand-isnt-random.html>).
+If you are using C<rand()> and want each forked child to use a different seed, you
+can add the following to your program:
+
+    $pm->run_on_start(sub { srand });
+
 =head1 SECURITY
 
 Parallel::ForkManager uses temporary files when 
@@ -883,7 +893,7 @@ Gabor Szabo <gabor@szabgab.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2000 by Balázs Szabó.
+This software is copyright (c) 2018, 2016, 2015 by Balázs Szabó.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

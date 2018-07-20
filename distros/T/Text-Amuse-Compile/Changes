@@ -1,5 +1,15 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.06 2018-07-18
+
+ - HTML: respect centerchapter and centersection
+
+1.05 2018-07-17
+
+ - New options: continuefootnotes, centerchapter, centersection
+ - Remove tags from HTML title in standalone HTML
+ - CSS adjustment for floats and captions
+
 1.04 2018-03-31
 
  - Handle the new way Text::Amuse encodes the non-breaking space

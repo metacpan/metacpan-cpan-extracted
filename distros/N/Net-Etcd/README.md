@@ -238,6 +238,7 @@ Sam Batschelet (hexfusion)
 # CONTRIBUTORS
 
 Ananth Kavuri
+Michael Fung
 
 # ACKNOWLEDGEMENTS
 

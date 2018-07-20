@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Compound;
-$JSONAPI::Document::Builder::Compound::VERSION = '2.1';
+$JSONAPI::Document::Builder::Compound::VERSION = '2.2';
 =head1 NAME
 
 JSONAPI::Document::Builder::Compound - Compound Resource Document builder
 
 =head1 VERSION
 
-version 2.1
+version 2.2
 
 =head1 DESCRIPTION
 
@@ -164,8 +164,6 @@ sub build_nested_relationship {
     $options //= {};
     my $builder = JSONAPI::Document::Builder::Relationships->new({
         api_url          => $self->api_url,
-        chi              => $self->chi,
-        segmenter        => $self->segmenter,
         fields           => $fields,
         kebab_case_attrs => $self->kebab_case_attrs,
         row              => $primary_row,

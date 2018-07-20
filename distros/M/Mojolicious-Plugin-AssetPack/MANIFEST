@@ -1,6 +1,7 @@
 .perltidyrc
 .ship.conf
 .travis.yml
+.vscode/tasks.json
 Changes
 cpanfile
 examples/rollup.pl

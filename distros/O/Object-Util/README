@@ -109,6 +109,28 @@ DESCRIPTION
 
         Like Object::Extend, but with added support for roles.
 
+    $_murder
+        Called on an object, tries its best to destroy the object.
+
+          my $object = Foo->new;
+          $object->$_murder;
+          defined($object);   # false
+
+        Not only will $object be set to undef in the above example, but if
+        there were any other references to the object, $_murder will do its
+        best to poison them too.
+
+        $_murder will empty out the contents of the underlying hash or array
+        in hashref-based and arrayref-based objects, and for scalarref-based
+        objects will set the underlying scalar to undef.
+
+        $_murder will also rebless the reference into a dummy class where all
+        method calls will croak.
+
+        $_murder will generously ensure that the object's `DESTROY` is called
+        before initiating the killing spree, allowing the class to perform any
+        necessary clean-up first.
+
    Method call modifiers
     $_call_if_object
         `$object->$_call_if_object($method => @args)` works like
@@ -218,6 +240,10 @@ DESCRIPTION
 
        use Object::Util magic => 0;
 
+    The magic may trigger bugs if you're loading Object::Util in a
+    sufficiently unusual way (for example, `require` and `import` instead of
+    `use`). If this happens, disable magic.
+
 BUGS
     Please report any bugs to
     <http://rt.cpan.org/Dist/Display.html?Queue=Object-Util>.
@@ -230,7 +256,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2014 by Toby Inkster.
+    This software is copyright (c) 2014, 2018 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

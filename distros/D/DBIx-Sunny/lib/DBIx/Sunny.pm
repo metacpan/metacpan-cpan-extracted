@@ -5,7 +5,7 @@ use warnings;
 use 5.008005;
 use DBI 1.615;
 
-our $VERSION = '0.25';
+our $VERSION = '0.9991';
 our $SKIP_CALLER_REGEX = qr/^(:?DBIx?|DBD|Try::Tiny|Context::Preserve)\b/;
 
 use parent qw/DBI/;
@@ -33,9 +33,9 @@ sub connect {
 package DBIx::Sunny::db;
 our @ISA = qw(DBI::db);
 
-use DBIx::TransactionManager;
-use Scalar::Util qw/weaken blessed/;
-use SQL::NamedPlaceholder 0.10;
+use DBIx::Sunny::Util qw/bind_and_execute expand_placeholder/;
+use DBIx::TransactionManager 0.13;
+use Scalar::Util qw/weaken/;
 
 sub connected {
     my $dbh = shift;
@@ -105,108 +105,45 @@ sub do {
     $self->SUPER::do($self->__set_comment($query), $attr, @bind);
 }
 
-sub __fill_arrayref {
-    my $self = shift;
-    my ($query, @bind) = @_;
-    return if ! defined $query;
-
-    if (@bind == 1 && ref $bind[0] eq 'HASH') {
-        ($query, my $bind) = SQL::NamedPlaceholder::bind_named($query, $bind[0]);
-        my $maybe_typed = scalar(grep { ref($_) } @$bind);
-        return ($query, $maybe_typed, @$bind);
-    }
-
-    my @bind_param;
-    $query =~ s{
-        \?
-    }{
-        my $bind = shift @bind;
-        if (ref($bind) && ref($bind) eq 'ARRAY') {
-            push @bind_param, @$bind;
-            join ',', ('?') x @$bind;
-        } else {
-            push @bind_param, $bind;
-            '?';
-        }
-    }gex;
-    my $maybe_typed = scalar(grep { ref($_) } @bind_param);
-    return ( $query, $maybe_typed, @bind_param );
-}
-
 sub fill_arrayref {
     my $self = shift;
-    my ($query, undef, @bind) = $self->__fill_arrayref(@_);
-    return ( $query, @bind );
+    return expand_placeholder(@_);
 }
 
 sub __prepare_and_execute {
     my $self = shift;
-    my ($query, @bind) = @_;
+    my ($query, @bind) = expand_placeholder(@_);
     my $sth = $self->prepare($query);
-    my $i = 0;
-    for my $bind ( @bind ) {
-        if ( blessed($bind) && $bind->can('value_ref') && $bind->can('type') ) {
-            # If $bind is an SQL::Maker::SQLType or compatible object, use its type info.
-            $sth->bind_param(++$i, ${ $bind->value_ref }, $bind->type);
-        } else {
-            $sth->bind_param(++$i, $bind);
-        }
-    }
-    my $ret = $sth->execute;
-    return ( $sth, $ret );
+    my $ret = bind_and_execute($sth, @bind);
+    return ($sth, $ret);
 }
 
 sub select_one {
     my $self = shift;
-    my ($query, $maybe_typed, @bind) = $self->__fill_arrayref(@_);
-    my $row;
-    if ( $maybe_typed ) {
-        my ($sth, $ret) = $self->__prepare_and_execute($query, @bind);
-        $row = $ret && $sth->fetchrow_arrayref;
-    } else {
-        $row = $self->selectrow_arrayref($query, {}, @bind);
-    }
+    my ($sth, $ret) = $self->__prepare_and_execute(@_);
+    my $row = $ret && $sth->fetchrow_arrayref;
     return unless $row;
     return $row->[0];
 }
 
 sub select_row {
     my $self = shift;
-    my ($query, $maybe_typed, @bind) = $self->__fill_arrayref(@_);
-    my $row;
-    if ( $maybe_typed ) {
-        my ($sth, $ret) = $self->__prepare_and_execute($query, @bind);
-        $row = $ret && $sth->fetchrow_hashref;
-    } else {
-        $row = $self->selectrow_hashref($query, {}, @bind);
-    }
+    my ($sth, $ret) = $self->__prepare_and_execute(@_);
+    my $row = $ret && $sth->fetchrow_hashref;
     return unless $row;
     return $row;
 }
 
 sub select_all {
     my $self = shift;
-    my ($query, $maybe_typed, @bind) = $self->__fill_arrayref(@_);
-    my $rows;
-    if ( $maybe_typed ) {
-        my ($sth, $ret) = $self->__prepare_and_execute($query, @bind);
-        $rows = $ret && $sth->fetchall_arrayref({});
-    } else {
-        $rows = $self->selectall_arrayref($query, { Slice => {} }, @bind);
-    }
+    my ($sth, $ret) = $self->__prepare_and_execute(@_);
+    my $rows = $ret && $sth->fetchall_arrayref({});
     return $rows;
 }
 
 sub query {
     my $self = shift;
-    my ($query, $maybe_typed, @bind) = $self->__fill_arrayref(@_);
-    my $ret;
-    if ( $maybe_typed ) {
-        (undef, $ret) = $self->__prepare_and_execute($query, @bind);
-    } else {
-        my $sth = $self->prepare($query);
-        $ret = $sth->execute(@bind);
-    }
+    (undef, my $ret) = $self->__prepare_and_execute(@_);
     return $ret;
 }
 
@@ -264,7 +201,7 @@ DBIx::Sunny supports only SQLite and MySQL.
 
 DBIx::Sunny sets AutoInactiveDestroy as true.
 
-=item [SQLite/MySQL/Pg] Auto encode/decode utf-8
+=item [SQLite/MySQL/Pg] Auto encode/decode UTF-8
 
 DBIx::Sunny sets sqlite_unicode, mysql_enable_utf8 and pg_enable_utf8 automatically.
 
@@ -328,19 +265,19 @@ DBIx::Sunny allows you to specify data types of bind parameters. If a bind param
 
 =over 4
 
-=item $col = $dbh->select_one($query, @bind);
+=item C<< $col = $dbh->select_one($query, @bind); >>
 
 Shortcut for prepare, execute and fetchrow_arrayref->[0]
 
-=item $row = $dbh->select_row($query, @bind);
+=item C<< $row = $dbh->select_row($query, @bind); >>
 
 Shortcut for prepare, execute and fetchrow_hashref
 
-=item $rows = $dbh->select_all($query, @bind);
+=item C<< $rows = $dbh->select_all($query, @bind); >>
 
-Shortcut for prepare, execute and selectall_arrayref(.., { Slice => {} }, ..)
+Shortcut for prepare, execute and C<< selectall_arrayref(.., { Slice => {} }, ..) >>
 
-=item $dbh->query($query, @bind);
+=item C<< $dbh->query($query, @bind); >>
 
 Shortcut for prepare, execute. 
 

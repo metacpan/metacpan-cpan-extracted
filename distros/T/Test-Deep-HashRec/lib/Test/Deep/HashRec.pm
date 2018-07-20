@@ -3,7 +3,7 @@ use warnings;
 
 package Test::Deep::HashRec;
 # ABSTRACT:  test hash entries for required and optional fields
-$Test::Deep::HashRec::VERSION = '0.001';
+$Test::Deep::HashRec::VERSION = '0.002';
 #pod =func hashrec
 #pod
 #pod   cmp_deeply(
@@ -33,8 +33,9 @@ our @EXPORT = qw(hashrec);
 
 sub hashrec { Test::Deep::HashRec::Object->new(@_) };
 
+{
 package
-  Test::Deep::HashRec::Object {
+  Test::Deep::HashRec::Object;
 
 use Test::Deep::Cmp;
 use Test::Deep::HashElements;
@@ -139,7 +140,7 @@ Test::Deep::HashRec - test hash entries for required and optional fields
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 FUNCTIONS
 

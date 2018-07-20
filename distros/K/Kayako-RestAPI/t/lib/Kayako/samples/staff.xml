@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<staffusers>
+<staff>
+<id><![CDATA[1]]></id>
+<staffgroupid><![CDATA[1]]></staffgroupid>
+<firstname><![CDATA[Administrator]]></firstname>
+<lastname><![CDATA[ACE]]></lastname>
+<fullname><![CDATA[Administrator]]></fullname>
+<username><![CDATA[admin]]></username>
+<email><![CDATA[foo@example.com]]></email>
+<designation />
+<greeting />
+<mobilenumber />
+<isenabled><![CDATA[1]]></isenabled>
+<timezone><![CDATA[Europe/Moscow]]></timezone>
+<enabledst><![CDATA[1]]></enabledst>
+<signature />
+</staff>
+<staff>
+<id><![CDATA[3]]></id>
+<staffgroupid><![CDATA[4]]></staffgroupid>
+<firstname><![CDATA[Maxim]]></firstname>
+<lastname><![CDATA[TS]]></lastname>
+<fullname><![CDATA[Maxim TS]]></fullname>
+<username><![CDATA[maxim]]></username>
+<email><![CDATA[maxim@example.com]]></email>
+<designation><![CDATA[tech. support engineer]]></designation>
+<greeting />
+<mobilenumber />
+<isenabled><![CDATA[1]]></isenabled>
+<timezone><![CDATA[Europe/Moscow]]></timezone>
+<enabledst><![CDATA[0]]></enabledst>
+<signature><![CDATA[----------------
+Best regards,
+Maxim
+Technical Support Engineer]]></signature>
+</staff>
+<staff>
+<id><![CDATA[5]]></id>
+<staffgroupid><![CDATA[4]]></staffgroupid>
+<firstname><![CDATA[Dmitriy]]></firstname>
+<lastname><![CDATA[TS]]></lastname>
+<fullname><![CDATA[Dmitriy TS]]></fullname>
+<username><![CDATA[dmitriy]]></username>
+<email><![CDATA[dmitriy@example.com]]></email>
+<designation><![CDATA[tech. support engineer]]></designation>
+<greeting />
+<mobilenumber />
+<isenabled><![CDATA[1]]></isenabled>
+<timezone><![CDATA[Europe/Moscow]]></timezone>
+<enabledst><![CDATA[0]]></enabledst>
+<signature><![CDATA[
+----------------
+Best regards,
+Dmitry
+Technical Support Engineer]]></signature>
+</staff>
+<staff>
+<id><![CDATA[6]]></id>
+<staffgroupid><![CDATA[4]]></staffgroupid>
+<firstname><![CDATA[Roman]]></firstname>
+<lastname><![CDATA[TS]]></lastname>
+<fullname><![CDATA[Roman TS]]></fullname>
+<username><![CDATA[Roman]]></username>
+<email><![CDATA[roman@example.com]]></email>
+<designation><![CDATA[Head of TS department]]></designation>
+<greeting />
+<mobilenumber />
+<isenabled><![CDATA[1]]></isenabled>
+<timezone />
+<enabledst><![CDATA[0]]></enabledst>
+<signature><![CDATA[----------------
+Best regards,
+Roman
+Head of Technical Support department]]></signature>
+</staff>
+</staffusers>

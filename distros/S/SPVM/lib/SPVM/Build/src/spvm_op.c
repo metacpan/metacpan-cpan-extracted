@@ -177,71 +177,6 @@ SPVM_OP* SPVM_OP_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_T
   return op_var;
 }
 
-void SPVM_OP_apply_unary_numeric_promotion(SPVM_COMPILER* compiler, SPVM_OP* op_term) {
-  
-  SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_term);
-  
-  SPVM_TYPE* dist_type;
-  if (type->dimension == 0 && type->basic_type->id <= SPVM_BASIC_TYPE_C_ID_INT) {
-    dist_type = SPVM_TYPE_create_int_type(compiler);
-  }
-  else {
-    return;
-  }
-  
-  if (!(type->basic_type->id == dist_type->basic_type->id && type->dimension == dist_type->dimension)) {
-    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_term);
-    
-    SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, op_term->file, op_term->line);
-    SPVM_OP* op_dist_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, op_term->file, op_term->line);
-    op_dist_type->uv.type = dist_type;
-    SPVM_OP_build_convert(compiler, op_convert, op_dist_type, op_term);
-    
-    SPVM_OP_replace_op(compiler, op_stab, op_convert);
-  }
-}
-
-void SPVM_OP_apply_binary_numeric_promotion(SPVM_COMPILER* compiler, SPVM_OP* op_first, SPVM_OP* op_last) {
-  
-  SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_first);
-  SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_last);
-  
-  SPVM_TYPE* dist_type;
-  if ((first_type->dimension == 0 && first_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) || (last_type->dimension == 0 && last_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE)) {
-    dist_type = SPVM_TYPE_create_double_type(compiler);
-  }
-  else if ((first_type->dimension == 0 && first_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) || (last_type->dimension == 0 && last_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT)) {
-    dist_type = SPVM_TYPE_create_float_type(compiler);
-  }
-  else if ((first_type->dimension == 0 && first_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) || (last_type->dimension == 0 && last_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG)) {
-    dist_type = SPVM_TYPE_create_long_type(compiler);
-  }
-  else {
-    dist_type = SPVM_TYPE_create_int_type(compiler);
-  }
-  
-  if (!(first_type->basic_type->id == dist_type->basic_type->id && first_type->dimension == dist_type->dimension)) {
-    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_first);
-    
-    SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, op_first->file, op_first->line);
-    SPVM_OP* op_dist_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, op_first->file, op_first->line);
-    op_dist_type->uv.type = dist_type;
-    SPVM_OP_build_convert(compiler, op_convert, op_dist_type, op_first);
-    
-    SPVM_OP_replace_op(compiler, op_stab, op_convert);
-  }
-  
-  if (!(last_type->basic_type->id == dist_type->basic_type->id && last_type->dimension == dist_type->dimension)) {
-    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_last);
-    
-    SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CONVERT, op_last->file, op_last->line);
-    SPVM_OP* op_dist_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, op_last->file, op_last->line);
-    op_dist_type->uv.type = dist_type;
-    SPVM_OP_build_convert(compiler, op_convert, op_dist_type, op_last);
-    SPVM_OP_replace_op(compiler, op_stab, op_convert);
-  }
-}
-
 _Bool SPVM_OP_is_rel_op(SPVM_COMPILER* compiler, SPVM_OP* op) {
   (void)compiler;
   
@@ -416,6 +351,23 @@ SPVM_OP* SPVM_OP_new_op_var(SPVM_COMPILER* compiler, SPVM_OP* op_name) {
   SPVM_VAR* var = SPVM_VAR_new(compiler);
   var->op_name = op_name;
   op_var->uv.var = var;
+  
+  return op_var;
+}
+
+SPVM_OP* SPVM_OP_new_op_var_clone(SPVM_COMPILER* compiler, SPVM_OP* original_op_var, const char* file, int32_t line) {
+  (void)compiler;
+  
+  SPVM_VAR* var = SPVM_VAR_new(compiler);
+  SPVM_OP* op_var = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_VAR, file, line);
+  
+  SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NAME, file, line);
+  op_name->uv.name = original_op_var->uv.var->op_my->uv.my->op_name->uv.name;
+  var->op_name = op_name;
+  var->op_my = original_op_var->uv.var->op_my;
+  op_var->uv.var = var;
+  
+  assert(original_op_var->uv.var != op_var->uv.var);
   
   return op_var;
 }
@@ -657,25 +609,6 @@ SPVM_OP* SPVM_OP_new_op_constant_string(SPVM_COMPILER* compiler, char* string, i
   return op_constant;
 }
 
-SPVM_OP* SPVM_OP_new_op_var_from_op_my(SPVM_COMPILER* compiler, SPVM_OP* op_my) {
-  (void)compiler;
-  
-  SPVM_VAR* var = SPVM_VAR_new(compiler);
-  SPVM_OP* op_var = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_VAR, op_my->file, op_my->line);
-  
-  SPVM_MY* my = op_my->uv.my;
-  
-  SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NAME, op_my->file, op_my->line);
-  op_name->uv.name = my->op_name->uv.name;
-  var->op_name = op_name;
-  var->op_my = op_my;
-  op_var->uv.var = var;
-  
-  SPVM_OP_insert_child(compiler, op_var, op_var->last, op_my);
-  
-  return op_var;
-}
-
 SPVM_OP* SPVM_OP_get_op_block_from_op_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub) {
   (void)compiler;
   
@@ -869,196 +802,21 @@ SPVM_OP* SPVM_OP_build_new_object(SPVM_COMPILER* compiler, SPVM_OP* op_new, SPVM
   
   SPVM_OP_insert_child(compiler, op_new, op_new->last, op_type);
   
-  // Convert ARRAY_INIT
-  // [before]
-  //   NEW
-  //    TYPE
-  // [after]
-  //   SEQUENCE
-  //     ASSIGN_NEW
-  //       NEW
-  //         TYPE
-  //         CONSTANT_LENGTH
-  //       VAR_TMP_NEW
-  //     ASSIGN_ARRAY_ACCESS
-  //       TERM
-  //       ARRAY_ACCESS
-  //         VAR_TMP_ARRAY_ACCESS
-  //         CONSTANT 0
-  //     ASSIGN_ARRAY_ACCESS
-  //       TERM
-  //       ARRAY_ACCESS
-  //         VAR_TMP_ARRAY
-  //         CONSTANT_INDEX
-  //     ASSIGN_ARRAY_ACCESS
-  //       TERM
-  //       ARRAY_ACCESS
-  //         VAR_TMP_ARRAY
-  //         CONSTANT_INDEX
-  //     VAR_TMP_RET
   if (op_list_elements) {
-    const char* file = op_new->file;
-    int32_t line = op_new->line;
+    SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_INIT, op_list_elements->file, op_list_elements->line);
+    SPVM_OP_insert_child(compiler, op_array_init, op_array_init->last, op_list_elements);
     
-    SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, file, line);
-    SPVM_OP* op_assign_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, file, line);
-    SPVM_OP* op_var_tmp_new = SPVM_OP_new_op_var_tmp(compiler, NULL, NULL, file, line);
-    
-    SPVM_OP_build_assign(compiler, op_assign_new, op_var_tmp_new, op_new);
-
-    SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_assign_new);
-    
-    int32_t length;
-    {
-      SPVM_OP* op_term_element = op_list_elements->first;
-      int32_t index = 0;
-      while ((op_term_element = SPVM_OP_sibling(compiler, op_term_element))) {
-        
-        SPVM_OP* op_assign_array_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, file, line);
-        SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_term_element);
-        
-        SPVM_OP* op_array_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_ACCESS, file, line);
-
-        SPVM_OP* op_var_tmp_array_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_VAR, file, line);
-        op_var_tmp_array_access->uv.var = op_var_tmp_new->uv.var;
-        SPVM_OP_insert_child(compiler, op_array_access, op_array_access->last, op_var_tmp_array_access);
-
-        SPVM_OP* op_constant_index = SPVM_OP_new_op_constant_int(compiler, index, file, line);
-        SPVM_OP_insert_child(compiler, op_array_access, op_array_access->last, op_constant_index);
-        
-        SPVM_OP_build_assign(compiler, op_assign_array_access, op_array_access, op_term_element);
-        
-        SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_assign_array_access);
-        
-        index++;
-        op_term_element = op_stab;
-      }
-      length = index;
-    }
-    SPVM_OP* op_constant_length = SPVM_OP_new_op_constant_int(compiler, length, file, line);
-    SPVM_OP_replace_op(compiler, op_type->last, op_constant_length);
-    
-    SPVM_OP* op_var_tmp_ret = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_VAR, file, line);
-    op_var_tmp_ret->uv.var = op_var_tmp_new->uv.var;
-    
-    SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_var_tmp_ret);
-    
-    return op_sequence;
+    return op_array_init;
   }
   
   return op_new;
 }
 
-SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_list_elements) {
+SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_init, SPVM_OP* op_list_elements) {
   
-  // Create array initialize AST
-  //   SEQUENCE
-  //     ASSIGN_NEW
-  //       NEW
-  //         TYPE_NEW
-  //           TYPE_ELEMENT
-  //           CONSTANT_LENGTH
-  //       VAR_TMP_NEW
-  //         MY
-  //     ASSIGN_ARRAY_ACCESS
-  //       TERM
-  //       ARRAY_ACCESS
-  //         VAR_TMP_ARRAY_ACCESS
-  //         CONSTANT 0
-  //     ASSIGN_ARRAY_ACCESS
-  //       TERM
-  //       ARRAY_ACCESS
-  //         VAR_TMP_ARRAY
-  //         CONSTANT_INDEX
-  //     ASSIGN_ARRAY_ACCESS
-  //       TERM
-  //       ARRAY_ACCESS
-  //         VAR_TMP_ARRAY
-  //         CONSTANT_INDEX
-  //     VAR_TMP_RET
-  const char* file = op_list_elements->file;
-  int32_t line = op_list_elements->line;
+  SPVM_OP_insert_child(compiler, op_array_init, op_array_init->last, op_list_elements);
   
-  SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, file, line);
-  SPVM_OP* op_type_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, file, line);
-  SPVM_OP_insert_child(compiler, op_new, op_new->last, op_type_new);
-  
-  SPVM_OP* op_type_element = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, file, line);
-  SPVM_OP_insert_child(compiler, op_type_new, op_type_new->last, op_type_element);
-  
-  SPVM_OP* op_sequence = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SEQUENCE, file, line);
-  SPVM_OP* op_assign_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, file, line);
-  SPVM_OP* op_var_tmp_new = SPVM_OP_new_op_var_tmp(compiler, NULL, NULL, file, line);
-  
-  SPVM_OP_build_assign(compiler, op_assign_new, op_var_tmp_new, op_new);
-
-  SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_assign_new);
-  
-  int32_t length;
-  {
-    SPVM_OP* op_term_element = op_list_elements->first;
-    int32_t index = 0;
-    while ((op_term_element = SPVM_OP_sibling(compiler, op_term_element))) {
-      if (index == 0) {
-        
-        if (op_term_element->id == SPVM_OP_C_ID_UNDEF) {
-          SPVM_yyerror_format(compiler, "Array initialization first element must not be undef at %s line %d\n", file, line);
-        }
-
-        SPVM_TYPE* type_term_element = SPVM_OP_get_type(compiler, op_term_element);
-
-        // Create element type
-        SPVM_TYPE* type_element = SPVM_TYPE_new(compiler);
-        type_element->basic_type = type_term_element->basic_type;
-        type_element->dimension = type_term_element->dimension;
-        type_element->is_const = type_term_element->is_const;
-        op_type_element->uv.type = type_element;
-        
-        // Create array type
-        SPVM_TYPE* type_new = SPVM_TYPE_new(compiler);
-        type_new->basic_type = type_term_element->basic_type;
-        type_new->dimension = type_term_element->dimension + 1;
-        type_new->is_const = type_term_element->is_const;
-        op_type_new->uv.type= type_new;
-        
-        op_var_tmp_new->uv.var->op_my->uv.my->op_type = op_type_new;
-      }
-      
-      SPVM_OP* op_assign_array_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, file, line);
-      SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_term_element);
-      
-      SPVM_OP* op_array_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_ACCESS, file, line);
-
-      SPVM_OP* op_var_tmp_array_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_VAR, file, line);
-      op_var_tmp_array_access->uv.var = op_var_tmp_new->uv.var;
-      SPVM_OP_insert_child(compiler, op_array_access, op_array_access->last, op_var_tmp_array_access);
-
-      SPVM_OP* op_constant_index = SPVM_OP_new_op_constant_int(compiler, index, file, line);
-      SPVM_OP_insert_child(compiler, op_array_access, op_array_access->last, op_constant_index);
-      
-      SPVM_OP_build_assign(compiler, op_assign_array_access, op_array_access, op_term_element);
-      
-      SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_assign_array_access);
-      
-      index++;
-      op_term_element = op_stab;
-    }
-    length = index;
-  }
-
-  SPVM_OP* op_constant_length = SPVM_OP_new_op_constant_int(compiler, length, file, line);
-  SPVM_OP_insert_child(compiler, op_type_new, op_type_new->last, op_constant_length);
-  
-  SPVM_OP* op_var_tmp_ret = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_VAR, file, line);
-  op_var_tmp_ret->uv.var = op_var_tmp_new->uv.var;
-  
-  SPVM_OP_insert_child(compiler, op_sequence, op_sequence->last, op_var_tmp_ret);
-
-  if (length == 0) {
-    SPVM_yyerror_format(compiler, "Array initialization need at least one element at %s line %d\n", file, line);
-  }
-  
-  return op_sequence;
+  return  op_array_init;
 }
 
 SPVM_OP* SPVM_OP_get_target_op_var(SPVM_COMPILER* compiler, SPVM_OP* op) {
@@ -1154,13 +912,13 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_NEGATE:
     case SPVM_OP_C_ID_NEW:
     case SPVM_OP_C_ID_CHECK_CAST:
+    case SPVM_OP_C_ID_ARRAY_INIT:
     {
       type = SPVM_OP_get_type(compiler, op->first);
       break;
     }
     case SPVM_OP_C_ID_LIST:
     case SPVM_OP_C_ID_SEQUENCE:
-    case SPVM_OP_C_ID_ARRAY_INIT:
       type = SPVM_OP_get_type(compiler, op->last);
       break;
     case SPVM_OP_C_ID_ASSIGN: {
@@ -1326,230 +1084,6 @@ const char* SPVM_OP_create_abs_name(SPVM_COMPILER* compiler, const char* package
   return abs_name;
 }
 
-const char* SPVM_OP_create_sub_signature(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
-  
-  int32_t length = 0;
-  
-  // Calcurate signature length
-  {
-    // (
-    length += 1;
-
-    // Return type basic type
-    length += strlen(sub->op_return_type->uv.type->basic_type->name);
-    
-    // Return type dimension
-    length += sub->op_return_type->uv.type->dimension * 2;
-    
-    // )
-    length += 1;
-    
-    // Subroutine name
-    length += strlen(sub->op_name->uv.name);
-    
-    // (
-    length += 1;
-    
-    int32_t arg_index;
-    for (arg_index = 0; arg_index < sub->op_args->length; arg_index++) {
-      if (sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_METHOD && arg_index == 0) {
-        // self
-        length += 4;
-      }
-      else {
-        SPVM_OP* op_arg_sub = SPVM_LIST_fetch(sub->op_args, arg_index);
-        SPVM_TYPE* type_arg_sub = SPVM_OP_get_type(compiler, op_arg_sub);
-        
-        // TYPE
-        length += strlen(type_arg_sub->basic_type->name);
-        
-        // Dimension
-        length += type_arg_sub->dimension * 2;
-      }
-      // ,
-      if (arg_index != sub->op_args->length - 1) {
-        length += 1;
-      }
-    }
-    
-    // )
-    length += 1;
-  }
-  
-  char* sub_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
-  
-  // Calcurate sub signature length
-  char* bufptr = sub_signature;
-  {
-    // (
-    memcpy(bufptr, "(", 1);
-    bufptr += 1;
-
-    // Return type
-    memcpy(bufptr, sub->op_return_type->uv.type->basic_type->name, strlen(sub->op_return_type->uv.type->basic_type->name));
-    bufptr += strlen(sub->op_return_type->uv.type->basic_type->name);
-    
-    int32_t dim_index;
-    for (dim_index = 0; dim_index < sub->op_return_type->uv.type->dimension; dim_index++) {
-      memcpy(bufptr, "[]", 2);
-      bufptr += 2;
-    }
-    
-    // )
-    *bufptr = ')';
-    bufptr += 1;
-
-    // Subroutine name
-    memcpy(bufptr, sub->op_name->uv.name, strlen(sub->op_name->uv.name));
-    bufptr += strlen(sub->op_name->uv.name);
-    
-    // (
-    *bufptr = '(';
-    bufptr += 1;
-    
-    int32_t arg_index;
-    for (arg_index = 0; arg_index < sub->op_args->length; arg_index++) {
-      // self
-      if (sub->call_type_id == SPVM_SUB_C_CALL_TYPE_ID_METHOD && arg_index == 0) {
-        memcpy(bufptr, "self", 4);
-        bufptr += 4;
-      }
-      else {
-        SPVM_OP* op_arg_sub = SPVM_LIST_fetch(sub->op_args, arg_index);
-        SPVM_TYPE* type_arg_sub = SPVM_OP_get_type(compiler, op_arg_sub);
-        
-        // TYPE
-        memcpy(bufptr, type_arg_sub->basic_type->name, strlen(type_arg_sub->basic_type->name));
-        bufptr += strlen(type_arg_sub->basic_type->name);
-
-        int32_t dim_index;
-        for (dim_index = 0; dim_index < type_arg_sub->dimension; dim_index++) {
-          memcpy(bufptr, "[]", 2);
-          bufptr += 2;
-        }
-      }
-
-      // ,
-      if (arg_index != sub->op_args->length - 1) {
-        memcpy(bufptr, ",", 1);
-        bufptr += 1;
-      }
-    }
-    
-    // )
-    memcpy(bufptr, ")", 1);
-    bufptr += 1;
-  }
-  
-  return sub_signature;
-}
-
-const char* SPVM_OP_create_field_signature(SPVM_COMPILER* compiler, SPVM_FIELD* field) {
-  
-  int32_t length = 0;
-  
-  // Calcurate signature length
-  {
-    // (
-    length += 1;
-
-    // Return type basic type
-    length += strlen(field->op_type->uv.type->basic_type->name);
-    
-    // Return type dimension
-    length += field->op_type->uv.type->dimension * 2;
-    
-    // )
-    length += 1;
-    
-    // Subroutine name
-    length += strlen(field->op_name->uv.name);
-  }
-  
-  char* field_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
-  
-  // Calcurate field signature length
-  char* bufptr = field_signature;
-  {
-    // (
-    memcpy(bufptr, "(", 1);
-    bufptr += 1;
-
-    // Return type
-    memcpy(bufptr, field->op_type->uv.type->basic_type->name, strlen(field->op_type->uv.type->basic_type->name));
-    bufptr += strlen(field->op_type->uv.type->basic_type->name);
-    
-    int32_t dim_index;
-    for (dim_index = 0; dim_index < field->op_type->uv.type->dimension; dim_index++) {
-      memcpy(bufptr, "[]", 2);
-      bufptr += 2;
-    }
-    
-    // )
-    *bufptr = ')';
-    bufptr += 1;
-
-    // Subroutine name
-    memcpy(bufptr, field->op_name->uv.name, strlen(field->op_name->uv.name));
-    bufptr += strlen(field->op_name->uv.name);
-  }
-  
-  return field_signature;
-}
-
-const char* SPVM_OP_create_package_var_signature(SPVM_COMPILER* compiler, SPVM_PACKAGE_VAR* package_var) {
-  
-  int32_t length = 0;
-  
-  // Calcurate signature length
-  {
-    // (
-    length += 1;
-
-    // Return type basic type
-    length += strlen(package_var->op_type->uv.type->basic_type->name);
-    
-    // Return type dimension
-    length += package_var->op_type->uv.type->dimension * 2;
-    
-    // )
-    length += 1;
-    
-    // Subroutine name
-    length += strlen(package_var->op_var->uv.var->op_name->uv.name);
-  }
-  
-  char* package_var_signature = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, length + 1);
-  
-  // Calcurate package_var signature length
-  char* bufptr = package_var_signature;
-  {
-    // (
-    memcpy(bufptr, "(", 1);
-    bufptr += 1;
-
-    // Return type
-    memcpy(bufptr, package_var->op_type->uv.type->basic_type->name, strlen(package_var->op_type->uv.type->basic_type->name));
-    bufptr += strlen(package_var->op_type->uv.type->basic_type->name);
-    
-    int32_t dim_index;
-    for (dim_index = 0; dim_index < package_var->op_type->uv.type->dimension; dim_index++) {
-      memcpy(bufptr, "[]", 2);
-      bufptr += 2;
-    }
-    
-    // )
-    *bufptr = ')';
-    bufptr += 1;
-
-    // Subroutine name
-    memcpy(bufptr, package_var->op_var->uv.var->op_name->uv.name, strlen(package_var->op_var->uv.var->op_name->uv.name));
-    bufptr += strlen(package_var->op_var->uv.var->op_name->uv.name);
-  }
-  
-  return package_var_signature;
-}
-
 const char* SPVM_OP_create_package_var_access_abs_name(SPVM_COMPILER* compiler, const char* package_name, const char* name) {
   int32_t length = (int32_t)(strlen(package_name) + 2 + strlen(name));
   
@@ -1700,10 +1234,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         // Add op package
         field->op_package = op_package;
       }
-      
-      if (SPVM_TYPE_is_object(compiler, field->op_type->uv.type)) {
-        SPVM_LIST_push(package->object_field_indexes, (void*)(intptr_t)field->index);
-      }
     }
   }
 
@@ -1827,48 +1357,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   SPVM_LIST_push(compiler->op_packages, op_package);
   SPVM_HASH_insert(compiler->op_package_symtable, package_name, strlen(package_name), op_package);
 
-  // Register sub signature
-  {
-    int32_t i;
-    for (i = 0; i < package->op_subs->length; i++) {
-      SPVM_OP* op_sub = SPVM_LIST_fetch(package->op_subs, i);
-      SPVM_SUB* sub = op_sub->uv.sub;
-      
-      const char* sub_signature = SPVM_OP_create_sub_signature(compiler, sub);
-      sub->signature = sub_signature;
-      SPVM_LIST_push(sub->op_package->uv.package->sub_signatures, (char*)sub_signature);
-      SPVM_HASH_insert(sub->op_package->uv.package->sub_signature_symtable, sub_signature, strlen(sub_signature), sub);
-    }
-  }
-
-  // Register field signature
-  {
-    int32_t i;
-    for (i = 0; i < package->op_fields->length; i++) {
-      SPVM_OP* op_field = SPVM_LIST_fetch(package->op_fields, i);
-      SPVM_FIELD* field = op_field->uv.field;
-      
-      const char* field_signature = SPVM_OP_create_field_signature(compiler, field);
-      field->signature = field_signature;
-      SPVM_LIST_push(field->op_package->uv.package->field_signatures, (char*)field_signature);
-      SPVM_HASH_insert(field->op_package->uv.package->field_signature_symtable, field_signature, strlen(field_signature), field);
-    }
-  }
-
-  // Register package_var signature
-  {
-    int32_t i;
-    for (i = 0; i < package->op_package_vars->length; i++) {
-      SPVM_OP* op_package_var = SPVM_LIST_fetch(package->op_package_vars, i);
-      SPVM_PACKAGE_VAR* package_var = op_package_var->uv.package_var;
-      
-      const char* package_var_signature = SPVM_OP_create_package_var_signature(compiler, package_var);
-      package_var->signature = package_var_signature;
-      SPVM_LIST_push(package_var->op_package->uv.package->package_var_signatures, (char*)package_var_signature);
-      SPVM_HASH_insert(package_var->op_package->uv.package->package_var_signature_symtable, package_var_signature, strlen(package_var_signature), package_var);
-    }
-  }
-  
   return op_package;
 }
 
@@ -1891,17 +1379,15 @@ SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op
   
   op_var = SPVM_OP_build_my(compiler, op_my, op_var, op_type);
   
-  // Variable declaration is argument
-  if (op_var->first) {
-    op_var->first->uv.my->is_arg = 1;
-  }
-  
   return op_var;
 }
 
 SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_var, SPVM_OP* op_type) {
   
   if (op_var->id == SPVM_OP_C_ID_VAR) {
+    
+    // Declaration
+    op_var->uv.var->is_declaration = 1;
     
     // Create my var information
     SPVM_MY* my = SPVM_MY_new(compiler);
@@ -1919,9 +1405,9 @@ SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_v
     
     op_var->uv.var->op_my = op_my;
     
-    SPVM_OP_insert_child(compiler, op_var, op_var->last, op_my);
-    
-    assert(op_var->first);
+    SPVM_OP* op_my_tmp = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_MY, op_my->file, op_my->line);
+    SPVM_MY* my_tmp = SPVM_MY_new(compiler);
+    op_my_tmp->uv.my = my_tmp;
   }
   else {
     const char* name = SPVM_OP_get_var_name(compiler, op_var);
@@ -2073,7 +1559,7 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
     while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
       if (sub_index == 0) {
         // Call type
-        SPVM_OP* op_type = op_arg->first->uv.my->op_type;
+        SPVM_OP* op_type = op_arg->uv.var->op_my->uv.my->op_type;
         if (op_type) {
           if (op_type->id == SPVM_OP_C_ID_SELF) {
             sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_METHOD;
@@ -2083,7 +1569,7 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
           }
         }
       }
-      SPVM_LIST_push(sub->op_args, op_arg->first);
+      SPVM_LIST_push(sub->op_args, op_arg->uv.var->op_my);
       sub_index++;
     }
   }
@@ -2092,7 +1578,7 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
   if (sub->have_native_desc) {
     SPVM_OP* op_arg = op_args->first;
     while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
-      SPVM_LIST_push(sub->op_mys, op_arg->first);
+      SPVM_LIST_push(sub->op_mys, op_arg->uv.var->op_my);
     }
   }
 
@@ -2107,16 +1593,21 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
     }
   }
   
-  // Add my declaration to first of block
+  // Add variable declaration to first of block
   if (op_block) {
     SPVM_OP* op_list_statement = op_block->first;
     {
       int32_t i;
       for (i = sub->op_args->length - 1; i >= 0; i--) {
         SPVM_OP* op_arg = SPVM_LIST_fetch(sub->op_args, i);
+        assert(op_arg);
         SPVM_OP* op_my = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_MY, op_arg->file, op_arg->line);
         op_my->uv.my = op_arg->uv.my;
-        SPVM_OP_insert_child(compiler, op_list_statement, op_list_statement->first, op_my);
+        SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_my->uv.my->op_name);
+        op_var->uv.var->op_my = op_my;
+        op_var->uv.var->is_declaration = 1;
+
+        SPVM_OP_insert_child(compiler, op_list_statement, op_list_statement->first, op_var);
       }
     }
     
@@ -2516,13 +2007,16 @@ SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_
   // Assign left child is var and it has variable declaration, try type inference
   if (op_assign_to->id == SPVM_OP_C_ID_VAR) {
     SPVM_OP* op_var = op_assign_to;
-    if (op_var->first && op_var->first->id == SPVM_OP_C_ID_MY) {
-      SPVM_OP* op_my = op_var->first;
+    if (op_var->uv.var->op_my && op_var->uv.var->op_my->id == SPVM_OP_C_ID_MY) {
+      SPVM_OP* op_my = op_var->uv.var->op_my;
       SPVM_MY* my = op_my->uv.my;
       my->try_type_inference = 1;
       my->op_term_type_inference = op_assign_from;
     }
   }
+
+  // SPVM_DUMPER_dump_ast(compiler, op_assign);
+  
   
   return op_assign;
 }

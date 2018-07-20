@@ -103,6 +103,14 @@ has grass_id_list => (
     isa => 'ArrayRef[Int]',
 );
 
+has_non_attribute_mapping {
+    _source => {
+        excludes => [qw/
+            grass_field
+        /],
+    },
+};
+
 __PACKAGE__->meta->make_immutable;
 
 1;

@@ -59,5 +59,6 @@ baz
 dequeuing
 enqueuing
 pre
+MetaCPAN
 
 __END__

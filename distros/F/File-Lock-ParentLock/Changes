@@ -1,3 +1,14 @@
+0.08      2018-07-19 14:27:11+03:00 Europe/Kiev
+
+0.08      2018-07-19 14:24:14+03:00 Europe/Kiev
+- reduced verbosity for --is-locked-by-us/others options
+
+0.07      2018-07-19 11:35:41+03:00 Europe/Kiev
+- added --is-locked-by-us/others to parentlock script
+
+0.06      2018-07-16 18:11:40+03:00 Europe/Kiev
+- added is_locked_by_us/is_locked_by_others; deprecated ambiguous is_locked
+
 0.05      2016-10-25 23:22:22+03:00 Europe/Kiev
 - cosmetic release: added Changes, updated spec, fixed some CPANTS issues
 

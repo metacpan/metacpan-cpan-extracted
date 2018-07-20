@@ -7,7 +7,7 @@ use Test::Mojo;
 use_ok('Mojolicious::Plugin::JSONAPI');
 
 {
-    plugin 'JSONAPI', { namespace => 'api', data_dir => 't/share' };
+    plugin 'JSONAPI', { namespace => 'api' };
 
     my $test = {};    # modified in each subtest for different scenarios
 
@@ -54,7 +54,7 @@ use_ok('Mojolicious::Plugin::JSONAPI');
 }
 
 {    # Without namespace
-    plugin 'JSONAPI', { data_dir => 't/share' };
+    plugin 'JSONAPI';
 
     my $test = {};    # modified in each subtest for different scenarios
 
@@ -101,7 +101,7 @@ use_ok('Mojolicious::Plugin::JSONAPI');
 }
 
 {    # With long namespace
-    plugin 'JSONAPI', { namespace => 'external/api', data_dir => 't/share' };
+    plugin 'JSONAPI', { namespace => 'external/api' };
 
     my $test = {};    # modified in each subtest for different scenarios
 

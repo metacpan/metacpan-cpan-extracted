@@ -1,14 +1,12 @@
 package JSONAPI::Document;
-$JSONAPI::Document::VERSION = '2.1';
+$JSONAPI::Document::VERSION = '2.2';
 # ABSTRACT: Turn DBIx results into JSON API documents.
 
 use Moo;
 
 use Carp ();
-use CHI;
 use JSONAPI::Document::Builder;
 use JSONAPI::Document::Builder::Compound;
-use Lingua::EN::Segment;
 
 has kebab_case_attrs => (
     is      => 'ro',
@@ -21,24 +19,6 @@ has api_url => (
     },
     required => 1,
 );
-
-has data_dir => (
-    is       => 'ro',
-    required => 1,
-);
-
-has chi => (is => 'lazy',);
-
-has segmenter => (is => 'lazy',);
-
-sub _build_chi {
-    my ($self) = @_;
-    return CHI->new(driver => 'File', root_dir => $self->data_dir);
-}
-
-sub _build_segmenter {
-    return Lingua::EN::Segment->new;
-}
 
 sub compound_resource_document {
     my ($self, $row, $options) = @_;
@@ -53,11 +33,9 @@ sub compound_resource_document {
 
     my $builder = JSONAPI::Document::Builder::Compound->new(
         api_url          => $self->api_url,
-        chi              => $self->chi,
         fields           => $fields,
         kebab_case_attrs => $self->kebab_case_attrs,
         row              => $row,
-        segmenter        => $self->segmenter,
         relationships    => \@relationships,
     );
 
@@ -91,11 +69,9 @@ sub resource_document {
 
     my $builder = JSONAPI::Document::Builder->new(
         api_url          => $self->api_url,
-        chi              => $self->chi,
         fields           => $fields,
         kebab_case_attrs => $self->kebab_case_attrs,
         row              => $row,
-        segmenter        => $self->segmenter,
     );
 
     my $document = $builder->build();
@@ -129,7 +105,7 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 =head1 VERSION
 
-version 2.1
+version 2.2
 
 =head1 SYNOPSIS
 
@@ -179,11 +155,6 @@ of the document. This is useful when you have a more complicated set of attribut
 by simply calling C<get_inflated_columns> (the default behaviour).
 
 =head1 ATTRIBUTES
-
-=head2 data_dir
-
-Required; Directory string where this module can store computed document type strings. This should be
-a directory that's ignored by your VCS.
 
 =head2 api_url
 
@@ -250,7 +221,11 @@ many_to_many relationships are not supported
 
 =item
 
-only one level of depth is supported (so requesting 'include=comments.likes.author' will throw errors)
+Only one level of depth is supported (so requesting 'include=comments.likes.author' will throw errors)
+
+=item
+
+Are only available through C<compound_resource_document> (not C<resource_document>).
 
 =back
 
@@ -272,10 +247,10 @@ Returns a I<HashRef> with the following structure:
 
 View the resource document specification L<here|http://jsonapi.org/format/#document-resource-objects>.
 
-Uses L<Lingua::EN::Segment|metacpan.org/pod/Lingua::EN::Segment> to set the appropriate type of the
-document. This is a bit expensive, but it ensures that your schema results source name gets hyphenated
-appropriately when converted into its plural form. The resulting type is cached into the C<data_dir>
-to minimize the need to re-compute the document type.
+Uses C<decamelize> from L<Mojo::Util|metacpan.org/pod/Mojo::Util> to parse the
+L<source_name|https://metacpan.org/pod/DBIx::Class::ResultSource#source_name> of the DBIx::Class::Row and
+set the appropriate type of the document. This is used to ensure that your rows source name gets
+hyphenated appropriately when converted into its plural form.
 
 The following options can be given:
 

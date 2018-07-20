@@ -43,6 +43,7 @@ t/fonts.t
 t/fontsizes.t
 t/header.t
 t/headings.t
+t/html-title.t
 t/html.t
 t/langs.t
 t/leaks.t
@@ -66,6 +67,7 @@ t/missing-fonts.t
 t/nobold-option.t
 t/nofinalpage.t
 t/notoc.t
+t/options-2.t
 t/options-f/dir1/1/options1.muse
 t/options-f/dir2/2/options2.muse
 t/options-impressum-sans.t
@@ -97,7 +99,9 @@ t/testfile/deleted.muse
 t/testfile/epub-meta.muse
 t/testfile/for-epub.muse
 t/testfile/for-multipar-footnotes.muse
+t/testfile/html-title.muse
 t/testfile/invalid.muse
+t/testfile/options-2.muse
 t/testfile/slides.muse
 t/testfile/strike.muse
 t/testfile/test.muse

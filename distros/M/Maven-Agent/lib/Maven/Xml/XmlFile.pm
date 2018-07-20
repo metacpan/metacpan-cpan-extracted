@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::XmlFile;
-$Maven::Xml::XmlFile::VERSION = '1.14';
+$Maven::Xml::XmlFile::VERSION = '1.15';
 # ABSTRACT: A base class for Maven XML file
 # PODNAME: Maven::Xml::XmlFile
 
@@ -62,7 +62,7 @@ Maven::Xml::XmlFile - A base class for Maven XML file
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

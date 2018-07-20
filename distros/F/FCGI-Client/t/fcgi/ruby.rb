@@ -1,4 +1,5 @@
 #!/usr/bin/ruby
+# encoding: utf-8
 load 't/fcgi/fcgi.rb'
 
 FCGI.each {|f|

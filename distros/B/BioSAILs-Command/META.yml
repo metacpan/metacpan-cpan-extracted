@@ -1,0 +1,54 @@
+---
+abstract: 'Command line wrapper for the BioX-Workflow-Command and HPC-Runner-Command libraries.'
+author:
+  - 'Jillian Rowe <jillian.e.rowe@gmail.com>'
+build_requires:
+  File::Spec::Functions: '0'
+  FindBin: '0'
+  Test::Class::Moose: '0'
+  Test::Class::Moose::Load: '0'
+  Test::Class::Moose::Runner: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BioSAILs-Command
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  BioX::Workflow::Command: '0'
+  BioX::Workflow::Command::add: '0'
+  BioX::Workflow::Command::new: '0'
+  BioX::Workflow::Command::run: '0'
+  HPC::Runner::Command: '0'
+  HPC::Runner::Command::execute_array: '0'
+  HPC::Runner::Command::execute_job: '0'
+  HPC::Runner::Command::submit_jobs: '0'
+  Moose: '0'
+  MooseX::App: '1.39'
+  MooseX::App::Command: '0'
+  MooseX::App::Plugin::Version::Command: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/biosails/BioSAILs-Command/issues
+  homepage: https://github.com/biosails/BioSAILs-Command
+  repository: https://github.com/biosails/BioSAILs-Command.git
+version: '1.0'
+x_generated_by_perl: v5.22.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

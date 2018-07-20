@@ -19,7 +19,10 @@
     Stamina: 90
     Attack: 118
     Defense: 118
-    HatchedMAX: 560
+    MAXCP:
+        Hatched: 560
+        Reward: 420
+        Boosted: 701
 フシギソウ:   #--------------------------------------------------------------
     Name:
         ja: フシギソウ
@@ -41,7 +44,10 @@
     Stamina: 120
     Attack: 151
     Defense: 151
-    HatchedMAX: 886
+    MAXCP:
+        Hatched: 886
+        Reward: 665
+        Boosted: 1108
 フシギバナ:   #--------------------------------------------------------------
     Name:
         ja: フシギバナ
@@ -62,7 +68,10 @@
     Stamina: 160
     Attack: 198
     Defense: 198
-    HatchedMAX: 1467
+    MAXCP:
+        Hatched: 1467
+        Reward: 1100
+        Boosted: 1834
 ヒトカゲ:   #--------------------------------------------------------------
     Name:
         ja: ヒトカゲ
@@ -83,7 +92,10 @@
     Stamina: 78
     Attack: 116
     Defense: 96
-    HatchedMAX: 475
+    MAXCP:
+        Hatched: 475
+        Reward: 356
+        Boosted: 593
 リザード:   #--------------------------------------------------------------
     Name:
         ja: リザード
@@ -105,7 +117,10 @@
     Stamina: 116
     Attack: 158
     Defense: 129
-    HatchedMAX: 847
+    MAXCP:
+        Hatched: 847
+        Reward: 636
+        Boosted: 1060
 リザードン:   #-------------------------------------------------------------
     Name:
         ja: リザードン
@@ -129,7 +144,10 @@
     Stamina: 156
     Attack: 223
     Defense: 176
-    HatchedMAX: 1535
+    MAXCP:
+        Hatched: 1535
+        Reward: 1151
+        Boosted: 1918
 ゼニガメ:   #--------------------------------------------------------------
     Name:
         ja: ゼニガメ
@@ -150,7 +168,10 @@
     Stamina: 88
     Attack: 94
     Defense: 122
-    HatchedMAX: 462
+    MAXCP:
+        Hatched: 462
+        Reward: 346
+        Boosted: 577
 カメール:   #--------------------------------------------------------------
     Name:
         ja: カメール
@@ -171,7 +192,10 @@
     Stamina: 118
     Attack: 126
     Defense: 155
-    HatchedMAX: 756
+    MAXCP:
+        Hatched: 756
+        Reward: 567
+        Boosted: 945
 カメックス:   #--------------------------------------------------------------
     Name:
         ja: カメックス
@@ -191,7 +215,10 @@
     Stamina: 158
     Attack: 171
     Defense: 210
-    HatchedMAX: 1309
+    MAXCP:
+        Hatched: 1309
+        Reward: 982
+        Boosted: 1637
 キャタピー:   #--------------------------------------------------------------
     Name:
         ja: キャタピー
@@ -210,7 +237,10 @@
     Stamina: 90
     Attack: 55
     Defense: 62
-    HatchedMAX: 224
+    MAXCP:
+        Hatched: 224
+        Reward: 168
+        Boosted: 280
 トランセル:   #--------------------------------------------------------------
     Name:
         ja: トランセル
@@ -229,7 +259,10 @@
     Stamina: 100
     Attack: 45
     Defense: 94
-    HatchedMAX: 239
+    MAXCP:
+        Hatched: 239
+        Reward: 179
+        Boosted: 299
 バタフリー:   #--------------------------------------------------------------
     Name:
         ja: バタフリー
@@ -251,7 +284,10 @@
     Stamina: 120
     Attack: 167
     Defense: 151
-    HatchedMAX: 972
+    MAXCP:
+        Hatched: 972
+        Reward: 729
+        Boosted: 1215
 ビードル:   #--------------------------------------------------------------
     Name:
         ja: ビードル
@@ -271,7 +307,10 @@
     Stamina: 80
     Attack: 63
     Defense: 55
-    HatchedMAX: 227
+    MAXCP:
+        Hatched: 227
+        Reward: 170
+        Boosted: 283
 コクーン:   #--------------------------------------------------------------
     Name:
         ja: コクーン
@@ -291,7 +330,10 @@
     Stamina: 90
     Attack: 46
     Defense: 86
-    HatchedMAX: 224
+    MAXCP:
+        Hatched: 224
+        Reward: 168
+        Boosted: 280
 スピアー:   #--------------------------------------------------------------
     Name:
         ja: スピアー
@@ -313,7 +355,10 @@
     Stamina: 130
     Attack: 169
     Defense: 150
-    HatchedMAX: 1015
+    MAXCP:
+        Hatched: 1015
+        Reward: 761
+        Boosted: 1269
 ポッポ:   #--------------------------------------------------------------
     Name:
         ja: ポッポ
@@ -335,7 +380,10 @@
     Stamina: 80
     Attack: 85
     Defense: 76
-    HatchedMAX: 331
+    MAXCP:
+        Hatched: 331
+        Reward: 248
+        Boosted: 414
 ピジョン:   #--------------------------------------------------------------
     Name:
         ja: ピジョン
@@ -357,7 +405,10 @@
     Stamina: 126
     Attack: 117
     Defense: 108
-    HatchedMAX: 620
+    MAXCP:
+        Hatched: 620
+        Reward: 465
+        Boosted: 775
 ピジョット:   #--------------------------------------------------------------
     Name:
         ja: ピジョット
@@ -380,7 +431,10 @@
     Stamina: 166
     Attack: 166
     Defense: 157
-    HatchedMAX: 1139
+    MAXCP:
+        Hatched: 1139
+        Reward: 854
+        Boosted: 1424
 コラッタ:   #--------------------------------------------------------------
     Name:
         ja: コラッタ
@@ -401,7 +455,10 @@
     Stamina: 60
     Attack: 103
     Defense: 70
-    HatchedMAX: 336
+    MAXCP:
+        Hatched: 336
+        Reward: 252
+        Boosted: 420
 ラッタ:   #--------------------------------------------------------------
     Name:
         ja: ラッタ
@@ -421,7 +478,10 @@
     Stamina: 110
     Attack: 161
     Defense: 144
-    HatchedMAX: 885
+    MAXCP:
+        Hatched: 885
+        Reward: 664
+        Boosted: 1106
 オニスズメ:   #-------------------------------------------------------------
     Name:
         ja: オニスズメ
@@ -444,7 +504,10 @@
     Stamina: 80
     Attack: 112
     Defense: 61
-    HatchedMAX: 385
+    MAXCP:
+        Hatched: 385
+        Reward: 288
+        Boosted: 481
 オニドリル:   #-------------------------------------------------------------
     Name:
         ja: オニドリル
@@ -466,7 +529,10 @@
     Stamina: 130
     Attack: 182
     Defense: 135
-    HatchedMAX: 1036
+    MAXCP:
+        Hatched: 1036
+        Reward: 777
+        Boosted: 1296
 アーボ:   #--------------------------------------------------------------
     Name:
         ja: アーボ
@@ -488,7 +554,10 @@
     Stamina: 70
     Attack: 110
     Defense: 102
-    HatchedMAX: 444
+    MAXCP:
+        Hatched: 444
+        Reward: 333
+        Boosted: 556
 アーボック:   #-------------------------------------------------------------
     Name:
         ja: アーボック
@@ -508,7 +577,10 @@
     Stamina: 120
     Attack: 167
     Defense: 158
-    HatchedMAX: 992
+    MAXCP:
+        Hatched: 992
+        Reward: 744
+        Boosted: 1240
 ピカチュウ:   #--------------------------------------------------------------
     Name:
         ja: ピカチュウ
@@ -530,7 +602,10 @@
     Stamina: 70
     Attack: 112
     Defense: 101
-    HatchedMAX: 450
+    MAXCP:
+        Hatched: 450
+        Reward: 337
+        Boosted: 562
 ライチュウ:   #--------------------------------------------------------------
     Name:
         ja: ライチュウ
@@ -552,7 +627,10 @@
     Stamina: 120
     Attack: 193
     Defense: 165
-    HatchedMAX: 1157
+    MAXCP:
+        Hatched: 1157
+        Reward: 867
+        Boosted: 1446
 サンド:   #--------------------------------------------------------------
     Name:
         ja: サンド
@@ -574,7 +652,10 @@
     Stamina: 100
     Attack: 126
     Defense: 145
-    HatchedMAX: 682
+    MAXCP:
+        Hatched: 682
+        Reward: 512
+        Boosted: 853
 サンドパン:   #--------------------------------------------------------------
     Name:
         ja: サンドパン
@@ -594,7 +675,10 @@
     Stamina: 150
     Attack: 182
     Defense: 202
-    HatchedMAX: 1330
+    MAXCP:
+        Hatched: 1330
+        Reward: 997
+        Boosted: 1663
 ニドラン♀:   #--------------------------------------------------------------
     Name:
         ja: ニドラン♀
@@ -615,7 +699,10 @@
     Stamina: 110
     Attack: 86
     Defense: 94
-    HatchedMAX: 420
+    MAXCP:
+        Hatched: 420
+        Reward: 315
+        Boosted: 525
 ニドリーナ:   #--------------------------------------------------------------
     Name:
         ja: ニドリーナ
@@ -636,7 +723,10 @@
     Stamina: 140
     Attack: 117
     Defense: 126
-    HatchedMAX: 696
+    MAXCP:
+        Hatched: 696
+        Reward: 522
+        Boosted: 870
 ニドクイン:   #--------------------------------------------------------------
     Name:
         ja: ニドクイン
@@ -657,7 +747,10 @@
     Stamina: 180
     Attack: 180
     Defense: 174
-    HatchedMAX: 1336
+    MAXCP:
+        Hatched: 1336
+        Reward: 1002
+        Boosted: 1670
 ニドラン♂:   #--------------------------------------------------------------
     Name:
         ja: ニドラン♂
@@ -678,7 +771,10 @@
     Stamina: 92
     Attack: 105
     Defense: 76
-    HatchedMAX: 422
+    MAXCP:
+        Hatched: 422
+        Reward: 316
+        Boosted: 528
 ニドリーノ:   #--------------------------------------------------------------
     Name:
         ja: ニドリーノ
@@ -699,7 +795,10 @@
     Stamina: 122
     Attack: 137
     Defense: 112
-    HatchedMAX: 715
+    MAXCP:
+        Hatched: 715
+        Reward: 536
+        Boosted: 894
 ニドキング:   #--------------------------------------------------------------
     Name:
         ja: ニドキング
@@ -721,7 +820,10 @@
     Stamina: 162
     Attack: 204
     Defense: 157
-    HatchedMAX: 1363
+    MAXCP:
+        Hatched: 1363
+        Reward: 1022
+        Boosted: 1704
 ピッピ:   #--------------------------------------------------------------
     Name:
         ja: ピッピ
@@ -742,7 +844,10 @@
     Stamina: 140
     Attack: 107
     Defense: 116
-    HatchedMAX: 620
+    MAXCP:
+        Hatched: 620
+        Reward: 465
+        Boosted: 775
 ピクシー:   #--------------------------------------------------------------
     Name:
         ja: ピクシー
@@ -763,7 +868,10 @@
     Stamina: 190
     Attack: 178
     Defense: 171
-    HatchedMAX: 1344
+    MAXCP:
+        Hatched: 1344
+        Reward: 1008
+        Boosted: 1681
 ロコン:   #--------------------------------------------------------------
     Name:
         ja: ロコン
@@ -784,7 +892,10 @@
     Stamina: 76
     Attack: 96
     Defense: 122
-    HatchedMAX: 442
+    MAXCP:
+        Hatched: 442
+        Reward: 331
+        Boosted: 552
 キュウコン:   #--------------------------------------------------------------
     Name:
         ja: キュウコン
@@ -807,7 +918,10 @@
     Stamina: 146
     Attack: 169
     Defense: 204
-    HatchedMAX: 1233
+    MAXCP:
+        Hatched: 1233
+        Reward: 924
+        Boosted: 1541
 プリン:   #--------------------------------------------------------------
     Name:
         ja: プリン
@@ -831,7 +945,10 @@
     Stamina: 230
     Attack: 80
     Defense: 44
-    HatchedMAX: 407
+    MAXCP:
+        Hatched: 407
+        Reward: 305
+        Boosted: 509
 プクリン:   #--------------------------------------------------------------
     Name:
         ja: プクリン
@@ -852,7 +969,10 @@
     Stamina: 280
     Attack: 156
     Defense: 93
-    HatchedMAX: 1089
+    MAXCP:
+        Hatched: 1089
+        Reward: 817
+        Boosted: 1361
 ズバット:   #--------------------------------------------------------------
     Name:
         ja: ズバット
@@ -875,7 +995,10 @@
     Stamina: 80
     Attack: 83
     Defense: 76
-    HatchedMAX: 325
+    MAXCP:
+        Hatched: 325
+        Reward: 243
+        Boosted: 406
 ゴルバット:   #--------------------------------------------------------------
     Name:
         ja: ゴルバット
@@ -898,7 +1021,10 @@
     Stamina: 150
     Attack: 161
     Defense: 153
-    HatchedMAX: 1045
+    MAXCP:
+        Hatched: 1045
+        Reward: 784
+        Boosted: 1307
 ナゾノクサ:   #--------------------------------------------------------------
     Name:
         ja: ナゾノクサ
@@ -920,7 +1046,10 @@
     Stamina: 90
     Attack: 131
     Defense: 116
-    HatchedMAX: 611
+    MAXCP:
+        Hatched: 611
+        Reward: 458
+        Boosted: 763
 クサイハナ:   #--------------------------------------------------------------
     Name:
         ja: クサイハナ
@@ -943,7 +1072,10 @@
     Stamina: 120
     Attack: 153
     Defense: 139
-    HatchedMAX: 864
+    MAXCP:
+        Hatched: 864
+        Reward: 648
+        Boosted: 1080
 ラフレシア:   #--------------------------------------------------------------
     Name:
         ja: ラフレシア
@@ -964,7 +1096,10 @@
     Stamina: 150
     Attack: 202
     Defense: 170
-    HatchedMAX: 1353
+    MAXCP:
+        Hatched: 1353
+        Reward: 1014
+        Boosted: 1691
 パラス:   #--------------------------------------------------------------
     Name:
         ja: パラス
@@ -986,7 +1121,10 @@
     Stamina: 70
     Attack: 121
     Defense: 99
-    HatchedMAX: 477
+    MAXCP:
+        Hatched: 477
+        Reward: 358
+        Boosted: 597
 パラセクト:   #--------------------------------------------------------------
     Name:
         ja: パラセクト
@@ -1008,7 +1146,10 @@
     Stamina: 120
     Attack: 165
     Defense: 146
-    HatchedMAX: 947
+    MAXCP:
+        Hatched: 947
+        Reward: 710
+        Boosted: 1183
 コンパン:   #--------------------------------------------------------------
     Name:
         ja: コンパン
@@ -1030,7 +1171,10 @@
     Stamina: 120
     Attack: 100
     Defense: 102
-    HatchedMAX: 515
+    MAXCP:
+        Hatched: 515
+        Reward: 386
+        Boosted: 644
 モルフォン:   #--------------------------------------------------------------
     Name:
         ja: モルフォン
@@ -1053,7 +1197,10 @@
     Stamina: 140
     Attack: 179
     Defense: 150
-    HatchedMAX: 1107
+    MAXCP:
+        Hatched: 1107
+        Reward: 830
+        Boosted: 1384
 ディグダ:   #--------------------------------------------------------------
     Name:
         ja: ディグダ
@@ -1075,7 +1222,10 @@
     Stamina: 20
     Attack: 109
     Defense: 88
-    HatchedMAX: 265
+    MAXCP:
+        Hatched: 265
+        Reward: 199
+        Boosted: 332
 ダグトリオ:   #--------------------------------------------------------------
     Name:
         ja: ダグトリオ
@@ -1096,7 +1246,10 @@
     Stamina: 70
     Attack: 167
     Defense: 147
-    HatchedMAX: 762
+    MAXCP:
+        Hatched: 762
+        Reward: 571
+        Boosted: 952
 ニャース:   #--------------------------------------------------------------
     Name:
         ja: ニャース
@@ -1117,7 +1270,10 @@
     Stamina: 80
     Attack: 92
     Defense: 81
-    HatchedMAX: 364
+    MAXCP:
+        Hatched: 364
+        Reward: 273
+        Boosted: 455
 ペルシアン:   #--------------------------------------------------------------
     Name:
         ja: ペルシアン
@@ -1138,7 +1294,10 @@
     Stamina: 130
     Attack: 150
     Defense: 139
-    HatchedMAX: 879
+    MAXCP:
+        Hatched: 879
+        Reward: 660
+        Boosted: 1100
 コダック:   #--------------------------------------------------------------
     Name:
         ja: コダック
@@ -1159,7 +1318,10 @@
     Stamina: 100
     Attack: 122
     Defense: 96
-    HatchedMAX: 552
+    MAXCP:
+        Hatched: 552
+        Reward: 414
+        Boosted: 690
 ゴルダック:   #--------------------------------------------------------------
     Name:
         ja: ゴルダック
@@ -1179,7 +1341,10 @@
     Stamina: 160
     Attack: 191
     Defense: 163
-    HatchedMAX: 1297
+    MAXCP:
+        Hatched: 1297
+        Reward: 973
+        Boosted: 1622
 マンキー:   #--------------------------------------------------------------
     Name:
         ja: マンキー
@@ -1200,7 +1365,10 @@
     Stamina: 80
     Attack: 148
     Defense: 87
-    HatchedMAX: 572
+    MAXCP:
+        Hatched: 572
+        Reward: 429
+        Boosted: 715
 オコリザル:   #--------------------------------------------------------------
     Name:
         ja: オコリザル
@@ -1222,7 +1390,10 @@
     Stamina: 130
     Attack: 207
     Defense: 144
-    HatchedMAX: 1203
+    MAXCP:
+        Hatched: 1203
+        Reward: 902
+        Boosted: 1503
 ガーディ:   #--------------------------------------------------------------
     Name:
         ja: ガーディ
@@ -1243,7 +1414,10 @@
     Stamina: 110
     Attack: 136
     Defense: 96
-    HatchedMAX: 634
+    MAXCP:
+        Hatched: 634
+        Reward: 476
+        Boosted: 793
 ウインディ:   #--------------------------------------------------------------
     Name:
         ja: ウインディ
@@ -1266,7 +1440,10 @@
     Stamina: 180
     Attack: 227
     Defense: 166
-    HatchedMAX: 1622
+    MAXCP:
+        Hatched: 1622
+        Reward: 1217
+        Boosted: 2028
 ニョロモ:   #--------------------------------------------------------------
     Name:
         ja: ニョロモ
@@ -1287,7 +1464,10 @@
     Stamina: 80
     Attack: 101
     Defense: 82
-    HatchedMAX: 397
+    MAXCP:
+        Hatched: 397
+        Reward: 298
+        Boosted: 496
 ニョロゾ:   #--------------------------------------------------------------
     Name:
         ja: ニョロゾ
@@ -1310,7 +1490,10 @@
     Stamina: 130
     Attack: 130
     Defense: 130
-    HatchedMAX: 750
+    MAXCP:
+        Hatched: 750
+        Reward: 562
+        Boosted: 938
 ニョロボン:   #--------------------------------------------------------------
     Name:
         ja: ニョロボン
@@ -1333,7 +1516,10 @@
     Stamina: 180
     Attack: 182
     Defense: 187
-    HatchedMAX: 1395
+    MAXCP:
+        Hatched: 1395
+        Reward: 1046
+        Boosted: 1744
 ケーシィ:   #--------------------------------------------------------------
     Name:
         ja: ケーシィ
@@ -1354,7 +1540,10 @@
     Stamina: 50
     Attack: 195
     Defense: 103
-    HatchedMAX: 656
+    MAXCP:
+        Hatched: 656
+        Reward: 492
+        Boosted: 820
 ユンゲラー:   #--------------------------------------------------------------
     Name:
         ja: ユンゲラー
@@ -1375,7 +1564,10 @@
     Stamina: 80
     Attack: 232
     Defense: 138
-    HatchedMAX: 1062
+    MAXCP:
+        Hatched: 1062
+        Reward: 797
+        Boosted: 1328
 フーディン:   #--------------------------------------------------------------
     Name:
         ja: フーディン
@@ -1397,7 +1589,10 @@
     Stamina: 110
     Attack: 271
     Defense: 194
-    HatchedMAX: 1649
+    MAXCP:
+        Hatched: 1649
+        Reward: 1237
+        Boosted: 2062
 ワンリキー:   #--------------------------------------------------------------
     Name:
         ja: ワンリキー
@@ -1419,7 +1614,10 @@
     Stamina: 140
     Attack: 137
     Defense: 88
-    HatchedMAX: 685
+    MAXCP:
+        Hatched: 685
+        Reward: 514
+        Boosted: 856
 ゴーリキー:   #--------------------------------------------------------------
     Name:
         ja: ゴーリキー
@@ -1441,7 +1639,10 @@
     Stamina: 160
     Attack: 177
     Defense: 130
-    HatchedMAX: 1091
+    MAXCP:
+        Hatched: 1091
+        Reward: 818
+        Boosted: 1364
 カイリキー:   #--------------------------------------------------------------
     Name:
         ja: カイリキー
@@ -1465,7 +1666,10 @@
     Stamina: 180
     Attack: 234
     Defense: 162
-    HatchedMAX: 1650
+    MAXCP:
+        Hatched: 1650
+        Reward: 1238
+        Boosted: 2063
 マダツボミ:   #--------------------------------------------------------------
     Name:
         ja: マダツボミ
@@ -1487,7 +1691,10 @@
     Stamina: 100
     Attack: 139
     Defense: 64
-    HatchedMAX: 523
+    MAXCP:
+        Hatched: 523
+        Reward: 392
+        Boosted: 654
 ウツドン:   #--------------------------------------------------------------
     Name:
         ja: ウツドン
@@ -1510,7 +1717,10 @@
     Stamina: 130
     Attack: 172
     Defense: 95
-    HatchedMAX: 842
+    MAXCP:
+        Hatched: 842
+        Reward: 632
+        Boosted: 1053
 ウツボット:   #--------------------------------------------------------------
     Name:
         ja: ウツボット
@@ -1531,7 +1741,10 @@
     Stamina: 160
     Attack: 207
     Defense: 138
-    HatchedMAX: 1296
+    MAXCP:
+        Hatched: 1296
+        Reward: 972
+        Boosted: 1620
 メノクラゲ:   #--------------------------------------------------------------
     Name:
         ja: メノクラゲ
@@ -1553,7 +1766,10 @@
     Stamina: 80
     Attack: 97
     Defense: 182
-    HatchedMAX: 546
+    MAXCP:
+        Hatched: 546
+        Reward: 410
+        Boosted: 683
 ドククラゲ:   #--------------------------------------------------------------
     Name:
         ja: ドククラゲ
@@ -1574,7 +1790,10 @@
     Stamina: 160
     Attack: 166
     Defense: 237
-    HatchedMAX: 1356
+    MAXCP:
+        Hatched: 1356
+        Reward: 1017
+        Boosted: 1695
 イシツブテ:   #--------------------------------------------------------------
     Name:
         ja: イシツブテ
@@ -1596,7 +1815,10 @@
     Stamina: 80
     Attack: 132
     Defense: 163
-    HatchedMAX: 682
+    MAXCP:
+        Hatched: 682
+        Reward: 511
+        Boosted: 852
 ゴローン:   #--------------------------------------------------------------
     Name:
         ja: ゴローン
@@ -1620,7 +1842,10 @@
     Stamina: 110
     Attack: 164
     Defense: 196
-    HatchedMAX: 1037
+    MAXCP:
+        Hatched: 1037
+        Reward: 778
+        Boosted: 1296
 ゴローニャ:   #--------------------------------------------------------------
     Name:
         ja: ゴローニャ
@@ -1643,7 +1868,10 @@
     Stamina: 160
     Attack: 211
     Defense: 229
-    HatchedMAX: 1666
+    MAXCP:
+        Hatched: 1666
+        Reward: 1250
+        Boosted: 2083
 ポニータ:   #--------------------------------------------------------------
     Name:
         ja: ポニータ
@@ -1665,7 +1893,10 @@
     Stamina: 100
     Attack: 170
     Defense: 132
-    HatchedMAX: 858
+    MAXCP:
+        Hatched: 858
+        Reward: 643
+        Boosted: 1073
 ギャロップ:   #--------------------------------------------------------------
     Name:
         ja: ギャロップ
@@ -1686,7 +1917,10 @@
     Stamina: 130
     Attack: 207
     Defense: 167
-    HatchedMAX: 1287
+    MAXCP:
+        Hatched: 1287
+        Reward: 965
+        Boosted: 1608
 ヤドン:   #--------------------------------------------------------------
     Name:
         ja: ヤドン
@@ -1709,7 +1943,10 @@
     Stamina: 180
     Attack: 109
     Defense: 109
-    HatchedMAX: 688
+    MAXCP:
+        Hatched: 688
+        Reward: 516
+        Boosted: 860
 ヤドラン:   #--------------------------------------------------------------
     Name:
         ja: ヤドラン
@@ -1730,7 +1967,10 @@
     Stamina: 190
     Attack: 177
     Defense: 194
-    HatchedMAX: 1418
+    MAXCP:
+        Hatched: 1418
+        Reward: 1063
+        Boosted: 1773
 コイル:   #--------------------------------------------------------------
     Name:
         ja: コイル
@@ -1752,7 +1992,10 @@
     Stamina: 50
     Attack: 165
     Defense: 128
-    HatchedMAX: 619
+    MAXCP:
+        Hatched: 619
+        Reward: 464
+        Boosted: 774
 レアコイル:   #--------------------------------------------------------------
     Name:
         ja: レアコイル
@@ -1775,7 +2018,10 @@
     Stamina: 100
     Attack: 223
     Defense: 182
-    HatchedMAX: 1278
+    MAXCP:
+        Hatched: 1278
+        Reward: 958
+        Boosted: 1598
 カモネギ:   #--------------------------------------------------------------
     Name:
         ja: カモネギ
@@ -1797,7 +2043,10 @@
     Stamina: 104
     Attack: 124
     Defense: 118
-    HatchedMAX: 624
+    MAXCP:
+        Hatched: 624
+        Reward: 468
+        Boosted: 780
 ドードー:   #--------------------------------------------------------------
     Name:
         ja: ドードー
@@ -1820,7 +2069,10 @@
     Stamina: 70
     Attack: 158
     Defense: 88
-    HatchedMAX: 577
+    MAXCP:
+        Hatched: 577
+        Reward: 433
+        Boosted: 722
 ドードリオ:   #--------------------------------------------------------------
     Name:
         ja: ドードリオ
@@ -1842,7 +2094,10 @@
     Stamina: 120
     Attack: 218
     Defense: 145
-    HatchedMAX: 1222
+    MAXCP:
+        Hatched: 1222
+        Reward: 916
+        Boosted: 1527
 パウワウ:   #--------------------------------------------------------------
     Name:
         ja: パウワウ
@@ -1865,7 +2120,10 @@
     Stamina: 130
     Attack: 85
     Defense: 128
-    HatchedMAX: 513
+    MAXCP:
+        Hatched: 513
+        Reward: 385
+        Boosted: 642
 ジュゴン:   #--------------------------------------------------------------
     Name:
         ja: ジュゴン
@@ -1889,7 +2147,10 @@
     Stamina: 180
     Attack: 139
     Defense: 184
-    HatchedMAX: 1082
+    MAXCP:
+        Hatched: 1082
+        Reward: 812
+        Boosted: 1353
 ベトベター:   #--------------------------------------------------------------
     Name:
         ja: ベトベター
@@ -1911,7 +2172,10 @@
     Stamina: 160
     Attack: 135
     Defense: 90
-    HatchedMAX: 725
+    MAXCP:
+        Hatched: 725
+        Reward: 544
+        Boosted: 907
 ベトベトン:   #--------------------------------------------------------------
     Name:
         ja: ベトベトン
@@ -1933,7 +2197,10 @@
     Stamina: 210
     Attack: 190
     Defense: 184
-    HatchedMAX: 1548
+    MAXCP:
+        Hatched: 1548
+        Reward: 1161
+        Boosted: 1935
 シェルダー:   #--------------------------------------------------------------
     Name:
         ja: シェルダー
@@ -1954,7 +2221,10 @@
     Stamina: 60
     Attack: 116
     Defense: 168
-    HatchedMAX: 547
+    MAXCP:
+        Hatched: 547
+        Reward: 410
+        Boosted: 684
 パルシェン:   #--------------------------------------------------------------
     Name:
         ja: パルシェン
@@ -1977,7 +2247,10 @@
     Stamina: 100
     Attack: 186
     Defense: 323
-    HatchedMAX: 1414
+    MAXCP:
+        Hatched: 1414
+        Reward: 1060
+        Boosted: 1767
 ゴース:   #--------------------------------------------------------------
     Name:
         ja: ゴース
@@ -2001,7 +2274,10 @@
     Stamina: 60
     Attack: 186
     Defense: 70
-    HatchedMAX: 572
+    MAXCP:
+        Hatched: 572
+        Reward: 429
+        Boosted: 715
 ゴースト:   #--------------------------------------------------------------
     Name:
         ja: ゴースト
@@ -2025,7 +2301,10 @@
     Stamina: 90
     Attack: 223
     Defense: 112
-    HatchedMAX: 980
+    MAXCP:
+        Hatched: 980
+        Reward: 735
+        Boosted: 1226
 ゲンガー:   #--------------------------------------------------------------
     Name:
         ja: ゲンガー
@@ -2049,7 +2328,10 @@
     Stamina: 120
     Attack: 261
     Defense: 156
-    HatchedMAX: 1496
+    MAXCP:
+        Hatched: 1496
+        Reward: 1122
+        Boosted: 1870
 イワーク:   #--------------------------------------------------------------
     Name:
         ja: イワーク
@@ -2073,7 +2355,10 @@
     Stamina: 70
     Attack: 85
     Defense: 288
-    HatchedMAX: 572
+    MAXCP:
+        Hatched: 572
+        Reward: 429
+        Boosted: 715
 スリープ:   #--------------------------------------------------------------
     Name:
         ja: スリープ
@@ -2094,7 +2379,10 @@
     Stamina: 120
     Attack: 89
     Defense: 158
-    HatchedMAX: 567
+    MAXCP:
+        Hatched: 567
+        Reward: 425
+        Boosted: 709
 スリーパー:   #--------------------------------------------------------------
     Name:
         ja: スリーパー
@@ -2116,7 +2404,10 @@
     Stamina: 170
     Attack: 144
     Defense: 215
-    HatchedMAX: 1170
+    MAXCP:
+        Hatched: 1170
+        Reward: 877
+        Boosted: 1463
 クラブ:   #--------------------------------------------------------------
     Name:
         ja: クラブ
@@ -2137,7 +2428,10 @@
     Stamina: 60
     Attack: 181
     Defense: 156
-    HatchedMAX: 792
+    MAXCP:
+        Hatched: 792
+        Reward: 594
+        Boosted: 990
 キングラー:   #--------------------------------------------------------------
     Name:
         ja: キングラー
@@ -2158,7 +2452,10 @@
     Stamina: 110
     Attack: 240
     Defense: 214
-    HatchedMAX: 1539
+    MAXCP:
+        Hatched: 1539
+        Reward: 1154
+        Boosted: 1924
 ビリリダマ:   #--------------------------------------------------------------
     Name:
         ja: ビリリダマ
@@ -2180,7 +2477,10 @@
     Stamina: 80
     Attack: 109
     Defense: 114
-    HatchedMAX: 489
+    MAXCP:
+        Hatched: 489
+        Reward: 367
+        Boosted: 612
 マルマイン:   #--------------------------------------------------------------
     Name:
         ja: マルマイン
@@ -2201,7 +2501,10 @@
     Stamina: 120
     Attack: 173
     Defense: 179
-    HatchedMAX: 1085
+    MAXCP:
+        Hatched: 1085
+        Reward: 814
+        Boosted: 1357
 タマタマ:   #--------------------------------------------------------------
     Name:
         ja: タマタマ
@@ -2223,7 +2526,10 @@
     Stamina: 120
     Attack: 107
     Defense: 140
-    HatchedMAX: 629
+    MAXCP:
+        Hatched: 629
+        Reward: 472
+        Boosted: 787
 ナッシー:   #--------------------------------------------------------------
     Name:
         ja: ナッシー
@@ -2246,7 +2552,10 @@
     Stamina: 190
     Attack: 233
     Defense: 158
-    HatchedMAX: 1666
+    MAXCP:
+        Hatched: 1666
+        Reward: 1250
+        Boosted: 2083
 カラカラ:   #--------------------------------------------------------------
     Name:
         ja: カラカラ
@@ -2267,7 +2576,10 @@
     Stamina: 100
     Attack: 90
     Defense: 165
-    HatchedMAX: 539
+    MAXCP:
+        Hatched: 539
+        Reward: 404
+        Boosted: 673
 ガラガラ:   #--------------------------------------------------------------
     Name:
         ja: ガラガラ
@@ -2287,7 +2599,10 @@
     Stamina: 120
     Attack: 144
     Defense: 200
-    HatchedMAX: 966
+    MAXCP:
+        Hatched: 966
+        Reward: 725
+        Boosted: 1208
 サワムラー:   #--------------------------------------------------------------
     Name:
         ja: サワムラー
@@ -2309,7 +2624,10 @@
     Stamina: 100
     Attack: 224
     Defense: 211
-    HatchedMAX: 1375
+    MAXCP:
+        Hatched: 1375
+        Reward: 1031
+        Boosted: 1718
 エビワラー:   #--------------------------------------------------------------
     Name:
         ja: エビワラー
@@ -2332,7 +2650,10 @@
     Stamina: 100
     Attack: 193
     Defense: 212
-    HatchedMAX: 1199
+    MAXCP:
+        Hatched: 1199
+        Reward: 899
+        Boosted: 1499
 ベロリンガ:   #--------------------------------------------------------------
     Name:
         ja: ベロリンガ
@@ -2352,7 +2673,10 @@
     Stamina: 180
     Attack: 108
     Defense: 137
-    HatchedMAX: 755
+    MAXCP:
+        Hatched: 755
+        Reward: 566
+        Boosted: 944
 ドガース:   #--------------------------------------------------------------
     Name:
         ja: ドガース
@@ -2374,7 +2698,10 @@
     Stamina: 80
     Attack: 119
     Defense: 164
-    HatchedMAX: 623
+    MAXCP:
+        Hatched: 623
+        Reward: 467
+        Boosted: 779
 マタドガス:   #--------------------------------------------------------------
     Name:
         ja: マタドガス
@@ -2395,7 +2722,10 @@
     Stamina: 130
     Attack: 174
     Defense: 221
-    HatchedMAX: 1247
+    MAXCP:
+        Hatched: 1247
+        Reward: 935
+        Boosted: 1559
 サイホーン:   #--------------------------------------------------------------
     Name:
         ja: サイホーン
@@ -2417,7 +2747,10 @@
     Stamina: 160
     Attack: 140
     Defense: 157
-    HatchedMAX: 959
+    MAXCP:
+        Hatched: 959
+        Reward: 719
+        Boosted: 1199
 サイドン:   #--------------------------------------------------------------
     Name:
         ja: サイドン
@@ -2439,7 +2772,10 @@
     Stamina: 210
     Attack: 222
     Defense: 206
-    HatchedMAX: 1886
+    MAXCP:
+        Hatched: 1886
+        Reward: 1414
+        Boosted: 2357
 ラッキー:   #--------------------------------------------------------------
     Name:
         ja: ラッキー
@@ -2461,7 +2797,10 @@
     Stamina: 500
     Attack: 60
     Defense: 176
-    HatchedMAX: 839
+    MAXCP:
+        Hatched: 839
+        Reward: 629
+        Boosted: 1049
 モンジャラ:   #--------------------------------------------------------------
     Name:
         ja: モンジャラ
@@ -2482,7 +2821,10 @@
     Stamina: 130
     Attack: 183
     Defense: 205
-    HatchedMAX: 1262
+    MAXCP:
+        Hatched: 1262
+        Reward: 946
+        Boosted: 1577
 ガルーラ:   #--------------------------------------------------------------
     Name:
         ja: ガルーラ
@@ -2504,7 +2846,10 @@
     Stamina: 210
     Attack: 181
     Defense: 165
-    HatchedMAX: 1407
+    MAXCP:
+        Hatched: 1407
+        Reward: 1055
+        Boosted: 1759
 タッツー:   #--------------------------------------------------------------
     Name:
         ja: タッツー
@@ -2525,7 +2870,10 @@
     Stamina: 60
     Attack: 129
     Defense: 125
-    HatchedMAX: 526
+    MAXCP:
+        Hatched: 526
+        Reward: 395
+        Boosted: 658
 シードラ:   #--------------------------------------------------------------
     Name:
         ja: シードラ
@@ -2547,7 +2895,10 @@
     Stamina: 110
     Attack: 187
     Defense: 182
-    HatchedMAX: 1131
+    MAXCP:
+        Hatched: 1131
+        Reward: 848
+        Boosted: 1414
 トサキント:   #--------------------------------------------------------------
     Name:
         ja: トサキント
@@ -2568,7 +2919,10 @@
     Stamina: 90
     Attack: 123
     Defense: 115
-    HatchedMAX: 575
+    MAXCP:
+        Hatched: 575
+        Reward: 431
+        Boosted: 719
 アズマオウ:   #--------------------------------------------------------------
     Name:
         ja: アズマオウ
@@ -2590,7 +2944,10 @@
     Stamina: 160
     Attack: 175
     Defense: 154
-    HatchedMAX: 1166
+    MAXCP:
+        Hatched: 1166
+        Reward: 874
+        Boosted: 1457
 ヒトデマン:   #--------------------------------------------------------------
     Name:
         ja: ヒトデマン
@@ -2612,7 +2969,10 @@
     Stamina: 60
     Attack: 137
     Defense: 112
-    HatchedMAX: 529
+    MAXCP:
+        Hatched: 529
+        Reward: 397
+        Boosted: 661
 スターミー:   #--------------------------------------------------------------
     Name:
         ja: スターミー
@@ -2636,7 +2996,10 @@
     Stamina: 120
     Attack: 210
     Defense: 184
-    HatchedMAX: 1316
+    MAXCP:
+        Hatched: 1316
+        Reward: 987
+        Boosted: 1645
 バリヤード:   #--------------------------------------------------------------
     Name:
         ja: バリヤード
@@ -2657,7 +3020,10 @@
     Stamina: 80
     Attack: 192
     Defense: 233
-    HatchedMAX: 1133
+    MAXCP:
+        Hatched: 1133
+        Reward: 850
+        Boosted: 1417
 ストライク:   #--------------------------------------------------------------
     Name:
         ja: ストライク
@@ -2681,7 +3047,10 @@
     Stamina: 140
     Attack: 218
     Defense: 170
-    HatchedMAX: 1408
+    MAXCP:
+        Hatched: 1408
+        Reward: 1056
+        Boosted: 1760
 ルージュラ:   #--------------------------------------------------------------
     Name:
         ja: ルージュラ
@@ -2704,7 +3073,10 @@
     Stamina: 130
     Attack: 223
     Defense: 182
-    HatchedMAX: 1435
+    MAXCP:
+        Hatched: 1435
+        Reward: 1076
+        Boosted: 1794
 エレブー:   #--------------------------------------------------------------
     Name:
         ja: エレブー
@@ -2724,7 +3096,10 @@
     Stamina: 130
     Attack: 198
     Defense: 173
-    HatchedMAX: 1255
+    MAXCP:
+        Hatched: 1255
+        Reward: 941
+        Boosted: 1568
 ブーバー:   #--------------------------------------------------------------
     Name:
         ja: ブーバー
@@ -2744,7 +3119,10 @@
     Stamina: 130
     Attack: 206
     Defense: 169
-    HatchedMAX: 1288
+    MAXCP:
+        Hatched: 1288
+        Reward: 966
+        Boosted: 1610
 カイロス:   #--------------------------------------------------------------
     Name:
         ja: カイロス
@@ -2766,7 +3144,10 @@
     Stamina: 130
     Attack: 238
     Defense: 197
-    HatchedMAX: 1583
+    MAXCP:
+        Hatched: 1583
+        Reward: 1187
+        Boosted: 1978
 ケンタロス:   #--------------------------------------------------------------
     Name:
         ja: ケンタロス
@@ -2786,7 +3167,10 @@
     Stamina: 150
     Attack: 198
     Defense: 197
-    HatchedMAX: 1421
+    MAXCP:
+        Hatched: 1421
+        Reward: 1066
+        Boosted: 1777
 コイキング:   #--------------------------------------------------------------
     Name:
         ja: コイキング
@@ -2804,7 +3188,10 @@
     Stamina: 40
     Attack: 29
     Defense: 102
-    HatchedMAX: 125
+    MAXCP:
+        Hatched: 125
+        Reward: 94
+        Boosted: 157
 ギャラドス:   #--------------------------------------------------------------
     Name:
         ja: ギャラドス
@@ -2828,7 +3215,10 @@
     Stamina: 190
     Attack: 237
     Defense: 197
-    HatchedMAX: 1874
+    MAXCP:
+        Hatched: 1874
+        Reward: 1406
+        Boosted: 2343
 ラプラス:   #--------------------------------------------------------------
     Name:
         ja: ラプラス
@@ -2851,7 +3241,10 @@
     Stamina: 260
     Attack: 165
     Defense: 180
-    HatchedMAX: 1487
+    MAXCP:
+        Hatched: 1487
+        Reward: 1115
+        Boosted: 1859
 メタモン:   #--------------------------------------------------------------
     Name:
         ja: メタモン
@@ -2868,7 +3261,10 @@
     Stamina: 96
     Attack: 91
     Defense: 91
-    HatchedMAX: 410
+    MAXCP:
+        Hatched: 410
+        Reward: 307
+        Boosted: 512
 イーブイ:   #--------------------------------------------------------------
     Name:
         ja: イーブイ
@@ -2893,7 +3289,10 @@
     Stamina: 110
     Attack: 104
     Defense: 121
-    HatchedMAX: 553
+    MAXCP:
+        Hatched: 553
+        Reward: 415
+        Boosted: 692
 シャワーズ:   #--------------------------------------------------------------
     Name:
         ja: シャワーズ
@@ -2912,7 +3311,10 @@
     Stamina: 260
     Attack: 205
     Defense: 177
-    HatchedMAX: 1804
+    MAXCP:
+        Hatched: 1804
+        Reward: 1353
+        Boosted: 2255
 サンダース:   #--------------------------------------------------------------
     Name:
         ja: サンダース
@@ -2932,7 +3334,10 @@
     Stamina: 130
     Attack: 232
     Defense: 201
-    HatchedMAX: 1560
+    MAXCP:
+        Hatched: 1560
+        Reward: 1170
+        Boosted: 1950
 ブースター:   #--------------------------------------------------------------
     Name:
         ja: ブースター
@@ -2953,7 +3358,10 @@
     Stamina: 130
     Attack: 246
     Defense: 204
-    HatchedMAX: 1659
+    MAXCP:
+        Hatched: 1659
+        Reward: 1245
+        Boosted: 2074
 ポリゴン:   #--------------------------------------------------------------
     Name:
         ja: ポリゴン
@@ -2979,7 +3387,10 @@
     Stamina: 130
     Attack: 153
     Defense: 139
-    HatchedMAX: 895
+    MAXCP:
+        Hatched: 895
+        Reward: 672
+        Boosted: 1120
 オムナイト:   #--------------------------------------------------------------
     Name:
         ja: オムナイト
@@ -3004,7 +3415,10 @@
     Stamina: 70
     Attack: 155
     Defense: 174
-    HatchedMAX: 768
+    MAXCP:
+        Hatched: 768
+        Reward: 576
+        Boosted: 961
 オムスター:   #--------------------------------------------------------------
     Name:
         ja: オムスター
@@ -3027,7 +3441,10 @@
     Stamina: 140
     Attack: 207
     Defense: 227
-    HatchedMAX: 1534
+    MAXCP:
+        Hatched: 1534
+        Reward: 1150
+        Boosted: 1918
 カブト:   #--------------------------------------------------------------
     Name:
         ja: カブト
@@ -3049,7 +3466,10 @@
     Stamina: 60
     Attack: 148
     Defense: 162
-    HatchedMAX: 670
+    MAXCP:
+        Hatched: 670
+        Reward: 502
+        Boosted: 837
 カブトプス:   #--------------------------------------------------------------
     Name:
         ja: カブトプス
@@ -3071,7 +3491,10 @@
     Stamina: 120
     Attack: 220
     Defense: 203
-    HatchedMAX: 1438
+    MAXCP:
+        Hatched: 1438
+        Reward: 1079
+        Boosted: 1798
 プテラ:   #--------------------------------------------------------------
     Name:
         ja: プテラ
@@ -3092,7 +3515,10 @@
     Stamina: 160
     Attack: 221
     Defense: 164
-    HatchedMAX: 1490
+    MAXCP:
+        Hatched: 1490
+        Reward: 1118
+        Boosted: 1863
 カビゴン:   #--------------------------------------------------------------
     Name:
         ja: カビゴン
@@ -3113,7 +3539,10 @@
     Stamina: 320
     Attack: 190
     Defense: 190
-    HatchedMAX: 1917
+    MAXCP:
+        Hatched: 1917
+        Reward: 1438
+        Boosted: 2396
 フリーザー:   #--------------------------------------------------------------
     Name:
         ja: フリーザー
@@ -3133,7 +3562,10 @@
     Stamina: 180
     Attack: 192
     Defense: 249
-    HatchedMAX: 1676
+    MAXCP:
+        Hatched: 1676
+        Reward: 1257
+        Boosted: 2095
 サンダー:   #--------------------------------------------------------------
     Name:
         ja: サンダー
@@ -3153,7 +3585,10 @@
     Stamina: 180
     Attack: 253
     Defense: 188
-    HatchedMAX: 1902
+    MAXCP:
+        Hatched: 1902
+        Reward: 1427
+        Boosted: 2378
 ファイヤー:   #--------------------------------------------------------------
     Name:
         ja: ファイヤー
@@ -3173,7 +3608,10 @@
     Stamina: 180
     Attack: 251
     Defense: 184
-    HatchedMAX: 1870
+    MAXCP:
+        Hatched: 1870
+        Reward: 1402
+        Boosted: 2337
 ミニリュウ:   #--------------------------------------------------------------
     Name:
         ja: ミニリュウ
@@ -3194,7 +3632,10 @@
     Stamina: 82
     Attack: 119
     Defense: 94
-    HatchedMAX: 491
+    MAXCP:
+        Hatched: 491
+        Reward: 368
+        Boosted: 614
 ハクリュー:   #--------------------------------------------------------------
     Name:
         ja: ハクリュー
@@ -3215,7 +3656,10 @@
     Stamina: 122
     Attack: 163
     Defense: 138
-    HatchedMAX: 919
+    MAXCP:
+        Hatched: 919
+        Reward: 689
+        Boosted: 1149
 カイリュー:   #--------------------------------------------------------------
     Name:
         ja: カイリュー
@@ -3239,7 +3683,10 @@
     Stamina: 182
     Attack: 263
     Defense: 201
-    HatchedMAX: 2046
+    MAXCP:
+        Hatched: 2046
+        Reward: 1535
+        Boosted: 2558
 ミュウツー:   #--------------------------------------------------------------
     Name:
         ja: ミュウツー
@@ -3260,7 +3707,10 @@
     Stamina: 193
     Attack: 300
     Defense: 182
-    HatchedMAX: 2275
+    MAXCP:
+        Hatched: 2275
+        Reward: 1706
+        Boosted: 2844
 ミュウ:   #--------------------------------------------------------------
     Name:
         ja: ミュウ
@@ -3284,4 +3734,7 @@
     Stamina: 200
     Attack: 210
     Defense: 210
-    HatchedMAX: 1766
+    MAXCP:
+        Hatched: 1766
+        Reward: 1324
+        Boosted: 2207

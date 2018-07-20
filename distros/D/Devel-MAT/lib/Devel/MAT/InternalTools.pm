@@ -8,7 +8,7 @@ package Devel::MAT::InternalTools;
 use strict;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 package Devel::MAT::Tool::help;
 

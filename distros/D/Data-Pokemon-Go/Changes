@@ -1,7 +1,10 @@
 Revision history for Perl extension Data-Pokemon-Go
 
+0.03 2018-07-20T06:56:27Z
+    - update datas and scripts for until Hoenn region
+
 0.02 2017-11-15T12:26:40Z
-  improve the cpanfile
+    - improve the cpanfile
 
 0.01 2017-11-15T08:12:56Z
 

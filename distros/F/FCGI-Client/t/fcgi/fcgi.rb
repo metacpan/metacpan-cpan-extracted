@@ -1,25 +1,30 @@
 =begin
 
-fcgi.rb 0.8.5 - fcgi.so compatible pure-ruby FastCGI library
+fcgi.rb 0.9.2 - fcgi.so compatible pure-ruby FastCGI library
 
 fastcgi.rb Copyright (C) 2001 Eli Green
 fcgi.rb    Copyright (C) 2002-2003 MoonWolf <moonwolf@moonwolf.com>
 fcgi.rb    Copyright (C) 2004 Minero Aoki
+fcgi.rb    Copyright (C) 2011 saks and Julik Tarkhanov
+fcgi.rb    Copyright (C) 2012-2013 mva
 
 =end
 trap('SIGTERM') { exit }
 trap('SIGPIPE','IGNORE')
 
 begin
-  raise LoadError if defined?(FCGI_PURE_RUBY) && FCGI_PURE_RUBY
+  raise LoadError if ENV["USE_PURE_RUBY_FCGI"]
   require "fcgi.so"
-rescue LoadError
+rescue LoadError # Load the pure ruby version instead
+  # At this point we do have STDERR so put it to some good use
+  $stderr.puts "Your FCGI gem does not contain the FCGI shared library, running pure ruby instead"
+
   require 'socket'
   require 'stringio'
 
   class FCGI
 
-    def self::is_cgi?
+    def self.is_cgi?
       begin
         s = Socket.for_fd($stdin.fileno)
         s.getpeername
@@ -31,21 +36,21 @@ rescue LoadError
       end
     end
 
-    def self::each(&block)
+    def self.each(&block)
       f = default_connection()
       Server.new(f).each_request(&block)
     ensure
       f.close if f
     end
 
-    def self::each_request(&block)
+    def self.each_request(&block)
       f = default_connection()
       Server.new(f).each_request(&block)
     ensure
       f.close if f
     end
 
-    def self::default_connection
+    def self.default_connection
       ::Socket.for_fd($stdin.fileno)
     end
 
@@ -108,9 +113,9 @@ rescue LoadError
           exit 0 if graceful
         end
       end
-      
+
       def session
-        sock, addr = *@server.accept
+        sock, _ = *@server.accept
         return unless sock
         fsock = FastCGISocket.new(sock)
         req = next_request(fsock)
@@ -191,7 +196,7 @@ rescue LoadError
       def read_record
         header = @socket.read(Record::HEADER_LENGTH) or return nil
         return nil unless header.size == Record::HEADER_LENGTH
-        version, type, reqid, clen, padlen, reserved = *Record.parse_header(header)
+        _, type, reqid, clen, padlen, _ = *Record.parse_header(header)
         Record.class_for(type).parse(reqid, read_record_body(clen, padlen))
       end
 
@@ -306,11 +311,11 @@ rescue LoadError
       HEADER_FORMAT = 'CCnnCC'
       HEADER_LENGTH = 8
 
-      def self::parse_header(buf)
+      def self.parse_header(buf)
         return *buf.unpack(HEADER_FORMAT)
       end
 
-      def self::class_for(type)
+      def self.class_for(type)
         RECORD_CLASS[type]
       end
 
@@ -351,7 +356,7 @@ rescue LoadError
       BODY_FORMAT = 'nCC5'
 
       def BeginRequestRecord.parse(id, body)
-        role, flags, *reserved = *body.unpack(BODY_FORMAT)
+        role, flags, *_ = *body.unpack(BODY_FORMAT)
         new(id, role, flags)
       end
 
@@ -363,7 +368,7 @@ rescue LoadError
 
       attr_reader :role
       attr_reader :flags
-      
+
       def make_body
         [@role, @flags, 0, 0, 0, 0, 0].pack(BODY_FORMAT)
       end
@@ -385,7 +390,7 @@ rescue LoadError
       # uint8_t  reserved[3];
       BODY_FORMAT = 'NCC3'
 
-      def self::parse(id, body)
+      def self.parse(id, body)
         appstatus, protostatus, *reserved = *body.unpack(BODY_FORMAT)
         new(id, appstatus, protostatus)
       end
@@ -411,7 +416,7 @@ rescue LoadError
       # uint8_t reserved[7];
       BODY_FORMAT = 'CC7'
 
-      def self::parse(id, body)
+      def self.parse(id, body)
         type, *reserved = *body.unpack(BODY_FORMAT)
         new(id, type)
       end
@@ -431,11 +436,11 @@ rescue LoadError
     end
 
     class ValuesRecord < Record
-      def self::parse(id, body)
+      def self.parse(id, body)
         new(id, parse_values(body))
       end
 
-      def self::parse_values(buf)
+      def self.parse_values(buf)
         result = {}
         until buf.empty?
           name, value = *read_pair(buf)
@@ -443,17 +448,29 @@ rescue LoadError
         end
         result
       end
-      
-      def self::read_pair(buf)
+
+      def self.read_pair(buf)
         nlen = read_length(buf)
         vlen = read_length(buf)
-        return buf.slice!(0, nlen), buf.slice!(0, vlen)
+        [buf.slice!(0, nlen), buf.slice!(0, vlen)]
       end
-      
-      def self::read_length(buf)
-        if buf[0] >> 7 == 0
-        then buf.slice!(0,1)[0]
-        else buf.slice!(0,4).unpack('N')[0] & ((1<<31) - 1)
+
+
+      if "".respond_to?(:bytes) # Ruby 1.9 string semantics
+        def self.read_length(buf)
+          if buf[0].bytes.first >> 7 == 0
+            buf.slice!(0,1)[0].bytes.first
+          else
+            buf.slice!(0,4).unpack('N')[0] & ((1<<31) - 1)
+          end
+        end
+      else # Ruby 1.8 string
+        def self.read_length(buf)
+          if buf[0] >> 7 == 0
+            buf.slice!(0,1)[0].bytes.first
+          else
+            buf.slice!(0,4).unpack('N')[0] & ((1<<31) - 1)
+          end
         end
       end
 
@@ -502,7 +519,7 @@ rescue LoadError
     end
 
     class GenericDataRecord < Record
-      def self::parse(id, body)
+      def self.parse(id, body)
         new(id, body)
       end
 
@@ -520,7 +537,11 @@ rescue LoadError
       private
 
       def make_body
-        @flagment
+        if @flagment.respond_to? 'force_encoding' then
+          return @flagment.dup.force_encoding('BINARY')
+        else
+          return @flagment
+        end
       end
     end
 
@@ -564,13 +585,13 @@ end # begin
 # are defined within module 'CGI', even if you have subclassed it
 
 class FCGI
-  def self::each_cgi(*args)
+  def self.each_cgi(*args)
     require 'cgi'
-    
+
     eval(<<-EOS,TOPLEVEL_BINDING)
     class CGI
       public :env_table
-      def self::remove_params
+      def self.remove_params
         if (const_defined?(:CGI_PARAMS))
           remove_const(:CGI_PARAMS)
           remove_const(:CGI_COOKIES)
@@ -601,18 +622,18 @@ class FCGI
       end # FCGI::CGI class
     end # FCGI class
     EOS
-    
+
     if FCGI::is_cgi?
       yield ::CGI.new(*args)
     else
-      exit_requested = false
-      FCGI::each {|request|
+      FCGI::each do |request|
+
         $stdout, $stderr = request.out, request.err
 
         yield CGI.new(request, *args)
-        
+
         request.finish
-      }
+      end
     end
   end
 end

@@ -1,5 +1,9 @@
 Revision history for CGI-Buffer
 
+0.81	Thu Jul 19 08:50:53 EDT 2018
+	Get the return status from the CGI::Info object
+	Optimise lists a bit more
+
 0.80	Mon Sep 25 13:03:24 EDT 2017
 	Remove false positive bug reports
 	Work with the latest IO::Compress::Brotli

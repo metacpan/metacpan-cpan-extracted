@@ -1,5 +1,5 @@
 package Kayako::RestAPI;
-$Kayako::RestAPI::VERSION = '0.04';
+$Kayako::RestAPI::VERSION = '0.06';
 
 # ABSTRACT: Perl library for working with L<Kayako REST API|https://kayako.atlassian.net/wiki/display/DEV/Kayako+REST+API>. Tested with
 
@@ -7,9 +7,12 @@ $Kayako::RestAPI::VERSION = '0.04';
 use common::sense;
 use Mojo::UserAgent;
 use Digest::SHA qw(hmac_sha256_base64);
-use XML::XML2JSON;
+use File::Slurp;
+use XML::LibXML::Simple;
 use utf8;
 use Data::Dumper;
+
+my $xs = XML::LibXML::Simple->new();
 
 sub new {
     my $class = shift;
@@ -19,8 +22,7 @@ sub new {
     $o->{xml2json_options} =
       { content_key => 'text', pretty => 1, attribute_prefix => 'attr_' }
       if not defined $o->{xml2json_options};
-    $o->{xml2json} = XML::XML2JSON->new( %{ $o->{xml2json_options} } );
-    $o->{ua}       = Mojo::UserAgent->new;
+    $o->{ua} = Mojo::UserAgent->new;
     bless $o, $class;
     return $o;
 }
@@ -43,7 +45,7 @@ sub _prepare_request {
 
 sub xml2obj {
     my ( $self, $xml ) = @_;
-    $self->{xml2json}->xml2obj($xml);
+    $xs->XMLin($xml);
 }
 
 # abstract api GET/POST/PUT/DELETE _query. return plain xml
@@ -82,7 +84,7 @@ sub delete {
 sub get_hash {
     my ( $self, $route, $params ) = @_;
     my $xml = $self->get( $route, $params );
-    return $self->{xml2json}->xml2obj($xml);
+    return $self->xml2obj($xml);
 }
 
 
@@ -103,7 +105,7 @@ sub get_ticket_hash {
         # $hash->{'is_found'} = 0;
     }
     else {
-        $hash = $self->{xml2json}->xml2obj($xml)->{tickets}{ticket};
+        $hash = $self->xml2obj($xml)->{ticket};
     }
     return $hash;
 }
@@ -155,43 +157,143 @@ sub filter_fields {
     return $a;
 }
 
+# Convert nested hash with id keys into array of hashes. For compatibility with old API
+# Usage is same as filter_fields
+sub _postprocess_libxml {
+    my ( $self, $hash ) = @_;    # array of hashes
+    my @res;
+    for my $k ( sort keys %$hash ) {
+
+# my $j = { map { $_ => $hash->{$k} } grep { exists $hash->{$k} } qw/id title module fullname/ };
+# warn "Element:".Dumper $j;
+        my $j = {
+            id     => $k,
+            title  => $hash->{$k}{title},
+            module => $hash->{$k}{module}
+        };
+        push @res, $j;
+
+        # push @res, $j;
+    }
+    return \@res;
+}
+
 
 sub get_departements {
     my $self = shift;
     my $xml  = $self->get('/Base/Department/');
-    my $a    = $self->xml2obj($xml)->{departments}{department};    # array
-    $self->filter_fields($a);
+    $self->xml2obj($xml)->{department};
+}
+
+sub get_departements_old {
+    my $self = shift;
+    $self->_postprocess_libxml( $self->get_departements );
 }
 
 
 sub get_ticket_statuses {
     my $self = shift;
     my $xml  = $self->get('/Tickets/TicketStatus/');
-    my $a    = $self->xml2obj($xml)->{ticketstatuses}{ticketstatus};    # array
-    $self->filter_fields($a);
+    $self->xml2obj($xml)->{ticketstatus};
+}
+
+sub get_ticket_statuses_old {
+    my $self = shift;
+    $self->_postprocess_libxml( $self->get_ticket_statuses );
 }
 
 
 sub get_ticket_priorities {
     my $self = shift;
     my $xml  = $self->get('/Tickets/TicketPriority/');
-    my $a    = $self->xml2obj($xml)->{ticketpriorities}{ticketpriority}; # array
-    $self->filter_fields($a);
+    $self->xml2obj($xml)->{ticketpriority};
+}
+
+sub get_ticket_priorities_old {
+    my $self = shift;
+    $self->_postprocess_libxml( $self->get_ticket_priorities );
 }
 
 
 sub get_ticket_types {
     my $self = shift;
     my $xml  = $self->get('/Tickets/TicketType/');
-    my $a    = $self->xml2obj($xml)->{tickettypes}{tickettype};    # array
-    $self->filter_fields($a);
+    $self->xml2obj($xml)->{tickettype};    # array
+}
+
+sub get_ticket_types_old {
+    my $self = shift;
+    $self->_postprocess_libxml( $self->get_ticket_types );
 }
 
 
 sub get_staff {
     my $self = shift;
     my $xml  = $self->get('/Base/Staff/');
-    $self->xml2obj($xml)->{staffusers}{staff};    # array
+    $self->xml2obj($xml)->{staff};    # array
+}
+
+sub get_staff_old {
+    my $self = shift;
+    $self->_postprocess_libxml( $self->get_staff );
+}
+
+# HTTP mocks
+# perl -Ilib -MData::Dumper -MKayako::RestAPI -E 'print Dumper Kayako::RestAPI::_samples();'
+sub _samples {
+    return [
+        {
+            method      => 'get',
+            route       => '/Tickets/Ticket/1000/',
+            sample_file => 'ticket.xml',
+            params      => {}
+        },
+        {
+            method      => 'get',
+            route       => '/Base/Department/',
+            sample_file => 'departments.xml'
+        },
+        {
+            method      => 'get',
+            route       => '/Tickets/TicketStatus/',
+            sample_file => 'ticket_status.xml'
+        },
+        {
+            method      => 'get',
+            route       => '/Tickets/TicketPriority/',
+            sample_file => 'ticket_priority.xml'
+        },
+        {
+            method      => 'get',
+            route       => '/Tickets/TicketType/',
+            sample_file => 'ticket_type.xml'
+        },
+        {
+            method      => 'get',
+            route       => '/Base/Staff/',
+            sample_file => 'staff.xml'
+        }
+    ];
+}
+
+# generate ethalon data to t/lib/Kayako/samples
+# perl -Ilib -MData::Dumper -MKayako::RestAPI -E 'print Dumper Kayako::RestAPI::_generate_t_samples();'
+sub _generate_t_samples {
+    my @samples = @{ __PACKAGE__->_samples };
+    my $k       = Kayako::RestAPI->new(
+        {
+            api_url    => '',
+            api_key    => '',
+            secret_key => ''
+        }
+    );
+
+    for my $s (@samples) {
+        my $data = $k->_query( $s->{method}, $s->{route} );
+        write_file( 't/lib/Kayako/samples/' . $s->{sample_file},
+            { binmode => ':raw' }, $data );
+    }
+
 }
 
 1;
@@ -208,7 +310,7 @@ Kayako::RestAPI - Perl library for working with L<Kayako REST API|https://kayako
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -248,6 +350,18 @@ version 0.04
     });
 
 You can test you controller with L<API Test Controller|https://kayako.atlassian.net/wiki/display/DEV/API+Test+Controller>
+
+Attention: since version 0.06 (migration from XML::XML2JSON to XML::LibXML::Simple) response structure of following methods was changed from array to hash
+
+    get_ticket_hash
+    get_departements
+    get_ticket_statuses
+    get_ticket_priorities
+    get_ticket_types
+
+If you need to use old structure please add _old suffix to method ;)
+
+WORK UNDER THIS MODULE IS IN PROGRESS, HELP WANTED, ESPECIALLY FOR WRITING DOCS
 
 =head1 METHODS
 
@@ -296,14 +410,16 @@ Check a list of required arguments here: L<https://kayako.atlassian.net/wiki/dis
 
 =head2 filter_fields
 
-Filter fields of API request result and trim content_key
+THIS METHOD LEFT HERE FOR COMPATIBILITY AND WILL BE REMOVED IN FUTURE RELEASES
+
+Filter fields of API request result and trim content_key added by XML::XML2JSON
 
 By default leave only id, title and module fields
 
     my $arrayref = $kayako_api->get_hash('/Some/API/Endpoint');
     $kayako_api->filter_fields($arrayref); 
 
-=head2 get_departements
+=head2 get_departements_old
 
     $kayako_api->get_departements();
 
@@ -324,7 +440,7 @@ Return an arrayref of hashes with title, module and id keys like
 
 API endpoint is /Base/Department/
 
-=head2 get_ticket_statuses
+=head2 get_ticket_statuses_old
 
     $kayako_api->get_ticket_statuses(); 
 
@@ -347,7 +463,7 @@ Return an arrayref of hashes with title and id keys like
 
 API endpoint is /Tickets/TicketStatus/
 
-=head2 get_ticket_priorities
+=head2 get_ticket_priorities_old
 
         $kayako_api->get_ticket_priorities();
 
@@ -366,7 +482,7 @@ Return an arrayref of hashes with title and id keys like
 
 API endpoint is /Tickets/TicketPriority/
 
-=head2 get_ticket_types
+=head2 get_ticket_types_old
 
     $kayako_api->get_ticket_types();
 
@@ -389,7 +505,7 @@ Return an arrayref of hashes with title and id keys like
 
 API endpoint is /Tickets/TicketType/
 
-=head2 get_staff
+=head2 get_staff_old
 
     $kayako_api->get_staff();
 
@@ -406,7 +522,7 @@ E.g.
             'lastname' => { 'text' => 'Serikov' },
             'enabledst' => { 'text' => '0'},
             'username' => { 'text' => 'pavelsr' },
-            'isenabled' => { 'text' => '1' }6,
+            'isenabled' => { 'text' => '1' },
             'staffgroupid' => { 'text' => '4' },
             'greeting' => {},
             'timezone' => {},

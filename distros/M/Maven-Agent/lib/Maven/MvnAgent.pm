@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::MvnAgent;
-$Maven::MvnAgent::VERSION = '1.14';
+$Maven::MvnAgent::VERSION = '1.15';
 # ABSTRACT: An agent for downloading artifacts using the mvn command
 # PODNAME: Maven::MvnAgent
 
@@ -196,7 +196,7 @@ Maven::MvnAgent - An agent for downloading artifacts using the mvn command
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,11 @@
+package FCGI::Client;
 use warnings;
 use strict;
-
-package FCGI::Client;
-our $VERSION = '0.08';
-use Carp;
 use 5.008001;
+
+our $VERSION = '0.09';
+
+use Carp;
 
 use FCGI::Client::Connection;
 use FCGI::Client::Record;

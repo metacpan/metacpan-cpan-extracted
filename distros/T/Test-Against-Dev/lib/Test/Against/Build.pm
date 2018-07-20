@@ -1,7 +1,7 @@
 package Test::Against::Build;
 use strict;
 use 5.14.0;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 use Carp;
 use Cwd;
 use File::Basename;

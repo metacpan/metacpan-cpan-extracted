@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::Dependencies;
-$Maven::Xml::Pom::Dependencies::VERSION = '1.14';
+$Maven::Xml::Pom::Dependencies::VERSION = '1.15';
 # ABSTRACT: Maven Dependencies element
 # PODNAME: Maven::Xml::Pom::Dependencies
 
@@ -29,7 +29,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Pom::Dependency;
-$Maven::Xml::Pom::Dependency::VERSION = '1.14';
+$Maven::Xml::Pom::Dependency::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -76,7 +76,7 @@ sub _key {
 }
 
 package Maven::Xml::Pom::Dependency::Exclusion;
-$Maven::Xml::Pom::Dependency::Exclusion::VERSION = '1.14';
+$Maven::Xml::Pom::Dependency::Exclusion::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -98,7 +98,7 @@ Maven::Xml::Pom::Dependencies - Maven Dependencies element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

@@ -57,10 +57,8 @@ is_deeply(
 );
 
 my $builder = JSONAPI::Document::Builder->new(
-    chi              => $t->chi,
     kebab_case_attrs => 1,
     row              => $t->schema->resultset('Post')->find(1),
-    segmenter        => $t->segmenter,
 );
 
 is_deeply(

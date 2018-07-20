@@ -21,7 +21,7 @@ Net::Etcd::Auth::RolePermission
 
 =cut
 
-our $VERSION = '0.021';
+our $VERSION = '0.022';
 
 =head1 DESCRIPTION
 
@@ -98,8 +98,7 @@ has permType =>(
 
 =head2 prefix
 
-This is a helper accessor which is an alias for range_end => "\0" if passed a true value.
-If range_end is also passed prefix will superceed it's value.
+set to true to grant a prefix permission, C<range_end> will be ignored.
 
 =cut
 
@@ -122,7 +121,10 @@ sub _build_perm {
     my ($self) = @_;
     my $perm;
     if ($self->{prefix}) {
-        $self->{range_end} = encode_base64( "\0", '' );
+        my $key = decode_base64($self->{key});
+        my $key_last_char = chr(ord(substr($key, -1)) + 0x1);
+        my $range_end_str = substr($key, 0, (length($key) - 1)) . $key_last_char;
+        $self->{range_end} = encode_base64( $range_end_str, '' );
     }
     for my $key ( keys %{$self} ) {
         unless ( $key =~ /(?:prefix|name|etcd|cb|endpoint)$/ ) {

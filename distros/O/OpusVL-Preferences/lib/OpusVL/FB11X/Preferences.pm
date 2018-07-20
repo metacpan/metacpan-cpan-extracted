@@ -4,7 +4,7 @@ use v5.24;
 use Moose::Role;
 use CatalystX::InjectComponent;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 with "OpusVL::FB11::RolesFor::Plugin";
 

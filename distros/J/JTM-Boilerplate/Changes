@@ -1,3 +1,11 @@
+2.182001  2018-07-19 09:43:26-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * Rename repository
+
+2.182000  2018-07-19 09:41:15-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * Remove Mercury from dependency chain
+
 2.181940  2018-07-12 18:58:10-06:00 America/Denver
  Joelle Maslak <jmaslak@antelope.net>
  * Convert to stand-alone module

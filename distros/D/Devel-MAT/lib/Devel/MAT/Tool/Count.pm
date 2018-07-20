@@ -7,9 +7,10 @@ package Devel::MAT::Tool::Count;
 
 use strict;
 use warnings;
+use 5.014; # s///r
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use constant CMD => "count";
 use constant CMD_DESC => "Count the various kinds of SV";

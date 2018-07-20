@@ -291,7 +291,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             SPVM_OPCODE opcode;
                             memset(&opcode, 0, sizeof(SPVM_OPCODE));
                             
-                            if (SPVM_TYPE_is_undef(compiler, term_arg_type)) {
+                            if (SPVM_TYPE_is_undef_type(compiler, term_arg_type)) {
                               assert(!sub_call_sub->op_package->uv.package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE);
                               opcode.id = SPVM_OPCODE_C_ID_PUSH_ARG_UNDEF;
                             }
@@ -424,7 +424,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
 
                         SPVM_TYPE* field_access_type = SPVM_OP_get_type(compiler, op_field_access->uv.field_access->field->op_package);
                         
-                        _Bool is_value_access = SPVM_TYPE_is_value_t(compiler, field_access_type);
+                        _Bool is_value_access = SPVM_TYPE_is_value_type(compiler, field_access_type);
                         
                         if (is_value_access) {
                           SPVM_OPCODE opcode;
@@ -1335,38 +1335,6 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             assert(0);
                           }
                         }
-                        else if (SPVM_TYPE_is_array_numeric(compiler, src_type)) {
-                          if (dist_type->dimension == 1) {
-                            assert(dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE);
-                            
-                            opcode.id = SPVM_OPCODE_C_ID_MOVE_OBJECT;
-                          }
-                          else if (dist_type->dimension == 2) {
-                            assert(dist_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE);
-                            
-                            if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
-                              opcode.id = SPVM_OPCODE_C_ID_CONVERT_BYTE_ARRAY_TO_STRING_ARRAY;
-                            }
-                            else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_SHORT) {
-                              opcode.id = SPVM_OPCODE_C_ID_CONVERT_SHORT_ARRAY_TO_STRING_ARRAY;
-                            }
-                            else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_INT) {
-                              opcode.id = SPVM_OPCODE_C_ID_CONVERT_INT_ARRAY_TO_STRING_ARRAY;
-                            }
-                            else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_LONG) {
-                              opcode.id = SPVM_OPCODE_C_ID_CONVERT_LONG_ARRAY_TO_STRING_ARRAY;
-                            }
-                            else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_FLOAT) {
-                              opcode.id = SPVM_OPCODE_C_ID_CONVERT_FLOAT_ARRAY_TO_STRING_ARRAY;
-                            }
-                            else if (src_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_DOUBLE) {
-                              opcode.id = SPVM_OPCODE_C_ID_CONVERT_DOUBLE_ARRAY_TO_STRING_ARRAY;
-                            }
-                            else {
-                              assert(0);
-                            }
-                          }
-                        }
                         // Check cast
                         else {
                           if (src_type->basic_type->id == dist_type->basic_type->id && src_type->dimension == dist_type->dimension) {
@@ -1399,7 +1367,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             }
                           }
                           else {
-                            opcode.id = SPVM_OPCODE_C_ID_CHECK_CAST;
+                            opcode.id = SPVM_OPCODE_C_ID_CAST;
                             opcode.operand2 = op_dist_type->uv.type->sub_rel_id;
                           }
                         }
@@ -1623,7 +1591,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         }
                       }
                       else if (op_assign_from->id == SPVM_OP_C_ID_VAR || op_assign_from->id == SPVM_OP_C_ID_ASSIGN) {
-                        _Bool type_to_is_value_t = SPVM_TYPE_is_value_t(compiler, type_to);
+                        _Bool type_to_is_value_t = SPVM_TYPE_is_value_type(compiler, type_to);
                         
                         if (type_to_is_value_t) {
                           SPVM_OPCODE opcode;
@@ -1692,7 +1660,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       SPVM_TYPE* from_type = SPVM_OP_get_type(compiler, op_assign_from);
 
                       // PACKAGE_VAR_ACCESS = UNDEF
-                      if (SPVM_TYPE_is_undef(compiler, from_type)) {
+                      if (SPVM_TYPE_is_undef_type(compiler, from_type)) {
                         SPVM_OPCODE opcode;
                         memset(&opcode, 0, sizeof(SPVM_OPCODE));
                         int32_t package_var_access_id = package_var_access->op_package_var->uv.package_var->id;
@@ -1746,7 +1714,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       
                       SPVM_TYPE* from_type = SPVM_OP_get_type(compiler, op_assign_from);
                       
-                      if (SPVM_TYPE_is_undef(compiler, from_type)) {
+                      if (SPVM_TYPE_is_undef_type(compiler, from_type)) {
                         // EXCEPTION_VAR = undef
                         SPVM_OPCODE opcode;
                         memset(&opcode, 0, sizeof(SPVM_OPCODE));
@@ -1830,7 +1798,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       
                         SPVM_TYPE* element_type = SPVM_OP_get_type(compiler, op_assign_from);
 
-                        if (SPVM_TYPE_is_undef(compiler, element_type)) {
+                        if (SPVM_TYPE_is_undef_type(compiler, element_type)) {
                           SPVM_OPCODE opcode;
                           memset(&opcode, 0, sizeof(SPVM_OPCODE));
                           
@@ -1902,7 +1870,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                       
                       SPVM_TYPE* field_access_type = SPVM_OP_get_type(compiler, op_field_access->uv.field_access->field->op_package);
                       
-                      _Bool is_value_access = SPVM_TYPE_is_value_t(compiler, field_access_type);
+                      _Bool is_value_access = SPVM_TYPE_is_value_type(compiler, field_access_type);
                       if (is_value_access) {
                         SPVM_OPCODE opcode;
                         memset(&opcode, 0, sizeof(SPVM_OPCODE));
@@ -1938,7 +1906,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                       }
                       else {
-                        if (SPVM_TYPE_is_undef(compiler, from_type)) {
+                        if (SPVM_TYPE_is_undef_type(compiler, from_type)) {
                           SPVM_OPCODE opcode;
                           memset(&opcode, 0, sizeof(SPVM_OPCODE));
                           opcode.id = SPVM_OPCODE_C_ID_SET_FIELD_UNDEF;
@@ -2357,30 +2325,34 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                     
                     break;
                   }
-                  case SPVM_OP_C_ID_MY: {
-                    SPVM_MY* my = op_cur->uv.my;
-                    
-                    SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_cur);
-                    _Bool type_is_value_t = SPVM_TYPE_is_value_t(compiler, type);
-                    
-                    if (SPVM_TYPE_is_object(compiler, type) && !type_is_value_t) {
+                  case SPVM_OP_C_ID_VAR: {
+                    if (op_cur->uv.var->is_declaration) {
                       
-                      SPVM_OPCODE opcode;
-                      memset(&opcode, 0, sizeof(SPVM_OPCODE));
-                      opcode.id = SPVM_OPCODE_C_ID_PUSH_MORTAL;
-                      opcode.operand0 = my->var_id;
+                      SPVM_OP* op_my = op_cur->uv.var->op_my;
+                      SPVM_MY* my = op_my->uv.my;
                       
-                      SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
+                      SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_my);
+                      _Bool type_is_value_t = SPVM_TYPE_is_value_type(compiler, type);
                       
-                      int32_t my_var_id = my->var_id;
-                      SPVM_LIST_push(mortal_stack, (void*)(intptr_t)my_var_id);
-                      
-                      if (mortal_stack->length > mortal_stack_max) {
-                        mortal_stack_max = mortal_stack->length;
+                      if (SPVM_TYPE_is_object_type(compiler, type) && !type_is_value_t) {
+                        
+                        SPVM_OPCODE opcode;
+                        memset(&opcode, 0, sizeof(SPVM_OPCODE));
+                        opcode.id = SPVM_OPCODE_C_ID_PUSH_MORTAL;
+                        opcode.operand0 = my->var_id;
+                        
+                        SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
+                        
+                        int32_t my_var_id = my->var_id;
+                        SPVM_LIST_push(mortal_stack, (void*)(intptr_t)my_var_id);
+                        
+                        if (mortal_stack->length > mortal_stack_max) {
+                          mortal_stack_max = mortal_stack->length;
+                        }
+                        
+                        SPVM_OP* op_block_current = SPVM_LIST_fetch(op_block_stack, op_block_stack->length - 1);
+                        op_block_current->uv.block->have_object_var_decl = 1;
                       }
-                      
-                      SPVM_OP* op_block_current = SPVM_LIST_fetch(op_block_stack, op_block_stack->length - 1);
-                      op_block_current->uv.block->have_object_var_decl = 1;
                     }
                     
                     break;
@@ -2824,7 +2796,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           SPVM_OPCODE opcode;
                           memset(&opcode, 0, sizeof(SPVM_OPCODE));
                           
-                          if (SPVM_TYPE_is_undef(compiler, term_arg_type)) {
+                          if (SPVM_TYPE_is_undef_type(compiler, term_arg_type)) {
                             assert(!sub_call_sub->op_package->uv.package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE);
                             opcode.id = SPVM_OPCODE_C_ID_PUSH_ARG_UNDEF;
                           }
@@ -2871,7 +2843,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                     if (op_cur->first) {
                       SPVM_TYPE* return_type = SPVM_OP_get_type(compiler, op_cur->first);
                       
-                      if (SPVM_TYPE_is_undef(compiler, return_type)) {
+                      if (SPVM_TYPE_is_undef_type(compiler, return_type)) {
                         SPVM_OPCODE opcode;
                         memset(&opcode, 0, sizeof(SPVM_OPCODE));
                         
@@ -2896,7 +2868,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               break;
                             }
                             default: {
-                              _Bool return_type_is_value_t = SPVM_TYPE_is_value_t(compiler, return_type);
+                              _Bool return_type_is_value_t = SPVM_TYPE_is_value_type(compiler, return_type);
                               if (return_type_is_value_t) {
                                 opcode.id = SPVM_OPCODE_C_ID_RETURN;
                               }

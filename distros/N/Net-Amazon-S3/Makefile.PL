@@ -52,7 +52,6 @@ my %WriteMakefileArgs = (
     "URI" => 0,
     "URI::Escape" => 0,
     "URI::QueryParam" => 0,
-    "VM::EC2::Security::CredentialCache" => 0,
     "XML::LibXML" => 0,
     "XML::LibXML::XPathContext" => 0,
     "namespace::clean" => 0,
@@ -70,7 +69,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "vars" => 0
   },
-  "VERSION" => "0.83",
+  "VERSION" => "0.84",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -117,7 +116,6 @@ my %FallbackPrereqs = (
   "URI" => 0,
   "URI::Escape" => 0,
   "URI::QueryParam" => 0,
-  "VM::EC2::Security::CredentialCache" => 0,
   "XML::LibXML" => 0,
   "XML::LibXML::XPathContext" => 0,
   "lib" => 0,

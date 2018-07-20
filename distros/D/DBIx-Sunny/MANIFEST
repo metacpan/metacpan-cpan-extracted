@@ -7,6 +7,8 @@ cpanfile
 eg/sample.pl
 lib/DBIx/Sunny.pm
 lib/DBIx/Sunny/Schema.pm
+lib/DBIx/Sunny/Util.pm
+minil.toml
 t/00_compile.t
 t/01_basic.t
 t/02_rootclass.t

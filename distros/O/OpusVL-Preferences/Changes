@@ -1,8 +1,14 @@
 Revision history for OpusVL-Preferences
 
+0.31      2018-07-18 14:21:39+01:00 Europe/London
+
+  * Boolean fields have blank first option in search mode
+  * Email search no longer requires an email address
+  * Generated forms now use bootstrap
+
 0.30      2018-06-19 12:51:23+01:00 Europe/London
 
-  * DEPRECATED. The changes below are for compatibility ONLY
+  * DEPRECATED. The changes below (and above) are for compatibility ONLY
   * Converted to Dist::Zilla
   * Now making use of FB11 brain architecture
   * Now is a standalone component

@@ -1,12 +1,12 @@
 {
    "abstract" : "A simple parallel processing fork manager",
    "author" : [
-      "dLux (Szabó, Balázs) <dlux@dlux.hu>",
+      "dLux (Szab\u00f3, Bal\u00e1zs) <dlux@dlux.hu>",
       "Yanick Champoux <yanick@cpan.org>",
       "Gabor Szabo <gabor@szabgab.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -24,9 +24,7 @@
       "develop" : {
          "requires" : {
             "Test::More" : "0.96",
-            "Test::PAUSE::Permissions" : "0",
-            "Test::Vars" : "0",
-            "warnings" : "0"
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -59,7 +57,7 @@
    "provides" : {
       "Parallel::ForkManager" : {
          "file" : "lib/Parallel/ForkManager.pm",
-         "version" : "1.19"
+         "version" : "1.20"
       }
    },
    "release_status" : "stable",
@@ -74,11 +72,16 @@
          "web" : "https://github.com/dluxhu/perl-parallel-forkmanager"
       }
    },
-   "version" : "1.19",
+   "version" : "1.20",
    "x_authority" : "cpan:DLUX",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
    "x_contributors" : [
       "Ninebit <kevin@9b.io>",
+      "Ricardo Signes <rjbs@cpan.org>",
       "Shlomi Fish <shlomif@shlomifish.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Maven::Agent
 
+1.15 2018-07-19
+    - Resolved issue #6: Parsing of dependencyManagement doesnt work
+
 1.14 2016-12-14
     - fixed bug in cygwin support for windows path in localRepository
 

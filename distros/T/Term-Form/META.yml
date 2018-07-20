@@ -22,19 +22,19 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Encode: '0'
-  Encode::Locale: '0'
   Exporter: '0'
   List::Util: '1.33'
-  Term::Choose: '1.513'
-  Term::Choose::LineFold: '1.513'
-  Term::ReadKey: '0'
+  Term::Choose: '1.607'
+  Term::Choose::Constants: '1.607'
+  Term::Choose::LineFold: '1.607'
+  Term::Choose::Linux: '1.607'
+  Term::Choose::Win32: '1.607'
   Unicode::GCString: '0'
-  constant: '0'
+  parent: '0'
   perl: '5.008003'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-Form.git
-version: '0.316'
+version: '0.321'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

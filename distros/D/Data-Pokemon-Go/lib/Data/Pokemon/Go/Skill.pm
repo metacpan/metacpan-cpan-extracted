@@ -45,7 +45,7 @@ sub strength {
     my $name = $self->name();
     my $num = $data->{$name}{power};
     die "'power' may be invalid: $num" unless $num =~ /^\d{1,3}$/;
-    $num *= 1.25 if grep{ $_ eq $self->types() } @{ $self->own_type() || [] };
+    $num *= 1.2 if grep{ $_ eq $self->types() } @{ $self->own_type() || [] };
     return $num;
 }
 

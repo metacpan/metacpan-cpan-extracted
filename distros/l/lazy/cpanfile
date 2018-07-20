@@ -1,4 +1,4 @@
-requires "App::cpm" => "0.974";
+requires "App::cpm" => "0.975";
 requires "App::cpm::CLI" => "0";
 requires "Getopt::Long" => "0";
 requires "Module::Loaded" => "0";

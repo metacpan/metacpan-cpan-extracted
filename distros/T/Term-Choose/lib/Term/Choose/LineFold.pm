@@ -4,25 +4,15 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.604';
+our $VERSION = '1.608';
 
 use Exporter qw( import );
 
 our @EXPORT_OK = qw( line_fold print_columns cut_to_printwidth );
 
 
-#BEGIN {
-#    if ( exists $ENV{TC_TERM} && $ENV{TC_TERM} ) {
-#        my $table_module = 'Term::Choose::LineFold::CharWidth' . $ENV{TC_TERM};
-#        eval "require $table_module" or die $@;
-#        $table_module->import( 'table_char_width' );
-#    }
-#    else {
-#        require Term::Choose::LineFold::CharWidthXTerm;
-#        Term::Choose::LineFold::CharWidthXTerm->import( 'table_char_width' );
-#    }
-#}
 use Term::Choose::LineFold::CharWidthXTerm qw( table_char_width );
+
 
 
 my $table = table_char_width();

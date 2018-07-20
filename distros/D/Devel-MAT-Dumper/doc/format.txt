@@ -1,0 +1,267 @@
+File consists sections:
+  Header
+  Roots
+  Stack
+  Heap
+  Context
+
+
+Header:
+  CHAR[4] MAGIC     "PMAT"
+  U8      FLAGS     0x01 : big-endian
+                    0x02 : INT/UV/IV are 64-bit
+                    0x04 : PTR is 64-bit
+                    0x08 : NV is long double
+                    0x10 : ithreads
+  U8      zero
+  U8      FORMATVER_MAJOR 0
+  U8      FORMATVER_MINOR 2
+  U32     PERLVER   rev<<24 | ver<<16 | sub
+
+  U8      NTYPES
+  {U8     HEADERLEN
+   U8     NPTRS
+   U8     NSTRS}*$NTYPES
+            -- type=0 is common, then actual SV types
+
+  U8      NCONTEXTS
+  {U8     HEADERLEN
+   U8     NPTRS
+   U8     NSTRS}*$NTYPES
+            -- type=0 is common, then actual Context types
+
+Roots:
+  PTR     UNDEF         the "undef" immortal
+  PTR     YES           the "yes" immortal
+  PTR     NO            the "no" immortal
+
+  U32     NROOTS=$n
+  {STR    ROOTNAME
+   PTR    ROOT} * $n
+
+          main_cv         = the main code
+          defstash        = the default stash
+          mainstack       = the main stack AV
+          beginav         = the BEGIN list
+          checkav         = the CHECK list
+          unitcheckav     = the UNITCHECK list
+          initav          = the INIT list
+          endav           = the END list
+          strtab          = the shared string table HV
+          envgv           = the ENV GV
+          incgv           = the INC GV
+          statgv          = the stat GV
+          statname        = the statname SV
+          tmpsv           = the temporary SV
+          defgv           = the default GV
+          argvgv          = the ARGV GV
+          argoutgv        = the argvout GV
+          argvout_stack   = the argout stack AV
+          fdpidav         = the FD-to-PID mapping AV
+          preambleav      = the compiler preamble AV
+          modglobalhv     = the module data globals HV
+          regex_padav     = the REGEXP pad AV
+          sortstash       = the sort stash
+          firstgv         = the *a GV
+          secondgv        = the *b GV
+          debstash        = the debugger stash
+          stashcache      = the stash cache
+          isarev          = the reverse map of @ISA dependencies
+          registered_mros = the registered MROs HV
+          rs              = the IRS
+          last_in_gv      = the last input GV
+          ofsgv           = the OFS GV
+          defoutgv        = the default output GV
+          hintgv          = the hints (%^H) GV
+          patchlevel      = the patch level
+          apiversion      = the API version
+          e_script        = the '-e' script
+          mess_sv         = the message SV
+          ors_sv          = the ORS SV
+          encoding        = the encoding
+          blockhooks      = the block hooks
+          custom_ops      = the custom ops HV
+          custom_op_names = the custom op names HV
+          custom_op_descs = the custom op descriptions HV
+
+          # Plus miscellaneous other internal UTF-8 / text encoding support SVs
+
+Stack:
+  UINT    SIZE = $n
+  {PTR    ELEM}*$n
+
+Heap:
+  type==0-terminated list of SVs
+
+
+An SV:
+  U8      TYPE       (0xff == UNKNOWN)
+  Header(4+P+I):
+    PTR     ADDRESS
+    U32     REFCNT
+    UINT    SIZE
+  PTRs(1):
+            BLESSED
+  STRs(0)
+
+  type: SCALAR:
+    Header(1+2I+N):
+      U8      FLAGS  0x01 : has IV
+                     0x02 : IV is UV
+                     0x04 : has NV
+                     0x08 : has STR
+                     0x10 : STR is UTF8
+      UINT    IV
+      double  NV
+      UINT    PVLEN
+    PTRs(1):
+              OURSTASH
+    STRs(1):
+              PV
+
+  type: REF:
+    Header(1):
+      U8      FLAGS  0x01 : RV is weak
+    PTRs(2):
+              RV
+              OURSTASH
+
+  type: GLOB
+    Header(I):
+      UINT    LINE
+    PTRs(8):
+              STASH
+              SCALAR
+              ARRAY
+              HASH
+              CODE
+              EGV
+              IO
+              FORM
+    STRs(2):
+              NAME
+              FILE
+
+  type: ARRAY
+    Header(1+I):
+      UINT    COUNT = $n
+      U8      FLAGS  0x01 : AV is not REAL
+    PTRs(0)
+    STRs(0)
+    Body:
+      {PTR    ELEM}*$n
+
+  type: HASH
+    Header(I):
+      UINT    COUNT = $n
+    PTRs(1):
+              BACKREFS
+    Body:
+      {STR    KEY
+       PTR    VALUE}*$n
+
+  type: STASH
+    [extends fields of a hash]
+    PTRs(4):
+              MRO_LINEAR_ALL
+              MRO_LINEAR_CURRENT
+              MRO_NEXTMETHOD
+              MRO_ISA
+    STRs(1):
+              NAME
+
+  type: CODE
+    Header(1+I+P):
+      UINT    LINE
+      U8      FLAGS  0x01 : CLONE
+                     0x02 : CLONED
+                     0x04 : XSUB
+                     0x08 : WEAKOUTSIDE
+                     0x10 : CVGV_RC
+                     0x20 : LEXICAL
+      PTR     OPROOT
+      U32     DEPTH
+    PTRs(5):
+              STASH
+              GLOB
+              OUTSIDE
+              PADLIST
+              CONSTVAL
+    STRs(2):
+              FILE
+              NAME
+    Body:
+      {U8     TYPE
+       ...         }    until TYPE==0
+
+     type: CONSTSV
+       PTR  SV
+
+     type: CONSTIX
+       UINT PADIX
+
+     type: GVSV
+       PTR  SV
+
+     type: GVIX
+       UINT PADIX
+
+     type: PADNAMES
+       PTR  PADNAMES
+
+     type: PAD
+       UINT DEPTH
+       PTR  PAD
+
+     type: PADNAME
+       UINT PADIX
+       STR  PADNAME
+       PTR  OURSTASH
+
+  type: IO
+    Header(2I):
+      UINT    IFILENO
+      UINT    OFILENO
+    PTRs(3):
+              TOP
+              FORMAT
+              BOTTOM
+
+  type: LVALUE
+    Header(1 + 2I):
+      U8      TYPE
+      UINT    OFF
+      UINT    LEN
+    PTRs(1):
+              TARG
+
+  type: REGEXP
+
+  type: FORMAT
+
+SV extensions:
+  type: MAGIC (0x80)
+    PTR   SV
+    U8    TYPE
+    U8    FLAGS  0x01 : MGf_REFCOUNTED
+    PTR   MG_OBJ
+    PTR   MG_PTR
+
+Context:
+  type==0-terminated list of CTXs
+
+  CTX:
+    U8    TYPE
+    U8    GIMME
+    UINT  LINE
+    STR   FILE
+
+  type: SUB
+    U32   OLDDEPTH
+    PTR   CV
+    PTR   ARGS
+
+  type: TRY
+
+  type: EVAL
+    PTR   CODESV

@@ -202,6 +202,9 @@ sub _build_full_options {
     # these values are picked from the file, if not provided by the compiler
     foreach my $override (qw/cover coverwidth nocoverpage notoc
                              impressum
+                             continuefootnotes
+                             centerchapter
+                             centersection
                              nofinalpage/) {
         $options{$override} = $self->$override;
     }
@@ -258,6 +261,10 @@ sub impressum {
     shift->_look_at_header('impressum');
 }
 
+sub continuefootnotes   { shift->_look_at_header('continuefootnotes') }
+sub centerchapter       { shift->_look_at_header('centerchapter') }
+sub centersection       { shift->_look_at_header('centersection') }
+
 sub _look_at_header {
     my ($self, $method) = @_;
     # these are booleans, so we enforce them
@@ -281,6 +288,12 @@ See L<Text::Amuse::Compile::TemplateOptions> for the explanation.
 =item nofinalpage
 
 =item impressum
+
+=item continuefootnotes
+
+=item centerchapter
+
+=item centersection
 
 =back
 
@@ -470,7 +483,12 @@ switches.
 sub _render_css {
     my ($self, %tokens) = @_;
     my $out = '';
-    $self->tt->process($self->templates->css, { fonts => $self->fonts, %tokens }, \$out);
+    $self->tt->process($self->templates->css, {
+                                               fonts => $self->fonts,
+                                               centersection => $self->centersection,
+                                               centerchapter => $self->centerchapter,
+                                               %tokens
+                                              }, \$out);
     return $out;
 }
 
@@ -479,9 +497,12 @@ sub html {
     my $self = shift;
     $self->purge('.html');
     my $outfile = $self->name . '.html';
+    my $doc = $self->document;
+    my $title = $doc->header_as_html->{title} || 'Untitled';
     $self->_process_template($self->templates->html,
                              {
-                              doc => $self->document,
+                              doc => $doc,
+                              title => $self->_remove_tags($title),
                               css => $self->_render_css(html => 1),
                               options => { %{$self->html_options} },
                              },

@@ -6,6 +6,27 @@ Home page:    <https://metacpan.org/release/Exporter-Tiny>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Exporter-Tiny>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.002001	2018-07-17
+
+ [ Packaging ]
+ - Fix dates in changelog.
+
+1.002000	2018-07-17
+
+ [ Packaging ]
+ - Repackage as 1.002000.
+
+1.001_001	2018-06-29
+
+ [ Test Suite ]
+ - Improved test coverage, up from 88.78% on coveralls.io to 96.74%.
+
+1.001_000	2018-06-26
+
+ - Added: Support for exporting non-code symbols such as $Foo, @Bar, and
+   %Baz.
+ - Added: Support for generating non-code symbols.
+
 1.000000	2017-05-22
 
  [ Packaging ]

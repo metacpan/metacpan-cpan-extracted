@@ -16,11 +16,11 @@ CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 =head1 VERSION
 
-Version 0.80
+Version 0.81
 
 =cut
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 =head1 SYNOPSIS
 
@@ -263,10 +263,12 @@ END {
 		}
 	}
 
-	$status = 200;
-
 	if(defined($headers) && ($headers =~ /^Status: (\d+)/m)) {
 		$status = $1;
+	} elsif($info) {
+		$status = $info->status();
+	} else {
+		$status = 200;
 	}
 
 	if($logger) {
@@ -488,7 +490,7 @@ END {
 					}
 				}
 				if($generate_etag && defined($etag)) {
-					$cache_hash->{'etag'} = $etag
+					$cache_hash->{'etag'} = $etag;
 				}
 				# TODO: Support the Expires header
 				# if($headers !~ /^Expires: /m))) {
@@ -559,11 +561,11 @@ END {
 		# CGI::Buffer
 		unshift @o, split(/\r\n/, $headers);
 		if($body && $send_body) {
-			unless(grep(/^Content-Length: \d/, @o)) {
+			if(scalar(grep(/^Content-Length: \d/, @o)) == 0) {
 				push @o, "Content-Length: $body_length";
 			}
 		}
-		unless(grep(/^Status: \d/, @o)) {
+		if(scalar(grep(/^Status: \d/, @o)) == 0) {
 			require HTTP::Status;
 			HTTP::Status->import();
 
@@ -694,7 +696,7 @@ sub _optimise_content {
 	$body =~ s/\<\/tr\>\s\<\/table\>/\<\/tr\>\<\/table\>/gi;
 	$body =~ s/\<br\s?\/?\>\s?\<p\>/\<p\>/gi;
 	$body =~ s/\<br\>\s/\<br\>/gi;
-	$body =~ s/\s+\<br\>/\<br\>/gi;
+	$body =~ s/\s+\<br/\<br/gi;
 	$body =~ s/\<br\s?\/\>\s/\<br \/\>/gi;
 	$body =~ s/[ \t]+/ /gs;	# Remove duplicate space, don't use \s+ it breaks JavaScript
 	$body =~ s/\s\<p\>/\<p\>/gi;
@@ -711,6 +713,7 @@ sub _optimise_content {
 	$body =~ s/<\/li>\s+<li>/<\/li><li>/gis;
 	$body =~ s/<\/li>\s+<\/ul>/<\/li><\/ul>/gis;
 	$body =~ s/<ul>\s+<li>/<ul><li>/gis;
+	$body =~ s/\s+<\/li>/<\/li>/gis;
 	$body =~ s/\<\/option\>\s+\<option/\<\/option\>\<option/gis;
 	$body =~ s/<title>\s*(.+?)\s*<\/title>/<title>$1<\/title>/is;
 }
@@ -1230,7 +1233,7 @@ L<http://search.cpan.org/dist/CGI-Buffer/>
 =head1 ACKNOWLEDGEMENTS
 
 The inspiration and code for some of this is cgi_buffer by Mark
-Nottingham: http://www.mnot.net/cgi_buffer.
+Nottingham: L<https://www.mnot.net/blog/2003/04/24/etags>.
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -1243,8 +1246,8 @@ The licence for cgi_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2011-2017 Nigel Horne,
-and is released under the following licence: GPL
+The rest of the program is Copyright 2011-2018 Nigel Horne,
+and is released under the following licence: GPL2
 
 =cut
 

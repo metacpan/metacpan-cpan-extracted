@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Repositories;
-$Maven::Repositories::VERSION = '1.14';
+$Maven::Repositories::VERSION = '1.15';
 # ABSTRACT: An ordered collection of repositories from which to resolve artifacts
 # PODNAME: Maven::Repositories
 
@@ -109,7 +109,7 @@ Maven::Repositories - An ordered collection of repositories from which to resolv
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

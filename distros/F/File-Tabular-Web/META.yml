@@ -16,7 +16,7 @@ name: File-Tabular-Web
 provides:
   File::Tabular::Web:
     file: lib/File/Tabular/Web.pm
-    version: '0.24'
+    version: '0.25'
   File::Tabular::Web::Attachments:
     file: lib/File/Tabular/Web/Attachments.pm
   File::Tabular::Web::Attachments::Indexed:
@@ -41,5 +41,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/File-Tabular-Web
-version: '0.24'
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

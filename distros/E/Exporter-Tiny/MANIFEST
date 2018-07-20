@@ -9,6 +9,7 @@ META.yml
 Makefile.PL
 README
 SIGNATURE
+TODO
 dist.ini
 doap.ttl
 examples/Example/Exporter.pm
@@ -28,3 +29,6 @@ t/07regexp.t
 t/08tags.t
 t/09warnings.t
 t/10no.t
+t/11noncode.t
+t/12noncodegenerators.t
+t/13doesntexist.t

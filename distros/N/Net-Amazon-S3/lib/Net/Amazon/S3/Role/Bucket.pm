@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Net::Amazon::S3::Role::Bucket;
-$Net::Amazon::S3::Role::Bucket::VERSION = '0.83';
+$Net::Amazon::S3::Role::Bucket::VERSION = '0.84';
 use Moose::Role;
 use Scalar::Util;
 
@@ -44,7 +44,7 @@ Net::Amazon::S3::Role::Bucket
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 AUTHOR
 

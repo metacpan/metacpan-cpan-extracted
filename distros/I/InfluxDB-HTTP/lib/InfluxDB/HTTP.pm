@@ -12,13 +12,21 @@ our @EXPORT    = ();
 
 use JSON::MaybeXS;
 use LWP::UserAgent;
-use Method::Signatures;
 use Object::Result;
 use URI;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-method new ($class: Str :$host = 'localhost', Int :$port = 8086, Int :$timeout = 180) {
+sub new {
+    my $class = shift;
+    my %args = (
+        host => 'localhost',
+        port => 8086,
+        timeout => 180,
+        @_,
+    );
+    my ($host, $port, $timeout) = @args{'host', 'port', 'timeout'};
+
     my $self = {
         host => $host,
         port => $port,
@@ -34,11 +42,13 @@ method new ($class: Str :$host = 'localhost', Int :$port = 8086, Int :$timeout =
     return $self;
 }
 
-method get_lwp_useragent {
+sub get_lwp_useragent {
+    my ($self) = @_;
     return $self->{lwp_user_agent};
 }
 
-method ping {
+sub ping {
+    my ($self) = @_;
     my $uri = $self->_get_influxdb_http_api_uri('ping');
     my $response = $self->{lwp_user_agent}->head($uri->canonical());
 
@@ -61,19 +71,27 @@ method ping {
     }
 }
 
-method query (Str|ArrayRef[Str] $query!, Str :$database, Int :$chunk_size, Str :$epoch where qr/(h|m|s|ms|u|ns)/ = 'ns') {
+sub query {
+    my $self = shift;
+    my $query = shift;
+    my %args = (epoch => 'ns', @_);
+    my ($database, $chunk_size, $epoch) = @args{'database', 'chunk_size', 'epoch'};
+
+    die "Missing argument 'query'" if !$query;
+    die "Argument epoch '$epoch' is not one of (h,m,s,ms,u,ns)" if $epoch !~ /^(h|m|s|ms|u|ns)$/;
+
     if (ref($query) eq 'ARRAY') {
         $query = join(';', @$query);
     }
 
     my $uri = $self->_get_influxdb_http_api_uri('query');
 
-    # FIXME move this query handling to _get_influxdb_http_api_uri subroutine
-    my $uri_query = {'q' => $query, };
-    $uri_query->{'db'} = $database if (defined $database);
-    $uri_query->{'chunk_size'} = $chunk_size if (defined $chunk_size);
-    $uri_query->{'epoch'} = $epoch if (defined $epoch);
-    $uri->query_form($uri_query);
+    $uri->query_form(
+        q => $query,
+        ($database ? (db => $database) : ()),
+        ($chunk_size ? (chunk_size => $chunk_size) : ()),
+        ($epoch ? (epoch => $epoch) : ())
+    );
 
     my $response = $self->{lwp_user_agent}->post($uri->canonical());
 
@@ -112,7 +130,16 @@ method query (Str|ArrayRef[Str] $query!, Str :$database, Int :$chunk_size, Str :
     }
 }
 
-method write (Str|ArrayRef[Str] $measurement!, Str :$database!, :$precision where { (!$_) || ($_ =~ /^(h|m|s|ms|u|ns)$/) }, Str :$retention_policy) {
+sub write {
+    my $self = shift;
+    my $measurement = shift;
+    my %args = @_;
+    my ($database, $precision, $retention_policy) = @args{'database', 'precision', 'retention_policy'};
+
+    die "Missing argument 'measurement'" if !$measurement;
+    die "Missing argument 'database'" if !$database;
+    die "Argument precision '$precision' is set and not one of (h,m,s,ms,u,ns)" if $precision && $precision !~ /^(h|m|s|ms|u|ns)$/;
+
     if (ref($measurement) eq 'ARRAY') {
         $measurement = join("\n", @$measurement);
     }
@@ -150,7 +177,11 @@ method write (Str|ArrayRef[Str] $measurement!, Str :$database!, :$precision wher
     }
 }
 
-method _get_influxdb_http_api_uri (Str $endpoint!) {
+sub _get_influxdb_http_api_uri {
+    my ($self, $endpoint) = @_;
+
+    die "Missing argument 'endpoint'" if !$endpoint;
+
     my $uri = URI->new();
 
     $uri->scheme('http');
@@ -171,7 +202,7 @@ InfluxDB::HTTP - The Perl way to interact with InfluxDB!
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 

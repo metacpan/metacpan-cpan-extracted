@@ -1,6 +1,16 @@
+0.04007   2018-07-18 22:49:22+02:00 Europe/Berlin
+    GitHub PR #2 merged (thanks karenetheridge)
+        * link to HTTP::Throwable    
+    GitHub PR #4 merged (thanks timbunce)
+        * use q{} for _status_message so message can contain a single quote
+        * throw exception on loader code error instead of silently ignoring
+    GitHub PR #5 merged (thanks neilb)
+        * Added [MetaJSON] so releases will include META.json
+        * Added "use warnings" to all modules
+
 0.04006   2014-02-14 00:27:50+01:00 Europe/Berlin
     typo fix (thanks dsteinbrunner)
-    
+
 0.04005   2014-02-14 00:03:43+01:00 Europe/Berlin
     corrected Encoding in dist.ini,
         due to CPAN Testers reporting an invalid byte sequence in the Makefile

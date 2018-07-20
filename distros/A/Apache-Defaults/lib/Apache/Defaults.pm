@@ -9,7 +9,7 @@ use Text::ParseWords;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub new {
     my $class = shift;
@@ -31,7 +31,7 @@ sub new {
 	    @servlist = ( $v );
 	}
     } else {
-	@servlist = qw(/usr/sbin/httpd /usr/sbin/apache2);
+	@servlist = qw(/usr/sbin/apachectl /usr/sbin/httpd /usr/sbin/apache2);
     }
     
     if (my @select = grep { -x $_->[0] }
@@ -74,7 +74,6 @@ sub environ { shift->{environ} }
 sub probe {
     my ($self, $cb, @opt) = @_;
 
-    open(my $nullout, '>', File::Spec->devnull);
     open(my $nullin, '<', File::Spec->devnull);
 
     my $out = gensym;
@@ -382,24 +381,26 @@ command line can also be used, e.g.:
 
 The default used in the absense of this attribute is:
 
-    [ '/usr/sbin/httpd', '/usr/sbin/apache2' ]
+    [ '/usr/sbin/apachectl', '/usr/sbin/httpd', '/usr/sbin/apache2' ]
 
+The use of B<apachectl> is preferred over directly invoking B<httpd> daemon,
+because the apache configuration file might contain referenmces to environment
+variables defined elsewhere, which will cause B<httpd> to fail. B<apachectl>
+takes care of this by including the file with variable definitions prior to
+calling B<httpd>. See also C<environ>, below.    
+    
 =item C<environ>
 
 Name of the shell script that sets the environment for B<httpd> invocation.
-
-If invoked with the B<-V> option, B<httpd> attempts to read its configuration
-file and will fail if the latter contains references to the environment
-variables defined elsewhere. This is quite common in Debian-based
-distributions, which define the environment variables in file
-F</etc/apache2/envvars>. To avoid such failures, use the C<environ> attribute,
-e.g.:
+Usually, this is the same script that is sourced by B<apachectl> prior to
+passing control over to B<httpd>. This option provides another solution to
+the environment problem mentioned above. E.g.:
 
     $x = new Apache::Defaults(environ => /etc/apache2/envvars)
 
 =item C<on_error>
 
-Controls the error handling. Allowed values are C<croak> and C<return>.
+Controls error handling. Allowed values are C<croak> and C<return>.
 If the value is C<croak> (the default), the method will I<croak> if an
 error occurs. If set to C<return>, the constructor will return a valid
 object. The B<httpd> exit status and diagnostics emitted to the stderr

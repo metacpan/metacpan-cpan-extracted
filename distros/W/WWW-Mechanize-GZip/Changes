@@ -1,5 +1,8 @@
 Revision history for WWW-Mechanize-GZip
 
+0.13    2018-07-16
+        - fixed typo in POD
+
 0.12    2009-06-24
         - fixed warning on undefined 'content-encoding' - thanks to Edward Smirnov
 

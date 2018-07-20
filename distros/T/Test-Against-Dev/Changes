@@ -1,5 +1,8 @@
 Revision history for Perl module Test::Against::Dev
 
+0.11 Mon Jul 16 11:58:54 EDT 2018
+    - Correct error in Test::Against::Dev::ProcessPSV::read_one_psv().
+
 0.10 Sun Jul 15 21:23:52 EDT 2018
     - Introduce Test::Against::Dev::ProcessPSV.  This package provides methods
       to consolidate monthly PSV files into the master PSV file as it grows

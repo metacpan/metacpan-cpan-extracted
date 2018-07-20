@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib/';
 use t::Internal;
 
 my $client = t::Internal->new(path => 't/fcgi/hello.fcgi');

@@ -1,0 +1,4 @@
+- improve test coverage
+- more tests and better support for non-code symbols
+- some kind of shim between Exporter::Tiny and Exporter.pm to allow people to use Exporter::Tiny features with Exporter.pm modules
+

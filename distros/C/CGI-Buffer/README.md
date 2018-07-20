@@ -3,13 +3,13 @@
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/CGI-Buffer/badge)](https://dependencyci.com/github/nigelhorne/CGI-Buffer)
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/CGI-Buffer/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Buffer?branch=master)
 
-# CGI::Buffer
+# NAME
 
-Verify, Cache and Optimise CGI Output
+CGI::Buffer - Verify, Cache and Optimise CGI Output
 
 # VERSION
 
-Version 0.80
+Version 0.81
 
 # SYNOPSIS
 
@@ -234,7 +234,7 @@ You can also look for information at:
 # ACKNOWLEDGEMENTS
 
 The inspiration and code for some of this is cgi\_buffer by Mark
-Nottingham: http://www.mnot.net/cgi\_buffer.
+Nottingham: [https://www.mnot.net/blog/2003/04/24/etags](https://www.mnot.net/blog/2003/04/24/etags).
 
 # LICENSE AND COPYRIGHT
 
@@ -247,5 +247,5 @@ The licence for cgi\_buffer is:
 
     This software is provided 'as is' without warranty of any kind."
 
-The rest of the program is Copyright 2011-2017 Nigel Horne,
-and is released under the following licence: GPL
+The rest of the program is Copyright 2011-2018 Nigel Horne,
+and is released under the following licence: GPL2

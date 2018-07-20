@@ -24,4 +24,4 @@ requires:
   constant: '0'
   strict: '0'
   warnings: '0'
-version: '0.05'
+version: '0.08'

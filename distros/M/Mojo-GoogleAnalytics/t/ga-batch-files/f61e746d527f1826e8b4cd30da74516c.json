@@ -1,0 +1,11 @@
+{
+  "reports": [
+    {
+      "columnHeader": {},
+      "nextPageToken": "some-token",
+      "data": {
+        "rowCount": 3
+      }
+    }
+  ]
+}

@@ -5,18 +5,24 @@ use strict;
 use warnings FATAL => 'all';
 use experimental qw(smartmatch);
 
-use parent 'Exporter';
-
+use File::Basename;
+use Storable;
 use POSIX qw(strftime);
 
 use List::MoreUtils qw(uniq);
 
-use Sport::Analytics::NHL::Config;
 use Sport::Analytics::NHL::LocalConfig;
-use Sport::Analytics::NHL::DB;
-use Sport::Analytics::NHL::Util;
-use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::Errors;
+
+use if ! $ENV{HOCKEYDB_NODB} && $MONGO_DB, 'Sport::Analytics::NHL::DB';
+use Sport::Analytics::NHL::Report;
 use Sport::Analytics::NHL::Scraper;
+use Sport::Analytics::NHL::Test;
+use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Util;
+
+use parent 'Exporter';
 
 =head1 NAME
 
@@ -24,7 +30,7 @@ Sport::Analytics::NHL - Crawl data from NHL.com and put it into a database
 
 =head1 VERSION
 
-Version 1.00
+Version 1.11
 
 =cut
 
@@ -32,7 +38,7 @@ our @EXPORT = qw(
 	hdb_version
 );
 
-our $VERSION = "1.00";
+our $VERSION = "1.11";
 
 =head1 SYNOPSIS
 
@@ -119,6 +125,31 @@ Returns: the list of game structures which are hash references with the followin
  * stage - 2 for Regular, 3 for Playoffs, none for both (default - none)
  * force - override the already present files and data
 
+=item C<compile_file>
+
+Compiles a single JSON or HTML report into a parsed hashref and stores it in a Storable file
+Arguments:
+ * The options hashref -
+   - force: Force overwrite of already existing file
+   - test: Test the resulted parsed report
+ * The file
+ * Our SSSSTNNNN game id
+ * Optional: preset type of the report
+
+Returns: the path to the compiled file
+
+=item C<compile>
+
+Compiles reports retrieved into the filesystem into parsed hashrefs and stores them in a Storable file.
+Arguments:
+ * The options hashref -
+   - force: Force overwrite of already existing file
+   - test: Test the resulted parsed report
+   - doc: limit compilation to these Report types
+   - data_dir: the root directory of the reports
+
+Returns: the location of the compiled storables
+
 =back
 
 =cut
@@ -129,7 +160,7 @@ sub new ($$) {
 	my $opts  = shift;
 
 	my $self = {};
-	unless ($opts->{no_database} || $ENV{HOCKEYDB_NODB}) {
+	unless ($opts->{no_database} || $ENV{HOCKEYDB_NODB} || ! $MONGO_DB) {
 		$self->{db} = Sport::Analytics::NHL::DB->new($opts->{database} || $ENV{HOCKEYDB_DBNAME} || $MONGO_DB);
 	}
 	$ENV{HOCKEYDB_DATA_DIR} = $DATA_DIR = $opts->{data_dir} if $opts->{data_dir};
@@ -246,7 +277,6 @@ sub get_db_scheduled_games ($$) {
     @games;
 }
 
-
 sub get_scheduled_games ($$) {
 
 	my $self = shift;
@@ -292,9 +322,65 @@ sub scrape_games ($$;@) {
 			last;
 		}
 		my $crawled_game = crawl_game($game);
-		push(@got_games, map($_->{file}, values %{$crawled_game}));
+		push(@got_games, map($_->{file}, values %{$crawled_game->{content}}));
 	}
 	@got_games;
+}
+
+sub compile_file ($$$$) {
+
+	my $opts    = shift;
+	my $file    = shift;
+	my $game_id = shift;
+	my $type    = shift || 'XX';
+
+	my $args = { file => $file };
+	if ($BROKEN_FILES{$game_id}->{$type}) {
+		print STDERR "File $file is broken, skipping\n";
+		return undef;
+	}
+	my $storable = $file;
+	$storable =~ s/\.([a-z]+)$/.storable/i;
+	#my $storable = dirname($file) . '/' . $args->{type} . '.storable';
+	if (!$opts->{force} && -f $storable && -M $storable < -M $file) {
+		print STDERR "File $storable already exists, skipping\n";
+		return $storable;
+	}
+	my $report = Sport::Analytics::NHL::Report->new($args);
+	$report->process();
+	if ($opts->{test}) {
+		test_boxscore($report, { lc $args->{type} => 1 });
+		verbose "Ran $TEST_COUNTER->{Curr_Test} tests";
+		$TEST_COUNTER->{Curr_Test} = 0;
+	}
+	store $report, $storable;
+	debug "Wrote $storable";
+	$storable;
+
+}
+
+sub compile ($$@) {
+
+	my $self = shift;
+	my $opts = shift;
+	my @game_ids = @_;
+
+	my @storables = ();
+	for my $game_id (@game_ids) {
+		if (defined $DEFAULTED_GAMES{$game_id})	{
+			print STDERR "Skipping defaulted game $game_id\n";
+			next;
+		}
+		my @game_files = get_game_files_by_id($game_id, $opts->{data_dir});
+		for my $game_file (@game_files) {
+			$game_file =~ m|/([A-Z]{2}).[a-z]{4}$|;
+			my $type = $1;
+			next if ($opts->{doc} && !grep {$_ eq $type} @{$opts->{doc}});
+			my $storable = compile_file($opts, $game_file, $game_id, $type);
+			push(@storables, $storable) if $storable;
+		}
+	}
+	return @storables;
 }
 
 =head1 AUTHOR
@@ -315,7 +401,6 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc Sport::Analytics::NHL
-
 
 You can also look for information at:
 

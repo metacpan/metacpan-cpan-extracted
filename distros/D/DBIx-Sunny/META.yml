@@ -4,14 +4,12 @@ author:
   - 'Masahiro Nagano <kazeburo KZBRKZBR@ gmail.com>'
 build_requires:
   Capture::Tiny: '0'
-  DBD::SQLite: '1.31'
   Test::More: '0.98'
   Test::Requires: '0'
-  Test::TCP: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,9 +28,11 @@ no_index:
 provides:
   DBIx::Sunny:
     file: lib/DBIx/Sunny.pm
-    version: '0.25'
+    version: '0.9991'
   DBIx::Sunny::Schema:
     file: lib/DBIx/Sunny/Schema.pm
+  DBIx::Sunny::Util:
+    file: lib/DBIx/Sunny/Util.pm
   DBIx::Sunny::db:
     file: lib/DBIx/Sunny.pm
   DBIx::Sunny::st:
@@ -52,7 +52,8 @@ resources:
   bugtracker: https://github.com/kazeburo/DBIx-Sunny/issues
   homepage: https://github.com/kazeburo/DBIx-Sunny
   repository: git://github.com/kazeburo/DBIx-Sunny.git
-version: '0.25'
+version: '0.9991'
+x_authority: cpan:KAZEBURO
 x_contributors:
   - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
   - 'Masahiro Nagano <kazeburo@gmail.com>'

@@ -5,9 +5,6 @@ use warnings FATAL => 'all';
 
 use Carp;
 use POSIX;
-use MongoDB;
-use MongoDB::OID;
-use MongoDB::MongoClient;
 
 use Tie::IxHash;
 use boolean;
@@ -15,6 +12,10 @@ use boolean;
 use Sport::Analytics::NHL::Config;
 use Sport::Analytics::NHL::LocalConfig;
 use Sport::Analytics::NHL::Util;
+
+use if ! $ENV{HOCKEYDB_NODB} && $MONGO_DB, 'MongoDB';
+use if ! $ENV{HOCKEYDB_NODB} && $MONGO_DB, 'MongoDB::OID';
+use if ! $ENV{HOCKEYDB_NODB} && $MONGO_DB, 'MongoDB::MongoClient';
 
 =head1 NAME
 
@@ -133,6 +134,8 @@ sub insert_schedule ($@) {
 	} map(ref $_ && ref $_ eq 'ARRAY' ? @{$_} : $_, @games);
 	$schedule_c->delete_many({_id => { '$in' => [ map {$_->{_id}} @games ] } });
 	$schedule_c->insert_many([@games]);
+	use Data::Dumper;
+	print Dumper \@games;
 	debug "Inserted " . scalar(@games) . " games for season $games[0]->{season}";
 	scalar @games;
 }

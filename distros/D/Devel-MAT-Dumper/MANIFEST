@@ -1,0 +1,13 @@
+Build.PL
+Changes
+doc/format.txt
+lib/Devel/MAT/Dumper.pm
+lib/Devel/MAT/Dumper.xs
+MANIFEST			This list of files
+t/00use.t
+t/01header.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

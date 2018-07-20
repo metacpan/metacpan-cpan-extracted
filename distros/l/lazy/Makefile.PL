@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "lazy",
   "PREREQ_PM" => {
-    "App::cpm" => "0.974",
+    "App::cpm" => "0.975",
     "App::cpm::CLI" => 0,
     "Getopt::Long" => 0,
     "Module::Loaded" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::TempDir::Tiny" => 0,
     "local::lib" => "2.000024"
   },
-  "VERSION" => "0.000005",
+  "VERSION" => "0.000006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::cpm" => "0.974",
+  "App::cpm" => "0.975",
   "App::cpm::CLI" => 0,
   "Capture::Tiny" => 0,
   "ExtUtils::MakeMaker" => 0,

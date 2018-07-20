@@ -1,0 +1,7 @@
+Revision history for EPFL-Net-ipv6Test
+
+1.01    2018-07-17
+        Fix build with Makefile
+
+1.00    2018-07-17
+        First version, released on an unsuspecting world.

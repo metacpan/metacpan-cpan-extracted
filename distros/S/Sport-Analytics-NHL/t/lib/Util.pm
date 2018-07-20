@@ -9,6 +9,7 @@ use Test::More;
 use POSIX qw(strftime);
 
 use Sport::Analytics::NHL::Config;
+use Sport::Analytics::NHL::LocalConfig;
 use Sport::Analytics::NHL::Test;
 use Sport::Analytics::NHL::Util;
 
@@ -29,7 +30,7 @@ sub test_env (;$) {
 	my $dbname = shift || $TEST_DB;
 
 	$ENV{HOCKEYDB_DBNAME}   = $dbname;
-	$ENV{HOCKEYDB_DEBUG}    = 0;
+	$ENV{HOCKEYDB_DEBUG} = $IS_AUTHOR;
 	$ENV{HOCKEYDB_DATA_DIR} = 't/data';
 	$ENV{HOCKEYDB_TEST}     = 1;
 }

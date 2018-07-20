@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::LocalRepository;
-$Maven::LocalRepository::VERSION = '1.14';
+$Maven::LocalRepository::VERSION = '1.15';
 # ABSTRACT: An local repository from which to resolve artifacts
 # PODNAME: Maven::LocalRepository
 
@@ -135,7 +135,7 @@ Maven::LocalRepository - An local repository from which to resolve artifacts
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

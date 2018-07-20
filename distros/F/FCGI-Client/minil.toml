@@ -1,0 +1,7 @@
+name = "FCGI-Client"
+# badges = ["travis"]
+authority="cpan:TOKUHIROM"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+

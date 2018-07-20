@@ -1,0 +1,4 @@
+1.01 2018-07-17
+	- Prefer apachectl over invoking httpd directly.
+1.00 2018-02-24
+	- Initial release.

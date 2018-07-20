@@ -5,7 +5,7 @@ use strict;
 use warnings; no warnings qw(void once uninitialized numeric redefine);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.000000';
+our $VERSION   = '1.002001';
 our @EXPORT_OK = qw< mkopt mkopt_hash _croak _carp >;
 
 sub _croak ($;@) { require Carp; my $fmt = shift; @_ = sprintf($fmt, @_); goto \&Carp::croak }
@@ -205,13 +205,36 @@ sub _exporter_expand_sub
 	
 	no strict qw(refs);
 	
-	if ($name =~ $permitted)
+	my $sigil = "&";
+	if ($name =~ /\A([&\$\%\@\*])(.+)\z/) {
+		$sigil = $1;
+		$name  = $2;
+		if ($sigil eq '*') {
+			_croak("Cannot export symbols with a * sigil");
+		}
+	}
+	my $sigilname = $sigil eq '&' ? $name : "$sigil$name";
+	
+	if ($sigilname =~ $permitted)
 	{
-		my $generator = $class->can("_generate_$name");
-		return $name => $class->$generator($name, $value, $globals) if $generator;
+		my $generatorprefix = {
+			'&' => "_generate_",
+			'$' => "_generateScalar_",
+			'@' => "_generateArray_",
+			'%' => "_generateHash_",
+		}->{$sigil};
+		
+		my $generator = $class->can("$generatorprefix$name");
+		return $sigilname => $class->$generator($sigilname, $value, $globals) if $generator;
 		
 		my $sub = $class->can($name);
-		return $name => $sub if $sub;
+		return $sigilname => $sub if $sub;
+		
+		# Could do this more cleverly, but this works.
+		if ($sigil ne '&') {
+			my $evalled = eval "\\${sigil}${class}::${name}";
+			return $sigilname => $evalled if $evalled;
+		}
 	}
 	
 	$class->_exporter_fail(@_);
@@ -247,19 +270,35 @@ sub _exporter_install_sub
 	
 	return unless defined $name;
 	
-	unless (ref($name))
-	{
+	my $sigil = "&";
+	unless (ref($name)) {
+		if ($name =~ /\A([&\$\%\@\*])(.+)\z/) {
+			$sigil = $1;
+			$name  = $2;
+			if ($sigil eq '*') {
+				_croak("Cannot export symbols with a * sigil");
+			}
+		}
 		my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, q();
 		my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, q();
 		$name = "$prefix$name$suffix";
 	}
 	
-	return ($$name = $sym)         if ref($name) eq q(SCALAR);
-	return ($into->{$name} = $sym) if ref($into) eq q(HASH);
+	my $sigilname = $sigil eq '&' ? $name : "$sigil$name";
+	
+#	if ({qw/$ SCALAR @ ARRAY % HASH & CODE/}->{$sigil} ne ref($sym)) {
+#		warn $sym;
+#		warn $sigilname;
+#		_croak("Reference type %s does not match sigil %s", ref($sym), $sigil);
+#	}
+		
+	return ($$name = $sym)              if ref($name) eq q(SCALAR);
+	return ($into->{$sigilname} = $sym) if ref($into) eq q(HASH);
 	
 	no strict qw(refs);
+	our %TRACKED;
 	
-	if (exists &{"$into\::$name"} and \&{"$into\::$name"} != $sym)
+	if (ref($sym) eq 'CODE' and exists &{"$into\::$name"} and \&{"$into\::$name"} != $sym)
 	{
 		my ($level) = grep defined, $value->{-replace}, $globals->{replace}, q(0);
 		my $action = {
@@ -273,6 +312,10 @@ sub _exporter_install_sub
 			die      => \&_croak,
 		}->{$level} || sub {};
 		
+		# Don't complain about double-installing the same sub. This isn't ideal
+		# because the same named sub might be generated in two different ways.
+		$action = sub {} if $TRACKED{$class}{$into}{$sigilname};
+		
 		$action->(
 			$action == \&_croak
 				? "Refusing to overwrite existing sub '%s::%s' with sub '%s' exported by %s"
@@ -284,12 +327,11 @@ sub _exporter_install_sub
 		);
 	}
 	
-	our %TRACKED;
-	$TRACKED{$class}{$into}{$name} = $sym;
+	$TRACKED{$class}{$into}{$sigilname} = $sym;
 	
 	no warnings qw(prototype);
 	$installer
-		? $installer->($globals, [$name, $sym])
+		? $installer->($globals, [$sigilname, $sym])
 		: (*{"$into\::$name"} = $sym);
 }
 
@@ -302,7 +344,21 @@ sub _exporter_uninstall_sub
 	ref $into and return;
 	
 	no strict qw(refs);
+
+	my $sigil = "&";
+	if ($name =~ /\A([&\$\%\@\*])(.+)\z/) {
+		$sigil = $1;
+		$name  = $2;
+		if ($sigil eq '*') {
+			_croak("Cannot export symbols with a * sigil");
+		}
+	}
+	my $sigilname = $sigil eq '&' ? $name : "$sigil$name";
 	
+	if ($sigil ne '&') {
+		_croak("Unimporting non-code symbols not supported yet");
+	}
+
 	# Cowardly refuse to uninstall a sub that differs from the one
 	# we installed!
 	my $our_coderef = $TRACKED{$class}{$into}{$name};

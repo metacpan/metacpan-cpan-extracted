@@ -17,6 +17,10 @@ elements:
       - type: Text
         label: Code *
         name: name
+        container_attributes:
+          class: form-group
+        attributes:
+          class: form-control
         constraints:
           - Required
           - type: Regex
@@ -39,6 +43,10 @@ elements:
       - type: Text
         label: Name *
         name: comment
+        container_attributes:
+          class: form-group
+        attributes:
+          class: form-control
         constraints:
           - Required
           - type: DBIC::Unique
@@ -50,11 +58,19 @@ elements:
 
       - type: Text
         name: default_value
+        container_attributes:
+          class: form-group
+        attributes:
+          class: form-control
         label: Default Value
 
       - type: Select
         label: Type *
         name: data_type
+        container_attributes:
+          class: form-group
+        attributes:
+          class: form-control
         options:
           - [ 'text', 'Text' ]
           - [ 'textarea', 'Text Area' ]
@@ -94,6 +110,10 @@ elements:
 
       - type: Text
         name: display_order
+        container_attributes:
+          class: form-group
+        attributes:
+          class: form-control
         label: Display Order
         constraints:
           - Number
@@ -111,12 +131,19 @@ elements:
 
       - type: Text
         name: display_mask
+        attributes:
+          class: form-control
         container_attributes:
+          class: form-group
           title: Mask sensitive data output on reports.  Uses a regex, captures specify which characters to display.  e.g. (\d{3}).*(\d{4}) displays the first 3 digits and the last 4.
         label: Display Mask
 
       - type: Text
         name: mask_char
+        container_attributes:
+          class: form-group
+        attributes:
+          class: form-control
         label: Mask Character
 
   - type: Submit                                                                
@@ -124,7 +151,6 @@ elements:
     value: Save
     attributes:
       class: "submit submit_ok"
-
 
 
 

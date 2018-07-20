@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::Symbols;
 
 use strict;
 use warnings;
+use 5.014; # s///r
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use constant CMD => "symbols";
 use constant CMD_DESC => "Display a list of the symbol table";

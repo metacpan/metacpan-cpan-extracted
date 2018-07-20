@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,10 +19,10 @@ name: JTM-Boilerplate
 provides:
   JCM::Boilerplate:
     file: lib/JCM/Boilerplate.pm
-    version: '2.181940'
+    version: '2.182001'
   JTM::Boilerplate:
     file: lib/JTM/Boilerplate.pm
-    version: '2.181940'
+    version: '2.182001'
 requires:
   AnyEvent::Delay: '0.001'
   AnyEvent::Handle::UDP: '0.043'
@@ -70,7 +70,6 @@ requires:
   MIME::Base64: '3.15'
   Mail::Sender: v0.8.23
   Math::Random::ISAAC::XS: '1.004'
-  Mercury: '0.008'
   Mojolicious: '6.65'
   Moose: '2.1604'
   Moose::Util::TypeConstraints: '2.1604'
@@ -113,9 +112,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
+  bugtracker: https://github.com/jmaslak/JTM-Boilerplate/issues
   repository: git://github.com/jmaslak/JTM-Boilerplate.git
-version: '2.181940'
+version: '2.182001'
 x_contributor_covenant:
   version: 0.02
-x_generated_by_perl: v5.24.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

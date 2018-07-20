@@ -7,7 +7,7 @@ use experimental qw(smartmatch);
 
 use Test::More;
 
-use JSON::XS;
+use JSON;
 
 use Sport::Analytics::NHL::LocalConfig;
 use Sport::Analytics::NHL::Test;

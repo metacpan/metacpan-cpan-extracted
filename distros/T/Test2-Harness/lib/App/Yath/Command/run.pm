@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001066';
+our $VERSION = '0.001067';
 
 use Test2::Harness::Feeder::Run;
 use Test2::Harness::Util::File::JSON;
@@ -473,6 +473,20 @@ This option implies -L
 =item --log
 
 Turn on logging
+
+=item --lff format-string
+
+=item --log-file-format format-string
+
+Specify the format for automatically-generated log files.
+
+Overridden by --log-file, if given
+
+This option implies -L
+
+(Default: $YATH_LOG_FILE_FORMAT, if that is set, or else '%Y-%m-%d~%H:%M:%S~%!U~%!p.jsonl')
+
+This is a string in which percent-escape sequences will be replaced as per POSIX::strftime.  The following special escape sequences are also replaced: (%!U : the unique test run ID)  (%!p : the process ID) (%!S : the number of seconds since local midnight UTC 
 
 =back
 

@@ -77,7 +77,7 @@
          "web" : "https://github.com/binary-com/perl-Math-Business-BlackScholesMerton"
       }
    },
-   "version" : "1.23",
+   "version" : "1.24",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
 }
 

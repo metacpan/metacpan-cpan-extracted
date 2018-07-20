@@ -35,6 +35,10 @@ elements:
 
                   - type: Text
                     name: value
+                    container_attributes:
+                      class: form-group
+                    attributes:
+                      class: form-control
                     label: Value
                     constraints:
                       - type: Required
@@ -50,6 +54,10 @@ elements:
 
                   - type: Text
                     name: display_order
+                    container_attributes:
+                      class: form-group
+                    attributes:
+                      class: form-control
                     label: Sequence
                     constraints:
                       - Number
@@ -72,6 +80,10 @@ elements:
 
           - type: Text
             name: value
+            container_attributes:
+              class: form-group
+            attributes:
+              class: form-control
             label: Value *
             constraints:
               - type: DBIC::Unique
@@ -84,6 +96,10 @@ elements:
 
           - type: Text
             name: display_order
+            container_attributes:
+              class: form-group
+            attributes:
+              class: form-control
             label: Sequence
             constraints:
               - Number
@@ -100,4 +116,3 @@ elements:
     value: Done
     attributes:
       class: "submit submit_cancel"
-

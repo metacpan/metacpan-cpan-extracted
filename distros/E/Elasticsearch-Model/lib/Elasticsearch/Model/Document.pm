@@ -12,6 +12,7 @@ my (undef, undef, $init_meta) = Moose::Exporter->build_import_methods(
     )],
     with_meta => [qw(
         has
+        has_non_attribute_mapping
     )],
     class_metaroles => {
         class => [
@@ -32,6 +33,11 @@ sub init_meta {
     );
 
     $class->$init_meta(%p);
+}
+
+sub has_non_attribute_mapping {
+    my ($self,$mapping) = @_;
+    $self->non_attribute_mapping($mapping);
 }
 
 1;

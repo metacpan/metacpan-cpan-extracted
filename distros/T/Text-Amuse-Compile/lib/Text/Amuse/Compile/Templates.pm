@@ -192,7 +192,7 @@ sub html {
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="[% doc.language_code %]" lang="[% doc.language_code %]">
 <head>
   <meta http-equiv="Content-type" content="application/xhtml+xml; charset=UTF-8" />
-  <title>[% doc.header_as_html.title %]</title>
+  <title>[% title %]</title>
   <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
 [% css %]
@@ -360,6 +360,14 @@ h6 {
     margin: 0;
 }
 
+[% IF centerchapter %]
+h1, h2, h3 { text-align: center; }
+[% END %]
+
+[% IF centersection %]
+h1, h2, h3, h4, h5, h6 { text-align: center; }
+[% END %]
+
 sup, sub {
     font-size: 80%;
     line-height: 0;
@@ -417,13 +425,19 @@ div.image, div.float_image_f {
 
 div.float_image_r {
     float: right;
+    text-align: center;
+    margin: 1em 0 1em 1em;
 }
 
 div.float_image_l {
     float: left;
+    text-align: center;
+    margin: 1em 1em 1em 0;
 }
 
 div.float_image_f {
+    margin-top: 3em;
+    margin-bottom: 3em;
     clear: both;
     margin-left: auto;
     margin-right: auto;
@@ -440,7 +454,8 @@ div.biblio, div.play {
 }
 
 div.caption {
-    padding-bottom: 1em;
+    padding-top: 1em;
+    text-align: center;
 }
 
 div.center {
@@ -740,10 +755,6 @@ sub latex {
 [% END %]
 \deffootnote[3em]{0em}{4em}{\textsuperscript{\thefootnotemark}~}
 
-% continuous numbering across the document. Defaults to resetting at chapter. Unclear
-% \usepackage{chngcntr}
-% \counterwithout{footnote}{chapter}
-
 \usepackage[shortlabels]{enumitem}
 \usepackage{tabularx}
 \usepackage[normalem]{ulem}
@@ -762,6 +773,18 @@ sub latex {
 \renewcommand*{\tableformat}{}
 \KOMAoption{captions}{belowfigure,nooneline}
 \addtokomafont{caption}{\centering}
+
+[% IF safe_options.continuefootnotes %]
+% continuous numbering across the document. Defaults to resetting at chapter.
+\usepackage{chngcntr}
+\counterwithout{footnote}{chapter}
+[% END %]
+[% IF safe_options.centerchapter %]
+\let\raggedchapter\centering
+[% END %]
+[% IF safe_options.centersection %]
+\let\raggedsection\centering
+[% END %]
 
 % avoid breakage on multiple <br><br> and avoid the next [] to be eaten
 \newcommand*{\forcelinebreak}{\strut\\*{}}

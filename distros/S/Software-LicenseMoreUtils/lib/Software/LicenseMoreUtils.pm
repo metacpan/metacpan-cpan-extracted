@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Software::LicenseMoreUtils;
-$Software::LicenseMoreUtils::VERSION = '1.001';
+$Software::LicenseMoreUtils::VERSION = '1.002';
 use strict;
 use warnings;
 use 5.10.1;
@@ -111,7 +111,7 @@ Software::LicenseMoreUtils - More utilities and a summary for Software::License
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 

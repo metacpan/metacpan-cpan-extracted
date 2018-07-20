@@ -6,7 +6,7 @@
 #
 
 package File::ByLine;
-$File::ByLine::VERSION = '1.181861';
+$File::ByLine::VERSION = '1.181990';
 use v5.10;
 
 # ABSTRACT: Line-by-line file access loops
@@ -162,7 +162,7 @@ File::ByLine - Line-by-line file access loops
 
 =head1 VERSION
 
-version 1.181861
+version 1.181990
 
 =head1 SYNOPSIS
 
@@ -196,7 +196,7 @@ version 1.181861
 
 
   #
-  # Functional Interface
+  # Object Oriented Interface (More Powerful!)
   #
 
   # Execute a routine for each line of a file
@@ -260,8 +260,8 @@ needed.
 This function calls a coderef once for each line in the file.  The file is read
 line-by-line, removes the newline character(s), and then executes the coderef.
 
-Each line (without newline) is passed to the coderef as the first parameter and
-only parameter to the coderef.  It is also placed into C<$_>.
+Each line (without newline) is passed to the coderef as the only parameter to
+the coderef.  It is also placed into C<$_>.
 
 This function returns the number of lines in the file.
 
@@ -269,6 +269,11 @@ This is similar to C<forlines()>, except for order of arguments.  The author
 recommends this form for short code blocks - I.E. a coderef that fits on
 one line.  For longer, multi-line code blocks, the author recommends
 the C<forlines()> syntax.
+
+Instead of a single filename, an arrayref can be passed in, in which case the
+files are read in turn as if they are all one file. Note that if the file
+doesn't end in a newline, a newline is inserted before processing the next
+file.
 
 =head2 forlines
 
@@ -278,8 +283,8 @@ the C<forlines()> syntax.
 This function calls a coderef once for each line in the file.  The file is read
 line-by-line, removes the newline character(s), and then executes the coderef.
 
-Each line (without newline) is passed to the coderef as the first parameter and
-only parameter to the coderef.  It is also placed into C<$_>.
+Each line (without newline) is passed to the coderef as the only parameter to
+the coderef.  It is also placed into C<$_>.
 
 This function returns the number of lines in the file.
 
@@ -295,6 +300,11 @@ Requires L<Parallel::WorkUnit> to be installed.
 
 Three parameters are requied: a codref, a filename, and number of simultanious
 child threads to use.
+
+Instead of a single filename, an arrayref can be passed in, in which case the
+files are read in turn as if they are all one file. Note that if the file
+doesn't end in a newline, a newline is inserted before processing the next
+file.
 
 This function performs similar to C<dolines()>, except that it does its'
 operations in parallel using C<fork()> and L<Parallel::WorkUnit>.  Because
@@ -326,6 +336,11 @@ Requires L<Parallel::WorkUnit> to be installed.
 
 Three parameters are requied: a filename, a codref, and number of simultanious
 child threads to use.
+
+Instead of a single filename, an arrayref can be passed in, in which case the
+files are read in turn as if they are all one file. Note that if the file
+doesn't end in a newline, a newline is inserted before processing the next
+file.
 
 This function performs similar to C<forlines()>, except that it does its'
 operations in parallel using C<fork()> and L<Parallel::WorkUnit>.  Because
@@ -360,8 +375,8 @@ the return value of that coderef, returns only the lines where the coderef
 evaluates to true.  This is similar to the C<grep> built-in function, except
 operating on file input rather than array input.
 
-Each line (without newline) is passed to the coderef as the first parameter and
-only parameter to the coderef.  It is also placed into C<$_>.
+Each line (without newline) is passed to the coderef as the only parameter to
+the coderef.  It is also placed into C<$_>.
 
 This function returns the lines for which the coderef evaluates as true.
 
@@ -371,6 +386,11 @@ This function returns the lines for which the coderef evaluates as true.
 
 Three parameters are requied: a coderef, filename, and number of simultanious
 child threads to use.
+
+Instead of a single filename, an arrayref can be passed in, in which case the
+files are read in turn as if they are all one file. Note that if the file
+doesn't end in a newline, a newline is inserted before processing the next
+file.
 
 This function performs similar to C<greplines()>, except that it does its'
 operations in parallel using C<fork()> and L<Parallel::WorkUnit>.  Because
@@ -408,8 +428,8 @@ basically if the coderef returns a list, all elements of that list are added
 as distinct elements to the return value array.  If the coderef returns an
 empty list, no elements are added.
 
-Each line (without newline) is passed to the coderef as the first parameter and
-only parameter to the coderef.  It is also placed into C<$_>.
+Each line (without newline) is passed to the coderef as the only parameter to
+the coderef.  It is also placed into C<$_>.
 
 This is meant to be similar to the built-in C<map> function.
 
@@ -427,6 +447,11 @@ This function returns the lines for which the coderef evaluates as true.
 
 Three parameters are requied: a coderef, filename, and number of simultanious
 child threads to use.
+
+Instead of a single filename, an arrayref can be passed in, in which case the
+files are read in turn as if they are all one file. Note that if the file
+doesn't end in a newline, a newline is inserted before processing the next
+file.
 
 This function performs similar to C<maplines()>, except that it does its'
 operations in parallel using C<fork()> and L<Parallel::WorkUnit>.  Because
@@ -467,27 +492,68 @@ Constructs a new object, suitable for the object oriented calls below.
 
 =head2 ATTRIBUTES
 
+=head3 extended_info
+
+  $extended = $byline->extended_info();
+  $byline->extended_info(1);
+
+This was added in version 1.181951.
+
+Gets and sets the "extended information" flag.  This defaults to false, but
+if set to a true value this will pass a second parameter to all user-defined
+code (such as the per-line code function in C<dolines> and C<do> and the
+C<header_handler> function.
+
+For all code, this information will be passed as the second argument to the
+user defined code.  It will be a hashref with the following keys defined:
+
+=over 4
+
+=item C<filename> - The filename currently being processed
+
+=item C<object> - An object corresponding to either the current explicit or implicit C<File::ByLine> object
+
+=item C<process_number> - Which child process (first process is zero)
+
+=back
+
+This object should not be modified by user code.  In addition, no attributes
+of the explict or implicit File::ByLine object passed as part of this hashref
+should be modified within user code.
+
 =head3 file
 
-  my $current_file = $byline->file();
+  my $file = $byline->file();
   $byline->file("abc.txt");
+  $byline->file( [ "abc.txt", "def.txt" ] );
+  $byline->file( "$abc.txt", "def.txt" );
 
 Gets and sets the default filename used by the methods in the object oriented
 interface.  The default value is C<undef> which indicates that no default
 filename is provided.
 
-=head3 header_skip
+Instead of a single filename, a list or arrayref can be passed in, in which
+case the files are read in turn as if they are all one file. Note that if the
+file doesn't end in a newline, a newline is inserted before processing the next
+file.
 
-  $byline->header_skip(1);
+=head3 header_all_files
 
-Gets and sets whether the object oriented methods will skip the first line
-in the file (which you might want to do for a line that is a header).  This
-defaults to false.  Any true value will cause the header line to be skipped.
+  my $all_files = $byline->header_all_files();
+  $byline->header_all_files(1);
 
-You cannot set this to true while a C<header_handler> value is set.
+Gets and sets whether the object oriented methods will call C<header_handler>
+for every file if multiple files are passed into the C<file> attribute.
+
+The anticipated usage of this would be with C<extended_info> set to true, with
+the C<header_handler> function examining the C<filename> attribute of the
+extended info hashref.  Note that all headers may be read before any line in
+any file is read, to better accommodate parallel code execution.  I.E. the
+headers of all files may be read at once before any data line is read.
 
 =head3 header_handler
 
+  my $handler = $byline->header_handler();
   $byline->header_handler( sub { ... } );
 
 Specifies code that should be executed on the header row of the input file.
@@ -496,8 +562,9 @@ When a header handler is specified, the first row of the file is sent to this
 handler, and is not sent to the code provided to the various do/grep/map/lines
 methods in the object oriented interface.
 
-The code is called with one parameter, the header line.  The header line is
-also stored in C<$_>.
+The code is called with one or two parameters, the header line, and, if the
+C<extended_info> attribute is set, the extended information hashref.  The
+header line is also stored in C<$_>.
 
 When set, this is always executed in the parent process, not in the child
 processes that are spawned (in the case of C<processes> being greater than
@@ -516,6 +583,32 @@ process.  Specifying C<2> or greater will use multiple processes to operate
 on the file (see documentation for the parallel_* functions described above
 for more details).
 
+=head3 skip_unreadable
+
+  my $unreadable = $byline->skip_unreadable();
+  $byline->skip_unreadable(10);
+
+This was added in version 1.181980.
+
+If this attribute is true, unreadable files are treated as empty files during
+processing.  The default is false, in which case an exception is thrown when
+an access attempt is made to an unreadable file.
+
+=head3 Short Name Aliases for Attributes
+
+  $byline->f();     # Alias for file
+  $byline->ei();    # Alias for extended_info
+  $byline->haf();   # Alias for header_all_files
+  $byline->hh();    # Alias for header_handler
+  $byline->hs();    # Alias for header_skip
+  $byline->p();     # Alias for processes
+  $byline->su();    # Alias for skip_unreadable
+
+Short name aliases were added in version 1.181980.
+
+Each attribute listed above has a corresponding short name.  This short name
+can also be used as a constructor argument.
+
 =head2 METHODS
 
 =head3 do
@@ -527,8 +620,15 @@ the filename is not provided, the C<file> attribute is used for this.  See the
 C<dolines> and C<parallel_dolines> functions for more information on how this
 functions.
 
-The code is called with one parameter, the header line.  The header line is
-also stored in C<$_>.
+Each line (without newline) is passed to the coderef as the first parameter to
+the coderef.  It is also placed into C<$_>.  If the C<extended_info> attribute
+is true, the extended information hashref will be passed as the second
+parameter.
+
+Instead of a single filename, an arrayref can be passed in, in which case the
+files are read in turn as if they are all one file. Note that if the file
+doesn't end in a newline, a newline is inserted before processing the next
+file.
 
 =head3 grep
 
@@ -539,11 +639,18 @@ the filename is not provided, the C<file> attribute is used for this.  See the
 C<greplines> and C<parallel_greplines> functions for more information on how
 this functions.
 
-The code is called with one parameter, the header line.  The header line is
-also stored in C<$_>.
+Each line (without newline) is passed to the coderef as the first parameter to
+the coderef.  It is also placed into C<$_>.  If the C<extended_info> attribute
+is true, the extended information hashref will be passed as the second
+parameter.
 
 The output is a list of all input lines where the code reference produces a
 true result.
+
+Instead of a single filename, an arrayref can be passed in, in which case the
+files are read in turn as if they are all one file. Note that if the file
+doesn't end in a newline, a newline is inserted before processing the next
+file.
 
 =head3 map
 
@@ -554,11 +661,18 @@ the filename is not provided, the C<file> attribute is used for this.  See the
 C<maplines> and C<parallel_maplines> functions for more information on how
 this functions.
 
-The code is called with one parameter, the header line.  The header line is
-also stored in C<$_>.
+Each line (without newline) is passed to the coderef as the first parameter to
+the coderef.  It is also placed into C<$_>.  If the C<extended_info> attribute
+is true, the extended information hashref will be passed as the second
+parameter.
 
 The output is the list produced by calling the passed-in code repeatively
 for each line of input.
+
+Instead of a single filename, an arrayref can be passed in, in which case the
+files are read in turn as if they are all one file. Note that if the file
+doesn't end in a newline, a newline is inserted before processing the next
+file.
 
 =head3 lines
 
@@ -573,6 +687,11 @@ The output is a list of all input lines.
 Note that this function is unaffected by the value of the C<processes>
 attribute - it always executes in the parent process.
 
+Instead of a single filename, an arrayref can be passed in, in which case the
+files are read in turn as if they are all one file. Note that if the file
+doesn't end in a newline, a newline is inserted before processing the next
+file.
+
 =head1 SUGGESTED DEPENDENCY
 
 The L<Parallel::WorkUnit> module is a recommended dependency.  It is required
@@ -583,6 +702,21 @@ Some CPAN clients will automatically try to install recommended dependency, but
 others won't (L<cpan> often, but not always, will; L<cpanm> will not by
 default).  In the cases where it is not automatically installed, you need to
 install L<Parallel::WorkUnit> to get this functionality.
+
+=head1 EXPRESSING APPRECIATION
+
+If this module makes your life easier, or helps make you (or your workplace)
+a ton of money, I always enjoy hearing about it!  My response when I hear that
+someone uses my module is to go back to that module and spend a little time on
+it if I think there's something to improve - it's motivating when you hear
+someone appreciates your work!
+
+I don't seek any money for this - I do this work because I enjoy it.  That
+said, should you want to show appreciation financially, few things would make
+me smile more than knowing that you sent a donation to the Gender Identity
+Center of Colorado (See L<http://giccolorado.org/>).  This organization
+understands TIMTOWTDI in life and, in line with that understanding, provides
+life-saving support to the transgender community.
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::Parent;
-$Maven::Xml::Pom::Parent::VERSION = '1.14';
+$Maven::Xml::Pom::Parent::VERSION = '1.15';
 # ABSTRACT: Maven Parent element
 # PODNAME: Maven::Xml::Pom::Parent
 
@@ -29,7 +29,7 @@ Maven::Xml::Pom::Parent - Maven Parent element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

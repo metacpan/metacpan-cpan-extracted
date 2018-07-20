@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::Organization;
-$Maven::Xml::Pom::Organization::VERSION = '1.14';
+$Maven::Xml::Pom::Organization::VERSION = '1.15';
 # ABSTRACT: Maven Organization element
 # PODNAME: Maven::Xml::Pom::Organization
 
@@ -27,7 +27,7 @@ Maven::Xml::Pom::Organization - Maven Organization element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

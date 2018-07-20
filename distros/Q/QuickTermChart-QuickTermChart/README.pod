@@ -1,0 +1,42 @@
+=head1 SCRIPT CATEGORIES
+Charts
+Fun/Educational
+Educational
+
+=head1 NAME
+
+quick_term_chart - a light perl script to quickly draw chart within the terminal
+input data can be piped to it
+
+=head1 DESCRIPTION
+  plots charts quickly within the terminal itself - useful for visualizing tabular data
+
+  Some TIY (Try It Yourself :) ) fun examples:
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart
+  echo -e "chat\t23\nemail\t15\nsocial media\t33"          | quick_term_chart
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart --consolidate
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart --sort_on_vals
+
+=head1 README
+
+  plots charts quickly within the terminal itself - useful for visualizing tabular data
+
+  Some TIY (Try It Yourself :) ) fun examples:
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart
+  echo -e "chat\t23\nemail\t15\nsocial media\t33"          | quick_term_chart
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart --consolidate
+  echo -e "chat\t23\nemail\t15\nsocial media\t33\nchat\t3" | quick_term_chart --sort_on_vals
+
+
+=head1 PREREQUISITES
+
+This uses the C<strict>, C<Getopt::Long>, C<Term::ANSIColor>, C<Term::ReadKey>, and C<POSIX> modules.
+=pod SCRIPT CATEGORIES
+
+Charts
+Fun/Educational
+Educational
+
+
+=cut
+

@@ -10,11 +10,11 @@ MikroTik::API - Client to MikroTik RouterOS API
 
 =head1 VERSION
 
-Version 1.0.4
+Version 1.0.5
 
 =cut
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.0.5';
 
 
 =head1 SYNOPSIS
@@ -69,7 +69,7 @@ sub BUILD {
     my ($self) = @_;
     if ( $self->get_autoconnect() && $self->get_host() ) {
         $self->connect();
-        if ($self->get_username() && $self->get_password() ) {
+        if ( $self->get_username() && defined( $self->get_password() ) ) {
             $self->login();
         }
     }
@@ -121,6 +121,9 @@ sub connect {
     if ( ! $self->get_socket() ) {
         die "socket creation failed ($!)";
     }
+    $self->get_socket()->sockopt(SO_KEEPALIVE,1);
+    $self->get_socket()->sockopt(SO_RCVTIMEO,$self->get_timeout());
+    $self->get_socket()->sockopt(SO_SNDTIMEO,$self->get_timeout());
     return $self;
 }
 
@@ -140,7 +143,7 @@ Connect happens on construction if you provide host address, username and passwo
 sub login {
     my ( $self ) = @_;
 
-    if ( ! $self->get_username() && $self->get_password() ) {
+    if ( ! $self->get_username() && defined( $self->get_password() ) ) {
         die 'username and password must be set before connect()';
     }
     if ( ! $self->get_socket() ) {
@@ -149,6 +152,9 @@ sub login {
 
     my @command = ('/login');
     my ( $retval, @results ) = $self->talk( \@command );
+    if ( $retval > 1 ) {
+        die 'error during establishing login: ' . $results[0]{'message'};
+    }
     my $challenge = pack("H*",$results[0]{'ret'});
     my $md5 = Digest::MD5->new();
     $md5->add( chr(0) );
@@ -159,6 +165,7 @@ sub login {
     push( @command, '=name=' . $self->get_username() );
     push( @command, '=response=00' . $md5->hexdigest() );
     ( $retval, @results ) = $self->talk( \@command );
+    die 'disconnected while logging in' if !defined $retval;
     if ( $retval > 1 ) {
         die $results[0]{'message'};
     }
@@ -196,6 +203,7 @@ sub cmd {
         push( @command, '='. $attr .'='. $attrs_href->{$attr} );
     }
     my ( $retval, @results ) = $self->talk( \@command );
+    die 'disconnected' if !defined $retval;
     if ($retval > 1) {
         die $results[0]{'message'};
     }
@@ -222,6 +230,7 @@ sub query {
         push( @command, '?'. $query .'='. $queries_href->{$query} );
     }
     my ( $retval, @results ) = $self->talk( \@command );
+    die 'disconnected' if !defined $retval;
     if ($retval > 1) {
         die $results[0]{'message'};
     }
@@ -241,6 +250,7 @@ sub get_by_key {
     my @command = ($cmd);
     my %ids;
     my ( $retval, @results ) = $self->talk( \@command );
+    die 'disconnected' if !defined $retval;
     if ($retval > 1) {
         die $results[0]{'message'};
     }
@@ -522,12 +532,7 @@ sub _read_word {
         my $length_received = 0;
         while ( $length_received < $len ) {
             my $line = '';
-            if ( ref $self->get_socket() eq 'IO::Socket::INET' ) {
-                $self->get_socket()->recv( $line, $len );
-            }
-            else { # IO::Socket::SSL does not implement recv()
-                $self->get_socket()->read( $line, $len );
-            }
+            $self->get_socket()->read( $line, $len );
 	    last if !defined($line) || $line eq ''; # EOF
             $ret_line .= $line; # append to $ret_line, in case we didn't get the whole word and are going round again
             $length_received += length $line;
@@ -590,12 +595,7 @@ sub _read_len {
 sub _read_byte{
     my ( $self ) = @_;
     my $line = '';
-    if ( ref $self->get_socket() eq 'IO::Socket::INET' ) {
-        $self->get_socket()->recv( $line, 1 );
-    }
-    else { # IO::Socket::SSL does not implement recv()
-        $self->get_socket()->read( $line, 1 );
-    }
+    $self->get_socket()->read( $line, 1 );
     die 'EOF' if !defined($line) || length($line) != 1;
     return ord($line);
 }
@@ -650,9 +650,27 @@ Please report any bugs or feature requests to C<bug-mikrotik-api at rt.cpan.org>
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MikroTik-API>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+=head2 Known issues
+
+=over 4
+
+=item *
+
+Quite high compile time because of using Moose. Use of a persistent running framework recommended.
+
+= item *
+
+Login to RouterOS v6.43rc* not possible because of a changed auth method using plaintext passwords
+
+=back
+
 =head1 TODOS
 
 =over 4
+
+=item *
+
+Merge auth mathod patch for RouterOS v6.43rc* and later. Requires some more work to prevent accidentally sent plaintext passwords: https://github.com/martin8883/MikroTik-API/pull/4
 
 =item *
 

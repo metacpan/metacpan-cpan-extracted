@@ -1,0 +1,105 @@
+NAME
+    Types::HTML5 - types for parsing strings of HTML into DOMs
+
+SYNOPSIS
+       package My::Page {
+          use Moo;
+          use Types::HTML5 -types;
+      
+          has template => (
+             is      => 'ro',
+             isa     => HtmlTree,
+             coerce  => 1,
+          );
+      
+          sub output_page {
+             ...;
+          }
+       }
+
+STATUS
+    This is still at a very early stage of development and has *no test suite*
+    yet.
+
+DESCRIPTION
+    This type library provides useful type constraints and coercions for
+    working with HTML5::DOM and XML::LibXML.
+
+  Type Constraints
+    `HtmlTree`
+        A blessed HTML::DOM::Tree object. Coercions from HTML5::DOM::Document
+        objects, XML::LibXML::Document objects, HTML5::DOM::Element objects,
+        strings of HTML or XHTML, filehandles, and Path::Tiny objects.
+
+    `HtmlDocument`
+        A blessed HTML::DOM::Document object. Coercions from HTML5::DOM::Tree
+        objects, XML::LibXML::Document objects, HTML5::DOM::Element objects,
+        strings of HTML or XHTML, filehandles, and Path::Tiny objects.
+
+    `HtmlElement`
+        A blessed HTML5::DOM::Element object. Can coerce from
+        XML::LibXML::Element objects.
+
+    `HtmlComment`
+        A blessed HTML5::DOM::Comment object. Can coerce from
+        XML::LibXML::Comment objects and plain strings.
+
+    `HtmlText`
+        A blessed HTML5::DOM::Text object. Can coerce from XML::LibXML::Text
+        objects and plain strings.
+
+    `XmlDocument`
+        A blessed XML::LibXML::Document object. Coercions from
+        HTML5::DOM::Tree objects, HTML5::DOM::Document objects,
+        HTML5::DOM::Element objects, strings of HTML or XHTML, filehandles,
+        and Path::Tiny objects.
+
+    `XmlElement`
+        A blessed XML::LibXML::Element object. Can coerce from
+        HTML5::DOM::Element objects.
+
+    `XmlComment`
+        A blessed XML::LibXML::Comment object. Can coerce from
+        HTML5::DOM::Comment objects and plain strings.
+
+    `XmlText`
+        A blessed XML::LibXML::Text object. Can coerce from HTML5::DOM::Text
+        objects and plain strings.
+
+  Convenience Functions
+    `str_to_html($str)`
+        Converts a string of HTML to an HTML5::DOM::Tree.
+
+    `str_to_xml($str)`
+        Converts a string of HTML to an XML::LibXML::Document.
+
+    `html_to_xml($node)`
+        Converts from an HTML5::DOM node to an XML::LibXML node. Supports text
+        nodes, comments, elements, documents, and trees.
+
+    `xml_to_html($node)`
+        Converts from an XML::LibXML node to a HTML5::DOM node. Supports text
+        nodes, comments, elements, and documents. (XML::LibXML::Document
+        becomes HTML5::DOM::Tree, not HTML5::DOM::Document.)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Types-HTML5>.
+
+SEE ALSO
+    HTML5::DOM, XML::LibXML, Path::Tiny.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2018 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

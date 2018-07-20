@@ -1,5 +1,8 @@
 Revision history for InfluxDB-HTTP
 
+0.04    2018-07-18
+        - Remove dependency on Method::Signatures (ang@open.ch).
+
 0.03    2018-07-12
         - Improved JSON error handling and configurable LWP UserAgent timeout (kb@open.ch).
 

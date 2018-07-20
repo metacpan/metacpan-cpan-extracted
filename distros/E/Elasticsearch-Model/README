@@ -134,7 +134,19 @@ SYNOPSIS
             type => 'integer',
         );
     
+        has_non_attribute_mapping {
+            _source => {
+                enabled => "false",
+            },
+        };
+    
         1;
+
+    You define your attributes as you would expect, setting Moose type
+    attributes, and also using the type attribute to tell elasticsearch
+    what the elasticsearch type is. You can set non_attribute_mappings here
+    as well, as shown in the above example, and these will be folded into
+    your index mapping.
 
 PUBLIC METHODS
 

@@ -6,9 +6,12 @@ use warnings FATAL => 'all';
 use Carp;
 use File::Basename;
 use File::Path qw(mkpath);
+use Data::Dumper;
 
 use parent 'Exporter';
+
 $SIG{__DIE__} = sub { Carp::confess( @_ ) };
+
 =head1 NAME
 
 Sport::Analytics::NHL::Util - Simple system-independent utilities
@@ -55,6 +58,20 @@ Produces message to the STDERR if the VERBOSE ($ENV{HOCKEYDB_VERBOSE})or the DEB
  Arguments: the tabulated file
  Returns: array of arrays with the data
 
+=item C<fill_broken>
+
+Fills a hash (player, event, etc.) with preset values. Usually happens with broken items.
+Arguments:
+ * the item to fill
+ * the hash with the preset values to use
+Returns: void.
+
+=item C<get_seconds>
+
+ Get the number of seconds in MM:SS string
+ Arguments: the MM:SS string
+ Returns: the number of seconds
+
 =back
 
 =cut
@@ -62,6 +79,8 @@ Produces message to the STDERR if the VERBOSE ($ENV{HOCKEYDB_VERBOSE})or the DEB
 our @EXPORT = qw(
 	debug verbose
 	read_file write_file
+	fill_broken
+	get_seconds
 );
 
 sub debug ($) {
@@ -91,6 +110,7 @@ sub read_file ($;$) {
 		$content = <$fh>;
 	}
 	close $fh;
+#	$content =~ tr/ / /;
 	$content =~ s/\xC2\xA0/ /g unless $no_strip;
 	$content;
 }
@@ -126,6 +146,31 @@ sub write_file ($$;$) {
 	close $fh;
 	$filename;
 }
+
+sub fill_broken($$;$) {
+
+	my $item = shift;
+	my $broken = shift;
+
+	return unless $broken;
+	for my $field (keys %{$broken}) {
+		$item->{$field} = $broken->{$field};
+	}
+}
+
+sub get_seconds ($) {
+
+	my $time = shift;
+
+	unless (defined $time) {
+		print "No time supplied\n";
+		die Dumper [caller];
+	}
+	return $time if $time =~ /^\d+$/;
+	$time =~ /^\-?(\d+)\:(\d+)$/;
+	$1*60 + $2;
+}
+
 
 =head1 AUTHOR
 

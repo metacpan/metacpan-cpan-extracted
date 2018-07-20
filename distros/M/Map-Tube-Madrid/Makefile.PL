@@ -33,9 +33,10 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::Madrid'           => { file => 'lib/Map/Tube/Madrid.pm'        , version => '0.12' },
-            'Map::Tube::Madrid::Line::L3' => { file => 'lib/Map/Tube/Madrid/Line/L3.pm', version => '0.12' },
-            'Map::Tube::Madrid::Line::L5' => { file => 'lib/Map/Tube/Madrid/Line/L5.pm', version => '0.12' },
+            'Map::Tube::Madrid'           => { file => 'lib/Map/Tube/Madrid.pm'        , version => '0.13' },
+            'Map::Tube::Madrid::Line::L1' => { file => 'lib/Map/Tube/Madrid/Line/L1.pm', version => '0.13' },
+            'Map::Tube::Madrid::Line::L3' => { file => 'lib/Map/Tube/Madrid/Line/L3.pm', version => '0.13' },
+            'Map::Tube::Madrid::Line::L5' => { file => 'lib/Map/Tube/Madrid/Line/L5.pm', version => '0.13' },
         },
         resources => {
             repository => {

@@ -27,6 +27,7 @@ t/extend-moose.t
 t/extend-mouse.t
 t/extend.t
 t/isa.t
+t/murder.t
 t/new.t
 t/tap.t
 t/try.t

@@ -36,6 +36,7 @@ lib/URI/postgres.pm
 lib/URI/postgresql.pm
 lib/URI/postgresxc.pm
 lib/URI/redshift.pm
+lib/URI/snowflake.pm
 lib/URI/sqlite.pm
 lib/URI/sqlite3.pm
 lib/URI/sqlserver.pm

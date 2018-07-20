@@ -1,6 +1,5 @@
 Changes
 lib/Term/Form.pm
-lib/Term/Form/Constants.pm
 lib/Term/Form/Linux.pm
 lib/Term/Form/Win32.pm
 LICENSE
@@ -10,7 +9,6 @@ README
 t/00-load.t
 t/01-can.t
 t/02-methods.t
-t/03_arguments_config.t
 xt/04_valid_arguments_readline.t
 xt/05_invalid_arguments_readline.t
 xt/06_readline.t

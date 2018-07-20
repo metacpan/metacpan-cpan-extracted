@@ -16,7 +16,7 @@ name: Sport-Analytics-NHL
 provides:
   Sport::Analytics::NHL:
     file: lib/Sport/Analytics/NHL.pm
-    version: '1.00'
+    version: '1.11'
   Sport::Analytics::NHL::Config:
     file: lib/Sport/Analytics/NHL/Config.pm
   Sport::Analytics::NHL::DB:
@@ -27,8 +27,18 @@ provides:
     file: lib/Sport/Analytics/NHL/LocalConfig.pm
   Sport::Analytics::NHL::Report:
     file: lib/Sport/Analytics/NHL/Report.pm
+  Sport::Analytics::NHL::Report::BH:
+    file: lib/Sport/Analytics/NHL/Report/BH.pm
   Sport::Analytics::NHL::Report::BS:
     file: lib/Sport/Analytics/NHL/Report/BS.pm
+  Sport::Analytics::NHL::Report::ES:
+    file: lib/Sport/Analytics/NHL/Report/ES.pm
+  Sport::Analytics::NHL::Report::GS:
+    file: lib/Sport/Analytics/NHL/Report/GS.pm
+  Sport::Analytics::NHL::Report::PL:
+    file: lib/Sport/Analytics/NHL/Report/PL.pm
+  Sport::Analytics::NHL::Report::RO:
+    file: lib/Sport/Analytics/NHL/Report/RO.pm
   Sport::Analytics::NHL::Scraper:
     file: lib/Sport/Analytics/NHL/Scraper.pm
   Sport::Analytics::NHL::Test:
@@ -40,24 +50,31 @@ provides:
   Sport::Analytics::NHL::Util:
     file: lib/Sport/Analytics/NHL/Util.pm
 recommends:
-  MongoDB: v1.8.1
+  MongoDB: v1.6.0
 requires:
   Carp: '0'
   Data::Dumper: '0'
+  Date::Calc: '6.4'
   Date::Parse: '2.27'
+  Encode: '2.49'
   File::Basename: '0'
   File::Find: '0'
   File::Path: '0'
   Getopt::Long: '0'
-  JSON::XS: '2.27'
+  HTML::TreeBuilder: '5.03'
+  JSON: '2.90'
+  LWP::Protocol::https: '5.837'
   LWP::Simple: '5.837'
   List::MoreUtils: '0.22'
+  Module::Pluggable: '5.2'
   POSIX: '0'
   Storable: '0'
+  Text::Unidecode: '1.30'
   Tie::IxHash: '1.23'
   Time::HiRes: '1.9721'
+  Try::Tiny: '0.27'
   boolean: v0.28.4
   experimental: '0.016'
   parent: '0'
-version: '1.00'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '1.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

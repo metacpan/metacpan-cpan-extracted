@@ -22,5 +22,5 @@ requires:
   Test::More: '0.5'
   Thread::Semaphore: '0'
   threads::shared: '1.21'
-version: '3.12'
+version: '3.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

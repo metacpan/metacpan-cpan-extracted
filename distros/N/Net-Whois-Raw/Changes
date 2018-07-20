@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99016  Jul 18 2018 Alexander Nalobin
+    - fixed recursion to referal whois servers in QRY_FIRST mode
+
 2.99015  Jun 14 2018 Sergei Sedinkin
     - new whois server for .net.ru, .org.ru and .pp.ru domains
 

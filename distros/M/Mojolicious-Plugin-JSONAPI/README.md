@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 1.9
+version 2.0
 
 # SYNOPSIS
 
@@ -17,7 +17,7 @@ version 1.9
 
         $self->plugin('JSONAPI', {
             namespace => 'api',
-            data_dir => '/path/to/data/dir',
+            kebab_case_attrs => 1,
         });
 
         $self->resource_routes({
@@ -68,11 +68,6 @@ specification, along with supplying helper methods to use when responding to req
 See [http://jsonapi.org/](http://jsonapi.org/) for the JSON API specification. At the time of writing, the version was 1.0.
 
 # OPTIONS
-
-- `data_dir`
-
-    Required; This should be a path to a directory which is not version controlled (if you use stuff like that). Used
-    by `JSONAPI::Document` to store computed document types.
 
 - `namespace`
 

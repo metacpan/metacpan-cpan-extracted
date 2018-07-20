@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::DependencyManagement;
-$Maven::Xml::Pom::DependencyManagement::VERSION = '1.14';
+$Maven::Xml::Pom::DependencyManagement::VERSION = '1.15';
 # ABSTRACT: Maven DependencyManagement element
 # PODNAME: Maven::Xml::Pom::DependencyManagement
 
@@ -36,7 +36,7 @@ Maven::Xml::Pom::DependencyManagement - Maven DependencyManagement element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

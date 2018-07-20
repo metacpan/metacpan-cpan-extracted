@@ -73,7 +73,12 @@ sub prf_defaults
 sub prf_preferences
 {
     my $self = shift;
-    return $self->search_related('prf_owner')->search_related('prf_preferences');
+    my $owner_subquery = $self->_hacky_prf_owner_subquery;
+    return _schema->resultset('PrfPreference')->search({
+        prf_owner_id => {
+            -in => $owner_subquery->get_column('prf_owner_id')->as_query
+        }
+    });
 }
 
 sub with_fields
@@ -128,15 +133,7 @@ sub with_fields
     # We can't use join any more, because the existing resultset won't have any
     # relationships into this code.
 
-    my $local_query = _schema->resultset('PrfOwner')->search({
-        # They will all have the same ID here. This is a silly architecture.
-        "me.prf_owner_type_id" => $self->get_column('prf_owner_type_id')->first,
-
-        # Assume the id column is the id column because this is a hack
-        "me.prf_owner_id" => {
-            -in => $self->get_column('id')->as_query,
-        },
-    });
+    my $local_query = $self->_hacky_prf_owner_subquery;
 
     # Join on the PrfPreferences
     $local_query = $local_query->search({
@@ -151,6 +148,19 @@ sub with_fields
         "me.id" => {
             -in => $local_query->get_column('prf_owner_id')->as_query
         }
+    });
+}
+
+sub _hacky_prf_owner_subquery {
+    my $self = shift;
+    _schema->resultset('PrfOwner')->search({
+        # They will all have the same ID here. This is a silly architecture.
+        "me.prf_owner_type_id" => $self->get_column('prf_owner_type_id')->first,
+
+        # Assume the id column is the id column because this is a hack
+        "me.prf_owner_id" => {
+            -in => $self->get_column('id')->as_query,
+        },
     });
 }
 

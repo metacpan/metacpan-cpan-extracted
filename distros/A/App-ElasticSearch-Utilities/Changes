@@ -1,9 +1,44 @@
 ==================================================
-Changes from 2016-07-06 00:00:00 +0000 to present.
+Changes from 2016-07-16 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 5.7 at 2018-07-06 05:34:25 +0000
+version 5.8 at 2018-07-16 19:20:08 +0000
+----------------------------------------
+
+  Change: 3f276cdc5e5b8a1fc6215275b8b3c24e3d8ef066
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-07-16 12:14:45 +0000
+
+    Docs update for 5.8 release 
+
+  Change: 12336ccb1ee03eaa294af46a1340af3cbb47f4c1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-07-16 11:45:58 +0000
+
+    Fix a warning and improve output
+
+    * Fix a "use of uninitialized" warning for when an index is missing a
+
+    date string but matches the base pattern * Fix logic bug that meant
+    '--delete --delete-days 1' was a noop because
+
+    of using '<' instead of '<=' 
+
+  Change: e3b0899af37835e7e9d372788c31339cc3cf8f01
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-07-16 11:43:38 +0000
+
+    Bubble up errors so we know why we failed 
+
+  Change: 9a07d69d5a7571d58951682c3d190083cf0a84df
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-07-16 11:25:16 +0000
+
+    Show shards breakdown by primary and replica 
+
+----------------------------------------
+version 5.7 at 2018-07-06 05:34:05 +0000
 ----------------------------------------
 
   Change: e90729b13bb4fc45d68e9711ac139c8f8ab1dad8
@@ -574,5 +609,5 @@ version 5.0 at 2016-08-19 03:50:24 +0000
     Version Numbers Updated 
 
 =================================================
-Plus 56 releases after 2016-07-06 00:00:00 +0000.
+Plus 56 releases after 2016-07-16 00:00:00 +0000.
 =================================================

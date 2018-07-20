@@ -1,0 +1,66 @@
+NAME
+
+    POE::Filter::ThruPut - a POE filter that passes data through unchanged
+    whilst counting bytes sent and received
+
+VERSION
+
+    version 1.00
+
+DESCRIPTION
+
+    POE::Filter::ThruPut passes data through without changing it, but
+    counts the bytes sent and received. It follows POE::Filter's API and
+    can be used with POE::Filter::Stackable.
+
+CONSTRUCTOR
+
+    new
+
+      Creates a new POE::Filter::ThruPut object.
+
+METHODS
+
+    get_one_start
+
+    get_one
+
+    get_pending
+
+    get
+
+    put
+
+      All the above are standard POE::Filter methods. They pass data
+      through unchanged.
+
+    send
+
+      Returns the number of bytes sent through the filter
+
+    recv
+
+      Returns the numbers of bytes received through the filter
+
+    stats
+
+      Returns an ARRAYREF of the number of bytes sent and received,
+      respectively.
+
+SEE ALSO
+
+    POE::Filter for more information about filters in general.
+
+    This module was based on POE::Filter::Stream.
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2018 by Chris Williams and Rocco Caputo.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

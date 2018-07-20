@@ -50,11 +50,10 @@ if ($^O eq 'freebsd') {
     }
 }
 
-
 GetOptions(
    "tclsh=s",     \(my $tclsh=$tclsh_default),
    "tclconfig=s", \ my $tclconfig,
-   "usestubs!",   \(my $usestubs = $^O =~ /^solaris|linux|hpux|darwin|cygwin|aix|freebsd|netbsd|openbsd$/? 1 : 0),
+   "usestubs!",   \(my $usestubs = $^O =~ /^MSWin32|solaris|linux|hpux|darwin|cygwin|aix|freebsd|netbsd|openbsd$/? 1 : 0),
 	# we prefer usestubs, but on windows default is to not use them, because
 	# stubs lib that come with AS TCL is impossible to link with GCC which 
 	# comes with strawberry perl; Have a ticket for this; (XXX) VKON 27-06-2018
@@ -64,6 +63,8 @@ GetOptions(
    "library=s",   \ my $libpath,
    "include=s",   \ my $incpath,
    "define=s",    \(my $defs=''),
+   "hack1!",      \(my $hack1=1),
+   "hack2!",      \(my $hack2=1),
    "help!",       \ my $help,   
 ) || usage();
 usage() if $help;
@@ -80,6 +81,7 @@ Customised usage:
   [--library=...]      \ # Use this specific Tcl library
   [--include=...]      \ # Use this specific include path
   [--define=...]       \ # Use this specific set of defines
+  [--nohack1]          \ # internal usage, please RTFS word 'hack1'
   [--help]             \ # --help
   [<makemaker opts>]     # e.g. LINKTYPE=STATIC
 
@@ -109,7 +111,8 @@ if (defined($libpath) && defined($incpath)) {
     # When user has its own tclConfig.sh with --tclconfig=..., then we
     # overwrite values in %tclcfg
 
-    open(my $fh, "$tclsh tclcfg.tcl |") or _die "error starting $tclsh: $!\n";
+    open(my $fh, "$tclsh tclcfg.tcl |") or _die "error starting $tclsh: $!";
+    _die "error starting $tclsh: \$?=$?; \$!=$!\n" if $?!=0;
     my $tclcfg = join '', <$fh>;
     print $tclcfg;
     my %tclcfg = $tclcfg =~ /^([^=]+)=(.*?)$/gm;
@@ -117,9 +120,10 @@ if (defined($libpath) && defined($incpath)) {
     if ($^O eq 'darwin' && !defined($tclconfig)) {
         $tclconfig = $tclcfg{'tclConfig.sh'};
     }
-    if ($^O eq 'MSWin32' && !defined($tclconfig) && !$usestubs) {
+    if ($^O eq 'MSWin32' && !defined($tclconfig) && (1 or !$usestubs)) {
         $tclconfig = $tclcfg{'tclConfig.sh'};
     }
+
 
     if (!defined($tclconfig) && $arch && $usestubs) {
 	$incpath = "-Itcl-core/include";
@@ -134,6 +138,19 @@ if (defined($libpath) && defined($incpath)) {
 	# Retrieve all info based on tclConfig.sh
 	process_tclconfig($tclconfig, \%tclcfg);
 
+	if ($hack1 and q{
+	    HACK1: on $^O eq 'MSWin32' activetcl 866 stub library could not be linked
+	           with gcc which comes with strawberry;
+		   860 is good.
+	     }) { # hopefully this will be:  if (0 and q{....})
+	    if ($usestubs and $^O eq 'MSWin32') {
+	        $stub = "tclstub84"; # use our stub, not their
+		$libpath = "-Ltcl-core/$arch -l$stub";
+		$incpath = "-Itcl-core/include";
+		$tclcfg{TCL_STUB_LIB_SPEC} = $libpath;
+		$tclcfg{TCL_LIB_FILE} = $tclcfg{TCL_DLL_FILE};
+	    }
+	}
 	$libpath = $usestubs ? $tclcfg{TCL_STUB_LIB_SPEC} : $tclcfg{TCL_LIB_SPEC};
 	$incpath = $tclcfg{TCL_INCLUDE_SPEC};
 
@@ -204,7 +221,7 @@ if ($^O eq 'darwin') {
     }
 }
 
-WriteMakefile(
+my $mm = WriteMakefile(
     NAME => "Tcl",
     VERSION_FROM => 'Tcl.pm',
     LICENSE => 'perl',
@@ -221,6 +238,13 @@ WriteMakefile(
     DEFINE => $defs,
     @extraargs,
 );
+if ($mm->is_make_type('dmake') and 0) { # Mmm. no. d-make welcome. problem was somewhere else
+    unlink('Makefile');
+    _die <<'EOS';
+dmake prohibited. It does bla-bla-bla
+EOS
+}
+
 
 sub process_tclconfig {
     # Process a tclConfig.sh file for build info

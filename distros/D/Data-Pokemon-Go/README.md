@@ -27,7 +27,7 @@ Data::Pokemon::Go is the helper module for who has less knowledge about Pokemons
 - guessing the IVs from each infomations is not available
 - supporting Multi-language is not available
 - YAMLs for Johto and Hoenn Regions are not available
-- Japanese documents are not available
+- Japanese documents are not available [qiitaで日本語解説を少しだけ](https://qiita.com/worthmine/items/4a51fd74f31b4a97cf3c)
 
 I can't support all of the above with just only me alone.
 So, please [PR](https://github.com/worthmine/Data-Pokemon-Go/pulls)!

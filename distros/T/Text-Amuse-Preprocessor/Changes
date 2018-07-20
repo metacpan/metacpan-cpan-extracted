@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.55 2018-07-18
+
+ - Minor improvements to HTML importer
+
 0.54 2018-07-04
 
  - Add support for Bahasa Indonesia

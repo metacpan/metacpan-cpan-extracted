@@ -10,8 +10,6 @@ lib/Devel/MAT.pm
 lib/Devel/MAT.xs
 lib/Devel/MAT/Cmd.pod
 lib/Devel/MAT/Context.pm
-lib/Devel/MAT/Dumper.pm
-lib/Devel/MAT/Dumper.xs
 lib/Devel/MAT/Dumpfile.pm
 lib/Devel/MAT/Graph.pm
 lib/Devel/MAT/InternalTools.pm

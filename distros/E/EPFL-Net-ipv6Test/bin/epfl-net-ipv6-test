@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Carp qw/croak/;
+use English qw/-no_match_vars/;
+use Term::ANSIColor;
+use EPFL::Net::ipv6Test qw/getWebServer getWebDns/;
+
+=head1 NAME
+
+epfl-net-ipv6-test
+
+=head1 DESCRIPTION
+
+Check IPv6 connectivity from a Website with ipv6-test.com
+
+=head1 VERSION
+
+Version 1.01
+
+=head1 USAGE
+
+  epfl-net-ipv6-test --help
+
+  epfl-net-ipv6-test --domain=actu.epfl.ch
+
+=cut
+
+our $VERSION = '1.01';
+
+my ( $help, $domain );
+
+GetOptions(
+  'domain=s' => \$domain,
+  'help'     => \$help,
+) || pod2usage(2);
+
+if ( $help || !$domain ) {
+  pod2usage(1);
+  exit 0;
+}
+
+my $aaaa = getWebServer($domain);
+if ( defined $aaaa->{dns_aaaa} ) {
+  print color('green'), '✔ AAAA DNS record ', $aaaa->{dns_aaaa}, "\n"
+    or croak "Couldn't write: $OS_ERROR";
+  print color('green'), '✔ IPv6 web server ', $aaaa->{server}, "\n",
+    color('clear')
+    or croak "Couldn't write: $OS_ERROR";
+}
+else {
+  print color('red'), '✘ ', $aaaa->{error}, "\n", color('clear')
+    or croak "Couldn't write: $OS_ERROR";
+  exit 1;
+}
+
+my $dns = getWebDns($domain);
+if ( defined $dns->{dns_ok} and $dns->{dns_ok} ) {
+  print color('green'), '✔ IPv6 DNS server '
+    or croak "Couldn't write: $OS_ERROR";
+
+  my $servers = join ', ', @{ $dns->{dns_servers} };
+  print $servers, "\n", color('clear') or croak "Couldn't write: $OS_ERROR";
+}
+
+=head1 AUTHOR
+
+William Belle, C<< <william.belle at gmail.com> >>
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests here L<https://github.com/epfl-idevelop/epfl-net-ipv6Test/issues>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc epfl-net-ipv6-test
+
+You can also look for information at:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/EPFL-Net-ipv6Test>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/EPFL-Net-ipv6Test>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/EPFL-Net-ipv6Test/>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, VPSI, 2018.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    L<http://www.apache.org/licenses/LICENSE-2.0>
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut
+
+1;

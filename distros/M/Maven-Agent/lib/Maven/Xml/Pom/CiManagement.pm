@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::CiManagement;
-$Maven::Xml::Pom::CiManagement::VERSION = '1.14';
+$Maven::Xml::Pom::CiManagement::VERSION = '1.15';
 # ABSTRACT: Maven CiManagement element
 # PODNAME: Maven::Xml::Pom::CiManagement
 
@@ -38,7 +38,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Pom::CiManagement::Notifier;
-$Maven::Xml::Pom::CiManagement::Notifier::VERSION = '1.14';
+$Maven::Xml::Pom::CiManagement::Notifier::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -72,7 +72,7 @@ Maven::Xml::Pom::CiManagement - Maven CiManagement element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

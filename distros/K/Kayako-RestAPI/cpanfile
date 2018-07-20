@@ -1,7 +1,8 @@
 requires "Data::Dumper" => "0";
 requires "Digest::SHA" => "0";
+requires "File::Slurp" => "0";
 requires "Mojo::UserAgent" => "0";
-requires "XML::XML2JSON" => "0";
+requires "XML::LibXML::Simple" => "0";
 requires "common::sense" => "0";
 requires "utf8" => "0";
 

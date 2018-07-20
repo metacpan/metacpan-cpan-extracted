@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::Build;
-$Maven::Xml::Pom::Build::VERSION = '1.14';
+$Maven::Xml::Pom::Build::VERSION = '1.15';
 # ABSTRACT: Maven Build element
 # PODNAME: Maven::Xml::Pom::Build
 
@@ -41,7 +41,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Pom::Build::Extension;
-$Maven::Xml::Pom::Build::Extension::VERSION = '1.14';
+$Maven::Xml::Pom::Build::Extension::VERSION = '1.15';
 use parent qw(Maven::Xml::Pom::BaseBuild);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -64,7 +64,7 @@ Maven::Xml::Pom::Build - Maven Build element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

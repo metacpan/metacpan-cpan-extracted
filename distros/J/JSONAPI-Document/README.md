@@ -4,7 +4,7 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 # VERSION
 
-version 2.1
+version 2.2
 
 # SYNOPSIS
 
@@ -54,11 +54,6 @@ of the document. This is useful when you have a more complicated set of attribut
 by simply calling `get_inflated_columns` (the default behaviour).
 
 # ATTRIBUTES
-
-## data\_dir
-
-Required; Directory string where this module can store computed document type strings. This should be
-a directory that's ignored by your VCS.
 
 ## api\_url
 
@@ -116,7 +111,8 @@ The following options can be given:
     **NOTE**: Nested relationships are experimental and come with the following limitations:
 
     - many\_to\_many relationships are not supported
-    - only one level of depth is supported (so requesting 'include=comments.likes.author' will throw errors)
+    - Only one level of depth is supported (so requesting 'include=comments.likes.author' will throw errors)
+    - Are only available through `compound_resource_document` (not `resource_document`).
 
 ## resource\_document(_DBIx::Class::Row|Object_ $row, _HashRef_ $options)
 
@@ -134,10 +130,10 @@ Returns a _HashRef_ with the following structure:
 
 View the resource document specification [here](http://jsonapi.org/format/#document-resource-objects).
 
-Uses [Lingua::EN::Segment](https://metacpan.org/pod/metacpan.org#pod-Lingua::EN::Segment) to set the appropriate type of the
-document. This is a bit expensive, but it ensures that your schema results source name gets hyphenated
-appropriately when converted into its plural form. The resulting type is cached into the `data_dir`
-to minimize the need to re-compute the document type.
+Uses `decamelize` from [Mojo::Util](https://metacpan.org/pod/metacpan.org#pod-Mojo::Util) to parse the
+[source\_name](https://metacpan.org/pod/DBIx::Class::ResultSource#source_name) of the DBIx::Class::Row and
+set the appropriate type of the document. This is used to ensure that your rows source name gets
+hyphenated appropriately when converted into its plural form.
 
 The following options can be given:
 

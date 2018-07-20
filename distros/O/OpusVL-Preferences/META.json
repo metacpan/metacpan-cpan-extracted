@@ -77,83 +77,83 @@
    "provides" : {
       "OpusVL::FB11X::Model::PreferencesDB" : {
          "file" : "lib/OpusVL/FB11X/Model/PreferencesDB.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::FB11X::Preferences" : {
          "file" : "lib/OpusVL/FB11X/Preferences.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::FB11X::Preferences::Controller::Preferences" : {
          "file" : "lib/OpusVL/FB11X/Preferences/Controller/Preferences.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::FB11X::Preferences::Role::ParameterValueEditing" : {
          "file" : "lib/OpusVL/FB11X/Preferences/Role/ParameterValueEditing.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::FB11X::Preferences::Role::PreferencesController" : {
          "file" : "lib/OpusVL/FB11X/Preferences/Role/PreferencesController.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences" : {
          "file" : "lib/OpusVL/Preferences.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::Hat::preferences" : {
          "file" : "lib/OpusVL/Preferences/Hat/preferences.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::RolesFor::Result::PrfOwner" : {
          "file" : "lib/OpusVL/Preferences/RolesFor/Result/PrfOwner.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::RolesFor::ResultSet::PrfOwner" : {
          "file" : "lib/OpusVL/Preferences/RolesFor/ResultSet/PrfOwner.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::RolesFor::Schema" : {
          "file" : "lib/OpusVL/Preferences/RolesFor/Schema.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::Schema" : {
          "file" : "lib/OpusVL/Preferences/Schema.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::Schema::Result::CustomDataUniqueValues" : {
          "file" : "lib/OpusVL/Preferences/Schema/Result/CustomDataUniqueValues.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::Schema::Result::PrfDefault" : {
          "file" : "lib/OpusVL/Preferences/Schema/Result/PrfDefault.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::Schema::Result::PrfDefaultValues" : {
          "file" : "lib/OpusVL/Preferences/Schema/Result/PrfDefaultValues.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::Schema::Result::PrfOwner" : {
          "file" : "lib/OpusVL/Preferences/Schema/Result/PrfOwner.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::Schema::Result::PrfOwnerType" : {
          "file" : "lib/OpusVL/Preferences/Schema/Result/PrfOwnerType.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::Schema::Result::PrfPreference" : {
          "file" : "lib/OpusVL/Preferences/Schema/Result/PrfPreference.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::Schema::ResultSet::PrfDefault" : {
          "file" : "lib/OpusVL/Preferences/Schema/ResultSet/PrfDefault.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::Schema::ResultSet::PrfDefaultValues" : {
          "file" : "lib/OpusVL/Preferences/Schema/ResultSet/PrfDefaultValues.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "OpusVL::Preferences::Schema::ResultSet::PrfOwnerType" : {
          "file" : "lib/OpusVL/Preferences/Schema/ResultSet/PrfOwnerType.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       }
    },
    "release_status" : "stable",
@@ -167,7 +167,7 @@
          "web" : "https://github.com/OpusVL/OpusVL-Preferences"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -525,7 +525,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.30",
+                  "tag" : "v0.31",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

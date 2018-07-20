@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl  -Ilib
 #-------------------------------------------------------------------------------
 # Test Data::Edit::Xml
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016

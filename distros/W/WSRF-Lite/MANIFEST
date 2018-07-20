@@ -1,4 +1,3 @@
-build-distribution.sh
 build.xml
 client-scripts/README
 client-scripts/sample_WS-Security_client.pl
@@ -42,7 +41,6 @@ t/001_load.t
 test/client_test.pl
 test/README
 test/signature_checker.pl
-test/TestingCanOnlyProveTheExistenceOfBugs
 test/wsrftest.pl
 modules.tar
 TODO

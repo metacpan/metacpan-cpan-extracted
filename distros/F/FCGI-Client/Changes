@@ -1,5 +1,12 @@
 Revision history for Perl extension FCGI::Client
 
+0.09 2018-07-16T14:23:14Z
+
+    - Switch to Minilla
+      https://github.com/tokuhirom/p5-fcgi-client/pull/2
+    - Switch to Moo
+      https://github.com/tokuhirom/p5-fcgi-client/pull/3
+
 0.08
 
     - fixed default timeout was 10secs.

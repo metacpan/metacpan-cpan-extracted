@@ -94,7 +94,7 @@ B<< Features: >>
 
                                       ExpPM   ExpTiny SubExp  SubExpProg
  Can export code symbols............. Yes     Yes     Yes     Yes      
- Can export non-code symbols......... Yes                              
+ Can export non-code symbols......... Yes     Yes                      
  Groups/tags......................... Yes     Yes     Yes     Yes      
  Export by regexp.................... Yes     Yes                      
  Bang prefix......................... Yes     Yes                      

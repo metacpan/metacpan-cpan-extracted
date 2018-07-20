@@ -1,0 +1,56 @@
+{
+   "abstract" : "QuickTermChart/QuickTermChart.pm",
+   "author" : [
+      "Shadkam Islam"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "QuickTermChart-QuickTermChart",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0.37",
+            "Getopt::Long" : "0",
+            "POSIX" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::ReadKey" : "0",
+            "perl" : "5.008004",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shadkam/QuickTermChart.git",
+         "web" : "https://github.com/shadkam/QuickTermChart"
+      }
+   },
+   "version" : 0.01,
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -22,7 +22,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'App::cpm' => '0.974',
+                                      'App::cpm' => '0.975',
                                       'App::cpm::CLI' => '0',
                                       'Getopt::Long' => '0',
                                       'Module::Loaded' => '0',

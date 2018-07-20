@@ -23,8 +23,9 @@
          "requires" : {
             "Data::Dumper" : "0",
             "Digest::SHA" : "0",
+            "File::Slurp" : "0",
             "Mojo::UserAgent" : "0",
-            "XML::XML2JSON" : "0",
+            "XML::LibXML::Simple" : "0",
             "common::sense" : "0",
             "utf8" : "0"
          }
@@ -39,16 +40,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/pavelsr/Kayako-RestAPI/issues"
-      },
+      "homepage" : "https://github.com/pavelsr/Kayako-RestAPI",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/pavelsr/Kayako-RestAPI.git",
+         "url" : "https://github.com/pavelsr/Kayako-RestAPI.git",
          "web" : "https://github.com/pavelsr/Kayako-RestAPI"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
 }
 

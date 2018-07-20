@@ -17,7 +17,7 @@ if ($ENV{HOCKEYDB_NONET}) {
 	plan skip_all => 'No network connection requested';
 	exit;
 }
-plan tests => 2;
+plan tests => 4;
 test_env();
 
 my $opts = {start_season => 2016, stop_season => 2017};
@@ -37,6 +37,8 @@ for my $season (keys %{$schedules}) {
 		like($game->{est}, qr/^\d{8} \d{2}:\d{2}:\d{2}/, 'estimate a timestamp');
 	}
 }
+is($TEST_COUNTER->{Curr_Test}, 16236, 'full test run');
+is($TEST_COUNTER->{Test_Results}[0], 16202, 'all expected ok');
 
 $opts = {start_season => 1930, stop_season => 1930};
 $schedules = crawl_schedule($opts);

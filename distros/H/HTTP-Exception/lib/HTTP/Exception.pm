@@ -1,6 +1,7 @@
 package HTTP::Exception;
-$HTTP::Exception::VERSION = '0.04006';
+$HTTP::Exception::VERSION = '0.04007';
 use strict;
+use warnings;
 use HTTP::Status;
 use Scalar::Util qw(blessed);
 
@@ -39,7 +40,7 @@ HTTP::Exception - throw HTTP-Errors as (Exception::Class-) Exceptions
 
 =head1 VERSION
 
-version 0.04006
+version 0.04007
 
 =begin readme
 
@@ -300,6 +301,8 @@ capable of.
 =head2 L<HTTP::Status>
 
 Constants, Statuscodes and Statusmessages
+
+=head2 L<HTTP::Throwable>, built on top of the more modern L<Throwable> framework (the successor to L<Exception::Class>)
 
 =head2 L<Plack>, especially L<Plack::Middleware::HTTPExceptions>
 

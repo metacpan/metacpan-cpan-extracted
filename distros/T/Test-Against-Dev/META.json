@@ -69,6 +69,6 @@
          "web" : "https://github.com/jkeenan/test-against-dev"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

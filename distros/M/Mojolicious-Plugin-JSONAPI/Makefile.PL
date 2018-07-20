@@ -17,9 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Mojolicious::Plugin::JSONAPI",
   "PREREQ_PM" => {
-    "CHI" => 0,
     "Carp" => 0,
-    "JSONAPI::Document" => "2.1",
+    "JSONAPI::Document" => "2.2",
     "Lingua::EN::Inflexion" => 0,
     "Mojo::Base" => 0
   },
@@ -31,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "1.9",
+  "VERSION" => "2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,9 +38,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "CHI" => 0,
   "Carp" => 0,
-  "JSONAPI::Document" => "2.1",
+  "JSONAPI::Document" => "2.2",
   "Lingua::EN::Inflexion" => 0,
   "Mojo::Base" => 0,
   "Mojolicious::Lite" => 0,

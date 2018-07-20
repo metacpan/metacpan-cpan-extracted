@@ -17,9 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "JSONAPI::Document",
   "PREREQ_PM" => {
-    "CHI" => 0,
     "Lingua::EN::Inflexion" => 0,
-    "Lingua::EN::Segment" => 0,
+    "Mojo::Util" => 0,
     "Moo" => 0
   },
   "TEST_REQUIRES" => {
@@ -31,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "2.1",
+  "VERSION" => "2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,11 +38,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "CHI" => 0,
   "Carp" => 0,
   "DBD::SQLite" => 0,
   "Lingua::EN::Inflexion" => 0,
-  "Lingua::EN::Segment" => 0,
+  "Mojo::Util" => 0,
   "Moo" => 0,
   "Test::DBIx::Class" => "0.52",
   "Test::MockModule" => 0,

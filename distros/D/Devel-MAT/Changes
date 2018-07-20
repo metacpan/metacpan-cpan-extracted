@@ -1,5 +1,9 @@
 Revision history for Devel-MAT
 
+0.36    2018-07-17 10:42:41
+        [CHANGES]
+         * Migrated Devel::MAT::Dumper into its own distribution
+
 0.35    2018-07-03 14:58:53
         [CHANGES]
          * Various improvements to 'count' command

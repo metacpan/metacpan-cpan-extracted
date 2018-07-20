@@ -104,7 +104,7 @@ es-apply-settings.pl - Run to apply a JSON list of settings to indexes matching 
 
 =head1 VERSION
 
-version 5.7
+version 5.8
 
 =head1 SYNOPSIS
 

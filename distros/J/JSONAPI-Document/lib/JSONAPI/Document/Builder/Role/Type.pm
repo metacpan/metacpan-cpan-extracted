@@ -1,12 +1,12 @@
 package JSONAPI::Document::Builder::Role::Type;
-$JSONAPI::Document::Builder::Role::Type::VERSION = '2.1';
+$JSONAPI::Document::Builder::Role::Type::VERSION = '2.2';
 =head1 NAME
 
 JSONAPI::Document::Builder::Role::Type - Normalizer for document types
 
 =head1 VERSION
 
-version 2.1
+version 2.2
 
 =head1 DESCRIPTION
 
@@ -15,22 +15,16 @@ Provides methods to correctly format a rows source name.
 =cut
 
 use Moo::Role;
-
+use Mojo::Util            ();
 use Lingua::EN::Inflexion ();
-
-has chi => (
-    is       => 'ro',
-    required => 1,
-);
-
-has segmenter => (
-    is       => 'ro',
-    required => 1,
-);
 
 =head2 format_type(Str $type) : Str
 
 Returns a dash cased version of the type.
+
+Useful for deriving resource types for relationships,
+which are already in the correct singular/plural form
+and don't require any word manipulations.
 
 =cut
 
@@ -51,19 +45,10 @@ Takes the type and creates its correct, pluralised type.
 
 sub document_type {
     my ($self, $type) = @_;
-    my $noun   = Lingua::EN::Inflexion::noun($type);
-    my $result = $self->chi->compute(
-        'JSONAPI::Document:' . $noun->plural,
-        undef,
-        sub {
-            my @words = $self->segmenter->segment($noun->plural);
-            unless (scalar(@words) > 0) {
-                push @words, $noun->plural;
-            }
-            @words = map { $_ } grep { $_ =~ m/\A(?:[A-Za-z_]+)\z/ } @words;
-            return $self->format_type(join('-', @words));
-        });
-    return $result;
+    my $formatted_type = $self->format_type(Mojo::Util::decamelize($type));
+    my @w = split('-', $formatted_type);
+    push(@w, Lingua::EN::Inflexion::noun(pop @w)->plural);
+    return join('-', @w);
 }
 
 1;

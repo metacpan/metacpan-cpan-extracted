@@ -41,6 +41,7 @@ t/footnotes/sec-good3.in
 t/footnotes/sec-good3.out
 t/footnotes/verbatim-exp.muse
 t/footnotes/verbatim-in.muse
+t/html-2.t
 t/html.t
 t/manifest.t
 t/memory-cycles.t

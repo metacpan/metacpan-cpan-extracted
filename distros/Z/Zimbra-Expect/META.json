@@ -4,7 +4,7 @@
       "Tobias Oetiker <tobi@oetiker.ch>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "gpl_3"
    ],
@@ -50,5 +50,6 @@
          "url" : "https://github.com/oetiker/zimbra-expect"
       }
    },
-   "version" : "v0.1.0"
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

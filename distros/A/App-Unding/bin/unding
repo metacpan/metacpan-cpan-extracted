@@ -9,6 +9,8 @@ use warnings;
 
 use v5.6.0;
 
+use Cwd qw(getcwd abs_path);
+use File::Copy;
 use File::Slurp;
 use Term::ReadKey;
 use Data::Serializer;
@@ -38,6 +40,7 @@ my $help_message = <<'END_HELP';
 
 END_HELP
 
+# evaluate if help should be shown
 if (      # decrypt (no arg given) but nothing stored
           (not defined $ARGV[0] and (length($old_state) < 2))
           # encrypt (arg given) but --help instead of path
@@ -47,10 +50,30 @@ if (      # decrypt (no arg given) but nothing stored
      exit 1;
 }
 
+# evualuate if everything is fine for writing, if needed
+if ( defined $ARGV[0] ) {
+    if (not -w $0) {
+        print STDERR "Write permissons on script needed.\n";
+        my $cwd = getcwd;
+        my $exe = abs_path($0);
+        copy ($exe, $cwd);
+        print STDERR "Copied $exe to $cwd for you.\n";
+        print STDERR "Use your new local copy.\n";
+        exit 1;
+    }
+    if (not length($old_state) < 2) {
+        print STDERR "Existing data will be overwritten.\n";
+        print STDERR "CTRL+C to abort, ENTER to continue";
+        ReadLine(0);
+    }
+}
+
 # read password, without any prompt
+print STDERR 'Password: ';
 ReadMode('noecho');
 my $password = ReadLine(0);
 ReadMode('restore');
+print STDERR "\n";
 
 my $obj = Data::Serializer->new(
                    serializer => 'Data::Dumper',
@@ -60,11 +83,16 @@ my $obj = Data::Serializer->new(
                    portable   => '1',
                    compress   => '0',
              serializer_token => '1',
-                     options  => {},
+                   options    => {},
                   );
 
 if ( defined $ARGV[0] ) {
-    die "\n\n\twrite permissons on script needed (yes!)\n\n" if (not -w $0);
+    print STDERR 'Password confirmation: ';
+    ReadMode('noecho');
+    my $password_retyped = ReadLine(0);
+    ReadMode('restore');
+    print STDERR "\n";
+    die 'Password missmatch' if ($password ne $password_retyped);
     $encrypt_mode = 1;
     my $filename = $ARGV[0];
     my $data = read_file($filename);
@@ -79,7 +107,6 @@ else {
         print STDERR "Wrong password?\n";
     }
 }
-
 
 END {
     if ($encrypt_mode) {
@@ -101,15 +128,16 @@ unding - dark magic, encrypted wallet
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
 This is an executable script, not a library.
 Since this script needs write access on it self (yes!), it's best you copy it to your local directory before using.
+It will do this automatically for you, if it is in writing context and doesn't have the rights necessary.
+But if you whant to do it manually, this is how you do it in C<bash>:
 
  cp $(which unding) .
- chmod 755 unding
 
 Encrypt a file. Content will be stored in unding.
 Attention: File will remain on disk!

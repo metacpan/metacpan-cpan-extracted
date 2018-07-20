@@ -12,6 +12,7 @@ my $help=0;
 
 my ($lockfile,$pid);
 my ($lock,$unlock,$status);
+my ($is_locked_by_others,$is_locked_by_us);
 my $verbose=1;
 
 my $result = GetOptions (
@@ -23,6 +24,8 @@ my $result = GetOptions (
     "l|lock"  => \$lock,
     "unlock"  => \$unlock,
     "status"  => \$status,
+    "is-locked-by-others"  => \$is_locked_by_others,
+    "is-locked-by-us"  => \$is_locked_by_us,
 );
 
 if ($help) {
@@ -37,8 +40,8 @@ if (@ARGV) {
 } elsif ($lock and $unlock) {
     warn "ERROR: both --lock and --unlock options are present!\n";
     pod2usage();
-} elsif (not $lock and not $unlock and not $status) {
-    warn "ERROR: one of --lock, --unlock, --status options should be present!\n";
+} elsif (not $lock and not $unlock and not $status and not $is_locked_by_us and not $is_locked_by_others) {
+    warn "ERROR: one of --lock, --unlock, --status or is-locked-by-* options should be present!\n";
     pod2usage();
 }
 
@@ -49,11 +52,15 @@ my $locker= File::Lock::ParentLock->new(
 
 my $exit_code=0;
 if ($lock) {
-    $exit_code=1 if !$locker->lock();
+    $exit_code=2 if !$locker->lock();
 } elsif ($unlock) {
-    $exit_code=1 if !$locker->unlock();
+    $exit_code=2 if !$locker->unlock();
+} elsif ($is_locked_by_others) {
+    $exit_code=1 if !$locker->is_locked_by_others();
+} elsif ($is_locked_by_us) {
+    $exit_code=1 if !$locker->is_locked_by_us();
 }
-if ($status or $verbose and $exit_code) {
+if ($status or $verbose and $exit_code==2) {
     print "ParentLock status: ", $locker->status_string(),"\n";
 }
 exit $exit_code;
@@ -71,7 +78,7 @@ parentlock - share parent's lock with child processes.
 
 B<parentlock>
 [B<-v>]
-[B<--lock> | B<--unlock>]
+[B<--lock> | B<--unlock> | B<--is-locked-by-us> | B<--is-locked-by-others>]
 [B<--status>]
 [B<--lockfile>] I<lockfile>
 [B<-p|--pid>] I<PID>
@@ -83,7 +90,7 @@ nested script calls and we want to share a lock from the main wrapper
 script for its subprocesses through the parent - child relationship.
 
 Note that unlocking is optional because the lock becomes invalid
-when the process that lock contains its pid dies.
+when the process whose pid is contained in the lock dies.
 
 =head1	EXAMPLES
 
@@ -93,6 +100,11 @@ In each chell script add at the beginning
  LOCKFILE=/workdir/.lock
  parentlock --lock --lockfile $LOCKFILE $$ || exit 1
  ...
+
+Optionally, add at the end of the script, to clean up stale lock file:
+
+ ...
+ parentlock --unlock --lockfile $LOCKFILE $$
 
 =head1	OPTIONS
 
@@ -105,6 +117,20 @@ Lock
 =item	B<-u,--unlock>
 
 Unlock
+
+=item	B<--is-locked-by-us>
+
+Query about existing lock. Returns true if it is locked by I<PID> or its parent.
+Return false ottherwise.
+
+=item	B<--is-locked-by-others>
+
+Query about existing lock. Returns true if is locked by a live process not related to I<PID>.
+Return false ottherwise.
+
+=item	B<--status>
+
+Print the lock status against the parent pid I<PID>.
 
 =item	B<-p,--pid>
 
@@ -136,7 +162,7 @@ had a strong influence on repocop.
 
 =head1	COPYING
 
-Copyright (c) 2008 Igor Vlasenko, ALT Linux Team.
+Copyright (c) 2008-2018 Igor Vlasenko, ALT Linux Team.
 
 This is free software; you can redistribute it and/or modify it under the terms
 of the GNU General Public License as published by the Free Software Foundation;

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::Scm;
-$Maven::Xml::Pom::Scm::VERSION = '1.14';
+$Maven::Xml::Pom::Scm::VERSION = '1.15';
 # ABSTRACT: Maven Scm element
 # PODNAME: Maven::Xml::Pom::Scm
 
@@ -29,7 +29,7 @@ Maven::Xml::Pom::Scm - Maven Scm element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

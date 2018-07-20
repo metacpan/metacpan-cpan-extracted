@@ -1,5 +1,9 @@
 Revision history for Net::Etcd
 
+0.022
+[ ENHANCEMENTS ]
+* Improve support for prefix inline with etcd API. Fixes GH #53 Thanks Michael Fung!
+
 0.021
 [ ENHANCEMENTS ]
 * Add support for prefix => 'true'.

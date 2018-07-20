@@ -10,7 +10,7 @@ use File::Spec;
 use Proc::ProcessTable;
 use File::Path qw(make_path remove_tree);
 
-our $VERSION=0.05;
+our $VERSION=0.06;
 
 my $default_lock_name = '.lock';
 
@@ -80,9 +80,20 @@ sub can_lock {
     return &parentlock_can_lock($self->{-lockfile},$self->{-pid});
 }
 
+# deprecated; will be removed in 0.07
 sub is_locked {
     my ($self)=@_;
     return &parentlock_is_locked($self->{-lockfile},$self->{-pid});
+}
+
+sub is_locked_by_us {
+    my ($self)=@_;
+    return &parentlock_is_locked_by_us($self->{-lockfile},$self->{-pid});
+}
+
+sub is_locked_by_others {
+    my ($self)=@_;
+    return &parentlock_is_locked_by_others($self->{-lockfile},$self->{-pid});
 }
 
 sub status_string {
@@ -174,7 +185,20 @@ sub parentlock_can_lock {
 sub parentlock_is_locked {
     my ($lockfile,$pid) = @_;
     $pid||=$$;
+    carp "parentlock_is_locked and is_locked method are deprecated! Use (parentlock_)is_locked_by_us!";
     return &_lock_status($lockfile,$pid) & _PERMITTED_LOCKED_BIT;
+}
+
+sub parentlock_is_locked_by_us {
+    my ($lockfile,$pid) = @_;
+    $pid||=$$;
+    return &_lock_status($lockfile,$pid) & _PERMITTED_LOCKED_BIT;
+}
+
+sub parentlock_is_locked_by_others {
+    my ($lockfile,$pid) = @_;
+    $pid||=$$;
+    return &_lock_status($lockfile,$pid) == FORBIDDEN_LOCKED_BY_OTHERS;
 }
 
 sub _lock_status {
@@ -322,10 +346,19 @@ or some other error happen.
 Test whether lock can be accuired.
 Returns true if lock can be accuired.
 
-=item	B<is_locked>
+=item	B<is_locked_by_us>
 
 Test whether lock is accuired by us or by our parent process.
-Returns true if lock is accuired.
+
+=item	B<is_locked_by_others>
+
+Test whether lock is accuired by a live process that is not us or our parent process.
+
+=item	B<is_locked>
+
+Test whether lock is accuired by us or by our parent process. Deprecated. 
+Use B<is_locked_by_us> instead.
+
 
 =item	B<status_string>
 
@@ -339,9 +372,9 @@ Accessor method. Returns the object's lockfile.
 
 Accessor method. Returns the object's pid.
 
-=item	B<parentlock_lock>, B<parentlock_unlock>, B<parentlock_is_locked>, B<parentlock_can_lock>, B<parentlock_status_string>
+=item	B<parentlock_lock>, B<parentlock_unlock>, B<parentlock_is_locked>, B<parentlock_is_locked_by_us>, B<parentlock_is_locked_by_others>, B<parentlock_can_lock>, B<parentlock_status_string>
 
-Procedural interface. Same as B<lock>, B<unlock>, B<is_locked>, B<can_lock>, B<status_string>
+Procedural interface. Same as B<lock>, B<unlock>, B<is_locked>, B<is_locked_by_us>, B<is_locked_by_others>, B<can_lock>, B<status_string>
 But require a pair ($lockfile,$pid) instead of the object.
 
 =back
@@ -357,7 +390,7 @@ had a strong influence on repocop.
 
 =head1	COPYRIGHT AND LICENSE
 
-Copyright (c) 2008-2016 Igor Vlasenko, ALT Linux Team.
+Copyright (c) 2008-2018 Igor Vlasenko, ALT Linux Team.
 
 This is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

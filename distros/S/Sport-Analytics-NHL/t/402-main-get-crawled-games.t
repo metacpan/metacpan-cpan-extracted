@@ -35,4 +35,4 @@ for my $game (@games) {
 summarize_tests;
 
 system(qw(rm -rf t/data/1969));
-$nhl->{db}{dbh}->get_collection('schedule')->drop();
+$nhl->{db}{dbh}->get_collection('schedule')->drop() if $MONGO_DB;

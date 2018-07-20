@@ -780,7 +780,7 @@ void SPVM_CSOURCE_BUILDER_build_sub_implementation(SPVM_COMPILER* compiler, SPVM
   int32_t sub_return_basic_type_id = sub_return_type->basic_type->id;
   
   int32_t sub_return_type_dimension = sub_return_type->dimension;
-  int32_t sub_return_type_is_object = SPVM_TYPE_is_object(compiler, sub_return_type);
+  int32_t sub_return_type_is_object = SPVM_TYPE_is_object_type(compiler, sub_return_type);
 
   int32_t sub_return_type_width = SPVM_TYPE_get_width(compiler, sub_return_type);
   
@@ -837,9 +837,9 @@ void SPVM_CSOURCE_BUILDER_build_sub_implementation(SPVM_COMPILER* compiler, SPVM
     for (arg_index = 0; arg_index < sub->op_args->length; arg_index++) {
       SPVM_OP* op_arg = SPVM_LIST_fetch(sub->op_args, arg_index);
       SPVM_TYPE* arg_type = op_arg->uv.my->op_type->uv.type;
-      _Bool arg_type_is_value_t = SPVM_TYPE_is_value_t(compiler, arg_type);
+      _Bool arg_type_is_value_t = SPVM_TYPE_is_value_type(compiler, arg_type);
       
-      if (SPVM_TYPE_is_object(compiler, arg_type) && !arg_type_is_value_t) {
+      if (SPVM_TYPE_is_object_type(compiler, arg_type) && !arg_type_is_value_t) {
         SPVM_MY* my_arg = op_arg->uv.my;
         
         SPVM_STRING_BUFFER_add(string_buffer, "  if (");
@@ -2461,7 +2461,7 @@ void SPVM_CSOURCE_BUILDER_build_sub_implementation(SPVM_COMPILER* compiler, SPVM
         
         break;
       }
-      case SPVM_OPCODE_C_ID_CHECK_CAST: {
+      case SPVM_OPCODE_C_ID_CAST: {
         int32_t rel_id = opcode->operand2;
         SPVM_OP* op_type = SPVM_LIST_fetch(sub->op_types, rel_id);
         const char* cast_basic_type_name = op_type->uv.type->basic_type->name;
@@ -2479,8 +2479,8 @@ void SPVM_CSOURCE_BUILDER_build_sub_implementation(SPVM_COMPILER* compiler, SPVM
         SPVM_STRING_BUFFER_add(string_buffer, "    void* object = ");
         SPVM_CSOURCE_BUILDER_add_operand(string_buffer, "void*", opcode->operand1);
         SPVM_STRING_BUFFER_add(string_buffer, ";\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t can_assign = env->check_cast(env, cast_basic_type_id, cast_type_dimension, object);\n");
-        SPVM_STRING_BUFFER_add(string_buffer, "    if (can_assign) { SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN(&");
+        SPVM_STRING_BUFFER_add(string_buffer, "    int32_t can_cast = env->check_cast(env, cast_basic_type_id, cast_type_dimension, object);\n");
+        SPVM_STRING_BUFFER_add(string_buffer, "    if (can_cast) { SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN(&");
         SPVM_CSOURCE_BUILDER_add_operand(string_buffer, "void*", opcode->operand0);
         SPVM_STRING_BUFFER_add(string_buffer, ", object); }\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    else {\n");
@@ -2504,8 +2504,8 @@ void SPVM_CSOURCE_BUILDER_build_sub_implementation(SPVM_COMPILER* compiler, SPVM
         
         // Declare subroutine return type
         SPVM_TYPE* decl_sub_return_type = decl_sub->op_return_type->uv.type;
-        int32_t decl_sub_return_type_is_object = SPVM_TYPE_is_object(compiler, decl_sub_return_type);
-        int32_t decl_sub_return_type_is_value_t = SPVM_TYPE_is_value_t(compiler, decl_sub_return_type);
+        int32_t decl_sub_return_type_is_object = SPVM_TYPE_is_object_type(compiler, decl_sub_return_type);
+        int32_t decl_sub_return_type_is_value_t = SPVM_TYPE_is_value_type(compiler, decl_sub_return_type);
         
         // Declare subroutine return type id
         int32_t decl_sub_return_basic_type_id = decl_sub_return_type->basic_type->id;
@@ -2579,9 +2579,11 @@ void SPVM_CSOURCE_BUILDER_build_sub_implementation(SPVM_COMPILER* compiler, SPVM
         if (decl_sub_return_type_is_value_t) {
           int32_t decl_sub_return_type_width = SPVM_TYPE_get_width(compiler, decl_sub_return_type);
           int32_t decl_sub_return_basic_type_id = decl_sub_return_type->basic_type->id;
-          SPVM_STRING_BUFFER_add(string_buffer, "memcpy(&vars[opcode->operand0], &stack[0], sizeof(SPVM_VALUE) * ");
+          SPVM_STRING_BUFFER_add(string_buffer, " memcpy(&vars[");
+          SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand0);
+          SPVM_STRING_BUFFER_add(string_buffer, "], &stack[0], sizeof(SPVM_VALUE) * ");
           SPVM_STRING_BUFFER_add_int(string_buffer, decl_sub_return_type_width);
-          SPVM_STRING_BUFFER_add(string_buffer, ");\n");
+          SPVM_STRING_BUFFER_add(string_buffer, "); ");
         }
         else if (decl_sub_return_type_is_object) {
           SPVM_STRING_BUFFER_add(string_buffer, " SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN(&");
@@ -2764,7 +2766,7 @@ void SPVM_CSOURCE_BUILDER_build_sub_implementation(SPVM_COMPILER* compiler, SPVM
 
   // No exception
   SPVM_STRING_BUFFER_add(string_buffer, "  if (!exception_flag) {\n");
-  _Bool sub_return_type_is_value_t = SPVM_TYPE_is_value_t(compiler, sub_return_type);
+  _Bool sub_return_type_is_value_t = SPVM_TYPE_is_value_type(compiler, sub_return_type);
   if (sub_return_type_is_object && !sub_return_type_is_value_t) {
     SPVM_STRING_BUFFER_add(string_buffer, "    if (stack[0].oval != NULL) { SPVM_RUNTIME_C_INLINE_DEC_REF_COUNT_ONLY(stack[0].oval); }\n");
   }

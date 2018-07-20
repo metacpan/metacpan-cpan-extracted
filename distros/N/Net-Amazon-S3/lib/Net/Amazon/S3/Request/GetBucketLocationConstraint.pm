@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::GetBucketLocationConstraint;
-$Net::Amazon::S3::Request::GetBucketLocationConstraint::VERSION = '0.83';
+$Net::Amazon::S3::Request::GetBucketLocationConstraint::VERSION = '0.84';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request';
@@ -33,7 +33,7 @@ Net::Amazon::S3::Request::GetBucketLocationConstraint - An internal class to get
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 

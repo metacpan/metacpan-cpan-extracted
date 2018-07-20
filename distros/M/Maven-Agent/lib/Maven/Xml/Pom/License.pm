@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::License;
-$Maven::Xml::Pom::License::VERSION = '1.14';
+$Maven::Xml::Pom::License::VERSION = '1.15';
 # ABSTRACT: Maven License element
 # PODNAME: Maven::Xml::Pom::License
 
@@ -29,7 +29,7 @@ Maven::Xml::Pom::License - Maven License element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

@@ -28,9 +28,8 @@
       },
       "runtime" : {
          "requires" : {
-            "CHI" : "0",
             "Lingua::EN::Inflexion" : "0",
-            "Lingua::EN::Segment" : "0",
+            "Mojo::Util" : "0",
             "Moo" : "0",
             "perl" : "5.010"
          }
@@ -51,35 +50,35 @@
    "provides" : {
       "JSONAPI::Document" : {
          "file" : "lib/JSONAPI/Document.pm",
-         "version" : "2.1"
+         "version" : "2.2"
       },
       "JSONAPI::Document::Builder" : {
          "file" : "lib/JSONAPI/Document/Builder.pm",
-         "version" : "2.1"
+         "version" : "2.2"
       },
       "JSONAPI::Document::Builder::Compound" : {
          "file" : "lib/JSONAPI/Document/Builder/Compound.pm",
-         "version" : "2.1"
+         "version" : "2.2"
       },
       "JSONAPI::Document::Builder::Relationships" : {
          "file" : "lib/JSONAPI/Document/Builder/Relationships.pm",
-         "version" : "2.1"
+         "version" : "2.2"
       },
       "JSONAPI::Document::Builder::Role::Attributes" : {
          "file" : "lib/JSONAPI/Document/Builder/Role/Attributes.pm",
-         "version" : "2.1"
+         "version" : "2.2"
       },
       "JSONAPI::Document::Builder::Role::Parameters" : {
          "file" : "lib/JSONAPI/Document/Builder/Role/Parameters.pm",
-         "version" : "2.1"
+         "version" : "2.2"
       },
       "JSONAPI::Document::Builder::Role::Type" : {
          "file" : "lib/JSONAPI/Document/Builder/Role/Type.pm",
-         "version" : "2.1"
+         "version" : "2.2"
       },
       "JSONAPI::Document::Role::Attributes" : {
          "file" : "lib/JSONAPI/Document/Role/Attributes.pm",
-         "version" : "2.1"
+         "version" : "2.2"
       }
    },
    "release_status" : "stable",
@@ -89,7 +88,7 @@
          "web" : "https://github.com/ziali088/jsonapi-document.git"
       }
    },
-   "version" : "2.1",
+   "version" : "2.2",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],

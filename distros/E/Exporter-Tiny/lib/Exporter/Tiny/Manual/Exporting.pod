@@ -72,6 +72,12 @@ L<Exporter::Tiny::Manual::Importing>. It can often be useful. In
 particular it will tell you what package the generated sub is destined
 to be installed into.
 
+To generate non-code symbols, name your generators like this:
+
+  sub _generateScalar_Foo { ... }  # generate a symbol $Foo
+  sub _generateArray_Bar  { ... }  # generate a symbol @Bar
+  sub _generateHash_Baz   { ... }  # generate a symbol %Baz
+
 You can also generate tags:
 
    my %constants;
@@ -193,6 +199,8 @@ the generator if there is one (or by calling C<< can >> on your exporter
 otherwise) and calls C<_exporter_fail> if it's unable to generate or
 retrieve a coderef.
 
+Despite the name, is also called for non-code symbols.
+
 =item C<< _exporter_permitted_regexp($globals) >>
 
 This method is called to retrieve a regexp for validating the names of
@@ -225,6 +233,8 @@ C<< -prefix >> and C<< -suffix >> functions. This method does a lot of
 stuff; if you need to override it, it's probably a good idea to just
 pre-process the arguments and then call the super method rather than
 trying to handle all of it yourself.
+
+Despite the name, is also called for non-code symbols.
 
 =item C<< _exporter_uninstall_sub($name, $args, $globals) >>
 

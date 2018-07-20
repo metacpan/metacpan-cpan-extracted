@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Maven;
-$Maven::Maven::VERSION = '1.14';
+$Maven::Maven::VERSION = '1.15';
 # ABSTRACT: The main interface to maven
 # PODNAME: Maven::Maven
 
@@ -191,7 +191,7 @@ Maven::Maven - The main interface to maven
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

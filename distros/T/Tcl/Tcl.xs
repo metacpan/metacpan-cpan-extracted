@@ -278,12 +278,14 @@ NpLoadLibrary(pTHX_ HMODULE *tclHandle, char *dllFilename, int dllFilenameSize)
 	}
 	if (!handle) {
 	    /* Try different versions anywhere in the path. */
+	    warn("failed dlopen(%s,...);", libname);
 	    char *pos = strstr(libname, "tcl8")+4;
 	    if (*pos == '.') {
 		pos++;
 	    }
 	    *pos = '9'; /* count down from '9' to '0': 8.9, 8.8, 8.7, 8.6, ... */
 	    do {
+		warn("trying dlopen(%s,...);", libname);
 		handle = dlopen(libname, RTLD_NOW | RTLD_GLOBAL);
 	    } while (!handle && (--*pos >= '0'));
 	    if (!handle) {

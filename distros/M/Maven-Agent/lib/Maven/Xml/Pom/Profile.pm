@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::Profile;
-$Maven::Xml::Pom::Profile::VERSION = '1.14';
+$Maven::Xml::Pom::Profile::VERSION = '1.15';
 # ABSTRACT: Maven Profile element
 # PODNAME: Maven::Xml::Pom::Profile
 
@@ -73,7 +73,7 @@ Maven::Xml::Pom::Profile - Maven Profile element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

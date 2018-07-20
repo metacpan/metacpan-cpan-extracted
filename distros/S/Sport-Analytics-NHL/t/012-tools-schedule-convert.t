@@ -7,7 +7,7 @@ use experimental qw(smartmatch);
 
 use Test::More;
 
-use JSON::XS qw(decode_json);
+use JSON qw(decode_json);
 
 plan tests => 2;
 

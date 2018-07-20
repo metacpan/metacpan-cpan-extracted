@@ -1,0 +1,1831 @@
+キモリ:    #----------------------------------------------------------------
+    ID: 252
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 80
+    Attack: 124
+    Defense: 104
+    MAXCP:
+        Hatched: 527
+        Reward: 395
+        Boosted: 659
+ジュプトル:    #-------------------------------------------------------------
+    ID: 253
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 100
+    Attack: 172
+    Defense: 130
+    MAXCP:
+        Hatched: 861
+        Reward: 646
+        Boosted: 1077
+ジュカイン:    #-------------------------------------------------------------
+    ID: 254
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 140
+    Attack: 223
+    Defense: 180
+    MAXCP:
+        Hatched: 1476
+        Reward: 1107
+        Boosted: 1845
+アチャモ:    #---------------------------------------------------------------
+    ID: 255
+    Types:
+    - ほのお
+    From:
+    To:
+    Stamina: 90
+    Attack: 130
+    Defense: 92
+    MAXCP:
+        Hatched: 548
+        Reward: 411
+        Boosted: 685
+ワカシャモ:    #-------------------------------------------------------------
+    ID: 256
+    Types:
+        - ほのお
+        - かくとう
+    From:
+    To:
+    Stamina: 120
+    Attack: 163
+    Defense: 115
+    MAXCP:
+        Hatched: 841
+        Reward: 631
+        Boosted: 1052
+バシャーモ:    #-------------------------------------------------------------
+    ID: 257
+    Types:
+        - ほのお
+        - かくとう
+    From:
+    To:
+    Stamina: 160
+    Attack: 240
+    Defense: 141
+    MAXCP:
+        Hatched: 1503
+        Reward: 1127
+        Boosted: 1879
+ミズゴロウ:    #-------------------------------------------------------------
+    ID: 258
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 100
+    Attack: 126
+    Defense: 93
+    MAXCP:
+        Hatched: 560
+        Reward: 420
+        Boosted: 701
+ヌマクロー:    #-------------------------------------------------------------
+    ID: 259
+    Types:
+        - みず
+        - じめん
+    From:
+    To:
+    Stamina: 140
+    Attack: 156
+    Defense: 133
+    MAXCP:
+        Hatched: 924
+        Reward: 693
+        Boosted: 1155
+ラグラージ:    #-------------------------------------------------------------
+    ID: 260
+    Types:
+        - みず
+        - じめん
+    From:
+    To:
+    Stamina: 200
+    Attack: 208
+    Defense: 175
+    MAXCP:
+        Hatched: 1608
+        Reward: 1206
+        Boosted: 2010
+ポチエナ:    #---------------------------------------------------------------
+    ID: 261
+    Types:
+        - あく
+    From:
+    To:
+    Stamina: 70
+    Attack: 96
+    Defense: 63
+    MAXCP:
+        Hatched: 322
+        Reward: 241
+        Boosted: 403
+グラエナ:    #---------------------------------------------------------------
+    ID: 262
+    Types:
+        - あく
+    From:
+    To:
+    Stamina: 140
+    Attack: 171
+    Defense: 137
+    MAXCP:
+        Hatched: 1018
+        Reward: 764
+        Boosted: 1273
+ジグザグマ:    #-------------------------------------------------------------
+    ID: 263
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 76
+    Attack: 58
+    Defense: 80
+    MAXCP:
+        Hatched: 242
+        Reward: 181
+        Boosted: 302
+マッスグマ:    #-------------------------------------------------------------
+    ID: 264
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 156
+    Attack: 142
+    Defense: 128
+    MAXCP:
+        Hatched: 876
+        Reward: 657
+        Boosted: 1095
+ケムッソ:    #---------------------------------------------------------------
+    ID: 265
+    Types:
+        - むし
+    From:
+    To:
+    Stamina: 90
+    Attack: 75
+    Defense: 61
+    MAXCP:
+        Hatched: 286
+        Reward: 215
+        Boosted: 358
+カラサリス:    #-------------------------------------------------------------
+    ID: 266
+    Types:
+        - むし
+    From:
+    To:
+    Stamina: 100
+    Attack: 60
+    Defense: 91
+    MAXCP:
+        Hatched: 295
+        Reward: 221
+        Boosted: 369
+アゲハント:    #-------------------------------------------------------------
+    ID: 267
+    Types:
+        - むし
+        - ひこう
+    From:
+    To:
+    Stamina: 120
+    Attack: 189
+    Defense: 98
+    MAXCP:
+        Hatched: 899
+        Reward: 674
+        Boosted: 1124
+マユルド:    #--------------------------------------------------------------
+    ID: 268
+    Types:
+        - むし
+    From:
+    To:
+    Stamina: 100
+    Attack: 60
+    Defense: 91
+    MAXCP:
+        Hatched: 295
+        Reward: 221
+        Boosted: 369
+ドクケイル:    #-------------------------------------------------------------
+    ID: 269
+    Types:
+        - むし
+        - どく
+    From:
+    To:
+    Stamina: 120
+    Attack: 98
+    Defense: 172
+    MAXCP:
+        Hatched: 640
+        Reward: 480
+        Boosted: 801
+ハスボー:    #---------------------------------------------------------------
+    ID: 270
+    Types:
+        - みず
+        - くさ
+    From:
+    To:
+    Stamina: 80
+    Attack: 71
+    Defense: 86
+    MAXCP:
+        Hatched: 300
+        Reward: 225
+        Boosted: 375
+ハスブレロ:    #-------------------------------------------------------------
+    ID: 271
+    Types:
+        - みず
+        - くさ
+    From:
+    To:
+    Stamina: 120
+    Attack: 112
+    Defense: 128
+    MAXCP:
+        Hatched: 629
+        Reward: 472
+        Boosted: 787
+ルンパッパ:    #-------------------------------------------------------------
+    ID: 272
+    Types:
+        - みず
+        - くさ
+    From:
+    To:
+    Stamina: 160
+    Attack: 173
+    Defense: 191
+    MAXCP:
+        Hatched: 1273
+        Reward: 955
+        Boosted: 1592
+タネボー:    #---------------------------------------------------------------
+    ID: 273
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 80
+    Attack: 71
+    Defense: 86
+    MAXCP:
+        Hatched: 300
+        Reward: 225
+        Boosted: 375
+コノハナ:    #--------------------------------------------------------------
+    ID: 274
+    Types:
+        - くさ
+        - あく
+    From:
+    To:
+    Stamina: 140
+    Attack: 134
+    Defense: 78
+    MAXCP:
+        Hatched: 638
+        Reward: 478
+        Boosted: 798
+ダーテング:    #------------------------------------------------------------
+    ID: 275
+    Types:
+        - くさ
+        - あく
+    From:
+    To:
+    Stamina: 180
+    Attack: 200
+    Defense: 121
+    MAXCP:
+        Hatched: 1249
+        Reward: 937
+        Boosted: 1562
+スバメ:    #----------------------------------------------------------------
+    ID: 276
+    Types:
+    - ノーマル
+    - ひこう
+    From:
+    To:
+    Stamina: 80
+    Attack: 106
+    Defense: 61
+    MAXCP:
+        Hatched: 366
+        Reward: 275
+        Boosted: 458
+オオスバメ:    #-------------------------------------------------------------
+    ID: 277
+    Types:
+        - ノーマル
+        - ひこう
+    From:
+    To:
+    Stamina: 120
+    Attack: 185
+    Defense: 130
+    MAXCP:
+        Hatched: 998
+        Reward: 749
+        Boosted: 1248
+キャモメ:    #---------------------------------------------------------------
+    ID: 278
+    Types:
+        - みず
+        - ひこう
+    From:
+    To:
+    Stamina: 80
+    Attack: 106
+    Defense: 61
+    MAXCP:
+        Hatched: 366
+        Reward: 275
+        Boosted: 458
+ペリッパー:    #-------------------------------------------------------------
+    ID: 279
+    Types:
+        - みず
+        - ひこう
+    From:
+    To:
+    Stamina: 120
+    Attack: 175
+    Defense: 189
+    MAXCP:
+        Hatched: 1125
+        Reward: 844
+        Boosted: 1406
+ラルトス:    #---------------------------------------------------------------
+    ID: 280
+    Types:
+        - エスパー
+        - フェアリー
+    From:
+    To:
+    Stamina: 56
+    Attack: 79
+    Defense: 63
+    MAXCP:
+        Hatched: 249
+        Reward: 187
+        Boosted: 312
+キルリア:    #---------------------------------------------------------------
+    ID: 281
+    Types:
+        - エスパー
+        - フェアリー
+    From:
+    To:
+    Stamina: 76
+    Attack: 117
+    Defense: 100
+    MAXCP:
+        Hatched: 481
+        Reward: 361
+        Boosted: 602
+サーナイト:    #-------------------------------------------------------------
+    ID: 282
+    Types:
+        - エスパー
+        - フェアリー
+    From:
+    To:
+    Stamina: 136
+    Attack: 237
+    Defense: 220
+    MAXCP:
+        Hatched: 1694
+        Reward: 1270
+        Boosted: 2117
+アメタマ:    #---------------------------------------------------------------
+    ID: 283
+    Types:
+        - むし
+        - みず
+    From:
+    To:
+    Stamina: 80
+    Attack: 93
+    Defense: 97
+    MAXCP:
+        Hatched: 397
+        Reward: 298
+        Boosted: 497
+アメモース:    #-------------------------------------------------------------
+    ID: 284
+    Types:
+        - むし
+        - ひこう
+    From:
+    To:
+    Stamina: 140
+    Attack: 192
+    Defense: 161
+    MAXCP:
+        Hatched: 1220
+        Reward: 915
+        Boosted: 1525
+キノココ:    #---------------------------------------------------------------
+    ID: 285
+    Types:
+    - くさ
+    From:
+    To:
+    Stamina: 120
+    Attack: 74
+    Defense: 110
+    MAXCP:
+        Hatched: 412
+        Reward: 309
+        Boosted: 515
+キノガッサ:    #-------------------------------------------------------------
+    ID: 286
+    Types:
+        - くさ
+        - かくとう
+    From:
+    To:
+    Stamina: 120
+    Attack: 241
+    Defense: 153
+    MAXCP:
+        Hatched: 1375
+        Reward: 1032
+        Boosted: 1720
+ナマケロ:    #---------------------------------------------------------------
+    ID: 287
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 120
+    Attack: 104
+    Defense: 104
+    MAXCP:
+        Hatched: 538
+        Reward: 403
+        Boosted: 672
+ヤルキモノ:    #-------------------------------------------------------------
+    ID: 288
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 160
+    Attack: 159
+    Defense: 159
+    MAXCP:
+        Hatched: 1083
+        Reward: 812
+        Boosted: 1354
+ケッキング:    #-------------------------------------------------------------
+    ID: 289
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 273
+    Attack: 290
+    Defense: 183
+    MAXCP:
+        Hatched: 2599
+        Reward: 1949
+        Boosted: 3249
+ツチニン:    #--------------------------------------------------------------
+    ID: 290
+    Types:
+        - むし
+        - じめん
+    From:
+    To:
+    Stamina: 62
+    Attack: 80
+    Defense: 153
+    isNotAvailable: 1
+    MAXCP:
+        Hatched:
+        Reward:
+        Boosted:
+テッカニン:    #-------------------------------------------------------------
+    ID: 291
+    Types:
+        - むし
+        - ひこう
+    From:
+    To:
+    Stamina: 122
+    Attack: 196
+    Defense: 114
+    isNotAvailable: 1
+    MAXCP:
+        Hatched:
+        Reward:
+        Boosted:
+ヌケニン:    #--------------------------------------------------------------
+    ID: 292
+    Types:
+        - むし
+        - ゴースト
+    From:
+    To:
+    Stamina: 2
+    Attack: 153
+    Defense: 80
+    isNotAvailable: 1
+    MAXCP:
+        Hatched:
+        Reward:
+        Boosted:
+ゴニョニョ:    #-------------------------------------------------------------
+    ID: 293
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 128
+    Attack: 92
+    Defense: 42
+    MAXCP:
+        Hatched: 344
+        Reward: 258
+        Boosted: 430
+ドゴーム:    #---------------------------------------------------------------
+    ID: 294
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 168
+    Attack: 134
+    Defense: 81
+    MAXCP:
+        Hatched: 704
+        Reward: 528
+        Boosted: 881
+バクオング:    #-------------------------------------------------------------
+    ID: 295
+    Types:
+    - ノーマル
+    From:
+    To:
+    Stamina: 208
+    Attack: 179
+    Defense: 142
+    MAXCP:
+        Hatched: 1295
+        Reward: 971
+        Boosted: 1619
+マクノシタ:    #-------------------------------------------------------------
+    ID: 296
+    Types:
+        - かくとう
+    From:
+    To:
+    Stamina: 144
+    Attack: 99
+    Defense: 54
+    MAXCP:
+        Hatched: 426
+        Reward: 319
+        Boosted: 532
+ハリテヤマ:    #-------------------------------------------------------------
+    ID: 297
+    Types:
+        - かくとう
+    From:
+    To:
+    Stamina: 288
+    Attack: 209
+    Defense: 114
+    MAXCP:
+        Hatched: 1580
+        Reward: 1185
+        Boosted: 1975
+ルリリ:    #----------------------------------------------------------------
+    ID: 298
+    Types:
+    - ノーマル
+    - フェアリー
+    From:
+    To:
+    Stamina: 100
+    Attack: 36
+    Defense: 71
+    isNotWild: 1
+    MAXCP:
+        Hatched: 181
+ノズパス:    #--------------------------------------------------------------
+    ID: 299
+    Types:
+        - いわ
+    From:
+    To:
+    Stamina: 60
+    Attack: 82
+    Defense: 236
+    MAXCP:
+        Hatched: 474
+        Reward: 356
+        Boosted: 593
+エネコ:    #----------------------------------------------------------------
+    ID: 300
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 100
+    Attack: 84
+    Defense: 84
+    MAXCP:
+        Hatched: 376
+        Reward: 282
+        Boosted: 471
+エネコロロ:    #-------------------------------------------------------------
+    ID: 301
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 140
+    Attack: 132
+    Defense: 132
+    MAXCP:
+        Hatched: 791
+        Reward: 593
+        Boosted: 989
+ヤミラミ:    #---------------------------------------------------------------
+    ID: 302
+    Types:
+        - あく
+        - ゴースト
+    From:
+    To:
+    Stamina: 100
+    Attack: 141
+    Defense: 141
+    MAXCP:
+        Hatched: 745
+        Reward: 559
+        Boosted: 932
+クチート:    #---------------------------------------------------------------
+    ID: 303
+    Types:
+        - はがね
+        - フェアリー
+    From:
+    To:
+    Stamina: 100
+    Attack: 155
+    Defense: 155
+    MAXCP:
+        Hatched: 848
+        Reward: 636
+        Boosted: 1060
+ココドラ:    #---------------------------------------------------------------
+    ID: 304
+    Types:
+        - はがね
+        - いわ
+    From:
+    To:
+    Stamina: 100
+    Attack: 121
+    Defense: 168
+    MAXCP:
+        Hatched: 704
+        Reward: 528
+        Boosted: 880
+コドラ:    #-----------------------------------------------------------------
+    ID: 305
+    Types:
+        - はがね
+        - いわ
+    From:
+    To:
+    Stamina: 120
+    Attack: 158
+    Defense: 240
+    MAXCP:
+        Hatched: 1145
+        Reward: 859
+        Boosted: 1432
+ボスゴドラ:    #--------------------------------------------------------------
+    ID: 306
+    Types:
+        - はがね
+        - いわ
+    From:
+    To:
+    Stamina: 140
+    Attack: 198
+    Defense: 314
+    MAXCP:
+        Hatched: 1716
+        Reward: 1287
+        Boosted: 2145
+アサナン:    #---------------------------------------------------------------
+    ID: 307
+    Types:
+        - かくとう
+        - エスパー
+    From:
+    To:
+    Stamina: 60
+    Attack: 78
+    Defense: 107
+    MAXCP:
+        Hatched: 317
+        Reward: 238
+        Boosted: 396
+チャーレム:    #-------------------------------------------------------------
+    ID: 308
+    Types:
+        - かくとう
+        - エスパー
+    From:
+    To:
+    Stamina: 120
+    Attack: 121
+    Defense: 152
+    MAXCP:
+        Hatched: 728
+        Reward: 546
+        Boosted: 911
+ラクライ:    #---------------------------------------------------------------
+    ID: 309
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 80
+    Attack: 123
+    Defense: 78
+    MAXCP:
+        Hatched: 462
+        Reward: 347
+        Boosted: 578
+ライボルト:    #-------------------------------------------------------------
+    ID: 310
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 140
+    Attack: 215
+    Defense: 127
+    MAXCP:
+        Hatched: 1217
+        Reward: 913
+        Boosted: 1522
+プラスル:    #---------------------------------------------------------------
+    ID: 311
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 120
+    Attack: 167
+    Defense: 147
+    MAXCP:
+        Hatched: 960
+        Reward: 720
+        Boosted: 1200
+マイナン:    #---------------------------------------------------------------
+    ID: 312
+    Types:
+        - でんき
+    From:
+    To:
+    Stamina: 120
+    Attack: 147
+    Defense: 167
+    MAXCP:
+        Hatched: 906
+        Reward: 679
+        Boosted: 1132
+バルビート:    #-------------------------------------------------------------
+    ID: 313
+    Types:
+        - むし
+    From:
+    To:
+    Stamina: 130
+    Attack: 143
+    Defense: 171
+    MAXCP:
+        Hatched: 926
+        Reward: 694
+        Boosted: 1157
+イルミーゼ:    #-------------------------------------------------------------
+    ID: 314
+    Types:
+        - むし
+    From:
+    To:
+    Stamina: 130
+    Attack: 143
+    Defense: 171
+    MAXCP:
+        Hatched: 926
+        Reward: 694
+        Boosted: 1157
+ロゼリア:    #---------------------------------------------------------------
+    ID: 315
+    Types:
+        - くさ
+        - どく
+    From:
+    To:
+    Stamina: 100
+    Attack: 186
+    Defense: 148
+    MAXCP:
+        Hatched: 982
+        Reward: 736
+        Boosted: 1227
+ゴクリン:    #---------------------------------------------------------------
+    ID: 316
+    Types:
+        - どく
+    From:
+    To:
+    Stamina: 140
+    Attack: 80
+    Defense: 99
+    MAXCP:
+        Hatched: 450
+        Reward: 338
+        Boosted: 563
+マルノーム:    #-------------------------------------------------------------
+    ID: 317
+    Types:
+        - どく
+    From:
+    To:
+    Stamina: 200
+    Attack: 140
+    Defense: 159
+    MAXCP:
+        Hatched: 1069
+        Reward: 802
+        Boosted: 1337
+キバニア:    #---------------------------------------------------------------
+    ID: 318
+    Types:
+        - みず
+        - あく
+    From:
+    To:
+    Stamina: 90
+    Attack: 171
+    Defense: 39
+    MAXCP:
+        Hatched: 499
+        Reward: 374
+        Boosted: 624
+サメハダー:    #-------------------------------------------------------------
+    ID: 319
+    Types:
+        - みず
+        - あく
+    From:
+    To:
+    Stamina: 140
+    Attack: 243
+    Defense: 83
+    MAXCP:
+        Hatched: 1134
+        Reward: 851
+        Boosted: 1418
+ホエルコ:    #---------------------------------------------------------------
+    ID: 320
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 260
+    Attack: 136
+    Defense: 68
+    MAXCP:
+        Hatched: 814
+        Reward: 610
+        Boosted: 1017
+ホエルオー:    #-------------------------------------------------------------
+    ID: 321
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 340
+    Attack: 175
+    Defense: 87
+    MAXCP:
+        Hatched: 1290
+        Reward: 967
+        Boosted: 1613
+ドンメル:    #---------------------------------------------------------------
+    ID: 322
+    Types:
+        - ほのお
+        - じめん
+    From:
+    To:
+    Stamina: 120
+    Attack: 119
+    Defense: 82
+    MAXCP:
+        Hatched: 547
+        Reward: 410
+        Boosted: 684
+バクーダ:    #---------------------------------------------------------------
+    ID: 323
+    Types:
+        - ほのお
+        - じめん
+    From:
+    To:
+    Stamina: 140
+    Attack: 194
+    Defense: 139
+    MAXCP:
+        Hatched: 1152
+        Reward: 864
+        Boosted: 1440
+コータス:    #---------------------------------------------------------------
+    ID: 324
+    Types:
+        - ほのお
+    From:
+    To:
+    Stamina: 140
+    Attack: 151
+    Defense: 234
+    MAXCP:
+        Hatched: 1163
+        Reward: 873
+        Boosted: 1454
+バネブー:    #---------------------------------------------------------------
+    ID: 325
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 120
+    Attack: 125
+    Defense: 145
+    MAXCP:
+        Hatched: 734
+        Reward: 550
+        Boosted: 917
+ブーピッグ:    #-------------------------------------------------------------
+    ID: 326
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 160
+    Attack: 171
+    Defense: 211
+    MAXCP:
+        Hatched: 1320
+        Reward: 990
+        Boosted: 1650
+パッチール:    #-------------------------------------------------------------
+    ID: 327
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 120
+    Attack: 116
+    Defense: 116
+    isNotAvailable: 1
+    MAXCP:
+        Hatched:
+        Reward:
+        Boosted:
+ナックラー:    #-------------------------------------------------------------
+    ID: 328
+    Types:
+        - じめん
+    From:
+    To:
+    Stamina: 90
+    Attack: 162
+    Defense: 78
+    MAXCP:
+        Hatched: 624
+        Reward: 468
+        Boosted: 780
+ビブラーバ:    #-------------------------------------------------------------
+    ID: 329
+    Types:
+        - じめん
+        - ドラゴン
+    From:
+    To:
+    Stamina: 100
+    Attack: 134
+    Defense: 99
+    MAXCP:
+        Hatched: 608
+        Reward: 456
+        Boosted: 761
+フライゴン:    #-------------------------------------------------------------
+    ID: 330
+    Types:
+        - じめん
+        - ドラゴン
+    From:
+    To:
+    Stamina: 160
+    Attack: 205
+    Defense: 168
+    MAXCP:
+        Hatched: 1405
+        Reward: 1053
+        Boosted: 1756
+サボネア:    #---------------------------------------------------------------
+    ID: 331
+    Types:
+        - くさ
+    From:
+    To:
+    Stamina: 100
+    Attack: 156
+    Defense: 74
+    MAXCP:
+        Hatched: 617
+        Reward: 463
+        Boosted: 771
+ノクタス:    #---------------------------------------------------------------
+    ID: 332
+    Types:
+        - くさ
+        - あく
+    From:
+    To:
+    Stamina: 140
+    Attack: 221
+    Defense: 115
+    MAXCP:
+        Hatched: 1195
+        Reward: 896
+        Boosted: 1494
+チルット:    #---------------------------------------------------------------
+    ID: 333
+    Types:
+        - ノーマル
+        - ひこう
+    From:
+    To:
+    Stamina: 90
+    Attack: 76
+    Defense: 139
+    MAXCP:
+        Hatched: 412
+        Reward: 309
+        Boosted: 516
+チルタリス:    #-------------------------------------------------------------
+    ID: 334
+    Types:
+        - ドラゴン
+        - ひこう
+    From:
+    To:
+    Stamina: 150
+    Attack: 141
+    Defense: 208
+    MAXCP:
+        Hatched: 1067
+        Reward: 801
+        Boosted: 1335
+ザングース:    #-------------------------------------------------------------
+    ID: 335
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 146
+    Attack: 222
+    Defense: 124
+    MAXCP:
+        Hatched: 1265
+        Reward: 949
+        Boosted: 1581
+ハブネーク:    #-------------------------------------------------------------
+    ID: 336
+    Types:
+        - どく
+    From:
+    To:
+    Stamina: 146
+    Attack: 196
+    Defense: 118
+    MAXCP:
+        Hatched: 1101
+        Reward: 826
+        Boosted: 1377
+ルナトーン:    #-------------------------------------------------------------
+    ID: 337
+    Types:
+        - いわ
+        - エスパー
+    From:
+    To:
+    Stamina: 180
+    Attack: 178
+    Defense: 163
+    MAXCP:
+        Hatched: 1283
+        Reward: 962
+        Boosted: 1604
+ソルロック:    #-------------------------------------------------------------
+    ID: 338
+    Types:
+        - いわ
+        - エスパー
+    From:
+    To:
+    Stamina: 180
+    Attack: 178
+    Defense: 163
+    MAXCP:
+        Hatched: 1283
+        Reward: 962
+        Boosted: 1604
+ドジョッチ:    #-------------------------------------------------------------
+    ID: 339
+    Types:
+        - みず
+        - じめん
+    From:
+    To:
+    Stamina: 100
+    Attack: 93
+    Defense: 83
+    MAXCP:
+        Hatched: 409
+        Reward: 306
+        Boosted: 511
+ナマズン:    #---------------------------------------------------------------
+    ID: 340
+    Types:
+        - みず
+        - じめん
+    From:
+    To:
+    Stamina: 220
+    Attack: 151
+    Defense: 142
+    MAXCP:
+        Hatched: 1137
+        Reward: 853
+        Boosted: 1422
+ヘイガニ:    #---------------------------------------------------------------
+    ID: 341
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 86
+    Attack: 141
+    Defense: 113
+    MAXCP:
+        Hatched: 633
+        Reward: 474
+        Boosted: 791
+シザリガー:    #-------------------------------------------------------------
+    ID: 342
+    Types:
+        - みず
+        - あく
+    From:
+    To:
+    Stamina: 126
+    Attack: 224
+    Defense: 156
+    MAXCP:
+        Hatched: 1324
+        Reward: 993
+        Boosted: 1655
+ヤジロン:    #---------------------------------------------------------------
+    ID: 343
+    Types:
+        - じめん
+        - エスパー
+    From:
+    To:
+    Stamina: 80
+    Attack: 77
+    Defense: 131
+    MAXCP:
+        Hatched: 386
+        Reward: 290
+        Boosted: 483
+ネンドール:    #-------------------------------------------------------------
+    ID: 344
+    Types:
+        - じめん
+        - エスパー
+    From:
+    To:
+    Stamina: 120
+    Attack: 140
+    Defense: 236
+    MAXCP:
+        Hatched: 1018
+        Reward: 763
+        Boosted: 1272
+リリーラ:    #---------------------------------------------------------------
+    ID: 345
+    Types:
+        - いわ
+        - くさ
+    From:
+    To:
+    Stamina: 132
+    Attack: 105
+    Defense: 154
+    MAXCP:
+        Hatched: 675
+        Reward: 506
+        Boosted: 843
+ユレイドル:    #-------------------------------------------------------------
+    ID: 346
+    Types:
+        - いわ
+        - くさ
+    From:
+    To:
+    Stamina: 172
+    Attack: 152
+    Defense: 198
+    MAXCP:
+        Hatched: 1189
+        Reward: 892
+        Boosted: 1486
+アノプス:    #---------------------------------------------------------------
+    ID: 347
+    Types:
+        - いわ
+        - むし
+    From:
+    To:
+    Stamina: 90
+    Attack: 176
+    Defense: 100
+    MAXCP:
+        Hatched: 749
+        Reward: 561
+        Boosted: 936
+アーマルド:    #-------------------------------------------------------------
+    ID: 348
+    Types:
+        - いわ
+        - むし
+    From:
+    To:
+    Stamina: 150
+    Attack: 222
+    Defense: 183
+    MAXCP:
+        Hatched: 1528
+        Reward: 1146
+        Boosted: 1911
+ヒンバス:    #---------------------------------------------------------------
+    ID: 349
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 40
+    Attack: 29
+    Defense: 102
+    MAXCP:
+        Hatched: 125
+        Reward: 94
+        Boosted: 157
+ミロカロス:    #-------------------------------------------------------------
+    ID: 350
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 190
+    Attack: 192
+    Defense: 242
+    isNotWild: 1
+    MAXCP:
+        Hatched: 1695
+        Reward:
+        Boosted:
+ポワルン:    #---------------------------------------------------------------
+    ID: 351
+    Types:  # TODO フォルム別に調べるようにする（アローラの応用）
+        - ノーマル
+    From:
+    To:
+    Stamina: 140
+    Attack: 139
+    Defense: 139
+    MAXCP:
+        Hatched: 849
+        Reward: 636
+        Boosted: 1061
+カクレオン:    #-------------------------------------------------------------
+    ID: 352
+    Types:
+        - ノーマル
+    From:
+    To:
+    Stamina: 120
+    Attack: 161
+    Defense: 212
+    isNotAvailable: 1
+    MAXCP:
+        Hatched:
+        Reward:
+        Boosted:
+カゲボウズ:    #-------------------------------------------------------------
+    ID: 353
+    Types:
+        - ゴースト
+    From:
+    To:
+    Stamina: 88
+    Attack: 138
+    Defense: 66
+    MAXCP:
+        Hatched: 498
+        Reward: 374
+        Boosted: 623
+ジュペッタ:    #-------------------------------------------------------------
+    ID: 354
+    Types:
+        - ゴースト
+    From:
+    To:
+    Stamina: 128
+    Attack: 218
+    Defense: 127
+    MAXCP:
+        Hatched: 1184
+        Reward: 888
+        Boosted: 1481
+ヨマワル:    #---------------------------------------------------------------
+    ID: 355
+    Types:
+        - ゴースト
+    From:
+    To:
+    Stamina: 40
+    Attack: 70
+    Defense: 162
+    MAXCP:
+        Hatched: 299
+        Reward: 224
+        Boosted: 374
+サマヨール:    #-------------------------------------------------------------
+    ID: 356
+    Types:
+        - ゴースト
+    From:
+    To:
+    Stamina: 80
+    Attack: 124
+    Defense: 234
+    MAXCP:
+        Hatched: 762
+        Reward: 572
+        Boosted: 953
+トロピウス:    #-------------------------------------------------------------
+    ID: 357
+    Types:
+        - くさ
+        - ひこう
+    From:
+    To:
+    Stamina: 198
+    Attack: 136
+    Defense: 165
+    MAXCP:
+        Hatched: 1055
+        Reward: 791
+        Boosted: 1319
+チーリン:    #---------------------------------------------------------------
+    ID: 358
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 150
+    Attack: 175
+    Defense: 174
+    MAXCP:
+        Hatched: 1197
+        Reward: 898
+        Boosted: 1496
+アブソル:    #---------------------------------------------------------------
+    ID: 359
+    Types:
+        - あく
+    From:
+    To:
+    Stamina: 130
+    Attack: 246
+    Defense: 120
+    MAXCP:
+        Hatched: 1303
+        Reward: 977
+        Boosted: 1629
+ソーナノ:    #---------------------------------------------------------------
+    ID: 360
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina: 190
+    Attack: 41
+    Defense: 86
+    isNotWild: 1
+    MAXCP:
+        Hatched: 287
+ユキワラシ:    #-------------------------------------------------------------
+    ID: 361
+    Types:
+        - こおり
+    From:
+    To:
+    Stamina: 100
+    Attack: 95
+    Defense: 95
+    MAXCP:
+        Hatched: 441
+        Reward: 331
+        Boosted: 551
+オニゴーリ:    #-------------------------------------------------------------
+    ID: 362
+    Types:
+        - こおり
+    From:
+    To:
+    Stamina: 160
+    Attack: 162
+    Defense: 162
+    MAXCP:
+        Hatched: 1111
+        Reward: 833
+        Boosted: 1389
+タマザラシ:    #-------------------------------------------------------------
+    ID: 363
+    Types:
+        - こおり
+        - みず
+    From:
+    To:
+    Stamina: 140
+    Attack: 95
+    Defense: 90
+    MAXCP:
+        Hatched: 500
+        Reward: 375
+        Boosted: 626
+トドグラー:    #-------------------------------------------------------------
+    ID: 364
+    Types:
+        - こおり
+        - みず
+    From:
+    To:
+    Stamina: 180
+    Attack: 137
+    Defense: 132
+    MAXCP:
+        Hatched: 918
+        Reward: 688
+        Boosted: 1148
+トドゼルガ:    #-------------------------------------------------------------
+    ID: 365
+    Types:
+        - こおり
+        - みず
+    From:
+    To:
+    Stamina: 220
+    Attack: 182
+    Defense: 176
+    MAXCP:
+        Hatched: 1489
+        Reward: 1117
+        Boosted: 1862
+パールル:    #---------------------------------------------------------------
+    ID: 366
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 70
+    Attack: 133
+    Defense: 149
+    isNotAvailable: 1
+    MAXCP:
+        Hatched:
+        Reward:
+        Boosted:
+ハンテール:    #-------------------------------------------------------------
+    ID: 367
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 110
+    Attack: 197
+    Defense: 194
+    isNotAvailable: 1
+    MAXCP:
+        Hatched:
+        Reward:
+        Boosted:
+サクラビス:    #-------------------------------------------------------------
+    ID: 368
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 110
+    Attack: 211
+    Defense: 194
+    isNotAvailable: 1
+    MAXCP:
+        Hatched:
+        Reward:
+        Boosted:
+ジーランス:    #-------------------------------------------------------------
+    ID: 369
+    Types:
+        - みず
+        - いわ
+    From:
+    To:
+    Stamina: 200
+    Attack: 162
+    Defense: 234
+    MAXCP:
+        Hatched: 1461
+        Reward: 1096
+        Boosted: 1827
+ラブカス:    #---------------------------------------------------------------
+    ID: 370
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 86
+    Attack: 81
+    Defense: 134
+    MAXCP:
+        Hatched: 420
+        Reward: 315
+        Boosted: 525
+タツベイ:    #---------------------------------------------------------------
+    ID: 371
+    Types:
+        - ドラゴン
+    From:
+    To:
+    Stamina: 90
+    Attack: 134
+    Defense: 107
+    MAXCP:
+        Hatched: 601
+        Reward: 451
+        Boosted: 752
+コモルー:    #---------------------------------------------------------------
+    ID: 372
+    Types:
+        - ドラゴン
+    From:
+    To:
+    Stamina: 130
+    Attack: 172
+    Defense: 179
+    MAXCP:
+        Hatched: 1119
+        Reward: 839
+        Boosted: 1399
+ボーマンダ:    #-------------------------------------------------------------
+    ID: 373
+    Types:
+        - ドラゴン
+        - ひこう
+    From:
+    To:
+    Stamina: 190
+    Attack: 277
+    Defense: 168
+    MAXCP:
+        Hatched: 2018
+        Reward: 1514
+        Boosted: 2523
+ダンバル:    #---------------------------------------------------------------
+    ID: 374
+    Types:
+        - はがね
+        - エスパー
+    From:
+    To:
+    Stamina: 80
+    Attack: 96
+    Defense: 141
+    MAXCP:
+        Hatched: 482
+        Reward: 361
+        Boosted: 602
+メタング:    #---------------------------------------------------------------
+    ID: 375
+    Types:
+        - はがね
+        - エスパー
+    From:
+    To:
+    Stamina: 120
+    Attack: 138
+    Defense: 185
+    MAXCP:
+        Hatched: 897
+        Reward: 673
+        Boosted: 1121
+メタグロス:    #-------------------------------------------------------------
+    ID: 376
+    Types:
+        - はがね
+        - エスパー
+    From:
+    To:
+    Stamina: 160
+    Attack: 257
+    Defense: 247
+    MAXCP:
+        Hatched: 2078
+        Reward: 1559
+        Boosted: 2598
+レジロック:    #-------------------------------------------------------------
+    ID: 377
+    Types:
+        - いわ
+    From:
+    To:
+    Stamina: 160
+    Attack: 179
+    Defense: 356
+    isNotAvailable: 1
+    MAXCP:
+        Hatched:
+        Reward:
+        Boosted:
+レジアイス:    #-------------------------------------------------------------
+    ID: 378
+    Types:
+        - こおり
+    From:
+    To:
+    Stamina: 160
+    Attack: 179
+    Defense: 356
+    MAXCP:
+        Hatched: 1764
+        Reward: 1323
+        Boosted: 2205
+レジスチル:    #-------------------------------------------------------------
+    ID: 379
+    Types:
+        - はがね
+    From:
+    To:
+    Stamina: 160
+    Attack: 143
+    Defense: 285
+    MAXCP:
+        Hatched: 1292
+        Reward: 969
+        Boosted: 1615
+ラティアス:    #-------------------------------------------------------------
+    ID: 380
+    Types:
+        - ドラゴン
+        - エスパー
+    From:
+    To:
+    Stamina: 160
+    Attack: 228
+    Defense: 268
+    MAXCP:
+        Hatched: 1929
+        Reward: 1447
+        Boosted: 2412
+ラティオス:    #-------------------------------------------------------------
+    ID: 381
+    Types:
+        - ドラゴン
+        - エスパー
+    From:
+    To:
+    Stamina: 160
+    Attack: 268
+    Defense: 228
+    MAXCP:
+        Hatched: 2082
+        Reward: 1562
+        Boosted: 2603
+カイオーガ:    #-------------------------------------------------------------
+    ID: 382
+    Types:
+        - みず
+    From:
+    To:
+    Stamina: 182
+    Attack: 270
+    Defense: 251
+    MAXCP:
+        Hatched: 2328
+        Reward: 1746
+        Boosted: 2910
+グラードン:    #-------------------------------------------------------------
+    ID: 383
+    Types:
+        - じめん
+    From:
+    To:
+    Stamina: 182
+    Attack: 270
+    Defense: 251
+    MAXCP:
+        Hatched: 2328
+        Reward: 1746
+        Boosted: 2910
+レックウザ:    #-------------------------------------------------------------
+    ID: 384
+    Types:
+        - ドラゴン
+        - ひこう
+    From:
+    To:
+    Stamina: 191
+    Attack: 284
+    Defense: 170
+    MAXCP:
+        Hatched: 2083
+        Reward: 1562
+        Boosted: 2604
+ジラーチ:    #---------------------------------------------------------------
+    ID: 385
+    Types:
+        - はがね
+        - エスパー
+    From:
+    To:
+    Stamina: 200
+    Attack: 210
+    Defense: 210
+    isNotAvailable: 1
+    MAXCP:
+        Hatched:
+        Reward:
+        Boosted:
+デオキシス:    #-------------------------------------------------------------
+    ID: 386
+    Types:
+        - エスパー
+    From:
+    To:
+    Stamina:
+    Attack:
+    Defense:
+    isNotAvailable: 1
+    MAXCP:
+    Hatched:
+    Reward:
+    Boosted:

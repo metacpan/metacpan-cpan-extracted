@@ -1,2 +1,4 @@
+0.1.1
+  * use IO::Handle was missing
 0.1.0
   * initial version

@@ -25,7 +25,23 @@ This list shall expand as the release grows.
 our $FIRST_SEASON = 1917;
 our @LOCKOUT_SEASONS = qw(2004);
 
+our %DEFAULTED_GAMES = (
+	191720035 => 1,
+	191720036 => 1,
+);
 our %TEAMS = (
+	MWN => {
+		defunct => 1,
+		long    => [],
+		short   => [],
+		full    => [('Montreal Wanderers')],
+	},
+	MMR => {
+		defunct => 1,
+		long    => [],
+		short   => [],
+		full    => [('Montreal Maroons')],
+	},
 	BRK => {
 		defunct => 1,
 		long => [],
@@ -47,7 +63,7 @@ our %TEAMS = (
 	MET => {
 		long => [],
 		defunct => 1,
-		short => [],
+		short => ['SEA'],
 		full => [('Seattle Metropolitans')],
 	},
 	VIC => {
@@ -155,10 +171,10 @@ our %TEAMS = (
 		short => [qw()],
 		full => [('Boston Bruins')],
 	},
-	CBN => {
+	CLE => {
 		defunct => 1,
 		long => [qw(Barons Seals)],
-		short => [qw(CSE OAK CGS)],
+		short => [qw(CSE OAK CGS CBN)],
 		full => [('Cleveland Barons', 'California Golden Seals', 'Oakland Seals')],
 	},
 	EDM => {
@@ -258,11 +274,301 @@ our $SECONDARY_GAME_FILE = 'BS.html';
 our $REGULAR = 2;
 our $PLAYOFF = 3;
 
+our $UNKNOWN_PLAYER_ID = 8000000;
+our $BENCH_PLAYER_ID   = 8000001;
+our $COACH_PLAYER_ID   = 8000002;
+our $EMPTY_NET_ID      = 8000003;
+
+our %VOCABULARY = (
+	penalty     => {
+		'3 MINUTE MINOR'                               => [],
+		'ABUSE OF OFFICIALS'                           => [
+			'ABUSE OF OFFICIASL',
+		],
+		'ABUSIVE LANGUAGE'                             => [],
+		'ABUSIVE LANGUAGE - GAME'                      => [],
+		'AGGRESSOR'                                    => [],
+		'ATTEMPT TO/DELIBERATE INJURY - MATCH PENALTY' => [
+			'ATTEMPT TO/DELIBERATE INJURY',
+			'ATTEMPT TO INJURE',
+			'MATCH - ATTEMPT TO INJURE',
+			'ATTEMPT TO/DELIBERATE INJURY (MAT)',
+		],
+		'BENCH'                                        => [],
+		'BOARDING'                                     => [ 'BOARD CHECK' ],
+		'BUTT ENDING'                                  => [],
+		'CHARGING'                                     => [],
+		'CHECKING FROM BEHIND'                         => [],
+		'CLIPPING'                                     => [],
+		'CLOSING HAND ON PUCK'                         => [ 'DELAYING GAME - SMOTHERING PUCK' ],
+		'COACH/MGR ON ICE'                             => [
+			'COACG OR MANAGER ON THE ICE',
+			'COACH OR MANAGER ON THE ICE',
+		],
+		'CONCEALING PUCK'                              => [],
+		'COVERING PUCK IN CREASE'                      => [ 'COVERING PACK IN CREASE' ],
+		'CROSS CHECKING',                              => [ 'CROSS CHECK' ],
+		'DELAYING GAME - FACE - OFF VIOLATION'         => [
+			'DELAYING THE GAME - FACE - OFF VIOLATION',
+			'DELAY GM - FACE-OFF VIOLATION',
+			'FACE-OFF VIOLATION',
+		],
+		'DELAYING GAME - ILL. PLAY GOALIE'             => [
+			'DELAYING GAME - ILLEGAL PLAY BY GOALIE',
+			'DELAYING GAME - ILLEGAL PLAY BY GOALKEEPER',
+			'DELAY GAME - ILLEGAL PLAY GOAL',
+		],
+		'DELAYING GAME - PUCK OVER GLASS'              => [
+			'DELAY GAME - PUCK OVER GLASS',
+			'DELAYING GAME-PUCK OVER GLASS',
+		],
+		'DELAYING THE GAME'                            => [ 'DELAYING GAME', 'DELAY OF GAME' ],
+		'DIVING'                                       => [
+			'UNSPORTSMANLIKE CONDUCT DIVING',
+			'EMBELLISHMENT',
+		],
+		'ELBOWING'                                     => [],
+		'FIGHTING'                                     => [],
+		'GAME MISCONDUCT'                              => [],
+		'GAME MISCONDUCT - TEAM STAFF'                 => [],
+		'GAME MISCONDUCT - HEAD COACH'                 => [ 'GAME MISCONDUCT - HEAD' ],
+		'GOALIE LEAVE CREASE'                          => [],
+		"GOALIE PARTICIPAT'N BYD CENTER"               => [
+			'GOALIE PARTICIPATION BEYOND CENTER',
+			'GOALKEEPER PARTICIPATION BEYOND CENTER',
+		],
+		'GOALKEEPER DISPLACED NET'                     => [],
+		'GROSS MISCONDUCT'                             => [
+			'20 MINUTE MATCH',
+			'MATCH PENALTY',
+		],
+		'HEAD BUTTING'                                 => [],
+		'HEAD BUTTING - GAME'                          => [],
+		'HI-STICKING'                                  => [
+			'HI STICK',
+		],
+		'HOLDING'                                      => [],
+		'HOLDING ON BREAKAWAY'                         => [],
+		'HOLDING THE STICK'                            => [ 'HOLDING STICK' ],
+		'HOLDING STICK ON BREAKAWAY'                   => [],
+		HOOKING                                        => [],
+		'HOOKING ON BREAKAWAY'                         => [],
+		'ILLEGAL EQUIPMENT'                            => [],
+		'ILLEGAL STICK'                                => [ 'BROKEN STICK' ],
+		'ILLEGAL SUBSTITUTION'                         => [],
+		'ILLEGAL CHECK TO HEAD'                        => [],
+		'INELIGIBLE PLAYER'                            => [],
+		'INSTIGATOR'                                   => [],
+		'INSTIGATOR - FACE SHIELD'                     => [],
+		'INSTIGATOR - MISCONDUCT'                      => [],
+		'INTERFERENCE'                                 => [],
+		'INTERFERENCE ON GOALKEEPER'                   => [
+			'INTERFERENCE - GOALKEEPER',
+			'INTERFERENCE - GOALTENDER',
+		],
+		'INTERFERE W/ OFFICIAL'                        => [ 'INTERFERENCE WITH OFFICIAL' ],
+		'KICKING'                                      => [],
+		'KNEEING'                                      => [],
+		'LATE ON ICE'                                  => [],
+		'LEAVING PENALTY BOX'                          => [],
+		'LEAVING PLAYER\'S/PENALTY BENCH'              => [
+			'PLAYER LEAVES BENCH',
+			'PLAYERS LEAVING BENCH',
+		],
+		'MATCH - DELIBERATE INJURY'                    => [ 'DELIBERATE INJURY' ],
+		'MISCONDUCT'                                   => [],
+		'NET DISPLACED'                                => [],
+		'NOT PROC. TO DRESS.RM.'                       => [
+			'NOT PROCEDING TO DRESSING ROOM',
+			'NOT PROCEEDING TO DRESSING ROOM',
+		],
+		'NOT PROCEEDING DIR PEN/BOX'                   => [ 'NOT PROCEEDING DIRECTLY TO PENALTY BOX' ],
+		'OBJECTS ON ICE'                               => [],
+		'PICKING UP PUCK IN CREASE'                    => [],
+		'PUCK THROWN FWD - GOALKEEPER'                 => [ 'PUCK THROWN FORWARD - GOALKEEPER' ],
+		'REFUSAL TO PLAY'                              => [],
+		'REMOVING SWEATER'                             => [],
+		ROUGHING                                       => [],
+		SLASHING                                       => [],
+		'SLASH ON BREAKAWAY'                           => [],
+		'SPEARING'                                     => [],
+		'THROWING OBJECT ON ICE'                       => [],
+		'THROW OBJECT AT PUCK'                         => [
+			'THOW OBJECT AT PU{',
+			'THOW OBJECT AT PUCK',
+		],
+		'THROWING STICK'                               => [],
+		'TOO MANY MEN/ICE'                             => [ 'TOO MANY MEN/ICE - BENCH', 'TOO MANY MEN ON THE ICE' ],
+		TRIPPING                                       => [],
+		'TRIPPING ON BREAKAWAY'                        => [],
+		'UNNECESSARY ROUGHNESS'                        => [],
+		'UNSPORTSMANLIKE CONDUCT'                      => [],
+		'UNSPORTSMANLIKE CONDUCT - COACH'              => [],
+		'UNKNOWN'                                      => [
+			'PENALTY SHOT',
+			'MAJOR',
+			'MINOR',
+		],
+		'ABUSIVE LANGUAGE - MISCONDUCT'                => [],
+	},
+	stopreason => {
+		'CHALLENGE AWAY: OFF-SIDE'              => [ 'CHLG VIS - OFF-SIDE' ],
+		'CHALLENGE HOME: OFF-SIDE'              => [ 'CHLG HM - OFF-SIDE' ],
+		'CHALLENGE LEAGUE: OFF-SIDE'            => [ 'CHLG LEAGUE - OFF-SIDE' ],
+		'CHALLENGE LEAGUE: GOALIE INTERFERENCE' => [ 'CHLG LEAGUE- GOAL INTERFERENCE' ],
+		'CHALLENGE HOME: GOALIE INTERFERENCE'   => [ 'CHLG HM - GOAL INTERFERENCE', ],
+		'CHALLENGE AWAY: GOALIE INTERFERENCE'   => [ 'CHLG VIS - GOAL INTERFERENCE' ],
+		'GOALIE STOPPED'                        => [],
+		'HIGH STICK'                            => [],
+		'HOME TIMEOUT'                          => [ 'TIME OUT - HOME' ],
+		ICING                                   => [],
+		OFFSIDE                                 => [],
+		'OFFSIDES PASS'                         => [],
+		'PUCK IN NETTING'                       => [],
+		'PUCK IN CROWD'                         => [],
+		'REFEREE OR LINESMAN'                   => [
+			'OFFICIAL INJURY',
+			'REFEREE',
+			'LINESMAN',
+		],
+		'TV TIMEOUT'                            => [],
+		'PUCK FROZEN'                           => [],
+		'NET OFF POST'                          => [],
+		'TIME OUT - VISITOR'                    => [ 'VISITOR TIMEOUT' ],
+		'HAND PASS'                             => [],
+		'PREMATURE SUBSTITUTION'                => [],
+		'INJURY'                                => [ 'PLAYER INJURY' ],
+		'RINK REPAIR'                           => [ 'ICE PROBLEM' ],
+		'OBJECTS ON ICE'                        => [],
+		'CLOCK PROBLEM'                         => [],
+		UNKNOWN                                 => [],
+		'PUCK IN BENCHES'                       => [],
+		'INVALID SHOOTOUT EVENT: ICING'         => [],
+		'NET OFF'                               => [],
+		'VIDEO REVIEW'                          => [],
+		'PLAYER EQUIPMENT'                      => [],
+		'SWITCH SIDES'                          => [],
+	},
+	miss        => {
+		WIDE     => [ 'WIDE OF NET' ],
+		CROSSBAR => [ 'HIT CROSSBAR' ],
+		OVER     => [ 'OVER NET' ],
+		GOALPOST => [],
+		UNKNOWN  => [ '' ],
+	},
+	shot_type   => {
+		SLAP          => [ 'SLAP SHOT' ],
+		SNAP          => [ 'SNAP SHOT' ],
+		WRIST         => [ 'WRIST SHOT' ],
+		BACKHAND      => [],
+		'TIP-IN'      => [],
+		UNKNOWN       => [ '', ' ' ],
+		'WRAP-AROUND' => [],
+		DEFLECTED     => [],
+	},
+	strength    => {
+		'EV' => [ 'EVEN' ],
+		'PP' => [ 'PPG' ],
+		'SH' => [ 'SHG' ],
+		'PS' => [],
+		'XX' => [ '', ' ' ],
+	},
+	events      => {
+		BLOCK => [ 'BLOCKED_SHOT' ],
+		CHL   => [ 'CHALLENGE' ],
+		FAC   => [ 'FACEOFF' ],
+		GEND  => [ 'GAME_END' ],
+		GIVE  => [ 'GIVEAWAY' ],
+		GOAL  => [],
+		HIT   => [],
+		MISS  => [ 'MISSED_SHOT' ],
+		PEND  => [ 'PERIOD_END' ],
+		PENL  => [ 'PENALTY', 'FIGHT' ],
+		PSTR  => [ 'PERIOD_START' ],
+		SHOT  => [],
+		STOP  => [],
+		TAKE  => [ 'TAKEAWAY' ],
+	},
+);
+
+our %DATA_BY_SEASON = (
+	attendance  => 2010,
+	coordinates => 2010,
+	location    => 1997,
+	officials   => 2011,
+	on_ice      => 2007,
+	pb_list     => 2018,
+	periods     => 2010,
+	severity    => 2010,
+	shot_types  => 2008,
+	stars       => 1998,
+	strength    => 1998,
+);
+
+our %STAT_RECORD_FROM = (
+	assists                 => $FIRST_SEASON,
+	goals                   => $FIRST_SEASON,
+	number                  => $FIRST_SEASON,
+	penaltyMinutes          => $FIRST_SEASON,
+	pim                     => $FIRST_SEASON,
+	timeOnIce               => $FIRST_SEASON,
+	shots                   => 1959,
+	plusMinus               => 1959,
+	powerPlayGoals          => 1933,
+	powerPlayAssists        => 1933,
+	saves                   => 1955,
+	shortHandedGoals        => 1933,
+	shortHandedAssists      => 1933,
+	evenSaves               => 1997,
+	evenShotsAgainst        => 1997,
+	evenTimeOnIce           => 1997,
+	faceoffTaken            => 1997,
+	faceOffWins             => 1997,
+	powerPlaySaves          => 1997,
+	powerPlayShotsAgainst   => 1997,
+	powerPlayTimeOnIce      => 1997,
+	shortHandedSaves        => 1997,
+	shortHandedShotsAgainst => 1997,
+	shortHandedTimeOnIce    => 1997,
+	start                   => 2003,
+	blocked                 => 2010, # 1998 in html
+	giveaways               => 2010, # 1998 not in html
+	hits                    => 2010, # 1998 in html
+	takeaways               => 2010, # 1998 in html
+);
+
+our %REASONABLE_EVENTS = (
+	old => 1, new => 150,
+);
+
+our %PENALTY_POSSIBLE_NO_OFFENDER = (
+	'TOO MANY MEN/ICE'                => 1,
+	'DELAYING THE GAME'               => 1,
+	'ABUSE OF OFFICIALS'              => 1,
+	'ABUSIVE LANGUAGE'                => 1,
+	'NOT PROCEEDING DIR PEN/BOX'      => 1,
+	'UNSPORTSMANLIKE CONDUCT'         => 1,
+	'UNKNOWN'                         => 1,
+	'LATE ON ICE'                     => 1,
+	'ILLEGAL SUBSTITUTION'            => 1,
+	'LEAVING PLAYER\'S/PENALTY BENCH' => 1,
+	'OBJECTS ON ICE'                  => 1,
+	'UNSPORTSMANLIKE CONDUCT - COACH' => 1,
+	'GROSS MISCONDUCT'                => 1,
+);
+
+our $LAST_PLAYOFF_GAME_INDEX = 417;
+our $LATE_START_IN_2012      = 1367330000;
+
 our @EXPORT = qw(
-	$REGULAR $PLAYOFF
+	$REGULAR $PLAYOFF $LAST_PLAYOFF_GAME_INDEX $LATE_START_IN_2012 %DEFAULTED_GAMES
 	$FIRST_SEASON @LOCKOUT_SEASONS %FIRST_REPORT_SEASONS
 	$MAIN_GAME_FILE $SECONDARY_GAME_FILE
 	%TEAMS
+	$UNKNOWN_PLAYER_ID $BENCH_PLAYER_ID $COACH_PLAYER_ID $EMPTY_NET_ID
+	%VOCABULARY
+	%DATA_BY_SEASON %STAT_RECORD_FROM %REASONABLE_EVENTS
+	%PENALTY_POSSIBLE_NO_OFFENDER
 );
 
 1;

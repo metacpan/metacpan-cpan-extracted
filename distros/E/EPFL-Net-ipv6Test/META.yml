@@ -1,0 +1,30 @@
+---
+abstract: 'Website IPv6 accessibility validator API'
+author:
+  - 'William Belle <william.belle@gmail.com>'
+build_requires:
+  File::Copy::Recursive: '0.44'
+  File::Find::Rule: '0.34'
+  Test::Deep: '1.128'
+  Test::MockModule: '0.15'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: EPFL-Net-ipv6Test
+provides:
+  EPFL::Net::ipv6Test:
+    file: lib/EPFL/Net/ipv6Test.pm
+    version: '1.01'
+requires:
+  JSON: '2.97'
+  LWP::UserAgent: '6.34'
+  Readonly: '2.05'
+  Term::ANSIColor: '4.06'
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

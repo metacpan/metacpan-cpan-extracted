@@ -4,7 +4,7 @@ WWW::Mechanize::GZip - tries to fetch webpages with gzip-compression
 
 =head1 VERSION
 
-Version 0.10
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -23,19 +23,15 @@ gzip-compression from the webserver.
 
 If the response contains a header with 'Content-Encoding: gzip', it
 decompresses the response in order to get the original (uncompressed) content.
-
-This module will help to reduce bandwith fetching webpages, if supported by the
-webeserver. If the webserver does not support gzip-compression, no decompression
-will be made.
+ 
+This module will help to reduce bandwidth fetching webpages, if supported by the 
+webeserver. If the webserver does not support gzip-compression, no decompression 
+will be made. 
 
 This modules is a direct subclass of L<WWW::Mechanize> and will therefore support
 any methods provided by L<WWW::Mechanize>.
 
 The decompression is handled by L<Compress::Zlib>::memGunzip.
-
-There is a small webform, you can instantly test, whether a webserver supports
-gzip-compression on a particular URL:
-L<http://www.computerhandlung.de/www-mechanize-gzip.htm>
 
 =head2 METHODS
 
@@ -74,7 +70,7 @@ modify it under the same terms as Perl itself.
 
 package WWW::Mechanize::GZip;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use strict;
 use warnings;

@@ -1,0 +1,8 @@
+lib/QuickTermChart/QuickTermChart.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+script/quick_term_chart
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

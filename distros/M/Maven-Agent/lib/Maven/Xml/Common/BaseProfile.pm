@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Common::BaseProfile;
-$Maven::Xml::Common::BaseProfile::VERSION = '1.14';
+$Maven::Xml::Common::BaseProfile::VERSION = '1.15';
 # ABSTRACT: Maven BaseProfile element
 # PODNAME: Maven::Xml::Common::BaseProfile
 
@@ -54,7 +54,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Common::BaseProfile::Activation;
-$Maven::Xml::Common::BaseProfile::Activation::VERSION = '1.14';
+$Maven::Xml::Common::BaseProfile::Activation::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -82,7 +82,7 @@ sub _get_parser {
 }
 
 package Maven::Xml::Common::BaseProfile::Activation::Os;
-$Maven::Xml::Common::BaseProfile::Activation::Os::VERSION = '1.14';
+$Maven::Xml::Common::BaseProfile::Activation::Os::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -95,7 +95,7 @@ __PACKAGE__->mk_ro_accessors(
 );
 
 package Maven::Xml::Common::BaseProfile::Activation::Property;
-$Maven::Xml::Common::BaseProfile::Activation::Property::VERSION = '1.14';
+$Maven::Xml::Common::BaseProfile::Activation::Property::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -106,7 +106,7 @@ __PACKAGE__->mk_ro_accessors(
 );
 
 package Maven::Xml::Common::BaseProfile::Activation::File;
-$Maven::Xml::Common::BaseProfile::Activation::File::VERSION = '1.14';
+$Maven::Xml::Common::BaseProfile::Activation::File::VERSION = '1.15';
 use parent qw(Maven::Xml::XmlNodeParser);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(
@@ -128,7 +128,7 @@ Maven::Xml::Common::BaseProfile - Maven BaseProfile element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

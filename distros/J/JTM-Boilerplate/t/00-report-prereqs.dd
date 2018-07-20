@@ -63,7 +63,6 @@ do { my $x = {
                                       'MIME::Base64' => '3.15',
                                       'Mail::Sender' => 'v0.8.23',
                                       'Math::Random::ISAAC::XS' => '1.004',
-                                      'Mercury' => '0.008',
                                       'Mojolicious' => '6.65',
                                       'Moose' => '2.1604',
                                       'Moose::Util::TypeConstraints' => '2.1604',

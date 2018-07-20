@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.47';
+$Map::Tube::CLI::VERSION   = '0.49';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,11 +9,12 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.47
+Version 0.49
 
 =cut
 
 use 5.006;
+use utf8::all;
 use Data::Dumper;
 use MIME::Base64;
 use Map::Tube::Exception::MissingStationName;
@@ -28,6 +29,7 @@ use Module::Pluggable
     inner       => 0,
     max_depth   => 3;
 
+use Text::ASCIITable;
 use Moo;
 use namespace::autoclean;
 use MooX::Options;
@@ -45,17 +47,23 @@ You can list all command line options by giving C<-h> flag.
     $ map-tube -h
     USAGE: map-tube [-h] [long options...]
 
-        --map=String    Map name
-        --start=String  Start station name
-        --end=String    End station name
-        --preferred     Show preferred route
-        --generate_map  Generate map as image
-        --line=String   Line name for map
+        --map=String     Map name
+        --start=String   Start station name
+        --end=String     End station name
+        --preferred      Show preferred route
+        --generate_map   Generate map as image
+        --line=String    Line name for map
+        --line_mappings  Generate line mappings
+        --line_notes     Generate line notes
 
-        --usage         show a short help message
-        -h              show a compact help message
-        --help          show a long help message
-        --man           show the manual
+        --usage          show a short help message
+        -h               show a compact help message
+        --help           show a long help message
+        --man            show the manual
+
+=head1 COMMON USAGES
+
+=head2 Shortest Route
 
 You can also ask for shortest route in London Tube Map as below:
 
@@ -63,11 +71,35 @@ You can also ask for shortest route in London Tube Map as below:
 
     Baker Street (Bakerloo, Circle, Hammersmith & City, Jubilee, Metropolitan), Great Portland Street (Circle, Hammersmith & City, Metropolitan), Euston Square (Circle, Hammersmith & City, Metropolitan)
 
+=head2 Preferred Shortest Route
+
 Now request for preferred route as below:
 
     $ map-tube --map 'London' --start 'Baker Street' --end 'Euston Square' --preferred
 
     Baker Street (Circle, Hammersmith & City, Metropolitan), Great Portland Street (Circle, Hammersmith & City, Metropolitan), Euston Square (Circle, Hammersmith & City, Metropolitan)
+
+=head2 Generate Full Map
+
+To generate entire map, follow the command below:
+
+    $ map-tube --map 'Delhi' --generate_map
+
+=head2 Generate Just a Line Map
+
+To generate just a particular line map, follow the command below:
+
+    $ map-tube --map 'London' --line 'Bakerloo' --generate_map
+
+=head2 Generate Line Mappings
+
+    $ map-tube --map 'London' --line 'Bakerloo' --line_mappings
+
+=head2 Generate Line Notes
+
+    $ map-tube --map 'London' --line 'Bakerloo' --line_notes
+
+=head2 General Error
 
 If encountered  invalid  map  or  missing map i.e not installed, you get an error
 message like below:
@@ -77,14 +109,6 @@ message like below:
 
     $ map-tube --map 'Kazan' --start 'Baker Street' --end 'Euston Square'
     ERROR: Missing Map [Kazan].
-
-To generate entire map, follow the command below:
-
-    $ map-tube --map 'Delhi' --generate_map
-
-To generate just a particular line map, follow the command below:
-
-    $ map-tube --map 'London' --line 'Bakerloo' --generate_map
 
 =head1 SUPPORTED MAPS
 
@@ -233,6 +257,17 @@ sub run {
         print $IMAGE decode_base64($image_data);
         close($IMAGE);
     }
+    elsif ($self->line_mappings || $self->line_notes) {
+        my $map_object = $self->{maps}->{uc($map)};
+        my ($line_map_table, $line_map_notes) = _prepare_mapping_notes($map_object, $line);
+
+        if ($self->line_mappings) {
+            print $line_map_table;
+        }
+        if ($self->line_notes) {
+            print _line_notes($map_object, $map, $line_map_notes);
+        }
+    }
     else {
         print $self->{maps}->{uc($map)}->get_shortest_route($start, $end), "\n";
     }
@@ -241,6 +276,91 @@ sub run {
 #
 #
 # PRIVATE METHODS
+
+sub _prepare_mapping_notes {
+    my ($map, $line_name) = @_;
+
+    my $map_table = Text::ASCIITable->new;
+    $map_table->setCols('Station Name','Connected To');
+
+    my $stations = $map->get_stations($line_name);
+
+    my @station_names = ();
+    foreach my $station (@$stations) {
+        push @station_names, $station->name;
+    }
+
+    my $i = 0;
+    my $map_notes = {};
+    foreach (@station_names) {
+        my $a = $station_names[$i];
+        my $b = '';
+        if ($i == 0) {
+            $b = $station_names[$i+1];
+        }
+        elsif ($i == (@station_names-1)) {
+            $b = $station_names[$i-1];
+        }
+        else {
+            $b = sprintf("%s, %s", $station_names[$i-1], $station_names[$i+1]);
+        }
+
+        $map_table->addRow($a, $b);
+
+        _add_notes($map, $line_name, $map_notes, $a);
+
+        $i++;
+    }
+
+    return ($map_table, $map_notes);
+}
+
+sub _line_notes {
+    my ($map, $map_name, $line_map_notes) = @_;
+
+    my $all_lines = $map->get_lines;
+    my $line_package = {};
+    foreach my $line (@$all_lines) {
+        next unless (scalar(@{$line->get_stations}));
+        $line_package->{$line->name} = 1;
+    }
+
+    my $notes = "\n";
+    $notes   .= "=head1 NOTE\n\n";
+    $notes   .= "=over 2\n";
+
+    foreach my $station (sort keys %$line_map_notes) {
+        my $lines = $line_map_notes->{$station};
+        my $line  = shift @$lines;
+        next unless defined $line;
+
+        $notes .= sprintf("\n=item * The station %s is also part of\n", $station);
+        $notes .= sprintf("          L<%s Line|Map::Tube::%s::Line::%s>\n", $line, $map_name, $line);
+        foreach my $line (@$lines) {
+            next unless (exists $line_package->{$line});
+            $notes .= sprintf("        | L<%s Line|Map::Tube::%s::Line::%s>\n", $line, $map_name, $line);
+        }
+    }
+
+    $notes .= "\n=back\n";
+
+    return $notes;
+}
+
+sub _add_notes {
+    my ($map_object, $line_name, $notes, $station_name) = @_;
+
+    my $station_lines = $map_object->get_node_by_name($station_name)->line;
+    my $lines = [];
+    foreach my $line (@$station_lines) {
+        my $_line_name = $line->name;
+        next if ($_line_name eq $line_name);
+        push @$lines, $_line_name;
+    }
+    return unless (scalar(@$lines));
+
+    $notes->{$station_name} = $lines;
+}
 
 sub _map_key {
     my ($name) = @_;
@@ -291,7 +411,23 @@ sub _validate_param {
         }
     }
 
-    unless ($self->generate_map) {
+    if ($self->line_mappings || $self->line_notes) {
+        Map::Tube::Exception::MissingLineName->throw({
+            method      => __PACKAGE__."::_validate_param",
+            message     => "ERROR: Missing Line Name.",
+            filename    => $caller[1],
+            line_number => $caller[2] })
+            unless (defined $line);
+
+        Map::Tube::Exception::InvalidLineName->throw({
+            method      => __PACKAGE__."::_validate_param",
+            message     => "ERROR: Invalid Line Name [$line].",
+            filename    => $caller[1],
+            line_number => $caller[2] })
+            unless defined $self->{maps}->{uc($map)}->get_line_by_name($line);
+    }
+
+    unless ($self->generate_map || $self->line_mappings || $self->line_notes) {
         Map::Tube::Exception::MissingStationName->throw({
             method      => __PACKAGE__."::_validate_param",
             message     => "ERROR: Missing Station Name [start].",

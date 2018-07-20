@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+use 5.014 ; use strict ; use warnings ; 
+use Getopt::Std ; getopts '1ah/:' , \my%o ; 
+use Term::ANSIColor qw[:constants] ; $Term::ANSIColor::AUTORESET =  1 ;
+use Scalar::Util qw[looks_like_number] ; 
+use FindBin qw[$Script] ; 
+BEGIN{
+print STDERR BRIGHT_RED qq["$ARGV[0]" may be given as a file although it should consist of column numbers.\n] if -f $ARGV[0] ;
+}
+my @cols = split /[,\n\t]/, shift @ARGV , 0 ; # 指定された列が @cols に格納される。
+do { print STDERR BRIGHT_RED "[$Script] Numbers is not specified: @cols\n" ; exit 1 } if grep {! looks_like_number $_ } @cols ;
+do { print STDERR BRIGHT_RED "[$Script] Only 0 is specified: @cols\n" ; exit 1 } unless grep { $_ != 0} @cols ;
+
+my $sep = $o{'/'} // "\t" ; 
+my @ca = @cols ; # @colsが作業用に格納され、処理中に使われる。
+do{ select STDERR ; &HELP_MESSAGE } unless @cols ; 
+$o{h} ? & takehead : & packing ; 
+do { print "\n" for @ca } if $o{a} ; 
+exit 0 ; 
+
+sub takehead { 
+  while ( <> ) { 
+    my $c = shift @ca ; 
+    do { last if $o{1} ; @ca = @cols ; $c = shift @ca } if ! defined $c ; 
+    chomp ; 
+    my @F = split /$sep/,$_,-1 ; 
+    print join ( $sep , splice @F , ($c>0?0:$c) , abs $c ) , "\n" ; 
+  }
+}
+
+sub packing {
+  my $ind =  0 ;
+  while ( <> ) { 
+   $ind = shift @ca if $ind == 0 ;
+   do { last if $o{1} ; @ca = @cols ; $ind = shift @ca } if ! defined $ind  ; 
+   do { print "\n" ; redo } if $ind == 0 ;
+   $ind -- ;
+   chomp $_ ;
+   print $_ ; 
+   print $ind ? (eof () ) ? "\n" : $sep : "\n" ;  # () がつくことで@ARGV の各ファイルのEOFの検出では無くて、全部の最後を検出。
+  }
+}
+
+## ヘルプとバージョン情報
+BEGIN {
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  our $VERSION = 0.00_14 ;
+    # 最初は 0.21 を目安とする。
+    # 1.00 以上とする必要条件は英語版のヘルプをきちんと出すこと。
+    # 2.00 以上とする必要条件はテストコードが含むこと。
+    # 0.00_12 : オプションを変えた。-rを使わず、-1を使うようにした。最後が改行で終了しないことがあることを抑制。
+    # 0.00_13 : 列番号に0が指定された場合に対応。意味の無い指定に警告やエラーを出すようにした。
+    # 0.00_14 : 区切り文字を変更できるようにした。
+}  
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1 
+
+ $0 [-1] [-h] num1,num2,num3...,numk < somefile
+
+  指定された数に応じて、入力の複数の行をタブ文字区切りで1行にまとめる。
+  つまり、num1行を読んで1行にまとめ、次のnum2行を読んで1行にまとめ、ということを繰り返す。
+  numkをk番目の1行にまとめたら、-1が指定されていなければ、更にnum1行目をよんで1行に
+  まとめる手順に戻る。
+
+ $0 -h n1,n2,..,nk < somefile 
+
+  -hが指定された場合は、入力は各行がタブ区切りで列に区切られていると見なし、
+  各行の先頭からnumで指定された列だけ抽出する。
+  つまり入力の1行目のn1列を出力の1行目として取り出し、入力の2行目のn2列を出力の2行目
+  として取り出し、という処理が続く。負の数を指定すると、末尾の列から取り出す。
+  残った列は捨てられる。
+
+ 例: 
+   seq 10 | matrixpack 3 
+   seq 10 | matrixpack -/: 3,2
+   seq 20 | matrixpack 2,3,4
+   seq 100 | matrixpack 10 | matrixpack -h "`seq 5`"
+
+ オプション: 
+
+ -h : 入力のx行目についてからnx個取り出す(nxが負なら末尾から-nx個を取り出す)。
+ -1 : 引数に与えられた n1,n2,..,nk を通常は繰り返すが、-1が与えられたら繰り返さない。
+ -a : 入力が尽きるか、指定された数が尽きた場合でも、出力指定がある限り、空行を出力。(-pの場合のみ)
+ -/ str ; 区切り文字をタブ文字から変更する。
+
+ --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+ --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+ --version : バージョン情報の表示
+
+=cut 

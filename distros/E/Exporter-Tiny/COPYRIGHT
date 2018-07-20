@@ -16,18 +16,6 @@ Files: README
 Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: COPYRIGHT
- CREDITS
- Changes
- INSTALL
- LICENSE
- META.json
- META.yml
- Makefile.PL
- doap.ttl
-Copyright: Copyright 2017 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: lib/Exporter/Shiny.pm
  t/05shiny.t
  t/06notwant.t
@@ -36,6 +24,27 @@ Files: lib/Exporter/Shiny.pm
  t/09warnings.t
  t/10no.t
 Copyright: This software is copyright (c) 2014, 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ INSTALL
+ LICENSE
+ Makefile.PL
+Copyright: Copyright 1970 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+Copyright: Copyright 2018 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/11noncode.t
+ t/12noncodegenerators.t
+ t/13doesntexist.t
+Copyright: This software is copyright (c) 2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
@@ -47,15 +56,19 @@ Files: SIGNATURE
 Copyright: None
 License: public-domain
 
+Files: TODO
+Copyright: Unknown
+License: Unknown
+
 License: Artistic-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  

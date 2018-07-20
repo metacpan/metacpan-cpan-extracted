@@ -18,6 +18,7 @@ WriteMakefile(
 	'Test::TempDir::Tiny' => 0,
 	'DateTime' => 0,
 	# 'Test::Kwalitee' => 0,
+	'WWW::RT::CPAN' => 0
     },
     PREREQ_PM => {
 	'Carp' => 0,

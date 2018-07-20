@@ -1,6 +1,7 @@
 package HTTP::Exception::3XX;
-$HTTP::Exception::3XX::VERSION = '0.04006';
+$HTTP::Exception::3XX::VERSION = '0.04007';
 use strict;
+use warnings;
 use base 'HTTP::Exception::Base';
 
 sub is_info         () { '' }
@@ -32,7 +33,7 @@ HTTP::Exception::3XX - Base Class for 3XX (redirect) Exceptions
 
 =head1 VERSION
 
-version 0.04006
+version 0.04007
 
 =head1 SYNOPSIS
 

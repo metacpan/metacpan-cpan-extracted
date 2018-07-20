@@ -45,8 +45,8 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     printf("%s", SPVM_OP_C_ID_NAMES[id]);
     if (op_cur->id == SPVM_OP_C_ID_CONSTANT) {
       SPVM_CONSTANT* constant = op_cur->uv.constant;
-      printf(" %s", SPVM_BASIC_TYPE_C_ID_NAMES[constant->type->basic_type->id]);
       if (constant->type->dimension == 0) {
+        printf(" %s", SPVM_BASIC_TYPE_C_ID_NAMES[constant->type->basic_type->id]);
         switch (constant->type->basic_type->id) {
           case SPVM_BASIC_TYPE_C_ID_BYTE:
             printf(" %" PRId8, constant->value.bval);
@@ -69,15 +69,10 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
         }
       }
       else if (constant->type->dimension == 1 && constant->type->basic_type->id == SPVM_BASIC_TYPE_C_ID_BYTE) {
-        printf(" \"%s\"", (char*)constant->value.oval);
+        printf(" string \"%s\"\n", (char*)constant->value.oval);
         break;
       }
       printf(" (index %" PRId32 ")", constant->id);
-    }
-    else if (id == SPVM_OP_C_ID_MY) {
-      SPVM_MY* my = op_cur->uv.my;
-      printf(" \"%s\"", my->op_name->uv.name);
-      printf(" (my->var_id:%d)", my->var_id);
     }
     else if (id == SPVM_OP_C_ID_PACKAGE_VAR) {
       SPVM_PACKAGE_VAR* package_var = op_cur->uv.package_var;
@@ -87,7 +82,12 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     else if (id == SPVM_OP_C_ID_VAR) {
       SPVM_VAR* var = op_cur->uv.var;
       printf(" \"%s\"", var->op_name->uv.name);
-      printf(" (my->var_id:%d)", var->op_my->uv.my->var_id);
+      if (var->op_my) {
+        printf(" (my->var_id:%d) declaration : %d", var->op_my->uv.my->var_id, op_cur->uv.var->is_declaration);
+      }
+      else {
+        printf(" (my->var_id:not yet resolved)");
+      }
     }
     else if (id == SPVM_OP_C_ID_PACKAGE_VAR_ACCESS) {
       SPVM_PACKAGE_VAR_ACCESS* package_var_access = op_cur->uv.package_var_access;
@@ -99,6 +99,7 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
     }
     else if (id == SPVM_OP_C_ID_TYPE) {
       if (op_cur->uv.type) {
+        printf(" ");
         SPVM_TYPE_fprint_type_name(compiler, stdout, op_cur->uv.type->basic_type->id, op_cur->uv.type->dimension);
       }
       else {

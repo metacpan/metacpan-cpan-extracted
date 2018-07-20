@@ -1,5 +1,5 @@
 package Net::Amazon::S3::HTTPRequest;
-$Net::Amazon::S3::HTTPRequest::VERSION = '0.83';
+$Net::Amazon::S3::HTTPRequest::VERSION = '0.84';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use HTTP::Date;
@@ -8,7 +8,6 @@ use Moose::Util::TypeConstraints;
 use URI::Escape qw( uri_escape_utf8 );
 use URI::QueryParam;
 use URI;
-use VM::EC2::Security::CredentialCache;
 
 use Net::Amazon::S3::Signature::V2;
 
@@ -126,7 +125,7 @@ Net::Amazon::S3::HTTPRequest - Create a signed HTTP::Request
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 SYNOPSIS
 

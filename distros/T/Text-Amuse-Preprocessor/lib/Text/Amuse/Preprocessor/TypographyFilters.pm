@@ -137,6 +137,7 @@ sub characters {
                    lsingle => "\x{2018}",
                    rsingle => "\x{2019}",
                    apos =>    "\x{2019}",
+                   # https://id.wikipedia.org/wiki/Tanda_pisah
                    emdash =>  "\x{2013}", # en dash –
                    endash =>  "\x{2013}", # en dash –
                    dash =>    "\x{2013}",

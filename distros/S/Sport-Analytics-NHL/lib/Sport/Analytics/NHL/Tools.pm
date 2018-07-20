@@ -9,7 +9,8 @@ use File::Path qw(make_path);
 use POSIX qw(strftime);
 
 use Date::Parse;
-use JSON::XS;
+use JSON;
+use List::MoreUtils qw(any);
 
 use Sport::Analytics::NHL::LocalConfig;
 use Sport::Analytics::NHL::Config;
@@ -177,10 +178,12 @@ our @EXPORT = qw(
 	$DB
 	parse_nhl_game_id parse_our_game_id
 	resolve_team get_games_for_dates
-	get_season_from_date get_start_stop_date
+	get_season_from_date get_start_stop_date str3time
 	get_schedule_json_file make_game_path get_game_id_from_path
+	get_game_files_by_id
 	arrange_schedule_by_date convert_schedule_game read_schedules
 	read_existing_game_ids
+	vocabulary_lookup normalize_penalty
 );
 
 our $DB;
@@ -255,7 +258,7 @@ sub resolve_team ($;$) {
 		my $team_id = $DB->resolve_team_db($team);
 		return $team_id if $team_id;
 	}
-	return 'MTL' if ($team =~ /MONTR/i);
+	return 'MTL' if ($team =~ /MONTR.*CAN/i || $team =~ /CAN.*MONTR/);
 	return 'NHL' if ($team eq 'League');
 	for my $team_id (keys %TEAMS) {
 		return $team_id if $team_id eq $team;
@@ -264,6 +267,29 @@ sub resolve_team ($;$) {
 		}
 	}
 	die "Couldn't resolve team $team";
+}
+
+=over 2
+
+=item C<str3time>
+
+Wraps around str2time to fix its parsing the pre-1969 dates to the same timestamp as their 100 years laters.
+Arguments: the str2time argument string
+Returns: the correct timestamp (negative for pre-1969)
+
+=back
+
+=cut
+
+sub str3time ($) {
+
+	my $str   = shift;
+
+	my $time = str2time($str);
+	my $year = substr($str, 0, 4);
+
+	$time -= (31536000 + 3124224000) if $year < 1969;
+	$time;
 }
 
 sub convert_new_schedule_game ($) {
@@ -278,14 +304,10 @@ sub convert_new_schedule_game ($) {
 	$game->{game_id}   = sprintf(
 		"%04d%d%04d",$game->{season},$game->{stage},$game->{season_id}
 	)+0;
-	$game->{ts}        = str2time(delete $schedule_game->{est})+0;
+	$game->{ts}        = str3time(delete $schedule_game->{est})+0;
 	$game->{date}      = strftime("%Y%m%d", localtime($game->{ts}))+0;
 	$game->{away}      = resolve_team(delete $schedule_game->{a});
 	$game->{home}      = resolve_team(delete $schedule_game->{h});
-	if ($game->{season} < 1969) {
-		$game->{ts}   -= (31536000 + 3124224000);
-		$game->{date} -= 1000000;
-	}
 	$game;
 }
 
@@ -312,20 +334,19 @@ sub convert_old_schedule_game ($) {
 	my $game = {
 		away      => resolve_team($schedule_game->{teams}{away}{team}{name}),
 		home      => resolve_team($schedule_game->{teams}{home}{team}{name}),
-		_id       => $schedule_game->{gamePk}+0,
+		_id       => $schedule_game->{gamePk} + 0,
 		stage     => $stage + 0,
-		season    => substr($schedule_game->{gamePk},0,4)+0,
-		season_id => $schedule_game->{gamePk} % 10000+0,
-		ts        => str2time($schedule_game->{gameDate}),
+		season    => substr($schedule_game->{gamePk}, 0, 4) + 0,
+		season_id => $schedule_game->{gamePk} % 10000 + 0,
+		ts        => str3time($schedule_game->{gameDate}),
+		year      => substr($schedule_game->{gameDate}, 0, 4) + 0,
 	};
 	$game->{game_id}   = sprintf(
 		"%04d%d%04d",$game->{season},$game->{stage},$game->{season_id}
 	)+0;
 	$game->{date}      = strftime("%Y%m%d", localtime($game->{ts}))+0;
-	if ($game->{season} < 1969) {
-		$game->{ts}   -= (31536000 + 3124224000);
-		$game->{date} -= 1000000;
-	}
+	#use Data::Dumper;
+	#print Dumper $game;
 	$game;
 }
 
@@ -451,6 +472,27 @@ sub get_game_id_from_path ($) {
 	$1 && $2 && $3 ? $1*100000 + $2*10000 + $3 : undef;
 }
 
+=over 2
+
+=item C<get_game_path_from_id>
+
+Gets the expected SSSS/TTTT/NNNN path for our 9-digit game id.
+Arguments: our 9-digit game id
+Returns: the path (creates it if necessary)
+
+=back
+
+=cut
+
+sub get_game_path_from_id ($;$) {
+
+	my $id       = shift;
+	my $data_dir = shift;
+
+	my $game = parse_our_game_id($id);
+	make_game_path($game->{season}, $game->{stage}, $game->{season_id}, $data_dir);
+}
+
 sub read_existing_game_ids ($) {
 
 	my $season = shift;
@@ -465,6 +507,103 @@ sub read_existing_game_ids ($) {
 		"$ENV{HOCKEYDB_DATA_DIR}/$season",
 	);
 	$game_ids;
+}
+
+=over 2
+
+=item C<get_game_files_by_id>
+
+Gets existing game files for the given game Id. Assumes SSSS/TTTT/NNNN file tree structure under the root data directory.
+Arguments:
+ * our 9-digit game id
+ * (optional) root data directory
+Returns: The list of html/json reports from the game directory
+
+=back
+
+=cut
+
+sub get_game_files_by_id ($;$) {
+
+	my $game_id  = shift;
+	my $data_dir = shift || $ENV{HOCKEYDB_DATA_DIR} || $DATA_DIR;
+
+	my $path = get_game_path_from_id($game_id, $data_dir);
+	debug "Using path $path";
+	opendir(DIR, $path);
+	my @game_files = map { "$path/$_" } grep {
+		-f "$path/$_" && (/html$/ || /json$/)
+	} readdir(DIR);
+	closedir(DIR);
+
+	@game_files;
+}
+
+=over 2
+
+=item C<vocabulary_lookup>
+
+Normalizes one of the following event properties from different variants:
+ * penalty
+ * shot_type
+ * miss
+ * strength
+ * stoppage reason
+
+Arguments: the property name and the original string
+Returns: the normalized, vocabulary-matched string
+
+=back
+
+=cut
+
+sub vocabulary_lookup ($$) {
+
+	my $vocabulary = shift;
+	my $string     = shift;
+
+	$string =~ tr/ / /;
+	$string =~ s/^\s+//;
+	$string =~ s/\s+$//;
+	$string = uc $string;
+	#print "resolving $string\n";
+	return $string if $VOCABULARY{$vocabulary}->{$string};
+	for my $word (keys %{$VOCABULARY{$vocabulary}}) {
+		my $alternatives = $VOCABULARY{$vocabulary}->{$word};
+		if (any {
+			#print "!$string!-!$_!\n";
+			$string eq $_
+		} @{$alternatives}) {
+#			print "resolved to $word\n";
+			return $word;
+		}
+	}
+	die "Unknown word $string for vocabulary $vocabulary";
+}
+
+=over 2
+
+=item C<normalize_penalty>
+
+Normalizes an NHL Report penalty string including a vocabulary lookup
+Arguments: the original string
+Returns: the normalized, vocabulary-matched string
+
+=back
+
+=cut
+
+sub normalize_penalty ($) {
+
+	my $penalty = shift;
+
+	$penalty =~ s/(\- double minor)//i;
+	$penalty =~ s/(\- obstruction)//i;
+	$penalty =~ s/(\-\s*bench\b)//i;
+	$penalty =~ s/(PS \- )//i;
+	#print Dumper $ld_event->{result}{secondaryType};
+	vocabulary_lookup('penalty', $penalty);
+
 }
 
 1;

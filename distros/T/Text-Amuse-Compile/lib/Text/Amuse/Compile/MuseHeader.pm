@@ -244,6 +244,17 @@ sub _build_impressum {
     return !!$self->header->{impressum};
 }
 
+has continuefootnotes   => (is => 'lazy', isa => Bool );
+has centerchapter       => (is => 'lazy', isa => Bool );
+has centersection       => (is => 'lazy', isa => Bool );
+sub _build_continuefootnotes   { shift->_look_at_header('continuefootnotes') }
+sub _build_centerchapter       { shift->_look_at_header('centerchapter') }
+sub _build_centersection       { shift->_look_at_header('centersection') }
+
+sub _look_at_header {
+    my ($self, $key) = @_;
+    return !!$self->header->{$key};
+}
 
 has topics => (is => 'lazy', isa => ArrayRef);
 

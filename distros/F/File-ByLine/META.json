@@ -37,7 +37,7 @@
       },
       "runtime" : {
          "recommends" : {
-            "Parallel::WorkUnit" : "1.117"
+            "Parallel::WorkUnit" : "2.181850"
          },
          "requires" : {
             "Carp" : "0",
@@ -61,18 +61,19 @@
             "Test2::Require::Module" : "0",
             "Test2::V0" : "0",
             "Test::More" : "0",
-            "Test::UseAllModules" : "0.17"
+            "Test::UseAllModules" : "0.17",
+            "overload" : "0"
          }
       }
    },
    "provides" : {
       "File::ByLine" : {
          "file" : "lib/File/ByLine.pm",
-         "version" : "1.181861"
+         "version" : "1.181990"
       },
       "File::ByLine::Object" : {
          "file" : "lib/File/ByLine/Object.pm",
-         "version" : "1.181861"
+         "version" : "1.181990"
       }
    },
    "release_status" : "stable",
@@ -86,7 +87,7 @@
          "web" : "https://github.com/jmaslak/File-ByLine"
       }
    },
-   "version" : "1.181861",
+   "version" : "1.181990",
    "x_contributor_covenant" : {
       "version" : 0.02
    },

@@ -3,7 +3,6 @@ package Test::Elasticsearch::Model::Index;
 use Test::Class::Most parent => 'Test';
 use Test::Warnings qw/:all/;
 
-
 sub basics :Tests(no_plan) {
     my $self = shift;
     my $model = TestModel->new;

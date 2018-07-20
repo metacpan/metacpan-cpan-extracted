@@ -21,10 +21,19 @@ my $pom_for_parser_expected = {
         version      => '1.0.0',
         relativePath => '../parent-parent'
     },
-    groupId      => 'com.pastdev',
-    artifactId   => 'my-project',
-    version      => '1.0.0',
-    packaging    => 'jar',
+    groupId              => 'com.pastdev',
+    artifactId           => 'my-project',
+    version              => '1.0.0',
+    packaging            => 'jar',
+    dependencyManagement => {
+        dependencies => {
+            'com.pastdev:managed:jar:' => {
+                groupId    => 'com.pastdev',
+                artifactId => 'managed',
+                version    => '1.0.0',
+            }
+        }
+    },
     dependencies => {
         'com.pastdev:dependency:jar:assembly' => {
             groupId    => 'com.pastdev',

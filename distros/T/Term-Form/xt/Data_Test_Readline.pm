@@ -79,7 +79,7 @@ sub return_test_data {
         {
              used_keys => [ 'CONTROL_U', "a", 'ENTER'],
              expected  => "<a>",
-             arguments => [ 'Prompt: ', { default => "many words " x 1000, no_echo => 0 } ],
+             arguments => [ 'Prompt: ', { default => "many words " x 100, no_echo => 0 } ],
         },
         {
             used_keys => [ "abcde ", "XY " x 10, ( 'LEFT' ) x 36, ( 'RIGHT' ) x 8, 'CONTROL_K', 'ENTER' ],

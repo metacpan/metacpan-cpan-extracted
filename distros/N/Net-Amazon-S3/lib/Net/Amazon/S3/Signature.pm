@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Net::Amazon::S3::Signature;
-$Net::Amazon::S3::Signature::VERSION = '0.83';
+$Net::Amazon::S3::Signature::VERSION = '0.84';
 use Moose;
 
 has http_request => (
@@ -37,7 +37,7 @@ Net::Amazon::S3::Signature
 
 =head1 VERSION
 
-version 0.83
+version 0.84
 
 =head1 NAME
 

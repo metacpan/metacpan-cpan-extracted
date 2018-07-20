@@ -6,6 +6,8 @@ use Scalar::Util qw(blessed);
 use Mojo::Util qw(trim);
 use Hash::MultiValue;
 
+has 'db_type' => 'mysql';
+
 # For Foreign Key Validator:
 # ------------------------------------------------------------------------
 sub fk_validator {
@@ -60,19 +62,17 @@ sub fk_attr_validator {
     'null'    => 'SET NULL',
     'default' => 'SET DEFAULT'
   );
-  my %data_fk = (
-    'ondel' => 0,
-  );
+  my $ondel = 0;
   if (exists $fk_table->{ondelete}) {
     if (exists $ondelup{(lc $fk_table->{ondelete})}) {
-      $data_fk{'ondel'} = 1;
+      $ondel = 1;
       $data .= 'ON DELETE ' . $ondelup{(lc $fk_table->{ondelete})};
     }
   }
   
   if (exists $fk_table->{onupdate}) {
     if (exists $ondelup{(lc $fk_table->{onupdate})}) {
-      $data .= ' ' if $data_fk{'ondel'} == 1;
+      $data .= ' ' if $ondel == 1;
       $data .= 'ON UPDATE ' . $ondelup{(lc $fk_table->{onupdate})};
     }
   }
@@ -87,6 +87,7 @@ sub table_attr_val {
   my ($col_attr, $table_attr) = @_;
   my $new_tblAttr = {};
   my $attrib_table = '';
+  my $db_type = $self->db_type // 'mysql';
   
   if (exists $table_attr->{fk}) {
     $table_attr = fk_validator($table_attr, $col_attr);
@@ -101,11 +102,18 @@ sub table_attr_val {
       if ($fk_table->{attr}) {
         $fk_attr = fk_attr_validator($fk_table->{attr});
       }
-      $table_fk .= "\tKEY " . $fk_name . " ($col_name), \n";
-      $table_fk .= "\tCONSTRAINT $fk_name ";
-      $table_fk .= "FOREIGN KEY ($col_name) ";
-      $table_fk .= "REFERENCES $table_target ($col_target)\n" if $fk_attr eq '';
-      $table_fk .= "REFERENCES $table_target ($col_target) \n\t$fk_attr\n" unless $fk_attr eq '';
+      if ($db_type eq 'sqlite') {
+        $table_fk .= "\tCONSTRAINT $fk_name ";
+        $table_fk .= "FOREIGN KEY ($col_name) ";
+        $table_fk .= "REFERENCES $table_target ($col_target)\n" if $fk_attr eq '';
+        $table_fk .= "REFERENCES $table_target ($col_target) \n\t$fk_attr\n" unless $fk_attr eq '';
+      } else {
+        $table_fk .= "\tKEY " . $fk_name . " ($col_name), \n";
+        $table_fk .= "\tCONSTRAINT $fk_name ";
+        $table_fk .= "FOREIGN KEY ($col_name) ";
+        $table_fk .= "REFERENCES $table_target ($col_target)\n" if $fk_attr eq '';
+        $table_fk .= "REFERENCES $table_target ($col_target) \n\t$fk_attr\n" unless $fk_attr eq '';
+      }
       
       my $new_attrTbl = Hash::MultiValue->new(%{$table_attr});
       $new_attrTbl->set(fk => $table_fk);
@@ -121,18 +129,15 @@ sub table_attr_val {
       $table_attr = $new_attrTbl->as_hashref;
     }
   }
-  my %tbl_attr = (
-    engine => 0,
-  );
+  my $engine = 0;
   if (exists $table_attr->{engine}) {
-    $tbl_attr{engine} = 1;
-    my $r_engine = check_engine($table_attr->{engine});
+    $engine = 1;
+    my $r_engine = $self->_check_engine($table_attr->{engine});
     $attrib_table .= 'ENGINE=' . $r_engine;
   }
-  if (exists $table_attr->{charset}) {
-    $attrib_table .= ' ' if ($tbl_attr{engine} == 1);
-    $attrib_table .= 'DEFAULT CHARSET=' . $table_attr->{charset};
-  }
+  $attrib_table .= ' ' if ($engine == 1);
+  $attrib_table .= exists $table_attr->{charset} ?
+    'DEFAULT CHARSET=' . $table_attr->{charset} : 'DEFAULT CHARSET=utf8';
   $new_tblAttr = Hash::MultiValue->new(%{$table_attr});
   $new_tblAttr->set(attr => $attrib_table);
   $table_attr = $new_tblAttr->as_hashref;
@@ -244,11 +249,12 @@ sub create_colAttr {
   my $data = $col_name . ' ';
   
   if (exists $attr->{type}) {
-    $data .= (uc $attr->{type}->{name}) . '' if (exists $attr->{type}->{name});
-    $data .= 'col1' unless (exists $attr->{type}->{name});
-    
-    $data .= '(' . $attr->{type}->{size} . ') ' if (exists $attr->{type}->{size});
-    $data .= ' ' unless (exists $attr->{type}->{size});
+    if ($db_type eq 'sqlite') {
+      $data .= exists $attr->{type}->{name} ? (uc $attr->{type}->{name}) . ' ' : 'varchar ';
+    } else {
+      $data .= exists $attr->{type}->{name} ? (uc $attr->{type}->{name}) : 'varchar';
+      $data .= exists $attr->{type}->{size} ? '(' . $attr->{type}->{size} . ') ' : ' ';
+    }
   }
   
   unless (exists $attr->{custom}) {
@@ -288,9 +294,6 @@ sub create_colAttr {
       }
     }
   }
-  else {
-    $data .= $attr->{custom};
-  }
   $data = trim($data);
   $data = "\t$data";
   return $data;
@@ -304,7 +307,7 @@ sub create_query_table {
   my ($table_name, $col_list, $col_attr, $table_attr, $db_type);
   my $data = '';
   my $size_tblAttr = 0;
-  $db_type = 'mysql';
+  $db_type = $self->db_type;
   
   if ($arg_len == 3) {
     ($table_name, $col_list, $col_attr) = @_;
@@ -320,7 +323,7 @@ sub create_query_table {
   }
   
   if ($arg_len >= 5) {
-    ($table_name, $col_list, $col_attr, $table_attr, $db_type) = @_;
+    ($table_name, $col_list, $col_attr, $table_attr, $self->db_type) = @_;
     $size_tblAttr = scalar keys %{$table_attr};
   }
   
@@ -331,12 +334,7 @@ sub create_query_table {
   my $i = 0;
   my @list_col = ();
   while ($i < $size_col) {
-    if ($db_type ne '') {
-      push @list_col, $self->create_colAttr($col_list->[$i], $col_attr->{$col_list->[$i]}, $db_type);
-    }
-    else {
-      push @list_col, $self->create_colAttr($col_list->[$i], $col_attr->{$col_list->[$i]}, 'mysql');
-    }
+    push @list_col, $self->create_colAttr($col_list->[$i], $col_attr->{$col_list->[$i]}, $self->db_type);
     $i++;
   }
   my $list_column = join ",\n", @list_col;
@@ -361,14 +359,14 @@ sub create_query_table {
     if (exists $table_attr->{attr} and $table_attr->{attr} ne '') {
       if ($size_fk == 1) {
         $attr_table = $table_attr->{attr};
-        $data .= ") $attr_table";
+        $data .= $db_type eq 'sqlite' ? " \n)" : ") $attr_table";
       }
       else {
-        $data .= $db_type eq 'sqlite' ? ")" : ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
+        $data .= $db_type eq 'sqlite' ? " \n)" : ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
       }
     }
     else {
-      $data .= $db_type eq 'sqlite' ? ")" : ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
+      $data .= $db_type eq 'sqlite' ? " \n)" : ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
     }
     
   }
@@ -385,8 +383,9 @@ sub create_query_table {
 
 # For check engine :
 # ------------------------------------------------------------------------
-sub check_engine {
-  my ($engine) = @_;
+sub _check_engine {
+  my ($self, $engine) = @_;
+  
   $engine = lc $engine;
   my %list_engine = (
     'myisam' => 'MyISAM',

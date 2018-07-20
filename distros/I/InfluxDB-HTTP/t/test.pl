@@ -12,6 +12,7 @@ use File::Temp;
 use File::Slurper qw(write_text);
 use IPC::Run qw(run);
 use Test::More;
+use Test::Exception;
 
 BEGIN {
     sub get_directory_of_this_file {
@@ -48,13 +49,14 @@ sub main {
     eval {
         require_ok( 'InfluxDB::HTTP' );
         my $influx = InfluxDB::HTTP->new(port => $PORT);
-        setup($influx);
-
         test_ping($influx);
+
+        setup($influx);
         test_write($influx);
         test_query($influx);
-
+        test_argument_checking($influx);
         cleanup($influx);
+
         done_testing();
     };
     diag($@) if $@;
@@ -95,6 +97,15 @@ sub cleanup_influx {
 }
 
 
+sub test_ping {
+    my $influx = shift;
+
+    my $ping = $influx->ping();
+    ok($ping, 'ping');
+
+    return;
+}
+
 sub setup {
     my $influx = shift;
 
@@ -109,15 +120,6 @@ sub cleanup {
 
     my $rv = $influx->query("DROP DATABASE $DATABASE");
     ok($rv, 'DROP DATABASE');
-
-    return;
-}
-
-sub test_ping {
-    my $influx = shift;
-
-    my $ping = $influx->ping();
-    ok($ping, 'ping');
 
     return;
 }
@@ -146,6 +148,18 @@ sub test_query {
     ok($rv, 'query');
     # [{"series":[{"values":[[1530794448,123]],"columns":["time","last"],"name":"m_test"}],"statement_id":0}]
     is($rv->data()->{results}->[0]->{series}->[0]->{values}->[0]->[1], $VALUE, 'query result');
+
+    return;
+}
+
+sub test_argument_checking {
+    my $influx = shift;
+
+    dies_ok { $influx->query() } 'query: check argument query';
+    dies_ok { $influx->query('q', epoch => 'f') } 'query: check argument epoch';
+    dies_ok { $influx->write() } 'write: check argument measurement';
+    dies_ok { $influx->write('m') } 'write: check argument database';
+    dies_ok { $influx->write('q', database => 'd', precision => 'f') } 'write: check argument precision';
 
     return;
 }

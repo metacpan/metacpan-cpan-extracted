@@ -29,7 +29,7 @@ no_index:
     - t
     - xt
 requires:
-  App::cpm: '0.974'
+  App::cpm: '0.975'
   App::cpm::CLI: '0'
   Getopt::Long: '0'
   Module::Loaded: '0'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/oalders/lazy/issues
   homepage: https://github.com/oalders/lazy
   repository: https://github.com/oalders/lazy.git
-version: '0.000005'
+version: '0.000006'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -275,7 +275,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::OALDERS/GithubMeta'
-      version: '0.54'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -296,7 +296,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::OALDERS/Git::GatherDir'
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -324,15 +324,15 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.3
+          git_version: 2.18.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.16.3
+          git_version: 2.18.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -415,12 +415,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.3
+          git_version: 2.18.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/release snapshot'
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -428,16 +428,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000005
+          tag: v0.000006
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.3
+          git_version: 2.18.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/Git::Tag'
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -469,12 +469,12 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.3
+          git_version: 2.18.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/post-release commit'
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -483,10 +483,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.16.3
+          git_version: 2.18.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -551,4 +551,4 @@ x_Dist_Zilla:
 x_contributors:
   - 'Olaf Alders <olaf@wundersolutions.com>'
 x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

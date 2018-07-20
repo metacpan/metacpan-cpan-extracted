@@ -2,73 +2,108 @@ package Mojolicious::Plugin::AssetPack::Pipe::Favicon;
 use Mojo::Base 'Mojolicious::Plugin::AssetPack::Pipe';
 
 use Mojo::DOM;
+use Mojo::JSON qw(false true);
+use Mojo::Template;
 use Mojo::Util;
+use Mojolicious::Plugin::AssetPack::Util 'checksum';
 
 # this should be considered private
-use constant API_URL => $ENV{MOJO_ASSETPACK_FAVICON_API_URL} || 'https://realfavicongenerator.net/api/favicon';
+use constant API_URL => $ENV{MOJO_ASSETPACK_FAVICON_API_URL}
+  || 'https://realfavicongenerator.net/api/favicon';
 
 has api_key  => sub { die 'api_key() must be set' };
-has design   => sub { +{desktop_browser => {}} };
+has design   => sub { shift->_build_design };
 has settings => sub { +{error_on_image_too_small => Mojo::JSON->true} };
-
-has _icons => sub { +{} };
 
 sub process {
   my ($self, $assets) = @_;
-  return unless $self->topic eq 'favicon.ico';
+  return unless $self->topic =~ m!^favicon(\.\w+)?\.ico$!;
 
   my $store = $self->assetpack->store;
   my $asset = $assets->first;
   my $attrs = $asset->TO_JSON;
-  my ($db, $files, $markup, @icons);
+  my ($urls, $markup, %sub_assets);
 
-  $attrs->{key} = join '-', sort keys %{$self->design}
+  $attrs->{key} = checksum(Mojo::JSON::encode_json($self->design))
     or die '[AssetPack] Invalid pipe("Favicon")->design({})';
 
-  if ($db = $store->load($attrs)) {
-    ($files, $markup) = split /__MARKUP__/, $db->content;
-    $files = [grep {/\w/} split /\n/, $files];
+  if (my $db = $store->load($attrs)) {
+    ($urls, $markup) = split /__MARKUP__/, $db->content;
+    $urls = [grep {/\w/} split /\n/, $urls];
   }
   else {
-    ($files, $markup) = $self->_fetch($assets);
-    $db = join "\n", @$files, __MARKUP__ => $markup;
+    ($urls, $markup) = $self->_fetch($asset);
+    $db = join "\n", @$urls, __MARKUP__ => $markup;
     $store->save(\$db, $attrs);
   }
 
-  for my $url (@$files) {
-    push @icons, $store->asset($url)
-      or die "AssetPack was unable to fetch icon asset $url";
+  for my $url (@$urls) {
+    my $asset = $store->asset($url)
+      or die "AssetPack was unable to fetch icons/assets asset $url";
+    $sub_assets{join '.', $asset->name, $asset->format} = $asset;
+    $self->assetpack->{by_checksum}{$asset->checksum} = $asset;
   }
 
-  $self->assetpack->{by_checksum}{$_->checksum} = $_ for @icons;
-  $self->assetpack->{by_topic}{$self->topic} = Mojo::Collection->new(@icons);
-
-  for my $child (Mojo::DOM->new($markup)->children->each) {
-    my $key = $child->{content} ? 'content' : 'href';
-    my $icon = shift @icons;
-    $self->_icons->{$icon->url} = [$key => $child, $icon];
-  }
-
-  if (@icons) {
-    my $child
-      = Mojo::DOM->new('<link rel="shortcut icon" href="favicon.ico">')->children->first;
-    my $icon = shift @icons;
-    $self->_icons->{$icon->url} = [href => $child, $icon];
-  }
+  $asset->renderer(
+    sub {
+      my ($asset, $c, $args, @attrs) = @_;
+      $markup
+        =~ s!href="(/?)([^"]+)"!sprintf 'href="%s"', $sub_assets{$2} ? $sub_assets{$2}->url_for($c) : "$1$2"!ger;
+    }
+  );
 }
 
-sub render {
-  my ($self, $c) = @_;
-  my $icons = $self->_icons;
-  $icons = [map { $icons->{$_} } sort keys %$icons];
-  $_->[1]{$_->[0]} = $_->[2]->url_for($c) for @$icons;
-  return Mojo::ByteStream->new(join "\n", map { $_->[1] } @$icons);
+sub _build_design {
+  my $self        = shift;
+  my $name        = ref $self->app;
+  my $bg_color    = '#F5F5F5';
+  my $theme_color = '#536DFE';
+
+  return {
+    desktop_browser => {},
+    android_chrome  => {
+      manifest => {display => 'standalone', name => $name, orientation => 'portrait'},
+      picture_aspect => 'shadow',
+      theme_color    => $theme_color,
+    },
+    firefox_app => {
+      background_color       => $bg_color,
+      circle_inner_margin    => '5',
+      keep_picture_in_circle => 'true',
+      picture_aspect         => 'circle',
+      manifest               => {
+        app_description => '',
+        app_name        => $name,
+        developer_name  => '',
+        developer_url   => '',
+      }
+    },
+    ios => {
+      background_color => $bg_color,
+      margin           => '4',
+      picture_aspect   => 'background_and_margin',
+    },
+    safari_pinned_tab => {
+      picture_aspect => 'black_and_white',
+      threshold      => 60,
+      theme_color    => $theme_color,
+    },
+    windows => {
+      background_color => $theme_color,
+      picture_aspect   => "white_silhouette",
+      assets           => {
+        windows_80_ie_10_tile => true,
+        windows_10_ie_11_edge_tiles =>
+          {big => true, medium => true, rectangle => false, small => false},
+      }
+    },
+  };
 }
 
 sub _fetch {
-  my ($self, $assets) = @_;
+  my ($self, $asset) = @_;
   $self->assetpack->ua->inactivity_timeout(60);
-  my $res = $self->assetpack->ua->post(API_URL, json => $self->_request($assets))->res;
+  my $res = $self->assetpack->ua->post(API_URL, json => $self->_request($asset))->res;
 
   unless ($res->code eq '200') {
     my $json = $res->json || {};
@@ -85,7 +120,7 @@ sub _fetch {
 }
 
 sub _request {
-  my ($self, $assets) = @_;
+  my ($self, $asset) = @_;
 
   return {
     favicon_generation => {
@@ -94,7 +129,7 @@ sub _request {
       settings       => $self->settings,
       files_location => {type => 'path', path => '/'},
       master_picture =>
-        {content => Mojo::Util::b64_encode($assets->first->content), type => 'inline'}
+        {content => Mojo::Util::b64_encode($asset->content), type => 'inline'}
     }
   };
 }
@@ -115,9 +150,13 @@ Mojolicious::Plugin::AssetPack::Pipe::Favicon - Generate favicons
   app->asset->pipe("Favicon")->api_key("fd27cc5654345678765434567876545678765556");
   app->asset->process("favicon.ico" => "images/favicon.png");
 
-Note that the topic must be "favicon.ico".
+  # Can also register variations of the favicon:
+  app->asset->process("favicon.variant1.ico" => "images/favicon1.png");
+  app->asset->process("favicon.variant2.ico" => "images/favicon2.png");
 
-The input image file should be 260x260 for optimal results.
+Note that the topic must be either "favicon.ico" or "favicon.some_identifier.ico".
+
+The input image file should be a 260x260 PNG file for optimal results.
 
 =head2 Template
 
@@ -174,16 +213,6 @@ L<http://realfavicongenerator.net/api/non_interactive_api> for details.
 =head2 process
 
 See L<Mojolicious::Plugin::AssetPack::Pipe/process>.
-
-=head2 render
-
-  $bytestream = $self->render($c);
-
-Used to render the favicons as HTML.
-
-=head1 TODO
-
-Add support for different icons for each platform.
 
 =head1 SEE ALSO
 

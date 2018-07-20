@@ -1,0 +1,125 @@
+NAME
+
+    Devel::MAT::Dumper - write a heap dump file for later analysis
+
+SYNOPSIS
+
+     use Devel::MAT::Dumper;
+    
+     Devel::MAT::Dumper::dump( "path/to/the/file.pmat" );
+
+DESCRIPTION
+
+    This module provides the memory-dumping function that creates a heap
+    dump file which can later be read by Devel::MAT::Dumpfile. It provides
+    a single function which is not exported, which writes a file to the
+    given path.
+
+    The dump file will contain a representation of every SV in Perl's
+    arena, providing information about pointers between them, as well as
+    other information about the state of the process at the time it was
+    created. It contains a snapshot of the process at that moment in time,
+    which can later be loaded and analysed by various tools using
+    Devel::MAT::Dumpfile.
+
+    This module used to be part of the main Devel::MAT distribution but is
+    now in its own one so that it can be installed independently on servers
+    or other locations where perl processes need to inspected but analysis
+    tools can be run elsewhere.
+
+IMPORT OPTIONS
+
+    The following import options control the behaviour of the module. They
+    may primarily be useful when used in the -M perl option:
+
+ -dump_at_DIE
+
+    Installs a handler for the special __DIE__ signal to write a dump file
+    when die() is about to cause a fatal signal. This is more reliable at
+    catching the callstack and memory state than using an END block.
+
+       $ perl -MDevel::MAT::Dumper=-dump_at_DIE ...
+
+ -dump_at_END
+
+    Installs an END block which writes a dump file at END time, just before
+    the interpreter exits.
+
+       $ perl -MDevel::MAT::Dumper=-dump_at_END ...
+
+ -dump_at_SIGQUIT
+
+    Installs a handler for SIGQUIT to write a dump file if the signal is
+    received. The signal handler will remain in place and can be used
+    several times.
+
+       $ perl -MDevel::MAT::Dumper=-dump_at_SIGQUIT ...
+
+ -dump_at_SIGNAME
+
+    Installs a handler for the named signal (e.g. SIGABRT, SIGINT) to write
+    a dump file if the signal is received. After dumping the file, the
+    signal handler is removed and the signal re-raised.
+
+       $ perl -MDevel::MAT::Dumper=-dump_at_SIGABRT ...
+
+ -file $PATH
+
+    Sets the name of the file which is automatically dumped; defaults to
+    basename $0.pmat if not supplied.
+
+       $ perl -MDevel::MAT::Dumper=-file,foo.pmat ...
+
+    In the special case that $0 is exactly the string -e or -E, the
+    filename will be prefixed with perl so as not to create files whose
+    names begin with a leading hyphen, as this confuses some commandline
+    parsers.
+
+       $ perl -MDevel::MAT::Dumper=-dump_at_END -E 'say "hello"'
+       hello
+       Dumping to perl-e.pmat because of END
+
+    If the pattern contains NNN, this will be replaced by a unique serial
+    number per written file, starting from 0. This may be helpful in the
+    case of DIE or SIGQUIT handlers, which could be invoked multiple times.
+
+    The file name is converted to an absolute path immediately, so if the
+    running program later calls chdir(), it will still be generated in the
+    directory the program started from rather than the one it happens to be
+    in at the time.
+
+ -max_string
+
+    Sets the maximum length of string buffer to dump from PVs; defaults to
+    256 if not supplied. Use a negative size to dump the entire buffer of
+    every PV regardless of size.
+
+ -eager_open
+
+    Opens the dump file immediately at import time, instead of waiting
+    until the time it actually writes the heap dump. This may be useful if
+    the process changes user ID, or to debug problems involving too many
+    open filehandles.
+
+FUNCTIONS
+
+    These functions are not exported, they must be called fully-qualified.
+
+ dump
+
+       dump( $path )
+
+    Writes a heap dump to the named file
+
+ dumpfh
+
+       dumpfh( $fh )
+
+    Writes a heap dump to the given filehandle (which must be a plain
+    OS-level filehandle, though does not need to be a regular file, or
+    seekable).
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,4 +25,5 @@ resources:
   bugtracker: https://github.com/oetiker/zimbra-expect/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/zimbra-expect
-version: v0.1.0
+version: v0.1.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

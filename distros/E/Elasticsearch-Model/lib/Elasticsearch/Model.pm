@@ -4,7 +4,7 @@ use Moose;
 use Moose::Exporter;
 use Elasticsearch::Model::Index;
 
-our $VERSION = '0.1.3'; # VERSION
+our $VERSION = '0.1.4'; # VERSION
 
 # ABSTRACT: Does one thing only: helps to deploy a Moose model and accompanying document classes to Elasticsearch.
 
@@ -137,7 +137,15 @@ You use C<index> to define the indexes belonging to your model. Here is an examp
         type => 'integer',
     );
 
+    has_non_attribute_mapping {
+        _source => {
+            enabled => "false",
+        },
+    };
+
     1;
+
+You define your attributes as you would expect, setting Moose type attributes, and also using the C<type> attribute to tell elasticsearch what the elasticsearch type is. You can set C<non_attribute_mapping>s here as well, as shown in the above example, and these will be folded into your index mapping.
 
 =cut
 

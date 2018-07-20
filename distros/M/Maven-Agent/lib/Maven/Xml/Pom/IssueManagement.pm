@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Pom::IssueManagement;
-$Maven::Xml::Pom::IssueManagement::VERSION = '1.14';
+$Maven::Xml::Pom::IssueManagement::VERSION = '1.15';
 # ABSTRACT: Maven IssueManagement element
 # PODNAME: Maven::Xml::Pom::IssueManagement
 
@@ -27,7 +27,7 @@ Maven::Xml::Pom::IssueManagement - Maven IssueManagement element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

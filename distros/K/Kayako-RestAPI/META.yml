@@ -18,12 +18,13 @@ name: Kayako-RestAPI
 requires:
   Data::Dumper: '0'
   Digest::SHA: '0'
+  File::Slurp: '0'
   Mojo::UserAgent: '0'
-  XML::XML2JSON: '0'
+  XML::LibXML::Simple: '0'
   common::sense: '0'
   utf8: '0'
 resources:
-  bugtracker: https://github.com/pavelsr/Kayako-RestAPI/issues
-  repository: git://github.com/pavelsr/Kayako-RestAPI.git
-version: '0.04'
+  homepage: https://github.com/pavelsr/Kayako-RestAPI
+  repository: https://github.com/pavelsr/Kayako-RestAPI.git
+version: '0.06'
 x_serialization_backend: 'YAML::Tiny version 1.70'

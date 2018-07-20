@@ -49,13 +49,14 @@ TEST: {
 			print $tmp "print \"\\n\\n\";\n";
 			print $tmp "print \"<HTML><BODY>   Hello World</BODY></HTML>\\n\";\n";
 
-			open(my $fout, '-|', "$^X -Iblib/lib " . $filename);
+			open(my $fin, '-|', "$^X -Iblib/lib " . $filename);
 
 			my $keep = $_;
 			undef $/;
-			my $output = <$fout>;
+			my $output = <$fin>;
 			$/ = $keep;
 
+			close $fin;
 			close $tmp;
 
 			ok($output !~ /^Content-Encoding: gzip/m);

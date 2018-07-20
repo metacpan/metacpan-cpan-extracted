@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::Common::Configuration;
-$Maven::Xml::Common::Configuration::VERSION = '1.14';
+$Maven::Xml::Common::Configuration::VERSION = '1.15';
 # ABSTRACT: Maven Configuration element
 # PODNAME: Maven::Xml::Common::Configuration
 
@@ -25,7 +25,7 @@ Maven::Xml::Common::Configuration - Maven Configuration element
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 

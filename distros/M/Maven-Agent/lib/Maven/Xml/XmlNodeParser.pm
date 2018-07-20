@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Maven::Xml::XmlNodeParser;
-$Maven::Xml::XmlNodeParser::VERSION = '1.14';
+$Maven::Xml::XmlNodeParser::VERSION = '1.15';
 # ABSTRACT: A parser for a Maven XML node
 # PODNAME: Maven::Xml::XmlNodeParser
 
@@ -84,7 +84,7 @@ Maven::Xml::XmlNodeParser - A parser for a Maven XML node
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 AUTHOR
 
