@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.609   2018-07-21
+        - Set environment variable TC_AMBIGUOUS_WIDE to treat ambiguous characters as full width.
+
 1.608   2018-07-20
         - Bugfix key codes Win32.
 

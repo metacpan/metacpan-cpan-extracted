@@ -3,7 +3,7 @@ package Pod::ProjectDocs::CSS;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';    # VERSION
+our $VERSION = '0.52';    # VERSION
 
 use Moose;
 with 'Pod::ProjectDocs::File';
@@ -315,16 +315,29 @@ table.dlsip     {
   white-space: pre;
 }
 
-.pod H1      {
+.pod H1,
+.pod H2,
+.pod H3,
+.pod H4 {
   background: transparent;
   color: #006699;
-  font-size: large;
+}
+
+.pod H1      {
+  font-size: x-large;
 }
 
 .pod H2      {
-  background: transparent;
-  color: #006699;
+  font-size: large;
+}
+
+.pod H3      {
   font-size: medium;
+}
+
+.pod H4      {
+  font-size: medium;
+  font-style: italic;
 }
 
 .pod IMG     {

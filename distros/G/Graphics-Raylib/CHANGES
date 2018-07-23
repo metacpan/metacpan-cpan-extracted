@@ -1,9 +1,41 @@
 ==================================================
-Changes from 2017-07-10 00:00:00 +0000 to present.
+Changes from 2017-07-21 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.021 at 2018-07-10 08:56:22 +0000
+version 0.022 at 2018-07-21 22:57:40 +0000
+------------------------------------------
+
+  Change: 0af53cedfba950230d339aecf78eb30ebe52b7ed
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-07-18 08:36:55 +0000
+
+    Bump README.pod version 
+
+  Change: 121784d9fe9aae36fd5fffe4f2295890db3caa0a
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-07-18 08:30:26 +0000
+
+    s/ref/Scalar::Util::blessed/ 
+
+  Change: dfd32d71366d1764536d4618a61d07aae618ed60
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-07-18 08:30:13 +0000
+
+    s/GetDefaultFont/GetFontDefault/ 
+
+  Change: 1094f2781707ec24d0650341714c2b1a4e0b2337
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-07-14 11:31:04 +0000
+
+    Pass -std=c99 when compiling XS
+
+    Should fix
+    http://www.cpantesters.org/cpan/report/95ead488-8468-11e8-8358-e8f6f8
+    bfe2bd 
+
+------------------------------------------
+version 0.021 at 2018-07-04 12:16:40 +0000
 ------------------------------------------
 
   Change: c3cb5f4fbb89e855aef9c90cf4b4836c48c0dbf5
@@ -433,5 +465,5 @@ version 0.003 at 2017-10-04 14:27:50 +0000
     Bigger bitmaps ran into size limits before. 
 
 ================================================
-Plus 2 releases after 2017-07-10 00:00:00 +0000.
+Plus 2 releases after 2017-07-21 00:00:00 +0000.
 ================================================

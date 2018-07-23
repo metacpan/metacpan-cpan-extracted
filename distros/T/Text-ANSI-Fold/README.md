@@ -12,6 +12,12 @@ Text::ANSI::Fold - Text folding with ANSI sequence and Asian wide characters.
     $f->configure(ambiguous => 'wide');
     ($folded, $remain) = $f->fold($text);
 
+    use Text::ANSI::Fold;
+    while (<>) {
+        print join "\n",
+            Text::ANSI::Fold->new(width => 40, text => $_)->chops;
+    }
+
 # DESCRIPTION
 
 Text::ANSI::Fold provides capability to fold a text into two strings
@@ -27,10 +33,14 @@ Use exported **ansi\_fold** function to fold original text, with number
 of visual columns you want to cut off the text.  Width parameter have
 to be a number greater than zero.
 
-    ($folded, $remain) = ansi_fold($text, $width);
+    ($folded, $remain, $w) = ansi_fold($text, $width);
 
-It returns a pair of strings.  First one is folded text, and second is
-cut-off text.
+It returns a pair of strings; first one is folded text, and second is
+the rest.
+
+Additional third result is the visual width of folded text.  You may
+want to know how many columns returned string takes for further
+processing.
 
 This function returns at least one character in any situation.  If you
 provide Asian wide string and just one column as width, it trims off
@@ -74,15 +84,30 @@ saved value.
 
 # STRING OBJECT INTERFACE
 
-Experimentally fold object can hold string inside.
+Fold object can hold string inside by **text** method.
 
-    $f->configure(text => "text");
+    $f->text("text");
 
-And folded string can be taken by _retrieve_ method.
+And folded string can be taken by **retrieve** method.  It returns
+empty string if nothing remained.
 
     while ((my $folded = $f->retrieve) ne '') {
         print $folded;
         print "\n" if $folded !~ /\n\z/;
+    }
+
+Method **chops** returns chopped string list.  Because **text** method
+returns the object itself, you can use **text** and **chops** like this:
+
+    print join "\n", $f->text($text)->chops;
+
+Actually, text can be set by **new** or **configure** method through
+**text** option.  Next program just works.
+
+    use Text::ANSI::Fold;
+    while (<>) {
+        print join "\n",
+            Text::ANSI::Fold->new(width => 40, text => $_)->chops;
     }
 
 # OPTIONS
@@ -147,6 +172,8 @@ function as well as **new** and **configure** method.
     overhead.  Also **sdif** need to process other than SGR (Select Graphic
     Rendition) color sequence, and non-spacing combining characters, those
     are not supported by these modules.
+
+- [https://en.wikipedia.org/wiki/ANSI\_escape\_code](https://en.wikipedia.org/wiki/ANSI_escape_code)
 
 # LICENSE
 

@@ -28,7 +28,7 @@ WriteMakefile(
     ABSTRACT_FROM     => 'lib/Graphics/Raylib/XS.pm', # retrieve abstract from module
     AUTHOR            => 'Ahmad Fatoum <ahmad@a3f.at>',
     LICENSE           => 'perl',
-    DEFINE            => '-Wno-format',
+    DEFINE            => '-Wno-format -std=c99',
     LIBS              => [ @LIBS ],
     @other_ldflags,
     INC               => Alien::raylib->cflags_static,

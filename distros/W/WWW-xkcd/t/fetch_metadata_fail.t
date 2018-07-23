@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 6;
 use Test::Fatal;
 
 # this makes the $can_async return false
@@ -46,7 +46,7 @@ use Test::Fatal;
         my $img  = shift;
 
         isa_ok( $self, 'HTTP::Tiny' );
-        is( $img, 'http://xkcd.com/100/info.0.json', 'Correct img' );
+        is( $img, 'https://xkcd.com/100/info.0.json', 'Correct img' );
 
         # this is purposely missing 'success' key
         return { reason => 'bwahaha' };
@@ -64,12 +64,11 @@ like(
 );
 
 SKIP: {
-    local $@ = undef;
-    eval 'use AnyEvent';
-    $@ and skip 'AnyEvent is needed for this test' => 1;
+    eval { require AnyEvent; require AnyEvent::HTTP; 1; }
+    and skip 'This test runs without AnyEvent and AnyEvent::HTTP' => 1;
 
     like(
-        exception { $x->fetch_metadata(100, sub {1} ) },
+        exception { $x->fetch_metadata( 100, sub {1} ) },
         qr/^\QAnyEvent and AnyEvent::HTTP are required for async mode\E/,
         'Failed in async as well',
     );

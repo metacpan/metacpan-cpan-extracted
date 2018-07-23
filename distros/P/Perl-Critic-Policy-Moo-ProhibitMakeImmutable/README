@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Perl-Critic-Policy-Moo-ProhibitMakeImmutable,
-version 0.02:
+version 0.03:
 
   Makes sure that Moo classes do not contain calls to make_immutable.
 
-This software is copyright (c) 2017 by Aran Deltac.
+This software is copyright (c) 2018 by Aran Deltac.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

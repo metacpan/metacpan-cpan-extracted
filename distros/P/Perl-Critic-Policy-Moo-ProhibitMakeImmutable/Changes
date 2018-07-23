@@ -1,5 +1,9 @@
 Revision history for Perl extension Perl::Critic::Policy::Moo::ProhibitMakeImmutable.
 
+0.03 2018-07-20
+
+ - Optimize; we only care *if* we found a match. @bleargh45
+
 0.02 2017-12-30
 
  - Fix typo. @kyzn

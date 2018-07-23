@@ -77,6 +77,36 @@ sub _rpcnot_didChangeConfiguration
 
 # ---------------------------------------------------------------------------
 
+
+sub _rpcnot_didChangeWorkspaceFolders
+    {
+    my ($self, $workspace, $req) = @_ ;
+
+    my $added = $req -> params -> {event}{added} ;
+    if ($added)
+        {
+        $workspace -> set_workspace_folders ($added) ;
+        }
+        
+    my $removed = $req -> params -> {event}{removed} ;
+    if ($removed)
+        {
+        foreach my $folder (@$removed)
+            {
+            my $uri = $folder -> {uri} ;
+            #TODO    
+            }    
+        }
+
+    async
+        {
+        $workspace -> background_parser ($self) ;
+        } ;
+
+    }
+
+# ---------------------------------------------------------------------------
+
 sub _rpcreq_symbol
     {
     my ($self, $workspace, $req) = @_ ;

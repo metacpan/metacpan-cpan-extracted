@@ -13,15 +13,23 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "WebService-KvKAPI",
+  "EXE_FILES" => [
+    "bin/query_kvk.pl"
+  ],
   "LICENSE" => "open_source",
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "WebService::KvKAPI",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Data::Dumper" => 0,
+    "Getopt::Long" => 0,
     "Moose" => 0,
     "MooseX::Log::Log4perl" => 0,
     "OpenAPI::Client" => 0,
-    "namespace::autoclean" => 0
+    "Pod::Usage" => 0,
+    "namespace::autoclean" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -31,11 +39,9 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::Exception" => 0,
     "Test::Mock::One" => 0,
-    "Test::More" => "0.96",
-    "strict" => 0,
-    "warnings" => 0
+    "Test::More" => "0.96"
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,12 +50,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Data::Dumper" => 0,
   "File::Spec" => 0,
+  "Getopt::Long" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Moose" => 0,
   "MooseX::Log::Log4perl" => 0,
   "OpenAPI::Client" => 0,
+  "Pod::Usage" => 0,
   "Sub::Override" => 0,
   "Test::Deep" => 0,
   "Test::Exception" => 0,

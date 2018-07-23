@@ -1,0 +1,419 @@
+アローラコラッタ:   #---------------------------------------------------------
+    Name:
+        ja: コラッタ
+        en: Rattata
+    ID: 019
+    Types:
+    - あく
+    - ノーマル
+    Skill:
+        - たいあたり
+        - でんこうせっか
+    Special:
+        - シャドーボール
+        - ひっさつまえば
+        - かみくだく
+    From:
+    To:
+        - ラッタ
+    Stamina: 60
+    Attack: 103
+    Defense: 70
+    MAXCP:
+        Hatched: 336
+        Boosted: 420
+アローララッタ:   #-----------------------------------------------------------
+    Name:
+        ja: ラッタ
+        en: Raticate
+    ID: 020
+    Types:
+        - あく
+        - ノーマル
+    Skill:
+        - かみつく
+        - でんこうせっか
+    Special:
+        - かみくだく
+        - ひっさつまえば
+        - はかいこうせん
+    From: コラッタ
+    To:
+    Stamina: 150
+    Attack: 135
+    Defense: 159
+    MAXCP:
+        Hatched: 907
+        Boosted: 1133
+アローラライチュウ:   #--------------------------------------------------------
+    Name:
+        ja: ライチュウ
+        en: Raichu
+    ID: 026
+    Types:
+        - でんき
+        - エスパー
+    Skill:
+        - ボルトチェンジ
+        - スパーク
+    Special:
+        - サイコキネシス
+        - かみなりパンチ
+        - ワイルドボルト
+    From: ピカチュウ
+    To:
+    Stamina: 120
+    Attack: 201
+    Defense: 172
+    MAXCP:
+        Hatched: 1224
+        Boosted: 1531
+アローラサンド:   #-----------------------------------------------------------
+    Name:
+        ja: サンド
+        en: Sandshrew
+    ID: 027
+    Types:
+        - こおり
+        - はがね
+    Skill:
+        - メタルクロー
+        - こなゆき
+    Special:
+        - ふぶき
+        - つじぎり
+        - ジャイロボール
+    From:
+    To:
+        - サンドパン
+    Stamina: 100
+    Attack: 125
+    Defense: 154
+    MAXCP:
+        Hatched: 696
+        Boosted: 870
+アローラサンドパン:   #--------------------------------------------------------
+    Name:
+        ja: サンドパン
+        en: Sandslash
+    ID: 028
+    Types:
+        - こおり
+        - はがね
+    Skill:
+        - メタルクロー
+        - こなゆき
+    Special:
+        - ふぶき
+        - ジャイロボール
+        - じならし
+    From: サンド
+    To:
+    Stamina: 150
+    Attack: 177
+    Defense: 221
+    MAXCP:
+        Hatched: 1352
+        Boosted: 1690
+アローラロコン:   #----------------------------------------------------------
+    Name:
+        ja: ロコン
+        en: Vulpix
+    ID: 037
+    Types:
+        - こおり
+    Skill:
+        - こなゆき
+        - しねんのずつき
+    Special:
+        - れいとうビーム
+        - ふぶき
+        - あくのはどう
+    From:
+    To:
+        - キュウコン
+    Stamina: 76
+    Attack: 96
+    Defense: 122
+    MAXCP:
+        Hatched: 442
+        Boosted: 552
+アローラキュウコン:   #--------------------------------------------------------
+    Name:
+        ja: キュウコン
+        en: Ninetales
+    ID: 038
+    Types:
+        - こおり
+        - フェアリー
+    Skill:
+        - だましうち
+        - こなゆき
+    Special:
+        - れいとうビーム
+        - ふぶき
+        - マジカルシャイン
+    From: ロコン
+    To:
+    Stamina: 146
+    Attack: 170
+    Defense: 207
+    MAXCP:
+        Hatched: 1248
+        Boosted: 1560
+アローラディグダ:   #---------------------------------------------------------
+    Name:
+        ja: ディグダ
+        en: Diglett
+    ID: 050
+    Types:
+        - じめん
+        - はがね
+    Skill:
+        - どろかけ
+        - メタルクロー
+    Special:
+        - あなをほる
+        - どろばくだん
+        - がんせきふうじ
+    From:
+    To:
+        - ダグトリオ
+    Stamina: 20
+    Attack: 108
+    Defense: 89
+    MAXCP:
+        Hatched: 264
+        Boosted: 331
+アローラダグトリオ:   #--------------------------------------------------------
+    Name:
+        ja: ダグトリオ
+        en: Dugtrio
+    ID: 051
+    Types:
+        - じめん
+        - はがね
+    Skill:
+        - どろかけ
+        - メタルクロー
+    Special:
+        - じしん
+        - どろばくだん
+        - アイアンヘッド
+    From: ディグダ
+    To:
+    Stamina: 70
+    Attack: 201
+    Defense: 148
+    MAXCP:
+        Hatched: 907
+        Boosted: 1134
+アローラニャース:   #---------------------------------------------------------
+    Name:
+        ja: ニャース
+        en: Meowth
+    ID: 052
+    Types:
+        - あく
+    Skill:
+        - ひっかく
+        - かみつく
+    Special:
+        - つじぎり
+        - あくのはどう
+        - イカサマ
+    From:
+    To:
+        - ペルシアン
+    Stamina: 80
+    Attack: 99
+    Defense: 81
+    MAXCP:
+        Hatched: 388
+        Boosted: 485
+アローラペルシアン:   #--------------------------------------------------------
+    Name:
+        ja: ペルシアン
+        en: Persian
+    ID: 053
+    Types:
+        - あく
+    Skill:
+        - ひっかく
+        - だましうち
+    Special:
+        - イカサマ
+        - じゃれつく
+        - あくのはどう
+    From: ニャース
+    To:
+    Stamina: 130
+    Attack: 158
+    Defense: 139
+    MAXCP:
+        Hatched: 922
+        Boosted: 1153
+アローライシツブテ:   #--------------------------------------------------------
+    Name:
+        ja: イシツブテ
+        en: Geodude
+    ID: 074
+    Types:
+        - いわ
+        - でんき
+    Skill:
+        - いわおとし
+        - ボルトチェンジ
+    Special:
+        - スピードスター
+        - がんせきふうじ
+        - 10まんボルト
+    From:
+    To:
+        - ゴローン
+    Stamina: 80
+    Attack: 132
+    Defense: 163
+    MAXCP:
+        Hatched: 682
+        Boosted: 852
+アローラゴローン:   #---------------------------------------------------------
+    Name:
+        ja: ゴローン
+        en: Graveler
+    ID: 075
+    Types:
+        - いわ
+        - でんき
+    Skill:
+        - いわおとし
+        - ボルトチェンジ
+    Special:
+        - ストーンエッジ
+        - ロックブラスト
+        - 10まんボルト
+    From:
+    To:
+        - ゴローニャ
+    Stamina: 110
+    Attack: 164
+    Defense: 196
+    MAXCP:
+        Hatched: 1037
+        Boosted: 1296
+アローラゴローニャ:   #--------------------------------------------------------
+    Name:
+        ja: ゴローニャ
+        en: Golem
+    ID: 076
+    Types:
+        - いわ
+        - でんき
+    Skill:
+        - いわおとし
+        - ボルトチェンジ
+    Special:
+        - ストーンエッジ
+        - ロックブラスト
+        - ワイルドボルト
+    From: ゴローン
+    To:
+    Stamina: 160
+    Attack: 211
+    Defense: 229
+    MAXCP:
+        Hatched: 1666
+        Boosted: 2083
+アローラベトベター:   #--------------------------------------------------------
+    Name:
+        ja: ベトベター
+        en: Grimer
+    ID: 088
+    Types:
+        - どく
+        - あく
+    Skill:
+        - どくづき
+        - かみつく
+    Special:
+        - ダストシュート
+        - かみくだく
+        - ヘドロばくだん
+    From:
+    To:
+        - ベトベトン
+    Stamina: 160
+    Attack: 135
+    Defense: 90
+    MAXCP:
+        Hatched: 725
+        Boosted: 907
+アローラベトベトン:   #--------------------------------------------------------
+    Name:
+        ja: ベトベトン
+        en: Muk
+    ID: 089
+    Types:
+        - どく
+        - あく
+    Skill:
+        - どくづき
+        - かみつく
+    Special:
+        - あくのはどう
+        - ダストシュート
+        - ヘドロウェーブ
+    From: ベトベター
+    To:
+    Stamina: 210
+    Attack: 190
+    Defense: 184
+    MAXCP:
+        Hatched: 1548
+        Boosted: 1935
+アローラナッシー:   #---------------------------------------------------------
+    Name:
+        ja: ナッシー
+        en: Exeggutor
+    ID: 103
+    Types:
+        - くさ
+        - ドラゴン
+    Skill:
+        - タネマシンガン
+        - ドラゴンテール
+    Special:
+        - タネばくだん
+        - りゅうのはどう
+        - ソーラービーム
+    From: タマタマ
+    To:
+    Stamina: 190
+    Attack: 230
+    Defense: 158
+    MAXCP:
+        Hatched: 1646
+        Boosted: 2058
+アローラガラガラ:   #---------------------------------------------------------
+    Name:
+        ja: ガラガラ
+        en: Marowak
+    ID: 105
+    Types:
+        - ほのお
+        - ゴースト
+    Skill:
+        - たたりめ
+        - いわくだき
+    Special:
+        - ホネこんぼう
+        - シャドーボール
+        - だいもんじ
+    From: カラカラ
+    To:
+    Stamina: 120
+    Attack: 144
+    Defense: 200
+    MAXCP:
+        Hatched: 966
+        Boosted: 1208

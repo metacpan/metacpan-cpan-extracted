@@ -1,6 +1,6 @@
 package WWW::xkcd;
 # ABSTRACT: Synchronous and asynchronous interfaces to xkcd comics
-$WWW::xkcd::VERSION = '0.008';
+$WWW::xkcd::VERSION = '0.009';
 use strict;
 use warnings;
 use Carp;
@@ -154,7 +154,7 @@ WWW::xkcd - Synchronous and asynchronous interfaces to xkcd comics
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -237,8 +237,7 @@ Fetch just the metadata of the comic.
 
 Works just like C<fetch>, but instead of retrieving the latest comic, or the
 one specified, just gets a random comic. It can also receive a callback for
-retrieving the comic. Nevertheless, at the current time, the request to
-get current number of availble comics is still synchronous.
+retrieving the comic.
 
 =head1 NAMING
 

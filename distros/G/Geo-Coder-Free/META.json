@@ -31,6 +31,7 @@
             "IPC::System::Simple" : "0",
             "JSON" : "0",
             "LWP::UserAgent::Throttled" : "0",
+            "Try::Tiny" : "0",
             "autodie" : "0"
          }
       },
@@ -87,6 +88,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

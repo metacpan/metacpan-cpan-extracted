@@ -3,10 +3,6 @@ package NKTI::general::hash;
 use strict;
 use warnings;
 
-# Define Version :
-# ---------------------------------------------------------------- 
-our $VERSION = '0.15';
-
 # Subroutine for union :
 # ------------------------------------------------------------------------
 =head1 SUBROUTINE union()

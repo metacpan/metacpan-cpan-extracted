@@ -1,5 +1,9 @@
 Revision history for Perl extension Perl::Critic::Policy::TryTiny::RequireUse.
 
+0.03 2018-07-20
+
+ - Optimize; we only care *if* we've found a match. @bleargh45
+
 0.02 2016-06-21
 
  - Add support for Try, Syntax::Feature::Try, and Error modules.

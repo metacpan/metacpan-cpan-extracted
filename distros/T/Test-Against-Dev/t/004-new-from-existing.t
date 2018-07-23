@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use feature 'say';
 
-use Test::More;
 use Carp;
 use Cwd;
 use File::Basename;
@@ -14,6 +13,9 @@ use File::Temp ( qw| tempdir tempfile |);
 use Data::Dump ( qw| dd pp | );
 use Test::RequiresInternet ('ftp.funet.fi' => 21);
 use Test::Against::Dev;
+use Test::More;
+use lib ('./t/lib');
+use Helpers (qw| test_TAD_analyze_methods |);
 
 my $self;
 my $perl_version = 'perl-5.27.4';
@@ -221,8 +223,6 @@ SKIP: {
     my ($perl_version) = $good_path =~ s{^.*/([^/]*?)/bin/perl$}{$1}r;
     # This test should be run with an installed bin/perl, installed bin/cpanm
     # and created but empty .cpanm beneath, say, ~/tmp/perl-5.28.0/
-    #say "WWW: $good_path";
-    #say "XXX: $perl_version";
     {
         local $@;
         my $bad_application_dir = catdir('foo', 'bar');
@@ -329,40 +329,8 @@ SKIP: {
         ok(-f $gzipped_build_log, "Located $gzipped_build_log");
     }
 
-    my $ranalysis_dir;
-    {
-        local $@;
-        eval { $ranalysis_dir = $self->analyze_cpanm_build_logs( [ verbose => 1 ] ); };
-        like($@, qr/analyze_cpanm_build_logs: Must supply hash ref as argument/,
-            "analyze_cpanm_build_logs(): Got expected error message for lack of hash ref");
-    }
-
-    $ranalysis_dir = $self->analyze_cpanm_build_logs( { verbose => 1 } );
-    ok(-d $ranalysis_dir,
-        "analyze_cpanm_build_logs() returned path to version-specific analysis directory '$ranalysis_dir'");
-
-    my $rv;
-    {
-        local $@;
-        eval { $rv = $self->analyze_json_logs( verbose => 1 ); };
-        like($@, qr/analyze_json_logs: Must supply hash ref as argument/,
-            "analyze_json_logs(): Got expected error message: absence of hash ref");
-    }
-
-    {
-        local $@;
-        eval { $rv = $self->analyze_json_logs( { verbose => 1, sep_char => "\t" } ); };
-        like($@, qr/analyze_json_logs: Currently only pipe \('\|'\) and comma \(','\) are supported as delimiter characters/,
-            "analyze_json_logs(): Got expected error message: unsupported delimiter");
-    }
-
-    my $fpsvfile = $self->analyze_json_logs( { verbose => 1 } );
-    ok($fpsvfile, "analyze_json_logs() returned true value");
-    ok(-f $fpsvfile, "Located '$fpsvfile'");
-
-    my $fcsvfile = $self->analyze_json_logs( { verbose => 1 , sep_char => ',' } );
-    ok($fcsvfile, "analyze_json_logs() returned true value");
-    ok(-f $fcsvfile, "Located '$fcsvfile'");
+    # blocks used in both t/004 and t/008
+    test_TAD_analyze_methods($self);
 }
 
 # Try to ensure that we get back to where we started so that tempdirs can be

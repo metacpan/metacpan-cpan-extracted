@@ -1,14 +1,10 @@
-﻿# $Id: 01_default.t 321 2010-10-30 18:06:08Z roland $
-# $Revision: 321 $
-# $HeadURL: svn+ssh://ipenburg.xs4all.nl/srv/svnroot/elaine/trunk/HTML-Hyphenate/t/01_default.t $
-# $Date: 2010-10-30 20:06:08 +0200 (Sat, 30 Oct 2010) $
-
-use strict;
+﻿use strict;
 use warnings;
 use utf8;
 
 use Test::More;
-$ENV{TEST_AUTHOR} && eval { require Test::NoWarnings };
+use Test::Warn;
+$ENV{AUTHOR_TESTING} && eval { require Test::NoWarnings };
 
 use HTML::Tree;
 use version;
@@ -121,16 +117,20 @@ my @fragments = (
     ],
 );
 
-plan tests => ( 0 + @fragments ) + 1;
+plan tests => ( 0 + @fragments ) + 1 + 1;
 
-use HTML::Hyphenate;
+warnings_like {
+	require HTML::Hyphenate;
+} [
+], 'Warned out unescaped left brace in TeX::Hyphen';
+
 my $h = HTML::Hyphenate->new();
 foreach my $frag (@fragments) {
     is( $h->hyphenated( @{$frag}[0] ), @{$frag}[1], @{$frag}[2] );
 }
 
-my $msg = 'Author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
+my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
 SKIP: {
-    skip $msg, 1 unless $ENV{TEST_AUTHOR};
+    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
 }
-$ENV{TEST_AUTHOR} && Test::NoWarnings::had_no_warnings();
+$ENV{AUTHOR_TESTING} && Test::NoWarnings::had_no_warnings();

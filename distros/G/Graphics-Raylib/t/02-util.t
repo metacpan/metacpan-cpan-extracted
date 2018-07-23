@@ -1,4 +1,5 @@
 use Test::More tests => 49;
+use Scalar::Util qw/blessed/;
 
 BEGIN {
     use_ok 'Graphics::Raylib::Util', ':objects';
@@ -6,7 +7,7 @@ BEGIN {
 
 my @vector2 = (10, -12);
 my $vector2 = vector(@vector2);
-is ref($vector2), 'Graphics::Raylib::XS::Vector2';
+is blessed($vector2), 'Graphics::Raylib::XS::Vector2';
 is length $$vector2, 8;
 is "$vector2", '(10, -12)';
 is $vector2->x, $vector2[0];
@@ -17,7 +18,7 @@ is abs($vector2), sqrt(10**2 + (-12)**2);
 
 my @vector3 = (10, -12, 9);
 my $vector3 = vector(@vector3);
-is ref($vector3), 'Graphics::Raylib::XS::Vector3';
+is blessed($vector3), 'Graphics::Raylib::XS::Vector3';
 is length $$vector3, 12;
 is "$vector3", '(10, -12, 9)';
 is $vector3->x, $vector3[0];
@@ -33,7 +34,7 @@ ok $vector2to3 == $vector2;
 {
     my @vector4 = (10, -12, 9, 2);
     my $vector4 = vector(@vector4);
-    is ref($vector4), 'Graphics::Raylib::XS::Vector4';
+    is blessed($vector4), 'Graphics::Raylib::XS::Vector4';
     is length $$vector4, 16;
     is "$vector4", '(10, -12, 9, 2)';
     is $vector4->x, $vector4[0];
@@ -52,7 +53,7 @@ is length $$vector5, 12;
 is $vector5, $vector3;
 
 my $rect = rectangle(x=>10, y=>-12, width => 2, height => 3);
-is ref($rect), 'Graphics::Raylib::XS::Rectangle';
+is blessed($rect), 'Graphics::Raylib::XS::Rectangle';
 is "$rect", '(x: 10.000000, y: -12.000000, width: 2.000000, height: 3.000000)';
 is length $$rect, 16;
 is $rect->x, 10;
@@ -64,7 +65,7 @@ ok rectangle(x=>10, y=> -12, width=> 1, height => 3) x $rect, 'Collision';
 ok !(rectangle(x=>10, y=> 10, width=> 1, height => 3) x $rect), 'No collision';
 
 my $cam = camera3d(position=>vector(4,2,0), target=>[5,6,7], up => $vector3, fovy => 3.5);
-is ref($cam), 'Graphics::Raylib::XS::Camera3D';
+is blessed($cam), 'Graphics::Raylib::XS::Camera3D';
 is length $$cam, 44;
 isnt $cam->position, vector(2,2,0);
 is $cam->position, vector(4,2,0);

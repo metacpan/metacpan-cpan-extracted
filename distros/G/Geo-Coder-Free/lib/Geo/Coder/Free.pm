@@ -16,11 +16,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -74,11 +74,10 @@ sub new {
 		maxmind => Geo::Coder::Free::MaxMind->new(%param)
 	};
 
-	if(!$param{'openaddr'}) {
-		if($ENV{'OPENADDR_HOME'}) {
-			$param{'openaddr'} = $ENV{'OPENADDR_HOME'};
-		}
+	if((!$param{'openaddr'}) && $ENV{'OPENADDR_HOME'}) {
+		$param{'openaddr'} = $ENV{'OPENADDR_HOME'};
 	}
+
 	if($param{'openaddr'}) {
 		$rc->{'openaddr'} = Geo::Coder::Free::OpenAddresses->new(%param);
 	}
@@ -122,6 +121,7 @@ my %common_words = (
 sub geocode {
 	my $self = shift;
 	my %param;
+
 	if(ref($_[0]) eq 'HASH') {
 		%param = %{$_[0]};
 	} elsif(ref($_[0])) {
@@ -146,7 +146,7 @@ sub geocode {
 
 				}
 			}
-			return @rc;
+			return @rc if($rc[0]);
 		} elsif(my $rc = $self->{'openaddr'}->geocode(\%param)) {
 			return $rc;
 		}
@@ -218,6 +218,14 @@ Nigel Horne <njh@bandsman.co.uk>
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
+=head1 GETTING STARTED
+
+Before you start,
+install L<App::csv2sqlite>;
+optionally set the environment variable OPENADDR_HOME to point to an empty directory and download the data from L<http://results.openaddresses.io> into that directory;
+optionally set the environment variable WHOSONFIRST_HOME to point to an empty directory and download the data using L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/wof-sqlite-download>.
+You do not need to download the MaxMind data, that will be downloaded automatically.
+
 =head1 MORE INFORMATION
 
 I've written a few Perl related Genealogy programs including gedcom (L<https://github.com/nigelhorne/gedcom>)
@@ -234,17 +242,15 @@ is to create a database of those databases and to create a search engine either 
 Both are in their early days, but I have examples which do surprisingly well.
 
 The local copy of the database is built using the createdatabase.PL script which is bundled with G:C:F.
-That script creates a single SQLite file from downloaded copies of the databases listed above.
-Running 'make' will download GeoNames and Maxmind, but OpenAddresses and WhosOnFirst need to be downloaded manually if you decide to use them - they are treated as optional by G:C:.F.
+That script creates a single SQLite file from downloaded copies of the databases listed above, to create the database you will need
+to first install L<App::csv2sqlite>.
+Running 'make' will download GeoNames and MaxMind, but OpenAddresses and WhosOnFirst need to be downloaded manually if you decide to use them - they are treated as optional by G:C:F.
 
 There is a sample website at L<https://geocode.nigelhorne.com/>.  The source code for that site is included in the G:C:F distribution.
 
 =head1 BUGS
 
 Lots of lookups fail at the moment.
-
-The openaddresses.io code has yet to be completed.
-There are die()s where the code path has yet to be written.
 
 The MaxMind data only contains cities.
 The openaddresses data doesn't cover the globe.

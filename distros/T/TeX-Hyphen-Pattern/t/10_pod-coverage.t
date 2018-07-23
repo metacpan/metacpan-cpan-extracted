@@ -1,10 +1,25 @@
-# $Id: 10_pod-coverage.t 102 2009-07-30 14:48:55Z roland $
-# $Revision: 102 $
-# $HeadURL: svn+ssh://ipenburg.xs4all.nl/srv/svnroot/rhonda/trunk/TeX-Hyphen-Pattern/t/10_pod-coverage.t $
-# $Date: 2009-07-30 16:48:55 +0200 (Thu, 30 Jul 2009) $
+#!/usr/bin/env perl -w    # -*- cperl -*-
+use strict;
+use warnings;
+use 5.014000;
+use utf8;
 
 use Test::More;
-eval "use Test::Pod::Coverage 1.00";
-plan skip_all => "Test::Pod::Coverage 1.00 required for testing POD coverage"
-  if $@;
-all_pod_coverage_ok();
+
+our $VERSION = 0.103;
+
+if ( not $ENV{'AUTHOR_TESTING'} ) {
+    my $msg =
+q{Author test. Set the environment variable AUTHOR_TESTING to enable this test.};
+    plan( 'skip_all' => $msg );
+}
+
+eval {
+    require Test::Pod::Coverage;
+    1;
+} or do {
+    my $msg = q{Test::Pod::Coverage 1.00 required to check spelling of POD};
+    plan 'skip_all' => $msg;
+};
+
+Test::Pod::Coverage::all_pod_coverage_ok();

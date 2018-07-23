@@ -3,10 +3,6 @@ package NKTI::general::char::split;
 use strict;
 use warnings;
 
-# Define Version
-# ----------------------------------------------------------------
-our $VERSION = '0.15';
-
 # Create Action Split Character in string :
 # ------------------------------------------------------------------------
 sub based_length {

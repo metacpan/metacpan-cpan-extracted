@@ -1,5 +1,14 @@
 Revision history for Map::Tube::CLI
 
+0.52  Sun Jul 22 10:00:00 2018
+      - Fixed bug in line notes logic.
+
+0.51  Sat Jul 21 09:20:00 2018
+      - Updated line mappings generated section slightly.
+
+0.50  Fri Jul 20 16:40:00 2018
+      - Improved guessing package name when generating line notes.
+
 0.49  Thu Jul 19 20:00:00 2018
       - Updated pod w.r.t to the new command lines options.
 

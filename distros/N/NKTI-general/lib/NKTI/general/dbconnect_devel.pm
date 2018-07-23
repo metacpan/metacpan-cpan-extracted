@@ -5,10 +5,6 @@ use warnings;
 use JSON;
 use DBI;
 
-# Define Version :
-# ----------------------------------------------------------------
-our $VERSION = '0.15';
-
 # Subroutine for MySQL RDMS connection :
 # ------------------------------------------------------------------------
 =head1 SUBROUTINE mysql()

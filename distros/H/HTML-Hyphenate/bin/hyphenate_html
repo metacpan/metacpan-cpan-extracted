@@ -1,0 +1,37 @@
+#!/usr/bin/env perl -w    # -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2009-2018, Roland van Ipenburg
+use strict;
+use warnings;
+
+use utf8;
+use 5.014000;
+use English qw( -no_match_vars );
+BEGIN { our $VERSION = '0.101'; }
+
+use HTML::Hyphenate;
+
+use Readonly;
+Readonly::Scalar my $EMPTY      => q{};
+Readonly::Scalar my $MIN_LENGTH => 5;
+
+my $hyphenator = HTML::Hyphenate->new();
+$hyphenator->min_length($MIN_LENGTH);
+
+while ( my $filename = shift @ARGV ) {
+    open( my $fh, q{<:encoding(UTF-8)}, $filename )
+      ## no critic qw(RequireCarping RequireUseOfExceptions)
+      || die qq{Can't open UTF-8 encoded $filename: $ERRNO};
+    ## use critic
+    my $html = q{};
+    while ( my $line = <$fh> ) {
+        $html .= $line;
+    }
+    ## no critic qw(RequireCarping RequireUseOfExceptions)
+    close $fh || die qq{Can't close UTF-8 encoded $fh: $ERRNO};
+    ## use critic
+    binmode STDOUT, ':encoding(UTF-8)';
+    my ( $pre, $body, $post ) = $html =~ m{^(.*<body>)(.*)(</body>.*)$}xmgis;
+    ## no critic qw(RequireCheckedSyscalls)
+    print $pre, $hyphenator->hyphenated($body), $post;
+    ## use critic
+}

@@ -42,7 +42,7 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Object::Util" => { file => "lib/Object/Util.pm", version => 0.009 },
+                        "Object::Util" => { file => "lib/Object/Util.pm", version => "0.010" },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -56,7 +56,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Object-Util/project",
                       },
-  "version"        => 0.009,
+  "version"        => "0.010",
 };
 
 my %dynamic_config;

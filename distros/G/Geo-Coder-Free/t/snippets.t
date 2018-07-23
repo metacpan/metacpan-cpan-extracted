@@ -12,11 +12,11 @@ if(not $ENV{AUTHOR_TESTING}) {
 eval "use Test::Pod::Snippets";
 
 if($@) {
-	plan skip_all => 'Test::Pod::Snippets required for testing POD code snippets';
+	plan(skip_all => 'Test::Pod::Snippets required for testing POD code snippets');
 } else {
-	my $tps = Test::Pod::Snippets->new;
+	my $tps = Test::Pod::Snippets->new();
 
-	my @modules = ('Geo::Coder::Free', 'Geo::Coder::Free::MaxMind', 'Geo::Coder::Free::Openaddresses');
+	my @modules = ('Geo::Coder::Free::OpenAddresses', 'Geo::Coder::Free::MaxMind', 'Geo::Coder::Free');
 
-	$tps->runtest( module => $_, testgroup => 1 ) for @modules;
+	$tps->runtest(module => $_, testgroup => 1) for @modules;
 }

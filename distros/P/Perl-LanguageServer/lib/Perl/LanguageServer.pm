@@ -7,9 +7,6 @@ use Moose::Util qw( apply_all_roles );
 use Coro ;
 use Coro::AIO ;
 use AnyEvent;
-#use AnyEvent::Handle ;
-#use AnyEvent::Socket ;
-#use Coro::Handle ;
 use JSON ;
 use Data::Dump qw{dump} ;
 
@@ -31,7 +28,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -86,6 +83,12 @@ has 'debug' =>
     default => 1,
     ) ;
 
+has 'out_semaphore' =>
+    (
+    is => 'ro',
+    isa => 'Coro::Semaphore',
+    default => sub { Coro::Semaphore -> new }
+    ) ;
 
 # ---------------------------------------------------------------------------
 
@@ -102,6 +105,7 @@ sub send_notification
 
     $notification -> {jsonrpc} = '2.0' ;       
     my $outdata = $json -> encode ($notification) ;
+    my $guard = $self -> out_semaphore -> guard  ;
     use bytes ;
     my $len  = length($outdata) ;
     #$self -> client_fh -> push_write ("Content-Length: $len\r\nContent-Type: application/vscode-jsonrpc; charset=utf-8\r\n\r\n$outdata") ;
@@ -144,9 +148,12 @@ sub call_method
     $package .= '::' . $module if ($module) ;
 
     #print STDERR "package=$package\n" ;
-    if (!exists $INC{$package})
+    my $fn = $package . '.pm' ;
+    $fn =~ s/::/\//g ;
+    if (!exists $INC{$fn})
         {
-        print STDERR "apply_all_roles ($self, $package)\n" ;
+        print STDERR dump (\%INC), "\n" ;
+        print STDERR "apply_all_roles ($self, $package, $fn)\n" ;
         apply_all_roles ($self, $package) ;
             
         #eval "require $package" ;
@@ -200,6 +207,7 @@ sub process_req
 
         if (defined($id))
             {
+            my $guard = $self -> out_semaphore -> guard  ;
             use bytes ;
             my $len  = length ($outdata) ;
             #$self -> client_fh -> push_write ("Content-Length: $len\r\nContent-Type: application/vscode-jsonrpc; charset=utf-8\r\n\r\n$outdata") ;
@@ -217,27 +225,6 @@ sub process_req
             }
         cede () ;
         } ;
-
-    }
-
-# ---------------------------------------------------------------------------
-
-sub xmainloop
-    {
-    my ($self) = @_ ;
-
-    my $data ;
-    while ($data = $self -> channel -> get)
-        {
-        my $reqdata ;
-        $reqdata = $json -> decode ($data) if ($data) ;
-        print STDERR dump ($reqdata), "\n" if ($debug2) ;
-
-        my $id = $reqdata -> {id} ;
-        #print STDERR "id=$id\n" ;
-
-        $self -> process_req ($id, $reqdata)  ;
-        }
 
     }
 
@@ -314,145 +301,6 @@ sub mainloop
 
     }
 
-# ---------------------------------------------------------------------------
-#
-#   end_connection - shutdown connection and output error if any
-#
-
-sub end_connection
-    {
-    my ($self, $msg) = @_ ;
-
-    #return if ($reqdata -> {in_end_connection}++) ;
-    
-    my $pid = $Coro::current+0 ;
-    my $client_fh = $self -> client_fh ;
-    $client_fh -> on_drain (sub { $_[0] -> destroy }) if ($client_fh) ;
-    logger ($msg) ;
-    }
-    
-
-# ---------------------------------------------------------------------------
-#
-#   read_client_headers - read headers of slave (proxy client)
-#
-
-sub read_client_headers
-    {
-    my ($self, $data) = @_ ;
-
-    my @req_headers ;
-    my @headers ;
-    my $req_body_length ;
-    my $user ;
-    my $pass ;
-    @req_headers = split (/\R/, $data) ;
-    foreach (@req_headers)
-        {
-        $req_body_length = $1 if (/^Content-Length:\s*(\d+)/) ;        
-        push @headers, $_ ;    
-        }
-        
-    logger (@headers) ;
-
-    if ($req_body_length)
-        {
-        $self -> {client_fh} -> push_read (chunk => $req_body_length, sub
-            {
-            $self -> channel -> put ($_[1]) ;
-            $self -> start_req ;
-            }) ;
-        }
-    else
-        {
-        $self -> end_connection ('no content-length') ;
-        }
-    }
-    
-    
-# ---------------------------------------------------------------------------
-
-sub start_req
-    {
-    my ($self) = @_ ;
-
-    $self -> client_fh -> push_read (line => "\r\n\r\n", sub
-            {
-            $self -> read_client_headers ($_[1])
-            }) ;
-    }
-
-# ---------------------------------------------------------------------------
-#
-#   handle_reqs - handle incoming request from slave (proxy client request)
-#
-#   in  $fh     socket filehandle
-#       $host   from host
-#       $port   from port
-#
-
-sub read_reqs
-    {
-    my ($self, $fh, $host, $port) = @_ ;
-
-    my $pid = $Coro::current+0 ;
-    logger ("Accepted connection from $host:$port") ;
-
-    my $client_fh = AnyEvent::Handle -> new (fh => $fh) ;
-    $self -> client_fh ($client_fh) ;
-
-    $client_fh -> on_error ( sub
-        {
-        my ($hdl, $fatal, $msg) = @_;
-        
-        $self -> end_connection ('client_connection_err', $msg, $host, $port) ;
-        }) ;
-
-    $client_fh -> on_eof ( sub
-        {
-        my ($hdl) = @_;
-        
-        $self -> end_connection (undef, $host, $port) ;
-        }) ;
-
-        
-    $self -> start_req ;
-    }    
-
-
-
-# --------------------------------------------------------------------------
-#
-#   run
-#
-#   - Start Proxy Listener
-#   - Start Changes Listener to handle additions
-#   - Start Cleanup Thread to delete unused targets
-#
-
-
-sub run_server
-    {
-    my ($self, $config) = @_ ;
-
-    my $in = <STDIN> ;
-    print STDERR "in=$in\n" ;
-
-    tcp_server ($self -> listenhost, $self -> listenport,
-        sub
-            {
-            my ($fh, $host, $port) = @_ ;
-
-            $self -> read_reqs ($fh, $host, $port) ;
-            },
-        sub
-            {
-            logger ("##### Replication Proxy Start on $_[1]:$_[2] #####") ;
-            return 0 ;
-            }) ;
-
-            
-    }
 
 # ---------------------------------------------------------------------------
 

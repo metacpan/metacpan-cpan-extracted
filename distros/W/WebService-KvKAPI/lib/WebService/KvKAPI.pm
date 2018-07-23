@@ -3,7 +3,7 @@ use Moose;
 
 # ABSTRACT: Query the Dutch Chamber of Commerence (KvK) API
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 use namespace::autoclean;
 use OpenAPI::Client;
 use Carp;
@@ -119,7 +119,7 @@ WebService::KvKAPI - Query the Dutch Chamber of Commerence (KvK) API
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 AUTHOR
 

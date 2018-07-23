@@ -1,5 +1,13 @@
 Revision history for Webservice-KvKAPI
 
+0.004     2018-07-20 14:22:45Z
+
+    * Change perl path in bin script
+
+0.003     2018-07-20 13:46:01Z
+
+    * Add CLI script for query-ing the KvK
+
 0.002     2018-07-02 19:23:43Z
 
     * Implement spoofmode module: WebService::KvKAPI::Spoof

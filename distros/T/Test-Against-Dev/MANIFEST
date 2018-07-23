@@ -2,6 +2,7 @@ Changes
 lib/Test/Against/Build.pm
 lib/Test/Against/Dev.pm
 lib/Test/Against/Dev/ProcessPSV.pm
+lib/Test/Against/Dev/Salvage.pm
 lib/Test/Against/Dev/Sort.pm
 LICENSE
 Makefile.PL
@@ -16,10 +17,13 @@ t/004-new-from-existing.t
 t/005-test-against-build.t
 t/006-sort-versions.t
 t/007-process-ppv.t
+t/008-salvage.t
 t/data/cpan-river-1000-perl-5.27.0.psv
 t/data/cpan-river-1000-perl-5.27.1.psv
 t/data/four-modules.txt
+t/data/sample.build.log
 t/data/two-modules.txt
+t/lib/Helpers.pm
 Todo
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -10,7 +10,7 @@ use Mojo::SQLite::Transaction;
 use Mojo::Util 'monkey_patch';
 use Scalar::Util 'weaken';
 
-our $VERSION = '3.000';
+our $VERSION = '3.001';
 
 our @CARP_NOT = qw(Mojo::SQLite::Migrations);
 
@@ -77,7 +77,7 @@ sub query {
   # query or with RaiseError disabled
   my $results;
   if (defined $sth) {
-    $results = $self->results_class->new(sth => $sth);
+    $results = $self->results_class->new(db => $self, sth => $sth);
     $results->{last_insert_id} = $dbh->{private_mojo_last_insert_id};
   }
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension Data-cuid
 
+0.06 2018-07-21T10:50:45Z
+
+    - Add extra test for multi-process collisions (needs IO::Async)
+    - Prevent imported subs (namely from List::Util and Sys::Hostname)
+      from dependencies to be available under Data::Cuid namespace
+
 0.05 2018-04-19T14:44:26Z
 
     - Fix CPAN Testers failures on perl versions prior to 5.021_004

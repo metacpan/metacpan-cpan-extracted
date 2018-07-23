@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 
 use FindBin;
-use Test::More tests => 11;
+use Test::More tests => 12;
 use File::Path qw(  remove_tree );
 
 use lib '../lib';
@@ -39,6 +39,7 @@ open my $i_fh, "<:encoding(UTF-8)",
 my $index_html = join '', <$i_fh>;
 close $i_fh;
 like $index_html, qr!Sample/Module.pm.html!;
+like $index_html, qr!Sample project for testing Pod::ProjectDocs!;
 like $index_html, qr!Sample/Project.pm.html!;
 
 # Source code is generated

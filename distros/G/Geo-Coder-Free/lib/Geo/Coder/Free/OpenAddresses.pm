@@ -70,7 +70,7 @@ To install:
 
 =head2 new
 
-    $geocoder = Geo::Coder::Free::OpenAddresses->new();
+    $geocoder = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'});
 
 Takes an optional parameter openaddr, which is the base directory of
 the OpenAddresses data downloaded from http://results.openaddresses.io.
@@ -232,7 +232,13 @@ sub geocode {
 		if($location =~ /^(.+?)\s+(United States|USA|US)$/i) {
 			my $l = $1;
 			$l =~ s/\s+//g;
-			if(my $rc = $self->_get($l . 'US')) {
+			if(my $rc = $self->_get($l, 'US')) {
+				return $rc;
+			}
+		} elsif($location =~ /^(.+?)\s+(England|Scotand|Wales|Northern Ireland|UK|GB)$/i) {
+			my $l = $1;
+			$l =~ s/\s+//g;
+			if(my $rc = $self->_get($l, 'GB')) {
 				return $rc;
 			}
 		}
@@ -250,14 +256,20 @@ sub geocode {
 					$street = "$1 AVE";
 				} elsif($street =~ /(.+)\s+AVENUE\s+(.+)/) {
 					$street = "$1 AVE $2";
-				} elsif($street =~ /(.+)\s+CT$/) {
-					$street = "$1 COURT";
+				} elsif($street =~ /(.+)\s+COURT$/) {
+					$street = "$1 CT";
 				} elsif($street =~ /(.+)\s+CIRCLE$/) {
 					$street = "$1 CIR";
 				} elsif($street =~ /(.+)\s+DRIVE$/) {
 					$street = "$1 DR";
 				} elsif($street =~ /(.+)\s+PARKWAY$/) {
 					$street = "$1 PKWY";
+				} elsif($street =~ /(.+)\s+GARDENS$/) {
+					$street = "$1 GRDNS";
+				} elsif($street =~ /(.+)\s+LANE$/) {
+					$street = "$1 LN";
+				} elsif($street =~ /(.+)\s+PLACE$/) {
+					$street = "$1 PL";
 				} elsif($street =~ /(.+)\s+CREEK$/) {
 					$street = "$1 CRK";
 				}
@@ -294,7 +306,8 @@ sub geocode {
 				}
 			}
 		}
-	} elsif($location =~ /^(.+?)[,\s]+(United States|USA|US)$/i) {
+	}
+	if($location =~ /^(.+?)[,\s]+(United States|USA|US)$/i) {
 		# Geo::libpostal isn't installed, fail back to Geo::StreetAddress::US, which is rather buggy
 
 		my $l = $1;
@@ -338,18 +351,16 @@ sub geocode {
 					if($href->{suffix}) {
 						$street .= ' ' . $href->{suffix};
 					}
-				}
-				if($street) {
 					if(my $prefix = $href->{prefix}) {
 						$street = "$prefix $street";
 					}
 					my $rc;
 					if($href->{'number'}) {
-						if($rc = $self->_get($href->{'number'} . "$street$city$state" . 'US')) {
+						if($rc = $self->_get($href->{'number'}, "$street$city$state", 'US')) {
 							return $rc;
 						}
 					}
-					if($rc = $self->_get("$street$city$state" . 'US')) {
+					if($rc = $self->_get("$street$city$state", 'US')) {
 						return $rc;
 					}
 				}
@@ -367,7 +378,7 @@ sub geocode {
 				}
 			}
 			if(length($state) == 2) {
-				if(my $rc = $self->_get($addr[0] . $addr[1] . $addr[2] . $state . 'US')) {
+				if(my $rc = $self->_get($addr[0], $addr[1], $addr[2], $state, 'US')) {
 					# ::diag(Data::Dumper->new([$rc])->Dump());
 					return $rc;
 				}
@@ -400,12 +411,12 @@ sub geocode {
 					$city = uc($city);
 					if($city =~ /^(.+)\sCOUNTY$/) {
 						# Simple case looking up a county in a state in the US
-						if($rc = $self->_get("$1$state" . 'US')) {
+						if($rc = $self->_get("$1$state", 'US')) {
 							return $rc;
 						}
 					} else {
 						# Simple case looking up a city in a state in the US
-						if($rc = $self->_get("$city$state" . 'US')) {
+						if($rc = $self->_get("$city$state", 'US')) {
 							return $rc;
 						}
 					}
@@ -439,11 +450,11 @@ sub geocode {
 						}
 						$args{street} = uc($street);
 						if($href->{'number'}) {
-							if($rc = $self->_get($href->{'number'} . "$street$city$state" . 'US')) {
+							if($rc = $self->_get($href->{'number'}, "$street$city$state", 'US')) {
 								return $rc;
 							}
 						}
-						if($rc = $self->_get("$street$city$state" . 'US')) {
+						if($rc = $self->_get("$street$city$state", 'US')) {
 							return $rc;
 						}
 					}
@@ -482,19 +493,19 @@ sub geocode {
 								$args{street} = uc($street);
 								if($href->{'number'}) {
 									if($county) {
-										if($rc = $self->_get($href->{'number'} . "$street$city$county$state" . 'US')) {
+										if($rc = $self->_get($href->{'number'}, "$street$city$county$state", 'US')) {
 											return $rc;
 										}
 									}
-									if($rc = $self->_get($href->{'number'} . "$street$city$state" . 'US')) {
+									if($rc = $self->_get($href->{'number'}, "$street$city$state", 'US')) {
 										return $rc;
 									}
 									if($county) {
-										if($rc = $self->_get("$street$city$county$state" . 'US')) {
+										if($rc = $self->_get("$street$city$county$state", 'US')) {
 											return $rc;
 										}
 									}
-									if($rc = $self->_get("$street$city$state" . 'US')) {
+									if($rc = $self->_get("$street$city$state", 'US')) {
 										return $rc;
 									}
 								}
@@ -510,28 +521,28 @@ sub geocode {
 						if($second =~ /(\d+)\s+(.+)/) {
 							$second = "$1$2";
 						}
-						if($rc = $self->_get("$first$second$state" . 'US')) {
+						if($rc = $self->_get("$first$second$state", 'US')) {
 							return $rc;
 						}
 						# Perhaps it's a city in a county?
 						# Silver Spring, Montgomery County, MD, USA
 						$second =~ s/\s+COUNTY$//;
-						if($rc = $self->_get("$first$second$state" . 'US')) {
+						if($rc = $self->_get("$first$second$state", 'US')) {
 							return $rc;
 						}
 						# Not all the database has the county
-						if($rc = $self->_get("$first$state" . 'US')) {
+						if($rc = $self->_get("$first$state", 'US')) {
 							return $rc;
 						}
 						# Brute force last ditch approach
 						my $copy = uc($location);
 						$copy =~ s/,\s+//g;
 						$copy =~ s/\s*USA$//;
-						if($rc = $self->_get($copy . 'US')) {
+						if($rc = $self->_get($copy, 'US')) {
 							return $rc;
 						}
 						if($copy =~ s/(\d+)\s+/$1/) {
-							if($rc = $self->_get($copy . 'US')) {
+							if($rc = $self->_get($copy, 'US')) {
 								return $rc;
 							}
 						}
@@ -548,7 +559,7 @@ sub geocode {
 				if($city !~ /,/) {
 					# Simple case looking up a city in a state in Canada
 					$city = uc($city);
-					if($rc = $self->_get("$city$state" . 'CA')) {
+					if($rc = $self->_get("$city$state", 'CA')) {
 						return $rc;
 					}
 				# } elsif(my $href = Geo::StreetAddress::Canada->parse_address("$city, $state")) {
@@ -588,16 +599,16 @@ sub geocode {
 						# Rockville Pike, Rockville, MD, USA
 						my $first = uc($1);
 						my $second = uc($2);
-						if($rc = $self->_get("$first$second$state" . 'CA')) {
+						if($rc = $self->_get("$first$second$state", 'CA')) {
 							return $rc;
 						}
 						# Perhaps it's a city in a county?
 						# Silver Spring, Montgomery County, MD, USA
 						$second =~ s/\s+COUNTY$//;
-						if($rc = $self->_get("$first$second$state" . 'CA')) {
+						if($rc = $self->_get("$first$second$state", 'CA')) {
 							return $rc;
 						}
-						if($rc = $self->_get("$first$state" . 'CA')) {
+						if($rc = $self->_get("$first$state", 'CA')) {
 							return $rc;
 						}
 					}
@@ -636,6 +647,12 @@ sub geocode {
 						$street = "$1 PKWY";
 					} elsif($street =~ /(.+)\s+CREEK$/) {
 						$street = "$1 CRK";
+					} elsif($street =~ /(.+)\s+LANE$/) {
+						$street = "$1 LN";
+					} elsif($street =~ /(.+)\s+PLACE$/) {
+						$street = "$1 PL";
+					} elsif($street =~ /(.+)\s+GARDENS$/) {
+						$street = "$1 GRDNS";
 					}
 					$street =~ s/^0+//;	# Turn 04th St into 4th St
 					if($street =~ /^(\d+)\s+(.+)/) {
@@ -696,8 +713,9 @@ sub _search {
 }
 
 sub _get {
-	my ($self, $location) = @_;
+	my ($self, @location) = @_;
 
+	my $location = join('', @location);
 	$location =~ s/,\s*//g;
 	my $digest = substr Digest::MD5::md5_base64(uc($location)), 0, 16;
 	# my @call_details = caller(0);
@@ -769,6 +787,12 @@ sub _normalize {
 		return 'RDG';
 	} elsif(($type eq 'CRK') || ($type eq 'CREEK')) {
 		return 'CRK';
+	} elsif(($type eq 'LANE') || ($type eq 'LN')) {
+		return 'LN';
+	} elsif(($type eq 'PLACE') || ($type eq 'PL')) {
+		return 'PL';
+	} elsif(($type eq 'GRDNS') || ($type eq 'GARDENS')) {
+		return 'GRDNS';
 	}
 
 	# Most likely failure of Geo::StreetAddress::US, but warn anyway, just in case

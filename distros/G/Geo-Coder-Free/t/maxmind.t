@@ -1,4 +1,4 @@
-#!perl -w
+#!perl -wT
 
 use warnings;
 use strict;
@@ -19,7 +19,7 @@ LOOKUP: {
 
 			Geo::Coder::Free::DB::init(logger => new_ok('MyLogger'));
 
-			my $geocoder = new_ok('Geo::Coder::Free');
+			my $geocoder = new_ok('Geo::Coder::Free::MaxMind');
 
 			my $location = $geocoder->geocode('Woolwich, London, England');
 			ok(defined($location));
@@ -43,7 +43,7 @@ LOOKUP: {
 			$location = $geocoder->geocode('Indianapolis, Indiana, USA');
 			ok(defined($location));
 			delta_within($location->{latitude}, 39.77, 1e-2);
-			delta_within($location->{longitude}, -86.16, 1e-2);
+			delta_within($location->{longitude}, -86.15, 1e-2);
 
 			$location = $geocoder->geocode('Ramsgate, Kent, England');
 			ok(defined($location));
@@ -53,22 +53,22 @@ LOOKUP: {
 			$location = $geocoder->geocode('Wokingham, Berkshire, United Kingdom');
 			ok(defined($location));
 			delta_within($location->{latitude}, 51.42, 1e-2);
-			delta_within($location->{longitude}, -0.84, 1e-2);
+			delta_within($location->{longitude}, -0.83, 1e-2);
 
 			$location = $geocoder->geocode('Wokingham, Berkshire, UK');
 			ok(defined($location));
 			delta_within($location->{latitude}, 51.42, 1e-2);
-			delta_within($location->{longitude}, -0.84, 1e-2);
+			delta_within($location->{longitude}, -0.83, 1e-2);
 
 			$location = $geocoder->geocode('Wokingham, Berkshire, GB');
 			ok(defined($location));
 			delta_within($location->{latitude}, 51.42, 1e-2);
-			delta_within($location->{longitude}, -0.84, 1e-2);
+			delta_within($location->{longitude}, -0.83, 1e-2);
 
 			$location = $geocoder->geocode('Wokingham, Berkshire, England');
 			ok(defined($location));
 			delta_within($location->{latitude}, 51.42, 1e-2);
-			delta_within($location->{longitude}, -0.84, 1e-2);
+			delta_within($location->{longitude}, -0.83, 1e-2);
 
 			# FIXME: This finds the Wokingham in England because of a problem in the unitary city handling
 			# which actually looks for Wokingham, GB.
@@ -85,27 +85,27 @@ LOOKUP: {
 
 			$location = $geocoder->geocode('Silver Spring, Maryland, USA');
 			ok(defined($location));
-			delta_within($location->{latitude}, 38.99, 1e-2);
+			delta_within($location->{latitude}, 39.00, 1e-2);
 			delta_within($location->{longitude}, -77.03, 1e-2);
 
 			$location = $geocoder->geocode('Silver Spring, MD, USA');
 			ok(defined($location));
-			delta_within($location->{latitude}, 38.99, 1e-2);
+			delta_within($location->{latitude}, 39.00, 1e-2);
 			delta_within($location->{longitude}, -77.03, 1e-2);
 
 			$location = $geocoder->geocode('Silver Spring, Montgomery, MD, USA');
 			ok(defined($location));
-			delta_within($location->{latitude}, 38.99, 1e-2);
+			delta_within($location->{latitude}, 39.00, 1e-2);
 			delta_within($location->{longitude}, -77.03, 1e-2);
 
 			$location = $geocoder->geocode('Silver Spring, Maryland, United States');
 			ok(defined($location));
-			delta_within($location->{latitude}, 38.99, 1e-2);
+			delta_within($location->{latitude}, 39.00, 1e-2);
 			delta_within($location->{longitude}, -77.03, 1e-2);
 
 			$location = $geocoder->geocode('Silver Spring, Montgomery County, Maryland, USA');
 			ok(defined($location));
-			delta_within($location->{latitude}, 38.99, 1e-2);
+			delta_within($location->{latitude}, 39.00, 1e-2);
 			delta_within($location->{longitude}, -77.03, 1e-2);
 
 			$location = $geocoder->geocode('Montgomery County, Maryland, USA');
@@ -144,7 +144,7 @@ LOOKUP: {
 			$location = $geocoder->geocode(location => 'Edmonton, Alberta, Canada');
 			ok(defined($location));
 			delta_within($location->{latitude}, 53.55, 1e-2);
-			delta_within($location->{longitude}, -113.5, 1e-2);
+			delta_within($location->{longitude}, -113.50, 1e-2);
 
 			my @locations = $geocoder->geocode(location => 'Temple Ewell, Kent, England');
 			ok(defined($locations[0]));

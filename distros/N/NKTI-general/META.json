@@ -1,5 +1,5 @@
 {
-   "abstract" : "The Part of CellBash The Simple Web Framework",
+   "abstract" : "unknown",
    "author" : [
       "Achmad Yusri Afandi <yusrideb@cpan.org>"
    ],
@@ -41,11 +41,11 @@
             "JSON" : "0",
             "LWP::UserAgent" : "0",
             "Test::More" : "0",
-            "perl" : "5.012000"
+            "perl" : "5.010001"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

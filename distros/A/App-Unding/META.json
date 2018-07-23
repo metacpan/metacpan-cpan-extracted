@@ -19,13 +19,20 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Script" : "1.10"
+         }
+      },
       "runtime" : {
          "requires" : {
+            "App::FatPacker" : "0",
             "Crypt::Blowfish" : "0",
             "Crypt::CBC" : "0",
             "Cwd" : "0",
             "Data::Serializer" : "0",
             "File::Copy" : "0",
+            "File::Path" : "0",
             "File::Slurp" : "0",
             "Term::ReadKey" : "0",
             "perl" : "v5.6.0",
@@ -48,7 +55,7 @@
          "web" : "https://gitlab.com/borisdaeppen/App-Unding.git"
       }
    },
-   "version" : "0.006",
+   "version" : "0.009",
    "x_generated_by_perl" : "v5.22.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

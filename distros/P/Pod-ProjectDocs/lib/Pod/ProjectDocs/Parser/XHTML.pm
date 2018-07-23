@@ -3,7 +3,7 @@ package Pod::ProjectDocs::Parser::XHTML;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';    # VERSION
+our $VERSION = '0.52';    # VERSION
 
 use base qw(Pod::Simple::XHTML);
 
@@ -76,6 +76,8 @@ sub resolve_pod_page_link {
 #
 #   Package::Name - Description line.
 #
+# The code also takes into account complex POD in the description line, like L<> tags.
+#
 sub start_head1 {
     my ( $self, $attrs ) = @_;
 
@@ -93,24 +95,45 @@ sub end_head1 {
 sub handle_text {
     my ( $self, $text ) = @_;
 
+    # Are we after =head1 NAME?
     if ( $self->{_titleflag} ) {
-        my ( $name, $description ) =
-          $text =~ m{ ^ \s* ([^-]*?) \s* - \s* (.*?) \s* $}x;
 
-        if ( $description && $self->doc() ) {
-            $self->doc()->title($description);
+# Remember the line number if not yet set - this means we just endered this line.
+        if ( !$self->{_titleline} ) {
+            $self->{_titleline} = $self->{line_count};
         }
-        delete $self->{_titleflag};
 
+# All nodes within this line will be processed, and their text added to the final description.
+        if ( $self->{line_count} == $self->{_titleline} ) {
+            $self->{_description} .= $text;
+        }
+
+        # Once we leave this line, turn off the title flag again.
+        else {
+            delete $self->{_titleflag};
+        }
     }
     elsif ( $self->{_in_head1} && $text eq 'NAME' ) {
         $self->{_titleflag} = 1;
     }
-    else {
-        delete $self->{_titleflag};
-    }
 
     return $self->SUPER::handle_text($text);
+}
+
+sub DESTROY {
+    my $self = shift;
+
+    # At the end - process and store the description.
+    if ( $self->{_description} ) {
+
+        my ( $name, $description ) =
+          $self->{_description} =~ m{ ^ \s* ([^-]*?) \s* - \s* (.*?) \s* $}x;
+
+        if ( $description && $self->doc() ) {
+            $self->doc()->title($description);
+        }
+    }
+    return;
 }
 
 1;

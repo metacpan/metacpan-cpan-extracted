@@ -19,6 +19,7 @@ build_requires:
   Test::Most: '0'
   Test::NoWarnings: '0'
   Test::Number::Delta: '0'
+  Try::Tiny: '0'
   autodie: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -57,5 +58,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free
   repository: git://github.com/nigelhorne/Geo-Coder-Free.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

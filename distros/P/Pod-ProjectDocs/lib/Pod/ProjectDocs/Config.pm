@@ -3,7 +3,7 @@ package Pod::ProjectDocs::Config;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';    # VERSION
+our $VERSION = '0.52';    # VERSION
 
 use Moose;
 

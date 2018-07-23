@@ -155,7 +155,7 @@ struct data {
 };
 
 static int weak_set(pTHX_ SV* sv, MAGIC* magic) {
-	if (!SvOK(sv)) {
+	if (!SvOK(sv) && !PL_dirty) {
 		struct data* data = (struct data*)magic->mg_ptr;
 		av_delete(data->backrefs, data->index, G_DISCARD);
 	}

@@ -1,5 +1,5 @@
 ---
-abstract: "Ð\x92 Ð½Ð°Ñ\x87Ð°Ð»Ñ£ Ð±Ñ£ Ð¡Ð»Ð¾Ð²Ð¾"
+abstract: 'В началѣ бѣ Слово'
 author:
   - 'Красимир Беров (berov@cpan.org)'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,5 +32,5 @@ resources:
   homepage: https://github.com/kberov/Slovo
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/kberov/Slovo.git
-version: v2018.07.16
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: v2018.07.20
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

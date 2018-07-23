@@ -3,10 +3,11 @@ use warnings;
 package Graphics::Raylib::Key;
 
 # ABSTRACT: Keyboard Key class
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use Graphics::Raylib::XS qw(:all);
 use Carp;
+use Scalar::Util qw/blessed/;
 require Exporter;
 our @ISA = qw(Exporter);
 our %EXPORT_TAGS = (keys => [ grep /^KEY_/, @Graphics::Raylib::XS::EXPORT_OK ]);
@@ -124,7 +125,7 @@ use overload 'eq' => \&streq, '==' => \&numeq, '""' => \&tostr, '0+' => \&tonum;
 
 sub numeq {
     my ($self, $other) = @_;
-    if (ref($other) eq 'Graphics::Raylib::Key') {
+    if ((blessed $other) // '' eq 'Graphics::Raylib::Key') {
         $other = $other->keycode;
     }
 
@@ -133,7 +134,7 @@ sub numeq {
 sub streq {
     my ($self, $other, $swapped) = @_;
 
-    unless (ref($other) eq 'Graphics::Raylib::Key') {
+    unless ((blessed $other) // '' eq 'Graphics::Raylib::Key') {
         $other = Graphics::Raylib::Key->from_vinotation($other);
     }
 

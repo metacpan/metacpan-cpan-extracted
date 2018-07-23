@@ -8,7 +8,6 @@ no warnings 'utf8';
 
 use Term::Choose            qw( choose );
 use Term::Choose::Constants qw( :screen );
-use Term::Form              qw();
 use Term::TablePrint        qw( print_table );
 
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
@@ -19,8 +18,6 @@ use App::DBBrowser::Table::Functions;
 #use App::DBBrowser::Table::Insert;  # "require"-d
 use App::DBBrowser::Table::Substatements;
 
-
-END { print SHOW_CURSOR }
 
 
 sub new {

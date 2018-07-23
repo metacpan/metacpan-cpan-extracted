@@ -3,10 +3,6 @@ package NKTI::general::file;
 use strict;
 use warnings;
 
-# Define Version :
-# ---------------------------------------------------------------- 
-our $VERSION = '0.15';
-
 # Create Subroutine for Clean Directory "/" Symbol :
 # ------------------------------------------------------------------------
 =head1 dir_symbol()

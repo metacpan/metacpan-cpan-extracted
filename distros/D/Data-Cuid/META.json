@@ -4,7 +4,7 @@
       "Zak B. Elep <zakame@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.17",
+   "generated_by" : "Minilla/v3.1.2",
    "license" : [
       "mit"
    ],
@@ -33,6 +33,7 @@
       },
       "develop" : {
          "requires" : {
+            "IO::Async" : "0.38",
             "Sub::Util" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
@@ -58,7 +59,7 @@
    "provides" : {
       "Data::Cuid" : {
          "file" : "lib/Data/Cuid.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -72,10 +73,11 @@
          "web" : "https://github.com/zakame/Data-Cuid"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:ZAKAME",
    "x_contributors" : [
       "Zak B. Elep <zakame@zakame.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

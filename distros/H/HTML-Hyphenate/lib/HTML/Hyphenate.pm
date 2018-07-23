@@ -1,17 +1,15 @@
-package HTML::Hyphenate;    # -*- cperl; cperl-indent-level: 4 -*-
+# -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2009-2018, Roland van Ipenburg
+package HTML::Hyphenate 0.101;
+
 use strict;
 use warnings;
-
-# $Id: Hyphenate.pm 387 2010-12-21 19:41:17Z roland $
-# $Revision: 387 $
-# $HeadURL: svn+ssh://ipenburg.xs4all.nl/srv/svnroot/elaine/trunk/HTML-Hyphenate/lib/HTML/Hyphenate.pm $
-# $Date: 2010-12-21 20:41:17 +0100 (Tue, 21 Dec 2010) $
-
-use 5.006000;
 use utf8;
-use charnames qw(:full);
+use 5.014000;
 
-our $VERSION = '0.05';
+use Moose;
+use namespace::autoclean '-also' => qr/^__/sxm;
+use charnames qw(:full);
 
 use Log::Log4perl qw(:easy get_logger);
 use Set::Scalar;
@@ -21,7 +19,6 @@ use HTML::Entities;
 use HTML::TreeBuilder;
 
 use Readonly;
-## no critic qw(ProhibitCallsToUnexportedSubs)
 Readonly::Scalar my $EMPTY              => q{};
 Readonly::Scalar my $HYPHEN             => q{-};
 Readonly::Scalar my $SOFT_HYPHEN        => qq{\N{SOFT HYPHEN}};
@@ -54,7 +51,8 @@ Readonly::Scalar my $LOG_HTML_METHOD   => q{Using HTML passed to method '%s'};
 Readonly::Scalar my $LOG_HTML_PROPERTY => q{Using HTML property '%s'};
 Readonly::Scalar my $LOG_HTML_UNDEF    => q{HTML to hyphenate is undefined};
 Readonly::Scalar my $LOG_NOT_HYPHEN    => q{No pattern found for '%s'};
-## use critic
+Readonly::Scalar my $LOG_REGISTER =>
+  q{Registering TeX::Hyphen object for label '%s'};
 
 my $ANYTHING = qr/.*/xsm;
 
@@ -70,85 +68,25 @@ my $STYLE_NOWRAP = qr/\bwhite-space\s*:\s*nowrap\b/xsm;
 Log::Log4perl->easy_init($ERROR);
 my $log = get_logger();
 
-use Class::Meta::Express qw(class ctor has meta method);
-use HTML::Hyphenate::TypeDef;
+has html       => ( is => 'rw', isa => 'Str' );
+has style      => ( is => 'rw', isa => 'Str' );
+has min_length => ( is => 'rw', isa => 'Int', default => $DEFAULT_MIN_LENGTH );
+has min_pre    => ( is => 'rw', isa => 'Int', default => $DEFAULT_MIN_PRE );
+has min_post   => ( is => 'rw', isa => 'Int', default => $DEFAULT_MIN_POST );
+has output_xml => ( is => 'rw', isa => 'Int', default => $DEFAULT_XML );
+has default_lang => ( is => 'rw', isa => 'Str', default => $DEFAULT_LANG );
+has default_included =>
+  ( is => 'rw', isa => 'Int', default => $DEFAULT_INCLUDED );
+has classes_included =>
+  ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
+has classes_excluded =>
+  ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 
-class {
+has _hyphenators => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
+has _lang        => ( is => 'rw', isa => 'Str' );
+has _tree        => ( is => 'rw', isa => 'HTML::TreeBuilder' );
 
-    meta 'html-hyphenate';
-
-    ctor 'new';
-
-    has html             => ( is => 'string' );
-    has style            => ( is => 'string' );
-    has min_length       => ( is => 'integer', default => $DEFAULT_MIN_LENGTH );
-    has min_pre          => ( is => 'integer', default => $DEFAULT_MIN_PRE );
-    has min_post         => ( is => 'integer', default => $DEFAULT_MIN_POST );
-    has output_xml       => ( is => 'integer', default => $DEFAULT_XML );
-    has default_lang     => ( is => 'string', default => $DEFAULT_LANG );
-    has default_included => ( is => 'integer', default => $DEFAULT_INCLUDED );
-    has classes_included => ( is => 'arrayref', default => [] );
-    has classes_excluded => ( is => 'arrayref', default => [] );
-
-    has _hyphenators => ( is => 'hashref', default => {}, view => 'PRIVATE' );
-    has _lang => ( is => 'string', view => 'PRIVATE' );
-    has _tree => ( is => 'tree',   view => 'PRIVATE' );
-
-    method hyphenated => \&__hyphenated;
-
-    method _traverse_html => (
-        code => \&__traverse_html,
-        view => 'PRIVATE',
-    );
-
-    method _clean_html => (
-        code => \&__clean_html,
-        view => 'PRIVATE',
-    );
-
-    method _hyphen => (
-        code => \&__hyphen,
-        view => 'PRIVATE',
-    );
-
-    method _hyphen_word => (
-        code => \&__hyphen_word,
-        view => 'PRIVATE',
-    );
-
-    method _configure_lang => (
-        code => \&__configure_lang,
-        view => 'PRIVATE',
-    );
-
-    method _add_tex_hyphen_to_cache => (
-        code => \&__add_tex_hyphen_to_cache,
-        view => 'PRIVATE',
-    );
-
-    method _hyphenable_by_class => (
-        code => \&__hyphenable_by_class,
-        view => 'PRIVATE',
-    );
-
-    method _hyphenable => (
-        code => \&__hyphenable,
-        view => 'PRIVATE',
-    );
-
-    method _get_nearest_ancestor_level_by_classname => (
-        code => \&__get_nearest_ancestor_level_by_classname,
-        view => 'PRIVATE',
-    );
-
-    method _reset_tree => (
-        code => \&__reset_tree,
-        view => 'PRIVATE',
-    );
-
-};
-
-sub __hyphenated {
+sub hyphenated {
     my ( $self, $html ) = @_;
     if ( defined $html ) {
         $log->debug( sprintf $LOG_HTML_METHOD, $html );
@@ -165,7 +103,18 @@ sub __hyphenated {
     return;
 }
 
-sub __traverse_html {
+sub register_tex_hyphen {
+    my ( $self, $label, $tex ) = @_;
+    if ( defined $label && $tex->isa('TeX::Hyphen') ) {
+        my $cache = $self->_hyphenators;
+        $log->debug( sprintf $LOG_REGISTER, $label );
+        ${$cache}{$label} = $tex;
+        $self->_hyphenators($cache);
+    }
+    return;
+}
+
+sub _traverse_html {
     my ($self) = @_;
     $self->_reset_tree;
     $self->_tree->parse_content( $self->html );
@@ -192,17 +141,15 @@ sub __traverse_html {
                         }
                     }
                 }
-                ## no critic qw(RequireExplicitInclusion ProhibitCallsToUnexportedSubs)
                 return HTML::Element::OK;
-                ## use critic
             },
-            undef
-        ]
+            undef,
+        ],
     );
     return;
 }
 
-sub __clean_html {
+sub _clean_html {
     my ($self) = @_;
     $self->_tree->deobjectify_text();
     my $html =
@@ -214,14 +161,14 @@ sub __clean_html {
     return $html;
 }
 
-sub __hyphen {
+sub _hyphen {
     my ( $self, $text ) = @_;
     $log->debug( sprintf $LOG_HYPHEN_TEXT, $text );
     $text =~ s/(\w{@{[$self->min_length]},})/$self->_hyphen_word($1)/xsmeg;
     return $text;
 }
 
-sub __hyphen_word {
+sub _hyphen_word {
     my ( $self, $word ) = @_;
     if ( defined $self->_hyphenators->{ $self->_lang } ) {
         $log->debug( sprintf $LOG_HYPHEN_WORD,
@@ -240,16 +187,16 @@ sub __hyphen_word {
     return $word;
 }
 
-sub __configure_lang {
+sub _configure_lang {
     my ( $self, $element ) = @_;
     my $lang = $element->attr_get_i($LANG);
     $lang ||= $element->attr_get_i(qq{xml:$LANG});
     my %hyphen_opts = (
-        leftmin  => $self->min_pre,
-        rightmin => $self->min_post,
+        q{leftmin}  => $self->min_pre,
+        q{rightmin} => $self->min_post,
     );
     defined $self->style
-      && ( $hyphen_opts{style} = $self->style );
+      && ( $hyphen_opts{'style'} = $self->style );
     defined $lang || ( $lang = $self->default_lang );
     if ( !defined $self->_lang || $lang ne $self->_lang ) {
         $self->_lang($lang);
@@ -261,7 +208,7 @@ sub __configure_lang {
     return;
 }
 
-sub __add_tex_hyphen_to_cache {
+sub _add_tex_hyphen_to_cache {
     my ($self) = @_;
     my $thp = TeX::Hyphen::Pattern->new();
     $thp->label( $self->_lang );
@@ -269,16 +216,16 @@ sub __add_tex_hyphen_to_cache {
     if ( my $file = $thp->filename ) {
         $log->debug( sprintf $LOG_PATTERN_FILE, $file );
         ${$cache}{ $self->_lang } = TeX::Hyphen->new(
-            file     => $file,
-            leftmin  => $self->min_pre,
-            rightmin => $self->min_post,
+            q{file}     => $file,
+            q{leftmin}  => $self->min_pre,
+            q{rightmin} => $self->min_post,
         );
         $self->_hyphenators($cache);
     }
     return;
 }
 
-sub __hyphenable_by_class {
+sub _hyphenable_by_class {
     my ( $self, $element ) = @_;
     my $included_level = $ONE_LEVEL_UP;
     my $excluded_level = $ONE_LEVEL_UP;
@@ -294,7 +241,7 @@ sub __hyphenable_by_class {
     return !( $excluded_level > $included_level );
 }
 
-sub __hyphenable {
+sub _hyphenable {
     my ( $self, $element ) = @_;
     return !( $element->is_inside($NOBR)
         || $element->is_inside($PRE)
@@ -303,7 +250,7 @@ sub __hyphenable {
         || !$self->_hyphenable_by_class($element) );
 }
 
-sub __get_nearest_ancestor_level_by_classname {
+sub _get_nearest_ancestor_level_by_classname {
     my ( $self, $element, $ar_classnames, $level ) = @_;
     my $classnames = Set::Scalar->new( @{$ar_classnames} );
     $log->debug( sprintf $LOG_LOOKING_UP, $classnames->size );
@@ -317,7 +264,7 @@ sub __get_nearest_ancestor_level_by_classname {
                 sub {
                     $_[0]
                       && $classnames->has( $_[0]->attr($CLASS) );
-                }
+                },
             )
         )
       )
@@ -328,7 +275,7 @@ sub __get_nearest_ancestor_level_by_classname {
 
 }
 
-sub __reset_tree {
+sub _reset_tree {
     my ($self) = @_;
     $self->_tree && $self->_tree( $self->_tree->delete );
     my $tree = HTML::TreeBuilder->new();
@@ -338,22 +285,21 @@ sub __reset_tree {
     return;
 }
 
-
 1;
 
 __END__
 
 =encoding utf8
 
-=for stopwords Ipenburg Readonly
+=for stopwords Ipenburg Readonly merchantability
 
 =head1 NAME
 
-HTML::Hyphenate - class for inserting soft hyphens into HTML.
+HTML::Hyphenate - insert soft hyphens into HTML.
 
 =head1 VERSION
 
-This is version 0.05.
+This document describes HTML::Hyphenate version 0.100.
 
 =head1 SYNOPSIS
 
@@ -441,22 +387,44 @@ hyphens inserted.
 Gets or sets a reference to an array of class names that will not have soft
 hyphens inserted.
 
+=item $hyphenator->register_tex_hyphen(C<lang>, C<TeX::Hyphen>)
+
+Registers a TeX::Hyphen object to handle the language defined by C<lang>.
+
 =back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+The output is generated by L<HTML::TreeBuilder|HTML::TreeBuilder> and can be
+either HTML or XML.
 
 =head1 DEPENDENCIES
 
-L<Class::Meta::Express|Class::Meta::Express>
-L<Class::Meta::Type|Class::Meta::Type>
-L<HTML::Entities|HTML::Entities>
-L<HTML::Hyphenate::TypeDef|HTML::Hyphenate::TypeDef>
-L<HTML::TreeBuilder|HTML::TreeBuilder>
-L<Log::Log4perl|Log::Log4perl>
-L<Readonly|Readonly>
-L<Set::Scalar|Set::Scalar>
-L<TeX::Hyphen|TeX::Hyphen>
-L<TeX::Hyphen::Pattern|TeX::Hyphen::Pattern>
-L<Test::More|Test::More>
-L<Test::NoWarnings|Test::NoWarnings>
+=over 4
+
+=item * Perl 5.14 
+
+=item * L<Moose|Moose>
+
+=item * L<HTML::Entities|HTML::Entities>
+
+=item * L<HTML::TreeBuilder|HTML::TreeBuilder>
+
+=item * L<Log::Log4perl|Log::Log4perl>
+
+=item * L<Readonly|Readonly>
+
+=item * L<Set::Scalar|Set::Scalar>
+
+=item * L<TeX::Hyphen|TeX::Hyphen>
+
+=item * L<TeX::Hyphen::Pattern|TeX::Hyphen::Pattern>
+
+=item * L<namespace::autoclean|namespace::autoclean>
+
+=item * L<Test::More|Test::More>
+
+=back
 
 =head1 INCOMPATIBILITIES
 
@@ -482,15 +450,6 @@ TeX::Hyphen::Pattern
 
 =over 4
 
-=item * Empty subclass test fails, this is probably a Class::Meta::Express
-issue. The empty subclass can't be empty, it needs at least:
-
-    use Class::Meta::Express;
-
-    class {
-        ctor 'new';
-    };
-
 =item * Perfect hyphenation can be more complicated than just inserting a
 hyphen somewhere in a word, and sometimes requires semantics to get it right.
 For example C<cafeetje> should be hyphenated as C<cafe-tje> and not
@@ -501,7 +460,7 @@ purpose of this module is to make it possible for HTML rendering engines that
 support soft hyphens to be able to break long words over multiple lines to
 avoid unwanted overflow.
 
-=item * The hyphenation doesn't get better than TeX::Hyphenate and it
+=item * The hyphenation doesn't get better than TeX::Hyphenate and it's
 hyphenation patterns provide.
 
 =item * The round trip from HTML source via HTML::Tree to HTML source might
@@ -510,21 +469,20 @@ transformed to HTML encoded entity equivalent.
 
 =back
 
-=head1 CONFIGURATION AND ENVIRONMENT
-
-The output is generated by L<HTML::TreeBuilder|HTML::TreeBuilder> and can be
-either HTML or XML.
+Please report any bugs or feature requests at
+L<RT for rt.cpan.org|
+https://rt.cpan.org/Dist/Display.html?Queue=HTML-Hyphenate>.
 
 =head1 AUTHOR
 
-Roland van Ipenburg  C<< <ipenburg@xs4all.nl> >>
+Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 by Roland van Ipenburg
+Copyright (C) 2009-2018, Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.0 or,
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 =head1 DISCLAIMER OF WARRANTY

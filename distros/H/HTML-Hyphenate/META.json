@@ -1,0 +1,71 @@
+{
+   "abstract" : "insert soft hyphens into HTML.",
+   "author" : [
+      "Roland van Ipenburg <ipenburg@xs4all.nl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "HTML-Hyphenate",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.86",
+            "Test::NoWarnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Entities" : "0",
+            "HTML::TreeBuilder" : "0",
+            "Log::Log4perl" : "0",
+            "Moose" : "0",
+            "Readonly" : "1.03",
+            "Set::Scalar" : "0",
+            "TeX::Hyphen" : "0",
+            "TeX::Hyphen::Pattern" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "TeX::Hyphen::Pattern" : "0.103",
+            "Test::CheckManifest" : "1.01",
+            "Test::Kwalitee" : "0",
+            "Test::Pod" : "1",
+            "Test::Pod::Coverage" : "1",
+            "Test::TestCoverage" : "0.08",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::Hyphenate" : {
+         "file" : "lib/HTML/Hyphenate.pm",
+         "version" : "0.101"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/ipenburg/HTML-Hyphenate"
+      }
+   },
+   "version" : "0.101",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

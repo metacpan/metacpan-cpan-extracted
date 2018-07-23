@@ -1,5 +1,5 @@
 package App::Unding;
-$App::Unding::VERSION = '0.006';
+$App::Unding::VERSION = '0.009';
 use strict;
 use warnings;
 # Autor: Boris Däppen, 2018
@@ -24,7 +24,7 @@ App::Unding - dark magic, encrypted wallet
 
 =head1 VERSION
 
-version 0.006
+version 0.009
 
 =head1 SYNOPSIS
 

@@ -9,7 +9,7 @@ __END__
 
 =head1 NAME
 
-Sample::Project - Sample project for testing Pod::ProjectDocs
+Sample::Project - Sample project for testing L<Pod::ProjectDocs>
 
 =head1 SYNOPSIS
 

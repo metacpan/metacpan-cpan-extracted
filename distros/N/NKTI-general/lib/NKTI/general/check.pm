@@ -16,11 +16,6 @@ use NKTI::general::char::split;
 # will save memory.
 our @EXPORT = qw(nkti_get_authkey);
 
-
-# Define Version :
-# ----------------------------------------------------------------
-our $VERSION = '0.15';
-
 # Create Module for Constructor :
 # ------------------------------------------------------------------------
 #

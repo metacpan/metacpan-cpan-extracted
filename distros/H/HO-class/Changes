@@ -1,0 +1,30 @@
+Revision history for HO-class
+
+0.073 - 2018-07-22
+* improve abstract method testing (DOES was missing in perl 5.8)
+
+0.072 - 2018-07-21
+* more release testing
+* made HO::abstract method compatible with Test::AbstractMethod
+
+0.071 - 2018-07-20
+* first release on PAUSE
+
+0.07 - 2017-04-20
+* support for default values in _ro and _rw accessors
+* make_subclass class method removed from HO::class
+
+0.06 - 2012-05-07
+* more tests
+* rw array accessors can now shift, pop and some splicing
+* fixed a bug in HO::abstract
+
+0.05
+* first public version
+
+0.4 2009-07-22
+* always store the base method in the object
+
+
+
+

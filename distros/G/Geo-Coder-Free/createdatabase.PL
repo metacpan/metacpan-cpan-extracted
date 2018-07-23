@@ -26,6 +26,7 @@ use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use Text::CSV;
 use CHI;
 use CHI::Driver::RawMemory;
+use Try::Tiny;
 
 use	constant	MAX_INSERT_COUNT => 250;	# Maximum number of CSV rows to insert in a single statement
 
@@ -94,152 +95,173 @@ my @whosonfirst_only_countries = (
 	'gb'
 );
 
-my %state_lengths = (
-	'au' => 3,
-	'ca' => 2,
-	'us' => 2
+my %max_state_lengths = (
+	'AU' => 3,
+	'CA' => 2,
+	'US' => 2
 );
 
 my %known_places = (	# Places I've checked with my GPS
-	'us/md/statewide.csv' =>
-		[
-			{
-				# NCBI
-				'LAT' => 38.99516556,
-				'LON' => -77.09943963,
-				'STREET' => 'MEDLARS DR',
-				'CITY' => 'BETHESDA',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-				'POSTCODE' => 20894,
-			}, {
-				'LAT' => 38.99698114,
-				'LON' => -77.10031119,
-				'STREET' => 'CENTER DR',
-				'CITY' => 'BETHESDA',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-			}, {
-				# Bold bite
-				'LAT' => 38.98939358,
-				'LON' => -77.09819543,
-				'STREET' => 'NORFOLK AVE',
-				'CITY' => 'BETHESDA',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-			}, {
-				'NAME' => 'ALBERT EINSTEIN HIGH SCHOOL',
-				'LAT' => 39.03869019,
-				'LON' => -77.0682871,
-				'NUMBER' => 11135,
-				'STREET' => 'NEWPORT MILL RD',
-				'CITY' => 'KENSINGTON',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-				'POSTCODE' => 20895
-			}, {
-				'NAME' => 'POST OFFICE',
-				'LAT' => 39.02554455,
-				'LON' => -77.07178215,
-				'NUMBER' => 10325,
-				'STREET' => 'KENSINGTON PKWY',
-				'CITY' => 'KENSINGTON',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-				'POSTCODE' => 20895
-			}, {
-				'NAME' => 'NEWPORT MILL MIDDLE SCHOOL',
-				'LAT' => 39.0416107,
-				'LON' => -77.06884708,
-				'NUMBER' => 11311,
-				'STREET' => 'NEWPORT MILL RD',
-				'CITY' => 'KENSINGTON',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-				'POSTCODE' => 20895
-			}, {
-				'NAME' => 'SAFEWAY',
-				'LAT' => 39.02822438,
-				'LON' => -77.0755196,
-				'NUMBER' => 10541,
-				'STREET' => 'HOWARD AVE',
-				'CITY' => 'KENSINGTON',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-				'POSTCODE' => 20895
-			}, {
-				'NAME' => 'HAIR CUTTERY',
-				'LAT' => 39.03323865,
-				'LON' => -77.07368044,
-				'NUMBER' => 3731,
-				'STREET' => 'CONNECTICUT AVE',
-				'CITY' => 'KENSINGTON',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-			}, {
-				'NAME' => 'STROSNIDERS',
-				'LAT' => 39.02781493,
-				'LON' => -77.07740792,
-				'NUMBER' => 10504,
-				'STREET' => 'CONNECTICUT AVE',
-				'CITY' => 'KENSINGTON',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-			}, {
-				'NAME' => 'SNIDERS',
-				'LAT' => 39.0088797,
-				'LON' => -77.04162824,
-				'NUMBER' => 1936,
-				'STREET' => 'SEMINARY RD',
-				'CITY' => 'SILVER SPRING',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-				'POSTCODE' => 20910,
-			}, {
-				'NAME' => 'SILVER DINER',
-				'LAT' => 39.05798753,
-				'LON' => -77.12165374,
-				'NUMBER' => 12276,
-				'STREET' => 'ROCKVILLE PIKE',
-				'CITY' => 'ROCKVILLE',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-				'POSTCODE' => 20852
-			}, {
-				# LF
-				'LAT' => 39.07669788,
-				'LON' => -77.12306436,
-				'NUMBER' => 1605,
-				'STREET' => 'VIERS MILL ROAD',
-				'CITY' => 'ROCKVILLE',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-				'POSTCODE' => 20851
-			}, {
-				'LAT' => 39.0147541,
-				'LON' => -77.05466857,
-				'NAME' => 'BP',
-				'NUMBER' => 2601,
-				'STREET' => 'FOREST GLEN ROAD',
-				'CITY' => 'SILVER SPRING',
-				'COUNTY' => 'MONTGOMERY',
-				'STATE' => 'MD',
-				'COUNTRY' => 'US',
-				'POSTCODE' => 20910
-			}
-		]
+	'us/md/statewide.csv' => [
+		{
+			# NCBI
+			'LAT' => 38.99516556,
+			'LON' => -77.09943963,
+			'STREET' => 'MEDLARS DR',
+			'CITY' => 'BETHESDA',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20894,
+		}, {
+			'LAT' => 38.99698114,
+			'LON' => -77.10031119,
+			'STREET' => 'CENTER DR',
+			'CITY' => 'BETHESDA',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+		}, {
+			# Bold bite
+			'LAT' => 38.98939358,
+			'LON' => -77.09819543,
+			'STREET' => 'NORFOLK AVE',
+			'CITY' => 'BETHESDA',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+		}, {
+			'NAME' => 'ALBERT EINSTEIN HIGH SCHOOL',
+			'LAT' => 39.03869019,
+			'LON' => -77.0682871,
+			'NUMBER' => 11135,
+			'STREET' => 'NEWPORT MILL RD',
+			'CITY' => 'KENSINGTON',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20895
+		}, {
+			'NAME' => 'POST OFFICE',
+			'LAT' => 39.02554455,
+			'LON' => -77.07178215,
+			'NUMBER' => 10325,
+			'STREET' => 'KENSINGTON PKWY',
+			'CITY' => 'KENSINGTON',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20895
+		}, {
+			'NAME' => 'NEWPORT MILL MIDDLE SCHOOL',
+			'LAT' => 39.0416107,
+			'LON' => -77.06884708,
+			'NUMBER' => 11311,
+			'STREET' => 'NEWPORT MILL RD',
+			'CITY' => 'KENSINGTON',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20895
+		}, {
+			'NAME' => 'SAFEWAY',
+			'LAT' => 39.02822438,
+			'LON' => -77.0755196,
+			'NUMBER' => 10541,
+			'STREET' => 'HOWARD AVE',
+			'CITY' => 'KENSINGTON',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20895
+		}, {
+			'NAME' => 'HAIR CUTTERY',
+			'LAT' => 39.03323865,
+			'LON' => -77.07368044,
+			'NUMBER' => 3731,
+			'STREET' => 'CONNECTICUT AVE',
+			'CITY' => 'KENSINGTON',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+		}, {
+			'NAME' => 'STROSNIDERS',
+			'LAT' => 39.02781493,
+			'LON' => -77.07740792,
+			'NUMBER' => 10504,
+			'STREET' => 'CONNECTICUT AVE',
+			'CITY' => 'KENSINGTON',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+		}, {
+			'NAME' => 'SNIDERS',
+			'LAT' => 39.0088797,
+			'LON' => -77.04162824,
+			'NUMBER' => 1936,
+			'STREET' => 'SEMINARY RD',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20910,
+		}, {
+			'NAME' => 'SILVER DINER',
+			'LAT' => 39.05798753,
+			'LON' => -77.12165374,
+			'NUMBER' => 12276,
+			'STREET' => 'ROCKVILLE PIKE',
+			'CITY' => 'ROCKVILLE',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20852
+		}, {
+			# LF
+			'LAT' => 39.07669788,
+			'LON' => -77.12306436,
+			'NUMBER' => 1605,
+			'STREET' => 'VIERS MILL ROAD',
+			'CITY' => 'ROCKVILLE',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20851
+		}, {
+			'LAT' => 39.075583,
+			'LON' => -77.123833,
+			'NUMBER' => 1406,
+			'STREET' => 'LANGBROOK PLACE',
+			'CITY' => 'ROCKVILLE',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20851
+		}, {
+			'LAT' => 39.0147541,
+			'LON' => -77.05466857,
+			'NAME' => 'BP',
+			'NUMBER' => 2601,
+			'STREET' => 'FOREST GLEN ROAD',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20910
+		}
+	],
+	'us/dc/statewide.csv' => [
+		{
+			'LAT' => 38.955403,
+			'LON' => -76.996241,
+			'NUMBER' => 5350,
+			'STREET' => 'CHILLUM PLACE NE',
+			'CITY' => 'WASHINGTON',
+			'STATE' => 'DC',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20011
+		}
+	]
 );
 
 my %postcodes = ();
@@ -279,8 +301,9 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 		if(!-d $oa) {
 			mkdir $oa;
 		}
-		$dbh->prepare('CREATE TABLE cities(sequence INTEGER, city VARCHAR, county VARCHAR, state VARCHAR NOT NULL, country CHAR(2) NOT NULL)')->execute();
-		$dbh->prepare('CREATE TABLE openaddresses(md5 CHAR(16), lat DECIMAL, lon DECIMAL, name VARCHAR, number VARCHAR, street VARCHAR, city INTEGER, FOREIGN KEY (city) REFERENCES cities(sequence))')->execute();
+		$dbh->do('CREATE TABLE cities(sequence INTEGER, city VARCHAR, county VARCHAR, state VARCHAR NOT NULL, country CHAR(2) NOT NULL)');
+		$dbh->do('CREATE TABLE openaddresses(md5 CHAR(16), lat DECIMAL, lon DECIMAL, name VARCHAR, number VARCHAR, street VARCHAR, city INTEGER, FOREIGN KEY (city) REFERENCES cities(sequence))');
+		# $dbh->do('CREATE TABLE openaddresses(md5 CHAR(16) PRIMARY KEY, lat DECIMAL, lon DECIMAL, name VARCHAR, number VARCHAR, street VARCHAR, city INTEGER, FOREIGN KEY (city) REFERENCES cities(sequence))');
 		# $dbh->prepare('CREATE TABLE node(md5 CHAR(16), parent CHAR(16)')->execute();
 		# $dbh->prepare('CREATE TABLE leaf(md5 CHAR(16), lat DECIMAL, lon DECIMAL')->execute();
 
@@ -517,7 +540,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					'NUMBER' => $number,
 					'STREET' => $street,
 					'CITY' => uc($city),
-					'STATE' => $state,
+					'STATE' => uc($state),
 					'COUNTRY' => uc($country),
 					'POSTCODE' => $postcode,
 				};
@@ -536,10 +559,9 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 
 		# Find all of the .csv files in $OPENADDR_HOME
 		foreach my $csv_file (uniq(create_tree($oa))) {
-			# next unless($csv_file =~ /statewide/);
-			# next unless($csv_file =~ /us\/ne\/dawes/);
-			# next unless($csv_file =~ /us\/ca\/sonoma/);
 			# next unless($csv_file =~ /us\/md\/statewide/);
+			# next unless($csv_file =~ /us\/ne\/dawes/);
+			# next unless($csv_file =~ /us\/mo\//);
 
 			# Handle https://github.com/openaddresses/openaddresses/issues/3928
 			# TODO: It would be better to merge airdrie.csv and city_of_airdrie.csv
@@ -562,9 +584,9 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 				}
 
 				# Clear the deduping hash when we can, to avoid it becoming too large
-				if(($country eq 'us') || ($country eq 'ca')) {
+				if($country eq 'us') {
 					if((!defined($current_state)) || ($state ne $current_state)) {
-						# print "New state, clear state_md5s\n";
+						# print "New state, clear state_md5s; state = $state, country = $country\n";
 						%state_md5s = ( );
 						$current_country = $country;
 						$current_state = $state;
@@ -645,12 +667,24 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 								$city = $w;
 							}
 						}
+						if($country ne 'us') {
+							# For the US, the state name comes from the WOF filename
+							# For the rest of the world there is one WOF file per country
+							$state = $properties->{'sg:region'} || $properties->{'sg:province'};
+						}
+						# if($city) {
+							# print "$country, $state, $city\n";
+						# } else {
+							# print "$country, $state\n";
+						# }
 						if(!defined($city)) {
 							my $address = $properties->{'addr:full'};
 							next if(!defined($address));
-							if(my $href = (Geo::StreetAddress::US->parse_location($address) || Geo::StreetAddress::US->parse_address($address))) {
-								if($href->{city}) {
-									$city = $href->{city};
+							if($country eq 'us') {
+								if(my $href = (Geo::StreetAddress::US->parse_location($address) || Geo::StreetAddress::US->parse_address($address))) {
+									if($href->{city}) {
+										$city = $href->{city};
+									}
 								}
 							}
 						}
@@ -952,7 +986,7 @@ sub import {
 			if(exists($unknown_zips{"$country/$zip"})) {
 				return 0;
 			}
-			my $res = $ua->get("http://api.zippopotam.us/$country/$zip");
+			my $res = $ua->get("https://api.zippopotam.us/$country/$zip");
 			if(!$res->is_success()) {
 				warn "$country/$zip: ", $res->status_line();
 				$unknown_zips{"$country/$zip"} = 1;
@@ -1030,6 +1064,12 @@ sub import {
 			$street = "$1 SPG";
 		} elsif($street =~ /(.+)\s+RIDGE$/) {
 			$street = "$1 RDG";
+		} elsif($street =~ /(.+)\s+LANE$/) {
+			$street = "$1 LN";
+		} elsif($street =~ /(.+)\s+PLACE$/) {
+			$street = "$1 PL";
+		} elsif($street =~ /(.+)\s+GARDENS$/) {
+			$street = "$1 GRDNS";
 		} elsif($street =~ /(.+)\s+CREEK$/) {
 			$street = "$1 CRK";
 		}
@@ -1207,12 +1247,13 @@ sub insert {
 	}
 	# print "$digest\n";
 	$digest = hash($global, Encode::encode_utf8($digest));
-	# print "$digest\n";
 
 	if(!defined($digest)) {
 		# print "Ignore ", join(',', values(%{$columns})), "\n";
 		return 0;
 	}
+
+	# print "$digest\n";
 
 	# my $q = "SELECT * FROM openaddresses WHERE MD5 = '$digest'";
 	# my $sth = $dbh->prepare($q);
@@ -1232,10 +1273,9 @@ sub insert {
 		$cities{$key} = $city_sequence;
 	}
 
+	# Some postal address parsers have problems with "N FOO ST", so also store "NFOOST"
 	if($columns->{'STREET'} && ($columns->{'STREET'} =~ /^[A-Z]\s\w+\s\w+$/)) {
 		# Handle https://rt.cpan.org/Public/Bug/Display.html?id=124919
-		my $s = $columns->{'STREET'};	# Should use a 'local' variable, I guess
-
 		$columns->{'STREET'} =~ s/\s+//g;
 		$digest = '';
 
@@ -1268,6 +1308,17 @@ sub flush_queue
 	keys %queued_commits;
 	# print scalar(keys %queued_commits), "\n";
 	while(my($md5, $row) = each %queued_commits) {
+		my $country = $row->{'COUNTRY'};
+		my $state = $row->{'STATE'};
+		if($max_state_lengths{$country} && $state && (length($state) > $max_state_lengths{$country})) {
+			print STDERR 'Invalid state length: ', Data::Dumper->new([$row])->Dump();
+			next;
+		}
+		if(length($country) != 2) {
+			print STDERR "Invalid country length:\n", Data::Dumper->new([$row])->Dump();
+			next;
+		}
+
 		if(!defined($query)) {
 			$query = 'INSERT INTO openaddresses(';
 			foreach my $column(@columns) {
@@ -1279,18 +1330,10 @@ sub flush_queue
 		}
 
 		# print join(',', @columns), ": $md5\n";
+		# print "$md5: ", Data::Dumper->new([$row])->Dump();
 
-		my $country = $row->{'COUNTRY'};
-		my $state = $row->{'STATE'};
-		if($state_lengths{$country} && (length($state) != $state_lengths{$country})) {
-			print STDERR "Invalid state length:\n", Data::Dumper->new([$row])->Dump();
-			return;
-		}
-		if(length($country) != 2) {
-			print STDERR "Invalid country length:\n", Data::Dumper->new([$row])->Dump();
-			return;
-		}
 		my $key = city_key($row->{'CITY'}, $row->{'COUNTY'}, $state, $country);
+
 		foreach my $column(@columns) {
 			if($row->{$column}) {
 				if(($column eq 'LAT') || ($column eq 'LON') || ($column eq 'CITY')) {
@@ -1312,7 +1355,12 @@ sub flush_queue
 		# $| = 1;
 		# print '.';
 		# $| = 0;
-		$dbh->do($query);
+		try {
+			$dbh->do($query);
+		} catch {
+			print Data::Dumper->new([\%queued_commits])->Dump();
+			die $_;
+		};
 		%queued_commits = ();
 	}
 }
@@ -1321,8 +1369,8 @@ sub hash
 {
 	my $global = shift;
 
-	my $digest = substr Digest::MD5::md5_base64(@_), 0, 16;
 	# my $digest = Digest::MD5::md5_base64(@_);
+	my $digest = substr Digest::MD5::md5_base64(@_), 0, 16;
 	return if($global_md5s{$digest} || $state_md5s{$digest});
 
 	# print join(',', @_), ": $digest\n";

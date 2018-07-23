@@ -10,15 +10,15 @@ BEGIN {
     @EXPORT_OK = qw(cuid slug);
 }
 
-use List::Util 'reduce';
-use Sys::Hostname 'hostname';
+use List::Util ();
+use Sys::Hostname ();
 use Time::HiRes ();
 
 our $size = 4;
 our $base = 36;
 our $cmax = ($base)**($size);
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 {
     my $c = 0;
@@ -54,8 +54,8 @@ sub _fingerprint {
     my $padding = 2;
     my $pid = _encode_base36 $$, $padding;
 
-    my $hostname = hostname;
-    my $id = reduce { $a + ord($b) } length($hostname) + $base,
+    my $hostname = Sys::Hostname::hostname;
+    my $id = List::Util::reduce { $a + ord($b) } length($hostname) + $base,
         split // => $hostname;
 
     join '' => $pid, _encode_base36 $id, $padding;

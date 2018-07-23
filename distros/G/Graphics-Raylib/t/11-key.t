@@ -1,4 +1,4 @@
-use Test::More tests => 23;
+use Test::More tests => 25;
 
 BEGIN {
     use_ok 'Graphics::Raylib::Key';
@@ -17,6 +17,8 @@ ok "$key" eq '<cr>' || "$key" eq '<enter>' || "$key" eq '<return>';
 
 $key = Graphics::Raylib::Key->new(map => '<0020>');
 is $key->keycode, KEY_SPACE;
+ok $key->keycode eq $key->keycode;
+ok $key eq $key;
 ok $key eq '<Space>';
 
 $key = Graphics::Raylib::Key->new(keycode => 0);

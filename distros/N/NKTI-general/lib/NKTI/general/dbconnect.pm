@@ -5,10 +5,6 @@ use warnings;
 use JSON::XS;
 use DBI;
 
-# Define Version :
-# ----------------------------------------------------------------
-our $VERSION = '0.15';
-
 # Create Module for Connection MySQL Database :
 # ------------------------------------------------------------------------
 sub mysql {

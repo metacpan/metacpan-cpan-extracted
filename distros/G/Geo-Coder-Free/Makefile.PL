@@ -13,10 +13,19 @@ if(eval { require Geo::libpostal; }) {
 }
 
 unless(eval { require File::Fetch; }) {
+	if($ENV{'AUTOMATED_TESTING'}) {
+		# This probably isn't the way to do it - need to find documentation
+		print STDERR "UNKNOWN: Needs File::Fetch >= 0.56";
+		exit;
+	}
 	die 'Install File::Fetch >= 0.56 first';
 }
 
 if(version->parse($File::Fetch::VERSION) < 0.56) {
+	if($ENV{'AUTOMATED_TESTING'}) {
+		print STDERR "UNKNOWN: Needs File::Fetch >= 0.56";
+		exit;
+	}
 	die 'Install File::Fetch >= 0.56 first';
 }
 
@@ -69,6 +78,7 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,
 		'JSON' => 0,
 		'LWP::UserAgent::Throttled' => 0,
+		'Try::Tiny' => 0,
 	},
 	TEST_REQUIRES => {
 		'CGI::IDS' => 0,

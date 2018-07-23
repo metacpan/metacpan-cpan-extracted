@@ -1,6 +1,7 @@
 use Test::More tests => 10;
+use Scalar::Util qw/blessed/;
 eval 'use Test::HexString';
-if ($@) {
+if (!$@) {
      sub is_hexstr($$;$) { goto &is; }
 }
 
@@ -14,7 +15,7 @@ my $data = "\xDE\xAD\xBE\xEF"."\xBA\xDC\x0F\xFE"
          . "\xBA\xDC\x0F\xFE"."\xDE\xAD\xBE\xEF";
 
 my $img = image(data => $data, width => 2, height => 3, mipmaps => 42);
-is ref($img), 'Graphics::Raylib::XS::Image';
+is blessed($img), 'Graphics::Raylib::XS::Image';
 is length $$img, $Config{ptrsize} + 4*$Config{intsize};
 is_hexstr $img->data(length $data), $data;
 is $img->width, 2;

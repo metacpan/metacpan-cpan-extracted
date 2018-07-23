@@ -2,20 +2,17 @@ use 5.010000;
 use strict;
 use warnings;
 use Time::Piece;
-use Test::More tests => 6;
-
-
+use Test::More tests => 8;
 
 my $v             = -1;
 my $v_pod         = -1;
 my $v_linux       = -1;
-#my $v_pod_linux   = -1;
 my $v_win32       = -1;
-#my $v_pod_win32   = -1;
 my $v_const       = -1;
+my $v_cwdefault   = -1;
+my $v_cwwide      = -1;
 my $v_changes     = -1;
 my $release_date  = -1;
-
 
 open my $fh, '<', 'lib/Term/Choose.pm' or die $!;
 while ( my $line = <$fh> ) {
@@ -35,11 +32,6 @@ while ( my $line = <$fh> ) {
     if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
         $v_linux = $1;
     }
-#    if ( $line =~ /^=pod/ .. $line =~ /^=cut/ ) {
-#        if ( $line =~ /^\s*Version\s+(\S+)/ ) {
-#            $v_pod_linux = $1;
-#        }
-#    }
 }
 close $fh;
 
@@ -48,11 +40,6 @@ while ( my $line = <$fh> ) {
     if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
         $v_win32 = $1;
     }
-#    if ( $line =~ /^=pod/ .. $line =~ /^=cut/ ) {
-#        if ( $line =~ /^\s*Version\s+(\S+)/ ) {
-#            $v_pod_win32 = $1;
-#        }
-#    }
 }
 close $fh;
 
@@ -61,11 +48,22 @@ while ( my $line = <$fh> ) {
     if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
         $v_const = $1;
     }
-#    if ( $line =~ /^=pod/ .. $line =~ /^=cut/ ) {
-#        if ( $line =~ /^\s*Version\s+(\S+)/ ) {
-#            $v_pod_const = $1;
-#        }
-#    }
+}
+close $fh;
+
+open $fh, '<', 'lib/Term/Choose/LineFold/CharWidthDefault.pm' or die $!;
+while ( my $line = <$fh> ) {
+    if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
+        $v_cwdefault = $1;
+    }
+}
+close $fh;
+
+open $fh, '<', 'lib/Term/Choose/LineFold/CharWidthAmbiguousWide.pm' or die $!;
+while ( my $line = <$fh> ) {
+    if ( $line =~ /^our\s\$VERSION\s=\s'(\d\.\d\d\d(?:_\d\d)?)';/ ) {
+        $v_cwwide = $1;
+    }
 }
 close $fh;
 
@@ -79,16 +77,14 @@ while ( my $line = <$fh_ch> ) {
 }
 close $fh_ch;
 
-
 my $t = localtime;
 my $today = $t->ymd;
-
 
 is( $v,            $v_pod,         'Version in POD Term::Choose OK' );
 is( $v,            $v_linux,       'Version in Term::Choose::Linux OK' );
 is( $v,            $v_win32,       'Version in Term::Choose::Win32 OK' );
 is( $v,            $v_const,       'Version in Term::Choose::Constants OK' );
-#is( $v,            $v_pod_linux,   'Version in POD Term::Choose::Linux OK' );
-#is( $v,            $v_pod_win32,   'Version in POD Term::Choose::Win32 OK' );
+is( $v,            $v_cwdefault,   'Version in Term::Choose::LineFold::CharWidthDefault OK' );
+is( $v,            $v_cwwide,      'Version in Term::Choose::LineFold::CharWidthAmbiguousWide OK' );
 is( $v,            $v_changes,     'Version in "Changes" OK' );
 is( $release_date, $today,         'Release date in Changes is date from today' );

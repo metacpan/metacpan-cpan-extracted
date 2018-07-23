@@ -5,10 +5,6 @@ use warnings;
 use JSON;
 use Data::Dumper;
 
-# Define Version :
-# ----------------------------------------------------------------
-our $VERSION = '0.15';
-
 # Create Constructor Module :
 # ------------------------------------------------------------------------
 #

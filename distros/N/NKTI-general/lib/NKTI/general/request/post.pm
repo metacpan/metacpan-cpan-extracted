@@ -8,10 +8,6 @@ use HTTP::Request::Common qw{ POST };
 use CGI;
 use JSON;
 
-# Define version :
-# ----------------------------------------------------------------
-our $VERSION = '0.15';
-
 # Create Module for Action Request POST :
 # ------------------------------------------------------------------------
 =head1 MODULE action()

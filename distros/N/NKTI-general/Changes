@@ -36,5 +36,9 @@ Revision history for Perl extension NKTI::general.
     - Fix PDO NKTI::general
 0.14  Sun Jun 18 23:19:05 2017
     - Revision Makefile.PL
+
 0.15  Mon Sep 18 01:57:00 2017
+    - Revision subroutine "time_event_mysql" for time measurement "MINUTES" to "MINUTE"
+
+0.16  Sun Jul 22 03:13:00 2018
     - Revision subroutine "time_event_mysql" for time measurement "MINUTES" to "MINUTE"

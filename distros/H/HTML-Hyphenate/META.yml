@@ -1,33 +1,43 @@
---- #YAML:1.0
-name:               HTML-Hyphenate
-version:            0.05
-abstract:           class for inserting soft hyphens into HTML.
+---
+abstract: 'insert soft hyphens into HTML.'
 author:
-    - Roland van Ipenburg <ipenburg@xs4all.nl>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Roland van Ipenburg <ipenburg@xs4all.nl>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Class::Meta::Express:  0.11
-    Class::Meta::Type:    0
-    HTML::Entities:       0
-    HTML::TreeBuilder:    0
-    Log::Log4perl:        0
-    Readonly:             1.03
-    Set::Scalar:          0
-    Test::More:           0.86
-    Test::NoWarnings:     0
-    TeX::Hyphen:          0
-    TeX::Hyphen::Pattern:  0
-    version:              0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  TeX::Hyphen::Pattern: '0.103'
+  Test::CheckManifest: '1.01'
+  Test::Kwalitee: '0'
+  Test::More: '0.86'
+  Test::NoWarnings: '0'
+  Test::Pod: '1'
+  Test::Pod::Coverage: '1'
+  Test::TestCoverage: '0.08'
+  Test::Warn: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Hyphenate
+provides:
+  HTML::Hyphenate:
+    file: lib/HTML/Hyphenate.pm
+    version: '0.101'
+requires:
+  HTML::Entities: '0'
+  HTML::TreeBuilder: '0'
+  Log::Log4perl: '0'
+  Moose: '0'
+  Readonly: '1.03'
+  Set::Scalar: '0'
+  TeX::Hyphen: '0'
+  TeX::Hyphen::Pattern: '0'
+  namespace::autoclean: '0'
+  perl: v5.14.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ipenburg/HTML-Hyphenate
+version: '0.101'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

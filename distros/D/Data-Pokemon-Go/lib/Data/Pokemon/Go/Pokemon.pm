@@ -14,10 +14,10 @@ use YAML::XS;
 use Path::Tiny;
 
 my $all = {};
-foreach my $region (qw|Kanto Johto Hoenn|){
+foreach my $region (qw|Kanto Johto Hoenn Alola|){
     my $in_file = path( 'data', "$region.yaml" );
     my $data = YAML::XS::LoadFile($in_file);
-    map{ $data->{$_}{name} = $_ } keys %$data;
+    map{ $data->{$_}{'name'} = $_ } keys %$data;
     %$all = ( %$all, %$data );
 }
 
@@ -131,21 +131,14 @@ sub defense {
 sub hatchedMAX {
     my $self = shift;
     my $name = $self->name();
-    croak "'HatchedMAX' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{'Hatched'};
+    croak "'Hatched' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{'Hatched'};
     return $all->{$name}{'MAXCP'}{'Hatched'};
-}
-
-sub rewardMAX {
-    my $self = shift;
-    my $name = $self->name();
-    croak "'HatchedMAX' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{'Reward'};
-    return $all->{$name}{'MAXCP'}{'Reward'};
 }
 
 sub boostedMAX {
     my $self = shift;
     my $name = $self->name();
-    croak "'HatchedMAX' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{'Boosted'};
+    croak "'Boosted' is undefined for $name" unless exists $all->{$name}{'MAXCP'}{'Boosted'};
     return $all->{$name}{'MAXCP'}{'Boosted'};
 }
 
@@ -159,6 +152,12 @@ sub isNotAvailable {
     my $self = shift;
     my $name = $self->name();
     return $all->{$name}{'isNotAvailable'};
+}
+
+sub isAlola {
+    my $self = shift;
+    my $name = $self->name();
+    return $all->{$name}{'isAlola'};
 }
 
 1;

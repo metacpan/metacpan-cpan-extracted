@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# $Id: sinfp3.pl,v 451c3602d7b2 2015/11/25 06:13:53 gomor $
+# $Id: sinfp3.pl,v 42a38f4bde90 2015/11/25 06:26:55 gomor $
 #
 use strict;
 use warnings;
@@ -111,10 +111,11 @@ if ($lopts{version}) {
    use Net::Frame::Layer::SinFP3;
    use Net::Frame::Simple;
    use Net::Write;
+   use Net::Write::Fast;
    print
       "\n  -- SinFP3 - $Net::SinFP3::VERSION --\n".
       "\n".
-      '   $Id: sinfp3.pl,v 451c3602d7b2 2015/11/25 06:13:53 gomor $'."\n".
+      '   $Id: sinfp3.pl,v 42a38f4bde90 2015/11/25 06:26:55 gomor $'."\n".
       "\n  -- Perl modules --\n\n".
       "  o Class::Gomor              - $Class::Gomor::VERSION\n".
       "  o DBD::SQLite               - $DBD::SQLite::VERSION\n".
@@ -127,6 +128,7 @@ if ($lopts{version}) {
       "  o Net::Frame::Layer::SinFP3 - $Net::Frame::Layer::SinFP3::VERSION\n".
       "  o Net::Frame::Simple        - $Net::Frame::Simple::VERSION\n".
       "  o Net::Write                - $Net::Write::VERSION\n".
+      "  o Net::Write::Fast          - $Net::Write::Fast::VERSION\n".
       "\n";
    exit(0);
 }

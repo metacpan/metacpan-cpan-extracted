@@ -228,7 +228,7 @@ es-copy-index.pl - Copy an index from one cluster to another
 
 =head1 VERSION
 
-version 5.8
+version 5.9
 
 =head1 SYNOPSIS
 

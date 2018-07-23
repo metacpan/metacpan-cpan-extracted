@@ -1,14 +1,9 @@
-# $Id: 02_classes.t 114 2009-08-02 19:12:48Z roland $
-# $Revision: 114 $
-# $HeadURL: svn+ssh://ipenburg.xs4all.nl/srv/svnroot/elaine/trunk/HTML-Hyphenate/t/02_classes.t $
-# $Date: 2009-08-02 21:12:48 +0200 (Sun, 02 Aug 2009) $
-
 use strict;
 use warnings;
 use utf8;
 
 use Test::More;
-$ENV{TEST_AUTHOR} && eval { require Test::NoWarnings };
+$ENV{AUTHOR_TESTING} && eval { require Test::NoWarnings };
 
 my $INCLUDE_BY_DEFAULT = 1;
 my $EXCLUDE_BY_DEFAULT = 0;
@@ -122,8 +117,8 @@ foreach my $frag (@fragments) {
     is( $h->hyphenated( @{$frag}[3] ), @{$frag}[4], @{$frag}[5] );
 }
 
-my $msg = 'Author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
+my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
 SKIP: {
-    skip $msg, 1 unless $ENV{TEST_AUTHOR};
+    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
 }
-$ENV{TEST_AUTHOR} && Test::NoWarnings::had_no_warnings();
+$ENV{AUTHOR_TESTING} && Test::NoWarnings::had_no_warnings();

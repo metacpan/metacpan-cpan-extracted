@@ -11,4 +11,5 @@ bin/unding
 dist.ini
 lib/App/Unding.pm
 t/run.t
-t/secret.txt
+xt/run.t
+xt/secret.txt

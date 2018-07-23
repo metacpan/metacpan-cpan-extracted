@@ -1,8 +1,41 @@
 Revision history for TeX-Hyphen-Pattern
 
+
+0.103 Sat Jul 21 12:43:58 UTC 2018
+    - Fixed fallback modules namespace
+
+0.102 Fri Jul 20 19:49:14 UTC 2018
+    - Fixed case sensitive issue with TeX/Tex namespace
+
+0.101 Sun Jul 15 14:02:58 UTC 2018
+    - Introduced fallbacks for mapping old labels to new modules
+    - Reintroduced Zu-ZA pattern
+
+0.100 Sun Jul 15 14:02:58 UTC 2018
+    - Refactored from Class::Meta::Express to Moose
+    - Refactored from ExtUtils::MakeMaker to Module::Build
+	- Removed patterns for Lo and Sr_latn
+	- Moved pattern for Zh_latn to Zh_latn_pinyin
+    
+0.05  Fri Mar 26 08:12:32
+       Added as_IN Assamese
+       Added bn_IN Bengali
+       Added gu_IN Guajrati
+       Added hi_IN Hindi
+       Added kn_IN Kannada
+       Added ml_IN Malayalam
+       Added mr_IN Marathi
+       Added or_IN Oriya
+       Added pa_IN Panjabi
+       Added ta_IN Tamil
+       Added te_IN Telugu
+       Added ml Malayalam
+       Added ta Tamil
+       Added tk Turkmen
+
 0.04  Mon Aug 17 08:12:32
-	   Work around "x encoded carons RT#48763
-	   Work around \message in pattern so Hu.pm and De_*.pm are included
+       Work around "x encoded carons RT#48763
+       Work around \message in pattern so Hu.pm and De_*.pm are included
        Made svn expand keywords
        Tuned author tests
 

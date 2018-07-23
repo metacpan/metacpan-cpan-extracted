@@ -1,0 +1,6 @@
+
+
+[Modules::ProhibitEvilModules]
+modules = Switch Pod::Plainer Shell
+
+

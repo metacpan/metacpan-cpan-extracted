@@ -11,10 +11,6 @@ use warnings;
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 
-# Define Version Application
-# ----------------------------------------------------------------
-our $VERSION = '0.15';
-
 # Constructor
 # ------------------------------------------------------------
 =head1 MODULE new()

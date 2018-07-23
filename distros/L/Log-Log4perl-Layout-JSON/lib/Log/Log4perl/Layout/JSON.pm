@@ -1,5 +1,5 @@
 package Log::Log4perl::Layout::JSON;
-$Log::Log4perl::Layout::JSON::VERSION = '0.55';
+$Log::Log4perl::Layout::JSON::VERSION = '0.56';
 # ABSTRACT: Layout a log message as a JSON hash, including MDC data
 
 use 5.008;
@@ -61,10 +61,19 @@ use Class::Tiny {
     },
 
     field => sub {
-        return { message => { value => "%m{chomp}" } };
+        my $self = shift;
+
+        my $content = {};
+
+        unless ($self->exclude_message) {
+            $content->{message} = { value => '%m{chomp}' };
+        }
+
+        return $content;
     },
     canonical => 0,
     include_mdc => 0,
+    exclude_message => 0,
     name_for_mdc => undef,
     max_json_length_kb => 20,
 
@@ -114,7 +123,7 @@ sub BUILD { ## no critic (RequireArgUnpacking)
     }
 
     for my $arg_name (qw(
-        canonical prefix include_mdc name_for_mdc max_json_length_kb format_prefix
+        canonical prefix include_mdc exclude_message name_for_mdc max_json_length_kb format_prefix
     )) {
         my $arg = delete $args->{$arg_name}
             or next;
@@ -284,7 +293,7 @@ Log::Log4perl::Layout::JSON - Layout a log message as a JSON hash, including MDC
 
 =head1 VERSION
 
-version 0.55
+version 0.56
 
 =head1 SYNOPSIS
 
@@ -353,6 +362,12 @@ Would log C<Hello World> as:
     Hello World @cee:{ .. MDC as JSON ... }
 
 See also L</prefix>
+
+=head2 exclude_message
+
+Exclude the message from the JSON (default: 0).  If you are logging the message
+in the prefix for example, you may want to omit the message from the JSON
+layout.
 
 =head2 include_mdc
 

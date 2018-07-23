@@ -1,5 +1,9 @@
 Revision history for Alien-pkgconf
 
+0.14 2018-07-20 15:29:47 -0700
+  - Require pkgconf 1.5.2 for bugfixes
+  - Switched to back to upstream for share install
+
 0.12 2018-06-25 06:52:07 -0400
   - Require pkgconf 1.5.0
   - Temp fetching patched version from dist.wdlabs.com

@@ -1,10 +1,27 @@
 Revision history for App-Unding
  
+0.009     2018-07-21 22:57:14+02:00 Europe/Zurich
+ - go back to Term::ReadKey, because Term::ReadPassword::Win32 does not work
+   together with Test::Script
+ - open /dev/tty (or "CON" on win32) for password interaction,
+   so that data to STDIN doesn't interfere
+ - move interactice tests (reading password from tty) to xt, since running
+   requires user input, which is not emulated by Test::Script
+
+0.008     2018-07-21 00:28:13+02:00 Europe/Zurich (TRIAL RELEASE)
+ - can now also read and encrypt data from STDIN
+ - switched to Term::ReadPassword::Win32 for receiving passwords
+ - updated and fixed documentation
+
+0.007     2018-07-20 22:31:33+02:00 Europe/Zurich
+ - added option --fatinit, allowing to fatpack dependencies
+ - don't test on windows, since Test::Script seems to have troubles
+
 0.006     2018-07-18 23:27:53+02:00 Europe/Zurich
  - warn before overwriting data
  - ask password twice when writing
  - show password prompt
- - copy script to current working directory, if now writable
+ - copy script to current working directory, if not writable
  - updated minor details in docs
 
 0.005     2018-06-16 16:58:54+02:00 Europe/Zurich

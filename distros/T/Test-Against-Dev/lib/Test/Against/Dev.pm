@@ -1,7 +1,7 @@
 package Test::Against::Dev;
 use strict;
 use 5.14.0;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 use Carp;
 use Cwd;
 use File::Basename;
@@ -787,32 +787,17 @@ sub fetch_cpanm {
     croak "Could not locate $cpanm_dir" unless (-d $cpanm_dir);
     $self->{cpanm_dir} = $cpanm_dir;
 
-    say "Fetching 'cpanm' from $uri" if $verbose;
-    my $ff = File::Fetch->new(uri => $uri);
-    my ($scalar, $where);
-    $where = $ff->fetch( to => \$scalar );
-    croak "Did not download 'cpanm'" unless (-f $where);
-    my $this_cpanm = File::Spec->catfile($self->{bin_dir}, 'cpanm');
+    my $bin_dir = $self->get_bin_dir();
+    my $this_cpanm = File::Spec->catfile($bin_dir, 'cpanm');
     # If cpanm is already installed in bin_dir, we don't need to try to
     # reinstall it.
-    unless (-f $this_cpanm) {
-        open my $IN, '<', \$scalar or croak "Unable to open scalar for reading";
-        open my $OUT, '>', $this_cpanm or croak "Unable to open $this_cpanm for writing";
-        while (<$IN>) {
-            chomp $_;
-            say $OUT $_;
-        }
-        close $OUT or croak "Unable to close $this_cpanm after writing";
-        close $IN or croak "Unable to close scalar after reading";
-        unless (-f $this_cpanm) {
-            croak "Unable to locate '$this_cpanm'";
-        }
-        else {
-            say "Installed '$this_cpanm'" if $verbose;
-        }
+    if (-f $this_cpanm) {
+        say "'$this_cpanm' already installed" if $verbose;
     }
     else {
-        say "'$this_cpanm' already installed" if $verbose;
+       say "Fetching 'cpanm' from $uri" if $verbose;
+       my $ff = File::Fetch->new(uri => $uri)->fetch(to => $bin_dir)
+           or croak "Unable to fetch 'cpanm' from $uri";
     }
     my $cnt = chmod 0755, $this_cpanm;
     croak "Unable to make '$this_cpanm' executable" unless $cnt;
@@ -1000,14 +985,15 @@ sub run_cpanm {
         $self->get_this_cpanm,
         @modules,
     );
-    eval {
+    {
         local $@;
-        my $rv = system(@cmd);
+        my $rv;
+        eval { $rv = system(@cmd); };
         say "<$@>" if $@;
         if ($verbose) {
             say $self->get_this_cpanm(), " exited with ", $rv >> 8;
         }
-    };
+    }
     my $gzipped_build_log = $self->gzip_cpanm_build_log();
     say "See gzipped build.log in $gzipped_build_log" if $verbose;
 

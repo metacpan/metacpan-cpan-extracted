@@ -6,10 +6,6 @@ use DBI;
 use JSON;
 use Data::Dumper;
 
-# Define Version :
-# ---------------------------------------------------------------- 
-our $VERSION = '0.15';
-
 # Subroutine for Error Handling MySQL Connection :
 # ------------------------------------------------------------------------
 =head1 SUBROUTINE errconn()

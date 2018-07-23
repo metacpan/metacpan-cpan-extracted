@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+bin/query_kvk.pl
 cpanfile
 dist.ini
 lib/WebService/KvKAPI.pm

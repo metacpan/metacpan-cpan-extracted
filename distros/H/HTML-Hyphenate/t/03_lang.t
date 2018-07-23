@@ -1,13 +1,14 @@
-# $Id: 03_lang.t 114 2009-08-02 19:12:48Z roland $
-# $Revision: 114 $
-# $HeadURL: svn+ssh://ipenburg.xs4all.nl/srv/svnroot/elaine/trunk/HTML-Hyphenate/t/03_lang.t $
-# $Date: 2009-08-02 21:12:48 +0200 (Sun, 02 Aug 2009) $
-
 use strict;
 use warnings;
 use utf8;
 use Test::More;
-$ENV{TEST_AUTHOR} && eval { require Test::NoWarnings };
+$ENV{AUTHOR_TESTING} && eval { require Test::NoWarnings };
+use Test::Warn;
+
+my $builder = Test::More->builder;
+binmode $builder->output,         ":utf8";
+binmode $builder->failure_output, ":utf8";
+binmode $builder->todo_output,    ":utf8";
 
 my @fragments = (
     [
@@ -334,29 +335,30 @@ my @utf8_fragments = (
         'lang el-polyton'
     ],
 );
-
-plan tests => ( 0 + @fragments + @utf8_fragments ) + 1;
+# 50 fragments + 14 utf8 fragments
+plan tests => ( 0 + @fragments + (@utf8_fragments << 1)) + 1;
 
 use HTML::Hyphenate;
 my $h = HTML::Hyphenate->new();
 foreach my $frag (@fragments) {
-    is( $h->hyphenated( @{$frag}[0] ), @{$frag}[1], @{$frag}[2] );
+	is( $h->hyphenated( @{$frag}[0] ), @{$frag}[1], @{$frag}[2] );
 }
 
 TODO: {
 	local $TODO = q{utf8 patterns not yet supported by TeX::Hyphen};
 	foreach my $frag (@utf8_fragments) {
-		is( $h->hyphenated( @{$frag}[0] ), @{$frag}[1], @{$frag}[2] );
+		warnings_like {
+			is( $h->hyphenated( @{$frag}[0] ), @{$frag}[1], @{$frag}[2] );
+		} [
+			qr/Use of uninitialized value within %CARON_MAP in substitution iterator.*/,
+		], 'Warned about uninitialized value within %CARON_MAP';
 	}
 };
 
-my $msg = 'Author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
+my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
 SKIP: {
-    skip $msg, 1 unless $ENV{TEST_AUTHOR};
+    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
 }
-if ($ENV{TEST_AUTHOR}) {
-	TODO: {
-		local $TODO = q{Wide characters in prints by Test::More};
-		Test::NoWarnings::had_no_warnings();
-	}
+if ($ENV{AUTHOR_TESTING}) {
+	Test::NoWarnings::had_no_warnings();
 }

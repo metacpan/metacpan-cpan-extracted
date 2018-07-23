@@ -1,0 +1,87 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+
+use App::ansifold qw($VERSION);
+
+=encoding utf-8
+
+=head1 NAME
+
+ansifold - fold command handling ANSI terminal sequences
+
+=head1 SYNOPSIS
+
+ansifold [ options ]
+
+    --width=80, -w80         Folding width
+    --boundary=word, -s      Fold on word boundary
+    --padding                Padding to margin space
+    --padchar=_              Padding character
+    --ambiguous=narrow|wide  Unicode ambiguous character handling
+    --paragraph, -p          Print extra newline
+
+=head1 DESCRIPTION
+
+B<ansifold> is almost B<fold> compatible command utilizing
+L<Text::ANSI::Fold> module, which enables to handle ANSI terminal
+sequences properly.
+
+=head1 LICENSE
+
+Copyright (C) Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=cut
+
+use open IO => 'utf8';
+binmode STDIN,  ":encoding(utf8)";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
+
+use Pod::Usage;
+use Text::ANSI::Fold;
+
+my %opt = (
+    width => 80,
+    );
+my @optargs = (
+    "width|w=i"   => \$opt{width},
+    "boundary=s"  => \$opt{boundary},
+    "padding!"    => \$opt{padding},
+    "padchar=s"   => \$opt{padchar},
+    "ambiguous=s" => \$opt{ambiguous},
+    "paragraph|p" => \$opt{paragraph},
+    "s" => sub {
+	$opt{boundary} = 'word';
+    },
+    "version|v" => sub {
+	print "Version: $VERSION\n";
+	exit;
+    },
+    );
+
+use Getopt::Long;
+Getopt::Long::Configure("bundling");
+GetOptions(@optargs) || pod2usage();
+
+my @option = do {
+    map  { $_ => $opt{$_} }
+    grep { defined $opt{$_} }
+    qw(width boundary padding padchar ambiguous);
+};
+
+my $fold = new Text::ANSI::Fold @option;
+
+while (<>) {
+    print join "\n", $fold->text($_)->chops;
+    print "\n" if $opt{paragraph};
+}

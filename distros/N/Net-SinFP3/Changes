@@ -1,5 +1,11 @@
 Revision history for Perl extension Net::SinFP3.
 
+1.24 Sat 21 Jul 16:53:17 CEST 2018
+   - bugfix: sinfp3.pl: -version to display version of Net::Write::Fast module
+   - bugfix: Search::Active: die when a Result object cannot be created
+   - bugfix: DB::SinFP3: do not lock sinfp3.db, we only read it.
+   - update: copyright notice
+
 1.23 Wed Nov 25 07:12:43 CET 2015
    - FEATURE: removed local XS code to use Net::Write::Fast
               => That means Support for Mac OS X.

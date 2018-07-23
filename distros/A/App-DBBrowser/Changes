@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.021    2018-07-20
+        - Output tweaking.
+        - Bugfix regexp.
+        - Minimum version "Term::Form" is "0.321".
+
 2.020    2018-07-15
         - Output tweaking.
         - Minimum version "Term::Choose" is "1.604".

@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: artistic
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Net-SinFP3
 provides:
   Net::SinFP3:
     file: lib/Net/SinFP3.pm
-    version: '1.23'
+    version: '1.24'
   Net::SinFP3::DB:
     file: lib/Net/SinFP3/DB.pm
   Net::SinFP3::DB::Null:
@@ -169,4 +169,5 @@ requires:
   perl: v5.6.1
 resources:
   license: http://www.perlfoundation.org/artistic_license_1_0
-version: '1.23'
+version: '1.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -181,7 +181,7 @@ sub fold {
 	$folded .= $padchar x $room if $room > 0;
     }
 
-    ($folded . $eol, $_);
+    ($folded . $eol, $_, $width - $room);
 }
 
 ##
@@ -205,12 +205,30 @@ sub simple_fold {
     ($s1, $s2, $w);
 }
 
+######################################################################
+
+sub text {
+    my $obj = shift;
+    croak "Invalid argument." unless @_;
+    $obj->{text} = shift;
+    $obj;
+}
+
 sub retrieve {
     my $obj = shift;
     local *_ = \$obj->{text};
     return '' if $_ eq '';
     (my $folded, $_) = $obj->fold($_);
     $folded;
+}
+
+sub chops {
+    my $obj = shift;
+    my @chops;
+    while ((my $chop = $obj->retrieve) ne '') {
+	push @chops, $chop;
+    }
+    @chops;
 }
 
 1;
@@ -233,6 +251,12 @@ Text::ANSI::Fold - Text folding with ANSI sequence and Asian wide characters.
     $f->configure(ambiguous => 'wide');
     ($folded, $remain) = $f->fold($text);
 
+    use Text::ANSI::Fold;
+    while (<>) {
+        print join "\n",
+            Text::ANSI::Fold->new(width => 40, text => $_)->chops;
+    }
+
 =head1 DESCRIPTION
 
 Text::ANSI::Fold provides capability to fold a text into two strings
@@ -248,10 +272,14 @@ Use exported B<ansi_fold> function to fold original text, with number
 of visual columns you want to cut off the text.  Width parameter have
 to be a number greater than zero.
 
-    ($folded, $remain) = ansi_fold($text, $width);
+    ($folded, $remain, $w) = ansi_fold($text, $width);
 
-It returns a pair of strings.  First one is folded text, and second is
-cut-off text.
+It returns a pair of strings; first one is folded text, and second is
+the rest.
+
+Additional third result is the visual width of folded text.  You may
+want to know how many columns returned string takes for further
+processing.
 
 This function returns at least one character in any situation.  If you
 provide Asian wide string and just one column as width, it trims off
@@ -295,15 +323,30 @@ saved value.
 
 =head1 STRING OBJECT INTERFACE
 
-Experimentally fold object can hold string inside.
+Fold object can hold string inside by B<text> method.
 
-    $f->configure(text => "text");
+    $f->text("text");
 
-And folded string can be taken by I<retrieve> method.
+And folded string can be taken by B<retrieve> method.  It returns
+empty string if nothing remained.
 
     while ((my $folded = $f->retrieve) ne '') {
         print $folded;
         print "\n" if $folded !~ /\n\z/;
+    }
+
+Method B<chops> returns chopped string list.  Because B<text> method
+returns the object itself, you can use B<text> and B<chops> like this:
+
+    print join "\n", $f->text($text)->chops;
+
+Actually, text can be set by B<new> or B<configure> method through
+B<text> option.  Next program just works.
+
+    use Text::ANSI::Fold;
+    while (<>) {
+        print join "\n",
+            Text::ANSI::Fold->new(width => 40, text => $_)->chops;
     }
 
 =head1 OPTIONS
@@ -374,6 +417,8 @@ L<Text::ANSI::Fold> provides simple folding mechanism with minimum
 overhead.  Also B<sdif> need to process other than SGR (Select Graphic
 Rendition) color sequence, and non-spacing combining characters, those
 are not supported by these modules.
+
+=item L<https://en.wikipedia.org/wiki/ANSI_escape_code>
 
 =back
 

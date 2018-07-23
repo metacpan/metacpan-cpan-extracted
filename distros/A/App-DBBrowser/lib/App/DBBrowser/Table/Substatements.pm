@@ -678,12 +678,14 @@ sub __set_operator_sql {
         }
         elsif ( $operator =~ /REGEXP(_i)?\z/ ) {
             $ax->print_sql( $sql, [ $stmt_type ], $tmp );
-            $tmp->{$stmt} =~ s/\s\Q$quote_col\E\z//;
+            $tmp->{$stmt} =~ s/ (?: (?<=\() | \s ) \Q$quote_col\E\z//x;
             my $do_not_match_regexp = $operator =~ /^NOT/       ? 1 : 0;
             my $case_sensitive      = $operator =~ /REGEXP_i\z/ ? 0 : 1;
             if ( ! eval {
                 my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-                $tmp->{$stmt} .= $plui->regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
+                my $regex_op = $plui->regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
+                $regex_op =~ s/^\s// if $tmp->{$stmt} =~ /\(\z/;
+                $tmp->{$stmt} .= $regex_op;
                 push @{$tmp->{$args}}, '...';
                 1 }
             ) {

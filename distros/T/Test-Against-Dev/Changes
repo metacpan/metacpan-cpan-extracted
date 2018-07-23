@@ -1,5 +1,10 @@
 Revision history for Perl module Test::Against::Dev
 
+0.12 Sat Jul 21 08:01:13 EDT 2018
+    - Introduce Test::Against::Dev::Salvage.  This package provides methods
+      that can be used when a test-against-dev run exits after completing
+      'cpanm' but before completing 'run_cpanm().
+
 0.11 Mon Jul 16 11:58:54 EDT 2018
     - Correct error in Test::Against::Dev::ProcessPSV::read_one_psv().
 

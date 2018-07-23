@@ -1,5 +1,5 @@
 #
-# $Id: SinFP3.pm,v 451c3602d7b2 2015/11/25 06:13:53 gomor $
+# $Id: SinFP3.pm,v 008243d3e89a 2018/07/21 14:54:07 gomor $
 #
 package Net::SinFP3::DB::SinFP3;
 use strict;
@@ -118,6 +118,7 @@ sub init {
 
    my $dbh = DBI->connect(
       "dbi:SQLite:dbname=".$self->file, '', '', {
+      sqlite_use_immediate_transaction => 0,  # Avoid lock
       RaiseError => 0,
       PrintError => 0,
       AutoCommit => 0,
@@ -606,7 +607,7 @@ Patrice E<lt>GomoRE<gt> Auffret
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2011-2015, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2011-2018, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of the Artistic license.
 See LICENSE.Artistic file in the source distribution archive.

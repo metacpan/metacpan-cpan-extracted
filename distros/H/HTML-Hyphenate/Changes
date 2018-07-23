@@ -1,4 +1,13 @@
-Revision history for HTML-Hyphenate
+Revision history for Perl extension HTML::Hyphenate.
+
+
+0.101 Sun Jul 22 05:48:37 UTC 2018
+    - fixed missing Test::Warn test prerequisite
+
+0.100 Sat Jul 21 21:39:31 UTC 2018
+    - Refactored from ExtUtils::MakeMaker to Module::Build
+    - Refactored from Class::Meta to Moose
+    - Added licenses
 
 0.05  Tue Dec 21 17:03:29 2010
        Fixed RT#64114

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.608';
+our $VERSION = '1.609';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -1074,7 +1074,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.608
+Version 1.609
 
 =cut
 
@@ -1639,7 +1639,7 @@ Requires Perl version 5.8.3 or greater.
 If L<Term::ReadKey> is available it is used C<ReadKey> to read the user input and C<GetTerminalSize> to get the
 terminal size. Without C<Term::ReadKey> C<getc> is used to read the input and C<stty size> to get the terminal size.
 
-If the OS is MSWin32 it is always used L<Win32::Console> to read the user input and to get the terminal size.
+If the OS is MSWin32 it is used L<Win32::Console> to read the user input and to get the terminal size.
 
 =head2 Decoded strings
 
@@ -1652,6 +1652,11 @@ For a correct output it is required an appropriate encoding layer for STDOUT mat
 =head2 Monospaced font
 
 It is required a terminal that uses a monospaced font which supports the printed characters.
+
+=head2 Ambiguous width characters
+
+By default ambiguous width characters are treated as half width. If the environment variable C<TC_AMBIGUOUS_WIDE> is set
+to a true value, ambiguous width characters are treated as full width.
 
 =head2 Escape sequences
 

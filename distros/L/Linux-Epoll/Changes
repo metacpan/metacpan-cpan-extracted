@@ -1,5 +1,8 @@
 Revision history for Linux-Epoll
 
+0.015     2018-07-21 23:13:22+02:00 Europe/Amsterdam
+          - Deal with global destruction more gracefully
+
 0.014     2018-06-30 11:07:06+02:00 Europe/Amsterdam
           - Swallow exceptions in wait
           - Add wakeup and exclusive flags

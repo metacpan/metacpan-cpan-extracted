@@ -1,7 +1,7 @@
 package Test::Against::Dev::ProcessPSV;
 use strict;
 use 5.14.0;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 use Carp;
 use Data::Dump ( qw| dd pp | );
 use Text::CSV_XS;

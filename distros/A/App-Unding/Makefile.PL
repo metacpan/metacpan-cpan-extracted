@@ -20,11 +20,13 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006000",
   "NAME" => "App::Unding",
   "PREREQ_PM" => {
+    "App::FatPacker" => 0,
     "Crypt::Blowfish" => 0,
     "Crypt::CBC" => 0,
     "Cwd" => 0,
     "Data::Serializer" => 0,
     "File::Copy" => 0,
+    "File::Path" => 0,
     "File::Slurp" => 0,
     "Term::ReadKey" => 0,
     "strict" => 0,
@@ -33,7 +35,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Script" => "1.10"
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,11 +43,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "App::FatPacker" => 0,
   "Crypt::Blowfish" => 0,
   "Crypt::CBC" => 0,
   "Cwd" => 0,
   "Data::Serializer" => 0,
   "File::Copy" => 0,
+  "File::Path" => 0,
   "File::Slurp" => 0,
   "Term::ReadKey" => 0,
   "Test::Script" => "1.10",

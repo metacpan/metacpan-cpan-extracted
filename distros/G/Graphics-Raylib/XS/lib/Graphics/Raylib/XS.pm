@@ -387,7 +387,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	GetCollisionRayTriangle
 	GetCollisionRec
 	GetColor
-	GetDefaultFont
+	GetFontDefault
 	GetDirectoryPath
 	GetExtension
 	GetFPS
@@ -1278,7 +1278,7 @@ None by default.
   RayHitInfo GetCollisionRayTriangle(Ray ray, Vector3 p1, Vector3 p2, Vector3 p3)
   Rectangle GetCollisionRec(Rectangle rec1, Rectangle rec2)
   Color GetColor(int hexValue)
-  Font GetDefaultFont(void)
+  Font GetFontDefault(void)
   char *GetDirectoryPath(char *fileName)
   char *GetExtension(char *fileName)
   int GetFPS(void)

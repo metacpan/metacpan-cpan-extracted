@@ -1,19 +1,35 @@
-# $Id: 11_test-coverage.t 112 2009-07-31 01:53:16Z roland $
-# $Revision: 112 $
-# $HeadURL: svn+ssh://ipenburg.xs4all.nl/srv/svnroot/rhonda/trunk/TeX-Hyphen-Pattern/t/11_test-coverage.t $
-# $Date: 2009-07-31 03:53:16 +0200 (Fri, 31 Jul 2009) $
+#!/usr/bin/env perl -w    # -*- cperl -*-
+use strict;
+use warnings;
+use 5.014000;
+use utf8;
 
 use Test::More;
-eval "use Test::TestCoverage 0.08";
-plan skip_all => "Test::TestCoverage 0.08 required for testing test coverage"
-  if $@;
 
-plan tests => 1;
-test_coverage("TeX::Hyphen::Pattern");
+our $VERSION = 0.103;
 
-my $obj = TeX::Hyphen::Pattern->new();
-$obj->label( q{nl} );
-$obj->filename();
-$obj->DESTROY();
+if ( not $ENV{'AUTHOR_TESTING'} ) {
+    my $msg =
+q{Author test. Set the environment variable AUTHOR_TESTING to enable this test.};
+    plan 'skip_all' => $msg;
+}
 
-ok_test_coverage('TeX::Hyphen::Pattern');
+eval {
+    require Test::TestCoverage;
+    1;
+} or do {
+    my $msg = q{Test::TestCoverage 0.08 required to check spelling of POD};
+    plan 'skip_all' => $msg;
+};
+
+plan 'tests' => 1;
+Test::TestCoverage::test_coverage('TeX::Hyphen::Pattern');
+
+my $thp = TeX::Hyphen::Pattern->new();
+$thp->label(q{nl});
+$thp->filename();
+$thp->meta();
+$thp->packaged();
+$thp->DESTROY();
+
+Test::TestCoverage::ok_test_coverage('TeX::Hyphen::Pattern');

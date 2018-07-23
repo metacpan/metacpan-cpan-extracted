@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.020';
+our $VERSION = '2.021';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -19,7 +19,7 @@ use File::Which    qw( which );
 use Term::Choose     qw( choose );
 use Term::TablePrint qw( print_table );
 
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
+use if $^O eq 'MSWin32', 'Win32::Console::ANSI'; ###
 
 #use App::DBBrowser::AttachDB;    # 'require'-d
 use App::DBBrowser::Auxil;
@@ -85,9 +85,9 @@ sub __init {
         $app_dir = catdir( $home, '.db_browser' );
     }
     mkdir $app_dir or die $! if ! -d $app_dir;
-    $sf->{i}{home_dir}         = $home;
-    $sf->{i}{app_dir}          = $app_dir;
-    $sf->{i}{file_settings}    = catfile $app_dir, 'general_settings.json';
+    $sf->{i}{home_dir}      = $home;
+    $sf->{i}{app_dir}       = $app_dir;
+    $sf->{i}{file_settings} = catfile $app_dir, 'general_settings.json';
     # check all info
 
     if ( ! eval {
@@ -251,14 +251,11 @@ sub run {
                 delete $ENV{TC_RESET_AUTO_UP};
             }
             $db =~ s/^[-\ ]\s// if $prefix;
-            my $db_string = 'DB '. basename( $db ) . '';
 
             # DB-HANDLE
 
             my $dbh;
             if ( ! eval {
-                print $sf->{i}{clear_screen};
-                print $db_string . "\n";
                 $dbh = $plui->get_db_handle( $db, $odb->connect_parameter( $db_opt, $db) );
                 #$sf->{i}{quote_char} = $dbh->get_info(29)  || '"', # SQL_IDENTIFIER_QUOTE_CHAR
                 $sf->{i}{sep_char}   = $dbh->get_info(41)  || '.'; # SQL_CATALOG_NAME_SEPARATOR
@@ -274,11 +271,11 @@ sub run {
             }
             my $driver = $dbh->{Driver}{Name};
             $sf->{d} = {
-                db       => $db,
-                dbh      => $dbh,
-                driver   => $driver,
-                user_dbs => $user_dbs,
-                sys_dbs  => $sys_dbs,
+                db        => $db,
+                dbh       => $dbh,
+                driver    => $driver,
+                user_dbs  => $user_dbs,
+                sys_dbs   => $sys_dbs,
             };
             $sf->{i}{file_attached_db} = catfile $sf->{i}{app_dir}, 'attached_DB.json';
             $sf->{db_attached} = 0;
@@ -321,6 +318,7 @@ sub run {
 
             SCHEMA: while ( 1 ) {
 
+                my $db_string = 'DB '. basename( $db ) . '';
                 my $schema;
                 if ( $sf->{redo_schema} ) {
                     $schema = delete $sf->{redo_schema};
@@ -701,7 +699,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.020
+Version 2.021
 
 =head1 DESCRIPTION
 

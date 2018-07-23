@@ -11,6 +11,7 @@ use v5.6.0;
 
 use Cwd qw(getcwd abs_path);
 use File::Copy;
+use File::Path 'remove_tree';
 use File::Slurp;
 use Term::ReadKey;
 use Data::Serializer;
@@ -26,6 +27,39 @@ INIT {
     $DATA_ptr = tell DATA;        # where is DATA?
     $old_state = join "", <DATA>; # slurp
 }
+
+##########################################
+# handle special case for App::FatPacker #
+##########################################
+
+# print this file, fatpacked to STDOUT
+if( defined $ARGV[0] and $ARGV[0] eq '--fatinit') {
+
+    # try to load module App::FatPacker
+    my $fatpack_loaded = eval {
+          require App::FatPacker;
+          App::FatPacker->import();
+          1;
+    };
+
+    if($fatpack_loaded) {
+        my @options = ('pack', $0);
+        # fatpack this very file and exit
+        App::FatPacker->new()->run_script(\@options);
+        # delete caching directory
+        remove_tree('fatlib');
+        exit 0;
+    }
+    else {
+        # inform user, that this option needs App::FatPacker installed
+        print STDERR "You need to install App::FatPacker to use this feature\n";
+        exit 1;
+    }
+}
+
+#########################################
+# see if help needs to be given to user #
+#########################################
 
 my $help_message = <<'END_HELP';
 
@@ -50,6 +84,10 @@ if (      # decrypt (no arg given) but nothing stored
      exit 1;
 }
 
+###########################
+# check write permissions #
+###########################
+
 # evualuate if everything is fine for writing, if needed
 if ( defined $ARGV[0] ) {
     if (not -w $0) {
@@ -64,15 +102,41 @@ if ( defined $ARGV[0] ) {
     if (not length($old_state) < 2) {
         print STDERR "Existing data will be overwritten.\n";
         print STDERR "CTRL+C to abort, ENTER to continue";
-        ReadLine(0);
+        if($^O eq 'MSWin32') {
+        	open(TTY, "CON") or die $!;
+        }
+        else {
+        	open(TTY, "</dev/tty") or die $!;
+        }
+        ReadLine(0, *TTY);
     }
 }
 
-# read password, without any prompt
+###############################
+# process normal user request #
+###############################
+
+# to avoid any problems with the reading of passwords
+# we first and foremost slurp anything from stdin
+my $data_stdin = '';
+if ( defined $ARGV[0] and $ARGV[0] eq '-' ) {
+    my @datalist_stdin = <STDIN>;
+    $data_stdin .= $_ foreach (@datalist_stdin);
+}
+
+# read password
 print STDERR 'Password: ';
-ReadMode('noecho');
-my $password = ReadLine(0);
-ReadMode('restore');
+#https://www.perlmonks.org/?node_id=570552
+if($^O eq 'MSWin32') {
+	open(TTY, "CON") or die $!;
+}
+else {
+	open(TTY, "</dev/tty") or die $!;
+}
+ReadMode('noecho', *TTY);
+my $password = ReadLine(0, *TTY);
+ReadMode('restore', *TTY);
+close(TTY);
 print STDERR "\n";
 
 my $obj = Data::Serializer->new(
@@ -86,18 +150,39 @@ my $obj = Data::Serializer->new(
                    options    => {},
                   );
 
+# user wants to write
 if ( defined $ARGV[0] ) {
     print STDERR 'Password confirmation: ';
-    ReadMode('noecho');
-    my $password_retyped = ReadLine(0);
-    ReadMode('restore');
+	#https://www.perlmonks.org/?node_id=570552
+	if($^O eq 'MSWin32') {
+		open(TTY, "CON") or die $!;
+	}
+	else {
+		open(TTY, "</dev/tty") or die $!;
+	}
+    ReadMode('noecho', *TTY);
+    my $password_retyped = ReadLine(0, *TTY);
+    ReadMode('restore', *TTY);
+    close(TTY);
     print STDERR "\n";
+
     die 'Password missmatch' if ($password ne $password_retyped);
+
     $encrypt_mode = 1;
     my $filename = $ARGV[0];
-    my $data = read_file($filename);
+
+    # read either from slurped STDIN or the filename
+    my $data;
+    if ($filename eq '-') {
+        $data = $data_stdin;
+    }
+    else {
+        $data = read_file($filename);
+    }
+
     $new_state =$obj->serialize($data);
 }
+# user just wants to read
 else {
     my $data =$obj->deserialize($old_state);
     if (defined $data) {
@@ -128,32 +213,49 @@ unding - dark magic, encrypted wallet
 
 =head1 VERSION
 
-version 0.006
+version 0.009
 
 =head1 SYNOPSIS
 
 This is an executable script, not a library.
-Since this script needs write access on it self (yes!), it's best you copy it to your local directory before using.
-It will do this automatically for you, if it is in writing context and doesn't have the rights necessary.
-But if you whant to do it manually, this is how you do it in C<bash>:
-
- cp $(which unding) .
+If you are a first time user, you might want to consult the L</SETUP> section in this document first.
 
 Encrypt a file. Content will be stored in unding.
 Attention: File will remain on disk!
 
  ./unding /path/to/file
 
+Or you might want to encrypt output from another program.
+You can do so, using a dash.
+
+ cat secret | perl unding -
+
 Decrypt and display content stored in unding.
 
  ./unding
 
-In both cases you must enter a password, but no prompt will tell you so.
+In all cases you must enter a password.
+
+=head1 SETUP
+
+Since this script needs write access on it self (yes!), it's best you copy it to your local directory before using.
+It will do this automatically for you, if it is in writing context and doesn't have the permissions necessary.
+But if you want to do it manually, this is how you do it in C<bash>:
+
+ cp $(which unding) .
+
+If you want to take this script with you (e.g. on a flash drive) and run it on different machines (e.g. for looking at your encrypted secrets), you might also want to take  all module dependencies with you.
+You can create a copy of this script which includes all needed modules inside itself.
+You need to install L<App::FatPacker> and then just run something similar to the following (here with redirection of C<stdout>):
+
+ /usr/bin/unding --fatinit > my_packed_unding
+
+You might also want to use the C<fatpack> interface of L<App::FatPacker> manually though.
 
 =head1 MOTIVATION
 
 B<Why «dark magic»?> The script uses a technique which making use of, is higly disencouraged by intelligent programmers:
-L<https://stackoverflow.com/questions/41061214/write-to-the-data-section-in-perl>
+L<Write to the DATA section in Perl|https://stackoverflow.com/questions/41061214/write-to-the-data-section-in-perl>
 
 B<Why the name «unding»?> C<unding> derives from the German I<Un-Ding>, meaning the negation of a thing, a I<Not-Thing> (nothing).
 The negation can be meant pejoratively, relating to the I<dark magic> invoced.
@@ -170,14 +272,6 @@ No separation of ciphertext and cryptologic.
 =item *
 
 This is an early release. Use it at your own risk.
-
-=item *
-
-While encryption, the script does not check if it overwrites existing encrypted data.
-
-=item *
-
-While encryption, the script does not check if the password is the same as before. Decrypt once to be sure you made no typos.
 
 =item *
 

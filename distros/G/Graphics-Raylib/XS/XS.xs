@@ -831,7 +831,7 @@ GetColor(hexValue)
     int    hexValue
 
 Font
-GetDefaultFont()
+GetFontDefault()
 
 char *
 GetDirectoryPath(fileName)

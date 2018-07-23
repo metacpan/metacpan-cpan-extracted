@@ -20,9 +20,8 @@ our %EXPORT_TAGS = ( 'all' => [ qw( cetak cetak_r cetak_pre ) ]);
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(cetak cetak_r cetak_pre);
 
-# Define Version :
-# ---------------------------------------------------------------- 
-our $VERSION = '0.15';
+# ABSTRACT: [DEPRECATED] The Part of CellBIS The Simple Web Framework
+our $VERSION = '0.16';
 
 # Create Subroutine for Get OS Server Information :
 # ------------------------------------------------------------------------

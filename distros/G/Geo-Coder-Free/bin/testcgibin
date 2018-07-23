@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/env PERL5OPT=-T perl
 
 use warnings;
 use strict;
@@ -8,14 +8,17 @@ use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
 eval {
-	doit($ARGV[0]);
+	my $testnumber = $ARGV[0];
+	if($testnumber =~ /^(\d+)$/) {
+		doit($1);
+	}
 };
 
 die $@ if $@;
 
 sub doit
 {
-	my $test = shift;
+	my $test = shift or die;
 
 	if($test == 1) {
 		# print "Test 1 - q\n";
@@ -29,5 +32,4 @@ sub doit
 		$ENV{'SERVER_PROTOCOL'} = 'HTTP/1.1';
 		system("$^X $Bin/../cgi-bin/page.fcgi page=query q='1600+Pennsylvania+Avenue+NW+Washington+DC'");
 	}
-
 }

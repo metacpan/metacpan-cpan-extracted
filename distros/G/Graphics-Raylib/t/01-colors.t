@@ -1,4 +1,5 @@
 use Test::More tests => 13;
+use Scalar::Util qw/blessed/;
 
 BEGIN {
     use_ok 'Graphics::Raylib::Color';
@@ -14,7 +15,7 @@ ok DARKPURPL->isa("Graphics::Raylib::XS::Color");
 is DARKPURPL->stringify, $color;
 
 $color = Graphics::Raylib::Color::color(0xDEADBEEF);
-is ref($color), 'Graphics::Raylib::XS::Color';
+is blessed($color), 'Graphics::Raylib::XS::Color';
 is $color->color, 0xDEADBEEF;
 is "$color", sprintf('(r: %u, g: %u, b: %u, a: %u)', 0xDE,0xAD,0xBE,0xEF);
 is $color->r, 0xDE;

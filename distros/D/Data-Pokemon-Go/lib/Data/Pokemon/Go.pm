@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 1;
 __END__
@@ -41,7 +41,7 @@ Data::Pokemon::Go is the helper module for who has less knowledge about Pokemons
 
 =item supporting Multi-language is not available
 
-=item YAMLs for Johto and Hoenn Regions are not available
+=item YAMLs for after Hoenn Region are not available
 
 =item Japanese documents are not available L<qiitaで日本語解説を少しだけ|https://qiita.com/worthmine/items/4a51fd74f31b4a97cf3c>
 

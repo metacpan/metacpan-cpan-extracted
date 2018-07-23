@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/env PERL5OPT=-T perl
 
 # Geo::Coder::Free is licensed under GPL2.0 for personal use only
 # njh@bandsman.co.uk

@@ -1,0 +1,52 @@
+h2. HO::class
+
+This is a simple class builder. It is used to create array based
+classes during compile time. It sets up the constructor new.
+Inheritance is supported, but dynamic addition of new properties is not.
+It is possible, but may not work well with inheritence. Until now there
+are no benchmarks.
+
+One feature I like most is that methods can be overwritten for a
+object. The system is extensible (and breakable) via some global
+variables.
+
+One source of ispiration for this package was Class::Struct.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc HO::class
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=HO-class
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/HO-class
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/HO-class
+
+    Search CPAN
+        http://search.cpan.org/dist/HO-class/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009,2018 Sebastian Knapp
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

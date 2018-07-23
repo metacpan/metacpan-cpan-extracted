@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+0.02 2018-07-21T14:56:01Z
+
+    - Introduce string holding mechanism, with text() and chops() method.
+
 0.01 2018-07-20T08:12:31Z
 
     - original version

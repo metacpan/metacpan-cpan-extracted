@@ -9,7 +9,7 @@ use File::Basename ;
 
 use v5.14;
 
-no warnings 'experimental' ;
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 no warnings 'uninitialized' ;
 
 
@@ -314,7 +314,7 @@ sub parse_perl_source
 
 sub _parse_perl_source_cached
     {
-    my ($self, $uri, $source, $path) = @_ ;    
+    my ($self, $uri, $source, $path, $stats) = @_ ;    
 
     my $cachepath = $self -> state_dir .'/' . $path ;
     $self -> mkpath (dirname ($cachepath)) ;
@@ -333,6 +333,7 @@ sub _parse_perl_source_cached
             my $cache ;
             aio_load ($cachepath, $cache) ;
             my $vars = $Perl::LanguageServer::json -> decode ($cache) ;
+            $stats -> {loaded}++ ;
             return $vars ;
             }
         }
@@ -342,6 +343,7 @@ sub _parse_perl_source_cached
     my $ifh = aio_open ($cachepath, IO::AIO::O_WRONLY | IO::AIO::O_TRUNC | IO::AIO::O_CREAT, 0664) or die "open $cachepath failed ($!)" ;
     aio_write ($ifh, undef, undef, $Perl::LanguageServer::json -> encode ($vars), 0) ;
     aio_close ($ifh) ;
+    $stats -> {parsed}++ ;
     
     return $vars ;
     }
@@ -352,7 +354,7 @@ sub _parse_perl_source_cached
 
 sub _parse_dir
     {
-    my ($self, $server, $dir, $vars, $fileno) = @_ ;
+    my ($self, $server, $dir, $vars, $stats) = @_ ;
 
     my $text ;
     my $fn ;
@@ -369,7 +371,7 @@ sub _parse_dir
         foreach my $d (sort @$dirs)
             {
             next if (exists $ignore_dir -> {$d}) ;
-            $self -> _parse_dir ($server, $dir . '/' . $d, $vars) ;
+            $self -> _parse_dir ($server, $dir . '/' . $d, $vars, $stats) ;
             }
         }
     
@@ -384,11 +386,11 @@ sub _parse_dir
 
             $uri = $self -> uri_server2client ('file://' . $fn) ;
             #print STDERR "parse $fn -> $uri\n" ;
-            $file_vars = $self -> _parse_perl_source_cached (undef, $text, $fn) ;
+            $file_vars = $self -> _parse_perl_source_cached (undef, $text, $fn, $stats) ;
             $vars -> {$uri} =  $file_vars ;
             #print STDERR "done $fn\n" ;
             my $cnt = keys %$vars ;
-            print STDERR "parsed $cnt files\n" if ($cnt % 100 == 0) ;
+            print STDERR "loaded $stats->{loaded} files, parsed $stats->{parsed} files, $cnt files\n" if ($cnt % 100 == 0) ;
             }
         }
     
@@ -410,14 +412,15 @@ sub background_parser
     print STDERR "background_parser folders = ", dump ($folders), "\n" ;
     %{$self -> symbols} = () ;
 
+    my $stats = {} ;
     foreach my $dir (values %$folders)
         {
-        $self -> _parse_dir ($server, $dir, $self -> symbols) ;
+        $self -> _parse_dir ($server, $dir, $self -> symbols, $stats) ;
         cede ;
         }
 
     my $cnt = keys %{$self -> symbols} ;
-    print STDERR "initial parsing done, parsed $cnt files\n" ;
+    print STDERR "initial parsing done, loaded $stats->{loaded} files, parsed $stats->{parsed} files, $cnt files\n" if ($cnt % 100 == 0) ;
 
     my $filefilter = $self -> file_filter_regex ;
 
@@ -432,7 +435,7 @@ sub background_parser
         aio_load ($fn, $text) ;
 
         print STDERR "parse $fn -> $uri\n" ;
-        my $file_vars = $self -> _parse_perl_source_cached (undef, $text, $fn) ;
+        my $file_vars = $self -> _parse_perl_source_cached (undef, $text, $fn, {}) ;
         $self -> symbols -> {$uri} =  $file_vars ;
         }
 

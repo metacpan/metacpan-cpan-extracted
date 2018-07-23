@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '5.8'; # VERSION
+our $VERSION = '5.9'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -516,7 +516,7 @@ sub es_indices {
 
             if ($args{older} && defined $DEF{DAYS}) {
                 my $days_old = es_index_days_old( $index );
-                if ($days_old < $DEF{DAYS}) {
+                if (defined $days_old && $days_old < $DEF{DAYS}) {
                     next;
                 }
             }
@@ -838,7 +838,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 5.8
+version 5.9
 
 =head1 SYNOPSIS
 

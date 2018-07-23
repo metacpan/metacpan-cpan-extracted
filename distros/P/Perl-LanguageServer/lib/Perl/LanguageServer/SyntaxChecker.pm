@@ -1,6 +1,7 @@
 package Perl::LanguageServer::SyntaxChecker ;
 
 use Moose::Role ;
+use strict ;
 
 use Coro ;
 use Coro::AIO ;
@@ -31,6 +32,13 @@ has 'outfile' =>
     ) ;
 
 has 'checker_channel' =>
+    (
+    is => 'ro',
+    isa => 'Coro::Channel',
+    default => sub { Coro::Channel -> new }    
+    ) ;
+
+has 'checker2_channel' =>
     (
     is => 'ro',
     isa => 'Coro::Channel',
@@ -75,7 +83,26 @@ sub background_checker
     {
     my ($self, $server) = @_ ;
     
-    my $channel = $self -> checker_channel ;
+    async
+        {
+        my $channel1 = $self -> checker_channel ;
+        my $channel2 = $self -> checker2_channel ;
+
+        my %timer ;
+        while (my $cmd = $channel1 -> get)
+            {
+            my ($uri, $text) = @$cmd ;
+
+            $timer{$uri} = AnyEvent->timer (after => 1.5, cb => sub
+                {
+                delete $timer{$uri} ;
+                $channel2 -> put($cmd) ;    
+                }) ;
+            }
+
+        } ;
+
+    my $channel = $self -> checker2_channel ;
 
     while (my $cmd = $channel -> get)
         {
@@ -114,6 +141,9 @@ sub background_checker
                 next if ($line =~ /had compilation errors/) ;
                 $filename = $1 if ($line =~ /at (.+?) line (\d+)[,.]/) ;
                 $lineno   = $1 if ($line =~ / line (\d+)[,.]/) ;
+                
+                #print STDERR "line = $lineno  file=$filename\n" ;
+                $msg .= $line ;
                 if ($lineno)
                     {
                     if ($msg)
@@ -126,7 +156,7 @@ sub background_checker
                             #   source?: string;
                             #   message: string;
                             #   relatedInformation?: DiagnosticRelatedInformation[];
-                            range => { start => { line => $lastline-1, character => 0 }, end => { line => $lastline+0, character => 0 }},
+                            range => { start => { line => $lineno-1, character => 0 }, end => { line => $lineno+0, character => 0 }},
                             message => $msg,
                             } ;
                         $diags{$filename} ||= [] ;
@@ -136,10 +166,8 @@ sub background_checker
                     $lineno = 0 ;
                     $msg    = '' ;
                     }    
-                $msg .= $line ;
                 }
             }
-                
         $self -> files -> {$uri}{diags} = [keys %diags] ;
         my $files = $self -> files ;
         foreach my $filename (keys %diags)

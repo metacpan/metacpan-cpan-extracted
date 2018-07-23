@@ -36,8 +36,8 @@ if($ENV{ALIEN_PKGCONF_TARBALL})
   exit;
 }
 
-#my $url = 'https://distfiles.dereferenced.org/pkgconf';
-my $url = 'https://dist.wdlabs.com/modified/';
+my $url = 'https://distfiles.dereferenced.org/pkgconf';
+#my $url = 'https://dist.wdlabs.com/modified/';
 my $ua = HTTP::Tiny->new;
 
 print "fetch $url\n";

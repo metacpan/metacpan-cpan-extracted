@@ -6,6 +6,7 @@ use Test::Most tests => 22;
 
 BIN: {
 	eval 'use Test::Script';
+
 	if($@) {
 		plan skip_all => 'Test::Script required for testing scripts';
 	} else {

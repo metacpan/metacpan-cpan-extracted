@@ -1,35 +1,49 @@
-# $Id: 00_base.t 119 2009-08-17 05:49:22Z roland $
-# $Revision: 119 $
-# $HeadURL: svn+ssh://ipenburg.xs4all.nl/srv/svnroot/rhonda/trunk/TeX-Hyphen-Pattern/t/00_base.t $
-# $Date: 2009-08-17 07:49:22 +0200 (Mon, 17 Aug 2009) $
-
+#!/usr/bin/env perl -w    # -*- cperl -*-
 use strict;
 use warnings;
+use 5.014000;
+use utf8;
 
 use Test::More;
-$ENV{TEST_AUTHOR} && eval {require Test::NoWarnings};
+
+our $VERSION = 0.103;
+
+if ( $ENV{'AUTHOR_TESTING'} ) {
+    eval {
+        require Test::NoWarnings;
+        1;
+    } or do {
+        diag q{Not testing for warnings};
+    };
+}
 
 BEGIN {
+    use Readonly;
+    Readonly my $COLLATERAL_TESTS => 4;
+    ## no critic qw(ProhibitPackageVars)
     @MAIN::methods = qw(filename available);
-    plan tests => ( 4 + @MAIN::methods ) + 1;
-    ok(1);
+    plan 'tests' => ( $COLLATERAL_TESTS + @MAIN::methods ) + 1;
+    ## use critic
+    ok( 1, q{Basic OK} );
     use_ok('TeX::Hyphen::Pattern');
 }
-diag( "Testing TeX::Hyphen::Pattern $TeX::Hyphen::Pattern::VERSION" );
+diag("Testing TeX::Hyphen::Pattern $TeX::Hyphen::Pattern::VERSION");
 my $pat = new_ok('TeX::Hyphen::Pattern');
 
 @TeX::Hyphen::Pattern::Sub::ISA = qw(TeX::Hyphen::Pattern);
-TODO: {
-    todo_skip 'Empty subclass of Class::Meta::Express issue', 1 if 1;
-    my $pat_sub = new_ok('TeX::Hyphen::Pattern::Sub');
-}
+my $pat_sub = new_ok('TeX::Hyphen::Pattern::Sub');
 
+## no critic qw(ProhibitPackageVars)
 foreach my $method (@MAIN::methods) {
     can_ok( 'TeX::Hyphen::Pattern', $method );
 }
+## use critic
 
-my $msg = 'Author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
+my $msg =
+q{Author test. Set the environment variable AUTHOR_TESTING to enable this test.};
 SKIP: {
-	skip $msg, 1 unless $ENV{TEST_AUTHOR}
+    if ( not $ENV{'AUTHOR_TESTING'} ) {
+        skip $msg, 1;
+    }
 }
-$ENV{TEST_AUTHOR} && Test::NoWarnings::had_no_warnings();
+$ENV{'AUTHOR_TESTING'} && Test::NoWarnings::had_no_warnings();

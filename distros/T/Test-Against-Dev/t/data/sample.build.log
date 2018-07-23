@@ -1,0 +1,77 @@
+cpanm (App::cpanminus) 1.7044 on perl 5.029001 built for amd64-freebsd-thread-multi
+Work directory is /home/jkeenan/testing/perl-5.29.0/.cpanm/work/1532092107.43293
+You have make /usr/bin/make
+You have /usr/local/bin/wget
+You have /usr/bin/tar: bsdtar 3.3.1 - libarchive 3.3.1 zlib/1.2.11 liblzma/5.2.3 bz2lib/1.0.6
+You have /usr/bin/unzip
+--> Working on /usr/home/jkeenan/gitwork/test-against-dev/t/data/Phony-PASS-0.01.tar.gz
+Fetching file:///usr/home/jkeenan/gitwork/test-against-dev/t/data/Phony-PASS-0.01.tar.gz
+-> OK
+Unpacking Phony-PASS-0.01.tar.gz
+Entering Phony-PASS-0.01
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (7.34)
+Configuring Phony-PASS-0.01
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Phony::PASS
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.34)
+Checking if you have Test::Simple 0.44 ... Yes (1.302136)
+Building and testing Phony-PASS-0.01
+cp lib/Phony/PASS.pm blib/lib/Phony/PASS.pm
+PERL_DL_NONLAZY=1 "/usr/home/jkeenan/testing/blead/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/001_load.t .. ok
+All tests successful.
+Files=1, Tests=3,  0 wallclock secs ( 0.01 usr  0.02 sys +  0.02 cusr  0.05 csys =  0.10 CPU)
+Result: PASS
+Appending installation info to /home/jkeenan/testing/blead/lib/perl5/5.29.1/amd64-freebsd-thread-multi/perllocal.pod
+-> OK
+Successfully installed Phony-PASS-0.01
+--> Working on /usr/home/jkeenan/gitwork/test-against-dev/t/data/Phony-FAIL-0.01.tar.gz
+Fetching file:///usr/home/jkeenan/gitwork/test-against-dev/t/data/Phony-FAIL-0.01.tar.gz
+-> OK
+Unpacking Phony-FAIL-0.01.tar.gz
+Entering Phony-FAIL-0.01
+Checking configure dependencies from META.json
+Checking if you have ExtUtils::MakeMaker 6.58 ... Yes (7.34)
+Configuring Phony-FAIL-0.01
+Running Makefile.PL
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Phony::FAIL
+Writing MYMETA.yml and MYMETA.json
+-> OK
+Checking dependencies from MYMETA.json ...
+Checking if you have Test::Simple 0.44 ... Yes (1.302136)
+Checking if you have ExtUtils::MakeMaker 0 ... Yes (7.34)
+Building and testing Phony-FAIL-0.01
+cp lib/Phony/FAIL.pm blib/lib/Phony/FAIL.pm
+PERL_DL_NONLAZY=1 "/usr/home/jkeenan/testing/blead/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+
+#   Failed test 'Generate a FAIL that a CPAN-installer such as 'cpanm' can detect.'
+#   at t/001_load.t line 11.
+# Looks like you failed 1 test of 3.
+t/001_load.t .. 
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/3 subtests 
+
+Test Summary Report
+-------------------
+t/001_load.t (Wstat: 256 Tests: 3 Failed: 1)
+  Failed test:  3
+  Non-zero exit status: 1
+Files=1, Tests=3,  0 wallclock secs ( 0.01 usr  0.02 sys +  0.04 cusr  0.02 csys =  0.09 CPU)
+Result: FAIL
+Failed 1/1 test programs. 1/3 subtests failed.
+*** Error code 1
+
+Stop.
+make: stopped in /usr/home/jkeenan/testing/blead/.cpanm/work/1532092107.43293/Phony-FAIL-0.01
+-> FAIL Installing /usr/home/jkeenan/gitwork/test-against-dev/t/data/Phony-FAIL-0.01.tar.gz failed. See /home/jkeenan/testing/perl-5.29.0/.cpanm/work/1532092107.43293/build.log for details. Retry with --force to force install it.
+1 distribution installed

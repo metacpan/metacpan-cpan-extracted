@@ -7,6 +7,7 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
+    'bin/query_kvk.pl',
     'lib/WebService/KvKAPI.pm',
     'lib/WebService/KvKAPI/Spoof.pm',
     't/00-compile.t',

@@ -19,6 +19,13 @@ my $self;
 
 {
     local $@;
+    eval { $self = Test::Against::Build->new(); };
+    like($@, qr/Argument to constructor must be hashref/,
+        "new: Got expected error message: no defined argument");
+}
+
+{
+    local $@;
     eval { $self = Test::Against::Build->new([]); };
     like($@, qr/Argument to constructor must be hashref/,
         "new: Got expected error message for non-hashref argument");
@@ -359,6 +366,13 @@ SKIP: {
     note("analyze_json_logs()");
 
     my $rv;
+    {
+        local $@;
+        eval { $rv = $self->analyze_json_logs(); };
+        like($@, qr/analyze_json_logs: Must supply hash ref as argument/,
+            "analyze_json_logs(): Got expected error message: no defined argument");
+    }
+
     {
         local $@;
         eval { $rv = $self->analyze_json_logs( verbose => 1 ); };

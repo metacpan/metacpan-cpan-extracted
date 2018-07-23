@@ -89,4 +89,27 @@ subtest "prefix includes category, priority" => sub {
     $appender->string('');
 };
 
+subtest "exclude message in json" => sub {
+    my $conf = q(
+        log4perl.rootLogger = INFO, Test
+        log4perl.appender.Test = Log::Log4perl::Appender::String
+        log4perl.appender.Test.layout = Log::Log4perl::Layout::JSON
+        log4perl.appender.Test.layout.prefix = %p %c %m{chomp} @cee:
+        log4perl.appender.Test.layout.format_prefix = 1
+        log4perl.appender.Test.layout.exclude_message = 1
+        log4perl.appender.Test.layout.canonical = 1
+    );
+    Log::Log4perl::init( \$conf );
+
+    ok my $appender = Log::Log4perl->appender_by_name("Test");
+    Log::Log4perl::MDC->get_context->{foo} = 'bar';
+
+    my $logger = Log::Log4perl->get_logger('foo');
+
+    $logger->info('info message');
+    is $appender->string(),
+        'INFO foo info message @cee:{}'."\n";
+    $appender->string('');
+};
+
 done_testing;

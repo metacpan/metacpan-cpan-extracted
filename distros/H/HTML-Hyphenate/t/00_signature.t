@@ -1,13 +1,8 @@
-# $Id: 00_signature.t 114 2009-08-02 19:12:48Z roland $
-# $Revision: 114 $
-# $HeadURL: svn+ssh://ipenburg.xs4all.nl/srv/svnroot/elaine/trunk/HTML-Hyphenate/t/00_signature.t $
-# $Date: 2009-08-02 21:12:48 +0200 (Sun, 02 Aug 2009) $
-
 use strict;
 use warnings;
 
 use Test::More;
-$ENV{TEST_AUTHOR} && eval { require Test::NoWarnings };
+$ENV{AUTHOR_TESTING} && eval { require Test::NoWarnings };
 
 if ( !$ENV{TEST_SIGNATURE} ) {
     plan skip_all =>
@@ -39,8 +34,8 @@ SKIP: {
     cmp_ok $ret, '==', Module::Signature::SIGNATURE_OK(), "Valid signature";
 }
 
-my $msg = 'Author test. Set $ENV{TEST_AUTHOR} to a true value to run.';
+my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
 SKIP: {
-    skip $msg, 1 unless $ENV{TEST_AUTHOR};
+    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
 }
-$ENV{TEST_AUTHOR} && Test::NoWarnings::had_no_warnings();
+$ENV{AUTHOR_TESTING} && Test::NoWarnings::had_no_warnings();

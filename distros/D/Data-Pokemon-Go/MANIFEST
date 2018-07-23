@@ -4,11 +4,11 @@ LICENSE
 META.json
 README.md
 cpanfile
+data/Alola.yaml
 data/Hoenn.yaml
 data/Johto.yaml
 data/Kanto.yaml
 data/LV.yaml
-data/Pokemon.yaml
 data/Relations.yaml
 data/Skill.yaml
 lib/Data/Pokemon/Go.pm

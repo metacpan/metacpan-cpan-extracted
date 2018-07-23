@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-#our $VERSION = '';
+use File::Basename qw( basename );
 
 use DBI qw();
 
@@ -59,15 +59,23 @@ sub get_db_handle {
     my ( $self, $db, $parameter ) = @_;
     my $cred = App::DBBrowser::Credentials->new( { parameter => $parameter } );
     my $dsn;
+    my $info = 'DB '. basename( $db );
     if ( ! $parameter->{use_env_var}{DBI_DSN} || ! exists $ENV{DBI_DSN} ) {
-        my $host = $cred->get_login( 'host' );
-        my $port = $cred->get_login( 'port' );
         $dsn = "dbi:$self->{driver}:dbname=$db";
-        $dsn .= ";host=$host" if length $host;
-        $dsn .= ";port=$port" if length $port;
+        my $host = $cred->get_login( 'host', $info );
+        if ( defined $host ) {
+            $info .= "\n" . 'Host: ' . $host;
+            $dsn .= ";host=$host" if length $host;
+        }
+        my $port = $cred->get_login( 'port', $info );
+        if ( defined $port ) {
+            $info .= "\n" . 'Port: ' . $port;
+            $dsn .= ";port=$port" if length $port;
+        }
     }
-    my $user   = $cred->get_login( 'user' );
-    my $passwd = $cred->get_login( 'pass' );
+    my $user   = $cred->get_login( 'user', $info );
+    $info .= "\n" . 'User: ' . $user if defined $user;
+    my $passwd = $cred->get_login( 'pass', $info );
     my $dbh = DBI->connect( $dsn, $user, $passwd, {
         PrintError => 0,
         RaiseError => 1,

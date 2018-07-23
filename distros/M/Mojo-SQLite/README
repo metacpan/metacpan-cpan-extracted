@@ -64,6 +64,8 @@ DESCRIPTION
     queries from data structures, and manage your database schema with
     migrations.
 
+BASICS
+
     Database and statement handles are cached automatically, so they can be
     reused transparently to increase performance. And you can handle
     connection timeouts gracefully by holding on to them only for short
@@ -132,6 +134,17 @@ DESCRIPTION
       my $tempfile = catfile $tempdir, 'test.db';
       my $sql = Mojo::SQLite->new->from_filename($tempfile);
 
+    SQL::Abstract::Pg can provide additional features to the SQL::Abstract
+    query methods in Mojo::SQLite::Database. The on_conflict and for
+    features are not applicable to SQLite queries.
+
+      use SQL::Abstract::Pg;
+      my $sql = Mojo::SQLite->new(abstract => SQL::Abstract::Pg->new(name_sep => '.', quote_char => '"'));
+      $sql->db->select(['some_table', ['other_table', foo_id => 'id']],
+        ['foo', [bar => 'baz'], \q{datetime('now') as dt}],
+        {foo => 'value'},
+        {order_by => 'foo', limit => 10, offset => 5, group_by => ['foo'], having => {baz => 'value'}});
+
 EXAMPLES
 
     This distribution also contains a well-structured example blog
@@ -165,7 +178,8 @@ ATTRIBUTES
 
     SQL::Abstract object used to generate CRUD queries for
     Mojo::SQLite::Database, defaults to setting name_sep to . and
-    quote_char to ".
+    quote_char to ". SQL::Abstract::Pg may be used to provide additional
+    features.
 
       # Generate WHERE clause and bind values
       my($stmt, @bind) = $sql->abstract->where({foo => 'bar', baz => 'yada'});

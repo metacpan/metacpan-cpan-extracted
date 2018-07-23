@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2016-07-16 00:00:00 +0000 to present.
+Changes from 2016-07-21 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 5.8 at 2018-07-16 19:20:08 +0000
+version 5.9 at 2018-07-21 01:17:48 +0000
+----------------------------------------
+
+  Change: 9b00c64735a21b74223fddcde44fff74772efd17
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-07-20 18:10:38 +0000
+
+    Bumping Release to 5.9 
+
+  Change: 415c84da87571aa488a0f246d423e24fbf446e00
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-07-18 17:58:55 +0000
+
+    Fix another uninitialized error in the code 
+
+----------------------------------------
+version 5.8 at 2018-07-16 19:14:45 +0000
 ----------------------------------------
 
   Change: 3f276cdc5e5b8a1fc6215275b8b3c24e3d8ef066
@@ -609,5 +625,5 @@ version 5.0 at 2016-08-19 03:50:24 +0000
     Version Numbers Updated 
 
 =================================================
-Plus 56 releases after 2016-07-16 00:00:00 +0000.
+Plus 56 releases after 2016-07-21 00:00:00 +0000.
 =================================================

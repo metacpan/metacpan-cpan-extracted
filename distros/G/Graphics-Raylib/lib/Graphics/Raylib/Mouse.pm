@@ -5,7 +5,7 @@ package Graphics::Raylib::Mouse;
 use Graphics::Raylib::XS;
 
 # ABSTRACT: Deal with Mouse Input
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 =pod
 
@@ -18,7 +18,7 @@ Graphics::Raylib::Mouse - Deal with Mouse Input
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

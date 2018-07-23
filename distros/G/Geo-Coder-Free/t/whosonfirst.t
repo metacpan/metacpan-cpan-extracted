@@ -1,4 +1,4 @@
-#!perl -w
+#!perl -wT
 
 use warnings;
 use strict;
@@ -28,7 +28,8 @@ WHOSONFIRST: {
 				my $geocoder = new_ok('Geo::Coder::Free');
 				my $location = $geocoder->geocode(location => 'Margate, Kent, England');
 				delta_within($location->{latitude}, 51.38, 1e-2);
-				delta_within($location->{longitude}, 1.30, 1e-2);
+				delta_within($location->{longitude}, 1.36, 1e-2);
+
 				$location = $geocoder->geocode(location => 'Summerfield Road, Margate, Kent, England');
 				delta_within($location->{latitude}, 51.39, 1e-2);
 				delta_within($location->{longitude}, 1.42, 1e-2);

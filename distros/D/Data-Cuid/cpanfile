@@ -5,6 +5,7 @@ requires 'List::Util',  '0';
 requires 'Time::HiRes', '0';
 
 on 'develop' => sub {
+    requires 'IO::Async', '0.38';
     requires 'Sub::Util', '0';
 };
 

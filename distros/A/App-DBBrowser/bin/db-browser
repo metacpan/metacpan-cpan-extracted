@@ -4,9 +4,11 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.020';
+our $VERSION = '2.021';
 
 use Encode::Locale qw();
+
+use Term::Choose::Constants qw( :screen );
 
 use App::DBBrowser;
 
@@ -17,6 +19,9 @@ binmode STDIN,  ':encoding(console_in)';
 binmode STDOUT, ':encoding(console_out)';
 binmode STDERR, ':encoding(console_out)';
 
+END { print SHOW_CURSOR }
+
+print HIDE_CURSOR;
 
 my $db_browser = App::DBBrowser->new();
 $db_browser->run();
@@ -34,7 +39,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.020
+Version 2.021
 
 =cut
 

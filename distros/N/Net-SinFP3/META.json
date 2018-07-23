@@ -4,7 +4,7 @@
       "GomoR <gomor_at_metabrik.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "artistic_1"
    ],
@@ -55,7 +55,7 @@
    "provides" : {
       "Net::SinFP3" : {
          "file" : "lib/Net/SinFP3.pm",
-         "version" : "1.23"
+         "version" : "1.24"
       },
       "Net::SinFP3::DB" : {
          "file" : "lib/Net/SinFP3/DB.pm"
@@ -247,5 +247,6 @@
          "http://www.perlfoundation.org/artistic_license_1_0"
       ]
    },
-   "version" : "1.23"
+   "version" : "1.24",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }
