@@ -1,5 +1,13 @@
 Revision history for Devel-MAT-Dumper
 
+0.37    2018-07-24 17:55:09
+        [CHANGES]
+         * Define PMAT format 0.3, which represents undef SCALARs more
+           efficiently
+
+        [BUGFIXES]
+         * Don't skip SVt_NULL SVs as they are valid undefs (RT125915)
+
 0.36    2018-07-16 20:21:41
         [CHANGES]
          * Split from Devel-MAT distribution

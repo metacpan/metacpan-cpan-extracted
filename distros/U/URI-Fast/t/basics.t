@@ -15,6 +15,7 @@ my @uris = (
 
 subtest 'simple' => sub{
   ok my $uri = uri($uris[1]), 'ctor';
+
   is $uri->scheme, 'http', 'scheme';
   is $uri->auth, 'www.test.com', 'auth';
   is $uri->path, '', 'path';
@@ -41,7 +42,7 @@ subtest 'simple' => sub{
     is $uri->pwd, '', 'pwd';
     is $uri->host, 'www.test.com', 'host';
     is $uri->port, '', 'port';
-  }
+  };
 };
 
 subtest 'complete' => sub{

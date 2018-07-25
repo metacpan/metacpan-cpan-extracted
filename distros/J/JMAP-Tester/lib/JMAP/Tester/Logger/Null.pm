@@ -1,5 +1,5 @@
 package JMAP::Tester::Logger::Null;
-$JMAP::Tester::Logger::Null::VERSION = '0.019';
+$JMAP::Tester::Logger::Null::VERSION = '0.020';
 use Moo;
 with 'JMAP::Tester::Logger';
 
@@ -28,7 +28,7 @@ JMAP::Tester::Logger::Null
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

@@ -1,18 +1,8 @@
-'type Error {
-  code: Int!
-  message: String!
-}
-
-type Mutation {
+'type Mutation {
   # Creates a new pet in the store.  Duplicates are allowed
   addPet(pet: NewPetInput!): Pet
   # deletes a single pet based on the ID supplied
   deletePet(id: Int!): String
-}
-
-type NewPet {
-  name: String!
-  tag: String
 }
 
 input NewPetInput {

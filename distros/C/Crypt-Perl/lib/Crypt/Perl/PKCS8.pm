@@ -5,6 +5,8 @@ package Crypt::Perl::PKCS8;
 use strict;
 use warnings;
 
+use Crypt::Perl::ASN1 ();
+
 use constant ASN1 => <<END;
     -- FG: simplified from RFC for Convert::ASN1
     Version ::= INTEGER
@@ -30,5 +32,21 @@ use constant ASN1 => <<END;
         subjectPublicKey     BIT STRING
     }
 END
+
+sub parse_private {
+    my ($pem_or_der) = @_;
+
+    return _asn1()->find('PrivateKeyInfo')->decode($pem_or_der);
+}
+
+sub parse_public {
+    my ($pem_or_der) = @_;
+
+    return _asn1()->find('SubjectPublicKeyInfo')->decode($pem_or_der);
+}
+
+sub _asn1 {
+    return Crypt::Perl::ASN1->new()->prepare( Crypt::Perl::PKCS8::ASN1() );
+}
 
 1;

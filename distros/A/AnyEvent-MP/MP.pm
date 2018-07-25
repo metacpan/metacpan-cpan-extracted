@@ -37,9 +37,9 @@ AnyEvent::MP - erlang-style multi-processing/message-passing framework
    kil $port, my_error => "everything is broken"; # error kill
 
    # monitoring
-   mon $localport, $cb->(@msg)      # callback is invoked on death
-   mon $localport, $otherport       # kill otherport on abnormal death
-   mon $localport, $otherport, @msg # send message on death
+   mon $port, $cb->(@msg)      # callback is invoked on death
+   mon $port, $localport       # kill localport on abnormal death
+   mon $port, $localport, @msg # send message on death
 
    # temporarily execute code in port context
    peval $port, sub { die "kill the port!" };
@@ -49,13 +49,18 @@ AnyEvent::MP - erlang-style multi-processing/message-passing framework
       die "kill the port, delayed";
    };
 
-=head1 CURRENT STATUS
+   # distributed database - modification
+   db_set $family => $subkey [=> $value]  # add a subkey
+   db_del $family => $subkey...           # delete one or more subkeys
+   db_reg $family => $port [=> $value]    # register a port
 
-   bin/aemp                - stable.
-   AnyEvent::MP            - stable API, should work.
-   AnyEvent::MP::Intro     - explains most concepts.
-   AnyEvent::MP::Kernel    - mostly stable API.
-   AnyEvent::MP::Global    - stable API.
+   # distributed database - queries
+   db_family $family => $cb->(\%familyhash)
+   db_keys   $family => $cb->(\@keys)
+   db_values $family => $cb->(\@values)
+
+   # distributed database - monitoring a family
+   db_mon $family => $cb->(\%familyhash, \@added, \@changed, \@deleted)
 
 =head1 DESCRIPTION
 
@@ -80,10 +85,13 @@ Ports allow you to register C<rcv> handlers that can match all or just
 some messages. Messages send to ports will not be queued, regardless of
 anything was listening for them or not.
 
+Ports are represented by (printable) strings called "port IDs".
+
 =item port ID - C<nodeid#portname>
 
-A port ID is the concatenation of a node ID, a hash-mark (C<#>) as
-separator, and a port name (a printable string of unspecified format).
+A port ID is the concatenation of a node ID, a hash-mark (C<#>)
+as separator, and a port name (a printable string of unspecified
+format created by AnyEvent::MP).
 
 =item node
 
@@ -93,49 +101,77 @@ ports.
 
 Nodes are either public (have one or more listening ports) or private
 (no listening ports). Private nodes cannot talk to other private nodes
-currently.
+currently, but all nodes can talk to public nodes.
+
+Nodes is represented by (printable) strings called "node IDs".
 
 =item node ID - C<[A-Za-z0-9_\-.:]*>
 
 A node ID is a string that uniquely identifies the node within a
 network. Depending on the configuration used, node IDs can look like a
 hostname, a hostname and a port, or a random string. AnyEvent::MP itself
-doesn't interpret node IDs in any way.
+doesn't interpret node IDs in any way except to uniquely identify a node.
 
 =item binds - C<ip:port>
 
 Nodes can only talk to each other by creating some kind of connection to
 each other. To do this, nodes should listen on one or more local transport
-endpoints - binds. Currently, only standard C<ip:port> specifications can
-be used, which specify TCP ports to listen on.
+endpoints - binds.
+
+Currently, only standard C<ip:port> specifications can be used, which
+specify TCP ports to listen on. So a bind is basically just a tcp socket
+in listening mode that accepts connections from other nodes.
 
 =item seed nodes
 
-When a node starts, it knows nothing about the network. To teach the node
-about the network it first has to contact some other node within the
-network. This node is called a seed.
+When a node starts, it knows nothing about the network it is in - it
+needs to connect to at least one other node that is already in the
+network. These other nodes are called "seed nodes".
 
-Apart from the fact that other nodes know them as seed nodes and they have
-to have fixed listening addresses, seed nodes are perfectly normal nodes -
-any node can function as a seed node for others.
+Seed nodes themselves are not special - they are seed nodes only because
+some other node I<uses> them as such, but any node can be used as seed
+node for other nodes, and eahc node can use a different set of seed nodes.
 
 In addition to discovering the network, seed nodes are also used to
-maintain the network and to connect nodes that otherwise would have
-trouble connecting. They form the backbone of an AnyEvent::MP network.
+maintain the network - all nodes using the same seed node are part of the
+same network. If a network is split into multiple subnets because e.g. the
+network link between the parts goes down, then using the same seed nodes
+for all nodes ensures that eventually the subnets get merged again.
 
 Seed nodes are expected to be long-running, and at least one seed node
 should always be available. They should also be relatively responsive - a
 seed node that blocks for long periods will slow down everybody else.
 
-=item seeds - C<host:port>
+For small networks, it's best if every node uses the same set of seed
+nodes. For large networks, it can be useful to specify "regional" seed
+nodes for most nodes in an area, and use all seed nodes as seed nodes for
+each other. What's important is that all seed nodes connections form a
+complete graph, so that the network cannot split into separate subnets
+forever.
 
-Seeds are transport endpoint(s) (usually a hostname/IP address and a
+Seed nodes are represented by seed IDs.
+
+=item seed IDs - C<host:port>
+
+Seed IDs are transport endpoint(s) (usually a hostname/IP address and a
 TCP port) of nodes that should be used as seed nodes.
 
-The nodes listening on those endpoints are expected to be long-running,
-and at least one of those should always be available. When nodes run out
-of connections (e.g. due to a network error), they try to re-establish
-connections to some seednodes again to join the network.
+=item global nodes
+
+An AEMP network needs a discovery service - nodes need to know how to
+connect to other nodes they only know by name. In addition, AEMP offers a
+distributed "group database", which maps group names to a list of strings
+- for example, to register worker ports.
+
+A network needs at least one global node to work, and allows every node to
+be a global node.
+
+Any node that loads the L<AnyEvent::MP::Global> module becomes a global
+node and tries to keep connections to all other nodes. So while it can
+make sense to make every node "global" in small networks, it usually makes
+sense to only make seed nodes into global nodes in large networks (nodes
+keep connections to seed nodes and global nodes, so making them the same
+reduces overhead).
 
 =back
 
@@ -147,23 +183,46 @@ connections to some seednodes again to join the network.
 
 package AnyEvent::MP;
 
+use AnyEvent::MP::Config ();
 use AnyEvent::MP::Kernel;
+use AnyEvent::MP::Kernel qw(
+   %NODE %PORT %PORT_DATA $UNIQ $RUNIQ $ID
+   add_node load_func
+
+   NODE $NODE
+   configure
+   node_of port_is_local
+   snd kil
+   db_set db_del
+   db_mon db_family db_keys db_values
+);
 
 use common::sense;
 
 use Carp ();
 
-use AE ();
+use AnyEvent ();
+use Guard ();
 
 use base "Exporter";
 
-our $VERSION = '1.30';
+our $VERSION = $AnyEvent::MP::Config::VERSION;
 
 our @EXPORT = qw(
-   NODE $NODE *SELF node_of after
+   NODE $NODE
    configure
-   snd rcv mon mon_guard kil psub peval spawn cal
-   port
+   node_of port_is_local
+   snd kil
+   db_set db_del
+   db_mon db_family db_keys db_values
+
+   *SELF
+
+   port rcv mon mon_guard psub peval spawn cal
+   db_set db_del db_reg
+   db_mon db_family db_keys db_values
+
+   after
 );
 
 our $SELF;
@@ -184,6 +243,10 @@ a call to C<configure>.
 
 Extracts and returns the node ID from a port ID or a node ID.
 
+=item $is_local = port_is_local $port
+
+Returns true iff the port is a local port.
+
 =item configure $profile, key => value...
 
 =item configure key => value...
@@ -193,11 +256,27 @@ Before a node can talk to other nodes on the network (i.e. enter
 to know is its own name, and optionally it should know the addresses of
 some other nodes in the network to discover other nodes.
 
-The key/value pairs are basically the same ones as documented for the
-F<aemp> command line utility (sans the set/del prefix).
-
 This function configures a node - it must be called exactly once (or
 never) before calling other AnyEvent::MP functions.
+
+The key/value pairs are basically the same ones as documented for the
+F<aemp> command line utility (sans the set/del prefix), with these additions:
+
+=over 4
+
+=item norc => $boolean (default false)
+
+If true, then the rc file (e.g. F<~/.perl-anyevent-mp>) will I<not>
+be consulted - all configuration options must be specified in the
+C<configure> call.
+
+=item force => $boolean (default false)
+
+IF true, then the values specified in the C<configure> will take
+precedence over any values configured via the rc file. The default is for
+the rc file to override any options specified in the program.
+
+=back
 
 =over 4
 
@@ -221,14 +300,20 @@ and the values specified directly via C<configure> have lowest priority,
 and can only be used to specify defaults.
 
 If the profile specifies a node ID, then this will become the node ID of
-this process. If not, then the profile name will be used as node ID. The
-special node ID of C<anon/> will be replaced by a random node ID.
+this process. If not, then the profile name will be used as node ID, with
+a unique randoms tring (C</%u>) appended.
+
+The node ID can contain some C<%> sequences that are expanded: C<%n>
+is expanded to the local nodename, C<%u> is replaced by a random
+strign to make the node unique. For example, the F<aemp> commandline
+utility uses C<aemp/%n/%u> as nodename, which might expand to
+C<aemp/cerebro/ZQDGSIkRhEZQDGSIkRhE>.
 
 =item step 2, bind listener sockets
 
 The next step is to look up the binds in the profile, followed by binding
 aemp protocol listeners on all binds specified (it is possible and valid
-to have no binds, meaning that the node cannot be contacted form the
+to have no binds, meaning that the node cannot be contacted from the
 outside. This means the node cannot talk to other nodes that also have no
 binds, but it can still talk to all "normal" nodes).
 
@@ -238,7 +323,7 @@ local IP address it finds.
 
 =item step 3, connect to seed nodes
 
-As the last step, the seeds list from the profile is passed to the
+As the last step, the seed ID list from the profile is passed to the
 L<AnyEvent::MP::Global> module, which will then use it to keep
 connectivity with at least one node at any point in time.
 
@@ -249,17 +334,17 @@ This should be the most common form of invocation for "daemon"-type nodes.
 
    configure
 
-Example: become an anonymous node. This form is often used for commandline
-clients.
+Example: become a semi-anonymous node. This form is often used for
+commandline clients.
 
-   configure nodeid => "anon/";
+   configure nodeid => "myscript/%n/%u";
 
-Example: configure a node using a profile called seed, which si suitable
+Example: configure a node using a profile called seed, which is suitable
 for a seed node as it binds on all local addresses on a fixed port (4040,
 customary for aemp).
 
    # use the aemp commandline utility
-   # aemp profile seed nodeid anon/ binds '*:4040'
+   # aemp profile seed binds '*:4040'
 
    # then use it
    configure profile => "seed";
@@ -334,15 +419,16 @@ If you want to stop/destroy the port, simply C<kil> it:
 
 sub rcv($@);
 
-sub _kilme {
-   die "received message on port without callback";
-}
+my $KILME = sub {
+   (my $tag = substr $_[0], 0, 30) =~ s/([^\x20-\x7e])/./g;
+   kil $SELF, unhandled_message => "no callback found for message '$tag'";
+};
 
 sub port(;&) {
-   my $id = "$UNIQ." . $ID++;
+   my $id = $UNIQ . ++$ID;
    my $port = "$NODE#$id";
 
-   rcv $port, shift || \&_kilme;
+   rcv $port, shift || $KILME;
 
    $port
 }
@@ -357,7 +443,7 @@ The global C<$SELF> (exported by this module) contains C<$port> while
 executing the callback. Runtime errors during callback execution will
 result in the port being C<kil>ed.
 
-The default callback received all messages not matched by a more specific
+The default callback receives all messages not matched by a more specific
 C<tag> match.
 
 =item rcv $local_port, tag => $callback->(@msg_without_tag), ...
@@ -402,7 +488,7 @@ sub rcv($@) {
    my $port = shift;
    my ($nodeid, $portid) = split /#/, $port, 2;
 
-   $NODE{$nodeid} == $NODE{""}
+   $nodeid eq $NODE
       or Carp::croak "$port: rcv can only be called on local ports, caught";
 
    while (@_) {
@@ -455,8 +541,8 @@ sub rcv($@) {
 
 =item peval $port, $coderef[, @args]
 
-Evaluates the given C<$codref> within the contetx of C<$port>, that is,
-when the code throews an exception the C<$port> will be killed.
+Evaluates the given C<$codref> within the context of C<$port>, that is,
+when the code throws an exception the C<$port> will be killed.
 
 Any remaining args will be passed to the callback. Any return values will
 be returned to the caller.
@@ -531,11 +617,11 @@ sub psub(&) {
    }
 }
 
-=item $guard = mon $port, $cb->(@reason)    # call $cb when $port dies
-
 =item $guard = mon $port, $rcvport          # kill $rcvport when $port dies
 
 =item $guard = mon $port                    # kill $SELF when $port dies
+
+=item $guard = mon $port, $cb->(@reason)    # call $cb when $port dies
 
 =item $guard = mon $port, $rcvport, @msg    # send a message when $port dies
 
@@ -543,31 +629,38 @@ Monitor the given port and do something when the port is killed or
 messages to it were lost, and optionally return a guard that can be used
 to stop monitoring again.
 
-In the first form (callback), the callback is simply called with any
-number of C<@reason> elements (no @reason means that the port was deleted
+The first two forms distinguish between "normal" and "abnormal" kil's:
+
+In the first form (another port given), if the C<$port> is C<kil>'ed with
+a non-empty reason, the other port (C<$rcvport>) will be kil'ed with the
+same reason. That is, on "normal" kil's nothing happens, while under all
+other conditions, the other port is killed with the same reason.
+
+The second form (kill self) is the same as the first form, except that
+C<$rvport> defaults to C<$SELF>.
+
+The remaining forms don't distinguish between "normal" and "abnormal" kil's
+- it's up to the callback or receiver to check whether the C<@reason> is
+empty and act accordingly.
+
+In the third form (callback), the callback is simply called with any
+number of C<@reason> elements (empty @reason means that the port was deleted
 "normally"). Note also that I<< the callback B<must> never die >>, so use
 C<eval> if unsure.
 
-In the second form (another port given), the other port (C<$rcvport>)
-will be C<kil>'ed with C<@reason>, if a @reason was specified, i.e. on
-"normal" kils nothing happens, while under all other conditions, the other
-port is killed with the same reason.
-
-The third form (kill self) is the same as the second form, except that
-C<$rvport> defaults to C<$SELF>.
-
-In the last form (message), a message of the form C<@msg, @reason> will be
-C<snd>.
+In the last form (message), a message of the form C<$rcvport, @msg,
+@reason> will be C<snd>.
 
 Monitoring-actions are one-shot: once messages are lost (and a monitoring
-alert was raised), they are removed and will not trigger again.
+alert was raised), they are removed and will not trigger again, even if it
+turns out that the port is still alive.
 
-As a rule of thumb, monitoring requests should always monitor a port from
-a local port (or callback). The reason is that kill messages might get
-lost, just like any other message. Another less obvious reason is that
-even monitoring requests can get lost (for example, when the connection
-to the other node goes down permanently). When monitoring a port locally
-these problems do not exist.
+As a rule of thumb, monitoring requests should always monitor a remote
+port locally (using a local C<$rcvport> or a callback). The reason is that
+kill messages might get lost, just like any other message. Another less
+obvious reason is that even monitoring requests can get lost (for example,
+when the connection to the other node goes down permanently). When
+monitoring a port locally these problems do not exist.
 
 C<mon> effectively guarantees that, in the absence of hardware failures,
 after starting the monitor, either all messages sent to the port will
@@ -622,7 +715,7 @@ sub mon {
    $node->monitor ($port, $cb);
 
    defined wantarray
-      and ($cb += 0, AnyEvent::Util::guard { $node->unmonitor ($port, $cb) })
+      and ($cb += 0, Guard::guard { $node->unmonitor ($port, $cb) })
 }
 
 =item $guard = mon_guard $port, $ref, $ref...
@@ -668,7 +761,17 @@ will be reported as reason C<< die => $@ >>.
 Transport/communication errors are reported as C<< transport_error =>
 $message >>.
 
-=cut
+Common idioms:
+
+   # silently remove yourself, do not kill linked ports
+   kil $SELF;
+
+   # report a failure in some detail
+   kil $SELF, failure_mode_1 => "it failed with too high temperature";
+
+   # do not waste much time with killing, just die when something goes wrong
+   open my $fh, "<file"
+      or die "file: $!";
 
 =item $port = spawn $node, $initfunc[, @initdata]
 
@@ -736,7 +839,7 @@ sub _spawn {
 sub spawn(@) {
    my ($nodeid, undef) = split /#/, shift, 2;
 
-   my $id = "$RUNIQ." . $ID++;
+   my $id = $RUNIQ . ++$ID;
 
    $_[0] =~ /::/
       or Carp::croak "spawn init function must be a fully-qualified name, caught";
@@ -745,6 +848,7 @@ sub spawn(@) {
 
    "$nodeid#$id"
 }
+
 
 =item after $timeout, @msg
 
@@ -769,6 +873,8 @@ sub after($@) {
          : snd @action;
    };
 }
+
+#=item $cb2 = timeout $seconds, $cb[, @args]
 
 =item cal $port, @msg, $callback[, $timeout]
 
@@ -824,6 +930,188 @@ sub cal(@) {
 
 =back
 
+=head1 DISTRIBUTED DATABASE
+
+AnyEvent::MP comes with a simple distributed database. The database will
+be mirrored asynchronously on all global nodes. Other nodes bind to one
+of the global nodes for their needs. Every node has a "local database"
+which contains all the values that are set locally. All local databases
+are merged together to form the global database, which can be queried.
+
+The database structure is that of a two-level hash - the database hash
+contains hashes which contain values, similarly to a perl hash of hashes,
+i.e.:
+
+  $DATABASE{$family}{$subkey} = $value
+
+The top level hash key is called "family", and the second-level hash key
+is called "subkey" or simply "key".
+
+The family must be alphanumeric, i.e. start with a letter and consist
+of letters, digits, underscores and colons (C<[A-Za-z][A-Za-z0-9_:]*>,
+pretty much like Perl module names.
+
+As the family namespace is global, it is recommended to prefix family names
+with the name of the application or module using it.
+
+The subkeys must be non-empty strings, with no further restrictions.
+
+The values should preferably be strings, but other perl scalars should
+work as well (such as C<undef>, arrays and hashes).
+
+Every database entry is owned by one node - adding the same family/subkey
+combination on multiple nodes will not cause discomfort for AnyEvent::MP,
+but the result might be nondeterministic, i.e. the key might have
+different values on different nodes.
+
+Different subkeys in the same family can be owned by different nodes
+without problems, and in fact, this is the common method to create worker
+pools. For example, a worker port for image scaling might do this:
+
+   db_set my_image_scalers => $port;
+
+And clients looking for an image scaler will want to get the
+C<my_image_scalers> keys from time to time:
+
+   db_keys my_image_scalers => sub {
+      @ports = @{ $_[0] };
+   };
+
+Or better yet, they want to monitor the database family, so they always
+have a reasonable up-to-date copy:
+
+   db_mon my_image_scalers => sub {
+      @ports = keys %{ $_[0] };
+   };
+
+In general, you can set or delete single subkeys, but query and monitor
+whole families only.
+
+If you feel the need to monitor or query a single subkey, try giving it
+it's own family.
+
+=over
+
+=item $guard = db_set $family => $subkey [=> $value]
+
+Sets (or replaces) a key to the database - if C<$value> is omitted,
+C<undef> is used instead.
+
+When called in non-void context, C<db_set> returns a guard that
+automatically calls C<db_del> when it is destroyed.
+
+=item db_del $family => $subkey...
+
+Deletes one or more subkeys from the database family.
+
+=item $guard = db_reg $family => $port => $value
+
+=item $guard = db_reg $family => $port
+
+=item $guard = db_reg $family
+
+Registers a port in the given family and optionally returns a guard to
+remove it.
+
+This function basically does the same as:
+
+   db_set $family => $port => $value
+
+Except that the port is monitored and automatically removed from the
+database family when it is kil'ed.
+
+If C<$value> is missing, C<undef> is used. If C<$port> is missing, then
+C<$SELF> is used.
+
+This function is most useful to register a port in some port group (which
+is just another name for a database family), and have it removed when the
+port is gone. This works best when the port is a local port.
+
+=cut
+
+sub db_reg($$;$) {
+   my $family = shift;
+   my $port = @_ ? shift : $SELF;
+
+   my $clr = sub { db_del $family => $port };
+   mon $port, $clr;
+
+   db_set $family => $port => $_[0];
+
+   defined wantarray
+      and &Guard::guard ($clr)
+}
+
+=item db_family $family => $cb->(\%familyhash)
+
+Queries the named database C<$family> and call the callback with the
+family represented as a hash. You can keep and freely modify the hash.
+
+=item db_keys $family => $cb->(\@keys)
+
+Same as C<db_family>, except it only queries the family I<subkeys> and passes
+them as array reference to the callback.
+
+=item db_values $family => $cb->(\@values)
+
+Same as C<db_family>, except it only queries the family I<values> and passes them
+as array reference to the callback.
+
+=item $guard = db_mon $family => $cb->(\%familyhash, \@added, \@changed, \@deleted)
+
+Creates a monitor on the given database family. Each time a key is
+set or is deleted the callback is called with a hash containing the
+database family and three lists of added, changed and deleted subkeys,
+respectively. If no keys have changed then the array reference might be
+C<undef> or even missing.
+
+If not called in void context, a guard object is returned that, when
+destroyed, stops the monitor.
+
+The family hash reference and the key arrays belong to AnyEvent::MP and
+B<must not be modified or stored> by the callback. When in doubt, make a
+copy.
+
+As soon as possible after the monitoring starts, the callback will be
+called with the intiial contents of the family, even if it is empty,
+i.e. there will always be a timely call to the callback with the current
+contents.
+
+It is possible that the callback is called with a change event even though
+the subkey is already present and the value has not changed.
+
+The monitoring stops when the guard object is destroyed.
+
+Example: on every change to the family "mygroup", print out all keys.
+
+   my $guard = db_mon mygroup => sub {
+      my ($family, $a, $c, $d) = @_;
+      print "mygroup members: ", (join " ", keys %$family), "\n";
+   };
+
+Exmaple: wait until the family "My::Module::workers" is non-empty.
+
+   my $guard; $guard = db_mon My::Module::workers => sub {
+      my ($family, $a, $c, $d) = @_;
+      return unless %$family;
+      undef $guard;
+      print "My::Module::workers now nonempty\n";
+   };
+
+Example: print all changes to the family "AnyEvent::Fantasy::Module".
+
+   my $guard = db_mon AnyEvent::Fantasy::Module => sub {
+      my ($family, $a, $c, $d) = @_;
+
+      print "+$_=$family->{$_}\n" for @$a;
+      print "*$_=$family->{$_}\n" for @$c;
+      print "-$_=$family->{$_}\n" for @$d;
+   };
+
+=cut
+
+=back
+
 =head1 AnyEvent::MP vs. Distributed Erlang
 
 AnyEvent::MP got lots of its ideas from distributed Erlang (Erlang node
@@ -864,19 +1152,24 @@ occur.
 
 =item * Erlang uses processes and a mailbox, AEMP does not queue.
 
-Erlang uses processes that selectively receive messages, and therefore
-needs a queue. AEMP is event based, queuing messages would serve no
-useful purpose. For the same reason the pattern-matching abilities of
-AnyEvent::MP are more limited, as there is little need to be able to
+Erlang uses processes that selectively receive messages out of order, and
+therefore needs a queue. AEMP is event based, queuing messages would serve
+no useful purpose. For the same reason the pattern-matching abilities
+of AnyEvent::MP are more limited, as there is little need to be able to
 filter messages without dequeuing them.
 
-(But see L<Coro::MP> for a more Erlang-like process model on top of AEMP).
+This is not a philosophical difference, but simply stems from AnyEvent::MP
+being event-based, while Erlang is process-based.
+
+You can have a look at L<Coro::MP> for a more Erlang-like process model on
+top of AEMP and Coro threads.
 
 =item * Erlang sends are synchronous, AEMP sends are asynchronous.
 
-Sending messages in Erlang is synchronous and blocks the process (and
-so does not need a queue that can overflow). AEMP sends are immediate,
-connection establishment is handled in the background.
+Sending messages in Erlang is synchronous and blocks the process until
+a connection has been established and the message sent (and so does not
+need a queue that can overflow). AEMP sends return immediately, connection
+establishment is handled in the background.
 
 =item * Erlang suffers from silent message loss, AEMP does not.
 
@@ -889,13 +1182,19 @@ guarantee that after one message is lost, all following ones sent to the
 same port are lost as well, until monitoring raises an error, so there are
 no silent "holes" in the message sequence.
 
+If you want your software to be very reliable, you have to cope with
+corrupted and even out-of-order messages in both Erlang and AEMP. AEMP
+simply tries to work better in common error cases, such as when a network
+link goes down.
+
 =item * Erlang can send messages to the wrong port, AEMP does not.
 
-In Erlang it is quite likely that a node that restarts reuses a process ID
-known to other nodes for a completely different process, causing messages
-destined for that process to end up in an unrelated process.
+In Erlang it is quite likely that a node that restarts reuses an Erlang
+process ID known to other nodes for a completely different process,
+causing messages destined for that process to end up in an unrelated
+process.
 
-AEMP never reuses port IDs, so old messages or old port IDs floating
+AEMP does not reuse port IDs, so old messages or old port IDs floating
 around in the network will not be sent to an unrelated port.
 
 =item * Erlang uses unprotected connections, AEMP uses secure
@@ -908,7 +1207,7 @@ securely authenticate nodes.
 communications.
 
 The AEMP protocol, unlike the Erlang protocol, supports both programming
-language independent text-only protocols (good for debugging) and binary,
+language independent text-only protocols (good for debugging), and binary,
 language-specific serialisers (e.g. Storable). By default, unless TLS is
 used, the protocol is actually completely text-based.
 
@@ -918,11 +1217,12 @@ protocol simple.
 
 =item * AEMP has more flexible monitoring options than Erlang.
 
-In Erlang, you can chose to receive I<all> exit signals as messages
-or I<none>, there is no in-between, so monitoring single processes is
-difficult to implement. Monitoring in AEMP is more flexible than in
-Erlang, as one can choose between automatic kill, exit message or callback
-on a per-process basis.
+In Erlang, you can chose to receive I<all> exit signals as messages or
+I<none>, there is no in-between, so monitoring single Erlang processes is
+difficult to implement.
+
+Monitoring in AEMP is more flexible than in Erlang, as one can choose
+between automatic kill, exit message or callback on a per-port basis.
 
 =item * Erlang tries to hide remote/local connections, AEMP does not.
 
@@ -974,6 +1274,114 @@ Keeping your messages simple, concentrating on data structures rather than
 objects, will keep your messages clean, tidy and efficient.
 
 =back
+
+=head1 PORTING FROM AnyEvent::MP VERSION 1.X
+
+AEMP version 2 has a few major incompatible changes compared to version 1:
+
+=over 4
+
+=item AnyEvent::MP::Global no longer has group management functions.
+
+At least not officially - the grp_* functions are still exported and might
+work, but they will be removed in some later release.
+
+AnyEvent::MP now comes with a distributed database that is more
+powerful. Its database families map closely to port groups, but the API
+has changed (the functions are also now exported by AnyEvent::MP). Here is
+a rough porting guide:
+
+  grp_reg $group, $port                      # old
+  db_reg $group, $port                       # new
+
+  $list = grp_get $group                     # old
+  db_keys $group, sub { my $list = shift }   # new
+
+  grp_mon $group, $cb->(\@ports, $add, $del) # old
+  db_mon $group, $cb->(\%ports, $add, $change, $del) # new
+
+C<grp_reg> is a no-brainer (just replace by C<db_reg>), but C<grp_get> is
+no longer instant, because the local node might not have a copy of the
+group. You can either modify your code to allow for a callback, or use
+C<db_mon> to keep an updated copy of the group:
+
+  my $local_group_copy;
+  db_mon $group => sub { $local_group_copy = $_[0] };
+
+  # now "keys %$local_group_copy" always returns the most up-to-date
+  # list of ports in the group.
+
+C<grp_mon> can be replaced by C<db_mon> with minor changes - C<db_mon>
+passes a hash as first argument, and an extra C<$chg> argument that can be
+ignored:
+
+  db_mon $group => sub {
+     my ($ports, $add, $chg, $del) = @_;
+     $ports = [keys %$ports];
+
+     # now $ports, $add and $del are the same as
+     # were originally passed by grp_mon.
+     ...
+  };
+
+=item Nodes not longer connect to all other nodes.
+
+In AEMP 1.x, every node automatically loads the L<AnyEvent::MP::Global>
+module, which in turn would create connections to all other nodes in the
+network (helped by the seed nodes).
+
+In version 2.x, global nodes still connect to all other global nodes, but
+other nodes don't - now every node either is a global node itself, or
+attaches itself to another global node.
+
+If a node isn't a global node itself, then it attaches itself to one
+of its seed nodes. If that seed node isn't a global node yet, it will
+automatically be upgraded to a global node.
+
+So in many cases, nothing needs to be changed - one just has to make sure
+that all seed nodes are meshed together with the other seed nodes (as with
+AEMP 1.x), and other nodes specify them as seed nodes. This is most easily
+achieved by specifying the same set of seed nodes for all nodes in the
+network.
+
+Not opening a connection to every other node is usually an advantage,
+except when you need the lower latency of an already established
+connection. To ensure a node establishes a connection to another node,
+you can monitor the node port (C<mon $node, ...>), which will attempt to
+create the connection (and notify you when the connection fails).
+
+=item Listener-less nodes (nodes without binds) are gone.
+
+And are not coming back, at least not in their old form. If no C<binds>
+are specified for a node, AnyEvent::MP assumes a default of C<*:*>.
+
+There are vague plans to implement some form of routing domains, which
+might or might not bring back listener-less nodes, but don't count on it.
+
+The fact that most connections are now optional somewhat mitigates this,
+as a node can be effectively unreachable from the outside without any
+problems, as long as it isn't a global node and only reaches out to other
+nodes (as opposed to being contacted from other nodes).
+
+=item $AnyEvent::MP::Kernel::WARN has gone.
+
+AnyEvent has acquired a logging framework (L<AnyEvent::Log>), and AEMP now
+uses this, and so should your programs.
+
+Every module now documents what kinds of messages it generates, with
+AnyEvent::MP acting as a catch all.
+
+On the positive side, this means that instead of setting
+C<PERL_ANYEVENT_MP_WARNLEVEL>, you can get away by setting C<AE_VERBOSE> -
+much less to type.
+
+=back
+
+=head1 LOGGING
+
+AnyEvent::MP does not normally log anything by itself, but since it is the
+root of the context hierarchy for AnyEvent::MP modules, it will receive
+all log messages by submodules.
 
 =head1 SEE ALSO
 

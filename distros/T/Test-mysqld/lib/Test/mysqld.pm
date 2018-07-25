@@ -12,7 +12,7 @@ use File::Temp qw(tempdir);
 use POSIX qw(SIGTERM WNOHANG);
 use Time::HiRes qw(sleep);
 
-our $VERSION = '1.0011';
+our $VERSION = '1.0012';
 
 our $errstr;
 our @SEARCH_PATHS = qw(/usr/local/mysql);
@@ -145,7 +145,6 @@ sub wait_for_setup {
         $dbh->do('CREATE DATABASE IF NOT EXISTS test')
             or die $dbh->errstr;
     }
-    # XXX copy_data_from doesn't work on MySQL8
 }
 
 sub stop {
@@ -189,6 +188,12 @@ sub setup {
         dircopy($self->copy_data_from, $self->my_cnf->{datadir})
             or die "could not dircopy @{[$self->copy_data_from]} to " .
                 "@{[$self->my_cnf->{datadir}]}:$!";
+        if (!$self->_is_maria && ($self->_mysql_major_version || 0) >= 8) {
+            my $mysql_db_dir = $self->my_cnf->{datadir} . '/mysql';
+            if (! -d $mysql_db_dir) {
+                mkdir $mysql_db_dir or die "failed to mkdir $mysql_db_dir: $!";
+            }
+        }
     }
     # my.cnf
     open my $fh, '>', $self->base_dir . '/etc/my.cnf'
@@ -217,7 +222,9 @@ sub setup {
 
         if ($self->use_mysqld_initialize) {
             $cmd .= ' --initialize-insecure';
-            if ($self->copy_data_from) {
+            if ($self->copy_data_from &&
+                !(!$self->_is_maria && ($self->_mysql_major_version || 0) >= 8)
+            ) {
                 opendir my $dh, $self->copy_data_from
                     or die "failed to open copy_data_from directory @{[$self->copy_data_from]}: $!";
                 while (my $entry = readdir $dh) {
@@ -285,6 +292,29 @@ sub _verbose_help {
 # `mysqld --initialize-insecure` should be used.
 sub _use_mysqld_initialize {
     shift->_verbose_help =~ /--initialize-insecure/ms;
+}
+
+sub _is_maria {
+    my $self = shift;
+    unless (exists $self->{_is_maria}) {
+        $self->{_is_maria} = $self->_verbose_help =~ /\A.*MariaDB/;
+    }
+    $self->{_is_maria};
+}
+
+sub _mysql_version {
+    my $self = shift;
+    unless (exists $self->{_mysql_version}) {
+        ($self->{_mysql_version})
+            = $self->_verbose_help =~ /\A.*Ver ([0-9]+\.[0-9]+\.[0-9]+)/;
+    }
+    $self->{_mysql_version};
+}
+
+sub _mysql_major_version {
+    my $ver = shift->_mysql_version;
+    return unless $ver;
+    +(split /\./, $ver)[0];
 }
 
 sub _get_path_of {

@@ -7,7 +7,7 @@ use GraphQL::Debug qw(_debug);
 use JSON::Validator::OpenAPI;
 use OpenAPI::Client;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %TYPEMAP = (
@@ -21,6 +21,7 @@ my %TYPEMAP = (
 my %TYPE2SCALAR = map { ($_ => 1) } qw(ID String Int Float Boolean DateTime);
 my %METHOD2MUTATION = map { ($_ => 1) } qw(post put patch delete);
 my @METHODS = (keys %METHOD2MUTATION, qw(get options head));
+my %KIND2SIMPLE = (scalar => 1, enum => 1);
 
 sub _apply_modifier {
   my ($modifier, $typespec) = @_;
@@ -33,7 +34,7 @@ sub _apply_modifier {
 
 sub _remove_modifiers {
   my ($typespec) = @_;
-  return $typespec->{type} if ref $typespec eq 'HASH';
+  return _remove_modifiers($typespec->{type}) if ref $typespec eq 'HASH';
   return $typespec if ref $typespec ne 'ARRAY';
   _remove_modifiers($typespec->[1]);
 }
@@ -449,6 +450,44 @@ sub _kind2name2endpoint {
   (\%kind2name2endpoint);
 }
 
+# possible "kind"s: scalar enum type input union interface
+# mutates %$name2typeused - is boolean
+sub _walk_type {
+  my ($name, $name2typeused, $name2type) = @_;
+  DEBUG and _debug("OpenAPI._walk_type", $name, $name2typeused);#, $name2type
+  return if $name2typeused->{$name}; # seen - stop
+  return if $TYPE2SCALAR{$name}; # builtin scalar - stop
+  $name2typeused->{$name} = 1;
+  my $type = $name2type->{$name};
+  return if $KIND2SIMPLE{ $type->{kind} }; # no sub-fields, types, etc - stop
+  if ($type->{kind} eq 'union') {
+    DEBUG and _debug("OpenAPI._walk_type(union)");
+    _walk_type($_, $name2typeused, $name2type) for @{$type->{types}};
+    return;
+  }
+  if ($type->{kind} eq 'interface') {
+    DEBUG and _debug("OpenAPI._walk_type(interface)");
+    for my $maybe_type (values %$name2type) {
+      next if $maybe_type->{kind} ne 'type' or !$maybe_type->{interfaces};
+      next if !grep $_ eq $name, @{$maybe_type->{interfaces}};
+      _walk_type($maybe_type->{name}, $name2typeused, $name2type);
+    }
+    # continue to pick up the fields' types too
+  }
+  # now only input and output object remain (but still interfaces too)
+  for my $fieldname (keys %{ $type->{fields} }) {
+    my $field_def = $type->{fields}{$fieldname};
+    DEBUG and _debug("OpenAPI._walk_type($name)(*object)", $field_def);
+    _walk_type(_remove_modifiers($field_def->{type}), $name2typeused, $name2type);
+    next if !%{ $field_def->{args} || {} };
+    for my $argname (keys %{ $field_def->{args} }) {
+      DEBUG and _debug("OpenAPI._walk_type(arg)($argname)");
+      my $arg_def = $field_def->{args}{$argname};
+      _walk_type(_remove_modifiers($arg_def->{type}), $name2typeused, $name2type);
+    }
+  }
+}
+
 sub to_graphql {
   my ($class, $spec, $app) = @_;
   my %appargs = (app => $app) if $app;
@@ -486,31 +525,17 @@ sub to_graphql {
     \%name2type,
     \%type2info,
   );
-  push @ast, values %name2type;
-  push @ast, {
-    kind => 'type',
-    name => 'Query',
-    fields => {
-      map {
-        my $name = $_;
-        (
-          $name => $kind2name2endpoint->{query}{$name},
-        )
-      } keys %{ $kind2name2endpoint->{query} }
-    },
-  };
-  push @ast, {
-    kind => 'type',
-    name => 'Mutation',
-    fields => {
-      map {
-        my $name = $_;
-        (
-          $name => $kind2name2endpoint->{mutation}{$name},
-        )
-      } keys %{ $kind2name2endpoint->{mutation} }
-    },
-  };
+  for my $kind (keys %$kind2name2endpoint) {
+    $name2type{ucfirst $kind} = +{
+      kind => 'type',
+      name => ucfirst $kind,
+      fields => { %{ $kind2name2endpoint->{$kind} } },
+    };
+  }
+  my %name2typeused;
+  _walk_type(ucfirst $_, \%name2typeused, \%name2type)
+    for keys %$kind2name2endpoint;
+  push @ast, map $name2type{$_}, keys %name2typeused;
   +{
     schema => GraphQL::Schema->from_ast(\@ast),
     root_value => OpenAPI::Client->new($openapi_schema->data, %appargs),

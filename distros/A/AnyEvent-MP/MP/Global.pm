@@ -1,6 +1,6 @@
 =head1 NAME
 
-AnyEvent::MP::Global - some network-global services
+AnyEvent::MP::Global - network backbone services
 
 =head1 SYNOPSIS
 
@@ -8,19 +8,17 @@ AnyEvent::MP::Global - some network-global services
 
 =head1 DESCRIPTION
 
-This module maintains a fully-meshed network, if possible, and tries to
-ensure that we are connected to at least one other node.
+This module is usually run (or started on) seed nodes and provides a
+variety of services to connected nodes, such as the distributed database.
 
-It also manages named port groups - ports can register themselves in any
-number of groups that will be available network-wide, which is great for
-discovering services.
+The global nodes form a fully-meshed network, that is, all global nodes
+currently maintain connections to all other global nodes.
 
-Running it on one node will automatically run it on all nodes, although,
-at the moment, the global service is started by default anyways.
+Loading this module (e.g. as a service) transforms the local node into a
+global node. There are no user-servicable parts inside.
 
-=head1 GLOBALS AND FUNCTIONS
-
-=over 4
+For a limited time, this module also exports some AEMP 1.x compatibility
+functions (C<grp_reg>, C<grp_get> and C<grp_mon>).
 
 =cut
 
@@ -28,431 +26,341 @@ package AnyEvent::MP::Global;
 
 use common::sense;
 use Carp ();
+use List::Util ();
 
 use AnyEvent ();
-use AnyEvent::Util ();
 
 use AnyEvent::MP;
 use AnyEvent::MP::Kernel;
-use AnyEvent::MP::Transport ();
 
-use base "Exporter";
-
-our @EXPORT = qw(
-   grp_reg
-   grp_get
-   grp_mon
-);
-
-our $GLOBAL_VERSION = 0;
-
-our %ON_SETUP; # take note: not public
-
-our %addr; # port ID => [address...] mapping
-
-our %port; # our rendezvous port on the other side
-our %lreg; # local registry, name => [pid...]
-our %lmon; # local registry monitoring name,pid => mon
-our %greg; # global regstry, name => pid => undef
-our %gmon; # group monitoring, group => [$cb...]
-
-our $nodecnt;
-
-$AnyEvent::MP::Kernel::WARN->(7, "starting global service.");
+AE::log 7 => "starting global service.";
 
 #############################################################################
-# seednodes
+# node protocol parts for global nodes
 
-our $MASTER; # our current master (which we regularly query for net updates)
+package AnyEvent::MP::Kernel;
 
-our %SEEDME; # $node => $port
-our @SEEDS;
-our %SEEDS; # just to check whether a seed is a seed
-our %SEED_CONNECT;
-our $SEED_WATCHER;
+use JSON::XS ();
 
-push @AnyEvent::MP::Transport::HOOK_CONNECT, sub {
-   my $peer = $_[0]{local_greeting}{peeraddr};
-   return unless exists $SEEDS{$peer};
-   $SEED_CONNECT{$peer} = 2;
-};
+# TODO: this is ugly (classical use vars vs. our),
+# maybe this should go into MP::Kernel
 
-push @AnyEvent::MP::Transport::HOOK_GREETING, sub {
-   # we rely on untrusted data here (the remote node name)
-   # this is hopefully ok, as we override it on successful
-   # connects, and this can at most be used for DOSing,
-   # which is easy when you can do MITM.
-   my $peer = $_[0]{local_greeting}{peeraddr};
-   return unless exists $SEEDS{$peer};
-   $SEEDS{$peer} ||= $_[0]{remote_node};
-};
+# "import" from Kernel
+our %NODE;
+our $NODE;
+#our $GLOBAL;
+our $SRCNODE; # the origin node id
+our %NODE_REQ;
+our %GLOBAL_NODE;
+our $GLOBAL;
 
-push @AnyEvent::MP::Transport::HOOK_CONNECTED, sub {
-   my $peer = $_[0]{local_greeting}{peeraddr};
-   return unless exists $SEEDS{$peer};
-   $SEEDS{$peer} = $_[0]{remote_node};
-};
+# only in global code
+our %GLOBAL_SLAVE;
+our %GLOBAL_MON; # monitors {family}
 
-push @AnyEvent::MP::Transport::HOOK_DESTROY, sub {
-   delete $SEED_CONNECT{$_[0]{local_greeting}{peeraddr}};
+our %GLOBAL_DB;    # all local databases, merged - empty on non-global nodes
+our %LOCAL_DBS; # local databases of other nodes (global and slave)
+our %LOCAL_DB;  # this node database
 
-   # check if we contacted ourselves, so nuke this seed
-   if (exists $_[0]{seed} && $_[0]{remote_node} eq $AnyEvent::MP::Kernel::NODE) {
-#      $AnyEvent::MP::Kernel::WARN->(0,"avoiding seed $_[0]{seed}\n");#d#
-      delete $SEEDS{$_[0]{seed}};
+# broadcasts a message to all other global nodes
+sub g_broadcast {
+   snd $_, @_
+      for keys %GLOBAL_NODE;
+}
+
+# add/replace/del inside a family in the database
+# @$del must not contain any key in %$set
+sub g_upd {
+   my ($node, $family, $set, $del) = @_;
+
+   my $ldb = $LOCAL_DBS{$node}{$family} ||= {};
+   my $gdb = $GLOBAL_DB       {$family} ||= {};
+
+   my %local_set; # extra local set's created by deletes
+
+   # add/replace keys
+   while (my ($k, $v) = each %$set) {
+      #TODO# optimize duplicate gdb-set's, to some extent, maybe
+      # but is probably difficult and slow, so don't for the time being.
+
+      $ldb->{$k} =
+      $gdb->{$k} = $v;
    }
-};
 
-sub seed_connect {
-   my ($seed) = @_;
+   my (@del_local, @del_global); # actual deletes for other global nodes / our slaves
 
-   my ($host, $port) = AnyEvent::Socket::parse_hostport $seed
-      or Carp::croak "$seed: unparsable seed address";
+   # take care of deletes
+   for my $k (@$del) {
+      delete $ldb->{$k};
 
-   return if $SEED_CONNECT{$seed};
-   return if defined $SEEDS{$seed} && node_is_up $SEEDS{$seed};
+      if (my @other = grep exists $LOCAL_DBS{$_}{$family}{$k}, keys %LOCAL_DBS) {
+         # key exists in some other db shard(s)
 
-   $AnyEvent::MP::Kernel::WARN->(9, "trying connect to seed node $seed.");
+         # if there is a local one, we have to update
+         # otherwise, we update and delete on other globals
 
-   # ughhh
-   $SEED_CONNECT{$seed} ||= AnyEvent::MP::Transport::mp_connect $host, $port,
-      seed => $seed,
-      sub {
-         $SEED_CONNECT{$seed} = 1;
-      },
-   ;
+         if (my $local = List::Util::first { exists $GLOBAL_SLAVE{$_} } @other) {
+            $set->{$k} =
+            $gdb->{$k} = $LOCAL_DBS{$local}{$family}{$k}
+               unless sv_eq $gdb->{$k}, $LOCAL_DBS{$local}{$family}{$k};
+
+         } else {
+            # must be in a global one then
+            my $global = List::Util::first { !exists $GLOBAL_SLAVE{$_} } @other;
+
+            push @del_global, $k;
+
+            $local_set{$k} =
+            $gdb->{$k}     = $LOCAL_DBS{$global}{$family}{$k}
+               unless sv_eq $gdb->{$k}, $LOCAL_DBS{$global}{$family}{$k};
+         }
+      } else {
+         delete $gdb->{$k};
+
+         # this was the only one, so delete locally
+         push @del_local, $k;
+         # and globally, if it's a local key
+         push @del_global, $k if exists $GLOBAL_SLAVE{$node};
+      }
+   }
+
+   # family could be empty now
+   delete $GLOBAL_DB       {$family} unless %$gdb;
+   delete $LOCAL_DBS{$node}{$family} unless %$ldb;
+
+   # tell other global nodes any changes in our database
+   g_broadcast g_upd => $family, $set, \@del_global
+      if exists $GLOBAL_SLAVE{$node} && (%$set || @del_global);
+
+   # tell subscribers we have changed the family
+   if (%$set || %local_set || @del_local) {
+      @$set{keys %local_set} = values %local_set;
+
+      snd $_ => g_chg2 => $family, $set, \@del_local
+         for keys %{ $GLOBAL_MON{$family} };
+   }
 }
 
-sub more_seeding {
-   my $int = List::Util::max 1,
-                $AnyEvent::MP::Kernel::CONFIG->{connect_interval}
-                * ($nodecnt ? keys %AnyEvent::MP::Kernel::NODE : 1)
-                - rand;
+# set the whole (node-local) database - previous value must be empty
+sub g_set($$) {
+   my ($node, $db) = @_;
 
-   $SEED_WATCHER = AE::timer $int, 0, \&more_seeding;
-
-   @SEEDS = keys %SEEDS unless @SEEDS;
-   return unless @SEEDS;
-
-   seed_connect splice @SEEDS, rand @SEEDS, 1;
+   while (my ($f, $k) = each %$db) {
+      g_upd $node, $f, $k;
+   }
 }
 
-sub set_seeds(@) {
-   @SEEDS{@_} = ();
-
-   $SEED_WATCHER ||= AE::timer 5, $AnyEvent::MP::Kernel::MONITOR_TIMEOUT, \&more_seeding;
-
-   after 0.100 * rand, \&more_seeding
-      for 1 .. keys %SEEDS;
-}
-
-sub up_seeds() {
-   grep node_is_up $_, values %SEEDS
-}
-
-sub node_is_seed($) {
-   grep $_ eq $_[0], grep defined, values %SEEDS
-}
-
-# returns all (up) seed nodes, or all nodes if no seednodes are up/known
-sub route_nodes {
-   my @seeds = up_seeds;
-   @seeds = up_nodes unless @seeds;
-   @seeds
-}
-
-#############################################################################
-
-sub _change {
-   my ($group, $add, $del) = @_;
-
-   my $kv = $greg{$group} ||= {};
-
-   delete @$kv{@$del};
-   @$kv{@$add} = ();
-
-   my $ports = [keys %$kv];
-   $_->($ports, $add, $del) for @{ $gmon{$group} };
-}
-
-sub unreg_groups($) {
+# delete all keys from a database
+sub g_clr($) {
    my ($node) = @_;
 
-   my $qr = qr/^\Q$node\E(?:#|$)/;
-   my @del;
+   my $db = $LOCAL_DBS{$node};
 
-   while (my ($group, $ports) = each %greg) {
-      @del = grep /$qr/, keys %$ports;
-      _change $group, [], \@del
-         if @del;
+   while (my ($f, $k) = each %$db) {
+      g_upd $node, $f, undef, [keys %$k];
+   }
+
+   delete $LOCAL_DBS{$node};
+}
+
+# gather node databases from slaves
+
+# other node wants to make us the master and sends us their db
+$NODE_REQ{g_slave} = sub {
+   my ($db) = @_
+      or return; # empty g_slave is used to start global service
+
+   my $node = $SRCNODE;
+   undef $GLOBAL_SLAVE{$node};
+   g_set $node, $db;
+};
+
+# other global node sends us their database
+$NODE_REQ{g_set} = sub {
+   my ($db) = @_;
+
+   # need to get it here, because g_set destroys it
+   my $binds = $db->{"'l"}{$SRCNODE};
+
+   g_set $SRCNODE, $db;
+
+   # a remote node always has to provide their listeners. for global
+   # nodes, we mirror their 'l locally, just as we also set 'g.
+   # that's not very efficient, but ensures that global nodes
+   # find each other.
+   db_set "'l" => $SRCNODE => $binds;
+};
+
+# other node (global and slave) sends us a family update
+$NODE_REQ{g_upd} = sub {
+   &g_upd ($SRCNODE, @_);
+};
+
+# slave node wants to know the listeners of a node
+$NODE_REQ{g_find} = sub {
+   my ($node) = @_;
+
+   snd $SRCNODE, g_found => $node, $GLOBAL_DB{"'l"}{$node};
+};
+
+$NODE_REQ{g_db_family} = sub {
+   my ($family, $id) = @_;
+   snd $SRCNODE, g_reply => $id, $GLOBAL_DB{$family} || {};
+};
+
+$NODE_REQ{g_db_keys} = sub {
+   my ($family, $id) = @_;
+   snd $SRCNODE, g_reply => $id, [keys %{ $GLOBAL_DB{$family} } ];
+};
+
+$NODE_REQ{g_db_values} = sub {
+   my ($family, $id) = @_;
+   snd $SRCNODE, g_reply => $id, [values %{ $GLOBAL_DB{$family} } ];
+};
+
+# monitoring
+
+sub g_disconnect($) {
+   my ($node) = @_;
+
+   delete $GLOBAL_NODE{$node}; # also done in Kernel.pm, but doing it here avoids overhead
+
+   db_del "'g" => $node;
+   db_del "'l" => $node;
+   g_clr $node;
+
+   if (my $mon = delete $GLOBAL_SLAVE{$node}) {
+      while (my ($f, $fv) = each %$mon) {
+         delete $GLOBAL_MON{$f}{$_}
+            for keys %$fv;
+
+         delete $GLOBAL_MON{$f}
+            unless %{ $GLOBAL_MON{$f} };
+      }
    }
 }
 
-sub set_groups($$) {
-   my ($node, $lreg) = @_;
+# g_mon0 family - stop monitoring
+$NODE_REQ{g_mon0} = sub {
+   delete $GLOBAL_MON{$_[0]}{$SRCNODE};
+   delete $GLOBAL_MON{$_[0]} unless %{ $GLOBAL_MON{$_[0]} };
 
-   while (my ($k, $v) = each %$lreg) {
-      _change $k, $v, [];
+   delete $GLOBAL_SLAVE{$SRCNODE}{$_[0]};
+};
+
+# g_mon1 family key - start monitoring
+$NODE_REQ{g_mon1} = sub {
+   undef $GLOBAL_SLAVE{$SRCNODE}{$_[0]};
+   undef $GLOBAL_MON{$_[0]}{$SRCNODE};
+
+   snd $SRCNODE, g_chg1 => $_[0], $GLOBAL_DB{$_[0]};
+};
+
+#############################################################################
+# switch to global mode
+
+# connect from a global node
+sub g_global_connect {
+   my ($node) = @_;
+
+   # each node puts the set of connected global nodes into
+   # 'g - this causes a big duplication and mergefest, but
+   # is the easiest way to ensure global nodes have a list
+   # of all other global nodes.
+   # we also mirror 'l as soon as we receive it, causing
+   # even more overhead.
+   db_set "'g" => $node;
+
+   # global nodes send all local databases of their slaves, merged,
+   # as their database to other global nodes
+   my %db;
+
+   while (my ($k, $v) = each %LOCAL_DBS) {
+      next unless exists $GLOBAL_SLAVE{$k};
+
+      while (my ($f, $fv) = each %$v) {
+         while (my ($k, $kv) = each %$fv) {
+            $db{$f}{$k} = $kv;
+         }
+      }
    }
+
+   snd $node => g_set => \%db;
 }
 
-=item $guard = grp_reg $group, $port
+# overrides request in Kernel
+$NODE_REQ{g_global} = sub {
+   g_disconnect $SRCNODE; # usually a nop, but not when a normal node becomes global
+   undef $GLOBAL_NODE{$SRCNODE}; # same as in Kernel.pm
+   g_global_connect $SRCNODE;
+};
 
-Register the given (local!) port in the named global group C<$group>.
+# delete data from other nodes on node-down
+mon_nodes sub {
+   if ($_[1]) {
+      snd $_[0] => "g_global"; # tell everybody that we are a global node
+   } else {
+      g_disconnect $_[0];
+   }
+};
 
-The port will be unregistered automatically when the port is destroyed.
+# now, this is messy
+AnyEvent::MP::Kernel::post_configure {
+   # enable global mode
+   $GLOBAL = 1;
 
-When not called in void context, then a guard object will be returned that
-will also cause the name to be unregistered when destroyed.
+   # global nodes are their own masters - this
+   # resends global requests and sets the local database.
+   master_set $NODE;
 
-=cut
+   # now add us to the set of global nodes
+   db_set "'g" => $NODE;
 
-# unregister local port
-sub unregister {
-   my ($port, $group) = @_;
+   # tell other nodes that we are global now
+   for (up_nodes) {
+      snd $_, "g_global";
 
-   delete $lmon{"$group\x00$port"};
-   @{ $lreg{$group} } = grep $_ ne $port, @{ $lreg{$group} };
+      # if the node is global, connect
+      g_global_connect $_
+         if exists $GLOBAL_NODE{$_};
+   }
 
-   _change $group, [], [$port];
+   # from here on we should be able to act "normally"
 
-   snd $_, reg0 => $group, $port
-      for values %port;
-}
+   # maintain connections to all global nodes that we know of
+   db_mon "'g" => sub {
+      keepalive_add $_ for @{ $_[1] };
+      keepalive_del $_ for @{ $_[3] };
+   };
+};
 
-# register local port
+#############################################################################
+# compatibility functions for aemp 1.0
+
+package AnyEvent::MP::Global;
+
+use base "Exporter";
+our @EXPORT = qw(grp_reg grp_get grp_mon);
+
 sub grp_reg($$) {
-   my ($group, $port) = @_;
-
-   port_is_local $port
-      or Carp::croak "AnyEvent::MP::Global::grp_reg can only be called for local ports, caught";
-
-   grep $_ eq $port, @{ $lreg{$group} }
-      and Carp::croak "'$group': group already registered, cannot register a second time";
-
-   $lmon{"$group\x00$port"} = mon $port, sub { unregister $port, $group };
-   push @{ $lreg{$group} }, $port;
-
-   snd $_, reg1 => $group, $port
-      for values %port;
-
-   _change $group, [$port], [];
-
-   defined wantarray && AnyEvent::Util::guard { unregister $port, $group }
+   &db_reg
 }
-
-=item $ports = grp_get $group
-
-Returns all the ports currently registered to the given group (as
-read-only(!) array reference). When the group has no registered members,
-return C<undef>.
-
-=cut
 
 sub grp_get($) {
-   my @ports = keys %{ $greg{$_[0]} };
+   my @ports = keys %{ $AnyEvent::MP::Kernel::GLOBAL_DB{$_[0]} };
+
    @ports ? \@ports : undef
 }
-
-=item $guard = grp_mon $group, $callback->($ports, $add, $del)
-
-Installs a monitor on the given group. Each time there is a change it
-will be called with the current group members as an arrayref as the
-first argument. The second argument only contains ports added, the third
-argument only ports removed.
-
-Unlike C<grp_get>, all three arguments will always be array-refs, even if
-the array is empty. None of the arrays must be modified in any way.
-
-The first invocation will be with the first two arguments set to the
-current members, as if all of them were just added, but only when the
-group is actually non-empty.
-
-Optionally returns a guard object that uninstalls the watcher when it is
-destroyed.
-
-=cut
 
 sub grp_mon($$) {
    my ($grp, $cb) = @_;
 
-   AnyEvent::MP::Kernel::delay sub {
-      return unless $cb;
+   db_mon $grp => sub {
+      my ($ports, $add, $chg, $del) = @_;
 
-      push @{ $gmon{$grp} }, $cb;
-      $cb->(((grp_get $grp) || return) x 2, []);
+      $cb->([keys %$ports], $add, $del);
    };
-
-   defined wantarray && AnyEvent::Util::guard {
-      my @mon = grep $_ != $cb, @{ delete $gmon{$grp} };
-      $gmon{$grp} = \@mon if @mon;
-      undef $cb;
-   }
 }
-
-sub start_node {
-   my ($node) = @_;
-
-   return if exists $port{$node};
-   return if $node eq $NODE; # do not connect to ourselves
-
-   # establish connection
-   my $port = $port{$node} = spawn $node, "AnyEvent::MP::Global::connect", $GLOBAL_VERSION, $NODE;
-
-   mon $port, sub {
-      unreg_groups $node;
-      delete $port{$node};
-   };
-
-   snd $port, addr => $AnyEvent::MP::Kernel::LISTENER;
-   snd $port, nodes => \%addr if %addr;
-   snd $port, set => \%lreg if %lreg;
-   snd $port, "setup"; # tell the other side that we are in business now
-}
-
-# other nodes connect via this
-sub connect {
-   my ($version, $node) = @_;
-
-   (int $version) == (int $GLOBAL_VERSION)
-      or die "node version mismatch (requested $version; we have $GLOBAL_VERSION)";
-
-   # monitor them, silently die
-   mon $node, psub {
-      delete $SEEDME{$node};
-      kil $SELF;
-   };
-
-   rcv $SELF,
-      setup => sub {
-         $_->($node) for values %ON_SETUP;
-      },
-      addr => sub {
-         my $addresses = shift;
-         $AnyEvent::MP::Kernel::WARN->(9, "$node told us its addresses (@$addresses).");
-         $addr{$node} = $addresses;
-
-         # delay broadcast by a random amount, to avoid nodes connecting to each other
-         # at the same time.
-         after 2 + rand, sub {
-            for my $slave (keys %SEEDME) {
-               snd $port{$slave} || next, nodes => { $node => $addresses };
-            }
-         };
-      },
-      nodes => sub {
-         my ($kv) = @_;
-
-         use JSON::XS;#d#
-         my $kv_txt = JSON::XS->new->encode ($kv);#d#
-         $AnyEvent::MP::Kernel::WARN->(9, "$node told us it knows about $kv_txt.");#d#
-
-         while (my ($id, $addresses) = each %$kv) {
-            my $node = AnyEvent::MP::Kernel::add_node $id;
-            $node->connect (@$addresses);
-            start_node $id;
-         }
-      },
-      set => sub {
-         set_groups $node, shift;
-      },
-      find => sub {
-         my ($othernode) = @_;
-
-         $AnyEvent::MP::Kernel::WARN->(9, "$node asked us to find $othernode.");
-         snd $port{$node}, nodes => { $othernode => $addr{$othernode} }
-            if $addr{$othernode};
-      },
-      reg0 => sub {
-         _change $_[0], [], [$_[1]];
-      },
-      reg1 => sub {
-         _change $_[0], [$_[1]], [];
-      },
-
-      # some node asks us to provide network updates
-      seedme0 => sub {
-         $AnyEvent::MP::Kernel::WARN->(9, "$node asked us to NOT seed it.");#d#
-         delete $SEEDME{$node};
-      },
-      seedme1 => sub {
-         $AnyEvent::MP::Kernel::WARN->(9, "$node asked us to seed it.");#d#
-         $SEEDME{$node} = ();
-
-         # for good measure
-         snd $port{$node}, nodes => \%addr if %addr;
-      },
-   ;
-}
-
-sub set_master($) {
-   return if $MASTER eq $_[0];
-
-   snd $port{$MASTER}, "seedme0"
-      if $MASTER && node_is_up $MASTER;
-
-   $MASTER = $_[0];
-
-   if ($MASTER) {
-      snd $port{$MASTER}, "seedme1";
-      $AnyEvent::MP::Kernel::WARN->(7, "selected new master: $MASTER.");
-   } else {
-      $AnyEvent::MP::Kernel::WARN->(1, "no contact to any other node, cannot seed.");
-   }
-}
-
-sub mon_node {
-   my ($node, $is_up) = @_;
-
-   if ($is_up) {
-      ++$nodecnt;
-      start_node $node;
-
-      if (node_is_seed $node) {
-         if (node_is_seed $MASTER) {
-            my @SEEDS = up_seeds;
-
-            # switching here with lower chance roughly hopefully still gives us
-            # an equal selection.
-            set_master $node
-               if 1 < rand @SEEDS;
-         } else {
-            # a seed always beats a non-seed
-            set_master $node;
-         }
-      }
-   }
-
-   # select a new(?) master, if required
-   unless ($MASTER and node_is_up $MASTER) {
-      if (my @SEEDS = up_seeds) {
-         set_master $SEEDS[rand @SEEDS];
-      } else {
-         # select "last" non-seed node
-         set_master +(sort +up_nodes)[-1];
-      }
-   }
-
-   unless ($is_up) {
-      --$nodecnt;
-      more_seeding unless $nodecnt;
-      unreg_groups $node;
-
-      # forget about the node
-      delete $addr{$node};
-
-      # ask our master for quick recovery
-      snd $port{$MASTER}, find => $node
-         if $MASTER;
-   }
-}
-
-mon_node $_, 1
-   for up_nodes;
-
-mon_nodes \&mon_node;
-
-=back
 
 =head1 SEE ALSO
 

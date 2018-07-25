@@ -1,0 +1,32 @@
+Revision history for Perl extension WebService::Hexonet::Connector.
+
+1.04  Thu Jul 24 15:00:00 2018
+    * reviewed project documentation
+	
+1.03  Thu Jul 24 12:00:00 2018
+    * fixed SDK docs
+	* fixed build release script
+
+1.02  Thu Jul 24 11:00:00 2018
+    * reviewed documentation
+
+1.01  Mon Jul 23 16:20:00 2018
+    * PrePAN review: lower case key names in documentation
+	* PrePAN review: Connection constructor / connect method using hash map
+	* fix compare operator in url_encode / url_decode tests: use eq instead of ==
+	* moved module to namespace WebService
+	* added build version script
+
+1.00  Thu Jul 19 14:37:00 2018
+    * reviewed version; based on http://www.perltk.de/tk_widgets/ghowto_create_cpan_module.html
+	* added sdk documentation and generator script
+	* added automated tests and coverage reporting
+	* added code linting
+	* fixed POD documentation: abstract_from works now
+	* fixed POD documentation: POD coverage 100%
+	* switch from MANIFEST to MANIFEST.SKIP
+
+0.01  Wed Jul 18 15:41:52 2018
+	- original version; created by h2xs 1.23 with options
+		-b 5.26.0 -XA -n Hexonet::Connector
+

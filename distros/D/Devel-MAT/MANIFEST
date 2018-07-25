@@ -1,6 +1,7 @@
 bin/pmat
 bin/pmat-cat-svpv
 bin/pmat-diff
+bin/pmat-leakreport
 bin/pmat-list-dangling-ptrs
 bin/pmat-list-orphans
 Build.PL

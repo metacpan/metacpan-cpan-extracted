@@ -19,6 +19,9 @@ my $builder = Module::Build->new(
         'Time::Piece'     => 0,
         'YAML'            => 0,
     },
+    configure_requires => {
+        'Module::Build' => 0.38,
+    },
     recommends => {
         'JSON'          => '2.0',
         'JIRA::REST'    => 0,

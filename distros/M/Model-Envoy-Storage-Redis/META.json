@@ -1,0 +1,45 @@
+{
+   "abstract" : "A Model::Envoy plugin for peristing model information in a Redis store.",
+   "author" : [
+      "Stephen Howard <stephen@enterity.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Model-Envoy-Storage-Redis",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4211"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Model::Envoy" : "v0.2.4",
+            "Moose" : "2.2010",
+            "MooseX::ClassAttribute" : "0.29",
+            "Redis::Fast" : "0.21",
+            "perl" : "v5.18.2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302085"
+         }
+      }
+   },
+   "provides" : {
+      "Model::Envoy::Storage::Redis" : {
+         "file" : "lib/Model/Envoy/Storage/Redis.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.1.0"
+}

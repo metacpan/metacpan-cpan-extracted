@@ -11,6 +11,11 @@ use My::Module::Recommend::All qw{ __all };
 my %misbehaving_os = map { $_ => 1 } qw{ MSWin32 cygwin };
 
 my @optionals = (
+    __any( 'Astro::Coord::ECI::TLE::Iridium'	=> <<'EOD' ),
+      This module is needed if you wish to compute Iridium Classic flare
+      events. If you do not intend to do this, this module is not
+      needed.
+EOD
     __any( 'Astro::SIMBAD::Client'	=> <<'EOD' ),
       This module is required for the 'satpass' script's 'sky lookup'
       command, but is otherwise unused by this package. If you do not
@@ -33,14 +38,6 @@ EOD
       you are running an earlier Perl, you can try installing Date-Manip
       5.54, which is the most recent version that does _not_ require
       Perl 5.10.
-EOD
-    __all( 'DateTime', 'DateTime::TimeZone'	=> <<'EOD' ),
-      If you set the 'zone' attribute of Astro::Coord::ECI::TLE::Iridium
-      to a zone name, these modules will be used to determine if a flare
-      occurred before or after midnight. If not available, $ENV{TZ} will
-      be set to the zone name in the hope that the localtime() built-in
-      will respond to this. If the 'zone' attribute is undef (the
-      default) or a numeric offset from GMT, this module is not used.
 EOD
     __any( 'Geo::Coder::OSM'			=> <<'EOD' ),
       This module is required for the 'satpass' script's 'geocode'
@@ -131,7 +128,7 @@ BEGIN {
     } or plan skip_all => 'Test::Without::Module not available';
 }
 
-do 't/$_';
+do './t/$_';
 
 1;
 

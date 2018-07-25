@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1692 2018-07-06 08:55:39Z willem $
+# $Id: Base.pm 1698 2018-07-24 15:29:05Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1692 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1698 $)[1];
 
 
 #
@@ -705,17 +705,20 @@ sub axfr {				## zone transfer
 			my $rr = shift(@rr);
 
 			if ( ref($rr) eq 'Net::DNS::RR::SOA' ) {
-				return $soa = $rr unless $soa;
-				$select = undef;
-				return if $rr->encode eq $soa->encode;
-				croak $self->errorstring('mismatched final SOA');
+				if ($soa) {
+					$select = undef;
+					return if $rr->encode eq $soa->encode;
+					croak $self->errorstring('mismatched final SOA');
+				}
+				$soa = $rr;
 			}
 
-			return $rr if scalar @rr;
+			unless ( scalar @rr ) {
+				my $reply;			# refill @rr
+				( $reply, $verify ) = $self->_axfr_next( $select, $verify );
+				@rr = $reply->answer;
+			}
 
-			my $reply;
-			( $reply, $verify ) = $self->_axfr_next( $select, $verify );
-			@rr = $reply->answer;
 			return $rr;
 		};
 

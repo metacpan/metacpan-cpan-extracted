@@ -1,5 +1,10 @@
 Revision history for File-Tabular-Web
 
+0.26 20.07.2018
+  - fix conceptual bug when running in Plack mode : the persistent
+    Plack component should not be confused with the temporary object
+    used to handle a single request. This replaces fixes 0.24 and 0.25.
+
 0.25 17.07.2018
   - bugfix fulltext_result need to be cleared in all cases
 

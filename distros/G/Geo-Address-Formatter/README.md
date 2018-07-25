@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/OpenCageData/perl-Geo-Address-Formatter.svg?branch=master)](https://travis-ci.org/OpenCageData/perl-Geo-Address-Formatter)
+[![Kritika Analysis Status](https://kritika.io/users/freyfogle/repos/4975169572151338/heads/master/status.svg)](https://kritika.io/users/freyfogle/repos/4975169572151338/heads/master/)
+[![CPAN](https://img.shields.io/cpan/v/Geo-Address-Formatter.svg?style=flat-square)](https://metacpan.org/pod/Geo::Address::Formatter)
 
 # perl-Geo-Address-Formatter
 
@@ -10,7 +12,7 @@ It is meant to run against a set of configuration and test cases in
 
 The address-formatting repository is added as a [git submodule](http://git-scm.com/book/en/Git-Tools-Submodules). It is
 versioned, that means it won't automatically update when you run `git
-pull`. To point it to a newer version of the configuration run 
+pull`. To point it to a newer version of the configuration run
 
 1. `git submodule init`
 2. `git submodule update`
@@ -22,7 +24,8 @@ To fetch the latest templates available use
 See also: <http://git-scm.com/book/en/Git-Tools-Submodules>
 
 To submit new countries/territories please see the details in the
-[address-formatting repository](https://github.com/opencagedata/address-formatting), this module just processes the templates
+[address-formatting repository](https://github.com/opencagedata/address-formatting),
+this module just processes the templates
 
 ### DEVELOPMENT
 
@@ -41,7 +44,7 @@ To submit new countries/territories please see the details in the
 
 ### COPYRIGHT AND LICENCE
 
-Copyright 2014-2017 Opencage Data Ltd <cpan@opencagedata.com>
+Copyright 2014-2018 Opencage Data Ltd <cpan@opencagedata.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10 or,
@@ -50,6 +53,6 @@ at your option, any later version of Perl 5 you may have available.
 ### YOU MAY ALSO ENJOY
 
 This module is in use on the [OpenCage
-Geocoder](http://geocoder.opencagedata.com/), converting lat,longs
+Geocoder](https://opencagedata.com), converting lat,longs
 into nicely formatted strings.
 Please give us a try if you have any geocoding needs.

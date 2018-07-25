@@ -4,9 +4,9 @@
       "Jason McIntosh (jmac@jmac.org)"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.0",
+   "generated_by" : "Minilla/v3.0.17",
    "license" : [
-      "unknown"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -65,7 +65,7 @@
    "provides" : {
       "Web::Microformats2" : {
          "file" : "lib/Web/Microformats2.pm",
-         "version" : "0.4"
+         "version" : "0.401"
       },
       "Web::Microformats2::Document" : {
          "file" : "lib/Web/Microformats2/Document.pm"
@@ -88,10 +88,9 @@
          "web" : "https://github.com/jmacdotorg/microformats2-perl"
       }
    },
-   "version" : "0.4",
+   "version" : "0.401",
    "x_contributors" : [
       "Jason McIntosh <jmac@jmac.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
-   "x_static_install" : 1
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,8 +1,9 @@
 package Ion::Server;
 # ABSTRACT: An Ion TCP service
-$Ion::Server::VERSION = '0.06';
+$Ion::Server::VERSION = '0.08';
 use common::sense;
 
+use Class::Slot;
 use Carp;
 use Coro;
 use AnyEvent::Socket qw(tcp_server);
@@ -19,28 +20,19 @@ use overload (
   fallback => 1,
 );
 
-sub new {
-  my ($class, %param) = @_;
-  my $self = bless {
-    host     => $param{host},
-    port     => $param{port},
-    guard    => undef,
-    handle   => undef,
-    cond     => undef,
-    queue    => Coro::Channel->new,
-    conn     => {},
-    encoders => [],
-    decoders => [],
-  }, $class;
-}
+slot 'host';
+slot 'port';
+slot 'guard';
+slot 'handle';
+slot 'cond';
+slot 'queue';
+slot 'encoders', def => sub{ [] };
+slot 'decoders', def => sub{ [] };
 
 sub DESTROY {
   my $self = shift;
   $self->stop;
 }
-
-sub host { $_[0]->{host} }
-sub port { $_[0]->{port} }
 
 sub accept {
   my $self = shift;
@@ -52,20 +44,20 @@ sub accept {
     host     => $host,
     port     => $port,
     handle   => unblock($fh),
-    encoders => $self->{encoders},
-    decoders => $self->{decoders},
+    encoders => $self->encoders,
+    decoders => $self->decoders,
   );
 }
 
 sub start {
   my ($self, $port, $host) = @_;
-  $self->stop if $self->{handle};
+  $self->stop if $self->handle;
   $self->{queue} ||= Coro::Channel->new;
 
   my $guard = tcp_server(
-    $host || $self->{host},
-    $port || $self->{port},
-    sub{ $self->{queue}->put([@_]) },
+    $host || $self->host || undef,
+    $port || $self->port || undef,
+    sub{ $self->queue->put([@_]) },
     rouse_cb
   );
 
@@ -83,10 +75,10 @@ sub start {
 
 sub stop {
   my $self = shift;
-  $self->{queue}->shutdown  if $self->{queue};
-  $self->{handle}->shutdown if $self->{handle};
-  $self->{handle}->close    if $self->{handle};
-  $self->{cond}->()         if $self->{cond};
+  $self->queue->shutdown  if $self->queue;
+  $self->handle->shutdown if $self->handle;
+  $self->handle->close    if $self->handle;
+  $self->cond->()         if $self->cond;
   undef $self->{queue};
   undef $self->{handle};
   undef $self->{guard};
@@ -95,19 +87,19 @@ sub stop {
 
 sub join {
   my $self = shift;
-  rouse_wait($self->{cond});
+  rouse_wait($self->cond);
   return 1;
 }
 
 sub encodes {
   my ($self, $encoder) = @_;
-  push @{$self->{encoders}}, $encoder;
+  push @{$self->encoders}, $encoder;
   return $self;
 }
 
 sub decodes {
   my ($self, $decoder) = @_;
-  push @{$self->{decoders}}, $decoder;
+  push @{$self->decoders}, $decoder;
   return $self;
 }
 
@@ -125,7 +117,7 @@ Ion::Server - An Ion TCP service
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 METHODS
 
@@ -186,7 +178,7 @@ Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Jeff Ober.
+This software is copyright (c) 2018 by Jeff Ober.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

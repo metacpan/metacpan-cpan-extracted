@@ -1,5 +1,13 @@
 Revision history for Perl module Crypt::Perl
 
+0.25 Tue Jul 24 2018
+- Fix install on old Perl installs where length() warns on undef.
+
+0.24 Tue Jul 24 2018
+- Ed25519 support added (experimental).
+- A bit of refactoring is done to start reducing duplication of ASN.1
+  and OID logic.
+
 0.23 Mon Jun 25 2018
 - Yet another attempt to get tests passing on 32-bit.
 

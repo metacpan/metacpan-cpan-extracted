@@ -1,4 +1,5 @@
-use Test2::Bundle::Extended;
+use Test2::V0;
+use Ion::Test;
 use Coro;
 use Coro::AnyEvent;
 use Ion;
@@ -6,7 +7,7 @@ use Ion;
 ok my $server = Listen, 'Listen';
 $server->start;
 
-ok my $conn = Connect($server->host, $server->port), 'Connect';
+ok my $conn = Connect('localhost', $server->port), 'Connect';
 
 my $service = async {
   while (my $client = <$server>) {

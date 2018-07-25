@@ -40,6 +40,7 @@
             "MIME::Base64" : "3.11",
             "Math::BigInt" : "1.999805",
             "Math::ProvablePrime" : "0.043",
+            "Math::Utils" : "1.07",
             "Symbol::Get" : "0.02",
             "Try::Tiny" : "0",
             "autodie" : "0",
@@ -56,9 +57,9 @@
             "Test::Class" : "0.4",
             "Test::Deep" : "0",
             "Test::Exception" : "0.4",
+            "Test::FailWarnings" : "0",
             "Test::More" : "1",
-            "Test::NoWarnings" : "0",
-            "Test::Simple" : "0.44"
+            "Test::NoWarnings" : "0"
          }
       }
    },
@@ -70,6 +71,6 @@
          "web" : "https://github.com/FGasper/p5-Crypt-Perl"
       }
    },
-   "version" : "0.23",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

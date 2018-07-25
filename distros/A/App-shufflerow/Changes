@@ -1,0 +1,133 @@
+Revision history for App-shufflerow
+
+0.32    2018-07-23
+        First version, released on an unsuspecting world.
+
+
+changeset:   1365:6c60e494ea1b
+tag:         tip
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Mon Jul 23 17:27:01 2018 +0900
+summary:     shufflerow マイクロ秒単位で実行時間を表示するようにした。
+
+changeset:   1364:91350478370a
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Mon Jul 23 17:18:21 2018 +0900
+summary:     shufflerow マニュアルにトリッキーな使い方を追加。
+
+changeset:   1363:a74122b6495b
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Mon Jul 23 17:09:13 2018 +0900
+summary:     shufflerow に shuffler から名前を変更
+
+changeset:   1362:39c6f84d09e6
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Mon Jul 23 17:07:40 2018 +0900
+summary:     shuffler -/を実装。段落ごとのシャッフルができるようにした。
+
+changeset:   1284:9856895444f8
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Thu Jun 28 17:50:18 2018 +0900
+summary:     shuffler  --version を実装。2次情報を書き換え
+
+changeset:   1067:7299d9258603
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Sun Mar 25 14:56:20 2018 +0900
+summary:     shuffler 英語の最小限のマニュアルを書き加えた。
+
+changeset:   929:c033e0ac8ca3
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Wed Dec 28 23:44:28 2016 +0900
+summary:     6個のブログラムファイルについて、srand を書換、5.001 に 5.014 から変更。boxmuller binom  randexpについては、-sNUM! の機能がうまくいかない
+
+changeset:   850:3de54e300a95
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Sat Nov 12 18:58:23 2016 +0900
+summary:     shuffler 計算時間を秒単位で標準エラー出力で出力するようにした。
+
+changeset:   849:3557de827e83
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Sat Nov 12 18:24:49 2016 +0900
+summary:     shuffler 個数の表示に、読み取った行数を表示するようにした。
+
+changeset:   806:1c447a72160e
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Tue Oct 18 15:56:59 2016 +0900
+summary:     shuffler -n を -: に。色を使わなくなった
+
+changeset:   797:b32d31af301d
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Thu Oct 13 16:35:40 2016 +0900
+summary:     shuffler 二次情報で拾った行数を表示する様にした
+
+changeset:   796:5043507192aa
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Thu Oct 13 16:29:47 2016 +0900
+summary:     shuffler -g (get) と -0 (no shuffle) を実装。ヘルプも書換
+
+changeset:   761:059dc2527df5
+parent:      759:f0f267692e6c
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Tue Oct 04 13:50:08 2016 +0900
+summary:     88個のファイルについて、先頭行の/usr/bin/env perl -T にしていた729番目のコミットを backout して、元に戻した
+
+changeset:   729:ee10a89adbe9
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Tue Aug 09 21:00:02 2016 +0900
+summary:     107個のファイルについて、1行目を書換。env と -T  を使う様にした。
+
+changeset:   660:5eead596bd84
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Thu Jul 28 19:19:44 2016 +0900
+summary:     37個のプログラムファイルについて、ディレクトリを変更または名前の変更
+
+changeset:   640:1a8f26af6df6
+date:        Thu Jul 21 07:56:31 2016 +0000
+summary:     shuffler 出力文字列の綴りを訂正。
+
+changeset:   576:c9c7f0cd6a7b
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Wed Jul 13 15:50:51 2016 +0900
+summary:     shuffler __END__ 行の消去を含む改訂。全てのオプションが組み合わせても整合した動作をするようにした。
+
+changeset:   377:512668971af3
+user:        Shimono Toshiyuki <tshimono@uhuru.jp>
+date:        Sat Mar 19 17:44:58 2016 +0900
+summary:     shufflerに --help opt の機能を付けた。
+
+changeset:   376:82f2e84233da
+user:        Shimono Toshiyuki <tshimono@uhuru.jp>
+date:        Sat Mar 19 17:21:02 2016 +0900
+summary:     -q の機能を追加
+
+changeset:   277:a8ac9ba9ae28
+user:        Shimono Toshiyuki <tshimono@uhuru.jp>
+date:        Sun Feb 28 19:27:12 2016 +0900
+summary:     sampelr とshuffler で --help を使えるように↓。
+
+changeset:   275:565b61ce46ff
+user:        Shimono Toshiyuki <tulamili@gmail.com>
+date:        Sat Feb 27 22:13:21 2016 +0900
+summary:     sampler.plとshufffle.plを改名。samplerとshufflerに。
+
+changeset:   216:4edd63b35036
+user:        Toshiyuki Shimono
+date:        Wed Feb 17 12:14:05 2016 +0900
+summary:     さらなるディレクリ間の移動
+
+changeset:   97:e59f6aa4cc8a
+user:        Shimono Toshiyuki at Komagome
+date:        Sat Jan 30 23:18:52 2016 +0900
+summary:     分かり安いようにディレクリ分けをした。
+
+changeset:   89:e46a259d4fe6
+user:        Shimono Toshiyuki at Komagome
+date:        Sat Jan 30 20:48:31 2016 +0900
+summary:     shuffle.plとsampler.plを大幅に書換え。特に、sampler.plを絶対値で扱わないことにした。負の数は0とみなされるようになった。
+
+changeset:   73:4f088cabff3a
+user:        Toshiyuki Shimono
+date:        Mon Jan 25 15:36:12 2016 +0900
+summary:     shuffle.pl 大幅に変更。GetOpt::Longについて改善の余地あり。
+
+

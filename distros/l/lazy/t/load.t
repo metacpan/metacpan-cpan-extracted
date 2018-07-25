@@ -12,6 +12,11 @@ use Test::RequiresInternet (
 
 my ($cb) = grep { ref $_ eq 'CODE' } @INC;
 my ( $stdout, $stderr, @result ) = capture { $cb->( undef, 'Local::404' ) };
-like( $stderr, qr{FAIL}, 'fake module not installed' );
+my $ok = like( $stderr, qr{FAIL}, 'fake module not installed' );
+
+unless ($ok) {
+    diag $stdout;
+    diag $stderr;
+}
 
 done_testing();

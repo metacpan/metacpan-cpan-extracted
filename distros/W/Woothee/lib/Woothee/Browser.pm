@@ -7,7 +7,7 @@ use Carp;
 use Woothee::Util qw/update_map update_category update_version update_os/;
 use Woothee::DataSet qw/dataset/;
 
-our $VERSION = "1.7.0";
+our $VERSION = "1.8.0";
 
 sub challenge_msie {
     my ($ua,$result) = @_;
@@ -25,6 +25,21 @@ sub challenge_msie {
         $version = Woothee::DataSet->const('VALUE_UNKNOWN');
     }
     update_map($result, dataset('MSIE'));
+    update_version($result, $version);
+    return 1;
+}
+
+sub challenge_yandex_browser {
+    my ($ua, $result) = @_;
+
+    return 0 if index($ua, "YaBrowser/") < 0;
+
+    my $version = Woothee::DataSet->const('VALUE_UNKNOWN');
+
+    if ($ua =~ m{YaBrowser/([.0-9]+)}o) {
+        $version = $1;
+    }
+    update_map($result, dataset('YaBrowser'));
     update_version($result, $version);
     return 1;
 }

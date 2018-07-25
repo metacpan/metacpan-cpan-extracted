@@ -1,5 +1,6 @@
 package Geo::Coder::OpenCage;
-$Geo::Coder::OpenCage::VERSION = '0.15';
+# ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
+$Geo::Coder::OpenCage::VERSION = '0.16';
 use strict;
 use warnings;
 
@@ -42,6 +43,7 @@ my %valid_params = (
     no_record        => 1,
     q                => 1,
     pretty           => 1,  # makes no actual difference
+    proximity        => 1,
 );
 
 sub geocode {
@@ -117,11 +119,11 @@ __END__
 
 =head1 NAME
 
-Geo::Coder::OpenCage
+Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geocoder
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -134,10 +136,6 @@ version 0.15
 This module provides an interface to the OpenCage geocoding service.
 
 For full details of the API visit L<https://opencagedata.com/api>.
-
-=head1 NAME
-
-Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geocoder
 
 =head1 METHODS
 

@@ -1,0 +1,37 @@
+Changes
+examples/mixed.pl
+examples/status.png
+lib/Mojolicious/Plugin/resources/public/mojo-status/app.css
+lib/Mojolicious/Plugin/resources/public/mojo-status/bootstrap/bootstrap.css
+lib/Mojolicious/Plugin/resources/public/mojo-status/bootstrap/bootstrap.js
+lib/Mojolicious/Plugin/resources/public/mojo-status/fontawesome/fontawesome.css
+lib/Mojolicious/Plugin/resources/public/mojo-status/logo-black-2x.png
+lib/Mojolicious/Plugin/resources/public/mojo-status/logo-black.png
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-brands-400.eot
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-brands-400.svg
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-brands-400.ttf
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-brands-400.woff
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-brands-400.woff2
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-regular-400.eot
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-regular-400.svg
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-regular-400.ttf
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-regular-400.woff
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-regular-400.woff2
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-solid-900.eot
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-solid-900.svg
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-solid-900.ttf
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-solid-900.woff
+lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-solid-900.woff2
+lib/Mojolicious/Plugin/resources/templates/layouts/mojo-status.html.ep
+lib/Mojolicious/Plugin/resources/templates/mojo-status/dashboard.html.ep
+lib/Mojolicious/Plugin/Status.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/pod.t
+t/pod_coverage.t
+t/status.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

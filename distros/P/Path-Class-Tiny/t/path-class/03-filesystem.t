@@ -341,9 +341,9 @@ SKIP: { skip 'tempdir methods not fully implemented';
 }
 } # SKIP block
 
-SKIP: { skip 'copy_to/move_to not yet implemented';
 
 # copy_to()
+# MODIFIED from original
 {
   my $file1 = file('t', 'file1');
   my $file2 = file('t', 'file2');
@@ -352,7 +352,7 @@ SKIP: { skip 'copy_to/move_to not yet implemented';
 
   my $copy = $file1->copy_to($file2);
 
-  isa_ok $copy, "Path::Class::File";
+  isa_ok $copy, "Path::Class::Tiny";
   is($copy->stringify, $file2->stringify, "same file");
 
   ok -e $file2;
@@ -389,8 +389,6 @@ SKIP: { skip 'copy_to/move_to not yet implemented';
   $file2->remove;
   ok( ! -e $_, "$_ should be gone") for ($file1, $file2);
 }
-
-} # SKIP block
 
 
 done_testing;

@@ -8,6 +8,7 @@ use lib qw{ inc };
 use Astro::Coord::ECI;
 use Astro::Coord::ECI::Sun;
 use Astro::Coord::ECI::Utils qw{ :time deg2rad };
+use My::Module::Sun;
 use My::Module::Test qw{ :tolerance format_time };
 use Test::More 0.88;
 
@@ -469,6 +470,19 @@ EOD
 
     tolerance $almanac[5]{time}, time_gm( 0, 26, 22, 1, 0, 2008 ), 60,
 	'Time twilight ends', \&format_gmt;
+}
+
+# Test ability to set Sun
+{
+    my $eci = Astro::Coord::ECI->new();
+
+    is ref $eci->get( 'sun' ), 'Astro::Coord::ECI::Sun',
+	'ECI object has default Sun object';
+
+    $eci->set( sun => 'My::Module::Sun' );
+
+    is ref $eci->get( 'sun' ), 'My::Module::Sun',
+	'ECI object now has non-default Sun object';
 }
 
 done_testing;

@@ -440,7 +440,7 @@ CREATE TABLE `trash` (
 CREATE TABLE `users` (
   `pass` text NOT NULL,
   `user` varchar(25) NOT NULL DEFAULT '',
-  `date` date NOT NULL DEFAULT '0000-00-00',
+  `date` date NOT NULL DEFAULT '1000-01-01',
   `email` varchar(100) NOT NULL DEFAULT '',
   `right` int(11) NOT NULL DEFAULT '0',
   `name` varchar(100) NOT NULL DEFAULT '',
@@ -455,5 +455,5 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-INSERT INTO `users` (`pass`,`user`,`date`,`email`,`right`,`name`,`firstname`,`street`,`city`,`postcode`,`phone`,`sid`,`ip`,`cats`,`id`) values('guest','guest','0000-00-00','','0','','',NULL,NULL,NULL,NULL,'123','dd','news','1');
+INSERT INTO `users` (`pass`,`user`,`date`,`email`,`right`,`name`,`firstname`,`street`,`city`,`postcode`,`phone`,`sid`,`ip`,`cats`,`id`) values('guest','guest','1000-01-01','','0','','',NULL,NULL,NULL,NULL,'123','dd','news','1');
 

@@ -103,7 +103,7 @@ done_testing();
 
 sub _get_clan {
     my $net = WG::API->new( application_id => $ENV{'WG_KEY'} )->net;
-    return $net->clans_list( limit => 1, fields => 'clan_id' )->[0];
+    return $net->clans( limit => 1, fields => 'clan_id' )->[0];
 }
 
 sub _get_account {

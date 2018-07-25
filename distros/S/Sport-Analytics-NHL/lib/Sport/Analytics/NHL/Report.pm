@@ -14,6 +14,7 @@ use Module::Pluggable require => 1, search_path => ['Sport::Analytics::NHL::Repo
 use Time::Local;
 
 use Sport::Analytics::NHL::Util;
+use Sport::Analytics::NHL::Tools;
 use Sport::Analytics::NHL::Config;
 use Sport::Analytics::NHL::Errors;
 
@@ -118,6 +119,12 @@ Parses the header of the HTML report, dispatching the processing of the discover
 Arguments: none
 Returns: void. Everything is set in the object.
 
+=item C<has_html>
+
+Checks if one of the sources of the boxscore is an HTML report
+Arguments: none
+Returns: True|False
+
 =item C<read_status>
 
 Reads the game status block from the game header
@@ -151,6 +158,21 @@ Arguments: the args hashref:
  * the explicit data type setting,
    optional when 'file' is specified.
 Returns: void. Updates the args hashref.
+
+=item C<set_event_extra_data>
+
+Sets extra data to already parsed events:
+
+ * The file type as event source
+ * The game_id normalized
+ * Bench player in case of bench penalty
+ * Resolves teams to standard 3-letter codes
+ * Converts time to timestamp (ts)
+ * Sets field t for primary event team:
+   0 for away, 1 for home, -1 - noplay event
+
+Arguments: none
+Returns: void. Updates the events in the object.
 
 =back
 
@@ -285,6 +307,13 @@ sub html_new ($$) {
 	$self->{type}   = $args->{type};
 	bless $self, $class;
 	$self;
+}
+
+sub has_html ($$) {
+
+	my $self = shift;
+
+	return $self->{GS} || $self->{ES} || $self->{RO} || $self->{PL};
 }
 
 sub read_status ($$$) {
@@ -632,6 +661,40 @@ sub process ($) {
 	$self->normalize();
 	$self->{html}->delete();
 	delete $self->{source};
+}
+
+sub set_event_extra_data ($) {
+
+	my $self   = shift;
+	for my $event (@{$self->{events}}) {
+		$event->{sources} = {$self->{type} => 1};
+		$event->{game_id} = delete $event->{game} if $event->{game};
+		$event->{player1} ||= $BENCH_PLAYER_ID if ($event->{penalty});
+		my $t = -1;
+#		print Dumper $event;
+		if ($event->{team1}) {
+#			print Dumper $event;
+			$event->{team1} = resolve_team($event->{team1}) if
+				$event->{team1} ne 'OTH';
+			$t =
+				$event->{team1} eq $self->{teams}[0]{name} ? 0 :
+					$event->{team1} eq $self->{teams}[1]{name} ? 1 : -1;
+#			print Dumper [
+#				$event->{description},
+#				$event->{team1},
+#				$self->{teams}[0]{name},
+#				$self->{teams}[1]{name},
+#				$t,
+#			];
+		}
+		$event->{team2} = resolve_team($event->{team2}) if $event->{team2} && $event->{team2} ne 'OTH';
+		$event->{t} = $t;
+		$event->{ts} =
+			$event->{special} ? 0 :
+				$event->{stage} == $PLAYOFF || $event->{stage} == $REGULAR && $event->{period} < 5 ?
+					($event->{period}-1) * 1200 + get_seconds($event->{time}) : 3900;
+	}
+	$self->{no_events} unless @{$self->{events}};
 }
 
 END {

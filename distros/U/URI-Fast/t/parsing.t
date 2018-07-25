@@ -22,7 +22,7 @@ is uri('http://test'), 'http://test', 'auth w/ invalid host';
 is uri('http://usr:pwd')->usr, '', 'no usr w/o @';
 is uri('http://usr:pwd')->pwd, '', 'no pwd w/o @';
 is uri('http://usr:pwd')->host, 'usr', 'host w/ invalid port';
-is uri('http://usr:pwd')->port, '', 'invalid port number ignored';
+is uri('http://usr:pwd')->port, 'pwd', 'invalid port number';
 
 is uri('#')->frag, '', 'fragment empty but starts with #';
 
@@ -74,27 +74,6 @@ subtest 'split_path' => sub{
     item 'bar';
     end;
   }, 'double internal slashes';
-};
-
-subtest 'overruns' => sub{
-   # scheme: 32
-   # path:   2048
-   # query:  2048
-   # frag:   128
-   # usr:    128
-   # pwd:    128
-   # host:   512
-   # port:   8
-   # auth:   779 = 128 (usr) + 128 (pwd) + 512 (host) + 8 (port) + 3 (separator chars)
-   ok dies{ uri(sprintf('%s://www.test.com', 'x' x 33)) }, 'scheme';
-   ok dies{ uri(sprintf('http://%s', 'x' x 780)) }, 'auth';
-   ok dies{ uri(sprintf('http://%s:foo@www.test.com', 'x' x 129)) }, 'usr';
-   ok dies{ uri(sprintf('http://someone:%s@www.test.com', 'x' x 129)) }, 'pwd';
-   ok dies{ uri(sprintf('http://%s', 'x' x 513)) }, 'host';
-   ok dies{ uri('http://www.test.com:1234567890') }, 'port';
-   ok dies{ uri(sprintf('http://www.test.com/%s', 'x' x 2049)) }, 'path';
-   ok dies{ uri(sprintf('http://www.test.com/foo/?%s', 'x' x 2049)) }, 'query';
-   ok dies{ uri(sprintf('http://www.test.com/foo#%s', 'x' x 129)) }, 'frag';
 };
 
 done_testing;

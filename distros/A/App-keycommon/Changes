@@ -1,0 +1,69 @@
+Revision history for App-keycommon
+
+0.00_12 2018-07-23
+        Option switch -c is added.
+
+0.00_11 2018-07-23
+        Option-switches -1 and -2 are added to increase the usability.
+        One point refined to enable the set union calculation as a tricky usage.
+
+0.00_10 2018-07-23
+        First version, released on an unsuspecting world.
+
+
+changeset:   1357:5a38cb7ae410
+tag:         tip
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Mon Jul 23 11:41:28 2018 +0900
+summary:     keycommon polarから改名。オプションをいくつか変更。
+
+changeset:   1070:e20037df6f6e
+user:        Toshiyuki Shimono <shimono@dglab.com>
+date:        Sun Mar 25 18:41:33 2018 +0900
+summary:     polar に keypole から名前を変えた。こちらがもっと洗練された呼び名だと考えた。
+
+changeset:   761:059dc2527df5
+parent:      759:f0f267692e6c
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Tue Oct 04 13:50:08 2016 +0900
+summary:     88個のファイルについて、先頭行の/usr/bin/env perl -T にしていた729番目のコミットを backout して、元に戻した
+
+changeset:   729:ee10a89adbe9
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Tue Aug 09 21:00:02 2016 +0900
+summary:     107個のファイルについて、1行目を書換。env と -T  を使う様にした。
+
+changeset:   660:5eead596bd84
+user:        Toshiyuki Shimono <tshimono@uhuru.jp>
+date:        Thu Jul 28 19:19:44 2016 +0900
+summary:     37個のプログラムファイルについて、ディレクトリを変更または名前の変更
+
+changeset:   428:5bb36285d56c
+user:        Toshiyuki Shimono
+date:        Wed Apr 06 18:29:22 2016 +0900
+summary:     keypole -xを-~に変更。複数のデータセットに切り替わる部分をデバグ。
+
+changeset:   414:2885767b7a8d
+date:        Fri Apr 01 09:45:26 2016 +0000
+summary:     keypole  キーの列数を指定できるようにした。
+
+changeset:   368:0f35cdadf5c0
+user:        Toshiyuki Shimono
+date:        Wed Mar 16 20:29:08 2016 +0900
+summary:     keypole.pl を keypole に改名。
+
+changeset:   362:094320c2be2e
+user:        Toshiyuki Shimono
+date:        Wed Mar 16 18:13:59 2016 +0900
+summary:     keypole.plへ keycommon.plから改名。数だけをとりだす部分をうまくなおしたい。
+
+changeset:   355:1f9d72325012
+user:        Toshiyuki Shimono
+date:        Tue Mar 15 17:31:03 2016 +0900
+summary:     機能追加とマニュアル書換 keycommon
+
+changeset:   349:7b181a49012c
+user:        Shimono Toshiyuki <tulamili@gmail.com>
+date:        Tue Mar 15 02:00:26 2016 +0900
+summary:     createed 1 file
+

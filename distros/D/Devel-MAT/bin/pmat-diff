@@ -7,11 +7,25 @@ use feature qw( say );
 use Devel::MAT;
 use List::UtilsBy qw( nsort_by );
 
-my $pmatA = Devel::MAT->load( $ARGV[0] // die "Need dumpfile A\n" );
-my $pmatB = Devel::MAT->load( $ARGV[1] // die "Need dumpfile B\n" );
+STDOUT->autoflush(1);
+
+my $progress = ( -t STDOUT ) ?
+   sub { print "\r\e[K" . ( shift // "" ); } :
+   undef;
+
+my $pmatA = Devel::MAT->load( ( $ARGV[0] // die "Need dumpfile A\n" ),
+   progress => $progress,
+);
+my $pmatB = Devel::MAT->load( ( $ARGV[1] // die "Need dumpfile B\n" ),
+   progress => $progress,
+);
+
+$progress->( "Sorting,.." ) if $progress;
 
 my @svsA = nsort_by { $_->addr } $pmatA->dumpfile->heap;
 my @svsB = nsort_by { $_->addr } $pmatB->dumpfile->heap;
+
+$progress->() if $progress;
 
 say "A\tB";
 
@@ -23,12 +37,15 @@ while( @svsA && @svsB ) {
    my $svA = $svsA[0];
    my $svB = $svsB[0];
 
-   if( $svA->addr < $svB->addr ) {
+   my $addrA = $svA->addr;
+   my $addrB = $svB->addr;
+
+   if( $addrA < $addrB ) {
       $countA++;
       say $svA->desc_addr;
       shift @svsA;
    }
-   elsif( $svB->addr < $svA->addr ) {
+   elsif( $addrB < $addrA ) {
       $countB++;
       say "\t", $svB->desc_addr;
       shift @svsB;

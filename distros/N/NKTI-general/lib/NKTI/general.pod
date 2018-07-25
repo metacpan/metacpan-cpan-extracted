@@ -1,6 +1,6 @@
 =head1 NAME
 
-NKTI::general - The Part of CellBIS The Simple Web Framework
+NKTI::general - [DEPRECATED] The Part of CellBIS The Simple Web Framework
 
 =head1 SYNOPSIS
 

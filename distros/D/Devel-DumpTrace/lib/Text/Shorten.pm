@@ -502,7 +502,7 @@ L<Dumpvalue> / C<dumpvars.pl>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Marty O'Brien.
+Copyright 2010-2017 Marty O'Brien.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

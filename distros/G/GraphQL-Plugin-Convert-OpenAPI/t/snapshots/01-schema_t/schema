@@ -41,18 +41,6 @@ input EnvironmentToolchainInput {
   value: String
 }
 
-# OpenAPI Error Object
-type Error {
-  errors: [ErrorErrors]
-}
-
-type ErrorErrors {
-  # Human readable description of the error
-  message: String!
-  # JSON pointer to the input data where the error occur
-  path: String
-}
-
 # The report grade. Pass is passing tests. Fail is failing tests. NA is the distribution cannot be used on the system. Unknown is any other problem.
 enum Grade {
   fail
@@ -95,14 +83,6 @@ input LanguageVariablesInput {
 type Mutation {
   # Submit a new report to CPAN Testers
   v3_report_post(report: NewReportInput!): AcceptedReports
-}
-
-type NewReport {
-  comments: String
-  distribution: Distribution!
-  environment: Environment!
-  reporter: Reporter!
-  result: Result!
 }
 
 input NewReportInput {

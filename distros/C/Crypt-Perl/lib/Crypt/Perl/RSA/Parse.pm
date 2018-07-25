@@ -10,10 +10,12 @@ Crypt::Perl::RSA::Parse - RSA key parsing
 
     use Crypt::Perl::RSA::Parse ();
 
-    #These accept either DER or PEM, native format or PKCS8.
-    #
+    # These accept either DER or PEM, native format or PKCS8/SPKI.
     my $prkey = Crypt::Perl::RSA::Parse::private($buffer);
     my $pbkey = Crypt::Perl::RSA::Parse::public($buffer);
+
+    # Note that this accepts a structure, not raw JSON.
+    my $key = Crypt::Perl::RSA::Parse::jwk($jwk_hr);
 
 =head1 DISCUSSION
 

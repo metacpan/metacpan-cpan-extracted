@@ -1,0 +1,26 @@
+---
+abstract: 'A Model::Envoy plugin for peristing model information in a Redis store.'
+author:
+  - 'Stephen Howard <stephen@enterity.com>'
+build_requires:
+  Test::More: '1.302085'
+configure_requires:
+  Module::Build: '0.4211'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Model-Envoy-Storage-Redis
+provides:
+  Model::Envoy::Storage::Redis:
+    file: lib/Model/Envoy/Storage/Redis.pm
+    version: v0.1.0
+requires:
+  Model::Envoy: v0.2.4
+  Moose: '2.2010'
+  MooseX::ClassAttribute: '0.29'
+  Redis::Fast: '0.21'
+  perl: v5.18.2
+version: v0.1.0

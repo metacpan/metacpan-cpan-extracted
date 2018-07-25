@@ -1,7 +1,7 @@
 use Test::More;
 
 use Time::Random qw/all/;
-
+use Time::Piece;
 use Data::Dumper;
 my $from = time() - 604800;
 
@@ -15,7 +15,7 @@ for (1..100) {
 	$unique{$random->epoch}++;
 }
 
-is (scalar keys %unique, 100, '100 unique');
+is (scalar keys %unique > 90, 1, '100 unique');
 
 my $random = time_random(
 	from => '1531922094',
@@ -37,5 +37,13 @@ my $st = time_random(
 	strftime => '%y-%m-%d %H:%M:%S'
 );
 is($okay{$st}, 1, 'expected value');
+
+my $tp = time_random(
+	from => scalar gmtime('1531922094'),
+	to => scalar gmtime('1531922097'),
+	strftime => '%y-%m-%d %H:%M:%S'
+);
+
+is($okay{$tp}, 1, 'expected value');
 
 done_testing();

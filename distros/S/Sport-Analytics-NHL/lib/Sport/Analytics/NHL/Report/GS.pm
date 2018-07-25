@@ -612,10 +612,10 @@ sub parse ($$) {
 		}
 	}
 	for my $event (@{$self->{events}}) {
-		$event->{file} = $self->{file};
-		$event->{game} = $self->{_id};
-		$event->{stage} = $self->{stage};
-		$event->{season} = $self->{season};
+		$event->{file}    = $self->{file};
+		$event->{game_id} = $self->{_id};
+		$event->{stage}   = $self->{stage};
+		$event->{season}  = $self->{season};
 	}
 	for my $t (0,1) {
 		$self->{teams}[$t]{roster} = [];

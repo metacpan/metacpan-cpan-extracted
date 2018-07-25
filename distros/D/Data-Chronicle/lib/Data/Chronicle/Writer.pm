@@ -14,7 +14,7 @@ Data::Chronicle::Writer - Provides writing to an efficient data storage for vola
 
 =cut
 
-our $VERSION = '0.17';    ## VERSION
+our $VERSION = '0.19';    ## VERSION
 
 =head1 DESCRIPTION
 
@@ -37,19 +37,20 @@ In addition to caching every incoming data, it is also stored in PostgreSQL for 
 
 =item B<Transparent>
 
-This modules hides all the details about distribution, caching, database structure and ... from developer. He only needs to call a method
+This modules hides all the internal details including distribution, caching, and database structure from the developer. He only needs to call a method
 to save data and another method to retrieve it. All the underlying complexities are handled by the module.
 
 =back
 
-=head1 Example
+=head1 EXAMPLE
 
  my $d = get_some_log_data();
 
  my $chronicle_w = Data::Chronicle::Writer->new(
-    cache_writer => $writer,
-    dbic         => $dbic,
-    ttl          => 86400);
+    cache_writer   => $writer,
+    dbic           => $dbic,
+    ttl            => 86400,
+    publish_on_set => 1);
 
  my $chronicle_r = Data::Chronicle::Reader->new(
     cache_reader => $reader,
@@ -68,18 +69,30 @@ to save data and another method to retrieve it. All the underlying complexities 
 
 =cut
 
+=head1 METHODS
+
+=head2 cache_writer
+
+cache_writer should be an instance of L<RedisDB>.
+
+=cut
+
 has 'cache_writer' => (
     is      => 'ro',
     default => undef,
 );
+
+=head2 dbic
+
+dbic should be an instance of L<DBIx::Connector>.
+
+=cut
 
 has 'dbic' => (
     isa     => 'Maybe[DBIx::Connector]',
     is      => 'ro',
     default => undef,
 );
-
-=head1 METHODS
 
 =head2 ttl
 
@@ -160,7 +173,7 @@ sub mset {
     my $suppress_pub = shift // 0;
     my $ttl          = shift // $self->ttl;
 
-    $self->_validate_value($_->[2]) foreach @$entries;
+    $self->_validate_value(@$_) foreach @$entries;
     $self->_validate_rec_date($rec_date);
 
     my $writer = $self->cache_writer;
@@ -168,11 +181,9 @@ sub mset {
     # publish & set in transaction
     $writer->multi;
     foreach my $entry (@$entries) {
-        my $category = $entry->[0];
-        my $name     = $entry->[1];
-        my $value    = $entry->[2];
+        my ($category, $name, $value) = @$entry;
 
-        my $key = $self->_generate_key($category, $name);
+        my $key = $category . '::' . $name;
 
         my $encoded = encode_json_utf8($value);
         $writer->publish($key, $encoded) if $self->publish_on_set && !$suppress_pub;
@@ -187,48 +198,9 @@ sub mset {
     return 1;
 }
 
-=head2 subscribe
-
-Example:
-
-    $chronicle_writer->subscribe("category1", "name1", $code_ref);
-
-=cut
-
-sub subscribe {
-    my ($self, $category, $name, $subref) = @_;
-    die 'publish_on_set must be enabled to subscribe' unless $self->publish_on_set;
-    die 'Subscription requires a coderef' if ref $subref ne 'CODE';
-
-    my $key = $self->_generate_key($category, $name);
-    return $self->cache_writer->subscribe($key, $subref);
-}
-
-=head2 unsubscribe
-
-Example:
-
-    $chronicle_writer->unsubscribe("category1", "name1", $code_ref);
-
-=cut
-
-sub unsubscribe {
-    my ($self, $category, $name, $subref) = @_;
-    die 'publish_on_set must be enabled to unsubscribe' unless $self->publish_on_set;
-    die 'Unsubscription requires a coderef' if ref $subref ne 'CODE';
-
-    my $key = $self->_generate_key($category, $name);
-    return $self->cache_writer->unsubscribe($key, $subref);
-}
-
-sub _generate_key {
-    my ($self, $category, $name) = @_;
-    return $category . '::' . $name;
-}
-
 sub _validate_value {
-    my ($self, $value) = @_;
-    die "Cannot store undefined values in Chronicle!" unless defined $value;
+    my ($self, $category, $name, $value) = @_;
+    die "Cannot store an undefined value for ${category}::${name} in Chronicle!" unless defined $value;
     die "You can only store hash-ref or array-ref in Chronicle!" unless (ref $value eq 'ARRAY' or ref $value eq 'HASH');
     return;
 }
@@ -306,7 +278,7 @@ L<http://cpanratings.perl.org/d/Data-Chronicle>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Data-Chronicle/>
+L<https://metacpan.org/release/Data-Chronicle/>
 
 =back
 

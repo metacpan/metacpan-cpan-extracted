@@ -46,7 +46,7 @@ use Event::Distributor::Action;
 
    $act->subscribe( sub { } );
 
-   ok( !defined eval { $act->subscribe( sub { } ); 1 },
+   ok( exception { $act->subscribe( sub { } ) },
       'Second ->subscribe fails' );
 }
 

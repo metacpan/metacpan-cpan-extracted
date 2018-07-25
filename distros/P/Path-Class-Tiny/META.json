@@ -4,7 +4,7 @@
       "Buddy Burden <barefootcoder@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "artistic_2"
    ],
@@ -27,8 +27,13 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Date::Easy" : "0.06"
+         },
          "requires" : {
             "Carp" : "0",
+            "Cwd" : "0",
+            "Date::Easy::Datetime" : "0",
             "Exporter" : "0",
             "File::Spec" : "0",
             "Module::Runtime" : "0",
@@ -40,17 +45,21 @@
       },
       "test" : {
          "requires" : {
-            "Cwd" : "0",
+            "File::Basename" : "0",
             "File::Temp" : "0",
             "Test::Differences" : "0.500",
-            "Test::Most" : "0.25"
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0.25",
+            "lib" : "0",
+            "parent" : "0"
          }
       }
    },
    "provides" : {
       "Path::Class::Tiny" : {
          "file" : "lib/Path/Class/Tiny.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -65,8 +74,7 @@
          "web" : "https://github.com/barefootcoder/path-class-tiny"
       }
    },
-   "version" : "0.03",
-   "x_generated_by_perl" : "v5.14.4",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

@@ -6,9 +6,9 @@ use File::Copy;
 use HTTP::Request::Common;
 use Plack::Test;
 use File::Tabular::Web;
-use Test::More tests => 11;
+use Test::More tests => 13;
 
-my $base_app = File::Tabular::Web->new->to_app;
+my $base_app = File::Tabular::Web->new(disclaimer => "This is free software")->to_app;
 my $url = "html/entities.ftw";
 
 test_psgi
@@ -32,11 +32,18 @@ test_psgi
     $res = $cb->(GET $url . "?S=grave");
     like $res->content, qr[<b>10</b> results found],     'search grave';
 
+
+    # results should not be persistent through several requests
+    unlike $res->content, qr[Next|Previous],             'no page links';
+
     $res = $cb->(GET $url . "?L=221"); 
     like $res->content, qr[Entity named <b>Yacute</b>],  'long';
 
     $res = $cb->(GET $url . "?M=221"); 
     like $res->content, qr[<input name="Name" value="Yacute">], 'modify';
+
+    # parameters to the initial new() should be copied to per-request instances
+    like $res->content, qr[This is free software], 'new() params';
 
     SKIP : {
       # get a fresh copy of the data file

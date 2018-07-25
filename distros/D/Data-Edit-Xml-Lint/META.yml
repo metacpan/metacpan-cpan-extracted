@@ -15,7 +15,7 @@ name: Data-Edit-Xml-Lint
 provides:
   Data::Edit::Xml::Lint:
     file: lib/Data/Edit/Xml/Lint.pm
-    version: '20180629'
+    version: '20180723'
   Data::Edit::Xml::Lint::Report:
     file: lib/Data/Edit/Xml/Lint.pm
 requires:
@@ -29,5 +29,5 @@ requires:
   Test::SharedFork: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20180629'
+version: '20180723'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-use 5.008002;
+use Canary::Stability AnyEvent::MP => 1, 5.008002;
 
 my $mm = MM->new({
     dist         => {
@@ -9,17 +9,25 @@ my $mm = MM->new({
        SUFFIX	=> '.gz',
 	            },
     NAME         => "AnyEvent::MP",
-    VERSION_FROM => "MP.pm",
+    VERSION_FROM => "MP/Config.pm",
     EXE_FILES    => ["bin/aemp"],
+    CONFIGURE_REQUIRES => { ExtUtils::MakeMaker => 6.52, Canary::Stability => 0 },
     PREREQ_PM    => {
-       AnyEvent           => 5.11,
+       AnyEvent           => 6.14,
        AnyEvent::Watchdog => 1.0,
-       Digest::MD6        => 0,
-       Digest::HMAC_MD6   => 0, # requires Module::Build, which fails on 5.8.7 :/
+       Digest::SHA3       => 0.24,
+       Digest::HMAC       => 1.03,
        MIME::Base64       => 3,
        JSON::XS           => 2.25,
-       Net::Interface     => 1.011,
+       CBOR::XS           => 1.5,
+       Guard              => 1.022,
        common::sense      => 0,
+       Task::Weaken       => 0,
+    },
+    META_MERGE => {
+        recommends => {
+           Net::Interface => 1.011,
+        }
     },
 });
 

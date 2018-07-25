@@ -42,7 +42,7 @@ Try to see $useragent's category is 'crawler' or not, by casual(fast) method. Mi
 
 # AUTHOR
 
-TAGOMORI Satoshi <tagomoris {at} gmail.com>
+TAGOMORI Satoshi &lt;tagomoris {at} gmail.com>
 
 # LICENSE
 

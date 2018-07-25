@@ -14,9 +14,15 @@ sub WINVER() {
         warn "We had an error grabbing the Win32 OS Name: $err";
     }
 
+    my $err_msg = "This version of Windows is no longer supported. See: ";
+    $err_msg .= "https://github.com/libuv/libuv/blob/v1.x/SUPPORTED_PLATFORMS.md";
+
     if ($ver =~ /^Win(?:Win32s|95|98|Me|NT4|NT3\.51|HomeSvr)/) {
-        warn "This version of Windows is really old and we can't install here";
+        warn $err_msg;
         exit(1);
+    }
+    if ($ver =~ /^Win(?:200[038]|XP\/\.NET|Vista)/) {
+        warn $err_msg. "\nBut we'll attempt a build anyway.";
     }
     return '0x0500' if $ver =~ /^Win2000/;
     return '0x0501' if $ver =~ /^WinXP\/\.Net/;
@@ -40,90 +46,100 @@ plugin 'PkgConfig' => (
 );
 
 share {
-  # note on apple weirdisms: https://github.com/joyent/libuv/issues/1200
-  meta->prop->{env}->{LIBTOOLIZE} = 'libtoolize' if $^O eq 'darwin';
+    # note on apple weirdisms: https://github.com/joyent/libuv/issues/1200
+    meta->prop->{env}->{LIBTOOLIZE} = 'libtoolize' if $^O eq 'darwin';
 
-  plugin Download => (
-    url     => 'https://dist.libuv.org/dist/v1.20.3',
-    version => qr/^libuv-v([0-9\.]+)\.tar\.gz$/,
-  );
-
-  plugin Extract => 'tar.gz';
-
-  if($^O eq 'MSWin32')
-  {
-    my $bits = $Config{archname} =~ /^MSWin32-x64/ ? 64 : 32;
-    requires 'Path::Tiny';
-    plugin 'Build::Make' => 'gmake';
-
-    meta->before_hook(
-      build => sub {
-        my($build) = @_;
-        my $prefix = $build->install_prop->{prefix};
-        $prefix =~ s{/}{\\}g;
-        meta->interpolator->add_helper(prefix_win => sub { $prefix });
-      }
+    plugin Download => (
+        url     => 'https://dist.libuv.org/dist/v1.22.0',
+        version => qr/^libuv-v([0-9\.]+)\.tar\.gz$/,
     );
 
-    meta->after_hook(gather_share => sub {
-        my $build= shift;
-        my $flags = '-DWIN32 -D_WIN32';
-        $flags .= ' -DWIN64 -D_WIN64' if $bits == 64;
-        if (my $ver = WINVER()) {
-            $flags .= " -D_WINVER=$ver -D_WIN32_WINNT=$ver"
-        }
-        $build->runtime_prop->{$_} .= " $flags" for qw( cflags cflags_static );
-        # on windows, we need the following libraries to be included. MinGW can't pull these
-        # from source on windows, so we add the equivalent to these pragma comments
-        # to our libs/libs_static area:
-        #pragma comment(lib, "Advapi32.lib")
-        #pragma comment(lib, "IPHLPAPI.lib")
-        #pragma comment(lib, "kernel32.lib")
-        #pragma comment(lib, "Psapi.lib")
-        #pragma comment(lib, "User32.lib")
-        #pragma comment(lib, "Userenv.lib")
-        #pragma comment(lib, "Ws2_32.lib")
-        $build->runtime_prop->{$_} .= ' -ladvapi32 -lIphlpapi -lkernel32 -lpsapi -luser32 -luserenv -lws2_32' for qw( libs libs_static );
-    });
+    plugin Extract => 'tar.gz';
 
-    build [
-      '%{make} -f Makefile.mingw CC=%{perl.config.cc}',
-      'mkdir %{prefix_win}\\lib',
-      'mkdir %{prefix_win}\\lib\\pkgconfig',
-      'copy libuv.a %{prefix_win}\\lib',
-      'mkdir %{prefix_win}\\include',
-      'copy include\\*.h %{prefix_win}\\include',
-      sub {
-        my($build) = @_;
-        my($pc) = Path::Tiny->new('libuv.pc.in')->slurp;
+    if($^O eq 'MSWin32') {
+        my $bits = $Config{archname} =~ /^MSWin32-x64/ ? 64 : 32;
+        requires 'Path::Tiny';
+        plugin 'Build::Make' => 'gmake';
+        plugin 'Build::CMake';
 
-        my $prefix = $build->runtime_prop->{prefix};
-        my $version = $build->runtime_prop->{version};
+        my @args = (
+            -G => '%{cmake_generator}',
+            '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true',
+            '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+            '-DCMAKE_MAKE_PROGRAM:PATH=%{make}',
+        );
 
-        $pc =~ s{\@prefix\@}{$prefix}g;
-        $pc =~ s{\@libdir\@}{$prefix/lib}g;
-        $pc =~ s{\@includedir\@}{$prefix/include}g;
-        $pc =~ s{\@PACKAGE_NAME\@}{libuv}g;
-        $pc =~ s{\@PACKAGE_VERSION\@}{$version}g;
-        $pc =~ s{\@LIBS\@}{}g;
+        meta->before_hook(build => sub {
+            my($build) = @_;
+            my $prefix = $build->install_prop->{prefix};
+            $prefix =~ s{/}{\\}g;
+            meta->interpolator->add_helper(prefix_win => sub { $prefix });
+        });
 
-        Path::Tiny->new($build->install_prop->{prefix})->child('lib/pkgconfig/libuv.pc')->spew($pc);
-      },
-    ];
-  }
-  else
-  {
-    requires 'Alien::Autotools';
-    plugin 'Build::Autoconf' => ();
+        meta->after_hook(gather_share => sub {
+            my $build= shift;
+            my $flags = '-DWIN32 -D_WIN32';
+            $flags .= ' -DWIN64 -D_WIN64' if $bits == 64;
+            if (my $ver = WINVER()) {
+                $flags .= " -D_WINVER=$ver -D_WIN32_WINNT=$ver"
+            }
+            $build->runtime_prop->{$_} .= " $flags" for qw( cflags cflags_static );
+            # on windows, we need the following libraries to be included. MinGW can't pull these
+            # from source on windows, so we add the equivalent to these pragma comments
+            # to our libs/libs_static area:
+            #pragma comment(lib, "Advapi32.lib")
+            #pragma comment(lib, "IPHLPAPI.lib")
+            #pragma comment(lib, "kernel32.lib")
+            #pragma comment(lib, "Psapi.lib")
+            #pragma comment(lib, "Shell32.lib")
+            #pragma comment(lib, "User32.lib")
+            #pragma comment(lib, "Userenv.lib")
+            #pragma comment(lib, "Ws2_32.lib")
+            $build->runtime_prop->{$_} .= ' -ladvapi32 -lIphlpapi -lkernel32 -lpsapi -lshell32 -luser32 -luserenv -lws2_32' for qw( libs libs_static );
+        });
 
-    build [
-      'sh autogen.sh',
-      '%{configure}',
-      '%{make}',
-      '%{make} test',
-      '%{make} install',
-    ];
-  }
+        build [
+            ['%{cmake}', @args, '%{.install.extract}' ],
+            ['%{make}' ],
+            'mkdir %{prefix_win}\\lib',
+            'mkdir %{prefix_win}\\lib\\pkgconfig',
+            'copy libuv_a.a %{prefix_win}\\lib\\libuv.a',
+            'copy libuv.dll %{prefix_win}\\lib',
+            'copy libuv.dll.a %{prefix_win}\\lib',
+            'mkdir %{prefix_win}\\include',
+            'mkdir %{prefix_win}\\include\\uv',
+            'copy include\\*.h %{prefix_win}\\include',
+            'copy include\\uv\\*.h %{prefix_win}\\include\\uv',
+            sub {
+                my($build) = @_;
+                my($pc) = Path::Tiny->new('libuv.pc.in')->slurp;
 
-  plugin 'Gather::IsolateDynamic' => ();
+                my $prefix = $build->runtime_prop->{prefix};
+                my $version = $build->runtime_prop->{version};
+
+                $pc =~ s{\@prefix\@}{$prefix}g;
+                $pc =~ s{\@libdir\@}{$prefix/lib}g;
+                $pc =~ s{\@includedir\@}{$prefix/include}g;
+                $pc =~ s{\@PACKAGE_NAME\@}{libuv}g;
+                $pc =~ s{\@PACKAGE_VERSION\@}{$version}g;
+                $pc =~ s{\@LIBS\@}{}g;
+
+                Path::Tiny->new($build->install_prop->{prefix})->child('lib/pkgconfig/libuv.pc')->spew($pc);
+            },
+        ];
+    }
+    else {
+        requires 'Alien::Autotools';
+        plugin 'Build::Autoconf' => ();
+
+        build [
+            'sh autogen.sh',
+            '%{configure}',
+            '%{make}',
+            '%{make} test',
+            '%{make} install',
+        ];
+    }
+
+    plugin 'Gather::IsolateDynamic' => ();
 };

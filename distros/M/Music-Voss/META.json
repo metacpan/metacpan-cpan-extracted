@@ -4,9 +4,9 @@
       "Jeremy Mates <jmates@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -34,7 +34,9 @@
             "Carp" : "0",
             "Exporter" : "0",
             "List::Util" : "1.26",
+            "Math::Trig" : "0",
             "Scalar::Util" : "0",
+            "perl" : "5.010000",
             "strict" : "0"
          }
       },
@@ -46,7 +48,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "version" : "0.08",
    "x_homepageresources" : {
       "repository" : {
          "type" : "git",
@@ -54,5 +56,5 @@
          "web" : "https://github.com/thrig/Music-Voss"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

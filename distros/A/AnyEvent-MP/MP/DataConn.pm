@@ -40,7 +40,6 @@ use AnyEvent::Util ();
 
 use AnyEvent::MP;
 use AnyEvent::MP::Kernel ();
-use AnyEvent::MP::Global ();
 
 our $ID = "a";
 our %STATE;
@@ -105,7 +104,7 @@ sub _connect {
          $host, $port,
          protocol => "aemp-dataconn",
          local_greeting => { dataconn_id => $id },
-         sub { $transport->destroy }, #TODO: destroys handshaked conenctions too early
+         sub { $transport->destroy }, #TODO: destroys handshaked connections too early
       ;
    };
 }
@@ -114,7 +113,7 @@ sub _connect {
 
 Creates a socket connection between the local node and the node C<$node>
 (which can also be specified as a port). One of the nodes must have
-listening ports ("binds").
+listeners ("binds").
 
 When the connection could be successfully created, the C<$initfunc>
 will be called with the given C<@initdata> on the remote node (similar
@@ -137,7 +136,7 @@ The timeout should be large enough to cover at least four network
 round-trips and one message round-trip.
 
 Example: on node1, establish a connection to node2 and send a line of text,
-one node2, provide a receiver function.
+on node2, provide a receiver function.
 
    # node1, code executes in some port context
    AnyEvent::MP::DataConn::connect_to "node2", 5, "pkg::receiver", 1, sub {

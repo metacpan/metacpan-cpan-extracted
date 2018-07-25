@@ -67,11 +67,10 @@ software is currently being "dogfooded" on an experimental branch of the
 author's own essay blog.
 
 Further, the parser implementation is incomplete. The HTML and JSON
-documents found in t/microformats-v2 include the full Microformats2
+documents found in t/microformats-v2 are based on the full Microformats2
 parser test suite found at [https://github.com/microformats/tests](https://github.com/microformats/tests), as
-of early April, 2018. The parser-test program in t/parser.pl marks a
-great deal of these tests as TODO. (But fewer than half of them, for all
-that, so hey.)
+of mid-2018, and this library currently passes around 80 percent of
+them.
 
 # ABOUT MICROFORMATS2
 
@@ -126,3 +125,33 @@ This software is Copyright (c) 2018 by Jason McIntosh.
 This is free software, licensed under:
 
     The MIT (X11) License
+
+# A PERSONAL REQUEST
+
+My ability to share and maintain free, open-source software like this
+depends upon my living in a society that allows me the free time and
+personal liberty to create work benefiting people other than just myself
+or my immediate family. I recognize that I got a head start on this due
+to an accident of birth, and I strive to convert some of my unclaimed
+time and attention into work that, I hope, gives back to society in some
+small way.
+
+Worryingly, I find myself today living in a country experiencing a
+profound and unwelcome political upheaval, with its already flawed
+democracy under grave threat from powerful authoritarian elements. These
+powers wish to undermine this society, remolding it according to their
+deeply cynical and strictly zero-sum philosophies, where nobody can gain
+without someone else losing.
+
+Free and open-source software has no place in such a world. As such,
+these autocrats' further ascension would have a deleterious effect on my
+ability to continue working for the public good.
+
+Therefore, if you would like to financially support my work, I would ask
+you to consider a donation to one of the following causes. It would mean
+a lot to me if you did. (You can tell me about it if you'd like to, but
+you don't have to.)
+
+- [The American Civil Liberties Union](https://aclu.org)
+- [The Democratic National Committee](https://democrats.org)
+- [Earthjustice](https://earthjustice.org)

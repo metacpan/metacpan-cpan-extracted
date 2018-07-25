@@ -20,7 +20,7 @@ git-tag-grep - grep tags
 
 =head1 VERSION
 
-This documentation refers to git-tag-grep version 1.0.6
+This documentation refers to git-tag-grep version 1.0.7
 
 =head1 SYNOPSIS
 

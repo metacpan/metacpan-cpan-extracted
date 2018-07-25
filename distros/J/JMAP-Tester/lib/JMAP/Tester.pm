@@ -3,7 +3,7 @@ use warnings;
 
 package JMAP::Tester;
 # ABSTRACT: a JMAP client made for testing JMAP servers
-$JMAP::Tester::VERSION = '0.019';
+$JMAP::Tester::VERSION = '0.020';
 use Moo;
 
 use Crypt::Misc qw(decode_b64u encode_b64u);
@@ -428,10 +428,12 @@ sub upload {
 #pod
 #pod   blobId    - the blob to download (no default)
 #pod   accountId - the account for which we're downloading (no default)
+#pod   type      - the content-type we want the server to provide back (no default)
 #pod   name      - the name we want the server to provide back (default: "download")
 #pod
-#pod If the download URI template has a C<blobId> or C<accountId> placeholder but no
-#pod argument for that is given to C<download>, an exception will be thrown.
+#pod If the download URI template has a C<blobId>, C<accountId>, or C<type>
+#pod placeholder but no argument for that is given to C<download>, an exception
+#pod will be thrown.
 #pod
 #pod The return value will either be a L<failure
 #pod object|JMAP::Tester::Result::Failure> or an L<upload
@@ -447,7 +449,7 @@ sub download_uri_for {
   Carp::confess("can't compute download URI without configured download_uri")
     unless my $uri = $self->download_uri;
 
-  for my $param (qw(blobId accountId name)) {
+  for my $param (qw(blobId accountId name type)) {
     next unless $uri =~ /\{$param\}/;
     my $value = $arg->{ $param } // $DL_DEFAULT{ $param };
 
@@ -788,7 +790,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 OVERVIEW
 
@@ -909,10 +911,12 @@ Valid arguments are:
 
   blobId    - the blob to download (no default)
   accountId - the account for which we're downloading (no default)
+  type      - the content-type we want the server to provide back (no default)
   name      - the name we want the server to provide back (default: "download")
 
-If the download URI template has a C<blobId> or C<accountId> placeholder but no
-argument for that is given to C<download>, an exception will be thrown.
+If the download URI template has a C<blobId>, C<accountId>, or C<type>
+placeholder but no argument for that is given to C<download>, an exception
+will be thrown.
 
 The return value will either be a L<failure
 object|JMAP::Tester::Result::Failure> or an L<upload
@@ -951,7 +955,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alfie John Matthew Horsfall
+=for stopwords Alfie John Matthew Horsfall Michael McClimon
 
 =over 4
 
@@ -962,6 +966,10 @@ Alfie John <alfiej@fastmail.fm>
 =item *
 
 Matthew Horsfall <wolfsage@gmail.com>
+
+=item *
+
+Michael McClimon <michael@mcclimon.org>
 
 =back
 

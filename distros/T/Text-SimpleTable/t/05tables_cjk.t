@@ -6,7 +6,15 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 2;
+use Test::More;
+
+eval "use Unicode::GCString";
+if ($@) {
+    plan skip_all => "These tests require Unicode::GCString";
+}
+else {
+   plan tests => 2;
+}
 
 binmode STDERR, ":utf8";
 binmode STDOUT, ":utf8";

@@ -4,7 +4,7 @@ Plack::Middleware::XSRFBlock - Block XSRF Attacks with minimal changes to your a
 
 # VERSION
 
-version 0.0.12
+version 0.0.15
 
 # SYNOPSIS
 
@@ -32,6 +32,8 @@ You may also over-ride any, or all of these values:
             inject_form_input       => 1,
             header_name             => undef,
             secret                  => undef,
+            http_method_regex       => qr{^post$}i,
+            contents_to_filter_regex => qr{^(text/html|application/xhtml(?:\+xml)?)\b}i,
             blocked                 => sub {
                                         return [ $status, $headers, $body ]
                                     },
@@ -81,6 +83,15 @@ modifications to your application.
     double-submit issues.
 
     If this is a coderef, the coderef will be evaluated with the following arguments:
+
+- http\_method\_regex (default: qr{^post$}i)
+
+    Which HTTP methods to check. Can be useful to also handle PUT, DELETE,
+    PATCH, and the like.
+
+- contents\_to\_filter\_regex default: qr{^(text/html|application/xhtml(?:\\+xml)?)\\b}i)
+
+    Only modify &lt;form> elements in responses whose content type matches this regex
 
     - The middleware object itself,
     - The request,
@@ -157,17 +168,59 @@ messages will be of the form `XSRF detected [reason]`
 
 ## detect\_xsrf($self, $request, $env)
 
-## cookie\_handler($self, $request, $env, $res)
+returns a message explaining the XSRF-related problem, or `undef` if
+there's no problem
+
+## should\_be\_filtered($self, $request, $env, $res)
+
+returns true if the response should be filtered by this middleware
+(currently, if its content-type matches `contents_to_filter_regex`)
+
+## generate\_token($self, $request, $env, $res)
+
+returns the token value to use for this response.  Gets the token value from:
+
+- the cookie value, if it's already set
+- from the generator, if the cookie is not set, or if we want a
+different token for each request
+
+## cookie\_handler($self, $request, $env, $res, $token)
+
+sets the given token as a cookie in the response
 
 ## filter\_response\_html($self, $request, $env, $res, $token)
 
+Filters the response, injecting `<input>` elements with the token
+value into all forms whose method matches `http_method_regex`.
+
+Streaming responses are still streaming after the filtering.
+
 ## filter\_response($self, $request, $env)
+
+Calls the application, and (if the response ["`should_be_filtered`"](#should_be_filtered)), it injects the token in the cookie and (if ["`inject_form_input`"](#inject_form_input)) the forms.
 
 ## invalid\_signature($self, $value)
 
+Returns true if the value is not correctly signed. If we're not
+signing tokens, this method always returns false.
+
 ## xsrf\_detected($self, $args)
 
+Invoked when the XSRF is detected. Calls the ["`blocked`"](#blocked)
+coderef if we have it, or returns a 403.
+
+The `blocked` coderef is invoked like:
+
+    $self->blocked->($env,$msg, app => $self->app);
+
+- the original request PSGI environment
+- the error message (from ["`detect_xsrf`"](#detect_xsrf))
+- a hash, currently `app => $self->app`, so you can call the
+original application
+
 ## log($self, $level, $msg)
+
+log through the PSGI logger, if defined
 
 # EXPLANATION
 
@@ -236,7 +289,7 @@ to force into the existing module.
 
 ## BUILD STATUS
 
-[![Build status](https://badge.buildkite.com/330e67514dd501f1827bcf33db423ccadf201caf5b2b563fbf.svg)](https://buildkite.com/chizography/plack-middleware-xsrfblock)
+[![Build Status](https://travis-ci.org/chiselwright/plack-middleware-xsrfblock.svg?branch=master)](https://travis-ci.org/chiselwright/plack-middleware-xsrfblock)
 
 # AUTHOR
 
@@ -253,6 +306,7 @@ the same terms as the Perl 5 programming language system itself.
 
 - Chisel <chisel.wright@net-a-porter.com>
 - Daniel Perrett <dp13@sanger.ac.uk>
+- Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>
 - Karen Etheridge <ether@cpan.org>
 - Matthew Ryall <matt.ryall@gmail.com>
 - Matthias Zeichmann <matthias.zeichmann@gmail.com>

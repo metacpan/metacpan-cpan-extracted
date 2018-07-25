@@ -219,6 +219,22 @@ Tests teams that played in the game
 
 Tests the time to be of format M{1,3}:SS
 
+=item C<test_merged_boxscore>
+
+Tests the boxscore after it was merged with other files (e.g. via Sport::Analytics::NHL::Merger). Test options are set according to the types of reports that have been merged ($boxscore->{sources})
+
+=item C<test_merged_events>
+
+Tests the events of the merged boxscore
+
+=item C<test_merged_header>
+
+Tests the header of the merged boxscore
+
+=item C<test_merged_teams>
+
+Tests the teams of the merged boxscore
+
 =back
 
 =cut
@@ -226,11 +242,12 @@ Tests the time to be of format M{1,3}:SS
 our $TEST_COUNTER = {Curr_Test => 0, Test_Results => []};
 
 our @EXPORT = qw(
-	my_like my_ok my_is
+	my_like my_ok my_is is_noplay_event
 	test_game_id test_team_id test_team_code
 	test_stage test_season test_season_id
 	test_ts test_game_date
-	test_header test_periods test_officials test_teams test_events test_boxscore
+	test_header test_periods test_officials test_teams test_events
+	test_boxscore test_merged_boxscore
 	$TEST_COUNTER
 	$EVENT $BOXSCORE $PLAYER $TEAM
 );
@@ -477,6 +494,7 @@ sub set_tested_stats ($$) {
 	my $opts   = shift || {};
 
 	my @stats;
+	return () if $player->{missing};
 	if ($opts->{gs}) {
 		@stats = $player->{old} ?
 			qw(timeOnIce shots saves goals) :
@@ -492,6 +510,7 @@ sub set_tested_stats ($$) {
 		@stats = $player->{position} eq 'G' ?
 			qw(pim evenShotsAgainst shots timeOnIce shortHandedShotsAgainst assists shortHandedSaves powerPlayShotsAgainst powerPlaySaves evenSaves number saves goals) :
 			qw(penaltyMinutes shortHandedAssists goals evenTimeOnIce takeaways blocked assists hits powerPlayTimeOnIce plusMinus powerPlayGoals giveaways faceoffTaken faceOffWins shortHandedGoals powerPlayAssists number timeOnIce shots shortHandedTimeOnIce);
+		$stats[0] = 'penaltyMinutes' if $opts->{merged};
 	}
 	@stats;
 }
@@ -648,9 +667,9 @@ sub test_goal ($$) {
 		$opts->{pb} || $opts->{pl} || $event->{so}
 		|| $BROKEN_FILES{BS}->{$BOXSCORE->{_id}}
 	) {
-		my_like($event->{en}, qr/^0|1$/, 'en definition');
+		my_like($event->{en}, qr/^0|1$/, 'en definition') if $event->{sources}{BS} || $event->{sources}{GS};
 		my_like($event->{gwg}, qr/^0|1$/, 'gwg definition')
-			unless $opts->{bh} || $opts->{gs};
+			if $opts->{bs};# $opts->{bh} || $opts->{gs};
 	}
 }
 
@@ -661,7 +680,7 @@ sub test_penalty ($$) {
 		my_like(
 			$event->{severity},
 			qr/^major|misconduct|minor|game|match|double|shot$/i, 'severity defined'
-		) unless is_unapplicable('severity')
+		) unless ! defined $event->{severity} || is_unapplicable('severity')
 			|| $opts->{bh}
 			|| $opts->{gs}
 			|| $opts->{pl}
@@ -750,10 +769,22 @@ sub test_events ($;$) {
 
 	my $event_n = scalar @{$events};
 
+#  	if (! @{$events}){
+#  		if ($BOXSCORE->{season} < 1999) {
+#  			printf "\t%d => { BS => \$NO_EVENTS },\n", $BOXSCORE->{_id};
+#  			return;
+#  		}
+#  		else {
+# # #			print Dumper \%BROKEN_FILES;
+#  			exit;
+#  		}
+	#  	}
+#	print Dumper $BOXSCORE;
 	my_ok($event_n >= $REASONABLE_EVENTS{
 		$BOXSCORE->{season} < 2010 ? 'old' : 'new'
 	}, "enough events($event_n) read")
-		unless ($opts->{bs} && $BROKEN_FILES{$BOXSCORE->{_id}}{BS})
+		unless $BROKEN_FILES{$BOXSCORE->{_id}}{BS}
+		&& (!$BOXSCORE->{sources}{GS} && !$BOXSCORE->{sources}{PL}) 
 			|| $opts->{bh} || $opts->{gs};
 	for my $event (@{$events}) {
 		test_event($event, $opts);
@@ -777,6 +808,45 @@ sub test_boxscore ($;$) {
 	undef $BOXSCORE;
 	undef $PLAYER;
 	undef $EVENT;
+}
+
+sub test_merged_header ($) {
+
+	my $bs = shift;
+	test_header($bs);
+
+	my_like($bs->{attendance}, qr/^\d+$/, 'attendance set')
+		if $BOXSCORE->has_html() || ! is_unapplicable('attendance');
+	my_like($bs->{tz}, qr/^\w{1,2}T$/, 'tz ok') if $bs->has_html();
+	my_like($bs->{month}, qr/^(0|1)?\d?/, 'month ok');
+}
+
+sub test_merged_teams ($) {
+
+	my $teams = shift;
+	my $opts = {merged => 1};
+	test_teams($teams, $opts);
+}
+
+sub test_merged_events ($) {
+
+	my $events = shift;
+	my $opts = {merged => 1};
+
+	test_events($events, $opts);
+}
+
+sub test_merged_boxscore ($) {
+
+	my $boxscore = shift;
+	$BOXSCORE = $boxscore;
+	test_merged_header($boxscore);
+	test_merged_teams($boxscore->{teams});
+	test_periods($boxscore->{periods});
+	test_merged_events($boxscore->{events});
+	undef $BOXSCORE;
+	undef $EVENT;
+	undef $PLAYER;
 }
 
 END {

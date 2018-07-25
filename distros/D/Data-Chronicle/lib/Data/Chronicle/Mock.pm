@@ -16,7 +16,13 @@ use Test::Mock::Redis;
 use Data::Chronicle::Reader;
 use Data::Chronicle::Writer;
 
-our $VERSION = '0.17';    ## VERSION
+# This is to resolve a compatibility issue between Test::Mock::Redis (where mget returns an array)
+#   and RedisDB (where mget returns an arrayref).
+use Test::MockModule;
+my $mocked_mock_redis = Test::MockModule->new('Test::Mock::Redis');
+$mocked_mock_redis->mock('mget', sub { return [$mocked_mock_redis->original('mget')->(@_)] });
+
+our $VERSION = '0.19';    ## VERSION
 
 =head3 C<< my $ch = get_mocked_chronicle(); >>
 

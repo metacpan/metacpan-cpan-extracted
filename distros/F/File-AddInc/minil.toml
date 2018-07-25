@@ -1,0 +1,13 @@
+name = "File-AddInc"
+# badges = ["travis"]
+authority="cpan:HKOBA"
+
+module_maker="ModuleBuildTiny"
+
+readme_from="lib/File/AddInc.pod"
+abstract_from="lib/File/AddInc.pod"
+authors_from="lib/File/AddInc.pod"
+
+static_install = "auto"
+
+badges = ['travis', 'metacpan']

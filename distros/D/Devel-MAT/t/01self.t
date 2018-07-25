@@ -29,6 +29,7 @@ BEGIN { our $PACKAGE_SCALAR = "some value" }
    ok( my $sv = $gv->scalar, 'PACKAGE_SCALAR GV has SCALAR' );
 
    is( $sv->symname, '$main::PACKAGE_SCALAR', 'PACKAGE_SCALAR SV has a name' );
+   is( $sv->basetype, 'SV', 'SV base type' );
 
    identical( $pmat->find_symbol( '$PACKAGE_SCALAR' ), $sv,
       '$pmat->find_symbol $PACKAGE_SCALAR' );
@@ -48,6 +49,7 @@ BEGIN { our @PACKAGE_ARRAY = qw( A B C ) }
    ok( my $av = $gv->array, 'PACKAGE_ARRAY GV has ARRAY' );
 
    is( $av->symname, '@main::PACKAGE_ARRAY', 'PACKAGE_ARRAY AV has a name' );
+   is( $av->basetype, 'AV', 'AV base type' );
 
    identical( $pmat->find_symbol( '@PACKAGE_ARRAY' ), $av,
       '$pmat->find_symbol @PACKAGE_ARRAY' );
@@ -60,7 +62,9 @@ BEGIN { our %PACKAGE_HASH = ( one => 1, two => 2 ) }
    ok( my $gv = $defstash->value( "PACKAGE_HASH" ), 'default stash hash PACKAGE_HASH GV' );
    ok( my $hv = $gv->hash, 'PACKAGE_HASH GV has HASH' );
 
+   is( $gv->basetype, 'GV', 'GV base type' );
    is( $hv->symname, '%main::PACKAGE_HASH', 'PACKAGE_HASH hv has a name' );
+   is( $hv->basetype, 'HV', 'HV base type' );
 
    identical( $pmat->find_symbol( '%PACKAGE_HASH' ), $hv,
       '$pmat->find_symbol %PACKAGE_HASH' );
@@ -78,6 +82,7 @@ sub PACKAGE_CODE { my $lexvar = "An unlikely scalar value"; }
    ok( my $cv = $defstash->value_code( "PACKAGE_CODE" ), 'default stash has PACKAGE_CODE CV' );
 
    is( $cv->symname, '&main::PACKAGE_CODE', 'PACKAGE_CODE CV has a name' );
+   is( $cv->basetype, 'CV', 'CV base type' );
 
    is( $cv->depth, 0, 'PACKAGE_CODE CV currently has depth 0' );
 

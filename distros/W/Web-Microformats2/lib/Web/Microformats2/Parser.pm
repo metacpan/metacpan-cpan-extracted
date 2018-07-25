@@ -187,7 +187,7 @@ sub analyze_element {
                 my $vcp_fragments_ref =
                     $self->_seek_value_class_pattern( $element );
                 if ( @$vcp_fragments_ref ) {
-                    $dt_string = join q{}, @$vcp_fragments_ref;
+                    $dt_string = $self->_format_datetime(join q{T}, @$vcp_fragments_ref);
                 }
                 elsif ( my $alt = $element->findvalue( './@datetime|@title|@value' ) ) {
                     $dt_string = $alt;
@@ -196,17 +196,9 @@ sub analyze_element {
                     $dt_string = $text;
                 }
                 if ( defined $dt_string ) {
-                    my $dt;
-                    eval {
-                    $dt = DateTime::Format::ISO8601->new
-                              ->parse_datetime( $dt_string );
-                    };
-                    next if $@;
-                    # XXX Needs to check for & set timezone offset
-                    my $format = '%Y-%m-%d %H:%M:%S';
                     $current_item->add_property(
                         "dt-$property",
-                        $dt->strftime( $format ),
+                        $dt_string,
                     );
                 }
             }
@@ -520,6 +512,9 @@ sub _seek_value_class_pattern {
         if ( $1 ) {
             push @$vcp_fragments_ref, $element->attr( 'title' );
         }
+        elsif ( ( $element->tag =~ /^(del|ins|time)$/ ) && defined( $element->attr('datetime'))) {
+            push @$vcp_fragments_ref, $element->attr('datetime');
+        }
         else {
             my $html;
             for my $content_piece ( $element->content_list ) {
@@ -549,6 +544,79 @@ sub _trim {
     $string =~ s/^\s+//;
     $string =~ s/\s+$//;
     return $string;
+}
+
+sub _format_datetime {
+    my ($self, $dt_string) = @_;
+
+    my $dt;
+
+    # Knock off leading/trailing whitespace.
+    $dt_string = _trim($dt_string);
+
+    $dt_string =~ s/t/T/;
+
+    # XXX Will have to come back to this...
+    $dt_string =~ s/((?:a|p)\.?m\.?)//i;
+    my $am_or_pm = $1 || '';
+
+    # Store the provided TZ offset.
+    my ($provided_offset) = $dt_string =~ /([\-\+Z](?:\d\d:?\d\d)?)$/;
+    $provided_offset ||= '';
+
+    # Reformat HHMM offset as HH:MM.
+    $dt_string =~ s/(-|\+)(\d\d)(\d\d)/$1$2:$3/;
+
+    # Store the provided seconds.
+    my ($seconds) = $dt_string =~ /\d\d:\d\d:(\d\d)/;
+    $seconds = '' unless defined $seconds;
+
+    # Insert :00 seconds on time when paired with a TZ offset.
+    $dt_string =~ s/T(\d\d:\d\d)([\-\+Z])/T$1:00$2/;
+    $dt_string =~ s/^(\d\d:\d\d)([\-\+Z])/$1:00$2/;
+
+    # Zero-pad hours when only a single-digit hour appears.
+    $dt_string =~ s/T(\d)$/T0$1/;
+    $dt_string =~ s/T(\d):/T0$1:/;
+
+    # Insert :00 minutes on time when only an hour is listed.
+    $dt_string =~ s/T(\d\d)$/T$1:00/;
+
+    # Treat a space separator between date & time as a 'T'.
+    $dt_string =~ s/ /T/;
+
+    eval {
+    $dt = DateTime::Format::ISO8601->new
+              ->parse_datetime( $dt_string );
+    };
+
+    return if $@;
+
+    if ($am_or_pm =~ /^[pP]/) {
+        # There was a 'pm' specified, so add 12 hours.
+        $dt->add( hours => 12 );
+    }
+
+    my $format;
+    if ( ($dt_string =~ /-/) && ($dt_string =~ /[ T]/) ) {
+        my $offset;
+        if ($provided_offset eq 'Z') {
+            $offset = 'Z';
+        }
+        elsif ($provided_offset) {
+            $offset = '%z';
+        }
+        else {
+            $offset = '';
+        }
+        $seconds = ":$seconds" if length $seconds;
+        $format = "%Y-%m-%d %H:%M$seconds$offset";
+    }
+    elsif ( $dt_string =~ /-/ ) {
+        $format = '%Y-%m-%d';
+    }
+
+    return $dt->strftime( $format );
 }
 
 1;

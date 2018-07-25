@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000405';
+our $VERSION='1.0000406';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -2513,7 +2513,8 @@ require Term::Menus;
 require Term::ReadKey;
 require Term::RawInput;
 my $last_known_good_location=
-      "http://download.oracle.com/berkeley-db/db-5.2.28.tar.gz";
+#      "http://download.oracle.com/berkeley-db/db-5.2.28.tar.gz";
+      "http://download.oracle.com/berkeley-db/db-6.2.32.tar.gz";
 
 my $process_id='';my $PREFIX='';
 $process_id=pop @ARGV if $ARGV[$#ARGV-1]=~/^\d+$/;
@@ -4617,12 +4618,16 @@ END
                         $res->message,
                      );
                      if (!$end_flag && ($status_line eq '404')) {
+                        unlink $filename;
                         $source=$last_known_good_location;
                         $end_flag=1;my $rt=qr/b.*?\d.tar.gz/;
                         my $h=qr/http:\/\/$site\//;
                         $source=~s/^.*?($h)(?:otn\/)*($rt).*$/$1$2/s;
                         $file=$2;
+                        ($suffix=$file)=~s/^.*(([.]NC)*.tar.gz)$/$1/;
+                        $BDB_selection='Encrypted' if $1;
                         $file=substr($file,(index $file,'/')+1,-7);
+                        ($fh,$filename)=get_temp_file($file,$suffix);
                         $ver=$file;
                         $ver=~s/_.*$//;
                         $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
@@ -4662,12 +4667,16 @@ END
                         $res->message,
                      );
                      if (!$end_flag && ($status_line eq '404')) {
+                        unlink $filename;
                         $source=$last_known_good_location;
                         $end_flag=1;my $rt=qr/b.*?\d.tar.gz/;
                         my $h=qr/http:\/\/$site\//;
                         $source=~s/^.*?($h)(?:otn\/)*($rt).*$/$1$2/s;
                         $file=$2;
+                        ($suffix=$file)=~s/^.*(([.]NC)*.tar.gz)$/$1/;
+                        $BDB_selection='Encrypted' if $1;
                         $file=substr($file,(index $file,'/')+1,-7);
+                        ($fh,$filename)=get_temp_file($file,$suffix);
                         $ver=$file;
                         $ver=~s/_.*$//;
                         $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
@@ -4771,7 +4780,7 @@ END
             fa_system($CPAN::Config->{tar}." xvf $filename");
          }
          my $uniq='';
-         if ($BDB_selection eq 'Encrypted') {
+         if ($BDB_selection eq 'Encrypted' || -1==index $filename,'.NC.') {
             $filename=~/^.*(......).tar$/;
             $uniq=$1;
             $filename=~s/........tar$//;
@@ -4782,6 +4791,12 @@ END
             $filename=~s/........NC.tar$//;
             `mv -f $filename.NC $filename.NC_$uniq`;
          }
+         my $ver=$file;
+         $ver=~s/_.*$//;
+         $ver=~s/^.*db-(\d+[.]\d+).*$/$1/;
+         my $timeout=120;my $a='';my $w="      ";
+         my $pre="/usr/local/BerkeleyDB.$ver";
+         $pre=$PREFIX."BerkeleyDB$ver" if $PREFIX;
          build_berkeleydb($filename,$uniq,$pre,$PREFIX,$BDB_selection);
       } else {
          if ($res->is_error(500)) {

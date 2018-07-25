@@ -72,6 +72,12 @@ Returns: void.
  Arguments: the MM:SS string
  Returns: the number of seconds
 
+=item C<my_uniq>
+
+An expansion of List::MoreUtils::uniq function that filters the items not only by their value, but by applying a function to that value. Effectively:
+
+ uniq @list == my_uniq { $_ } @list
+
 =back
 
 =cut
@@ -81,6 +87,7 @@ our @EXPORT = qw(
 	read_file write_file
 	fill_broken
 	get_seconds
+	my_uniq
 );
 
 sub debug ($) {
@@ -153,9 +160,12 @@ sub fill_broken($$;$) {
 	my $broken = shift;
 
 	return unless $broken;
+#	print Dumper $item, $broken;
 	for my $field (keys %{$broken}) {
 		$item->{$field} = $broken->{$field};
 	}
+#	print Dumper $item, $broken;
+#	exit;
 }
 
 sub get_seconds ($) {
@@ -171,6 +181,12 @@ sub get_seconds ($) {
 	$1*60 + $2;
 }
 
+sub my_uniq (&@) {
+
+	my $func = shift;
+	my %seen = ();
+	grep {! $seen{$func->($_)}++} @_;
+}
 
 =head1 AUTHOR
 

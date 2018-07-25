@@ -20,6 +20,8 @@ use Carp ();
 use AnyEvent ();
 use JSON::XS ();
 
+our $VERSION = '2.01';
+
 our $CONFIG_FILE = exists $ENV{PERL_ANYEVENT_MP_RC} ? $ENV{PERL_ANYEVENT_MP_RC}
                    : exists $ENV{HOME}              ? "$ENV{HOME}/.perl-anyevent-mp"
                    :                                  "$ENV{APPDATA}/perl-anyevent-mp";
@@ -77,15 +79,27 @@ sub _find_profile($) {
 sub find_profile($;%) {
    my ($name, %kv) = @_;
 
-   +{
+   my $norc  = delete $kv{norc};
+   my $force = delete $kv{force};
+
+   %kv = (
       monitor_timeout  => 30,
       connect_interval => 2,
-      framing_format   => [qw(json storable)], # framing types we offer and accept, in order of preference
-      auth_offer       => [qw(tls_md6_64_256 hmac_md6_64_256)], # what we will send
-      auth_accept      => [qw(tls_md6_64_256 hmac_md6_64_256 tls_anon cleartext)], # what we accept
+      framing_format   => [qw(cbor json storable)], # framing types we offer and accept, in order of preference
+      auth_offer       => [qw(tls_sha3_512 hmac_sha3_512)], # what we will send
+      auth_accept      => [qw(tls_sha3_512 hmac_sha3_512 tls_anon cleartext)], # what we accept
       %kv,
-      _find_profile $name,
+   );
+
+   unless ($norc) {
+      if ($force) {
+         %kv = (_find_profile $name, %kv);
+      } else {
+         %kv = (%kv, _find_profile $name);
+      }
    }
+
+   \%kv
 }
 
 load;

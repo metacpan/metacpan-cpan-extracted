@@ -1,4 +1,5 @@
-use Test2::Bundle::Extended;
+use Test2::V0;
+use Ion::Test;
 use Coro;
 use Coro::AnyEvent;
 use Storable qw(freeze thaw);
@@ -21,7 +22,7 @@ my $server = Service{ $request = $_[0] }
   >> sub{ freeze(shift) } >> sub{ encode_base64(shift, '') }
   << sub{ decode_base64(shift) } << sub{ thaw(shift) };
 
-my $client = Connect($server->host, $server->port);
+my $client = Connect('localhost', $server->port);
 $client >>= sub{ freeze(shift) };
 $client >>= sub{ encode_base64(shift, '') };
 $client <<= sub{ decode_base64(shift) };

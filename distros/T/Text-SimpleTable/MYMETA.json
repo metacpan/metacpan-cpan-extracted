@@ -1,0 +1,60 @@
+{
+   "abstract" : "Simple eyecandy ASCII tables",
+   "author" : [
+      "Sebastian Riedel <sri@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-SimpleTable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Text::VisualWidth::PP" : "0",
+            "Text::VisualWidth::UTF8" : "0",
+            "Unicode::LineBreak" : "0"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/marcusramberg/text-simpletable.git",
+         "web" : "http://github.com/marcusramberg/text-simpletable"
+      }
+   },
+   "version" : "2.07",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

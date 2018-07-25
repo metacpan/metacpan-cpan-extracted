@@ -2,16 +2,43 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::InstallGuide;
-
+package Dist::Zilla::Plugin::InstallGuide; # git description: v1.200010-1-g506c085
 # ABSTRACT: Build an INSTALL file
-our $VERSION = '1.200009'; # VERSION
+
+our $VERSION = '1.200011';
+
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
 with 'Dist::Zilla::Role::TextTemplate';
 with 'Dist::Zilla::Role::FileMunger';
-use List::Util 'first';
+use List::Util 1.33 qw(first any);
+use namespace::autoclean;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod In C<dist.ini>:
+#pod
+#pod     [InstallGuide]
+#pod
+#pod =begin :prelude
+#pod
+#pod =for test_synopsis BEGIN { die "SKIP: synopsis isn't perl code" }
+#pod
+#pod =end :prelude
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This plugin adds a very simple F<INSTALL> file to the distribution, telling
+#pod the user how to install this distribution.
+#pod
+#pod You should use this plugin in your L<Dist::Zilla> configuration after
+#pod C<[MakeMaker]> or C<[ModuleBuild]> so that it can determine what kind of
+#pod distribution you are building and which installation instructions are
+#pod appropriate.
+#pod
+#pod =head1 METHODS
+#pod
+#pod =cut
 
 has template => (is => 'ro', isa => 'Str', default => <<'END_TEXT');
 This is the Perl distribution {{ $dist->name }}.
@@ -38,10 +65,18 @@ Alternatively, if your CPAN shell is set up, you should just be able to do:
 ## Manual installation
 
 {{ $manual_installation }}
-
 The prerequisites of this distribution will also have to be installed manually. The
 prerequisites are listed in one of the files: `MYMETA.yml` or `MYMETA.json` generated
 by running the manual build process described above.
+
+## Configure Prerequisites
+
+This distribution requires other modules to be installed before this
+distribution's installer can be run.  They can be found under the
+{{ join(" or the\n",
+    $has_meta_yml ? '"configure_requires" key of META.yml' : '',
+    $has_meta_json ? '"{prereqs}{configure}{requires}" key of META.json' : '',
+)}}.
 
 ## Documentation
 
@@ -49,12 +84,20 @@ by running the manual build process described above.
 You can run `perldoc` from a shell to read the documentation:
 
     % perldoc {{ $package }}
+
+For more information on installing Perl modules via CPAN, please see:
+https://www.cpan.org/modules/INSTALL.html
 END_TEXT
 
-has makemaker_manual_installation => (is => 'ro', isa => 'Str', default => <<'END_TEXT');
+our $common_instructions = <<'END_TEXT';
 As a last resort, you can manually install it. Download the tarball, untar it,
-then build it:
+install configure prerequisites (see below), then build it:
 
+END_TEXT
+
+has makemaker_manual_installation => (
+    is => 'ro', isa => 'Str',
+    default => $common_instructions . <<'END_TEXT',
     % perl Makefile.PL
     % make && make test
 
@@ -68,11 +111,11 @@ If your perl is system-managed, you can create a local::lib in your home
 directory to install modules to. For details, see the local::lib documentation:
 https://metacpan.org/pod/local::lib
 END_TEXT
+);
 
-has module_build_manual_installation => (is => 'ro', isa => 'Str', default => <<'END_TEXT');
-As a last resort, you can manually install it. Download the tarball, untar it,
-then build it:
-
+has module_build_manual_installation => (
+    is => 'ro', isa => 'Str',
+    default => $common_instructions . <<'END_TEXT',
     % perl Build.PL
     % ./Build && ./Build test
 
@@ -91,28 +134,32 @@ If your perl is system-managed, you can create a local::lib in your home
 directory to install modules to. For details, see the local::lib documentation:
 https://metacpan.org/pod/local::lib
 END_TEXT
+);
 
-has cpan_reference => (is => 'ro', isa => 'Str', default => <<END_TEXT);
-For more information on installing Perl modules via CPAN, please see:
-https://www.cpan.org/modules/INSTALL.html
-END_TEXT
-
+#pod =head2 gather_files
+#pod
+#pod Creates the F<INSTALL> file.
+#pod
+#pod =cut
 
 sub gather_files {
     my $self = shift;
 
-    my $content = $self->template;
-    $content .= $self->cpan_reference;
-
     require Dist::Zilla::File::InMemory;
     $self->add_file(Dist::Zilla::File::InMemory->new({
         name => 'INSTALL',
-        content => $content,
+        content => $self->template,
+
     }));
 
     return;
 }
 
+#pod =head2 munge_files
+#pod
+#pod Inserts the appropriate installation instructions into F<INSTALL>.
+#pod
+#pod =cut
 
 sub munge_files {
     my $self = shift;
@@ -147,6 +194,8 @@ sub munge_files {
         {   dist                => \$zilla,
             package             => $main_package,
             manual_installation => $manual_installation,
+            has_meta_yml        => (any { $_->name eq 'META.yml' } @{ $zilla->files }),
+            has_meta_json       => (any { $_->name eq 'META.json' } @{ $zilla->files }),
         }
     );
 
@@ -170,7 +219,7 @@ Dist::Zilla::Plugin::InstallGuide - Build an INSTALL file
 
 =head1 VERSION
 
-version 1.200009
+version 1.200011
 
 =for test_synopsis BEGIN { die "SKIP: synopsis isn't perl code" }
 
@@ -200,21 +249,16 @@ Creates the F<INSTALL> file.
 
 Inserts the appropriate installation instructions into F<INSTALL>.
 
-=head1 AVAILABILITY
+=head1 SUPPORT
 
-The latest version of this module is available from the Comprehensive Perl
-Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
-site near you, or see L<https://metacpan.org/module/Dist::Zilla::Plugin::InstallGuide/>.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-InstallGuide>
+(or L<bug-Dist-Zilla-Plugin-InstallGuide@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-InstallGuide@rt.cpan.org>).
 
-=head1 SOURCE
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
 
-The development version is on github at L<https://github.com/doherty/Dist-Zilla-Plugin-InstallGuide>
-and may be cloned from L<git://github.com/doherty/Dist-Zilla-Plugin-InstallGuide.git>
-
-=head1 BUGS AND LIMITATIONS
-
-You can make new bug reports, and view existing ones, through the
-web interface at L<https://github.com/doherty/Dist-Zilla-Plugin-InstallGuide/issues>.
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
 =head1 AUTHORS
 
@@ -227,6 +271,46 @@ Marcel Grünauer <marcel@cpan.org>
 =item *
 
 Mike Doherty <doherty@cpan.org>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=for stopwords Mike Doherty Karen Etheridge Marcel Gruenauer jonasbn Dan Book Dave Rolsky Apocalypse
+
+=over 4
+
+=item *
+
+Mike Doherty <mike@mikedoherty.ca>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Marcel Gruenauer <hanekomu@gmail.com>
+
+=item *
+
+jonasbn <jonasbn@gmail.com>
+
+=item *
+
+Mike Doherty <doherty@cs.dal.ca>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Dave Rolsky <autarch@urth.org>
+
+=item *
+
+Apocalypse <APOCAL@cpan.org>
 
 =back
 

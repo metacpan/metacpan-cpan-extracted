@@ -21,7 +21,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(cetak cetak_r cetak_pre);
 
 # ABSTRACT: [DEPRECATED] The Part of CellBIS The Simple Web Framework
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 # Create Subroutine for Get OS Server Information :
 # ------------------------------------------------------------------------

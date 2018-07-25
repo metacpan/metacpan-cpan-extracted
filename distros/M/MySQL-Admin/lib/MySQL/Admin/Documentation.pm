@@ -7,7 +7,7 @@ require Exporter;
 use AutoLoader qw(AUTOLOAD);
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(help readPod);
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 sub help {
     pod2usage(1);

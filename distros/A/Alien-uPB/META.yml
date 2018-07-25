@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::CppGuess: '0.11'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,4 +22,6 @@ name: Alien-uPB
 resources:
   homepage: https://github.com/mbarbon/alien-upb
   repository: https://github.com/mbarbon/alien-upb.git
-version: '0.10'
+version: '0.11'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

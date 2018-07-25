@@ -11,18 +11,21 @@ Astro::Coord::ECI::Moon - Predict location of the Moon.
 Astro::Coord::ECI::Star - Predict location of a star.
 Astro::Coord::ECI::Sun - Predict location of the Sun.
 Astro::Coord::ECI::TLE - Predict location of a satellite.
-Astro::Coord::ECI::TLE::Iridium - Subclass of TLE, with the ability
-    to predict flares.
 Astro::Coord::ECI::TLE::Set - Aggregation of TLEs, with ability
     to use the correct TLE depending on time.
 Astro::Coord::ECI::Utils - Constants and utility subroutines.
 
+The following has been moved to its own package:
+
+Astro::Coord::ECI::TLE::Iridium - Subclass of TLE, with the ability
+    to predict flares.
+
 INSTALLATION
 
-Most Perl users will want to install using their favorite of either
-'cpan' or 'cpanp'. For either of these, installing Astro::Coord::ECI
-gets you everything. ActivePerl users will want to use ActiveState's
-'ppi', and install Astro-satpass.
+Most Perl users will want to install using their favorite of 'cpan',
+'cpanm', or 'cpanp'. For any of these, installing Astro::Coord::ECI gets
+you everything. ActivePerl users who use ActiveState's 'ppi' should
+install Astro-satpass.
 
 If for some reason neither of these works for you, you can download the
 distribution and expand it using something like

@@ -1,5 +1,11 @@
 This file documents the revision history for Perl extension Text::SimpleTable.
 
+2.07  2018-07-22 23:09:00
+        - rerelease with unbroken manifest.
+
+2.06  2018-07-22 23:09:00
+        - Apply changes from Wesley Schwengle (waterkip) to
+          make tests more resillient
 2.05  2010-06-06 16:38:00
         - Add CJK support (usausat)
         - Add unicode box support (pjsg)

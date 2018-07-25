@@ -47,10 +47,11 @@ SKIP: {
 
     subtest 'clans' => sub {
         my ( $clans, $clan_info );
-        is( $clans = $net->clans_list( game => 'wox', search => 'hellenes' ), undef, 'Search clan with invalid game' );
+        is( $net->clans_list( game => 'wox', search => 'hellenes' ), undef, 'Search clan, using deprecated method' );
+        is( $clans = $net->clans( game => 'wox', search => 'hellenes' ), undef, 'Search clan with invalid game' );
         is( $net->clans_info( clan_id => 'clan_id' ), undef, 'Get clan info with invalid clan_id' );
 
-        ok( $clans = $net->clans_list( game => 'wot', search => 'hellenes' ), 'Search clan with valid params' );
+        ok( $clans = $net->clans( game => 'wot', search => 'hellenes' ), 'Search clan with valid params' );
         ok( $clan_info = $net->clans_info( clan_id => $clans->[0]->{clan_id} ), 'Get clan info' );
 
         my ($clan_id) = keys %$clan_info;

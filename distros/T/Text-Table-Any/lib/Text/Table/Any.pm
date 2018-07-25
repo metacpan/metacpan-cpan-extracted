@@ -1,7 +1,7 @@
 package Text::Table::Any;
 
-our $DATE = '2018-07-02'; # DATE
-our $VERSION = '0.091'; # VERSION
+our $DATE = '2018-07-23'; # DATE
+our $VERSION = '0.092'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -54,6 +54,10 @@ sub table {
         require Text::Table::LTSV;
         return Text::Table::LTSV::table(
             rows => $rows);
+    } elsif ($backend eq 'Text::Table::ASV') {
+        require Text::Table::ASV;
+        return Text::Table::ASV::table(
+            rows => $rows, header_row => $header_row);
     } elsif ($backend eq 'Text::Table::HTML') {
         require Text::Table::HTML;
         return Text::Table::HTML::table(
@@ -144,7 +148,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.091 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2018-07-02.
+This document describes version 0.092 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2018-07-23.
 
 =head1 SYNOPSIS
 
@@ -281,6 +285,8 @@ Optional. Pick a backend module. Supported backends:
 =item * Text::Table::TSV
 
 =item * Text::Table::LTSV
+
+=item * Text::Table::ASV
 
 =item * Text::Table::HTML
 

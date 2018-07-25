@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Event::Distributor::_Event );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp;
 

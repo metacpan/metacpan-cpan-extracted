@@ -1,16 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
 
 package Event::Distributor;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp;
+use Syntax::Keyword::Try;
 
 use Future;
 
@@ -251,7 +252,13 @@ sub subscribe_sync
    my ( $name, $code ) = @_;
 
    $self->subscribe_async( $name, sub {
-      Future->done( $code->( @_ ) )
+      my @args = @_;
+      try {
+         return Future->done( $code->( @args ) );
+      }
+      catch {
+         return Future->fail( $@ );
+      }
    });
 }
 

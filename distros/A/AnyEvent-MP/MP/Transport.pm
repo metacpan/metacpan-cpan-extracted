@@ -27,13 +27,11 @@ use common::sense;
 use Scalar::Util ();
 use List::Util ();
 use MIME::Base64 ();
-use Storable ();
-use JSON::XS ();
 
-use Digest::MD6 ();
-use Digest::HMAC_MD6 ();
+use Digest::SHA3 ();
+use Digest::HMAC ();
 
-use AE ();
+use AnyEvent ();
 use AnyEvent::Socket ();
 use AnyEvent::Handle 4.92 ();
 
@@ -41,10 +39,10 @@ use AnyEvent::MP::Config ();
 
 our $PROTOCOL_VERSION = 1;
 
-our @HOOK_CONNECT;   # called at connect/accept time
-our @HOOK_GREETING;  # called at greeting1 time
-our @HOOK_CONNECTED; # called at data phase
-our @HOOK_DESTROY;   # called at destroy time
+our @HOOK_GREET;   # called at connect/accept time
+our @HOOK_GREETED; # called at greeting1 time
+our @HOOK_CONNECT; # called at data phase
+our @HOOK_DESTROY; # called at destroy time
 our %HOOK_PROTOCOL = (
    "aemp-dataconn" => sub {
       require AnyEvent::MP::DataConn;
@@ -52,7 +50,7 @@ our %HOOK_PROTOCOL = (
    },
 );
 
-=item $listener = mp_listener $host, $port, <constructor-args>
+=item $listener = mp_server $host, $port, <constructor-args>
 
 Creates a listener on the given host/port using
 C<AnyEvent::Socket::tcp_server>.
@@ -98,25 +96,33 @@ sub mp_connect {
 
 =item new AnyEvent::MP::Transport
 
+Create a new transport - usually used via C<mp_server> or C<mp_connect>
+instead.
+
    # immediately starts negotiation
    my $transport = new AnyEvent::MP::Transport
       # mandatory
-      fh       => $filehandle,
-      local_id => $identifier,
-      on_recv  => sub { receive-callback },
-      on_error => sub { error-callback },
+      fh         => $filehandle,
+      local_id   => $identifier,
+      on_recv    => sub { receive-callback },
+      on_error   => sub { error-callback },
 
       # optional
-      on_eof   => sub { clean-close-callback },
+      on_greet   => sub { before sending greeting },
+      on_greeted => sub { after receiving greeting },
       on_connect => sub { successful-connect-callback },
-      greeting => { key => value },
+      greeting   => { key => value },
 
       # tls support
-      tls_ctx  => AnyEvent::TLS,
-      peername => $peername, # for verification
+      tls_ctx    => AnyEvent::TLS,
+      peername   => $peername, # for verification
    ;
 
 =cut
+
+sub hmac_sha3_512_hex($$) {
+   Digest::HMAC::hmac_hex $_[1], $_[0], \&Digest::SHA3::sha3_512, 72
+}
 
 sub new {
    my ($class, %arg) = @_;
@@ -164,13 +170,15 @@ sub new {
       my $greeting_kv = $self->{local_greeting} ||= {};
 
       $greeting_kv->{tls}      = "1.0" if $self->{tls_ctx};
-      $greeting_kv->{provider} = "AE-$AnyEvent::MP::VERSION"; # MP.pm might not be loaded, so best effort :(
+      $greeting_kv->{provider} = "AE-$AnyEvent::MP::Config::VERSION";
       $greeting_kv->{peeraddr} = AnyEvent::Socket::format_hostport $self->{peerhost}, $self->{peerport};
 
       my $protocol = $self->{protocol} || "aemp";
 
       # can modify greeting_kv
-      $_->($self) for $protocol eq "aemp" ? @HOOK_CONNECT : ();
+      $_->($self) for $protocol eq "aemp" ? @HOOK_GREET : ();
+      (delete $self->{on_greet})->($self)
+         if exists $self->{on_greet};
 
       # send greeting
       my $lgreeting1 = "$protocol;$PROTOCOL_VERSION"
@@ -204,7 +212,9 @@ sub new {
             $self->{protocol} = $protocol = $aemp;
          }
 
-         $_->($self) for $protocol eq "aemp" ? @HOOK_GREETING : ();
+         $_->($self) for $protocol eq "aemp" ? @HOOK_GREETED : ();
+         (delete $self->{on_greeted})->($self)
+            if exists $self->{on_greeted};
 
          if ($aemp ne $protocol and $aemp ne "aemp") {
             return $self->error ("unparsable greeting, expected '$protocol', got '$aemp'");
@@ -249,7 +259,6 @@ sub new {
             defined $s_framing
                or return $self->error ("$framings: no common framing method supported");
 
-            my $key;
             my $lauth;
 
             if ($tls) {
@@ -258,17 +267,15 @@ sub new {
                return unless $self->{hdl}; # starttls might destruct us
 
                $lauth =
-                  $s_auth eq "tls_anon"       ? ""
-                : $s_auth eq "tls_md6_64_256" ? Digest::MD6::md6_hex "$lgreeting1\012$lgreeting2\012$rgreeting1\012$rgreeting2\012"
+                  $s_auth eq "tls_anon"     ? ""
+                : $s_auth eq "tls_sha3_512" ? Digest::SHA3::sha3_512_hex "$lgreeting1\012$lgreeting2\012$rgreeting1\012$rgreeting2\012"
                 : return $self->error ("$s_auth: fatal, selected unsupported snd auth method");
 
             } elsif (length $secret) {
                return $self->error ("$s_auth: fatal, selected unsupported snd auth method")
-                  unless $s_auth eq "hmac_md6_64_256"; # hardcoded atm.
+                  unless $s_auth eq "hmac_sha3_512"; # hardcoded atm.
 
-               $key = Digest::MD6::md6 $secret;
-               # we currently only support hmac_md6_64_256
-               $lauth = Digest::HMAC_MD6::hmac_md6_hex $key, "$lgreeting1\012$lgreeting2\012$rgreeting1\012$rgreeting2\012", 64, 256;
+               $lauth = hmac_sha3_512_hex $secret, "$lgreeting1\012$lgreeting2\012$rgreeting1\012$rgreeting2\012";
 
             } else {
                return $self->error ("unable to handshake TLS and no shared secret configured");
@@ -284,16 +291,17 @@ sub new {
                my ($auth_method, $rauth2, $r_framing) = split /;/, $rline;
 
                my $rauth =
-                  $auth_method eq "hmac_md6_64_256" ? Digest::HMAC_MD6::hmac_md6_hex $key, "$rgreeting1\012$rgreeting2\012$lgreeting1\012$lgreeting2\012", 64, 256
-                : $auth_method eq "cleartext"       ? unpack "H*", $secret
-                : $auth_method eq "tls_anon"        ? ($tls ? "" : "\012\012") # \012\012 never matches
-                : $auth_method eq "tls_md6_64_256"  ? ($tls ? Digest::MD6::md6_hex "$rgreeting1\012$rgreeting2\012$lgreeting1\012$lgreeting2\012" : "\012\012")
+                  $auth_method eq "hmac_sha3_512" ? hmac_sha3_512_hex $secret, "$rgreeting1\012$rgreeting2\012$lgreeting1\012$lgreeting2\012"
+                : $auth_method eq "cleartext"     ? unpack "H*", $secret
+                : $auth_method eq "tls_anon"      ? ($tls ? "" : "\012\012") # \012\012 never matches
+                : $auth_method eq "tls_sha3_512"  ? ($tls ? Digest::SHA3::sha3_512_hex "$rgreeting1\012$rgreeting2\012$lgreeting1\012$lgreeting2\012" : "\012\012")
                 : return $self->error ("$auth_method: fatal, selected unsupported rcv auth method");
 
                if ($rauth2 ne $rauth) {
                   return $self->error ("authentication failure/shared secret mismatch");
                }
 
+               $self->{r_framing} = $r_framing;
                $self->{s_framing} = $s_framing;
 
                $hdl->rbuf_max (undef);
@@ -305,52 +313,15 @@ sub new {
                   if $auth_method eq "tls_anon";
 
                if ($protocol eq "aemp" and $self->{hdl}) {
-                  # listener-less node need to continuously probe
-                  unless (@$AnyEvent::MP::Kernel::LISTENER) {
-                     $self->{hdl}->wtimeout ($timeout);
-                     $self->{hdl}->on_wtimeout (sub { $self->{send}->([]) });
-                  }
+                  # listener-less nodes need to continuously probe
+#                  unless (@$AnyEvent::MP::Kernel::BINDS) {
+#                     $self->{hdl}->wtimeout ($timeout);
+#                     $self->{hdl}->on_wtimeout (sub { $self->{send}->([]) });
+#                  }
 
                   # receive handling
-
-                  my $push_write = $hdl->can ("push_write");
-                  my $push_read  = $hdl->can ("push_read");
-
-                  if ($s_framing eq "json") {
-                     $self->{send} = sub {
-                        $push_write->($hdl, JSON::XS::encode_json $_[0]);
-                     };
-                  } else {
-                     $self->{send} = sub {
-                        $push_write->($hdl, $s_framing => $_[0]);
-                     };
-                  }
-
-                  if ($r_framing eq "json") {
-                     my $coder = JSON::XS->new->utf8;
-
-                     $hdl->on_read (sub {
-                        local $AnyEvent::MP::Kernel::SRCNODE = $self->{node};
-
-                        AnyEvent::MP::Kernel::_inject (@$_)
-                           for $coder->incr_parse (delete $_[0]{rbuf});
-
-                        ()
-                     });
-                  } else {
-                     my $rmsg; $rmsg = $self->{rmsg} = sub {
-                        $push_read->($_[0], $r_framing => $rmsg);
-
-                        local $AnyEvent::MP::Kernel::SRCNODE = $self->{node};
-                        AnyEvent::MP::Kernel::_inject (@{ $_[1] });
-                     };
-                     eval {
-                        $push_read->($_[0], $r_framing => $rmsg);
-                     };
-                     Scalar::Util::weaken $rmsg;
-                     return $self->error ("$r_framing: unusable remote framing")
-                        if $@;
-                  }
+                  $self->set_snd_framing;
+                  $self->set_rcv_framing;
                }
 
                $self->connected;
@@ -362,6 +333,78 @@ sub new {
    $self
 }
 
+sub set_snd_framing {
+   my ($self) = @_;
+
+   my $framing    = $self->{s_framing};
+   my $hdl        = $self->{hdl};
+   my $push_write = $hdl->can ("push_write");
+
+   if ($framing eq "cbor") {
+      require CBOR::XS;
+      $self->{send} = sub {
+         $push_write->($hdl, CBOR::XS::encode_cbor ($_[0]));
+      };
+   } elsif ($framing eq "json") {
+      require JSON::XS;
+      $self->{send} = sub {
+         $push_write->($hdl, JSON::XS::encode_json ($_[0]));
+      };
+   } else {
+      $self->{send} = sub {
+         $push_write->($hdl, $framing => $_[0]);
+      };
+   }
+}
+
+sub set_rcv_framing {
+   my ($self) = @_;
+
+   my $node       = $self->{remote_node};
+   my $framing    = $self->{r_framing};
+   my $hdl        = $self->{hdl};
+   my $push_read  = $hdl->can ("push_read");
+
+   if ($framing eq "cbor") {
+      require CBOR::XS;
+      my $coder = CBOR::XS->new;
+
+      $hdl->on_read (sub {
+         $AnyEvent::MP::Kernel::SRCNODE = $node;
+
+         AnyEvent::MP::Kernel::_inject (@$_)
+            for $coder->incr_parse_multiple ($_[0]{rbuf});
+
+         ()
+      });
+   } elsif ($framing eq "json") {
+      require JSON::XS;
+      my $coder = JSON::XS->new->utf8;
+
+      $hdl->on_read (sub {
+         $AnyEvent::MP::Kernel::SRCNODE = $node;
+
+         AnyEvent::MP::Kernel::_inject (@$_)
+            for $coder->incr_parse (delete $_[0]{rbuf});
+
+         ()
+      });
+   } else {
+      my $rmsg; $rmsg = $self->{rmsg} = sub {
+         $push_read->($_[0], $framing => $rmsg);
+
+         $AnyEvent::MP::Kernel::SRCNODE = $node;
+         AnyEvent::MP::Kernel::_inject (@{ $_[1] });
+      };
+      eval {
+         $push_read->($hdl, $framing => $rmsg);
+      };
+      Scalar::Util::weaken $rmsg;
+      return $self->error ("$framing: unusable remote framing")
+         if $@;
+   }
+}
+
 sub error {
    my ($self, $msg) = @_;
 
@@ -370,7 +413,7 @@ sub error {
    if ($self->{protocol}) {
       $HOOK_PROTOCOL{$self->{protocol}}->($self, $msg);
    } else {
-      $AnyEvent::MP::Kernel::WARN->(9, "$self->{peerhost}:$self->{peerport} $msg");#d#
+      AE::log 9 => "$self->{peerhost}:$self->{peerport} disconnected - $msg.";
 
       $self->{node}->transport_error (transport_error => $self->{node}{id}, $msg)
          if $self->{node} && $self->{node}{transport} == $self;
@@ -379,7 +422,6 @@ sub error {
    (delete $self->{release})->()
       if exists $self->{release};
    
-#   $AnyEvent::MP::Kernel::WARN->(7, "$self->{peerhost}:$self->{peerport}: $msg");
    $self->destroy;
 }
 
@@ -392,17 +434,20 @@ sub connected {
       $self->{hdl}->on_error (undef);
       $HOOK_PROTOCOL{$self->{protocol}}->($self, undef);
    } else {
-      $AnyEvent::MP::Kernel::WARN->(9, "$self->{peerhost}:$self->{peerport} connected as $self->{remote_node}");
+      AE::log 9 => "$self->{peerhost}:$self->{peerport} connected as $self->{remote_node}.";
 
       my $node = AnyEvent::MP::Kernel::add_node ($self->{remote_node});
       Scalar::Util::weaken ($self->{node} = $node);
       $node->transport_connect ($self);
 
-      $_->($self) for @HOOK_CONNECTED;
+      $_->($self) for @HOOK_CONNECT;
    }
 
    (delete $self->{release})->()
       if exists $self->{release};
+
+   (delete $self->{on_connect})->($self)
+      if exists $self->{on_connect};
 }
 
 sub destroy {
@@ -414,7 +459,11 @@ sub destroy {
    $self->{hdl}->destroy
       if $self->{hdl};
 
+   (delete $self->{on_destroy})->($self)
+      if exists $self->{on_destroy};
    $_->($self) for $self->{protocol} ? () : @HOOK_DESTROY;
+
+   $self->{protocol} = "destroyed"; # to keep hooks from invoked twice.
 }
 
 sub DESTROY {
@@ -446,7 +495,7 @@ that can be received.
 
 Example:
 
-   aemp;0;rain;tls_md6_64_256,hmac_md6_64_256,tls_anon,cleartext;json,storable;timeout=12;peeraddr=10.0.0.1:48082
+   aemp;0;rain;tls_sha3_512,hmac_sha3_512,tls_anon,cleartext;cbor,json,storable;timeout=12;peeraddr=10.0.0.1:48082
 
 The first line contains strings separated (not ended) by C<;>
 characters. The first five strings are fixed by the protocol, the
@@ -509,6 +558,24 @@ The peer address (socket address of the other side) as seen locally.
 Indicates that the other side supports TLS (version should be 1.0) and
 wishes to do a TLS handshake.
 
+=item nproto=<major>.<fractional>
+
+Informs the other side of the node protocol implemented by this
+node. Major version mismatches are fatal. If this key is missing, then it
+is assumed that the node doesn't support the node protocol.
+
+The node protocol is currently undocumented, but includes port
+monitoring, spawning and informational requests.
+
+=item gproto=<major>.<fractional>
+
+Informs the other side of the global protocol implemented by this
+node. Major version mismatches are fatal. If this key is missing, then it
+is assumed that the node doesn't support the global protocol.
+
+The global protocol is currently undocumented, but includes node address
+lookup and shared database operations.
+
 =back
 
 =head3 Second Greeting Line
@@ -566,22 +633,18 @@ course very insecure if TLS is not used (and not completely secure even
 if TLS is used), which is why this module will accept, but not generate,
 cleartext auth replies.
 
-=item hmac_md6_64_256
+=item hmac_sha3_512
 
-This method uses an MD6 HMAC with 64 bit blocksize and 256 bit hash, and
-requires a shared secret. It is the preferred auth method when a shared
-secret is available.
+This method uses a SHA-3/512 HMAC with 576 bit blocksize and 512 bit hash,
+and requires a shared secret. It is the preferred auth method when a
+shared secret is available.
 
-First, the shared secret is hashed with MD6:
-
-   key = MD6 (secret)
-
-This secret is then used to generate the "local auth reply", by taking
-the two local greeting lines and the two remote greeting lines (without
+The secret is used to generate the "local auth reply", by taking the
+two local greeting lines and the two remote greeting lines (without
 line endings), appending \012 to all of them, concatenating them and
-calculating the MD6 HMAC with the key:
+calculating the HMAC with the key:
 
-   lauth = HMAC_MD6 key, "lgreeting1\012lgreeting2\012rgreeting1\012rgreeting2\012"
+   lauth = HMAC_SHA3_512 key, "lgreeting1\012lgreeting2\012rgreeting1\012rgreeting2\012"
 
 This authentication token is then lowercase-hex-encoded and sent to the
 other side.
@@ -589,9 +652,16 @@ other side.
 Then the remote auth reply is generated using the same method, but local
 and remote greeting lines swapped:
 
-   rauth = HMAC_MD6 key, "rgreeting1\012rgreeting2\012lgreeting1\012lgreeting2\012"
+   rauth = HMAC_SHA3_512 key, "rgreeting1\012rgreeting2\012lgreeting1\012lgreeting2\012"
 
 This is the token that is expected from the other side.
+
+=item hmac_md6_64_256 [obsolete, not supported]
+
+This method uses an MD6 HMAC with 64 bit blocksize and 256 bit hash, and
+requires a shared secret. It is similar to C<hmac_sha3_512>, but uses
+MD6 instead of SHA-3 and instead of using the secret directly, it uses
+MD6(secret) as HMAC key.
 
 =item tls_anon
 
@@ -607,18 +677,22 @@ exploits this in a way that is worse than just denying the service.
 By default, this implementation accepts but never generates this auth
 reply.
 
-=item tls_md6_64_256
+=item tls_sha3_512
 
 This type is only valid I<iff> TLS was enabled and the TLS handshake was
 successful.
 
 This authentication type simply calculates:
 
-   lauth = MD6 "rgreeting1\012rgreeting2\012lgreeting1\012lgreeting2\012"
+   lauth = SHA3_512 "rgreeting1\012rgreeting2\012lgreeting1\012lgreeting2\012"
 
 and lowercase-hex encodes the result and sends it as authentication
 data. No shared secret is required (authentication is done by TLS). The
 checksum exists only to make tinkering with the greeting hard.
+
+=item tls_md6_64_256 [deprecated, unsupported]
+
+Same as C<tls_sha3_512>, except MD6 is used.
 
 =back
 
@@ -680,7 +754,7 @@ yourself. The the handshake is as simple as sending three lines of text,
 reading three lines of text, and then you can exchange JSON-formatted
 messages:
 
-   aemp;1;<nodename>;hmac_md6_64_256;json
+   aemp;1;<nodename>;hmac_sha3_512;json
    <nonce>
    cleartext;<hexencoded secret>;json
 
@@ -719,7 +793,7 @@ This is not sufficient for listener-less nodes, however: they need
 to regularly send data (30 seconds, or the monitoring interval, is
 recommended), so TCP actively probes.
 
-Future implementations of AnyEvent::Transport might query the kernel TCP
+Future implementations of AnyEvent::MP::Transport might query the kernel TCP
 buffer after a write timeout occurs, and if it is non-empty, shut down the
 connections, but this is an area of future research :)
 

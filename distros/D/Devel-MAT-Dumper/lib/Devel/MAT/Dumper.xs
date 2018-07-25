@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 #define FORMAT_VERSION_MAJOR 0
-#define FORMAT_VERSION_MINOR 2
+#define FORMAT_VERSION_MINOR 3
 
 #ifndef SvOOK_offset
 #  define SvOOK_offset(sv, len) STMT_START { len = SvIVX(sv); } STMT_END
@@ -56,6 +56,7 @@ static uint8_t sv_sizes[] = {
   0,                          0,     0,     /* REGEXP */
   0,                          0,     0,     /* FORMAT */
   0,                          0,     0,     /* INVLIST */
+  0,                          0,     0,     /* UNDEF */
 };
 
 static uint8_t ctx_sizes[] = {
@@ -80,6 +81,7 @@ enum PMAT_SVt {
   PMAT_SVtREGEXP,
   PMAT_SVtFORMAT,
   PMAT_SVtINVLIST,
+  PMAT_SVtUNDEF,
 
   PMAT_SVtMAGIC = 0x80,
 };
@@ -616,6 +618,8 @@ static void write_sv(FILE *fh, const SV *sv)
 {
   unsigned char type = -1;
   switch(SvTYPE(sv)) {
+    case SVt_NULL:
+      type = PMAT_SVtUNDEF; break;
     case SVt_IV:
     case SVt_NV:
     case SVt_PV:
@@ -645,6 +649,9 @@ static void write_sv(FILE *fh, const SV *sv)
       break;
   }
 
+  if(type == PMAT_SVtSCALAR && !SvOK(sv))
+    type = PMAT_SVtUNDEF;
+
   write_u8(fh, type);
 
   switch(type) {
@@ -663,6 +670,7 @@ static void write_sv(FILE *fh, const SV *sv)
 #endif
     case PMAT_SVtFORMAT: write_common_sv(fh, sv, sizeof(XPVFM)); break;
     case PMAT_SVtINVLIST: write_common_sv(fh, sv, sizeof(XPV) + SvLEN(sv)); break;
+    case PMAT_SVtUNDEF:  write_common_sv(fh, sv, 0); break;
   }
 
   if(SvMAGICAL(sv)) {
@@ -918,7 +926,6 @@ static void dumpfh(FILE *fh)
     SV *sv;
     for(sv = arena + 1; sv < arenaend; sv++) {
       switch(SvTYPE(sv)) {
-        case 0:
         case 0xff:
           continue;
       }

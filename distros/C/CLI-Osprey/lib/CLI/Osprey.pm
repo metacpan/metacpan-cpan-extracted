@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: MooX::Options + MooX::Cmd + Sanity
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 use Carp 'croak';
@@ -85,7 +85,8 @@ sub import {
     my ($name, %attributes) = @_;
 
     $has->($name => _non_option_attributes(%attributes));
-    $options_data->{$name} = _option_attributes($name, added_order => ++$added_order, %attributes);
+    $options_data->{$name} = _option_attributes($name, %attributes);
+    $options_data->{$name}{added_order} = ++$added_order;
     $apply_modifiers->();
   };
 
@@ -161,7 +162,7 @@ CLI::Osprey - MooX::Options + MooX::Cmd + Sanity
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -576,7 +577,7 @@ Andrew Rodland <arodland@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Andrew Rodland.
+This software is copyright (c) 2018 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

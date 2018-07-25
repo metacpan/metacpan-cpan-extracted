@@ -1,3 +1,8 @@
+0.092   2018-07-23 (PERLANCAR)
+
+	- Add backend: Text::Table::ASV.
+
+
 0.091   2018-07-02 (PERLANCAR)
 
 	- [Incompatible change] Change header_row default from 0 to 1.

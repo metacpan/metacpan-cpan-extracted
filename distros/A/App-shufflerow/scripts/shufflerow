@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+use 5.001 ; use strict ; use warnings ; # 5.014 is neccesary for srand to work well.
+use List::Util qw[ min shuffle ] ;
+use Term::ANSIColor qw/:constants color/; 
+use Getopt::Std ; getopts ':=/:g:s:q0' ,\my %o ;
+use FindBin qw [ $Script ] ;
+use Time::HiRes qw[ tv_interval gettimeofday] ;
+$Term::ANSIColor::AUTORESET = 1 ;
+
+sub procOptions ( ) ; 
+sub choreHeader ( ) ; 
+sub coreLoops ( ) ; 
+
+my $time0 = [ gettimeofday ] ; # time ; 
+my $seed ; # ランダムシード
+$/ = ! defined $o{'/'} ? "\n" : eval qq[qq[$o{'/'}]] ;
+
+procOptions ; 
+choreHeader ; 
+coreLoops ; 
+exit 0 ; 
+
+## いろいろな関数たち
+  
+sub procOptions ( ) { 
+	srand do{ $o{s}//='';my $s=($o{s}=~s/(.*)!$//)?$1:1<<32; $seed = $o{s}||int rand($s) } ;
+	#$o{s} = defined $o{s} ? srand $o{s} : srand 
+} # 乱数シードの保管/設定
+sub choreHeader ( ) { do { print  "=:\t" if $o{':'} ; print ( my $tmp = <> ) } if $o{'='} } # ヘッダの処理 
+
+sub coreLoops ( ) {
+	my @lines ; # 標準入力の各行が格納される。
+	push @lines, $_ while ( <> ) ; # 標準入力を全てここで読みとる。
+	my @nums = shuffle 0 .. $#lines ; 
+	splice @nums , 0 , -$o{g} if defined $o{g} ; # <- -- 最初の方ではなくて最後の方を取り出すことに注意。
+	@nums = sort { $a <=> $b } @nums if $o{0} ;
+	for ( @nums ) { 
+	  print $_+1 , ":\t" if $o{':'} ; 
+	  print $lines[$_] ; 
+	}
+	$0 =~ s|.*/|| ;
+
+	my $num = @nums ; 
+	my $sec = tv_interval ( $time0 )  ;
+	unless ( $o{q} ) 
+	{ 
+	     my $he = $o{'='} ? 'is' : 'is not' ;
+		 print STDERR CYAN "Used random seed: ",  BRIGHT_CYAN $seed ; 
+		 print STDERR CYAN ". Read lines: ", BRIGHT_CYAN scalar @lines, ". " ; 
+		 print STDERR CYAN "Picked lines: ", BRIGHT_CYAN $num ; 
+		 print STDERR CYAN " ; a heading line " , BRIGHT_CYAN $he, CYAN " assumed " . 
+		 ($o{'='}? "to appear in output":'') . ". ($Script, " ; 
+		 print STDERR BRIGHT_CYAN "$sec" , CYAN ". sec)\n" ; 
+	}
+}
+
+## ヘルプとバージョン情報
+BEGIN {
+  our $VERSION = 0.32 ;
+  $Getopt::Std::STANDARD_HELP_VERSION = 1 ; 
+  grep { m/--help/} @ARGV and *VERSION_MESSAGE = sub {} ; 
+   # shuffler 
+   #  Produced by Toshiyuki Shimono in Tokyo, 2016-01-25 ~ 2016-10-13 ; 2018-03-25 English added.
+   # 目安: 
+   #   0.21 : 人になんとか提供できる段階で 0.21 を目安とする。
+   #   1.00 以上 : 英語版のヘルプをきちんと出すことが必要条件。
+   #   2.00 以上 : テストコードが含むことが必要条件。
+}  
+
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+ 
+ $0 -s seed   
+
+用途と使い方: What it does? 
+
+ 各行をシャッフルする。 Shuffles the STDIN. 
+
+オプション: 
+
+ -= : 入力の1行目はそのまま出力し、シャッフルの対象とはしない。Just throw the 1st line input. Shuffle starts from 2nd.
+ -: : 各行の先頭に、何番目のデータから来たかを表示。 (numbering from where) 
+ -/ str : 行の区切り文字の変更。eval[qq[qq[$o{'/'}]]] により評価される。未指定なら "\n" 。 空行区切りで段落ごとにシャッフルする場合は"\n\n" を指定。
+ -g num : データとして最大何行を出力するかの指定。負の数を指定すると、その絶対値で何個を省力するかの指定になる。(how many lines to Get.)
+ -s : 乱数のシードを指定する。 (random Seed -- for reproducibility.)
+ -q : 乱数シード情報を出さない。(Quiet ; no secondary information such as the seed. )
+ -0 : -g N により指定個数を取り出すが、シャッフルしないで順番通りに出力する。(no shuffle. Combining -g option is useful.)
+
+ --help     : ヘルプを表示する
+ --help opt : このコマンドのオプションの説明のみを表示する。
+ --version  : バージョン情報を表示する。
+
+ トリッキーな使い方: 
+   shufflerow -0 -: -/ '\n\n'  # 段落番号を各段落の先頭に付加する。ここで段落とは空行2個で区切られたテキスト。
+ 
+=cut
+

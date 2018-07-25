@@ -15,13 +15,13 @@ use Fcntl qw(:flock :seek);
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 my $Time_HiRes_avail;
 my $color_avail;
 
 BEGIN {
-    # compile Devel::DumpTrace::Const AFTER the environment is processed
+    # process environment before Devel::DumpTrace::Const is compiled
     if (defined $ENV{DUMPTRACE}) {
         my $kv_splitter = $ENV{DUMPTRACE}=~/;/ ? ';' : ',';
 	foreach my $kv (split $kv_splitter, $ENV{DUMPTRACE}) {
@@ -1123,7 +1123,7 @@ Devel::DumpTrace - Evaluate and print out each line before it is executed.
 
 =head1 VERSION
 
-0.26
+0.27
 
 =head1 SYNOPSIS
 
@@ -1443,7 +1443,7 @@ to match a general pattern of package names.
 Settings in C<@INCLUDE_PATTERN> take precendence over C<@EXCLUDE_PATTERN>,
 so a package that matches a pattern in C<@INCLUDE_PATTERN> will always
 be traced, even if it also matches one or more patterns in
-<@EXCLUDE_PATTERN>.
+C<@EXCLUDE_PATTERN>.
 
     # -Foo::Bar is ignored, because Foo::Bar also matches included .*::Bar
     perl -d:DumpTrace=-Foo::Bar,+.*::Bar my_script.pl
@@ -1702,7 +1702,7 @@ Marty O'Brien, E<lt>mob at cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Marty O'Brien.
+Copyright 2010-2018 Marty O'Brien.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

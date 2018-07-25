@@ -34,13 +34,6 @@ convert_tle
     uses the same keys as) the Space Track REST interface. The -help
     option gets you the documentation.
 
-iridium
-    This Perl script uses Astro::SpaceTrack (not included) to download
-    Iridium data from http://celestrak.com/ and predict flares for the
-    next two days at the given location, which is hard-coded as Los
-    Pinos, Ciudad Mexico, Mexico. It takes about 30 seconds on a
-    lightly-loaded 800 MHz PowerPC G4.
-
 iss
     This Perl script uses Astro::SpaceTrack (not included) to download
     orbital data from http://spaceflight.nasa.gov/realdata/elements/ and

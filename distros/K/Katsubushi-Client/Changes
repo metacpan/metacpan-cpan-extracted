@@ -1,5 +1,8 @@
 Revision history for Perl extension Katsubushi-Client
 
+0.2 2018-07-25T03:10:29Z
+    - fork safe (#4)
+
 0.1 2016-10-12T06:40:07Z
 
     - original version

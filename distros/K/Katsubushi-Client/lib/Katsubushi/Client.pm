@@ -4,7 +4,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.1";
+our $VERSION = "0.2";
 
 use Cache::Memcached::Fast;
 
@@ -17,6 +17,7 @@ use Class::Tiny +{
             Cache::Memcached::Fast->new({ servers => [ $_ ] });
         } @{$self->servers} ];
     },
+    pid => sub { $$ },
 };
 
 sub BUILD {
@@ -30,6 +31,7 @@ sub BUILD {
 sub fetch {
     my $self = shift;
 
+    $self->ensure_fork_safe;
     my $id = 0;
 
     # retry at once for only main (the first of list) server
@@ -48,6 +50,9 @@ sub fetch {
 sub fetch_multi {
     my $self = shift;
     my $n    = shift;
+
+    $self->ensure_fork_safe;
+
     my @keys = ( 1 .. $n );
     my $ids;
     # retry at once for only main (the first of list) server
@@ -61,6 +66,19 @@ sub fetch_multi {
     }
 
     return map { $ids->{$_} } @keys;
+}
+
+sub ensure_fork_safe {
+    my $self = shift;
+
+    if ($self->pid != $$) {
+        # detect forked
+        $self->pid($$);
+        for my $memd (@{$self->_models}) {
+            $memd->disconnect_all;
+        }
+    }
+    1;
 }
 
 1;

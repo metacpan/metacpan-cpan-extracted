@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Chronicle.pm',
     'Data/Chronicle/Mock.pm',
     'Data/Chronicle/Reader.pm',
+    'Data/Chronicle/Subscriber.pm',
     'Data/Chronicle/Writer.pm'
 );
 

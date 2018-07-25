@@ -4,7 +4,7 @@ lazy - Lazily install missing Perl modules
 
 # VERSION
 
-version 0.000006
+version 0.000007
 
 # SYNOPSIS
 
@@ -74,6 +74,14 @@ Just make sure that you `use local::lib` before you `use lazy`.
 \* If not installing globally, `use local::lib` before you `use lazy`
 
 \* Don't pass the `-L` or `--local-lib-contained` args directly to `lazy`.  Use [local::lib](https://metacpan.org/pod/local::lib) directly to get the best (and least confusing) results.
+
+\* Right now `lazy` will not attempt to install modules which are loaded inside
+an `eval`.  (The exception is code which is run via [Capture::Tiny](https://metacpan.org/pod/Capture::Tiny)).  This
+prevents attempted installs of some optional modules as well as modules which
+may be OS-specific.  If you think this is wrong, would like to see an option to
+disable this,  or would like to whitelist additional modules, please open an
+issue.  I'm happy to discuss this.  Currently `lazy` will `warn` in these
+instances in order to help with debugging failed installs.
 
 \* Remove `lazy` before you put your work into production.
 

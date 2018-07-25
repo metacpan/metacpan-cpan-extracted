@@ -1,7 +1,7 @@
 use v5.10.0;
 package JMAP::Tester::Response::Sentence::Set;
 # ABSTRACT: the kind of sentence you get in reply to a setFoos call
-$JMAP::Tester::Response::Sentence::Set::VERSION = '0.019';
+$JMAP::Tester::Response::Sentence::Set::VERSION = '0.020';
 use Moo;
 extends 'JMAP::Tester::Response::Sentence';
 
@@ -182,7 +182,7 @@ JMAP::Tester::Response::Sentence::Set - the kind of sentence you get in reply to
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 OVERVIEW
 

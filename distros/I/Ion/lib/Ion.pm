@@ -1,11 +1,10 @@
 package Ion;
 # ABSTRACT: A clear and concise API for writing TCP servers and clients
-$Ion::VERSION = '0.06';
+$Ion::VERSION = '0.08';
 use common::sense;
 
 use Carp;
 use Coro;
-use AnyEvent;
 use Ion::Server;
 use Ion::Conn;
 
@@ -19,8 +18,8 @@ our @EXPORT = qw(
 
 sub Connect (;$$) {
   my ($host, $port) = @_;
-  return Ion::Conn->new(handle => $host) if ref $host;
-  return Ion::Conn->new(host => $host, port => $port);
+  @_ = ('Ion::Conn', (ref $host ? (handle => $host) : (host => $host, port => $port)));
+  goto \&Ion::Conn::new;
 }
 
 sub Listen (;$$) {
@@ -70,7 +69,7 @@ Ion - A clear and concise API for writing TCP servers and clients
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -224,8 +223,8 @@ data.
   use JSON::XS;
 
   my $server = Listen;
-  $server << sub{ decode_json(shift) };
-  $server >> sub{ encode_json(shift) };
+  $server <<= sub{ decode_json(shift) };
+  $server >>= sub{ encode_json(shift) };
 
   while (my $conn = <$server>) {
     while (my $data = <$conn>) {              # $data is perl data
@@ -242,21 +241,45 @@ data.
   my $client = Connect somehost => 4242;
 
   # Compound expression
-  $client << sub{ decode_base64(shift) }                # decode line format
-    << sub{ my $msg = eval shift; $@ && die $@; $msg }; # eval perl string
+  $client << sub{ decode_base64(shift) }                      # decode line format
+          << sub{ my $msg = eval shift; $@ && die $@; $msg }; # eval perl string
 
   # Individual statements
-  $client >>= sub{ Dumper(shift) };                     # serialize with Dumper
-  $client >>= sub{ encode_base64(shift, '') };          # single line of base64
+  $client >>= sub{ Dumper(shift) };                           # serialize with Dumper
+  $client >>= sub{ encode_base64(shift, '') };                # single line of base64
 
 =head1 ENDLINES
 
-As one would expect using the <> operator, the value of C<$/> controls the character
-or string used to match the end of a line of input from the socket. It is also appended
-to all output.
+As one would expect using the <> operator, the value of C<$/> controls the
+character or string used to match the end of a line of input from the socket.
+It is also appended to all output.
 
   local $/ = "\n\n";
   my $http_request = <$conn>;
+
+=head1 PRECEDENCE OF BITWISE OPERATORS
+
+The bit shift operators overloaded to simplify data serialization and
+deserialization have a higher precedence than the comma operator, which can
+cause unexpected problems.
+
+For example, the following code:
+
+  my $client = Connect 'somehost', 4242
+    << sub{ decode_json(shift) }
+    >> sub{ encode_json(shift) };
+
+...is equivalent to the parenthesized statement:
+
+  my $client = Connect 'somehost', ((4242
+    << sub{ decode_json(shift) })
+    >> sub{ encode_json(shift) });
+
+...and would be more correctly written to avoid errors as:
+
+  my $client = Connect('somehost', 4242)
+    << sub{ decode_json(shift) }
+    >> sub{ encode_json(shift) };
 
 =head1 AUTHOR
 
@@ -264,7 +287,7 @@ Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Jeff Ober.
+This software is copyright (c) 2018 by Jeff Ober.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,13 @@
 Revision history for Alien-libuv
 
+1.004     2018-07-24
+  - Update to the libuv v1.22.0 release
+  - Deprecate all Windows versions prior to Windows 7 as per
+    https://github.com/libuv/libuv/blob/v1.x/SUPPORTED_PLATFORMS.md
+  - Switch to CMake when on Windows via Alien::cmake3
+  - Add a missing -lshell32 library inclusion to the libs and static_libs
+  - Add Perl 5.28 to the Strawberry tests on AppVeyor
+
 1.003     2018-06-19
   - Update library inclusions for building with MinGW on Windows.
   - Add a contributing document.

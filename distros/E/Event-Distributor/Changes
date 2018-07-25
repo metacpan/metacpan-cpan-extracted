@@ -1,5 +1,14 @@
 Revision history for Event-Distributor
 
+0.05    2018-07-23 16:11:07
+        [CHANGES]
+         * Ensure an empty query event doesn't fail
+         * Ensure that a dying subscriber to query doesn't kill the entire
+           distribution
+         * Make empty results count as failures for Query
+         * Make Query return empty result if all its subscribers did
+         * Use Syntax::Keyword::Try instead of plain eval{} block
+
 0.04    2015/11/27 21:53:07
         [CHANGES]
          * Added 'action' events

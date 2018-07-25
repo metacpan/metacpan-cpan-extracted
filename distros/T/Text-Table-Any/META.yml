@@ -34,6 +34,7 @@ recommends:
   Text::Table::TinyWide: '0'
   Text::TabularDisplay: '0'
 requires:
+  Text::Table::ASV: '0'
   Text::Table::Tiny: '0'
   perl: '5.010001'
   strict: '0'
@@ -42,7 +43,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-Any
   homepage: https://metacpan.org/release/Text-Table-Any
   repository: git://github.com/perlancar/perl-Text-Table-Any.git
-version: '0.091'
+version: '0.092'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

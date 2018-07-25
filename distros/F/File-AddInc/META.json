@@ -1,0 +1,85 @@
+{
+   "abstract" : "FindBin(+ use lib) alike for *.pm modulino (instead of *.pl)",
+   "author" : [
+      "Kobayasi, Hiroaki <buribullet@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.2",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "File-AddInc",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "lib" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Kantan" : "0",
+            "Test::More" : "0.98",
+            "rlib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::AddInc" : {
+         "file" : "lib/File/AddInc.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hkoba/p5-File-AddInc/issues"
+      },
+      "homepage" : "https://github.com/hkoba/p5-File-AddInc",
+      "repository" : {
+         "url" : "git://github.com/hkoba/p5-File-AddInc.git",
+         "web" : "https://github.com/hkoba/p5-File-AddInc"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:HKOBA",
+   "x_contributors" : [
+      "Kobayasi, Hiroaki <hkoba@ssri.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

@@ -1,29 +1,30 @@
 ---
-abstract: ~
+abstract: 'prints stack traces with arguments expanded into readable format'
 author:
-  - 'Sergey Aleynikov <sergey.aleynikov@gmail.com>'
+  - 'Sergey Aleynikov <randir@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.01'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Devel-PrettyTrace
 no_index:
   directory:
-    - inc
     - t
+    - inc
 requires:
-  Exporter: 0
-  perl: 5.6.0
-  Data::Printer: 0.19
-  parent: 0
-  List::MoreUtils: 0
+  Data::Printer: '0.19'
+  Exporter: '0'
+  List::MoreUtils: '0'
+  parent: '0'
+  perl: '5.006'
 resources:
-  license: http://opensource.org/licenses/bsd-license.php
-version: 0.04
+  bugtracker: https://github.com/dur-randir/Devel-PrettyTrace/issues
+  repository: https://github.com/dur-randir/Devel-PrettyTrace
+version: '0.05'

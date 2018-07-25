@@ -3,10 +3,8 @@ Changes
 LICENSE
 META.json
 README.md
-author/travis_install_mysql.sh
 cpanfile
 lib/Test/mysqld.pm
-minil.toml
 t/00-base.t
 t/01-raii.t
 t/02-multi.t

@@ -537,6 +537,9 @@ sub parse_on_ice ($$) {
 			$event->{on_ice} ||= [];
 			$event->{on_ice}[$team-1] = [];
 			for (my $i = 0; $i < $num; $i+=2) {
+				my $on_ice_font = $self->get_sub_tree(0, [$i,0,0,0,0], $on_ice_table);
+				my $name = $on_ice_font->attr('title') || '';
+				$event->{description} .= " $name";
 				my $on_ice_cell = $self->get_sub_tree(0, [$i,0,0,0,0,0], $on_ice_table);
 				next unless defined $on_ice_cell;
 				$on_ice_cell =
@@ -569,6 +572,7 @@ sub read_old_on_ice ($$) {
 	my $self = shift;
 	my $line = shift;
 
+	$self->{events}[-1]{description} .= $line;
 	$line =~ /^\s+(\S{3}):\s+(\S.*)/;
 	my $team = resolve_team($1, 1);
 	$self->{events}[-1]{on_ice} ||= [];
@@ -630,18 +634,19 @@ sub read_old_line ($$) {
 	$event->{id} = $self->{so} ? $self->{events}[-1]{id}+3 : substr($line, 0, 5);
 	$event->{id} =~ s/\s//g;
 	#print Dumper $event;
-	return $BROKEN_EVENTS{PL}->{$self->{_id}}{$event->{id}}
-		if ($BROKEN_EVENTS{PL}->{$self->{_id}}{$event->{id}});
+#	return $BROKEN_EVENTS{PL}->{$self->{_id}}{$event->{id}}
+#		if ($BROKEN_EVENTS{PL}->{$self->{_id}}{$event->{id}});
 	$event->{id}         += $self->{missed_events};
 	return undef if
 		defined $BROKEN_EVENTS{PL}->{$self->{_id}}->{$event->{id}} &&
-		!       $BROKEN_EVENTS{PL}->{$self->{_id}}->{$event->{id}};
+		(! $BROKEN_EVENTS{PL}->{$self->{_id}}->{$event->{id}} ||
+		 $BROKEN_EVENTS{PL}->{$self->{_id}}->{$event->{id}}{special});
 	if ($self->{so}) {
 		$line =~ s/^\s+(\S+)/" "x(9-length($1)).$1/e
 	}
 	$event->{period}      = $self->{so} ? 5                   : substr($line, 5, 5);
 	$event->{period}      =~ s/\s//g;
-	#print Dumper $event->{period}, $self->{stage};
+#	print Dumper $event->{period}, $self->{stage};
 	return undef if $event->{period} > 5 && $self->{stage} == $REGULAR;
 	$event->{type}        = substr($line, 16, 16);
 	$event->{team}        = substr($line, 34, 3);
@@ -731,6 +736,7 @@ sub read_playbyplay_old ($) {
 		for my $line (@lines) {
 			my $event = $self->read_old_line($line, $self);
 			next unless $event;
+#			print Dumper $event;
 			next if $event_cache->{$event->{id}};
 			$event_cache->{$event->{id}} = 1;
 			$self->cleanup_old_event($event);
@@ -749,7 +755,7 @@ sub read_playbyplay_old ($) {
 			if ($event->{strength} eq '-') {
 				$event->{strength} = @{$self->{events}} ? $self->{events}[-1]{strength} : 'EV';
 			}
-			fill_broken($evx, $event);
+			fill_broken($event, $evx);
 			$self->fill_event_values($event);
 			next if $event->{period} > 11;
 			push(@{$self->{events}}, $event);
@@ -841,7 +847,10 @@ sub fill_broken_events ($) {
 		unshift(@{$self->{events}}, @{$evx->{-1}});
 	}
 	for my $event (@{$self->{events}}) {
+		next unless $evx->{$event->{id}};
+#		print Dumper $evx;
 		next if $event->{special};
+#		print Dumper $evx->{$event->{id}};
 		if ($evx->{$event->{id}}{on_ice}) {
 			$event->{on_ice} = $evx->{$event->{id}}{on_ice};
 		}
@@ -851,6 +860,8 @@ sub fill_broken_events ($) {
 		elsif ($evx->{$event->{id}}{on_ice}) {
 			$event->{on_ice}[1] = $evx->{$event->{id}}{on_ice2};
 		}
+#		print Dumper $event;
+#		exit;
 	}
 }
 
@@ -870,10 +881,10 @@ sub fill_event_values ($$) {
 
 	my $self  = shift;
 	my $event = shift;
-	$event->{file}   = $self->{file};
-	$event->{season} = $self->{season};
-	$event->{game}   = $self->{_id};
-	$event->{stage}  = $self->{stage};
+	$event->{file}    = $self->{file};
+	$event->{season}  = $self->{season};
+	$event->{game_id} = $self->{_id};
+	$event->{stage}   = $self->{stage};
 	if ($event->{period} == 5 && $self->{stage} == $REGULAR) {
 		$event->{so}          = 1;
 		$event->{penaltyshot} = 1;
@@ -897,9 +908,12 @@ sub read_playbyplay ($) {
 			next if ! $event || $self->skip_event($event);
 			#print $play_row->dump;
 			$self->parse_description($event);
-			my $evx = $BROKEN_EVENTS{PL}->{$self->{_id}};
-			fill_broken($event, $evx->{$event->{id}});
+			next if $event->{type} eq 'CHL' && $event->{team1} eq 'html';
 			$self->parse_on_ice($event) unless $event->{type} eq 'GEND';
+			my $evx = $BROKEN_EVENTS{PL}->{$self->{_id}}
+				? $BROKEN_EVENTS{PL}->{$self->{_id}}{$event->{id}}
+				: undef;
+			fill_broken($event, $evx);
 			delete $event->{on_ice1} if $event->{on_ice1} && ref $event->{on_ice1} && ref $event->{on_ice1} ne 'ARRAY';
 			delete $event->{on_ice2} if $event->{on_ice2} && ref $event->{on_ice2} && ref $event->{on_ice2} ne 'ARRAY';
 			$self->fill_event_values($event);

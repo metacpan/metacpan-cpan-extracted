@@ -15,11 +15,11 @@ use URI::QueryParam;
 
 =head1 VERSION
 
-Version v0.10
+Version v0.11
 
 =cut
 
-our $VERSION = 'v0.10';
+our $VERSION = 'v0.11';
 
 =head1 SYNOPSIS
 
@@ -27,7 +27,7 @@ Base class for all instances
 
 =cut
 
-requires 'api_uri';
+requires '_api_uri';
 
 =head1 ATTRIBUTES
 
@@ -35,9 +35,7 @@ requires 'api_uri';
 
 =item I<application_id*>
 
-Rerquired application id: L<https://developers.wargaming.net/documentation/guide/getting-started/>
-
-=back
+Required application id: L<https://developers.wargaming.net/documentation/guide/getting-started/>
 
 =cut
 
@@ -46,11 +44,7 @@ has application_id => (
     require => 1,
 );
 
-=over 1
-
 =item I<language>
-
-=back
 
 =cut
 
@@ -59,43 +53,29 @@ has language => (
     default => sub {'ru'},
 );
 
-=over 1
-
 =item I<status>
 
 Return request status
-
-=back
 
 =cut
 
 has status => ( is => 'rw', );
 
-=over 1
-
 =item I<response>
 
 Return response
-
-=back
 
 =cut
 
 has response => ( is => 'rw', );
 
-=over 1
-
 =item I<meta_data>
 
 Return meta data from response
 
-=back
-
 =cut
 
 has meta_data => ( is => 'rw', );
-
-=over 1
 
 =item I<debug>
 
@@ -119,8 +99,6 @@ has debug => (
 
 Returns a user agent instance
 
-=back
-
 =cut
 
 #@returns LWP::UserAgent
@@ -129,32 +107,26 @@ has ua => (
     default => sub { LWP::UserAgent->new() },
 );
 
-=over 1
-
 =item B<error>
 
 Returns a WG::API::Error instance if defined;
-
-=back
 
 =cut
 
 #@returns WG::API::Error
 has error => ( is => 'rw', );
 
-=over 1
-
 =item B<set_debug>
 
 Set debug mode
-
-=back
 
 =over 1
 
 =item B<log>
 
 Logger
+
+=back
 
 =back
 
@@ -273,7 +245,7 @@ sub _parse {
 sub _build_url {
     my ( $self, $uri ) = @_;
 
-    my $url = URI->new( $self->api_uri );
+    my $url = URI->new( $self->_api_uri );
     $url->scheme("https");
     $url->path($uri);
 

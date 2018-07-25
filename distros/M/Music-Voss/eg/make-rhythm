@@ -17,22 +17,22 @@ my @possible_durations = qw(sn en sn qn);
 # durations, or changing the keys. The keys are labels and could be
 # changed to lilypond duration names or whatever.
 my %duration_of = (
-  'wn'  => 128,
-  'hn'  => 64,
-  'dhn' => 64 + 32,
-  'qn'  => 32,
-  'dqn' => 32 + 16,
-  'en'  => 16,
-  'den' => 16 + 8,
-  'sn'  => 8,
-  '32'  => 4,
-  '64'  => 2,
-  '128' => 1,         # anything smaller will require reworking things...
+    'wn'  => 128,
+    'hn'  => 64,
+    'dhn' => 64 + 32,
+    'qn'  => 32,
+    'dqn' => 32 + 16,
+    'en'  => 16,
+    'den' => 16 + 8,
+    'sn'  => 8,
+    '32'  => 4,
+    '64'  => 2,
+    '128' => 1,         # anything smaller will require reworking things...
 );
 
 # NOTE this controls how many notes a complete rhythm must contain (as
 # otherwise random results tend not fall on measure boundaries)
-my $MEASURES = 8;
+my $MEASURES = 32;
 my $MAX_LEN  = 128 * $MEASURES;
 
 my $ms = MIDI::Simple->new_score;
@@ -40,39 +40,39 @@ $ms->set_tempo(500000);
 $ms->noop(qw/c1 f o5/);
 
 for my $dur ( gen_rhythm() ) {
-  $ms->n( $dur, "C" );
+    $ms->n( $dur, "C" );
 }
 
 $ms->write_score('out.midi');
 
 sub gen_rhythm {
-  my @rhythm;
-ATTEMPT: while (1) {
-    # NOTE this should produce numbers equal to or a subset of
-    # @possible_durations (min here is 0, max 3, depending on how the
-    # coinflips turn out)
-    my $durfn = bitchange(
-      roll    => sub { int rand 2 },
-      rollers => 3,
-    );
+    my @rhythm;
+  ATTEMPT: while (1) {
+        # NOTE this should produce numbers equal to or a subset of
+        # @possible_durations (min here is 0, max 3, depending on how the
+        # coinflips turn out)
+        my $durfn = bitchange(
+            roll    => sub { int rand 2 },
+            rollers => 3,
+        );
 
-    my $x   = 0;
-    my $sum = 0;
-    while (1) {
-      my $roll = $durfn->( $x++ );
-      push @rhythm, $possible_durations[$roll] // default_dur($roll);
-      $sum += $duration_of{ $rhythm[-1] };
-      if ( $sum == $MAX_LEN ) {
-        last ATTEMPT;
-      } elsif ( $sum > $MAX_LEN ) {
-        @rhythm = ();
-        next ATTEMPT;
-      }
+        my $x   = 0;
+        my $sum = 0;
+        while (1) {
+            my $roll = $durfn->( $x++ );
+            push @rhythm, $possible_durations[$roll] // default_dur($roll);
+            $sum += $duration_of{ $rhythm[-1] };
+            if ( $sum == $MAX_LEN ) {
+                last ATTEMPT;
+            } elsif ( $sum > $MAX_LEN ) {
+                @rhythm = ();
+                next ATTEMPT;
+            }
+        }
     }
-  }
-  return @rhythm;
+    return @rhythm;
 }
 
 sub default_dur {
-  die "unable to lookup duration for ", $_[0], "\n";
+    die "unable to lookup duration for ", $_[0], "\n";
 }

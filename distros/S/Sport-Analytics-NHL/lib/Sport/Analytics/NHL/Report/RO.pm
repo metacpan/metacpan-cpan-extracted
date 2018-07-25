@@ -7,6 +7,8 @@ use experimental qw(smartmatch);
 
 use Sport::Analytics::NHL::Tools;
 
+use parent 'Sport::Analytics::NHL::Report';
+
 =head1 NAME
 
 Sport::Analytics::NHL::Report::RO - Class for the NHL HTML RO report.
@@ -97,8 +99,6 @@ Reads the old Roster report into a boxscore structure
 =back
 
 =cut
-
-use parent 'Sport::Analytics::NHL::Report';
 
 sub get_roster_old ($$$;$) {
 

@@ -31,7 +31,7 @@ eval {use PPI;
 
 
 
-$Devel::DumpTrace::PPI::VERSION = '0.26';
+$Devel::DumpTrace::PPI::VERSION = '0.27';
 use constant ADD_IMPLICIT_ => 1;
 use constant DECORATE_FOR => 1;
 use constant DECORATE_FOREACH => 1;
@@ -107,7 +107,7 @@ sub _update_ppi_src_for_file {
     foreach my $element (_DECORATE_REVERSE ? reverse @$statements
                                            : @$statements) {
 	my $_line = $element->line_number;
-	__decorate1($element, $file);
+	__decorate1($element, $file, $doc);
 	next if _element_has_ancestor_on_same_line($element,$_line);
 	__decorate2($element, $file);
 	_update_ppi_src_for_element($element, $file, $_line);
@@ -165,6 +165,7 @@ sub __decorate1 {
     }
     __decorate_first_statement_in_for_block($element, $file);
     __decorate_first_statement_in_foreach_block($element, $file);
+    __decorate_first_statement_AFTER_for_block($element,$file);
     return;
 }
 
@@ -172,6 +173,7 @@ sub __decorate2 {
     my ($element, $file) = @_;
     __remove_whitespace_and_comments_just_before_end_of_statement($element);
     __decorate_first_statement_in_while_block($element, $file);
+    __decorate_first_statement_AFTER_while_block($element, $file);
     __decorate_statements_in_ifelse_block($element, $file);
     __decorate_last_statement_in_dowhile_block($element, $file);
     return;
@@ -227,26 +229,58 @@ sub _get_decorated_statements {
 	} elsif ($ss->{__DECORATED__} eq 'for'
 		 && $last_file_line_displayed ne $ss->{__FOR_LINE__}) {
 
-	    unshift @s, __new_token("FOR-UPDATE: {"), $ss->{__CONTINUE__},
-	        __new_token(" } FOR-COND: {"), $ss->{__CONDITION__},
-	        __new_token(" }" . $ws);
+	    unshift @s,
+                __new_token("FOR-UPDATE: {"),
+                $ss->{__CONTINUE__},
+	        __new_token(" } FOR-COND: {"),
+                $ss->{__CONDITION__},
+	        __new_token(" } $ws");
 
 	} elsif ($ss->{__DECORATED__} eq 'while/until'
 		 && $last_file_line_displayed ne $ss->{__WHILE_LINE__}) {
+
 	    unshift @s,
 	        __new_token($ss->{__BLOCK_NAME__} . ": "),
-	        $ss->{__CONDITION__}, __new_token(" " . $ws);
+	        $ss->{__CONDITION__},
+                __new_token(" $ws");
+
 	} elsif ($ss->{__DECORATED__} eq 'if-elsif-else'
 		 && $last_file_line_displayed eq $ss->{__IF_LINE__}) {
 
-	    unshift @s, @{$ss->{__CONDITIONS__}}, __new_token(" ". $ws);
+	    unshift @s,
+                @{$ss->{__CONDITIONS__}},
+                __new_token(" ". $ws);
+
 	} elsif ($ss->{__DECORATED__} eq 'do-while'
 		 && $last_file_line_displayed ne $ss->{__DOWHILE_LINE__}) {
-	    push @s, __new_token(" " . $ws),
+
+	    push @s,
+                __new_token(" " . $ws),
 	        __new_token($ss->{__SENSE__} . ": {"),
 	        @{$ss->{__CONDITION__}},
 	        __new_token("}");
-	}
+
+	} elsif ($ss->{__DECORATED__} eq 'end-for'
+                 && $last_file_line_displayed ne $ss->{__ENDFOR_LINE__}
+                 && $ss->{__CONDITIONER__} 
+                 && $ss->{__CONDITIONER__}{__GP_CONDITION__}) {
+
+            unshift @s,
+                __new_token("FOR-COND: {"),
+                $ss->{__CONDITIONER__}{__GP_CONDITION__},
+                __new_token("} $ws");
+
+	} elsif ($ss->{__DECORATED__} eq 'end-while'
+                 && $last_file_line_displayed ne $ss->{__ENDWHILE_LINE__}
+                 && $ss->{__CONDITIONER__} 
+                 && $ss->{__CONDITIONER__}{__GP_CONDITION__}) {
+
+            unshift @s,
+                __new_token($ss->{__SENSE__} . ": ("),
+                $ss->{__CONDITIONER__}{__GP_CONDITION__},
+                __new_token(") $ws");
+
+        }
     }
     return @s;
 }
@@ -290,8 +324,10 @@ sub evaluate_and_display_line_PPI {
     #       sufficient or should we analyze the PPI tokens?
     if ($code    =~ /^ \s* (my|our) \s*
                        [\$@%*\(] /x           # lexical declaration
+
 	&& $code =~ / (?<!;) .* ;
                       \s* (\# .* )? $/x      # single statement, single line
+
 	&& $code !~ /=/) {                   # NOT an assignment
 
 	$xcode = $code;
@@ -1179,6 +1215,7 @@ sub __decorate_first_statement_in_for_block {
 
 	    my $condition_statement = $for_statements[1]->clone();
 	    $element->{__CONDITION__} = $condition_statement;
+            $gparent->{__GP_CONDITION__} = $condition_statement;
 
 	    if (@for_statements > 2) {
 		my $continue_statement = $for_statements[2]->clone();
@@ -1194,6 +1231,40 @@ sub __decorate_first_statement_in_for_block {
 	    $element->{__DECORATED__} = 'for';
 	}
     }
+    return;
+}
+
+sub __decorate_first_statement_AFTER_for_block {
+
+   
+    return unless DECORATE_FOR;
+
+    my ($element, $file,$doc) = @_;
+
+    return if ref($element) ne 'PPI::Statement::Compound';
+    my @children = $element->children;
+    @children = grep { ref($_) ne 'PPI::Token::Whitespace' } @children;
+    return if ref($children[0]) ne 'PPI::Token::Word';
+    return if "$children[0]" ne "for" && "$children[0]" ne "foreach";
+    
+    my $next = __next_sibling($element);
+    return unless $next;
+
+
+    if (0) {
+        open TTY,">","/dev/tty";
+        print TTY "WANT TO DECORATE STATEMENT\n\n\t$next\n\n\nAFTER FOR";
+        print TTY "PREV STATEMENT IS\n\n\t$element\n\n",ref($element),"\n\n\n";
+        local $Data::Dumper::Indent = 0;
+        #    print TTY "\n", Dumper($element);
+        print TTY "\n",join("\n",sort keys %$element),"\n";
+        print TTY "\n";
+    }
+
+    my $line = $next->line_number;
+    $next->{__DECORATED__} = "end-for";
+    $next->{__ENDFOR_LINE__} = "$file:$line";
+    $next->{__CONDITIONER__} = $element;
     return;
 }
 
@@ -1302,12 +1373,49 @@ sub __decorate_first_statement_in_while_block {
 
 	    $element->{__BLOCK_NAME__} = uc ($cond_name || 'COND');
 	    $element->{__CONDITION__} = $cond->clone();
+            $gparent->{__GP_CONDITION__} = $element->{__CONDITION__};
 	    my $line = $cond->line_number;
 	    $element->{__WHILE_LINE__} = "$file:$line";
 	    $element->{__DECORATED__} = 'while/until';
 	    return;
 	}
     }
+    return;
+}
+
+sub __decorate_first_statement_AFTER_while_block {
+
+   
+    return unless DECORATE_WHILE;
+
+    my ($element, $file) = @_;
+
+    return if ref($element) ne 'PPI::Statement::Compound';
+    my @children = $element->children;
+    @children = grep { ref($_) ne 'PPI::Token::Whitespace' } @children;
+    return if ref($children[0]) ne 'PPI::Token::Word';
+    return if "$children[0]" ne "while" && "$children[0]" ne "until";
+    my $sense = uc($children[0]);
+    
+    my $next = __next_sibling($element);
+    return unless $next;
+
+
+    if (0) {
+        open TTY,">","/dev/tty";
+        print TTY "WANT TO DECORATE STATEMENT\n\n\t$next\n\n\nAFTER WHILE";
+        print TTY "PREV STATEMENT IS\n\n\t$element\n\n",ref($element),"\n\n\n";
+        local $Data::Dumper::Indent = 0;
+        #    print TTY "\n", Dumper($element);
+        print TTY "\n",join("\n",sort keys %$element),"\n";
+        print TTY "\n";
+    }
+
+    my $line = $next->line_number;
+    $next->{__DECORATED__} = "end-while";
+    $next->{__SENSE__} = $sense;
+    $next->{__ENDWHILE_LINE__} = "$file:$line";
+    $next->{__CONDITIONER__} = $element;
     return;
 }
 
@@ -1361,6 +1469,21 @@ sub __decorate_last_statement_in_dowhile_block {
     $element->{__DOWHILE_LINE__} = "$file:$line";
     $element->{__SENSE__} = "DO-" . uc "$sense";
     $element->{__CONDITION__} = [ @condition ];
+    return;
+}
+
+sub __next_sibling {
+    my ($element) = @_;
+    my $parent = $element->parent;
+    return unless $parent;
+    my $last = undef;
+    foreach my $sib ($parent->children) {
+        next if ref($sib) eq 'PPI::Token::Whitespace';
+        if ($last eq $element) {
+            return $sib;
+        }
+        $last = $sib;
+    }
     return;
 }
 
@@ -1472,7 +1595,7 @@ Devel::DumpTrace::PPI - PPI-based version of Devel::DumpTrace
 
 =head1 VERSION
 
-0.26
+0.27
 
 =head1 SYNOPSIS
 
@@ -1506,8 +1629,8 @@ Devel::DumpTrace::PPI - PPI-based version of Devel::DumpTrace
 
 C<Devel::DumpTrace::PPI> is a near drop-in replacement
 to L<Devel::DumpTrace|Devel::DumpTrace> that uses the L<PPI module|PPI>
-for parsing the source code.
-PPI overcomes some of the limitations of the original C<Devel::DumpTrace>
+for parsing the source code. With PPI, this module
+overcomes some of the limitations of the original C<Devel::DumpTrace>
 parser and makes a few other features available, including
 
 =over 4
@@ -1684,9 +1807,9 @@ and configuration settings.
 
 Inside a Perl debugger, there are many expressions evaluated
 inside Perl flow control structures that "cannot hold a breakpoint"
-(to use the language of L<perldebguts|perldebguts>). As a result,
-these expressions never appear in a normal trace ouptut (using
-C<-d:Trace>, for example).
+(to use the language of L<perldebguts|perldebguts/"Debugger-Internals>). 
+As a result, these expressions never appear in a normal trace ouptut 
+(using C<-d:Trace>, for example).
 
 For example, a trace for a line containing a C-style C<for> loop 
 typically appears only once, during the first iteration of the loop:
@@ -1727,6 +1850,10 @@ expressions to the existing source code and to display and
 evaluate these expressions when they would have been evaluated
 in the Perl program.
 
+=cut
+
+# Is any of this decoration feasible for the simple parser?
+
 =head2 Special handling for C-style for loops
 
 A C-style for loop has the structure
@@ -1743,24 +1870,23 @@ expressions from the C<for> loop:
   for ($i=0; $i<3; $i++) {
     $y += $i;
   }
+  print $y;
 
   $ perl -d:DumpTrace::PPI simple-for.pl
-  >>>   simple-for.pl:3:[__top__]:
-  >>>>> simple-for.pl:1:[__top__]: for ($i:0=0; $i:0<3; $i:0++) {
-  >>>>> simple-for.pl:2:[__top__]: $y:0 += $i:0;
-  >>>>> simple-for.pl:2:[__top__]: FOR-UPDATE: {$i:1++ } FOR-COND: {$i:1<3; }
-                                     $y:1 += $i:1;
-  >>>>> simple-for.pl:2:[__top__]: FOR-UPDATE: {$i:2++ } FOR-COND: {$i:2<3; }
-                                     $y:3 += $i:2;
+  >>>>> simple-for.pl:1:[__top__]:  for ($i:0=0; $i:undef<3; $i:0++) {
+  >>>>> simple-for.pl:2:[__top__]:  $y:0 += $i:0;
+  >>>>> simple-for.pl:2:[__top__]:  FOR-UPDATE: {$i:2++ } FOR-COND: {$i:1<3; } 
+                                    $y:1 += $i:1;
+  >>>>> simple-for.pl:2:[__top__]:  FOR-UPDATE: {$i:3++ } FOR-COND: {$i:2<3; } 
+                                    $y:3 += $i:2;
+  >>>   simple-for.pl:4:[__top__]:  FOR-COND: {$i:3<3;} 
+                                    print $y:3;
 
   $ perl -d:DumpTrace::PPI=verbose simple-for.pl
-  >>    simple-for.pl:3:[__top__]:
-  >>>
-  -------------------------------------------
   >>    simple-for.pl:1:[__top__]:
   >>>              for ($i=0; $i<3; $i++) {
-  >>>>             for ($i=0; 0<3; 0++) {
-  >>>>>            for (0=0; 0<3; 0++) {
+  >>>>             for ($i=0; undef<3; $i++) {
+  >>>>>            for (0=0; undef<3; 0++) {
   -------------------------------------------
   >>    simple-for.pl:2:[__top__]:
   >>>              $y += $i;
@@ -1768,14 +1894,18 @@ expressions from the C<for> loop:
   >>>>>            0 += 0;
   -------------------------------------------
   >>    simple-for.pl:2:[__top__]:
-  >>>              FOR-UPDATE: {$i++ } FOR-COND: {$i<3; } $y += $i;
-  >>>>             FOR-UPDATE: {1++ } FOR-COND: {1<3; } $y += 1;
-  >>>>>            FOR-UPDATE: {1++ } FOR-COND: {1<3; } 1 += 1;
+  >>>              FOR-UPDATE: {$i++ } FOR-COND: {$i<3; }  $y += $i;
+  >>>>             FOR-UPDATE: {$i++ } FOR-COND: {1<3; }  $y += 1;
+  >>>>>            FOR-UPDATE: {2++ } FOR-COND: {1<3; }  1 += 1;
   -------------------------------------------
   >>    simple-for.pl:2:[__top__]:
-  >>>              FOR-UPDATE: {$i++ } FOR-COND: {$i<3; } $y += $i;
-  >>>>             FOR-UPDATE: {2++ } FOR-COND: {2<3; } $y += 2;
-  >>>>>            FOR-UPDATE: {2++ } FOR-COND: {2<3; } 3 += 2;
+  >>>              FOR-UPDATE: {$i++ } FOR-COND: {$i<3; }  $y += $i;
+  >>>>             FOR-UPDATE: {$i++ } FOR-COND: {2<3; }  $y += 2;
+  >>>>>            FOR-UPDATE: {3++ } FOR-COND: {2<3; }  3 += 2;
+  -------------------------------------------
+  >>    simple-for.pl:4:[__top__]:
+  >>>              FOR-COND: {$i<3;}  print $y;
+  >>>>             FOR-COND: {3<3;}  print 3;
   -------------------------------------------
 
 The first time the loop's block code is executed, there is no need
@@ -1785,13 +1915,14 @@ time through the loop, the original source code is decorated with
 C<FOR-UPDATE: {> I<expression> C<}> and C<FOR-COND: {> I<expression>
 C<}>, showing what code was executed when the previous iteration 
 finished, and what expression was evaluated to determine whether to
-continue with the C<for> loop, respectively. 
+continue with the C<for> loop, respectively.
 
-Unfortunately, this example still does not show the expressions
-that were evaluated at the end of the third loop, when the
-update and condition expressions are evaluated another time.
-In the last iteration, the condition expression evaluates to false
-and the program breaks out of the loop.
+B<Note:> the final C<FOR-COND ...> statement, where the 
+condition is false and Perl breaks out of the loop, will only be
+displayed when the compound C<for> statement is not the last statement
+in the current block, as this feature works by attaching
+additional information to the statement that I<follows> the end
+of the C<for> loop.
 
 =head2 Special handling for other foreach loops
 
@@ -1845,31 +1976,35 @@ beginning of every iteration of the loop:
     next if $k % 5 == 1;
     $l = $l + $k;
   }
+  print "L is $l\n";
 
   $ perl -d:DumpTrace::PPI ./simple-while.pl
-  >>>   ./simple-while.pl:1:[__top__]:
-  >>>   ./simple-while.pl:2:[__top__]:       while ($i:0++ < 6) {
-  >>>>> ./simple-while.pl:3:[__top__]:       my $k:9 = $i:1 * $j:9--;
-  >>>   ./simple-while.pl:4:[__top__]:       next if $k:9 % 5 == 1;
-  >>>>> ./simple-while.pl:5:[__top__]:       $l:9 = $l:0 + $k:9;
-  >>>>> ./simple-while.pl:3:[__top__]:       WHILE: ($i:2++ < 6)
-                                          my $k:16 = $i:2 * $j:8--;
-  >>>   ./simple-while.pl:4:[__top__]:       next if $k:16 % 5 == 1;
-  >>>>> ./simple-while.pl:3:[__top__]:       WHILE: ($i:3++ < 6)
-                                          my $k:21 = $i:3 * $j:7--;
-  >>>   ./simple-while.pl:4:[__top__]:       next if $k:21 % 5 == 1;
-  >>>>> ./simple-while.pl:3:[__top__]:       WHILE: ($i:4++ < 6)
-                                          my $k:24 = $i:4 * $j:6--;
-  >>>   ./simple-while.pl:4:[__top__]:       next if $k:24 % 5 == 1;
-  >>>>> ./simple-while.pl:5:[__top__]:       $l:33 = $l:9 + $k:24;
-  >>>>> ./simple-while.pl:3:[__top__]:       WHILE: ($i:5++ < 6)
-                                          my $k:25 = $i:5 * $j:5--;
-  >>>   ./simple-while.pl:4:[__top__]:       next if $k:25 % 5 == 1;
-  >>>>> ./simple-while.pl:5:[__top__]:       $l:58 = $l:33 + $k:25;
-  >>>>> ./simple-while.pl:3:[__top__]:       WHILE: ($i:6++ < 6)
-                                          my $k:24 = $i:6 * $j:4--;
-  >>>   ./simple-while.pl:4:[__top__]:       next if $k:24 % 5 == 1;
-  >>>>> ./simple-while.pl:5:[__top__]:       $l:82 = $l:58 + $k:24;
+  >>>>> simple-while.pl:1:[__top__]:  my ($i:0, $j:9, $l:0) = (0, 9, 0);
+  >>>>> simple-while.pl:2:[__top__]:  while ($i:1++ < 6) {
+  >>>>> simple-while.pl:3:[__top__]:  my $k:9 = $i:1 * $j:8--;
+  >>>   simple-while.pl:4:[__top__]:  next if $k:9 % 5 == 1;
+  >>>>> simple-while.pl:5:[__top__]:  $l:9 = $l:0 + $k:9;
+  >>>>> simple-while.pl:3:[__top__]:  WHILE: ($i:2++ < 6) 
+                                      my $k:16 = $i:2 * $j:7--;
+  >>>   simple-while.pl:4:[__top__]:  next if $k:16 % 5 == 1;
+  >>>>> simple-while.pl:3:[__top__]:  WHILE: ($i:3++ < 6) 
+                                      my $k:21 = $i:3 * $j:6--;
+  >>>   simple-while.pl:4:[__top__]:  next if $k:21 % 5 == 1;
+  >>>>> simple-while.pl:3:[__top__]:  WHILE: ($i:4++ < 6) 
+                                      my $k:24 = $i:4 * $j:5--;
+  >>>   simple-while.pl:4:[__top__]:  next if $k:24 % 5 == 1;
+  >>>>> simple-while.pl:5:[__top__]:  $l:33 = $l:9 + $k:24;
+  >>>>> simple-while.pl:3:[__top__]:  WHILE: ($i:5++ < 6) 
+                                      my $k:25 = $i:5 * $j:4--;
+  >>>   simple-while.pl:4:[__top__]:  next if $k:25 % 5 == 1;
+  >>>>> simple-while.pl:5:[__top__]:  $l:58 = $l:33 + $k:25;
+  >>>>> simple-while.pl:3:[__top__]:  WHILE: ($i:6++ < 6) 
+                                      my $k:24 = $i:6 * $j:3--;
+  >>>   simple-while.pl:4:[__top__]:  next if $k:24 % 5 == 1;
+  >>>>> simple-while.pl:5:[__top__]:  $l:82 = $l:58 + $k:24;
+  L is 82
+  >>>>> simple-while.pl:7:[__top__]:  WHILE: {($i:7++ < 6)} 
+                                      print "L is $l\n";
 
 In this example, a C<WHILE: {> I<expression> C<}> decorator
 (capitalized to indicate that it is not a part of the actual source
@@ -1879,9 +2014,10 @@ the conditional expression contains a C<++> postfix operator,
 but this module does not evaluate the expression until after the
 real conditional expression has actually been evaluated).
 
-Again, the output does not show the conditional expression being
-evaluated for the final time, right before the program breaks out
-of the while loop control structure.
+B<Note:> Again, the output for the evaluation that breaks out
+of the C<while> loop can only be displayed when the compound
+C<while> or C<until> statement is not the last statement in the
+block.
 
 =head2 do-while and do-until loops
 
@@ -1892,8 +2028,8 @@ decorates the last statement of a C<do-while> or C<do-until> block
 to print out the condition:
 
   $ perl -d:DumpTrace::PPI -e 'do {
-  > $k++;
-  > $l += $k;
+  >   $k++;
+  >   $l += $k;
   > } while $l < 40'
   >>>   -e:1:[__top__]:   do {
   >>>>> -e:2:[__top__]:   $k:1++;
@@ -2047,7 +2183,7 @@ Marty O'Brien, E<lt>mob at cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Marty O'Brien.
+Copyright 2010-2018 Marty O'Brien.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

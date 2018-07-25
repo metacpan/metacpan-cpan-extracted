@@ -27,6 +27,6 @@ requires:
   JSON: '0'
   LWP::UserAgent: '0'
   Test::More: '0'
-  perl: '5.010001'
-version: '0.16'
+  perl: '5.012000'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -24,3 +24,4 @@ my $ev = {a => 1};
 my $broken = {a => 2, b => 1};
 fill_broken($ev, $broken);
 is_deeply($ev, $broken, 'fill_broken correct');
+is_deeply([my_uniq {$_ % 2} 2,4,5 ], [2,5], 'my uniq correct');

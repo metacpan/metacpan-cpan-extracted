@@ -1,4 +1,19 @@
-$Id: Changes 1695 2018-07-16 04:25:23Z willem $                       -*-text-*-
+$Id: Changes 1700 2018-07-24 20:18:14Z willem $                       -*-text-*-
+
+
+**** 1.17 Jul 25, 2018
+
+Fix rt.cpan.org #125890
+
+	AXFR: 1 record per packet responses.
+
+Fix rt.cpan.org #125889
+
+	New NSEC3 for empty non-terminal leaves type bitmap undefined.
+
+Fix rt.cpan.org #125882
+
+	RDATA name compression pointer calculated incorrectly.
 
 
 **** 1.16 Jul 15, 2018

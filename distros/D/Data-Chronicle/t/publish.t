@@ -5,6 +5,7 @@ use Date::Utility;
 use Test::More;
 use Test::Exception;
 use Data::Chronicle::Writer;
+use Data::Chronicle::Subscriber;
 require Test::NoWarnings;
 
 package t::InMemoryCache {
@@ -66,51 +67,16 @@ subtest "disabled publish_on_set (default)" => sub {
 };
 
 subtest "subscribe & unsubscribe" => sub {
-    my $cache  = t::InMemoryCache->new;
-    my $writer = Data::Chronicle::Writer->new(
-        cache_writer   => $cache,
-        publish_on_set => 1,
-        ttl            => 86400
+    my $cache      = t::InMemoryCache->new;
+    my $subscriber = Data::Chronicle::Subscriber->new(
+        cache_subscriber => $cache,
     );
     my $subref = sub { print 'Hello'; };
-    $writer->subscribe('namespace', 'category', $subref);
+    $subscriber->subscribe('namespace', 'category', $subref);
     ok $cache->cache->{"subscribe::namespace::category"}, "subscription is set";
-    $writer->unsubscribe('namespace', 'category', $subref);
+
+    $subscriber->unsubscribe('namespace', 'category');
     ok !exists $cache->cache->{"subscribe::namespace::category"}, "subscription is unset";
-};
-
-subtest "subscribe & unsubscribe without publish_on_set" => sub {
-    my $cache  = t::InMemoryCache->new;
-    my $writer = Data::Chronicle::Writer->new(
-        cache_writer => $cache,
-        ttl          => 86400
-    );
-    my $subref = sub { print 'Hello'; };
-    throws_ok {
-        $writer->subscribe('namespace', 'category', $subref)
-    }
-    qr/publish_on_set must be enabled/;
-    throws_ok {
-        $writer->unsubscribe('namespace', 'category', $subref)
-    }
-    qr/publish_on_set must be enabled/;
-};
-
-subtest "subscribe & unsubscribe without coderef" => sub {
-    my $cache  = t::InMemoryCache->new;
-    my $writer = Data::Chronicle::Writer->new(
-        cache_writer   => $cache,
-        publish_on_set => 1,
-        ttl            => 86400
-    );
-    throws_ok {
-        $writer->subscribe('namespace', 'category', 56)
-    }
-    qr/requires a coderef/;
-    throws_ok {
-        $writer->unsubscribe('namespace', 'category', 'hta')
-    }
-    qr/requires a coderef/;
 };
 
 Test::NoWarnings::had_no_warnings();

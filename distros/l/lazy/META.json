@@ -84,7 +84,7 @@
          "web" : "https://github.com/oalders/lazy"
       }
    },
-   "version" : "0.000006",
+   "version" : "0.000007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -195,7 +195,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "name" : "@Author::OALDERS/InstallGuide",
-            "version" : "1.200009"
+            "version" : "1.200011"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -583,7 +583,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000006",
+                  "tag" : "v0.000007",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

@@ -1,5 +1,8 @@
 Revision history for JMAP-Tester
 
+0.020     2018-07-24 15:23:33-04:00 America/New_York
+        - add "type" to download_uri_for arguments
+
 0.019     2018-07-15 20:57:09-04:00 America/Toronto
         - allow "-X" with a numeric "X" as the output filename for Logger to
           output to the numeric file descriptor

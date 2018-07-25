@@ -1,5 +1,9 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.65   2018-07-23
+       - better error message for the case when we are unable to abbreviate
+         due to not being supplied a country_code
+
 1.64   2018-02-08
        - support county_codes for IT provinces
        - some Perl::Critic fixes

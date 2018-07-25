@@ -10,7 +10,7 @@ use warnings;
 use 5.014; # s///r
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 use constant CMD => "count";
 use constant CMD_DESC => "Count the various kinds of SV";
@@ -40,11 +40,35 @@ This C<Devel::MAT> tool counts the different kinds of SV in the heap.
 
 Prints a summary of the count of each type of object.
 
+Takes the following named options:
+
+=over 4
+
+=item --blessed, -b
+
+Additionally classify blessed references per package
+
+=item --scalars, -S
+
+Additionally classify SCALAR SVs according to which fields they have present
+
+=item --struct
+
+Use the structural size to sum byte counts
+
+=item --owned
+
+Use the owned size to sum byte counts
+
+=back
+
 =cut
 
 use constant CMD_OPTS => (
    blessed => { help => "classify blessed references per package",
                 alias => "b" },
+   scalars => { help => "classify SCALARs according to present fields",
+                alias => "S" },
    struct  => { help => "sum SVs by structural size" },
    owned   => { help => "sum SVs by owned size" },
 );
@@ -65,6 +89,7 @@ sub run
                    "size";
 
    my %counts;
+   my %counts_SCALAR;
    my %counts_per_package;
 
    foreach my $sv ( $self->df->heap ) {
@@ -74,10 +99,24 @@ sub run
       $c->svs++;
       $c->bytes += $bytes;
 
-      $sv->blessed or next;
+      if( $sv->blessed ) {
+         $c->blessed_svs++;
+         $c->blessed_bytes += $bytes;
+      }
 
-      $c->blessed_svs++;
-      $c->blessed_bytes += $bytes;
+      if( $opts{scalars} and $sv->isa( "Devel::MAT::SV::SCALAR" ) ) {
+         my $desc = $sv->desc;
+
+         $c = $counts_SCALAR{$desc} //= Counts( ( 0 ) x 4 );
+
+         $c->svs++;
+         $c->bytes += $bytes;
+
+         if( $sv->blessed ) {
+            $c->blessed_svs++;
+            $c->blessed_bytes += $bytes;
+         }
+      }
 
       $opts{blessed} or next;
 
@@ -99,6 +138,16 @@ sub run
             $c->blessed_bytes ? Devel::MAT::Cmd->format_bytes( $c->blessed_bytes ) : "" ];
 
       push @table, _gen_package_breakdown( $counts_per_package{$_} ) if $opts{blessed};
+
+      if( $kind eq "SCALAR" and $opts{scalars} ) {
+         foreach ( sort keys %counts_SCALAR ) {
+            my $c = $counts_SCALAR{$_};
+
+            push @table, [ "    $_", $c->svs, $c->blessed_svs // "",
+                  Devel::MAT::Cmd->format_bytes( $c->bytes ),
+                  $c->blessed_bytes ? Devel::MAT::Cmd->format_bytes( $c->blessed_bytes ) : "" ];
+         }
+      }
    }
 
    push @table, [ "  -----", ( "" ) x 4 ];

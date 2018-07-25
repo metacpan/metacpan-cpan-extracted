@@ -56,7 +56,7 @@ sub as_json {
         items => $self->top_level_items,
     };
 
-    return JSON->new->convert_blessed->pretty->utf8->encode( $data_for_json );
+    return JSON->new->convert_blessed->utf8->encode( $data_for_json );
 }
 
 sub as_raw_data {

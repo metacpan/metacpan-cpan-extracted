@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use v5.8.2;               # PadWalker 1.5 not available for <v5.8.2
+use v5.8.1;               # PadWalker 1.5 not available for <v5.8.1
 
 my $TESTS = "t/*.t t/ppi/*.t";
 unless (eval 'use PPI;1') {

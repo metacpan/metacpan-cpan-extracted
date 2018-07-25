@@ -6,6 +6,7 @@ requires 'Modern::Perl', '>=1.20170117';
 requires 'perl', '>=5.020';
 requires 'Log::Any', '>=1.049';
 requires 'URI';
+requires 'Const::Fast';
 
 on build => sub {
     requires 'Test::More';

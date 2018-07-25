@@ -16,6 +16,7 @@ do { my $x = {
                       'requires' => {
                                       'AnyEvent' => '7.14',
                                       'Carp' => '0',
+                                      'Class::Slot' => '0.05',
                                       'Coro' => '6.514',
                                       'List::Util' => '0',
                                       'Scalar::Util' => '0',
@@ -31,7 +32,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'JSON::XS' => '0',
-                                   'Test2::Bundle::Extended' => '0',
+                                   'Test2::V0' => '0',
                                    'Test::More' => '0',
                                    'Test::Pod' => '0'
                                  }

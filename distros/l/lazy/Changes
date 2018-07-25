@@ -1,5 +1,8 @@
 Revision history for lazy
 
+0.000007  2018-07-24 15:22:16Z
+    - In general, don't install modules which are loaded inside an eval
+
 0.000006  2018-07-17 02:49:19Z
     - Bump App::cpm prereq to latest version (0.975)
     - use lazy later in t/local-install-via-args.t

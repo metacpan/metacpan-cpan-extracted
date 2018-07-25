@@ -1,35 +1,55 @@
 {
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-MP",
    "no_index" : {
       "directory" : [
          "t",
          "inc"
       ]
    },
-   "meta-spec" : {
-      "version" : 1.4,
-      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Canary::Stability" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Net::Interface" : "1.011"
+         },
+         "requires" : {
+            "AnyEvent" : "6.14",
+            "AnyEvent::Watchdog" : "1",
+            "CBOR::XS" : "1.5",
+            "Digest::HMAC" : "1.03",
+            "Digest::SHA3" : "0.24",
+            "Guard" : "1.022",
+            "JSON::XS" : "2.25",
+            "MIME::Base64" : "3",
+            "Task::Weaken" : "0",
+            "common::sense" : "0"
+         }
+      }
    },
-   "generated_by" : "ExtUtils::MakeMaker::JSONMETA version 7.000",
-   "distribution_type" : "module",
-   "version" : "1.30",
-   "name" : "AnyEvent-MP",
-   "author" : [],
-   "license" : "unknown",
-   "build_requires" : {
-      "ExtUtils::MakeMaker" : 0
-   },
-   "requires" : {
-      "AnyEvent" : 5.11,
-      "Net::Interface" : 1.011,
-      "JSON::XS" : 2.25,
-      "Digest::HMAC_MD6" : 0,
-      "MIME::Base64" : 3,
-      "AnyEvent::Watchdog" : 1,
-      "common::sense" : 0,
-      "Digest::MD6" : 0
-   },
-   "abstract" : null,
-   "configure_requires" : {
-      "ExtUtils::MakeMaker" : 0
-   }
+   "release_status" : "stable",
+   "version" : "2.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

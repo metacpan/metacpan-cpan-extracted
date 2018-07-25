@@ -16,6 +16,10 @@ my $commit = '50c11cce165a0e2cda8ebbd70661b27d0b0abd5c';
 sub new {
     my $class = shift;
     my $protobuf_flags = Alien::ProtoBuf->cflags;
+    my $make_args = '';
+    if ($^O eq 'freebsd') {
+        $make_args = 'CXX=c++';
+    }
     my $self = $class->SUPER::new(
         @_,
         alien_name            => 'uPB', # to stop Alien::Base warnings
@@ -23,7 +27,7 @@ sub new {
             'Alien::gmake' => 0.11, # needed for %{gmake} helper
         },
         alien_build_commands => [
-            "%{gmake} default googlepb USER_CPPFLAGS=\"$protobuf_flags -fPIC\"",
+            "%{gmake} default googlepb USER_CPPFLAGS=\"$protobuf_flags -fPIC\" $make_args",
         ],
         alien_install_commands => [
             "$^X ../../scripts/install.pl %s",

@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/oalders/lazy/issues
   homepage: https://github.com/oalders/lazy
   repository: https://github.com/oalders/lazy.git
-version: '0.000006'
+version: '0.000007'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -129,7 +129,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Author::OALDERS/InstallGuide'
-      version: '1.200009'
+      version: '1.200011'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -428,7 +428,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000006
+          tag: v0.000007
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

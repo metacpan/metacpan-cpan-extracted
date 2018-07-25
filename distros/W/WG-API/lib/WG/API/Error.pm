@@ -4,25 +4,23 @@ use Moo;
 
 =head1 NAME
 
-WG::API::Error - module for work with API error 
+WG::API::Error - Module for work with API errors
 
 =head1 VERSION
 
-Version v0.10
+Version v0.11
 
 =cut
 
-our $VERSION = 'v0.10';
+our $VERSION = 'v0.11';
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
+Return full error data for unsuccessed requests.
 
     use WG::API::Error;
 
-    my $wg_error = WG::API::Error->new();
+    my $wg_error = WG::API::Error->new({code => 999, message => 'test error', fieald => 'unknown', value => 'none'});
     ...
     say $wg_error->code;
 

@@ -6,7 +6,7 @@ FB3::Validator - check file to be a valid FB3 book
 
 =head1 SYNOPSIS
 
-  my $Validator = FB3::Validator->new( "path/to/xsd/schemas/directory" );
+  my $Validator = FB3::Validator->new;
   if( my $ValidationError = $Validator->Validate( "path/to/book.fb3" )) {
     die "path/to/book.fb3 is not a valid FB3: $ValidationError";
   }
@@ -16,6 +16,7 @@ FB3::Validator - check file to be a valid FB3 book
 use strict;
 use OPC;
 use XML::LibXML;
+use FB3;
 
 our $XSD_DIR;
 
@@ -35,6 +36,8 @@ use constant {
 
 sub new {
   my( $class, $XSD_DIR ) = @_;
+  $XSD_DIR //= FB3::SchemasDirPath(); # in development purposes it maybe
+    # convenient to use some other schemas path
 
   my $Validator = {
     xsd_dir => $XSD_DIR,

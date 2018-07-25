@@ -45,7 +45,7 @@
          "web" : "http://github.com/arodland/CLI-Osprey"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:ARODLAND",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

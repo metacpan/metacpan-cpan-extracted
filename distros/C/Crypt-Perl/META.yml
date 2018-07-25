@@ -10,9 +10,9 @@ build_requires:
   Test::Class: '0.4'
   Test::Deep: '0'
   Test::Exception: '0.4'
+  Test::FailWarnings: '0'
   Test::More: '1'
   Test::NoWarnings: '0'
-  Test::Simple: '0.44'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -35,6 +35,7 @@ requires:
   MIME::Base64: '3.11'
   Math::BigInt: '1.999805'
   Math::ProvablePrime: '0.043'
+  Math::Utils: '1.07'
   Symbol::Get: '0.02'
   Try::Tiny: '0'
   autodie: '0'
@@ -43,5 +44,5 @@ requires:
   perl: '5.008000'
 resources:
   repository: https://github.com/FGasper/p5-Crypt-Perl.git
-version: '0.23'
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

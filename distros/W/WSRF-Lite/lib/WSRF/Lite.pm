@@ -34,7 +34,7 @@ WSRF::Lite - Implementation of the Web Service Resource Framework
 
 =head1 VERSION
 
-This document refers to version 0.8.3.2 of WSRF::Lite released July, 2018
+This document refers to version 0.8.3.3 of WSRF::Lite released July, 2018
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ use strict;
 use vars qw{ $VERSION };
 
 BEGIN {
-	$VERSION = '0.8.3.2';
+	$VERSION = '0.8.3.3';
 }
 
 # WSRF uses WS-Address headers in the SOAP Header - by default
@@ -6563,7 +6563,7 @@ sub verify {
 		  $doc->toStringEC14N( 0, $WSRF::WSS::Xpath{$key}, [''] );
 		die "Could not get the Canonicalize $key from Envelope\n"
 		  unless $CanonicalForm;
-		my $token_digest = Digest::SHA1::sha1($CanonicalForm);
+		my $token_digest = $WSRF::WSS::algorithm eq 'sha256' ? Digest::SHA::sha256($CanonicalForm) : Digest::SHA1::sha1($CanonicalForm);
 		$token_digest = MIME::Base64::encode($token_digest);
 		chomp($token_digest);
 		if ( $SignedStuff{ $Signed{$key} } eq $token_digest ) {

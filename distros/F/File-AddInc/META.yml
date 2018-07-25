@@ -1,0 +1,48 @@
+---
+abstract: 'FindBin(+ use lib) alike for *.pm modulino (instead of *.pl)'
+author:
+  - 'Kobayasi, Hiroaki <buribullet@gmail.com>'
+build_requires:
+  Test::Kantan: '0'
+  Test::More: '0.98'
+  rlib: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-AddInc
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  File::AddInc:
+    file: lib/File/AddInc.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  lib: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/hkoba/p5-File-AddInc/issues
+  homepage: https://github.com/hkoba/p5-File-AddInc
+  repository: git://github.com/hkoba/p5-File-AddInc.git
+version: '0.001'
+x_authority: cpan:HKOBA
+x_contributors:
+  - 'Kobayasi, Hiroaki <hkoba@ssri.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

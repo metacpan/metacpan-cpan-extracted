@@ -54,7 +54,7 @@ use vars qw(
 );
 @MySQL::Admin::GUI::EXPORT  = qw( ContentHeader Body ChangeDb Unique openFile action applyRights maxlength);
 @ISA                        = qw( Exporter MySQL::Admin );
-$MySQL::Admin::GUI::VERSION = '1.15';
+$MySQL::Admin::GUI::VERSION = '1.16';
 $m_bMod_perl                = ( $ENV{MOD_PERL} ) ? 1 : 0;
 local $^W = 0;
 our @m_processlist;

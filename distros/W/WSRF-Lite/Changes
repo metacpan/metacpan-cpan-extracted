@@ -45,3 +45,8 @@ For previous changes prior to version 0.8.2.3, please read README
     - first cpan release
     - swapped XML::CanonicalizeXML for XML::LibXML
     - makefile now downloads missing dependencies
+
+0.8.3.2
+    - SSL updates (thanks Mariusz Karaś)
+0.8.3.3
+    - SSL updates (thanks Mariusz Karaś)

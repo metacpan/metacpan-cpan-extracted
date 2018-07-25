@@ -9,8 +9,7 @@ BEGIN {
   } else {
     plan tests => 1;
   }
-    use_ok( 'Devel::DumpTrace::PPI' ) || print "Bail out!
-";
+    use_ok( 'Devel::DumpTrace::PPI' ) || print "Bail out!\n";
 }
 
 diag "Testing Devel::DumpTrace::PPI ",

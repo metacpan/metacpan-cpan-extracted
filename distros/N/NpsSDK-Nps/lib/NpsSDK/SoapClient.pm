@@ -12,7 +12,7 @@ use Data::Structure::Util qw( unbless );
 
 use Encode qw(encode);
 
-our $VERSION = '1.6'; # VERSION
+our $VERSION = '1.9'; # VERSION
 
 my $connection; 
 my $response; 

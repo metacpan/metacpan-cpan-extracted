@@ -15,7 +15,7 @@ Header:
                     0x10 : ithreads
   U8      zero
   U8      FORMATVER_MAJOR 0
-  U8      FORMATVER_MINOR 2
+  U8      FORMATVER_MINOR 3
   U32     PERLVER   rev<<24 | ver<<16 | sub
 
   U8      NTYPES
@@ -238,6 +238,8 @@ An SV:
   type: REGEXP
 
   type: FORMAT
+
+  type: UNDEF
 
 SV extensions:
   type: MAGIC (0x80)

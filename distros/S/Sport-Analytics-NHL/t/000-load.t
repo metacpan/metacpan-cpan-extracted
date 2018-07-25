@@ -1,10 +1,10 @@
-#!perl 
+#!perl
 
 use v5.10.1;
 use strict;
 use warnings FATAL => 'all';
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 
 my @MODULES;
 BEGIN {

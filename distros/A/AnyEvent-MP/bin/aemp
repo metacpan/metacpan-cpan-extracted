@@ -59,6 +59,7 @@
    aemp showconfig <name> ...    # display effective config
 
    # node configuration: low-level protocol
+   aemp [set|del]secure <boolean>
    aemp [set|del]monitor_timeout <seconds>
    aemp [set|del]connect_interval <seconds>
    aemp [set|del]framing_format [array]
@@ -207,11 +208,20 @@ nodes for the same, thus tracing all node connections.
 These commands deal with rather basic settings, the node ID, the shared
 secret and the TLS certificate.
 
+All C<setxxx> commands have an alias without the C<set> prefix (for
+exmaple, C<setnodeid> can be shortened to C<nodeid>), unless that alias is
+already used for somethign else (for exmaple, C<eval> is not an alias for
+C<seteval>).
+
 =over 4
 
 =item setnodeid <nodeid>
 
-Set the node ID to the given string.
+Set the node ID to the given string. If it ends with a slash (C</>), then
+a random string is appended to make it unique.
+
+If no nodeid is specified in any profile, then the profile name, plus
+appended slash, is used.
 
 =item delnodeid
 
@@ -220,12 +230,13 @@ parent profile, or stays unset.
 
 =item gensecret
 
-Generates a random shared secret and sets it. The shared secret is used to
-authenticate nodes to each other when TLS is not required.
+Generates a random shared secret (currently 1071 bits) and sets it. The
+shared secret is used to authenticate nodes to each other when TLS is not
+required.
 
 =item setsecret <secret>
 
-Sets the shared secret tot he given string, which can be anything.
+Sets the shared secret to the given string, which can be anything.
 
 =item delsecret
 
@@ -371,7 +382,7 @@ pass.
 The algorithm to find the function is the same as used for C<<
 L<AnyEvent::MP>::spawn >>.
 
-Example: run the globa service (which runs anyway, but this doesn't hurt).
+Example: run the global service.
 
    aemp setservices AnyEvent::MP::Global::
 
@@ -391,6 +402,16 @@ Adds a single service.
 =item delservice <initfunc>
 
 Deletes the given service, if it exists.
+
+=item seteval <string>
+
+Sometimes, all you need is to evaluate a small perl snippet to bring a
+node up. This sets a perl string that is eval'ed after the node has been
+configured.
+
+=item deleval
+
+Delete any eval string set with seteval.
 
 =back
 
@@ -461,6 +482,22 @@ what you are doing.
 
 =over 4
 
+=item [set|del]secure <boolean>
+
+Normally, nodes allow anything to be done to them by remote nodes,
+including remotely-triggered execution of code.
+
+Sometimes a more secure mode is desired - this can be achieved by setting
+the secure option to a true value.
+
+When secure mode is enabled, then the node will not execute code locally,
+at least not via the normal node protocol. All other messages are still
+allowed. This means remote nodes can monitor, kill or snd to local ports
+(port names can also be easily guessed).
+
+At the moment, this setting ignores C<snd_on>, C<eval_on> and C<spawn>
+requests.
+
 =item [set|del]monitor_timeout <seconds>
 
 Sets the default monitor timeout, that is, when a connection to a node
@@ -485,8 +522,8 @@ Configures the list of framing formats offered to the other side. This is
 simply a list of formatted read/write types used with L<AnyEvent::Handle>,
 in order of decreasing preference.
 
-Nodes support both C<json> and C<storable> framing formats for data
-packets out of the box, and usually choose C<json> because it is first in
+Nodes support C<cbor>, C<json> and C<storable> framing formats for data
+packets out of the box, and usually choose C<cbor> because it is first in
 the list.
 
 Example: prefer the C<My::Personal::Format> framing format over JSON over
@@ -500,7 +537,7 @@ Configures the list of authentication types that the node offers to the
 other side as acceptable, in order of decreasing preference. Only auth
 methods that the node can actually support will be offered.
 
-The default is '["tls_md6_64_256", "hmac_md6_64_256"]' and is usually good
+The default is '["tls_sha3_512", "hmac_sha3_512"]' and is usually good
 enough.
 
 =item [set|del]auth_accept [array]
@@ -508,18 +545,20 @@ enough.
 Configures the list of authentication types that remote nodes can use to
 authenticate, in order of decreasing preference.
 
-The default is '["tls_md6_64_256", "hmac_md6_64_256", "tls_anon",
+The default is '["tls_sha3_512", "hmac_sha3_512", "tls_anon",
 "cleartext"]' and is usually good enough.
 
 =item [set|del]autocork <boolean>
 
 Sets the default C<autocork> option value for the L<AnyEvent::Handle>
-object used by transports. By default, autocorking is off.
+object used by transports. By default, autocorking is off, potentially
+reducing latency.
 
 =item [set|del]nodelay <boolean>
 
 Sets the default C<nodelay> option value for the L<AnyEvent::Handle>
-object used by transports. By default, nodelay is on.
+object used by transports. By default, nodelay is on, potentially reducing
+latency.
 
 =back
 
@@ -599,32 +638,40 @@ sub gen_cert {
 }
 
 sub init {
-   configure profile => "aemp", nodeid => "anon/";
+   configure profile => "aemp", nodeid => "aemp/%n/%u";
 }
 
 our $cfg     = AnyEvent::MP::Config::config;
 our $profile = $cfg;
 
 sub trace {
-   my ($node) = @_;
+   my ($seed) = @_;
    my $cv = AE::cv;
    my %seen;
+   my $exit;
 
-   my $to = AE::timer 15, 0, sub { exit 1 };
+   my %to;
 
    init;
 
    my $reply = port {
-      my ($node, @neigh) = @_;
+      my ($node, undef, @neigh) = @_;
+
+      delete $to{$node};
 
       @neigh = grep $_ ne $NODE, @neigh;
 
-      print +(join " ", $node, @neigh), "\n";
+      print $node, " -> ", (join " ", @neigh), "\n";
 
-      for (@neigh) {
-         unless ($seen{$_}++) {
+      for my $neigh (@neigh) {
+         unless ($seen{$neigh}++) {
             $cv->begin;
-            snd $_, up_nodes => $SELF => $_;
+            $to{$neigh} = AE::timer 15, 0, sub {
+               print "$neigh (timeout)\n";
+               $exit = 1;
+               $cv->end;
+            };
+            AnyEvent::MP::Kernel::eval_on $neigh, "AnyEvent::MP::Kernel::up_nodes" => $SELF => $neigh;
          }
       }
 
@@ -632,9 +679,11 @@ sub trace {
    };
 
    $cv->begin;
-   snd $reply, seed => $node;
+   snd $reply, seed => undef, $seed;
 
    $cv->recv;
+
+   exit $exit;
 }
 
 sub shell {
@@ -648,10 +697,17 @@ Entering interactive shell - no commandline editing of course (use rlfe etc.).
 
 \=           display a list of nodes
 \=name       switch to another node
+package P   switch to package P when evaluating
+\$ECHO       contains the name of a port that echos everything sent to it
 
 EOF
-   print "$node> ";
+   my $json = JSON::XS->new->pretty->ascii;
+   my $pkg = "AnyEvent::MP::Kernel";
    my $cv = AE::cv;
+   my $echo = port {
+      print "\nECHO<$AnyEvent::MP::Kernel::SRCNODE> ", $json->encode (\@_), "\n$node $pkg> ";
+   };
+   print "$node $pkg> ";
    my $t = AE::io *STDIN, 0, sub {
       chomp (my $line = <STDIN>);
 
@@ -659,27 +715,37 @@ EOF
          if (length $line) {
             $node = $line;
          } else {
-            print +(join " ", AnyEvent::MP::Kernel::up_nodes), "\n";
+            db_keys "'l" => sub {
+               print "\nnodes: ", (join " ", sort @{ $_[0] }), "\n$node $pkg> ";
+            };
          }
-      } else {
+      } elsif ($line =~ /^\s*package\s+(\S+)\s*;?\s*$/) {
+         $pkg = $1;
+      } elsif ($line =~ /\S/) {
          my $time = AE::time;
-         AnyEvent::MP::Kernel::eval_on $node, $line, port {
-            my ($err, @res) = @_;
+         AnyEvent::MP::Kernel::eval_on
+            $node,
+            "package $pkg; my \$ECHO = '$echo'; $line",
+            port {
+               kil $SELF;
 
-            $time = AE::time - $time;
+               my ($err, @res) = @_;
 
-            print "\n  $node: $line\n";
-            if (length $err) {
-               print "  $err @res";
-            } else {
-               print "  ", JSON::XS::encode_json \@_;
+               $time = AE::time - $time;
+
+               print "\n$node: $line\n";
+               printf "%0.3fs\n", $time;
+               if (length $err) {
+                  print "$err @res";
+               } else {
+                  print $json->encode(\@res);
+               }
+               print "\n$node $pkg> ";
             }
-            printf "\n  %0.3fs\n", $time;
-            print "$node> ";
-         };
+         ;
       }
 
-      print "$node> ";
+      print "$node $pkg> ";
    };
    $cv->recv;
 }
@@ -780,7 +846,7 @@ our %CMD = (
       ++$cfg->{dirty};
    },
    gensecret => sub {
-      $profile->{secret} = AnyEvent::MP::Kernel::alnumbits AnyEvent::MP::Kernel::nonce 64;
+      $profile->{secret} = AnyEvent::MP::Kernel::nonce62 180; # ~1071 bits
       ++$cfg->{dirty};
    },
    delsecret => sub {
@@ -897,6 +963,17 @@ our %CMD = (
       }
       ++$cfg->{dirty};
    },
+   seteval => sub {
+      @ARGV >= 1
+         or die "eval string missing\n";
+
+      $profile->{eval} = shift @ARGV;
+      ++$cfg->{dirty};
+   },
+   deleval => sub {
+      delete $profile->{eval};
+      ++$cfg->{dirty};
+   },
 
    profile => sub {
       @ARGV >= 1
@@ -933,7 +1010,7 @@ our %CMD = (
       print JSON::XS->new->pretty->encode ($cfg->{profile}{$name} || {});
    },
    showconfig => sub {
-      my $name = @ARGV ? shift @ARGV : AnyEvent::MP::Kernel::_nodename;
+      my $name = @ARGV ? shift @ARGV : AnyEvent::MP::Kernel::nodename;
 
       my $profile = AnyEvent::MP::Config::find_profile $name, @ARGV;
       @ARGV = ();
@@ -944,16 +1021,11 @@ our %CMD = (
 
       print JSON::XS->new->pretty->encode ($profile);
    },
-
-   # undocumented
-   _resolve => sub {
-      print +(join ",", (AnyEvent::MP::Kernel::_resolve shift @ARGV)->recv), "\n";
-   },
 );
 
 for my $attr (qw(
    monitor_timeout connect_interval framing_format auth_offer
-   auth_accept autocork nodelay
+   auth_accept autocork nodelay secure
 )) {
    $CMD{"set$attr"} = sub {
       @ARGV >= 1
@@ -969,7 +1041,7 @@ for my $attr (qw(
 }
 
 for (keys %CMD) {
-   $CMD{$1} = $CMD{$_} if /^set(.*)$/;
+   $CMD{$1} ||= $CMD{$_} if /^set(.*)$/;
 }
 
 sub docmd {

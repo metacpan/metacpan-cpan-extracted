@@ -5,10 +5,12 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 # line 1025 - handle: sub a::b
+# parseFileName = ["/home/phil/r/act/images/.directory", undef, undef, undef]
+# formatTableA returns "[]" if passed an empty array
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180616';
+our $VERSION = '20180723';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -20,6 +22,7 @@ use POSIX qw(strftime);                                                         
 use Data::Dump qw(dump);
 use JSON;
 use MIME::Base64;
+use Storable qw(store retrieve); ## Add to manifest
 use String::Numeric qw(is_float);
 use Time::HiRes qw(gettimeofday);
 use utf8;
@@ -121,6 +124,48 @@ sub parseCommandLineArguments(&$;$)                                             
   $sub->([@a], {%h})
  }
 
+sub call(&@)                                                                    # Call the specified sub in a separate process, wait for it to complete, copy back the named L<our|https://perldoc.perl.org/functions/our.html> variables, free the memory used.
+ {my ($sub, @our) = @_;                                                         # Sub to call, our variable names with preceding sigils to copy back
+  my ($p) = caller;                                                             # Caller's package
+  unless(my $pid = fork)                                                        # Fork - child
+   {&$sub;                                                                      # Execute the sub
+    my $m = join ", ", map {q(\\).$p.q(::).$_} @our;                            # Addresses for our variables
+    my @s = '';                                                                 # Code to copy back our variables
+    for my $our(@our)                                                           # Each variable
+     {my ($sigil, $var) = $our =~ m(\A(.)(.+)\Z)s;                              # Sigil, variable name
+      my $Our = $sigil.$p.q(::).$var;                                           # Add caller's package to variable name
+      my $c = ord($sigil);                                                      # Differentiate between variables with the same type but different sigils
+      my $file = qq(${$}$var$c.data);
+      push @s, <<END                                                            # Save each our variable in a file
+store \\$Our, q($file);
+END
+     }
+    my $s = join "\n", @s;                                                      # Perl code to store our variables
+    eval $s;                                                                    # Eavluate code to store our variables
+    confess $@ if $@;                                                           # Confess any errors
+    exit;                                                                       # End of child process
+   }
+  else                                                                          # Fork - parent
+   {waitpid $pid,0;                                                             # Wait for child
+    my @s = '';                                                                 # Code to retrieve our variables
+    my @file;                                                                   # Transfer files
+    for my $our(@our)
+     {my ($sigil, $var) = $our =~ m(\A(.)(.+)\Z)s;                              # Sigil, variable name
+      my $Our = $sigil.$p.q(::).$var;                                           # Add caller's package to variable name
+      my $c = ord($sigil);                                                      # Differentiate between variables with the same type but different sigils
+      my $file = qq($pid$var$c.data);                                           # Save file
+      push @s, <<END;                                                           # Perl code to retrieve our variables
+$Our = ${sigil}{retrieve q($file)};
+END
+      push @file, $file;                                                        # Remove transfer files
+     }
+    my $s = join "\n", @s;
+    eval $s;                                                                    # Evaluate perl code
+    unlink $_ for @file;                                                        # Remove transfer files
+    confess "$@\n$s\n" if $@;                                                   # Confess to any errors
+   }
+ }
+
 #1 Files and paths                                                              # Operations on files and paths
 #2 Statistics                                                                   # Information about each file
 
@@ -202,7 +247,7 @@ sub filePathExt(@)                                                              
   filePath(@file, $f)
  }
 
-BEGIN                                                                           # Some undocumented shorter names for these useful routines
+BEGIN                                                                           # Some shorter undocumented names for these useful routines.
  {*fpd = *filePathDir;
   *fpe = *filePathExt;
   *fpf = *filePath;
@@ -247,6 +292,25 @@ sub trackFiles($@)                                                              
   say STDERR "$label ", dump([map{[fileSize($_), $_]} @files]);
  }
 
+sub titleToUniqueFileName($$$$)                                                 # Create a file name from a title that is unique within the set %uniqueNames.
+ {my ($uniqueFileNames, $title, $suffix, $ext) = @_;                            # Unique file names hash {} which will be updated by this method, title, file name suffix, file extension
+  my $t = $title;                                                               # Title
+     $t =~ s/[^a-z0-9_-]//igs;                                                  # Edit out characters that would produce annoying file names
+
+  my $n = 1 + keys %$uniqueFileNames;                                           # Make the file name unique
+  my $f = $t =~ m(\S) ?                                                         # File name without unique number if possible
+        fpe(qq(${t}_${suffix}), $ext):
+        fpe(        ${suffix},  $ext);
+
+     $f = $t =~ m(\S) ?                                                         # Otherwise file name with unique number
+      fpe(qq(${t}_${suffix}_${n}), $ext):
+      fpe(     qq(${suffix}_${n}), $ext)
+        if $$uniqueFileNames{$f};
+
+  $$uniqueFileNames{$f}++;
+  $f
+ } # titleToUniqueFileName
+
 #2 Position                                                                     # Position in the file system
 
 sub currentDirectory                                                            # Get the current working directory.
@@ -266,26 +330,26 @@ sub currentDirectoryAbove                                                       
 sub parseFileName($)                                                            # Parse a file name into (path, name, extension)
  {my ($file) = @_;                                                              # File name to parse
   return ($file) if $file =~ m{\/\Z}s or $file =~ m/\.\.\Z/s;                   # Its a folder
-  if ($file =~ m/\.[^\/]+\Z/s)                                                  # The file name has an extension
+  if ($file =~ m/\.[^\/]+?\Z/s)                                                 # The file name has an extension
    {if ($file =~ m/\A.+[\/]/s)                                                  # The file name has a preceding path
-     {my @f = $file =~ m/(\A.+[\/])([^\/]+)\.([^\/]+)\Z/s;                      # File components
+     {my @f = $file =~ m/(\A.+[\/])([^\/]+)\.([^\/]+?)\Z/s;                     # File components
       return @f;
      }
     else                                                                        # There is no preceding path
-     {my @f = $file =~ m/(\A.+)\.([^\/]+)\Z/s;                                  # File components
+     {my @f = $file =~ m/(\A.+)\.([^\/]+?)\Z/s;                                 # File components
       return (undef, @f)
      }
    }
   else                                                                          # The file name has no extension
    {if ($file =~ m/\A.+[\/]/s)                                                  # The file name has a preceding path
-     {my @f = $file =~ m/(\A.+\/)([^\/]+)\Z/s;                                  # File components
+     {my @f = $file =~ m/(\A.+\/)([^\/]+?)\Z/s;                                 # File components
       return @f;
      }
     elsif ($file =~ m/\A[\/]./s)                                                # The file name has a single preceding /
      {return (q(/), substr($file, 1));
      }
     elsif ($file =~ m/\A[\/]\Z/s)                                               # The file name is a single /
-     {my @f = $file =~ m/(\A.+\/)([^\/]+)\Z/s;                                  # File components
+     {my @f = $file =~ m/(\A.+\/)([^\/]+?)\Z/s;                                 # File components
       return (q(/));
      }
     else                                                                        # There is no preceding path
@@ -420,12 +484,15 @@ sub searchDirectoryTreesForMatchingFiles(@)                                     
  {my (@foldersandExtensions) = @_;                                              # Mixture of folder names and extensions
   my @folder     = grep { -d $_ } @_;                                           # Folders
   my @extensions = grep {!-d $_ } @_;                                           # Extensions
+  for(@extensions)                                                              # Prefix period to extension of not all ready there
+   {$_ = qq(\.$_) unless m(\A\.)s
+   }
   my $e = join '|', @extensions;                                                # Files
   my @f;                                                                        # Files
   for my $dir(@folder)                                                          # Directory
-   {for(split /\0/, qx(find $dir -print0))
-     {next if -d $_;                                                            # Do not include folder names
-      push @f, $_ if m(($e)\Z)is;
+   {for my $d(split /\0/, qx(find $dir -print0))
+     {next if -d $d;                                                            # Do not include folder names
+      push @f, $d if $d =~ m(($e)\Z)is;
      }
    }
   sort @f
@@ -583,16 +650,17 @@ sub imageSize($)                                                                
    }
  }
 
-sub convertImageToJpx2($$;$)                                                    # Convert an image to jpx format as the latest version of ImageMagick no longer seems to tile.
+sub convertImageToJpx690($$;$)                                                  # Convert an image to jpx format using versions of ImageMagick version 6.9.0 and above
  {my ($source, $target, $Size) = @_;                                            # Source file, target folder (as multiple files will be created),  optional size of each tile - defaults to 256
-  -e $source or confess
-   "Cannot convert image file as file does not exist:\n$source\n";
-  my $size = $Size // 256;
-  makePath($target.q(/));                                                       # Make sure the path is a directory
-  my ($w, $h) = imageSize($source);
-  my $W = int($w/$size); ++$W if $w % $size;
+  my $size = $Size // 256;                                                      # Size of each tile
+  my $N    = 4;                                                                 # Power of ten representing the maximum number of tiles
+  -e $source or confess "Image file does not exist:\n$source\n";                # Check source
+  $target  = fpd($target);                                                      # Make sure the target is a folder
+  makePath($target);                                                            # Make target folder
+  my ($w, $h) = imageSize($source);                                             # Image size
+  my $W = int($w/$size); ++$W if $w % $size;                                    # Image size in tiles
   my $H = int($h/$size); ++$H if $h % $size;
-  writeFile(filePath($target, "jpx.data"), <<END);
+  writeFile(filePath($target, "jpx.data"), <<END);                              # Write jpx header
 version 1
 type    jpx
 size    $size
@@ -601,29 +669,52 @@ width   $w
 height  $h
 END
 
-  if (1)
+  if (1)                                                                        # Create tiles
    {my $s = quoteFile($source);
+    my $t = quoteFile($target."%0${N}d.jpg");
+    my $c = qq(convert $s -crop ${size}x${size} $t);
+    say STDERR $c;
+    say STDERR $_ for qx($c 2>&1);
+   }
+
+  if (1)                                                                        # Rename tiles in two dimensions
+   {my $W = int($w/$size); ++$W if $w % $size;
+    my $H = int($h/$size); ++$H if $h % $size;
+    my $k = 0;
     for   my $Y(1..$H)
      {for my $X(1..$W)
-       {my $t  = "${target}${Y}_${X}.jpg";
-        my $T  = quoteFile($t);
-        my $px = ($X-1)*$size;
-        my $py = ($Y-1)*$size;
-        my $c = qq(convert $s -crop ${size}x${size}+$px+$py $t);
-        my $r = qx($c 2>&1);
-        -e $t or confess "Cannot convert to jpx:\n$s\n$t\n$r\n$c\n";
+       {my $s = sprintf("${target}%0${N}d.jpg", $k++);
+        my $t = "${target}/${Y}_${X}.jpg";
+        rename $s, $t or confess "Cannot rename file:\n$s\nto:\n$t\n";
+        -e $t or confess "Cannot create file:\n$t\n";
        }
      }
    }
  }
 
-sub convertImageToJpx($$;$)                                                     # Convert an image to jpx format - works with: Version: ImageMagick 6.8.9-9 Q16 x86_64 2017-03-14
+#convertImageToJpx690(
+#"/home/phil/audioImageCache/images/Blacktipshark.JPG",
+#"/tmp/AppaAppsPhotoApp/users/philiprbrenan/GoneFishing/assets/images/Shark.Blacktip/"
+#); exit;
+
+sub convertImageToJpx($$;$)                                                     # Convert an image to jpx format - works with: Version: ImageMagick 6.8.9-9 Q16 x86_64 2017-03-14. Later versions are handled by convertImageToJpx690.
  {my ($source, $target, $Size) = @_;                                            # Source file, target folder (as multiple files will be created),  optional size of each tile - defaults to 256
-  -e $source or confess
-   "Cannot convert image file as file does not exist:\n$source\n";
+
+  if (1)
+   {my $r = qx(convert --version);
+    if ($r =~ m(\AVersion: ImageMagick ((\d|\.)+)))
+     {my $version = join '', map {sprintf("%04d", $_)} split /\./, $1;
+      return &convertImageToJpx690(@_) if $version >= 600090000;
+     }
+    else {confess "Please install Imagemagick:\nsudo apt install imagemagick"}
+   }
+
+  -e $source or confess "Image file does not exist:\n$source\n";
   my $size = $Size // 256;
+
   makePath($target);
-  my ($w, $h) = imageSize($source);
+
+  my ($w, $h) = imageSize($source);                                             # Write Jpx header
   writeFile(filePath($target, "jpx.data"), <<END);
 version 1
 type    jpx
@@ -633,7 +724,7 @@ width   $w
 height  $h
 END
 
-  if (1)
+  if (1)                                                                        # Create tiles
    {my $s = quoteFile($source);
     my $t = quoteFile($target);
     my $c = qq(convert $s -crop ${size}x${size} $t);
@@ -641,7 +732,7 @@ END
     say STDERR $_ for qx($c 2>&1);
    }
 
-  if (1)
+  if (1)                                                                        # Rename tiles in two dimensions
    {my $W = int($w/$size); ++$W if $w % $size;
     my $H = int($h/$size); ++$H if $h % $size;
     my $k = 0;
@@ -897,15 +988,15 @@ sub formatTableBasic($;$)                                                       
   my $d = $data;
   ref($d) =~ /array/i or confess "Array reference required not:\n".dump($d);
   my @D;                                                                        # Maximum width of each column
-  my @C;                                                                        # Whether column has non numeric
+# my @C;                                                                        # Whether column has non numeric
   for   my $e(@$d)
    {ref($e) =~ /array/i or confess "Array reference required not:\n".dump($e);
     for my $D(0..$#$e)                                                          # Each column index
      {my $a  = $D[$D]           // 0;                                           # Maximum length of data so far
       my $b  = length($e->[$D]) // 0;                                           # Length of current item
       $D[$D] = ($a > $b ? $a : $b);                                             # Update maximum length
-      $C[$D] = 1 if !$C[$D] and                                                 # Not a number in this column
-          $e->[$D] !~ /\A\s*[-+]?\s*[0-9,]+(\.\d+)?([Ee]\s*[-+]?\s*\d+)?\s*\Z/;
+#      $C[$D] = 1 if !$C[$D] and                                                 # Not a number in this column
+#          $e->[$D] !~ /\A\s*[-+]?\s*[0-9,]+(\.\d+)?([Ee]\s*[-+]?\s*\d+)?\s*\Z/;
      }
    }
 
@@ -915,7 +1006,8 @@ sub formatTableBasic($;$)                                                       
     for my $D(0..$#$e)
      {my $m = $D[$D];                                                           # Maximum width
       my $i = $e->[$D]//'';                                                     # Current item
-      if ($C[$D])                                                               # Not a number - left justify
+#     if ($C[$D])                                                               # Not a number - left justify
+      if ($i !~ /\A\s*[-+]?\s*[0-9,]+(\.\d+)?([Ee]\s*[-+]?\s*\d+)?\s*\Z/)       # Not a number - left justify                                                        # Not a number - left justify
        {$t .= substr($i.(' 'x$m), 0, $m)."  ";
        }
       else                                                                      # Number - right justify
@@ -1145,6 +1237,11 @@ sub assertRef(@)                                                                
   1
  }
 
+sub ˢ(&)                                                                        # Immediately executed inline sub to allow a code block before if.
+ {my ($sub) = @_;                                                               # Sub as {} without the word "sub"
+  &$sub
+ }
+
 #1 Strings                                                                      # Actions on strings
 
 sub indentString($$)                                                            # Indent lines contained in a string or formatted table by the specified string.
@@ -1369,7 +1466,7 @@ END
    }
 
   unless($perlModule =~ m(\A(Text.pm|Doc.pm)\Z)s)                               # Load the module being documented so that we can call its extractDocumentationFlags method if needed to process user flags, we do not need to load these modules as they are already loaded
-   {do "$perlModule";
+   {do "./$perlModule";
     confess dump($@, $!) if $@;
    }
 
@@ -1421,7 +1518,7 @@ END
       $private  {$name} = $private   if $private;                               # Private
       $static   {$name} = $static    if $static;                                # Static
       $iUseful  {$name} = $comment   if $iUseful;                               # Immediately useful
-      $exported {$name} = $exported if $exported;                               # Exported
+      $exported {$name} = $exported  if $exported;                              # Exported
 
       $userFlags{$name} =                                                       # Process user flags
         &docUserFlags($userFlags, $perlModule, $package, $name)
@@ -1504,7 +1601,7 @@ END
 
       push @method,                                                             # Static method
        "\nThis is a static method and so should be invoked as:\n\n".
-       "  $package::$name\n"                   if $static;
+       "  $package\:\:$name\n"                 if $static;
 
       push @method,                                                             # Exported
        "\nThis method can be imported via:\n\n".
@@ -1717,7 +1814,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT_OK    = qw(
 absFromAbsPlusRel addCertificate appendFile assertRef
 binModeAllUtf8
-checkFile checkFilePath checkFilePathExt checkFilePathDir
+call checkFile checkFilePath checkFilePathExt checkFilePathDir
 checkKeys clearFolder contains containingPowerOfTwo
 containingFolder convertDocxToFodt convertImageToJpx convertUnicodeToXml
 createEmptyFile currentDirectory currentDirectoryAbove cutOutImagesInFodtFile
@@ -1748,7 +1845,9 @@ updateDocumentation updatePerlModuleDocumentation userId
 versionCode versionCodeDashed
 writeBinaryFile writeFile writeFiles
 xxx XXX
-zzz);
+zzz
+ˢ
+);
 %EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
 
 # podDocumentation
@@ -1917,6 +2016,20 @@ Classify the specified array of words into positional parameters and keyword par
   1  $sub       Sub to call
   2  $args      List of arguments to parse
   3  $valid     Optional list of valid parameters else all parameters will be accepted
+
+=head2 call(&@)
+
+Call the specified sub in a separate process, wait for it to complete, copy back the named L<our|https://perldoc.perl.org/functions/our.html> variables, free the memory used.
+
+     Parameter  Description
+  1  $sub       Sub to call
+  2  @our       Our variable names with preceding sigils to copy back
+
+Example:
+
+
+  ˢ{our @a = qw(1);
+
 
 =head1 Files and paths
 
@@ -2246,33 +2359,14 @@ Return (width, height) of an image obtained via imagemagick.
      Parameter  Description
   1  $image     File containing image
 
-=head2 convertImageToJpx2($$$)
+=head2 convertImageToJpx690($$$)
 
-Convert an image to jpx format as the latest version of ImageMagick no longer seems to tile.
-
-     Parameter  Description
-  1  $source    Source file
-  2  $target    Target folder (as multiple files will be created)
-  3  $Size      Optional size of each tile - defaults to 256
-
-=head2 convertImageToJpx($$$)
-
-Convert an image to jpx format - works with: Version: ImageMagick 6.8.9-9 Q16 x86_64 2017-03-14
+Convert an image to jpx format using versions of ImageMagick version 6.9.0 and above
 
      Parameter  Description
   1  $source    Source file
   2  $target    Target folder (as multiple files will be created)
   3  $Size      Optional size of each tile - defaults to 256
-
-=head2 convertDocxToFodt($$)
-
-Convert a .docx file to .fodt using unoconv which must not be running elsewhere at the time.  L<Unoconv|/https://github.com/dagwieers/unoconv> can be installed via:
-
-  sudo apt install sharutils unoconv
-
-     Parameter    Description
-  1  $inputFile   Input file
-  2  $outputFile  Output file
 
 =head1 Encoding and Decoding
 
@@ -2393,23 +2487,6 @@ Tabularize text
   1  $data       Reference to an array of arrays of data to be formatted as a table
   2  $separator  Optional line separator to use instead of new line for each row.
 
-=head2 formatTable($$$)
-
-Format various data structures as a table
-
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional reference to an array of titles
-  3  $separator  Optional line separator
-
-=head2 keyCount($$)
-
-Count keys down to the specified level.
-
-     Parameter  Description
-  1  $maxDepth  Maximum depth to count to
-  2  $ref       Reference to an array or a hash
-
 =head1 Lines
 
 Load data structures from lines
@@ -2497,6 +2574,26 @@ Generate LVALUE hash methods in the current package. A reference to a method tha
 Example:
 
    $a->value->{a} = 'b';
+
+=head2 assertRef(@)
+
+Confirm that the specified references are to the package into which this routine has been exported.
+
+     Parameter  Description
+  1  @refs      References
+
+=head2 ˢ(&)
+
+Immediately executed inline sub to allow a code block before if.
+
+     Parameter  Description
+  1  $sub       Sub as {} without the word "sub"
+
+Example:
+
+
+  ok ˢ{1};
+
 
 =head1 Strings
 
@@ -2684,60 +2781,6 @@ Normalize a folder name component by adding a trailing separator.
      Parameter  Description
   1  $name      Name
 
-=head2 formatTableAA($$$)
-
-Tabularize an array of arrays.
-
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional referebce to an array of titles
-  3  $separator  Optional line separator
-
-=head2 formatTableHA($$$)
-
-Tabularize a hash of arrays.
-
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
-
-=head2 formatTableAH($$$)
-
-Tabularize an array of hashes.
-
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
-
-=head2 formatTableHH($$$)
-
-Tabularize a hash of hashes.
-
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
-
-=head2 formatTableA($$$)
-
-Tabularize an array.
-
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
-
-=head2 formatTableH($$$)
-
-Tabularize a hash.
-
-     Parameter   Description
-  1  $data       Data to be formatted
-  2  $title      Optional title
-  3  $separator  Optional line separator
-
 =head2 extractTest($)
 
 Extract a line of a test.
@@ -2755,33 +2798,33 @@ Extract a line of a test.
 
 3 L<appendFile|/appendFile>
 
-4 L<binModeAllUtf8|/binModeAllUtf8>
+4 L<assertRef|/assertRef>
 
-5 L<checkFile|/checkFile>
+5 L<binModeAllUtf8|/binModeAllUtf8>
 
-6 L<checkFilePath|/checkFilePath>
+6 L<call|/call>
 
-7 L<checkFilePathDir|/checkFilePathDir>
+7 L<checkFile|/checkFile>
 
-8 L<checkFilePathExt|/checkFilePathExt>
+8 L<checkFilePath|/checkFilePath>
 
-9 L<checkKeys|/checkKeys>
+9 L<checkFilePathDir|/checkFilePathDir>
 
-10 L<clearFolder|/clearFolder>
+10 L<checkFilePathExt|/checkFilePathExt>
 
-11 L<containingFolder|/containingFolder>
+11 L<checkKeys|/checkKeys>
 
-12 L<containingPowerOfTwo|/containingPowerOfTwo>
+12 L<clearFolder|/clearFolder>
 
-13 L<containingPowerOfTwoX|/containingPowerOfTwo>
+13 L<containingFolder|/containingFolder>
 
-14 L<contains|/contains>
+14 L<containingPowerOfTwo|/containingPowerOfTwo>
 
-15 L<convertDocxToFodt|/convertDocxToFodt>
+15 L<containingPowerOfTwoX|/containingPowerOfTwo>
 
-16 L<convertImageToJpx|/convertImageToJpx>
+16 L<contains|/contains>
 
-17 L<convertImageToJpx2|/convertImageToJpx2>
+17 L<convertImageToJpx690|/convertImageToJpx690>
 
 18 L<convertUnicodeToXml|/convertUnicodeToXml>
 
@@ -2829,135 +2872,121 @@ Extract a line of a test.
 
 40 L<firstFileThatExists|/firstFileThatExists>
 
-41 L<formatTable|/formatTable>
+41 L<formatTableBasic|/formatTableBasic>
 
-42 L<formatTableA|/formatTableA>
+42 L<fullFileName|/fullFileName>
 
-43 L<formatTableAA|/formatTableAA>
+43 L<genLValueArrayMethods|/genLValueArrayMethods>
 
-44 L<formatTableAH|/formatTableAH>
+44 L<genLValueHashMethods|/genLValueHashMethods>
 
-45 L<formatTableBasic|/formatTableBasic>
+45 L<genLValueScalarMethods|/genLValueScalarMethods>
 
-46 L<formatTableH|/formatTableH>
+46 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
 
-47 L<formatTableHA|/formatTableHA>
+47 L<hostName|/hostName>
 
-48 L<formatTableHH|/formatTableHH>
+48 L<htmlToc|/htmlToc>
 
-49 L<fullFileName|/fullFileName>
+49 L<imageSize|/imageSize>
 
-50 L<genLValueArrayMethods|/genLValueArrayMethods>
+50 L<indentString|/indentString>
 
-51 L<genLValueHashMethods|/genLValueHashMethods>
+51 L<isBlank|/isBlank>
 
-52 L<genLValueScalarMethods|/genLValueScalarMethods>
+52 L<javaPackage|/javaPackage>
 
-53 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
+53 L<javaPackageAsFileName|/javaPackageAsFileName>
 
-54 L<hostName|/hostName>
+54 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
 
-55 L<htmlToc|/htmlToc>
+55 L<loadArrayFromLines|/loadArrayFromLines>
 
-56 L<imageSize|/imageSize>
+56 L<loadHashArrayFromLines|/loadHashArrayFromLines>
 
-57 L<indentString|/indentString>
+57 L<loadHashFromLines|/loadHashFromLines>
 
-58 L<isBlank|/isBlank>
+58 L<makePath|/makePath>
 
-59 L<javaPackage|/javaPackage>
+59 L<matchPath|/matchPath>
 
-60 L<javaPackageAsFileName|/javaPackageAsFileName>
+60 L<max|/max>
 
-61 L<keyCount|/keyCount>
+61 L<microSecondsSinceEpoch|/microSecondsSinceEpoch>
 
-62 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
+62 L<min|/min>
 
-63 L<loadArrayFromLines|/loadArrayFromLines>
+63 L<nws|/nws>
 
-64 L<loadHashArrayFromLines|/loadHashArrayFromLines>
+64 L<pad|/pad>
 
-65 L<loadHashFromLines|/loadHashFromLines>
+65 L<parseCommandLineArguments|/parseCommandLineArguments>
 
-66 L<makePath|/makePath>
+66 L<parseFileName|/parseFileName>
 
-67 L<matchPath|/matchPath>
+67 L<perlPackage|/perlPackage>
 
-68 L<max|/max>
+68 L<powerOfTwo|/powerOfTwo>
 
-69 L<microSecondsSinceEpoch|/microSecondsSinceEpoch>
+69 L<powerOfTwoX|/powerOfTwo>
 
-70 L<min|/min>
+70 L<printFullFileName|/printFullFileName>
 
-71 L<nws|/nws>
+71 L<printQw|/printQw>
 
-72 L<pad|/pad>
+72 L<quoteFile|/quoteFile>
 
-73 L<parseCommandLineArguments|/parseCommandLineArguments>
+73 L<readBinaryFile|/readBinaryFile>
 
-74 L<parseFileName|/parseFileName>
+74 L<readFile|/readFile>
 
-75 L<perlPackage|/perlPackage>
+75 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs>
 
-76 L<powerOfTwo|/powerOfTwo>
+76 L<removeFilePrefix|/removeFilePrefix>
 
-77 L<powerOfTwoX|/powerOfTwo>
+77 L<renormalizeFolderName|/renormalizeFolderName>
 
-78 L<printFullFileName|/printFullFileName>
+78 L<saveSourceToS3|/saveSourceToS3>
 
-79 L<printQw|/printQw>
+79 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
 
-80 L<quoteFile|/quoteFile>
+80 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
 
-81 L<readBinaryFile|/readBinaryFile>
+81 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
 
-82 L<readFile|/readFile>
+82 L<temporaryDirectory|/temporaryDirectory>
 
-83 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs>
+83 L<temporaryFile|/temporaryFile>
 
-84 L<removeFilePrefix|/removeFilePrefix>
+84 L<temporaryFolder|/temporaryFolder>
 
-85 L<renormalizeFolderName|/renormalizeFolderName>
+85 L<timeStamp|/timeStamp>
 
-86 L<saveSourceToS3|/saveSourceToS3>
+86 L<trackFiles|/trackFiles>
 
-87 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
+87 L<trim|/trim>
 
-88 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
+88 L<updateDocumentation|/updateDocumentation>
 
-89 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
+89 L<userId|/userId>
 
-90 L<temporaryDirectory|/temporaryDirectory>
+90 L<versionCode|/versionCode>
 
-91 L<temporaryFile|/temporaryFile>
+91 L<versionCodeDashed|/versionCodeDashed>
 
-92 L<temporaryFolder|/temporaryFolder>
+92 L<writeBinaryFile|/writeBinaryFile>
 
-93 L<timeStamp|/timeStamp>
+93 L<writeFile|/writeFile>
 
-94 L<trackFiles|/trackFiles>
+94 L<writeFiles|/writeFiles>
 
-95 L<trim|/trim>
+95 L<xxx|/xxx>
 
-96 L<updateDocumentation|/updateDocumentation>
+96 L<yyy|/yyy>
 
-97 L<userId|/userId>
+97 L<zzz|/zzz>
 
-98 L<versionCode|/versionCode>
-
-99 L<versionCodeDashed|/versionCodeDashed>
-
-100 L<writeBinaryFile|/writeBinaryFile>
-
-101 L<writeFile|/writeFile>
-
-102 L<writeFiles|/writeFiles>
-
-103 L<xxx|/xxx>
-
-104 L<yyy|/yyy>
-
-105 L<zzz|/zzz>
+98 L<ˢ|/ˢ>
 
 =head1 Installation
 
@@ -3020,7 +3049,7 @@ test unless caller;
 # podDocumentation
 __DATA__
 #Test::More->builder->output("/dev/null");
-use Test::More tests => 236;
+use Test::More tests => 256;
 my $windows = $^O =~ m(MSWin32)is;
 my $mac     = $^O =~ m(darwin)is;
 
@@ -3082,6 +3111,7 @@ if (1)                                                                          
   is_deeply [parseFileName "test.data"],            [undef,         "test", "data"];
   is_deeply [parseFileName "phil/"],                [qw(phil/)];
   is_deeply [parseFileName "/var/www/html/translations/"], [qw(/var/www/html/translations/)];
+  is_deeply [parseFileName "a.b/c.d.e"],            [qw(a.b/ c.d e)];
  }
 
 if (1)                                                                          # Unicode
@@ -3180,8 +3210,8 @@ if (1)                                                                          
            [qw(AAA BBB CCC)],
            [qw(1   22  333)]];
 
-  ok formatTableBasic($d,     '|') eq "A    B    C    |AA   BB   CC   |AAA  BBB  CCC  |1    22   333  |";
-  ok formatTable     ($d, $t, '|') eq "   aa   bb   cc   |1  A    B    C    |2  AA   BB   CC   |3  AAA  BBB  CCC  |4  1    22   333  |";
+  ok formatTableBasic($d,     '|') eq "A    B    C    |AA   BB   CC   |AAA  BBB  CCC  |  1   22  333  |";
+  ok formatTable     ($d, $t, '|') eq "   aa   bb   cc   |1  A    B    C    |2  AA   BB   CC   |3  AAA  BBB  CCC  |4    1   22  333  |";
  }
 
 if (1)                                                                          # Format table and AA
@@ -3191,8 +3221,8 @@ if (1)                                                                          
            [qw(333   BBB CCC)],
            [qw(4444  22  333)]];
 
-  ok formatTableBasic($d,     '|') eq "   1  B    C    |  22  BB   CC   | 333  BBB  CCC  |4444  22   333  |";
-  ok formatTable     ($d, $t, '|') eq "   aa    bb   cc   |1  1     B    C    |2  22    BB   CC   |3  333   BBB  CCC  |4  4444  22   333  |";
+  ok formatTableBasic($d,     '|') eq "   1  B    C    |  22  BB   CC   | 333  BBB  CCC  |4444   22  333  |";
+  ok formatTable     ($d, $t, '|') eq "   aa    bb   cc   |1     1  B    C    |2    22  BB   CC   |3   333  BBB  CCC  |4  4444   22  333  |";
  }
 
 if (1)                                                                          # AH
@@ -3201,17 +3231,17 @@ if (1)                                                                          
            {aa=>'AAA', bb=>'BBB', cc=>'CCC'},
            {aa=>'1', bb=>'22', cc=>'333'}
           ];
-  ok formatTable($d, undef, '|') eq "   aa   bb   cc   |1  A    B    C    |2  AA   BB   CC   |3  AAA  BBB  CCC  |4  1    22   333  |";
+  ok formatTable($d, undef, '|') eq "   aa   bb   cc   |1  A    B    C    |2  AA   BB   CC   |3  AAA  BBB  CCC  |4    1   22  333  |";
  }
 
 if (1)                                                                          # HA
  {my $d = {''=>[qw(aa bb cc)], 1=>[qw(A B C)], 22=>[qw(AA BB CC)], 333=>[qw(AAA BBB CCC)],  4444=>[qw(1 22 333)]};
-  ok formatTable($d, undef, '|') eq "      aa   bb   cc   |1     A    B    C    |22    AA   BB   CC   |333   AAA  BBB  CCC  |4444  1    22   333  |";
+  ok formatTable($d, undef, '|') eq "      aa   bb   cc   |   1  A    B    C    |  22  AA   BB   CC   | 333  AAA  BBB  CCC  |4444    1   22  333  |";
  }
 
 if (1)                                                                          # HH
  {my $d = {a=>{aa=>'A', bb=>'B', cc=>'C'}, aa=>{aa=>'AA', bb=>'BB', cc=>'CC'}, aaa=>{aa=>'AAA', bb=>'BBB', cc=>'CCC'}, aaaa=>{aa=>'1', bb=>'22', cc=>'333'}};
-  ok formatTable($d, undef, '|') eq "      aa   bb   cc   |a     A    B    C    |aa    AA   BB   CC   |aaa   AAA  BBB  CCC  |aaaa  1    22   333  |";
+  ok formatTable($d, undef, '|') eq "      aa   bb   cc   |a     A    B    C    |aa    AA   BB   CC   |aaa   AAA  BBB  CCC  |aaaa    1   22  333  |";
  }
 
 if (1)                                                                          # A
@@ -3305,7 +3335,7 @@ if (1)                                                                          
   my $d = [[qw(A B C)], [qw(AA BB CC)], [qw(AAA BBB CCC)],  [qw(1 22 333)]];
   my $s = indentString(formatTable($d), '  ') =~ s/\n/|/gr;
 
-  ok $s eq "  1  A    B    C    |  2  AA   BB   CC   |  3  AAA  BBB  CCC  |  4  1    22   333  ", "indent";
+  ok $s eq "  1  A    B    C    |  2  AA   BB   CC   |  3  AAA  BBB  CCC  |  4    1   22  333  ", "indent";
  }
 
 ok trim(" a b ") eq join ' ', qw(a b);                                          # Trim
@@ -3604,3 +3634,30 @@ ok "/home/il/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/",         "../.
 ok "/home/il/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/",         "../../il/perl/bbb");
 ok "/home/il/perl"         eq absFromAbsPlusRel("/home/la/perl/aaa",      "../../il/perl");
 ok "/home/il/perl/"         eq absFromAbsPlusRel("/home/la/perl/",         "../../il/perl/");
+
+ok ˢ{1};                                                                        #Tˢ
+
+ˢ{my $f = {};
+  ok q(a_p.txt)   eq &titleToUniqueFileName($f, qw(a p txt));
+  ok q(a_p_2.txt) eq &titleToUniqueFileName($f, qw(a p txt));
+  ok q(a_p_3.txt) eq &titleToUniqueFileName($f, qw(a p txt));
+  ok q(a_q.txt)   eq &titleToUniqueFileName($f, qw(a q txt));
+  ok q(a_q_5.txt) eq &titleToUniqueFileName($f, qw(a q txt));
+  ok q(a_q_6.txt) eq &titleToUniqueFileName($f, qw(a q txt));
+ };
+
+test:;
+ˢ{our $a = q(1);                                                                #Tcall
+  our @a = qw(1);
+  our %a = (a=>1);
+  our $b = q(1);
+  for(2..4)
+   {call {$a = $_  x 1000; $a[0] = $_; $a{a} = $_; $b = 2;} qw($a @a %a);
+    ok $a    == $_ x 1000;
+    ok $a[0] == $_;
+    ok $a{a} == $_;
+    ok $b    == 1;
+   }
+ };
+
+1

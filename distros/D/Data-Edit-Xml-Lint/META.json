@@ -35,7 +35,7 @@
    "provides" : {
       "Data::Edit::Xml::Lint" : {
          "file" : "lib/Data/Edit/Xml/Lint.pm",
-         "version" : "20180629"
+         "version" : "20180723"
       },
       "Data::Edit::Xml::Lint::Report" : {
          "file" : "lib/Data/Edit/Xml/Lint.pm"
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20180629",
+   "version" : "20180723",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

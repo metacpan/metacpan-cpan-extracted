@@ -12,12 +12,11 @@ This is an internal utility module, horrible to look at, so don't.
 
 =cut
 
-package AnyEvent::MP::Node;
+package AnyEvent::MP::Node; # base class for nodes
 
 use common::sense;
 
-use AE ();
-use AnyEvent::Util ();
+use AnyEvent ();
 use AnyEvent::Socket ();
 
 use AnyEvent::MP::Transport ();
@@ -27,10 +26,18 @@ sub new {
 
    $self = bless { id => $id }, $self;
 
+   # register
+   $AnyEvent::MP::Kernel::NODE{$id} = $self;
+
    $self->init;
    $self->transport_reset;
 
    $self
+}
+
+sub DESTROY {
+   # unregister
+   delete $AnyEvent::MP::Kernel::NODE{$_[0]{id}};
 }
 
 sub init {
@@ -42,7 +49,7 @@ sub send {
 }
 
 # nodes reachable via the network
-package AnyEvent::MP::Node::External;
+package AnyEvent::MP::Node::Remote; # a remote node
 
 use base "AnyEvent::MP::Node";
 
@@ -80,9 +87,11 @@ sub transport_error {
    AnyEvent::MP::Kernel::_inject_nodeevent ($self, 0, @reason)
       unless $no_transport;
 
-   # if we are here and are idle, we nuke ourselves
-   delete $AnyEvent::MP::Kernel::NODE{$self->{id}}
-      unless $self->{transport} || $self->{connect_to};
+   # we weaken the node reference, so it can go away if unused
+   Scalar::Util::weaken $AnyEvent::MP::Kernel::NODE{$self->{id}}
+      unless $self->{connect_to};
+
+   AE::log 9 => "@reason";
 }
 
 # called after handshake was successful
@@ -94,7 +103,6 @@ sub transport_connect {
    $self->transport_error (transport_error => $self->{id}, "switched connections")
       if $self->{transport};
 
-   delete $self->{connect_addr};
    delete $self->{connect_w};
    delete $self->{connect_to};
 
@@ -111,50 +119,68 @@ sub transport_connect {
 }
 
 sub connect {
-   my ($self, @addresses) = @_;
+   my ($self) = @_;
 
    return if $self->{transport};
+   return if $self->{connect_w};
+
+   # we unweaken the node reference, in case it was weakened before
+   $AnyEvent::MP::Kernel::NODE{$self->{id}}
+      = $AnyEvent::MP::Kernel::NODE{$self->{id}};
 
    Scalar::Util::weaken $self;
 
-   my $monitor = $AnyEvent::MP::Kernel::CONFIG->{monitor_timeout};
-
-   $self->{connect_to} ||= AE::timer $monitor, 0, sub {
-      $self->transport_error (transport_error => $self->{id}, "unable to connect");
+   $self->{connect_to} ||= AE::timer $AnyEvent::MP::Kernel::CONFIG->{connect_interval}, 0, sub {
+      $self->transport_error (transport_error => $self->{id}, "connect timeout");
    };
 
-   return unless @addresses;
+   # maybe @$addresses?
+   my $addresses = $AnyEvent::MP::Kernel::GLOBAL_DB{"'l"}{$self->{id}};
 
-   if ($self->{connect_w}) {
-      # sometimes we get told about new addresses after we started to connect
-      unshift @{$self->{connect_addr}}, @addresses;
+   if ($addresses) {
+      $self->connect_to ($addresses);
+   } else {
+      # on global nodes, all bets are off now - we either know the node, or we don't
+      if ($AnyEvent::MP::Kernel::GLOBAL) {
+         $self->transport_error (transport_error => $self->{id}, "no known address");
+      } else {
+         AnyEvent::MP::Kernel::g_find ($self->{id});
+      }
+   }
+}
+
+sub connect_to {
+   my ($self, $addresses) = @_;
+
+   return if $self->{transport};
+   return if $self->{connect_w};
+
+   unless (@$addresses) {
+      $self->transport_error (transport_error => $self->{id}, "no known address");
       return;
    }
+   
+   AE::log 9 => "connecting to $self->{id} with [@$addresses]";
 
-   $self->{connect_addr} = \@addresses; # a bit weird, but efficient
-
-   $AnyEvent::MP::Kernel::WARN->(9, "connecting to $self->{id} with [@addresses]");
-
+   my $monitor  = $AnyEvent::MP::Kernel::CONFIG->{monitor_timeout};
    my $interval = $AnyEvent::MP::Kernel::CONFIG->{connect_interval};
 
-   $interval = ($monitor - $interval) / @addresses
-      if ($monitor - $interval) / @addresses < $interval;
+   $interval = ($monitor - $interval) / @$addresses
+      if ($monitor - $interval) / @$addresses < $interval;
 
    $interval = 0.4 if $interval < 0.4;
 
-   my @endpoints;
+   my @endpoints = reverse @$addresses;
 
-   $self->{connect_w} = AE::timer 0.050 * rand, $interval * (0.9 + 0.1 * rand), sub {
-      @endpoints = @addresses
-         unless @endpoints;
+   $self->{connect_w} = AE::timer 0, $interval * (0.9 + 0.1 * rand), sub {
+      my $endpoint = pop @endpoints
+         or return;
 
-      my $endpoint = shift @endpoints;
-
-      $AnyEvent::MP::Kernel::WARN->(9, "connecting to $self->{id} at $endpoint");
+      AE::log 9 => "connecting to $self->{id} at $endpoint";
 
       $self->{trial}{$endpoint} ||= do {
          my ($host, $port) = AnyEvent::Socket::parse_hostport $endpoint
-            or return $AnyEvent::MP::Kernel::WARN->(1, "$self->{id}: not a resolved node reference.");
+            or return AE::log critical => "$self->{id}: '$endpoint' is not a resolved node reference.";
 
          AnyEvent::MP::Transport::mp_connect
             $host, $port,
@@ -166,7 +192,7 @@ sub connect {
 sub kill {
    my ($self, $port, @reason) = @_;
 
-   $self->send (["", kil => $port, @reason]);
+   $self->{send} (["", kil1 => $port, @reason]);
 }
 
 sub monitor {
@@ -194,12 +220,7 @@ sub unmonitor {
    }
 }
 
-# used for direct slave connections as well
-package AnyEvent::MP::Node::Direct;
-
-use base "AnyEvent::MP::Node::External";
-
-package AnyEvent::MP::Node::Self;
+package AnyEvent::MP::Node::Self; # the local node
 
 use base "AnyEvent::MP::Node";
 
@@ -212,13 +233,13 @@ our $DELAY = -50;
 our @DELAY;
 our $DELAY_W;
 
-sub _send_delayed {
-   local $AnyEvent::MP::Kernel::SRCNODE = $AnyEvent::MP::Kernel::NODE{""};
+our $send_delayed = sub {
+   $AnyEvent::MP::Kernel::SRCNODE = $AnyEvent::MP::Kernel::NODE;
    (shift @DELAY)->()
       while @DELAY;
    undef $DELAY_W;
    $DELAY = -50;
-}
+};
 
 sub transport_reset {
    my ($self) = @_;
@@ -226,14 +247,14 @@ sub transport_reset {
    Scalar::Util::weaken $self;
 
    $self->{send} = sub {
-      if ($DELAY++ >= 0) {
+      if (++$DELAY > 0) {
          my $msg = $_[0];
          push @DELAY, sub { AnyEvent::MP::Kernel::_inject (@$msg) };
-         $DELAY_W ||= AE::timer 0, 0, \&_send_delayed;
+         $DELAY_W ||= AE::timer 0, 0, $send_delayed;
          return;
       }
 
-      local $AnyEvent::MP::Kernel::SRCNODE = $self;
+      local $AnyEvent::MP::Kernel::SRCNODE = $AnyEvent::MP::Kernel::NODE;
       AnyEvent::MP::Kernel::_inject (@{ $_[0] });
    };
 }
@@ -241,7 +262,7 @@ sub transport_reset {
 sub transport_connect {
    my ($self, $tp) = @_;
 
-   $AnyEvent::MP::Kernel::WARN->(9, "I refuse to talk to myself ($tp->{peerhost}:$tp->{peerport})");
+   AE::log 9 => "I refuse to talk to myself ($tp->{peerhost}:$tp->{peerport})";
 }
 
 sub kill {
@@ -251,7 +272,7 @@ sub kill {
    # from anything but the event loop context.
    $DELAY = 1;
    push @DELAY, sub { AnyEvent::MP::Kernel::_kill (@args) };
-   $DELAY_W ||= AE::timer 0, 0, \&_send_delayed;
+   $DELAY_W ||= AE::timer 0, 0, $send_delayed;
 }
 
 sub monitor {

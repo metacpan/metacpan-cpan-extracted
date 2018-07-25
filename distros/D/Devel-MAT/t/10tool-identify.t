@@ -56,6 +56,11 @@ $want = quotemeta $want;
 $want =~ s/_ADDR_/0x[0-9a-f]+/g;
 $want =~ s/_NUM_/\\d+/g;
 
+# Various versions of perl internals might sometimes end up leaving one of
+# these in PL_tmpsv. In order not to upset the exact match of this test, just
+# trim them out
+$got =~ s/=tmpsv//g;
+
 like( $got, qr/^$want$/, 'string from walk_graph' );
 
 done_testing;

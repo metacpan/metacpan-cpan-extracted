@@ -42,3 +42,6 @@ Revision history for Perl extension NKTI::general.
 
 0.16  Sun Jul 22 03:13:00 2018
     - Revision subroutine "time_event_mysql" for time measurement "MINUTES" to "MINUTE"
+
+0.17  Sun Jul 23 00:49:00 2018
+    DEPRECATED

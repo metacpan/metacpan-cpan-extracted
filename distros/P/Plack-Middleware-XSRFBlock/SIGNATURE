@@ -14,15 +14,15 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 210ce22b51a76908b3ea5597b8ba19e3d4651cc0 Changes
+SHA1 b65ff4b50a2e87d9efe2f1a88d6010ad9fbe7a39 Changes
 SHA1 6cdfb385ffe721014248eaebfae0409fd2c2c514 LICENSE
-SHA1 23f31986e5cb6307d597bba85c030df480dba31c MANIFEST
-SHA1 c504a6b76065c6e5406a0d13d506acea1b9bd4d1 META.json
-SHA1 a15a14e0a8e5ae3329ddeeb4fc537c2404e13230 META.yml
-SHA1 0e2321d0f93572eecf7b2bdad8553e65fecb1d59 Makefile.PL
-SHA1 e7cbad8fad26eea410e1655481d57581b1e1bcfe README.mkdn
+SHA1 8b2ef2fd96aab035cf480663123ca6bcd854ce0e MANIFEST
+SHA1 ecd297866db390dd7d29c4ee1f00e65f8d447df1 META.json
+SHA1 94e2ca8fe28092afa08c44a2699dc285d05c40fb META.yml
+SHA1 6cfd9069fcd1c0632f0770b13842e9a3f897a48e Makefile.PL
+SHA1 15ad710b26a8844e516d11026de29c7fa4dc573d README.mkdn
 SHA1 ffa064ca357cd789fd0206cf8d774885124ae37a dist.ini
-SHA1 5683d1b76ae1a9a4daec9d17ccca3e4d027833eb lib/Plack/Middleware/XSRFBlock.pm
+SHA1 c706ca7623ccfd9bb9b6ae62139516178c421309 lib/Plack/Middleware/XSRFBlock.pm
 SHA1 d4426c3a7150a7a522cb0617b5e0b6c806995b5e script/buildkite/dzil-authordeps
 SHA1 7872b53eabda8b053bc1e540724da4dd721a3751 script/buildkite/dzil-distrodeps
 SHA1 e68ecb276d56454d75134d2afb1176550fcfd378 script/buildkite/dzil-install
@@ -38,18 +38,19 @@ SHA1 259f1d716c429b31057069889e7b25b0a4cda990 t/03.meta_tag.t
 SHA1 e671491ac8c4b130799f31f7e08ec8a354016737 t/03.request_header.t
 SHA1 591d9d0ac8e072edbafa49e46d210bf9a84b1a89 t/03.token_per_request.t
 SHA1 da7652a71789bed307555e28147172cf2b44ea67 t/04.cookie_options.t
-SHA1 c847440c193d948dc7a29f06ffc78bc65b11338e t/author-no-tabs.t
+SHA1 145463568426af903049f4ca671d9378142f2027 t/05.not-html.t
+SHA1 c6a4f8615e170b6984a4d21962a93b434b6282aa t/author-no-tabs.t
 SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
 SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
 SHA1 66bfe8be526fd24544bc5004af9c5adcf40780dc t/lib/Plack/Test/MockHTTP.pm
-SHA1 9a066e924b1bd100e133d68376b79cc7b78b9a32 t/lib/Test/XSRFBlock/App.pm
+SHA1 d5917d5039e63d33ddf49738e0198f958d272649 t/lib/Test/XSRFBlock/App.pm
 SHA1 3b8f77fe01a8f9345d58b87018c90f54d708494d t/lib/Test/XSRFBlock/Util.pm
 SHA1 d527491e13186274d2947c0d9f4b7a8a8d227616 t/release-kwalitee.t
 SHA1 91bacb1498d0fb115ed2f1130ffbe8d593931a2d weaver.ini
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAllnTQYACgkQh4j7xTiFuxEobQCgjRBoO15m/hC0z1/bckelKHTh
-ja8AoKHGQpVIZg+13B5pWmoQC8ZhFABr
-=C2Dc
+iEYEARECAAYFAltXHx8ACgkQh4j7xTiFuxGq7ACfb6egaALGIHIpMjhtJ1Z7+hXj
+rFoAniPTPxTY12blJXPM9lRgwH/+sqFs
+=VHKA
 -----END PGP SIGNATURE-----

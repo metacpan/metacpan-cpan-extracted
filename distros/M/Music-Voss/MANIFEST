@@ -8,7 +8,7 @@ lib/Music/Voss.pm
 t/00-load.t
 t/10-powers.t
 t/11-bitchange.t
-t/manifest.t
+t/12-weierstrass.t
 t/pod-coverage.t
 t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -1,3 +1,6 @@
+Version 0.04: 2018-07-22
+  * Fix "added_order" option.
+
 Version 0.03: 2017-12-09
   * Fix line wrapping for "Subcommands available" list
 

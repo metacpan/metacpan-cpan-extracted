@@ -1,0 +1,54 @@
+{
+   "abstract" : "prints stack traces with arguments expanded into readable format",
+   "author" : [
+      "Sergey Aleynikov <randir@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-PrettyTrace",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Printer" : "0.19",
+            "Exporter" : "0",
+            "List::MoreUtils" : "0",
+            "parent" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dur-randir/Devel-PrettyTrace/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/dur-randir/Devel-PrettyTrace"
+      }
+   },
+   "version" : "0.05"
+}

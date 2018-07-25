@@ -1,12 +1,4 @@
 Changes
-inc/Module/Install.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/Devel/PrettyTrace.pm
 lib/Devel/PrettyTrace.pod
 Makefile.PL
@@ -18,3 +10,4 @@ t/02_colors.t
 t/03_traces.t
 t/04_begin.t
 t/inc/Foo.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -492,7 +492,7 @@ $m_hrSettings = {
         style        => 'mysql',
     },
     language  => 'en',
-    version   => '1.15',
+    version   => '1.14',
     session   => "$inctance->{properties}{cgi}/config/session.pl",
     actions   => "$inctance->{properties}{cgi}/config/actions.pl",
     translate => "$inctance->{properties}{cgi}/config/translate.pl",

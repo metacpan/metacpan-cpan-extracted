@@ -1,5 +1,11 @@
 Revision history for Web::Microformats2
 
+0.401 2018-07-23T11:59:13Z
+
+    - Improved parsing and presentation of datetime properties.
+    
+    - Updated the tests to account for recent specification changes. (As a happy side effect, eleven formerly TODO-marked tests now run and pass.)
+
 0.4 2018-05-18T13:10:37Z
 
     - Tests should now pass with older Perl versions. (GitHub issue #1; thanks to Slaven Rezić for the bug report.)

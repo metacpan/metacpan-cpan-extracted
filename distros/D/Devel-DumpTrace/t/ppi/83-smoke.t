@@ -54,7 +54,7 @@ for my $level (1, 2, 3) {
   my (@abbrevs) = grep { /\.\.\./ } @xh;
   ok(@abbrevs = 3 - $level,
      "smoke output has 3-$level lines abbreviated") or $keep++;
-  ok(5 == grep { /\>+\s+$0.pl:\d+\S*:\s+\S/ } @xh,
+  ok(5 == (grep { /\>+\s+$0.pl:\d+\S*:\s+\S/ } @xh),
      "smoke output displays file and line on all output") or $keep++;
 
   unlink $file unless $keep;

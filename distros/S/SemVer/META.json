@@ -1,16 +1,16 @@
 {
    "abstract" : "Use semantic version numbers",
    "author" : [
-      "David E. Wheeler <david@kineticode.com>"
+      "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "SemVer",
    "prereqs" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "SemVer" : {
          "file" : "lib/SemVer.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.7.0"
       }
    },
    "release_status" : "stable",
@@ -55,5 +55,6 @@
          "url" : "http://github.com/theory/semver"
       }
    },
-   "version" : "v0.6.0"
+   "version" : "v0.7.0",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -1,5 +1,5 @@
 package JMAP::Tester::Abort;
-$JMAP::Tester::Abort::VERSION = '0.019';
+$JMAP::Tester::Abort::VERSION = '0.020';
 use Moo;
 extends 'Throwable::Error';
 
@@ -52,7 +52,7 @@ JMAP::Tester::Abort
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

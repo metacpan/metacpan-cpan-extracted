@@ -64,7 +64,7 @@ t/ppi/83-smoke.t
 t/ppi/84-smoke.t
 t/ppi/86-smoke.t
 t/ppi/87-smoke-RT77673.t
-t/ppi/88-smoke.t
+t/ppi/88-smoke-decorators.t
 t/ppi/90-smoke-threads.t
 t/ppi/91-smoke-threads.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -18,151 +18,151 @@ increased significantly over Perl compiled for MacOS.
 =head2 Constructor
 
                             Rate            URI      URI::Fast
-              URI       129199/s             --           -88%
-        URI::Fast      1111111/s           760%             --
+              URI       116822/s             --           -87%
+        URI::Fast       892857/s           664%             --
 
 
 =head2 Get scheme
 
                             Rate            URI      URI::Fast
-              URI       104384/s             --           -88%
-        URI::Fast       877193/s           740%             --
+              URI        92764/s             --           -89%
+        URI::Fast       847458/s           814%             --
 
 
 =head2 Set scheme
 
                             Rate            URI      URI::Fast
-              URI        65274/s             --           -92%
-        URI::Fast       847458/s          1198%             --
+              URI        57937/s             --           -93%
+        URI::Fast       847458/s          1363%             --
 
 
 =head2 Get authority
 
                             Rate            URI      URI::Fast
-              URI        89445/s             --           -90%
-        URI::Fast       925926/s           935%             --
+              URI        60606/s             --           -89%
+        URI::Fast       555556/s           817%             --
 
 
 =head2 Set authority
 
                             Rate            URI      URI::Fast
-              URI        46253/s             --           -93%
-        URI::Fast       684932/s          1381%             --
+              URI        38344/s             --           -94%
+        URI::Fast       632911/s          1551%             --
 
 
 =head2 Get path (scalar)
 
                             Rate            URI      URI::Fast
-              URI        86207/s             --           -86%
-        URI::Fast       625000/s           625%             --
+              URI        85763/s             --           -86%
+        URI::Fast       602410/s           602%             --
 
 
 =head2 Get path (list)
 
                             Rate            URI      URI::Fast
-              URI        71633/s             --           -85%
-        URI::Fast       480769/s           571%             --
+              URI        71023/s             --           -86%
+        URI::Fast       505051/s           611%             --
 
 
 =head2 Set path (scalar)
 
                             Rate            URI      URI::Fast
-              URI        76923/s             --           -88%
-        URI::Fast       617284/s           702%             --
+              URI        76453/s             --           -87%
+        URI::Fast       588235/s           669%             --
 
 
 =head2 Set path (array)
 
                             Rate            URI      URI::Fast
-              URI        75988/s             --           -85%
-        URI::Fast       515464/s           578%             --
+              URI        75758/s             --           -84%
+        URI::Fast       471698/s           523%             --
 
 
 =head2 Get query
 
                             Rate            URI      URI::Fast
-              URI        47483/s             --           -89%
-        URI::Fast       413223/s           770%             --
+              URI        45579/s             --           -89%
+        URI::Fast       423729/s           830%             --
 
 
 =head2 Set query parameter
 
                             Rate            URI      URI::Fast
-              URI        56370/s             --           -87%
-        URI::Fast       438596/s           678%             --
+              URI        53706/s             --           -87%
+        URI::Fast       413223/s           669%             --
 
 
 =head2 Get query (hash)
 
                             Rate            URI      URI::Fast
-              URI        48263/s             --           -87%
-        URI::Fast       364964/s           656%             --
+              URI        45746/s             --           -88%
+        URI::Fast       381679/s           734%             --
 
 
 =head2 Get query keys
 
                             Rate            URI      URI::Fast
-              URI        49801/s             --           -88%
-        URI::Fast       416667/s           737%             --
+              URI        45537/s             --           -88%
+        URI::Fast       384615/s           745%             --
 
 
 =head2 Stringification
 
                             Rate            URI      URI::Fast
-              URI        98814/s             --           -79%
-        URI::Fast       471698/s           377%             --
+              URI        83472/s             --           -75%
+        URI::Fast       335570/s           302%             --
 
 
 =head2 uri_split
 
                             Rate     URI::Split      URI::Fast
-       URI::Split       495050/s             --           -64%
-        URI::Fast      1388889/s           181%             --
+       URI::Split       458716/s             --           -55%
+        URI::Fast      1020408/s           122%             --
 
 
 =head2 Encode
 
-                            Rate    URI::Escape    URL::Encode      URI::Fast URI::Encode::XS
-      URI::Escape         5962/s             --           -26%          -100%           -100%
-      URL::Encode         8071/s            35%             --           -99%            -99%
-        URI::Fast      1282051/s         21403%         15785%             --            -18%
-  URI::Encode::XS      1562500/s         26106%         19259%            22%             --
+                            Rate    URI::Escape    URL::Encode      URI::FastURI::Encode::XS
+      URI::Escape         5218/s             --           -26%          -100%          -100%
+      URL::Encode         7016/s            34%             --           -99%           -99%
+        URI::Fast      1111111/s         21196%         15738%             --            -4%
+  URI::Encode::XS      1162791/s         22186%         16474%             5%             --
 
 
 =head2 Decode
 
-                            Rate    URL::Encode    URI::Escape      URI::Fast URI::Encode::XS
-      URL::Encode         6053/s             --            -1%           -99%            -99%
-      URI::Escape         6098/s             1%             --           -99%            -99%
-        URI::Fast       602410/s          9853%          9778%             --            -30%
-  URI::Encode::XS       862069/s         14143%         14036%            43%              --
+                            Rate    URL::Encode    URI::Escape      URI::FastURI::Encode::XS
+      URL::Encode         5568/s             --            -3%           -99%           -99%
+      URI::Escape         5714/s             3%             --           -99%           -99%
+        URI::Fast       568182/s         10105%          9844%             --           -33%
+  URI::Encode::XS       847458/s         15120%         14732%            49%             --
 
 
 =head2 IRI - ctor
 
                             Rate            IRI      URI::Fast
-              IRI        13998/s             --           -99%
-        URI::Fast      1136364/s          8018%             --
+              IRI        12207/s             --           -99%
+        URI::Fast       847458/s          6842%             --
 
 
 =head2 IRI - set query (hash)
 
                             Rate            IRI      URI::Fast
-              IRI        12610/s             --           -98%
-        URI::Fast       595238/s          4620%             --
+              IRI        11299/s             --           -98%
+        URI::Fast       617284/s          5363%             --
 
 
 =head2 IRI - set param
 
                             Rate            IRI      URI::Fast
-              IRI        11729/s             --           -98%
-        URI::Fast       510204/s          4250%             --
+              IRI        11455/s             --           -98%
+        URI::Fast       505051/s          4309%             --
 
 
 =head2 IRI - set path
 
                             Rate            IRI      URI::Fast
-              IRI        11765/s             --           -98%
-        URI::Fast       675676/s          5643%             --
+              IRI        11740/s             --           -98%
+        URI::Fast       746269/s          6257%             --
 
 

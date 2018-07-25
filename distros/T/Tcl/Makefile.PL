@@ -118,13 +118,14 @@ if (defined($libpath) && defined($incpath)) {
     print $tclcfg;
     my %tclcfg = $tclcfg =~ /^([^=]+)=(.*?)$/gm;
 
+    $defs .= " -DTCLSH_PATH=\\\"".([$tclcfg{tclsh}=~/^(.*)\//]->[0])."\\\""; #haack
+
     if ($^O eq 'darwin' && !defined($tclconfig)) {
         $tclconfig = $tclcfg{'tclConfig.sh'};
     }
     if ($^O eq 'MSWin32' && !defined($tclconfig) && (1 or !$usestubs)) {
         $tclconfig = $tclcfg{'tclConfig.sh'};
     }
-
 
     if (!defined($tclconfig) && $arch && $usestubs) {
 	$incpath = "-Itcl-core/include";
@@ -167,12 +168,12 @@ if (defined($libpath) && defined($incpath)) {
 	if ($usestubs) {
 	    if ($^O eq 'darwin' && $tclcfg{TCL_STUB_LIB_PATH} =~ /\.framework/ ) {
 		(my $fmk = $tclcfg{TCL_STUB_LIB_PATH}) =~ s/(?<=\.framework).*//;
-		$defs .= " -DLIB_RUNTIME_DIR=\\\"".quotemeta($fmk)."\\\"";
+		$defs .= " -DLIB_RUNTIME_DIR=\\\"$fmk\\\"";
 		@extraargs = (dynamic_lib => {OTHERLDFLAGS => "-framework Carbon"});
 	    } else {
-		$defs .= " -DLIB_RUNTIME_DIR=\\\"$tclcfg{TCL_EXEC_PREFIX}/lib\\\"";
+		$defs .= " -DLIB_RUNTIME_DIR=\\\"$tclcfg{TCL_EXEC_PREFIX}".($^O eq 'MSWin32'?'':'/lib')."\\\"";
 	    }
-	    $defs .= " -DTCL_LIB_FILE=\\\"".quotemeta($tclcfg{TCL_LIB_FILE})."\\\"";
+	    $defs .= " -DTCL_LIB_FILE=\\\"$tclcfg{TCL_LIB_FILE}\\\"";
 	}
     } else {
 	# no --tclconfig=... -> get values from ./tclcfg.tcl
@@ -245,7 +246,6 @@ if ($mm->is_make_type('dmake') and 0) { # Mmm. no. d-make welcome. problem was s
 dmake prohibited. It does bla-bla-bla
 EOS
 }
-
 
 sub process_tclconfig {
     # Process a tclConfig.sh file for build info

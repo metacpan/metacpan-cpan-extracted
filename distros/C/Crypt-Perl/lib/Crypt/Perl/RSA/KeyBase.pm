@@ -8,7 +8,6 @@ use parent qw(
     Crypt::Perl::KeyBase
 );
 
-use Crypt::Format ();
 use Module::Load ();
 
 use Crypt::Perl::BigInt ();
@@ -37,6 +36,7 @@ sub new {
 sub to_pem {
     my ($self) = @_;
 
+    require Crypt::Format;
     return Crypt::Format::der2pem( $self->to_der(), $self->_PEM_HEADER() );
 }
 
@@ -130,7 +130,7 @@ sub _asn1_find {
         Crypt::Perl::RSA::Template::get_template('INTEGER'),
     );
 
-    $asn1->find($macro);
+    return $asn1->find($macro);
 }
 
 sub _to_der {

@@ -201,9 +201,7 @@ fallback2: &fallback2 |
         {{{house}}}
         {{{road}}} {{{house_number}}}
         {{{suburb}}}
-        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} {{/first}}
-        {{{county}}}
-        {{#first}} {{{state_district}}} || {{{state}}} {{/first}}
+        {{#first}} {{{city}}} || {{{town}}} || {{{village}}} || {{{county}}} || {{{island}}} {{/first}}, {{#first}} {{{state_code}}} || {{{state}}} {{/first}}
         {{{country}}}
 
 fallback3: &fallback3 |
@@ -299,6 +297,9 @@ AR:
     address_template: *generic9
     replace:
         - ["^Autonomous City of ",""]
+    postformat_replace:
+        # fix the postcode to make it \w\d\d\d\d \w\w\w
+        - ["\n(\\w\\d{4})(\\w{3}) ","\n$1 $2 "]
 
 # American Samoa
 AS: 
@@ -506,6 +507,9 @@ CK:
 # Chile
 CL: 
     address_template: *generic1
+    postformat_replace:
+        # fix the postcode to make it \d\d\d \d\d\d\d
+        - ["\n(\\d{3})(\\d{4}) ","\n$1 $2 "]
 
 # Cameroon
 CM: 
@@ -759,6 +763,7 @@ GB:
         - ["^County( of)? ",""]
         - ["^Parish of ",""]
         - ["^Central ",""]
+        - ["^Greater London","London"]
         - ["^London Borough of .+","London"]
         - ["Royal Borough of ",""]
     postformat_replace:
@@ -818,6 +823,9 @@ GQ:
 # Greece
 GR:
     address_template: *generic1
+    postformat_replace:
+        # fix the postcode to make it \d\d\d \d\d
+        - ["\n(\\d{3})(\\d{2}) ","\n$1 $2 "]
 
 # South Georgia and the South Sandwich Islands - same as UK
 GS:
@@ -1843,7 +1851,8 @@ UG:
     address_template: *generic16
 
 # US Minor Outlying Islands, same as USA
-UM: 
+UM:
+    fallback_template: *fallback3
     use_country: US
     change_country: United States of America
     add_component: state=US Minor Outlying Islands

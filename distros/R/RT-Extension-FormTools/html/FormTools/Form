@@ -6,6 +6,7 @@ $include_page_layout => 1
 $include_tabs        => 0
 $ShowBar             => 1
 $validation          => 0
+$enable_persisting   => 1
 $forbid_persisting   => {}
 $form_id             => undef
 $form_name           => undef
@@ -116,12 +117,14 @@ $next_for_validation ||= $m->caller(1)->path;
 % }
 <%$content|n%>
 
+% if ($enable_persisting) {
 % foreach my $key (keys %request_args) {
 % next if (ref $request_args{$key} && ref $request_args{$key} ne 'ARRAY');
 % foreach my $val ( ref ($request_args{$key}) ? @{$request_args{$key}} : ($request_args{$key})) {
 % next if $forbid_persisting->{$key};
 % next if ($key eq 'user' or $key eq 'pass');
 <input type="hidden" name="<%$key%>" value="<%$val%>" />
+% }
 % }
 % }
 

@@ -1,5 +1,13 @@
 Revision history for git-workflow-tools
 
+1.0.7   2018-07-22
+        Updating for release of version 1.0.7
+        Adding config requires (Ivan Wills)
+        Adding documentation for depth (Ivan Wills)
+        Adding a maximum depth option (Ivan Wills)
+        Fixing getting old commits (Ivan Wills)
+        Fixing getting the period based dates (Ivan Wills)
+
 1.0.6   2018-04-10
         Updating for release of version 1.0.6
         Fixed the rest of the tests (Ivan Wills)

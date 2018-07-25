@@ -12,7 +12,7 @@ use Scalar::Util qw(refaddr);
 use Filter::Simple;
 use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our $DEBUG_ALL = $ENV{CLASS_SLOT_DEBUG}; # Enable debugging for all classes
 our %DEBUG;                              # Enable debugging for individual classes
@@ -166,8 +166,8 @@ $acc
     else {
       eval qq{
 CHECK {
-  \$Class::Slot::CLASS{$caller}{init}->()
-    if exists \$Class::Slot::CLASS{$caller}{init};
+  \$Class::Slot::CLASS{'$caller'}{init}->()
+    if exists \$Class::Slot::CLASS{'$caller'}{init};
 }
 };
 
@@ -247,10 +247,10 @@ sub new \{
       $code .= "  \$self->{'$ident'} = ";
 
       if (ref $def eq 'CODE') {
-        $code .= "\$CLASS{$class}{slot}{'$ident'}{def}->(\$self)";
+        $code .= "\$CLASS{'$class'}{slot}{'$ident'}{def}->(\$self)";
       }
       else {
-        $code .= "\$CLASS{$class}{slot}{'$ident'}{def}";
+        $code .= "\$CLASS{'$class'}{slot}{'$ident'}{def}";
       }
 
       $code .= " unless exists \$self->{'$ident'};\n";

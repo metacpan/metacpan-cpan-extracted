@@ -81,8 +81,8 @@ sub blocked_app {
 sub mapped_app {
     my $mapped = builder {
         mount "/post" => base_app();
-        mount "/form/html" => sub { [ HTTP_OK, [ 'Content-Type' => 'text/html' ], [ $form ] ] };
-        mount "/form/xhtml" => sub { [ HTTP_OK, [ 'Content-Type' => 'application/xhtml+xml' ], [ $form ] ] };
+        mount "/form/html" => sub { [ HTTP_OK, [ 'Content-Type' => 'text/html; charset=utf-8' ], [ $form ] ] };
+        mount "/form/xhtml" => sub { [ HTTP_OK, [ 'Content-Type' => 'application/xhtml+xml; charset=utf-8' ], [ $form ] ] };
         mount "/form/text" => sub { [ HTTP_OK, [ 'Content-Type' => 'text/plain' ], [ $form ] ] };
         mount "/form/html-charset" => sub { [ HTTP_OK, [ 'Content-Type' => 'text/html; charset=UTF-8' ], [ $form ] ] };
         mount "/form/xhtml-charset" => sub { [ HTTP_OK, [ 'Content-Type' => 'application/xhtml+xml; charset=UTF-8' ], [ $form ] ] };

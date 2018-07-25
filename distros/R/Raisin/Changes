@@ -1,3 +1,6 @@
+0.74 Fixes
+    * Type in example (#42);
+    * Fix unblessed refs in `_compile_column` (#31);
 
 0.73 Fixes
     * Fixes logging issue (#36);

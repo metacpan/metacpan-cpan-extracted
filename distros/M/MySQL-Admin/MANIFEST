@@ -71,8 +71,13 @@ htdocs/images/preview.jpg
 htdocs/index.html
 htdocs/install.html
 htdocs/javascript/admin.js
+htdocs/javascript/bootstrap-markdown-editor.js
+htdocs/javascript/bootstrap-select.min.css
+htdocs/javascript/bootstrap-select.min.js
 htdocs/javascript/cms.js
+htdocs/javascript/jquery-3.3.1.min.js
 htdocs/javascript/mysql_admin.js
+htdocs/javascript/require.js
 htdocs/src-min/ace.js
 htdocs/src-min/ext-beautify.js
 htdocs/src-min/ext-chromevox.js
@@ -486,8 +491,6 @@ lib/Template/Quick.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
 README
 t/02-pod.t
 t/05-session.t
@@ -500,3 +503,5 @@ t/11-Templates.t
 t/content.pl
 t/settings.pl
 todo
+META.yml
+META.json

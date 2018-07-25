@@ -15,6 +15,8 @@ t/04-execute.t
 t/04-schema.t
 t/05-corpus.yml
 t/05-schema.t
+t/06-corpus.json
+t/06-schema.t
 t/local-full.t
 t/local.t
 t/snapshots/01-execute_t/execute
@@ -23,6 +25,7 @@ t/snapshots/03-schema_t/schema
 t/snapshots/04-execute_t/execute
 t/snapshots/04-schema_t/schema
 t/snapshots/05-schema_t/schema
+t/snapshots/06-schema_t/schema
 xt/manifest.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

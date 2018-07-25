@@ -7,13 +7,13 @@ my $deeply = \&eq_or_diff;
 
 use Music::Voss;
 
-can_ok('Music::Voss', qw(bitchange));
+can_ok( 'Music::Voss', qw(bitchange) );
 
-# TODO actual tests
-#my $fun = Music::Voss::bitchange( roll => sub { defined $_[0] ? $_[0] : 0 } );
-#
-#for my $x (0..21) {
-#  diag sprintf "%d %d", $x, $fun->($x);
-#}
+my $fun = Music::Voss::bitchange( roll => sub { defined $_[0] ? $_[0] : 0 } );
 
-plan tests => 1;
+# confirm at least it produces the same wrong numbers as the LISP
+# implementation (also written by me so could have similar bugs)
+my @seq = map { $fun->($_) } 0 .. 9;
+$deeply->( \@seq, [qw/0 1 4 5 12 13 16 17 24 25/], "some numbers");
+
+plan tests => 2;

@@ -1,18 +1,13 @@
-# nps-sdk-perl
-Perl Server-side SDK
+# Perl SDK
 
-Status: Under Development
-
-#  Perl SDK
- 
-
+  
 ## Availability
 Supports Perl 5.24.1
 
 ## How to install
 
 ```
-cpan install NpsSDK
+cpan install NpsSDK::Nps
 ```
 
 ## Configuration
@@ -55,10 +50,10 @@ my $params = {
     'psp_CardSecurityCode' => '123'
 };
 
-my $response = NpsSDK::Nps::pay_online_2p($params);	
+my $response = NpsSDK::Nps::pay_online_2p($params); 
 ```
 
-## environments
+## Environments
 
 ```perl
 use NpsSDK::Nps;
@@ -68,7 +63,31 @@ $NpsSDK::Constants::STAGING_ENV
 $NpsSDK::Constants::SANDBOX_ENV
 ```
 
+## Error handling
+
+You can check if something went wrong checking the type of $response. There are 3 type of errors: Timeout, Connection and Unknown. Their type of object are NpsSDK::TimeoutException, NpsSDK::ConnectionException, NpsSDK::UnknownError respectively.
+
+The example below also work for Connection and Unknown errors.
+
+```perl
+use NpsSDK::Nps;
+use warnings;
+use stricts;
+
+NpsSDK::Configuration::configure(environment => $NpsSDK::Constants::SANDBOX_ENV,
+                                 secret_key  => "_YOUR_SECRET_KEY_",
+                                 timeout     => 60);
+
+my $response = NpsSDK::Nps::pay_online_2p($params);
+
+if (ref($response) eq "NpsSDK::TimeoutException") {
+    #Your code to handle the error
+};
+```
+
 ## Advanced configurations
+
+### Logging 
 
 Nps SDK allows you to log what’s happening with you request inside of our SDK.
 In order to do so you will have to create a logger with Log::Log4perl and pass it by configuration.
@@ -82,6 +101,8 @@ NpsSDK::Configuration::configure(environment => $NpsSDK::Constants::SANDBOX_ENV,
                                  secret_key  => "_YOUR_SECRET_KEY_",
                                  logger      => $logger);
 ```
+
+### LogLevel
 
 The INFO level will write concise information of the request and will mask sensitive data of the request. 
 The DEBUG level will write information about the request to let developers debug it in a more detailed way.
@@ -139,21 +160,28 @@ NpsSDK::Configuration::configure(environment => $NpsSDK::Constants::SANDBOX_ENV,
                                  logger      => $logger);
 ```
 
+### Sanitize
 
 Sanitize allows the SDK to truncate to a fixed size some fields that could make request fail, like extremely long name.
 
 ```perl
 use NpsSDK::Nps;
+use warnings; 
+use strict;
 
 NpsSDK::Configuration::configure(environment => $NpsSDK::Constants::SANDBOX_ENV,
                                  secret_key  => "_YOUR_SECRET_KEY_",
                                  sanitize    => 1);
 ```
 
+### Timeout
+
 You can change the timeout of the request.
 
 ```perl
 use NpsSDK::Nps;
+use warnings; 
+use strict;
 
 NpsSDK::Configuration::configure(environment => $NpsSDK::Constants::SANDBOX_ENV,
                                  secret_key  => "_YOUR_SECRET_KEY_",

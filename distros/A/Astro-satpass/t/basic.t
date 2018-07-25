@@ -39,18 +39,11 @@ require_ok 'Astro::Coord::ECI::Sun'
 require_ok 'Astro::Coord::ECI::TLE'
     or BAIL_OUT 'Can not continue without Astro::Coord::ECI::TLE';
 
-require_ok 'Astro::Coord::ECI::TLE::Iridium'
-    or BAIL_OUT 'Can not continue without Astro::Coord::ECI::Iridium';
-
 require_ok 'Astro::Coord::ECI::TLE::Set'
     or BAIL_OUT 'Can not continue without Astro::Coord::ECI::Set';
 
 instantiate 'Astro::Coord::ECI::TLE::Set'
     or BAIL_OUT 'Can not instantiate Astro::Coord::ECI::Set';
-
-u_ok embodies => [ qw{ Astro::Coord::ECI::TLE::Iridium
-    Astro::Coord::ECI::TLE } ],
-    'An Iridium embodies a TLE';
 
 u_cmp_eql deg2rad => 45, .7853981634, '%.10f', 'deg2rad( 45 )';
 

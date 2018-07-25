@@ -1595,9 +1595,6 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
       case SPVM_OPCODE_C_ID_MOVE_OBJECT:
         SPVM_RUNTIME_C_INLINE_OBJECT_ASSIGN((void**)&vars[opcode->operand0], *(void**)&vars[opcode->operand1]);
         break;
-      case SPVM_OPCODE_C_ID_MOVE_VALUES:
-        memcpy(&vars[opcode->operand0], &vars[opcode->operand1], sizeof(SPVM_VALUE) * opcode->operand2);
-        break;
       case SPVM_OPCODE_C_ID_PUSH_MORTAL: {
         mortal_stack[mortal_stack_top] = opcode->operand0;
         mortal_stack_top++;
@@ -2229,16 +2226,44 @@ int32_t SPVM_RUNTIME_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stac
         }
         break;
       }
-      case SPVM_OPCODE_C_ID_PUSH_ARG: {
-        int32_t width = opcode->operand1;
-        memcpy(&stack[call_sub_arg_stack_top], &vars[opcode->operand0], sizeof(SPVM_VALUE) * width);
-        call_sub_arg_stack_top += width;
-        
+      case SPVM_OPCODE_C_ID_PUSH_ARG_BYTE: {
+        *(SPVM_VALUE_byte*)&stack[call_sub_arg_stack_top] = *(SPVM_VALUE_byte*)&vars[opcode->operand0];
+        call_sub_arg_stack_top++;
+        break;
+      }
+      case SPVM_OPCODE_C_ID_PUSH_ARG_SHORT: {
+        *(SPVM_VALUE_short*)&stack[call_sub_arg_stack_top] = *(SPVM_VALUE_short*)&vars[opcode->operand0];
+        call_sub_arg_stack_top++;
+        break;
+      }
+      case SPVM_OPCODE_C_ID_PUSH_ARG_INT: {
+        *(SPVM_VALUE_int*)&stack[call_sub_arg_stack_top] = *(SPVM_VALUE_int*)&vars[opcode->operand0];
+        call_sub_arg_stack_top++;
+        break;
+      }
+      case SPVM_OPCODE_C_ID_PUSH_ARG_LONG: {
+        *(SPVM_VALUE_long*)&stack[call_sub_arg_stack_top] = *(SPVM_VALUE_long*)&vars[opcode->operand0];
+        call_sub_arg_stack_top++;
+        break;
+      }
+      case SPVM_OPCODE_C_ID_PUSH_ARG_FLOAT: {
+        *(SPVM_VALUE_float*)&stack[call_sub_arg_stack_top] = *(SPVM_VALUE_float*)&vars[opcode->operand0];
+        call_sub_arg_stack_top++;
+        break;
+      }
+      case SPVM_OPCODE_C_ID_PUSH_ARG_DOUBLE: {
+        *(SPVM_VALUE_double*)&stack[call_sub_arg_stack_top] = *(SPVM_VALUE_double*)&vars[opcode->operand0];
+        call_sub_arg_stack_top++;
+        break;
+      }
+      case SPVM_OPCODE_C_ID_PUSH_ARG_OBJECT: {
+        *(SPVM_VALUE_object*)&stack[call_sub_arg_stack_top] = *(SPVM_VALUE_object*)&vars[opcode->operand0];
+        call_sub_arg_stack_top++;
         break;
       }
       case SPVM_OPCODE_C_ID_PUSH_ARG_UNDEF:
         *(void**)&stack[call_sub_arg_stack_top] = NULL;
-        call_sub_arg_stack_top += opcode->operand1;
+        call_sub_arg_stack_top++;
         
         break;
       case SPVM_OPCODE_C_ID_CAST: {

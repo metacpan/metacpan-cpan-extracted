@@ -18,6 +18,8 @@ Crypt::Perl::PK - Public-key cryptography logic
     #   Crypt::Perl::RSA::PublicKey
     #   Crypt::Perl::ECDSA::PrivateKey
     #   Crypt::Perl::ECDSA::PublicKey
+    #   Crypt::Perl::Ed25519::PrivateKey
+    #   Crypt::Perl::Ed25519::PublicKey
     #
     my $key_obj = Crypt::Perl::PK::parse_jwk( { .. } );
 
@@ -47,7 +49,7 @@ sub parse_key {
 
     my $obj;
 
-    for my $alg ( qw( RSA ECDSA ) ) {
+    for my $alg ( qw( RSA ECDSA Ed25519 ) ) {
         my $module = "Crypt::Perl::$alg\::Parse";
         Module::Load::load($module);
 
@@ -84,6 +86,9 @@ sub parse_jwk {
         }
         elsif ($kty eq 'EC') {
             $module = 'Crypt::Perl::ECDSA::Parse';
+        }
+        elsif ($kty eq 'OKP' && $hr->{'crv'} eq 'Ed25519') {
+            $module = 'Crypt::Perl::Ed25519::Parse';
         }
         else {
             die Crypt::Perl::X::create('UnknownJTKkty', $kty);

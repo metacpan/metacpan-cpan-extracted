@@ -5,7 +5,10 @@ use 5.006002;
 use strict;
 use warnings;
 
+use lib qw{ inc };
+
 use Astro::Coord::ECI::TLE;
+use My::Module::Sun;
 use Time::Local;
 
 use Test::More 0.88;	# Because of done_testing();
@@ -25,13 +28,17 @@ EOD
     'Parse generic TLE.'
     or diag $@;
 
-ok eval { ( $got ) = Astro::Coord::ECI::TLE->parse( <<'EOD' ); 1 },
+my $attrs = { sun => 'My::Module::Sun' };
+
+ok eval { ( $got ) = Astro::Coord::ECI::TLE->parse( $attrs, <<'EOD' ); 1 },
 VANGUARD 1
 1     5U  8  2B    0  9.78495062  .00000023      0-0     98-4 0    53
 2     5   4.2682   8.7242      67   1.7664   9.3264  1.82419157413667
 EOD
     'Parse TLE with leading spaces.'
     or diag $@;
+
+isa_ok $got->get( 'sun' ), 'My::Module::Sun';
 
 is $got->get( 'international' ), ' 8  2B',
     q{Got expected 'international' value};

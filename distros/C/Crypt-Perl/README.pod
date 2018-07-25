@@ -43,6 +43,8 @@ a broad variety of extensions
 
 =item * L<ECDSA|Crypt::Perl::ECDSA>
 
+=item * L<ECDSA|Crypt::Perl::Ed25519>
+
 =back
 
 =head1 SECURITY
@@ -66,8 +68,8 @@ Caveat emptor.
 RSA key generation is slow—too slow, probably, unless you have
 L<Math::BigInt::GMP> or L<Math::BigInt::Pari> (either of which requires XS).
 It’s one application where pure-Perl cryptography just doesn’t seem
-feasible. :-( Everything else, though, including all ECDSA operations,
-should be fine.
+feasible. :-( Everything else, though, including all ECDSA and Ed25519
+operations, should be fine.
 
 =head1 TODO
 
@@ -93,6 +95,8 @@ Much of the logic here comes from Kenji Urushima’s L<jsrsasign|https://github.
 Most of the tests depend on the near-ubiquitous L<OpenSSL|http://openssl.org>,
 without which the Internet would be a very, very different reality from
 what we know!
+
+The Ed25519 logic is ported from L<forge.js|https://github.com/digitalbazaar/forge/blob/master/lib/ed25519.js>.
 
 Other parts are ported from L<LibTomCrypt|http://www.libtom.net>.
 

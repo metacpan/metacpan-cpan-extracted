@@ -1,4 +1,11 @@
 <%init>
+# Make sure we are under /Example/, otherwise we'll submit to "/user_info"
+# instead of "/Example/user_info"
+my $request_uri = $m->cgi_object->env->{REQUEST_URI};
+if ( $request_uri =~ /Example$/ ) {
+    return RT::Interface::Web::Redirect( $request_uri . '/' );
+}
+
 my $queue = RT::Queue->new($RT::SystemUser);
 $queue->Load('General');
 die "Could not find the queue " unless $queue->id;

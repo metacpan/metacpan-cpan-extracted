@@ -1,9 +1,9 @@
 # carton snapshot format: version 1.0
 DISTRIBUTIONS
-  CPAN-Perl-Releases-3.58
-    pathname: B/BI/BINGOS/CPAN-Perl-Releases-3.58.tar.gz
+  CPAN-Perl-Releases-3.68
+    pathname: B/BI/BINGOS/CPAN-Perl-Releases-3.68.tar.gz
     provides:
-      CPAN::Perl::Releases 3.58
+      CPAN::Perl::Releases 3.68
     requirements:
       ExtUtils::MakeMaker 0
       Test::More 0.47
@@ -32,12 +32,12 @@ DISTRIBUTIONS
       overload 0
       strict 0
       warnings 0
-  Devel-PatchPerl-1.48
-    pathname: B/BI/BINGOS/Devel-PatchPerl-1.48.tar.gz
+  Devel-PatchPerl-1.52
+    pathname: B/BI/BINGOS/Devel-PatchPerl-1.52.tar.gz
     provides:
-      Devel::PatchPerl 1.48
-      Devel::PatchPerl::Hints 1.48
-      Devel::PatchPerl::Plugin 1.48
+      Devel::PatchPerl 1.52
+      Devel::PatchPerl::Hints 1.52
+      Devel::PatchPerl::Plugin 1.52
     requirements:
       ExtUtils::MakeMaker 0
       File::pushd 1.00
@@ -49,10 +49,55 @@ DISTRIBUTIONS
     pathname: T/TO/TODDR/Exporter-5.72.tar.gz
     provides:
       Exporter 5.72
-      Exporter::Heavy 5.72
+      Exporter::Heavy 5.73
     requirements:
       Carp 1.05
       ExtUtils::MakeMaker 0
+  ExtUtils-MakeMaker-7.34
+    pathname: B/BI/BINGOS/ExtUtils-MakeMaker-7.34.tar.gz
+    provides:
+      ExtUtils::Command 7.34
+      ExtUtils::Command::MM 7.34
+      ExtUtils::Liblist 7.34
+      ExtUtils::Liblist::Kid 7.34
+      ExtUtils::MM 7.34
+      ExtUtils::MM_AIX 7.34
+      ExtUtils::MM_Any 7.34
+      ExtUtils::MM_BeOS 7.34
+      ExtUtils::MM_Cygwin 7.34
+      ExtUtils::MM_DOS 7.34
+      ExtUtils::MM_Darwin 7.34
+      ExtUtils::MM_MacOS 7.34
+      ExtUtils::MM_NW5 7.34
+      ExtUtils::MM_OS2 7.34
+      ExtUtils::MM_QNX 7.34
+      ExtUtils::MM_UWIN 7.34
+      ExtUtils::MM_Unix 7.34
+      ExtUtils::MM_VMS 7.34
+      ExtUtils::MM_VOS 7.34
+      ExtUtils::MM_Win32 7.34
+      ExtUtils::MM_Win95 7.34
+      ExtUtils::MY 7.34
+      ExtUtils::MakeMaker 7.34
+      ExtUtils::MakeMaker::Config 7.34
+      ExtUtils::MakeMaker::Locale 7.34
+      ExtUtils::MakeMaker::_version 7.34
+      ExtUtils::MakeMaker::charstar 7.34
+      ExtUtils::MakeMaker::version 7.34
+      ExtUtils::MakeMaker::version::regex 7.34
+      ExtUtils::MakeMaker::version::vpp 7.34
+      ExtUtils::Mkbootstrap 7.34
+      ExtUtils::Mksymlists 7.34
+      ExtUtils::testlib 7.34
+      MM 7.34
+      MY 7.34
+    requirements:
+      Data::Dumper 0
+      Encode 0
+      File::Basename 0
+      File::Spec 0.8
+      Pod::Man 0
+      perl 5.006
   File-Which-1.22
     pathname: P/PL/PLICEASE/File-Which-1.22.tar.gz
     provides:

@@ -92,6 +92,8 @@ my $builddir='';my @ls_tmp=();
 
 # https://www.cartoonify.de/
 
+# https://mythemeshop.com/blog/add-amazon-products-woocommerce/
+
 my $configure_wordpress=sub {
 
    my $selection=$_[0]||'';

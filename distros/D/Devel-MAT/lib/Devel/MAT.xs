@@ -170,6 +170,7 @@ CODE:
       case 1: /* PMAT_SVtGLOB */
         Newx(ptr, 1, struct pmat_sv_glob); break;
       case 2: /* PMAT_SVtSCALAR */
+      case 13: /* PMAT_SVtUNDEF */
         Newx(ptr, 1, struct pmat_sv_scalar); break;
       case 3: /* PMAT_SVtREF */
         Newx(ptr, 1, struct pmat_sv_ref); break;

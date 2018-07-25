@@ -1,0 +1,30 @@
+App::SlowQuitApps version 0.000002
+
+This module makes it easier to configure the SlowQuitApps
+application (L<https://github.com/dteoh/SlowQuitApps>).
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+    * MacOS
+
+    * The SlowQuitApps application
+      <https://github.com/dteoh/SlowQuitApps>
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2018, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

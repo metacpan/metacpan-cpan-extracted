@@ -12,7 +12,7 @@ use Woothee::Crawler;
 use Woothee::Appliance;
 use Woothee::Misc;
 
-our $VERSION = "1.7.0";
+our $VERSION = "1.8.0";
 
 sub parse {
     my ($this,$useragent) = @_;
@@ -92,6 +92,9 @@ sub try_browser {
         return 1;
     }
     if (Woothee::Browser::challenge_vivaldi($useragent, $result)) {
+        return 1;
+    }
+    if (Woothee::Browser::challenge_yandex_browser($useragent, $result)) {
         return 1;
     }
     if (Woothee::Browser::challenge_safari_chrome($useragent, $result)) {

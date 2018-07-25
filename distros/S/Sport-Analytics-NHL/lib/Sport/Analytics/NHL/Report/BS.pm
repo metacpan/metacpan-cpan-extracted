@@ -174,6 +174,15 @@ Sets the start, end and last updated timestamps for the game from the date strin
  Argument: the boxscore JSON hashref
  Returns: void.
 
+=item C<build_resolve_cache>
+
+Builds a resolution cache for the roster, with keys as numbers of players pointing at their whole player record in the game. The players who are not numbered are stored as reference to their record in a special list [names].
+
+ Arguments: none
+ Returns: void. Sets $self->{resolve_cache}
+
+Note: the caches are per team, and valid for one game only.
+
 =back
 
 =cut
@@ -304,6 +313,7 @@ sub set_player ($$) {
 
 	my $self      = shift;
 	my $ld_player = shift;
+
 	unless ($ld_player->{stats}{skaterStats} || $ld_player->{stats}{goalieStats}) {
 		$ld_player->{stats}{
 			$ld_player->{position}{code} eq 'G' ? 'goalieStats' : 'skaterStats'
@@ -324,7 +334,7 @@ sub set_player ($$) {
 		&& ref $BROKEN_PLAYERS{BS}->{$self->{_id}}->{$ld_player->{person}{id}}) {
 		for my $stat (keys %{$BROKEN_PLAYERS{BS}->{$self->{_id}}->{$ld_player->{person}{id}}}) {
 			print "bkey $stat bp $ld_player->{person}{id}\n";
-			$player->{$stat} = $BROKEN_PLAYERS{BS}->{$self->{_id}}->{$ld_player->{person}{id}}{ $stat };
+			$player->{$stat} = $BROKEN_PLAYERS{BS}->{$self->{_id}}->{$ld_player->{person}{id}}{$stat};
 		}
 	}
 	$player->{pim} ||= ($player->{penaltyMinutes} || 0) if $player->{position} eq 'G';
@@ -623,6 +633,32 @@ sub set_events ($$) {
 	}
 }
 
+sub build_resolve_cache ($) {
+
+	my $self  = shift;
+
+	$self->{resolve_cache} = {};
+	for my $t (0,1) {
+		my $unknown_number = 100;
+		$self->{teams}[$t]{roster} = [ my_uniq { $_->{_id} } @{$self->{teams}[$t]{roster}} ];
+		for my $player (@{$self->{teams}[$t]{roster}}) {
+			if (! $player->{broken}) {
+				$player->{penaltyMinutes} = delete $player->{pim} if defined $player->{pim};
+				$player->{number} ||= $unknown_number++;
+				while ($self->{resolve_cache}{$self->{teams}[$t]{name}}->{$player->{number}}) {
+					$player->{number} += 100;
+				}
+				$self->{resolve_cache}{$self->{teams}[$t]{name}}->{$player->{number}} = \$player;
+			}
+			else {
+				$self->{resolve_cache}{$self->{teams}[$t]{name}}->{names}
+					||= [];
+				push(@{$self->{resolve_cache}{$self->{teams}[$t]{name}}->{names}}, \$player);
+			}
+		}
+	}
+}
+
 sub process ($) {
 
 	my $self = shift;
@@ -640,7 +676,7 @@ sub process ($) {
 		$BROKEN_FILES{$self->{_id}}->{BS} = 1;
 		$self->{events} = [];
 	}
-	$self->{type} = 'BH';
+	$self->{type} = 'BS';
 	delete $self->{json};
 	1;
 }

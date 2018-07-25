@@ -26,6 +26,12 @@ lib/Crypt/Perl/ECDSA/Parse.pm
 lib/Crypt/Perl/ECDSA/PrivateKey.pm
 lib/Crypt/Perl/ECDSA/PublicKey.pm
 lib/Crypt/Perl/ECDSA/Utils.pm
+lib/Crypt/Perl/Ed25519.pm
+lib/Crypt/Perl/Ed25519/KeyBase.pm
+lib/Crypt/Perl/Ed25519/Math.pm
+lib/Crypt/Perl/Ed25519/Parse.pm
+lib/Crypt/Perl/Ed25519/PrivateKey.pm
+lib/Crypt/Perl/Ed25519/PublicKey.pm
 lib/Crypt/Perl/JWK.pm
 lib/Crypt/Perl/KeyBase.pm
 lib/Crypt/Perl/Math.pm
@@ -100,6 +106,9 @@ t/Crypt-Perl-ECDSA-Math.t
 t/Crypt-Perl-ECDSA-Parse.t
 t/Crypt-Perl-ECDSA-PrivateKey.t
 t/Crypt-Perl-ECDSA-PublicKey.t
+t/Crypt-Perl-Ed25519-Math.t
+t/Crypt-Perl-Ed25519-Parse.t
+t/Crypt-Perl-Ed25519-PrivateKey.t
 t/Crypt-Perl-Math.t
 t/Crypt-Perl-PK.t
 t/Crypt-Perl-PKCS10-Attribute-extensionRequest.t

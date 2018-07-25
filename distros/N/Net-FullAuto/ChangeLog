@@ -20,6 +20,13 @@
 #######################################################################
 
 
+2018-07-23  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000406 released
+
+        * Updated Makefile.PL to use specific BerkeleyDB.
+
+
 2018-01-24  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000405 released

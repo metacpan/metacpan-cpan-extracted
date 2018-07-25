@@ -1,3 +1,6 @@
+0.05    2018-07-23
+-bugfix: package names correctly escaped when used as hash key
+
 0.04    2018-05-11
 -*correctly* increment MIN_PERL_VERSION and fix bugtracker metadata (credit: Dan Book)
 

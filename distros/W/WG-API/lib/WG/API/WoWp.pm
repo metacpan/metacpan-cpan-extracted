@@ -1,22 +1,30 @@
 package WG::API::WoWp;
 
+use Const::Fast;
+
 use Moo;
 
 with 'WG::API::Base';
 
 =head1 NAME
 
-WG::API::WoWp - Modules to work with Wargaming.net Public API for World of Warplanes
+WG::API::WoWp - Module to work with Wargaming.net Public API for World of Warplanes
 
 =head1 VERSION
 
-Version v0.10
+Version v0.11
 
 =cut
 
-our $VERSION = 'v0.10';
+our $VERSION = 'v0.11';
 
-use constant api_uri => '//api.worldofwarplanes.ru/';
+const my $api_uri => '//api.worldofwarplanes.ru/';
+
+sub _api_uri {
+    my ($self) = @_;
+
+    return $api_uri;
+}
 
 =head1 SYNOPSIS
 
@@ -64,9 +72,7 @@ Method returns partial list of players. The list is filtered by initial characte
 =cut
 
 sub account_list {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wowp/account/list/', [ 'language', 'fields', 'type', 'search', 'limit' ], ['search'],
         @_
     );
@@ -87,9 +93,7 @@ Method returns player details.
 =cut
 
 sub account_info {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wowp/account/info/', [ 'language', 'fields', 'access_token', 'account_id' ],
         ['account_id'], @_
     );
@@ -110,9 +114,7 @@ Method returns details on player's aircrafts.
 =cut
 
 sub account_planes {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wowp/account/planes/', [ 'language', 'fields', 'access_token', 'account_id', 'in_garage', 'plane_id' ],
         ['account_id'], @_
     );
@@ -131,9 +133,7 @@ Method returns list of all aircrafts from Encyclopedia
 =cut
 
 sub encyclopedia_planes {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wowp/encyclopedia/planes/', [ 'fields', 'language', 'nation', 'type' ], undef, @_ );
+    return shift->_request( 'get', 'wowp/encyclopedia/planes/', [ 'fields', 'language', 'nation', 'type' ], undef, @_ );
 }
 
 =item B<encyclopedia_planeinfo( [ %params ] )>
@@ -151,9 +151,7 @@ Method returns aircraft details from Encyclopedia.
 =cut
 
 sub encyclopedia_planeinfo {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wowp/encyclopedia/planeinfo/', [ 'plane_id', 'fields', 'language' ], ['plane_id'], @_ );
+    return shift->_request( 'get', 'wowp/encyclopedia/planeinfo/', [ 'plane_id', 'fields', 'language' ], ['plane_id'], @_ );
 }
 
 =item B<encyclopedia_planemodules( [ %params ] )>
@@ -171,9 +169,7 @@ Method returns information from Encyclopedia about modules available for specifi
 =cut
 
 sub encyclopedia_planemodules {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wowp/encyclopedia/planemodules/', [ 'plane_id', 'fields', 'language', 'type' ], ['plane_id'], @_ );
+    return shift->_request( 'get', 'wowp/encyclopedia/planemodules/', [ 'plane_id', 'fields', 'language', 'type' ], ['plane_id'], @_ );
 }
 
 =item B<encyclopedia_planeupgrades( [ %params ] )>
@@ -191,9 +187,7 @@ Method returns information from Encyclopedia about slots of aircrafts and lists 
 =cut
 
 sub encyclopedia_planeupgrades {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wowp/encyclopedia/planeupgrades/', [ 'plane_id', 'fields', 'language' ], ['plane_id'], @_ );
+    return shift->_request( 'get', 'wowp/encyclopedia/planeupgrades/', [ 'plane_id', 'fields', 'language' ], ['plane_id'], @_ );
 }
 
 =item B<encyclopedia_planespecification( [ %params ] )>
@@ -209,9 +203,7 @@ sub encyclopedia_planeupgrades {
 =cut
 
 sub encyclopedia_planespecification {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wowp/encyclopedia/planespecification/', [ 'plane_id', 'bind_id', 'fields', 'language', 'module_id' ], ['plane_id'], @_ );
+    return shift->_request( 'get', 'wowp/encyclopedia/planespecification/', [ 'plane_id', 'bind_id', 'fields', 'language', 'module_id' ], ['plane_id'], @_ );
 }
 
 =item B<encyclopedia_achievements( [ %params ] )>
@@ -221,9 +213,7 @@ Method returns dictionary of achievements from Encyclopedia.
 =cut
 
 sub encyclopedia_achievements {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wowp/encyclopedia/achievements/', [ 'fields', 'language' ], undef, @_ );
+    return shift->_request( 'get', 'wowp/encyclopedia/achievements/', [ 'fields', 'language' ], undef, @_ );
 }
 
 =item B<encyclopedia_info( [ %params ] )>
@@ -233,9 +223,7 @@ Method returns information about Encyclopedia.
 =cut
 
 sub encyclopedia_info {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wowp/encyclopedia/info/', undef, undef, @_ );
+    return shift->_request( 'get', 'wowp/encyclopedia/info/', undef, undef, @_ );
 }
 
 =back
@@ -251,9 +239,7 @@ Method returns dictionary of rating periods and ratings details.
 =cut
 
 sub ratings_types {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wowp/ratings/types/', [ 'language', 'fields' ], undef, @_ );
+    return shift->_request( 'get', 'wowp/ratings/types/', [ 'language', 'fields' ], undef, @_ );
 }
 
 =item B<ratings_accounts( [ %params ] )>
@@ -272,9 +258,7 @@ Method returns player ratings by specified IDs.
 =cut
 
 sub ratings_accounts {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wowp/ratings/accounts/',
         [ 'language', 'fields',       'type', 'date', 'account_id' ],
         [ 'type',     'account_id' ], @_
@@ -298,9 +282,7 @@ Method returns list of adjacent positions in specified rating.
 =cut
 
 sub ratings_neighbors {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wowp/ratings/neighbors/',
         [ 'language', 'fields',     'type',         'date', 'account_id', 'rank_field', 'limit' ],
         [ 'type',     'account_id', 'rank_field' ], @_
@@ -323,9 +305,7 @@ Method returns the list of top players by specified parameter.
 =cut
 
 sub ratings_top {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wowp/ratings/top/',
         [ 'language', 'fields',       'type', 'date', 'rank_field', 'limit', 'page_no' ],
         [ 'type',     'rank_field' ], @_
@@ -347,9 +327,7 @@ Method returns dates with available rating data.
 =cut
 
 sub ratings_dates {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wowp/ratings/dates/', [ 'language', 'fields', 'type', 'account_id' ], ['type'], @_ );
+    return shift->_request( 'get', 'wowp/ratings/dates/', [ 'language', 'fields', 'type', 'account_id' ], ['type'], @_ );
 }
 
 =back
@@ -373,9 +351,7 @@ Method returns statistics on player's aircraft.
 =cut
 
 sub planes_stats {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wowp/planes/stats/', [ 'account_id', 'access_token', 'fields', 'in_garage', 'language', 'plane_id' ], ['account_id'], @_ );
+    return shift->_request( 'get', 'wowp/planes/stats/', [ 'account_id', 'access_token', 'fields', 'in_garage', 'language', 'plane_id' ], ['account_id'], @_ );
 }
 
 =item B<planes_achievements( [ %params ] )>
@@ -393,9 +369,7 @@ Method returns achievements on player's aircraft.
 =cut
 
 sub planes_achievements {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wowp/planes/achievements/', [ 'account_id', 'fields', 'language', 'plane_id' ], ['account_id'], @_ );
+    return shift->_request( 'get', 'wowp/planes/achievements/', [ 'account_id', 'fields', 'language', 'plane_id' ], ['account_id'], @_ );
 }
 
 =back

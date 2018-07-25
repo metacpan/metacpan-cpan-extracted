@@ -1,0 +1,11 @@
+MANIFEST
+LICENSE
+Build.PL
+lib/Model/Envoy/Storage/Redis.pm
+t/pod.t
+t/storage.t
+t/lib/My/Envoy/Widget.pm
+t/lib/MockRedis.pm
+t/lib/My/Envoy.pm
+META.yml
+META.json

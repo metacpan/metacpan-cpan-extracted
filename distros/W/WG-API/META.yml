@@ -36,29 +36,30 @@ no_index:
 provides:
   WG::API:
     file: lib/WG/API.pm
-    version: v0.10.0
+    version: v0.11.0
   WG::API::Auth:
     file: lib/WG/API/Auth.pm
-    version: v0.10.0
+    version: v0.11.0
   WG::API::Base:
     file: lib/WG/API/Base.pm
-    version: v0.10.0
+    version: v0.11.0
   WG::API::Error:
     file: lib/WG/API/Error.pm
-    version: v0.10.0
+    version: v0.11.0
   WG::API::NET:
     file: lib/WG/API/NET.pm
-    version: v0.10.0
+    version: v0.11.0
   WG::API::WoT:
     file: lib/WG/API/WoT.pm
-    version: v0.10.0
+    version: v0.11.0
   WG::API::WoWp:
     file: lib/WG/API/WoWp.pm
-    version: v0.10.0
+    version: v0.11.0
   WG::API::WoWs:
     file: lib/WG/API/WoWs.pm
-    version: v0.10.0
+    version: v0.11.0
 requires:
+  Const::Fast: '0'
   JSON: '2.61'
   LWP: '6.08'
   LWP::Protocol::https: '6.07'
@@ -69,7 +70,7 @@ requires:
   perl: '5.020'
 resources:
   repository: git://gitlab.com/cynovg/WG-API.git
-version: v0.10
+version: v0.11
 x_contributors:
   - 'Novgorodcev Cyrill <cynovg@gmail.com>'
   - 'Novgorodcev Cyrill <novgorodtsev.kirill@220-volt.ru>'

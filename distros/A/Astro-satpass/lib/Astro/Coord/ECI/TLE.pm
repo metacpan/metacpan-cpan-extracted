@@ -231,7 +231,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.099';
+our $VERSION = '0.100';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -1245,17 +1245,25 @@ sub null {}
 
 =item @elements = Astro::Coord::ECI::TLE->parse( @data );
 
-This method parses a NORAD two- or three-line element set (or a
-mixture), returning a list of Astro::Coord::ECI::TLE objects. The
-L</Attributes> section identifies those attributes which will be filled
-in by this method.
+This method parses NORAD two- or three-line element sets, JSON element
+sets, or a mixture, returning a list of Astro::Coord::ECI::TLE objects.
+The L</Attributes> section identifies those attributes which will be
+filled in by this method.
 
-The input will be split into individual lines, and all blank lines and
+TLE input will be split into individual lines, and all blank lines and
 lines beginning with '#' will be eliminated. The remaining lines are
 assumed to represent two- or three-line element sets, in so-called
 external format. Internal format (denoted by a 'G' in column 79 of line
 1 of the set, not counting the common name if any) is not supported,
 and the presence of such data will result in an exception being thrown.
+
+Input beginning with C<[{> (with optional spaces) is presumed to be
+NORAD JSON element sets and parsed accordingly.
+
+Optionally, the first argument (after the invocant) can be a reference
+to a hash of default attribute values. These are preferred over the
+static values, but attributes provided by the TLE or JSON input override
+both.
 
 =cut
 
@@ -1270,7 +1278,7 @@ sub parse {
 Error - Arguments to parse() must be scalar.
 eod
 	if ( $datum =~ m/ \A \s* \[? \s* \{ /smx ) {
-	    push @rslt, $self->_parse_json( $datum );
+	    push @rslt, $self->_parse_json( $attrs, $datum );
 	} else {
 	    foreach my $line (split qr{\n}, $datum) {
 		$line =~ s/ \s+ \z //smx;
@@ -1674,7 +1682,7 @@ eod
 	$suntim = $sun_screen = $sun_limit = $pass_end + SECSPERDAY;
 	$dawn = 1;
     } else {
-	$sun = Astro::Coord::ECI::Sun->new ();
+	$sun = $tle->get( 'sun' );
 	( $suntim, $dawn, $sun_screen, $sun_limit ) =
 	    _next_elevation_screen( $sta->universal( $pass_start ),
 		$pass_step, $sun, $twilight );
@@ -2487,8 +2495,13 @@ table.
 For convenience, you can pass an alias instead of the full class name. The
 following aliases are recognized:
 
- iridium => 'Astro::Coord::ECI::TLE::Iridium'
  tle => 'Astro::Coord::ECI::TLE'
+
+If you install
+L<Astro::Coord::ECI::TLE::Iridium|Astro::Coord::ECI::TLE::Iridium> it
+will define alias
+
+ iridium => 'Astro::Coord::ECI::TLE::Iridium'
 
 Other aliases may be defined with the alias() static method.
 
@@ -2631,13 +2644,16 @@ commands and arguments are:
 
 status (add => $id, $type => $status, $name, $comment) adds an item to
 the status table or modifies an existing item. The $id is the NORAD ID
-of the body. The only currently-supported $type is
-'Astro::Coord::ECI::TLE::Iridium', but any alias to this will also work
-(see alias(); 'iridium' is defined by default). The $status is 0, 1, 2,
-or 3 representing in-service, spare, failed, or decayed respectively.
-The strings '+' or '' will be interpreted as 0, 'S', 's', or '?' as 1,
-'D' as 3, and any other non-numeric string as 2. The  $name and $comment
-arguments default to empty.
+of the body.
+
+No types are supported out of the box, but if you have installed
+L<Astro::Coord::ECI::TLE::Iridium|Astro::Coord::ECI::TLE::Iridium> that
+or C<'iridium'> will work.
+
+The $status is 0, 1, 2, or 3 representing in-service, spare, failed, or
+decayed respectively.  The strings '+' or '' will be interpreted as 0,
+'S', 's', or '?' as 1, 'D' as 3, and any other non-numeric string as 2.
+The  $name and $comment arguments default to empty.
 
 status ('clear') clears the status table.
 
@@ -7622,6 +7638,7 @@ encoded with a four-digit year.
 	$have_json
 	    or croak 'Can not load JSON';
 	my $json = JSON->new()->utf8( 1 );
+	my $attrs = HASH_REF eq ref $args[0] ? shift @args : {};
 	my @rslt;
 
 	foreach my $arg ( @args ) {
@@ -7632,7 +7649,7 @@ encoded with a four-digit year.
 
 		my $class = $hash->{astro_coord_eci_class} || __PACKAGE__;
 		load_module( $class );
-		push @rslt, $class->__from_json( $hash );
+		push @rslt, $class->__from_json( $hash, $attrs );
 
 	    }
 	}
@@ -7641,7 +7658,9 @@ encoded with a four-digit year.
     }
 
     sub __from_json {
-	my ( $class, $hash ) = @_;
+	my ( $class, $hash, $attrs ) = @_;
+
+	$attrs ||= {};
 
 	if ( exists $hash->{SATNAME} ) {	# TODO Deprecated
 	    warnings::enabled( 'deprecated' )
@@ -7686,7 +7705,7 @@ encoded with a four-digit year.
 	    }
 	}
 
-	my %tle;
+	my %tle = %{ $attrs };
 	foreach my $key ( keys %{ $hash } ) {
 	    my $value = $hash->{$key};
 	    my $attr = $json_map{$key}
@@ -8227,7 +8246,9 @@ sub _next_elevation_screen {
 {
     # The following classes initialize themselves on load.
     local $@ = undef;
-    require Astro::Coord::ECI::TLE::Iridium;
+    eval {	## no critic (RequireCheckingReturnValueOfEval)
+	require Astro::Coord::ECI::TLE::Iridium;
+    };
 }
 
 # The following is all the Celestrak visual list that have magnitudes in
@@ -8238,7 +8259,7 @@ sub _next_elevation_screen {
 #
 #   $ eg/visual -merge
 #
-# Last-Modified: Thu, 12 Apr 2018 22:44:11 GMT
+# Last-Modified: Thu, 12 Apr 2018 22:44:14 GMT
 
 %magnitude_table = (
   '00694' => 3.5,
@@ -8638,8 +8659,12 @@ This attribute contains the NORAD SATCAT catalog ID.
 
 =item illum (string, static)
 
-This attribute specifies the source of illumination for the body.  You
-may specify the class name C<'Astro::Coord::ECI'> or the name of any
+This attribute specifies the source of illumination for the body, for
+the purpose of detecting things like Iridium flares. This is
+distinguished from the parent class' C<'sun'> attribute, which is used
+to determine night or day.
+
+You may specify the class name C<'Astro::Coord::ECI'> or the name of any
 subclass (though in practice only C<'Astro::Coord::ECI::Sun'> or
 C<'Astro::Coord::ECI::Moon'> will do anything useful), or an alias()
 thereof, or you may specify an object of the appropriate class. When you

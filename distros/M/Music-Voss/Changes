@@ -1,5 +1,7 @@
 See also the git repository.
 
+ * 0.08 - relicense under BSD license, some unit tests for bitchange.
+   add weierstrass function generator.
  * 0.02 - never too soon to break the interface (s/voss/powers/), more
    functions, etc.
  * 0.01 - first version, released to a (mostly) unsuspecting world.

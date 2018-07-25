@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.64';
+$Geo::Address::Formatter::VERSION = '1.65';
 use strict;
 use warnings;
 use feature qw(say);
@@ -18,7 +18,7 @@ use YAML qw(Load LoadFile);
 use utf8;
 
 my $THC = Text::Hogan::Compiler->new;
-my %THT_cache; # a place to store Text::Hogan::Template objects
+my %THT_CACHE; # a place to store Text::Hogan::Template objects
 
 
 sub new {
@@ -91,7 +91,7 @@ sub _read_configuration {
             };
         }
     }
-    
+
     # get the abbreviations
     my @abbrv_filenames =
         File::Find::Rule->file()->name( '*.yaml' )->in($path.'/abbreviations');
@@ -181,10 +181,10 @@ sub format_address {
     }
 
     # get a compiled template
-    if (!defined($THT_cache{$template_text})){
-        $THT_cache{$template_text} = $THC->compile($template_text, {'numeric_string_as_string' => 1});
+    if (!defined($THT_CACHE{$template_text})){
+        $THT_CACHE{$template_text} = $THC->compile($template_text, {'numeric_string_as_string' => 1});
     }
-    my $compiled_template = $THT_cache{$template_text};
+    my $compiled_template = $THT_CACHE{$template_text};
 
     # render it
     my $text;
@@ -414,7 +414,7 @@ sub _add_code {
 
         foreach ( keys %$mapping ){
             if ( uc($rh_components->{$keyname}) eq uc($mapping->{$_}) ){
-                $rh_components->{$code} = $_; 
+                $rh_components->{$code} = $_;
                 last;
             }
         }
@@ -426,9 +426,9 @@ sub _add_code {
                     if ($rh_components->{state} =~ m/^united states/i){
                         my $state = $rh_components->{state};
                         $state =~ s/^United States/US/i;
-                        foreach ( keys %$mapping ){
-                            if ( uc($state) eq uc($_) ){
-                                $rh_components->{state_code} = $mapping->{$_};
+                        foreach my $k ( keys %$mapping ){
+                            if ( uc($state) eq uc($k) ){
+                                $rh_components->{state_code} = $mapping->{$k};
                                 last;
                             }
                         }
@@ -479,9 +479,13 @@ sub _abbreviate {
     my $self = shift;
     my $rh_comp = shift // return;
 
-    # do we the country?
+    # do we know the country?
     if (!defined($rh_comp->{country_code})){
-        warn "unable to determine country, thus unable to abbreviate";
+        my $error_msg = 'no country_code, unable to abbreviate';
+        if (defined($rh_comp->{country})){
+            $error_msg .= ' - country: ' . $rh_comp->{country};
+        }
+        warn $error_msg;
         return;
     }
 
@@ -569,7 +573,7 @@ sub _clean {
 
 sub _render_template {
     my $self       = shift;
-    my $THTemplate = shift;
+    my $thtemplate = shift;
     my $components = shift;
 
     # Mustache calls it context
@@ -581,7 +585,7 @@ sub _render_template {
         return $selected;
     };
 
-    my $output = $THTemplate->render($context);
+    my $output = $thtemplate->render($context);
     #warn "in _render pre _clean $output";
     $output = $self->_clean($output);
 
@@ -624,7 +628,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.64
+version 1.65
 
 =head1 SYNOPSIS
 

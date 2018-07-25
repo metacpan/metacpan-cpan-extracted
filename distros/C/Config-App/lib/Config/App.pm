@@ -13,7 +13,7 @@ use JSON::XS ();
 use YAML::XS ();
 use POSIX ();
 
-our $VERSION = '1.07'; # VERSION
+our $VERSION = '1.08'; # VERSION
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
@@ -112,7 +112,10 @@ sub _location_fetch {
     return unless ($raw_config);
 
     $conf->{config_app}{root_dir} ||= $root_dir if ($root_dir);
-    push( @{ $conf->{config_app}{includes} }, $root_dir . '/' . $location );
+    push(
+        @{ $conf->{config_app}{includes} },
+        $root_dir . '/' . ( ( ref $location ) ? $$location : $location ),
+    );
 
     my $set = _parse_config( $raw_config, $location, @source_path );
 
@@ -309,7 +312,7 @@ Config::App - Cascading merged application configuration
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Config-App.svg)](https://travis-ci.org/gryphonshafer/Config-App)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Config-App/badge.png)](https://coveralls.io/r/gryphonshafer/Config-App)

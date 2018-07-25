@@ -4,10 +4,76 @@ TODO: testsuite
 TODO: intro: maybe simple job pool example?
 TODO: intro: mention watchdog...
 TODO: maybe disbale warnings by default?
+TODO: listener-scopes (10.0.0.1:4040@vpn) and connect-scopes ("vpn,public")
+TODO: document env-variable usage
+TODO: make node objects responsible for keepalive?
 
 faq: can't se anything
 faq: all is asynch
 faq: how to interface to non-perl nodes?
+
+TODO: check gproto, nproto, on connect
+TODO: limiting reconnecting speed when unreachable? somehow use same interval timers as for seeding and keepalive?
+TODO: multiple profiles? also some default profiles?
+TODO: export keepalive?
+TODO: $guard = con $cb->($up)
+TODO: aemp readline support
+TODO: gleeco re: AE::MP::DataConn -
+
+2.01 Tue Jul 24 09:02:34 CEST 2018
+	- try to work around a race condition that we can't identify
+          (patch suggested by Sadrak).
+
+2.0  Tue Jul 24 08:52:26 CEST 2018
+	- INCOMPATIBLE CHANGE: the node protocol used by this version is not
+          compatible to versions <2 - you have to upgrade all nodes.
+        - INCOMPATIBLE CHANGE: many APIs have changed, see the section
+          "PORTING FROM VERSION 1" in the AnyEvent::MP manpage for details.
+        - AnyEvent::MP::Global is now optional - only seed nodes autoload it
+          and create a fully-meshed network with each other, normal nodes only
+          have to connect to seed nodes, other connections are on-demand.
+        - remove md6 auth algorithms (and use algorithms based on SHA3 instead).
+        - implement CBOR framing and make it the preferred format.
+	- new "norc" and "force" options for MP::configure to ignore
+          or override the rc file.
+        - a shitload of minor and major fixes all reported and debugged
+          by Felix Ostmann.
+	- move seed code to Kernel.
+        - non-json receive framing was probably broken.
+        - fixed small typo in MP::Transport.
+        - fix (unused) provider-kv (version sometimes missing).
+        - reduce the default export list of MP::Kernel.
+        - reduced various random delays to zero, as they
+          are hopefully no longer needed with the new global
+          protocol.
+        - implement a secure mode that can suppress (some) code execution
+          requests.
+        - do not use GMP for generating alphanumeric strings even when
+          available, use a more tricky algorithm instead.
+        - anonymous node names and remote port names have been shortened
+          considerably.
+        - $AnyEvent::MP::Kernel::SRCNODE contains the node ID of the origin
+          node during message receives.
+        - aemp shell now supports "package" selection and offers an
+          $ECHO port you can send messages to.
+        - rely on perl rand() instead of using /dev/urandom when available, as
+          hopefully it is random enough.
+        - aemp shell no longer leaks one port per command.
+        - nodenames can contain %-escapes such as %n or %u.
+        - aemp now uses aemp/%n/%u as nodename.
+        - configure supports "eval", a small perl snippet to initialsie a node,
+          most useful in "aemp run eval ...".
+        - known_nodes is gone, it has little value, use all_nodes as
+          replacement.
+        - lots of small change and improvements.
+        - node_is_known has been removed.
+        - TRACE now shows the portid on SND.
+        - aggressively reduce number of external modules, to reduce
+          memory usage for nodes.
+        - rework most of the documentation.
+        - clean up MP::Kernel exports.
+        - include AnyEvent::MP in AnyEvent::MP::Kernel's @CARP_NOT to
+          hopefully improve error messages.
 
 1.30 Thu Jun 30 11:30:39 CEST 2011
 	- connection errors at the right time would kill node

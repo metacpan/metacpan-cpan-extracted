@@ -19,7 +19,10 @@ These two stages are described here separately. It is important to note that
 they don't have to be done at the same time, on the same F<perl> process, or
 even on the same sort of machine. It is fully possible to capture the heap
 from a process on, say, a small server, then copy the file to a development
-workstation or laptop and analyse it there at a later time.
+workstation or laptop and analyse it there at a later time. It is for this
+reason that the heap-dumping part, L<Devel::MAT::Dumper>, is now separated
+into its own CPAN distribution. This means it can be installed on its own,
+without all the extra dependencies the full set of analysis tools require.
 
 =head1 CAPTURING THE HEAP
 

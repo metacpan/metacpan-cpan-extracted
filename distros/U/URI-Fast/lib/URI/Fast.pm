@@ -1,6 +1,6 @@
 package URI::Fast;
 
-our $XS_VERSION = our $VERSION = '0.38';
+our $XS_VERSION = our $VERSION = '0.39';
 $VERSION =~ tr/_//;
 
 use utf8;
@@ -46,10 +46,7 @@ foreach my $attr (qw(scheme usr pwd host port frag)) {
     }
 
     if (defined wantarray) {
-      # It turns out that it is faster to call decode here than directly in
-      # url_fast.c due to the overhead of decoding utf8 and flipping the
-      # internal utf8 switch.
-      return decode( $_[0]->$g() );
+      return $_[0]->$g();
     }
   };
 }
@@ -257,17 +254,19 @@ See L</ENCODING>.
 
 =head1 ATTRIBUTES
 
-Unless otherwise specified, all attributes serve as full accessors, allowing
-the URI segment to be both retrieved and modified.
+All attributes serve as full accessors, allowing the URI segment to be both
+retrieved and modified.
+
+Each attribute defines a C<raw_*> method, which returns the raw, encoded string
+value for that attribute.
 
 Each attribute further has a matching clearer method (C<clear_*>) which unsets
 its value.
 
-Note that because URIs are parsed into a fixed size struct, any method
-(including the constructor) attempting to set a value larger than the max
-allowable size cause the value to be truncated before croaking. If this error
-is caught in an eval, the URI will remain nominally usable in its updated,
-truncated state.
+In general, accessors accept an I<unencoded> string and set their slot value to
+the I<encoded> value. They return the decoded value. See L</ENCODING> for an in
+depth description of their behavior as well as an explanation of the more
+complex behavior of compound fields.
 
 =head2 scheme
 
@@ -285,7 +284,8 @@ port number:
 Setting this field may be done with a string (see the note below about
 L</ENCODING>) or a hash reference of individual field names (C<usr>, C<pwd>,
 C<host>, and C<port>). In both cases, the existing values are completely
-replaced by the new values and any values not present are deleted.
+replaced by the new values and any values missing from the caller-supplied
+input are deleted.
 
 =head3 usr
 
@@ -450,12 +450,12 @@ Overloads the C<eq> operator.
 
 C<URI::Fast> tries to do the right thing in most cases with regard to reserved
 and non-ASCII characters. C<URI::Fast> will fully encode reserved and non-ASCII
-characters when setting I<individual> values. However, the "right thing" is a
-bit ambiguous when it comes to setting compound fields like L</auth>, L</path>,
-and L</query>.
+characters when setting I<individual> values and return their fully decoded
+values. However, the "right thing" is somewhat ambiguous when it comes to
+setting compound fields like L</auth>, L</path>, and L</query>.
 
-When setting these fields with a string value, reserved characters are expected
-to be present, and are therefore accepted as-is. However, any non-ASCII
+When setting compound fields with a string value, reserved characters are
+expected to be present, and are therefore accepted as-is. Any non-ASCII
 characters will be percent-encoded (since they are unambiguous and there is no
 risk of double-encoding them). Thus,
 
@@ -464,10 +464,12 @@ risk of double-encoding them). Thus,
 
 On the other hand, when setting these fields with a I<reference> value (assumed
 to be a hash ref for L</auth> and L</query> or an array ref for L</path>; see
-individual methods' docs for details), each field is fully percent-encoded:
+individual methods' docs for details), each field is fully percent-encoded,
+just as if each individual simple slot's setter had been called:
 
   $uri->auth({usr => 'some one', host => 'somewhere.com'});
   print $uri->auth; # "some%20one@somewhere.com"
+  print $uri->usr;; # "some one"
 
 The same goes for return values. For compound fields returning a string,
 non-ASCII characters are decoded but reserved characters are not. When

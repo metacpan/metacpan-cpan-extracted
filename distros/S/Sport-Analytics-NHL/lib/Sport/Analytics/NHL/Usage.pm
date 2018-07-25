@@ -84,6 +84,16 @@ our %OPTS = (
 			description => "Use Mongo database DB (default $def_db)"
 		},
 	],
+	compile => [
+		{
+			long => 'no-compile',
+			description => 'Do not compile file even if storable is absent',
+		},
+		{
+			long => 'recompile',
+			description => 'Compile file even if storable is present',
+		}
+	],
 	misc     => [
 		{
 			short       => 'f', long => 'force',

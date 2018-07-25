@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Bakerloo;
 
-$Map::Tube::London::Line::Bakerloo::VERSION   = '1.07';
+$Map::Tube::London::Line::Bakerloo::VERSION   = '1.09';
 $Map::Tube::London::Line::Bakerloo::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Bakerloo - London Tube Map: Bakerloo Line.
 
 =head1 VERSION
 
-Version 1.07
+Version 1.09
 
 =head1 DESCRIPTION
 
@@ -52,28 +52,68 @@ London Tube Map: Bakerloo Line.
 
 =over 2
 
-=item * The station "Oxford Circus" is also part of
-          L<Central Line|Map::Tube::London::Line::Central>
-        | L<Victoria Line|Map::Tube::London::Line::Victoria>.
-
-=item * The station "Paddington" is also part of
-          L<Circle Line|Map::Tube::London::Line::Circle>
-        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>.
-
-=item * The station "Embankment" is also part of
-          L<District Line|Map::Tube::London::Line::District>
-        | L<Northern Line|Map::Tube::London::Line::Northern>.
-
 =item * The station "Baker Street" is also part of
           L<Circle Line|Map::Tube::London::Line::Circle>
         | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
         | L<Jubilee Line|Map::Tube::London::Line::Jubilee>
-        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
+        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+
+=item * The station "Charing Cross" is also part of
+          L<Northern Line|Map::Tube::London::Line::Northern>
+
+=item * The station "Edgware Road" is also part of
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<District Line|Map::Tube::London::Line::District>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Embankment" is also part of
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<District Line|Map::Tube::London::Line::District>
+        | L<Northern Line|Map::Tube::London::Line::Northern>
+
+=item * The station "Harlesden" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
+
+=item * The station "Harrow & Wealdstone" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
+
+=item * The station "Kensal Green" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
+
+=item * The station "Kenton" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
+
+=item * The station "North Wembley" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
+
+=item * The station "Oxford Circus" is also part of
+          L<Central Line|Map::Tube::London::Line::Central>
+        | L<Victoria Line|Map::Tube::London::Line::Victoria>
+
+=item * The station "Paddington" is also part of
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<District Line|Map::Tube::London::Line::District>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Piccadilly Circus" is also part of
+          L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+
+=item * The station "South Kenton" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
+
+=item * The station "Stonebridge Park" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
 
 =item * The station "Waterloo" is also part of
           L<Jubilee Line|Map::Tube::London::Line::Jubilee>
         | L<Northern Line|Map::Tube::London::Line::Northern>
-        | L<Waterloo & City Line|Map::Tube::London::Line::WaterlooCity>.
+        | L<Waterloo & City Line|Map::Tube::London::Line::WaterlooCity>
+
+=item * The station "Wembley Central" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
+
+=item * The station "Willesden Junction" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
 
 =back
 

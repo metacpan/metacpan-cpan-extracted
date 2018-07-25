@@ -40,7 +40,7 @@
    "provides" : {
       "FB3" : {
          "file" : "lib/FB3.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "FB3::Validator" : {
          "file" : "lib/FB3/Validator.pm"
@@ -52,6 +52,6 @@
          "http://opensource.org/licenses/lgpl-license.php"
       ]
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
 }

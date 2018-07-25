@@ -1,5 +1,13 @@
 Revision history for Data-Chronicle
 
+0.19      2018-07-25 05:26:29+00:00 UTC
+        Bug fix: Fixed compatibility for RedisDB API
+
+0.18      2018-07-23 05:32:57+00:00 UTC
+        Created new Subscriber package so a separate connection can be used for this functionality
+        Removed partially implemented functionality to use Perl hash instead of Redis
+        Updated documentation and made style consistent
+
 0.17      2018-07-12 18:17:13+08:00 Asia/Manila
         - Replace dbh with DBIx::Connector object
         - Add mget and mset methods

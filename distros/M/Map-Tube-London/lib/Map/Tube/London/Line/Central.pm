@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Central;
 
-$Map::Tube::London::Line::Central::VERSION   = '1.07';
+$Map::Tube::London::Line::Central::VERSION   = '1.09';
 $Map::Tube::London::Line::Central::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Central - London Tube Map: Central Line.
 
 =head1 VERSION
 
-Version 1.07
+Version 1.09
 
 =head1 DESCRIPTION
 
@@ -77,29 +77,46 @@ London Tube Map: Central Line.
 =over 2
 
 =item * The station "Bank" is also part of
-          L<Waterloo & City Line|Map::Tube::London::Line::WaterlooCity>
+          L<DLR Line|Map::Tube::London::Line::Dlr>
         | L<Northern Line|Map::Tube::London::Line::Northern>
-        | L<Dockland Light Railway Line|Map::Tube::London::Line::DLR>.
+        | L<Waterloo & City Line|Map::Tube::London::Line::WaterlooCity>
 
-=item * The station "Oxford Circus" is also part of
-          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
-        | L<Victoria Line|Map::Tube::London::Line::Victoria>.
+=item * The station "Bond Street" is also part of
+          L<Jubilee Line|Map::Tube::London::Line::Jubilee>
 
-=item * The station "Mile End" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
+=item * The station "Ealing Broadway" is also part of
+          L<District Line|Map::Tube::London::Line::District>
 
-=item * The station "Notting Hill Gate" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
+=item * The station "Holborn" is also part of
+          L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
 
 =item * The station "Liverpool Street" is also part of
           L<Circle Line|Map::Tube::London::Line::Circle>
         | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
-        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
+        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+
+=item * The station "Mile End" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Notting Hill Gate" is also part of
+          L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Oxford Circus" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+        | L<Victoria Line|Map::Tube::London::Line::Victoria>
+
+=item * The station "Shepherd's Bush" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
 
 =item * The station "Stratford" is also part of
-          L<Dockland Light Railway Line|Map::Tube::London::Line::DLR>
+          L<DLR Line|Map::Tube::London::Line::Dlr>
         | L<Jubilee Line|Map::Tube::London::Line::Jubilee>
-        | L<London Overground Line|Map::Tube::London::Line::Overground>
+        | L<Overground Line|Map::Tube::London::Line::Overground>
+
+=item * The station "Tottenham Court Road" is also part of
+          L<Northern Line|Map::Tube::London::Line::Northern>
 
 =back
 

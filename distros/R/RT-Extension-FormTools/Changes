@@ -1,0 +1,7 @@
+Revision history for RT-Extension-FormTools
+
+0.51 2018-07-24
+
+ - Add enable_persisting argument to Form component
+ - Fix form action on "/Example" by redirecting the page to "/Example/"
+

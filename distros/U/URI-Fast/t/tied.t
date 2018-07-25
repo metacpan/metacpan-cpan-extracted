@@ -25,14 +25,15 @@ subtest 'set_param' => sub{
     tie my $key, 'TiedSV', 'foo';
     tie my $val, 'TiedSV', 'bar';
     my $uri = uri 'http://www.test.com';
-    ok !dies{ $uri->set_param($key, [$val], '&') }, 'call';
+    ok lives{ $uri->set_param($key, [$val], '&') }, 'call';
+    $uri->set_param($key, [$val], '&');
     is $uri->param('foo'), 'bar', 'check';
   };
 
   subtest 'arrays' => sub{
     tie my $val, 'TiedSV', ['bar'];
     my $uri = uri 'http://www.test.com';
-    ok !dies{ $uri->set_param('foo', $val, '&') }, 'call';
+    ok lives{ $uri->set_param('foo', $val, '&') }, 'call';
     is $uri->param('foo'), 'bar', 'check';
   };
 };

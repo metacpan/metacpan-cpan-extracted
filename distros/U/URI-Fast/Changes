@@ -1,3 +1,12 @@
+0.39 2018-07-22
+-behavior: no size limit on member string sizes
+-bugfix: encode and decode no longer emit a warning when passed undef
+-bugfix: get_auth was not decoding utf8 as asserted by the docs
+-bugfix: get_query was not decoding utf8 as asserted by the docs
+-bugfix: some setters emit a warning and do not clear member when passed undef
+-bugfix: some setters were not properly handling magic
+-new methods: raw_$field to get the raw, encoded field value
+
 0.38 2018-07-09
 -behavior: uri_t->path increased from 1024 bytes to 2048
 -behavior: setters now croak when an input string is truncated to fit within the uri_t struct

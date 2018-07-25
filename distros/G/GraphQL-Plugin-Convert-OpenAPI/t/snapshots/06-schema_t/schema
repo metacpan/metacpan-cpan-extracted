@@ -1,0 +1,169 @@
+'type Article {
+  author: Profile!
+  body: String!
+  createdAt: DateTime!
+  description: String!
+  favorited: Boolean!
+  favoritesCount: Int!
+  slug: String!
+  tagList: [String]!
+  title: String!
+  updatedAt: DateTime!
+}
+
+type Comment {
+  author: Profile!
+  body: String!
+  createdAt: DateTime!
+  id: Int!
+  updatedAt: DateTime!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
+}
+
+input LoginUserRequestInput {
+  user: LoginUserInput!
+}
+
+type MultipleArticlesResponse {
+  articles: [Article]!
+  articlesCount: Int!
+}
+
+type MultipleCommentsResponse {
+  comments: [Comment]!
+}
+
+type Mutation {
+  # Create an article
+  CreateArticle(article: NewArticleRequestInput!): SingleArticleResponse
+  # Create a comment for an article
+  CreateArticleComment(comment: NewCommentRequestInput!, slug: String!): SingleCommentResponse
+  # Favorite an article
+  CreateArticleFavorite(slug: String!): SingleArticleResponse
+  # Register a new user
+  CreateUser(body: NewUserRequestInput!): UserResponse
+  # Delete an article
+  DeleteArticle(slug: String!): String
+  # Delete a comment for an article
+  DeleteArticleComment(id: Int!, slug: String!): String
+  # Unfavorite an article
+  DeleteArticleFavorite(slug: String!): SingleArticleResponse
+  # Follow a user
+  FollowUserByUsername(username: String!): ProfileResponse
+  # Existing user login
+  Login(body: LoginUserRequestInput!): UserResponse
+  # Unfollow a user
+  UnfollowUserByUsername(username: String!): ProfileResponse
+  # Update an article
+  UpdateArticle(article: UpdateArticleRequestInput!, slug: String!): SingleArticleResponse
+  # Update current user
+  UpdateCurrentUser(body: UpdateUserRequestInput!): UserResponse
+}
+
+input NewArticleInput {
+  body: String!
+  description: String!
+  tagList: [String]
+  title: String!
+}
+
+input NewArticleRequestInput {
+  article: NewArticleInput!
+}
+
+input NewCommentInput {
+  body: String!
+}
+
+input NewCommentRequestInput {
+  comment: NewCommentInput!
+}
+
+input NewUserInput {
+  email: String!
+  password: String!
+  username: String!
+}
+
+input NewUserRequestInput {
+  user: NewUserInput!
+}
+
+type Profile {
+  bio: String!
+  following: Boolean!
+  image: String!
+  username: String!
+}
+
+type ProfileResponse {
+  profile: Profile!
+}
+
+type Query {
+  # Get an article
+  GetArticle(slug: String!): SingleArticleResponse
+  # Get comments for an article
+  GetArticleComments(slug: String!): MultipleCommentsResponse
+  # Get recent articles globally
+  GetArticles(author: String, favorited: String, limit: Int, offset: Int, tag: String): MultipleArticlesResponse
+  # Get recent articles from users you follow
+  GetArticlesFeed(limit: Int, offset: Int): MultipleArticlesResponse
+  # Get current user
+  GetCurrentUser: UserResponse
+  # Get a profile
+  GetProfileByUsername(username: String!): ProfileResponse
+  # Get tags
+  get__tags: TagsResponse
+}
+
+type SingleArticleResponse {
+  article: Article!
+}
+
+type SingleCommentResponse {
+  comment: Comment!
+}
+
+type TagsResponse {
+  tags: [String]!
+}
+
+input UpdateArticleInput {
+  body: String
+  description: String
+  title: String
+}
+
+input UpdateArticleRequestInput {
+  article: UpdateArticleInput!
+}
+
+input UpdateUserInput {
+  bio: String
+  email: String
+  image: String
+  token: String
+  username: String
+}
+
+input UpdateUserRequestInput {
+  user: UpdateUserInput!
+}
+
+type User {
+  bio: String!
+  email: String!
+  image: String!
+  token: String!
+  username: String!
+}
+
+type UserResponse {
+  user: User!
+}
+'

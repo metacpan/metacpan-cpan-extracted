@@ -28,8 +28,10 @@ DESCRIPTION
     numerous features and options. Among them are hash lists (one set of
     values is displayed for the user, but another is used as data), ability
     to disable either the text entry widget or the listbox, ability to allow
-    user to delete items from the list, additional keyboard bindings, and
-    much more.
+    user to delete items from the list, additional keyboard bindings,
+    ability to have the drop-down list "fixed" (always displayed, ability to
+    use Tk::HListbox, ie. to include thumbnail icons in the list),
+    customized key bindings and behaviour, and much more!
 
     JBrowseEntry widgets allow one to specify a full combo-box, a "readonly"
     box (text field allows user to type the 1st letter of an item to search
@@ -260,15 +262,21 @@ WIDGET-SPECIFIC OPTIONS
         commas. "mod" means any modifier (Shift|Control|Alt), "*button1"
         means button1 regardless of modifier.
 
-        "Tab=PopList" - Normally, if the [Tab] key is pressed while the
-        drop-down list is displayed, the focus simply returns to the text
-        entry field and the listbox remains displayed. Modern combo-boxes
-        generally don't do this and many users don't expect it. Specifying
-        "Tab=PopList" makes Tk::JBrowseEntry behave like most modern
-        combo-boxes by simply undisplaying the drop-down list and restoring
-        focus to the text entry field. Either way, the listbox is
-        undisplayed anyway when the JBrowseEntry widget itself goes out of
-        focus, or either the [Enter] or [Esc] key is pressed.
+        "Tab=KeepList" - Normally, if the [Tab] key is pressed while the
+        drop-down list is displayed, the drop-down list is removed from view
+        (rolled up) and the focus simply returns to the text entry field.
+        Specifying "Tab=KeepList" (on Unixish systems) makes
+        Tk::JBrowseEntry keep the drop-down list displayed while returning
+        the focus back to the text field. If "Tab=Popup" is also specified,
+        it implies "KeepList" as well on Unixish systems where the list is
+        not "fixed" as this avoids trapping the user in a "tab loop" between
+        the text-entry field and the drop-down list. Either way, the listbox
+        is undisplayed anyway when the JBrowseEntry widget itself goes out
+        of focus, or either the [Enter] or [Esc] key is pressed. If the
+        drop-down list is a "fixed" list (*-fixedlist* is specified), then
+        the list always remains in view and only the focus changes and this
+        setting is ignored. This setting is also ignored on M$-Windows
+        platforms, which is beyond our control.
 
         "Down=None", "Up=None", "Right=None", "Esc=None", "Return=None",
         "Space=None" - causes pressing that respective key to NOT perform
@@ -276,9 +284,9 @@ WIDGET-SPECIFIC OPTIONS
         within their calling program though.
 
     -arrowimage
-        Allows one to specify an image for the the button which activates
-        the drop-down list when the button has the keyboard focus. The
-        default is: $MainWin->Getimage('cbxarrow') on Linux and a custom
+        Allows one to specify an alternate image for the the button which
+        activates the drop-down list when the button has the keyboard focus.
+        The default is: $MainWin->Getimage('cbxarrow') on Linux and a custom
         bitmap on M$-Windows. Also see the "-farrowimage" option below, as
         well as the "-arrowimage" option under Standard BrowseEntry options
         for more details. On Linux, this is used regardless of the focus
@@ -327,6 +335,19 @@ WIDGET-SPECIFIC OPTIONS
         the entry field first receives focus, then pressing <Tab> causes the
         button to be focused.
 
+    -colorstate
+        Archaic carryover from Tk::BrowseEntry -- Appears to force the
+        background of the text-entry widget to *"lightgray"* if state is
+        *readonly* or *disabled* and no -background color has been set; and
+        a slightly darker shade of gray (*"gray95 "*) otherwise. This
+        appears to be broken for the *readonly* and *disabled* states, so
+        I've added a special value of *"2"* to actually do this always. Any
+        other *true* value works like their (broken) version. Regardless of
+        *true* values, we also set the foreground color to *gray30* for
+        *readonly* or *disabled* states and *black* otherwise to ensure that
+        the text remains readable regardless of what foreground color is
+        otherwise set.
+
     -deleteitemsok
         If set, allows user to delete individual items in the drop-down list
         by pressing the <Delete> key to delete the current (active) item. No
@@ -354,15 +375,62 @@ WIDGET-SPECIFIC OPTIONS
         details. The default image for Linux is:
         $MainWin->Getimage('cbxarrow') and a custom bitmap for M$-Windows.
 
+    -fixedlist
+        Normally the drop-down list pops up and down when requested, rolling
+        up (hiding) when not. Setting this option to a true value will cause
+        the drop-down list to be a fixed listbox widget packed below the
+        rest of the widget. Specifying -fixedlist => *"top"* will instead
+        display the listbox *above* the rest of the widget. Default: 0 -
+        drop-down list is not fixed (pre-v5.10 behavior).
+
+    -indicator
+        Only used if -listboxtype is set to HListbox, otherwise ignored.
+        Specifies whether an indicator image may be included with HListbox
+        entries. Default 0 (no indicator image).
+
+    -itemtype
+        Only used if -listboxtype is set to HListbox, otherwise ignored.
+        Specifies the type of data permitted for HListbox entries. Valid
+        values are: *"text"*, *"image"*, and *"imagetext"*. Default:
+        *"text"*.
+
+    -label
+        Specify a label to be displayed next to the widget. The default is
+        *undef* - do not display (or pack) a label next to the widget. If
+        you do not wish to specify a label initially, but plan to set a
+        label later, you should set -label to ''. By default the label is
+        displayed to the left of the widget (as part of it). This can be
+        changed using the -labelPack option.
+
+    -labelbackground
+        Specify alternate background for the label.
+
+    -labelforeground
+        Specify alternate foreground for the label.
+
+    -labelfont
+        Specify alternate font for the label.
+
     -labelPack
         Specify alternate packing options for the label. The default is:
-        "[-side => 'left', -anchor => 'e']". The argument is an arrayref.
-        Note: if no label is specified, none is packed or displayed.
+        "[-side => 'left', -anchor => 'e']" ("[-side => 'left', -anchor =>
+        'n'|'s', -pady => 1, -ipady => 2] if -fixedlist is set ('s' if
+        'top', 'n' otherwise)). The argument is an arrayref. Note: if no
+        label is specified, none is packed or displayed, therefore, if you
+        do not wish to specify a label initially, but plan to set a label
+        later, you should set -label to ''.
 
     -labelrelief
         Default "flat"
 
         Allow relief of the label portion of the widget to be specified.
+
+    -listboxtype
+        Specifies tye type of listbox widget to use for the drop-down list.
+        Valid values are *"Listbox"* and *"HListbox"*. Default is
+        *"Listbox"* (Tk::Listbox). If *"HListbox"* is specified, you must
+        have Tk::HListbox (v2.1+) installed or the application will fail
+        with an error.
 
     -listcmd
         Specifies a callback function to call when the button next to the
@@ -382,8 +450,8 @@ WIDGET-SPECIFIC OPTIONS
         Specifies the width of the popup listbox.
 
     -nobutton
-        Default 0 (display the button) NOTE: Regardless of setting, the
-        button is not displayed if the state is "text" or "textonly".
+        Whether or not to display the button that toggles the drop-down
+        list. Set to 1 to hide. Default 0 (display the button).
 
         Prevents drop-down list button from being displayed if set to 1
         (true).
@@ -391,9 +459,12 @@ WIDGET-SPECIFIC OPTIONS
     -noselecttext
         Normally, when the widget has the focus and is set by listbox
         selection, the text will then be "selected" (highlighted and in the
-        cut-buffer). Some consider this annoying. Setting this option will
-        cause the text to not be selected. The user can still select the
-        text themself, ie. for pasting somewhere else.
+        cut-buffer), and will not "appear" to be selected in the drop-down
+        listbox, if visible. Some consider this annoying. Setting this
+        option will cause the text to not be selected, but will still appear
+        selected in the drop-down listbox (if visible). The user can still
+        select the text themself, but either way, the selected item is in
+        the cut buffer.
 
     -tabcomplete
         If set to "1", pressing the "<Tab>" key will cause the string in the
@@ -401,11 +472,47 @@ WIDGET-SPECIFIC OPTIONS
         list. If there is no match, the typed text is not changed. If it
         already matches a list item, then the listbox is removed from view
         and keyboard focus transfers to the next widget. If set to "2" and
-        there is no match in the list, then entry is set to the default
+        there is no match in the list, then entry is reset to the default
         value or empty string. If set to "0", focus is simply advanced to
-        the next widget in the main window.
+        the next widget in the main window. In either case, if the text
+        field is changed, focus remains on the text field, otherwise focus
+        advances to next widget, so, after completing, pressing [Tab] again
+        advances to next widget.
+
+    -textbackground
+        Specify alternate background for the entry field (when editable).
+
+    -textforeground
+        Specify alternate foreground for the entry field (when editable).
+
+    -textdisabledbackground
+        Specify alternate background for the entry field (when *-state* is
+        disabled). Default: -disabledbackground or the widget's background.
+
+    -textdisabledforeground
+        Specify alternate foreground for the entry field (when *-state* is
+        disabled). Default: -disabledforeground or a dark grey.
+
+    -textreadonlybackground
+        Specify alternate background for the entry field (when *-state* is
+        readonly).
+
+    -textreadonlyforeground
+        Specify alternate foreground for the entry field (when *-state* is
+        readonly). Default is a light gray.
 
 INHERITED OPTIONS
+    -activestyle
+        Specifies the style in which to draw the active element. This must
+        be one of dotbox (show a focus ring around the active element), none
+        (no special indication of active element) or underline (underline
+        the active element). The default is underline. Ignored (not
+        supported) if -listboxtype is set to *HListbox*, in which case,
+        *"dotbox"* is always used.
+
+    -background
+        Specifies the background color for the widget and it's subwidgets.
+
     -choices
         Specifies the list of initial choices to pop up. This is a reference
         to an array or hash of strings specifying the choices. If a
@@ -413,12 +520,15 @@ INHERITED OPTIONS
         and the values represent the corresponding values the user sees
         displayed in the listbox. NOTE: If a *hashref* is specified, the
         -variable should be initialized to one of the hash VALUES rather
-        than it's corresponding key.
+        than it's corresponding key. The individual items in the referenced
+        array are normally simple text strings unless -listboxtype is set to
+        *"HListbox"*, in which case, each can be either a simple text string
+        or a hashref to a hash of attributes and values representing a valid
+        Tk::HListbox entry, for example: {-image => $thumbnailimage, -text
+        => 'text string'}.
 
-    -colorstate
-        Depreciated -- Appears to force the background of the entry widget
-        on the Unix version to "grey95" if state is normal and a
-        "-background" color is not specified.
+    -foreground
+        Specifies the foreground color for the widget and it's subwidgets.
 
     -height
         Specify the maximum number of items to be displayed in the listbox
@@ -429,7 +539,8 @@ INHERITED OPTIONS
     -maxwidth
         Specifies the maximum width the entry and listbox widgets can expand
         to in characters. The default is zero, meaning expand to the width
-        to accomodate the widest string in the list.
+        to accomodate the widest string in the list. (Ignored if -width > 0
+        (a fixed width) is specified).
 
     -variable
         Specifies a scalar reference to the variable in which the entered
@@ -457,7 +568,12 @@ WIDGET METHODS
         keys represent the actual data values and the values represent the
         corresponding values the user sees displayed in the listbox. NOTE:
         If a *hashref* is specified, the -variable should be initialized to
-        one of the hash VALUES rather than it's corresponding key.
+        one of the hash VALUES rather than it's corresponding key. The
+        individual items in the referenced array are normally simple text
+        strings unless -listboxtype is set to *"HListbox"*, in which case,
+        each can be either a simple text string or a hashref to a hash of
+        attributes and values representing a valid Tk::HListbox entry, for
+        example: {-image => $thumbnailimage, -text => 'text string'}.
 
     $widget->curselection()
         Returns the currently-selected element in the listbox, if any,
@@ -504,20 +620,22 @@ WIDGET METHODS
         option value) if the choice list is a hash (same as the hash passed
         to choices()), otherwise, undef is returned.
 
-    $widget->get([first [, last])
+    $widget->get([first [, last]])
         get() with no arguments returns the current value of the
         "-textvariable" variable. If any arguments are passed, they are
         passed directly to the listbox->get() function, ie. "0", "end" to
-        return all values of the listbox. For choice hashes, the value
-        returned is what is displayed to the user. The arguments are
-        indices.
+        return all *text* values of the listbox. For choice hashes, the
+        value returned is what is displayed to the user. If Tk::HListbox is
+        used, only the *text* part of the entries are returned. The
+        arguments are indices.
 
-    $widget->get_icursor(index)
+    $widget->get_icursor([index])
         Return the location of *index* in the *text-entry* field. Values
         known to be valid are: "insert" and "end", which return the
         character position of the insertion cursor and the location of the
         "end" of the current input string (ie. it's length). The cursor is
-        set by the $widget->icursor function.
+        set by the $widget->icursor function. If no argument (*index*) is
+        given, the index of the insertion cursor (*"insert"*) is returned.
 
     $widget->get_index(value)
         Returns the index number in the list (zero-based) that can be used
@@ -549,7 +667,12 @@ WIDGET METHODS
         to a list (*listref*). If a hash reference is specified, then the
         values are displayed to the user in the drop-down list, but the
         values returned by the "-textvariable" variable or the get()
-        function are the corresponding hash key(s).
+        function are the corresponding hash key(s). The individual items in
+        the referenced array are normally simple text strings unless
+        -listboxtype is set to *"HListbox"*, in which case, each can be
+        either a simple text string or a hashref to a hash of attributes and
+        values representing a valid Tk::HListbox entry, for example: {-image
+        => $thumbnailimage, -text => 'text string'}.
 
     $widget->selectionRange(index1, index2)
         Select (highlight) the text in the text-entry field between *index1*
@@ -570,12 +693,15 @@ WIDGET METHODS
         is useful when the developer intends to immediately focus somewhere
         else.
 
-    $widget->PressButton()
+    $widget->PressButton([nofocussave])
         Activates drop-down list as if user pressed the button (unless state
         is "text" or "textonly" or "disabled". Returns 1 if drop-down list
         activated, zero otherwise. If the drop-down list is already visible,
         then removes it (pops it back down) and returns zero. Available in
-        versions 5.0 and later.
+        versions 5.0 and later. The current keyboard focus is saved for
+        restoration when the drop-down list is rolled up unless
+        *nofocussave* is specified and is true, in which case, focus will
+        remain with the JBrowseEntry widget whose button was "pressed".
 
 AUTHOR
     Jim Turner, "<https://metacpan.org/author/TURNERJW>".

@@ -8,9 +8,9 @@ build_requires:
   Test::More: '0.98'
   YAML: '0'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,41 +29,43 @@ no_index:
 provides:
   Woothee:
     file: lib/Woothee.pm
-    version: v1.7.0
+    version: v1.8.0
   Woothee::Appliance:
     file: lib/Woothee/Appliance.pm
-    version: v1.7.0
+    version: v1.8.0
   Woothee::Browser:
     file: lib/Woothee/Browser.pm
-    version: v1.7.0
+    version: v1.8.0
   Woothee::Crawler:
     file: lib/Woothee/Crawler.pm
-    version: v1.7.0
+    version: v1.8.0
   Woothee::DataSet:
     file: lib/Woothee/DataSet.pm
   Woothee::Misc:
     file: lib/Woothee/Misc.pm
-    version: v1.7.0
+    version: v1.8.0
   Woothee::MobilePhone:
     file: lib/Woothee/MobilePhone.pm
-    version: v1.7.0
+    version: v1.8.0
   Woothee::OS:
     file: lib/Woothee/OS.pm
-    version: v1.7.0
+    version: v1.8.0
   Woothee::Util:
     file: lib/Woothee/Util.pm
-    version: v1.7.0
+    version: v1.8.0
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/woothee/woothee-perl/issues
   homepage: https://github.com/woothee/woothee-perl
   repository: git://github.com/woothee/woothee-perl.git
-version: 1.7.0
+version: 1.8.0
 x_contributors:
-  - 'hitode909 <hitode909@gmail.com>'
-  - 'yusuke-enomoto <yusuke.enomoto@dena.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-  - 'Takuya Tsuchida <takuya.tsuchida@gmail.com>'
-  - 'tell-k <ffk2005@gmail.com>'
   - 'Satoshi "Moris" Tagomori <tagomoris@gmail.com>'
+  - 'Takuya Tsuchida <takuya.tsuchida@gmail.com>'
+  - 'hitode909 <hitode909@gmail.com>'
+  - 'tell-k <ffk2005@gmail.com>'
+  - 'yusuke-enomoto <yusuke.enomoto@dena.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

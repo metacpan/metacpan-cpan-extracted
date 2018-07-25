@@ -11,6 +11,10 @@ sub _get {
     return $PID_RNG{$$} ||= Bytes::Random::Secure::Tiny->new();
 }
 
+sub bytes {
+    return _get()->bytes(@_);
+}
+
 sub bytes_hex {
     return _get()->bytes_hex(@_);
 }

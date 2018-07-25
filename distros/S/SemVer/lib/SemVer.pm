@@ -12,7 +12,7 @@ use overload (
 );
 
 our @ISA = qw(version);
-our $VERSION = '0.6.0'; # For Module::Build
+our $VERSION = '0.7.0'; # For Module::Build
 
 sub _die { require Carp; Carp::croak(@_) }
 
@@ -21,10 +21,17 @@ sub import {}
 
 # Adapted from version.pm.
 my $STRICT_INTEGER_PART = qr/0|[1-9][0-9]*/;
-my $STRICT_DOTTED_INTEGER_PART = qr/\.$STRICT_INTEGER_PART/;
-my $STRICT_DOTTED_INTEGER_VERSION =
-    qr/ $STRICT_INTEGER_PART $STRICT_DOTTED_INTEGER_PART{2,} /x;
-my $OPTIONAL_EXTRA_PART = qr/[a-zA-Z][-0-9A-Za-z]*/;
+my $DOT_SEPARATOR = qr/\./;
+my $PLUS_SEPARATOR = qr/\+/;
+my $DASH_SEPARATOR = qr/-/;
+my $STRICT_DOTTED_INTEGER_PART = qr/$DOT_SEPARATOR$STRICT_INTEGER_PART/;
+my $STRICT_DOTTED_INTEGER_VERSION = qr/ $STRICT_INTEGER_PART $STRICT_DOTTED_INTEGER_PART{2,} /x;
+my $IDENTIFIER = qr/[-0-9A-Za-z]+/;
+my $DOTTED_IDENTIFIER = qr/(?:$DOT_SEPARATOR$IDENTIFIER)*/;
+my $PRERELEASE = qr/$IDENTIFIER$DOTTED_IDENTIFIER/;
+my $METADATA = qr/$IDENTIFIER$DOTTED_IDENTIFIER/;
+
+my $OPTIONAL_EXTRA_PART = qr/$PRERELEASE($PLUS_SEPARATOR$METADATA)?/;
 
 sub new {
     my ($class, $ival) = @_;
@@ -37,11 +44,12 @@ sub new {
         my $self = $class->SUPER::new($ival);
         $self->{extra} = $ival->{extra};
         $self->{dash}  = $ival->{dash};
+        $self->_evalPreRelease($self->{extra});
         return $self;
     }
 
     my ($val, $dash, $extra) = (
-        $ival =~ /^v?($STRICT_DOTTED_INTEGER_VERSION)(?:(-)($OPTIONAL_EXTRA_PART))?$/
+        $ival =~ /^v?($STRICT_DOTTED_INTEGER_VERSION)(?:($DASH_SEPARATOR)($OPTIONAL_EXTRA_PART))?$/
     );
     _die qq{Invalid semantic version string format: "$ival"}
         unless defined $val;
@@ -49,7 +57,23 @@ sub new {
     my $self = $class->SUPER::new($val);
     $self->{dash}  = $dash;
     $self->{extra} = $extra;
+    $self->_evalPreRelease($self->{extra});
+
     return $self;
+}
+
+# Internal function to split up given string into prerelease- and patch-components
+sub _evalPreRelease {
+    no warnings 'uninitialized';
+    my $self = shift;
+    my $v = shift;
+    my ($preRelease, $plus, $patch) = (
+       $v =~ /^($PRERELEASE)(?:($PLUS_SEPARATOR)($METADATA))?$/
+    );
+    @{$self->{prerelease}} = split $DOT_SEPARATOR,$preRelease;
+    $self->{plus} = $plus;
+    @{$self->{patch}} = (split $DOT_SEPARATOR, $patch || undef);
+    return;
 }
 
 $VERSION = __PACKAGE__->new($VERSION); # For ourselves.
@@ -59,13 +83,14 @@ sub declare {
     return $class->new($ival) if Scalar::Util::isvstring($ival)
         or eval { $ival->isa('version') };
 
-    (my $v = $ival) =~ s/(?:(-?)($OPTIONAL_EXTRA_PART))[[:space:]]*$//;
+    (my $v = $ival) =~ s/^v?$STRICT_DOTTED_INTEGER_VERSION(?:($DASH_SEPARATOR)($OPTIONAL_EXTRA_PART))[[:space:]]*$//;
     my $dash  = $1;
     my $extra = $2;
     $v += 0 if $v =~ s/_//g; # ignore underscores.
     my $self = $class->SUPER::declare($v);
     $self->{dash}  = $dash;
     $self->{extra} = $extra;
+    $self->_evalPreRelease($self->{extra});
     return $self;
 }
 
@@ -74,13 +99,14 @@ sub parse {
     return $class->new($ival) if Scalar::Util::isvstring($ival)
         or eval { $ival->isa('version') };
 
-    (my $v = $ival) =~ s/(?:(-?)($OPTIONAL_EXTRA_PART))[[:space:]]*$//;
+    (my $v = $ival) =~ s/^v?$STRICT_DOTTED_INTEGER_VERSION(?:($DASH_SEPARATOR)($OPTIONAL_EXTRA_PART))[[:space:]]*$//;
     my $dash  = $1;
     my $extra = $2;
     $v += 0 if $v =~ s/_//g; # ignore underscores.
     my $self = $class->SUPER::parse($v);
     $self->{dash}  = $dash;
     $self->{extra} = $extra;
+    $self->_evalPreRelease($self->{extra});
     return $self;
 }
 
@@ -102,6 +128,21 @@ sub normal   {
 sub numify   { _die 'Semantic versions cannot be numified'; }
 sub is_alpha { !!shift->{extra} }
 
+
+# Sort Ordering:
+# Precedence refers to how versions are compared to each other when ordered. Precedence MUST be calculated by
+# separating the version into major, minor, patch and pre-release identifiers in that order (Build metadata does not figure into precedence).
+# Precedence is determined by the first difference when comparing each of these identifiers from left to right as follows:
+# 1. Major, minor, and patch versions are always compared numerically. Example: 1.0.0 < 2.0.0 < 2.1.0 < 2.1.1.
+# 2. When major, minor, and patch are equal, a pre-release version has lower precedence than a normal version.
+#    Example: 1.0.0-alpha < 1.0.0.
+# 3. Precedence for two pre-release versions with the same major, minor, and patch version MUST be determined by
+#    comparing each dot separated identifier from left to right until a difference is found as follows:
+#    3.a. identifiers consisting of only digits are compared numerically and identifiers with letters or hyphens are
+#         compared lexically in ASCII sort order.
+#    3.b. Numeric identifiers always have lower precedence than non-numeric identifiers.
+#    3.c. A larger set of pre-release fields has a higher precedence than a smaller set, if all of the preceding identifiers are equal.
+#    Example: 1.0.0-alpha < 1.0.0-alpha.1 < 1.0.0-alpha.beta < 1.0.0-beta < 1.0.0-beta.2 < 1.0.0-beta.11 < 1.0.0-rc.1 < 1.0.0.
 sub vcmp {
     my $left  = shift;
     my $right = ref($left)->declare(shift);
@@ -109,16 +150,69 @@ sub vcmp {
     # Reverse?
     ($left, $right) = shift() ? ($right, $left): ($left, $right);
 
-    # Major and minor win.
+    # Major and minor win. - case 1.
     if (my $ret = $left->SUPER::vcmp($right, 0)) {
         return $ret;
-    } else {
-        # They're equal. Check the extra text stuff.
-        if (my $l = $left->{extra}) {
-            my $r = $right->{extra} or return -1;
-            return lc $l cmp lc $r;
+    } else { #cases 2, 3
+    	my $lenLeft = 0;
+    	my $lenRight = 0;
+    	if (defined $left->{prerelease}) {
+        	$lenLeft = scalar(@{$left->{prerelease}});
+        }
+        if (defined $right->{prerelease}) {
+        	$lenRight = scalar(@{$right->{prerelease}});
+        }
+        my $lenMin =  ($lenLeft, $lenRight)[$lenLeft > $lenRight];
+        if ( $lenLeft == 0) {
+            if ($lenRight == 0) {
+                return 0; # Neither LEFT nor RIGHT have prerelease identifiers - versions are equal
+            } else {
+                # Case 2: When major, minor, and patch are equal, a pre-release version has lower precedence than a normal version.
+                return 1; # Only RIGHT has prelease - not LEFT -> LEFT wins
+            }
         } else {
-            return $right->{extra} ? 1 : 0;
+            if ($lenRight == 0) {
+                # Case 2: When major, minor, and patch are equal, a pre-release version has lower precedence than a normal version.
+                return -1; # Only LEFT has prelease identifiers - not RIGHT -> RIGHT wins
+            } else {
+                # LEFT and RIGHT have prelease identifiers - compare each part separately
+                for (my $i = 0; $i < $lenMin; $i++) {
+                    my $isNumLeft = Scalar::Util::looks_like_number($left->{prerelease}->[$i]);
+                    my $isNumRight = Scalar::Util::looks_like_number($right->{prerelease}->[$i]);
+                    # Case 3.b: Numeric identifiers always have lower precedence than non-numeric identifiers
+                    if (!$isNumLeft && $isNumRight) {
+                        return 1; # LEFT identifier is Non-numeric - RIGHT identifier is numeric -> LEFT wins
+										} elsif ($isNumLeft && !$isNumRight) {
+                        return -1; # LEFT identifier is numeric - RIGHT identifier is non-numeric -> RIGHT wins
+                    } elsif ($isNumLeft && $isNumRight) {
+                        # Case 3.a.1: identifiers consisting of only digits are compared numerically
+                        if ($left->{prerelease}->[$i] == $right->{prerelease}->[$i] ) {
+                            next;  # LEFT identifier and RIGHT identifier are equal - step to next part
+												} elsif ($left->{prerelease}->[$i] > $right->{prerelease}->[$i] ) {
+                            return 1; # LEFT identifier is bigger than RIGHT identifier -> LEFT wins
+                        } else {
+                            return -1; return 1; # LEFT identifier is smaller than RIGHT identifier -> RIGHT wins
+                        }
+                    } else {
+                        # Case 3.a.2: identifiers with letters or hyphens are compared lexically in ASCII sort order.
+                        if (lc $left->{prerelease}->[$i] eq lc $right->{prerelease}->[$i] ) {
+                            next;  # LEFT identifier and RIGHT identifier are equal - step to next part
+												} elsif (lc $left->{prerelease}->[$i] gt  lc $right->{prerelease}->[$i] ) {
+                            return 1; # LEFT identifier is bigger than RIGHT identifier -> LEFT wins
+                        } else {
+                            return -1; return 1; # LEFT identifier is smaller than RIGHT identifier -> RIGHT wins
+                        }
+                    }
+                }
+                # Case 3.c: A larger set of pre-release fields has a higher precedence than a smaller set, if all of the preceding identifiers are equal
+                if ($lenLeft > $lenRight) {
+                    return 1; # All existing identifiers are equal, but LEFT has more identifiers -> LEFT wins
+								} elsif ($lenLeft < $lenRight) {
+                    return -1; # All existing identifiers are equal, but RIGHT has more identifiers -> RIGHT wins
+                }
+                # All identifiers are equal
+                return 0;
+            }
         }
     }
 }
@@ -132,32 +226,43 @@ SemVer - Use semantic version numbers
 
 =head1 Synopsis
 
-  use SemVer; our $VERSION = SemVer->new('1.2.0b1');
+  use SemVer; our $VERSION = SemVer->new('1.2.0-b1');
 
 =head1 Description
 
 This module subclasses L<version> to create semantic versions, as defined by
-the L<Semantic Versioning 1.0.0 Specification|http://semver.org/spec/v1.0.0.html>.
-The two salient points of the specification, for the purposes of version
+the L<Semantic Versioning 2.0.0 Specification|http://semver.org/spec/v2.0.0.html>.
+The three salient points of the specification, for the purposes of version
 formatting, are:
 
 =over
 
 =item 1.
 
-A normal version number MUST take the form X.Y.Z where X, Y, and Z are
-integers. X is the major version, Y is the minor version, and Z is the patch
-version. Each element MUST increase numerically by increments of one. For
-instance: C<< 1.9.0 < 1.10.0 < 1.11.0 >>.
+A normal version number MUST take the form X.Y.Z where X, Y, and Z are non-negative 
+integers, and MUST NOT contain leading zeroes. X is the major version, Y is the 
+minor version, and Z is the patch version. Each element MUST increase numerically. 
+For instance: C<< 1.9.0 -> 1.10.0 -> 1.11.0 >>.
 
 =item 2.
 
-A pre-release version number MAY be denoted by appending an arbitrary string
-immediately following the patch version and a dash. The string MUST be
-comprised of only alphanumerics plus dash C<[0-9A-Za-z-]>. Pre-release
-versions satisfy but have a lower precedence than the associated normal
-version. Precedence SHOULD be determined by lexicographic ASCII sort order. For
-instance: C<< 1.0.0-alpha1 < 1.0.0-beta1 < 1.0.0-beta2 < 1.0.0-rc1 < 1.0.0 >>.
+A pre-release version MAY be denoted by appending a hyphen and a series of dot 
+separated identifiers immediately following the patch version. Identifiers MUST 
+comprise only ASCII alphanumerics and hyphen C<[0-9A-Za-z-]>. Identifiers MUST NOT 
+be empty. Numeric identifiers MUST NOT include leading zeroes. Pre-release versions 
+have a lower precedence than the associated normal version. A pre-release version 
+indicates that the version is unstable and might not satisfy the intended 
+compatibility requirements as denoted by its associated normal version: 
+C<< 1.0.0-alpha, 1.0.0-alpha.1, 1.0.0-0.3.7, 1.0.0-x.7.z.92 >>
+
+=item 3.
+
+Build metadata MAY be denoted by appending a plus sign and a series of dot separated 
+identifiers immediately following the patch or pre-release version. Identifiers MUST 
+comprise only ASCII alphanumerics and hyphen C<[0-9A-Za-z-]>. Identifiers MUST NOT 
+be empty. Build metadata SHOULD be ignored when determining version precedence. Thus 
+two versions that differ only in the build metadata, have the same precedence. 
+Examples: C<< 1.0.0-alpha+001, 1.0.0+20130313144700, 1.0.0-beta+exp.sha.5114f85 >>.
 
 =back
 
@@ -336,11 +441,17 @@ debugging help.
 
 =head1 Authors
 
-David E. Wheeler <david@kineticode.com>
+=over
+
+=item * David E. Wheeler <david@kineticode.com>
+
+=item * Johannes Kilian <hoppfrosch@gmx.de> 
+
+=back
 
 =head1 Copyright and License
 
-Copyright (c) 2010-2015 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2010-2018 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

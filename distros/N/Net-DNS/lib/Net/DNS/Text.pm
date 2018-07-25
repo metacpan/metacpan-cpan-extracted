@@ -1,9 +1,9 @@
 package Net::DNS::Text;
 
 #
-# $Id: Text.pm 1694 2018-07-16 04:19:40Z willem $
+# $Id: Text.pm 1698 2018-07-24 15:29:05Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1694 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1698 $)[1];
 
 
 =head1 NAME
@@ -45,7 +45,7 @@ use constant ASCII => ref eval {
 	Encode::find_encoding('ascii');
 };
 
-use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see UTR#16 3.6]
+use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see Unicode TR#16 3.6]
 	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
 };
 
@@ -317,8 +317,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, RFC1035, RFC3629,
-Unicode Technical Report #16
+L<perl>, L<Net::DNS>, RFC1035, RFC3629, Unicode TR#16
 
 =cut
 

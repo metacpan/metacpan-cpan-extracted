@@ -1,5 +1,9 @@
 Revision history for Perl extension Devel::PrettyTrace.
 
+0.05  Wed Jul 25 02:37:09 MSK 2018
+    - fix tests for different perl versions
+    - fix compability with DDP >= 0.36
+
 0.04  Wed Jun 29 12:08:28 MSD 2011
 	- fix tests on 5.14 and later
 

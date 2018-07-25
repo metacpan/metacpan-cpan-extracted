@@ -16,15 +16,15 @@ Time::Random - Generate a random time in time.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
-    use Time::Random qw/time_random/;
+	use Time::Random qw/time_random/;
 
 	my $time = time_random(
 		from => '1531909277',
@@ -52,27 +52,18 @@ our $VERSION = '0.01';
 =cut
 
 sub time_random {
-	my %args = @_;
-
-	my $to = $args{to} 
+	my %args = scalar @_ == 1 ? %{ $_[0] } : @_;
+	$args{$_} = $args{$_} 
 		? $args{strptime} 
-			? Time::Piece->strptime($args{to}, $args{strptime})->epoch
-			: $args{to}
-		: time();
-
-	my $from = $args{from}
-		? $args{strptime} 
-			? Time::Piece->strptime($args{from}, $args{strptime})->epoch 
-			: $args{from}
-		: $to - 86400;
-	
-	my $epoch = $to - int(rand($to - $from));
-	
-	unless ($args{strftime}) {
-		return gmtime($epoch);
-	}
-
-	return gmtime($epoch)->strftime($args{strftime});
+			? Time::Piece->strptime($args{$_}, $args{strptime})->epoch
+			: ref $args{$_}
+				? $args{$_}->epoch()
+				: $args{$_}
+		: $_ eq 'to' ? time() : $args{to} - int(rand($args{to} - 86400))
+	foreach qw/to from/;
+	do { $args{time} = gmtime($args{to} - int(rand($args{to} - $args{from}))) } && $args{strftime} 
+		? $args{time}->strftime($args{strftime}) 
+		: $args{time};
 }
 
 =head1 AUTHOR
@@ -90,7 +81,6 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc Time::Random
-
 
 You can also look for information at:
 

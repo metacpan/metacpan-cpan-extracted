@@ -8,11 +8,11 @@ Data::Chronicle - Chronicle storage system
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 
 =head1 DESCRIPTION
 
-This package contains two modules (Reader and Writer) which can be used to store and retrieve information
+This package contains three modules (Reader, Writer, and Subscriber) which can be used to store and retrieve information
 on an efficient storage with below properties:
 
 =head2 Timeliness
@@ -49,11 +49,23 @@ MUST be either hash-ref or array-ref.
     $writer->set("category1", "name1", "value1");
     $writer->set("category1", "name2", "value2", Date::Utility->new("2016-08-01 00:06:00"));
 
+=head2 L<Data::Chronicle::Writer/mset>
+
+Given multiple categories, names and values atomically performs the set operation on each corresponding category, name, value set.
+
+    $writer->mset([["category1", "name1", $value1], ["category2, "name2", $value2], ...]);
+
 =head2 L<Data::Chronicle::Reader/get>
 
 Given a category and name returns the latest version of the data according to current Redis cache
 
     my $value1 = $reader->get("category1, "name1"); #value1
+
+=head2 L<Data::Chronicle::Reader/mget>
+
+Given multiple categories and name atomically performs the get operation on each corresponding category, name set.
+
+    my @values = $reader->mget([["category1", "name1"], ["category2", "name2"], ...])
 
 =head2 L<Data::Chronicle::Reader/get_for>
 
@@ -68,7 +80,27 @@ Given a category, name, start_timestamp and end_timestamp returns an array-ref c
 
     my $arrayref = $reader->get_for_period("category1", "name2", Date::Utility->new("2015-08-01 00:06:00"), Date::Utility->new("2015-08-01 00:06:00"));
 
-=head1 Examples
+=head2 L<Data::Chronicle::Reader/get_history>
+
+Given a category, name, and revision returns version of the data the specified number of revisions in the past.
+If revision 0 is chosen, the latest version of the data will be returned.
+If revision 1 is chosen, the previous version of the data will be returned.
+
+    my $some_old_data = $reader->get_for("category1", "name2", 2);
+
+=head2 L<Data::Chronicle::Subscriber/subscribe>
+
+Given a category, name, and callback assigns the callback to be called when a new value is set for the specified category and name (if the writer has publish_on_set enabled).
+
+    $subscriber->subscribe("category1", "name2", sub { print 'Hello World' });
+
+=head2 L<Data::Chronicle::Subscriber/unsubscribe>
+
+Given a category, name, clears the callbacks associated with the specified category and name.
+
+    $subscriber->unsubscribe("category1", "name2");
+
+=head1 EXAMPLES
 
     my $d = get_some_log_data();
 

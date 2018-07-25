@@ -1,6 +1,6 @@
 package File::Tabular::Web; # documentation at bottom of file
 
-our $VERSION = "0.25";
+our $VERSION = "0.26";
 
 use strict;
 use warnings;
@@ -31,21 +31,26 @@ sub call { # Plack request dispatcher (see L<Plack::Component>)
 #----------------------------------------------------------------------
   my ($self, $env) = @_;
 
+  # $self is the persistent Plack component; we create another temporary
+  # instance called 'handler' to handle the current request
+  my $class = ref $self;
+  my $handler = $class->new(%$self);
+
   try {
     # regular response
-    $self->_new($env);
-    $self->_dispatch_request;
+    $handler->_new($env);
+    $handler->_dispatch_request;
   }
     # in case of an exception
     catch {
       # try displaying through msg view..
-      $self->{msg} = "<b><font color='red'>ERROR</font></b> : $_";
-      $self->{view} = 'msg';
-      try {$self->display}
+      $handler->{msg} = "<b><font color='red'>ERROR</font></b> : $_";
+      $handler->{view} = 'msg';
+      try {$handler->display}
         catch { 
           # .. or else fallback with simple HTML page
           my $res = Plack::Response->new(500);
-          $res->body("<html>$self->{msg}</html>");
+          $res->body("<html>$handler->{msg}</html>");
           $res->content_type('text/html');
           return $res->finalize;
         };
@@ -288,7 +293,6 @@ sub _new { # expands and re-blesses the File::Tabular::Web instance
   $self->{user}   = $req->user || "Anonymous";
   $self->{url}    = $req->base . $path_info;
   $self->{method} = $req->method;
-  $self->{msg}    = "";
 
   # are we running under mod_perl ? if so, have a handle to the Rec object.
   my $mod_perl = do {my $input = $self->{req}->env->{'psgi.input'};
@@ -1723,35 +1727,38 @@ C<< <application_name>_long.tt >>, etc.
 
 =head2 Note on the architecture
 
-The internal object-oriented design is a bit unorthodox, merely
+The internal object-oriented design is a bit unorthodox, mainly
 because I wrote it many years ago at a time when I was less familiar
-with Web architectures; unfortunately this cannot be changed now,
+with Web architectures, and also because when migrating to Plack I
+also had to keep the previous modperl+CGI API for preserving backwards
+compatibility. Unfortunately the architecture cannot be changed now,
 because there might be subclasses that rely on this particular design.
-External users need not worry about this architecture, but authors
-of subclasses should be aware of the design.
+External users need not worry, but authors of subclasses should be
+aware of the design.
 
-An instance of C<File::Tabular::Web> plays several roles simultaneously :
+There are two kinds of instance of the C<File::Tabular::Web> class :
+
 
 =over
 
 =item *
 
-it is an instance of a L<Plack::Component>
-
-=item * 
-
-it maintains a collection of I<application hashrefs>, loaded
-dynamically when needed. Each application hashref holds
-information about its configuration file, template files, etc.
+if running under L<Plack>, one instance is the persistent Plack component
+that will execute the L</call> method at each request.
 
 =item *
 
-it acts as a transient I<request object> : every time an HTTP request
-is received, the object is reset to a clean initial state, and may
-be re-blessed into the subclass needed to serve the request.
+at each HTTP request, a new transient instance of C<File::Tabular::Web> class
+is created; that instance holds temporary information needed to communicate
+across the various steps of request handling. It is automatically destroyed
+after having sent the response.
 
 =back
 
+In addition, the module itself  maintains a collection of
+I<application hashrefs>, loaded
+dynamically when needed. Each application hashref holds
+information about its configuration file, template files, etc.
 
 By convention, methods starting with an underscore are meant to
 be I<private>, i.e. should not be redefined in subclasses.

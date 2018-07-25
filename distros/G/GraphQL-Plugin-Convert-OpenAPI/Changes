@@ -1,5 +1,10 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-OpenAPI
 
+0.14	Mon 23 Jul 06:15:25 BST 2018
+ - schema now only include ones used
+ - CI improvements including coverage
+ - add https://github.com/gothinkster/realworld api spec to tests
+
 0.13	Sun  1 Jul 23:35:54 BST 2018
  - dump result if json_is fails
 

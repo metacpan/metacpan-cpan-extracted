@@ -1,0 +1,26 @@
+Changes
+CONTRIBUTING.md
+docs/connection.html
+docs/connector.html
+docs/hexonet.html
+docs/response.html
+docs/util.html
+lib/WebService/Hexonet.pm
+lib/WebService/Hexonet/Connector.pm
+lib/WebService/Hexonet/Connector/Connection.pm
+lib/WebService/Hexonet/Connector/Response.pm
+lib/WebService/Hexonet/Connector/Util.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+scripts/buildrelease.sh
+scripts/buildversion.sh
+scripts/coverage.sh
+scripts/generatedocs.sh
+scripts/perltidy.sh
+scripts/rebuild.sh
+t/Hexonet-connector.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

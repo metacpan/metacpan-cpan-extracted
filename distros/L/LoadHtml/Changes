@@ -18,3 +18,9 @@ Revision history for LoadHtml
 7.08	2012/10/16
 	Moved evaluation of <!HASH> tags below <!LOOP>'s so that a LOOP can be used
 	to create the contents of a <!HASH> tag.  (Lines 1102-1109).
+7.09 2016/02/05
+	Change TODAY and FILEDATE functions to use Date::Time2fmtstr instead of 
+	to_char.  Also a cpl. of optimizations.
+7.10 2018/07/23
+	Convert docs to POD format and add to source file, build for CPAN 
+	distribution.

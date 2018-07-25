@@ -1,9 +1,9 @@
 package Net::DNS::RR;
 
 #
-# $Id: RR.pm 1694 2018-07-16 04:19:40Z willem $
+# $Id: RR.pm 1696 2018-07-20 16:15:11Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1694 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1696 $)[1];
 
 
 =head1 NAME
@@ -269,7 +269,7 @@ sub encode {
 
 	my $owner = $self->{owner}->encode( $offset, @opaque );
 	my ( $type, $class, $ttl ) = @{$self}{qw(type class ttl)};
-	my $rdata = $self->_empty ? '' : $self->_encode_rdata( RRFIXEDSZ + length $owner, @opaque );
+	my $rdata = $self->_empty ? '' : $self->_encode_rdata( $offset + length($owner) + RRFIXEDSZ, @opaque );
 	pack 'a* n2 N n a*', $owner, $type, $class || 1, $ttl || 0, length $rdata, $rdata;
 }
 
@@ -292,7 +292,7 @@ sub canonical {
 
 	my $owner = $self->{owner}->canonical;
 	my ( $type, $class, $ttl ) = @{$self}{qw(type class ttl)};
-	my $rdata = $self->_empty ? '' : $self->_encode_rdata( RRFIXEDSZ + length $owner );
+	my $rdata = $self->_empty ? '' : $self->_encode_rdata( length($owner) + RRFIXEDSZ );
 	pack 'a* n2 N n a*', $owner, $type, $class || 1, $ttl || 0, length $rdata, $rdata;
 }
 

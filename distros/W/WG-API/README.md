@@ -5,7 +5,7 @@ WG::API - Module for work with Wargaming.net Public API
 
 # VERSION
 
-Version v0.10
+Version v0.11
 
 # SYNOPSIS
 
@@ -33,7 +33,7 @@ This module provide access to WG Public API
 
 - **wowp**
 
-    Returns A WoWp instance
+    Returns a WoWp instance
 
 - **wows**
 

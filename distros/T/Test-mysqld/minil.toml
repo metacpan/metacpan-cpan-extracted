@@ -1,6 +1,0 @@
-name = "Test-mysqld"
-badges = ["travis"]
-authority="cpan:KAZUHO"
-
-module_maker="ModuleBuildTiny"
-

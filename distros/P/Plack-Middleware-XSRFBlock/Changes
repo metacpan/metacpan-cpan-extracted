@@ -1,5 +1,20 @@
 Revision history for Plack-Middleware-XSRFBlock
 
+0.0.15    2018-07-24 13:44:11+01:00 Europe/London
+ - fix contents_to_filter_regex (@dakkar) (#23)
+ - simpler non-html test (@dakkar) (#23)
+
+0.0.14    2018-07-23 17:18:03+01:00 Europe/London
+ - limit munging to appropriate content-types (@dakkar) (#22)
+ - allow blocking non-POST methods (@dakkar) (#22)
+
+0.0.13    2018-07-23 12:01:27+01:00 Europe/London
+ - Replace $@ with $msg (#19)
+ - Add missing use statement (#20)
+ - Update Build Status icon/badge
+ - Travis: add 5.26 and 5.24 as versions to test with
+ - Update Dist::Zilla used in Travis
+
 0.0.12    2017-07-13 06:35:46-04:00 America/New_York
  - Refactor internals to make extensible (PR #17)
  - dzil: use Git::Contributors instead of ContributorsFromGit (PR #18)

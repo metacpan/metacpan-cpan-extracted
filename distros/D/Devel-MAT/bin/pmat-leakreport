@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Devel::MAT;
+use List::UtilsBy qw( nsort_by );
+
+STDOUT->autoflush(1);
+
+my $findex = 1;
+my $progress = ( -t STDOUT ) ?
+   sub { print "\r\e[K";
+         print "[$findex]: $_[0]" if @_; } :
+   undef;
+
+# A leaking SV is one that appears and then never gets touched again
+# To detect them, we need to look for SVs that appear between two files,
+# and then don't disappear again. Any that do disappear were simply
+# temporaries and can be ignored.
+
+# In order to try to detect reused arena slots we'll use the combination of
+# address and basetype as the key
+
+sub sv_key { return join ":", $_[0]->addr, $_[0]->basetype }
+
+my %candidates;
+
+# To detect newly-allocated SVs, keep a set of the previous file's ones.
+my $previous_svs;
+
+my $pmat;
+
+sub list_svs
+{
+   return { map { sv_key($_) => 1 } $pmat->dumpfile->heap };
+}
+
+# Initialise the set of previous SVs from the first file
+$pmat = Devel::MAT->load( shift @ARGV, progress => $progress );
+$previous_svs = list_svs;
+
+while( my $file = shift @ARGV ) {
+   $pmat = Devel::MAT->load( $file, progress => $progress );
+   my $svs = list_svs;
+
+   # Any current candidates that aren't now still allocated, are definitely not
+   # leaks
+   exists $svs->{$_} or delete $candidates{$_}
+      for keys %candidates;
+
+   # No point looking for more candidates if there's no files left to
+   # invalidate any new temporaries with
+   last unless @ARGV;
+
+   # Any new SV that wasn't seen previously is a candidate for leaking
+   exists $previous_svs->{$_} or $candidates{$_} = $findex
+      for keys %$svs;
+
+   $findex++;
+   $previous_svs = $svs;
+}
+
+$progress->() if $progress;
+
+my $df = $pmat->dumpfile;
+
+foreach my $svkey ( nsort_by { $candidates{$_} } keys %candidates ) {
+   my $findex = $candidates{$svkey};
+   my ( $addr ) = split m/:/, $svkey;
+   my $sv = $df->sv_at( $addr );
+
+   printf "LEAK[%d] %s\n",
+      $findex, $sv->desc_addr;
+}

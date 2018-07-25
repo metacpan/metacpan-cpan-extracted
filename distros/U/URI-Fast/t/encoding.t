@@ -21,6 +21,9 @@ subtest 'basics' => sub{
   is URI::Fast::decode(URI::Fast::encode($reserved)), $reserved, 'decode';
 
   is URI::Fast::encode(" &", "&"), "%20&", "encode: allowed chars";
+
+  is URI::Fast::encode(undef), "", "encode: undef";
+  is URI::Fast::decode(undef), "", "decode: undef";
 };
 
 subtest 'negative path' => sub {
@@ -45,19 +48,31 @@ subtest 'utf8' => sub{
 
   ok my $uri = uri($url), 'ctor';
 
-  is $uri->auth("$u:$u\@www.$u.com:1234"), "$a:$a\@www.$a.com:1234", 'auth';
+  is $uri->auth("$u:$u\@www.$u.com:1234"), "$u:$u\@www.$u.com:1234", 'auth';
+  is $uri->raw_auth, "$a:$a\@www.$a.com:1234", 'raw_auth';
 
   is $uri->usr, $u, 'usr';
+  is $uri->raw_usr, $a, 'raw_usr';
+
   is $uri->pwd, $u, 'pwd';
+  is $uri->raw_pwd, $a, 'raw_pwd';
+
   is $uri->host, "www.$u.com", 'host';
+  is $uri->raw_host, "www.$a.com", 'raw_host';
 
   is $uri->path("/$u/$u"), "/$u/$u", "path";
-  is $uri->path([$u, $a]), "/$u/$a", "path";
+  is $uri->raw_path, "/$a/$a", "raw_path";
 
-  is $uri->query("x=$u"), "x=$a", "query";
+  is $uri->path([$u, $a]), "/$u/" . URI::Fast::encode($a), "path";
+  is $uri->raw_path, "/$a/" . URI::Fast::encode($a), "raw_path";
+
+  is $uri->query("x=$u"), "x=$u", "query";
   is $uri->param('x'), $u, 'param';
-  is $uri->query({x => $u}), "x=$a", "query";
+  is scalar($uri->raw_query), "x=$a", "raw_query";
+
+  is $uri->query({x => $u}), "x=$u", "query";
   is $uri->param('x'), $u, 'param';
+  is scalar($uri->raw_query), "x=$a", "raw_query";
 
   ok my $mal = URI::Fast::decode($malformed), 'decode: malformed';
   ok !utf8::is_utf8($mal), 'decode: utf8 flag not set when malformed';

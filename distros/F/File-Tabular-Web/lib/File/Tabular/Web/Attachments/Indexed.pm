@@ -59,9 +59,6 @@ sub before_search {
 
   $self->SUPER::before_search;
 
-  # Cleanup fulltext_result which might be populated from previous query
-  delete $self->{fulltext_result};
-  
   # searches into the fulltext index are passed through param 'SFT'
   $self->{search_fulltext} = $self->param('SFT') or return; 
 

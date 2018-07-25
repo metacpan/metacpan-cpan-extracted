@@ -17,7 +17,7 @@ use XML::Parser;
 
 use Data::Dumper; use Data::UUID; $Data::Dumper::Terse = 1; 
 
-our $VERSION = '1.4'; # VERSION
+our $VERSION = '1.9'; # VERSION
 
 sub add_extra_info {
     my ($service, $ref_params) = @_;
@@ -28,7 +28,7 @@ sub add_extra_info {
     return \%params if(exists($hash_merch_services{$service}));
 
     my %info = (
-        SdkInfo => join " ", $NpsSDK::Constants::LANGUAGE, $NpsSDK::Version::VERSION,
+        SdkInfo => join " ", $NpsSDK::Constants::LANGUAGE, "SDK", "Version:", $NpsSDK::Version::VERSION,
     );
 
     my $merch_details_key = "psp_MerchantAdditionalDetails";

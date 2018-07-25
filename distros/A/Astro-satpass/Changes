@@ -1,3 +1,19 @@
+0.100		2018-07-22	T. R. Wyant
+    Add non-TLE attributes as optional hash reference to parse().
+    Actually, this already worked for traditional TLEs, it just needed
+    to be documented. But it needed to be added to the JSON code.
+
+    Fix $eci->set( sun => ... ). The mutator was not in fact setting the
+    new value of the attribute. Included in this is support for changing
+    the static (i.e. default) value of the attribute.
+
+    Make singleton Sun & Moon per-class. This is so that you always get
+    back the same class you requested if there is more than one class
+    that can represent each body (say, at different accuracies).
+
+    Pull out Astro::Coord::ECI::TLE::Iridium as separate distribution.
+    The canned statuses went with it.
+
 0.099		2018-06-29	T. R. Wyant
     Canned status update:
 

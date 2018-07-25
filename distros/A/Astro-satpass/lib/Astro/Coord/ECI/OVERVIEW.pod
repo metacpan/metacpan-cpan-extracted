@@ -208,10 +208,11 @@ available.
 Given a chunk of TLE data, the
 L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
 L<parse()|Astro::Coord::ECI::TLE/parse> method can be used to turn it
-into L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> or
+into L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> objects -- or
 L<Astro::Coord::ECI::TLE::Iridium|Astro::Coord::ECI::TLE::Iridium>
-objects. If your data are in JSON format, you will need the optional
-L<JSON|JSON> module installed.
+objects if you have installed that module from its own distribution. If
+your data are in JSON format, you will need the optional L<JSON|JSON>
+module installed.
 
 In practice, TLE data have an effective date, and a shelf life measured
 from that effective date. Unfortunately, the TLE data do not contain
@@ -402,12 +403,12 @@ calculations if you suspect that your TLE data may not all be valid.
 
 This module is a subclass of
 L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> representing an Iridium
-satellite. The L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
+Classic satellite. The L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
 L<parse()|Astro::Coord::ECI::TLE/parse> method produces these
 automatically when fed L<TLE|/TLE> data representing Iridium satellites.
 
 This module adds to the L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>
-functionality the ability to calculate Iridium flares. The
+functionality the ability to calculate Iridium Classic flares. The
 L<flare()|Astro::Coord::ECI::TLE::Iridium/flare> method is passed the
 L<observers' location|/Station> and the desired time range for the
 prediction. It returns a list of hashes representing the predicted
@@ -415,6 +416,12 @@ flares. This prediction is modified by attributes giving limiting
 magnitudes for daytime and nighttime flares, and whether you want
 predictions for am (between midnight and sunrise), day (between sunrise
 and sunset), and/or pm (between sunset and midnight) flares.
+
+This module was moved into its own distribution in mid-2018, due to the
+impending replacement of all Iridium Classic satellites with Iridium
+Next. The Iridium Next satellites are not expected to flare (at least
+not nearly as spectacularly as the Iridium Classic satellites), and have
+a different geometry anyway, so this class is useless for the,.
 
 =head2 Astro::Coord::ECI::TLE::Set
 

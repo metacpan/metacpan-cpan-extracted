@@ -10,6 +10,7 @@ my @files = (
     'lib/Data/Chronicle.pm',
     'lib/Data/Chronicle/Mock.pm',
     'lib/Data/Chronicle/Reader.pm',
+    'lib/Data/Chronicle/Subscriber.pm',
     'lib/Data/Chronicle/Writer.pm',
     't/00-check-deps.t',
     't/00-compile.t',

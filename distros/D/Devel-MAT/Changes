@@ -1,5 +1,13 @@
 Revision history for Devel-MAT
 
+0.37    2018-07-24 16:56:49
+        [CHANGES]
+         * Optional splitting of SCALAR by subtype in 'count' command
+         * Small improvements to 'pmat-diff'
+         * Added $sv->basetype method
+         * Added 'pmat-leakreport'
+         * Handle upcoming PMAT v0.3 format with compressed undefs
+
 0.36    2018-07-17 10:42:41
         [CHANGES]
          * Migrated Devel::MAT::Dumper into its own distribution

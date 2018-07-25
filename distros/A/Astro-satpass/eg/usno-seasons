@@ -14,7 +14,7 @@ use Pod::Usage;
 use POSIX qw{ strftime };
 use Time::Local;
 
-our $VERSION = '0.099';
+our $VERSION = '0.100';
 
 local $Astro::Coord::ECI::Sun::Singleton = 0;
 

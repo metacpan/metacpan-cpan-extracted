@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-OpenCage
 
+0.16    2018-07-24
+        - add support for new, optional "proximity" parameter
+          see: https://blog.opencagedata.com/post/new-optional-parameter-proximity
+
 0.15    2018-06-19
         - updated OpenCage documentation URLs, no code changes
 

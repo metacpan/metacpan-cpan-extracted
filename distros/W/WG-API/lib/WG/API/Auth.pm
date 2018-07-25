@@ -1,9 +1,10 @@
 package WG::API::Auth;
 
-use Moo;
-with 'WG::API::Base';
+use Const::Fast;
 
-use constant api_uri => '//api.worldoftanks.ru/';
+use Moo;
+
+with 'WG::API::Base';
 
 =head1 NAME
 
@@ -11,11 +12,19 @@ WG::API::Auth  - Auth-module with using OpenID for work with WG PAPI
 
 =head1 VERSION
 
-Version v0.10
+Version v0.11
 
 =cut
 
-our $VERSION = 'v0.10';
+our $VERSION = 'v0.11';
+
+const my $api_uri => '//api.worldoftanks.ru/';
+
+sub _api_uri {
+    my ($self) = @_;
+
+    return $api_uri;
+}
 
 =head1 SYNOPSIS
 
@@ -43,9 +52,7 @@ Information on authorization status is sent to URL specified in redirect_uri par
 =cut
 
 sub login {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/auth/login/', [ 'expires_at', 'redirect_uri', 'display', 'nofollow' ], undef, @_ );
+    return shift->_request( 'get', 'wot/auth/login/', [ 'expires_at', 'redirect_uri', 'display', 'nofollow' ], undef, @_ );
 }
 
 =over 1
@@ -60,7 +67,9 @@ This method is used when the player is still using the application but the curre
 
 =item I<required fields:>
 
-    access_token - Access token for the private data of a user's account; can be received via the authorization method; valid within a stated time period
+    access_token - Access token for the private data of a user's account
+                   can be received via the authorization method
+                   valid within a stated time period
 
 =back
 
@@ -69,9 +78,7 @@ This method is used when the player is still using the application but the curre
 =cut
 
 sub prolongate {
-    my $self = shift;
-
-    return $self->_request( 'post', 'wot/auth/prolongate/', [ 'access_token', 'expires_at' ], ['access_token'], @_ );
+    return shift->_request( 'post', 'wot/auth/prolongate/', [ 'access_token', 'expires_at' ], ['access_token'], @_ );
 }
 
 =over 1
@@ -95,9 +102,7 @@ After this method is called, access_token becomes invalid.
 =cut
 
 sub logout {
-    my $self = shift;
-
-    return $self->_request( 'post', 'wot/auth/logout/', ['access_token'], ['access_token'], @_ );
+    return shift->_request( 'post', 'wot/auth/logout/', ['access_token'], ['access_token'], @_ );
 }
 
 =head1 BUGS

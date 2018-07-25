@@ -48,11 +48,6 @@ type CauseUserIdCause {
   userName: String
 }
 
-type ClassesByClass {
-  _class: String
-  classes: [String]
-}
-
 type ClockDifference {
   _class: String
   diff: Int
@@ -82,34 +77,6 @@ type DiskSpaceMonitorDescriptorDiskSpace {
 type EmptyChangeLogSet {
   _class: String
   kind: String
-}
-
-type ExtensionClassContainerImpl1 {
-  _class: String
-  _links: ExtensionClassContainerImpl1links
-  map: ExtensionClassContainerImpl1map
-}
-
-type ExtensionClassContainerImpl1links {
-  _class: String
-  self: Link
-}
-
-type ExtensionClassContainerImpl1map {
-  _class: String
-  io_jenkins_blueocean_service_embedded_rest_MultiBranchPipelineImpl: ExtensionClassImpl
-  io_jenkins_blueocean_service_embedded_rest_PipelineImpl: ExtensionClassImpl
-}
-
-type ExtensionClassImpl {
-  _class: String
-  _links: ExtensionClassImpllinks
-  classes: [String]
-}
-
-type ExtensionClassImpllinks {
-  _class: String
-  self: Link
 }
 
 type FavoriteImpl {
@@ -186,31 +153,6 @@ type FreeStyleProjecthealthReport {
   score: Int
 }
 
-type GenericResource {
-  _class: String
-  displayName: String
-  durationInMillis: Int
-  id: String
-  result: String
-  startTime: String
-}
-
-type GithubContent {
-  _class: String
-  base64Data: String
-  name: String
-  owner: String
-  path: String
-  repo: String
-  sha: String
-  size: Int
-}
-
-type GithubFile {
-  _class: String
-  content: GithubContent
-}
-
 type GithubOrganization {
   _class: String
   _links: GithubOrganizationlinks
@@ -221,54 +163,6 @@ type GithubOrganization {
 type GithubOrganizationlinks {
   _class: String
   repositories: Link
-  self: Link
-}
-
-type GithubRepositories {
-  _class: String
-  _links: GithubRepositorieslinks
-  items: [GithubRepository]
-  lastPage: Int
-  nextPage: Int
-  pageSize: Int
-}
-
-type GithubRepositorieslinks {
-  _class: String
-  self: Link
-}
-
-type GithubRepository {
-  _class: String
-  _links: GithubRepositorylinks
-  defaultBranch: String
-  description: String
-  fullName: String
-  name: String
-  permissions: GithubRepositorypermissions
-  private: Boolean
-}
-
-type GithubRepositorylinks {
-  _class: String
-  self: Link
-}
-
-type GithubRepositorypermissions {
-  _class: String
-  admin: Boolean
-  pull: Boolean
-  push: Boolean
-}
-
-type GithubRespositoryContainer {
-  _class: String
-  _links: GithubRespositoryContainerlinks
-  repositories: GithubRepositories
-}
-
-type GithubRespositoryContainerlinks {
-  _class: String
   self: Link
 }
 
@@ -468,49 +362,6 @@ type PipelineActivityartifacts {
   name: String
   size: Int
   url: String
-}
-
-type PipelineBranchesitem {
-  _class: String
-  displayName: String
-  estimatedDurationInMillis: Int
-  latestRun: PipelineBranchesitemlatestRun
-  name: String
-  organization: String
-  pullRequest: PipelineBranchesitempullRequest
-  totalNumberOfPullRequests: Int
-  weatherScore: Int
-}
-
-type PipelineBranchesitemlatestRun {
-  _class: String
-  commitId: String
-  durationInMillis: Int
-  enQueueTime: String
-  endTime: String
-  estimatedDurationInMillis: Int
-  id: String
-  organization: String
-  pipeline: String
-  result: String
-  runSummary: String
-  startTime: String
-  state: String
-  type: String
-}
-
-type PipelineBranchesitempullRequest {
-  _class: String
-  _links: PipelineBranchesitempullRequestlinks
-  author: String
-  id: String
-  title: String
-  url: String
-}
-
-type PipelineBranchesitempullRequestlinks {
-  _class: String
-  self: String
 }
 
 type PipelineFolderImpl {
@@ -773,22 +624,6 @@ type QueueItemImpl {
   queuedTime: Int
 }
 
-type QueueLeftItem {
-  _class: String
-  actions: [CauseAction]
-  blocked: Boolean
-  buildable: Boolean
-  cancelled: Boolean
-  executable: FreeStyleBuild
-  id: Int
-  inQueueSince: Int
-  params: String
-  stuck: Boolean
-  task: FreeStyleProject
-  url: String
-  why: String
-}
-
 type ResponseTimeMonitorData {
   _class: String
   average: Int
@@ -827,10 +662,6 @@ type User {
   fullName: String
   id: String
   name: String
-}
-
-type putPipelineFavorite_body {
-  favorite: Boolean!
 }
 
 input putPipelineFavorite_bodyInput {

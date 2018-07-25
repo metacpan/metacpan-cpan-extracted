@@ -59,7 +59,7 @@
    "provides" : {
       "Sport::Analytics::NHL" : {
          "file" : "lib/Sport/Analytics/NHL.pm",
-         "version" : "1.11"
+         "version" : "1.20"
       },
       "Sport::Analytics::NHL::Config" : {
          "file" : "lib/Sport/Analytics/NHL/Config.pm"
@@ -72,6 +72,9 @@
       },
       "Sport::Analytics::NHL::LocalConfig" : {
          "file" : "lib/Sport/Analytics/NHL/LocalConfig.pm"
+      },
+      "Sport::Analytics::NHL::Merger" : {
+         "file" : "lib/Sport/Analytics/NHL/Merger.pm"
       },
       "Sport::Analytics::NHL::Report" : {
          "file" : "lib/Sport/Analytics/NHL/Report.pm"
@@ -111,6 +114,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.11",
+   "version" : "1.20",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

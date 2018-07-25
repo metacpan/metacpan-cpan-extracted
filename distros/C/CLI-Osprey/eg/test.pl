@@ -1,9 +1,15 @@
 package Foo;
 use Moo;
 use CLI::Osprey
-  doc => "The Moo Foo";
+  doc => "The Moo Foo",
+  added_order => 1;
 
 option opt => (
+  is => 'ro',
+  format => 's',
+);
+
+option abc => (
   is => 'ro',
   format => 's',
 );

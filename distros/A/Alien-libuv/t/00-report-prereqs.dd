@@ -1,11 +1,8 @@
 do { my $x = {
        'build' => {
                     'requires' => {
-                                    'Alien::Base' => '0',
-                                    'Alien::Build' => '0.32',
+                                    'Alien::Build' => '1.00',
                                     'Alien::Build::MM' => '0.32',
-                                    'Alien::Build::Plugin::Build::Autoconf' => '0',
-                                    'Alien::Build::Plugin::Gather::IsolateDynamic' => '0',
                                     'Config' => '0',
                                     'ExtUtils::MakeMaker' => '6.52',
                                     'IPC::Cmd' => '0'
@@ -21,6 +18,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Dist::Zilla' => '0',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
@@ -38,7 +36,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Alien::Base' => '0',
+                                      'Alien::Base' => '1.00',
                                       'base' => '0',
                                       'perl' => '5.008001',
                                       'strict' => '0',

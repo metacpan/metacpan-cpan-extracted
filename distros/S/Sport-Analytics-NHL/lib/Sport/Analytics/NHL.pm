@@ -16,6 +16,7 @@ use Sport::Analytics::NHL::Config;
 use Sport::Analytics::NHL::Errors;
 
 use if ! $ENV{HOCKEYDB_NODB} && $MONGO_DB, 'Sport::Analytics::NHL::DB';
+use Sport::Analytics::NHL::Merger;
 use Sport::Analytics::NHL::Report;
 use Sport::Analytics::NHL::Scraper;
 use Sport::Analytics::NHL::Test;
@@ -30,7 +31,7 @@ Sport::Analytics::NHL - Crawl data from NHL.com and put it into a database
 
 =head1 VERSION
 
-Version 1.11
+Version 1.20
 
 =cut
 
@@ -38,7 +39,7 @@ our @EXPORT = qw(
 	hdb_version
 );
 
-our $VERSION = "1.11";
+our $VERSION = "1.20";
 
 =head1 SYNOPSIS
 
@@ -147,8 +148,41 @@ Arguments:
    - test: Test the resulted parsed report
    - doc: limit compilation to these Report types
    - data_dir: the root directory of the reports
+ * The list of game ids
 
 Returns: the location of the compiled storables
+
+=item C<retrieve_compiled_report>
+
+Retrieves the compiled storable file for the given game ID and file type.
+Compiles the file anew unless explicitly prohibited from doing so.
+
+Arguments:
+ * The options hashref -
+   - no_compile: don't compile files if required
+   - recompile: force recompilation
+ * game ID
+ * doc type (e.g. BS, PL, RO, ...)
+ * path to the storable file.
+The file is expected at location $path/$doc.storable
+
+Returns: the file structure retrieved from storable, or undef.
+
+=item C<merge>
+
+Merges reports compiled in the filesystem into one boxscore hashref and stores it in a Storable file.
+
+Arguments:
+ * The options hashref -
+   - force: Force overwrite of already existing file
+   - test: Test the resulted parsed report
+   - doc: limit compilation to these Report types
+   - data_dir: the root directory of the reports
+   - no_compile: don't compile files if required
+   - recompile: force recompilation
+ * The list of game ids
+
+Returns: the location of the merged storable
 
 =back
 
@@ -355,6 +389,7 @@ sub compile_file ($$$$) {
 	}
 	store $report, $storable;
 	debug "Wrote $storable";
+
 	$storable;
 
 }
@@ -367,7 +402,7 @@ sub compile ($$@) {
 
 	my @storables = ();
 	for my $game_id (@game_ids) {
-		if (defined $DEFAULTED_GAMES{$game_id})	{
+		if (defined $DEFAULTED_GAMES{$game_id}) {
 			print STDERR "Skipping defaulted game $game_id\n";
 			next;
 		}
@@ -379,6 +414,76 @@ sub compile ($$@) {
 			my $storable = compile_file($opts, $game_file, $game_id, $type);
 			push(@storables, $storable) if $storable;
 		}
+	}
+	return @storables;
+}
+
+sub retrieve_compiled_report ($$$$) {
+
+	my $opts    = shift;
+	my $game_id = shift;
+	my $doc     = shift;
+	my $path    = shift;
+
+@Sport::Analytics::NHL::Report::RO::ISA = qw(Sport::Analytics::NHL::Report);
+@Sport::Analytics::NHL::Report::PL::ISA = qw(Sport::Analytics::NHL::Report);
+@Sport::Analytics::NHL::Report::GS::ISA = qw(Sport::Analytics::NHL::Report);
+@Sport::Analytics::NHL::Report::ES::ISA = qw(Sport::Analytics::NHL::Report);
+	my $doc_storable = "$path/$doc.storable";
+	my $doc_source   = "$path/$doc." . ($doc eq 'BS' ? 'json' : 'html');
+	#$Storable::DEBUGME = 1;
+	debug "Looking for file $doc_storable or $doc_source";
+	return retrieve $doc_storable if -f $doc_storable && ! $opts->{recompile};
+	if ($opts->{no_compile}) {
+		print STDERR "No storable file and no-compile option specified, skipping\n";
+		return undef;
+	}
+	if (! -f $doc_source) {
+		print STDERR "No storable and no source report available, skipping\n";
+		return undef;
+	}
+	debug "Compiling $doc_source";
+	$doc_storable = compile_file($opts, $doc_source, $game_id, $doc);
+	retrieve $doc_storable if $doc_storable;
+}
+
+sub merge ($$@) {
+
+	my $self = shift;
+	my $opts = shift;
+	my @game_ids = @_;
+
+	my @storables = ();
+
+	for my $game_id (@game_ids) {
+		if (defined $DEFAULTED_GAMES{$game_id})	{
+			print STDERR "Skipping defaulted game $game_id\n";
+			next;
+		}
+		my $path = get_game_path_from_id($game_id);
+		my $merged = "$path/$MERGED_FILE";
+		if (! $opts->{force} && -f "$merged") {
+			print STDERR "Merged file $merged already exists, skipping\n";
+			next;
+		}
+		$opts->{doc} ||= [];
+		$opts->{doc}   = [qw(PL RO GS ES)];
+		my $boxscore = retrieve_compiled_report($opts, $game_id, 'BS', $path);
+		next unless $boxscore;
+		$boxscore->build_resolve_cache();
+		$boxscore->set_event_extra_data();
+		for my $doc (@{$opts->{doc}}) {
+			my $report = retrieve_compiled_report($opts, $game_id, $doc, $path);
+			merge_report($boxscore, $report) if $report;
+		}
+		if ($opts->{test}) {
+			test_merged_boxscore($boxscore);
+			verbose "Ran $TEST_COUNTER->{Curr_Test} tests";
+			$TEST_COUNTER->{Curr_Test} = 0;
+		}
+		debug "Storing $merged";
+		store($boxscore, $merged);
+		push(@storables, $merged)
 	}
 	return @storables;
 }

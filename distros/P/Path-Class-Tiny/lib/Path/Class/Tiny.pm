@@ -4,10 +4,10 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 use Exporter;
-our @EXPORT = qw< path file >;
+our @EXPORT = qw< cwd path file >;
 
 sub import
 {
@@ -29,6 +29,12 @@ our @ISA = qw< Path::Tiny >;
 sub path
 {
 	bless Path::Tiny::path(@_), __PACKAGE__;
+}
+
+sub cwd
+{
+	require Cwd;
+	path(Cwd::getcwd());
 }
 
 *file = \&path;
@@ -55,8 +61,10 @@ sub child { path(shift->[0], @_) }
 
 
 # essentially just reblessings
-sub parent		{ path( &Path::Tiny::parent   ) }
-sub realpath	{ path( &Path::Tiny::realpath ) }
+sub parent		{ path( &Path::Tiny::parent   )          }
+sub realpath	{ path( &Path::Tiny::realpath )          }
+sub copy_to		{ path( &Path::Tiny::copy     )          }
+sub children	{ map { path($_) } &Path::Tiny::children }
 
 # simple correspondences
 *dir		=	\&parent;
@@ -66,6 +74,30 @@ sub realpath	{ path( &Path::Tiny::realpath ) }
 # more complex corresondences
 sub cleanup		{ path(shift->canonpath) }
 sub open		{ my $io_class = -d $_[0] ? 'IO::Dir' : 'IO::File'; require_module $io_class; $io_class->new(@_) }
+
+
+# wrappers
+sub touch
+{
+	my ($self, $dt) = @_;
+	$dt = $dt->epoch if defined $dt and $dt->can('epoch');
+	$self->SUPER::touch($dt);
+}
+
+sub move_to
+{
+	my ($self, $dest) = @_;
+	$self->move($dest);
+	# if we get this far, the move must have succeeded
+	# this is basically the way Path::Class::File does it:
+	my $new = path($dest);
+	my $max_idx = $#$self > $#$new ? $#$self : $#$new;
+	# yes, this is a mutator, which could be considered bad
+	# OTOH, the file is actually mutating on the disk,
+	# so you can also consider it good that the object mutates to keep up
+	$self->[$_] = $new->[$_] foreach 0..$max_idx;
+	return $self;
+}
 
 
 # reimplementations
@@ -156,6 +188,13 @@ sub ef
 }
 
 
+sub mtime
+{
+	require Date::Easy::Datetime or croak("can't locate Date::Easy");
+	return Date::Easy::Datetime->new(shift->stat->mtime);
+}
+
+
 1;
 
 
@@ -172,7 +211,7 @@ Path::Class::Tiny - a Path::Tiny wrapper for Path::Class compatibility
 
 =head1 VERSION
 
-This document describes version 0.03 of Path::Class::Tiny.
+This document describes version 0.04 of Path::Class::Tiny.
 
 =head1 SYNOPSIS
 
@@ -312,6 +351,114 @@ Just an alias to L<Path::Tiny/remove_tree>.
 
 Just an alias to L<Path::Tiny/child>.
 
+=head2 touch
+
+Basically just calls L<Path::Tiny/touch>, which is better than L<Path::Class::File/touch> in a
+couple of ways:
+
+=over
+
+=item *
+
+It returns the path object, which is useful for chaining.
+
+=item *
+
+It takes an argument, so you can set the time to something other than "now."
+
+=back
+
+However, C<Path::Class::Tiny::touch> is even better than that!  It adds another cool feature:
+
+=over
+
+=item *
+
+If the argument is an object, and that object has an C<epoch> method, it will call it and pass the
+result on to C<Path::Tiny::touch>.
+
+=back
+
+The practical result is that your argument to C<touch> can be an integer (number of epoch seconds),
+or any of the most popular datetime objects: L<DateTime>, L<Time::Piece>, L<Time::Moment>,
+L<Date::Easy>, and possibly others as well.
+
+B<Potential Incompatibility:> The only way these additional features could be incompatible with
+existing C<Path::Class> code is if it were relying on the return value from C<touch>, which in
+C<Path::Class> is either the return from C<open> or the return from C<utime> (so theoretically it's
+true if the C<touch> was successful and false otherwise).  C<Path::Tiny> (and thus
+C<Path::Class::Tiny>) will instead throw an exception if the C<touch> was unsuccessful and return
+the chained object.
+
+=head2 copy_to
+
+Just an alias to L<Path::Tiny/copy>.
+
+=head2 move_to
+
+There are two big differences between L<Path::Tiny/move> and L<Path::Class::File/move_to>:
+
+=over
+
+=item *
+
+On failure, C<Path::Class::File::move_to> returns undef, while C<Path::Tiny::move> throws an
+exception.
+
+=item *
+
+On success, C<Path::Tiny::move> just returns true.  C<Path::Class::File::move_to>, on the other
+hand, returns the path object for chaining, B<which has been modified to have the new name>.
+
+=back
+
+C<Path::Class::Tiny> splits the difference by throwing an exception on error, and returning the
+modified C<$self> on success.  B<That means this method is a mutator!>  Consequently, use of this
+method means your objects are not immutable.  No doubt many people will object to this behavior.
+However, after some internal debate, it was decided to retain this aspect of L<Path::Class>'s
+interface for the following reasons:
+
+=over
+
+=item *
+
+It keeps from breaking existing C<Path::Class> code that you're trying to convert over to
+C<Path::Class::Tiny>.  While we do implement I<some> breaking changes, most of them feel a lot
+less likely to be encountered in real code than this one.
+
+=item *
+
+The real-world thing that the object represents--that is, the file on disk--is itself being mutated.
+If the object is not changed to reflect the new reality, then any stray copies of it lying around
+now reference a file that doesn't exist.  So it seems just about as likely to I<fix> a problem as to
+cause one.
+
+=item *
+
+If you don't like the mutability, just call L</move> instead.
+
+=back
+
+=head1 PATH::TINY STYLE METHODS
+
+Since a C<Path::Class::Tiny> object C<isa> L<Path::Tiny> object, the vast majority of C<Path::Tiny>
+methods just work the same way they always have.  Notable methods (with exceptions or just
+clarifications) are listed below.
+
+=head2 move
+
+Unchanged from L<Path::Tiny>, which means it's I<quite> different from L</move_to>.  In particular,
+C<move> does B<not> mutate the object, which means that code like this:
+
+    my $file = path($whatever);
+    $file->move($new_name);
+    say $file->basename;
+
+does B<not> give you the basename of the file-as-it-is, but rather the basename of the
+file-as-it-was, which could be considered less useful.  But at least it doesn't mutate the object,
+so it's got that going for it.  If you actually I<want> the object to be mutated, try L</move_to>
+instead.
+
 =head1 NEW METHODS
 
 =head2 ef
@@ -335,6 +482,39 @@ work, really.  Do note that both files must actually exist in the filesystem tho
 for both to be exactly the same object:
 
     if ( $file1->ef($file1) )   # always true
+
+=head2 mtime
+
+This is mostly just a shortcut for going through C<stat>, but it has the added benefit of producing
+a L<Date::Easy::Datetime> object.  Thus:
+
+    my $file = path($whatever);
+    $file->mtime == $file->stat->mtime        # true, but maybe not for the reason you thought
+    $file->mtime->epoch == $file->stat->mtime # true, and more reflective of reality
+    $file->mtime->isa('Date::Easy::Datetime') # true, which can be handy:
+
+    say $file->mtime->as('-Ymd')    # day portion of mtime, in YYYY-mm-dd format
+    say "file is from the future!"  # this one will work, but only if you have
+        if $file->mtime > now;      # previously done `use Date::Easy` (to get `now`)
+
+Note that C<Date::Easy::Datetime> is loaded on demand, so:
+
+=over
+
+=item *
+
+It is not necessary for you to load it ahead of time.
+
+=item *
+
+However, as the example above mentions, you don't get all the exports you would if you C<use
+Date::Easy>, so you may wish to do that anyway.
+
+=item *
+
+If L<Date::Easy> is not installed, you get a runtime error when you call C<mtime>.
+
+=back
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

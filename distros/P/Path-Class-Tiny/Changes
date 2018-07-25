@@ -1,5 +1,17 @@
 Revision history for Path-Class-Tiny
 
+0.04      2018-07-23 03:34:07-07:00 America/Los_Angeles
+
+    [Bug Fixes]
+    * `children` is returning the proper class now
+
+    [New Features]
+    * `cwd` is an export now
+    * `copy_to` and `move_to` work now
+    * limited integration with Date::Easy:
+      * can send `touch` a datetime object
+      * new method: `mtime` (returns a datetime object)
+
 0.03      2018-05-31 14:57:25-07:00 America/Los_Angeles
 
     [Bug Fixes]

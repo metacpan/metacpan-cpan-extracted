@@ -1,5 +1,8 @@
 Revision history for Perl module Woothee
 
+1.8.0 2018-07-23T06:22:12Z
+   - add support for YandexBrowser
+
 1.7.0 2017-08-21T04:03:03Z
    - add support for trendictionbot
    - add support for Yeti bot

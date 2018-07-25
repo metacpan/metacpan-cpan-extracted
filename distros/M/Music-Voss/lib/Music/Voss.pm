@@ -12,109 +12,147 @@ use warnings;
 use Carp qw(croak);
 use Exporter 'import';
 use List::Util ();
+use Math::Trig qw(pi);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
-our @EXPORT_OK = qw(bitchange powers powers_stateless);
+our @EXPORT_OK = qw(bitchange powers powers_stateless weierstrass);
 
 # This method derived from the "White and brown music, fractal curves
 # and one-over-f fluctuations" article. Should also be possible with
 # physical dice and a binary chart to show how the bits change between
 # tries and thus which dice need be re-rolled for a particular try.
 sub bitchange {
-  my (%params) = @_;
-  if ( !exists $params{rollers} ) {
-    $params{rollers} = 3;
-  } elsif ( !defined $params{rollers} or !looks_like_number $params{rollers} ) {
-    croak "rollers must be a number";
-  } else {
-    $params{rollers} = int $params{rollers};
-  }
-  if ( !exists $params{roll} ) {
-    $params{roll} = sub { int rand 6 };
-  } elsif ( !defined $params{roll} or ref $params{roll} ne 'CODE' ) {
-    croak "roll must be code reference";
-  }
-  if ( !exists $params{summer} ) {
-    $params{summer} = \&List::Util::sum0;
-  } elsif ( !defined $params{summer} or ref $params{summer} ne 'CODE' ) {
-    croak "summer must be code reference";
-  }
-  my @nums = map { $params{roll}->( undef, $_ ) } 0 .. $params{rollers} - 1;
-  my $prev;
-  return sub {
-    my ($n) = @_;
-    croak "input must be number" if !defined $n or !looks_like_number $n;
-    if ( defined $prev ) {
-      for my $rnum ( 0 .. $params{rollers} - 1 ) {
-        if ( ( $n >> $rnum & 1 ) != ( $prev >> $rnum & 1 ) ) {
-          $nums[$rnum] = $params{roll}->( $n, $rnum );
-        }
-      }
+    my (%params) = @_;
+    if ( !exists $params{rollers} ) {
+        $params{rollers} = 3;
+    } elsif ( !defined $params{rollers} or !looks_like_number $params{rollers} ) {
+        croak "rollers must be a number";
+    } else {
+        $params{rollers} = int $params{rollers};
     }
-    $prev = $n;
-    return $params{summer}->(@nums);
-  };
+    if ( !exists $params{roll} ) {
+        $params{roll} = sub { int rand 6 };
+    } elsif ( !defined $params{roll} or ref $params{roll} ne 'CODE' ) {
+        croak "roll must be code reference";
+    }
+    if ( !exists $params{summer} ) {
+        $params{summer} = \&List::Util::sum0;
+    } elsif ( !defined $params{summer} or ref $params{summer} ne 'CODE' ) {
+        croak "summer must be code reference";
+    }
+    my @nums = map { $params{roll}->( undef, $_ ) } 0 .. $params{rollers} - 1;
+    my $prev;
+    return sub {
+        my ($n) = @_;
+        croak "input must be number" if !defined $n or !looks_like_number $n;
+        if ( defined $prev ) {
+            for my $rnum ( 0 .. $params{rollers} - 1 ) {
+                if ( ( $n >> $rnum & 1 ) != ( $prev >> $rnum & 1 ) ) {
+                    $nums[$rnum] = $params{roll}->( $n, $rnum );
+                }
+            }
+        }
+        $prev = $n;
+        return $params{summer}->(@nums);
+    };
 }
 
 # "Musimathics, Vol 1" p.358 based function generator based on powers of
 # (by default) 2, the supplied number, and a list of subroutines to
 # (perhaps) run. (Was called "voss", orginally.)
 sub powers {
-  my (%params) = @_;
-  croak "must be given list of calls"
-    if !$params{calls}
-    or ref $params{calls} ne 'ARRAY';
-  if ( !exists $params{summer} ) {
-    $params{summer} = \&List::Util::sum0;
-  } elsif ( !defined $params{summer} or ref $params{summer} ne 'CODE' ) {
-    croak "summer must be code reference";
-  }
-  if ( !exists $params{e} ) {
-    $params{e} = 2;
-  } elsif ( !defined $params{e} or !looks_like_number $params{e} ) {
-    croak "e must be a number";
-  }
-  my @nums = (0) x @{ $params{calls} };
-  return sub {
-    my ($n) = @_;
-    croak "input must be number" if !defined $n or !looks_like_number $n;
-    for my $k ( 0 .. $#{ $params{calls} } ) {
-      if ( $n % $params{e}**$k == 0 ) {
-        $nums[$k] = $params{calls}->[$k]->( $n, $k );
-      }
+    my (%params) = @_;
+    croak "must be given list of calls"
+      if !$params{calls}
+      or ref $params{calls} ne 'ARRAY';
+    if ( !exists $params{summer} ) {
+        $params{summer} = \&List::Util::sum0;
+    } elsif ( !defined $params{summer} or ref $params{summer} ne 'CODE' ) {
+        croak "summer must be code reference";
     }
-    return $params{summer}->(@nums);
-  };
+    if ( !exists $params{e} ) {
+        $params{e} = 2;
+    } elsif ( !defined $params{e} or !looks_like_number $params{e} ) {
+        croak "e must be a number";
+    }
+    my @nums = (0) x @{ $params{calls} };
+    return sub {
+        my ($n) = @_;
+        croak "input must be number" if !defined $n or !looks_like_number $n;
+        for my $k ( 0 .. $#{ $params{calls} } ) {
+            if ( $n % $params{e}**$k == 0 ) {
+                $nums[$k] = $params{calls}->[$k]->( $n, $k );
+            }
+        }
+        return $params{summer}->(@nums);
+    };
 }
 
 sub powers_stateless {
-  my (%params) = @_;
-  croak "must be given list of calls"
-    if !$params{calls}
-    or ref $params{calls} ne 'ARRAY';
-  if ( !exists $params{summer} ) {
-    $params{summer} = \&List::Util::sum0;
-  } elsif ( !defined $params{summer} or ref $params{summer} ne 'CODE' ) {
-    croak "summer must be code reference";
-  }
-  if ( !exists $params{e} ) {
-    $params{e} = 2;
-  } elsif ( !defined $params{e} or !looks_like_number $params{e} ) {
-    croak "e must be a number";
-  }
-  return sub {
-    my ($n) = @_;
-    croak "input must be number" if !defined $n or !looks_like_number $n;
-    my @nums;
-    for my $k ( 0 .. $#{ $params{calls} } ) {
-      if ( $n % $params{e}**$k == 0 ) {
-        push @nums, $params{calls}->[$k]->( $n, $k );
-      }
+    my (%params) = @_;
+    croak "must be given list of calls"
+      if !$params{calls}
+      or ref $params{calls} ne 'ARRAY';
+    if ( !exists $params{summer} ) {
+        $params{summer} = \&List::Util::sum0;
+    } elsif ( !defined $params{summer} or ref $params{summer} ne 'CODE' ) {
+        croak "summer must be code reference";
     }
-    return $params{summer}->(@nums);
-  };
+    if ( !exists $params{e} ) {
+        $params{e} = 2;
+    } elsif ( !defined $params{e} or !looks_like_number $params{e} ) {
+        croak "e must be a number";
+    }
+    return sub {
+        my ($n) = @_;
+        croak "input must be number" if !defined $n or !looks_like_number $n;
+        my @nums;
+        for my $k ( 0 .. $#{ $params{calls} } ) {
+            if ( $n % $params{e}**$k == 0 ) {
+                push @nums, $params{calls}->[$k]->( $n, $k );
+            }
+        }
+        return $params{summer}->(@nums);
+    };
+}
+
+# also from "Musimathics, Vol 1" around the same place as the above
+sub weierstrass {
+    my (%params) = @_;
+    if ( !defined $params{r} or !looks_like_number $params{r} ) {
+        croak "r must be a number (0 < r <= 1)";
+    }
+    if ( !defined $params{H} or !looks_like_number $params{H} ) {
+        croak "H must be a number (0 < H <= 1)";
+    }
+    if ( !defined $params{N} or !looks_like_number $params{N} ) {
+        croak "N must be a number";
+    }
+    if ( !exists $params{phase} ) {
+        $params{phase} = sub { 0 };
+    } elsif ( !defined $params{phase} or ref $params{phase} ne 'CODE' ) {
+        croak "phase must be code reference";
+    }
+    if ( !exists $params{summer} ) {
+        $params{summer} = \&List::Util::sum0;
+    } elsif ( !defined $params{summer} or ref $params{summer} ne 'CODE' ) {
+        croak "summer must be code reference";
+    }
+    return sub {
+        my ( $t, $x ) = @_;
+        croak "input must be number" if !defined $t or !looks_like_number $t;
+        $x //= 0;
+        my @nums;
+        for my $k ( 0 .. $params{N} ) {
+            push @nums,
+              $params{r}**( $k * $params{H} ) *
+              sin(
+                $t * pi * $params{r}**( -$k ) + $params{phase}->( $t, $x, $k, %params ) );
+        }
+        return $params{summer}->(@nums);
+    };
 }
 
 1;
@@ -129,7 +167,7 @@ Music::Voss - functions for fractal noise generation functions
   use List::Util qw(max sum0);
   use Music::Voss qw(bitchange powers);
 
-  # roll up to 3 dice as the bits change between x values
+  # roll up to 3 dice as the bits change between the $x values
   my $bc = bitchange(
     roll    => sub { 1 + int rand 6 },
     rollers => 3,
@@ -163,9 +201,9 @@ distribution for more example code.
 
 =head1 DESCRIPTION
 
-This module contains functions that generate functions that may then be
-called in turn with a sequence of numbers to generate numbers. Given how
-hopelessly vague this may sound, let us move on to the
+This module contains functions that generate functions that can be
+called with numbers to generate other numbers. Given how hopelessly
+vague this may sound, let us move on to the
 
 =head1 FUNCTIONS
 
@@ -198,7 +236,8 @@ concerned with the number passed to the generated function:
 The generated function ideally should be fed sequences of integers that
 increment by one, though other sequences will produce other bit change
 patterns. Too large a number of C<rollers> may run into problems,
-possibly around 32 or 64, depending on how perl is compiled.
+possibly around 32 or 64, depending on how perl is compiled and thus how
+many bits are available in a given integer.
 
 =item B<powers>
 
@@ -258,6 +297,40 @@ are only called on every 2nd, 4th, etc. input value (assuming as ever
 that the input values are a list of integers that being on an even value
 and increment by one for each successive call).
 
+=item B<weierstrass>
+
+This function returns a function that calculates Fourier like numbers
+only with exponents instead of linear harmonics. The required parameters
+are C<r>, C<H>, and C<N>
+
+  r should be 0 < r <= 1
+  H should be 0 < H <= 1
+  N should be a positive integer number of harmonics
+
+Example use
+
+  my $w = weierstrass( r => 0.5, H => 1.0, N => 32 );
+  for my $t (0 .. 100) { ... = $w->( $t / 10 ); ... }
+
+Unlike the previous functions the function returned by B<weierstrass> is
+typically fed floating point values instead of integers.
+
+Optionally a phase function can be supplied that accepts both the
+current value C<$t>, a custom value C<$x> that sets the strength of the
+effect, and C<$k> the current harmonic number of C<N>. The original
+parameters are also available.
+
+  use Math::Trig qw(pi);
+  my $w = weierstrass(
+      r => 0.5, H => 1.0, N => 32,
+      phase => sub {
+          my ( $t, $x, $k, %params ) = @_;
+          return $x * pi * rand() * $params{r}**( $k * $params{H} );
+      }
+  );
+  my $x = ...;
+  for my $t (...) { ... = $w->( $t, $x ); ... }
+
 =back
 
 =head1 BUGS
@@ -277,16 +350,19 @@ L<https://github.com/thrig/Music-Voss>
 The functions returned by some functions of this module probably should
 not be used in a threaded environment, on account of unknown results
 should multiple threads call the same function around the same time.
-This may actually be a feature for experimental musical composition.
+This could be a feature for experimental musical composition.
 
 May need multiple return values from the function returning functions,
 with the remaining functions being means to reset or otherwise interact
-with any state maintained by the function.
+with any state maintained by the function. (In the meantime make a new
+object to reset things to a known state.)
 
 The lack of testing. (Bad input values, whether anything sketchy is
 going on with the closures, etc.)
 
-Probably should add a weierstrass method, but that's more work.
+Probably should make a distinction between the initial element function
+and those called for different input numbers, as one may want particular
+starting values, or a different seed function called.
 
 =head1 SEE ALSO
 
@@ -296,6 +372,9 @@ functions of this module) into MIDI events, frequencies, or a form
 suitable to pass to lilypond. L<Music::Canon> (or the C<canonical>
 program by way of L<App::MusicTools>) may also be of interest, as well
 as L<Music::AtonalUtil> for various music related functions.
+
+L<Music::RecRhythm> is a similar if different means to change rhythms
+over time. L<Music::VoiceGen> is a more markov approach.
 
 =head1 REFERENCES
 
@@ -317,9 +396,9 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Jeremy Mates
+Copyright (C) 2016,2018 by Jeremy Mates
 
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/BSD-3-Clause>
 
 =cut

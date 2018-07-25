@@ -1,22 +1,30 @@
 package WG::API::WoT;
 
+use Const::Fast;
+
 use Moo;
 
 with 'WG::API::Base';
 
 =head1 NAME
 
-WG::API::WoT - Modules to work with Wargaming.net Public API for World of Tanks
+WG::API::WoT - Module to work with Wargaming.net Public API for World of Tanks
 
 =head1 VERSION
 
-Version v0.10
+Version v0.11
 
 =cut
 
-our $VERSION = 'v0.10';
+our $VERSION = 'v0.11';
 
-use constant api_uri => '//api.worldoftanks.ru/';
+const my $api_uri => '//api.worldoftanks.ru/';
+
+sub _api_uri {
+    my ($self) = @_;
+
+    return $api_uri;
+}
 
 =head1 SYNOPSIS
 
@@ -65,9 +73,7 @@ Method returns partial list of players. The list is filtered by initial characte
 =cut
 
 sub account_list {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wot/account/list/', [ 'language', 'fields', 'type', 'search', 'limit' ], ['search'],
         @_
     );
@@ -88,9 +94,7 @@ Method returns player details.
 =cut
 
 sub account_info {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wot/account/info/', [ 'language', 'fields', 'access_token', 'extra', 'account_id' ],
         ['account_id'], @_
     );
@@ -111,9 +115,7 @@ Method returns details on player's vehicles.
 =cut
 
 sub account_tanks {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wot/account/tanks/', [ 'language', 'fields', 'access_token', 'account_id', 'tank_id' ],
         ['account_id'], @_
     );
@@ -140,9 +142,7 @@ Achievement properties define the achievements field values:
 =cut
 
 sub account_achievements {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/account/achievements/', [ 'language', 'fields', 'account_id' ], ['account_id'], @_ );
+    return shift->_request( 'get', 'wot/account/achievements/', [ 'language', 'fields', 'account_id' ], ['account_id'], @_ );
 }
 
 =item B<stronghold_claninfo( [ %params ] )>
@@ -160,9 +160,7 @@ Method returns general information and the battle statistics of clans in the Str
 =cut
 
 sub stronghold_claninfo {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/stronghold/claninfo/', [ 'clan_id', 'fields', 'language' ], ['clan_id'], @_ );
+    return shift->_request( 'get', 'wot/stronghold/claninfo/', [ 'clan_id', 'fields', 'language' ], ['clan_id'], @_ );
 }
 
 =item B<stronghold_clanreserves( [ %params ] )>
@@ -182,9 +180,7 @@ Method returns information about available Reserves and their current status.
 =cut
 
 sub stronghold_clanreserves {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/stronghold/clanreserves/', [ 'access_token', 'fields', 'language' ], ['access_token'], @_ );
+    return shift->_request( 'get', 'wot/stronghold/clanreserves/', [ 'access_token', 'fields', 'language' ], ['access_token'], @_ );
 }
 
 =head2 Encyclopedia
@@ -198,9 +194,7 @@ Method returns list of available vehicles.
 =cut
 
 sub encyclopedia_vehicles {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/vehicles/', [ 'fields', 'language', 'limit', 'nation', 'page_no', 'tank_id', 'tier', 'type' ], undef, @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/vehicles/', [ 'fields', 'language', 'limit', 'nation', 'page_no', 'tank_id', 'tier', 'type' ], undef, @_ );
 }
 
 =item B<encyclopedia_vehicleprofile( [ %params ] )>
@@ -216,9 +210,7 @@ sub encyclopedia_vehicles {
 =cut
 
 sub encyclopedia_vehicleprofile {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wot/encyclopedia/vehicleprofile/',
         [ 'tank_id', 'engine_id', 'fields', 'gun_id', 'language', 'profile_id', 'radio_id', 'suspension_id', 'turret_id' ],
         ['tank_id'],
@@ -233,9 +225,7 @@ Method returns information about achievements.
 =cut
 
 sub encyclopedia_achievements {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/achievements/', [ 'fields', 'language' ], undef, @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/achievements/', [ 'fields', 'language' ], undef, @_ );
 }
 
 =item B<encyclopedia_info( [ %params ] )>
@@ -245,9 +235,7 @@ Method returns information about Tankopedia.
 =cut
 
 sub encyclopedia_info {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/info/', [ 'fields', 'language' ], undef, @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/info/', [ 'fields', 'language' ], undef, @_ );
 }
 
 =item B<encyclopedia_arenas( [ %params ] )>
@@ -257,9 +245,7 @@ Method returns information about maps.
 =cut
 
 sub encyclopedia_arenas {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/arenas/', [ 'fields', 'language' ], undef, @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/arenas/', [ 'fields', 'language' ], undef, @_ );
 }
 
 =item B<encyclopedia_provisions( [ %params ] )>
@@ -269,9 +255,7 @@ Method returns a list of available equipment and consumables.
 =cut
 
 sub encyclopedia_provisions {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/provisions/', [ 'fields', 'language', 'limit', 'page_no', 'provision_id', 'type' ], undef, @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/provisions/', [ 'fields', 'language', 'limit', 'page_no', 'provision_id', 'type' ], undef, @_ );
 }
 
 =item B<encyclopedia_personalmissions( [ %params ] )>
@@ -281,9 +265,7 @@ Method returns details on Personal Missions on the basis of specified campaign I
 =cut
 
 sub encyclopedia_personalmissions {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/personalmissions/', [ 'compaign_id', 'fields', 'language', 'operation_id', 'set_id', 'tag' ], undef, @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/personalmissions/', [ 'compaign_id', 'fields', 'language', 'operation_id', 'set_id', 'tag' ], undef, @_ );
 }
 
 =item B<encyclopedia_boosters( [ %params ] )>
@@ -293,9 +275,7 @@ Method returns information about Personal Reserves.
 =cut
 
 sub encyclopedia_boosters {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/boosters/', [ 'fields', 'language' ], undef, @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/boosters/', [ 'fields', 'language' ], undef, @_ );
 }
 
 =item B<encyclopedia_vehicleprofiles( [ %params ] )>
@@ -313,19 +293,17 @@ Method returns vehicle configuration characteristics.
 =cut
 
 sub encyclopedia_vehicleprofiles {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/vehicleprofiles/', [ 'tank_id', 'fields', 'language', 'order_by' ], ['tank_id'], @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/vehicleprofiles/', [ 'tank_id', 'fields', 'language', 'order_by' ], ['tank_id'], @_ );
 }
 
 =item B<encyclopedia_modules( [ %params ] )>
 
+Method returns list of available modules that can be installed on vehicles, such as engines, turrets, etc. At least one input filter parameter (module ID, type) is required to be indicated.
+
 =cut
 
 sub encyclopedia_modules {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/modules/', [ 'extra', 'fields', 'language', 'limit', 'module_id', 'nation', 'page_no', 'type' ], undef, @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/modules/', [ 'extra', 'fields', 'language', 'limit', 'module_id', 'nation', 'page_no', 'type' ], undef, @_ );
 }
 
 =item B<encyclopedia_badges( [ %params ] )>
@@ -335,9 +313,7 @@ Method returns list of available badges a player can gain in Ranked Battles.
 =cut
 
 sub encyclopedia_badges {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/badges/', [ 'fields', 'language' ], undef, @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/badges/', [ 'fields', 'language' ], undef, @_ );
 }
 
 =item B<encyclopedia_crewroles( [ %params ] )>
@@ -347,9 +323,7 @@ Method returns full description of all crew qualifications.
 =cut
 
 sub encyclopedia_crewroles {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/crewroles/', [ 'fields', 'language', 'role' ], undef, @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/crewroles/', [ 'fields', 'language', 'role' ], undef, @_ );
 }
 
 =item B<encyclopedia_crewskills( [ %params ] )>
@@ -359,9 +333,7 @@ Method returns full description of all crew skills.
 =cut
 
 sub encyclopedia_crewskills {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/encyclopedia/crewskills/', [ 'fields', 'language', 'role', 'skill' ], undef, @_ );
+    return shift->_request( 'get', 'wot/encyclopedia/crewskills/', [ 'fields', 'language', 'role', 'skill' ], undef, @_ );
 }
 
 =back
@@ -377,9 +349,7 @@ Method returns details on ratings types and categories.
 =cut
 
 sub clanratings_types {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/clanratings/types/', [], [], @_ );
+    return shift->_request( 'get', 'wot/clanratings/types/', [], [], @_ );
 }
 
 =item B<calnratings_dates( [ %params ] )>
@@ -389,9 +359,7 @@ Method returns dates with available rating data.
 =cut
 
 sub clanratings_dates {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/clanratings/dates/', ['limit'], undef, @_ );
+    return shift->_request( 'get', 'wot/clanratings/dates/', ['limit'], undef, @_ );
 }
 
 =item B<clanratings_clans>
@@ -409,9 +377,7 @@ Method returns clan ratings by specified IDs.
 =cut
 
 sub clanratings_clans {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/clanratings/clans/', [ 'clan_id', 'date', 'fields', 'language' ], ['clan_id'], @_ );
+    return shift->_request( 'get', 'wot/clanratings/clans/', [ 'clan_id', 'date', 'fields', 'language' ], ['clan_id'], @_ );
 }
 
 =item B<clanratings_neighbors( [ %params ] )>
@@ -430,9 +396,7 @@ Method returns list of adjacent positions in specified clan rating
 =cut
 
 sub clanratings_neighbors {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/clanratings/neighbors/', [ 'clan_id', 'rank_field', 'date', 'fields', 'language', 'limit' ], [ 'clan_id', 'rank_field' ], @_ );
+    return shift->_request( 'get', 'wot/clanratings/neighbors/', [ 'clan_id', 'rank_field', 'date', 'fields', 'language', 'limit' ], [ 'clan_id', 'rank_field' ], @_ );
 }
 
 =item B<clanratings_top( [ %params ] )>
@@ -452,9 +416,7 @@ Method returns the list of top clans by specified parameters
 =cut
 
 sub clanratings_top {
-    my $self = shift;
-
-    return $self->_request( 'get', 'wot/clanratings/top/', [ 'rank_field', 'date', 'fields', 'language', 'limit', 'page_no' ], ['rank_field'], @_ );
+    return shift->_request( 'get', 'wot/clanratings/top/', [ 'rank_field', 'date', 'fields', 'language', 'limit', 'page_no' ], ['rank_field'], @_ );
 }
 
 =head2 Player's vehicles
@@ -474,9 +436,7 @@ Method returns overall statistics, Tank Company statistics, and clan statistics 
 =cut
 
 sub tanks_stats {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wot/tanks/stats/',
         [ 'language', 'fields', 'access_token', 'account_id', 'tank_id', 'in_garage', 'extra' ],
         ['account_id'], @_
@@ -506,9 +466,7 @@ Achievement properties define the achievements field values:
 =cut
 
 sub tanks_achievements {
-    my $self = shift;
-
-    return $self->_request(
+    return shift->_request(
         'get', 'wot/tanks/achievements/',
         [ 'language', 'fields', 'access_token', 'account_id', 'tank_id', 'in_garage' ],
         ['account_id'], @_

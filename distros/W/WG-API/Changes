@@ -1,5 +1,11 @@
 Revision history for WG-API
 
+v0.11 2018-07-24T09:32:04Z
+
+  - rename clan_list to clans;
+  - don't use redundant var;
+  - use Const::Fast instead pragma constant;
+
 v0.10 2018-07-12T13:32:34Z
 
   - add wows encyclopedy

@@ -33,6 +33,7 @@ require_ok 'File::Spec';
 require_ok 'Astro::SpaceTrack';
 cmp_ok mung_version( Astro::SpaceTrack->VERSION ), '>=', 0.085,
     'Need at least Astro::SpaceTrack 0.085';
+require_ok 'Astro::Coord::ECI::TLE::Iridium';
 require_ok 'Date::Manip';
 require_ok 'Test::CPAN::Changes';
 require_ok 'Test::MockTime';

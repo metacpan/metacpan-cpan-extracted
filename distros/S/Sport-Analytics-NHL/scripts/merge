@@ -1,0 +1,109 @@
+#!/usr/local/bin/perl
+
+use v5.10.1;
+use strict;
+use warnings FATAL => 'all';
+use experimental qw(smartmatch);
+
+use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL;
+use Sport::Analytics::NHL::Usage;
+
+my @accepts_opts = qw(
+	:compile data-dir force test doc
+);
+
+my @accepts_args = (
+	{
+		name        => 'GAME_IDS',
+		description => 'Our 9-digit game ids that are present in the file system',
+	}
+);
+
+my $what_it_does = 'Merge the compiled NHL reports into a Storable file (merged.storable).';
+my $opts = gopts($what_it_does, \@accepts_opts, \@accepts_args);
+my $hockeydb = Sport::Analytics::NHL->new($opts);
+$hockeydb->merge($opts, @ARGV);
+
+=head1 NAME
+
+merge - merge (recompile if necessary) the NHL reports into one.
+
+=head1 SYNOPSIS
+
+Merge the compiled NHL reports into a Storable file (merged.storable).
+
+ Usage: merge [Options] Arguments
+ Options:
+	-h|--help                       print this message and exit
+	-V|--version                    print version and exit
+	-v|--verbose                    produce verbose output to STDERR
+	-d|--debug                      produce debug output to STDERR
+	--no-compile                    Do not compile file even if storable is absent
+	--recompile                     Compile file even if storable is present
+	-E|--data-dir        DIR        Data directory root (default /misc/nhl)
+	-f|--force                      override/overwrite existing data
+	--test                          Test the validity of the files (use with caution)
+	--doc                DOC        Only process reports of type doc (repeatable). Available types are: BS, PL, RO, GS, ES
+ Arguments:
+	GAME_IDS             Our 9-digit game ids that are present in the file system
+
+=cut
+
+=head1 AUTHOR
+
+More Hockey Stats, C<< <contact at morehockeystats.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<contact at morehockeystats.com>, or through
+the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Sport::Analytics::NHL>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Sport::Analytics::NHL
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Sport::Analytics::NHL>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Sport::Analytics::NHL>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/d/Sport::Analytics::NHL>
+
+=item * Search CPAN
+
+L<https://metacpan.org/release/Sport::Analytics::NHL>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2018 More Hockey Stats.
+
+This program is released under the following license: gnu
+
+
+=cut
+
+1;
+

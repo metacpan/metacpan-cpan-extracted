@@ -1,6 +1,6 @@
 package Tcl;
 
-$Tcl::VERSION = '1.23';
+$Tcl::VERSION = '1.24';
 
 =head1 NAME
 
@@ -297,11 +297,11 @@ This means no automatic cleanup will occur on the sub{...} or $sub
 
 
 And after the destroy inside Tcl any triggering writable on $fileref will fail as well.
-so it shhould be replaced first via
+so it should be replaced first via
   $interp->call('FILEEVENT',$fileref,WRITABLE=>'');
 
 =item (CODEREF) = Tcl::_code_dispose(NAME)
-
+	
 Purges the internal table of a NAME
 and may initiate destruction of something created thru call or create_tcl_sub
 
@@ -315,7 +315,7 @@ only when the last usage is purged does the entry get purged from the command ta
 While the internal tracking structure saves the INTERP the code was added to,
 it itself does not keep things separated by INTERP,
 A TCLNAME or DESCRNAMe can only exist in one INTERP at a time,
-using a new INTERP just causes the one in the last INTERP to disapear,
+using a new INTERP just causes the one in the last INTERP to disappear,
 and probably end up with the Tcl code getting deleted
 
 Returns (CODEREF), this is the original coderef
@@ -381,7 +381,7 @@ The optional argument FLAGS behaves as in I<SetVar> above.
 
 In V1.03 command table cleanup was intoduced.
 This tries to keep the internal structure and command table clean.
-In V1.02 and prior heavy use of sub { .. } in Tcl commands could polute these tables
+In V1.02 and prior heavy use of sub { .. } in Tcl commands could pollute these tables
 as they were never cleared. Command table cleanup tries to alieviate this.
 
 if you call create_tcl_sub the internal reference exists until
@@ -394,7 +394,7 @@ if the internal reference was created internaly by call(...) there are two rules
 =item 1)
 
 If the command is an "after" the internal references is keept at least until 1 second after the delay.
-If there are still other "users" of the TCLNAME then it is not deleted untill the last one goes away.
+If there are still other "users" of the TCLNAME then it is not deleted until the last one goes away.
 If another call with the same CODEREF happens before this,
 then it will get registered as a "user" without any need to delete/recreate the tcl command first.
 
@@ -409,7 +409,7 @@ or "=gets sock9ac2b50"
 or "=fileevent sock9827430 writable"
 
 
-the TCLCODES created for that command will be kept at least untill a command with
+the TCLCODES created for that command will be kept at least until a command with
 the same DESCRNAME and containing a subroutine reference is run again.
 Since many DESCRNAMES can reference the same TCLNAME only when
 the last DESCRNAME referencing a TCLNAME is released is the TCLNAME purged.
@@ -436,7 +436,7 @@ set them to non-blank or non-zero to add the tracking output to SYSOUT
 =item $Tcl::TRACE_SHOWCODE
 
 Display all generated Tcl code by call().
-Be aware: Tkx::MainLoop runs by issueing a lot of "winfo exists ." calls, a LOT.
+Be aware: Tkx::MainLoop runs by issuing a lot of "winfo exists ." calls, a LOT.
 But this is a nice way to tell what your programs are doing to Tcl.
 
 

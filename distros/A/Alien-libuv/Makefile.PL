@@ -10,11 +10,8 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Interface to the libuv library L<http://libuv.org>",
   "AUTHOR" => "Chase Whitener <capoeirab\@cpan.org>",
   "BUILD_REQUIRES" => {
-    "Alien::Base" => 0,
-    "Alien::Build" => "0.32",
+    "Alien::Build" => "1.00",
     "Alien::Build::MM" => "0.32",
-    "Alien::Build::Plugin::Build::Autoconf" => 0,
-    "Alien::Build::Plugin::Gather::IsolateDynamic" => 0,
     "Config" => 0,
     "ExtUtils::MakeMaker" => "6.52",
     "IPC::Cmd" => 0
@@ -30,7 +27,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "Alien::libuv",
   "PREREQ_PM" => {
-    "Alien::Base" => 0,
+    "Alien::Base" => "1.00",
     "base" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -43,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "1.003",
+  "VERSION" => "1.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,11 +48,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Alien::Base" => 0,
-  "Alien::Build" => "0.32",
+  "Alien::Base" => "1.00",
+  "Alien::Build" => "1.00",
   "Alien::Build::MM" => "0.32",
-  "Alien::Build::Plugin::Build::Autoconf" => 0,
-  "Alien::Build::Plugin::Gather::IsolateDynamic" => 0,
   "Config" => 0,
   "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,
@@ -85,6 +80,16 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+if ( $^O !~ /win/i ) {
+	$WriteMakefileArgs{PREREQ_PM}{'Alien::Autotools'} = $FallbackPrereqs{'Alien::Autotools'} = '1.00';
+	$WriteMakefileArgs{PREREQ_PM}{'Alien::Build::Plugin::Build::Autoconf'} = $FallbackPrereqs{'Alien::Build::Plugin::Build::Autoconf'} = '0.04';
+}
+
+if ( $^O eq 'MSWin32' ) {
+	$WriteMakefileArgs{PREREQ_PM}{'Alien::Build::Plugin::Build::CMake'} = $FallbackPrereqs{'Alien::Build::Plugin::Build::CMake'} = '0';
+	$WriteMakefileArgs{PREREQ_PM}{'Alien::cmake3'} = $FallbackPrereqs{'Alien::cmake3'} = '0.04';
+}
 
 WriteMakefile(%WriteMakefileArgs);
 

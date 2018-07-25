@@ -53,7 +53,7 @@ sub const {
 
 my $DATASET = {};
 {
-    # GENERATED from dataset.yaml at Sun Aug 20 01:08:28 JST 2017 by root
+    # GENERATED from dataset.yaml at Sun Jul 22 01:54:42 JST 2018 by root
     my $obj;
     $obj = {label => 'MSIE', name => 'Internet Explorer', type => 'browser'};
     $obj->{vendor} = 'Microsoft';
@@ -82,6 +82,9 @@ my $DATASET = {};
     $obj = {label => 'Webview', name => 'Webview', type => 'browser'};
     $obj->{vendor} = 'OS vendor';
     $DATASET->{'Webview'} = $obj;
+    $obj = {label => 'YaBrowser', name => 'Yandex Browser', type => 'browser'};
+    $obj->{vendor} = 'Yandex';
+    $DATASET->{'YaBrowser'} = $obj;
     $obj = {label => 'Win', name => 'Windows UNKNOWN Ver', type => 'os'};
     $obj->{category} = 'pc';
     $DATASET->{'Win'} = $obj;

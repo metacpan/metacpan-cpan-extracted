@@ -84,7 +84,6 @@ use Bytes::Random::Secure::Tiny ();
 
 use Crypt::Perl::ASN1 ();
 use Crypt::Perl::BigInt ();
-use Crypt::Perl::PKCS8 ();
 use Crypt::Perl::Math ();
 use Crypt::Perl::ToDER ();
 use Crypt::Perl::X ();

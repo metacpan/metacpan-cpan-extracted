@@ -1,8 +1,9 @@
 package Ion::Conn;
 # ABSTRACT: An Ion TCP socket connection
-$Ion::Conn::VERSION = '0.06';
+$Ion::Conn::VERSION = '0.08';
 use common::sense;
 
+use Class::Slot;
 use Carp;
 use Coro;
 use AnyEvent::Socket qw(tcp_connect);
@@ -19,78 +20,95 @@ use overload (
   fallback => 1,
 );
 
-sub new {
-  my ($class, %param) = @_;
-
-  unless ($param{handle}) {
-    my $host = $param{host} || croak 'host is required when handle is not specified';
-    my $port = $param{port} || croak 'port is required when handle is not specified';
-    my $fh;
-
-    my $guard = tcp_connect($host, $port, rouse_cb);
-    ($fh, $host, $port) = rouse_wait;
-
-    croak "connection failed: $!" unless $fh;
-    $param{handle} = unblock $fh;
-    $param{guard}  = $guard;
-    $param{host}   = $host;
-    $param{port}   = $port;
-  }
-
-  my $self = bless {
-    port     => $param{port},
-    host     => $param{host},
-    guard    => $param{guard},
-    handle   => $param{handle},
-    encoders => $param{encoders} || [],
-    decoders => $param{decoders} || [],
-  }, $class;
-}
+slot 'port';
+slot 'host';
+slot 'guard';
+slot 'handle';
+slot 'encoders',  def => sub{ [] };
+slot 'decoders',  def => sub{ [] };
+slot 'connected', def => 0;
 
 sub DESTROY {
   my $self = shift;
   $self->close;
 }
 
-sub host { $_[0]->{host} }
-sub port { $_[0]->{port} }
+sub copy {
+  my $self = shift;
+  my $dup  = \%$self;
+  $dup->close;
+  return $dup;
+}
+
+sub connect {
+  my $self = shift;
+
+  $self->{connected} = 1
+    if $self->handle;
+
+  unless ($self->connected) {
+    my $host = $self->host || croak 'host is required when handle is not specified';
+    my $port = $self->port || croak 'port is required when handle is not specified';
+    my $fh;
+
+    my $guard = tcp_connect($host, $port, rouse_cb);
+    ($fh, $host, $port) = rouse_wait;
+
+    croak "connection failed: $!" unless $fh;
+    $self->{handle}    = unblock $fh;
+    $self->{guard}     = $guard;
+    $self->{host}      = $host;
+    $self->{port}      = $port;
+    $self->{connected} = 1;
+
+    return 1;
+  }
+
+  return;
+}
 
 sub print {
   my ($self, $msg) = @_;
-  $msg = reduce{ $b->($a) } $msg, @{$self->{encoders}};
-  $self->{handle}->print($msg, $/);
+  $self->connect;
+  $msg = reduce{ $b->($a) } $msg, @{$self->encoders};
+  $self->handle->print($msg, $/);
 }
 
 sub readline {
   my $self = shift;
-  my $line = $self->{handle}->readline($/) or return;
+  $self->connect;
+  my $line = $self->handle->readline($/) or return;
   chomp $line;
-  reduce{ $b->($a) } $line, @{$self->{decoders}};
+  reduce{ $b->($a) } $line, @{$self->decoders};
 }
 
 sub close {
   my $self = shift;
-  $self->{handle}->shutdown if $self->{handle};
-  $self->{handle}->close    if $self->{handle};
+  $self->handle->shutdown if $self->handle;
+  $self->handle->close    if $self->handle;
   undef $self->{handle};
   undef $self->{guard};
+  $self->{connected} = 0;
   return 1;
 }
 
 sub writer {
   my $self = shift;
-  sub { $self->print(shift) };
+  sub {
+    $self->connect;
+    $self->print(shift);
+  };
 }
 
 sub encodes {
   my ($self, $encoder) = @_;
-  push @{$self->{encoders}}, $encoder;
+  push @{$self->encoders}, $encoder;
   return $self;
 }
 
 sub decodes {
   my ($self, $decoder) = @_;
-  push @{$self->{decoders}}, $decoder;
+  push @{$self->decoders}, $decoder;
   return $self;
 }
 
@@ -108,7 +126,7 @@ Ion::Conn - An Ion TCP socket connection
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 METHODS
 
@@ -119,6 +137,10 @@ Returns the peer host IP.
 =head2 port
 
 Returns the peer port.
+
+=head2 connect
+
+Connects to the remote host unless already connected.
 
 =head2 print
 
@@ -170,7 +192,7 @@ Jeff Ober <sysread@fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Jeff Ober.
+This software is copyright (c) 2018 by Jeff Ober.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

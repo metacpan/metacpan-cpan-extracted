@@ -16,7 +16,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 1.0.6;
+our $VERSION  = 1.0.7;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -30,6 +30,7 @@ sub run {
         'branch|b',
         'branches|B',
         'day|d',
+        'depth|D=i',
         'files|f',
         'month|m',
         'out|o=s',
@@ -139,13 +140,15 @@ sub recent_commits {
     my @args = ('--since', $option->{since} );
 
     if ( !$option->{since} ) {
-        my (undef,undef,undef,$day,$month,$year) = localtime;
+        my $sec_ago = $option->{month} ? 60 * 60 * 24 * 30
+            : $option->{week} ? 60 * 60 * 24 * 7
+            :                   60 * 60 * 24;
+
+        my (undef,undef,undef,$day,$month,$year) = localtime( time - $sec_ago );
         $year += 1900;
         $month++;
 
-        @args = $option->{week} ? ('--since', sprintf "%04d-%02d-%02d", $year - 1, $month, $day )
-            : $option->{month}  ? ('--since', sprintf "%04d-%02d-%02d", $year, $month - 1, $day )
-            :                     ('--since', sprintf "%04d-%02d-%02d", $year, $month, $day - 1 );
+        @args = ('--since', sprintf "%04d-%02d-%02d", $year, $month, $day );
     }
 
     unshift @args, $option{tag} ? '--tags'
@@ -165,6 +168,9 @@ sub changed_from_shas {
     for my $sha (@commits) {
         my $changed = $workflow->commit_details($sha, branches => 1, files => 1, user => 1);
         for my $type (keys %{ $changed->{files} }) {
+            if ( defined $option{depth} ) {
+                $type = join '/', grep {defined $_} (split m{/}, $type)[0 .. $option{depth} - 1];
+            }
             $changed{$type}{users}{$changed->{user}}++;
             $changed{$type}{files} = {
                 %{ $changed{$type}{files} || {} },
@@ -198,7 +204,7 @@ git-recent - Find what files have been changed recently in a repository
 
 =head1 VERSION
 
-This documentation refers to git-recent version 1.0.6
+This documentation refers to git-recent version 1.0.7
 
 =head1 SYNOPSIS
 
@@ -220,6 +226,9 @@ This documentation refers to git-recent version 1.0.6
 
  OUTPUT:
   -B --branches Show the output by what's changed in each branch
+  -D --depth[=]int
+                Truncate files to this number of directories (allows showing
+                areas that have changed)
   -u --users    Show the output by who has made the changes
   -f --files    Show the output the files changed (Default)
   -o --out[=](text|json|perl)

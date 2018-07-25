@@ -13,5 +13,6 @@ t/00_compile.t
 t/01_fetch.t
 t/02_fetch_multi.t
 t/03_converter.t
+t/04_fork.t
 META.yml
 MANIFEST

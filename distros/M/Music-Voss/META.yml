@@ -9,8 +9,8 @@ configure_requires:
   ExtUtils::MakeMaker: '6.48'
   strict: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
-license: artistic_2
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -23,12 +23,14 @@ requires:
   Carp: '0'
   Exporter: '0'
   List::Util: '1.26'
+  Math::Trig: '0'
   Scalar::Util: '0'
+  perl: '5.010000'
   strict: '0'
-version: '0.05'
+version: '0.08'
 x_homepageresources:
   repository:
     type: git
     url: git://github.com/thrig/Music-Voss.git
     web: https://github.com/thrig/Music-Voss
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -24,6 +24,7 @@ my @files = (
     't/03.request_header.t',
     't/03.token_per_request.t',
     't/04.cookie_options.t',
+    't/05.not-html.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',

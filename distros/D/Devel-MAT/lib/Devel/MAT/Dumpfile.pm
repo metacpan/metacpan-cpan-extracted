@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Dumpfile;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 use Carp;
 use IO::Handle;   # ->read
@@ -177,7 +177,7 @@ sub load
 
    $self->_read_u8 == 0 or die "Cannot read $path - format version major unrecognised";
 
-   ( $self->{format_minor} = $self->_read_u8 ) <= 2 or
+   ( $self->{format_minor} = $self->_read_u8 ) <= 3 or
       die "Cannot read $path - format version minor unrecognised ($self->{format_minor})";
 
    if( $self->{format_minor} < 1 ) {

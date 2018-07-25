@@ -47,6 +47,7 @@
             "Text::TabularDisplay" : "0"
          },
          "requires" : {
+            "Text::Table::ASV" : "0",
             "Text::Table::Tiny" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -74,7 +75,7 @@
          "web" : "https://github.com/perlancar/perl-Text-Table-Any"
       }
    },
-   "version" : "0.091",
+   "version" : "0.092",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

@@ -182,8 +182,9 @@ our @EXPORT = qw(
 	get_schedule_json_file make_game_path get_game_id_from_path
 	get_game_files_by_id
 	arrange_schedule_by_date convert_schedule_game read_schedules
-	read_existing_game_ids
+	read_existing_game_ids get_game_path_from_id
 	vocabulary_lookup normalize_penalty
+	print_events
 );
 
 our $DB;
@@ -259,7 +260,7 @@ sub resolve_team ($;$) {
 		return $team_id if $team_id;
 	}
 	return 'MTL' if ($team =~ /MONTR.*CAN/i || $team =~ /CAN.*MONTR/);
-	return 'NHL' if ($team eq 'League');
+	return 'NHL' if ($team eq 'League' || $team eq 'NHL');
 	for my $team_id (keys %TEAMS) {
 		return $team_id if $team_id eq $team;
 		for my $type (qw(short long full)) {
@@ -604,6 +605,25 @@ sub normalize_penalty ($) {
 	#print Dumper $ld_event->{result}{secondaryType};
 	vocabulary_lookup('penalty', $penalty);
 
+}
+
+=over 2
+
+=item C<print_events>
+
+Prints the list of parsed events in a compact for. Work in progress. Do not use.
+
+=back
+
+=cut
+
+sub print_events ($) {
+
+	my $events = shift;
+
+	for (@{$events}) {
+		print "$_->{bsjs_id}\t$_->{t}\t$_->{ts}\t$_->{type}\n";
+	}
 }
 
 1;

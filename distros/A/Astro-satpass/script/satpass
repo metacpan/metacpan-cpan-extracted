@@ -37,7 +37,7 @@ $clipboard_unavailable = $IO::Clipboard::clipboard_unavailable;
 #	Initialization
 #
 
-our $VERSION = '0.099';
+our $VERSION = '0.100';
 
 use constant LINFMT => <<eod;
 %s %s %8.4f %9.4f %7.1f %-4s %s
@@ -51,11 +51,13 @@ use constant BGFMT => <<eod;
 %s %s %8.4f %9.4f              %s
 eod
 
+use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
+
 my @bodies;
 my @sky = (
-    Astro::Coord::ECI::Sun->new (),
+    SUN_CLASS_DEFAULT->new (),
     Astro::Coord::ECI::Moon->new (),
-    );
+);
 
 my %opt;	# Options passed when we were invoked.
 my %cmdconfig;	# How option parsing is to be comfigured for command.
@@ -86,6 +88,7 @@ my %parm = (
     geometric => 1,
     gmt => 0,
 ##    horizon => 20, set below
+    illum	=> SUN_CLASS_DEFAULT,
     local_coord => 'azel_rng',
     model => 'model',
     pass_threshold => undef,
@@ -96,6 +99,7 @@ my %parm = (
     simbad_url => 'simbad.u-strasbg.fr',
     simbad_version => 4,
     singleton => 0,
+    sun		=> SUN_CLASS_DEFAULT,
     time_format => '%H:%M:%S',
 ##    timing => 0,
 ##    twilignt => 'civil', set below
@@ -130,6 +134,7 @@ my %mutator = (
     gmt => \&_set_unmodified,
     height => \&_set_unmodified,
     horizon => \&_set_angle,
+    illum	=> \&_set_eci_class,
     latitude => \&_set_angle,
     local_coord => \&_set_local_coord,
     location => \&_set_unmodified,
@@ -141,6 +146,7 @@ my %mutator = (
     simbad_url => \&_set_unmodified,
     simbad_version => \&_set_simbad_version,
     singleton => \&_set_unmodified,
+    sun		=> \&_set_sun_class,
     pass_threshold => \&_set_angle_or_undef,
     time_format => \&_set_unmodified,
 ##    timing => \&_set_unmodified,
@@ -776,11 +782,24 @@ foreach my $tle (@bodies) {
 #
 
 sub dump {
-use Data::Dumper;
-local $Data::Dumper::Terse = 1;
-foreach my $body (@bodies, @sky) {
-    print "\n", $body->get ('name') || $body->get ('id'), ' = ' , Dumper ($body);
+    use Data::Dumper;
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Sortkeys = 1;
+    my @dump_list;
+    if ( @_ ) {
+	$cmdopt{choose} = [@_];
+	@dump_list = (
+	    _select_observing_list(),
+	    _select_matching_bodies( \@sky, $cmdopt{choose} ),
+	);
+    } else {
+	@dump_list = ( @bodies, @sky );
     }
+    foreach my $body ( @dump_list ) {
+	print "\n", $body->get ('name') || $body->get ('id'), ' = ',
+	    Dumper ($body);
+    }
+    return;
 }
 
 ########################################################################
@@ -1288,7 +1307,7 @@ BEGIN {
     iridium => 'Astro::Coord::ECI::TLE::Iridium',
     moon => 'Astro::Coord::ECI::Moon',
     set => 'Astro::Coord::ECI::TLE::Set',
-    sun => 'Astro::Coord::ECI::Sun',
+    sun => SUN_CLASS_DEFAULT,
     st => 'Astro::SpaceTrack',
     star => 'Astro::Coord::ECI::Star',
     tle => 'Astro::Coord::ECI::TLE',
@@ -1387,8 +1406,12 @@ foreach my $fn (@_) {
 Error - Cannot open $expand.
         $!
 eod
+    my $attrs = {
+	illum	=> $parm{illum},
+	sun	=> $parm{sun},
+    };
     local $/ = undef;
-    push @bodies, Astro::Coord::ECI::TLE->parse (<$fh>);
+    push @bodies, Astro::Coord::ECI::TLE->parse ( $attrs, <$fh>);
     }
 }
 
@@ -1731,7 +1754,7 @@ my $twilight = $parm{_twilight};
 
 my $sta = _get_station ();
 
-my $sun = Astro::Coord::ECI::Sun->new ();
+my $sun = $parm{sun}->new ();
 
 #	Print a header.
 
@@ -1936,6 +1959,20 @@ sub _set_angle_or_undef {
     return;
 }
 
+sub _set_eci_class {
+    my ( $name, $val ) = @_;
+    ref $val and die "Error - $name must not be a reference\n";
+    if ( defined $val ) {
+	_load_module( $val );
+	$val->isa( 'Astro::Coord::ECI' )
+	    or die "Error - $name must be an Astro::Coord::ECI::Sun\n";
+    } else {
+	$val = 'Astro::Coord::ECI';
+    }
+    $parm{$name} = $val;
+    return;
+}
+
 sub _set_ellipsoid {
 Astro::Coord::ECI->set (ellipsoid => $_[1]);
 $parm{$_[0]} = $_[1];
@@ -1985,6 +2022,20 @@ Error - Invalid SIMBAD version number $_[1]. Must be $lastver.
 eod
 	}
     }
+}
+
+sub _set_sun_class {
+    my ( $name, $val ) = @_;
+    ref $val and die "Error - $name must not be a reference\n";
+    if ( defined $val ) {
+	_load_module( $val );
+	$val->isa( SUN_CLASS_DEFAULT )
+	    or die "Error - $name must be an Astro::Coord::ECI::Sun\n";
+    } else {
+	$val = SUN_CLASS_DEFAULT;
+    }
+    $parm{$name} = $help_module{$name} = $val;
+    return;
 }
 
 sub _set_time {
@@ -5407,6 +5458,17 @@ is displayed in decimal degrees.
 
 The default is 20 degrees.
 
+=for html <a name="illum"></a>
+
+=item illum (string)
+
+This parameter specifies the name of the class to set as the 'illum'
+attribute for any bodies that require it. This is used for calculating
+Iridium flares, and potentially other things. The value must be the name
+of a subclass of C<Astro::Coord::ECI>.
+
+The default is C<'Astro::Coord::ECI::Sun>.
+
 =for html <a name="latitude"></a>
 
 =item latitude (numeric)
@@ -5518,6 +5580,15 @@ model8 - Use either sgp8 or sdp8 as appropriate.
 
 The default is 'model'.
 
+=for html <a name="pass_threshold"></a>
+
+=item pass_threshold (angle or undef)
+
+This parameter corresponds to the
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> C<pass_threshold>
+attribute.  It is set in degrees. It can also be set to the C<undef>
+value by specifying the string C<'undef'> (unquoted) as its value.
+
 =for html <a name="perltime"></a>
 
 =item perltime (boolean)
@@ -5620,14 +5691,15 @@ take about 15% longer.
 
 The default is 0 (i.e. false).
 
-=for html <a name="pass_threshold"></a>
+=for html <a name="sun"></a>
 
-=item pass_threshold (angle or undef)
+=item sun (string)
 
-This parameter corresponds to the
-L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> C<pass_threshold>
-attribute.  It is set in degrees. It can also be set to the C<undef>
-value by specifying the string C<'undef'> (unquoted) as its value.
+This parameter specifies the name of the class to set as the 'sun'
+attribute for any bodies that require it. The value must be the name of
+a subclass of C<Astro::Coord::ECI::Sun>.
+
+The default is C<'Astro::Coord::ECI::Sun>.
 
 =for html <a name="time_format"></a>
 

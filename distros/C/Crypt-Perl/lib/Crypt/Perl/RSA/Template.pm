@@ -3,6 +3,8 @@ package Crypt::Perl::RSA::Template;
 use strict;
 use warnings;
 
+use Crypt::Perl::PKCS8 ();
+
 #cf. RFC 3447 appendix A.1.1
 #
 #replacing INTEGER with FG_FAUX_INTEGER to facilitate “lite” mode
@@ -40,28 +42,7 @@ my $ASN1_TEMPLATE = q<
         coefficient       FG_FAUX_INTEGER,  -- (inverse of q) mod p
         otherPrimeInfos   OtherPrimeInfos OPTIONAL
     }
-
-    -- cf. RFC 3280 4.1.1.2
-    AlgorithmIdentifier  ::=  SEQUENCE  {
-        algorithm               OBJECT IDENTIFIER,
-        parameters              ANY DEFINED BY algorithm OPTIONAL
-    }
-
-    -- cf. RFC 5208 appendix A
-    PrivateKeyInfo ::= SEQUENCE {
-        version Version,
-        privateKeyAlgorithm AlgorithmIdentifier,
-        privateKey PrivateKey
-    }
-
-    PrivateKey ::= OCTET STRING
-
-    -- cf. RFC 3280 4.1
-    SubjectPublicKeyInfo  ::=  SEQUENCE  {
-        algorithm            AlgorithmIdentifier,
-        subjectPublicKey     BIT STRING
-    }
->;
+> . Crypt::Perl::PKCS8::ASN1();
 
 sub get_template {
     my ($what_is_big_fat_int) = @_;

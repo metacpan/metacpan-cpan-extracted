@@ -74,4 +74,16 @@ use Event::Distributor;
    pass( 'Synchronous fire returns immediately' );
 }
 
+# subscriber death is not fatal to queries
+{
+   my $dist = Event::Distributor->new;
+   $dist->declare_query( "question" );
+
+   $dist->subscribe_sync( question => sub { die "Oopsie\n" } );
+   $dist->subscribe_sync( question => sub { return "OK" } );
+
+   is( $dist->fire_sync( question => ), "OK",
+      'Synchronous subscriber death is not fatal to query' );
+}
+
 done_testing;

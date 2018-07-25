@@ -16,5 +16,11 @@ Search : <input name=S> <input type=submit>
 
 [% content %]
 
+
+<hr>
+
+<small>[% self.disclaimer %]</small>
+
+
 </body>
 </html>
