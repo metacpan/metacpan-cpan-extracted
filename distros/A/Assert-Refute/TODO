@@ -6,22 +6,18 @@
 +   ++  MOD port Test::Deep to refute
 +   ++  MOD port Test::Differences to refute
 +   ++  TST Even more examples
-+   +++ BUG Consistent reporting of caller under Test::More
 ++  +   MOD T::Array: point out misbehaving elements in all tests
 ++  ++  API todo() or $TODO - need to do something about passing tests
 ++  ++  MOD Round-trip assertion
 ++  ++  MOD Util::Tempfile - preserve file if tests fail
-+++ +   API Report: configurable verbosity level
 +++ +   API If contract with args fails, display args
 +++ +   API Optional short-circuit on first failure
 +++ +   API Some extra goodies to contract {...} like title
 +++ +   API verbosity switch to include more/less info in report
 +++ +   MOD T::Array: block subs curry if no second arg
-+++ +   API skip remaining tests [workaround: return]
 ++  +++ DRV add Test-based driver
 ++  +++ MOD Provide what Test::Most can
 ++  +++ MOD import Test::Builder-based tests
-+++ ++  MOD `is_diff` LCS-based multiline test
 +++ +++ DRV A TAP consumer class
 +++ +++ DRV Own Unit-testing backend (adhere TAP::Harness)
 +++ +++ MOD async_ok "event id" => [ prerequisite1, prerequisite2 ]

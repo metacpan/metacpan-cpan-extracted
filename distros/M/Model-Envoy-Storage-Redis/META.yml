@@ -16,11 +16,12 @@ name: Model-Envoy-Storage-Redis
 provides:
   Model::Envoy::Storage::Redis:
     file: lib/Model/Envoy/Storage/Redis.pm
-    version: v0.1.0
+    version: v0.1.2
 requires:
-  Model::Envoy: v0.2.4
+  JSON::XS: '3.04'
+  Model::Envoy: v0.4.1
   Moose: '2.2010'
   MooseX::ClassAttribute: '0.29'
   Redis::Fast: '0.21'
   perl: v5.18.2
-version: v0.1.0
+version: v0.1.2

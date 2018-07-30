@@ -147,7 +147,7 @@ $TOP->idletasks();
 
 $TOP->eventGenerate('<2>', -x => 50, -y => 60); # For checking x/y substitution
 
-# This seems to be required for the events to be reliabily registered for this test case outside of a MainLoop
+# This seems to be required for the events to be reliably registered for this test case outside of a MainLoop
 foreach (1..10){
         $TOP->update();
         $TOP->idletasks();
@@ -155,7 +155,7 @@ foreach (1..10){
 
 $b2->eventGenerate('<Shift-3>'); # For checking event source for class binding
 
-# This seems to be required for the events to be reliabily registered for this test case outside of a MainLoop
+# This seems to be required for the events to be reliably registered for this test case outside of a MainLoop
 foreach (1..10){
         $TOP->update();
         $TOP->idletasks();

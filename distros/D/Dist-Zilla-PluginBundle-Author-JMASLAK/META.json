@@ -96,7 +96,7 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::Author::JMASLAK" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/JMASLAK.pm",
-         "version" : "1.181841"
+         "version" : "1.182070"
       }
    },
    "release_status" : "stable",
@@ -110,7 +110,7 @@
          "web" : "https://github.com/jmaslak/Dist-Zilla-PluginBundle-Author-JMASLAK"
       }
    },
-   "version" : "1.181841",
+   "version" : "1.182070",
    "x_contributor_covenant" : {
       "version" : 0.02
    },

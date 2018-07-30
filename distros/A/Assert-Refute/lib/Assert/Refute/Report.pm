@@ -3,7 +3,7 @@ package Assert::Refute::Report;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.1201';
+our $VERSION = '0.1301';
 
 =head1 NAME
 
@@ -69,13 +69,19 @@ sub new {
 
 =head2 RUNNING PRIMITIVES
 
-=head3 plan( tests => n )
+=head3 plan( tests => $n )
 
 Plan to run exactly n tests.
 This is not required, and L</done_testing> (see below)
 is needed at the end anyway.
 
-Dies if there's already a plan, or tests are being run, or done_testing
+=head3 plan( skip_all => $reason )
+
+Plan to run no tests at all.
+As of current, this does not prevent any future checks from being run.
+
+In both cases,
+dies if there's already a plan, or tests are being run, or done_testing
 was seen.
 
 If plan is not fullfilled by the time of C<done_testing> call,
@@ -90,14 +96,21 @@ sub plan {
     $self->_croak( $ERROR_DONE )
         if $self->{done};
 
+    $self->_croak( "plan(): already defined" )
+        if defined $self->{plan_tests};
+    $self->_croak( "plan(): testing already started" )
+        if $self->{count} > 0;
+
     if ($todo eq 'tests') {
-        $self->_croak( "Usage: plan tests => n")
+        $self->_croak( "plan(): usage: plan tests => n")
             unless @args == 1 and defined $args[0] and $args[0] =~ /^\d+$/;
-        $self->_croak( "Plan already defined" )
-            if defined $self->{plan_tests};
-        $self->_croak( "Testing already started" )
-            if $self->{count} > 0;
         $self->{plan_tests} = $args[0];
+    } elsif ($todo eq 'skip_all') {
+        $self->_croak( "plan(): usage: plan skip_all => reason")
+            unless @args == 1 and defined $args[0] and length $args[0];
+        $self->{plan_skip} = $args[0];
+        $self->{plan_tests} = 0;
+        # TODO should we lock report?
     } else {
         $self->_croak( "Unknown 'plan $todo ...' command" );
     };
@@ -660,7 +673,7 @@ sub get_log {
 
     # output plan if there was plan
     if (defined $self->{plan_tests}) {
-        push @mess, [ 0, 0, "1..$self->{plan_tests}" ]
+        push @mess, _plan_to_tap( $self->{plan_tests}, $self->{plan_skip} )
             unless $verbosity < 0;
     };
 
@@ -696,11 +709,20 @@ sub get_log {
     };
 
     if (!defined $self->{plan_tests} and $self->{done}) {
-        push @mess, [ 0, 0, "1..".$self->get_count ]
+        push @mess, _plan_to_tap( $self->get_count )
             unless $verbosity < 0;
     };
 
     return \@mess;
+};
+
+sub _plan_to_tap {
+    my ($n, $skip) = @_;
+
+    my $line = "1..".$n;
+    $line .= " # SKIP $skip"
+        if defined $skip;
+    return [ 0, 0, $line ];
 };
 
 sub _croak {

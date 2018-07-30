@@ -14,7 +14,7 @@
 # Here goes tests for non-core Tk methods
 
 use strict;
-use Tk;
+use Tcl::pTk;
 
 BEGIN {
     if (!eval q{

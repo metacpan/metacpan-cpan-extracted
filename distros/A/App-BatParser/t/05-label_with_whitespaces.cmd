@@ -2,7 +2,7 @@
 
 cp file1 file2
 
-goto label
+goto label 
 
 echo Never get executed
 

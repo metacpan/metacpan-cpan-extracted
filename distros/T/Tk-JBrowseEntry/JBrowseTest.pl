@@ -111,6 +111,26 @@ $jb7->insert(2, 'Third', 'Fourth');              #ADD MORE AFTER 1ST 2.
 $jb7->insert('end', [qw(Seventh Oops Nineth)]);  #ADD STILL MORE AT END.
 $jb7->delete(7);                                 #REMOVE ONE.
 
+$jb9 = $MainWin->JBrowseEntry(
+	-label => 'Bouncy:',
+	-altbinding => 'list=bouncy',
+	-variable => \$dbname1,
+	-state => 'normal',
+	-choices => [qw(pigs cows foxes goats)],
+	-width  => 12);
+$jb9->pack(
+	-side   => 'top', -pady => '10', -anchor => 'w');
+
+$jb10 = $MainWin->JBrowseEntry(
+	-label => 'Fixed:',
+	-fixedlist => 'bottom',
+	-variable => \$dbname1,
+	-state => 'normal',
+	-choices => [qw(pigs cows foxes goats)],
+	-width  => 12);
+$jb10->pack(
+	-side   => 'top', -pady => '10', -anchor => 'w');
+
 $b = $MainWin->Button(-text => 'Quit', -command => sub {exit (0); });
 $b->pack(-side => 'top');
  $jb1->focus;

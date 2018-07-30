@@ -1,4 +1,5 @@
 use 5.006;
+use lib '.';
 use inc::Module::Install;
 
 all_from 'lib/Text/Quoted.pm';

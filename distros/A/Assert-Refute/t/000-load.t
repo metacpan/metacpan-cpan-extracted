@@ -2,6 +2,7 @@
 use 5.006;
 use strict;
 use warnings;
+BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 use Test::More;
 
 plan tests => 1;

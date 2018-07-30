@@ -3,10 +3,12 @@ package lazy;
 use strict;
 use warnings;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000009';
 
 use App::cpm 0.975;    # CLI has no $VERSION
-use App::cpm::CLI;
+use App::cpm::CLI ();
+use Carp qw(longmess);
+use Try::Tiny qw( catch try );
 
 # Cargo-culted from App::cpm::CLI
 # Adding pass_through so that we don't have to keep up with all possible options
@@ -83,36 +85,17 @@ sub import {
         shift;
 
         my $name = shift;
+
         $name =~ s{/}{::}g;
         $name =~ s{\.pm\z}{};
 
-        # Don't try to install if we're called inside an eval
-        # See https://stackoverflow.com/questions/51483287/how-to-detect-if-perl-code-is-being-run-inside-an-eval/
-        for my $level ( 0 .. 20 ) {
-            my @caller = caller($level);
-            last unless @caller;
-
-            if (
-                (
-                       ( $caller[1] && $caller[1] =~ m{eval} )
-                    || ( $caller[3] && $caller[3] =~ m{eval} )
-                )
-                && ( $caller[0] ne 'Capture::Tiny' )
-            ) {
-                my @args = (
-                    $caller[0], $name, $name, $caller[1], $caller[2],
-                    $caller[0]
-                );
-                warn sprintf( <<'EOF', @args );
-Code in package "%s" is attempting to load %s from inside an eval, so we are not installing %s.
-See %s at line %s
-Please open an issue if %s should be whitelisted.
-EOF
-                return;
-            }
+        try {
+            $cpm->run( 'install', @args, $name );
         }
-
-        $cpm->run( 'install', @args, $name );
+        catch {
+            warn longmess();
+            warn $_;
+        };
         return 1;
     }, @INC;
 }
@@ -167,7 +150,7 @@ lazy - Lazily install missing Perl modules
 
 =head1 VERSION
 
-version 0.000007
+version 0.000009
 
 =head1 SYNOPSIS
 
@@ -237,14 +220,6 @@ Just make sure that you C<use local::lib> before you C<use lazy>.
 * If not installing globally, C<use local::lib> before you C<use lazy>
 
 * Don't pass the C<-L> or C<--local-lib-contained> args directly to C<lazy>.  Use L<local::lib> directly to get the best (and least confusing) results.
-
-* Right now C<lazy> will not attempt to install modules which are loaded inside
-an C<eval>.  (The exception is code which is run via L<Capture::Tiny>).  This
-prevents attempted installs of some optional modules as well as modules which
-may be OS-specific.  If you think this is wrong, would like to see an option to
-disable this,  or would like to whitelist additional modules, please open an
-issue.  I'm happy to discuss this.  Currently C<lazy> will C<warn> in these
-instances in order to help with debugging failed installs.
 
 * Remove C<lazy> before you put your work into production.
 

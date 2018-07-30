@@ -5,12 +5,12 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 # line 1025 - handle: sub a::b
-# parseFileName = ["/home/phil/r/act/images/.directory", undef, undef, undef]
+# deprecate parseFileName in this file too!
 # formatTableA returns "[]" if passed an empty array
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20180723';
+our $VERSION = '20180724';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -253,6 +253,35 @@ BEGIN                                                                           
   *fpf = *filePath;
  }
 
+sub fp($)                                                                       # Get path from file name
+ {my ($file) = @_;                                                              # File name
+  return '' unless $file =~ m(\/);                                              # Must have a / in it else no path
+  $file =~ s([^/]*+\Z) ()gsr
+ }
+
+sub fpn($)                                                                      # Remove extension from file name
+ {my ($file) = @_;                                                              # File name
+  return '' unless $file =~ m(/);                                               # Must have a / in it else no path
+  $file =~ s(\.[^.]+?\Z) ()gsr
+ }
+
+sub fn($)                                                                       # Remove path and extension from file name
+ {my ($file) = @_;                                                              # File name
+  $file =~ s(\A.*/) ()gsr =~ s(\.[^.]+?\Z) ()gsr
+ }
+
+sub fne($)                                                                      # Remove path from file name
+ {my ($file) = @_;                                                              # File name
+  $file =~ s(\A.*/) ()gsr;
+ }
+
+sub fe($)                                                                       # Get extension of file name
+ {my ($file) = @_;                                                              # File name
+  return '' unless $file =~ m(\.)s;                                             # Must have a period
+  my $f = $file =~ s(\.[^.]+?\Z) ()gsr;
+  substr($file, length($f)+1)
+ }
+
 sub checkFile($)                                                                # Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
  {my ($file) = @_;                                                              # File to check
   unless(-e $file)
@@ -329,6 +358,7 @@ sub currentDirectoryAbove                                                       
 
 sub parseFileName($)                                                            # Parse a file name into (path, name, extension)
  {my ($file) = @_;                                                              # File name to parse
+# cluck "parseFileName is deprecated, please use fp, fn, fe, fpn, fne instead";
   return ($file) if $file =~ m{\/\Z}s or $file =~ m/\.\.\Z/s;                   # Its a folder
   if ($file =~ m/\.[^\/]+?\Z/s)                                                 # The file name has an extension
    {if ($file =~ m/\A.+[\/]/s)                                                  # The file name has a preceding path
@@ -397,7 +427,7 @@ sub absFromAbsPlusRel($$)                                                       
   @f && $f[0] eq q(..) and confess "$f has too many leading ../";
   return q(/).fpe(grep {$_ and m/\S/} @a, @f, $ff, $fx) if defined $fx;
 
-  my @A = grep {$_ and m/\S/} @a, @f, $ff, $fx;                                          # Components of new file
+  my @A = grep {$_ and m/\S/} @a, @f, $ff, $fx;                                 # Components of new file
   return q(/).fpe(@A)    if @A >  1 and  defined($fx);
   return q(/).fpf(@A)    if @A >  1 and !defined($fx) and  defined($ff);
   return q(/).fpd(@A)    if @A >  1 and !defined($fx) and !defined($ff);
@@ -549,6 +579,20 @@ sub readFile($)                                                                 
   $s
  }
 
+sub readUtf16File($)                                                            # Read a file containing unicode in utf-16 format
+ {my ($file) = @_;                                                              # Name of file to read
+  my $f = $file;
+  defined($f) or  confess "Cannot read undefined file\n";
+  $f =~ m(\n) and confess "File name contains a new line:\n=$file=\n";
+  -e $f or confess "Cannot read file because it does not exist, file:\n$f\n";
+  open(my $F, "<:encoding(UTF-16)", $f) or confess
+    "Cannot open file for utf16 input, file:\n$f\n$!\n";
+  local $/ = undef;
+  my $s = eval {<$F>};
+  $@ and confess $@;
+  $s
+ }
+
 sub readBinaryFile($)                                                           # Read binary file - a file whose contents are not to be interpreted as unicode.
  {my ($file) = @_;                                                              # File to read
   my $f = $file;
@@ -556,6 +600,11 @@ sub readBinaryFile($)                                                           
   open my $F, "<$f" or confess "Cannot open binary file for input:\n$f\n$!\n";
   local $/ = undef;
   <$F>;
+ }
+
+sub removeBOM($)                                                                # Remove BOM from a string
+ {my ($s) = @_;                                                                 # String
+  $s =~ s(\A\xff\xfe) ()r;
  }
 
 sub makePath($)                                                                 # Make the path for the specified file name or folder.
@@ -1306,9 +1355,41 @@ sub printQw(@)                                                                  
 
 #1 Cloud Cover                                                                  # Useful for operating across the cloud
 
+sub saveCodeToS3($$$;$)                                                         # Save source code files
+ {my ($saveCodeEvery, $zipFileName, $bucket, $S3Parms) = @_;                    # Save every seconds, zip file name, bucket/key, additional S3 parameters like profile or region as a string
+  my $saveTimeFile = q(.codeSaveTimes);                                         # Get last save time if any
+  my $s3Parms = $S3Parms // '';
+  my $lastSaveTime = -e $saveTimeFile ? retrieve($saveTimeFile) : undef;        # Get last save time
+  return if $lastSaveTime and $lastSaveTime->[0] > time - $saveCodeEvery;       # Too soon
+
+  return if fork;                                                               # Fork zip and upload
+  say STDERR &timeStamp." Saving latest version of code to S3";
+
+  my $z = filePathExt($zipFileName, q(zip));                                    # Zip file
+  unlink $z;                                                                    # Remove old zip file
+
+  if (my $c = <<END =~ s/\n/ /gsr)                                              # Zip command
+zip -qr $z *
+END
+   {my $r = qx($c);
+    confess "$c\n$r\n" if $r =~ m(\S);                                          # Confirm zip
+   }
+
+  if (my $c = "aws s3 cp $z s3://$bucket/$zipFileName.zip $s3Parms")            # Upload zip
+   {my $r = qx($c);
+    confess "$c\n$r\n" if $r =~ m(\S);                                          # Confirm upload
+   }
+
+  store([time], $saveTimeFile);                                                 # Save last save time
+  unlink $z;                                                                    # Remove old zip file
+  say STDERR &timeStamp." Saved latest version of code to S3";
+  exit;
+ }
+
 sub saveSourceToS3($;$)                                                         # Save source code
  {my ($aws, $saveIntervalInSeconds) = @_;                                       # Aws target file and keywords, save internal
   $saveIntervalInSeconds //= 1200;                                              # Default save time
+  cluck "saveSourceToS3 is deprecated, please use saveCodeToS3 instead";
   unless(fork())
    {my $saveTime = "/tmp/saveTime/$0";                                          # Get last save time if any
     makePath($saveTime);
@@ -1342,6 +1423,11 @@ sub hostName                                                                    
 
 sub userId                                                                      # The userid we are currently running under
  {trim(qx(whoami))
+ }
+
+sub wwwEncode($)                                                                # Replace spaces in a string with %20
+ {my ($string) = @_;                                                            # String
+  $string =~ s(\s) (%20)gsr;
  }
 
 #1 Documentation                                                                # Extract, format and update documentation for a perl module
@@ -1568,7 +1654,7 @@ END
        {$methodParms{$_} = $name for @{$u->[2]};                                # Generated names array
        }
 
-      my   @method;                                                             # Accumulate method documentation
+      my @method;                                                               # Accumulate method documentation
 
       if (1)                                                                    # Section title
        {my $h = $private ? 2 : $headLevel;
@@ -1802,7 +1888,7 @@ if (0 and !caller)
  }
 
 #-------------------------------------------------------------------------------
-# Export
+# Export - eeee
 #-------------------------------------------------------------------------------
 
 use Exporter qw(import);
@@ -1824,7 +1910,7 @@ fileList fileModTime fileOutOfDate
 filePath filePathDir filePathExt fileSize findDirs findFiles
 findFileWithExtension
 firstFileThatExists
-formatTableBasic fpd fpe fpf fullFileName
+formatTableBasic fpd fpe fpf fp fe fn fpn fne fullFileName
 genLValueArrayMethods genLValueHashMethods
 genLValueScalarMethods genLValueScalarMethodsWithDefaultValues
 hostName htmlToc
@@ -1837,13 +1923,13 @@ makePath matchPath max microSecondsSinceEpoch min
 nws
 pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName printQw
 quoteFile
-readBinaryFile readFile relFromAbsAgainstAbs removeFilePrefix
-saveSourceToS3 searchDirectoryTreesForMatchingFiles
+readBinaryFile readFile readUtf16File relFromAbsAgainstAbs removeBOM removeFilePrefix
+saveCodeToS3 saveSourceToS3 searchDirectoryTreesForMatchingFiles
 setIntersectionOfTwoArraysOfWords setUnionOfTwoArraysOfWords
 temporaryDirectory temporaryFile temporaryFolder timeStamp trackFiles trim
 updateDocumentation updatePerlModuleDocumentation userId
 versionCode versionCodeDashed
-writeBinaryFile writeFile writeFiles
+wwwEncode writeBinaryFile writeFile writeFiles
 xxx XXX
 zzz
 ˢ
@@ -2028,7 +2114,7 @@ Call the specified sub in a separate process, wait for it to complete, copy back
 Example:
 
 
-  ˢ{our @a = qw(1);
+  ˢ{our $a = q(1);
 
 
 =head1 Files and paths
@@ -2098,6 +2184,41 @@ File name from file name components and extension.
      Parameter  Description
   1  @File      File components and extension
 
+=head3 fp($)
+
+Get path from file name
+
+     Parameter  Description
+  1  $file      File name
+
+=head3 fpn($)
+
+Remove extension from file name
+
+     Parameter  Description
+  1  $file      File name
+
+=head3 fn($)
+
+Remove path and extension from file name
+
+     Parameter  Description
+  1  $file      File name
+
+=head3 fne($)
+
+Remove path from file name
+
+     Parameter  Description
+  1  $file      File name
+
+=head3 fe($)
+
+Get extension of file name
+
+     Parameter  Description
+  1  $file      File name
+
 =head3 checkFile($)
 
 Return the name of the specified file if it exists, else confess the maximum extent of the path that does exist.
@@ -2149,6 +2270,16 @@ Track the existence of files
   1  $label     Label
   2  @files     Files
 
+=head3 titleToUniqueFileName($$$$)
+
+Create a file name from a title that is unique within the set %uniqueNames.
+
+     Parameter         Description
+  1  $uniqueFileNames  Unique file names hash {} which will be updated by this method
+  2  $title            Title
+  3  $suffix           File name suffix
+  4  $ext              File extension
+
 =head2 Position
 
 Position in the file system
@@ -2169,39 +2300,6 @@ Parse a file name into (path, name, extension)
 
      Parameter  Description
   1  $file      File name to parse
-
-=head3 containingFolder($)
-
-Path to the folder that contains this file, or use L</parseFileName>
-
-     Parameter  Description
-  1  $file      File name
-
-=head3 fullFileName()
-
-Full name of a file.
-
-
-=head3 printFullFileName()
-
-Print a file name on a separate line with escaping so it can be used easily from the command line.
-
-
-=head3 absFromAbsPlusRel($$)
-
-Create an absolute file from a an absolute file and a following relative file.
-
-     Parameter  Description
-  1  $a         Absolute file name
-  2  $f         Relative file name
-
-=head3 relFromAbsAgainstAbs($$)
-
-Derive a relative file name for the first absolute file relative to the second absolute file name.
-
-     Parameter  Description
-  1  $f         Absolute file to be made relative
-  2  $a         Absolute file to compare against
 
 =head2 Temporary
 
@@ -2290,12 +2388,26 @@ Read a file containing unicode.
      Parameter  Description
   1  $file      Name of unicode file to read
 
+=head3 readUtf16File($)
+
+Read a file containing unicode in utf-16 format
+
+     Parameter  Description
+  1  $file      Name of file to read
+
 =head3 readBinaryFile($)
 
 Read binary file - a file whose contents are not to be interpreted as unicode.
 
      Parameter  Description
   1  $file      File to read
+
+=head3 removeBOM($)
+
+Remove BOM from a string
+
+     Parameter  Description
+  1  $s         String
 
 =head3 makePath($)
 
@@ -2668,6 +2780,16 @@ Print an array of words in qw() format
 
 Useful for operating across the cloud
 
+=head2 saveCodeToS3($$$$)
+
+Save source code files
+
+     Parameter       Description
+  1  $saveCodeEvery  Save every seconds
+  2  $zipFileName    Zip file name
+  3  $bucket         Bucket/key
+  4  $S3Parms        Additional S3 parameters like profile or region as a string
+
 =head2 saveSourceToS3($$)
 
 Save source code
@@ -2692,6 +2814,13 @@ The name of the host we are running on
 
 The userid we are currently running under
 
+
+=head2 wwwEncode($)
+
+Replace spaces in a string with %20
+
+     Parameter  Description
+  1  $string    String
 
 =head1 Documentation
 
@@ -2792,201 +2921,211 @@ Extract a line of a test.
 =head1 Index
 
 
-1 L<absFromAbsPlusRel|/absFromAbsPlusRel>
+1 L<addCertificate|/addCertificate>
 
-2 L<addCertificate|/addCertificate>
+2 L<appendFile|/appendFile>
 
-3 L<appendFile|/appendFile>
+3 L<assertRef|/assertRef>
 
-4 L<assertRef|/assertRef>
+4 L<binModeAllUtf8|/binModeAllUtf8>
 
-5 L<binModeAllUtf8|/binModeAllUtf8>
+5 L<call|/call>
 
-6 L<call|/call>
+6 L<checkFile|/checkFile>
 
-7 L<checkFile|/checkFile>
+7 L<checkFilePath|/checkFilePath>
 
-8 L<checkFilePath|/checkFilePath>
+8 L<checkFilePathDir|/checkFilePathDir>
 
-9 L<checkFilePathDir|/checkFilePathDir>
+9 L<checkFilePathExt|/checkFilePathExt>
 
-10 L<checkFilePathExt|/checkFilePathExt>
+10 L<checkKeys|/checkKeys>
 
-11 L<checkKeys|/checkKeys>
+11 L<clearFolder|/clearFolder>
 
-12 L<clearFolder|/clearFolder>
+12 L<containingPowerOfTwo|/containingPowerOfTwo>
 
-13 L<containingFolder|/containingFolder>
+13 L<containingPowerOfTwoX|/containingPowerOfTwo>
 
-14 L<containingPowerOfTwo|/containingPowerOfTwo>
+14 L<contains|/contains>
 
-15 L<containingPowerOfTwoX|/containingPowerOfTwo>
+15 L<convertImageToJpx690|/convertImageToJpx690>
 
-16 L<contains|/contains>
+16 L<convertUnicodeToXml|/convertUnicodeToXml>
 
-17 L<convertImageToJpx690|/convertImageToJpx690>
+17 L<createEmptyFile|/createEmptyFile>
 
-18 L<convertUnicodeToXml|/convertUnicodeToXml>
+18 L<currentDirectory|/currentDirectory>
 
-19 L<createEmptyFile|/createEmptyFile>
+19 L<currentDirectoryAbove|/currentDirectoryAbove>
 
-20 L<currentDirectory|/currentDirectory>
+20 L<dateStamp|/dateStamp>
 
-21 L<currentDirectoryAbove|/currentDirectoryAbove>
+21 L<dateTimeStamp|/dateTimeStamp>
 
-22 L<dateStamp|/dateStamp>
+22 L<decodeBase64|/decodeBase64>
 
-23 L<dateTimeStamp|/dateTimeStamp>
+23 L<decodeJson|/decodeJson>
 
-24 L<decodeBase64|/decodeBase64>
+24 L<denormalizeFolderName|/denormalizeFolderName>
 
-25 L<decodeJson|/decodeJson>
+25 L<encodeBase64|/encodeBase64>
 
-26 L<denormalizeFolderName|/denormalizeFolderName>
+26 L<encodeJson|/encodeJson>
 
-27 L<encodeBase64|/encodeBase64>
+27 L<extractTest|/extractTest>
 
-28 L<encodeJson|/encodeJson>
+28 L<fe|/fe>
 
-29 L<extractTest|/extractTest>
+29 L<fileList|/fileList>
 
-30 L<fileList|/fileList>
+30 L<fileModTime|/fileModTime>
 
-31 L<fileModTime|/fileModTime>
+31 L<fileOutOfDate|/fileOutOfDate>
 
-32 L<fileOutOfDate|/fileOutOfDate>
+32 L<filePath|/filePath>
 
-33 L<filePath|/filePath>
+33 L<filePathDir|/filePathDir>
 
-34 L<filePathDir|/filePathDir>
+34 L<filePathExt|/filePathExt>
 
-35 L<filePathExt|/filePathExt>
+35 L<fileSize|/fileSize>
 
-36 L<fileSize|/fileSize>
+36 L<findDirs|/findDirs>
 
-37 L<findDirs|/findDirs>
+37 L<findFiles|/findFiles>
 
-38 L<findFiles|/findFiles>
+38 L<findFileWithExtension|/findFileWithExtension>
 
-39 L<findFileWithExtension|/findFileWithExtension>
+39 L<firstFileThatExists|/firstFileThatExists>
 
-40 L<firstFileThatExists|/firstFileThatExists>
+40 L<fn|/fn>
 
-41 L<formatTableBasic|/formatTableBasic>
+41 L<fne|/fne>
 
-42 L<fullFileName|/fullFileName>
+42 L<formatTableBasic|/formatTableBasic>
 
-43 L<genLValueArrayMethods|/genLValueArrayMethods>
+43 L<fp|/fp>
 
-44 L<genLValueHashMethods|/genLValueHashMethods>
+44 L<fpn|/fpn>
 
-45 L<genLValueScalarMethods|/genLValueScalarMethods>
+45 L<genLValueArrayMethods|/genLValueArrayMethods>
 
-46 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
+46 L<genLValueHashMethods|/genLValueHashMethods>
 
-47 L<hostName|/hostName>
+47 L<genLValueScalarMethods|/genLValueScalarMethods>
 
-48 L<htmlToc|/htmlToc>
+48 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
 
-49 L<imageSize|/imageSize>
+49 L<hostName|/hostName>
 
-50 L<indentString|/indentString>
+50 L<htmlToc|/htmlToc>
 
-51 L<isBlank|/isBlank>
+51 L<imageSize|/imageSize>
 
-52 L<javaPackage|/javaPackage>
+52 L<indentString|/indentString>
 
-53 L<javaPackageAsFileName|/javaPackageAsFileName>
+53 L<isBlank|/isBlank>
 
-54 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
+54 L<javaPackage|/javaPackage>
 
-55 L<loadArrayFromLines|/loadArrayFromLines>
+55 L<javaPackageAsFileName|/javaPackageAsFileName>
 
-56 L<loadHashArrayFromLines|/loadHashArrayFromLines>
+56 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
 
-57 L<loadHashFromLines|/loadHashFromLines>
+57 L<loadArrayFromLines|/loadArrayFromLines>
 
-58 L<makePath|/makePath>
+58 L<loadHashArrayFromLines|/loadHashArrayFromLines>
 
-59 L<matchPath|/matchPath>
+59 L<loadHashFromLines|/loadHashFromLines>
 
-60 L<max|/max>
+60 L<makePath|/makePath>
 
-61 L<microSecondsSinceEpoch|/microSecondsSinceEpoch>
+61 L<matchPath|/matchPath>
 
-62 L<min|/min>
+62 L<max|/max>
 
-63 L<nws|/nws>
+63 L<microSecondsSinceEpoch|/microSecondsSinceEpoch>
 
-64 L<pad|/pad>
+64 L<min|/min>
 
-65 L<parseCommandLineArguments|/parseCommandLineArguments>
+65 L<nws|/nws>
 
-66 L<parseFileName|/parseFileName>
+66 L<pad|/pad>
 
-67 L<perlPackage|/perlPackage>
+67 L<parseCommandLineArguments|/parseCommandLineArguments>
 
-68 L<powerOfTwo|/powerOfTwo>
+68 L<parseFileName|/parseFileName>
 
-69 L<powerOfTwoX|/powerOfTwo>
+69 L<perlPackage|/perlPackage>
 
-70 L<printFullFileName|/printFullFileName>
+70 L<powerOfTwo|/powerOfTwo>
 
-71 L<printQw|/printQw>
+71 L<powerOfTwoX|/powerOfTwo>
 
-72 L<quoteFile|/quoteFile>
+72 L<printQw|/printQw>
 
-73 L<readBinaryFile|/readBinaryFile>
+73 L<quoteFile|/quoteFile>
 
-74 L<readFile|/readFile>
+74 L<readBinaryFile|/readBinaryFile>
 
-75 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs>
+75 L<readFile|/readFile>
 
-76 L<removeFilePrefix|/removeFilePrefix>
+76 L<readUtf16File|/readUtf16File>
 
-77 L<renormalizeFolderName|/renormalizeFolderName>
+77 L<removeBOM|/removeBOM>
 
-78 L<saveSourceToS3|/saveSourceToS3>
+78 L<removeFilePrefix|/removeFilePrefix>
 
-79 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
+79 L<renormalizeFolderName|/renormalizeFolderName>
 
-80 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
+80 L<saveCodeToS3|/saveCodeToS3>
 
-81 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
+81 L<saveSourceToS3|/saveSourceToS3>
 
-82 L<temporaryDirectory|/temporaryDirectory>
+82 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
 
-83 L<temporaryFile|/temporaryFile>
+83 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords>
 
-84 L<temporaryFolder|/temporaryFolder>
+84 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords>
 
-85 L<timeStamp|/timeStamp>
+85 L<temporaryDirectory|/temporaryDirectory>
 
-86 L<trackFiles|/trackFiles>
+86 L<temporaryFile|/temporaryFile>
 
-87 L<trim|/trim>
+87 L<temporaryFolder|/temporaryFolder>
 
-88 L<updateDocumentation|/updateDocumentation>
+88 L<timeStamp|/timeStamp>
 
-89 L<userId|/userId>
+89 L<titleToUniqueFileName|/titleToUniqueFileName>
 
-90 L<versionCode|/versionCode>
+90 L<trackFiles|/trackFiles>
 
-91 L<versionCodeDashed|/versionCodeDashed>
+91 L<trim|/trim>
 
-92 L<writeBinaryFile|/writeBinaryFile>
+92 L<updateDocumentation|/updateDocumentation>
 
-93 L<writeFile|/writeFile>
+93 L<userId|/userId>
 
-94 L<writeFiles|/writeFiles>
+94 L<versionCode|/versionCode>
 
-95 L<xxx|/xxx>
+95 L<versionCodeDashed|/versionCodeDashed>
 
-96 L<yyy|/yyy>
+96 L<writeBinaryFile|/writeBinaryFile>
 
-97 L<zzz|/zzz>
+97 L<writeFile|/writeFile>
 
-98 L<ˢ|/ˢ>
+98 L<writeFiles|/writeFiles>
+
+99 L<wwwEncode|/wwwEncode>
+
+100 L<xxx|/xxx>
+
+101 L<yyy|/yyy>
+
+102 L<zzz|/zzz>
+
+103 L<ˢ|/ˢ>
 
 =head1 Installation
 
@@ -3049,7 +3188,7 @@ test unless caller;
 # podDocumentation
 __DATA__
 #Test::More->builder->output("/dev/null");
-use Test::More tests => 256;
+use Test::More tests => 267;
 my $windows = $^O =~ m(MSWin32)is;
 my $mac     = $^O =~ m(darwin)is;
 
@@ -3632,7 +3771,7 @@ ok "/home/il/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/aaa.pl",   "../.
 ok "/home/il/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/aaa",      "../../il/perl/bbb");
 ok "/home/il/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/",         "../../il/perl/bbb");
 ok "/home/il/perl/bbb"      eq absFromAbsPlusRel("/home/la/perl/",         "../../il/perl/bbb");
-ok "/home/il/perl"         eq absFromAbsPlusRel("/home/la/perl/aaa",      "../../il/perl");
+ok "/home/il/perl"          eq absFromAbsPlusRel("/home/la/perl/aaa",      "../../il/perl");
 ok "/home/il/perl/"         eq absFromAbsPlusRel("/home/la/perl/",         "../../il/perl/");
 
 ok ˢ{1};                                                                        #Tˢ
@@ -3646,7 +3785,17 @@ ok ˢ{1};                                                                       
   ok q(a_q_6.txt) eq &titleToUniqueFileName($f, qw(a q txt));
  };
 
-test:;
+  ok fp (q(a/b/c.d.e))  eq q(a/b/),    q(f1);
+  ok fpn(q(a/b/c.d.e))  eq q(a/b/c.d), q(f2);
+  ok fn (q(a/b/c.d.e))  eq q(c.d),     q(f3);
+  ok fne(q(a/b/c.d.e))  eq q(c.d.e),   q(f4);
+  ok fe (q(a/b/c.d.e))  eq q(e),       q(f5);
+  ok fp (q(/a/b/c.d.e)) eq q(/a/b/),    q(f1);
+  ok fpn(q(/a/b/c.d.e)) eq q(/a/b/c.d), q(f2);
+  ok fn (q(/a/b/c.d.e)) eq q(c.d),     q(f3);
+  ok fne(q(/a/b/c.d.e)) eq q(c.d.e),   q(f4);
+  ok fe (q(/a/b/c.d.e)) eq q(e),       q(f5);
+
 ˢ{our $a = q(1);                                                                #Tcall
   our @a = qw(1);
   our %a = (a=>1);
@@ -3659,5 +3808,7 @@ test:;
     ok $b    == 1;
    }
  };
+
+ ok wwwEncode(q(a  b c)) eq q(a%20%20b%20c);
 
 1

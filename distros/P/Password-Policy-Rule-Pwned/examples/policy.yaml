@@ -1,0 +1,5 @@
+---
+default:
+    length: 2
+    algorithm: "Plaintext"
+    pwned: 1

@@ -2,8 +2,8 @@
 
 common: fi fl ffi ffl ff fi fl ffi ffl ff
 
-This is «my quotation» and ‘this’ and that’s all This is «my
-quotation» and ‘this’ and that’s all
+This is «my quotation» and „this“ and that’s all This is «my
+quotation» and „this“ and that’s all
 
 10-15 and 100000-150000,10-15
  - a list
@@ -14,7 +14,7 @@ In the ’80 and ’90
 
 — not a list — not really — no
 
-‘this’ and ‘this.’
+„this“ and „this.“
 
 «this» and «this.»
 
@@ -22,7 +22,7 @@ In the ’80 and ’90
 
 «this« and «this«
 
-‘this‘ and ‘this‘
+„this„ and „this„
 
 «my» «quote»
 
@@ -36,22 +36,22 @@ and — here we are — the — ósecondÓ — example
 
 hello.» hell’o»
 
-«?hello?» «?hello?» «l’amour» ‘amour’
+«?hello?» «?hello?» «l’amour» „amour“
 
-This is «ómy quotationÓ» and ‘Óthisó’ and that’s all
+This is «ómy quotationÓ» and „Óthisó“ and that’s all
 
-«This is a ‘quotation’».
+«This is a „quotation“».
 
-«This is a ‘quotation’.»
+«This is a „quotation“.»
 
 sólo Sólo sólobla blasólo sólobla blasólo blasólobla
 
 l’«amore» l’«amore» l’ardore
 
-«хотите присоединиться «к» ‘ордену’ Библиотекарей»
-‘хотите присоединиться «к» ‘ордену’ Библиотекарей’
-«‘хотите’» ‘«хотите»’ ‘«хотите»’
-‘«хотите»’ «‘хотите’» «‘хотите’»
+«хотите присоединиться «к» „ордену“ Библиотекарей»
+„хотите присоединиться «к» „ордену“ Библиотекарей“
+«„хотите“» „«хотите»“ „«хотите»“
+„«хотите»“ «„хотите“» «„хотите“»
 
 This was -not not-here nor-here-x all. —
 This was all. —

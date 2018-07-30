@@ -16,13 +16,13 @@ union SPVM_value {
   float fval;
   double dval;
   void* oval;
-  int8_t* baval;
-  int16_t* saval;
-  int32_t* iaval;
-  int64_t* laval;
-  float* faval;
-  double* daval;
-  SPVM_VALUE* vaval;
+  int8_t* bptr;
+  int16_t* sptr;
+  int32_t* iptr;
+  int64_t* lptr;
+  float* fptr;
+  double* dptr;
+  SPVM_VALUE* vptr;
 };
 
 typedef int8_t SPVM_VALUE_byte;

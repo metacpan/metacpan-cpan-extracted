@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$MooseX::MungeHas::AUTHORITY = 'cpan:TOBYINK';
-	$MooseX::MungeHas::VERSION   = '0.008';
+	$MooseX::MungeHas::VERSION   = '0.010';
 };
 
 use Carp qw(croak);
@@ -120,24 +120,31 @@ sub _compile_munger_code
 	push @code, '    my $_is = delete($_{_is});';
 	push @code, '    $_{is} ||= $_is;';
 	push @code, '  }';
+
+	push @code, 'if ( ref $_{lazy} eq q(CODE) ) {';
+	push @code, '    $_{builder} ||= $_{lazy};';
+	push @code, '}';
 	
 	push @code, '  if (ref($_{builder}) eq q(CODE)) {';
 	push @code, '    no strict qw(refs);';
 	push @code, '    require Sub::Util;';
-	push @code, '    my $name = "$_{__CALLER__}::_build_$_";';
+	push @code, '    my $short_name = "_build_$_";';
+	push @code, '    my $name = "$_{__CALLER__}::$short_name";';
 	push @code, '    *$name = Sub::Util::set_subname($name, $_{builder});';
-	push @code, '    $_{builder} = $name;';
+	push @code, '    $_{builder} = $short_name;';
 	push @code, '  }';
 	
 	unless (_detect_oo($caller) eq "Moo")
 	{
-		push @code, '  if ($_{is} eq q(lazy)) {';
+		push @code, '  my $is = $_{is} || "";';
+
+		push @code, '  if ($is eq q(lazy)) {';
 		push @code, '    $_{is}      = "ro";';
 		push @code, '    $_{lazy}    = 1 unless exists($_{lazy});';
 		push @code, '    $_{builder} = "_build_$_" if $_{lazy} && !exists($_{builder}) && !exists($_{default});';
 		push @code, '  }';
 		
-		push @code, '  if ($_{is} eq q(rwp)) {';
+		push @code, '  if ($is eq q(rwp)) {';
 		push @code, '    $_{is}     = "ro";';
 		push @code, '    $_{writer} = "_set_$_" unless exists($_{writer});';
 		push @code, '  }';
@@ -386,6 +393,13 @@ Makes C<< has $name => $type_constraint >> into a shortcut for:
 
 (Assuming that C<< $type_constraint >> is a blessed type constraint
 object a la L<Type::Tiny>, L<MooseX::Types>, etc.)
+
+=item *
+
+Makes C<< lazy => sub { ... } >> into a shortcut for:
+
+    lazy    => 1,
+    builder => sub { ... },
 
 =back
 

@@ -5,7 +5,7 @@ package Tcl::pTk::Text;
 
 use Text::Tabs;
 
-our ($VERSION) = ('0.93');
+our ($VERSION) = ('0.94');
 
 # borrowed from Tk/Text.pm without any modifications
 
@@ -841,6 +841,7 @@ sub tag{
 sub FindAll
 {
  my ($w,$mode, $case, $pattern ) = @_;
+ $mode = _expandModeFlag($mode);
  ### 'sel' tags accumulate, need to remove any previous existing
  $w->unselectAll;
 
@@ -913,7 +914,8 @@ sub FindSelectionPrevious
 sub FindNext
 {
  my ($w,$direction, $mode, $case, $pattern ) = @_;
-
+ $mode = _expandModeFlag($mode);
+ 
  ## if searching forward, start search at end of selected block
  ## if backward, start search from start of selected block.
  ## dont want search to find currently selected text.
@@ -1057,6 +1059,23 @@ sub ViewMenuItems
   ];
 }
 
+# Workaround for compatibility with Perl/Tk search()
+# (used by Tk::Text Find methods), which accepts
+# abbreviated flags, whereas Tcl/Tk search() does not
+#
+# TODO: should this be rewritten as _expandSearchFlags
+# and process e.g. $direction or $case as well?
+sub _expandModeFlag {
+  my $mode = shift;
+  if (($mode =~ m{^-e}) &&
+      ($mode eq substr("-exact", 0, length($mode)))) {
+    $mode = '-exact';
+  } elsif (($mode =~ m{^-r}) &&
+      ($mode eq substr("-regex", 0, length($mode)))) {
+    $mode = '-regex';
+  }
+  return $mode;
+}
 
 
 1;

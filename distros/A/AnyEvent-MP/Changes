@@ -19,6 +19,10 @@ TODO: export keepalive?
 TODO: $guard = con $cb->($up)
 TODO: aemp readline support
 TODO: gleeco re: AE::MP::DataConn -
+TODO: version both in MP.pm and MP/Config.pm because of cpan indexer
+
+2.02 Sun Jul 29 04:22:53 CEST 2018
+	- hardcode version in MP.pm to help the CPAN indexer.
 
 2.01 Tue Jul 24 09:02:34 CEST 2018
 	- try to work around a race condition that we can't identify

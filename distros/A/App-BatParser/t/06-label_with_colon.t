@@ -73,11 +73,6 @@ use Path::Tiny;
                         'Identifier' => 'label2'
                     }
                 },
-                {
-                    'Statement' => {
-                        'Command' => ''
-                    }
-                },
             ]
         }
     };

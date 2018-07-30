@@ -7,8 +7,8 @@
 =cut
 
 use strict;
-use Test::More tests => 10;
-use strict;
+use Test::More tests => 12;
+use Test::Warn;
 
 use_ok('CGI::Ex::Validate');
 my $e;
@@ -77,3 +77,16 @@ $v = {
 $e = validate($form, $v);
 ok(! $e, "No error");
 is($form->{'key3'}, '23', "Non-global is fine");
+
+{
+    local $form->{'key1'} = undef;
+    $v = {
+        key1 => {
+            replace => 's/whatever//',
+        },
+    };
+
+    local $^W = 1;  # enable warnings
+    warning_is { $e = validate($form, $v) } undef, 'No warnings';
+    ok(! $e, 'No error');
+}

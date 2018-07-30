@@ -1,0 +1,27 @@
+Changes
+examples/create_db.pl
+examples/show_post
+lib/WordPress/DBIC/Schema.pm
+lib/WordPress/DBIC/Schema/Result/WpComment.pm
+lib/WordPress/DBIC/Schema/Result/WpCommentmeta.pm
+lib/WordPress/DBIC/Schema/Result/WpLink.pm
+lib/WordPress/DBIC/Schema/Result/WpOption.pm
+lib/WordPress/DBIC/Schema/Result/WpPost.pm
+lib/WordPress/DBIC/Schema/Result/WpPostmeta.pm
+lib/WordPress/DBIC/Schema/Result/WpTerm.pm
+lib/WordPress/DBIC/Schema/Result/WpTermmeta.pm
+lib/WordPress/DBIC/Schema/Result/WpTermRelationship.pm
+lib/WordPress/DBIC/Schema/Result/WpTermTaxonomy.pm
+lib/WordPress/DBIC/Schema/Result/WpUser.pm
+lib/WordPress/DBIC/Schema/Result/WpUsermeta.pm
+lib/WordPress/DBIC/Schema/ResultSet/WpPost.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

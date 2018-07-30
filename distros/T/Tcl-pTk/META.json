@@ -12,7 +12,6 @@
       "GUI"
    ],
    "license" : [
-      "unknown",
       "perl_5"
    ],
    "meta-spec" : {
@@ -49,6 +48,14 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.93",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/chrstphrchvz/perl-tcl-ptk.git",
+         "web" : "https://github.com/chrstphrchvz/perl-tcl-ptk"
+      },
+      "x_MailingList" : "mailto:tcltk@perl.org"
+   },
+   "version" : "0.94",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

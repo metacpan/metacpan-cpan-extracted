@@ -164,6 +164,17 @@ void V8Context::set(const char* name, SV* value)
     pl_stats_stop(aTHX_ this, &perf, "set");
 }
 
+void V8Context::remove(const char* name)
+{
+    ENTER_SCOPE;
+    set_up();
+
+    Perf perf;
+    pl_stats_start(aTHX_ this, &perf);
+    pl_del_global_or_property(aTHX_ this, name);
+    pl_stats_stop(aTHX_ this, &perf, "remove");
+}
+
 SV* V8Context::eval(const char* code, const char* file)
 {
     ENTER_SCOPE;

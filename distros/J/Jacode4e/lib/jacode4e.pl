@@ -1,5 +1,5 @@
 package jacode4e;
-$VERSION = '2.13.6.5';
+$VERSION = '2.13.6.6';
 ######################################################################
 #
 # jacode4e - jacode.pl-like program for enterprise
@@ -37,13 +37,14 @@ $VERSION = '2.13.6.5';
 #       mnemonic      means
 #       -----------------------------------------------------------------------
 #       cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-#       cp932         CP932
-#       sjis2004      Shift_JIS-2004
+#       cp932         Microsoft CP932, IANA Windows-31J
+#       sjis2004      JISC Shift_JIS-2004
 #       cp00930       IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
 #       keis78        HITACHI KEIS78
 #       keis83        HITACHI KEIS83
 #       keis90        HITACHI KEIS90
-#       jef           FUJITSU JEF
+#       jef           FUJITSU JEF (12 point size for printing with option OUTPUT_SHIFTING)
+#       jef9p         FUJITSU JEF ( 9 point size for printing with option OUTPUT_SHIFTING)
 #       jipsj         NEC JIPS(J)
 #       jipse         NEC JIPS(E)
 #       utf8          UTF-8
@@ -60,9 +61,9 @@ $VERSION = '2.13.6.5';
 #                        default is 'S'
 #       OUTPUT_SHIFTING  true means use output shift code, false means not use
 #                        default is false
-#       SPACE            output space code in DBCS
+#       SPACE            output space code in DBCS/MBCS
 #                        default is U+3000 in Unicode
-#       GETA             output geta code in DBCS
+#       GETA             output geta code in DBCS/MBCS
 #                        default is U+3013 in Unicode
 #       -----------------------------------------------------------------------
 #
@@ -72,7 +73,7 @@ $VERSION = '2.13.6.5';
 #   use FindBin;
 #   use lib "$FindBin::Bin/lib";
 #   require 'jacode4e.pl';
-#   jacode4e::VERSION('2.13.6.5');
+#   jacode4e::VERSION('2.13.6.6');
 #   while (<>) {
 #       $return =
 #       jacode4e::convert(\$_, 'cp932x', 'cp00930', {
@@ -108,6 +109,46 @@ my @encodings = qw(
 );
 my @io_encodings = grep( ! /^(?:unicode)$/, @encodings);
 
+if ($0 eq __FILE__) {
+    if (not @ARGV) {
+        die <<END;
+usage:
+    perl $0 --dumptable
+
+END
+    }
+    elsif ($ARGV[0] eq '--dumptable') {
+        chomp(@_ = <DATA>);
+        for my $encoding (@encodings) {
+            open(TABLE,">$0.table.$encoding");
+            for (@_) {
+                my %hex = ();
+                @hex{@encodings} = split(/ +/,$_);
+                print TABLE $_;
+                if ($hex{$encoding} =~ /^[0123456789ABCDEF]+$/) {
+                    if ($encoding =~ /^(?:cp932x|cp932|sjis2004|unicode|utf8)$/) {
+                        if (('00' le $hex{$encoding}) and ($hex{$encoding} le '1F')) {
+                        }
+                        else {
+                            print TABLE "\x20\x5B", pack('H*', $hex{$encoding}), "\x5D";
+                        }
+                    }
+                    elsif ($encoding =~ /^utf8jp$/) {
+                        if (('F3B08080' le $hex{$encoding}) and ($hex{$encoding} le 'F3B0809F')) {
+                        }
+                        else {
+                            print TABLE "\x20\x5B", pack('H*', $hex{$encoding}), "\x5D";
+                        }
+                    }
+                }
+                print TABLE "\n";
+            }
+            close(TABLE);
+        }
+        exit;
+    }
+}
+
 while (<DATA>) {
     chomp;
 
@@ -128,7 +169,7 @@ while (<DATA>) {
                 warn qq{@{[__FILE__]} duplicate definitions \$tr{'$encoding'}{'utf8jp'}{'$hex{utf8}'} = "$hex{$encoding}" and "} . uc unpack('H*',$tr{$encoding}{'utf8jp'}{$bin{'utf8jp'}})    . qq{"\n};
             }
             $tr{'utf8jp'}{$encoding}{$bin{$encoding}} = $bin{'utf8jp'};
-            $tr{$encoding}{'utf8jp'}{$bin{'utf8jp'}   } = $bin{$encoding};
+            $tr{$encoding}{'utf8jp'}{$bin{'utf8jp'} } = $bin{$encoding};
         }
     }
 }
@@ -602,6 +643,12 @@ END
         'getc'      => sub { s!^(${_[0]})!!;                                   $tr{'utf8jp'}{'jef'}{$1   };    },
         'putc'      => sub { local $^W;                                        $tr{'jef'}{'utf8jp'}{$_[0]};    },
     },
+    'jef9p' => {
+        'get_ctype' => sub { s!^\x29!! ? 'SBCS' :     s!^[\x28\x38]!! ? 'DBCS' : undef                         },
+        'set_ctype' => sub { {'SBCS'=>"\x29",         'DBCS'=>"\x38",    }->{$_[0]}                            },
+        'getc'      => sub { s!^(${_[0]})!!;                                   $tr{'utf8jp'}{'jef'}{$1   };    },
+        'putc'      => sub { local $^W;                                        $tr{'jef'}{'utf8jp'}{$_[0]};    },
+    },
     'jipsj' => {
         'get_ctype' => sub { s!^\x1A\x71!! ? 'SBCS' : s!^\x1A\x70!! ? 'DBCS' : undef                           },
         'set_ctype' => sub { {'SBCS'=>"\x1A\x71",     'DBCS'=>"\x1A\x70",}->{$_[0]}                            },
@@ -686,6 +733,7 @@ sub convert {
     if ($_{$INPUT_encoding}{'set_ctype'}->('DBCS') ne '') {
         if (defined $option->{'INPUT_LAYOUT'}) {
             $INPUT_LAYOUT = $option->{'INPUT_LAYOUT'};
+            $INPUT_LAYOUT =~ s/([SD])([0-9]+)/$1 x $2/ge;
             if ($INPUT_LAYOUT =~ /^[SD]*$/) {
                 @ctype = map {{'S'=>'SBCS', 'D'=>'DBCS',}->{$_}} split(//,$INPUT_LAYOUT);
             }
@@ -785,13 +833,14 @@ jacode4e - jacode.pl-like program for enterprise
       mnemonic      means
       -----------------------------------------------------------------------
       cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-      cp932         CP932
-      sjis2004      Shift_JIS-2004
+      cp932         Microsoft CP932, IANA Windows-31J
+      sjis2004      JISC Shift_JIS-2004
       cp00930       IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
       keis78        HITACHI KEIS78
       keis83        HITACHI KEIS83
       keis90        HITACHI KEIS90
-      jef           FUJITSU JEF
+      jef           FUJITSU JEF (12 point size for printing with option OUTPUT_SHIFTING)
+      jef9p         FUJITSU JEF ( 9 point size for printing with option OUTPUT_SHIFTING)
       jipsj         NEC JIPS(J)
       jipse         NEC JIPS(E)
       utf8          UTF-8
@@ -807,16 +856,16 @@ jacode4e - jacode.pl-like program for enterprise
                        'S' means one char as SBCS, 'D' means one char as DBCS
       OUTPUT_SHIFTING  true means use output shift code, false means not use
                        default is false
-      SPACE            output space code in DBCS
-      GETA             output geta code in DBCS
+      SPACE            output space code in DBCS/MBCS
+      GETA             output geta code in DBCS/MBCS
       -----------------------------------------------------------------------
 
-=head1 SAMPLES
+=head1 SAMPLE
 
   use FindBin;
   use lib "$FindBin::Bin/lib";
   require 'jacode4e.pl';
-  jacode4e::VERSION('2.13.6.5');
+  jacode4e::VERSION('2.13.6.6');
   while (<>) {
       $return =
       jacode4e::convert(\$_, 'cp932x', 'cp00930', {
@@ -827,6 +876,117 @@ jacode4e - jacode.pl-like program for enterprise
       });
       print $_;
   }
+
+=head1 INPUT SI/SO code
+
+  Wikipedia tells us Kanji shift code of each encoding of vendors.
+  jacode4e::convert() handle SI/SO(Shift In and Shift Out) code in $line
+  automatically. If $line has no SI/SO code, we can use option INPUT_LAYOUT
+  instead of SI/SO code.
+  Actually saying, we have to use option INPUT_LAYOUT almost always, if
+  $INPUT_encoding is any of enterprise encodings.
+  
+  ---------------------------------------------------------------------------
+                     SO(Shift Out)       SI(Shift In)
+  $INPUT_encoding    KI(KANJI In)        KO(KANJI Out)
+  mnemonic           switch to DBCS      switch to SBCS    note
+  ---------------------------------------------------------------------------
+  'cp932x'           (nothing)           (nothing)         
+  'cp932'            (nothing)           (nothing)         
+  'sjis2004'         (nothing)           (nothing)         
+  'cp00930'          "\x0E"              "\x0F"            
+  'keis78'           "\x0A\x42"          "\x0A\x41"        
+  'keis83'           "\x0A\x42"          "\x0A\x41"        
+  'keis90'           "\x0A\x42"          "\x0A\x41"        
+  'jef'              "\x28" or "\x38"    "\x29"            both 12 and 9 point size are ok
+  'jef9p'            "\x28" or "\x38"    "\x29"            both 12 and 9 point size are ok
+  'jipsj'            "\x1A\x70"          "\x1A\x71"        
+  'jipse'            "\x3F\x75"          "\x3F\x76"        
+  'utf8'             (nothing)           (nothing)         
+  'utf8jp'           (nothing)           (nothing)         
+  ---------------------------------------------------------------------------
+
+=head1 OUTPUT SI/SO code
+
+  jacode4e::convert() doesn't output SI/SO code on default. Thus, if you
+  need SI/SO code then you have to use option 'OUTPUT_SHIFTING' => 1.
+  
+  ---------------------------------------------------------------------------
+                     SO(Shift Out)       SI(Shift In)
+  $OUTPUT_encoding   KI(KANJI In)        KO(KANJI Out)
+  mnemonic           switch to DBCS      switch to SBCS    %option
+  ---------------------------------------------------------------------------
+  'cp932x'           (nothing)           (nothing)         
+  'cp932'            (nothing)           (nothing)         
+  'sjis2004'         (nothing)           (nothing)         
+  'cp00930'          "\x0E"              "\x0F"            'OUTPUT_SHIFTING' => 1
+  'keis78'           "\x0A\x42"          "\x0A\x41"        'OUTPUT_SHIFTING' => 1
+  'keis83'           "\x0A\x42"          "\x0A\x41"        'OUTPUT_SHIFTING' => 1
+  'keis90'           "\x0A\x42"          "\x0A\x41"        'OUTPUT_SHIFTING' => 1
+  'jef'              "\x28"              "\x29"            'OUTPUT_SHIFTING' => 1
+  'jef9p'            "\x38"              "\x29"            'OUTPUT_SHIFTING' => 1
+  'jipsj'            "\x1A\x70"          "\x1A\x71"        'OUTPUT_SHIFTING' => 1
+  'jipse'            "\x3F\x75"          "\x3F\x76"        'OUTPUT_SHIFTING' => 1
+  'utf8'             (nothing)           (nothing)         
+  'utf8jp'           (nothing)           (nothing)         
+  ---------------------------------------------------------------------------
+
+=head1 OUTPUT DBCS/MBCS SPACE code
+
+  The default space code is as follows.
+  You can change the space code using the option 'SPACE' if you want.
+  
+  ---------------------------------------------------------------------------
+  $OUTPUT_encoding
+  mnemonic           default code        %option
+  ---------------------------------------------------------------------------
+  'cp932x'           "\x81\x40"          
+  'cp932'            "\x81\x40"          
+  'sjis2004'         "\x81\x40"          'SPACE' => "\x20\x20" for CP/M-86 compatible
+  'cp00930'          "\x40\x40"          
+  'keis78'           "\xA1\xA1"          
+  'keis83'           "\xA1\xA1"          
+  'keis90'           "\xA1\xA1"          
+  'jef'              "\xA1\xA1"          'SPACE' => "\x40\x40" for 99FR-0012-2 and 99FR-0012-3 compatible
+  'jef9p'            "\xA1\xA1"          'SPACE' => "\x40\x40" for 99FR-0012-2 and 99FR-0012-3 compatible
+  'jipsj'            "\x21\x21"          
+  'jipse'            "\x4F\x4F"          
+  'utf8'             "\xE3\x80\x80"      
+  'utf8jp'           "\xF3\xB0\x84\x80"  
+  ---------------------------------------------------------------------------
+
+=head1 OUTPUT DBCS/MBCS GETA code
+
+  If a character isn't included in $OUTPUT_encoding set, GETA code will be
+  used instead of converted code.
+  
+  The default GETA code is as follows.
+  You can change GETA code using option 'GETA' if you want.
+  
+  "GETA" doesn't mean "GETA", but means "GETA-MARK".
+  
+  GETA is Japanese wooden shoes that made for walk on paddy field. One GETA
+  has two teeth, and they make GETA-MARK on the ground by bite the earth
+  twice. Thus, GETA code is double byte code, or often multibyte code.
+  
+  ---------------------------------------------------------------------------
+  $OUTPUT_encoding
+  mnemonic           default code        %option sample
+  ---------------------------------------------------------------------------
+  'cp932x'           "\x81\xAC"          'GETA' => "\x81\xA1"
+  'cp932'            "\x81\xAC"          'GETA' => "\x81\x9C"
+  'sjis2004'         "\x81\xAC"          'GETA' => "\x81\xFC"
+  'cp00930'          "\x44\x7D"          
+  'keis78'           "\xA2\xAE"          
+  'keis83'           "\xA2\xAE"          
+  'keis90'           "\xA2\xAE"          
+  'jef'              "\xA2\xAE"          
+  'jef9p'            "\xA2\xAE"          
+  'jipsj'            "\x22\x2E"          
+  'jipse'            "\x7F\x4B"          
+  'utf8'             "\xE3\x80\x93"      
+  'utf8jp'           "\xF3\xB0\x85\xAB"  
+  ---------------------------------------------------------------------------
 
 =head1 ABSTRACT
 
@@ -938,6 +1098,31 @@ When you lost your way, you can see this matrix and find your way.
   ---------------------------------------------------------
   Beginner   jacode.pl  jacode.pl  jacode.pl  jacode4e.pl
   ---------------------------------------------------------
+
+=head1 Why CP932X born?
+
+In order to know why CP932X exists the way it is(or isn't), one must first know why CP932X born.
+
+  Q1) Is CCS of JIS X 0208 enough?
+  A1) No. Often we require GAIJI.
+  
+  Q2) Is CCS of JIS X 0213 enough?
+  A2) It's not perfect, but enough for many people.
+  
+  Q3) Is CES by UTF-8 good?
+  A3) No. In Japanese information processing, it's unstable and not popular still now.
+  
+  Q4) Is CES by Shift_JIS-2004 good?
+  A4) No. Because Shift_JIS-2004 cannot support very popular CP932 and your GAIJI. We need a realistic solution to solving real problem.
+  
+  Q5) Is escape sequence good idea to support CCS of JIS X 0213?
+  A5) No. Because the programming is so hard.
+  
+  Q6) Which character is best as single shift code to support CCS of JIS X 0213?
+    -- The single shift code must be a DBCS code, because DBCS field cannot store SBCS code in some cases
+    -- Moreover, all GAIJI code points must be yours
+    -- The impact of this solution must be minimum
+  A6) I select 1-55-27 as single shift code. It is ghost character and not used by nobody.
 
 =head1 AUTHOR
 
@@ -1079,19 +1264,19 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 1;
 
-#+++++++-------------------------------------------------------------------------------- CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-#||||||| ++++--------------------------------------------------------------------------- CP932
-#||||||| |||| ++++---------------------------------------------------------------------- Shift_JIS-2004
-#||||||| |||| |||| ++++----------------------------------------------------------------- IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
-#||||||| |||| |||| |||| ++++------------------------------------------------------------ HITACHI KEIS78
-#||||||| |||| |||| |||| |||| ++++------------------------------------------------------- HITACHI KEIS83
-#||||||| |||| |||| |||| |||| |||| ++++-------------------------------------------------- HITACHI KEIS90
-#||||||| |||| |||| |||| |||| |||| |||| ++++--------------------------------------------- FUJITSU JEF
-#||||||| |||| |||| |||| |||| |||| |||| |||| ++++---------------------------------------- NEC JIPS(J)
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| ++++----------------------------------- NEC JIPS(E)
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| +++++++++------------------------- Unicode
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| ++++++++++++------------ UTF-8
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| |||||||||||| ++++++++--- UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
+#+++++++------------------------------------------------------------------------------- CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
+#||||||| ++++-------------------------------------------------------------------------- Microsoft CP932, IANA Windows-31J
+#||||||| |||| ++++--------------------------------------------------------------------- JISC Shift_JIS-2004
+#||||||| |||| |||| ++++---------------------------------------------------------------- IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
+#||||||| |||| |||| |||| ++++----------------------------------------------------------- HITACHI KEIS78
+#||||||| |||| |||| |||| |||| ++++------------------------------------------------------ HITACHI KEIS83
+#||||||| |||| |||| |||| |||| |||| ++++------------------------------------------------- HITACHI KEIS90
+#||||||| |||| |||| |||| |||| |||| |||| ++++-------------------------------------------- FUJITSU JEF
+#||||||| |||| |||| |||| |||| |||| |||| |||| ++++--------------------------------------- NEC JIPS(J)
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| ++++---------------------------------- NEC JIPS(E)
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| +++++++++------------------------ Unicode
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| ++++++++++++----------- UTF-8
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| |||||||||||| ++++++++-- UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
 #2345678 1234 1234 1234 1234 1234 1234 1234 1234 1234 123456789 123456789012 12345678
 #VVVVVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVVVVVVV VVVVVVVVVVVV VVVVVVVV
 __DATA__

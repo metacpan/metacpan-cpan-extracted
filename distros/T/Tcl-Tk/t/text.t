@@ -10,6 +10,10 @@ if ($^O ne 'MSWin32' and !$ENV{DISPLAY}) {
 
 my $mw = Tcl::Tk::MainWindow->new;
 
+if (!$mw->interp->pkg_require('tile')) {
+    print "1..0 # skip: no tile extension available\n";
+    exit;
+}
 plan tests=>3;
 
 my $tw = $mw->Scrolled('Text',-font=>32)->pack;

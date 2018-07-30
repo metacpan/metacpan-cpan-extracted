@@ -4,9 +4,12 @@ use strict;
 use Exporter 'import';
 use CPAN;
 use CPAN::HandleConfig;
+
 our @EXPORT_OK = qw(is_distro_ok block_distro);
-our $VERSION = '0.016'; # VERSION
+
+our $VERSION = '0.017'; # VERSION
 #
+
 =pod
 
 =head1 NAME
@@ -35,15 +38,16 @@ Returns true or false depending if the string passes the tests. It will also C<w
 sub is_distro_ok {
     my $distro = shift;
 
-    unless (defined($distro)) {
-       warn "--distro is a required parameter!\n\n";
-       return 0;
+    unless ( defined($distro) ) {
+        warn "--distro is a required parameter!\n\n";
+        return 0;
     }
 
-    unless ($distro =~ /^\w+\/[\w-]+$/) {
+    unless ( $distro =~ /^\w+\/[\w-]+$/ ) {
         warn "invalid string '$distro' in --distro!\n\n";
         return 0;
-    } else {
+    }
+    else {
         return 1;
     }
 }
@@ -80,24 +84,24 @@ If there is an already file created as defined in C<full_path> key, it will C<wa
 =cut
 
 sub block_distro {
-    my ($distro, $perlbrew_perl, $comment) = @_;
+    my ( $distro, $perl_info, $comment ) = @_;
     my $distribution = '^' . $distro;
     my $filename     = "$distro.yml";
     $filename =~ s/\//./;
 
     my %data = (
         comment => $comment || 'Tests hang smoker',
-        match   => { distribution  => $distribution, 
-                     env           => { 
-                          PERLBREW_PERL => $perlbrew_perl
-                        },
-                    },
+        match => {
+            distribution => $distribution,
+            perlconfig   => $perl_info
+        },
         disabled => 1
     );
 
     CPAN::HandleConfig->load;
     my $prefs_dir = $CPAN::Config->{prefs_dir};
-    die "$prefs_dir does not exist or it is not readable\n" unless ( -d $prefs_dir );
+    die "$prefs_dir does not exist or it is not readable\n"
+      unless ( -d $prefs_dir );
     my $full_path = File::Spec->catfile( $prefs_dir, $filename );
 
     if ( -f $full_path ) {

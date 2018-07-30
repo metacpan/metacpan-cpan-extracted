@@ -45,8 +45,15 @@ DESCRIPTION
 
 FUNCTIONS
   extract
+      my $struct = extract($text, \%arg);
+
     Takes a single string argument which is the text to extract quote
     structure from. Returns a nested datastructure as described above.
+
+    Second argument is optional: a hashref of options. The only valid
+    argument at present is:
+
+      no_separators - never mark paragraphs as "separators"
 
     Exported by default.
 

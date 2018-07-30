@@ -251,6 +251,12 @@ WIDGET-SPECIFIC OPTIONS
         [Return] key is bound with an *-altbinding*, etc. to do something
         other than pop up the drop-down list.
 
+        "List=Bouncy" - causes the drop-down list to behave more like a
+        popup menu and immediately roll back up (after matching text with
+        nearest entry) if the mouse button is pressed and released on the
+        drop-down list button. (Normally, the drop-down list state is simply
+        toggled when mouse is pressed and released on the button.)
+
         "Nolistbox=actions" - causes certain *actions* to NOT invoke the
         *-browsecmd* callback when activated within the listbox widget, ie.
         "Nolistbox=listbox.space" means don't invoke *-browsecmd* callback
@@ -335,18 +341,34 @@ WIDGET-SPECIFIC OPTIONS
         the entry field first receives focus, then pressing <Tab> causes the
         button to be focused.
 
+    -buttonbackground
+        Specify alternate background for the drop-down list button.
+
+    -buttonforeground
+        Specify alternate foreground for the drop-down list button.
+
     -colorstate
         Archaic carryover from Tk::BrowseEntry -- Appears to force the
-        background of the text-entry widget to *"lightgray"* if state is
-        *readonly* or *disabled* and no -background color has been set; and
-        a slightly darker shade of gray (*"gray95 "*) otherwise. This
-        appears to be broken for the *readonly* and *disabled* states, so
-        I've added a special value of *"2"* to actually do this always. Any
-        other *true* value works like their (broken) version. Regardless of
-        *true* values, we also set the foreground color to *gray30* for
+        background of the text-entry widget to *"lightgray"* if set to *"1"*
+        and state is *readonly* or *disabled*, and no -background color has
+        been set; and a slightly darker shade of gray (*"gray95 "*)
+        otherwise. We also set the foreground color to *gray30* for
         *readonly* or *disabled* states and *black* otherwise to ensure that
         the text remains readable regardless of what foreground color is
-        otherwise set.
+        otherwise set. I've also added special value of *"2"* (or *"dark"*)
+        to set a darker version of the readonly and disabled colors. To only
+        make one or the other use the "darker" shades, one can instead
+        specify *"readonlydark"* or *"disableddark"*. NOTE: Once the widget
+        has been set to a "readonly" state, the *"-textreadonlybackground"*
+        color remains fixed thru future calls to setPalette! This seems to
+        be a limitation of Tk and setPalette. Also note that in general,
+        changing the widget's *-foreground* and / or *-background* options
+        later via "$widget->configure() may not completely change all the
+        colors of every part of every subwidget, and setPalette may not
+        completely correct everything until the widget's *-state* is
+        changed, therefore, it's a good idea to also call
+        $w->state($w->state()); after dynamically changing foreground or
+        background colors for the widget.
 
     -deleteitemsok
         If set, allows user to delete individual items in the drop-down list
@@ -487,7 +509,7 @@ WIDGET-SPECIFIC OPTIONS
 
     -textdisabledbackground
         Specify alternate background for the entry field (when *-state* is
-        disabled). Default: -disabledbackground or the widget's background.
+        disabled).
 
     -textdisabledforeground
         Specify alternate foreground for the entry field (when *-state* is
@@ -512,6 +534,13 @@ INHERITED OPTIONS
 
     -background
         Specifies the background color for the widget and it's subwidgets.
+        NOTE: In general, changing the widget's *-foreground* and / or
+        *-background* options later via "$widget->configure() may not
+        completely change all the colors of every part of every subwidget,
+        and setPalette may not completely correct everything until the
+        widget's *-state* is changed, therefore, it's a good idea to also
+        call $w->state($w->state()); after dynamically changing foreground
+        or background colors for the widget.
 
     -choices
         Specifies the list of initial choices to pop up. This is a reference

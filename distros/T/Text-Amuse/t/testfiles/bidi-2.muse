@@ -1,0 +1,52 @@
+#lang en
+#title Bidi 2
+
+The Persian language is classified as a continuation of Middle
+Persian, the official religious and literary language of the Sasanian
+Empire, itself a continuation of Old Persian, the language of the
+Achaemenid Empire.[15][16][17] Its grammar is similar to that of many
+contemporary European languages.[18] A Persian-speaking person may be
+referred to as Persophone.[19]
+
+There are approximately 110 million Persian speakers worldwide, with
+the language holding official status in Iran, Afghanistan, and
+Tajikistan. For centuries, Persian has also been a prestigious
+cultural language in other regions of Western Asia, Central Asia, and
+South Asia by the various empires based in the regions.[20]
+
+Persian has had a considerable (mainly lexical) influence on
+neighboring languages, particularly the Turkic languages in Central
+Asia, Caucasus, and Anatolia, neighboring Iranian languages, as well
+as Armenian, Georgian, and Indo-Aryan languages, especially Urdu (a
+register of Hindustani). It also exerted some influence on Arabic,
+particularly Bahrani Arabic,[21] while borrowing much vocabulary from
+it after the Arab conquest of Iran.[15][18][22][23][24][25][26]
+
+<<<
+ سری جنگ‌های صلیبی بود که دو پادشاه اروپایی، لوئی هفت
+>>>
+
+With a long history of literature in the form of Middle Persian before
+Islam, Persian was the first language in the Muslim world to break
+through Arabic's monopoly on writing, and the writing of poetry in
+Persian was established as a court tradition in many eastern
+courts.[20] Some of the famous works of Persian literature are the
+Shahnameh of Ferdowsi, the works of Rumi, the Rubaiyat of Omar
+Khayyam, the Panj Ganj of Nizami Ganjavi, the Divān of Hafez and the
+two miscellanea of prose and verse by Saadi Shirazi, the Gulistan and
+the Bustan.
+
+<<<
+ سری جنگ‌های صلیبی بود که دو پادشاه اروپایی، لوئی هفت
+
+
+** Another section
+
+
+A table:
+
+<<<
+
+ سری جنگ‌های صلیبی بود که دو پادشاه اروپایی، لوئی هفت |  سری جنگ‌های صلیبی بود که دو پادشاه اروپایی، لوئی هفت
+
+>>>

@@ -1,3 +1,4 @@
+CONTRIBUTING.pod
 COPYRIGHT
 CREDITS
 Changes
@@ -17,6 +18,7 @@ examples/benchmarking/benchmark-coercions.pl
 examples/benchmarking/benchmark-constraints.pl
 examples/benchmarking/benchmark-named-param-validation.pl
 examples/benchmarking/benchmark-param-validation.pl
+examples/benchmarking/formvalidatorlite.pl
 examples/benchmarking/versus-scalar-validation.pl
 examples/datetime-coercions.pl
 examples/nonempty.pl
@@ -68,6 +70,8 @@ lib/Types/Standard/Dict.pm
 lib/Types/Standard/HashRef.pm
 lib/Types/Standard/Map.pm
 lib/Types/Standard/ScalarRef.pm
+lib/Types/Standard/StrMatch.pm
+lib/Types/Standard/Tied.pm
 lib/Types/Standard/Tuple.pm
 lib/Types/TypeTiny.pm
 t/00-begin.t
@@ -81,8 +85,11 @@ t/20-unit/Error-TypeTiny-Compilation/basic.t
 t/20-unit/Error-TypeTiny-WrongNumberOfParameters/basic.t
 t/20-unit/Error-TypeTiny/basic.t
 t/20-unit/Error-TypeTiny/stacktrace.t
+t/20-unit/Eval-TypeTiny/aliases-devel-lexalias.t
+t/20-unit/Eval-TypeTiny/aliases-native.t
+t/20-unit/Eval-TypeTiny/aliases-padwalker.t
+t/20-unit/Eval-TypeTiny/aliases-tie.t
 t/20-unit/Eval-TypeTiny/basic.t
-t/20-unit/Eval-TypeTiny/fallback-aliases.t
 t/20-unit/Eval-TypeTiny/lexical-subs.t
 t/20-unit/Test-TypeTiny/basic.t
 t/20-unit/Test-TypeTiny/extended.t
@@ -98,6 +105,7 @@ t/20-unit/Type-Coercion/parameterized.t
 t/20-unit/Type-Coercion/smartmatch.t
 t/20-unit/Type-Coercion/typetiny-constructor.t
 t/20-unit/Type-Library/assert.t
+t/20-unit/Type-Library/deprecation.t
 t/20-unit/Type-Library/errors.t
 t/20-unit/Type-Library/inheritance.t
 t/20-unit/Type-Library/is.t
@@ -106,7 +114,10 @@ t/20-unit/Type-Library/types.t
 t/20-unit/Type-Params/badsigs.t
 t/20-unit/Type-Params/carping.t
 t/20-unit/Type-Params/coerce.t
+t/20-unit/Type-Params/compile-named-bless.t
+t/20-unit/Type-Params/compile-named-oo.t
 t/20-unit/Type-Params/compile-named.t
+t/20-unit/Type-Params/defaults.t
 t/20-unit/Type-Params/hashorder.t
 t/20-unit/Type-Params/methods.t
 t/20-unit/Type-Params/mixednamed.t
@@ -136,12 +147,14 @@ t/20-unit/Type-Tiny-Role/basic.t
 t/20-unit/Type-Tiny-Role/errors.t
 t/20-unit/Type-Tiny-Union/basic.t
 t/20-unit/Type-Tiny-Union/errors.t
+t/20-unit/Type-Tiny-Union/relationships.t
 t/20-unit/Type-Tiny-_HalfOp/double-union.t
 t/20-unit/Type-Tiny-_HalfOp/overload-precedence.t
 t/20-unit/Type-Tiny/arithmetic.t
 t/20-unit/Type-Tiny/basic.t
 t/20-unit/Type-Tiny/coercion-modifiers.t
 t/20-unit/Type-Tiny/constraint-strings.t
+t/20-unit/Type-Tiny/deprecation.t
 t/20-unit/Type-Tiny/esoteric.t
 t/20-unit/Type-Tiny/my-methods.t
 t/20-unit/Type-Tiny/parameterization.t
@@ -157,12 +170,15 @@ t/20-unit/Type-Utils/dwim-mouse.t
 t/20-unit/Type-Utils/match-on-type.t
 t/20-unit/Type-Utils/warnings.t
 t/20-unit/Types-Common-Numeric/basic.t
+t/20-unit/Types-Common-Numeric/ranges.t
 t/20-unit/Types-Common-String/basic.t
 t/20-unit/Types-Common-String/coerce.t
+t/20-unit/Types-Common-String/strlength.t
 t/20-unit/Types-Common-String/unicode.t
 t/20-unit/Types-Standard/basic.t
 t/20-unit/Types-Standard/cycletuple.t
 t/20-unit/Types-Standard/deep-coercions.t
+t/20-unit/Types-Standard/filehandle.t
 t/20-unit/Types-Standard/lockdown.t
 t/20-unit/Types-Standard/mxtmlb-alike.t
 t/20-unit/Types-Standard/optlist.t
@@ -173,11 +189,14 @@ t/20-unit/Types-Standard/tied.t
 t/20-unit/Types-TypeTiny/basic.t
 t/20-unit/Types-TypeTiny/coercion.t
 t/20-unit/Types-TypeTiny/meta.t
+t/20-unit/Types-TypeTiny/moosemouse.t
+t/20-unit/Types-TypeTiny/progressiveexporter.t
 t/30-integration/Class-InsideOut/basic.t
 t/30-integration/Exporter-Tiny/basic.t
 t/30-integration/Exporter-Tiny/installer.t
 t/30-integration/Exporter-Tiny/role-conflict.t
 t/30-integration/Function-Parameters/basic.t
+t/30-integration/Kavorka/80returntype.t
 t/30-integration/Kavorka/basic.t
 t/30-integration/Moo/basic.t
 t/30-integration/Moo/coercion-inlining-avoidance.t
@@ -204,6 +223,7 @@ t/30-integration/MouseX-Types/extending.t
 t/30-integration/Object-Accessor/basic.t
 t/30-integration/Return-Type/basic.t
 t/30-integration/Sub-Quote/basic.t
+t/30-integration/Sub-Quote/delayed-quoting.t
 t/30-integration/Sub-Quote/unquote-coercions.t
 t/30-integration/Sub-Quote/unquote-constraints.t
 t/30-integration/Switcheroo/basic.t
@@ -215,6 +235,8 @@ t/40-regression/73f51e2d.pl
 t/40-regression/73f51e2d.t
 t/40-regression/gh1.t
 t/40-regression/gh14.t
+t/40-regression/rt125132.t
+t/40-regression/rt125765.t
 t/40-regression/rt85911.t
 t/40-regression/rt86004.t
 t/40-regression/rt86233.t

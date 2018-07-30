@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2014, 2017 by Toby Inkster.
+This software is copyright (c) 2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -60,7 +60,7 @@ is_deeply(
 	[
 		'"Int&Int" requires that the value pass "Int" and "Int"',
 		'Value "3.14159" did not pass type constraint "Int"',
-		'"Int" is defined as: (defined($_) and !ref($_) and $_ =~ /\\A-?[0-9]+\\z/)',
+		'"Int" is defined as: (do { my $tmp = $_; defined($tmp) and !ref($tmp) and $tmp =~ /\\A-?[0-9]+\\z/ })',
 	],
 ) or diag explain($e->explain);
 

@@ -20,7 +20,7 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  homepage: https://github.com/pavelsr/net-ip-minimal
-  repository: https://github.com/pavelsr/net-ip-minimal.git
-version: '0.02'
+  homepage: https://github.com/pavelsr/net-ip-checker
+  repository: https://github.com/pavelsr/net-ip-checker.git
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -5,9 +5,9 @@ use strict;
 
 use parent qw(Exporter);
 use Data::Printer;
-use List::MoreUtils qw(all any);
+use List::Util qw(any);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our @EXPORT = qw(bt);
 
 our $Indent = '  ';
@@ -40,21 +40,21 @@ sub bt() {
         ($Deeplimit <= 0 || $i < $Deeplimit + 1)
             &&
         (my @info = get_caller_info($i + 1))	#+1 as we introduce another call frame
-    ){
+    ) {
         $i++;
         next if $filter->($info[3]);
     
         $ret .= format_call(\@info);
     }
     
-    if (defined wantarray){
+    if (defined wantarray) {
         return $ret;
-    }else{
+    } else {
         print STDERR $ret;
     }
 }
 
-sub get_ignore_filter{
+sub get_ignore_filter {
     my @filters = map { qr/^\Q$_\E/ } keys %IgnorePkg;
     
     return sub {
@@ -65,31 +65,31 @@ sub get_ignore_filter{
     }
 }
 
-sub format_call{
+sub format_call {
     my $info = shift;
 
     my $result = $Indent;
     
-    if (defined $info->[6]){
-        if ($info->[7]){
+    if (defined $info->[6]) {
+        if ($info->[7]) {
             $result .= "require $info->[6]";
             
-        }else{
+        } else {
             $info->[6] =~ s/\n;$/;/;
             $result .= "eval '".trim_to_length($info->[6], $Evalen)."'";
         }
         
-    }elsif ($info->[3] eq '(eval)'){
+    } elsif ($info->[3] eq '(eval)') {
             $result .= 'eval {...}';
             
-    }else{
+    } else {
         $result .= $info->[3];
     }
     
-    if ($info->[4]){
+    if ($info->[4]) {
         $result .= "(";
     
-        if (scalar @DB::args){
+        if (scalar @DB::args) {
             $result .= format_args();
         }
         
@@ -101,7 +101,7 @@ sub format_call{
     return $result;
 }
 
-sub format_args{
+sub format_args {
     my $result = p(@DB::args, %Opts);
     
     #result is always non-empty array, so transform [\n a\n b\n] => \n\t\t a \n\t\t b \n\t
@@ -112,17 +112,17 @@ sub format_args{
     return $result;
 }
 
-sub trim_to_length{
+sub trim_to_length {
     my ($str, $len) = @_;
     
-    if ($len > 2 && length($str) > $len){
+    if ($len > 2 && length($str) > $len) {
         substr($str, $len - 3) = '...';
     }
     
     return $str;
 }
 
-sub get_caller_info{
+sub get_caller_info {
     my $level = shift;
 
     do {

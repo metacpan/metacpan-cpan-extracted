@@ -1,5 +1,14 @@
 Revision history for git-workflow-tools
 
+1.0.8   2018-07-29
+        Updating for release of version 1.0.8
+        Added documentation for ignore function (Ivan Wills)
+        Fixed logic to pick when to show the files (Ivan Wills)
+        Making text output more consistant depending on output options chosen (Ivan Wills)
+        Fixed issue when users or branches are empty (Ivan Wills)
+        Added docs for new arguments (Ivan Wills)
+        Adding option to ignore specific users and branches (Ivan Wills)
+
 1.0.7   2018-07-22
         Updating for release of version 1.0.7
         Adding config requires (Ivan Wills)

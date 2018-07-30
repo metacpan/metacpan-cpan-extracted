@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::CycleTuple::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::CycleTuple::VERSION   = '1.002002';
+	$Types::Standard::CycleTuple::VERSION   = '1.004002';
 }
 
 use Type::Tiny ();
@@ -26,16 +26,16 @@ sub __constraint_generator
 {
 	my @params = map {
 		ref($_) eq 'HASH' and exists($_->{slurpy})
-			and _croak("Parameters to CycleTuple[`a] cannot be slurpy");
-		my $param = Types::TypeTiny::to_TypeTiny($_);
+			and _croak("Parameters to CycleTuple[...] cannot be slurpy");
+		my $param = $_;
 		Types::TypeTiny::TypeTiny->check($param)
-			or _croak("Parameter to CycleTuple[`a] expected to be a type constraint; got $param");
+			or _croak("Parameters to CycleTuple[...] expected to be type constraints; got $param");
 		$param;
 	} @_;
 	my $count  = @params;
 	my $tuple  = Types::Standard::Tuple()->of(@params);
 	
-	_croak("Parameters to CycleTuple[`a] cannot be optional")
+	_croak("Parameters to CycleTuple[...] cannot be optional")
 		if grep !!$_->is_strictly_a_type_of($_Optional), @params;
 	
 	sub {
@@ -55,7 +55,7 @@ sub __constraint_generator
 sub __inline_generator
 {
 	my @params = map {
-		my $param = Types::TypeTiny::to_TypeTiny($_);
+		my $param = $_;
 		Types::TypeTiny::TypeTiny->check($param)
 			or _croak("Parameter to CycleTuple[`a] expected to be a type constraint; got $param");
 		$param;
@@ -246,7 +246,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2017 by Toby Inkster.
+This software is copyright (c) 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

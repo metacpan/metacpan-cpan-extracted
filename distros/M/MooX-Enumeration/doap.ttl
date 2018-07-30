@@ -35,7 +35,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooX-Enumeration";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-006>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-007>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moox-enumeration>;
@@ -125,6 +125,22 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Enumeration-0.006.tar.gz>;
 	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-Enumeration/v_0-007>
+	a                    doap:Version;
+	rdfs:label           "Bond. James Bond.";
+	dc:identifier        "MooX-Enumeration-0.007"^^xsd:string;
+	dc:issued            "2018-07-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Don't try to install delegate methods for attributes that aren't even enumerations.";
+			rdfs:seeAlso <https://github.com/tobyink/p5-moox-enumeration/issues/1>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-Enumeration-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/srezic>
 	a                    foaf:Person;

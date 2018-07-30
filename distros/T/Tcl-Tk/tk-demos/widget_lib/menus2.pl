@@ -16,9 +16,10 @@ sub menus2 {
         -iconname => 'menus2',
     );
 
-    my $menubar = $TOP->Frame(-relief => 'raised', -borderwidth => 2);
-    $menubar->grid(qw/-sticky ew/);
-    my $f = $menubar->Menubutton(qw/-text File -underline 0 -menuitems/ =>
+    my $toplevel = $TOP->toplevel;
+    my $menubar = $toplevel->Menu(-type => 'menubar');
+    $toplevel->configure(-menu => $menubar);
+    my $f = $menubar->cascade(qw/-label File -underline 0 -menuitems/ =>
         [
          [Button => 'Open ...',    -command => [\&menus_error2, 'Open']],
 	 [Button => 'New',         -command => [\&menus_error2, 'New']],
@@ -29,9 +30,9 @@ sub menus2 {
 	 [Button => 'Print ...',   -command => [\&menus_error2, 'Print']],
 	 [Separator => ''],
 	 [Button => 'Quit',        -command => [$TOP => 'bell']],
-	])->grid(qw/-row 0 -column 0 -sticky w/);
+	]);
 
-    my $b = $menubar->Menubutton(qw/-text Basic -underline 0 -menuitems/ =>
+    my $b = $menubar->cascade(qw/-label Basic -underline 0 -menuitems/ =>
         [
 	 [Button => 'Long entry that does nothing'],
 	  map (
@@ -40,11 +41,11 @@ sub menus2 {
 	        -accelerator => "Meta+$_" ],
 	       ('a' .. 'g')
 	  ),
-	])->grid(qw/-row 0 -column 1 -sticky w/);
+	]);
 
     my $menu_cb = '~Check buttons';
     my $menu_rb = '~Radio buttons';
-    my $c = $menubar->Menubutton(qw/-text Cascades -underline 0 -menuitems/ =>
+    my $c = $menubar->cascade(qw/-label Cascades -underline 0 -menuitems/ =>
         [
 	 [Button => 'Print ~hello',   -command => sub {print "Hello\n"},
 	  -accelerator => 'Control+a'],
@@ -93,7 +94,7 @@ sub menus2 {
 	    ], # end button
 	   ], # end radiobutton menuitems
 	  ], # end radiobuttons cascade
-         ])->grid(qw/-row 0 -column 2 -sticky w/);
+         ]);
 
     $TOP->bind('<Control-a>' => sub {print "Hello\n"});
     $TOP->bind('<Control-b>' => sub {print "Goodbye\n"});
@@ -112,7 +113,7 @@ sub menus2 {
     $cr->invoke(1);
     $cr->invoke(7);
 
-    my $i = $menubar->Menubutton(qw/-text Icons -underline 0 -menuitems/ =>
+    my $i = $menubar->cascade(qw/-label Icons -underline 0 -menuitems/ =>
         [
 	 [Button   => '', -bitmap => '@'.'./images/pattern.bmp',
 	 -command => sub{$DIALOG_ICON -> Show}],
@@ -122,9 +123,9 @@ sub menus2 {
 	       [sub {print "You invoked the \"$_[0]\" bitmap\n"}, $_]],
 	      (qw/info questhead error/),
 	      ),
-	 ])->grid(qw/-row 0 -column 3 -sticky w/);
+	 ]);
 
-    my $m = $menubar->Menubutton(qw/-text More -underline 0 -menuitems/ =>
+    my $m = $menubar->cascade(qw/-label More -underline 0 -menuitems/ =>
         [
 	 map (
 	      [Button   => $_,
@@ -133,9 +134,9 @@ sub menus2 {
 	      ('An entry', 'Another entry', 'Does nothing',
 	       'Does almost nothing', 'Make life meaningful'),
 	      ),
-	 ])->grid(qw/-row 0 -column 4 -sticky w/);
+	 ]);
 
-    my $k = $menubar->Menubutton(qw/-text Colors -underline 1 -menuitems/ =>
+    my $k = $menubar->cascade(qw/-label Colors -underline 1 -menuitems/ =>
         [
 	 map (
 	      [Button      => $_,
@@ -144,7 +145,7 @@ sub menus2 {
 	       [sub {print "You invoked \"$_[0]\"\n"}, $_]],
 	      (qw/red orange yellow green blue/),
 	      ),
-	 ])->grid(qw/-row 0 -column 5 -sticky w/);
+	 ]);
 
     my $details = $TOP->Label(qw/-wraplength 4i -justify left -text/ => 'This window contains a collection of menus and cascaded menus.  You can post a menu from the keyboard by typing Alt+x, where "x" is the character underlined on the menu.  You can then traverse among the menus using the arrow keys.  When a menu is posted, you can invoke the current entry by typing space, or you can invoke any entry by typing its underlined character.  If a menu entry has an accelerator, you can invoke the entry without posting the menu just by typing the accelerator.', -font => $FONT)->grid;
 

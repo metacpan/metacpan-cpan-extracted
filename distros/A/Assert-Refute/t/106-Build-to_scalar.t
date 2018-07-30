@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 
 # Avoid Test::More detection
 use Assert::Refute::Build qw(to_scalar);

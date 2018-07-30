@@ -1,11 +1,11 @@
 #title Test
 #lang ru
 
-Hello [1] there [2] «hullo», ‘hullo’ [3] [1978]
+Hello [1] there [2] «hullo», „hullo“ [3] [1978]
 [1] ààà
 [2] čČč
 
-‘Hello’ — «there»!!! <verbatim>"Hello" [1]</verbatim>
+„Hello“ — «there»!!! <verbatim>"Hello" [1]</verbatim>
 [3] three čČč Да поехал
 
 <example>

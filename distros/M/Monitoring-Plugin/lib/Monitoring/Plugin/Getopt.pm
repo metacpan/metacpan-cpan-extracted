@@ -81,14 +81,15 @@ sub _spec_to_help
 {
   my ($self, $spec, $label) = @_;
 
-  my ($opts, $type) = split /=|:/, $spec, 2;
+  my ($opts, $type) = split /=|:|!/, $spec, 2;
   my $optional = ($spec =~ m/:/);
+  my $boolean = ($spec =~ m/!/);
   my (@short, @long);
   for (split /\|/, $opts) {
     if (length $_ == 1) {
       push @short, "-$_";
     } else {
-      push @long, "--$_";
+      push @long, $boolean ? "--[no-]$_" : "--$_";
     }
   }
 
@@ -207,7 +208,7 @@ sub _process_specs_getopt_long
     # Setup names and defaults
     my $spec = $arg->{spec};
     # Use first arg as name (like Getopt::Long does)
-    $spec =~ s/[=:].*$//;
+    $spec =~ s/[=:!].*$//;
     my $name = (split /\s*\|\s*/, $spec)[0];
     $arg->{name} = $name;
     if (defined $self->{$name}) {
@@ -259,7 +260,9 @@ sub _load_config_section
 
   my $Config;
   eval { $Config = Monitoring::Plugin::Config->read($file); };
-  $self->_die($@) if ($@); #TODO: add test?
+  $self->_die($@) if ($@);
+  defined $Config
+      or $self->_die(Monitoring::Plugin::Config->errstr);
 
   # TODO: is this check sane? Does --extra-opts=foo require a [foo] section?
   ## Nevertheless, if we die as UNKNOWN here we should do the same on default
@@ -381,27 +384,24 @@ sub arg
   my $self = shift;
   my %args;
 
-  # Named args
-  if ($_[0] =~ m/^(spec|help|required|default)$/ && scalar(@_) % 2 == 0) {
-    %args = validate( @_, {
-      spec => 1,
-      help => 1,
-      default => 0,
+  # Param name to required boolean
+  my %params = (
+      spec     => 1,
+      help     => 1,
+      default  => 0,
       required => 0,
-      label => 0,
-    });
+      label    => 0,
+  );
+
+  # Named args
+  if (exists $params{$_[0]} && @_ % 2 == 0) {
+    %args = validate( @_, \%params );
   }
 
   # Positional args
   else {
-    my @args = validate_pos(@_, 1, 1, 0, 0, 0);
-    %args = (
-      spec      => $args[0],
-      help      => $args[1],
-      default   => $args[2],
-      required  => $args[3],
-      label     => $args[4],
-    );
+    my @order = qw(spec help default required label);
+    @args{@order} = validate_pos(@_, @params{@order});
   }
 
   # Add to private args arrayref
@@ -445,7 +445,7 @@ sub getopts
   # Setup default alarm handler for alarm($ng->timeout) in plugin
   $SIG{ALRM} = sub {
     my $plugin = uc $self->{_attr}->{plugin};
-    $plugin =~ s/^check_//;
+    $plugin =~ s/^CHECK[-_]//i;
     $self->_die(
       sprintf("%s UNKNOWN - plugin timed out (timeout %ss)",
         $plugin, $self->timeout));
@@ -697,7 +697,8 @@ but basically it is a series of one or more argument names for this argument
 (separated by '|'), suffixed with an '=<type>' indicator if the argument
 takes a value. '=s' indicates a string argument; '=i' indicates an integer
 argument; appending an '@' indicates multiple such arguments are accepted;
-and so on. The following are some examples:
+appending an '!' indicates negation using '--no'-prefix is possible; and so on.
+The following are some examples:
 
 =over 4
 
@@ -708,6 +709,8 @@ and so on. The following are some examples:
 =item ports|port|p=i
 
 =item exclude|X=s@
+
+=item perfdata!
 
 =item verbose|v+
 

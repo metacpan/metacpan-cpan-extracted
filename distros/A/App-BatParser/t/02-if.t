@@ -68,11 +68,6 @@ use Path::Tiny;
                         'Identifier' => 'label'
                     }
                 },
-                {
-                    'Statement' => {
-                        'Command' => ''
-                    }
-                }
             ]
           }
 

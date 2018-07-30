@@ -21,11 +21,13 @@ lib/App/cpm/Master.pm
 lib/App/cpm/Requirement.pm
 lib/App/cpm/Resolver.pm
 lib/App/cpm/Resolver/02Packages.pm
+lib/App/cpm/Resolver/CPANfile.pm
 lib/App/cpm/Resolver/Cascade.pm
 lib/App/cpm/Resolver/MetaCPAN.pm
 lib/App/cpm/Resolver/MetaDB.pm
 lib/App/cpm/Resolver/Snapshot.pm
 lib/App/cpm/Tutorial.pm
+lib/App/cpm/Util.pm
 lib/App/cpm/Worker.pm
 lib/App/cpm/Worker/Installer.pm
 lib/App/cpm/Worker/Installer/Menlo.pm

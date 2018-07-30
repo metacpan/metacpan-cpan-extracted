@@ -6,7 +6,7 @@ use Exporter 'import';
 use vars qw(@EXPORT_OK %EXPORT_TAGS);
 
 @Tcl::Tk::ISA = qw(Tcl);
-$Tcl::Tk::VERSION = '1.12';
+$Tcl::Tk::VERSION = '1.29';
 
 sub WIDGET_CLEANUP() {0}
 
@@ -295,7 +295,7 @@ Example:
    # following line does exactly same thing as previous line:
    $text->_insertEnd('text to insert','tag');
 
-When doing many inserts to text widget, faster version could fasten execution.
+When doing many inserts to text widget, faster version will make execution faster.
 
 =head2 using any Tcl/Tk feature with Tcl::Tk module
 
@@ -555,26 +555,30 @@ my $Wdata = $W{DATA};
 # hash to keep track on preloaded Tcl/Tk modules, such as Tix, BWidget
 my %preloaded_tk; # (interpreter independent thing. is this right?)
 
-#
+# create Tcl::Tk interpreter instance; forward $display to tcl/tk, if specified
 sub new {
     my ($class, $display) = @_;
     if (@_ > 2) {
         require Carp;
         Carp::croak('Usage: $interp = new Tcl::Tk([$display])');
     }
-    my @argv;
-    if (defined($display)) {
-	push(@argv, -display => $display);
-    } else {
-	$display = $ENV{DISPLAY} || '';
-    }
+
     my $i = new Tcl;
     bless $i, $class;
-    $i->SetVar2("env", "DISPLAY", $display, Tcl::GLOBAL_ONLY);
-    $i->SetVar("argv", [@argv], Tcl::GLOBAL_ONLY);
+
+    $i->SetVar("argv", [
+	    (defined($display) ? (-display => $display) : ()),
+	], Tcl::GLOBAL_ONLY);
     $i->SetVar("tcl_interactive", 0, Tcl::GLOBAL_ONLY);
     $i->SUPER::Init();
-    $i->pkg_require('Tk', $i->GetVar('tcl_version'));
+
+    unless ($i->pkg_require('Tk', $i->GetVar('tcl_version'))) {
+        warn $@; # in case of failure: warn to show this error for user
+        unless ($i->pkg_require('Tk')) { # try w/o version
+	    die $@; # ...and then re-die to have this error for user
+	}
+    }
+
     my $mwid = $i->invoke('winfo','id','.');
     $W{PATH}->{$mwid} = '.';
     $W{INT}->{$mwid} = $i;
@@ -737,9 +741,9 @@ sub pkg_require {
 
     return $preloaded_tk{$id} if $preloaded_tk{$id};
 
-    my @args = ("package", "require", $pkg);
-    push(@args, $ver) if defined($ver);
-    eval { $preloaded_tk{$id} = $int->icall(@args); };
+    eval {
+       	$preloaded_tk{$id} = $int->icall("package", "require", $pkg, (defined $ver? ($ver) : ()) ); 
+    };
     if ($@) {
 	# Don't cache failures, as the package may become available by
 	# changing auto_path and such.
@@ -766,7 +770,7 @@ sub create_rotext {
     my $int = shift;
     $int->ensure_snit();
     $int->Eval(<<'EOS');
-# got 'rotext' code from http://mini.net/tcl/3963 and modified a bit
+# got 'rotext' code from https://wiki.tcl.tk/3963 and modified a bit
 # (insertion cursor unchanged, unlike was proposed by author of original code)
 if {[info proc rotext]==""} {
 
@@ -926,21 +930,21 @@ sub AUTOLOAD {
 # some tcl/tk pure-tcl modules, in case these aren't found in tcl/tk:
 sub ensure_snit {
     my $int = shift;
-    eval{$int->icall('package','require','snit');};
-    if ($@) {
-	$int->Eval(require Tcl::Fallback::snit1);
+    unless ($int->pkg_require('snit')) {
+	# see pkg_require
+	$preloaded_tk{"${int}snit"} = $int->Eval(require Tcl::Fallback::snit1);
     }
 }
 sub ensure_scrolledwindow {
     my $int = shift;
     $int->ensure_snit();
-    eval{$int->icall('package','require','widget');};
-    if ($@) {
-	$int->Eval(require Tcl::Fallback::widget);
+    unless ($int->pkg_require('widget')) {
+	$preloaded_tk{"${int}widget"} =
+	    $int->Eval(require Tcl::Fallback::widget);
     }
-    eval{$int->icall('package','require','widget::scrolledwindow');};
-    if ($@) {
-	$int->Eval(require Tcl::Fallback::scrollw);
+    unless ($int->pkg_require('widget::scrolledwindow')) {
+	$preloaded_tk{"${int}widget::scrolledwindow"} =
+	    $int->Eval(require Tcl::Fallback::scrollw);
     }
 }
 
@@ -1750,7 +1754,7 @@ sub _addcascade {
     $mnu->add('cascade',%args);
     return $smnu;
 }
-# internal helper sub to process perlTk's -menuitmes option
+# internal helper sub to process perlTk's -menuitems option
 sub _process_menuitems {
     my ($int,$mnu,$mis) = @_;
     for (@$mis) {

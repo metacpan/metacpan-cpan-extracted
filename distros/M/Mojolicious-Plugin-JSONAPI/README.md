@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 2.0
+version 2.1
 
 # SYNOPSIS
 
@@ -62,7 +62,7 @@ version 2.0
 # DESCRIPTION
 
 This module intends to supply the user with helper methods that can be used to build a JSON API
-compliant Mojolicious server. It helps create routes for your resources that conform with the
+compliant API using Mojolicious. It helps create routes for your resources that conform with the
 specification, along with supplying helper methods to use when responding to requests.
 
 See [http://jsonapi.org/](http://jsonapi.org/) for the JSON API specification. At the time of writing, the version was 1.0.
@@ -98,7 +98,7 @@ Creates a set of routes for the given resource. `$spec` is a hash reference that
 
 - `controller _Str_`
 
-    The controller name where the actions are to be stored. Defaults to "api-{resource}", where
+    The controller name where the actions are to be stored. Defaults to `api-{resource}`, where
     resource is in its pluralised form.
 
     Routes will point to controller actions, the names of which follow the pattern `{http_method}_{resource}`, with
@@ -130,7 +130,7 @@ Creates a set of routes for the given resource. `$spec` is a hash reference that
 
     **NOTE**: Your relationships should be in the correct form (singular/plural) based on the relationship in your
     schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
-    sure comments is passed in as a plural noun.
+    sure comments is passed in as a plural noun here.
 
 ## render\_error(_Str_ $status, _ArrayRef|Str_ $errors, _HashRef_ $data. _HashRef_ $meta)
 

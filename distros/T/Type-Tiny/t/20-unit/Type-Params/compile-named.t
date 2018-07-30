@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -30,6 +30,13 @@ use Type::Params qw(compile_named validate_named);
 use Types::Standard -types, "slurpy";
 use Type::Utils;
 use Scalar::Util qw(refaddr);
+
+
+{
+	package
+	Type::Tiny::_Test::X;
+	sub new { bless $_[1], $_[0] }
+}
 
 sub simple_test {
 	my ($name, @spec) = @_;

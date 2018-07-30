@@ -3,7 +3,7 @@ abstract: 'Unified testing and assertion tool'
 author:
   - 'Konstantin S. Uvarin <khedin@gmail.com>'
 build_requires:
-  Test::More: '0.87'
+  Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -25,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/dallaylaen/assert-refute-perl/issues
   repository: https://github.com/dallaylaen/assert-refute-perl.git
-version: '0.1201'
+version: '0.1301'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

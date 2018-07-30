@@ -20,6 +20,7 @@ WriteMakefile(
         'HTML::PullParser' => 0,
         'Text::Amuse' => '0.95',
         'Pod::Simple::Wiki' => '0.19',
+        'Text::Diff' => 0,
     },
     EXE_FILES => [
         'bin/muse-rearrange-footnotes.pl',

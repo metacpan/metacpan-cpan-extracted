@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME         => 'Net::ACME2',
-    VERSION_FROM => 'lib/Net/ACME2/Constants.pm',            # finds \$VERSION
+    VERSION_FROM => 'lib/Net/ACME2.pm',            # finds \$VERSION
     AUTHOR       => 'Felipe Gasper',
     ABSTRACT_FROM => 'lib/Net/ACME2.pm',
     LICENSE      => 'perl',
@@ -16,12 +16,17 @@ WriteMakefile(
         'parent'                   => 0.225,
         'Call::Context'            => 0.02,
         'Crypt::Format'            => 0.06,
-        'Crypt::Perl'              => '0.17',
+        'Crypt::Perl'              => 0.18,
         'HTTP::Tiny'               => 0.058,
         'HTTP::Tiny::UA::Response' => 0.004,
         'JSON'                     => 2.9,
         'MIME::Base64'             => 3.11,
         'X::Tiny'                  => 0.12,
+
+        # We need SSL to speak ACME. There is no pure Perl
+        # SSL implementation, so the following will bring in
+        # Net::SSLeay, which requires XS. :-(
+        'IO::Socket::SSL'          => 0,
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -39,5 +44,7 @@ WriteMakefile(
         'Test::Deep'      => 0,
         'Test::Exception' => 0.40,
         'Test::NoWarnings' => 0,
+        'Test::FailWarnings' => 0,
+        'HTTP::Status' => 0,
     },
 );

@@ -1,0 +1,12 @@
+Revision history for DBIx-Class-Helper-Row-Enumeration:
+
+v0.1.2    2018-07-29 22:56:43+01:00 Europe/London
+  [Tests]
+  - Add SQL::Translator as a test prerequisite.
+
+v0.1.1    2018-07-29 18:11:59+01:00 Europe/London
+  [Documentation]
+  - Fixed typo in SEE ALSO and added link to DBIx::Class.
+
+v0.1.0    2018-07-29 18:07:35+01:00 Europe/London
+ - Initial release.

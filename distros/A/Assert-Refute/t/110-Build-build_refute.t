@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 use Assert::Refute::Build;
 use Assert::Refute::Report; # Avoid T::M detection
 use Test::More tests => 2;

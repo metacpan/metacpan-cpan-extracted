@@ -1,0 +1,10 @@
+#This bug was fixed in 5.12. Since 5.12 was out of support before this
+#module came into existence, there’s no point in filing an RT case for it.
+sub bug_exists {
+    local $@;
+    eval {
+        local $@;
+        die 123;
+    };
+    return $@ ? 0 : 1;
+}

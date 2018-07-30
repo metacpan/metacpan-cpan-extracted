@@ -25,7 +25,7 @@ my $top = MainWindow->new(-title => 'Dialog Test');
 
 my $okbutton = $t->Subwidget('B_OK');
 
-# This seems to be required for the events to be reliabily registered for this test case outside of a MainLoop
+# This seems to be required for the events to be reliably registered for this test case outside of a MainLoop
 foreach (1..10){
         $top->update();
         $top->idletasks();

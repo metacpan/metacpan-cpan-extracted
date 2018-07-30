@@ -1,5 +1,9 @@
 Revision history for Perl extension Log::Dispatch::FileRotate.
 
+1.36 Sun 24 29 2018
+    - If the "permissions" param is set, use the same permissions for the lock
+      file that the log file will use. [github #21]
+
 1.35 Wed 43 07 2018
     - Fix lockfile race condition test in Strawberry Perl (Thanks Zak B. Elep)
     - Skip file open failure test on Cygwin - chmod bahaviour varies on Cygwin

@@ -16,7 +16,6 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Clone'        => 0,
-        'Storable'     => 0, # rm ?
         'Test::More'   => 0,
     },
     META_MERGE => {
@@ -25,14 +24,13 @@ WriteMakefile(
         },
     },
     PREREQ_PM => {
-        'Carp'         => 0,
-        'PPI'          => 0,
-        'Safe'         => 0,
-        'Scalar::Util' => 0,
-        'parent'       => 0,
-        're'           => 0.08, # it seems eralier versions has no is_regexp() and regexp_pattern()
-        'strict'       => 0,
-        'warnings'     => 0
+        'Carp'              => 0,
+        'Safe'              => 0,
+        'Text::Balanced'    => 0,
+        'parent'            => 0,
+        're'                => 0.08, # it seems eralier versions has no is_regexp() and regexp_pattern()
+        'strict'            => 0,
+        'warnings'          => 0
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Struct-Path-PerlStyle-* cover_db' },

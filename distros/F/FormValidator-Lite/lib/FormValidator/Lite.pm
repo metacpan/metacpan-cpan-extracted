@@ -12,7 +12,7 @@ use Class::Accessor::Lite 0.05 (
 use Class::Load ();
 use FormValidator::Lite::Hash;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 our $Rules;
 our $FileRules;
@@ -74,7 +74,7 @@ sub check {
 sub _extract_values {
     my ($self, $key) = @_;
 
-    local $CGI::LIST_CONTEXT_WARN = 0;
+    local $CGI::LIST_CONTEXT_WARN = 0 if %CGI::;
     my $q = $self->{query};
     my @values;
     if (ref $key) {
@@ -383,6 +383,8 @@ You can also load the constraints during import :
     use FormValidator::Lite qw/Date Email/;
 
 Load constraint components named C<< "FormValidator::Lite::Constraint::${name}" >>.
+
+By default, You can use only constraints defined by L<FormValidator::Lite::Constraint::Default>.
 
 =item $validator->load_function_message($lang)
 

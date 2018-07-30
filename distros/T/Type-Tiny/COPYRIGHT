@@ -3,8 +3,7 @@ Upstream-Name: Type-Tiny
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Type-Tiny
 
-Files: examples/benchmarking/benchmark-coercions.pl
- lib/Devel/TypeTiny/Perl56Compat.pm
+Files: lib/Devel/TypeTiny/Perl56Compat.pm
  lib/Devel/TypeTiny/Perl58Compat.pm
  lib/Error/TypeTiny.pm
  lib/Error/TypeTiny/Assertion.pm
@@ -46,6 +45,8 @@ Files: examples/benchmarking/benchmark-coercions.pl
  lib/Types/Standard/HashRef.pm
  lib/Types/Standard/Map.pm
  lib/Types/Standard/ScalarRef.pm
+ lib/Types/Standard/StrMatch.pm
+ lib/Types/Standard/Tied.pm
  lib/Types/Standard/Tuple.pm
  lib/Types/TypeTiny.pm
  t/00-begin.t
@@ -57,8 +58,11 @@ Files: examples/benchmarking/benchmark-coercions.pl
  t/20-unit/Error-TypeTiny-WrongNumberOfParameters/basic.t
  t/20-unit/Error-TypeTiny/basic.t
  t/20-unit/Error-TypeTiny/stacktrace.t
+ t/20-unit/Eval-TypeTiny/aliases-devel-lexalias.t
+ t/20-unit/Eval-TypeTiny/aliases-native.t
+ t/20-unit/Eval-TypeTiny/aliases-padwalker.t
+ t/20-unit/Eval-TypeTiny/aliases-tie.t
  t/20-unit/Eval-TypeTiny/basic.t
- t/20-unit/Eval-TypeTiny/fallback-aliases.t
  t/20-unit/Eval-TypeTiny/lexical-subs.t
  t/20-unit/Type-Coercion-Union/basic.t
  t/20-unit/Type-Coercion/basic.t
@@ -74,6 +78,9 @@ Files: examples/benchmarking/benchmark-coercions.pl
  t/20-unit/Type-Params/badsigs.t
  t/20-unit/Type-Params/carping.t
  t/20-unit/Type-Params/coerce.t
+ t/20-unit/Type-Params/compile-named-bless.t
+ t/20-unit/Type-Params/compile-named.t
+ t/20-unit/Type-Params/hashorder.t
  t/20-unit/Type-Params/methods.t
  t/20-unit/Type-Params/mixednamed.t
  t/20-unit/Type-Params/multisig.t
@@ -96,6 +103,7 @@ Files: examples/benchmarking/benchmark-coercions.pl
  t/20-unit/Type-Tiny-Role/basic.t
  t/20-unit/Type-Tiny-Role/errors.t
  t/20-unit/Type-Tiny-Union/basic.t
+ t/20-unit/Type-Tiny-Union/relationships.t
  t/20-unit/Type-Tiny/arithmetic.t
  t/20-unit/Type-Tiny/basic.t
  t/20-unit/Type-Tiny/coercion-modifiers.t
@@ -125,6 +133,7 @@ Files: examples/benchmarking/benchmark-coercions.pl
  t/30-integration/Moops/library-keyword.t
  t/30-integration/Moose/accept-moose-types.t
  t/30-integration/Moose/basic.t
+ t/30-integration/Moose/coercion-more.t
  t/30-integration/Moose/coercion.t
  t/30-integration/Moose/native-attribute-traits.t
  t/30-integration/MooseX-Types/basic.t
@@ -140,7 +149,7 @@ Files: examples/benchmarking/benchmark-coercions.pl
  t/30-integration/Validation-Class-Simple/basic.t
  t/lib/BiggerLib.pm
  t/lib/DemoLib.pm
-Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+Copyright: This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/20-unit/Devel-TypeTiny-Perl56Compat/basic.t
@@ -172,6 +181,7 @@ Files: t/20-unit/Devel-TypeTiny-Perl56Compat/basic.t
  t/20-unit/Types-TypeTiny/basic.t
  t/20-unit/Types-TypeTiny/coercion.t
  t/20-unit/Types-TypeTiny/meta.t
+ t/20-unit/Types-TypeTiny/moosemouse.t
  t/30-integration/Kavorka/basic.t
  t/30-integration/Moo/coercion-inlining-avoidance.t
  t/30-integration/Moose/inflate-then-inline.t
@@ -181,14 +191,31 @@ Files: t/20-unit/Devel-TypeTiny-Perl56Compat/basic.t
  t/30-integration/Switcheroo/basic.t
  t/30-integration/Type-Tie/basic.t
  t/30-integration/match-simple/basic.t
-Copyright: This software is copyright (c) 2014, 2017 by Toby Inkster.
+Copyright: This software is copyright (c) 2014, 2017-2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: NEWS
+Files: META.json
+ META.yml
+ NEWS
  TODO
- examples/benchmarking/benchmark-constraints.pl
- examples/benchmarking/benchmark-named-param-validation.pl
+ doap.ttl
  examples/benchmarking/benchmark-param-validation.pl
+ t/20-unit/Type-Params/defaults.t
+Copyright: Copyright 2018 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: CONTRIBUTING.pod
+ t/20-unit/Type-Library/deprecation.t
+ t/20-unit/Type-Params/compile-named-oo.t
+ t/20-unit/Type-Tiny/deprecation.t
+ t/20-unit/Types-Standard/filehandle.t
+ t/20-unit/Types-TypeTiny/progressiveexporter.t
+ t/30-integration/Sub-Quote/delayed-quoting.t
+Copyright: This software is copyright (c) 2018 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: examples/benchmarking/benchmark-constraints.pl
+ examples/benchmarking/benchmark-named-param-validation.pl
  examples/benchmarking/versus-scalar-validation.pl
  examples/datetime-coercions.pl
  examples/nonempty.pl
@@ -196,12 +223,21 @@ Files: NEWS
 Copyright: Copyright 2017 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: INSTALL
+ examples/benchmarking/formvalidatorlite.pl
+ t/README
+ t/TODO
+ t/mk-test-manifest.pl
+ t/not-covered.pl
+Copyright: Unknown
+License: Unknown
+
 Files: t/40-regression/rt92571-2.t
  t/40-regression/rt92571.t
  t/40-regression/rt92591.t
  t/40-regression/rt94196.t
  t/40-regression/rt97684.t
-Copyright: This software is copyright (c) 2014, 2017 by Diab Jerius.
+Copyright: This software is copyright (c) 2014, 2017-2018 by Diab Jerius.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: CREDITS
@@ -212,57 +248,40 @@ Files: CREDITS
 Copyright: Copyright 1970 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
- t/README
- t/TODO
- t/mk-test-manifest.pl
- t/not-covered.pl
-Copyright: Unknown
-License: Unknown
-
-Files: lib/Types/Standard/CycleTuple.pm
- t/20-unit/Type-Tiny-_HalfOp/double-union.t
- t/20-unit/Type-Tiny/constraint-strings.t
- t/20-unit/Types-Standard/cycletuple.t
- t/40-regression/gh14.t
-Copyright: This software is copyright (c) 2017 by Toby Inkster.
+Files: lib/Type/Tiny/_HalfOp.pm
+ t/20-unit/Type-Tiny-_HalfOp/overload-precedence.t
+ t/40-regression/73f51e2d.pl
+ t/40-regression/73f51e2d.t
+Copyright: This software is copyright (c) 2014, 2017-2018 by Graham Knop.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/20-unit/Types-Common-Numeric/basic.t
  t/20-unit/Types-Common-String/basic.t
  t/20-unit/Types-Common-String/coerce.t
  t/20-unit/Types-Common-String/unicode.t
-Copyright: This software is copyright (c) 2013-2014, 2017 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
-License: GPL-1.0+ or Artistic-1.0
-
-Files: lib/Type/Tiny/_HalfOp.pm
- t/20-unit/Type-Tiny-_HalfOp/overload-precedence.t
- t/40-regression/73f51e2d.pl
- t/40-regression/73f51e2d.t
-Copyright: This software is copyright (c) 2014, 2017 by Graham Knop.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: META.json
- META.yml
- doap.ttl
-Copyright: Copyright 2018 Toby Inkster.
+Copyright: This software is copyright (c) 2013-2014, 2017-2018 by Matt S Trout - mst (at) shadowcatsystems.co.uk (L<http://www.shadowcatsystems.co.uk/>).
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/40-regression/rt85911.t
  t/40-regression/rt86004.t
  t/40-regression/rt90096-2.t
-Copyright: This software is copyright (c) 2013-2014, 2017 by Diab Jerius.
+Copyright: This software is copyright (c) 2013-2014, 2017-2018 by Diab Jerius.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/20-unit/Type-Params/compile-named.t
- t/20-unit/Type-Params/hashorder.t
- t/30-integration/Moose/coercion-more.t
-Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
+Files: lib/Types/Standard/CycleTuple.pm
+ t/20-unit/Type-Tiny-_HalfOp/double-union.t
+ t/20-unit/Type-Tiny/constraint-strings.t
+Copyright: This software is copyright (c) 2017-2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/40-regression/rt86233.t
  t/40-regression/rt86239.t
-Copyright: This software is copyright (c) 2013-2014, 2017 by Vyacheslav Matyukhin.
+Copyright: This software is copyright (c) 2013-2014, 2017-2018 by Vyacheslav Matyukhin.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/20-unit/Types-Standard/cycletuple.t
+ t/40-regression/gh14.t
+Copyright: This software is copyright (c) 2017, 2018 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -270,48 +289,66 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: t/20-unit/Types-Common-Numeric/ranges.t
+ t/20-unit/Types-Common-String/strlength.t
+Copyright: This software is copyright (c) 2018 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: examples/benchmarking/benchmark-coercions.pl
+ t/30-integration/Kavorka/80returntype.t
+Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-regression/rt125132.t
+Copyright: This software is copyright (c) 2018 by Marc Ballarin.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-regression/ttxs-gh1.t
+Copyright: This software is copyright (c) 2014, 2017-2018 by Jed Lund.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-regression/rt125765.t
+Copyright: This software is copyright (c) 2018 by KB JÃ¸rgensen.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-regression/gh1.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2018 by Richard SimÃµes.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Test/Fatal.pm
+Copyright: Copyright 2014 Ricardo Signes.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: inc/Try/Tiny.pm
 Copyright: Copyright 2014 Yuval Kogman.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/40-regression/gh1.t
-Copyright: This software is copyright (c) 2013-2014, 2017 by Richard SimÃµes.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: dist.ini
-Copyright: Copyright 2014 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/30-integration/Class-InsideOut/basic.t
-Copyright: This software is copyright (c) 2013-2014, 2017 by David Golden, Toby Inkster.
+Files: t/40-regression/rt98113.t
+Copyright: This software is copyright (c) 2014, 2017-2018 by Dagfinn Ilmari MannsÃ¥ker.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: inc/Test/Requires.pm
 Copyright: Copyright 2014 MATSUNO Tokuhiro.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/40-regression/rt90096.t
-Copyright: This software is copyright (c) 2013-2014, 2017 by Samuel Kaufman.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/40-regression/rt98113.t
-Copyright: This software is copyright (c) 2014, 2017 by Dagfinn Ilmari MannsÃ¥ker.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: t/40-regression/ttxs-gh1.t
-Copyright: This software is copyright (c) 2014, 2017 by Jed Lund.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/99-moose-std-types-test.t
-Copyright: This software is copyright (c) 2013-2014, 2017 by Infinity Interactive, Inc..
+Copyright: This software is copyright (c) 2013-2014, 2017-2018 by Infinity Interactive, Inc..
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/40-regression/rt90096.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2018 by Samuel Kaufman.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/30-integration/MooseX-Getopt/coercion.t
-Copyright: This software is copyright (c) 2014, 2017 by Alexander Hartmaier.
+Copyright: This software is copyright (c) 2014, 2017-2018 by Alexander Hartmaier.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: inc/Test/Fatal.pm
-Copyright: Copyright 2014 Ricardo Signes.
+Files: t/30-integration/Class-InsideOut/basic.t
+Copyright: This software is copyright (c) 2013-2014, 2017-2018 by David Golden, Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

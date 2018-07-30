@@ -206,7 +206,7 @@ use Guard ();
 
 use base "Exporter";
 
-our $VERSION = $AnyEvent::MP::Config::VERSION;
+our $VERSION = '2.02'; # also in MP/Config.pm
 
 our @EXPORT = qw(
    NODE $NODE

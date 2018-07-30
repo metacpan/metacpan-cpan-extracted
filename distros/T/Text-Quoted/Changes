@@ -1,5 +1,16 @@
 Revision history for Perl extension Text::Quoted.
 
+2.10 2018-07-26
+ - Add no_separators option (RJBS)
+ - Fix "Negative repeat count does nothing" warning (thanks to Stefan
+   Bühler)
+ - Fix Makefile.PL for perl 5.26 where "." is not in @INC by default
+   (thanks to Petr Písař)
+
+2.09 2015-02-20
+ - Switch back to using Text::Tabs, as it no longer segfaults perl
+ - Compatibility with Text::Autoformat >= 1.69
+
 2.08 2013-05-21
  - add a combine_hunks function to recombine hunks (RJBS)
  - implicitly private methods are now underscore private: organize,

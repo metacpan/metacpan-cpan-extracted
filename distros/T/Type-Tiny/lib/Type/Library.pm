@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Library::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Library::VERSION   = '1.002002';
+	$Type::Library::VERSION   = '1.004002';
 }
 
 use Eval::TypeTiny qw< eval_closure >;
@@ -108,7 +108,7 @@ sub _mksub
 		$type->qualified_name,
 		eval_closure(
 			source      => $source,
-			description => sprintf("exportable function '%s'", $type),
+			description => sprintf("exportable function '%s::%s'", $class, $type),
 			environment => {'$type' => \$type},
 		),
 	);
@@ -164,8 +164,15 @@ sub _exporter_install_sub
 	my ($name, $value, $globals, $sym) = @_;
 	
 	my $package = $globals->{into};
+	my $type = $class->get_type($name);
 	
-	if (!ref $package and my $type = $class->get_type($name))
+	Exporter::Tiny::_carp(
+		"Exporting deprecated type %s to %s",
+		$type->qualified_name,
+		ref($package) ? "reference" : "package $package",
+	) if (defined $type and $type->deprecated and not $globals->{allow_deprecated});
+	
+	if (!ref $package and defined $type)
 	{
 		my ($prefix) = grep defined, $value->{-prefix}, $globals->{prefix}, q();
 		my ($suffix) = grep defined, $value->{-suffix}, $globals->{suffix}, q();
@@ -536,6 +543,11 @@ assume that the C<Types::Mine> library defines types C<Number> and C<String>.
    #
    use Types::Mine qw( :types );
    
+   # Exports "coerce_String" and "coerce_Number", as well as any other
+   # coercions
+   #
+   use Types::Mine qw( :coercions );
+   
    # Exports a sub "is_String" so that "is_String($foo)" is equivalent
    # to "String->check($foo)".
    #
@@ -594,7 +606,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

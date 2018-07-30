@@ -1,0 +1,5 @@
+Wow, you want to help?  That's great!  However, this module probably
+isn't a good choice - this module is a place where I (Joelle) try
+different Perl constructrs that may have compatibility issues.  By
+trying it with this module, I can test this across CPAN Testers.
+

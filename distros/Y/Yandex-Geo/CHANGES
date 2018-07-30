@@ -1,0 +1,29 @@
+==================================================
+Changes from 2017-07-26 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.02 at 2018-07-26 13:48:12 +0000
+-----------------------------------------
+
+  Change: 67aeeb1216142d5be81b88ca98c6fd734d9b56ac
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-26 16:46:58 +0000
+
+    Fixed pod and add some fields in Yandex::Geo::Company 
+
+  Change: 8605670f6e48b1039d2f8b5ba9b95764ed26329a
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-26 14:48:56 +0000
+
+    Fixed pod and add README.md 
+
+  Change: fdf1be015f9a4dc060fe2c75d2d696e146039414
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-26 14:44:35 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

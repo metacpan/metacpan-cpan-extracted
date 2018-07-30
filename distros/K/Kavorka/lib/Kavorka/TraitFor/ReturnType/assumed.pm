@@ -5,7 +5,7 @@ use warnings;
 package Kavorka::TraitFor::ReturnType::assumed;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.038';
+our $VERSION   = '0.039';
 
 use Moo::Role;
 use Types::Standard qw(Any);

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.002002';
+our $VERSION   = '1.004002';
 
 use Scalar::Util qw< blessed refaddr weaken >;
 
@@ -12,18 +12,24 @@ our @EXPORT_OK = ( __PACKAGE__->type_names, qw/to_TypeTiny/ );
 
 my %cache;
 
+# This `import` method is designed to avoid loading Exporter::Tiny.
+# This is so that if you stick to only using the purely OO parts of
+# Type::Tiny, you can skip loading the exporter.
+#
 sub import
 {
-	# do the shuffle!
-	no warnings "redefine";
-	our @ISA = qw( Exporter::Tiny );
-	require Exporter::Tiny;
-	my $next = \&Exporter::Tiny::import;
-	*import = $next;
-	my $class = shift;
-	my $opts  = { ref($_[0]) ? %{+shift} : () };
-	$opts->{into} ||= scalar(caller);
-	return $class->$next($opts, @_);
+	# If this sub succeeds, it will replace itself.
+	# uncoverable subroutine
+	return unless @_ > 1;                         # uncoverable statement
+	no warnings "redefine";                       # uncoverable statement
+	our @ISA = qw( Exporter::Tiny );              # uncoverable statement
+	require Exporter::Tiny;                       # uncoverable statement
+	my $next = \&Exporter::Tiny::import;          # uncoverable statement
+	*import = $next;                              # uncoverable statement
+	my $class = shift;                            # uncoverable statement
+	my $opts  = { ref($_[0]) ? %{+shift} : () };  # uncoverable statement
+	$opts->{into} ||= scalar(caller);             # uncoverable statement
+	return $class->$next($opts, @_);              # uncoverable statement
 }
 
 sub meta
@@ -441,7 +447,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

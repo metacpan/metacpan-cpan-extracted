@@ -1,12 +1,15 @@
 ---
 abstract: 'Create tmux layout strings programmatically'
 author:
-  - 'J. Maslak <jmaslak@antelope.net>'
+  - 'Joelle Maslak <jmaslak@antelope.net>'
 build_requires:
   Cwd: '0'
+  ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  IO::Socket::INET: '0'
   IO::Socket::IP: '0'
   Test::More: '0'
+  Test::UseAllModules: '0.17'
   Time::Out: '0'
   lib: '0'
 configure_requires:
@@ -18,6 +21,10 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Term-Tmux-Layout
+provides:
+  Term::Tmux::Layout:
+    file: lib/Term/Tmux/Layout.pm
+    version: '1.182062'
 requires:
   Carp: '0'
   Moose: '0'
@@ -27,6 +34,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  repository: https://github.com/jmaslak/Term-Tmux-Layout.git
-version: '1.005'
+  bugtracker: https://github.com/jmaslak/Term-Tmux-Layout/issues
+  repository: git://github.com/jmaslak/Term-Tmux-Layout.git
+version: '1.182062'
+x_contributor_covenant:
+  version: 0.02
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -201,6 +201,19 @@ in the currently-selected path, it will be highlighted and selected; and pressin
 the [Reset] button will reset the selected file to be this one.  Default: none 
 (no default file name is initially shown).
 
+=head2 -FNameList
+
+Optional reference to a list of specific file names to be displayed in the file 
+list.  User can be forced to select a file from this specific list by further 
+constraints such as B<-DisableFPat> => 1, B<-Create> => -1, B<-SelDir> => -1, 
+and B<-DisableShowAll> => 1.  The list can contain any combination of file names 
+(ie. I<"file.ext">, absolute paths, ie. I<"/home/user/file.ext">, or relative paths, 
+ie. I<"user/file.ext"> or I"<c:file.ext>.  The files will be compared against the 
+current path and, if matching (and existing, if B<-Create> < 1), will be shown in 
+the drop-down list.  Default:  none (show all files otherwise matching any other 
+filters found in the current path.  NOTE:  File-names are case-sensitive and paths 
+should be forward slashes ("/"), even on M$-Windows.
+
 =head2 -FPat
 
 Sets the default file selection pattern.  Only files matching this pattern will 
@@ -429,7 +442,7 @@ The title of the Error Dialog Box.  Default: 'Incorrect entry or selection!'.
 package Tk::JFileDialog;
 
 use vars qw($VERSION $bummer $MAXWIDTH);
-$VERSION = '2.01';
+$VERSION = '2.10';
 $MAXWIDTH = 60;  #AVG. CHARACTERS.
 
 require 5.002;
@@ -539,6 +552,7 @@ sub Populate
 			-Create		=> ['PASSIVE', undef, undef, 1],
 			-DisableShowAll	=> ['PASSIVE', undef, undef, 0],
 			-DisableFPat	=> ['PASSIVE', undef, undef, 0],
+			-FNameList			=> ['PASSIVE', undef, undef, undef],
 			-FPat			=> ['PASSIVE', undef, undef, ''],
 			-FPatList			=> ['PASSIVE', undef, undef, undef],
 			-FPatFilters	=> ['PASSIVE', undef, undef, undef],
@@ -1213,15 +1227,15 @@ sub BuildPathEntry
 			-label => '',
 			-state => $favcnt ? 'normal' : 'textonly',
 			-variable => \$self->{'Configure'}{$LabelVar},
-			-altbinding => 'Return=NonEmptyGo,Right=NoSearch',
+			-altbinding => $altbindings,
 			-btntakesfocus => 1,
 			-browsecmd => sub {
 				$self->{'Configure'}{'-Path'} = $self->{$entry}->dereference($self->{'Configure'}{$LabelVar});
 				&RescanFiles($self)  unless (!$self->{'Configure'}{'-QuickSelect'} || $_[2] =~ /(?:space|listbox\.mod)/o);
 				$self->{$entry}->icursor('end');  ###
 				my $state = $self->{$entry}->cget( "-state" );
-				$self->{'FileEntry'}->focus  #WARNING:THIS LINE CAN LOCK UP THE APP (at least w/o this test)?!
-						unless ($state =~ /dis/o || !$self->{'Configure'}{'-QuickSelect'} || $_[2] =~ /(?:space|listbox\.mod)/o);
+#FIXME: THIS LINE STILL LOCKS UP APP?!:				$self->{'FileEntry'}->focus  #WARNING:THIS LINE CAN LOCK UP THE APP (at least w/o this test)?!
+#						unless ($state =~ /dis/o || !$self->{'Configure'}{'-QuickSelect'} || $_[2] =~ /(?:space|listbox\.mod)/o);
 			},
 			-noselecttext => $self->{'Configure'}{'-noselecttext'},
 			-listrelief => 'flat',
@@ -1570,7 +1584,8 @@ sub BuildFDWindow
 			-variable => \$self->{'Configure'}{'-FPat'},
 			-deleteitemsok => 0,
 			-listrelief => 'flat',
-			-altbinding => 'Down=Popup;Return=SingleGo;Return=NonEmptyGo',
+			#-altbinding => 'Down=Popup;Return=SingleGo;Return=NonEmptyGo',
+			-altbinding => 'Down=Popup;Return=Go,Nolistbox=space,mod',
 			-browsecmd => sub {
 				&RescanFiles($self);
 				if ($self->{'Configure'}{'-SelDir'} == 1)   # !!!
@@ -1586,7 +1601,7 @@ sub BuildFDWindow
 					$self->{$widget}->focus;
 				}
 			},
-			-noselecttext => $self->{'Configure'}{'-noselecttext'},
+			-noselecttext => 1,
 	)->pack(@leftPack, @expand, @xfill);
 
 	## and the radio box
@@ -1857,9 +1872,70 @@ sub RescanFiles
 		@filters = ('')  unless ($#filters >= 0);
 		undef @allfiles;
 
-		if (opendir(DIR, $path))
+		#WE'LL EITHER LOAD FILES FROM A USER-PROVIDED LIST -OR- FROM THE CURRENT PATH:
+		if ($self->{'Configure'}{'-FNameList'} && ref($self->{'Configure'}{'-FNameList'}))
 		{
-FILELOOP:			while ($_ = readdir(DIR))
+FILELOOP1:			foreach my $f (@{$self->{'Configure'}{'-FNameList'}})  #USER-PROVIDED LIST:
+			{
+				$_ = $f;
+				if ($bummer)
+				{
+					$_ = "\u$f\E"  if (/^\w\:/o);
+					s#\\#\/#go;
+					if (s#^(\w:)([^\/])#$2#)  #WINDOWS REL. FILE (c:filename):
+					{
+						next  unless ($1 =~ /^$driveletter/i);
+					}
+				}
+				if (m#\/([^\/]+)$#o)  #FILE NAME CONTAINS A PATH:
+				{
+					my $fn = $1;
+					if ($_ eq $path . $fn)  #FILE NAME'S PATH IS SAME AS THE CURRENT PATH:
+					{
+						next  if ($self->{'Configure'}{'-Create'} < 1
+								&& !(-f "${path}$fn"));
+						$_ = $fn;
+					}
+					elsif (($path . $fn) =~ /${_}$/ && $_ ne "/$fn")  #FILE NAME'S RELATIVE PATH IS CONTAINED 
+					{
+						next  if ($self->{'Configure'}{'-Create'} < 1
+								&& !(-f "${path}$fn"));
+						$_ = $fn;
+					}
+					else
+					{
+						next;
+					}
+				}
+				else
+				{
+					next  if ($self->{'Configure'}{'-Create'} < 1
+							&& !(-f "${path}$_"));
+				}
+				if (!$filters[0] || $filters[0] =~ /^\*$/o)
+				{
+					push @allfiles, $_;
+					next;
+				}
+				foreach my $filter (@filters)
+				{
+					if (/^${filter}$/)
+					{
+						push @allfiles, $_;
+						next FILELOOP1;
+					}
+				}
+			}
+			foreach $direntry (sort @allfiles)
+			{
+				#INCLUDE FILE IF EXISTS || WE'RE USING A FILE-NAME LIST:
+				$direntry =~ s!.*/([^/]*)$!$1!;
+				$fl->insert('end',$direntry)  if ($show || $direntry !~ /^\./o);
+			}
+		}
+		elsif (opendir(DIR, $path))   #LOAD FILE NAMES FROM CURRENT PATH:
+		{
+FILELOOP2:			while ($_ = readdir(DIR))
 			{
 				if (!$filters[0] || $filters[0] =~ /^\*$/o)
 				{
@@ -1871,72 +1947,71 @@ FILELOOP:			while ($_ = readdir(DIR))
 					if (/^${filter}$/)
 					{
 						push @allfiles, $_;
-						next FILELOOP;
+						next FILELOOP2;
 					}
 				}
 			}
 			closedir DIR;
-		}
-		if ($self->{'Configure'}{'-SortOrder'} =~ /^N/o)
-		{
-			foreach $direntry (sort @allfiles)
+			if ($self->{'Configure'}{'-SortOrder'} =~ /^N/o)
 			{
-				if (-f "${path}$direntry")
+				foreach $direntry (sort @allfiles)
 				{
-					$direntry =~ s!.*/([^/]*)$!$1!;
-					unless ($show)
+					if (-f "${path}$direntry")
 					{
-						next  if ($direntry =~ /^\./o);  #SKIP ".-FILES" EVEN ON WINDOWS!
-						if ($bummer)  #SKIP FILES WINDOWS CONSIDERS HIDDEN:
+						$direntry =~ s!.*/([^/]*)$!$1!;
+						unless ($show)
 						{
-							my $attrs;
-							next  unless (Win32::File::GetAttributes("${path}$direntry", $attrs));
-							next  if ($attrs & HIDDEN());
+							next  if ($direntry =~ /^\./o);  #SKIP ".-FILES" EVEN ON WINDOWS!
+							if ($bummer)  #SKIP FILES WINDOWS CONSIDERS HIDDEN:
+							{
+								my $attrs;
+								next  unless (Win32::File::GetAttributes("${path}$direntry", $attrs));
+								next  if ($attrs & HIDDEN());
+							}
 						}
+						$fl->insert('end',$direntry);
 					}
+				}
+			}
+			else
+			{
+				my @sortedFiles;
+				foreach $direntry (@allfiles)
+				{
+					if (-f "${path}$direntry")
+					{
+						my (@timestuff, @stats, $atime);
+						@stats = stat "${path}$direntry";
+						@timestuff = localtime($stats[9]);
+						$atime = ($timestuff[5] + 1900);
+						$atime .= '0'  if ($timestuff[4] < 9);
+						$atime .= ($timestuff[4] + 1);
+						$atime .= '0'  if ($timestuff[3] < 10);
+						$atime .= $timestuff[3];
+						$atime .= ' ';
+						$atime .= '0'  if ($timestuff[2] < 10);
+						$atime .= $timestuff[2];
+						$atime .= '0'  if ($timestuff[1] < 10);
+						$atime .= $timestuff[1];
+						$direntry =~ s!.*/([^/]*)$!$1!;
+						unless ($show)
+						{
+							next  if ($direntry =~ /^\./o);  #SKIP ".-FILES" EVEN ON WINDOWS!
+							if ($bummer)  #SKIP FILES WINDOWS CONSIDERS HIDDEN:
+							{
+								my $attrs;
+								next  unless (Win32::File::GetAttributes("${path}$direntry", $attrs));
+								next  if ($attrs & HIDDEN());
+							}
+						}
+						push @sortedFiles, ($atime . ' ' . $direntry);
+					}
+				}
+				my @stats;
+				foreach $direntry (sort @sortedFiles)
+				{
 					$fl->insert('end',$direntry);
 				}
-			}
-		}
-		else
-		{
-
-			my @sortedFiles;
-			foreach $direntry (@allfiles)
-			{
-				if (-f "${path}$direntry")
-				{
-					my (@timestuff, @stats, $atime);
-					@stats = stat "${path}$direntry";
-					@timestuff = localtime($stats[9]);
-					$atime = ($timestuff[5] + 1900);
-					$atime .= '0'  if ($timestuff[4] < 9);
-					$atime .= ($timestuff[4] + 1);
-					$atime .= '0'  if ($timestuff[3] < 10);
-					$atime .= $timestuff[3];
-					$atime .= ' ';
-					$atime .= '0'  if ($timestuff[2] < 10);
-					$atime .= $timestuff[2];
-					$atime .= '0'  if ($timestuff[1] < 10);
-					$atime .= $timestuff[1];
-					$direntry =~ s!.*/([^/]*)$!$1!;
-					unless ($show)
-					{
-						next  if ($direntry =~ /^\./o);  #SKIP ".-FILES" EVEN ON WINDOWS!
-						if ($bummer)  #SKIP FILES WINDOWS CONSIDERS HIDDEN:
-						{
-							my $attrs;
-							next  unless (Win32::File::GetAttributes("${path}$direntry", $attrs));
-							next  if ($attrs & HIDDEN());
-						}
-					}
-					push @sortedFiles, ($atime . ' ' . $direntry);
-				}
-			}
-			my @stats;
-			foreach $direntry (sort @sortedFiles)
-			{
-				$fl->insert('end',$direntry);
 			}
 		}
 	}
@@ -2083,7 +2158,7 @@ sub GetReturn
 				my $errnames = '';
 				my @filters = split (/\|/o, $self->{'Configure'}{'-FPatFilters'});
 				@filters = ('')  unless ($#filters >= 0);
-FILELOOP1:				foreach my $f (@filelist)   #ADD FULL PATHS TO ANY THAT ARE MISSING PATHS!:
+FILELOOP3:				foreach my $f (@filelist)   #ADD FULL PATHS TO ANY THAT ARE MISSING PATHS!:
 				{
 					$f =~ s#\\#\/#go;
 					$f = $driveletter . $f  if ($f =~ m#^\/#o);
@@ -2108,7 +2183,7 @@ FILELOOP1:				foreach my $f (@filelist)   #ADD FULL PATHS TO ANY THAT ARE MISSIN
 							if ($f =~ /^${filter}$/)
 							{
 								$filenames .= $f . ',';
-								next FILELOOP1;
+								next FILELOOP3;
 							}
 						}
 						$errnames .= $f . ', ';
@@ -2230,7 +2305,7 @@ FILELOOP1:				foreach my $f (@filelist)   #ADD FULL PATHS TO ANY THAT ARE MISSIN
 				my $errnames = '';
 				my @filters = split (/\|/o, $self->{'Configure'}{'-FPatFilters'});
 				@filters = ('')  unless ($#filters >= 0);
-FILELOOP2:				foreach my $f (@filelist)
+FILELOOP4:				foreach my $f (@filelist)
 				{
 					if ($self->{'Configure'}{'-Create'} > 0 || -f $f)   #SEPARATE THE SHEEP FROM THE GOATS:
 					{
@@ -2244,7 +2319,7 @@ FILELOOP2:				foreach my $f (@filelist)
 							if ($f =~ /^${filter}$/)
 							{
 								$filenames .= $f . ',';
-								next FILELOOP2;
+								next FILELOOP4;
 							}
 						}
 						$errnames .= $f . ', ';

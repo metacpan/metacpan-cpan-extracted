@@ -2,6 +2,8 @@
 
 use strict;
 use warnings FATAL => 'all';
+use FindBin;
+use lib "$FindBin::Bin/../";
 use Test::Most;
 
 BEGIN { use_ok 't::Class2' };

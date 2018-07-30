@@ -1,5 +1,11 @@
 Revision history for lazy
 
+0.000009  2018-07-26 20:02:15Z
+    - Use a relative file path in test
+
+0.000008  2018-07-25 15:04:40Z
+    - Stop detecting eval. This was a bad idea.
+
 0.000007  2018-07-24 15:22:16Z
     - In general, don't install modules which are loaded inside an eval
 

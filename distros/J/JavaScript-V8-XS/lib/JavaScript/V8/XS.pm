@@ -6,7 +6,7 @@ use parent 'Exporter';
 use Text::Trim qw(trim rtrim);
 use XSLoader;
 
-our $VERSION = '0.000004';
+our $VERSION = '0.000005';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 our @EXPORT_OK = qw[];
@@ -107,7 +107,7 @@ JavaScript::V8::XS - Perl XS binding for the V8 Javascript embeddable engine
 
 =head1 VERSION
 
-Version 0.000004
+Version 0.000005
 
 =head1 SYNOPSIS
 
@@ -121,6 +121,7 @@ Version 0.000004
 
     $vm->set('global_name', [1, 2, 3]);
     my $aref = $vm->get('global_name');
+    $vm->remove('global_name');
 
     $vm->set('my.object.slot', { foo => [ 4, 5 ] });
     my $href = $vm->get('my.object.slot');
@@ -223,6 +224,10 @@ Get the value stored in a JavaScript variable or object slot.
 The JavaScript value is converted into an equivalent Perl value, so you can
 freely pass nested structures (hashes of arrays of hashes) and they will be
 handled correctly.
+
+=head2 remove
+
+Remove a JavaScript variable or object slot.
 
 =head2 exists
 

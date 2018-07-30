@@ -1,10 +1,312 @@
 ==================================================
-Changes from 2017-03-05 00:00:00 +0000 to present.
+Changes from 2017-07-30 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.016 at 2018-03-05 17:17:21 +0000
+version 0.017 at 2018-07-30 01:33:52 +0000
 ------------------------------------------
+
+  Change: 8c4a7665ac9bd61e3404b4108e042dd459fbe15d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-07-29 22:32:07 +0000
+
+    Reduced number of info stored in distroprefs
+
+    Experience during smoking tests shows that most of the cases, a
+    distribution that blocks archtecture, OS version and some cases if
+    the perl was compiled with threads support or not. More than that, it
+    is just noise. 
+
+  Change: 0a303addbd35a78bcbf2b113ead150ca8086991b
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-07-27 19:51:51 +0000
+
+    Updated list of blocked distros 
+
+  Change: 515c675810e3626b23b0717fc91fe4aae6081ed9
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-07-22 11:25:46 +0000
+
+    Adding OS and architecture name to distroprefs
+
+    Adding minimum information to distroprefs files created with dblock.
+    Experiences show that distributions presenting issues on OpenBSD
+    occurs on all versions of the OS or perl version. Switching back the
+    version 0.017, since 0.016 is the last version available on Metacpan. 
+
+  Change: 6ec399707cef43e601fb1662133672e0a88e3b3a
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-07-20 10:05:04 +0000
+
+    Updated comment in distro file 
+
+  Change: 4fd2d3ce57b5dcc5c13849878fe3c37d451078e6
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-07-20 10:04:07 +0000
+
+    Disabled more distros 
+
+  Change: 32b1e567ae5c5e7685c95bfb15fc4fd62ab1252d
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-07-11 07:37:31 +0000
+
+    Adding more details with dblock 
+
+  Change: 32caab31457e48772319a78f929afbbd0b54e29a
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-07-02 18:28:07 +0000
+
+    Added more distros to be blocked 
+
+  Change: 10f8da9c3a3cdb1e6154f3d5102678f8f96c4a90
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-06-28 00:47:39 +0000
+
+    Removed osversion from all preference files
+
+    Most files with "osversion '6.2'" where blocking the smoker, so
+    disabling all of the by removing the line. 
+
+  Change: 666c0a78e39aee2c89d5196488749b4107ed043f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-06-26 19:13:40 +0000
+
+    Disabling more distros in all OpenBSD versions 
+
+  Change: 72e88f9bf4495228eb30c8824820beb34fc1f10c
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-06-24 01:37:36 +0000
+
+    More bugfixes 
+
+  Change: 6e1a7e4830b26ed41ad250513dc792265b0f7f1e
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-06-24 00:44:27 +0000
+
+    More bugfixes 
+
+  Change: f978c5cb361fdc0a14996c3d5ab32289a2d8391d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-06-24 00:14:47 +0000
+
+    More bugfixes 
+
+  Change: 7382d96a508c83e128065e74f7ecc0a7b05aaa9b
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-06-23 21:13:36 +0000
+
+    Merge branch 'master' of github.com:glasswalk3r/cpan-openbsd-smoker 
+
+  Change: fe5f8bd41b1ec61fb2cc94917657919113f174eb
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-06-23 21:13:23 +0000
+
+    Bug fixes 
+
+  Change: 201364c6740491a02365d7fc7add1cc1529a898f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-06-20 23:28:55 +0000
+
+    Generic blocking distributions 
+
+  Change: ca4651719876cc1b7ca6dc43510537e4b65ff4b5
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-06-20 14:29:30 +0000
+
+    Added new prefs to block distro 
+
+  Change: a113185b95b4a3e482b4510eb7e9f5d3df68f03c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-06-18 15:58:45 +0000
+
+    Blocking distros for all OpenBSD versions 
+
+  Change: 94d756ac233c090ba2f07514c229f33c7fc59a70
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-06-11 00:36:53 +0000
+
+    Cleanup and refactoring
+
+    Adding cleanup after perl setup for vagrant user. Refactoring cleanup
+    function to be used by vagrant_user.sh and vagrant_bootstrap.sh
+    scripts. Fixed perlbrew installing perl-stable (naming it as
+    perl-stable) to avoid having to list the current available perls. 
+
+  Change: 3923a5f7cd33eacf1f3c8617b08f73869330af69
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-06-10 20:36:48 +0000
+
+    Moved perl initialization to bootstrap
+
+    All modules installed by this script were moved to the
+    vagrant_boostrap.sh. 
+
+  Change: 8bdb061d37608113a199c9af69166b500f5c2012
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-06-10 14:04:46 +0000
+
+    Adding Packer support
+
+    Start using Packer to generate the base VM. Small fixes and minor
+    improvements to the Vagrant process. 
+
+  Change: 000305643101d9f10fe6cd47ece26c7b410d3ab5
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-06-02 13:39:48 +0000
+
+    Update LICENSE 
+
+  Change: 2f868b41eb406e0ba767b64d9ec4db84acb4e66c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-04-04 12:10:26 +0000
+
+    new distroprefs additions, keeping IPC-Cmd namespace safe 
+
+  Change: c7001b1aaf7e2ee14f287eb8a49be9eb0451ad2e
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-31 18:11:58 +0000
+
+    Updated README.md with latest project changes. 
+
+  Change: b68676b7dff347522c565ead94ee04bff5053084
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-31 16:59:52 +0000
+
+    Fixed bug processing the right perl 
+
+  Change: 27a26eeef3780ec1ff3dbd14d96c2e166294498e
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-31 12:36:13 +0000
+
+    Missed merging some statements 
+
+  Change: 7a2481774b7ab525ed3bf4d2a82e86c1214c13a3
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-31 12:22:19 +0000
+
+    Merge branch 'using_yaml' 
+
+  Change: c2dea9969605aaab3a857cac2c39fe7410a4b4fc
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-31 12:00:50 +0000
+
+    Removed the now replaced config_smoker.sh
+
+    config_smoker.sh is now fully replaced by config_smoker.pl (Perl
+    script) 
+
+  Change: 750e8d2179299e096f82d21949ed2b4272f7d561
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-30 23:23:54 +0000
+
+    Fixed bug with CPAN::SQLite
+
+    CPAN::SQLite must be installed separated, to give it a chance to
+    create the required database before the install can proceed, so it
+    was removed from the modules/required.txt. Now removing the temporary
+    file left by installing perlbrew. 
+
+  Change: 56bb70d61f7b4e75023c0002909a4dd5bba10ae5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-26 01:45:34 +0000
+
+    More bugfixes 
+
+  Change: e73251950b6edce53e596758f5a534db26b2d59a
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-26 00:33:33 +0000
+
+    More bugfixes 
+
+  Change: 2a7e01df1de3bd9d6b15c24ba9b481604e419103
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-25 19:45:24 +0000
+
+    Finished changes to use YAML based parameters
+
+    Fixed bug on Vagrantfile introduced by serialization of parameters in
+    a YAML file. Refactoring on Vagrantfile to copy and (latter) remove
+    files between the host and VM, which should help keeping track of
+    those files. Finished implementation of config_smoker.pl. Fixed bug
+    of config_smoker.pl. install_perl.sh was updated to use information
+    provided by the YAML file. Created read_yaml.pl to parse the YAML and
+    provide the required information in a format that parallel could use. 
+
+  Change: 358b0453702d645e84735fc6b163c9aa2b492d83
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-03-21 11:44:13 +0000
+
+    Added new distroprefs 
+
+  Change: d471cf3d70629209ae5ca16b0e0add3b44ca0118
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-03-12 15:37:10 +0000
+
+    Fixed a bunch of mistakes with distroprefs
+
+    A lot of distroprefs were inserted with non-valid YAML lines, those
+    are now fixed. Added a simple Perl program to validate all the YAML
+    distroprefs syntax. 
+
+  Change: 9d49b3a775fb47a14dd3c3e1a7f6905dcfce1335
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-10 23:40:11 +0000
+
+    Enhancements for dblock
+
+    Made dblock create very specific distroprefs to disable distributions
+    to run over the smoker. Setup the proper umask to make the
+    distroprefs file to be created with write permissions for the group.
+    Fixed tests due those changes. 
+
+  Change: 51e699f149a80b525c37c0ed08abaf1e793c5dff
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-10 23:00:33 +0000
+
+    Specifying more details to distroprefs
+
+    Added osname, osvers and archname (from Config module) to the
+    following distroprefs in order to make them more specific for
+    disabling distributions. 
+
+  Change: 169347dc426a13d67282749d73cfb6428a68cdf5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-03-10 22:23:25 +0000
+
+    Removed distroprefs disabling cperl
+
+    cperl is not officially supported by CPAN Testers, so removing those
+    specific distroprefs. 
+
+  Change: 44d98b54083997c921de7f28b5f0196677a1e923
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-03-08 16:43:57 +0000
+
+    Using full perlconfig on distroprefs
+
+    Adding all options for perl installed using perlbrew to create more
+    specific filters for the distroprefs. Removing the unnecessary
+    generation of random strings for distro name. dblock now delegates
+    the YAML comment generation to the block_distro function. The
+    dblock.t tests now uses 100% mocked data for testing. 
+
+  Change: 16044aa7c2c6a761aaa652d2527c5bfa5e8990e0
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-03-08 11:48:42 +0000
+
+    Added more distroprefs 
+
+  Change: 343caa2fcff6ca7bba3ffc319a1ae88510cd3b27
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-03-07 18:29:34 +0000
+
+    Finished fixing the tests 
+
+  Change: d5a18c6acf22e580fd1e249e90ab13d63925cecd
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-03-07 18:14:54 +0000
+
+    Fixing dblock clashing with existing distropres 
 
   Change: 4d915f4842dd71c4248945d8b4c1f4a2fbf477e7
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
@@ -122,6 +424,12 @@ version 0.016 at 2018-03-05 17:17:21 +0000
   Date : 2018-02-15 19:34:45 +0000
 
     Bug fixes of errors identified during testing 
+
+  Change: 41bcc39bb21393c6377e1a89f58802604e22becd
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-13 22:58:47 +0000
+
+    Started replacing Bash with Perl and YAML 
 
   Change: b09026c726320e4038ed895b002c9320217d19d3
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

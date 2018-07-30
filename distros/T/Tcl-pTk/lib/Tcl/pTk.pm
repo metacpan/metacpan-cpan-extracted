@@ -1,6 +1,6 @@
 package Tcl::pTk;
 
-our ($VERSION) = ('0.93');
+our ($VERSION) = ('0.94');
 
 use strict;
 use Tcl;
@@ -89,7 +89,7 @@ sub _DEBUG {
 
 =head1 NAME
 
-Tcl::pTk - Interface to Tcl/Tk with Perl/Tk compatible sytax
+Tcl::pTk - Interface to Tcl/Tk with Perl/Tk compatible syntax
 
 =head1 SYNOPSIS
 
@@ -715,6 +715,8 @@ versions.
 =item Gisle Aas, gisle _a_ activestate . com, 14 Apr 2004.
 
 =item John Cerney, john.cerney _a_ gmail . com, 29 Sep 2009.
+
+=item Christopher A. Chavez, chrischavez _a_ gmx . us, May 2018.
 
 =back
 

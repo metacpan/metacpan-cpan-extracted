@@ -1,0 +1,119 @@
+
+=head1 NAME
+
+Mojolicious::Plugin::Loco - launch local GUI via default web browser
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  # myapp.pl
+
+  use Mojolicious::Lite
+  plugin 'Loco';
+
+  get '/' => "index";
+  #...
+  app->start;
+
+  __DATA__
+  @@ index.html.ep
+  % layout 'default';
+  %# ... main page
+
+  @@ layouts/default.html.ep
+  <!DOCTYPE html><html><head>
+  %= $c->loco->jsload;
+  %= content_for 'head'
+  </head><body>
+  %= content
+  </body>
+  </html>
+
+=head1 DESCRIPTION
+
+This plugin allows writing low-effort desktop applications using L<Mojolicious> (even cross-platform ones if your code is sufficiently portable).
+
+When run as a daemon listening on an explicit loopback/localhost port, the plugin causes a dedicated window to open in your default internet browser, assuming we're in a desktop/window-manager context where L<Browser::Open> is meaningful.  The server will then shut down once the browser window and all descendants thereof are subsequently closed.
+
+=head1 OPTIONS
+
+=head2 initial_wait
+
+How many seconds to wait on server start for browser window to finish loading.  Defaults to 10.
+
+=head2 final_wait
+
+How many seconds to wait after browser window ceases communicating before terminating (we do not rely on C<window.unload>).  Defaults to 3.
+
+Since javascript timer events from backgrounded/hidden tabs/windows are typically throttled, reducing this below 2 will most likely make the application terminate whenever the window is hidden or minimized.
+
+=head2 entry
+
+URI path for the entry point of your application (i.e., what to display when the brower window opens).  Defaults to C</>.
+
+=head2 api_path
+
+Path prefix for URIs used by this plugin.  This is where the various endpoints needed by this module live (and is also where the required javascript file(s) are served from).  Defaults to C</hb/>; it can be pretty much anything as long as it's distinct from what the rest of your application uses.  But it would be best to keep it short.
+
+=head1 HELPERS
+
+=head2 loco.jsload
+
+Loads whatever javascript needs to be in the <head> section of every page to be displayed in the browser window.  You most likely want this in your default layout.
+
+  %= $c->loco->jsload;
+
+Or you can be more elaborate
+
+  %= javascript 'https://code.jquery.com/jquery-3.3.1.min.js';
+  %= $c->loco->jsload( nojquery => 1, begin
+        .on_hb(function(h) {
+          // do something on every heartbeat
+	  $('#heartbeat').html(h);
+        })
+  % end );
+
+Options include
+
+=head3 nojquery
+
+Suppress loading of jquery from the Mojolicious distribution, meaning you already loaded it from elsewhere (needs to be at least version 3.0).
+
+=head3 nofinish
+
+Suppress the default C<on_finish> handler.
+
+=head3 begin
+
+Final C<begin> block, if provided, will be assumed to be javascript code to further configure the heartbeat object (code is preceded by C<$().heartbeat()>), typically to add C<on_hb> or C<on_finish> handlers
+
+=head1 METHODS
+
+L<Mojolicious::Plugin::Loco> inherits all methods from
+L<Mojolicious::Plugin> and implements the following new ones.
+
+=head2 register
+
+  $plugin->register(Mojolicious->new, entry => '/');
+
+Register plugin in L<Mojolicious> application.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
+
+=head1 AUTHOR
+
+Roger Crew <wrog@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Roger Crew.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

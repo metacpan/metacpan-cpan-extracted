@@ -1,0 +1,30 @@
+---
+abstract: 'Ship your TestML1 version'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-TestML1Includer
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  Dist::Zilla::Plugin::ModuleIncluder: '0'
+  Moose: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/dist-zilla-plugin-testml1includer-pm/issues
+  homepage: https://github.com/ingydotnet/dist-zilla-plugin-testml1includer-pm
+  repository: https://github.com/ingydotnet/dist-zilla-plugin-testml1includer-pm.git
+version: 0.0.2
+x_serialization_backend: 'YAML::Tiny version 1.69'

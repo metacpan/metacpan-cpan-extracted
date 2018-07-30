@@ -35,7 +35,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooseX-MungeHas";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-008>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-003>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-004>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-005>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-006>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-007>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-008>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-009>, <http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-010>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moosex-mungehas>;
@@ -253,6 +253,47 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.008.tar.gz>;
 	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "MooseX-MungeHas-0.009"^^xsd:string;
+	dc:issued            "2018-07-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Don't use fully-qualified sub names for builders.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/arc>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-moosex-mungehas/pull/3>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "MooseX-MungeHas-0.010"^^xsd:string;
+	dc:issued            "2018-07-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Tests;
+			rdfs:label "Make 07lazy.t actually test something useful. I can't remember why this test case even exists.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Eliminate uninitialized warning when no `is` under Moose.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/arc>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-moosex-mungehas/pull/5>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooseX-MungeHas-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/arc>
+	a                    foaf:Person;
+	foaf:name            "Aaron Crane";
+	foaf:nick            "ARC";
+	foaf:page            <https://metacpan.org/author/ARC>.
 
 <http://purl.org/NET/cpan-uri/person/arodland>
 	a                    foaf:Person;

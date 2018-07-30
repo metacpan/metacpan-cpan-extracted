@@ -20,7 +20,7 @@ name: Dist-Zilla-PluginBundle-Author-JMASLAK
 provides:
   Dist::Zilla::PluginBundle::Author::JMASLAK:
     file: lib/Dist/Zilla/PluginBundle/Author/JMASLAK.pm
-    version: '1.181841'
+    version: '1.182070'
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::AutoPrereqs: '0'
@@ -71,7 +71,7 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Dist-Zilla-PluginBundle-Author-JMASLAK/issues
   repository: git://github.com/jmaslak/Dist-Zilla-PluginBundle-Author-JMASLAK.git
-version: '1.181841'
+version: '1.182070'
 x_contributor_covenant:
   version: 0.02
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,16 +1,17 @@
 package JIRA::REST;
-# ABSTRACT: Thin wrapper around JIRA's REST API
-$JIRA::REST::VERSION = '0.018';
-use 5.008_008;
+# ABSTRACT: Thin wrapper around Jira's REST API
+$JIRA::REST::VERSION = '0.019';
+use 5.010;
 use utf8;
 use strict;
 use warnings;
 
 use Carp;
 use URI;
+use Encode;
 use MIME::Base64;
 use URI::Escape;
-use JSON;
+use JSON 2.23;
 use REST::Client;
 
 sub new {
@@ -66,7 +67,7 @@ sub new {
     }
 
     for ($args{rest_client_config}) {
-        $_ = {} unless defined;
+        $_ //= {};
         croak __PACKAGE__ . "::new: 'rest_client_config' argument must be a hash reference.\n"
             unless defined && ref && ref eq 'HASH';
     }
@@ -75,7 +76,7 @@ sub new {
     # This is deprecated since v0.017
     if (my $proxy = delete $args{rest_client_config}{proxy}) {
         carp __PACKAGE__ . "::new: passing 'proxy' in the 'rest_client_config' hash is deprecated. Please, use the corresponding argument instead.\n";
-        $args{proxy} = $proxy unless defined $args{proxy};
+        $args{proxy} //= $proxy;
     }
 
     my $rest = REST::Client->new($args{rest_client_config});
@@ -86,7 +87,7 @@ sub new {
     # Follow redirects/authentication by default
     $rest->setFollow(1);
 
-    # Since JIRA doesn't send an authentication challenge, we force the
+    # Since Jira doesn't send an authentication challenge, we force the
     # sending of the authentication header.
     $rest->addHeader(Authorization => 'Basic ' . encode_base64("$args{username}:$args{password}"))
         unless $args{anonymous};
@@ -179,7 +180,7 @@ sub _error {
     } elsif ($type =~ m:application/json:) {
         my $error = $self->{json}->decode($content);
         if (ref $error eq 'HASH') {
-            # JIRA errors may be laid out in all sorts of ways. You have to
+            # Jira errors may be laid out in all sorts of ways. You have to
             # look them up from the scant documentation at
             # https://docs.atlassian.com/jira/REST/latest/.
 
@@ -196,6 +197,9 @@ sub _error {
             if (my $errors = $error->{errors}) {
                 $msg .= "- [$_] $errors->{$_}\n" foreach sort keys %$errors;
             }
+
+            # some give us a single message in 'errorMessage'
+            $msg .= $error->{errorMessage} . qq{\n} if $error->{errorMessage};
         } else {
             $msg .= $content;
         }
@@ -275,8 +279,7 @@ sub PUT {
     $path = $self->_build_path($path, $query);
 
     $headers                   ||= {};
-    $headers->{'Content-Type'}   = 'application/json;charset=UTF-8'
-        unless defined $headers->{'Content-Type'};
+    $headers->{'Content-Type'} //= 'application/json;charset=UTF-8';
 
     $self->{rest}->PUT($path, $self->{json}->encode($value), $headers);
 
@@ -292,8 +295,7 @@ sub POST {
     $path = $self->_build_path($path, $query);
 
     $headers                   ||= {};
-    $headers->{'Content-Type'}   = 'application/json;charset=UTF-8'
-        unless defined $headers->{'Content-Type'};
+    $headers->{'Content-Type'} //= 'application/json;charset=UTF-8';
 
     $self->{rest}->POST($path, $self->{json}->encode($value), $headers);
 
@@ -355,7 +357,7 @@ sub attach_files {
             %{$rest->{_headers}},
             'X-Atlassian-Token' => 'nocheck',
             'Content-Type'      => 'form-data',
-            'Content'           => [ file => [$file, Encode::encode_utf8( $file )] ],
+            'Content'           => [ file => [$file, encode_utf8( $file )] ],
         );
 
         $response->is_success
@@ -373,11 +375,11 @@ __END__
 
 =head1 NAME
 
-JIRA::REST - Thin wrapper around JIRA's REST API
+JIRA::REST - Thin wrapper around Jira's REST API
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -430,29 +432,29 @@ version 0.018
 
 =head1 DESCRIPTION
 
-L<JIRA|http://www.atlassian.com/software/jira/> is a proprietary bug
+L<Jira|http://www.atlassian.com/software/jira/> is a proprietary bug
 tracking system from Atlassian.
 
-This module implements a very thin wrapper around JIRA's REST APIs:
+This module implements a very thin wrapper around Jira's REST APIs:
 
 =over
 
-=item * L<JIRA Core REST API|https://docs.atlassian.com/jira/REST/server/>
+=item * L<Jira Core REST API|https://docs.atlassian.com/jira/REST/server/>
 
-This rich API superseded the old L<JIRA SOAP
+This rich API superseded the old L<Jira SOAP
 API|http://docs.atlassian.com/software/jira/docs/api/rpc-jira-plugin/latest/com/atlassian/jira/rpc/soap/JiraSoapService.html>
-which isn't supported anymore as of JIRA version 7.
+which isn't supported anymore as of Jira version 7.
 
 The endpoints of this API have a path prefix of C</rest/api/VERSION>.
 
-=item * L<JIRA Service Desk REST API|https://docs.atlassian.com/jira-servicedesk/REST/server/>
+=item * L<Jira Service Desk REST API|https://docs.atlassian.com/jira-servicedesk/REST/server/>
 
-This API deals with the objects of the JIRA Service Desk application. Its
+This API deals with the objects of the Jira Service Desk application. Its
 endpoints have a path prefix of C</rest/servicedeskapi>.
 
-=item * L<JIRA Software REST API|https://docs.atlassian.com/jira-software/REST/server/>
+=item * L<Jira Software REST API|https://docs.atlassian.com/jira-software/REST/server/>
 
-This API deals with the objects of the JIRA Software application. Its
+This API deals with the objects of the Jira Software application. Its
 endpoints have a path prefix of C</rest/agile/VERSION>.
 
 =back
@@ -476,7 +478,7 @@ hash keys:
 
 =item * B<url>
 
-A string or a URI object denoting the base URL of the JIRA server. This is a
+A string or a URI object denoting the base URL of the Jira server. This is a
 required argument.
 
 The REST methods described below all accept as a first argument the
@@ -504,7 +506,7 @@ during construction.
 
 =item * B<password>
 
-The username and password of a JIRA user to use for authentication.
+The username and password of a Jira user to use for authentication.
 
 If B<anonymous> is false then, if either B<username> or B<password> isn't
 defined the module looks them up in either the C<.netrc> file or via
@@ -536,23 +538,23 @@ describing the fully qualified URL (including port) to your network proxy.
 
 Sets the C<SSL_verify_mode> and C<verify_hostname ssl> options on the
 underlying L<REST::Client>'s user agent to 0, thus disabling them. This
-allows access to JIRA servers that have self-signed certificates that don't
+allows access to Jira servers that have self-signed certificates that don't
 pass L<LWP::UserAgent>'s verification methods.
 
 =item * B<anonymous>
 
-Tells the module that you want to connect to the specified JIRA server with
-no username or password.  This way you can access public JIRA servers
+Tells the module that you want to connect to the specified Jira server with
+no username or password.  This way you can access public Jira servers
 without needing to authenticate.
 
 =back
 
 =head1 REST METHODS
 
-JIRA's REST API documentation lists dozens of "resources" which can be
+Jira's REST API documentation lists dozens of "resources" which can be
 operated via the standard HTTP requests: GET, DELETE, PUT, and
 POST. JIRA::REST objects implement four methods called GET, DELETE,
-PUT, and POST to make it easier to invoke and get results from JIRA's
+PUT, and POST to make it easier to invoke and get results from Jira's
 REST endpoints.
 
 All four methods need two arguments:
@@ -566,7 +568,7 @@ fields, you pass C</rest/api/latest/field>, and in order to get SLA
 information about an issue you pass
 C</rest/servicedeskapi/request/$key/sla>.
 
-If you're using a method form JIRA Core REST API you may omit the prefix
+If you're using a method form Jira Core REST API you may omit the prefix
 C</rest/api/VERSION>. For example, to GET the list of all fields you may
 pass just C</field>.
 
@@ -598,7 +600,7 @@ usually is a hash reference. The value is encoded as a
 L<JSON|http://www.json.org/> string using the C<JSON::encode> method
 and sent with a Content-Type of C<application/json>.
 
-It's usually easy to infer from the JIRA REST API documentation which
+It's usually easy to infer from the Jira REST API documentation which
 kind of value you should pass to each resource.
 
 This argument is required.
@@ -671,7 +673,7 @@ Sets up an iterator for the search specified by the hash reference PARAMS.
 It must be called before calls to B<next_issue>.
 
 PARAMS must conform with the query parameters allowed for the
-C</rest/api/2/search> JIRA REST endpoint.
+C</rest/api/2/search> Jira REST endpoint.
 
 =head2 B<next_issue>
 
@@ -691,6 +693,33 @@ requires a specific content type encoding which is difficult to come up with
 just the C<REST::Client> interface. This utility method offers an easier
 interface to attach files to issues.
 
+=head1 PERL AND JIRA COMPATIBILITY POLICY
+
+Currently L<JIRA::REST> requires Perl 5.10 and supports Jira 7.0.
+
+We try to be compatible with the Perl native packages of the oldest L<Ubuntu
+LTS|https://www.ubuntu.com/info/release-end-of-life> and
+L<CentOS|https://wiki.centos.org/About/Product> Linux distributions still
+getting maintainance updates.
+
+  +-----------------------+------+-------------+
+  | Distro                | Perl | End of Life |
+  +-----------------------+------+-------------+
+  | Ubuntu 14.04 (trusty) | 5.18 |   2019-04   |
+  | Ubuntu 16.04 (xenial) | 5.22 |   2021-04   |
+  | Ubuntu 18.04 (bionic) | 5.26 |   2023-04   |
+  | CentOS 6              | 5.10 |   2020-12   |
+  | CentOS 7              | 5.16 |   2024-07   |
+  +-----------------------+------+-------------+
+
+As you can see, we're kept behind mostly by the slow pace of CentOS (actually,
+RHEL) releases.
+
+As for Jira, the policy is very lax. I (the author) only test L<JIRA::REST> on
+the Jira server installed in the company I work for, which is usually (but not
+always) at most one year older than the newest released version. I don't have
+yet an easy way to test it on different versions.
+
 =head1 SEE ALSO
 
 =over
@@ -701,7 +730,7 @@ JIRA::REST uses a REST::Client object to perform the low-level interactions.
 
 =item * C<JIRA::Client::REST>
 
-This is another module implementing JIRA's REST API using
+This is another module implementing Jira's REST API using
 L<SPORE|https://github.com/SPORE/specifications/blob/master/spore_description.pod>.
 I got a message from the author saying that he doesn't intend to keep
 it going.
@@ -718,7 +747,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

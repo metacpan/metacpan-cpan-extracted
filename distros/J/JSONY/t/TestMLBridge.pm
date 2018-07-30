@@ -1,6 +1,6 @@
 package TestMLBridge;
-use base 'TestML::Bridge';
-use TestML::Util;
+use base 'TestML1::Bridge';
+use TestML1::Util;
 
 use JSONY;
 use JSON;

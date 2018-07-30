@@ -2,7 +2,7 @@ package Tcl::pTk::DropSite;
 require Tcl::pTk::DragDrop::Common;
 require Tcl::pTk::DragDrop::Rect;
 
-our ($VERSION) = ('0.93');
+our ($VERSION) = ('0.94');
 
 use base  qw(Tcl::pTk::DragDrop::Common Tcl::pTk::DragDrop::Rect);
 

@@ -1,0 +1,12 @@
+#title English
+#lang en
+
+Chickpeas 	
+
+An Indian merchant holding green chickpeas (Cicer arietinum). One of
+the earliest cultivated legumes, chickpeas are ingredients in a number
+of dishes <<<هفدهم ویکی‌پدیاها>>> around the world. India is the
+largest producer of this nutrient-dense food, accounting for 64% of
+global production in 2016.
+
+

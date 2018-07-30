@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Hook::OnAdd;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Role for plugins running during the task creation stage
-$Taskwarrior::Kusarigama::Hook::OnAdd::VERSION = '0.9.1';
+$Taskwarrior::Kusarigama::Hook::OnAdd::VERSION = '0.9.2';
 
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ Taskwarrior::Kusarigama::Hook::OnAdd - Role for plugins running during the task 
 
 =head1 VERSION
 
-version 0.9.1
+version 0.9.2
 
 =head1 SYNOPSIS
 

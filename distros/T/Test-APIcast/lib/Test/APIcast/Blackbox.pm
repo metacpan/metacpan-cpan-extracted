@@ -157,7 +157,11 @@ my $write_nginx_config = sub {
 
     # reset ENV to memorized state
     for my $key (keys %ResetEnv) {
-        $ENV{$key} = $ResetEnv{$key};
+        if (defined $ResetEnv{$key}) {
+            $ENV{$key} = $ResetEnv{$key};
+        } else {
+            delete $ENV{$key};
+        }
         delete $ResetEnv{$key};
     }
 

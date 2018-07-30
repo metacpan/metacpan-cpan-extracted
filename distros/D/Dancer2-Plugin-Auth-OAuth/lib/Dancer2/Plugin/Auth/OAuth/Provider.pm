@@ -147,6 +147,7 @@ sub callback {
     my $session_data = $session->read('oauth') || {};
 
     if( $self->protocol_version < 2 ) {
+	    return $self->settings->{error_url} || '/' unless( defined($request->param('oauth_token')) );
         my $at_request = Net::OAuth->request( 'access token' )->new(
            $self->_default_args_v1,
             token          => $request->param('oauth_token'),

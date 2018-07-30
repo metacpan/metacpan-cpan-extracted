@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Coercion::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Coercion::VERSION   = '1.002002';
+	$Type::Coercion::VERSION   = '1.004002';
 }
 
 use Eval::TypeTiny qw<>;
@@ -104,7 +104,7 @@ sub _maybe_restore_type_constraint
 	{
 		return Type::Tiny->new(constraint => $check);
 	}
-	return;
+	return; # uncoverable statement
 }
 
 sub add
@@ -229,15 +229,21 @@ sub add_type_coercions
 	
 	while (@args)
 	{
-		my $type     = Types::TypeTiny::to_TypeTiny(shift @args);
-		my $coercion = shift @args;
+		my $type = Types::TypeTiny::to_TypeTiny(shift @args);
 		
-		_croak "Types must be blessed Type::Tiny objects"
-			unless Types::TypeTiny::TypeTiny->check($type);
-		_croak "Coercions must be code references or strings"
-			unless Types::TypeTiny::StringLike->check($coercion) || Types::TypeTiny::CodeLike->check($coercion);
-		
-		push @{$self->type_coercion_map}, $type, $coercion;
+		if (blessed $type and my $method = $type->can('type_coercion_map'))
+		{
+			push @{$self->type_coercion_map}, @{$method->($type)};
+		}
+		else
+		{
+			my $coercion = shift @args;
+			_croak "Types must be blessed Type::Tiny objects"
+				unless Types::TypeTiny::TypeTiny->check($type);
+			_croak "Coercions must be code references or strings"
+				unless Types::TypeTiny::StringLike->check($coercion) || Types::TypeTiny::CodeLike->check($coercion);
+			push @{$self->type_coercion_map}, $type, $coercion;
+		}
 	}
 	
 	$self->_clear_compiled_coercion;
@@ -926,7 +932,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

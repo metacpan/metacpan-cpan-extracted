@@ -1,20 +1,21 @@
 package DT;
 
 use strict;
-use warnings 'FATAL';
-no warnings 'uninitialized';
+use warnings 'FATAL' => 'all';
 
 use Carp qw();
 use Scalar::Util qw(looks_like_number);
 use Sub::Install;
 
 use DateTime::Format::ISO8601;
+use DateTime::Format::ISO8601::Format;
 
 use parent 'DateTime::Moonpig';
 
-our $VERSION = '0.4.0';
+our $VERSION = '0.5.0';
 
 use overload
+    '""'  => \&_dt_stringify,
     '=='  => \&_dt_int_eq,
     '!='  => \&_dt_int_ne,
     '<=>' => \&_dt_int_cmp,
@@ -63,22 +64,20 @@ sub new {
     return bless $dt, $class;
 }
 
-sub unix_time {
-    my ($dt) = @_;
-
-    return $dt->epoch;
-}
+sub unix_time { $_[0]->epoch }
 
 sub pg_timestamp_notz {
-    my ($dt) = @_;
-
-    return DateTime::Format::Pg->format_timestamp_without_time_zone($dt);
+    Carp::croak("DateTime::Format::Pg is not installed")
+        unless $HAVE_PG || ($HAVE_PG = require DateTime::Format::Pg);
+    
+    return DateTime::Format::Pg->format_timestamp_without_time_zone($_[0]);
 }
 
 sub pg_timestamp_tz {
-    my ($dt) = @_;
+    Carp::croak("DateTime::Format::Pg is not installed")
+        unless $HAVE_PG || ($HAVE_PG = require DateTime::Format::Pg);
     
-    return DateTime::Format::Pg->format_timestamptz($dt);
+    return DateTime::Format::Pg->format_timestamptz($_[0]);
 }
 
 {
@@ -122,6 +121,10 @@ sub _promote {
         if not ref($side_b) or not $side_b->isa('DateTime');
     
     return ($_[0], $side_b, $_[2]);
+}
+
+sub _dt_stringify {
+    return DateTime::Format::ISO8601::Format->new->format_datetime($_[0]);
 }
 
 sub _dt_int_eq {
@@ -198,15 +201,19 @@ DT - DateTime wrapper that tries hard to DWYM
     use DT;
 
     my $dt_now = DT->new(time); # Just works
-    my $dt_fh = DT->new('2018-02-06T15:45:00-0500'); # Just works
+    my $dt_past = DT->new('2018-02-06T15:45:00-0500'); # Just works
 
     my ($pg_time_str) = $pg_dbh->selectrow_array("SELECT now();")
     my $dt_pg = DT->new($pg_time_str); # Also just works
     
     say "Wowza!" if $dt_now < time + 1; # Unexpectedly, works too!
+    
+    say "$dt_now"; # 2018-07-27T03:49:49Z
 
-    my $timestamp_notz = $dt_pg->pg_timestamp_notz;
-    my $timestamp_tz = $dt->pg->pg_timestamp_tz;
+    use DateTime::Format::Pg;
+    
+    say $dt_now->pg_timestamp_notz; # 2018-07-27 03:49:49
+    say $dt_now->pg_timestamp_tz;   # 2018-07-27 03:49:49+0000
 
 =head1 DESCRIPTION
 
@@ -214,7 +221,7 @@ DT - DateTime wrapper that tries hard to DWYM
 
 DT is a very simple and thin wrapper over DateTime::Moonpig, which
 in turn is a wrapper over DateTime. DateTime::Moonpig brings immutability
-and saner operator overloading at the cost of cartoonish name but also
+and saner operator overloading at the cost of a cartoonish name but also
 lacks date/time parsing capabilities that are badly needed all the time.
 
 There is a myriad of helpful modules on CPAN but oh all that typing!
@@ -222,20 +229,29 @@ There is a myriad of helpful modules on CPAN but oh all that typing!
 Consider:
 
     use DateTime;
+    
     my $dt = DateTime->from_epoch(epoch => time);
 
     use DateTime::Format::Pg;
+    
     my $dt = DateTime::Format::Pg->parse_datetime($timestamp_from_postgres);
+    my $date_str = DateTime::Format::Pg->format_timestamp_without_time_tzone($dt);
 
     use DateTime::Format::ISO8601;
+    use DateTime::Format::ISO8601::Format;
+    
     my $dt = DateTime::Format::ISO8601->parse_datetime($iso_datetime);
+    my $date_str = DateTime::Format::ISO8601::Format->new->format_datetime($dt);
 
 Versus:
 
-    use DT;
+    use DT ':pg';
+    
     my $dt_unix = DT->new(time);
     my $dt_pg = DT->new($timestamp_from_postgres);
     my $dt_iso = DT->new($iso_datetime);
+    
+    my $date_str = "$dt_unix";
 
 DT constructor will try to Do What You Mean, and if it cannot it will
 fall back to default DateTime constructor. Simple.
@@ -320,7 +336,8 @@ To install this module type the following:
 =head1 DEPENDENCIES
 
 L<DateTime::Moonpig> is the parent class for C<DT>. L<DateTime::Format::ISO8601>
-is required for parsing ISO8601 date/time formats.
+is required for parsing ISO8601 date/time formats, and
+L<DateTime::Format::ISO8601::Format> is required for stringification.
 
 PostgreSQL related methods are optional and depend on L<DateTime::Format::Pg>
 being installed.

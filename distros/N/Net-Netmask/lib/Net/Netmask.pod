@@ -11,7 +11,7 @@
  $block = Net::Netmask->new2(network block)
  $block = Net::Netmask->new2(network block, netmask)
 
- print $block;                      # a.b.c.d/bits
+ print $block;                      # a.b.c.d/bits or 1:2:3::4/bits
  print $block->base()
  print $block->mask()
  print $block->hostmask()
@@ -57,7 +57,7 @@
 
 =head1 DESCRIPTION
 
-Net::Netmask parses and understands IPv4 CIDR blocks (see
+Net::Netmask parses and understands IPv4 and IPv6 CIDR blocks (see
 L<https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing>
 for more information on CIDR blocks).  It's built with an
 object-oriented interface, with functions being methods that
@@ -74,6 +74,12 @@ into a list of IP addresses.
 
 There is a function for sorting by text IP address.
 
+All functions understand both IPv4 and IPv6.  Matches, finds, etc,
+will always return false when an IPv4 address is matched against
+an IPv6 address.
+
+IPv6 support was added in 1.9104.
+
 =head1 CONSTRUCTING
 
 Net::Netmask objects are created with an IP address and optionally
@@ -83,7 +89,7 @@ a mask.  There are many forms that are recognized:
 
 =item '216.240.32.0/24'
 
-The preferred form.
+The preferred IPv6 form.
 
 =item '216.240.32.0:255.255.255.0'
 
@@ -124,6 +130,18 @@ Always a /8 block.
 A hostmask (as used by Cisco access-lists - that is, the hostmask
 is the bitwise inverse of a netmask).
 
+=item '2001:db8:1234:5678::/64'
+
+The preferred IPv6 form.
+
+=item '2001:db8:1234:5678::9876'
+
+A /128 block.
+
+=item 'default6' or 'any6'
+
+::/0 (the default route)
+
 =back
 
 There are two constructor methods: C<new> and C<new2>.  C<new2>
@@ -140,22 +158,24 @@ C<new2> the error can be found as Net::Netmask::errstr or $Net::Netmask::error.
 
 =item ->B<desc>()
 
-Returns a description of the network block.  Eg: "216.240.32.0/19".
-This is also available as overloaded stringification.
+Returns a description of the network block.  Eg: "216.240.32.0/19"
+or "2001:db8:1234::/48".  This is also available as overloaded
+stringification.
 
 =item ->B<base>()
 
 Returns base address of the network block as a string.  Eg: "216.240.32.0".
-B<Base> does not give an indication of the size of the network block.
+or "2001:db8:1234::/48".  B<Base> does not give an indication of the size
+of the network block.
 
 =item ->B<mask>()
 
-Returns the netmask as a string. Eg: "255.255.255.0".
+Returns the netmask as a string. Eg: "255.255.255.0" or "ffff:ffff:ffff:ffff::"
 
 =item ->B<hostmask>()
 
 Returns the host mask which is the opposite of the netmask.
-Eg: "0.0.0.255".
+Eg: "0.0.0.255" or "::ffff:ffff:ffff:ffff".
 
 =item ->B<bits>()
 
@@ -164,17 +184,20 @@ portion of the address for this block.  Eg: 24.
 
 =item ->B<size>()
 
-Returns the number of IP addresses in a block.  Eg: 256.
+Returns the number of IP addresses in a block.  Eg: 256.  For IPv6 addresses,
+this will be a Math::BigInt object.
 
 =item ->B<broadcast>()
 
 The blocks broadcast address. (The last IP address inside the
 block.) Eg: 192.168.1.0/24 => 192.168.1.255
+or 2001:db8::/64 => 2001:db8::ffff:ffff:ffff:ffff
 
 =item ->B<next>()
 
 The first IP address following the block. (The IP address following
 the broadcast address.) Eg: 192.168.1.0/24 => 192.168.2.0
+or 2001:db8:0:1::/64 => 2001:db8:0:2::/64
 
 =item ->B<first>() & ->B<last>()
 
@@ -184,8 +207,8 @@ Synonyms for ->B<base>() and ->B<broadcast>()
 
 Added in version 1.9102.
 
-Returns the address family/protocol represented by the block.  Today,
-this will always be "IPv4".
+Returns the address family/protocol represented by the block.
+Either 'IPv4' or 'IPv6'.
 
 =item ->B<match>($ip)
 
@@ -199,7 +222,8 @@ For example, if we have the network 192.168.1.0/24, then
   ...
   192.168.1.255 => 255
 
-$ip should be a dotted-quad (eg: "192.168.66.3")
+$ip should be a dotted-quad (eg: "192.168.66.3") or an IPv6 address
+in standard notation (eg: "2001:db8::1").
 
 It just happens that the return value is the position within the block.
 Since zero is a legal position, the true string "0 " is returned in
@@ -231,6 +255,9 @@ If the optional argument is given, step through the block in
 increments of a given network size.  To step by 4, use a bitstep
 of 30 (as in a /30 network).
 
+Note that for IPv6, this will return failure if more than 1,000,000,000
+addresses would be returned.
+
 =item ->B<nth>($index, [$bitstep])
 
 Returns the nth element of the array that B<enumerate> would return
@@ -240,9 +267,13 @@ get the last usable address, use B<nth>(-2).
 
 =item ->B<inaddr>()
 
-Returns an inline list of tuples.  There is a tuple for each
-DNS zone name in the block.  If the block is smaller than a /24,
-then the zone of the enclosing /24 is returned.
+Returns an inline list of tuples.
+
+For IPv4:
+
+There is a tuple for each DNS zone name (at the /24 level) in the block.
+If the block is smaller than a /24, then the zone of the enclosing /24
+is returned.
 
 Each tuple contains: the DNS zone name, the last component of
 the first IP address in the block in that zone, the last component
@@ -252,6 +283,16 @@ Examples: the list returned for the block '216.240.32.0/23' would
 be: '32.240.216.in-addr.arpa', 0, 255, '33.240.216.in-addr.arpa', 0, 255.
 The list returned for the block '216.240.32.64/27' would be:
 '32.240.216.in-addr.arpa', 64, 95.
+
+For IPv6:
+
+A list is returned with each DNS zone name at the shortest-prefix length
+possible.  This is not returned as a tuple, but just a list of strings.
+
+Examples: the list returned for the block '2002::/16' would be a one
+element list, containing just 2.0.0.2.ip6.arpa'.  The list
+for '2002::/17' would return a two element list
+containing '0.2.0.0.2.ip6.arpa' and '1.2.0.0.2.ip6.arpa'.
 
 =item ->B<nextblock>([$count])
 
@@ -381,6 +422,9 @@ It turns out that there is one method for sorting dotted-quads
 ("a.b.c.d") that is faster than all the rest.  This is that
 way.  Use it as C<sort_by_ip_address(@list_of_ips)>.  That was
 the theory anyway.  Someone sent a faster version ...
+
+This method also will sort IPv6 addresses, but is not performance
+optimized.  It is correct, however.
 
 =item B<sort_network_blocks>
 

@@ -21,6 +21,7 @@ MANIFEST.SKIP
 README
 t/000-load.t
 t/001-contract-signature.t
+t/002-try_refute.t
 t/101-Report-refute.t
 t/102-Contract-apply.t
 t/103-Report-signature.t
@@ -47,6 +48,7 @@ t/211-Basic-use_ok.t
 t/212-get_tap-exact.t
 t/213-Report-get_result_details.t
 t/214-plan-tests.t
+t/215-optimize-out.t
 t/301-dies_like.t
 t/302-warns_like.t
 t/303-refute_these.t
@@ -65,8 +67,8 @@ t/404-configure.t
 t/502-refute_these-config-0.13.t
 t/503-refute_these-v.0.15.t
 t/504-Report-set_result-v.0.15.t
-t/601-Driver-More-happy-case.t
 t/603-Driver-More-popen.t
+t/604-Driver-More.t
 t/README
 TODO
 xt/pod-coverage.t

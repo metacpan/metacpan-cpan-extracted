@@ -1,5 +1,5 @@
 /**----------------------------------------------------------------***
-*  Copyright 2007 - Paul Seamons                                     *
+*  Copyright - Paul Seamons                                          *
 *  Distributed under the Perl Artistic License without warranty      *
 *  Based upon YAML.pm v0.35 from Perl                                *
 ***----------------------------------------------------------------**/

@@ -166,6 +166,20 @@ CONFIGURATION
     pressing the [Reset] button will reset the selected file to be this one.
     Default: none (no default file name is initially shown).
 
+  -FNameList
+    Optional reference to a list of specific file names to be displayed in
+    the file list. User can be forced to select a file from this specific
+    list by further constraints such as -DisableFPat => 1, -Create => -1,
+    -SelDir => -1, and -DisableShowAll => 1. The list can contain any
+    combination of file names (ie. *"file.ext"*, absolute paths, ie.
+    *"/home/user/file.ext"*, or relative paths, ie. *"user/file.ext"* or
+    I"<c:file.ext>. The files will be compared against the current path and,
+    if matching (and existing, if -Create < 1), will be shown in the
+    drop-down list. Default: none (show all files otherwise matching any
+    other filters found in the current path. NOTE: File-names are
+    case-sensitive and paths should be forward slashes ("/"), even on
+    M$-Windows.
+
   -FPat
     Sets the default file selection pattern. Only files matching this
     pattern will be displayed in the File List Box. It can also be multiple

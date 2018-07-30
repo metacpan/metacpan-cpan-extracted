@@ -1,5 +1,5 @@
 package Log::Dispatch::FileRotate;
-$Log::Dispatch::FileRotate::VERSION = '1.35';
+$Log::Dispatch::FileRotate::VERSION = '1.36';
 # ABSTRACT: Log to Files that Archive/Rotate Themselves
 
 require 5.005;
@@ -378,7 +378,14 @@ sub logit {
     sub mutex_for_path {
         my ($self, $path) = @_;
 
-        $MUTEXES{$path} ||= Log::Dispatch::FileRotate::Mutex->new($path);
+        my %args;
+
+        # use same permissions for the Mutex file
+        if (exists $self->{params}{permissions}) {
+            $args{permissions} = $self->{params}{permissions};
+        }
+
+        $MUTEXES{$path} ||= Log::Dispatch::FileRotate::Mutex->new($path, %args);
     }
 }
 
@@ -666,13 +673,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Log::Dispatch::FileRotate - Log to Files that Archive/Rotate Themselves
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -994,7 +1003,7 @@ And thanks to Stephen Gordon for his more portable code on lockfile naming.
 
 =head1 SOURCE
 
-The development version is on github at L<http://https://github.com/mschout/perl-log-dispatch-filerotate>
+The development version is on github at L<https://https://github.com/mschout/perl-log-dispatch-filerotate>
 and may be cloned from L<git://https://github.com/mschout/perl-log-dispatch-filerotate.git>
 
 =head1 BUGS

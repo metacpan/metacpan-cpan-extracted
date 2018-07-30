@@ -1,36 +1,32 @@
 ---
-abstract: 'A fast heap structure for Perl'
+abstract: 'A fast and flexible heap structure'
 author:
   - 'Jeff Ober <sysread@fastmail.fm>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
-  Test2: '1.302125'
-  Test2::Suite: '0.000100'
+  ExtUtils::MakeMaker: 6.63_03
   Test2::V0: '0'
   Test::LeakTrace: '0.16'
-  Test::More: '0'
-  Test::Pod: '1.41'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: SkewHeap
-provides:
-  SkewHeap:
-    file: lib/SkewHeap.pm
-    version: '0.03'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Inline: '0.80'
-  Inline::C: '0.78'
-  perl: '5.012'
+  Carp: '0'
+  Exporter: '0'
+  parent: '0'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/sysread/SkewHeap/issues
   homepage: https://github.com/sysread/SkewHeap
   repository: https://github.com/sysread/SkewHeap.git
-version: '0.03'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

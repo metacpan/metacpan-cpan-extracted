@@ -4,7 +4,7 @@
       "Felipe Gasper"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,9 +34,10 @@
          "requires" : {
             "Call::Context" : "0.02",
             "Crypt::Format" : "0.06",
-            "Crypt::Perl" : "0.17",
+            "Crypt::Perl" : "0.18",
             "HTTP::Tiny" : "0.058",
             "HTTP::Tiny::UA::Response" : "0.004",
+            "IO::Socket::SSL" : "0",
             "JSON" : "2.9",
             "MIME::Base64" : "3.11",
             "X::Tiny" : "0.12",
@@ -49,8 +50,10 @@
       "test" : {
          "requires" : {
             "File::Slurp" : "0",
+            "HTTP::Status" : "0",
             "Test::Deep" : "0",
             "Test::Exception" : "0.4",
+            "Test::FailWarnings" : "0",
             "Test::More" : "1",
             "Test::NoWarnings" : "0"
          }
@@ -64,6 +67,6 @@
          "web" : "https://github.com/FGasper/p5-Net-ACME2"
       }
    },
-   "version" : "0.12",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

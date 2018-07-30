@@ -16,7 +16,7 @@ use File::Spec::Functions qw/catfile catdir/;
 use Text::Amuse::Preprocessor;
 use Text::Amuse::Preprocessor::Footnotes;
 
-use Test::More tests => 48;
+use Test::More tests => 52;
 use Data::Dumper;
 
 my @tests = ([ good => undef ],
@@ -70,6 +70,10 @@ foreach my $test (@tests) {
     if ($test->[1]) {
         ok (!$ok, "No success");
         ok (! -f $out, "$out not written");
+        my $err = $pp->error;
+        my $diff = delete $err->{differences};
+        ok $diff;
+        diag $diff;
         is_deeply ($pp->error, $test->[1], 'Error is correct');
     }
     else {

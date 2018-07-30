@@ -1,6 +1,11 @@
 Revision history for Elasticsearch-Model
 
 
+0.1.5    2018-07-26
+    - Check for Elasticsearch version >= 6
+    - Use perl v5.10 or above for defined-or operator
+    - Ignore 404 for PUTs to index paths in Elasticsearch::Model::Index::deploy,
+      because this can be a creation, but don't ignore 404 when putting mappings
 
 0.1.4    2018-07-16
     - Add has_non_attribute_mapping facility, to do such things as set

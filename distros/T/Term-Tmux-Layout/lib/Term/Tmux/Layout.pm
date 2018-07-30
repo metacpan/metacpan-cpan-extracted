@@ -1,12 +1,12 @@
 #
-# Copyright (C) 2015,2016 J. Maslak
+# Copyright (C) 2015,2016,2017,2018 Joelle Maslak
 # All Rights Reserved - See License
 #
 
+package Term::Tmux::Layout;
+$Term::Tmux::Layout::VERSION = '1.182062';
 use v5.8;
 
-package Term::Tmux::Layout;
-$Term::Tmux::Layout::VERSION = '1.005';
 # ABSTRACT: Create tmux layout strings programmatically
 
 use strict;
@@ -20,22 +20,22 @@ use namespace::autoclean;
 
 
 sub set_layout {
-    if ($#_ < 1) { confess 'invalid call' }
-    my ($self, @def) = @_;
+    if ( $#_ < 1 ) { confess 'invalid call' }
+    my ( $self, @def ) = @_;
 
-    my ($x, $y) = $self->get_window_size();
-    if (!defined($y)) { die "Cannot get the current tmux window size"; }
+    my ( $x, $y ) = $self->get_window_size();
+    if ( !defined($y) ) { die "Cannot get the current tmux window size"; }
 
     $self->hsize($x);
     $self->vsize($y);
 
     my $layout = $self->layout(@def);
-    system('tmux', 'select-layout', $layout);
+    system( 'tmux', 'select-layout', $layout );
     if ($@) {
         die('Could not set layout');
     }
 
-    return $layout;   
+    return $layout;
 }
 
 
@@ -43,7 +43,7 @@ sub layout {
     if ( $#_ < 1 ) { confess 'invalid call' }
     my ( $self, @desc ) = @_;
 
-    my @rows = split /[\n|]/, join('|', @desc);
+    my @rows = split /[\n|]/, join( '|', @desc );
     my $width = length( $rows[0] );
     foreach (@rows) {
         if ( $width != length($_) ) {
@@ -54,29 +54,29 @@ sub layout {
     my $desc = join '|', @desc;
 
     # Where are my divisions?
-    my $hdiv = $self->hsize / ($width * 1.0);
-    my $vdiv = $self->vsize / (scalar(@rows) * 1.0);
+    my $hdiv = $self->hsize / ( $width * 1.0 );
+    my $vdiv = $self->vsize / ( scalar(@rows) * 1.0 );
 
     my @v_grid;
-    for (my $i=0; $i<scalar(@rows); $i++) {
-        $v_grid[$i] = int($vdiv * $i + .5);
+    for ( my $i = 0; $i < scalar(@rows); $i++ ) {
+        $v_grid[$i] = int( $vdiv * $i + .5 );
     }
     my @h_grid;
-    for (my $i=0; $i<length($rows[0]); $i++) {
-        $h_grid[$i] = int($hdiv * $i + .5);
+    for ( my $i = 0; $i < length( $rows[0] ); $i++ ) {
+        $h_grid[$i] = int( $hdiv * $i + .5 );
     }
     push @h_grid, $self->hsize + 1;
     push @v_grid, $self->vsize + 1;
 
     my %gridstruct = (
-        hgrid => \@h_grid,  # H Start positions for each pane
-        vgrid => \@v_grid,  # V Start positions for each pane
-        hparent => 0,       # absolute start x position of enclosing window
-        vparent => 0,       # absolute start y position of enclosing window
-        hoffset => 0,       # We are drawing division at child relative grid location x
-        voffset => 0,       # We are drawing division at child relative location x
-        hsize   => $#h_grid,  # Child grid size X
-        vsize   => $#v_grid,  # Child grid size Y
+        hgrid   => \@h_grid,    # H Start positions for each pane
+        vgrid   => \@v_grid,    # V Start positions for each pane
+        hparent => 0,           # absolute start x position of enclosing window
+        vparent => 0,           # absolute start y position of enclosing window
+        hoffset => 0,           # We are drawing division at child relative grid location x
+        voffset => 0,           # We are drawing division at child relative location x
+        hsize   => $#h_grid,    # Child grid size X
+        vsize   => $#v_grid,    # Child grid size Y
         layout  => $desc
     );
     my $result = $self->_divide( \%gridstruct );
@@ -87,7 +87,7 @@ sub _divide {
     if ( $#_ != 1 ) { confess 'invalid call' }
     my ( $self, $gridstruct ) = @_;
 
-    my (@map) = $self->_make_map($gridstruct->{layout});
+    my (@map) = $self->_make_map( $gridstruct->{layout} );
 
     # Check 1: Are we done (I.E. only one pane left)?
     my %panes;
@@ -134,8 +134,8 @@ sub _divide {
     # Division width/height in col/rows
     my $h_size = $h_char_rel_n - $h_char_rel_b;
     my $v_size = $v_char_rel_n - $v_char_rel_b;
-    if ($h_char_abs_b == 0) { $h_size--; }
-    if ($v_char_abs_b == 0) { $v_size--; }
+    if ( $h_char_abs_b == 0 ) { $h_size--; }
+    if ( $v_char_abs_b == 0 ) { $v_size--; }
 
     my $result = "${h_size}x${v_size},${h_char_abs_b},${v_char_abs_b}";
 
@@ -162,31 +162,29 @@ sub _divide {
         my (@vfield) = $self->_vsplit_field( $gridstruct->{layout}, $i );
 
         my %left = (
-            hgrid => $gridstruct->{hgrid},
-            vgrid => $gridstruct->{vgrid},
+            hgrid   => $gridstruct->{hgrid},
+            vgrid   => $gridstruct->{vgrid},
             hparent => $h_grid_abs_b,
             vparent => $v_grid_abs_b,
             hoffset => 0,
             voffset => 0,
             hsize   => $i,
             vsize   => $gridstruct->{vsize},
-            layout => $vfield[0]
+            layout  => $vfield[0]
         );
         my %right = (
-            hgrid => $gridstruct->{hgrid},
-            vgrid => $gridstruct->{vgrid},
+            hgrid   => $gridstruct->{hgrid},
+            vgrid   => $gridstruct->{vgrid},
             hparent => $h_grid_abs_b,
             vparent => $v_grid_abs_b,
             hoffset => $i,
             voffset => 0,
             hsize   => $gridstruct->{hsize} - $i,
             vsize   => $gridstruct->{vsize},
-            layout => $vfield[1]
+            layout  => $vfield[1]
         );
 
-        $result .= '{'
-          . $self->_divide( \%left ) . ','
-          . $self->_divide( \%right ) . '}';
+        $result .= '{' . $self->_divide( \%left ) . ',' . $self->_divide( \%right ) . '}';
 
         return $result;
     }
@@ -205,35 +203,33 @@ sub _divide {
         my (@hfield) = $self->_hsplit_field( $gridstruct->{layout}, $j );
 
         my %left = (
-            hgrid => $gridstruct->{hgrid},
-            vgrid => $gridstruct->{vgrid},
+            hgrid   => $gridstruct->{hgrid},
+            vgrid   => $gridstruct->{vgrid},
             hparent => $h_grid_abs_b,
             vparent => $v_grid_abs_b,
             hoffset => 0,
             voffset => 0,
             hsize   => $gridstruct->{hsize},
             vsize   => $j,
-            layout => $hfield[0]
+            layout  => $hfield[0]
         );
         my %right = (
-            hgrid => $gridstruct->{hgrid},
-            vgrid => $gridstruct->{vgrid},
+            hgrid   => $gridstruct->{hgrid},
+            vgrid   => $gridstruct->{vgrid},
             hparent => $h_grid_abs_b,
             vparent => $v_grid_abs_b,
             hoffset => 0,
             voffset => $j,
             hsize   => $gridstruct->{hsize},
             vsize   => $gridstruct->{vsize} - $j,
-            layout => $hfield[1]
+            layout  => $hfield[1]
         );
         # We can split here!
 
         # TODO: We should check that we aren't allowing things
         # that are 0xY or Xx0
 
-        $result .= '['
-          . $self->_divide( \%left ) . ','
-          . $self->_divide( \%right ) . ']';
+        $result .= '[' . $self->_divide( \%left ) . ',' . $self->_divide( \%right ) . ']';
 
         return $result;
     }
@@ -350,17 +346,17 @@ sub checksum {
 
 
 sub get_window_size {
-    if (scalar(@_) != 1) { confess 'invalid call' }
-   
+    if ( scalar(@_) != 1 ) { confess 'invalid call' }
+
     my (@windows) = `tmux list-windows`;
     @windows = grep { /\(active\)$/ } map { chomp; $_ } @windows;
 
-    if (scalar(@windows)) {
-        my ($x, $y) = $windows[0] =~ / \[(\d+)x(\d+)\] /;
-        return ($x, $y);
+    if ( scalar(@windows) ) {
+        my ( $x, $y ) = $windows[0] =~ / \[([0-9]+)x([0-9]+)\] /;
+        return ( $x, $y );
     }
 
-    return undef;
+    return;
 }
 
 
@@ -376,7 +372,6 @@ has 'vsize' => (
     isa     => 'Int',
     default => 24
 );
-
 
 
 __PACKAGE__->meta->make_immutable;
@@ -395,7 +390,7 @@ Term::Tmux::Layout - Create tmux layout strings programmatically
 
 =head1 VERSION
 
-version 1.005
+version 1.182062
 
 =head1 SYNOPSIS
 
@@ -533,11 +528,11 @@ L<https://rt.cpan.org/Public/Dist/Display.html?Name=Term-Layout>
 
 =head1 AUTHOR
 
-J. Maslak <jmaslak@antelope.net>
+Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2016 by J. Maslak.
+This software is copyright (c) 2015-2018 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

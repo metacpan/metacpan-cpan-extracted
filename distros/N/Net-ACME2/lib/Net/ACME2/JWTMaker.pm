@@ -12,6 +12,8 @@ use warnings;
 use JSON              ();
 use MIME::Base64      ();
 
+use Net::ACME2::X ();
+
 BEGIN {
     *_encode_b64u = *MIME::Base64::encode_base64url;
 }
@@ -19,13 +21,7 @@ BEGIN {
 sub new {
     my ($class, %opts) = @_;
 
-    die 'need “key”' if !$opts{'key'};
-
-    $opts{'format'} ||= q<>;
-
-    if ($opts{'format'} && $opts{'format'} ne 'compact') {
-        die "Unknown “format”: “$opts{'format'}”";
-    }
+    die Net::ACME2::X->create('Generic', 'need “key”') if !$opts{'key'};
 
     return bless \%opts, $class;
 }
@@ -49,9 +45,8 @@ sub create_key_id_jws {
 #----------------------------------------------------------------------
 
 #expects:
-#   key - object
-#   payload
-#   extra_headers (optional, hashref)
+#   payload - unblessed string, arrayref, or hashref
+#   extra_headers - hashref
 sub _create_jwt {
     my ( $self, %args ) = @_;
 
@@ -62,7 +57,7 @@ sub _create_jwt {
 
     my $payload = $args{payload};
 
-    my $header  = $args{extra_headers} ? { %{$args{extra_headers}} } : {};
+    my $header  = { %{$args{extra_headers}} };
 
     # serialize payload
     $payload = $self->_payload_enc($payload);
@@ -79,17 +74,13 @@ sub _create_jwt {
 
     my $b64u_signature = _encode_b64u( $signer_cr->("$b64u_header.$b64u_payload", $key) );
 
-    if ($self->{'format'} && $self->{'format'} eq 'compact') {
-        return join('.', $b64u_header, $b64u_payload, $b64u_signature);
-    }
-
-    return <<"END";
-{
-    "protected": "$b64u_header",
-    "payload": "$b64u_payload",
-    "signature": "$b64u_signature"
-}
-END
+    return $self->_encode_json(
+        {
+            protected => $b64u_header,
+            payload => $b64u_payload,
+            signature => $b64u_signature,
+        }
+    );
 }
 
 sub _encode_json {
@@ -102,7 +93,7 @@ sub _encode_json {
     return $self->{'_json'}->encode($payload);
 }
 
-#Taken from Crypt::JWT
+#Derived from Crypt::JWT
 sub _payload_enc {
     my ($self, $payload) = @_;
 
@@ -110,7 +101,9 @@ sub _payload_enc {
         $payload = $self->_encode_json($payload);
     }
     else {
-        utf8::downgrade($payload, 1) or die "JWT: payload cannot contain wide character";
+        utf8::downgrade($payload, 1) or do {
+            die Net::ACME2::X->create('Generic', "JWT: payload ($payload) cannot contain wide character");
+        };
     }
 
     return $payload;

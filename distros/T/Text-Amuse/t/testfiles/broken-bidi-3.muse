@@ -1,0 +1,15 @@
+#title Broken bidi 3
+#lang fa
+
+
+رئیس شهربانی دوره
+
+>>>
+
+** Test me
+
+>>>
+{{{
+hello there
+}}}
+

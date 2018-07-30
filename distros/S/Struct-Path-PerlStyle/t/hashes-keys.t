@@ -2,17 +2,13 @@
 
 use strict;
 use warnings;
+use utf8;
 
-use Test::More tests => 26;
+use Test::More tests => 32;
 use Struct::Path::PerlStyle qw(str2path path2str);
 
 use lib 't';
 use _common qw(roundtrip t_dump);
-
-# unquoted utf8 for hash key doesn't supported yet =(
-# https://github.com/adamkennedy/PPI/issues/168#issuecomment-180506979
-eval { str2path('{кириллица}'), };
-like($@, qr/Failed to parse passed path/, "can't parse unquoted utf8 hash keys");
 
 eval { path2str([{garbage => ['a']}]) };
 like($@, qr/^Unsupported hash definition \(garbage\), step #0 /);
@@ -28,6 +24,27 @@ like($@, qr/^Unsupported hash key type 'undef', step #0 /);
 
 eval { path2str([{K => ['test',[]]}]) };
 like($@, qr/^Unsupported hash key type 'ARRAY', step #0 /);
+
+eval { str2path('{,a}') };
+like($@, qr/^Unsupported key ',a', step #0 /, 'Leading comma');
+
+eval { str2path('{a,}') };
+like($@, qr/^Trailing delimiter at step #0 /, 'Trailing comma');
+
+eval { str2path('{"a""b"}') };
+like($@, qr/^Delimiter expected before '"b"', step #0 /, 'Delimiter missed, double quoted key');
+
+eval { str2path('{"a" "b"}') };
+like($@, qr/^Delimiter expected before '"b"', step #0 /, 'Space for delimiter');
+
+eval { str2path("{'a''b'}") };
+like($@, qr/^Delimiter expected before ''b'', step #0 /, 'Delimiter missed, single quoted key');
+
+TODO: {
+    local $TODO = "crap";
+eval { str2path('{a+b}') };
+like($@, qr/^Unsupported thing .* for hash key, step /, "garbage in hash keys definition");
+}
 
 roundtrip (
     [{K => ['a']},{K => ['b']},{K => ['c']}],
@@ -47,37 +64,34 @@ roundtrip (
     "Empty string and space as hash keys"
 );
 
-# no roundtrip here - will be comma-separated
-# TODO: get rid of it (deprecated since 0.72)
-is_deeply(
-    str2path('{a b}{e d}'),
-    [{K => ['a','b']},{K => ['e','d']}],
-    "Spaces as delimiters"
-);
-
-# no roundtrip here - spaces will be discarded
 is_deeply(
     str2path('{ c,a, b}{e  ,d }'),
     [{K => ['c','a','b']},{K => ['e','d']}],
-    "Hash path with slices and whitespace garbage"
+    "Unquoted leading and trailing spaces should be discarded"
 );
 
 roundtrip (
-    [{K => ['  a b']}],
-    '{"  a b"}',
+    [{K => [' c','a',' b']},{K => ['e  ','d ']}],
+    '{" c",a," b"}{"e  ","d "}',
+    "Qouted leading and trailing spaces should be preserved"
+);
+
+roundtrip (
+    [{K => ['  a b,c']}],
+    '{"  a b,c"}',
     "Double quotes"
 );
 
 # no roundtrip here - double quotes used on serialization
 is_deeply(
-    str2path("{'  c d'}"),
-    [{K => ['  c d']}],
+    str2path("{'  c d,e'}"),
+    [{K => ['  c d,e']}],
     "Single quotes"
 );
 
-# no roundtrip here - no quotes for ASCII simple words
+# no roundtrip here - no quotes for barewords
 is_deeply(
-    str2path('{\'first\',"second"}{"3rd" \'4th\'}'),
+    str2path('{\'first\',"second"}{"3rd",\'4th\'}'),
     [{K => ['first','second']},{K => ['3rd','4th']}],
     "Quotes on simple words"
 );
@@ -89,14 +103,20 @@ roundtrip (
 );
 
 roundtrip (
-    [{K => ['co:lo:ns','semi;colons','dashe-s','sl/as/hes']}],
-    '{"co:lo:ns","semi;colons","dashe-s","sl/as/hes"}',
-    "Quotes for colons"
+    [{K => ['+','-','.','_']}],
+    '{+,-,.,_}',
+    "Bareword hash keys extra"
 );
 
 roundtrip (
-    [{K => ['/looks like regexp, but string/','/another/']}],
-    '{"/looks like regexp, but string/","/another/"}',
+    [{K => ['co:lo:ns','semi;colons','sl/as/hes']}],
+    '{"co:lo:ns","semi;colons","sl/as/hes"}',
+    "Quotes for punct characters"
+);
+
+roundtrip (
+    [{K => ['/looks like regexp, but string/','m/another/']}],
+    '{"/looks like regexp, but string/","m/another/"}',
     "Quotes for regexp looking strings"
 );
 
@@ -116,19 +136,19 @@ roundtrip (
 is_deeply(
     str2path('{\'\t\',\'\n\',\'\r\',\'\f\',\'\b\',\'\a\',\'\e\'}'),
     [{K => ['\t','\n','\r','\f','\b','\a','\e']}],
-    "Do not unescape when single quoted"
+    "Do not interpolate single quoted strings"
 );
 
 roundtrip (
     [{K => [qw# | ( ) [ { ^ $ * + ? . #]}],
-    '{"|","(",")","[","{","^","$","*","+","?","."}',
+    '{"|","(",")","[","{","^","$","*",+,"?",.}',
     "Pattern metacharacters"
 );
 
 roundtrip (
-    [{K => ['кириллица']}],
-    '{"кириллица"}',
-    "Non ASCII characters must be quoted even it's a bareword"
+    [{K => ['кириллица', 'два слова']}],
+    '{кириллица,"два слова"}',
+    "Non ASCII characters"
 );
 
 roundtrip (
@@ -149,13 +169,13 @@ SKIP: {
 }
 
 is_deeply(
-    str2path('{01.0}'), # bug?? (PPI treats this as two things: octal and double)
-    [{K => ['01','.0']}],
+    str2path('{01.0}'),
+    [{K => ['01.0']}],
 );
 
 is_deeply(
-    str2path('{01}{"01"}{127.0.0.1}{  1}{undef}'),
-    [{K => ['01']},{K => ['01']},{K => ['127.0.0.1']},{K => ['1']},{K => ['undef']}],
+    str2path('{01}{"01"}{127.0.0.1}{"2001:db8:1::/64"}{  1}{0_1}{undef}'),
+    [{K => ['01']},{K => ['01']},{K => ['127.0.0.1']},{K => ['2001:db8:1::/64']},{K => ['1']},{K => ['0_1']},{K => ['undef']}],
     "Undecided %)"
 );
 

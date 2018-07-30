@@ -110,10 +110,10 @@ sub test_file {
             }
         }
         if ($has_toc) {
-            like $body, qr{<div class="table-of-contents">}, "Found the ToC";
+            like $body, qr{<div class="table-of-contents"}, "Found the ToC";
         }
         else {
-            unlike $body, qr{<div class="table-of-contents">}, "ToC not found";
+            unlike $body, qr{<div class="table-of-contents"}, "ToC not found";
         }
     }
     unless ($ENV{NO_CLEANUP}) {

@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.005'
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
@@ -38,6 +38,7 @@ do { my $x = {
                                       'Moo' => '0',
                                       'MooX::StrictConstructor' => '0',
                                       'Parse::MIME' => '0',
+                                      'Ref::Util' => '0',
                                       'String::Trim' => '0',
                                       'Sub::Exporter' => '0',
                                       'Term::Size::Any' => '0',
@@ -62,6 +63,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'HTML::FormatText::WithLinks' => '0',
+                                   'HTTP::CookieJar::LWP' => '0',
                                    'HTTP::Request' => '0',
                                    'Log::Dispatch::Array' => '0',
                                    'Path::Tiny' => '0',

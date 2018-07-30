@@ -15,8 +15,8 @@ my ( $stdout, $stderr, @result ) = capture { $cb->( undef, 'Local::404' ) };
 my $ok = like( $stderr, qr{FAIL}, 'fake module not installed' );
 
 unless ($ok) {
-    diag $stdout;
-    diag $stderr;
+    diag 'STDOUT: ' . $stdout;
+    diag 'STDERR: ' . $stderr;
 }
 
 done_testing();

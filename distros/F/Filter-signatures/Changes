@@ -1,4 +1,10 @@
-0.13 20180511
+0.14 2018-07-26
+    + Add code and documentation on how to load this module from the command
+      line. This is mostly intended to give you a way to do a quick fix for
+      using Perl code that requires signatures on a version of Perl that doesn't
+      support them out of the box.
+
+0.13 2018-05-11
     + Support (well, ignore) comments in signatures
       This comes at the cost of erasing those comments from the source code.
       If you stack source filters and a source filters expects to extract value
@@ -6,46 +12,46 @@
     ! More robustness when parsing the formal signature argument list. Too many
       strings in your source code could make the module behave erratically
 
-0.12 20180510
+0.12 2018-05-10
     ! Make subroutines with empty body return C<undef>
       Pointed out in discussion at
       https://www.nntp.perl.org/group/perl.perl5.porters/2014/02/msg212580.html
     . Documentation fix by MANWAR, many thanks!
 
-0.11 20180228
+0.11 2018-02-28
     + Support parentheses in default assignments on Perl 5.10 onwards
 	    sub foo( $now = time() ) {
 
-0.10 20170628
+0.10 2017-06-28
     + Support multiline signatures
 	. We also attempt to keep the line numbers correct
 
-0.09 20170116
+0.09 2017-01-16
     + Support single-line functions
       In fact, we simply don't require the subroutine declaration to be on a
       separate line from other code.
       This adresses RT #119843
 
-0.08 20161219
+0.08 2016-12-19
     ! Make signature-less subroutines work again instead of warning
 
-0.07 20161218
+0.07 2016-12-18
     + Actually allow for empty parameter lists
     + Allow for unnamed/ignored parameters sub ($foo,$,$bar) { ... }
     . Adresses Github issue #1
 
-0.06 20161107
+0.06 2016-11-07
     + Don't crash on empty function parameter lists.
 	+ Make module internals more testable
 	. Add a test that verifies function default parameters actually parse
 	  as we expect. Thanks to Rolf Langsdorf for the discussion.
 
-0.05 20160929
+0.05 2016-09-29
     . Bump Filter::Simple prerequisite to 0.91
       Earlier versions gave problems with some of my modules
       If it works for you, no need to upgrade
 
-0.04 20160906
+0.04 2016-09-06
     + Add support for defaults, and our own, very, _very_
       simplicistic "expression parser" (which blindly splits on comma.
       This means that the following is now supported:
@@ -60,17 +66,17 @@
           print $baz # "default"
         };
 
-0.03 20160519
+0.03 2016-05-19
     + Add our own fake 'experimental::signatures' warning category
       if we install our filter so that "no warnings 'experimental::signatures'"
       doesn't raise an error on Perl versions where we install our filter
 
-0.02 20160423
+0.02 2016-04-23
     + Check does now not use the version of Perl but checks
       `use feature 'signatures'`
     + You can force the use of the module using an environment variable
       (not that you should)
 
-0.01 20160414
+0.01 2016-04-14
     . Released on an unsuspecting world
     . Spun out of App::StarTraders (unreleased)

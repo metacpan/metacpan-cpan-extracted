@@ -20,6 +20,7 @@ BEGIN {
         ["\xFC\xFC",'keis83',  'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\xA2\xA3"        },"\xA2\xA3"        ],
         ["\xFC\xFC",'keis90',  'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\xA2\xA3"        },"\xA2\xA3"        ],
         ["\xFC\xFC",'jef',     'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\xA2\xA3"        },"\xA2\xA3"        ],
+        ["\xFC\xFC",'jef9p',   'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\xA2\xA3"        },"\xA2\xA3"        ],
         ["\xFC\xFC",'jipsj',   'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\x22\x23"        },"\x22\x23"        ],
         ["\xFC\xFC",'jipse',   'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\x7F\x4B"        },"\x7F\x4B"        ],
         ["\xFC\xFC",'utf8',    'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\xE2\x96\xA0"    },"\xE2\x96\xA0"    ],

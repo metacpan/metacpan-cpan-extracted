@@ -111,7 +111,7 @@ sub tokenizers : Tests(no_plan) {
 sub deploy :Tests(no_plan) {
     my $self = shift;
     SKIP: {
-        skip "No live elasticsearch server" unless $self->live_testing_ok;
+        skip "No ES server or wrong version" unless $self->live_testing_ok;
         my $model = TestModel->new;
         lives_ok { $model->deploy(delete => 1) } "I can deploy my model";
     };

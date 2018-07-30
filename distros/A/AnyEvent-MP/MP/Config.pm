@@ -20,7 +20,7 @@ use Carp ();
 use AnyEvent ();
 use JSON::XS ();
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 our $CONFIG_FILE = exists $ENV{PERL_ANYEVENT_MP_RC} ? $ENV{PERL_ANYEVENT_MP_RC}
                    : exists $ENV{HOME}              ? "$ENV{HOME}/.perl-anyevent-mp"

@@ -26,7 +26,7 @@ our @EXPORT_OK = qw(%ERRORS %STATUS_TEXT);
 # CPAN stupidly won't index this module without a literal $VERSION here,
 #   so we're forced to duplicate it explicitly
 # Make sure you update $Monitoring::Plugin::Functions::VERSION too
-our $VERSION = "0.39";
+our $VERSION = "0.40";
 
 sub new {
 	my $class = shift;
@@ -287,8 +287,7 @@ Icinga or Shinken (and compatible) plugins.
    );
    $np->plugin_exit( $code, "Threshold check failed" ) if $code != OK;
 
-
-   # Message methods (EXPERIMENTAL AND SUBJECT TO CHANGE) -
+   # Message methods
    #   add_message( CODE, $message ); check_messages()
    for (@collection) {
      if (m/Error/) {
@@ -412,6 +411,32 @@ following options:
 
 =back
 
+=head2 GETTER/SETTER
+
+The following internal variables can be retrieved or set by calling a
+method with the respective name. Expect for C<shortname>, don't change
+values unless you know what you're doing.
+
+Examples:
+
+  use Data::Dumper;
+  print Dumper($plugin->perfdata);
+  $plugin->shortname('DifferentName');
+
+=over
+
+=item shortname
+
+=item perfdata
+
+=item messages
+
+=item opts
+
+=item threshold
+
+=back
+
 =head2 OPTION HANDLING METHODS
 
 C<Monitoring::Plugin> provides these methods for accessing the functionality in C<Monitoring::Plugin::Getopt>.
@@ -477,15 +502,15 @@ Again, see L<Monitoring::Plugin::Getopt>.
 Exit with return code CODE, and a standard nagios message of the
 form "SHORTNAME CODE - $message".
 
+=item nagios_exit( <CODE>, $message )
+
+Alias for plugin_exit(). Deprecated.
+
 =item plugin_die( $message, [<CODE>] )
 
 Same as plugin_exit(), except that CODE is optional, defaulting
 to UNKNOWN.  NOTE: exceptions are not raised by default to calling code.
 Set C<$_use_die> flag if this functionality is required (see test code).
-
-=item nagios_exit( <CODE>, $message )
-
-Alias for plugin_die(). Deprecated.
 
 =item nagios_die( $message, [<CODE>] )
 
@@ -553,8 +578,6 @@ need to do that from a plugin script.
 =back
 
 =head2 MESSAGE METHODS
-
-EXPERIMENTAL AND SUBJECT TO CHANGE
 
 add_messages and check_messages are higher-level convenience methods to add
 and then check a set of messages, returning an appropriate return code

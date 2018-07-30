@@ -1,10 +1,10 @@
 {
    "abstract" : "Relaxed JSON with a little bit of YAML",
    "author" : [
-      "Ingy döt Net <ingy@cpan.org>"
+      "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -59,6 +59,7 @@
          "web" : "https://github.com/ingydotnet/jsony-pm"
       }
    },
-   "version" : "0.1.17"
+   "version" : "0.1.18",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
 }
 

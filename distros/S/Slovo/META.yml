@@ -7,8 +7,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -20,8 +20,8 @@ no_index:
     - t
 requires:
   Cpanel::JSON::XS: '4.04'
-  Mojo::SQLite: '3.000'
-  Mojolicious: '7.87'
+  Mojo::SQLite: '3.001'
+  Mojolicious: '7.89'
   Mojolicious::Plugin::Authentication: '1.32'
   Mojolicious::Plugin::OpenAPI: '1.30'
   Mojolicious::Plugin::RoutesConfig: '0.05'
@@ -32,5 +32,5 @@ resources:
   homepage: https://github.com/kberov/Slovo
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/kberov/Slovo.git
-version: v2018.07.20
+version: v2018.07.28
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

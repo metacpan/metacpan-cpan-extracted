@@ -1,10 +1,22 @@
 ==================================================
-Changes from 2017-07-09 00:00:00 +0000 to present.
+Changes from 2017-07-26 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.02 at 2018-07-09 11:16:34 +0000
+version 0.03 at 2018-07-26 07:22:57 +0000
 -----------------------------------------
+
+  Change: 53e5fabfa8949945eca314a5ecec4a795e5645f8
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-26 10:22:40 +0000
+
+    Updated README.md 
+
+  Change: 7f3270d22e435b5b8f11bc0b63cbe8c221a03f8f
+  Author: Pavel Serikov <pavelsr@cpan.org>
+  Date : 2018-07-26 10:22:07 +0000
+
+    Fixed misprint in doc and version+ 
 
   Change: 370d3bbfb39dc05f3ae9e4f300ff6d009feae884
   Author: Pavel Serikov <pavelsr@cpan.org>

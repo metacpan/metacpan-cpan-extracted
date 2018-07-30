@@ -16,6 +16,7 @@ Makefile.PL
 MANIFEST			This list of files
 README
 t/00-load.t
+t/bidi.t
 t/br.t
 t/breakages.t
 t/broken.t
@@ -42,6 +43,7 @@ t/lists.t
 t/manifest.t
 t/memory-cycles.t
 t/memory-size.t
+t/missing-bidi.t
 t/muse-to-object.t
 t/on-the-fly.t
 t/output.t
@@ -64,12 +66,27 @@ t/testfiles/beamer.exp.html
 t/testfiles/beamer.exp.ltx
 t/testfiles/beamer.exp.sl.tex
 t/testfiles/beamer.muse
+t/testfiles/bidi-1.exp.html
+t/testfiles/bidi-1.exp.ltx
+t/testfiles/bidi-1.muse
+t/testfiles/bidi-2.exp.html
+t/testfiles/bidi-2.exp.ltx
+t/testfiles/bidi-2.muse
 t/testfiles/br-in-footnotes.exp.html
 t/testfiles/br-in-footnotes.exp.ltx
 t/testfiles/br-in-footnotes.muse
 t/testfiles/breaklist.exp.html
 t/testfiles/breaklist.exp.ltx
 t/testfiles/breaklist.muse
+t/testfiles/broken-bidi-1.exp.html
+t/testfiles/broken-bidi-1.exp.ltx
+t/testfiles/broken-bidi-1.muse
+t/testfiles/broken-bidi-2.exp.html
+t/testfiles/broken-bidi-2.exp.ltx
+t/testfiles/broken-bidi-2.muse
+t/testfiles/broken-bidi-3.exp.html
+t/testfiles/broken-bidi-3.exp.ltx
+t/testfiles/broken-bidi-3.muse
 t/testfiles/broken-inline.exp.html
 t/testfiles/broken-inline.exp.ltx
 t/testfiles/broken-inline.muse

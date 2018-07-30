@@ -8,7 +8,7 @@ GraphQL::Plugin::Convert::OpenAPI - convert OpenAPI schema to GraphQL schema
 |:-------:|--------------:|
 | Linux   | [![Build Status](https://travis-ci.org/graphql-perl/GraphQL-Plugin-Convert-OpenAPI.svg?branch=master)](https://travis-ci.org/graphql-perl/GraphQL-Plugin-Convert-OpenAPI) |
 
-[![CPAN version](https://badge.fury.io/pl/GraphQL-Plugin-Convert-OpenAPI.svg)](https://metacpan.org/pod/GraphQL::Plugin::Convert::OpenAPI)
+[![CPAN version](https://badge.fury.io/pl/GraphQL-Plugin-Convert-OpenAPI.svg)](https://metacpan.org/pod/GraphQL::Plugin::Convert::OpenAPI) [![Coverage Status](https://coveralls.io/repos/github/graphql-perl/GraphQL-Plugin-Convert-OpenAPI/badge.svg?branch=master)](https://coveralls.io/github/graphql-perl/GraphQL-Plugin-Convert-OpenAPI?branch=master)
 
 # SYNOPSIS
 

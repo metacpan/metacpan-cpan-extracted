@@ -1,3 +1,9 @@
+0.57 Sat Jul 28 08:01:20 PDT 2018
+ - Add Test::Differences to test deps
+
+0.56 Fri Jul 27 19:17:36 PDT 2018
+ - More changes for TestML1
+
 0.55 Mon Jun 11 21:24:37 MDT 2018
  - Renaming this module TestML1
  - Nobody seems to be using it

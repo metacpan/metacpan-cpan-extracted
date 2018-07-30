@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Tuple::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Tuple::VERSION   = '1.002002';
+	$Types::Standard::Tuple::VERSION   = '1.004002';
 }
 
 use Type::Tiny ();
@@ -25,12 +25,12 @@ sub __constraint_generator
 	my $slurpy;
 	if (exists $constraints[-1] and ref $constraints[-1] eq "HASH")
 	{
-		$slurpy = Types::TypeTiny::to_TypeTiny(pop(@constraints)->{slurpy});
+		$slurpy = Types::TypeTiny::to_TypeTiny($constraints[-1]{slurpy});
 		Types::TypeTiny::TypeTiny->check($slurpy)
 			or _croak("Slurpy parameter to Tuple[...] expected to be a type constraint; got $slurpy");
+		pop(@constraints)->{slurpy} = $slurpy;  # keep canonicalized version around
 	}
 	
-	@constraints = map Types::TypeTiny::to_TypeTiny($_), @constraints;
 	for (@constraints)
 	{
 		Types::TypeTiny::TypeTiny->check($_)
@@ -60,6 +60,10 @@ sub __constraint_generator
 	my @is_optional = map !!$_->is_strictly_a_type_of($_Optional), @constraints;
 	my $slurp_hash  = $slurpy && $slurpy->is_a_type_of(Types::Standard::HashRef);
 	my $slurp_any   = $slurpy && $slurpy->equals(Types::Standard::Any);
+	
+	my @sorted_is_optional = sort @is_optional;
+	join("|", @sorted_is_optional) eq join("|", @is_optional)
+		or _croak("Optional parameters to Tuple[...] cannot precede required parameters");
 	
 	sub
 	{
@@ -100,10 +104,10 @@ sub __inline_generator
 	{
 		$slurpy = pop(@constraints)->{slurpy};
 	}
-	
+
 	return if grep { not $_->can_be_inlined } @constraints;
 	return if defined $slurpy && !$slurpy->can_be_inlined;
-	
+
 	if (Type::Tiny::_USE_XS and !$slurpy)
 	{
 		my @known = map {
@@ -371,7 +375,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

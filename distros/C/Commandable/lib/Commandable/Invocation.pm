@@ -7,8 +7,9 @@ package Commandable::Invocation;
 
 use strict;
 use warnings;
+use 5.010; # //
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -77,7 +78,7 @@ sub _next_token
    my $self = shift;
 
    if( $self->{text} =~ m/^"/ ) {
-      $self->{text} =~ m/^"(.*)"\s*/ and
+      $self->{text} =~ m/^"((?:\\.|[^"])*)"\s*/ and
          $self->{trim_pos} = $+[0], return $self->_unescape( $1 );
    }
    else {
@@ -86,6 +87,16 @@ sub _next_token
    }
 
    return undef;
+}
+
+sub _escape
+{
+   my $self = shift;
+   my ( $s ) = @_;
+
+   $s =~ s/["\\]/\\$1/g;
+
+   return $s;
 }
 
 sub _unescape
@@ -146,7 +157,37 @@ Returns the entire unparsed content of the rest of the text string.
 sub remaining
 {
    my $self = shift;
+
    return $self->{text};
+}
+
+=head2 putback_tokens
+
+   $inv->putback_tokens( @tokens )
+
+I<Since version 0.02.>
+
+Prepends text back onto the stored text string such that subsequent calls to
+L</pull_token> will yield the given list of tokens once more. This takes care
+to quote tokens with spaces inside, and escape any embedded backslashes or
+quote marks.
+
+This method is intended to be used, for example, around a commandline option
+parser which handles mixed options and arguments, to put back the non-option
+positional arguments after the options have been parsed and removed from it.
+
+=cut
+
+sub putback_tokens
+{
+   my $self = shift;
+
+   $self->{text} = join " ",
+      ( map {
+         my $s = $self->_escape( $_ );
+         $s =~ m/ / ? qq("$s") : $s
+      } @_ ),
+      ( length $self->{text} ? $self->{text} : () );
 }
 
 =head1 AUTHOR

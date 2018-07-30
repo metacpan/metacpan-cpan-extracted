@@ -1,4 +1,10 @@
+2.1       2018-07-25 23:41:24+01:00 Europe/London
+
 2.0       2018-07-18 23:23:36+01:00 Europe/London
+- Update minimum dependency on JSONAPI::Document, this removes the required
+argument 'data_dir' as now all types are derived in a less expensive way.
+
+Thanks @dakkar and @jplindstrom!
 
 1.9       2018-07-12 21:08:47+01:00 Europe/London
 - Update minimum dependency on JSONAPI::Document

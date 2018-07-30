@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojo::RabbitMQ::Client:
     file: lib/Mojo/RabbitMQ/Client.pm
-    version: v0.1.0
+    version: v0.2.1
   Mojo::RabbitMQ::Client::Channel:
     file: lib/Mojo/RabbitMQ/Client/Channel.pm
   Mojo::RabbitMQ::Client::Consumer:
@@ -50,12 +50,15 @@ resources:
   bugtracker: https://github.com/inway/mojo-rabbitmq-client/issues
   homepage: https://github.com/inway/mojo-rabbitmq-client
   repository: git://github.com/inway/mojo-rabbitmq-client.git
-version: 0.1.0
+version: 0.2.1
 x_contributors:
   - 'Christopher Rasch-Olsen Raa <christopher@stix.no>'
+  - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'
   - 'Patrick Goldmann <patrick.goldmann@googlemail.com>'
   - 'Richard Lippmann <lippmann@findus-internet-opac.de>'
   - 'Sebastian Podjasek <sebastian@podjasek.pl>'
+  - 'Sebastian Riedel <kraihx@gmail.com>'
   - 'Stephan Kulow <coolo@suse.de>'
   - 'Vidar Tyldum <vidar@tyldum.com>'
+  - 'gregor herrmann <gregor+github@comodo.priv.at>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

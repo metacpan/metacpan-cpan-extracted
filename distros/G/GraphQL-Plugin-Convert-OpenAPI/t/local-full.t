@@ -41,7 +41,17 @@ subtest 'GraphQL with POST' => sub {
     '{"query":"{echo(arg: \"Yo\")}"}',
   )->json_is(
     { 'data' => { 'echo' => '{"arg":"Yo"}' } },
-  )->or(sub { diag explain shift->tx->res->json });
+  )->or(sub {
+    diag explain shift->tx->res->json;
+    local $ENV{GRAPHQL_DEBUG} = 1;
+    diag "Re-executing with GRAPHQL_DEBUG=1";
+    # the env var sets a compile-time constant, so re-compile
+    delete $INC{'GraphQL/Execution.pm'};
+    require GraphQL::Execution;
+    $t->post_ok('/graphql', { Content_Type => 'application/json' },
+      '{"query":"{echo(arg: \"Yo\")}"}',
+    );
+  });
 };
 
 done_testing;

@@ -2,7 +2,7 @@ package Mew;
 
 use strictures 2;
 
-our $VERSION = '1.002001'; # VERSION
+our $VERSION = '1.002002'; # VERSION
 
 use Import::Into;
 use Moo;

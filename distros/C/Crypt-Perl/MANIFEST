@@ -121,6 +121,7 @@ t/Crypt-Perl-RSA-PublicKey.t
 t/Crypt-Perl-X509-Extension-subjectAltName.t
 t/Crypt-Perl-X509-SCT.t
 t/Crypt-Perl-X509v3.t
+t/Crypt-Perl-X509v3_ed25519.t
 t/assets/RS256.dump
 t/assets/c2pnb163v1.key
 t/assets/ecdsa_explicit_compressed/brainpoolP160r1.key

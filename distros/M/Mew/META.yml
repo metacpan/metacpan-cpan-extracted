@@ -4,10 +4,12 @@ author:
   - 'Zoffix Znet <cpan@zoffix.com>'
 build_requires:
   File::Spec: '0'
+  FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
   Test::Most: '0'
+  lib: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
@@ -24,12 +26,13 @@ name: Mew
 provides:
   Mew:
     file: lib/Mew.pm
-    version: '1.002001'
+    version: '1.002002'
   ew:
     file: lib/ew.pm
-    version: '1.002001'
+    version: '1.002002'
 requires:
   Filter::Simple: '0'
+  FindBin: '0'
   Import::Into: '1.002005'
   Module::Runtime: '0.014'
   Moo: '2.002004'
@@ -45,10 +48,10 @@ resources:
   bugtracker: https://github.com/zoffixznet/mew/issues
   homepage: http://metacpan.org/release/Mew
   repository: git://github.com/zoffixznet/mew.git
-version: '1.002001'
+version: '1.002002'
 x_Dist_Zilla:
   perl:
-    version: '5.026000'
+    version: '5.028000'
   plugins:
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
@@ -167,7 +170,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Author::ZOFFIX/InstallGuide'
-      version: '1.200009'
+      version: '1.200011'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -313,7 +316,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.1.4
+          git_version: 2.15.1
           repo_root: .
       name: '@Author::ZOFFIX/Git::NextVersion'
       version: '2.045'
@@ -354,7 +357,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.1.4
+          git_version: 2.15.1
           repo_root: .
       name: '@Author::ZOFFIX/Git::Check'
       version: '2.045'
@@ -371,7 +374,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.1.4
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -384,11 +387,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.002001
+          tag: v1.002002
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.1.4
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -402,7 +405,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.1.4
+          git_version: 2.15.1
           repo_root: .
       name: '@Author::ZOFFIX/Git::Push'
       version: '2.045'
@@ -467,5 +470,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.26.0
+x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

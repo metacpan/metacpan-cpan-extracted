@@ -1,24 +1,31 @@
 NAME
+
     Pegex::JSON - Pegex Loader for JSON
 
 SYNOPSIS
+
         my $data = Pegex::JSON->new->load($json);
 
 DESCRIPTION
+
     Pegex::JSON is a JSON parser written in Pegex.
 
 SEE ALSO
-    *   Pegex
 
-    *   JSON
+      * Pegex
+
+      * JSON
 
 AUTHOR
+
     Ingy döt Net <ingy@cpan.org>
 
 COPYRIGHT
+
     Copyright 2011-2014 Ingy döt Net
 
 LICENSE
+
     This library is free software and may be distributed under the same
     terms as perl itself.
 

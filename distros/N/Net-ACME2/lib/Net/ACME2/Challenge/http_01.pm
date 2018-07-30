@@ -3,9 +3,9 @@ package Net::ACME2::Challenge::http_01;
 use strict;
 use warnings;
 
-use parent qw( Net::ACME2::ChallengeBase::HasToken );
+use parent qw( Net::ACME2::Challenge );
 
-use constant PATH_DIRECTORY => '/.well-known/acme-challenge';
+use constant _PATH_DIRECTORY => '/.well-known/acme-challenge';
 
 =encoding utf-8
 
@@ -66,11 +66,13 @@ sub create_handler {
     );
 }
 
-=head2 I<OBJ>->path()
+#----------------------------------------------------------------------
 
-Returns the URL path that needs to serve up the
-key authorization. This is useful if, for whatever reason, you’re not
-using C<create_handler()> to satisfy this challenge.
+=head2 I<OBJ>->get_path()
+
+Returns the path component of the URL that should serve up the
+relevant content. This is useful if, for whatever reason,
+you’re not using C<create_handler()> to satisfy this challenge.
 
 Example:
 
@@ -78,12 +80,39 @@ Example:
 
 =cut
 
-sub path {
+sub get_path {
     my ($self) = @_;
 
     my $token = $self->token();
 
-    return $self->PATH_DIRECTORY() . "/$token";
+    return $self->_PATH_DIRECTORY() . "/$token";
+}
+
+# legacy - a courtesy to early adopters
+*path = \*get_path;
+
+#----------------------------------------------------------------------
+
+=head2 I<OBJ>->get_content( $ACME )
+
+Accepts a L<Net::ACME2> instance and returns the content that the
+URL should serve.
+
+Example:
+
+    q1hcOY6mDLNh7jummITkoQ1PHBpaxwNwyERZEqbADqI._jDy0skz-fuLE9OyLfS2UBa9z9QtS_MZGWq3x2nMx34
+
+=cut
+
+sub get_content {
+    my ($self, $acme) = @_;
+
+    # Errors for the programmer.
+    if (!$acme) {
+        die 'Need “Net::ACME2” instance to compute HTTP content!'
+    }
+
+    return $acme->make_key_authorization($self);
 }
 
 1;

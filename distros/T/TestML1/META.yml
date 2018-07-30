@@ -1,9 +1,10 @@
 ---
-abstract: 'A Generic Software Testing Meta Language'
+abstract: 'DEPRECATED Generic Software Testing Meta Language'
 author:
   - 'Ingy döt Net <ingy@cpan.org>'
 build_requires:
   Capture::Tiny: '0'
+  Test::Differences: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
@@ -24,8 +25,8 @@ requires:
   Pegex: '0.30'
   perl: v5.8.1
 resources:
-  bugtracker: https://github.com/ingydotnet/testml-pm/issues
-  homepage: https://github.com/ingydotnet/testml-pm
-  repository: https://github.com/ingydotnet/testml-pm.git
-version: '0.55'
+  bugtracker: https://github.com/ingydotnet/testml1-pm/issues
+  homepage: https://github.com/ingydotnet/testml1-pm
+  repository: https://github.com/ingydotnet/testml1-pm.git
+version: '0.57'
 x_serialization_backend: 'YAML::Tiny version 1.69'

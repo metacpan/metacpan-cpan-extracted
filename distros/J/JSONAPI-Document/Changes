@@ -1,4 +1,10 @@
+2.3       2018-07-25 23:32:04+01:00 Europe/London
+
 2.2       2018-07-18 23:04:28+01:00 Europe/London
+- Use a less taxing method of deriving a documents resource type with Mojo::Util::decamelize,
+removing the need to lookup and cache the type using Lingua::EN::Segment and CHI.
+
+Thanks to @dakkar and @jplindstrom for the feedback!
 
 2.1       2018-07-12 20:09:22+01:00 Europe/London
 - Allow attributes starting with an underscore to not go through kebab casing

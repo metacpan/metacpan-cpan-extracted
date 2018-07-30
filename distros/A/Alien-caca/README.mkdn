@@ -1,0 +1,61 @@
+# NAME
+
+Alien::caca - Alien package for the Colored ASCII Art library
+
+# VERSION
+
+version 0.0.2
+
+# SYNOPSIS 
+
+In your Build.PL:
+
+```perl
+   use Module::Build;
+   use Alien::caca;
+   my $builder = Module::Build->new(
+       ...
+       configure_requires => {
+           'Alien::caca' => '0',
+           ...
+       },
+       extra_compiler_flags => Alien::caca->cflags,
+       extra_linker_flags   => Alien::caca->libs,
+       ...
+   );
+
+   $build->create_build_script;
+```
+
+In your Makefile.PL:
+
+```perl
+use ExtUtils::MakeMaker;
+use Config;
+use Alien::caca;
+
+WriteMakefile(
+...
+CONFIGURE_REQUIRES => {
+    'Alien::caca' => '0',
+},
+CCFLAGS => Alien::caca->cflags . " $Config{ccflags}",
+LIBS    => [ Alien::caca->libs ],
+...
+);
+```
+
+# DESCRIPTION 
+
+This distribution installs [libcaca](http://caca.zoy.org/wiki/libcaca) so that it can be used by other Perl distributions.  Mostly [Term::Caca](https://metacpan.org/pod/Term::Caca).
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

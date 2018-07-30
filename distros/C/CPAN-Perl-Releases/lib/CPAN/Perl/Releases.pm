@@ -1,5 +1,5 @@
 package CPAN::Perl::Releases;
-$CPAN::Perl::Releases::VERSION = '3.70';
+$CPAN::Perl::Releases::VERSION = '3.72';
 #ABSTRACT: Mapping Perl releases on CPAN to the location of the tarballs
 
 use strict;
@@ -291,7 +291,7 @@ CPAN::Perl::Releases - Mapping Perl releases on CPAN to the location of the tarb
 
 =head1 VERSION
 
-version 3.70
+version 3.72
 
 =head1 SYNOPSIS
 
@@ -349,8 +349,6 @@ Returns a sorted list of all PAUSE IDs of Perl pumpkins.
 =head1 SEE ALSO
 
 L<http://www.cpan.org/src/5.0/>
-
-L<http://search.cpan.org/faq.html#Is_there_a_API?>
 
 =head1 AUTHOR
 

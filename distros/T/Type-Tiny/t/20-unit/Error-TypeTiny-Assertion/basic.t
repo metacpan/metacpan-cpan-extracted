@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -30,6 +30,11 @@ use Test::Fatal;
 
 use Scalar::Util qw(refaddr);
 use Types::Standard slurpy => -types;
+
+require Error::TypeTiny::Assertion;
+
+my $tmp = Error::TypeTiny::Assertion->new(value => 1.1, type => Int, varname => '$bob');
+is($tmp->message, "Value \"1.1\" did not pass type constraint \"Int\" (in \$bob)", "autogeneration of \$e->message");
 
 my $supernum = Types::Standard::STRICTNUM ? "StrictNum" : "LaxNum";
 
@@ -175,7 +180,7 @@ TODO: {
 			'Reference {1 => "1.1","2.2" => "2.3","3.3" => "3.4"} did not pass type constraint "Map[Int,Num]"',
 			'"Map[Int,Num]" constrains each key in the hash with "Int"',
 			'Value "2.2" did not pass type constraint "Int" (in key $_->{"2.2"})',
-			'"Int" is defined as: (defined($_) and !ref($_) and $_ =~ /\A-?[0-9]+\z/)',
+			'"Int" is defined as: (do { my $tmp = $_; defined($tmp) and !ref($tmp) and $tmp =~ /\A-?[0-9]+\z/ })',
 		],
 		'Map[Int,Num] deep explanation, given {1=>1.1,2.2=>2.3,3.3=>3.4}',
 	);
@@ -234,6 +239,20 @@ is_deeply(
 		'2 values found; too many',
 	],
 	'$TupleOf1 explanation, given [1,2]',
+);
+
+my $CTuple = CycleTuple[ Int, ArrayRef ];
+
+is_deeply(
+	(exception { $CTuple->([1,"Foo"]) })->explain,
+	[
+		'Reference [1,"Foo"] did not pass type constraint "CycleTuple[Int,ArrayRef]"',
+		'"CycleTuple[Int,ArrayRef]" constrains value at index 1 of array with "ArrayRef"',
+		'"ArrayRef" is a subtype of "Ref"',
+		'Value "Foo" did not pass type constraint "Ref" (in $_->[1])',
+		'"Ref" is defined as: (!!ref($_))',
+	],
+	'$CTuple explanation, given [1,"Foo"]',
 );
 
 TODO: {

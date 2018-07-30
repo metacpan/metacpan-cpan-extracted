@@ -17,6 +17,7 @@ binmode STDOUT, ':encoding(utf-8)';
 binmode STDERR, ':encoding(utf-8)';
 
 use Text::Amuse::Compile::Merged;
+use Text::Amuse::Compile::Devel qw/explode_epub/;
 
 chdir File::Spec->catdir(qw/t merged-dir/) or die $!;
 
@@ -166,7 +167,7 @@ $compile->purge_all;
 my $epub = $compile->epub;
 ok ($epub, "EPUB produced");
 ok (-f $epub, "$epub exists");
-my $epub_html = _get_epub_xhtml($epub);
+my $epub_html = explode_epub($epub);
 # diag $epub_html;
 like ($epub_html, qr{author.*Pallino\sPinco.*
                      title.*First\sfile.*
@@ -182,20 +183,3 @@ like ($epub_html, qr{author.*Pallino\sPinco.*
 
 $compile->purge_all;
 
-sub _get_epub_xhtml {
-    my $epub = shift;
-    my $zip = Archive::Zip->new;
-    die "Couldn't read $epub" if $zip->read($epub) != AZ_OK;
-    my $tmpdir = File::Temp->newdir(CLEANUP => 1);
-    $zip->extractTree('OPS', $tmpdir->dirname) == AZ_OK
-      or die "Cannot extract $epub OPS into $tmpdir";
-    opendir (my $dh, $tmpdir->dirname) or die $!;
-    my @pieces = sort grep { /\Apiece\d+\.xhtml\z/ } readdir($dh);
-    closedir $dh;
-    my @html;
-    foreach my $piece ('toc.ncx', 'titlepage.xhtml', @pieces) {
-        push @html, "<!-- $piece -->",
-          read_file(File::Spec->catfile($tmpdir->dirname, $piece));
-    }
-    return join('', @html);
-}

@@ -20,7 +20,7 @@ git-recent - Find what files have been changed recently in a repository
 
 =head1 VERSION
 
-This documentation refers to git-recent version 1.0.7
+This documentation refers to git-recent version 1.0.8
 
 =head1 SYNOPSIS
 
@@ -47,6 +47,12 @@ This documentation refers to git-recent version 1.0.7
                 areas that have changed)
   -u --users    Show the output by who has made the changes
   -f --files    Show the output the files changed (Default)
+     --ignore-user[=]regexp
+     --ignore-users[=]regexp
+                Ignore any user(s) matching regexp (can be specified more than once)
+     --ignore-branch[=]regexp
+     --ignore-branches[=]regexp
+                Ignore any branch(s) matching regexp (can be specified more than once)
   -o --out[=](text|json|perl)
                 Specify how to display the results
                     - text : Nice human readable format (Default)

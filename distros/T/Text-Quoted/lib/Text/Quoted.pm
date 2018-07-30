@@ -1,5 +1,5 @@
 package Text::Quoted;
-our $VERSION = "2.09";
+our $VERSION = "2.10";
 use 5.006;
 use strict;
 use warnings;
@@ -69,8 +69,15 @@ C<quoter> is the quotation string.
 
 =head2 extract
 
+  my $struct = extract($text, \%arg);
+
 Takes a single string argument which is the text to extract quote
 structure from.  Returns a nested datastructure as described above.
+
+Second argument is optional: a hashref of options.  The only valid
+argument at present is:
+
+  no_separators - never mark paragraphs as "separators"
 
 Exported by default.
 
@@ -187,10 +194,13 @@ sub combine_hunks {
 }
 
 sub _classify {
-    my $text = shift;
+    my ($text, $arg) = @_;
+    $arg ||= {};
+
+    # If the user passes in a null string, we really want to end up with
+    # _something_
     return { raw => undef, text => undef, quoter => undef }
         unless defined $text && length $text;
-    # If the user passes in a null string, we really want to end up with _something_
 
     # DETABIFY
     my @lines = Text::Tabs::expand( split /\n/, $text );
@@ -201,7 +211,8 @@ sub _classify {
         @line{'quoter', 'text'} = (/\A *($quoter?) *(.*?)\s*\Z/);
         $line{hang}      = $hang_package->new( $line{'text'} );
         $line{empty}     = 1 if $line{hang}->empty() && $line{'text'} !~ /\S/;
-        $line{separator} = 1 if $line{text} =~ /\A *$separator *\Z/o;
+        $line{separator} = 1 if $line{text} =~ /\A *$separator *\Z/o
+                             and ! $arg->{no_separators};
         push @lines, \%line;
     }
 
@@ -241,6 +252,7 @@ sub _classify {
             else {
                 my $extraspace =
                   length( $line->{raw} ) - length( $line->{text} ) - $firstfrom;
+                $extraspace = 0 if $extraspace < 0;
                 $paras[-1]->{text} .= "\n" . q{ } x $extraspace . $line->{text};
                 $paras[-1]->{raw} .= "\n" . $line->{raw};
             }

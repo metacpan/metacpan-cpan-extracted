@@ -70,7 +70,7 @@ sub _typography_filter_es {
 
   # em-dash —
   # look behind and check it's not a \n
-  # not a spece, space, one-three hypens, space, not a space => space — space
+  # not a spece, space, one-three hyphens, space, not a space => space — space
   $l =~ s/(?<=\S) +-{1,3} +(?=\S)/ — /gs;
   # - at beginning of the line (with no space), it's a dialog (em dash)
   $l =~ s/^- */— /gm;
@@ -194,7 +194,7 @@ sub _typography_filter_ru {
               на|от|об|из|за|по|до|во|та|ту|то|те|ко|со|
               На|От|Об|Из|За|По|До|Во|Со|Ко|Та|Ту|То|Те|
 
-              # conjuctions
+              # conjunctions
               А |А,|
               а |а,|
               И |И,|
@@ -320,7 +320,7 @@ It's a bit opinionated to hide the full url and show only the domain.
 Anyway, it's a preprocessing filter and the most important thing is
 not to loose pieces. And we don't, because the full url is still
 there. Anyway, long urls are a pain to display and to typeset, so the
-domain is a sensible choise. The user can anyway change this. It's
+domain is a sensible choice. The user can anyway change this. It's
 just an helper to avoid boring tasks, nothing more.
 
 Returns the adjusted string.

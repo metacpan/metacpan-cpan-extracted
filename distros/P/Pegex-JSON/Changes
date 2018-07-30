@@ -1,3 +1,6 @@
+0.28 Sat Jul 28 15:24:54 PDT 2018
+ - Switch to new TestML for tests
+
 0.27 Sat Aug 30 23:32:26 MDT 2014
  - Add tests for top level scalars
  - Found a serious bug with it and fix
@@ -57,4 +60,3 @@
 0.10 Thu Sep 22 00:09:21 CEST 2011
  - First Release
  - Released from Liz++ and Wendy++'s Laundry Room. On the washing machine.
-

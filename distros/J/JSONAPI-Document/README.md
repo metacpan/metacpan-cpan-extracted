@@ -4,7 +4,7 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 # VERSION
 
-version 2.2
+version 2.3
 
 # SYNOPSIS
 
@@ -50,7 +50,7 @@ while keeping relationship names intact (i.e. an 'author' relationship will stil
 This module supplies an opt-in Moo role that can be consumed by objects that layer over a DBIx::Class::Row,
 `JSONAPI::Document::Role::Attributes`. Consuming objects should implement a method called `attributes`
 which will be used throughout the creation of resource documents for that result type to build the attributes
-of the document. This is useful when you have a more complicated set of attribute that cannot be fulfilled
+of the document. This is useful when you have a more complicated set of attributes that cannot be fulfilled
 by simply calling `get_inflated_columns` (the default behaviour).
 
 # ATTRIBUTES
@@ -158,8 +158,8 @@ The following options can be given:
     An optional list of attributes to include for the given resource. Implements
     [sparse fieldsets](http://jsonapi.org/format/#fetching-sparse-fieldsets) in the specification.
 
-    Will pass the array reference to the `attributes_via` method, which should make use
-    of the reference and return **only** those attributes that were requested.
+    Will pass the array reference to the `attributes` method (if you're using the attributes role), which
+    should make use of the reference and return **only** those attributes that were requested.
 
 - `related_fields` _HashRef_
 
@@ -169,9 +169,13 @@ The following options can be given:
     Not specifying sparse fieldsets for a resource implies requesting all attributes for
     that relationship.
 
-## resource\_documents(_DBIx::Class::Row|Object_ $row, _HashRef_ $options)
+## resource\_documents(_DBIx::Class::ResultSet|Object|ArrayRef_ $resultset, _HashRef_ $options)
 
 Builds the structure for multiple resource documents with a given resultset.
+
+`$resultset` can be either a `DBIx::Class::ResultSet` object in which case this method will call
+`all` on the resultset, an object that extends `DBIx::Class::ResultSet`, or you can pass in an
+ArrayRef from your own `all` call.
 
 Returns a _HashRef_ with the following structure:
 

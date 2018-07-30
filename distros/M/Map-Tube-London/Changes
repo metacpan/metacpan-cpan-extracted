@@ -1,10 +1,22 @@
 Revision history for Map::Tube::London
 
+1.13  2018-07-29
+      - Updated section NOTE for the line "DLR".
+
+1.12  2018-07-28
+      - Updated section NOTE for the line "District".
+
+1.11  2018-07-27
+      - Updated section NOTE for the line "Circle".
+
+1.10  2018-07-26
+      - Added missing line "Piccadilly" for the "King's Cross St. Pancras".
+
 1.09  2018-07-24
-      - Updated section NOTES for the line "Central".
+      - Updated section NOTE for the line "Central".
 
 1.08  2018-07-23
-      - Updated section NOTES for the line "Bakerloo".
+      - Updated section NOTE for the line "Bakerloo".
 
 1.07  2018-07-08
       - Used File::ShareDir v1.114 instead of File::Share.

@@ -67,3 +67,8 @@ Revision history for Tk-JFileDialog
         "Directories:" on M$-Windows.
 2.01    * Fixed: "Changes" file missing from MANIFEST, thus missing from 
         MetaCPAN.
+2.10    * Fixed critical bug that sometimes locked up application when 
+        path selected from the path history drop-down list.
+        * Added -FNameList => arrayref option to allow developer to 
+        specify a reference to a specific list of filenames to display in 
+        the listbox for the user to select from.

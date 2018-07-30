@@ -42,20 +42,22 @@ foreach my $header (0..1) {
         my $texbody = read_file($tex);
         my $htmlbody = read_file($html);
         my $barebody = read_file($bare_html);
+        my $re_no_display = qr/<div class="table-of-contents" style="display:none"( dir="...")?>/;
+        my $re_display    = qr/<div class="table-of-contents"( dir="...")?>/;
         if ($header || $option) {
             unlike($texbody, qr/\\tableofcontents/, "ToC is not present header: $header option: $option");
-            like($htmlbody, qr/<div class="table-of-contents" style="display:none">/);
-            like($barebody, qr/<div class="table-of-contents" style="display:none">/);
-            unlike($htmlbody, qr/<div class="table-of-contents">/);
-            unlike($barebody, qr/<div class="table-of-contents">/);
+            like($htmlbody, $re_no_display);
+            like($barebody, $re_no_display);
+            unlike($htmlbody, $re_display);
+            unlike($barebody, $re_display);
 
         }
         else {
             like($texbody, qr/\\tableofcontents/, "ToC is present header: $header option: $option");
-            unlike($htmlbody, qr/<div class="table-of-contents" style="display:none">/);
-            unlike($barebody, qr/<div class="table-of-contents" style="display:none">/);
-            like($htmlbody, qr/<div class="table-of-contents">/);
-            like($barebody, qr/<div class="table-of-contents">/);
+            unlike($htmlbody, $re_no_display);
+            unlike($barebody, $re_no_display);
+            like($htmlbody, $re_display);
+            like($barebody, $re_display);
         }
       SKIP:
         {

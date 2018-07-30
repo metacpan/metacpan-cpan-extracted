@@ -141,7 +141,14 @@ for my $appname ('psgix.input.non-buffered', 'psgix.input.buffered') {
 
 sub _debug_fail {
     my $res = shift;
-    use Data::Printer alias=>'splat'; diag $res->content; diag $res->code; diag splat($res->headers);
+    use Data::Dumper;
+    local $Data::Dumper::Indent   = 1;
+    local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Terse    = 1;
+
+    diag $res->content;
+    diag $res->code;
+    diag Data::Dumper::Dumper($res->headers);
 }
 
 done_testing;

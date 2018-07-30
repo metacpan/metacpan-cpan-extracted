@@ -19,7 +19,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         # ours
-        'Text::Amuse' => 1.01,
+        'Text::Amuse' => 1.21,
         'PDF::Imposition' => 0.23,
         'EBook::EPUB::Lite' => 0.71,
         # needed
@@ -28,6 +28,7 @@ WriteMakefile(
         'Template::Tiny' => 1.12, # version in wheezy
         'IO::Pipe' => 0,
         'Archive::Zip' => 0, # alread a requirement of EBook::EPUB
+        'Path::Tiny' => 0,
         'JSON::MaybeXS' => 0,
     },
     EXE_FILES => [

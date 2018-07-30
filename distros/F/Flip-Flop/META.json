@@ -1,5 +1,5 @@
 {
-   "abstract" : "Flop a switch in your script to zero after a run with the switch set to one.",
+   "abstract" : "Set a switch in your script to zero after a run with the switch set to one.",
    "author" : [
       "philiprbrenan@gmail.com"
    ],
@@ -30,7 +30,7 @@
    "provides" : {
       "Flip::Flop" : {
          "file" : "lib/Flip/Flop.pm",
-         "version" : "20170828"
+         "version" : "20180726"
       }
    },
    "release_status" : "stable",
@@ -39,5 +39,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20170828"
+   "version" : "20180726",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

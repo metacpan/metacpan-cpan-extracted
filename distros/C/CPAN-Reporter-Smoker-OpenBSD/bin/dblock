@@ -8,7 +8,7 @@ use Pod::Usage 1.69;
 use CPAN::Reporter::Smoker::OpenBSD qw(is_distro_ok block_distro);
 use Config;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 my ( $distro, $help, $version_check, $comment );
 
 GetOptions(
@@ -27,21 +27,22 @@ if ($version_check) {
 
 pod2usage( -exitval => 1, -verbose => 1 ) unless ( is_distro_ok($distro) );
 
-my $perl_version;
+my %perl_info = (
+    osname      => $Config{osname},
+    archname    => $Config{archname},
+    useithreads => $Config{useithreads},
+);
 
-if (exists($ENV{PERLBREW_ROOT})) {
-    $perl_version = $ENV{PERLBREW_PERL};
-} else {
-    $perl_version = 'perl-'. $Config{version};
-}
-
-unless (my $data_ref = block_distro($distro, $perl_version, ($comment || 'Tests hang smoker'))) {
+unless ( my $data_ref = block_distro( $distro, \%perl_info, $comment ) ) {
     exit(1);
-} else {
-    my $path = delete($data_ref->{full_path});
-    DumpFile($path, $data_ref);
 }
+else {
+    my $path = delete( $data_ref->{full_path} );
 
+    # to make sure group can write to distroprefs
+    umask 002;
+    DumpFile( $path, $data_ref );
+}
 
 __END__
 

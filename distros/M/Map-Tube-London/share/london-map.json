@@ -1126,7 +1126,7 @@
          {
             "other_link" : "Street:E017",
             "id" : "K013",
-            "line" : "HC:14,Circle:14,Victoria:7,Metropolitan:6,Northern:31",
+            "line" : "HC:14,Circle:14,Victoria:7,Metropolitan:6,Northern:31,Piccadilly:41",
             "name" : "King's Cross St. Pancras",
             "link" : "H023,E018,F002,A009,R015,C001"
          },

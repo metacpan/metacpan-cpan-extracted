@@ -40,5 +40,6 @@ foreach my $file (@ARGV) {
     $pp->process;
     if (my $error = $pp->error) {
         print "$file: found: $error->{footnotes_found} ($error->{footnotes}) references: $error->{references_found} ($error->{references})\n";
+        print "Differences between the list of footnotes and references:\n$error->{differences}\n";
     }
 }

@@ -4,7 +4,7 @@ use warnings;
 use 5.006;
 
 package LWP::ConsoleLogger;
-our $VERSION = '0.000037';
+our $VERSION = '0.000038';
 use Data::Printer { end_separator => 1, hash_separator => ' => ' };
 use DateTime qw();
 use HTML::Restrict qw();
@@ -16,6 +16,7 @@ use Log::Dispatch qw();
 use Moo;
 use MooX::StrictConstructor;
 use Parse::MIME qw( parse_mime_type );
+use Ref::Util qw( is_blessed_ref );
 use Term::Size::Any qw( chars );
 use Text::SimpleTable::AutoWidth 0.09 qw();
 use Try::Tiny qw( catch try );
@@ -204,7 +205,7 @@ sub response_callback {
     }
 
     $self->_log_headers( 'response', $res->headers );
-    $self->_log_cookies( 'response', $ua->cookie_jar );
+    $self->_log_cookies( 'response', $ua->cookie_jar, $res->request->uri );
 
     $self->_log_content($res);
     $self->_log_text($res);
@@ -296,36 +297,57 @@ sub _log_cookies {
     my $self = shift;
     my $type = shift;
     my $jar  = shift;
+    my $uri  = shift;
 
-    return if !$self->dump_cookies || !$jar;
+    return if !$self->dump_cookies || !$jar || !is_blessed_ref($jar);
 
-    my $monster = HTTP::CookieMonster->new($jar);
+    if ( $jar->isa('HTTP::Cookies') ) {
+        my $monster = HTTP::CookieMonster->new($jar);
+        my @cookies = $monster->all_cookies;
 
-    my @cookies    = $monster->all_cookies;
-    my $name_width = 10;
+        my @methods = (
+            'key',       'val',    'path', 'domain',
+            'path_spec', 'secure', 'expires'
+        );
 
-    my @methods = (
-        'key',       'val',    'path', 'domain',
-        'path_spec', 'secure', 'expires'
-    );
+        foreach my $cookie (@cookies) {
 
-    foreach my $cookie (@cookies) {
+            my $t = Text::SimpleTable::AutoWidth->new;
+            $t->captions( [ 'Key', 'Value' ] );
 
-        my $t = Text::SimpleTable::AutoWidth->new();
-        $t->captions( [ 'Key', 'Value' ] );
-
-        foreach my $method (@methods) {
-            my $val = $cookie->$method;
-            if ($val) {
-                $val = DateTime->from_epoch( epoch => $val )
-                    if $method eq 'expires';
-                $t->row( $method, $val );
+            foreach my $method (@methods) {
+                my $val = $cookie->$method;
+                if ($val) {
+                    $val = DateTime->from_epoch( epoch => $val )
+                        if $method eq 'expires';
+                    $t->row( $method, $val );
+                }
             }
+
+            $self->_draw( $t, ucfirst $type . " Cookie:\n" );
         }
-
-        $self->_draw( $t, ucfirst $type . " Cookie:\n" );
     }
+    elsif ( $jar->isa('HTTP::CookieJar') ) {
+        my @cookies = $jar->cookies_for($uri);
+        for my $cookie (@cookies) {
 
+            my $t = Text::SimpleTable::AutoWidth->new;
+            $t->captions( [ 'Key', 'Value' ] );
+
+            for my $key ( sort keys %{$cookie} ) {
+                my $val = $cookie->{$key};
+                if ( $val && $key =~ m{expires|_time} ) {
+                    $val = DateTime->from_epoch( epoch => $val );
+                }
+                $t->row( $key, $val );
+            }
+
+            $self->_draw(
+                $t,
+                sprintf( '%s Cookie (%s)', ucfirst($type), $cookie->{name} )
+            );
+        }
+    }
 }
 
 sub _get_content {
@@ -534,7 +556,7 @@ LWP::ConsoleLogger - LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000037
+version 0.000038
 
 =head1 SYNOPSIS
 

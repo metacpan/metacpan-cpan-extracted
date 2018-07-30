@@ -11,6 +11,7 @@
 
 use strict;
 use warnings;
+BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 
 # Assure we don't autodetect Test::More and adjust to it
 use Assert::Refute::Report;

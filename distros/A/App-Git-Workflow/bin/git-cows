@@ -20,7 +20,7 @@ git-cows - checkout whitespace only changed files
 
 =head1 VERSION
 
-This documentation refers to git-cows version 1.0.7
+This documentation refers to git-cows version 1.0.8
 
 =head1 SYNOPSIS
 

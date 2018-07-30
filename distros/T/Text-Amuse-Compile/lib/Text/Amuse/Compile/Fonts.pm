@@ -245,6 +245,16 @@ sub default_font_list {
              type => 'serif',
             },
             {
+             name => 'DejaVu Serif',
+             name => 'DejaVu Serif',
+             type => 'serif',
+            },
+            {
+             name => 'FreeSerif',
+             name => 'FreeSerif',
+             type => 'serif',
+            },
+            {
              name => 'Linux Libertine O',
              desc => 'Linux Libertine',
              type => 'serif',
@@ -276,6 +286,9 @@ sub default_font_list {
             { name => 'Lora',           desc => 'Lora',           type => 'serif' },
             { name => 'Merriweather',   desc => 'Merriweather',   type => 'serif' },
             { name => 'Vollkorn',       desc => 'Vollkorn',       type => 'serif' },
+            # arabic
+            { name => 'Amiri',          desc => 'Amiri',          type => 'serif' },
+            { name => 'Scheherazade',   desc => 'Scheherazade',   type => 'serif' },
             {
              name => 'Antykwa Poltawskiego',
              desc => 'Antykwa Półtawskiego',

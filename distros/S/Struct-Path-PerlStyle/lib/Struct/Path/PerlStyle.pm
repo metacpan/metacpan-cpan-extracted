@@ -4,12 +4,14 @@ use 5.010;
 use strict;
 use warnings FATAL => 'all';
 use parent 'Exporter';
+use utf8;
 
 use Carp 'croak';
-use PPI;
 use Safe;
-use Scalar::Util 'looks_like_number';
+use Text::Balanced qw(extract_bracketed extract_quotelike);
 use re qw(is_regexp regexp_pattern);
+
+require Struct::Path::PerlStyle::Functions;
 
 our @EXPORT_OK = qw(
     path2str
@@ -32,11 +34,11 @@ Struct::Path::PerlStyle - Perl-style syntax frontend for L<Struct::Path|Struct::
 
 =head1 VERSION
 
-Version 0.80
+Version 0.90
 
 =cut
 
-our $VERSION = '0.80';
+our $VERSION = '0.90';
 
 =head1 SYNOPSIS
 
@@ -70,63 +72,72 @@ Nothing is exported by default.
 
 =head1 PATH SYNTAX
 
-Examples:
+Path is a sequence of 'steps', each represents nested level in the structure.
 
-    '{a}{b}'              # points to b's value
-    '{a}{}'               # all values from a's subhash; same for arrays (using empty square brackets)
-    '{a}{b,c}'            # b's and c's values
-    '{a}{"space inside"}' # key must be quoted unless it is a simple word (single quotes supported as well)
-    '{a}{"multi\nline"}'  # same for special characters (if double quoted)
-    '{a}{"π"}'            # keys containing non ASCII characters also must be quoted*
-    '{a}{/pattern/mods}'  # regexp keys match (fully supported, except code expressions)
-    '{a}{b}[0,1,2,5]'     # 0, 1, 2 and 5 array's items
-    '{a}{b}[0..2,5]'      # same, but using ranges
-    '{a}{b}[9..0]'        # descending ranges allowed (perl doesn't)
-    '{a}{b}(back){c}'     # step back (to previous level)
+=head2 Hashes
 
-    * at least until https://github.com/adamkennedy/PPI/issues/168
+Like in perl hash keys should be specified using curly brackets
+
+    {}                  # all values from a's subhash
+    {foo}               # value for 'foo' key
+    {foo,bar}           # slicing: 'foo' and 'bar' values
+    {"space inside"}    # key must be quoted unless it is a simple word
+    {"multi\nline"}     # special characters interpolated when double quoted
+    {/pattern/mods}     # keys regexp match
+
+=head2 Arrays
+
+Square brackets used for array indexes specification
+
+    []                  # all array items
+    [9]                 # 9-th element
+    [0,1,2,5]           # slicing: 0, 1, 2 and 5 array items
+    [0..2,5]            # same, but using ranges
+    [9..0]              # descending ranges allowed
+
+=head2 Hooks
+
+Expressions enclosed in parenthesis treated as hooks and evaluated using
+L<Safe> compartment. Almost all perl operators and core functions available,
+see L<Safe> for more info. Some additional path related functions provided by
+L<Struct::Path::PerlStyle::Functions>.
+
+    [](/pattern/mods)           # match array values by regular expression
+    []{foo}(eq "bar" && back)   # select hashes which have pair 'foo' => 'bar'
+
+There are two global variables available whithin safe compartment: C<$_> which
+refers to value and C<%_> provides current path via key C<path> (in
+L<Struct::Path> notation) and structure levels refs stack via key C<refs>.
+
+=head2 Aliases
+
+String in angle brackets is an alias - shortcut mapped into specified sequence
+of steps. Aliases resolved recursively, so alias may also map into path with
+another aliases.
+
+Aliases map may be defined via global variable
+
+    $Struct::Path::PerlStyle::ALIASES = {
+        foo => '{some}{complex}{path}',
+        bar => '{and}{one}{more}'
+    };
+
+and then
+
+    <foo><bar>      # expands to '{some}{complex}{path}{and}{one}{more}'
+
+or as option for C<str2path>:
+
+    str2path('<foo>', {aliases => {foo => '{long}{path}'}});
 
 =head1 SUBROUTINES
 
 =cut
 
-our $HOOKS = {
-    'back' => sub { # step back $count times
-        my $static = defined $_[0] ? $_[0] : 1;
-        return sub {
-            my $count = $static; # keep arg (reusable closure)
-            while ($count) {
-                croak "Can't step back (root of the structure)"
-                    unless (@{$_[0]} and @{$_[1]});
-                pop @{$_[0]};
-                pop @{$_[1]};
-                $count--;
-            }
-            return 1;
-        };
-    },
-    '=~' => sub {
-        croak "Only one arg accepted by '=~'" if (@_ != 1);
-        my $arg = shift;
-        return sub {
-            return (defined ${$_[1]->[-1]} and ${$_[1]->[-1]} =~ $arg) ? 1 : 0;
-        }
-    },
-    'defined' => sub {
-        croak "no args accepted by 'defined'" if (@_);
-        return sub { return defined (${$_[1]->[-1]}) ? 1 : 0 }
-    },
-    'eq' => sub {
-        croak "Only one arg accepted by 'eq'" if (@_ != 1);
-        my $arg = shift;
-        return sub {
-            return (defined ${$_[1]->[-1]} and ${$_[1]->[-1]} eq $arg) ? 1 : 0;
-        };
-    },
-};
+our $ALIASES;
 
 my %ESCP = (
-    '\\' => '\\\\', # single => double
+#    '\\' => '\\\\', # single => double
     '"'  => '\"',
     "\a" => '\a',
     "\b" => '\b',
@@ -141,15 +152,40 @@ my $ESCP = join('', sort keys %ESCP);
 my %INTP = map { $ESCP{$_} => $_ } keys %ESCP; # swap keys <-> values
 my $INTP = join('|', map { "\Q$_\E" } sort keys %INTP);
 
-my $RSAFE = Safe->new;
-$RSAFE->permit_only(
-    'const',
-    'lineseq',
-    'qr',
-    'leaveeval',
-    'rv2gv',
-    'padany',
+# $_ will be substituted (if omitted) as first arg if placed on start of
+# hook expression
+my $COMPL_OPS = join('|', map { "\Q$_\E" }
+    qw(< > <= => lt gt le ge == != eq ne ~~ =~));
+
+my $HASH_KEY_CHARS = qr/[\p{Alnum}_\.\-\+]/;
+
+our $HOOK_STRICT = 1;
+
+my $SAFE = Safe->new;
+$SAFE->share_from(
+    'Struct::Path::PerlStyle::Functions',
+    \@Struct::Path::PerlStyle::Functions::EXPORT_OK
 );
+$SAFE->deny('warn');
+
+my $QR_MAP = {
+    ''   => sub { qr/$_[0]/ },
+    i    => sub { qr/$_[0]/i },
+    m    => sub { qr/$_[0]/m },
+    s    => sub { qr/$_[0]/s },
+    x    => sub { qr/$_[0]/x },
+    im   => sub { qr/$_[0]/im },
+    is   => sub { qr/$_[0]/is },
+    ix   => sub { qr/$_[0]/ix },
+    ms   => sub { qr/$_[0]/ms },
+    mx   => sub { qr/$_[0]/mx },
+    sx   => sub { qr/$_[0]/sx },
+    ims  => sub { qr/$_[0]/ims },
+    imx  => sub { qr/$_[0]/imx },
+    isx  => sub { qr/$_[0]/isx },
+    msx  => sub { qr/$_[0]/msx },
+    imsx => sub { qr/$_[0]/imsx },
+};
 
 =head2 str2path
 
@@ -159,103 +195,141 @@ Convert perl-style string to L<Struct::Path|Struct::Path> path structure
 
 =cut
 
-sub str2path($;$);
+sub _push_hash {
+    my ($steps, $text) = @_;
+    my ($body, $delim, $mods, %step, $token, $type);
+
+    while ($text) {
+        ($token, $text, $type, $delim, $body, $mods) =
+            (extract_quotelike($text))[0,1,3,4,5,10];
+
+        if (not defined $delim) { # bareword
+            push @{$step{K}}, $token = $1
+                if ($text =~ s/^\s*($HASH_KEY_CHARS+)//);
+        } elsif (!$type and $delim eq '"') {
+            $body =~ s/($INTP)/$INTP{$1}/gs; # interpolate
+            push @{$step{K}}, $body;
+        } elsif (!$type and $delim eq "'") {
+            push @{$step{K}}, $body;
+        } elsif ($delim eq '/' and !$type or $type eq 'm') {
+            $mods = join('', sort(split('', $mods)));
+            eval { push @{$step{R}}, $QR_MAP->{$mods}->($body) };
+            if ($@) {
+                (my $err = $@) =~ s/ at .+//s;
+                croak "Step #" . scalar @{$steps} . " $err";
+            }
+        } else { # things like qr, qw and so on
+            substr($text, 0, 0, $token);
+            undef $token;
+        }
+
+        croak "Unsupported key '$text', step #" . @{$steps}
+            if (!defined $token);
+
+        $text =~ s/^\s+//; # discard trailing spaces
+
+        if ($text ne '') {
+            if ($text =~ s/^,//) {
+                croak "Trailing delimiter at step #" . @{$steps}
+                    if ($text eq '');
+            } else {
+                croak "Delimiter expected before '$text', step #" . @{$steps};
+            }
+        }
+    }
+
+    push @{$steps}, \%step;
+}
+
+sub _push_hook {
+    my ($steps, $text) = @_;
+
+    # substitute default value if omitted
+    $text =~ s/^\s*/\$_ /
+        if ($text =~ /^\s*(!\s*|not\s+)*($COMPL_OPS)/);
+
+    my $hook = 'sub {' .
+        '$^W = 0; ' .
+        'local %_ = ("path", $_[0], "refs", $_[1]); ' .
+        'local $_ = (ref $_[1] eq "ARRAY" and @{$_[1]}) ? ${$_[1]->[-1]} : undef; ' .
+        $text .
+    '}';
+
+    open (local *STDERR,'>', \(my $stderr)); # catch compilation errors
+
+    unless ($hook = $SAFE->reval($hook, $HOOK_STRICT)) {
+        if ($stderr) {
+            $stderr =~ s/ at \(eval \d+\) .+//s;
+            $stderr = " ($stderr)";
+        } else {
+            $stderr = "";
+        }
+
+        (my $err = $@) =~ s/ at \(eval \d+\) .+//s;
+        croak "Failed to eval hook '$text': $err, step #" . @{$steps} . $stderr;
+    }
+
+    push @{$steps}, $hook;
+}
+
+sub _push_list {
+    my ($steps, $text) = @_;
+    my (@range, @step);
+
+    for my $i (split /\s*,\s*/, $text, -1) {
+        @range = grep {
+            croak "Incorrect array index '$i', step #" . @{$steps}
+                unless (eval { $_ == int($_) });
+        } ($i =~ /^\s*(-?\d+)\s*\.\.\s*(-?\d+)\s*$/) ? ($1, $2) : $i;
+
+        push @step, $range[0] < $range[-1]
+            ? $range[0] .. $range[-1]
+            : reverse $range[-1] .. $range[0];
+    }
+
+    push @{$steps}, \@step;
+}
+
 sub str2path($;$) {
     my ($path, $opts) = @_;
 
     croak "Undefined path passed" unless (defined $path);
-    my $doc = PPI::Document->new(ref $path ? $path : \$path);
-    croak "Failed to parse passed path '$path'" unless (defined $doc);
-    my @out;
 
-    for my $step (map { $_->can('elements') ? $_->elements : $_ } $doc->elements) {
-        $step->prune('PPI::Token::Whitespace') if $step->can('prune');
+    local $ALIASES = $opts->{aliases} if (exists $opts->{aliases});
 
-        if ($step->isa('PPI::Structure') and $step->start eq '{' and $step->finish) {
-            push @out, {};
-            for my $t (map { $_->elements } $step->children) {
-                if ($t->isa('PPI::Token::Word') or $t->isa('PPI::Token::Number')) {
-                    push @{$out[-1]->{K}}, $t->content;
-                } elsif ($t->isa('PPI::Token::Operator') and $t eq ',') {
-                    ;
-                } elsif ($t->isa('PPI::Token::Quote::Single')) {
-                    push @{$out[-1]->{K}}, $t->literal;
-                } elsif ($t->isa('PPI::Token::Quote::Double')) {
-                    push @{$out[-1]->{K}}, $t->string;
-                    $out[-1]->{K}->[-1] =~ s/($INTP)/$INTP{$1}/gs; # interpolate
-                } elsif (
-                    $t->isa('PPI::Token::Regexp::Match') or
-                    $t->isa('PPI::Token::QuoteLike::Regexp')
-                ) {
-                    push @{$out[-1]->{R}}, $RSAFE->reval(
-                        'qr/' . $t->get_match_string . '/' .
-                        join('', keys %{$t->get_modifiers}), 1
-                    );
-                    if ($@) {
-                        (my $err = $@) =~ s/ at \(eval \d+\) .+//s;
-                        croak "Step #$#out: failed to evaluate regexp: $err";
-                    }
-                } else {
-                    croak "Unsupported thing '$t' for hash key, step #$#out";
-                }
+    my (@steps, $step, $type);
+
+    while ($path) {
+        # separated match: to be able to have another brackets inside;
+        # currently mostly for hooks, for example: '( $x > $y )'
+        for ('{"}', '["]', '(")', '<">') {
+            ($step, $path) = extract_bracketed($path, $_, '');
+            last if ($step);
+        }
+
+        croak "Unsupported thing in the path, step #" . @steps . ": '$path'"
+            unless ($step);
+
+        $type = substr $step,  0, 1, ''; # remove leading bracket
+                substr $step, -1, 1, ''; # remove trailing bracket
+
+        if ($type eq '{') {
+            _push_hash(\@steps, $step);
+        } elsif ($type eq '[') {
+            _push_list(\@steps, $step);
+        } elsif ($type eq '(') {
+            _push_hook(\@steps, $step);
+        } else { # <>
+            if (exists $ALIASES->{$step}) {
+                substr $path, 0, 0, $ALIASES->{$step};
+                redo;
             }
-        } elsif ($step->isa('PPI::Structure') and $step->start eq '[' and $step->finish) {
-            push @out, [];
-            my $range;
-            for my $t (map { $_->elements } $step->children) {
-                if ($t->isa('PPI::Token::Number')) {
-                    croak "Incorrect array index '$t', step #$#out"
-                        unless ($t->content == int($t));
-                    if (defined $range) {
-                        push @{$out[-1]},
-                            ($range < $t->content ? $range .. $t : reverse $t .. $range);
-                        $range = undef;
-                    } else {
-                        push @{$out[-1]}, int($t);
-                    }
-                } elsif ($t->isa('PPI::Token::Operator') and $t eq ',') {
-                    ;
-                } elsif ($t->isa('PPI::Token::Operator') and $t eq '..') {
-                    $range = pop(@{$out[-1]});
-                    croak "Range start absent, step #$#out"
-                        unless (defined $range);
-                } else {
-                    croak "Unsupported thing '$t' for array index, step #$#out";
-                }
-            }
-            croak "Unfinished range secified, step #$#out" if ($range);
-        } elsif ($step->isa('PPI::Structure') and $step->start eq '(' and $step->finish) {
-            my ($hook, @args) = map { $_->elements } $step->children;
-            my $neg;
-            if ($hook eq 'not' or $hook eq '!') {
-                $neg = $hook;
-                $hook = shift @args;
-            }
-            croak "Unsupported thing '$hook' as hook, step #" . @out
-                unless ($hook->isa('PPI::Token::Operator') or $hook->isa('PPI::Token::Word'));
-            croak "Unsupported hook '$hook', step #" . @out
-                unless (exists $HOOKS->{$hook});
-            @args = map {
-                if ($_->isa('PPI::Token::Quote::Single') or $_->isa('PPI::Token::Number')) {
-                    $_->literal;
-                } elsif ($_->isa('PPI::Token::Quote::Double')) {
-                    $_->string;
-                } else {
-                    croak "Unsupported thing '$_' as hook argument, step #" . @out;
-                }
-            } @args;
-            $hook = $HOOKS->{$hook}->(@args); # closure with saved args
-            push @out, ($neg ? sub { not $hook->(@_) } : $hook);
-        } elsif ($step->isa('PPI::Token::Symbol') and $step->raw_type eq '$') {
-            my $name = substr($step, 1); # cut off sigil
-            croak "Unknown alias '$name'" unless (exists $opts->{aliases}->{$name});
-            push @out, @{str2path($opts->{aliases}->{$name}, $opts)};
-        } else {
-            croak "Unsupported thing '$step' in the path, step #" . @out;
+
+            croak "Unknown alias '$step'";
         }
     }
 
-    return \@out;
+    return \@steps;
 }
 
 =head2 path2str
@@ -279,7 +353,7 @@ sub path2str($) {
         if (ref $step eq 'ARRAY') {
             for my $i (@{$step}) {
                 croak "Incorrect array index '" . ($i // 'undef') . "', step #$sc"
-                    unless (looks_like_number($i) and int($i) == $i);
+                    unless (eval { int($i) == $i });
                 if (@items and (
                     $items[-1][0] < $i and $items[-1][-1] == $i - 1 or   # ascending
                     $items[-1][0] > $i and $items[-1][-1] == $i + 1      # descending
@@ -318,9 +392,7 @@ sub path2str($) {
 
                     push @items, $k;
 
-                    unless (looks_like_number($k) or $k =~ /^[0-9a-zA-Z_]+$/) {
-                        # \w doesn't fit -- PPI can't parse unquoted utf8 hash keys
-                        # https://github.com/adamkennedy/PPI/issues/168#issuecomment-180506979
+                    unless ($k =~ /^$HASH_KEY_CHARS+$/) {
                         $items[-1] =~ s/([\Q$ESCP\E])/$ESCP{$1}/gs;    # escape
                         $items[-1] = qq("$items[-1]");                 # quote
                     }
@@ -336,7 +408,7 @@ sub path2str($) {
                         unless (is_regexp($r));
 
                     my ($patt, $mods) = regexp_pattern($r);
-                    $patt =~ s|/|\\/|g;
+                    $mods =~ s/[dlu]//g; # for Perl's internal use (c) perlre
                     push @items, "/$patt/$mods";
                 }
             }
@@ -393,11 +465,12 @@ L<http://search.cpan.org/dist/Struct-Path-PerlStyle/>
 
 =head1 SEE ALSO
 
-L<Struct::Path>, L<Struct::Diff>, L<perldsc>, L<perldata>
+L<Struct::Path>, L<Struct::Path::JsonPointer>, L<Struct::Diff>
+L<perldsc>, L<perldata>, L<Safe>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016,2017 Michael Samoglyadov.
+Copyright 2016-2018 Michael Samoglyadov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

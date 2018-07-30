@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::ButBefore;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Create a preceding task
-$Taskwarrior::Kusarigama::Plugin::Command::ButBefore::VERSION = '0.9.1';
+$Taskwarrior::Kusarigama::Plugin::Command::ButBefore::VERSION = '0.9.2';
 
 use 5.10.0;
 
@@ -50,7 +50,7 @@ Taskwarrior::Kusarigama::Plugin::Command::ButBefore - Create a preceding task
 
 =head1 VERSION
 
-version 0.9.1
+version 0.9.2
 
 =head1 SYNOPSIS
 

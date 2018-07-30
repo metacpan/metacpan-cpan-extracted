@@ -1,5 +1,8 @@
 Revision history for Dancer2-Plugin-Auth-OAuth
 
+0.16  2018-07-26 13:46:51 CEST
+        - merged github PR #16 (thanks dpnub!)
+
 0.15  2018-04-30 21:48:43 CEST
         - added Mail.ru and Yandex, thanks to https://github.com/beast-den
         - documentation updated to include configuration settings

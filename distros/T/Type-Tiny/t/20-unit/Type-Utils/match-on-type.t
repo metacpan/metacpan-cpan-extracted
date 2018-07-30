@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -88,6 +88,18 @@ is(
 	'to_json_2 using match_on_type works',
 );
 
+like(
+	exception { to_json(do { my $x = "hello"; \$x }) },
+	qr{\ASCALAR\(\w+\) is not acceptable json type},
+	"fallthrough works for compile_match_on_type",
+);
+
+like(
+	exception { to_json_2(do { my $x = "hello"; \$x }) },
+	qr{\ASCALAR\(\w+\) is not acceptable json type},
+	"fallthrough works for match_on_type",
+);
+
 my $compiled1 = compile_match_on_type(
 	HashRef()  => sub { 'HASH' },
 	ArrayRef() => sub { 'ARRAY' },
@@ -140,7 +152,7 @@ like(
 	'coderef compiled by compile_match_on_type with no match',
 );
 
-my $context;
+our $context;
 MATCH_VOID: {
 	match_on_type([], ArrayRef, sub { $context = wantarray });
 	ok(!defined($context), 'match_on_type void context');
@@ -152,6 +164,18 @@ MATCH_SCALAR: {
 MATCH_LIST: {
 	my @x = match_on_type([], ArrayRef, sub { $context = wantarray });
 	ok(defined($context) && $context, 'match_on_type list context');
+};
+MATCH_VOID_STRINGOFCODE: {
+	match_on_type([], ArrayRef, q{ $::context = wantarray });
+	ok(!defined($context), 'match_on_type void context (string of code)');
+};
+MATCH_SCALAR_STRINGOFCODE: {
+	my $x = match_on_type([], ArrayRef, q{ $::context = wantarray });
+	ok(defined($context) && !$context, 'match_on_type scalar context (string of code)');
+};
+MATCH_LIST_STRINGOFCODE: {
+	my @x = match_on_type([], ArrayRef, q{ $::context = wantarray });
+	ok(defined($context) && $context, 'match_on_type list context (string of code)');
 };
 my $compiled = compile_match_on_type(ArrayRef, sub { $context = wantarray });
 COMPILE_VOID: {

@@ -2,7 +2,7 @@ package Assert::Refute::T::Numeric;
 
 use strict;
 use warnings;
-our $VERSION = '0.1201';
+our $VERSION = '0.1301';
 
 =head1 NAME
 

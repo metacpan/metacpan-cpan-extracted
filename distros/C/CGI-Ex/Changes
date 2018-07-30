@@ -1,3 +1,9 @@
+2.46
+    2018-07-24
+        * Skip replace validation types in CGI::Ex::Validate when the corresponding form key's value is undef (thanks to Matt Devey)
+        * Test added for CGI::Ex::Validate skipping replace validation when form key's value is undef (thanks to Charles McGarvey)
+        * Removed copyright years as they weren't necessary
+
 2.45
     2017-07-23
         * Lost commits from 2.43 have been restored in this version

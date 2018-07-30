@@ -1,5 +1,5 @@
 package LWP::ConsoleLogger::Easy;
-our $VERSION = '0.000037';
+our $VERSION = '0.000038';
 use strict;
 use warnings;
 
@@ -80,7 +80,7 @@ LWP::ConsoleLogger::Easy - Easy LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000037
+version 0.000038
 
 =head1 SYNOPSIS
 

@@ -3,13 +3,13 @@ package Crypt::Perl;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 =encoding utf-8
 
 =head1 NAME
 
-Crypt::Perl - Cryptography in Pure Perl
+Crypt::Perl - Cryptography in pure Perl
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ a broad variety of extensions
 
 =item * L<ECDSA|Crypt::Perl::ECDSA>
 
-=item * L<ECDSA|Crypt::Perl::Ed25519>
+=item * L<Ed25519|Crypt::Perl::Ed25519>
 
 =back
 

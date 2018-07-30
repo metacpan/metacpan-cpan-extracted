@@ -1,14 +1,13 @@
 
 use lib 't/lib';
 
-unlink '/tmp/envoy';
-
 use Test::More;
 use My::Envoy::Widget;
+use Test::Exception;
 use My::Envoy::Part;
 
-My::Envoy::Widget->_schema->storage->dbh->do( My::DB::Result::Widget->sql );
-My::Envoy::Widget->_schema->storage->dbh->do( My::DB::Result::Part->sql );
+my $schema = My::DB->db_connect;
+$schema->deploy;
 
 my $test = new My::Envoy::Widget(
     id         => 1,
@@ -55,6 +54,11 @@ subtest "Updating a Model" => sub {
     isa_ok( $test->parts->[0], 'My::Envoy::Part', "Related Model" );
     is( $test->parts->[0]->id, 3, "Related Model id" );
     is( $test->parts->[1]->name, 'buzz', "Related Model name" );
+
+    $test->save;
+
+    ok( $test->in_storage('DBIC') );
+    dies_ok( sub { $test->in_storage('NotAThing') } );
 };
 
 $test->delete;

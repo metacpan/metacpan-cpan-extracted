@@ -293,7 +293,7 @@ sub _cleanup_text_block {
     $parsed =~ s!(<[^/]*?>)( +)!$2$1!g;
     $recursion++;
   }
-  # empty links artefacts.
+  # empty links artifacts.
   $parsed =~ s/\[\[\]\]//g;
   $parsed =~ s/\s+/ /gs;
   $parsed =~ s/\A\s+//;

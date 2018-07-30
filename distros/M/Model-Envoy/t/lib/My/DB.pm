@@ -5,12 +5,14 @@ use warnings;
 
 use base 'DBIx::Class::Schema';
 
+my $schema;
+
 sub db_connect {
-    my( $schema, $filename ) = @_;
+    my( $class ) = @_;
 
-    $filename ||= '/tmp/testdata';
+    $schema //= $class->connect( "dbi:SQLite:dbname=",'','');
 
-    return $schema->connect( "dbi:SQLite:dbname=$filename",'','');
+    return $schema;
 }
 
 __PACKAGE__->load_namespaces;

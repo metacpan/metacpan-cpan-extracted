@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,21 +14,25 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "lazy",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "lazy",
   "PREREQ_PM" => {
     "App::cpm" => "0.975",
     "App::cpm::CLI" => 0,
+    "Carp" => 0,
     "Getopt::Long" => 0,
     "Module::Loaded" => 0,
+    "Try::Tiny" => 0,
     "local::lib" => "2.000024",
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "App::cpm::Resolver::02Packages" => 0,
     "Capture::Tiny" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "LWP" => "6.35",
     "Path::Iterator::Rule" => 0,
     "Path::Tiny" => 0,
     "Test::More" => 0,
@@ -36,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::TempDir::Tiny" => 0,
     "local::lib" => "2.000024"
   },
-  "VERSION" => "0.000007",
+  "VERSION" => "0.000009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,16 +50,20 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "App::cpm" => "0.975",
   "App::cpm::CLI" => 0,
+  "App::cpm::Resolver::02Packages" => 0,
   "Capture::Tiny" => 0,
+  "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => 0,
+  "LWP" => "6.35",
   "Module::Loaded" => 0,
   "Path::Iterator::Rule" => 0,
   "Path::Tiny" => 0,
   "Test::More" => 0,
   "Test::RequiresInternet" => 0,
   "Test::TempDir::Tiny" => 0,
+  "Try::Tiny" => 0,
   "local::lib" => "2.000024",
   "strict" => 0,
   "warnings" => 0

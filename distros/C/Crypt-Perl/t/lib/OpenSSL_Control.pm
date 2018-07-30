@@ -71,6 +71,30 @@ sub can_ecdsa {
     return !$_ecdsa_test_err;
 }
 
+my $_can_ed25519;
+sub can_ed25519 {
+    my ($self) = @_;
+
+    if (!defined $_can_ed25519) {
+        my $bin = openssl_bin();
+
+        diag "Checking $bin for ed25519 support …";
+
+        system { $bin } $bin, 'genpkey', '-algorithm', 'ed25519';
+
+        if ($?) {
+            $_can_ed25519 = 0;
+            diag "$bin does not support ed25519.";
+        }
+        else {
+            $_can_ed25519 = 1;
+            diag "$bin supports ed25519.";
+        }
+    }
+
+    return $_can_ed25519;
+}
+
 my $_has_ecdsa_verify_private_bug;
 
 # Certain old OpenSSL versions (0.9.8zg … maybe others?) fail to recognize
@@ -179,7 +203,15 @@ sub __ecparam {
 
 my $ossl_bin;
 sub openssl_bin {
-    return $ossl_bin ||= File::Which::which('openssl');
+    return $ossl_bin ||= do {
+        diag "Looking for OpenSSL binary …";
+
+        my $bin = File::Which::which('openssl');
+
+        diag "Found OpenSSL: $bin";
+
+        $bin;
+    };
 }
 
 BEGIN {

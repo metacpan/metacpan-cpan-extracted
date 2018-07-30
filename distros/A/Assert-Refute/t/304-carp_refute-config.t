@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 use Test::More tests => 5;
 use Assert::Refute::T::Errors;
 

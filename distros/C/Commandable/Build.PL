@@ -9,6 +9,7 @@ my $build = Module::Build->new(
       'Module::Build' => "0.4004", # test_requires
    },
    requires => {
+      'perl' => '5.010', # //
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Hook::OnExit;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Role for plugins running during the exit stage
-$Taskwarrior::Kusarigama::Hook::OnExit::VERSION = '0.9.1';
+$Taskwarrior::Kusarigama::Hook::OnExit::VERSION = '0.9.2';
 use strict;
 use warnings;
 
@@ -24,7 +24,7 @@ Taskwarrior::Kusarigama::Hook::OnExit - Role for plugins running during the exit
 
 =head1 VERSION
 
-version 0.9.1
+version 0.9.2
 
 =head1 SYNOPSIS
 

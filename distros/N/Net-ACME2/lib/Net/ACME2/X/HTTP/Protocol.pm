@@ -13,7 +13,7 @@ request, and the problem had specifically to do with something
 that happened on the remote server, not just a general connection
 problem. For example, this class would be suitable for use when
 you get a 500 (Internal Server Error) or a 404 (Not Found), but it
-would not be suitable for use if you get a Connection Refused
+would not be suitable for use if you get a Connection Refused TCP
 error when trying to connect.
 
 =cut
@@ -21,7 +21,7 @@ error when trying to connect.
 use strict;
 use warnings;
 
-use parent qw( Net::ACME2::X::Base );
+use parent qw( Net::ACME2::X::Generic );
 
 # In a normal HTTP response, we don't necessarily know if the body is going
 # to be meaningful for display, so only include the first chunk.

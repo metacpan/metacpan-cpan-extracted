@@ -250,6 +250,19 @@ set(Duk* duk, const char* name, SV* value)
     pl_stats_stop(aTHX_ duk, &stats, "set");
   OUTPUT: RETVAL
 
+int
+remove(Duk* duk, const char* name)
+  PREINIT:
+    duk_context* ctx = 0;
+    Stats stats;
+  CODE:
+    TIMEOUT_RESET(duk);
+    ctx = duk->ctx;
+    pl_stats_start(aTHX_ duk, &stats);
+    RETVAL = pl_del_global_or_property(aTHX_ ctx, name);
+    pl_stats_stop(aTHX_ duk, &stats, "remove");
+  OUTPUT: RETVAL
+
 SV*
 eval(Duk* duk, const char* js, const char* file = 0)
   CODE:
@@ -282,10 +295,12 @@ run_gc(Duk* duk)
 SV*
 global_objects(Duk* duk)
   PREINIT:
+    duk_context* ctx = 0;
     Stats stats;
   CODE:
     TIMEOUT_RESET(duk);
+    ctx = duk->ctx;
     pl_stats_start(aTHX_ duk, &stats);
-    RETVAL = pl_global_objects(duk);
+    RETVAL = pl_global_objects(aTHX_ ctx);
     pl_stats_stop(aTHX_ duk, &stats, "global_objects");
   OUTPUT: RETVAL

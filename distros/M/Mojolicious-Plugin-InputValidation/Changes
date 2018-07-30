@@ -1,0 +1,11 @@
+Revision history for Mojolicious-Plugin-InputValidation
+
+0.04    2018-07-28
+        Be more backcompat with older perls by removing postderefs
+0.03    2018-07-28
+        Tell PAUSE to not index private packages
+0.02    2018-07-28
+        Declare dependency on Mojolicious
+0.01    2018-07-27
+        First version, released on an unsuspecting world.
+

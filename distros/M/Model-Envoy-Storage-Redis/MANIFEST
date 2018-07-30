@@ -4,8 +4,13 @@ Build.PL
 lib/Model/Envoy/Storage/Redis.pm
 t/pod.t
 t/storage.t
+t/live_storage.t
 t/lib/My/Envoy/Widget.pm
 t/lib/MockRedis.pm
 t/lib/My/Envoy.pm
+t/lib/My/CachedEnvoy.pm
+t/lib/My/Envoy/CachedWidget.pm
+t/lib/Test/SpawnRedisServer.pm
 META.yml
 META.json
+

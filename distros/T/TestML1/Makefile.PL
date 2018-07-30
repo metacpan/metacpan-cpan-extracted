@@ -13,7 +13,7 @@ install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A Generic Software Testing Meta Language",
+  "ABSTRACT" => "DEPRECATED Generic Software Testing Meta Language",
   "AUTHOR" => "Ingy d\x{f6}t Net <ingy\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -27,9 +27,10 @@ my %WriteMakefileArgs = (
     "Pegex" => "0.30"
   },
   "TEST_REQUIRES" => {
-    "Capture::Tiny" => 0
+    "Capture::Tiny" => 0,
+    "Test::Differences" => 0
   },
-  "VERSION" => "0.55",
+  "VERSION" => "0.57",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +39,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
-  "Pegex" => "0.30"
+  "Pegex" => "0.30",
+  "Test::Differences" => 0
 );
 
 

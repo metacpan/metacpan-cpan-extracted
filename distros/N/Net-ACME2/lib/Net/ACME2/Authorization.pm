@@ -24,6 +24,7 @@ use Net::ACME2::Challenge ();
 #Pre-load challenge classes.
 use Net::ACME2::Challenge::http_01 ();
 use Net::ACME2::Challenge::dns_01 ();
+use Net::ACME2::Challenge::tls_alpn_01 ();
 
 use constant _ACCESSORS => (
     'id',

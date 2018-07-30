@@ -1,0 +1,23 @@
+---
+abstract: 'access Melbourne public transport data.'
+author:
+  - 'Greg Foletta <greg@foletta.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Transport-AU-PTV
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/gregfoletta/Transport-AU-PTV/issues
+  homepage: https://github.com/gregfoletta/Transport-AU-PTV
+  repository: https://github.com/gregfoletta/Transport-AU-PTV.git
+version: '0.01'
+x_generated_by_perl: v5.29.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

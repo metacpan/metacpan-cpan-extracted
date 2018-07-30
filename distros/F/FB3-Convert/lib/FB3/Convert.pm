@@ -21,7 +21,7 @@ use XML::Entities::Data;
 use Time::HiRes qw(gettimeofday sleep);
 binmode(STDOUT,':utf8');
 
-our $VERSION = 0.08;
+our $VERSION = 0.11;
 
 =head1 NAME
 
@@ -36,11 +36,10 @@ my %MODULES;
     'class' => 'FB3::Convert::Epub',
     'unpack' => 1,
   },
-  'fb2' => { #не реализовано. просто пример подключения модуля в конвертор
+  'fb2' => {
     'class' => 'FB3::Convert::FB2',
-    'unpack' => ['fb2.zip']
+    'unpack' => 0,
   },
-  'fb2.zip' => \$MODULES{'fb2'},
 );
 
 my @BlockLevel =
@@ -177,191 +176,6 @@ my %AllowElementsMain = (
   
 );
 
-my %GenreTranslate = (
-  'accounting'=>'Бухучет, налогообложение, аудит',
-  'adventure'=>'Приключения',
-  'adv_animal'=>'Природа и животные',
-  'adv_geo'=>'Книги о Путешествиях',
-  'adv_history'=>'Исторические приключения',
-  'adv_maritime'=>'Морские приключения',
-  'adv_western'=>'Вестерны',
-  'antique'=>'Старинная литература',
-  'antique_ant'=>'Античная литература',
-  'antique_east'=>'Древневосточная литература',
-  'antique_european'=>'Европейская старинная литература',
-  'antique_myths'=>'Мифы. Легенды. Эпос',
-  'antique_russian'=>'Древнерусская литература',
-  'aphorism_quote'=>'Афоризмы и цитаты',
-  'architecture_book'=>'Архитектура',
-  'auto_regulations'=>'Автомобили и ПДД',
-  'banking'=>'Банковское дело',
-  'beginning_authors'=>'Начинающие авторы',
-  'samizdat'=>'Самиздат',
-  'children'=>'Книги для детей',
-  'child_adv'=>'Детские приключения',
-  'child_det'=>'Детские детективы',
-  'child_education'=>'Учебная литература',
-  'child_prose'=>'Детская проза',
-  'child_sf'=>'Детская фантастика',
-  'child_tale'=>'Сказки',
-  'child_verse'=>'Детские стихи',
-  'cinema_theatre'=>'Кинематограф, театр',
-  'city_fantasy'=>'Городское фэнтези',
-  'computers'=>'Компьютеры',
-  'comp_db'=>'Базы данных',
-  'comp_hard'=>'Компьютерное Железо',
-  'comp_osnet'=>'ОС и Сети',
-  'comp_programming'=>'Программирование',
-  'comp_soft'=>'Программы',
-  'comp_www'=>'Интернет',
-  'detective'=>'Современные детективы',
-  'det_action'=>'Боевики',
-  'det_classic'=>'Классические детективы',
-  'det_crime'=>'Криминальные боевики',
-  'det_espionage'=>'Шпионские детективы',
-  'det_hard'=>'Крутой детектив',
-  'det_history'=>'Исторические детективы',
-  'det_irony'=>'Иронические детективы',
-  'det_police'=>'Полицейские детективы',
-  'det_political'=>'Политические детективы',
-  'dragon_fantasy'=>'Фэнтези про драконов',
-  'dramaturgy'=>'Драматургия',
-  'economics'=>'Экономика',
-  'essays'=>'Эссе',
-  'fantasy_fight'=>'Боевое фэнтези',
-  'foreign_action'=>'Зарубежные боевики',
-  'foreign_adventure'=>'Зарубежные приключения',
-  'foreign_antique'=>'Зарубежная старинная литература',
-  'foreign_business'=>'Зарубежная деловая литература',
-  'foreign_children'=>'Зарубежные детские книги',
-  'foreign_comp'=>'Зарубежная компьютерная литература',
-  'foreign_contemporary'=>'Современная зарубежная литература',
-  'foreign_desc'=>'Зарубежная справочная литература',
-  'foreign_detective'=>'Зарубежные детективы',
-  'foreign_dramaturgy'=>'Зарубежная драматургия',
-  'foreign_edu'=>'Зарубежная образовательная литература',
-  'foreign_fantasy'=>'Зарубежное фэнтези',
-  'foreign_home'=>'Зарубежная прикладная и научно-популярная литература',
-  'foreign_humor'=>'Зарубежный юмор',
-  'foreign_language'=>'Иностранные языки',
-  'foreign_love'=>'Зарубежные любовные романы',
-  'foreign_other'=>'Зарубежное',
-  'foreign_poetry'=>'Зарубежные стихи',
-  'foreign_prose'=>'Зарубежная классика',
-  'foreign_psychology'=>'Зарубежная психология',
-  'foreign_publicism'=>'Зарубежная публицистика',
-  'foreign_religion'=>'Зарубежная эзотерическая и религиозная литература',
-  'foreign_sf'=>'Зарубежная фантастика',
-  'geography_book'=>'География',
-  'geo_guides'=>'Путеводители',
-  'global_economy'=>'ВЭД',
-  'historical_fantasy'=>'Историческое фэнтези',
-  'home'=>'Дом и Семья',
-  'home_cooking'=>'Кулинария',
-  'home_crafts'=>'Хобби, Ремесла',
-  'home_diy'=>'Сделай Сам',
-  'home_entertain'=>'Развлечения',
-  'home_garden'=>'Сад и Огород',
-  'home_health'=>'Здоровье',
-  'home_pets'=>'Домашние Животные',
-  'home_sex'=>'Эротика, Секс',
-  'home_sport'=>'Спорт, фитнес',
-  'humor'=>'Юмор',
-  'humor_anecdote'=>'Анекдоты',
-  'humor_fantasy'=>'Юмористическое фэнтези',
-  'humor_prose'=>'Юмористическая проза',
-  'humor_verse'=>'Юмористические стихи',
-  'industries'=>'Отраслевые издания',
-  'job_hunting'=>'Поиск работы, карьера',
-  'literature_18'=>'Литература 18 века',
-  'literature_19'=>'Литература 19 века',
-  'literature_20'=>'Литература 20 века',
-  'love_contemporary'=>'Современные любовные романы',
-  'love_detective'=>'Остросюжетные любовные романы',
-  'love_erotica'=>'Эротическая литература',
-  'love_fantasy'=>'Любовное фэнтези',
-  'love_history'=>'Исторические любовные романы',
-  'love_sf'=>'Любовно-фантастические романы',
-  'love_short'=>'Короткие любовные романы',
-  'magician_book'=>'Книги про волшебников',
-  'management'=>'Управление, подбор персонала',
-  'marketing'=>'Маркетинг, PR, реклама',
-  'military_special'=>'Военное дело, спецслужбы',
-  'music_dancing'=>'Музыка, балет',
-  'narrative'=>'Повести',
-  'newspapers'=>'Газеты',
-  'nonfiction'=>'Документальная литература',
-  'nonf_biography'=>'Биографии и Мемуары',
-  'nonf_criticism'=>'Критика',
-  'nonf_publicism'=>'Публицистика',
-  'org_behavior'=>'Корпоративная культура',
-  'paper_work'=>'Делопроизводство',
-  'pedagogy_book'=>'Педагогика',
-  'periodic'=>'Журналы',
-  'personal_finance'=>'Личные финансы',
-  'poetry'=>'Поэзия',
-  'popadanec'=>'Попаданцы',
-  'popular_business'=>'О бизнесе популярно',
-  'prose_classic'=>'Классическая проза',
-  'prose_counter'=>'Контркультура',
-  'prose_history'=>'Историческая литература',
-  'prose_military'=>'Книги о войне',
-  'prose_rus_classic'=>'Русская классика',
-  'prose_su_classics'=>'Советская литература',
-  'psy_alassic'=>'Классики психологии',
-  'psy_childs'=>'Детская психология',
-  'psy_generic'=>'Общая психология',
-  'psy_personal'=>'Личностный рост',
-  'psy_sex_and_family'=>'Секс и семейная психология',
-  'psy_social'=>'Социальная психология',
-  'psy_theraphy'=>'Психотерапия и консультирование',
-  'real_estate'=>'Недвижимость',
-  'reference'=>'Справочная литература',
-  'ref_dict'=>'Словари',
-  'ref_encyc'=>'Энциклопедии',
-  'ref_guide'=>'Руководства',
-  'ref_ref'=>'Справочники',
-  'religion'=>'Религия',
-  'religion_esoterics'=>'Эзотерика',
-  'religion_rel'=>'Религиозные тексты',
-  'religion_self'=>'Самосовершенствование',
-  'russian_contemporary'=>'Современная русская литература',
-  'russian_fantasy'=>'Русское фэнтези',
-  'science'=>'Прочая образовательная литература',
-  'sci_biology'=>'Биология',
-  'sci_chem'=>'Химия',
-  'sci_culture'=>'Культурология',
-  'sci_history'=>'История',
-  'sci_juris'=>'Юриспруденция, право',
-  'sci_linguistic'=>'Языкознание',
-  'sci_math'=>'Математика',
-  'sci_medicine'=>'Медицина',
-  'sci_philosophy'=>'Философия',
-  'sci_phys'=>'Физика',
-  'sci_politics'=>'Политика, политология',
-  'sci_religion'=>'Религиоведение',
-  'sci_tech'=>'Техническая литература',
-  'sf'=>'Научная фантастика',
-  'sf_action'=>'Боевая фантастика',
-  'sf_cyberpunk'=>'Киберпанк',
-  'sf_detective'=>'Детективная фантастика',
-  'sf_heroic'=>'Героическая фантастика',
-  'sf_history'=>'Историческая фантастика',
-  'sf_horror'=>'Ужасы и Мистика',
-  'sf_humor'=>'Юмористическая фантастика',
-  'sf_social'=>'Социальная фантастика',
-  'sf_space'=>'Космическая фантастика',
-  'short_story'=>'Рассказы',
-  'sketch'=>'Очерки',
-  'small_business'=>'Малый бизнес',
-  'sociology_book'=>'Социология',
-  'stock'=>'Ценные бумаги, инвестиции',
-  'thriller'=>'Триллеры',
-  'upbringing_book'=>'Воспитание детей',
-  'vampire_book'=>'Книги про вампиров',
-  'visual_arts'=>'Изобразительное искусство, фотография',
-);
-
 my $XSLT = XML::LibXSLT->new;
 my $XC = XML::LibXML::XPathContext->new();
 my $Parser = XML::LibXML->new();
@@ -401,7 +215,7 @@ sub new {
 
   $SourcePath =~ /\.([^\.]+)$/;
   my $FileType = $1;
-  Error($X, "File '".$SourcePath."' format not detected") unless $MODULES{$FileType};
+  Error($X, "File '".$SourcePath."' format '".$FileType."' not detected") unless $MODULES{$FileType};
   my $Sub = $FileType;
 
   my $Module = $MODULES{$Sub}->{class};
@@ -432,78 +246,82 @@ sub new {
   $X->{'bench'} = $Args{'bench'} ? 1 : 0; #бенчмарк режим в stdout
   $X->{'bench2file'} = $Args{'bench2file'} ? $Args{'bench2file'} : 0; #бенчмарк режим в файл
   $X->{'bench_list'} = {}; #бенчмарк режим
+	$X->{'simple'} = $Args{'simple'} ? 1 : 0; #Преобразование без создания структуры
+	$X->{'xsl_path'} = $Args{'xsl_path'};
 
-  #Наша внутренняя структура данных конвертора. шаг влево  - расстрел
-  $X->{'STRUCTURE'} = {
+	unless ($Args{'simple'}) {
+		#Наша внутренняя структура данных конвертора. шаг влево  - расстрел
+		$X->{'STRUCTURE'} = {
 
-  'DESCRIPTION' => {
-    'TITLE-INFO' => {
-      'COVER' => undef,
-        'AUTHORS' => undef, #[
-                    #{
-                    #  'first-name' => "Иван",
-                    #  'id' => 'bcf95bde-eedc-49ef-926c-588bd4cfd9cd',
-                    #  'middle-name' => undef,
-                    #  'last-name' => "Растеряйло"
-                    #},
-                  #],
-        'PUBLISHER' => undef,
-        'ANNOTATION' => undef,
-        'BOOK-TITLE' => undef,
-        'GENRES' => undef, #[
-                  # 'humor_prose',
-                  # 'prose_su_classics'
-                  #],
-    },
-    'DOCUMENT-INFO' => {
-      'DATE' => undef, #{
-        #'attributes' => {
-        #  'value' => undef
-        #}
-      #},
-      'TIME' => {
-        'attributes' => {
-          'value' => "00:00:00",
-        }
-      },
-      'LANGUAGE' => undef,
-      'ID' => undef
-    }
-  },
-  'IMG_LIST' => [ # сюда складывает все встреченные картинки. Их ведь нужно копировать в новую папку, и rels строить
-    # {
-    #   'src_path' => 'images/_1000516292.jpg',
-    #   'id' => 'img1',
-    #   'new_path' => 'img/794__1000516292.jpg'
-    # }
-  ],
-  'CSS_LIST' => [ # так же со стилями
-    #{
-    #  'id' => 'mainCSS',
-    #  'new_path' => undef,
-    #  'src_path' => 'css/main.css'
-    #},
-  ],
-  'PAGES' => { # контент для body
-  'attributes' => {
-                   'CP_compact' => 1 # узлы  без контейнеров
-                            },
-  'value' => [
-                        {} # дерево любой вложенности. см sub Obj2DOM
-                       ]
-             }
-  };
-   
+			'DESCRIPTION' => {
+			  'TITLE-INFO' => {
+			    'COVER' => undef,
+			      'AUTHORS' => undef, #[
+			                  #{
+			                  #  'first-name' => "Иван",
+			                  #  'id' => 'bcf95bde-eedc-49ef-926c-588bd4cfd9cd',
+			                  #  'middle-name' => undef,
+			                  #  'last-name' => "Растеряйло"
+			                  #},
+			                #],
+			      'PUBLISHER' => undef,
+			      'ANNOTATION' => undef,
+			      'BOOK-TITLE' => undef,
+			      'GENRES' => undef, #[
+			                # 'humor_prose',
+			                # 'prose_su_classics'
+			                #],
+			  },
+				'DOCUMENT-INFO' => {
+				  'DATE' => undef, #{
+				    #'attributes' => {
+				    #  'value' => undef
+				    #}
+				  #},
+				  'TIME' => {
+				    'attributes' => {
+				      'value' => "00:00:00",
+				    }
+				  },
+				  'LANGUAGE' => undef,
+				  'ID' => undef
+				}
+			},
+			'IMG_LIST' => [ # сюда складывает все встреченные картинки. Их ведь нужно копировать в новую папку, и rels строить
+			  # {
+			  #   'src_path' => 'images/_1000516292.jpg',
+			  #   'id' => 'img1',
+			  #   'new_path' => 'img/794__1000516292.jpg'
+			  # }
+			],
+			'CSS_LIST' => [ # так же со стилями
+			  #{
+			  #  'id' => 'mainCSS',
+			  #  'new_path' => undef,
+			  #  'src_path' => 'css/main.css'
+			  #},
+			],
+			'PAGES' => { # контент для body
+				'attributes' => {
+			    'CP_compact' => 1 # узлы  без контейнеров
+			  },
+				'value' => [
+			    {} # дерево любой вложенности. см sub Obj2DOM
+			  ]
+			}
+		};
+	}
+
   bless $X, $class;
   Init($X);
-   
+
   #мета из файла (->fb3/description.xml)
   if ($Args{'metadata'}) {
     $X->Error("Meta file ".$Args{'metadata'}." not exists\n") unless -f $Args{'metadata'};
     $X->{'metadata'} = $Args{'metadata'};
-    $X->ParseMetaFile();     
+    $X->ParseMetaFile() unless $Args{'simple'};     
     File::Copy::copy($X->{'metadata'}, $X->{'DestinationDir'}."/fb3/description.xml");
-  } else {
+  } elsif ($Args{'meta'}) {
     #или мета из  параметров  
     $X->BuildOuterMeta(meta => $Args{'meta'});
   }
@@ -538,11 +356,11 @@ sub Reap {
 
   $X->Msg("working with file ".$File."\n",'w',1) if $X->{'showname'} || $X->{'verbose'};
 
-  $X->_bs('unpack','Распаковка Epub');
+  $X->_bs('unpack','Распаковка файла');
   $File = $Processor->{class}->_Unpacker($X,$File) if $Processor->{'unpack'};
   $X->_be('unpack');
 
-  $X->_bs('reap','Потрошение Epub, cборка данных');
+  $X->_bs('reap','Потрошение исходного файла, cборка данных');
   $Processor->{'class'}->Reaper($X, source => ($File || $X->{'Source'}));
   $X->_be('reap');
 
@@ -569,252 +387,23 @@ sub _Unpacker {
 	}
 	
   my @FilesInZip = $Zip->members(); 
-	
-  Msg($X,"Unzip epub to directory: ".$TMPPath."\n");
+
+  Msg($X,"Unzip source file to directory: ".$TMPPath."\n");
   foreach (@FilesInZip) {
     my $ExtFile = $TMPPath.'/'.$_->fileName;
     Error($X,"can't unpuck ".$_->fileName." from ".$Source." archive") unless $Zip->extractMember($_, $ExtFile) == AZ_OK;
-  } 
- 
+  }
+
   return $TMPPath;
 }
 
 sub FB3Create {
-  my $X = shift;
-  Msg($X,"Create FB3\n");
+	my $X = shift;
+  my $Processor = $MODULES{$X->{'ClassName'}};
 
-  my $Structure = shift || $X->{'STRUCTURE'} || $X->Error("Structure is empty");
-  my $FB3Path = $X->{'DestinationDir'};
+	my $FB3Path = $Processor->{'class'}->FB3Creator($X);
 
-  #compile required files
-  my $CoverSrc = $Structure->{'DESCRIPTION'}->{'TITLE-INFO'}->{'COVER'};
-
-  Msg($X,"FB3: Create /_rels/.rels\n","w");
-  my $FNrels="$FB3Path/_rels/.rels";
-  open FHrels, ">$FNrels" or $X->Error("$FNrels: $!");
-  print FHrels qq{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-  <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">}.
-  ( $CoverSrc ? qq{
-  <Relationship Id="rId0" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/thumbnail" Target="$CoverSrc"/>} : '' ).qq{
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="fb3/meta/core.xml"/>
-  <Relationship Id="rId2" Type="http://www.fictionbook.org/FictionBook3/relationships/Book" Target="fb3/description.xml"/>
-  </Relationships>};
-  close FHrels;
-
-  Msg($X,"FB3: Create [Content_Types].xml\n","w");
-  my $FNct="$FB3Path/[Content_Types].xml";
-  open FHct, ">$FNct" or $X->Error("$FNct: $!");
-  print FHct qq{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-  <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-   	<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml" />
-   	<Default Extension="png" ContentType="image/png"/>
-   	<Default Extension="jpg" ContentType="image/jpeg"/>
-    <Default Extension="jpeg" ContentType="image/jpeg"/>
-   	<Default Extension="gif" ContentType="image/gif"/>
-   	<Default Extension="svg" ContentType="image/svg+xml"/>
-   	<Default Extension="xml" ContentType="application/xml"/>
-   	<Default Extension="css" ContentType="text/css"/>
-   	<Override PartName="/fb3/meta/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
-   	<Override PartName="/fb3/description.xml" ContentType="application/fb3-description+xml"/>
-   	<Override PartName="/fb3/body.xml" ContentType="application/fb3-body+xml"/>
-  </Types>};
-  close FHct;
-
-  Msg($X,"FB3: Create /fb3/_rels/description.xml.rels\n","w");
-  my $FNdrels="$FB3Path/fb3/_rels/description.xml.rels";
-  open FHdrels, ">$FNdrels" or $X->Error("$FNdrels: $!");
-  print FHdrels qq{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-  <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-   	<Relationship Id="rId0"
-    		Target="body.xml"
-    		Type="http://www.fictionbook.org/FictionBook3/relationships/body" />
-  </Relationships>};
-  close FHdrels;
-
- # !! Стили пока не трогаем !!
-  #Скопируем стили
-#  foreach my $css (@{$Structure->{'CSS_LIST'}}) {
-#    my $SrcPath = $X->{'ContentDir'}."/".$css->{'src_path'};
-#    my $CssDestPath = $X->{'DestinationDir'}."/fb3/style";
-#    my $CssFile = $css->{'src_path'};
-#    $CssFile =~ s/.*\/([^\/]+)/$1/g;
-#    my $DstPath = $CssDestPath."/".$CssFile;
-#    $X->Msg("copy $SrcPath -> $DstPath\n","w");
-#    copy($SrcPath, $DstPath) or $X->Error($!);
-#    $css->{'new_path'} = "style/".$CssFile;
-#  }
-
-  #ДО ЭТОГО МОМЕНТА МЫ МОЖЕМ ИЗМЕНЯТЬ $Structure, ТО ЕСТЬ ВМЕШИВАТЬСЯ В КОНЕЧНЫЙ РЕЗУЛЬТАТ ОТРИСОВКИ FB3
- # print Data::Dumper::Dumper($Structure);
- # exit;
-  
-  my $GlobalID = $Structure->{'DESCRIPTION'}->{'DOCUMENT-INFO'}->{'ID'};
-  my $TitleInfo = $Structure->{'DESCRIPTION'}->{'TITLE-INFO'};
-  my $DocInfo = $Structure->{'DESCRIPTION'}->{'DOCUMENT-INFO'};
-  
-  #Пишем body
-  Msg($X,"FB3: Create /fb3/body.xml\n","w");
-  my $FNbody="$FB3Path/fb3/body.xml";
-  my $BodyAttr = {
-  	'xmlns'=>"http://www.fictionbook.org/FictionBook3/body",
-    'xmlns:xlink'=>"http://www.w3.org/1999/xlink",
-    'id'=>$GlobalID,
-  };
-
-  $X->_bs('Obj2DOM_body','PAGES => DOM');
-  my $Body = Obj2DOM($X,
-              obj=>{
-                attributes=>{CP_compact=>1},
-                value=>$Structure->{'PAGES'}->{'value'}
-              },
-              root=>{name=>'fb3-body', attributes=>$BodyAttr}
-            );  
-  $X->_be('Obj2DOM_body');
-  
-  #финальное приведение section к валидному виду
-  foreach my $Section ($XC->findnodes( "/fb3-body/section/section", $Body), $XC->findnodes( "/fb3-body/section", $Body)) {
-    $Section = $X->Transform2Valid(node=>$Section);
-  }
-
-  #финальное приведение table к валидному виду
-  foreach my $Table ($XC->findnodes( "/fb3-body//table", $Body)) {
-    $Table = $X->TransformTable2Valid(node=>$Table);
-  }
-
-  open FHbody, ">$FNbody" or $X->Error("$FNbody: $!");
-  print FHbody $Body->toString(1);
-  close FHbody;
-
-  #Пишем мету
-  #Превращаем перл-структуру в DOM
-  delete $Structure->{'PAGES'};
-  $X->_bs('Obj2DOM_meta','META => DOM');
-  my $Doc = Obj2DOM($X, obj=>$Structure, like_parent=>0, compact=>0 ); 
-  $X->_be('Obj2DOM_meta');
-
-  #Пишем rels
-  Msg($X,"FB3: Create /fb3/_rels/body.xml.rels\n","w");
-  my $FNbodyrels="$FB3Path/fb3/_rels/body.xml.rels";
-  open FHbodyrels, ">$FNbodyrels" or $X->Error("$FNbodyrels: $!");
-  print FHbodyrels qq{<?xml version="1.0" encoding="UTF-8"?>
-<Relationships xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.openxmlformats.org/package/2006/relationships" xmlns:xlink="http://www.w3.org/1999/xlink">
-};
-  foreach (@{$Structure->{'IMG_LIST'}}) {
-    print FHbodyrels qq{  <Relationship Id="$_->{'id'}" Type="http://www.fictionbook.org/FictionBook3/relationships/image" Target="$_->{'new_path'}"/>
-};
-  }
-  print FHbodyrels qq{</Relationships>};
-  close FHbodyrels;
-  
-  #Пишем core
-  Msg($X,"FB3: Create /fb3/meta/core.xml\n","w");
-  my $FNcore="$FB3Path/fb3/meta/core.xml";
-  open FHcore, ">$FNcore" or $X->Error("$FNcore: $!");
-  print FHcore qq{<?xml version="1.0" encoding="UTF-8"?>
-  <cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.fictionbook.org/FictionBook3/description" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/">
-    <dc:title>}.$TitleInfo->{'BOOK-TITLE'}.qq{</dc:title>
-    <dc:subject>}.$TitleInfo->{'ANNOTATION'}.qq{</dc:subject>
-    <dc:creator>};
-  
-  my $c=1;         
-  foreach (@{$TitleInfo->{'AUTHORS'}}) {
-    print FHcore $_->{'first-name'}." ".$_->{'last-name'};
-    print FHcore ", " if $c < scalar @{$TitleInfo->{'AUTHORS'}};
-    $c++;
-  }
-  
-  print FHcore qq{</dc:creator>
-    <dc:description>}.$TitleInfo->{'ANNOTATION'}.qq{</dc:description>
-    <cp:keywords>XML, FictionBook, eBook, OPC</cp:keywords>
-    <cp:revision>1.00</cp:revision>
-    }.
-  ($DocInfo->{'DATE'}->{'attributes'}->{'value'}?qq{<dcterms:created xsi:type="dcterms:W3CDTF">}.$DocInfo->{'DATE'}->{'attributes'}->{'value'}.qq{</dcterms:created>
-    }:'')
-  .qq{<cp:contentStatus>Draft</cp:contentStatus>
-    <cp:category>};
-  
-  my $c=1;         
-  foreach (@{$TitleInfo->{'GENRES'}}) {
-    print FHcore $_;
-    print FHcore ", " if $c < scalar @{$TitleInfo->{'GENRES'}};
-    $c++;
-  }
-
-  print FHcore qq{</cp:category>
-  </cp:coreProperties>};
-  close FHcore;
-  #Пишем description
-  Msg($X,"FB3: Create /fb3/description.xml\n","w");
-  my $FNdesc="$FB3Path/fb3/description.xml";
-  open FHdesc, ">$FNdesc" or $X->Error("$FNdesc: $!");
-  print FHdesc qq{<?xml version="1.0" encoding="UTF-8"?>
-<fb3-description xmlns="http://www.fictionbook.org/FictionBook3/description" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" id="}.$GlobalID.qq{" version="1.0">
-  };
-
-  print FHdesc qq{<title>
-    <main>}.$TitleInfo->{'BOOK-TITLE'}.qq{</main>
-  </title>
-  };
-    
-  print FHdesc qq{<fb3-relations>
-    };
-
-  foreach (@{$TitleInfo->{'AUTHORS'}}) {
-
-    my $First = $_->{'first-name'};
-    my $Middle = $_->{'middle-name'};
-    my $Last = $_->{'last-name'}||"Unknown";
-
-    print FHdesc qq{<subject link="author" id="}.($_->{'id'}||'00000000-0000-0000-0000-000000000000').qq{">
-      <title>
-        <main>
-          }.
-      ($First?$First.' '.$Last:$Last).qq{
-        </main>
-      </title>}
-      .($First?qq{
-      <first-name>}.$First.'</first-name>':'')
-      .($Middle?qq{
-      <middle-name>}.$Middle.qq{</middle-name>}:'')
-      .qq{
-      <last-name>}.$Last.qq{</last-name>
-    </subject>
-  };
-  }
-
-  print FHdesc qq{</fb3-relations>
-  };
-
-  
-  print FHdesc qq{<fb3-classification>
-    };
-  foreach (@{$TitleInfo->{'GENRES'}}) {
-    print FHdesc qq{<subject>}.(exists $GenreTranslate{$_}?$GenreTranslate{$_}:$_).qq{</subject>
-    };
-  }
-  print FHdesc qq{</fb3-classification>
-  };
-  
-
-  print FHdesc qq{<lang>}.$DocInfo->{'LANGUAGE'}.qq{</lang>
-  <written>
-    <lang>}.$DocInfo->{'LANGUAGE'}.qq{</lang>
-  </written>
-  };
-
-  my $DCDate = $DocInfo->{'DATE'}->{'attributes'}->{'value'}."T".$DocInfo->{'TIME'}->{'attributes'}->{'value'};
-  print FHdesc qq{<document-info created="}.$DCDate.qq{" updated="}.$DCDate.qq{"/>
-};
-
-  print FHdesc qq{  <annotation>
-    <p>}.$TitleInfo->{'ANNOTATION'}.qq{</p>
-  </annotation>
-} if $TitleInfo->{'ANNOTATION'};
-
-  print FHdesc qq{</fb3-description>};
-  close FHdesc;
- 
-  return $FB3Path;
+	return $FB3Path;
 }
 
 sub FB3_2_Zip {
@@ -1366,6 +955,10 @@ sub Reaper {
   print "This method in package " . __PACKAGE__ . " and not defined in Processor class\n";
 }
 
+sub FB3Creator {
+  print "This method in package " . __PACKAGE__ . " and not defined in Processor class\n";
+}
+
 sub TransformTable2Valid {
   my $X = shift;
   my %Args = @_;
@@ -1477,7 +1070,7 @@ sub BuildAuthorName  {
 sub EncodeUtf8 {
   my $X = shift;
   my $Out = shift;
-  $Out = Encode::encode_utf8($Out);
+  $Out = Encode::encode_utf8($Out) if $Out;
   return $Out;
 }
 
@@ -1630,16 +1223,16 @@ sub ParseMetaFile {
     my $ID = ($xpc->findnodes('/fbd:fb3-description')->[0])->getAttribute('id');
     $DESCRIPTION->{'DOCUMENT-INFO'}->{'ID'} = $ID if defined $ID;
 
-    my $TITLE = $xpc->findnodes('/fbd:fb3-description/fbd:title/fbd:main')->[0]->string_value;
-    $DESCRIPTION->{'TITLE-INFO'}->{'BOOK-TITLE'} = $TITLE if defined $TITLE;
+    my $TITLE = $xpc->findnodes('/fbd:fb3-description/fbd:title/fbd:main')->[0];
+    $DESCRIPTION->{'TITLE-INFO'}->{'BOOK-TITLE'} = EncodeUtf8($X,$TITLE->string_value) if defined $TITLE;
 
-    my $ANNOTATION = $xpc->findnodes('/fbd:fb3-description/fbd:annotation/fbd:p')->[0]->string_value;;
-    $DESCRIPTION->{'TITLE-INFO'}->{'ANNOTATION'} = $ANNOTATION if defined $ANNOTATION;
+    my $ANNOTATION = $xpc->findnodes('/fbd:fb3-description/fbd:annotation/fbd:p')->[0];
+    $DESCRIPTION->{'TITLE-INFO'}->{'ANNOTATION'} = EncodeUtf8($X,$ANNOTATION->string_value) if defined $ANNOTATION;
 
-    my $LANGUAGE = $xpc->findnodes('/fbd:fb3-description/fbd:lang')->[0]->string_value; 
-    $DESCRIPTION->{'DOCUMENT-INFO'}->{'LANGUAGE'} = $LANGUAGE if defined $LANGUAGE;
+    my $LANGUAGE = $xpc->findnodes('/fbd:fb3-description/fbd:lang')->[0];
+    $DESCRIPTION->{'DOCUMENT-INFO'}->{'LANGUAGE'} = $LANGUAGE->string_value if defined $LANGUAGE;
 
-    my @GENRES = map {$_->string_value} ($xpc->findnodes('/fbd:fb3-description/fbd:fb3-classification/fbd:subject'));
+    my @GENRES = map {EncodeUtf8($X,$_->string_value)} ($xpc->findnodes('/fbd:fb3-description/fbd:fb3-classification/fbd:subject'));
     $DESCRIPTION->{'TITLE-INFO'}->{'GENRES'} = [ @GENRES ];
 
     my @AUTHORS;
@@ -1660,9 +1253,9 @@ sub ParseMetaFile {
         'id' => $SubjID,
         'link' => $SubjLink,
         'percent' => $SubjPercent,
-        'first-name' => $FirstName,
-        'middle-name' => $MiddleName,
-        'last-name' => $LastName,
+        'first-name' => EncodeUtf8($X,$FirstName),
+        'middle-name' => EncodeUtf8($X,$MiddleName),
+        'last-name' => EncodeUtf8($X,$LastName),
       };
     }
     $DESCRIPTION->{'TITLE-INFO'}->{'AUTHORS'} = [ @AUTHORS ];

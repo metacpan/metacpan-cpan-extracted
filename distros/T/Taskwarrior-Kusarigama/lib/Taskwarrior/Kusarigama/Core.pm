@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Core;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Set of core functions interacting with Taskwarrior
-$Taskwarrior::Kusarigama::Core::VERSION = '0.9.1';
+$Taskwarrior::Kusarigama::Core::VERSION = '0.9.2';
 
 use strict;
 use warnings;
@@ -140,7 +140,7 @@ Taskwarrior::Kusarigama::Core - Set of core functions interacting with Taskwarri
 
 =head1 VERSION
 
-version 0.9.1
+version 0.9.2
 
 =head1 DESCRIPTION
 

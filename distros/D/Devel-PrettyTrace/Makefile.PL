@@ -13,7 +13,7 @@ WriteMakefile(
         'Data::Printer'     => '0.19',
         'Exporter'          => 0,
         'parent'            => 0,
-        'List::MoreUtils'   => 0,
+        'List::Util'        => '1.43',
     },
     META_MERGE      => {
         resources     => {
@@ -23,6 +23,6 @@ WriteMakefile(
         dynamic_config  => 0,
     },
     ABSTRACT_FROM   => 'lib/Devel/PrettyTrace.pod',
-    LICENSE         => 'bsd',
+    LICENSE         => 'perl',
     MIN_PERL_VERSION=> 5.006,
 );

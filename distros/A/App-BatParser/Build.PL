@@ -18,7 +18,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "App-BatParser",
-  "dist_version" => "0.009",
+  "dist_version" => "0.010",
   "license" => "perl",
   "module_name" => "App::BatParser",
   "recursive_test_files" => 1,
@@ -30,6 +30,7 @@ my %module_build_args = (
     "utf8" => 0
   },
   "test_requires" => {
+    "Data::Dumper" => 0,
     "English" => 0,
     "Path::Tiny" => 0,
     "Test::More" => 0,
@@ -41,6 +42,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
+  "Data::Dumper" => 0,
   "English" => 0,
   "Module::Build" => "0.28",
   "Path::Tiny" => 0,

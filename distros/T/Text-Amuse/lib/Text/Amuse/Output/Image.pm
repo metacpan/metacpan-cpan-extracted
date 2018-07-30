@@ -72,6 +72,9 @@ sub new {
         else {
             die "Wrong wrapping option";
         }
+        if ($wrap eq 'l' or $wrap eq 'r') {
+            $opts{width} ||= 50;
+        }
     }
 
     if (my $w = $opts{width}) {

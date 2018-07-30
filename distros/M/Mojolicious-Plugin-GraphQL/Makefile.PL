@@ -48,6 +48,11 @@ WriteMakefile(
           'Pod::Markdown' => 0,
         },
       },
+      runtime => {
+        recommends => {
+          'Cpanel::JSON::XS' => 0,
+        },
+      },
     },
   },
 );

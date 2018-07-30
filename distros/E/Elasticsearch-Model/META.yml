@@ -5,6 +5,7 @@ author:
 build_requires:
   DateTime: '0'
   IO::Socket::INET: '0'
+  IPC::System::Simple: '0'
   MooseX::Types::Structured: '0'
   Test::Class::Load: '0'
   Test::Class::Most: '0'
@@ -14,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,8 +33,8 @@ requires:
   MooseX::Types::Moose: '0'
   Search::Elasticsearch: '6.00'
   Try::Tiny: '0'
+  perl: v5.10.0
 resources:
   repository: git://github.com/amiri/Elasticsearch-Model.git
-version: 0.1.4
-x_generated_by_perl: v5.26.2
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: 0.1.5
+x_serialization_backend: 'YAML::Tiny version 1.70'

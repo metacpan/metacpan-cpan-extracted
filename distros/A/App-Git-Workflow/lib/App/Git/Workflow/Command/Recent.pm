@@ -16,7 +16,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 1.0.7;
+our $VERSION  = 1.0.8;
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -32,6 +32,8 @@ sub run {
         'day|d',
         'depth|D=i',
         'files|f',
+        'ignore_user|ignore-users=s@',
+        'ignore_branch|ignore-branches=s@',
         'month|m',
         'out|o=s',
         'quiet|q',
@@ -99,8 +101,15 @@ sub out_text {
 
     for my $file (sort keys %$changed) {
         print "$file\n";
-        print "  Changed by : " . ( join ', ', @{ $changed->{$file}{users} } ), "\n";
-        print "  In branches: " . ( join ', ', @{ $changed->{$file}{branches} } ), "\n";
+        if ( ! $option{users} ) {
+            print "  Changed by : " . ( join ', ', @{ $changed->{$file}{users} || [] } ), "\n";
+        }
+        if ( ! $option{branches} ) {
+            print "  In branches: " . ( join ', ', @{ $changed->{$file}{branches} || [] } ), "\n";
+        }
+        if ( $option{users} || $option{branches} ) {
+            print "  Files: " . ( join ', ', @{ $changed->{$file}{files} || [] } ), "\n";
+        }
     }
 
     return;
@@ -151,10 +160,10 @@ sub recent_commits {
         @args = ('--since', sprintf "%04d-%02d-%02d", $year, $month, $day );
     }
 
-    unshift @args, $option{tag} ? '--tags'
-        : $option{branch}       ? '--branches'
-        : $option{remote}       ? '--remotes'
-        :                         '--all';
+    unshift @args, $option->{tag} ? '--tags'
+        : $option->{branch}       ? '--branches'
+        : $option->{remote}       ? '--remotes'
+        :                           '--all';
 
     return $workflow->git->rev_list(@args);
 }
@@ -167,6 +176,8 @@ sub changed_from_shas {
 
     for my $sha (@commits) {
         my $changed = $workflow->commit_details($sha, branches => 1, files => 1, user => 1);
+        next if $self->ignore($changed);
+
         for my $type (keys %{ $changed->{files} }) {
             if ( defined $option{depth} ) {
                 $type = join '/', grep {defined $_} (split m{/}, $type)[0 .. $option{depth} - 1];
@@ -194,6 +205,22 @@ sub changed_from_shas {
     return %changed;
 }
 
+sub ignore {
+    my ($self, $commit) = @_;
+
+    if ($option{ignore_user}
+        && grep {$commit->{user} =~ /$_/} @{ $option{ignore_user} } ) {
+        return 1;
+    }
+
+    if ($option{ignore_branch}
+        && grep {$commit->{branches} =~ /$_/} @{ $option{ignore_branch} } ) {
+        return 1;
+    }
+
+    return 0;
+}
+
 1;
 
 __DATA__
@@ -204,7 +231,7 @@ git-recent - Find what files have been changed recently in a repository
 
 =head1 VERSION
 
-This documentation refers to git-recent version 1.0.7
+This documentation refers to git-recent version 1.0.8
 
 =head1 SYNOPSIS
 
@@ -231,6 +258,12 @@ This documentation refers to git-recent version 1.0.7
                 areas that have changed)
   -u --users    Show the output by who has made the changes
   -f --files    Show the output the files changed (Default)
+     --ignore-user[=]regexp
+     --ignore-users[=]regexp
+                Ignore any user(s) matching regexp (can be specified more than once)
+     --ignore-branch[=]regexp
+     --ignore-branches[=]regexp
+                Ignore any branch(s) matching regexp (can be specified more than once)
   -o --out[=](text|json|perl)
                 Specify how to display the results
                     - text : Nice human readable format (Default)
@@ -279,6 +312,10 @@ Displays changed files in a JSON format
 =head2 C<out_yaml ($changed)>
 
 Displays changed files in a YAML format
+
+=head2 C<ignore ($commit)>
+
+Determine if a commit should be ignored or not
 
 =head1 DIAGNOSTICS
 

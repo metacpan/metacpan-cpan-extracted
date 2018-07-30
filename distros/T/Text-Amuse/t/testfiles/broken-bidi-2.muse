@@ -1,0 +1,7 @@
+#title Broken bidi 2
+#lang fa
+
+سری جنگ‌های صلیبی>>>Hello there
+
+>>>
+Hello there

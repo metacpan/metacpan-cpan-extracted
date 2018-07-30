@@ -24,10 +24,12 @@ do { my $x = {
                       'requires' => {
                                       'App::cpm' => '0.975',
                                       'App::cpm::CLI' => '0',
+                                      'Carp' => '0',
                                       'Getopt::Long' => '0',
                                       'Module::Loaded' => '0',
+                                      'Try::Tiny' => '0',
                                       'local::lib' => '2.000024',
-                                      'perl' => '5.006',
+                                      'perl' => '5.010',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -37,16 +39,18 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'App::cpm::Resolver::02Packages' => '0',
                                    'Capture::Tiny' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'LWP' => '6.35',
                                    'Path::Iterator::Rule' => '0',
                                    'Path::Tiny' => '0',
                                    'Test::More' => '0',
                                    'Test::RequiresInternet' => '0',
                                    'Test::TempDir::Tiny' => '0',
                                    'local::lib' => '2.000024',
-                                   'perl' => '5.006'
+                                   'perl' => '5.010'
                                  }
                  }
      };

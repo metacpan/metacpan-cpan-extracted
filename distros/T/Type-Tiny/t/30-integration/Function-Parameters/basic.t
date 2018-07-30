@@ -17,7 +17,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -37,6 +37,8 @@ BEGIN {
 	or eval 'use Moose 2.0000; 1'
 	or plan skip_all => "this test requires Moo 1.000000 or Moose 2.0000";
 };
+
+BEGIN { plan skip_all => 'Devel::Cover'  if $INC{'Devel/Cover.pm'} };
 
 use Types::Standard -types;
 use Function::Parameters qw(:strict);

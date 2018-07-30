@@ -1,30 +1,30 @@
 {
    "abstract" : "Pegex Loader for JSON",
    "author" : [
-      "Ingy döt Net <ingy@cpan.org>"
+      "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Pegex-JSON",
    "no_index" : {
       "directory" : [
+         "example",
          "inc",
          "t",
-         "xt",
-         "example"
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -57,6 +57,8 @@
          "web" : "https://github.com/ingydotnet/pegex-json-pm"
       }
    },
-   "version" : "0.27"
+   "version" : "0.28",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
 }
 

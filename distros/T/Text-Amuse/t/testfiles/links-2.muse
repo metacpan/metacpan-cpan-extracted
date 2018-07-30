@@ -18,3 +18,10 @@
 
 [[http://laltromondo.dynalias.net/gitweb/?p=AMuseWiki.git;a=summary]]
 
+[[https://ru.wikipedia.org/wiki/Заглавная_страница]]
+
+[[https://example.com/?id=5&s=test]]
+
+[[https://example.com/*foo*]]
+
+[[https://example.com/foo>}bar]]

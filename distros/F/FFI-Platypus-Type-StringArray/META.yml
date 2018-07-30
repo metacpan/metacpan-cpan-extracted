@@ -12,7 +12,7 @@ configure_requires:
   Module::Build::FFI: '0.15'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,11 @@ requires:
   FFI::Platypus: '0.15'
   perl: '5.006'
 resources:
+  IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/plicease/FFI-Platypus-Type-StringArray/issues
-  homepage: http://perl.wdlabs.com/FFI-Platypus-Type-StringArray
+  homepage: https://metacpan.org/pod/FFI::Platypus::Type::StringArray
   repository: git://github.com/plicease/FFI-Platypus-Type-StringArray.git
-version: '0.01'
+version: '0.02'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

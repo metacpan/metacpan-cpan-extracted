@@ -45,7 +45,7 @@ sub document_namespace :Tests(no_plan) {
 sub refresh :Tests(no_plan) {
     my $self = shift;
     SKIP: {
-        skip "No live elasticsearch server" unless $self->live_testing_ok;
+        skip "No ES server or wrong version" unless $self->live_testing_ok;
         my $model = TestModel->new;
         $model->deploy(delete => 1);
         for my $name (qw/a b c/) {
@@ -58,7 +58,7 @@ sub refresh :Tests(no_plan) {
 sub delete :Tests(no_plan) {
     my $self = shift;
     SKIP: {
-        skip "No live elasticsearch server" unless $self->live_testing_ok;
+        skip "No ES server or wrong version" unless $self->live_testing_ok;
         my $model = TestModel->new;
         $model->deploy(delete => 1);
         for my $name (qw/a b c/) {
@@ -71,7 +71,7 @@ sub delete :Tests(no_plan) {
 sub deploy_to :Tests(no_plan) {
     my $self = shift;
     SKIP: {
-        skip "No live elasticsearch server" unless $self->live_testing_ok;
+        skip "No ES server or wrong version" unless $self->live_testing_ok;
         my $model = TestModel->new;
         for my $name (qw/a b c/) {
             my $index = $model->index($name);

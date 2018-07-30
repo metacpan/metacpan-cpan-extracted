@@ -221,6 +221,26 @@ sub stringify {
 
 sub _markup_table {
     return {
+            'rtl' => {
+                      open => {
+                               html => '<span dir="rtl">',
+                               ltx => "\\RL{",
+                              },
+                      close => {
+                                html => '</span>&#x200E;', # LRM (U+200E LEFT-TO-RIGHT MARK)
+                                ltx => '}',
+                               },
+                     },
+            'ltr' => {
+                      open => {
+                               html => '<span dir="ltr">',
+                               ltx => "\\LR{",
+                              },
+                      close => {
+                                html => '</span>&#x200F;', #  RLM (U+200F RIGHT-TO-LEFT MARK)
+                                ltx => '}',
+                               },
+                     },
             'em' => {
                      open => {
                               html => '<em>',

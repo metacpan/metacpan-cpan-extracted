@@ -11,6 +11,9 @@ use Crypt::Perl::PKCS10 ();
 
 use HTTP::Tiny ();
 
+# Used to report failed challenges.
+use Data::Dumper;
+
 use Net::ACME2::LetsEncrypt ();
 
 use constant {
@@ -22,9 +25,9 @@ sub run {
     my ($class) = @_;
 
     my $_test_key = Crypt::Perl::ECDSA::Generate::by_name(_ECDSA_CURVE())->to_pem_with_curve_name();
-    print "Account key:$/$_test_key$/";
 
     my $acme = Net::ACME2::LetsEncrypt->new(
+        environment => 'staging',
         key => $_test_key,
     );
 
@@ -39,16 +42,12 @@ sub run {
         my $created = $acme->create_new_account(
             termsOfServiceAgreed => 1,
         );
-
-        printf "key ID: %s$/", $acme->key_id();
     }
 
     my @domains = $class->_get_domains();
 
     my $order = $acme->create_new_order(
         identifiers => [ map { { type => 'dns', value => $_ } } @domains ],
-        #notAfter => (time + 86400),
-        #notAfter => 'hahahahah',   #it accepts this?!?
     );
 
     my @authzs = map { $acme->get_authorization($_) } $order->authorizations();
@@ -68,22 +67,41 @@ sub run {
         $acme->accept_challenge($challenge);
     }
 
-    while ($valid_authz_count != @authzs) {
-        my $waiting;
+    while (1) {
         for my $authz (@authzs) {
             next if $authz->status() eq 'valid';
-            if ($acme->poll_authorization($authz)) {
-                $valid_authz_count++;
+
+            my $status = $acme->poll_authorization($authz);
+
+            my $name = $authz->identifier()->{'value'};
+            substr($name, 0, 0, '*.') if $authz->wildcard();
+
+            if ($status eq 'valid') {
+
+                print "$/“$name” has passed validation.$/";
+            }
+            elsif ($status eq 'pending') {
+                print "$/“$name”’s authorization is still pending …$/";
             }
             else {
-                $waiting = 1;
+                if ($status eq 'invalid') {
+                    my $challenge = $class->_get_challenge_from_authz($authz);
+                    print Dumper($challenge);
+                }
+
+                die "$/“$name”’s authorization is in “$status” state.";
             }
         }
 
-        sleep 1 if $waiting;
+        $valid_authz_count = grep { $_->status() eq 'valid' } @authzs;
+        last if $valid_authz_count == @authzs;
+
+        sleep 1;
     }
 
     my ($key, $csr) = _make_key_and_csr_for_domains(@domains);
+
+    print "Finalizing order …$/";
 
     $acme->finalize_order($order, $csr);
 
@@ -99,6 +117,20 @@ sub run {
     print HTTP::Tiny->new()->get($order->certificate())->{'content'};
 
     return;
+}
+
+sub _get_challenge_from_authz {
+    my ($class, $authz_obj) = @_;
+
+    my $challenge_type = $class->_CHALLENGE_TYPE();
+
+    my ($challenge) = grep { $_->type() eq $challenge_type } $authz_obj->challenges();
+
+    if (!$challenge) {
+        die "No “$challenge_type” challenge for “$authz_obj”!\n";
+    }
+
+    return $challenge;
 }
 
 sub _get_domains {

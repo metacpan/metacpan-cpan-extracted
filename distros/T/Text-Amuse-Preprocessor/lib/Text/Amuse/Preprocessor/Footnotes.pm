@@ -5,7 +5,7 @@ use warnings;
 use File::Spec;
 use File::Temp;
 use File::Copy;
-use Data::Dumper;
+use Text::Diff ();
 
 =encoding utf8
 
@@ -70,7 +70,7 @@ The input file. It must exists.
 =head3 output
 
 The output file. It will be written by the module if the parsing
-succeedes. If not specified, the module will run in dry-run mode.
+succeeds. If not specified, the module will run in dry-run mode.
 
 =head3 debug
 
@@ -107,6 +107,10 @@ The reference's numbers found in the body as a long string.
 =item footnotes_found
 
 The footnote' numbers found in the body as a long string.
+
+=item differences
+
+The unified diff between the footnotes and the references' list
 
 =back
 
@@ -177,7 +181,6 @@ sub tmpdir {
 
 sub process {
     my $self = shift;
-    print Dumper($self) if $self->debug;
     # auxiliary files
     my $tmpdir = $self->tmpdir;
     print "Using $tmpdir\n" if $self->debug;
@@ -285,6 +288,9 @@ sub rewrite {
                            footnotes_found  => join(" ",
                                                     map { $open . $_ . $close }
                                                     @footnotes_found),
+                           differences => Text::Diff::diff([ map { $open . $_ . $close . "\n" } @footnotes_found  ],
+                                                           [ map { $open . $_ . $close . "\n" } @references_found ],
+                                                           { STYLE => 'Unified' }),
                           });
         return;
     }

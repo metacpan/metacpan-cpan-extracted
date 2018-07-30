@@ -360,14 +360,18 @@ Return true if the element will merge the next one
 sub can_merge_next {
     my $self = shift;
     return 0 if $self->will_not_merge;
-    if ($self->type eq 'stopblock'  or
-        $self->type eq 'startblock' or
-        $self->type eq 'null'       or
-        $self->type eq 'table'      or
-        $self->type eq 'versep'     or
-        $self->type eq 'newpage'    or
-        $self->type eq 'inlinecomment' or
-        $self->type eq 'comment') {
+    my %nomerge = (
+                   bidimarker    => 1,
+                   stopblock     => 1,
+                   startblock    => 1,
+                   null          => 1,
+                   table         => 1,
+                   versep        => 1,
+                   newpage       => 1,
+                   inlinecomment => 1,
+                   comment       => 1,
+                  );
+    if ($nomerge{$self->type}) {
         return 0;
     } else {
         return 1;

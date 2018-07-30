@@ -8,7 +8,10 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Create tmux layout strings programmatically",
-  "AUTHOR" => "J. Maslak <jmaslak\@antelope.net>",
+  "AUTHOR" => "Joelle Maslak <jmaslak\@antelope.net>",
+  "BUILD_REQUIRES" => {
+    "Test::UseAllModules" => "0.17"
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -29,13 +32,16 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Cwd" => 0,
+    "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "IO::Socket::INET" => 0,
     "IO::Socket::IP" => 0,
     "Test::More" => 0,
+    "Test::UseAllModules" => "0.17",
     "Time::Out" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.005",
+  "VERSION" => "1.182062",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,10 +51,13 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Cwd" => 0,
+  "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "IO::Socket::INET" => 0,
   "IO::Socket::IP" => 0,
   "Moose" => 0,
   "Test::More" => 0,
+  "Test::UseAllModules" => "0.17",
   "Time::Out" => 0,
   "autodie" => 0,
   "lib" => 0,

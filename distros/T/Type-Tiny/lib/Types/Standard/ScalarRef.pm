@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::ScalarRef::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::ScalarRef::VERSION   = '1.002002';
+	$Types::Standard::ScalarRef::VERSION   = '1.004002';
 }
 
 use Types::Standard ();
@@ -20,7 +20,7 @@ sub __constraint_generator
 {
 	return Types::Standard::ScalarRef unless @_;
 	
-	my $param = Types::TypeTiny::to_TypeTiny(shift);
+	my $param = shift;
 	Types::TypeTiny::TypeTiny->check($param)
 		or _croak("Parameter to ScalarRef[`a] expected to be a type constraint; got $param");
 	
@@ -140,7 +140,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

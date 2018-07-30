@@ -15,14 +15,9 @@ Files: Changes
  META.json
  META.yml
  doap.ttl
-Copyright: Copyright 2017 Toby Inkster.
+ t/07lazy.t
+Copyright: Copyright 2018 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
-
-Files: COPYRIGHT
- CREDITS
- SIGNATURE
-Copyright: None
-License: public-domain
 
 Files: INSTALL
  LICENSE
@@ -30,13 +25,20 @@ Files: INSTALL
 Copyright: Unknown
 License: Unknown
 
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
 Files: README
  lib/MooseX/MungeHas.pm
 Copyright: This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: t/05multihas.t
-Copyright: This software is copyright (c) 2014 by Toby Inkster.
+Files: t/08rolebuildersub.t
+ t/09undefbare.t
+Copyright: This software is copyright (c) 2017 by Aaron Crane.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: dist.ini
@@ -47,15 +49,19 @@ Files: t/06multiattr.t
 Copyright: This software is copyright (c) 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/05multihas.t
+Copyright: This software is copyright (c) 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  

@@ -1,5 +1,5 @@
 package JSONAPI::Document;
-$JSONAPI::Document::VERSION = '2.2';
+$JSONAPI::Document::VERSION = '2.3';
 # ABSTRACT: Turn DBIx results into JSON API documents.
 
 use Moo;
@@ -49,7 +49,12 @@ sub resource_documents {
     my ($self, $resultset, $options) = @_;
     $options //= {};
 
-    my @results = $resultset->all();
+    my @results;
+    if ((ref($resultset) // '') eq 'ARRAY') {
+        @results = @$resultset;
+    } else {
+        @results = $resultset->all();
+    }
     return { data => [map { $self->resource_document($_, $options) } @results], };
 }
 
@@ -105,7 +110,7 @@ JSONAPI::Document - Turn DBIx results into JSON API documents.
 
 =head1 VERSION
 
-version 2.2
+version 2.3
 
 =head1 SYNOPSIS
 
@@ -151,7 +156,7 @@ while keeping relationship names intact (i.e. an 'author' relationship will stil
 This module supplies an opt-in Moo role that can be consumed by objects that layer over a DBIx::Class::Row,
 C<JSONAPI::Document::Role::Attributes>. Consuming objects should implement a method called C<attributes>
 which will be used throughout the creation of resource documents for that result type to build the attributes
-of the document. This is useful when you have a more complicated set of attribute that cannot be fulfilled
+of the document. This is useful when you have a more complicated set of attributes that cannot be fulfilled
 by simply calling C<get_inflated_columns> (the default behaviour).
 
 =head1 ATTRIBUTES
@@ -277,8 +282,8 @@ If this option is true, links object will be replaced with attributes.
 An optional list of attributes to include for the given resource. Implements
 L<sparse fieldsets|http://jsonapi.org/format/#fetching-sparse-fieldsets> in the specification.
 
-Will pass the array reference to the C<attributes_via> method, which should make use
-of the reference and return B<only> those attributes that were requested.
+Will pass the array reference to the C<attributes> method (if you're using the attributes role), which
+should make use of the reference and return B<only> those attributes that were requested.
 
 =item C<related_fields> I<HashRef>
 
@@ -290,9 +295,13 @@ that relationship.
 
 =back
 
-=head2 resource_documents(I<DBIx::Class::Row|Object> $row, I<HashRef> $options)
+=head2 resource_documents(I<DBIx::Class::ResultSet|Object|ArrayRef> $resultset, I<HashRef> $options)
 
 Builds the structure for multiple resource documents with a given resultset.
+
+C<$resultset> can be either a C<DBIx::Class::ResultSet> object in which case this method will call
+C<all> on the resultset, an object that extends C<DBIx::Class::ResultSet>, or you can pass in an
+ArrayRef from your own C<all> call.
 
 Returns a I<HashRef> with the following structure:
 

@@ -93,7 +93,7 @@ subtest 'GraphQL with JSON error' => sub {
     { Content_Type => 'application/json' },
     '{"query":"{helloWorld}""}',
   )->content_like(
-    qr/Malformed JSON: Expected comma/
+    qr/Malformed JSON: Expected comma|, or \} expected while parsing/
   );
 };
 

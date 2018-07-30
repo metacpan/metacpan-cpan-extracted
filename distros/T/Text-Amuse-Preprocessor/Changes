@@ -1,5 +1,13 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.57 2018-07-28
+
+ - Correct the inner quotes for russian. Thanks to @labdsf
+
+0.56 2018-07-26
+
+ - Add the differences to the footnotes mismatch error
+
 0.55 2018-07-18
 
  - Minor improvements to HTML importer
@@ -61,7 +69,7 @@ Revision history for perl module Text-Amuse-Preprocessor
 
 0.30 2016-05-13
 
- - Added portugese support
+ - Added portuguese support
  - Removed min perl version
 
 0.29 2016-04-16

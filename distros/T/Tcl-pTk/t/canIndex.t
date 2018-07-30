@@ -58,7 +58,7 @@ $canvas->CanvasFocus; # make the canvas have the focus, so that the delete key w
 #$canvas->focus;
 
                 
-# This seems to be required for the events to be reliabily registered for this test case outside of a MainLoop
+# This seems to be required for the events to be reliably registered for this test case outside of a MainLoop
 foreach (1..10){
         $TOP->update();
         $TOP->idletasks();
@@ -68,7 +68,7 @@ foreach (1..10){
 # Fire a delete event for the whole canvas and check variables
 $canvas->eventGenerate('<Delete>');
 
-# This seems to be required for the events to be reliabily registered for this test case outside of a MainLoop
+# This seems to be required for the events to be reliably registered for this test case outside of a MainLoop
 foreach (1..10){
         $TOP->update();
         $TOP->idletasks();
@@ -86,7 +86,7 @@ $canvas->CanvasFocus();
 
 $canvas->eventGenerate('<Delete>');
 
-# This seems to be required for the events to be reliabily registered for this test case outside of a MainLoop
+# This seems to be required for the events to be reliably registered for this test case outside of a MainLoop
 foreach (1..10){
         $TOP->update();
         $TOP->idletasks();
@@ -104,4 +104,5 @@ ok($focusID, undef, "Focus Return Check 2");
  
 
 
+MainLoop if(@ARGV);
 

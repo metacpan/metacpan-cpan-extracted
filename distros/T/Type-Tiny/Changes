@@ -6,12 +6,218 @@ Home page:    <https://metacpan.org/release/Type-Tiny>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
-1.002002	2018-04-17
+1.004002	2018-07-29
+
+ [ Bug Fixes ]
+ - Skip one particular test on old versions of Moo because it relies on a
+   feature introduced in Moo 1.004000.
+   Fixes RT#125948.
+   <https://rt.cpan.org/Ticket/Display.html?id=125948>
+
+1.004001	2018-07-28
+
+ [ Bug Fixes ]
+ - Add Eval::TypeTiny::Sandbox to the list of packages which should be
+   skipped as internal by Error::TypeTiny, as it was mistakenly removed in
+   1.003_008.
+   Fixes RT#125942.
+   <https://rt.cpan.org/Ticket/Display.html?id=125942>
+
+ [ Documentation ]
+ - Correct release date of 1.004000 in change log.
+
+1.004000	2018-07-27
+
+ [ Documentation ]
+ - Update NEWS.
+ - Update TODO.
+
+ [ Packaging ]
+ - Repackage as a stable release. No functional changes since 1.003_010.
+
+1.003_010	2018-07-25
+
+ [ Test Suite ]
+ - Improve test coverage for Type::Utils, Type::Coercion,
+   Types::Standard::Tuple, Eval::TypeTiny, Type::Registry,
+   Type::Tiny::Class, and Types::Standard::Tied.
+
+1.003_009	2018-07-24
+
+ [ Documentation ]
+ - Better documentation of parameterization API.
+
+ [ Test Suite ]
+ - Improve testing of Test::TypeTiny itself; the matchfor() function in
+   particular.
+ - Test bad parameters to NumRange and IntRange.
+ - Test late loading of Sub::Quote.
+
+ [ Other ]
+ - Types::Standard::Defined->complementary_type will now return
+   Types::Standard::Undef, and vice versa.
+
+1.003_008	2018-07-16
+
+ [ REGRESSIONS ]
+ - Make Error::TypeTiny aware of some newer internal modules.
+
+ [ Bug Fixes ]
+ - Fix error messages generating deep explanations of some parameterized
+   types.
+   Fixes RT#125765.
+   KB Jørgensen++
+   <https://rt.cpan.org/Ticket/Display.html?id=125765>
+
+ [ Test Suite ]
+ - Improve test coverage.
+ - Test Type::Utils' match_on_type's support for wantarray on strings of
+   code.
+
+ [ Other ]
+ - Improve processing of parameters to Types::Standard's parameterized type
+   constraints
+ - Simplify how Type::Registry generates the `t()` function.
+ - Split out some code from Types::Standard into autoloaded modules to
+   speed up loading.
+ - Types::Common::Numeric's IntRange and NumRange do better checking of
+   parameters.
+ - Types::Common::String's StrLength does better checking of parameters.
+
+1.003_007	2018-07-12
+
+ [ Test Suite ]
+ - Add tests for deep coercions in Tuples.
+ - Better tests for Eval::TypeTiny's implementations of alias=>1.
+ - Improve coverage.
+ - Restructure Types::TypeTiny test cases so more of them run when Moose
+   and Mouse aren't available.
+
+ [ Other ]
+ - Added: Eval::TypeTiny now supports PadWalker as a fallback
+   implementation of alias => 1.
+ - Added: Eval::TypeTiny provides a collection of constants to indicate the
+   current implementation of alias => 1.
+ - Eval::TypeTiny will now throw errors when it detects a mismatch between
+   sigils and reference types in the environment hashref but only if
+   EXTENDED_TESTING environment variable is true. Perl will probably give
+   you its own error message for this later on anyway.
+ - Improve progressive exporter in Types::TypeTiny to avoid loading
+   Exporter::TypeTiny more often.
+ - Removed: Eval::TypeTiny::HAS_LEXICAL_VARS constant is no longer
+   documented and will be removed at a later date.
+ - Types::Standard does better at checking the parameters of parameterized
+   types are valid.
+ - Updated: Eval::TypeTiny now supports Perl 5.22 refaliasing as the
+   preferred implementation of alias => 1.
+
+1.003_006	2018-07-08
+
+ [ Bug Fixes ]
+ - Fix issues with arrayref and hashref defaults in Type::Params.
+ - Workaround for Regexp-based check for Int clobbering $1 sometimes (this
+   will sometimes slow down Int checks a little, but is needed for
+   correctness).
+   Fixes RT#125132.
+   <https://rt.cpan.org/Ticket/Display.html?id=125132>
+
+ [ Documentation ]
+ - Better documentation of environment variables.
+ - Type::Params caller_level option is now documented.
+
+ [ Test Suite ]
+ - Improve coverage.
+
+ [ Other ]
+ - Added: PERL_TYPE_PARAMS_XS environment variable.
+ - Added: Type::Params compile/compile_named now have subname and
+   description options.
+
+1.003_005	2018-07-05
+
+ [ Documentation ]
+ - Type::Tiny::Manual::Coercions improvements.
+   Fixes RT#122305.
+   <https://rt.cpan.org/Ticket/Display.html?id=122305>
+
+ [ Other ]
+ - Added: Allow type libraries to mark certain type constraints as
+   deprecated.
+   Fixes RT#124728.
+   <https://rt.cpan.org/Ticket/Display.html?id=124728>
+
+1.003_004	2018-06-12
+
+ [ Bug Fixes ]
+ - Load modules with `use` instead of `require` in 00-begin.t.
+   Fixes RT#124067.
+   Andreas J König++
+   Slaven Rezić++
+   <https://rt.cpan.org/Ticket/Display.html?id=124067>
+
+1.003_003	2018-06-10
+
+ [ BACK COMPAT ]
+ - Bool (Types::Standard) is stricter, no longer allowing blessed objects
+   that overload stringification because that's weird.
+
+ [ Other ]
+ - Added: Bool now allows coercion from Any.
+
+1.003_002	2018-05-28
+
+ - Added: Types::Common::Numeric now has NumRange and IntRange types.
+ - Added: Types::Common::String now has a StrLength type.
+
+1.003_001	2018-05-22
+
+ [ Test Suite ]
+ - Tests for coercions to CycleTuple from Types::Standard with
+   non-inlineable type constraints.
+
+ [ Other ]
+ - Don't use Type::Tiny::XS's implementation of Bool in Types::Standard
+   unless Type::Tiny::XS >= 0.014.
+ - Looser definition of FileHandle in Types::Standard.
+   Fixes RT#121762.
+   <https://rt.cpan.org/Ticket/Display.html?id=121762>
+
+1.003_000	2018-05-20
 
  [ Bug Fixes ]
  - Compatibility with constants and with CV-in-stash optimisation.
    Fixes RT#123408.
    <https://rt.cpan.org/Ticket/Display.html?id=123408>
+
+ [ Documentation ]
+ - Add a new CONTRIBUTING.pod file.
+ - Document Type::Library's :coercion export tag.
+   Diab Jerius++
+ - Fix typo.
+   Philippe Bruhat++
+ - Improvements to Type::Params documentation.
+
+ [ Test Suite ]
+ - Skip t/30-integration/Moose/native-attribute-traits.t on older Moose
+   because Test::Moose is broken.
+
+ [ Packaging ]
+ - Ref::Util::XS 0.100 should be recommended, not 0.200 (which doesn't
+   exist yet).
+   Fixes RT#121981.
+   <https://rt.cpan.org/Ticket/Display.html?id=121981>
+
+ [ Other ]
+ - Added: Allow Type::Coercion's add_type_coercion to accept a
+   Type::Coercion object, which was already documented as working.
+   Diab Jerius++
+ - Added: Type::Params compile_named now supports bless/class/constructor
+   options.
+ - Added: Type::Params now exports a compile_named_oo function which
+   returns a parameters object.
+ - Added: Type::Params now supports parameter defaults.
+ - Don't use Type::Tiny::XS's implementation of PositiveInt in
+   Types::Common::Numeric unless Type::Tiny::XS >= 0.013.
 
 1.002001	2017-06-08
 

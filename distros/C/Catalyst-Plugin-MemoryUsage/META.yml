@@ -1,45 +1,53 @@
 ---
 abstract: 'Profile memory usage of requests'
 author:
-  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+  - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
-  Catalyst: 0
-  Catalyst::Controller: 0
-  File::Find: 0
-  File::Temp: 0
-  Module::Build: 0.3601
-  Test::More: 0.88
-  Test::WWW::Mechanize::Catalyst: 0
-  parent: 0
+  Catalyst: '0'
+  Catalyst::Controller: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::WWW::Mechanize::Catalyst: '0'
+  lib: '0'
+  parent: '0'
 configure_requires:
-  Module::Build: 0.3601
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Catalyst-Plugin-MemoryUsage
 provides:
   Catalyst::Plugin::MemoryUsage:
     file: lib/Catalyst/Plugin/MemoryUsage.pm
-    version: v0.4.0
+    version: v0.4.1
 requires:
-  Devel::CheckOS: 0
-  List::Util: 0
-  MRO::Compat: 0
-  Memory::Usage: 0
-  Moose::Role: 0
-  Number::Bytes::Human: 0
-  Text::SimpleTable: 0
-  namespace::autoclean: 0
-  strict: 0
-  warnings: 0
+  Devel::CheckOS: '0'
+  List::Util: '0'
+  MRO::Compat: '0'
+  Memory::Usage: '0'
+  Moose::Role: '0'
+  Number::Bytes::Human: '0'
+  Text::SimpleTable: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Plugin-MemoryUsage
-  homepage: http://search.cpan.org/dist/Catalyst-Plugin-MemoryUsage/
+  bugtracker: https://github.com/yanick/Catalyst-Plugin-MemoryUsage/issues
+  homepage: https://github.com/yanick/Catalyst-Plugin-MemoryUsage
   repository: https://github.com/yanick/Catalyst-Plugin-MemoryUsage.git
-version: 0.4.0
+version: 0.4.1
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.01
+x_contributors:
+  - 'Mike Doherty <doherty@pythian.com>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

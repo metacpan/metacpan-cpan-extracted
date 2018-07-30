@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -24,6 +24,7 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Test::Fatal;
 use Test::TypeTiny;
 
 use Types::Standard qw( Tied HashRef );
@@ -85,5 +86,8 @@ should_pass($h, $intersection);
 should_fail($a, $intersection);
 should_fail($s, $intersection);
 should_fail({foo=>2}, $intersection);
+
+my $e = exception { Tied[{}] };
+like($e, qr/^Parameter to Tied\[.a\] expected to be a class name/, 'weird exception');
 
 done_testing;

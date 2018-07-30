@@ -134,6 +134,7 @@ sub _deploy {
             method => 'PUT',
             path   => "/$index_name",
             body   => $dep,
+            ignore => [404],
         }
     );
     sleep(1);

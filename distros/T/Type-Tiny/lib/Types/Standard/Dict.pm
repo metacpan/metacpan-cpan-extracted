@@ -6,13 +6,13 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Dict::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Dict::VERSION   = '1.002002';
+	$Types::Standard::Dict::VERSION   = '1.004002';
 }
 
 use Types::Standard ();
 use Types::TypeTiny ();
 
-sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
+sub _croak ($;@) { require Carp; goto \&Carp::confess; require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 my $_optional = Types::Standard::Optional;
 my $_hash     = Types::Standard::HashRef;
@@ -21,18 +21,41 @@ my $_any      = Types::Standard::Any;
 
 no warnings;
 
+sub pair_iterator {
+	_croak("Expected even-sized list") if @_ % 2;
+	my @array = @_;
+	sub {
+		return unless @array;
+		splice(@array, 0, 2);
+	};
+}
+
 sub __constraint_generator
 {
-	my $slurpy = ref($_[-1]) eq q(HASH) ? pop(@_)->{slurpy} : undef;
-	my %constraints = @_;
+	my $shash;
+	my $slurpy = ref($_[-1]) eq q(HASH) ? do { $shash = pop @_; Types::TypeTiny::to_TypeTiny($shash->{slurpy}) } : undef;
+	my $iterator = pair_iterator @_;
+	my %constraints;
 	my %is_optional;
+	my @keys;
 	
-	while (my ($k, $v) = each %constraints)
+	if ($slurpy)
 	{
-		$constraints{$k} = Types::TypeTiny::to_TypeTiny($v);
-		$is_optional{$k} = !!$constraints{$k}->is_strictly_a_type_of($_optional);
+		Types::TypeTiny::TypeTiny->check($slurpy)
+			or _croak("Slurpy parameter to Dict[...] expected to be a type constraint; got $slurpy");
+		
+		$shash->{slurpy} = $slurpy;  # store canonicalized slurpy
+	}
+	
+	while (my ($k, $v) = $iterator->())
+	{
+		$constraints{$k} = $v;
 		Types::TypeTiny::TypeTiny->check($v)
-			or _croak("Parameter to Dict[`a] for key '$k' expected to be a type constraint; got $v");
+			or _croak("Parameter for Dict[...] with key '$k' expected to be a type constraint; got $v");
+		Types::TypeTiny::StringLike->check($k)
+			or _croak("Key for Dict[...] expected to be string; got $k");
+		push @keys, $k;
+		$is_optional{$k} = !!$constraints{$k}->is_strictly_a_type_of($_optional);
 	}
 	
 	return sub
@@ -49,7 +72,7 @@ sub __constraint_generator
 		{
 			exists($constraints{$_}) || return for sort keys %$value;
 		}
-		for my $k (sort keys %constraints) {
+		for my $k (@keys) {
 			exists($value->{$k}) or ($is_optional{$k} ? next : return);
 			$constraints{$k}->check($value->{$k}) or return;
 		}
@@ -80,14 +103,18 @@ sub __inline_generator
 			&& [ $_any, $slurpy->parameters->[0] ]
 		));
 	
-	my %constraints = @_;
-	for my $c (values %constraints)
+	my $iterator = pair_iterator @_;
+	my %constraints;
+	my @keys;
+	
+	while (my ($k, $c) = $iterator->())
 	{
-		next if $c->can_be_inlined;
-		return;
+		return unless $c->can_be_inlined;
+		$constraints{$k} = $c;
+		push @keys, $k;
 	}
 	
-	my $regexp = join "|", map quotemeta, sort keys %constraints;
+	my $regexp = join "|", map quotemeta, @keys;
 	return sub
 	{
 		require B;
@@ -117,7 +144,7 @@ sub __inline_generator
 				$constraints{$_}->is_strictly_a_type_of( $_optional )
 					? sprintf('(!exists %s->{%s} or %s)', $h, $k, $constraints{$_}->inline_check("$h\->{$k}"))
 					: ( "exists($h\->{$k})", $constraints{$_}->inline_check("$h\->{$k}") )
-			} sort keys %constraints ),
+			} @keys ),
 	}
 }
 
@@ -128,11 +155,19 @@ sub __deep_explanation
 	my @params = @{ $type->parameters };
 	
 	my $slurpy = ref($params[-1]) eq q(HASH) ? pop(@params)->{slurpy} : undef;
-	my %constraints = @params;
-			
-	for my $k (sort keys %constraints)
+	my $iterator = pair_iterator @params;
+	my %constraints;
+	my @keys;
+	
+	while (my ($k, $c) = $iterator->())
 	{
-		next if $constraints{$k}->parent == Types::Standard::Optional && !exists $value->{$k};
+		push @keys, $k;
+		$constraints{$k} = $c;
+	}
+
+	for my $k (@keys)
+	{
+		next if $constraints{$k}->has_parent && ($constraints{$k}->parent == Types::Standard::Optional) && (!exists $value->{$k});
 		next if $constraints{$k}->check($value->{$k});
 		
 		return [
@@ -304,6 +339,84 @@ sub __coercion_generator
 	return $C;
 }
 
+sub __dict_is_slurpy
+{
+	my $self = shift;
+	
+	return !!0 if $self==Types::Standard::Dict();
+	
+	my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Dict() });
+	ref($dict->parameters->[-1]) eq q(HASH)
+		? $dict->parameters->[-1]{slurpy}
+		: !!0
+}
+
+sub __hashref_allows_key
+{
+	my $self = shift;
+	my ($key) = @_;
+	
+	return Types::Standard::Str()->check($key) if $self==Types::Standard::Dict();
+	
+	my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Dict() });
+	my %params;
+	my $slurpy = $dict->my_dict_is_slurpy;
+	if ($slurpy)
+	{
+		my @args = @{$dict->parameters};
+		pop @args;
+		%params = @args;
+	}
+	else
+	{
+		%params = @{ $dict->parameters }
+	}
+	
+	return !!1
+		if exists($params{$key});
+	return !!0
+		if !$slurpy;
+	return Types::Standard::Str()->check($key)
+		if $slurpy==Types::Standard::Any() || $slurpy==Types::Standard::Item() || $slurpy==Types::Standard::Defined() || $slurpy==Types::Standard::Ref();
+	return $slurpy->my_hashref_allows_key($key)
+		if $slurpy->is_a_type_of(Types::Standard::HashRef());
+	return !!0;
+}
+
+sub __hashref_allows_value
+{
+	my $self = shift;
+	my ($key, $value) = @_;
+	
+	return !!0 unless $self->my_hashref_allows_key($key);
+	return !!1 if $self==Types::Standard::Dict();
+	
+	my $dict = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Dict() });
+	my %params;
+	my $slurpy = $dict->my_dict_is_slurpy;
+	if ($slurpy)
+	{
+		my @args = @{$dict->parameters};
+		pop @args;
+		%params = @args;
+	}
+	else
+	{
+		%params = @{ $dict->parameters }
+	}
+	
+	return !!1
+		if exists($params{$key}) && $params{$key}->check($value);
+	return !!0
+		if !$slurpy;
+	return !!1
+		if $slurpy==Types::Standard::Any() || $slurpy==Types::Standard::Item() || $slurpy==Types::Standard::Defined() || $slurpy==Types::Standard::Ref();
+	return $slurpy->my_hashref_allows_value($key, $value)
+		if $slurpy->is_a_type_of(Types::Standard::HashRef());
+	return !!0;
+}
+
+
 1;
 
 __END__
@@ -342,7 +455,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

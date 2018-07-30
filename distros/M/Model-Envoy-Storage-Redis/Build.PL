@@ -9,9 +9,10 @@ my $build = Module::Build->new(
     requires    => {
         'perl'                   => '5.18.2',
         'Moose'                  => '>= 2.2010',
-        'Model::Envoy'           => '>= 0.2.4',
+        'Model::Envoy'           => '>= 0.4.1',
         'Redis::Fast'            => '>= 0.21',
         'MooseX::ClassAttribute' => '>=0.29',
+        'JSON::XS'               => '>=3.04',
     },
     configure_requires => {
         'Module::Build' => '>= 0.4211',

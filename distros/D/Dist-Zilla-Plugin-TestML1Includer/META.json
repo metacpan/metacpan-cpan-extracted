@@ -1,0 +1,58 @@
+{
+   "abstract" : "Ship your TestML1 version",
+   "author" : [
+      "Ingy d\u00f6t Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-TestML1Includer",
+   "no_index" : {
+      "directory" : [
+         "example",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::ModuleIncluder" : "0",
+            "Moose" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/dist-zilla-plugin-testml1includer-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/dist-zilla-plugin-testml1includer-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/dist-zilla-plugin-testml1includer-pm.git",
+         "web" : "https://github.com/ingydotnet/dist-zilla-plugin-testml1includer-pm"
+      }
+   },
+   "version" : "0.0.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
+}
+

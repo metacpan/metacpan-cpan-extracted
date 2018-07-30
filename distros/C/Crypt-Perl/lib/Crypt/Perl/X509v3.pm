@@ -35,6 +35,8 @@ Crypt::Perl::X509v3 - TLS/SSL Certificates
         subject_unique_id => '..',
     );
 
+    # The signature algorithm (2nd argument) is not needed
+    # when the signing key is Ed25519.
     $cert->sign( $crypt_perl_private_key_obj, 'sha256' );
 
     my $pem = $cert->to_pem();
@@ -56,8 +58,6 @@ There currently is not a parsing interface. Hopefully that can be remedied.
 
 use parent qw( Crypt::Perl::ASN1::Encodee );
 
-use Digest::SHA ();
-
 use Crypt::Perl::ASN1::Signatures ();
 use Crypt::Perl::X509::Extensions ();
 use Crypt::Perl::X509::Name ();
@@ -70,6 +70,7 @@ use Crypt::Perl::X ();
 sub to_pem {
     my ($self) = @_;
 
+    require Crypt::Format;
     return Crypt::Format::der2pem( $self->to_der(), 'CERTIFICATE' );
 }
 
@@ -164,22 +165,20 @@ sub new {
 sub sign {
     my ($self, $signer_key, $digest_algorithm) = @_;
 
-    #This validates the digest algorithm.
-    my $tbs = $self->_encode_tbs_certificate($signer_key, $digest_algorithm);
+    my ( $tbs, $digest_length ) = $self->_encode_tbs_certificate($signer_key, $digest_algorithm);
 
     my ($sig_alg, $sig_func, $signature);
 
-    $digest_algorithm =~ m<([0-9]+)\z> or die "huh? ($digest_algorithm)";
-    my $digest_length = $1;
-
     if ($signer_key->isa('Crypt::Perl::ECDSA::PrivateKey')) {
-        #$sig_alg = $signer_key->get_public_key()->algorithm_identifier_with_curve_name();
+        require Digest::SHA;
+
         $sig_alg = "ecdsa-with-SHA$digest_length";
 
         $signature = $signer_key->sign( Digest::SHA->can($digest_algorithm)->($tbs) );
     }
     elsif ($signer_key->isa('Crypt::Perl::RSA::PrivateKey')) {
-        #$sig_alg = $signer_key->get_public_key()->algorithm_identifier();
+        require Digest::SHA;
+
         $sig_alg = "sha${digest_length}WithRSAEncryption";
 
         my $sign_cr = $signer_key->can("sign_RS$digest_length") or do {
@@ -187,6 +186,10 @@ sub sign {
         };
 
         $signature = $sign_cr->($signer_key, $tbs);
+    }
+    elsif ($signer_key->isa('Crypt::Perl::Ed25519::PrivateKey')) {
+        $sig_alg = 'ed25519';
+        $signature = $signer_key->sign($tbs);
     }
     else {
         die "Key ($signer_key) is not a recognized private key object!";
@@ -205,6 +208,14 @@ sub sign {
     return $self;
 }
 
+sub _get_digest_length {
+    $_[0] =~ m<\Asha(224|256|384|512)\z> or do {
+        die Crypt::Perl::X::create('Generic', "Unknown digest algorithm: “$_[0]”");
+    };
+
+    return $1;
+}
+
 sub _encode_params {
     my ($self) = @_;
 
@@ -218,10 +229,7 @@ sub _encode_params {
 sub _encode_tbs_certificate {
     my ($self, $signing_key, $digest_algorithm) = @_;
 
-    $digest_algorithm =~ m<\Asha(224|256|384|512)\z> or do {
-        die Crypt::Perl::X::create('Generic', "Unknown digest algorithm: “$digest_algorithm”");
-    };
-    my $digest_length = $1;
+    my $digest_length = $digest_algorithm && _get_digest_length($digest_algorithm);
 
     my $sig_alg;
 
@@ -229,13 +237,15 @@ sub _encode_tbs_certificate {
 
     if ($self->{'_key'}->isa('Crypt::Perl::ECDSA::PublicKey')) {
         $pubkey_der = $self->{'_key'}->to_der_with_curve_name();
-        #$sig_alg = 'ecPublicKey'; #"ecdsa-with-SHA$digest_length";
         $sig_alg = "ecdsa-with-SHA$digest_length";
     }
     elsif ($self->{'_key'}->isa('Crypt::Perl::RSA::PublicKey')) {
         $pubkey_der = $self->{'_key'}->to_subject_der();
-        #$sig_alg = 'rsaEncryption'; #"sha${digest_length}WithRSAEncryption";
         $sig_alg = "sha${digest_length}WithRSAEncryption";
+    }
+    elsif ($self->{'_key'}->isa('Crypt::Perl::Ed25519::PublicKey')) {
+        $sig_alg = 'ed25519';
+        $pubkey_der = $self->{'_key'}->to_der();
     }
     else {
         die "Key ($self->{'_key'}) is not a recognized public key object!";
@@ -276,7 +286,7 @@ sub _encode_tbs_certificate {
     $asn1 = $asn1->find('TBSCertificate');
     $asn1->configure( encode => { time => 'utctime' } );
 
-    return $asn1->encode($params_hr);
+    return ( $asn1->encode($params_hr), $digest_length );
 }
 
 #sub _get_GeneralizedTime {

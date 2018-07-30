@@ -11,7 +11,7 @@ use Sub::Util qw(set_subname);
 use B qw(perlstring);
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.006';
+our $VERSION   = '0.007';
 
 sub import {
 	my $class  = shift;
@@ -35,7 +35,7 @@ sub setup_for {
 		$attrs = [$attrs] unless ref $attrs;
 		for my $attr (@$attrs) {
 			%spec = $class->process_spec($target, $attr, %spec);
-			if (ref $spec{handles}) {
+			if (delete $spec{moox_enumeration_process_handles}) {
 				$class->install_delegates($target, $attr, \%spec);
 			}
 			$orig->($attr, %spec);
@@ -70,6 +70,8 @@ sub process_spec {
 	
 	# Canonicalize handles
 	if (my $handles = $spec{handles}) {
+		
+		$spec{moox_enumeration_process_handles} = !!1;
 		
 		if (!ref $handles and $handles eq 1) {
 			$handles = +{ map +( "is_$_" => [ "is", $_ ] ), @values };

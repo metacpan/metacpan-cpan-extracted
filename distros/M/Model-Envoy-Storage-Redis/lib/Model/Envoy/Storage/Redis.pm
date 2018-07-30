@@ -1,9 +1,10 @@
 package Model::Envoy::Storage::Redis;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.2';
 
 use Moose;
 use MooseX::ClassAttribute;
+use JSON::XS;
 
 extends 'Model::Envoy::Storage';
 
@@ -26,7 +27,6 @@ sub configure {
     $class->redis(
         ref $conf->{redis} eq 'CODE' ? $conf->{redis}->() : $conf->{redis}
     );
-
     $conf->{_configured} = 1;
 }
 
@@ -48,7 +48,7 @@ sub fetch {
 
     if ( my $result = $self->redis->get( 'id:' . $id ) ) {
 
-        return $model_class->build($result);
+        return $model_class->build( decode_json( $result ) );
     }
 
     return undef;
@@ -57,9 +57,14 @@ sub fetch {
 sub save {
     my ( $self ) = @_;
 
-    $self->redis->set( 'id:' . $self->model->id => $self->model->dump );
+    $self->redis->set( 'id:' . $self->model->id => encode_json( $self->model->dump ) );
 
     return $self;
+}
+
+sub list {
+
+    return undef;
 }
 
 sub delete {

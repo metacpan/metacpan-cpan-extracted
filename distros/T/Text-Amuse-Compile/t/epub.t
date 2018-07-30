@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 47;
+use Test::More tests => 51;
 use File::Spec;
 use Text::Amuse::Compile;
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
@@ -44,6 +44,7 @@ foreach my $file (qw/piece000001.xhtml
                      titlepage.xhtml/) {
     my $page = read_file(File::Spec->catfile($tmpdir->dirname,
                                              $file));
+    like $page, qr{xml:lang="en" lang="en" dir="ltr"};
     like $page, qr{<title>.*\&amp\;.*\&amp\;.*</title>}, "Title escaped on $file";
     like $page, qr{\&amp\;.*\&amp\;}, "& escaped on $file";
     unlike $page, qr{\&amp\;#160\;};

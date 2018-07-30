@@ -785,7 +785,19 @@ sub epub {
 
     my $text = $self->document;
 
-    my @pieces = $text->as_splat_html;
+    my @pieces;
+    if ($text->can('as_splat_html_with_attrs')) {
+        @pieces = $text->as_splat_html_with_attrs;
+    }
+    else {
+        @pieces = map {
+            +{
+              text => $_,
+              language_code => $text->language_code,
+              html_direction => $text->html_direction,
+             }
+        } $text->as_splat_html;
+    }
     my @toc = $text->raw_html_toc;
     # fixed in 0.51
     if (my $missing = scalar(@pieces) - scalar(@toc)) {
@@ -931,7 +943,8 @@ HTML
                        {
                         title => $self->_remove_tags($header->{title} || 'Untitled'),
                         text => $titlepage,
-                        options => { %{$self->html_options} },
+                        html_direction => $text->html_direction,
+                        language_code => $text->language_code,
                        },
                        \$firstpage)
       or $self->log_fatal($self->tt->error);
@@ -952,7 +965,7 @@ HTML
         my $piecenumber = 0;
         foreach my $piece (@pieces) {
             # we insert these in Text::Amuse, so it's not a wild regexp.
-            while ($piece =~ m/<a id="(text-amuse-label-.+?)"( class="text-amuse-internal-anchor")?><\/a>/g) {
+            while ($piece->{text} =~ m/<a id="(text-amuse-label-.+?)"( class="text-amuse-internal-anchor")?><\/a>/g) {
                 my $label = $1;
                 $internal_links{$label} =
                   $self->_format_epub_fragment($toc[$piecenumber]{index});
@@ -972,20 +985,19 @@ HTML
         }
     };
     while (@pieces) {
-        my $fi =    shift @pieces;
+        my $piece = shift @pieces;
         my $index = shift @toc;
         my $xhtml = "";
         # print Dumper($index);
         my $filename = $self->_format_epub_fragment($index->{index});
         my $prefix = '*' x $index->{level};
         my $title = $prefix . " " . $index->{string};
-        $fi =~ s/(<a class="text-amuse-link" href=")#(text-amuse-label-.+?)"/$1 . $fix_link->($2) .  '"'/ge;
+        $piece->{text} =~ s/(<a class="text-amuse-link" href=")#(text-amuse-label-.+?)"/$1 . $fix_link->($2) .  '"'/ge;
 
         $self->tt->process($self->templates->minimal_html,
                            {
                             title => $self->_remove_tags($title),
-                            options => { %{$self->html_options} },
-                            text => $fi,
+                            %$piece,
                            },
                            \$xhtml)
           or $self->log_fatal($self->tt->error);
@@ -1243,7 +1255,10 @@ sub _prepare_tex_tokens {
 
     # I don't like doing this here, but here we go...
     my %scripts = (
-                   russian    => 'Cyrillic',
+                   russian  => 'Cyrillic',
+                   farsi    => 'Arabic',
+                   arabic   => 'Arabic',
+                   hebrew   => 'Hebrew',
                   );
 
     if (my $script = $scripts{$lang}) {
@@ -1279,11 +1294,11 @@ sub _prepare_tex_tokens {
             $parsed{other_languages_additional} = join("\n", sort keys %additional_strings);
         }
     }
-
     return {
             options => \%tokens,
             safe_options => \%parsed,
             doc => $doc,
+            disable_bigfoot => 0, # $doc->is_rtl || $doc->is_bidi,
             tex_metadata => $self->file_header->tex_metadata,
            };
 }

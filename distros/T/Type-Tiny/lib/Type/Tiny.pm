@@ -10,11 +10,10 @@ BEGIN {
 
 BEGIN {
 	$Type::Tiny::AUTHORITY   = 'cpan:TOBYINK';
-	$Type::Tiny::VERSION     = '1.002002';
+	$Type::Tiny::VERSION     = '1.004002';
 	$Type::Tiny::XS_VERSION  = '0.011';
 }
 
-use Eval::TypeTiny ();
 use Scalar::Util qw( blessed weaken refaddr isweak );
 use Types::TypeTiny ();
 
@@ -52,19 +51,6 @@ BEGIN {
 		? sub () { $INC{'Mouse/Util.pm'} and Mouse::Util::MOUSE_XS() }
 		: sub () { !!0 };
 };
-
-sub __warn__ {
-	my ($msg, $thing) = @_==2 ? @_ : (Thing => @_);
-	my $string = do {
-		blessed($thing) && $thing->isa('Type::Tiny::Union') ? sprintf('Union[%s]', join q{, }, map $_->name, @{$thing->type_constraints}) :
-		blessed($thing) && $thing->isa('Type::Tiny') ? $thing->name :
-		blessed($thing) && $thing->isa('Type::Tiny::_HalfOp') ? sprintf('HalfOp[ q{%s}, %s, %s ]', $thing->{op}, $thing->{type}->name, $thing->{param}) :
-		!defined($thing) ? 'NIL' :
-		"$thing"
-	};
-	warn "$msg => $string\n";
-	$thing;
-}
 
 use overload
 	q("")      => sub { caller =~ m{^(Moo::HandleMoose|Sub::Quote)} ? overload::StrVal($_[0]) : $_[0]->display_name },
@@ -174,6 +160,7 @@ sub new
 	and not exists $params{constraint_generator}
 	and not exists $params{inline_generator})
 	{
+		require Eval::TypeTiny;
 		my $code = $params{constraint};
 		$params{constraint} = Eval::TypeTiny::eval_closure(
 			source      => sprintf('sub ($) { %s }', $code),
@@ -194,7 +181,15 @@ sub new
 		
 		_croak "Parent must be an instance of %s", __PACKAGE__
 			unless blessed($params{parent}) && $params{parent}->isa(__PACKAGE__);
+		
+		if ($params{parent}->deprecated and not exists $params{deprecated})
+		{
+			$params{deprecated} = 1;
+		}
 	}
+	
+	# canonicalize to a boolean
+	$params{deprecated} = !!$params{deprecated};
 	
 	$params{name} = "__ANON__" unless exists $params{name};
 	$params{uniq} = $uniq++;
@@ -274,7 +269,7 @@ sub new
 			if not defined $subname;
 		if ($subname)
 		{
-			$subname->(
+			(Scalar::Util::reftype($params{my_methods}{$_}) eq 'CODE') && $subname->(
 				sprintf("%s::my_%s", $self->qualified_name, $_),
 				$params{my_methods}{$_},
 			) for keys %{$params{my_methods}};
@@ -347,6 +342,7 @@ sub coercion                 { $_[0]{coercion}       ||= $_[0]->_build_coercion 
 sub message                  { $_[0]{message} }
 sub library                  { $_[0]{library} }
 sub inlined                  { $_[0]{inlined} }
+sub deprecated               { $_[0]{deprecated} }
 sub constraint_generator     { $_[0]{constraint_generator} }
 sub inline_generator         { $_[0]{inline_generator} }
 sub name_generator           { $_[0]{name_generator} ||= $_[0]->_build_name_generator }
@@ -430,6 +426,7 @@ sub _build_compiled_check
 		return $self->parent->compiled_check;
 	}
 	
+	require Eval::TypeTiny;
 	return Eval::TypeTiny::eval_closure(
 		source      => sprintf('sub ($) { %s }', $self->inline_check('$_[0]')),
 		description => sprintf("compiled check '%s'", $self),
@@ -740,7 +737,7 @@ sub inline_check
 			unless $self->has_parent;
 		$r[0] = $self->parent->inline_check(@_);
 	}
-	my $r = join " && " => map { /[;{}]/ ? "do { $_ }" : "($_)" } @r;
+	my $r = join " && " => map { /[;{}]/ && !/\Ado \{.+\}\z/ ? "do { $_ }" : "($_)" } @r;
 	return @r==1 ? $r : "($r)";
 }
 
@@ -1343,6 +1340,15 @@ The package name of the type library this type is associated with.
 Optional. Informational only: setting this attribute does not install
 the type into the package.
 
+=item C<< deprecated >>
+
+Optional boolean indicating whether a type constraint is deprecated.
+L<Type::Library> will issue a warning if you attempt to import a deprecated
+type constraint, but otherwise the type will continue to function as normal.
+There will not be deprecation warnings every time you validate a value, for
+instance. If omitted, defaults to the parent's deprecation status (or false
+if there's no parent).
+
 =item C<< message >>
 
 Coderef that returns an error message when C<< $_ >> does not validate
@@ -1376,26 +1382,57 @@ constraints. Unlike Moose, these aren't handled by separate subclasses.
 
 =item C<< constraint_generator >>
 
-Coderef that generates a new constraint coderef based on parameters.
-Alternatively, the constraint generator can return a fully-formed
-Type::Tiny object, in which case the C<name_generator>, C<inline_generator>,
-and C<coercion_generator> attributes documented below are ignored.
+Coderef that is called when a type constraint is parameterized. When called,
+it is passed the list of parameters, though any parameter which looks like a
+foreign type constraint (Moose type constraints, Mouse type constraints, etc,
+I<< and coderefs(!!!) >>) is first coerced to a native Type::Tiny object.
+
+Note that for compatibility with the Moose API, the base type is I<not>
+passed to the constraint generator, but can be found in the package variable
+C<< $Type::Tiny::parameterize_type >>. The first parameter is also available
+as C<< $_ >>.
+
+Types I<can> be parameterized with an empty parameter list. For example,
+in L<Types::Standard>, C<Tuple> is just an alias for C<ArrayRef> but
+C<< Tuple[] >> will only allow zero-length arrayrefs to pass the constraint.
+If you wish C<< YourType >> and C<< YourType[] >> to mean the same thing,
+then do:
+
+ return $Type::Tiny::parameterize_type unless @_;
+
+The constraint generator should generate and return a new constraint coderef
+based on the parameters. Alternatively, the constraint generator can return a
+fully-formed Type::Tiny object, in which case the C<name_generator>,
+C<inline_generator>, and C<coercion_generator> attributes documented below
+are ignored.
 
 Optional; providing a generator makes this type into a parameterizable
-type constraint.
+type constraint. If there is no generator, attempting to parameterize the
+type constraint will throw an exception.
 
 =item C<< name_generator >>
 
-A coderef which generates a new display_name based on parameters.
+A coderef which generates a new display_name based on parameters. Called with
+the same parameters and package variables as the C<constraint_generator>.
+Expected to return a string.
+
 Optional; the default is reasonable.
 
 =item C<< inline_generator >>
 
-A coderef which generates a new inlining coderef based on parameters.
+A coderef which generates a new inlining coderef based on parameters. Called
+with the same parameters and package variables as the C<constraint_generator>.
+Expected to return a coderef.
+
+Optional.
 
 =item C<< coercion_generator >>
 
 A coderef which generates a new L<Type::Coercion> object based on parameters.
+Called with the same parameters and package variables as the
+C<constraint_generator>. Expected to return a blessed object.
+
+Optional.
 
 =item C<< deep_explanation >>
 
@@ -1832,6 +1869,18 @@ for easy localization.
 
 =back
 
+=head2 Environment
+
+=over
+
+=item C<PERL_TYPE_TINY_XS>
+
+Currently this has more effect on L<Types::Standard> than Type::Tiny. In
+future it may be used to trigger or suppress the loading XS implementations
+of parts of Type::Tiny.
+
+=back
+
 =head1 BUGS
 
 Please report any bugs to
@@ -1866,7 +1915,7 @@ Thanks to Matt S Trout for advice on L<Moo> integration.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

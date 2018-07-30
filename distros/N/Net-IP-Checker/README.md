@@ -4,7 +4,7 @@ Net::IP::Checker - IPv4/IPv6 addresses validator
 
 # VERSION
 
-version 0.02
+version 0.03
 
 # SYNOPSIS
 
@@ -33,7 +33,7 @@ Net::IP::Checker
 # FUNCTIONS
 
 The same as [Net::IP](https://metacpan.org/pod/Net::IP) these functions are not exported by default. You may import them explicitly
-or use `:PROC` to import them all.
+or use `:ALL` to import them all.
 
 - `ip_get_version`
 

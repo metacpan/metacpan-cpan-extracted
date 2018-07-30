@@ -59,6 +59,11 @@ SV* pl_instanceof_global_or_property(pTHX_ V8Context* ctx, const char* oname, co
 int pl_set_global_or_property(pTHX_ V8Context* ctx, const char* name, SV* value);
 
 /*
+ * Delete a global / nested property.
+ */
+int pl_del_global_or_property(pTHX_ V8Context* ctx, const char* name);
+
+/*
  * Run the V8 GC
  */
 int pl_run_gc(V8Context* ctx);

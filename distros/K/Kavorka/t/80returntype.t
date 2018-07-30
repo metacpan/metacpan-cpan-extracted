@@ -35,10 +35,10 @@ fun add1 ($a, $b → Int) {
 
 is( add1(4,5), 9 );
 is( add1(4.1,4.9), 9 );
-like(exception { my $r = add1(4.1, 5) }, qr{did not pass type constraint "Int" at \S+ line 38});
+like(exception { my $r = add1(4.1, 5) }, qr{did not pass type constraint "Int"});
 
 is_deeply( [add1(4,5)], [9] );
-like(exception { my @r = add1(4.1, 5) }, qr{did not pass type constraint "ArrayRef.Int." at \S+ line 41});
+like(exception { my @r = add1(4.1, 5) }, qr{did not pass type constraint "ArrayRef.Int."});
 
 note "type constraint expression";
 
@@ -61,10 +61,10 @@ fun add3 ($a, $b → Int, ArrayRef[Int] is list) {
 
 is( add3(4,5), 9 );
 is( add3(4.1,4.9), 9 );
-like(exception { my $r = add3(4.1, 5) }, qr{did not pass type constraint "Int" at \S+ line 64});
+like(exception { my $r = add3(4.1, 5) }, qr{did not pass type constraint "Int"});
 
 is_deeply( [add3(4,5)], [4,5] );
-like(exception { my @r = add3(4.1,4.9) }, qr{did not pass type constraint "ArrayRef.Int." at \S+ line 67});
-like(exception { my @r = add3(4.1,5) }, qr{did not pass type constraint "ArrayRef.Int." at \S+ line 68});
+like(exception { my @r = add3(4.1,4.9) }, qr{did not pass type constraint "ArrayRef.Int."});
+like(exception { my @r = add3(4.1,5) }, qr{did not pass type constraint "ArrayRef.Int."});
 
 done_testing;

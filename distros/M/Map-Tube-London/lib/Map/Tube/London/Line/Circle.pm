@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Circle;
 
-$Map::Tube::London::Line::Circle::VERSION   = '1.09';
+$Map::Tube::London::Line::Circle::VERSION   = '1.13';
 $Map::Tube::London::Line::Circle::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Circle - London Tube Map: Circle Line.
 
 =head1 VERSION
 
-Version 1.09
+Version 1.13
 
 =head1 DESCRIPTION
 
@@ -62,47 +62,138 @@ London Tube Map: Circle Line.
 
 =over 2
 
-=item * The station "Edgware Road" is also part of
+=item * The station "Aldgate" is also part of
+          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+
+=item * The station "Baker Street" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+        | L<Jubilee Line|Map::Tube::London::Line::Jubilee>
+        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+
+=item * The station "Barbican" is also part of
+          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+
+=item * The station "Bayswater" is also part of
           L<District Line|Map::Tube::London::Line::District>
-        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>.
+
+=item * The station "Blackfriars" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Cannon Street" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Edgware Road" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+        | L<District Line|Map::Tube::London::Line::District>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Embankment" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+        | L<District Line|Map::Tube::London::Line::District>
+        | L<Northern Line|Map::Tube::London::Line::Northern>
+
+=item * The station "Euston Square" is also part of
+          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+
+=item * The station "Farringdon" is also part of
+          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+
+=item * The station "Gloucester Road" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+        | L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+
+=item * The station "Goldhawk Road" is also part of
+          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Great Portland Street" is also part of
+          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
 
 =item * The station "Hammersmith" is also part of
           L<District Line|Map::Tube::London::Line::District>
         | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
-        | L<Picadilly Line|Map::Tube::London::Line::Piccadilly>.
+        | L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
 
 =item * The station "High Street Kensington" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
+          L<District Line|Map::Tube::London::Line::District>
 
-=item * The station "Gloucester Road" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
-
-=item * The station "Paddington" is also part of
-          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
-        | L<District Line|Map::Tube::London::Line::District>.
-
-=item * The station "Moorgate" is also part of
-          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
-        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
-        | L<Northern Line|Map::Tube::London::Line::Northern>.
-
-=item * The station "King's Cross St Pancras" is also part of
+=item * The station "King's Cross St. Pancras" is also part of
           L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
         | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
         | L<Northern Line|Map::Tube::London::Line::Northern>
-        | L<Picadilly Line|Map::Tube::London::Line::Piccadilly>
-        | L<Victoria Line|Map::Tube::London::Line::Victoria>.
+        | L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+        | L<Victoria Line|Map::Tube::London::Line::Victoria>
+
+=item * The station "Ladbroke Grove" is also part of
+          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Latimer Road" is also part of
+          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
 
 =item * The station "Liverpool Street" is also part of
           L<Central Line|Map::Tube::London::Line::Central>
         | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
-        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
+        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
 
-=item * The station "Baker Street" is also part of
+=item * The station "Mansion House" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Monument" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Moorgate" is also part of
           L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
+        | L<Northern Line|Map::Tube::London::Line::Northern>
+
+=item * The station "Notting Hill Gate" is also part of
+          L<Central Line|Map::Tube::London::Line::Central>
+        | L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Paddington" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+        | L<District Line|Map::Tube::London::Line::District>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Royal Oak" is also part of
+          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Shepherd's Bush Market" is also part of
+          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Sloane Square" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "South Kensington" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+        | L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+
+=item * The station "St. James's Park" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Temple" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Tower Hill" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+
+=item * The station "Victoria" is also part of
+          L<District Line|Map::Tube::London::Line::District>
+        | L<Victoria Line|Map::Tube::London::Line::Victoria>
+
+=item * The station "Westbourne Park" is also part of
+          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+
+=item * The station "Westminster" is also part of
+          L<District Line|Map::Tube::London::Line::District>
         | L<Jubilee Line|Map::Tube::London::Line::Jubilee>
-        | L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
-        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
+
+=item * The station "Wood Lane" is also part of
+          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
 
 =back
 

@@ -4,7 +4,7 @@
       "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -36,11 +36,12 @@
       "runtime" : {
          "requires" : {
             "CPAN::Uploader" : "0.103007",
-            "Dist::Zilla" : "5.029",
+            "Dist::Zilla" : "6.012",
             "Dist::Zilla::Plugin::ChangesFromYaml" : "0.004",
             "Dist::Zilla::Plugin::GithubMeta" : "0.46",
             "Dist::Zilla::Plugin::ReadmeFromPod" : "0.30",
             "Dist::Zilla::Plugin::TestBaseIncluder" : "0.09",
+            "Dist::Zilla::Plugin::TestML1Includer" : "v0.0.1",
             "Dist::Zilla::Plugin::TestMLIncluder" : "0.12",
             "Dist::Zilla::PluginBundle::Git" : "2.029",
             "ExtUtils::MakeMaker" : "6.98",
@@ -71,7 +72,8 @@
          "web" : "https://github.com/ingydotnet/zilla-dist-pm"
       }
    },
-   "version" : "0.0.197",
+   "version" : "0.0.199",
+   "x_generated_by_perl" : "v5.18.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
 }
 

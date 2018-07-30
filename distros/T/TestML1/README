@@ -1,6 +1,17 @@
 NAME
 
-    TestML - A Generic Software Testing Meta Language
+    TestML1 - DEPRECATED Generic Software Testing Meta Language
+
+VERSION
+
+    This document describes TestML1 version 0.57.
+
+STATUS
+
+    TestML1 is DEPRECATED.
+
+    Actually TestML1 is the old 2009-2018 version of TestML, in case you
+    still need it. Check out the new TestML.
 
 SYNOPSIS
 

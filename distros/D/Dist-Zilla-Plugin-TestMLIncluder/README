@@ -1,23 +1,50 @@
 NAME
+
     Dist::Zilla::Plugin::TestMLIncluder - Ship your TestML version
 
+VERSION
+
+    This document describes Dist::Zilla::Plugin::TestMLIncluder version
+    0.14.
+
 SYNOPSIS
-    In dist.ini:
+
+    In your dist.ini:
 
         [TestMLIncluder]
 
 DESCRIPTION
-    This module includes the version of TestML on your system with your
-    module dist.
+
+    This Dist::Zilla plugin allows you to ship your module with .t files
+    written in the TestML <http://testml.org/> language rather then in
+    Perl. Your module does not need to add any dependencies (like TestML)
+    to do this.
+
+    This plugin does the following (when you dzil build):
+
+      * Adds the latest TestML sources into inc/lib/
+
+      * Adds the testml-cpan program to inc/bin/
+
+      * Modifies your TestML .t file's shebang lines to use testml-cpan
+
+      * Precompiles your TestML files into inc/t/... files
+
+    Not only does this make TestML easy to use for CPAN modules, it also
+    ensures that the exact TestML code you tested with locally is being
+    used by people installing your module. ie It makes your CPAN
+    distribution future-proof to any TestML language changes.
 
 AUTHOR
+
     Ingy döt Net <ingy@cpan.org>
 
-COPYRIGHT
-    Copyright 2014. Ingy döt Net.
+COPYRIGHT AND LICENSE
+
+    Copyright 2018. Ingy döt Net.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See <http://www.perl.com/perl/misc/Artistic.html>
+    See http://www.perl.com/perl/misc/Artistic.html
 

@@ -1,0 +1,11 @@
+Revision history for WordPress-DBIC-Schema
+
+1.01    2018-7-28
+
+ * Fix undeclared dependency on URI. Thanks to Andreas Koenig
+   Closes [rt.cpan.org #125947]
+
+1.00    2018-7-26
+
+ * First version, with basic relationships
+

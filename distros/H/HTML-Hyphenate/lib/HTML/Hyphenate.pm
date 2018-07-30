@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2009-2018, Roland van Ipenburg
-package HTML::Hyphenate 0.101;
+package HTML::Hyphenate v1.0.0;
 
 use strict;
 use warnings;
@@ -15,12 +15,10 @@ use Log::Log4perl qw(:easy get_logger);
 use Set::Scalar;
 use TeX::Hyphen;
 use TeX::Hyphen::Pattern;
-use HTML::Entities;
-use HTML::TreeBuilder;
+use Mojo::DOM;
 
 use Readonly;
-Readonly::Scalar my $EMPTY              => q{};
-Readonly::Scalar my $HYPHEN             => q{-};
+Readonly::Scalar my $DOT                => q{.};
 Readonly::Scalar my $SOFT_HYPHEN        => qq{\N{SOFT HYPHEN}};
 Readonly::Scalar my $ONE_LEVEL_UP       => -1;
 Readonly::Scalar my $DEFAULT_MIN_LENGTH => 10;
@@ -28,17 +26,19 @@ Readonly::Scalar my $DEFAULT_MIN_PRE    => 2;
 Readonly::Scalar my $DEFAULT_MIN_POST   => 2;
 Readonly::Scalar my $DEFAULT_LANG       => q{en_us};
 
-Readonly::Scalar my $HTML_ESCAPE      => undef;
 Readonly::Scalar my $DEFAULT_INCLUDED => 1;
 Readonly::Scalar my $DEFAULT_XML      => 1;
 
-Readonly::Scalar my $LANG   => q{lang};
-Readonly::Scalar my $TEXT   => q{text};
-Readonly::Scalar my $NOBR   => q{nobr};
-Readonly::Scalar my $PRE    => q{pre};
-Readonly::Scalar my $NOWRAP => q{nowrap};
-Readonly::Scalar my $STYLE  => q{style};
-Readonly::Scalar my $CLASS  => q{class};
+Readonly::Scalar my $LANG         => q{lang};
+Readonly::Scalar my $TEXT         => q{text};
+Readonly::Scalar my $TAG          => q{tag};
+Readonly::Scalar my $RAW          => q{raw};
+Readonly::Scalar my $NOBR         => q{nobr};
+Readonly::Scalar my $PRE          => q{pre};
+Readonly::Scalar my $NOWRAP       => q{*[nowrap]};
+Readonly::Scalar my $STYLE        => q{style};
+Readonly::Scalar my $CLASS        => q{class};
+Readonly::Scalar my $CLASS_JOINER => q{, .};
 
 Readonly::Scalar my $LOG_TRAVERSE      => q{Traversing HTML element '%s'};
 Readonly::Scalar my $LOG_LANGUAGE_SET  => q{Language changed to '%s'};
@@ -50,20 +50,16 @@ Readonly::Scalar my $LOG_LOOKING_UP    => q{Looking up for %d class(es)};
 Readonly::Scalar my $LOG_HTML_METHOD   => q{Using HTML passed to method '%s'};
 Readonly::Scalar my $LOG_HTML_PROPERTY => q{Using HTML property '%s'};
 Readonly::Scalar my $LOG_HTML_UNDEF    => q{HTML to hyphenate is undefined};
+Readonly::Scalar my $LOG_NO_LANG       => q{No language defined for '%s'};
 Readonly::Scalar my $LOG_NOT_HYPHEN    => q{No pattern found for '%s'};
 Readonly::Scalar my $LOG_REGISTER =>
   q{Registering TeX::Hyphen object for label '%s'};
 
-my $ANYTHING = qr/.*/xsm;
-
 # HTML %Text attributes <http://www.w3.org/TR/REC-html40/index/attributes.html>
 my $text_attr = Set::Scalar->new(qw/abbr alt label standby summary title/);
 
-# Strip document root tags from a fragment added by HTML::TreeBuilder:
-my $ROOT = qr{ ^<html>(?:<head></head>)??<body>(.*)</body></html>\s*$ }ixsm;
-
 # Match inline style requesting not to wrap anyway:
-my $STYLE_NOWRAP = qr/\bwhite-space\s*:\s*nowrap\b/xsm;
+my $STYLE_NOWRAP = q{[style*=nowrap]};
 
 Log::Log4perl->easy_init($ERROR);
 my $log = get_logger();
@@ -73,7 +69,6 @@ has style      => ( is => 'rw', isa => 'Str' );
 has min_length => ( is => 'rw', isa => 'Int', default => $DEFAULT_MIN_LENGTH );
 has min_pre    => ( is => 'rw', isa => 'Int', default => $DEFAULT_MIN_PRE );
 has min_post   => ( is => 'rw', isa => 'Int', default => $DEFAULT_MIN_POST );
-has output_xml => ( is => 'rw', isa => 'Int', default => $DEFAULT_XML );
 has default_lang => ( is => 'rw', isa => 'Str', default => $DEFAULT_LANG );
 has default_included =>
   ( is => 'rw', isa => 'Int', default => $DEFAULT_INCLUDED );
@@ -84,7 +79,7 @@ has classes_excluded =>
 
 has _hyphenators => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
 has _lang        => ( is => 'rw', isa => 'Str' );
-has _tree        => ( is => 'rw', isa => 'HTML::TreeBuilder' );
+has _dom         => ( is => 'rw', isa => 'Mojo::DOM' );
 
 sub hyphenated {
     my ( $self, $html ) = @_;
@@ -96,7 +91,9 @@ sub hyphenated {
         $log->debug( sprintf $LOG_HTML_PROPERTY, $self->html );
     }
     if ( defined $self->html ) {
-        $self->_traverse_html();
+        $self->_reset_dom;
+        $self->_dom->parse( $self->html );
+        $self->_traverse_dom( $self->_dom->root );
         return $self->_clean_html();
     }
     $log->warn($LOG_HTML_UNDEF);
@@ -114,50 +111,37 @@ sub register_tex_hyphen {
     return;
 }
 
-sub _traverse_html {
-    my ($self) = @_;
-    $self->_reset_tree;
-    $self->_tree->parse_content( $self->html );
-    $self->_tree->objectify_text();
-    $self->_tree->traverse(
-        [
-            sub {
-                my $element = $_[0];
-                $log->debug( sprintf $LOG_TRAVERSE, $element->tag() );
-                $self->_configure_lang($element);
-                if ( $element->attr($TEXT) ) {
-                    if ( $self->_hyphenable($element) ) {
-                        $log->debug( sprintf $LOG_TEXT_NODE,
-                            $element->attr($TEXT) );
-                        $element->attr( $TEXT,
-                            $self->_hyphen( $element->attr($TEXT) ) );
-                    }
+sub _traverse_dom {
+    my ( $self, $node ) = @_;
+    if ( $self->_hyphenable($node) ) {
+        if ( $node->type eq $TAG ) {
+            $log->debug( sprintf $LOG_TRAVERSE, $node->tag );
+            $self->_configure_lang($node);
+            foreach my $attr ( keys %{ $node->attr } ) {
+                if ( $text_attr->has($attr) ) {
+                    $node->attr( $attr, $self->_hyphen( $node->attr($attr) ) );
                 }
-                else {
-                    foreach my $attr ( $element->all_external_attr_names() ) {
-                        if ( $text_attr->has($attr) ) {
-                            $element->attr( $attr,
-                                $self->_hyphen( $element->attr($attr) ) );
-                        }
-                    }
-                }
-                return HTML::Element::OK;
-            },
-            undef,
-        ],
-    );
+            }
+        }
+        elsif ( 'text' eq $node->type || $node->type eq $RAW ) {
+            if ( !defined $self->_lang ) {
+                $self->_configure_lang($node);
+            }
+            $log->debug( sprintf $LOG_TEXT_NODE, $node->to_string );
+            $node->replace( $self->_hyphen( $node->to_string ) );
+            return;
+        }
+    }
+    for my $child ( $node->child_nodes->each ) {
+        $self->_traverse_dom($child);
+    }
     return;
 }
 
 sub _clean_html {
     my ($self) = @_;
-    $self->_tree->deobjectify_text();
-    my $html =
-        $self->output_xml
-      ? $self->_tree->as_XML()
-      : $self->_tree->as_HTML( $HTML_ESCAPE, $EMPTY, {} );
-    $self->_reset_tree;
-    $html =~ s/$ROOT/$1/xgism;
+    my $html = $self->_dom->to_string();
+    $self->_reset_dom;
     return $html;
 }
 
@@ -170,27 +154,33 @@ sub _hyphen {
 
 sub _hyphen_word {
     my ( $self, $word ) = @_;
-    if ( defined $self->_hyphenators->{ $self->_lang } ) {
-        $log->debug( sprintf $LOG_HYPHEN_WORD,
-            $word, $self->_hyphenators->{ $self->_lang }->visualize($word) );
-        my $number = 0;
-        foreach
-          my $pos ( $self->_hyphenators->{ $self->_lang }->hyphenate($word) )
-        {
-            substr $word, $pos + $number, 0, $SOFT_HYPHEN;
-            $number += length $SOFT_HYPHEN;
+    if ( defined $self->_lang ) {
+        if ( defined $self->_hyphenators->{ $self->_lang } ) {
+            $log->debug( sprintf $LOG_HYPHEN_WORD,
+                $word,
+                $self->_hyphenators->{ $self->_lang }->visualize($word) );
+            my $number = 0;
+            foreach my $pos (
+                $self->_hyphenators->{ $self->_lang }->hyphenate($word) )
+            {
+                substr $word, $pos + $number, 0, $SOFT_HYPHEN;
+                $number += length $SOFT_HYPHEN;
+            }
+        }
+        else {
+            $log->warn( sprintf $LOG_NOT_HYPHEN, $self->_lang );
         }
     }
     else {
-        $log->warn( sprintf $LOG_NOT_HYPHEN, $self->_lang );
+        $log->warn( sprintf $LOG_NO_LANG, $word );
     }
     return $word;
 }
 
 sub _configure_lang {
     my ( $self, $element ) = @_;
-    my $lang = $element->attr_get_i($LANG);
-    $lang ||= $element->attr_get_i(qq{xml:$LANG});
+    my $lang = $element->attr($LANG);
+    $lang ||= $element->attr(qq{xml:$LANG});
     my %hyphen_opts = (
         q{leftmin}  => $self->min_pre,
         q{rightmin} => $self->min_post,
@@ -226,62 +216,54 @@ sub _add_tex_hyphen_to_cache {
 }
 
 sub _hyphenable_by_class {
-    my ( $self, $element ) = @_;
+    my ( $self, $node ) = @_;
     my $included_level = $ONE_LEVEL_UP;
     my $excluded_level = $ONE_LEVEL_UP;
     $self->default_included && $excluded_level--;
     $self->default_included || $included_level--;
 
     $included_level =
-      $self->_get_nearest_ancestor_level_by_classname( $element,
+      $self->_get_nearest_ancestor_level_by_classname( $node,
         $self->classes_included, $included_level );
     $excluded_level =
-      $self->_get_nearest_ancestor_level_by_classname( $element,
+      $self->_get_nearest_ancestor_level_by_classname( $node,
         $self->classes_excluded, $excluded_level );
+    if ( $included_level == $excluded_level ) {
+        return $self->default_included;
+    }
     return !( $excluded_level > $included_level );
 }
 
 sub _hyphenable {
-    my ( $self, $element ) = @_;
-    return !( $element->is_inside($NOBR)
-        || $element->is_inside($PRE)
-        || $element->look_up( $NOWRAP, $ANYTHING )
-        || $element->look_up( $STYLE,  $STYLE_NOWRAP )
-        || !$self->_hyphenable_by_class($element) );
+    my ( $self, $node ) = @_;
+    return !( $node->ancestors($NOBR)->size
+        || $node->ancestors($PRE)->size
+        || $node->ancestors($NOWRAP)->size
+        || $node->ancestors($STYLE_NOWRAP)->size
+        || !$self->_hyphenable_by_class($node) );
 }
 
 sub _get_nearest_ancestor_level_by_classname {
-    my ( $self, $element, $ar_classnames, $level ) = @_;
+    my ( $self, $node, $ar_classnames, $level ) = @_;
     my $classnames = Set::Scalar->new( @{$ar_classnames} );
     $log->debug( sprintf $LOG_LOOKING_UP, $classnames->size );
-
-    # Only looking up the tree if there is something to look for:
-    if (
-        $classnames
-        && (
-            my $container = $element->look_up(
-                $CLASS => $ANYTHING,
-                sub {
-                    $_[0]
-                      && $classnames->has( $_[0]->attr($CLASS) );
-                },
-            )
-        )
-      )
+    if ( !$classnames->is_empty
+        && ( $node->ancestors->size ) )
     {
-        $level = $container->depth;
+        my $selector = $DOT . join $CLASS_JOINER, $classnames->members;
+        my $nearest = $node->ancestors($selector)->first;
+        if ($nearest) {
+            return $nearest->ancestors->size;
+        }
     }
     return $level;
 
 }
 
-sub _reset_tree {
+sub _reset_dom {
     my ($self) = @_;
-    $self->_tree && $self->_tree( $self->_tree->delete );
-    my $tree = HTML::TreeBuilder->new();
-    $tree->warn(1);
-    $tree->store_pis(1);
-    $self->_tree($tree);
+    my $dom = Mojo::DOM->new();
+    $self->_dom($dom);
     return;
 }
 
@@ -299,7 +281,7 @@ HTML::Hyphenate - insert soft hyphens into HTML.
 
 =head1 VERSION
 
-This document describes HTML::Hyphenate version 0.100.
+This document describes HTML::Hyphenate version v1.0.0.
 
 =head1 SYNOPSIS
 
@@ -314,7 +296,6 @@ This document describes HTML::Hyphenate version 0.100.
     $hyphenator->min_length(10);
     $hyphenator->min_pre(2);
     $hyphenator->min_post(2);
-    $hyphenator->output_xml(1);
     $hyphenator->default_lang('en-us');
     $hyphenator->default_included(1);
     $hyphenator->classes_included(['shy']);
@@ -362,10 +343,6 @@ first soft hyphen. Defaults to 2 characters.
 Gets or sets the minimum amount of characters in a word preserved after the
 last soft hyphen. Defaults to 2 characters.
 
-=item $hyphenator->output_xml(1);
-
-Have L<HTML::TreeBuilder|HTML::TreeBuilder> output HTML in HTML or XML mode. 
-
 =item $hyphenator->default_lang('en-us');
 
 Gets or sets the default pattern to use when no language can be derived from
@@ -395,8 +372,7 @@ Registers a TeX::Hyphen object to handle the language defined by C<lang>.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-The output is generated by L<HTML::TreeBuilder|HTML::TreeBuilder> and can be
-either HTML or XML.
+The output is generated by L<Mojo::DOM|Mojo::DOM>.
 
 =head1 DEPENDENCIES
 
@@ -406,9 +382,7 @@ either HTML or XML.
 
 =item * L<Moose|Moose>
 
-=item * L<HTML::Entities|HTML::Entities>
-
-=item * L<HTML::TreeBuilder|HTML::TreeBuilder>
+=item * L<Mojo::DOM|Mojo::DOM>
 
 =item * L<Log::Log4perl|Log::Log4perl>
 
@@ -431,7 +405,7 @@ either HTML or XML.
 =over 4
 
 This module has the same limits as TeX::Hyphen, TeX::Hyphen::Pattern and
-HTML::TreeBuilder.
+Mojo::DOM.
 
 =back
 
@@ -463,9 +437,10 @@ avoid unwanted overflow.
 =item * The hyphenation doesn't get better than TeX::Hyphenate and it's
 hyphenation patterns provide.
 
-=item * The round trip from HTML source via HTML::Tree to HTML source might
+=item * The round trip from HTML source via Mojo::DOM to HTML source might
 introduce changes to the source, for example accented characters might be
-transformed to HTML encoded entity equivalent.
+transformed to HTML encoded entity equivalents or Boolean attributes are
+converted to a different notation.
 
 =back
 

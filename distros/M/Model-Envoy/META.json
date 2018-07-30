@@ -22,12 +22,16 @@
       "runtime" : {
          "requires" : {
             "DBIx::Class" : "0.082840",
+            "List::AllUtils" : "0.14",
             "Moose" : "2.2010",
+            "MooseX::ClassAttribute" : "0.29",
+            "MooseX::Role::Parameterized" : "1.10",
             "perl" : "v5.18.2"
          }
       },
       "test" : {
          "requires" : {
+            "SQL::Translator" : "0.11018",
             "Test::Exception" : "0.43",
             "Test::More" : "1.302085"
          }
@@ -36,17 +40,25 @@
    "provides" : {
       "Model::Envoy" : {
          "file" : "lib/Model/Envoy.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.4.1"
       },
       "Model::Envoy::Meta::Attribute::Trait::Envoy" : {
          "file" : "lib/Model/Envoy.pm"
       },
       "Model::Envoy::Set" : {
          "file" : "lib/Model/Envoy/Set.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.3.0"
+      },
+      "Model::Envoy::Storage" : {
+         "file" : "lib/Model/Envoy/Storage.pm",
+         "version" : "v0.1.0"
       },
       "Model::Envoy::Storage::DBIC" : {
          "file" : "lib/Model/Envoy/Storage/DBIC.pm",
+         "version" : "v0.3.2"
+      },
+      "Model::Envoy::Storage::Memory" : {
+         "file" : "lib/Model/Envoy/Storage/Memory.pm",
          "version" : "v0.1.1"
       },
       "Moose::Meta::Attribute::Custom::Trait::EDBIC" : {
@@ -60,6 +72,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.1.1",
+   "version" : "v0.4.1",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -6,12 +6,11 @@ use warnings;
 use utf8;
 use 5.014000;
 use English qw( -no_match_vars );
-BEGIN { our $VERSION = '0.101'; }
+BEGIN { our $VERSION = v1.0.0; }
 
 use HTML::Hyphenate;
 
 use Readonly;
-Readonly::Scalar my $EMPTY      => q{};
 Readonly::Scalar my $MIN_LENGTH => 5;
 
 my $hyphenator = HTML::Hyphenate->new();

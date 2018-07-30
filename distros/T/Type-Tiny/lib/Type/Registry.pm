@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Type::Registry::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Registry::VERSION   = '1.002002';
+	$Type::Registry::VERSION   = '1.004002';
 }
 
 use Exporter::Tiny qw( mkopt );
@@ -19,21 +19,17 @@ our @EXPORT_OK = qw(t);
 
 sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
-sub _exporter_expand_sub
+sub _generate_t
 {
 	my $class = shift;
-	my ($name, $value, $globals, $permitted) = @_;
+	my ($name, $value, $globals) = @_;
 	
-	if ($name eq "t")
-	{
-		my $caller = $globals->{into};
-		my $reg = $class->for_class(
-			ref($caller) ? sprintf('HASH(0x%08X)', refaddr($caller)) : $caller
-		);
-		return t => sub (;$) { @_ ? $reg->lookup(@_) : $reg };
-	}
+	my $caller = $globals->{into};
+	my $reg = $class->for_class(
+		ref($caller) ? sprintf('HASH(0x%08X)', refaddr($caller)) : $caller
+	);
 	
-	return $class->SUPER::_exporter_expand_sub(@_);
+	sub (;$) { @_ ? $reg->lookup(@_) : $reg };
 }
 
 sub new
@@ -502,7 +498,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

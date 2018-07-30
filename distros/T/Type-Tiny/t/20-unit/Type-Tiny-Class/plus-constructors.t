@@ -16,7 +16,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -119,5 +119,9 @@ my $me2 = Person->new(
 );
 
 is_deeply($me, $me2, 'coercion worked');
+
+my $you = $Person->plus_constructors->coerce({ name => "Livvy" });
+my $you2 = Person->new(name => "Livvy");
+is_deeply($you, $you2, 'coercion worked (plus_constructors with no parameters)');
 
 done_testing;

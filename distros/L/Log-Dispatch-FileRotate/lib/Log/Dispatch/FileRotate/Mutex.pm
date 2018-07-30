@@ -8,11 +8,12 @@
 #
 
 package Log::Dispatch::FileRotate::Mutex;
-$Log::Dispatch::FileRotate::Mutex::VERSION = '1.35';
+$Log::Dispatch::FileRotate::Mutex::VERSION = '1.36';
 # ABSTRACT: Flock Based File Mutex.
 
 use strict;
 use warnings;
+use Carp 'croak';
 
 use Log::Dispatch::FileRotate::Flock qw(safe_flock flopen);
 use Fcntl ':flock';
@@ -39,12 +40,13 @@ sub DESTROY {
 
 
 sub new {
-    my ($class, $path) = @_;
+    my ($class, $path, %args) = @_;
 
     $class = ref $class || $class;
 
     my $self = bless {
-        _path => $path
+        _path => $path,
+        %args
     }, $class;
 
     return $self;
@@ -59,6 +61,8 @@ sub lock {
     unless (exists $self->{$pid}) {
         # we have not opened the lockfile in this thread.
         my ($fh, $inode) = flopen($self->{_path});
+
+        $self->_set_permissions;
 
         unless (defined $fh) {
             return 0;
@@ -89,9 +93,27 @@ sub lock {
         }
     }
 
-    # otherwise this $pid is alraedy holding the lock
+    # otherwise this $pid is already holding the lock
 
     return $self->{$pid} || 0;
+}
+
+sub _set_permissions {
+    my $self = shift;
+
+    unless (defined $self->{permissions}) {
+        return;
+    }
+
+    my $file = $self->{_path};
+
+    my $current_mode = (stat $self->{_path})[2] & 07777;
+
+    if ($current_mode ne $self->{permissions}) {
+        chmod $self->{permissions}, $self->{_path}
+            or croak sprintf 'Failed to chmod %s to %04o: %s',
+                $self->{_path}, $self->{permissions} & 07777, $!;
+    }
 }
 
 
@@ -119,13 +141,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Log::Dispatch::FileRotate::Mutex - Flock Based File Mutex.
 
 =head1 VERSION
 
-version 1.35
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -157,7 +181,7 @@ Get the current process or thread id
 
 =head1 SOURCE
 
-The development version is on github at L<http://https://github.com/mschout/perl-log-dispatch-filerotate>
+The development version is on github at L<https://https://github.com/mschout/perl-log-dispatch-filerotate>
 and may be cloned from L<git://https://github.com/mschout/perl-log-dispatch-filerotate.git>
 
 =head1 BUGS

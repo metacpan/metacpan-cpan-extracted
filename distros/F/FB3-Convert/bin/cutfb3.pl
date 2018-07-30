@@ -18,9 +18,9 @@ GetOptions(
 	'in|i=s'		=>	\$In,
 	'out|o=s'		=>	\$Out,
 	'chars|c=i'	=>	\$CutChars,
-	'xsd|x=s'   =>  \$XsdPath,
+	'xsd|x=s'   =>  \$XsdPath, # optional
   'imagespath|p=s'  =>  \$ImagesPath,
-) or usage ("CutPartFB3: makes trial fragment from fb3\n\nUsage:\n\nCutPartFB3.pl in=<inputfile.fb3> out=<outputfile.fb3> chars=<chars_in_result> xsd=<xsd_path> imagespath=/path/to/fb3/images\n");
+) or usage ("CutPartFB3: makes trial fragment from fb3\n\nUsage:\n\nCutPartFB3.pl in=<inputfile.fb3> out=<outputfile.fb3> chars=<chars_in_result> imagespath=/path/to/fb3/images\n");
 
 if($ImagesPath){
   die "Path $ImagesPath not found\n" unless -d $ImagesPath;

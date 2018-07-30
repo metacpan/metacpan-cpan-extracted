@@ -1,20 +1,27 @@
 use strict;
 use warnings;
 
-use HTTP::Request;
-use LWP::ConsoleLogger;
-use LWP::UserAgent;
+use HTTP::CookieJar::LWP ();
+
+#use HTTP::Request;
+use LWP::ConsoleLogger ();
+use LWP::UserAgent     ();
 use Path::Tiny qw( path );
 use Test::Fatal qw( exception );
 use Test::Most;
-use URI::file;
-use WWW::Mechanize;
+use URI::file      ();
+use WWW::Mechanize ();
 
 my @mech = (
     LWP::UserAgent->new( cookie_jar => {} ),
+    LWP::UserAgent->new( cookie_jar => HTTP::CookieJar::LWP->new ),
     WWW::Mechanize->new( autocheck  => 0 ),
 );
-my $logger = LWP::ConsoleLogger->new( dump_content => 1, dump_text => 1 );
+my $logger = LWP::ConsoleLogger->new(
+    dump_content => 1,
+    dump_cookies => 1,
+    dump_text    => 1,
+);
 ok( $logger, 'logger compiles' );
 
 foreach my $mech (@mech) {

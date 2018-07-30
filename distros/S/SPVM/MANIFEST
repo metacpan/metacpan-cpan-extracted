@@ -112,7 +112,7 @@ lib/SPVM/Document/Extension.pod
 lib/SPVM/Document/Functions.pod
 lib/SPVM/Document/Language.pod
 lib/SPVM/Document/NativeInterface.pod
-lib/SPVM/Document/SPVMAPI.pod
+lib/SPVM/Document/PerlAPI.pod
 lib/SPVM/Double.pm
 lib/SPVM/Double.spvm
 lib/SPVM/Example.native/Example.c
@@ -222,6 +222,8 @@ t/default/lib/TestCase/Long.spvm
 t/default/lib/TestCase/Loop.spvm
 t/default/lib/TestCase/Minimal.spvm
 t/default/lib/TestCase/NumericOperator.spvm
+t/default/lib/TestCase/Object.spvm
+t/default/lib/TestCase/PerlAPI.spvm
 t/default/lib/TestCase/Point_b3.spvm
 t/default/lib/TestCase/Point_d3.spvm
 t/default/lib/TestCase/Point_f3.spvm
@@ -231,6 +233,7 @@ t/default/lib/TestCase/Point_s3.spvm
 t/default/lib/TestCase/Pointer.native/Pointer.c
 t/default/lib/TestCase/Pointer.spvm
 t/default/lib/TestCase/Private.spvm
+t/default/lib/TestCase/Ref.spvm
 t/default/lib/TestCase/Short.spvm
 t/default/lib/TestCase/Simple.spvm
 t/default/lib/TestCase/SpecialAssign.spvm
@@ -246,6 +249,7 @@ t/default/numeric-operator.t
 t/default/object.t
 t/default/package_var.t
 t/default/perl-api.t
+t/default/ref.t
 t/default/special-assign.t
 t/default/string.t
 t/default/switch.t
@@ -312,6 +316,8 @@ t/precompile/lib/TestCase/Long.spvm
 t/precompile/lib/TestCase/Loop.spvm
 t/precompile/lib/TestCase/Minimal.spvm
 t/precompile/lib/TestCase/NumericOperator.spvm
+t/precompile/lib/TestCase/Object.spvm
+t/precompile/lib/TestCase/PerlAPI.spvm
 t/precompile/lib/TestCase/Point_b3.spvm
 t/precompile/lib/TestCase/Point_d3.spvm
 t/precompile/lib/TestCase/Point_f3.spvm
@@ -321,6 +327,7 @@ t/precompile/lib/TestCase/Point_s3.spvm
 t/precompile/lib/TestCase/Pointer.native/Pointer.c
 t/precompile/lib/TestCase/Pointer.spvm
 t/precompile/lib/TestCase/Private.spvm
+t/precompile/lib/TestCase/Ref.spvm
 t/precompile/lib/TestCase/Short.spvm
 t/precompile/lib/TestCase/Simple.spvm
 t/precompile/lib/TestCase/SpecialAssign.spvm
@@ -336,6 +343,7 @@ t/precompile/numeric-operator.t
 t/precompile/object.t
 t/precompile/package_var.t
 t/precompile/perl-api.t
+t/precompile/ref.t
 t/precompile/special-assign.t
 t/precompile/string.t
 t/precompile/switch.t

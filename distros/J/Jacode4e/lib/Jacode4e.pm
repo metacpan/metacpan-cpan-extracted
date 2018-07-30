@@ -5,7 +5,7 @@ package Jacode4e;
 #
 # Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
-$VERSION = '2.13.6.5';
+$VERSION = '2.13.6.6';
 $VERSION = $VERSION;
 
 use strict;
@@ -69,13 +69,14 @@ Jacode4e - jacode.pl-like program for enterprise
       mnemonic      means
       -----------------------------------------------------------------------
       cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-      cp932         CP932
-      sjis2004      Shift_JIS-2004
+      cp932         Microsoft CP932, IANA Windows-31J
+      sjis2004      JISC Shift_JIS-2004
       cp00930       IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
       keis78        HITACHI KEIS78
       keis83        HITACHI KEIS83
       keis90        HITACHI KEIS90
-      jef           FUJITSU JEF
+      jef           FUJITSU JEF (12 point size for printing with option OUTPUT_SHIFTING)
+      jef9p         FUJITSU JEF ( 9 point size for printing with option OUTPUT_SHIFTING)
       jipsj         NEC JIPS(J)
       jipse         NEC JIPS(E)
       utf8          UTF-8
@@ -91,16 +92,16 @@ Jacode4e - jacode.pl-like program for enterprise
                        'S' means one char as SBCS, 'D' means one char as DBCS
       OUTPUT_SHIFTING  true means use output shift code, false means not use
                        default is false
-      SPACE            output space code in DBCS
-      GETA             output geta code in DBCS
+      SPACE            output space code in DBCS/MBCS
+      GETA             output geta code in DBCS/MBCS
       -----------------------------------------------------------------------
 
-=head1 SAMPLES
+=head1 SAMPLE
 
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e;
-  Jacode4e::VERSION('2.13.6.5');
+  Jacode4e::VERSION('2.13.6.6');
   while (<>) {
       $return =
       Jacode4e::convert(\$_, 'cp932x', 'cp00930', {

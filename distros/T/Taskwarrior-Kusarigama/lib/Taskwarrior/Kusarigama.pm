@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: plugin system for the Taskwarrior task manager
-$Taskwarrior::Kusarigama::VERSION = '0.9.1';
+$Taskwarrior::Kusarigama::VERSION = '0.9.2';
 
 # TODO document the kusarigama.dir key
 1;
@@ -18,11 +18,11 @@ Taskwarrior::Kusarigama - plugin system for the Taskwarrior task manager
 
 =head1 VERSION
 
-version 0.9.1
+version 0.9.2
 
 =head1 SYNOPSIS
 
-    $ task-kusarigama add GitCommit Command::Before Command::After
+    $ task-kusarigama add GitCommit Command::ButBefore Command::AndAfter
 
     $ task-kusarigama install
 
@@ -67,11 +67,11 @@ should look like
 Then you need to tell the system with plugins to use, 
 either via C<task-kusarigama>
 
-    $ task-kusarigama add Command::After
+    $ task-kusarigama add Command::AndAfter
 
 or directly via the Taskwarrior config command
 
-    $ task config  task-kusarigama.plugins  Command::After
+    $ task config  kusarigama.plugins  Command::AndAfter
 
 =head3 Configure the plugins
 
@@ -87,7 +87,7 @@ The inner workings of the plugin system are fairly simple.
 The list of plugins we want to be active lives in the taskwarrior
 configuration under the key <kusarigama.plugins>. E.g.,
 
-    kusarigama.plugins=Renew,Command::Before,Command::After,+FishCurrent
+    kusarigama.plugins=Renew,Command::ButBefore,Command::AndAfter,+FishCurrent
 
 Plugin namess prefixed with a plus sign are left left alone (minus the '+'),
 while the other ones get C<Taskwarrior::Kusarigama::Plugin::> prefixed to

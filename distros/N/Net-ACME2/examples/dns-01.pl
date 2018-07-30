@@ -15,6 +15,8 @@ use parent 'Net_ACME2_Example';
 
 use constant {
     CAN_WILDCARD => 1,
+
+    _CHALLENGE_TYPE => 'dns-01',
 };
 
 __PACKAGE__->run() if !caller;
@@ -24,22 +26,15 @@ sub _authz_handler {
 
     my $zone = $authz_obj->identifier()->{'value'};
 
-    my ($challenge) = grep { $_->type() eq 'dns-01' } $authz_obj->challenges();
+    my $challenge = $class->_get_challenge_from_authz($authz_obj);
 
-    if (!$challenge) {
-        substr($zone, 0, 0, '*.') if $authz_obj->wildcard();
-        die "No DNS challenge for “$zone”!\n";
-    }
+    my $rec_name = $challenge->get_record_name();
+    my $rec_value = $challenge->get_record_value($acme);
 
-    my $key_authz = $acme->make_key_authorization($challenge);
-
-    my $sha = Digest::SHA::sha256($key_authz);
-    my $b64 = MIME::Base64::encode_base64url($sha);
-
-    print "$/Create a TXT record for:$/$/\t_acme-challenge.$zone.$/$/";
+    print "$/Create a TXT record for:$/$/\t$rec_name.$zone.$/$/";
     print "… with the following value:$/$/";
 
-    print "\t$b64$/$/";
+    print "\t$rec_value$/$/";
 
     <STDIN>;
 

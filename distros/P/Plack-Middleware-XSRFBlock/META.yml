@@ -4,7 +4,7 @@ author:
   - 'Chisel <chisel@chizography.net>'
 build_requires:
   Carp: '0'
-  Data::Printer: '0'
+  Data::Dumper: '0'
   FindBin::libs: '0'
   HTTP::Cookies: '0'
   HTTP::Message::PSGI: '0'
@@ -50,7 +50,7 @@ requires:
 resources:
   bugtracker: http://github.com/chiselwright/Plack-Middleware-XSRFBlock/issues
   repository: git://github.com/chiselwright/plack-middleware-xsrfblock.git
-version: 0.0.15
+version: 0.0.16
 x_contributors:
   - 'Chisel <chisel.wright@net-a-porter.com>'
   - 'Daniel Perrett <dp13@sanger.ac.uk>'

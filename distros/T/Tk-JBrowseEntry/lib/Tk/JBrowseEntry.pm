@@ -262,6 +262,12 @@ Useful particularly if the [arrow-button] isn't displayed,
 ie. (I<-nobutton> => 1) and/or the [Return] key is bound with an 
 I<-altbinding>, etc. to do something other than pop up the drop-down list.
 
+"List=Bouncy" - causes the drop-down list to behave more like a popup menu 
+and immediately roll back up (after matching text with nearest entry) if the 
+mouse button is pressed and released on the drop-down list button.
+(Normally, the drop-down list state is simply toggled when mouse is pressed 
+and released on the button.)
+
 "Nolistbox=actions" - causes certain I<actions> to NOT invoke the 
 I<-browsecmd> callback when activated within the listbox widget, 
 ie. "Nolistbox=listbox.space" means don't invoke I<-browsecmd> callback if 
@@ -340,17 +346,35 @@ the button, or both or neither receive keyboard focus. If both options are set,
 the entry field first receives focus, then pressing <Tab> causes the button 
 to be focused. 
 
+=item B<-buttonbackground>
+
+Specify alternate background for the drop-down list button.
+
+=item B<-buttonforeground>
+
+Specify alternate foreground for the drop-down list button.
+
 =item B<-colorstate>
 
 Archaic carryover from Tk::BrowseEntry -- Appears to force the background of 
-the text-entry widget to I<"lightgray"> if state is I<readonly> or I<disabled>  
-and no B<-background> color has been set; and a slightly darker shade of gray 
-(I<"gray95 ">) otherwise.  This appears to be broken for the I<readonly> and 
-I<disabled> states, so I've added a special value of I<"2"> to actually do 
-this always.  Any other I<true> value works like their (broken) version.
-Regardless of I<true> values, we also set the foreground color to I<gray30> 
-for I<readonly> or I<disabled> states and I<black> otherwise to ensure that 
-the text remains readable regardless of what foreground color is otherwise set.
+the text-entry widget to I<"lightgray"> if set to I<"1"> and state is 
+I<readonly> or I<disabled>, and no B<-background> color has been set; and a 
+slightly darker shade of gray (I<"gray95 ">) otherwise.  We also set the 
+foreground color to I<gray30> for I<readonly> or I<disabled> states and 
+I<black> otherwise to ensure that the text remains readable regardless of what 
+foreground color is otherwise set.  I've also added special value of I<"2"> 
+(or I<"dark">) to set a darker version of the readonly and disabled colors.  
+To only make one or the other use the "darker" shades, one can instead 
+specify I<"readonlydark"> or I<"disableddark">.  NOTE:  Once the widget has 
+been set to a "readonly" state, the I<"-textreadonlybackground"> color remains 
+fixed thru future calls to setPalette!  This seems to be a limitation of Tk 
+and setPalette.  Also note that in general, changing the widget's 
+I<-foreground> and / or I<-background> options later via "$widget->configure() 
+may not completely change all the colors of every part of every subwidget, 
+and setPalette may not completely correct everything until the widget's 
+I<-state> is changed, therefore, it's a good idea to also call 
+$w->state($w->state()); after dynamically changing foreground or background 
+colors for the widget.
 
 =item B<-deleteitemsok>
 
@@ -507,7 +531,6 @@ Specify alternate foreground for the entry field (when editable).
 =item B<-textdisabledbackground>
 
 Specify alternate background for the entry field (when I<-state> is disabled).
-Default:  B<-disabledbackground> or the widget's background.
 
 =item B<-textdisabledforeground>
 
@@ -540,6 +563,13 @@ to I<HListbox>, in which case, I<"dotbox"> is always used.
 =item B<-background>
 
 Specifies the background color for the widget and it's subwidgets.  
+NOTE:  In general, changing the widget's 
+I<-foreground> and / or I<-background> options later via "$widget->configure() 
+may not completely change all the colors of every part of every subwidget, 
+and setPalette may not completely correct everything until the widget's 
+I<-state> is changed, therefore, it's a good idea to also call 
+$w->state($w->state()); after dynamically changing foreground or background 
+colors for the widget.
 
 =item B<-choices>
 
@@ -768,17 +798,18 @@ package Tk::JBrowseEntry;
 
 BEGIN
 {
-	use vars qw($VERSION $haveHListbox);
-	$VERSION = '5.10';
+	use vars qw($VERSION $haveHListbox $haveJSetPalette);
+	$VERSION = '5.20';
 
 	use strict;
 	use Carp;
 	use Tk;
 	use Tk::Frame;
 	eval 'use Tk::HMListbox; $haveHListbox = ($Tk::HListbox::VERSION >= 2.1) ? 1 : 0; 1';
-
 	use base qw(Tk::Frame);
 };
+
+eval 'require "setPalette.pl"; $haveJSetPalette = 1; 1';
 
 Construct Tk::Widget 'JBrowseEntry';
 
@@ -813,9 +844,7 @@ sub ClassInit
 		}
 		else
 		{
-			my $bits = pack("b11"x14,
-					"...........",
-					"....###....",
+			my $bits = pack("b11"x12,
 					"....###....",
 					"....###....",
 					"....###....",
@@ -829,7 +858,7 @@ sub ClassInit
 					".#########.",
 					".#########."
 			);
-			$mw->DefineBitmap($BITMAP => 11,14, $bits);
+			$mw->DefineBitmap($BITMAP => 11,12, $bits);
 		}
 		$FOCUSEDBITMAP = __PACKAGE__ . "::fdownarrow";
 
@@ -851,9 +880,7 @@ sub ClassInit
 		}
 		else
 		{
-			my $bits = pack("b11"x14,
-					"...........",
-					"....###....",
+			my $bits = pack("b11"x12,
 					"....###....",
 					"....###....",
 					"....###....",
@@ -867,7 +894,7 @@ sub ClassInit
 					".#########.",
 					".#########."
 			);
-			$mw->DefineBitmap($FOCUSEDBITMAP => 11,14, $bits);
+			$mw->DefineBitmap($FOCUSEDBITMAP => 11,12, $bits);
 		}
 	}
 }
@@ -888,20 +915,21 @@ sub Populate
 	$w->{'-height'} = $args->{'-height'}  if (defined($args->{'-height'}));
 	$w->{'-maxwidth'} = delete($args->{'-maxwidth'})  if (defined($args->{'-maxwidth'}));
 	$w->{'-listwidth'} = $w->{'-width'};
-	$w->{'-foreground'} = $args->{'-foreground'}  if (defined($args->{'-foreground'}));
-	$w->{'-background'} = $args->{'-background'}  if (defined($args->{'-background'}));
-	$w->{'-background'} ||= $w->parent->cget('-background');
+#	$w->{'-foreground'} = $args->{'-foreground'}  if (defined($args->{'-foreground'}));
+#	$w->{'-background'} = $args->{'-background'}  if (defined($args->{'-background'}));
+#	$w->{'-background'} ||= $w->parent->cget('-background');
+	my $initFG = defined($args->{'-foreground'}) ? $args->{'-foreground'} : $w->parent->cget('-foreground');
+	my $initBG = defined($args->{'-background'}) ? $args->{'-background'} : $w->parent->cget('-background');
 	foreach my $i (qw/-textreadonlyforeground/)
 	{
 		$w->{$i} = delete($args->{$i})  if (defined($args->{$i}));
 	}
 	foreach my $i (qw/-textbackground -textforeground -textdisabledbackground -textdisabledforeground
-			-textreadonlybackground -labelbackground -labelforeground
-			-disabledbackground -disabledforeground/)
+			-textreadonlybackground -labelbackground -labelforeground -buttonbackground -buttonforeground/)
 	{
 		$w->{$i} = $args->{$i}  if (defined($args->{$i}));
 	}
-	$w->{'-foreground'} = $w->parent->cget('-foreground');
+#	$w->{'-foreground'} = $w->parent->cget('-foreground');
 #	$w->{'-borderwidth'} = delete($args->{'-borderwidth'})  if (defined($args->{'-borderwidth'}));  #CHGD. TO NEXT 20070904 FROM WOLFRAM HUMANN.
 	$w->{'-borderwidth'} = defined($args->{'-borderwidth'}) ? delete($args->{'-borderwidth'}) : 2; 
 	$w->{'-relief'} = 'sunken';
@@ -925,7 +953,7 @@ sub Populate
 	$w->{'-buttonborderwidth'} = defined($args->{'-buttonborderwidth'})
 		? delete($args->{'-buttonborderwidth'}) : 1;
 	$w->{'-entryborderwidth'} = defined($args->{'-entryborderwidth'})
-		? delete($args->{'-entryborderwidth'}) : 0;
+		? $args->{'-entryborderwidth'} : 0;
 	$w->{'-nobutton'} = defined($args->{'-nobutton'})
 		? delete($args->{-nobutton}) : 0;
 	$w->{'-labelrelief'} = defined($args->{'-labelrelief'})
@@ -940,6 +968,9 @@ sub Populate
 	$w->{'-itemtype'} = defined($args->{'-itemtype'}) ? delete($args->{'-itemtype'}) : 'text';
 	$w->{'-indicator'} = defined($args->{'-indicator'}) ? delete($args->{'-indicator'}) : '0';
 	$w->{'-activestyle'} = defined($args->{'-activestyle'}) ? delete($args->{'-activestyle'}) : 'underline';
+	$w->{'-activestyle'} = defined($args->{'-activestyle'}) ? delete($args->{'-activestyle'}) : 'underline';
+#	$w->{'-colorstate'} = defined($args->{'-colorstate'})
+#		? $args->{'-colorstate'} : 0;
 
 	my $lpack = delete $args->{-labelPack};   #MOVED ABOVE SUPER:POPULATE 20050120.
 
@@ -956,12 +987,20 @@ sub Populate
 
 	my $ll = $w->Label();
 	my $tf = $w->Frame(-borderwidth => ($w->{-borderwidth} || 2),
+			-highlightcolor => $initFG, -highlightbackground => $initBG,
 			-highlightthickness => ($w->{'-framehighlightthickness'} || 1), 
 			-relief => ($w->{'-relief'} || 'sunken'));
 
 	#DEPRECIATED(SOLVED): FOR SOME REASON, E HAS TO BE A LABENTRY, JUST PLAIN ENTRY WOULDN'T TAKE KEYBOARD EVENTS????
 	#AFTER MUCH T&E: POUNDING OUT THE "e->bindtags()" FUNCTION CALL RESOLVED THIS ISSUE! :D
-	my $e = $tf->Entry(-borderwidth => $w->{'-entryborderwidth'}, -relief => 'flat');
+	my %entryHash = (-borderwidth => $w->{'-entryborderwidth'}||0, -relief => 'flat',
+			-highlightcolor => $initFG, -highlightbackground => $initBG);
+	if ($args->{'-colorstate'} == 1)
+	{
+		$entryHash{'-background'} = 'gray95';
+		$entryHash{'-foreground'} = 'black';
+	}
+	my $e = $tf->Entry(%entryHash);
 	$w->ConfigSpecs(DEFAULT => [$e]);
 	my $b = $tf->Button(-borderwidth => $w->{'-buttonborderwidth'}, -takefocus => $w->{'btntakesfocus'}, 
 			-bitmap => $BITMAP);
@@ -983,7 +1022,7 @@ sub Populate
 	# POPUP SHELL FOR LISTBOX WITH VALUES.
 
 	my ($c, $sl);
-	if ($w->{'-listboxtype'} =~ /HList/io)
+	if ($w->{'-listboxtype'} =~ /HList/i)
 	{
 		die "Error: You requested Tk::HListbox, but it does not appear to be installed or is < v2.1."
 				unless ($haveHListbox);
@@ -1007,7 +1046,17 @@ sub Populate
 		$c->pack(-side => 'top', -padx => 0, -pady => 0, -fill => 'both', -expand => 1);
 		$tf->pack(-side => 'top', -padx => 0, -pady => 0, -fill => 'x', -expand => 1)
 				if ($w->{'-fixedlist'} =~ /top/);
-		$c->bind('<FocusIn>' => sub { $sl->focus; Tk->break });  #AIN'T SUPPOSED TO TAKE FOCUS, BUT DOES, SO, MOVE ALONG!
+		$c->bind('<FocusIn>' => sub {
+			if ($w->{'_lbignorefocus'} == 1)  #DON'T REFOCUS ON JUST POPPED-DOWN "BOUNCY" LISTBOX!
+			{
+				$w->{'_lbignorefocus'} = 0;
+			}
+			else
+			{
+				$sl->focus;
+			}
+			Tk->break;
+		});  #AIN'T SUPPOSED TO TAKE FOCUS, BUT DOES, SO, MOVE ALONG!
 		$e->bind('<FocusIn>' => sub { $w->Popdown(1); Tk->break });
 	}
 	else
@@ -1048,9 +1097,10 @@ sub Populate
 			-deletecmd   => [qw/CALLBACK deleteCmd   DeleteCmd/,   undef],
 			-choices     => [qw/METHOD   choices     Choices/,     undef],
 			-state       => [qw/METHOD   state       State         normal/],
+			-colorstate  => [qw/METHOD   undef       undef         0/],
+			#-colorstate  => [qw/PASSIVE  colorState  ColorState/,  undef],
 			-arrowimage  => [ {-image => $b}, qw/arrowImage ArrowImage/, undef],
 			-variable    => '-textvariable',
-			-colorstate  => [qw/PASSIVE  colorState  ColorState/,  undef],
 			-label       => [ {-text => $ll}, qw/label Label/, undef],
 				-labelrelief => [ {-relief => $ll}, qw/relief Relief/, undef],
 				-labelbackground => [ {-background => $ll}, qw/background Background/, undef],
@@ -1062,7 +1112,10 @@ sub Populate
 				-textdisabledforeground => [ {-disabledforeground => $e}, qw/disabledForeground DisabledForeground/, undef],
 				-textreadonlybackground => [ {-readonlybackground => $e}, qw/readonlyBackground ReadonlyBackground/, undef],
 				#THIS ONE DOESN'T EXIST!: -textreadonlyforeground => [ {-readonlyforeground => $e}, qw/background Background/, undef],
-			-background  => [[SELF, DESCENDANTS, {-readonlybackground => $e}], qw/background   Background/,   undef],
+				-entryborderwidth => [ {-borderwidth => $e}, qw/borderWidth BorderWidth/, 0],
+				-buttonbackground => [ {-background => $b}, qw/background Background/, undef],
+				-buttonforeground => [ {-foreground => $b}, qw/foreground Foreground/, undef],
+			-background  => [[SELF, DESCENDANTS], qw/background   Background/,   undef],
 			-foreground  => [[SELF, DESCENDANTS], qw/foreground   Foreground/,   undef],
 			-default     => ['PASSIVE', undef, undef, ''],
 		DEFAULT      => [$e] );
@@ -1070,6 +1123,7 @@ sub Populate
 	$sl->configure(-relief => $w->{'-listrelief'}||'sunken');
 	$sl->configure(-font => $w->{'-listfont'})  if ($w->{'-listfont'});
 	$sl->Subwidget('yscrollbar')->configure(-takefocus => 0);
+	my $state = (defined $args->{'-state'}) ? $args->{'-state'} : 'normal';
 	my %argHash = ();
 	my $haveSomething = 0;
 	foreach my $a (keys %{$w})  #THIS UGLY HACK NEEDED TO INITIALIZE -labelforground, -labelbackground, ETC.:
@@ -1089,20 +1143,23 @@ no strict 'refs';
 		$var_ref = '';
 		$w->configure(-textvariable => \$var_ref);
 	}
-	eval { $w->{'default'} = $_[1]->{'-default'} || ${$_[1]->{'-variable'}}; }; 
+	eval { $w->{'default'} = $_[1]->{'-default'} || ${$_[1]->{'-variable'}}; };
+
 }
 
 sub focus   #CALLED WHENEVER MAIN WIDGET TAKES FOCUS:
 {
 	my ($w) = shift;
 
-	if ($w->{'_ignorefocus'})  #DON'T CHANGE (SUBWIDGET) FOCUS EVEN THOUGH MAIN WIDGET IS TAKING FOCUS (NEEDED BY CLICKING ON THE FIXED DD-LIST):
+	if ($w->{'_ignorefocus'} == 1)  #DON'T CHANGE (SUBWIDGET) FOCUS EVEN THOUGH MAIN WIDGET IS TAKING FOCUS (NEEDED BY CLICKING ON THE FIXED DD-LIST):
 	{
 		$w->{'_ignorefocus'} = 0;
 		return;
 	}
 	my ($state) = $w->cget( "-state" );
 	my $fw = ($state eq 'readonly') ? 'frame' : 'entry';
+	$w->Subwidget($fw)->configure(-highlightcolor => $w->Subwidget('frame')->cget('-background'))
+			if ($fw eq 'entry');  #CLEAN UP ANY MESS MADE BY setPalette!
 	$w->Subwidget($fw)->focus;
 
 	#BUTTON GETS FOCUS IF BUTTON TAKES FOCUS, BUT WIDGET ITSELF DOESN'T.
@@ -1365,7 +1422,7 @@ no strict 'refs';
 			$b->configure(-bitmap => $FOCUSEDBITMAP);
 		}
 		$w->{'savehl'} = $f->cget('-highlightcolor');
-		my $framehlcolor = $w->{'-background'} || ($bummer ? 'SystemButtonFace' : $e->cget( '-background' ));
+		my $framehlcolor = $f->cget('-background');
 		$f->configure(-highlightcolor => $framehlcolor);
 		Tk->break;
 	});
@@ -1388,21 +1445,21 @@ no strict 'refs';
 		}
 	});
 
-	$b->bind('<ButtonRelease-1>', sub   #MOUSE CLICKED ON THE BUTTON:
+	$b->bind('<ButtonPress-1>', sub   #MOUSE CLICKED ON THE BUTTON:
 	{
 		unless ($b->cget( '-state' ) eq 'disabled')
 		{
-			$w->LbFindSelection()  if ($w->{'popped'});  #(IF LISTBOX IS SHOWING, FIND & HIGHLIGHT CLOSEST MATCH TO TEXT):
+$w->LbFindSelection()  if ($w->{'popped'});  #(IF LISTBOX IS SHOWING, FIND & HIGHLIGHT CLOSEST MATCH TO TEXT):
 			$w->PopupChoices;   #TOGGLES DISPLAY OF LISTBOX!
 			if ($w->{'popped'})
 			{
-				my $index = $w->LbIndex(1);
+my $index = $w->LbIndex(1);
 
 				$sl->focus;
 				$sl->raise;
-				$l->activate($index);         #THIS UNDERLINES IT.
-				$l->selectionClear(0,'end');  #THIS HIGHLIGHTS IT (NEEDED 1ST TIME?!)
-				$l->selectionSet($index);     #THIS HIGHLIGHTS IT (NEEDED 1ST TIME?!)
+$l->activate($index);         #THIS UNDERLINES IT.
+$l->selectionClear(0,'end');  #THIS HIGHLIGHTS IT (NEEDED 1ST TIME?!)
+$l->selectionSet($index);     #THIS HIGHLIGHTS IT (NEEDED 1ST TIME?!)
 				$w->{'_ignorefocus'} = 1;
 			}
 			else
@@ -1410,7 +1467,24 @@ no strict 'refs';
 				$w->{'_ignorefocus'} = 0;
 				$w->focus;
 			}
-			$w->LbCopySelection(1,'button.button1');
+$w->LbCopySelection(1,'button.button1');
+		}
+		Tk->break;
+	});
+
+	$b->bind('<Shift-ButtonRelease-1>', sub   #SHIFT-MOUSE1: SO USER CAN AVOID BOUNCE ON BOUNCY MENUS!
+	{
+		Tk->break;
+	});
+
+	$b->bind('<ButtonRelease-1>', sub   #MOUSE CLICKED ON THE BUTTON:
+	{
+		if ($w->{'popped'} && $w->{'-altbinding'} =~ /List\=Bouncy/io)
+		{
+			$w->{'_ignorefocus'} = 0;
+			$w->{'_lbignorefocus'} = 1;
+			$w->Popdown(1); #  if ($w->{'popped'} && $w->{'-altbinding'} =~ /List\=Bouncy/io);
+			$w->focus();
 		}
 		Tk->break;
 	});
@@ -1621,7 +1695,8 @@ no strict 'refs';
 			$s->focus;
 			$w->LbClose  unless (defined $e);   #POPS DOWN (ROLLS UP LIST)
 			$w->LbChoose($l->XEvent->x, $l->XEvent->y, $keyModifier);
-			if ($w->{'-fixedlist'} && !$w->{'popped'})  #"POP UP" DD-LIST W/O ACTUALLY POPPING IT UP (CALLING PopupChoices() PUTS FOCUS BACK ON ENTRY FIELD)!
+			if (($w->{'-altbinding'} !~ /List\=Bouncy/io || $keyModifier =~ /mod/o)
+					&& $w->{'-fixedlist'} && !$w->{'popped'})  #"POP UP" DD-LIST W/O ACTUALLY POPPING IT UP (CALLING PopupChoices() PUTS FOCUS BACK ON ENTRY FIELD)!
 			{
 				$s->Subwidget($w->{'-listboxtype'})->configure('-takefocus' => 1);
 				$w->{'popped'} = 1;
@@ -1630,10 +1705,15 @@ no strict 'refs';
 				$w->Subwidget('choices')->configure(-cursor => 'arrow');
 				$w->{'_ignorefocus'} = 1;
 			}
+			else
+			{
+				$w->{'_lbignorefocus'} = 1  if ($w->{'-fixedlist'} && $w->{'-altbinding'} =~ /List\=Bouncy/io && $keyModifier !~ /mod/o);
+				$w->{'_ignorefocus'} = 0;
+				$w->focus;
+			}
 		}
 		Tk->break;
 	};
-
 
 	$l->bind('<Shift-ButtonRelease-1>', [\&ListboxMoused,'mod.Shift']);
 	$l->bind('<Control-ButtonRelease-1>', [\&ListboxMoused,'mod.Control']);
@@ -1880,6 +1960,7 @@ sub PopupChoices   #TOGGLE STATE OF DD-LIST (POP UP OR DOWN):
 			$s->see('active');
 			$c->configure(-cursor => 'arrow');
 			$s->focus;
+			$w->grab;
 			return;
 		}
 		my $e = $w->Subwidget('entry');
@@ -2009,8 +2090,6 @@ sub LbChoose  # CHOOSE VALUE FROM LISTBOX WITH THE MOUSE IF APPROPRIATE.
 		$w->LbCopySelection($popornotFlag,"listbox.${keyModifier}button1");
 	}
 }
-
-
 
 sub LbClose  # CLOSE THE LISTBOX AFTER CLEARING SELECTION.
 {
@@ -2204,8 +2283,8 @@ sub Popdown   # POP DOWN (ROLL UP/HIDE) THE DD-LIST BOX!
 		else   #ROLL UP ("UN-POP") THE DD-LIST:
 		{
 			$w->Subwidget('choices')->withdraw;
-			$w->grabRelease;
 		}
+		$w->grabRelease;
 		$w->{'popped'} = 0;
 		$w->Subwidget('entry')->selectionRange(0,'end')  
 				unless ($w->{'-noselecttext'} || !$w->Subwidget('entry')->index('end'));
@@ -2431,48 +2510,50 @@ sub _set_edit_state  #CHANGE APPEARANCES BASED ON CHANGES IN "-STATE" OPTION:
 	my $label  = $w->Subwidget('label');
 	my $button = $w->Subwidget('arrow');
 	my $slistbox = $w->Subwidget('slistbox');
-	my $txtfg = ($w->cget('-colorstate')) ? 'black' : $w->{'-textforeground'} || $w->cget('-foreground') || ($bummer ? 'SystemWindowText' : $w->{'-foreground'});
-	my $txtbg = ($w->cget('-colorstate')) ? 'gray95' : $w->{'-textbackground'} || $w->cget('-background') || ($bummer ? 'SystemWindow' : $w->{'-background'});
-	my $texthlcolor = $w->{'-background'} || $entry->cget( '-background' );
-	my $framehlcolor = $bummer ? $w->{'-background'} || 'SystemButtonFace'
-			: $w->{'-foreground'} || $entry->cget( '-foreground' );
+	my $txtfg = ($w->cget('-colorstate') == 1) ? 'black' : $w->{'-textforeground'} || $frame->cget('-foreground');
+	my $txtbg = ($w->cget('-colorstate') == 1) ? 'gray95' : $w->{'-textbackground'} || $frame->cget('-background');
+	my $texthlcolor = $frame->cget('-background');
+	my $framehlcolor = $frame->cget('-foreground');
+	my $framehlbg = $texthlcolor;
 	if( $state eq 'readonly')
 	{
-		$framehlcolor = $w->{'-foreground'} || $entry->cget( '-foreground' );
-		if ($bummer)
+		$framehlcolor = $frame->cget('-foreground') || $entry->cget( '-foreground' );
+		if ($w->cget('-colorstate') == 1)
 		{
-			$txtfg = $w->{'-textreadonlyforeground'} || 'SystemDisabledText';
-			$txtbg = $w->{'-textreadonlybackground'} || $entry->cget('-readonlybackground')
-					|| $entry->cget('-disabledbackground') || 'SystemButtonFace';
-			$button->configure( -state => 'normal', -takefocus => $w->{'btntakesfocus'}, -relief => 'raised');
-			$frame->configure(-relief => ($w->{'-relief'} || 'groove'), 
-					-takefocus => (1 & $w->{'takefocus'}), -highlightcolor => $framehlcolor);
+			$txtbg = 'lightgray';
 		}
-		else
+		elsif ($w->cget('-colorstate') =~ /^(?:2|dark|readonlydark)$/io || !$haveJSetPalette)
 		{
-			$txtfg = $w->{'-textreadonlyforeground'} || 'gray30';
-			$txtbg = $w->{'-textreadonlybackground'} || $entry->cget('-readonlybackground')
-					|| $entry->cget('-disabledbackground') || 'lightgray';
-			$button->configure( -state => "normal", -takefocus => $w->{'btntakesfocus'}, -relief => 'raised');
-			$frame->configure(-relief => ($w->{'-relief'} || 'raised'), 
-					-takefocus => (1 & $w->{'takefocus'}), -highlightcolor => $framehlcolor);
+			$txtfg = ($txtbg eq $entry->cget('-readonlybackground')) ? 'gray30' : 'black';
 		}
-		$txtbg = 'lightgray'  if ($w->cget('-colorstate') == 2);
-		$entry->configure( -state => 'readonly', -takefocus => 0, 
-				-foreground => $txtfg, 
-				-background => $txtbg, -readonlybackground => $txtbg, -highlightcolor => $texthlcolor);
+		$txtfg = $w->{'-textreadonlyforeground'}  if ($w->{'-textreadonlyforeground'});
+		$txtbg = $w->{'-textreadonlybackground'}  if ($w->{'-textreadonlybackground'});
+		my %entryHash = (-state => $state, -takefocus => 0, 
+				-foreground => $txtfg, -background => $txtbg,
+				-highlightcolor => $texthlcolor,
+				-highlightbackground => $texthlcolor);
+		#PROGRAMMER NOTE:  ONCE THIS PARAMETER IS "SET", SWITCHING PALETTES WILL *NOT* UPDATE IT!:
+		$entryHash{'-readonlybackground'} = $w->{'-textreadonlybackground'} || 'lightgray'  if ($w->cget('-colorstate') == 1);
+		$entry->configure(%entryHash);
+
+		$button->configure(-state => 'normal', -takefocus => $w->{'btntakesfocus'}, -relief => 'raised',
+				-highlightcolor => $framehlcolor, -highlightbackground => $framehlbg);
+		$frame->configure(-relief => ($w->{'-relief'} || 'raised'), 
+				-takefocus => (1 & $w->{'takefocus'}), -highlightcolor => $framehlcolor,
+				-highlightbackground => $framehlbg);
 		$slistbox->configure(-state => 'normal')		if ($w->{'-fixedlist'});
 	}
-	elsif ($state =~ /text/)
+	elsif ($state =~ /text/o)
 	{
-		$framehlcolor = $w->{'-background'} || 'SystemButtonFace'
-				if ($bummer);
-		$button->configure( -state => 'disabled', -takefocus => 0, -relief => 'flat');
+		$button->configure( -state => 'disabled', -takefocus => 0, -relief => 'flat',
+				-highlightbackground => $framehlbg);
 		$frame->configure(-relief => ($w->{'-relief'} || 'sunken'), 
-				-takefocus => 0, -highlightcolor => $framehlcolor);
+				-takefocus => 0, -highlightcolor => $framehlcolor,
+				-highlightcolor => $texthlcolor, -highlightbackground => $framehlbg);
 		$entry->configure( -state => 'normal', 
 				-takefocus => (1 & ($w->{'takefocus'} || $w->{'btntakesfocus'})), 
-				-foreground => $txtfg, -background => $txtbg, -highlightcolor => $texthlcolor);
+				-foreground => $txtfg, -background => $txtbg, -highlightcolor => $texthlcolor,
+				-highlightbackground => $texthlcolor);
 		if ($w->{'-fixedlist'})
 		{
 			$w->Popdown(1)  if ($w->{"popped"});   #UNFOCUS BEFORE DISABLING!
@@ -2482,38 +2563,21 @@ sub _set_edit_state  #CHANGE APPEARANCES BASED ON CHANGES IN "-STATE" OPTION:
 	}
 	elsif ($state eq 'disabled')
 	{
-		my $considerDisabledFG = $w->{'-disabledforeground'} ? $entry->cget('-disabledforeground') : 0;
-		if ($bummer)
-		{
-			$txtfg = $w->{'-textdisabledforeground'} || $entry->cget('-disabledforeground')
-					|| 'SystemDisabledText';
-			$txtbg = $w->{'-textdisabledbackground'} || $entry->cget('-disabledbackground')
-					|| 'SystemButtonFace';
-			$framehlcolor = $w->{'-background'} || 'SystemButtonFace';
-			$button->configure(-state => $state,  -takefocus => 0, 
-					-relief => 'flat');
-			$frame->configure(-relief => ($w->{'-relief'} || 'sunken'), 
-					-takefocus => 0, -highlightcolor => $framehlcolor);
-		}
-		else
-		{
-			$txtfg = $w->{'-textdisabledforeground'} || $entry->cget('-disabledforeground')
-					|| 'gray30';
-			$txtbg = $w->{'-textdisabledbackground'} || $entry->cget('-disabledbackground')
-					|| 'lightgray';
-			$frame->configure(-relief => ($w->{'-relief'} || 'groove'), 
-					-takefocus => 0, -highlightcolor => $framehlcolor);
-		}
-		if ($w->cget('-colorstate') == 2) {
-			$entry->configure( -state => $state, -takefocus => 0, 
-					-foreground => 'grey30', -disabledbackground => 'lightgray', 
-					-highlightcolor => $texthlcolor);
-		} else {
-			$entry->configure( -state => $state, -takefocus => 0, 
-					-foreground => $txtfg, -background => $txtbg, 
-					-highlightcolor => $texthlcolor);
-		}
-		$button->configure(-state => $state,  -takefocus => 0, -relief => 'flat');
+		$frame->configure(-relief => ($w->{'-relief'} || 'groove'), 
+				-takefocus => 0, -highlightcolor => $framehlcolor,
+				-highlightbackground => $framehlbg);
+
+		$txtfg = $w->{'-textdisabledforeground'}  if ($w->{'-textdisabledforeground'});
+		$txtbg = $w->{'-textdisabledbackground'}  if ($w->{'-textdisabledbackground'});
+		my %entryHash = (-state => $state, -takefocus => 0, 
+				-foreground => $txtfg, -background => $txtbg,
+				-highlightcolor => $texthlcolor,
+				-highlightbackground => $texthlcolor);
+		$entryHash{'-disabledbackground'} = ''  if ($w->cget('-colorstate') =~ /^(?:2|dark|disableddark)$/io);
+		$entry->configure(%entryHash);
+
+		$button->configure(-state => $state,  -takefocus => 0, -relief => 'flat',
+				-highlightcolor => $framehlcolor, -highlightbackground => $framehlbg);
 		if ($w->{'-fixedlist'})
 		{
 			$w->Popdown(1)  if ($w->{"popped"});   #UNFOCUS BEFORE DISABLING!
@@ -2523,15 +2587,17 @@ sub _set_edit_state  #CHANGE APPEARANCES BASED ON CHANGES IN "-STATE" OPTION:
 	}
 	else   #NORMAL.
 	{
-		$framehlcolor = $w->{'-background'} || 'SystemButtonFace'
-				if ($bummer);
 		$entry->configure( -state => $state, -takefocus => 0, 
-				-foreground => $txtfg, -background => $txtbg, -highlightcolor => $texthlcolor);
-		$button->configure( -state => $state, -relief => 'raised', 
-				-takefocus => $w->{'btntakesfocus'});
+				-foreground => $txtfg, -background => $txtbg,
+				-highlightcolor => $texthlcolor,
+				-highlightbackground => $texthlcolor);
+		$button->configure(-state => $state, -relief => 'raised', 
+				-takefocus => $w->{'btntakesfocus'},
+				-highlightcolor => $framehlcolor, -highlightbackground => $framehlbg);
 		$frame->configure(-relief => ($w->{'-relief'} || 'sunken'), 
 				-takefocus => (1 & $w->{'takefocus'}), 
-				-highlightcolor => $framehlcolor);
+				-highlightcolor => $framehlcolor,
+				-highlightbackground => $framehlbg);
 		$slistbox->configure(-state => $state)		if ($w->{'-fixedlist'});
 	}
 
@@ -2554,6 +2620,22 @@ sub state   #DYNAMICALLY CHANGE THE -state OF THE WIDGET:
 	else
 	{
 		return $w->{'Configure'}{'-state'};
+	}
+}
+
+sub colorstate   #DYNAMICALLY CHANGE THE -state OF THE WIDGET:
+{
+	my $w = shift;
+
+	if (@_)
+	{
+		my $state = $w->cget('-state') || 'normal';
+		$w->{'Configure'}{'-colorstate'} = shift;
+		$w->_set_edit_state($state);
+	}
+	else
+	{
+		return $w->{'Configure'}{'-colorstate'};
 	}
 }
 

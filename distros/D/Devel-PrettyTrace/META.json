@@ -4,9 +4,9 @@
       "Sergey Aleynikov <randir@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "bsd"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -35,9 +34,14 @@
          "requires" : {
             "Data::Printer" : "0.19",
             "Exporter" : "0",
-            "List::MoreUtils" : "0",
+            "List::Util" : "1.43",
             "parent" : "0",
             "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
@@ -50,5 +54,5 @@
          "url" : "https://github.com/dur-randir/Devel-PrettyTrace"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06"
 }

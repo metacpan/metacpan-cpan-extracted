@@ -4,7 +4,7 @@ extends 'Pegex::Grammar';
 
 use constant file => '../json-pgx/json.pgx';
 
-sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.55)
+sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.64)
   {
     '+grammar' => 'json',
     '+include' => 'pegex-atoms',
@@ -63,7 +63,7 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.55)
       '.rgx' => qr/\Gnull/
     },
     'number' => {
-      '.rgx' => qr/\G(\-?(?:0|[1-9][0-9]*)(?:\.[0-9]*)?(?:[eE][\-\+]?[0-9]+)?)/
+      '.rgx' => qr/\G(\-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][\-\+]?[0-9]+)?)/
     },
     'object' => {
       '.all' => [
@@ -109,7 +109,7 @@ sub make_tree {   # Generated/Inlined by Pegex::Grammar (0.55)
       ]
     },
     'string' => {
-      '.rgx' => qr/\G"((?:\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})|[^"\x00-\x1f])*)"/
+      '.rgx' => qr/\G"((?:\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})|[^"\x00-\x1f\\])*)"/
     },
     'true' => {
       '.rgx' => qr/\Gtrue/

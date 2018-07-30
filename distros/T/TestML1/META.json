@@ -1,5 +1,5 @@
 {
-   "abstract" : "A Generic Software Testing Meta Language",
+   "abstract" : "DEPRECATED Generic Software Testing Meta Language",
    "author" : [
       "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
@@ -41,23 +41,24 @@
       },
       "test" : {
          "requires" : {
-            "Capture::Tiny" : "0"
+            "Capture::Tiny" : "0",
+            "Test::Differences" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ingydotnet/testml-pm/issues"
+         "web" : "https://github.com/ingydotnet/testml1-pm/issues"
       },
-      "homepage" : "https://github.com/ingydotnet/testml-pm",
+      "homepage" : "https://github.com/ingydotnet/testml1-pm",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/ingydotnet/testml-pm.git",
-         "web" : "https://github.com/ingydotnet/testml-pm"
+         "url" : "https://github.com/ingydotnet/testml1-pm.git",
+         "web" : "https://github.com/ingydotnet/testml1-pm"
       }
    },
-   "version" : "0.55",
+   "version" : "0.57",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
 }
 

@@ -7,7 +7,6 @@ author/create_ddl.pl
 author/xgettext.pl
 cpanfile
 eg/app.psgi
-eg/dotcloud.yml
 eg/ukigumo.yml
 lib/Ukigumo/Server.pm
 lib/Ukigumo/Server/API.pm

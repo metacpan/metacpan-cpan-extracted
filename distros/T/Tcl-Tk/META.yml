@@ -28,6 +28,6 @@ requires:
   perl: '5.006'
 resources:
   MailingList: mailto:tcltk@perl.org
-  repository: http://github.com/vadrer/perl-tcl-tk
-version: '1.12'
+  repository: https://github.com/vadrer/perl-tcl-tk.git
+version: '1.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

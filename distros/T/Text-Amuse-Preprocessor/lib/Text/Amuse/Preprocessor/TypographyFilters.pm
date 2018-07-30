@@ -181,8 +181,8 @@ sub characters {
             ru => {
                    ldouble => "\x{ab}",
                    rdouble => "\x{bb}",
-                   lsingle => "\x{2018}",
-                   rsingle => "\x{2019}",
+                   lsingle => "\x{201e}",
+                   rsingle => "\x{201c}",
                    apos    => "\x{2019}",
                    emdash  => "\x{2014}",
                    endash  => "-",

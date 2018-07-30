@@ -19,9 +19,11 @@ no_index:
     - inc
 requires:
   DateTime::Format::ISO8601: '0.08'
+  DateTime::Format::ISO8601::Format: '0.003'
   DateTime::Moonpig: '1.03'
+  Scalar::Util: '0'
   parent: '0.236'
 resources:
   bugtracker: https://github.com/nohuhu/DT/issues
-version: v0.4.0
+version: v0.5.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

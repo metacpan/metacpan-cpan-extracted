@@ -1,0 +1,32 @@
+---
+abstract: 'Performs queries using Yandex Maps Company Search API'
+author:
+  - 'Pavel Serikov <pavelsr@cpan.org>'
+build_requires:
+  File::Slurp: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Yandex-Geo
+requires:
+  Carp: '0'
+  Geo::JSON: '0'
+  JSON::XS: '0'
+  LWP::UserAgent: '0'
+  Object::Tiny: '0'
+  URI: '0'
+  URI::Escape: '0'
+  utf8: '0'
+resources:
+  bugtracker: https://github.com/pavelsr/yandex-geo/issues
+  repository: git://github.com/pavelsr/yandex-geo.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

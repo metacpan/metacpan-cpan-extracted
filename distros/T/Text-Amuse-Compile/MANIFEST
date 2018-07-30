@@ -2,6 +2,7 @@ bin/muse-compile.pl
 bin/muse-create-font-file.pl
 Changes
 lib/Text/Amuse/Compile.pm
+lib/Text/Amuse/Compile/Devel.pm
 lib/Text/Amuse/Compile/File.pm
 lib/Text/Amuse/Compile/FileName.pm
 lib/Text/Amuse/Compile/Fonts.pm
@@ -22,6 +23,7 @@ t/00-load.t
 t/article-class.t
 t/bcor-sides.t
 t/beamer.t
+t/bidi-slides.t
 t/changes.t
 t/compile-file.t
 t/compile-merged.t
@@ -54,6 +56,9 @@ t/manual/br-in-footnotes.muse
 t/manual/logo.png
 t/manual/manual.muse
 t/memory.t
+t/merged-dir-2/english.muse
+t/merged-dir-2/farsi.muse
+t/merged-dir-2/russian.muse
 t/merged-dir/first.muse
 t/merged-dir/forth.muse
 t/merged-dir/logo-1.png
@@ -61,8 +66,10 @@ t/merged-dir/logo.png
 t/merged-dir/nosections.muse
 t/merged-dir/second.muse
 t/merged-dir/third.muse
+t/merged-rtl.t
 t/merged.t
 t/methods.t
+t/missing-bidi.t
 t/missing-fonts.t
 t/nobold-option.t
 t/nofinalpage.t

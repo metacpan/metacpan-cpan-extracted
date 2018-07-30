@@ -6,6 +6,7 @@ bin/importfb3_from_fb2.pl
 Build.PL
 lib/FB3/Convert.pm
 lib/FB3/Convert/Epub.pm
+lib/FB3/Convert/FB2.pm
 lib/FB3/Euristica.pm
 MANIFEST			This list of files
 README

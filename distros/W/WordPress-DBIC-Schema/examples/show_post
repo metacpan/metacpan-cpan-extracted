@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+
+use utf8;
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Data::Dumper::Concise;
+use WordPress::DBIC::Schema;
+
+
+my $schema = WordPress::DBIC::Schema->connect('wordpress');
+
+foreach my $id (@ARGV) {
+    if (my $post = $schema->resultset('WpPost')->published
+        ->find($id, {
+                     prefetch => ['metas', { wp_term_relationships => { wp_term_taxonomy => 'wp_term' } }],
+                    })) {
+        foreach my $taxonomy ($post->taxonomies) {
+            print $post->post_title . ' ' . $taxonomy->wp_term->name . "\n";
+        }
+        print $post->clean_url . "\n";
+        print $post->permalink . "\n";
+        foreach my $meta ($post->metas) {
+            if ($meta->meta_key eq 'subtitle') {
+                print $meta->meta_value . "\n";
+            }
+        }
+        print $post->html_body . "\n";
+    }
+}

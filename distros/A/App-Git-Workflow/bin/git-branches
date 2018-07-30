@@ -20,7 +20,7 @@ git-branches - lists branches with dates of last commits
 
 =head1 VERSION
 
-This documentation refers to git-branches version 1.0.7
+This documentation refers to git-branches version 1.0.8
 
 =head1 SYNOPSIS
 

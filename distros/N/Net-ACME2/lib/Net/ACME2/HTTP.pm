@@ -6,29 +6,18 @@ package Net::ACME2::HTTP;
 
 Net::ACME2::HTTP - transport logic for C<Net::ACME2>.
 
-=head1 SYNOPSIS
-
-    my $resp = Net::ACME2::HTTP->new()->get('https://url/to/endpoint');
-
-    my $http_authn = Net::ACME2::HTTP->new( key => $account_key );
-
-    my $post_resp = $http_authn->post(
-        'https://url/to/endpoint',
-        { foo => 4 },   #i.e., the payload to send
-        %opts,          #cf. HTTP::Tiny::request
-    );
-
 =head1 DESCRIPTION
 
 This module handles communication with an ACME server at the HTTP level.
-It handles the wrapping of POSTs in JWSes (JSON Web Signatures).
+It wraps POSTs in JWSes (JSON Web Signatures) as needed.
+
+There should be no reason to interact with this class in production.
 
 =cut
 
 use strict;
 use warnings;
 
-use Crypt::Perl::PK ();
 use JSON ();
 
 use Net::ACME2::Error          ();
@@ -48,7 +37,7 @@ our $verify_SSL = 1;
 sub new {
     my ( $class, %opts ) = @_;
 
-    die 'need “key”!' if !$opts{'key'};
+    die Net::ACME2::X->create('Generic', 'need “key”!') if !$opts{'key'};
 
     my $ua = Net::ACME2::HTTP_Tiny->new( verify_SSL => $verify_SSL );
 
@@ -56,7 +45,6 @@ sub new {
         _ua       => $ua,
         _acme_key => $opts{'key'},
         _key_id => $opts{'key_id'},
-        _jws_format => $opts{'jws_format'},
     }, $class;
 
     return bless $self, $class;
@@ -85,12 +73,15 @@ sub get {
     return $self->_request( 'GET', $url );
 }
 
+# ACME spec 6.2: for all requests not signed using an existing account,
+# e.g., newAccount
 sub post_full_jwt {
     my $self = shift;
 
     return $self->_post( 'create_full_jws', @_ );
 }
 
+# ACME spec 6.2: for all requests signed using an existing account
 sub post_key_id {
     my $self = shift;
 
@@ -106,6 +97,8 @@ sub post_key_id {
 sub _post {
     my ( $self, $jwt_method, $url, $data, $opts_hr ) = @_;
 
+    # Shouldn’t be needed because the constructor requires “key”,
+    # but just in case.
     die "Constructor needed “key” to do POST! ($url)" if !$self->{'_acme_key'};
 
     my $jws = $self->_create_jwt( $jwt_method, $url, $data );
@@ -142,7 +135,9 @@ sub _request {
 
     eval { $resp = $self->_ua_request( $type, @args ); };
 
-    if (ref $@) {
+    # Check ref() first to avoid potentially running overload.pm’s
+    # stringification.
+    if (ref($@) || $@) {
         my $exc = $@;
 
         if ( eval { $exc->isa('Net::ACME2::X::HTTP::Protocol') } ) {
@@ -194,12 +189,9 @@ sub _request_and_set_last_nonce {
     #each request must use the most recently sent nonce). It implies that GETs
     #do not need to send nonces, though each GET will *receive* a nonce that
     #may be used.
-    if ( my $nonce = $resp->header($_NONCE_HEADER) ) {
-        $self->{'_last_nonce'} = $nonce;
-    }
-    else {
-        warn "Received no $_NONCE_HEADER from $url!";
-    }
+    $self->{'_last_nonce'} = $resp->header($_NONCE_HEADER) or do {
+        die Net::ACME2::X->create('Generic', "Received no $_NONCE_HEADER from $url!");
+    };
 
     return $resp;
 }
@@ -207,13 +199,13 @@ sub _request_and_set_last_nonce {
 sub _get_first_nonce {
     my ($self) = @_;
 
-    my $url = $self->{'_nonce_url'} or die "Need newNonce URL!";
+    my $url = $self->{'_nonce_url'} or do {
+
+        # Shouldn’t happen unless there’s an errant refactor.
+        die Net::ACME2::X->create('Set newNonce URL first!');
+    };
 
     $self->_request_and_set_last_nonce( 'HEAD', $url );
-
-    if (!$self->{'_nonce_url'}) {
-        die "Didn’t get a new nonce from “$self->{'_nonce_url'}”!";
-    }
 
     return;
 }
@@ -233,7 +225,11 @@ sub _create_jwt {
             $class = 'Net::ACME2::JWTMaker::ECC';
         }
         else {
-            die "Unknown key “$self->{'_acme_key'}”";
+
+            # As of this writing, Crypt::Perl only does RSA and ECDSA keys.
+            # If we get here, it’s possible that Crypt::Perl now supports
+            # an additional key type that this library doesn’t recognize.
+            die Net::ACME2::X->create('Generic', "Unrecognized key type: $self->{'_acme_key'}");
         }
 
         if (!$class->can('new')) {
@@ -243,7 +239,6 @@ sub _create_jwt {
 
         $class->new(
             key => $self->{'_acme_key'},
-            format => $self->{'_jws_format'},
         );
     };
 

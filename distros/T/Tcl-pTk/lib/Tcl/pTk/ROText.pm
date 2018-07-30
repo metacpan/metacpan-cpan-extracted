@@ -6,7 +6,7 @@
 
 package Tcl::pTk::ROText;
 
-our ($VERSION) = ('0.93');
+our ($VERSION) = ('0.94');
 
 use base  qw(Tcl::pTk::Derived Tcl::pTk::Text);
 

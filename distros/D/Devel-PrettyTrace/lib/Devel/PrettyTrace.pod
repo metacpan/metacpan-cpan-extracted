@@ -6,23 +6,23 @@ Devel::PrettyTrace - prints stack traces with arguments expanded into readable f
 
     use Devel::PrettyTrace;
 	
-	sub foo{
-		bar();
-	}
+    sub foo{
+        bar();
+    }
 
-	sub bar{
-		bt;
-	}
+    sub bar{
+        bt;
+    }
 
-	foo(1, "b");
+    foo(1, "b");
 
-	#and you get
+    #and you get
 	
-	main::bar() called at foo.pl line 4
-	main::foo(
-    	[0] 1,
-		[1] "b"
-	) called at foo.pl line 10
+    main::bar() called at foo.pl line 4
+    main::foo(
+        [0] 1,
+        [1] "b"
+    ) called at foo.pl line 10
 
 =head1 DESCRIPTION
 
@@ -55,36 +55,12 @@ C<%Opts>
 
 Options for L<Data::Printer>, that determine how to render arguments. If you need special formatting, do it here.
 
-=head1 AUTHOR
+=head1 COPYRIGHT AND LICENSE
 
-Sergey Aleynikov <sergey.aleynikov@gmail.com>
+Copyright (C) 2011,2018 by Sergey Aleynikov
 
-=head1 LICENSE
-
-Copyright (c) 2011 by Sergey Aleynikov.
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-
-1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGE.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut

@@ -1,5 +1,8 @@
 package Net::ACME2::Challenge;
 
+use strict;
+use warnings;
+
 =encoding utf-8
 
 =head1 NAME
@@ -10,19 +13,12 @@ Net::ACME2::Challenge
 
 The ACME Challenge object.
 
-(NB: The specification doesn’t seem to define this as a resource
-per se .. oversight?)
-
-Note that C<http-01> challenges use L<Net::ACME2::Challenge::http_01>.
+You probably won’t instantiate these directly; they’re created automatically
+as part of L<Net::ACME2::Authorization> instantiation.
 
 =cut
 
-use strict;
-use warnings;
-
 use parent qw( Net::ACME2::AccessorBase );
-
-use Net::ACME2::X ();
 
 use constant _ACCESSORS => (
     'url',
@@ -30,7 +26,7 @@ use constant _ACCESSORS => (
     'status',
     'validated',
     'error',
-    #'keyAuthorization',
+    'token',
 );
 
 =head1 ACCESSORS

@@ -19,6 +19,11 @@
             "Module::Build" : "0.4004"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010"
+         }
+      },
       "test" : {
          "requires" : {
             "Test::More" : "0.88",
@@ -29,11 +34,11 @@
    "provides" : {
       "Commandable" : {
          "file" : "lib/Commandable.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Commandable::Invocation" : {
          "file" : "lib/Commandable/Invocation.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -42,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

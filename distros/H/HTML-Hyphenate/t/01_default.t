@@ -6,16 +6,7 @@ use Test::More;
 use Test::Warn;
 $ENV{AUTHOR_TESTING} && eval { require Test::NoWarnings };
 
-use HTML::Tree;
 use version;
-
-my $tree = version->parse($HTML::Tree::VERSION);
-my $broken = version->parse('4.0');
-
-diag(q{Using HTML::Tree version } . $tree);
-if ($tree == $broken) {
-	BAIL_OUT(q{HTML::Tree version 4.0 is not supported, use 3.23 or earlier or 4.1 or later to avoid issues as reported in RT #61809 <https://rt.cpan.org/Ticket/Display.html?id=61809>});
-}
 
 my @fragments = (
     [
@@ -40,9 +31,7 @@ my @fragments = (
     ],
     [
         'Supercalifragilisticexpialidocious &lt; &gt; &amp;',
-		$tree < $broken
-			? 'Su­per­cal­ifrag­ilis­tic­ex­pi­ali­do­cious &#60; &#62; &#38;'
-			: 'Su­per­cal­ifrag­ilis­tic­ex­pi­ali­do­cious &lt; &gt; &amp;',
+		'Su­per­cal­ifrag­ilis­tic­ex­pi­ali­do­cious &lt; &gt; &amp;',
         'plain word, HTML encoded less than sign, greater than sign and ampersand'
     ],
     [
@@ -87,12 +76,12 @@ my @fragments = (
     ],
     [
 '<table><tr><th nowrap>Supercalifragilisticexpialidocious</th></tr></table>',
-'<table><tr><th nowrap="nowrap">Supercalifragilisticexpialidocious</th></tr></table>',
+'<table><tr><th nowrap>Supercalifragilisticexpialidocious</th></tr></table>',
         'single word table head with nowrap attribute'
     ],
     [
-        '<img alt="Supercalifragilisticexpialidocious"/>',
-'<img alt="Su­per­cal­ifrag­ilis­tic­ex­pi­ali­do­cious" />',
+'<img alt="Supercalifragilisticexpialidocious"/>',
+'<img alt="Su­per­cal­ifrag­ilis­tic­ex­pi­ali­do­cious">',
         'image with alt attribute'
     ],
     [

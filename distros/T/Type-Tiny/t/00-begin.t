@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -28,17 +28,10 @@ sub diag_version
 {
 	my ($module, $version) = @_;
 	
-	if ($module eq 'Type::Tiny::XS'
-	and $ENV{AUTOMATED_TESTING}
-	and $ENV{PATH} =~ m{\A/home/sand/bin:})
-	{
-		diag "**** ANDK BROKEN TESTING ENVIRONMENT DETECTED";
-		diag "**** SKIPPING REPORTING VERSION OF $module";
-		diag "**** EVERYTHING ELSE SHOULD BE OKAY";
-		return;
+	unless (defined $version) {
+		eval "use $module ()";
+		$version =  $module->VERSION;
 	}
-	
-	$version = eval "require $module; $module->VERSION" unless defined $version;
 	
 	return diag sprintf('  %-30s    undef', $module) unless defined $version;
 	

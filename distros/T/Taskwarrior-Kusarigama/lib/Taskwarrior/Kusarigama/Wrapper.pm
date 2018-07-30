@@ -1,7 +1,7 @@
 package  Taskwarrior::Kusarigama::Wrapper;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: interface to the taskwarrior's 'task' command
-$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.9.1';
+$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.9.2';
 
 # TODO use Test::Pod::Snippet for that example ^^^
 
@@ -141,7 +141,7 @@ sub AUTOLOAD {
     (my $meth = our $AUTOLOAD) =~ s/.+:://;
     return if $meth eq 'DESTROY';
 
-    $meth =~ tr/_/-/;
+    $meth =~ s/(?<=.)_/-/;
 
     return $self->RUN($meth, @_);
 }
@@ -160,7 +160,7 @@ Taskwarrior::Kusarigama::Wrapper - interface to the taskwarrior's 'task' command
 
 =head1 VERSION
 
-version 0.9.1
+version 0.9.2
 
 =head1 SYNOPSIS
 

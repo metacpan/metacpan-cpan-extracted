@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   GraphQL: '0.26'
   JSON::Validator: '2.01'
-  Mojolicious::Plugin::GraphQL: '0.10'
+  Mojolicious::Plugin::GraphQL: '0.11'
   Mojolicious::Plugin::OpenAPI: '1.25'
   OpenAPI::Client: '0.14'
   Test::More: '0.98'
@@ -35,5 +35,5 @@ resources:
   bugtracker: https://github.com/graphql-perl/GraphQL-Plugin-Convert-OpenAPI/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/GraphQL-Plugin-Convert-OpenAPI
-version: '0.14'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

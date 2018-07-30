@@ -1,5 +1,9 @@
 Revision history for this software.
 
+2.13.6.6 2018/07/25 00:00:00
+  - support jef9p
+  - created by INABA Hitoshi
+
 2.13.6.5 2018/04/09 00:00:00
   - add known license
   - support JIPS(J) and JIPS(E)

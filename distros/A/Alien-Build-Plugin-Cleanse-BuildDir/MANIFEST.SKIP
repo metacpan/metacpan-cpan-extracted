@@ -1,0 +1,8 @@
+.appveyor.yml
+.gitattributes
+.travis.yml
+.git
+blib
+Makefile.old
+tar.gz$
+MANIFEST.bak

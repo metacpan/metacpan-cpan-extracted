@@ -1,4 +1,11 @@
 Revision history for Commandable
 
+0.02    2018-07-29 23:39:17
+        [CHANGES]
+         * Added ->putback_tokens
+
+        [BUGFIXES]
+         * Make sure that "multiple" "quotes" are parsed correctly
+
 0.01    2018-06-07 13:10:15
         Initial version with just Commandable::Invocation

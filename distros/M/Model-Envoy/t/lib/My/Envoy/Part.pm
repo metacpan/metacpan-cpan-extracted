@@ -1,17 +1,10 @@
 package My::Envoy::Part;
 
     use Moose;
-    with 'Model::Envoy';
 
-    use My::DB;
+    extends 'My::Envoy::Base';
 
     sub dbic { 'My::DB::Result::Part' }
-
-    my $schema;
-
-    sub _schema {
-        $schema ||= My::DB->db_connect('/tmp/envoy');
-    }
 
     has 'id' => (
         is => 'ro',
@@ -32,7 +25,6 @@ package My::Envoy::Part;
         isa => 'Maybe[My::Envoy::Widget]',
         traits => ['DBIC','Envoy'],
         rel => 'belongs_to',
-        coerce => 1,
     );
 
 1;

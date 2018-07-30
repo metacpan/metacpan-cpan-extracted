@@ -18,11 +18,11 @@ Text::Amuse::Preprocessor - Helpers for Text::Amuse document formatting.
 
 =head1 VERSION
 
-Version 0.55
+Version 0.57
 
 =cut
 
-our $VERSION = '0.55';
+our $VERSION = '0.57';
 
 
 =head1 SYNOPSIS
@@ -558,7 +558,7 @@ sub tmpdir {
 sub _get_lang {
     my $self = shift;
     my $infile = $self->_infile;
-    # shoudn't happen
+    # shouldn't happen
     die unless $infile && -f $infile;
     my $info;
     eval {

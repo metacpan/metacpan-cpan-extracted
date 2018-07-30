@@ -148,6 +148,14 @@ enum {
   SPVM_OP_C_ID_COMPILE,
   SPVM_OP_C_ID_SCALAR,
   SPVM_OP_C_ID_ARRAY_FIELD_ACCESS,
+  SPVM_OP_C_ID_REF,
+  SPVM_OP_C_ID_DEREF,
+  SPVM_OP_C_ID_BYTE_REF,
+  SPVM_OP_C_ID_SHORT_REF,
+  SPVM_OP_C_ID_INT_REF,
+  SPVM_OP_C_ID_LONG_REF,
+  SPVM_OP_C_ID_FLOAT_REF,
+  SPVM_OP_C_ID_DOUBLE_REF,
 };
 
 extern const char* const SPVM_OP_C_ID_NAMES[];
@@ -269,6 +277,9 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op);
 
 void SPVM_OP_convert_to_op_constant_true(SPVM_COMPILER* compiler, SPVM_OP* op);
 void SPVM_OP_convert_to_op_constant_false(SPVM_COMPILER* compiler, SPVM_OP* op);
+
+SPVM_OP* SPVM_OP_build_deref(SPVM_COMPILER* compiler, SPVM_OP* op_deref, SPVM_OP* op_var);
+SPVM_OP* SPVM_OP_build_ref(SPVM_COMPILER* compiler, SPVM_OP* op_ref, SPVM_OP* op_var);
 
 SPVM_OP* SPVM_OP_build_concat(SPVM_COMPILER* compiler, SPVM_OP* op_cancat, SPVM_OP* op_first, SPVM_OP* op_last);
 SPVM_OP* SPVM_OP_build_return(SPVM_COMPILER* compiler, SPVM_OP* op_return, SPVM_OP* op_term);

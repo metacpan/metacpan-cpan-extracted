@@ -2,7 +2,7 @@
 
 
 package Net::IP::Checker;
-$Net::IP::Checker::VERSION = '0.02';
+$Net::IP::Checker::VERSION = '0.03';
 use strict;
 use warnings;
 use Regexp::IPv6 qw($IPv6_re);
@@ -46,7 +46,7 @@ Net::IP::Checker - IPv4/IPv6 addresses validator
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ L<Net::IP>, L<Net::IP::Checker>, L<Net::IP::Lite>
 =head1 FUNCTIONS
 
 The same as L<Net::IP> these functions are not exported by default. You may import them explicitly
-or use C<:PROC> to import them all.
+or use C<:ALL> to import them all.
 
 =over
 

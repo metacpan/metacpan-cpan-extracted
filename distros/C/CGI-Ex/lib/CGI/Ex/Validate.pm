@@ -2,13 +2,13 @@ package CGI::Ex::Validate;
 
 ###---------------------###
 #  See the perldoc in CGI/Ex/Validate.pod
-#  Copyright 2003-2017 - Paul Seamons
+#  Copyright - Paul Seamons
 #  Distributed under the Perl Artistic License without warranty
 
 use strict;
 use Carp qw(croak);
 
-our $VERSION  = '2.45';
+our $VERSION  = '2.46';
 our $QR_EXTRA = qr/^(\w+_error|as_(array|string|hash)_\w+|no_\w+)/;
 our @UNSUPPORTED_BROWSERS = (qr/MSIE\s+5.0\d/i);
 our $JS_URI_PATH;
@@ -314,6 +314,7 @@ sub validate_buddy {
                 $copy;
             };
             foreach my $value (@$values) {
+                next if ! defined $value;
                 if ($global) { $value =~ s{(?$opt:$pat)}{ $expand->($value, [@-], [@+]) }eg }
                 else         { $value =~ s{(?$opt:$pat)}{ $expand->($value, [@-], [@+]) }e  }
             }

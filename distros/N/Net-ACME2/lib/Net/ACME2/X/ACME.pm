@@ -3,7 +3,12 @@ package Net::ACME2::X::ACME;
 use strict;
 use warnings;
 
-use parent qw( Net::ACME2::X::Base );
+use parent qw( Net::ACME2::X::Generic );
+
+#----------------------------------------------------------------------
+# This class indicates that the ACME server gave an error response.
+# It should be coincident with a 4xx-level HTTP response.
+#----------------------------------------------------------------------
 
 #named args required:
 #

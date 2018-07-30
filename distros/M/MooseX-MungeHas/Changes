@@ -6,6 +6,24 @@ Home page:    <https://metacpan.org/release/MooseX-MungeHas>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-MungeHas>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.010	2018-07-28
+
+ [ Bug Fixes ]
+ - Eliminate uninitialized warning when no `is` under Moose.
+   Aaron Crane++
+   <https://github.com/tobyink/p5-moosex-mungehas/pull/5>
+
+ [ Test Suite ]
+ - Make 07lazy.t actually test something useful. I can't remember why this
+   test case even exists.
+
+0.009	2018-07-28
+
+ [ Bug Fixes ]
+ - Don't use fully-qualified sub names for builders.
+   Aaron Crane++
+   <https://github.com/tobyink/p5-moosex-mungehas/pull/3>
+
 0.008	2017-05-27
 
  [ Bug Fixes ]

@@ -1,0 +1,10 @@
+File:         06perms.txt
+Description:  Description: CSV file of upload permission to the CPAN per namespace
+    best-permission is one of "m" for "modulelist", "f" for
+    "first-come", "c" for "co-maint"
+Columns:      package, userid, best-permission
+Intended-For: Automated fetch routines, namespace documentation.
+Written-By:   CPAN::Repository 0.010
+Line-Count:   0
+Date:         Tue, 24 Jul 18 23:39:52 UTC
+

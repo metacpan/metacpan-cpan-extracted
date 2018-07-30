@@ -74,3 +74,4 @@ ok !defined($dt ge undef), "ge undef";
 ok !defined($ud ge $dt), "undef ge";
 is $dt ge time, !1, "ge";
 is time ge $dt, 1, "reverse ge";
+

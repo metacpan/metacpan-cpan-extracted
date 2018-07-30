@@ -3,7 +3,7 @@ use strict;
 use Filter::Simple;
 
 use vars '$VERSION';
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 =head1 NAME
 
@@ -190,14 +190,14 @@ sub parse_argument_list {
 # This is the version that is most downwards compatible but doesn't handle
 # parentheses in default assignments
 sub transform_arguments {
-	# This should also support
-	# sub foo($x,$y,@) { ... }, throwing away additional arguments
-	# Named or anonymous subs
-	no warnings 'uninitialized';
-	s{\bsub(\s*)(\w*)(\s*)\((\s*)((?:[^)]*?\@?))(\s*)\)(\s*)\{}{
-		parse_argument_list("$2","$5","$1$3$4$6$7")
-	 }mge;
-	$_
+        # This should also support
+        # sub foo($x,$y,@) { ... }, throwing away additional arguments
+        # Named or anonymous subs
+        no warnings 'uninitialized';
+        s{\bsub(\s*)(\w*)(\s*)\((\s*)((?:[^)]*?\@?))(\s*)\)(\s*)\{}{
+                parse_argument_list("$2","$5","$1$3$4$6$7")
+         }mge;
+        $_
 }
 
 if( $] >= 5.010 ) {
@@ -205,14 +205,14 @@ if( $] >= 5.010 ) {
     no warnings 'redefine';
     eval <<'PERL_5010_onwards';
 sub transform_arguments {
-	# This should also support
-	# sub foo($x,$y,@) { ... }, throwing away additional arguments
-	# Named or anonymous subs
+        # This should also support
+        # sub foo($x,$y,@) { ... }, throwing away additional arguments
+        # Named or anonymous subs
     # We also want to handle arbitrarily deeply nested balanced parentheses here
-	no warnings 'uninitialized';
+        no warnings 'uninitialized';
 
     # For Perl 5.10 onwards we have nice recursive patterns and comments
-	s{\bsub(\s*) #1
+        s{\bsub(\s*) #1
            (\w*) #2
            (\s*) #3
            \(
@@ -231,12 +231,57 @@ sub transform_arguments {
            )
            (\s*)\)
            (\s*)\{}{
-		parse_argument_list("$2","$5","$1$3$4$8$9")
-	 }mgex;
-	$_
+                parse_argument_list("$2","$5","$1$3$4$8$9")
+         }mgex;
+        $_
 }
 PERL_5010_onwards
     die $@ if $@;
+}
+
+sub import {
+    my( $class, $scope ) = @_;
+# Guard against double-installation of our scanner
+    if( $scope and $scope eq 'global' ) {
+        
+        my $scan; $scan = sub {
+            my( $self, $filename ) = @_;
+
+            # Find the filters/directories that are still applicable:
+            my $idx = 0;
+            $idx++ while ((!ref $INC[$idx] or $INC[$idx] != $scan) and $idx < @INC);
+            $idx++;
+
+            my @found;
+            foreach my $prefix (@INC[ $idx..$#INC ]) {
+                if (ref($prefix) eq 'CODE') {
+                    #... do other stuff - see text below ....
+                    @found = $prefix->( $self, $filename );
+                    if( @found ) { # we found the module
+                        last;
+                    };
+                } else {
+                        my $realfilename = "$prefix/$filename";
+                        next if ! -e $realfilename || -d _ || -b _;
+
+                        open my $fh, '<', $realfilename
+                            or die "Couldn't read '$realfilename': $!";
+                        @found = (undef, $fh);
+                };
+            };
+            if( !ref $found[0] ) {
+                $found[0] = \(my $buf = "");
+            };
+            ${$found[0]} .= do { local $/; my $fh = $found[1]; my $content = <$fh>; $content };
+
+            # Prepend usages of "feature" with our filter
+            ${$found[0]} =~ s!\b(use\s+feature\s+(['"])signatures\2)!use Filter::signatures;\n$1!gs;
+
+            return @found
+        };
+        # We need to run as early as possible to filter other modules
+        unshift @INC, $scan;
+    };
 }
 
 if( (! $have_signatures) or $ENV{FORCE_FILTER_SIGNATURES} ) {
@@ -260,6 +305,21 @@ FILTER_ONLY
 
 1;
 
+=head1 USAGE WITHOUT SOURCE CODE MODIFICATION
+
+If you have a source file that was written for use with signatures and you
+cannot modify that source file, you can run it as follows:
+
+  perl -Mlib=some/directory -MFilter::signatures=global myscript.pl
+
+This is intended as a quick-fix solution and is not very robust. If your
+script modifies C<@INC>,  the filtering may not get a chance to modify
+the source code of the loaded module.
+
+This currently does not play well with (other) hooks in C<@INC> as it
+only handles hooks that return a filehandle. Implementations for the
+rest are welcome.
+
 =head1 SEE ALSO
 
 L<perlsub/Signatures>
@@ -275,7 +335,7 @@ closer to Perl 6, but requires L<PPI> and L<Devel::Declare>
 
 L<Function::Parameters> - adds two new keywords for declaring subroutines and
 parses their signatures. It supports more features than core Perl, closer to
-Perl 6, but requires a C compiler and Pelr 5.14+.
+Perl 6, but requires a C compiler and Perl 5.14+.
 
 =head1 REPOSITORY
 

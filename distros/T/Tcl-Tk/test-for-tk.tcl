@@ -8,4 +8,7 @@ if {![catch {package require snit}]} {
 if {![catch {package require tklib}]} {
     puts {ok3}
 }
+if {![catch {package require tile}]} {
+    puts {ok4}
+}
 exit

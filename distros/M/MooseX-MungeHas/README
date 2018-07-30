@@ -50,6 +50,11 @@ DESCRIPTION
         (Assuming that $type_constraint is a blessed type constraint object a
         la Type::Tiny, MooseX::Types, etc.)
 
+    *   Makes `lazy => sub { ... }` into a shortcut for:
+
+            lazy    => 1,
+            builder => sub { ... },
+
     When you import this module (i.e. `use MooseX::MungeHas`) you can provide
     a list of additional mungers you want it to apply. These may be provided
     as coderefs, though for a few common, useful sets of behaviour, there are

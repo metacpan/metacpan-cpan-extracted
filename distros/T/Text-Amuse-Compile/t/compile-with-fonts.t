@@ -68,7 +68,7 @@ foreach my $fs ($file, \@fonts) {
     {
         ok (-f $tex, "$tex produced");
         my $texbody = read_file($tex);
-        like $texbody, qr/mainfont\{DejaVuSerif\}/;
+        like $texbody, qr/mainfont.*\{DejaVuSerif\}/;
         like $texbody, qr/monofont.*\{DejaVuSansMono\}/;
         like $texbody, qr/sansfont.*\{DejaVuSans\}/ or die Dumper($c);
     }
@@ -117,7 +117,7 @@ foreach my $fs ($file, \@fonts) {
     {
         ok (-f $tex, "$tex produced");
         my $texbody = read_file($tex);
-        like $texbody, qr/mainfont\{DejaVuSerif\}/;
+        like $texbody, qr/mainfont.*\{DejaVuSerif\}/;
         like $texbody, qr/monofont.*\{DejaVuSansMono\}/;
         like $texbody, qr/sansfont.*\{DejaVuSans\}/ or die Dumper($c);
     }
@@ -225,7 +225,7 @@ ok ($@, "bad specification: $@");
     {
         ok (-f $tex, "$tex produced");
         my $texbody = read_file($tex);
-        like $texbody, qr/mainfont\{DejaVuSerif\}/;
+        like $texbody, qr/mainfont.*\{DejaVuSerif\}/;
         like $texbody, qr/monofont.*\{DejaVuSansMono\}/;
         like $texbody, qr/sansfont.*\{DejaVuSans\}/ or die Dumper($c);
     }
@@ -278,7 +278,7 @@ ok ($@, "bad specification: $@");
     {
         ok (-f $tex, "$tex produced");
         my $texbody = read_file($tex);
-        like $texbody, qr/mainfont\{DejaVuSansMono\}/;
+        like $texbody, qr/mainfont.*\{DejaVuSansMono\}/;
         like $texbody, qr/monofont.*\{DejaVuSans\}/;
         like $texbody, qr/sansfont.*\{DejaVuSerif\}/;
     }

@@ -142,7 +142,7 @@ L<Type::Tiny::Manual::Coercions>.
 
 Use a custom types library just like you would L<Types::Standard>:
 
-   packge MyClass;
+   package MyClass;
    use Moose;
    use DateTime;
    use Example::Types qw( Datetime ); # import the custom type
@@ -304,7 +304,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

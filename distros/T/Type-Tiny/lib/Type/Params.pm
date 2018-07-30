@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '1.002002';
+	$Type::Params::VERSION   = '1.004002';
 }
 
 use B qw();
@@ -20,13 +20,13 @@ use Error::TypeTiny;
 use Error::TypeTiny::Assertion;
 use Error::TypeTiny::WrongNumberOfParameters;
 use Types::Standard -types;
-use Types::TypeTiny qw(CodeLike ArrayLike to_TypeTiny);
+use Types::TypeTiny qw(CodeLike TypeTiny ArrayLike to_TypeTiny);
 
 require Exporter::Tiny;
 our @ISA = 'Exporter::Tiny';
 
 our @EXPORT    = qw( compile compile_named );
-our @EXPORT_OK = qw( multisig validate validate_named Invocant );
+our @EXPORT_OK = qw( multisig validate validate_named compile_named_oo Invocant );
 
 sub english_list {
 	require Type::Utils;
@@ -74,12 +74,42 @@ sub _mkslurpy
 		);
 }
 
+sub _mkdefault
+{
+	my $param_options = shift;
+	my $default;
+	
+	if (exists $param_options->{default}) {
+		$default = $param_options->{default};
+		if (ArrayRef->check($default) and not @$default) {
+			$default = '[]';
+		}
+		elsif (HashRef->check($default) and not %$default) {
+			$default = '{}';
+		}
+		elsif (Str->check($default)) {
+			$default = $QUOTE->($default);
+		}
+		elsif (Undef->check($default)) {
+			$default = 'undef';
+		}
+		elsif (not CodeLike->check($default)) {
+			Error::TypeTiny::croak("Default expected to be string, coderef, undef, or reference to an empty hash or array");
+		}
+	}
+
+	$default;
+}
+
 sub compile
 {
 	my (@code, %env);
 	push @code, '#placeholder', '#placeholder';  # @code[0,1]
 	
-	my %options    = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+	my %options;
+	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
+		%options = (%options, %{+shift});
+	}
 	my $arg        = -1;
 	my $saw_slurpy = 0;
 	my $min_args   = 0;
@@ -90,18 +120,21 @@ sub compile
 	$code[0] = 'my (%tmp, $tmp);';
 	PARAM: for my $param (@_) {
 		if (HashRef->check($param)) {
-			$code[0] = 'my (@R, %tmp, $tmp);';
+			$code[0] = 'my (@R, %tmp, $tmp, $dtmp);';
 			$return_default_list = !!0;
 			last PARAM;
 		}
 		elsif (not Bool->check($param)) {
 			if ($param->has_coercion) {
-				$code[0] = 'my (@R, %tmp, $tmp);';
+				$code[0] = 'my (@R, %tmp, $tmp, $dtmp);';
 				$return_default_list = !!0;
 				last PARAM;
 			}
 		}
 	}
+	
+	my @default_indices;
+	my @default_values;
 		
 	while (@_)
 	{
@@ -112,12 +145,20 @@ sub compile
 		my $is_slurpy;
 		my $varname;
 		
+		my $param_options = {};
+		$param_options = shift if HashRef->check($_[0]) && !exists $_[0]{slurpy};
+		my $default = _mkdefault($param_options);
+		
+		if ($param_options->{optional} or defined $default) {
+			$is_optional = 1;
+		}
+		
 		if (Bool->check($constraint))
 		{
 			$constraint = $constraint ? Any : Optional[Any];
 		}
-		
-		if (HashRef->check($constraint))
+
+		if (HashRef->check($constraint) and exists $constraint->{slurpy})
 		{
 			$constraint = to_TypeTiny(
 				$constraint->{slurpy}
@@ -138,10 +179,33 @@ sub compile
 		{
 			Error::TypeTiny::croak("Parameter following slurpy parameter") if $saw_slurpy;
 			
-			$is_optional     = grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
-			$really_optional = $is_optional && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
+			$is_optional     += grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
+			$really_optional = $is_optional && $constraint->parent && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
 			
-			if ($is_optional)
+			if (ref $default) {
+				$env{'@default'}[$arg] = $default;
+				push @code, sprintf(
+					'$dtmp = ($#_ < %d) ? $default[%d]->() : $_[%d];',
+					$arg,
+					$arg,
+					$arg,
+				);
+				$saw_opt++;
+				$max_args++;
+				$varname = '$dtmp';
+			}
+			elsif (defined $default) {
+				push @code, sprintf(
+					'$dtmp = ($#_ < %d) ? %s : $_[%d];',
+					$arg,
+					$default,
+					$arg,
+				);
+				$saw_opt++;
+				$max_args++;
+				$varname = '$dtmp';
+			}
+			elsif ($is_optional)
 			{
 				push @code, sprintf(
 					'return %s if $#_ < %d;',
@@ -150,15 +214,15 @@ sub compile
 				);
 				$saw_opt++;
 				$max_args++;
+				$varname = sprintf '$_[%d]', $arg;
 			}
 			else
 			{
 				Error::TypeTiny::croak("Non-Optional parameter following Optional parameter") if $saw_opt;
 				$min_args++;
 				$max_args++;
+				$varname = sprintf '$_[%d]', $arg;
 			}
-			
-			$varname = sprintf '$_[%d]', $arg;
 		}
 		
 		if ($constraint->has_coercion and $constraint->coercion->can_be_inlined)
@@ -256,14 +320,16 @@ sub compile
 	
 	my $closure = eval_closure(
 		source      => $source,
-		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		description => $options{description}||sprintf("parameter validation for '%s'", $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
 		environment => \%env,
 	);
 	
 	return {
-		min_args   => $min_args,
-		max_args   => $saw_slurpy ? undef : $max_args,
-		closure    => $closure,
+		min_args    => $min_args,
+		max_args    => $saw_slurpy ? undef : $max_args,
+		closure     => $closure,
+		source      => $source,
+		environment => \%env,
 	} if $options{want_details};
 	
 	return $closure;
@@ -276,7 +342,10 @@ sub compile_named
 	@code = 'my (%R, %tmp, $tmp);';
 	push @code, '#placeholder';   # $code[1]
 	
-	my %options    = (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) ? %{+shift} : ();
+	my %options;
+	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
+		%options = (%options, %{+shift});
+	}
 	my $arg = -1;
 	my $had_slurpy;
 	
@@ -290,13 +359,25 @@ sub compile_named
 		my $really_optional;
 		my $is_slurpy;
 		my $varname;
+		my $default;
 		
+		Str->check($name)
+			or Error::TypeTiny::croak("Expected parameter name as string, got $name");
+		
+		my $param_options = {};
+		$param_options = shift @_ if HashRef->check($_[0]) && !exists $_[0]{slurpy};
+		$default = _mkdefault($param_options);
+		
+		if ($param_options->{optional} or defined $default) {
+			$is_optional = 1;
+		}
+	
 		if (Bool->check($constraint))
 		{
 			$constraint = $constraint ? Any : Optional[Any];
 		}
-		
-		if (HashRef->check($constraint))
+	
+		if (HashRef->check($constraint) and exists $constraint->{slurpy})
 		{
 			$constraint = to_TypeTiny($constraint->{slurpy});
 			++$is_slurpy;
@@ -304,13 +385,30 @@ sub compile_named
 		}
 		else
 		{
-			$is_optional     = grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
-			$really_optional = $is_optional && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
+			$is_optional     += grep $_->{uniq} == Optional->{uniq}, $constraint->parents;
+			$really_optional = $is_optional && $constraint->parent && $constraint->parent->{uniq} eq Optional->{uniq} && $constraint->type_parameter;
 			
 			$constraint = $constraint->type_parameter if $really_optional;
 		}
 		
-		unless ($is_optional or $is_slurpy) {
+		if (ref $default) {
+			$env{'@default'}[$arg] = $default;
+			push @code, sprintf(
+				'exists($in{%s}) or $in{%s} = $default[%d]->();',
+				$QUOTE->($name),
+				$QUOTE->($name),
+				$arg,
+			);
+		}
+		elsif (defined $default) {
+			push @code, sprintf(
+				'exists($in{%s}) or $in{%s} = %s;',
+				$QUOTE->($name),
+				$QUOTE->($name),
+				$default,
+			);
+		}
+		elsif (not $is_optional||$is_slurpy) {
 			push @code, sprintf(
 				'exists($in{%s}) or "Error::TypeTiny::WrongNumberOfParameters"->throw(message => sprintf "Missing required parameter: %%s", %s);',
 				$QUOTE->($name),
@@ -385,47 +483,171 @@ sub compile_named
 		push @code, 'keys(%in) and "Error::TypeTiny"->throw(message => sprintf "Unrecognized parameter%s: %s", keys(%in)>1?"s":"", Type::Params::english_list(sort keys %in));'
 	}
 	
-	push @code, '\\%R;';
+	if ($options{bless}) {
+		push @code, sprintf('bless \\%%R, %s;', $QUOTE->($options{bless}));
+	}
+	elsif (ArrayRef->check($options{class})) {
+		push @code, sprintf('(%s)->%s(\\%%R);', $QUOTE->($options{class}[0]), $options{class}[1]||'new');
+	}
+	elsif ($options{class}) {
+		push @code, sprintf('(%s)->%s(\\%%R);', $QUOTE->($options{class}), $options{constructor}||'new');
+	}
+	else {
+		push @code, '\\%R;';
+	}
 	
 	my $source  = "sub { no warnings; ".join("\n", @code)." };";
 	return $source if $options{want_source};
 	
 	my $closure = eval_closure(
 		source      => $source,
-		description => sprintf("parameter validation for '%s'", [caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
+		description => $options{description}||sprintf("parameter validation for '%s'", $options{subname}||[caller(1+($options{caller_level}||0))]->[3] || '__ANON__'),
 		environment => \%env,
 	);
 	
 	return {
-		min_args   => undef,  # always going to be 1 or 0
-		max_args   => undef,  # should be possible to figure out if no slurpy param
-		closure    => $closure,
+		min_args    => undef,  # always going to be 1 or 0
+		max_args    => undef,  # should be possible to figure out if no slurpy param
+		closure     => $closure,
+		source      => $source,
+		environment => \%env,
 	} if $options{want_details};
 	
 	return $closure;
 }
 
+my %klasses;
+my $kls_id = 0;
+my $has_cxsa;
+my $want_cxsa;
+sub _mkklass
+{
+	my $klass = sprintf('%s::OO::Klass%d', __PACKAGE__, ++$kls_id);
+	
+	if (!defined $has_cxsa or !defined $want_cxsa) {
+		$has_cxsa = !! eval {
+			require Class::XSAccessor;
+			'Class::XSAccessor'->VERSION('1.17'); # exists_predicates, June 2013
+			1;
+		};
+		
+		$want_cxsa =
+			$ENV{PERL_TYPE_PARAMS_XS}         ? 'XS' :
+			exists($ENV{PERL_TYPE_PARAMS_XS}) ? 'PP' :
+			$has_cxsa                         ? 'XS' : 'PP';
+		
+		if ($want_cxsa eq 'XS' and not $has_cxsa) {
+			Error::TypeTiny::croak("Cannot load Class::XSAccessor"); # uncoverable statement
+		}
+	}
+	
+	if ($want_cxsa eq 'XS') {
+		eval {
+			'Class::XSAccessor'->import(
+				redefine          => 1,
+				class             => $klass,
+				getters           => { map { defined($_->{getter})    ? ($_->{getter}    => $_->{slot}) : () } values %{$_[0]} },
+				exists_predicates => { map { defined($_->{predicate}) ? ($_->{predicate} => $_->{slot}) : () } values %{$_[0]} },
+			);
+			1;
+		} ? return($klass) : die($@);
+	}
+	
+	for my $attr (values %{$_[0]}) {
+		defined($attr->{getter}) and eval sprintf(
+			'package %s; sub %s { $_[0]{%s} }; 1',
+			$klass,
+			$attr->{getter},
+			$attr->{slot},
+		) || die($@);
+		defined($attr->{predicate}) and eval sprintf(
+			'package %s; sub %s { exists $_[0]{%s} }; 1',
+			$klass,
+			$attr->{predicate},
+			$attr->{slot},
+		) || die($@);
+	}
+	
+	$klass;
+}
+
+sub compile_named_oo
+{
+	my %options;
+	while (ref($_[0]) eq "HASH" && !$_[0]{slurpy}) {
+		%options = (%options, %{+shift});
+	}
+	my @rest       = @_;
+	
+	my %attribs;
+	while (@_) {
+		my ($name, $type) = splice(@_, 0, 2);
+		my $opts = (HashRef->check($_[0]) && !exists $_[0]{slurpy}) ? shift(@_) : {};
+			
+		my $is_optional = 0+!! $opts->{optional};
+		$is_optional += grep $_->{uniq} == Optional->{uniq}, $type->parents;
+		
+		my $getter = exists($opts->{getter})
+			? $opts->{getter}
+			: $name;
+		
+		Error::TypeTiny::croak("Bad accessor name: $getter")
+			unless $getter =~ /\A[A-Za-z][A-Za-z0-9_]*\z/;
+		
+		my $predicate = exists($opts->{predicate})
+			? ($opts->{predicate} eq '1' ? "has_$getter" : $opts->{predicate} eq '0' ? undef : $opts->{predicate})
+			: ($is_optional ? "has_$getter" : undef);
+		
+		$attribs{$name} = {
+			slot       => $name,
+			getter     => $getter,
+			predicate  => $predicate,
+		};
+	}
+	
+	my $kls = join '//',
+		map sprintf('%s*%s*%s', $attribs{$_}{slot}, $attribs{$_}{getter}, $attribs{$_}{predicate}||'0'),
+		sort keys %attribs;
+	
+	$klasses{$kls} ||= _mkklass(\%attribs);
+	
+	compile_named({ %options, bless => $klasses{$kls} }, @rest);
+}
+
+# Would be faster to inline this into validate and validate_named, but
+# that would complicate them. :/
+sub _mk_key {
+	local $_;
+	join ':', map {
+		HashRef->check($_)   ? do { my %h = %$_; sprintf('{%s}', _mk_key(map {; $_ => $h{$_} } sort keys %h)) } :
+		TypeTiny->check($_)  ? sprintf('TYPE=%s', $_->{uniq}) :
+		Ref->check($_)       ? sprintf('REF=%s', refaddr($_)) :
+		Undef->check($_)     ? sprintf('UNDEF') :
+		$QUOTE->($_)
+	} @_;
+}
+
 my %compiled;
 sub validate
 {
-	my $arr = shift;
-	my $sub = (
-		$compiled{ join ":", map($_->{uniq}||"\@$_->{slurpy}", @_) }
-			||= compile({ caller_level => 1 }, @_)
-	);
-	@_ = @$arr;
+	my $arg = shift;
+	my $sub = ($compiled{_mk_key(@_)} ||= compile(
+		{ caller_level => 1, %{ref($_[0])eq'HASH'?shift(@_):+{}} },
+		@_,
+	));
+	@_ = @$arg;
 	goto $sub;
 }
 
 my %compiled_named;
 sub validate_named
 {
-	my $arr = shift;
-	my $sub = (
-		$compiled_named{ join ":", map(ref($_)?($_->{uniq}||"\@$_->{slurpy}"):$QUOTE->($_), @_) }
-			||= compile_named({ caller_level => 1 }, @_)
-	);
-	@_ = @$arr;
+	my $arg = shift;
+	my $sub = ($compiled_named{_mk_key(@_)} ||= compile_named(
+		{ caller_level => 1, %{ref($_[0])eq'HASH'?shift(@_):+{}} },
+		@_,
+	));
+	@_ = @$arg;
 	goto $sub;
 }
 
@@ -546,7 +768,7 @@ Not quite as neat, but not awful either.
 
 There's a shortcut reducing it to one step:
 
- use Type::Params qw( validate validate_named );
+ use Type::Params qw( validate );
  
  sub deposit_monies
  {
@@ -572,242 +794,290 @@ Dude, these functions are documented!
 
 =item validate_named
 
+=item compile_named_oo
+
 =item Invocant
 
 =item multisig
 
 =end trustme
 
-=head1 COOKBOOK
+=head1 VALIDATE VERSUS COMPILE
 
-=head2 Positional Parameters
+This module offers one-stage ("validate") and two-stage ("compile" then
+"check") variants of parameter checking for you to use. Performance with
+the two-stage variant will I<always> beat the one stage variant — I
+cannot think of many reasons you'd want to use the one-stage version.
 
-   sub nth_root
-   {
-      state $check = compile( Num, Num );
-      my ($x, $n) = $check->(@_);
-      
-      return $x ** (1 / $n);
-   }
+ # One-stage, positional parameters
+ my @args = validate(\@_, @spec);
+ 
+ # Two-stage, positional parameters
+ state $check = compile(@spec);
+ my @args = $check->(@_);
+ 
+ # One-stage, named parameters
+ my $args = validate_named(\@_, @spec);
+ 
+ # Two-stage, named parameters
+ state $check = compile_named(@spec);
+ my $args = $check->(@_);
 
-=head2 Method Calls
+Use C<compile> and C<compile_named>, not C<validate> and C<validate_named>.
 
-Type::Params exports an additional keyword C<Invocant> on request. This is
-a type constraint accepting blessed objects and also class names.
+=head1 VALIDATION SPECIFICATIONS
 
-   use Types::Standard qw( ClassName Object Str Int );
-   use Type::Params qw( compile Invocant );
-   
-   # a class method
-   sub new_from_json
-   {
-      state $check = compile( ClassName, Str );
-      my ($class, $json) = $check->(@_);
-      
-      $class->new( from_json($json) );
-   }
-   
-   # an object method
-   sub dump
-   {
-      state $check = compile( Object, Int );
-      my ($self, $limit) = $check->(@_);
-      
-      local $Data::Dumper::Maxdepth = $limit;
-      print Data::Dumper::Dumper($self);
-   }
-   
-   # can be called as either and object or class method
-   sub run
-   {
-      state $check = compile( Invocant );
-      my ($proto) = $check->(@_);
-      
-      my $self = ref($proto) ? $proto : $default_instance;
-      $self->_run;
-   }
+The C<< @spec >> is where most of the magic happens.
 
-Of course, some people like to use C<shift> for the invocant:
+The generalized form of specifications for positional parameters is:
 
-   sub dump
-   {
-      my $self = shift;
-      
-      state $check = compile( Int );
-      my ($limit) = $check->(@_);
-      
-      local $Data::Dumper::Maxdepth = $limit;
-      print Data::Dumper::Dumper($self);
-   }
+ @spec = (
+   \%general_opts,
+   $type_for_arg_1, \%opts_for_arg_1,
+   $type_for_arg_2, \%opts_for_arg_2,
+   $type_for_arg_3, \%opts_for_arg_3,
+   ...,
+   slurpy($slurpy_type),
+ );
+
+And for named parameters:
+
+ @spec = (
+   \%general_opts,
+   foo => $type_for_foo, \%opts_for_foo,
+   bar => $type_for_bar, \%opts_for_bar,
+   baz => $type_for_baz, \%opts_for_baz,
+   ...,
+   slurpy($slurpy_type),
+ );
+
+Option hashrefs can simply be omitted if you don't need to specify any
+particular options.
+
+The C<slurpy> function is exported by L<Types::Standard>. It may be
+omitted if not needed.
+
+=head2 General Options
+
+Currently supported general options are:
+
+=over
+
+=item C<< want_source => Bool >>
+
+Instead of returning a coderef, return Perl source code string. Handy
+for debugging.
+
+=item C<< want_details => Bool >>
+
+Instead of returning a coderef, return a hashref of stuff including the
+coderef. This is mostly for people extending Type::Params and I won't go
+into too many details about what else this hashref contains.
+
+=item C<< class => ClassName >>
+
+B<< Named parameters only. >> The check coderef will, instead of returning
+a simple hashref, call C<< $class->new($hashref) >> and return a proper
+object.
+
+=item C<< constructor => Str >>
+
+B<< Named parameters only. >> Specify an alternative method name instead
+of C<new> for the C<class> option described above.
+
+=item C<< class => Tuple[ClassName, Str] >>
+
+B<< Named parameters only. >> Given a class name and constructor name pair,
+the check coderef will, instead of returning a simple hashref, call
+C<< $class->$constructor($hashref) >> and return a proper object. Shortcut
+for declaring both the C<class> and C<constructor> options at once.
+
+=item C<< bless => ClassName >>
+
+B<< Named parameters only. >> Bypass the constructor entirely and directly
+bless the hashref.
+
+=item C<< description => Str >>
+
+Description of the coderef that will show up in stack traces. Defaults to
+"parameter validation for X" where X is the caller sub name.
+
+=item C<< subname => Str >>
+
+If you wish to use the default description, but need to change the sub name,
+use this.
+
+=item C<< caller_level => Int >>
+
+If you wish to use the default description, but need to change the caller
+level for detecting the sub name, use this.
+
+=back
+
+=head2 Type Constraints
+
+The types for each parameter may be any L<Type::Tiny> type constraint, or
+anything that Type::Tiny knows how to coerce into a Type::Tiny type
+constraint, such as a MooseX::Types type constraint or a coderef.
 
 =head2 Optional Parameters
 
-   use Types::Standard qw( Object Optional Int );
-   
-   sub dump
-   {
-      state $check = compile( Object, Optional[Int] );
-      my ($self, $limit) = $check->(@_);
-      $limit //= 0;
-      
-      local $Data::Dumper::Maxdepth = $limit;
-      print Data::Dumper::Dumper($self);
-   }
-   
-   $obj->dump(1);      # ok
-   $obj->dump();       # ok
-   $obj->dump(undef);  # dies
+The C<Optional> parameterizable type constraint from L<Types::Standard>
+may be used to indicate optional parameters.
+
+ # Positional parameters
+ state $check = compile(Int, Optional[Int], Optional[Int]);
+ my ($foo, $bar, $baz) = $check->(@_);  # $bar and $baz are optional
+ 
+ # Named parameters
+ state $check = compile(
+   foo => Int,
+   bar => Optional[Int],
+   baz => Optional[Int],
+ );
+ my $args = $check->(@_);  # $args->{bar} and $args->{baz} are optional
+
+As a special case, the numbers 0 and 1 may be used as shortcuts for
+C<< Optional[Any] >> and C<< Any >>.
+
+ # Positional parameters
+ state $check = compile(1, 0, 0);
+ my ($foo, $bar, $baz) = $check->(@_);  # $bar and $baz are optional
+ 
+ # Named parameters
+ state $check = compile_named(foo => 1, bar => 0, baz => 0);
+ my $args = $check->(@_);  # $args->{bar} and $args->{baz} are optional
+
+If you're using positional parameters, then required parameters must
+precede any optional ones.
 
 =head2 Slurpy Parameters
 
-   use Types::Standard qw( slurpy ClassName HashRef );
-   
-   sub new
-   {
-      state $check = compile( ClassName, slurpy HashRef );
-      my ($class, $ref) = $check->(@_);
-      bless $ref => $class;
-   }
-   
-   __PACKAGE__->new(foo => 1, bar => 2);
+Specifications may include a single slurpy parameter which should have
+a type constraint derived from C<ArrayRef> or C<HashRef>. (C<Any> is
+also allowed, which is interpreted as C<ArrayRef> in the case of positional
+parameters, and C<HashRef> in the case of named parameters.)
 
-The following types from L<Types::Standard> can be made slurpy:
-C<ArrayRef>, C<Tuple>, C<HashRef>, C<Map>, C<Dict>. Hash-like types
-will die if an odd number of elements are slurped in.
+If a slurpy parameter is provided in the specification, the C<< $check >>
+coderef will slurp up any remaining arguments from C<< @_ >> (after
+required and optional parameters have been removed), validate it against
+the given slurpy type, and return it as a single arrayref/hashref.
 
-A check may only have one slurpy parameter, and it must be the last
-parameter.
+For example:
 
-Having a slurpy parameter will slightly slow down your checks.
+ sub xyz {
+   state $check = compile(Int, Int, slurpy ArrayRef[Int]);
+   my ($foo, $bar, $baz) = $check->(@_);
+ }
+ 
+ xyz(1..5);  # $foo = 1
+             # $bar = 2
+             # $baz = [ 3, 4, 5 ]
 
-=head2 Named Parameters
+A specification have one or zero slurpy parameters. If there is a slurpy
+parameter, it must be the final one.
 
-You can use C<compile_named> to accept a hash of named parameters
+Note that having a slurpy parameter will slightly slow down C<< $check >>
+because it means that C<< $check >> can't just check C<< @_ >> and return
+it unaltered if it's valid — it needs to build a new array to return.
 
-   use Type::Params qw(compile_named);
-   use Types::Standard qw( slurpy Dict Ref Optional Int );
-   
-   sub dump
-   {
-      state $check = compile_named(
-         var    => Ref,
-         limit  => Optional[Int],
-      );
-      my $arg = $check->(@_);
-      
-      local $Data::Dumper::Maxdepth = $arg->{limit};
-      print Data::Dumper::Dumper($arg->{var});
-   }
-   
-   dump({ var => $foo, limit => 1 });    # ok (hashref)
-   dump(  var => $foo, limit => 1  );    # ok (hash)
-   dump(  var => $foo  );                # ok (no optional parameter)
-   dump(  limit => 1  );                 # dies
+=head2 Type Coercion
 
-Prior to Type::Tiny 1.002000, the recommendation was to use a slurpy
-C<Dict>. This still works, though the error messages you get might not
-be quite so nice, and you don't get the automatic detection of hash
-versus hashref in the input C<< @_ >>. Oh, and it's usually slower.
+Type coercions are automatically applied for all types that have
+coercions.
 
-   use Type::Params qw(compile);
-   use Types::Standard qw( slurpy Dict Ref Optional Int );
-   
-   sub dump
-   {
-      state $check = compile(
-         slurpy Dict[
-            var    => Ref,
-            limit  => Optional[Int],
-         ],
-      );
-      my ($arg) = $check->(@_);
-      
-      local $Data::Dumper::Maxdepth = $arg->{limit};
-      print Data::Dumper::Dumper($arg->{var});
-   }
-   
-   dump(  var => $foo, limit => 1  );    # ok (hash)
-   dump(  var => $foo  );                # ok (no optional parameter)
-   dump(  limit => 1  );                 # dies
-
-=head2 Mixed Positional and Named Parameters
-
-For this, you can still use the C<< slurpy Dict >> hack...
-
-   use Types::Standard qw( slurpy Dict Ref Optional Int );
-   
-   sub my_print
-   {
-      state $check = compile(
-         Str,
-         slurpy Dict[
-            colour => Optional[Str],
-            size   => Optional[Int],
-         ],
-      );
-      my ($string, $arg) = $check->(@_);
-      
-      ...;
-   }
-   
-   my_print("Hello World", colour => "blue");
-
-=head2 Coercions
-
-Coercions will automatically be applied for I<all> type constraints that have
-a coercion associated.
-
-   use Type::Utils;
-   use Types::Standard qw( Int Num );
-   
-   my $RoundedInt = declare as Int;
-   coerce $RoundedInt, from Num, q{ int($_) };
-   
-   sub set_age
-   {
-      state $check = compile( Object, $RoundedInt );
-      my ($self, $age) = $check->(@_);
-      
-      $self->{age} = $age;
-   }
-   
-   $obj->set_age(32.5);   # ok; coerced to "32".
+ my $RoundedInt = Int->plus_coercions(Num, q{ int($_) });
+ 
+ state $check = compile($RoundedInt, $RoundedInt);
+ my ($foo, $bar) = $check->(@_);
+ 
+ # if @_ is (1.1, 2.2), then $foo is 1 and $bar is 2.
 
 Coercions carry over into structured types such as C<ArrayRef> automatically:
 
-   sub delete_articles
-   {
-      state $check = compile( Object, slurpy ArrayRef[$RoundedInt] );
-      my ($db, $articles) = $check->(@_);
-      
-      $db->select_article($_)->delete for @$articles;
-   }
+ sub delete_articles
+ {
+   state $check = compile( Object, slurpy ArrayRef[$RoundedInt] );
+   my ($db, $articles) = $check->(@_);
    
-   # delete articles 1, 2 and 3
-   delete_articles($my_db, 1.1, 2.2, 3.3);
+   $db->select_article($_)->delete for @$articles;
+ }
+ 
+ # delete articles 1, 2 and 3
+ delete_articles($my_db, 1.1, 2.2, 3.3);
 
-If type C<Foo> has coercions from C<Str> and C<ArrayRef> and you want to
-B<prevent> coercion, then use:
+That's a L<Types::Standard> feature rather than something specific to
+Type::Params.
 
-   state $check = compile( Foo->no_coercions );
+Note that having any coercions in a specification, even if they're not
+used in a particular check, will slightly slow down C<< $check >>
+because it means that C<< $check >> can't just check C<< @_ >> and return
+it unaltered if it's valid — it needs to build a new array to return.
 
-Or if you just want to prevent coercion from C<Str>, use:
+=head2 Parameter Options
 
-   state $check = compile( Foo->minus_coercions(Str) );
+The type constraint for a parameter may be followed by a hashref of
+options for it.
 
-Or maybe add an extra coercion:
+The following options are supported:
 
-   state $check = compile(
-      Foo->plus_coercions(Int, q{ Foo->new_from_number($_) }),
-   );
+=over
 
-Note that the coercion is specified as a string of Perl code. This is usually
-the fastest way to do it, but a coderef is also accepted. Either way, the
-value to be coerced is C<< $_ >>.
+=item C<< optional => Bool >>
 
-Having any coercions will slightly slow down your checks.
+This is an alternative way of indicating that a parameter is optional.
 
-=head2 Alternatives
+ state $check = compile_named(
+   foo => Int,
+   bar => Int, { optional => 1 },
+   baz => Optional[Int],
+ );
+
+The two are not I<exactly> equivalent. If you were to set C<bar> to a
+non-integer, it would throw an exception about the C<Int> type constraint
+being violated. If C<baz> were a non-integer, the exception would mention
+the C<< Optional[Int] >> type constraint instead.
+
+=item C<< default => CodeRef|Ref|Str|Undef >>
+
+A default may be provided for a parameter.
+
+ state $check = compile_named(
+   foo => Int,
+   bar => Int, { default => "666" },
+   baz => Int, { default => "999" },
+ );
+
+Supported defaults are any strings (including numerical ones), C<undef>,
+and empty hashrefs and arrayrefs. Non-empty hashrefs and arrayrefs are
+I<< not allowed as defaults >>.
+
+Alternatively, you may provide a coderef to generate a default value:
+
+ state $check = compile_named(
+   foo => Int,
+   bar => Int, { default => sub { 6 * 111 } },
+   baz => Int, { default => sub { 9 * 111 } },
+ );
+
+That coderef may generate any value, including non-empty arrayrefs and
+non-empty hashrefs. For undef, simple strings, numbers, and empty
+structures, avoiding using a coderef will make your parameter processing
+faster.
+
+The default I<will> be validated against the type constraint, and
+potentially coerced.
+
+Defaults are not supported for slurpy parameters.
+
+Note that having any defaults in a specification, even if they're not
+used in a particular check, will slightly slow down C<< $check >>
+because it means that C<< $check >> can't just check C<< @_ >> and return
+it unaltered if it's valid — it needs to build a new array to return.
+
+=back
+
+=head1 MULTIPLE SIGNATURES
 
 Type::Params can export a C<multisig> function that compiles multiple
 alternative signatures into one, and uses the first one that works:
@@ -818,9 +1088,9 @@ alternative signatures into one, and uses the first one that works:
       [ CodeRef ],
    );
    
-   my ($int, $arrayref) = $check->( 1, [] );
-   my ($hashref, $num)  = $check->( {}, 1.1 );
-   my ($code)           = $check->( sub { 1 } );
+   my ($int, $arrayref) = $check->( 1, [] );      # okay
+   my ($hashref, $num)  = $check->( {}, 1.1 );    # okay
+   my ($code)           = $check->( sub { 1 } );  # okay
    
    $check->( sub { 1 }, 1.1 );  # throws an exception
 
@@ -874,33 +1144,246 @@ a full example:
    get_from('foo', \%hash);   # returns $hash{foo}
    get_from('foo', $obj);     # returns $obj->foo
 
-=head2 Defaults
+=head1 PARAMETER OBJECTS
 
-Type::Params does not currently offer a built-in way to set defaults
-for a parameter. Setting defaults manually is not especially difficult.
+Here's a quick example function:
 
-   sub print_coloured {
-      state $check = compile( Str, Optional[Str] );
+   sub add_contact_to_database {
+      state $check = compile_named(
+         dbh     => Object,
+         id      => Int,
+         name    => Str,
+      );
+      my $arg = $check->(@_);
       
-      my ($text, $colour) = $check->(@_);
-      $colour //= "black";
-      
-      ...;
+      my $sth = $arg->{db}->prepare('INSERT INTO contacts VALUES (?, ?)');
+      $sth->execute($arg->{id}, $arg->{name});
    }
 
-I occasionally get requests for this to work:
+Looks simple, right? Did you spot that it will always die with an error
+message I<< Can't call method "prepare" on an undefined value >>?
 
-   sub print_coloured {
-      state $check = compile( Str, Default[Str, "black"] );
+This is because we defined a parameter called 'dbh' but later tried to
+refer to it as C<< $arg{db} >>. Here, Perl gives us a pretty clear
+error, but sometimes the failures will be far more subtle. Wouldn't it
+be nice if instead we could do this?
+
+   sub add_contact_to_database {
+      state $check = compile_named_oo(
+         dbh     => Object,
+         id      => Int,
+         name    => Str,
+      );
+      my $arg = $check->(@_);
       
-      my ($text, $colour) = $check->(@_);
-      
-      ...;
+      my $sth = $arg->dbh->prepare('INSERT INTO contacts VALUES (?, ?)');
+      $sth->execute($arg->id, $arg->name);
    }
 
-But honestly, I don't find that any clearer.
+If we tried to call C<< $arg->db >>, it would fail because there was
+no such method.
 
-=head1 COMPARISON WITH PARAMS::VALIDATE
+Well, that's exactly what C<compile_named_oo> does.
+
+As well as giving you nice protection against mistyped parameter names,
+It also looks kinda pretty, I think. Hash lookups are a little faster
+than method calls, of course (though Type::Params creates the methods
+using L<Class::XSAccessor> if it's installed, so they're still pretty
+fast).
+
+An optional parameter C<foo> will also get a nifty C<< $arg->has_foo >>
+predicate method. Yay!
+
+=head2 Options
+
+C<compile_named_oo> gives you some extra options for parameters.
+
+   sub add_contact_to_database {
+      state $check = compile_named_oo(
+         dbh     => Object,
+         id      => Int,    { default => '0', getter => 'identifier' },
+         name    => Str,    { optional => 1, predicate => 'has_name' },
+      );
+      my $arg = $check->(@_);
+      
+      my $sth = $arg->dbh->prepare('INSERT INTO contacts VALUES (?, ?)');
+      $sth->execute($arg->identifier, $arg->name) if $arg->has_name;
+   }
+
+The C<getter> option lets you choose the method name for getting the
+argument value. The C<predicate> option lets you choose the method name
+for checking the existence of an argument.
+
+By setting an explicit predicate method name, you can force a predicate
+method to be generated for non-optional arguments.
+
+=head2 Classes
+
+The objects returned by C<compile_named_oo> are blessed into lightweight
+classes which have been generated on the fly. Don't expect the names of
+the classes to be stable or predictable. It's probably a bad idea to be
+checking C<can>, C<isa>, or C<DOES> on any of these objects. If you're
+doing that, you've missed the point of them.
+
+They don't have any constructor (C<new> method). The C<< $check >>
+coderef effectively I<is> the constructor.
+
+=head1 COOKBOOK
+
+=head2 Mixed Positional and Named Parameters
+
+This can be faked using positional parameters and a slurpy dictionary.
+
+ state $check = compile(
+   Int,
+   slurpy Dict[
+     foo => Int,
+     bar => Optional[Int],
+     baz => Optional[Int],
+   ],
+ );
+ 
+ @_ = (42, foo => 21);                 # ok
+ @_ = (42, foo => 21, bar  => 84);     # ok
+ @_ = (42, foo => 21, bar  => 10.5);   # not ok
+ @_ = (42, foo => 21, quux => 84);     # not ok
+
+=head2 Method Calls
+
+Some people like to C<shift> off the invocant before running type checks:
+
+ sub my_method {
+   my $self = shift;
+   state $check = compile_named(
+     haystack => ArrayRef,
+     needle   => Int,
+   );
+   my $arg = $check->(@_);
+   
+   return $arg->{haystack}[ $self->base_index + $arg->{needle} ];
+ }
+ 
+ $object->my_method(haystack => \@somelist, needle => 42);
+
+If you're using positional parameters, there's really no harm in including
+the invocant in the check:
+
+ sub my_method {
+   state $check = compile(Object, ArrayRef, Int);
+   my ($self, $arr, $ix) = $check->(@_);
+   
+   return $arr->[ $self->base_index + $ix ];
+ }
+ 
+ $object->my_method(\@somelist, 42);
+
+Some methods will be designed to be called as class methods rather than
+instance methods. Remember to use C<ClassName> instead of C<Object> in
+those cases.
+
+Type::Params exports an additional keyword C<Invocant> on request. This
+gives you a type constraint which accepts classnames I<and> blessed
+objects.
+
+ use Type::Params qw( compile Invocant );
+ 
+ sub my_method {
+   state $check = compile(Instance, ArrayRef, Int);
+   my ($self_or_class, $arr, $ix) = $check->(@_);
+   
+   return $arr->[ $ix ];
+ }
+
+=head2 There is no C<< coerce => 0 >>
+
+If you give C<compile> a type constraint which has coercions, then
+C<< $check >> will I<< always coerce >>. It cannot be switched off.
+
+Luckily, Type::Tiny gives you a very easy way to create a type
+constraint without coercions from one that has coercions:
+
+ state $check = compile(
+   $RoundedInt->no_coercions,
+   $RoundedInt->minus_coercions(Num),
+ );
+
+That's a Type::Tiny feature rather than a Type::Params feature though.
+
+=head2 Extra Coercions
+
+Type::Tiny provides an easy shortcut for adding coercions to
+a type constraint:
+
+ # We want an arrayref, but accept a hashref and coerce it
+ state $check => compile(
+   ArrayRef->plus_coercions( HashRef, sub { [sort values %$_] } ),
+ );
+
+=head2 Value Constraints
+
+You may further constrain a parameter using C<where>:
+
+ state $check = compile(
+   Int->where('$_ % 2 == 0'),   # even numbers only
+ );
+
+This is also a Type::Tiny feature rather than a Type::Params feature.
+
+=head2 Smarter Defaults
+
+This works:
+
+ sub print_coloured {
+   state $check = compile(
+     Str,
+     Str, { default => "black" },
+   );
+   
+   my ($text, $colour) = $check->(@_);
+   
+   ...;
+ }
+
+But so does this (and it might benchmark a little faster):
+
+ sub print_coloured {
+   state $check = compile(
+     Str,
+     Str, { optional => 1 },
+   );
+   
+   my ($text, $colour) = $check->(@_);
+   $colour = "black" if @_ < 2;
+   
+   ...;
+ }
+
+Just because Type::Params now supports defaults, doesn't mean you can't
+do it the old-fashioned way. The latter is more flexible. In the example,
+we've used C<< if @_ < 2 >>, but we could instead have done something like:
+
+   $colour ||= "black";
+
+Which would have defaulted C<< $colour >> to "black" if it were the empty
+string.
+
+=head1 ENVIRONMENT
+
+=over
+
+=item C<PERL_TYPE_PARAMS_XS>
+
+Affects the building of accessors for C<compile_named_oo>. If set to true,
+will use L<Class::XSAccessor>. If set to false, will use pure Perl. If this
+environment variable does not exist, will use L<Class::XSAccessor> if it
+is available.
+
+=back
+
+
+=head1 COMPARISONS WITH OTHER MODULES
+
+=head2 Params::Validate
 
 L<Type::Params> is not really a drop-in replacement for L<Params::Validate>;
 the API differs far too much to claim that. Yet it performs a similar task,
@@ -927,11 +1410,6 @@ a L<Path::Tiny> object, you could coerce it from a string.
 
 =item *
 
-Params::Validate allows you to supply defaults for missing parameters;
-Type::Params does not, but you may be able to use coercion from Undef.
-
-=item *
-
 If you are primarily writing object-oriented code, using Moose or similar,
 and you are using Type::Tiny type constraints for your attributes, then
 using Type::Params allows you to use the same constraints for method calls.
@@ -951,7 +1429,7 @@ any other Type::Tiny type constraints.
 
 =back
 
-=head1 COMPARISON WITH PARAMS::VALIDATIONCOMPILER
+=head1 Params::ValidationCompiler
 
 L<Params::ValidationCompiler> does basically the same thing as
 L<Type::Params>.
@@ -984,10 +1462,6 @@ Versus:
 
 =item *
 
-L<Params::ValidationCompiler> offers defaults.
-
-=item *
-
 L<Params::ValidationCompiler> probably has slightly better exceptions.
 
 =back
@@ -1007,7 +1481,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

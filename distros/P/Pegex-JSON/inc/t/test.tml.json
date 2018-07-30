@@ -1,0 +1,70 @@
+{ "testml": "0.3.0",
+  "code": [
+    ["%<>",["*json","*yaml"],
+      ["==",
+        [".",
+          ["*","json"],
+          ["load"],
+          ["yaml"]],
+        ["*","yaml"]]]],
+  "data": [
+    { "label": "Simple Mapping",
+      "point": {
+        "json": "{\"a\":1,\"b\":2}",
+        "yaml": "a: 1\nb: 2\n"}},
+    { "label": "Empty Mapping",
+      "point": {
+        "json": "{}\n",
+        "yaml": "{}\n"}},
+    { "label": "One Pair Mapping",
+      "point": {
+        "json": "{\"alphabet\": \"city\"}\n",
+        "yaml": "alphabet: city\n"}},
+    { "label": "Simple Sequence",
+      "point": {
+        "json": "[ \"a\", 2, true ]\n",
+        "yaml": "- a\n- 2\n- 1\n"}},
+    { "label": "Empty Sequence",
+      "point": {
+        "json": "[]\n",
+        "yaml": "[]\n"}},
+    { "label": "One Elem Sequence",
+      "point": {
+        "json": "[\"foo\"]\n",
+        "yaml": "- foo\n"}},
+    { "label": "Seq in Map",
+      "point": {
+        "json": "{\n    \"xyz\": [1,2,3]\n}\n",
+        "yaml": "xyz:\n- 1\n- 2\n- 3\n"}},
+    { "label": "Map in Seq",
+      "point": {
+        "json": "[\n{\"xyz\": [1,2,3]}\n]\n",
+        "yaml": "- xyz:\n  - 1\n  - 2\n  - 3\n"}},
+    { "label": "Leading and Trailing Whitespace",
+      "point": {
+        "json": "       [\n{  \"xyz\"  : [  1  ,  2  ,  3  ]  }  \n]      \n",
+        "yaml": "- xyz:\n  - 1\n  - 2\n  - 3\n"}},
+    { "label": "False Values",
+      "point": {
+        "json": "[0, \"\", false, null]\n",
+        "yaml": "- 0\n- ''\n- 0\n- ~\n"}},
+    { "label": "Numbers",
+      "point": {
+        "json": "[\n    0, -0,\n    1, -1,\n    22, -22,\n    3.3, -3.3,\n    44.4, -44.4,\n    5.55, -5.55,\n    66.66, -66.66\n]\n",
+        "yaml": "- 0\n- 0\n- 1\n- -1\n- 22\n- -22\n- 3.3\n- -3.3\n- 44.4\n- -44.4\n- 5.55\n- -5.55\n- 66.66\n- -66.66\n"}},
+    { "label": "Top Level String",
+      "point": {
+        "json": "\"JSON Value\"\n",
+        "yaml": "JSON Value\n"}},
+    { "label": "Top Level Number",
+      "point": {
+        "json": "42\n",
+        "yaml": "42\n"}},
+    { "label": "Top Level Boolean",
+      "point": {
+        "json": "true\n",
+        "yaml": "1\n"}},
+    { "label": "Top Level null",
+      "point": {
+        "json": "null\n",
+        "yaml": "~\n"}}]}

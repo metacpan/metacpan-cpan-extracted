@@ -46,10 +46,12 @@
          "requires" : {
             "App::cpm" : "0.975",
             "App::cpm::CLI" : "0",
+            "Carp" : "0",
             "Getopt::Long" : "0",
             "Module::Loaded" : "0",
+            "Try::Tiny" : "0",
             "local::lib" : "2.000024",
-            "perl" : "5.006",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -59,16 +61,18 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "App::cpm::Resolver::02Packages" : "0",
             "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "LWP" : "6.35",
             "Path::Iterator::Rule" : "0",
             "Path::Tiny" : "0",
             "Test::More" : "0",
             "Test::RequiresInternet" : "0",
             "Test::TempDir::Tiny" : "0",
             "local::lib" : "2.000024",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       }
    },
@@ -84,7 +88,7 @@
          "web" : "https://github.com/oalders/lazy"
       }
    },
-   "version" : "0.000007",
+   "version" : "0.000009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -447,7 +451,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },
@@ -458,7 +462,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -566,7 +570,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -583,12 +587,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000007",
+                  "tag" : "v0.000009",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -638,7 +642,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -658,7 +662,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },
@@ -686,6 +690,33 @@
             },
             "name" : "DevelopRequires",
             "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "test",
+                  "type" : "requires"
+               }
+            },
+            "name" : "TestRequires",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Encoding",
+            "name" : "Encoding",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::StaticInstall",
+            "config" : {
+               "Dist::Zilla::Plugin::StaticInstall" : {
+                  "dry_run" : 0,
+                  "mode" : "auto"
+               }
+            },
+            "name" : "StaticInstall",
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -750,6 +781,7 @@
       "Olaf Alders <olaf@wundersolutions.com>"
    ],
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
+   "x_static_install" : 1
 }
 

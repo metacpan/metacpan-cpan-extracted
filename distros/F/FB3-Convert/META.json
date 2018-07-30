@@ -28,7 +28,7 @@
          "requires" : {
             "Archive::Zip" : "0",
             "Clone" : "0",
-            "FB3" : "0.06",
+            "FB3" : "0.07",
             "File::ShareDir" : "1.00",
             "Hash::Merge" : "0",
             "Image::Info" : "0",
@@ -47,10 +47,13 @@
    "provides" : {
       "FB3::Convert" : {
          "file" : "lib/FB3/Convert.pm",
-         "version" : "0.08"
+         "version" : "0.11"
       },
       "FB3::Convert::Epub" : {
          "file" : "lib/FB3/Convert/Epub.pm"
+      },
+      "FB3::Convert::FB2" : {
+         "file" : "lib/FB3/Convert/FB2.pm"
       },
       "FB3::Euristica" : {
          "file" : "lib/FB3/Euristica.pm"
@@ -62,6 +65,6 @@
          "http://opensource.org/licenses/lgpl-license.php"
       ]
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
 }

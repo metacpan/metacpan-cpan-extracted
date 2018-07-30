@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2014, 2017 by Toby Inkster.
+This software is copyright (c) 2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -24,17 +24,18 @@ use warnings;
 use lib qw( ./lib ./t/lib ../inc ./inc );
 
 use Test::More;
+use Type::Tiny ();
 
 BEGIN {
-	$] <  5.010001 ? plan(skip_all => "Perl too old") :
-	$] >= 5.021000 ? plan(skip_all => "Perl too new") :
-	$] >= 5.018000 ? warnings->unimport('experimental::smartmatch') :
-	();
-};
+	Type::Tiny::SUPPORT_SMARTMATCH
+		or plan skip_all => 'smartmatch support not available for this version or Perl';
+}
 
 use Types::Standard qw( Num Int );
 
 my $type = Int->plus_coercions( Num, sub{+int} );
+
+no warnings; #!!
 
 ok     ( 3.1 ~~ $type->coercion );
 ok not ( [ ] ~~ $type->coercion );

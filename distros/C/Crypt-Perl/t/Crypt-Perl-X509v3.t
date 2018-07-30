@@ -106,6 +106,18 @@ PE/rmAMQA9R8iRuOFOlzr4hkYDQX8ZlqbA==
 -----END EC PRIVATE KEY-----
 END
 
+    my $ed25519_1 = <<END;
+-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIPP7sBjvqBSTr/WyIXc0PnDKpRSfPbQWq6gYDDBcuvr/
+-----END PRIVATE KEY-----
+END
+
+    my $ed25519_2 = <<END;
+-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIDX2w1Pe1GTPfLYdZypIJ5clRAiDNs0BCmwjB2kBz3II
+-----END PRIVATE KEY-----
+END
+
     # user and signing key
     my @key_combos = (
         [ 'self-sign - RSA', $rsa1, $rsa1 ],
@@ -114,10 +126,23 @@ END
 
     if (OpenSSL_Control::can_ecdsa()) {
         push @key_combos, (
-            [ 'self-sign - ECC', $p256_1, $p256_2 ],
+            [ 'self-sign - ECC', $p256_1, $p256_1 ],
             [ 'two ECCs', $p256_1, $p256_2 ],
             [ 'subject RSA, signer ECC', $rsa1, $p256_1 ],
             [ 'subject ECC, signer RSA', $p256_1, $rsa1 ],
+        );
+    }
+
+    if (OpenSSL_Control::can_ed25519()) {
+
+        # Any OpenSSL that supports Ed25519 also supports ECC.
+        push @key_combos, (
+            [ 'self-sign - Ed25519', $ed25519_1, $ed25519_2 ],
+            [ 'two Ed25519s', $ed25519_1, $ed25519_2 ],
+            [ 'subject RSA, signer Ed25519', $rsa1, $ed25519_1 ],
+            [ 'subject Ed25519, signer RSA', $ed25519_1, $rsa1 ],
+            [ 'subject ECC, signer Ed25519', $p256_1, $ed25519_1 ],
+            [ 'subject Ed25519, signer ECC', $ed25519_1, $p256_1 ],
         );
     }
 
@@ -302,9 +327,7 @@ sub test_creation : Tests() {
         );
 
         my $signing_key = Crypt::Perl::PK::parse_key( $signer_pem );
-        #print "SIGNING:\n" . $signing_key->to_pem() . $/;
 
-        #$cert->sign($signing_key, 'sha256');
         $cert->sign($user_key, 'sha256');
 
         my $pem = $cert->to_pem() or die "No PEM?!?";

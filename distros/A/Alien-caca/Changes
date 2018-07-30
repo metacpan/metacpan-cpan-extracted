@@ -1,0 +1,10 @@
+Revision history for Alien-CACA
+
+0.0.2 2018-07-27
+  - Alien::caca, not Alien::CACA. oops.
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 15 insertions(+), 1 deletion(-)
+
+0.0.1 2018-07-27
+  - First version, unleashed on an unsuspecting world.

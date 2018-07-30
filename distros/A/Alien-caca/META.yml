@@ -1,0 +1,41 @@
+---
+abstract: 'Alien package for the Colored ASCII Art library'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.005'
+  File::ShareDir: '1.03'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-caca
+provides:
+  Alien::caca:
+    file: lib/Alien/caca.pm
+    version: v0.0.2
+requires:
+  Alien::Base: '0.005'
+  File::ShareDir: '1.03'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Alien-caca/issues
+  homepage: https://github.com/yanick/Alien-caca
+  repository: https://github.com/yanick/Alien-caca.git
+version: 0.0.2
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.01
+x_serialization_backend: 'YAML::Tiny version 1.67'

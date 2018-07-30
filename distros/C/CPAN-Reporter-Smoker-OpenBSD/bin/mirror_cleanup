@@ -9,7 +9,7 @@ use Pod::Usage 1.69;
 use CPAN::Mini 1.111016;
 use File::Spec;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 my ( $help, $version_check );
 
@@ -24,7 +24,7 @@ if ($version_check) {
     exit(0);
 }
 
-print "Readloading CPAN client indexes...\n";
+print "Reloading CPAN client indexes...\n";
 CPAN::HandleConfig->load;
 CPAN::Shell::setup_output;
 CPAN::Index->force_reload;

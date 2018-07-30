@@ -111,8 +111,8 @@ if (defined($libpath) && defined($incpath)) {
     # When user has its own tclConfig.sh with --tclconfig=..., then we
     # overwrite values in %tclcfg
 
-    open(my $fh, "$tclsh tclcfg.tcl |") or _die "error starting $tclsh: $!";
     $?=0;
+    open(my $fh, "$tclsh tclcfg.tcl |") or _die "error starting $tclsh: $!";
     _die "error starting $tclsh: \$?=$?; \$!=$!\n" if $?!=0;
     my $tclcfg = join '', <$fh>;
     print $tclcfg;
@@ -240,7 +240,7 @@ my $mm = WriteMakefile(
     DEFINE => $defs,
     @extraargs,
 );
-if ($mm->is_make_type('dmake') and 0) { # Mmm. no. d-make welcome. problem was somewhere else
+if (0 and $mm->is_make_type('dmake')) { # Mmm. no. d-make welcome. problem was somewhere else
     unlink('Makefile');
     _die <<'EOS';
 dmake prohibited. It does bla-bla-bla

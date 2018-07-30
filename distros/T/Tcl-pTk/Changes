@@ -1,5 +1,16 @@
 Summary of Changes to Tcl::pTk
 
+Release 0.94:  2018-07-28
+
+ * Change `use Tk;` to `use Tcl::pTk;` in text2.t
+ * Allow abbreviated mode flag for search() (used by text2.t)
+ * Replace GNU GPLv2 text in LICENSE file with GNU GPLv1
+   (which is what Perl 5 license uses)
+ * Specify license in MakeMaker LICENSE attribute rather than in META_MERGE
+ * Add resources to META_MERGE: GitHub repository, mailing list
+ * Keep canIndex.t running if command line arg present (for debugging)
+ * Various spelling fixes
+
 Release 0.93:  2018-07-13
 
  * Add missing module `Sub::Name` to PREREQ_PM (RT #116432)

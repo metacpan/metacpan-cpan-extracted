@@ -13,7 +13,7 @@ Crypt::Perl::PKCS10 - Certificate Signing Request (CSR) creation
 
     my $pkcs10 = Crypt::Perl::PKCS10->new(
 
-        key => $key_obj,
+        key => $private_key_obj,
 
         subject => [
             commonName => 'foo.com',
@@ -45,8 +45,8 @@ L<Let’s Encrypt|http://letsencrypt.org>.
 It’s also a good deal easier to use!
 
 I believe this is the only L<CPAN|http://search.cpan.org> module that
-can create CSRs for either RSA or ECDSA keys. Other encryption schemes would
-not be difficult to integrate—but do any CAs accept them?
+can create CSRs for RSA, ECDSA, and Ed25519 keys. Other encryption schemes
+would not be difficult to integrate—but do any CAs accept them?
 
 =head1 ECDSA KEY FORMAT
 
@@ -64,6 +64,8 @@ ECDSA it’s the strongest SHA digest algorithm that the key allows
 
 If you need additional flexibility, let me know.
 
+(Note that Ed25519 signs an entire document rather than a digest.)
+
 =head1 CLASS METHODS
 
 =head2 new( NAME => VALUE, ... );
@@ -72,8 +74,8 @@ Create an instance of this class. Parameters are:
 
 =over 4
 
-=item * C<key> - An instance of either
-C<Crypt::Perl::RSA::PrivateKey> or C<Crypt::Perl::ECDSA::PrivateKey>.
+=item * C<key> - An instance of C<Crypt::Perl::RSA::PrivateKey>,
+C<Crypt::Perl::ECDSA::PrivateKey>, or C<Crypt::Perl::Ed25519::PrivateKey>.
 If you’ve got a DER- or PEM-encoded key string, use L<Crypt::Perl::PK>
 (included in this distribution) to create an appropriate object.
 
@@ -104,9 +106,6 @@ Currently this only seems to support RSA.
 
 =cut
 
-use Crypt::Format ();
-use Digest::SHA ();
-
 use Crypt::Perl::ASN1 ();
 use Crypt::Perl::ASN1::Signatures ();
 use Crypt::Perl::PKCS10::Attributes ();
@@ -121,6 +120,7 @@ use parent qw( Crypt::Perl::ASN1::Encodee );
 sub to_pem {
     my ($self) = @_;
 
+    require Crypt::Format;
     return Crypt::Format::der2pem( $self->to_der(), 'CERTIFICATE REQUEST' );
 }
 
@@ -172,6 +172,7 @@ sub _encode_params {
     my ($sig_alg, $sig_param, $sig_func);
 
     if ($key->isa('Crypt::Perl::ECDSA::PrivateKey')) {
+        require Digest::SHA;
 
         my $bits = $key->max_sign_bits();
 
@@ -202,11 +203,18 @@ sub _encode_params {
         $pk_der = $key->get_public_key()->to_der_with_curve_name();
     }
     elsif ($key->isa('Crypt::Perl::RSA::PrivateKey')) {
+        require Digest::SHA;
+
         $sig_alg = 'sha512WithRSAEncryption';
         $sig_param = q<>;
         $sig_func = $key->can('sign_RS512');
 
         $pk_der = $key->to_subject_public_der();
+    }
+    elsif ($key->isa('Crypt::Perl::Ed25519::PrivateKey')) {
+        $sig_alg = 'ed25519';
+        $sig_func = $key->can('sign');
+        $pk_der = $key->get_public_key()->to_der();
     }
     else {
         die Crypt::Perl::X::create('Generic', "Key ($key) is not a recognized private key class instance!");

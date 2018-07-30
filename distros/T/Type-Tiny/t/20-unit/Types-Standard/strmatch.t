@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -25,9 +25,16 @@ use lib qw( . ./t ../inc ./inc );
 
 use Test::More;
 use Test::TypeTiny;
+use Test::Fatal;
 
 use Types::Standard -all, "slurpy";
 use Type::Utils;
+
+my $e = exception { StrMatch[{}] };
+like($e, qr/^First parameter to StrMatch\[\`a\] expected to be a Regexp/, 'error message 1');
+
+$e = exception { StrMatch[qr/(.)/, []] };
+like($e, qr/^Second parameter to StrMatch\[\`a\] expected to be a type constraint/, 'error message 2');
 
 my $DistanceUnit = enum DistanceUnit => [qw/ mm cm m km /];
 my $Distance = declare Distance => as StrMatch[
@@ -65,5 +72,17 @@ should_fail("11", $Boolean);
 my $SecureUrl = declare SecureUrl => as StrMatch[qr{^https://}];
 should_pass("https://www.google.com/", $SecureUrl);
 should_fail("http://www.google.com/", $SecureUrl);
+
+my $length_eq_3 = StrMatch[qr/\A...\z/];
+should_fail('ab', $length_eq_3);
+should_pass('abc', $length_eq_3);
+should_fail('abcd', $length_eq_3);
+#diag( $length_eq_3->inline_check('$x') );
+
+my $length_ge_3 = StrMatch[qr/\A.../];
+should_fail('ab', $length_ge_3);
+should_pass('abc', $length_ge_3);
+should_pass('abcd', $length_ge_3);
+#diag( $length_ge_3->inline_check('$x') );
 
 done_testing;

@@ -1,5 +1,13 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.21 2018-07-29
+
+ - Add RTL support for slides
+
+1.20 2018-07-26
+
+ - Introduce experimental RTL/LTR support
+
 1.06 2018-07-18
 
  - HTML: respect centerchapter and centersection

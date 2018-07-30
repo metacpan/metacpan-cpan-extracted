@@ -1,0 +1,76 @@
+{
+   "abstract" : "Compare text to known pwned passwords list",
+   "author" : [
+      "Pete Houston (cpan@openstrike.co.uk)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Password-Policy-Rule-Pwned",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "LWP" : "6.02",
+            "LWP::Protocol::https" : "6.02",
+            "Password::Policy" : "0.04",
+            "perl" : "5.006000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "Test::Exception" : "0.38",
+            "Test::More" : "0.84"
+         }
+      }
+   },
+   "provides" : {
+      "Password::Policy::Exception::Pwned" : {
+         "file" : "lib/Password/Policy/Exception/Pwned.pm",
+         "version" : "0.01"
+      },
+      "Password::Policy::Exception::PwnedError" : {
+         "file" : "lib/Password/Policy/Exception/PwnedError.pm",
+         "version" : "0.01"
+      },
+      "Password::Policy::Rule::Pwned" : {
+         "file" : "lib/Password/Policy/Rule/Pwned.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Password-Policy-Rule-Pwned"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://gitlab.com/openstrike/password-pwned.git",
+         "web" : "https://gitlab.com/openstrike/password-pwned"
+      }
+   },
+   "version" : "0.01"
+}

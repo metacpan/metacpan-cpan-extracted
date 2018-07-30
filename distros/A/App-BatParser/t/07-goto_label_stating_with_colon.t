@@ -61,12 +61,6 @@ use Path::Tiny;
                         }
                     }
                 },
-                ,
-                {
-                    'Statement' => {
-                        'Command' => ''
-                    }
-                },
             ]
         }
     };

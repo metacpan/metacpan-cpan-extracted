@@ -18,15 +18,15 @@
 
 %token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE NEW OUR SELF CONST
 %token <opval> LAST NEXT NAME CONSTANT ENUM DESCRIPTOR CORETYPE CROAK VAR_NAME INTERFACE REF ISA
-%token <opval> SWITCH CASE DEFAULT EVAL WEAKEN PRECOMPILE
-%token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT
+%token <opval> SWITCH CASE DEFAULT EVAL WEAKEN PRECOMPILE DEREF
+%token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT BYTE_REF SHORT_REF INT_REF LONG_REF FLOAT_REF DOUBLE_REF
 
 %type <opval> grammar opt_statements statements statement my_var field if_statement else_statement array_init
 %type <opval> block enumeration_block package_block sub opt_declarations_in_package call_sub unop binop isa
 %type <opval> opt_assignable_terms assignable_terms assignable_term args arg opt_args use declaration_in_package declarations_in_package term logical_term relative_term
 %type <opval> enumeration_values enumeration_value weaken_field package_var invocant list_assignable_terms
 %type <opval> type field_name sub_name package anon_package declarations_in_grammar opt_enumeration_values array_type
-%type <opval> for_statement while_statement expression opt_declarations_in_grammar var anon_sub
+%type <opval> for_statement while_statement expression opt_declarations_in_grammar var anon_sub deref ref
 %type <opval> field_access array_access convert_type enumeration new_object basic_type array_length declaration_in_grammar
 %type <opval> switch_statement case_statement default_statement array_type_with_length const_array_type
 %type <opval> ';' opt_descriptors opt_colon_descriptors descriptors type_or_void normal_statement normal_statement_for_end eval_block
@@ -485,6 +485,26 @@ array_length
       $$ = SPVM_OP_build_array_length(compiler, op_array_length, $4);
     }
 
+deref
+  : DEREF var
+    {
+      $$ = SPVM_OP_build_deref(compiler, $1, $2);
+    }
+  | DEREF '{' var '}'
+    {
+      $$ = SPVM_OP_build_deref(compiler, $1, $3);
+    }
+
+ref
+  : REF var
+    {
+      $$ = SPVM_OP_build_ref(compiler, $1, $2);
+    }
+  | REF '{' var '}'
+    {
+      $$ = SPVM_OP_build_ref(compiler, $1, $3);
+    }
+
 term
   : assignable_term
   | relative_term
@@ -512,6 +532,8 @@ assignable_term
   | my_var
   | binop
   | unop
+  | ref
+  | deref
 
 expression
   : LAST
@@ -560,9 +582,12 @@ new_object
     {
       $$ = SPVM_OP_build_new_object(compiler, $1, $2, $4);
     }
-  | NEW anon_package
+  | anon_package
     {
-      $$ = SPVM_OP_build_new_object(compiler, $1, $2, NULL);
+      // New
+      SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, $1->file, $1->line);
+
+      $$ = SPVM_OP_build_new_object(compiler, op_new, $1, NULL);
     }
   | anon_sub
     {
@@ -712,6 +737,10 @@ binop
   | '(' assignable_term ')'
     {
       $$ = $2;
+    }
+  | deref ASSIGN assignable_term
+    {
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
     }
 
 relative_term
@@ -966,6 +995,48 @@ basic_type
     {
       SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
       op_type->uv.type = SPVM_TYPE_create_string_type(compiler);
+      
+      $$ = op_type;
+    }
+  | BYTE_REF
+    {
+      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
+      op_type->uv.type = SPVM_TYPE_create_byte_ref_type(compiler);
+      
+      $$ = op_type;
+    }
+  | SHORT_REF
+    {
+      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
+      op_type->uv.type = SPVM_TYPE_create_short_ref_type(compiler);
+      
+      $$ = op_type;
+    }
+  | INT_REF
+    {
+      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
+      op_type->uv.type = SPVM_TYPE_create_int_ref_type(compiler);
+      
+      $$ = op_type;
+    }
+  | LONG_REF
+    {
+      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
+      op_type->uv.type = SPVM_TYPE_create_long_ref_type(compiler);
+      
+      $$ = op_type;
+    }
+  | FLOAT_REF
+    {
+      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
+      op_type->uv.type = SPVM_TYPE_create_float_ref_type(compiler);
+      
+      $$ = op_type;
+    }
+  | DOUBLE_REF
+    {
+      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
+      op_type->uv.type = SPVM_TYPE_create_double_ref_type(compiler);
       
       $$ = op_type;
     }

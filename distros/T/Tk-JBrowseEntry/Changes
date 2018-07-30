@@ -160,7 +160,7 @@ Revision history for "ptkftp".
 	  * Adjusted dropdown menu's width to work better when -nobutton is set.
 	  * Cleaned up the code and documentation, including fixing some 
 	  "strict refs" errors and problems when a -default value is specified.
-5.1	- * Added -fixedlist option to cause the pop-up drop-down list to be 
+5.10	- * Added -fixedlist option to cause the pop-up drop-down list to be 
 	  "fixed" (static) - always visible and be packed as a widget along with 
 	  the text-entry and button portions.  Default is 0 (not fixed), as has 
 	  always been the case.  If set to a true value, the listbox will appear 
@@ -169,10 +169,10 @@ Revision history for "ptkftp".
 	  * Added -listboxtype option to specify that the drop-down list should 
 	  use a "Tk::HList" widget by specifying "-listboxtype => 'HListbox', 
 	  if Tk::HListbox is installed.  The default remains 'Listbox'.  
-	  Also added Tk::HListbox-specific options:  -indicator, and -itemtype.
+	  * Also added Tk::HListbox-specific options:  -indicator, and -itemtype.
 	  These are ignored if the default Tk::Listbox is used.  
 	  The -label option is now dynamically configurable via $w->configure().
-	  Added -labelforeground, -labelbackground, and -labelfont options.
+	  * Added -labelforeground, -labelbackground, and -labelfont options.
 	  * NOTE:  REMOVED the "altbinding" string "Tab=PopList" as this is now 
 	  the default (to roll up / hide the drop-down list whenever 
 	  the [Tab] key is pressed within it (unless -fixedlist is specified).
@@ -182,3 +182,16 @@ Revision history for "ptkftp".
 	  rolled up the list anyway.
 	  * Fixed several related key-binding / focusing issues along with the 
 	  usual code and doc. cleanups / optimizations.
+5.20   * Added "List=Bouncy" -altbinding to make listbox immediately roll 
+	  back up when user releases the mouse button, more like a popup-menu.
+	  (User can avoid the "bounce" feature by holding down the [Shift] key 
+	  with the mouse).  On "fixed" lists, focus immediately jumps back to 
+	  the text-entry field, so that it behaves the same as if not "fixed".
+	  * Added -buttonforeground and -buttonbackground color config. options.
+	  * Added -colorstate to options that can be changed dynamically via 
+	  $widget->configure.
+	  * Greatly cleaned up the -colorstate option to play nicer with 
+	  setPalette() and other color options as well as fixed alot of 
+	  annoying issues with it (See revised pod docs).
+	  * Updated the test suite to include new "bouncy" and "fixedlist" 
+	  examples.

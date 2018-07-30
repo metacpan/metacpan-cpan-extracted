@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Plugin::GraphQL
 
+0.12    Thu 26 Jul 18:17:54 BST 2018
+ - handle JSON-decoding errors from other JSON module
+
 0.11    Sun Jan 21 21:47:00 GMT 2018
  - handle JSON-decoding errors
  - Promise->all now class method

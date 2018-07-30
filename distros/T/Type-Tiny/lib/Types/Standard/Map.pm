@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Types::Standard::Map::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Standard::Map::VERSION   = '1.002002';
+	$Types::Standard::Map::VERSION   = '1.004002';
 }
 
 use Type::Tiny ();
@@ -23,7 +23,7 @@ sub __constraint_generator
 {
 	return $meta->get_type('Map') unless @_;
 	
-	my ($keys, $values) = map Types::TypeTiny::to_TypeTiny($_), @_;
+	my ($keys, $values) = @_;
 	Types::TypeTiny::TypeTiny->check($keys)
 		or _croak("First parameter to Map[`k,`v] expected to be a type constraint; got $keys");
 	Types::TypeTiny::TypeTiny->check($values)
@@ -173,6 +173,32 @@ sub __coercion_generator
 	return $C;
 }
 
+sub __hashref_allows_key {
+	my $self = shift;
+	my ($key) = @_;
+	
+	return Types::Standard::Str()->check($key) if $self==Types::Standard::Map();
+	
+	my $map = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Map() });
+	my ($kcheck, $vcheck) = @{ $map->parameters };
+	
+	($kcheck or Types::Standard::Any())->check($key);
+}
+
+sub __hashref_allows_value {
+	my $self = shift;
+	my ($key, $value) = @_;
+	
+	return !!0 unless $self->my_hashref_allows_key($key);
+	return !!1 if $self==Types::Standard::Map();
+	
+	my $map = $self->find_parent(sub { $_->has_parent && $_->parent==Types::Standard::Map() });
+	my ($kcheck, $vcheck) = @{ $map->parameters };
+	
+	($kcheck or Types::Standard::Any())->check($key)
+		and ($vcheck or Types::Standard::Any())->check($value);
+}
+
 1;
 
 __END__
@@ -211,7 +237,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

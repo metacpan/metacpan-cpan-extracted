@@ -44,6 +44,10 @@ use Commandable::Invocation;
    is( $inv->pull_token, "quoted token", '->pull_token yields string' );
 
    is( $inv->remaining, "here", '->remaining after ->pull_token' );
+
+   $inv = Commandable::Invocation->new( q("three" "quoted" "tokens") );
+
+   is( $inv->pull_token, "three", '->pull_token splits multiple quotes' );
 }
 
 # \" escaping
@@ -56,6 +60,22 @@ use Commandable::Invocation;
    $inv = Commandable::Invocation->new( q(\\\\backslash) );
 
    is( $inv->pull_token, "\\backslash", '->pull_token yields de-escaped backslash' );
+}
+
+# putback
+{
+   my $inv = Commandable::Invocation->new( "c" );
+   $inv->putback_tokens( qw( a b ) );
+
+   is( $inv->peek_token, "a", '->peek_token after putback' );
+   is( $inv->pull_token, "a", '->pull_token after putback' );
+
+   is( $inv->pull_token, "b", '->pull_token after putback' );
+
+   is( $inv->pull_token, "c", '->pull_token after putback' );
+
+   $inv->putback_tokens( "foo", "bar splot" );
+   is( $inv->remaining, q(foo "bar splot"), '->remaining after putback' );
 }
 
 done_testing;

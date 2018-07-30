@@ -12,6 +12,7 @@ use App::cpm::Requirement;
 use App::cpm::Resolver::Cascade;
 use App::cpm::Resolver::MetaCPAN;
 use App::cpm::Resolver::MetaDB;
+use App::cpm::Util qw(WIN32 determine_home maybe_abs);
 use App::cpm::Worker;
 use App::cpm::version;
 use App::cpm;
@@ -24,33 +25,17 @@ use List::Util ();
 use Parallel::Pipes;
 use Pod::Text ();
 
-use constant WIN32 => $^O eq 'MSWin32';
-
-sub determine_home { # taken from Menlo
-    my $class = shift;
-
-    my $homedir = $ENV{HOME}
-      || eval { require File::HomeDir; File::HomeDir->my_home }
-      || join('', @ENV{qw(HOMEDRIVE HOMEPATH)}); # Win32
-
-    if (WIN32) {
-        require Win32; # no fatpack
-        $homedir = Win32::GetShortPathName($homedir);
-    }
-
-    return "$homedir/.perl-cpm";
-}
-
 sub new {
     my ($class, %option) = @_;
     my $prebuilt = exists $ENV{PERL_CPM_PREBUILT} && !$ENV{PERL_CPM_PREBUILT} ? 0 : 1;
     bless {
-        home => $class->determine_home,
+        home => determine_home,
+        cwd => Cwd::cwd(),
         workers => WIN32 ? 1 : 5,
         snapshot => "cpanfile.snapshot",
         cpanfile => "cpanfile",
         local_lib => "local",
-        cpanmetadb => "http://cpanmetadb.plackperl.org/v1.0/",
+        cpanmetadb => "https://cpanmetadb.plackperl.org/v1.0/",
         mirror => ["https://cpan.metacpan.org/"],
         retry => 1,
         configure_timeout => 60,
@@ -113,8 +98,8 @@ sub parse_options {
         "feature=s@" => \@feature,
     or exit 1;
 
-    $self->{local_lib} = $self->maybe_abs($self->{local_lib}) unless $self->{global};
-    $self->{home} = $self->maybe_abs($self->{home});
+    $self->{local_lib} = maybe_abs($self->{local_lib}, $self->{cwd}) unless $self->{global};
+    $self->{home} = maybe_abs($self->{home}, $self->{cwd});
     $self->{resolver} = \@resolver;
     $self->{feature} = \@feature if @feature;
     $self->{mirror} = \@mirror if @mirror;
@@ -188,22 +173,13 @@ sub _inc {
     }
 }
 
-sub maybe_abs {
-    my ($self, $path) = @_;
-    if (File::Spec->file_name_is_absolute($path)) {
-        return $path;
-    } else {
-        File::Spec->canonpath(File::Spec->catdir(Cwd::cwd(), $path));
-    }
-}
-
 sub normalize_mirror {
     my ($self, $mirror) = @_;
     $mirror =~ s{/*$}{/};
     return $mirror if $mirror =~ m{^https?://};
     $mirror =~ s{^file://}{};
     die "$mirror: No such directory.\n" unless -d $mirror;
-    "file://" . $self->maybe_abs($mirror);
+    "file://" . maybe_abs($mirror, $self->{cwd});
 }
 
 sub run {
@@ -258,7 +234,7 @@ sub cmd_install {
         (exists $self->{target_perl} ? (target_perl => $self->{target_perl}) : ()),
     );
 
-    my ($packages, $dists) = $self->initial_job($master);
+    my ($packages, $dists, $resolver) = $self->initial_job($master);
     return 0 unless $packages;
 
     my $worker = App::cpm::Worker->new(
@@ -267,7 +243,7 @@ sub cmd_install {
         logger    => $logger,
         notest    => $self->{notest},
         sudo      => $self->{sudo},
-        resolver  => $self->generate_resolver,
+        resolver  => $self->generate_resolver($resolver),
         man_pages => $self->{man_pages},
         retry     => $self->{retry},
         prebuilt  => $self->{prebuilt},
@@ -391,7 +367,7 @@ sub initial_job {
         my $arg = $_; # copy
         my ($package, $dist);
         if (-d $arg || -f $arg || $arg =~ s{^file://}{}) {
-            $arg = $self->maybe_abs($arg);
+            $arg = maybe_abs($arg, $self->{cwd});
             $dist = App::cpm::Distribution->new(source => "local", uri => "file://$arg", provides => []);
         } elsif ($arg =~ /(?:^git:|\.git(?:@.+)?$)/) {
             my %ref = $arg =~ s/(?<=\.git)@(.+)$// ? (ref => $1) : ();
@@ -437,23 +413,23 @@ sub initial_job {
         push @dist, $dist if $dist;
     }
 
+    my $resolver;
     if (!@{$self->{argv}}) {
-        my ($requirements, $dists) = $self->load_cpanfile($self->{cpanfile});
-        push @dist, @$dists;
-        my ($is_satisfied, @need_resolve) = $master->is_satisfied($requirements);
-        if (!@$dists and $is_satisfied) {
+        my ($requirement, $reinstall);
+        ($requirement, $reinstall, $resolver) = $self->load_cpanfile($self->{cpanfile});
+        my ($is_satisfied, @need_resolve) = $master->is_satisfied($requirement);
+        if (!@$reinstall and $is_satisfied) {
             warn "All requirements are satisfied.\n";
             return;
         } elsif (!defined $is_satisfied) {
-            my ($req) = grep { $_->{package} eq "perl" } @$requirements;
+            my ($req) = grep { $_->{package} eq "perl" } @$requirement;
             die sprintf "%s requires perl %s, but you have only %s\n",
                 $self->{cpanfile}, $req->{version_range}, $self->{target_perl} || $];
-        } else {
-            push @package, @need_resolve;
         }
+        push @package, @need_resolve, @$reinstall;
     }
 
-    return (\@package, \@dist);
+    return (\@package, \@dist, $resolver);
 }
 
 sub load_cpanfile {
@@ -463,49 +439,38 @@ sub load_cpanfile {
     my $prereqs = $cpanfile->prereqs_with(@{ $self->{"feature"} });
     my @phase = grep $self->{"with_$_"}, qw(configure build test runtime develop);
     my @type  = grep $self->{"with_$_"}, qw(requires recommends suggests);
-    my $requirements = $prereqs->merged_requirements(\@phase, \@type);
-    my $hash = $requirements->as_string_hash;
+    my $reqs = $prereqs->merged_requirements(\@phase, \@type)->as_string_hash;
 
-    my (@package, @distribution);
-    for my $package (sort keys %$hash) {
-        my $option = $cpanfile->options_for_module($package) || +{};
-        my $uri;
-        if ($uri = $option->{git}) {
-            push @distribution, App::cpm::Distribution->new(
-                source => "git", uri => $uri, ref => $option->{ref},
-                provides => [{package => $package}],
-            );
-        } elsif ($uri = $option->{dist}) {
-            my $dist = App::cpm::DistNotation->new_from_dist($uri);
-            die "Unsupported dist '$uri' found in $file\n" unless $dist;
-            my $cpan_uri = $dist->cpan_uri($option->{mirror} || $self->{mirror}[0]);
-            push @distribution, App::cpm::Distribution->new(
-                source => "cpan", uri => $cpan_uri,
-                distfile => $dist->distfile,
-                provides => [{package => $package}],
-            );
-        } elsif ($uri = $option->{url}) {
-            die "Unsupported url '$uri' found in $file\n" if $uri !~ m{^(?:https?|file)://};
-            my $dist = App::cpm::DistNotation->new_from_uri($uri);
-            my $source = $dist ? 'cpan' : $uri =~ m{^file://} ? 'local' : 'http';
-            push @distribution, App::cpm::Distribution->new(
-                source => $source, uri => $dist ? $dist->cpan_uri : $uri,
-                ($dist ? (distfile => $dist->distfile) : ()),
-                provides => [{package => $package}],
-            );
+    my (@package, @reinstall);
+    for my $package (sort keys %$reqs) {
+        my $option = $cpanfile->options_for_module($package) || {};
+        my $req = {
+            package => $package,
+            version_range => $reqs->{$package},
+            dev => $option->{dev},
+            reinstall => $option->{git} ? 1 : 0,
+        };
+        if ($option->{git}) {
+            push @reinstall, $req;
         } else {
-            push @package, {
-                package => $package, version_range => $hash->{$package}, dev => $option->{dev},
-            };
+            push @package, $req;
         }
     }
-    (\@package, \@distribution);
+
+    require App::cpm::Resolver::CPANfile;
+    my $resolver = App::cpm::Resolver::CPANfile->new(
+        cpanfile => $cpanfile,
+        mirror => $self->{mirror},
+    );
+
+    (\@package, \@reinstall, $resolver);
 }
 
 sub generate_resolver {
-    my $self = shift;
+    my ($self, $initial) = @_;
 
     my $cascade = App::cpm::Resolver::Cascade->new;
+    $cascade->add($initial) if $initial;
     if (@{$self->{resolver}}) {
         for (@{$self->{resolver}}) {
             my ($klass, @arg) = split /,/, $_;

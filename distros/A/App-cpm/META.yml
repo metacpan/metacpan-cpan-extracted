@@ -23,7 +23,7 @@ no_index:
 provides:
   App::cpm:
     file: lib/App/cpm.pm
-    version: '0.975'
+    version: '0.977'
   App::cpm::CLI:
     file: lib/App/cpm/CLI.pm
   App::cpm::CircularDependency:
@@ -48,6 +48,8 @@ provides:
     file: lib/App/cpm/Resolver.pm
   App::cpm::Resolver::02Packages:
     file: lib/App/cpm/Resolver/02Packages.pm
+  App::cpm::Resolver::CPANfile:
+    file: lib/App/cpm/Resolver/CPANfile.pm
   App::cpm::Resolver::Cascade:
     file: lib/App/cpm/Resolver/Cascade.pm
   App::cpm::Resolver::MetaCPAN:
@@ -58,6 +60,8 @@ provides:
     file: lib/App/cpm/Resolver/Snapshot.pm
   App::cpm::Tutorial:
     file: lib/App/cpm/Tutorial.pm
+  App::cpm::Util:
+    file: lib/App/cpm/Util.pm
   App::cpm::Worker:
     file: lib/App/cpm/Worker.pm
   App::cpm::Worker::Installer:
@@ -100,7 +104,7 @@ resources:
   bugtracker: https://github.com/skaji/cpm/issues
   homepage: https://github.com/skaji/cpm
   repository: https://github.com/skaji/cpm.git
-version: '0.975'
+version: '0.977'
 x_contributors:
   - 'Andrew Rodland <andrew@cleverdomain.org>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'

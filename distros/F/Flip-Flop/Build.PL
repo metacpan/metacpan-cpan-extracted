@@ -4,7 +4,7 @@ use Module::Build;
 my $b = Module::Build->new(
   configure_requires => {'Module::Build'=>0.4224},
   create_readme      =>  0,
-  dist_abstract      => 'Flop a switch in your script to zero after a run with the switch set to one.',
+  dist_abstract      => 'Set a switch in your script to zero after a run with the switch set to one.',
   dist_author        => 'philiprbrenan@gmail.com',
   license            => 'perl',
   module_name        => 'Flip::Flop',

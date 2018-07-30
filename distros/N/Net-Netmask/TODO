@@ -1,4 +1,12 @@
 TODO Items
 
+Good beginner tasks:
+ * Use test2 native exception testing where we're using $sig{__WARN__} to
+   catch exceptions
+ * Refactor tests in netmask.t to not use dlist() helper (just use "is")
+ * Refactor tests in netmask.t to always have descriptions
+
+Advanced tests:
  * IPv6 Support
+ * Speed improvements for IPv6
 

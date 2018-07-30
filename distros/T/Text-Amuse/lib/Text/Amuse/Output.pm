@@ -440,7 +440,7 @@ sub inline_elements {
                             (?<verbatim>      \<verbatim\> .*? \<\/verbatim\>      ) |
                             (?<verbatim_code> \<code\>     .*? \<\/code\>          ) |
                             (?<verbatim_code> (?<!\w)\=(?=\S)  .+? (?<=\S)\=(?!\w) ) |
-
+                            (?<bidimarker>   (?:\<\<\<|\>\>\>) ) |
                             (?<pri_footnote> \s*\[[1-9][0-9]*\]) |
                             (?<sec_footnote> \s*\{[1-9][0-9]*\}) |
                             (?<tag> \<
@@ -530,8 +530,53 @@ sub manage_regular {
     # we do the processing in more steps. It may be more expensive,
     # but at least the code should be clearer.
 
-    my @pieces;
-    my @processed = $self->inline_elements($string);
+    my @pieces = $self->inline_elements($string);
+    my @processed;
+    my $current_direction = '';
+  BIDIPROC:
+    while (@pieces) {
+        my $piece = shift @pieces;
+        my %dirs = (
+                    '<<<' => 'rtl',
+                    '>>>' => 'ltr',
+                   );
+        if ($piece->type eq 'bidimarker') {
+            $self->document->set_bidi_document;
+            my $dir = $dirs{$piece->string} or die "Invalid bidimarker " . $piece->string;
+            # we need to close
+            if ($current_direction) {
+                if ($dir ne $current_direction) {
+                    push @processed, Text::Amuse::InlineElement->new(string => '',
+                                                                     fmt => $self->fmt,
+                                                                     tag => $current_direction,
+                                                                     type => 'close');
+                    $current_direction = '';
+                }
+                else {
+                    warn "$string is trying to set direction to $dir twice!, ignoring\n";
+                }
+            }
+            # we need to open
+            else {
+                $current_direction = $dir;
+                push @processed, Text::Amuse::InlineElement->new(string => '',
+                                                                 fmt => $self->fmt,
+                                                                 tag => $current_direction,
+                                                                 type => 'open');
+            }
+        }
+        else {
+            push @processed, $piece;
+        }
+    }
+    if ($current_direction) {
+        push @processed, Text::Amuse::InlineElement->new(string => '',
+                                                         fmt => $self->fmt,
+                                                         tag => $current_direction,
+                                                         type => 'close');
+        $current_direction = '';
+    }
+
     # now we decide what to do with the inline elements: either turn
     # them into open/close tag via unroll, or turn them into regular
     # text
@@ -1353,12 +1398,14 @@ sub format_single_link {
             return "\\hyperref{}{amuse}{$linkname}{$linkname}";
         }
     }
+
+    my $url = $self->_url_safe_escape($link);
+    my $desc = $self->safe($link);
     if ($self->is_html) {
-        $link = $self->_url_safe_escape($link);
-        return qq{<a class="text-amuse-link" href="$link">$link</a>};
+        return qq{<a class="text-amuse-link text-amuse-is-single-link" href="$url">$desc</a>};
     }
     elsif ($self->is_latex) {
-        return "\\url{" . $self->_url_safe_escape($link) . "}";
+        return "\\href{$url}{\\texttt{$desc}}";
     }
     else { die "Not reached" }
 }
@@ -1396,6 +1443,30 @@ sub blk_table {
 
 sub _build_blk_table {
     my $table = {
+            'rtl' => {
+                      start => {
+                                html => '<div dir="rtl">',
+                                # ltx => "\n\\setRTL\%",
+                                ltx => "\n\\begin{RTL}\n",
+                              },
+                      stop => {
+                                html => "</div>\n",
+                                ltx => "\n\\end{RTL}\n",
+                               # ltx => "\n\\setLTR\%",
+                               },
+                     },
+            'ltr' => {
+                      start => {
+                                html => '<div dir="ltr">',
+                                ltx => "\n\\begin{LTR}\n",
+                                # ltx => "\n\\setLTR\%",
+                              },
+                      stop => {
+                               html => "</div>\n", #  RLM (U+200F RIGHT-TO-LEFT MARK)
+                               ltx => "\n\\end{LTR}\n",
+                               # ltx => "\n\\setRTL\%",
+                               },
+                     },
                                   p =>  { start => {
                                                     ltx => "\n",
                                                     html => "\n<p>\n",

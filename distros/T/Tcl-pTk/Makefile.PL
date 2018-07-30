@@ -23,12 +23,21 @@ EOT
 my %makeArgs = (
     NAME => "Tcl::pTk",
     VERSION_FROM => 'lib/Tcl/pTk.pm',
+    LICENSE => 'perl_5',
     EXE_FILES => \@SCRIPTS,
-    META_MERGE => 
-	{ no_index => { directory => [ qw! benchmarks TableMatrixDemos lib/Tcl/pTk/demos ! ] },
-          keywords => [ qw/ Tk Tcl Tix GUI /],
-          license  => 'perl',
-        } ,
+    META_MERGE => {
+        "meta-spec" => { version => 2 },
+        no_index => { directory => [ qw! benchmarks TableMatrixDemos lib/Tcl/pTk/demos ! ] },
+        keywords => [ qw/ Tk Tcl Tix GUI /],
+        resources => {
+            repository => {
+                type => 'git',
+                url => 'https://github.com/chrstphrchvz/perl-tcl-ptk.git',
+                web => 'https://github.com/chrstphrchvz/perl-tcl-ptk',
+            },
+            MailingList => 'mailto:tcltk@perl.org',
+        },
+    },
     PREREQ_PM => {
 	Tcl => 0.90,
 	'Class::ISA' => 0.36,

@@ -1,8 +1,8 @@
 use lib (-e 't' ? 't' : 'test'), 'inc';
-use TestML;
+use TestML1;
 use TestMLBridge;
 
-TestML->new(
+TestML1->new(
     testml => 'testml/load.tml',
     bridge => 'TestMLBridge',
 )->run;

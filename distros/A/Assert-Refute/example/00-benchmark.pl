@@ -12,6 +12,15 @@ use Time::HiRes qw(clock);
 use Getopt::Long;
 use Assert::Refute {}, ":all";
 
+BEGIN {
+    if (Assert::Refute->VERSION < 0.05) {
+        die "Assert::Refute too old, can't cope: ".Assert::Refute->VERSION;
+    };
+    if (Assert::Refute->VERSION < 0.10) {
+        *try_refute = \&refute_these;
+    };
+};
+
 my $count    = 100;
 my $repeat   = 1000;
 my $want_tap = 0;

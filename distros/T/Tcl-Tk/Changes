@@ -1,5 +1,9 @@
 Revision history for Perl extension Tcl::Tk.
 
+1.12	13-jul-2018
+	- workaround when tcl/tk installation lacks snit and tklib; use own
+	- ChangeLog no longer maintained, remove it
+
 1.06	23-jun-2018
 	- now on github
 	- get contribution from MaxPerl, etc

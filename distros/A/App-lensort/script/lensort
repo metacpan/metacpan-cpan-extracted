@@ -1,0 +1,157 @@
+#!perl
+
+our $DATE = '2018-07-26'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my %Opts = (
+    reverse => 0,
+);
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'reverse|r'     => \$Opts{reverse},
+        'help|h'        => sub {
+            print <<USAGE;
+Usage:
+  lensort [OPTIONS]...
+Options:
+  --reverse, -r
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub run {
+    my @lines;
+    my $i = 0;
+    if ($Opts{reverse}) {
+        @lines = map { $_->[0] } sort { $b->[1] <=> $a->[1] || $b->[2] <=> $a->[2] }
+            map { [$_, length($_), $i++] } <>;
+    } else {
+        @lines = map { $_->[0] } sort { $a->[1] <=> $b->[1] || $a->[2] <=> $b->[2] }
+            map { [$_, length($_), $i++] } <>;
+    }
+
+    print for @lines;
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Sort lines of text by their length
+# PODNAME: lensort
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+lensort - Sort lines of text by their length
+
+=head1 VERSION
+
+This document describes version 0.002 of lensort (from Perl distribution App-lensort), released on 2018-07-26.
+
+=head1 SYNOPSIS
+
+ lensort [OPTION]... [FILE]...
+
+Sample input:
+
+ one
+ two
+ three
+ four
+
+Sample output (C<lensort>):
+
+ one
+ two
+ four
+ three
+
+Sample output (C<lensort -r>):
+
+ three
+ four
+ two
+ one
+
+=head1 DESCRIPTION
+
+This utility sorts lines of text by their length. The default is shortest first
+(if C<--reverse> a.k.a. C<-r> is given, will show longest line first). Lines
+with same length will be sorted by appearance (first in first out).
+
+=head1 EXIT CODES
+
+0 on success.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item --reverse, -r
+
+Show longest line first instead of the default shortest line first. Also, under
+C<-r> line that appears later will be shown earlier (last-in-first-out) instead
+of the default first-in-first-out.
+
+=back
+
+=head1 FAQ
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-lensort>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-lensort>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lensort>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+To sort numerically or alphabetically, use the Unix command B<sort>.
+
+To print the longest line, you can use C<wc -L>.
+
+To sort by several other criteria, check out L<sortsub> and the various
+C<Sort::Sub::*> backend modules.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

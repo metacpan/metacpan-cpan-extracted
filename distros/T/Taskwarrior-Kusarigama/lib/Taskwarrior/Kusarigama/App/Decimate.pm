@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::App::Decimate;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: interactively re-prioritize tasks
-$Taskwarrior::Kusarigama::App::Decimate::VERSION = '0.9.1';
+$Taskwarrior::Kusarigama::App::Decimate::VERSION = '0.9.2';
 
 use 5.20.0;
 
@@ -174,7 +174,7 @@ Taskwarrior::Kusarigama::App::Decimate - interactively re-prioritize tasks
 
 =head1 VERSION
 
-version 0.9.1
+version 0.9.2
 
 =head1 SYNOPSIS
 

@@ -30,6 +30,8 @@ class V8Context {
         SV* instanceof(const char* oname, const char* cname);
 
         void set(const char* name, SV* value);
+        void remove(const char* name);
+
         SV* eval(const char* code, const char* file = 0);
 
         SV* dispatch_function_in_event_loop(const char* func);

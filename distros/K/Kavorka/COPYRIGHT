@@ -115,14 +115,14 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: examples/benchmarks-multisub.pl
- examples/fibonacci.pl
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: dist.ini
  t/lib/Local/Bad.pm
 Copyright: Copyright 2017 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: examples/benchmarks-multisub.pl
+ examples/fibonacci.pl
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/99threads.t

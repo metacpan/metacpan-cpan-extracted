@@ -189,7 +189,7 @@ sub html {
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="[% doc.language_code %]" lang="[% doc.language_code %]">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="[% doc.language_code %]" lang="[% doc.language_code %]" dir="[% doc.html_direction %]">
 <head>
   <meta http-equiv="Content-type" content="application/xhtml+xml; charset=UTF-8" />
   <title>[% title %]</title>
@@ -337,27 +337,33 @@ span.hiddenindex, span.commentmarker, .comment, span.tocprefix, #hitme {
 
 h1 {
     font-size: 200%;
-    margin: .67em 0
+    margin: .67em 0;
+    clear: both;
 }
 h2 {
     font-size: 180%;
-    margin: .75em 0
+    margin: .75em 0;
+    clear: both;
 }
 h3 {
     font-size: 150%;
-    margin: .83em 0
+    margin: .83em 0;
+    clear: both;
 }
 h4 {
     font-size: 130%;
-    margin: 1.12em 0
+    margin: 1.12em 0;
+    clear: both;
 }
 h5 {
     font-size: 115%;
-    margin: 1.5em 0
+    margin: 1.5em 0;
+    clear: both;
 }
 h6 {
     font-size: 100%;
     margin: 0;
+    clear: both;
 }
 
 [% IF centerchapter %]
@@ -535,11 +541,11 @@ sub bare_html {
     }
     my $html = <<'EOF';
 [% IF doc.toc_as_html %]
-<div class="table-of-contents"[% IF options.notoc %] style="display:none"[% END %]>
+<div class="table-of-contents"[% IF options.notoc %] style="display:none"[% END %] dir="[% doc.html_direction %]">
 [% doc.toc_as_html %]
 </div>
 [% END %]
-<div id="thework">
+<div id="thework" dir="[% doc.html_direction %]">
 [% doc.as_html %]
 </div>
 EOF
@@ -588,6 +594,7 @@ EOF
 }
 
 sub minimal_html {
+    # has no options.
     my $self = shift;
     if (my $ref = $self->ttref('minimal_html')) {
         return $ref;
@@ -595,7 +602,7 @@ sub minimal_html {
     my $html = <<'EOF';
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="[% language_code %]" lang="[% language_code %]" dir="[% html_direction %]">
   <head>
     <title>[% title %]</title>
     <link href="stylesheet.css" type="text/css" rel="stylesheet" />
@@ -630,24 +637,10 @@ sub latex {
                paper=[% safe_options.papersize %]]%
                {[% safe_options.class %]}
 \usepackage{fontspec}
-\usepackage{polyglossia}
-\setmainfont{[% safe_options.mainfont %]}
-% these are not used but prevents XeTeX to barf
-\setsansfont[Scale=MatchLowercase]{[% safe_options.sansfont %]}
-\setmonofont[Scale=MatchLowercase]{[% safe_options.monofont %]}
-\setmainlanguage{[% safe_options.lang %]}
+\setmainfont[Script=[% doc.font_script %]]{[% safe_options.mainfont %]}
+\setsansfont[Script=[% doc.font_script %],Scale=MatchLowercase]{[% safe_options.sansfont %]}
+\setmonofont[Script=[% doc.font_script %],Scale=MatchLowercase]{[% safe_options.monofont %]}
 [% safe_options.mainlanguage_script %]
-
-[% IF safe_options.other_languages %]
-\setotherlanguages{[% safe_options.other_languages %]}
-[% END %]
-[% IF safe_options.other_languages_additional %]
-[% safe_options.other_languages_additional %]
-[% END %]
-
-[% IF safe_options.mainlanguage_toc_name %]
-\renewcaptionname{[% safe_options.lang %]}{\contentsname}{[% safe_options.mainlanguage_toc_name %]}
-[% END %]
 
 [% IF safe_options.nocoverpage %]
 \let\chapter\section
@@ -741,19 +734,6 @@ sub latex {
 \PassOptionsToPackage{hyphens}{url}\usepackage[hyperfootnotes=false,hidelinks,breaklinks=true]{hyperref}
 \usepackage{bookmark}
 
-% footnote handling
-\usepackage[fragile]{bigfoot}
-\usepackage{perpage}
-\DeclareNewFootnote{default}
-[% IF safe_options.secondary_footnotes_alpha %]
-\DeclareNewFootnote{B}[alph]
-\MakeSortedPerPage[1]{footnoteB}
-[% ELSE %]
-\DeclareNewFootnote{B}
-\MakeSorted{footnoteB}
-\renewcommand*\thefootnoteB{(\arabic{footnoteB})}
-[% END %]
-\deffootnote[3em]{0em}{4em}{\textsuperscript{\thefootnotemark}~}
 
 \usepackage[shortlabels]{enumitem}
 \usepackage{tabularx}
@@ -785,6 +765,44 @@ sub latex {
 [% IF safe_options.centersection %]
 \let\raggedsection\centering
 [% END %]
+
+\usepackage{polyglossia}
+\setmainlanguage{[% safe_options.lang %]}
+[% safe_options.mainlanguage_script %]
+
+[% IF safe_options.other_languages %]
+\setotherlanguages{[% safe_options.other_languages %]}
+[% END %]
+[% IF safe_options.other_languages_additional %]
+[% safe_options.other_languages_additional %]
+[% END %]
+
+[% IF safe_options.mainlanguage_toc_name %]
+\renewcaptionname{[% safe_options.lang %]}{\contentsname}{[% safe_options.mainlanguage_toc_name %]}
+[% END %]
+
+[% IF doc.is_bidi %]
+\usepackage{bidi}
+[% END %]
+
+[% IF disable_bigfoot %]
+\newcommand{\footnoteB}[1]{\{\{#1\}\}}
+[% ELSE %]
+% footnote handling
+\usepackage[fragile]{bigfoot}
+\usepackage{perpage}
+\DeclareNewFootnote{default}
+[% IF safe_options.secondary_footnotes_alpha %]
+\DeclareNewFootnote{B}[alph]
+\MakeSortedPerPage[1]{footnoteB}
+[% ELSE %]
+\DeclareNewFootnote{B}
+\MakeSorted{footnoteB}
+\renewcommand*\thefootnoteB{(\arabic{footnoteB})}
+[% END %]
+[% END %]
+\deffootnote[3em]{0em}{4em}{\textsuperscript{\thefootnotemark}~}
+
 
 % avoid breakage on multiple <br><br> and avoid the next [] to be eaten
 \newcommand*{\forcelinebreak}{\strut\\*{}}
@@ -1018,17 +1036,11 @@ sub slides {
     my $slides =<<'LATEX';
 \documentclass[ignorenonframetext]{beamer}
 \usepackage{fontspec}
-\usepackage{polyglossia}
-\setmainfont{[% safe_options.mainfont %]}
-\setsansfont{[% safe_options.sansfont %]}
-\setmonofont[Scale=MatchLowercase]{[% safe_options.monofont %]}
+\setmainfont[Script=[% doc.font_script %]]{[% safe_options.mainfont %]}
+\setsansfont[Script=[% doc.font_script %],Scale=MatchLowercase]{[% safe_options.sansfont %]}
+\setmonofont[Script=[% doc.font_script %],Scale=MatchLowercase]{[% safe_options.monofont %]}
 \usetheme{[% safe_options.beamertheme %]}
 \usecolortheme{[% safe_options.beamercolortheme %]}
-\setmainlanguage{[% safe_options.lang %]}
-[% safe_options.mainlanguage_script %]
-[% IF safe_options.mainlanguage_toc_name %]
-\renewcaptionname{[% safe_options.lang %]}{\contentsname}{[% safe_options.mainlanguage_toc_name %]}
-[% END %]
 \usepackage{graphicx}
 \usepackage{alltt}
 \usepackage{verbatim}
@@ -1041,6 +1053,23 @@ sub slides {
 % Unclear if \protect  \hsout is needed. Doesn't looks so
 \DeclareRobustCommand{\sout}[1]{\texorpdfstring{\hsout{#1}}{#1}}
 \usepackage{wrapfig}
+
+\usepackage{polyglossia}
+\setmainlanguage{[% safe_options.lang %]}
+[% safe_options.mainlanguage_script %]
+[% IF safe_options.mainlanguage_toc_name %]
+\renewcaptionname{[% safe_options.lang %]}{\contentsname}{[% safe_options.mainlanguage_toc_name %]}
+[% END %]
+
+[% IF doc.is_bidi %]
+\usepackage{bidi}
+[% END %]
+[% IF doc.is_rtl %]
+\setbeamertemplate{frametitle}[default][right]
+[% END %]
+
+
+
 % remove the numbering
 \setcounter{secnumdepth}{-2}
 

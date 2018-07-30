@@ -12,7 +12,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -24,6 +24,7 @@ use warnings;
 use lib qw( . ./t ../inc ./inc );
 
 use Test::More;
+use Test::Fatal;
 use Test::TypeTiny;
 
 use Types::Standard -all, "slurpy";
@@ -156,6 +157,27 @@ should_fail({ foo => 4.2, bar => 6.66, baz => "x" }, $gazetteer);
 should_fail({ foo => undef, baz => "x" }, $gazetteer);
 should_fail({ baz => "x" }, $gazetteer);
 
+my $gazetteer2 = Dict[ foo => Int, bar => Optional[Int], slurpy Map[StrMatch[qr/^...$/], Num] ];
+should_pass({ foo => 99, jjj => '2.2' }, $gazetteer2);
+should_fail({ jjj => '2.2' }, $gazetteer2);
+should_fail({ foo => 99, jjjj => '2.2' }, $gazetteer2);
+
+subtest slurpy_coderef_thing => sub
+{
+	my $allow_extras = 1;
+	my $type = Tuple[Int, slurpy sub { $allow_extras }];
+
+	isa_ok($type->parameters->[-1]{slurpy}, 'Type::Tiny');
+
+	should_pass([1], $type);
+	should_pass([1, "extra"], $type);
+	
+	$allow_extras = 0;
+	
+	should_pass([1], $type);
+	should_fail([1, "extra"], $type);
+};
+
 subtest my_dict_is_slurpy => sub
 {
 	ok(!$struct5->my_dict_is_slurpy, 'On a non-slurpy Dict');
@@ -250,6 +272,40 @@ subtest my_hashref_allows_value => sub
 	ok((Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_value(bar => 42), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] allows key "bar" with value 42');
 	ok((Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_value(21, 42), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] allows key "21" with value 42');
 	ok(!(Dict[bar=>Int, slurpy Map[Int,Int]])->create_child_type->my_hashref_allows_value(baz => 42), 'A child of Dict[bar=>Int,slurpy Map[Int,Int]] disallows key "baz" with value 42');
+};
+
+subtest "Invalid parameters" => sub {
+	my $e;
+	$e = exception { ScalarRef[1] };
+	like($e, qr/Parameter to ScalarRef\[\`a\] expected to be a type constraint/, 'ScalarRef[INVALID]');
+	$e = exception { ArrayRef[1] };
+	like($e, qr/Parameter to ArrayRef\[\`a\] expected to be a type constraint/, 'ArrayRef[INVALID]');
+	$e = exception { HashRef[1] };
+	like($e, qr/Parameter to HashRef\[\`a\] expected to be a type constraint/, 'HashRef[INVALID]');
+	$e = exception { Map[1, Str] };
+	like($e, qr/First parameter to Map\[\`k,\`v\] expected to be a type constraint/, 'Map[INVALID, Str]');
+	$e = exception { Map[Str, 1] };
+	like($e, qr/Second parameter to Map\[\`k,\`v\] expected to be a type constraint/, 'Map[Str, INVALID]');
+	$e = exception { Tuple[1] };
+	like($e, qr/Parameters to Tuple\[\.\.\.] expected to be type constraints/, 'Tuple[INVALID]');
+	$e = exception { Tuple[Str, slurpy 42] };
+	like($e, qr/Slurpy parameter to Tuple\[\.\.\.] expected to be a type constraint/, 'Tuple[Str, slurpy INVALID]');
+	$e = exception { Tuple[Optional[Str], Str] };
+	like($e, qr/Optional parameters to Tuple\[\.\.\.] cannot precede required parameters/, 'Tuple[Optional[Str], Str]');
+	$e = exception { CycleTuple[1] };
+	like($e, qr/Parameters to CycleTuple\[\.\.\.] expected to be type constraints/, 'CycleTuple[INVALID]');
+	$e = exception { CycleTuple[Optional[Str]] };
+	like($e, qr/Parameters to CycleTuple\[\.\.\.] cannot be optional/, 'CycleTuple[Optional[Str]]');
+	$e = exception { CycleTuple[slurpy Str] };
+	like($e, qr/Parameters to CycleTuple\[\.\.\.] cannot be slurpy/, 'CycleTuple[slurpy Str]');
+	$e = exception { Dict[1] };
+	like($e, qr/Expected even-sized list/, 'Dict[INVALID]');
+	$e = exception { Dict[[], Str] };
+	like($e, qr/Key for Dict\[\.\.\.\] expected to be string/, 'Dict[INVALID => Str]');
+	$e = exception { Dict[foo => 1] };
+	like($e, qr/Parameter for Dict\[\.\.\.\] with key 'foo' expected to be a type constraint/, 'Dict[foo => INVALID]');
+	$e = exception { Dict[foo => Str, slurpy 42] };
+	like($e, qr/Slurpy parameter to Dict\[\.\.\.] expected to be a type constraint/, 'Dict[foo => Str, slurpy INVALID]');
 };
 
 done_testing;

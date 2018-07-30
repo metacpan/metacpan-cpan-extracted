@@ -19,3 +19,6 @@ t/03moo.t
 t/04mouse.t
 t/05multihas.t
 t/06multiattr.t
+t/07lazy.t
+t/08rolebuildersub.t
+t/09undefbare.t

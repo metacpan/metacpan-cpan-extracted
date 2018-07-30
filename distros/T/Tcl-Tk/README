@@ -3,24 +3,31 @@ NAME
 
 DESCRIPTION
     
-    The Tcl::Tk extension (not to be confused with the "native" perl5
-    Perl/Tk extension) provides a raw but complete interface to the whole
-    of Tk via the Tcl extension.
+The Tcl::Tk extension (not to be confused with the "native" perl5 Perl/Tk
+extension) provides a raw but complete interface to the whole of Tk via the Tcl
+extension.
 
-    Have incomplete but quite much support for perlTk syntax (i.e. you can use
-    perlTk syntax to use create Tcl/Tk GUI from perl), and existing Tcl/Tk GUI
-    could be embedded to Perl without extra coding, including pure-Tcl widgets
-    and any widgets that exist in you current Tcl/Tk.
+Tcl::Tk is pure-perl, with all binary bindings offloaded to Tcl perl module.
 
-Build in the usual way for a perl extension:
+Tcl::Tk has full support for perl/Tk syntax. This does not mean 100%
+compatibility though. perl/Tk syntax is taken, but it is not followed when it 
+is not tcl/tk compatible. Do not expect full perl/tk compatibility, just use
+the same syntax.
+
+This approach allows you to intermix tcl/tk and perl/tk code, for example you
+can use pure-tcl to create entire GUI and then use perl/Tk syntax to access
+individual widgets. This also allows you to design GUI with any tcl/tk GUI
+designer.
+
+Build the module in the usual way for a perl extension:
 
    perl Makefile.PL
    make
    make test
    make install
 
-In some rare cases you may want to pass some parameters to Makefile.PL, you
-may see some explanations on them with
+In some rare cases you may want to pass some parameters to Makefile.PL.
+You can see some explanations on these with
 
    perl Makefile.PL --help
 

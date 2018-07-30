@@ -7,7 +7,7 @@ $ENV{AUTHOR_TESTING} && eval { require Test::NoWarnings };
 
 BEGIN {
     @MAIN::methods =
-      qw(html style min_length min_pre min_post output_xml default_lang default_included classes_included classes_excluded hyphenated);
+      qw(html style min_length min_pre min_post default_lang default_included classes_included classes_excluded hyphenated);
     plan tests => ( 4 + @MAIN::methods ) + 1;
     ok(1);
     use_ok('HTML::Hyphenate');

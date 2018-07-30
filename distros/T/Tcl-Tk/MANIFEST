@@ -1,6 +1,5 @@
 TODO
 Changes		changes file
-ChangeLog	detailed ChangeLog file
 test-for-tk.tcl	check if existing Tcl/Tk installation fits
 MANIFEST	This list of files
 Makefile.PL	Tcl::Tk extension makefile writer

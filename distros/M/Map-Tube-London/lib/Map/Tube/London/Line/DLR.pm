@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::DLR;
 
-$Map::Tube::London::Line::DLR::VERSION   = '1.09';
+$Map::Tube::London::Line::DLR::VERSION   = '1.13';
 $Map::Tube::London::Line::DLR::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::DLR - London Tube Map: Dockland Light Railway Line.
 
 =head1 VERSION
 
-Version 1.09
+Version 1.13
 
 =head1 DESCRIPTION
 
@@ -79,29 +79,26 @@ London Tube Map: Dockland Light Railway Line.
 =item * The station "Bank" is also part of
           L<Central Line|Map::Tube::London::Line::Central>
         | L<Northern Line|Map::Tube::London::Line::Northern>
-        | L<Waterloo & City Line|Map::Tube::London::Line::WaterlooCity>.
-
-=item * The station "Canning Town" is also part of
-          L<Jubilee Line|Map::Tube::London::Line::Jubilee>.
+        | L<Waterloo & City Line|Map::Tube::London::Line::WaterlooCity>
 
 =item * The station "Canary Wharf" is also part of
-          L<Jubilee Line|Map::Tube::London::Line::Jubilee>.
+          L<Jubilee Line|Map::Tube::London::Line::Jubilee>
 
-=item * The station "Monument" is also part of
-          L<District Line|Map::Tube::London::Line::District>.
+=item * The station "Canning Town" is also part of
+          L<Jubilee Line|Map::Tube::London::Line::Jubilee>
+
+=item * The station "Shadwell" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
 
 =item * The station "Stratford" is also part of
           L<Central Line|Map::Tube::London::Line::Central>
         | L<Jubilee Line|Map::Tube::London::Line::Jubilee>
-        | L<London Overground Line|Map::Tube::London::Line::Overground>.
-
-=item * The station "Shadwell" is also part of
-          L<London Overground Line|Map::Tube::London::Line::Overground>.
+        | L<Overground Line|Map::Tube::London::Line::Overground>
 
 =item * The station "West Ham" is also part of
           L<District Line|Map::Tube::London::Line::District>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
         | L<Jubilee Line|Map::Tube::London::Line::Jubilee>
-        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>.
 
 =back
 

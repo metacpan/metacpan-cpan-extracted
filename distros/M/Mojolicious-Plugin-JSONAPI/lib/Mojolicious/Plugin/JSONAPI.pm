@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::JSONAPI;
-$Mojolicious::Plugin::JSONAPI::VERSION = '2.0';
+$Mojolicious::Plugin::JSONAPI::VERSION = '2.1';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use JSONAPI::Document;
@@ -211,7 +211,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 =head1 VERSION
 
-version 2.0
+version 2.1
 
 =head1 SYNOPSIS
 
@@ -269,7 +269,7 @@ version 2.0
 =head1 DESCRIPTION
 
 This module intends to supply the user with helper methods that can be used to build a JSON API
-compliant Mojolicious server. It helps create routes for your resources that conform with the
+compliant API using Mojolicious. It helps create routes for your resources that conform with the
 specification, along with supplying helper methods to use when responding to requests.
 
 See L<http://jsonapi.org/> for the JSON API specification. At the time of writing, the version was 1.0.
@@ -311,7 +311,7 @@ version (e.g. "post" -> "posts") automatically where necessary.
 
 =item C<controller I<Str>>
 
-The controller name where the actions are to be stored. Defaults to "api-{resource}", where
+The controller name where the actions are to be stored. Defaults to C<api-{resource}>, where
 resource is in its pluralised form.
 
 Routes will point to controller actions, the names of which follow the pattern C<{http_method}_{resource}>, with
@@ -343,7 +343,7 @@ Specifying C<relationships> will create additional routes that fall under the re
 
 B<NOTE>: Your relationships should be in the correct form (singular/plural) based on the relationship in your
 schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
-sure comments is passed in as a plural noun.
+sure comments is passed in as a plural noun here.
 
 =back
 

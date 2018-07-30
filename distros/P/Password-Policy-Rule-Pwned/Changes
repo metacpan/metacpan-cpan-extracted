@@ -1,0 +1,23 @@
+0.01 2018-07-26
+
+ - Test versions of all modules
+ - Set release_status from version format
+
+0.00_03 2018-07-20
+
+ - More extensive POD
+ - Meta Data has explicit versions of all packages
+ - Set release_status to testing
+
+0.00_02 2018-07-18
+
+ - Test suite: utf-8 passwords and new exception tested
+ - New Exception class PwnedError to be thrown when API is down/unreachable
+
+0.00_01 2018-06-15
+
+ - Add missing package statement
+
+0.00 2018-06-13
+
+ - Initial release

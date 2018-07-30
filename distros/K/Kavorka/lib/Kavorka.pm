@@ -14,7 +14,7 @@ use Sub::Util ();
 package Kavorka;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.038';
+our $VERSION   = '0.039';
 
 our @ISA         = qw( Exporter::Tiny );
 our @EXPORT      = qw( fun method );

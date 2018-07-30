@@ -72,34 +72,41 @@
      EVAL = 288,
      WEAKEN = 289,
      PRECOMPILE = 290,
-     UNDEF = 291,
-     VOID = 292,
-     BYTE = 293,
-     SHORT = 294,
-     INT = 295,
-     LONG = 296,
-     FLOAT = 297,
-     DOUBLE = 298,
-     STRING = 299,
-     OBJECT = 300,
-     SPECIAL_ASSIGN = 301,
-     ASSIGN = 302,
-     OR = 303,
-     AND = 304,
-     BIT_XOR = 305,
-     BIT_OR = 306,
-     BIT_AND = 307,
-     REL = 308,
-     SHIFT = 309,
-     REMAINDER = 310,
-     DIVIDE = 311,
-     MULTIPLY = 312,
-     UMINUS = 313,
-     SCALAR = 314,
-     NOT = 315,
-     DEC = 316,
-     INC = 317,
-     ARROW = 318
+     DEREF = 291,
+     UNDEF = 292,
+     VOID = 293,
+     BYTE = 294,
+     SHORT = 295,
+     INT = 296,
+     LONG = 297,
+     FLOAT = 298,
+     DOUBLE = 299,
+     STRING = 300,
+     OBJECT = 301,
+     BYTE_REF = 302,
+     SHORT_REF = 303,
+     INT_REF = 304,
+     LONG_REF = 305,
+     FLOAT_REF = 306,
+     DOUBLE_REF = 307,
+     SPECIAL_ASSIGN = 308,
+     ASSIGN = 309,
+     OR = 310,
+     AND = 311,
+     BIT_XOR = 312,
+     BIT_OR = 313,
+     BIT_AND = 314,
+     REL = 315,
+     SHIFT = 316,
+     REMAINDER = 317,
+     DIVIDE = 318,
+     MULTIPLY = 319,
+     UMINUS = 320,
+     SCALAR = 321,
+     NOT = 322,
+     DEC = 323,
+     INC = 324,
+     ARROW = 325
    };
 #endif
 /* Tokens.  */
@@ -136,34 +143,41 @@
 #define EVAL 288
 #define WEAKEN 289
 #define PRECOMPILE 290
-#define UNDEF 291
-#define VOID 292
-#define BYTE 293
-#define SHORT 294
-#define INT 295
-#define LONG 296
-#define FLOAT 297
-#define DOUBLE 298
-#define STRING 299
-#define OBJECT 300
-#define SPECIAL_ASSIGN 301
-#define ASSIGN 302
-#define OR 303
-#define AND 304
-#define BIT_XOR 305
-#define BIT_OR 306
-#define BIT_AND 307
-#define REL 308
-#define SHIFT 309
-#define REMAINDER 310
-#define DIVIDE 311
-#define MULTIPLY 312
-#define UMINUS 313
-#define SCALAR 314
-#define NOT 315
-#define DEC 316
-#define INC 317
-#define ARROW 318
+#define DEREF 291
+#define UNDEF 292
+#define VOID 293
+#define BYTE 294
+#define SHORT 295
+#define INT 296
+#define LONG 297
+#define FLOAT 298
+#define DOUBLE 299
+#define STRING 300
+#define OBJECT 301
+#define BYTE_REF 302
+#define SHORT_REF 303
+#define INT_REF 304
+#define LONG_REF 305
+#define FLOAT_REF 306
+#define DOUBLE_REF 307
+#define SPECIAL_ASSIGN 308
+#define ASSIGN 309
+#define OR 310
+#define AND 311
+#define BIT_XOR 312
+#define BIT_OR 313
+#define BIT_AND 314
+#define REL 315
+#define SHIFT 316
+#define REMAINDER 317
+#define DIVIDE 318
+#define MULTIPLY 319
+#define UMINUS 320
+#define SCALAR 321
+#define NOT 322
+#define DEC 323
+#define INC 324
+#define ARROW 325
 
 
 

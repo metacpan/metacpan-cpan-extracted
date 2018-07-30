@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Types::Common::Numeric::AUTHORITY = 'cpan:TOBYINK';
-	$Types::Common::Numeric::VERSION   = '1.002002';
+	$Types::Common::Numeric::VERSION   = '1.004002';
 }
 
 use Type::Library -base, -declare => qw(
@@ -19,10 +19,13 @@ use Type::Library -base, -declare => qw(
 	NegativeNum NegativeOrZeroNum
 	NegativeInt NegativeOrZeroInt
 	SingleDigit
+	NumRange IntRange
 );
 
 use Type::Tiny ();
-use Types::Standard qw( Num Int );
+use Types::Standard qw( Num Int Bool );
+
+sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 my $meta = __PACKAGE__->meta;
 
@@ -44,7 +47,8 @@ $meta->add_type(
 
 my ($pos_int, $posz_int);
 if (Type::Tiny::_USE_XS) {
-	$pos_int  = Type::Tiny::XS::get_coderef_for('PositiveInt');
+	$pos_int  = Type::Tiny::XS::get_coderef_for('PositiveInt')
+		if Type::Tiny::XS->VERSION >= 0.013; # fixed bug with "00"
 	$posz_int = Type::Tiny::XS::get_coderef_for('PositiveOrZeroInt');
 }
 
@@ -118,6 +122,77 @@ $meta->add_type(
 	message    => sub { "Must be a single digit" },
 );
 
+for my $base (qw/Num Int/) {
+	$meta->add_type(
+		name       => "${base}Range",
+		parent     => Types::Standard->get_type($base),
+		constraint_generator => sub {
+			return $meta->get_type("${base}Range") unless @_;
+			
+			my $base = Types::Standard->get_type($base);
+			
+			my ($min, $max, $min_excl, $max_excl) = @_;
+			!defined($min) or $base->check($min) or _croak("${base}Range min must be a %s; got %s", lc($base), $min);
+			!defined($max) or $base->check($max) or _croak("${base}Range max must be a %s; got %s", lc($base), $max);
+			!defined($min_excl) or Bool->check($min_excl) or _croak("${base}Range minexcl must be a boolean; got $min_excl");
+			!defined($max_excl) or Bool->check($max_excl) or _croak("${base}Range maxexcl must be a boolean; got $max_excl");
+			
+			# this is complicated so defer to the inline generator
+			eval sprintf(
+				'sub { %s }',
+				join ' and ',
+					grep defined,
+					$meta->get_type("${base}Range")->inline_generator->(@_)->(undef, '$_[0]'),
+			);
+		},
+		inline_generator => sub {
+			my ($min, $max, $min_excl, $max_excl) = @_;
+			
+			my $gt = $min_excl ? '>' : '>=';
+			my $lt = $max_excl ? '<' : '<=';
+			
+			return sub {
+				my $v = $_[1];
+				my @code = (undef); # parent constraint
+				push @code, "$v $gt $min";
+				push @code, "$v $lt $max" if defined $max;
+				return @code;
+			};
+		},
+		deep_explanation => sub {
+			my ($type, $value, $varname) = @_;
+			my ($min, $max, $min_excl, $max_excl) = @{ $type->parameters || [] };
+			my @whines;
+			if (defined $max) {
+				push @whines, sprintf(
+					'"%s" expects %s to be %s %d and %s %d',
+					$type,
+					$varname,
+					$min_excl ? 'greater than' : 'at least',
+					$min,
+					$max_excl ? 'less than' : 'at most',
+					$max,
+				);
+			}
+			else {
+				push @whines, sprintf(
+					'"%s" expects %s to be %s %d',
+					$type,
+					$varname,
+					$min_excl ? 'greater than' : 'at least',
+					$min,
+				);
+			}
+			push @whines, sprintf(
+				"length(%s) is %d",
+				$varname,
+				length($value),
+			);
+			return \@whines;
+		},
+	);
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -166,10 +241,49 @@ L<MooseX::Types::Common::Numeric>.
 
 =item C<SingleDigit>
 
-=back
-
 C<SingleDigit> interestingly accepts the numbers -9 to -1; not
 just 0 to 9. 
+
+=back
+
+This module also defines an extra pair of type constraints not found in
+L<MooseX::Types::Common::Numeric>.
+
+=over
+
+=item C<< IntRange[`min, `max] >>
+
+Type constraint for an integer between min and max. For example:
+
+  IntRange[1, 10]
+
+The maximum can be omitted.
+
+  IntRange[10]   # at least 10
+
+The minimum and maximum are inclusive.
+
+=item C<< NumRange[`min, `max] >>
+
+Type constraint for a number between min and max. For example:
+
+  NumRange[0.1, 10.0]
+
+As with IntRange, the maximum can be omitted, and the minimum and maximum
+are inclusive.
+
+Exclusive ranges can be useful for non-integer values, so additional parameters
+can be given to make the minimum and maximum exclusive.
+
+  NumRange[0.1, 10.0, 0, 0]  # both inclusive
+  NumRange[0.1, 10.0, 0, 1]  # exclusive maximum, so 10.0 is invalid
+  NumRange[0.1, 10.0, 1, 0]  # exclusive minimum, so 0.1 is invalid
+  NumRange[0.1, 10.0, 1, 1]  # both exclusive
+
+Making one of the limits exclusive means that a C<< < >> or C<< > >> operator
+will be used instead of the usual C<< <= >> or C<< >= >> operators.
+
+=back
 
 =head1 BUGS
 
@@ -190,7 +304,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

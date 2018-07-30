@@ -38,7 +38,7 @@ sub setup {
     $source = abs_path("$base/$source");
     $target = abs_path("$base/$target");
     $tests = abs_path("$base/$tests");
-    die "'#{source}' directory does not exist"
+    die "'$source' directory does not exist"
         unless -e $source;
     mkdir $target unless -d $target;
     mkdir $tests unless -d $tests;

@@ -27,9 +27,8 @@
       },
       "runtime" : {
          "requires" : {
-            "HTML::Entities" : "0",
-            "HTML::TreeBuilder" : "0",
             "Log::Log4perl" : "0",
+            "Mojo::DOM" : "0",
             "Moose" : "0",
             "Readonly" : "1.03",
             "Set::Scalar" : "0",
@@ -54,7 +53,7 @@
    "provides" : {
       "HTML::Hyphenate" : {
          "file" : "lib/HTML/Hyphenate.pm",
-         "version" : "0.101"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
@@ -66,6 +65,6 @@
          "url" : "https://github.com/ipenburg/HTML-Hyphenate"
       }
    },
-   "version" : "0.101",
+   "version" : "v1.0.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

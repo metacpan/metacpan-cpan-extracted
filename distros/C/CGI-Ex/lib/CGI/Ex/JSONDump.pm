@@ -7,7 +7,7 @@ CGI::Ex::JSONDump - Comprehensive data to JSON dump.
 =cut
 
 ###----------------------------------------------------------------###
-#  Copyright 2006-2017 - Paul Seamons                                #
+#  Copyright - Paul Seamons                                          #
 #  Distributed under the Perl Artistic License without warranty      #
 ###----------------------------------------------------------------###
 
@@ -17,7 +17,7 @@ use strict;
 use base qw(Exporter);
 
 BEGIN {
-    $VERSION = '2.45';
+    $VERSION = '2.46';
 
     @EXPORT = qw(JSONDump);
     @EXPORT_OK = @EXPORT;

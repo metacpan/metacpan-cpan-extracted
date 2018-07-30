@@ -12,7 +12,7 @@ use Params::Validate qw(:types validate);
 use Math::Calc::Units;
 
 # Remember to update Monitoring::Plugins as well
-our $VERSION = "0.39";
+our $VERSION = "0.40";
 
 our @STATUS_CODES = qw(OK WARNING CRITICAL UNKNOWN DEPENDENT);
 
@@ -118,7 +118,10 @@ sub plugin_exit {
 
     # Setup output
     my $output = "$STATUS_TEXT{$code}";
-    $output .= " - $message" if defined $message && $message ne '';
+    if (defined $message && $message ne '') {
+        $output .= " - " unless $message =~ /^\s*\n/mxs;
+        $output .= $message;
+    }
     my $shortname = ($arg->{plugin} ? $arg->{plugin}->shortname : undef);
     $shortname ||= get_shortname(); # Should happen only if funnctions are called directly
     $output = "$shortname $output" if $shortname;

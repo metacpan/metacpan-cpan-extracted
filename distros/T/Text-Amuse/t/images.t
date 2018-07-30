@@ -4,7 +4,7 @@ use utf8;
 use Test::More;
 use Text::Amuse::Output::Image;
 
-plan tests => 35;
+plan tests => 47;
 my ($image, $ltx, $html);
 
 $image = Text::Amuse::Output::Image->new(
@@ -166,4 +166,35 @@ eval {
 ok($@, "Exception raised with wrong width: $@");
 
 
+
+$image = Text::Amuse::Output::Image->new(
+                                         filename => 'test.png',
+                                         wrap  => 'l',
+                                        );
+
+ok($image->wrap, "wrap ok");
+is($image->width, "0.50", "width ok");
+is($image->width_html, "50%", "html width ok");
+is($image->width_latex, "0.50\\textwidth", "LaTeX width ok");
+
+$image = Text::Amuse::Output::Image->new(
+                                         filename => 'test.png',
+                                         wrap  => 'r',
+                                        );
+
+ok($image->wrap, "wrap ok");
+is($image->width, "0.50", "width ok");
+is($image->width_html, "50%", "html width ok");
+is($image->width_latex, "0.50\\textwidth", "LaTeX width ok");
+
+
+$image = Text::Amuse::Output::Image->new(
+                                         filename => 'test.png',
+                                         wrap  => 'f',
+                                        );
+
+ok($image->wrap, "wrap ok");
+is($image->width, "1", "width ok");
+is($image->width_html, "100%", "html width ok");
+is($image->width_latex, "\\textwidth", "LaTeX width ok");
 

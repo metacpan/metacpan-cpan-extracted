@@ -44,7 +44,7 @@ test_file($file_no_toc, {
           qr/DIV=9/,
           qr/fontsize=11pt/,
           qr/mainlanguage\{croatian\}/,
-          qr/\\setmainfont\{CMU Serif\}/,
+          qr/\\setmainfont\[Script=Latin\]\{CMU Serif\}/,
           qr/paper=5.5in:8.5in/,
           qr/\\end\{titlepage\}\s*\\cleardoublepage/s,
           qr/document\}\s*\\hyphenation\{\s*a-no-ther\ste-st\s*}/s,
@@ -73,7 +73,7 @@ test_file($file_no_toc, {
                          twoside => 1,
                         }, [
           qr/\\end\{center\}\s*\\vskip 3em\s*\\par\s*\w/s,
-          qr/\\setmainfont\{Iwona\}/,
+          qr/\\setmainfont\[Script=Latin\]\{Iwona\}/,
           qr/\n\s+twoside\,\%\n/s,
           qr/BCOR=0mm/,
           qr/ifthispageodd/,

@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$Error::TypeTiny::AUTHORITY = 'cpan:TOBYINK';
-	$Error::TypeTiny::VERSION   = '1.002002';
+	$Error::TypeTiny::VERSION   = '1.004002';
 }
 
 use overload
@@ -17,23 +17,44 @@ use overload
 
 our %CarpInternal;
 $CarpInternal{$_}++ for qw(
-	Eval::TypeTiny
-	Eval::TypeTiny::Sandbox
+	Types::Standard::_Stringable
 	Exporter::Tiny
+	Eval::TypeTiny::Sandbox
+	
+	Devel::TypeTiny::Perl56Compat
+	Devel::TypeTiny::Perl58Compat
+	Error::TypeTiny
+	Error::TypeTiny::Assertion
+	Error::TypeTiny::Compilation
+	Error::TypeTiny::WrongNumberOfParameters
+	Eval::TypeTiny
+	Reply::Plugin::TypeTiny
 	Test::TypeTiny
 	Type::Coercion
+	Type::Coercion::FromMoose
 	Type::Coercion::Union
-	Error::TypeTiny
 	Type::Library
 	Type::Params
+	Type::Parser
 	Type::Registry
+	Types::Common::Numeric
+	Types::Common::String
 	Types::Standard
-	Types::Standard::_Stringable
+	Types::Standard::ArrayRef
+	Types::Standard::CycleTuple
+	Types::Standard::Dict
+	Types::Standard::HashRef
+	Types::Standard::Map
+	Types::Standard::ScalarRef
+	Types::Standard::StrMatch
+	Types::Standard::Tied
+	Types::Standard::Tuple
 	Types::TypeTiny
 	Type::Tiny
 	Type::Tiny::Class
 	Type::Tiny::Duck
 	Type::Tiny::Enum
+	Type::Tiny::_HalfOp
 	Type::Tiny::Intersection
 	Type::Tiny::Role
 	Type::Tiny::Union
@@ -52,10 +73,11 @@ sub throw
 	my $class = shift;
 	
 	my ($level, @caller, %ctxt) = 0;
-	while (
-		defined scalar caller($level) and $CarpInternal{scalar caller($level)}
-	) { $level++ };
-	if ( ((caller($level - 1))[1]||"") =~ /^parameter validation for '(.+?)'$/ )
+	while (do {
+		my $caller = caller $level;
+		defined $caller and $CarpInternal{$caller};
+	}) { $level++ };
+	if ( ((caller($level - 1))[1]||"") =~ /^(?:parameter validation for|exportable function) '(.+?)'$/ )
 	{
 		my ($pkg, $func) = ($1 =~ m{^(.+)::(\w+)$});
 		$level++ if caller($level) eq ($pkg||"");
@@ -268,7 +290,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

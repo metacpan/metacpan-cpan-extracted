@@ -350,6 +350,25 @@ int pl_set_global_or_property(pTHX_ V8Context* ctx, const char* name, SV* value)
     return ret;
 }
 
+int pl_del_global_or_property(pTHX_ V8Context* ctx, const char* name)
+{
+    int ret = 0;
+
+    HandleScope handle_scope(ctx->isolate);
+    Local<Context> context = Local<Context>::New(ctx->isolate, *ctx->persistent_context);
+    Context::Scope context_scope(context);
+
+    Local<Object> parent;
+    Local<Value> slot;
+    bool found = find_parent(ctx, name, context, parent, slot);
+    if (found) {
+        parent->Delete(slot);
+        ret = 1;
+    }
+
+    return ret;
+}
+
 SV* pl_exists_global_or_property(pTHX_ V8Context* ctx, const char* name)
 {
     SV* ret = &PL_sv_no; /* return false by default */

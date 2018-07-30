@@ -15,7 +15,7 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => '0',
     },
     BUILD_REQUIRES => {
-        'Test::More'          => 0.87, # done_testing + subtest
+        'Test::More'          => 0.98, # done_testing + subtest
     },
     PREREQ_PM => {
         'Scalar::Util'        => 1.14, # set_prototype

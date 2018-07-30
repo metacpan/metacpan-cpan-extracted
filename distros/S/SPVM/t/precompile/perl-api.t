@@ -17,6 +17,9 @@ use FindBin;
 
 use SPVM 'TestCase'; my $use_test_line = __LINE__;
 
+use SPVM 'TestCase::PerlAPI';
+use SPVM 'TestCase::Point_i3';
+
 my $BYTE_MAX = 127;
 my $BYTE_MIN = -128;
 my $SHORT_MAX = 32767;
@@ -30,6 +33,44 @@ my $DOUBLE_PRECICE = 65536.5;
 
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
+
+# Object
+{
+  # Create object
+  {
+    my $object = TestCase->new();
+    $object->set_x_int_array(SPVM::new_int_array([$INT_MAX, $INT_MAX]));
+    my $sp_values = SPVM::new_byte_array_len(3);
+    $sp_values->set_bin("abc");
+    $object->set_x_string($sp_values);
+    ok(TestCase::PerlAPI->spvm_object_set_object($object));
+  }
+  # Create object
+  {
+    my $object = TestCase->new();
+    $object->set_x_byte($BYTE_MAX);
+    $object->set_x_short($SHORT_MAX);
+    $object->set_x_int($INT_MAX);
+    $object->set_x_long($LONG_MAX);
+    $object->set_x_float($FLOAT_PRECICE);
+    $object->set_x_double($DOUBLE_PRECICE);
+    $object->set_x_int_array(SPVM::new_int_array([1, 2, 3, 4]));
+    $object->set_x_string(SPVM::new_byte_array_string("Hello"));
+    my $minimal = TestCase::Minimal->new;
+    $minimal->set_x(3);
+    $object->set_minimal($minimal);
+    
+    ok(TestCase::PerlAPI->spvm_object_set($object));
+    
+    is($object->get_x_byte,$BYTE_MAX);
+    is($object->get_x_short, $SHORT_MAX);
+    is($object->get_x_int, $INT_MAX);
+    is($object->get_x_long, $LONG_MAX);
+    is($object->get_x_float, $FLOAT_PRECICE);
+    is($object->get_x_double, $DOUBLE_PRECICE);
+    is($object->get_minimal->get_x, 3);
+  }
+}
 
 # time
 {
@@ -69,7 +110,7 @@ is_deeply(
     my $object2 = TestCase->new();
     $object2->set_x_int(2);
     $object_array->set_element(1, $object2);
-    ok(TestCase->spvm_new_object_array_len_element_object_array($object_array));
+    ok(TestCase::PerlAPI->spvm_new_object_array_len_element_object_array($object_array));
     
     my $object1_get = $object_array->get_element(0);
     my $object2_get = $object_array->get_element(1);
@@ -86,7 +127,7 @@ is_deeply(
     $object_array->set_element(0, $object1);
     my $object2 = SPVM::new_byte_array([4, 5, 6]);
     $object_array->set_element(1, $object2);
-    ok(TestCase->spvm_new_object_array_len_element_byte_array($object_array));
+    ok(TestCase::PerlAPI->spvm_new_object_array_len_element_byte_array($object_array));
     
     my $object1_get = $object_array->get_element(0);
     my $object2_get = $object_array->get_element(1);
@@ -102,7 +143,7 @@ is_deeply(
     $object_array->set_element(0, $object1);
     my $object2 = SPVM::new_short_array([4, 5, 6]);
     $object_array->set_element(1, $object2);
-    ok(TestCase->spvm_new_object_array_len_element_short_array($object_array));
+    ok(TestCase::PerlAPI->spvm_new_object_array_len_element_short_array($object_array));
     
     my $object1_get = $object_array->get_element(0);
     my $object2_get = $object_array->get_element(1);
@@ -118,7 +159,7 @@ is_deeply(
     $object_array->set_element(0, $object1);
     my $object2 = SPVM::new_int_array([4, 5, 6]);
     $object_array->set_element(1, $object2);
-    ok(TestCase->spvm_new_object_array_len_element_int_array($object_array));
+    ok(TestCase::PerlAPI->spvm_new_object_array_len_element_int_array($object_array));
     
     my $object1_get = $object_array->get_element(0);
     my $object2_get = $object_array->get_element(1);
@@ -134,7 +175,7 @@ is_deeply(
     $object_array->set_element(0, $object1);
     my $object2 = SPVM::new_long_array([4, 5, 6]);
     $object_array->set_element(1, $object2);
-    ok(TestCase->spvm_new_object_array_len_element_long_array($object_array));
+    ok(TestCase::PerlAPI->spvm_new_object_array_len_element_long_array($object_array));
     
     my $object1_get = $object_array->get_element(0);
     my $object2_get = $object_array->get_element(1);
@@ -150,7 +191,7 @@ is_deeply(
     $object_array->set_element(0, $object1);
     my $object2 = SPVM::new_float_array([4, 5, 6]);
     $object_array->set_element(1, $object2);
-    ok(TestCase->spvm_new_object_array_len_element_float_array($object_array));
+    ok(TestCase::PerlAPI->spvm_new_object_array_len_element_float_array($object_array));
     
     my $object1_get = $object_array->get_element(0);
     my $object2_get = $object_array->get_element(1);
@@ -166,7 +207,7 @@ is_deeply(
     $object_array->set_element(0, $object1);
     my $object2 = SPVM::new_double_array([4, 5, 6]);
     $object_array->set_element(1, $object2);
-    ok(TestCase->spvm_new_object_array_len_element_double_array($object_array));
+    ok(TestCase::PerlAPI->spvm_new_object_array_len_element_double_array($object_array));
     
     my $object1_get = $object_array->get_element(0);
     my $object2_get = $object_array->get_element(1);
@@ -181,45 +222,79 @@ is_deeply(
   {
     my $sp_values = SPVM::new_byte_array([0, 0]);
     $sp_values->set_element(1, $BYTE_MAX);
-    ok(TestCase->spvm_set_and_get_byte($sp_values));
+    ok(TestCase::PerlAPI->spvm_set_and_get_byte($sp_values));
     my $value = $sp_values->get_element(1);
     is($value, $BYTE_MAX);
   }
   {
     my $sp_values = SPVM::new_short_array([0, 0]);
     $sp_values->set_element(1, $SHORT_MAX);
-    ok(TestCase->spvm_set_and_get_short($sp_values));
+    ok(TestCase::PerlAPI->spvm_set_and_get_short($sp_values));
     my $value = $sp_values->get_element(1);
     is($value, $SHORT_MAX);
   }
   {
     my $sp_values = SPVM::new_int_array([0, 0]);
     $sp_values->set_element(1, $INT_MAX);
-    ok(TestCase->spvm_set_and_get_int($sp_values));
+    ok(TestCase::PerlAPI->spvm_set_and_get_int($sp_values));
     my $value = $sp_values->get_element(1);
     is($value, $INT_MAX);
   }
   {
     my $sp_values = SPVM::new_long_array([0, 0]);
     $sp_values->set_element(1, $LONG_MAX);
-    ok(TestCase->spvm_set_and_get_long($sp_values));
+    ok(TestCase::PerlAPI->spvm_set_and_get_long($sp_values));
     my $value = $sp_values->get_element(1);
     is($value, $LONG_MAX);
   }
   {
     my $sp_values = SPVM::new_float_array([0, 0]);
     $sp_values->set_element(1, $FLOAT_PRECICE);
-    ok(TestCase->spvm_set_and_get_float($sp_values));
+    ok(TestCase::PerlAPI->spvm_set_and_get_float($sp_values));
     my $value = $sp_values->get_element(1);
     is($value, $FLOAT_PRECICE);
   }
   {
     my $sp_values = SPVM::new_double_array([0, 0]);
     $sp_values->set_element(1, $DOUBLE_PRECICE);
-    ok(TestCase->spvm_set_and_get_double($sp_values));
+    ok(TestCase::PerlAPI->spvm_set_and_get_double($sp_values));
     my $value = $sp_values->get_element(1);
     is($value, $DOUBLE_PRECICE);
   }
+}
+
+# value_t array
+{
+  {
+    my $sp_values = SPVM::new_value_t_array_len("TestCase::Point_i3", 3);
+    $sp_values->set_element(1, {x => $INT_MIN, y => 1, z => 2});
+    ok(TestCase::PerlAPI->spvm_set_and_get_value_t_int($sp_values));
+    my $value = $sp_values->get_element(1);
+    is_deeply($value, {x => $INT_MIN, y => 1, z => 2});
+  }
+
+  {
+    my $values = [
+      {x => $INT_MIN, y => 1, z => 2},
+      {x => 3, y => 4, z => 5},
+      {x => 6, y => 7, z => 8},
+    ];
+    my $sp_values = SPVM::new_value_t_array("TestCase::Point_i3", $values);
+    $sp_values->set_elements($values);
+    ok(TestCase::PerlAPI->spvm_new_value_t_array_int($sp_values));
+    my $out_values = $sp_values->to_elements;
+    is_deeply($out_values, $values);
+  }
+
+  {
+    my $bin = pack('l9', ($INT_MIN, 1, 2), (3, 4, 5), (6, 7, 8));
+    my $sp_values = SPVM::new_value_t_array_len("TestCase::Point_i3", 3);
+    $sp_values->set_bin($bin);
+    ok(TestCase::PerlAPI->spvm_new_value_t_array_bin_int($sp_values));
+    my $out_bin = $sp_values->to_bin;
+    is_deeply($out_bin, $bin);
+  }
+
 }
 
 # SPVM Functions
@@ -332,57 +407,60 @@ is_deeply(
   {
     {
       my $sp_values = SPVM::new_byte_array_string("あ");
-      ok(TestCase->spvm_new_byte_array_string($sp_values));
+      ok(TestCase::PerlAPI->spvm_new_byte_array_string($sp_values));
     }
   }
   
   # new_xxx_array_bin
   {
     {
-      my $sp_values = SPVM::new_byte_array_bin("abc");
-      ok(TestCase->spvm_new_byte_array_bin($sp_values));
+      my $sp_values = SPVM::new_byte_array_len(3);
+      $sp_values->set_bin("abc");
+      ok(TestCase::PerlAPI->spvm_new_byte_array_bin($sp_values));
     }
     {
       my $bin = pack('c3', 97, 98, $BYTE_MAX);
-      
-      my $sp_values = SPVM::new_byte_array_bin($bin);
-      ok(TestCase->spvm_new_byte_array_bin_pack($sp_values));
+      my $sp_values = SPVM::new_byte_array_len(3);
+      $sp_values->set_bin($bin);
+      ok(TestCase::PerlAPI->spvm_new_byte_array_bin_pack($sp_values));
     }
     {
       my $bin = pack('c3', 97, 98, $BYTE_MAX);
-      
-      my $sp_values = SPVM::new_byte_array_bin($bin);
-      ok(TestCase->spvm_new_byte_array_bin_pack($sp_values));
+      my $sp_values = SPVM::new_byte_array_len(3);
+      $sp_values->set_bin($bin);
+      ok(TestCase::PerlAPI->spvm_new_byte_array_bin_pack($sp_values));
     }
     {
       my $bin = pack('s3', 97, 98, $SHORT_MAX);
       
-      my $sp_values = SPVM::new_short_array_bin($bin);
-      ok(TestCase->spvm_new_short_array_bin_pack($sp_values));
+      my $sp_values = SPVM::new_short_array_len(3);
+      $sp_values->set_bin($bin);
+      ok(TestCase::PerlAPI->spvm_new_short_array_bin_pack($sp_values));
     }
     {
       my $bin = pack('l3', 97, 98, $INT_MAX);
       
-      my $sp_values = SPVM::new_int_array_bin($bin);
-      ok(TestCase->spvm_new_int_array_bin_pack($sp_values));
+      my $sp_values = SPVM::new_int_array_len(3);
+      $sp_values->set_bin($bin);
+      ok(TestCase::PerlAPI->spvm_new_int_array_bin_pack($sp_values));
     }
     {
       my $bin = pack('q3', 97, 98, $LONG_MAX);
-      
-      my $sp_values = SPVM::new_long_array_bin($bin);
-      ok(TestCase->spvm_new_long_array_bin_pack($sp_values));
+      my $sp_values = SPVM::new_long_array_len(3);
+      $sp_values->set_bin($bin);
+      ok(TestCase::PerlAPI->spvm_new_long_array_bin_pack($sp_values));
     }
     {
       my $bin = pack('f3', 97, 98, $FLOAT_PRECICE);
-      
-      my $sp_values = SPVM::new_float_array_bin($bin);
-      ok(TestCase->spvm_new_float_array_bin_pack($sp_values));
+      my $sp_values = SPVM::new_float_array_len(3);
+      $sp_values->set_bin($bin);
+      ok(TestCase::PerlAPI->spvm_new_float_array_bin_pack($sp_values));
     }
     {
       my $bin = pack('d3', 97, 98, $DOUBLE_PRECICE);
-      
-      my $sp_values = SPVM::new_double_array_bin($bin);
-      ok(TestCase->spvm_new_double_array_bin_pack($sp_values));
+      my $sp_values = SPVM::new_double_array_len(3);
+      $sp_values->set_bin($bin);
+      ok(TestCase::PerlAPI->spvm_new_double_array_bin_pack($sp_values));
     }
   }
 }
@@ -446,6 +524,13 @@ is_deeply(
     is($values->to_string, "あいうえお");
   }
 }
+
+# Complex
+{
+  my $z3 = SPVM::CORE->cadd({re => 0.25, im => 0.5}, {re => 0.5, im => 0.125});
+  is_deeply($z3, {re => 0.75, im => 0.625});
+}
+
 
 # All object is freed
 my $end_memory_blocks_count = SPVM::get_memory_blocks_count();

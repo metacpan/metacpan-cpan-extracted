@@ -4,7 +4,6 @@ use local::lib qw( --no-create );
 
 use Capture::Tiny qw( capture );
 use Path::Iterator::Rule ();
-use Path::Tiny qw( path );
 use Test::More;
 use Test::TempDir::Tiny qw( tempdir );
 use Test::RequiresInternet (
@@ -13,27 +12,38 @@ use Test::RequiresInternet (
     'fastapi.metacpan.org'     => 443,
 );
 
+my $darkpan;
 my $dir;
 
 BEGIN {
-    $dir = tempdir();
+    use App::cpm::Resolver::02Packages ();
+    use Path::Tiny qw( path );
+
+    $darkpan = path('t/test-data/darkpan')->stringify;
+    $dir     = tempdir();
 }
 
 # Install in local lib even if it's already installed elsewhere. However, we
 # will add lazy to @INC *after* all of the other use statements, so that we
 # don't accidentally try to install any test deps here.
-use lazy ( '-L', $dir, '--reinstall', '-v' );
+use lazy (
+    '-L', $dir, '--workers', 1, '--resolver',
+    '02packages,' . $darkpan, $^V < 5.16 ? ( '--resolver', 'metadb' ) : (),
+    '--reinstall', '-v'
+);
 
+# Acme::CPANAuthors::Canadian has static_install enabled.  This may resolve
+# some issues with circular requires on CPAN Testers reports.
 my ($cb) = grep { ref $_ eq 'CODE' } @INC;
 my ( $stdout, $stderr, @result )
-    = capture { $cb->( undef, 'Try::Tiny' ) };
+    = capture { $cb->( undef, 'Local::StaticInstall' ) };
 like( $stderr, qr{installed}, 'module installed' );
 
 my $rule = Path::Iterator::Rule->new->file->nonempty;
 my $next = $rule->iter($dir);
 my $found;
 while ( defined( my $file = $next->() ) ) {
-    if ( $file =~ m{Tiny.pm\z} ) {
+    if ( $file =~ m{StaticInstall.pm\z} ) {
         $found = 1;
         last;
     }
@@ -53,18 +63,6 @@ if ( !$found ) {
     while ( defined( my $file = $next->() ) ) {
         diag $file;
     }
-}
-
-{
-    my ( $stdout, $stderr, @result ) = eval {
-        capture { $cb->( undef, 'Try::Tiny' ) }
-    };
-    like(
-        $stderr,
-        qr{Code in package "main" is attempting to load Try::Tiny from inside an eval, so we are not installing Try::Tiny},
-        'module not installed from inside an eval'
-    );
-    note $stderr;
 }
 
 done_testing();

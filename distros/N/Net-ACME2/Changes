@@ -1,5 +1,31 @@
 Revision history for Perl module Net::ACME2
 
+0.21 25 Jul 2018
+- Make LetsEncrypt.pm default to the production server.
+- Make LetsEncrypt.pm accept an “environment” to simplify testing.
+- Pass constructor arguments to the HOST() method.
+- Make tests flex ECDSA keys as strenuously as they flex RSA keys.
+- Add aviso about speed to the main POD.
+- Acknowledge need for XS-based TLS functionality. This module can’t run
+  “anywhere that Perl runs” because of this. :-(
+
+0.2 19 Jun 2018
+- BREAKING: poll_authorization() and poll_order() now return the object’s
+new status rather than boolean and no longer throw an exception on an
+unrecognized status.
+- finalize_order() now returns the object’s new status.
+- “http_01” challenges now have get_path() and get_content() methods.
+- “dns_01” challenges now have get_record_name() and get_record_value() methods.
+- Experimental support for the “tls-alpn-01” ACME challenge.
+- Most exceptions are now converted to Net::ACME::X::Generic or subclasses
+thereof. The remaining plain-string exceptions “really should not happen”.
+- Some unused logic (e.g., compact JWS serialization) is pruned away.
+- We no longer send undef/null values to newAccount.
+- Example scripts are a bit more refined.
+- More substantive tests are added.
+- Fix versioning issue with PAUSE. (Thanks to Dan Book for mentioning it.)
+- I now consider this to be a “beta” release.
+
 0.12 11 Jun 2018
 - Remove Types::Serialiser (thanks, Chris Novakovic!)
 

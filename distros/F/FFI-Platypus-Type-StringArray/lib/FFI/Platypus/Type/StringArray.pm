@@ -2,15 +2,18 @@ package FFI::Platypus::Type::StringArray;
 
 use strict;
 use warnings;
+use FFI::Platypus;
 
 # ABSTRACT: Platypus custom type for arrays of strings
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 use constant _incantation =>
   $^O eq 'MSWin32' && $Config::Config{archname} =~ /MSWin32-x64/
   ? 'Q'
   : 'L!';
+use constant _size_of_pointer => FFI::Platypus->new->sizeof('opaque');
+use constant _pointer_buffer => "P" . _size_of_pointer;
 
 my @stack;
 
@@ -32,6 +35,29 @@ sub perl_to_native_post
   ();
 }
 
+sub native_to_perl
+{
+  return unless defined $_[0];
+  my @list;
+  my $i=0;
+  while(1)
+  {
+    my $pointer_pointer = unpack(
+      _incantation,
+      unpack(
+        _pointer_buffer,
+        pack(
+          _incantation, $_[0]+_size_of_pointer*$i
+        )
+      )
+    );
+    last unless $pointer_pointer;
+    push @list, unpack('p', pack(_incantation, $pointer_pointer));
+    $i++;
+  }
+  \@list;
+}
+
 sub ffi_custom_type_api_1
 {
   # arg0 = class
@@ -39,48 +65,48 @@ sub ffi_custom_type_api_1
   # arg2 = array size
   # arg3 = default value
   my(undef, undef, $count, $default) = @_;
-  
+
   my $config = {
     native_type => 'opaque',
     perl_to_native => \&perl_to_native,
     perl_to_native_post => \&perl_to_native_post,
+    native_to_perl => \&native_to_perl,
   };
 
   if(defined $count)
   {
+    my $end = $count-1;
+
     $config->{perl_to_native} = sub {
-      my @list;
       my $incantation = '';
-      
-      foreach my $i (0..($count-1))
-      {
-        my $item = $_[0]->[$i];
-        if(defined $item)
-        {
-          push @list, $item;
-          $incantation .= 'P';
-        }
-        elsif(defined $default)
-        {
-          push @list, $default;
-          $incantation .= 'P';
-        }
-        else
-        {
-          push @list, 0;
-          $incantation .= _incantation;
-        }
-      }
-      
-      push @list, 0;
+
+      my @list = ((map {
+        defined $_
+          ? do { $incantation .= 'P'; $_ }
+          : defined $default
+            ? do { $incantation .= 'P'; $default }
+            : do { $incantation .= _incantation; 0 };
+      } @{ $_[0] }[0..$end]), 0);
+
       $incantation .= _incantation;
+
       my $pointers = pack $incantation, @list;
       my $array_pointer = unpack _incantation, pack 'P', $pointers;
       push @stack, [ \@list, $pointers ];
       $array_pointer;
     };
+
+    my $pointer_buffer = "P@{[ FFI::Platypus->new->sizeof('opaque') * $count ]}";
+    my $incantation_count = _incantation.$count;
+
+    $config->{native_to_perl} = sub {
+      return unless defined $_[0];
+      my @pointer_pointer = unpack($incantation_count, unpack($pointer_buffer, pack(_incantation, $_[0])));
+      [map { defined $_ ? $_ : $default } map { unpack('p', pack(_incantation, $_)) } @pointer_pointer];
+    };
+
   }
-  
+
   $config;
 }
 
@@ -98,7 +124,7 @@ FFI::Platypus::Type::StringArray - Platypus custom type for arrays of strings
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -118,13 +144,14 @@ In your C code:
 
 In your L<Platypus::FFI> code:
 
- use FFI::Platypus::Declare
-   'void',
-   [ '::StringArray' => 'string_array' ],
-   [ '::StringArray' => 'string_5' => 5 ];
+ use FFI::Platypus;
+
+ my $ffi = FFI::Platypus->new;
+ $ffi->load_custom_type('::StringArray' => 'string_array');
+ $ffi->load_custom_type('::StringArray' => 'string_5' => 5);
  
- attach takes_string_array => [string_array] => void;
- attach takes_fixed_string_array => [string_5] => void;
+ $ffi->attach(takes_string_array => ['string_array'] => 'void');
+ $ffi->attach(takes_fixed_string_array => ['string_5'] => 'void');
  
  my @list = qw( foo bar baz );
  
@@ -133,14 +160,43 @@ In your L<Platypus::FFI> code:
 
 =head1 DESCRIPTION
 
-This module provides a L<FFI::Platypus> custom type for arrays of 
-strings. The array is always NULL terminated.  It is not (yet) supported 
-as a return type.
+This module provides a L<FFI::Platypus> custom type for arrays of
+strings. The array is always NULL terminated.  Return types are supported!
 
-This custom type takes two optional arguments.  The first is the size of 
-arrays and the second is a default value to fill in any values that 
-aren't provided when the function is called.  If not default is provided 
+This custom type takes two optional arguments.  The first is the size of
+arrays and the second is a default value to fill in any values that
+aren't provided when the function is called.  If not default is provided
 then C<NULL> will be passed in for those values.
+
+=head1 SUPPORT
+
+If something does not work the way you think it should, or if you have a
+feature request, please open an issue on this project's GitHub Issue
+tracker:
+
+L<https://github.com/plicease/FFI-Platypus-Type-StringArray/issues>
+
+=head1 CONTRIBUTING
+
+If you have implemented a new feature or fixed a bug then you may make a
+pull request on this project's GitHub repository:
+
+L<https://github.com/plicease/FFI-Platypus-Type-StringArray/pulls>
+
+This project's GitHub issue tracker listed above is not Write-Only.  If
+you want to contribute then feel free to browse through the existing
+issues and see if there is something you feel you might be good at and
+take a whack at the problem.  I frequently open issues myself that I
+hope will be accomplished by someone in the future but do not have time
+to immediately implement myself.
+
+Another good area to help out in is documentation.  I try to make sure
+that there is good document coverage, that is there should be
+documentation describing all the public features and warnings about
+common pitfalls, but an outsider's or alternate view point on such
+things would be welcome; if you see something confusing or lacks
+sufficient detail I encourage documentation only pull requests to
+improve things.
 
 =head1 SEE ALSO
 
@@ -152,15 +208,13 @@ then C<NULL> will be passed in for those values.
 
 =back
 
-=cut
-
 =head1 AUTHOR
 
 Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Graham Ollis.
+This software is copyright (c) 2015, 2018 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

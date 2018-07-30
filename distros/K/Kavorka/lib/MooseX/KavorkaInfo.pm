@@ -15,7 +15,7 @@ use Sub::Util ();
 {
 	package MooseX::KavorkaInfo;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.038';
+	our $VERSION   = '0.039';
 	
 	sub import
 	{
@@ -36,7 +36,7 @@ use Sub::Util ();
 {
 	package MooseX::KavorkaInfo::Trait::Method;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.038';
+	our $VERSION   = '0.039';
 	
 	use Moose::Role;
 	
@@ -66,7 +66,7 @@ use Sub::Util ();
 {
 	package MooseX::KavorkaInfo::Trait::WrappedMethod;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.038';
+	our $VERSION   = '0.039';
 	
 	use Moose::Role;
 	with 'MooseX::KavorkaInfo::Trait::Method';

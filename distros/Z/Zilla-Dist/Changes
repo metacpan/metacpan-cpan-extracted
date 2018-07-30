@@ -1,3 +1,11 @@
+0.0.199 Sat Jul 28 14:14:43 PDT 2018
+ - Update required version of Dist::Zilla
+
+0.0.198 Fri Jul 27 11:36:54 PDT 2018
+ - Dist::Zilla::Plugin::TestML1Includer
+ - Add 5.28 to travis perl versions
+ - Update copyright year
+
 0.0.197 Fri Jun 22 21:15:15 MDT 2018
  - Add 5.26 to travis perl versions
 
@@ -34,7 +42,7 @@
  - Update prereq versions
 
 0.0.186 Thu Jan  1 00:00:27 PST 2015
- - Add copright year check
+ - Add copyright year check
  - Happy New Year 2015
 
 0.0.185 Wed Dec 31 21:24:14 PST 2014

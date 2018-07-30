@@ -3,10 +3,10 @@ local_testml_dir: ./testml
 test_file_prefix: testml-
 test_file_template: |
   use lib (-e 't' ? 't' : 'test'), 'inc';
-  use TestML;
+  use TestML1;
   use TestMLBridge;
 
-  TestML->new(
+  TestML1->new(
       testml => '[% file %]',
       bridge => 'TestMLBridge',
   )->run;

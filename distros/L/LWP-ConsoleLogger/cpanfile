@@ -12,6 +12,7 @@ requires "Module::Load::Conditional" => "0";
 requires "Moo" => "0";
 requires "MooX::StrictConstructor" => "0";
 requires "Parse::MIME" => "0";
+requires "Ref::Util" => "0";
 requires "String::Trim" => "0";
 requires "Sub::Exporter" => "0";
 requires "Term::Size::Any" => "0";
@@ -32,6 +33,7 @@ on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
   requires "HTML::FormatText::WithLinks" => "0";
+  requires "HTTP::CookieJar::LWP" => "0";
   requires "HTTP::Request" => "0";
   requires "Log::Dispatch::Array" => "0";
   requires "Path::Tiny" => "0";
@@ -70,5 +72,5 @@ on 'develop' => sub {
 };
 
 on 'develop' => sub {
-  recommends "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.005";
+  recommends "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.007";
 };

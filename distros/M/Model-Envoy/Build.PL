@@ -7,9 +7,12 @@ my $build = Module::Build->new(
     dist_version_from => 'lib/Model/Envoy.pm',
     dist_abstract     => 'A Moose Role that can be used to build a model layer that keeps business logic separate from your storage layer.',
     requires    => {
-        'perl'        => '5.18.2',
-        'Moose'       => '>= 2.2010',
-        'DBIx::Class' => '>= 0.082840',
+        'perl'           => '5.18.2',
+        'Moose'          => '>= 2.2010',
+        'DBIx::Class'    => '>= 0.082840',
+        'List::AllUtils' => '>=0.14',
+        'MooseX::Role::Parameterized' => '>=1.10',
+        'MooseX::ClassAttribute'      => '>=0.29',
     },
     configure_requires => {
       'Module::Build' => '>= 0.4211',
@@ -17,5 +20,6 @@ my $build = Module::Build->new(
     test_requires    => {
         'Test::More'        => '>= 1.302085',
         'Test::Exception'   => '>= 0.43',
+        'SQL::Translator'   => '>= 0.11018',
     },
 )->create_build_script;

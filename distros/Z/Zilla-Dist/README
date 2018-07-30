@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    This document describes Zilla::Dist version 0.0.197.
+    This document describes Zilla::Dist version 0.0.199.
 
 SYNOPSIS
 
@@ -221,6 +221,8 @@ NOTES
       * https://github.com/ingydotnet/dist-zilla-plugin-testbaseincluder-pm
 
       * https://github.com/ingydotnet/dist-zilla-plugin-testmlincluder-pm
+
+      * https://github.com/ingydotnet/dist-zilla-plugin-testml1includer-pm
 
       * https://github.com/ingydotnet/error-errors-pm
 

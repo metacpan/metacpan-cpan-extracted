@@ -3,6 +3,7 @@ abstract: 'lightweight form validation library'
 author:
   - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ gmail.com>'
 build_requires:
+  CGI: '>= 3.31, != 4.05, != 4.06, != 4.07, != 4.08'
   Test::Base::Less: '0'
   Test::More: '0.98'
   Test::Requires: '0.05'
@@ -10,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +30,7 @@ no_index:
 provides:
   FormValidator::Lite:
     file: lib/FormValidator/Lite.pm
-    version: '0.39'
+    version: '0.40'
   FormValidator::Lite::Constraint:
     file: lib/FormValidator/Lite/Constraint.pm
   FormValidator::Lite::Constraint::Date:
@@ -63,7 +64,6 @@ provides:
   FormValidator::Lite::Upload::PlackRequest:
     file: lib/FormValidator/Lite/Upload/PlackRequest.pm
 requires:
-  CGI: '>= 3.31, != 4.05, != 4.06, != 4.07, != 4.08'
   Class::Accessor::Lite: '0.05'
   Class::Load: '0.11'
   Email::Valid: '0'
@@ -75,7 +75,7 @@ resources:
   bugtracker: https://github.com/tokuhirom/FormValidator-Lite/issues
   homepage: https://github.com/tokuhirom/FormValidator-Lite
   repository: git://github.com/tokuhirom/FormValidator-Lite.git
-version: '0.39'
+version: '0.40'
 x_contributors:
   - 'Kan Fushihara <kan@mobilefactory.jp>'
   - 'fujiwara <fujiwara.shunichiro@gmail.com>'
@@ -94,5 +94,7 @@ x_contributors:
   - 'magai <xxmagai@gmail.com>'
   - 'Géraud CONTINSOUZAS <geraud@gcu.info>'
   - 'Syohei YOSHIDA <shohei.yoshida@dena.com>'
+  - 'oddmutou <n@o625.com>'
+  - 'Kang-min Liu <gugod@gugod.org>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

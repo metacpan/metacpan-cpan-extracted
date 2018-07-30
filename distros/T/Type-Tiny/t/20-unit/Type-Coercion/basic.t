@@ -16,7 +16,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -180,5 +180,29 @@ should_fail('1|2|3', ArrayRef->coercibles);
 should_fail({},      ArrayRef->coercibles);
 
 is($arrayref_from_piped->coercibles, $arrayref_from_piped->coercibles, '$arrayref_from_piped->coercibles == $arrayref_from_piped->coercibles');
+
+# ensure that add_type_coercion can handle Type::Coercions
+subtest 'add a Type::Coercion to a Type::Coercion' => sub {
+	
+	my $coercion = Type::Coercion->new;
+	ok(
+		!$coercion->has_coercion_for_type( Str ),
+		"empty coercion can't coerce a Str"
+	);
+	
+	is( exception { $coercion->add_type_coercions( ArrayRefFromPiped ) },
+	undef, "add a coercion from Str" );
+	
+	ok(
+		$coercion->has_coercion_for_type( Str ),
+		"check that coercion was added"
+	);
+	
+	# now see if coercion actually works
+	my $arrayref_from_piped = ArrayRef->plus_coercions($coercion);
+	my $coercibles          = $arrayref_from_piped->coercibles;
+	should_pass('1|2|3', $coercibles, "can coerce from a Str");
+};
+
 
 done_testing;

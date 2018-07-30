@@ -14,8 +14,10 @@ use constant _ALG => 'RS256';
 sub _get_signer {
     my ( $self ) = @_;
 
+    my $method_name = 'sign_' . _ALG();
+
     return sub {
-        return $self->{'key'}->can('sign_' . _ALG())->($self->{'key'}, @_);
+        return $self->{'key'}->$method_name(@_);
     };
 }
 

@@ -143,6 +143,34 @@ is_deeply(
 );
 
 is_deeply(
+    $t->resource_documents([$t->schema->resultset('Comment')->all]),
+    {
+        data => [{
+                type       => 'comments',
+                id         => 1,
+                attributes => {
+                    author_id   => 1,
+                    post_id     => 1,
+                    description => 'This is a really good post',
+                    likes       => 2,
+                },
+            },
+            {
+                type       => 'comments',
+                id         => 2,
+                attributes => {
+                    author_id   => 1,
+                    post_id     => 1,
+                    description => 'Another really good post',
+                    likes       => 4,
+                },
+            },
+        ]
+    },
+    'resource documents from arrayref'
+);
+
+is_deeply(
     $t->compound_resource_document($post, { includes => [qw/author/] }),
     {
         data => {

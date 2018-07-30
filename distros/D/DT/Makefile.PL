@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 
 use strict;
-use warnings;
+use warnings FATAL => 'all';
 
 # Add the `devtest` target to run regression and POD tests in one go
 # Beware the unexpanded tabs in this block!
@@ -26,9 +26,11 @@ END
 }
 
 my %MAIN_REQ = (
-    'parent'                    => '0.236',
-    'DateTime::Moonpig'         => '1.03',
-    'DateTime::Format::ISO8601' => '0.08',
+    'parent'                            => '0.236',
+    'Scalar::Util'                      => 0,
+    'DateTime::Moonpig'                 => '1.03',
+    'DateTime::Format::ISO8601'         => '0.08',
+    'DateTime::Format::ISO8601::Format' => '0.003',
 );
 
 WriteMakefile(
@@ -50,3 +52,4 @@ WriteMakefile(
         },
     },
 );
+

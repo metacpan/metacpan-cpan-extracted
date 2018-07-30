@@ -1,7 +1,14 @@
 #!perl
 
+# This test verifies integration with Test::More
+# the brutal way.
+# It spits out tiny `perl -e` spnippets and collects their output.
+# This is probably a dead end considering there's Test::Tester.
+# But we have to keep it for some edge cases for now.
+
 use strict;
 use warnings;
+BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 use Test::More;
 
 # Make sure to work under cover -t
@@ -21,8 +28,8 @@ eval {
     exit 1;
 };
 
-if ($path =~ /["\$]/) {
-    plan skip_all => "Path noth suitable for subshelling: $path";
+if ($path =~ /["'\$]/) {
+    plan skip_all => "Path not suitable for subshelling: $path";
     exit;
 };
 
@@ -86,20 +93,22 @@ note "SUBTEST CONTENT\n$smoke_subtest/SUBTEST CONTENT";
 
 my $getters = run_cmd( <<'PERL' );
     ok 1;
+    note q{pre_pass=}.current_contract->is_passing;
     ok 0;
     current_contract->refute( q{foo bared}, q{fail} );
     current_contract->refute( 0, q{pass} );
 
     note q{#########};
     note q{count=}.current_contract->get_count;
-    note q{pass=}.current_contract->is_passing;
+    note q{post_pass=}.current_contract->is_passing;
     note q{res2=}.current_contract->get_result(2);
     note q{res3=}.current_contract->get_result(3);
     done_testing;
 PERL
 
 like $getters, qr/# count=4\n/s, "Count";
-like $getters, qr/# pass=(0|)\n/s, "is_passing";
+like $getters, qr/# pre_pass=1\n/s, "is_passing (pre)";
+like $getters, qr/# post_pass=(0|)\n/s, "is_passing (post)";
 like $getters, qr/# res2=1\n/s, "unknown reason";
 like $getters, qr/# res3=foo bared\n/s, "known reason";
 

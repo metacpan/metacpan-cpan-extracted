@@ -14,15 +14,15 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 b65ff4b50a2e87d9efe2f1a88d6010ad9fbe7a39 Changes
+SHA1 c2901582f5e0fe63b5a33c5bdbf3925768d44153 Changes
 SHA1 6cdfb385ffe721014248eaebfae0409fd2c2c514 LICENSE
 SHA1 8b2ef2fd96aab035cf480663123ca6bcd854ce0e MANIFEST
-SHA1 ecd297866db390dd7d29c4ee1f00e65f8d447df1 META.json
-SHA1 94e2ca8fe28092afa08c44a2699dc285d05c40fb META.yml
-SHA1 6cfd9069fcd1c0632f0770b13842e9a3f897a48e Makefile.PL
-SHA1 15ad710b26a8844e516d11026de29c7fa4dc573d README.mkdn
-SHA1 ffa064ca357cd789fd0206cf8d774885124ae37a dist.ini
-SHA1 c706ca7623ccfd9bb9b6ae62139516178c421309 lib/Plack/Middleware/XSRFBlock.pm
+SHA1 9c71a980df3acb05200a2c374393a0749b3959d9 META.json
+SHA1 29af63418a0cce8335f3b306941500770dd10d7b META.yml
+SHA1 99d7add2bccd109b1ee059dc679b8dad0e012722 Makefile.PL
+SHA1 c8328befd33306c9ec357a97e7faeafd6f05eac8 README.mkdn
+SHA1 f45974b85af540f21f0a917af7180c5c31b28ede dist.ini
+SHA1 f4a3335430843fead958ced5ee449bd7351e376e lib/Plack/Middleware/XSRFBlock.pm
 SHA1 d4426c3a7150a7a522cb0617b5e0b6c806995b5e script/buildkite/dzil-authordeps
 SHA1 7872b53eabda8b053bc1e540724da4dd721a3751 script/buildkite/dzil-distrodeps
 SHA1 e68ecb276d56454d75134d2afb1176550fcfd378 script/buildkite/dzil-install
@@ -35,7 +35,7 @@ SHA1 637ced0fa3c9aa4d5d05107aa2da3f52d9eeafa3 t/01.basic.t
 SHA1 2e66df9491f80ffd07d7f4dae4ce9581d60eb38c t/02.content.t
 SHA1 4841d3a41a01bc1ef8dbc38dbf021e5e9d58dc16 t/03.blocked.t
 SHA1 259f1d716c429b31057069889e7b25b0a4cda990 t/03.meta_tag.t
-SHA1 e671491ac8c4b130799f31f7e08ec8a354016737 t/03.request_header.t
+SHA1 8776dce1ceeebdd138ca5bdb8916e2a82bc3531c t/03.request_header.t
 SHA1 591d9d0ac8e072edbafa49e46d210bf9a84b1a89 t/03.token_per_request.t
 SHA1 da7652a71789bed307555e28147172cf2b44ea67 t/04.cookie_options.t
 SHA1 145463568426af903049f4ca671d9378142f2027 t/05.not-html.t
@@ -50,7 +50,7 @@ SHA1 91bacb1498d0fb115ed2f1130ffbe8d593931a2d weaver.ini
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAltXHx8ACgkQh4j7xTiFuxGq7ACfb6egaALGIHIpMjhtJ1Z7+hXj
-rFoAniPTPxTY12blJXPM9lRgwH/+sqFs
-=VHKA
+iEYEARECAAYFAltYed0ACgkQh4j7xTiFuxGsEgCdEeoY9Gij6N1D0UbdXOUp/bfY
+rTwAn3h+uKdtdC88nfI69DtKDPZhQKv7
+=bOkH
 -----END PGP SIGNATURE-----

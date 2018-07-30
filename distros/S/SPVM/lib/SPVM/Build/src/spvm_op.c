@@ -150,7 +150,29 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "COMPILE",
   "SCALAR",
   "ARRAY_FIELD_ACCESS",
+  "REF",
+  "DEREF",
+  "BYTE_REF",
+  "SHORT_REF",
+  "INT_REF",
+  "LONG_REF",
+  "FLOAT_REF",
+  "DOUBLE_REF",
 };
+
+SPVM_OP* SPVM_OP_build_deref(SPVM_COMPILER* compiler, SPVM_OP* op_deref, SPVM_OP* op_var) {
+  
+  SPVM_OP_insert_child(compiler, op_deref, op_deref->last, op_var);
+
+  return op_deref;
+}
+
+SPVM_OP* SPVM_OP_build_ref(SPVM_COMPILER* compiler, SPVM_OP* op_ref, SPVM_OP* op_var) {
+  
+  SPVM_OP_insert_child(compiler, op_ref, op_ref->last, op_var);
+  
+  return op_ref;
+}
 
 SPVM_OP* SPVM_OP_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_TYPE* type, const char* file, int32_t line) {
 
@@ -832,6 +854,12 @@ SPVM_OP* SPVM_OP_get_target_op_var(SPVM_COMPILER* compiler, SPVM_OP* op) {
   else if (op->id == SPVM_OP_C_ID_SEQUENCE) {
     op_var = SPVM_OP_get_target_op_var(compiler, op->last);
   }
+  else if (op->id == SPVM_OP_C_ID_REF) {
+    op_var = SPVM_OP_get_target_op_var(compiler, op->first);
+  }
+  else if (op->id == SPVM_OP_C_ID_DEREF) {
+    op_var = SPVM_OP_get_target_op_var(compiler, op->first);
+  }
   else {
     assert(0);
   }
@@ -957,9 +985,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     }
     case SPVM_OP_C_ID_VAR: {
       SPVM_VAR* var = op->uv.var;
-      if (var->op_my->uv.my->op_type) {
-        type = var->op_my->uv.my->op_type->uv.type;
-      }
+      type = var->op_my->uv.my->op_type->uv.type;
       break;
     }
     case SPVM_OP_C_ID_PACKAGE_VAR_ACCESS: {
@@ -1011,6 +1037,60 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_FIELD: {
       SPVM_FIELD* field = op->uv.field;
       type = field->op_type->uv.type;
+      break;
+    }
+    case SPVM_OP_C_ID_REF: {
+      SPVM_TYPE* term_type = SPVM_OP_get_type(compiler, op->first);
+      assert(term_type->dimension == 0);
+      switch (term_type->basic_type->id) {
+        case SPVM_BASIC_TYPE_C_ID_BYTE:
+          type = SPVM_TYPE_create_byte_ref_type(compiler);
+          break;
+        case SPVM_BASIC_TYPE_C_ID_SHORT:
+          type = SPVM_TYPE_create_short_ref_type(compiler);
+          break;
+        case SPVM_BASIC_TYPE_C_ID_INT:
+          type = SPVM_TYPE_create_int_ref_type(compiler);
+          break;
+        case SPVM_BASIC_TYPE_C_ID_LONG:
+          type = SPVM_TYPE_create_long_ref_type(compiler);
+          break;
+        case SPVM_BASIC_TYPE_C_ID_FLOAT:
+          type = SPVM_TYPE_create_float_ref_type(compiler);
+          break;
+        case SPVM_BASIC_TYPE_C_ID_DOUBLE:
+          type = SPVM_TYPE_create_double_ref_type(compiler);
+          break;
+        default:
+          assert(0);
+      }
+      break;
+    }
+    case SPVM_OP_C_ID_DEREF: {
+      SPVM_TYPE* term_type = SPVM_OP_get_type(compiler, op->first);
+      assert(term_type->dimension == 0);
+      switch (term_type->basic_type->id) {
+        case SPVM_BASIC_TYPE_C_ID_BYTE_REF:
+          type = SPVM_TYPE_create_byte_type(compiler);
+          break;
+        case SPVM_BASIC_TYPE_C_ID_SHORT_REF:
+          type = SPVM_TYPE_create_short_type(compiler);
+          break;
+        case SPVM_BASIC_TYPE_C_ID_INT_REF:
+          type = SPVM_TYPE_create_int_type(compiler);
+          break;
+        case SPVM_BASIC_TYPE_C_ID_LONG_REF:
+          type = SPVM_TYPE_create_long_type(compiler);
+          break;
+        case SPVM_BASIC_TYPE_C_ID_FLOAT_REF:
+          type = SPVM_TYPE_create_float_type(compiler);
+          break;
+        case SPVM_BASIC_TYPE_C_ID_DOUBLE_REF:
+          type = SPVM_TYPE_create_double_type(compiler);
+          break;
+        default:
+          assert(0);
+      }
       break;
     }
   }
@@ -1410,7 +1490,7 @@ SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_v
     SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NAME, op_var->file, op_var->line);
     op_name->uv.name = op_var->uv.var->op_name->uv.name;
     my->op_name = op_name;
-
+    
     // Add my information to op
     op_my->uv.my = my;
     

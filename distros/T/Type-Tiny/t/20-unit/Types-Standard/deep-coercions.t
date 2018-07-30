@@ -13,7 +13,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -502,4 +502,38 @@ TUPLE: {
 	);
 };
 
+TUPLE: {
+	my $IntFromStr = declare IntFromStr => as Int;
+	coerce $IntFromStr, from Str, q{ length($_) };
+	
+	is_deeply(
+		Tuple->of(HashRef, slurpy ArrayRef[$IntFromStr])->coerce([{}, 1, 2.2, "Hello", "world"]),
+		[{}, 1, 3, 5, 5],
+		'coercing Tuple with slurpy arrayref'
+	);
+};
+
+THINGY1: {
+	my $IntFromStr = declare IntFromStr => as Int;
+	coerce $IntFromStr, from Str, q{ length($_) };
+	
+	is_deeply(
+		Tuple->of($IntFromStr)->coerce(["Hello","world"]),
+		["Hello","world"],
+		'inlinable coercion of Tuple with no slurpy given input with extra fields fails'
+	);
+};
+
+THINGY2: {
+	my $IntFromStr = declare IntFromStr => as Int;
+	coerce $IntFromStr, from Str, sub{ length($_) };
+	
+	is_deeply(
+		Tuple->of($IntFromStr)->coerce(["Hello","world"]),
+		["Hello","world"],
+		'non-inlinable coercion of Tuple with no slurpy given input with extra fields fails'
+	);
+};
+
 done_testing;
+

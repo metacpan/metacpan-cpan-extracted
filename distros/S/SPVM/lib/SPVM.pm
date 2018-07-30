@@ -16,7 +16,7 @@ use Encode 'encode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0362';
+our $VERSION = '0.0364';
 
 our $ENV;
 our $BUILD;
@@ -76,26 +76,16 @@ sub new_byte_array {
   return $array;
 }
 
-sub new_byte_array_bin {
-  my $bin = shift;
-  
-  my $length = length $bin;
-  
-  my $array = SPVM::new_byte_array_len($length);
-  
-  $array->set_bin($bin);
-  
-  return $array;
-}
-
-
 sub new_byte_array_string {
   my $string = shift;
   
   # Encode internal string to UTF-8 string
   my $bin = Encode::encode('UTF-8', $string);
   
-  my $array = SPVM::new_byte_array_bin($bin);
+  my $length = length $bin;
+  
+  my $array = SPVM::new_byte_array_len($length);
+  $array->set_bin($bin);
   
   return $array;
 }
@@ -118,24 +108,6 @@ sub new_short_array {
   return $array;
 }
 
-sub new_short_array_bin {
-  my $bin = shift;
-  
-  my $byte_length = length $bin;
-  
-  unless ($byte_length % 2 == 0) {
-    confess("bin byte length must be divide by 2");
-  }
-  
-  my $length = int($byte_length / 2);
-  
-  my $array = SPVM::new_short_array_len($length);
-  
-  $array->set_bin($bin);
-  
-  return $array;
-}
-
 sub new_int_array {
   my $elements = shift;
 
@@ -150,24 +122,6 @@ sub new_int_array {
   my $array = SPVM::new_int_array_len($length);
   
   $array->set_elements($elements);
-  
-  return $array;
-}
-
-sub new_int_array_bin {
-  my $bin = shift;
-  
-  my $byte_length = length $bin;
-  
-  unless ($byte_length % 4 == 0) {
-    confess("bin byte length must be divide by 4");
-  }
-  
-  my $length = int($byte_length / 4);
-  
-  my $array = SPVM::new_int_array_len($length);
-  
-  $array->set_bin($bin);
   
   return $array;
 }
@@ -190,24 +144,6 @@ sub new_long_array {
   return $array;
 }
 
-sub new_long_array_bin {
-  my $bin = shift;
-  
-  my $byte_length = length $bin;
-  
-  unless ($byte_length % 8 == 0) {
-    confess("bin byte length must be divide by 8");
-  }
-  
-  my $length = $byte_length / 8;
-  
-  my $array = SPVM::new_long_array_len($length);
-  
-  $array->set_bin($bin);
-  
-  return $array;
-}
-
 sub new_float_array {
   my $elements = shift;
 
@@ -222,24 +158,6 @@ sub new_float_array {
   my $array = SPVM::new_float_array_len($length);
   
   $array->set_elements($elements);
-  
-  return $array;
-}
-
-sub new_float_array_bin {
-  my $bin = shift;
-  
-  my $byte_length = length $bin;
-  
-  unless ($byte_length % 4 == 0) {
-    confess("bin byte length must be divide by 4");
-  }
-  
-  my $length = $byte_length / 4;
-  
-  my $array = SPVM::new_float_array_len($length);
-  
-  $array->set_bin($bin);
   
   return $array;
 }
@@ -262,20 +180,38 @@ sub new_double_array {
   return $array;
 }
 
-sub new_double_array_bin {
-  my $bin = shift;
+sub new_object_array {
+  my ($package_name, $elements) = @_;
   
-  my $byte_length = length $bin;
+  return undef unless defined $elements;
   
-  unless ($byte_length % 8 == 0) {
-    confess("bin byte length must be divide by 8");
+  if (ref $elements ne 'ARRAY') {
+    confess "Argument must be array reference";
   }
   
-  my $length = $byte_length / 8;
+  my $length = @$elements;
   
-  my $array = SPVM::new_double_array_len($length);
+  my $array = SPVM::new_object_array_len($package_name, $length);
   
-  $array->set_bin($bin);
+  $array->set_elements($elements);
+  
+  return $array;
+}
+
+sub new_value_t_array {
+  my ($package_name, $elements) = @_;
+  
+  return undef unless defined $elements;
+  
+  if (ref $elements ne 'ARRAY') {
+    confess "Argument must be array reference";
+  }
+  
+  my $length = @$elements;
+  
+  my $array = SPVM::new_value_t_array_len($package_name, $length);
+
+  $array->set_elements($elements);
   
   return $array;
 }
@@ -295,10 +231,6 @@ sub new_object {
 =head1 NAME
 
 SPVM - Fast array and numeric operation, and provide easy way to C/C++ Binding
-
-B<SPVM is before 1.0 under development! I will change implementation and specification without warnings.>
-
-Curent SPVM version is 0.3 serieses. This means implementation is finshed by 30% of version 1.0.
 
 =head1 SYNOPSIS
 
@@ -368,7 +300,7 @@ Use SPVM Module from Perl
   
   print $total . "\n";
 
-See also L<SPVM::Document::SPVMAPI>.
+See also L<SPVM::Document::PerlAPI>.
 
 =head2 C Extension using SPVM
 
@@ -441,9 +373,9 @@ print, warn, time
 
 L<SPVM::CORE>, L<SPVM::Byte>, L<SPVM::Short>, L<SPVM::Int>, L<SPVM::Long>, L<SPVM::Float>, L<SPVM::Double>, L<SPVM::Bool>
 
-=head1 SPVM API
+=head1 SPVM Perl API
 
-L<SPVM::Document::SPVMAPI>
+L<SPVM::Document::PerlAPI>
 
 =head1 Native Interface
 
@@ -488,6 +420,12 @@ L<chromatic|https://github.com/chromatic>
 L<Kazutake Hiramatsu|https://github.com/kazhiramatsu>
 
 =back
+
+=head1 NOTE
+
+B<SPVM is before 1.0 under development! I will change implementation and specification without warnings.>
+
+Curent SPVM version is 0.3 serieses. This means implementation is finshed by 30% of version 1.0.
 
 =head1 COPYRIGHT & LICENSE
 

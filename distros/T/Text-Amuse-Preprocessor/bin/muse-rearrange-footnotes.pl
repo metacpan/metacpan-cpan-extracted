@@ -78,6 +78,7 @@ foreach my $file (@ARGV) {
           . "($error->{footnotes_found})\n"
             . "found references: $error->{references} "
               . "($error->{references_found})\n\n";
+        print "Differences between the list of footnotes and references:\n$error->{differences}\n";
         next;
     }
     elsif (! -f $output) {

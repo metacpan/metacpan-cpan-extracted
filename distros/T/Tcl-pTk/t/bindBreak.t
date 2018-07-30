@@ -61,14 +61,14 @@ Tcl::pTk::break();
 
 # Generate some events for testing
 
-# This seems to be required for the events to be reliabily registered for this test case outside of a MainLoop
+# This seems to be required for the events to be reliably registered for this test case outside of a MainLoop
 foreach (1..10){
         $TOP->update();
         $TOP->idletasks();
 }
 $b->eventGenerate('<3>'); # For checking event source for class binding
 
-# This seems to be required for the events to be reliabily registered for this test case outside of a MainLoop
+# This seems to be required for the events to be reliably registered for this test case outside of a MainLoop
 foreach (1..10){
         $TOP->update();
         $TOP->idletasks();

@@ -36,14 +36,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/pavelsr/net-ip-minimal",
+      "homepage" : "https://github.com/pavelsr/net-ip-checker",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/pavelsr/net-ip-minimal.git",
-         "web" : "https://github.com/pavelsr/net-ip-minimal"
+         "url" : "https://github.com/pavelsr/net-ip-checker.git",
+         "web" : "https://github.com/pavelsr/net-ip-checker"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
 }
 

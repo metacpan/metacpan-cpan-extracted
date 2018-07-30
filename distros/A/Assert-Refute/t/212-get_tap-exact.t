@@ -8,6 +8,7 @@
 
 use strict;
 use warnings;
+BEGIN{ delete @ENV{qw(NDEBUG PERL_NDEBUG)} };
 # instantiate before Test::More to avoid autodetect
 use Assert::Refute {};
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-APIcast
 
+0.16 2018-07-25T15:11:19Z
+   - Properly cleanup ENV back to uninitialized state.
+
 0.15 2018-07-18T10:09:07Z
    - Add `Test::Nginx::Socket::set_http_config_filter` support to Test::APIcast::Blackbox
    - Change ENV instead of passing it to APIcast executable

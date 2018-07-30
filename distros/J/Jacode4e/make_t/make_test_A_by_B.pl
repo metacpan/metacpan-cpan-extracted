@@ -20,7 +20,7 @@ while (<JACODE4E>) {
 close(JACODE4E);
 
 my @encoding = qw( cp932x cp932 sjis2004 cp00930 keis78 keis83 keis90 jef jipsj jipse unicode utf8 utf8jp );
-my @io_encoding = grep( ! /^unicode$/, @encoding);
+my @io_encoding = (grep( ! /^unicode$/, @encoding), 'jef9p');
 my %geta = (
     'cp932x'   => '81AC',
     'cp932'    => '81AC',
@@ -30,6 +30,7 @@ my %geta = (
     'keis83'   => 'A2AE',
     'keis90'   => 'A2AE',
     'jef'      => 'A2AE',
+    'jef9p'    => 'A2AE',
     'jipsj'    => '222E',
     'jipse'    => '7F4B',
     'utf8'     => 'E38093',
@@ -73,10 +74,14 @@ END___________________________________________________________________
         for (@data) {
             my %data = ();
             @data{@encoding} = split(/ +/,$_);
+            $data{'jef9p'} = $data{'jef'};
             if ($data{$INPUT_encoding} !~ /^[0123456789ABCDEF]+$/) {
                 next;
             }
-            my $input = join('', map {"\\x$_"} ($data{$INPUT_encoding}  =~ /([0123456789ABCDEF]{2})/g));
+            my $input = '';
+            if (1) {
+                $input = join('', map {"\\x$_"} ($data{$INPUT_encoding}  =~ /([0123456789ABCDEF]{2})/g));
+            }
             my $output = '';
             if ($data{$OUTPUT_encoding} =~ /^[0123456789ABCDEF]+$/) {
                 $output = join('', map {"\\x$_"} ($data{$OUTPUT_encoding} =~ /([0123456789ABCDEF]{2})/g))
@@ -99,12 +104,12 @@ END___________________________________________________________________
     $|=1; print "1..",scalar(@test),"\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" }
 }
 
-require 'jacode4e.pl';
+use Jacode4e;
 
 for my $test (@test) {
     my($give,$OUTPUT_encoding,$INPUT_encoding,$option,$want) = @{$test};
     my $got = $give;
-    my $return = jacode4e::convert(\$got,$OUTPUT_encoding,$INPUT_encoding,$option);
+    my $return = Jacode4e::convert(\$got,$OUTPUT_encoding,$INPUT_encoding,$option);
 
     my $option_content = '';
     if (defined $option) {

@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,14 +25,15 @@ name: Log-Dispatch-FileRotate
 provides:
   Log::Dispatch::FileRotate:
     file: lib/Log/Dispatch/FileRotate.pm
-    version: '1.35'
+    version: '1.36'
   Log::Dispatch::FileRotate::Flock:
     file: lib/Log/Dispatch/FileRotate/Flock.pm
-    version: '1.35'
+    version: '1.36'
   Log::Dispatch::FileRotate::Mutex:
     file: lib/Log/Dispatch/FileRotate/Mutex.pm
-    version: '1.35'
+    version: '1.36'
 requires:
+  Carp: '0'
   Date::Manip: '0'
   Exporter: '0'
   Fcntl: '0'
@@ -48,5 +49,6 @@ resources:
   bugtracker: https://github.com/mschout/perl-log-dispatch-filerotate/issues
   homepage: https://github.com/mschout/perl-log-dispatch-filerotate
   repository: https://github.com/mschout/perl-log-dispatch-filerotate.git
-version: '1.35'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '1.36'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

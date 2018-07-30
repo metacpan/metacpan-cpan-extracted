@@ -1,10 +1,11 @@
 package Elasticsearch::Model;
 
+use v5.10;
 use Moose;
 use Moose::Exporter;
 use Elasticsearch::Model::Index;
 
-our $VERSION = '0.1.4'; # VERSION
+our $VERSION = '0.1.5'; # VERSION
 
 # ABSTRACT: Does one thing only: helps to deploy a Moose model and accompanying document classes to Elasticsearch.
 

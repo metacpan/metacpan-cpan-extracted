@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::AndAfter;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: create a subsequent task
-$Taskwarrior::Kusarigama::Plugin::Command::AndAfter::VERSION = '0.9.1';
+$Taskwarrior::Kusarigama::Plugin::Command::AndAfter::VERSION = '0.9.2';
 
 use 5.10.0;
 
@@ -17,11 +17,14 @@ with 'Taskwarrior::Kusarigama::Hook::OnCommand';
 sub on_command {
     my $self = shift;
 
-    my $args = $self->args;
-    $args =~ s/(?<=task)\s+(.*?)\s+and-after/ add depends:$1 /
-        or die "'$args' not in the expected format\n";
+    my $select = $self->pre_command_args 
+        || ( $self->run_task->export( [ '+LATEST' ] ) )[0]->{uuid};
 
-    system $args;
+    $self->run_task->add( $self->post_command_args, { depends => $select } );
+
+    say for $self->run_task->list(
+        $self->run_task->_id( '+LATEST' )
+    );
 };
 
 1;
@@ -38,11 +41,16 @@ Taskwarrior::Kusarigama::Plugin::Command::AndAfter - create a subsequent task
 
 =head1 VERSION
 
-version 0.9.1
+version 0.9.2
 
 =head1 SYNOPSIS
 
-    $ task 101 and-after do the next thing
+    $ task 101 and-after do the next thing 
+
+=head1 DESCRIPTION 
+
+Creates a task that depends on the give task(s). If no previous task is 
+provided, defaults to C<+LATEST>.
 
 =head1 AUTHOR
 

@@ -29,6 +29,7 @@ use parent qw(
 );
 
 use Crypt::Perl::ECDSA::Generate ();
+use Crypt::Perl::Ed25519::PrivateKey ();
 use Crypt::Perl::PK ();
 use Crypt::Perl::X509::Name ();
 
@@ -75,6 +76,10 @@ sub _KEY_TYPES_TO_TEST {
         );
     }
 
+    if ( OpenSSL_Control::can_ed25519() ) {
+        push @types, 'ed25519';
+    }
+
     return @types;
 }
 
@@ -91,6 +96,10 @@ sub test_new : Tests() {
         if ($type =~ m<\A[0-9]>) {
             $key = Crypt::Perl::PK::parse_key( scalar qx<$ossl_bin genrsa $type> );
             $print_type = "RSA ($type-bit)";
+        }
+        elsif ($type eq 'ed25519') {
+            $key = Crypt::Perl::Ed25519::PrivateKey->new();
+            $print_type = 'ed25519';
         }
         else {
             $key = Crypt::Perl::ECDSA::Generate::by_curve_name($type);

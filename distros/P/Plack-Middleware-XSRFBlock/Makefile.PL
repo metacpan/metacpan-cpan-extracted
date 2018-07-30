@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Carp" => 0,
-    "Data::Printer" => 0,
+    "Data::Dumper" => 0,
     "FindBin::libs" => 0,
     "HTTP::Cookies" => 0,
     "HTTP::Message::PSGI" => 0,
@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
     "Test::UseAllModules" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "0.0.15",
+  "VERSION" => "0.0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Data::Printer" => 0,
+  "Data::Dumper" => 0,
   "Digest::HMAC_SHA1" => 0,
   "FindBin::libs" => 0,
   "HTML::Escape" => 0,

@@ -72,10 +72,11 @@
          "web" : "https://github.com/b10m/p5-Dancer2-Plugin-Auth-OAuth"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_contributors" : [
       "B10m <menno@b10m.net>",
       "Biafra <paulo.a.ferreira@gmail.com>",
+      "Dmitry A. Pashko <bitbucket.org@pashko.ru>",
       "Keith Broughton <keithbro256@gmail.com>",
       "Menno Blom <menno.blom@booking.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

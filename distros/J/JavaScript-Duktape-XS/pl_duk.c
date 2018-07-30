@@ -474,6 +474,24 @@ int pl_set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* valu
     return 1;
 }
 
+int pl_del_global_or_property(pTHX_ duk_context* ctx, const char* name)
+{
+    int len = 0;
+    int last_dot = find_last_dot(name, &len);
+    if (last_dot < 0) {
+        duk_push_global_object(ctx);
+        duk_del_prop_lstring(ctx, -1, name, len);
+    } else {
+        if (duk_peval_lstring(ctx, name, last_dot) != 0) {
+            croak("Could not eval JS object %*.*s: %s\n",
+                  last_dot, last_dot, name, duk_safe_to_string(ctx, -1));
+        }
+        duk_del_prop_lstring(ctx, -1, name + last_dot + 1, len - last_dot - 1);
+    }
+    duk_pop(ctx); /* pop (global) object */
+    return 1;
+}
+
 SV* pl_eval(pTHX_ Duk* duk, const char* js, const char* file)
 {
     SV* ret = &PL_sv_undef; /* return undef by default */
@@ -529,9 +547,8 @@ int pl_run_gc(Duk* duk)
     return PL_GC_RUNS;
 }
 
-SV* pl_global_objects(Duk* duk)
+SV* pl_global_objects(pTHX_ duk_context* ctx)
 {
-    duk_context* ctx = duk->ctx;
     int count = 0;
     AV* values = newAV();
 

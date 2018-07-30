@@ -49,7 +49,7 @@ sub parse_key {
 
     my $obj;
 
-    for my $alg ( qw( RSA ECDSA Ed25519 ) ) {
+    for my $alg ( qw( RSA Ed25519 ECDSA ) ) {
         my $module = "Crypt::Perl::$alg\::Parse";
         Module::Load::load($module);
 
@@ -84,11 +84,11 @@ sub parse_jwk {
             $module = 'Crypt::Perl::RSA::Parse';
 
         }
-        elsif ($kty eq 'EC') {
-            $module = 'Crypt::Perl::ECDSA::Parse';
-        }
         elsif ($kty eq 'OKP' && $hr->{'crv'} eq 'Ed25519') {
             $module = 'Crypt::Perl::Ed25519::Parse';
+        }
+        elsif ($kty eq 'EC') {
+            $module = 'Crypt::Perl::ECDSA::Parse';
         }
         else {
             die Crypt::Perl::X::create('UnknownJTKkty', $kty);

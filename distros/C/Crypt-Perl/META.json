@@ -1,5 +1,5 @@
 {
-   "abstract" : "Cryptography in Pure Perl",
+   "abstract" : "Cryptography in pure Perl",
    "author" : [
       "Felipe Gasper, with contributions from Mohammad S Anwar"
    ],
@@ -71,6 +71,6 @@
          "web" : "https://github.com/FGasper/p5-Crypt-Perl"
       }
    },
-   "version" : "0.25",
+   "version" : "0.27",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

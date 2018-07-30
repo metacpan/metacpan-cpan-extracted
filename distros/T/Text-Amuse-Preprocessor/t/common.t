@@ -152,6 +152,11 @@ is_deeply ($bpp->error, {
                          references => 1,
                          footnotes_found => '[1] [1] [1]',
                          references_found => '[1]',
+                         differences => '@@ -1,3 +1 @@
+ [1]
+-[1]
+-[1]
+'
                         });
 
 {

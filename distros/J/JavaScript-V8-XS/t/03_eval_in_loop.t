@@ -8,7 +8,7 @@ use Test::More;
 my $CLASS = 'JavaScript::V8::XS';
 
 sub test_eval {
-    my ($times, $use_reset) = @_;
+    my ($times, $do_reset) = @_;
 
     my $count = 0;
     my $js = '2 * 2';
@@ -16,9 +16,9 @@ sub test_eval {
     my @vms;
     my $vm;
     my $t0 = Time::HiRes::gettimeofday();
-    $vm = $CLASS->new() if $use_reset;
+    $vm = $CLASS->new() if $do_reset;
     for ($count = 0; $count < $times; ++$count) {
-        if ($use_reset) {
+        if ($do_reset) {
             $vm->reset();
         }
         else {
@@ -35,7 +35,7 @@ sub test_eval {
     my $elapsed = 1000.0 * ($t1 - $t0);
     ok($count == $times,
        sprintf("did all %d iterations with reset=%d, %.0f ms, %.2fms each",
-               $times, $use_reset ? 1 : 0, $elapsed, $elapsed / $times));
+               $times, $do_reset ? 1 : 0, $elapsed, $elapsed / $times));
 }
 
 sub main {

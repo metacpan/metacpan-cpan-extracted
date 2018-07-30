@@ -4,13 +4,13 @@
       "Красимир Беров (berov@cpan.org)"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Slovo",
    "no_index" : {
@@ -34,8 +34,8 @@
       "runtime" : {
          "requires" : {
             "Cpanel::JSON::XS" : "4.04",
-            "Mojo::SQLite" : "3.000",
-            "Mojolicious" : "7.87",
+            "Mojo::SQLite" : "3.001",
+            "Mojolicious" : "7.89",
             "Mojolicious::Plugin::Authentication" : "1.32",
             "Mojolicious::Plugin::OpenAPI" : "1.30",
             "Mojolicious::Plugin::RoutesConfig" : "0.05",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2018.07.20",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v2018.07.28",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

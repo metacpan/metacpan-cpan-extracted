@@ -186,6 +186,7 @@ t2/simple.t
 t2/subtests.t
 t2/subtests_buffered.t
 t2/subtests_streamed.t
+t2/utf8-2.t
 t2/utf8.t
 test.pl
 xt/acceptance/help.t

@@ -11,7 +11,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::JMASLAK;
 # ABSTRACT: JMASLAK's Plugin Bundle
-$Dist::Zilla::PluginBundle::Author::JMASLAK::VERSION = '1.181841';
+$Dist::Zilla::PluginBundle::Author::JMASLAK::VERSION = '1.182070';
 
 use Moose;
 use Dist::Zilla;
@@ -265,7 +265,7 @@ Dist::Zilla::PluginBundle::Author::JMASLAK - JMASLAK's Plugin Bundle
 
 =head1 VERSION
 
-version 1.181841
+version 1.182070
 
 =head1 DESCRIPTION
 
