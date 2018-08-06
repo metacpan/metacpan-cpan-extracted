@@ -155,7 +155,6 @@ sub parse_scoring_event ($$;$) {
 	$event->{type}      = $is_goal =~ /\d/ ? 'GOAL' : 'MISS';
 	my $offset = $event->{type} eq 'MISS' ? 1 : 0;
 	$event->{period}    = $self->get_sub_tree(0, [$is_new ? (1,0) : (1,0,0)], $row);
-#	$event->{period} =~ s/\xA0/ /ug if $event->{period};
 	return undef if !$is_special && $event->{period} !~ /\w/;
 	$event->{time}      = $self->get_sub_tree(0, [$is_new ? (2,0) : (2,0,0)], $row);
 	$event->{team1}     = $self->get_sub_tree(0, [$is_new ? (4,0) : (3,0,0)], $row);
@@ -170,9 +169,6 @@ sub parse_scoring_event ($$;$) {
 		return $event;
 	}
 	$event->{strength} = $self->get_sub_tree(0, [$is_new ? (3,0) : (9,0,0)], $row);
-	#print Dumper $event->{strength};
-	#$event->{strength} =~ s/\- PS//;
-	#print Dumper $event->{strength};
 	if ($event->{period} eq 'OT') {
 		$event->{period} = 4;
 	}
@@ -191,7 +187,6 @@ sub parse_scoring_event ($$;$) {
 		$event->{assist2} = undef;
 		$offset = 1;
 	}
-#	$row->dump;
 	if ($event->{type} eq 'MISS') {
 		$event->{description} = 'Missed Penalty Shot';
 		$event->{assist1} = $event->{assist2} = undef;
@@ -308,13 +303,11 @@ sub parse_penalty_event ($$$) {
 	my $row  = shift;
 	my $t    = shift;
 
-#	print $row->dump;
 	my $event = {};
 
 	$event->{type}       = 'PENL';
 	$event->{period}     = $self->get_sub_tree(0, [1+7*$t,0,0], $row);
 	return undef unless $event->{period};
-#	$event->{period} =~ s/\xA0/ /ug;
 	return undef unless $event->{period} =~ /\w/;
 	$event->{period} = 4 if $event->{period} eq 'OT';
 	$event->{time}       = $self->get_sub_tree(0, [2+7*$t,0,0], $row);
@@ -377,8 +370,6 @@ sub parse_new_pp_summary ($$$) {
 
 	for my $t (0,1) {
 		my $pp_team_summary = $self->get_sub_tree(0, [ (1,0,0,0,$t) ], $pp_summary);
-#		print $pp_team_summary->dump;
-#		exit;
 		$self->{teams}[$t]{pptype} = {};
 		my $pp = 0;
 		for my $pptype (qw(5v4 5v3 4v3)) {
@@ -430,8 +421,6 @@ sub parse_new_misc_summary ($$$) {
 	my $misc_summary = shift;
 
 	my $officials_table = $self->get_sub_tree(0, [1,0,0], $misc_summary);
-#	print $officials_table->dump;
-#	exit;
 	$self->{officials} = {
 		referees => [
 			$self->get_sub_tree(0, [1,0,0,0,0,0], $officials_table),
@@ -523,12 +512,10 @@ sub parse_misc_summary ($$$) {
 	for my $r (0..3) {
 		my $type = $self->get_sub_tree(0, [$r+1,$g_span+3,0,0], $misc_summary);
 		next unless $type;
-#		$type =~ s/\xA0/ /ug;
 		next unless $type =~ /\w/;
 		$type = $type =~ /R|A/ ? 'referees' : 'linesmen';
 		$self->{officials}{$type} ||= [];
 		my $name = $self->get_sub_tree(0, [$r+1,$g_span+4,0,0], $misc_summary);
-#		$name =~ s/\xA0/ /ug;
 		push(@{$self->{officials}{$type}}, { name => $name, number => 0}) if $name =~ /\w/;
 	}
 }
@@ -570,7 +557,6 @@ sub parse_goaltender_summary ($$$) {
 		else {
 			$t++;
 		}
-#		print "G $g GR ", scalar(@{$goalies_row->{_content}}), "\n";
 		$g++;
 	}
 }
@@ -749,7 +735,6 @@ sub normalize_old ($$) {
 	my $self     = shift;
 
 	for my $event (@{$self->{events}}) {
-#		$event->{time} =~ s/^(\d+):(\d+)$/$1*60+$2/e;
 		$event->{old} = 1;
 		$event->{file} = $self->{file};
 		if ($event->{type} eq 'GOAL' || $event->{type} eq 'MISS') {
@@ -830,7 +815,6 @@ sub normalize_old ($$) {
 		else {
 			$goalie->{team_decision} =~ /^(\S{3})/;
 			delete $goalie->{team_decision};
-#			$goalie->{decision} = '';
 			if (! $t0) {
 				$t = 0;
 				$t0 = $1;
@@ -866,7 +850,8 @@ sub normalize ($) {
 	$self->{old} ?
 		$self->normalize_old($self) :
 		$self->normalize_new($self);
-	@{$self->{events}} = grep { $_->{type} ne 'PENL' } @{$self->{events}};
+	@{$self->{events}} = grep { $_->{type} ne 'PENL' } @{$self->{events}}
+		unless $ENV{GS_KEEP_PENL};
 	for my $event (@{$self->{events}}) {
 		if (my $evx = $BROKEN_EVENTS{GS}->{$self->{_id}}->{$event->{id}}) {
 			for my $key (keys %{$evx}) {
@@ -879,7 +864,6 @@ sub normalize ($) {
 			$event->{penalty} =~ s/(\- obstruction)//i;
 			$event->{penalty} =~ s/(PS \- )//i;
 		}
-		#print Dumper $event;
 		for my $v (qw(strength shot_type penalty miss)) {
 			$event->{$v} = vocabulary_lookup($v, $event->{$v}) if exists $event->{$v};
 		}

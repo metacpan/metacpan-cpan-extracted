@@ -13,37 +13,46 @@ SYNOPSIS
     $ pp -f Crypto -M Filter::Crypto::Decrypt -o hello hello.pl
     $ hello
 
+    # Display the Filter-Crypto distribution version number:
+    use Filter::Crypto;
+    print "This is Filter-Crypto $Filter::Crypto::VERSION\n";
+
 DESCRIPTION
 
-    This distribution provides the means to convert your Perl files into an
-    encrypted, yet still runnable, format to hide the source code from casual
-    prying eyes.
+    The Filter-Crypto distribution provides the means to convert your Perl files
+    into an encrypted, yet still runnable, format to hide the source code from
+    casual prying eyes.
 
-    This is achieved using a Perl source code filter.  The encrypted files,
+    This is achieved using a Perl source code filter. The encrypted files,
     produced using the Filter::Crypto::CryptFile module, automatically have one
     (unencrypted) line added to the start of them that loads the
-    Filter::Crypto::Decrypt module.  The latter is a Perl source code filter
-    that decrypts the remaining (encrypted) part of the Perl file on-the-fly
-    when it is run.
+    Filter::Crypto::Decrypt module. The latter is a Perl source code filter that
+    decrypts the remaining (encrypted) part of the Perl file on the fly when it
+    is run. See perlfilter if you want to know more about how Perl source code
+    filters work.
 
     These two modules can be built and installed separately, so it is possible
     to set-up two separate Perl installations: one containing the
     Filter::Crypto::CryptFile module to be used for encrypting your Perl files,
     and another containing only the Filter::Crypto::Decrypt module for
     distributing with your encrypted Perl files so that they can be run but not
-    easily decrypted.  (Well, not very easily, anyway.  Please see the WARNING
+    easily decrypted. (Well, not very easily, anyway. Please see the WARNING
     below.)
 
     Encrypted files can also be produced more conveniently using the crypt_file
     script, or (if you also have the PAR module available) using the
-    PAR::Filter::Crypto module.  The latter can be utilized by the standard PAR
-    tools to produce PAR archives in which your Perl files are encrypted.  The
+    PAR::Filter::Crypto module. The latter can be utilized by the standard PAR
+    tools to produce PAR archives in which your Perl files are encrypted. The
     Filter::Crypto::Decrypt module (only) can also be automatically included in
     these PAR archives, so this is perhaps the easiest way to produce
     redistributable, encrypted Perl files.
 
     The actual encryption and decryption is performed using one of the symmetric
-    cipher algorithms provided by the OpenSSL libcrypto library.
+    cipher algorithms provided by the OpenSSL libcrypto library. The EVP library
+    high-level interface functions to the various cipher algorithms themselves
+    are used so that your choice of algorithm (and also what password or key to
+    use) is made simply by answering some questions when building this
+    distribution. See the INSTALL file for more details.
 
 WARNING
 
@@ -76,10 +85,10 @@ COMPATIBILITY
     is now output as a pair of hexadecimal digits and therefore no longer
     susceptible to such breakage.
 
-    THIS IS AN INCOMPATIBLE CHANGE.  CURRENT VERSIONS OF THESE MODULES WILL NOT
+    THIS IS AN INCOMPATIBLE CHANGE. CURRENT VERSIONS OF THESE MODULES WILL NOT
     BE ABLE TO DECRYPT FILES ENCRYPTED WITH VERSIONS OF THESE MODULES PRIOR TO
     VERSION 2.00 OF THIS DISTRIBUTION, EVEN WHEN BUILT WITH THE SAME
-    CONFIGURATION OPTIONS.  EXISTING ENCRYPTED FILES WILL NEED TO BE
+    CONFIGURATION OPTIONS. EXISTING ENCRYPTED FILES WILL NEED TO BE
     RE-ENCRYPTED.
 
 INSTALLATION
@@ -88,7 +97,7 @@ INSTALLATION
 
 COPYRIGHT
 
-    Copyright (C) 2004-2010, 2012-2015 Steve Hay.  All rights reserved.
+    Copyright (C) 2004-2010, 2012-2015, 2017 Steve Hay. All rights reserved.
 
 LICENCE
 

@@ -5,7 +5,7 @@ package WebService::BitbucketServer::Response;
 use warnings;
 use strict;
 
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 use Clone qw(clone);
 use Types::Standard qw(HashRef Object);
@@ -59,8 +59,8 @@ has json => (
     isa     => Object,
     default => sub {
         shift->context->json || do {
-            require JSON;
-            JSON->new->utf8(1);
+            require JSON::MaybeXS;
+            JSON::MaybeXS->new(utf8 => 1);
         };
     },
 );
@@ -159,7 +159,7 @@ WebService::BitbucketServer::Response - A response object for Bitbucket Server R
 
 =head1 VERSION
 
-version 0.604
+version 0.605
 
 =head1 SYNOPSIS
 
@@ -232,11 +232,11 @@ L<HTTP::Tiny> response (regardless of which user agent was used to get the respo
 =head2 decoded_content
 
 Get the decoded response content which may include page info if this is a paged response. Consider
-using L</data>, L</page_data>, etc. before this.
+using L</data>, L</page_info>, etc. before this.
 
 =head2 json
 
-Get the L<JSON> (or compatible) object used for encoding and decoding documents.
+Get the L<JSON::XS> (or compatible) object used for encoding and decoding documents.
 
 =head1 METHODS
 
@@ -265,14 +265,10 @@ false), or undef if this response is not an error.
 
 =head2 data
 
-=head2 info
-
-=head2 value
-
-=head2 values
-
 Get the decoded response content. If this is a paged response (see L</is_paged>), this will be an
 arrayref of values.
+
+Aliases: C<info>, C<value>, C<values>
 
 =head2 is_paged
 
@@ -326,6 +322,8 @@ Sometimes the response doesn't include the page information in the root object, 
 response has an envelope with other non-repeated information. In such cases, L</is_paged> is false
 and L</page_info> is undef. You can use this method to easily create a paged response by specifying
 the field name of the object that contains the page info.
+
+=for Pod::Coverage info|value|values
 
 =head1 BUGS
 

@@ -47,9 +47,7 @@ sleep 3;
 
 $chip->display_lamptest( 0 )->get;
 
-my $display = [
-   map { [ ( 0 ) x $chip->columns ] } 1 .. $chip->rows
-];
+$chip->clear;
 
 my $maxcol = $chip->columns - 1;
 my $maxrow = $chip->rows    - 1;
@@ -57,39 +55,21 @@ my $maxrow = $chip->rows    - 1;
 # Build a test pattern:
 
 # A border
-$display->[$_][      0] = 1 for 0 .. $maxrow;
-$display->[$_][$maxcol] = 1 for 0 .. $maxrow;
-$display->[      0][$_] = 1 for 0 .. $maxcol;
-$display->[$maxrow][$_] = 1 for 0 .. $maxcol;
+$chip->draw_vline(       0, 0, $maxrow );
+$chip->draw_vline( $maxcol, 0, $maxrow );
+$chip->draw_hline( 0, $maxcol,       0 );
+$chip->draw_hline( 0, $maxcol, $maxrow );
 
 # A diagonal line out from the centre
 my $midcol = $chip->columns / 2;
 my $midrow = $chip->rows / 2;
 foreach my $i ( 0 .. $midrow ) {
-   $display->[$midrow-$i  ][$midcol-$i] = 1;
-   $display->[$midrow+$i+1][$midcol-$i] = 1;
-   $display->[$midrow-$i  ][$midcol+$i+1] = 1;
-   $display->[$midrow+$i+1][$midcol+$i+1] = 1;
+   $chip->draw_pixel( $midcol-$i,   $midrow-$i   );
+   $chip->draw_pixel( $midcol-$i,   $midrow+$i+1 );
+   $chip->draw_pixel( $midcol+$i+1, $midrow-$i   );
+   $chip->draw_pixel( $midcol+$i+1, $midrow+$i+1 );
 }
 
-my $pixels = "";
-sub _mkpixel
-{
-   @_ == 8 or die "Need 8 pixel values";
-   my $v = 0;
-   $v <<= 1, $_ && ( $v |= 1 ) for reverse @_;
-   return chr $v;
-}
-
-# The byte buffer is built in pages
-foreach my $page ( 0 .. ( $chip->rows / 8 ) - 1 ) {
-   my $row = $page * 8;
-
-   foreach my $col ( 0 .. $maxcol ) {
-      $pixels .= _mkpixel( map { $display->[$row+$_][$col] } 0 .. 7 );
-   }
-}
-
-$chip->send_display( $pixels )->get;
+$chip->refresh->get;
 
 sleep 10;

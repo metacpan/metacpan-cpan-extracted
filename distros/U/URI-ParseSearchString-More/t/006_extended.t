@@ -1,5 +1,3 @@
-# -*- perl -*-
-
 use strict;
 use warnings;
 
@@ -48,32 +46,30 @@ use URI::ParseSearchString::More;
 my $more = URI::ParseSearchString::More->new();
 
 use Config::General;
-my $conf = new Config::General(
-    -ConfigFile      => "t/extended_urls.cfg",
+my $conf = Config::General->new(
+    -ConfigFile      => 't/extended_urls.cfg',
     -BackslashEscape => 1,
 );
 my %config = $conf->getall;
 
 if ( exists $ENV{'TEST_UPM_CACHED'}
-    && $ENV{'TEST_UPM_CACHED'} )
-{
-    $more->set_cached( 1 );
-    diag( "caching is enabled..." );
+    && $ENV{'TEST_UPM_CACHED'} ) {
+    $more->set_cached(1);
+    diag('caching is enabled...');
 }
 
 my $skip = 1;
 if ( exists $ENV{'TEST_UPM_EXTENDED'}
-    && $ENV{'TEST_UPM_EXTENDED'} )
-{
+    && $ENV{'TEST_UPM_EXTENDED'} ) {
     $skip = 0;
-    diag( "extended testing is enabled..." );
+    diag('extended testing is enabled...');
 }
 
 my $tests = scalar @{ $config{'urls'} };
 
 SKIP: {
 
-    skip "See inline docs for info on how to enable these tests", $tests
+    skip 'See inline docs for info on how to enable these tests', $tests
         if $skip;
 
     foreach my $test ( @{ $config{'urls'} } ) {
@@ -85,7 +81,7 @@ SKIP: {
         cmp_ok(
             $more->blame(), 'eq',
             'URI::ParseSearchString::More',
-            "parsed by More"
+            'parsed by More'
         );
 
     }

@@ -6,7 +6,7 @@ print "1..1\n";
 
 $init   = "";
 $buffer = "";
-require "t/init.pl";
+require "./t/init.pl";
 
 my $source = <<EOT;
 $init

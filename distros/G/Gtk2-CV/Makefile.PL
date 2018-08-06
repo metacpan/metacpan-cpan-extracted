@@ -11,6 +11,9 @@ print <<EOF;
 ** apt-get install libmagic-dev libjpeg62-dev libglib-perl libgtk2-perl
 ** apt-get install libgtk2.0-dev
 **
+** Optional dependencies:
+** apt-get install libwebp-dev
+**
 
 EOF
 
@@ -19,8 +22,18 @@ use ExtUtils::Depends;
 
 my $pkg = new ExtUtils::Depends ("Gtk2::CV");
 
-$pkg->set_libs ("-ljpeg -lmagic");
+my $lib = "-ljpeg -lmagic";
+my $inc = "";
+
+if (!system "pkg-config --exists libwebp libwebpdemux") {
+   $inc .= " -DWEBP=1";
+   $inc .= " " . qx<pkg-config --cflags libwebp libwebpdemux>;
+   $lib .= " " . qx<pkg-config --libs   libwebp libwebpdemux>;
+}
+
 $pkg->add_deps ("Gtk2", "Glib");
+$pkg->set_libs ($lib);
+$pkg->set_inc  ($inc);
 
 sub MY::postamble {
    my $self=shift;

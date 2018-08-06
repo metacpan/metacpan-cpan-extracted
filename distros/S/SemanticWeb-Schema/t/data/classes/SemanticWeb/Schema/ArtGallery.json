@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An art gallery.",
+      "rdfs:label" : "ArtGallery",
+      "rdfs:subClassOf" : "schema:EntertainmentBusiness"
+   },
+   "properties" : {}
+}

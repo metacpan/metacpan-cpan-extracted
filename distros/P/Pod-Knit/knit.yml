@@ -1,0 +1,24 @@
+---
+plugins:
+    - Abstract
+    - Attributes
+    - Methods
+    - NamedSections:
+        sections:
+            - synopsis
+            - description
+    - Version
+    - Authors
+    - Legal
+    - Sort:
+        order:
+          - NAME
+          - VERSION
+          - SYNOPSIS
+          - DESCRIPTION
+          - ATTRIBUTES
+          - METHODS
+          - '*'
+          - AUTHORS
+          - AUTHOR
+          - COPYRIGHT AND LICENSE

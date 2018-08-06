@@ -2,7 +2,7 @@
 #  Test of adding/removing widgets using the IDElayout methods
 #
 #   Expected Results
-#     After initial window creation (To tabframes visible, Stacked vertically)
+#     After initial window creation (Two tabframes visible, Stacked vertically)
 #       1) Widget should be added to the left side after two seconds
 #       2) Widget addd in step (1) should be deleted after another two seconds.
 #

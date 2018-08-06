@@ -1,9 +1,10 @@
 package Mojolicious::Plugin::RoutesAuthDBI::Model::Guest;
-use Mojo::Base 'DBIx::Mojo::Model';
+#~ use Mojo::Base 'DBIx::Mojo::Model';
+use Mojo::Base 'Mojolicious::Plugin::RoutesAuthDBI::Model::Base';
 
-sub new {
-  state $self = shift->SUPER::new(@_);
-}
+#~ sub new {
+  #~ state $self = shift->SUPER::new(@_);
+#~ }
 
 sub get_guest {
   my $self = ref($_[0]) ? shift : shift->new;

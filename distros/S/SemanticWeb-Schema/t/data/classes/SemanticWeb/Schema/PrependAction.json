@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of inserting at the beginning if an ordered collection.",
+      "rdfs:label" : "PrependAction",
+      "rdfs:subClassOf" : "schema:InsertAction"
+   },
+   "properties" : {}
+}

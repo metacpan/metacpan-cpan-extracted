@@ -72,7 +72,7 @@
          "web" : "https://github.com/perlancar/perl-Finance-Currency-FiatX"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -477,7 +477,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::EnsureVersion",
             "name" : "@Author::PERLANCAR/Prereqs::EnsureVersion",
-            "version" : "0.04"
+            "version" : "0.050"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::CheckCircular",

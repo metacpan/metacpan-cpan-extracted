@@ -1,18 +1,17 @@
 Artistic                                 The "Artistic License"
 Changes                                  Differences from previous version
 Copying                                  The GNU General Public License
+fallback/const-c.inc                     Win32::SharedFileOpen extension constants fallback file
+fallback/const-xs.inc                    Win32::SharedFileOpen extension constants fallback file
 INSTALL                                  Detailed installation instructions
+lib/Win32/SharedFileOpen.pm              Win32::SharedFileOpen extension Perl module
 LICENCE                                  The Licence
 Makefile.PL                              Makefile writer
 MANIFEST                                 This list of files
 MANIFEST.SKIP                            Manifest skip specs
+ppport.h                                 Perl/Pollution/Portability header
 README                                   The Instructions
 SharedFileOpen.xs                        Win32::SharedFileOpen extension external subroutines
-ppport.h                                 Perl/Pollution/Portability header
-typemap                                  Win32::SharedFileOpen extension interface types
-fallback/const-c.inc                     Win32::SharedFileOpen extension constants fallback file
-fallback/const-xs.inc                    Win32::SharedFileOpen extension constants fallback file
-lib/Win32/SharedFileOpen.pm              Win32::SharedFileOpen extension Perl module
 t/01_imports_01.t                        See if import options work
 t/01_imports_02.t                        See if import options work
 t/01_imports_03.t                        See if import options work
@@ -38,6 +37,10 @@ t/09_sopen_share.t                       See if sopen() share modes work
 t/10_fsopen_fh_leak.t                    See if fsopen() leaks filehandles
 t/11_sopen_fh_leak.t                     See if sopen() leaks filehandles
 t/12_variables.t                         See if $ErrStr, $Trace and $Retry variables work
-t/13_pod.t                               See if POD is OK
+t/13_changes.t                           See if Changes file format is OK
+t/14_critic.t                            See if coding style is OK
+t/15_pod.t                               See if POD is OK
+t/16_pod_coverage.t                      See if POD coverage is OK
+typemap                                  Win32::SharedFileOpen extension interface types
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

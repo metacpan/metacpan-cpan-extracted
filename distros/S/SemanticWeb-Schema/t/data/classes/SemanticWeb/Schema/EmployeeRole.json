@@ -1,0 +1,34 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A subclass of OrganizationRole used to describe employee relationships.",
+      "rdfs:label" : "EmployeeRole",
+      "rdfs:subClassOf" : "schema:OrganizationRole"
+   },
+   "properties" : {
+      "schema:baseSalary" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The base salary of the job or of an employee in an EmployeeRole.",
+         "rdfs:label" : "baseSalary",
+         "schema:domainIncludes" : [
+            "schema:JobPosting",
+            "schema:EmployeeRole"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:Number",
+            "schema:PriceSpecification"
+         ]
+      },
+      "schema:salaryCurrency" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The currency (coded using <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217</a> ) used for the main salary information in this job posting or for this employee.",
+         "rdfs:label" : "salaryCurrency",
+         "schema:domainIncludes" : [
+            "schema:EmployeeRole",
+            "schema:JobPosting"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

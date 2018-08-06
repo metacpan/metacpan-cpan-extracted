@@ -1,0 +1,53 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_QAStackExchange",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A specific question - e.g. from a user seeking answers online, or collected in a Frequently Asked Questions (FAQ) document.",
+      "rdfs:label" : "Question",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:acceptedAnswer" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The answer that has been accepted as best, typically on a Question/Answer site. Sites vary in their selection mechanisms, e.g. drawing on community opinion and/or the view of the Question author.",
+         "rdfs:label" : "acceptedAnswer",
+         "rdfs:subPropertyOf" : "schema:suggestedAnswer",
+         "schema:domainIncludes" : "schema:Question",
+         "schema:rangeIncludes" : "schema:Answer"
+      },
+      "schema:answerCount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of answers this question has received.",
+         "rdfs:label" : "answerCount",
+         "schema:domainIncludes" : "schema:Question",
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:downvoteCount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of downvotes this question, answer or comment has received from the community.",
+         "rdfs:label" : "downvoteCount",
+         "schema:domainIncludes" : [
+            "schema:Comment",
+            "schema:Question"
+         ],
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:suggestedAnswer" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An answer (possibly one of several, possibly incorrect) to a Question, e.g. on a Question/Answer site.",
+         "rdfs:label" : "suggestedAnswer",
+         "schema:domainIncludes" : "schema:Question",
+         "schema:rangeIncludes" : "schema:Answer"
+      },
+      "schema:upvoteCount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of upvotes this question, answer or comment has received from the community.",
+         "rdfs:label" : "upvoteCount",
+         "schema:domainIncludes" : [
+            "schema:Question",
+            "schema:Comment"
+         ],
+         "schema:rangeIncludes" : "schema:Integer"
+      }
+   }
+}

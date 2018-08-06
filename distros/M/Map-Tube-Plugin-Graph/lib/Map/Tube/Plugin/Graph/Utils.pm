@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph::Utils;
 
-$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.31';
+$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.32';
 $Map::Tube::Plugin::Graph::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph::Utils - Helper package for Map::Tube::Plugin::Graph.
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =cut
 
@@ -63,9 +63,12 @@ sub graph_line_image {
         line_number => $caller[2] })
         unless defined $line;
 
-    my $color  = $EDGE_COLOR;
-    $color     = $line->color if defined $line->color;
-    $line_name = $line->name;
+    my $color   = $EDGE_COLOR;
+    $color      = $line->color if defined $line->color;
+    $line_name  = $line->name;
+    my $bgcolor = $map->bgcolor;
+    $bgcolor    = _graph_bgcolor($color) unless defined $bgcolor;
+
     my $graph  = GraphViz2->new(
         edge   => { color     => $color,
                     arrowsize => $ARROWSIZE },
@@ -73,7 +76,7 @@ sub graph_line_image {
         global => { directed  => $DIRECTED  },
         graph  => { label     => _graph_line_label($line_name, $map->name),
                     labelloc  => $LABELLOC,
-                    bgcolor   => _graph_bgcolor($color) });
+                    bgcolor   => $bgcolor });
 
     my $stations = $line->get_stations;
     foreach my $node (@$stations) {
@@ -111,13 +114,16 @@ sub graph_line_image {
 sub graph_map_image {
     my ($map) = @_;
 
+    my $bgcolor = $map->bgcolor;
+    $bgcolor = $BGCOLOR unless defined $bgcolor;
+
     my $graph  = GraphViz2->new(
         node   => { shape     => $SHAPE     },
         edge   => { arrowsize => $ARROWSIZE },
         global => { directed  => $DIRECTED  },
         graph  => { label     => _graph_map_label($map->name),
                     labelloc  => $LABELLOC,
-                    bgcolor   => $BGCOLOR
+                    bgcolor   => $bgcolor
         });
 
     my $lines    = $map->lines;

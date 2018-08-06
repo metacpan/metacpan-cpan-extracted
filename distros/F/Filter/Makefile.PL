@@ -16,7 +16,7 @@ my @files = qw( t/filter-util.pl
              Exec/Exec.pm 
              decrypt/decrypt.pm decrypt/decr decrypt/encrypt
              tee/tee.pm
-             lib/Filter/cpp.pm lib/Filter/exec.pm lib/Filter/sh.pm
+             lib/Filter/cpp.pm lib/Filter/exec.pm lib/Filter/m4.pm lib/Filter/sh.pm
              examples/filtdef
              examples/method/Count.pm
              examples/method/NewSubst.pm
@@ -37,6 +37,7 @@ my @files = qw( t/filter-util.pl
              t/cpp.t
              t/decrypt.t
              t/exec.t
+             t/m4.t
              t/order.t
              t/sh.t
              t/tee.t         

@@ -166,7 +166,7 @@ has 'covers'	=> (
 	builder => 'generate_covers'
 );
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 sub BUILD
 {
@@ -489,14 +489,14 @@ sub generate_primes
 		#
 		for my $low (0 .. $#{ $bits[$level] })
 		{
+			my %nextlvlimp;
+
 			#
 			# These nested for-loops get all permutations
 			# of adjacent sets.
 			#
 			for my $lv (@{ $bits[$level][$low] })
 			{
-				my %nextlvlimp;
-
 				#
 				# Initialize the implicant as unused.
 				#
@@ -529,27 +529,24 @@ sub generate_primes
 						#
 						### Compared: $lv
 						### to      : $hv
-						### pushing : $new
+						### saving  : $new
 						#
 						# Save the new implicant to the
 						# next level, then mark the two
 						# values as used.
 						#
-						push @{ $bits[$level + 1][$low + 1] }, $new unless (exists $nextlvlimp{$new});
 						$nextlvlimp{$new} = 1;
 						$implicant{$lv} = 1;
 						$implicant{$hv} = 1;
 					}
-					else
-					{
-						#
-						### Compared: $lv
-						### to      : $hv
-						### No push
-						#
-					}
 				}
 			}
+
+			#
+			# Push those next-level implicants to the next level,
+			# assuming we found any.
+			#
+			push @{ $bits[$level + 1][$low + 1] }, keys %nextlvlimp if (%nextlvlimp);
 		}
 	}
 
@@ -709,7 +706,8 @@ sub recurse_solve
 
 	#
 	##### recurse_solve() level: $level
-	##### recurse_solve() called with: "\n" . chart(\%primes, $self->width)
+	##### recurse_solve() called with
+	##### primes: "\n" . chart(\%primes, $self->width)
 	#
 	
 	my %ess = find_essentials(\%primes, $self->minmax_bit_terms());
@@ -750,7 +748,7 @@ sub recurse_solve
 		my @cols = row_dominance(\%cols, 0);
 		#### row_dominance called with primes (rotated): "\n" . chart(\%cols, $self->width)
 		#### row_dominance returns for removal: "[" . join(", ", @cols) . "]"
-		remels($_, \%primes) for (@cols);
+		remels(\%primes, @cols);
 
 		%ess = find_essentials(\%primes, $self->minmax_bit_terms());
 
@@ -763,21 +761,19 @@ sub recurse_solve
 	return [ reverse sort @prefix ] unless (keys %primes);
 
 	#
-	##### recurse_solve() Primes after loop: "\n" . chart(\%primes, $self->width)
+	# Find a term (there may be more than one) that has the least
+	# number of prime implicants covering it, and a list of those
+	# prime implicants. Use that list to figure out the best set
+	# to cover the rest of the terms.
 	#
+	##### recurse_solve() Primes after loop
+	##### primes: "\n" . chart(\%primes, $self->width)
+	#
+	my($term, @ta) = covered_least(\%primes, $self->minmax_bit_terms());
 
 	#
-	# Find the term that has the least number of prime implicants
-	# covering it. Then having found it, make a list of those
-	# prime implicants, and use that list to figure out the best
-	# set to cover the rest of the terms.
-	#
-	my $term = least_covered(\%primes, $self->minmax_bit_terms());
-	my @ta = grep { countels($term, $primes{$_}) } keys %primes;
-
-	#
-	##### Least-covered term returned is: $term
-	##### Prime implicants that cover term are: "[" . join(", ", @ta) . "]"
+	##### Least Covered term: $term
+	##### Covered by: @ta
 	#
 	# Make a copy of the section of the prime implicants
 	# table that don't cover that term.

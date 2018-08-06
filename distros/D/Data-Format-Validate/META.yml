@@ -1,7 +1,7 @@
---- Data::Format::Validate
+---
 abstract: 'Perl module to validate data'
 author:
-  - 'Israel Costa <israel.batista@univem.edu.br>'
+  - 'Israel Batista <rozcovo@cpan.org>'
 build_requires:
   Test::Simple: '1.302136'
 dynamic_config: 0
@@ -11,9 +11,23 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-Format-Validate
+provides:
+  Data::Format::Validate:
+    file: lib/Data/Format/Validate.pm
+    version: '0.3'
+  Data::Format::Validate::Email:
+    file: lib/Data/Format/Validate/Email.pm
+    version: '0.3'
+  Data::Format::Validate::IP:
+    file: lib/Data/Format/Validate/IP.pm
+    version: '0.3'
+  Data::Format::Validate::URL:
+    file: lib/Data/Format/Validate/URL.pm
+    version: '0.3'
+  Data::Format::Validate::URN:
+    file: lib/Data/Format/Validate/URN.pm
+    version: '0.3'
 requires:
   Carp: v1.3.8
-resources:
-  license: http://www.opensource.org/licenses/mit-license.php
-version: '0.1'
+version: '0.3'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

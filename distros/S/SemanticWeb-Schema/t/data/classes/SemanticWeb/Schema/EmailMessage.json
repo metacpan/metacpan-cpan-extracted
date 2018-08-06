@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An email message.",
+      "rdfs:label" : "EmailMessage",
+      "rdfs:subClassOf" : "schema:Message"
+   },
+   "properties" : {}
+}

@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::State::LaxParser;
-$Games::Solitaire::Verify::State::LaxParser::VERSION = '0.1800';
+$Games::Solitaire::Verify::State::LaxParser::VERSION = '0.1900';
 use warnings;
 use strict;
 
@@ -8,12 +8,12 @@ use parent 'Games::Solitaire::Verify::State';
 
 sub _from_string
 {
-    my ($self, $str) = @_;
+    my ( $self, $str ) = @_;
 
     my $rank_re = '[0A1-9TJQK]';
 
     my $founds_s;
-    if ($str =~ m{\A(Foundations:[^\n]*)\n}cgms)
+    if ( $str =~ m{\A(Foundations:[^\n]*)\n}cgms )
     {
         $founds_s = $1;
     }
@@ -26,21 +26,21 @@ sub _from_string
         Games::Solitaire::Verify::Foundations->new(
             {
                 num_decks => $self->num_decks(),
-                string => $founds_s,
+                string    => $founds_s,
             }
         )
     );
 
     my $fc = 'Freecells:';
-    if ($str =~ m{\G(Freecells:[^\n]*)\n}cgms)
+    if ( $str =~ m{\G(Freecells:[^\n]*)\n}cgms )
     {
         $fc = $1;
     }
     $self->_assign_freecells_from_string($fc);
 
-    foreach my $col_idx (0 .. ($self->num_columns()-1))
+    foreach my $col_idx ( 0 .. ( $self->num_columns() - 1 ) )
     {
-        if ($str !~ m{\G([^\n]*)\n}msg)
+        if ( $str !~ m{\G([^\n]*)\n}msg )
         {
             Games::Solitaire::Verify::Exception::Parse::State::Column->throw(
                 error => "Cannot parse column",
@@ -48,7 +48,7 @@ sub _from_string
             );
         }
         my $column_str = $1;
-        if ($column_str !~ /\A:/)
+        if ( $column_str !~ /\A:/ )
         {
             $column_str =~ s/\A\s*/: /;
         }
@@ -65,7 +65,7 @@ sub _from_string
     return;
 }
 
-1; # End of Games::Solitaire::Verify::State
+1;    # End of Games::Solitaire::Verify::State
 
 __END__
 
@@ -80,11 +80,11 @@ states (or positions) of the entire board.
 
 =head1 VERSION
 
-version 0.1800
+version 0.1900
 
 =head1 VERSION
 
-version 0.1800
+version 0.1900
 
 =head1 AUTHOR
 

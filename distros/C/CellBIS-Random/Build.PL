@@ -18,7 +18,7 @@ my %module_build_args = (
     "Achmad Yusri Afandi <yusrideb\@cpan.org>"
   ],
   "dist_name" => "CellBIS-Random",
-  "dist_version" => "0.1",
+  "dist_version" => "0.3",
   "license" => "artistic_2",
   "module_name" => "CellBIS::Random",
   "recursive_test_files" => 1,
@@ -26,6 +26,7 @@ my %module_build_args = (
     "Carp" => 0,
     "List::SomeUtils" => 0,
     "Scalar::Util" => 0,
+    "perl" => "5.010",
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0

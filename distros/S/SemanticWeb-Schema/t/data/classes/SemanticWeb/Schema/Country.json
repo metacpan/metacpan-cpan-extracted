@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A country.",
+      "rdfs:label" : "Country",
+      "rdfs:subClassOf" : "schema:AdministrativeArea"
+   },
+   "properties" : {}
+}

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A table on a Web page.",
+      "rdfs:label" : "Table",
+      "rdfs:subClassOf" : "schema:WebPageElement"
+   },
+   "properties" : {}
+}

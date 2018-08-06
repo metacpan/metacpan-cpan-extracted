@@ -1,5 +1,8 @@
 Revision history for Win32-ServiceManager
 
+0.002005  2018-07-31 19:08:22-05:00 America/Chicago
+ - add optional start type config
+
 0.002004  2018-02-13 16:25:46-06:00 America/Chicago
  - add optional user and password configs
 

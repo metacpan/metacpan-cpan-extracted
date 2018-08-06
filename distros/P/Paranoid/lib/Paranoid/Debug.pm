@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Debug.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+# $Id: lib/Paranoid/Debug.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -23,7 +23,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use base qw(Exporter);
 use Paranoid;
 
-($VERSION) = ( q$Revision: 2.05 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT    = qw(PDEBUG pdebug pIn pOut);
 @EXPORT_OK = (
@@ -196,7 +196,7 @@ Paranoid::Debug - Trace message support for paranoid programs
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Debug.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+$Id: lib/Paranoid/Debug.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 
 =head1 SYNOPSIS
 

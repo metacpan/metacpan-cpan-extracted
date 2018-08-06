@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Cwd" => 0,
     "Digest" => "1.03",
     "Digest::SHA" => "5.45",
+    "Encode" => 0,
     "Exporter" => "5.57",
     "Fcntl" => 0,
     "File::Copy" => 0,
@@ -47,7 +48,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "open" => 0
   },
-  "VERSION" => "0.106",
+  "VERSION" => "0.108",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,6 +61,7 @@ my %FallbackPrereqs = (
   "Digest" => "1.03",
   "Digest::MD5" => 0,
   "Digest::SHA" => "5.45",
+  "Encode" => 0,
   "Exporter" => "5.57",
   "ExtUtils::MakeMaker" => 0,
   "Fcntl" => 0,

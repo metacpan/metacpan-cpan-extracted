@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Kea - Package for language Kabuverdianu
 
 package Locale::CLDR::Locales::Kea;
 # This file auto generated from Data\common\main\kea.xml
-#	on Fri 13 Apr  7:16:09 am GMT
+#	on Sun  5 Aug  6:07:39 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -50,6 +50,7 @@ has 'display_name_language' => (
  				'agq' => 'aghem',
  				'ak' => 'akan',
  				'am' => 'amáriku',
+ 				'an' => 'argones',
  				'ar' => 'árabi',
  				'ar_001' => 'árabi mudernu',
  				'arn' => 'araukanu',
@@ -59,6 +60,7 @@ has 'display_name_language' => (
  				'az' => 'azerbaijanu',
  				'az@alt=short' => 'azeri',
  				'ba' => 'baxkir',
+ 				'ban' => 'balinese',
  				'be' => 'bielorusu',
  				'bem' => 'bemba',
  				'bez' => 'bena',
@@ -228,6 +230,7 @@ has 'display_name_language' => (
  				'wo' => 'uolof',
  				'xh' => 'koza',
  				'yo' => 'ioruba',
+ 				'yue' => 'kantonese',
  				'zh' => 'xines',
  				'zh_Hans' => 'xines simplifikadu',
  				'zh_Hant' => 'xines tradisional',
@@ -2296,6 +2299,12 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(Ougia \(1973–2017\)),
+				'other' => q(Ougia \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ougia),
 				'other' => q(Ougia),
 			},
@@ -2469,6 +2478,12 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(Dobra di Sãu Tume i Prínsipi \(1977–2017\)),
+				'other' => q(Dobra di Sãu Tume i Prinsipi \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dobra di Sãu Tume i Prínsipi),
 				'other' => q(Dobra di Sãu Tume i Prinsipi),
@@ -2880,16 +2895,16 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'pm' => q{pm},
 					'am' => q{am},
+					'pm' => q{pm},
 				},
 				'narrow' => {
-					'am' => q{a},
 					'pm' => q{p},
+					'am' => q{a},
 				},
 				'abbreviated' => {
-					'am' => q{am},
 					'pm' => q{pm},
+					'am' => q{am},
 				},
 			},
 		},

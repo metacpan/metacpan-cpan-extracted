@@ -1,0 +1,30 @@
+## name Small map block
+## failures 0
+## cut
+
+map {
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    [42,42,42,42,42,42];
+} (1..100);
+
+## name Large map block
+## failures 1
+## cut
+
+map {
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+} (1...100)

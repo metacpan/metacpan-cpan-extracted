@@ -1,5 +1,5 @@
 package Data::Format::Validate::Email;
-our $VERSION = q/0.2/;
+our $VERSION = q/0.3/;
 
 use Carp;
 use base q/Exporter/;
@@ -18,14 +18,23 @@ our %EXPORT_TAGS = (
 
 sub looks_like_any_email {
 
-    $_ = shift || croak q/Value most be provided/;
-    /^\S+@\S+$/
+    my $email = shift || croak q/Value most be provided/;
+    $email =~ /^
+        \S+ # Username (visible digits)
+        @   # at
+        \S+ # Server (visible digits)
+    $/x
 }
 
 sub looks_like_common_email {
 
-    $_ = shift || croak q/Value most be provided/;
-    /^\w+(?:\.\w+)*@(?:[A-Z0-9-]+\.)+[A-Z]{2,6}$/i
+    my $email = shift || croak q/Value most be provided/;
+    $email =~ /^
+        \w+(?:\.\w+)*       # Username, can contain '.', but cant end with
+        @                   # at
+        (?:[A-Z0-9-]+\.)+   # Server, can contain alphanumeric digits and '-'
+        [A-Z]{2,6}          # Final part of servername, 2 to 6 letters
+    $/ix
 }
 1;
 
@@ -39,9 +48,9 @@ Data::Format::Validate::Email - A e-mail validating module.
 
 =head1 SYNOPSIS
 
-Module that validate e-mail addressess.
+Function-oriented module capable of validating the format of any email, or only the common ones.
 
-=head1 Utilities
+=head1 UTILITIES
 
 =over 4
 
@@ -49,33 +58,15 @@ Module that validate e-mail addressess.
 
     use Data::Format::Validate::Email 'looks_like_any_email';
 
-    looks_like_any_email 'israel.batista@univem.edu.br';    # 1
-    looks_like_any_email '!$%@&[.B471374@*")..$$#!+=.-';    # 1
-
-    looks_like_any_email 'israel.batistaunivem.edu.br';     # 0
-    looks_like_any_email 'israel. batista@univem.edu.br';   # 0
-    looks_like_any_email 'israel.batista@univ em.edu.br';   # 0
+    looks_like_any_email 'rozcovo@cpan.org';    # returns 1
+    looks_like_any_email 'rozcovo@cpan. org';   # returns 0
 
 =item Common E-mail
 
     use Data::Format::Validate::Email 'looks_like_common_email';
 
-    looks_like_common_email 'israel.batista@univem.edu.br';         # 1
-    looks_like_common_email 'israel.batista42@univem.edu.br';       # 1
-
-    looks_like_common_email 'israel.@univem.edu.br';                # 0
-    looks_like_common_email 'israel.batistaunivem.edu.br';          # 0
-    looks_like_common_email '!$%@&[.B471374@*")..$$#!+=.-';         # 0
-    looks_like_common_email '!srael.batista@un!vem.edu.br';         # 0
-    looks_like_common_email 'i%rael.bati%ta@univem.edu.br';         # 0
-    looks_like_common_email 'isra&l.batista@univ&m.&du.br';         # 0
-    looks_like_common_email 'israel[batista]@univem.edu.br';        # 0
-    looks_like_common_email 'israel. batista@univem.edu.br';        # 0
-    looks_like_common_email 'israel.batista@univem. edu.br';        # 0
-    looks_like_common_email 'israel.batista@univem..edu.br';        # 0
-    looks_like_common_email 'israel..batista@univem.edu.br';        # 0
-    looks_like_common_email 'israel.batista@@univem.edu.br';        # 0
-    looks_like_common_email 'israel.batista@univem.edu.brasilia';   # 0
+    looks_like_common_email 'rozcovo@cpan.org';     # returns 1
+    looks_like_common_email 'rozcovo.@cpan.org';    # returns 0
 
 =back
 
@@ -87,6 +78,6 @@ This source is on Github:
 
 =head1 AUTHOR
 
-Created by Israel Batista <<israel.batista@univem.edu.br>>
+Created by Israel Batista <rozcovo@cpan.org>
 
 =cut

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Dyo - Package for language Jola-Fonyi
 
 package Locale::CLDR::Locales::Dyo;
 # This file auto generated from Data\common\main\dyo.xml
-#	on Fri 13 Apr  7:06:50 am GMT
+#	on Sun  5 Aug  5:57:13 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -450,6 +450,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(ugiiya yati Mooritanii \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(ugiiya yati Mooritanii),
 			},
 		},
@@ -657,7 +662,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -681,7 +686,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

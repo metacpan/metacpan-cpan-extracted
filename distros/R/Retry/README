@@ -1,5 +1,5 @@
 NAME
-    Retry
+    Retry - Try an action repeatedly with callback support
 
 SYNOPSIS
     A one-feature module, this provides a method to wrap any function in

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Lag - Package for language Langi
 
 package Locale::CLDR::Locales::Lag;
 # This file auto generated from Data\common\main\lag.xml
-#	on Fri 13 Apr  7:17:57 am GMT
+#	on Sun  5 Aug  6:09:39 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -538,6 +538,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ungwíiya ya Moritánia \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ungwíiya ya Moritánia),
 			},
 		},
@@ -602,6 +607,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dóbura ya SaoTóome na Pirínsipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dóbura ya SaoTóome na Pirínsipe),
 			},
@@ -807,13 +817,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{TOO},
-					'pm' => q{MUU},
-				},
 				'abbreviated' => {
-					'am' => q{TOO},
 					'pm' => q{MUU},
+					'am' => q{TOO},
+				},
+				'wide' => {
+					'pm' => q{MUU},
+					'am' => q{TOO},
 				},
 			},
 		},
@@ -893,7 +903,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -916,7 +926,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

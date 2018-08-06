@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An embassy.",
+      "rdfs:label" : "Embassy",
+      "rdfs:subClassOf" : "schema:GovernmentBuilding"
+   },
+   "properties" : {}
+}

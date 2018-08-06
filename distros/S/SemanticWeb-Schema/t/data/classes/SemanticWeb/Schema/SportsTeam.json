@@ -1,0 +1,24 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Organization: Sports team.",
+      "rdfs:label" : "SportsTeam",
+      "rdfs:subClassOf" : "schema:SportsOrganization"
+   },
+   "properties" : {
+      "schema:athlete" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A person that acts as performing member of a sports team; a player as opposed to a coach.",
+         "rdfs:label" : "athlete",
+         "schema:domainIncludes" : "schema:SportsTeam",
+         "schema:rangeIncludes" : "schema:Person"
+      },
+      "schema:coach" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A person that acts in a coaching role for a sports team.",
+         "rdfs:label" : "coach",
+         "schema:domainIncludes" : "schema:SportsTeam",
+         "schema:rangeIncludes" : "schema:Person"
+      }
+   }
+}

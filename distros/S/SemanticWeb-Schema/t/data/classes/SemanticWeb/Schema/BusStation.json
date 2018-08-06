@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A bus station.",
+      "rdfs:label" : "BusStation",
+      "rdfs:subClassOf" : "schema:CivicStructure"
+   },
+   "properties" : {}
+}

@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::StringFormatError
 Perl data type class for the XML Schema defined complexType
 StringFormatError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+A list of error code for reporting invalid content of input strings. 
 
 
 

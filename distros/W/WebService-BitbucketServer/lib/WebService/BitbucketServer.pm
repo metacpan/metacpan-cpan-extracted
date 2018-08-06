@@ -5,7 +5,7 @@ package WebService::BitbucketServer;
 use warnings;
 use strict;
 
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 use HTTP::AnyUA::Util qw(www_form_urlencode);
 use HTTP::AnyUA;
@@ -69,8 +69,8 @@ has json => (
     is      => 'lazy',
     isa     => Object,
     default => sub {
-        load JSON;
-        JSON->new->utf8(1);
+        load JSON::MaybeXS;
+        JSON::MaybeXS->new(utf8 => 1);
     },
 );
 
@@ -305,7 +305,7 @@ WebService::BitbucketServer - Bindings for Bitbucket Server REST APIs
 
 =head1 VERSION
 
-version 0.604
+version 0.605
 
 =head1 SYNOPSIS
 
@@ -361,7 +361,7 @@ Get the username of the user for authenticating.
 
 =head2 password
 
-Get the password of the user for authenticating.
+Get the password (or personal access token) of the user for authenticating.
 
 =head2 ua
 
@@ -378,7 +378,7 @@ Get the L<HTTP::AnyUA> object.
 
 =head2 json
 
-Get the L<JSON> (or compatible) object used for encoding and decoding documents.
+Get the L<JSON::XS> (or compatible) object used for encoding and decoding documents.
 
 =head2 no_security_warning
 

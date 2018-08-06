@@ -1,0 +1,110 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A property-value pair, e.g. representing a feature of a product or place. Use the 'name' property for the name of the property. If there is an additional human-readable version of the value, put that into the 'description' property.</p>\n\n<p>Always use specific schema.org properties when a) they exist and b) you can populate them. Using PropertyValue as a substitute will typically not trigger the same effect as using the original, specific property.",
+      "rdfs:label" : "PropertyValue",
+      "rdfs:subClassOf" : "schema:StructuredValue"
+   },
+   "properties" : {
+      "schema:maxValue" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The upper value of some characteristic or property.",
+         "rdfs:label" : "maxValue",
+         "schema:domainIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:PropertyValue",
+            "schema:QuantitativeValue",
+            "schema:PropertyValueSpecification"
+         ],
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:minValue" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The lower value of some characteristic or property.",
+         "rdfs:label" : "minValue",
+         "schema:domainIncludes" : [
+            "schema:PropertyValueSpecification",
+            "schema:MonetaryAmount",
+            "schema:QuantitativeValue",
+            "schema:PropertyValue"
+         ],
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:propertyID" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A commonly used identifier for the characteristic represented by the property, e.g. a manufacturer or a standard code for a property. propertyID can be\n(1) a prefixed string, mainly meant to be used with standards for product properties; (2) a site-specific, non-prefixed string (e.g. the primary key of the property or the vendor-specific id of the property), or (3)\na URL indicating the type of the property, either pointing to an external vocabulary, or a Web resource that describes the property (e.g. a glossary entry).\nStandards bodies should promote a standard prefix for the identifiers of properties from their standards.",
+         "rdfs:label" : "propertyID",
+         "schema:domainIncludes" : "schema:PropertyValue",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      },
+      "schema:unitCode" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The unit of measurement given using the UN/CEFACT Common Code (3 characters) or a URL. Other codes than the UN/CEFACT Common Code may be used with a prefix followed by a colon.",
+         "rdfs:label" : "unitCode",
+         "schema:domainIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:TypeAndQuantityNode",
+            "schema:UnitPriceSpecification",
+            "schema:PropertyValue"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      },
+      "schema:unitText" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for\n<a href='unitCode'>unitCode</a>.",
+         "rdfs:label" : "unitText",
+         "schema:domainIncludes" : [
+            "schema:UnitPriceSpecification",
+            "schema:TypeAndQuantityNode",
+            "schema:QuantitativeValue",
+            "schema:PropertyValue"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:value" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "<p>The value of the quantitative value or property value node.</p>\n\n<ul>\n<li>For <a class=\"localLink\" href=\"http://schema.org/QuantitativeValue\">QuantitativeValue</a> and <a class=\"localLink\" href=\"http://schema.org/MonetaryAmount\">MonetaryAmount</a>, the recommended type for values is 'Number'.</li>\n<li>For <a class=\"localLink\" href=\"http://schema.org/PropertyValue\">PropertyValue</a>, it can be 'Text;', 'Number', 'Boolean', or 'StructuredValue'.</li>\n</ul>\n",
+         "rdfs:label" : "value",
+         "schema:domainIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:PropertyValue",
+            "schema:QuantitativeValue"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Boolean",
+            "schema:Number",
+            "schema:Text",
+            "schema:StructuredValue"
+         ]
+      },
+      "schema:valueReference" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A pointer to a secondary value that provides additional information on the original value, e.g. a reference temperature.",
+         "rdfs:label" : "valueReference",
+         "schema:domainIncludes" : [
+            "schema:QualitativeValue",
+            "schema:PropertyValue",
+            "schema:QuantitativeValue"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Enumeration",
+            "schema:PropertyValue",
+            "schema:StructuredValue",
+            "schema:QualitativeValue"
+         ]
+      }
+   }
+}

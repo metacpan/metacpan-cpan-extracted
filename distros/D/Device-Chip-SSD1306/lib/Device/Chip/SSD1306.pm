@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
 
 package Device::Chip::SSD1306;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp;
 
@@ -59,7 +59,14 @@ of the display modules, often found with a 0.96 inch display.
 =item C<SSD1306-128x32>
 
 An F<SSD1306> driving a display with 128 columns and 32 rows. This is the
-usual "half-height" display.
+usual "half-height" module, often found with a 0.91 inch display. This uses
+only even-numbered rows.
+
+=item C<SSD1306-64x32>
+
+An F<SSD1306> driving a display with 64 columns and 32 rows. This is the usual
+"quarter" size module, often found with a 0.49 inch display. This uses the
+only the middle 64 columns.
 
 =item C<SH1106-128x64>
 
@@ -84,6 +91,14 @@ my %MODELS = (
 
       set_com_pins_arg => 0x02,
       column_offset    => 0,
+   },
+   "SSD1306-64x32" => {
+      columns => 64,
+      rows    => 32,
+
+      set_com_pins_arg => 0x12,
+      # This module seems to use the middle 64 column pins
+      column_offset    => 32,
    },
    "SH1106-128x64" => {
       columns => 128,
@@ -208,7 +223,7 @@ sub init
 
    $self->display( 0 )
       ->then( sub { $self->send_cmd( CMD_SET_CLOCKDIV,     ( 8 << 4 ) | 0x80 ) })
-      ->then( sub { $self->send_cmd( CMD_SET_MUX_RATIO,    0x3F ) })
+      ->then( sub { $self->send_cmd( CMD_SET_MUX_RATIO,    $self->rows - 1 ) })
       ->then( sub { $self->send_cmd( CMD_SET_DISPLAY_OFFS, 0 ) })
       ->then( sub { $self->send_cmd( CMD_SET_DISPLAY_START | 0 ) })
       ->then( sub { $self->send_cmd( CMD_SET_CHARGEPUMP,   0x14 ) })
@@ -286,6 +301,145 @@ sub send_display
    return $f;
 }
 
+=head1 DRAWING METHODS
+
+The following methods operate on an internal framebuffer stored by the
+instance. The user must invoke the L</refresh> method to update the actual
+chip after calling them.
+
+=cut
+
+=head2 clear
+
+   $chip->clear
+
+Resets the stored framebuffer to blank.
+
+=cut
+
+sub clear
+{
+   my $self = shift;
+
+   $self->{display} = [
+      map { [ ( 0 ) x $self->columns ] } 1 .. $self->rows
+   ];
+   $self->{display_dirty} = ( 1 << $self->rows/8 ) - 1;
+   $self->{display_dirty_xlo} = 0;
+   $self->{display_dirty_xhi} = $self->columns-1;
+}
+
+=head2 draw_pixel
+
+   $chip->draw_pixel( $x, $y, $val = 1 )
+
+Draw the given pixel. If the third argument is false, the pixel will be
+cleared instead of set.
+
+=cut
+
+sub draw_pixel
+{
+   my $self = shift;
+   my ( $x, $y, $val ) = @_;
+
+   $val //= 1;
+
+   $self->{display}[$y][$x] = $val;
+   $self->{display_dirty} |= ( 1 << int( $y / 8 ) );
+   $self->{display_dirty_xlo} = $x if $self->{display_dirty_xlo} > $x;
+   $self->{display_dirty_xhi} = $x if $self->{display_dirty_xhi} < $x;
+}
+
+=head2 draw_hline
+
+   $chip->draw_hline( $x1, $x2, $y, $val = 1 )
+
+Draw a horizontal line in the given I<$y> row, between the columns I<$x1> and
+I<$x2> (inclusive). If the fourth argument is false, the pixels will be
+cleared instead of set.
+
+=cut
+
+sub draw_hline
+{
+   my $self = shift;
+   my ( $x1, $x2, $y, $val ) = @_;
+
+   $val //= 1;
+
+   $self->{display}[$y][$_] = $val for $x1 .. $x2;
+   $self->{display_dirty} |= ( 1 << int( $y / 8 ) );
+   $self->{display_dirty_xlo} = $x1 if $self->{display_dirty_xlo} > $x1;
+   $self->{display_dirty_xhi} = $x2 if $self->{display_dirty_xhi} < $x2;
+}
+
+=head2 draw_vline
+
+   $chip->draw_vline( $x, $y1, $y2, $val = 1 )
+
+Draw a vertical line in the given I<$x> column, between the rows I<$y1> and
+I<$y2> (inclusive). If the fourth argument is false, the pixels will be
+cleared instead of set.
+
+=cut
+
+sub draw_vline
+{
+   my $self = shift;
+   my ( $x, $y1, $y2, $val ) = @_;
+
+   $val //= 1;
+
+   $self->{display}[$_][$x] = $val for $y1 .. $y2;
+   $self->{display_dirty} |= ( 1 << int( $_ / 8 ) ) for $y1 .. $y2;
+   $self->{display_dirty_xlo} = $x if $self->{display_dirty_xlo} > $x;
+   $self->{display_dirty_xhi} = $x if $self->{display_dirty_xhi} < $x;
+}
+
+=head2 refresh
+
+   $chip->refresh->get
+
+Sends the framebuffer to the display chip.
+
+=cut
+
+sub refresh
+{
+   my $self = shift;
+
+   my $display = $self->{display};
+   my $maxcol = $self->columns - 1;
+   my $column = $self->{column_offset} + $self->{display_dirty_xlo};
+
+   my $f = Future->done;
+
+   foreach my $page ( 0 .. ( $self->rows / 8 ) - 1 ) {
+      next unless $self->{display_dirty} & ( 1 << $page );
+      my $row = $page * 8;
+
+      my $data = "";
+      foreach my $col ( $self->{display_dirty_xlo} .. $self->{display_dirty_xhi} ) {
+         my $v = 0;
+         $v <<= 1, $display->[$row+$_][$col] && ( $v |= 1 ) for reverse 0 .. 7;
+         $data .= chr $v;
+      }
+
+      $f = $f->then( sub { $self->send_cmd( CMD_SET_PAGE_START + $page ) } )
+         ->then( sub { $self->send_cmd( CMD_SET_LOW_COLUMN | $column & 0x0f ) } )
+         ->then( sub { $self->send_cmd( CMD_SET_HIGH_COLUMN | $column >> 4 ) } )
+         ->then( sub { $self->send_data( $data ) } );
+
+      $self->{display_dirty} &= ~( 1 << $page );
+   }
+
+   $self->{display_dirty_xlo} = $self->columns;
+   $self->{display_dirty_xhi} = -1;
+
+   return $f;
+}
+
 =head1 TODO
 
 =over 4
@@ -293,10 +447,6 @@ sub send_display
 =item *
 
 More interfaces - 3-wire SPI
-
-=item *
-
-Maintain a framebuffer. Add some drawing commands like pixels and lines.
 
 =back
 

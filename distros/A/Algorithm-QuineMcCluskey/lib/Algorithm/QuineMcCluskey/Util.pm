@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use 5.010001;
 
-use List::MoreUtils qw(any indexes uniq);
+use List::MoreUtils qw(any indexes);
 use List::Compare::Functional qw(is_LequivalentR is_LsubsetR);
 
 use Exporter;
@@ -20,10 +20,9 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = (
 	all => [ qw(
 		columns
-		countels
+		covered_least
 		find_essentials
 		hammingd1pos
-		least_covered
 		maskedmatch
 		matchcount
 		purge_elements
@@ -37,7 +36,7 @@ our @EXPORT_OK = (
 	@{ $EXPORT_TAGS{all} }
 );
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 =head1 DESCRIPTION
 
@@ -165,7 +164,7 @@ sub row_dominance
 {
 	my($primes, $dominant_rows) = @_;
 	my @kp = keys %$primes;
-	my @rows;
+	my %unique_rows;
 
 	$dominant_rows //= 0;
 
@@ -184,40 +183,64 @@ sub row_dominance
 				is_LequivalentR([ $primes->{$row1} => $primes->{$row2} ]) or
 				!is_LsubsetR([ $primes->{$row1} => $primes->{$row2} ]));
 
-			push @rows, (($dominant_rows)? $row1: $row2);
+			$unique_rows{(($dominant_rows)? $row1: $row2)} = 1;
 		}
 	}
 
-	return uniq(@rows);
+	return keys %unique_rows;
 }
 
-=head3 least_covered()
+=head3 covered_least()
 
-Find the term with the fewest implicant covers.
+Find the term with the fewest implicant covers, along with a list of
+those covers.
 
-      my $t = least_covered(\%primes, @terms);
+      my($term, @covers) = covered_least(\%primes, @terms);
 
 =cut
 
-sub least_covered
+sub covered_least
 {
 	my($primes, @bit_terms) = @_;
 
+	#
+	# Find the bit terms that are within the hash's arrays.
+	#
 	my @t = grep {
 		my $o = $_;
-		any { countels( $o, $_ ) } values %{$primes}
+		any { $o eq $_  } map {@$_} values %{$primes}
 	} @bit_terms;
 
 	#
-	# Flip the table so that terms become keys, limited
-	# to those found in @t.
+	# Find out which keys in the primes hash
+	# cover each term (that is, have the term
+	# in each primes' arrays).
 	#
-	my %ic = columns($primes, @t);
+	my @pkeys = keys %$primes;
+	my $count = 1 + scalar @pkeys;
+	my @covers;
+	my $term = "";
 
 	#
-	# Sort by count of the array items.
+	# Now find a term with the lowest number of covers.
 	#
-	return (sort { @{ $ic{$a} } <=> @{ $ic{$b} } } keys %ic)[0];
+	for my $o (@t)
+	{
+		my @cvs = grep {
+			any { $_ eq $o } @{ $primes->{$_} }
+		} @pkeys;
+
+		my $c = scalar @cvs;
+
+		if ($c < $count)
+		{
+			$term = $o;
+			$count = $c;
+			@covers = @cvs;
+		}
+	}
+
+	return ($term, @covers);
 }
 
 =head3 purge_elements()
@@ -232,9 +255,8 @@ the essential prime implicants) from the table, both row-wise and column-wise.
 sub purge_elements
 {
 	my($primes, @ess) = @_;
-	my $count = 0;
 
-	return $count if (scalar @ess == 0 or scalar keys %$primes == 0);
+	return 0 if (scalar @ess == 0 or scalar keys %$primes == 0);
 
 	#
 	# Delete the rows of each element,
@@ -242,26 +264,19 @@ sub purge_elements
 	#
 	delete ${$primes}{$_} for @ess;
 
-	for my $el (@ess)
-	{
-		$count += remels($el, $primes);
-	}
-
-	if ($count != 0)
-	{
-	}
-	return $count;
+	return remels($primes, @ess);
 }
 
 =head3 remels()
 
-Given a value and a reference to a hash of arrayrefs, remove the value
-from the individual arrayrefs if the value matches the masks.
+Given a reference to a hash of arrayrefs and a reference to an array of
+values, remove the values from the individual arrayrefs if the values
+matches their masks.
 
 Deletes the entire arrayref from the hash if the last element of the
 array is removed.
 
-      remels($element, \%primes);
+      remels(\%primes, @elements);
 
 Returns the number of removals made.
 
@@ -269,51 +284,34 @@ Returns the number of removals made.
 
 sub remels
 {
-	my ($el, $href) = @_;
+	my ($href, @els) = @_;
 	my $rems = 0;
 	my @kp = keys %$href;
 
-	for my $k (@kp)
+	for my $el (@els)
 	{
-		my @pos = indexes { maskedmatch($el, $_) } @{$href->{$k}};
-
-		#
-		# If it turns out that all the elements in the array
-		# are to be removed, then just delete the entire
-		# array reference.
-		#
-		if (scalar @pos == scalar @{$href->{$k}})
+		for my $k (@kp)
 		{
-			delete $href->{$k};
+			my @pos = indexes { maskedmatch($el, $_) } @{$href->{$k}};
 			$rems += scalar @pos;
-		}
-		else
-		{
-			for my $pos (reverse @pos)
+
+			#
+			# If it turns out that all the elements in the array
+			# are to be removed, then just delete the entire
+			# array reference.
+			#
+			if (scalar @pos == scalar @{$href->{$k}})
 			{
-				splice(@{$href->{$k}}, $pos, 1);
-				$rems++;
+				delete $href->{$k};
+			}
+			else
+			{
+				splice(@{$href->{$k}}, $_, 1) for (reverse sort @pos);
 			}
 		}
 	}
 
 	return $rems;
-}
-
-=head3 countels()
-
-Returns a count of all elements in the array ref that are equal to $el.
-
-      my $c = countels($el, \@array);
-
-=cut
-
-sub countels
-{
-	my($el, $aref) = @_;
-
-	return 0 unless (@$aref);
-	return scalar grep { $_ eq $el } @$aref;
 }
 
 =head3 uniqels()

@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.99';
+our $VERSION = '1.01';
 
 use File::Which qw( which );
 
@@ -69,7 +69,7 @@ Dist::Zilla::Plugin::DROLSKY::MakeMaker - Subclasses MakeMaker::Awesome to alway
 
 =head1 VERSION
 
-version 0.99
+version 1.01
 
 =for Pod::Coverage .*
 

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of responding instinctively and emotionally to an object, expressing a sentiment.",
+      "rdfs:label" : "ReactAction",
+      "rdfs:subClassOf" : "schema:AssessAction"
+   },
+   "properties" : {}
+}

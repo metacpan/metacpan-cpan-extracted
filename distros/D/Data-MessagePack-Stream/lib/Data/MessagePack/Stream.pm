@@ -1,9 +1,10 @@
 package Data::MessagePack::Stream;
 use strict;
 use warnings;
+use Data::MessagePack;
 use XSLoader;
 
-our $VERSION = '1.01';
+our $VERSION = '1.04';
 
 XSLoader::load __PACKAGE__, $VERSION;
 

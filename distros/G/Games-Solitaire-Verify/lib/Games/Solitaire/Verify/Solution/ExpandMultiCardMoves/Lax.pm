@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::Lax;
-$Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::Lax::VERSION = '0.1800';
+$Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::Lax::VERSION = '0.1900';
 use strict;
 use warnings;
 
@@ -8,15 +8,15 @@ use parent 'Games::Solitaire::Verify::Solution::ExpandMultiCardMoves';
 
 sub _assign_read_new_state
 {
-    my ($self, $str) = @_;
+    my ( $self, $str ) = @_;
 
-    if (!defined($self->_st()))
+    if ( !defined( $self->_st() ) )
     {
         $self->_st(
             Games::Solitaire::Verify::State->new(
                 {
                     string => $str,
-                    @{$self->_V},
+                    @{ $self->_V },
                 }
             )
         );
@@ -26,7 +26,7 @@ sub _assign_read_new_state
 }
 
 
-1; # End of Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::Lax
+1;    # End of Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::Lax
 
 __END__
 
@@ -41,7 +41,7 @@ laxer expansion.
 
 =head1 VERSION
 
-version 0.1800
+version 0.1900
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ version 0.1800
 
 =head1 VERSION
 
-version 0.1800
+version 0.1900
 
 =head1 AUTHOR
 

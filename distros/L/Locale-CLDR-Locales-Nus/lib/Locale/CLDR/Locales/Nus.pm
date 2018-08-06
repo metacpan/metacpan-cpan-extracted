@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Nus - Package for language Nuer
 
 package Locale::CLDR::Locales::Nus;
 # This file auto generated from Data\common\main\nus.xml
-#	on Fri 13 Apr  7:24:25 am GMT
+#	on Sun  5 Aug  6:16:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -506,7 +506,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -530,7 +530,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

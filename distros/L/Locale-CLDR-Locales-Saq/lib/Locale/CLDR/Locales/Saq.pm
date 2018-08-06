@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Saq - Package for language Samburu
 
 package Locale::CLDR::Locales::Saq;
 # This file auto generated from Data\common\main\saq.xml
-#	on Fri 13 Apr  7:27:20 am GMT
+#	on Sun  5 Aug  6:20:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -561,6 +561,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Njilingi eel Moritania \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Njilingi eel Moritania),
 			},
 		},
@@ -625,6 +630,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Njilingi eel Sao Tome na Principe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Njilingi eel Sao Tome na Principe),
 			},
@@ -829,11 +839,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{Teipa},
 					'am' => q{Tesiran},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{Teipa},
 					'am' => q{Tesiran},
 				},
@@ -915,7 +925,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -938,7 +948,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

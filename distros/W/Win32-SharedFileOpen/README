@@ -1,8 +1,3 @@
-________________________________________________________________________________
-
-                      Win32::SharedFileOpen, Version 4.02
-________________________________________________________________________________
-
 NAME
 
     Win32::SharedFileOpen - Open a file for shared reading and/or writing
@@ -44,7 +39,7 @@ SYNOPSIS
 DESCRIPTION
 
     This module provides Perl emulations of the Microsoft C library functions
-    _fsopen() and _sopen().  These functions are counterparts to the standard C
+    _fsopen() and _sopen(). These functions are counterparts to the standard C
     library functions fopen(3) and open(2) respectively (which are already
     effectively available in Perl as open() and sysopen() respectively), but are
     intended for use when opening a file for subsequent shared reading and/or
@@ -53,16 +48,16 @@ DESCRIPTION
 COMPATIBILITY
 
     Before version 2.00 of this module, fsopen() and sopen() both created a
-    filehandle and returned it to the caller.  (undef was returned instead on
+    filehandle and returned it to the caller. (undef was returned instead on
     failure.)
 
     As of version 2.00 of this module, the arguments and return values of these
-    two functions now more closely resemble those of the Perl built-in functions
-    open() and sysopen().  Specifically, they now both expect a filehandle as
-    their first argument and they both return a Boolean value to indicate
-    success or failure.
+    two functions now more closely resemble those of the Perl built-in open()
+    and sysopen() functions. Specifically, they now both expect a filehandle or
+    an indirect filehandle as their first argument and they both return a
+    Boolean value to indicate success or failure.
 
-    THIS IS AN INCOMPATIBLE CHANGE.  EXISTING SOFTWARE THAT USES THESE FUNCTIONS
+    THIS IS AN INCOMPATIBLE CHANGE. EXISTING SOFTWARE THAT USES THESE FUNCTIONS
     WILL NEED TO BE MODIFIED.
 
 INSTALLATION
@@ -71,7 +66,7 @@ INSTALLATION
 
 COPYRIGHT
 
-    Copyright (C) 2001-2008, 2013-2014 Steve Hay.  All rights reserved.
+    Copyright (C) 2001-2008, 2013-2015 Steve Hay. All rights reserved.
 
 LICENCE
 
@@ -79,4 +74,3 @@ LICENCE
     under the same terms as Perl itself, i.e. under the terms of either the GNU
     General Public License or the Artistic License, as specified in the LICENCE
     file.
-________________________________________________________________________________

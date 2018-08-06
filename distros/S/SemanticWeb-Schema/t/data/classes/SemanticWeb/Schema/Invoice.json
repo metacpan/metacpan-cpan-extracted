@@ -1,0 +1,185 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A statement of the money due for goods or services; a bill.",
+      "rdfs:label" : "Invoice",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:accountId" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The identifier for the account the payment will be applied to.",
+         "rdfs:label" : "accountId",
+         "rdfs:subPropertyOf" : "schema:identifier",
+         "schema:domainIncludes" : "schema:Invoice",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:billingPeriod" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The time interval used to compute the invoice.",
+         "rdfs:label" : "billingPeriod",
+         "schema:domainIncludes" : "schema:Invoice",
+         "schema:rangeIncludes" : "schema:Duration"
+      },
+      "schema:broker" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An entity that arranges for an exchange between a buyer and a seller.  In most cases a broker never acquires or releases ownership of a product or service involved in an exchange.  If it is not clear whether an entity is a broker, seller, or buyer, the latter two terms are preferred.",
+         "rdfs:label" : "broker",
+         "schema:domainIncludes" : [
+            "schema:Service",
+            "schema:Invoice",
+            "schema:Reservation",
+            "schema:Order"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:category" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.",
+         "rdfs:label" : "category",
+         "schema:domainIncludes" : [
+            "schema:Property",
+            "schema:Class",
+            "schema:Service",
+            "schema:Product",
+            "schema:Offer",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Thing"
+         ]
+      },
+      "schema:confirmationNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A number that confirms the given order or payment has been received.",
+         "rdfs:label" : "confirmationNumber",
+         "rdfs:subPropertyOf" : "schema:identifier",
+         "schema:domainIncludes" : [
+            "schema:Invoice",
+            "schema:Order"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:customer" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Party placing the order or paying the invoice.",
+         "rdfs:label" : "customer",
+         "schema:domainIncludes" : [
+            "schema:Order",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      },
+      "schema:minimumPaymentDue" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The minimum payment required at this time.",
+         "rdfs:label" : "minimumPaymentDue",
+         "schema:domainIncludes" : "schema:Invoice",
+         "schema:rangeIncludes" : [
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount"
+         ]
+      },
+      "schema:paymentDue" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date that payment is due.",
+         "rdfs:label" : "paymentDue",
+         "schema:domainIncludes" : [
+            "schema:Order",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime",
+         "schema:supersededBy" : "schema:paymentDueDate"
+      },
+      "schema:paymentDueDate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date that payment is due.",
+         "rdfs:label" : "paymentDueDate",
+         "schema:domainIncludes" : [
+            "schema:Order",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:paymentMethod" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The name of the credit card or other method of payment for the order.",
+         "rdfs:label" : "paymentMethod",
+         "schema:domainIncludes" : [
+            "schema:Invoice",
+            "schema:Order"
+         ],
+         "schema:rangeIncludes" : "schema:PaymentMethod"
+      },
+      "schema:paymentMethodId" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An identifier for the method of payment used (e.g. the last 4 digits of the credit card).",
+         "rdfs:label" : "paymentMethodId",
+         "schema:domainIncludes" : [
+            "schema:Invoice",
+            "schema:Order"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:paymentStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The status of payment; whether the invoice has been paid or not.",
+         "rdfs:label" : "paymentStatus",
+         "schema:domainIncludes" : "schema:Invoice",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:PaymentStatusType"
+         ]
+      },
+      "schema:provider" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
+         "rdfs:label" : "provider",
+         "schema:domainIncludes" : [
+            "schema:ParcelDelivery",
+            "schema:BusTrip",
+            "schema:CreativeWork",
+            "schema:Service",
+            "schema:TrainTrip",
+            "schema:Reservation",
+            "schema:Flight",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:referencesOrder" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The Order(s) related to this Invoice. One or more Orders may be combined into a single Invoice.",
+         "rdfs:label" : "referencesOrder",
+         "schema:domainIncludes" : "schema:Invoice",
+         "schema:rangeIncludes" : "schema:Order"
+      },
+      "schema:scheduledPaymentDate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date the invoice is scheduled to be paid.",
+         "rdfs:label" : "scheduledPaymentDate",
+         "schema:domainIncludes" : "schema:Invoice",
+         "schema:rangeIncludes" : "schema:Date"
+      },
+      "schema:totalPaymentDue" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The total amount due.",
+         "rdfs:label" : "totalPaymentDue",
+         "schema:domainIncludes" : "schema:Invoice",
+         "schema:rangeIncludes" : [
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount"
+         ]
+      }
+   }
+}

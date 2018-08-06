@@ -1,0 +1,34 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of notifying an event organizer as to whether you expect to attend the event.",
+      "rdfs:label" : "RsvpAction",
+      "rdfs:subClassOf" : "schema:InformAction"
+   },
+   "properties" : {
+      "schema:additionalNumberOfGuests" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "If responding yes, the number of guests who will attend in addition to the invitee.",
+         "rdfs:label" : "additionalNumberOfGuests",
+         "schema:domainIncludes" : "schema:RsvpAction",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:comment" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Comments, typically from users.",
+         "rdfs:label" : "comment",
+         "schema:domainIncludes" : [
+            "schema:RsvpAction",
+            "schema:CreativeWork"
+         ],
+         "schema:rangeIncludes" : "schema:Comment"
+      },
+      "schema:rsvpResponse" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The response (yes, no, maybe) to the RSVP.",
+         "rdfs:label" : "rsvpResponse",
+         "schema:domainIncludes" : "schema:RsvpAction",
+         "schema:rangeIncludes" : "schema:RsvpResponseType"
+      }
+   }
+}

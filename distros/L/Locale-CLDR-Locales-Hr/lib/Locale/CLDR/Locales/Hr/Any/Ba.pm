@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Hr::Any::Ba - Package for language Croatian
 
 package Locale::CLDR::Locales::Hr::Any::Ba;
 # This file auto generated from Data\common\main\hr_BA.xml
-#	on Fri 13 Apr  7:13:33 am GMT
+#	on Sun  5 Aug  6:04:43 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -83,27 +83,27 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+				}
+				if($day_period_type eq 'selection') {
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}

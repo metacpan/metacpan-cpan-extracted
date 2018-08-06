@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "ATM/cash machine.",
+      "rdfs:label" : "AutomatedTeller",
+      "rdfs:subClassOf" : "schema:FinancialService"
+   },
+   "properties" : {}
+}

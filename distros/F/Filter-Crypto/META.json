@@ -4,7 +4,7 @@
       "Steve Hay <shay@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -23,6 +23,16 @@
       ]
    },
    "optional_features" : {
+      "changestest" : {
+         "description" : "Changes testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::CPAN::Changes" : "0"
+               }
+            }
+         }
+      },
       "critictest" : {
          "description" : "Perl::Critic testing",
          "prereqs" : {
@@ -134,5 +144,5 @@
          "url" : "https://github.com/steve-m-hay/Filter-Crypto.git"
       }
    },
-   "version" : "2.07"
+   "version" : "2.08"
 }

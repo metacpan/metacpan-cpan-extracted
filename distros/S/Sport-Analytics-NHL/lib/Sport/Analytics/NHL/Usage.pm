@@ -70,7 +70,7 @@ our %OPTS = (
 			description => "Stop at season SEASON (default $CURRENT_SEASON)",
 		},
 		{
-			short       => 'T', long => 'start-season', arg => 'STAGE', type => 'i',
+			short       => 'T', long => 'stage', arg => 'STAGE', type => 'i',
 			description => "Scrape stage STAGE ($REGULAR: REGULAR, $PLAYOFF: PLAYOFF, default: $CURRENT_STAGE",
 		},
 	],
@@ -91,6 +91,16 @@ our %OPTS = (
 		},
 		{
 			long => 'recompile',
+			description => 'Compile file even if storable is present',
+		}
+	],
+	merge => [
+		{
+			long => 'no-merge',
+			description => 'Do not merge file even if storable is absent',
+		},
+		{
+			long => 'remerge',
 			description => 'Compile file even if storable is present',
 		}
 	],
@@ -181,8 +191,6 @@ sub gopts ($$$) {
 	else {
 		$usage_message .= "\t\tNo Options\n";
 	}
-	#use Data::Dumper;
-	#print Dumper \%g_opts;
 	if (@{$args}) {
 		$usage_message .= "\t\tArguments:\n";
 		for my $arg (@{$args}) {

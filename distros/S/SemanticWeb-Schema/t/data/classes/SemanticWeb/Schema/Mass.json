@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Properties that take Mass as values are of the form '&lt;Number&gt; &lt;Mass unit of measure&gt;'. E.g., '7 kg'.",
+      "rdfs:label" : "Mass",
+      "rdfs:subClassOf" : "schema:Quantity"
+   },
+   "properties" : {}
+}

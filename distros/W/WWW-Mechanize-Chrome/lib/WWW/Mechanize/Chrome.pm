@@ -1,5 +1,6 @@
 package WWW::Mechanize::Chrome;
 use strict;
+use warnings;
 use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
@@ -20,7 +21,7 @@ use Time::HiRes qw(usleep);
 use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -110,19 +111,7 @@ Interesting parameters might be
     '--start-maximized',
     '--window-size=1280x1696'
     '--ignore-certificate-errors'
-    '--disable-background-networking',
-    '--disable-client-side-phishing-detection',
-    '--disable-component-update',
-    '--disable-hang-monitor',
-    '--disable-prompt-on-repost',
-    '--disable-sync',
-    '--disable-web-resources',
-    '--disable-save-password-bubble'
 
-    '--disable-default-apps',
-    '--disable-infobars',
-    '--disable-popup-blocking',
-    '--disable-default-apps',
     '--disable-web-security',
     '--allow-running-insecure-content',
 
@@ -144,8 +133,9 @@ The base data directory for this session. If not given, Chrome will use your
 current base directory.
 
   use File::Temp 'tempdir';
+  # create a fresh Chrome every time
   my $mech = WWW::Mechanize::Chrome->new(
-      data_directory => tempdir(),        # create a fresh Chrome every time
+      data_directory => tempdir(CLEANUP => 1 ),
   );
 
 =item B<startup_timeout>
@@ -171,27 +161,75 @@ Mutes the audio output. This setting is enabled by default.
 
 =item B<background_networking>
 
+Enable "background networking".
+
+Default is disabled.
+
 =item B<client_side_phishing_detection>
+
+Enable "client side phising detection".
+
+Default is disabled.
 
 =item B<component_update>
 
-=item B<hang_monitor>
+Enable "component update".
 
-=item B<prompt_on_repost>
-
-=item B<sync>
-
-=item B<web_resources>
+Default is disabled.
 
 =item B<default_apps>
+
+Enable "default apps".
+
+Default is disabled.
+
+=item B<hang_monitor>
+
+Enable "hang monitor".
+
+Default is disabled.
+
+=item B<hide_scrollbars>
+
+Hide scrollbars.
+
+Default is disabled.
 
 =item B<infobars>
 
-=item B<default_apps>
+Enable "infobars".
+
+Default is disabled.
 
 =item B<popup_blocking>
 
-=item B<hide_scrollbars>
+Enable "popup blocking".
+
+Default is disabled.
+
+=item B<prompt_on_repost>
+
+Enable "prompt on repost".
+
+Default is disabled.
+
+=item B<save_password_bubble>
+
+Enable the "save password" bubble.
+
+Default is disabled.
+
+=item B<sync>
+
+Enable "sync".
+
+Default is disabled.
+
+=item B<web_resources>
+
+Enable "Web resources".
+
+Default is disabled.
 
 =back
 
@@ -266,6 +304,7 @@ sub build_command_line {
         default_apps
         popup_blocking
         gpu
+        save-password-bubble
     )) {
         (my $optname = $option) =~ s!_!-!g;
         if( ! exists $options->{$option}) {
@@ -1225,7 +1264,7 @@ sub _waitForNavigationEnd( $self, %options ) {
     my $frameId = $options{ frameId } || $self->frameId;
     my $requestId = $options{ requestId } || $self->requestId;
     my $msg = "Capturing events until 'Page.frameStoppedLoading' for frame $frameId";
-    $msg .= " or 'Network.loadingFailed' for request '$requestId'"
+    $msg .= " or 'Network.loadingFailed' or 'Network.loadingFinished' for request '$requestId'"
         if $requestId;
 
     $self->log('trace', $msg);
@@ -1233,9 +1272,12 @@ sub _waitForNavigationEnd( $self, %options ) {
         # Let's assume that the first frame id we see is "our" frame
         $frameId ||= $self->_fetchFrameId($ev);
         $requestId ||= $self->_fetchRequestId($ev);
-
         my $stopped = (    $ev->{method} eq 'Page.frameStoppedLoading'
                        && $ev->{params}->{frameId} eq $frameId);
+        # This means basically no navigation events will follow:
+        my $internal_navigation = (   $ev->{method} eq 'Page.navigatedWithinDocument'
+                       && $requestId
+                       && $ev->{params}->{requestId} eq $requestId);
         my $failed  = (   $ev->{method} eq 'Network.loadingFailed'
                        && $requestId
                        && $ev->{params}->{requestId} eq $requestId);
@@ -1245,7 +1287,7 @@ sub _waitForNavigationEnd( $self, %options ) {
                        && exists $ev->{params}->{response}->{headers}->{"Content-Disposition"}
                        && $ev->{params}->{response}->{headers}->{"Content-Disposition"} =~ m!^attachment\b!
                        );
-        return $stopped || $failed || $download;
+        return $stopped || $internal_navigation || $failed || $download;
     });
 
     $events_f;
@@ -1263,6 +1305,7 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
         'Network.requestWillBeSent',      # trial
         #'Page.frameResized',              # download
         'Inspector.detached',             # Browser (window) was closed by user
+        'Page.navigatedWithinDocument',
     );
     my $navigated;
     my $does_navigation;
@@ -1273,6 +1316,7 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
     weaken $s;
     $does_navigation = $scheduled
         ->then(sub( $ev ) {
+            my $res;
             if(     $ev->{method} eq 'Page.frameResized'
                 and 0+keys %{ $ev->{params} } == 0 ) {
                 # This is dead code that is never reached (see above)
@@ -1284,7 +1328,7 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
                 $s->log('trace', "Download started, returning synthesized event");
                 $navigated++;
                 $s->{ frameId } = $ev->{params}->{frameId};
-                Future->done(
+                $res = Future->done(
                     # Since Chrome v64,
                     { method => 'MechanizeChrome.download', params => {
                         frameId => $ev->{params}->{frameId},
@@ -1300,10 +1344,24 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
 
             } elsif( $ev->{method} eq 'Inspector.detached' ) {
                 $s->log('error', "Inspector was detached");
-                Future->fail("Inspector was detached");
+                $res = Future->fail("Inspector was detached");
 
+            } elsif( $ev->{method} eq 'Page.navigatedWithinDocument' ) {
+                $s->log('trace', "Intra-page navigation started, logging ($ev->{method})");
+                $frameId ||= $s->_fetchFrameId( $ev );
+                $res = Future->done(
+                    # Since Chrome v64,
+                    { method => 'Page.intra-page-navigation', params => {
+                        frameId => $ev->{params}->{frameId},
+                        loaderId => $ev->{params}->{loaderId},
+                        response => {
+                            status => 200,
+                            statusText => 'faked response',
+                    }}
+                })
+            
             } else {
-                  $s->log('trace', "Navigation started, logging");
+                  $s->log('trace', "Navigation started, logging ($ev->{method})");
                   $navigated++;
 
                   $frameId ||= $s->_fetchFrameId( $ev );
@@ -1311,8 +1369,9 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
                   $s->{ frameId } = $frameId;
                   $s->{ requestId } = $requestId;
 
-                  $s->_waitForNavigationEnd( %options );
+                  $res = $s->_waitForNavigationEnd( %options )
             };
+            return $res
         });
     };
 
@@ -1326,11 +1385,9 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
         # so we wait a bit to see if it will navigate in response to our click
         $self->sleep_future(0.1); # X XX baad fix
     })->then( sub {
-
         my $f;
         my @events;
-        if( $navigated or $options{ navigates }) {
-            #warn "Now collecting the navigation events from the backlog";
+        if( $navigated ) { #or $options{ navigates }) {
             $f = $does_navigation->then( sub {
                 @events = @_;
                 # Handle all the events, by turning them into a ->response again
@@ -1342,17 +1399,17 @@ sub _mightNavigate( $self, $get_navigation_future, %options ) {
                 # Store our frame id so we know what events to listen for in the future!
                 $self->{frameId} ||= $nav->{frameId};
 
-                Future->done( @events )
+                Future->done( \@events )
             })
         } else {
             $self->log('trace', "No navigation occurred, not collecting events");
             $does_navigation->cancel;
-            $f = Future->done(@events);
+            $f = Future->done(\@events);
             $scheduled->cancel;
             undef $scheduled;
         };
 
-        $f
+        return $f
     })
 }
 
@@ -1364,12 +1421,13 @@ sub get($self, $url, %options ) {
     # our command:
     my $s = $self;
     weaken $s;
-    my @events = $self->_mightNavigate( sub {
-        $s->log('trace', "Navigating to [$url]");
+    my $events = $self->_mightNavigate( sub {
+        $s->log('debug', "Navigating to [$url]");
         $s->driver->send_message(
             'Page.navigate',
             url => "$url"
-    )}, url => "$url", %options, navigates => 1 )
+        )
+        }, url => "$url", %options, navigates => 1 )
     ->get;
 
     return $self->response;
@@ -4709,105 +4767,7 @@ This module does not yet support POST requests
 
 =head1 INSTALLING
 
-=head2 Install the C<chrome> executable
-
-C<WWW::Mechanize::Chrome> requires that you have the Chrome browser installed
-on your system. If Chrome is not installed, please consult
-L<Google's instructions|https://support.google.com/chrome/answer/95346> for
-help installing the Chrome browser.
-
-C<WWW::Mechanize::Chrome> will do its best to locate Chrome's executable file
-on your system. With any luck, it will find the executable you want to use. If
-C<WWW::Mechanize::Chrome> does not find Chrome on your system or you want to
-use a different executable, you can use the C<launch_exe> constructor argument
-to tell C<WWW::Mechanize::Chrome> where to find it. You can alse set the
-C<CHROME_BIN> environment variable to the absolute path of the executable.
-
-=head2 Test the C<chrome> executable
-
-You should verify that Chrome's executable is working properly. On Ubuntu, the
-executable is typically named C<chrome-browser> and so you can test Chrome's
-installation with:
-
-C<chrome-browser --version>
-
-and you should see something like C<Google Chrome 67.0.3396.99> returned.
-
-Note that the command you run will vary based on your operating sytem and
-possibly the version of Chrome installed.
-
-On a Debian system, for example, the command will most likely be something
-like:
-
-C<google-chrome-stable --version> or
-C<google-chrome-beta --version> or
-C<google-chrome-unstable --version>
-
-On Windows, the executable is named C<chrome.exe> and doesn't output
-information to the console but you can check that Chrome starts by running:
-
-C<chrome>
-
-in the terminal.
-
-On MacOS, the executable can usually be be found inside the C<Google Chrome.app>
-package in the C</Applications> directory and its installation can be
-tested with something like the following:
-
-C</Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version>
-
-or, if Chrome is installed for a single user:
-
-C</Users/<user_nameE<gt>/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version>
-
-If you are having trouble finding, installing, or running Chrome on your
-system, please consult the appropriate documentation or a knowledgeable expert.
-
-=head2 Chrome versions
-
-Note that the Chrome version numbers do not denote availability of features.
-Features can still be added to Chrome v62 when Chrome v64 is already out.
-
-If you are serious about automating a website, use a separate copy of Chrome
-and disable its automatic updates.
-
-=head2 Module prerequisites on OSX
-
-=head3 L<Imager::File::PNG>
-
-This module relies on L<Imager> for processing screenshots. If you don't need
-this functionality, you can ignore the L<Imager> and L<Imager::File::PNG>
-installation and use this module with the system Perl provided by Apple.
-
-The installation of L<Imager::File::PNG> works on OSX using the Homebrew tool
-and the Perl installable through Homebrew:
-
-    brew install perl-5.28
-    brew install libpng
-    cpan Imager::File::PNG
-
-I haven't been able to make it work using the system Perl.
-
-=head1 RUNNING THE TEST SUITE
-
-The normal test invocation is 'make test'.
-
-If your executable has a different name than C<chrome-browser> or
-C<chrome.exe> or is not in your path, then set the environment variable
-C<CHROME_BIN> to the absolute path.
-
-If you have Chrome already running, it must have been started with the
-C<<--remote-debugging-port=9222>> option to enable access to the developer API.
-You may want to set up a dedicated and version pinned version of Chrome for your
-automation.
-
-The test suite is apt to disturb your display when a locally running chrome
-browser gets animated. On unixish systems you can avoid this kind of disturbance
-by (1) not running any chrome binary and (2) start a separate display with Xvfb
-and (3) set the DISPLAY variable accordingly. E.g.:
-
-  Xvfb :121 &
-  DISPLAY=:121 CHROME_BIN=/usr/bin/google-chrome-stable make test
+See L<WWW::Mechanize::Chrome::Install>
 
 =head1 SEE ALSO
 

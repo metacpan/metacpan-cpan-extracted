@@ -1,0 +1,17 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of planning the execution of an event/task/action/reservation/plan to a future date.",
+      "rdfs:label" : "PlanAction",
+      "rdfs:subClassOf" : "schema:OrganizeAction"
+   },
+   "properties" : {
+      "schema:scheduledTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The time the object is scheduled to.",
+         "rdfs:label" : "scheduledTime",
+         "schema:domainIncludes" : "schema:PlanAction",
+         "schema:rangeIncludes" : "schema:DateTime"
+      }
+   }
+}

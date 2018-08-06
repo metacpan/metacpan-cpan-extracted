@@ -11,7 +11,7 @@ my $build = Module::Build->new
   (
    module_name => "PDL::IO::NDF",
    license => "perl",
-   dist_version => '1.04',
+   dist_version => '1.05',
    dist_abstract => 'Read PDLs from NDF files and write PDLs to NDF files',
    dist_author => [
                    'Tim Jenness <tjenness@cpan.org>',
@@ -19,8 +19,8 @@ my $build = Module::Build->new
                   ],
    meta_merge => {
                resources =>  {
-                              repository => "git://github.com/timj/perl-PDL-IO-NDF.git",
-                              homepage => "http://github.com/timj/perl-PDL-IO-NDF/tree/master",
+                              repository => "git://github.com/Starlink/perl-PDL-IO-NDF.git",
+                              homepage => "http://github.com/Starlink/perl-PDL-IO-NDF/tree/master",
                              },
                 },
    requires => {

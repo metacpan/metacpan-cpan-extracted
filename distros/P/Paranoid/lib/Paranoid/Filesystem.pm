@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Filesystem.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+# $Id: lib/Paranoid/Filesystem.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -33,7 +33,7 @@ use Paranoid::Input;
 use Paranoid::IO;
 use Paranoid::Glob;
 
-($VERSION) = ( q$Revision: 2.05 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(
     preadDir     psubdirs    pfiles
@@ -1036,7 +1036,7 @@ Paranoid::Filesystem - Filesystem Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Filesystem.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+$Id: lib/Paranoid/Filesystem.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -1115,7 +1115,7 @@ that's not present is not considered a failure.
   $rv = prmR("/foo", 1, %errors);
 
 This function works the same as B<prm> but performs a recursive delete,
-similar to "rm -r" on the command line.  An optional second argument determins
+similar to "rm -r" on the command line.  An optional second argument determines
 if symbolic links are followed and the targets also recursively deleted.
 
 =head2 preadDir

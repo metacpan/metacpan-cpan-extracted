@@ -1,0 +1,25 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of notifying someone of information pertinent to them, with no expectation of a response.",
+      "rdfs:label" : "InformAction",
+      "rdfs:subClassOf" : "schema:CommunicateAction"
+   },
+   "properties" : {
+      "schema:event" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Upcoming or past event associated with this place, organization, or action.",
+         "rdfs:label" : "event",
+         "schema:domainIncludes" : [
+            "schema:JoinAction",
+            "schema:PlayAction",
+            "schema:InformAction",
+            "schema:Organization",
+            "schema:Place",
+            "schema:LeaveAction",
+            "schema:InviteAction"
+         ],
+         "schema:rangeIncludes" : "schema:Event"
+      }
+   }
+}

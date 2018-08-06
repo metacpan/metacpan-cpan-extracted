@@ -1,5 +1,8 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-OpenAPI
 
+0.17	Thu  2 Aug 17:46:36 BST 2018
+ - dep on OpenAPI::Client 0.17 - thanks @vanHoesel
+
 0.16	Mon 30 Jul 09:39:45 BST 2018
  - update Mojolicious::Plugin::GraphQL dep - thanks @eserte
 

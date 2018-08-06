@@ -264,3 +264,11 @@ installer/engine.exe
 installer/puttycfg.exe
 installer/puttyyes.exe
 SIGNATURE                                Public-key signature (added by MakeMaker)
+#demo/pscp.exe
+#demo/putty.exe
+#demo/puttygen.exe
+#demo/runputty.exe
+#demo/puttykey.exe
+#demo/engine.exe
+#demo/puttycfg.exe
+#demo/puttyyes.exe

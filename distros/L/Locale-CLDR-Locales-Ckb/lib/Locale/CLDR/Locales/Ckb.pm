@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ckb - Package for language Central Kurdish
 
 package Locale::CLDR::Locales::Ckb;
 # This file auto generated from Data\common\main\ckb.xml
-#	on Fri 13 Apr  7:05:12 am GMT
+#	on Sun  5 Aug  5:55:25 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1165,43 +1165,43 @@ has 'day_periods' => (
 	default		=> sub { {
 		'generic' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{ب.ن},
 					'pm' => q{د.ن},
 				},
-				'abbreviated' => {
-					'pm' => q{د.ن},
+				'wide' => {
 					'am' => q{ب.ن},
+					'pm' => q{د.ن},
 				},
 			},
 		},
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{ب.ن},
 					'pm' => q{د.ن},
+					'am' => q{ب.ن},
 				},
 				'wide' => {
-					'am' => q{ب.ن},
 					'pm' => q{د.ن},
+					'am' => q{ب.ن},
 				},
 				'narrow' => {
-					'am' => q{ب.ن},
 					'pm' => q{د.ن},
+					'am' => q{ب.ن},
 				},
 			},
 			'stand-alone' => {
 				'narrow' => {
-					'am' => q{ب.ن},
 					'pm' => q{د.ن},
+					'am' => q{ب.ن},
 				},
 				'wide' => {
-					'pm' => q{د.ن},
 					'am' => q{ب.ن},
+					'pm' => q{د.ن},
 				},
 				'abbreviated' => {
-					'am' => q{ب.ن},
 					'pm' => q{د.ن},
+					'am' => q{ب.ن},
 				},
 			},
 		},
@@ -1301,6 +1301,40 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			E => q{ccc},
+			Ed => q{E dھەم},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			M => q{L},
+			MEd => q{E، M/d},
+			MMM => q{LLL},
+			MMMEd => q{E، dی MMM},
+			MMMMd => q{MMMM d},
+			MMMd => q{dی MMM},
+			Md => q{MM-dd},
+			d => q{d},
+			h => q{hی a},
+			y => q{G y},
+			yM => q{M/y},
+			yMEd => q{E، d/M/y},
+			yMMM => q{MMMی y},
+			yMMMEd => q{E، dی MMMی y},
+			yMMMd => q{dی MMMی y},
+			yMd => q{d/M/y},
+			yyyy => q{G y},
+			yyyyM => q{GGGGG y-MM},
+			yyyyMEd => q{GGGGG y-MM-dd, E},
+			yyyyMMM => q{G y MMM},
+			yyyyMMMEd => q{G y MMM d, E},
+			yyyyMMMM => q{G y MMMM},
+			yyyyMMMd => q{G y MMM d},
+			yyyyMd => q{GGGGG y-MM-dd},
+			yyyyQQQ => q{G y QQQ},
+			yyyyQQQQ => q{G y QQQQ},
+		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E HH:mm},
@@ -1342,41 +1376,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d/M/y},
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
-			yw => q{هەفتەی w ی Y},
-		},
-		'generic' => {
-			E => q{ccc},
-			Ed => q{E dھەم},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			M => q{L},
-			MEd => q{E، M/d},
-			MMM => q{LLL},
-			MMMEd => q{E، dی MMM},
-			MMMMd => q{MMMM d},
-			MMMd => q{dی MMM},
-			Md => q{MM-dd},
-			d => q{d},
-			h => q{hی a},
-			y => q{G y},
-			yM => q{M/y},
-			yMEd => q{E، d/M/y},
-			yMMM => q{MMMی y},
-			yMMMEd => q{E، dی MMMی y},
-			yMMMd => q{dی MMMی y},
-			yMd => q{d/M/y},
-			yyyy => q{G y},
-			yyyyM => q{GGGGG y-MM},
-			yyyyMEd => q{GGGGG y-MM-dd, E},
-			yyyyMMM => q{G y MMM},
-			yyyyMMMEd => q{G y MMM d, E},
-			yyyyMMMM => q{G y MMMM},
-			yyyyMMMd => q{G y MMM d},
-			yyyyMd => q{GGGGG y-MM-dd},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
+			yw => q{هەفتەی w ی y},
 		},
 	} },
 );
@@ -1397,38 +1397,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			MEd => {
-				M => q{E، M/d – E، M/d},
-				d => q{E، M/d – E، M/d},
-			},
-			MMM => {
-				M => q{MMM–MMM},
-			},
-			MMMEd => {
-				d => q{E، dی MMM – E، dی MMM},
-			},
-			MMMd => {
-				d => q{d–dی MMM},
-			},
-			yMEd => {
-				M => q{E، d/M/y – E، d/M/y},
-				d => q{E، d/M/y – E، d/M/y},
-				y => q{E، d/M/y – E، d/M/y},
-			},
-			yMMM => {
-				M => q{MMM–MMMی y},
-				y => q{MMMی y – MMMی y},
-			},
-			yMMMd => {
-				M => q{dی MMM – dی MMMی y},
-				d => q{d–dی MMMی y},
-				y => q{dی MMMMی y – dی MMMMی y},
-			},
-			yMd => {
-				y => q{d/M/y – d/M/y},
-			},
-		},
 		'generic' => {
 			M => {
 				M => q{MM–MM},
@@ -1489,6 +1457,38 @@ has 'datetime_formats_interval' => (
 			yMd => {
 				M => q{GGGGG y-MM-dd – y-MM-dd},
 				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{d/M/y – d/M/y},
+			},
+		},
+		'gregorian' => {
+			MEd => {
+				M => q{E، M/d – E، M/d},
+				d => q{E، M/d – E، M/d},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				d => q{E، dی MMM – E، dی MMM},
+			},
+			MMMd => {
+				d => q{d–dی MMM},
+			},
+			yMEd => {
+				M => q{E، d/M/y – E، d/M/y},
+				d => q{E، d/M/y – E، d/M/y},
+				y => q{E، d/M/y – E، d/M/y},
+			},
+			yMMM => {
+				M => q{MMM–MMMی y},
+				y => q{MMMی y – MMMی y},
+			},
+			yMMMd => {
+				M => q{dی MMM – dی MMMی y},
+				d => q{d–dی MMMی y},
+				y => q{dی MMMMی y – dی MMMMی y},
+			},
+			yMd => {
 				y => q{d/M/y – d/M/y},
 			},
 		},

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A theater group or company, for example, the Royal Shakespeare Company or Druid Theatre.",
+      "rdfs:label" : "TheaterGroup",
+      "rdfs:subClassOf" : "schema:PerformingGroup"
+   },
+   "properties" : {}
+}

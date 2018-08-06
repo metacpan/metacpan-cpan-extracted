@@ -1,0 +1,162 @@
+
+
+times in msec
+ clock   self+sourced   self:  sourced script
+ clock   elapsed:              other lines
+
+000.041  000.041: --- NVIM STARTING ---
+023.845  023.804: locale set
+166.532  142.687: inits 1
+166.582  000.049: window checked
+337.666  171.084: parsing arguments
+337.688  000.023: expanding arguments
+337.964  000.276: inits 2
+339.247  001.282: init highlight
+852.834  006.085  006.085: sourcing /home/yanick/.config/nvim/autoload/plug.vim
+1616.350  000.392  000.392: sourcing /home/yanick/.config/nvim/plugged/typescript-vim/ftdetect/typescript.vim
+1652.748  000.119  000.119: sourcing /home/yanick/.config/nvim/plugged/tsuquyomi/ftdetect/typescript.vim
+1788.725  000.222  000.222: sourcing /home/yanick/.config/nvim/plugged/vim-vue/ftdetect/vue.vim
+1890.265  000.321  000.321: sourcing /home/yanick/.config/nvim/plugged/vim-markdown/ftdetect/markdown.vim
+2050.961  000.576  000.576: sourcing /home/yanick/.config/nvim/plugged/vim-ansible-yaml/ftdetect/ansible.vim
+2102.155  000.423  000.423: sourcing /home/yanick/.config/nvim/plugged/ansible-vim/ftdetect/ansible.vim
+2255.153  000.343  000.343: sourcing /home/yanick/.config/nvim/plugged/vim-json/ftdetect/json.vim
+2379.526  000.280  000.280: sourcing /home/yanick/.config/nvim/plugged/neosnippet/ftdetect/neosnippet.vim
+2381.055  932.536  929.860: sourcing /usr/share/nvim/runtime/filetype.vim
+2530.978  000.189  000.189: sourcing /usr/share/nvim/runtime/ftplugin.vim
+2589.064  000.180  000.180: sourcing /usr/share/nvim/runtime/indent.vim
+3300.927  001.222  001.222: sourcing /usr/share/nvim/runtime/syntax/syncolor.vim
+3301.657  003.555  002.334: sourcing /usr/share/nvim/runtime/syntax/synload.vim
+3301.780  513.805  510.250: sourcing /usr/share/nvim/runtime/syntax/syntax.vim
+3352.865  000.568  000.568: sourcing /usr/share/nvim/runtime/syntax/nosyntax.vim
+3355.852  001.032  001.032: sourcing /usr/share/nvim/runtime/syntax/syncolor.vim
+3356.566  002.741  001.708: sourcing /usr/share/nvim/runtime/syntax/synload.vim
+3356.683  053.803  050.494: sourcing /usr/share/nvim/runtime/syntax/syntax.vim
+3359.529  001.015  001.015: sourcing /usr/share/nvim/runtime/syntax/syncolor.vim
+3506.492  002.725  002.725: sourcing /usr/share/nvim/runtime/ftoff.vim
+3531.183  000.056  000.056: sourcing /home/yanick/.config/nvim/plugged/typescript-vim/ftdetect/typescript.vim
+3531.281  000.047  000.047: sourcing /home/yanick/.config/nvim/plugged/tsuquyomi/ftdetect/typescript.vim
+3531.351  000.033  000.033: sourcing /home/yanick/.config/nvim/plugged/vim-vue/ftdetect/vue.vim
+3531.456  000.056  000.056: sourcing /home/yanick/.config/nvim/plugged/vim-markdown/ftdetect/markdown.vim
+3531.615  000.115  000.115: sourcing /home/yanick/.config/nvim/plugged/vim-ansible-yaml/ftdetect/ansible.vim
+3531.730  000.076  000.076: sourcing /home/yanick/.config/nvim/plugged/ansible-vim/ftdetect/ansible.vim
+3531.867  000.062  000.062: sourcing /home/yanick/.config/nvim/plugged/vim-json/ftdetect/json.vim
+3531.951  000.040  000.040: sourcing /home/yanick/.config/nvim/plugged/neosnippet/ftdetect/neosnippet.vim
+3532.277  018.310  017.826: sourcing /usr/share/nvim/runtime/filetype.vim
+3532.567  000.009  000.009: sourcing /usr/share/nvim/runtime/ftplugin.vim
+3532.842  000.008  000.008: sourcing /usr/share/nvim/runtime/indent.vim
+3783.696  001.037  001.037: sourcing /usr/share/nvim/runtime/syntax/syncolor.vim
+3785.081  000.391  000.391: sourcing /usr/share/nvim/runtime/syntax/syncolor.vim
+3853.715  075.625  074.197: sourcing /home/yanick/.config/nvim/plugged/vim-colors-solarized/colors/solarized.vim
+3856.245  000.043  000.043: sourcing /usr/share/nvim/runtime/filetype.vim
+3856.632  000.009  000.009: sourcing /usr/share/nvim/runtime/filetype.vim
+3856.913  000.009  000.009: sourcing /usr/share/nvim/runtime/ftplugin.vim
+3857.187  000.008  000.008: sourcing /usr/share/nvim/runtime/filetype.vim
+3857.458  000.008  000.008: sourcing /usr/share/nvim/runtime/indent.vim
+4016.439  3332.747  1728.379: sourcing /home/yanick/.config/nvim/init.vim
+4016.482  344.488: sourcing vimrc file(s)
+4239.116  000.738  000.738: sourcing /home/yanick/.config/nvim/plugin/taskwarrior.vim
+4364.181  000.164  000.164: sourcing /home/yanick/.config/nvim/plugged/startuptime.vim/plugin/startuptime.vim
+4643.046  000.866  000.866: sourcing /home/yanick/.config/nvim/plugged/vim-import-js/autoload/importjs.vim
+4973.617  513.191  512.326: sourcing /home/yanick/.config/nvim/plugged/vim-import-js/plugin/import-js.vim
+5162.670  000.785  000.785: sourcing /home/yanick/.config/nvim/plugged/ale/autoload/ale.vim
+5165.854  110.371  109.585: sourcing /home/yanick/.config/nvim/plugged/ale/plugin/ale.vim
+5345.019  000.415  000.415: sourcing /home/yanick/.config/nvim/plugged/vimproc.vim/plugin/vimproc.vim
+5363.217  000.726  000.726: sourcing /home/yanick/.config/nvim/plugged/tsuquyomi/plugin/tsuquyomi.vim
+5554.686  001.911  001.911: sourcing /home/yanick/.config/nvim/plugged/vim-eunuch/plugin/eunuch.vim
+5744.247  001.122  001.122: sourcing /home/yanick/.config/nvim/plugged/tabular/plugin/Tabular.vim
+5814.593  000.809  000.809: sourcing /home/yanick/.config/nvim/plugged/vim-commentary/plugin/commentary.vim
+5846.266  000.462  000.462: sourcing /home/yanick/.config/nvim/plugged/perldoc-vim/plugin/perldoc.vim
+6452.931  000.628  000.628: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline.vim
+6566.188  000.461  000.461: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/init.vim
+6636.618  000.435  000.435: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/parts.vim
+6639.805  381.592  380.068: sourcing /home/yanick/.config/nvim/plugged/vim-airline/plugin/airline.vim
+6823.633  000.128  000.128: sourcing /home/yanick/.config/nvim/plugged/vim-airline-themes/plugin/airline-themes.vim
+7528.218  421.550  421.550: sourcing /home/yanick/.config/nvim/plugged/vim-webdevicons/plugin/webdevicons.vim
+7962.002  083.327  083.327: sourcing /home/yanick/.config/nvim/plugged/vim-project/plugin/project.vim
+8021.382  000.273  000.273: sourcing /home/yanick/.config/nvim/plugged/deoplete.nvim/autoload/deoplete.vim
+8069.846  000.531  000.531: sourcing /home/yanick/.config/nvim/plugged/deoplete.nvim/autoload/deoplete/init.vim
+9098.271  000.798  000.798: sourcing /usr/share/nvim/runtime/autoload/remote/host.vim
+9123.023  000.670  000.670: sourcing /usr/share/nvim/runtime/autoload/remote/define.vim
+9123.415  304.728  303.260: sourcing /home/yanick/.local/share/nvim/rplugin.vim
+9123.448  358.854  054.125: sourcing /usr/share/nvim/runtime/plugin/rplugin.vim
+9711.676  000.415  000.415: sourcing /usr/share/nvim/runtime/autoload/provider/pythonx.vim
+18802.436  8948.604  8948.604: sourcing /usr/share/nvim/runtime/autoload/provider/python3.vim
+31240.594  000.397  000.397: sourcing /home/yanick/.config/nvim/plugged/deoplete.nvim/autoload/deoplete/mapping.vim
+31250.984  000.719  000.719: sourcing /home/yanick/.config/nvim/plugged/deoplete.nvim/autoload/deoplete/util.vim
+31261.151  000.555  000.555: sourcing /home/yanick/.config/nvim/plugged/deoplete.nvim/autoload/deoplete/handler.vim
+31261.917  23246.599  13936.251: sourcing /home/yanick/.config/nvim/plugged/deoplete.nvim/plugin/deoplete.vim
+31342.429  000.857  000.857: sourcing /home/yanick/.config/nvim/plugged/neosnippet/plugin/neosnippet.vim
+31363.729  000.800  000.800: sourcing /home/yanick/.config/nvim/plugged/vim-easy-align/plugin/easy_align.vim
+31379.292  000.211  000.211: sourcing /home/yanick/.config/nvim/plugged/vim-snippets/plugin/vimsnippets.vim
+31845.826  415.577  415.577: sourcing /home/yanick/.config/nvim/plugged/vim-unimpaired/plugin/unimpaired.vim
+31950.733  017.548  017.548: sourcing /home/yanick/.config/nvim/plugged/vim-fugitive/plugin/fugitive.vim
+32134.491  145.443  145.443: sourcing /home/yanick/.config/nvim/plugged/vim-surround/plugin/surround.vim
+32232.405  000.114  000.114: sourcing /usr/share/nvim/runtime/plugin/gui_shim.vim
+32234.772  001.060  001.060: sourcing /usr/share/nvim/runtime/plugin/gzip.vim
+32328.017  000.154  000.154: sourcing /usr/share/nvim/runtime/plugin/health.vim
+32342.815  000.374  000.374: sourcing /usr/share/nvim/runtime/plugin/man.vim
+32426.730  002.605  002.605: sourcing /usr/share/nvim/runtime/plugin/matchit.vim
+32427.800  000.699  000.699: sourcing /usr/share/nvim/runtime/plugin/matchparen.vim
+32430.416  002.229  002.229: sourcing /usr/share/nvim/runtime/plugin/netrwPlugin.vim
+32430.558  000.032  000.032: sourcing /usr/share/nvim/runtime/plugin/rplugin.vim
+32466.669  000.102  000.102: sourcing /usr/share/nvim/runtime/plugin/rrhelper.vim
+32467.389  000.395  000.395: sourcing /usr/share/nvim/runtime/plugin/shada.vim
+32468.636  000.187  000.187: sourcing /usr/share/nvim/runtime/plugin/spellfile.vim
+32469.610  000.645  000.645: sourcing /usr/share/nvim/runtime/plugin/tarPlugin.vim
+32533.200  000.465  000.465: sourcing /usr/share/nvim/runtime/plugin/tohtml.vim
+32583.440  000.156  000.156: sourcing /usr/share/nvim/runtime/plugin/tutor.vim
+32631.480  000.857  000.857: sourcing /usr/share/nvim/runtime/plugin/zipPlugin.vim
+32631.552  3261.452: loading plugins
+32929.358  297.806: loading packages
+33182.566  000.283  000.283: sourcing /home/yanick/.config/nvim/plugged/ale/after/plugin/ale.vim
+33271.227  000.998  000.998: sourcing /home/yanick/.config/nvim/plugged/tabular/autoload/tabular.vim
+33278.988  041.972  040.974: sourcing /home/yanick/.config/nvim/plugged/tabular/after/plugin/TabularMaps.vim
+33279.419  000.039  000.039: sourcing /home/yanick/.config/nvim/plugged/ale/after/plugin/ale.vim
+33279.437  307.785: loading after plugins
+33279.492  000.055: inits 3
+33643.554  364.062: reading ShaDa
+36820.064  3176.510: clearing screen
+38480.247  000.455  000.455: sourcing /home/yanick/.config/nvim/plugged/perldoc-vim/ftplugin/perl/perldoc.vim
+39532.957  008.744  008.744: sourcing /usr/share/nvim/runtime/ftplugin/perl.vim
+40532.330  000.775  000.775: sourcing /usr/share/nvim/runtime/indent/perl.vim
+41156.912  002.083  002.083: sourcing /usr/share/nvim/runtime/syntax/pod.vim
+41167.985  333.028  330.944: sourcing /usr/share/nvim/runtime/syntax/perl.vim
+41380.250  000.357  000.357: sourcing /home/yanick/.config/nvim/plugged/ale/autoload/ale/events.vim
+41486.053  000.828  000.828: sourcing /home/yanick/.config/nvim/plugged/ale/autoload/ale/util.vim
+41575.442  000.419  000.419: sourcing /home/yanick/.config/nvim/plugged/ale/autoload/ale/linter.vim
+41833.405  003.007  003.007: sourcing /home/yanick/.config/nvim/plugged/ale/ale_linters/perl/perl.vim
+41892.139  002.912  002.912: sourcing /home/yanick/.config/nvim/plugged/ale/ale_linters/perl/perlcritic.vim
+42013.511  001.716  001.716: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/extensions.vim
+42271.561  000.783  000.783: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/extensions/quickfix.vim
+42399.904  000.498  000.498: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/extensions/netrw.vim
+42601.632  000.537  000.537: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/extensions/csv.vim
+42625.874  001.747  001.747: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/extensions/branch.vim
+42662.536  000.755  000.755: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/extensions/ale.vim
+42695.856  001.073  001.073: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/extensions/whitespace.vim
+42701.785  000.493  000.493: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/extensions/po.vim
+42705.706  000.443  000.443: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/extensions/wordcount.vim
+42732.577  000.383  000.383: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/extensions/keymap.vim
+42970.488  000.729  000.729: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/section.vim
+42973.601  001.882  001.882: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/highlighter.vim
+43277.135  000.197  000.197: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/themes.vim
+43277.516  032.297  032.101: sourcing /home/yanick/.config/nvim/plugged/vim-airline-themes/autoload/airline/themes/solarized.vim
+43493.531  001.010  001.010: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/util.vim
+43616.277  000.558  000.558: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/builder.vim
+43775.805  000.340  000.340: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/extensions/default.vim
+44070.030  076.405  076.405: sourcing /home/yanick/.config/nvim/plugged/ale/autoload/ale/engine.vim
+44192.744  000.425  000.425: sourcing /home/yanick/.config/nvim/plugged/ale/autoload/ale/history.vim
+44365.845  000.249  000.249: sourcing /home/yanick/.config/nvim/plugged/ale/autoload/ale/command.vim
+44722.142  000.788  000.788: sourcing /home/yanick/.config/nvim/plugged/ale/autoload/ale/job.vim
+44970.523  000.686  000.686: sourcing /home/yanick/.config/nvim/plugged/ale/autoload/ale/path.vim
+45728.329  000.335  000.335: sourcing /home/yanick/.config/nvim/plugged/deoplete.nvim/autoload/deoplete/custom.vim
+46596.172  9301.449: opening buffers
+46596.709  000.538: BufEnter autocommands
+46596.727  000.018: editing files in windows
+46597.321  000.594: VimEnter autocommands
+47501.024  760.152  760.152: sourcing /usr/share/nvim/runtime/autoload/provider/clipboard.vim
+47501.043  143.570: before starting main loop
+48135.997  000.544  000.544: sourcing /home/yanick/.config/nvim/plugged/ale/autoload/ale/cursor.vim
+48268.547  000.817  000.817: sourcing /home/yanick/.config/nvim/plugged/vim-airline/autoload/airline/async.vim
+48660.000  000.177  000.177: sourcing /home/yanick/.config/nvim/plugged/ale/autoload/ale/statusline.vim
+48671.221  1168.641: first screen update
+48671.238  000.016: --- NVIM STARTED ---

@@ -1,0 +1,24 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A technical article - Example: How-to (task) topics, step-by-step, procedural troubleshooting, specifications, etc.",
+      "rdfs:label" : "TechArticle",
+      "rdfs:subClassOf" : "schema:Article"
+   },
+   "properties" : {
+      "schema:dependencies" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Prerequisites needed to fulfill steps in article.",
+         "rdfs:label" : "dependencies",
+         "schema:domainIncludes" : "schema:TechArticle",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:proficiencyLevel" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Proficiency needed for this content; expected values: 'Beginner', 'Expert'.",
+         "rdfs:label" : "proficiencyLevel",
+         "schema:domainIncludes" : "schema:TechArticle",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

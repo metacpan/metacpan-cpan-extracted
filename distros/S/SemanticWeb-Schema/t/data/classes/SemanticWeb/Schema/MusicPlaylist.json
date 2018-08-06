@@ -1,0 +1,42 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A collection of music tracks in playlist form.",
+      "rdfs:label" : "MusicPlaylist",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:numTracks" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of tracks in this album or playlist.",
+         "rdfs:label" : "numTracks",
+         "schema:domainIncludes" : "schema:MusicPlaylist",
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:track" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A music recording (track)&#x2014;usually a single song. If an ItemList is given, the list should contain items of type MusicRecording.",
+         "rdfs:label" : "track",
+         "schema:domainIncludes" : [
+            "schema:MusicGroup",
+            "schema:MusicPlaylist"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:MusicRecording",
+            "schema:ItemList"
+         ]
+      },
+      "schema:tracks" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A music recording (track)&#x2014;usually a single song.",
+         "rdfs:label" : "tracks",
+         "schema:domainIncludes" : [
+            "schema:MusicGroup",
+            "schema:MusicPlaylist"
+         ],
+         "schema:rangeIncludes" : "schema:MusicRecording",
+         "schema:supersededBy" : "schema:track"
+      }
+   }
+}

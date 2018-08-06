@@ -24,7 +24,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,6 +37,8 @@ no_index:
   package:
     - Filter::Crypto::_ConfigureBuild
 optional_features:
+  changestest:
+    description: 'Changes testing'
   critictest:
     description: 'Perl::Critic testing'
   parfilter:
@@ -71,4 +73,4 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/steve-m-hay/Filter-Crypto.git
-version: '2.07'
+version: '2.08'

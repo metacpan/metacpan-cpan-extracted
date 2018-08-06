@@ -1,0 +1,20 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of traveling from an fromLocation to a destination by a specified mode of transport, optionally with participants.",
+      "rdfs:label" : "TravelAction",
+      "rdfs:subClassOf" : "schema:MoveAction"
+   },
+   "properties" : {
+      "schema:distance" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The distance travelled, e.g. exercising or travelling.",
+         "rdfs:label" : "distance",
+         "schema:domainIncludes" : [
+            "schema:TravelAction",
+            "schema:ExerciseAction"
+         ],
+         "schema:rangeIncludes" : "schema:Distance"
+      }
+   }
+}

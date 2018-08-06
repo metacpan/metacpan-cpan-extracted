@@ -4,6 +4,10 @@ author:
   - 'hexonet <middleware@hexonet.net>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0.43'
+  Test::More: '0'
+  Test::RequiresInternet: '0.05'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -17,6 +21,10 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '1.05'
+requires:
+  Data::Dumper: '2.161'
+  LWP::UserAgent: '6.35'
+  MIME::Base64: '0'
+  Time::Local: '0'
+version: '1.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

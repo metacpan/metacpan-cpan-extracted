@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Glob.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+# $Id: lib/Paranoid/Glob.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -30,7 +30,7 @@ use File::Glob qw(bsd_glob);
 use Paranoid;
 use Paranoid::Debug qw(:all);
 
-($VERSION) = ( q$Revision: 2.05 $ =~ /(\d+(?:\.\d+)+)/s );
+($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/s );
 
 #####################################################################
 #
@@ -506,7 +506,7 @@ Paranoid::Glob - Paranoid Glob objects
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Glob.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+$Id: lib/Paranoid/Glob.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 
 =head1 SYNOPSIS
 

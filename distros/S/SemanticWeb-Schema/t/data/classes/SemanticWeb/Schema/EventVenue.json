@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An event venue.",
+      "rdfs:label" : "EventVenue",
+      "rdfs:subClassOf" : "schema:CivicStructure"
+   },
+   "properties" : {}
+}

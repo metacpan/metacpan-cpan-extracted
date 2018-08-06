@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -15,12 +15,18 @@ install_share dist => "share";
 my %WriteMakefileArgs = (
   "ABSTRACT" => "launch local GUI via default web browser",
   "AUTHOR" => "Roger Crew <wrog\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "Pod::Coverage::TrustPod" => 0,
+    "Test::Pod" => 0,
+    "Test::Pod::Coverage" => 0
+  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Mojolicious-Plugin-Loco",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Mojolicious::Plugin::Loco",
   "PREREQ_PM" => {
     "Browser::Open" => 0,
@@ -30,7 +36,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +47,10 @@ my %FallbackPrereqs = (
   "Browser::Open" => 0,
   "File::ShareDir" => 0,
   "Mojolicious" => "7.87",
-  "Test::More" => 0
+  "Pod::Coverage::TrustPod" => 0,
+  "Test::More" => 0,
+  "Test::Pod" => 0,
+  "Test::Pod::Coverage" => 0
 );
 
 

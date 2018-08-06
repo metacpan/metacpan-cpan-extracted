@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A comedy club.",
+      "rdfs:label" : "ComedyClub",
+      "rdfs:subClassOf" : "schema:EntertainmentBusiness"
+   },
+   "properties" : {}
+}

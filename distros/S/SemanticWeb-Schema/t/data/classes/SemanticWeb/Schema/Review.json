@@ -1,0 +1,34 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A review of an item - for example, of a restaurant, movie, or store.",
+      "rdfs:label" : "Review",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:itemReviewed" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The item that is being reviewed/rated.",
+         "rdfs:label" : "itemReviewed",
+         "schema:domainIncludes" : [
+            "schema:Review",
+            "schema:AggregateRating"
+         ],
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:reviewBody" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The actual body of the review.",
+         "rdfs:label" : "reviewBody",
+         "schema:domainIncludes" : "schema:Review",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:reviewRating" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The rating given in this review. Note that reviews can themselves be rated. The <code>reviewRating</code> applies to rating given by the review. The <a class=\"localLink\" href=\"http://schema.org/aggregateRating\">aggregateRating</a> property applies to the review itself, as a creative work.",
+         "rdfs:label" : "reviewRating",
+         "schema:domainIncludes" : "schema:Review",
+         "schema:rangeIncludes" : "schema:Rating"
+      }
+   }
+}

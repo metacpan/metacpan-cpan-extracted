@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A list of possible conditions for the item.",
+      "rdfs:label" : "OfferItemCondition",
+      "rdfs:subClassOf" : "schema:Enumeration"
+   },
+   "properties" : {}
+}

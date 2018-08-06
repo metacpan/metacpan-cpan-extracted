@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A shop that will buy, or lend money against the security of, personal possessions.",
+      "rdfs:label" : "PawnShop",
+      "rdfs:subClassOf" : "schema:Store"
+   },
+   "properties" : {}
+}

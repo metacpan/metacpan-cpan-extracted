@@ -7,10 +7,8 @@ use feature qw( say );
 use Devel::MAT;
 use List::UtilsBy qw( nsort_by );
 
-STDOUT->autoflush(1);
-
-my $progress = ( -t STDOUT ) ?
-   sub { print "\r\e[K" . ( shift // "" ); } :
+my $progress = ( -t STDERR ) ?
+   sub { print STDERR "\r\e[K" . ( shift // "" ); } :
    undef;
 
 my $pmatA = Devel::MAT->load( ( $ARGV[0] // die "Need dumpfile A\n" ),

@@ -25,7 +25,7 @@ __END__
 Perl data type class for the XML Schema defined simpleType
 QuotaCheckError.Reason from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Enums for all the reasons an error can be thrown to the user during billing quota checks. 
 
 
 

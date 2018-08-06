@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+
+# PODNAME: podknit 
+# ABSTRACT: cli interface to Pod::Knit
+
+use 5.10.0;
+
+use strict;
+use warnings;
+
+use Pod::Knit;
+
+say Pod::Knit->new->munge_document( file => shift )->as_string;

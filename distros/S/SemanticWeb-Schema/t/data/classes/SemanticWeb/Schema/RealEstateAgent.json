@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A real-estate agent.",
+      "rdfs:label" : "RealEstateAgent",
+      "rdfs:subClassOf" : "schema:LocalBusiness"
+   },
+   "properties" : {}
+}

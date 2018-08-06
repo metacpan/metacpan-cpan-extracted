@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Tzm::Any::Ma - Package for language Central Atlas Tamazig
 
 package Locale::CLDR::Locales::Tzm::Any::Ma;
 # This file auto generated from Data\common\main\tzm_MA.xml
-#	on Fri 13 Apr  7:33:01 am GMT
+#	on Sun  5 Aug  6:26:32 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

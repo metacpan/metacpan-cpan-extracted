@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ar::Any::Om - Package for language Arabic
 
 package Locale::CLDR::Locales::Ar::Any::Om;
 # This file auto generated from Data\common\main\ar_OM.xml
-#	on Fri 13 Apr  7:01:23 am GMT
+#	on Sun  5 Aug  5:50:55 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -22,6 +22,13 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Ar::Any');
+has 'default_numbering_system' => (
+	is			=> 'ro',
+	isa			=> Str,
+	init_arg	=> undef,
+	default		=> 'arab',
+);
+
 no Moo;
 
 1;

@@ -28,6 +28,8 @@ t/07-goto_label_stating_with_colon.cmd
 t/07-goto_label_stating_with_colon.t
 t/08-whitespaces_setting_variables.cmd
 t/08-whitespaces_setting_variables.t
+t/09-do_something.cmd
+t/09-do_something.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

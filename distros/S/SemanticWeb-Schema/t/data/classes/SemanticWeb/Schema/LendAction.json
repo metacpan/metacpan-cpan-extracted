@@ -1,0 +1,18 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>The act of providing an object under an agreement that it will be returned at a later date. Reciprocal of BorrowAction.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/BorrowAction\">BorrowAction</a>: Reciprocal of LendAction.</li>\n</ul>\n",
+      "rdfs:label" : "LendAction",
+      "rdfs:subClassOf" : "schema:TransferAction"
+   },
+   "properties" : {
+      "schema:borrower" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The person that borrows the object being lent.",
+         "rdfs:label" : "borrower",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : "schema:LendAction",
+         "schema:rangeIncludes" : "schema:Person"
+      }
+   }
+}

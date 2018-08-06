@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of discovering/finding an object.",
+      "rdfs:label" : "DiscoverAction",
+      "rdfs:subClassOf" : "schema:FindAction"
+   },
+   "properties" : {}
+}

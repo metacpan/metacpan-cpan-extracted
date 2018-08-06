@@ -1,10 +1,10 @@
 # NAME
 
-Alien::caca - Alien package for the Colored ASCII Art library
+Alien::caca - Alien package for the Colored ASCII Art library 
 
 # VERSION
 
-version 0.0.2
+version 0.0.3
 
 # SYNOPSIS 
 

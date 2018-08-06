@@ -1,0 +1,18 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of achieving victory in a competitive activity.",
+      "rdfs:label" : "WinAction",
+      "rdfs:subClassOf" : "schema:AchieveAction"
+   },
+   "properties" : {
+      "schema:loser" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The loser of the action.",
+         "rdfs:label" : "loser",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : "schema:WinAction",
+         "schema:rangeIncludes" : "schema:Person"
+      }
+   }
+}

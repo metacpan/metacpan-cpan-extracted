@@ -40,12 +40,9 @@ touch('./t/test_chown/bar');
 
 $user  = 'nobody';
 $uid   = ptranslateUser($user);
-$group = 'nogroup';
+$group = 'nobody';
 $gid   = ptranslateGroup($group);
-unless ( defined $gid ) {
-    $group = 'nobody';
-    $gid   = ptranslateGroup($group);
-}
+my $hasNG = defined $gid;
 
 # NOTE: The following block is skipped due to a bug in all current
 # version of Perl involving platforms with unsigned ints for GIDs.  A patch
@@ -53,7 +50,7 @@ unless ( defined $gid ) {
 SKIP: {
     skip( 'Bug in some perls UINT in GIDs', 15 ) unless $] >= 5.010;
     skip( 'Non-root user running tests',    15 ) unless $< == 0;
-    skip( 'Failed to resolve nobody/nogroup to test with', 15 )
+    skip( 'Failed to resolve nobody/nobody to test with', 15 )
         unless defined $uid and defined $gid;
     ok( pchown( "./t/test_chown/*", $user ), 'pchown no group 1' );
     $id = ( stat "./t/test_chown/foo" )[4];

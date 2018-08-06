@@ -1,0 +1,161 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Carp qw/croak/;
+use English qw/-no_match_vars/;
+use LWP::UserAgent;
+use Term::ANSIColor;
+use WebService::SSLLabs;
+
+=head1 NAME
+
+epfl-net-ssl-test
+
+=head1 DESCRIPTION
+
+Check SSL connectivity from a Website with ssllabs.com
+
+=head1 VERSION
+
+Version 1.00
+
+=head1 USAGE
+
+  epfl-net-ssl-test --help
+
+  epfl-net-ssl-test --domain=actu.epfl.ch
+
+=cut
+
+our $VERSION = '1.00';
+
+my ( $help, $domain );
+
+GetOptions(
+  'domain=s' => \$domain,
+  'help'     => \$help,
+) || pod2usage(2);
+
+if ( $help || !$domain ) {
+  pod2usage(1);
+  exit 0;
+}
+
+my $labs = WebService::SSLLabs->new();
+my $host;
+
+while ( not $host = $labs->analyze( host => $domain )->complete() ) {
+  sleep $labs->previous_eta();
+}
+
+if ( $host->ready() ) {
+  foreach my $endpoint ( $host->endpoints() ) {
+    if ( $endpoint->ready() ) {
+      print "\n", $endpoint->ip_address(), "\n"
+        or croak "Couldn't write: $OS_ERROR";
+      print color('green'), '✔ Diode', "\n", color('clear')
+        or croak "Couldn't write: $OS_ERROR";
+      print color('green'), '✔ SSL Certificate', "\n", color('clear')
+        or croak "Couldn't write: $OS_ERROR";
+      if ( $endpoint->grade() eq 'A' or $endpoint->grade() eq 'A+' ) {
+        print color('green'), '✔ Grade ', $endpoint->grade(), "\n\n",
+          color('clear')
+          or croak "Couldn't write: $OS_ERROR";
+      }
+      else {
+        print color('red'), '✘ Grade ', $endpoint->grade(), "\n\n",
+          color('clear')
+          or croak "Couldn't write: $OS_ERROR";
+      }
+    }
+    else {
+      print "\n", color('red'), '✘ Diode', "\n", color('clear')
+        or croak "Couldn't write: $OS_ERROR";
+      checkLocalCertificate($domain);
+    }
+  }
+}
+else {
+  print "\n", color('red'), '✘ ', $host->status_message(), "\n\n",
+    color('clear')
+    or croak "Couldn't write: $OS_ERROR";
+  exit 1;
+}
+
+sub checkLocalCertificate {
+  my $dom = shift;
+
+  my $url     = 'https://' . $dom;
+  my $ua      = LWP::UserAgent->new;
+  my $request = HTTP::Request->new( HEAD => $url );
+
+  my $response = $ua->request($request);
+  if ( $response->is_error ) {
+    print color('red'), '✘ SSL Certificate', "\n\n", color('clear')
+      or croak "Couldn't write: $OS_ERROR";
+  }
+  if ( $response->is_success ) {
+    print color('green'), '✔ SSL Certificate', "\n\n", color('clear')
+      or croak "Couldn't write: $OS_ERROR";
+  }
+
+  return;
+}
+
+=head1 AUTHOR
+
+William Belle, C<< <william.belle at gmail.com> >>
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests here
+L<https://github.com/epfl-idevelop/epfl-net-sslTest/issues>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc EPFL::Net::SSLTest
+
+You can also look for information at:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/EPFL-Net-SSLTest>
+
+=item * CPAN Ratings
+
+L<https://cpanratings.perl.org/d/EPFL-Net-SSLTest>
+
+=item * Search CPAN
+
+L<https://metacpan.org/release/EPFL-Net-SSLTest>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright ECOLE POLYTECHNIQUE FEDERALE DE LAUSANNE, Switzerland, VPSI, 2018.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    L<http://www.apache.org/licenses/LICENSE-2.0>
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut

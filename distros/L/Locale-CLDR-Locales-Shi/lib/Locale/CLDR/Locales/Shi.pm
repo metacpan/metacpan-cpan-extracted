@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Shi - Package for language Tachelhit
 
 package Locale::CLDR::Locales::Shi;
 # This file auto generated from Data\common\main\shi.xml
-#	on Fri 13 Apr  7:27:43 am GMT
+#	on Sun  5 Aug  6:20:36 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -568,6 +568,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(ⵓⵇⵉⵢⵢⴰ ⵏ ⵎⵓⵕⵉⵟⴰⵏⵢⴰ \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(ⵓⵇⵉⵢⵢⴰ ⵏ ⵎⵓⵕⵉⵟⴰⵏⵢⴰ),
 			},
 		},
@@ -637,6 +642,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(ⴰⴷⵓⴱⵔⴰ ⵏ ⵙⴰⵏⵟⵓⵎⵉ \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(ⴰⴷⵓⴱⵔⴰ ⵏ ⵙⴰⵏⵟⵓⵎⵉ),
 			},
@@ -831,8 +841,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
+					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 				},
 				'abbreviated' => {
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
@@ -912,7 +922,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			M => q{M},
 			MMM => q{MMM},
 			MMMEd => q{E d MMM},
@@ -932,7 +942,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			M => q{M},
 			MMM => q{MMM},
 			MMMEd => q{E d MMM},

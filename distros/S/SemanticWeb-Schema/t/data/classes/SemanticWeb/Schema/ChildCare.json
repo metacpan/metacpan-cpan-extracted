@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A Childcare center.",
+      "rdfs:label" : "ChildCare",
+      "rdfs:subClassOf" : "schema:LocalBusiness"
+   },
+   "properties" : {}
+}

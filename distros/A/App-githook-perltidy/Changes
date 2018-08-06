@@ -1,3 +1,77 @@
+0.12.0 (2018-08-02)
+
+    Packaging:
+        - Generate t/githook-perltidy with generic subroutine
+
+0.11.11_4 (2018-07-31)
+
+    New Features:
+        - Tidy files which are copied or moved by the commit. That
+          these were not tidied was an oversight from the very
+          beginning.
+
+    Enhancements:
+        - Make --verbose messages actually useful
+
+    Bug Fixes:
+        - Remove debug usleep() call introduced in 0.11.5_2. Do I get
+          to call that a performance improvement? :-/
+
+    Dependencies:
+        - Instead of recommending Perl::Tidy::Sweetened make it a
+          suggestion and also suggest Perl::Critic.
+        - Require Perl::Tidy::Sweetened and Perl::Critic on "develop".
+
+    Packaging:
+        - Transition to App::githook::perltidy away from
+          App::githook_perltidy to match the distribution name.
+
+0.11.11_3 (2018-07-31)
+
+    Enhancements:
+        - Documentation updates
+        - Performance improvements:
+            - Move instead of copy tidied files back to working tree.
+            - Only call git-checkout-index once per commit instead of
+              once per committed file.
+            - Only call git-add once per commit instead of once per
+              committed file.
+
+0.11.11_2 (2018-07-27)
+
+    New Features:
+        - Add support for Perl::Critic checks
+
+    Enhancements:
+        - Minor documentation updates
+        - Minor code clarity improvements
+        - Skip checks when NO_GITHOOK_PERLTIDY is set
+        - Finish faster when no tidying needed
+
+    Dependencies:
+        - Add Perl::Tidy::Sweetened as a runtime "recommends"
+          dependency.
+
+    Packaging:
+        - Renamed development branch "devel" to "master" and now just
+          have a single "dist" branch for distributions. Now visitors
+          to Github will see current development history first thing
+          instead of searching around for a strange branch scheme.
+
+0.11.11_1 (2018-07-17)
+
+    New Features:
+        - Add support for Perl::Tidy::Sweetened inspired by a patch by
+          Mark Grimes (MGRIMES)
+
+    Enhancements:
+        - Use Test::TempDir::Tiny instead of home-grown temp directory
+          code.
+        - Minor code refactoring
+
+    Packaging:
+        - Use META-SPEC version 2 and add Github repository URLs.
+
 0.11.10 (2018-07-14)
 
     Packaging:

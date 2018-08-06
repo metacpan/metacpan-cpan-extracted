@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.4.0;
+package Pcore::Chrome v0.4.1;
 
 use Pcore -dist, -const, -class;
 use Pcore::Chrome::Tab;
@@ -120,7 +120,7 @@ sub get_tabs ( $self, $cb ) {
     P->http->get(
         "http://$self->{host}:$self->{port}/json",
         sub ($res) {
-            my $tabs = from_json $res->{body};
+            my $tabs = from_json $res->{data};
 
             for my $tab ( $tabs->@* ) {
                 $tab = bless { chrome => $self, id => $tab->{id} }, 'Pcore::Chrome::Tab';
@@ -143,7 +143,7 @@ sub new_tab ( $self, @args ) {
     P->http->get(
         "http://$self->{host}:$self->{port}/json/new$url",
         sub ($res) {
-            my $data = from_json $res->{body};
+            my $data = from_json $res->{data};
 
             my $tab = bless { chrome => $self, id => $data->{id} }, 'Pcore::Chrome::Tab';
 

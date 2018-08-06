@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Event type: Exhibition event, e.g. at a museum, library, archive, tradeshow, ...",
+      "rdfs:label" : "ExhibitionEvent",
+      "rdfs:subClassOf" : "schema:Event"
+   },
+   "properties" : {}
+}

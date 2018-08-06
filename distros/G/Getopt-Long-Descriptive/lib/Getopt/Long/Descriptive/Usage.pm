@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Getopt::Long::Descriptive::Usage;
 # ABSTRACT: the usage description for GLD
-$Getopt::Long::Descriptive::Usage::VERSION = '0.102';
+$Getopt::Long::Descriptive::Usage::VERSION = '0.103';
 use List::Util qw(max);
 
 #pod =head1 SYNOPSIS
@@ -93,9 +93,11 @@ sub option_text {
     }
 
     ($spec, $assign) = Getopt::Long::Descriptive->_strip_assignment($spec);
-    $assign = _parse_assignment($assign);
-    $spec = join " ", reverse map { length > 1 ? "--${_}$assign" : "-${_}$assign" }
-                              split /\|/, $spec;
+    my ($left, $right) = _parse_assignment($assign);
+    $spec = join q{ },
+              reverse
+              map { length > 1 ? "--$left$_$right" : "-${_}$right" }
+              split /\|/, $spec;
 
     my @desc = $self->_split_description($length, $desc);
 
@@ -126,7 +128,9 @@ sub _option_length {
     my $number_shortopts = 0;
     my ($spec, $argspec) = Getopt::Long::Descriptive->_strip_assignment($fullspec);
     my $length = length $spec;
-    my $arglen = length(_parse_assignment($argspec));
+
+    my ($left, $right) = _parse_assignment($argspec);
+    my $arglen = length($left) + length($right);
 
     # Spacing rules:
     #
@@ -191,7 +195,8 @@ sub _parse_assignment {
     my $desttype;
     if (length($assign_spec) < 2) {
         # empty, ! or +
-        return '';
+        return ('[no-]', '') if $assign_spec eq '!';
+        return ('', '');
     }
 
     my $optional = substr($assign_spec, 0, 1) eq ':';
@@ -214,11 +219,11 @@ sub _parse_assignment {
     }
 
     if ($optional) {
-        return "[=$result]";
+        return ("", "[=$result]");
     }
 
     # with leading space so it can just blindly be appended.
-    return " $result";
+    return ("", " $result");
 }
 
 #pod =head2 warn
@@ -235,7 +240,7 @@ sub warn { warn shift->text }
 #pod
 #pod   $usage_obj->die(\%arg);
 #pod
-#pod Some arguments can be provided 
+#pod Some arguments can be provided
 #pod
 #pod   pre_text  - text to be prepended to the usage message
 #pod   post_text - text to be appended to the usage message
@@ -280,7 +285,7 @@ Getopt::Long::Descriptive::Usage - the usage description for GLD
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 SYNOPSIS
 
@@ -331,7 +336,7 @@ This throws the usage message as an exception.
 
   $usage_obj->die(\%arg);
 
-Some arguments can be provided 
+Some arguments can be provided
 
   pre_text  - text to be prepended to the usage message
   post_text - text to be appended to the usage message

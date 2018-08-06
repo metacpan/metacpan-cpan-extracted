@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::RequestError
 Perl data type class for the XML Schema defined complexType
 RequestError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Encapsulates the generic errors thrown when there's an error with user request. 
 
 
 

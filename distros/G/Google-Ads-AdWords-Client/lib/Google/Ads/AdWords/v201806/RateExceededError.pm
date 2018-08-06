@@ -102,7 +102,7 @@ Google::Ads::AdWords::v201806::RateExceededError
 Perl data type class for the XML Schema defined complexType
 RateExceededError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Signals that a call failed because a measured rate exceeded. 
 
 
 

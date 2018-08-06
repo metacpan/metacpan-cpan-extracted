@@ -489,8 +489,23 @@ Schnauzer or image window. The default is C<gimp>.
 
 =item CV_AUDIO_PLAYER
 
+EXPERIMENTAL: audio playback is now via mpv, this variable is currently
+ignored.
+
 Program used to play all sorts of audio (wav, aif, mp3, ogg...), default "play".
 Will be called like C<< $CV_AUDIO_PLAYER -- <path> >>.
+
+=item CV_MPLAYER
+
+Program used to play all sorts of video files. Unlike C<CV_AUDIO_PLAYER>,
+this really must be one of the C<mplayer>, C<mplayer2> or C<mpv> programs,
+or something that is very command-line compatible to them.
+
+Currently, if this string contains the substring C<mpv>, then it
+is assumed to be mpv-compatible, otherwise it is assumed to be
+mplayer-compatible.
+
+Note: for video-thumbnailing, mplayer is still used (and hardcoded).
 
 =item CV_PRINT_DESTINATION
 

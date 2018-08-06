@@ -19,6 +19,7 @@ my $mp = Data::MessagePack->new;
     $stream->feed( $mp->encode(3) );
     $stream->feed( $mp->encode([qw/a b c/]) );
     $stream->feed( $mp->encode({ foo => 'bar' }) );
+    $stream->feed( "\x81\x01\xa3bar" ); # {1 => 'bar'}
 
     ok !$stream->data, 'no data unless calling next';
 
@@ -36,6 +37,8 @@ my $mp = Data::MessagePack->new;
     is_deeply $stream->data, [qw/a b c/];
     ok $stream->next, 'next ok';
     is_deeply $stream->data, { foo => 'bar' };
+    ok $stream->next, 'next ok';
+    is_deeply $stream->data, { 1 => 'bar' };
 
     ok !$stream->next, 'no more data ok';
 }

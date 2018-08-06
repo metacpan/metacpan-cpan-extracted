@@ -8,7 +8,7 @@ use lib qw{inc}; use Alien::Base::ModuleBuild;
 
 my %module_build_args = (
   "alien_build_commands" => [
-    "perl -i -pe's/v in 13/v in 15 14 13/' ./bootstrap",
+    "perl -i -pe's/v in 13/v in 19 18 17 16 15 14 13/' ./bootstrap",
     "./bootstrap",
     "%c --prefix=%s --disable-java --disable-python --disable-ruby --disable-doc",
     "make"
@@ -25,18 +25,19 @@ my %module_build_args = (
     "Alien::Base::ModuleBuild" => "0.005",
     "File::ShareDir" => "1.03"
   },
-  "dist_abstract" => "Alien package for the Colored ASCII Art library",
+  "dist_abstract" => "Alien package for the Colored ASCII Art library ",
   "dist_author" => [
     "Yanick Champoux <yanick\@cpan.org>"
   ],
   "dist_name" => "Alien-caca",
-  "dist_version" => "0.0.2",
+  "dist_version" => "0.0.3",
   "license" => "perl",
   "module_name" => "Alien::caca",
   "recursive_test_files" => 1,
   "requires" => {
     "Alien::Base" => "0.005",
     "File::ShareDir" => "1.03",
+    "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },

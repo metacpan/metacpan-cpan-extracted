@@ -1,0 +1,34 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A summary of how users have interacted with this CreativeWork. In most cases, authors will use a subtype to specify the specific type of interaction.",
+      "rdfs:label" : "InteractionCounter",
+      "rdfs:subClassOf" : "schema:StructuredValue"
+   },
+   "properties" : {
+      "schema:interactionService" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The WebSite or SoftwareApplication where the interactions took place.",
+         "rdfs:label" : "interactionService",
+         "schema:domainIncludes" : "schema:InteractionCounter",
+         "schema:rangeIncludes" : [
+            "schema:SoftwareApplication",
+            "schema:WebSite"
+         ]
+      },
+      "schema:interactionType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The Action representing the type of interaction. For up votes, +1s, etc. use <a class=\"localLink\" href=\"http://schema.org/LikeAction\">LikeAction</a>. For down votes use <a class=\"localLink\" href=\"http://schema.org/DislikeAction\">DislikeAction</a>. Otherwise, use the most specific Action.",
+         "rdfs:label" : "interactionType",
+         "schema:domainIncludes" : "schema:InteractionCounter",
+         "schema:rangeIncludes" : "schema:Action"
+      },
+      "schema:userInteractionCount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of interactions for the CreativeWork using the WebSite or SoftwareApplication.",
+         "rdfs:label" : "userInteractionCount",
+         "schema:domainIncludes" : "schema:InteractionCounter",
+         "schema:rangeIncludes" : "schema:Integer"
+      }
+   }
+}

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Mg - Package for language Malagasy
 
 package Locale::CLDR::Locales::Mg;
 # This file auto generated from Data\common\main\mg.xml
-#	on Fri 13 Apr  7:19:16 am GMT
+#	on Sun  5 Aug  6:11:09 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -617,6 +617,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ouguiya moritanianina \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ouguiya moritanianina),
 			},
 		},
@@ -686,6 +691,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dobra \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dobra),
 			},
@@ -1015,24 +1025,24 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 				'abbreviated' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'narrow' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
 				'wide' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'abbreviated' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},

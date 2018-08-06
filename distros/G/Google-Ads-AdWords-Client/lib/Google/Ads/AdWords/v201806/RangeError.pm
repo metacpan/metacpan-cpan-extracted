@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::RangeError
 Perl data type class for the XML Schema defined complexType
 RangeError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+A list of all errors associated with the Range constraint. 
 
 
 

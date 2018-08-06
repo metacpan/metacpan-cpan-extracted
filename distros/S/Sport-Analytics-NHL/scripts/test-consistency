@@ -1,0 +1,53 @@
+#!/usr/local/bin/perl
+
+use v5.10.1;
+use strict;
+use warnings FATAL => 'all';
+use experimental qw(smartmatch);
+
+use File::Basename;
+use Storable;
+
+use File::Touch;
+
+use Sport::Analytics::NHL::LocalConfig;
+use Sport::Analytics::NHL::Normalizer;
+use Sport::Analytics::NHL::Test;
+use Sport::Analytics::NHL::Tools;
+use Sport::Analytics::NHL::Errors;
+use Sport::Analytics::NHL;
+use Sport::Analytics::NHL::Usage;
+
+my @accepts_opts = qw(
+	data-dir :season
+);
+
+my @accepts_args = ();
+my $what_it_does = 'Tests the consistency of the merged boxscore';
+my $opts = gopts($what_it_does, \@accepts_opts, \@accepts_args);
+my $hockeydb = Sport::Analytics::NHL->new($opts);
+my $query = {};
+if ($opts->{start_season} || $opts->{stop_season}) {
+	$query->{season} = {
+		$opts->{start_season} ? ('$gte' => $opts->{start_season}) : (),
+		$opts->{stop_season}  ? ('$lte' => $opts->{stop_season})  : (),
+	}
+}
+my @game_ids = $hockeydb->{db}{dbh}->get_collection('schedule')->find(
+	$query, {_id => 0, game_id => 1}
+)->all();
+for my $game_id (@game_ids) {
+	my $repeat = 0;
+	TEST:
+	my @merged = $hockeydb->merge($opts, map($_->{game_id}, $game_id));
+	next unless @merged;
+	my $path = dirname($merged[0]);
+	my $summarized = "$path/$SUMMARIZED_FILE";
+	my $merged_file = "$path/$MERGED_FILE";
+	next if ! $opts->{force} && -f $summarized &&
+		-M $summarized < -M $merged_file;
+	my $boxscore = retrieve $merged[0];
+	my $event_summary = summarize $boxscore;
+	Sport::Analytics::NHL::check_consistency($merged_file, $boxscore, $event_summary);
+}
+

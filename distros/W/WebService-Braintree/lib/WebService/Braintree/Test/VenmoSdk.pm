@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::Test::VenmoSdk;
-$WebService::Braintree::Test::VenmoSdk::VERSION = '1.6';
+$WebService::Braintree::Test::VenmoSdk::VERSION = '1.7';
 use 5.010_001;
 use strictures 1;
 

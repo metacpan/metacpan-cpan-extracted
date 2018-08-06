@@ -1,7 +1,7 @@
 package Finance::Currency::FiatX::Role::Source;
 
-our $DATE = '2018-07-15'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-08-01'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use Role::Tiny;
 
@@ -23,7 +23,7 @@ Finance::Currency::FiatX::Role::Source - Role for FiatX sources
 
 =head1 VERSION
 
-This document describes version 0.009 of Finance::Currency::FiatX::Role::Source (from Perl distribution Finance-Currency-FiatX), released on 2018-07-15.
+This document describes version 0.010 of Finance::Currency::FiatX::Role::Source (from Perl distribution Finance-Currency-FiatX), released on 2018-08-01.
 
 =head1 DESCRIPTION
 

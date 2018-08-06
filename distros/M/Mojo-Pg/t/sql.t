@@ -55,6 +55,17 @@ $result = [
   'baz', 'yada'
 ];
 is_deeply \@sql, $result, 'right query';
+@sql = $abstract->insert(
+  'foo',
+  {bar         => 'baz'},
+  {on_conflict => [['foo', 'bar'] => {foo => 'yada'}]}
+);
+$result = [
+  'INSERT INTO "foo" ( "bar") VALUES ( ? )'
+    . ' ON CONFLICT ("foo", "bar") DO UPDATE SET "foo" = ?',
+  'baz', 'yada'
+];
+is_deeply \@sql, $result, 'right query';
 
 # ON CONFLICT (unsupported value)
 eval { $abstract->insert('foo', {bar => 'baz'}, {on_conflict => [[], []]}) };
@@ -92,7 +103,7 @@ is_deeply \@sql,
   'right query';
 @sql = $abstract->select(
   'foo', '*',
-  {bar => {'>' => 'baz'}},
+  {bar      => {'>' => 'baz'}},
   {group_by => ['bar'], having => {baz => {'<' => 'bar'}}}
 );
 $result = [
@@ -126,11 +137,23 @@ is_deeply \@sql, ['SELECT "bar", "bar" AS "baz", "yada" FROM "foo"'],
 is_deeply \@sql,
   ['SELECT "bar", extract(epoch from baz) as baz, "yada" FROM "foo"'],
   'right query';
+@sql = $abstract->select('foo', ['bar', \['? as baz', 'test'], 'yada']);
+is_deeply \@sql, ['SELECT "bar", ? as baz, "yada" FROM "foo"', 'test'],
+  'right query';
 
 # AS (unsupported value)
 eval { $abstract->select('foo', [[]]) };
 like $@, qr/field alias must be in the form \[\$name => \$alias\]/,
   'right error';
+
+# JSON
+@sql = $abstract->update('foo', {bar => {-json => [1, 2, 3]}});
+is_deeply \@sql, ['UPDATE "foo" SET "bar" = ?', {json => [1, 2, 3]}],
+  'right query';
+@sql = $abstract->select('foo', '*', {bar => {'=' => {-json => [1, 2, 3]}}});
+is_deeply \@sql,
+  ['SELECT * FROM "foo" WHERE ( "bar" = ? )', {json => [1, 2, 3]}],
+  'right query';
 
 # JOIN
 @sql = $abstract->select(['foo', ['bar', foo_id => 'id']]);
@@ -141,8 +164,9 @@ is_deeply \@sql,
 is_deeply \@sql,
   ['SELECT * FROM "foo" JOIN "bar" ON ("foo"."id" = "bar"."foo_id")'],
   'right query';
-@sql = $abstract->select(
-  ['foo', ['bar', foo_id => 'id'], ['baz', foo_id => 'id']]);
+@sql
+  = $abstract->select(['foo', ['bar', foo_id => 'id'], ['baz', foo_id => 'id']
+  ]);
 $result
   = [ 'SELECT * FROM "foo"'
     . ' JOIN "bar" ON ("bar"."foo_id" = "foo"."id")'

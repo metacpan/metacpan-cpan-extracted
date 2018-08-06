@@ -1,5 +1,10 @@
 Revision history for App-NDTools
 
+0.6.0   2018-07-31
+        - ndproc-Insert: replace whole structure if path opt omitted
+        - ndproc-Remove: throw error when no one path specified to remove
+        - all: Struct::Path::PerlStyle updated to 0.90
+
 0.5.9   2018-07-03
         - tests fixed (YAML::XS version check)
 

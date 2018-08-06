@@ -722,7 +722,7 @@ package Sidef::Types::String::String {
 
     sub graphemes {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { bless \$_ } map { /\X/g } $$self]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } $$self =~ /(\X)/g]);
     }
 
     *graphs = \&graphemes;
@@ -804,27 +804,81 @@ package Sidef::Types::String::String {
     }
 
     sub trim {
-        my ($self) = @_;
+        my ($self, $arg) = @_;
+
+        if (defined($arg)) {
+
+            my $regex;
+
+            if (ref($arg) eq 'Sidef::Types::Regex::Regex') {
+                $regex = qr/(?:$arg->{regex})/;
+            }
+            else {
+                my @chars = split('', "$arg");
+                $regex = qr/(?:[@chars]+)/;
+            }
+
+            return $self->new(($$self =~ s/^$regex//r) =~ s/$regex\z//r);
+        }
+
         $self->new(unpack('A*', $$self) =~ s/^\s+//r);
     }
 
     *strip = \&trim;
 
     sub strip_beg {
-        my ($self) = @_;
+        my ($self, $arg) = @_;
+
+        if (defined($arg)) {
+
+            my $regex;
+
+            if (ref($arg) eq 'Sidef::Types::Regex::Regex') {
+                $regex = qr/^(?:$arg->{regex})/;
+            }
+            else {
+                my @chars = split('', "$arg");
+                $regex = qr/^(?:[@chars]+)/;
+            }
+
+            return $self->new($$self =~ s/$regex//r);
+        }
+
         $self->new($$self =~ s/^\s+//r);
     }
 
-    *ltrim    = \&strip_beg;
-    *trim_beg = \&strip_beg;
+    *lstrip     = \&strip_beg;
+    *ltrim      = \&strip_beg;
+    *trim_beg   = \&strip_beg;
+    *strip_left = \&strip_beg;
+    *trim_left  = \&strip_beg;
 
     sub strip_end {
-        my ($self) = @_;
+        my ($self, $arg) = @_;
+
+        if (defined($arg)) {
+
+            my $regex;
+
+            if (ref($arg) eq 'Sidef::Types::Regex::Regex') {
+                $regex = qr/(?:$arg->{regex})\z/;
+            }
+            else {
+                my @chars = split('', "$arg");
+                $regex = qr/(?:[@chars]+)\z/;
+            }
+
+            return $self->new($$self =~ s/$regex//r);
+        }
+
         $self->new(unpack('A*', $$self));
     }
 
-    *rtrim    = \&strip_end;
-    *trim_end = \&strip_end;
+    *rstrip      = \&strip_end;
+    *rtrim       = \&strip_end;
+    *trim_end    = \&strip_end;
+    *strip_right = \&strip_end;
+    *trim_right  = \&strip_end;
 
     sub trans {
         my ($self, $orig, $repl) = @_;
@@ -1020,6 +1074,12 @@ package Sidef::Types::String::String {
     *contain  = \&contains;
     *include  = \&contains;
     *includes = \&contains;
+
+    sub rotate {
+        my ($self, $n) = @_;
+        $n = (CORE::int($n) % (CORE::length($$self) || return $self)) || return $self;
+        $self->new(CORE::substr($$self, $n) . CORE::substr($$self, 0, $n));
+    }
 
     sub count {
         my ($self, $arg) = @_;

@@ -64,15 +64,15 @@
      CROAK = 280,
      VAR_NAME = 281,
      INTERFACE = 282,
-     REF = 283,
-     ISA = 284,
-     SWITCH = 285,
-     CASE = 286,
-     DEFAULT = 287,
-     EVAL = 288,
-     WEAKEN = 289,
-     PRECOMPILE = 290,
-     DEREF = 291,
+     ISA = 283,
+     SWITCH = 284,
+     CASE = 285,
+     DEFAULT = 286,
+     EVAL = 287,
+     WEAKEN = 288,
+     PRECOMPILE = 289,
+     DEREF = 290,
+     BACKSLASH = 291,
      UNDEF = 292,
      VOID = 293,
      BYTE = 294,
@@ -83,30 +83,25 @@
      DOUBLE = 299,
      STRING = 300,
      OBJECT = 301,
-     BYTE_REF = 302,
-     SHORT_REF = 303,
-     INT_REF = 304,
-     LONG_REF = 305,
-     FLOAT_REF = 306,
-     DOUBLE_REF = 307,
-     SPECIAL_ASSIGN = 308,
-     ASSIGN = 309,
-     OR = 310,
-     AND = 311,
-     BIT_XOR = 312,
-     BIT_OR = 313,
-     BIT_AND = 314,
-     REL = 315,
-     SHIFT = 316,
-     REMAINDER = 317,
-     DIVIDE = 318,
-     MULTIPLY = 319,
-     UMINUS = 320,
-     SCALAR = 321,
-     NOT = 322,
-     DEC = 323,
-     INC = 324,
-     ARROW = 325
+     AMPERSAND = 302,
+     SPECIAL_ASSIGN = 303,
+     ASSIGN = 304,
+     OR = 305,
+     AND = 306,
+     BIT_XOR = 307,
+     BIT_OR = 308,
+     BIT_AND = 309,
+     REL = 310,
+     SHIFT = 311,
+     REMAINDER = 312,
+     DIVIDE = 313,
+     MULTIPLY = 314,
+     UMINUS = 315,
+     SCALAR = 316,
+     NOT = 317,
+     DEC = 318,
+     INC = 319,
+     ARROW = 320
    };
 #endif
 /* Tokens.  */
@@ -135,15 +130,15 @@
 #define CROAK 280
 #define VAR_NAME 281
 #define INTERFACE 282
-#define REF 283
-#define ISA 284
-#define SWITCH 285
-#define CASE 286
-#define DEFAULT 287
-#define EVAL 288
-#define WEAKEN 289
-#define PRECOMPILE 290
-#define DEREF 291
+#define ISA 283
+#define SWITCH 284
+#define CASE 285
+#define DEFAULT 286
+#define EVAL 287
+#define WEAKEN 288
+#define PRECOMPILE 289
+#define DEREF 290
+#define BACKSLASH 291
 #define UNDEF 292
 #define VOID 293
 #define BYTE 294
@@ -154,30 +149,25 @@
 #define DOUBLE 299
 #define STRING 300
 #define OBJECT 301
-#define BYTE_REF 302
-#define SHORT_REF 303
-#define INT_REF 304
-#define LONG_REF 305
-#define FLOAT_REF 306
-#define DOUBLE_REF 307
-#define SPECIAL_ASSIGN 308
-#define ASSIGN 309
-#define OR 310
-#define AND 311
-#define BIT_XOR 312
-#define BIT_OR 313
-#define BIT_AND 314
-#define REL 315
-#define SHIFT 316
-#define REMAINDER 317
-#define DIVIDE 318
-#define MULTIPLY 319
-#define UMINUS 320
-#define SCALAR 321
-#define NOT 322
-#define DEC 323
-#define INC 324
-#define ARROW 325
+#define AMPERSAND 302
+#define SPECIAL_ASSIGN 303
+#define ASSIGN 304
+#define OR 305
+#define AND 306
+#define BIT_XOR 307
+#define BIT_OR 308
+#define BIT_AND 309
+#define REL 310
+#define SHIFT 311
+#define REMAINDER 312
+#define DIVIDE 313
+#define MULTIPLY 314
+#define UMINUS 315
+#define SCALAR 316
+#define NOT 317
+#define DEC 318
+#define INC 319
+#define ARROW 320
 
 
 

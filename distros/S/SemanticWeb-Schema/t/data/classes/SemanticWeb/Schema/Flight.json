@@ -1,0 +1,183 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An airline flight.",
+      "rdfs:label" : "Flight",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:aircraft" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The kind of aircraft (e.g., \"Boeing 747\").",
+         "rdfs:label" : "aircraft",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Vehicle"
+         ]
+      },
+      "schema:arrivalAirport" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The airport where the flight terminates.",
+         "rdfs:label" : "arrivalAirport",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : "schema:Airport"
+      },
+      "schema:arrivalGate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Identifier of the flight's arrival gate.",
+         "rdfs:label" : "arrivalGate",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:arrivalTerminal" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Identifier of the flight's arrival terminal.",
+         "rdfs:label" : "arrivalTerminal",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:arrivalTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The expected arrival time.",
+         "rdfs:label" : "arrivalTime",
+         "schema:domainIncludes" : [
+            "schema:TrainTrip",
+            "schema:Flight",
+            "schema:BusTrip"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:boardingPolicy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of boarding policy used by the airline (e.g. zone-based or group-based).",
+         "rdfs:label" : "boardingPolicy",
+         "schema:domainIncludes" : [
+            "schema:Airline",
+            "schema:Flight"
+         ],
+         "schema:rangeIncludes" : "schema:BoardingPolicyType"
+      },
+      "schema:carrier" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "'carrier' is an out-dated term indicating the 'provider' for parcel delivery and flights.",
+         "rdfs:label" : "carrier",
+         "schema:domainIncludes" : [
+            "schema:Flight",
+            "schema:ParcelDelivery"
+         ],
+         "schema:rangeIncludes" : "schema:Organization",
+         "schema:supersededBy" : "schema:provider"
+      },
+      "schema:departureAirport" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The airport where the flight originates.",
+         "rdfs:label" : "departureAirport",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : "schema:Airport"
+      },
+      "schema:departureGate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Identifier of the flight's departure gate.",
+         "rdfs:label" : "departureGate",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:departureTerminal" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Identifier of the flight's departure terminal.",
+         "rdfs:label" : "departureTerminal",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:departureTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The expected departure time.",
+         "rdfs:label" : "departureTime",
+         "schema:domainIncludes" : [
+            "schema:BusTrip",
+            "schema:Flight",
+            "schema:TrainTrip"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:estimatedFlightDuration" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The estimated time the flight will take.",
+         "rdfs:label" : "estimatedFlightDuration",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : [
+            "schema:Duration",
+            "schema:Text"
+         ]
+      },
+      "schema:flightDistance" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The distance of the flight.",
+         "rdfs:label" : "flightDistance",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : [
+            "schema:Distance",
+            "schema:Text"
+         ]
+      },
+      "schema:flightNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The unique identifier for a flight including the airline IATA code. For example, if describing United flight 110, where the IATA code for United is 'UA', the flightNumber is 'UA110'.",
+         "rdfs:label" : "flightNumber",
+         "rdfs:subPropertyOf" : "schema:identifier",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:mealService" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Description of the meals that will be provided or available for purchase.",
+         "rdfs:label" : "mealService",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:provider" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
+         "rdfs:label" : "provider",
+         "schema:domainIncludes" : [
+            "schema:ParcelDelivery",
+            "schema:BusTrip",
+            "schema:CreativeWork",
+            "schema:Service",
+            "schema:TrainTrip",
+            "schema:Reservation",
+            "schema:Flight",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:seller" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An entity which offers (sells / leases / lends / loans) the services / goods.  A seller may also be a provider.",
+         "rdfs:label" : "seller",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : [
+            "schema:BuyAction",
+            "schema:Demand",
+            "schema:Flight",
+            "schema:Order",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:webCheckinTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The time when a passenger can check into the flight online.",
+         "rdfs:label" : "webCheckinTime",
+         "schema:domainIncludes" : "schema:Flight",
+         "schema:rangeIncludes" : "schema:DateTime"
+      }
+   }
+}

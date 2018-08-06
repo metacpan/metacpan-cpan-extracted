@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A Hindu temple.",
+      "rdfs:label" : "HinduTemple",
+      "rdfs:subClassOf" : "schema:PlaceOfWorship"
+   },
+   "properties" : {}
+}

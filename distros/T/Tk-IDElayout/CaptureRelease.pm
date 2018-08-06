@@ -1,6 +1,6 @@
 package Tk::CaptureRelease;
 
-our ($VERSION) = ('0.33');
+our ($VERSION) = ('0.34');
 
 use Tk;
 require DynaLoader;

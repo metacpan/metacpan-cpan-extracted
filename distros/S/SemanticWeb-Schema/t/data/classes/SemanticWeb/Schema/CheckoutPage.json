@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Web page type: Checkout page.",
+      "rdfs:label" : "CheckoutPage",
+      "rdfs:subClassOf" : "schema:WebPage"
+   },
+   "properties" : {}
+}

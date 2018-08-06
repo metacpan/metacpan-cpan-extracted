@@ -130,7 +130,7 @@ sub print_sql {
     for my $stmt_type ( @$stmt_typeS ) {
          $str .= $sf->get_stmt( $pr_sql, $stmt_type, 'print' );
     }
-    my $filled = $sf->fill_stmt( $str, [ @{$pr_sql->{set_args}}, @{$pr_sql->{where_args}}, @{$pr_sql->{having_args}} ] );
+    my $filled = $sf->stmt_placeholder_to_value( $str, [ @{$pr_sql->{set_args}}, @{$pr_sql->{where_args}}, @{$pr_sql->{having_args}} ] );
     $str = $filled if defined $filled;
     $str .= "\n";
     print $sf->{i}{clear_screen};
@@ -138,7 +138,7 @@ sub print_sql {
 }
 
 
-sub fill_stmt {
+sub stmt_placeholder_to_value {
     my ( $sf, $stmt, $args, $quote ) = @_;
     my $rx_placeholder = qr/(?<=(?:,|\s|\())\?(?=(?:,|\s|\)|$))/;
     for my $arg ( @$args ) {

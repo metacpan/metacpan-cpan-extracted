@@ -22,7 +22,6 @@ lib/Devel/MAT/Tool/Count.pm
 lib/Devel/MAT/Tool/Find.pm
 lib/Devel/MAT/Tool/Identify.pm
 lib/Devel/MAT/Tool/Inrefs.pm
-lib/Devel/MAT/Tool/IO.pm
 lib/Devel/MAT/Tool/Outrefs.pm
 lib/Devel/MAT/Tool/Reachability.pm
 lib/Devel/MAT/Tool/Roots.pm

@@ -33,7 +33,7 @@ throws_ok {
 	$mq->channel_open(
 		channel => 1,
 	);
-} qr/COMMAND_INVALID - second 'channel[.]open'/, 'channel.open dupe';
+} qr/second 'channel[.]open'/, 'channel.open dupe';
 
 # The connection should now be invalid.
 throws_ok {

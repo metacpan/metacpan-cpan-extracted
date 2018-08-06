@@ -27,8 +27,8 @@ WriteMakefile(
         'Moo'                  => '2.000000',
         'namespace::autoclean' => '0.28',
         'MIME::Base64'         => '3.14',
-        'Map::Tube::Exception' => '3.12',
-        'Map::Tube'            => '3.50',
+        'Map::Tube::Exception' => '3.17',
+        'Map::Tube'            => '3.54',
         'Encode::Locale'       => '1.05',
         'Text::ASCIITable'     => '0.22',
         'utf8::all'            => '0.024',
@@ -38,8 +38,8 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::CLI'         => { file => 'lib/Map/Tube/CLI.pm'       , version => '0.52' },
-            'Map::Tube::CLI::Option' => { file => 'lib/Map/Tube/CLI/Option.pm', version => '0.52' },
+            'Map::Tube::CLI'         => { file => 'lib/Map/Tube/CLI.pm'       , version => '0.54' },
+            'Map::Tube::CLI::Option' => { file => 'lib/Map/Tube/CLI/Option.pm', version => '0.54' },
         },
         resources => {
             repository => {

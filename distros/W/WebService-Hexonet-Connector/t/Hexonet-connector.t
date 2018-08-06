@@ -1,17 +1,17 @@
 use strict;
 use warnings;
 
-use Test::More tests => 50;
+use Test::More;
 use Test::Exception;
+use Test::RequiresInternet ( 'coreapi.1api.net' => 80 );
 
-our $VERSION = '1.05';
+our $VERSION = '1.11';
 
-#######################################
+##########################
 # TESTS for Connection.pm
-#######################################
+##########################
 
 # T1-5: test import modules
-use_ok( "lib",                                      qw(./lib) );
 use_ok( "Scalar::Util",                             qw(blessed) );
 use_ok( "WebService::Hexonet::Connector",           $VERSION );
 use_ok( "WebService::Hexonet::Connector::Response", $VERSION );
@@ -26,6 +26,7 @@ our $api = WebService::Hexonet::Connector::connect(
         password => 'test.passw0rd'
     }
 );
+$api->enableDebugMode();
 our $cl = blessed($api);
 is(
     $cl,
@@ -58,6 +59,7 @@ $api = WebService::Hexonet::Connector::connect(
         role     => 'testrole'
     }
 );
+$api->enableDebugMode();
 $cl = blessed($api);
 is(
     $cl,
@@ -94,6 +96,7 @@ $api = WebService::Hexonet::Connector::connect(
         role => 'testrole'
     }
 );
+$api->enableDebugMode();
 $cl = blessed($api);
 is(
     $cl,
@@ -122,6 +125,7 @@ $api = WebService::Hexonet::Connector::connect(
     }
 );
 $cl = blessed($api);
+$api->enableDebugMode();
 
 #T11
 is(
@@ -190,6 +194,7 @@ $api = WebService::Hexonet::Connector::connect(
         entity   => "1234"
     }
 );
+$api->enableDebugMode();
 $r = $api->call(
     {
         COMMAND => "QueryDomainList",
@@ -242,6 +247,7 @@ $api = WebService::Hexonet::Connector::connect(
         entity   => "1234"
     }
 );
+$api->enableDebugMode();
 $r = $api->call(
     {
         COMMAND => "QueryDomainPendingDeleteList",
@@ -277,3 +283,5 @@ ok( $enc eq "ZGFzIHN0aW5rdCB6dW0gSGltbWVs" );
 #T50
 $dec = WebService::Hexonet::Connector::Util::base64_decode($enc);
 ok( $dec eq $key );
+
+done_testing();

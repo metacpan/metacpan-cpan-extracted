@@ -4,7 +4,7 @@ WebService::TeamCity - Client for the TeamCity REST API
 
 # VERSION
 
-version 0.03
+version 0.04
 
 # SYNOPSIS
 
@@ -118,7 +118,7 @@ You can pass arguments as key/value pairs to limit the build types returned:
 
     Only return build types matching this name.
 
-- paused => Bool
+- paused => Bool | JSONBool
 
     Only return build types which are or are not paused.
 
@@ -134,7 +134,7 @@ You can pass arguments as key/value pairs to limit the build types returned:
     defined the same way as a build type, but you cannot include a `template` key
     for the template spec too.
 
-- template\_flag => Bool
+- template\_flag => Bool | JSONBool
 
     Only return build types which are or are not templates.
 
@@ -164,11 +164,11 @@ You can pass arguments as key/value pairs to limit the projects returned:
     Only return builds which were built using the specific build type. Build types
     can be specified as defined for the `build_types` method.
 
-- canceled => Bool
+- canceled => Bool | JSONBool
 
     Only returns builds which were or were not canceled.
 
-- failed\_to\_start => Bool
+- failed\_to\_start => Bool | JSONBool
 
     Only returns builds which did or did not fail to start.
 
@@ -188,11 +188,11 @@ You can pass arguments as key/value pairs to limit the projects returned:
 
     Only return builds matching this number.
 
-- personal => Bool
+- personal => Bool | JSONBool
 
     Only returns builds which are or are not marked as personal builds.
 
-- pinned => Bool
+- pinned => Bool | JSONBool
 
     Only returns builds which are or are not pinned.
 
@@ -202,7 +202,7 @@ You can pass arguments as key/value pairs to limit the projects returned:
     specified as defined for the `projects` method. This only includes the
     project itself, not its sub-projects.
 
-- running => Bool
+- running => Bool | JSONBool
 
     Only returns builds which are or are not running.
 
@@ -220,17 +220,24 @@ You can pass arguments as key/value pairs to limit the projects returned:
     Only returns builds which match _all_ of the specified tags. Tags are given
     as strings.
 
+# SUPPORT
+
+Bugs may be submitted through [https://github.com/maxmind/WebService-TeamCity/issues](https://github.com/maxmind/WebService-TeamCity/issues).
+
 # AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-Dave Rolsky <drolsky@maxmind.com>
+- Dave Rolsky <drolsky@maxmind.com>
+- Greg Oschwald <goschwald@maxmind.com>
+- Mark Fowler <mark@twoshortplanks.com>
+- Olaf Alders <oalders@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by MaxMind, Inc..
+This software is copyright (c) 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

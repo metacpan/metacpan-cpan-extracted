@@ -10,8 +10,10 @@
 #   Copyright (C) 2002-2006, 2014 Steve Hay.  All rights reserved.
 #
 # LICENCE
-#   You may distribute under the terms of either the GNU General Public License
-#   or the Artistic License, as specified in the LICENCE file.
+#   This script is free software; you can redistribute it and/or modify it under
+#   the same terms as Perl itself, i.e. under the terms of either the GNU
+#   General Public License or the Artistic License, as specified in the LICENCE
+#   file.
 #
 #===============================================================================
 
@@ -23,6 +25,8 @@ use warnings;
 use Config qw(%Config);
 use Test::More tests => 45;
 use Time::HiRes qw(time);
+
+## no critic (Subroutines::ProhibitSubroutinePrototypes)
 
 sub new_filename();
 sub stderr(;$);

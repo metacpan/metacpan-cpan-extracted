@@ -2,7 +2,7 @@ package Google::Ads::AdWords::v201806::CriterionError::Reason;
 use strict;
 use warnings;
 
-sub get_xmlns { 'https://adwords.google.com/api/adwords/rm/v201806'};
+sub get_xmlns { 'https://adwords.google.com/api/adwords/cm/v201806'};
 
 # derivation by restriction
 use base qw(
@@ -23,7 +23,7 @@ __END__
 =head1 DESCRIPTION
 
 Perl data type class for the XML Schema defined simpleType
-CriterionError.Reason from the namespace https://adwords.google.com/api/adwords/rm/v201806.
+CriterionError.Reason from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
 
 

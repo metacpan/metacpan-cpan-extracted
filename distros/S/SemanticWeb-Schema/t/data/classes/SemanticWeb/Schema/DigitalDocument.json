@@ -1,0 +1,17 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An electronic file or document.",
+      "rdfs:label" : "DigitalDocument",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:hasDigitalDocumentPermission" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A permission related to the access to this document (e.g. permission to read or write an electronic document). For a public document, specify a grantee with an Audience with audienceType equal to \"public\".",
+         "rdfs:label" : "hasDigitalDocumentPermission",
+         "schema:domainIncludes" : "schema:DigitalDocument",
+         "schema:rangeIncludes" : "schema:DigitalDocumentPermission"
+      }
+   }
+}

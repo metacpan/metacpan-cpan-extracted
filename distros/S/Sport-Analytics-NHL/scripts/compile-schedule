@@ -54,7 +54,7 @@ Validate the crawled NHL reports and compile them into Storable Perl structures
 	--test                          Test the validity of the files (use with caution)
 	-s|--start-season    SEASON     Start at season SEASON (default 2018)
 	-S|--stop-season     SEASON     Stop at season SEASON (default 2018)
-	-T|--start-season    STAGE      Scrape stage STAGE (2: REGULAR, 3: PLAYOFF, default: 3
+	-T|--stage           STAGE      Scrape stage STAGE (2: REGULAR, 3: PLAYOFF, default: 2
 	--doc                DOC        Only process reports of type doc (repeatable). Available types are: BS, PL, RO, GS, ES
 Arguments:
 	GAME_IDS             Our 9-digit game ids that are present in the file system

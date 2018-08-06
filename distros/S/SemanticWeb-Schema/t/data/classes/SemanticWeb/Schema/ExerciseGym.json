@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A gym.",
+      "rdfs:label" : "ExerciseGym",
+      "rdfs:subClassOf" : "schema:SportsActivityLocation"
+   },
+   "properties" : {}
+}

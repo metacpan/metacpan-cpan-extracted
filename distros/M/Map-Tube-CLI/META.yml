@@ -21,15 +21,15 @@ no_index:
 provides:
   Map::Tube::CLI:
     file: lib/Map/Tube/CLI.pm
-    version: '0.52'
+    version: '0.54'
   Map::Tube::CLI::Option:
     file: lib/Map/Tube/CLI/Option.pm
-    version: '0.52'
+    version: '0.54'
 requires:
   Encode::Locale: '1.05'
   MIME::Base64: '3.14'
-  Map::Tube: '3.50'
-  Map::Tube::Exception: '3.12'
+  Map::Tube: '3.54'
+  Map::Tube::Exception: '3.17'
   Module::Pluggable: '5.1'
   Moo: '2.000000'
   MooX::Options: '4.023'
@@ -40,5 +40,5 @@ requires:
   utf8::all: '0.024'
 resources:
   repository: https://github.com/manwar/Map-Tube-CLI.git
-version: '0.52'
+version: '0.54'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

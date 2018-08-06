@@ -1,0 +1,20 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A movie theater.",
+      "rdfs:label" : "MovieTheater",
+      "rdfs:subClassOf" : [
+         "schema:EntertainmentBusiness",
+         "schema:CivicStructure"
+      ]
+   },
+   "properties" : {
+      "schema:screenCount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of screens in the movie theater.",
+         "rdfs:label" : "screenCount",
+         "schema:domainIncludes" : "schema:MovieTheater",
+         "schema:rangeIncludes" : "schema:Number"
+      }
+   }
+}

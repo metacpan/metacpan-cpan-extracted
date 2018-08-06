@@ -36,6 +36,16 @@ use JSON::XS ();
 
 my $title_image;
 
+# should go to utility module
+sub dir_is_movie($) {
+   return undef; #d# not ready yet
+
+   -f "$_[0]/VIDEO_TS/VIDEO_TS.IFO"		and return "dvd";
+   -d "$_[0]/BDMV/STREAM"			and return "br";
+
+   undef
+}
+
 use Glib::Object::Subclass
    Gtk2::Window::,
    properties => [
@@ -102,7 +112,7 @@ sub INIT_INSTANCE {
    $self->clear_image;
 }
 
-sub SET_PROPERTY { 
+sub SET_PROPERTY {
    my ($self, $pspec, $newval) = @_;
 
    $pspec = $pspec->get_name;
@@ -206,8 +216,8 @@ sub realize_image {
 
 =item $img->load_image ($path)
 
-Tries to load the given file (if it is an image), or embeds mplayer (if
-mplayer supports it).
+Tries to load the given file (if it is an image), or embeds mpv (if
+mpv supports it).
 
 =cut
 
@@ -219,9 +229,15 @@ my %othertypes = (
    "Ogg data, OGM video (DivX 5)" => "video/x-ogg",
    "RIFF (little-endian) data, wrapped MPEG-1 (CDXA)" => "video/mpeg",
    "ISO Media"      => "video/x-mp4",
+   "MPEG transport stream data" => "video/mpeg",
 );
 
 my %exttypes = (
+   mp2  => "audio/mpeg",
+   mp3  => "audio/mpeg",
+   flac => "audio/x-flac",
+   ogg  => "audio/x-ogg",
+   mpc  => "audio/x-monkeyaudio",
    mpg  => "video/mpeg",
    mpeg => "video/mpeg",
    ogm  => "video/x-ogg",
@@ -277,6 +293,8 @@ sub load_image {
       $self->kill_player;
       $self->force_redraw;
 
+      my $moviedir = dir_is_movie $path;
+
       my $image;
       my $type = Gtk2::CV::magic_mime $path;
 
@@ -301,6 +319,9 @@ sub load_image {
       } elsif ($type eq "image/jpeg") {
          $image = Gtk2::CV::load_jpeg $path;
 
+      } elsif ($type eq "image/webp") {
+         $image = Gtk2::CV::load_webp $path;
+
       } elsif ($type eq "image/jp2") { # jpeg2000 hack
          open my $pnm, "-|:raw", "jasper", "--input", $path, "--output-format", "pnm"
             or die "error running jasper (jpeg2000): $!";
@@ -321,7 +342,7 @@ sub load_image {
          $loader->close;
          $image = $loader->get_pixbuf;
 
-      } elsif ($type =~ /^(audio\/|application\/ogg$)/) {
+      } elsif (0 && $type =~ /^(audio\/|application\/ogg$)/) {
          if (1 || exists $ENV{CV_AUDIO_PLAYER}) {
             $self->{player_pid} = fork;
 
@@ -330,7 +351,7 @@ sub load_image {
 #            open STDOUT, ">/dev/null";
 #            open STDERR, ">&2";
 
-               my $player = $ENV{CV_AUDIO_PLAYER} || "mplayer";
+               my $player = $ENV{CV_AUDIO_PLAYER} || $Gtk2::CV::MPLAYER;
                $path = "./$path" if $path =~ /^-/;
                exec "$player \Q$path";
                POSIX::_exit 0;
@@ -339,7 +360,7 @@ sub load_image {
             $image = $self->gstreamer_setup ($path);
          }
 
-      } elsif ($type =~ /^(?:video|application)\//) {
+      } elsif ($type =~ /^(?:video|application)\// || $moviedir || $type =~ /^(audio\/|application\/ogg$)/) {
          $path = "./$path" if $path =~ /^-/;
 
          # try video
@@ -375,7 +396,7 @@ sub load_image {
             $ffmpeg = eval { JSON::XS->new->latin1->decode ($ffmpeg) };
 
             for (@{ $ffmpeg->{streams} }) {
-               if ($_->{codec_type} eq "video") {
+               if ($_->{codec_type} eq "video" && !$_->{disposition}{attached_pic}) {
                   $w = $_->{width};
                   $h = $_->{height};
 
@@ -391,10 +412,16 @@ sub load_image {
                }
             }
 
+            # hack, ffmpeg does not support dvds
+            if ($moviedir && !$w) {
+               ($w, $h) = (1280, 720);
+            }
+
+
          } else {
             no integer;
 
-            my $mplayer = qx{LC_ALL=C exec mplayer </dev/null 2>/dev/null -really-quiet -noconfig all -noautosub -nofontconfig -sub /dev/null -sub-fuzziness 0 -cache-min 0 -input nodefault-bindings:conf=/dev/null -identify -vo null -ao null -frames 0 \Q$path};
+            my $mplayer = qx{LC_ALL=C exec \Q$Gtk2::CV::MPLAYER\E </dev/null 2>/dev/null -really-quiet -noconfig all -noautosub -nofontconfig -sub /dev/null -sub-fuzziness 0 -cache-min 0 -input nodefault-bindings:conf=/dev/null -identify -vo null -ao null -frames 0 \Q$path};
 
             $w = $mplayer =~ /^ID_VIDEO_WIDTH=(\d+)$/sm ? $1 : undef;
             $h = $mplayer =~ /^ID_VIDEO_HEIGHT=(\d+)$/sm ? $1 : undef;
@@ -406,6 +433,22 @@ sub load_image {
                #$w = POSIX::ceil $w * 1.50 * ($h / $w); # correct aspect ratio, assume square pixels
                #$w = POSIX::ceil $w * 1.33;
             }
+         }
+
+         my @extra_mpv_args;
+         unless ($w && $h) {
+            # assume audio visualisation
+            $w = 592;
+            $h = 333;
+            push @extra_mpv_args,
+               "--force-window",
+
+               # visualisers by Muhammad Faiz (https://sourceforge.net/p/smplayer/feature-requests/638/)
+               # showcqt
+               "--lavfi-complex=[aid1] asplit [ao], afifo, showcqt=fps=60:size=1600x900:count=2:bar_g=2:sono_g=4:sono_v=9:fontcolor='st(0, (midi(f)-53.5)/12); st(1, 0.5 - 0.5 * cos(PI*ld(0))); r(1-ld(1)) + b(ld(1))':tc=0.33:tlength='st(0,0.17); 384*tc / (384 / ld(0) + tc*f /(1-ld(0))) + 384*tc / (tc*f / ld(0) + 384 /(1-ld(0)))', format=yuv420p [vo]",
+               # showspectrum
+               #"--lavfi-complex=[aid1] asplit [ao], afifo, showspectrum=s=1366x256:orientation=horizontal:win_func=nuttall, scale=1366:768, setsar=1/1 [vo]",
+            ;
          }
 
          if ($w && $h) {
@@ -445,11 +488,6 @@ sub load_image {
             if ($self->{player_pid} == 0) {
                $ENV{LC_ALL} = "C";
 
-               open STDIN, "<&" . fileno $sfh;
-               open STDOUT, ">&" . fileno $sfh;
-               #open STDOUT, ">/dev/null";
-               open STDERR, ">/dev/null";
-
                my @rotate = (
                   [],
                   ["-vf-add", "rotate=0"],
@@ -457,7 +495,30 @@ sub load_image {
                   ["-vf-add", "rotate=2"],
                );
 
-               exec "mplayer", qw(-slave -nofs -nokeepaspect -input nodefault-bindings:conf=/dev/null -zoom -fixed-vo -quiet -loop 0),
+               my @mplayer_args;
+
+               if ($Gtk2::CV::MPLAYER_IS_MPV) {
+                  @mplayer_args = (
+                     qw(
+                        --no-input-terminal --no-input-default-bindings --no-input-cursor --input-conf=/dev/null
+                        --input-vo-keyboard=no
+                     ),
+                     @extra_mpv_args,
+                     "--input-file=fd://" . fileno $sfh
+                  );
+                  open STDIN, "</dev/null";
+                  open STDOUT, ">/dev/null";
+                  fcntl $sfh, Fcntl::F_SETFD (), 0;
+               } else {
+                  @mplayer_args = qw(-nofs -slave -fixed-vo -nokeepaspect -input nodefault-bindings:conf=/dev/null -zoom);
+                  open STDIN, "+<&" . fileno $sfh;
+                  open STDOUT, ">&" . fileno $sfh;
+                  # $sfh will autoclose
+               }
+
+               #open STDERR, ">/dev/null";
+
+               exec $Gtk2::CV::MPLAYER, @mplayer_args, qw(-quiet -loop 0),
                                @{ $rotate[$self->{load_rotate} / 90] },
                                -wid => $xid, $path;
                POSIX::_exit 0;
@@ -465,6 +526,7 @@ sub load_image {
 
             close $sfh;
 
+            print $mfh "enable_events all\n";
             print $mfh "get_file_name\n";
 
             my $input;
@@ -475,9 +537,23 @@ sub load_image {
                   while ($input =~ s/^(.*)\n//) {
                      my $line = $1;
 
-                     if ($line =~ /ANS_FILENAME=/) {
-                        # presumably, everything is set-up now
-                        $self->update_mplayer_window;
+                     if ($line =~ /^\{/) {
+                        # mpv
+
+                        $line = eval { JSON::XS::decode_json $line };
+
+                        if ($line->{event} eq "video-reconfig") {
+                           $self->update_mplayer_window;
+                        }
+
+                     } else {
+                        # mplayer
+
+                        if ($line =~ /ANS_FILENAME=/) {
+                           # presumably, everything is set-up now
+                           $self->update_mplayer_window;
+                        }
+
                      }
                   }
                } elsif (defined $len or $! != Errno::EAGAIN) {
@@ -487,7 +563,7 @@ sub load_image {
                1
             };
          } else {
-            $@ = "mplayer doesn't recognize this '$type' file";
+            $@ = "mpv doesn't recognize this '$type' file";
             # probably audio, or a real error
          }
 
@@ -814,6 +890,8 @@ sub handle_key {
 
    local $SIG{PIPE} = 'IGNORE'; # for mplayer_fh
 
+   my $volume = $Gtk2::CV::MPLAYER_IS_MPV ? "add ao-volume %s2" : "volume %s1";
+
    if ($state * "control-mask") {
       if ($key == $Gtk2::Gdk::Keysyms{p} || $key == $Gtk2::Gdk::Keysyms{P}) {
          new Gtk2::CV::PrintDialog
@@ -938,15 +1016,15 @@ sub handle_key {
       } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{j}) {
          print {$self->{mplayer_fh}} "sub_select\n";
       } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{o}) {
-         print {$self->{mplayer_fh}} "osd\n";
+         print {$self->{mplayer_fh}} "no-osd cycle-values osd-level 2 3 0 1\n";
       } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{p}) {
          print {$self->{mplayer_fh}} "pause\n";
       } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{Escape}) {
          print {$self->{mplayer_fh}} "quit\n";
       } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{9}) {
-         print {$self->{mplayer_fh}} "volume -1\n";
+         printf {$self->{mplayer_fh}} "$volume\n", "-";
       } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{0}) {
-         print {$self->{mplayer_fh}} "volume 1\n";
+         printf {$self->{mplayer_fh}} "$volume\n", "+";
 #      } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{f}) {
 #         print {$self->{mplayer_fh}} "vo_fullscreen\n";
 

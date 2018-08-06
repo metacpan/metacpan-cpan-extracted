@@ -1,8 +1,13 @@
 Revision history for Perl extension HTML::Hyphenate.
 
+v1.1.0 Sat Aug 4 13:01:36 UTC 2018
+    - RT87759 add 'list' and 'placeholder' as hyphenable attributes
+    - RT100747 ignore inline styling hints. This changes output that relies on 'nowrap'
+      'nobr' and 'white-space' to suppress hyphenation
+
 1.0.0 Sun Jul 29 13:22:51 UTC 2018
     - internally replaced HTML::TreeBuilder with Mojo::DOM to handle inline SVG
-	- dropped support for XML output for Mojo::DOM compatibility
+    - dropped support for XML output for Mojo::DOM compatibility
 
 0.101 Sun Jul 22 05:48:37 UTC 2018
     - fixed missing Test::Warn test prerequisite

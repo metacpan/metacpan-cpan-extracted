@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A zoo.",
+      "rdfs:label" : "Zoo",
+      "rdfs:subClassOf" : "schema:CivicStructure"
+   },
+   "properties" : {}
+}

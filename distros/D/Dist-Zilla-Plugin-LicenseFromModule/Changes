@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-LicenseFromModule
 
+0.07  2018-08-04 10:57:49 PDT
+        - Same as 0.06
+
+0.06  2018-08-04 10:55:24 PDT
+        - Add JSON dependency
+
 0.05  2014-08-23 14:03:32 PDT
         - Scan for .pod of the main module if it exists #3 (DarwinAwardWinner)
         - Add source_file option #3 (DarwinAwardWinner)

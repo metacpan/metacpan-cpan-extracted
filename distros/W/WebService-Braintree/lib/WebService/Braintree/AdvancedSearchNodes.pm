@@ -6,7 +6,7 @@
 
 {
     package WebService::Braintree::AdvancedSearchNodes;
-$WebService::Braintree::AdvancedSearchNodes::VERSION = '1.6';
+$WebService::Braintree::AdvancedSearchNodes::VERSION = '1.7';
 use 5.010_001;
     use strictures 1;
 
@@ -15,7 +15,7 @@ use 5.010_001;
 
 {
     package WebService::Braintree::SearchNode;
-$WebService::Braintree::SearchNode::VERSION = '1.6';
+$WebService::Braintree::SearchNode::VERSION = '1.7';
 use 5.010_001;
     use strictures 1;
 
@@ -46,7 +46,7 @@ use 5.010_001;
 
 {
     package WebService::Braintree::IsNode;
-$WebService::Braintree::IsNode::VERSION = '1.6';
+$WebService::Braintree::IsNode::VERSION = '1.7';
 use 5.010_001;
     use strictures 1;
 
@@ -63,7 +63,7 @@ use 5.010_001;
 
 {
     package WebService::Braintree::EqualityNode;
-$WebService::Braintree::EqualityNode::VERSION = '1.6';
+$WebService::Braintree::EqualityNode::VERSION = '1.7';
 use 5.010_001;
     use strictures 1;
 
@@ -80,7 +80,7 @@ use 5.010_001;
 
 {
     package WebService::Braintree::KeyValueNode;
-$WebService::Braintree::KeyValueNode::VERSION = '1.6';
+$WebService::Braintree::KeyValueNode::VERSION = '1.7';
 use 5.010_001;
     use strictures 1;
 
@@ -107,7 +107,7 @@ use 5.010_001;
 
 {
     package WebService::Braintree::PartialMatchNode;
-$WebService::Braintree::PartialMatchNode::VERSION = '1.6';
+$WebService::Braintree::PartialMatchNode::VERSION = '1.7';
 use 5.010_001;
     use strictures 1;
 
@@ -129,7 +129,7 @@ use 5.010_001;
 
 {
     package WebService::Braintree::TextNode;
-$WebService::Braintree::TextNode::VERSION = '1.6';
+$WebService::Braintree::TextNode::VERSION = '1.7';
 use 5.010_001;
     use strictures 1;
 
@@ -146,7 +146,7 @@ use 5.010_001;
 
 {
     package WebService::Braintree::RangeNode;
-$WebService::Braintree::RangeNode::VERSION = '1.6';
+$WebService::Braintree::RangeNode::VERSION = '1.7';
 use 5.010_001;
     use strictures 1;
 
@@ -176,7 +176,7 @@ use 5.010_001;
 
 {
     package WebService::Braintree::MultipleValuesNode;
-$WebService::Braintree::MultipleValuesNode::VERSION = '1.6';
+$WebService::Braintree::MultipleValuesNode::VERSION = '1.7';
 use 5.010_001;
     use strictures 1;
 

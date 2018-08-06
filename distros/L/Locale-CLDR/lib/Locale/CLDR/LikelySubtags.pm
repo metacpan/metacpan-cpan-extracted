@@ -1,12 +1,12 @@
 package Locale::CLDR::LikelySubtags;
 # This file auto generated from Data\common\supplemental\likelySubtags.xml
-#	on Fri 13 Apr  6:59:46 am GMT
+#	on Sun  5 Aug  5:49:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1586,7 +1586,7 @@ has 'likely_subtags' => (
 		'und_PW'	=> 'pau_Latn_PW',
 		'und_PY'	=> 'gn_Latn_PY',
 		'und_QA'	=> 'ar_Arab_QA',
-		'und_QO'	=> 'en_Latn_IO',
+		'und_QO'	=> 'en_Latn_DG',
 		'und_RE'	=> 'fr_Latn_RE',
 		'und_RO'	=> 'ro_Latn_RO',
 		'und_RS'	=> 'sr_Cyrl_RS',

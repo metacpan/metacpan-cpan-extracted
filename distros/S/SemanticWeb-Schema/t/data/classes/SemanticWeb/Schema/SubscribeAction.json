@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>The act of forming a personal connection with someone/something (object) unidirectionally/asymmetrically to get updates pushed to.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/FollowAction\">FollowAction</a>: Unlike FollowAction, SubscribeAction implies that the subscriber acts as a passive agent being constantly/actively pushed for updates.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/RegisterAction\">RegisterAction</a>: Unlike RegisterAction, SubscribeAction implies that the agent is interested in continuing receiving updates from the object.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/JoinAction\">JoinAction</a>: Unlike JoinAction, SubscribeAction implies that the agent is interested in continuing receiving updates from the object.</li>\n</ul>\n",
+      "rdfs:label" : "SubscribeAction",
+      "rdfs:subClassOf" : "schema:InteractAction"
+   },
+   "properties" : {}
+}

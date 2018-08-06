@@ -1,0 +1,143 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Describes a reservation for travel, dining or an event. Some reservations require tickets. </p>\n\n<p>Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations. For offers of tickets, restaurant reservations, flights, or rental cars, use <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a>.",
+      "rdfs:label" : "Reservation",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:bookingAgent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "'bookingAgent' is an out-dated term indicating a 'broker' that serves as a booking agent.",
+         "rdfs:label" : "bookingAgent",
+         "schema:domainIncludes" : "schema:Reservation",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ],
+         "schema:supersededBy" : "schema:broker"
+      },
+      "schema:bookingTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date and time the reservation was booked.",
+         "rdfs:label" : "bookingTime",
+         "schema:domainIncludes" : "schema:Reservation",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:broker" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An entity that arranges for an exchange between a buyer and a seller.  In most cases a broker never acquires or releases ownership of a product or service involved in an exchange.  If it is not clear whether an entity is a broker, seller, or buyer, the latter two terms are preferred.",
+         "rdfs:label" : "broker",
+         "schema:domainIncludes" : [
+            "schema:Service",
+            "schema:Invoice",
+            "schema:Reservation",
+            "schema:Order"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:modifiedTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date and time the reservation was modified.",
+         "rdfs:label" : "modifiedTime",
+         "schema:domainIncludes" : "schema:Reservation",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:priceCurrency" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The currency (in 3-letter ISO 4217 format) of the price or a price component, when attached to <a class=\"localLink\" href=\"http://schema.org/PriceSpecification\">PriceSpecification</a> and its subtypes.",
+         "rdfs:label" : "priceCurrency",
+         "schema:domainIncludes" : [
+            "schema:PriceSpecification",
+            "schema:Reservation",
+            "schema:Ticket",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:programMembershipUsed" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any membership in a frequent flyer, hotel loyalty program, etc. being applied to the reservation.",
+         "rdfs:label" : "programMembershipUsed",
+         "schema:domainIncludes" : "schema:Reservation",
+         "schema:rangeIncludes" : "schema:ProgramMembership"
+      },
+      "schema:provider" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
+         "rdfs:label" : "provider",
+         "schema:domainIncludes" : [
+            "schema:ParcelDelivery",
+            "schema:BusTrip",
+            "schema:CreativeWork",
+            "schema:Service",
+            "schema:TrainTrip",
+            "schema:Reservation",
+            "schema:Flight",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:reservationFor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The thing -- flight, event, restaurant,etc. being reserved.",
+         "rdfs:label" : "reservationFor",
+         "schema:domainIncludes" : "schema:Reservation",
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:reservationId" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A unique identifier for the reservation.",
+         "rdfs:label" : "reservationId",
+         "schema:domainIncludes" : "schema:Reservation",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:reservationStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The current status of the reservation.",
+         "rdfs:label" : "reservationStatus",
+         "schema:domainIncludes" : "schema:Reservation",
+         "schema:rangeIncludes" : "schema:ReservationStatusType"
+      },
+      "schema:reservedTicket" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A ticket associated with the reservation.",
+         "rdfs:label" : "reservedTicket",
+         "schema:domainIncludes" : "schema:Reservation",
+         "schema:rangeIncludes" : "schema:Ticket"
+      },
+      "schema:totalPrice" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The total price for the reservation or ticket, including applicable taxes, shipping, etc.",
+         "rdfs:label" : "totalPrice",
+         "schema:domainIncludes" : [
+            "schema:Ticket",
+            "schema:Reservation"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:PriceSpecification",
+            "schema:Text"
+         ]
+      },
+      "schema:underName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The person or organization the reservation or ticket is for.",
+         "rdfs:label" : "underName",
+         "schema:domainIncludes" : [
+            "schema:Ticket",
+            "schema:Reservation"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      }
+   }
+}

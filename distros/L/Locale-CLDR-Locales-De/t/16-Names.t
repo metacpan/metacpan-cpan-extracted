@@ -52,6 +52,7 @@ my $all_languages = {
 	'aro' => 'Araona',
 	'arp' => 'Arapaho',
 	'arq' => 'Algerisches Arabisch',
+	'ars' => 'Nadschd-Arabisch',
 	'arw' => 'Arawak',
 	'ary' => 'Marokkanisches Arabisch',
 	'arz' => 'Ägyptisches Arabisch',

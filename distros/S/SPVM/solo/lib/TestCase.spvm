@@ -12,8 +12,9 @@ package TestCase {
   use TestCase::Comparator;
   use TestCase::ComparatorAnon;
   use TestCase::Pointer;
-  use TestCase::Complex_d2;
   use TestCase::ComplexCalc;
+  use SPVM::Complex_d2;
+  use TestCase::Point_d3;
 
 =pod
 
@@ -52,16 +53,53 @@ SPVM::Test - SPVM test module
   sub FLOAT_PRECICE : float () { return 32767f; }
   sub DOUBLE_PRECICE : double () { return 2147483647.0; }
 
-  sub ref_sum : double ($x_in1 : double, $x_in2 : double, $x_out : double_ref) {
-    $$x_out = $x_in1 + $x_in2;
-  }
-  
-  sub : int ($self : self, $x1 : int, $x2 : int) {
-    
-    return $x1 + $x2;
-  }
-  
   sub main : int ($mvar : int) {
+    {
+      my $point1 : TestCase::Point_d3;
+      
+      $point1->{x} = DBL_MIN();
+      $point1->{y} = 0.5;
+      $point1->{z} = 0.125;
+      
+      my $point1_ref = \$point1;
+      
+      my $point2 = $$point1_ref;
+      
+      if ($point2->{x} == DBL_MIN() && $point2->{y} == 0.5 && $point2->{z} == 0.125) {
+        1;
+      }
+    }
+
+    {
+      my $z : SPVM::Complex_d2;
+      
+      $z->{re} = 0.25;
+      $z->{im} = 0.5;
+      
+      my $z_ref = \$z;
+      
+      my $z_re = $z_ref->{re};
+      my $z_im = $z_ref->{im};
+      
+      print((string)$z_re . " " . (string)$z_im . "\n");
+      
+      my $out : SPVM::Complex_d2;
+      
+      ref_sum_complex($z, $z, \$out);
+      
+      print((string)$out->{re} . " " . (string)$out->{im} . "\n");
+    }
+    
+    {
+      my $z1 : SPVM::Complex_d2;
+      $z1->{re} = 0.25;
+      $z1->{im} = 0.5;
+      
+      my $z1_ref = \$z1;
+      
+      my $z2 = $$z1_ref;
+    }
+    
     {
       my $out : double;
       ref_sum(0.25, 0.5, \$out);
@@ -105,7 +143,7 @@ SPVM::Test - SPVM test module
       
     }
     {
-      my $nums1 = new TestCase::Complex_d2[10];
+      my $nums1 = new SPVM::Complex_d2[10];
       $nums1->[9]{re} = 5;
       $nums1->[9]{im} = 9;
       
@@ -126,11 +164,11 @@ SPVM::Test - SPVM test module
     }
     
     {
-      my $z1 : TestCase::Complex_d2;
+      my $z1 : SPVM::Complex_d2;
       $z1->{re} = 0.5;
       $z1->{im} = 0.25;
       
-      my $z2 : TestCase::Complex_d2;
+      my $z2 : SPVM::Complex_d2;
       $z2->{re} = 1.0;
       $z2->{im} = 0.5;
       
@@ -144,7 +182,7 @@ SPVM::Test - SPVM test module
     }
 
     {
-      my $z : TestCase::Complex_d2;
+      my $z : SPVM::Complex_d2;
       $z->{re} = 0.5;
       $z->{im} = 0.25;
       
@@ -1580,7 +1618,19 @@ SPVM::Test - SPVM test module
   sub receive_undef : void ($test_case : TestCase) {
     
   }
-
+  sub ref_sum : double ($x_in1 : double, $x_in2 : double, $x_out : &double) {
+    $$x_out = $x_in1 + $x_in2;
+  }
+  
+  sub : int ($self : self, $x1 : int, $x2 : int) {
+    
+    return $x1 + $x2;
+  }
+  
+  sub ref_sum_complex : double ($x_in1 : SPVM::Complex_d2, $x_in2 : SPVM::Complex_d2, $x_out : &SPVM::Complex_d2) {
+    $x_out->{re} = $x_in1->{re} + $x_in2->{re};
+    $x_out->{im} = $x_in1->{im} + $x_in2->{im};
+  }
 }
 
 =head1 NAME

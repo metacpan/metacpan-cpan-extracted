@@ -1,6 +1,6 @@
 package Mojolicious::Che;
-use Mojo::Base  'Mojolicious';#::Che
 use Mojo::Base::Che; # один патч для хазов
+use Mojo::Base  'Mojolicious';#::Che
 use Mojo::Log::Che;
 use Mojo::Loader qw(load_class);
 
@@ -228,31 +228,33 @@ sub спейсы {
 # overide only on my $path   = $req->url->path->to_route;# to_abs_string;
 sub Mojolicious::dispatch {
   my ($self, $c) = @_;
-
+ 
   my $plugins = $self->plugins->emit_hook(before_dispatch => $c);
-
+ 
   # Try to find a static file
   my $tx = $c->tx;
   $self->static->dispatch($c) and $plugins->emit_hook(after_static => $c)
     unless $tx->res->code;
-
+ 
   # Start timer (ignore static files)
   my $stash = $c->stash;
   unless ($stash->{'mojo.static'} || $stash->{'mojo.started'}) {
     my $req    = $c->req;
     my $method = $req->method;
-    my $path   = $req->url->path->to_route;# to_abs_string;
-    $self->log->debug(qq{$method "$path"});
-    $stash->{'mojo.started'} = [Time::HiRes::gettimeofday];
+    my $path   = $req->url->path->to_route;#to_abs_string;
+    my $id     = $req->request_id;
+    $self->log->debug(qq{$method "$path" ($id)});
+    $c->helpers->timing->begin('mojo.timer');
   }
-
+ 
   # Routes
   $plugins->emit_hook(before_routes => $c);
   $c->helpers->reply->not_found
     unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code;
 }
 
-our $VERSION = '0.034';
+
+our $VERSION = '0.035';
 
 =pod
 
@@ -266,7 +268,7 @@ our $VERSION = '0.034';
 
 =head1 VERSION
 
-0.034
+0.035
 
 =head1 NAME
 

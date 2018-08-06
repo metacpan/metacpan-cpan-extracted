@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A self-storage facility.",
+      "rdfs:label" : "SelfStorage",
+      "rdfs:subClassOf" : "schema:LocalBusiness"
+   },
+   "properties" : {}
+}

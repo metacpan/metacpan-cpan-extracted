@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Cy - Package for language Welsh
 
 package Locale::CLDR::Locales::Cy;
 # This file auto generated from Data\common\main\cy.xml
-#	on Fri 13 Apr  7:05:40 am GMT
+#	on Sun  5 Aug  5:55:55 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1206,6 +1206,7 @@ has 'display_name_region' => (
  			'151' => 'Dwyrain Ewrop',
  			'154' => 'Gogledd Ewrop',
  			'155' => 'Gorllewin Ewrop',
+ 			'202' => 'Affrica Is-Sahara',
  			'419' => 'America Ladin',
  			'AC' => 'Ynys Ascension',
  			'AD' => 'Andorra',
@@ -1224,7 +1225,7 @@ has 'display_name_region' => (
  			'AW' => 'Aruba',
  			'AX' => 'Ynysoedd Åland',
  			'AZ' => 'Azerbaijan',
- 			'BA' => 'Bosnia a Herzegovina',
+ 			'BA' => 'Bosnia & Herzegovina',
  			'BB' => 'Barbados',
  			'BD' => 'Bangladesh',
  			'BE' => 'Gwlad Belg',
@@ -7474,6 +7475,17 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(Ouguiya Mauritania \(1973–2017\)),
+				'few' => q(ouguiya Mauritania \(1973–2017\)),
+				'many' => q(ouguiya Mauritania \(1973–2017\)),
+				'one' => q(ouguiya Mauritania \(1973–2017\)),
+				'other' => q(ouguiya Mauritania \(1973–2017\)),
+				'two' => q(ouguiya Mauritania \(1973–2017\)),
+				'zero' => q(ouguiya Mauritania \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ouguiya Mauritania),
 				'few' => q(ouguiya Mauritania),
 				'many' => q(ouguiya Mauritania),
@@ -8084,6 +8096,18 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(Dobra São Tomé a Príncipe \(1977–2017\)),
+				'few' => q(dobra São Tomé a Príncipe \(1977–2017\)),
+				'many' => q(dobra São Tomé a Príncipe \(1977–2017\)),
+				'one' => q(dobra São Tomé a Príncipe \(1977–2017\)),
+				'other' => q(dobra São Tomé a Príncipe \(1977–2017\)),
+				'two' => q(dobra São Tomé a Príncipe \(1977–2017\)),
+				'zero' => q(dobra São Tomé a Príncipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
 			display_name => {
 				'currency' => q(Dobra São Tomé a Príncipe),
 				'few' => q(dobra São Tomé a Príncipe),
@@ -9011,17 +9035,17 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
 				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
+				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'morning1' if $time >= 0
@@ -9032,17 +9056,17 @@ has 'day_period_data' => (
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'noon' if $time == 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 1200;
 				}
-				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
-					return 'midnight' if $time == 0;
+				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
 					return 'morning1' if $time >= 0
@@ -9071,38 +9095,58 @@ has 'day_periods' => (
 				'abbreviated' => {
 					'pm' => q{yh},
 					'am' => q{yb},
-				},
-				'narrow' => {
-					'pm' => q{h},
-					'am' => q{b},
+					'afternoon1' => q{y prynhawn},
+					'evening1' => q{yr hwyr},
+					'morning1' => q{y bore},
+					'midnight' => q{canol nos},
+					'noon' => q{canol dydd},
 				},
 				'wide' => {
-					'morning1' => q{y bore},
-					'afternoon1' => q{y prynhawn},
 					'noon' => q{canol dydd},
 					'am' => q{yb},
-					'evening1' => q{yr hwyr},
 					'pm' => q{yh},
+					'morning1' => q{y bore},
+					'evening1' => q{yr hwyr},
+					'afternoon1' => q{y prynhawn},
 					'midnight' => q{canol nos},
+				},
+				'narrow' => {
+					'am' => q{b},
+					'pm' => q{h},
+					'afternoon1' => q{yn y prynhawn},
+					'evening1' => q{min nos},
+					'midnight' => q{canol nos},
+					'morning1' => q{yn y bore},
+					'noon' => q{canol dydd},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'morning1' => q{y bore},
-					'afternoon1' => q{y prynhawn},
-					'noon' => q{canol dydd},
-					'am' => q{yb},
-					'evening1' => q{yr hwyr},
-					'pm' => q{yh},
-					'midnight' => q{canol nos},
-				},
 				'narrow' => {
 					'pm' => q{yh},
 					'am' => q{yb},
+					'afternoon1' => q{prynhawn},
+					'evening1' => q{min nos},
+					'morning1' => q{bore},
+					'midnight' => q{canol nos},
+					'noon' => q{canol dydd},
 				},
-				'abbreviated' => {
+				'wide' => {
+					'noon' => q{canol dydd},
 					'pm' => q{yh},
 					'am' => q{yb},
+					'morning1' => q{y bore},
+					'evening1' => q{yr hwyr},
+					'afternoon1' => q{y prynhawn},
+					'midnight' => q{canol nos},
+				},
+				'abbreviated' => {
+					'evening1' => q{yr hwyr},
+					'midnight' => q{canol nos},
+					'afternoon1' => q{prynhawn},
+					'morning1' => q{bore},
+					'pm' => q{yh},
+					'am' => q{yb},
+					'noon' => q{canol dydd},
 				},
 			},
 		},

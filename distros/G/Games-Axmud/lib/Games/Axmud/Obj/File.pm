@@ -361,8 +361,18 @@
             $axmud::CLIENT->fillDataDirs();
 
             # Copy pre-configured worlds into the data directory, and add entries for each of them
-            #   in the GA::Client's directories
-            $axmud::CLIENT->copyPreConfigWorlds();
+            #   in the GA::Client's directories. The TRUE argument signals that this function is the
+            #   calling function
+            OUTER: foreach my $world ($axmud::CLIENT->constWorldList) {
+
+                if (! defined $axmud::CLIENT->copyPreConfigWorld($world, TRUE)) {
+
+                    return $self->writeError(
+                        'Error setting up \'' . $self->fileType . '\' data file',
+                        $self->_objClass . '->setupConfigFile',
+                    );
+                }
+            }
 
             # Try to create a config file
             if (! $self->saveConfigFile()) {
@@ -576,6 +586,18 @@
                 $client->autoSaveWaitTime,
             '# Auto-retain most recent temporary backup file',
                 $client->autoRetainFileFlag,
+            '# Auto-backup mode',
+                $client->autoBackupMode,
+            '# Auto-backup directory',
+                $client->autoBackupDir,
+            '# Auto-backup interval (days)',
+                $client->autoBackupInterval,
+            '# Time of last auto-backup (string in form \'Thu Dec 18, 2010\')',
+                $client->autoBackupDate,
+            '# Auto-backup file type',
+                $client->autoBackupFileType,
+            '# Append time to auto-backup files',
+                $self->convert($client->autoBackupAppendFlag),
             '@@@ eos',
         );
 
@@ -627,6 +649,8 @@
 
         push (@list,
             '# WORLD PROFILES',
+            '# Previous client version',
+                $client->prevClientVersion,
             '# Number of world profiles',
                 scalar @modList,
             '# World profile list',
@@ -1352,6 +1376,15 @@
 
             $failFlag = $self->readFlag($failFlag, \%dataHash, 'auto_retain_file_flag');
         }
+        if ($self->scriptConvertVersion >= 1_001_024) {
+
+            $failFlag = $self->readValue($failFlag, \%dataHash, 'auto_backup_mode');
+            $failFlag = $self->readValue($failFlag, \%dataHash, 'auto_backup_dir');
+            $failFlag = $self->readValue($failFlag, \%dataHash, 'auto_backup_interval');
+            $failFlag = $self->readValue($failFlag, \%dataHash, 'auto_backup_date');
+            $failFlag = $self->readValue($failFlag, \%dataHash, 'auto_backup_file_type');
+            $failFlag = $self->readFlag($failFlag, \%dataHash, 'auto_backup_append_flag');
+        }
         $failFlag = $self->readEndOfSection($failFlag, $fileHandle);
 
         # Read plugin data
@@ -1375,6 +1408,10 @@
         $failFlag = $self->readEndOfSection($failFlag, $fileHandle);
 
         # Read world profile data
+        if ($self->scriptConvertVersion >= 1_001_021) {
+
+            $failFlag = $self->readValue($failFlag, \%dataHash, 'prev_client_version');
+        }
         $failFlag = $self->readList($failFlag, \%dataHash, 'world_prof_list');
         $failFlag = $self->readList($failFlag, \%dataHash, 'favourite_world_list');
         $failFlag = $self->readEndOfSection($failFlag, $fileHandle);
@@ -1863,18 +1900,21 @@
             }
 
             # GA::Client->termTypeMode
-            if ($dataHash{'term_type_mode'} eq '0') {
-                $dataHash{'term_type_mode'} = 'send_nothing';
-            } elsif ($dataHash{'term_type_mode'} eq '1') {
-                $dataHash{'term_type_mode'} = 'send_client';
-            } elsif ($dataHash{'term_type_mode'} eq '2') {
-                $dataHash{'term_type_mode'} = 'send_client_version';
-            } elsif ($dataHash{'term_type_mode'} eq '3') {
-                $dataHash{'term_type_mode'} = 'send_custom_client';
-            } elsif ($dataHash{'term_type_mode'} eq '4') {
-                $dataHash{'term_type_mode'} = 'send_default';
-            } elsif ($dataHash{'term_type_mode'} eq '5') {
-                $dataHash{'term_type_mode'} = 'send_unknown';
+            if ($self->scriptConvertVersion >= 1_000_160) {
+
+                if ($dataHash{'term_type_mode'} eq '0') {
+                    $dataHash{'term_type_mode'} = 'send_nothing';
+                } elsif ($dataHash{'term_type_mode'} eq '1') {
+                    $dataHash{'term_type_mode'} = 'send_client';
+                } elsif ($dataHash{'term_type_mode'} eq '2') {
+                    $dataHash{'term_type_mode'} = 'send_client_version';
+                } elsif ($dataHash{'term_type_mode'} eq '3') {
+                    $dataHash{'term_type_mode'} = 'send_custom_client';
+                } elsif ($dataHash{'term_type_mode'} eq '4') {
+                    $dataHash{'term_type_mode'} = 'send_default';
+                } elsif ($dataHash{'term_type_mode'} eq '5') {
+                    $dataHash{'term_type_mode'} = 'send_unknown';
+                }
             }
         }
 
@@ -1914,6 +1954,15 @@
 
             $client->ivPoke('autoRetainFileFlag', $dataHash{'auto_retain_file_flag'});
         }
+        if ($self->scriptConvertVersion >= 1_001_024) {
+
+            $client->ivPoke('autoBackupMode', $dataHash{'auto_backup_mode'});
+            $client->ivPoke('autoBackupDir', $dataHash{'auto_backup_dir'});
+            $client->ivPoke('autoBackupInterval', $dataHash{'auto_backup_interval'});
+            $client->ivPoke('autoBackupDate', $dataHash{'auto_backup_date'});
+            $client->ivPoke('autoBackupFileType', $dataHash{'auto_backup_file_type'});
+            $client->ivPoke('autoBackupAppendFlag', $dataHash{'auto_backup_append_flag'});
+        }
 
         # Set plugin data
         $client->ivPoke('initPluginList', @{$dataHash{'init_plugin_list'}});
@@ -1934,6 +1983,10 @@
         $client->ivPoke('cmdSep', $dataHash{'cmd_sep'});
 
         # Set world profile data
+        if ($self->scriptConvertVersion >= 1_001_021) {
+
+            $client->ivPoke('prevClientVersion', $dataHash{'prev_client_version'});
+        }
         $client->ivPoke('configWorldProfList', @{$dataHash{'world_prof_list'}});
         $client->ivPoke('favouriteWorldList', @{$dataHash{'favourite_world_list'}});
 
@@ -2467,7 +2520,7 @@
 
         # Compile a special hash, %saveHash, that references all the data we want to save
 
-        # First compile the header information (ie metadata)...
+        # First compile the header information (i.e. metadata)...
         $saveHash{'file_type'} = $self->fileType;
         $saveHash{'script_name'} = $axmud::NAME_FILE;
         $saveHash{'script_version'} = $axmud::VERSION;
@@ -2822,7 +2875,7 @@
                 %loadHash = $self->updateHeaderAfterRename(%loadHash);
             }
 
-            # Extract the header information (ie metadata) from the hash
+            # Extract the header information (i.e. metadata) from the hash
             $fileType = $loadHash{'file_type'};
             $scriptName = $loadHash{'script_name'};
             $scriptVersion = $loadHash{'script_version'};
@@ -2870,12 +2923,18 @@
 
                 # Load failed
                 return undef;
-
-            } else {
-
-                # Load complete
-                return 1;
             }
+
+            # Apply patches to any pre-configured world profiles with serious problems
+            if (
+                $fileType eq 'worldprof'
+                && $axmud::CLIENT->ivExists('constWorldPatchHash', $assocWorldProf)
+            ) {
+                $self->patchWorldProf($assocWorldProf, $scriptVersion);
+            }
+
+            # Load complete
+            return 1;
         }
     }
 
@@ -2935,7 +2994,7 @@
 
         # Compile a special hash, %saveHash, that references all the data we want to save
 
-        # First compile the header information (ie metadata)...
+        # First compile the header information (i.e. metadata)...
 #        $saveHash{'file_type'} = $self->fileType;                  # Set below
         $saveHash{'script_name'} = $axmud::NAME_FILE;
         $saveHash{'script_version'} = $axmud::VERSION;
@@ -3316,7 +3375,7 @@
                 %loadHash = $self->updateHeaderAfterRename(%loadHash);
             }
 
-            # Extract the header information (ie metadata) from the hash
+            # Extract the header information (i.e. metadata) from the hash
             $fileType = $loadHash{'file_type'};
             $scriptName = $loadHash{'script_name'};
             $scriptVersion = $loadHash{'script_version'};
@@ -5735,18 +5794,21 @@
                             $profObj->ivPoke('loginAccountMode', 'required');
                         }
 
-                        if ($profObj->autoQuitMode eq '0') {
-                            $profObj->ivPoke('autoQuitMode', 'normal');
-                        } elsif ($profObj->autoQuitMode eq '1') {
-                            $profObj->ivPoke('autoQuitMode', 'world_cmd');
-                        } elsif ($profObj->autoQuitMode eq '2') {
-                            $profObj->ivPoke('autoQuitMode', 'task');
-                        } elsif ($profObj->autoQuitMode eq '3') {
-                            $profObj->ivPoke('autoQuitMode', 'task_script');
-                        } elsif ($profObj->autoQuitMode eq '4') {
-                            $profObj->ivPoke('autoQuitMode', 'script');
-                        } elsif ($profObj->autoQuitMode eq '5') {
-                            $profObj->ivPoke('autoQuitMode', 'mission');
+                        if ($version >= 1_000_543) {
+
+                            if ($profObj->autoQuitMode eq '0') {
+                                $profObj->ivPoke('autoQuitMode', 'normal');
+                            } elsif ($profObj->autoQuitMode eq '1') {
+                                $profObj->ivPoke('autoQuitMode', 'world_cmd');
+                            } elsif ($profObj->autoQuitMode eq '2') {
+                                $profObj->ivPoke('autoQuitMode', 'task');
+                            } elsif ($profObj->autoQuitMode eq '3') {
+                                $profObj->ivPoke('autoQuitMode', 'task_script');
+                            } elsif ($profObj->autoQuitMode eq '4') {
+                                $profObj->ivPoke('autoQuitMode', 'script');
+                            } elsif ($profObj->autoQuitMode eq '5') {
+                                $profObj->ivPoke('autoQuitMode', 'mission');
+                            }
                         }
 
                         if ($profObj->inventoryMode eq '0') {
@@ -5866,6 +5928,32 @@
 
                         # (This line makes sure the correct file object's ->modifyFlag is set)
                         $profObj->ivPoke('category', $profObj->category);
+                    }
+                }
+            }
+
+            if ($version < 1_001_020) {
+
+                # Update world profiles with a new IV
+                foreach my $profObj ($axmud::CLIENT->ivValues('worldProfHash')) {
+
+                    if (! exists $profObj->{inventorySplitPatternList}) {
+
+                        $profObj->{inventorySplitPatternList} = [];
+                        $profObj->ivEmpty('inventorySplitPatternList');
+                    }
+                }
+            }
+
+            if ($version < 1_001_030) {
+
+                # Update world profiles with a new IV
+                foreach my $profObj ($axmud::CLIENT->ivValues('worldProfHash')) {
+
+                    if (! exists $profObj->{roomCmdIgnoreList}) {
+
+                        $profObj->{roomCmdIgnoreList} = [];
+                        $profObj->ivEmpty('roomCmdIgnoreList');
                     }
                 }
             }
@@ -6951,9 +7039,22 @@
                     delete $wmObj->{showToolBarFlag};
                 }
             }
+
+            if ($version < 1_001_030) {
+
+                # Add the new IV to all room model objects
+                foreach my $obj ($wmObj->ivValues('roomModelHash')) {
+
+                    if (! exists $obj->{tempRoomCmdList}) {
+
+                        $obj->{tempRoomCmdList} = [];
+                        $obj->ivEmpty('tempRoomCmdList');
+                    }
+                }
+            }
         }
 
-        ### new built-in tasks (IVs updated below) ################################################
+        ### new built-in tasks (new IVs for existing tasks are below) #############################
 
         if ($self->fileType eq 'tasks') {
 
@@ -8133,6 +8234,21 @@
                     }
                 }
             }
+
+            if ($version < 1_001_031 && $self->session) {
+
+                # This version updates all tasks by renaming an IV
+                foreach my $taskObj ($self->compileTasks()) {
+
+                    if (! exists $taskObj->{taskType}) {
+
+                        $taskObj->{taskType} = undef;
+                        $taskObj->ivPoke('taskType', $taskObj->{taskList});
+
+                        delete $taskObj->{taskList};
+                    }
+                }
+            }
         }
 
         ### scripts ###############################################################################
@@ -8547,6 +8663,7 @@
             if ($version < 1_000_927) {
 
                 my (
+                    $oldName,
                     @buttonList,
                     %buttonHash,
                 );
@@ -8556,16 +8673,28 @@
                 foreach my $buttonObj ($axmud::CLIENT->ivValues('toolbarHash')) {
 
                     if ($buttonObj->name eq 'connect') {
+
+                        $oldName = $buttonObj->name;
                         $buttonObj->ivPoke('name', 'connect_me');
+
                     } elsif ($buttonObj->name eq 'help') {
+
+                        $oldName = $buttonObj->name;
                         $buttonObj->ivPoke('name', 'help_me');
+
                     } elsif ($buttonObj->name eq 'login') {
+
+                        $oldName = $buttonObj->name;
                         $buttonObj->ivPoke('name', 'login_me');
+
                     } elsif ($buttonObj->name eq 'save') {
+
+                        $oldName = $buttonObj->name;
                         $buttonObj->ivPoke('name', 'save_me');
                     }
 
                     $buttonHash{$buttonObj->name} = $buttonObj;
+                    delete $buttonHash{$oldName};
                 }
 
                 foreach my $name ($axmud::CLIENT->toolbarList) {
@@ -8585,6 +8714,80 @@
 
                 $axmud::CLIENT->ivPoke('toolbarHash', %buttonHash);
                 $axmud::CLIENT->ivPoke('toolbarList', @buttonList);
+            }
+
+            if ($version < 1_001_017) {
+
+                # This version adds a toolbar button for the new quick preferences window. If the
+                #   user still has a toolbar button for client preference window, and a new button
+                #   before it
+
+                my (
+                    $obj,
+                    @buttonList,
+                );
+
+                foreach my $item ($axmud::CLIENT->toolbarList) {
+
+                    if ($item eq 'edit_client') {
+
+                        # Insert the new button here
+                        $obj = Games::Axmud::Obj::Toolbar->new(
+                            'edit_quick',
+                            'Set quick preferences',
+                            FALSE,          # Default, not custom, toolbar button
+                            'book_edit.png',
+                            ';editquick',
+                            TRUE,
+                            TRUE,
+                        );
+
+                        if ($obj) {
+
+                            push (@buttonList, $obj->name);
+                            $axmud::CLIENT->ivAdd('toolbarHash', $obj->name, $obj);
+                        }
+                    }
+
+                    # The existing button is added after the new one
+                    push (@buttonList, $item);
+                }
+
+                $axmud::CLIENT->ivPoke('toolbarList', @buttonList);
+            }
+
+            if ($version < 1_001_028) {
+
+                my (
+                    $buttonObj,
+                    @buttonList,
+                );
+
+                # This version renames one of the toolbar buttons, as the window it opens has also
+                #   been renamed
+                $buttonObj = $axmud::CLIENT->ivShow('toolbarHash', 'open_gui');
+                if ($buttonObj) {
+
+                    $buttonObj->ivPoke('name', 'open_viewer');
+
+                    $buttonObj->ivPoke('descrip', 'Open object viewer window');
+                    $buttonObj->ivPoke('iconPath', 'watermark_table.png');
+                    $buttonObj->ivPoke('instruct', ';openobjectviewer');
+
+                    $axmud::CLIENT->ivDelete('toolbarHash', 'open_gui');
+                    $axmud::CLIENT->ivAdd('toolbarHash', 'open_viewer', $buttonObj);
+
+                    foreach my $name ($axmud::CLIENT->toolbarList) {
+
+                        if ($name eq 'open_gui') {
+                            push (@buttonList, 'open_viewer');
+                        } else {
+                            push (@buttonList, $name);
+                        }
+                    }
+
+                    $axmud::CLIENT->ivPoke('toolbarList', @buttonList);
+                }
             }
 
         ## zonemaps ###############################################################################
@@ -8692,6 +8895,27 @@
                 }
             }
 
+        ## winmaps ################################################################################
+
+        } elsif ($self->fileType eq 'winmaps') {
+
+            if ($version < 1_001_028) {
+
+                my $obj;
+
+                # Change the name of the colour scheme for 'viewer' windows, which used to be called
+                #   'gui' windows
+                $obj = $axmud::CLIENT->ivShow('colourSchemeHash', 'gui');
+                if ($obj) {
+
+                    $obj->ivPoke('name', 'viewer');
+
+                    $axmud::CLIENT->ivDelete('colourSchemeHash', 'gui');
+                    $axmud::CLIENT->ivAdd('colourSchemeHash', 'viewer', $obj);
+                }
+            }
+
+
         ## tts ####################################################################################
 
         } elsif ($self->fileType eq 'tts') {
@@ -8725,6 +8949,465 @@
                     $obj->ivUndef('pitch');
                     $obj->ivUndef('volume');
                 }
+            }
+        }
+
+        return 1;
+    }
+
+    sub patchWorldProf {
+
+        # Called by $self->loadDataFile for a world profile that must be patched due to serious
+        #   problems
+        # Checks the version number of the loaded file against the version number specified by the
+        #   GA::Client IV, and applies the patch, if required
+        #
+        # Expected arguments
+        #   $world          - The name of the world profile
+        #   $worldVersion   - The Axmud version used to save the file that the calling function has
+        #                       just loaded
+        #
+        # Return values
+        #   'undef' on improper arguments, if the world profile doesn't need to be patched or if the
+        #       user declines to apply a patch
+        #   1 if the world profile is patched
+
+        my ($self, $world, $worldVersion, $check) = @_;
+
+        # Local variables
+        my ($worldObj, $patchVersion, $choice);
+
+        # Check for improper arguments
+        if (! defined $world || ! defined $worldVersion || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->patchWorldProf', @_);
+        }
+
+        # Import the world profile
+        $worldObj = $axmud::CLIENT->ivShow('worldProfHash', $world);
+
+        # Convert versions, e.g. '1.1.0' to '1_001_000' (the calling function has already checked
+        #   that $world exists in GA::Client->constWorldPatchHash
+        $worldVersion = $axmud::CLIENT->convertVersion($worldVersion);
+        $patchVersion = $axmud::CLIENT->convertVersion(
+            $axmud::CLIENT->ivShow('constWorldPatchHash', $world),
+        );
+
+        if ($worldVersion > $patchVersion) {
+
+            # No patch required
+            return undef;
+        }
+
+        # If the user has ever connected to this world, ask permission before patching it
+        if ($worldObj->numberConnects) {
+
+            # If the existing file object needs to be saved, asked permission before importing data
+            #   into it
+            $choice = $axmud::CLIENT->mainWin->showMsgDialogue(
+                'Patch pre-configured world',
+                'question',
+                "The world profile '" . $world . "' requires a patch. Do you want to apply this"
+                . " patch now?\n\n"
+                . "Click 'Yes' unless you have modified the world profile yourself and you are"
+                . " CERTAIN that it is working properly.",
+                'yes-no',
+            );
+
+            if ($choice eq 'no') {
+
+                return undef;
+            }
+        }
+
+        # Apply the patch
+        if ($world eq 'avalonrpg' && $worldVersion <= 1_001_012) {
+
+            my ($compObj, $missionObj);
+
+            # Patch to fix handling of room statements, which doesn't work at night, and to fix the
+            #   login mission, which no longer works at all
+            $worldObj->ivDelete('componentHash', 'ignore_line');
+
+            $compObj = Games::Axmud::Obj::Component->new(
+                $axmud::CLIENT,
+                $worldObj,
+                'ignore_line',
+                'ignore_line',
+            );
+
+            if ($compObj) {
+
+                $compObj->{size} = 0;
+                $compObj->{minSize} = 0;        # Optional
+                $compObj->{maxSize} = 1;
+                $compObj->{analyseMode} = 'check_line';
+                $compObj->{boldSensitiveFlag} = FALSE;
+                $compObj->{useInitialTagsFlag} = FALSE;
+                $compObj->{combineLinesFlag} = FALSE;
+
+                $compObj->{startPatternList} = [
+                    '^The sky ',
+                ];
+                $compObj->{startTagList} = [];
+                $compObj->{startAllFlag} = FALSE;
+                $compObj->{startTagMode} = 'default';
+
+                $worldObj->ivAdd('componentHash', $compObj->name, $compObj);
+            }
+
+            $missionObj = $worldObj->ivShow('missionHash', 'avalon_login');
+            if ($missionObj) {
+
+                $missionObj->ivPoke(
+                    'missionList',
+                        't What is the name',
+                        'n',        # Send char name
+                        't What is the password',
+                        'w',        # Send account password
+                        't Land of Avalon',
+                        '> ',
+                        ';login',
+                );
+            }
+
+        } elsif ($world eq 'discworld' && $worldVersion <= 1_001_012) {
+
+            my $compObj;
+
+            # Patch to fix handling of room statements, which doesn't work when MXP is turned on
+            $worldObj->ivPoke(
+                'verboseAnchorPatternList',
+                    '^.*There are (.*) obvious exits\: (.*)',
+                    '^.*There is one obvious exit\: (.*)',
+                    '^.*There are no obvious exits\.',
+            );
+
+            $worldObj->ivPoke(
+                'verboseExitLeftMarkerList',
+                    '^.*There are (.*) obvious exits\: ',
+                    '^.*There is one obvious exit\: ',
+                    '^.*There are no obvious exits\.',
+            );
+
+            $worldObj->ivDelete('componentHash', 'verb_descrip');
+            $worldObj->ivDelete('componentHash', 'verb_descrip_1');
+            $worldObj->ivDelete('componentHash', 'verb_descrip_2');
+            $worldObj->ivDelete('componentHash', 'ignore_line');
+            $worldObj->ivDelete('componentHash', 'verb_exit');
+
+            $worldObj->ivPoke(
+                'verboseComponentList',
+                    'verb_descrip_1',       # no MXP
+                    'verb_descrip_2',       # MXP
+                    'ignore_line',
+                    'anchor',
+                    'verb_exit',
+            );
+
+            $compObj = Games::Axmud::Obj::Component->new(
+                $axmud::CLIENT,
+                $worldObj,
+                'verb_descrip_1',
+                'verb_descrip',
+            );
+
+            if ($compObj) {
+
+                $compObj->{size} = 0;
+                $compObj->{minSize} = 0;
+                $compObj->{maxSize} = 16;
+                $compObj->{analyseMode} = 'check_line';
+                $compObj->{boldSensitiveFlag} = FALSE;
+                $compObj->{useInitialTagsFlag} = FALSE;
+                $compObj->{combineLinesFlag} = FALSE;
+
+                $compObj->{usePatternBackRefs} = '^\s[\s\-\|\\\/\&\$\@\+\*]{10}\s(.*)',
+
+                $compObj->{startPatternList} = [
+                    '^\s[\s\-\|\\\/\&\$\@\+\*]{10}\s(.*)',
+                ],
+                $compObj->{startTagList} = [];
+                $compObj->{startAllFlag} = FALSE;
+                $compObj->{startTagMode} = 'default';
+
+                $compObj->{stopBeforeNoPatternList} = [
+                    '^\s[\s\-\|\\\/\&\$\@\+\*]{10}\s(.*)',
+                ],
+                $compObj->{stopBeforeNoTagList} = [];
+                $compObj->{stopBeforeNoAllFlag} = FALSE;
+                $compObj->{stopBeforeNoTagMode} = 'default';
+
+                $compObj->{stopBeforePatternList} = [
+                    '^\s..........\sIt is ',
+                    '^\s..........\sThe land is lit up ',
+                ],
+                $compObj->{stopBeforeTagList} = [];
+                $compObj->{stopBeforeAllFlag} = FALSE;
+                $compObj->{stopBeforeTagMode} = 'default';
+
+                $worldObj->ivAdd('componentHash', $compObj->name, $compObj);
+            }
+
+            $compObj = Games::Axmud::Obj::Component->new(
+                $axmud::CLIENT,
+                $worldObj,
+                'verb_descrip_2',
+                'verb_descrip',
+            );
+
+            if ($compObj) {
+
+                $compObj->{size} = 0;
+                $compObj->{minSize} = 0;
+                $compObj->{maxSize} = 16;
+                $compObj->{analyseMode} = 'check_line';
+                $compObj->{boldSensitiveFlag} = FALSE;
+                $compObj->{useInitialTagsFlag} = FALSE;
+                $compObj->{combineLinesFlag} = FALSE;
+
+                $compObj->{startPatternList} = [
+                    '^\w',
+                ],
+                $compObj->{startTagList} = [];
+                $compObj->{startAllFlag} = FALSE;
+                $compObj->{startTagMode} = 'default';
+
+                $compObj->{stopBeforeNoPatternList} = [
+                    '^\w',
+                ],
+                $compObj->{stopBeforeNoTagList} = [];
+                $compObj->{stopBeforeNoAllFlag} = FALSE;
+                $compObj->{stopBeforeNoTagMode} = 'default';
+
+                $compObj->{stopBeforePatternList} = [
+                    '^It is ',
+                    '^The land is lit up ',
+                ],
+                $compObj->{stopBeforeTagList} = [];
+                $compObj->{stopBeforeAllFlag} = FALSE;
+                $compObj->{stopBeforeTagMode} = 'default';
+
+                $worldObj->ivAdd('componentHash', $compObj->name, $compObj);
+            }
+
+            $compObj = Games::Axmud::Obj::Component->new(
+                $axmud::CLIENT,
+                $worldObj,
+                'ignore_line',
+                'ignore_line',
+            );
+
+            if ($compObj) {
+
+                $compObj->{size} = 0;
+                $compObj->{minSize} = 0;
+                $compObj->{maxSize} = 16;
+                $compObj->{analyseMode} = 'check_line';
+                $compObj->{boldSensitiveFlag} = FALSE;
+                $compObj->{useInitialTagsFlag} = FALSE;
+                $compObj->{combineLinesFlag} = FALSE;
+
+                $compObj->{startPatternList} = [];
+                $compObj->{startTagList} = [
+                    'yellow',               # no mxp
+                    '#FF8700',              # mxp
+                    'x208',                 # xterm256
+                ];
+                $compObj->{startAllFlag} = FALSE;
+                $compObj->{startTagMode} = 'default';
+
+                $compObj->{stopBeforeNoPatternList} = [];
+                $compObj->{stopBeforeNoTagList} = [
+                    'yellow',
+                    '#FF8700',
+                    'x208',
+                ];
+                $compObj->{stopBeforeNoAllFlag} = FALSE;
+                $compObj->{stopBeforeNoTagMode} = 'default';
+
+                $worldObj->ivAdd('componentHash', $compObj->name, $compObj);
+            }
+
+            $compObj = Games::Axmud::Obj::Component->new(
+                $axmud::CLIENT,
+                $worldObj,
+                'verb_exit',
+                'verb_exit',
+            );
+
+            if ($compObj) {
+
+                $compObj->{size} = 0;
+                $compObj->{minSize} = 1;
+                $compObj->{maxSize} = 16;
+                $compObj->{analyseMode} = 'check_line';
+                $compObj->{boldSensitiveFlag} = FALSE;
+                $compObj->{useInitialTagsFlag} = FALSE;
+                $compObj->{combineLinesFlag} = TRUE;
+
+                $compObj->{startPatternList} = [];
+                $compObj->{startTagList} = [
+                    'green',                # no mxp and xterm256
+                    '#008000',              # mxp
+                ];
+                $compObj->{startAllFlag} = FALSE;
+                $compObj->{startTagMode} = 'default';
+
+                $compObj->{stopBeforeNoPatternList} = [];
+                $compObj->{stopBeforeNoTagList} = [
+                    'green',
+                    '#008000',
+                ];
+                $compObj->{stopBeforeNoAllFlag} = FALSE;
+                $compObj->{stopBeforeNoTagMode} = 'default';
+
+                $worldObj->ivAdd('componentHash', $compObj->name, $compObj);
+            }
+
+        } elsif ($world eq 'swmud' && $worldVersion <= 1_001_012) {
+
+            my $compObj;
+
+            # Patch to fix handling of room statements, which doesn't work very well at all
+            $worldObj->ivPoke(
+                'verboseAnchorPatternList',
+                    '^There are (.*) obvious exits\: (.*)',
+                    '^The only obvious exit is (.*)\.',
+                    '^There are no obvious exits\.',
+            );
+
+            $worldObj->ivPoke(
+                'verboseExitDelimiterList',
+                    ', and ',
+                    ' and ',
+                    ', ',
+            );
+
+            $worldObj->ivDelete('componentHash', 'verb_title');
+            $worldObj->ivDelete('componentHash', 'verb_descrip');
+            $worldObj->ivDelete('componentHash', 'ignore_line');
+            $worldObj->ivDelete('componentHash', 'ignore_line_1');
+            $worldObj->ivDelete('componentHash', 'ignore_line_2');
+            $worldObj->ivDelete('componentHash', 'verb_exit');
+
+            $worldObj->ivPoke(
+                'verboseComponentList',
+                    'verb_descrip',
+                    'ignore_line_1',
+                    'ignore_line_2',
+                    'anchor',
+                    'verb_exit',
+            );
+
+            $compObj = Games::Axmud::Obj::Component->new(
+                $axmud::CLIENT,
+                $worldObj,
+                'verb_descrip',
+                'verb_descrip',
+            );
+
+            if ($compObj) {
+
+                $compObj->{size} = 0;
+                $compObj->{minSize} = 0;
+                $compObj->{maxSize} = 16;
+                $compObj->{analyseMode} = 'check_line';
+                $compObj->{boldSensitiveFlag} = FALSE;
+                $compObj->{useInitialTagsFlag} = FALSE;
+                $compObj->{combineLinesFlag} = FALSE;
+
+                $compObj->{stopBeforePatternList} = [
+                        '^\>',
+                ];
+                $compObj->{stopBeforeTagList} = [];
+                $compObj->{stopBeforeAllFlag} = FALSE;
+                $compObj->{stopBeforeTagMode} = 'default';
+
+                $worldObj->ivAdd('componentHash', $compObj->name, $compObj);
+            }
+
+            $compObj = Games::Axmud::Obj::Component->new(
+                $axmud::CLIENT,
+                $worldObj,
+                'ignore_line_1',
+                'ignore_line',
+            );
+
+            if ($compObj) {
+
+                $compObj->{size} = 0;
+                $compObj->{minSize} = 0;
+                $compObj->{maxSize} = 16;
+                $compObj->{analyseMode} = 'check_line';
+                $compObj->{boldSensitiveFlag} = FALSE;
+                $compObj->{useInitialTagsFlag} = FALSE;
+                $compObj->{combineLinesFlag} = FALSE;
+
+                $compObj->{startPatternList} = [];
+                $compObj->{startTagList} = ['green'];
+                $compObj->{startAllFlag} = FALSE;
+                $compObj->{startTagMode} = 'default';
+
+                $compObj->{stopAtMode} = 'no_letter_num';
+
+                $worldObj->ivAdd('componentHash', $compObj->name, $compObj);
+            }
+
+            $compObj = Games::Axmud::Obj::Component->new(
+                $axmud::CLIENT,
+                $worldObj,
+                'ignore_line_2',
+                'ignore_line',
+            );
+
+            if ($compObj) {
+
+                $compObj->{size} = 1;                           # Fixed size
+                $compObj->{analyseMode} = 'check_line';
+                $compObj->{boldSensitiveFlag} = FALSE;
+                $compObj->{useInitialTagsFlag} = FALSE;
+                $compObj->{combineLinesFlag} = FALSE;
+
+                $worldObj->ivAdd('componentHash', $compObj->name, $compObj);
+            }
+
+            $compObj = Games::Axmud::Obj::Component->new(
+                $axmud::CLIENT,
+                $worldObj,
+                'verb_exit',
+                'verb_exit',
+            );
+
+            if ($compObj) {
+
+                $compObj->{size} = 0;
+                $compObj->{minSize} = 1;
+                $compObj->{maxSize} = 16;
+                $compObj->{analyseMode} = 'check_line';
+                $compObj->{boldSensitiveFlag} = FALSE;
+                $compObj->{useInitialTagsFlag} = FALSE;
+                $compObj->{combineLinesFlag} = TRUE;
+
+                $compObj->{startPatternList} = [
+                    '^There are (.*) obvious exits\: (.*)',
+                    '^The only obvious exit is (.*)\.',
+                    '^There are no obvious exits\.',
+                ];
+                $compObj->{startTagList} = [];
+                $compObj->{startAllFlag} = FALSE;
+                $compObj->{startTagMode} = 'default';
+
+                $compObj->{stopPatternList} = [
+                    '\.\s*$',
+                ];
+                $compObj->{stopTagList} = [];
+                $compObj->{stopAllFlag} = FALSE;
+                $compObj->{stopTagMode} = 'default';
+
+                $compObj->{stopAtMode} = 'no_letter_num';
+
+                $worldObj->ivAdd('componentHash', $compObj->name, $compObj);
             }
         }
 

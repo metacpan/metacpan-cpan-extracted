@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An internet cafe.",
+      "rdfs:label" : "InternetCafe",
+      "rdfs:subClassOf" : "schema:LocalBusiness"
+   },
+   "properties" : {}
+}

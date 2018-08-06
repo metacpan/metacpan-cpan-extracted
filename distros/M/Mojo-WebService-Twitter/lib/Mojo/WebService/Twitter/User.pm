@@ -5,7 +5,7 @@ use Mojo::WebService::Twitter::Tweet;
 use Mojo::WebService::Twitter::Util 'parse_twitter_timestamp';
 use Scalar::Util 'weaken';
 
-our $VERSION = '0.002';
+our $VERSION = '1.000';
 
 has [qw(source created_at description followers friends id last_tweet name
 	protected screen_name statuses time_zone url utc_offset verified)];
@@ -131,7 +131,8 @@ Number of tweets the user has sent.
 
  my $tz = $user->time_zone;
 
-String describing the user's time zone.
+String describing the user's time zone. This is now always undefined; see
+L<https://twittercommunity.com/t/upcoming-changes-to-the-developer-platform/104603>.
 
 =head2 url
 
@@ -143,7 +144,8 @@ User's profile URL.
 
  my $seconds = $user->utc_offset;
 
-User's current offset from UTC in seconds.
+User's current offset from UTC in seconds. This is now always undefined; see
+L<https://twittercommunity.com/t/upcoming-changes-to-the-developer-platform/104603>.
 
 =head2 verified
 

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A shop that sells alcoholic drinks such as wine, beer, whisky and other spirits.",
+      "rdfs:label" : "LiquorStore",
+      "rdfs:subClassOf" : "schema:Store"
+   },
+   "properties" : {}
+}

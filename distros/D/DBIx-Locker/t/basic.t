@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More tests => 19;
 
 use DBI;
 use DBIx::Locker;
@@ -46,7 +46,7 @@ my $guid;
 
   eval { $locker->lock('Zombie Soup'); };
   ok(
-    $@, 
+    $@,
     # (used to be isa_ok) 'X::Unavailable',
     "can't lock already-locked resources"
   );
@@ -87,9 +87,17 @@ my $guid;
 
 {
   my $lock = $locker->lock('a');
-  eval { $locker->lock('a') };
+  scalar eval { $locker->lock('a') }; # scalar because void is banned
   like(
     $@, qr/could not lock resource <a>:.*(?:not unique|unique constraint)/si,
     'underlying DB exception included'
   );
+}
+
+{
+  my $ok = eval { $locker->lock('a'); 1 };
+  my $error = $@;
+
+  ok(! $ok, "you can't call lock in void context");
+  like($error, qr/void context/, "...and we say so");
 }

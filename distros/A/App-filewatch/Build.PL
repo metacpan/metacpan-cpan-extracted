@@ -8,7 +8,7 @@ my $builder = Module::Build->new(
     dist_author       => 'Ivan Wills <ivan.wills@gmail.com>',
     dist_version_from => 'lib/App/filewatch.pm',
     requires          => {
-        'perl'                 => 5.008,
+        'perl'                 => 5.010,
         'AnyEvent'             => 0,
         'AnyEvent::Loop'       => 0,
         'File::TypeCategories' => 0,
@@ -16,9 +16,12 @@ my $builder = Module::Build->new(
         'Path::Tiny'           => 0,
         'version'              => 0,
     },
+    configure_requires => {
+        'Module::Build' => 0.38,
+    },
     build_requires => {
         'Test::More'     => '0.88',
-        'Test::Warnings' => 0,
+        'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'App-filewatch-*' ],
     create_license     => 1,

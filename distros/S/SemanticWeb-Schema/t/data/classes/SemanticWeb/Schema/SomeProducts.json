@@ -1,0 +1,23 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A placeholder for multiple similar products of the same kind.",
+      "rdfs:label" : "SomeProducts",
+      "rdfs:subClassOf" : "schema:Product"
+   },
+   "properties" : {
+      "schema:inventoryLevel" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The current approximate inventory level for the item or items.",
+         "rdfs:label" : "inventoryLevel",
+         "schema:domainIncludes" : [
+            "schema:Offer",
+            "schema:SomeProducts",
+            "schema:Demand"
+         ],
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      }
+   }
+}

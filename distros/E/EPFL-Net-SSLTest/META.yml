@@ -1,0 +1,28 @@
+---
+abstract: 'Website SSL accessibility validator'
+author:
+  - 'William Belle <william.belle@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: EPFL-Net-SSLTest
+provides:
+  EPFL::Net::SSLTest:
+    file: lib/EPFL/Net/SSLTest.pm
+    version: '1.00'
+requires:
+  LWP::Protocol::https: '6.06'
+  LWP::UserAgent: '6.34'
+  Term::ANSIColor: '4.06'
+  WebService::SSLLabs: '0.30'
+resources:
+  repository: https://github.com/epfl-idevelop/epfl-net-sslTest
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

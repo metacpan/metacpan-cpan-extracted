@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::GitHub;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use Moose;
 
@@ -65,6 +65,7 @@ has fork => (
 
 # GitHub::Update
 
+# deprecated and no longer documented. Use 'metacpan' instead!
 has cpan => (
     is      => 'ro',
     isa     => 'Bool',
@@ -169,7 +170,7 @@ Dist::Zilla::PluginBundle::GitHub - GitHub plugins all-in-one
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -234,27 +235,19 @@ If the repository is a GitHub fork of another repository this option will make
 all the information be taken from the original repository instead of the forked
 one, if it's set to true (default).
 
-=item C<cpan>
-
-The GitHub homepage field will be set to the CPAN page (search.cpan.org) of the
-module if this option is set to true (default),
-
 =item C<p3rl>
 
 The GitHub homepage field will be set to the p3rl.org shortened URL
-(e.g. C<http://p3rl.org/My::Module>) if this option is set to true (default is
+(e.g. C<http://p3rl.org/Dist::Zilla::PluginBundle::GitHub>) if this option is set to true (default is
 false).
-
-This takes precedence over the C<cpan> option (if both are true, p3rl will be
-used).
 
 =item C<metacpan>
 
 The GitHub homepage field will be set to the metacpan.org distribution URL
-(e.g. C<http://metacpan.org/release/My-Module>) if this option is set to true
+(e.g. C<http://metacpan.org/release/Dist-Zilla-Plugin-GitHub>) if this option is set to true
 (default is false).
 
-This takes precedence over the C<cpan> and C<p3rl> options (if all three are
+This takes precedence over the C<p3rl> options (if both are
 true, metacpan will be used).
 
 =item C<meta_home>
@@ -263,8 +256,8 @@ The GitHub homepage field will be set to the value present in the dist meta
 (e.g. the one set by other plugins) if this option is set to true (default is
 false). If no value is present in the dist meta, this option is ignored.
 
-This takes precedence over the C<metacpan>, C<cpan> and C<p3rl> options (if all
-four are true, meta_home will be used).
+This takes precedence over the C<metacpan> and C<p3rl> options (if all
+three are true, meta_home will be used).
 
 =item C<prompt_2fa>
 

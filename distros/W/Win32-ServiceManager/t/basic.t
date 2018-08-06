@@ -61,4 +61,13 @@ cmp_deeply(
    'sc configure auth ok',
 );
 
+cmp_deeply(
+   [$sm->_sc_configure('foo', {display => 'Foo', start => 'delayed-auto'})],
+   [qw(sc config foo),
+      'DisplayName= "Foo"',
+      'type= own start= delayed-auto',
+   ],
+   'sc configure start ok',
+);
+
 done_testing;

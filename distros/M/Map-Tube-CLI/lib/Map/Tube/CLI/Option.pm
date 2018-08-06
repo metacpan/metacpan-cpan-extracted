@@ -1,6 +1,6 @@
 package Map::Tube::CLI::Option;
 
-$Map::Tube::CLI::Option::VERSION   = '0.52';
+$Map::Tube::CLI::Option::VERSION   = '0.54';
 $Map::Tube::CLI::Option::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI::Option - Option as Moo Role for Map::Tube::CLI.
 
 =head1 VERSION
 
-Version 0.52
+Version 0.54
 
 =cut
 
@@ -28,9 +28,10 @@ option start         => (is => 'ro', order => 2, isa => Str, format => 's', doc 
 option end           => (is => 'ro', order => 3, isa => Str, format => 's', doc => 'End station name'  );
 option preferred     => (is => 'ro', order => 4, doc => 'Show preferred route');
 option generate_map  => (is => 'ro', order => 5, doc => 'Generate map as image');
-option line          => (is => 'ro', order => 6, isa => Str, format => 's', doc => 'Line name for map' );
-option line_mappings => (is => 'ro', order => 7, doc => 'Generate line mappings');
-option line_notes    => (is => 'ro', order => 8, doc => 'Generate line notes');
+option line          => (is => 'ro', order => 6, isa => Str, format => 's', doc => 'Line name for map'    );
+option bgcolor       => (is => 'ro', order => 7, isa => Str, format => 's', doc => 'Map background color' );
+option line_mappings => (is => 'ro', order => 8, doc => 'Generate line mappings');
+option line_notes    => (is => 'ro', order => 9, doc => 'Generate line notes');
 
 =head1 DESCRIPTION
 

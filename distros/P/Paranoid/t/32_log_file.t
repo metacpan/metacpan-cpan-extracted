@@ -1,6 +1,6 @@
 #!/usr/bin/perl -T
 
-use Test::More tests => 12;
+use Test::More tests => 13;
 use Paranoid;
 use Paranoid::Log;
 use Paranoid::Process qw(:pfork);
@@ -13,7 +13,7 @@ psecureEnv();
 
 $SIG{CHLD} = \&sigchld;
 
-my ( $child, $pid, @lines );
+my ( $child, $pid, @lines, $line, $i, $j );
 my $file = './t/foo.log';
 
 # Load a bad facility
@@ -35,7 +35,7 @@ SKIP: {
     foreach $child ( 1 .. 5 ) {
         unless ( $pid = pfork() ) {
             for ( 1 .. 50 ) {
-                my $intvl = int rand 100;
+                my $intvl = int rand 500;
                 usleep($intvl);
                 plog( PL_WARN,
                     "child $child: this is test #$_ (slept $intvl usec)" );
@@ -51,6 +51,21 @@ SKIP: {
     slurp( $file, @lines, 1 );
     my $rv = ( scalar @lines == 251 or scalar @lines == 252 );
     ok( $rv, 'line count' );
+
+    # Make sure children have been logging at the same time and not blocked
+    # by advisory locks, etc.
+    $i = $j = 0;
+    while (@lines) {
+        $line = shift @lines;
+        if ($line =~ /child 2:/s) {
+            $i++;
+            $i += $j;
+            $j = 0;
+        } elsif ($i) {
+            $j++;
+        }
+    }
+    ok( $i > 55, 'multiple children logged' );
 }
 
 ok( stopLogger('foo'), 'stopLogger 2' );
@@ -64,6 +79,7 @@ my @fstats = stat $file;
 is( $fstats[7], 0, 'file size' );
 ok( stopLogger('foo'), 'stopLogger 2' );
 unlink $file;
+
 ok( startLogger(
         'foo', 'File', PL_WARN, PL_GE,
         { file => $file, perm => 0600, mode => O_CREAT | O_RDWR, }

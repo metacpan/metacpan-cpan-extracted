@@ -2,7 +2,7 @@ package Datahub::Factory::Importer::KMSKA;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use Moo;
 use Catmandu;
@@ -21,17 +21,6 @@ has generate_temp_tables => (is => 'ro', default => 1);
 sub _build_importer {
     my $self = shift;
     my $dsn = sprintf('dbi:mysql:%s', $self->db_name);
-
-    # Add indices
-    $self->logger->info('Creating indices on TMS tables.');
-    my $index = Datahub::Factory::Importer::KMSKA::TMS::Index->new(
-        db_host => $self->db_host,
-        db_name => $self->db_name,
-        db_user => $self->db_user,
-        db_password => $self->db_password
-    );
-
-    $index->add_indices();
 
     my $query = 'select * from CITvgsrpObjTombstoneD_RO;';
     my $importer = Catmandu->importer('DBI', dsn => $dsn, host => $self->db_host, user => $self->db_user, password => $self->db_password, query => $query, encoding => ':iso-8859-1');
@@ -54,10 +43,14 @@ sub prepare {
     $self->__dimensions();
     $self->logger->info('Adding "subjects" temporary table.');
     $self->__subjects();
-    $self->logger->info('Adding "pids" temporary table.');
-    $self->__pids();
     $self->logger->info('Adding "constituents" temporary table.');
     $self->__constituents();
+    $self->logger->info('Adding "datapids" temporary table.');
+    $self->__datapids();
+    $self->logger->info('Adding "representationpids" temporary table.');
+    $self->__representationpids();
+    $self->logger->info('Adding "workpids" temporary table.');
+    $self->__workpids();
 }
 
 sub prepare_call {
@@ -118,76 +111,46 @@ sub merge_call {
 
 sub __constituents {
     my $self = shift;
-    $self->prepare_call('
-        SELECT ConstituentID AS _id,
-            AlphaSort,
-            DisplayName,
-            BeginDate,
-            EndDate,
-            BeginDateISO,
-            EndDateISO
-        FROM Constituents
-    ', 'constituents');
+    $self->prepare_call('SELECT * FROM vconstituents', 'constituents');
 }
 
 sub __classifications {
     my $self = shift;
-    $self->prepare_call('select ClassificationID as _id, Classification as term from Classifications', 'classifications');
+    $self->prepare_call('SELECT * FROM vclassifications', 'classifications');
 }
 
 sub __period {
     my $self = shift;
-    $self->prepare_call('select ObjectID as _id, Period as term from ObjContext', 'periods');
+    $self->prepare_call('SELECT * FROM vperiods', 'periods');
 }
 
-sub __pids {
+sub __datapids {
     my $self = shift;
-    # key is object_number
+    $self->prepare_call('SELECT * FROM vdatapids', 'datapids');
+}
 
-    $self->prepare_call("SELECT o.ObjectNumber as _id, pids.* FROM CITvgsrpObjTombstoneD_RO o, 
-(select
-    ID,
-    SUBSTRING_INDEX(GROUP_CONCAT(FieldValue), ',', 1) AS dataPid,
-    SUBSTRING_INDEX(SUBSTRING_INDEX(GROUP_CONCAT(FieldValue), ',', 2), ',', -1) AS representationPid,
-    SUBSTRING_INDEX(SUBSTRING_INDEX(GROUP_CONCAT(FieldValue), ',', -3), ',', -1) AS workPid
-from UserFieldXrefs 
-WHERE userFieldID IN (44, 46, 48) GROUP BY ID ORDER BY userFieldID) pids WHERE o.ObjectID = pids.ID", 'Cit_KMSKApids_conversie_gecorrigeerd');
+sub __workpids {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vworkpids', 'workpids');
+}
 
+sub __representationpids {
+    my $self = shift;
+    $self->prepare_call('SELECT * FROM vperiods', 'representationpids');
 }
 
 sub __dimensions {
     my $self = shift;
-    my $query = "SELECT o.ObjectID as objectid, d.Dimension as dimension, t.DimensionType as type, e.Element as element, u.UnitName as unit
-    FROM CITvgsrpObjTombstoneD_RO o
-    LEFT JOIN
-        DimItemElemXrefs x ON x.ID = o.ObjectID
-    INNER JOIN
-        Dimensions d ON d.DimItemElemXrefID = x.DimItemElemXrefID
-    INNER JOIN
-        DimensionUnits u ON u.UnitID = d.PrimaryUnitID
-    INNER JOIN
-        DimensionTypes t ON t.DimensionTypeID = d.DimensionTypeID
-    INNER JOIN
-        DimensionElements e ON e.ElementID = x.ElementID
-    WHERE
-        x.TableID = '108'
-    AND
-        x.ElementID = '3';";
-    $self->merge_call($query, 'dimensions', 'dimensions');
+    $self->merge_call('SELECT * FROM vdimensions', 'dimensions', 'dimensions');
 }
 
 sub __subjects {
     my $self = shift;
-    my $query = "SELECT o.ObjectID as objectid, t.Term as subject
-    FROM Terms t, CITvgsrpObjTombstoneD_RO o, ThesXrefs x, ThesXrefTypes y
-    WHERE
-    x.TermID = t.TermID and
-    x.ID = o.ObjectID and
-    x.ThesXrefTypeID = y.ThesXrefTypeID and
-    y.ThesXrefTypeID = 30;"; # Only those from the VKC website
-    $self->merge_call($query, 'subjects', 'subjects');
+    $self->merge_call('SELECT * FROM vsubjects', 'subjects', 'subjects');
 }
+
 1;
+
 __END__
 
 =encoding utf-8

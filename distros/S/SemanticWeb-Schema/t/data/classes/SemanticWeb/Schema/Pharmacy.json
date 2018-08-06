@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A pharmacy or drugstore.",
+      "rdfs:label" : "Pharmacy",
+      "rdfs:subClassOf" : "schema:MedicalOrganization"
+   },
+   "properties" : {}
+}

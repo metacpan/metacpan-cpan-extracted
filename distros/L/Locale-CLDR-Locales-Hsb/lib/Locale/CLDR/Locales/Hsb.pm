@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Hsb - Package for language Upper Sorbian
 
 package Locale::CLDR::Locales::Hsb;
 # This file auto generated from Data\common\main\hsb.xml
-#	on Fri 13 Apr  7:13:33 am GMT
+#	on Sun  5 Aug  6:04:43 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -4187,6 +4187,15 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(mawretanska ouguiya \(1973–2017\)),
+				'few' => q(mawretanske ouguije \(1973–2017\)),
+				'one' => q(mawretanska ouguiya \(1973–2017\)),
+				'other' => q(mawretanskich ouguijow \(1973–2017\)),
+				'two' => q(mawretanskej ouguiji \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(mawretanska ouguiya),
 				'few' => q(mawretanske ouguije),
 				'one' => q(mawretanska ouguiya),
@@ -4540,6 +4549,15 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(são tomeski dobra \(1977–2017\)),
+				'few' => q(são tomeske dobry \(1977–2017\)),
+				'one' => q(são tomeski dobra \(1977–2017\)),
+				'other' => q(são tomeskich dobrow \(1977–2017\)),
+				'two' => q(são tomeskej dobraj \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(são tomeski dobra),
 				'few' => q(são tomeske dobry),
@@ -5087,12 +5105,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'am' => q{dopołdnja},
 					'pm' => q{popołdnju},
+					'am' => q{dopołdnja},
 				},
 				'narrow' => {
-					'am' => q{dop.},
 					'pm' => q{pop.},
+					'am' => q{dop.},
 				},
 				'abbreviated' => {
 					'am' => q{dopołdnja},

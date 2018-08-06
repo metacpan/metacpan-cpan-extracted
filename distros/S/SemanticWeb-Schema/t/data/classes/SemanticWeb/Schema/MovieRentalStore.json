@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A movie rental store.",
+      "rdfs:label" : "MovieRentalStore",
+      "rdfs:subClassOf" : "schema:Store"
+   },
+   "properties" : {}
+}

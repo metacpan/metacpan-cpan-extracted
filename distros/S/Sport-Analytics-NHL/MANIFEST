@@ -5,6 +5,7 @@ lib/Sport/Analytics/NHL/DB.pm
 lib/Sport/Analytics/NHL/Errors.pm
 lib/Sport/Analytics/NHL/LocalConfig.pm
 lib/Sport/Analytics/NHL/Merger.pm
+lib/Sport/Analytics/NHL/Normalizer.pm
 lib/Sport/Analytics/NHL.pm
 lib/Sport/Analytics/NHL/Report/BH.pm
 lib/Sport/Analytics/NHL/Report/BS.pm
@@ -25,6 +26,9 @@ scripts/compile
 scripts/merge
 scripts/compile-schedule
 scripts/merge-schedule
+scripts/normalize
+scripts/normalize-schedule
+scripts/test-consistency
 t/000-load.t
 t/001-config.t
 t/002-localconfig.t
@@ -36,7 +40,8 @@ t/013-tools-schedule-arrange.t
 t/014-get-games-for-dates-fs.t
 t/015-tools-read-schedules.t
 t/016-read-existing-game-ids.t
-t/017-compile-tools.t
+t/017-Tools-compile.t
+t/018-Tools-normalize.t
 t/050-db-new.t
 t/051-db-insert-schedule.t
 t/100-scraper.t
@@ -65,6 +70,14 @@ t/221-Merger-find-player.t
 t/222-Merger-find-event.t
 t/223-Merger-resolve.t
 t/224-Merger-merge.t
+t/230-Normalizer.t
+t/231-Normalizer-summarize-functions.t
+t/232-Normalizer-summarize.t
+t/233-Normalizer-normalize-header.t
+t/234-Normalizer-normalize-teams.t
+t/235-Normalizer-normalize-events.t
+t/236-Normalizer-normalize-arrange-events.t
+t/237-Normalizer-boxscore.t
 t/400-main.t
 t/401-main-parse-game-args.t
 t/402-main-get-crawled-games.t
@@ -72,6 +85,7 @@ t/403-main-get-scheduled-games.t
 t/404-main-scrape-games.t
 t/405-main-compile.t
 t/406-main-merge.t
+t/407-main-normalize.t
 t/data/1930/0002/0010/BS.json
 t/data/1930/schedule.json
 t/data/2011/0002/0010/BS.json

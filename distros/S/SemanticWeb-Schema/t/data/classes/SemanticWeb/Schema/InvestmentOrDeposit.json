@@ -1,0 +1,25 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:FIBO",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A type of financial product that typically requires the client to transfer funds to a financial service in return for potential beneficial financial return.",
+      "rdfs:label" : "InvestmentOrDeposit",
+      "rdfs:subClassOf" : "schema:FinancialProduct"
+   },
+   "properties" : {
+      "schema:amount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The amount of money.",
+         "rdfs:label" : "amount",
+         "schema:domainIncludes" : [
+            "schema:DatedMoneySpecification",
+            "schema:InvestmentOrDeposit",
+            "schema:LoanOrCredit"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:MonetaryAmount"
+         ]
+      }
+   }
+}

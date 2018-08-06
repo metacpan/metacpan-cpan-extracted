@@ -1933,6 +1933,19 @@
 
         $menuColumn_edit->append(Gtk2::SeparatorMenuItem->new());   # Separator
 
+        my $menuItem_quickPrefs = Gtk2::ImageMenuItem->new(
+            '_Quick preferences...',
+        );
+        my $menuImg_quickPrefs = Gtk2::Image->new_from_stock('gtk-preferences', 'menu');
+        $menuItem_quickPrefs->set_image($menuImg_quickPrefs);
+        $menuItem_quickPrefs->signal_connect('activate' => sub {
+
+            $self->winObj->visibleSession->pseudoCmd('editquick', $mode);
+        });
+        $menuColumn_edit->append($menuItem_quickPrefs);
+        # (Requires a visible session whose status is 'connected' or 'offline')
+        $self->ivAdd('menuItemHash', 'edit_quick_prefs', $menuItem_quickPrefs);
+
         my $menuItem_clientPrefs = Gtk2::ImageMenuItem->new(
             $axmud::SCRIPT . ' pr_eferences...',
         );
@@ -2067,26 +2080,26 @@
             my $menuItem_chatTask_chatMM = Gtk2::MenuItem->new('Chat using _MudMaster...');
             $menuItem_chatTask_chatMM->signal_connect('activate' => sub {
 
-                my ($address, $port);
+                my ($host, $port);
 
-                # Prompt the user for an address and port
-                ($address, $port) = $self->winObj->showDoubleEntryDialogue(
+                # Prompt the user for a host and port
+                ($host, $port) = $self->winObj->showDoubleEntryDialogue(
                     'Chat using MudMaster',
                     'Enter a DNS/IP address',
                     '(Optional) enter the port',
                 );
 
-                if ($address) {
+                if ($host) {
 
                     if (! $port) {
 
                         # (Don't use an empty string as the port)
-                        $self->winObj->visibleSession->pseudoCmd('chatmcall ' . $address, $mode);
+                        $self->winObj->visibleSession->pseudoCmd('chatmcall ' . $host, $mode);
 
                     } else {
 
                         $self->winObj->visibleSession->pseudoCmd(
-                            'chatmcall ' . $address . ' ' . $port,
+                            'chatmcall ' . $host . ' ' . $port,
                             $mode,
                         );
                     }
@@ -2097,26 +2110,26 @@
             my $menuItem_chatTask_chatZChat = Gtk2::MenuItem->new('Chat using _zChat...');
             $menuItem_chatTask_chatZChat->signal_connect('activate' => sub {
 
-                my ($address, $port);
+                my ($host, $port);
 
                 # Prompt the user for an address and port
-                ($address, $port) = $self->winObj->showDoubleEntryDialogue(
+                ($host, $port) = $self->winObj->showDoubleEntryDialogue(
                     'Chat using zChat',
                     'Enter a DNS/IP address',
                     '(Optional) enter the port',
                 );
 
-                if ($address) {
+                if ($host) {
 
                     if (! $port) {
 
                         # (Don't use an empty string as the port)
-                        $self->winObj->visibleSession->pseudoCmd('chatzcall ' . $address, $mode);
+                        $self->winObj->visibleSession->pseudoCmd('chatzcall ' . $host, $mode);
 
                     } else {
 
                         $self->winObj->visibleSession->pseudoCmd(
-                            'chatzcall ' . $address . ' ' . $port,
+                            'chatzcall ' . $host . ' ' . $port,
                             $mode,
                         );
                     }
@@ -2910,16 +2923,16 @@
         # (Requires a visible session whose status is 'connected' or 'offline')
         $self->ivAdd('menuItemHash', 'open_automapper', $menuItem_openAutomapper);
 
-        my $menuItem_openGUI = Gtk2::ImageMenuItem->new('Open _GUI window');
-        my $menuImg_openGUI = Gtk2::Image->new_from_stock('gtk-jump-to', 'menu');
-        $menuItem_openGUI->set_image($menuImg_openGUI);
-        $menuItem_openGUI->signal_connect('activate' => sub {
+        my $menuItem_openViewer = Gtk2::ImageMenuItem->new('Open _object viewer');
+        my $menuImg_openViewer = Gtk2::Image->new_from_stock('gtk-jump-to', 'menu');
+        $menuItem_openViewer->set_image($menuImg_openViewer);
+        $menuItem_openViewer->signal_connect('activate' => sub {
 
-            $self->winObj->visibleSession->pseudoCmd('openguiwindow', $mode);
+            $self->winObj->visibleSession->pseudoCmd('openobjectviewer', $mode);
         });
-        $menuColumn_display->append($menuItem_openGUI);
+        $menuColumn_display->append($menuItem_openViewer);
         # (Requires a visible session whose status is 'connected' or 'offline')
-        $self->ivAdd('menuItemHash', 'open_gui_window', $menuItem_openGUI);
+        $self->ivAdd('menuItemHash', 'open_object_viewer', $menuItem_openViewer);
 
         $menuColumn_display->append(Gtk2::SeparatorMenuItem->new());    # Separator
 

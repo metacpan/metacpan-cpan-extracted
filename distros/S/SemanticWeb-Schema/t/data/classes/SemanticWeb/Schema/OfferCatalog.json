@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An OfferCatalog is an ItemList that contains related Offers and/or further OfferCatalogs that are offeredBy the same provider.",
+      "rdfs:label" : "OfferCatalog",
+      "rdfs:subClassOf" : "schema:ItemList"
+   },
+   "properties" : {}
+}

@@ -1,0 +1,99 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A recipe. For dietary restrictions covered by the recipe, a few common restrictions are enumerated via <a class=\"localLink\" href=\"http://schema.org/suitableForDiet\">suitableForDiet</a>. The <a class=\"localLink\" href=\"http://schema.org/keywords\">keywords</a> property can also be used to add more detail.",
+      "rdfs:label" : "Recipe",
+      "rdfs:subClassOf" : "schema:HowTo"
+   },
+   "properties" : {
+      "schema:cookTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The time it takes to actually cook the dish, in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 duration format</a>.",
+         "rdfs:label" : "cookTime",
+         "rdfs:subPropertyOf" : "schema:performTime",
+         "schema:domainIncludes" : "schema:Recipe",
+         "schema:rangeIncludes" : "schema:Duration"
+      },
+      "schema:cookingMethod" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The method of cooking, such as Frying, Steaming, ...",
+         "rdfs:label" : "cookingMethod",
+         "schema:domainIncludes" : "schema:Recipe",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:ingredients" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A single ingredient used in the recipe, e.g. sugar, flour or garlic.",
+         "rdfs:label" : "ingredients",
+         "rdfs:subPropertyOf" : "schema:supply",
+         "schema:domainIncludes" : "schema:Recipe",
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:supersededBy" : "schema:recipeIngredient"
+      },
+      "schema:nutrition" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Nutrition information about the recipe or menu item.",
+         "rdfs:label" : "nutrition",
+         "schema:domainIncludes" : [
+            "schema:MenuItem",
+            "schema:Recipe"
+         ],
+         "schema:rangeIncludes" : "schema:NutritionInformation"
+      },
+      "schema:recipeCategory" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The category of the recipeâfor example, appetizer, entree, etc.",
+         "rdfs:label" : "recipeCategory",
+         "schema:domainIncludes" : "schema:Recipe",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:recipeCuisine" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The cuisine of the recipe (for example, French or Ethiopian).",
+         "rdfs:label" : "recipeCuisine",
+         "schema:domainIncludes" : "schema:Recipe",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:recipeIngredient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A single ingredient used in the recipe, e.g. sugar, flour or garlic.",
+         "rdfs:label" : "recipeIngredient",
+         "rdfs:subPropertyOf" : "schema:supply",
+         "schema:domainIncludes" : "schema:Recipe",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:recipeInstructions" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A step in making the recipe, in the form of a single item (document, video, etc.) or an ordered list with HowToStep and/or HowToSection items.",
+         "rdfs:label" : "recipeInstructions",
+         "rdfs:subPropertyOf" : "schema:steps",
+         "schema:domainIncludes" : "schema:Recipe",
+         "schema:rangeIncludes" : [
+            "schema:ItemList",
+            "schema:CreativeWork",
+            "schema:Text"
+         ]
+      },
+      "schema:recipeYield" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The quantity produced by the recipe (for example, number of people served, number of servings, etc).",
+         "rdfs:label" : "recipeYield",
+         "rdfs:subPropertyOf" : "schema:yield",
+         "schema:domainIncludes" : "schema:Recipe",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:QuantitativeValue"
+         ]
+      },
+      "schema:suitableForDiet" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates a dietary restriction or guideline for which this recipe or menu item is suitable, e.g. diabetic, halal etc.",
+         "rdfs:label" : "suitableForDiet",
+         "schema:domainIncludes" : [
+            "schema:Recipe",
+            "schema:MenuItem"
+         ],
+         "schema:rangeIncludes" : "schema:RestrictedDiet"
+      }
+   }
+}

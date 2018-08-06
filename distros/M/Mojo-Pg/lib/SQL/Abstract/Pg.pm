@@ -10,26 +10,16 @@ sub insert {
   return $self->SUPER::insert($table, $data, $options);
 }
 
-sub select {
-  my ($self, $table, $fields, @args) = @_;
+sub new {
+  my $self = shift->SUPER::new(@_);
 
-  if (ref $fields eq 'ARRAY') {
-    my @fields;
-    for my $field (@$fields) {
-      if (ref $field eq 'ARRAY') {
-        puke 'field alias must be in the form [$name => $alias]' if @$field < 2;
-        push @fields,
-            $self->_quote($field->[0])
-          . $self->_sqlcase(' as ')
-          . $self->_quote($field->[1]);
-      }
-      elsif (ref $field eq 'SCALAR') { push @fields, $$field }
-      else                           { push @fields, $self->_quote($field) }
-    }
-    $fields = join ', ', @fields;
-  }
+  # -json op
+  push @{$self->{unary_ops}}, {
+    regex   => qr/^json$/,
+    handler => sub { '?', {json => $_[2]} }
+  };
 
-  return $self->SUPER::select($table, $fields, @args);
+  return $self;
 }
 
 sub _insert_returning {
@@ -49,8 +39,10 @@ sub _insert_returning {
           my ($target, $set) = @$conflict;
           puke 'on_conflict value must be in the form [$target, \%set]'
             unless ref $set eq 'HASH';
+          $target = [$target] unless ref $target eq 'ARRAY';
 
-          $conflict_sql = '(' . $self->_quote($target) . ')';
+          $conflict_sql
+            = '(' . join(', ', map { $self->_quote($_) } @$target) . ')';
           $conflict_sql .= $self->_sqlcase(' do update set ');
           my ($set_sql, @set_bind) = $self->_update_set_values($set);
           $conflict_sql .= $set_sql;
@@ -58,7 +50,7 @@ sub _insert_returning {
         },
         ARRAYREFREF => sub { ($conflict_sql, @conflict_bind) = @$$conflict },
         SCALARREF => sub { $conflict_sql = $$conflict },
-        UNDEF     => sub { $conflict_sql = $self->_sqlcase('do nothing') }
+        UNDEF => sub { $conflict_sql = $self->_sqlcase('do nothing') }
       }
     );
     $sql .= $self->_sqlcase(' on conflict ') . $conflict_sql;
@@ -135,6 +127,36 @@ sub _order_by {
   return $sql, @bind;
 }
 
+sub _select_fields {
+  my ($self, $fields) = @_;
+
+  return $fields unless ref $fields eq 'ARRAY';
+
+  my (@fields, @bind);
+  for my $field (@$fields) {
+    $self->_SWITCH_refkind(
+      $field => {
+        ARRAYREF => sub {
+          puke 'field alias must be in the form [$name => $alias]'
+            if @$field < 2;
+          push @fields,
+              $self->_quote($field->[0])
+            . $self->_sqlcase(' as ')
+            . $self->_quote($field->[1]);
+        },
+        ARRAYREFREF => sub {
+          push @fields, shift @$$field;
+          push @bind,   @$$field;
+        },
+        SCALARREF => sub { push @fields, $$field },
+        FALLBACK  => sub { push @fields, $self->_quote($field) }
+      }
+    );
+  }
+
+  return join(', ', @fields), @bind;
+}
+
 sub _table {
   my ($self, $table) = @_;
 
@@ -183,6 +205,17 @@ SQL::Abstract::Pg - PostgreSQL
 L<SQL::Abstract::Pg> extends L<SQL::Abstract> with a few PostgreSQL features
 used by L<Mojo::Pg>.
 
+=head2 JSON
+
+In many places (as supported by L<SQL::Abstract>) you can use the C<-json> unary
+op to encode JSON from Perl data structures.
+
+  # "update some_table set foo = '[1,2,3]' where bar = 23"
+  $abstract->update('some_table', {foo => {-json => [1, 2, 3]}}, {bar => 23});
+
+  # "select * from some_table where foo = '[1,2,3]'"
+  $abstract->select('some_table', '*', {foo => {'=' => {-json => [1, 2, 3]}}});
+
 =head1 INSERT
 
   $abstract->insert($table, \@values || \%fieldvals, \%options);
@@ -206,6 +239,11 @@ This includes operations commonly referred to as C<upsert>.
   # "insert into t (a) values ('b') on conflict (a) do update set a = 'c'"
   $abstract->insert('t', {a => 'b'}, {on_conflict => [a => {a => 'c'}]});
 
+  # "insert into t (a, b) values ('c', 'd')
+  #  on conflict (a, b) do update set a = 'e'"
+  $abstract->insert(
+    't', {a => 'c', b => 'd'}, {on_conflict => [['a', 'b'] => {a => 'e'}]});
+
   # "insert into t (a) values ('b') on conflict (a) do update set a = 'c'"
   $abstract->insert(
     't', {a => 'b'}, {on_conflict => \['(a) do update set a = ?', 'c']});
@@ -219,7 +257,8 @@ This includes operations commonly referred to as C<upsert>.
 
 The C<$fields> argument now also accepts array references containing array
 references with field names and aliases, as well as array references containing
-scalar references to pass literal SQL.
+scalar references to pass literal SQL and array reference references to pass
+literal SQL with bind values.
 
   # "select foo as bar from some_table"
   $abstract->select('some_table', [[foo => 'bar']]);
@@ -229,6 +268,9 @@ scalar references to pass literal SQL.
 
   # "select extract(epoch from foo) as foo, bar from some_table"
   $abstract->select('some_table', [\'extract(epoch from foo) as foo', 'bar']);
+
+  # "select 'test' as foo, bar from some_table"
+  $abstract->select('some_table', [\['? as foo', 'test'], 'bar']);
 
 =head2 JOIN
 
@@ -309,6 +351,6 @@ L<SQL::Abstract::Pg> inherits all methods from L<SQL::Abstract>.
 
 =head1 SEE ALSO
 
-L<Mojo::Pg>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojo::Pg>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

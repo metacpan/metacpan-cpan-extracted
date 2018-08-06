@@ -1,5 +1,8 @@
 Revision history for Retry
 
+1.04    Aug 06 2018
+  * Fix Debian lintian issue in POD
+
 1.02    Jun 24 11:11:00 2017
   * Update author contact details
   * Update Makefile.PL for perl 5.26 compatibility

@@ -69,6 +69,7 @@ SHA
 Schwern
 Shlomi
 Sillitoe
+Sluka
 Smylers
 Steinbrunner
 Szabo
@@ -90,6 +91,7 @@ dagolden
 dirname
 dsteinbrunner
 ether
+fany
 fatalize
 gabiruh
 geraud

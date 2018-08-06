@@ -1,0 +1,96 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:FIBO",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A monetary value or range. This type can be used to describe an amount of money such as $50 USD, or a range as in describing a bank account being suitable for a balance between Â£1,000 and Â£1,000,000 GBP, or the value of a salary, etc. It is recommended to use <a class=\"localLink\" href=\"http://schema.org/PriceSpecification\">PriceSpecification</a> Types to describe the price of an Offer, Invoice, etc.",
+      "rdfs:label" : "MonetaryAmount",
+      "rdfs:subClassOf" : "schema:StructuredValue"
+   },
+   "properties" : {
+      "schema:currency" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The currency in which the monetary amount is expressed (in 3-letter <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217</a> format).",
+         "rdfs:label" : "currency",
+         "schema:domainIncludes" : [
+            "schema:DatedMoneySpecification",
+            "schema:MonetaryAmount"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:maxValue" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The upper value of some characteristic or property.",
+         "rdfs:label" : "maxValue",
+         "schema:domainIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:PropertyValue",
+            "schema:QuantitativeValue",
+            "schema:PropertyValueSpecification"
+         ],
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:minValue" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The lower value of some characteristic or property.",
+         "rdfs:label" : "minValue",
+         "schema:domainIncludes" : [
+            "schema:PropertyValueSpecification",
+            "schema:MonetaryAmount",
+            "schema:QuantitativeValue",
+            "schema:PropertyValue"
+         ],
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:validFrom" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date when the item becomes valid.",
+         "rdfs:label" : "validFrom",
+         "schema:domainIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:Permit",
+            "schema:Demand",
+            "schema:PriceSpecification",
+            "schema:OpeningHoursSpecification",
+            "schema:LocationFeatureSpecification",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:validThrough" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
+         "rdfs:label" : "validThrough",
+         "schema:domainIncludes" : [
+            "schema:Offer",
+            "schema:LocationFeatureSpecification",
+            "schema:OpeningHoursSpecification",
+            "schema:JobPosting",
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount",
+            "schema:Demand"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:value" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "<p>The value of the quantitative value or property value node.</p>\n\n<ul>\n<li>For <a class=\"localLink\" href=\"http://schema.org/QuantitativeValue\">QuantitativeValue</a> and <a class=\"localLink\" href=\"http://schema.org/MonetaryAmount\">MonetaryAmount</a>, the recommended type for values is 'Number'.</li>\n<li>For <a class=\"localLink\" href=\"http://schema.org/PropertyValue\">PropertyValue</a>, it can be 'Text;', 'Number', 'Boolean', or 'StructuredValue'.</li>\n</ul>\n",
+         "rdfs:label" : "value",
+         "schema:domainIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:PropertyValue",
+            "schema:QuantitativeValue"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Boolean",
+            "schema:Number",
+            "schema:Text",
+            "schema:StructuredValue"
+         ]
+      }
+   }
+}

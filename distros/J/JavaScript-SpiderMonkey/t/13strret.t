@@ -1,8 +1,8 @@
 ######################################################################
 # Testcase:     Returning string values from perl 
-# Revision:     $Revision: 1.1 $
-# Last Checkin: $Date: 2006/06/13 13:43:51 $
-# By:           $Author: thomas_busch $
+# Revision:     $Revision$
+# Last Checkin: $Date$
+# By:           $Author$
 #
 # Author:       Marc Relation marc@igneousconsulting.com
 ######################################################################

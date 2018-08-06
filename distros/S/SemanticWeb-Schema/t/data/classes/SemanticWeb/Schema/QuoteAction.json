@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An agent quotes/estimates/appraises an object/product/service with a price at a location/store.",
+      "rdfs:label" : "QuoteAction",
+      "rdfs:subClassOf" : "schema:TradeAction"
+   },
+   "properties" : {}
+}

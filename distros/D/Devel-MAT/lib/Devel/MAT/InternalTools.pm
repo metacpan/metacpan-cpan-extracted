@@ -8,7 +8,7 @@ package Devel::MAT::InternalTools;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 package Devel::MAT::Tool::help;
 
@@ -89,6 +89,11 @@ sub help_cmd
          $tool->find_subcommand( $_ )->CMD_DESC,
       ) for @subs;
 
+      return;
+   }
+
+   if( my $code = $tool->can( "help_cmd" ) ) {
+      $tool->$code();
       return;
    }
 

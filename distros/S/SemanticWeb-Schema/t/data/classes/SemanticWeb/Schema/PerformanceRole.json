@@ -1,0 +1,17 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A PerformanceRole is a Role that some entity places with regard to a theatrical performance, e.g. in a Movie, TVSeries etc.",
+      "rdfs:label" : "PerformanceRole",
+      "rdfs:subClassOf" : "schema:Role"
+   },
+   "properties" : {
+      "schema:characterName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The name of a character played in some acting or performing role, i.e. in a PerformanceRole.",
+         "rdfs:label" : "characterName",
+         "schema:domainIncludes" : "schema:PerformanceRole",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

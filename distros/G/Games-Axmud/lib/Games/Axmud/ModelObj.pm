@@ -919,6 +919,10 @@
         # For worlds that provide a list of commands available in the room (typically instead of an
         #   exit list, but not necessarily), a list of those commands
         $self->{roomCmdList}            = [];
+        # A temporary list of room commands. Set whenever $self->roomCmdList is set. Thereafter,
+        #   when the user types ';roomcommand', the first command is removed from the list,
+        #   executed as a world command, and added to the end of the list
+        $self->{tempRoomCmdList}        = [];
 
         # Records the number of visits to this room for each character. Hash in the form
         #   $visitHash{character_name} = number_of_visits
@@ -1072,6 +1076,8 @@
 
     sub roomCmdList
         { my $self = shift; return @{$self->{roomCmdList}}; }
+    sub tempRoomCmdList
+        { my $self = shift; return @{$self->{tempRoomCmdList}}; }
 
     sub visitHash
         { my $self = shift; return %{$self->{visitHash}}; }

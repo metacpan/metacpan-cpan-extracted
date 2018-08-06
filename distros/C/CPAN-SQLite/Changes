@@ -1,5 +1,8 @@
 Revision history for Perl extension CPAN::SQLite.
 
+0.212 Aug 3, 2018
+  - Fixed a long-standing bug with missing CPAN::Shell on some systems
+
 0.211 Jul 14, 2015
   - Fixed t/06retrieve.t by using predefined CPAN urllist
 

@@ -1,0 +1,47 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An list item, e.g. a step in a checklist or how-to description.",
+      "rdfs:label" : "ListItem",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:item" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An entity represented by an entry in a list or data feed (e.g. an 'artist' in a list of 'artists')â.",
+         "rdfs:label" : "item",
+         "schema:domainIncludes" : [
+            "schema:ListItem",
+            "schema:DataFeedItem"
+         ],
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:nextItem" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A link to the ListItem that follows the current one.",
+         "rdfs:label" : "nextItem",
+         "schema:domainIncludes" : "schema:ListItem",
+         "schema:rangeIncludes" : "schema:ListItem"
+      },
+      "schema:position" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The position of an item in a series or sequence of items.",
+         "rdfs:label" : "position",
+         "schema:domainIncludes" : [
+            "schema:CreativeWork",
+            "schema:ListItem"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Integer"
+         ]
+      },
+      "schema:previousItem" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A link to the ListItem that preceeds the current one.",
+         "rdfs:label" : "previousItem",
+         "schema:domainIncludes" : "schema:ListItem",
+         "schema:rangeIncludes" : "schema:ListItem"
+      }
+   }
+}

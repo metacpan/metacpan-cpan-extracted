@@ -1,0 +1,94 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Nutritional information about the recipe.",
+      "rdfs:label" : "NutritionInformation",
+      "rdfs:subClassOf" : "schema:StructuredValue"
+   },
+   "properties" : {
+      "schema:calories" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of calories.",
+         "rdfs:label" : "calories",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Energy"
+      },
+      "schema:carbohydrateContent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of grams of carbohydrates.",
+         "rdfs:label" : "carbohydrateContent",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Mass"
+      },
+      "schema:cholesterolContent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of milligrams of cholesterol.",
+         "rdfs:label" : "cholesterolContent",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Mass"
+      },
+      "schema:fatContent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of grams of fat.",
+         "rdfs:label" : "fatContent",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Mass"
+      },
+      "schema:fiberContent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of grams of fiber.",
+         "rdfs:label" : "fiberContent",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Mass"
+      },
+      "schema:proteinContent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of grams of protein.",
+         "rdfs:label" : "proteinContent",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Mass"
+      },
+      "schema:saturatedFatContent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of grams of saturated fat.",
+         "rdfs:label" : "saturatedFatContent",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Mass"
+      },
+      "schema:servingSize" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The serving size, in terms of the number of volume or mass.",
+         "rdfs:label" : "servingSize",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:sodiumContent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of milligrams of sodium.",
+         "rdfs:label" : "sodiumContent",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Mass"
+      },
+      "schema:sugarContent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of grams of sugar.",
+         "rdfs:label" : "sugarContent",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Mass"
+      },
+      "schema:transFatContent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of grams of trans fat.",
+         "rdfs:label" : "transFatContent",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Mass"
+      },
+      "schema:unsaturatedFatContent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of grams of unsaturated fat.",
+         "rdfs:label" : "unsaturatedFatContent",
+         "schema:domainIncludes" : "schema:NutritionInformation",
+         "schema:rangeIncludes" : "schema:Mass"
+      }
+   }
+}

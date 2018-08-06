@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Es::Any::Ec - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Ec;
 # This file auto generated from Data\common\main\es_EC.xml
-#	on Fri 13 Apr  7:08:35 am GMT
+#	on Sun  5 Aug  5:59:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -121,51 +121,51 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 				}
 				last SWITCH;
 				}
@@ -195,15 +195,15 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'am' => q{a. m.},
+				'abbreviated' => {
 					'pm' => q{p. m.},
+					'am' => q{a. m.},
 				},
 				'wide' => {
-					'am' => q{a. m.},
 					'pm' => q{p. m.},
+					'am' => q{a. m.},
 				},
-				'abbreviated' => {
+				'narrow' => {
 					'pm' => q{p. m.},
 					'am' => q{a. m.},
 				},

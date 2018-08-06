@@ -833,6 +833,14 @@ Aliases: I<denominator>
 
 =cut
 
+=head2 dedekind_psi
+
+Number.dedekind_psi() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 defs
 
 Number.defs() -> I<Obj>
@@ -1425,6 +1433,14 @@ Return the
 
 =cut
 
+=head2 is_congruent
+
+Number.is_congruent() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_coprime
 
 Number.is_coprime() -> I<Obj>
@@ -1571,7 +1587,15 @@ Number.is_pow() -> I<Obj>
 
 Return the
 
-Aliases: I<is_power>
+Aliases: I<is_power>, I<is_perfect_power>
+
+=cut
+
+=head2 is_powerful
+
+Number.is_powerful() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1669,7 +1693,7 @@ Number.is_sqr() -> I<Obj>
 
 Return the
 
-Aliases: I<is_square>
+Aliases: I<is_square>, I<is_perfect_square>
 
 =cut
 
@@ -1678,6 +1702,8 @@ Aliases: I<is_square>
 Number.is_square_free() -> I<Obj>
 
 Return the
+
+Aliases: I<is_squarefree>
 
 =cut
 
@@ -1903,6 +1929,14 @@ Return the
 
 =cut
 
+=head2 lsb
+
+Number.lsb() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 lucas
 
 Number.lucas() -> I<Obj>
@@ -1978,6 +2012,14 @@ Return the
 =head2 mone
 
 Number.mone() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 msb
+
+Number.msb() -> I<Obj>
 
 Return the
 
@@ -2229,6 +2271,14 @@ Aliases: I<nth_prime>
 
 =cut
 
+=head2 prime_divisors
+
+Number.prime_divisors() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 primepi
 
 Number.primepi() -> I<Obj>
@@ -2247,6 +2297,40 @@ Return the
 
 =cut
 
+=head2 prime_power_divisors
+
+Number.prime_power_divisors() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_power_sigma
+
+Number.prime_power_sigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_power_udivisors
+
+Number.prime_power_udivisors() -> I<Obj>
+
+Return the
+
+Aliases: I<prime_power_unitary_divisors>, I<unitary_prime_power_divisors>
+
+=cut
+
+=head2 prime_power_usigma
+
+Number.prime_power_usigma() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prime_root
 
 Number.prime_root() -> I<Obj>
@@ -2258,6 +2342,40 @@ Return the
 =head2 primes
 
 Number.primes() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_sigma
+
+Number.prime_sigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_udivisors
+
+Number.prime_udivisors() -> I<Obj>
+
+Return the
+
+Aliases: I<prime_unitary_divisors>, I<unitary_prime_divisors>
+
+=cut
+
+=head2 prime_usigma
+
+Number.prime_usigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prime_usigma0
+
+Number.prime_usigma0() -> I<Obj>
 
 Return the
 
@@ -2559,9 +2677,111 @@ Return the
 
 =cut
 
+=head2 square_divisors
+
+Number.square_divisors() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 square_free_count
 
 Number.square_free_count() -> I<Obj>
+
+Return the
+
+Aliases: I<squarefree_count>
+
+=cut
+
+=head2 squarefree_divisors
+
+Number.squarefree_divisors() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 squarefree_sigma
+
+Number.squarefree_sigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 squarefree_sigma0
+
+Number.squarefree_sigma0() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 squarefree_udivisors
+
+Number.squarefree_udivisors() -> I<Obj>
+
+Return the
+
+Aliases: I<squarefree_unitary_divisors>, I<unitary_squarefree_divisors>
+
+=cut
+
+=head2 squarefree_usigma
+
+Number.squarefree_usigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 squarefree_usigma0
+
+Number.squarefree_usigma0() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 square_sigma
+
+Number.square_sigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 square_sigma0
+
+Number.square_sigma0() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 square_udivisors
+
+Number.square_udivisors() -> I<Obj>
+
+Return the
+
+Aliases: I<square_unitary_divisors>, I<unitary_square_divisors>
+
+=cut
+
+=head2 square_usigma
+
+Number.square_usigma() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 square_usigma0
+
+Number.square_usigma0() -> I<Obj>
 
 Return the
 
@@ -2831,7 +3051,7 @@ Number.Ω() -> I<Obj>
 
 Return the
 
-Aliases: I<big_omega>
+Aliases: I<big_omega>, I<bigomega>, I<prime_power_sigma0>
 
 =cut
 
@@ -2841,7 +3061,7 @@ Number.ω() -> I<Obj>
 
 Return the
 
-Aliases: I<omega>
+Aliases: I<omega>, I<prime_sigma0>, I<prime_power_usigma0>
 
 =cut
 

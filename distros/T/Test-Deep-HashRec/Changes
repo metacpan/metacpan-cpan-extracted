@@ -1,5 +1,10 @@
 Release history for Test-Deep-HashRec
 
+0.003     2018-07-30 11:01:08-04:00 America/New_York
+        - drop the use of s///r modifier, again for ancient perls
+        - also //
+        - I am really sick of perl 5.8.
+
 0.002     2018-07-16 08:57:25-04:00 America/Toronto
         - drop the package{...} form for the sake of ancient perls
 

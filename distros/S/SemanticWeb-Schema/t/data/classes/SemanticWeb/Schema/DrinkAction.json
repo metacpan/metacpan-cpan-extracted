@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of swallowing liquids.",
+      "rdfs:label" : "DrinkAction",
+      "rdfs:subClassOf" : "schema:ConsumeAction"
+   },
+   "properties" : {}
+}

@@ -8,7 +8,7 @@ use Log::Log4Cli;
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub MODINFO { "Remove specified parts from structure" }
 
@@ -19,6 +19,15 @@ sub arg_opts {
         $self->SUPER::arg_opts(),
         'strict' => \$self->{OPTS}->{strict},
     )
+}
+
+sub check_rule {
+    my ($self, $rule) = @_;
+
+    die_fatal "At least one path should be specified", 1
+        unless ($rule->{path} and @{$rule->{path}});
+
+    return $self;
 }
 
 sub process_path {
@@ -58,7 +67,8 @@ Blame calculation toggle. Enabled by default.
 
 =item B<--path> E<lt>pathE<gt>
 
-Path in the structure to remove. May be used several times.
+Path in the structure to remove. May be used several times, at least one path
+should be specified.
 
 =item B<--preserve> E<lt>pathE<gt>
 

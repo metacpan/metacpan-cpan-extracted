@@ -1,5 +1,13 @@
 Revision history for Alien-Build-Plugin-Cleanse-BuildDir
 
+0.05      2018-08-01
+  - Clean up the manifest (thanks MANWAR)
+  - Remove redundant directories.
+
+0.04      2018-07-30
+  - Simplify the test dependencies (thanks to PLICEASE) 
+  - Clean up some duplicated POD
+
 0.03      2018-07-29 22:00 +1000
   - More dzil cleanout
 

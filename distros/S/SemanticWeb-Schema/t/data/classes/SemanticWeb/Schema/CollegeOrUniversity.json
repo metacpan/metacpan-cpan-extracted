@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A college, university, or other third-level educational institution.",
+      "rdfs:label" : "CollegeOrUniversity",
+      "rdfs:subClassOf" : "schema:EducationalOrganization"
+   },
+   "properties" : {}
+}

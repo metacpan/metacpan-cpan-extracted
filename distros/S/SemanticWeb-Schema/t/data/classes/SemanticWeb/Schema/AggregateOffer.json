@@ -1,0 +1,51 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "When a single product is associated with multiple offers (for example, the same pair of shoes is offered by different merchants), then AggregateOffer can be used.",
+      "rdfs:label" : "AggregateOffer",
+      "rdfs:subClassOf" : "schema:Offer"
+   },
+   "properties" : {
+      "schema:highPrice" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The highest price of all offers available.",
+         "rdfs:label" : "highPrice",
+         "schema:domainIncludes" : "schema:AggregateOffer",
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:Text"
+         ]
+      },
+      "schema:lowPrice" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The lowest price of all offers available.",
+         "rdfs:label" : "lowPrice",
+         "schema:domainIncludes" : "schema:AggregateOffer",
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:Text"
+         ]
+      },
+      "schema:offerCount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of offers for the product.",
+         "rdfs:label" : "offerCount",
+         "schema:domainIncludes" : "schema:AggregateOffer",
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:offers" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event.",
+         "rdfs:label" : "offers",
+         "schema:domainIncludes" : [
+            "schema:Product",
+            "schema:MenuItem",
+            "schema:CreativeWork",
+            "schema:AggregateOffer",
+            "schema:Event",
+            "schema:Service"
+         ],
+         "schema:rangeIncludes" : "schema:Offer"
+      }
+   }
+}

@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::GitHub::Update;
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use JSON::MaybeXS;
 use Moose;
@@ -13,10 +13,11 @@ extends 'Dist::Zilla::Plugin::GitHub';
 
 with 'Dist::Zilla::Role::AfterRelease';
 
+# deprecated and no longer documented. Use 'metacpan' instead!
 has cpan => (
     is      => 'ro',
     isa     => 'Bool',
-    default => 1
+    default => 0
 );
 
 has p3rl => (
@@ -28,7 +29,7 @@ has p3rl => (
 has metacpan => (
     is      => 'ro',
     isa     => 'Bool',
-    default => 0
+    default => 1
 );
 
 has meta_home => (
@@ -50,7 +51,10 @@ has meta_home => (
 #pod     login LoginName
 #pod     password GitHubpassword
 #pod
-#pod (if only the login name is set, the password will be asked interactively)
+#pod (if only the login name is set, the password will be asked interactively).
+#pod
+#pod You can also generate an access token for "full control over repositories" by following
+#pod L<these instructions|https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/>,
 #pod
 #pod then, in your F<dist.ini>:
 #pod
@@ -76,6 +80,11 @@ around dump_config => sub
     my $config = $self->$orig;
 
     my $option = first { $self->$_ } qw(meta_home metacpan p3rl cpan);
+    if ($option eq 'cpan') {
+        $self->log->warn('the \'cpan\' option has been removed: please use \'metacpan\' instead');
+        $option = 'metacpan';
+    }
+
     $config->{+__PACKAGE__} = {
         $option => ($self->$option ? 1 : 0),
     };
@@ -114,9 +123,6 @@ sub after_release {
         my $guess_name = $dist_name;
         $guess_name =~ s/\-/\:\:/g;
         $params->{homepage} = "http://p3rl.org/$guess_name";
-    } elsif ($self->cpan) {
-        $self->log("Using CPAN URL");
-        $params->{homepage} = "http://search.cpan.org/dist/$dist_name/";
     }
 
     my $url = $self->api."/repos/$repo_name";
@@ -174,7 +180,7 @@ Dist::Zilla::Plugin::GitHub::Update - Update a GitHub repo's info on release
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -189,7 +195,10 @@ in the (optionally GPG-encrypted) C<~/.github> file as follows:
     login LoginName
     password GitHubpassword
 
-(if only the login name is set, the password will be asked interactively)
+(if only the login name is set, the password will be asked interactively).
+
+You can also generate an access token for "full control over repositories" by following
+L<these instructions|https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/>,
 
 then, in your F<dist.ini>:
 
@@ -223,27 +232,19 @@ when it belongs to another GitHub user/organization.
 The name of the Git remote pointing to the GitHub repository (C<"origin"> by
 default). This is used when trying to guess the repository name.
 
-=item C<cpan>
-
-The GitHub homepage field will be set to the CPAN page (search.cpan.org) of the
-module if this option is set to true (default),
-
 =item C<p3rl>
 
 The GitHub homepage field will be set to the p3rl.org shortened URL
-(e.g. C<http://p3rl.org/My::Module>) if this option is set to true (default is
+(e.g. C<http://p3rl.org/Dist::Zilla::Plugin::GitHub>) if this option is set to true (default is
 false).
-
-This takes precedence over the C<cpan> option (if both are true, p3rl will be
-used).
 
 =item C<metacpan>
 
 The GitHub homepage field will be set to the metacpan.org distribution URL
-(e.g. C<http://metacpan.org/release/My-Module>) if this option is set to true
-(default is false).
+(e.g. C<http://metacpan.org/release/Dist-Zilla-Plugin-GitHub>) if this option is set to true
+(default).
 
-This takes precedence over the C<cpan> and C<p3rl> options (if all three are
+This takes precedence over the C<p3rl> options (if both are
 true, metacpan will be used).
 
 =item C<meta_home>
@@ -252,8 +253,8 @@ The GitHub homepage field will be set to the value present in the dist meta
 (e.g. the one set by other plugins) if this option is set to true (default is
 false). If no value is present in the dist meta, this option is ignored.
 
-This takes precedence over the C<metacpan>, C<cpan> and C<p3rl> options (if all
-four are true, meta_home will be used).
+This takes precedence over the C<metacpan> and C<p3rl> options (if all
+three are true, meta_home will be used).
 
 =item C<prompt_2fa>
 

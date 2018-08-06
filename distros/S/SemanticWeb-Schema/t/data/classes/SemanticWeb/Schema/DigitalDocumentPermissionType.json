@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A type of permission which can be granted for accessing a digital document.",
+      "rdfs:label" : "DigitalDocumentPermissionType",
+      "rdfs:subClassOf" : "schema:Enumeration"
+   },
+   "properties" : {}
+}

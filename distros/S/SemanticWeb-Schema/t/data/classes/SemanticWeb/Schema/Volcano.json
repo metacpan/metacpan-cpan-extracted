@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A volcano, like Fuji san.",
+      "rdfs:label" : "Volcano",
+      "rdfs:subClassOf" : "schema:Landform"
+   },
+   "properties" : {}
+}

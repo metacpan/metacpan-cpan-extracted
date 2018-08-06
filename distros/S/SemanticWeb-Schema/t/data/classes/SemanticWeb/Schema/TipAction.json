@@ -1,0 +1,33 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of giving money voluntarily to a beneficiary in recognition of services rendered.",
+      "rdfs:label" : "TipAction",
+      "rdfs:subClassOf" : "schema:TradeAction"
+   },
+   "properties" : {
+      "schema:recipient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The participant who is at the receiving end of the action.",
+         "rdfs:label" : "recipient",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : [
+            "schema:TipAction",
+            "schema:GiveAction",
+            "schema:CommunicateAction",
+            "schema:PayAction",
+            "schema:SendAction",
+            "schema:Message",
+            "schema:ReturnAction",
+            "schema:AuthorizeAction",
+            "schema:DonateAction"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:ContactPoint",
+            "schema:Organization",
+            "schema:Audience",
+            "schema:Person"
+         ]
+      }
+   }
+}

@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::SizeLimitError
 Perl data type class for the XML Schema defined complexType
 SizeLimitError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Indicates that the number of entries in the request or response exceeds the system limit. 
 
 
 

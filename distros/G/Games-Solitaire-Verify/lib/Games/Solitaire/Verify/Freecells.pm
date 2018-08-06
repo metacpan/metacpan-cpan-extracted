@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Freecells;
-$Games::Solitaire::Verify::Freecells::VERSION = '0.1800';
+$Games::Solitaire::Verify::Freecells::VERSION = '0.1900';
 use warnings;
 use strict;
 
@@ -12,64 +12,66 @@ use Games::Solitaire::Verify::Card;
 use List::Util qw(first);
 
 # _s is the string.
-__PACKAGE__->mk_acc_ref([qw(
-    _count
-    _cells
-    _s
-    )]);
+__PACKAGE__->mk_acc_ref(
+    [
+        qw(
+            _count
+            _cells
+            _s
+            )
+    ]
+);
 
 
 sub _input_from_string
 {
     my $self = shift;
-    my $str = shift;
+    my $str  = shift;
 
-    if ($str !~ m{\AFreecells:}gms)
+    if ( $str !~ m{\AFreecells:}gms )
     {
         Games::Solitaire::Verify::Exception::Parse::State::Freecells->throw(
-            error => "Wrong Freecell String",
-        );
+            error => "Wrong Freecell String", );
     }
 
-    POS:
-    for my $pos (0 .. ($self->count()-1))
+POS:
+    for my $pos ( 0 .. ( $self->count() - 1 ) )
     {
-        if ($str =~ m{\G\z}cg)
+        if ( $str =~ m{\G\z}cg )
         {
             last POS;
         }
-        elsif ($str =~ m{\G  (..)}gms)
+        elsif ( $str =~ m{\G  (..)}gms )
         {
             my $card_s = $1;
-            $self->assign($pos, $self->_parse_freecell_card($card_s))
+            $self->assign( $pos, $self->_parse_freecell_card($card_s) );
         }
         else
         {
-            Games::Solitaire::Verify::Exception::Parse::State::Freecells->throw(
-                error => "Wrong Freecell String",
-            );
+            Games::Solitaire::Verify::Exception::Parse::State::Freecells
+                ->throw( error => "Wrong Freecell String", );
         }
     }
 }
 
 sub _init
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    if (! exists($args->{count}))
+    if ( !exists( $args->{count} ) )
     {
         die "The count was not specified for the freecells";
     }
 
-    $self->_count($args->{count});
+    $self->_count( $args->{count} );
 
-    $self->_s('Freecells:' . ('    ' x $self->_count));
+    $self->_s( 'Freecells:' . ( '    ' x $self->_count ) );
 
-    $self->_cells([(undef) x $self->_count()]);
+    $self->_cells( [ (undef) x $self->_count() ] );
 
-    if (exists($args->{string}))
+    if ( exists( $args->{string} ) )
     {
-        return $self->_input_from_string($args->{string});
+        return $self->_input_from_string( $args->{string} );
     }
 
     return;
@@ -77,17 +79,16 @@ sub _init
 
 sub _parse_freecell_card
 {
-    my ($self, $s) = @_;
+    my ( $self, $s ) = @_;
 
-    return
-    (
-        ($s eq q{  })
-            ? undef()
-            : Games::Solitaire::Verify::Card->new(
-                {
-                    string => $s,
-                }
-            )
+    return (
+        ( $s eq q{  } )
+        ? undef()
+        : Games::Solitaire::Verify::Card->new(
+            {
+                string => $s,
+            }
+        )
     );
 }
 
@@ -102,7 +103,7 @@ sub count
 
 sub cell
 {
-    my ($self, $idx) = @_;
+    my ( $self, $idx ) = @_;
 
     return $self->_cells()->[$idx];
 }
@@ -110,10 +111,13 @@ sub cell
 
 sub assign
 {
-    my ($self, $idx, $card) = @_;
+    my ( $self, $idx, $card ) = @_;
 
     $self->_cells()->[$idx] = $card;
-    substr($self->{_s}, length('Freecells:')+($idx << 2)+2,2,(defined($card) ? $card->fast_s : '  '));
+    substr(
+        $self->{_s}, length('Freecells:') + ( $idx << 2 ) + 2,
+        2, ( defined($card) ? $card->fast_s : '  ' )
+    );
 
     return;
 }
@@ -121,14 +125,14 @@ sub assign
 
 sub to_string
 {
-    (my $r = $_[0]->{_s}) =~ s# +\z##;
+    ( my $r = $_[0]->{_s} ) =~ s# +\z##;
     return $r;
 }
 
 
 sub cell_clone
 {
-    my ($self, $pos) = @_;
+    my ( $self, $pos ) = @_;
 
     my $card = $self->cell($pos);
 
@@ -138,29 +142,27 @@ sub cell_clone
 
 sub clear
 {
-    my ($self, $pos) = @_;
+    my ( $self, $pos ) = @_;
 
-    $self->assign($pos, undef());
+    $self->assign( $pos, undef() );
 
     return;
 }
-
 
 
 sub clone
 {
     my $self = shift;
 
-    my $copy =
-        __PACKAGE__->new(
-            {
-                count => $self->count(),
-            }
-        );
+    my $copy = __PACKAGE__->new(
+        {
+            count => $self->count(),
+        }
+    );
 
-    foreach my $pos (0 .. ($self->count()-1))
+    foreach my $pos ( 0 .. ( $self->count() - 1 ) )
     {
-        $copy->assign($pos, $self->cell_clone($pos));
+        $copy->assign( $pos, $self->cell_clone($pos) );
     }
 
     return $copy;
@@ -173,9 +175,9 @@ sub num_empty
 
     my $count = 0;
 
-    foreach my $fc_idx (0 .. ($self->count()-1) )
+    foreach my $fc_idx ( 0 .. ( $self->count() - 1 ) )
     {
-        if (!defined($self->cell($fc_idx)))
+        if ( !defined( $self->cell($fc_idx) ) )
         {
             $count++;
         }
@@ -183,7 +185,7 @@ sub num_empty
     return $count;
 }
 
-1; # End of Games::Solitaire::Verify::Freecells
+1;    # End of Games::Solitaire::Verify::Freecells
 
 __END__
 
@@ -198,7 +200,7 @@ Freecells in games such as Freecell, Baker's Game, or Seahaven Towers
 
 =head1 VERSION
 
-version 0.1800
+version 0.1900
 
 =head1 SYNOPSIS
 
@@ -208,7 +210,7 @@ version 0.1800
 
 =head1 VERSION
 
-version 0.1800
+version 0.1900
 
 =head1 METHODS
 

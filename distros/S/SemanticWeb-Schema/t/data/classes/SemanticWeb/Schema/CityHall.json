@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A city hall.",
+      "rdfs:label" : "CityHall",
+      "rdfs:subClassOf" : "schema:GovernmentBuilding"
+   },
+   "properties" : {}
+}

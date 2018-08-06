@@ -5,8 +5,9 @@ use warnings;
 use WebService::Hexonet::Connector::Response;
 use WebService::Hexonet::Connector::Util;
 use LWP::UserAgent;
+use Data::Dumper;
 
-our $VERSION = '1.05';
+our $VERSION = '1.11';
 
 sub new {
     my $class = shift;
@@ -16,7 +17,18 @@ sub new {
         delete $self->{$key};
         $self->{ lc $key } = $value;
     }
+    $self->{"debugMode"} = 0;
     return bless $self, $class;
+}
+
+sub enableDebugMode {
+    my $self = shift;
+    $self->{"debugMode"} = 1;
+}
+
+sub disableDebugMode {
+    my $self = shift;
+    $self->{"debugMode"} = 0;
 }
 
 sub call {
@@ -70,19 +82,35 @@ sub call_raw_http {
             $post->{s_user} = $config->{user};
         }
     }
+    my $r = $self->{_useragent}->post( $url, $post );
+    if ( $r->is_success ) {
+        $r = $r->decoded_content;
+    }
+    else {
+        my $err = $r->status_line;
+        $r =
+            "[RESPONSE]\r\n"
+          . "CODE=421\r\n"
+          . "DESCRIPTION=HTTP communication failed;$err\r\n"
+          . "EOF\r\n";
 
-    my $response = $self->{_useragent}->post( $url, $post );
-    return $response->content();
-
+    }
+    if ( $self->{"debugMode"} ) {
+        print STDERR Dumper($command);
+        print STDERR Dumper($post);
+        print STDERR Dumper($r);
+    }
+    return $r;
 }
 
 sub _get_useragent {
     my $self = shift;
     return $self->{_useragent} if exists $self->{_useragent};
-    $self->{_useragent} = new LWP::UserAgent(
+    $self->{_useragent} = LWP::UserAgent->new(
         agent      => "Hexonet-perl/$WebService::Hexonet::Connector::VERSION",
-        keep_alive => 4
+        keep_alive => 4,
     );
+    $self->{_useragent}->default_header( 'Expect', '' );
     return $self->{_useragent};
 }
 
@@ -119,6 +147,14 @@ Supported configuration data keys are:
 - entity - Backend system entity; use "54cd" for LIVE system and "1234" for OT&E system
 - user - to have a view into subuser account data
 - role - in case you want to login with a role user account that is directly under the given uid
+
+=item C<enableDebugMode()>
+
+Activate debug output
+
+=item C<disableDebugMode()>
+
+Disable debug output (default)
 
 =item C<call(command, config)>
 

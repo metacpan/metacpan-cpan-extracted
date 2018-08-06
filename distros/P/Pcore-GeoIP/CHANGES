@@ -1,3 +1,6 @@
+v1.2.7 2018-08-03T23:58:55Z
+ - Pcore::HTTP refactoring
+
 v1.2.6 2018-05-06T05:23:08Z
  - usr MaxMind::DB::Reader only on windows
 

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Naq - Package for language Nama
 
 package Locale::CLDR::Locales::Naq;
 # This file auto generated from Data\common\main\naq.xml
-#	on Fri 13 Apr  7:21:06 am GMT
+#	on Sun  5 Aug  6:13:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -556,6 +556,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Mauritania Ouguiya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Mauritania Ouguiya),
 			},
 		},
@@ -626,6 +631,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Sao Tome and Principe Dobra \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Sao Tome and Principe Dobra),
 			},
@@ -830,13 +840,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{ǃuias},
-					'am' => q{ǁgoagas},
-				},
 				'abbreviated' => {
-					'pm' => q{ǃuias},
 					'am' => q{ǁgoagas},
+					'pm' => q{ǃuias},
+				},
+				'wide' => {
+					'am' => q{ǁgoagas},
+					'pm' => q{ǃuias},
 				},
 			},
 		},

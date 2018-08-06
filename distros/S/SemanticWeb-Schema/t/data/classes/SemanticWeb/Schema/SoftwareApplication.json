@@ -1,0 +1,207 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A software application.",
+      "rdfs:label" : "SoftwareApplication",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:applicationCategory" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Type of software application, e.g. 'Game, Multimedia'.",
+         "rdfs:label" : "applicationCategory",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text"
+         ]
+      },
+      "schema:applicationSubCategory" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Subcategory of the application, e.g. 'Arcade Game'.",
+         "rdfs:label" : "applicationSubCategory",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      },
+      "schema:applicationSuite" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The name of the application suite to which the application belongs (e.g. Excel belongs to Office).",
+         "rdfs:label" : "applicationSuite",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:availableOnDevice" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Device required to run the application. Used in cases where a specific make/model is required to run the application.",
+         "rdfs:label" : "availableOnDevice",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:countriesNotSupported" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Countries for which the application is not supported. You can also provide the two-letter ISO 3166-1 alpha-2 country code.",
+         "rdfs:label" : "countriesNotSupported",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:countriesSupported" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Countries for which the application is supported. You can also provide the two-letter ISO 3166-1 alpha-2 country code.",
+         "rdfs:label" : "countriesSupported",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:device" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Device required to run the application. Used in cases where a specific make/model is required to run the application.",
+         "rdfs:label" : "device",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:supersededBy" : "schema:availableOnDevice"
+      },
+      "schema:downloadUrl" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "If the file can be downloaded, URL to download the binary.",
+         "rdfs:label" : "downloadUrl",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:featureList" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Features or modules provided by this application (and possibly required by other applications).",
+         "rdfs:label" : "featureList",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text"
+         ]
+      },
+      "schema:fileSize" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Size of the application / package (e.g. 18MB). In the absence of a unit (MB, KB etc.), KB will be assumed.",
+         "rdfs:label" : "fileSize",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:installUrl" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "URL at which the app may be installed, if different from the URL of the item.",
+         "rdfs:label" : "installUrl",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:memoryRequirements" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Minimum memory requirements.",
+         "rdfs:label" : "memoryRequirements",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text"
+         ]
+      },
+      "schema:operatingSystem" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Operating systems supported (Windows 7, OSX 10.6, Android 1.6).",
+         "rdfs:label" : "operatingSystem",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:permissions" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Permission(s) required to run the app (for example, a mobile app may require full internet access or may run only on wifi).",
+         "rdfs:label" : "permissions",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:processorRequirements" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Processor architecture required to run the application (e.g. IA64).",
+         "rdfs:label" : "processorRequirements",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:releaseNotes" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Description of what changed in this version.",
+         "rdfs:label" : "releaseNotes",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      },
+      "schema:requirements" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Component dependency requirements for application. This includes runtime environments and shared libraries that are not included in the application distribution package, but required to run the application (Examples: DirectX, Java or .NET runtime).",
+         "rdfs:label" : "requirements",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ],
+         "schema:supersededBy" : "schema:softwareRequirements"
+      },
+      "schema:screenshot" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A link to a screenshot image of the app.",
+         "rdfs:label" : "screenshot",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : [
+            "schema:ImageObject",
+            "schema:URL"
+         ]
+      },
+      "schema:softwareAddOn" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Additional content for a software application.",
+         "rdfs:label" : "softwareAddOn",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:SoftwareApplication"
+      },
+      "schema:softwareHelp" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Software application help.",
+         "rdfs:label" : "softwareHelp",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:CreativeWork"
+      },
+      "schema:softwareRequirements" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Component dependency requirements for application. This includes runtime environments and shared libraries that are not included in the application distribution package, but required to run the application (Examples: DirectX, Java or .NET runtime).",
+         "rdfs:label" : "softwareRequirements",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text"
+         ]
+      },
+      "schema:softwareVersion" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Version of the software instance.",
+         "rdfs:label" : "softwareVersion",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:storageRequirements" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Storage requirements (free space required).",
+         "rdfs:label" : "storageRequirements",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text"
+         ]
+      },
+      "schema:supportingData" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Supporting data for a SoftwareApplication.",
+         "rdfs:label" : "supportingData",
+         "schema:domainIncludes" : "schema:SoftwareApplication",
+         "schema:rangeIncludes" : "schema:DataFeed"
+      }
+   }
+}

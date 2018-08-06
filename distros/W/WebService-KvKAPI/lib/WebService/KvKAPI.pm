@@ -3,10 +3,11 @@ use Moose;
 
 # ABSTRACT: Query the Dutch Chamber of Commerence (KvK) API
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use namespace::autoclean;
-use OpenAPI::Client;
+use OpenAPI::Client 0.17;
 use Carp;
+use Try::Tiny;
 
 with 'MooseX::Log::Log4perl';
 
@@ -75,7 +76,14 @@ sub profile {
 sub api_call {
     my ($self, $operation, $query) = @_;
 
-    my $tx = $self->client->$operation({ %$query, user_key => $self->api_key });
+    my $tx = try {
+        $self->client->call(
+            $operation => { %{$query}, user_key => $self->api_key }
+        );
+    }
+    catch {
+        die("Error calling KvK API with operation '$operation': '$_'", $/);
+    };
 
     if ($tx->error) {
         croak(
@@ -119,7 +127,7 @@ WebService::KvKAPI - Query the Dutch Chamber of Commerence (KvK) API
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

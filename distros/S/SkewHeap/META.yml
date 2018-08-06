@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/sysread/SkewHeap/issues
   homepage: https://github.com/sysread/SkewHeap
   repository: https://github.com/sysread/SkewHeap.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::OperatorError
 Perl data type class for the XML Schema defined complexType
 OperatorError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Errors due to the use of unsupported operations. 
 
 
 

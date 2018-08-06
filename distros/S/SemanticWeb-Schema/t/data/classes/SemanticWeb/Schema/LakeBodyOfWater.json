@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A lake (for example, Lake Pontrachain).",
+      "rdfs:label" : "LakeBodyOfWater",
+      "rdfs:subClassOf" : "schema:BodyOfWater"
+   },
+   "properties" : {}
+}

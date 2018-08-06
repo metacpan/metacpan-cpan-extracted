@@ -10,6 +10,7 @@ use Test::More tests => 1345;
 use Sport::Analytics::NHL::Report;
 use Sport::Analytics::NHL::Util;
 use Sport::Analytics::NHL::Test;
+use Sport::Analytics::NHL::Tools;
 
 my $report;
 $report = Sport::Analytics::NHL::Report->new({

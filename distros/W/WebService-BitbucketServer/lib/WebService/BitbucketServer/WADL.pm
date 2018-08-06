@@ -4,7 +4,7 @@ package WebService::BitbucketServer::WADL;
 use warnings;
 use strict;
 
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 use WebService::BitbucketServer::Spec qw(api_info documentation_url package_name sub_name);
 
@@ -474,8 +474,8 @@ sub _format_preformatted {
     my $text = shift;
 
     my $formatted = eval {
-        require JSON;
-        my $json = JSON->new->canonical->utf8->pretty;
+        require JSON::MaybeXS;
+        my $json = JSON::MaybeXS->new(canonical => 1, pretty => 1, utf8 => 1);
         $json->encode($json->decode($text));
     } || $text;
 
@@ -528,7 +528,7 @@ WebService::BitbucketServer::WADL - Subroutines for parsing WADL and generating 
 
 =head1 VERSION
 
-version 0.604
+version 0.605
 
 =head1 FUNCTIONS
 

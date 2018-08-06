@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A media season e.g. tv, radio, video game etc.",
+      "rdfs:label" : "Season",
+      "rdfs:subClassOf" : "schema:CreativeWork",
+      "schema:supersededBy" : "schema:CreativeWorkSeason"
+   },
+   "properties" : {}
+}

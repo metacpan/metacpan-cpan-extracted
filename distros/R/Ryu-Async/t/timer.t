@@ -35,7 +35,7 @@ $loop->add(
 		is($count, 10, 'have 10');
         my $elapsed = Time::HiRes::time - $start;
         note 'Elapsed ' . $elapsed . 's';
-		cmp_deeply($elapsed, num(1.0, 0.15), 'elapsed time looks about right');
+		cmp_deeply($elapsed, num(2.0, 0.15), 'elapsed time looks about right');
 	}
 	is_refcount($timer, 1, 'have only one ref after completion');
 	dispose($timer);

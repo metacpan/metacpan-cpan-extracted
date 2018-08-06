@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of applying an object to its intended purpose.",
+      "rdfs:label" : "UseAction",
+      "rdfs:subClassOf" : "schema:ConsumeAction"
+   },
+   "properties" : {}
+}

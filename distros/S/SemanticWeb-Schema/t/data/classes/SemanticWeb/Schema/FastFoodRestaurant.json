@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A fast-food restaurant.",
+      "rdfs:label" : "FastFoodRestaurant",
+      "rdfs:subClassOf" : "schema:FoodEstablishment"
+   },
+   "properties" : {}
+}

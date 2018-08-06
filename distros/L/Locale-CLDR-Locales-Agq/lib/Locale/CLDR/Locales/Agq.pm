@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Agq - Package for language Aghem
 
 package Locale::CLDR::Locales::Agq;
 # This file auto generated from Data\common\main\agq.xml
-#	on Fri 13 Apr  7:00:45 am GMT
+#	on Sun  5 Aug  5:50:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -591,6 +591,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ùgueya è Mùlètenyìa \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ùgueya è Mùlètenyìa),
 			},
 		},
@@ -655,6 +660,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dɔbàlà è Sàwu Tɔ̀me à Pèlènsipè \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dɔbàlà è Sàwu Tɔ̀me à Pèlènsipè),
 			},
@@ -854,13 +864,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{a.g},
 					'pm' => q{a.k},
 				},
-				'abbreviated' => {
-					'pm' => q{a.k},
+				'wide' => {
 					'am' => q{a.g},
+					'pm' => q{a.k},
 				},
 			},
 		},
@@ -940,7 +950,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Ed => q{d E},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -964,7 +974,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Ed => q{d E},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

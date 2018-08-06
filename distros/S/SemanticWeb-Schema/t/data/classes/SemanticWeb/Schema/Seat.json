@@ -1,0 +1,41 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Used to describe a seat, such as a reserved seat in an event reservation.",
+      "rdfs:label" : "Seat",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:seatNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The location of the reserved seat (e.g., 27).",
+         "rdfs:label" : "seatNumber",
+         "schema:domainIncludes" : "schema:Seat",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:seatRow" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The row location of the reserved seat (e.g., B).",
+         "rdfs:label" : "seatRow",
+         "schema:domainIncludes" : "schema:Seat",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:seatSection" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The section location of the reserved seat (e.g. Orchestra).",
+         "rdfs:label" : "seatSection",
+         "schema:domainIncludes" : "schema:Seat",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:seatingType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type/class of the seat.",
+         "rdfs:label" : "seatingType",
+         "schema:domainIncludes" : "schema:Seat",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:QualitativeValue"
+         ]
+      }
+   }
+}

@@ -1,0 +1,64 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Computer programming source code. Example: Full (compile ready) solutions, code snippet samples, scripts, templates.",
+      "rdfs:label" : "SoftwareSourceCode",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:codeRepository" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Link to the repository where the un-compiled, human readable code and related code is located (SVN, github, CodePlex).",
+         "rdfs:label" : "codeRepository",
+         "schema:domainIncludes" : "schema:SoftwareSourceCode",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:codeSampleType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "What type of code sample: full (compile ready) solution, code snippet, inline code, scripts, template.",
+         "rdfs:label" : "codeSampleType",
+         "schema:domainIncludes" : "schema:SoftwareSourceCode",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:programmingLanguage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The computer programming language.",
+         "rdfs:label" : "programmingLanguage",
+         "schema:domainIncludes" : "schema:SoftwareSourceCode",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:ComputerLanguage"
+         ]
+      },
+      "schema:runtime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Runtime platform or script interpreter dependencies (Example - Java v1, Python2.3, .Net Framework 3.0).",
+         "rdfs:label" : "runtime",
+         "schema:domainIncludes" : "schema:SoftwareSourceCode",
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:supersededBy" : "schema:runtimePlatform"
+      },
+      "schema:runtimePlatform" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Runtime platform or script interpreter dependencies (Example - Java v1, Python2.3, .Net Framework 3.0).",
+         "rdfs:label" : "runtimePlatform",
+         "schema:domainIncludes" : "schema:SoftwareSourceCode",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:sampleType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "What type of code sample: full (compile ready) solution, code snippet, inline code, scripts, template.",
+         "rdfs:label" : "sampleType",
+         "schema:domainIncludes" : "schema:SoftwareSourceCode",
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:supersededBy" : "schema:codeSampleType"
+      },
+      "schema:targetProduct" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Target Operating System / Product to which the code applies.  If applies to several versions, just the product name can be used.",
+         "rdfs:label" : "targetProduct",
+         "schema:domainIncludes" : "schema:SoftwareSourceCode",
+         "schema:rangeIncludes" : "schema:SoftwareApplication"
+      }
+   }
+}

@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Devel::Confess" => 0,
-    "Finance::Currency::FiatX" => "0.007",
+    "Finance::Currency::FiatX" => "0.010",
     "List::Util" => "1.45",
     "Locale::Codes::Currency_Codes" => 0,
     "Log::ger" => "0.023",
@@ -63,7 +63,7 @@ my %WriteMakefileArgs = (
     "Test::SQL::Schema::Versioned" => 0,
     "Test::WithDB" => "0.100"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -90,7 +90,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "Devel::Confess" => 0,
   "File::Spec" => 0,
-  "Finance::Currency::FiatX" => "0.007",
+  "Finance::Currency::FiatX" => "0.010",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.45",

@@ -9,10 +9,11 @@ build_requires:
   File::BaseDir: '0.03'
   File::DesktopEntry: '0.04'
   Pod::Usage: '0'
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '6.30'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +28,7 @@ requires:
 resources:
   bugtracker: https://github.com/mbeijen/File-MimeInfo/issues
   repository: https://github.com/mbeijen/File-MimeInfo
-version: '0.28'
+version: '0.29'
 x_contributors:
   - 'Bernhard RosenkrÃ¤nzer <bero@lindev.ch>'
   - 'Christian Ludwig <chrissicool@gmail.com>'
@@ -37,7 +38,9 @@ x_contributors:
   - 'Michiel Beijen <michiel.beijen@gmail.com>'
   - 'Nitish Bezzala <nbezzala@yahoo.com>'
   - 'Patrick Burroughs (Celti) <celti@celti.name>'
+  - 'Rudolf Leermakers <rudolf@hatsuseno.org>'
   - 'Sean Smith <ssmith@ncsgraphics.com>'
   - 'Stefan Seifert <nine@detonation.org>'
   - 'brian m. carlson <sandals@crustytoothpaste.net>'
+  - 'gregor herrmann <gregoa@debian.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A general contractor.",
+      "rdfs:label" : "GeneralContractor",
+      "rdfs:subClassOf" : "schema:HomeAndConstructionBusiness"
+   },
+   "properties" : {}
+}

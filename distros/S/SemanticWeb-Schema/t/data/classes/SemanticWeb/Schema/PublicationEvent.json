@@ -1,0 +1,37 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A PublicationEvent corresponds indifferently to the event of publication for a CreativeWork of any type e.g. a broadcast event, an on-demand event, a book/journal publication via a variety of delivery media.",
+      "rdfs:label" : "PublicationEvent",
+      "rdfs:subClassOf" : "schema:Event"
+   },
+   "properties" : {
+      "schema:free" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A flag to signal that the item, event, or place is accessible for free.",
+         "rdfs:label" : "free",
+         "schema:domainIncludes" : "schema:PublicationEvent",
+         "schema:rangeIncludes" : "schema:Boolean",
+         "schema:supersededBy" : "schema:isAccessibleForFree"
+      },
+      "schema:isAccessibleForFree" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A flag to signal that the item, event, or place is accessible for free.",
+         "rdfs:label" : "isAccessibleForFree",
+         "schema:domainIncludes" : [
+            "schema:CreativeWork",
+            "schema:PublicationEvent",
+            "schema:Place",
+            "schema:Event"
+         ],
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:publishedOn" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A broadcast service associated with the publication event.",
+         "rdfs:label" : "publishedOn",
+         "schema:domainIncludes" : "schema:PublicationEvent",
+         "schema:rangeIncludes" : "schema:BroadcastService"
+      }
+   }
+}

@@ -1,0 +1,21 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1061",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A fact-checking review of claims made (or reported) in some creative work (referenced via itemReviewed).",
+      "rdfs:label" : "ClaimReview",
+      "rdfs:subClassOf" : "schema:Review",
+      "schema:category" : "issue-1061"
+   },
+   "properties" : {
+      "schema:claimReviewed" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1061",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A short summary of the specific claims reviewed in a ClaimReview.",
+         "rdfs:label" : "claimReviewed",
+         "schema:category" : "issue-1061",
+         "schema:domainIncludes" : "schema:ClaimReview",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

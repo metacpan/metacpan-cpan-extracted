@@ -12,11 +12,11 @@ use strict;
 use warnings;
 
 package Pod::Markdown;
-# git description: v3.004-0-g69a7b15
+# git description: v3.005-2-g8647fc4
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Convert POD to Markdown
-$Pod::Markdown::VERSION = '3.005';
+$Pod::Markdown::VERSION = '3.100';
 use Pod::Simple 3.27 (); # detected_encoding and keep_encoding bug fix
 use parent qw(Pod::Simple::Methody);
 use Encode ();
@@ -26,8 +26,12 @@ our %URL_PREFIXES = (
   metacpan => 'https://metacpan.org/pod/',
   man      => 'http://man.he.net/man',
 );
-$URL_PREFIXES{perldoc} = $URL_PREFIXES{metacpan};
+$URL_PREFIXES{$_} = $URL_PREFIXES{metacpan}
+  for qw(perldoc local_module);
 
+our $LOCAL_MODULE_RE = qr/^(Local::|\w*?_\w*)/;
+
+## no critic
 #{
   our $HAS_HTML_ENTITIES;
 
@@ -86,6 +90,7 @@ $URL_PREFIXES{perldoc} = $URL_PREFIXES{metacpan};
   my $DEFAULT_ENTITY_CHARS = '^\n\r\t !\#\$%\(-;=?-~';
 
 #}
+## use critic
 
 # Use hash for simple "exists" check in `new` (much more accurate than `->can`).
 my %attributes = map { ($_ => 1) }
@@ -93,6 +98,8 @@ my %attributes = map { ($_ => 1) }
     html_encode_chars
     match_encoding
     output_encoding
+    local_module_re
+    local_module_url_prefix
     man_url_prefix
     perldoc_url_prefix
     perldoc_fragment_format
@@ -109,6 +116,9 @@ sub new {
   $self->preserve_whitespace(1);
   $self->nbsp_for_S(1);
   $self->accept_targets(qw( markdown html ));
+
+  # Default to the global, but allow it to be overwritten in args.
+  $self->local_module_re($LOCAL_MODULE_RE);
 
   while( my ($attr, $val) = each %args ){
     # NOTE: Checking exists on a private var means we don't allow Pod::Simple
@@ -131,7 +141,7 @@ sub new {
   }
 
     # TODO: move this logic to setter (and call _prepare_fragment_format).
-    for my $type ( qw( perldoc man ) ){
+    for my $type ( qw( local_module perldoc man ) ){
         my $attr  = $type . '_url_prefix';
         # Use provided argument or default alias.
         my $url = $self->$attr || $type;
@@ -1029,7 +1039,10 @@ sub format_man_url {
 sub format_perldoc_url {
   my ($self, $name, $section) = @_;
 
-  my $url_prefix = $self->perldoc_url_prefix;
+  my $url_prefix = $self->is_local_module($name)
+    ? $self->local_module_url_prefix
+    : $self->perldoc_url_prefix;
+
   my $url = '';
 
   # If the link is to another module (external link).
@@ -1146,6 +1159,12 @@ sub format_fragment_pod_simple_html {
 sub format_fragment_metacpan { shift->format_fragment_pod_simple_xhtml(@_); }
 sub format_fragment_sco      { shift->format_fragment_pod_simple_html(@_);  }
 
+sub is_local_module {
+  my ($self, $name) = @_;
+
+  return (defined($name) && $name =~ $self->local_module_re);
+}
+
 1;
 
 __END__
@@ -1165,7 +1184,7 @@ Pod::Markdown - Convert POD to Markdown
 
 =head1 VERSION
 
-version 3.005
+version 3.100
 
 =for test_synopsis my ($pod_string);
 
@@ -1232,6 +1251,22 @@ L</html_encode_chars> which will only operate outside of code spans (where it is
 The constructor accepts the following named arguments:
 
 =over 4
+
+=item *
+
+C<local_module_url_prefix>
+
+Alters the perldoc urls that are created from C<< LE<lt>E<gt> >> codes
+when the module is a "local" module (C<"Local::*"> or C<"Foo_Corp::*"> (see L<perlmodlib>)).
+
+The default is to use C<perldoc_url_prefix>.
+
+=item *
+
+C<local_module_re>
+
+Alternate regular expression for determining "local" modules.
+Default is C<< our $LOCAL_MODULE_RE = qr/^(Local::|\w*?_\w*)/ >>.
 
 =item *
 
@@ -1386,6 +1421,14 @@ The encoding to use when writing to the output file handle.
 If neither this nor L</match_encoding> are specified,
 a character string will be returned in whatever L<Pod::Simple> output method you specified.
 
+=head2 local_module_re
+
+Returns the regular expression used to determine local modules.
+
+=head2 local_module_url_prefix
+
+Returns the url prefix in use for local modules.
+
 =head2 man_url_prefix
 
 Returns the url prefix in use for man pages.
@@ -1464,6 +1507,7 @@ parse_from_filehandle
 end_.+
 start_.+
 encode_entities
+is_local_module
 
 =head1 SEE ALSO
 
@@ -1512,7 +1556,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Pod-Markdown>
+L<https://metacpan.org/release/Pod-Markdown>
 
 =back
 

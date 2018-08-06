@@ -3,15 +3,18 @@ use Test2::Mock;
 use Test::Alien::Build;
 use Alien::Build::Plugin::Cleanse::BuildDir;
 use Path::Tiny qw( path );
-use Capture::Tiny qw( capture_merged );
 
 my $alien_file = q|
     use alienfile;
+    use Path::Tiny qw( path );
 
     share {
-      start_url 'file://TARFILE';
-      plugin 'Download';
-      plugin Extract => 'tar';
+      #start_url 'file://TARFILE';
+      #plugin 'Download';
+      #plugin Extract => 'tar';
+
+      download sub { path('file1')->touch }; 
+      extract sub { path('file2')->touch }; 
 
       plugin 'Cleanse::BuildDir';
       
@@ -22,8 +25,8 @@ my $alien_file = q|
     }
 |;
 
-my $tarfile = path('./corpus/dist/foo-1.00.tar')->absolute;
-$alien_file =~ s/TARFILE/$tarfile/;
+#my $tarfile = path('./corpus/dist/foo-1.00.tar')->absolute;
+#$alien_file =~ s/TARFILE/$tarfile/;
 
 print $alien_file . "\n";
 

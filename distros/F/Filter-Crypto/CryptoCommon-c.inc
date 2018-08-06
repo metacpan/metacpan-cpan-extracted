@@ -6,11 +6,13 @@
  *   Common C code for Filter::Crypto modules.
  *
  * COPYRIGHT
- *   Copyright (C) 2004-2009, 2012-2014 Steve Hay.  All rights reserved.
+ *   Copyright (C) 2004-2009, 2012-2014, 2017 Steve Hay.  All rights reserved.
  *
  * LICENCE
- *   You may distribute under the terms of either the GNU General Public License
- *   or the Artistic License, as specified in the LICENCE file.
+ *   This file is free software; you can redistribute it and/or modify it under
+ *   the same terms as Perl itself, i.e. under the terms of either the GNU
+ *   General Public License or the Artistic License, as specified in the LICENCE
+ *   file.
  *
  *============================================================================*/
 
@@ -157,7 +159,11 @@ static FILTER_CRYPTO_CCTX *FilterCrypto_CryptoAlloc(pTHX) {
     Newxz(ctx, 1, FILTER_CRYPTO_CCTX);
 
     /* Allocate the cipher context. */
+#if FILTER_CRYPTO_OPENSSL_VERSION < 90802
     Newxz(ctx->cipher_ctx, 1, EVP_CIPHER_CTX);
+#else
+    ctx->cipher_ctx = EVP_CIPHER_CTX_new();
+#endif
 
     /* Allocate a pair of SVs with enough string space to hold a salt and an
      * initialization vector (IV) respectively, and store their required
@@ -454,7 +460,11 @@ static void FilterCrypto_CryptoFree(pTHX_ FILTER_CRYPTO_CCTX *ctx) {
 #endif
 
     /* Free the cipher context. */
+#if FILTER_CRYPTO_OPENSSL_VERSION < 90802
     Safefree(ctx->cipher_ctx);
+#else
+    EVP_CIPHER_CTX_free(ctx->cipher_ctx);
+#endif
     ctx->cipher_ctx = NULL;
 
     /* Free the crypto context. */
@@ -739,9 +749,9 @@ static bool FilterCrypto_PRNGInit(pTHX) {
     if (RAND_status())
         return TRUE;
 
-    /* Win32 has a RAND_screen() function for seeding the PRNG.  In other cases
-     * we just have to manage ourselves. */
-#ifdef WIN32
+    /* Win32 had a RAND_screen() function (deprecated in OpenSSL 1.1.0) for
+     * seeding the PRNG.  In other cases we just have to manage ourselves. */
+#if (defined(WIN32) && FILTER_CRYPTO_OPENSSL_VERSION < 101000)
     RAND_screen();
 #else
     {

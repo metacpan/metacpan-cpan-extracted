@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A file containing slides or used for a presentation.",
+      "rdfs:label" : "PresentationDigitalDocument",
+      "rdfs:subClassOf" : "schema:DigitalDocument"
+   },
+   "properties" : {}
+}

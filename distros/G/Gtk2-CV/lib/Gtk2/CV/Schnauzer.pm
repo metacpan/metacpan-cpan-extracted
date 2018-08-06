@@ -24,6 +24,8 @@ package Gtk2::CV::Schnauzer;
 use common::sense;
 use integer;
 
+our %EXCLUDE; # to be set form your .cvrc to exclude additional files
+
 use Gtk2;
 use Gtk2::Pango;
 use Gtk2::Gdk::Keysyms;
@@ -56,6 +58,7 @@ use Fcntl;
 use IO::AIO;
 
 use Gtk2::CV::Jobber;
+use Gtk2::CV::ImageWindow (); # dir_is_movie
 
 use base Gtk2::CV::Jobber::Client::;
 
@@ -169,6 +172,10 @@ my %ext_logo = (
    tif  => "tif",
    tiff => "tif",
 
+   webp => "png",
+   wep  => "png",
+   wej  => "jpeg",
+
    mp2  => "mp2",
    mp3  => "mp3",
    m4a  => "audio",
@@ -189,6 +196,7 @@ my %ext_logo = (
    m1v  => "mpeg",
    m2v  => "mpeg",
    m4v  => "mpeg",
+   ts   => "mpeg",
    
    ogm  => "ogm",
    mkv  => "ogm", # sigh
@@ -404,27 +412,32 @@ sub {
 
       mkdir +(dirname $path) . "/.xvpics", 0777;
 
-      my $pb = eval { $path =~ /\.jpe?g$/i && Gtk2::CV::load_jpeg $path, 1, IWD, IHD }
-               || eval {
-                     # pixbuf only supports utf-8 filenames so do I/O ourselves. sigh.
-                     open my $fh, "<:perlio", $path
-                        or die "$path: $!";
-                     my $loader = new Gtk2::Gdk::PixbufLoader;
+      my $pb;
 
-                     # should set size-prepared callback to scale down, but
-                     # we only really care about this for jpegs, which are handled above.
-                     #$loader->set_size (IW, IH);
+      if (sysopen my $fh, $path, IO::AIO::O_RDONLY) {
+         if (IO::AIO::mmap my $data, -s $fh, IO::AIO::PROT_READ, IO::AIO::MAP_SHARED, $fh) {
+            my $type = Gtk2::CV::filetype $data;
 
-                     my $buf;
-                     1
-                        while (0 < sysread $fh, $buf, 65536)
-                              && $loader->write ($buf);
+            $pb = eval { $type eq "jpg" && Gtk2::CV::decode_jpeg $data, 1, IWD, IHD }
+                  || eval { $type eq "webp" && Gtk2::CV::decode_webp $data, 1, IWD, IHD }
+                  || eval {
+                        my $loader = new Gtk2::Gdk::PixbufLoader;
 
-                     $loader->close;
-                     $loader->get_pixbuf
-                  }
-               || eval { video_thumbnail $path }
-               || Gtk2::CV::require_image "error.png";
+                        # should set size-prepared callback to scale down, but
+                        # we only really care about this for jpegs, which are handled above.
+                        #$loader->set_size (IW, IH);
+
+                        $loader->write ($data);
+
+                        $loader->close;
+                        $loader->get_pixbuf
+                     }
+                  || eval { video_thumbnail $path }
+             ;
+         }
+      }
+
+      $pb ||= Gtk2::CV::require_image "error.png";
 
       utf8::downgrade $path; # Gtk2::Gdk::Pixbuf upgrades :/
 
@@ -440,6 +453,7 @@ sub {
 
       $pb = Gtk2::CV::dealpha $pb->scale_simple ($w, $h, 'tiles');
 
+#      sysopen my $fh, xvpic $path, IO::AIO::O_CREAT | IO::AIO::O_TRUNC | IO::AIO::O_WRONLY, 0666
       open my $fh, ">:raw", xvpic $path
          or die "xvpic($path): $!";
       syswrite $fh, $pb->save_to_buffer ("jpeg", quality => 95);;
@@ -1221,7 +1235,7 @@ sub emit_activate {
 
    $self->{cursor_current} = $path;
 
-   if (-d $path) {
+   if (-d $path && !Gtk2::CV::ImageWindow::dir_is_movie $path) {
       $self->push_state;
       $self->set_dir ($path);
    } else {
@@ -2038,7 +2052,7 @@ sub chpaths {
 
    $self->emit_sel_changed;
 
-   my %exclude = ($curdir => 0, $updir => 0, ".xvpics" => 0);
+   my %exclude = ($curdir => 0, $updir => 0, ".xvpics" => 0, %EXCLUDE);
 
    my %xvpics;
    my $leaves = -1;

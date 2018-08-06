@@ -64,19 +64,20 @@ sub update ( $type, $cb = undef ) {
 
     return P->http->get(
         $RES->{$type}->[1],
-        buf_size    => 1,
-        on_progress => 1,
-        on_finish   => sub ($res) {
+        mem_buf_size => 0,
+        on_progress  => 1,
+        sub ($res) {
             my $success = 0;
 
             if ( $res->{status} == 200 ) {
                 eval {
                     my $temp = P->file->tempfile;
 
-                    IO::Uncompress::Gunzip::gunzip( $res->{body}, $temp->path, BinModeOut => 1 );
+                    IO::Uncompress::Gunzip::gunzip( $res->{data}, $temp->path, BinModeOut => 1 );
 
                     $ENV->{share}->write( 'Pcore-GeoIP', $RES->{$type}->[0], $temp->path );
 
+                    # empty cache
                     delete $H->{$type};
 
                     $success = 1;

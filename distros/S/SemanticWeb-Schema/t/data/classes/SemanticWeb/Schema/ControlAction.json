@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An agent controls a device or application.",
+      "rdfs:label" : "ControlAction",
+      "rdfs:subClassOf" : "schema:Action"
+   },
+   "properties" : {}
+}

@@ -5,7 +5,7 @@ use warnings;
 package Path::Tiny;
 # ABSTRACT: File path utility
 
-our $VERSION = '0.106';
+our $VERSION = '0.108';
 
 # Dependencies
 use Config;
@@ -40,13 +40,26 @@ sub THAW   { return path( $_[2] ) }
 my $HAS_UU; # has Unicode::UTF8; lazily populated
 
 sub _check_UU {
-    !!eval { require Unicode::UTF8; Unicode::UTF8->VERSION(0.58); 1 };
+    local $SIG{__DIE__}; # prevent outer handler from being called
+    !!eval {
+        require Unicode::UTF8;
+        Unicode::UTF8->VERSION(0.58);
+        1;
+    };
 }
 
-my $HAS_PU; # has PerlIO::utf8_strict; lazily populated
+my $HAS_PU;              # has PerlIO::utf8_strict; lazily populated
 
 sub _check_PU {
-    !!eval { require PerlIO::utf8_strict; PerlIO::utf8_strict->VERSION(0.003); 1 };
+    local $SIG{__DIE__}; # prevent outer handler from being called
+    !!eval {
+        # MUST preload Encode or $SIG{__DIE__} localization fails
+        # on some Perl 5.8.8 (maybe other 5.8.*) compiled with -O2.
+        require Encode;
+        require PerlIO::utf8_strict;
+        PerlIO::utf8_strict->VERSION(0.003);
+        1;
+    };
 }
 
 my $HAS_FLOCK = $Config{d_flock} || $Config{d_fcntl_can_lock} || $Config{d_lockf};
@@ -2143,7 +2156,7 @@ Path::Tiny - File path utility
 
 =head1 VERSION
 
-version 0.106
+version 0.108
 
 =head1 SYNOPSIS
 
@@ -3297,7 +3310,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dave Rolsky David Steinbrunner Doug Bell Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin Kjeldsen Michael G. Schwern Nigel Gregoire Philippe Bruhat (BooK) Regina Verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
+=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dave Rolsky David Steinbrunner Doug Bell Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin H. Sluka Kjeldsen Michael G. Schwern Nigel Gregoire Philippe Bruhat (BooK) Regina Verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
 
 =over 4
 
@@ -3372,6 +3385,10 @@ Karen Etheridge <ether@cpan.org>
 =item *
 
 Mark Ellis <mark.ellis@cartridgesave.co.uk>
+
+=item *
+
+Martin H. Sluka <fany@cpan.org>
 
 =item *
 

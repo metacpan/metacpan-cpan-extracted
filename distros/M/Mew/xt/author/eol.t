@@ -12,8 +12,10 @@ my @files = (
     't/00-compile.t',
     't/01-mew.t',
     't/02-optional.t',
+    't/03-maybe.t',
     't/Class1.pm',
-    't/Class2.pm'
+    't/Class2.pm',
+    't/Class3.pm'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

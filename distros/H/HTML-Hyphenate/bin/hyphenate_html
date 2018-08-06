@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 use 5.014000;
 use English qw( -no_match_vars );
-BEGIN { our $VERSION = v1.0.0; }
+BEGIN { our $VERSION = v1.1.0; }
 
 use HTML::Hyphenate;
 

@@ -1,0 +1,52 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A set of characteristics belonging to people, e.g. who compose an item's target audience.",
+      "rdfs:label" : "PeopleAudience",
+      "rdfs:subClassOf" : "schema:Audience"
+   },
+   "properties" : {
+      "schema:requiredGender" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Audiences defined by a person's gender.",
+         "rdfs:label" : "requiredGender",
+         "schema:domainIncludes" : "schema:PeopleAudience",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:requiredMaxAge" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Audiences defined by a person's maximum age.",
+         "rdfs:label" : "requiredMaxAge",
+         "schema:domainIncludes" : "schema:PeopleAudience",
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:requiredMinAge" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Audiences defined by a person's minimum age.",
+         "rdfs:label" : "requiredMinAge",
+         "schema:domainIncludes" : "schema:PeopleAudience",
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:suggestedGender" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The gender of the person or audience.",
+         "rdfs:label" : "suggestedGender",
+         "schema:domainIncludes" : "schema:PeopleAudience",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:suggestedMaxAge" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Maximal age recommended for viewing content.",
+         "rdfs:label" : "suggestedMaxAge",
+         "schema:domainIncludes" : "schema:PeopleAudience",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:suggestedMinAge" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Minimal age recommended for viewing content.",
+         "rdfs:label" : "suggestedMinAge",
+         "schema:domainIncludes" : "schema:PeopleAudience",
+         "schema:rangeIncludes" : "schema:Number"
+      }
+   }
+}

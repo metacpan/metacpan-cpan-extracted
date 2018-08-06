@@ -21,7 +21,7 @@ is_deeply ($months, [qw( 01 02 03 04 05 06 07 08 09 10 11 12 )], 'Month format n
 $months = $locale->month_stand_alone_wide();
 is_deeply ($months, [qw( Genver Cʼhwevrer Meurzh Ebrel Mae Mezheven Gouere Eost Gwengolo Here Du Kerzu )], 'Month stand alone wide');
 $months = $locale->month_stand_alone_abbreviated();
-is_deeply ($months, [qw( Gen. Cʼhwe. Meur. Ebr. Mae Mezh. Goue. Eost Gwen. Here Du Ker. )], 'Month stand alone abbreviated');
+is_deeply ($months, [qw( Gen. Cʼhwe. Meur. Ebr. Mae Mezh. Goue. Eost Gwen. Here Du Kzu. )], 'Month stand alone abbreviated');
 $months = $locale->month_stand_alone_narrow();
 is_deeply ($months, [qw( 01 02 03 04 05 06 07 08 09 10 11 12 )], 'Month stand alone narrow');
 
@@ -97,13 +97,13 @@ $day_period_data = $locale->get_day_period('1210');
 is($day_period_data, 'G.M.', 'Day period data PM');
 
 my $date_format = $locale->date_format_full;
-is($date_format, 'y MMMM d, EEEE', 'Date Format Full');
+is($date_format, 'EEEE d MMMM y', 'Date Format Full');
 $date_format = $locale->date_format_long;
-is($date_format, 'y MMMM d', 'Date Format Long');
+is($date_format, 'd MMMM y', 'Date Format Long');
 $date_format = $locale->date_format_medium;
-is($date_format, 'y MMM d', 'Date Format Medium');
+is($date_format, 'd MMM y', 'Date Format Medium');
 $date_format = $locale->date_format_short;
-is($date_format, 'y-MM-dd', 'Date Format Short');
+is($date_format, 'dd/MM/y', 'Date Format Short');
 
 my $time_format = $locale->time_format_full;
 is($time_format, 'HH:mm:ss zzzz', 'Time Format Full');
@@ -115,13 +115,13 @@ $time_format = $locale->time_format_short;
 is($time_format, 'HH:mm', 'Time Format Short');
 
 my $date_time_format = $locale->datetime_format_full;
-is($date_time_format, "y MMMM d, EEEE 'da' HH:mm:ss zzzz", 'Date Time Format Full');
+is($date_time_format, "EEEE d MMMM y 'da' HH:mm:ss zzzz", 'Date Time Format Full');
 $date_time_format = $locale->datetime_format_long;
-is($date_time_format, "y MMMM d 'da' HH:mm:ss z", 'Date Time Format Long');
+is($date_time_format, "d MMMM y 'da' HH:mm:ss z", 'Date Time Format Long');
 $date_time_format = $locale->datetime_format_medium;
-is($date_time_format, 'y MMM d HH:mm:ss', 'Date Time Format Medium');
+is($date_time_format, 'd MMM y, HH:mm:ss', 'Date Time Format Medium');
 $date_time_format = $locale->datetime_format_short;
-is($date_time_format, 'y-MM-dd HH:mm', 'Date Time Format Short');
+is($date_time_format, 'dd/MM/y HH:mm', 'Date Time Format Short');
 
 is ($locale->prefers_24_hour_time(), 1, 'Prefers 24 hour time');
 is ($locale->first_day_of_week(), 1, 'First day of week recoded for DateTime');

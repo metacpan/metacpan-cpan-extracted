@@ -2,7 +2,6 @@ bin/convert2fb3.pl
 bin/cutfb3.pl
 bin/fb3_2_json.pl
 bin/fb3_to_fb2.pl
-bin/importfb3_from_fb2.pl
 Build.PL
 lib/FB3/Convert.pm
 lib/FB3/Convert/Epub.pm

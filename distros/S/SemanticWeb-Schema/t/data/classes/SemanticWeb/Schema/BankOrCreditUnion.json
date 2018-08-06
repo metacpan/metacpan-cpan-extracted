@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Bank or credit union.",
+      "rdfs:label" : "BankOrCreditUnion",
+      "rdfs:subClassOf" : "schema:FinancialService"
+   },
+   "properties" : {}
+}

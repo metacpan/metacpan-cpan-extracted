@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Dsb - Package for language Lower Sorbian
 
 package Locale::CLDR::Locales::Dsb;
 # This file auto generated from Data\common\main\dsb.xml
-#	on Fri 13 Apr  7:06:41 am GMT
+#	on Sun  5 Aug  5:57:04 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -4197,6 +4197,15 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(mauretański ouguiya \(1973–2017\)),
+				'few' => q(mauretańske ouguiya \(1973–2017\)),
+				'one' => q(mauretański ouguiya \(1973–2017\)),
+				'other' => q(mauretański ouguiya \(1973–2017\)),
+				'two' => q(mauretańskej ouguiya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(mauretański ouguiya),
 				'few' => q(mauretańske ouguiya),
 				'one' => q(mauretański ouguiya),
@@ -4550,6 +4559,15 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(são-tomeska dobra \(1977–2017\)),
+				'few' => q(são-tomeske dobry \(1977–2017\)),
+				'one' => q(são-tomeska dobra \(1977–2017\)),
+				'other' => q(são-tomeskich dobrow \(1977–2017\)),
+				'two' => q(são-tomeskej dobrje \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(são-tomeska dobra),
 				'few' => q(são-tomeske dobry),
@@ -5096,17 +5114,17 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{wótpołdnja},
 					'am' => q{dopołdnja},
 				},
 				'narrow' => {
-					'am' => q{dop.},
 					'pm' => q{wótp.},
+					'am' => q{dop.},
 				},
-				'abbreviated' => {
-					'pm' => q{wótpołdnja},
+				'wide' => {
 					'am' => q{dopołdnja},
+					'pm' => q{wótpołdnja},
 				},
 			},
 		},

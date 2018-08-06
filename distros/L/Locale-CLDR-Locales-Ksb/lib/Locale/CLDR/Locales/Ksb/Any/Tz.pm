@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ksb::Any::Tz - Package for language Shambala
 
 package Locale::CLDR::Locales::Ksb::Any::Tz;
 # This file auto generated from Data\common\main\ksb_TZ.xml
-#	on Fri 13 Apr  7:17:36 am GMT
+#	on Sun  5 Aug  6:09:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

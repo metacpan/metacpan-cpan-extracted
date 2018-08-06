@@ -25,7 +25,7 @@ __END__
 Perl data type class for the XML Schema defined simpleType
 AuthenticationError.Reason from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+The single reason for the authentication failure. 
 
 
 

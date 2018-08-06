@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Kkj - Package for language Kako
 
 package Locale::CLDR::Locales::Kkj;
 # This file auto generated from Data\common\main\kkj.xml
-#	on Fri 13 Apr  7:16:29 am GMT
+#	on Sun  5 Aug  6:08:01 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -366,23 +366,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			Ed => q{E d},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E d MMM y G},
-			GyMMMd => q{d MMM y G},
-			MEd => q{E dd/MM},
-			MMMEd => q{E d MMM},
-			MMMd => q{d MMM},
-			Md => q{dd/MM},
-			yM => q{MM y},
-			yMEd => q{E dd/MM y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E d MMM y},
-			yMMMd => q{d MMM y},
-			yMd => q{dd/MM y},
-		},
 		'generic' => {
 			Ed => q{E d},
 			Gy => q{y G},
@@ -399,6 +382,23 @@ has 'datetime_formats_available_formats' => (
 			yyyyMMMEd => q{E d MMM y G},
 			yyyyMMMd => q{d MMM y G},
 			yyyyMd => q{dd/MM y GGGGG},
+		},
+		'gregorian' => {
+			Ed => q{E d},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E d MMM y G},
+			GyMMMd => q{d MMM y G},
+			MEd => q{E dd/MM},
+			MMMEd => q{E d MMM},
+			MMMd => q{d MMM},
+			Md => q{dd/MM},
+			yM => q{MM y},
+			yMEd => q{E dd/MM y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E d MMM y},
+			yMMMd => q{d MMM y},
+			yMd => q{dd/MM y},
 		},
 	} },
 );

@@ -25,6 +25,16 @@ sub env_to_apicast (@) {
     %EnvToNginx = (%EnvToNginx, %env);
 };
 
+my $original_server_port_for_client;
+
+sub set_server_port_for_client (@) {
+    $original_server_port_for_client = $Test::Nginx::Util::ServerPortForClient;
+    Test::Nginx::Util::server_port_for_client(shift);
+    if ($Test::Nginx::Util::Verbose) {
+        warn("changed ServerPortForClient from $original_server_port_for_client to $Test::Nginx::Util::ServerPortForClient");
+    }
+}
+
 add_block_preprocessor(sub {
     my $block = shift;
     my $seq = $block->seq_num;
@@ -51,7 +61,8 @@ add_block_preprocessor(sub {
             }
         }
 _EOC_
-        $Test::Nginx::Util::ServerPortForClient = $test_port;
+
+        set_server_port_for_client($test_port);
         $block->set_value('raw_request', "GET / HTTP/1.1\r\nHost: test\r\nConnection: close\r\n\r\n")
     }
 
@@ -242,6 +253,13 @@ _EOC_
 
     $ENV{APICAST_LOADED_ENVIRONMENTS} = join('|',$ env_file, $block->environment_file);
 };
+
+add_block_preprocessor(sub {
+    if (defined $original_server_port_for_client) {
+        Test::Nginx::Util::server_port_for_client($original_server_port_for_client);
+        undef $original_server_port_for_client;
+    }
+});
 
 BEGIN {
     no warnings 'redefine';

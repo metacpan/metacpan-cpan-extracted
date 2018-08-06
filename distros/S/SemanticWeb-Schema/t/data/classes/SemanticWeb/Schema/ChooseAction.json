@@ -1,0 +1,33 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of expressing a preference from a set of options or a large or unbounded set of choices/options.",
+      "rdfs:label" : "ChooseAction",
+      "rdfs:subClassOf" : "schema:AssessAction"
+   },
+   "properties" : {
+      "schema:actionOption" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of object. The options subject to this action.",
+         "rdfs:label" : "actionOption",
+         "rdfs:subPropertyOf" : "schema:object",
+         "schema:domainIncludes" : "schema:ChooseAction",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Thing"
+         ]
+      },
+      "schema:option" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of object. The options subject to this action.",
+         "rdfs:label" : "option",
+         "rdfs:subPropertyOf" : "schema:object",
+         "schema:domainIncludes" : "schema:ChooseAction",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Thing"
+         ],
+         "schema:supersededBy" : "schema:actionOption"
+      }
+   }
+}

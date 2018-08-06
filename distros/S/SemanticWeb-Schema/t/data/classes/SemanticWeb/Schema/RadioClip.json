@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A short radio program or a segment/part of a radio program.",
+      "rdfs:label" : "RadioClip",
+      "rdfs:subClassOf" : "schema:Clip"
+   },
+   "properties" : {}
+}

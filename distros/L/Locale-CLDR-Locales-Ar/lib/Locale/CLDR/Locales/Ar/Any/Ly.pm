@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ar::Any::Ly - Package for language Arabic
 
 package Locale::CLDR::Locales::Ar::Any::Ly;
 # This file auto generated from Data\common\main\ar_LY.xml
-#	on Fri 13 Apr  7:01:23 am GMT
+#	on Sun  5 Aug  5:50:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -112,36 +112,36 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
+					return 'night1' if $time >= 0
+						&& $time < 100;
+					return 'night2' if $time >= 100
+						&& $time < 300;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
 					return 'afternoon2' if $time >= 1300
 						&& $time < 1800;
-					return 'night2' if $time >= 100
-						&& $time < 300;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1300;
 					return 'morning1' if $time >= 300
 						&& $time < 600;
-					return 'night1' if $time >= 0
-						&& $time < 100;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1300;
 				}
 				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 300
-						&& $time < 600;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1300;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
+					return 'morning1' if $time >= 300
+						&& $time < 600;
+					return 'afternoon2' if $time >= 1300
+						&& $time < 1800;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 					return 'night2' if $time >= 100
 						&& $time < 300;
 					return 'night1' if $time >= 0
 						&& $time < 100;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
-					return 'afternoon2' if $time >= 1300
-						&& $time < 1800;
 				}
 				last SWITCH;
 				}
@@ -162,13 +162,13 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'night1' => q{منتصف الليل},
-					'night2' => q{ل},
-					'afternoon1' => q{ظهرًا},
-					'morning1' => q{فجرًا},
-					'afternoon2' => q{بعد الظهر},
-					'morning2' => q{ص},
 					'evening1' => q{مساءً},
+					'morning1' => q{فجرًا},
+					'afternoon1' => q{ظهرًا},
+					'afternoon2' => q{بعد الظهر},
+					'night2' => q{ل},
+					'night1' => q{منتصف الليل},
+					'morning2' => q{ص},
 				},
 			},
 		},

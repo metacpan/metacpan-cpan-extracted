@@ -1,0 +1,84 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The geographic coordinates of a place or event.",
+      "rdfs:label" : "GeoCoordinates",
+      "rdfs:subClassOf" : "schema:StructuredValue"
+   },
+   "properties" : {
+      "schema:address" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Physical address of the item.",
+         "rdfs:label" : "address",
+         "schema:domainIncludes" : [
+            "schema:GeoShape",
+            "schema:Organization",
+            "schema:Place",
+            "schema:GeoCoordinates",
+            "schema:Person"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:PostalAddress"
+         ]
+      },
+      "schema:addressCountry" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The country. For example, USA. You can also provide the two-letter <a href=\"http://en.wikipedia.org/wiki/ISO_3166-1\">ISO 3166-1 alpha-2 country code</a>.",
+         "rdfs:label" : "addressCountry",
+         "schema:domainIncludes" : [
+            "schema:GeoCoordinates",
+            "schema:GeoShape",
+            "schema:PostalAddress"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Country",
+            "schema:Text"
+         ]
+      },
+      "schema:elevation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The elevation of a location (<a href=\"https://en.wikipedia.org/wiki/World_Geodetic_System\">WGS 84</a>).",
+         "rdfs:label" : "elevation",
+         "schema:domainIncludes" : [
+            "schema:GeoShape",
+            "schema:GeoCoordinates"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Number"
+         ]
+      },
+      "schema:latitude" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The latitude of a location. For example <code>37.42242</code> (<a href=\"https://en.wikipedia.org/wiki/World_Geodetic_System\">WGS 84</a>).",
+         "rdfs:label" : "latitude",
+         "schema:domainIncludes" : "schema:GeoCoordinates",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Number"
+         ]
+      },
+      "schema:longitude" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The longitude of a location. For example <code>-122.08585</code> (<a href=\"https://en.wikipedia.org/wiki/World_Geodetic_System\">WGS 84</a>).",
+         "rdfs:label" : "longitude",
+         "schema:domainIncludes" : "schema:GeoCoordinates",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Number"
+         ]
+      },
+      "schema:postalCode" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The postal code. For example, 94043.",
+         "rdfs:label" : "postalCode",
+         "schema:domainIncludes" : [
+            "schema:PostalAddress",
+            "schema:GeoCoordinates",
+            "schema:GeoShape"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

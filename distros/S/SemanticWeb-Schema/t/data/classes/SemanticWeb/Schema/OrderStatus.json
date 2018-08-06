@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Enumerated status values for Order.",
+      "rdfs:label" : "OrderStatus",
+      "rdfs:subClassOf" : "schema:Enumeration"
+   },
+   "properties" : {}
+}

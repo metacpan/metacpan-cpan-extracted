@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Se - Package for language Northern Sami
 
 package Locale::CLDR::Locales::Se;
 # This file auto generated from Data\common\main\se.xml
-#	on Fri 13 Apr  7:27:35 am GMT
+#	on Sun  5 Aug  6:20:28 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2615,15 +2615,15 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{e.b.},
+				'narrow' => {
 					'am' => q{i.b.},
+					'pm' => q{e.b.},
 				},
 				'wide' => {
 					'am' => q{iđitbeaivet},
 					'pm' => q{eahketbeaivet},
 				},
-				'narrow' => {
+				'abbreviated' => {
 					'pm' => q{e.b.},
 					'am' => q{i.b.},
 				},
@@ -2633,13 +2633,13 @@ has 'day_periods' => (
 					'am' => q{i.b.},
 					'pm' => q{e.b.},
 				},
-				'narrow' => {
-					'am' => q{i.b.},
-					'pm' => q{e.b.},
-				},
 				'wide' => {
-					'pm' => q{eahketbeaivi},
 					'am' => q{iđitbeaivi},
+					'pm' => q{eahketbeaivi},
+				},
+				'narrow' => {
+					'pm' => q{e.b.},
+					'am' => q{i.b.},
 				},
 			},
 		},

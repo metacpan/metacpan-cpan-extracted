@@ -42,4 +42,4 @@ requires:
   XAO::Base: '1.21'
   XAO::FS: '1.21'
   perl: '5.010001'
-version: '1.70'
+version: '1.71'

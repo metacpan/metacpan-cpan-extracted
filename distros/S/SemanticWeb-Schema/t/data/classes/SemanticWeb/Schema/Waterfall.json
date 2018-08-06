@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A waterfall, like Niagara.",
+      "rdfs:label" : "Waterfall",
+      "rdfs:subClassOf" : "schema:BodyOfWater"
+   },
+   "properties" : {}
+}

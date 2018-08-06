@@ -6,13 +6,13 @@ Locale::CLDR::Locales::It::Any::It - Package for language Italian
 
 package Locale::CLDR::Locales::It::Any::It;
 # This file auto generated from Data\common\main\it_IT.xml
-#	on Fri 13 Apr  7:15:12 am GMT
+#	on Sun  5 Aug  6:06:35 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

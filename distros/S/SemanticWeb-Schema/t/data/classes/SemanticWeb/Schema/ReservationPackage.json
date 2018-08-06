@@ -1,0 +1,17 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A group of multiple reservations with common values for all sub-reservations.",
+      "rdfs:label" : "ReservationPackage",
+      "rdfs:subClassOf" : "schema:Reservation"
+   },
+   "properties" : {
+      "schema:subReservation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The individual reservations included in the package. Typically a repeated property.",
+         "rdfs:label" : "subReservation",
+         "schema:domainIncludes" : "schema:ReservationPackage",
+         "schema:rangeIncludes" : "schema:Reservation"
+      }
+   }
+}

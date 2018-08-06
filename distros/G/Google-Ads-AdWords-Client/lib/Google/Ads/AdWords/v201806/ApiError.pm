@@ -79,7 +79,7 @@ Google::Ads::AdWords::v201806::ApiError
 Perl data type class for the XML Schema defined complexType
 ApiError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+The API error base class that provides details about an error that occurred while processing a service request. <p>The OGNL field path is provided for parsers to identify the request data element that may have caused the error.</p> 
 
 
 

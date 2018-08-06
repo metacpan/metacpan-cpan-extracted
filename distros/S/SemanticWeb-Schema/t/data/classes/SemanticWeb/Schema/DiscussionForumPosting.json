@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A posting to a discussion forum.",
+      "rdfs:label" : "DiscussionForumPosting",
+      "rdfs:subClassOf" : "schema:SocialMediaPosting"
+   },
+   "properties" : {}
+}

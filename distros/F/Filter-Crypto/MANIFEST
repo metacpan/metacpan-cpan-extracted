@@ -1,26 +1,26 @@
 Artistic                                 The "Artistic License"
 Changes                                  Differences from previous version
 Copying                                  The GNU General Public License
+CryptFile/CryptFile.xs                   Filter::Crypto::CryptFile extension external subroutines
+CryptFile/fallback/const-c.inc           Filter::Crypto::CryptFile extension constants fallback file
+CryptFile/fallback/const-xs.inc          Filter::Crypto::CryptFile extension constants fallback file
+CryptFile/lib/Filter/Crypto/CryptFile.pm Filter::Crypto::CryptFile extension Perl module
+CryptFile/Makefile.PL                    Filter::Crypto::CryptFile extension makefile writer
+CryptFile/typemap                        Filter::Crypto::CryptFile extension interface types
 CryptoCommon-c.inc                       Filter::Crypto::* extensions common C code
 CryptoCommon-xs.inc                      Filter::Crypto::* extensions common external subroutines
+Decrypt/Decrypt.xs                       Filter::Crypto::Decrypt extension external subroutines
+Decrypt/lib/Filter/Crypto/Decrypt.pm     Filter::Crypto::Decrypt extension Perl module
+Decrypt/Makefile.PL                      Filter::Crypto::Decrypt extension makefile writer
 INSTALL                                  Detailed installation instructions
+lib/Filter/Crypto.pm                     Filter::Crypto Perl module
+lib/PAR/Filter/Crypto.pm                 PAR::Filter::Crypto Perl module
 LICENCE                                  The Licence
 Makefile.PL                              Filter::Crypto makefile writer
 MANIFEST                                 This list of files
 MANIFEST.SKIP                            Manifest skip specs
 README                                   The Instructions
 ppport.h                                 Perl/Pollution/Portability header
-CryptFile/CryptFile.xs                   Filter::Crypto::CryptFile extension external subroutines
-CryptFile/Makefile.PL                    Filter::Crypto::CryptFile extension makefile writer
-CryptFile/typemap                        Filter::Crypto::CryptFile extension interface types
-CryptFile/fallback/const-c.inc           Filter::Crypto::CryptFile extension constants fallback file
-CryptFile/fallback/const-xs.inc          Filter::Crypto::CryptFile extension constants fallback file
-CryptFile/lib/Filter/Crypto/CryptFile.pm Filter::Crypto::CryptFile extension Perl module
-Decrypt/Decrypt.xs                       Filter::Crypto::Decrypt extension external subroutines
-Decrypt/Makefile.PL                      Filter::Crypto::Decrypt extension makefile writer
-Decrypt/lib/Filter/Crypto/Decrypt.pm     Filter::Crypto::Decrypt extension Perl module
-lib/Filter/Crypto.pm                     Filter::Crypto Perl module
-lib/PAR/Filter/Crypto.pm                 PAR::Filter::Crypto Perl module
 script/crypt_file                        Perl script to encrypt (and decrypt) Perl modules
 t/01_imports_01.t                        See if import options work
 t/01_imports_02.t                        See if import options work

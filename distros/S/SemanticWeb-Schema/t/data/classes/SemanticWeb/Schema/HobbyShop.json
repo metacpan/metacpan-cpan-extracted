@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A store that sells materials useful or necessary for various hobbies.",
+      "rdfs:label" : "HobbyShop",
+      "rdfs:subClassOf" : "schema:Store"
+   },
+   "properties" : {}
+}

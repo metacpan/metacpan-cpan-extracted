@@ -1,0 +1,96 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A lodging business, such as a motel, hotel, or inn.",
+      "rdfs:label" : "LodgingBusiness",
+      "rdfs:subClassOf" : "schema:LocalBusiness"
+   },
+   "properties" : {
+      "schema:amenityFeature" : {
+         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
+         "rdfs:label" : "amenityFeature",
+         "schema:domainIncludes" : [
+            "schema:Place",
+            "schema:Accommodation",
+            "schema:LodgingBusiness"
+         ],
+         "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
+      },
+      "schema:audience" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
+         "rdfs:label" : "audience",
+         "schema:domainIncludes" : [
+            "schema:Product",
+            "schema:Service",
+            "schema:LodgingBusiness",
+            "schema:Event",
+            "schema:CreativeWork",
+            "schema:PlayAction"
+         ],
+         "schema:rangeIncludes" : "schema:Audience"
+      },
+      "schema:availableLanguage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
+         "rdfs:label" : "availableLanguage",
+         "schema:domainIncludes" : [
+            "schema:TouristAttraction",
+            "schema:LodgingBusiness",
+            "schema:ContactPoint",
+            "schema:ServiceChannel"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Language"
+         ]
+      },
+      "schema:checkinTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The earliest someone may check into a lodging establishment.",
+         "rdfs:label" : "checkinTime",
+         "schema:domainIncludes" : [
+            "schema:LodgingBusiness",
+            "schema:LodgingReservation"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:checkoutTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The latest someone may check out of a lodging establishment.",
+         "rdfs:label" : "checkoutTime",
+         "schema:domainIncludes" : [
+            "schema:LodgingReservation",
+            "schema:LodgingBusiness"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:petsAllowed" : {
+         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates whether pets are allowed to enter the accommodation or lodging business. More detailed information can be put in a text value.",
+         "rdfs:label" : "petsAllowed",
+         "schema:domainIncludes" : [
+            "schema:LodgingBusiness",
+            "schema:Accommodation"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Boolean",
+            "schema:Text"
+         ]
+      },
+      "schema:starRating" : {
+         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An official rating for a lodging business or food establishment, e.g. from national associations or standards bodies. Use the author property to indicate the rating organization, e.g. as an Organization with name such as (e.g. HOTREC, DEHOGA, WHR, or Hotelstars).",
+         "rdfs:label" : "starRating",
+         "schema:domainIncludes" : [
+            "schema:FoodEstablishment",
+            "schema:LodgingBusiness"
+         ],
+         "schema:rangeIncludes" : "schema:Rating"
+      }
+   }
+}

@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:FIBO",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A service to convert funds from one currency to another currency.",
+      "rdfs:label" : "CurrencyConversionService",
+      "rdfs:subClassOf" : "schema:FinancialProduct"
+   },
+   "properties" : {}
+}

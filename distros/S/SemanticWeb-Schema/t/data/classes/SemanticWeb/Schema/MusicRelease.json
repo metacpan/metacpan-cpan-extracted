@@ -1,0 +1,69 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:MBZ",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A MusicRelease is a specific release of a music album.",
+      "rdfs:label" : "MusicRelease",
+      "rdfs:subClassOf" : "schema:MusicPlaylist"
+   },
+   "properties" : {
+      "schema:catalogNumber" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The catalog number for the release.",
+         "rdfs:label" : "catalogNumber",
+         "schema:domainIncludes" : "schema:MusicRelease",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:creditedTo" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The group the release is credited to if different than the byArtist. For example, Red and Blue is credited to \"Stefani Germanotta Band\", but by Lady Gaga.",
+         "rdfs:label" : "creditedTo",
+         "schema:domainIncludes" : "schema:MusicRelease",
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      },
+      "schema:duration" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
+         "rdfs:label" : "duration",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:MediaObject",
+            "schema:MusicRelease",
+            "schema:Movie",
+            "schema:MusicRecording"
+         ],
+         "schema:rangeIncludes" : "schema:Duration"
+      },
+      "schema:musicReleaseFormat" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Format of this release (the type of recording media used, ie. compact disc, digital media, LP, etc.).",
+         "rdfs:label" : "musicReleaseFormat",
+         "schema:domainIncludes" : "schema:MusicRelease",
+         "schema:rangeIncludes" : "schema:MusicReleaseFormatType"
+      },
+      "schema:recordLabel" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "owl:equivalentProperty" : "mo:label",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The label that issued the release.",
+         "rdfs:label" : "recordLabel",
+         "schema:domainIncludes" : "schema:MusicRelease",
+         "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:releaseOf" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The album this is a release of.",
+         "rdfs:label" : "releaseOf",
+         "schema:domainIncludes" : "schema:MusicRelease",
+         "schema:inverseOf" : "schema:albumRelease",
+         "schema:rangeIncludes" : "schema:MusicAlbum"
+      }
+   }
+}

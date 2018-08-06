@@ -1,0 +1,17 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Web applications.",
+      "rdfs:label" : "WebApplication",
+      "rdfs:subClassOf" : "schema:SoftwareApplication"
+   },
+   "properties" : {
+      "schema:browserRequirements" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifies browser requirements in human-readable text. For example, 'requires HTML5 support'.",
+         "rdfs:label" : "browserRequirements",
+         "schema:domainIncludes" : "schema:WebApplication",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

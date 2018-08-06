@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ksb - Package for language Shambala
 
 package Locale::CLDR::Locales::Ksb;
 # This file auto generated from Data\common\main\ksb.xml
-#	on Fri 13 Apr  7:17:36 am GMT
+#	on Sun  5 Aug  6:09:15 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -555,6 +555,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(ugwiya ya Molitania \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(ugwiya ya Molitania),
 			},
 		},
@@ -624,6 +629,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(dobla ya Sao Tome na Plincipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(dobla ya Sao Tome na Plincipe),
 			},
@@ -829,13 +839,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{nyiaghuo},
-					'am' => q{makeo},
-				},
 				'wide' => {
 					'am' => q{makeo},
 					'pm' => q{nyiaghuo},
+				},
+				'abbreviated' => {
+					'pm' => q{nyiaghuo},
+					'am' => q{makeo},
 				},
 			},
 		},

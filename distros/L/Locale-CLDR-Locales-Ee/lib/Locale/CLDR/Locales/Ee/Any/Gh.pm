@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ee::Any::Gh - Package for language Ewe
 
 package Locale::CLDR::Locales::Ee::Any::Gh;
 # This file auto generated from Data\common\main\ee_GH.xml
-#	on Fri 13 Apr  7:07:12 am GMT
+#	on Sun  5 Aug  5:57:38 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

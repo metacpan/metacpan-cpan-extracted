@@ -3,8 +3,10 @@ use strict;
 use warnings;
 use Config;
 
+use FindBin;
+use lib "$FindBin::Bin"; # required to load filter-util.pl
+
 BEGIN {
-    unshift @INC, 't';
     my $foundTR = 0 ;
     if ($^O eq 'MSWin32') {
         # Check if tr is installed

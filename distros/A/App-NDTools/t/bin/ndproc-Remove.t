@@ -23,12 +23,13 @@ run_ok(
     test => sub { files_eq_or_diff("$test.exp", "$test.got", $test) },
 );
 
-$test = "path_absent"; # FIXME: no changes (bug?)
+$test = "path_absent";
 run_ok(
     name => $test,
     pre => sub { copy("_empty_hash.json", "$test.got") },
     cmd => [ @cmd, "$test.got" ],
-    test => sub { files_eq_or_diff("$test.exp", "$test.got", $test) },
+    stderr => qr/ FATAL] At least one path should be specified/,
+    exit => 1,
 );
 
 $test = "path_empty"; # full doc removed

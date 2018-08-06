@@ -42,6 +42,8 @@ t/11-for_loop.cmd
 t/11-for_loop.t
 t/12-env_variables.cmd
 t/12-env_variables.t
+t/13-comparison_with_spaces.cmd
+t/13-comparison_with_spaces.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/author-synopsis.t

@@ -1,0 +1,21 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>The act of responding to a question/message asked/sent by the object. Related to <a class=\"localLink\" href=\"http://schema.org/AskAction\">AskAction</a></p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/AskAction\">AskAction</a>: Appears generally as an origin of a ReplyAction.</li>\n</ul>\n",
+      "rdfs:label" : "ReplyAction",
+      "rdfs:subClassOf" : "schema:CommunicateAction"
+   },
+   "properties" : {
+      "schema:resultComment" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of result. The Comment created or sent as a result of this action.",
+         "rdfs:label" : "resultComment",
+         "rdfs:subPropertyOf" : "schema:result",
+         "schema:domainIncludes" : [
+            "schema:CommentAction",
+            "schema:ReplyAction"
+         ],
+         "schema:rangeIncludes" : "schema:Comment"
+      }
+   }
+}

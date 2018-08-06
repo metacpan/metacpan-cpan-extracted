@@ -1,0 +1,52 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A unique instance of a BroadcastService on a CableOrSatelliteService lineup.",
+      "rdfs:label" : "BroadcastChannel",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:broadcastChannelId" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The unique address by which the BroadcastService can be identified in a provider lineup. In US, this is typically a number.",
+         "rdfs:label" : "broadcastChannelId",
+         "schema:domainIncludes" : "schema:BroadcastChannel",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:broadcastServiceTier" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of service required to have access to the channel (e.g. Standard or Premium).",
+         "rdfs:label" : "broadcastServiceTier",
+         "schema:domainIncludes" : "schema:BroadcastChannel",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:genre" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Genre of the creative work, broadcast channel or group.",
+         "rdfs:label" : "genre",
+         "schema:domainIncludes" : [
+            "schema:MusicGroup",
+            "schema:CreativeWork",
+            "schema:BroadcastChannel"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text"
+         ]
+      },
+      "schema:inBroadcastLineup" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The CableOrSatelliteService offering the channel.",
+         "rdfs:label" : "inBroadcastLineup",
+         "schema:domainIncludes" : "schema:BroadcastChannel",
+         "schema:rangeIncludes" : "schema:CableOrSatelliteService"
+      },
+      "schema:providesBroadcastService" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The BroadcastService offered on this channel.",
+         "rdfs:label" : "providesBroadcastService",
+         "schema:domainIncludes" : "schema:BroadcastChannel",
+         "schema:rangeIncludes" : "schema:BroadcastService"
+      }
+   }
+}

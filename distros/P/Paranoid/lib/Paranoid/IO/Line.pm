@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/IO/Line.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+# $Id: lib/Paranoid/IO/Line.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -29,7 +29,7 @@ use Paranoid::Debug qw(:all);
 use Paranoid::IO qw(:all);
 use Paranoid::Input qw(:all);
 
-($VERSION) = ( q$Revision: 2.05 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(sip nlsip tailf nltailf slurp nlslurp piolClose);
 @EXPORT_OK   = ( @EXPORT, qw(PIOMAXLNSIZE) );
@@ -470,7 +470,7 @@ Paranoid::IO::Line - Paranoid Line-based I/O functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO/Line.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+$Id: lib/Paranoid/IO/Line.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -571,6 +571,9 @@ B<NOTE:> I<sip> does try to check the file stat with every call.  This allows
 us to automatically flush buffers and reopen files in the event that the file
 you're sipping from was truncated, deleted, or overwritten.
 
+The third argument is a boolean option which controls whether lines are
+automatically chomped or not.  It defaults to not.
+
 =head2 nlsip
 
     $nlines = nlsip($filename, @lines);
@@ -618,6 +621,9 @@ in memory.
 Files with slurp are explicitly closed after the read.  All the normal
 safeguards apply:  I<PIOMAXFSIZE> is the largest amount of data that will be
 read into memory, and all lines must be within I<PIOMAXLNSIZE>.
+
+The third argument is a boolean option which controls whether lines are
+automatically chomped or not.  It defaults to not.
 
 =head2 nlslurp
 

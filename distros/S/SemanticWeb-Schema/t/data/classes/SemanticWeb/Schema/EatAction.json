@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of swallowing solid objects.",
+      "rdfs:label" : "EatAction",
+      "rdfs:subClassOf" : "schema:ConsumeAction"
+   },
+   "properties" : {}
+}

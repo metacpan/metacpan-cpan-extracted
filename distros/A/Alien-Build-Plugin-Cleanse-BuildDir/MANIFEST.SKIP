@@ -6,3 +6,6 @@ blib
 Makefile.old
 tar.gz$
 MANIFEST.bak
+^Makefile$
+
+^MYMETA

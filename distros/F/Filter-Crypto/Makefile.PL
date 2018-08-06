@@ -7,11 +7,14 @@
 #   Top-level makefile creation script.
 #
 # COPYRIGHT
-#   Copyright (C) 2004-2009, 2012, 2014, 2015 Steve Hay.  All rights reserved.
+#   Copyright (C) 2004-2009, 2012, 2014, 2015, 2017 Steve Hay.  All rights
+#   reserved.
 #
 # LICENCE
-#   You may distribute under the terms of either the GNU General Public License
-#   or the Artistic License, as specified in the LICENCE file.
+#   This script is free software; you can redistribute it and/or modify it under
+#   the same terms as Perl itself, i.e. under the terms of either the GNU
+#   General Public License or the Artistic License, as specified in the LICENCE
+#   file.
 #
 #===============================================================================
 
@@ -30,8 +33,8 @@ use ExtUtils::MakeMaker qw(WriteMakefile);
 our($VERSION, $YEAR);
 
 BEGIN {
-    $VERSION = '2.07';
-    $YEAR = '2004-2009, 2012, 2014, 2015';
+    $VERSION = '2.08';
+    $YEAR = '2004-2009, 2012, 2014, 2015, 2017';
 }
 
 #===============================================================================
@@ -112,6 +115,17 @@ MAIN: {
                         test => {
                             requires => {
                                 'Archive::Zip' => '0'
+                            }
+                        }
+                    }
+                },
+
+                changestest => {
+                    description => 'Changes testing',
+                    prereqs => {
+                        test => {
+                            requires => {
+                                'Test::CPAN::Changes' => '0'
                             }
                         }
                     }
@@ -1163,8 +1177,10 @@ sub probe_for_lib_file {
     # 11 doesn't even ship static libraries for OpenSSL, so libcrypto.so must be
     # used instead where that exists in place of libcrypto.a.
     # On "native" Windows platforms built with Visual C++ (cl) or Borland C++
-    # (bcc32) they are called ssleay32.lib and libeay32.lib and are specified as
-    # -lssleay32 and -llibeay32.
+    # (bcc32) they were called ssleay32.lib and libeay32.lib and were specified
+    # as -lssleay32 and -llibeay32 but from 1.1.0 onwards are now called
+    # libssl.lib and libcrypto.lib and are specified as -llibssl and
+    # -llibcrypto.
     # It is also possible to produce "native" Windows builds (i.e. binaries and
     # libraries that are linked against the Microsoft C RTL msvcrt.dll rather
     # than Cygwin's POSIX C RTL cygwin1.dll) via MinGW/MinGW-w64 (gcc).  In that
@@ -1210,6 +1226,10 @@ sub probe_for_lib_file {
                 $lib_file = $file;
                 $lib_name = 'libeay32MDd';
             }
+            elsif (-f ($file = catfile($candidate_lib_dir, 'libcrypto.lib'))) {
+                $lib_file = $file;
+                $lib_name = 'libcrypto';
+            }
         }
     }
     else {
@@ -1235,7 +1255,17 @@ sub set_libs {
 
     my $lib_dir  = $self->lib_dir();
     my $lib_name = $self->lib_name();
-    $self->libs("-L$lib_dir -l$lib_name");
+
+    # The Crypto API library is required for static builds of OpenSSL on Windows
+    # from version 1.1.0 onwards (unless the no-capieng build option was used),
+    # so include it in the list of libraries just in case it is required. See:
+    # https://mta.openssl.org/pipermail/openssl-users/2016-May/003759.html
+    if ($self->is_win32()) {
+        $self->libs("-L$lib_dir -l$lib_name -lcrypt32.lib");
+    }
+    else {
+        $self->libs("-L$lib_dir -l$lib_name");
+    }
 }
 
 sub locate_bin_file {
@@ -2946,11 +2976,11 @@ maintained by Michael G Schwern.
 
 =head1 AUTHOR
 
-Steve Hay E<lt>shay@cpan.orgE<gt>
+Steve Hay E<lt>L<shay@cpan.org|mailto:shay@cpan.org>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2009, 2012, 2014, 2015 Steve Hay.  All rights reserved.
+Copyright (C) 2004-2009, 2012, 2014, 2015, 2017 Steve Hay.  All rights reserved.
 
 =head1 LICENCE
 
@@ -2960,11 +2990,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 2.07
+Version 2.08
 
 =head1 DATE
 
-28 Feb 2015
+31 Jul 2018
 
 =head1 HISTORY
 

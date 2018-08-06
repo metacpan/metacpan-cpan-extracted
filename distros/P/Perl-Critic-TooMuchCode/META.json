@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Perl-Critic-TooMuchCode",
    "prereqs" : {
@@ -26,6 +26,8 @@
       },
       "runtime" : {
          "requires" : {
+            "List::Util" : "1.50",
+            "PPIx::Utils" : "0",
             "Perl::Critic" : "0"
          }
       },
@@ -36,29 +38,28 @@
       }
    },
    "provides" : {
+      "Perl::Critic::Policy::TooMuchCode::ProhibitLargeBlock" : {
+         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitLargeBlock.pm"
+      },
       "Perl::Critic::Policy::TooMuchCode::ProhibitLargeTryBlock" : {
-         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitLargeTryBlock.pm",
-         "version" : "0.01"
+         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitLargeTryBlock.pm"
       },
       "Perl::Critic::Policy::TooMuchCode::ProhibitUnnecessaryUTF8Pragma" : {
-         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnnecessaryUTF8Pragma.pm",
-         "version" : "0.01"
+         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnnecessaryUTF8Pragma.pm"
       },
       "Perl::Critic::Policy::TooMuchCode::ProhibitUnusedConstant" : {
-         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedConstant.pm",
-         "version" : "0.01"
+         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedConstant.pm"
       },
       "Perl::Critic::Policy::TooMuchCode::ProhibitUnusedImport" : {
          "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedImport.pm",
          "version" : "0.01"
       },
       "Perl::Critic::Policy::TooMuchCode::ProhibitUnusedInclude" : {
-         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedInclude.pm",
-         "version" : "0.01"
+         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedInclude.pm"
       },
       "Perl::Critic::TooMuchCode" : {
          "file" : "lib/Perl/Critic/TooMuchCode.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -69,7 +70,7 @@
          "web" : "https://github.com/gugod/Perl-Critic-TooMuchCode"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : "1"
 }

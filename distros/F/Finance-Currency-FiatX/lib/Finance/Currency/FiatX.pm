@@ -1,7 +1,7 @@
 package Finance::Currency::FiatX;
 
-our $DATE = '2018-07-15'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-08-01'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -506,7 +506,7 @@ sub _get_all_spot_rates_or_get_spot_rate {
                 {
                     last unless $which eq 'get_spot_rate';
                     my $time = time();
-                    my $res = &{"$mod\::get_spot_rate"}($from, $to, $type);
+                    my $res = &{"$mod\::get_spot_rate"}(from => $from, to => $to, type => $type);
                     log_trace "Got response from source: %s", $res;
                     if ($res->[0] == 200) {
                         my $rate = $res->[2];
@@ -674,7 +674,7 @@ Finance::Currency::FiatX - Fiat currency exchange rate library
 
 =head1 VERSION
 
-This document describes version 0.009 of Finance::Currency::FiatX (from Perl distribution Finance-Currency-FiatX), released on 2018-07-15.
+This document describes version 0.010 of Finance::Currency::FiatX (from Perl distribution Finance-Currency-FiatX), released on 2018-08-01.
 
 =head1 SYNOPSIS
 

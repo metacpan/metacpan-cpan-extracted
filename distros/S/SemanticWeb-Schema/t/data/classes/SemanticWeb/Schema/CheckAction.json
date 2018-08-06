@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An agent inspects, determines, investigates, inquires, or examines an object's accuracy, quality, condition, or state.",
+      "rdfs:label" : "CheckAction",
+      "rdfs:subClassOf" : "schema:FindAction"
+   },
+   "properties" : {}
+}

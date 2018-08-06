@@ -5,7 +5,7 @@ use warnings;
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'https://adwords.google.com/api/adwords/rm/v201806' };
+sub get_xmlns { 'https://adwords.google.com/api/adwords/cm/v201806' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -62,7 +62,7 @@ Google::Ads::AdWords::v201806::PolicyViolationError::Part
 =head1 DESCRIPTION
 
 Perl data type class for the XML Schema defined complexType
-PolicyViolationError.Part from the namespace https://adwords.google.com/api/adwords/rm/v201806.
+PolicyViolationError.Part from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
 Points to a substring within an ad field or criterion. 
 

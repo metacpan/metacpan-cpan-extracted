@@ -1,24 +1,31 @@
 Summary of Changes to Tk::IDElayout
 
-Release 0.33:  4/26/14
+Release 0.34:  2018-08-02
+
+ * Improved error message if widgets are missing containers needed for dropping
+   (contribution from Alexander Becker)
+ * Include GNU GPLv1 (not GPLv2) in LICENSE file to match Perl 5 license
+ * Update CPAN META info: add GitHub repository, license
+ 
+Release 0.33:  2014-04-26
 
  * Fixed intermittent bug where in the populate method, the frameStructure method would get called before the -widgets
    stucture would get populated, causing errors.
 
-Release 0.32:  9/18/08
+Release 0.32:  2008-09-18
 
  * Fixed bug where the status line would vanish if the whole window was expanded and then shrunk.
  * Updated Makefile.PL so CPAN (hopefully) will understand that Tk is required for this module.
      (Since Tk was required for just running the Makefile.PL, this was more complicated than just
       adding to PREREQ_PM.)
 
-Release 0.31:  9/20/07
+Release 0.31:  2007-09-20
 
  * Updated to work with Graph packages greater than version .3
  * Fixed memory leak where widgets where not being destroyed after the tabs that contained
    them were closed.
 
-Release 0.3:  9/16/07
+Release 0.3:  2007-09-16
 
  * First Public Release.
 

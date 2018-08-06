@@ -1,3 +1,18 @@
+0.003   2018-08-04 (PERLANCAR)
+
+	- [Bugfix] Missing label.
+
+
+0.002   2018-08-01 (PERLANCAR)
+
+	- Avoid deref-ing an undef.
+
+	- Tweak terminology: order amount -> order size (following terminology
+          in exchanges).
+
+	- [doc] Update example in Synopsis.
+
+
 0.001   2018-06-25 (PERLANCAR)
 
         - First release.

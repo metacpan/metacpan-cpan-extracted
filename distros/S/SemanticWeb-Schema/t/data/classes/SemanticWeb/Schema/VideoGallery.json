@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Web page type: Video gallery page.",
+      "rdfs:label" : "VideoGallery",
+      "rdfs:subClassOf" : "schema:CollectionPage"
+   },
+   "properties" : {}
+}

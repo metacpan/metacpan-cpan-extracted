@@ -4,90 +4,97 @@ author:
   - 'John Beppu <beppu@cpan.org>'
   - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
-  Module::Build: 0.3601
-  Scalar::Util: 0
-  Test::More: 0.94
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Approx: '0'
+  Test::Exception: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.3601
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: unrestricted
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Term-Caca
 provides:
   Term::Caca:
     file: lib/Term/Caca.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Bitmap:
     file: lib/Term/Caca/Bitmap.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Constants:
     file: lib/Term/Caca/Constants.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Event:
     file: lib/Term/Caca/Event.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Event::Key:
     file: lib/Term/Caca/Event/Key.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Event::Key::Press:
     file: lib/Term/Caca/Event/Key/Press.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Event::Key::Release:
     file: lib/Term/Caca/Event/Key/Release.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Event::Mouse::Button:
     file: lib/Term/Caca/Event/Mouse/Button.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Event::Mouse::Button::Press:
     file: lib/Term/Caca/Event/Mouse/Button/Press.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Event::Mouse::Button::Release:
     file: lib/Term/Caca/Event/Mouse/Button/Release.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Event::Mouse::Motion:
     file: lib/Term/Caca/Event/Mouse/Motion.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Event::Quit:
     file: lib/Term/Caca/Event/Quit.pm
-    version: v1.2.0
+    version: v3.0.0
   Term::Caca::Event::Resize:
     file: lib/Term/Caca/Event/Resize.pm
-    version: v1.2.0
+    version: v3.0.0
+  Term::Caca::FFI:
+    file: lib/Term/Caca/FFI.pm
+    version: v3.0.0
   Term::Caca::Sprite:
     file: lib/Term/Caca/Sprite.pm
-    version: v1.2.0
-  Term::Kaka:
-    file: lib/Term/Kaka.pm
-    version: v1.2.0
-  Term::Kaka::Bitmap:
-    file: lib/Term/Kaka/Bitmap.pm
-    version: v1.2.0
-  Term::Kaka::Constants:
-    file: lib/Term/Kaka/Constants.pm
-    version: v1.2.0
-  Term::Kaka::Sprite:
-    file: lib/Term/Kaka/Sprite.pm
-    version: v1.2.0
+    version: v3.0.0
 requires:
-  Carp: 0
-  Const::Fast: 0
-  DynaLoader: 0
-  Exporter: 0
-  List::MoreUtils: 0
-  Method::Signatures: 0
-  base: 0
-  constant: 0
-  parent: 0
-  perl: 5.10.0
-  strict: 0
-  vars: 0
-  warnings: 0
+  Alien::caca: '0'
+  Carp: '0'
+  Exporter: '0'
+  Exporter::Shiny: '0'
+  FFI::Platypus: '0'
+  FFI::Platypus::Memory: '0'
+  FFI::TinyCC: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Moose: '0'
+  MooseX::Attribute::Chained: '0'
+  MooseX::MungeHas: '0'
+  Path::Tiny: '0'
+  base: '0'
+  constant: '0'
+  experimental: '0'
+  parent: '0'
+  perl: v5.20.0
+  strict: '0'
+  warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Term-Caca
-  homepage: http://search.cpan.org/dist/Term-Caca/
+  bugtracker: https://github.com/yanick/Term-Caca/issues
+  homepage: https://github.com/yanick/Term-Caca
   repository: https://github.com/yanick/Term-Caca.git
-version: 1.2.0
+version: 3.0.0
 x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.01
+x_contributors:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

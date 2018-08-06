@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any branch of a field in which people typically develop specific expertise, usually after significant study, time, and effort.",
+      "rdfs:label" : "Specialty",
+      "rdfs:subClassOf" : "schema:Enumeration"
+   },
+   "properties" : {}
+}

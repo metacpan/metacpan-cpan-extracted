@@ -4,11 +4,16 @@ use strict;
 use warnings;
 
 use Devel::MAT;
+use Getopt::Long qw( :config no_permute );
 use String::Tagged 0.15;  # sprintf
 use String::Tagged::Terminal;
 use Commandable::Invocation;
 
-use constant CAN_COLOUR => -t STDOUT;
+use constant CAN_COLOUR => -t STDERR;
+
+GetOptions(
+   'quiet|q' => \( my $QUIET ),
+) or exit 1;
 
 # Some tools might want to draw pretty graphs with line drawing / similar
 STDOUT->binmode( ":encoding(UTF-8)" );
@@ -16,8 +21,8 @@ STDOUT->autoflush(1);
 
 my $file = shift @ARGV or die "Need dumpfile\n";
 
-my $progress = ( CAN_COLOUR ?
-   sub { print "\r\e[K" . ( shift // "" ); } :
+my $progress = ( CAN_COLOUR && !$QUIET ?
+   sub { print STDERR "\r\e[K" . ( shift // "" ); } :
    undef
 );
 
@@ -29,8 +34,10 @@ $progress->() if $progress;
 
 my $df = $pmat->dumpfile;
 
-print "Perl memory dumpfile from perl ", $df->perlversion, "\n";
-print "Heap contains ", scalar $df->heap, " objects\n";
+if( !$QUIET ) {
+   print "Perl memory dumpfile from perl ", $df->perlversion, "\n";
+   print "Heap contains ", scalar $df->heap, " objects\n";
+}
 
 sub Devel::MAT::Cmd::printf
 {

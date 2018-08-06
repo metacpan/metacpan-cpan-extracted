@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An enumeration of several kinds of Map.",
+      "rdfs:label" : "MapCategoryType",
+      "rdfs:subClassOf" : "schema:Enumeration"
+   },
+   "properties" : {}
+}

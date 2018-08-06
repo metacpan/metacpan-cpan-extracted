@@ -33,6 +33,12 @@ sub new {
     return $self;
 }
 
+sub File::lockf::lock_obj::fh {
+    my ($self) = @_;
+    
+    return $self->{fh};
+}
+
 sub File::lockf::lock_obj::lock {
     my ($self, $size) = @_;
     $size = 0 unless $size;
@@ -145,6 +151,10 @@ and then perform lock operations with it. All of the methods return 0
 This function returns a new lock object bound to the given file
 handle. Note that you need to pass a reference to the file handle
 to the constructor, not the file handle itself.
+
+=item $fh = $lock->fh()
+
+This method returns the file handle associated with the lock object.
 
 =item $status = $lock->lock(size = 0)
 

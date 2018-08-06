@@ -1,4 +1,6 @@
 Revision history for WebService-Braintree
+1.7     2018-07-08
+        Forgot to move some 'use Moose::Role' statements to 'use Moo::Role'
 1.6     2018-07-02
         Move from Moose to Moo
 1.5     2018-06-04

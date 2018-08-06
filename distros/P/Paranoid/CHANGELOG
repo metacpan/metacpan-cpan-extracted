@@ -1,5 +1,18 @@
 CHANGELOG
 
+v2.06 (2018/08/06)
+==================
+--Typos in documentation (Debian Perl Group)
+--Fixed bug in pflock in Paranoid::Process that failed to apply the 
+  flock as requested
+--Improved pflock testing as used by Paranoid::Log::File
+--Updated Paranoid::IO::Line POD to clarify the third option to many
+  functions which control line chomping.
+--Improved Paranoid::Process to constrain SIGCHLD handling to only those 
+  children forked specifically with/pfork().  This keeps evals and
+  miscellaneous system calls from skewing the counter.
+--Fixed pchown tests for platforms that use negative numbers for uid/gid
+
 v2.05 (2017/03/23)
 ==================
 --pkmdir would fail when given paths that included . or .. subdirs,

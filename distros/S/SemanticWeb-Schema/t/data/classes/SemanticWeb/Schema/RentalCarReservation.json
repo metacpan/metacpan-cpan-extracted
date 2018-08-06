@@ -1,0 +1,44 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A reservation for a rental car.</p>\n\n<p>Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations.",
+      "rdfs:label" : "RentalCarReservation",
+      "rdfs:subClassOf" : "schema:Reservation"
+   },
+   "properties" : {
+      "schema:dropoffLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Where a rental car can be dropped off.",
+         "rdfs:label" : "dropoffLocation",
+         "schema:domainIncludes" : "schema:RentalCarReservation",
+         "schema:rangeIncludes" : "schema:Place"
+      },
+      "schema:dropoffTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "When a rental car can be dropped off.",
+         "rdfs:label" : "dropoffTime",
+         "schema:domainIncludes" : "schema:RentalCarReservation",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:pickupLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Where a taxi will pick up a passenger or a rental car can be picked up.",
+         "rdfs:label" : "pickupLocation",
+         "schema:domainIncludes" : [
+            "schema:TaxiReservation",
+            "schema:RentalCarReservation"
+         ],
+         "schema:rangeIncludes" : "schema:Place"
+      },
+      "schema:pickupTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "When a taxi will pickup a passenger or a rental car can be picked up.",
+         "rdfs:label" : "pickupTime",
+         "schema:domainIncludes" : [
+            "schema:RentalCarReservation",
+            "schema:TaxiReservation"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      }
+   }
+}

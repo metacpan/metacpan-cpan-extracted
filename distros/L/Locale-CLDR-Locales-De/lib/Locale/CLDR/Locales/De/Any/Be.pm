@@ -6,13 +6,13 @@ Locale::CLDR::Locales::De::Any::Be - Package for language German
 
 package Locale::CLDR::Locales::De::Any::Be;
 # This file auto generated from Data\common\main\de_BE.xml
-#	on Fri 13 Apr  7:06:38 am GMT
+#	on Sun  5 Aug  5:57:01 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

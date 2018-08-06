@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of forming one's opinion, reaction or sentiment.",
+      "rdfs:label" : "AssessAction",
+      "rdfs:subClassOf" : "schema:Action"
+   },
+   "properties" : {}
+}

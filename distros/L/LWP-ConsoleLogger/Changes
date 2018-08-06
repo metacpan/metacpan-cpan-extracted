@@ -1,5 +1,8 @@
 Revision history for LWP-ConsoleLogger
 
+0.000039  2018-08-01 19:40:39Z
+    - (temporarily?) skip XML parsing test under newer versions of Data::Printer
+
 0.000038  2018-07-28 02:39:17Z
     - Add support for HTTP::CookieJar
 

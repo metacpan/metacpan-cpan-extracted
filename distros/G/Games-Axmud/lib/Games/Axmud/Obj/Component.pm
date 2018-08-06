@@ -203,7 +203,7 @@
             # The Locator checks the IVs in the order they appear here
             # NB The IVs using Axmud colour/style tags can use any of the tags in
             #   GA::Client->constColourStyleList except the dummy style tags (like 'bold',
-            #   'reverse_off' and 'attribs_off'), and all xterm/RGB colour tags
+            #   'reverse_off' and 'attribs_off'), and can also use all xterm/RGB colour tags
 
             # Start at the first line which DOES include one of these patterns
             startPatternList            => [],

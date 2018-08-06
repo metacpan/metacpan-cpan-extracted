@@ -22,15 +22,15 @@ WriteMakefile(
         'Mojo::Log::Che' => '0.01',
     },
     META_MERGE => {
-    'meta-spec' => { version => 2 },
-    resources => {
-      repository => {
-        type => 'git',
-        url => 'git://github.com/mche/Mojolicious-Che.git',
-        web => 'https://github.com/mche/Mojolicious-Che',
-      },
+        'meta-spec' => { version => 2 },
+        resources => {
+          repository => {
+            type => 'git',
+            url => 'git://github.com/mche/Mojolicious-Che.git',
+            web => 'https://github.com/mche/Mojolicious-Che',
+          },
+        },
     },
-  },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     #clean => { FILES => 'Mojolicious-Che-*' },
 );

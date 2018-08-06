@@ -1,5 +1,5 @@
 package Tk::IDElayoutDropSite;
-our ($VERSION) = ('0.33');
+our ($VERSION) = ('0.34');
 
 use base  qw(Tk::DropSite);
 
@@ -14,7 +14,7 @@ Tk::IDElayoutDropSite - Tk::DropSite widget with for the IDElayout Widget
 =head1 DESCRIPTION
 
 This is a L<Tk::DropSite> derived widget that handles drop-targets for the
-L<Tk::IDElayout> widget, which features some special drag/drop behavoir.
+L<Tk::IDElayout> widget, which features some special drag/drop behavior.
 
 =head1 SYNOPSIS
 

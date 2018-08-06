@@ -1,5 +1,10 @@
 Revision history for Webservice-KvKAPI
 
+0.005     2018-08-02 09:50:48Z
+
+    * Allow more search options with the CLI script
+    * Bump requirement for OpenAPI::Client to v0.17
+
 0.004     2018-07-20 14:22:45Z
 
     * Change perl path in bin script

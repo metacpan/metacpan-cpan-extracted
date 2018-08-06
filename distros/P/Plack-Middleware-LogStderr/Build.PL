@@ -19,7 +19,7 @@ my %module_build_args = (
     "Alex Malek"
   ],
   "dist_name" => "Plack-Middleware-LogStderr",
-  "dist_version" => "0.001",
+  "dist_version" => "0.002",
   "license" => "perl",
   "module_name" => "Plack::Middleware::LogStderr",
   "recursive_test_files" => 1,

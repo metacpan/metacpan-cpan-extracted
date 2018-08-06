@@ -4,6 +4,23 @@ The purpose of this module is to randomize characters in strings.
 Before a random or unrandom character (extract from random), the string
 will be converted to an array to get an odd/even number of key array.
 
+## How to Install :
+From Source :
+```bash
+git clone -b v0.1 git@github.com:CellBIS/CellBIS-Random.git
+perl Makefile.PL
+make && make test
+make install && make clean
+```
+with `cpan` command :
+```bash
+cpan -i CellBIS::Random
+```
+with `cpanm` command :
+```bash
+cpanm CellBIS::Random
+```
+
 # METHODS
 
 There is four methods `set_string`, `get_result`, `random` and `unrandom`.
@@ -33,7 +50,7 @@ Method to get result of random character and Extract result of random.
 
 ## random
 
-With set_string :
+With `set_string` :
 ```perl
 use CellBIS::Random;
 
@@ -48,7 +65,7 @@ Without `set_string` :
 my $result_random = $rand->random('my string here', 2, 3);
 print "Random Result : $result_random \n";
 ```
-=head2 unrandom
+## unrandom
 
 With `set_string` :
 ```perl
@@ -119,7 +136,7 @@ print "Extract Random Result : $extract_random \n";
   
 Case 2
 
-```
+```perl
 use CellBIS::Random;
 
 my $rand = CellBIS::Random->new();
@@ -137,6 +154,26 @@ my $extract_random = $rand->unrandom($result_random, 2, 3);
 
 print "Extract Random Result : $extract_random \n";
 ```
+  
+Case 3
+```perl
+use CellBIS::Random;
+
+my $rand = CellBIS::Random->new();
+
+# For Random
+my $result_random = $rand->random('my string here', 2, 3);
+
+print "Random Result : $result_random \n";
+
+=====================================================
+
+# For Extract Random
+my $extract_random = $rand->unrandom($result_random, 2, 3);
+
+print "Extract Random Result : $extract_random \n";
+```
+  
 # AUTHOR
 
 Achmad Yusri Afandi, <yusrideb@cpan.org>

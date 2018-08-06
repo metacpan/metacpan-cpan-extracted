@@ -3059,13 +3059,13 @@
             'edit_cmds', 'edit_routes',
             'simulate',
             'run_locator_wiz', 'edit_world_model',
-            'edit_client_prefs', 'edit_session_prefs', 'edit_current_prof',
+            'edit_quick_prefs', 'edit_client_prefs', 'edit_session_prefs', 'edit_current_prof',
             # 'Tasks' column
             'freeze_tasks', 'chat_task',
             'run_locator_wiz_2',
             'other_task',
             # 'Display' column
-            'open_automapper', 'open_gui_window',
+            'open_automapper', 'open_object_viewer',
             'activate_grid', 'activate_grid_with', 'reset_grid', 'disactivate_grid',
             'win_components', 'current_layer',
             'test_controls', 'test_panels',
@@ -4627,9 +4627,6 @@
             mapObj                      => undef,
             # The session's current world model object
             worldModelObj               => $session->worldModelObj,
-            # The pause window (a 'dialogue' window), set by $self->showPauseWin and reset by
-            #   $self->hidePauseWin
-            pauseWin                    => undef,
 
             # The menu bar
             menuBar                     => undef,
@@ -5383,7 +5380,7 @@
         }
 
         # If the pause window is visible, destroy it
-        if ($self->pauseWin) {
+        if ($axmud::CLIENT->busyWin) {
 
             $self->hidePauseWin();
         }
@@ -15047,19 +15044,13 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->showPauseWin', @_);
         }
 
-        if (! $self->pauseWin) {
+        if (! $axmud::CLIENT->busyWin) {
 
             # Show the window widget
-            my $dialogueWin = $self->showBusyWin(
+            $self->showBusyWin(
                 $axmud::SHARE_DIR . '/icons/system/mapper.png',
                 'Working...',
             );
-
-            if ($dialogueWin) {
-
-                # Update IVs
-                $self->ivPoke('pauseWin', $dialogueWin);
-            }
         }
 
         return 1;
@@ -15085,10 +15076,9 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->hidePauseWin', @_);
         }
 
-        if ($self->pauseWin) {
+        if ($axmud::CLIENT->busyWin) {
 
-            $self->closeDialogueWin($self->pauseWin);
-            $self->ivUndef('pauseWin');
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
         }
 
         return 1;
@@ -40546,8 +40536,6 @@
         { $_[0]->{mapObj} }
     sub worldModelObj
         { $_[0]->{worldModelObj} }
-    sub pauseWin
-        { $_[0]->{pauseWin} }
 
     sub menuBar
         { $_[0]->{menuBar} }

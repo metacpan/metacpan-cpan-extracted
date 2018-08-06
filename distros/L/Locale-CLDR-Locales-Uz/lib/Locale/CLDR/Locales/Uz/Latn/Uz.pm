@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Uz::Latn::Uz - Package for language Uzbek
 
 package Locale::CLDR::Locales::Uz::Latn::Uz;
 # This file auto generated from Data\common\main\uz_Latn_UZ.xml
-#	on Fri 13 Apr  7:34:04 am GMT
+#	on Sun  5 Aug  6:27:42 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

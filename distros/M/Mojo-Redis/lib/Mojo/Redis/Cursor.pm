@@ -28,14 +28,14 @@ sub all {
       $p->then(sub { push @res, @{$_[0] || []} })->catch(sub { $err = shift })->wait;
       croak $err if $err;
     }
-    return $self->{process}->(\@res);
+    return $self->{process}->($self, \@res);
   }
 
   # Non-blocking
   my $then;
   $then = sub {
     push @res, @{$_[0]};
-    return $self->$cb('', $self->{process}->(\@res)) if $self->{finished};
+    return $self->$cb('', $self->{process}->($self, \@res)) if $self->{finished};
     return $self->_next_p($conn)->then($then);
   };
 
@@ -50,7 +50,7 @@ sub all_p {
 
   $then = sub {
     push @res, @{$_[0]};
-    return $self->{process}->(\@res) if $self->{finished};
+    return $self->{process}->($self, \@res) if $self->{finished};
     return $self->_next_p($conn)->then($then);
   };
 
@@ -68,19 +68,19 @@ sub next {
   # Blocking
   unless ($cb) {
     my ($err, $res);
-    $p->then(sub { $res = $self->{process}->(shift) })->catch(sub { $err = shift })->wait;
+    $p->then(sub { $res = $self->{process}->($self, shift) })->catch(sub { $err = shift })->wait;
     croak $err if $err;
     return $res;
   }
 
   # Non-blocking
-  $p->then(sub { $self->$cb('', $self->{process}->(shift)) })->catch(sub { $self->$cb(shift, undef) });
+  $p->then(sub { $self->$cb('', $self->{process}->($self, shift)) })->catch(sub { $self->$cb(shift, undef) });
   return $self;
 }
 
 sub next_p {
   my $self = shift;
-  return $self->_next_p($self->connection)->then(sub { $self->{process}->(shift) });
+  return $self->_next_p($self->connection)->then(sub { $self->{process}->($self, shift) });
 }
 
 sub new {
@@ -110,25 +110,25 @@ sub _next_p {
 
   my $cmd = $self->command;
   return $conn->write_p(@$cmd)->then(sub {
-    my $pos = shift;
-    $cmd->[$self->{cursor_pos_in_command}] = $pos // 0;
-    $self->{finished} = 1 unless $pos;
-    return [@_];
+    my $res = shift;
+    $cmd->[$self->{cursor_pos_in_command}] = $res->[0] // 0;
+    $self->{finished} = 1 unless $res->[0];
+    return $res->[1];
   });
 }
 
-sub _process_hgetall  { +{@{$_[0]}} }
-sub _process_hkeys    { my %h = @{$_[0]}; return [keys %h]; }
-sub _process_hscan    { $_[0] }
-sub _process_keys     { $_[0] }
-sub _process_scan     { $_[0] }
-sub _process_smembers { $_[0] }
-sub _process_sscan    { $_[0] }
-sub _process_zscan    { $_[0] }
+sub _process_hgetall  { +{@{$_[1]}} }
+sub _process_hkeys    { my %h = @{$_[1]}; return [keys %h]; }
+sub _process_hscan    { $_[1] }
+sub _process_keys     { $_[1] }
+sub _process_scan     { $_[1] }
+sub _process_smembers { $_[1] }
+sub _process_sscan    { $_[1] }
+sub _process_zscan    { $_[1] }
 
 sub DESTROY {
   my $self = shift;
-  return unless (my $redis = $self->redis) && (my $conn = $self->connection);
+  return unless (my $redis = $self->{redis}) && (my $conn = $self->{connection});
   $redis->_enqueue($conn);
 }
 

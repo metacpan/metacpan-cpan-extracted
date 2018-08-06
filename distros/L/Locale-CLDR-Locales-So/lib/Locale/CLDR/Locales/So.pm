@@ -6,13 +6,13 @@ Locale::CLDR::Locales::So - Package for language Somali
 
 package Locale::CLDR::Locales::So;
 # This file auto generated from Data\common\main\so.xml
-#	on Fri 13 Apr  7:28:39 am GMT
+#	on Sun  5 Aug  6:21:39 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -819,23 +819,23 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'wide' => {
+					'am' => q{sn.},
+					'pm' => q{gn.},
+				},
+				'narrow' => {
+					'am' => q{sn.},
+					'pm' => q{gn.},
+				},
 				'abbreviated' => {
 					'pm' => q{gn.},
 					'am' => q{sn.},
 				},
-				'narrow' => {
-					'pm' => q{gn.},
-					'am' => q{sn.},
-				},
-				'wide' => {
-					'am' => q{sn.},
-					'pm' => q{gn.},
-				},
 			},
 			'stand-alone' => {
 				'wide' => {
-					'pm' => q{gn.},
 					'am' => q{sn.},
+					'pm' => q{gn.},
 				},
 				'abbreviated' => {
 					'pm' => q{gn.},
@@ -919,7 +919,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -927,6 +927,7 @@ has 'datetime_formats_available_formats' => (
 			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
+			MMMMW => q{'usbuuc' W 'ee' MMMM},
 			MMMMd => q{MMMM d},
 			MMMd => q{MMM d},
 			Md => q{M/d},
@@ -942,7 +943,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -950,7 +951,6 @@ has 'datetime_formats_available_formats' => (
 			MMM => q{LLL},
 			MMMEd => q{E, MMM d},
 			MMMMEd => q{E, MMMM d},
-			MMMMW => q{'usbuuc' W 'ee' MMMM},
 			MMMMd => q{MMMM d},
 			MMMd => q{MMM d},
 			Md => q{M/d},
@@ -982,7 +982,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			M => {
 				M => q{M–M},
 			},
@@ -1059,7 +1059,7 @@ has 'datetime_formats_interval' => (
 				y => q{dd/MM/y – dd/MM/y},
 			},
 		},
-		'gregorian' => {
+		'generic' => {
 			M => {
 				M => q{M–M},
 			},

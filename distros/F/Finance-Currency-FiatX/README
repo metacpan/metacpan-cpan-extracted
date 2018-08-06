@@ -2,8 +2,8 @@ NAME
     Finance::Currency::FiatX - Fiat currency exchange rate library
 
 VERSION
-    This document describes version 0.009 of Finance::Currency::FiatX (from
-    Perl distribution Finance-Currency-FiatX), released on 2018-07-15.
+    This document describes version 0.010 of Finance::Currency::FiatX (from
+    Perl distribution Finance-Currency-FiatX), released on 2018-08-01.
 
 SYNOPSIS
     See fiatx from App::fiatx for an example on how to use this module.

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Seh - Package for language Sena
 
 package Locale::CLDR::Locales::Seh;
 # This file auto generated from Data\common\main\seh.xml
-#	on Fri 13 Apr  7:27:40 am GMT
+#	on Sun  5 Aug  6:20:33 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -567,6 +567,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ouguiya da Mauritânia \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ouguiya da Mauritânia),
 			},
 		},
@@ -642,6 +647,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dobra de São Tomé e Príncipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dobra de São Tomé e Príncipe),
 			},

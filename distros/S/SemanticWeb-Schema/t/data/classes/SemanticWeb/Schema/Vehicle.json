@@ -1,0 +1,248 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A vehicle is a device that is designed or used to transport people or cargo over land, water, air, or through space.",
+      "rdfs:label" : "Vehicle",
+      "rdfs:subClassOf" : "schema:Product"
+   },
+   "properties" : {
+      "schema:cargoVolume" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The available volume for cargo or luggage. For automobiles, this is usually the trunk volume.</p>\n\n<p>Typical unit code(s): LTR for liters, FTQ for cubic foot/feet</p>\n\n<p>Note: You can use <a class=\"localLink\" href=\"http://schema.org/minValue\">minValue</a> and <a class=\"localLink\" href=\"http://schema.org/maxValue\">maxValue</a> to indicate ranges.",
+         "rdfs:label" : "cargoVolume",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      },
+      "schema:dateVehicleFirstRegistered" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date of the first registration of the vehicle with the respective public authorities.",
+         "rdfs:label" : "dateVehicleFirstRegistered",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:Date"
+      },
+      "schema:driveWheelConfiguration" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The drive wheel configuration, i.e. which roadwheels will receive torque from the vehicle's engine via the drivetrain.",
+         "rdfs:label" : "driveWheelConfiguration",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : [
+            "schema:DriveWheelConfigurationValue",
+            "schema:Text"
+         ]
+      },
+      "schema:fuelConsumption" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "<p>The amount of fuel consumed for traveling a particular distance or temporal duration with the given vehicle (e.g. liters per 100 km).</p>\n\n<ul>\n<li>Note 1: There are unfortunately no standard unit codes for liters per 100 km.  Use <a class=\"localLink\" href=\"http://schema.org/unitText\">unitText</a> to indicate the unit of measurement, e.g. L/100 km.</li>\n<li>Note 2: There are two ways of indicating the fuel consumption, <a class=\"localLink\" href=\"http://schema.org/fuelConsumption\">fuelConsumption</a> (e.g. 8 liters per 100 km) and <a class=\"localLink\" href=\"http://schema.org/fuelEfficiency\">fuelEfficiency</a> (e.g. 30 miles per gallon). They are reciprocal.</li>\n<li>Note 3: Often, the absolute value is useful only when related to driving speed (\"at 80 km/h\") or usage pattern (\"city traffic\"). You can use <a class=\"localLink\" href=\"http://schema.org/valueReference\">valueReference</a> to link the value for the fuel consumption to another value.</li>\n</ul>\n",
+         "rdfs:label" : "fuelConsumption",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      },
+      "schema:fuelEfficiency" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "<p>The distance traveled per unit of fuel used; most commonly miles per gallon (mpg) or kilometers per liter (km/L).</p>\n\n<ul>\n<li>Note 1: There are unfortunately no standard unit codes for miles per gallon or kilometers per liter. Use <a class=\"localLink\" href=\"http://schema.org/unitText\">unitText</a> to indicate the unit of measurement, e.g. mpg or km/L.</li>\n<li>Note 2: There are two ways of indicating the fuel consumption, <a class=\"localLink\" href=\"http://schema.org/fuelConsumption\">fuelConsumption</a> (e.g. 8 liters per 100 km) and <a class=\"localLink\" href=\"http://schema.org/fuelEfficiency\">fuelEfficiency</a> (e.g. 30 miles per gallon). They are reciprocal.</li>\n<li>Note 3: Often, the absolute value is useful only when related to driving speed (\"at 80 km/h\") or usage pattern (\"city traffic\"). You can use <a class=\"localLink\" href=\"http://schema.org/valueReference\">valueReference</a> to link the value for the fuel economy to another value.</li>\n</ul>\n",
+         "rdfs:label" : "fuelEfficiency",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      },
+      "schema:fuelType" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of fuel suitable for the engine or engines of the vehicle. If the vehicle has only one engine, this property can be attached directly to the vehicle.",
+         "rdfs:label" : "fuelType",
+         "schema:domainIncludes" : [
+            "schema:Vehicle",
+            "schema:EngineSpecification"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text",
+            "schema:QualitativeValue"
+         ]
+      },
+      "schema:knownVehicleDamages" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A textual description of known damages, both repaired and unrepaired.",
+         "rdfs:label" : "knownVehicleDamages",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:mileageFromOdometer" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The total distance travelled by the particular vehicle since its initial production, as read from its odometer.</p>\n\n<p>Typical unit code(s): KMT for kilometers, SMI for statute miles",
+         "rdfs:label" : "mileageFromOdometer",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      },
+      "schema:numberOfAirbags" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number or type of airbags in the vehicle.",
+         "rdfs:label" : "numberOfAirbags",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Number"
+         ]
+      },
+      "schema:numberOfAxles" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of axles.</p>\n\n<p>Typical unit code(s): C62",
+         "rdfs:label" : "numberOfAxles",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Number"
+         ]
+      },
+      "schema:numberOfDoors" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of doors.</p>\n\n<p>Typical unit code(s): C62",
+         "rdfs:label" : "numberOfDoors",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Number"
+         ]
+      },
+      "schema:numberOfForwardGears" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The total number of forward gears available for the transmission system of the vehicle.</p>\n\n<p>Typical unit code(s): C62",
+         "rdfs:label" : "numberOfForwardGears",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Number"
+         ]
+      },
+      "schema:numberOfPreviousOwners" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of owners of the vehicle, including the current one.</p>\n\n<p>Typical unit code(s): C62",
+         "rdfs:label" : "numberOfPreviousOwners",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Number"
+         ]
+      },
+      "schema:productionDate" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date of production of the item, e.g. vehicle.",
+         "rdfs:label" : "productionDate",
+         "schema:domainIncludes" : [
+            "schema:Vehicle",
+            "schema:Product"
+         ],
+         "schema:rangeIncludes" : "schema:Date"
+      },
+      "schema:purchaseDate" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date the item e.g. vehicle was purchased by the current owner.",
+         "rdfs:label" : "purchaseDate",
+         "schema:domainIncludes" : [
+            "schema:Vehicle",
+            "schema:Product"
+         ],
+         "schema:rangeIncludes" : "schema:Date"
+      },
+      "schema:steeringPosition" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The position of the steering wheel or similar device (mostly for cars).",
+         "rdfs:label" : "steeringPosition",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:SteeringPositionValue"
+      },
+      "schema:vehicleConfiguration" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A short text indicating the configuration of the vehicle, e.g. '5dr hatchback ST 2.5 MT 225 hp' or 'limited edition'.",
+         "rdfs:label" : "vehicleConfiguration",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:vehicleEngine" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Information about the engine or engines of the vehicle.",
+         "rdfs:label" : "vehicleEngine",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:EngineSpecification"
+      },
+      "schema:vehicleIdentificationNumber" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The Vehicle Identification Number (VIN) is a unique serial number used by the automotive industry to identify individual motor vehicles.",
+         "rdfs:label" : "vehicleIdentificationNumber",
+         "rdfs:subPropertyOf" : "schema:serialNumber",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:vehicleInteriorColor" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The color or color combination of the interior of the vehicle.",
+         "rdfs:label" : "vehicleInteriorColor",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:vehicleInteriorType" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type or material of the interior of the vehicle (e.g. synthetic fabric, leather, wood, etc.). While most interior types are characterized by the material used, an interior type can also be based on vehicle usage or target audience.",
+         "rdfs:label" : "vehicleInteriorType",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:vehicleModelDate" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The release date of a vehicle model (often used to differentiate versions of the same make and model).",
+         "rdfs:label" : "vehicleModelDate",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:Date"
+      },
+      "schema:vehicleSeatingCapacity" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of passengers that can be seated in the vehicle, both in terms of the physical space available, and in terms of limitations set by law.</p>\n\n<p>Typical unit code(s): C62 for persons.",
+         "rdfs:label" : "vehicleSeatingCapacity",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:QuantitativeValue"
+         ]
+      },
+      "schema:vehicleSpecialUsage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates whether the vehicle has been used for special purposes, like commercial rental, driving school, or as a taxi. The legislation in many countries requires this information to be revealed when offering a car for sale.",
+         "rdfs:label" : "vehicleSpecialUsage",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:vehicleTransmission" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of component used for transmitting the power from a rotating power source to the wheels or other relevant component(s) (\"gearbox\" for cars).",
+         "rdfs:label" : "vehicleTransmission",
+         "schema:domainIncludes" : "schema:Vehicle",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text",
+            "schema:QualitativeValue"
+         ]
+      }
+   }
+}

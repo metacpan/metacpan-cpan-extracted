@@ -1,0 +1,425 @@
+{
+   "class" : {
+      "owl:equivalentClass" : "dcmitype:Event",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An event happening at a certain time and location, such as a concert, lecture, or festival. Ticketing information may be added via the <a class=\"localLink\" href=\"http://schema.org/offers\">offers</a> property. Repeated events may be structured as separate Event objects.",
+      "rdfs:label" : "Event",
+      "rdfs:subClassOf" : "schema:Thing"
+   },
+   "properties" : {
+      "schema:about" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The subject matter of the content.",
+         "rdfs:label" : "about",
+         "schema:domainIncludes" : [
+            "schema:CommunicateAction",
+            "schema:Event",
+            "schema:CreativeWork"
+         ],
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:actor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc., or in an event. Actors can be associated with individual items or with a series, episode, clip.",
+         "rdfs:label" : "actor",
+         "schema:domainIncludes" : [
+            "schema:TVSeries",
+            "schema:Event",
+            "schema:VideoGameSeries",
+            "schema:Clip",
+            "schema:VideoObject",
+            "schema:RadioSeries",
+            "schema:Movie",
+            "schema:Episode",
+            "schema:CreativeWorkSeason",
+            "schema:MovieSeries",
+            "schema:VideoGame"
+         ],
+         "schema:rangeIncludes" : "schema:Person"
+      },
+      "schema:aggregateRating" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The overall rating, based on a collection of reviews or ratings, of the item.",
+         "rdfs:label" : "aggregateRating",
+         "schema:domainIncludes" : [
+            "schema:Organization",
+            "schema:Event",
+            "schema:Place",
+            "schema:Brand",
+            "schema:Product",
+            "schema:CreativeWork",
+            "schema:Offer",
+            "schema:Service"
+         ],
+         "schema:rangeIncludes" : "schema:AggregateRating"
+      },
+      "schema:attendee" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A person or organization attending the event.",
+         "rdfs:label" : "attendee",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      },
+      "schema:attendees" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A person attending the event.",
+         "rdfs:label" : "attendees",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ],
+         "schema:supersededBy" : "schema:attendee"
+      },
+      "schema:audience" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
+         "rdfs:label" : "audience",
+         "schema:domainIncludes" : [
+            "schema:Product",
+            "schema:Service",
+            "schema:LodgingBusiness",
+            "schema:Event",
+            "schema:CreativeWork",
+            "schema:PlayAction"
+         ],
+         "schema:rangeIncludes" : "schema:Audience"
+      },
+      "schema:composer" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The person or organization who wrote a composition, or who is the composer of a work performed at some event.",
+         "rdfs:label" : "composer",
+         "schema:domainIncludes" : [
+            "schema:MusicComposition",
+            "schema:Event"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      },
+      "schema:contributor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A secondary contributor to the CreativeWork or Event.",
+         "rdfs:label" : "contributor",
+         "schema:domainIncludes" : [
+            "schema:CreativeWork",
+            "schema:Event"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:director" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A director of e.g. tv, radio, movie, video gaming etc. content, or of an event. Directors can be associated with individual items or with a series, episode, clip.",
+         "rdfs:label" : "director",
+         "schema:domainIncludes" : [
+            "schema:Movie",
+            "schema:VideoGameSeries",
+            "schema:Clip",
+            "schema:VideoObject",
+            "schema:TVSeries",
+            "schema:Episode",
+            "schema:MovieSeries",
+            "schema:RadioSeries",
+            "schema:Event",
+            "schema:CreativeWorkSeason",
+            "schema:VideoGame"
+         ],
+         "schema:rangeIncludes" : "schema:Person"
+      },
+      "schema:doorTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The time admission will commence.",
+         "rdfs:label" : "doorTime",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:duration" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
+         "rdfs:label" : "duration",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:MediaObject",
+            "schema:MusicRelease",
+            "schema:Movie",
+            "schema:MusicRecording"
+         ],
+         "schema:rangeIncludes" : "schema:Duration"
+      },
+      "schema:endDate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The end date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
+         "rdfs:label" : "endDate",
+         "schema:domainIncludes" : [
+            "schema:CreativeWorkSeries",
+            "schema:CreativeWorkSeason",
+            "schema:Role",
+            "schema:Event",
+            "schema:DatedMoneySpecification"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:DateTime",
+            "schema:Date"
+         ]
+      },
+      "schema:eventStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An eventStatus of an event represents its status; particularly useful when an event is cancelled or rescheduled.",
+         "rdfs:label" : "eventStatus",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : "schema:EventStatusType"
+      },
+      "schema:funder" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A person or organization that supports (sponsors) something through some kind of financial contribution.",
+         "rdfs:label" : "funder",
+         "rdfs:subPropertyOf" : "schema:sponsor",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:CreativeWork",
+            "schema:Organization",
+            "schema:Person"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      },
+      "schema:inLanguage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/availableLanguage\">availableLanguage</a>.",
+         "rdfs:label" : "inLanguage",
+         "schema:domainIncludes" : [
+            "schema:CommunicateAction",
+            "schema:CreativeWork",
+            "schema:WriteAction",
+            "schema:Event"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Language",
+            "schema:Text"
+         ]
+      },
+      "schema:isAccessibleForFree" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A flag to signal that the item, event, or place is accessible for free.",
+         "rdfs:label" : "isAccessibleForFree",
+         "schema:domainIncludes" : [
+            "schema:CreativeWork",
+            "schema:PublicationEvent",
+            "schema:Place",
+            "schema:Event"
+         ],
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:location" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The location of for example where the event is happening, an organization is located, or where an action takes place.",
+         "rdfs:label" : "location",
+         "schema:domainIncludes" : [
+            "schema:Organization",
+            "schema:Action",
+            "schema:Event"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:PostalAddress",
+            "schema:Place"
+         ]
+      },
+      "schema:maximumAttendeeCapacity" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The total number of individuals that may attend an event or venue.",
+         "rdfs:label" : "maximumAttendeeCapacity",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:Place"
+         ],
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:offers" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event.",
+         "rdfs:label" : "offers",
+         "schema:domainIncludes" : [
+            "schema:Product",
+            "schema:MenuItem",
+            "schema:CreativeWork",
+            "schema:AggregateOffer",
+            "schema:Event",
+            "schema:Service"
+         ],
+         "schema:rangeIncludes" : "schema:Offer"
+      },
+      "schema:organizer" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An organizer of an Event.",
+         "rdfs:label" : "organizer",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:performer" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A performer at the event&#x2014;for example, a presenter, musician, musical group or actor.",
+         "rdfs:label" : "performer",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      },
+      "schema:performers" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The main performer or performers of the event&#x2014;for example, a presenter, musician, or actor.",
+         "rdfs:label" : "performers",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ],
+         "schema:supersededBy" : "schema:performer"
+      },
+      "schema:previousStartDate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Used in conjunction with eventStatus for rescheduled or cancelled events. This property contains the previously scheduled start date. For rescheduled events, the startDate property should be used for the newly scheduled start date. In the (rare) case of an event that has been postponed and rescheduled multiple times, this field may be repeated.",
+         "rdfs:label" : "previousStartDate",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : "schema:Date"
+      },
+      "schema:recordedIn" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The CreativeWork that captured all or part of this Event.",
+         "rdfs:label" : "recordedIn",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:inverseOf" : "schema:recordedAt",
+         "schema:rangeIncludes" : "schema:CreativeWork"
+      },
+      "schema:remainingAttendeeCapacity" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of attendee places for an event that remain unallocated.",
+         "rdfs:label" : "remainingAttendeeCapacity",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:review" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A review of the item.",
+         "rdfs:label" : "review",
+         "schema:domainIncludes" : [
+            "schema:CreativeWork",
+            "schema:Brand",
+            "schema:Offer",
+            "schema:Event",
+            "schema:Service",
+            "schema:Place",
+            "schema:Organization",
+            "schema:Product"
+         ],
+         "schema:rangeIncludes" : "schema:Review"
+      },
+      "schema:sponsor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A person or organization that supports a thing through a pledge, promise, or financial contribution. e.g. a sponsor of a Medical Study or a corporate sponsor of an event.",
+         "rdfs:label" : "sponsor",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:Person",
+            "schema:Organization",
+            "schema:CreativeWork"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:startDate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The start date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
+         "rdfs:label" : "startDate",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:DatedMoneySpecification",
+            "schema:CreativeWorkSeries",
+            "schema:Role",
+            "schema:CreativeWorkSeason"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Date",
+            "schema:DateTime"
+         ]
+      },
+      "schema:subEvent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An Event that is part of this event. For example, a conference event includes many presentations, each of which is a subEvent of the conference.",
+         "rdfs:label" : "subEvent",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:inverseOf" : "schema:superEvent",
+         "schema:rangeIncludes" : "schema:Event"
+      },
+      "schema:subEvents" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Events that are a part of this event. For example, a conference event includes many presentations, each subEvents of the conference.",
+         "rdfs:label" : "subEvents",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : "schema:Event",
+         "schema:supersededBy" : "schema:subEvent"
+      },
+      "schema:superEvent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An event that this event is a part of. For example, a collection of individual music performances might each have a music festival as their superEvent.",
+         "rdfs:label" : "superEvent",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:inverseOf" : "schema:subEvent",
+         "schema:rangeIncludes" : "schema:Event"
+      },
+      "schema:translator" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Organization or person who adapts a creative work to different languages, regional differences and technical requirements of a target market, or that translates during some event.",
+         "rdfs:label" : "translator",
+         "schema:domainIncludes" : [
+            "schema:CreativeWork",
+            "schema:Event"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:typicalAgeRange" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The typical expected age range, e.g. '7-9', '11-'.",
+         "rdfs:label" : "typicalAgeRange",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:CreativeWork"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:workFeatured" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A work featured in some event, e.g. exhibited in an ExhibitionEvent.\n       Specific subproperties are available for workPerformed (e.g. a play), or a workPresented (a Movie at a ScreeningEvent).",
+         "rdfs:label" : "workFeatured",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : "schema:CreativeWork"
+      },
+      "schema:workPerformed" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A work performed in some event, for example a play performed in a TheaterEvent.",
+         "rdfs:label" : "workPerformed",
+         "rdfs:subPropertyOf" : "schema:workFeatured",
+         "schema:domainIncludes" : "schema:Event",
+         "schema:rangeIncludes" : "schema:CreativeWork"
+      }
+   }
+}

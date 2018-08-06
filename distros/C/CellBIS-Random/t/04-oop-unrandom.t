@@ -8,12 +8,23 @@ use lib "$FindBin::Bin/../lib";
 
 use CellBIS::Random;
 
-my $rand = CellBIS::Random->new();
+my $rand;
+my $random;
+my $unrandom;
+
+$rand = CellBIS::Random->new();
 $rand->set_string('string testing random');
-my $random = $rand->random(2, 3);
+$random = $rand->random(2, 3);
 
 $rand->set_string($random);
-my $unrandom = $rand->unrandom(2, 3);
-is($unrandom, 'string testing random', "Result of unrandom : [$unrandom] is true");
+$unrandom = $rand->unrandom(2, 3);
+is($unrandom, 'string testing random', "Result of unrandom with set_string : [$unrandom] is true");
+
+$rand = CellBIS::Random->new();
+$random = $rand->random('string testing random', 2, 3);
+
+$rand->set_string($random);
+$unrandom = $rand->unrandom(2, 3);
+is($unrandom, 'string testing random', "Result of unrandom without set_string : [$unrandom] is true");
 
 done_testing();

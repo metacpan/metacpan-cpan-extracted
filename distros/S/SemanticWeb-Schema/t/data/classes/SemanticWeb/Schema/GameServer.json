@@ -1,0 +1,32 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Server that provides game interaction in a multiplayer game.",
+      "rdfs:label" : "GameServer",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:game" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Video game which is played on this server.",
+         "rdfs:label" : "game",
+         "schema:domainIncludes" : "schema:GameServer",
+         "schema:inverseOf" : "schema:gameServer",
+         "schema:rangeIncludes" : "schema:VideoGame"
+      },
+      "schema:playersOnline" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Number of players on the server.",
+         "rdfs:label" : "playersOnline",
+         "schema:domainIncludes" : "schema:GameServer",
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:serverStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Status of a game server.",
+         "rdfs:label" : "serverStatus",
+         "schema:domainIncludes" : "schema:GameServer",
+         "schema:rangeIncludes" : "schema:GameServerStatus"
+      }
+   }
+}

@@ -11,10 +11,10 @@ use URI;
 use Test::More;
 use Test::WWW::Mechanize::Catalyst 'RestTest';
 use HTTP::Request::Common;
-use JSON;
+use JSON::MaybeXS;
 use Data::Printer;
 
-my $json = JSON->new->utf8;
+my $json = JSON::MaybeXS->new(utf8 => 1);
 
 my $mech = Test::WWW::Mechanize::Catalyst->new;
 ok( my $schema = DBICTest->init_schema(), 'got schema' );
@@ -206,7 +206,7 @@ my $track_list_url           = "$base/api/rest/track";
         $response,
 
         # track does set use_json_boolean
-        { list => \@expected_response, success => JSON::true, totalcount => 15 },
+        { list => \@expected_response, success => JSON::MaybeXS::true, totalcount => 15 },
         'correct data returned for static configured paging'
     );
 }
@@ -326,7 +326,7 @@ my $track_list_url           = "$base/api/rest/track";
         is_deeply(
             $response,
             # track does set use_json_boolean
-            { list => \@expected_response, success => JSON::true, totalcount => 2 },
+            { list => \@expected_response, success => JSON::MaybeXS::true, totalcount => 2 },
             'correct data returned for -and|-or search param'
         )
             or diag p($case) . p($response);

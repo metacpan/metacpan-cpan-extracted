@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::IdError
 Perl data type class for the XML Schema defined complexType
 IdError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Errors associated with the ids. 
 
 
 

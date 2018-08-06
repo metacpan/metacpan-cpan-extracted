@@ -5,7 +5,7 @@ use warnings;
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'https://adwords.google.com/api/adwords/rm/v201806' };
+sub get_xmlns { 'https://adwords.google.com/api/adwords/cm/v201806' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -85,7 +85,7 @@ Google::Ads::AdWords::v201806::CriterionError
 =head1 DESCRIPTION
 
 Perl data type class for the XML Schema defined complexType
-CriterionError from the namespace https://adwords.google.com/api/adwords/rm/v201806.
+CriterionError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
 Error class used for reporting criteria related errors. 
 

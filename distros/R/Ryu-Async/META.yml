@@ -18,7 +18,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.48'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,7 @@ requires:
   Future: '0.37'
   IO::Async: '0.71'
   IO::Socket::IP: '0.37'
-  Log::Any: '1.000'
+  Log::Any: '1.050'
   Ryu: '0.026'
   Syntax::Keyword::Try: '0'
   URI::tcp: '0'
@@ -45,5 +45,6 @@ requires:
 resources:
   bugtracker: https://github.com/team-at-cpan/Ryu-Async/issues
   repository: git://github.com/team-at-cpan/Ryu-Async.git
-version: '0.009'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.010'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

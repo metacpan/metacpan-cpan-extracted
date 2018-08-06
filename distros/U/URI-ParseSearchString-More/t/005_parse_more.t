@@ -1,5 +1,3 @@
-# -*- perl -*-
-
 use strict;
 use warnings;
 
@@ -24,23 +22,21 @@ export TEST_UPM_CACHED=1
 
 use Test::Most;
 use Test::RequiresInternet;
-
-use URI::ParseSearchString::More;
+use URI::ParseSearchString::More ();
 
 my $more = URI::ParseSearchString::More->new();
 
 use Config::General;
-my $conf = new Config::General(
-    -ConfigFile      => "t/urls.cfg",
+my $conf = Config::General->new(
+    -ConfigFile      => 't/urls.cfg',
     -BackslashEscape => 1,
 );
 my %config = $conf->getall;
 
 if ( exists $ENV{'TEST_UPM_CACHED'}
-    && $ENV{'TEST_UPM_CACHED'} )
-{
-    $more->set_cached( 1 );
-    diag( "caching is enabled..." );
+    && $ENV{'TEST_UPM_CACHED'} ) {
+    $more->set_cached(1);
+    diag('caching is enabled...');
 }
 
 foreach my $test ( @{ $config{'urls'} } ) {
@@ -50,10 +46,9 @@ foreach my $test ( @{ $config{'urls'} } ) {
 
     if (   $more->get_mech
         && $more->get_mech->status
-        && $more->get_mech->status == 403 )
-    {
-        diag( "You may be getting blocked by $test->{'url'}" );
-        exit( 0 );
+        && $more->get_mech->status == 403 ) {
+        diag("You may be getting blocked by $test->{'url'}");
+        exit(0);
     }
 
     is( $terms, $test->{'terms'}, "got $terms" );

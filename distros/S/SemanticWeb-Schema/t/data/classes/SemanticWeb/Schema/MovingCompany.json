@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A moving company.",
+      "rdfs:label" : "MovingCompany",
+      "rdfs:subClassOf" : "schema:HomeAndConstructionBusiness"
+   },
+   "properties" : {}
+}

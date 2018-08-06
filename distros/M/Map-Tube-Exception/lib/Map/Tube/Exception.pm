@@ -1,13 +1,13 @@
 package Map::Tube::Exception;
 $Map::Tube::Exception::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::VERSION = '3.16';
+$Map::Tube::Exception::VERSION = '3.17';
 =head1 NAME
 
 Map::Tube::Exception - Base exception package as Moo Role for Map::Tube::* family.
 
 =head1 VERSION
 
-version 3.16
+version 3.17
 
 =cut
 
@@ -76,6 +76,7 @@ Map::Tube and it's Map::Tube::* family. It has been re-structured in the process
     |     127     | Invalid color hex code.                                     |
     |     128     | Invalid line structure.                                     |
     |     129     | Invalid station structure.                                  |
+    |     130     | Invalid background color.                                   |
     +-------------+-------------------------------------------------------------+
 
 =head1 AUTHOR

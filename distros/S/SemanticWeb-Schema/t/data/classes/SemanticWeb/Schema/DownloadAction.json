@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of downloading an object.",
+      "rdfs:label" : "DownloadAction",
+      "rdfs:subClassOf" : "schema:TransferAction"
+   },
+   "properties" : {}
+}

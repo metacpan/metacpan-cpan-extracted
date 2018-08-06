@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Lu - Package for language Luba-Katanga
 
 package Locale::CLDR::Locales::Lu;
 # This file auto generated from Data\common\main\lu.xml
-#	on Fri 13 Apr  7:18:54 am GMT
+#	on Sun  5 Aug  6:10:44 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -583,6 +583,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ugwiya wa Moritani \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ugwiya wa Moritani),
 			},
 		},
@@ -652,6 +657,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dobra wa Sao Tome ne Presipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dobra wa Sao Tome ne Presipe),
 			},
@@ -861,8 +871,8 @@ has 'day_periods' => (
 					'am' => q{Dinda},
 				},
 				'abbreviated' => {
-					'am' => q{Dinda},
 					'pm' => q{Dilolo},
+					'am' => q{Dinda},
 				},
 			},
 		},
@@ -942,7 +952,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -966,7 +976,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

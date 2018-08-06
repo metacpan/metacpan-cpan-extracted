@@ -10,7 +10,7 @@ use warnings;
 use 5.014; # s///r
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use constant CMD => "count";
 use constant CMD_DESC => "Count the various kinds of SV";

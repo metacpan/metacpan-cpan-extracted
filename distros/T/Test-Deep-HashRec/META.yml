@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/rjbs/Test-Deep-HashRec/issues
   homepage: https://github.com/rjbs/Test-Deep-HashRec
   repository: https://github.com/rjbs/Test-Deep-HashRec.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -317,7 +317,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.002'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::My - Package for language Burmese
 
 package Locale::CLDR::Locales::My;
 # This file auto generated from Data\common\main\my.xml
-#	on Fri 13 Apr  7:20:49 am GMT
+#	on Sun  5 Aug  6:12:53 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -832,6 +832,7 @@ has 'display_name_region' => (
  			'151' => 'အရှေ့ ဥရောပ',
  			'154' => 'မြောက် ဥရောပ',
  			'155' => 'အနောက် ဥရောပ',
+ 			'202' => 'ဆာဟာရ-အောက်ပိုင်း အာဖရိက',
  			'419' => 'လက်တင်အမေရိက',
  			'AC' => 'အဆန်းရှင်းကျွန်း',
  			'AD' => 'အန်ဒိုရာ',
@@ -1595,7 +1596,7 @@ has 'units' => (
 					'kilogram' => {
 						'name' => q(ကီလိုဂရမ်),
 						'other' => q({0} ကီလိုဂရမ်),
-						'per' => q({0} လျှင် တစ်ကီလိုဂရမ်),
+						'per' => q(တစ်ကီလိုဂရမ်လျှင် {0}),
 					},
 					'kilohertz' => {
 						'name' => q(ကီလိုဟတ်ဇ်),
@@ -2949,8 +2950,8 @@ has 'currencies' => (
 		'AOA' => {
 			symbol => 'AOA',
 			display_name => {
-				'currency' => q(အင်ဂိုလာ ကန်ဇာ),
-				'other' => q(အင်ဂိုလာ ကန်ဇာ),
+				'currency' => q(အန်ဂိုလာ ကွမ်ဇာ),
+				'other' => q(အန်ဂိုလာ ကွမ်ဇာ),
 			},
 		},
 		'ARP' => {
@@ -3613,6 +3614,12 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(မော်ရီတေးနီးယား အူဂီးယာ \(1973–2017\)),
+				'other' => q(မော်ရီတေးနီးယား အူဂီးယာ \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(မော်ရီတေးနီးယား အူဂီးယာ),
 				'other' => q(မော်ရီတေးနီးယား အူဂီးယာ),
 			},
@@ -3881,6 +3888,13 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ \(1977–2017\)),
+				'other' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
 			display_name => {
 				'currency' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ),
 				'other' => q(ဆောင်တူမေးနှင့် ပရင်စီပီ ဒိုဘရာ),
@@ -4408,53 +4422,53 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
-				}
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
+					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
 					return 'evening1' if $time >= 1600
 						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
-				}
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 1200;
+					return 'midnight' if $time == 0;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
-					return 'night1' if $time >= 1900
-						&& $time < 2400;
 					return 'evening1' if $time >= 1600
 						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'evening1' if $time >= 1600
+						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 1200;
+					return 'night1' if $time >= 1900
+						&& $time < 2400;
 				}
 				last SWITCH;
 				}
@@ -4477,64 +4491,64 @@ has 'day_periods' => (
 				'narrow' => {
 					'pm' => q{ညနေ},
 					'midnight' => q{သန်းခေါင်ယံ},
-					'afternoon1' => q{နေ့လယ်},
-					'morning1' => q{နံနက်},
 					'night1' => q{ည},
-					'noon' => q{မွန်းတည့်},
 					'am' => q{နံနက်},
+					'afternoon1' => q{နေ့လယ်},
 					'evening1' => q{ညနေ},
+					'morning1' => q{နံနက်},
+					'noon' => q{မွန်းတည့်},
 				},
 				'wide' => {
+					'noon' => q{မွန်းတည့်},
+					'evening1' => q{ညနေ},
+					'afternoon1' => q{နေ့လယ်},
+					'morning1' => q{နံနက်},
+					'am' => q{နံနက်},
+					'night1' => q{ည},
 					'midnight' => q{သန်းခေါင်ယံ},
 					'pm' => q{ညနေ},
-					'morning1' => q{နံနက်},
-					'afternoon1' => q{နေ့လယ်},
-					'noon' => q{မွန်းတည့်},
-					'night1' => q{ည},
-					'evening1' => q{ညနေ},
-					'am' => q{နံနက်},
 				},
 				'abbreviated' => {
-					'am' => q{နံနက်},
-					'evening1' => q{ညနေ},
 					'noon' => q{မွန်းတည့်},
-					'night1' => q{ည},
+					'evening1' => q{ညနေ},
 					'morning1' => q{နံနက်},
 					'afternoon1' => q{နေ့လယ်},
+					'am' => q{နံနက်},
+					'night1' => q{ည},
 					'midnight' => q{သန်းခေါင်ယံ},
 					'pm' => q{ညနေ},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'am' => q{နံနက်},
-					'evening1' => q{ညနေ},
+				'abbreviated' => {
 					'noon' => q{မွန်းတည့်},
-					'night1' => q{ည},
-					'morning1' => q{နံနက်},
+					'evening1' => q{ညနေ},
 					'afternoon1' => q{နေ့လယ်},
+					'morning1' => q{နံနက်},
+					'am' => q{နံနက်},
+					'night1' => q{ည},
 					'midnight' => q{သန်းခေါင်ယံ},
 					'pm' => q{ညနေ},
+				},
+				'wide' => {
+					'pm' => q{ညနေ},
+					'midnight' => q{သန်းခေါင်ယံ},
+					'night1' => q{ည},
+					'am' => q{နံနက်},
+					'evening1' => q{ညနေ},
+					'afternoon1' => q{နေ့လယ်},
+					'morning1' => q{နံနက်},
+					'noon' => q{မွန်းတည့်},
 				},
 				'narrow' => {
-					'am' => q{နံနက်},
-					'evening1' => q{ညနေ},
-					'morning1' => q{နံနက်},
-					'afternoon1' => q{နေ့လယ်},
-					'night1' => q{ည},
-					'noon' => q{မွန်းတည့်},
 					'midnight' => q{သန်းခေါင်ယံ},
 					'pm' => q{ညနေ},
-				},
-				'abbreviated' => {
 					'night1' => q{ည},
-					'noon' => q{မွန်းတည့်},
-					'afternoon1' => q{နေ့လယ်},
 					'morning1' => q{နံနက်},
-					'midnight' => q{သန်းခေါင်ယံ},
-					'pm' => q{ညနေ},
-					'am' => q{နံနက်},
 					'evening1' => q{ညနေ},
+					'afternoon1' => q{နေ့လယ်},
+					'am' => q{နံနက်},
+					'noon' => q{မွန်းတည့်},
 				},
 			},
 		},
@@ -4669,7 +4683,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{dd-MM-y},
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
-			yw => q{Y ခု w ပတ်မြောက်},
+			yw => q{y ခု w ပတ်မြောက်},
 		},
 		'generic' => {
 			Bh => q{B h},

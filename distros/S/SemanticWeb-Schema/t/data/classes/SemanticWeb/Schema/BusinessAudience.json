@@ -1,0 +1,34 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A set of characteristics belonging to businesses, e.g. who compose an item's target audience.",
+      "rdfs:label" : "BusinessAudience",
+      "rdfs:subClassOf" : "schema:Audience"
+   },
+   "properties" : {
+      "schema:numberOfEmployees" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of employees in an organization e.g. business.",
+         "rdfs:label" : "numberOfEmployees",
+         "schema:domainIncludes" : [
+            "schema:BusinessAudience",
+            "schema:Organization"
+         ],
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      },
+      "schema:yearlyRevenue" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The size of the business in annual revenue.",
+         "rdfs:label" : "yearlyRevenue",
+         "schema:domainIncludes" : "schema:BusinessAudience",
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      },
+      "schema:yearsInOperation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The age of the business.",
+         "rdfs:label" : "yearsInOperation",
+         "schema:domainIncludes" : "schema:BusinessAudience",
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      }
+   }
+}

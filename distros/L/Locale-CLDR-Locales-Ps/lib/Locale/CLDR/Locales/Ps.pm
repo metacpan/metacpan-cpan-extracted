@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ps - Package for language Pashto
 
 package Locale::CLDR::Locales::Ps;
 # This file auto generated from Data\common\main\ps.xml
-#	on Fri 13 Apr  7:25:20 am GMT
+#	on Sun  5 Aug  6:17:56 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -130,6 +130,8 @@ has 'display_name_language' => (
  				'el' => 'یوناني',
  				'en' => 'انګریزي',
  				'en_AU' => 'انګریزي (AU)',
+ 				'en_CA' => 'کاناډايي انګلیسي',
+ 				'en_GB' => 'برتانوی انګلیسي',
  				'en_GB@alt=short' => 'انګریزي (GB)',
  				'en_US' => 'انګریزي (US)',
  				'en_US@alt=short' => 'انګریزي (US)',
@@ -330,9 +332,10 @@ has 'display_name_language' => (
  				'quc' => 'کچی',
  				'rap' => 'رپانوئي',
  				'rar' => 'راروټانګان',
- 				'rm' => 'رومانش',
+ 				'rm' => 'رومانیش',
  				'rn' => 'رونډی',
- 				'ro' => 'روماني',
+ 				'ro' => 'رومانیایی',
+ 				'ro_MD' => 'مولداویایی',
  				'rof' => 'رومبو',
  				'root' => 'روټ',
  				'ru' => 'روسي',
@@ -378,6 +381,7 @@ has 'display_name_language' => (
  				'suk' => 'سکوما',
  				'sv' => 'سویډنی',
  				'sw' => 'سواهېلي',
+ 				'sw_CD' => 'کانګو سواهلی',
  				'swb' => 'کومورياني',
  				'syr' => 'سوریاني',
  				'ta' => 'تامیل',
@@ -546,6 +550,7 @@ has 'display_name_region' => (
  			'151' => 'ختيځه اروپا',
  			'154' => 'شمالي اروپا',
  			'155' => 'لویدیځه اروپا',
+ 			'202' => 'د افریقا جنوب-صحرا',
  			'419' => 'لاتیني امریکا',
  			'AC' => 'د توغندیو ټاپو',
  			'AD' => 'اندورا',
@@ -3572,6 +3577,13 @@ has 'currencies' => (
 				'other' => q(MRO),
 			},
 		},
+		'MRU' => {
+			display_name => {
+				'currency' => q(MRU),
+				'one' => q(MRU),
+				'other' => q(MRU),
+			},
+		},
 		'MUR' => {
 			symbol => 'MUR',
 			display_name => {
@@ -3866,6 +3878,14 @@ has 'currencies' => (
 				'currency' => q(STD),
 				'one' => q(STD),
 				'other' => q(STD),
+			},
+		},
+		'STN' => {
+			symbol => 'STN',
+			display_name => {
+				'currency' => q(STN),
+				'one' => q(STN),
+				'other' => q(STN),
 			},
 		},
 		'SYP' => {
@@ -4720,7 +4740,7 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{غ.و.},
 					'am' => q{غ.م.},
 				},
@@ -4728,21 +4748,21 @@ has 'day_periods' => (
 					'am' => q{غ.م.},
 					'pm' => q{غ.و.},
 				},
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{غ.م.},
 					'pm' => q{غ.و.},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{غ.م.},
+				'narrow' => {
 					'pm' => q{غ.و.},
+					'am' => q{غ.م.},
 				},
 				'wide' => {
 					'am' => q{غ.م.},
 					'pm' => q{غ.و.},
 				},
-				'narrow' => {
+				'abbreviated' => {
 					'pm' => q{غ.و.},
 					'am' => q{غ.م.},
 				},
@@ -4878,6 +4898,80 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'islamic' => {
+			E => q{ccc},
+			Ed => q{d, E},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			M => q{L},
+			MEd => q{MM-dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d, E},
+			MMMMd => q{d MMMM},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
+			y => q{G y},
+			yM => q{G y/M},
+			yMMMM => q{د G y د MMMM},
+			yyyy => q{G y},
+			yyyyM => q{GGGGG y-MM},
+			yyyyMEd => q{GGGGG y-MM-dd, E},
+			yyyyMMM => q{G y MMM},
+			yyyyMMMEd => q{G y MMM d, E},
+			yyyyMMMM => q{G y MMMM},
+			yyyyMMMd => q{G y MMM d},
+			yyyyMd => q{GGGGG y-MM-dd},
+			yyyyQQQ => q{G y QQQ},
+			yyyyQQQQ => q{G y QQQQ},
+		},
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{H},
+			Hm => q{H:mm},
+			Hms => q{H:mm:ss},
+			M => q{L},
+			MEd => q{MM-dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d, E},
+			MMMMd => q{d MMMM},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{G y},
+			yM => q{G y/M},
+			yMMMM => q{د G y د MMMM},
+			yyyy => q{G y},
+			yyyyM => q{GGGGG y-MM},
+			yyyyMEd => q{GGGGG y-MM-dd, E},
+			yyyyMMM => q{G y MMM},
+			yyyyMMMEd => q{G y MMM d, E},
+			yyyyMMMM => q{G y MMMM},
+			yyyyMMMd => q{G y MMM d},
+			yyyyMd => q{GGGGG y-MM-dd},
+			yyyyQQQ => q{G y QQQ},
+			yyyyQQQQ => q{G y QQQQ},
+		},
 		'gregorian' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -4926,80 +5020,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{y QQQQ},
 			yw => q{اونۍ w د Y},
 		},
-		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d, E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{H},
-			Hm => q{H:mm},
-			Hms => q{H:mm:ss},
-			M => q{L},
-			MEd => q{MM-dd, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMMd => q{d MMMM},
-			MMMd => q{MMM d},
-			Md => q{M/d},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{G y},
-			yM => q{G y/M},
-			yMMMM => q{د G y د MMMM},
-			yyyy => q{G y},
-			yyyyM => q{GGGGG y-MM},
-			yyyyMEd => q{GGGGG y-MM-dd, E},
-			yyyyMMM => q{G y MMM},
-			yyyyMMMEd => q{G y MMM d, E},
-			yyyyMMMM => q{G y MMMM},
-			yyyyMMMd => q{G y MMM d},
-			yyyyMd => q{GGGGG y-MM-dd},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
-		},
-		'islamic' => {
-			E => q{ccc},
-			Ed => q{d, E},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			M => q{L},
-			MEd => q{MM-dd, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMMd => q{d MMMM},
-			MMMd => q{MMM d},
-			Md => q{M/d},
-			d => q{d},
-			y => q{G y},
-			yM => q{G y/M},
-			yMMMM => q{د G y د MMMM},
-			yyyy => q{G y},
-			yyyyM => q{GGGGG y-MM},
-			yyyyMEd => q{GGGGG y-MM-dd, E},
-			yyyyMMM => q{G y MMM},
-			yyyyMMMEd => q{G y MMM d, E},
-			yyyyMMMM => q{G y MMMM},
-			yyyyMMMd => q{G y MMM d},
-			yyyyMd => q{GGGGG y-MM-dd},
-			yyyyQQQ => q{G y QQQ},
-			yyyyQQQQ => q{G y QQQQ},
-		},
 	} },
 );
 
@@ -5019,6 +5039,69 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{G y–y},
+			},
+			yM => {
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				M => q{G y MMM–MMM},
+				y => q{G y MMM – y MMM},
+			},
+			yMMMEd => {
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				M => q{G y MMMM–MMMM},
+				y => q{G y MMMM – y MMMM},
+			},
+			yMMMd => {
+				M => q{G y MMM d – MMM d},
+				d => q{G y MMM d–d},
+				y => q{G y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
+			},
+		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -5112,69 +5195,6 @@ has 'datetime_formats_interval' => (
 				M => q{y-MM-dd – y-MM-dd},
 				d => q{y-MM-dd – y-MM-dd},
 				y => q{y-MM-dd – y-MM-dd},
-			},
-		},
-		'generic' => {
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{G y–y},
-			},
-			yM => {
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-			},
-			yMMM => {
-				M => q{G y MMM–MMM},
-				y => q{G y MMM – y MMM},
-			},
-			yMMMEd => {
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
-			},
-			yMMMM => {
-				M => q{G y MMMM–MMMM},
-				y => q{G y MMMM – y MMMM},
-			},
-			yMMMd => {
-				M => q{G y MMM d – MMM d},
-				d => q{G y MMM d–d},
-				y => q{G y MMM d – y MMM d},
-			},
-			yMd => {
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
-				y => q{GGGGG y-MM-dd – y-MM-dd},
 			},
 		},
 	} },
@@ -6241,7 +6261,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#هوبارټ#,
 		},
 		'Australia/Lindeman' => {
-			exemplarCity => q#Lindeman#,
+			exemplarCity => q#لینډامین#,
 		},
 		'Australia/Lord_Howe' => {
 			exemplarCity => q#رب هیله#,
@@ -7061,6 +7081,9 @@ has 'time_zone_names' => (
 		'Pacific/Honolulu' => {
 			exemplarCity => q#هینولولو#,
 		},
+		'Pacific/Johnston' => {
+			exemplarCity => q#جانستون#,
+		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#Kiritimati#,
 		},
@@ -7182,7 +7205,7 @@ has 'time_zone_names' => (
 		},
 		'Pitcairn' => {
 			long => {
-				'standard' => q#Pitcairn وخت#,
+				'standard' => q#پیټ کارین وخت#,
 			},
 		},
 		'Ponape' => {
@@ -7231,7 +7254,7 @@ has 'time_zone_names' => (
 		},
 		'Solomon' => {
 			long => {
-				'standard' => q#د سليمان سلیمان ټایمز#,
+				'standard' => q#د سلیمان ټاپوګانو وخت#,
 			},
 		},
 		'South_Georgia' => {

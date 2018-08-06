@@ -16,7 +16,7 @@ name: Sport-Analytics-NHL
 provides:
   Sport::Analytics::NHL:
     file: lib/Sport/Analytics/NHL.pm
-    version: '1.20'
+    version: '1.31'
   Sport::Analytics::NHL::Config:
     file: lib/Sport/Analytics/NHL/Config.pm
   Sport::Analytics::NHL::DB:
@@ -27,6 +27,8 @@ provides:
     file: lib/Sport/Analytics/NHL/LocalConfig.pm
   Sport::Analytics::NHL::Merger:
     file: lib/Sport/Analytics/NHL/Merger.pm
+  Sport::Analytics::NHL::Normalizer:
+    file: lib/Sport/Analytics/NHL/Normalizer.pm
   Sport::Analytics::NHL::Report:
     file: lib/Sport/Analytics/NHL/Report.pm
   Sport::Analytics::NHL::Report::BH:
@@ -52,6 +54,7 @@ provides:
   Sport::Analytics::NHL::Util:
     file: lib/Sport/Analytics/NHL/Util.pm
 recommends:
+  File::Touch: '0'
   MongoDB: v1.6.0
 requires:
   Carp: '0'
@@ -78,5 +81,5 @@ requires:
   boolean: v0.28.4
   experimental: '0.016'
   parent: '0'
-version: '1.20'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: '1.31'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ use 5.008;
 
 package DBIx::Locker;
 # ABSTRACT: locks for db resources that might not be totally insane
-$DBIx::Locker::VERSION = '0.100118';
+$DBIx::Locker::VERSION = '0.100119';
 use Carp ();
 use DBI;
 use Data::GUID ();
@@ -148,12 +148,15 @@ sub lock {
   my ($self, $lockstring, $arg) = @_;
   $arg ||= {};
 
-  X::BadValue->throw('must provide a lockstring')
+  Carp::confess("calling ->lock in void context is not permitted")
+    unless defined wantarray;
+
+  Carp::confess("no lockstring provided")
     unless defined $lockstring and length $lockstring;
 
   my $expires = $arg->{expires} ||= 3600;
 
-  X::BadValue->throw('expires must be a positive integer')
+  Carp::confess("expires must be a positive integer")
     unless $expires > 0 and $expires == int $expires;
 
   $expires = time + $expires;
@@ -258,7 +261,7 @@ DBIx::Locker - locks for db resources that might not be totally insane
 
 =head1 VERSION
 
-version 0.100118
+version 0.100119
 
 =head1 DESCRIPTION
 
@@ -379,7 +382,7 @@ Sergiy Borodych <sergiy.borodych@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

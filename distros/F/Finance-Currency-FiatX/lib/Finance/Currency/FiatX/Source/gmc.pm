@@ -1,7 +1,7 @@
 package Finance::Currency::FiatX::Source::gmc;
 
-our $DATE = '2018-07-15'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2018-08-01'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -118,7 +118,7 @@ Finance::Currency::FiatX::Source::gmc - Get currency conversion rates from GMC (
 
 =head1 VERSION
 
-This document describes version 0.009 of Finance::Currency::FiatX::Source::gmc (from Perl distribution Finance-Currency-FiatX), released on 2018-07-15.
+This document describes version 0.010 of Finance::Currency::FiatX::Source::gmc (from Perl distribution Finance-Currency-FiatX), released on 2018-08-01.
 
 =head1 DESCRIPTION
 

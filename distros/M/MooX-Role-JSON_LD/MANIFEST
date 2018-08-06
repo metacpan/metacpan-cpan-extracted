@@ -8,8 +8,11 @@ t/01-load.t
 t/02-moo-basic.t
 t/02-moo-moox-json_ld.t
 t/03-moose-basic.t
+t/04-moox-json-subclass.t
+t/05-moo-nested.t
 t/lib/MooseTester.pm
-t/lib/MooTester2.pm
 t/lib/MooTester.pm
+t/lib/MooTester2.pm
+t/lib/MooTester3.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

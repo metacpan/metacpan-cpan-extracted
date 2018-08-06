@@ -36,32 +36,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -69,11 +69,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -85,7 +85,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -94,10 +94,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -106,7 +106,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -191,7 +191,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -201,7 +201,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -224,36 +224,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -271,7 +271,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -1110,32 +1110,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -1143,11 +1143,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -1158,7 +1158,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -1167,10 +1167,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -1179,7 +1179,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -1240,7 +1240,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -1250,7 +1250,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -1273,36 +1273,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -1320,7 +1320,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -2578,32 +2578,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -2611,11 +2611,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -2626,7 +2626,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -2635,10 +2635,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -2647,7 +2647,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -3064,7 +3064,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -3074,7 +3074,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -3097,36 +3097,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -3144,7 +3144,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -10483,32 +10483,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -10516,11 +10516,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -10531,7 +10531,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -10540,10 +10540,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -10552,7 +10552,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -10711,7 +10711,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -10721,7 +10721,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -10744,36 +10744,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -10791,7 +10791,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -11217,7 +11217,7 @@
             'func'          => $self->getMethodRef('radioButtonCallback'),
             'id'            => 'button_2',
             'text'          => 'Enable',
-            'select_flag'   => TRUE,
+            'select_flag'   => FALSE,
             'group'         => $radioTableObj->group,
         );
 
@@ -11755,32 +11755,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -11788,11 +11788,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -11803,7 +11803,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -11812,10 +11812,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -11824,7 +11824,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -11914,7 +11914,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -11924,7 +11924,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -11947,36 +11947,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -11994,7 +11994,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -12909,32 +12909,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -12942,11 +12942,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -12957,7 +12957,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -12966,10 +12966,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -12978,7 +12978,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -13041,7 +13041,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -13051,7 +13051,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -13074,36 +13074,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -13121,7 +13121,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -13380,32 +13380,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -13413,11 +13413,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -13428,7 +13428,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -13437,10 +13437,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -13449,7 +13449,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -13579,7 +13579,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -13589,7 +13589,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -13612,36 +13612,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -13659,7 +13659,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -14931,32 +14931,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -14964,11 +14964,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -14979,7 +14979,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -14988,10 +14988,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -15000,7 +15000,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -15054,7 +15054,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -15064,7 +15064,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -15087,36 +15087,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -15134,7 +15134,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -15479,32 +15479,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -15512,11 +15512,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -15527,7 +15527,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -15536,10 +15536,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -15548,7 +15548,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -15676,7 +15676,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -15686,7 +15686,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -15709,36 +15709,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -15756,7 +15756,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -16553,7 +16553,7 @@
         # Local variables
         my (
             $statusObj, $modelObj, $worldObj, $cashValue,
-            @patternList, @objList,
+            @patternList, @stringList, @modList,
         );
 
         # Check for improper arguments
@@ -16594,80 +16594,99 @@
             } until (! @patternList);
         }
 
-        # For carried objects in an inventory list...
-        if (
-            $type eq 'wield' || $type eq 'hold' || $type eq 'wear' || $type eq 'carry'
-            || $type eq 'sack' || $type eq 'misc'
-        ) {
-            # Convert the matched string into a list of non-model objects
-            push (@objList, $modelObj->parseObj($self->session, FALSE, $string));
+        # The world profile provides patterns which should be applied in a Perl split operation,
+        #   discarding the matching portions and using everything between them as separate objects
+        push (@stringList, $string);
+        foreach my $pattern ($worldObj->inventorySplitPatternList) {
 
-            OUTER: foreach my $obj (@objList) {
+            foreach my $item (@stringList) {
 
-                my (
-                    $count, $index,
-                    @previousList,
-                );
+                push (@modList, split(/$pattern/, $item));
+            }
 
-                # Add the object to this task's inventory list
-                $self->ivPush('inventoryList', $obj);
-                # Set the object's inventory type
-                $obj->ivPoke('inventoryType', $type);
+            @stringList = @modList;
+            @modList = ();
+        }
 
-                # Compare $obj against everything in the previous inventory list. If a match is
-                #   found, remove the equivalent object from the previous inventory list, but copy
-                #   its condition (if set) to $obj
-                @previousList = $self->previousList;    # We're going to splice the IV
-                $count = -1;
+        # If $string has been split into multiple strings, apply the same $type to all of them
+        foreach my $item (@stringList) {
 
-                INNER: foreach my $oldObj (@previousList) {
+            my @objList;
 
-                    $count++;
-                    if ($modelObj->objCompare($self->sensitivity, $obj, $oldObj)) {
+            # For carried objects in an inventory list...
+            if (
+                $type eq 'wield' || $type eq 'hold' || $type eq 'wear' || $type eq 'carry'
+                || $type eq 'sack' || $type eq 'misc'
+            ) {
+                # Convert the matched string into a list of non-model objects
+                push (@objList, $modelObj->parseObj($self->session, FALSE, $item));
 
-                        # $obj was also present in the previous list. Remove the entry from that
-                        #   list
+                OUTER: foreach my $obj (@objList) {
 
-                        # Remove the entry in the previous list
-                        $index = $self->ivFind('previousList', $oldObj);
-                        if (defined $index) {
+                    my (
+                        $count, $index,
+                        @previousList,
+                    );
 
-                            $self->ivSplice('previousList', $index, 1);
+                    # Add the object to this task's inventory list
+                    $self->ivPush('inventoryList', $obj);
+                    # Set the object's inventory type
+                    $obj->ivPoke('inventoryType', $type);
+
+                    # Compare $obj against everything in the previous inventory list. If a match is
+                    #   found, remove the equivalent object from the previous inventory list, but
+                    #   copy its condition (if set) to $obj
+                    @previousList = $self->previousList;    # We're going to splice the IV
+                    $count = -1;
+
+                    INNER: foreach my $oldObj (@previousList) {
+
+                        $count++;
+                        if ($modelObj->objCompare($self->sensitivity, $obj, $oldObj)) {
+
+                            # $obj was also present in the previous list. Remove the entry from that
+                            #   list
+
+                            # Remove the entry in the previous list
+                            $index = $self->ivFind('previousList', $oldObj);
+                            if (defined $index) {
+
+                                $self->ivSplice('previousList', $index, 1);
+                            }
+
+                            # If $oldObj had a condition set, copy it to the current object
+                            if (defined $oldObj->condition) {
+
+                                $obj->ivPoke('condition', $oldObj->condition);
+                            }
+
+                            # Only need to copy one condition setting per object
+                            next OUTER;
                         }
-
-                        # If $oldObj had a condition set, copy it to the current object
-                        if (defined $oldObj->condition) {
-
-                            $obj->ivPoke('condition', $oldObj->condition);
-                        }
-
-                        # Only need to copy one condition setting per object
-                        next OUTER;
                     }
                 }
-            }
 
-        # For all lines representing money..
-        } elsif ($type ne 'ignore') {
+            # For all lines representing money..
+            } elsif ($type ne 'ignore') {
 
-            if ($type eq 'empty') {
+                if ($type eq 'empty') {
 
-                $cashValue = 0;
+                    $cashValue = 0;
 
-            } else {
+                } else {
 
-                # Convert the value into the standard currency unit (defined by the current world
-                #   profile)
-                $cashValue = $self->convertCash($string);
-            }
+                    # Convert the value into the standard currency unit (defined by the current
+                    #   world profile)
+                    $cashValue = $self->convertCash($item);
+                }
 
+                if (defined $cashValue) {
 
-            if (defined $cashValue) {
+                    # Update the Status task, if it is running
+                    if ($statusObj) {
 
-                # Update the Status task, if it is running
-                if ($statusObj) {
-
-                    $statusObj->set_cashValues($type, $cashValue);
+                        $statusObj->set_cashValues($type, $cashValue);
+                    }
                 }
             }
         }
@@ -17358,32 +17377,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -17391,11 +17410,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -17406,7 +17425,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -17415,10 +17434,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -17427,7 +17446,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -17480,7 +17499,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -17490,7 +17509,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -18175,32 +18194,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -18208,11 +18227,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -18223,7 +18242,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -18232,10 +18251,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -18244,7 +18263,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -18446,7 +18465,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -18456,7 +18475,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -18479,36 +18498,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -18526,7 +18545,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -23843,8 +23862,23 @@
 
                 foreach my $item (@tempList) {
 
-                    my @miniList = split($delim, $item);        # $delim is not a regex
-                    push (@thisList, @miniList);
+                    my $offset;
+
+                    # Can't use Perl split(), because $delim is not a regex
+                    do {
+
+                        $offset = index($item, $delim);
+                        if ($offset >= 0) {
+
+                            push (@thisList, substr($item, 0, $offset));
+                            $item = substr($item, ($offset + length($delim)));
+
+                        } else {
+
+                            push (@thisList, $item);
+                        }
+
+                    } until ($offset < 0);
                 }
             }
 
@@ -24106,8 +24140,23 @@
 
                 foreach my $item (@tempList) {
 
-                    my @miniList = split($delim, $item);        # $delim is not a regex
-                    push (@thisList, @miniList);
+                    my $offset;
+
+                    # Can't use Perl split(), because $delim is not a regex
+                    do {
+
+                        $offset = index($item, $delim);
+                        if ($offset >= 0) {
+
+                            push (@thisList, substr($item, 0, $offset));
+                            $item = substr($item, ($offset + length($delim)));
+
+                        } else {
+
+                            push (@thisList, $item);
+                        }
+
+                    } until ($offset < 0);
                 }
             }
 
@@ -24310,6 +24359,7 @@
 
             my @thisList = ($line);
 
+            # Sort in reverse order of length, otherwise unexpected problems might occur
             foreach my $delim ($worldObj->roomCmdDelimiterList) {
 
                 my @tempList = @thisList;
@@ -24317,8 +24367,23 @@
 
                 foreach my $item (@tempList) {
 
-                    my @miniList = split($delim, $item);        # $delim is not a regex
-                    push (@thisList, @miniList);
+                    my $offset;
+
+                    # Can't use Perl split(), because $delim is not a regex
+                    do {
+
+                        $offset = index($item, $delim);
+                        if ($offset >= 0) {
+
+                            push (@thisList, substr($item, 0, $offset));
+                            $item = substr($item, ($offset + length($delim)));
+
+                        } else {
+
+                            push (@thisList, $item);
+                        }
+
+                    } until ($offset < 0);
                 }
             }
 
@@ -24363,6 +24428,7 @@
 
         # Update the non-model room object
         $roomObj->ivPush('roomCmdList', @finalList);
+        $roomObj->ivPoke('tempRoomCmdList', $roomObj->roomCmdList);
 
         # Operation complete
         return 1;
@@ -24557,9 +24623,8 @@
 
                 $exit =~ s/$pattern//gi;
                 if (! $exit) {
+
                     next OUTER;     # All text has been removed, so ignore this exit
-                } else {
-                    last INNER;     # Only remove the first matching portion of the exit
                 }
             }
 
@@ -25044,7 +25109,7 @@
 
                 } else {
 
-                    $roomCmdString .= ' ' . $roomCmd;
+                    $roomCmdString .= ', ' . $roomCmd;
                 }
             }
 
@@ -25716,6 +25781,44 @@
         }
     }
 
+    sub useRoomCmd {
+
+        # Called by GA::Cmd::RoomCommand->do
+        # Removes the first room command from the current room's list, executes it as a world
+        #   command, then moves it to the end of the list (so room commands can be executed in a
+        #   continuous cycle)
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments, if there is no current room or if the current room has
+        #       no room commands
+        #   Otherwise returns the room command executed
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my $cmd;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->useRoomCmd', @_);
+        }
+
+        if (! $self->roomObj || ! $self->roomObj->tempRoomCmdList) {
+
+            return undef;
+        }
+
+        $cmd = $self->roomObj->ivShift('tempRoomCmdList');
+        $self->session->worldCmd($cmd);
+        $self->roomObj->ivPush('tempRoomCmdList', $cmd);
+
+        return $cmd;
+    }
+
     ##################
     # Response methods
 
@@ -26054,32 +26157,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -26087,11 +26190,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -26102,7 +26205,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -26111,10 +26214,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -26123,7 +26226,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -26181,7 +26284,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -26191,7 +26294,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -26214,36 +26317,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -26261,7 +26364,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -26724,32 +26827,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -26757,11 +26860,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -26772,7 +26875,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -26781,10 +26884,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -26793,7 +26896,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -26840,7 +26943,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -26850,7 +26953,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -26933,32 +27036,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -26966,11 +27069,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -26981,7 +27084,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -26990,10 +27093,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -27002,7 +27105,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -27049,7 +27152,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -27059,7 +27162,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -27140,32 +27243,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -27173,11 +27276,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -27188,7 +27291,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -27197,10 +27300,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -27209,7 +27312,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -27319,7 +27422,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -27329,7 +27432,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -27352,36 +27455,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -27399,7 +27502,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -27562,7 +27665,6 @@
         # If any gauges/status bars have been created, destroy them
         if ($self->gaugeStripObj && ($self->gaugeHash || $self->statusBarHash)) {
 
-            print "taskobj 27309 ->removeGauges\n";
             $self->gaugeStripObj->removeGauges(
                 $self->session,
                 FALSE,
@@ -27601,7 +27703,6 @@
         # If any gauges/status bars have been created, destroy them
         if ($self->gaugeStripObj && ($self->gaugeHash || $self->statusBarHash)) {
 
-             print "taskobj 27347 ->removeGauges\n";
            $self->gaugeStripObj->removeGauges(
                 $self->session,
                 FALSE,
@@ -28625,7 +28726,6 @@
         # Delete the gauge with this local $number, if it exists
         if ($self->ivExists('gaugeHash', $number)) {
 
-              print "taskobj 28362 ->removeGauges\n";
           $self->gaugeStripObj->removeGauges(
                 $self->session,
                 FALSE,
@@ -28757,7 +28857,6 @@
         # If this task has already created a status bar with the local number $number, remove it
         if ($self->ivExists('statusBarHash', $number)) {
 
-            print "taskobj 28493 ->removeGauges\n";
             $self->gaugeStripObj->removeGauges(
                 $self->session,
                 FALSE,
@@ -28816,7 +28915,6 @@
         # Delete the status bar with this local $number, if it exists
         if ($self->ivExists('statusBarHash', $number)) {
 
-              print "taskobj 28551 ->removeGauges\n";
           $self->gaugeStripObj->removeGauges(
                 $self->session,
                 FALSE,
@@ -29257,32 +29355,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -29290,11 +29388,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -29305,7 +29403,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -29314,10 +29412,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -29326,7 +29424,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -29839,7 +29937,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -29849,7 +29947,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -29872,36 +29970,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -29919,7 +30017,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -35532,32 +35630,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -35565,11 +35663,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -35580,7 +35678,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -35589,10 +35687,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -35601,7 +35699,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -35648,7 +35746,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -35658,7 +35756,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -35837,32 +35935,32 @@
         #   $session    - The parent GA::Session (not stored as an IV)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current', when called by $self->clone) Name of the
+        #   $profName   - ($taskType = 'current', when called by $self->clone) Name of the
         #                   profile from whose initial tasklist this task was created ('undef' if
         #                   none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist this
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist this
         #                   task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be added to the specified tasklist
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -35870,11 +35968,11 @@
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
         }
 
-        if ($taskList) {
+        if ($taskType) {
 
             # For initial tasks, check that $profName exists
             if (
-                $taskList eq 'initial'
+                $taskType eq 'initial'
                 && defined $profName
                 && ! $session->ivExists('profHash', $profName)
             ) {
@@ -35885,7 +35983,7 @@
 
             # For custom tasks, check that $customName doesn't already exist
             } elsif (
-                $taskList eq 'custom'
+                $taskType eq 'custom'
                 && $axmud::CLIENT->ivExists('customTaskHash', $customName)
             ) {
                 return $session->writeError(
@@ -35894,10 +35992,10 @@
                     $class . '->new',
                 );
 
-            } elsif ($taskList ne 'current' && $taskList ne 'initial' && $taskList ne 'custom') {
+            } elsif ($taskType ne 'current' && $taskType ne 'initial' && $taskType ne 'custom') {
 
                 return $session->writeError(
-                    'Can\'t create new task because \'' . $taskList . '\' is an invalid tasklist',
+                    'Can\'t create new task because \'' . $taskType . '\' is an invalid tasklist',
                     $class . '->new',
                 );
             }
@@ -35906,7 +36004,7 @@
         # Task settings
         my $self = Games::Axmud::Generic::Task->new(
             $session,
-            $taskList,
+            $taskType,
             $profName,
             $profCategory,
             $customName,
@@ -35976,7 +36074,7 @@
         bless $self, $class;
 
         # For all tasks that aren't temporary...
-        if ($taskList) {
+        if ($taskType) {
 
             # Check that the task doesn't belong to a disabled plugin (in which case, it can't be
             #   added to any current, initial or custom tasklist)
@@ -35986,7 +36084,7 @@
             }
 
             # Set the parent file object
-            $self->setParentFileObj($session, $taskList, $profName, $profCategory);
+            $self->setParentFileObj($session, $taskType, $profName, $profCategory);
 
             # Create entries in tasklists, if possible
             if (! $self->updateTaskLists($session)) {
@@ -36009,36 +36107,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -36049,7 +36147,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original

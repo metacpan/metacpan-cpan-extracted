@@ -2,11 +2,12 @@
 abstract: 'Extract License and Copyright from its main_module file'
 author:
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
-build_requires: {}
+build_requires:
+  JSON: '0'
 configure_requires:
-  Module::Build::Tiny: '0.037'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,12 +15,12 @@ meta-spec:
 name: Dist-Zilla-Plugin-LicenseFromModule
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
   Dist::Zilla: '4.30003'
   Module::Load: '0.32'
@@ -29,6 +30,11 @@ resources:
   bugtracker: https://github.com/miyagawa/Dist-Zilla-Plugin-LicenseFromModule/issues
   homepage: https://github.com/miyagawa/Dist-Zilla-Plugin-LicenseFromModule
   repository: https://github.com/miyagawa/Dist-Zilla-Plugin-LicenseFromModule.git
-version: '0.05'
+version: '0.07'
 x_contributors:
+  - 'Flavio Poletti <flavio@polettix.it>'
   - 'Ryan C. Thompson <rct@thompsonclan.org>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
+x_generated_by_perl: v5.20.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

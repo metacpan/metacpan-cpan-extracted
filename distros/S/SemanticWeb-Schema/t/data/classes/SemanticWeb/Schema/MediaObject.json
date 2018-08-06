@@ -1,0 +1,145 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A media object, such as an image, video, or audio object embedded in a web page or a downloadable dataset i.e. DataDownload. Note that a creative work may have many media objects associated with it on the same web page. For example, a page about a single song (MusicRecording) may have a music video (VideoObject), and a high and low bandwidth audio stream (2 AudioObject's).",
+      "rdfs:label" : "MediaObject",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:associatedArticle" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A NewsArticle associated with the Media Object.",
+         "rdfs:label" : "associatedArticle",
+         "schema:domainIncludes" : "schema:MediaObject",
+         "schema:rangeIncludes" : "schema:NewsArticle"
+      },
+      "schema:bitrate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The bitrate of the media object.",
+         "rdfs:label" : "bitrate",
+         "schema:domainIncludes" : "schema:MediaObject",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:contentSize" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "File size in (mega/kilo) bytes.",
+         "rdfs:label" : "contentSize",
+         "schema:domainIncludes" : "schema:MediaObject",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:contentUrl" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Actual bytes of the media object, for example the image file or video file.",
+         "rdfs:label" : "contentUrl",
+         "schema:domainIncludes" : "schema:MediaObject",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:duration" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
+         "rdfs:label" : "duration",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:MediaObject",
+            "schema:MusicRelease",
+            "schema:Movie",
+            "schema:MusicRecording"
+         ],
+         "schema:rangeIncludes" : "schema:Duration"
+      },
+      "schema:embedUrl" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A URL pointing to a player for a specific video. In general, this is the information in the <code>src</code> element of an <code>embed</code> tag and should not be the same as the content of the <code>loc</code> tag.",
+         "rdfs:label" : "embedUrl",
+         "schema:domainIncludes" : "schema:MediaObject",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:encodesCreativeWork" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The CreativeWork encoded by this media object.",
+         "rdfs:label" : "encodesCreativeWork",
+         "schema:domainIncludes" : "schema:MediaObject",
+         "schema:rangeIncludes" : "schema:CreativeWork"
+      },
+      "schema:encodingFormat" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "mp3, mpeg4, etc.",
+         "rdfs:label" : "encodingFormat",
+         "schema:domainIncludes" : "schema:MediaObject",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:height" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The height of the item.",
+         "rdfs:label" : "height",
+         "schema:domainIncludes" : [
+            "schema:Person",
+            "schema:Product",
+            "schema:VisualArtwork",
+            "schema:MediaObject"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Distance",
+            "schema:QuantitativeValue"
+         ]
+      },
+      "schema:playerType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Player type required&#x2014;for example, Flash or Silverlight.",
+         "rdfs:label" : "playerType",
+         "schema:domainIncludes" : "schema:MediaObject",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:productionCompany" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The production company or studio responsible for the item e.g. series, video game, episode etc.",
+         "rdfs:label" : "productionCompany",
+         "schema:domainIncludes" : [
+            "schema:CreativeWorkSeason",
+            "schema:MediaObject",
+            "schema:RadioSeries",
+            "schema:MovieSeries",
+            "schema:Episode",
+            "schema:VideoGameSeries",
+            "schema:Movie",
+            "schema:TVSeries"
+         ],
+         "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:regionsAllowed" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The regions where the media is allowed. If not specified, then it's assumed to be allowed everywhere. Specify the countries in <a href=\"http://en.wikipedia.org/wiki/ISO_3166\">ISO 3166 format</a>.",
+         "rdfs:label" : "regionsAllowed",
+         "schema:domainIncludes" : "schema:MediaObject",
+         "schema:rangeIncludes" : "schema:Place"
+      },
+      "schema:requiresSubscription" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates if use of the media require a subscription  (either paid or free). Allowed values are <code>true</code> or <code>false</code> (note that an earlier version had 'yes', 'no').",
+         "rdfs:label" : "requiresSubscription",
+         "schema:domainIncludes" : "schema:MediaObject",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:uploadDate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Date when this media object was uploaded to this site.",
+         "rdfs:label" : "uploadDate",
+         "schema:domainIncludes" : "schema:MediaObject",
+         "schema:rangeIncludes" : "schema:Date"
+      },
+      "schema:width" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The width of the item.",
+         "rdfs:label" : "width",
+         "schema:domainIncludes" : [
+            "schema:VisualArtwork",
+            "schema:Product",
+            "schema:MediaObject"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Distance",
+            "schema:QuantitativeValue"
+         ]
+      }
+   }
+}

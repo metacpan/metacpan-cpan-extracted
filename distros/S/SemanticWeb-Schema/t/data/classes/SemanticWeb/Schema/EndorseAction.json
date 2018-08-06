@@ -1,0 +1,21 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An agent approves/certifies/likes/supports/sanction an object.",
+      "rdfs:label" : "EndorseAction",
+      "rdfs:subClassOf" : "schema:ReactAction"
+   },
+   "properties" : {
+      "schema:endorsee" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The person/organization being supported.",
+         "rdfs:label" : "endorsee",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : "schema:EndorseAction",
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      }
+   }
+}

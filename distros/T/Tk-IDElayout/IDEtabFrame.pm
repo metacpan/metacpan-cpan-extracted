@@ -182,7 +182,7 @@ real object in this hash.
 =cut
 
 package Tk::IDEtabFrame;
-our ($VERSION) = ('0.33');
+our ($VERSION) = ('0.34');
 
 use Carp;
 use strict;
@@ -721,7 +721,7 @@ sub drop{
 	
 	print "DragSource = $DragSource\n" if($DEBUG);
 	
-	# Calback to add new tab
+	# Callback to add new tab
 	my $addAction =
 		sub{
 			my $newFrame = $self->add(
@@ -900,7 +900,7 @@ sub endDragTW {
 	my $newgeom = $shadow->geometry();
 	print "In End Command\n" if($DEBUG);
 
-	# Get the new root positio of the window and set posX/Y, so we don't
+	# Get the new root position of the window and set posX/Y, so we don't
 	#   get a false window move indication
 	my ( $newX, $newY ) = $newgeom =~ /(\d+)\+(\d+)$/;
 	if ( defined($newX) && defined($newY) && !$self->{dropped} )

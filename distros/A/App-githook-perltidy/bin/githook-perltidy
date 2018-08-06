@@ -1,9 +1,9 @@
 #!perl
 use strict;
-use App::githook_perltidy;
+use App::githook::perltidy;
 use OptArgs2 qw/class_optargs/;
 
-my ( $class, $opts ) = class_optargs('App::githook_perltidy');
+my ( $class, $opts ) = class_optargs('App::githook::perltidy');
 eval "require $class" or die $@;
 $class->new($opts)->run;
 
@@ -16,7 +16,7 @@ githook-perltidy - run perltidy and podtidy before Git commits
 
 =head1 VERSION
 
-0.11.10 (2018-07-14)
+0.12.0 (2018-08-02)
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,8 @@ githook-perltidy - run perltidy and podtidy before Git commits
 
 B<githook-perltidy> is a script designed to run from a Git pre-commit
 hook. It ensures that your Perl and POD files are always cleanly
-commited by running L<perltidy> and L<podtidy> on them.
+commited by running L<Perl::Tidy>, and optionally L<Pod::Tidy> and
+L<Perl::Critic> on them.
 
 This script is is efficient: it only modifies files that are being
 committed and not every file in your repository. It also tries its
@@ -34,8 +35,11 @@ hardest to be safe: tidying is performed in a temporary location so
 that your own working files are not left in a bad state in the event of
 failure.
 
+=head2 Repository Setup
+
 Before you can use B<githook-perltidy> you need to make sure everyone
-working on your code uses the the same tidy options:
+working on your code uses the the same L<Perl::Tidy> and L<Pod::Tidy>
+options:
 
     $ perltidy -b -w -dop | grep -v dump-options > .perltidyrc
     $ echo '--columns 72' > .podtidy-opts
@@ -44,9 +48,32 @@ working on your code uses the the same tidy options:
     $ git add .perltidyrc .podtidy-opts MANIFEST.SKIP
     $ git commit -m 'githook-perltidy support' && git push
 
-B<githook-perltidy> has an automatic README-from-POD feature. To enable
-it you create and commit a file called F<.readme_from> containing the
-name of a source file containing POD text:
+You should also add L<App::githook::perltidy> as an explicit "develop"
+dependency in your F<cpanfile>, F<Makefile.PL> or F<Build.PL>, so that
+B<githook-perltidy> gets installed when developers install the rest of
+your project's dependencies.
+
+=head3 Sweeter Tidying
+
+You may prefer to tidy with L<Perl::Tidy::Sweetened> instead of plain
+L<Perl::Tidy>. To enable that you commit a F<.perltidyrc.sweetened>
+file instead of F<.perltidyrc>.  If you use this feature you will want
+to add L<Perl::Tidy::Sweetened> as an explicit "develop" dependency in
+your F<cpanfile>, F<Makefile.PL> or F<Build.PL>.
+
+=head3 Critical Checks
+
+You may additionally wish to have L<Perl::Critic> run against your
+commits.  To enable that you simply commit a F<.perlcriticrc> file to
+the repository. If you use this feature you will want to add
+L<Perl::Critic> as an explicit "develop" dependency in your
+F<cpanfile>, F<Makefile.PL> or F<Build.PL>.
+
+=head3 README from POD
+
+B<githook-perltidy> also has an automatic README-from-POD feature. To
+enable it you create and commit a file called F<.readme_from>
+containing the name of the POD source file:
 
     $ echo 'lib/Your/App.pm' > .readme_from
     $ echo '^\.readme_from' >> MANIFEST.SKIP
@@ -58,40 +85,53 @@ potentially committed) whenever F<lib/Your/App.pm> is committed.
 
 =head2 githook-perltidy install [--force, -f]
 
-Anyone making commits in a setup repository should ensure
-B<githook-perltidy> runs from their pre-commit script. The C<install>
-command can be used to create one, and must be run from the top-level
-directory of your repository. It writes a F<pre-commit> file in the
-F<$GIT_DIR/hooks/> directory.
+Anyone making commits in your repository should ensure that
+B<githook-perltidy> runs before the Git commit completes.  The
+C<install> command is used to create a F<pre-commit> file in the
+F<$GIT_DIR/hooks/> directory. It must be run from the top-level
+directory of your repository.
 
     $ githook-perltidy install
     $ cat .git/hooks/pre-commit
     #!/bin/sh
     /usr/local/bin/githook-perltidy pre-commit
 
-This command fails if there is no F<.perltidyrc> file in the repository
-or if the hooks directory isn't found. It will also fail if the Git
-F<pre-commit> already file exists, unless C<--force> is used.
+This command fails if there is no F<.perltidyrc> or
+F<.perltidyrc.sweetened> file in the repository or if the hooks
+directory isn't found. It will also fail if the Git F<pre-commit>
+already file exists, unless C<--force> is used to replace it.
 
 =head2 githook-perltidy pre-commit
 
 The C<pre-commit> command loops through the Git index, checking out
-Perl/POD files to a temporary working directory. It runs L<perltidy> on
-the temporary Perl files using F<.perltidyrc>. If F<.podtidy-opts>
-exists then L<podtidy> is also run on Perl and POD files.  The Git
-index is updated along with your original working files.
+files to a temporary working directory. Then on each file that looks
+like a Perl or Pod file it:
 
-A tidying error stops the script (and therefore the commit)
-immediately. Any successful cleanups to the index and working tree up
-until that point remain in place.
+=over
 
-This command fails if there is no F<.perltidyrc> file in the
-repository.
+=item * Runs L<perlcritic> if F<.perlcriticrc> exists (for a Perl file)
 
-If F<.readme_from> exists and the file named therein is tidied, then
-B<githook-perltidy> translates it with L<Pod::Text> into a new README
-file. If the README file is tracked by Git then it is also added it to
-the index for committing.
+=item * Runs L<perltidy> (or L<perltidy-sweet>) (for a Perl file)
+
+=item * Runs L<podtidy> if F<.podtidy-opts> exists (for a Perl or Pod file)
+
+=item * Updates the Git index with the tidied file.
+
+=item * Creates a new F<README> file using L<Pod::Text> if the tidied
+file matches F<.readme_from>. The F<README> file gets committed if it
+is already being tracked by Git.
+
+=item * Runs L<perltidy> and/or L<podtidy> on your working
+tree file. This prevents C<git diff> from displaying an eroneous diff.
+
+=back
+
+Any error stops the script (and therefore the commit) immediately. Any
+successful cleanups to the index and working tree up until that point
+remain in place.
+
+This command fails if there is no F<.perltidyrc> or
+F<.perltidyrc.sweetened> file in the repository.
 
 =head1 GLOBAL OPTIONS
 
@@ -128,15 +168,35 @@ files on disk and in the index.
 
 =item F<.perltidyrc>
 
-Perltidy command options file.
+L<Perl::Tidy> options file.
+
+=item F<.perltidyrc.sweetend>
+
+L<Perl::Tidy::Sweetened> options file. Conflicts with F<.perltidyrc>.
 
 =item F<.podtidy-opts>
 
-Podtidy command options file. This is githook-perltidy specific.
+L<Pod::Tidy> options file. This is B<githook-perltidy> specific.
+
+=item F<.perlcriticrc>
+
+L<Perl::Critic> options file.
 
 =item F<.readme_from>
 
-Automatic README config file. This is githook-perltidy specific.
+Contains name of POD file to convert to a text README file. This is
+B<githook-perltidy> specific.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item NO_GITHOOK_PERLTIDY
+
+Setting this to 1 makes B<githook-perltidy> a no-op. Useful if you want
+to make a non-tidy commit.
 
 =back
 
@@ -148,7 +208,7 @@ This tool is managed via github:
 
 =head1 SEE ALSO
 
-L<githooks>(5), L<perltidy>(1), L<podtidy>(1)
+L<githooks>(5), L<perltidy>(1), L<podtidy>(1), L<perlcritic>(1)
 
 =head1 AUTHOR
 
@@ -162,4 +222,5 @@ This program is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
 Free Software Foundation; either version 3 of the License, or (at your
 option) any later version.
+
 

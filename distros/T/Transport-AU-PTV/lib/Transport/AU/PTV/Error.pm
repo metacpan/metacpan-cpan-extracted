@@ -1,5 +1,9 @@
 package Transport::AU::PTV::Error;
-$Transport::AU::PTV::Error::VERSION = '0.01';
+$Transport::AU::PTV::Error::VERSION = '0.03';
+# VERSION
+# PODNAME
+# ABSTRACT: error object with AUTOLOAD method slurper.
+
 use strict;
 use warnings;
 use 5.010;
@@ -62,11 +66,11 @@ __END__
 
 =head1 NAME
 
-Transport::AU::PTV::Error
+Transport::AU::PTV::Error - error object with AUTOLOAD method slurper.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 NAME
 

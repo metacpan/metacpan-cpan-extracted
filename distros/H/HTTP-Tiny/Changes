@@ -1,5 +1,39 @@
 Release notes for HTTP-Tiny
 
+0.076     2018-08-05 21:07:38-04:00 America/New_York
+
+    - No changes from 0.075-TRIAL.
+
+0.075     2018-08-01 07:03:36-04:00 America/New_York (TRIAL RELEASE)
+
+    [CHANGED]
+
+    - The 'peer' option now also can take a code reference
+
+0.074     2018-07-30 15:35:44-04:00 America/New_York
+
+    - No changes from 0.073-TRIAL.
+
+0.073     2018-07-24 11:33:53-04:00 America/New_York (TRIAL RELEASE)
+
+    0.071 never made it to CPAN; skipping to 0.073
+
+    [DOCS]
+
+    - Documented 'protocol' field in response hash.
+
+0.071     2018-04-22 14:45:43+02:00 Europe/Oslo (TRIAL RELEASE)
+
+    [DOCS]
+
+    - Documented that method argument to request() is case-sensitive.
+
+    [INTERNAL]
+
+    - Minor regex cleanup
+
+    - Updated .travis.yml for recent Perls
+
 0.070     2016-10-09 23:23:28-04:00 America/New_York
 
     - No changes from 0.069-TRIAL.

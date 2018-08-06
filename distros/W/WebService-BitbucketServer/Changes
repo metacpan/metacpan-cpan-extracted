@@ -1,5 +1,10 @@
 Revision history for WebService-BitbucketServer.
 
+0.605     2018-08-04 13:17:48-06:00 MST7MDT
+
+  * Use JSON::MaybeXS to construct JSON object
+  * Fix some pod problems
+
 0.604     2018-05-25 18:23:41-06:00 MST7MDT
 
   * Bump API version to 5.10.0

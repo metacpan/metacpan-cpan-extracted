@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::NotEmptyError
 Perl data type class for the XML Schema defined complexType
 NotEmptyError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Errors corresponding with violation of a NOT EMPTY check. 
 
 
 

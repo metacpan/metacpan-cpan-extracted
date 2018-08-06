@@ -5,7 +5,7 @@
 print "1..1\n";
 
 $init = "";
-require "t/init.pl";
+require "./t/init.pl";
 
 $js->array_by_path("document.form");
 

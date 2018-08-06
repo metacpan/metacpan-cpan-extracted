@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A canal, like the Panama Canal.",
+      "rdfs:label" : "Canal",
+      "rdfs:subClassOf" : "schema:BodyOfWater"
+   },
+   "properties" : {}
+}

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A parking lot or other parking facility.",
+      "rdfs:label" : "ParkingFacility",
+      "rdfs:subClassOf" : "schema:CivicStructure"
+   },
+   "properties" : {}
+}

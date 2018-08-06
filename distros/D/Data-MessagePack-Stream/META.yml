@@ -3,28 +3,47 @@ abstract: 'yet another messagepack streaming deserializer'
 author:
   - 'Daisuke Murase <typester@cpan.org>'
 build_requires:
-  Data::MessagePack: 0
-  Devel::PPPort: 3.19
-  ExtUtils::MakeMaker: 6.36
+  Test::More: '0.98'
 configure_requires:
-  Devel::PPPort: 3.19
-  ExtUtils::MakeMaker: 6.36
-  ExtUtils::ParseXS: 3.18
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+  Devel::PPPort: '3.42'
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Data-MessagePack-Stream
 no_index:
   directory:
-    - inc
     - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::MessagePack::Stream:
+    file: lib/Data/MessagePack/Stream.pm
+    version: '1.04'
 requires:
-  XSLoader: 0.02
+  Data::MessagePack: '0'
+  perl: '5.008001'
 resources:
-  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/typester/Data-MessagePack-Stream/issues
+  homepage: https://github.com/typester/Data-MessagePack-Stream
   repository: git://github.com/typester/Data-MessagePack-Stream.git
-version: '1.01'
+version: '1.04'
+x_authority: cpan:TYPESTER
+x_contributors:
+  - 'Daisuke Murase <typester@gmail.com>'
+  - 'Kang-min Liu <gugod@gugod.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Sergey Zhuravlev <zhur@yandex-team.ru>'
+  - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

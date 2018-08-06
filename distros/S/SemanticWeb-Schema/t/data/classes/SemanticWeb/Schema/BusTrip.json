@@ -1,0 +1,85 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A trip on a commercial bus line.",
+      "rdfs:label" : "BusTrip",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:arrivalBusStop" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The stop or station from which the bus arrives.",
+         "rdfs:label" : "arrivalBusStop",
+         "schema:domainIncludes" : "schema:BusTrip",
+         "schema:rangeIncludes" : [
+            "schema:BusStop",
+            "schema:BusStation"
+         ]
+      },
+      "schema:arrivalTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The expected arrival time.",
+         "rdfs:label" : "arrivalTime",
+         "schema:domainIncludes" : [
+            "schema:TrainTrip",
+            "schema:Flight",
+            "schema:BusTrip"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:busName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The name of the bus (e.g. Bolt Express).",
+         "rdfs:label" : "busName",
+         "schema:domainIncludes" : "schema:BusTrip",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:busNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The unique identifier for the bus.",
+         "rdfs:label" : "busNumber",
+         "schema:domainIncludes" : "schema:BusTrip",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:departureBusStop" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The stop or station from which the bus departs.",
+         "rdfs:label" : "departureBusStop",
+         "schema:domainIncludes" : "schema:BusTrip",
+         "schema:rangeIncludes" : [
+            "schema:BusStation",
+            "schema:BusStop"
+         ]
+      },
+      "schema:departureTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The expected departure time.",
+         "rdfs:label" : "departureTime",
+         "schema:domainIncludes" : [
+            "schema:BusTrip",
+            "schema:Flight",
+            "schema:TrainTrip"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:provider" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
+         "rdfs:label" : "provider",
+         "schema:domainIncludes" : [
+            "schema:ParcelDelivery",
+            "schema:BusTrip",
+            "schema:CreativeWork",
+            "schema:Service",
+            "schema:TrainTrip",
+            "schema:Reservation",
+            "schema:Flight",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      }
+   }
+}

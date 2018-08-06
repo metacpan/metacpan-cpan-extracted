@@ -4,14 +4,14 @@ use utf8;
 
 use Moo;
 use Types::Standard qw(ConsumerOf);
-use App::BatParser 0.005;
+use App::BatParser 0.011;
 use Carp;
 use Data::Dumper;
 use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use namespace::autoclean;
 
-our $VERSION = '0.010';    # VERSION
+our $VERSION = '0.012';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -270,9 +270,9 @@ sub _handle_condition {
         $right_operand = $self->_variable_substitution( $right_operand, $context );
 
         if ( $operator eq '==' || $operator eq 'EQU' ) {
-
-            #print "$left_operand == $right_operand\n";
-            return $left_operand eq $right_operand;
+            my $a = $left_operand =~ s/\s*(.*)\s*/$1/r;
+            my $b = $right_operand =~ s/\s*(.*)\s*/$1/r;
+            return $a eq $b;
         } elsif ( $operator eq 'NEQ' ) {
             return $left_operand != $right_operand;
         } elsif ( $operator eq 'LSS' ) {
@@ -399,7 +399,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -442,7 +442,7 @@ This is free software, licensed under:
 
 =head1 CONTRIBUTORS
 
-=for stopwords eva.dominguez Eva Dominguez pablo.rodriguez Toby Inkster
+=for stopwords eva.dominguez Eva Dominguez pablo.rodriguez ricardo.gomez Toby Inkster
 
 =over 4
 
@@ -457,6 +457,10 @@ Eva Dominguez <meloncego@gmail.com>
 =item *
 
 pablo.rodriguez <pablo.rodriguez@meteologica.com>
+
+=item *
+
+ricardo.gomez <ricardogomezescalante@gmail.com>
 
 =item *
 

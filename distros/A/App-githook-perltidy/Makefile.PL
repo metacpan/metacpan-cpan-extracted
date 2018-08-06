@@ -11,56 +11,71 @@ use strict;
 use warnings;
 use 5.006;
 use ExtUtils::MakeMaker::CPANfile;
-use Pod::Text;
 
 WriteMakefile(
-    NAME      => 'App::githook::perltidy',
-    ABSTRACT  => 'run perltidy and podtidy before Git commits',
-    AUTHOR    => 'Mark Lawrence <nomad@null.net>',
-    VERSION   => '0.11.10',
-    LICENSE   => 'gpl_3',
-    EXE_FILES => ['bin/githook-perltidy'],
-    test      => { RECURSIVE_TEST_FILES => 1, },
-    META_ADD  => {
-        resources =>
-          { repository => 'https//github.com/mlawren/githook-perltidy', },
-    },
+    NAME       => 'App::githook::perltidy',
+    ABSTRACT   => 'run perltidy and podtidy before Git commits',
+    AUTHOR     => 'Mark Lawrence <nomad@null.net>',
+    VERSION    => '0.12.0',
+    LICENSE    => 'gpl_3',
+    EXE_FILES  => ['bin/githook-perltidy'],
+    test       => { RECURSIVE_TEST_FILES => 1, },
     META_MERGE => {
-        no_index => {
+        'meta-spec' => { version => 2 },
+        no_index    => {
             package => [
                 qw(
-                  App::githook_perltidy::install
-                  App::githook_perltidy::pre_commit
-                  App::githook_perltidy::post_commit
+                  App::githook::perltidy::install
+                  App::githook::perltidy::pre_commit
+                  App::githook::perltidy::post_commit
                   )
             ],
+        },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'ssh://git@github.com/mlawren/githook-perltidy.git',
+                web  => 'https//github.com/mlawren/githook-perltidy',
+            }
         },
     },
 );
 
-if ( -e '.git' ) {
-    my $parser = Pod::Text->new( sentence => 0 );
+# Create the test script
+sub create_t_scripts {
+    use Path::Tiny;
 
-    # Read POD from file.pod and write to file.txt.
-    $parser->parse_from_file( 'bin/githook-perltidy', 'README' );
+    my $perl = -x $^X           ? $^X : "/usr/bin/env $^X";
+    my $sep  = $^O eq 'MSWin32' ? ';' : ':';
+
+    my $root = path('.')->absolute;
+
+    my $bin   = $root->child('bin');
+    my $lib   = $root->child('lib');
+    my $share = $root->child('share');
+    my $t     = $root->child('t');
+
+    my @scripts = @_ ? @_ : $bin->children;
+
+    foreach my $script (@scripts) {
+        my $t_script = $t->child( $script->basename );
+
+        $t_script->spew_utf8(<<"EOF");
+#!$perl
+
+### Test script specific setup ###
+BEGIN {
+    \$ENV{PATH} = "$t" .'$sep'.\$ENV{PATH};
+    \$ENV{SHARE_DIR} //= "$share";
+}
+use lib "$lib";
+### Original file continues from here ###
+
+EOF
+
+        $t_script->append_utf8( $script->slurp_utf8 );
+        $t_script->chmod('a+x');
+    }
 }
 
-# Create the test script
-open( FH, '>', 't/githook-perltidy' ) or die "open: $!";
-
-print FH qq{#!$^X
-use FindBin qw/\$Bin/;
-use lib "\$Bin/../lib";
-
-use strict;
-use App::githook_perltidy;
-use OptArgs2 qw/class_optargs/;
-
-my ( \$class, \$opts ) = class_optargs('App::githook_perltidy');
-eval "require \$class" or die \$@;
-\$class->new(\$opts)->run;
-
-};
-
-close FH;
-chmod 0755, 't/githook-perltidy' or warn "chmod: $!";
+create_t_scripts();

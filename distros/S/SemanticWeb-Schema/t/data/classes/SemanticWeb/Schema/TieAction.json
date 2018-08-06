@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of reaching a draw in a competitive activity.",
+      "rdfs:label" : "TieAction",
+      "rdfs:subClassOf" : "schema:AchieveAction"
+   },
+   "properties" : {}
+}

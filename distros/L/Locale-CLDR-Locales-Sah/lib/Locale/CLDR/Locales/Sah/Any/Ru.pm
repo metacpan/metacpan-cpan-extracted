@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Sah::Any::Ru - Package for language Sakha
 
 package Locale::CLDR::Locales::Sah::Any::Ru;
 # This file auto generated from Data\common\main\sah_RU.xml
-#	on Fri 13 Apr  7:27:20 am GMT
+#	on Sun  5 Aug  6:20:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

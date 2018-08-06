@@ -5,7 +5,7 @@
 print "1..1\n";
 
 $init = "";
-require "t/init.pl";
+require "./t/init.pl";
 
 my $a = $js->array_by_path("document.array");
 my $e = $js->array_set_element($a, 0, "gurkenhobel"); 

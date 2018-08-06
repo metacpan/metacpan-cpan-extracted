@@ -1,0 +1,23 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An agent orders an object/product/service to be delivered/sent.",
+      "rdfs:label" : "OrderAction",
+      "rdfs:subClassOf" : "schema:TradeAction"
+   },
+   "properties" : {
+      "schema:deliveryMethod" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of instrument. The method of delivery.",
+         "rdfs:label" : "deliveryMethod",
+         "rdfs:subPropertyOf" : "schema:instrument",
+         "schema:domainIncludes" : [
+            "schema:OrderAction",
+            "schema:ReceiveAction",
+            "schema:TrackAction",
+            "schema:SendAction"
+         ],
+         "schema:rangeIncludes" : "schema:DeliveryMethod"
+      }
+   }
+}

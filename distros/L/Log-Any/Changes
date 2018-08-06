@@ -2,6 +2,15 @@ Revision history for Log-Any
 
 ** denotes an incompatible change
 
+1.707     2018-08-01 22:55:01-05:00 America/Chicago
+
+    [Fixed]
+
+    - The local context hash (`$log->context`) and the log hash
+      (`$log->$level( $message, $hash )`) now get merged correctly,
+      combining contextual logging and structured logging. Thanks
+      @mephinet! [Github #76] [Github #73]
+
 1.706     2018-07-06 20:20:00-05:00 America/Chicago
 
     [Fixed]

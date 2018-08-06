@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Web page type: Search results page.",
+      "rdfs:label" : "SearchResultsPage",
+      "rdfs:subClassOf" : "schema:WebPage"
+   },
+   "properties" : {}
+}

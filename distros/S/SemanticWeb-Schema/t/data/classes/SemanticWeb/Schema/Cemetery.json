@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A graveyard.",
+      "rdfs:label" : "Cemetery",
+      "rdfs:subClassOf" : "schema:CivicStructure"
+   },
+   "properties" : {}
+}

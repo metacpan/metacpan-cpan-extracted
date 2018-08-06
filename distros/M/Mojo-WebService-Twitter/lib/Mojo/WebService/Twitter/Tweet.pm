@@ -1,13 +1,16 @@
 package Mojo::WebService::Twitter::Tweet;
 use Mojo::Base -base;
 
+use Mojo::WebService::Twitter::Media;
 use Mojo::WebService::Twitter::User;
 use Mojo::WebService::Twitter::Util 'parse_twitter_timestamp';
+use Scalar::Util 'weaken';
 
-our $VERSION = '0.002';
+our $VERSION = '1.000';
 
 has [qw(source coordinates created_at favorites id in_reply_to_screen_name
 	in_reply_to_status_id in_reply_to_user_id retweets text user)];
+has media => sub { [] };
 
 sub from_source {
 	my ($self, $source) = @_;
@@ -18,8 +21,22 @@ sub from_source {
 	$self->in_reply_to_screen_name($source->{in_reply_to_screen_name}) if defined $source->{in_reply_to_screen_name};
 	$self->in_reply_to_status_id($source->{in_reply_to_status_id_str}) if defined $source->{in_reply_to_status_id_str};
 	$self->in_reply_to_user_id($source->{in_reply_to_user_id_str}) if defined $source->{in_reply_to_user_id_str};
+	if (defined $source->{extended_entities} and defined $source->{extended_entities}{media}) {
+		my @media;
+		foreach my $media_source (@{$source->{extended_entities}{media}}) {
+			my $media = Mojo::WebService::Twitter::Media->new->from_source($media_source);
+			weaken($media->{tweet} = $self);
+			push @media, $media;
+		}
+		$self->media(\@media);
+	}
 	$self->retweets($source->{retweet_count});
-	$self->text($source->{text});
+	my $text = $source->{full_text} // $source->{text};
+	if (defined $source->{display_text_range}) {
+	  my ($start, $end) = @{$source->{display_text_range}};
+	  $text = substr $text, $start, $end;
+	}
+	$self->text($text);
 	$self->user(Mojo::WebService::Twitter::User->new->from_source($source->{user})) if defined $source->{user};
 	$self->source($source);
 	return $self;
@@ -101,6 +118,13 @@ Tweet ID which tweet was in reply to, or C<undef> if tweet was not a reply.
 
 User ID of user whom tweet was in reply to, or C<undef> if tweet was not a
 reply.
+
+=head2 media
+
+ my $media = $tweet->media;
+
+Array reference of media entities associated to this tweet as
+L<Mojo::WebService::Twitter::Media> objects.
 
 =head2 retweets
 

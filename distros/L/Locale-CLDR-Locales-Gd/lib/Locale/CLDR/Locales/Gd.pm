@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Gd - Package for language Scottish Gaelic
 
 package Locale::CLDR::Locales::Gd;
 # This file auto generated from Data\common\main\gd.xml
-#	on Fri 13 Apr  7:11:35 am GMT
+#	on Sun  5 Aug  6:02:31 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -7061,6 +7061,15 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(Ouguiya Moratàineach \(1973–2017\)),
+				'few' => q(ouguiya Moratàineach \(1973–2017\)),
+				'one' => q(ouguiya Moratàineach \(1973–2017\)),
+				'other' => q(ouguiya Moratàineach \(1973–2017\)),
+				'two' => q(ouguiya Moratàineach \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ouguiya Moratàineach),
 				'few' => q(ouguiya Moratàineach),
 				'one' => q(ouguiya Moratàineach),
@@ -7640,6 +7649,16 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(Dobra São Tomé agus Príncipe \(1977–2017\)),
+				'few' => q(dobra São Tomé agus Príncipe \(1977–2017\)),
+				'one' => q(dobra São Tomé agus Príncipe \(1977–2017\)),
+				'other' => q(dobra São Tomé agus Príncipe \(1977–2017\)),
+				'two' => q(dhobra São Tomé agus Príncipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
 			display_name => {
 				'currency' => q(Dobra São Tomé agus Príncipe),
 				'few' => q(dobra São Tomé agus Príncipe),
@@ -8617,20 +8636,24 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{f},
-					'am' => q{m},
-				},
 				'narrow' => {
 					'am' => q{m},
 					'pm' => q{f},
 				},
 				'wide' => {
-					'pm' => q{f},
 					'am' => q{m},
+					'pm' => q{f},
+				},
+				'abbreviated' => {
+					'am' => q{m},
+					'pm' => q{f},
 				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'am' => q{m},
+					'pm' => q{f},
+				},
 				'wide' => {
 					'pm' => q{f},
 					'am' => q{m},
@@ -8638,10 +8661,6 @@ has 'day_periods' => (
 				'narrow' => {
 					'pm' => q{f},
 					'am' => q{m},
-				},
-				'abbreviated' => {
-					'am' => q{m},
-					'pm' => q{f},
 				},
 			},
 		},
@@ -8812,7 +8831,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{M/d/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
-			yw => q{'seachdain' w 'dhe' Y},
+			yw => q{'seachdain' w 'dhe' y},
 		},
 		'generic' => {
 			Bh => q{h B},
@@ -8881,23 +8900,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'buddhist' => {
-			H => {
-				H => q{HH – HH},
-			},
-			Hm => {
-				H => q{HH:mm – HH:mm},
-				m => q{HH:mm – HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm – HH:mm v},
-				m => q{HH:mm – HH:mm v},
-			},
-			Hv => {
-				H => q{HH – HH v},
-			},
-			fallback => '{0} – {1}',
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH – HH},
@@ -8992,6 +8994,23 @@ has 'datetime_formats_interval' => (
 				d => q{d/M/y – d/M/y},
 				y => q{d/M/y – d/M/y},
 			},
+		},
+		'buddhist' => {
+			H => {
+				H => q{HH – HH},
+			},
+			Hm => {
+				H => q{HH:mm – HH:mm},
+				m => q{HH:mm – HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm – HH:mm v},
+				m => q{HH:mm – HH:mm v},
+			},
+			Hv => {
+				H => q{HH – HH v},
+			},
+			fallback => '{0} – {1}',
 		},
 		'generic' => {
 			H => {

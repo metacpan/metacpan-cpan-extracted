@@ -37,7 +37,7 @@ requires:
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Devel::Confess: '0'
-  Finance::Currency::FiatX: '0.007'
+  Finance::Currency::FiatX: '0.010'
   List::Util: '1.45'
   Locale::Codes::Currency_Codes: '0'
   Log::ger: '0.023'
@@ -58,7 +58,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-cryp-arbit
   homepage: https://metacpan.org/release/App-cryp-arbit
   repository: git://github.com/perlancar/perl-App-cryp-arbit.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -134,7 +134,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.592'
+      version: '0.593'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -159,6 +159,17 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CheckSelfDependency
+      config:
+        Dist::Zilla::Plugin::CheckSelfDependency:
+          finder:
+            - ':InstallModules'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
+      name: '@Author::PERLANCAR/CheckSelfDependency'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
@@ -366,7 +377,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
-      version: '0.04'
+      version: '0.050'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'

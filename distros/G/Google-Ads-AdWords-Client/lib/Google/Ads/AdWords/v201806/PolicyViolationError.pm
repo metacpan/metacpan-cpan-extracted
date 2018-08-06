@@ -5,7 +5,7 @@ use warnings;
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-sub get_xmlns { 'https://adwords.google.com/api/adwords/rm/v201806' };
+sub get_xmlns { 'https://adwords.google.com/api/adwords/cm/v201806' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;
@@ -110,7 +110,7 @@ Google::Ads::AdWords::v201806::PolicyViolationError
 =head1 DESCRIPTION
 
 Perl data type class for the XML Schema defined complexType
-PolicyViolationError from the namespace https://adwords.google.com/api/adwords/rm/v201806.
+PolicyViolationError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
 Represents violations of a single policy by some text in a field. Violations of a single policy by the same string in multiple places within a field is reported in one instance of this class and only one exemption needs to be filed. Violations of a single policy by two different strings is reported as two separate instances of this class. e.g. If 'ACME' violates 'capitalization' and occurs twice in a text ad it would be represented by one instance. If the ad also contains 'INC' which also violates 'capitalization' it would be represented in a separate instance. 
 

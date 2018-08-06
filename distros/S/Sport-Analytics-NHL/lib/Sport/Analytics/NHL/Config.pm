@@ -328,7 +328,7 @@ our %VOCABULARY = (
 			'EMBELLISHMENT',
 		],
 		'ELBOWING'                                     => [],
-		'FIGHTING'                                     => [],
+		'FIGHTING'                                     => [ 'FIGHTING (MAJ)' ],
 		'GAME MISCONDUCT'                              => [],
 		'GAME MISCONDUCT - TEAM STAFF'                 => [],
 		'GAME MISCONDUCT - HEAD COACH'                 => [ 'GAME MISCONDUCT - HEAD' ],
@@ -365,6 +365,7 @@ our %VOCABULARY = (
 		'INTERFERENCE ON GOALKEEPER'                   => [
 			'INTERFERENCE - GOALKEEPER',
 			'INTERFERENCE - GOALTENDER',
+			'INTERFERENCE-ON THE GOALTENDER'
 		],
 		'INTERFERE W/ OFFICIAL'                        => [ 'INTERFERENCE WITH OFFICIAL' ],
 		'KICKING'                                      => [],
@@ -557,6 +558,13 @@ our %PENALTY_POSSIBLE_NO_OFFENDER = (
 	'GROSS MISCONDUCT'                => 1,
 );
 
+our %REVERSE_STAT = (
+	HIT   => 'received_hit',
+	BLOCK => 'shot_blocked',
+	PENL  => 'drew_penalty',
+	GOAL  => 'goals_against',
+);
+
 our $LAST_PLAYOFF_GAME_INDEX = 417;
 our $LATE_START_IN_2012      = 1367330000;
 
@@ -569,6 +577,12 @@ our @EXPORT = qw(
 	%VOCABULARY
 	%DATA_BY_SEASON %STAT_RECORD_FROM %REASONABLE_EVENTS
 	%PENALTY_POSSIBLE_NO_OFFENDER
+	%ZERO_EVENT_GAMES
+	%REVERSE_STAT
+);
+
+our %ZERO_EVENT_GAMES = (
+	194320118 => 1,
 );
 
 1;

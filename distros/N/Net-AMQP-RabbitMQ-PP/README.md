@@ -26,7 +26,7 @@ Like [Net::RabbitMQ](https://metacpan.org/pod/Net::RabbitMQ) but pure perl rathe
 
 # VERSION
 
-0.05
+0.06
 
 # SUBROUTINES/METHODS
 
@@ -51,6 +51,14 @@ Connect to the server. Default arguments are show below:
                 password    => 'guest',
                 virtualhost => '/',
                 heartbeat   => undef,
+        );
+
+connect can also take a secure flag for SSL connections, this will only work if
+IO::Socket::SSL is available
+
+        $mq->connect(
+                ...
+                secure => 1,
         );
 
 ## disconnect
@@ -300,7 +308,8 @@ Current maintainer:
 
 Contributors:
 
-    Ben Kaufman
+        Ben Kaufman
+        Jonathan Briggs
 
 # LICENSE AND COPYRIGHT
 

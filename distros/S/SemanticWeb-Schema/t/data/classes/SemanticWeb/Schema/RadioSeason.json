@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Season dedicated to radio broadcast and associated online delivery.",
+      "rdfs:label" : "RadioSeason",
+      "rdfs:subClassOf" : "schema:CreativeWorkSeason"
+   },
+   "properties" : {}
+}

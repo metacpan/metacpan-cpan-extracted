@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "access Melbourne public transport data.",
+  "ABSTRACT" => "access Melbourne Public Transport data.",
   "AUTHOR" => "Greg Foletta <greg\@foletta.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -16,15 +16,37 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Transport::AU::PTV",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.01",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "DateTime::Format::ISO8601" => 0,
+    "Digest::SHA" => 0,
+    "JSON" => 0,
+    "LWP::UserAgent" => 0,
+    "URI" => 0,
+    "constant" => 0,
+    "parent" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Carp" => 0,
+  "DateTime::Format::ISO8601" => 0,
+  "Digest::SHA" => 0,
+  "JSON" => 0,
+  "LWP::UserAgent" => 0,
+  "URI" => 0,
+  "constant" => 0,
+  "parent" => 0,
+  "strict" => 0,
+  "warnings" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

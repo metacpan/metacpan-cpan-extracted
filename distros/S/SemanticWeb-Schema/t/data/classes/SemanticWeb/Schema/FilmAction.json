@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of capturing sound and moving images on film, video, or digitally.",
+      "rdfs:label" : "FilmAction",
+      "rdfs:subClassOf" : "schema:CreateAction"
+   },
+   "properties" : {}
+}

@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.022    2018-08-04
+        - Bugfix in 'add_subqueries'.
+
 2.021    2018-07-20
         - Output tweaking.
         - Bugfix regexp.

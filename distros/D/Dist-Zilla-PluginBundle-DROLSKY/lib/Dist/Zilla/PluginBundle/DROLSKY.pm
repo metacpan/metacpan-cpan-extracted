@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.99';
+our $VERSION = '1.01';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
@@ -850,7 +850,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 0.99
+version 1.01
 
 =head1 SYNOPSIS
 

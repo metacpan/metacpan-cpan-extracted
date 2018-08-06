@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Event type: Visual arts event.",
+      "rdfs:label" : "VisualArtsEvent",
+      "rdfs:subClassOf" : "schema:Event"
+   },
+   "properties" : {}
+}

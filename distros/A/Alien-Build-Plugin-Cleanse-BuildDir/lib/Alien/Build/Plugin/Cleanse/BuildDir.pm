@@ -9,8 +9,8 @@ use File::Path qw /remove_tree/;
 use Cwd qw /getcwd/;
 use Path::Tiny qw /path/;
 
-# ABSTRACT: Alien::Build plugin to cleanse the build dir
-our $VERSION = '0.03'; # VERSION
+
+our $VERSION = '0.05'; # VERSION
 
 
 sub init {
@@ -62,7 +62,7 @@ __END__
 
 =head1 NAME
 
-Alien::Build::Plugin::Cleanse::BuildDir - Alien::Build plugin to cleanse the build dir
+Alien::Build::Plugin::Cleanse::BuildDir - Alien::Build plugin to cleanse the build dir after the build phase
 
 =head1 VERSION
 
@@ -81,7 +81,7 @@ version 0.01
 
 =head1 DESCRIPTION
 
-This plugin deletes the build directory after the make phase.
+This plugin deletes the build directory after the alien module's build phase.
 This is useful if your alien has a large build size.  It was
 developed because the L<Alien::gdal> build footprint is enormous,
 and was filling up disk space on cpan testers.
@@ -93,14 +93,6 @@ build dir contents are not needed later.
 Has no effect if you are running a non-share install,
 or are using an out of source build
 (although these are currently untested).
-
-=head1 NAME
-
-Alien::Build::Plugin::Cleanse::BuildDir - Alien::Build plugin to cleanse the build dir
-
-=head1 VERSION
-
-version 0.01
 
 =head1 SEE ALSO
 
@@ -121,15 +113,4 @@ This software is copyright (c) 2018 by Shawn Laffan.
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
-=head1 AUTHOR
 
-Shawn Laffan <shawnlaffan@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Shawn Laffan.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

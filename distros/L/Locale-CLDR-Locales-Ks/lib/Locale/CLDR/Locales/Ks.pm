@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ks - Package for language Kashmiri
 
 package Locale::CLDR::Locales::Ks;
 # This file auto generated from Data\common\main\ks.xml
-#	on Fri 13 Apr  7:17:23 am GMT
+#	on Sun  5 Aug  6:09:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1901,6 +1901,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(مورِٹینِیَن عوگیوٗیا \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(مورِٹینِیَن عوگیوٗیا),
 			},
 		},
@@ -2705,33 +2710,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			Gy => q{Gy},
-			GyMMM => q{MMM Gy},
-			GyMMMEd => q{EEE, MMM d, Gy},
-			GyMMMd => q{MMM d, Gy},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, M/d},
-			MMM => q{LLL},
-			MMMEd => q{E, MMM d},
-			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{d-MMM},
-			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{EEE, M/d/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{EEE, MMM d, y},
-			yMMMM => q{MMMM y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
-		},
 		'generic' => {
 			Gy => q{Gy},
 			GyMMM => q{MMM Gy},
@@ -2760,6 +2738,33 @@ has 'datetime_formats_available_formats' => (
 			yyyyMMMd => q{MMM d, Gy},
 			yyyyQQQ => q{QQQ Gy},
 			yyyyQQQQ => q{QQQQ Gy},
+		},
+		'gregorian' => {
+			Gy => q{Gy},
+			GyMMM => q{MMM Gy},
+			GyMMMEd => q{EEE, MMM d, Gy},
+			GyMMMd => q{MMM d, Gy},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, M/d},
+			MMM => q{LLL},
+			MMMEd => q{E, MMM d},
+			MMMMEd => q{E, MMMM d},
+			MMMMd => q{MMMM d},
+			MMMd => q{d-MMM},
+			Md => q{M/d},
+			d => q{d},
+			hm => q{h:mm a},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{EEE, M/d/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{EEE, MMM d, y},
+			yMMMM => q{MMMM y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
 		},
 	} },
 );

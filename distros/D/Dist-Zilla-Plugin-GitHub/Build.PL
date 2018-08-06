@@ -87,7 +87,7 @@ EOW
         "Alessandro Ghedini <alexbio\@cpan.org>"
       ],
       "dist_name" => "Dist-Zilla-Plugin-GitHub",
-      "dist_version" => "0.45",
+      "dist_version" => "0.46",
       "license" => "perl",
       "module_name" => "Dist::Zilla::Plugin::GitHub",
       "recursive_test_files" => 1,

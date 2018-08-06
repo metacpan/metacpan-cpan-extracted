@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Sport-Analytics-NHL",
    "prereqs" : {
@@ -26,6 +26,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "File::Touch" : "0",
             "MongoDB" : "v1.6.0"
          },
          "requires" : {
@@ -59,7 +60,7 @@
    "provides" : {
       "Sport::Analytics::NHL" : {
          "file" : "lib/Sport/Analytics/NHL.pm",
-         "version" : "1.20"
+         "version" : "1.31"
       },
       "Sport::Analytics::NHL::Config" : {
          "file" : "lib/Sport/Analytics/NHL/Config.pm"
@@ -75,6 +76,9 @@
       },
       "Sport::Analytics::NHL::Merger" : {
          "file" : "lib/Sport/Analytics/NHL/Merger.pm"
+      },
+      "Sport::Analytics::NHL::Normalizer" : {
+         "file" : "lib/Sport/Analytics/NHL/Normalizer.pm"
       },
       "Sport::Analytics::NHL::Report" : {
          "file" : "lib/Sport/Analytics/NHL/Report.pm"
@@ -114,6 +118,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.20",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.31",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

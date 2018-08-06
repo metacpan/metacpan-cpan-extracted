@@ -1,0 +1,23 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of adding at a specific location in an ordered collection.",
+      "rdfs:label" : "InsertAction",
+      "rdfs:subClassOf" : "schema:AddAction"
+   },
+   "properties" : {
+      "schema:toLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of location. The final location of the object or the agent after the action.",
+         "rdfs:label" : "toLocation",
+         "rdfs:subPropertyOf" : "schema:location",
+         "schema:domainIncludes" : [
+            "schema:InsertAction",
+            "schema:ExerciseAction",
+            "schema:TransferAction",
+            "schema:MoveAction"
+         ],
+         "schema:rangeIncludes" : "schema:Place"
+      }
+   }
+}

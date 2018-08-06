@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ce - Package for language Chechen
 
 package Locale::CLDR::Locales::Ce;
 # This file auto generated from Data\common\main\ce.xml
-#	on Fri 13 Apr  7:04:47 am GMT
+#	on Sun  5 Aug  5:54:56 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2125,6 +2125,13 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(Мавританин уги \(1973–2017\)),
+				'one' => q(Мавританин уги \(1973–2017\)),
+				'other' => q(Мавританин угиш \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Мавританин уги),
 				'one' => q(Мавританин уги),
 				'other' => q(Мавританин угиш),
@@ -2420,6 +2427,14 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(Сан-Томен а, Принсипин а добра \(1977–2017\)),
+				'one' => q(Сан-Томен а, Принсипин а добра \(1977–2017\)),
+				'other' => q(Сан-Томен а, Принсипин а добраш \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
 			display_name => {
 				'currency' => q(Сан-Томен а, Принсипин а добра),
 				'one' => q(Сан-Томен а, Принсипин а добра),
@@ -2993,7 +3008,7 @@ has 'time_zone_names' => (
 		fallbackFormat => q({1} ({0})),
 		'Afghanistan' => {
 			long => {
-				'standard' => q#ОвхӀан мохк#,
+				'standard' => q#ОвхӀан#,
 			},
 		},
 		'Africa/Abidjan' => {
@@ -3332,6 +3347,9 @@ has 'time_zone_names' => (
 		'America/El_Salvador' => {
 			exemplarCity => q#Сальвадор#,
 		},
+		'America/Fort_Nelson' => {
+			exemplarCity => q#Форт Нельсон#,
+		},
 		'America/Fortaleza' => {
 			exemplarCity => q#Форталеза#,
 		},
@@ -3532,6 +3550,9 @@ has 'time_zone_names' => (
 		},
 		'America/Puerto_Rico' => {
 			exemplarCity => q#Пуэрто-Рико#,
+		},
+		'America/Punta_Arenas' => {
+			exemplarCity => q#Пунта-Аренас#,
 		},
 		'America/Rainy_River' => {
 			exemplarCity => q#Рейни-Ривер#,
@@ -3799,6 +3820,9 @@ has 'time_zone_names' => (
 		},
 		'Asia/Dushanbe' => {
 			exemplarCity => q#Душанбе#,
+		},
+		'Asia/Famagusta' => {
+			exemplarCity => q#Фамагуста#,
 		},
 		'Asia/Gaza' => {
 			exemplarCity => q#Газа#,
@@ -4140,9 +4164,9 @@ has 'time_zone_names' => (
 		},
 		'China' => {
 			long => {
-				'daylight' => q#Китай, аьхкенан хан#,
-				'generic' => q#Китай#,
-				'standard' => q#Китай, стандартан хан#,
+				'daylight' => q#Цийчоьнан, аьхкенан хан#,
+				'generic' => q#Цийчоь#,
+				'standard' => q#Цийчоьнан, стандартан хан#,
 			},
 		},
 		'Choibalsan' => {
@@ -4523,7 +4547,7 @@ has 'time_zone_names' => (
 		},
 		'India' => {
 			long => {
-				'standard' => q#Инди#,
+				'standard' => q#ХӀинди#,
 			},
 		},
 		'Indian/Antananarivo' => {
@@ -4607,9 +4631,9 @@ has 'time_zone_names' => (
 		},
 		'Japan' => {
 			long => {
-				'daylight' => q#Япони, аьхкенан хан#,
-				'generic' => q#Япони#,
-				'standard' => q#Япони, стандартан хан#,
+				'daylight' => q#Япон, аьхкенан хан#,
+				'generic' => q#Япон#,
+				'standard' => q#Япон, стандартан хан#,
 			},
 		},
 		'Kazakhstan_Eastern' => {
@@ -4972,6 +4996,11 @@ has 'time_zone_names' => (
 		'Ponape' => {
 			long => {
 				'standard' => q#Понапе, гӀ-наш#,
+			},
+		},
+		'Pyongyang' => {
+			long => {
+				'standard' => q#Пхеньян#,
 			},
 		},
 		'Reunion' => {

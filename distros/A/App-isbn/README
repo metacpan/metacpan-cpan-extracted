@@ -1,0 +1,73 @@
+NAME
+    App::isbn - Query book information by ISBN
+
+VERSION
+    This document describes version 0.001 of App::isbn (from Perl
+    distribution App-isbn), released on 2018-08-02.
+
+SYNOPSIS
+    See isbn script.
+
+FUNCTIONS
+  isbn
+    Usage:
+
+     isbn(%args) -> [status, msg, result, meta]
+
+    List available drivers.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "search")
+
+        Choose what action to perform. The default is 'search'. Other
+        actions include:
+
+        *   'installed_drivers' - List installed driver modules. Will return
+            the driver names, e.g. if WWW::Scraper::ISBN::AmazonUS_Driver is
+            installed then will include "AmazonUS" in the result.
+
+        *   'available_drivers' - List available driver modules on CPAN.
+            Currently uses and requires App::lcpan and an up-to-date local
+            mini-CPAN.
+
+    *   drivers => *array[str]*
+
+    *   isbn => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-isbn>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-isbn>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-isbn>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

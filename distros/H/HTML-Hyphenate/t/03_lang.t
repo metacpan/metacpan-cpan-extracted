@@ -336,7 +336,7 @@ my @utf8_fragments = (
     ],
 );
 # 50 fragments + 14 utf8 fragments
-plan tests => ( 0 + @fragments + (@utf8_fragments << 1)) + 1;
+plan tests => ( 0 + @fragments + @utf8_fragments ) + 1;
 
 use HTML::Hyphenate;
 my $h = HTML::Hyphenate->new();
@@ -347,11 +347,7 @@ foreach my $frag (@fragments) {
 TODO: {
 	local $TODO = q{utf8 patterns not yet supported by TeX::Hyphen};
 	foreach my $frag (@utf8_fragments) {
-		warnings_like {
-			is( $h->hyphenated( @{$frag}[0] ), @{$frag}[1], @{$frag}[2] );
-		} [
-			qr/Use of uninitialized value within %CARON_MAP in substitution iterator.*/,
-		], 'Warned about uninitialized value within %CARON_MAP';
+		is( $h->hyphenated( @{$frag}[0] ), @{$frag}[1], @{$frag}[2] );
 	}
 };
 

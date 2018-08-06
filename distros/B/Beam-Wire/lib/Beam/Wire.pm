@@ -1,5 +1,5 @@
 package Beam::Wire;
-our $VERSION = '1.021';
+our $VERSION = '1.022';
 # ABSTRACT: Lightweight Dependency Injection Container
 
 #pod =head1 SYNOPSIS
@@ -1211,7 +1211,7 @@ Beam::Wire - Lightweight Dependency Injection Container
 
 =head1 VERSION
 
-version 1.021
+version 1.022
 
 =head1 SYNOPSIS
 
@@ -1688,7 +1688,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Moon Bruce Armstrong Kent Fredric mohawk2
+=for stopwords Ben Moon Bruce Armstrong Kent Fredric Mohammad S Anwar mohawk2
 
 =over 4
 
@@ -1703,6 +1703,10 @@ Bruce Armstrong <bruce@armstronganchor.net>
 =item *
 
 Kent Fredric <kentnl@cpan.org>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 

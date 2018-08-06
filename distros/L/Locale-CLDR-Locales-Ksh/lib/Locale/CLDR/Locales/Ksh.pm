@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ksh - Package for language Colognian
 
 package Locale::CLDR::Locales::Ksh;
 # This file auto generated from Data\common\main\ksh.xml
-#	on Fri 13 Apr  7:17:38 am GMT
+#	on Sun  5 Aug  6:09:18 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2619,6 +2619,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(mauretanesche Ouguiya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(mauretanesche Ouguiya),
 			},
 		},
@@ -2845,6 +2850,14 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dobra vun São Tomé un Príncipe \(1977–2017\)),
+				'one' => q(Dobra vun São Tomé un Príncipe \(1977–2017\)),
+				'other' => q(Dobra vun São Tomé un Príncipe \(1977–2017\)),
+				'zero' => q(Dobra vun São Tomé un Príncipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dobra vun São Tomé un Príncipe),
 				'one' => q(Dobra vun São Tomé un Príncipe),
@@ -3264,19 +3277,19 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'am' => q{v.M.},
+					'pm' => q{n.M.},
+				},
 				'wide' => {
 					'am' => q{Uhr vörmiddaachs},
 					'pm' => q{Uhr nommendaachs},
 				},
-				'abbreviated' => {
-					'pm' => q{n.M.},
-					'am' => q{v.M.},
-				},
 			},
 			'stand-alone' => {
 				'wide' => {
-					'am' => q{Vörmeddaach},
 					'pm' => q{Nommendaach},
+					'am' => q{Vörmeddaach},
 				},
 			},
 		},
@@ -3369,7 +3382,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E 'dä' d.},
 			Hm => q{H:mm},
 			Hms => q{H:mm:ss},
@@ -3394,7 +3407,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQy},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E 'dä' d.},
 			Hm => q{H:mm},
 			Hms => q{H:mm:ss},
@@ -3435,6 +3448,46 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			M => {
+				M => q{M–M},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			Md => {
+				d => q{dd. – dd. MM.},
+			},
+			d => {
+				d => q{d–d},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yMEd => {
+				M => q{E y-MM-dd – E y-MM-dd},
+				d => q{E y-MM-dd – E y-MM-dd},
+				y => q{E y-MM-dd – E y-MM-dd},
+			},
+			yMMM => {
+				M => q{MMM–MMM y},
+				y => q{MMM. y – MMM. y},
+			},
+			yMMMEd => {
+				M => q{E y-MM-dd – E y-MM-dd},
+				d => q{E y-MM-dd – E y-MM-dd},
+				y => q{E y-MM-dd – E y-MM-dd},
+			},
+			yMMMM => {
+				M => q{MMMM–MMMM y},
+				y => q{MMMM y – MMMM y},
+			},
+		},
 		'gregorian' => {
 			M => {
 				M => q{M–M},
@@ -3477,46 +3530,6 @@ has 'datetime_formats_interval' => (
 			yMMMd => {
 				M => q{y MMM d – MMM d},
 				d => q{d.–d. MMMM y},
-			},
-		},
-		'generic' => {
-			M => {
-				M => q{M–M},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			Md => {
-				d => q{dd. – dd. MM.},
-			},
-			d => {
-				d => q{d–d},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			y => {
-				y => q{y–y},
-			},
-			yMEd => {
-				M => q{E y-MM-dd – E y-MM-dd},
-				d => q{E y-MM-dd – E y-MM-dd},
-				y => q{E y-MM-dd – E y-MM-dd},
-			},
-			yMMM => {
-				M => q{MMM–MMM y},
-				y => q{MMM. y – MMM. y},
-			},
-			yMMMEd => {
-				M => q{E y-MM-dd – E y-MM-dd},
-				d => q{E y-MM-dd – E y-MM-dd},
-				y => q{E y-MM-dd – E y-MM-dd},
-			},
-			yMMMM => {
-				M => q{MMMM–MMMM y},
-				y => q{MMMM y – MMMM y},
 			},
 		},
 	} },

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of starting or activating a device or application (e.g. starting a timer or turning on a flashlight).",
+      "rdfs:label" : "ActivateAction",
+      "rdfs:subClassOf" : "schema:ControlAction"
+   },
+   "properties" : {}
+}

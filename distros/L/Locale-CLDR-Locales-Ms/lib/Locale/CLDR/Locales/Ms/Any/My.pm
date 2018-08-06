@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ms::Any::My - Package for language Malay
 
 package Locale::CLDR::Locales::Ms::Any::My;
 # This file auto generated from Data\common\main\ms_MY.xml
-#	on Fri 13 Apr  7:20:38 am GMT
+#	on Sun  5 Aug  6:12:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

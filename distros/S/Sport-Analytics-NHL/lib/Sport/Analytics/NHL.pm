@@ -6,10 +6,11 @@ use warnings FATAL => 'all';
 use experimental qw(smartmatch);
 
 use File::Basename;
-use Storable;
+use Storable qw(store retrieve dclone);
 use POSIX qw(strftime);
 
 use List::MoreUtils qw(uniq);
+use JSON -convert_blessed_universally;
 
 use Sport::Analytics::NHL::LocalConfig;
 use Sport::Analytics::NHL::Config;
@@ -17,6 +18,7 @@ use Sport::Analytics::NHL::Errors;
 
 use if ! $ENV{HOCKEYDB_NODB} && $MONGO_DB, 'Sport::Analytics::NHL::DB';
 use Sport::Analytics::NHL::Merger;
+use Sport::Analytics::NHL::Normalizer;
 use Sport::Analytics::NHL::Report;
 use Sport::Analytics::NHL::Scraper;
 use Sport::Analytics::NHL::Test;
@@ -31,7 +33,7 @@ Sport::Analytics::NHL - Crawl data from NHL.com and put it into a database
 
 =head1 VERSION
 
-Version 1.20
+Version 1.31
 
 =cut
 
@@ -39,7 +41,7 @@ our @EXPORT = qw(
 	hdb_version
 );
 
-our $VERSION = "1.20";
+our $VERSION = "1.31";
 
 =head1 SYNOPSIS
 
@@ -183,6 +185,36 @@ Arguments:
  * The list of game ids
 
 Returns: the location of the merged storable
+
+=item C<check_consistency>
+
+Checks the consistency between the summarized events and the summary data in the boxscore itself. If there are inconsistencies, the game files are recompiled and remerged and some fix If there are unfixable inconsistencies, the check dies.
+
+Arguments:
+ * The merged file (to manage the game files)
+ * The boxscore to summarize
+ * The produced summary of events
+
+Returns: void. Dies if something goes wrong.
+
+=item C<normalize>
+
+Normalizes the merged boxscore, providing default values and erasing unnecessary data from the boxscore data structure. Saves the normalized boxscore both as a Perl storable and as a JSON. This is the highest level of integration that this package provides without a database (Mongo) interface.
+
+
+Arguments:
+ * The options hashref -
+   - force: Force overwrite of already existing file
+   - test: Test the resulted parsed report
+   - doc: limit compilation to these Report types
+   - data_dir: the root directory of the reports
+   - no_compile: don't compile files if required
+   - recompile: force recompilation
+   - no_merge: don't merge files if required
+   - remerge: force remerging
+ * The list of game ids
+
+Returns: the location of the normalized storable(s). The JSON would be in the same directory.
 
 =back
 
@@ -369,13 +401,16 @@ sub compile_file ($$$$) {
 	my $type    = shift || 'XX';
 
 	my $args = { file => $file };
-	if ($BROKEN_FILES{$game_id}->{$type}) {
+	if (
+		$BROKEN_FILES{$game_id}->{$type} &&
+		$BROKEN_FILES{$game_id}->{$type} != $UNSYNCHED &&
+		$BROKEN_FILES{$game_id}->{$type} != $NO_EVENTS
+	) {
 		print STDERR "File $file is broken, skipping\n";
 		return undef;
 	}
 	my $storable = $file;
 	$storable =~ s/\.([a-z]+)$/.storable/i;
-	#my $storable = dirname($file) . '/' . $args->{type} . '.storable';
 	if (!$opts->{force} && -f $storable && -M $storable < -M $file) {
 		print STDERR "File $storable already exists, skipping\n";
 		return $storable;
@@ -402,11 +437,19 @@ sub compile ($$@) {
 
 	my @storables = ();
 	for my $game_id (@game_ids) {
+		$ENV{GS_KEEP_PENL} = 0;
 		if (defined $DEFAULTED_GAMES{$game_id}) {
 			print STDERR "Skipping defaulted game $game_id\n";
 			next;
 		}
 		my @game_files = get_game_files_by_id($game_id, $opts->{data_dir});
+		if (
+			$BROKEN_FILES{$game_id}->{BS} &&
+			$BROKEN_FILES{$game_id}->{BS} == $NO_EVENTS &&
+			!grep { /PL/ } @game_files
+		) {
+			$ENV{GS_KEEP_PENL} = 1;
+		}
 		for my $game_file (@game_files) {
 			$game_file =~ m|/([A-Z]{2}).[a-z]{4}$|;
 			my $type = $1;
@@ -431,15 +474,15 @@ sub retrieve_compiled_report ($$$$) {
 @Sport::Analytics::NHL::Report::ES::ISA = qw(Sport::Analytics::NHL::Report);
 	my $doc_storable = "$path/$doc.storable";
 	my $doc_source   = "$path/$doc." . ($doc eq 'BS' ? 'json' : 'html');
-	#$Storable::DEBUGME = 1;
+
 	debug "Looking for file $doc_storable or $doc_source";
 	return retrieve $doc_storable if -f $doc_storable && ! $opts->{recompile};
 	if ($opts->{no_compile}) {
-		print STDERR "No storable file and no-compile option specified, skipping\n";
+		print STDERR "$doc: No storable file and no-compile option specified, skipping\n";
 		return undef;
 	}
 	if (! -f $doc_source) {
-		print STDERR "No storable and no source report available, skipping\n";
+		print STDERR "$doc: No storable and no source report available, skipping\n";
 		return undef;
 	}
 	debug "Compiling $doc_source";
@@ -460,15 +503,17 @@ sub merge ($$@) {
 			print STDERR "Skipping defaulted game $game_id\n";
 			next;
 		}
-		my $path = get_game_path_from_id($game_id);
+		my $path = get_game_path_from_id($game_id, $opts->{data_dir});
 		my $merged = "$path/$MERGED_FILE";
-		if (! $opts->{force} && -f "$merged") {
+		if (! $opts->{force} && -f $merged) {
 			print STDERR "Merged file $merged already exists, skipping\n";
+			push(@storables, $merged);
 			next;
 		}
 		$opts->{doc} ||= [];
 		$opts->{doc}   = [qw(PL RO GS ES)];
 		my $boxscore = retrieve_compiled_report($opts, $game_id, 'BS', $path);
+		$boxscore->{sources} = {BS => 1};
 		next unless $boxscore;
 		$boxscore->build_resolve_cache();
 		$boxscore->set_event_extra_data();
@@ -484,6 +529,132 @@ sub merge ($$@) {
 		debug "Storing $merged";
 		store($boxscore, $merged);
 		push(@storables, $merged)
+	}
+	return @storables;
+}
+
+sub check_consistency ($$$;$) {
+
+	my $merged_file   = shift;
+	my $boxscore      = shift;
+	my $event_summary = shift;
+
+	my $to_die = 0;
+	my $loop = 1;
+
+	my $frozen_event_summary = $event_summary;
+	while ($loop) {
+		$event_summary = dclone $frozen_event_summary;
+		eval {
+			test_consistency($boxscore, $event_summary)
+				unless $BROKEN_FILES{$boxscore->{_id}}->{BS}
+				&& keys(%{$boxscore->{sources}}) <= 1;
+		};
+		if ($@) {
+			my $error = $@;
+			my $path = dirname($merged_file);
+			unlink for glob("$path/*.storable");
+			die $error if $to_die == 1;
+			print STDERR "Trying to fix error: $error";
+			if ($error =~ /team.*(0|1).*playergo.*consistent: (\d+) vs (\d+)/i) {
+				verbose "Fixing team playergoals";
+				my $t = $1;
+				fix_playergoals($boxscore, $t, $event_summary);
+				store $boxscore, $merged_file;
+				$to_die = 1;
+				next;
+			}
+			else {
+				$error =~ /(\d{7})/; my $player = $1;
+				die $error if $to_die == $player;
+				if ($boxscore->{season} < 1945 && $error =~ /assists/) {
+					$error =~ / (\d{7}).* (\d) vs (\d)/;
+					if ($2 == $3 + 1) {
+						set_player_stat($boxscore, $1, 'assists', $3);
+						store $boxscore, $merged_file;
+					}
+				}
+				elsif ($error =~ /goalsAgainst/) {
+					$error =~ / (\d{7}).* (\d+) vs (\d+)/;
+					set_player_stat($boxscore, $1, 'goalsAgainst', $3);
+					store $boxscore, $merged_file;
+				}
+				elsif ($error =~ /penaltyMinutes/ ) {
+					$error =~ / (\d{7}).* (\d+) vs (\d+)/;
+					my $result = set_player_stat(
+						$boxscore, $1, 'penaltyMinutes', $3,
+						$event_summary->{$1}{_servedbyMinutes},
+					) || 0;
+					store $boxscore, $merged_file unless $result;
+				}
+				$to_die = $player;
+			}
+		}
+		else {
+			$loop = 0;
+		}
+	}
+}
+
+sub normalize ($$@) {
+
+	my $self = shift;
+	my $opts = shift;
+	my @game_ids = @_;
+
+	my @storables = ();
+
+	for my $game_id (@game_ids) {
+		if (defined $DEFAULTED_GAMES{$game_id})	{
+			print STDERR "Skipping defaulted game $game_id\n";
+			next;
+		}
+		my $repeat = -1;
+		REPEAT:
+		$repeat++;
+		my $path = get_game_path_from_id($game_id);
+		my $normalized = "$path/$NORMALIZED_FILE";
+		if (! $opts->{force} && -f $normalized) {
+			print STDERR "Normalized file $normalized already exists, skipping\n";
+			push(@storables, $normalized);
+			next;
+		}
+		my @merged = $self->merge($opts, $game_id);
+		my $boxscore = retrieve $merged[0];
+		$boxscore->{sources}{BS} ||= 1;
+		if (! $boxscore) {
+			print STDERR "Couldn't retrieve the merged file, skipping";
+			next;
+		}
+		my $event_summary = summarize($boxscore);
+		if ($opts->{test}) {
+			check_consistency($merged[0], $boxscore, $event_summary);
+			verbose "Ran $TEST_COUNTER->{Curr_Test} tests";
+			$TEST_COUNTER->{Curr_Test} = 0;
+		}
+		eval {
+			normalize_boxscore($boxscore, 1);
+		};
+		if ($@) {
+			unlink for glob("$path/*.storable");
+			die $@;
+		}
+		if ($opts->{test}) {
+			eval {
+				test_normalized_boxscore($boxscore);
+			};
+			if ($@) {
+				unlink $merged[0];
+				goto REPEAT if ! $repeat;
+			}
+			verbose "Ran $TEST_COUNTER->{Curr_Test} tests";
+			$TEST_COUNTER->{Curr_Test} = 0;
+		}
+		debug "Storing $normalized";
+		my $json = JSON->new()->pretty(1)->allow_nonref->convert_blessed;
+		write_file($json->encode($boxscore), "$path/$NORMALIZED_JSON");
+		store($boxscore, $normalized);
+		push(@storables, $normalized);
 	}
 	return @storables;
 }

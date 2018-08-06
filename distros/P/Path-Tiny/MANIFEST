@@ -22,6 +22,8 @@ t/data/chmod.txt
 t/digest.t
 t/exception.t
 t/exports.t
+t/fakelib/PerlIO/utf8_strict.pm
+t/fakelib/Unicode/UTF8.pm
 t/filesystem.t
 t/input_output.t
 t/input_output_no_PU_UU.t
@@ -35,6 +37,7 @@ t/overloading.t
 t/parent.t
 t/recurse.t
 t/rel-abs.t
+t/sig_die.t
 t/subsumes.t
 t/symlinks.t
 t/temp.t

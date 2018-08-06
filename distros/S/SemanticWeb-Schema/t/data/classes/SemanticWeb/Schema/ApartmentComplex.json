@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Residence type: Apartment complex.",
+      "rdfs:label" : "ApartmentComplex",
+      "rdfs:subClassOf" : "schema:Residence"
+   },
+   "properties" : {}
+}

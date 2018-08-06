@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::State;
-$Games::Solitaire::Verify::State::VERSION = '0.1800';
+$Games::Solitaire::Verify::State::VERSION = '0.1900';
 use warnings;
 use strict;
 
@@ -18,19 +18,23 @@ use Games::Solitaire::Verify::VariantsMap;
 use List::Util qw(first);
 use POSIX qw();
 
-__PACKAGE__->mk_acc_ref([qw(
-    _columns
-    _freecells
-    _foundations
-    _variant
-    _variant_params
-    _temp_move
-    )]);
+__PACKAGE__->mk_acc_ref(
+    [
+        qw(
+            _columns
+            _freecells
+            _foundations
+            _variant
+            _variant_params
+            _temp_move
+            )
+    ]
+);
 
 
 sub set_freecells
 {
-    my ($self,$freecells) = @_;
+    my ( $self, $freecells ) = @_;
 
     $self->_freecells($freecells);
 
@@ -39,13 +43,13 @@ sub set_freecells
 
 sub _assign_freecells_from_string
 {
-    my $self = shift;
+    my $self   = shift;
     my $string = shift;
 
     $self->set_freecells(
         Games::Solitaire::Verify::Freecells->new(
             {
-                count => $self->num_freecells(),
+                count  => $self->num_freecells(),
                 string => $string,
             }
         )
@@ -57,9 +61,9 @@ sub _assign_freecells_from_string
 
 sub add_column
 {
-    my ($self, $col) = @_;
+    my ( $self, $col ) = @_;
 
-    push @{$self->_columns()}, $col;
+    push @{ $self->_columns() }, $col;
 
     return;
 }
@@ -67,7 +71,7 @@ sub add_column
 
 sub set_foundations
 {
-    my ($self,$foundations) = @_;
+    my ( $self, $foundations ) = @_;
 
     $self->_foundations($foundations);
 
@@ -83,15 +87,14 @@ sub _get_suits_seq
 
 sub _from_string
 {
-    my ($self, $str) = @_;
+    my ( $self, $str ) = @_;
 
     my $rank_re = '[0A1-9TJQK]';
 
-    if ($str !~ m{\A(Foundations:[^\n]*)\n}gms)
+    if ( $str !~ m{\A(Foundations:[^\n]*)\n}gms )
     {
         Games::Solitaire::Verify::Exception::Parse::State::Foundations->throw(
-            error => "Wrong Foundations",
-        );
+            error => "Wrong Foundations", );
     }
     my $founds_s = $1;
 
@@ -99,22 +102,21 @@ sub _from_string
         Games::Solitaire::Verify::Foundations->new(
             {
                 num_decks => $self->num_decks(),
-                string => $founds_s,
+                string    => $founds_s,
             }
         )
     );
 
-    if ($str !~ m{\G(Freecells:[^\n]*)\n}gms)
+    if ( $str !~ m{\G(Freecells:[^\n]*)\n}gms )
     {
         Games::Solitaire::Verify::Exception::Parse::State::Freecells->throw(
-            error => "Wrong Freecell String",
-        );
+            error => "Wrong Freecell String", );
     }
     $self->_assign_freecells_from_string($1);
 
-    foreach my $col_idx (0 .. ($self->num_columns()-1))
+    foreach my $col_idx ( 0 .. ( $self->num_columns() - 1 ) )
     {
-        if ($str !~ m{\G(:[^\n]*)\n}msg)
+        if ( $str !~ m{\G(:[^\n]*)\n}msg )
         {
             Games::Solitaire::Verify::Exception::Parse::State::Column->throw(
                 error => "Cannot parse column",
@@ -137,17 +139,17 @@ sub _from_string
 
 sub _fill_non_custom_variant
 {
-    my $self = shift;
+    my $self    = shift;
     my $variant = shift;
 
     my $variants_map = Games::Solitaire::Verify::VariantsMap->new();
 
     my $params = $variants_map->get_variant_by_id($variant);
 
-    if (!defined($params))
+    if ( !defined($params) )
     {
         Games::Solitaire::Verify::Exception::Variant::Unknown->throw(
-            error => "Unknown/Unsupported Variant",
+            error   => "Unknown/Unsupported Variant",
             variant => $variant,
         );
     }
@@ -164,10 +166,10 @@ sub _set_variant
 
     my $variant = $args->{variant};
 
-    if ($variant eq "custom")
+    if ( $variant eq "custom" )
     {
         $self->_variant($variant);
-        $self->_variant_params($args->{variant_params});
+        $self->_variant_params( $args->{variant_params} );
     }
     else
     {
@@ -179,23 +181,23 @@ sub _set_variant
 
 sub _init
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     # Set the variant
     $self->_set_variant($args);
 
-    $self->_columns([]);
+    $self->_columns( [] );
 
-    if (exists($args->{string}))
+    if ( exists( $args->{string} ) )
     {
-        return $self->_from_string($args->{string});
+        return $self->_from_string( $args->{string} );
     }
 }
 
 
 sub get_freecell
 {
-    my ($self, $index) = @_;
+    my ( $self, $index ) = @_;
 
     return $self->_freecells()->cell($index);
 }
@@ -203,25 +205,25 @@ sub get_freecell
 
 sub set_freecell
 {
-    my ($self, $index, $card) = @_;
+    my ( $self, $index, $card ) = @_;
 
-    return $self->_freecells->assign($index, $card);
+    return $self->_freecells->assign( $index, $card );
 }
 
 
 sub get_foundation_value
 {
-    my ($self, $suit, $idx) = @_;
+    my ( $self, $suit, $idx ) = @_;
 
-    return $self->_foundations()->value($suit, $idx);
+    return $self->_foundations()->value( $suit, $idx );
 }
 
 
 sub increment_foundation_value
 {
-    my ($self, $suit, $idx) = @_;
+    my ( $self, $suit, $idx ) = @_;
 
-    $self->_foundations()->increment($suit, $idx);
+    $self->_foundations()->increment( $suit, $idx );
 
     return;
 }
@@ -261,7 +263,7 @@ sub num_columns
 
 sub get_column
 {
-    my $self = shift;
+    my $self  = shift;
     my $index = shift;
 
     return $self->_columns->[$index];
@@ -274,9 +276,9 @@ sub num_empty_columns
 
     my $count = 0;
 
-    foreach my $idx (0 .. ($self->num_columns()-1) )
+    foreach my $idx ( 0 .. ( $self->num_columns() - 1 ) )
     {
-        if (! $self->get_column($idx)->len())
+        if ( !$self->get_column($idx)->len() )
         {
             $count++;
         }
@@ -290,30 +292,25 @@ sub clone
     my $self = shift;
 
     my $variant = $self->_variant;
-    my $copy = Games::Solitaire::Verify::State->new(
+    my $copy    = Games::Solitaire::Verify::State->new(
         {
             variant => $variant,
-            (($variant eq "custom")
-                ? (variant_params => $self->_variant_params())
+            (
+                  ( $variant eq "custom" )
+                ? ( variant_params => $self->_variant_params() )
                 : ()
             ),
         }
     );
 
-    foreach my $idx (0 .. ($self->num_columns()-1))
+    foreach my $idx ( 0 .. ( $self->num_columns() - 1 ) )
     {
-        $copy->add_column(
-            $self->get_column($idx)->clone()
-        );
+        $copy->add_column( $self->get_column($idx)->clone() );
     }
 
-    $copy->set_foundations(
-        $self->_foundations()->clone()
-    );
+    $copy->set_foundations( $self->_foundations()->clone() );
 
-    $copy->_freecells(
-        $self->_freecells()->clone()
-    );
+    $copy->_freecells( $self->_freecells()->clone() );
 
     return $copy;
 }
@@ -322,16 +319,18 @@ sub clone
 # Returns 0 on success, else the error.
 sub _can_put_into_empty_column
 {
-    my ($self, $card) = @_;
+    my ( $self, $card ) = @_;
 
-    if ($self->_variant_params->empty_stacks_filled_by() eq "kings")
+    if ( $self->_variant_params->empty_stacks_filled_by() eq "kings" )
     {
-        if ($card->rank() != 13)
+        if ( $card->rank() != 13 )
         {
-            return Games::Solitaire::Verify::Exception::Move::Dest::Col::OnlyKingsCanFillEmpty->new(
+            return
+                Games::Solitaire::Verify::Exception::Move::Dest::Col::OnlyKingsCanFillEmpty
+                ->new(
                 error => "Non-king on an empty stack",
-                move => $self->_temp_move(),
-            );
+                move  => $self->_temp_move(),
+                );
         }
     }
     return 0;
@@ -339,28 +338,26 @@ sub _can_put_into_empty_column
 
 sub _is_matching_color
 {
-    my ($self, $parent, $child) = @_;
+    my ( $self, $parent, $child ) = @_;
 
     my $rules = $self->_variant_params()->rules();
-    my $sbb = $self->_variant_params()->seq_build_by();
+    my $sbb   = $self->_variant_params()->seq_build_by();
 
-    my $verdict =
-    (
-          ($rules eq "simple_simon")
-        ? 0
-        : ($sbb eq "alt_color")
-        ? ($parent->color() eq $child->color())
-        : ($sbb eq "suit")
-        ? ($parent->suit() ne $child->suit())
+    my $verdict = (
+          ( $rules eq "simple_simon" ) ? 0
+        : ( $sbb eq "alt_color" )      ? ( $parent->color() eq $child->color() )
+        : ( $sbb eq "suit" )           ? ( $parent->suit() ne $child->suit() )
         : 0
     );
 
     if ($verdict)
     {
-        return Games::Solitaire::Verify::Exception::Move::Dest::Col::NonMatchSuits->new(
+        return
+            Games::Solitaire::Verify::Exception::Move::Dest::Col::NonMatchSuits
+            ->new(
             seq_build_by => $sbb,
-            move => $self->_temp_move(),
-        );
+            move         => $self->_temp_move(),
+            );
     }
 
     return 0;
@@ -368,17 +365,19 @@ sub _is_matching_color
 
 sub _can_put_on_top
 {
-    my ($self, $parent, $child) = @_;
+    my ( $self, $parent, $child ) = @_;
 
-    if ($parent->rank() != $child->rank()+1)
+    if ( $parent->rank() != $child->rank() + 1 )
     {
-        return Games::Solitaire::Verify::Exception::Move::Dest::Col::RankMismatch->new(
+        return
+            Games::Solitaire::Verify::Exception::Move::Dest::Col::RankMismatch
+            ->new(
             error => "Rank mismatch between parent and child cards",
-            move => $self->_temp_move(),
-        );
+            move  => $self->_temp_move(),
+            );
     }
 
-    if (my $ret = $self->_is_matching_color($parent, $child) )
+    if ( my $ret = $self->_is_matching_color( $parent, $child ) )
     {
         return $ret;
     }
@@ -388,49 +387,45 @@ sub _can_put_on_top
 
 sub _can_put_on_column
 {
-    my ($self, $col_idx, $card) = @_;
+    my ( $self, $col_idx, $card ) = @_;
 
-    return
-        (($self->get_column($col_idx)->len() == 0)
-            ? $self->_can_put_into_empty_column($card)
-            : $self->_can_put_on_top(
-                $self->get_column($col_idx)->top(),
-                $card
-              )
-        );
+    return (
+        ( $self->get_column($col_idx)->len() == 0 )
+        ? $self->_can_put_into_empty_column($card)
+        : $self->_can_put_on_top( $self->get_column($col_idx)->top(), $card )
+    );
 }
 
 sub _calc_freecell_max_seq_move
 {
-    my ($self, $args) = @_;
-    my $to_empty = (defined($args->{to_empty}) ? $args->{to_empty} : 0);
+    my ( $self, $args ) = @_;
+    my $to_empty = ( defined( $args->{to_empty} ) ? $args->{to_empty} : 0 );
 
-    return (($self->num_empty_freecells()+1) << ($self->num_empty_columns()-$to_empty))
+    return ( ( $self->num_empty_freecells() + 1 )
+        << ( $self->num_empty_columns() - $to_empty ) );
 }
 
 sub _calc_empty_stacks_filled_by_any_card_max_seq_move
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
     return $self->_calc_freecell_max_seq_move($args);
 }
 
 sub _calc_max_sequence_move
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    return
-        +($self->_variant_params->sequence_move() eq "unlimited")
-            ? POSIX::INT_MAX()
-            : ($self->_variant_params->empty_stacks_filled_by() eq "any")
-            ? $self->_calc_empty_stacks_filled_by_any_card_max_seq_move($args)
-            : ($self->num_empty_freecells() + 1)
-        ;
+    return +( $self->_variant_params->sequence_move() eq "unlimited" )
+        ? POSIX::INT_MAX()
+        : ( $self->_variant_params->empty_stacks_filled_by() eq "any" )
+        ? $self->_calc_empty_stacks_filled_by_any_card_max_seq_move($args)
+        : ( $self->num_empty_freecells() + 1 );
 }
 
 sub _is_sequence_in_column
 {
-    my ($self, $source_idx, $num_cards, $num_seq_components_ref) = @_;
+    my ( $self, $source_idx, $num_cards, $num_seq_components_ref ) = @_;
 
     my $col = $self->get_column($source_idx);
     my $len = $col->len();
@@ -439,26 +434,24 @@ sub _is_sequence_in_column
 
     my $num_comps = 1;
 
-    foreach my $card_idx (0 .. ($num_cards-2))
+    foreach my $card_idx ( 0 .. ( $num_cards - 2 ) )
     {
-        my $parent = $col->pos($len-1-$card_idx-1);
-        my $child = $col->pos($len-1-$card_idx);
+        my $parent = $col->pos( $len - 1 - $card_idx - 1 );
+        my $child  = $col->pos( $len - 1 - $card_idx );
 
-        if ($self->_can_put_on_top($parent, $child))
+        if ( $self->_can_put_on_top( $parent, $child ) )
         {
             return
-                Games::Solitaire::Verify::Exception::Move::Src::Col::NonSequence->new
-                (
-                    move => $self->_temp_move(),
-                    pos => $card_idx,
-                )
-                ;
+                Games::Solitaire::Verify::Exception::Move::Src::Col::NonSequence
+                ->new(
+                move => $self->_temp_move(),
+                pos  => $card_idx,
+                );
         }
 
-        $num_comps +=
-        (
-              ($rules eq "simple_simon")
-            ? (($parent->suit() ne $child->suit()) ? 1 : 0)
+        $num_comps += (
+              ( $rules eq "simple_simon" )
+            ? ( ( $parent->suit() ne $child->suit() ) ? 1 : 0 )
             : 1
         );
     }
@@ -471,20 +464,21 @@ sub _is_sequence_in_column
 
 sub clear_freecell
 {
-    my ($self, $index) = @_;
+    my ( $self, $index ) = @_;
 
     return $self->_freecells->clear($index);
 }
 
 sub verify_and_perform_move
 {
-    my ($self, $move) = @_;
+    my ( $self, $move ) = @_;
 
-    if (my $method = $self->can("_mv_" . $move->source_type . "_to_" . $move->dest_type))
+    if ( my $method =
+        $self->can( "_mv_" . $move->source_type . "_to_" . $move->dest_type ) )
     {
         $self->_temp_move($move);
         my $ret = $method->($self);
-        $self->_temp_move(undef());
+        $self->_temp_move( undef() );
         return $ret;
     }
     else
@@ -500,29 +494,25 @@ sub _mv_stack_to_foundation
     my $move = $self->_temp_move();
 
     my $col_idx = $move->source();
-    my $card = $self->get_column($col_idx)->top();
+    my $card    = $self->get_column($col_idx)->top();
 
     my $rank = $card->rank();
     my $suit = $card->suit();
 
-    my $f_idx =
-        first
-        { $self->get_foundation_value($suit, $_) == $rank-1 }
-        (0 .. ($self->num_decks()-1))
-        ;
+    my $f_idx = first { $self->get_foundation_value( $suit, $_ ) == $rank - 1 }
+    ( 0 .. ( $self->num_decks() - 1 ) );
 
-    if (defined($f_idx))
+    if ( defined($f_idx) )
     {
         $self->get_column($col_idx)->pop();
-        $self->increment_foundation_value($suit, $f_idx);
+        $self->increment_foundation_value( $suit, $f_idx );
         return 0;
     }
     else
     {
         return
             Games::Solitaire::Verify::Exception::Move::Dest::Foundation->new(
-                move => $move
-            );
+            move => $move );
     }
 }
 
@@ -534,52 +524,42 @@ sub _mv_stack_seq_to_foundation
 
     my $rules = $self->_variant_params()->rules();
 
-    if ($rules ne "simple_simon")
+    if ( $rules ne "simple_simon" )
     {
         return Games::Solitaire::Verify::Exception::Move::Variant::Unsupported
-            ->new(
-                move => $move
-            );
+            ->new( move => $move );
     }
 
     my $col_idx = $move->source();
 
     my $num_seq_components;
     my $verdict =
-        $self->_is_sequence_in_column(
-            $col_idx,
-            13,
-            \$num_seq_components,
-        );
+        $self->_is_sequence_in_column( $col_idx, 13, \$num_seq_components, );
 
     if ($verdict)
     {
         return $verdict;
     }
 
-    if ($num_seq_components != 1)
+    if ( $num_seq_components != 1 )
     {
-        return Games::Solitaire::Verify::Exception::Move::Src::Col::NotTrueSeq->new(
-            move => $move
-        );
+        return Games::Solitaire::Verify::Exception::Move::Src::Col::NotTrueSeq
+            ->new( move => $move );
     }
 
     my $card = $self->get_column($col_idx)->top();
 
     my $suit = $card->suit();
 
-    my $f_idx =
-        first
-        { $self->get_foundation_value($suit, $_) == 0 }
-        (0 .. ($self->num_decks()-1))
-        ;
+    my $f_idx = first { $self->get_foundation_value( $suit, $_ ) == 0 }
+    ( 0 .. ( $self->num_decks() - 1 ) );
 
-    if (defined($f_idx))
+    if ( defined($f_idx) )
     {
-        foreach my $card_idx (1 .. 13)
+        foreach my $card_idx ( 1 .. 13 )
         {
             $self->get_column($col_idx)->pop();
-            $self->increment_foundation_value($suit, $f_idx);
+            $self->increment_foundation_value( $suit, $f_idx );
         }
         return 0;
     }
@@ -587,8 +567,7 @@ sub _mv_stack_seq_to_foundation
     {
         return
             Games::Solitaire::Verify::Exception::Move::Dest::Foundation->new(
-                move => $move
-            );
+            move => $move );
     }
 }
 
@@ -598,25 +577,22 @@ sub _mv_stack_to_freecell
     my $move = $self->_temp_move();
 
     my $col_idx = $move->source();
-    my $fc_idx = $move->dest();
+    my $fc_idx  = $move->dest();
 
-    if (! $self->get_column($col_idx)->len())
+    if ( !$self->get_column($col_idx)->len() )
     {
         return
             Games::Solitaire::Verify::Exception::Move::Src::Col::NoCards->new(
-                move => $move,
-            );
+            move => $move, );
     }
 
-    if (defined($self->get_freecell($fc_idx)))
+    if ( defined( $self->get_freecell($fc_idx) ) )
     {
-        return
-            Games::Solitaire::Verify::Exception::Move::Dest::Freecell->new(
-                move => $move,
-            );
+        return Games::Solitaire::Verify::Exception::Move::Dest::Freecell->new(
+            move => $move, );
     }
 
-    $self->set_freecell($fc_idx, $self->get_column($col_idx)->pop());
+    $self->set_freecell( $fc_idx, $self->get_column($col_idx)->pop() );
 
     return 0;
 }
@@ -626,8 +602,8 @@ sub _mv_stack_to_stack
     my $self = shift;
     my $move = $self->_temp_move();
 
-    my $source = $move->source();
-    my $dest = $move->dest();
+    my $source    = $move->source();
+    my $dest      = $move->dest();
     my $num_cards = $move->num_cards();
 
     # Source column
@@ -636,28 +612,28 @@ sub _mv_stack_to_stack
 
     my $source_len = $sc->len();
 
-    if ($source_len < $num_cards)
+    if ( $source_len < $num_cards )
     {
         return
-            Games::Solitaire::Verify::Exception::Move::Src::Col::NotEnoughCards->new(
-                move => $move,
-            );
+            Games::Solitaire::Verify::Exception::Move::Src::Col::NotEnoughCards
+            ->new( move => $move, );
     }
 
     my $num_seq_components;
-    if (my $verdict = $self->_is_sequence_in_column(
-            $source,
-            $num_cards,
-            \$num_seq_components,
-        ))
+    if (
+        my $verdict = $self->_is_sequence_in_column(
+            $source, $num_cards, \$num_seq_components,
+        )
+        )
     {
         return $verdict;
     }
 
-    if (my $verdict = $self->_can_put_on_column(
-            $dest,
-            $sc->pos($source_len-$num_cards)
-        ))
+    if (
+        my $verdict = $self->_can_put_on_column(
+            $dest, $sc->pos( $source_len - $num_cards )
+        )
+        )
     {
         return $verdict;
     }
@@ -665,16 +641,17 @@ sub _mv_stack_to_stack
     # Now let's see if we have enough resources
     # to move the cards.
 
-    if ($num_seq_components > $self->_calc_max_sequence_move(
+    if (
+        $num_seq_components > $self->_calc_max_sequence_move(
             {
-                to_empty => ($dc->len() == 0),
+                to_empty => ( $dc->len() == 0 ),
             }
-            ))
+        )
+        )
     {
         return
             Games::Solitaire::Verify::Exception::Move::NotEnoughEmpties->new(
-                move => $move,
-            );
+            move => $move, );
     }
 
     # Now let's actually move them.
@@ -689,37 +666,32 @@ sub _mv_freecell_to_foundation
     my $move = $self->_temp_move();
 
     my $fc_idx = $move->source();
-    my $card = $self->get_freecell($fc_idx);
+    my $card   = $self->get_freecell($fc_idx);
 
-    if (!defined($card))
+    if ( !defined($card) )
     {
         return
-            Games::Solitaire::Verify::Exception::Move::Src::Freecell::Empty->new(
-                move => $move,
-            );
+            Games::Solitaire::Verify::Exception::Move::Src::Freecell::Empty
+            ->new( move => $move, );
     }
 
     my $rank = $card->rank();
     my $suit = $card->suit();
 
-    my $f_idx =
-        first
-        { $self->get_foundation_value($suit, $_) == $rank-1 }
-        (0 .. ($self->num_decks()-1))
-        ;
+    my $f_idx = first { $self->get_foundation_value( $suit, $_ ) == $rank - 1 }
+    ( 0 .. ( $self->num_decks() - 1 ) );
 
-    if (defined($f_idx))
+    if ( defined($f_idx) )
     {
         $self->clear_freecell($fc_idx);
-        $self->increment_foundation_value($suit, $f_idx);
+        $self->increment_foundation_value( $suit, $f_idx );
         return 0;
     }
     else
     {
         return
             Games::Solitaire::Verify::Exception::Move::Dest::Foundation->new(
-                move => $move
-            );
+            move => $move );
     }
 }
 
@@ -728,19 +700,18 @@ sub _mv_freecell_to_stack
     my $self = shift;
     my $move = $self->_temp_move();
 
-    my $fc_idx = $move->source();
+    my $fc_idx  = $move->source();
     my $col_idx = $move->dest();
 
     my $card = $self->get_freecell($fc_idx);
 
-    if (!defined($card))
+    if ( !defined($card) )
     {
-        return Games::Solitaire::Verify::Exception::Move::Src::Freecell::Empty->new(
-            move => $move,
-        );
+        return Games::Solitaire::Verify::Exception::Move::Src::Freecell::Empty
+            ->new( move => $move, );
     }
 
-    if (my $verdict = $self->_can_put_on_column($col_idx, $card))
+    if ( my $verdict = $self->_can_put_on_column( $col_idx, $card ) )
     {
         return $verdict;
     }
@@ -752,20 +723,90 @@ sub _mv_freecell_to_stack
 }
 
 
+my @SS = ( @{ Games::Solitaire::Verify::Card->get_suits_seq() } );
+
+sub verify_contents
+{
+    my ( $self, $args ) = @_;
+
+    my $MAX_RANK = $args->{max_rank};
+    my $found    = {};
+    my $register = sub {
+        my $card = shift;
+        if ( $card->rank > $MAX_RANK )
+        {
+            die Games::Solitaire::Verify::Exception::State::TooHighRank->new(
+                cards => [$card], );
+        }
+        my $s = $card->fast_s;
+        if ( ( ++$found->{$s} ) > 1 )
+        {
+            die Games::Solitaire::Verify::Exception::State::ExtraCards->new(
+                cards => [$card], );
+        }
+        return;
+    };
+    for my $fc ( 0 .. $self->num_freecells - 1 )
+    {
+        my $card = $self->get_freecell($fc);
+        if ( defined $card )
+        {
+            $register->($card);
+        }
+    }
+    foreach my $suit (@SS)
+    {
+        for my $rank ( 1 .. $self->get_foundation_value( $suit, 0 ) )
+        {
+            $register->(
+                Games::Solitaire::Verify::Card->new(
+                    {
+                        string => (
+                            Games::Solitaire::Verify::Card->rank_to_string(
+                                $rank)
+                                . $suit
+                        )
+                    }
+                ),
+            );
+        }
+    }
+
+    foreach my $idx ( 0 .. ( $self->num_columns() - 1 ) )
+    {
+        my $col = $self->get_column($idx);
+        for my $pos ( 0 .. $col->len - 1 )
+        {
+            $register->( $col->pos($pos) );
+        }
+    }
+
+    if ( scalar( keys %$found ) != $MAX_RANK * 4 )
+    {
+        die Games::Solitaire::Verify::Exception::State::MissingCards->new(
+            cards => [], );
+    }
+
+    return;
+}
+
+
 sub to_string
 {
     my $self = shift;
 
-    return join("\n",
+    return join(
+        "\n",
         (
-            map { $_->to_string() }
-            $self->_foundations(), $self->_freecells(), @{$self->_columns()}
+            map { $_->to_string() } $self->_foundations(),
+            $self->_freecells(),
+            @{ $self->_columns() }
         ),
         ""
     );
 }
 
-1; # End of Games::Solitaire::Verify::State
+1;    # End of Games::Solitaire::Verify::State
 
 __END__
 
@@ -780,7 +821,7 @@ states (or positions) of the entire board.
 
 =head1 VERSION
 
-version 0.1800
+version 0.1900
 
 =head1 SYNOPSIS
 
@@ -815,7 +856,7 @@ version 0.1800
 
 =head1 VERSION
 
-version 0.1800
+version 0.1900
 
 =head1 FUNCTIONS
 
@@ -889,6 +930,16 @@ value. See L<Games::Solitaire::Verify::Move> for more information.
 =head2 $self->clear_freecell($index)
 
 Clears/empties the freecell at position $pos .
+
+=head2 $board->verify_contents({max_rank => 13});
+
+Verify that all the cards inside the state are present and exactly once.
+C<'max_rank'> should be 13 unless you want to only include cards up to a lower
+rank.
+
+This method either throws an exception object or returns normally.
+
+(New in version 0.1900 .)
 
 =head2 $self->to_string()
 

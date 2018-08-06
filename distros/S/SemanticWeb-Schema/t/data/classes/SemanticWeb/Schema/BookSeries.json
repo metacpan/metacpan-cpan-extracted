@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A series of books. Included books can be indicated with the hasPart property.",
+      "rdfs:label" : "BookSeries",
+      "rdfs:subClassOf" : "schema:CreativeWorkSeries"
+   },
+   "properties" : {}
+}

@@ -6,6 +6,7 @@ MANIFEST
 META.json
 META.yml
 README
+Resources/TMS/schema.sql
 cpanfile
 dist.ini
 lib/Datahub/Factory/Arthub.pm

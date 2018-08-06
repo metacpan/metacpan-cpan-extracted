@@ -150,6 +150,18 @@ extern gdFontPtr gdFontGiant;  /* 9x15 */
 extern gdFontPtr gdFontTiny;  /* 5x8 */
 
 
+/* These intermediate functions are necessary on Windows since 
+   the shared version of libgd uses a different calling convention
+   and there is no proper macro defined.
+*/
+#if defined(WIN32) && !defined(NONDLL)
+static void gp_gdImagePolygon(gdImagePtr, gdPointPtr, int, int);
+static void gp_gdImageFilledPolygon(gdImagePtr, gdPointPtr, int, int);
+#else
+# define gp_gdImagePolygon gdImagePolygon
+# define gp_gdImageFilledPolygon gdImageFilledPolygon 
+#endif
+
 #define GREG_XMAX 640
 #define GREG_YMAX 480
 
@@ -265,6 +277,20 @@ static PNG_FILL_TILE PNG_fill_tile = { (gdImagePtr)0, 0 };
 
 static int PNG_FillSolid __PROTO((int fillpar));
 static int PNG_FillPattern __PROTO((int fillpar));
+
+#if defined(WIN32) && !defined(NONDLL)
+static void 
+gp_gdImagePolygon(gdImagePtr im, gdPointPtr p, int n, int c)
+{
+    gdImagePolygon(im, p, n, c);
+}
+
+static void 
+gp_gdImageFilledPolygon(gdImagePtr im, gdPointPtr p, int n, int c)
+{
+    gdImageFilledPolygon(im, p, n, c);
+}
+#endif
 
 static int
 PNG_FillSolid(int fillpar)
@@ -1199,22 +1225,22 @@ PNG_point(unsigned int x, unsigned int y, int number)
 	    gdImageFillToBorder(png_state.image, x, y, png_state.color, png_state.color);
 	    break;
 	case 7: /* triangle */
-	    PNG_Triangle(x, y, 1, gdImagePolygon);
+	    PNG_Triangle(x, y, 1, gp_gdImagePolygon);
 	    break;
 	case 8: /* triangle              filled */
-	    PNG_Triangle(x, y, 1, gdImageFilledPolygon);
+	    PNG_Triangle(x, y, 1, gp_gdImageFilledPolygon);
 	    break;
 	case 9: /* upside down triangle */
-	    PNG_Triangle(x, y, -1, gdImagePolygon);
+	    PNG_Triangle(x, y, -1, gp_gdImagePolygon);
 	    break;
 	case 10: /* upside down triangle  filled */
-	    PNG_Triangle(x, y, -1, gdImageFilledPolygon);
+	    PNG_Triangle(x, y, -1, gp_gdImageFilledPolygon);
 	    break;
 	case 11: /* diamond */
-	    PNG_Diamond(x, y, gdImagePolygon);
+	    PNG_Diamond(x, y, gp_gdImagePolygon);
 	    break;
 	case 12: /* diamond               filled */
-	    PNG_Diamond(x, y, gdImageFilledPolygon);
+	    PNG_Diamond(x, y, gp_gdImageFilledPolygon);
 	    break;
     }
 }

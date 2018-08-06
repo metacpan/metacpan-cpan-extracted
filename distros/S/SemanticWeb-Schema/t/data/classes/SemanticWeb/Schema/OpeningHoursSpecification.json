@@ -1,0 +1,67 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A structured value providing information about the opening hours of a place or a certain service inside a place.</p>\n\n<p>The place is <strong>open</strong> if the <a class=\"localLink\" href=\"http://schema.org/opens\">opens</a> property is specified, and <strong>closed</strong> otherwise.</p>\n\n<p>If the value for the <a class=\"localLink\" href=\"http://schema.org/closes\">closes</a> property is less than the value for the <a class=\"localLink\" href=\"http://schema.org/opens\">opens</a> property then the hour range is assumed to span over the next day.",
+      "rdfs:label" : "OpeningHoursSpecification",
+      "rdfs:subClassOf" : "schema:StructuredValue"
+   },
+   "properties" : {
+      "schema:closes" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The closing hour of the place or service on the given day(s) of the week.",
+         "rdfs:label" : "closes",
+         "schema:domainIncludes" : "schema:OpeningHoursSpecification",
+         "schema:rangeIncludes" : "schema:Time"
+      },
+      "schema:dayOfWeek" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The day of the week for which these opening hours are valid.",
+         "rdfs:label" : "dayOfWeek",
+         "schema:domainIncludes" : "schema:OpeningHoursSpecification",
+         "schema:rangeIncludes" : "schema:DayOfWeek"
+      },
+      "schema:opens" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The opening hour of the place or service on the given day(s) of the week.",
+         "rdfs:label" : "opens",
+         "schema:domainIncludes" : "schema:OpeningHoursSpecification",
+         "schema:rangeIncludes" : "schema:Time"
+      },
+      "schema:validFrom" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date when the item becomes valid.",
+         "rdfs:label" : "validFrom",
+         "schema:domainIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:Permit",
+            "schema:Demand",
+            "schema:PriceSpecification",
+            "schema:OpeningHoursSpecification",
+            "schema:LocationFeatureSpecification",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:validThrough" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
+         "rdfs:label" : "validThrough",
+         "schema:domainIncludes" : [
+            "schema:Offer",
+            "schema:LocationFeatureSpecification",
+            "schema:OpeningHoursSpecification",
+            "schema:JobPosting",
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount",
+            "schema:Demand"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      }
+   }
+}

@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::DatabaseError
 Perl data type class for the XML Schema defined complexType
 DatabaseError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Errors that are thrown due to a database access problem. 
 
 
 

@@ -65,9 +65,10 @@ my %WriteMakefileArgs = (
     "Test::Needs" => 0,
     "Test::RequiresInternet" => 0,
     "URI::file" => 0,
-    "WWW::Mechanize" => 0
+    "WWW::Mechanize" => 0,
+    "version" => 0
   },
-  "VERSION" => "0.000038",
+  "VERSION" => "0.000039",
   "test" => {
     "TESTS" => "t/*.t t/LWP/*.t t/LWP/ConsoleLogger/*.t"
   }
@@ -121,6 +122,7 @@ my %FallbackPrereqs = (
   "WWW::Mechanize" => 0,
   "XML::Simple" => 0,
   "strict" => 0,
+  "version" => 0,
   "warnings" => 0
 );
 

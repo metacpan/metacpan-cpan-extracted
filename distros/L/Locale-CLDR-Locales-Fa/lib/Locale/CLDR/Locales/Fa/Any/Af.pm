@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Fa::Any::Af - Package for language Persian
 
 package Locale::CLDR::Locales::Fa::Any::Af;
 # This file auto generated from Data\common\main\fa_AF.xml
-#	on Fri 13 Apr  7:09:31 am GMT
+#	on Sun  5 Aug  6:00:13 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -790,52 +790,52 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'persian') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1700
 						&& $time < 1900;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1700;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1700
-						&& $time < 1900;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1700;
-				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
 					return 'evening1' if $time >= 1700
 						&& $time < 1900;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1700;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1700;
+					return 'evening1' if $time >= 1700
+						&& $time < 1900;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
@@ -855,49 +855,49 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'night1' => q{شب},
-					'noon' => q{ظهر},
-					'afternoon1' => q{بعد از چاشت},
-					'morning1' => q{صبح},
-					'midnight' => q{نیمه‌شب},
-					'evening1' => q{شام},
-				},
 				'wide' => {
-					'night1' => q{شب},
-					'noon' => q{ظهر},
+					'evening1' => q{شام},
 					'afternoon1' => q{بعد از چاشت},
 					'morning1' => q{صبح},
 					'midnight' => q{نیمه‌شب},
-					'evening1' => q{شام},
+					'night1' => q{شب},
+					'noon' => q{ظهر},
 				},
 				'narrow' => {
-					'morning1' => q{ص},
-					'afternoon1' => q{ب.ظ.},
 					'night1' => q{ش},
 					'noon' => q{ظ},
 					'evening1' => q{ش},
 					'midnight' => q{ن},
+					'afternoon1' => q{ب.ظ.},
+					'morning1' => q{ص},
+				},
+				'abbreviated' => {
+					'noon' => q{ظهر},
+					'night1' => q{شب},
+					'evening1' => q{شام},
+					'midnight' => q{نیمه‌شب},
+					'afternoon1' => q{بعد از چاشت},
+					'morning1' => q{صبح},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'afternoon1' => q{بعد از چاشت},
-					'morning1' => q{صبح},
+				'abbreviated' => {
 					'night1' => q{شب},
+					'afternoon1' => q{بعد از چاشت},
 					'evening1' => q{شام},
+					'morning1' => q{صبح},
+				},
+				'wide' => {
+					'evening1' => q{شام},
+					'morning1' => q{صبح},
+					'afternoon1' => q{بعد از چاشت},
+					'night1' => q{شب},
 				},
 				'narrow' => {
-					'evening1' => q{شام},
 					'afternoon1' => q{بعد از چاشت},
+					'evening1' => q{شام},
 					'morning1' => q{ص},
 					'night1' => q{ش},
-				},
-				'abbreviated' => {
-					'evening1' => q{شام},
-					'night1' => q{شب},
-					'morning1' => q{صبح},
-					'afternoon1' => q{بعد از چاشت},
 				},
 			},
 		},

@@ -8,7 +8,7 @@ Locale::CLDR - A Module to create locale objects with localisation data from the
 
 =head1 VERSION
 
-Version 0.32.0
+Version 0.33.0
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ or
 
 use v5.10.1;
 use version;
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use open ':encoding(utf8)';
 use utf8;
@@ -161,6 +161,92 @@ value.
 Currently supported extensions are
 
 =over 8
+
+=item ca
+
+=item calendar
+
+You can use this to override a locales default calendar. Valid values are
+
+=over 12
+
+=item buddhist
+
+Thai Buddhist calendar
+
+=item chinese
+
+Traditional Chinese calendar
+
+=item coptic
+
+Coptic calendar
+
+=item dangi
+
+Traditional Korean calendar
+
+=item ethioaa
+
+=item ethiopic-amete-alem
+
+Ethiopic calendar, Amete Alem (epoch approx. 5493 B.C.E)
+
+=item ethiopic
+
+Ethiopic calendar, Amete Mihret (epoch approx, 8 C.E.)
+
+=item gregory
+
+=item gregorian
+
+Gregorian calendar
+
+=item hebrew
+
+Hebrew Calendar
+
+=item indian
+
+Indian National Calendar
+
+=item islamic
+
+Islamic Calendar
+
+=item islamic-civil
+
+Islamic Calendar (tabular, civil epoch)
+
+=item islamic-rgsa
+
+Islamic Calendar (Saudi Arabia, sighting)
+
+=item islamic-tbla
+
+Islamic Calendar (tabular, astronomical epoch)
+
+=item islamic-umalqura
+
+Islamic Calendar (Umm al-Qura)
+
+=item iso8601
+
+ISO-8601 Calendar
+
+=item japanese
+
+Japanese Calendar
+
+=item persian
+
+Persian Calendar
+
+=item roc
+
+Minguo Calendar
+
+=back
 
 =item nu
 
@@ -420,88 +506,6 @@ Vai Digits
 
 =back
 
-=item ca
-
-=item calendar
-
-You can use this to override a locales default calendar. Valid values are
-
-=over 12
-
-=item buddhist
-
-Buddhist Calendar
-
-=item chinese
-
-Chinese Calendar
-
-=item coptic
-
-Coptic Calendar
-
-=item dangi
-
-Dangi Calendar
-
-=item ethiopic
-
-Ethiopic Calendar
-
-=item ethiopic-amete-alem
-
-Ethiopic Amete Alem Calendar
-
-=item gregorian
-
-Gregorian Calendar
-
-=item hebrew
-
-Hebrew Calendar
-
-=item indian
-
-Indian National Calendar
-
-=item islamic
-
-Islamic Calendar
-
-=item islamic-civil
-
-Islamic Calendar (tabular, civil epoch)
-
-=item islamic-rgsa
-
-Islamic Calendar (Saudi Arabia, sighting)
-
-=item islamic-tbla
-
-Islamic Calendar (tabular, astronomical epoch)
-
-=item islamic-umalqura
-
-Islamic Calendar (Umm al-Qura)
-
-=item iso8601
-
-ISO-8601 Calendar
-
-=item japanese
-
-Japanese Calendar
-
-=item persian
-
-Persian Calendar
-
-=item roc
-
-Minguo Calendar
-
-=back
-
 =item cu
 
 =item currency
@@ -522,11 +526,17 @@ one of
 =over 12
 
 =item mon
+
 =item tue
+
 =item wed
+
 =item thu
+
 =item fri
+
 =item sat
+
 =item sun
 
 =back
@@ -1299,16 +1309,21 @@ sub BUILDARGS {
 				(?:[-_]u[_-](.+))?
 			$/x;
 
+		if (! defined $script && length $language == 4) {
+			$script = $language;
+			$language = undef;
+		}
+		
 		foreach ($language, $script, $region, $variant) {
 			$_ = '' unless defined $_;
 		}
 
 		%args = (
-			language_id		=> $language,
-			script_id		=> $script,
+			language_id	=> $language,
+			script_id	=> $script,
 			region_id	=> $region,
-			variant_id		=> $variant,
-			extensions		=> $extensions,
+			variant_id	=> $variant,
+			extensions	=> $extensions,
 		);
 	}
 
@@ -1329,11 +1344,11 @@ sub BUILDARGS {
 	# Fix casing of args
 	$args{language_id}	= lc $args{language_id}			if defined $args{language_id};
 	$args{script_id}	= ucfirst lc $args{script_id}	if defined $args{script_id};
-	$args{region_id}	= uc $args{region_id}		if defined $args{region_id};
+	$args{region_id}	= uc $args{region_id}			if defined $args{region_id};
 	$args{variant_id}	= uc $args{variant_id}			if defined $args{variant_id};
 	
 	# Set up undefined language
-	$args{language_id} //= 'und';
+	$args{language_id} ||= 'und';
 
 	$self->SUPER::BUILDARGS(%args, %internal_args);
 }
@@ -2877,9 +2892,14 @@ sub transform {
 	$_ = ucfirst(lc $_) foreach ($from, $to, $variant);
 	
 	my $package = __PACKAGE__ . "::Transformations::${variant}::${from}::${to}";
-	eval { Class::Load::load_class($package); };
-	warn $@ if $@;
-	return $text if $@; # Can't load transform module so return original text
+	my ($canload, $error) = Class::Load::try_load_class($package, { -version => $VERSION});
+    if ($canload) {
+	    Class::Load::load_class($package, { -version => $VERSION});
+    }
+    else {
+	    warn $error;
+	    return $text; # Can't load transform module so return original text
+    }
 	use feature 'state';
 	state $transforms;
 	$transforms->{$variant}{$from}{$to} //= $package->new();
@@ -2960,7 +2980,7 @@ sub _transformation_transform {
 				$text = '';
 			}
 			else {
-				$text = $self->transform($text, $variant, $rule->{from}, $rule->to);
+				$text = $self->transform(text => $text, variant => $variant, from => $rule->{from}, to => $rule->{to});
 			}
 		}
 	}

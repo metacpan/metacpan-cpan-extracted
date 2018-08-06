@@ -57,7 +57,7 @@ is($r_storable, undef, 'no compile detected');
 $r_storable = Sport::Analytics::NHL::retrieve_compiled_report(
 	{}, 201120010, 'BS', 't/tmp/data/2011/0002/0010',
 );
-is_deeply($r_storable, retrieve $storables[1], 'compile on the fly correct');
+is_deeply($r_storable, retrieve($storables[1]), 'compile on the fly correct');
 unlink 't/tmp/data/2011/0002/0010/BS.storable';
 unlink 't/tmp/data/2011/0002/0010/BS.json';
 $r_storable = Sport::Analytics::NHL::retrieve_compiled_report(

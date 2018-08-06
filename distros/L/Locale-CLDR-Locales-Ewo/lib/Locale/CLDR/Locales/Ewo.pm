@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ewo - Package for language Ewondo
 
 package Locale::CLDR::Locales::Ewo;
 # This file auto generated from Data\common\main\ewo.xml
-#	on Fri 13 Apr  7:09:13 am GMT
+#	on Sun  5 Aug  5:59:53 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -591,6 +591,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ugiya yá Moritaní \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ugiya yá Moritaní),
 			},
 		},
@@ -660,6 +665,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dóbə́ra yá Saó Tomé ai Pəlinəsípe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dóbə́ra yá Saó Tomé ai Pəlinəsípe),
 			},

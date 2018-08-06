@@ -135,6 +135,8 @@
             # Flag set to TRUE if this profile has EVER been a current profile (in which case, it
             #   will have cages etc); set to FALSE if not (in which case, the parent file object
             #   will set up cages etc when this profile first becomes a current profile)
+            # NB The flag will be TRUE for all pre-configured worlds, as the code that creates them
+            #   also creates cages for each world
             setupCompleteFlag           => FALSE,
             # List containing notes written by this user for this profile, and available to the
             #   Notepad task when it's running
@@ -759,6 +761,21 @@
             # These patterns are matched against lines after patterns in
             #   ->inventoryIgnorePatternList are checked
             inventoryDiscardPatternList => [],
+            # Inventory split pattern groups (groups of 1)
+            #   [0] - the pattern which matches a portion of a line
+            # All patterns in the list are matched against all lines. For any matching lines, the
+            #   line is split into multiple pieces, in a standard Perl split operation using the
+            #   pattern. If multiple discard patterns are specified, they are all applied, one after
+            #   another, potentially splitting existing line pieces into smaller pieces. Each piece
+            #   is then parsed as a (separate) object. The portion of the line matching the split
+            #   pattern is discarded
+            # NB The split occurs before the object(s) are passed to GA::Obj::WorldModel->parseObj.
+            #   That function uses the current dictonary to parse a string like 'Two orcs, a sword
+            #   and three shields' into a list of objects. This IV doesn't need to include commas
+            #   and words like 'and' because ->parseObj already takes care of that
+            # These patterns are matched against lines after patterns in
+            #   ->inventoryIgnorePatternList and ->inventoryDiscardPatternList are checked
+            inventorySplitPatternList   => [],
             # The way in which the Inventory task (if running) interprets the character's inventory
             # In inventory mode 'match_all', only lines matching one of the patterns in
             #   ->inventoryPatternList (and not matching ->inventoryIgnorePatternList) are used. The
@@ -1155,10 +1172,13 @@
             # Settings for 'verb_exit' component
             # If the exits in the 'verb_exit' component are separated by characters or strings, the
             #   delimiters used. Must include whitespace, as appropriate (e.g. ' and ' / ', ' / '.')
+            # Items in the list should ideally be in order of length, longest first (but the
+            #   Locator task sorts them before using them, anyway)
             verboseExitDelimiterList    => [],      # String, not a regex
             # A non-delimiter is a string which the exit list should NOT contain. This helps the
             #   Locator task to work out what is a list of exits, and what is not (e.g. 'is here',
             #   'are here')
+            # Items in the list can be in any order (and are not sorted by the Locator task)
             verboseExitNonDelimiterList => [],      # String, not a regex
             # Alternatively, if the exits are single letters in a continuous string (e.g. NSEW),
             #   set this flag to TRUE to split the string into 1-letter exits
@@ -1182,10 +1202,13 @@
             # Settings for 'brief_exit', 'brief_title_exit' and 'brief_exit_title' components
             # If the exits in these components are separated by characters or strings, the
             #   delimiters used. Must include whitespace, as appropriate (e.g. ' and ' / ', ' / '.')
+            # Items in the list should ideally be in order of length, longest first (but the
+            #   Locator task sorts them before using them, anyway)
             briefExitDelimiterList      => [],      # String, not a regex
             # A non-delimiter is a string which the exit list should NOT contain. This helps the
             #   Locator task to work out what is a list of exits, and what is not (e.g. 'is here',
             #   'are here')
+            # Items in the list can be in any order (and are not sorted by the Locator task)
             briefExitNonDelimiterList   => [],      # String, not a regex
             # Alternatively, if the exits are single letters in a continuous string (e.g. NSEW),
             #   set this flag to TRUE to split the string into 1-letter exits
@@ -1270,9 +1293,12 @@
             # If the commands in the 'room_cmd' component are separated by characters or strings,
             #   the delimiters used. Must include whitespace, as appropriate (e.g. ' and ' / ', '
             #   / '.')
+            # Items in the list should ideally be in order of length, longest first (but the
+            #   Locator task sorts them before using them, anyway)
             roomCmdDelimiterList        => [],      # String, not a regex
             # A non-delimiter is a string which the room command list should NOT contain. This helps
             #   the Locator task to work out what is a list of room commands, and what is not
+            # Items in the list can be in any order (and are not sorted by the Locator task)
             roomCmdNonDelimiterList     => [],      # String, not a regex
             # Alternatively, if the room commands are single letters in a continuous string (e.g.
             #   HGP representing commands for harvesting, gathering and picking), set this flag to
@@ -1293,6 +1319,8 @@
             #   '^There are no commands in this room\.*$'
             roomCmdLeftMarkerList       => [],
             roomCmdRightMarkerList      => [],
+            # A list of room commands for this world which should be ignored by ';roomcommand'
+            roomCmdIgnoreList           => [],
 
             # For worlds with long(ish) room statements - especially those whose verbose
             #   descriptions come after the anchor line - it's possible to define a pattern which
@@ -1489,6 +1517,7 @@
             inventoryPatternList        => [$self->inventoryPatternList],
             inventoryIgnorePatternList  => [$self->inventoryIgnorePatternList],
             inventoryDiscardPatternList => [$self->inventoryDiscardPatternList],
+            inventorySplitPatternList   => [$self->inventorySplitPatternList],
             inventoryMode               => $self->inventoryMode,
 
             conditionPatternList        => [$self->conditionPatternList],
@@ -1628,6 +1657,7 @@
             roomCmdSplitCharFlag        => $self->roomCmdSplitCharFlag,
             roomCmdLeftMarkerList       => [$self->roomCmdLeftMarkerList],
             roomCmdRightMarkerList      => [$self->roomCmdRightMarkerList],
+            roomCmdIgnoreList           => [$self->roomCmdIgnoreList],
 
             verboseFinalPattern         => $self->verboseFinalPattern,
             shortFinalPattern           => $self->shortFinalPattern,
@@ -2040,6 +2070,7 @@
         $self->mergeGroupList('inventoryPatternList', $otherObj, 5);
         $self->mergeGroupList('inventoryIgnorePatternList', $otherObj, 2);
         $self->mergeList('inventoryDiscardPatternList', $otherObj);
+        $self->mergeList('inventorySplitPatternList', $otherObj);
         $self->ivPoke('inventoryMode', $otherObj->inventoryMode);
         $self->mergeGroupList('conditionPatternList', $otherObj, 4);
         $self->mergeList('conditionIgnorePatternList', $otherObj);
@@ -2195,6 +2226,7 @@
         $self->ivPoke('roomCmdSplitCharFlag', $otherObj->roomCmdSplitCharFlag);
         $self->mergeList('roomCmdLeftMarkerList', $otherObj);
         $self->mergeList('roomCmdRightMarkerList', $otherObj);
+        $self->mergeList('roomCmdIgnoreList', $otherObj);
 
         $self->ivPoke('verboseFinalPattern', $otherObj->verboseFinalPattern);
         $self->ivPoke('shortFinalPattern', $otherObj->shortFinalPattern);
@@ -2608,6 +2640,8 @@
         { my $self = shift; return @{$self->{inventoryIgnorePatternList}}; }
     sub inventoryDiscardPatternList
         { my $self = shift; return @{$self->{inventoryDiscardPatternList}}; }
+    sub inventorySplitPatternList
+        { my $self = shift; return @{$self->{inventorySplitPatternList}}; }
     sub inventoryMode
         { $_[0]->{inventoryMode} }
 
@@ -2839,6 +2873,8 @@
         { my $self = shift; return @{$self->{roomCmdLeftMarkerList}}; }
     sub roomCmdRightMarkerList
         { my $self = shift; return @{$self->{roomCmdRightMarkerList}}; }
+    sub roomCmdIgnoreList
+        { my $self = shift; return @{$self->{roomCmdIgnoreList}}; }
 
     sub verboseFinalPattern
         { $_[0]->{verboseFinalPattern} }
@@ -4182,7 +4218,7 @@
 
     sub new {
 
-        # Called by GA::Cmd::AddTemplate->do, ListProperty->do or by the GUI window
+        # Called by GA::Cmd::AddTemplate->do, ListProperty->do or by the object viewer window
         # Creates a new kind of custom profile, called a 'profile template'
         #   Call ->new to create the bare bones of a custom profile - the instance variables that
         #       all custom profile must have

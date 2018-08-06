@@ -1,7 +1,7 @@
 package App::cryp::arbit;
 
-our $DATE = '2018-06-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-08-04'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -429,6 +429,7 @@ sub _get_account_balances {
     $r->{_stash}{account_balances} = {};
     for my $e (sort keys %{ $r->{_stash}{account_exchanges} }) {
         my $accounts = $r->{_stash}{account_exchanges}{$e};
+      ACC:
         for my $acc (sort keys %$accounts) {
             my $client = _get_exchange_client($r, $e, $acc);
             my $time = time();
@@ -1583,7 +1584,7 @@ App::cryp::arbit - Cryptocurrency arbitrage utility
 
 =head1 VERSION
 
-This document describes version 0.001 of App::cryp::arbit (from Perl distribution App-cryp-arbit), released on 2018-06-25.
+This document describes version 0.003 of App::cryp::arbit (from Perl distribution App-cryp-arbit), released on 2018-08-04.
 
 =head1 SYNOPSIS
 

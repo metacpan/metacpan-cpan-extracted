@@ -6,13 +6,13 @@ Locale::CLDR::Locales::En::Any::Gh - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Gh;
 # This file auto generated from Data\common\main\en_GH.xml
-#	on Fri 13 Apr  7:07:55 am GMT
+#	on Sun  5 Aug  5:58:26 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

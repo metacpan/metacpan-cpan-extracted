@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Data type: Floating number.",
+      "rdfs:label" : "Float",
+      "rdfs:subClassOf" : "schema:Number"
+   },
+   "properties" : {}
+}

@@ -30,9 +30,6 @@ system(qw(mkdir -p t/tmp/));
 system(qw(cp -a t/data t/tmp/));
 my $opts = {no_schedule_crawl => 1, no_database => 1, start_season => 2016, stop_season => 2017};
 $ENV{MONGO_DB} = undef;
-#use Data::Dumper;
-#print Dumper \%ENV;
-#exit;
 my $nhl = Sport::Analytics::NHL->new($opts);
 my @got_games = $nhl->scrape_games($opts, 193020001, 201620001, 201720001);
 for my $season (1930,2016,2017) {
@@ -51,21 +48,4 @@ for my $season (1930,2016,2017) {
 	}
 }
 ok(! @got_games, 'all files matched');
-system(qw(rm -rf t/tmp/data));
-__END__
-$ENV{HOCKEYDB_DEBUG} = 1;
-delete $opts->{no_schedule_crawl};
-@got_games = $nhl->scrape_games($opts, 19300202, 20160202, 20170202);
-for my $got_game (@got_games) {
-	ok(-f $got_game, 'file retrieved');
-	ok(-s $got_game > 10000, 'reasonable size');
-}
-system(qw(rm -rf t/tmp/data));
-$opts->{stop_season} = 1930;
-$opts->{start_season} = 1930;
-@got_games = $nhl->scrape_games($opts);
-for my $got_game (@got_games) {
-	ok(-f $got_game, 'file retrieved');
-	ok(-s $got_game > 10000, 'reasonable size');
-}
 system(qw(rm -rf t/tmp/data));

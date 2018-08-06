@@ -1,0 +1,46 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>The act of physically/electronically dispatching an object for transfer from an origin to a destination.Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/ReceiveAction\">ReceiveAction</a>: The reciprocal of SendAction.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/GiveAction\">GiveAction</a>: Unlike GiveAction, SendAction does not imply the transfer of ownership (e.g. I can send you my laptop, but I'm not necessarily giving it to you).</li>\n</ul>\n",
+      "rdfs:label" : "SendAction",
+      "rdfs:subClassOf" : "schema:TransferAction"
+   },
+   "properties" : {
+      "schema:deliveryMethod" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of instrument. The method of delivery.",
+         "rdfs:label" : "deliveryMethod",
+         "rdfs:subPropertyOf" : "schema:instrument",
+         "schema:domainIncludes" : [
+            "schema:OrderAction",
+            "schema:ReceiveAction",
+            "schema:TrackAction",
+            "schema:SendAction"
+         ],
+         "schema:rangeIncludes" : "schema:DeliveryMethod"
+      },
+      "schema:recipient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The participant who is at the receiving end of the action.",
+         "rdfs:label" : "recipient",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : [
+            "schema:TipAction",
+            "schema:GiveAction",
+            "schema:CommunicateAction",
+            "schema:PayAction",
+            "schema:SendAction",
+            "schema:Message",
+            "schema:ReturnAction",
+            "schema:AuthorizeAction",
+            "schema:DonateAction"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:ContactPoint",
+            "schema:Organization",
+            "schema:Audience",
+            "schema:Person"
+         ]
+      }
+   }
+}

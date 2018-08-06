@@ -17,6 +17,7 @@ our $defaults = {# copy to pod!
     oauth_sites => 'oauth.sites',
     oauth_users => 'oauth.users',
     guests => 'guests',
+    logs=>'logs',
   },
   
 };
@@ -57,6 +58,7 @@ See L<https://github.com/mche/Mojolicious-Plugin-RoutesAuthDBI/blob/master/Diagr
     oauth_sites => 'oauth.sites',
     oauth_users => 'oauth.users',
     guests => 'guests',
+    logs=>'logs',
     },
   }
 
@@ -93,11 +95,11 @@ sub schema {
   
   $c->app->log->debug($c->dumper($vars));
   
-  my $text = $dict->{'schema'}->template(%$vars);
-  $text .= "\n\n".$dict->{'sequence'}->template(%$vars)
+  my $text = $dict->{'schema'}->render(%$vars);
+  $text .= "\n\n".$dict->{'sequence'}->render(%$vars)
     if $vars->{sequence};
-  $text .= "\n\n".$dict->{$_}->template(%$vars)
-    for grep $vars->{tables}{$_}, qw(routes namespaces controllers actions profiles logins roles refs oauth_sites oauth_users guests);
+  $text .= "\n\n".$dict->{$_}->render(%$vars)
+    for grep $vars->{tables}{$_}, qw(routes namespaces controllers actions profiles logins roles refs oauth_sites oauth_users guests logs);
   
   $c->render(format=>'txt', text => $text);
 
@@ -107,14 +109,14 @@ sub schema_drop {
   my $c = shift;
   my $vars = $c->_vars;
   #~ $schema = qq{"$schema".} if $schema;
-  $c->render(format=>'txt', text => $dict->{'drop'}->template(%$vars));
+  $c->render(format=>'txt', text => $dict->{'drop'}->render(%$vars));
 
 }
 
 sub schema_flush {
   my $c = shift;
   my $vars = $c->_vars;
-  $c->render(format=>'txt', text => $dict->{'flush'}->template(%$vars));
+  $c->render(format=>'txt', text => $dict->{'flush'}->render(%$vars));
 }
 
 1;
@@ -244,12 +246,22 @@ create table IF NOT EXISTS "{%= $schema %}"."{%= $tables->{oauth_users} %}" (
 );
 
 @@ guests
--- Гостевые записи
+-- Гостевые пользователи
 create table IF NOT EXISTS "{%= $schema %}"."{%= $tables->{guests} %}" (
   id integer NOT NULL DEFAULT nextval('{%= $sequence %}'::regclass) primary key,
   ts timestamp without time zone NOT NULL DEFAULT now(),
   data jsonb null
-  
+);
+
+@@ logs
+-- auth || guest user only
+create table IF NOT EXISTS "{%= $schema %}"."{%= $tables->{logs} %}" (
+  ts timestamp without time zone NOT NULL DEFAULT now(),
+  user_id int not null,  --- and profile or guest id
+  route_id int,
+  url text, --- if none route_id
+  status int not null, --- http
+  elapsed numeric not null ---seconds  from mojo.timer
 );
 
 @@ drop
@@ -278,4 +290,6 @@ delete from "{%= $schema %}"."{%= $tables->{namespaces} %}";
 delete from "{%= $schema %}"."{%= $tables->{actions} %}";
 delete from "{%= $schema %}"."{%= $tables->{oauth_sites} %}";
 delete from "{%= $schema %}"."{%= $tables->{oauth_users} %}";
+delete from "{%= $schema %}"."{%= $tables->{guests} %}";
+delete from "{%= $schema %}"."{%= $tables->{logs} %}";
 

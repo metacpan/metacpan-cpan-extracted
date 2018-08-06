@@ -18,13 +18,14 @@ $log->context->{pid}      = 42;
 sub process_file {
     my ($file) = @_;
     my $log2 = Log::Any->get_logger( category => 'MyApp::FileProcessor' );
-    $log2->info('Performing work');
+    $log2->info('Performing work', {file => $file});
 }
 
 sub process_dir {
     my ($dir) = @_;
     my $log1 = Log::Any->get_logger( category => 'MyApp::DirWalker' );
     local $log1->context->{directory} = $dir;
+    local $log1->context->{file}      = 'will be overwritten...';
     for ( 1 .. 3 ) {
         local $log1->context->{pass} = $_;
         process_file("$dir/$_");
@@ -41,13 +42,14 @@ process_dir('/foo');
 }
 
 my @expected_text_log = map {
-    qq(Performing work {directory => "/foo",pass => $_,pid => 42,progname => "context.t"})
+    qq(Performing work {directory => "/foo",file => "/foo/$_",pass => $_,pid => 42,progname => "context.t"})
 } ( 1 .. 3 );
 
 my @expected_structured_log = map {
     {   category => 'MyApp::FileProcessor',
         data     => [
             {   directory => '/bar',
+                file      => "/bar/$_",
                 pass      => $_,
                 pid       => 84,
                 progname  => 'context.t'

@@ -1,0 +1,53 @@
+## name File::Spec
+## failures 1
+## cut
+
+use File::Spec;
+print 42;
+
+## name Try::Tiny
+## failures 1
+## cut
+
+use Try::Tiny;
+print 42;
+
+## name Try::Tiny + File::Spec
+## failures 2
+## cut
+
+use Try::Tiny;
+use File::Spec;
+print 42;
+
+## name -Try::Tiny +File::Spec
+## failures 1
+## cut
+
+use Try::Tiny;
+use File::Spec;
+try { print 42; };
+
+## name -Try::Tiny -File::Spec
+## failures 0
+## cut
+
+use Try::Tiny;
+use File::Spec;
+try { print File::Spec->catfile("answer" => 42); };
+
+## name +Try::Tiny -File::Spec
+## failures 1
+## cut
+
+use Try::Tiny;
+use File::Spec;
+print File::Spec->catfile("answer" => 42);
+
+## name +Try::Lite
+## failures 1
+## cut
+
+use Try::Lite;
+use Something;
+print localtime();

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Sk::Any::Sk - Package for language Slovak
 
 package Locale::CLDR::Locales::Sk::Any::Sk;
 # This file auto generated from Data\common\main\sk_SK.xml
-#	on Fri 13 Apr  7:28:18 am GMT
+#	on Sun  5 Aug  6:21:15 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

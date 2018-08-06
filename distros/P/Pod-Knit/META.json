@@ -1,0 +1,176 @@
+{
+   "abstract" : "Stitches together POD documentation",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Knit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DDP" : "0",
+            "HTML::TreeBuilder::LibXML" : "0",
+            "List::AllUtils" : "0",
+            "List::Util" : "0",
+            "Log::Any" : "0",
+            "Module::Runtime" : "0",
+            "Mojo::DOM58" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "MooseX::MungeHas" : "0",
+            "Path::Tiny" : "0",
+            "Pod::Simple::PullParser" : "0",
+            "Text::Wrap" : "0",
+            "Web::Query" : "0",
+            "Web::Query::LibXML" : "0",
+            "XML::Writer" : "0",
+            "XML::Writer::Simpler" : "0",
+            "XML::WriterX::Simple" : "0",
+            "XML::XSS" : "0",
+            "YAML" : "0",
+            "experimental" : "0",
+            "perl" : "v5.20.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Software::License::Artistic_2_0" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::Knit" : {
+         "file" : "lib/Pod/Knit.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::DOM::Mojo" : {
+         "file" : "lib/Pod/Knit/DOM/Mojo.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::DOM::WebQuery" : {
+         "file" : "lib/Pod/Knit/DOM/WebQuery.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Document" : {
+         "file" : "lib/Pod/Knit/Document.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Document::Mojo" : {
+         "file" : "lib/Pod/Knit/Document/Mojo.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Document::WebQuery" : {
+         "file" : "lib/Pod/Knit/Document/WebQuery.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Manual" : {
+         "file" : "lib/Pod/Knit/Manual.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Output::Pod" : {
+         "file" : "lib/Pod/Knit/Output/Pod.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Plugin" : {
+         "file" : "lib/Pod/Knit/Plugin.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Plugin::Abstract" : {
+         "file" : "lib/Pod/Knit/Plugin/Abstract.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Plugin::Attributes" : {
+         "file" : "lib/Pod/Knit/Plugin/Attributes.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Plugin::Authors" : {
+         "file" : "lib/Pod/Knit/Plugin/Authors.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Plugin::HeadsToSections" : {
+         "file" : "lib/Pod/Knit/Plugin/HeadsToSections.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Plugin::Legal" : {
+         "file" : "lib/Pod/Knit/Plugin/Legal.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Plugin::Methods" : {
+         "file" : "lib/Pod/Knit/Plugin/Methods.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Plugin::NamedSections" : {
+         "file" : "lib/Pod/Knit/Plugin/NamedSections.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Plugin::Sort" : {
+         "file" : "lib/Pod/Knit/Plugin/Sort.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Plugin::Version" : {
+         "file" : "lib/Pod/Knit/Plugin/Version.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::PodParser" : {
+         "file" : "lib/Pod/Knit/PodParser.pm",
+         "version" : "v0.0.1"
+      },
+      "Pod::Knit::Zilla" : {
+         "file" : "lib/Pod/Knit/Zilla.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Pod-Knit/issues"
+      },
+      "homepage" : "https://github.com/yanick/Pod-Knit",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Pod-Knit.git",
+         "web" : "https://github.com/yanick/Pod-Knit"
+      }
+   },
+   "version" : "0.0.1",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributor_covenant" : {
+      "version" : 0.01
+   },
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

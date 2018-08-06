@@ -1,4 +1,13 @@
-Revision history for Catalyst-Controller-DBIC-API: 2.006002
+Revision history for Catalyst-Controller-DBIC-API: 2.007002
+
+2.007002  2018-08-02 21:55:55+02:00 Europe/Vienna
+  - Remove the debug logging which shouldn't have been in the previous release
+
+2.007001  2018-08-02 21:12:33+02:00 Europe/Vienna
+  - Improve data_root & item_root documentation
+  - Fix grouped_by request argument documentation
+  - Don't overwrite already set response data when return_object is enabled
+  - Use JSON::MaybeXS for improved performance
 
 2.006002  2014-08-26 12:31:27+02:00 Europe/Vienna
  - Fix missing Data::Printer test requirement
@@ -133,7 +142,7 @@ Revision history for Catalyst-Controller-DBIC-API: 2.006002
    + list_format_output
    + row_format_output (which is just a passthrough per row)
  - Search can now take an array of hashrefs to give the ability to use the
-   default 'OR' 
+   default 'OR'
  - By default search_parameters is an ArrayRef[HashRef] which is pertinent
    to list_munge_parameters
  - More thorough documentation of the various bits and pieces.

@@ -11,8 +11,10 @@
 #   Copyright (C) 2004-2008, 2012, 2014 Steve Hay.  All rights reserved.
 #
 # LICENCE
-#   You may distribute under the terms of either the GNU General Public License
-#   or the Artistic License, as specified in the LICENCE file.
+#   This module is free software; you can redistribute it and/or modify it under
+#   the same terms as Perl itself, i.e. under the terms of either the GNU
+#   General Public License or the Artistic License, as specified in the LICENCE
+#   file.
 #
 #===============================================================================
 
@@ -38,7 +40,7 @@ our(@ISA, $VERSION);
 BEGIN {
     @ISA = qw(PAR::Filter);
 
-    $VERSION = '2.07';
+    $VERSION = '2.08';
 }
 
 #===============================================================================
@@ -232,10 +234,6 @@ version 0.76 or higher.
 
 I<None>.
 
-=head1 KNOWN BUGS
-
-I<None>.
-
 =head1 SEE ALSO
 
 L<PAR::Filter>;
@@ -249,7 +247,7 @@ the PAR::Packer distribution (version 1.017), written by Audrey Tang.
 
 =head1 AUTHOR
 
-Steve Hay E<lt>shay@cpan.orgE<gt>
+Steve Hay E<lt>L<shay@cpan.org|mailto:shay@cpan.org>E<gt>.
 
 =head1 COPYRIGHT
 
@@ -263,11 +261,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 2.07
+Version 2.08
 
 =head1 DATE
 
-28 Feb 2015
+31 Jul 2018
 
 =head1 HISTORY
 

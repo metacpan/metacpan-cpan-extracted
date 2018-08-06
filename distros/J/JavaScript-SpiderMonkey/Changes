@@ -1,5 +1,13 @@
 Revision history for Perl extension JavaScript::SpiderMonkey.
 
+0.23 (02/08/2018)
+    (tb) Applied patch to fix issue where tests fail when no ',' in @INC (RT #121452)
+
+0.22 (02/08/2018)
+    (tb) Added support for CentOS 7
+    (tb) Added support for SpiderMonkey 1.8.5 and 1.87
+         (RT #80137, RT #75058, RT #69371)
+
 0.21 (23/10/2011)
     (tb) Added support for CentOS 5 / 64-bit
     (tb) Added support for MacPorts (RT #44068)

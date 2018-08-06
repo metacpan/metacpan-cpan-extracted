@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A fire station. With firemen.",
+      "rdfs:label" : "FireStation",
+      "rdfs:subClassOf" : [
+         "schema:CivicStructure",
+         "schema:EmergencyService"
+      ]
+   },
+   "properties" : {}
+}

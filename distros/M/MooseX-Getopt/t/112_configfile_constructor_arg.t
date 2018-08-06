@@ -3,10 +3,7 @@ use warnings;
 
 # respect the configfile value passed into the constructor.
 
-use Test::Requires {
-    'MooseX::SimpleConfig' => '()',
-    'YAML' => 0,
-};
+use Test::Needs 'MooseX::SimpleConfig', 'YAML';
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Path::Tiny 0.009;

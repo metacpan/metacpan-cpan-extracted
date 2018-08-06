@@ -1,0 +1,21 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An educational organization.",
+      "rdfs:label" : "EducationalOrganization",
+      "rdfs:subClassOf" : "schema:Organization"
+   },
+   "properties" : {
+      "schema:alumni" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Alumni of an organization.",
+         "rdfs:label" : "alumni",
+         "schema:domainIncludes" : [
+            "schema:Organization",
+            "schema:EducationalOrganization"
+         ],
+         "schema:inverseOf" : "schema:alumniOf",
+         "schema:rangeIncludes" : "schema:Person"
+      }
+   }
+}

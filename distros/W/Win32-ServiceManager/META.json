@@ -53,7 +53,7 @@
          "web" : "https://github.com/frioux/Win32-ServiceManager"
       }
    },
-   "version" : "0.002004",
+   "version" : "0.002005",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

@@ -57,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => 0,
     "Test::Warn" => 0
   },
-  "VERSION" => "1.6",
+  "VERSION" => "1.7",
   "test" => {
     "TESTS" => "t/sandbox/*.t t/unit/*.t"
   }

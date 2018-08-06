@@ -1,0 +1,17 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A subclass of Role used to describe roles within organizations.",
+      "rdfs:label" : "OrganizationRole",
+      "rdfs:subClassOf" : "schema:Role"
+   },
+   "properties" : {
+      "schema:numberedPosition" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A number associated with a role in an organization, for example, the number on an athlete's jersey.",
+         "rdfs:label" : "numberedPosition",
+         "schema:domainIncludes" : "schema:OrganizationRole",
+         "schema:rangeIncludes" : "schema:Number"
+      }
+   }
+}

@@ -1,3 +1,16 @@
+1.000     2018-08-04 17:40:55 EDT
+  - INCOMPATIBLE CHANGE: Always retrieve extended tweets so the full text is
+    available in the text attribute of tweet objects, since many tweets now
+    exceed the original 140 character limit. Returned text will not include
+    prefixed mentions or suffixed media links, but may now be longer than 140
+    characters, and no assumptions should be made about its maximum size.
+  - Document that time_zone and utc_offset in user objects will now always be
+    undefined.
+  - Add media attribute to tweet objects, and media object class to represent
+    the extended media entities.
+  - Add _p variants of each Twitter API request method as a non-blocking query
+    that returns a Mojo::Promise.
+
 0.002     2016-02-09 00:54:31 EST
   - Fix setting authentication based on returned hashrefs
   - Documentation fixes

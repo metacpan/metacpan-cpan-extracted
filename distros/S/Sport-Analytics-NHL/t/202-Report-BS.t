@@ -22,6 +22,3 @@ is($report->{stage}, $REGULAR, 'stage correct');
 is($report->{season_id}, '0010', 'season id correct');
 is($report->{_id}, 201120010, '_id correct');
 
-__END__
-$report->process();
-print Dumper $report;

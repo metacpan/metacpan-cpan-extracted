@@ -19,7 +19,7 @@ meta-spec:
   version: '1.4'
 name: Bat-Interpreter
 requires:
-  App::BatParser: '0.005'
+  App::BatParser: '0.011'
   Carp: '0'
   Data::Dumper: '0'
   Moo: '0'
@@ -33,11 +33,12 @@ resources:
   bugtracker: https://github.com/pablrod/p5-Bat-Interpreter/issues
   homepage: https://github.com/pablrod/p5-Bat-Interpreter
   repository: https://github.com/pablrod/p5-Bat-Interpreter.git
-version: '0.010'
+version: '0.012'
 x_contributors:
   - 'eva.dominguez <eva.dominguez@meteologica.com>'
   - 'Eva Dominguez <meloncego@gmail.com>'
   - 'pablo.rodriguez <pablo.rodriguez@meteologica.com>'
+  - 'ricardo.gomez <ricardogomezescalante@gmail.com>'
   - 'Toby Inkster <tobyink@cpan.org>'
 x_generated_by_perl: v5.22.2
 x_serialization_backend: 'YAML::Tiny version 1.69'

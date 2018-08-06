@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Se::Any::Fi - Package for language Northern Sami
 
 package Locale::CLDR::Locales::Se::Any::Fi;
 # This file auto generated from Data\common\main\se_FI.xml
-#	on Fri 13 Apr  7:27:37 am GMT
+#	on Sun  5 Aug  6:20:30 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -162,6 +162,71 @@ has 'display_name_code_patterns' => (
 	},
 );
 
+has 'number_formats' => (
+	is			=> 'ro',
+	isa			=> HashRef,
+	init_arg	=> undef,
+	default		=> sub { {
+		decimalFormat => {
+			'long' => {
+				'1000' => {
+					'other' => '0 duháhat',
+					'two' => '0 dt',
+				},
+				'10000' => {
+					'one' => '00 duháhat',
+					'two' => '00 dt',
+				},
+				'100000' => {
+					'one' => '000 duháhat',
+					'two' => '000 dt',
+				},
+				'1000000' => {
+					'two' => '0 mn',
+				},
+				'10000000' => {
+					'one' => '00 miljonat',
+					'two' => '00 mn',
+				},
+				'100000000' => {
+					'one' => '000 miljonat',
+					'two' => '000 mn',
+				},
+				'1000000000' => {
+					'one' => '0 miljárda',
+					'other' => '0 miljárdat',
+					'two' => '0 miljárdat',
+				},
+				'10000000000' => {
+					'one' => '00 miljárdat',
+					'other' => '00 miljárdat',
+					'two' => '00 md',
+				},
+				'100000000000' => {
+					'one' => '000 miljárdat',
+					'other' => '000 miljárdat',
+					'two' => '000 md',
+				},
+				'1000000000000' => {
+					'one' => '0 biljovdna',
+					'other' => '0 biljovdnat',
+					'two' => '0 bn',
+				},
+				'10000000000000' => {
+					'one' => '00 biljovdnat',
+					'other' => '00 biljovdnat',
+					'two' => '00 bn',
+				},
+				'100000000000000' => {
+					'one' => '000 biljovdnat',
+					'other' => '000 biljovdnat',
+					'two' => '000 bn',
+				},
+			},
+		},
+} },
+);
+
 has 'calendar_months' => (
 	is			=> 'ro',
 	isa			=> HashRef,
@@ -171,18 +236,10 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'ođđj',
-							'guov',
-							'njuk',
-							'cuoŋ',
-							'mies',
-							'geas',
-							'suoi',
-							'borg',
-							'čakč',
-							'golg',
-							'skáb',
-							'juov'
+							'',
+							'',
+							'',
+							'cuoŋ'
 						],
 						leap => [
 							
@@ -192,18 +249,10 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'ođđj',
-							'guov',
-							'njuk',
-							'cuoŋ',
-							'mies',
-							'geas',
-							'suoi',
-							'borg',
-							'čakč',
-							'golg',
-							'skáb',
-							'juov'
+							'',
+							'',
+							'',
+							'cuoŋ'
 						],
 						leap => [
 							
@@ -332,7 +381,7 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{eb},
 					'am' => q{ib},
 				},
@@ -340,23 +389,23 @@ has 'day_periods' => (
 					'am' => q{i},
 					'pm' => q{e},
 				},
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{eb},
 					'am' => q{ib},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'pm' => q{eb},
 					'am' => q{ib},
-				},
-				'narrow' => {
 					'pm' => q{eb},
-					'am' => q{ib},
 				},
 				'wide' => {
 					'pm' => q{eb},
 					'am' => q{ib},
+				},
+				'narrow' => {
+					'am' => q{ib},
+					'pm' => q{eb},
 				},
 			},
 		},

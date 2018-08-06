@@ -1743,8 +1743,8 @@
         #   $scalar     - The scalar value to match
         #
         # Return values
-        #   'undef' on failure (because $iv doesn't exist, or isn't an array, or improper arguments
-        #        supplied)
+        #   'undef' on failure (because $iv doesn't exist, or isn't an array, or no matching
+        #       element found, or improper arguments supplied)
         #   The index of the first element in the array that matches $scalar, on success
 
         my ($self, $iv, $scalar, $check) = @_;
@@ -1817,8 +1817,8 @@
         #   If $globalFlag and $ignoreCaseFlag are both 1, the match done is m/.../gi
         #
         # Return values
-        #   'undef' on failure (because $iv doesn't exist, or isn't an array, or improper arguments
-        #        supplied)
+        #   'undef' on failure (because $iv doesn't exist, or isn't an array, or no matching
+        #       element found, or improper arguments supplied)
         #   The index of the first element in the array that matches the regular expression, on
         #       success
 

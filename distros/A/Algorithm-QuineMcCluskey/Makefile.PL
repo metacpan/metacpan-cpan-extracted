@@ -4,18 +4,18 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
   'PL_FILES' => {},
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
   'VERSION_FROM' => 'lib/Algorithm/QuineMcCluskey.pm',
   'NAME' => 'Algorithm::QuineMcCluskey',
   'PREREQ_PM' => {
+                   'namespace::autoclean' => '0.28',
+                   'Test::More' => 0,
                    'Moose' => '2.16',
                    'List::MoreUtils' => '0.401',
-                   'namespace::autoclean' => '0.28',
-                   'Carp' => 0,
-                   'List::Compare::Functional' => '0.53',
                    'Tie::Cycle' => '1.225',
-                   'Test::More' => 0
-                 },
-  'INSTALLDIRS' => 'site',
-  'EXE_FILES' => []
+                   'List::Compare::Functional' => '0.53',
+                   'Carp' => 0
+                 }
 )
 ;

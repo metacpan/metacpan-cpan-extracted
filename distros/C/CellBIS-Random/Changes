@@ -1,4 +1,11 @@
 Revision history for perl distribution CellBIS-Random
 
+0.3       2018-08-02 12:30:25+08:00 Asia/Makassar
+          Fix a Minimum perl version on Build.PL
+
+0.2       2018-08-01 17:28:32+08:00 Asia/Makassar
+          Fixed bug when using methods "random" and "unrandom" for 3 arguments
+          and disallow to use 4 arguments.
+
 0.1       2018-07-12 23:23:29+08:00 Asia/Makassar
           Random and Unrandom characters in string.

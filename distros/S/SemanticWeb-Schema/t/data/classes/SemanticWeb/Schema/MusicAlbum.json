@@ -1,0 +1,44 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A collection of music tracks.",
+      "rdfs:label" : "MusicAlbum",
+      "rdfs:subClassOf" : "schema:MusicPlaylist"
+   },
+   "properties" : {
+      "schema:albumProductionType" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Classification of the album by it's type of content: soundtrack, live album, studio album, etc.",
+         "rdfs:label" : "albumProductionType",
+         "schema:domainIncludes" : "schema:MusicAlbum",
+         "schema:rangeIncludes" : "schema:MusicAlbumProductionType"
+      },
+      "schema:albumRelease" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A release of this album.",
+         "rdfs:label" : "albumRelease",
+         "schema:domainIncludes" : "schema:MusicAlbum",
+         "schema:inverseOf" : "schema:releaseOf",
+         "schema:rangeIncludes" : "schema:MusicRelease"
+      },
+      "schema:albumReleaseType" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The kind of release which this album is: single, EP or album.",
+         "rdfs:label" : "albumReleaseType",
+         "schema:domainIncludes" : "schema:MusicAlbum",
+         "schema:rangeIncludes" : "schema:MusicAlbumReleaseType"
+      },
+      "schema:byArtist" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The artist that performed this album or recording.",
+         "rdfs:label" : "byArtist",
+         "schema:domainIncludes" : [
+            "schema:MusicAlbum",
+            "schema:MusicRecording"
+         ],
+         "schema:rangeIncludes" : "schema:MusicGroup"
+      }
+   }
+}

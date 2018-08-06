@@ -1,6 +1,7 @@
 package Chrome::DevToolsProtocol;
 use 5.010; # for //
 use strict;
+use warnings;
 use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
@@ -13,7 +14,7 @@ use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 our @CARP_NOT;
 
 =head1 NAME

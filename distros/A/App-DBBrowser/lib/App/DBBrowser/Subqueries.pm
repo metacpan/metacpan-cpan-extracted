@@ -42,7 +42,7 @@ sub choose_subquery {
     my $saved_subqueries = $h_ref->{$driver}{$db} || []; # reverse
     my $tmp_subqueries;
     for my $stmt ( @{$sf->{i}{stmt_history}} ) {
-        my $filled = $ax->fill_stmt( @$stmt, 1 );
+        my $filled = $ax->stmt_placeholder_to_value( @$stmt, 1 );
         push @$tmp_subqueries, $filled if defined $filled;
     }
     my $choices = [ @pre, map( '  ' . $_, @$saved_subqueries ), map( 't ' . $_, @$tmp_subqueries ) ];
@@ -101,26 +101,26 @@ sub edit_sq_file {
     while ( 1 ) {
         my $h_ref = $ax->read_json( $sf->{sq_file} );
         my $subqueries = $h_ref->{$driver}{$db} || [];
-        my @tmp = ( $sf->{d}{db_string}, 'Saved stmts:', map( '  ' . $_, @$subqueries ), ' ' );
-        my $info = join "\n", @tmp;
+        my @tmp_info = ( $sf->{d}{db_string}, 'Saved stmts:', map( '  ' . $_, @$subqueries ), ' ' );
+        my $info = join "\n", @tmp_info;
         my $choice = choose(
             [ @pre, $add, $edit, $remove ],
             { %{$sf->{i}{lyt_m}}, prompt => 'Choose:', info => $info }
         );
-        my $ok;
+        my $changed = 0;
         if ( ! defined $choice ) {
             return;
         }
         elsif ( $choice eq $add ) {
-            $subqueries = $sf->__add_subqueries( $subqueries );
+            $changed = $sf->__add_subqueries( $subqueries );
         }
         elsif ( $choice eq $edit ) {
-            $subqueries = $sf->__edit_subqueries( $subqueries );
+            $changed = $sf->__edit_subqueries( $subqueries );
         }
         elsif ( $choice eq $remove ) {
-            $subqueries = $sf->__remove_subqueries( $subqueries );
+            $changed = $sf->__remove_subqueries( $subqueries );
         }
-        if ( defined $subqueries ) {
+        if ( $changed ) {
             if ( @$subqueries ) {
                 $h_ref->{$driver}{$db} = $subqueries;
             }
@@ -138,7 +138,7 @@ sub __add_subqueries {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $available;
     for my $stmt ( @{$sf->{i}{stmt_history}} ) {
-        my $filled = $ax->fill_stmt( @$stmt, 1 );
+        my $filled = $ax->stmt_placeholder_to_value( @$stmt, 1 );
         push @$available, $filled if defined $filled;
     }
     my $readline = '  readline';
@@ -146,8 +146,8 @@ sub __add_subqueries {
     my $bu = [];
 
     while ( 1 ) {
-        my @tmp = ( $sf->{d}{db_string}, 'Saved stmts:', map( '  ' . $_, @$subqueries ), ' ' );
-        my $info = join "\n", @tmp;
+        my @tmp_info = ( $sf->{d}{db_string}, 'Saved stmts:', map( '  ' . $_, @$subqueries ), ' ' );
+        my $info = join "\n", @tmp_info;
         my $choices = [ @pre, map { '  ' . $_ } @$available ];
         my $idx = choose(
             $choices,
@@ -156,25 +156,20 @@ sub __add_subqueries {
         if ( ! $idx ) {
             if ( @$bu ) {
                 ( $subqueries, $available ) = @{pop @$bu};
-                next; #
+                next;
             }
             return;
         }
         elsif ( $choices->[$idx] eq $sf->{i}{_confirm} ) {
-            return $subqueries;
+            return 1;
         }
         elsif ( $choices->[$idx] eq $readline ) {
             my $tf = Term::Form->new();
             my $stmt = $tf->readline( 'Stmt: ', { info => $info, clear_screen => 1  } );
-            if ( ! defined $stmt || ! length $stmt ) {
-                if ( @$bu ) {
-                    ( $subqueries, $available ) = @{pop @$bu};
-                    next; #
-                }
-                return 0;
+            if ( defined $stmt && length $stmt ) {
+                push @$bu, [ [ @$subqueries ], [ @$available ] ];
+                push @$subqueries, $stmt;
             }
-            push @$bu, [ [ @$subqueries ], [ @$available ] ];
-            push @$subqueries, $stmt;
         }
         else {
             push @$bu, [ [ @$subqueries ], [ @$available ] ];
@@ -192,8 +187,8 @@ sub __edit_subqueries {
     my $old_idx = 0;
 
     STMT: while ( 1 ) {
-        my @tmp = ( $sf->{d}{db_string} );
-        my $info = join "\n", @tmp;
+        my @tmp_info = ( $sf->{d}{db_string} );
+        my $info = join "\n", @tmp_info;
         my @available;
         for my $i ( 0 .. $#$subqueries ) {
             my $pre = ( any { $i == $_ } @$indexes ) ? '| ' : '  ';
@@ -224,11 +219,11 @@ sub __edit_subqueries {
         }
         delete $ENV{TC_RESET_AUTO_UP};
         if ( $choices->[$idx] eq $sf->{i}{_confirm} ) {
-            return $subqueries;
+            return 1;
         }
         else {
             $idx -= @pre;
-            my @tmp = ( $sf->{d}{db_string}, 'Choose stmt:', '  BACK', '  CONFIRM' );
+            my @tmp_info = ( $sf->{d}{db_string}, 'Choose stmt:', '  BACK', '  CONFIRM' );
             for my $i ( 0 .. $#$subqueries ) {
                 my $pre = '  ';
                 if ( $i == $idx ) {
@@ -237,12 +232,12 @@ sub __edit_subqueries {
                 elsif ( any { $i == $_ } @$indexes ) {
                     $pre = '| ';
                 }
-                push @tmp, $pre . $subqueries->[$i];
+                push @tmp_info, $pre . $subqueries->[$i];
             }
-            push @tmp, ' ';
-            my $info = join "\n", @tmp;
+            push @tmp_info, ' ';
+            my $info = join "\n", @tmp_info;
             my $tf = Term::Form->new();
-            my $stmt = $tf->readline( 'Stmt: ', { info => $info, clear_screen => 1, default => $subqueries->[$idx]  } );
+            my $stmt = $tf->readline( 'Stmt: ', { info => $info, clear_screen => 1, default => $subqueries->[$idx] } );
             if ( ! defined $stmt || ! length $stmt ) {
                 if ( @$bu ) {
                     ( $subqueries, $indexes ) = @{pop @$bu};
@@ -265,8 +260,8 @@ sub __remove_subqueries {
     if ( ! @$subqueries ) {
         return;
     }
-    my @tmp = ( $sf->{d}{db_string}, 'Stmts to remove:' );
-    my $info = join "\n", @tmp;
+    my @tmp_info = ( $sf->{d}{db_string}, 'Stmts to remove:' );
+    my $info = join "\n", @tmp_info;
     my $prompt = "\n" . 'Choose:';
     my $idx = choose_a_subset(
         $subqueries,
@@ -279,7 +274,7 @@ sub __remove_subqueries {
     for my $i ( sort { $b <=> $a } @$idx ) {
         my $ref = splice( @$subqueries, $i, 1 );
     }
-    return $subqueries;
+    return 1;
 }
 
 

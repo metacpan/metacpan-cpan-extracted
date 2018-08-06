@@ -1,23 +1,33 @@
-________________________________________________________________________________
+Revision history for Perl distribution Win32-SharedFileOpen
 
-                      Win32::SharedFileOpen, Version 4.02
-________________________________________________________________________________
+4.03 2018-07-31
 
-Revision history for Perl extension Win32::SharedFileOpen.
-_________________
+    - Fixed broken link for active bugs on the CPAN Request Tracker.
 
-v4.02 30 May 2014
+    - Added optional Changes testing (skipped unless AUTHOR_TESTING).
+
+    - Reformatted Changes file as per CPAN::Changes::Spec.
+
+    - Made Perl Critic, Pod and Pod Coverage tests skip unless AUTHOR_TESTING.
+
+    - Added optional POD coverage testing.
+
+    - Added optional Perl::Critic testing.
+
+    - Made code Perl::Critic clean.
+
+    - Simplified and corrected Makefile.PL requirements.
+
+4.02 2014-05-30
 
     - Simplified repository metadata for cleaner appearance on search.cpan.org.
-_________________
 
-v4.01 19 May 2014
+4.01 2014-05-19
 
     - Changed all time() calls to Time::HiRes::time() calls to improve accuracy
       and (hopefully) to fix occasional test failures in t/12_variables.t.
-_________________
 
-v4.00 16 May 2014
+4.00 2014-05-16
 
     - Fixed occasional test failures in t/10_fsopen_fh_leak.t and
       t/11_sopen_fh_leak.t by avoiding the problem of trying to open a file with
@@ -56,7 +66,7 @@ v4.00 16 May 2014
       have been removed too.  Note, however, that there is still a compatibility
       problem when building this module with Visual Studio .NET 2002/2003 (VC7)
       or earlier if your perl was built with Visual Studio 2005 (VC8) or later:
-      see [perl #121448].  However, that is quite an unlikely scenario, so it is
+      see Perl RT#121448.  However, that is quite an unlikely scenario, so it is
       not worth checking for in Makefile.PL.
 
     - Changed all PerlLIO_*() function calls to the corresponding lowio
@@ -67,8 +77,7 @@ v4.00 16 May 2014
       and Jan Dubois on the "perl5-porters" mailing list, 04-05 Mar 2010, for
       more details on this.
 
-    - Added $Trace to @EXPORT_OK as requested by Denby Angus
-      <Denby.Angus@kisters.com.au>.
+    - Added $Trace to @EXPORT_OK.  [Denby Angus <Denby.Angus@kisters.com.au>]
 
     - Uploaded source code to GitHub and included repository URLs in metadata.
 
@@ -91,41 +100,35 @@ v4.00 16 May 2014
 
     - Bumped minimum required Perl version from 5.6.0 to 5.8.1.  This is in line
       with the minimum requirement of the "Perl Toolchain".
-_________________
 
-v3.44 08 Jul 2013
+3.44 2013-07-08
 
     - Corrected typo in a comment.
-_________________
 
-v3.43 20 Mar 2012
+3.43 2012-03-20
 
     - Updated Module::Install::PRIVATE to version 1.07.
 
     - Updated Module::Install components from version 1.06 of that distribution.
-_________________
 
-v3.42 28 Feb 2012
+3.42 2012-02-28
 
     - Updated Module::Install components from version 1.04 of that distribution.
 
     - Updated ppport.h using version 3.20 of the Devel::PPPort distribution.
-_________________
 
-v3.41 25 Oct 2009
+3.41 2009-10-25
 
     - Updated Module::Install components from version 0.91 of that distribution.
 
     - Updated ppport.h using version 3.19 of the Devel::PPPort distribution.
-_________________
 
-v3.40 11 Oct 2009
+3.40 2009-10-11
 
     - Declare all core module dependencies in the Makefile.PL as well as the
-      existing CPAN module dependencies.  (Cf. [cpan #50107].)
-_________________
+      existing CPAN module dependencies.  [Cf. CPAN RT#50107]
 
-v3.39 25 Aug 2008
+3.39 2008-08-25
 
     - Updated Module::Install components from version 0.77 of that distribution.
 
@@ -133,11 +136,10 @@ v3.39 25 Aug 2008
       since under certain circumstances $@ can end up undefined after a failed
       eval.
 
-    - Changed all Nullxx macros to (XX *)NULL as per perl change #33051 and
+    - Changed all Nullxx macros to (XX *)NULL as per Perl core change #33051 and
       various earlier changes.
-_________________
 
-v3.38 06 Jul 2008
+3.38 2008-07-06
 
     - Updated Module::Install::PRIVATE to version 1.06 for Makefile.PL
       improvements:
@@ -151,17 +153,15 @@ v3.38 06 Jul 2008
       change in the (undocumented) recommends() method.
 
     - Added full paths to Cygwin tools used when creating the distribution.
-_________________
 
-v3.37 30 Jun 2008
+3.37 2008-06-30
 
     - Added the magic "OS unsupported" phrase to Makefile.PL's die() message so
       that CPAN Testers report "N/A" rather than "FAIL" on non-Win32 OSes.
 
     - Updated ppport.h using version 3.14 of the Devel::PPPort distribution.
-_________________
 
-v3.36 10 Jul 2007
+3.36 2007-07-10
 
     - Updated Module::Install::PRIVATE to version 1.05 for Makefile.PL
       improvements:
@@ -175,9 +175,8 @@ v3.36 10 Jul 2007
     - Updated ppport.h using version 3.11 of the Devel::PPPort distribution.
 
     - Added comments to MANIFEST file.
-_________________
 
-v3.35 14 Feb 2006
+3.35 2006-02-14
 
     - Fixes for building with Borland C++:
 
@@ -231,9 +230,8 @@ v3.35 14 Feb 2006
 
     - Corrected spelling mistakes and improved the grammar in some of the
       documentation.
-_________________
 
-v3.34 02 Sep 2005
+3.34 2005-09-02
 
     - Changed test scripts from using Test to Test::More for better diagnostic
       output in case of failures.
@@ -244,23 +242,20 @@ v3.34 02 Sep 2005
       * Relaxed the compiler version checking so that only the major version
         numbers have to match (and also the minor version numbers for Visual
         Studio .NET 2002/2003 (VC7) and later, which use C RTL DLLs named
-        msvcr70.dll, msvcr71.dll, etc)
-        
-        (Thanks to Sisyphus <sisyphus1@optusnet.com.au> for drawing attention to
-        this problem via the PAR mailing list (par@perl.org));
+        msvcr70.dll, msvcr71.dll, etc)  [Sisyphus <sisyphus1@optusnet.com.au> on
+        the PAR mailing list (par@perl.org)];
 
-      * Fixed the parsing of bcc32's output as per perl change #24855.
+      * Fixed the parsing of bcc32's output as per Perl core change #24855.
 
     - Dropped the use of I<> for Perl variables in POD, in line with changes
-      made (some time ago) to the perlpod manpage (perl change #12542).
+      made (some time ago) to the perlpod manpage (Perl core change #12542).
 
     - Corrected spelling mistake: INITIALISATION should be INITIALIZATION.
 
     - Updated Module::Install and ExtUtils::AutoInstall components from versions
       0.37 and 0.62 of those distributions respectively.
-_________________
 
-v3.33 01 Jun 2005
+3.33 2005-06-01
 
     - Updated Module::Install::PRIVATE to version 1.02 for Makefile.PL
       improvements:
@@ -278,9 +273,8 @@ v3.33 01 Jun 2005
           # Looks like your test died before it could output anything.
 
         in the event of any subsequent error that causes Makefile.PL to croak().
-_________________
 
-v3.32 03 Mar 2005
+3.32 2005-03-03
 
     - Included Module::Install::PRIVATE version 1.01 for Makefile.PL
       improvements:
@@ -299,17 +293,15 @@ v3.32 03 Mar 2005
 
     - Fixed up copyright years in all files to reflect which files actually
       changed in each year.
-_________________
 
-v3.31 12 Dec 2004
+3.31 2004-12-12
 
     - Moved XSLoader::load() call inside BEGIN subroutine as recommended by the
       XSLoader manpage.  This means that the XSUBs are now installed before the
       rest of the Perl module is compiled, and hence their prototypes are now
       known, and can be checked, during the remaining compilation.
-_________________
 
-v3.30 31 Oct 2004
+3.30 2004-10-31
 
     - Removed $Debug variable and introduced new $ErrStr variable.
 
@@ -342,9 +334,8 @@ v3.30 31 Oct 2004
 
     - Updated Module::Install and ExtUtils::AutoInstall components from versions
       0.36 and 0.61 of those distributions respectively.
-_________________
 
-v3.19 08 Aug 2004
+3.19 2004-08-08
 
     - Added a note to the INSTALL file that if possible the same compiler should
       be used to build this module as was used to build perl itself.
@@ -355,9 +346,8 @@ v3.19 08 Aug 2004
       descriptors, errno and other such resources between the different C RTL
       DLLs used by those compilers (msvcr71.dll and msvcrt.dll respectively)
       does not work.)
-_________________
 
-v3.18 01 Aug 2004
+3.18 2004-08-01
 
     - Removed standard modules from the list of pre-requisites in Makefile.PL
       (since a minimum required Perl version is given anyway), and included
@@ -389,9 +379,8 @@ v3.18 01 Aug 2004
       list rather than a single "false" value (which would be seen as "true" in
       list context).  (They are not currently called in list context anyway;
       this is just defensive programming.)
-_________________
 
-v3.17 26 Feb 2004
+3.17 2004-02-26
 
     - Use Module::Install as a front-end to ExtUtils::MakeMaker.  The same build
       script can also be used as a front-end to Module::Build in due course
@@ -400,9 +389,8 @@ v3.17 26 Feb 2004
       http://search.cpan.org/ makes use of.
 
     - Added new test to check for POD errors if Test::Pod is available.
-_________________
 
-v3.16 21 Feb 2004
+3.16 2004-02-21
 
     - Separated the two debug modes into a more traditional Boolean debug mode
       emitting warnings about function failures, plus a new Boolean trace mode
@@ -437,9 +425,8 @@ v3.16 21 Feb 2004
     - Removed ppport.h since no use was being made of it.  (This module contains
       its own portability fixups in order to build on Perl installations back to
       5.6.0, both with and without ithreads.)
-_________________
 
-v3.15 24 Sep 2003
+3.15 2003-09-24
 
     - Changed the output of debug information to use warn() rather than simply
       print()ing to STDERR to enable the information to be captured by a
@@ -459,9 +446,8 @@ v3.15 24 Sep 2003
       files "eight bit clean".
 
     - Updated META.yml via ExtUtils::MakeMaker 6.17.
-_________________
 
-v3.14 31 Jul 2003
+3.14 2003-07-31
 
     - Preload some ERROR_* constants that our use()rs might need, otherwise the
       value of $^E gets interfered with when they are autoloaded by
@@ -469,9 +455,8 @@ v3.14 31 Jul 2003
       perl.
 
     - Added META.yml (courtesy of ExtUtils::MakeMaker 6.11).
-_________________
 
-v3.13 28 May 2003
+3.13 2003-05-28
 
     - Regenerated constant() and AUTOLOAD() using h2xs 1.22 with options:
       -n Win32::SharedFileOpen -b 5.6.0
@@ -484,9 +469,8 @@ v3.13 28 May 2003
       and added other modules use()d by the test suite too.
 
     - Minor cosmetic changes.
-_________________
 
-v3.12 30 Apr 2003
+3.12 2003-04-30
 
     - Removed unused "len" argument from constant() function and simplified
       INPUT section of _constant() XS function to use the typemap for "const
@@ -497,9 +481,8 @@ v3.12 30 Apr 2003
 
     - Added AUTHOR option to Makefile.PL.  This is used when creating a PPD file
       (nmake ppd).
-_________________
 
-v3.11 08 Mar 2003
+3.11 2003-03-08
 
     - Fix for building under Perl 5.6.0: added definitions of IoTYPE_*
       constants.  This module *really* should build under Perl 5.6.0 and above
@@ -519,9 +502,8 @@ v3.11 08 Mar 2003
       of note that is very new, and moved the sections on "Filehandles and
       Indirect Filehandles" and "Error Checking" to a "BACKGROUND REFERENCE"
       section near the end of the POD where they belong.
-_________________
 
-v3.10 25 Jan 2003
+3.10 2003-01-25
 
     - Fixes for building under perls with PERL_IMPLICIT_CONTEXT and/or
       PERL_IMPLICIT_SYS enabled (e.g. ActivePerl):
@@ -545,9 +527,8 @@ v3.10 25 Jan 2003
       it into PerlIO, and then pushing a text mode layer on top if required.
 
     - Speeded up the "12_variables.t" test by reducing the retry times.
-_________________
 
-v3.00 02 Nov 2002
+3.00 2002-11-02
 
     - Fixed the fsopen() bug by opening the Perl filehandle in the XS rather
       than passing a file descriptor back from the XS to the Perl and
@@ -559,9 +540,8 @@ v3.00 02 Nov 2002
       information in the event of a failure revealing exactly what failed.
 
     - Added and improved some tests.
-_________________
 
-v2.12 05 Sep 2002
+2.12 2002-09-05
 
     - Fixes for Perl Version 5.8.0:
 
@@ -576,9 +556,8 @@ v2.12 05 Sep 2002
     - Improved definition of @EXPORT, @EXPORT_OK and %EXPORT_TAGS.
 
     - Corrected documentation typos in the README and the POD.
-_________________
 
-v2.11 02 Jul 2002
+2.11 2002-07-02
 
     - Imported the INFINITE flag from <winbase.h> like other Win32 modules do,
       rather than defining our own constant, to avoid clashes with them.
@@ -592,9 +571,8 @@ v2.11 02 Jul 2002
       variable is not in use.
 
     - Updated documentation for these changes.
-_________________
 
-v2.10 20 Jun 2002
+2.10 2002-06-20
 
     - Implemented the "First-Class Filehandle Trick" in the function new_fh(),
       and re-exported the function gensym() from the Symbol module, for
@@ -607,9 +585,8 @@ v2.10 20 Jun 2002
 
     - Local()ized the changes made to $! within AUTOLOAD() as per Perl Bug ID
       20020614.002: see http://rt.perl.org/ for more details.
-_________________
 
-v2.00 27 May 2002
+2.00 2002-05-27
 
     - Changed arguments and return values of fsopen() and sopen() to require a
       "filehandle" argument and simply return a Boolean, rather than returning
@@ -619,15 +596,12 @@ v2.00 27 May 2002
       and to document a serious flaw in fsopen() :-(
 
     - Minor cosmetic changes.
-_________________
 
-v1.00 13 Aug 2001
+1.00 2001-08-13
 
     - First released version.
-_________________
 
-v0.01 02 Jun 2001
+0.01 2001-06-02
 
     - Original version; created by h2xs 1.21 with options:
       -n Win32::SharedFileOpen
-________________________________________________________________________________

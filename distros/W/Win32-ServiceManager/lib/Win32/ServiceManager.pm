@@ -1,5 +1,5 @@
 package Win32::ServiceManager;
-$Win32::ServiceManager::VERSION = '0.002004';
+$Win32::ServiceManager::VERSION = '0.002005';
 # ABSTRACT: Manage Windows Services
 
 use Moo;
@@ -8,6 +8,7 @@ use Win32::Service qw(StartService StopService GetStatus GetServices);
 use Time::HiRes 'sleep';
 use Syntax::Keyword::Junction 'any';
 use List::Util 'first';
+use Carp 'croak';
 
 has use_nssm_default => (
     is => 'ro',
@@ -60,9 +61,20 @@ sub _sc_install {
 sub _sc_configure {
    my ($self, $name, $c) = @_;
    qw(sc config), $name, qq(DisplayName= "$c->{display}"),
-   qq(type= own start= auto)
+   qq(type= own)
+   . $self->_start($c->{start})
    . $self->_depends($c->{depends})
    . $self->_auth($c->{user}, $c->{password})
+}
+
+sub _start {
+   my ($self, $start) = @_;
+   $start //= 'auto';
+
+   my %types = map { $_ => 1 } qw{boot system auto demand disabled delayed-auto};
+   croak 'Unknown start type' unless $types{$start};
+
+   return qq( start= $start);
 }
 
 sub _depends {
@@ -109,6 +121,7 @@ sub create_service {
    my $config = {
       display => $display,
       depends => $args{depends},
+      start => $args{start},
       user => $args{user},
       password => $args{password},
    };
@@ -296,7 +309,7 @@ Win32::ServiceManager - Manage Windows Services
 
 =head1 VERSION
 
-version 0.002004
+version 0.002005
 
 =head1 SYNOPSIS
 
@@ -332,6 +345,7 @@ version 0.002004
     use_nssm    => 1,
     command     => 'C:\code\GR\script\server.pl -p 3001',
     depends     => [qw(MSSQL Apache2.4)],
+    start       => 'delayed-auto',
     user        => 'DOMAIN\username',
     password    => 'hunter2',
  );
@@ -346,11 +360,11 @@ Takes a hash of the following arguments:
 
 =item * C<use_nssm>
 
-(defaults to the value of L<use_nssm_default>)  Set this to start your service with L</nssm>
+(defaults to the value of L</use_nssm_default>)  Set this to start your service with L</nssm>
 
 =item * C<use_perl>
 
-(defaults to the value of L<use_perl_default>)  Set this to create perl
+(defaults to the value of L</use_perl_default>)  Set this to create perl
 services.  Uses C<$^X>.  If for some reason you want to use a different perl you
 will have to set C<use_perl> to false.
 
@@ -364,7 +378,7 @@ will have to set C<use_perl> to false.
 
 =item * C<check_command>
 
-(defaults to the value of L<check_command_default>) This will check that the
+(defaults to the value of L</check_command_default>) This will check that the
 command you passed exists on the filesystem and if it does not exists it will
 die
 
@@ -383,6 +397,15 @@ XXX: do these even make sense?
 function.  You may either pass a string or an array ref.  A string gets passed
 on directly, the array reference gets properly joined together.
 
+=item * C<start>
+
+(optional) The start type for the service.  If left blank, the default value is
+B<auto>.  Available start types are C<boot> C<system> C<auto> C<demand>
+C<disabled> C<delayed-auto>.
+
+Note: The default value when using C<sc> is C<demand>. The default value in
+this package is C<auto> to maintain compatibility with previous versions.
+
 =item * C<user>
 
 (optional) The user account under which to run the service. If left blank, the
@@ -390,12 +413,12 @@ default value is B<LocalSystem>.
 
 =item * C<password>
 
-(optional) The password credential for L<user>. Required for any other user
+(optional) The password credential for C<user>. Required for any other user
 than LocalSystem. If a blank password is desired, use an empty string.
 
 =item * C<idempotent>
 
-(defaults to the value of L<idempotent_default>)  Set this to get errors if the
+(defaults to the value of L</idempotent_default>)  Set this to get errors if the
 service already exists.  Note that unlike the other methods this one is not %100
 idempotent.  If a service has the exact same name but a different command it
 this will mask that problem.  I am willing to resolve this if you have patches
@@ -406,9 +429,9 @@ on how to read this information (preferably without diving into the registry.)
 Note: there are many options that C<sc> can use to create and modify services.
 I have taken the few that we use in my project and forced the rest upon you,
 gentle user.  For example, whether you like it or not these services will
-restart on failure and start automatically on boot.  I am completely willing to
-add more options, but in 4 distinct projects we have never needed more than the
-above.  B<Patches Welcome!>
+restart on failure.  I am completely willing to add more options, but in 4
+distinct projects we have never needed more than the above.  B<Patches
+Welcome!>
 
 =head2 start_service
 

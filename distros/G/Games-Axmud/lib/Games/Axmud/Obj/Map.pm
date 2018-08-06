@@ -1046,10 +1046,10 @@
                         );
                     }
 
-                return $self->setCurrentRoom(
-                    undef,
-                    $self->_objClass . '->moveKnownDirSeen',    # Character now lost
-                );
+                    return $self->setCurrentRoom(
+                        undef,
+                        $self->_objClass . '->moveKnownDirSeen',    # Character now lost
+                    );
 
                 } else {
 

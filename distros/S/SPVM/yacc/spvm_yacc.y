@@ -17,15 +17,15 @@
 %}
 
 %token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE NEW OUR SELF CONST
-%token <opval> LAST NEXT NAME CONSTANT ENUM DESCRIPTOR CORETYPE CROAK VAR_NAME INTERFACE REF ISA
-%token <opval> SWITCH CASE DEFAULT EVAL WEAKEN PRECOMPILE DEREF
-%token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT BYTE_REF SHORT_REF INT_REF LONG_REF FLOAT_REF DOUBLE_REF
+%token <opval> LAST NEXT NAME CONSTANT ENUM DESCRIPTOR CORETYPE CROAK VAR_NAME INTERFACE ISA
+%token <opval> SWITCH CASE DEFAULT EVAL WEAKEN PRECOMPILE DEREF BACKSLASH
+%token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT AMPERSAND
 
 %type <opval> grammar opt_statements statements statement my_var field if_statement else_statement array_init
 %type <opval> block enumeration_block package_block sub opt_declarations_in_package call_sub unop binop isa
 %type <opval> opt_assignable_terms assignable_terms assignable_term args arg opt_args use declaration_in_package declarations_in_package term logical_term relative_term
 %type <opval> enumeration_values enumeration_value weaken_field package_var invocant list_assignable_terms
-%type <opval> type field_name sub_name package anon_package declarations_in_grammar opt_enumeration_values array_type
+%type <opval> type field_name sub_name package anon_package declarations_in_grammar opt_enumeration_values array_type ref_type
 %type <opval> for_statement while_statement expression opt_declarations_in_grammar var anon_sub deref ref
 %type <opval> field_access array_access convert_type enumeration new_object basic_type array_length declaration_in_grammar
 %type <opval> switch_statement case_statement default_statement array_type_with_length const_array_type
@@ -496,13 +496,15 @@ deref
     }
 
 ref
-  : REF var
+  : BACKSLASH var
     {
-      $$ = SPVM_OP_build_ref(compiler, $1, $2);
+      SPVM_OP* op_ref = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_REF, $1->file, $1->line);
+      $$ = SPVM_OP_build_ref(compiler, op_ref, $2);
     }
-  | REF '{' var '}'
+  | BACKSLASH '{' var '}'
     {
-      $$ = SPVM_OP_build_ref(compiler, $1, $3);
+      SPVM_OP* op_ref = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_REF, $1->file, $1->line);
+      $$ = SPVM_OP_build_ref(compiler, op_ref, $3);
     }
 
 term
@@ -710,7 +712,7 @@ binop
     {
       $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
     }
-  | assignable_term BIT_AND assignable_term
+  | assignable_term AMPERSAND assignable_term %prec BIT_AND
     {
       $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
     }
@@ -936,6 +938,7 @@ type
   : basic_type
   | array_type
   | const_array_type
+  | ref_type
 
 basic_type
   : NAME
@@ -998,47 +1001,11 @@ basic_type
       
       $$ = op_type;
     }
-  | BYTE_REF
+
+ref_type
+  : AMPERSAND basic_type
     {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_byte_ref_type(compiler);
-      
-      $$ = op_type;
-    }
-  | SHORT_REF
-    {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_short_ref_type(compiler);
-      
-      $$ = op_type;
-    }
-  | INT_REF
-    {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_int_ref_type(compiler);
-      
-      $$ = op_type;
-    }
-  | LONG_REF
-    {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_long_ref_type(compiler);
-      
-      $$ = op_type;
-    }
-  | FLOAT_REF
-    {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_float_ref_type(compiler);
-      
-      $$ = op_type;
-    }
-  | DOUBLE_REF
-    {
-      SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE, $1->file, $1->line);
-      op_type->uv.type = SPVM_TYPE_create_double_ref_type(compiler);
-      
-      $$ = op_type;
+      $$ = SPVM_OP_build_ref_type(compiler, $2);
     }
 
 array_type

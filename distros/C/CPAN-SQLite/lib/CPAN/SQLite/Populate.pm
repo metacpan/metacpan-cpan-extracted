@@ -1,11 +1,11 @@
-# $Id: Populate.pm 53 2015-07-14 23:14:34Z stro $
+# $Id: Populate.pm 58 2018-08-03 20:06:35Z stro $
 
 package CPAN::SQLite::Populate;
 use strict;
 use warnings;
 no warnings qw(redefine);
 
-our $VERSION = '0.211';
+our $VERSION = '0.212';
 
 use English qw/-no_match_vars/;
 
@@ -852,7 +852,7 @@ CPAN::SQLite::Populate - create and populate database tables
 
 =head1 VERSION
 
-version 0.211
+version 0.212
 
 =head1 DESCRIPTION
 

@@ -10,8 +10,10 @@
 #   Copyright (C) 2004-2010, 2012, 2014, 2015 Steve Hay.  All rights reserved.
 #
 # LICENCE
-#   You may distribute under the terms of either the GNU General Public License
-#   or the Artistic License, as specified in the LICENCE file.
+#   This module is free software; you can redistribute it and/or modify it under
+#   the same terms as Perl itself, i.e. under the terms of either the GNU
+#   General Public License or the Artistic License, as specified in the LICENCE
+#   file.
 #
 #===============================================================================
 
@@ -29,7 +31,7 @@ use warnings;
 our($VERSION);
 
 BEGIN {
-    $VERSION = '2.07';
+    $VERSION = '2.08';
 }
 
 1;
@@ -73,11 +75,20 @@ Perl source code filter that decrypts the remaining (encrypted) part of the Perl
 file on the fly when it is run.  See L<perlfilter> if you want to know more
 about how Perl source code filters work.
 
+These two modules can be built and installed separately, so it is possible to
+set-up two separate Perl installations: one containing the
+Filter::Crypto::CryptFile module to be used for encrypting your Perl files, and
+another containing only the Filter::Crypto::Decrypt module for distributing with
+your encrypted Perl files so that they can be run but not easily decrypted.
+(Well, not very easily, anyway.  Please see the WARNING below.)
+
 Encrypted files can also be produced more conveniently using the B<crypt_file>
 script, or (if you also have the L<PAR|PAR> module available) using the
 L<PAR::Filter::Crypto|PAR::Filter::Crypto> module.  The latter can be utilized
 by the standard L<PAR|PAR> tools to produce PAR archives in which your Perl
-files are encrypted.
+files are encrypted.  The Filter::Crypto::Decrypt module (only) can also be
+automatically included in these PAR archives, so this is perhaps the easiest
+way to produce redistributable, encrypted Perl files.
 
 The actual encryption and decryption is performed using one of the symmetric
 cipher algorithms provided by the OpenSSL libcrypto library.  The EVP library
@@ -105,7 +116,7 @@ decryption filter.
 
 Some of the points below come from a discussion on the perl5-porters mailing
 list, in the thread starting here:
-F<http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2003-10/msg01169.html>;
+L<http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2003-10/msg01169.html>;
 others are taken from the L<Filter::decrypt|Filter::decrypt> manpage.
 
 In general, it is hopeless to try to prevent everyone from getting at the source
@@ -218,20 +229,23 @@ EXISTING ENCRYPTED FILES WILL NEED TO BE RE-ENCRYPTED.>
 
 Patches, bug reports, suggestions or any other feedback is welcome.
 
-Bugs can be reported on the CPAN Request Tracker at
-F<https://rt.cpan.org/Public/Bug/Report.html?Queue=Filter-Crypto>.
+Patches can be sent as GitHub pull requests at
+L<https://github.com/steve-m-hay/Filter-Crypto/pulls>.
 
-Active bugs on the CPAN Request Tracker can be viewed at
-F<https://rt.cpan.org/Public/Dist/Display.html?Status=Active;Queue=Filter-Crypto>.
+Bug reports and suggestions can be made on the CPAN Request Tracker at
+L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Filter-Crypto>.
+
+Currently active requests on the CPAN Request Tracker can be viewed at
+L<https://rt.cpan.org/Public/Dist/Display.html?Status=Active;Queue=Filter-Crypto>.
 
 Please test this distribution.  See CPAN Testers Reports at
-F<http://www.cpantesters.org/> for details of how to get involved.
+L<http://www.cpantesters.org/> for details of how to get involved.
 
 Previous test results on CPAN Testers Reports can be viewed at
-F<http://www.cpantesters.org/distro/F/Filter-Crypto.html>.
+L<http://www.cpantesters.org/distro/F/Filter-Crypto.html>.
 
 Please rate this distribution on CPAN Ratings at
-F<http://cpanratings.perl.org/rate/?distribution=Filter-Crypto>.
+L<http://cpanratings.perl.org/rate/?distribution=Filter-Crypto>.
 
 =head1 SEE ALSO
 
@@ -256,13 +270,14 @@ Filter::Crypto::Decrypt module itself was based.
 The latest version of this module is available from CPAN (see
 L<perlmodlib/"CPAN"> for details) at
 
-F<https://metacpan.org/release/Filter-Crypto> or
+L<https://metacpan.org/release/Filter-Crypto> or
 
-F<http://search.cpan.org/dist/Filter-Crypto/> or
+L<http://www.cpan.org/authors/id/S/SH/SHAY/> or
 
-F<http://www.cpan.org/authors/id/S/SH/SHAY/> or
+L<http://www.cpan.org/modules/by-module/Filter/>.
 
-F<http://www.cpan.org/modules/by-module/Filter/>.
+The latest source code is available from GitHub at
+L<https://github.com/steve-m-hay/Filter-Crypto>.
 
 =head1 INSTALLATION
 
@@ -270,11 +285,11 @@ See the F<INSTALL> file.
 
 =head1 AUTHOR
 
-Steve Hay E<lt>shay@cpan.orgE<gt>
+Steve Hay E<lt>L<shay@cpan.org|mailto:shay@cpan.org>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2010, 2012-2015 Steve Hay.  All rights reserved.
+Copyright (C) 2004-2010, 2012-2015, 2017 Steve Hay.  All rights reserved.
 
 =head1 LICENCE
 
@@ -284,11 +299,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 2.07
+Version 2.08
 
 =head1 DATE
 
-28 Feb 2015
+31 Jul 2018
 
 =head1 HISTORY
 

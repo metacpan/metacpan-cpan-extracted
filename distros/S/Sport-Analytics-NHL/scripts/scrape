@@ -40,7 +40,7 @@ scrape - scrape the NHL website for games
 	-d|--debug                      produce debug output to STDERR
 	-s|--start-season    SEASON     Start at season SEASON (default 2018)
 	-S|--stop-season     SEASON     Stop at season SEASON (default 2018)
-	-T|--start-season    STAGE      Scrape stage STAGE (2: REGULAR, 3: PLAYOFF, default: 3
+	-T|--stage           STAGE      Scrape stage STAGE (2: REGULAR, 3: PLAYOFF, default: 2
 	--no-database                   Do not use a MongoDB backend
 	-D|--database        DB         Use Mongo database DB (default hockeytest)
 	-E|--data-dir        DIR        Data directory root (default /misc/nhl)

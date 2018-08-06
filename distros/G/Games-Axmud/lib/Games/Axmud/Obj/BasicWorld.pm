@@ -13,7 +13,7 @@
 #
 #
 # Games::Axmud::Obj::BasicWorld
-# Stores the long mudlist (containing many more worlds than Axmud's list of pre-configured worlds)
+# Stores the basic mudlist (containing many more worlds than Axmud's list of pre-configured worlds)
 
 { package Games::Axmud::Obj::BasicWorld;
 
@@ -40,22 +40,22 @@
         #                   $axmud::CLIENT->constReservedHash)
         #   $longName   - World's long name, matching GA::Profile::World->longName (suggested max
         #                   length of 32 chars)
-        #   $address    - DNS or IP address
+        #   $host       - DNS or IP address
         #   $port       - Port
         #   $adultFlag  - Flag set to TRUE for worlds with primarily adult (sexual) content, FALSE
         #                   otherwise
         #   $language   - String representing the dictionary language (matching
-        #                   GA::Obj::Dict->language, e.g. 'English', 'Francais', 'Deutsch'
+        #                   GA::Obj::Dict->language, e.g. 'English', 'Francais', 'Deutsch')
         #
         # Return values
         #   'undef' on improper arguments or if any arguments are invalid
         #   Blessed reference to the newly-created object on success
 
-        my ($class, $name, $longName, $address, $port, $adultFlag, $language, $check) = @_;
+        my ($class, $name, $longName, $host, $port, $adultFlag, $language, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $class || ! defined $name || ! defined $longName || ! defined $address
+            ! defined $class || ! defined $name || ! defined $longName || ! defined $host
             || ! defined $port || ! defined $adultFlag || ! defined $language || defined $check
         ) {
             return $axmud::CLIENT->writeImproper($class . '->new', @_);
@@ -96,7 +96,7 @@
             #   chars)
             longName                    => $longName,
             # DNS or IP address
-            address                     => $address,
+            host                        => $host,
             # Port
             port                        => $port,
             # Flag set to TRUE for worlds with primarily adult (sexual) content, FALSE otherwise
@@ -124,8 +124,8 @@
         { $_[0]->{name} }
     sub longName
         { $_[0]->{longName} }
-    sub address
-        { $_[0]->{address} }
+    sub host
+        { $_[0]->{host} }
     sub port
         { $_[0]->{port} }
     sub adultFlag

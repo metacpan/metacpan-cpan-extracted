@@ -1,5 +1,12 @@
 Changelog for Beam-Wire
 
+1.022     2018-08-01 22:38:58-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed missing minimum Perl version in prereqs. Thanks @manwar!
+      [Github #67]
+
 1.021     2018-03-18 12:26:40-05:00 America/Chicago
 
     [Fixed]

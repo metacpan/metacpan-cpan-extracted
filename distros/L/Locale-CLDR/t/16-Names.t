@@ -535,6 +535,7 @@ my $all_languages = {
 	'sog' => 'Sogdien',
 	'sq' => 'Albanian',
 	'sr' => 'Serbian',
+	'sr_ME' => 'Montenegrin',
 	'srn' => 'Sranan Tongo',
 	'srr' => 'Serer',
 	'ss' => 'Swati',

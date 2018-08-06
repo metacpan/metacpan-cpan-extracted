@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The basic data types such as Integers, Strings, etc.",
+      "rdfs:label" : "DataType",
+      "rdfs:subClassOf" : "rdfs:Class"
+   },
+   "properties" : {}
+}

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ti::Any::Er - Package for language Tigrinya
 
 package Locale::CLDR::Locales::Ti::Any::Er;
 # This file auto generated from Data\common\main\ti_ER.xml
-#	on Fri 13 Apr  7:31:11 am GMT
+#	on Sun  5 Aug  6:24:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -91,13 +91,7 @@ has 'calendar_days' => (
 			'gregorian' => {
 				'stand-alone' => {
 					narrow => {
-						mon => 'ሰ',
-						tue => 'ሰ',
-						wed => 'ረ',
-						thu => 'ሓ',
-						fri => 'ዓ',
-						sat => 'ቀ',
-						sun => 'ሰ'
+						tue => 'ሰ'
 					},
 				},
 			},

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Event type: Literary event.",
+      "rdfs:label" : "LiteraryEvent",
+      "rdfs:subClassOf" : "schema:Event"
+   },
+   "properties" : {}
+}

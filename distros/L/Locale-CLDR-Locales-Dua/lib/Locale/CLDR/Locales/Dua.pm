@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Dua - Package for language Duala
 
 package Locale::CLDR::Locales::Dua;
 # This file auto generated from Data\common\main\dua.xml
-#	on Fri 13 Apr  7:06:49 am GMT
+#	on Sun  5 Aug  5:57:13 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -313,8 +313,8 @@ has 'day_periods' => (
 					'am' => q{idiɓa},
 				},
 				'abbreviated' => {
-					'pm' => q{ebyámu},
 					'am' => q{idiɓa},
+					'pm' => q{ebyámu},
 				},
 			},
 		},
@@ -394,7 +394,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -418,7 +418,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

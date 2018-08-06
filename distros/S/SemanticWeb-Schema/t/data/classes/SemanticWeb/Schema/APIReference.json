@@ -1,0 +1,46 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Reference documentation for application programming interfaces (APIs).",
+      "rdfs:label" : "APIReference",
+      "rdfs:subClassOf" : "schema:TechArticle"
+   },
+   "properties" : {
+      "schema:assembly" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Library file name e.g., mscorlib.dll, system.web.dll.",
+         "rdfs:label" : "assembly",
+         "schema:domainIncludes" : "schema:APIReference",
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:supersededBy" : "schema:executableLibraryName"
+      },
+      "schema:assemblyVersion" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Associated product/technology version. e.g., .NET Framework 4.5.",
+         "rdfs:label" : "assemblyVersion",
+         "schema:domainIncludes" : "schema:APIReference",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:executableLibraryName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Library file name e.g., mscorlib.dll, system.web.dll.",
+         "rdfs:label" : "executableLibraryName",
+         "schema:domainIncludes" : "schema:APIReference",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:programmingModel" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates whether API is managed or unmanaged.",
+         "rdfs:label" : "programmingModel",
+         "schema:domainIncludes" : "schema:APIReference",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:targetPlatform" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Type of app development: phone, Metro style, desktop, XBox, etc.",
+         "rdfs:label" : "targetPlatform",
+         "schema:domainIncludes" : "schema:APIReference",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

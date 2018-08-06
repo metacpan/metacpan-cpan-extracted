@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Args.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+# $Id: lib/Paranoid/Args.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -26,7 +26,7 @@ use base qw(Exporter);
 use Paranoid;
 use Paranoid::Debug qw(:all);
 
-($VERSION) = ( q$Revision: 2.05 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(parseArgs);
 @EXPORT_OK   = @EXPORT;
@@ -857,7 +857,7 @@ Paranoid::Args - Command-line argument parsing functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Args.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+$Id: lib/Paranoid/Args.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -1073,8 +1073,7 @@ similar) forms:
   --verbose 5
   --verbose=5
 
-If B<CountShort> was instead false you'd have to say '-v5' or '-v 5' instead 
-of '-vvvvv'.
+If B<CountShort> was instead false you'd have to say '-v 5' instead of '-vvvvv'.
 
 When the B<parseArgs> function is called the options hash passed to it would
 be populated with:
@@ -1272,7 +1271,7 @@ L<Paranoid::Debug>
     );
 
   # Process @ARGV:  -vvvfh host1 file1 file2 file3
-  if (parseArgs(@otemplates, %opts, @errors)) {
+  if (parseArgs(@templates, %opts )) {
     setVerbosity($opts{'verbose'});
 
     if ($opts{'force'}) {

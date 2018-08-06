@@ -3,7 +3,7 @@ use warnings;
 
 use Capture::Tiny 'capture_stderr';
 use Path::Tiny qw( path );
-use Test::FailWarnings;
+use Test::FailWarnings -allow_deps => 1;
 use Test::Fatal qw( exception );
 use Test::More;
 use LWP::UserAgent;

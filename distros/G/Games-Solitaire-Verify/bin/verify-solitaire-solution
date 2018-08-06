@@ -22,7 +22,7 @@ solutions.
 
 =head1 VERSION
 
-version 0.1800
+version 0.1900
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ L<Games::Solitaire::Verify>.
 
 =head1 VERSION
 
-version 0.1800
+version 0.1900
 
 =head1 COMMAND LINE OPTIONS
 
@@ -68,6 +68,14 @@ What empty stacks can be filled by.
 =head2 --sequence-move [limited|unlimited]
 
 Whether the sequence move is limited or unlimited.
+
+=head2 --max-rank [n]
+
+Set the maximal rank to a different value than 13. So one can have C<A-Q>
+instead of C<A-K>, if one specifies C<--max-rank 12>. Using this flag is likely
+a bad idea.
+
+(New in version 0.1900 .)
 
 =head1 BUGS
 

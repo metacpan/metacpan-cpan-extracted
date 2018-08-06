@@ -57,7 +57,6 @@ __DATA__
             "required": true,
             "schema": {
               "type": "object",
-              "required": true,
               "required": ["email", "password"],
               "properties": {
                 "email": { "type": "string", "format": "email", "description": "User email" },

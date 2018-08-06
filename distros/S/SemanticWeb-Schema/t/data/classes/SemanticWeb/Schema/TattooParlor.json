@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A tattoo parlor.",
+      "rdfs:label" : "TattooParlor",
+      "rdfs:subClassOf" : "schema:HealthAndBeautyBusiness"
+   },
+   "properties" : {}
+}

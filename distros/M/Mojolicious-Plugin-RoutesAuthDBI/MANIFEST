@@ -1,4 +1,5 @@
 Changes
+lib/Mojolicious/Plugin/RoutesAuthDBI/Model/Base.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/Model/Profiles.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/Model/Logins.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/Model/OAuth.pm
@@ -9,6 +10,7 @@ lib/Mojolicious/Plugin/RoutesAuthDBI/Model/Controllers.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/Model/Namespaces.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/Model/Roles.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/Model/Guest.pm
+lib/Mojolicious/Plugin/RoutesAuthDBI/Model/Log.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/Util.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/OAuth.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/Schema.pm
@@ -16,6 +18,7 @@ lib/Mojolicious/Plugin/RoutesAuthDBI/Install.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/Admin.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/Access.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI/Guest.pm
+lib/Mojolicious/Plugin/RoutesAuthDBI/Log.pm
 lib/Mojolicious/Plugin/RoutesAuthDBI.pm
 README.pod
 Makefile.PL
@@ -28,13 +31,12 @@ t/04-admin.t
 t/05-access.t
 t/06-guest.t
 t/07-oauth.t
+t/08-log.t
 t/99-drop.t
 t/Test/Test1.pm
 t/config.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-MYMETA.yml
-MYMETA.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

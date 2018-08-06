@@ -34,7 +34,8 @@ You may need to satisfy some dependencies. The easiest way to satisfy
 dependencies is to install the last release. This is available at
 https://metacpan.org/release/{{ $dist->name }}
 
-You can use cpanminus to do this without downloading the tarball first:
+You can use [`cpanminus`](https://metacpan.org/pod/App::cpanminus) to do this
+without downloading the tarball first:
 
     $ cpanm --reinstall --installdeps --with-recommends {{
   $main_package = $dist->main_module->name;
@@ -44,9 +45,10 @@ You can use cpanminus to do this without downloading the tarball first:
   $main_package
 }}
 
-Dist::Zilla is a very powerful authoring tool, but requires a number of
-author-specific plugins. If you would like to use it for contributing, install
-it from CPAN, then the following command to install the needed distros:
+[`Dist::Zilla`](https://metacpan.org/pod/Dist::Zilla) is a very powerful
+authoring tool, but requires a number of author-specific plugins. If you would
+like to use it for contributing, install it from CPAN, then the following
+command to install the needed distros:
 
     $ dzil authordeps --missing | cpanm
 
@@ -79,8 +81,9 @@ if ((my $link = $dist->distmeta->{resources}{repository}{web}) =~ /github/) {
 "\n" . 'The code for this distribution is [hosted on GitHub](' . $link . ').'
 . "\n" .'
 You can submit code changes by forking the repository, pushing your code
-changes to your clone, and then submitting a pull request. See the GitHub documentation
-or [detailed instructions on pull requests](https://help.github.com/articles/creating-a-pull-request)'; }
+changes to your clone, and then submitting a pull request. See the GitHub
+documentation for [detailed instructions on pull
+requests](https://help.github.com/articles/creating-a-pull-request)'; }
 }}
 
 If you have found a bug, but do not have an accompanying patch to fix it, you
@@ -95,19 +98,18 @@ $extra .= $dist->distmeta->{resources}{x_IRC}
 $extra;
 }}
 {{ if ( -e '.travis.yml' ) {
-    my $ci = '
+    my ($path) = `git remote show -n origin` =~ /github\.com:(.+)\.git/;
+    my $ci_links = "on Linux by [Travis](https://travis-ci.org/$path)";
+    if ( -e 'appveyor.yml' ) {
+        # AppVeyor paths use my username, not the GitHub group name.
+        $path =~ s{^.+/}{autarch/};
+        $ci_links .= " and on Windows by [AppVeyor](https://ci.appveyor.com/project/$path)";
+    }
+    my $ci = "
 ## Continuous Integration
 
-All pull requests for this distribution will be automatically tested by
-[Travis](https://travis-ci.org/) and the build status will be reported on the
-pull request page. If your build fails, please take a look at the output.';
-
-    if ( -e 'appyeyor.yml' ) {
-        $ci .='
-
-Pull requests are also tested on Windows by [AppVeyor](https://www.appveyor.com/).';
-
-}
+All pull requests for this distribution will be automatically tested
+$ci_links.";
 
 $ci .= '
 

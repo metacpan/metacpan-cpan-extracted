@@ -5,8 +5,7 @@ use warnings;
 
 __PACKAGE__->_set_element_form_qualified(1);
 
-our $OBJECT_NAMESPACE = 'https://adwords.google.com/api/adwords/cm/v201806';
-sub get_xmlns { return $OBJECT_NAMESPACE };
+sub get_xmlns { 'https://adwords.google.com/api/adwords/cm/v201806' };
 
 our $XML_ATTRIBUTE_CLASS;
 undef $XML_ATTRIBUTE_CLASS;

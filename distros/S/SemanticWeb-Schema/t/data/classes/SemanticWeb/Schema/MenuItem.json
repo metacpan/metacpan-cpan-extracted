@@ -1,0 +1,44 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A food or drink item listed in a menu or menu section.",
+      "rdfs:label" : "MenuItem",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:nutrition" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Nutrition information about the recipe or menu item.",
+         "rdfs:label" : "nutrition",
+         "schema:domainIncludes" : [
+            "schema:MenuItem",
+            "schema:Recipe"
+         ],
+         "schema:rangeIncludes" : "schema:NutritionInformation"
+      },
+      "schema:offers" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event.",
+         "rdfs:label" : "offers",
+         "schema:domainIncludes" : [
+            "schema:Product",
+            "schema:MenuItem",
+            "schema:CreativeWork",
+            "schema:AggregateOffer",
+            "schema:Event",
+            "schema:Service"
+         ],
+         "schema:rangeIncludes" : "schema:Offer"
+      },
+      "schema:suitableForDiet" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates a dietary restriction or guideline for which this recipe or menu item is suitable, e.g. diabetic, halal etc.",
+         "rdfs:label" : "suitableForDiet",
+         "schema:domainIncludes" : [
+            "schema:Recipe",
+            "schema:MenuItem"
+         ],
+         "schema:rangeIncludes" : "schema:RestrictedDiet"
+      }
+   }
+}

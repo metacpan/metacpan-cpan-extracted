@@ -165,3 +165,4 @@ trypng.h
 trypdf.h
 META.yml                                 Module meta-data (added by MakeMaker)
 utils/empty_gnuplot.c
+META.json                                Module JSON meta-data (added by MakeMaker)

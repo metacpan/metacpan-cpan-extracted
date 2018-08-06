@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The header section of the page.",
+      "rdfs:label" : "WPHeader",
+      "rdfs:subClassOf" : "schema:WebPageElement"
+   },
+   "properties" : {}
+}

@@ -2,7 +2,7 @@
 #  Test Case for the Tk::IDEpanedwindow
 #
 #   Expected Results
-#     After initial window creation, frames inside the panewindow should resize proportionaly when the
+#     After initial window creation, frames inside the panewindow should resize proportionally when the
 #       whole window is resized
 
 # With nothing on the command line, the script will quit after the text completes

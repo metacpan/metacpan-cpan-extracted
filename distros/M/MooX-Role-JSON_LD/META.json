@@ -4,13 +4,13 @@
       "Dave Cross <dave@perlhacks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "MooX-Role-JSON_LD",
    "no_index" : {
@@ -36,7 +36,6 @@
             "JSON::MaybeXS" : "0",
             "Moo" : "0",
             "Moose" : "0",
-            "Ref::Util" : "0",
             "Sub::Quote" : "0",
             "Types::Standard" : "0",
             "perl" : "5.006000"
@@ -51,10 +50,9 @@
          "web" : "https://github.com/davorg/moox-role-json_ld"
       }
    },
-   "version" : "v0.0.13",
+   "version" : "v0.0.15",
    "x_contributors" : [
       "Robert Rothenberg <rrwo@cpan.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
-   ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   ]
 }

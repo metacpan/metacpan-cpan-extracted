@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Nds::Any::Nl - Package for language Low German
 
 package Locale::CLDR::Locales::Nds::Any::Nl;
 # This file auto generated from Data\common\main\nds_NL.xml
-#	on Fri 13 Apr  7:22:32 am GMT
+#	on Sun  5 Aug  6:14:47 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

@@ -19,7 +19,7 @@ SkewHeap - A fast and flexible heap structure
   $heap->take; # 62
   $heap->take; # 200
 
-  $heap->merge($other_skewheap);
+  my $merged_heap = $heap->merge($other_skewheap);
 
 =head1 DESCRIPTION
 
@@ -58,8 +58,7 @@ Removes and returns the next element from the heap.
 
 =head2 merge
 
-Destructively merges another heap into itself. After calling merge, the second
-heap is empty and the first holds all elements from both heaps.
+Non-destructively merges two heaps into a new heap. Returns the new heap.
 
 =head1 AUTHOR
 

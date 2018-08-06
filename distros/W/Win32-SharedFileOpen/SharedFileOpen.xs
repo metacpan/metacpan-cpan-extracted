@@ -9,8 +9,10 @@
  *   Copyright (C) 2001-2004, 2006, 2008, 2014 Steve Hay.  All rights reserved.
  *
  * LICENCE
- *   You may distribute under the terms of either the GNU General Public License
- *   or the Artistic License, as specified in the LICENCE file.
+ *   This file is free software; you can redistribute it and/or modify it under
+ *   the same terms as Perl itself, i.e. under the terms of either the GNU
+ *   General Public License or the Artistic License, as specified in the LICENCE
+ *   file.
  *
  *============================================================================*/
 

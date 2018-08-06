@@ -1,0 +1,21 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A single feed providing structured information about one or more entities or topics.",
+      "rdfs:label" : "DataFeed",
+      "rdfs:subClassOf" : "schema:Dataset"
+   },
+   "properties" : {
+      "schema:dataFeedElement" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An item within in a data feed. Data feeds may have many elements.",
+         "rdfs:label" : "dataFeedElement",
+         "schema:domainIncludes" : "schema:DataFeed",
+         "schema:rangeIncludes" : [
+            "schema:DataFeedItem",
+            "schema:Text",
+            "schema:Thing"
+         ]
+      }
+   }
+}

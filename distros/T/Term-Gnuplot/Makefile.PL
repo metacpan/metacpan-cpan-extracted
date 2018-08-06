@@ -26,6 +26,15 @@ my (%libs, %symb);
     require FindLib;
     $loadlibs = FindLib::findlib( $try_libs );
   }
+  if ($^O =~ /MSWin32/) {	# Semantic of ext() is very different.
+    my ($sep, @grep) = (($loadlibs =~ /^".*"$/ ? '"\s+"' : '\s+'), ($try_libs =~ /(?!<\S)-l(.*?)(?!\S)/g));
+    (my $l = $loadlibs) =~ s/^"|"$//g;
+    my (@found) = split /$sep/, $l;	# Check for "" just in case: should be always present
+    s(^.*[/\\](?:lib)?(.*)\E$Config{lib_ext}\E$)($1) for @found;
+#      warn "Win libs: <@found>\n";
+    my %check = map +($_, 1), @grep;
+    $loadlibs = join ' -l', '', grep $check{$_}, @found;
+  }
 
   print "...Found libs: '$loadlibs'\n";
   my (@libs) = ($loadlibs =~ /\B-l(\S*)/g);
@@ -195,10 +204,10 @@ sub MY::postamble {
 "GNUPLOT_DIR = $gnuplotdir" .   '
 
 $(MYEXTLIB)  : FORCE
-	cd $(GNUPLOT_DIR); make libgnuterm$(LIB_EXT) $(PASTHRU)
+	cd $(GNUPLOT_DIR) && $(MAKE) libgnuterm$(LIB_EXT) $(PASTHRU)
 
 gnuterm_dynamic  : FORCE
-	cd $(GNUPLOT_DIR); make dynamic $(PASTHRU)
+	cd $(GNUPLOT_DIR); $(MAKE) dynamic $(PASTHRU)
 
 ';
 }

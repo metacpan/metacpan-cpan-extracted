@@ -22,28 +22,28 @@ name: Locale-CLDR-Locales-Ca
 provides:
   Locale::CLDR::Locales::Ca:
     file: lib/Locale/CLDR/Locales/Ca.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Locales::Ca::Any:
     file: lib/Locale/CLDR/Locales/Ca/Any.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Locales::Ca::Any::Ad:
     file: lib/Locale/CLDR/Locales/Ca/Any/Ad.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Locales::Ca::Any::Es:
     file: lib/Locale/CLDR/Locales/Ca/Any/Es.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Locales::Ca::Any::Es::Valencia:
     file: lib/Locale/CLDR/Locales/Ca/Any/Es/Valencia.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Locales::Ca::Any::Fr:
     file: lib/Locale/CLDR/Locales/Ca/Any/Fr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Locales::Ca::Any::It:
     file: lib/Locale/CLDR/Locales/Ca/Any/It.pm
-    version: v0.32.0
+    version: v0.33.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.32.0
+  Locale::CLDR: v0.33.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -53,5 +53,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.32.0
+version: v0.33.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

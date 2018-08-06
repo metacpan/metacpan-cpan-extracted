@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A notary.",
+      "rdfs:label" : "Notary",
+      "rdfs:subClassOf" : "schema:LegalService"
+   },
+   "properties" : {}
+}

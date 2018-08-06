@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An advertising section of the page.",
+      "rdfs:label" : "WPAdBlock",
+      "rdfs:subClassOf" : "schema:WebPageElement"
+   },
+   "properties" : {}
+}

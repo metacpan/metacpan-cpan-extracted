@@ -1,0 +1,26 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of editing a recipient by replacing an old object with a new object.",
+      "rdfs:label" : "ReplaceAction",
+      "rdfs:subClassOf" : "schema:UpdateAction"
+   },
+   "properties" : {
+      "schema:replacee" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of object. The object that is being replaced.",
+         "rdfs:label" : "replacee",
+         "rdfs:subPropertyOf" : "schema:object",
+         "schema:domainIncludes" : "schema:ReplaceAction",
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:replacer" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of object. The object that replaces.",
+         "rdfs:label" : "replacer",
+         "rdfs:subPropertyOf" : "schema:object",
+         "schema:domainIncludes" : "schema:ReplaceAction",
+         "schema:rangeIncludes" : "schema:Thing"
+      }
+   }
+}

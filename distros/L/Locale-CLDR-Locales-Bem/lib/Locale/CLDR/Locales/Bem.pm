@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Bem - Package for language Bemba
 
 package Locale::CLDR::Locales::Bem;
 # This file auto generated from Data\common\main\bem.xml
-#	on Fri 13 Apr  7:02:28 am GMT
+#	on Sun  5 Aug  5:52:14 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -291,13 +291,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{uluchelo},
-					'pm' => q{akasuba},
-				},
 				'wide' => {
-					'am' => q{uluchelo},
 					'pm' => q{akasuba},
+					'am' => q{uluchelo},
+				},
+				'abbreviated' => {
+					'pm' => q{akasuba},
+					'am' => q{uluchelo},
 				},
 			},
 		},

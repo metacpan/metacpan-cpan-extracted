@@ -87,6 +87,7 @@ lib/Locale/CLDR/Transformations/Any/Es_fonipa/Es_419_fonipa.pm
 lib/Locale/CLDR/Transformations/Any/Es_fonipa/Ja.pm
 lib/Locale/CLDR/Transformations/Any/Es_fonipa/Zh.pm
 lib/Locale/CLDR/Transformations/Any/Ethi/Latn.pm
+lib/Locale/CLDR/Transformations/Any/Fa/Fa_fonipa.pm
 lib/Locale/CLDR/Transformations/Any/Fullwidth/Halfwidth.pm
 lib/Locale/CLDR/Transformations/Any/Geor/Latn.pm
 lib/Locale/CLDR/Transformations/Any/Grek/Latn.pm
@@ -114,6 +115,7 @@ lib/Locale/CLDR/Transformations/Any/Guru/Orya.pm
 lib/Locale/CLDR/Transformations/Any/Guru/Taml.pm
 lib/Locale/CLDR/Transformations/Any/Guru/Telu.pm
 lib/Locale/CLDR/Transformations/Any/Guru/Ur.pm
+lib/Locale/CLDR/Transformations/Any/Ha/Ha_ne.pm
 lib/Locale/CLDR/Transformations/Any/Halfwidth/Fullwidth.pm
 lib/Locale/CLDR/Transformations/Any/Han/Spacedhan.pm
 lib/Locale/CLDR/Transformations/Any/Hang/Latn.pm
@@ -233,6 +235,7 @@ lib/Locale/CLDR/Transformations/Any/My/My_fonipa.pm
 lib/Locale/CLDR/Transformations/Any/Nl/Title.pm
 lib/Locale/CLDR/Transformations/Any/Numericpinyin/Latin.pm
 lib/Locale/CLDR/Transformations/Any/Numericpinyin/Pinyin.pm
+lib/Locale/CLDR/Transformations/Any/Nv/Nv_fonipa.pm
 lib/Locale/CLDR/Transformations/Any/Oriya/Interindic.pm
 lib/Locale/CLDR/Transformations/Any/Orya/Arab.pm
 lib/Locale/CLDR/Transformations/Any/Orya/Beng.pm
@@ -335,6 +338,7 @@ lib/Locale/CLDR/Transformations/Any/Und_fonipa/Und_fonxsamp.pm
 lib/Locale/CLDR/Transformations/Any/Und_fonxsamp/Und_fonipa.pm
 lib/Locale/CLDR/Transformations/Any/Uz_cyrl/Uz_latn.pm
 lib/Locale/CLDR/Transformations/Any/Uz_latn/Uz_cyrl.pm
+lib/Locale/CLDR/Transformations/Any/Vec/Vec_fonipa.pm
 lib/Locale/CLDR/Transformations/Any/Xh/Am.pm
 lib/Locale/CLDR/Transformations/Any/Xh/Ar.pm
 lib/Locale/CLDR/Transformations/Any/Xh/Chr.pm

@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::InternalApiError
 Perl data type class for the XML Schema defined complexType
 InternalApiError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Indicates that a server-side error has occured. {@code InternalApiError}s are generally not the result of an invalid request or message sent by the client. 
 
 
 

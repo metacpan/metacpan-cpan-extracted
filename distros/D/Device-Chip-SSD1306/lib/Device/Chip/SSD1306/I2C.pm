@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip::SSD1306 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use constant PROTOCOL => "I2C";
 

@@ -26,7 +26,7 @@ sub gather_violations_generic {
 
     my $include_statements = $elem->find(sub { $_[1]->isa('PPI::Statement::Include') }) || [];
     for my $st (@$include_statements) {
-        next if $st->schild(0) eq "no";
+        next if $st->schild(0) eq 'no';
         my $expr_qw = $st->find( sub { $_[1]->isa('PPI::Token::QuoteLike::Words'); }) or next;
 
         my $included_module = $st->schild(1);
@@ -38,10 +38,10 @@ sub gather_violations_generic {
             my $expr_str = "$expr";
 
             # Given that both PPI and PPR parse this correctly, I don't care about what are the characters used for quoting. We can remove the characters at the position that are supposed to be quoting characters.
-            substr($expr_str, 0, 3) = "";
-            substr($expr_str, -1, 1) = "";
+            substr($expr_str, 0, 3) = '';
+            substr($expr_str, -1, 1) = '';
 
-            my @words = split ' ', $expr_str;
+            my @words = split /\s+/, $expr_str;
             for my $w (@words) {
                 next if $w =~ /\A [:\-]/x;
                 push @{ $imported{$w} //=[] }, $included_module;
@@ -50,7 +50,7 @@ sub gather_violations_generic {
     }
 
     my %used;
-    for my $el_word (@{ $elem->find( sub { $_[1]->isa("PPI::Token::Word") }) ||[]}) {
+    for my $el_word (@{ $elem->find( sub { $_[1]->isa('PPI::Token::Word') }) ||[]}) {
         $used{"$el_word"}++;
     }
 
@@ -58,7 +58,7 @@ sub gather_violations_generic {
     my @to_report = grep { !$used{$_} } (sort keys %imported);
     for my $tok (@to_report) {
         for my $inc_mod (@{ $imported{$tok} }) {
-            push @violations, $self->violation( "Unused import", "A token <$tok> is imported but not used in the same code.", $inc_mod );
+            push @violations, $self->violation( 'Unused import', "A token <$tok> is imported but not used in the same code.", $inc_mod );
         }
     }
 
@@ -75,11 +75,11 @@ TooMuchCode::ProhibitUnusedImport -- Find unused imports
 
 =head1 DESCRIPTION
 
-An "Unused Import" is usually a subroutine name imported by an C<use> statement.
+An "Unused Import" is usually a subroutine name imported by a C<use> statement.
 For example, the word C<Dumper> in the following statement:
 
     use Data::Dumper qw<Dumper>;
 
-If the rest of program has not mention the word C<Dumper>, then it can be deleted.
+If the rest of program has not mentioned the word C<Dumper>, then it can be deleted.
 
 =cut

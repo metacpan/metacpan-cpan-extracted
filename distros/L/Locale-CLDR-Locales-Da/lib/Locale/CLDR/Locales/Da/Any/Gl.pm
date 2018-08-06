@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Da::Any::Gl - Package for language Danish
 
 package Locale::CLDR::Locales::Da::Any::Gl;
 # This file auto generated from Data\common\main\da_GL.xml
-#	on Fri 13 Apr  7:06:16 am GMT
+#	on Sun  5 Aug  5:56:36 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

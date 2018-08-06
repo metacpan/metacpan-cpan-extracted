@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Web page type: Contact page.",
+      "rdfs:label" : "ContactPage",
+      "rdfs:subClassOf" : "schema:WebPage"
+   },
+   "properties" : {}
+}

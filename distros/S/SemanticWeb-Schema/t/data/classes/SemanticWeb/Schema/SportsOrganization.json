@@ -1,0 +1,20 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Represents the collection of all sports organizations, including sports teams, governing bodies, and sports associations.",
+      "rdfs:label" : "SportsOrganization",
+      "rdfs:subClassOf" : "schema:Organization"
+   },
+   "properties" : {
+      "schema:sport" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A type of sport (e.g. Baseball).",
+         "rdfs:label" : "sport",
+         "schema:domainIncludes" : "schema:SportsOrganization",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      }
+   }
+}

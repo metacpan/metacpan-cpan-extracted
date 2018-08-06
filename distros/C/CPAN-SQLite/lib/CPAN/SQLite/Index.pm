@@ -1,10 +1,10 @@
-# $Id: Index.pm 53 2015-07-14 23:14:34Z stro $
+# $Id: Index.pm 58 2018-08-03 20:06:35Z stro $
 
 package CPAN::SQLite::Index;
 use strict;
 use warnings;
 
-our $VERSION = '0.211';
+our $VERSION = '0.212';
 
 use English qw/-no_match_vars/;
 
@@ -216,7 +216,7 @@ CPAN::SQLite::Index - set up or update database tables.
 
 =head1 VERSION
 
-version 0.211
+version 0.212
 
 =head1 SYNOPSIS
 

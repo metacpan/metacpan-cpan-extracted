@@ -1,5 +1,5 @@
 package LWP::ConsoleLogger::Everywhere;
-our $VERSION = '0.000038';
+our $VERSION = '0.000039';
 use strict;
 use warnings;
 
@@ -52,7 +52,7 @@ LWP::ConsoleLogger::Everywhere - LWP tracing everywhere
 
 =head1 VERSION
 
-version 0.000038
+version 0.000039
 
 =head1 SYNOPSIS
 

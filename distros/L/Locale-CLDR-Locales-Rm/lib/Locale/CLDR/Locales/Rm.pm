@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Rm - Package for language Romansh
 
 package Locale::CLDR::Locales::Rm;
 # This file auto generated from Data\common\main\rm.xml
-#	on Fri 13 Apr  7:26:09 am GMT
+#	on Sun  5 Aug  6:18:51 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2387,6 +2387,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(ouguiya da la Mauretania \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(ouguiya da la Mauretania),
 			},
 		},
@@ -2694,6 +2699,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(dobra da São Tomé e Principe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(dobra da São Tomé e Principe),
 			},
@@ -3301,11 +3311,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 				'wide' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'narrow' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
@@ -3320,12 +3330,12 @@ has 'day_periods' => (
 					'am' => q{AM},
 				},
 				'wide' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 				'narrow' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 			},
 		},

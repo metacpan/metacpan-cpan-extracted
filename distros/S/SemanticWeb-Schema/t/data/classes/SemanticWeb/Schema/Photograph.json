@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A photograph.",
+      "rdfs:label" : "Photograph",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {}
+}

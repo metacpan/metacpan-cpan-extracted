@@ -1,0 +1,24 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Financial services business.",
+      "rdfs:label" : "FinancialService",
+      "rdfs:subClassOf" : "schema:LocalBusiness"
+   },
+   "properties" : {
+      "schema:feesAndCommissionsSpecification" : {
+         "dc:source" : "schemadotorgsources:FIBO",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Description of fees, commissions, and other terms applied either to a class of financial product, or by a financial service organization.",
+         "rdfs:label" : "feesAndCommissionsSpecification",
+         "schema:domainIncludes" : [
+            "schema:FinancialService",
+            "schema:FinancialProduct"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      }
+   }
+}

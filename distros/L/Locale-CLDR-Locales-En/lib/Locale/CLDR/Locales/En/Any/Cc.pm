@@ -6,13 +6,13 @@ Locale::CLDR::Locales::En::Any::Cc - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Cc;
 # This file auto generated from Data\common\main\en_CC.xml
-#	on Fri 13 Apr  7:07:51 am GMT
+#	on Sun  5 Aug  5:58:22 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -46,26 +46,26 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
 					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
-					return 'morning1' if $time >= 600
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 600
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}

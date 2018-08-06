@@ -79,7 +79,7 @@ Google::Ads::AdWords::v201806::SoapHeader
 Perl data type class for the XML Schema defined complexType
 SoapHeader from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Defines the required and optional elements within the header of a SOAP request. 
 
 
 

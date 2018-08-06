@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::ReadOnlyError
 Perl data type class for the XML Schema defined complexType
 ReadOnlyError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Errors from attempting to write to read-only fields. 
 
 
 

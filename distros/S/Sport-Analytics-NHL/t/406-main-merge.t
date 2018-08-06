@@ -44,7 +44,7 @@ is($storable, 't/tmp/data/1930/0002/0010/merged.storable', 'return path correct'
 ok(-f $storable, 'file exists');
 $boxscore = retrieve $storable;
 test_merged_boxscore($boxscore);
-is($TEST_COUNTER->{Curr_Test}, 5451, 'team and roster all tested');
+is($TEST_COUNTER->{Curr_Test}, 5472, 'team and roster all tested');
 is($TEST_COUNTER->{Curr_Test}, $TEST_COUNTER->{Test_Results}[0], 'all ok');
 
 END {

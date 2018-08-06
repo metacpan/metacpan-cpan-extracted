@@ -1,0 +1,74 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A means for accessing a service, e.g. a government office location, web site, or phone number.",
+      "rdfs:label" : "ServiceChannel",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:availableLanguage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
+         "rdfs:label" : "availableLanguage",
+         "schema:domainIncludes" : [
+            "schema:TouristAttraction",
+            "schema:LodgingBusiness",
+            "schema:ContactPoint",
+            "schema:ServiceChannel"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Language"
+         ]
+      },
+      "schema:processingTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Estimated processing time for the service using this channel.",
+         "rdfs:label" : "processingTime",
+         "schema:domainIncludes" : "schema:ServiceChannel",
+         "schema:rangeIncludes" : "schema:Duration"
+      },
+      "schema:providesService" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The service provided by this channel.",
+         "rdfs:label" : "providesService",
+         "schema:domainIncludes" : "schema:ServiceChannel",
+         "schema:rangeIncludes" : "schema:Service"
+      },
+      "schema:serviceLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The location (e.g. civic structure, local business, etc.) where a person can go to access the service.",
+         "rdfs:label" : "serviceLocation",
+         "schema:domainIncludes" : "schema:ServiceChannel",
+         "schema:rangeIncludes" : "schema:Place"
+      },
+      "schema:servicePhone" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The phone number to use to access the service.",
+         "rdfs:label" : "servicePhone",
+         "schema:domainIncludes" : "schema:ServiceChannel",
+         "schema:rangeIncludes" : "schema:ContactPoint"
+      },
+      "schema:servicePostalAddress" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The address for accessing the service by mail.",
+         "rdfs:label" : "servicePostalAddress",
+         "schema:domainIncludes" : "schema:ServiceChannel",
+         "schema:rangeIncludes" : "schema:PostalAddress"
+      },
+      "schema:serviceSmsNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number to access the service by text message.",
+         "rdfs:label" : "serviceSmsNumber",
+         "schema:domainIncludes" : "schema:ServiceChannel",
+         "schema:rangeIncludes" : "schema:ContactPoint"
+      },
+      "schema:serviceUrl" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The website to access the service.",
+         "rdfs:label" : "serviceUrl",
+         "schema:domainIncludes" : "schema:ServiceChannel",
+         "schema:rangeIncludes" : "schema:URL"
+      }
+   }
+}

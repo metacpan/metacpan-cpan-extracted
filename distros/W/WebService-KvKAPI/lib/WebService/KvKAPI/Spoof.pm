@@ -1,5 +1,5 @@
 package WebService::KvKAPI::Spoof;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Moose;
 
 # ABSTRACT: Enable spoof mode on the KvK API
@@ -30,7 +30,7 @@ WebService::KvKAPI::Spoof - Enable spoof mode on the KvK API
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

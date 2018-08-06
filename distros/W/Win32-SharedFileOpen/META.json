@@ -4,7 +4,7 @@
       "Steve Hay <shay@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -23,6 +23,36 @@
       ]
    },
    "optional_features" : {
+      "changestest" : {
+         "description" : "Changes testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::CPAN::Changes" : "0"
+               }
+            }
+         }
+      },
+      "critictest" : {
+         "description" : "Perl::Critic testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Perl::Critic" : "0"
+               }
+            }
+         }
+      },
+      "podcoveragetest" : {
+         "description" : "POD coverage testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Pod::Coverage" : "0.08"
+               }
+            }
+         }
+      },
       "podtest" : {
          "description" : "POD testing",
          "prereqs" : {
@@ -53,29 +83,25 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
             "Errno" : "0",
             "Exporter" : "0",
             "Symbol" : "0",
             "Time::HiRes" : "0",
             "Win32::WinError" : "0",
             "XSLoader" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Config" : "0",
-            "Errno" : "0",
             "FileHandle" : "0",
             "IO::File" : "0",
             "IO::Handle" : "0",
-            "Symbol" : "0",
-            "Test::More" : "0",
-            "Time::HiRes" : "0",
-            "Win32::WinError" : "0",
-            "perl" : "5.008001",
-            "strict" : "0",
-            "warnings" : "0"
+            "Test::More" : "0"
          }
       }
    },
@@ -86,5 +112,5 @@
          "url" : "https://github.com/steve-m-hay/Win32-SharedFileOpen.git"
       }
    },
-   "version" : "4.02"
+   "version" : "4.03"
 }

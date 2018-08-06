@@ -1,0 +1,18 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of producing a balanced opinion about the object for an audience. An agent reviews an object with participants resulting in a review.",
+      "rdfs:label" : "ReviewAction",
+      "rdfs:subClassOf" : "schema:AssessAction"
+   },
+   "properties" : {
+      "schema:resultReview" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of result. The review that resulted in the performing of the action.",
+         "rdfs:label" : "resultReview",
+         "rdfs:subPropertyOf" : "schema:result",
+         "schema:domainIncludes" : "schema:ReviewAction",
+         "schema:rangeIncludes" : "schema:Review"
+      }
+   }
+}

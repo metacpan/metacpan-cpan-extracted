@@ -1,0 +1,108 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_ActionCollabClass",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An action performed by a direct agent and indirect participants upon a direct object. Optionally happens at a location with the help of an inanimate instrument. The execution of the action may produce a result. Specific action sub-type documentation specifies the exact expectation of each argument/role.</p>\n\n<p>See also <a href=\"http://blog.schema.org/2014/04/announcing-schemaorg-actions.html\">blog post</a> and <a href=\"http://schema.org/docs/actions.html\">Actions overview document</a>.",
+      "rdfs:label" : "Action",
+      "rdfs:subClassOf" : "schema:Thing"
+   },
+   "properties" : {
+      "schema:actionStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates the current disposition of the Action.",
+         "rdfs:label" : "actionStatus",
+         "schema:domainIncludes" : "schema:Action",
+         "schema:rangeIncludes" : "schema:ActionStatusType"
+      },
+      "schema:agent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The direct performer or driver of the action (animate or inanimate). e.g. <em>John</em> wrote a book.",
+         "rdfs:label" : "agent",
+         "schema:domainIncludes" : "schema:Action",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:endTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The endTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to end. For actions that span a period of time, when the action was performed. e.g. John wrote a book from January to <em>December</em>.</p>\n\n<p>Note that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
+         "rdfs:label" : "endTime",
+         "schema:domainIncludes" : [
+            "schema:FoodEstablishmentReservation",
+            "schema:Action"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:error" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "For failed actions, more information on the cause of the failure.",
+         "rdfs:label" : "error",
+         "schema:domainIncludes" : "schema:Action",
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:instrument" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The object that helped the agent perform the action. e.g. John wrote a book with <em>a pen</em>.",
+         "rdfs:label" : "instrument",
+         "schema:domainIncludes" : "schema:Action",
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:location" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The location of for example where the event is happening, an organization is located, or where an action takes place.",
+         "rdfs:label" : "location",
+         "schema:domainIncludes" : [
+            "schema:Organization",
+            "schema:Action",
+            "schema:Event"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:PostalAddress",
+            "schema:Place"
+         ]
+      },
+      "schema:object" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The object upon which the action is carried out, whose state is kept intact or changed. Also known as the semantic roles patient, affected or undergoer (which change their state) or theme (which doesn't). e.g. John read <em>a book</em>.",
+         "rdfs:label" : "object",
+         "schema:domainIncludes" : "schema:Action",
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:participant" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Other co-agents that participated in the action indirectly. e.g. John wrote a book with <em>Steve</em>.",
+         "rdfs:label" : "participant",
+         "schema:domainIncludes" : "schema:Action",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:result" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The result produced in the action. e.g. John wrote <em>a book</em>.",
+         "rdfs:label" : "result",
+         "schema:domainIncludes" : "schema:Action",
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:startTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The startTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to start. For actions that span a period of time, when the action was performed. e.g. John wrote a book from <em>January</em> to December.</p>\n\n<p>Note that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
+         "rdfs:label" : "startTime",
+         "schema:domainIncludes" : [
+            "schema:FoodEstablishmentReservation",
+            "schema:Action"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:target" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates a target EntryPoint for an Action.",
+         "rdfs:label" : "target",
+         "schema:domainIncludes" : "schema:Action",
+         "schema:rangeIncludes" : "schema:EntryPoint"
+      }
+   }
+}

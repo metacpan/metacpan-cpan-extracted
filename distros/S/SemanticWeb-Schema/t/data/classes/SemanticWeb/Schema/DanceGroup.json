@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A dance group&#x2014;for example, the Alvin Ailey Dance Theater or Riverdance.",
+      "rdfs:label" : "DanceGroup",
+      "rdfs:subClassOf" : "schema:PerformingGroup"
+   },
+   "properties" : {}
+}

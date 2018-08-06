@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Kam::Any::Ke - Package for language Kamba
 
 package Locale::CLDR::Locales::Kam::Any::Ke;
 # This file auto generated from Data\common\main\kam_KE.xml
-#	on Fri 13 Apr  7:16:08 am GMT
+#	on Sun  5 Aug  6:07:38 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

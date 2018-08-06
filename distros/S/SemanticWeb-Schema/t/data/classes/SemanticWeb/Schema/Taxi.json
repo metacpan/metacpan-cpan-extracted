@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A taxi.",
+      "rdfs:label" : "Taxi",
+      "rdfs:subClassOf" : "schema:Service",
+      "schema:supersededBy" : "schema:TaxiService"
+   },
+   "properties" : {}
+}

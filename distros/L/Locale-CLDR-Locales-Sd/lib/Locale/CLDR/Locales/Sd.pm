@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Sd - Package for language Sindhi
 
 package Locale::CLDR::Locales::Sd;
 # This file auto generated from Data\common\main\sd.xml
-#	on Fri 13 Apr  7:27:22 am GMT
+#	on Sun  5 Aug  6:20:13 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -113,6 +113,7 @@ has 'display_name_language' => (
  				'dav' => 'تائيتا',
  				'de' => 'جرمن',
  				'de_AT' => 'آسٽريائي جرمن',
+ 				'de_CH' => 'سوئس هائي جرمن',
  				'dgr' => 'داگرب',
  				'dje' => 'زارما',
  				'dsb' => 'لوئر سوربين',
@@ -127,10 +128,15 @@ has 'display_name_language' => (
  				'eka' => 'ايڪاجڪ',
  				'el' => 'يوناني',
  				'en' => 'انگريزي',
- 				'en_AU' => 'en (آسٽريليا)',
+ 				'en_AU' => 'آسٽريليائي انگريزي',
+ 				'en_CA' => 'ڪينيڊيائي انگريزي',
+ 				'en_GB' => 'برطانوي انگريزي',
+ 				'en_GB@alt=short' => 'برطانوي انگريزي',
+ 				'en_US' => 'آمريڪي انگريزي',
  				'en_US@alt=short' => 'انگريزي (آمريڪا)',
  				'eo' => 'ايسپرانٽو',
  				'es' => 'اسپيني',
+ 				'es_419' => 'لاطيني آمريڪي اسپينش',
  				'es_ES' => 'يورپي اسپيني',
  				'et' => 'ايستونائي',
  				'eu' => 'باسڪي',
@@ -143,6 +149,8 @@ has 'display_name_language' => (
  				'fo' => 'فيروايس',
  				'fon' => 'فون',
  				'fr' => 'فرانسي',
+ 				'fr_CA' => 'ڪينيڊيائي فرانسيسي',
+ 				'fr_CH' => 'سوئس فرانسيسي',
  				'fur' => 'فرائي لئين',
  				'fy' => 'مغربي فريشن',
  				'ga' => 'آئرش',
@@ -422,6 +430,8 @@ has 'display_name_language' => (
  				'yue' => 'ڪينٽونيز',
  				'zgh' => 'معياري مراڪشي تامازائيٽ',
  				'zh' => 'چيني',
+ 				'zh_Hans' => 'آسان چینی',
+ 				'zh_Hant' => 'روايتي چيني',
  				'zu' => 'زولو',
  				'zun' => 'زوني',
  				'zxx' => 'ڪوئي ٻولي جو مواد ڪونهي',
@@ -516,6 +526,7 @@ has 'display_name_region' => (
  			'015' => 'اترين آفريڪا',
  			'017' => 'وچ آفريڪا',
  			'018' => 'ڏاکڻي آمريڪا',
+ 			'019' => 'آمريڪا',
  			'021' => 'اترين آمريڪا',
  			'029' => 'ڪيريبين',
  			'030' => 'اوڀر ايشيا',
@@ -533,6 +544,7 @@ has 'display_name_region' => (
  			'151' => 'اوڀر يورپ',
  			'154' => 'اترين يورپ',
  			'155' => 'اولهندي يورپ',
+ 			'202' => 'سب سهارا آفريڪا',
  			'419' => 'لاطيني آمريڪا',
  			'AC' => 'طلوع ٻيٽ',
  			'AD' => 'اندورا',
@@ -575,10 +587,13 @@ has 'display_name_region' => (
  			'CA' => 'ڪئناڊا',
  			'CC' => 'ڪوڪوس ٻيٽ',
  			'CD' => 'ڪانگو -ڪنشاسا',
+ 			'CD@alt=variant' => 'ڪانگو',
  			'CF' => 'وچ آفريقي جمهوريه',
  			'CG' => 'ڪانگو - برازاویل',
+ 			'CG@alt=variant' => 'ڪانگو (جمهوري)',
  			'CH' => 'سئيٽرزلينڊ',
  			'CI' => 'آئيوري ڪنارو',
+ 			'CI@alt=variant' => 'آئيوري ڪوسٽ',
  			'CK' => 'ڪوڪ ٻيٽ',
  			'CL' => 'چلي',
  			'CM' => 'ڪيمرون',
@@ -783,7 +798,7 @@ has 'display_name_region' => (
  			'UM' => 'آمريڪي ٻاهريون ٻيٽ',
  			'UN' => 'اقوام متحده',
  			'US' => 'آمريڪا جون گڏيل رياستون',
- 			'US@alt=short' => 'آمريڪا',
+ 			'US@alt=short' => 'يوايس',
  			'UY' => 'يوروگوءِ',
  			'UZ' => 'ازبڪستان',
  			'VA' => 'ويٽڪين سٽي',
@@ -1249,9 +1264,9 @@ has 'units' => (
 						'other' => q({0} گيگا واٽز),
 					},
 					'gram' => {
-						'name' => q(گرام),
+						'name' => q(گرامَ),
 						'one' => q({0} گرام),
-						'other' => q({0} گرام),
+						'other' => q({0} گرامَ),
 						'per' => q({0} في گرام),
 					},
 					'hectare' => {
@@ -1327,9 +1342,9 @@ has 'units' => (
 						'other' => q({0} ڪلو ڪيلوريز),
 					},
 					'kilogram' => {
-						'name' => q(ڪلو گرام),
+						'name' => q(ڪلوگرامَ),
 						'one' => q({0} ڪلوگرام),
-						'other' => q({0} ڪلوگرام),
+						'other' => q({0}ڪلوگرامَ),
 						'per' => q({0} في ڪلوگرام),
 					},
 					'kilohertz' => {
@@ -1436,13 +1451,13 @@ has 'units' => (
 						'other' => q({0} ميٽر في سيڪنڊ اسڪوائر),
 					},
 					'metric-ton' => {
-						'name' => q(ميٽرڪ ٽن),
-						'one' => q({0} ٽن),
-						'other' => q({0} ميٽرڪ ٽن),
+						'name' => q(ميٽرڪ ٽَنَ),
+						'one' => q({0} ميٽرڪ ٽَنُ),
+						'other' => q({0} ميٽرڪ ٽَنَ),
 					},
 					'microgram' => {
-						'name' => q(مائڪرو گرام),
-						'one' => q({0} مائڪرو گرام),
+						'name' => q(مائڪروگرامَ),
+						'one' => q({0} مائڪروگرام),
 						'other' => q({0} مائڪرو گرام),
 					},
 					'micrometer' => {
@@ -1491,9 +1506,9 @@ has 'units' => (
 						'other' => q({0} ملي بارز),
 					},
 					'milligram' => {
-						'name' => q(ملي گرام),
+						'name' => q(ملي گرامَ),
 						'one' => q({0} ملي گرام),
-						'other' => q({0} ملي گرام),
+						'other' => q({0} ملي گرامَ),
 					},
 					'milligram-per-deciliter' => {
 						'name' => q(ملي گرامز في ڊيسي ليٽر),
@@ -1698,6 +1713,11 @@ has 'units' => (
 						'one' => q({0} ٽيرا بائيٽز),
 						'other' => q({0} ٽيرا بائيٽز),
 					},
+					'ton' => {
+						'name' => q(ٽن),
+						'one' => q({0} ٽن),
+						'other' => q({0} ٽن),
+					},
 					'volt' => {
 						'name' => q(وولٽز),
 						'one' => q({0} وولٽ),
@@ -1750,8 +1770,9 @@ has 'units' => (
 					},
 					'gram' => {
 						'name' => q(گرام),
-						'one' => q({0} گرام),
-						'other' => q({0} گرام),
+						'one' => q({0}گـ.),
+						'other' => q({0}گـ.),
+						'per' => q({0}/گـ.),
 					},
 					'hour' => {
 						'name' => q(ڪلاڪ),
@@ -1759,9 +1780,10 @@ has 'units' => (
 						'other' => q({0} ڪلاڪ),
 					},
 					'kilogram' => {
-						'name' => q(ڪلوگرام),
-						'one' => q({0} ڪلوگرام),
-						'other' => q({0} ڪلوگرام),
+						'name' => q(ڪ.گـ.),
+						'one' => q({0}ڪ.گـ.),
+						'other' => q({0}ڪ.گـ.),
+						'per' => q({0}/ڪ.گـ.),
 					},
 					'kilometer' => {
 						'name' => q(ڪلوميٽر),
@@ -1787,6 +1809,16 @@ has 'units' => (
 						'name' => q(ميٽر),
 						'one' => q({0} ميٽر),
 						'other' => q({0} ميٽر),
+					},
+					'metric-ton' => {
+						'name' => q(ٽَـ),
+						'one' => q({0}ٽَـ),
+						'other' => q({0}ٽَـ),
+					},
+					'milligram' => {
+						'name' => q(مـ.گـ.),
+						'one' => q({0}مـ.گـ.),
+						'other' => q({0}مـ.گـ.),
 					},
 					'millimeter' => {
 						'name' => q(ملي ميٽر),
@@ -2037,10 +2069,10 @@ has 'units' => (
 						'other' => q({0} گيگا واٽ),
 					},
 					'gram' => {
-						'name' => q(گرام),
-						'one' => q({0} گرام),
-						'other' => q({0} گرام),
-						'per' => q({0} في گرام),
+						'name' => q(گرامَ),
+						'one' => q({0} گـ),
+						'other' => q({0} گـ.),
+						'per' => q({0}/گـ.),
 					},
 					'hectare' => {
 						'name' => q(هيڪٽر),
@@ -2115,10 +2147,10 @@ has 'units' => (
 						'other' => q({0} ڪلو ڪيلوريز),
 					},
 					'kilogram' => {
-						'name' => q(ڪلوگرام),
-						'one' => q({0} ڪلوگرام),
-						'other' => q({0} ڪلوگرام),
-						'per' => q({0} في ڪلوگرام),
+						'name' => q(ڪ.گـ.),
+						'one' => q({0} ڪ.گـ.),
+						'other' => q({0} ڪ.گـ.),
+						'per' => q({0}/ڪ.گـ.),
 					},
 					'kilohertz' => {
 						'name' => q(ڪلو هرٽز),
@@ -2224,9 +2256,9 @@ has 'units' => (
 						'other' => q({0} m/s²),
 					},
 					'metric-ton' => {
-						'name' => q(ٽن),
-						'one' => q({0} ٽن),
-						'other' => q({0} ٽن),
+						'name' => q(ٽَـ),
+						'one' => q({0} ٽَـ),
+						'other' => q({0} ٽَـ),
 					},
 					'microgram' => {
 						'name' => q(مائڪرو گرام),
@@ -2279,9 +2311,9 @@ has 'units' => (
 						'other' => q({0} ملي بارز),
 					},
 					'milligram' => {
-						'name' => q(ملي گرام),
-						'one' => q({0} ملي گرام),
-						'other' => q({0} ملي گرام),
+						'name' => q(مـ.گـ.),
+						'one' => q({0} مـ.گـ.),
+						'other' => q({0} مـ.گـ.),
 					},
 					'milligram-per-deciliter' => {
 						'name' => q(ملي گرامز في ڊيسي ليٽر),
@@ -2486,6 +2518,11 @@ has 'units' => (
 						'one' => q({0} ٽيرا بائيٽز),
 						'other' => q({0} ٽيرا بائيٽز),
 					},
+					'ton' => {
+						'name' => q(ٽن),
+						'one' => q({0} ٽن),
+						'other' => q({0} ٽن),
+					},
 					'volt' => {
 						'name' => q(وولٽ),
 						'one' => q({0} وولٽ),
@@ -2645,11 +2682,11 @@ has 'number_formats' => (
 			},
 			'long' => {
 				'1000' => {
-					'one' => '0K',
-					'other' => '0K',
+					'one' => '0 ھزار',
+					'other' => '0 ھزار',
 				},
 				'10000' => {
-					'one' => '00K',
+					'one' => '00 ھزار',
 					'other' => '00K',
 				},
 				'100000' => {
@@ -3517,6 +3554,13 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(موريشيائي اوگوئیا \(1973–2017\)),
+				'one' => q(موريشيائي اوگوئیا \(1973–2017\)),
+				'other' => q(موريشيائي اوگوئیا \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(موريشيائي اوگوئیا),
 				'one' => q(موريشيائي اوگوئیا),
 				'other' => q(موريشيائي اوگوئیا),
@@ -3812,6 +3856,14 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(سائو ٽوم ۽ پرنسپي دوبرا \(1977–2017\)),
+				'one' => q(سائو ٽوم ۽ پرنسپي دوبرا \(1977–2017\)),
+				'other' => q(سائو ٽوم ۽ پرنسپي دوبرا \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'STN',
 			display_name => {
 				'currency' => q(سائو ٽوم ۽ پرنسپي دوبرا),
 				'one' => q(سائو ٽوم ۽ پرنسپي دوبرا),
@@ -4310,27 +4362,27 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{صبح، منجهند},
-					'pm' => q{منجهند، شام},
-				},
-				'narrow' => {
-					'pm' => q{منجهند، شام},
-					'am' => q{صبح، منجهند},
-				},
 				'abbreviated' => {
 					'pm' => q{شام، منجهند},
 					'am' => q{صبح، منجهند},
 				},
-			},
-			'stand-alone' => {
 				'wide' => {
-					'am' => q{صبح، منجهند},
 					'pm' => q{منجهند، شام},
+					'am' => q{صبح، منجهند},
 				},
 				'narrow' => {
 					'am' => q{صبح، منجهند},
 					'pm' => q{منجهند، شام},
+				},
+			},
+			'stand-alone' => {
+				'wide' => {
+					'pm' => q{منجهند، شام},
+					'am' => q{صبح، منجهند},
+				},
+				'narrow' => {
+					'pm' => q{منجهند، شام},
+					'am' => q{صبح، منجهند},
 				},
 				'abbreviated' => {
 					'pm' => q{منجهند، شام},
@@ -4422,52 +4474,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d, E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{L},
-			MEd => q{MM-dd, E},
-			MMM => q{LLL},
-			MMMEd => q{MMM d, E},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{MM-dd},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{y-MM},
-			yMEd => q{y-MM-dd, E},
-			yMMM => q{y MMM},
-			yMMMEd => q{y MMM d, E},
-			yMMMM => q{y MMMM},
-			yMMMd => q{y MMM d},
-			yMd => q{y-MM-dd},
-			yQQQ => q{y QQQ},
-			yQQQQ => q{y QQQQ},
-		},
 		'generic' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -4511,6 +4517,54 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{G y QQQ},
 			yyyyQQQQ => q{G y QQQQ},
 		},
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{L},
+			MEd => q{MM-dd, E},
+			MMM => q{LLL},
+			MMMEd => q{MMM d, E},
+			MMMMW => q{ھفتو W جو MMMM},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{MM-dd},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{y-MM},
+			yMEd => q{y-MM-dd, E},
+			yMMM => q{y MMM},
+			yMMMEd => q{y MMM d, E},
+			yMMMM => q{y MMMM},
+			yMMMd => q{y MMM d},
+			yMd => q{y-MM-dd},
+			yQQQ => q{y QQQ},
+			yQQQQ => q{y QQQQ},
+			yw => q{ھفتو w جو Y},
+		},
 	} },
 );
 
@@ -4530,6 +4584,69 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{G y–y},
+			},
+			yM => {
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				M => q{G y MMM–MMM},
+				y => q{G y MMM – y MMM},
+			},
+			yMMMEd => {
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				M => q{G y MMMM–MMMM},
+				y => q{G y MMMM – y MMMM},
+			},
+			yMMMd => {
+				M => q{G y MMM d – MMM d},
+				d => q{G y MMM d–d},
+				y => q{G y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
+			},
+		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -4623,69 +4740,6 @@ has 'datetime_formats_interval' => (
 				M => q{y-MM-dd – y-MM-dd},
 				d => q{y-MM-dd – y-MM-dd},
 				y => q{y-MM-dd – y-MM-dd},
-			},
-		},
-		'generic' => {
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{G y–y},
-			},
-			yM => {
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-			},
-			yMMM => {
-				M => q{G y MMM–MMM},
-				y => q{G y MMM – y MMM},
-			},
-			yMMMEd => {
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
-			},
-			yMMMM => {
-				M => q{G y MMMM–MMMM},
-				y => q{G y MMMM – y MMMM},
-			},
-			yMMMd => {
-				M => q{G y MMM d – MMM d},
-				d => q{G y MMM d–d},
-				y => q{G y MMM d – y MMM d},
-			},
-			yMd => {
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
-				y => q{GGGGG y-MM-dd – y-MM-dd},
 			},
 		},
 	} },
@@ -5815,13 +5869,13 @@ has 'time_zone_names' => (
 		},
 		'Bolivia' => {
 			long => {
-				'standard' => q#بولیویا جو وقت#,
+				'standard' => q#بولويائي وقت#,
 			},
 		},
 		'Brasilia' => {
 			long => {
 				'daylight' => q#براسيليا جي اونهاري جو وقت#,
-				'generic' => q#براسیلیا جو وقت#,
+				'generic' => q#بريسيليائي وقت#,
 				'standard' => q#براسيليا جو معياري وقت#,
 			},
 		},
@@ -5931,6 +5985,9 @@ has 'time_zone_names' => (
 		'Etc/UTC' => {
 			long => {
 				'standard' => q#گڏيل دنياوي وقت#,
+			},
+			short => {
+				'standard' => q#م ع و#,
 			},
 		},
 		'Etc/Unknown' => {
@@ -6220,7 +6277,7 @@ has 'time_zone_names' => (
 		},
 		'Guyana' => {
 			long => {
-				'standard' => q#گیانا جو وقت#,
+				'standard' => q#گيانائي وقت#,
 			},
 		},
 		'Hawaii_Aleutian' => {
@@ -6565,6 +6622,9 @@ has 'time_zone_names' => (
 		'Pacific/Honolulu' => {
 			exemplarCity => q#هونو لولو#,
 		},
+		'Pacific/Johnston' => {
+			exemplarCity => q#جانسٹن#,
+		},
 		'Pacific/Kiritimati' => {
 			exemplarCity => q#ڪريٽمٽي#,
 		},
@@ -6680,8 +6740,8 @@ has 'time_zone_names' => (
 		'Pierre_Miquelon' => {
 			long => {
 				'daylight' => q#سینٽ پیئر و میڪوئیلون جي ڏينهن جو وقت#,
-				'generic' => q#سینٽ پیئر و میڪوئیلون جو وقت#,
-				'standard' => q#سینٽ پیئر و میڪوئیلون جو معياري وقت#,
+				'generic' => q#سينٽ پيئر ائن ميڪوئلون جو وقت#,
+				'standard' => q#سینٽ پیئر اَئن میڪوئلون جو مانائتو وقت#,
 			},
 		},
 		'Pitcairn' => {

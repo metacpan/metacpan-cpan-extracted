@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ko::Any::Kr - Package for language Korean
 
 package Locale::CLDR::Locales::Ko::Any::Kr;
 # This file auto generated from Data\common\main\ko_KR.xml
-#	on Fri 13 Apr  7:17:22 am GMT
+#	on Sun  5 Aug  6:09:00 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

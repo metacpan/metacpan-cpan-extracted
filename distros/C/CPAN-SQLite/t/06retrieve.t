@@ -1,4 +1,4 @@
-# $Id: 06retrieve.t 53 2015-07-14 23:14:34Z stro $
+# $Id: 06retrieve.t 58 2018-08-03 20:06:35Z stro $
 
 use strict;
 use warnings;
@@ -10,6 +10,7 @@ use CPAN::DistnameInfo;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use CPAN::SQLite::Index;
+use TestShell;
 
 plan tests => 5;
 

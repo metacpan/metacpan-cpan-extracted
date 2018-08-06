@@ -5,7 +5,7 @@ Tk::IDElayout - Tk Widget for Layout of Frames Similar to an IDE.
 
 =head1 SYNOPSIS
 
-B<Simple Example>: (See t/simpleIDElayout2.t in the source distrubution for complete example)
+B<Simple Example>: (See t/simpleIDElayout2.t in the source distribution for complete example)
 
         #### This example creates two IDEtabFrames for managing with IDElayout #####
         my $TOP = MainWindow->new;
@@ -83,7 +83,7 @@ B<Simple Example>: (See t/simpleIDElayout2.t in the source distrubution for comp
 =head1 DESCRIPTION
 
 This is a widget for managing the layout of Tk frames (and other widgets) like an IDE (Integrated Development Environment)
-like I<Ecliplse> or I<Microsoft Visual Studio>.
+like I<Eclipse> or I<Microsoft Visual Studio>.
 
 B<Features:>
 
@@ -361,7 +361,7 @@ The last side of the frame (e.g. left, right, top, bot) that the mouse pointer w
 
 package Tk::IDElayout;
 
-our ($VERSION) = ('0.33');
+our ($VERSION) = ('0.34');
 
 use strict;
 
@@ -616,7 +616,7 @@ sub populateWindow{
 	my @kids = $frameStruct->successors($name);  # get the childs
 	my $childOrder = $attr->{childOrder}; # Get the order of the childs
 		
-        my $expandfactors = $attr->{expandfactors} || [map 0, @$childOrder]; # Resize behavoir of the childs, defaults to all zeros
+        my $expandfactors = $attr->{expandfactors} || [map 0, @$childOrder]; # Resize behavior of the childs, defaults to all zeroes
         
 
         my $IDEpanedwindowConfig = $cw->cget(-IDEpanedwindowConfig);
@@ -679,7 +679,7 @@ sub menu{
 	my $menuFrame = $cw->Subwidget('menuFrame');
 
 	$menu->pack(-in => $menuFrame, -side => 'top', -fill => 'x', -expand => 0);	
-	$menu->raise(); # Raise needed, because menuFrame might have been created after menu, and it would obsure the menu
+	$menu->raise(); # Raise needed, because menuFrame might have been created after menu, and it would obscure the menu
 	
 }
 
@@ -700,7 +700,7 @@ sub statusLine{
 	my $statusLineFrame = $cw->Subwidget('statusLineFrame');
 
 	$statusLine->pack(-in => $statusLineFrame, -side => 'bottom', -expand => 'no', -fill => 'x', -anchor => 'sw');
-	$statusLine->raise(); # Raise needed, because statusLineFrame might have been created after statusLine, and it would obsure the menu
+	$statusLine->raise(); # Raise needed, because statusLineFrame might have been created after statusLine, and it would obscure the menu
 	
 }
 
@@ -721,7 +721,7 @@ sub toolbar{
 	my $toolbarFrame = $cw->Subwidget('toolbarFrame');
 
 	$toolbar->pack(-in => $toolbarFrame, -side => 'top', -fill => 'x', -expand => 0);	
-	$toolbar->raise(); # Raise needed, because Frame might have been created after widget, and it would obsure the widget
+	$toolbar->raise(); # Raise needed, because Frame might have been created after widget, and it would obscure the widget
 	
 	
 }
@@ -1052,7 +1052,7 @@ sub addWidgetAtSide{
 			}
 
 			my $childOrder    = $pAttr->{childOrder};
-			my $expandfactors = $pAttr->{expandfactors} || [map 0, @$childOrder]; # default expandFactors is all zereoes
+			my $expandfactors = $pAttr->{expandfactors} || [map 0, @$childOrder]; # default expandFactors is all zeroes
 
 			my $frameIndex;    # Frame index we are adding before/after
 
@@ -1223,7 +1223,7 @@ sub addWidgetAtSide{
 
         $self->adjustGeom if( $self->cget(-ResizeOnReconfig)); # Resize to requested width/height if ResizeOnConfig true
         
-        # Fix the Dropsites so that the IDELayout dropsite is allways last in the order
+        # Fix the Dropsites so that the IDELayout dropsite is always last in the order
         #   Otherwise, the background IDElayout dropsites will show up first before others
         #    (like the IDEtabFrame dropsites).
         my $DropSites = $self->toplevel->{DropSites}{Local};

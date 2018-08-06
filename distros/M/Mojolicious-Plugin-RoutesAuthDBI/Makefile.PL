@@ -28,6 +28,7 @@ WriteMakefile(
     },
     META_MERGE => {
       'meta-spec' => { version => 2 },
+      homepage   => 'https://github.com/mche',
       resources => {
         repository => {
           type => 'git',

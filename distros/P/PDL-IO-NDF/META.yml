@@ -4,23 +4,24 @@ author:
   - 'Tim Jenness <tjenness@cpan.org>'
   - 'Douglas Burke <dburke@cfa.harvard.edu>'
 build_requires:
-  Test::More: 0
-  Test::Number::Delta: 0
+  Test::More: '0'
+  Test::Number::Delta: '0'
 configure_requires:
-  Module::Build: 0.3
+  Module::Build: '0.3'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PDL-IO-NDF
 requires:
-  Astro::FITS::Header: 3
-  NDF: 1.51
+  Astro::FITS::Header: '3'
+  NDF: '1.51'
   PDL: v2.4.0
 resources:
-  homepage: http://github.com/timj/perl-PDL-IO-NDF/tree/master
+  homepage: http://github.com/Starlink/perl-PDL-IO-NDF/tree/master
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/timj/perl-PDL-IO-NDF.git
-version: 1.04
+  repository: git://github.com/Starlink/perl-PDL-IO-NDF.git
+version: '1.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

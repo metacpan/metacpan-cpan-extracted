@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Es::Any::Mx - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Mx;
 # This file auto generated from Data\common\main\es_MX.xml
-#	on Fri 13 Apr  7:08:37 am GMT
+#	on Sun  5 Aug  5:59:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -340,10 +340,6 @@ has 'units' => (
 						'one' => q({0} megavatio),
 						'other' => q({0} megavatios),
 					},
-					'microgram' => {
-						'one' => q({0} microgramo),
-						'other' => q({0} microgramos),
-					},
 					'micrometer' => {
 						'name' => q(micrometros),
 						'one' => q({0} micrometro),
@@ -451,10 +447,6 @@ has 'units' => (
 						'name' => q(c),
 						'one' => q({0} c),
 						'other' => q({0} c),
-					},
-					'celsius' => {
-						'one' => q({0} °C),
-						'other' => q({0} °C),
 					},
 					'cup' => {
 						'name' => q(tza.),
@@ -639,6 +631,13 @@ has 'currencies' => (
 		'SSP' => {
 			symbol => '£',
 		},
+		'STN' => {
+			display_name => {
+				'currency' => q(dobra santotomense),
+				'one' => q(dobra santotomense),
+				'other' => q(dobra santotomense),
+			},
+		},
 		'SYP' => {
 			symbol => '£',
 		},
@@ -792,49 +791,49 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 				}
 				last SWITCH;
 				}
@@ -854,34 +853,34 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'pm' => q{p. m.},
+					'am' => q{a. m.},
+				},
 				'wide' => {
 					'am' => q{a. m.},
 					'pm' => q{p. m.},
 				},
 				'narrow' => {
 					'morning2' => q{mañana},
-					'evening1' => q{de la tarde},
 					'night1' => q{de la noche},
 					'noon' => q{del mediodía},
+					'evening1' => q{de la tarde},
 					'morning1' => q{de la madrugada},
-				},
-				'abbreviated' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'am' => q{a. m.},
 					'pm' => q{p. m.},
+					'am' => q{a. m.},
 				},
 				'narrow' => {
-					'pm' => q{p. m.},
 					'am' => q{a. m.},
+					'pm' => q{p. m.},
 				},
 				'wide' => {
-					'am' => q{a. m.},
 					'pm' => q{p. m.},
+					'am' => q{a. m.},
 				},
 			},
 		},
@@ -955,8 +954,6 @@ has 'datetime_formats_available_formats' => (
 			GyMMMd => q{d MMM y G},
 			Hm => q{H:mm},
 			Hms => q{H:mm:ss},
-			Hmsv => q{H:mm:ss v},
-			Hmv => q{H:mm v},
 			MMMEd => q{E d 'de' MMM},
 			MMd => q{d/MM},
 			MMdd => q{dd/MM},

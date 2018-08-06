@@ -8,7 +8,7 @@ package Devel::MAT::Dumpfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Carp;
 use IO::Handle;   # ->read

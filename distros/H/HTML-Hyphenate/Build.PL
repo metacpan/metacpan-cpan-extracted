@@ -12,7 +12,7 @@ Module::Build->new(
         'Readonly'             => 1.03,
         'Set::Scalar'          => 0,
         'TeX::Hyphen'          => 0,
-        'TeX::Hyphen::Pattern' => 0,
+        'TeX::Hyphen::Pattern' => 0.100,
         'Moose'                => 0,
         'namespace::autoclean' => 0,
     },

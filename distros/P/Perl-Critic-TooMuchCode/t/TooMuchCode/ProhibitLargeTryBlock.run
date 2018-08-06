@@ -1,0 +1,31 @@
+## name Small Try block
+## failures 0
+## cut
+
+use Try::Tiny;
+try {
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+} or print 42;
+
+## name Try
+## failures 1
+## cut
+
+use Try::Tiny;
+try {
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+    print 42;
+} or print 42;

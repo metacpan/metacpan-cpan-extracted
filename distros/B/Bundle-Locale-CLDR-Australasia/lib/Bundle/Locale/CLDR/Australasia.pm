@@ -2,17 +2,19 @@ package Bundle::Locale::CLDR::Australasia;
 
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 =head1 NAME Bundle::Locale::CLDR::Australasia
 
 =head1 CONTENTS
 
-Locale::CLDR::Locales::En::Any 0.32.0
-Locale::CLDR::Locales::En::Any::Au 0.32.0
-Locale::CLDR::Locales::En::Any::Nf 0.32.0
-Locale::CLDR::Locales::En::Any::Nz 0.32.0
-Locale::CLDR::Locales::En::Any::001 0.32.0
+Locale::CLDR::Locales::En::Any 0.33.0
+Locale::CLDR::Locales::En::Any::Au 0.33.0
+Locale::CLDR::Locales::En::Any::Cc 0.33.0
+Locale::CLDR::Locales::En::Any::Cx 0.33.0
+Locale::CLDR::Locales::En::Any::Nf 0.33.0
+Locale::CLDR::Locales::En::Any::Nz 0.33.0
+Locale::CLDR::Locales::En::Any::001 0.33.0
 
 =cut
 

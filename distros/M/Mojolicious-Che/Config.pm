@@ -13,6 +13,9 @@
 
 Config.pm - Пример конфига для Mojolicious::Che приложения
 
+=head1 DESCRIPTION
+
+See raw this module content.
 
 =cut
 

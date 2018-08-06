@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Zh::Hant::Tw - Package for language Chinese
 
 package Locale::CLDR::Locales::Zh::Hant::Tw;
 # This file auto generated from Data\common\main\zh_Hant_TW.xml
-#	on Fri 13 Apr  7:38:03 am GMT
+#	on Sun  5 Aug  6:32:09 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

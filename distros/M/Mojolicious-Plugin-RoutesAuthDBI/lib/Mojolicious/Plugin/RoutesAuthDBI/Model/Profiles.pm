@@ -8,7 +8,8 @@ has [qw(roles auth_cookie)];
 #==========
 
 package Mojolicious::Plugin::RoutesAuthDBI::Model::Profiles;
-use Mojo::Base 'DBIx::Mojo::Model';
+#~ use Mojo::Base 'DBIx::Mojo::Model';
+use Mojo::Base 'Mojolicious::Plugin::RoutesAuthDBI::Model::Base';
 
 
 #~ has roles => sub {
@@ -17,9 +18,9 @@ use Mojo::Base 'DBIx::Mojo::Model';
   
 #~ };
 
-sub new {
-  state $self = shift->SUPER::new(@_);
-}
+#~ sub new {
+  #~ state $self = shift->SUPER::new(@_);
+#~ }
 
 sub get_profile {
   my $self = ref($_[0]) ? shift : shift->new;

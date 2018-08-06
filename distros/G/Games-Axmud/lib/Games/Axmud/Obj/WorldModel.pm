@@ -6994,7 +6994,7 @@
 
                 # If it's not a primary direction, then the new exit is drawn as 'unallocated' (and
                 #   this function call returns 'undef')
-                $standardDir = $session->currentDict->checkPrimaryDir($dir);
+                $standardDir = $session->currentDict->checkStandardDir($dir);
 
                 # Add a new incomplete exit, using what information we have
                 $exitObj = $self->addExit(

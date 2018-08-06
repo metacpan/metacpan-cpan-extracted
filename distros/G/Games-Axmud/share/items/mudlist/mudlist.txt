@@ -1,4 +1,4 @@
-# Axmud list of all worlds, created Fri Jun 8, 2018
+# Axmud list of all worlds, created Mon Jul 30, 2018
 
 Aabahran, The Forsaken Lands
 aabahran
@@ -481,7 +481,7 @@ avalonmud
 avalon.mud.de
 7777
 0
-English
+Deutsch
 
 Avalon: The Legend Lives
 avalonrpg
@@ -726,7 +726,7 @@ bylins
 bylins.su
 4000
 0
-Russian
+Russkiy
 
 Carinus
 carinus
@@ -1542,7 +1542,7 @@ English
 
 DuneMUD
 dunemud
-dune.servint.com
+dunemud.com
 6789
 0
 English
@@ -4511,7 +4511,7 @@ English
 Threshold RPG
 threshold
 thresholdrpg.com
-23
+3333
 0
 English
 
@@ -4610,6 +4610,13 @@ The Sea of Storms
 tsosmud
 tsosmud.org
 7070
+0
+English
+
+Tsunami
+tsunami
+tsunami.thebigwave.net
+23
 0
 English
 

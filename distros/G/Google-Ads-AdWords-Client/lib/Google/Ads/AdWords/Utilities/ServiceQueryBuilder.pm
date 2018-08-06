@@ -92,7 +92,7 @@ sub order_by {
 # Returns: This service query builder.
 sub limit {
   my ($self, $start_index, $page_size) = @_;
-  if ($start_index xor $page_size) {
+  if (defined($start_index) xor defined($page_size)) {
     $self->_log_error("Both start_index and page_size need to be set.");
   }
   if ($start_index < 0) {
@@ -130,10 +130,38 @@ sub build {
     ? sprintf(' ORDER BY %s', join(", ", @{$self->get_order_by()}))
     : '';
   $awql .=
-    ($self->get_start_index() and $self->get_page_size())
+    (defined($self->get_start_index()) and defined($self->get_page_size()))
     ? sprintf(' LIMIT %s, %s', $self->get_start_index(), $self->get_page_size())
     : '';
   return $awql;
+}
+
+# Checks if there is still a page left to query. This is used in conjunction
+# with next_page. The page_size is necessary when using DataService, as its
+# paging mechanism is different from other services. For details, see
+# https://developers.google.com/adwords/api/docs/guides/bid-landscapes#paging_through_results.
+# Returns 1 if there is a page left.
+sub has_next {
+  my ($self, $page, $total_entries) = @_;
+  if ($total_entries) {
+    return ($total_entries >= $self->get_page_size());
+  } else {
+    return (($self->get_start_index() + $self->get_page_size())
+        < $page->get_totalNumEntries());
+  }
+}
+
+# Sets the LIMIT clause of the AWQL to the next page.
+# This is meant to be used with HasNext().
+# The page_size is necessary when using DataService, as its paging mechanism
+# is different from other services. For details, see
+# https://developers.google.com/adwords/api/docs/guides/bid-landscapes#paging_through_results.
+sub next_page {
+  my ($self, $other_page_size) = @_;
+  my $current_page_size = ($other_page_size)
+      ? $other_page_size
+      : $self->get_page_size();
+  $self->set_start_index($self->get_start_index() + $current_page_size);
 }
 
 1;
@@ -253,5 +281,49 @@ Builds the AWQL query.
 =head3 Returns
 
 A string that is the AWQL query.
+
+=head2 has_next
+
+Checks if there is still a page left to query. This is used in conjunction
+with next_page. The page_size is necessary when using DataService, as its
+paging mechanism is different from other services. For details, see
+https://developers.google.com/adwords/api/docs/guides/bid-landscapes#paging_through_results.
+
+=head3 Parameters
+
+=over
+
+=item *
+
+The current page.
+
+=item *
+
+Optional: The total number of entries left.
+
+=back
+
+=head3 Returns
+
+Returns 1 if there is another page to process.
+
+=head2 next_page
+
+Sets the LIMIT clause of the AWQL to the next page.
+This is meant to be used with HasNext().
+The page_size is necessary when using DataService, as its paging mechanism
+is different from other services. For details, see
+https://developers.google.com/adwords/api/docs/guides/bid-landscapes#paging_through_results.
+
+=head3 Parameters
+
+=over
+
+=item *
+
+Optional: A different size in which to increment other than the current page
+size.
+
+=back
 
 =cut

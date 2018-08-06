@@ -1,3 +1,4 @@
+.travis.yml
 Build.PL
 Changes
 LICENSE
@@ -6,6 +7,7 @@ META.json
 META.yml
 README
 cpanfile
+lib/Perl/Critic/Policy/TooMuchCode/ProhibitLargeBlock.pm
 lib/Perl/Critic/Policy/TooMuchCode/ProhibitLargeTryBlock.pm
 lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnnecessaryUTF8Pragma.pm
 lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedConstant.pm
@@ -13,4 +15,10 @@ lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedImport.pm
 lib/Perl/Critic/Policy/TooMuchCode/ProhibitUnusedInclude.pm
 lib/Perl/Critic/TooMuchCode.pm
 metamerge.json
+t/TooMuchCode/ProhibitLargeBlock.run
+t/TooMuchCode/ProhibitLargeTryBlock.run
+t/TooMuchCode/ProhibitUnusedConstant.run
+t/TooMuchCode/ProhibitUnusedImport.run
+t/TooMuchCode/ProhibitUnusedInclude.run
+t/all.t
 t/require.t

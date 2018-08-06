@@ -1,6 +1,6 @@
 package SkewHeap;
 
-our $XS_VERSION = our $VERSION = '0.04';
+our $XS_VERSION = our $VERSION = '0.05';
 $VERSION =~ tr/_//;
 
 use strict;
@@ -15,18 +15,6 @@ use Exporter;
 use parent 'Exporter';
 
 our @EXPORT = qw(skewheap);
-
-sub skewheap (&) {
-  my $cmp  = shift;
-  my $heap = SkewHeap->new($cmp);
-  return $heap;
-}
-
-sub put {
-  my $self = shift;
-  $self->put_one($_) foreach @_;
-  $self->size;
-}
 
 =head1 NAME
 
@@ -49,7 +37,7 @@ SkewHeap - A fast and flexible heap structure
   $heap->take; # 62
   $heap->take; # 200
 
-  $heap->merge($other_skewheap);
+  my $merged_heap = $heap->merge($other_skewheap);
 
 =head1 DESCRIPTION
 
@@ -88,8 +76,7 @@ Removes and returns the next element from the heap.
 
 =head2 merge
 
-Destructively merges another heap into itself. After calling merge, the second
-heap is empty and the first holds all elements from both heaps.
+Non-destructively merges two heaps into a new heap. Returns the new heap.
 
 =head1 AUTHOR
 

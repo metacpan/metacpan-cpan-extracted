@@ -1,0 +1,50 @@
+{
+   "abstract" : "Website SSL accessibility validator",
+   "author" : [
+      "William Belle <william.belle@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "EPFL-Net-SSLTest",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::Protocol::https" : "6.06",
+            "LWP::UserAgent" : "6.34",
+            "Term::ANSIColor" : "4.06",
+            "WebService::SSLLabs" : "0.30"
+         }
+      }
+   },
+   "provides" : {
+      "EPFL::Net::SSLTest" : {
+         "file" : "lib/EPFL/Net/SSLTest.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/epfl-idevelop/epfl-net-sslTest"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

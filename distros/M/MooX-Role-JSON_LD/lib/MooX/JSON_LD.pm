@@ -107,10 +107,9 @@ use warnings;
 use Moo       ();
 use Moo::Role ();
 
-use List::Util qw/ any /;
 use Sub::Quote qw/ quote_sub /;
 
-our $VERSION = '0.0.13';
+our $VERSION = '0.0.15';
 
 my %Attributes;
 
@@ -171,17 +170,12 @@ sub _process_has {
         my $label  = delete $opts{json_ld};
         my $method = delete $opts{json_ld_serializer};
 
-        push @{ $Attributes{$class} },
-
-          {
-
+        push @{ $Attributes{$class} }, {
             $label eq "1" ? $name : $label => $method || $name
-
-          }
-
+        };
     }
 
-    ( $name, %opts );
+    return ( $name, %opts );
 }
 
 1;

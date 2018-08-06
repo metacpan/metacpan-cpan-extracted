@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ms::Any::Bn - Package for language Malay
 
 package Locale::CLDR::Locales::Ms::Any::Bn;
 # This file auto generated from Data\common\main\ms_BN.xml
-#	on Fri 13 Apr  7:20:38 am GMT
+#	on Sun  5 Aug  6:12:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -73,57 +73,57 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1400
-						&& $time < 1900;
-					return 'morning2' if $time >= 100
-						&& $time < 1200;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
+					return 'morning2' if $time >= 100
+						&& $time < 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 100;
+					return 'evening1' if $time >= 1400
+						&& $time < 1900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
 				}
 				if($day_period_type eq 'default') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'evening1' if $time >= 1400
 						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 100;
 					return 'morning2' if $time >= 100
 						&& $time < 1200;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning1' if $time >= 0
-						&& $time < 100;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1400
-						&& $time < 1900;
-					return 'morning2' if $time >= 100
-						&& $time < 1200;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
+					return 'morning2' if $time >= 100
+						&& $time < 1200;
 					return 'morning1' if $time >= 0
 						&& $time < 100;
+					return 'evening1' if $time >= 1400
+						&& $time < 1900;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1400;
 				}
 				if($day_period_type eq 'default') {
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1400;
 					return 'evening1' if $time >= 1400
 						&& $time < 1900;
+					return 'morning1' if $time >= 0
+						&& $time < 100;
 					return 'morning2' if $time >= 100
 						&& $time < 1200;
 					return 'night1' if $time >= 1900
 						&& $time < 2400;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1400;
-					return 'morning1' if $time >= 0
-						&& $time < 100;
 				}
 				last SWITCH;
 				}

@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::SQL::Schema::Versioned" => 0,
     "Test::WithDB" => "0.100"
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }

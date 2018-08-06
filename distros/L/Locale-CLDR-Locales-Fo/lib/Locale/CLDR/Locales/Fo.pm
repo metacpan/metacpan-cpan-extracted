@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Fo - Package for language Faroese
 
 package Locale::CLDR::Locales::Fo;
 # This file auto generated from Data\common\main\fo.xml
-#	on Fri 13 Apr  7:10:15 am GMT
+#	on Sun  5 Aug  6:01:03 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -643,7 +643,7 @@ has 'display_name_language' => (
  				'bin' => 'bini',
  				'bla' => 'siksika',
  				'bm' => 'bambara',
- 				'bn' => 'bengalskt',
+ 				'bn' => 'bangla',
  				'bo' => 'tibetskt',
  				'br' => 'bretonskt',
  				'brx' => 'bodo',
@@ -730,7 +730,7 @@ has 'display_name_language' => (
  				'hr' => 'kroatiskt',
  				'hsb' => 'ovara sorbian',
  				'hsn' => 'xiang kinesiskt',
- 				'ht' => 'haitiskt',
+ 				'ht' => 'haitiskt creole',
  				'hu' => 'ungarskt',
  				'hup' => 'hupa',
  				'hy' => 'armenskt',
@@ -873,7 +873,7 @@ has 'display_name_language' => (
  				'nyn' => 'nyankole',
  				'oc' => 'occitanskt',
  				'om' => 'oromo',
- 				'or' => 'oriya',
+ 				'or' => 'odia',
  				'os' => 'ossetiskt',
  				'pa' => 'punjabi',
  				'pag' => 'pangasinan',
@@ -1024,7 +1024,7 @@ has 'display_name_script' => (
 			my %scripts = (
 			'Arab' => 'arabisk',
  			'Armn' => 'armenskt',
- 			'Beng' => 'bengali',
+ 			'Beng' => 'bangla',
  			'Bopo' => 'bopomofo',
  			'Brai' => 'blindaskrift',
  			'Cyrl' => 'kyrilliskt',
@@ -1055,7 +1055,7 @@ has 'display_name_script' => (
  			'Mlym' => 'malayalam',
  			'Mong' => 'mongolsk',
  			'Mymr' => 'myanmarskt',
- 			'Orya' => 'oriya',
+ 			'Orya' => 'odia',
  			'Sinh' => 'sinhala',
  			'Taml' => 'tamilskt',
  			'Telu' => 'telugu',
@@ -1114,6 +1114,7 @@ has 'display_name_region' => (
  			'151' => 'Eysturevropa',
  			'154' => 'Norðurevropa',
  			'155' => 'Vesturevropa',
+ 			'202' => 'Afrika sunnanfyri Sahara',
  			'419' => 'Latínamerika',
  			'AC' => 'Ascension',
  			'AD' => 'Andorra',
@@ -1141,7 +1142,7 @@ has 'display_name_region' => (
  			'BH' => 'Barein',
  			'BI' => 'Burundi',
  			'BJ' => 'Benin',
- 			'BL' => 'St-Barthélemy',
+ 			'BL' => 'St. Barthélemy',
  			'BM' => 'Bermuda',
  			'BN' => 'Brunei',
  			'BO' => 'Bolivia',
@@ -1180,7 +1181,7 @@ has 'display_name_region' => (
  			'DM' => 'Dominika',
  			'DO' => 'Dominikalýðveldið',
  			'DZ' => 'Algeria',
- 			'EA' => 'Ceuta og Melilla',
+ 			'EA' => 'Ceuta & Melilla',
  			'EC' => 'Ekvador',
  			'EE' => 'Estland',
  			'EG' => 'Egyptaland',
@@ -1193,6 +1194,7 @@ has 'display_name_region' => (
  			'FI' => 'Finnland',
  			'FJ' => 'Fiji',
  			'FK' => 'Falklandsoyggjar',
+ 			'FK@alt=variant' => 'Falklandsoyggjar (Islas Malvinas)',
  			'FM' => 'Mikronesiasamveldið',
  			'FO' => 'Føroyar',
  			'FR' => 'Frakland',
@@ -1305,7 +1307,7 @@ has 'display_name_region' => (
  			'PH' => 'Filipsoyggjar',
  			'PK' => 'Pakistan',
  			'PL' => 'Pólland',
- 			'PM' => 'Saint Pierre og Miquelon',
+ 			'PM' => 'Saint Pierre & Miquelon',
  			'PN' => 'Pitcairnoyggjar',
  			'PR' => 'Puerto Riko',
  			'PS' => 'Palestinskt landøki',
@@ -1471,7 +1473,7 @@ has 'display_name_type' => (
  				'arabext' => q{víðkað arabisk tøl},
  				'armn' => q{armensk tøl},
  				'armnlow' => q{armensk tøl (smáir bókstavir)},
- 				'beng' => q{bengalisk tøl},
+ 				'beng' => q{bangla tøl},
  				'deva' => q{devanagarik tøl},
  				'ethi' => q{etiopisk tøl},
  				'fullwide' => q{tøl í fullari longd},
@@ -1494,7 +1496,7 @@ has 'display_name_type' => (
  				'latn' => q{vesturlendsk tøl},
  				'mlym' => q{malayalam tøl},
  				'mymr' => q{myanmarsk tøl},
- 				'orya' => q{oriya tøl},
+ 				'orya' => q{odia tøl},
  				'roman' => q{rómartøl},
  				'romanlow' => q{rómartøl (smáir bókstavir)},
  				'taml' => q{vanlig tamilsk tøl},
@@ -3708,6 +3710,14 @@ has 'currencies' => (
 				'other' => q(Kili peso),
 			},
 		},
+		'CNH' => {
+			symbol => 'CNH',
+			display_name => {
+				'currency' => q(kinesiskur yuan \(úr landi\)),
+				'one' => q(kinesiskur yuan \(úr landi\)),
+				'other' => q(kinesiskur yuan \(úr landi\)),
+			},
+		},
 		'CNY' => {
 			symbol => 'CN¥',
 			display_name => {
@@ -3959,9 +3969,9 @@ has 'currencies' => (
 		'ILS' => {
 			symbol => '₪',
 			display_name => {
-				'currency' => q(Ísrael new sheqel),
-				'one' => q(Ísrael new sheqel),
-				'other' => q(Ísrael new sheqel),
+				'currency' => q(Ísrael new shekel),
+				'one' => q(Ísrael new shekel),
+				'other' => q(Ísrael new shekel),
 			},
 		},
 		'INR' => {
@@ -4190,6 +4200,13 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			symbol => 'MRO',
+			display_name => {
+				'currency' => q(Móritania ouguiya \(1973–2017\)),
+				'one' => q(Móritania ouguiya \(1973–2017\)),
+				'other' => q(Móritania ouguiya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
 			display_name => {
 				'currency' => q(Móritania ouguiya),
 				'one' => q(Móritania ouguiya),
@@ -4486,6 +4503,14 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(Sao Tome & Prinsipi dobra \(1977–2017\)),
+				'one' => q(Sao Tome & Prinsipi dobra \(1977–2017\)),
+				'other' => q(Sao Tome & Prinsipi dobra \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'STN',
 			display_name => {
 				'currency' => q(Sao Tome & Prinsipi dobra),
 				'one' => q(Sao Tome & Prinsipi dobra),
@@ -5013,28 +5038,28 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'narrow' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
 				'wide' => {
 					'pm' => q{PM},
 					'am' => q{AM},
-				},
-				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
 				'wide' => {
-					'am' => q{AM},
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 				'narrow' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
+				'abbreviated' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
@@ -5128,54 +5153,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{E d.},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E d. MMM y G},
-			GyMMMd => q{d. MMM y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{LL},
-			MEd => q{E dd.MM},
-			MMM => q{LLL},
-			MMMEd => q{E d. MMM},
-			MMMMW => q{W. 'vika' 'í' MMM},
-			MMMMd => q{d. MMMM},
-			MMMd => q{d. MMM},
-			Md => q{dd.MM},
-			d => q{d.},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{MM.y},
-			yMEd => q{E dd.MM.y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E d. MMM y},
-			yMMMM => q{MMMM y},
-			yMMMd => q{d. MMM y},
-			yMd => q{dd.MM.y},
-			yQQQ => q{QQQ 'í' y},
-			yQQQQ => q{QQQQ 'í' y},
-			yw => q{w. 'vika' 'í' Y},
-		},
 		'generic' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -5227,6 +5204,54 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{QQQ 'í' y G},
 			yyyyQQQQ => q{QQQQ 'í' y G},
 		},
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{E d.},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E d. MMM y G},
+			GyMMMd => q{d. MMM y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{LL},
+			MEd => q{E dd.MM},
+			MMM => q{LLL},
+			MMMEd => q{E d. MMM},
+			MMMMW => q{W. 'vika' 'í' MMM},
+			MMMMd => q{d. MMMM},
+			MMMd => q{d. MMM},
+			Md => q{dd.MM},
+			d => q{d.},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{MM.y},
+			yMEd => q{E dd.MM.y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E d. MMM y},
+			yMMMM => q{MMMM y},
+			yMMMd => q{d. MMM y},
+			yMd => q{dd.MM.y},
+			yQQQ => q{QQQ 'í' y},
+			yQQQQ => q{QQQQ 'í' y},
+			yw => q{w. 'vika' 'í' Y},
+		},
 	} },
 );
 
@@ -5246,101 +5271,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{E dd.MM–E dd.MM},
-				d => q{E dd.MM–E dd.MM},
-			},
-			MMM => {
-				M => q{MMM–MMM},
-			},
-			MMMEd => {
-				M => q{E d. MMM–E d. MMM},
-				d => q{E d. MMM–E d. MMM},
-			},
-			MMMd => {
-				M => q{d. MMM–d. MMM},
-				d => q{d.–d. MMM},
-			},
-			Md => {
-				M => q{dd.MM–dd.MM},
-				d => q{dd.MM–dd.MM},
-			},
-			d => {
-				d => q{d.–d.},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a–h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a–h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a–h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a–h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
-			yM => {
-				M => q{MM.y–MM.y},
-				y => q{MM.y–MM.y},
-			},
-			yMEd => {
-				M => q{E dd.MM.y–E dd.MM.y},
-				d => q{E dd.MM.y–E dd.MM.y},
-				y => q{E dd.MM.y–E dd.MM.y},
-			},
-			yMMM => {
-				M => q{MMM–MMM y},
-				y => q{MMM y–MMM y},
-			},
-			yMMMEd => {
-				M => q{E dd. MMM–E dd. MMM y},
-				d => q{E dd. MMM–E dd. MMM y},
-				y => q{E dd. MMM y–E dd. MMM y},
-			},
-			yMMMM => {
-				M => q{MMMM–MMMM y},
-				y => q{MMMM y–MMMM y},
-			},
-			yMMMd => {
-				M => q{dd. MMM–dd. MMM y},
-				d => q{d.–d. MMM y},
-				y => q{dd. MMM y–dd. MMM y},
-			},
-			yMd => {
-				M => q{dd.MM.y–dd.MM.y},
-				d => q{dd.MM.y–dd.MM.y},
-				y => q{dd.MM.y–dd.MM.y},
-			},
-		},
 		'generic' => {
 			H => {
 				H => q{HH–HH},
@@ -5434,6 +5364,101 @@ has 'datetime_formats_interval' => (
 				M => q{dd.MM.y–dd.MM.y GGGGG},
 				d => q{dd.MM.y–dd.MM.y GGGGG},
 				y => q{dd.MM.y–dd.MM.y GGGGG},
+			},
+		},
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{E dd.MM–E dd.MM},
+				d => q{E dd.MM–E dd.MM},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E d. MMM–E d. MMM},
+				d => q{E d. MMM–E d. MMM},
+			},
+			MMMd => {
+				M => q{d. MMM–d. MMM},
+				d => q{d.–d. MMM},
+			},
+			Md => {
+				M => q{dd.MM–dd.MM},
+				d => q{dd.MM–dd.MM},
+			},
+			d => {
+				d => q{d.–d.},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a–h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a–h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a–h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a–h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yM => {
+				M => q{MM.y–MM.y},
+				y => q{MM.y–MM.y},
+			},
+			yMEd => {
+				M => q{E dd.MM.y–E dd.MM.y},
+				d => q{E dd.MM.y–E dd.MM.y},
+				y => q{E dd.MM.y–E dd.MM.y},
+			},
+			yMMM => {
+				M => q{MMM–MMM y},
+				y => q{MMM y–MMM y},
+			},
+			yMMMEd => {
+				M => q{E dd. MMM–E dd. MMM y},
+				d => q{E dd. MMM–E dd. MMM y},
+				y => q{E dd. MMM y–E dd. MMM y},
+			},
+			yMMMM => {
+				M => q{MMMM–MMMM y},
+				y => q{MMMM y–MMMM y},
+			},
+			yMMMd => {
+				M => q{dd. MMM–dd. MMM y},
+				d => q{d.–d. MMM y},
+				y => q{dd. MMM y–dd. MMM y},
+			},
+			yMd => {
+				M => q{dd.MM.y–dd.MM.y},
+				d => q{dd.MM.y–dd.MM.y},
+				y => q{dd.MM.y–dd.MM.y},
 			},
 		},
 	} },
@@ -5601,7 +5626,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Porto-Novo#,
 		},
 		'Africa/Sao_Tome' => {
-			exemplarCity => q#Sao Tome#,
+			exemplarCity => q#São Tomé#,
 		},
 		'Africa/Tripoli' => {
 			exemplarCity => q#Tripoli#,
@@ -6844,7 +6869,7 @@ has 'time_zone_names' => (
 			exemplarCity => q#Ulyanovsk#,
 		},
 		'Europe/Uzhgorod' => {
-			exemplarCity => q#Uzhgorod#,
+			exemplarCity => q#Uzhhorod#,
 		},
 		'Europe/Vaduz' => {
 			exemplarCity => q#Vaduz#,

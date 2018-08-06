@@ -1,5 +1,13 @@
 Revision history for perl distribution Mojo-Redis
 
+3.08 2018-08-02T15:37:32+0800
+ - Add benchmark test #3
+ - Fix cache() need to use Protocol::Redis because of binary data
+ - Fix GEOPOS return value
+ - Fix only decode response data if defined #19
+ - Fix do not create new connection objects during global destruction
+ - Improved return values in documentation
+
 3.07 2018-07-12T09:59:05+0800
  - Add support for sending custom commands #18
  - Fix documentation issues

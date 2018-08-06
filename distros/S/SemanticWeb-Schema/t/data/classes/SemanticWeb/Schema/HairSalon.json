@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A hair salon.",
+      "rdfs:label" : "HairSalon",
+      "rdfs:subClassOf" : "schema:HealthAndBeautyBusiness"
+   },
+   "properties" : {}
+}

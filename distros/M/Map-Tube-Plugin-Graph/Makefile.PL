@@ -25,15 +25,16 @@ WriteMakefile(
         'File::Temp'           => '0.2304',
         'MIME::Base64'         => '3.14',
         'Graphics::ColorNames' => '2.11',
-        'Map::Tube::Exception' => '3.14',
+        'Map::Tube'            => '3.54',
+        'Map::Tube::Exception' => '3.17',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Map-Tube-Plugin-Graph-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Map::Tube::Plugin::Graph'        => { file => 'lib/Map/Tube/Plugin/Graph.pm',       version => '0.31' },
-            'Map::Tube::Plugin::Graph::Utils' => { file => 'lib/Map/Tube/Plugin/Graph/Utils.pm', version => '0.31' },
+            'Map::Tube::Plugin::Graph'        => { file => 'lib/Map/Tube/Plugin/Graph.pm',       version => '0.32' },
+            'Map::Tube::Plugin::Graph::Utils' => { file => 'lib/Map/Tube/Plugin/Graph/Utils.pm', version => '0.32' },
         },
         resources => {
             repository => {

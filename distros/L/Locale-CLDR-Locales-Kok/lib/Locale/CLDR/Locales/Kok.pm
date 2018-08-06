@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Kok - Package for language Konkani
 
 package Locale::CLDR::Locales::Kok;
 # This file auto generated from Data\common\main\kok.xml
-#	on Fri 13 Apr  7:17:22 am GMT
+#	on Sun  5 Aug  6:09:00 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1494,30 +1494,30 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{म.पू.},
 					'pm' => q{म.नं.},
+					'am' => q{म.पू.},
 				},
 				'narrow' => {
-					'am' => q{म.पू.},
 					'pm' => q{म.नं.},
+					'am' => q{म.पू.},
 				},
 				'wide' => {
-					'pm' => q{म.नं.},
 					'am' => q{म.पू.},
+					'pm' => q{म.नं.},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{म.पू.},
 					'pm' => q{म.नं.},
+				},
+				'wide' => {
+					'pm' => q{म.नं.},
+					'am' => q{म.पू.},
 				},
 				'narrow' => {
 					'am' => q{म.पू.},
 					'pm' => q{म.नं.},
-				},
-				'abbreviated' => {
-					'pm' => q{म.नं.},
-					'am' => q{म.पू.},
 				},
 			},
 		},
@@ -1651,7 +1651,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{y-MM-dd},
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
-			yw => q{'week' w 'of' Y},
+			yw => q{'week' w 'of' y},
 		},
 	} },
 );
@@ -1672,9 +1672,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			fallback => '{0} – {1}',
-		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -1769,6 +1766,9 @@ has 'datetime_formats_interval' => (
 				d => q{dd-MM-y – dd-MM-y},
 				y => q{dd-MM-y – dd-MM-y},
 			},
+		},
+		'generic' => {
+			fallback => '{0} – {1}',
 		},
 	} },
 );

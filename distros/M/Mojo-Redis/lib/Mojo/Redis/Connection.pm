@@ -121,21 +121,39 @@ sub _parse_message_cb {
   return sub {
     my ($protocol, @messages) = @_;
     my $encoding = $self->encoding;
-    my (@res, @err);
-
     $self->_write;
 
-    while (@messages) {
-      my ($type, $data) = @{shift(@messages)}{qw(type data)};
-      if    ($type eq '-') { push @err, $data }
-      elsif ($type eq ':') { push @res, 0 + $data }
-      elsif ($type eq '*' and ref $data) { push @messages, @$data }
-      else                               { push @res,      $encoding ? Mojo::Util::decode($encoding, $data) : $data }
-    }
+    my $unpack;
+    $unpack = sub {
+      my @res;
 
+      while (my $m = shift @_) {
+        if ($m->{type} eq '-') {
+          return $m->{data}, undef;
+        }
+        elsif ($m->{type} eq ':') {
+          push @res, 0 + $m->{data};
+        }
+        elsif ($m->{type} eq '*' and ref $m->{data} eq 'ARRAY') {
+          my ($err, $res) = $unpack->(@{$m->{data}});
+          return $err if defined $err;
+          push @res, $res;
+        }
+        elsif ($encoding and defined $m->{data}) {
+          push @res, Mojo::Util::decode($encoding, $m->{data});
+        }
+        else {
+          push @res, $m->{data};
+        }
+      }
+
+      return undef, \@res;
+    };
+
+    my ($err, $res) = $unpack->(@messages);
     my $p = shift @{$self->{waiting} || []};
-    return $p ? $p->reject(@err) : $self->emit(error => @err) if @err;
-    return $p ? $p->resolve(@res) : $self->emit(response => @res);
+    return $p ? $p->reject($err) : $self->emit(error => $err) unless $res;
+    return $p ? $p->resolve($res->[0]) : $self->emit(response => $res->[0]);
   };
 }
 

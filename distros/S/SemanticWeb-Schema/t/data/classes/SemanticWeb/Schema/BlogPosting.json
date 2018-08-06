@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A blog post.",
+      "rdfs:label" : "BlogPosting",
+      "rdfs:subClassOf" : "schema:SocialMediaPosting"
+   },
+   "properties" : {}
+}

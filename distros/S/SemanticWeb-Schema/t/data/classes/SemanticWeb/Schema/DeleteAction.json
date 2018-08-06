@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of editing a recipient by removing one of its objects.",
+      "rdfs:label" : "DeleteAction",
+      "rdfs:subClassOf" : "schema:UpdateAction"
+   },
+   "properties" : {}
+}

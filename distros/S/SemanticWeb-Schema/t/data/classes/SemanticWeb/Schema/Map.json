@@ -1,0 +1,17 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A map.",
+      "rdfs:label" : "Map",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:mapType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates the kind of Map, from the MapCategoryType Enumeration.",
+         "rdfs:label" : "mapType",
+         "schema:domainIncludes" : "schema:Map",
+         "schema:rangeIncludes" : "schema:MapCategoryType"
+      }
+   }
+}

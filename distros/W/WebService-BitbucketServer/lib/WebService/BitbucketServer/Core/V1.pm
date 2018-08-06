@@ -6,7 +6,7 @@ package WebService::BitbucketServer::Core::V1;
 use warnings;
 use strict;
 
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 use Moo;
 use namespace::clean;
@@ -1717,7 +1717,7 @@ WebService::BitbucketServer::Core::V1 - Bindings for a Bitbucket Server REST API
 
 =head1 VERSION
 
-version 0.604
+version 0.605
 
 =head1 SYNOPSIS
 
@@ -3890,7 +3890,8 @@ Update the project matching the B<<< projectKey >>> supplied in the resource pat
 To include a custom avatar for the updated project, the project definition should contain an additional attribute
 with the key C<<< avatar >>> and the value a data URI containing Base64-encoded image data. The URI should be
 in the following format:
-C<<<data:(content type, e.g. image/png);base64,(data)
+C<<<
+data:(content type, e.g. image/png);base64,(data)
  >>>
 If the data is not Base64-encoded, or if a character set is defined in the URI, or the URI is otherwise invalid,
 I<<< project creation will fail >>>.

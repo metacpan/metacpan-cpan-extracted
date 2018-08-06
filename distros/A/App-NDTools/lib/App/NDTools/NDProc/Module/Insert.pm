@@ -9,7 +9,7 @@ use Scalar::Util qw(looks_like_number);
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path);
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub MODINFO { "Insert value into structure" }
 
@@ -51,6 +51,8 @@ sub check_rule {
         log_error { "Value to insert should be defined" };
         $out = undef;
     }
+
+    push @{$rule->{path}}, '' unless (@{$rule->{path}});
 
     return $out;
 }

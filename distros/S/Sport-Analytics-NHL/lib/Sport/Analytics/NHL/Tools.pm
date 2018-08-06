@@ -184,6 +184,8 @@ our @EXPORT = qw(
 	arrange_schedule_by_date convert_schedule_game read_schedules
 	read_existing_game_ids get_game_path_from_id
 	vocabulary_lookup normalize_penalty
+	is_noplay_event
+	set_roster_positions set_player_stat fix_playergoals
 	print_events
 );
 
@@ -346,8 +348,6 @@ sub convert_old_schedule_game ($) {
 		"%04d%d%04d",$game->{season},$game->{stage},$game->{season_id}
 	)+0;
 	$game->{date}      = strftime("%Y%m%d", localtime($game->{ts}))+0;
-	#use Data::Dumper;
-	#print Dumper $game;
 	$game;
 }
 
@@ -488,7 +488,7 @@ Returns: the path (creates it if necessary)
 sub get_game_path_from_id ($;$) {
 
 	my $id       = shift;
-	my $data_dir = shift;
+	my $data_dir = shift || $ENV{HOCKEYDB_DATA_DIR} || $DATA_DIR;
 
 	my $game = parse_our_game_id($id);
 	make_game_path($game->{season}, $game->{stage}, $game->{season_id}, $data_dir);
@@ -567,15 +567,12 @@ sub vocabulary_lookup ($$) {
 	$string =~ s/^\s+//;
 	$string =~ s/\s+$//;
 	$string = uc $string;
-	#print "resolving $string\n";
 	return $string if $VOCABULARY{$vocabulary}->{$string};
 	for my $word (keys %{$VOCABULARY{$vocabulary}}) {
 		my $alternatives = $VOCABULARY{$vocabulary}->{$word};
 		if (any {
-			#print "!$string!-!$_!\n";
 			$string eq $_
 		} @{$alternatives}) {
-#			print "resolved to $word\n";
 			return $word;
 		}
 	}
@@ -602,10 +599,139 @@ sub normalize_penalty ($) {
 	$penalty =~ s/(\- obstruction)//i;
 	$penalty =~ s/(\-\s*bench\b)//i;
 	$penalty =~ s/(PS \- )//i;
-	#print Dumper $ld_event->{result}{secondaryType};
 	vocabulary_lookup('penalty', $penalty);
 
 }
+
+=over 2
+
+=item C<set_roster_positions>
+
+Prepares a hash with positions of each player id in the boxscore for future caching and resolving purposes.
+
+Arguments: the boxscore
+Returns: the positions hash.
+
+=back
+
+=cut
+
+sub set_roster_positions ($) {
+
+	my $boxscore = shift;
+	my $positions = {};
+
+	for my $t (0,1) {
+		my $team = $boxscore->{teams}[$t];
+		for my $player (@{$team->{roster}}) {
+			$positions->{$player->{_id}} = $player->{position};
+		}
+	}
+	$positions;
+}
+
+=over 2
+
+=item C<set_player_stat>
+
+A testing helper that sets the player stats the way they seem to appear in the event summary rather than in the boxscore, or finds a way to arbitrate the discrepancies.
+
+Arguments:
+ * The boxscore
+ * The NHL id of the player being fixed
+ * The stat to fix
+ * The value of the stat in the event summary
+ * The possible arbitration delta
+
+Returns: void. The boxscore is updated.
+
+=back
+
+=cut
+
+sub set_player_stat ($$$$;$) {
+
+	my $boxscore  = shift;
+	my $player_id = shift;
+	my $stat      = shift;
+	my $value     = shift;
+	my $delta     = shift || 0;
+
+	for my $t (0,1) {
+		for my $player (@{$boxscore->{teams}[$t]{roster}}) {
+			if ($player->{_id} == $player_id) {
+				if ($stat eq 'goalsAgainst' && defined $player->{saves}) {
+					$player->{saves} = $player->{shots} - $value;
+					debug "Setting $player->{_id} $stat to $value";
+					$player->{$stat} = $value;
+				}
+				elsif ($stat eq 'penaltyMinutes') {
+					if($delta) {
+						debug "Setting $player->{_id} $stat to $value+$delta";
+						$player->{$stat} = $delta;
+					}
+				}
+				elsif (defined $player->{$stat}) {
+					debug "Setting $player->{_id} $stat to $value";
+					$player->{$stat} = $value;
+				}
+				return;
+			}
+		}
+	}
+	die "Couldn't find $player_id / $stat\n";
+	1;
+}
+
+=over 2
+
+=item C<fix_playergoals>
+
+Fixes the number of goals and assists for players in the boxscore as shown by the summary.
+
+Arguments:
+ * The boxscore
+ * The index of the team of the player (0 - away, 1 - home)
+ * The event summary
+
+Returns: void. Boxscore is modified.
+
+=back
+
+=cut
+
+sub fix_playergoals ($$$) {
+
+	my $boxscore      = shift;
+	my $t             = shift;
+	my $event_summary = shift;
+
+	for my $player (@{$boxscore->{teams}[$t]{roster}}) {
+		if (my $es = $event_summary->{$player->{_id}}) {
+			$player->{goals} = $es->{goals};
+			$player->{assists} = $es->{assists};
+		}
+	}
+}
+
+=over 2
+
+=item C<is_noplay_event>
+
+Check if the event is not a played one (PEND, GEND, PSTR, STOP)
+
+=back
+
+=cut
+
+sub is_noplay_event ($) {
+	my $event = shift;
+
+        $event->{type} eq 'PEND'    || $event->{type} eq 'PSTR'
+        || $event->{type} eq 'GEND' || $event->{type} eq 'STOP';
+}
+
+
 
 =over 2
 
@@ -622,7 +748,7 @@ sub print_events ($) {
 	my $events = shift;
 
 	for (@{$events}) {
-		print "$_->{bsjs_id}\t$_->{t}\t$_->{ts}\t$_->{type}\n";
+		print "$_->{period}\t$_->{t}\t$_->{ts}\t$_->{type}\n";
 	}
 }
 

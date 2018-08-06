@@ -1,15 +1,15 @@
 
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for release candidate testing');
+    print qq{1..0 # SKIP these tests are for release candidate testing\n};
+    exit
   }
 }
 
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::PAUSE::Permissions 0.002
+# this test was generated with Dist::Zilla::Plugin::Test::PAUSE::Permissions 0.003
 
 use Test::More;
 BEGIN {

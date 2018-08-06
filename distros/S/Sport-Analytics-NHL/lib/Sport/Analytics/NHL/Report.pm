@@ -302,7 +302,6 @@ sub html_new ($$) {
 		}
 		$self->{html} = $tb->{_body};
 	}
-	#$args->{data} =~ s/\s+/ /g;
 	$self->{source} = $args->{data};
 	$self->{type}   = $args->{type};
 	bless $self, $class;
@@ -459,16 +458,12 @@ sub read_team ($$$$) {
 	if (ref $name && $self->{old}) {
 		$name = $self->get_sub_tree(0, [0,0,5], $cell);
 	}
-	#my $c = 2 - (scalar(@{$self->{head}})-1)*(1-$idx)
-	#		+ $idx*$self->{gs}/2-(scalar(@{$self->{head}})-1)*2*$idx;
 	my $score = $self->{old} ?
 		$self->get_sub_tree(0, [
 			2 - (scalar(@{$self->{head}})-1)*(1-$idx)
 			+ $idx*($self->{gs}-5)-(scalar(@{$self->{head}})-1)*2*$idx,
 			,0,0
 		], $cell->{_parent}) : $self->get_sub_tree(0, [1,0,0,0,1,0], $cell);
-	#my $sc = 2+5*$idx+($self->{gs}==12);
-	#print Dumper $cell;
 	$score = $self->get_sub_tree(0, [2+5*$idx+($self->{gs}>=12)*(1-$idx),0,0], $cell->{_parent}) if $score !~ /^\d{1,2}\s*$/;
 	$score = $self->get_sub_tree(0, [9,0,0], $cell->{_parent}) if !defined $score || $score !~ /^\d{1,2}\s*$/;
 	if (!defined $score || $score !~ /^\s*\d{1,2}\s*$/) {
@@ -536,7 +531,6 @@ sub read_header ($) {
 			$offset = $i + $i*$self->{old}*$gameinfo_size/2 + $self->{old}*(1-2*$i);
 			$offset += 1-$i if $gameinfo_size == 12;
 			$offset += 1-$i if $gameinfo_size == 14;
-			#			print "i $i OS $offset\n";
 			$cell = $self->get_sub_tree(0, [ $self->{old} ? $offset : ($offset, 0), ], $gameinfo_row);
 		}
 		($i % 2) ? $self->read_status($cell) : $self->read_team($cell, $i / 2);
@@ -620,7 +614,6 @@ sub force_decision ($$) {
 	my @goalies = sort {
 		get_seconds($b->{timeOnIce}) <=>  get_seconds($a->{timeOnIce})
 	} grep { $_->{position} eq 'G' } @{$team->{roster}};
-	#print Dumper $self->{goalies};
 	my $goalie = $goalies[0];
 	if ($self->{_score}[0] == $self->{_score}[1]) {
 		$goalie->{decision} = 'T';
@@ -671,21 +664,14 @@ sub set_event_extra_data ($) {
 		$event->{game_id} = delete $event->{game} if $event->{game};
 		$event->{player1} ||= $BENCH_PLAYER_ID if ($event->{penalty});
 		my $t = -1;
-#		print Dumper $event;
 		if ($event->{team1}) {
-#			print Dumper $event;
 			$event->{team1} = resolve_team($event->{team1}) if
 				$event->{team1} ne 'OTH';
-			$t =
-				$event->{team1} eq $self->{teams}[0]{name} ? 0 :
-					$event->{team1} eq $self->{teams}[1]{name} ? 1 : -1;
-#			print Dumper [
-#				$event->{description},
-#				$event->{team1},
-#				$self->{teams}[0]{name},
-#				$self->{teams}[1]{name},
-#				$t,
-#			];
+			$t = $event->{team1} eq $self->{teams}[0]{name}
+				? 0
+				: $event->{team1} eq $self->{teams}[1]{name}
+				? 1
+				: -1;
 		}
 		$event->{team2} = resolve_team($event->{team2}) if $event->{team2} && $event->{team2} ne 'OTH';
 		$event->{t} = $t;

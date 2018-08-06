@@ -4,6 +4,10 @@
 #include "util.h"
 #include "tables.h"
 
+#ifdef WIN32		/* Need WIN32_FIND_DATA etc */
+#include <windows.h>
+#endif
+
 /* From tables.c */
 int
 lookup_table(tbl, find_token)

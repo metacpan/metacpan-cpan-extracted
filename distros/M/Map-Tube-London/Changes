@@ -1,5 +1,11 @@
 Revision history for Map::Tube::London
 
+1.15  2018-08-05
+      - Updated map for line DLR with different bgcolor.
+
+1.14  2018-08-03
+      - Updated dependency on Map::Tube v3.54.
+
 1.13  2018-07-29
       - Updated section NOTE for the line "DLR".
 

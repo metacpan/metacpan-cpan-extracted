@@ -1,5 +1,26 @@
 Revision history for Perl distribution Filter-Crypto
 
+2.08 2018-07-31
+
+    - Dropped use of RAND_screen() on Windows for OpenSSL 1.1.0 onwards since it
+      is now marked as deprecated.
+
+    - Further improved compatibility with OpenSSL 1.1.0 on Windows by always
+      linking against crypt32.lib, which is now required for static builds of
+      OpenSSL on Windows (unless the no-capieng build option was used).
+
+    - Improved compatibility with OpenSSL 1.1.0 by changing Newxz()/Safefree()
+      to EVP_CIPHER_CTX_new()/EVP_CIPHER_CTX_free().  These functions for opaque
+      EVP_CIPHER_CTX handling were added in OpenSSL 0.9.8b, but their use now
+      seems to be necessary on some systems.  [kmx, CPAN RT#121970]
+
+    - Added support for new library file name on Windows arising from unified
+      build system changes in OpenSSL 1.1.0.
+
+    - Avoided possible test failures in t/04_par.t by checking that 'pp' really
+      is PAR Packager rather than a different 'pp' (e.g. from App-Adenosine or
+      the FreeBSD ports collection).  [Slaven Rezic, CPAN RT#111423]
+
 2.07 2015-02-28
 
     - Fixed parsing of OPENSSL_VERSION_NUMBER in openssl-1.0.2.  [Dmytro

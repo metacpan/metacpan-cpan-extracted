@@ -1,0 +1,73 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A structured value indicating the quantity, unit of measurement, and business function of goods included in a bundle offer.",
+      "rdfs:label" : "TypeAndQuantityNode",
+      "rdfs:subClassOf" : "schema:StructuredValue"
+   },
+   "properties" : {
+      "schema:amountOfThisGood" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The quantity of the goods included in the offer.",
+         "rdfs:label" : "amountOfThisGood",
+         "schema:domainIncludes" : "schema:TypeAndQuantityNode",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:businessFunction" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The business function (e.g. sell, lease, repair, dispose) of the offer or component of a bundle (TypeAndQuantityNode). The default is http://purl.org/goodrelations/v1#Sell.",
+         "rdfs:label" : "businessFunction",
+         "schema:domainIncludes" : [
+            "schema:TypeAndQuantityNode",
+            "schema:Demand",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : "schema:BusinessFunction"
+      },
+      "schema:typeOfGood" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The product that this structured value is referring to.",
+         "rdfs:label" : "typeOfGood",
+         "schema:domainIncludes" : [
+            "schema:TypeAndQuantityNode",
+            "schema:OwnershipInfo"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Product",
+            "schema:Service"
+         ]
+      },
+      "schema:unitCode" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The unit of measurement given using the UN/CEFACT Common Code (3 characters) or a URL. Other codes than the UN/CEFACT Common Code may be used with a prefix followed by a colon.",
+         "rdfs:label" : "unitCode",
+         "schema:domainIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:TypeAndQuantityNode",
+            "schema:UnitPriceSpecification",
+            "schema:PropertyValue"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      },
+      "schema:unitText" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A string or text indicating the unit of measurement. Useful if you cannot provide a standard unit code for\n<a href='unitCode'>unitCode</a>.",
+         "rdfs:label" : "unitText",
+         "schema:domainIncludes" : [
+            "schema:UnitPriceSpecification",
+            "schema:TypeAndQuantityNode",
+            "schema:QuantitativeValue",
+            "schema:PropertyValue"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A synagogue.",
+      "rdfs:label" : "Synagogue",
+      "rdfs:subClassOf" : "schema:PlaceOfWorship"
+   },
+   "properties" : {}
+}

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A spreadsheet file.",
+      "rdfs:label" : "SpreadsheetDigitalDocument",
+      "rdfs:subClassOf" : "schema:DigitalDocument"
+   },
+   "properties" : {}
+}

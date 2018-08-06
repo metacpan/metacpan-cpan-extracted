@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Smn - Package for language Inari Sami
 
 package Locale::CLDR::Locales::Smn;
 # This file auto generated from Data\common\main\smn.xml
-#	on Fri 13 Apr  7:28:37 am GMT
+#	on Sun  5 Aug  6:21:36 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1336,6 +1336,10 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'pm' => q{ep.},
+					'am' => q{ip.},
+				},
 				'narrow' => {
 					'pm' => q{ep.},
 					'am' => q{ip.},
@@ -1343,24 +1347,20 @@ has 'day_periods' => (
 				'wide' => {
 					'am' => q{ip.},
 					'pm' => q{ep.},
-				},
-				'abbreviated' => {
-					'pm' => q{ep.},
-					'am' => q{ip.},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'am' => q{ip.},
+				'abbreviated' => {
 					'pm' => q{ep.},
+					'am' => q{ip.},
 				},
 				'narrow' => {
 					'pm' => q{ep.},
 					'am' => q{ip.},
 				},
-				'abbreviated' => {
-					'pm' => q{ep.},
+				'wide' => {
 					'am' => q{ip.},
+					'pm' => q{ep.},
 				},
 			},
 		},
@@ -1448,33 +1448,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			E => q{ccc},
-			Ed => q{E d.},
-			Gy => q{y G},
-			GyMMM => q{LLL y G},
-			GyMMMEd => q{E MMM d. y G},
-			GyMMMd => q{MMM d. y G},
-			M => q{L},
-			MEd => q{E d.M.},
-			MMM => q{LLL},
-			MMMEd => q{ccc MMM d.},
-			MMMMd => q{d. MMMM},
-			MMMd => q{MMM d.},
-			Md => q{d.M.},
-			d => q{d},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{L.y G},
-			yyyyMEd => q{E d.M.y G},
-			yyyyMMM => q{LLL y G},
-			yyyyMMMEd => q{E MMM d. y G},
-			yyyyMMMM => q{LLLL y G},
-			yyyyMMMd => q{MMM d. y G},
-			yyyyMd => q{d.M.y G},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E H.mm},
@@ -1518,6 +1491,33 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 			yw => q{'okko' w, Y},
 		},
+		'generic' => {
+			E => q{ccc},
+			Ed => q{E d.},
+			Gy => q{y G},
+			GyMMM => q{LLL y G},
+			GyMMMEd => q{E MMM d. y G},
+			GyMMMd => q{MMM d. y G},
+			M => q{L},
+			MEd => q{E d.M.},
+			MMM => q{LLL},
+			MMMEd => q{ccc MMM d.},
+			MMMMd => q{d. MMMM},
+			MMMd => q{MMM d.},
+			Md => q{d.M.},
+			d => q{d},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{L.y G},
+			yyyyMEd => q{E d.M.y G},
+			yyyyMMM => q{LLL y G},
+			yyyyMMMEd => q{E MMM d. y G},
+			yyyyMMMM => q{LLLL y G},
+			yyyyMMMd => q{MMM d. y G},
+			yyyyMd => q{d.M.y G},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
 	} },
 );
 
@@ -1537,69 +1537,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			M => {
-				M => q{L.–L.},
-			},
-			MEd => {
-				M => q{E d.M. – E d.M.},
-				d => q{E d. – E d.M.},
-			},
-			MMM => {
-				M => q{LLL–LLLL},
-			},
-			MMMEd => {
-				M => q{MMMM E d. – MMMM E d.},
-				d => q{MMMM E d. – E d.},
-			},
-			MMMd => {
-				M => q{MMMM d. – MMMM d.},
-				d => q{MMMM d.–d.},
-			},
-			Md => {
-				M => q{d.M.–d.M.},
-				d => q{d.–d.M.},
-			},
-			d => {
-				d => q{d.–d.},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{y–y G},
-			},
-			yM => {
-				M => q{LLL–LLLL y G},
-				y => q{LLLL y – LLLL y G},
-			},
-			yMEd => {
-				M => q{E d.M.y – E d.M.y G},
-				d => q{E d.M.y – E d.M.y G},
-				y => q{E d.M.y – E d.M.y G},
-			},
-			yMMM => {
-				M => q{LLL–LLLL y G},
-				y => q{LLLL y – LLLL y G},
-			},
-			yMMMEd => {
-				M => q{MMMM E d. – MMMM E d. y G},
-				d => q{MMMM E d. – E d. y G},
-				y => q{MMMM E d. y – MMMM E d. y G},
-			},
-			yMMMM => {
-				M => q{LLL–LLLL y G},
-				y => q{LLLL y – LLLL y G},
-			},
-			yMMMd => {
-				M => q{MMMM d. – MMMM d. y G},
-				d => q{MMMM d.–d. y G},
-				y => q{MMMM d. y – MMMM d. y G},
-			},
-			yMd => {
-				M => q{d.M.–d.M.y G},
-				d => q{d.–d.M.y G},
-				y => q{d.M.y–d.M.y G},
-			},
-		},
 		'gregorian' => {
 			H => {
 				H => q{H–H},
@@ -1693,6 +1630,69 @@ has 'datetime_formats_interval' => (
 				M => q{d.M.–d.M.y},
 				d => q{d. – d.M.y},
 				y => q{d.M.y–d.M.y},
+			},
+		},
+		'generic' => {
+			M => {
+				M => q{L.–L.},
+			},
+			MEd => {
+				M => q{E d.M. – E d.M.},
+				d => q{E d. – E d.M.},
+			},
+			MMM => {
+				M => q{LLL–LLLL},
+			},
+			MMMEd => {
+				M => q{MMMM E d. – MMMM E d.},
+				d => q{MMMM E d. – E d.},
+			},
+			MMMd => {
+				M => q{MMMM d. – MMMM d.},
+				d => q{MMMM d.–d.},
+			},
+			Md => {
+				M => q{d.M.–d.M.},
+				d => q{d.–d.M.},
+			},
+			d => {
+				d => q{d.–d.},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{y–y G},
+			},
+			yM => {
+				M => q{LLL–LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMEd => {
+				M => q{E d.M.y – E d.M.y G},
+				d => q{E d.M.y – E d.M.y G},
+				y => q{E d.M.y – E d.M.y G},
+			},
+			yMMM => {
+				M => q{LLL–LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMEd => {
+				M => q{MMMM E d. – MMMM E d. y G},
+				d => q{MMMM E d. – E d. y G},
+				y => q{MMMM E d. y – MMMM E d. y G},
+			},
+			yMMMM => {
+				M => q{LLL–LLLL y G},
+				y => q{LLLL y – LLLL y G},
+			},
+			yMMMd => {
+				M => q{MMMM d. – MMMM d. y G},
+				d => q{MMMM d.–d. y G},
+				y => q{MMMM d. y – MMMM d. y G},
+			},
+			yMd => {
+				M => q{d.M.–d.M.y G},
+				d => q{d.–d.M.y G},
+				y => q{d.M.y–d.M.y G},
 			},
 		},
 	} },

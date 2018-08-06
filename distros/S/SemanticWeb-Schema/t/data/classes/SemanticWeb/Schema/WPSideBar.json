@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A sidebar section of the page.",
+      "rdfs:label" : "WPSideBar",
+      "rdfs:subClassOf" : "schema:WebPageElement"
+   },
+   "properties" : {}
+}

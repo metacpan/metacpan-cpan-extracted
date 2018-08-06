@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A permit issued by a government agency.",
+      "rdfs:label" : "GovernmentPermit",
+      "rdfs:subClassOf" : "schema:Permit"
+   },
+   "properties" : {}
+}

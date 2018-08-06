@@ -28,7 +28,6 @@ sub check_rule {
     my ($self, $rule) = @_;
     my $out = $self;
 
-    # process full source if no paths defined # FIXME: move it to parent and make common for all mods
     push @{$rule->{path}}, '' unless (@{$rule->{path}});
 
     unless (defined $rule->{command}) {

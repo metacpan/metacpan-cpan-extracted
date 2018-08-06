@@ -18,6 +18,7 @@ my $b = Module::Build->new(
     'File::Temp'     => 0,
      JSON            => 0,
      POSIX           => 0,
+     Storable        => 0,
     'String::Numeric'=> 0,
     'Time::HiRes'    => 0,
     'Test::More'     => 0,

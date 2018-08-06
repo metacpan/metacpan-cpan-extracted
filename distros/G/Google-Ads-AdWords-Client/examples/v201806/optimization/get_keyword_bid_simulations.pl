@@ -22,10 +22,7 @@ use lib "../../../lib";
 
 use Google::Ads::AdWords::Client;
 use Google::Ads::AdWords::Logging;
-use Google::Ads::AdWords::v201806::OrderBy;
-use Google::Ads::AdWords::v201806::Paging;
-use Google::Ads::AdWords::v201806::Predicate;
-use Google::Ads::AdWords::v201806::Selector;
+use Google::Ads::AdWords::Utilities::ServiceQueryBuilder;
 
 use Cwd qw(abs_path);
 
@@ -39,54 +36,45 @@ my $keyword_id  = "INSERT_CRITERION_ID_HERE";
 sub get_keyword_bid_simulations {
   my ($client, $ad_group_id, $keyword_id) = @_;
 
-  # Create predicates.
-  my $adgroup_predicate = Google::Ads::AdWords::v201806::Predicate->new({
-      field    => "AdGroupId",
-      operator => "IN",
-      values   => [$ad_group_id]});
-  my $criterion_predicate = Google::Ads::AdWords::v201806::Predicate->new({
-      field    => "CriterionId",
-      operator => "IN",
-      values   => [$keyword_id]});
 
-  # Create selector.
-  my $paging = Google::Ads::AdWords::v201806::Paging->new({
-    startIndex    => 0,
-    numberResults => PAGE_SIZE
-  });
-  my $selector = Google::Ads::AdWords::v201806::Selector->new({
-      fields => [
-        "AdGroupId",                "CriterionId",
-        "StartDate",                "EndDate",
-        "Bid",                      "BiddableConversions",
-        "BiddableConversionsValue", "LocalClicks",
-        "LocalCost",                "LocalImpressions"
-      ],
-      paging     => $paging,
-      predicates => [$adgroup_predicate, $criterion_predicate]});
+  # Create a query to select all keyword bid simulations for the
+  # specified ad group.
+  my $query_builder = Google::Ads::AdWords::Utilities::ServiceQueryBuilder->new(
+      {client => $client})
+      ->select([
+      "AdGroupId",                "CriterionId",
+      "StartDate",                "EndDate",
+      "Bid",                      "BiddableConversions",
+      "BiddableConversionsValue", "LocalClicks",
+      "LocalCost",                "LocalImpressions"])
+      ->where("AdGroupId")->in([$ad_group_id])
+      ->where("CriterionId")->in([$keyword_id])
+      ->limit(0, PAGE_SIZE);
 
   # Display bid landscapes.
   my $landscape_points_in_previous_page = 0;
-  my $start_index                       = 0;
+  my $page;
   do {
     # Offset the start index by the number of landscape points in the last
     # retrieved page, NOT the number of entries (bid landscapes) in the page.
-    $start_index += $landscape_points_in_previous_page;
-    $selector->get_paging()->set_startIndex($start_index);
+    if (defined($page)) {
+      $query_builder->next_page($landscape_points_in_previous_page);
+    }
 
     # Reset the count of landscape points in preparation for processing the
     # next page.
     $landscape_points_in_previous_page = 0;
 
     # Request the next page of bid landscapes.
-    my $page =
+    $page =
       $client->DataService()
-      ->getCampaignCriterionBidLandscape({serviceSelector => $selector});
+      ->queryCriterionBidLandscape({query => $query_builder->build()});
 
     if ($page->get_entries()) {
       foreach my $criterion_bid_landscape (@{$page->get_entries()}) {
         printf "Criterion bid landscape with ad group ID %d, criterion ID " .
           " %d, start date %s, end date %s, with landscape points:\n",
+          $criterion_bid_landscape->get_adGroupId(),
           $criterion_bid_landscape->get_criterionId(),
           $criterion_bid_landscape->get_startDate(),
           $criterion_bid_landscape->get_endDate();
@@ -107,7 +95,7 @@ sub get_keyword_bid_simulations {
         printf(" was found.");
       }
     }
-  } while ($landscape_points_in_previous_page >= PAGE_SIZE);
+  } while ($query_builder->has_next($page, $landscape_points_in_previous_page));
   return 1;
 }
 

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A unique instance of a radio BroadcastService on a CableOrSatelliteService lineup.",
+      "rdfs:label" : "RadioChannel",
+      "rdfs:subClassOf" : "schema:BroadcastChannel"
+   },
+   "properties" : {}
+}

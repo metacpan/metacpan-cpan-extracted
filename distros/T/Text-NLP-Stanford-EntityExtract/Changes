@@ -1,5 +1,8 @@
 Revision history for Text-NLP-Stanford-EntityExtract
 
+0.07  Sat 4th Aug 2018
+      - Move from Mouse to Moo
+      - improve unicode handling; allow multiple lines to be processed thanks sdonley
 0.06  Thu 25th Nov 2008
         - added debug flag to make identifying problems with server easier.
 

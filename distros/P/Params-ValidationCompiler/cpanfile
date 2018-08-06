@@ -8,6 +8,7 @@ requires "Scalar::Util" => "0";
 requires "overload" => "0";
 requires "strict" => "0";
 requires "warnings" => "0";
+recommends "Class::XSAccessor" => "0";
 recommends "Sub::Util" => "1.40";
 
 on 'test' => sub {
@@ -31,6 +32,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Class::XSAccessor" => "0";
   requires "Code::TidyAll" => "0.56";
   requires "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003";
   requires "Code::TidyAll::Plugin::Test::Vars" => "0.02";

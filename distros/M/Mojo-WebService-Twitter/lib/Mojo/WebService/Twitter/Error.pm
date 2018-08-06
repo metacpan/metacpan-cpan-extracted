@@ -5,7 +5,7 @@ use Exporter 'import';
 
 use overload bool => sub {1}, '""' => sub { shift->to_string }, fallback => 1;
 
-our $VERSION = '0.002';
+our $VERSION = '1.000';
 our @EXPORT_OK = qw(twitter_tx_error);
 
 has 'api_errors' => sub { [] };
@@ -28,11 +28,11 @@ sub from_tx {
 sub to_string {
 	my $self = shift;
 	if (defined(my $err = $self->connection_error)) {
-		return "Connection error: $err";
+		return "Connection error: $err\n";
 	} elsif (my @errs = @{$self->api_errors}) {
-		return "API error $errs[0]{code}: $errs[0]{message}";
+		return "API error $errs[0]{code}: $errs[0]{message}\n";
 	} else {
-		return 'HTTP status ' . $self->http_status . ': ' . $self->http_message;
+		return 'HTTP status ' . $self->http_status . ': ' . $self->http_message . "\n";
 	}
 }
 

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A ski resort.",
+      "rdfs:label" : "SkiResort",
+      "rdfs:subClassOf" : "schema:SportsActivityLocation"
+   },
+   "properties" : {}
+}

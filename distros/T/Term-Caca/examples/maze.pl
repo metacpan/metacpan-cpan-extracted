@@ -3,13 +3,20 @@
 use 5.12.0;
 
 use Games::Maze;
-use Term::Caca qw/ :colors :events /;
+use Term::Caca::Constants qw/ :colors :events /;
+use Term::Caca;
 
-my $term = Term::Caca->new;
+use experimental qw/
+    signatures
+    postderef
+    smartmatch
+/;
 
-$term->set_title( 'maze' );
+my $term = Term::Caca->new();
 
-my( $w, $h ) = $term->canvas_size;
+$term->title( 'maze' );
+
+my( $w, $h ) = $term->canvas_size->@*;
 
 # generate the maze
 my $maze = Games::Maze->new( 
@@ -20,7 +27,7 @@ $maze->make;
 my @maze = map { [ split '' ] }  split "\n", $maze->to_ascii;
 
 # display the maze itself
-$term->set_color( qw/ LIGHTBLUE BLACK / );
+$term->set_color( LIGHTBLUE, BLACK );
 for my $x ( 0..$w ) {
     for my $y ( 0..$h ) {
         $term->char( [$x, $y], $maze[$y][$x] );
@@ -28,9 +35,11 @@ for my $x ( 0..$w ) {
 }
 
 
-$term->set_color( qw/ RED BLACK / );
+$term->set_color( RED, BLACK );
 
 my @pos = (1,0);
+
+# TODO work with a coord class
 
 while (1) {
     $term->char( \@pos, '@' );
@@ -38,8 +47,8 @@ while (1) {
     $term->char( \@pos, '.' );
 
     my $event = $term->wait_for_event( 
-        timeout => -1,
-        mask => $KEY_PRESS | $QUIT 
+        KEY_PRESS | QUIT,
+        -1,
     );  
 
     exit if $event->isa( 'Term::Caca::Event::Quit' )

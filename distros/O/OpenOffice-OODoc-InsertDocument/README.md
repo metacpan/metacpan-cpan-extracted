@@ -1,7 +1,3 @@
-# NAME
-
-OpenOffice::OODoc::InsertDocument - insert, merge or append OpenOffice::OODoc objects
-
 # SYNOPSIS
 
     use OpenOffice::OODoc;
@@ -17,15 +13,25 @@ OpenOffice::OODoc::InsertDocument - insert, merge or append OpenOffice::OODoc ob
 
 # DESCRIPTION
 
-This module will enable to merge the content from one `OpenOffice::OODoc` into
+This module will enable to merge the content from one [OpenOffice::OODoc](https://metacpan.org/pod/OpenOffice::OODoc) into
 another.
 
-# LICENCE
+# METHODS
 
-This software is distributed, subject to the EUPL. You may not use this file
-except in compliance with the License. You may obtain a copy of the License at
-[europa.eu EUPL](http://joinup.ec.europa.eu/software/page/eupl)
+## appendDocument TODO
 
-Software distributed under the License is distributed on an "AS IS" basis,
-WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the
-specific language governing rights and limitations under the License.
+Inserts an OpenOffice::OODoc at the end off the document.
+
+    $oodoc_orig->appendDocument( $oodoc_from, new_page => 1 );
+
+## insertDocument
+
+Inserts a OODoc document at location.
+
+    $oodoc_dest_document->insertDocument( $oodoc_element, 'after', $oodoc_from );
+
+If there is any style associated with the `$oodoc_element`, than that will be
+used for styling the document to be inserted. Otherwise, it will use default
+body styles instead.
+
+# CAVEAT

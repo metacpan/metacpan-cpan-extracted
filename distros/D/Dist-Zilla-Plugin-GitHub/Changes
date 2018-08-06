@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-GitHub
 
+0.46      2018-08-05 01:19:21Z
+
+  - Fix error in calculating github credentials (J.Maslak, #52)
+  - the 'cpan' option in [GitHub::Update] is now deprecated, and will now
+    behave as if the 'metacpan' option was set instead.
+
 0.45      2018-05-27 03:56:57Z
 
   - Authentication is optionally available for all requests, via the new
@@ -205,7 +211,7 @@ Revision history for Dist-Zilla-Plugin-GitHub
 
 0.03      2011-02-28 21:18:03 Europe/Rome
 
- - Remove 'login' and 'token' paramenters, add 'repo'
+ - Remove 'login' and 'token' parameters, add 'repo'
  - Add 'homepage', 'bugs and 'wiki' parameters to GitHub::Meta
 
 0.02      2011-02-27 19:56:39 Europe/Rome

@@ -1,0 +1,93 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A trip on a commercial train line.",
+      "rdfs:label" : "TrainTrip",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:arrivalPlatform" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The platform where the train arrives.",
+         "rdfs:label" : "arrivalPlatform",
+         "schema:domainIncludes" : "schema:TrainTrip",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:arrivalStation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The station where the train trip ends.",
+         "rdfs:label" : "arrivalStation",
+         "schema:domainIncludes" : "schema:TrainTrip",
+         "schema:rangeIncludes" : "schema:TrainStation"
+      },
+      "schema:arrivalTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The expected arrival time.",
+         "rdfs:label" : "arrivalTime",
+         "schema:domainIncludes" : [
+            "schema:TrainTrip",
+            "schema:Flight",
+            "schema:BusTrip"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:departurePlatform" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The platform from which the train departs.",
+         "rdfs:label" : "departurePlatform",
+         "schema:domainIncludes" : "schema:TrainTrip",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:departureStation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The station from which the train departs.",
+         "rdfs:label" : "departureStation",
+         "schema:domainIncludes" : "schema:TrainTrip",
+         "schema:rangeIncludes" : "schema:TrainStation"
+      },
+      "schema:departureTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The expected departure time.",
+         "rdfs:label" : "departureTime",
+         "schema:domainIncludes" : [
+            "schema:BusTrip",
+            "schema:Flight",
+            "schema:TrainTrip"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:provider" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
+         "rdfs:label" : "provider",
+         "schema:domainIncludes" : [
+            "schema:ParcelDelivery",
+            "schema:BusTrip",
+            "schema:CreativeWork",
+            "schema:Service",
+            "schema:TrainTrip",
+            "schema:Reservation",
+            "schema:Flight",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:trainName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The name of the train (e.g. The Orient Express).",
+         "rdfs:label" : "trainName",
+         "schema:domainIncludes" : "schema:TrainTrip",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:trainNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The unique identifier for the train.",
+         "rdfs:label" : "trainNumber",
+         "schema:domainIncludes" : "schema:TrainTrip",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

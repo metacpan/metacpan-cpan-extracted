@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>A range of of services that will be provided to a customer free of charge in case of a defect or malfunction of a product.</p>\n\n<p>Commonly used values:</p>\n\n<ul>\n<li>http://purl.org/goodrelations/v1#Labor-BringIn</li>\n<li>http://purl.org/goodrelations/v1#PartsAndLabor-BringIn</li>\n<li>http://purl.org/goodrelations/v1#PartsAndLabor-PickUp</li>\n</ul>\n",
+      "rdfs:label" : "WarrantyScope",
+      "rdfs:subClassOf" : "schema:Enumeration"
+   },
+   "properties" : {}
+}

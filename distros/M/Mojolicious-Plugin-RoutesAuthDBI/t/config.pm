@@ -14,6 +14,7 @@ use Mojo::Base -strict;
     roles=>'роли доступа',
     routes=>'маршруты',
     guests=>'гости',
+    logs=>'логи',
   },
   admin_user => 'admin3',
   admin_pass => 'секрет',

@@ -1,0 +1,80 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A web page. Every web page is implicitly assumed to be declared to be of type WebPage, so the various properties about that webpage, such as <code>breadcrumb</code> may be used. We recommend explicit declaration if these properties are specified, but if they are found outside of an itemscope, they will be assumed to be about the page.",
+      "rdfs:label" : "WebPage",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:breadcrumb" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A set of links that can help a user understand and navigate a website hierarchy.",
+         "rdfs:label" : "breadcrumb",
+         "schema:domainIncludes" : "schema:WebPage",
+         "schema:rangeIncludes" : [
+            "schema:BreadcrumbList",
+            "schema:Text"
+         ]
+      },
+      "schema:lastReviewed" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Date on which the content on this web page was last reviewed for accuracy and/or completeness.",
+         "rdfs:label" : "lastReviewed",
+         "schema:domainIncludes" : "schema:WebPage",
+         "schema:rangeIncludes" : "schema:Date"
+      },
+      "schema:mainContentOfPage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates if this web page element is the main subject of the page.",
+         "rdfs:label" : "mainContentOfPage",
+         "schema:domainIncludes" : "schema:WebPage",
+         "schema:rangeIncludes" : "schema:WebPageElement"
+      },
+      "schema:primaryImageOfPage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates the main image on the page.",
+         "rdfs:label" : "primaryImageOfPage",
+         "schema:domainIncludes" : "schema:WebPage",
+         "schema:rangeIncludes" : "schema:ImageObject"
+      },
+      "schema:relatedLink" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A link related to this web page, for example to other related web pages.",
+         "rdfs:label" : "relatedLink",
+         "schema:domainIncludes" : "schema:WebPage",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:reviewedBy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "People or organizations that have reviewed the content on this web page for accuracy and/or completeness.",
+         "rdfs:label" : "reviewedBy",
+         "schema:domainIncludes" : "schema:WebPage",
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      },
+      "schema:significantLink" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "One of the more significant URLs on the page. Typically, these are the non-navigation links that are clicked on the most.",
+         "rdfs:label" : "significantLink",
+         "schema:domainIncludes" : "schema:WebPage",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:significantLinks" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The most significant URLs on the page. Typically, these are the non-navigation links that are clicked on the most.",
+         "rdfs:label" : "significantLinks",
+         "schema:domainIncludes" : "schema:WebPage",
+         "schema:rangeIncludes" : "schema:URL",
+         "schema:supersededBy" : "schema:significantLink"
+      },
+      "schema:specialty" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "One of the domain specialities to which this web page's content applies.",
+         "rdfs:label" : "specialty",
+         "schema:domainIncludes" : "schema:WebPage",
+         "schema:rangeIncludes" : "schema:Specialty"
+      }
+   }
+}

@@ -1,0 +1,64 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A music recording (track), usually a single song.",
+      "rdfs:label" : "MusicRecording",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:byArtist" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The artist that performed this album or recording.",
+         "rdfs:label" : "byArtist",
+         "schema:domainIncludes" : [
+            "schema:MusicAlbum",
+            "schema:MusicRecording"
+         ],
+         "schema:rangeIncludes" : "schema:MusicGroup"
+      },
+      "schema:duration" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
+         "rdfs:label" : "duration",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:MediaObject",
+            "schema:MusicRelease",
+            "schema:Movie",
+            "schema:MusicRecording"
+         ],
+         "schema:rangeIncludes" : "schema:Duration"
+      },
+      "schema:inAlbum" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The album to which this recording belongs.",
+         "rdfs:label" : "inAlbum",
+         "schema:domainIncludes" : "schema:MusicRecording",
+         "schema:rangeIncludes" : "schema:MusicAlbum"
+      },
+      "schema:inPlaylist" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The playlist to which this recording belongs.",
+         "rdfs:label" : "inPlaylist",
+         "schema:domainIncludes" : "schema:MusicRecording",
+         "schema:rangeIncludes" : "schema:MusicPlaylist"
+      },
+      "schema:isrcCode" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The International Standard Recording Code for the recording.",
+         "rdfs:label" : "isrcCode",
+         "schema:domainIncludes" : "schema:MusicRecording",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:recordingOf" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The composition this track is a recording of.",
+         "rdfs:label" : "recordingOf",
+         "schema:domainIncludes" : "schema:MusicRecording",
+         "schema:inverseOf" : "schema:recordedAs",
+         "schema:rangeIncludes" : "schema:MusicComposition"
+      }
+   }
+}

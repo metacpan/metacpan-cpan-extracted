@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of organizing tasks/objects/events by associating resources to it.",
+      "rdfs:label" : "AllocateAction",
+      "rdfs:subClassOf" : "schema:OrganizeAction"
+   },
+   "properties" : {}
+}

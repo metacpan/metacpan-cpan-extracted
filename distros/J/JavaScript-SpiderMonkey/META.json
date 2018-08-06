@@ -4,7 +4,7 @@
       "Mike Schilli <m@perlmeister.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "unknown"
    ],
@@ -22,20 +22,20 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Data::Dumper" : 0
+            "Data::Dumper" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.21"
+   "version" : "0.23"
 }

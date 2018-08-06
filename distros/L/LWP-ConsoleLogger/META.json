@@ -101,7 +101,8 @@
             "Test::RequiresInternet" : "0",
             "URI::file" : "0",
             "WWW::Mechanize" : "0",
-            "perl" : "5.013010"
+            "perl" : "5.013010",
+            "version" : "0"
          }
       }
    },
@@ -117,7 +118,7 @@
          "web" : "https://github.com/oalders/lwp-consolelogger"
       }
    },
-   "version" : "0.000038",
+   "version" : "0.000039",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -158,7 +159,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::TidyAll",
             "name" : "@Author::OALDERS/MAXMIND::TidyAll",
-            "version" : "0.13"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
@@ -485,7 +486,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },
@@ -496,7 +497,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -604,7 +605,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -621,12 +622,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000038",
+                  "tag" : "v0.000039",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -676,7 +677,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -696,7 +697,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.17.1",
                   "repo_root" : "."
                }
             },
@@ -793,6 +794,6 @@
       "\u0421\u0435\u0440\u0433\u0435\u0439 \u0420\u043e\u043c\u0430\u043d\u043e\u0432 <sromanov-dev@yandex.ru>"
    ],
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

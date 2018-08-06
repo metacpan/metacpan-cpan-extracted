@@ -3,7 +3,7 @@ package Ryu::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 =head1 NAME
 
@@ -64,7 +64,6 @@ use URI::udp;
 use URI::tcp;
 
 use curry::weak;
-use Variable::Disposition qw(retain_future);
 
 use Log::Any qw($log);
 use Syntax::Keyword::Try;
@@ -179,7 +178,25 @@ sub from_stream {
     return $src;
 }
 
-=head2 from_stream
+sub to_stream {
+    use Scalar::Util qw(blessed weaken);
+    use namespace::clean qw(blessed weaken);
+    my ($self, $stream) = @_;
+
+    my $sink = $self->sink(label => 'from');
+    $sink->source->each(sub {
+        $stream->write($_)
+    });
+#    unless($stream->parent) {
+#        $self->add_child($stream);
+#        $sink->source->on_ready(sub {
+#            $self->remove_child($stream) if $stream->parent;
+#        });
+#    }
+    return $sink;
+}
+
+=head2 stdin
 
 Create a new L<Ryu::Source> that wraps STDIN.
 
@@ -236,7 +253,7 @@ sub timer {
         my $timer = IO::Async::Timer::Periodic->new(
             reschedule => 'hard',
             %args,
-            on_tick => $src->curry::weak::emit(''),
+            on_tick => $src->$curry::weak(sub { shift->emit('') }),
         )
     );
     Scalar::Util::weaken($timer);
@@ -304,8 +321,19 @@ sub source {
 
 Creates a new UDP client.
 
-This will return a L<Ryu::Async::Connection> instance, which provides
-a sink for outgoing packets, and a source for incoming responses.
+This provides a sink for L<Ryu::Async::Client/outgoing> packets, and a source for L<Ryu::Async::Client/incoming> responses.
+
+=over 4
+
+=item * C<uri> - an optional URI of the form C<< udp://host:port >>
+
+=item * C<host> - which host to listen on, defaults to C<0.0.0.0>
+
+=item * C<port> - the port to listen on
+
+=back
+
+Returns a L<Ryu::Async::Client> instance.
 
 =cut
 
@@ -317,14 +345,27 @@ sub udp_client {
     $uri = URI->new($uri) unless ref $uri;
     $log->debugf("UDP client for %s", $uri->as_string);
 
+    my $src = $self->source(
+        label => $args{label} // $uri->as_string,
+    );
     my $sink = $self->sink(
         label => $args{label} // $uri->as_string,
     );
     $self->add_child(
         my $client = IO::Async::Socket->new(
             on_recv => sub {
-                my ($sock, $msg, $addr) = @_;
-                warn "Client received $msg from $addr";
+                my ($sock, $payload, $addr) = @_;
+                try {
+                    $log->tracef("Receiving [%s] from %s", $payload, $addr);
+                    $src->emit(
+                        Ryu::Async::Packet->new(
+                            from => $addr,
+                            payload => $payload
+                        )
+                    );
+                } catch {
+                    $log->errorf("Exception when sending: %s", $@);
+                }
             },
         )
     );
@@ -340,20 +381,18 @@ sub udp_client {
     });
     $sink->source->each(sub {
         my $payload = $_;
-        retain_future(
-            $f->on_done(sub {
-                try {
-                    $log->tracef("Sending [%s] to %s", $payload, $uri);
-                    $client->send($payload);
-                } catch {
-                    $log->errorf("Exception when sending: %s", $@);
-                }
-            })
-        );
+        $f->on_done(sub {
+            try {
+                $log->tracef("Sending [%s] to %s", $payload, $uri);
+                $client->send($payload);
+            } catch {
+                $log->errorf("Exception when sending: %s", $@);
+            }
+        })->retain;
     });
     Ryu::Async::Client->new(
         outgoing => $sink,
-        incoming => undef
+        incoming => $src,
     );
 }
 
@@ -453,6 +492,7 @@ sub sink {
         $label =~ s/^Net::Async::/Na/g;
         $label =~ s/^IO::Async::/Ia/g;
         $label =~ s/^Web::Async::/Wa/g;
+        $label =~ s/^Job::Async::/Ja/g;
         $label =~ s/^Tickit::Async::/Ta/g;
         $label =~ s/^Tickit::Widget::/TW/g;
         $label =~ s/::([^:]*)$/->$1/;

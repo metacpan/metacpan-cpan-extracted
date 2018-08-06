@@ -1,13 +1,14 @@
 package Twitter::API;
 # ABSTRACT: A Twitter REST API library for Perl
 
-our $VERSION = '1.0002';
+our $VERSION = '1.0003';
 use 5.14.1;
 use Moo;
 use Carp;
 use Digest::SHA;
 use Encode qw/encode_utf8/;
-use HTTP::Request::Common qw/GET POST/;
+use HTTP::Request;
+use HTTP::Request::Common qw/POST/;
 use JSON::MaybeXS ();
 use Module::Runtime qw/use_module/;
 use Ref::Util qw/is_arrayref is_ref/;
@@ -179,23 +180,44 @@ sub preprocess_url {
 sub prepare_request {
     my ( $self, $c ) = @_;
 
-    # possible override Accept header
+    # possibly override Accept header
     $c->set_header(accept => $c->get_option('accept'))
         if $c->has_option('accept');
 
-    my $method = $c->http_method;
-    $c->set_http_request(
-        $method eq 'POST' ? (
-            $c->get_option('multipart_form_data') ? $self->prepare_multipart_post($c)
-            : $c->has_option('to_json')   ? $self->prepare_json_post($c)
-            : $self->prepare_post($c)
-        )
-        : $method eq 'GET' ? $self->prepare_get($c)
-        : croak "unexpected HTTP method: $_"
-    );
+    # dispatch on HTTP method
+    my $http_method = $c->http_method;
+    my $prepare_method = join '_', 'mk', lc($http_method), 'request';
+    my $dispatch = $self->can($prepare_method)
+        || croak "unexpected HTTP method: $http_method";
+
+    my $req = $self->$dispatch($c);
+    $c->set_http_request($req);
 }
 
-sub prepare_multipart_post {
+sub mk_get_request {
+    shift->mk_simple_request(GET => @_);
+}
+
+sub mk_delete_request {
+    shift->mk_simple_request(DELETE => @_);
+}
+
+sub mk_post_request {
+    my ( $self, $c ) = @_;
+
+    if ( $c->get_option('multipart_form_data') ) {
+        return $self->mk_multipart_post($c);
+    }
+
+    if ( $c->has_option('to_json') ) {
+        return $self->mk_json_post($c);
+    }
+
+    return $self->mk_form_urlencoded_post($c);
+}
+
+
+sub mk_multipart_post {
     my ( $self, $c ) = @_;
 
     $c->set_header(content_type => 'multipart/form-data;charset=utf-8');
@@ -206,7 +228,7 @@ sub prepare_multipart_post {
         ];
 }
 
-sub prepare_json_post {
+sub mk_json_post {
     my ( $self, $c ) = @_;
 
     POST $c->url,
@@ -214,7 +236,7 @@ sub prepare_json_post {
         Content => $self->to_json($c->get_option('to_json'));
 }
 
-sub prepare_post {
+sub mk_form_urlencoded_post {
     my ( $self, $c ) = @_;
 
     $c->set_header(
@@ -224,15 +246,18 @@ sub prepare_post {
         Content => $self->encode_args_string($c->args);
 }
 
-sub prepare_get {
-    my ( $self, $c ) = @_;
+sub mk_simple_request {
+    my ( $self, $http_method, $c ) = @_;
 
     my $uri = URI->new($c->url);
     if ( my $encoded = $self->encode_args_string($c->args) ) {
         $uri->query($encoded);
     }
 
-    GET $uri, %{ $c->headers };
+    # HTTP::Message expects an arrayref, so transform
+    my $headers = [ %{ $c->headers } ];
+
+    return HTTP::Request->new($http_method, $uri, $headers);
 }
 
 sub add_authorization {
@@ -436,7 +461,7 @@ Twitter::API - A Twitter REST API library for Perl
 
 =head1 VERSION
 
-version 1.0002
+version 1.0003
 
 =head1 SYNOPSIS
 

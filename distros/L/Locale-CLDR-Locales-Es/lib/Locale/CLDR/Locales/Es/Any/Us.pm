@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Es::Any::Us - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Us;
 # This file auto generated from Data\common\main\es_US.xml
-#	on Fri 13 Apr  7:08:40 am GMT
+#	on Sun  5 Aug  5:59:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -271,10 +271,6 @@ has 'units' => (
 						'one' => q({0} megavatio),
 						'other' => q({0} megavatios),
 					},
-					'microgram' => {
-						'one' => q({0} microgramo),
-						'other' => q({0} microgramos),
-					},
 					'mile-per-gallon-imperial' => {
 						'name' => q(mpg Imp.),
 						'one' => q({0} mpg Imp.),
@@ -332,14 +328,6 @@ has 'units' => (
 						'name' => q(c),
 						'one' => q({0} c),
 						'other' => q({0} c),
-					},
-					'celsius' => {
-						'one' => q({0} °C),
-						'other' => q({0} °C),
-					},
-					'cup' => {
-						'one' => q({0} tza.),
-						'other' => q({0} tza.),
 					},
 					'day' => {
 						'per' => q({0}/d),
@@ -426,7 +414,7 @@ has 'number_formats' => (
 					'other' => '0',
 				},
 				'10000' => {
-					'one' => '00 K',
+					'one' => '00 K',
 					'other' => '00 K',
 				},
 				'100000' => {
@@ -504,6 +492,13 @@ has 'currencies' => (
 		'SSP' => {
 			symbol => '£',
 		},
+		'STN' => {
+			display_name => {
+				'currency' => q(dobra santotomense),
+				'one' => q(dobra santotomense),
+				'other' => q(dobra santotomense),
+			},
+		},
 		'SYP' => {
 			symbol => '£',
 		},
@@ -544,37 +539,6 @@ has 'currencies' => (
 	} },
 );
 
-
-has 'calendar_months' => (
-	is			=> 'ro',
-	isa			=> HashRef,
-	init_arg	=> undef,
-	default		=> sub { {
-			'gregorian' => {
-				'format' => {
-					abbreviated => {
-						nonleap => [
-							'ene.',
-							'feb.',
-							'mar.',
-							'abr.',
-							'may.',
-							'jun.',
-							'jul.',
-							'ago.',
-							'sep.',
-							'oct.',
-							'nov.',
-							'dic.'
-						],
-						leap => [
-							
-						],
-					},
-				},
-			},
-	} },
-);
 
 has 'calendar_days' => (
 	is			=> 'ro',
@@ -633,49 +597,49 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2000
-						&& $time < 2400;
 					return 'morning1' if $time >= 0
 						&& $time < 600;
-					return 'morning2' if $time >= 600
-						&& $time < 1200;
 					return 'evening1' if $time >= 1200
 						&& $time < 2000;
+					return 'night1' if $time >= 2000
+						&& $time < 2400;
+					return 'morning2' if $time >= 600
+						&& $time < 1200;
 				}
 				if($day_period_type eq 'default') {
 					return 'noon' if $time == 1200;
-					return 'morning1' if $time >= 0
-						&& $time < 600;
 					return 'night1' if $time >= 2000
 						&& $time < 2400;
-					return 'evening1' if $time >= 1200
-						&& $time < 2000;
 					return 'morning2' if $time >= 600
 						&& $time < 1200;
+					return 'evening1' if $time >= 1200
+						&& $time < 2000;
+					return 'morning1' if $time >= 0
+						&& $time < 600;
 				}
 				last SWITCH;
 				}
@@ -700,15 +664,15 @@ has 'day_periods' => (
 					'am' => q{a. m.},
 				},
 				'wide' => {
-					'pm' => q{p. m.},
 					'am' => q{a. m.},
+					'pm' => q{p. m.},
 				},
 				'narrow' => {
 					'morning1' => q{de la madrugada},
-					'night1' => q{de la noche},
+					'evening1' => q{de la tarde},
 					'noon' => q{del mediodía},
 					'morning2' => q{mañana},
-					'evening1' => q{de la tarde},
+					'night1' => q{de la noche},
 				},
 			},
 			'stand-alone' => {
@@ -716,13 +680,13 @@ has 'day_periods' => (
 					'am' => q{a. m.},
 					'pm' => q{p. m.},
 				},
-				'wide' => {
-					'am' => q{a. m.},
-					'pm' => q{p. m.},
-				},
 				'narrow' => {
-					'am' => q{a. m.},
 					'pm' => q{p. m.},
+					'am' => q{a. m.},
+				},
+				'wide' => {
+					'pm' => q{p. m.},
+					'am' => q{a. m.},
 				},
 			},
 		},

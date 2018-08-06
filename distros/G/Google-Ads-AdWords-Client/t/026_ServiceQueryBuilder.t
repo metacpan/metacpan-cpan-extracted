@@ -22,8 +22,9 @@ use lib qw(lib t t/util);
 use File::Temp qw(tempfile);
 use HTTP::Response;
 use Test::Exception;
+use Test::MockObject;
 use Test::MockObject::Extends;
-use Test::More (tests => 14);
+use Test::More (tests => 18);
 use TestAPIUtils qw(get_api_package);
 use TestClientUtils qw(get_test_client_no_auth get_test_client);
 use TestUtils qw(read_test_properties replace_properties);
@@ -31,7 +32,6 @@ use TestUtils qw(read_test_properties replace_properties);
 use_ok("Google::Ads::AdWords::Utilities::ServiceQueryBuilder");
 
 my $client          = get_test_client();
-my $current_version = $client->get_version();
 
 # Instantiate the report query builder.
 my $query_builder =
@@ -142,3 +142,39 @@ dies_ok {
   $query_builder->build();
 }
 "expected to die due to invalid page_size in limit";
+
+my $page = Test::MockObject->new();
+$page->set_always("get_totalNumEntries", 10);
+$query_builder =
+    Google::Ads::AdWords::Utilities::ServiceQueryBuilder->new({
+        client => $client})
+        ->select(["Id", "Name"])->where("Status")->equal_to("ENABLED")
+        ->order_by("Id")->order_by("Status", 0)->limit(1, 10);
+is($query_builder->has_next($page, 10), 1);
+
+$query_builder =
+    Google::Ads::AdWords::Utilities::ServiceQueryBuilder->new({
+        client => $client})
+        ->select(["Id", "Name"])->where("Status")->equal_to("ENABLED")
+        ->order_by("Id")->order_by("Status", 0)->limit(1, 10);
+is($query_builder->has_next($page), '');
+
+$query_builder =
+    Google::Ads::AdWords::Utilities::ServiceQueryBuilder->new({
+        client => $client})
+        ->select(["Id", "Name"])->where("Status")->equal_to("ENABLED")
+        ->order_by("Id")->order_by("Status", 0)->limit(1, 10);
+$query_builder->next_page(4);
+is($query_builder->build(),
+    'SELECT Id, Name WHERE Status = "ENABLED" ORDER BY Id ASC, Status DESC ' .
+        'LIMIT 5, 10');
+
+$query_builder =
+    Google::Ads::AdWords::Utilities::ServiceQueryBuilder->new({
+        client => $client})
+        ->select(["Id", "Name"])->where("Status")->equal_to("ENABLED")
+        ->order_by("Id")->order_by("Status", 0)->limit(1, 10);
+$query_builder->next_page();
+is($query_builder->build(),
+    'SELECT Id, Name WHERE Status = "ENABLED" ORDER BY Id ASC, Status DESC ' .
+        'LIMIT 11, 10');

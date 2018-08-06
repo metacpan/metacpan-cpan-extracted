@@ -9,7 +9,7 @@ use Mojo::WebSocketProxy::Config;
 
 use Class::Method::Modifiers;
 
-use JSON::MaybeUTF8 qw(encode_json_utf8);
+use JSON::MaybeUTF8 qw(:v1);
 use Unicode::Normalize ();
 use Future::Mojo 0.004;    # ->new_timeout
 use Future::Utils qw(fmap);
@@ -17,7 +17,7 @@ use Scalar::Util qw(blessed);
 
 use constant TIMEOUT => $ENV{MOJO_WEBSOCKETPROXY_TIMEOUT} || 15;
 
-our $VERSION = '0.08';     ## VERSION
+our $VERSION = '0.09';     ## VERSION
 around 'send' => sub {
     my ($orig, $c, $api_response, $req_storage) = @_;
 
@@ -61,11 +61,13 @@ sub open_connection {
     $config->{opened_connection}->($c) if $config->{opened_connection};
 
     $c->on(
-        message => sub {
+        text => sub {
             my ($c, $msg) = @_;
             # Incoming data will be JSON-formatted text, as a Unicode string.
             # We normalize the entire string before decoding.
-            my $args = Mojo::JSON::decode_json(Unicode::Normalize::NFC($msg));
+            my $normalized_msg = Unicode::Normalize::NFC($msg);
+            my $args = eval { decode_json_utf8($normalized_msg) };
+            $log->error("JSON decoding $normalized_msg failed: $@") if $@;
             on_message($c, $args);
         });
 
@@ -110,7 +112,7 @@ sub on_message {
             return $req_storage->{instead_of_forward}->($c, $req_storage) if $req_storage->{instead_of_forward};
             return $c->forward($req_storage);
         }
-    )->then(
+        )->then(
         sub {
             my $result = shift;
             return $c->after_forward($result, $req_storage)->transform(done => sub { $result });
@@ -127,7 +129,7 @@ sub on_message {
             }
         ),
         $f
-    )->then(
+        )->then(
         sub {
             my ($result) = @_;
             $c->send({json => $result}, $req_storage) if $result;
@@ -203,7 +205,7 @@ sub forward {
     }
 
     my $backend_name = $req_storage->{backend} // "default";
-    my $backend      = $c->wsp_config->{backends}{$backend_name}
+    my $backend = $c->wsp_config->{backends}{$backend_name}
         or die "Cannot dispatch request - no backend named '$backend_name'";
 
     $backend->call_rpc($c, $req_storage);

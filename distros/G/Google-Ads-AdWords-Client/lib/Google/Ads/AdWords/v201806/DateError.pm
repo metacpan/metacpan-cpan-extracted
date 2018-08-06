@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::DateError
 Perl data type class for the XML Schema defined complexType
 DateError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Errors associated with invalid dates and date ranges. 
 
 
 

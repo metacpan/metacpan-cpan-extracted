@@ -1,4 +1,11 @@
 
+4.09  2018-08-02
+  - Added support for -json unary op to SQL::Abstract::Pg.
+  - Added support for multi-column unique constraints in upserts to
+    SQL::Abstract::Pg.
+  - Added support for literal SQL with bind values in select fields to
+    SQL::Abstract::Pg.
+
 4.08  2018-01-29
   - Improved on_conflict option of insert and insert_p methods in
     Mojo::Pg::Database with a shortcut for simple conflict targets.

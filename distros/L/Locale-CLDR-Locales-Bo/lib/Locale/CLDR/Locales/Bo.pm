@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Bo - Package for language Tibetan
 
 package Locale::CLDR::Locales::Bo;
 # This file auto generated from Data\common\main\bo.xml
-#	on Fri 13 Apr  7:03:07 am GMT
+#	on Sun  5 Aug  5:52:57 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -663,8 +663,8 @@ has 'day_periods' => (
 					'am' => q{སྔ་དྲོ་},
 				},
 				'wide' => {
-					'pm' => q{ཕྱི་དྲོ་},
 					'am' => q{སྔ་དྲོ་},
+					'pm' => q{ཕྱི་དྲོ་},
 				},
 			},
 		},

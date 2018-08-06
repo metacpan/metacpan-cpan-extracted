@@ -10,6 +10,8 @@ package Sidef::Optimizer {
                   BOOL        => 'Sidef::Types::Bool::Bool',
                   ARRAY       => 'Sidef::Types::Array::Array',
                   RANGENUM    => 'Sidef::Types::Range::RangeNumber',
+                  DIR_DT      => 'Sidef::DataTypes::Glob::Dir',
+                  FILE_DT     => 'Sidef::DataTypes::Glob::File',
                   NUMBER_DT   => 'Sidef::DataTypes::Number::Number',
                   STRING_DT   => 'Sidef::DataTypes::String::String',
                   COMPLEX_DT  => 'Sidef::DataTypes::Number::Complex',
@@ -280,13 +282,22 @@ package Sidef::Optimizer {
                    eq ne
                    and or xor
 
+                   sigma
+                   usigma
+
+                   prime_sigma
+                   prime_usigma
+
+                   is_power
+
                    complex
                    root iroot
                    log
                    next_pow
                    max min
                    roundf
-                   nok
+                   binomial
+                   subfactorial
                    modinv
                    isub
                    iadd
@@ -311,9 +322,14 @@ package Sidef::Optimizer {
                    inc dec not
 
                    factorial
+                   subfactorial
+                   superfactorial
+                   hyperfactorial
+                   lnsuperfactorial
+                   lnhyperfactorial
                    sqrt isqrt
                    next_pow2
-                   abs int rat float
+                   abs int rat float complex
                    norm conj sqr
 
                    zeta
@@ -324,6 +340,21 @@ package Sidef::Optimizer {
                    Li
                    Li2
                    Ei
+
+                   sigma
+                   sigma0
+
+                   usigma
+                   usigma0
+
+                   prime_sigma
+                   prime_usigma
+
+                   divisors
+                   udivisors
+
+                   factor
+                   factor_exp
 
                    exp
                    exp2
@@ -395,6 +426,7 @@ package Sidef::Optimizer {
 
                    is_prime
                    is_square
+                   is_power
 
                    sgn
                    ceil
@@ -653,6 +685,30 @@ package Sidef::Optimizer {
             ),
         ),
 
+        (FILE_DT) => build_tree(
+
+            # File.method(STRING)
+            (
+             map { [$_, [table(STRING)]] }
+               dtypes(FILE_DT, qw(
+                   new
+                   )
+               )
+            ),
+        ),
+
+        (DIR_DT) => build_tree(
+
+            # Dir.method(STRING)
+            (
+             map { [$_, [table(STRING)]] }
+               dtypes(DIR_DT, qw(
+                   new
+                   )
+               )
+            ),
+        ),
+
         (RANGENUM_DT) => build_tree(
 
             # RangeNum.method(NUMBER, NUMBER)
@@ -872,6 +928,10 @@ package Sidef::Optimizer {
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
             my %expr = $self->optimize($obj->{expr});
             $obj->{expr} = \%expr;
+        }
+        elsif ($ref eq 'Sidef::Meta::Assert') {
+            my %arg = $self->optimize($obj->{arg});
+            $obj->{arg} = \%arg;
         }
 
         if (not exists($expr->{ind}) and not exists($expr->{call})) {

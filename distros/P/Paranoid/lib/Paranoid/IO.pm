@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/IO.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+# $Id: lib/Paranoid/IO.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -30,7 +30,7 @@ use Paranoid::Debug qw(:all);
 use Paranoid::Input;
 use IO::Handle;
 
-($VERSION) = ( q$Revision: 2.05 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(pclose pcloseAll popen preopen ptell pseek pflock pread
     pnlread pwrite pappend ptruncate);
@@ -407,7 +407,6 @@ use constant PDEFFILESZ => 65536;
 
         my $filename = shift;
         my $lock     = shift;
-        my $cpkg     = scalar caller;
         my ( $rv, $fh );
         local $!;
 
@@ -426,24 +425,13 @@ use constant PDEFFILESZ => 65536;
 
             if ( defined $fh ) {
 
-                # Check if the caller is outside of this package,
-                # the file handle is unmanaged, or if we're currently
-                # unlocked
-                if (   $cpkg ne __PACKAGE__
-                    or !defined $filename
-                    or $files{$filename}{ltype} == LOCK_UN ) {
+                # Apply the lock
+                $rv = flock $fh, $lock;
 
-                    # Apply the lock
-                    $rv = flock $fh, $lock;
-                    $files{$filename}{ltype} = $lock
-                        if defined $filename and $cpkg eq __PACKAGE__;
-
-                } else {
-
-                    # Pretend, since the developer is managing locks
-                    # themselves
-                    $rv = 1;
-                }
+                # Record change to internal state if we're tracking this file
+                $files{$filename}{ltype} = $lock
+                    if defined $filename
+                        and exists $files{$filename};
 
                 Paranoid::ERROR =
                     pdebug( 'error attempting to pflock: %s', PDLEVEL1, $! )
@@ -752,7 +740,7 @@ Paranoid::IO - Paranoid IO support
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+$Id: lib/Paranoid/IO.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -849,7 +837,7 @@ is impossible to tell within those calls.
 This module provides a replacement for Perl's internal L<sysopen>, which
 should be used even where read/write file access is necessary.  One key
 benefit for doing so is that it provides internal file handle caching based on
-the file name.  All the addtional functions provided by this module use it
+the file name.  All the additional functions provided by this module use it
 internally to retrieve that cached file handle to avoid the overhead of
 repetitive opening and closing of files.
 
@@ -1003,10 +991,8 @@ sould be one of the B<SEEK_*> constants as exported by L<Fcntl>.
 This returns the return value from L<flock>.  The appropriate lock type values
 should be one of the B<LOCK_*> constants as exported by L<Fcntl>.
 
-B<NOTE:>  If you wish to control file locking yourself you can do so with this
-function.  Any existing locks explicitly applied are tracked and will cause
-read/write functions to refrain from attempting to apply (and remove) locks 
-automatically.
+B<NOTE:> This function essentially acts like a pass-through to the native
+L<flock> function for any file handle not opened via this module's functions.
 
 =head2 pread
 

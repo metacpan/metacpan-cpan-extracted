@@ -1,0 +1,54 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Specifies a location feature by providing a structured value representing a feature of an accommodation as a property-value pair of varying degrees of formality.",
+      "rdfs:label" : "LocationFeatureSpecification",
+      "rdfs:subClassOf" : "schema:PropertyValue"
+   },
+   "properties" : {
+      "schema:hoursAvailable" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The hours during which this service or contact is available.",
+         "rdfs:label" : "hoursAvailable",
+         "schema:domainIncludes" : [
+            "schema:ContactPoint",
+            "schema:Service",
+            "schema:LocationFeatureSpecification"
+         ],
+         "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
+      },
+      "schema:validFrom" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date when the item becomes valid.",
+         "rdfs:label" : "validFrom",
+         "schema:domainIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:Permit",
+            "schema:Demand",
+            "schema:PriceSpecification",
+            "schema:OpeningHoursSpecification",
+            "schema:LocationFeatureSpecification",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:validThrough" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
+         "rdfs:label" : "validThrough",
+         "schema:domainIncludes" : [
+            "schema:Offer",
+            "schema:LocationFeatureSpecification",
+            "schema:OpeningHoursSpecification",
+            "schema:JobPosting",
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount",
+            "schema:Demand"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      }
+   }
+}

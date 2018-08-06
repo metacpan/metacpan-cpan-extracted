@@ -3,13 +3,14 @@ use Test::More;
 use Test::Mojo;
 use DBI;
 
+use constant PKG => __PACKAGE__;
+
 plan skip_all => 'set env TEST_CONN_PG="DBI:Pg:dbname=<db>/<pg_user>/<passwd>" to enable this test'
   unless $ENV{TEST_CONN_PG};
 
 has dbh => sub { DBI->connect(split m|[/]|, $ENV{TEST_CONN_PG}) };
 
 my $config = do 't/config.pm';
-my $pkg = __PACKAGE__;
 
 sub startup {
   my $app = shift;
@@ -47,7 +48,7 @@ sub startup {
   } );
 }
 
-my $t = Test::Mojo->new($pkg);
+my $t = Test::Mojo->new(PKG);
 
 $t->get_ok("/guest/is")->status_is(404)
   #~ ->content_like(qr/Deny access at auth step/i)

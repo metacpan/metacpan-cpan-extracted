@@ -131,11 +131,11 @@ For a brief overview, we can just count the total number of objects of various
 kinds in the heap:
 
   pmat> count
-    Kind                 Count      (blessed) 
-    ARRAY                1259       89        
-    CODE                 274                  
-    GLOB                 326                  
-  ...
+    Kind       Count (blessed)        Bytes (blessed)
+    ARRAY        182         0     16.0 KiB          
+    CODE         182         0     22.8 KiB          
+    GLOB         325         0     48.2 KiB          
+    ...
 
 We can inspect the callstack at the time the heap dump was made:
 
@@ -174,6 +174,42 @@ Also note that each command is implemented by a (correctly-cased) package
 under the C<Devel::MAT::Tool> namespace. For example, the C<count> tool is
 implemented by, and therefore more documentation can be found in, the
 L<Devel::MAT::Tool::Count> package.
+
+=head2 Specifying SVs
+
+Many commands operate on a particular given SV. This can be specified in
+several ways:
+
+=over 4
+
+=item *
+
+A numerical address directly:
+
+   pmat> show 0x55a7e4e59f78
+   IO()=IO::File at 0x55a7e4e59f78 with refcount 1
+   ...
+
+=item *
+
+A named root SV (see the C<roots> command for a list of them all):
+
+   pmat> show defstash
+   STASH(61) at 0x55a7e4d69060=defstash with refcount 2
+
+=item *
+
+A named symbol from the symbol table. Note that subs require the C<&> sigil:
+
+  pmat> show $warnings::VERSION
+  SCALAR(PV) at 0x55a7e4d96550 with refcount 1
+  ...
+
+  pmat> show &warnings::import
+  CODE(PP) at 0x55a7e4dc3458 with refcount 1
+  ...
+
+=back
 
 =head1 AUTHOR
 

@@ -11,9 +11,9 @@ use URI;
 use Test::More tests => 17;
 use Test::WWW::Mechanize::Catalyst 'RestTest';
 use HTTP::Request::Common;
-use JSON;
+use JSON::MaybeXS;
 
-my $json = JSON->new->utf8;
+my $json = JSON::MaybeXS->new(utf8 => 1);
 
 my $mech = Test::WWW::Mechanize::Catalyst->new;
 ok( my $schema = DBICTest->init_schema(), 'got schema' );

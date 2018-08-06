@@ -1,4 +1,4 @@
-package Pcore::Captcha v1.3.3;
+package Pcore::Captcha v1.3.4;
 
 use Pcore -dist, -class;
 

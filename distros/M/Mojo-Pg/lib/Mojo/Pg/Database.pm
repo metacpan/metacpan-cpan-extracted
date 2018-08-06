@@ -374,6 +374,11 @@ Including operations commonly referred to as C<upsert>.
   # "insert into t (a) values ('b') on conflict (a) do update set a = 'c'"
   $db->insert('t', {a => 'b'}, {on_conflict => [a => {a => 'c'}]});
 
+  # "insert into t (a, b) values ('c', 'd')
+  #  on conflict (a, b) do update set a = 'e'"
+  $db->insert(
+    't', {a => 'c', b => 'd'}, {on_conflict => [['a', 'b'] => {a => 'e'}]});
+
 =head2 insert_p
 
   my $promise = $db->insert_p($table, \@values || \%fieldvals, \%options);
@@ -511,8 +516,14 @@ As well as some PostgreSQL specific extensions added by L<SQL::Abstract::Pg>.
   # "select foo as bar from some_table"
   $db->select('some_table', [[foo => 'bar']]);
 
+  # "select * from some_table where foo = '[1,2,3]'"
+  $db->select('some_table', '*', {foo => {'=' => {-json => [1, 2, 3]}}});
+
   # "select extract(epoch from foo) as foo, bar from some_table"
   $db->select('some_table', [\'extract(epoch from foo) as foo', 'bar']);
+
+  # "select 'test' as foo, bar from some_table"
+  $db->select('some_table', [\['? as foo', 'test'], 'bar']);
 
 Including a new last argument to pass many new options.
 
@@ -595,6 +606,9 @@ L<SQL::Abstract>.
   # "update some_table set foo = 'bar' where id = 23 returning id"
   $db->update('some_table', {foo => 'bar'}, {id => 23}, {returning => 'id'});
 
+  # "update some_table set foo = '[1,2,3]' where bar = 23"
+  $db->update('some_table', {foo => {-json => [1, 2, 3]}}, {bar => 23});
+
 =head2 update_p
 
   my $promise = $db->update_p($table, \%fieldvals, \%where, \%options);
@@ -613,6 +627,6 @@ callback.
 
 =head1 SEE ALSO
 
-L<Mojo::Pg>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojo::Pg>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

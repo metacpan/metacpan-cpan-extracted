@@ -4,7 +4,7 @@
       "Nito Martinez <Nito@Qindel.ES>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4218",
    "license" : [
       "gpl_1"
    ],
@@ -34,6 +34,7 @@
             "Log::Log4perl" : "0",
             "Moose" : "0",
             "Readonly" : "0",
+            "Tie::IxHash" : "0",
             "Try::Tiny" : "0"
          }
       }
@@ -41,7 +42,7 @@
    "provides" : {
       "Net::SugarCRM" : {
          "file" : "lib/Net/SugarCRM.pm",
-         "version" : "3.23144"
+         "version" : "3.320000"
       },
       "Net::SugarCRM::Entry" : {
          "file" : "lib/Net/SugarCRM/Entry.pm",
@@ -54,6 +55,6 @@
          "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
       ]
    },
-   "version" : "3.23144",
+   "version" : "3.320000",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

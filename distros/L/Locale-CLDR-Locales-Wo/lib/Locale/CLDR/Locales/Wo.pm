@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Wo - Package for language Wolof
 
 package Locale::CLDR::Locales::Wo;
 # This file auto generated from Data\common\main\wo.xml
-#	on Fri 13 Apr  7:34:27 am GMT
+#	on Sun  5 Aug  6:28:09 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1068,31 +1068,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'am' => q{Sub},
+					'pm' => q{Ngo},
+				},
 				'narrow' => {
 					'pm' => q{Ngo},
 					'am' => q{Sub},
 				},
 				'wide' => {
-					'pm' => q{Ngo},
-					'am' => q{Sub},
-				},
-				'abbreviated' => {
 					'am' => q{Sub},
 					'pm' => q{Ngo},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'pm' => q{Ngo},
+				'abbreviated' => {
 					'am' => q{Sub},
+					'pm' => q{Ngo},
 				},
 				'wide' => {
 					'am' => q{Sub},
 					'pm' => q{Ngo},
 				},
-				'abbreviated' => {
-					'am' => q{Sub},
+				'narrow' => {
 					'pm' => q{Ngo},
+					'am' => q{Sub},
 				},
 			},
 		},

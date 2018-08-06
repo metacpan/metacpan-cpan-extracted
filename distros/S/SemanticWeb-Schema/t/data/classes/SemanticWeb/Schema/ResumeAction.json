@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of resuming a device or application which was formerly paused (e.g. resume music playback or resume a timer).",
+      "rdfs:label" : "ResumeAction",
+      "rdfs:subClassOf" : "schema:ControlAction"
+   },
+   "properties" : {}
+}

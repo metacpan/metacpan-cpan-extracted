@@ -1,3 +1,7 @@
+0.03
+        - add: ProhibitLargeBlock
+        - add: ProhibitLargeTryBlock
+
 0.02
 	- minor
 

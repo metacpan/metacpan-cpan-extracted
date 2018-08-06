@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Web page type: Collection page.",
+      "rdfs:label" : "CollectionPage",
+      "rdfs:subClassOf" : "schema:WebPage"
+   },
+   "properties" : {}
+}

@@ -4,6 +4,7 @@
 .vscode/tasks.json
 Changes
 cpanfile
+examples/not-found.pl
 examples/rollup.pl
 examples/sprites.pl
 lib/Mojolicious/Plugin/AssetPack.pm
@@ -44,6 +45,7 @@ t/assets/image/master_favicon_thumbnail.png
 t/assets/image/photo-1429734160945-4f85244d6a5a.jpg
 t/assets/image/sample.png
 t/assets/js/export.js
+t/assets/js/not-found.js
 t/assets/js/some-lib.js
 t/assets/js/vue-app.js
 t/assets/other/dummy.gif

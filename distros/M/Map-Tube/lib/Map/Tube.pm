@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.53';
+$Map::Tube::VERSION   = '3.54';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.53
+Version 3.54
 
 =cut
 
@@ -43,7 +43,7 @@ use Map::Tube::Exception::MalformedMapData;
 use Map::Tube::Exception::InvalidLineStructure;
 use Map::Tube::Exception::InvalidStationStructure;
 use Map::Tube::Utils qw(to_perl is_same trim common_lines get_method_map is_valid_color);
-use Map::Tube::Types qw(Routes Tables Lines NodeMap LineMap);
+use Map::Tube::Types qw(Routes Tables Lines NodeMap LineMap Color);
 
 use Moo::Role;
 use Role::Tiny qw();
@@ -95,11 +95,12 @@ documented in L<Map::Tube::Cookbook>.
 
 has [qw(name name_to_id plugins _active_link _other_links _line_stations _common_lines)] => (is => 'rw');
 has experimental => (is => 'ro', default => sub { 0 });
-has nodes  => (is => 'rw', isa => NodeMap);
-has lines  => (is => 'rw', isa => Lines  );
-has tables => (is => 'rw', isa => Tables );
-has routes => (is => 'rw', isa => Routes );
-has _lines => (is => 'rw', isa => LineMap);
+has nodes   => (is => 'rw', isa => NodeMap);
+has lines   => (is => 'rw', isa => Lines  );
+has tables  => (is => 'rw', isa => Tables );
+has routes  => (is => 'rw', isa => Routes );
+has _lines  => (is => 'rw', isa => LineMap);
+has bgcolor => (is => 'rw', isa => Color  );
 
 our $AUTOLOAD;
 our $PLUGINS = {
@@ -467,6 +468,14 @@ sub get_next_stations {
 
     return $nodes;
 }
+
+=head2 bgcolor($color)
+
+Set the background color for the map. It is optional. Please set it before making
+call to method C<as_image()>. If not set, it will try to  guess and may not be as
+good as you would expect. The C<$color> can be a simply color name or hash code.
+
+=cut
 
 #
 #

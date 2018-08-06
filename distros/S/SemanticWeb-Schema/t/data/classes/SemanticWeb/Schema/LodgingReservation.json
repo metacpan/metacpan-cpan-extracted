@@ -1,0 +1,67 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A reservation for lodging at a hotel, motel, inn, etc.</p>\n\n<p>Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations.",
+      "rdfs:label" : "LodgingReservation",
+      "rdfs:subClassOf" : "schema:Reservation"
+   },
+   "properties" : {
+      "schema:checkinTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The earliest someone may check into a lodging establishment.",
+         "rdfs:label" : "checkinTime",
+         "schema:domainIncludes" : [
+            "schema:LodgingBusiness",
+            "schema:LodgingReservation"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:checkoutTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The latest someone may check out of a lodging establishment.",
+         "rdfs:label" : "checkoutTime",
+         "schema:domainIncludes" : [
+            "schema:LodgingReservation",
+            "schema:LodgingBusiness"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:lodgingUnitDescription" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A full description of the lodging unit.",
+         "rdfs:label" : "lodgingUnitDescription",
+         "schema:domainIncludes" : "schema:LodgingReservation",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:lodgingUnitType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Textual description of the unit type (including suite vs. room, size of bed, etc.).",
+         "rdfs:label" : "lodgingUnitType",
+         "schema:domainIncludes" : "schema:LodgingReservation",
+         "schema:rangeIncludes" : [
+            "schema:QualitativeValue",
+            "schema:Text"
+         ]
+      },
+      "schema:numAdults" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of adults staying in the unit.",
+         "rdfs:label" : "numAdults",
+         "schema:domainIncludes" : "schema:LodgingReservation",
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Integer"
+         ]
+      },
+      "schema:numChildren" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of children staying in the unit.",
+         "rdfs:label" : "numChildren",
+         "schema:domainIncludes" : "schema:LodgingReservation",
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Integer"
+         ]
+      }
+   }
+}

@@ -1,0 +1,64 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A delivery service through which content is provided via broadcast over the air or online.",
+      "rdfs:label" : "BroadcastService",
+      "rdfs:subClassOf" : "schema:Service"
+   },
+   "properties" : {
+      "schema:area" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The area within which users can expect to reach the broadcast service.",
+         "rdfs:label" : "area",
+         "schema:domainIncludes" : "schema:BroadcastService",
+         "schema:rangeIncludes" : "schema:Place",
+         "schema:supersededBy" : "schema:serviceArea"
+      },
+      "schema:broadcastAffiliateOf" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The media network(s) whose content is broadcast on this station.",
+         "rdfs:label" : "broadcastAffiliateOf",
+         "schema:domainIncludes" : "schema:BroadcastService",
+         "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:broadcastDisplayName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The name displayed in the channel guide. For many US affiliates, it is the network name.",
+         "rdfs:label" : "broadcastDisplayName",
+         "schema:domainIncludes" : "schema:BroadcastService",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:broadcastTimezone" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The timezone in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 format</a> for which the service bases its broadcasts",
+         "rdfs:label" : "broadcastTimezone",
+         "schema:domainIncludes" : "schema:BroadcastService",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:broadcaster" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The organization owning or operating the broadcast service.",
+         "rdfs:label" : "broadcaster",
+         "schema:domainIncludes" : "schema:BroadcastService",
+         "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:parentService" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A broadcast service to which the broadcast service may belong to such as regional variations of a national channel.",
+         "rdfs:label" : "parentService",
+         "schema:domainIncludes" : "schema:BroadcastService",
+         "schema:rangeIncludes" : "schema:BroadcastService"
+      },
+      "schema:videoFormat" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of screening or video broadcast used (e.g. IMAX, 3D, SD, HD, etc.).",
+         "rdfs:label" : "videoFormat",
+         "schema:domainIncludes" : [
+            "schema:BroadcastEvent",
+            "schema:BroadcastService",
+            "schema:ScreeningEvent"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

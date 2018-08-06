@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Fr::Any::Cf - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Cf;
 # This file auto generated from Data\common\main\fr_CF.xml
-#	on Fri 13 Apr  7:10:54 am GMT
+#	on Sun  5 Aug  6:01:46 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

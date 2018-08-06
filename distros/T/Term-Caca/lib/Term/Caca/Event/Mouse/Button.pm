@@ -1,38 +1,30 @@
 package Term::Caca::Event::Mouse::Button;
-BEGIN {
-  $Term::Caca::Event::Mouse::Button::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $Term::Caca::Event::Mouse::Button::VERSION = '1.2.0';
-}
-
+our $AUTHORITY = 'cpan:YANICK';
+$Term::Caca::Event::Mouse::Button::VERSION = '3.0.0';
 use strict;
 use warnings;
 
-use parent 'Term::Caca::Event';
-use Term::Caca;
-use Method::Signatures;
+use Moose;
+extends 'Term::Caca::Event';
 
-sub new {
-    my $class = shift;
-    return bless $class->SUPER::new( @_ ), $class;
-}
+has index =>
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        Term::Caca::caca_get_event_mouse_button( $_[0]->event );
+    };
 
-method index {
-    return Term::Caca::_get_event_mouse_button( $self->_event );
-}
-
-method left { return 1 == $self->index }
-method right { return 3 == $self->index }
-method middle { return 2 == $self->index }
-
+sub left { return 1 == $_[0]->index }
+sub right { return 3 == $_[0]->index }
+sub middle { return 2 == $_[0]->index }
 
 1;
 
-
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -40,7 +32,7 @@ Term::Caca::Event::Mouse::Button
 
 =head1 VERSION
 
-version 1.2.0
+version 3.0.0
 
 =head1 AUTHORS
 
@@ -58,11 +50,10 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by John Beppu.
+This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
 
 This is free software, licensed under:
 
   DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
 
 =cut
-

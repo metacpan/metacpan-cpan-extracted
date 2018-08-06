@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Residence type: Gated community.",
+      "rdfs:label" : "GatedResidenceCommunity",
+      "rdfs:subClassOf" : "schema:Residence"
+   },
+   "properties" : {}
+}

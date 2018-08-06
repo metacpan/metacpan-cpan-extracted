@@ -20,10 +20,10 @@ To compile and install File-Lockf, simply run the following commands:
      make install
 
 
-File-Lockf has only been tested under Solaris 2.5. It is possible that it
-will not compile as-is under other operating systems. If you can't get
-File-Lockf to compile, please contact me and I'll gladly help you figure
-out what changes are needed for your platform, and merge them into the
+File-Lockf has been tested under Solaris 2.5-10 and Linux. It is possible that
+it will not compile as-is under other operating systems. If you can't get
+File-Lockf to compile, please contact me and I'll try to help you figure out
+what changes are needed for your platform, and potentially merge them into the
 distribution.
 
 The File-Lockf module contains usage instructions, which can be viewed
@@ -33,6 +33,9 @@ File::lockf".
 
 Changes
 -------
+
+0.25 - Added new method to return file handle associated with lock
+       object.
 
 0.20 - Added simple OO wrapper class around locking functionality,
        including a new method to iteratively attempt to acquire a
@@ -48,6 +51,6 @@ Please report any bugs or feature requests to <henson@acm.org>.
 
 
 The latest version of File-Lockf is currently available on CPAN, or
-via the URL:
+via github:
 
-http://www.intranet.csupomona.edu/~henson/www/projects/File-Lockf/
+	https://github.com/pbhenson/File-Lockf

@@ -36,6 +36,7 @@ examples/method/Subst.pm
 examples/method/UUdecode.pm
 lib/Filter/cpp.pm
 lib/Filter/exec.pm
+lib/Filter/m4.pm
 lib/Filter/sh.pm
 mytest
 perlfilter.pod
@@ -44,6 +45,7 @@ t/cpp.t
 t/decrypt.t
 t/exec.t
 t/filter-util.pl
+t/m4.t
 t/order.t
 t/rt_101033.pm
 t/rt_101033.t

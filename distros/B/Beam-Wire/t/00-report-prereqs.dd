@@ -20,7 +20,8 @@ do { my $x = {
                                       'Path::Tiny' => '0.055',
                                       'Throwable' => '0',
                                       'Types::Standard' => '0',
-                                      'YAML' => '0'
+                                      'YAML' => '0',
+                                      'perl' => '5.008'
                                     }
                     },
        'test' => {

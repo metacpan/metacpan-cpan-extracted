@@ -1,0 +1,37 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A comment on an item - for example, a comment on a blog post. The comment's content is expressed via the <a class=\"localLink\" href=\"http://schema.org/text\">text</a> property, and its topic via <a class=\"localLink\" href=\"http://schema.org/about\">about</a>, properties shared with all CreativeWorks.",
+      "rdfs:label" : "Comment",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:downvoteCount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of downvotes this question, answer or comment has received from the community.",
+         "rdfs:label" : "downvoteCount",
+         "schema:domainIncludes" : [
+            "schema:Comment",
+            "schema:Question"
+         ],
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:parentItem" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The parent of a question, answer or item in general.",
+         "rdfs:label" : "parentItem",
+         "schema:domainIncludes" : "schema:Comment",
+         "schema:rangeIncludes" : "schema:Question"
+      },
+      "schema:upvoteCount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of upvotes this question, answer or comment has received from the community.",
+         "rdfs:label" : "upvoteCount",
+         "schema:domainIncludes" : [
+            "schema:Question",
+            "schema:Comment"
+         ],
+         "schema:rangeIncludes" : "schema:Integer"
+      }
+   }
+}

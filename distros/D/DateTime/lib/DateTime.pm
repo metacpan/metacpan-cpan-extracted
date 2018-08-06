@@ -8,7 +8,7 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.49';
+our $VERSION = '1.50';
 
 use Carp;
 use DateTime::Duration;
@@ -1111,7 +1111,7 @@ sub jd { $_[0]->mjd + 2_400_000.5 }
         'd' => sub { sprintf( '%02d', $_[0]->day_of_month ) },
         'D' => sub { $_[0]->strftime('%m/%d/%y') },
         'e' => sub { sprintf( '%2d', $_[0]->day_of_month ) },
-        'F' => sub { $_[0]->ymd('-') },
+        'F' => sub { $_[0]->strftime('%Y-%m-%d') },
         'g' => sub { substr( $_[0]->week_year, -2 ) },
         'G' => sub { $_[0]->week_year },
         'H' => sub { sprintf( '%02d', $_[0]->hour ) },
@@ -2348,7 +2348,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 
@@ -3114,6 +3114,9 @@ strftime patterns.
 
 If you give a pattern that doesn't exist, then it is simply treated as
 text.
+
+Note that any deviation from the POSIX standard is probably a bug. DateTime
+should match the output of C<POSIX::strftime> for any given pattern.
 
 =head3 $dt->format_cldr( $format, ... )
 

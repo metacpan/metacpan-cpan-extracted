@@ -134,7 +134,17 @@
             $msg = pop @packageList;
         }
 
-        # Decode the JSON data
+        # Decode the JSON data. I'm still not sure what data format is allowed under ATCP (and
+        #   neither is anyone else, apparently), so if ATCP isn't obviously in a JSON format, I'll
+        #   enclose it in quotes to prevent GA::Client->decodeJson from throwing up an error
+        if ($class eq 'Games::Axmud::Obj::Atcp') {
+
+            if ($origData =~ m/^[^\{\}\[\]\:]*$/) {
+
+                $origData = '"' . $origData . '"';
+            }
+        }
+
         $data = $axmud::CLIENT->decodeJson($origData);
         if (! defined $data) {
 
@@ -200,6 +210,15 @@
         if (! defined $jsonScalar || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->update', @_);
+        }
+
+        # As described in ->new, ATCP must be handled with kid gloves
+        if ($self->isa('Games::Axmud::Obj::Atcp')) {
+
+            if ($jsonScalar =~ m/^[^\{\}\[\]\:]*$/) {
+
+                $jsonScalar = '"' . $jsonScalar . '"';
+            }
         }
 
         $newData = $axmud::CLIENT->decodeJson($jsonScalar);
@@ -2279,6 +2298,73 @@
 
             # <task> is a task in the current tasklist
             push (@returnArray, $axmud::CLIENT->ivShow('initTaskHash', $string));
+        }
+
+        # Return the list of matching tasks
+        return @returnArray;
+    }
+
+    sub findProfileInitialTask {
+
+        # Called by GA::Cmd::WorldCompass->do (or by any other code)
+        # An alternative to $self->findGlobalInitialTask, looking instead in a specified profile's
+        #   initial tasklist for a task matching the string $taskName, and which returns the blessed
+        #   references of all matches in a list
+        # $taskName can match a task label (stored in GA::Client->taskLabelHash) or a task's formal
+        #   name (stored in GA::Client->taskPackageHash)
+        #
+        # Expected arguments
+        #   $string     - The string to analyse (e.g. 'status')
+        #   $profObj    - Blessed reference of the profile object
+        #
+        # Return values
+        #   An empty list on improper arguments or if no matching tasks are found
+        #   Otherwise returns a list of blessed references to matching tasks
+
+        my ($self, $string, $profObj, $check) = @_;
+
+        # Local variables
+        my (
+            $taskName,
+            @emptyList, @returnArray,
+        );
+
+        # Check for improper arguments
+        if (! defined $string || ! defined $profObj || defined $check) {
+
+            $axmud::CLIENT->writeImproper($self->_objClass . '->findProfileInitialTask', @_);
+            return @emptyList;
+        }
+
+        # Look for a task matching <task>. First check task labels...
+        if ($axmud::CLIENT->ivExists('taskLabelHash', $string)) {
+
+            # <task> is a valid task label (e.g. 'status')
+
+            # Get the task's formal name (e.g. 'status_task')
+            $taskName = $axmud::CLIENT->ivShow('taskLabelHash', $string);
+            # Add all matching tasks in the world's initial tasklist
+            foreach my $taskObj ($profObj->ivValues('initTaskHash')) {
+
+                if ($taskObj->name eq $taskName) {
+
+                    push (@returnArray, $taskObj);
+                }
+            }
+
+        # ..then check formal names...
+        } elsif ($axmud::CLIENT->ivExists('taskPackageHash', $string)) {
+
+            # <task> is a valid formal name (e.g. 'status_task')
+
+            # Add all matching tasks in the world's initial tasklist
+            foreach my $taskObj ($profObj->ivValues('initTaskHash')) {
+
+                if ($taskObj->name eq $string) {
+
+                    push (@returnArray, $taskObj);
+                }
+            }
         }
 
         # Return the list of matching tasks
@@ -5457,6 +5543,167 @@
         return (\%hash, \%otherHash);
      }
 
+    sub updateCompass {
+
+        # Called by GA::Cmd::PermCompass->do and WorldCompass->do
+        # Applies changes to the IVs for a global initial task or the current world's initial task
+        #
+        # Expected arguments
+        #   $session, $inputString, $standardCmd
+        #                   - Standard arguments to a command's ->do function
+        #   $argListRef     - Reference to the list of arguments supplied to the client command
+        #                       (unmodified). The calling function has already checked there is at
+        #                       least one argument
+        #   $currentListRef - Reference to a list of current tasklist tasks (should contain 0 or 1
+        #                       items)
+        #   $initListRef    - Reference to a list of initial tasks (can contain any number of items,
+        #                       including 0)
+        #
+        # Return values
+        #   'undef' on improper arguments or failure
+        #   1 on success
+
+        my (
+            $self, $session, $inputString, $standardCmd, $argListRef, $currentListRef, $initListRef,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my (
+            $hashRef, $otherHashRef, $count, $errorCount, $key, $keycode, $cmd,
+            @args, @taskList, @initTaskList,
+            %hash, %otherHash,
+        );
+
+        # Check for improper arguments
+        if (
+            ! defined $session || ! defined $inputString || ! defined $standardCmd
+            || ! defined $argListRef || ! defined $currentListRef || ! defined $initListRef
+            || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper(
+                $self->_objClass . '->updateCompass',
+                @_,
+            );
+        }
+
+        # Dereference the args
+        @args = @$argListRef;
+        @taskList = @$currentListRef;
+        @initTaskList = @$initListRef;
+
+        # %hash to convert all the <key>s that the Compass task allows us to customise
+        # %otherHash of other keypad <key>s that the Compass task doesn't allow us to customise
+        ($hashRef, $otherHashRef) = $self->getKeypadHashes();
+        %hash = %$hashRef;
+        %otherHash = %$otherHashRef;
+
+        # Count successes and errors, to show in confirmation messages
+        $count = 0;
+        $errorCount = 0;
+
+        # ;pcm on
+        # ;pcm -o
+        if ($args[0] eq 'on' || $args[0] eq '-o') {
+
+            # (For the benefit of visually-impaired users, ignore everything after the first
+            #   argument)
+            foreach my $taskObj (@taskList) {
+
+                if (! $taskObj->enable()) {
+                    $errorCount++;
+                } else {
+                    $count++;
+                }
+            }
+
+            foreach my $taskObj (@initTaskList) {
+
+                $count++;
+                $taskObj->set_enabledFlag(TRUE);
+            }
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Compass tasks set to \'enabled\'. (Found tasks: ' . ($count + $errorCount)
+                . ', errors: ' . $errorCount . ').',
+            )
+
+        # ;pcm off
+        # ;pcm -f
+        } elsif ($args[0] eq 'off' || $args[0] eq '-f') {
+
+            foreach my $taskObj (@taskList) {
+
+                if (! $taskObj->disable()) {
+                    $errorCount++;
+                } else {
+                    $count++;
+                }
+            }
+
+            foreach my $taskObj (@initTaskList) {
+
+                $count++;
+                $taskObj->set_enabledFlag(FALSE);
+            }
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Compass tasks set to \'disabled\'. (Found tasks: ' . ($count + $errorCount)
+                . ', errors: ' . $errorCount . ').',
+            );
+
+        # ;pcm <key> <command>
+        # ;pcm <key>
+        } elsif ($args[0]) {
+
+            # Get the Axmud standard keycode
+            $key = shift @args;
+            if (! exists $hash{$key} && ! exists $otherHash{$key}) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Unrecognised keypad key (try \';help compass\' for a list of recognised keys)',
+                );
+
+            } elsif (exists $otherHash{$key}) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'The Compass task doesn\'t allow us to customise the \'' . $otherHash{$key}
+                    . '\' key',
+                );
+
+            } else {
+
+                $keycode = $hash{$key};
+            }
+
+            # Set the corresponding world <command> (if one was specified)
+            if (@args) {
+
+                $cmd = join (' ', @args);
+            }
+
+            # Update the task(s)
+            foreach my $taskObj (@taskList, @initTaskList) {
+
+                if (! $taskObj->set_key($keycode, $cmd)) {
+                    $errorCount++;
+                } else {
+                    $count++;
+                }
+            }
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Set a world command for the keypad key \'' . $key . '\'. (Found tasks: '
+                . ($count + $errorCount) . ', errors: ' . $errorCount . ').',
+            );
+        }
+    }
+
     sub killLimitedTargets {
 
         # Called by GA::Cmd::Kill->do and Kkill->do
@@ -7281,10 +7528,10 @@
                 $self->editObj->doModify('saveChanges');
             }
 
-            # Update the current session's GUI window, if it is open
-            if ($self->session->guiWin) {
+            # Update the current session's object viewer window, if it is open
+            if ($self->session->viewerWin) {
 
-                $self->session->guiWin->updateNotebook();
+                $self->session->viewerWin->updateNotebook();
             }
         }
 
@@ -7970,11 +8217,11 @@
         # Make the button clickable
         $button->signal_connect('clicked' => sub {
 
-            # Set the IV to undef
-            $self->ivAdd('editHash', $iv, undef);
-
             # Empty the entry to remove any text entered into it
             $entry->set_text('');
+
+            # Set the IV to undef
+            $self->ivAdd('editHash', $iv, undef);
 
             # Change the button's image to mark this IV as being set to undef
             my $image2 = Gtk2::Image->new_from_stock('gtk-remove', 'menu');
@@ -18287,24 +18534,24 @@
         #                   $self->updateTaskLists for current tasks)
         #
         # Optional arguments
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world), 'custom' (tasks with
         #                   customised initial parameters, which are run when the user demands). If
         #                   set to 'undef', this is a temporary task, created in order to access the
         #                   default values stored in IVs, that will not be added to any tasklist
-        #   $profName   - ($taskList = 'current') name of the profile from whose initial tasklist
+        #   $profName   - ($taskType = 'current') name of the profile from whose initial tasklist
         #                   this task was created ('undef' if none)
-        #               - ($taskList = 'initial') name of the profile in whose initial tasklist
+        #               - ($taskType = 'initial') name of the profile in whose initial tasklist
         #                   this task will be. If 'undef', the global initial tasklist is used
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $profCategory
-        #               - ($taskList = 'current', 'initial') which category the profile falls undef
+        #               - ($taskType = 'current', 'initial') which category the profile falls undef
         #                   (i.e. 'world', 'race', 'char', etc, or 'undef' if no profile)
-        #               - ($taskList = 'custom') 'undef'
+        #               - ($taskType = 'custom') 'undef'
         #   $customName
-        #               - ($taskList = 'current', 'initial') 'undef'
-        #               - ($taskList = 'custom') the custom task name, matching a key in
+        #               - ($taskType = 'current', 'initial') 'undef'
+        #               - ($taskType = 'custom') the custom task name, matching a key in
         #                   GA::Session->customTaskHash
         #
         # Return values
@@ -18312,7 +18559,7 @@
         #   Otherwise returns $self, a hash that will be blessed into existence by the inheriting
         #       object
 
-        my ($class, $session, $taskList, $profName, $profCategory, $customName, $check) = @_;
+        my ($class, $session, $taskType, $profName, $profCategory, $customName, $check) = @_;
 
         # Check for improper arguments
         if (! defined $class || ! defined $session || defined $check) {
@@ -18323,8 +18570,8 @@
         # For 'initial' tasks, check that the profile $profName exists (for 'current' tasks, if
         #   $profName is defined, we can safely assume that it already exists)
         if (
-            $taskList
-            && $taskList eq 'initial'
+            $taskType
+            && $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -18376,18 +18623,18 @@
             # Description of the task (any length permitted)
             descrip                     => 'A generic task',
             # 'current', 'initial' or 'custom' (or 'undef' for a temporary task)
-            taskList                    => $taskList,
-            # ($taskList = 'current') name of the profile from whose initial tasklist this task was
+            taskType                    => $taskType,
+            # ($taskType = 'current') name of the profile from whose initial tasklist this task was
             #   created ('undef' if none)
-            # ($taskList = 'initial') name of the profile in whose initial tasklisk this task will
+            # ($taskType = 'initial') name of the profile in whose initial tasklisk this task will
             #   be
-            # ($taskList = 'custom') 'undef'
+            # ($taskType = 'custom') 'undef'
             profName                    => $profName,
-            # (->taskList = 'initial') the category of the profile with which this initial task is
+            # ($taskType = 'initial') the category of the profile with which this initial task is
             #   associated ('world', 'race', 'guild', 'char', etc)
-            # ($taskList = 'current', 'initial') which category the profile falls under (i.e.
+            # ($taskType = 'current', 'initial') which category the profile falls under (i.e.
             #   'world', 'race', 'char', etc, or 'undef' if no profile)
-            # ($taskList = 'custom') 'undef'
+            # ($taskType = 'custom') 'undef'
             profCategory                => $profCategory,
             # A reference to the GA::Session IV for this task, if there is one (e.g.
             #   GA::Session->locatorTask for the current Locator task). We need it so that, if the
@@ -18656,36 +18903,36 @@
         #
         # Expected arguments
         #   $session    - The parent GA::Session (not stored as an IV)
-        #   $taskList   - Which tasklist this task is being created into - 'current' for the current
+        #   $taskType   - Which tasklist this task is being created into - 'current' for the current
         #                   tasklist (tasks which are actually running now), 'initial' (tasks which
         #                   should be run when the user connects to the world). Custom tasks aren't
         #                   cloned (at the moment)
         #
         # Optional arguments
-        #   $profName   - ($taskList = 'initial') name of the profile in whose initial tasklist the
+        #   $profName   - ($taskType = 'initial') name of the profile in whose initial tasklist the
         #                   existing task is stored
         #   $profCategory
-        #               - ($taskList = 'initial') which category the profile falls under (i.e.
+        #               - ($taskType = 'initial') which category the profile falls under (i.e.
         #                   'world', 'race', 'char', etc)
         #
         # Return values
         #   'undef' on improper arguments or if the task can't be cloned
         #   Blessed reference to the newly-created object on success
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $session || ! defined $taskList || defined $check
-            || ($taskList ne 'current' && $taskList ne 'initial')
-            || ($taskList eq 'initial' && (! defined $profName || ! defined $profCategory))
+            ! defined $session || ! defined $taskType || defined $check
+            || ($taskType ne 'current' && $taskType ne 'initial')
+            || ($taskType eq 'initial' && (! defined $profName || ! defined $profCategory))
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->clone', @_);
         }
 
         # For initial tasks, check that $profName exists
         if (
-            $taskList eq 'initial'
+            $taskType eq 'initial'
             && defined $profName
             && ! $session->ivExists('profHash', $profName)
         ) {
@@ -18703,7 +18950,7 @@
         }
 
         # Create the new task, using default settings and parameters
-        my $clone = $self->_objClass->new($session, $taskList, $profName, $profCategory);
+        my $clone = $self->_objClass->new($session, $taskType, $profName, $profCategory);
 
         # Most of the cloned task's settings have default values, but a few are copied from the
         #   original
@@ -18862,7 +19109,7 @@
         #
         # Expected arguments
         #   $session        - The calling function's GA::Session
-        #   $taskList       - Which tasklist this task is being created into - 'current', 'initial'
+        #   $taskType       - Which tasklist this task is being created into - 'current', 'initial'
         #                       or 'custom'
         #
         # Optional arguments
@@ -18874,16 +19121,16 @@
         #   'undef' on improper arguments
         #   1 otherwise
 
-        my ($self, $session, $taskList, $profName, $profCategory, $check) = @_;
+        my ($self, $session, $taskType, $profName, $profCategory, $check) = @_;
 
         # Check for improper arguments
-        if (! defined $session || ! defined $taskList || defined $check) {
+        if (! defined $session || ! defined $taskType || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->setParentFileObj', @_);
         }
 
         # Initial task in a profile's initial tasklist
-        if ($taskList eq 'initial' && defined $profName) {
+        if ($taskType eq 'initial' && defined $profName) {
 
             if ($profCategory eq 'world') {
 
@@ -18896,7 +19143,7 @@
             }
 
         # Task in the global initial/custom tasklists
-        } elsif ($taskList eq 'initial' || $taskList eq 'custom') {
+        } elsif ($taskType eq 'initial' || $taskType eq 'custom') {
 
             $self->{_parentFile} = 'tasks';
         }
@@ -18933,7 +19180,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->updateTaskLists', @_);
         }
 
-        if ($self->taskList eq 'current') {
+        if ($self->taskType eq 'current') {
 
             # Give task a unique name within the current tasklist
             $self->{uniqueName} = $self->{name} . '_' . $axmud::CLIENT->inc_taskTotal();
@@ -18952,7 +19199,7 @@
                     $self->_objClass . '->updateTaskLists',
                 );
 
-            } elsif ($self->taskList eq 'initial') {
+            } elsif ($self->taskType eq 'initial') {
 
                 if (! defined $self->profName) {
 
@@ -18974,7 +19221,7 @@
                     $profile->ivPush('initTaskOrderList', $self->uniqueName);
                 }
 
-            } elsif ($self->taskList eq 'custom') {
+            } elsif ($self->taskType eq 'custom') {
 
                 # Create an entry in the custom tasklist registry (the ->uniqueName IV isn't set;
                 #   the task already has a ->customName)
@@ -21109,8 +21356,8 @@
         { $_[0]->{category} }
     sub descrip
         { $_[0]->{descrip} }
-    sub taskList
-        { $_[0]->{taskList} }
+    sub taskType
+        { $_[0]->{taskType} }
     sub profName
         { $_[0]->{profName} }
     sub profCategory
@@ -21322,7 +21569,7 @@
     sub setTitle {
 
         # Can be called by anything
-        # Sets this window's title bar
+        # Sets the text on this window's title bar
         #
         # Expected arguments
         #   $title  - The string to use as the window's title
@@ -21344,6 +21591,31 @@
 
             $self->winWidget->set_title($title);
         }
+
+        return 1;
+    }
+
+    sub getTitle {
+
+        # Can be called by anything
+        # Gets the text on this window's title bar
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   Otherwise returns the title bar text
+
+        my ($self, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+             return $axmud::CLIENT->writeImproper($self->_objClass . '->getTitle', @_);
+        }
+
+        return $self->winWidget->get_title();
 
         return 1;
     }
@@ -21799,7 +22071,14 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->closeDialogueWin', @_);
         }
 
+        # Close the window
         $dialogueWin->destroy();
+
+        # For a 'dialogue' window created by $self->showBusyWin, we need to update a GA::Client IV
+        if ($axmud::CLIENT->busyWin && $axmud::CLIENT->busyWin eq $dialogueWin) {
+
+            $axmud::CLIENT->set_busyWin();
+        }
 
         return 1;
     }
@@ -21899,6 +22178,13 @@
             || defined $check
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->showMsgDialogue', @_);
+        }
+
+        # If an earlier call to $self->showBusyWin created a popup window, close it (otherwise it'll
+        #   be visible above the new dialogue window)
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
         }
 
         # Check that $icon and $buttonType are valid values
@@ -22077,6 +22363,13 @@
         if (! defined $session || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->showKeycodeDialogue', @_);
+        }
+
+        # If an earlier call to $self->showBusyWin created a popup window, close it (otherwise it'll
+        #   be visible above the new dialogue window)
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
         }
 
         # Set the correct spacing size for 'dialogue' windows
@@ -22273,6 +22566,13 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->showFileChooser', @_);
         }
 
+        # If an earlier call to $self->showBusyWin created a popup window, close it (otherwise it'll
+        #   be visible above the new dialogue window)
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
+        }
+
         # Check that $type is a valid type
         if (
             $type ne 'open' && $type ne 'save' && $type ne 'select-folder'
@@ -22407,6 +22707,13 @@
         if (! defined $title || ! defined $text || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->showEntryDialogue', @_);
+        }
+
+        # If an earlier call to $self->showBusyWin created a popup window, close it (otherwise it'll
+        #   be visible above the new dialogue window)
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
         }
 
         # Set the correct spacing size for 'dialogue' windows
@@ -22710,6 +23017,13 @@
             @emptyList,
         );
 
+        # If an earlier call to $self->showBusyWin created a popup window, close it (otherwise it'll
+        #   be visible above the new dialogue window)
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
+        }
+
         # Set the correct spacing size for 'dialogue' windows
         $spacing = $axmud::CLIENT->constFreeSpacingPixels;
 
@@ -22892,6 +23206,13 @@
 
             $axmud::CLIENT->writeImproper($self->_objClass . '->showTripleEntryDialogue', @_);
             return @emptyList;
+        }
+
+        # If an earlier call to $self->showBusyWin created a popup window, close it (otherwise it'll
+        #   be visible above the new dialogue window)
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
         }
 
         # Set the correct spacing size for 'dialogue' windows
@@ -23080,6 +23401,13 @@
         if (! defined $title || ! defined $text || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->showComboDialogue', @_);
+        }
+
+        # If an earlier call to $self->showBusyWin created a popup window, close it (otherwise it'll
+        #   be visible above the new dialogue window)
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
         }
 
         # Set the correct spacing size for 'dialogue' windows
@@ -23348,6 +23676,13 @@
             return @emptyList;
         }
 
+        # If an earlier call to $self->showBusyWin created a popup window, close it (otherwise it'll
+        #   be visible above the new dialogue window)
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
+        }
+
         # Set the correct spacing size for 'dialogue' windows
         $spacing = $axmud::CLIENT->constFreeSpacingPixels;
 
@@ -23531,6 +23866,13 @@
             );
         }
 
+        # If an earlier call to $self->showBusyWin created a popup window, close it (otherwise it'll
+        #   be visible above the new dialogue window)
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
+        }
+
         # Show the 'dialogue' window
         my $dialogueWin = Gtk2::ColorSelectionDialog->new($title);
 
@@ -23604,6 +23946,13 @@
             );
         }
 
+        # If an earlier call to $self->showBusyWin created a popup window, close it (otherwise it'll
+        #   be visible above the new dialogue window)
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
+        }
+
         # Show the 'dialogue' window
         my $dialogueWin = Gtk2::FontSelectionDialog->new($title);
         $dialogueWin->set_position('center-always');
@@ -23649,6 +23998,13 @@
         if (defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->showIrreversibleTest', @_);
+        }
+
+        # If an earlier call to $self->showBusyWin created a popup window, close it (otherwise it'll
+        #   be visible above the new dialogue window)
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
         }
 
         # Show the 'dialogue' window
@@ -23744,6 +24100,13 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->showBusyWin', @_);
         }
 
+        # Only one of these temporary popup windows can exist at a time. If one already exists,
+        #   close it
+        if ($axmud::CLIENT->busyWin) {
+
+            $self->closeDialogueWin($axmud::CLIENT->busyWin);
+        }
+
         # Set the file path and caption text, if not specified
         if (! defined $path || ! (-e $path)) {
 
@@ -23792,6 +24155,8 @@
         $dialogueWin->present();
         # Update Gtk2's events queue
         $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->showBusyWin');
+        # Update the Client IV
+        $axmud::CLIENT->set_busyWin($dialogueWin);
 
         return $dialogueWin;
     }

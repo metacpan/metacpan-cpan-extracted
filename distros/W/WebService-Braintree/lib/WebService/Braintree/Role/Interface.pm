@@ -6,7 +6,7 @@ package # hide from pause
 use 5.010_001;
 use strictures 1;
 
-use Moose::Role;
+use Moo::Role;
 
 sub gateway {
     return WebService::Braintree->configuration->gateway;

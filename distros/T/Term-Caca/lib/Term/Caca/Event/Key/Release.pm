@@ -1,12 +1,7 @@
 package Term::Caca::Event::Key::Release;
-BEGIN {
-  $Term::Caca::Event::Key::Release::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $Term::Caca::Event::Key::Release::VERSION = '1.2.0';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # abstract: event triggered by a key release
-
+$Term::Caca::Event::Key::Release::VERSION = '3.0.0';
 
 use strict;
 use warnings;
@@ -22,9 +17,11 @@ sub new {
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -32,7 +29,7 @@ Term::Caca::Event::Key::Release
 
 =head1 VERSION
 
-version 1.2.0
+version 3.0.0
 
 =head1 SYNOPSIS
 
@@ -77,11 +74,10 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by John Beppu.
+This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
 
 This is free software, licensed under:
 
   DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
 
 =cut
-

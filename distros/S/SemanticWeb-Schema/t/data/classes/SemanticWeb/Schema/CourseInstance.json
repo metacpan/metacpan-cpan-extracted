@@ -1,0 +1,27 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An instance of a <a class=\"localLink\" href=\"http://schema.org/Course\">Course</a> which is distinct from other instances because it is offered at a different time or location or through different media or modes of study or to a specific section of students.",
+      "rdfs:label" : "CourseInstance",
+      "rdfs:subClassOf" : "schema:Event"
+   },
+   "properties" : {
+      "schema:courseMode" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The medium or means of delivery of the course instance or the mode of study, either as a text label (e.g. \"online\", \"onsite\" or \"blended\"; \"synchronous\" or \"asynchronous\"; \"full-time\" or \"part-time\") or as a URL reference to a term from a controlled vocabulary (e.g. https://ceds.ed.gov/element/001311#Asynchronous ).",
+         "rdfs:label" : "courseMode",
+         "schema:domainIncludes" : "schema:CourseInstance",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text"
+         ]
+      },
+      "schema:instructor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A person assigned to instruct or provide instructional assistance for the <a class=\"localLink\" href=\"http://schema.org/CourseInstance\">CourseInstance</a>.",
+         "rdfs:label" : "instructor",
+         "schema:domainIncludes" : "schema:CourseInstance",
+         "schema:rangeIncludes" : "schema:Person"
+      }
+   }
+}

@@ -16,32 +16,54 @@ use WebService::KvKAPI;
 my %options = ();
 
 GetOptions(\%options, qw(
+    help|h
+    apiKey=s
+    raw=s
+    mainBranch
+    branch
+    legalPerson
     profile
     kvkNumber=s
     branchNumber=s
-    apiKey=s
-    mainBranch
-    help|h
+    street=s
+    houseNumber=s
+    postalCode=s
+    city=s
+    tradeName=s
+    q=s
 ));
 
 if ($options{help}) {
     pod2usage({verbose => 1, exitval => 0});
 }
 
+my $profile_search = delete $options{profile};
+my $api_key        = delete $options{apiKey};
+my $raw            = delete $options{raw};
+
+my $api;
+if ($api_key) {
+    $api = WebService::KvKAPI->new(
+        api_key => $api_key,
+    );
+}
+else {
+    use WebService::KvKAPI::Spoof;
+    print "Using spoof mode, no api key given", $/;
+    $api = WebService::KvKAPI::Spoof->new(
+        api_key => 'spoofmode',
+    );
+}
+
 if (!keys %options) {
     pod2usage({verbose => 1, exitval => 1});
 }
 
-my $api = WebService::KvKAPI->new(
-    api_key => delete $options{apiKey},
-);
 
-if (delete $options{mainBranch}) {
-    $options{restrictToMainBranch} = 1;
+if ($raw) {
+    print Dumper $api->api_call($raw, \%options);
 }
-
-
-if ($options{profile}) {
+elsif ($profile_search) {
     print Dumper $api->profile(%options);
 }
 else {
@@ -60,7 +82,7 @@ query_kvk.pl - Query the Dutch Chamber of Commerce via the CLI
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

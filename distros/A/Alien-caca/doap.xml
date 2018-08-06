@@ -7,7 +7,7 @@
   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
   >
   <name>Alien-caca</name>
-  <shortdesc>Alien package for the Colored ASCII Art library</shortdesc>
+  <shortdesc>Alien package for the Colored ASCII Art library </shortdesc>
   <developer>
     <foaf:Person>
       <foaf:name>Yanick Champoux</foaf:name>
@@ -26,6 +26,12 @@
   <release>
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0.1</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-07-27</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0.2</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2018-07-27</dc:issued>
     </Version>
   </release>

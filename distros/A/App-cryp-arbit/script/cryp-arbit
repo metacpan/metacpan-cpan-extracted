@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-06-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-08-04'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,7 +41,7 @@ cryp-arbit - Cryptocurrency arbitrage utility
 
 =head1 VERSION
 
-This document describes version 0.001 of cryp-arbit (from Perl distribution App-cryp-arbit), released on 2018-06-25.
+This document describes version 0.003 of cryp-arbit (from Perl distribution App-cryp-arbit), released on 2018-08-04.
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ can be shared between cryp-* family of scripts):
  ; db_username = youruser         ; optional, will be searched in ~/.my.cnf
  ; db_password = yourpass         ; optional, will be searched in ~/.my.cnf
 
- [exchange/bitcoin-indonesia]
+ [exchange/indodax]
  key = ...
  secret = ...
 
@@ -150,13 +150,11 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
@@ -205,7 +203,7 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 

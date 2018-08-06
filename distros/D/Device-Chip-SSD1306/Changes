@@ -1,5 +1,11 @@
 Revision history for Device-Chip-SSD1306
 
+0.05    2018-08-05 13:48:14
+        [CHANGES]
+         * Support the 0.49inch 64x32 module
+         * Maintain a framebuffer, provide some efficient drawing methods for
+           managing it
+
 0.04    2017/01/09 00:21:52
         [CHANGES]
          * Support other sized modules:

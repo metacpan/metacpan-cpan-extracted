@@ -4,7 +4,7 @@
       "Sebastian Riedel <sri@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -36,7 +36,7 @@
          "requires" : {
             "DBD::Pg" : "3.005001",
             "Mojolicious" : "7.53",
-            "SQL::Abstract" : "1.85",
+            "SQL::Abstract" : "1.86",
             "perl" : "5.010001"
          }
       }
@@ -46,7 +46,7 @@
       "bugtracker" : {
          "web" : "https://github.com/kraih/mojo-pg/issues"
       },
-      "homepage" : "http://mojolicious.org",
+      "homepage" : "https://mojolicious.org",
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ],
@@ -57,6 +57,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#mojo"
    },
-   "version" : "4.08",
+   "version" : "4.09",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

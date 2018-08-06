@@ -14,8 +14,8 @@ my $script_outtable
   = data_section(main => 'pull_out_from_a_redis_list_generate_sha1hex_for_each_element_and_return_the_array.lua');
 
 my $script_myid_sha = $db->script(load => $script_myid);
-ok $db->script(exists => $script_myid_sha), 'script myid exists';
-ok !$db->script(exists => sha1_sum('nope')), 'script nope does not exist';
+ok $db->script(exists => $script_myid_sha)->[0], 'script myid exists';
+ok !$db->script(exists => sha1_sum('nope'))->[0], 'script nope does not exist';
 
 my $input = Mojo::Collection->new(1 .. 3)->map(sub { int rand 999999 });
 my $key = "$0:eval";

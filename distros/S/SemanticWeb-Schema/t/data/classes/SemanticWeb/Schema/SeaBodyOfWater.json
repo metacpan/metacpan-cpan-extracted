@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A sea (for example, the Caspian sea).",
+      "rdfs:label" : "SeaBodyOfWater",
+      "rdfs:subClassOf" : "schema:BodyOfWater"
+   },
+   "properties" : {}
+}

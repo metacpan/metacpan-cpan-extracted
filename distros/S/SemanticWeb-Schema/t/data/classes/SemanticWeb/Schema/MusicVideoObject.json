@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A music video file.",
+      "rdfs:label" : "MusicVideoObject",
+      "rdfs:subClassOf" : "schema:MediaObject"
+   },
+   "properties" : {}
+}

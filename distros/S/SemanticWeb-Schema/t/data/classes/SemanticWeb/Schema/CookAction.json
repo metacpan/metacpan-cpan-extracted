@@ -1,0 +1,37 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of producing/preparing food.",
+      "rdfs:label" : "CookAction",
+      "rdfs:subClassOf" : "schema:CreateAction"
+   },
+   "properties" : {
+      "schema:foodEstablishment" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of location. The specific food establishment where the action occurred.",
+         "rdfs:label" : "foodEstablishment",
+         "rdfs:subPropertyOf" : "schema:location",
+         "schema:domainIncludes" : "schema:CookAction",
+         "schema:rangeIncludes" : [
+            "schema:Place",
+            "schema:FoodEstablishment"
+         ]
+      },
+      "schema:foodEvent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of location. The specific food event where the action occurred.",
+         "rdfs:label" : "foodEvent",
+         "rdfs:subPropertyOf" : "schema:location",
+         "schema:domainIncludes" : "schema:CookAction",
+         "schema:rangeIncludes" : "schema:FoodEvent"
+      },
+      "schema:recipe" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of instrument. The recipe/instructions used to perform the action.",
+         "rdfs:label" : "recipe",
+         "rdfs:subPropertyOf" : "schema:instrument",
+         "schema:domainIncludes" : "schema:CookAction",
+         "schema:rangeIncludes" : "schema:Recipe"
+      }
+   }
+}

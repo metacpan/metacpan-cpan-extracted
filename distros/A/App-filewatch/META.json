@@ -4,7 +4,7 @@
       "Ivan Wills <ivan.wills@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -17,12 +17,12 @@
       "build" : {
          "requires" : {
             "Test::More" : "0.88",
-            "Test::Warnings" : "0"
+            "Test::Warnings" : "0.026"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.38"
          }
       },
       "runtime" : {
@@ -32,7 +32,7 @@
             "File::TypeCategories" : "0",
             "Linux::Inotify2" : "0",
             "Path::Tiny" : "0",
-            "perl" : "5.008",
+            "perl" : "5.01",
             "version" : "0"
          }
       }
@@ -40,7 +40,7 @@
    "provides" : {
       "App::filewatch" : {
          "file" : "lib/App/filewatch.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "url" : "git://github.com/ivanwills/App-filewatch.git"
       }
    },
-   "version" : "0.004",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.005",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

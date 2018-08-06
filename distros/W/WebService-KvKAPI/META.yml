@@ -25,25 +25,26 @@ name: WebService-KvKAPI
 provides:
   WebService::KvKAPI:
     file: lib/WebService/KvKAPI.pm
-    version: '0.004'
+    version: '0.005'
   WebService::KvKAPI::Spoof:
     file: lib/WebService/KvKAPI/Spoof.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Carp: '0'
   Data::Dumper: '0'
   Getopt::Long: '0'
   Moose: '0'
   MooseX::Log::Log4perl: '0'
-  OpenAPI::Client: '0'
+  OpenAPI::Client: '0.17'
   Pod::Usage: '0'
+  Try::Tiny: '0'
   namespace::autoclean: '0'
   perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   repository: git://gitlab.com/mintlab/webservice-kvkapi.git
-version: '0.004'
+version: '0.005'
 x_contributors:
   - 'Wesley Schwengle <wesley@schwengle.net>'
 x_generated_by_perl: v5.26.2

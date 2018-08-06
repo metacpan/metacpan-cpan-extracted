@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ar::Any::001 - Package for language Arabic
 
 package Locale::CLDR::Locales::Ar::Any::001;
 # This file auto generated from Data\common\main\ar_001.xml
-#	on Fri 13 Apr  7:01:20 am GMT
+#	on Sun  5 Aug  5:50:52 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

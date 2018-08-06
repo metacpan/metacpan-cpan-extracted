@@ -1,0 +1,20 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_DatasetClass",
+      "owl:equivalentClass" : "dcat:Catalog",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A collection of datasets.",
+      "rdfs:label" : "DataCatalog",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:dataset" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A dataset contained in this catalog.",
+         "rdfs:label" : "dataset",
+         "schema:domainIncludes" : "schema:DataCatalog",
+         "schema:inverseOf" : "schema:includedInDataCatalog",
+         "schema:rangeIncludes" : "schema:Dataset"
+      }
+   }
+}

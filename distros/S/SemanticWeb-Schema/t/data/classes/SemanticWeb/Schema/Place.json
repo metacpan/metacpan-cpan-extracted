@@ -1,0 +1,330 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Entities that have a somewhat fixed, physical extension.",
+      "rdfs:label" : "Place",
+      "rdfs:subClassOf" : "schema:Thing"
+   },
+   "properties" : {
+      "schema:additionalProperty" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A property-value pair representing an additional characteristics of the entitity, e.g. a product feature or another characteristic for which there is no matching property in schema.org.</p>\n\n<p>Note: Publishers should be aware that applications designed to use specific schema.org properties (e.g. http://schema.org/width, http://schema.org/color, http://schema.org/gtin13, ...) will typically expect such data to be provided using those properties, rather than using the generic property/value mechanism.",
+         "rdfs:label" : "additionalProperty",
+         "schema:domainIncludes" : [
+            "schema:QualitativeValue",
+            "schema:QuantitativeValue",
+            "schema:Product",
+            "schema:Place"
+         ],
+         "schema:rangeIncludes" : "schema:PropertyValue"
+      },
+      "schema:address" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Physical address of the item.",
+         "rdfs:label" : "address",
+         "schema:domainIncludes" : [
+            "schema:GeoShape",
+            "schema:Organization",
+            "schema:Place",
+            "schema:GeoCoordinates",
+            "schema:Person"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:PostalAddress"
+         ]
+      },
+      "schema:aggregateRating" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The overall rating, based on a collection of reviews or ratings, of the item.",
+         "rdfs:label" : "aggregateRating",
+         "schema:domainIncludes" : [
+            "schema:Organization",
+            "schema:Event",
+            "schema:Place",
+            "schema:Brand",
+            "schema:Product",
+            "schema:CreativeWork",
+            "schema:Offer",
+            "schema:Service"
+         ],
+         "schema:rangeIncludes" : "schema:AggregateRating"
+      },
+      "schema:amenityFeature" : {
+         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
+         "rdfs:label" : "amenityFeature",
+         "schema:domainIncludes" : [
+            "schema:Place",
+            "schema:Accommodation",
+            "schema:LodgingBusiness"
+         ],
+         "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
+      },
+      "schema:branchCode" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A short textual code (also called \"store code\") that uniquely identifies a place of business. The code is typically assigned by the parentOrganization and used in structured URLs.</p>\n\n<p>For example, in the URL http://www.starbucks.co.uk/store-locator/etc/detail/3047 the code \"3047\" is a branchCode for a particular branch.",
+         "rdfs:label" : "branchCode",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:containedIn" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The basic containment relation between a place and one that contains it.",
+         "rdfs:label" : "containedIn",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : "schema:Place",
+         "schema:supersededBy" : "schema:containedInPlace"
+      },
+      "schema:containedInPlace" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The basic containment relation between a place and one that contains it.",
+         "rdfs:label" : "containedInPlace",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:inverseOf" : "schema:containsPlace",
+         "schema:rangeIncludes" : "schema:Place"
+      },
+      "schema:containsPlace" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The basic containment relation between a place and another that it contains.",
+         "rdfs:label" : "containsPlace",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:inverseOf" : "schema:containedInPlace",
+         "schema:rangeIncludes" : "schema:Place"
+      },
+      "schema:event" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Upcoming or past event associated with this place, organization, or action.",
+         "rdfs:label" : "event",
+         "schema:domainIncludes" : [
+            "schema:JoinAction",
+            "schema:PlayAction",
+            "schema:InformAction",
+            "schema:Organization",
+            "schema:Place",
+            "schema:LeaveAction",
+            "schema:InviteAction"
+         ],
+         "schema:rangeIncludes" : "schema:Event"
+      },
+      "schema:events" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Upcoming or past events associated with this place or organization.",
+         "rdfs:label" : "events",
+         "schema:domainIncludes" : [
+            "schema:Organization",
+            "schema:Place"
+         ],
+         "schema:rangeIncludes" : "schema:Event",
+         "schema:supersededBy" : "schema:event"
+      },
+      "schema:faxNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The fax number.",
+         "rdfs:label" : "faxNumber",
+         "schema:domainIncludes" : [
+            "schema:ContactPoint",
+            "schema:Organization",
+            "schema:Place",
+            "schema:Person"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:geo" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The geo coordinates of the place.",
+         "rdfs:label" : "geo",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : [
+            "schema:GeoShape",
+            "schema:GeoCoordinates"
+         ]
+      },
+      "schema:globalLocationNumber" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The <a href=\"http://www.gs1.org/gln\">Global Location Number</a> (GLN, sometimes also referred to as International Location Number or ILN) of the respective organization, person, or place. The GLN is a 13-digit number used to identify parties and physical locations.",
+         "rdfs:label" : "globalLocationNumber",
+         "rdfs:subPropertyOf" : "schema:identifier",
+         "schema:domainIncludes" : [
+            "schema:Place",
+            "schema:Person",
+            "schema:Organization"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:hasMap" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A URL to a map of the place.",
+         "rdfs:label" : "hasMap",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Map"
+         ]
+      },
+      "schema:isAccessibleForFree" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A flag to signal that the item, event, or place is accessible for free.",
+         "rdfs:label" : "isAccessibleForFree",
+         "schema:domainIncludes" : [
+            "schema:CreativeWork",
+            "schema:PublicationEvent",
+            "schema:Place",
+            "schema:Event"
+         ],
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:isicV4" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The International Standard of Industrial Classification of All Economic Activities (ISIC), Revision 4 code for a particular organization, business person, or place.",
+         "rdfs:label" : "isicV4",
+         "schema:domainIncludes" : [
+            "schema:Person",
+            "schema:Place",
+            "schema:Organization"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:logo" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An associated logo.",
+         "rdfs:label" : "logo",
+         "rdfs:subPropertyOf" : "schema:image",
+         "schema:domainIncludes" : [
+            "schema:Brand",
+            "schema:Service",
+            "schema:Place",
+            "schema:Product",
+            "schema:Organization"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:ImageObject"
+         ]
+      },
+      "schema:map" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A URL to a map of the place.",
+         "rdfs:label" : "map",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : "schema:URL",
+         "schema:supersededBy" : "schema:hasMap"
+      },
+      "schema:maps" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A URL to a map of the place.",
+         "rdfs:label" : "maps",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : "schema:URL",
+         "schema:supersededBy" : "schema:hasMap"
+      },
+      "schema:maximumAttendeeCapacity" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The total number of individuals that may attend an event or venue.",
+         "rdfs:label" : "maximumAttendeeCapacity",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:Place"
+         ],
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:openingHoursSpecification" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The opening hours of a certain place.",
+         "rdfs:label" : "openingHoursSpecification",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
+      },
+      "schema:photo" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A photograph of this place.",
+         "rdfs:label" : "photo",
+         "rdfs:subPropertyOf" : "schema:image",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : [
+            "schema:ImageObject",
+            "schema:Photograph"
+         ]
+      },
+      "schema:photos" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Photographs of this place.",
+         "rdfs:label" : "photos",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : [
+            "schema:Photograph",
+            "schema:ImageObject"
+         ],
+         "schema:supersededBy" : "schema:photo"
+      },
+      "schema:publicAccess" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A flag to signal that the <a class=\"localLink\" href=\"http://schema.org/Place\">Place</a> is open to public visitors.  If this property is omitted there is no assumed default boolean value",
+         "rdfs:label" : "publicAccess",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:review" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A review of the item.",
+         "rdfs:label" : "review",
+         "schema:domainIncludes" : [
+            "schema:CreativeWork",
+            "schema:Brand",
+            "schema:Offer",
+            "schema:Event",
+            "schema:Service",
+            "schema:Place",
+            "schema:Organization",
+            "schema:Product"
+         ],
+         "schema:rangeIncludes" : "schema:Review"
+      },
+      "schema:reviews" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Review of the item.",
+         "rdfs:label" : "reviews",
+         "schema:domainIncludes" : [
+            "schema:Organization",
+            "schema:Offer",
+            "schema:Product",
+            "schema:Place",
+            "schema:CreativeWork"
+         ],
+         "schema:rangeIncludes" : "schema:Review",
+         "schema:supersededBy" : "schema:review"
+      },
+      "schema:smokingAllowed" : {
+         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates whether it is allowed to smoke in the place, e.g. in the restaurant, hotel or hotel room.",
+         "rdfs:label" : "smokingAllowed",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:specialOpeningHoursSpecification" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The special opening hours of a certain place.</p>\n\n<p>Use this to explicitly override general opening hours brought in scope by <a class=\"localLink\" href=\"http://schema.org/openingHoursSpecification\">openingHoursSpecification</a> or <a class=\"localLink\" href=\"http://schema.org/openingHours\">openingHours</a>.",
+         "rdfs:label" : "specialOpeningHoursSpecification",
+         "schema:domainIncludes" : "schema:Place",
+         "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
+      },
+      "schema:telephone" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The telephone number.",
+         "rdfs:label" : "telephone",
+         "schema:domainIncludes" : [
+            "schema:Person",
+            "schema:ContactPoint",
+            "schema:Organization",
+            "schema:Place"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

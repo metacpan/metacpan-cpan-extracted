@@ -11,12 +11,12 @@ plan skip_all => 'no driver available to run the tests' unless $driver;
 
 my $t = Term::Caca->new( driver => $driver );
 
-$t->circle( [ 10, 10 ], 5, fill => 'x' );
+$t->circle( [ 10, 10 ], 5, 'x' );
 
 $t->refresh;
 
 for ( qw/ caca ansi text html html3 irc ps svg tga / ) {
-    $t->export( format => $_ );
+    $t->export( $_ ); # in most cases return nothing because 'null' driver
     pass "export to $_";
 }
 

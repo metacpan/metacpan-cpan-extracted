@@ -66,6 +66,8 @@ $conn = $db->connection;
 
 is $redis->encoding, 'UTF-8', 'default redis encoding';
 is $conn->encoding,  'UTF-8', 'encoding passed on to connection';
+$conn->write_p(qw(get t:redis:encoding))->then(sub { @res = @_ })->wait;
+is_deeply \@res, [undef], 'undefined key not decoded';
 $conn->write_p(qw(set t:redis:encoding), $str)->wait;
 $conn->write_p(qw(get t:redis:encoding))->then(sub { @res = @_ })->wait;
 is_deeply \@res, [$str], 'unicode encoding';

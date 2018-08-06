@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Fur - Package for language Friulian
 
 package Locale::CLDR::Locales::Fur;
 # This file auto generated from Data\common\main\fur.xml
-#	on Fri 13 Apr  7:11:01 am GMT
+#	on Sun  5 Aug  6:01:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1566,12 +1566,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'wide' => {
-					'pm' => q{p.},
 					'am' => q{a.},
+					'pm' => q{p.},
 				},
 				'abbreviated' => {
-					'pm' => q{p.},
 					'am' => q{a.},
+					'pm' => q{p.},
 				},
 			},
 		},
@@ -1647,7 +1647,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			Ed => q{d E},
 			Hm => q{H:mm},
 			M => q{L},
@@ -1670,7 +1670,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			Ed => q{d E},
 			Hm => q{H:mm},
 			M => q{L},
@@ -1709,7 +1709,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -1804,7 +1804,7 @@ has 'datetime_formats_interval' => (
 				y => q{dd/MM/y – dd/MM/y},
 			},
 		},
-		'generic' => {
+		'gregorian' => {
 			H => {
 				H => q{HH–HH},
 			},

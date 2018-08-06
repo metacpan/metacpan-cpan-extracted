@@ -1,0 +1,18 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>The act of searching for an object.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/FindAction\">FindAction</a>: SearchAction generally leads to a FindAction, but not necessarily.</li>\n</ul>\n",
+      "rdfs:label" : "SearchAction",
+      "rdfs:subClassOf" : "schema:Action"
+   },
+   "properties" : {
+      "schema:query" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of instrument. The query used on this action.",
+         "rdfs:label" : "query",
+         "rdfs:subPropertyOf" : "schema:instrument",
+         "schema:domainIncludes" : "schema:SearchAction",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

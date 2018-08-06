@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Adapter;
 
 # ABSTRACT: Tell Log::Any where to send its logs
-our $VERSION = '1.706';
+our $VERSION = '1.707';
 
 use Log::Any;
 our @CARP_NOT = ( 'Log::Any::Manager' );
@@ -39,7 +39,7 @@ Log::Any::Adapter - Tell Log::Any where to send its logs
 
 =head1 VERSION
 
-version 1.706
+version 1.707
 
 =head1 SYNOPSIS
 

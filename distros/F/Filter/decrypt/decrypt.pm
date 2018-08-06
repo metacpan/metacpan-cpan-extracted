@@ -2,7 +2,7 @@ package Filter::decrypt ;
 
 require 5.006 ;
 require XSLoader;
-our $VERSION = "1.58" ;
+our $VERSION = "1.59" ;
 
 XSLoader::load('Filter::decrypt');
 1;

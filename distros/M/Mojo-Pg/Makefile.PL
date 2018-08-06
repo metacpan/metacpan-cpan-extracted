@@ -19,7 +19,7 @@ WriteMakefile(
     prereqs        => {runtime => {requires => {perl => '5.010001'}}},
     resources      => {
       bugtracker => {web => 'https://github.com/kraih/mojo-pg/issues'},
-      homepage   => 'http://mojolicious.org',
+      homepage   => 'https://mojolicious.org',
       license    => ['http://www.opensource.org/licenses/artistic-license-2.0'],
       repository => {
         type => 'git',
@@ -30,6 +30,6 @@ WriteMakefile(
     },
   },
   PREREQ_PM =>
-    {'DBD::Pg' => 3.005001, Mojolicious => '7.53', 'SQL::Abstract' => '1.85'},
+    {'DBD::Pg' => 3.005001, Mojolicious => '7.53', 'SQL::Abstract' => '1.86'},
   test => {TESTS => 't/*.t t/*/*.t'}
 );

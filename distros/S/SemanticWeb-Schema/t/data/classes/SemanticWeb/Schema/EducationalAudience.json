@@ -1,0 +1,18 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_LRMIClass",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An EducationalAudience.",
+      "rdfs:label" : "EducationalAudience",
+      "rdfs:subClassOf" : "schema:Audience"
+   },
+   "properties" : {
+      "schema:educationalRole" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An educationalRole of an EducationalAudience.",
+         "rdfs:label" : "educationalRole",
+         "schema:domainIncludes" : "schema:EducationalAudience",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

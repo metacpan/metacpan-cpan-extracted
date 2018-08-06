@@ -1,9 +1,9 @@
 # mojo-loco
-Mojolicious plugin that launches a local GUI via default web browser
+Mojolicious plugin that launches a web browser
 
-This is one way to create low-effort desktop applications using [Mojolicious](https://metacpan.org/pod/Mojolicious) (cross-platform if your code is sufficiently portable).
+This is a cheap way to create desktop applications using [Mojolicious](https://metacpan.org/pod/Mojolicious) (cross-platform if your code is sufficiently portable).
 
-On server start, [Mojolicious::Plugin::Loco](https://metacpan.org/pod/Mojolicious::Plugin::Loco) this opens a dedicated window in your default internet browser, assuming an available desktop and default internet browser that [Browser::Open](https://metacpan.org/pod/Browser::Open) knows how to deal with.  The application server then listens on a loopback/localhost port, shutting down once the browser window and all descendants thereof are subsequently closed.
+Run the [SYNOPSIS](lib/Mojolicious/Plugin/Loco.pod#SYNOPSIS); you'll get the idea.
 
 [Module documentation](lib/Mojolicious/Plugin/Loco.pod).
 

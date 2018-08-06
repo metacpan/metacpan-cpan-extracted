@@ -15,7 +15,7 @@ $db->multi_p->then(sub {
   push @res, map { $_->[0] } @_;
   return $db->exec_p;
 })->then(sub {
-  push @res, @_;
+  push @res, @{$_[0]};
 })->wait;
 is_deeply(\@res, [('QUEUED') x 4, 'OK', 1011, 1012, 1002], 'exec_p');
 

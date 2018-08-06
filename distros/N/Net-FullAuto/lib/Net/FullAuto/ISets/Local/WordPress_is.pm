@@ -3,7 +3,7 @@ package Net::FullAuto::ISets::Local::WordPress_is;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Powerful Network Process Automation Software
-#    Copyright © 2000-2018  Brian M. Kelly
+#    Copyright © 2000-2017  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -92,16 +92,14 @@ my $builddir='';my @ls_tmp=();
 
 # https://www.cartoonify.de/
 
-# https://mythemeshop.com/blog/add-amazon-products-woocommerce/
-
 my $configure_wordpress=sub {
 
    my $selection=$_[0]||'';
    my $service_and_cert_password=$_[1]||'';
-   my $stripe_publish_key=$_[2]||'';
-   my $stripe_secret_key=$_[3]||'';
-   my $recaptcha_publish_key=$_[4]||'';
-   my $recpatcha_secret_key=$_[5]||'';
+   my $stripe_publish_key=$_[2]||'pk_live_rRhtVk5Vj8sKyLwKI1zqCGeA';
+   my $stripe_secret_key=$_[3]||'sk_live_n3Vgr2ELkRxOR75ME4NRI4Fs';
+   my $recaptcha_publish_key=$_[4]||'6LfelToUAAAAADcI6ys632o074uL2_HtT_8zpGyi';
+   my $recpatcha_secret_key=$_[5]||'6LfelToUAAAAABZ8_QHWq0_AFPPk0kYP31aOyGZH';
    my ($stdout,$stderr)=('','');
    my $handle=$localhost;my $connect_error='';
    my $sudo=($^O eq 'cygwin')?'':'sudo ';
@@ -146,7 +144,7 @@ my $configure_wordpress=sub {
          'tar zcvf /home/www-data/gw_backup.tar '.
          '/var/www/html/wordpress','__display__');
    }
-&Net::FullAuto::FA_Core::cleanup;
+#&Net::FullAuto::FA_Core::cleanup;
 $do=1;
 if ($do==1) {
    unless ($^O eq 'cygwin') {
@@ -1078,6 +1076,12 @@ END
          # https://ssldecoder.org
 $do=1;
 if ($do==1) {
+
+resolver_timeout 5s;
+resolver 127.0.0.1 [::1]:5353;
+add_header Strict-Transport-Security "max-age=63072000; includeSubDomains;" always;
+add_header X-Frame-Options https://video.get-wisdom.com;
+
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/^ssl_certificate_key/assl_dhparam /etc/letsencrypt".
             "/ssl-dhparams.pem;' $nginx_path/nginx/nginx.conf");
@@ -1085,21 +1089,20 @@ if ($do==1) {
             "sed -i '/^ssl_dhparam/a# https://cipherli.st/' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/cipherli.st/assl_protocols TLSv1.2 TLSv1.3;' ".
+            "sed -i '/cipherli.st/assl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/^ssl_protocols/assl_prefer_server_ciphers on;' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_prefer_server_ciphers/assl_ciphers ECDHE-RSA-AES256-".
-            "GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256".
-            "-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;' ".
+            "sed -i '/^ssl_prefer_server_ciphers/assl_ciphers ".
+            "HIGH:!aNULL:!MD5;' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/^ssl_ciphers ECDHE/assl_ecdh_curve secp384r1;' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_ecdh_curve/assl_session_timeout  10m;' ".
+            "sed -i '/^ssl_ecdh_curve/assl_session_timeout  180m;' ".
             "$nginx_path/nginx/nginx.conf"); 
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/^ssl_session_timeout/assl_session_cache shared:SSL:10m;' ".
@@ -1114,10 +1117,10 @@ if ($do==1) {
             "sed -i '/^ssl_stapling/assl_stapling_verify on;' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/^ssl_stapling_verify/a#resolver \$DNS-IP-1 \$DNS-IP-2 valid=300s;' ".
+            "sed -i '/^ssl_stapling_verify/a#resolver 127.0.0.1 [::1]:5353 valid=300s;' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
-            "sed -i '/DNS-IP-1/aresolver_timeout 5s;' ".
+            "sed -i '/valid=/aresolver_timeout 5s;' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/resolver_timeout/aadd_header Strict-Transport-Security ".
@@ -1125,18 +1128,26 @@ if ($do==1) {
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/Strict-Transport-Security/aadd_header ".
-            "X-Frame-Options SAMEORIGIN;' ".
+            "X-Frame-Options \"ALLOW-FROM https://video.get-wisdom.com\";' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/X-Frame-Options/aadd_header X-Content-Type-Options nosniff;' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/X-Content-Type-Options/aadd_header X-XSS-Protection \"1; ".
-            "mode=block\";' ".
+            "mode=block\" always;' ".
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd(
             "sed -i '/X-XSS-Protection/aadd_header X-Robots-Tag none;' ".
             "$nginx_path/nginx/nginx.conf");
+         ($stdout,$stderr)=$handle->cmd(
+            "sed -i '/X-Robots-Tag/aadd_header Content-Security-Policy ".
+            "\"default-src \'self\' \'unsafe-inline\' \'unsafe-eval\' ".
+            "http: https: \*.get-wisdom.com gmpg.org; img-src http: ".
+            "https: data: ws.sharethis.com s.w.org \*.gravatar.com ".
+            "themes.googleusercontent.com wordpress.org; font-src ".
+            "\'self\' \'unsafe-inline\' http: https: data: ".
+            "fonts.googleapis.com fonts.gstatic.com\";");
 }
          ($stdout,$stderr)=$handle->cmd("service nginx restart",
             '__display__');
@@ -1294,12 +1305,69 @@ END
       "mysql-community-client.x86_64 ".
       "mysql-community-devel.x86_64 ".
       "mysql-connector-python.x86_64",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo."yum -y install ".
-      "mysql-community-server.x86_64 ".
-      "mysql-community-common.x86_64 ".
-      "mysql-community-client.x86_64 ".
-      "mysql-community-devel.x86_64 ".
-      "mysql-connector-python.x86_64",'__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo."yum -y install ".
+   #   "mysql-community-server.x86_64 ".
+   #   "mysql-community-common.x86_64 ".
+   #   "mysql-community-client.x86_64 ".
+   #   "mysql-community-devel.x86_64 ".
+   #   "mysql-connector-python.x86_64",'__display__');
+   my $ad=<<END;
+[mariadb]
+name = MariaDB
+baseurl = http://yum.mariadb.org/5.5/centos6-amd64
+gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgcheck=1
+END
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$ad\" > maria.repo");
+   ($stdout,$stderr)=$handle->cmd(
+      "sudo yum-config-manager --add-repo maria.repo",'__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      "sudo rpm --import https://yum.mariadb.org/RPM-GPG-KEY-MariaDB",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      'sudo /etc/init.d/mysql stop','__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      "sudo yum -y erase MariaDB-server MariaDB-client",'__display__');
+   ($stdout,$stderr)=$handle->cmd(
+      "sudo yum -y install MariaDB-server MariaDB-client",'__display__');
+   ($stdout,$stderr)=$handle->cmd("sudo /etc/init.d/mysql start",
+      '__display__');
+   #if ($stderr) {
+   #   ($stdout,$stderr)=$handle->cmd(
+   #      "sudo yum -y install MariaDB-server MariaDB-client",'__display__');
+   #   ($stdout,$stderr)=$handle->cmd("sudo /etc/init.d/mysql start",
+   #      '__display__');
+   #}
+   $handle->{_cmd_handle}->print('sudo mysql_secure_installation');
+   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   while (1) {
+      my $output=Net::FullAuto::FA_Core::fetch($handle);
+      last if $output=~/$prompt/;
+      print $output;
+      if (-1<index $output,'root (enter for none):') {
+         $handle->{_cmd_handle}->print();
+         next;
+      } elsif (-1<index $output,'Set root password? [Y/n]') {
+         $handle->{_cmd_handle}->print('n');
+         next;
+      } elsif (-1<index $output,'Remove anonymous users? [Y/n]') {
+         $handle->{_cmd_handle}->print('Y');
+         next;
+      } elsif (-1<index $output,'Disallow root login remotely? [Y/n]') {
+         $handle->{_cmd_handle}->print('Y');
+         next;
+      } elsif (-1<index $output,
+            'Remove test database and access to it? [Y/n]') {
+         $handle->{_cmd_handle}->print('Y');
+         next;
+      } elsif (-1<index $output,'Reload privilege tables now? [Y/n]') {
+         $handle->{_cmd_handle}->print('Y');
+         next;
+      }
+   }
+my $r=0;
+if ($r==1) {
    ($stdout,$stderr)=$handle->cmd($sudo."service mysqld start",
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1339,38 +1407,41 @@ END
          next;
       }
    }
-   $handle->{_cmd_handle}->print('mysql -u root --password='.
-      $service_and_cert_password);
+}
+   #$handle->{_cmd_handle}->print('mysql -u root -p'.
+   #   $service_and_cert_password);
+   $handle->{_cmd_handle}->print('mysql -u root');
    $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
    my $cmd_sent=0;
    while (1) {
       my $output=Net::FullAuto::FA_Core::fetch($handle);
       my $out=$output;
       $out=~s/$prompt//sg;
-      print $out if $output!~/^mysql>\s*$/;
+      #print $out if $output!~/^mysql>\s*$/;
+      print $out if $output!~/^MariaDB.*?>\s*$/;
       last if $output=~/$prompt|Bye/;
-      if (!$cmd_sent && $output=~/mysql>\s*$/) {
+      if (!$cmd_sent && $output=~/MariaDB.*?>\s*$/) {
          my $cmd='DROP DATABASE wordpress;';
          print "$cmd\n";
          $handle->{_cmd_handle}->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
-      } elsif ($cmd_sent==1 && $output=~/mysql>\s*$/) {
+      } elsif ($cmd_sent==1 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd="CREATE DATABASE wordpress;";
          print "$cmd\n";
          $handle->{_cmd_handle}->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
-      } elsif ($cmd_sent==2 && $output=~/mysql>\s*$/) {
+      } elsif ($cmd_sent==2 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd='DROP USER wordpressuser@localhost;';
          print "$cmd\n";
          $handle->{_cmd_handle}->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
-      } elsif ($cmd_sent==3 && $output=~/mysql>\s*$/) {
+      } elsif ($cmd_sent==3 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd='CREATE USER wordpressuser@localhost IDENTIFIED BY '.
                  "'".$service_and_cert_password."';";
          print "$cmd\n";
@@ -1378,7 +1449,7 @@ END
          $cmd_sent++;
          sleep 1;
          next;
-      } elsif ($cmd_sent==4 && $output=~/mysql>\s*$/) {
+      } elsif ($cmd_sent==4 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd='GRANT ALL PRIVILEGES ON wordpress.*'.
                  ' TO wordpressuser@localhost;';
          print "$cmd\n";
@@ -1386,14 +1457,14 @@ END
          $cmd_sent++;
          sleep 1;
          next;
-      } elsif ($cmd_sent==5 && $output=~/mysql>\s*$/) {
+      } elsif ($cmd_sent==5 && $output=~/MariaDB.*?>\s*$/) {
          my $cmd="FLUSH PRIVILEGES;";
          print "$cmd\n";
          $handle->{_cmd_handle}->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
-      } elsif ($cmd_sent>=6 && $output=~/mysql>\s*$/) {
+      } elsif ($cmd_sent>=6 && $output=~/MariaDB.*?>\s*$/) {
          print "quit\n";
          $handle->{_cmd_handle}->print('quit');
          sleep 1;
@@ -1662,7 +1733,7 @@ END
 }
 
 .site-header {
-    background-image: url(https://www.get-wisdom.com/wp-content/uploads/2018/12/gw_header.png);
+    background-image: url(https://www.get-wisdom.com/wp-content/uploads/2017/12/gw_header.png);
 }
 
 .site-branding .site-title a {
@@ -1896,7 +1967,8 @@ my $curyear=$thisyear + 1900;
    "'%angelwing75%'\" --path=/var/www/html/wordpress --allow-root");
 $stdout=~s/^.*(\d+)$/$1/s;
 my $post_id=$stdout;
-$handle->{_cmd_handle}->print('mysql -u root --password='.$service_and_cert_password);
+#$handle->{_cmd_handle}->print('mysql -u root --password='.$service_and_cert_password);
+$handle->{_cmd_handle}->print('mysql -u root');
 $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
 $cmd_sent=0;
 while (1) {
@@ -1905,21 +1977,21 @@ while (1) {
    $out=~s/$prompt//sg;
    print $out if $output!~/^mysql>\s*$/;
    last if $output=~/$prompt|Bye/;
-   if (!$cmd_sent && $output=~/mysql>\s*$/) {
+   if (!$cmd_sent && $output=~/MariaDB.*?>\s*$/) {
       my $cmd='UPDATE wordpress.wp_options SET option_value = \'a:5:{s:18:"nav_menu_locations";a:0:{}s:18:"custom_css_post_id";i:-1;s:10:"meta_login";b:1;s:15:"nav_menu_search";b:1;s:20:"columns_ratio_header";s:3:"7-5";}\' WHERE option_name = \'theme_mods_memberlite-child\';';
       print "$cmd\n";
       $handle->{_cmd_handle}->print($cmd);
       $cmd_sent++;
       sleep 1;
       next;
-   } elsif ($cmd_sent==1 && $output=~/mysql>\s*$/) {
+   } elsif ($cmd_sent==1 && $output=~/MariaDB.*?>\s*$/) {
       my $cmd='UPDATE wordpress.wp_options SET option_value = \'1\' WHERE option_name = \'users_can_register\';';
       print "$cmd\n";
       $handle->{_cmd_handle}->print($cmd);
       $cmd_sent++;
       sleep 1;
       next;
-   } elsif ($cmd_sent>=2 && $output=~/mysql>\s*$/) {
+   } elsif ($cmd_sent>=2 && $output=~/MariaDB.*?>\s*$/) {
       print "quit\n";
       $handle->{_cmd_handle}->print('quit;');
       sleep 1;
@@ -2942,9 +3014,12 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl start elasticsearch','__display__');
    my $ep='%NL%/** ElasticPress */%NL%'.
-          "define( 'EP_HOST', 'http://127.0.0.1:9200' );";
+          "define( %SQ%EP_HOST%SQ%, %SQ%http://127.0.0.1:9200%SQ% );";
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \'/DB_COLLATE/a$ep\' /var/www/html/wordpress/wp-config.php");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \"s/%SQ%/\'/g\" ".
+       '/var/www/html/wordpress/wp-config.php');
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
        '/var/www/html/wordpress/wp-config.php');
@@ -2965,7 +3040,7 @@ if ($do==1) {
           |_| \_|\___|\__|     |_|   \__,_|_|_/_/   \_\__,_|\__\___/ (C)
 
 
-   Copyright (C) 2000-2018  Brian M. Kelly  Brian.Kelly@FullAuto.com
+   Copyright (C) 2000-2017  Brian M. Kelly  Brian.Kelly@FullAuto.com
 
 END
    eval {

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of inserting at the end if an ordered collection.",
+      "rdfs:label" : "AppendAction",
+      "rdfs:subClassOf" : "schema:InsertAction"
+   },
+   "properties" : {}
+}

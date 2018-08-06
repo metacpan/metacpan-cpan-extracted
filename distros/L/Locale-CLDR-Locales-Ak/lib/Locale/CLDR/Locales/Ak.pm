@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ak - Package for language Akan
 
 package Locale::CLDR::Locales::Ak;
 # This file auto generated from Data\common\main\ak.xml
-#	on Fri 13 Apr  7:00:46 am GMT
+#	on Sun  5 Aug  5:50:14 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -860,6 +860,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Mɔretenia Ouguiya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Mɔretenia Ouguiya),
 			},
 		},
@@ -929,6 +934,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Sao Tome ne Principe Dobra \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Sao Tome ne Principe Dobra),
 			},
@@ -1085,13 +1095,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'am' => q{AN},
-					'pm' => q{EW},
-				},
 				'wide' => {
 					'am' => q{AN},
 					'pm' => q{EW},
+				},
+				'abbreviated' => {
+					'pm' => q{EW},
+					'am' => q{AN},
 				},
 			},
 		},

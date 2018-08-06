@@ -1,0 +1,33 @@
+CaptureRelease.pm
+CaptureRelease.xs
+CaptureReleaseTest
+Changes
+dragShadowTest
+DragShadowToplevelTest
+IDEdragDrop.pm
+IDEdragShadow.pm
+IDEdragShadowToplevel.pm
+IDElayout.pm
+IDElayoutDropSite.pm
+IDEpanedwindow.pm
+IDEtabFrame.pm
+lib/Tk/IDElayout/DropBox.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+myConfig
+README
+Screenshots.pdf
+t/addDeleteWidgets.t
+t/dropbox.t
+t/IDEpanedwindow.t
+t/IDEtabFrameCaptureRelease.t
+t/simpleIDElayout.t
+t/simpleIDElayout2.t
+t/simpleIDElayoutSingleWidget.t
+TabsDragDemo
+testTextEdit
+WmCaptureRelease.c
+WmCaptureRelease.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

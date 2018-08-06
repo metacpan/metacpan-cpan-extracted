@@ -7,7 +7,7 @@ INTRODUCTION
 
 Tk::IDElayout is a widget for managing the layout of Tk frames
 (and other widgets) like an IDE (Integrated Development Environment)
-similar to Ecliplse or Microsoft Visual Studio.
+similar to Eclipse or Microsoft Visual Studio.
 
 Features:
 

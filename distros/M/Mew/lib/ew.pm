@@ -3,7 +3,7 @@ package ew;
 use strictures 2;
 use Module::Runtime;
 
-our $VERSION = '1.002002'; # VERSION
+our $VERSION = '1.002003'; # VERSION
 
 sub _mew {
   print <<'EOMEW';

@@ -1,0 +1,113 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A single message from a sender to one or more organizations or people.",
+      "rdfs:label" : "Message",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:bccRecipient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of recipient. The recipient blind copied on a message.",
+         "rdfs:label" : "bccRecipient",
+         "rdfs:subPropertyOf" : "schema:recipient",
+         "schema:domainIncludes" : "schema:Message",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:ContactPoint",
+            "schema:Person"
+         ]
+      },
+      "schema:ccRecipient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of recipient. The recipient copied on a message.",
+         "rdfs:label" : "ccRecipient",
+         "rdfs:subPropertyOf" : "schema:recipient",
+         "schema:domainIncludes" : "schema:Message",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:ContactPoint",
+            "schema:Person"
+         ]
+      },
+      "schema:dateRead" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date/time at which the message has been read by the recipient if a single recipient exists.",
+         "rdfs:label" : "dateRead",
+         "schema:domainIncludes" : "schema:Message",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:dateReceived" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date/time the message was received if a single recipient exists.",
+         "rdfs:label" : "dateReceived",
+         "schema:domainIncludes" : "schema:Message",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:dateSent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date/time at which the message was sent.",
+         "rdfs:label" : "dateSent",
+         "schema:domainIncludes" : "schema:Message",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:messageAttachment" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A CreativeWork attached to the message.",
+         "rdfs:label" : "messageAttachment",
+         "schema:domainIncludes" : "schema:Message",
+         "schema:rangeIncludes" : "schema:CreativeWork"
+      },
+      "schema:recipient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The participant who is at the receiving end of the action.",
+         "rdfs:label" : "recipient",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : [
+            "schema:TipAction",
+            "schema:GiveAction",
+            "schema:CommunicateAction",
+            "schema:PayAction",
+            "schema:SendAction",
+            "schema:Message",
+            "schema:ReturnAction",
+            "schema:AuthorizeAction",
+            "schema:DonateAction"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:ContactPoint",
+            "schema:Organization",
+            "schema:Audience",
+            "schema:Person"
+         ]
+      },
+      "schema:sender" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The participant who is at the sending end of the action.",
+         "rdfs:label" : "sender",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : [
+            "schema:ReceiveAction",
+            "schema:Message"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Audience",
+            "schema:Organization"
+         ]
+      },
+      "schema:toRecipient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of recipient. The recipient who was directly sent the message.",
+         "rdfs:label" : "toRecipient",
+         "rdfs:subPropertyOf" : "schema:recipient",
+         "schema:domainIncludes" : "schema:Message",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Audience",
+            "schema:Person",
+            "schema:ContactPoint"
+         ]
+      }
+   }
+}

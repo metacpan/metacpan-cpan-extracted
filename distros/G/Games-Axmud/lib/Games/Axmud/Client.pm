@@ -90,6 +90,9 @@
             aboutWin                    => undef,       # Set by $self->set_aboutWin
             # The Error Console window (only one can be open at a time)
             consoleWin                  => undef,       # Set by $self->set_consoleWin
+            # A 'dialogue' window created by a call to GA::Generic::Win->showBusyWin, e.g. the
+            #   'Loading...' window created by $self->start
+            busyWin                     => undef,       # Set by $self->set_busyWin
 
             # Instance variable constants
             # ---------------------------
@@ -256,6 +259,7 @@
                 'trigger'               => undef,
                 'tts'                   => undef,
                 'usercomm'              => undef,
+                'viewer'                => undef,
                 'window'                => undef,
                 'winmap'                => undef,
                 'winmaps'               => undef,
@@ -336,6 +340,36 @@
             #   user can manually restore the previous version. If this flag is set to FALSE, the
             #   backup is destroyed as soon as the save process is complete.
             autoRetainFileFlag          => TRUE,        # [config]
+            #
+            # Auto-backup (a process which creates a .tgz or .zip of the entire Axmud data
+            #   directory)
+            # Auto-backup mode: 'no_backup' (don't do auto-backups'), 'all_start' (do an auto-backup
+            #   whenever Axmud starts), 'all_stop' (do an auto-backup whenever Axmud stops),
+            #   'interval_start' (do an auto-backup at regular intervals, performed when Axmud
+            #   first starts after the interval has passed), 'interval_stop' (do an auto backup at
+            #   regular intervals, when Axmud stops)
+            autoBackupMode              => 'no_backup', # [config]
+            # The directory in which the backup is saved. If 'undef' or an empty string, the user
+            #   is prompted for a directory each time
+            autoBackupDir               => undef,       # [config]
+            # For auto-backup mode 'interval_start' and 'interval_stop', the number of days between
+            #   successive backups. 1 means do daily backups, 8 means do weekly backups, 366 means
+            #   backup once a year. 0 means stop doing backups temporarily (but remember when the
+            #   last backup occured, so when the interval is change back to a positive integer, that
+            #   interval is applied to the time since the last backup). Range 0-366
+            autoBackupInterval          => 8,           # [config]
+            # The time of the last successful auto-backup, set a string returned by $self->localDate
+            #   (in the form 'Thu Dec 18, 2010'). 'undef' or an empty string if no auto-backup has
+            #   ever been performed, or if auto-backup mode is currently 'no_backup', 'all_start' or
+            #   'all_stop'. The value is not modified if the user performs a manual backup using the
+            #   ';backupdata' command
+            autoBackupDate              => undef,           # [config]
+            # Auto-backup file type: 'tar' to use a .tgz file, 'zip' to use a .zip file, 'default'
+            #   to use a convenient file type for the system (.tgz for Linux, .zip for MS Windows)
+            autoBackupFileType          => 'default',   # [config]
+            # Flag set to TRUE if the time should be appended to auto-backups and to manual backups
+            #   using the ';backupdata' command
+            autoBackupAppendFlag        => FALSE,       # [config]
             #
             # GA::Session->setupProfiles can optionally create a 'Loading...' popup window by
             #   calling GA::Generic::Win->showBusyWin, if the file(s) it's loading are above a
@@ -663,11 +697,11 @@
                         'TestModel',
                     'QuickInput',
                     'SimulateWorld', 'SimulatePrompt', 'SimulateCommand', 'SimulateHook',
-                    'DebugToggle', 'DebugConnection', 'Restart', 'Peek', 'Poke',
+                    'DebugToggle', 'DebugConnection', 'Restart', 'Peek', 'Poke', 'PeekHelp',
                 '@Client commands',
                     'Help', 'Hint', 'QuickHelp', 'SearchHelp', 'ListReserved',
                     'About', 'OpenAboutWindow', 'CloseAboutWindow',
-                    'EditClient', 'EditSession',
+                    'EditQuick', 'EditClient', 'EditSession',
                     'SwitchSession', 'MaxSession', 'ListSession', 'SetSession',
                     'Connect', 'Reconnect', 'XConnect', 'Telnet', 'SSH', 'SSL',
                     'Login',
@@ -692,7 +726,8 @@
                     'ShowFile', 'DisableSaveLoad', 'DisableSaveWorld', 'Save', 'Load',
                         'AutoSave', 'EmergencySave',
                     'ExportFiles', 'ImportFiles', 'ExportData', 'ImportData',
-                    'RetainBackups',
+                    'RetainFileCopy',
+                    'BackupData', 'RestoreData', 'AutoBackup',
                     'LoadPlugin', 'EnablePlugin', 'DisablePlugin', 'TestPlugin', 'ListPlugin',
                     'AddInitialPlugin', 'DeleteInitialPlugin', 'ListInitialPlugin',
                     'SetTelnetOption', 'SetMUDProtocol', 'SetTermType', 'MSDP', 'MSSP', 'MXP',
@@ -706,13 +741,16 @@
                         'PermAlert', 'ListAttribute', 'AddConfig', 'CloneConfig', 'EditConfig',
                         'ModifyConfig', 'DeleteConfig', 'ListConfig',
                 '@Other windows',
-                    'OpenGUIWindow', 'CloseGUIWindow',
+                    'OpenObjectViewer', 'CloseObjectViewer',
                     'OpenAutomapper', 'CloseAutomapper', 'ToggleAutomapper',
                     'LocatorWizard',
                 '@Dictionaries',
                     'AddDictionary', 'SetDictionary', 'CloneDictionary', 'EditDictionary',
                         'DeleteDictionary', 'ListDictionary', 'SetLanguage', 'SwitchLanguage',
                     'AddWord', 'QuickAddWord', 'DeleteWord', 'ListWord',
+                    'ModifyPrimary', 'AddSecondary', 'ModifySecondary', 'DeleteSecondary',
+                        'ListDirection',
+                    'SetAutoSecondary', 'ListAutoSecondary',
                     'AddSpeedWalk', 'DeleteSpeedWalk', 'ListSpeedWalk',
                     'AddModifierChar', 'DeleteModifierChar', 'ListModifierChar',
                 '@Profiles - general',
@@ -724,7 +762,7 @@
                 '@Profiles - world profiles',
                     'AddWorld', 'SetWorld', 'CloneWorld', 'EditWorld', 'DeleteWorld', 'ListWorld',
                         'SetFavouriteWorld', 'ListFavouriteWorld', 'RestoreWorld',
-                        'ListRestoreWorld', 'UpdateWorld', 'ListOtherWorld',
+                        'ListRestoreWorld', 'UpdateWorld', 'ListBasicWorld',
                     'ToggleHistory', 'ClearHistory', 'ShowHistory',
                 '@Profiles - other profiles',
                     'AddGuild', 'SetGuild', 'UnsetGuild', 'CloneGuild', 'EditGuild', 'DeleteGuild',
@@ -749,8 +787,8 @@
                     'AddTimer', 'ModifyTimer', 'DeleteTimer', 'ListTimer',
                     'AddHook', 'ModifyHook', 'DeleteHook', 'ListHook',
                 '@Keycodes',
-                    'AddKeycodeObject', 'SetKeycodeObject', 'EditKeycodeObject',
-                        'CloneKeycodeObject', 'ResetKeycodeObject', 'DeleteKeycodeObject',
+                    'AddKeycodeObject', 'SetKeycodeObject', 'CloneKeycodeObject',
+                        'EditKeycodeObject', 'ResetKeycodeObject', 'DeleteKeycodeObject',
                         'ListKeycodeObject',
                     'GetKeycode', 'SetKeycode', 'ResetKeycode', 'ListKeycode',
                         'ListKeycodeAlternative',
@@ -840,7 +878,7 @@
                         'ChatSetIcon',
                     'AddSmiley', 'DeleteSmiley', 'ListSmiley', 'ResetSmiley',
                 '@Compass task',
-                    'Compass', 'PermCompass',
+                    'Compass', 'PermCompass', 'WorldCompass',
                 '@Debugger task',
                     'SetDebuggerMode',
                 '@Divert task',
@@ -871,9 +909,11 @@
                     'AddPlayerCharacter', 'DeletePlayerCharacter', 'ListPlayerCharacter',
                     'AddMinionString', 'DeleteMinionString', 'ListMinionString',
                     'SetLightList', 'ResetLightList', 'SetLightStatus',
-                    'SetRoom', 'ResetRoom', 'SetOfflineRoom', 'LocateRoom', 'EditRoomComponent',
-                        'ListRoomComponent', 'EditPainter',
+                    'SetRoom', 'ResetRoom', 'SetOfflineRoom', 'LocateRoom',
+                    'EditRoomComponent', 'ListRoomComponent',
+                    'EditPainter',
                     'SetAssistedMoves', 'SetProtectedMoves',
+                    'RoomCommand', 'IgnoreRoomCommand', 'NoticeRoomCommand', 'ListRoomCommand',
                 '@Exit model commands',
                     'AddExit', 'EditExit', 'DeleteExit', 'ListExitModel', 'DumpExitModel',
             ],
@@ -1232,82 +1272,115 @@
             #   $worldProfHash{unique_string_name} = blessed_reference_to_profile_object
             worldProfHash               => {},      # [config] [worldprof]
             #
-            # Axmud comes with some pre-configured world profiles. A constant registry list of those
-            #   profiles
-            constWorldList              => [
-                'aardwolf',         # Aardwolf MUD / aardmud.org 40000
-                'achaea',           # Achaea / achaea.com 23
-                'aetolia',          # Aetolia / aetolia.com 23
-                'alteraeon',        # Alter Aeon / alteraeon.com 3000
-                'anguish',          # Ancient Anguish / ancient.anguish.org 2222
-                'archipelago',      # Archipelago MUD / the-firebird.net 8000
-                'arctic',           # ArcticMud / mud.arctic.org 2700
-                'ateraan',          # New Worlds: Ateraan / www.ateraan.com 4002
-                'avalonrpg',        # Avalon; The Legend Lives / avalon-rpg.com 23
-                'avatarmud',        # Avatar MUD / avatar.outland.org 3000
-                'batmud',           # BatMUD / batmud.bat.org 23
-                'bedlam',           # Bedlam / mud.playbedlam.com 9000
-                'burningmud',       # Burning MUD / burningmud.com 4000
-                'clok',             # CLOK / clok.contrarium.net 4000
-                'coffeemud',        # CoffeeMud / coffeemud.net 23
-                'cryosphere',       # Cryosphere / cryosphere.org 6666
-                'darkrealms',       # Dark Realms: City of Syne / 173.244.70.250 1138
-                'dartmud',          # DartMUD / dartmud.com 2525
-                'dawn',             # Dawn / 23.241.198.57 3000
-                'discworld',        # Discworld MUD / discworld.starturtle.net 23
-                'dsdev',            # Dead Souls development mud / dead-souls.net 8000
-                'dslands',          # Dark and Shattered Lands / dsl-mud.org 4000
-                'dslocal',          # Local installation of Dead Souls mudlib / localhost 6666
-                'dsprime',          # Dead Souls game mud / dead-souls.net 6666
-                'dunemud',          # DuneMUD / dune.servint.com 6789
-                'duris',            # Duris: Land of BloodLust / mud.durismud.com 7777
-                'elephantmud',      # Elephant MUD / elephant.org 23
-                'empire',           # EmpireMUD 2.0 / empiremud.net 4000
-                'eotl',             # End of the Line / eotl.org 2010
-                'fourdims',         # 4Dimensions / 4dimensions.org 6000
-                'genesis',          # Genesis / mud.genesismud.org 3011
-                'holyquest',        # HolyQuest / holyquest.org 8080
-                'iberia',           # Iberia MUD / iberiamud.com 5900
-                'icesus',           # Icesus / icesus.org 23
-                'ifmud',            # ifMUD / ifmud.port4000.com 4000
-                'imperian',         # Imperian: Sundered Heavens / imperian.com 23
-                'islands',          # Islands / islands.genesismuds.com 3000
-                'kallisti',         # Legends of Kallisti / legendsofkallisti.com 4000
-                'lambda',           # LambdaMOO / lambda.moo.mud.org 8888
-                'legendmud',        # LegendMUD / mud.legendmud.org 9999
-                'lostsouls',        # Lost Souls / lostsouls.org 23
-                'luminari',         # Luminari MUD / luminarimud.com 4100
-                'lusternia',        # Lusternia / lusternia.com 23
-                'magica',           # Materia Magica / materiamagica.com 4000
-                'medievia',         # Medievia / medievia.com 4000
-                'merentha',         # Merentha / mud.merentha.com 10000
-                'morgengrauen',     # MorgenGrauen / mg.mud.de 23
-                'mud1',             # MUD1 (British Legends) / british-legends.com 27750
-                'mud2',             # MUD2 (Canadian server) / mud2.com 23
-                'mudii',            # MUD2 (UK server) / mud2.com 23
-                'nanvaent',         # Nanvaent / nanvaent.org 23
-                'nodeka',           # Nodeka / nodeka.com 23
-                'nuclearwar',       # Nuclear War / nuclearwarmudusa.com 4000
-                'penultimate',      # Penultimate Destination / penultimatemush.com 9500
-                'pict',             # Pict MUD / pict.genesismuds.com 4200
-                'reinos',           # Reinos de Leyenda / rlmud.org 5001
-                'retromud',         # RetroMUD / retromud.org 3000
-                'rodespair',        # Realms of Despair / realmsofdespair.com 23
-                'rupert',           # Rupert / rupert.twyst.org 9040
-                'slothmud',         # SlothMUD III / slothmud.org 6101
-                'stonia',           # Stonia / stonia.ttu.ee 4000
-                'swmud',            # Star Wars Mud / swmud.org 6666
-                'tempora',          # Tempora Heroica / login1.ibiblio.org 2895
-                'threekingdoms',    # 3Kingdoms / 3k.org 3000
-                'threescapes',      # 3Scapes / 3scapes.org 3200
-                'torilmud',         # TorilMUD / torilmud.org 9999
-                'valhalla',         # Valhalla MUD / valhalla.com 4242
-                'vikingmud',        # Viking MUD / connect.vikingmud.org 2001
-                'wotmud',           # The Wheel of Time MUD / game.wotmud.org 2224
-                'zombiemud',        # ZombieMUD / zombiemud.org 23
-                # Pre-configured worlds from earlier releases, now defunct
-#                'midkemia',         # Midkemia Online / closed 2016
-            ],
+            # Axmud comes with some pre-configured world profiles. A constant registry hash of those
+            #   world profiles, and the Axmud version in which they were introduced
+            # If the user is using a newer version of Axmud, this IV is consulted and any new
+            #   pre-configured worlds are imported into Axmud's data directories
+            constWorldHash              => {
+                'aardwolf'          => '1.0.140', # Aardwolf MUD / aardmud.org 40000
+                'achaea'            => '1.0.050', # Achaea / achaea.com 23
+                'aetolia'           => '1.0.376', # Aetolia / aetolia.com 23
+                'alteraeon'         => '1.0.140', # Alter Aeon / alteraeon.com 3000
+                'anguish'           => '1.0.050', # Ancient Anguish / ancient.anguish.org 2222
+                'aochaos'           => '1.1.050', # Age of Chaos / aoc.pandapub.com 4000
+                'archipelago'       => '1.0.140', # Archipelago MUD / the-firebird.net 8000
+                'arctic'            => '1.1.0',   # ArcticMud / mud.arctic.org 2700
+                'ateraan'           => '1.1.0',   # New Worlds: Ateraan / www.ateraan.com 4002
+                'avalonmud'         => '1.1.050', # Avalon (Germany) / avalon.mud.de 7777
+                'avalonrpg'         => '1.1.0',   # Avalon; The Legend Lives / avalon-rpg.com 23
+                'avatarmud'         => '1.1.0',   # Avatar MUD / avatar.outland.org 3000
+                'batmud'            => '1.0.140', # BatMUD / batmud.bat.org 23
+                'bedlam'            => '1.0.140', # Bedlam / mud.playbedlam.com 9000
+                'burningmud'        => '1.1.0',   # Burning MUD / burningmud.com 4000
+                'carrion'           => '1.1.050', # Carrion Fields / carrionfields.net 4449
+                'clok'              => '1.0.275', # CLOK / clok.contrarium.net 4000
+                'coffeemud'         => '1.1.0',   # CoffeeMud / coffeemud.net 23
+                'cryosphere'        => '1.0.376', # Cryosphere / cryosphere.org 6666
+                'cyberassault'      => '1.1.050', # CyberASSAULT / cyberassault.org 11111
+                'darkrealms'        => '1.1.0',   # Dark Realms: City of Syne / 173.244.70.250 1138
+                'dartmud'           => '1.1.0',   # DartMUD / dartmud.com 2525
+                'dawn'              => '1.1.0',   # Dawn / 23.241.198.57 3000
+                'discworld'         => '1.0.140', # Discworld MUD / discworld.starturtle.net 23
+                'dsdev'             => '1.0.0',   # Dead Souls development mud / dead-souls.net 8000
+                'dslands'           => '1.0.0',   # Dark and Shattered Lands / dsl-mud.org 4000
+                'dslocal'           => '1.0.0',   # Local installation of Dead Souls mudlib
+                                                  #     / localhost 6666
+                'dsprime'           => '1.0.0',   # Dead Souls game mud / dead-souls.net 6666
+                'dunemud'           => '1.1.0',   # DuneMUD / dune.servint.com 6789
+                'duris'             => '1.0.0',   # Duris: Land of BloodLust / mud.durismud.com 7777
+                'elephantmud'       => '1.1.0',   # Elephant MUD / elephant.org 23
+                'elysium'           => '1.1.050', # Elysium RPG / elysium-rpg.com 7777
+                'empire'            => '1.1.0',   # EmpireMUD 2.0 / empiremud.net 4000
+                'eotl'              => '1.1.0',   # End of the Line / eotl.org 2010
+                'fourdims'          => '1.0.050', # 4Dimensions / 4dimensions.org 6000
+                'genesis'           => '1.0.0',   # Genesis / mud.genesismud.org 3011
+                'hellmoo'           => '1.1.050', # HellMOO / hellmoo.org 7777
+                'holyquest'         => '1.1.0',   # HolyQuest / holyquest.org 8080
+                'iberia'            => '1.0.0',   # Iberia MUD / iberiamud.com 5900
+                'icesus'            => '1.1.0',   # Icesus / icesus.org 23
+                'ifmud'             => '1.0.275', # ifMUD / ifmud.port4000.com 4000
+                'imperian'          => '1.0.376', # Imperian: Sundered Heavens / imperian.com 23
+                'islands'           => '1.1.0',   # Islands / islands.genesismuds.com 3000
+                'kallisti'          => '1.1.0',   # Legends of Kallisti / legendsofkallisti.com 4000
+                'lambda'            => '1.1.0',   # LambdaMOO / lambda.moo.mud.org 8888
+                'legendmud'         => '1.0.275', # LegendMUD / mud.legendmud.org 9999
+                'lostsouls'         => '1.1.0',   # Lost Souls / lostsouls.org 23
+                'luminari'          => '1.1.0',   # Luminari MUD / luminarimud.com 4100
+                'lusternia'         => '1.0.0',   # Lusternia / lusternia.com 23
+                'magica'            => '1.0.140', # Materia Magica / materiamagica.com 4000
+                'medievia'          => '1.1.0',   # Medievia / medievia.com 4000
+                'merentha'          => '1.0.050', # Merentha / mud.merentha.com 10000
+                'miriani'           => '1.1.050', # Miriani / toastsoft.net 1234
+                'morgengrauen'      => '1.1.0',   # MorgenGrauen / mg.mud.de 23
+                'mud1'              => '1.1.0',   # MUD1 (British Legends)
+                                                  #     / british-legends.com 27750
+                'mud2'              => '1.1.0',   # MUD2 (Canadian server) / mud2.com 23
+                'mudii'             => '1.1.0',   # MUD2 (UK server) / mud2.com 23
+                'mume'              => '1.1.050', # MUME / mume.org 23
+                'nanvaent'          => '1.0.0',   # Nanvaent / nanvaent.org 23
+                'nodeka'            => '1.0.275', # Nodeka / nodeka.com 23
+                'nuclearwar'        => '1.0.140', # Nuclear War / nuclearwarmudusa.com 4000
+                'penultimate'       => '1.1.0',   # Penultimate Destination
+                                                  #     / penultimatemush.com 9500
+                'pict'              => '1.0.140', # Pict MUD / pict.genesismuds.com 4200
+                'reinos'            => '1.1.0',   # Reinos de Leyenda / rlmud.org 5001
+                'retromud'          => '1.1.0',   # RetroMUD / retromud.org 3000
+                'rodespair'         => '1.1.0',   # Realms of Despair / realmsofdespair.com 23
+                'roninmud'          => '1.1.050', # RoninMUD / game.roninmud.org 5000
+                'rupert'            => '1.0.275', # Rupert / rupert.twyst.org 9040
+                'slothmud'          => '1.0.140', # SlothMUD III / slothmud.org 6101
+                'stonia'            => '1.0.376', # Stonia / stonia.ttu.ee 4000
+                'swmud'             => '1.1.0',   # Star Wars Mud / swmud.org 6666
+                'tempora'           => '1.0.0',   # Tempora Heroica / login1.ibiblio.org 2895
+                'threekingdoms'     => '1.1.0',   # 3Kingdoms / 3k.org 3000
+                'threescapes'       => '1.1.0',   # 3Scapes / 3scapes.org 3200
+                'torilmud'          => '1.1.0',   # TorilMUD / torilmud.org 9999
+                'tsunami'           => '1.1.050', # Tsunami / tsunami.thebigwave.net 23
+                'valhalla'          => '1.0.0',   # Valhalla MUD / valhalla.com 4242
+                'vikingmud'         => '1.0.050', # Viking MUD / connect.vikingmud.org 2001
+                'wotmud'            => '1.1.0',   # The Wheel of Time MUD / game.wotmud.org 2224
+                'zombiemud'         => '1.1.0',   # ZombieMUD / zombiemud.org 23
+                # Pre-configured worlds from earlier releases => '1.1.0', now defunct
+#               'midkemia'          => '1.0.376', # Midkemia Online / closed 2016
+                # New release
+            },
+            # Constant registry hash of pre-configured world profiles that must be patched (because
+            #   of serious problems), and the most recent Axmud version whose saved data requires
+            #   the patch
+            constWorldPatchHash         => {
+                'avalonrpg'         => '1.1.012',
+                'discworld'         => '1.1.012',
+                'swmud'             => '1.1.012',
+            },
+            # Constant registry list of pre-configured world profiles; all the keys in
+            #   $self->constWorldList, sorted alphabetically
+            constWorldList              => [],      # Set below
+            # The Axmud version found the last time the user ran Axmud. If the user is now using a
+            #   newer version of Axmud, the code uses this IV to decide which new pre-configured
+            #   worlds to insert into Axmud's data directory
+            # The literal value stored below is the version number of Axmud's first public release.
+            #   This IV was introduced in v1.1.021
+            prevClientVersion           => '1.0.0', # [config]
             # List of the user's 'favourite' worlds, which appear at the top of the Connections
             #   window's list (in the same order they appear here)
             favouriteWorldList          => [],      # [config]
@@ -2107,7 +2180,7 @@
                 'customName'            => undef,
                 'category'              => undef,
                 'descrip'               => undef,
-                'taskList'              => undef,
+                'taskType'              => undef,
                 'profName'              => undef,
                 'profCategory'          => undef,
                 'shortCutIV'            => undef,
@@ -3961,8 +4034,8 @@
             #   workspace grids if this flag and GA::Obj::Desktop->gridPermitFlag are both TRUE
             activateGridFlag            => TRUE,            # [config]
             # Constant hash of standard 'grid' window types (any type of window that can be put onto
-            #   a workspace grid; includes 'external' windows, but doesn't include the GUI window,
-            #   'edit' windows, 'pref' windows, 'dialogue' windows etc)
+            #   a workspace grid; includes 'external' windows, but doesn't include the object viewer
+            #   window, 'edit' windows, 'pref' windows, 'dialogue' windows etc)
             # NB 'Internal' windows are a sub-class of 'grid' window handled by GA::Win::Internal,
             #   consisting of the window types 'main', 'protocol' and 'custom'
             # Hash in the form
@@ -3995,8 +4068,8 @@
             #   $constFreeWinTypeHash{window_type} = 'undef'
             # ...where 'window_type' matches GA::Generic::FreeWin->winType
             constFreeWinTypeHash        => {
-                # The GUI window
-                'gui'                   => undef,
+                # The object viewer window
+                'viewer'                => undef,
                 # All 'edit' windows
                 'edit'                  => undef,
                 # All preference windows (collectively, 'edit' and 'pref' windows are called
@@ -4410,9 +4483,10 @@
             # Constant list of icon sizes (these values never change; in pixels)
             constIconSizeList           => [16, 32, 48, 64, 128],
 
-            # If you want to extend the GUI window for this session with your own 'edit' window
-            #   - using code you've written in your own plugin - this flag gets set to TRUE; the
-            #   custom 'edit' window defined by the plugin can then be called by the GUI menu
+            # If you want to extend the object viewer window for this session with your own 'edit'
+            #   window - using code you've written in your own plugin - this flag gets set to TRUE;
+            #   the custom 'edit' window defined by the plugin can then be called by the object
+            #   viewer window's menu
             guiPrivateFlag              => FALSE,
             # If you want, in addition, the GUI menu to have its 'Private' column for code you've
             #   written yourself, set this flag to TRUE
@@ -4530,12 +4604,6 @@
                     ';resetlocator',
                     TRUE,                       # Requires current session
                     TRUE,                       # Requires connection to world
-                'open_gui',
-                    'Open GUI window',
-                    'watermark_table.png',
-                    ';openguiwindow',
-                    TRUE,                       # Requires current session
-                    TRUE,                       # Requires connection to world
                 # separator
                 'separator',
                 'active_int',
@@ -4582,8 +4650,14 @@
                     TRUE,                       # Requires connection to world
                 # separator
                 'separator',
+                'edit_quick',
+                    'Set quick preferences',
+                    'book_edit.png',
+                    ';editquick',
+                    TRUE,                       # Requires current session
+                    TRUE,                       # Requires connection to world
                 'edit_client',
-                    'Edit Axmud client preferences',
+                    'Set Axmud client preferences',
                     'application_edit.png',
                     ';editclient',
                     TRUE,                       # Requires current session
@@ -4592,6 +4666,12 @@
                     'Edit current world profile',
                     'world_edit.png',
                     ';editworld',
+                    TRUE,                       # Requires current session
+                    TRUE,                       # Requires connection to world
+                'open_viewer',
+                    'Open object viewer window',
+                    'watermark_table.png',
+                    ';openobjectviewer',
                     TRUE,                       # Requires current session
                     TRUE,                       # Requires connection to world
                 # separator
@@ -5102,6 +5182,13 @@
             startClockString            => undef,
             startDateString             => undef,
 
+            # Axmud usually terminates via a call to Gtk2->main_quit in GA::Client->stop. Doing
+            #   this, rather than using the standard Perl exit, prevents a segfault
+            # However, in certain situations, we may need to use exit after all (e.g. when
+            #   GA::Obj::Workspace->stop closes a spare 'main' window). In those cases, the code can
+            #   set this flag to TRUE
+            forceExitFlag               => FALSE,
+
             # When text is received from the world that doesn't end in a newline character, we wait
             #   a short time before treating it as a prompt. If nothing else is received in that
             #   time, it's a prompt.
@@ -5229,6 +5316,10 @@
             # If the flag above is TRUE, GA::Obj::File->setupConfigFile sets this flag to TRUE,
             #   which is the signal to GA::Client->start to open the Setup 'wiz' window
             showSetupWizWinFlag         => FALSE,
+            # Flag that can be set to TRUE by any code (by calling $self->set_blockWorldHintFlag)
+            #   to stop the GA::Session displaying a 'dialogue' window with the world profile's
+            #   ->worldHint, when the session starts
+            blockWorldHintFlag          => FALSE,
         };
 
         # Bless the object into existence
@@ -5243,6 +5334,11 @@
         $self->{clientCmdPrettyList}    = [$self->constClientCmdPrettyList];
 
         $self->{cmdSep}                 = $self->constCmdSep;
+
+        $self->{constWorldList}         = [
+                                            sort {lc($a) cmp lc($b)}
+                                                ($self->ivKeys('constWorldHash'))
+                                          ];
 
         $self->{cageTypeList}           = [$self->constCageTypeList];
 
@@ -5704,8 +5800,8 @@
 
         # Local variables
         my (
-            $warningFlag, $tempDir, $keycodeObjName, $keycodeObj, $desktopObj, $dialogueWin, $host,
-            $port, $world, $profObj, $taskObj,
+            $warningFlag, $tempDir, $keycodeObjName, $keycodeObj, $desktopObj, $host, $port, $world,
+            $profObj, $taskObj,
             @list,
         );
 
@@ -5744,13 +5840,13 @@
             }
         }
 
-        # Load the expanded mudlist, and store the data in GA::Obj::BasicWorld objects. The data
+        # Load the basic mudlist, and store the data in GA::Obj::BasicWorld objects. The data
         #   isn't important, so don't disable loading/saving of data files if the operation fails
         if (! $self->loadBasicWorlds()) {
 
             $warningFlag = TRUE;
             $self->writeWarning(
-                'Could not load expanded mudlist (files possible corrupted)',
+                'Could not load basic mudlist (files possible corrupted)',
                 $self->_objClass . '->start',
             );
         }
@@ -5915,15 +6011,35 @@
             }
         }
 
+        # Perform an auto-backup of Axmud's data directory, if required
+        if (
+            $self->autoBackupMode eq 'all_start'
+            || (
+                $self->autoBackupMode eq 'interval_start' && $self->checkBackupInterval()
+            )
+        ) {
+            $self->doAutoBackup();
+        }
+
         # Display a 'dialogue' window while loading data files/plugins
         if (! $axmud::TEST_MODE_FLAG && ! $axmud::BLIND_MODE_FLAG) {
 
-            $dialogueWin = $self->mainWin->showBusyWin();
+            $self->mainWin->showBusyWin();
+        }
+
+        # If the user is using a new version of Axmud, check if there are any new pre-configured
+        #   worlds in this version. If so, insert them into Axmud's data directory
+        if (
+            $self->convertVersion($axmud::VERSION) > $self->convertVersion($self->prevClientVersion)
+        ) {
+            $self->insertPreConfigWorlds();
+            # Don't perform this operation again until the next Axmud release
+            $self->ivPoke('prevClientVersion', $axmud::VERSION);
         }
 
         # Load world profiles, creating a file object for each (if allowed, and if there are any to
         #   load)
-        if ($self->loadDataFlag && $self->configWorldProfList) {
+        if ($self->loadDataFlag && $self->configWorldProfList && ! $axmud::TEST_PRE_CONFIG_FLAG) {
 
             if (! $self->loadWorldProfs() ) {
 
@@ -5959,7 +6075,7 @@
 
             # (Allow writing to something other than GA::Session - there are no sessions yet)
             return $self->writeError(
-                'Could not initialise ' . $axmud::SCRIPT . ' commands',
+                'Could not initialise ' . $axmud::SCRIPT . ' client commands',
                 $self->_objClass . '->start',
             );
         }
@@ -5994,10 +6110,10 @@
             }
         }
 
-        # Hide the 'dialogue' window
-        if ($dialogueWin) {
+        # Close the 'dialogue' window and reset the Client IV that stores it
+        if ($self->busyWin) {
 
-            $self->mainWin->closeDialogueWin($dialogueWin);
+            $self->mainWin->closeDialogueWin($self->busyWin);
         }
 
         # Start the client loop
@@ -6149,17 +6265,21 @@
 
             # In Axmud test mode, connect to a world which is assumed to be running on the local
             #   machine
-            $self->startSession(
-                $axmud::TEST_MODE_LOGIN_LIST[0],        # World
-                $axmud::TEST_MODE_LOGIN_LIST[1],        # Host
-                $axmud::TEST_MODE_LOGIN_LIST[2],        # Post
-                $axmud::TEST_MODE_LOGIN_LIST[3],        # Character
-                $axmud::TEST_MODE_LOGIN_LIST[4],        # Password
-                undef,                                  # Account
-                undef,                                  # Default protocol
-                undef,                                  # No login mode
-                $axmud::TEST_MODE_LOGIN_LIST[5],        # Offline flag
-            );
+            if (
+                ! $self->startSession(
+                    $axmud::TEST_MODE_LOGIN_LIST[0],        # World
+                    $axmud::TEST_MODE_LOGIN_LIST[1],        # Host
+                    $axmud::TEST_MODE_LOGIN_LIST[2],        # Post
+                    $axmud::TEST_MODE_LOGIN_LIST[3],        # Character
+                    $axmud::TEST_MODE_LOGIN_LIST[4],        # Password
+                    undef,                                  # Account
+                    undef,                                  # Default protocol
+                    undef,                                  # No login mode
+                    $axmud::TEST_MODE_LOGIN_LIST[5],        # Offline flag
+                )
+            ) {
+                return undef;
+            }
 
         } else {
 
@@ -6203,6 +6323,16 @@
         #   window, rather than just disengaging it)
         $self->ivPoke('shutdownFlag', TRUE);
 
+        # Perform an auto-backup of Axmud's data directory, if required
+        if (
+            $self->autoBackupMode eq 'all_stop'
+            || (
+                $self->autoBackupMode eq 'interval_stop' && $self->checkBackupInterval()
+            )
+        ) {
+            $self->doAutoBackup();
+        }
+
         # Fire any hooks in any session that are using the 'close_disconnect' hook event
         foreach my $sessionObj ($self->listSessions()) {
 
@@ -6244,8 +6374,13 @@
             unlink($_);
         }
 
-        # Because of a Gtk issue, using 'exit' will cause a segfault
-        Gtk2->main_quit();
+        # Because of a Gtk issue, using 'exit' will cause a segfault. However, in certain (rare)
+        #   situations, we do actually need to use 'exit' or we'll get a Gtk2-CRITICAL error
+        if (! $self->forceExitFlag) {
+            Gtk2->main_quit();
+        } else {
+            exit;
+        }
 
         return 1;
     }
@@ -6255,8 +6390,8 @@
     sub loadBasicWorlds {
 
         # Called by $self->start
-        # Loads data from the expanded mudlist and stores it in GA::Obj::BasicWorld objects, ready
-        #   for the Connections window to display
+        # Loads data from the basic mudlist and stores it in GA::Obj::BasicWorld objects, ready for
+        #   the Connections window to display
         #
         # Expected arguments
         #   (none besides $self)
@@ -6322,11 +6457,11 @@
         # Store the data
         do {
 
-            my ($longName, $name, $address, $port, $adultFlag, $language, $obj);
+            my ($longName, $name, $host, $port, $adultFlag, $language, $obj);
 
             $longName = shift @list;
             $name = shift @list;
-            $address = shift @list;
+            $host = shift @list;
             $port = shift @list;
             $adultFlag = shift @list;
             $language = shift @list;
@@ -6353,7 +6488,7 @@
             $obj = Games::Axmud::Obj::BasicWorld->new(
                 $name,
                 $longName,
-                $address,
+                $host,
                 $port,
                 $adultFlag,
                 $language,
@@ -7221,255 +7356,280 @@
         return 1;
     }
 
-    sub copyPreConfigWorlds {
+    sub copyPreConfigWorld {
 
         # Called by GA::Obj::File->setupConfigFile when a new 'config' file is created
-        # Copies pre-configured world profiles from Axmud's base sub-directories into its data
-        #   directories, and updates this object's IVs, ready for the file object to create a
-        #   'config' file that includes the pre-configured worlds
+        # Also called by $self->insertPreConfigWorlds when the user is using a newer version of
+        #   Axmud
+        #
+        # Copies a pre-configured world profile from Axmud's base sub-directories into its data
+        #   directories
+        # If called by ->setupConfigFile, creates a dummy entry in $self->worldProfHash, ready for
+        #   the file object to create a 'config' file that includes the pre-configured worlds
+        # If called by ->insertPreConfigWorlds, doesn't create a dummy entry, but otherwise the
+        #   operation is identical
+        #
         # If, by any chance, Axmud's data directories already contain a world profile with the same
-        #   name, don't replace them (but still update this object's IVs)
+        #   name, don't replace them (but still update $self->worldProfHash)
         #
         # Expected arguments
-        #   (none besides $self)
+        #   $world      - The name of the pre-configured world profile
+        #
+        # Optional arguments
+        #   $setupFlag  - TRUE if called by GA::Obj::File->setupConfigFile; FALSE (or 'undef') if
+        #                   called by anything else
         #
         # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
+        #   'undef' on improper arguments or if there's a serious error (meaning that no further
+        #       pre-configured worlds can be copied)
+        #   Otherwise returns a string: 'success' if the pre-configured world is succesfully
+        #       copied, 'fail' if the world can't be copied (but it's safe to continue copying
+        #       other worlds)
 
-        my ($self, $check) = @_;
+        my ($self, $world, $setupFlag, $check) = @_;
+
+        # Local variables
+        my (
+            $importPath, $extractObj, $tempDir, $newDir, $origLogo, $newLogo, $hashRef, $fileObj,
+            @fileList,
+            %fileHash, %loadHash, %dictHash,
+        );
 
         # Check for improper arguments
-        if (defined $check) {
+        if (! defined $world || defined $check) {
 
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->copyPreConfigWorlds', @_);
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->copyPreConfigWorld', @_);
         }
 
-        OUTER: foreach my $world ($self->constWorldList) {
+        # Pre-configured world test mode: When preparing for a release, the authors set this flag to
+        #   TRUE to stop Axmud complaining about missing pre-configured worlds
+        if ($axmud::TEST_PRE_CONFIG_FLAG) {
 
-            my (
-                $importPath, $extractObj, $tempDir, $newDir, $origLogo, $newLogo, $hashRef,
-                $fileObj,
-                @fileList,
-                %fileHash, %loadHash, %dictHash,
-            );
+            return 'success';
+        }
 
-            # If a directory for the pre-configured world exists and a data directory for a world
-            #   with the same name doesn't exist...
-              if (
-                -e $axmud::SHARE_DIR . '/items/worlds/' . $world
-                && ! (-e $axmud::DATA_DIR . '/data/worlds/' . $world)
-            ) {
-                # Copy the pre-configured worlds into the data directories (code adapted from
-                #   GA::Cmd::ImportFiles->do)
-                $importPath = $axmud::SHARE_DIR . '/items/worlds/' . $world . '/' . $world . '.tgz';
-                if (! -e $importPath) {
+        # If a directory for the pre-configured world exists and a data directory for a world with
+        #   the same name doesn't exist...
+        if (
+            -e $axmud::SHARE_DIR . '/items/worlds/' . $world
+            && ! (-e $axmud::DATA_DIR . '/data/worlds/' . $world)
+        ) {
+            # Copy the pre-configured worlds into the data directories (code adapted from
+            #   GA::Cmd::ImportFiles->do)
+            $importPath = $axmud::SHARE_DIR . '/items/worlds/' . $world . '/' . $world . '.tgz';
+            if (! -e $importPath) {
 
-                    # Pre-configured world archive missing; so move on to the next one
-                    next OUTER;
-                }
+                $self->writeWarning(
+                    'General error importing pre-configured worlds (archive missing for \''
+                    . $world . '\' world)',
+                    $self->_objClass . '->copyPreConfigWorld',
+                );
 
-                # Build an Archive::Extract object
-                $extractObj = Archive::Extract->new(archive => $importPath);
-                if (! $extractObj) {
+                return 'fail';
+            }
 
-                    return $self->writeError(
-                        'General error importing pre-configured worlds (archive error)',
-                        $self->_objClass . '->copyPreConfigWorlds',
-                    );
-                }
+            # Build an Archive::Extract object
+            $extractObj = Archive::Extract->new(archive => $importPath);
+            if (! $extractObj) {
 
-                # Extract the object to a temporary directory (if it doesn't already exist,
-                #   create it)
-                $tempDir = $axmud::DATA_DIR . '/data/temp/import';
-                if (! $extractObj->extract(to => $tempDir)) {
+                return $self->writeError(
+                    'General error importing pre-configured worlds (archive error)',
+                       $self->_objClass . '->copyPreConfigWorld',
+                );
+            }
 
-                    return $self->writeError(
-                        'General error importing pre-configured worlds (extraction error)',
-                        $self->_objClass . '->copyPreConfigWorlds',
-                    );
-                }
+            # Extract the object to a temporary directory (if it doesn't already exist, create it)
+            $tempDir = $axmud::DATA_DIR . '/data/temp/import';
+            if (! $extractObj->extract(to => $tempDir)) {
 
-                # All the files are now in /data/temp/import. Get a list of paths, relative to
-                #   $tempDir, of all the extracted files
-                @fileList = @{$extractObj->files};  # e.g. export/tasks.axm
-                # Convert all the paths into absolute paths. Check they are real Axmud files and, if
-                #   so, store them in a hash
-                INNER: foreach my $file (@fileList) {
+                return $self->writeError(
+                    'General error importing pre-configured worlds (extraction error)',
+                    $self->_objClass . '->copyPreConfigWorld',
+                );
+            }
 
-                    my (
-                        $fileType, $filePath,
-                        %headerHash,
-                    );
+            # All the files are now in /data/temp/import. Get a list of paths, relative to $tempDir,
+            #   of all the extracted files
+            @fileList = @{$extractObj->files};  # e.g. export/tasks.axm
+            # Convert all the paths into absolute paths. Check they are real Axmud files and, if so,
+            #   store them in a hash
+            foreach my $file (@fileList) {
 
-                    $filePath = $tempDir . '/' . $file;
+                my (
+                    $fileType, $filePath,
+                    %headerHash,
+                );
 
-                    %headerHash
-                        = Games::Axmud::Obj::File->examineDataFile($filePath, 'return_header');
-                    if (! %headerHash) {
+                $filePath = $tempDir . '/' . $file;
 
-                        $self->writeWarning(
-                            'General error importing pre-configured worlds (archive contains'
-                            . ' invalid file)',
-                            $self->_objClass . '->copyPreConfigWorlds',
-                        );
+                %headerHash = Games::Axmud::Obj::File->examineDataFile($filePath, 'return_header');
+                if (! %headerHash) {
 
-                        next INNER;
-
-                    } else {
-
-                        $fileType = $headerHash{'file_type'};
-                        $fileHash{$fileType} = $filePath;
-                    }
-                }
-
-                # Now we can check that we have the right three files ('worldprof', 'otherprof' and
-                #   'worldmodel')
-                if (
-                    ! exists $fileHash{'worldprof'}
-                    || ! exists $fileHash{'otherprof'}
-                    || ! exists $fileHash{'worldmodel'}
-                    || scalar (keys %fileHash) != 3
-                ) {
                     $self->writeWarning(
-                        'General error importing pre-configured worlds (incorrect archive for \''
-                        . $world . '\' world)',
-                        $self->_objClass . '->copyPreConfigWorlds',
+                        'General error importing pre-configured worlds (archive contains invalid'
+                        . ' file)',
+                        $self->_objClass . '->copyPreConfigWorld',
                     );
 
-                    next OUTER;
-                }
+                    return 'fail';
 
-                # Create the data sub-directory
-                $newDir = $axmud::DATA_DIR . '/data/worlds/' . $world . '/';
-                if (! mkdir ($newDir, 0755)) {
+                } else {
+
+                    $fileType = $headerHash{'file_type'};
+                    $fileHash{$fileType} = $filePath;
+                }
+            }
+
+            # Now we can check that we have the right three files ('worldprof', 'otherprof' and
+            #   'worldmodel')
+            if (
+                ! exists $fileHash{'worldprof'}
+                || ! exists $fileHash{'otherprof'}
+                || ! exists $fileHash{'worldmodel'}
+                || scalar (keys %fileHash) != 3
+            ) {
+                $self->writeWarning(
+                    'General error importing pre-configured worlds (incorrect archive for \''
+                    . $world . '\' world)',
+                    $self->_objClass . '->copyPreConfigWorld',
+                );
+
+                return 'fail';
+            }
+
+            # Create the data sub-directory
+            $newDir = $axmud::DATA_DIR . '/data/worlds/' . $world . '/';
+            if (! mkdir ($newDir, 0755)) {
+
+                $self->writeWarning(
+                    'General error importing pre-configured worlds (could not copy files)',
+                    $self->_objClass . '->copyPreConfigWorld',
+                );
+
+                return 'fail';
+            }
+
+            # Copy the files into the sub-directory
+            foreach my $file (keys %fileHash) {
+
+                my $filePath = $fileHash{$file};
+
+                if (! File::Copy::copy($filePath, $newDir . $file . '.axm')) {
+
+                    # Give up importing this pre-configured world; destroy its data sub-directory
+                    unlink $newDir;
 
                     $self->writeWarning(
                         'General error importing pre-configured worlds (could not copy files)',
-                        $self->_objClass . '->copyPreConfigWorlds',
+                        $self->_objClass . '->copyPreConfigWorld',
                     );
 
-                    next OUTER;
+                    return 'fail';
                 }
+            }
 
-                # Copy the files into the sub-directory
-                foreach my $file (keys %fileHash) {
+            # When this function was called by GA::Obj::File->setupConfigFile, add a dummy entry to
+            #   the this object's profile registry so the calling function,
+            #   GA::Obj::File->setupConfigFile, can add the world to the 'config' file it's about to
+            #   create (the dummy entry will be removed by that function)
+            if ($setupFlag) {
 
-                    my $filePath = $fileHash{$file};
-
-                    if (! File::Copy::copy($filePath, $newDir . $file . '.axm')) {
-
-                        $self->writeWarning(
-                            'General error importing pre-configured worlds (could not copy files)',
-                            $self->_objClass . '->copyPreConfigWorlds',
-                        );
-
-                        # Give up importing this pre-configured world; destroy its data
-                        #   sub-directory
-                        unlink $newDir;
-                        next OUTER;
-                    }
-                }
-
-                # Add a dummy entry to the this object's profile registry so the calling function,
-                #   GA::Obj::File->setupConfigFile, can add the world to the 'config' file it's
-                #   about to create (the dummy entry will be removed by that function)
                 $self->ivAdd('worldProfHash', $world, undef);
+            }
 
-                # If a logo for this world exists, and if the equivalent logo doesn't exist in the
-                #   data directory, copy it
-                $origLogo = $axmud::SHARE_DIR . '/items/worlds/' . $world . '/' . $world . '.png';
-                $newLogo = $axmud::DATA_DIR . '/logos/' . $world . '.png';
+            # If a logo for this world exists, and if the equivalent logo doesn't exist in the data
+            #   directory, copy it
+            $origLogo = $axmud::SHARE_DIR . '/items/worlds/' . $world . '/' . $world . '.png';
+            $newLogo = $axmud::DATA_DIR . '/logos/' . $world . '.png';
 
-                if (-e $origLogo && ! (-e $newLogo)) {
+            if (-e $origLogo && ! (-e $newLogo)) {
 
-                    File::Copy::copy($origLogo, $newLogo);
+                File::Copy::copy($origLogo, $newLogo);
+            }
+
+            # Now, try to import the corresponding file containing the world's dictionary
+            $importPath = $axmud::SHARE_DIR . '/items/worlds/' . $world . '/' . $world . '.amx';
+            if (! -e $importPath) {
+
+                # Pre-configured dictionary archive missing; so move on to the next world
+                $self->writeWarning(
+                    'General error importing pre-configured worlds (dictionary archive not found)',
+                    $self->_objClass . '->copyPreConfigWorld',
+                );
+
+                return 'fail';
+            }
+
+            # We can't call GA::Obj::File->importDataFile because it expects a GA::Session as an
+            #   argument
+            # Instead, we'll use a modified version of ->importDataFile and ->extractData
+
+            # Load all the data into an anonymous hash
+            eval { $hashRef = Storable::lock_retrieve($importPath); };
+            if (! $hashRef) {
+
+                return $self->writeError(
+                    'General error importing pre-configured worlds (lockfile error)',
+                    $self->_objClass . '->copyPreConfigWorld',
+                );
+            }
+
+            # Convert the anonymous hash referenced by $hashRef into a named hash
+            %loadHash = %{$hashRef};
+
+            # Before v1.0.868, Axmud had a different name. Update all header data
+            if (
+                defined $loadHash{'script_version'}
+                && $self->convertVersion($loadHash{'script_version'}) < 1_000_868
+            ) {
+                %loadHash = Games::Axmud::Obj::File->updateHeaderAfterRename(%loadHash);
+            }
+
+            if (
+                # Check the header is valid
+                ! defined $loadHash{'file_type'} || ! defined $loadHash{'script_name'}
+                || ! defined $loadHash{'script_version'} || ! defined $loadHash{'save_date'}
+                || ! defined $loadHash{'save_time'} || ! exists $loadHash{'assoc_world_prof'}
+                # Check it's the right kind of file
+                || $loadHash{'file_type'} ne 'dicts'
+                # Check the file was created by a compatible programme
+                || ! Games::Axmud::Obj::File->checkCompatibility($loadHash{'script_name'})
+            ) {
+                $self->writeWarning(
+                    'General error importing pre-configured worlds (dictionary archive invalid)',
+                    $self->_objClass . '->copyPreConfigWorld',
+                );
+
+                return 'fail';
+            }
+
+            # Import the dictionary objects stored in the file
+            %dictHash = %{$loadHash{'dict_hash'}};
+            if (%dictHash) {
+
+                foreach my $dictObj (values %dictHash) {
+
+                    # Before v1.0.868, Axmud had a different name. Update the dictionary object
+                    $dictObj = Games::Axmud::Obj::File->update_obj_dict($dictObj);
+
+                    $self->ivAdd('dictHash', $dictObj->name, $dictObj);
                 }
 
-                # Now, try to import the corresponding file containing the world's dictionary
-                $importPath
-                    = $axmud::SHARE_DIR . '/items/worlds/' . $world . '/' . $world . '.amx';
-                if (! -e $importPath) {
-
-                    # Pre-configured dictionary archive missing; so move on to the next world
-                    $self->writeWarning(
-                        'General error importing pre-configured worlds (dictionary archive'
-                        . ' not found)',
-                        $self->_objClass . '->copyPreConfigWorlds',
-                    );
-
-                    next OUTER;
-                }
-
-                # We can't call GA::Obj::File->importDataFile because it expects a GA::Session as an
-                #   argument
-                # Instead, we'll use a modified version of ->importDataFile and ->extractData
-
-                # Load all the data into an anonymous hash
-                eval { $hashRef = Storable::lock_retrieve($importPath); };
-                if (! $hashRef) {
-
-                    # ->lock_retrieve() failed
-                    return undef;
-                }
-
-                # Convert the anonymous hash referenced by $hashRef into a named hash
-                %loadHash = %{$hashRef};
-
-                # Before v1.0.868, Axmud had a different name. Update all header data
-                if (
-                    defined $loadHash{'script_version'}
-                    && $self->convertVersion($loadHash{'script_version'}) < 1_000_868
-                ) {
-                    %loadHash = Games::Axmud::Obj::File->updateHeaderAfterRename(%loadHash);
-                }
-
-                if (
-                    # Check the header is valid
-                    ! defined $loadHash{'file_type'} || ! defined $loadHash{'script_name'}
-                    || ! defined $loadHash{'script_version'} || ! defined $loadHash{'save_date'}
-                    || ! defined $loadHash{'save_time'} || ! exists $loadHash{'assoc_world_prof'}
-                    # Check it's the right kind of file
-                    || $loadHash{'file_type'} ne 'dicts'
-                    # Check the file was created by a compatible programme
-                    || ! Games::Axmud::Obj::File->checkCompatibility($loadHash{'script_name'})
-                ) {
-                    $self->writeWarning(
-                        'General error importing pre-configured worlds (dictionary archive'
-                        . ' invalid)',
-                        $self->_objClass . '->copyPreConfigWorlds',
-                    );
-
-                    next OUTER;
-                }
-
-                # Import the dictionary objects stored in the file
-                %dictHash = %{$loadHash{'dict_hash'}};
-                if (%dictHash) {
-
-                    foreach my $dictObj (values %dictHash) {
-
-                        # Before v1.0.868, Axmud had a different name. Update the dictionary object
-                        $dictObj = Games::Axmud::Obj::File->update_obj_dict($dictObj);
-
-                        $self->ivAdd('dictHash', $dictObj->name, $dictObj);
-                    }
-
-                    # The data stored in this IV is saved in the 'dicts' file
-                    $self->setModifyFlag('dicts', TRUE, $self->_objClass . '->copyPreConfigWorlds');
-                    # Because dictionary objects may contain new IVs (or other changes), we need
-                    #   to call the file object's ->updateExtractedData (this happens elsewhere,
-                    #   for the 'worldprof', 'otherprof' and 'worldmodel' files, but for the
-                    #   'dicts' file, we must do it now)
-                    $fileObj = $self->ivShow('fileObjHash', 'dicts');
-                    $fileObj->updateExtractedData(
-                        $self->convertVersion($loadHash{'script_version'}),
-                    );
-                }
+                # The data stored in this IV is saved in the 'dicts' file
+                $self->setModifyFlag('dicts', TRUE, $self->_objClass . '->copyPreConfigWorld');
+                # Because dictionary objects may contain new IVs (or other changes), we need to call
+                #   the file object's ->updateExtractedData (this happens elsewhere, for the
+                #   'worldprof', 'otherprof' and 'worldmodel' files, but for the 'dicts' file, we
+                #   must do it now)
+                $fileObj = $self->ivShow('fileObjHash', 'dicts');
+                $fileObj->updateExtractedData(
+                    $self->convertVersion($loadHash{'script_version'}),
+                );
             }
         }
 
-        return 1;
+        # Operation complete
+        return 'success';
     }
 
     sub cleanPreConfigWorlds {
@@ -7502,6 +7662,78 @@
 
                 $self->ivDelete('worldProfHash', $world);
                 $self->ivPush('configWorldProfList', $world);
+            }
+        }
+
+        return 1;
+    }
+
+    sub insertPreConfigWorlds {
+
+        # Called by $self->start when the user is using a new version of Axmud
+        # Checks whether any pre-configured worlds have been added since the version of Axmud last
+        #   used by the user (i.e. the version that created the Axmud data directory we're using)
+        # If any are found, inserts them into Axmud's data directory
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if there's a serious error (after which, this function
+        #       gives up inserting pre-configured worlds)
+        #   1 on success or if there are only minor errors (this function continued trying to
+        #       insert pre-configured worlds after the minor error)
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my (
+            $prevVersion,
+            %alreadyHash,
+        );
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->insertPreConfigWorlds', @_);
+        }
+
+        # Convert version, e.g. '1.1.0' to '1_001_000'
+        $prevVersion = $self->convertVersion($self->prevClientVersion);
+        # Compile a hash of world profiles which (should) already exist (none of which have been
+        #   loaded by $self->start yet)
+        foreach my $world ($self->configWorldProfList) {
+
+            $alreadyHash{$world} = undef;
+        }
+
+        # Only insert pre-configured worlds that are newer than the version of Axmud the user was
+        #   using last time
+        # Also don't import a pre-configured world if a world profile with the same name (created by
+        #   the user) already exists
+        foreach my $world ($self->constWorldList) {
+
+            my ($worldVersion, $result);
+
+            if (! exists $alreadyHash{$world} && $self->ivExists('constWorldHash', $world)) {
+
+                $worldVersion = $self->convertVersion($self->ivShow('constWorldHash', $world));
+
+                if ($worldVersion > $prevVersion) {
+
+                    $result = $self->copyPreConfigWorld($world);
+                    if (! defined $result) {
+
+                        # Serious error. Give up inserting pre-configured worlds
+                        return undef;
+
+                    } elsif ($result = 'success') {
+
+                        # No minor error reported, so tell the calling function to load this world
+                        #   profile
+                        $self->ivPush('configWorldProfList', $world);
+                    }
+                }
             }
         }
 
@@ -8100,8 +8332,6 @@
 
                     } elsif (length ($descrip) > 32) {
 
-                        print "client 5818 length " . length ($descrip) . "\n";
-                        print "client 5818 descrip *$descrip*\n";
                         $self->writeWarning(
                             'Invalid default toolbar button description (button \'' . $name . '\')',
                             $self->_objClass . '->initialiseToolbar',
@@ -8119,7 +8349,6 @@
                             $sessionFlag,
                             $connectFlag,
                         );
-
 
                         if (! $obj) {
 
@@ -8881,7 +9110,7 @@
         );
         $self->writeText(' ');
         $self->writeText(
-            'Most errors of this kind are caused by invalid patterns (regular expression)'
+            'Most errors of this kind are caused by invalid patterns (regular expressions)'
             . ' in your interfaces (triggers, aliases, macros, timers and hooks). You can'
             . ' often correct them by opening an \'edit\' window and by replacing the'
             . ' invalid pattern with a valid one or by deleting it altogether.',
@@ -9157,7 +9386,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the GA::Session object can't be created or started
-        #   1 otherwise
+        #   The new GA::Session object on success
 
         my (
             $self, $world, $host, $port, $char, $pass, $account, $protocol, $loginMode,
@@ -9165,7 +9394,7 @@
         ) = @_;
 
         # Local variables
-        my ($actualCount, $worldObj, $newSession, $index);
+        my ($actualCount, $tempName, $successFlag, $worldObj, $newSession, $index);
 
         # Check for improper arguments
         if (! defined $world || defined $check) {
@@ -9234,6 +9463,38 @@
             return undef;
         }
 
+        # For temporary profiles, check a world profile with the same name doesn't already exist
+        #   and, if so, rename the temporary profile
+        if ($tempFlag && $self->ivExists('worldProfHash', $world)) {
+
+            # (Give up after too many renaming attempts)
+            OUTER: for (my $count = 2; $count < 999; $count++) {
+
+                $tempName = $world . $count;        # e.g. 'deathmud2'
+
+                # Max length of a profile is 16 chars
+                if (length ($tempName) <= 16 && ! $self->ivExists('worldProfHash', $tempName)) {
+
+                    $world = $tempName;
+                    $successFlag = TRUE;
+                    last OUTER;
+                }
+            }
+
+            if (! $successFlag) {
+
+                $self->mainWin->showMsgDialogue(
+                    'Bad temporary world',
+                    'error',
+                    'Attempted to create a temporary world profile, but a world profile called \''
+                    . $world . '\' already exists, and Axmud could not find an alternative name',
+                    'ok',
+                );
+
+                return undef;
+            }
+        }
+
         # If $host and/or $port were not specified, use generic values
         if (! defined $host) {
 
@@ -9281,7 +9542,7 @@
         if (! $newSession->start()) {
             return undef;
         } else {
-            return 1;
+            return $newSession;
         }
     }
 
@@ -13635,6 +13896,234 @@
         }
     }
 
+    # Auto-backup
+
+    sub checkBackupInterval {
+
+        # Called by $self->start when $self->autoBackupMode is 'interval_start', and by $self->stop
+        #   when $self->autoBackupMode is 'interval_stop'
+        # Checks whether it is time to perform an auto-backup
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if it's not yet time to perform an auto-backup
+        #   1 if it is time to perform at auto-backup
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my ($format, $time, $oldTime, $diff);
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->checkBackupInterval', @_);
+        }
+
+        if (! $self->autoBackupInterval) {
+
+            # Don't do auto-backups for the time being
+            return undef;
+
+        } elsif (! $self->autoBackupDate) {
+
+            # No auto-backup time recorded, so perform an auto-backup now
+            return 1;
+
+        } else {
+
+            # Otherwise, do the calculation
+            $format = '%a %b %d, %Y';           # e.g. 'Thu Dec 18, 2010'
+            $time = Time::Piece->strptime($self->localDate(), $format);
+            $oldTime = Time::Piece->strptime($self->autoBackupDate, $format);
+
+            $diff = $time->julian_day() - $oldTime->julian_day();
+
+            if ($diff < $self->autoBackupInterval) {
+                return undef;
+            } else {
+                return 1;
+            }
+        }
+    }
+
+    sub doAutoBackup {
+
+        # Called by $self->start or $self->stop when it's time to do an auto-backup
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if the auto-backup fails
+        #   1 on success
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my (
+            $dataDir, $ext, $fileName, $backupPath, $zipObj, $tarObj,
+            @fileList,
+        );
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->doAutoBackup', @_);
+        }
+
+        # (Code borrowed from GA::Cmd::BackupData, as we don't want client command error messages)
+
+        # Import the Axmud data directory for use in regexes
+        $dataDir = $axmud::DATA_DIR;
+
+        # In 'default' mode, archive to .zip on MS Windows, and to .tgz on Linux
+        if ($self->autoBackupFileType eq 'default') {
+
+            if ($^O eq 'MSWin32') {
+                $ext = 'zip';
+            } else {
+                $ext = 'tgz';
+            }
+
+        } elsif ($self->autoBackupFileType eq 'zip') {
+            $ext = 'zip';
+        } else {
+            $ext = 'tgz';
+        }
+
+        # Set the filename, appending the time if required
+        if (! $axmud::CLIENT->autoBackupAppendFlag) {
+
+            $fileName = $axmud::NAME_FILE . '_backup_' . $axmud::CLIENT->localDateString() . '.'
+                            . $ext;
+
+        } else {
+
+            $fileName = $axmud::NAME_FILE . '_backup_' . $axmud::CLIENT->localDateString() . '_'
+                            . $axmud::CLIENT->localClockString() . '.' . $ext;
+        }
+
+        # If necessary, open a file chooser dialog to decide where to save the exported file
+        if ($self->autoBackupDir && -e $self->autoBackupDir) {
+
+            $backupPath = $self->autoBackupDir;
+
+        } else {
+
+            $backupPath = $self->mainWin->showFileChooser(
+                'Backup ' . $axmud::SCRIPT . ' data',
+                'save',
+                $fileName,
+            );
+        }
+
+        if (! $backupPath) {
+
+            return undef;
+        }
+
+        # Display a 'dialogue' window while backing up data. The 'undef' argument means 'show the
+        #   standard icon'
+        if (! $axmud::BLIND_MODE_FLAG) {
+
+            $self->mainWin->showBusyWin(undef, 'Backing up...');
+        }
+
+        # Get a list of files in the data directory, recursively searching sub-directories
+        File::Find::find(
+            sub { push (@fileList, $File::Find::name); },
+            $dataDir . '/',
+        );
+
+        # Perform the backup
+        if ($ext eq 'zip') {
+
+            # Create a zip object
+            $zipObj = Archive::Zip->new();
+
+            foreach my $file (@fileList) {
+
+                my $modFile;
+
+                if ($file ne $dataDir) {
+
+                    $modFile = $file;
+                    $modFile =~ s/$dataDir//;
+
+                    # 6 is the default compression level
+                    $zipObj->addFile($file, $modFile, 6);
+                }
+            }
+
+            # Save the .zip file. Successful operation returns 0
+            if ($zipObj->writeToFileNamed($backupPath)) {
+
+                # Close the 'dialogue' window and reset the Client IV that stores it
+                if ($self->busyWin) {
+
+                    $self->mainWin->closeDialogueWin($self->busyWin);
+                }
+
+                return undef;
+            }
+
+        } else {
+
+            # Create a tar object
+            $tarObj = Archive::Tar->new();
+
+            foreach my $file (@fileList) {
+
+                if ($file ne $dataDir) {
+
+                    $tarObj->add_files($file);
+                    # Rename each file in the archive to remove the directory structure
+                    $tarObj->rename(substr($file, 1), substr($file, length($dataDir)));
+                }
+            }
+
+            # Save the .tgz file
+            if (
+                ! $tarObj->write(
+                    $backupPath,
+                    Archive::Tar::COMPRESS_GZIP,
+                    $axmud::NAME_SHORT . '-data',
+                )
+            ) {
+                # Close the 'dialogue' window and reset the Client IV that stores it
+                if ($self->busyWin) {
+
+                    $self->mainWin->closeDialogueWin($self->busyWin);
+                }
+
+                return undef;
+            }
+        }
+
+        # Operation successful. Update IVs so the next scheduled auto-backup occurs on time
+        if ($self->autoBackupMode eq 'all_start' || $self->autoBackupMode eq 'all_stop') {
+
+            # No scheduled auto-backups; auto-backups occur when Axmud starts/stops
+            $self->ivUndef('autoBackupDate');
+
+        } else {
+
+            # Scheduled auto-backups
+            $self->ivPoke('autoBackupDate', $self->localDate());
+        }
+
+        # Close the 'dialogue' window and reset the Client IV that stores it
+        if ($self->busyWin) {
+
+            $self->mainWin->closeDialogueWin($self->busyWin);
+        }
+
+        return 1;
+    }
+
     # General-purpose methods
 
     sub nameCheck {
@@ -14058,7 +14547,7 @@
     sub localClock {
 
         # Converts the output from Perl's localtime() function into the following format:
-        #   e.g. 9:17:12
+        #   e.g. 09:17:12
         #
         # Expected arguments
         #   (none besides $self)
@@ -14412,7 +14901,7 @@
         # Uses the JSON module to convert a UTF-8 encoded binary string to a Perl data structure
         #
         # Expected arguments
-        #   $string     - The string to decode
+        #   $data     - The string to decode
         #
         # Return values
         #   'undef' on improper arguments or if the conversion fails
@@ -14432,13 +14921,6 @@
         $obj = JSON->new();
         $obj->allow_nonref();
         $obj->allow_unknown();
-
-        # Legends of Kallisti sends single strings without quotation marks "...", which is not
-        #   allowed in strict JSON, so we have to check for that
-        if ($data =~ m/^[a-zA-Z]\w*$/) {
-
-            $data = "\"$data\"";
-        }
 
         return $obj->utf8->decode($data);
     }
@@ -14927,6 +15409,130 @@
         return 1;
     }
 
+    sub set_autoBackupAppendFlag {
+
+        my ($self, $flag, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $flag || defined $check) {
+
+            return $axmud::CLIENT->writeImproper(
+                $self->_objClass . '->set_autoBackupAppendFlag',
+                @_,
+            );
+        }
+
+        if ($flag) {
+            $self->ivPoke('autoBackupAppendFlag', TRUE);
+        } else {
+            $self->ivPoke('autoBackupAppendFlag', FALSE);
+        }
+
+        # The data stored in this IV is saved in the 'config' file
+        $self->setModifyFlag('config', TRUE, $self->_objClass . '->set_autoBackupAppendFlag');
+
+        return 1;
+    }
+
+    sub set_autoBackupDir {
+
+        my ($self, $dir, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->set_autoBackupDir', @_);
+        }
+
+        $self->ivPoke('autoBackupDir', $dir);
+
+        # The data stored in this IV is saved in the 'config' file
+        $self->setModifyFlag('config', TRUE, $self->_objClass . '->set_autoBackupDir');
+
+        return 1;
+    }
+
+    sub set_autoBackupFileType {
+
+        my ($self, $type, $check) = @_;
+
+        # Check for improper arguments
+        if (
+            ! defined $type
+            || ($type ne 'default' && $type ne 'tar' && $type ne 'zip')
+            || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->set_autoBackupFileType', @_);
+        }
+
+        $self->ivPoke('autoBackupFileType', $type);
+
+        # The data stored in this IV is saved in the 'config' file
+        $self->setModifyFlag('config', TRUE, $self->_objClass . '->set_autoBackupFileType');
+
+        return 1;
+    }
+
+    sub set_autoBackupInterval {
+
+        my ($self, $number, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $number || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->set_autoBackupInterval', @_);
+        }
+
+        $self->ivPoke('autoBackupInterval', $number);
+
+        # The data stored in this IV is saved in the 'config' file
+        $self->setModifyFlag('config', TRUE, $self->_objClass . '->set_autoBackupInterval');
+
+        return 1;
+    }
+
+    sub set_autoBackupMode {
+
+        my ($self, $mode, $check) = @_;
+
+        # Check for improper arguments
+        if (
+            ! defined $mode
+            || (
+                $mode ne 'no_backup' && $mode ne 'all_start' && $mode ne 'all_stop'
+                && $mode ne 'interval_start' && $mode ne 'interval_stop'
+            ) || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->set_autoBackupMode', @_);
+        }
+
+        $self->ivPoke('autoBackupMode', $mode);
+
+        # The data stored in this IV is saved in the 'config' file
+        $self->setModifyFlag('config', TRUE, $self->_objClass . '->set_autoBackupMode');
+
+        return 1;
+    }
+
+    sub set_blockWorldHintFlag {
+
+        my ($self, $flag, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $flag || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->set_blockWorldHintFlag', @_);
+        }
+
+        if ($flag) {
+            $self->ivPoke('blockWorldHintFlag', TRUE);
+        } else {
+            $self->ivPoke('blockWorldHintFlag', FALSE);
+        }
+
+        return 1;
+    }
+
     sub set_browserCmd {
 
         my ($self, $cmd, $check) = @_;
@@ -14941,6 +15547,22 @@
 
         # The data stored in this IV is saved in the 'config' file
         $self->setModifyFlag('config', TRUE, $self->_objClass . '->set_browserCmd');
+
+        return 1;
+    }
+
+    sub set_busyWin {
+
+        my ($self, $winObj, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->set_busyWin', @_);
+        }
+
+        # Update IVs
+        $self->ivPoke('busyWin', $winObj);
 
         return 1;
     }
@@ -16162,6 +16784,21 @@
         }
 
         $self->ivDelete('fileObjHash', $obj->name);
+
+        return 1;
+    }
+
+    sub set_forceExitFlag {
+
+        my ($self, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->set_forceExitFlag', @_);
+        }
+
+        $self->ivPoke('forceExitFlag', TRUE);
 
         return 1;
     }
@@ -18387,6 +19024,8 @@
         { $_[0]->{aboutWin} }
     sub consoleWin
         { $_[0]->{consoleWin} }
+    sub busyWin
+        { $_[0]->{busyWin} }
 
     sub constIVHash
         { my $self = shift; return %{$self->{constIVHash}}; }
@@ -18415,6 +19054,19 @@
         { $_[0]->{autoSaveWaitTime} }
     sub autoRetainFileFlag
         { $_[0]->{autoRetainFileFlag} }
+
+    sub autoBackupMode
+        { $_[0]->{autoBackupMode} }
+    sub autoBackupDir
+        { $_[0]->{autoBackupDir} }
+    sub autoBackupInterval
+        { $_[0]->{autoBackupInterval} }
+    sub autoBackupDate
+        { $_[0]->{autoBackupDate} }
+    sub autoBackupFileType
+        { $_[0]->{autoBackupFileType} }
+    sub autoBackupAppendFlag
+        { $_[0]->{autoBackupAppendFlag} }
 
     sub constLargeFileSize
         { $_[0]->{constLargeFileSize} }
@@ -18657,8 +19309,14 @@
     sub worldProfHash
         { my $self = shift; return %{$self->{worldProfHash}}; }
 
+    sub constWorldHash
+        { my $self = shift; return %{$self->{constWorldHash}}; }
+    sub constWorldPatchHash
+        { my $self = shift; return %{$self->{constWorldPatchHash}}; }
     sub constWorldList
         { my $self = shift; return @{$self->{constWorldList}}; }
+    sub prevClientVersion
+        { $_[0]->{prevClientVersion} }
     sub favouriteWorldList
         { my $self = shift; return @{$self->{favouriteWorldList}}; }
     sub constBasicWorldHash
@@ -19385,6 +20043,9 @@
     sub startDateString
         { $_[0]->{startDateString} }
 
+    sub forceExitFlag
+        { $_[0]->{forceExitFlag} }
+
     sub constPromptWaitTime
         { $_[0]->{constPromptWaitTime} }
     sub promptWaitTime
@@ -19449,6 +20110,8 @@
         { $_[0]->{allowSetupWizWinFlag} }
     sub showSetupWizWinFlag
         { $_[0]->{showSetupWizWinFlag} }
+    sub blockWorldHintFlag
+        { $_[0]->{blockWorldHintFlag} }
 }
 
 # Package must return true

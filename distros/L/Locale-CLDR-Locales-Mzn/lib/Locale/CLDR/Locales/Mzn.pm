@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Mzn - Package for language Mazanderani
 
 package Locale::CLDR::Locales::Mzn;
 # This file auto generated from Data\common\main\mzn.xml
-#	on Fri 13 Apr  7:21:03 am GMT
+#	on Sun  5 Aug  6:13:09 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2302,6 +2302,12 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(موریتانی ِاوگوئیا \(1973–2017\)),
+				'other' => q(موریتانی ِاوگوئیا \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(موریتانی ِاوگوئیا),
 				'other' => q(موریتانی ِاوگوئیا),
 			},
@@ -2539,6 +2545,13 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(سائوتومه و پرینسیپ ِدوبرا \(1977–2017\)),
+				'other' => q(سائوتومه و پرینسیپ ِدوبرا \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
 			display_name => {
 				'currency' => q(سائوتومه و پرینسیپ ِدوبرا),
 				'other' => q(سائوتومه و پرینسیپ ِدوبرا),

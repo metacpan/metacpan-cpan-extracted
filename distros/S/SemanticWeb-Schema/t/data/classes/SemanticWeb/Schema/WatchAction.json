@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of consuming dynamic/moving visual content.",
+      "rdfs:label" : "WatchAction",
+      "rdfs:subClassOf" : "schema:ConsumeAction"
+   },
+   "properties" : {}
+}

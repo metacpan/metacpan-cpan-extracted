@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::RejectedError
 Perl data type class for the XML Schema defined complexType
 RejectedError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Indicates that a field was rejected due to compatibility issues. 
 
 
 

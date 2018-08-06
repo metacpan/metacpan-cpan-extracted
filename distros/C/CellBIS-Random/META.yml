@@ -20,12 +20,13 @@ requires:
   Carp: '0'
   List::SomeUtils: '0'
   Scalar::Util: '0'
+  perl: '5.010'
   strict: '0'
   utf8: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/CellBIS/CellBIS-Random/issues
   repository: git://github.com/CellBIS/CellBIS-Random.git
-version: '0.1'
+version: '0.3'
 x_generated_by_perl: v5.24.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

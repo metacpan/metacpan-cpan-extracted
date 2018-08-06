@@ -3,7 +3,7 @@ package Net::AMQP::RabbitMQ::PP;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
 use Cwd;
@@ -17,6 +17,8 @@ use Net::AMQP;
 use Sys::Hostname;
 use Try::Tiny;
 use Time::HiRes;
+
+use constant HAS_TLS => eval { require IO::Socket::SSL; 1 };
 
 sub new {
 	my ( $class, %parameters ) = @_;
@@ -47,11 +49,19 @@ sub connect {
 			Time::HiRes::alarm( $args{timeout} );
 		}
 
+		my $connection_class = "IO::Socket::INET";
+
+		if ( $args{secure} ) {
+			die "IO::Socket::SSL is required for secure connections"
+				if ! HAS_TLS;
+			$connection_class = "IO::Socket::SSL";
+		}
+
 		$self->_set_handle(
-			IO::Socket::INET->new(
+			$connection_class->new(
 				PeerAddr => $args{host} || 'localhost',
-				PeerPort => $args{port} || 5672,
-				Proto => 'tcp',
+				PeerPort => $args{port} || ( $args{secure} ? 5671 : 5672 ),
+				( ! $args{secure} ? ( Proto => 'tcp' ) : () ),
 			) or Carp::croak "Could not connect: $EVAL_ERROR"
 		);
 
@@ -194,7 +204,7 @@ sub _startup {
 		channel => 0,
 		output => [
 			Net::AMQP::Protocol::Connection::TuneOk->new(
-				channel_max => 0,
+				channel_max => 2047,
 				frame_max => 131072,
 				heartbeat => $heartbeat,
 			),
@@ -916,7 +926,7 @@ Like L<Net::RabbitMQ> but pure perl rather than a wrapper around librabbitmq.
 
 =head1 VERSION
 
-0.05
+0.06
 
 =head1 SUBROUTINES/METHODS
 
@@ -941,6 +951,14 @@ Connect to the server. Default arguments are show below:
 		password    => 'guest',
 		virtualhost => '/',
 		heartbeat   => undef,
+	);
+
+connect can also take a secure flag for SSL connections, this will only work if
+IO::Socket::SSL is available
+
+	$mq->connect(
+		...
+		secure => 1,
 	);
 
 =head2 disconnect
@@ -1190,7 +1208,8 @@ Current maintainer:
 
 Contributors:
 
-    Ben Kaufman
+	Ben Kaufman
+	Jonathan Briggs
 
 =head1 LICENSE AND COPYRIGHT
 

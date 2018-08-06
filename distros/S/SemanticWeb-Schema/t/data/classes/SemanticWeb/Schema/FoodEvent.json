@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Event type: Food event.",
+      "rdfs:label" : "FoodEvent",
+      "rdfs:subClassOf" : "schema:Event"
+   },
+   "properties" : {}
+}

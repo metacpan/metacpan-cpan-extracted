@@ -1,8 +1,12 @@
 
 use strict;
 use warnings;
-BEGIN { unshift @INC, 't'; }
-require "filter-util.pl" ;
+
+use FindBin;
+use lib "$FindBin::Bin"; # required to load filter-util.pl
+
+require "filter-util.pl";
+
 use Config;
 use Cwd ;
 my $here = getcwd ;

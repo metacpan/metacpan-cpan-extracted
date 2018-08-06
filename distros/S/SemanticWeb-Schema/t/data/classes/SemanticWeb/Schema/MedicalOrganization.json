@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A medical organization (physical or not), such as hospital, institution or clinic.",
+      "rdfs:label" : "MedicalOrganization",
+      "rdfs:subClassOf" : "schema:Organization"
+   },
+   "properties" : {}
+}

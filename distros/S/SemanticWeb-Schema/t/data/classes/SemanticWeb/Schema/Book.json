@@ -1,0 +1,47 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A book.",
+      "rdfs:label" : "Book",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:bookEdition" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The edition of the book.",
+         "rdfs:label" : "bookEdition",
+         "schema:domainIncludes" : "schema:Book",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:bookFormat" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The format of the book.",
+         "rdfs:label" : "bookFormat",
+         "schema:domainIncludes" : "schema:Book",
+         "schema:rangeIncludes" : "schema:BookFormatType"
+      },
+      "schema:illustrator" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The illustrator of the book.",
+         "rdfs:label" : "illustrator",
+         "schema:domainIncludes" : "schema:Book",
+         "schema:rangeIncludes" : "schema:Person"
+      },
+      "schema:isbn" : {
+         "owl:equivalentProperty" : "bibo:isbn",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The ISBN of the book.",
+         "rdfs:label" : "isbn",
+         "rdfs:subPropertyOf" : "schema:identifier",
+         "schema:domainIncludes" : "schema:Book",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:numberOfPages" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of pages in the book.",
+         "rdfs:label" : "numberOfPages",
+         "schema:domainIncludes" : "schema:Book",
+         "schema:rangeIncludes" : "schema:Integer"
+      }
+   }
+}

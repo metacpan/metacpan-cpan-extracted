@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Sn - Package for language Shona
 
 package Locale::CLDR::Locales::Sn;
 # This file auto generated from Data\common\main\sn.xml
-#	on Fri 13 Apr  7:28:38 am GMT
+#	on Sun  5 Aug  6:21:38 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -616,6 +616,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ugwiya ye Moritania \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ugwiya ye Moritania),
 			},
 		},
@@ -685,6 +690,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dobra re Sao Tome ne Principe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dobra re Sao Tome ne Principe),
 			},
@@ -1013,10 +1023,6 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'narrow' => {
 					'am' => q{a},
 					'pm' => q{p},
@@ -1025,12 +1031,12 @@ has 'day_periods' => (
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
-			},
-			'stand-alone' => {
 				'abbreviated' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
+			},
+			'stand-alone' => {
 				'wide' => {
 					'pm' => q{PM},
 					'am' => q{AM},
@@ -1038,6 +1044,10 @@ has 'day_periods' => (
 				'narrow' => {
 					'am' => q{AM},
 					'pm' => q{PM},
+				},
+				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
 				},
 			},
 		},
@@ -1125,32 +1135,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			E => q{ccc},
-			Ed => q{d, E},
-			Gy => q{G y},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, M/d},
-			MMM => q{LLL},
-			MMMEd => q{E, MMM d},
-			MMMMEd => q{E, MMMM d},
-			MMMMd => q{MMMM d},
-			MMMd => q{MMM d},
-			Md => q{M/d},
-			d => q{d},
-			hm => q{h:mm a},
-			ms => q{mm:ss},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E, M/d/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E, MMM d, y},
-			yMMMM => q{MMMM y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
-		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E HH:mm},
@@ -1194,6 +1178,32 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
 			yw => q{'week' w 'of' Y},
+		},
+		'generic' => {
+			E => q{ccc},
+			Ed => q{d, E},
+			Gy => q{G y},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, M/d},
+			MMM => q{LLL},
+			MMMEd => q{E, MMM d},
+			MMMMEd => q{E, MMMM d},
+			MMMMd => q{MMMM d},
+			MMMd => q{MMM d},
+			Md => q{M/d},
+			d => q{d},
+			hm => q{h:mm a},
+			ms => q{mm:ss},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{E, M/d/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E, MMM d, y},
+			yMMMM => q{MMMM y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
 		},
 	} },
 );

@@ -9,14 +9,22 @@
 #include <magic.h>
 
 #include <jpeglib.h>
+#include <jerror.h>
+
 #include <glib.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
 #include <gperl.h>
 #include <gtk2perl.h>
 
 #include <assert.h>
+
+#if WEBP
+#include <webp/demux.h>
+#include <webp/decode.h>
+#endif
 
 #include "perlmulticore.h"
 
@@ -30,6 +38,8 @@
 #define ELLIPSIS "\xe2\x80\xa6"
 
 typedef char *octet_string;
+
+static magic_t magic_cookie[2]; /* !mime, mime */
 
 struct jpg_err_mgr
 {
@@ -193,11 +203,67 @@ a85_finish (PerlIO *fp)
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// memory source for libjpeg
+
+static void cv_ms_init (j_decompress_ptr cinfo)
+{
+}
+
+static void cv_ms_term (j_decompress_ptr cinfo)
+{
+}
+
+static boolean cv_ms_fill (j_decompress_ptr cinfo)
+{
+  // unexpected EOF, warn and generate fake EOI marker
+
+  WARNMS (cinfo, JWRN_JPEG_EOF);
+
+  struct jpeg_source_mgr *src = (struct jpeg_source_mgr *)cinfo->src;
+
+  static const JOCTET eoi[] = { 0xFF, JPEG_EOI };
+
+  src->next_input_byte = eoi;
+  src->bytes_in_buffer = sizeof (eoi);
+
+  return TRUE;
+}
+
+static void cv_ms_skip (j_decompress_ptr cinfo, long num_bytes)
+{
+  struct jpeg_source_mgr *src = (struct jpeg_source_mgr *)cinfo->src;
+
+  src->next_input_byte += num_bytes;
+  src->bytes_in_buffer -= num_bytes;
+}
+
+static void cv_jpeg_mem_src (j_decompress_ptr cinfo, void *buf, size_t buflen)
+{
+  struct jpeg_source_mgr *src;
+
+  if (!cinfo->src)
+    cinfo->src = (struct jpeg_source_mgr *)
+      (*cinfo->mem->alloc_small) (
+        (j_common_ptr) cinfo, JPOOL_PERMANENT, sizeof (struct jpeg_source_mgr)
+      );
+
+  src = (struct jpeg_source_mgr *)cinfo->src;
+  src->init_source       = cv_ms_init;
+  src->fill_input_buffer = cv_ms_fill;
+  src->skip_input_data   = cv_ms_skip;
+  src->resync_to_restart = jpeg_resync_to_restart;
+  src->term_source       = cv_ms_term;
+  src->next_input_byte   = (JOCTET *)buf;
+  src->bytes_in_buffer   = buflen;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 
 MODULE = Gtk2::CV PACKAGE = Gtk2::CV
 
 PROTOTYPES: ENABLE
 
+# calculate the common prefix length of two strings
 # missing function in perl. really :)
 int
 common_prefix_length (a, b)
@@ -216,44 +282,31 @@ common_prefix_length (a, b)
         RETVAL
 
 const char *
-magic (octet_string path)
+magic (SV *path_or_data)
+	ALIAS:
+        magic             = 0
+        magic_mime        = 1
+        magic_buffer      = 2
+        magic_buffer_mime = 3
 	CODE:
 {
-	static magic_t cookie;
+	STRLEN len;
+	char *data = SvPVbyte (path_or_data, len);
 
-        if (!cookie)
-          {
-            cookie = magic_open (MAGIC_SYMLINK);
-
-            if (cookie)
-              magic_load (cookie, 0);
-            else
-              XSRETURN_UNDEF;
-          }
-
-        RETVAL = magic_file (cookie, path);
-}
-	OUTPUT:
-        RETVAL
-
-const char *
-magic_mime (octet_string path)
-	CODE:
-{
-	static magic_t cookie;
-
-        if (!cookie)
-          {
-            cookie = magic_open (MAGIC_MIME | MAGIC_SYMLINK);
-
-            if (cookie)
-              magic_load (cookie, 0);
-            else
-              XSRETURN_UNDEF;
+        if (!magic_cookie[0])
+	  {
+            magic_cookie[0] = magic_open (MAGIC_SYMLINK);
+            magic_cookie[1] = magic_open (MAGIC_SYMLINK | MAGIC_MIME_TYPE);
+            magic_load (magic_cookie[0], 0);
+            magic_load (magic_cookie[1], 0);
           }
 
         perlinterp_release ();
-        RETVAL = magic_file (cookie, path);
+
+        RETVAL = ix & 2
+          ? magic_buffer (magic_cookie[ix & 1], data, len)
+          : magic_file   (magic_cookie[ix & 1], data);
+
         perlinterp_acquire ();
 }
 	OUTPUT:
@@ -318,23 +371,145 @@ rotate (GdkPixbuf *pb, int angle)
 	OUTPUT:
         RETVAL
 
+const char *
+filetype (SV *image_data)
+	CODE:
+{
+        STRLEN data_len;
+        U8 *data = SvPVbyte (image_data, data_len);
+
+        if (data_len >= 20
+            && data[0] == 0xff
+            && data[1] == 0xd8
+            && data[2] == 0xff)
+	  RETVAL = "jpg";
+        else if (data_len >= 12
+            && data[ 0] == (U8)'R'
+            && data[ 1] == (U8)'I'
+            && data[ 2] == (U8)'F'
+            && data[ 3] == (U8)'F'
+            && data[ 8] == (U8)'W'
+            && data[ 9] == (U8)'E'
+            && data[10] == (U8)'B'
+            && data[11] == (U8)'P')
+          RETVAL = "webp";
+        else if (data_len >= 16
+            && data[ 0] == 0x89
+            && data[ 1] == (U8)'P'
+            && data[ 2] == (U8)'N'
+            && data[ 3] == (U8)'G'
+            && data[ 4] == 0x0d
+            && data[ 5] == 0x0a
+            && data[ 6] == 0x1a
+            && data[ 7] == 0x0a)
+          RETVAL = "png";
+        else
+          RETVAL = "other";
+}
+	OUTPUT:
+        RETVAL
+
 GdkPixbuf_noinc *
-load_jpeg (SV *path, int thumbnail = 0, int iw = 0, int ih = 0)
+decode_webp (SV *image_data, int thumbnail = 0, int iw = 0, int ih = 0)
+	CODE:
+{
+#if WEBP
+	STRLEN data_size;
+        int alpha;
+        WebPData data;
+        WebPDemuxer *demux;
+        WebPIterator iter;
+        WebPDecoderConfig config;
+        int inw, inh;
+
+        data.bytes = (uint8_t *)SvPVbyte (image_data, data_size);
+        data.size = data_size;
+
+        perlinterp_release ();
+
+        RETVAL = 0;
+
+	if (!(demux = WebPDemux (&data)))
+          goto err_demux;
+
+        if (!WebPDemuxGetFrame (demux, 1, &iter))
+          goto err_iter;
+
+        if (!WebPInitDecoderConfig (&config))
+          goto err_iter;
+
+        config.options.use_threads = 1;
+
+        if (WebPGetFeatures (iter.fragment.bytes, iter.fragment.size, &config.input) != VP8_STATUS_OK)
+          goto err_iter;
+
+        inw = config.input.width;
+        inh = config.input.height;
+
+	if (thumbnail)
+	  {
+            if (inw * ih > inh * iw)
+              ih = (iw * inh + inw - 1) / inw;
+            else
+              iw = (ih * inw + inh - 1) / inh;
+
+	    config.options.bypass_filtering    = 1;
+	    config.options.no_fancy_upsampling = 1;
+
+	    config.options.use_scaling   = 1;
+	    config.options.scaled_width  = iw;
+	    config.options.scaled_height = ih;
+          }
+        else
+          {
+            iw = inw;
+            ih = inh;
+          }
+
+        alpha = !!config.input.has_alpha;
+
+	RETVAL = gdk_pixbuf_new (GDK_COLORSPACE_RGB, alpha, 8, iw, ih);
+        if (!RETVAL)
+          goto err_iter;
+
+        config.output.colorspace = alpha ? MODE_RGBA : MODE_RGB;
+        config.output.u.RGBA.rgba   = gdk_pixbuf_get_pixels      (RETVAL);
+        config.output.u.RGBA.stride = gdk_pixbuf_get_rowstride   (RETVAL);
+        config.output.u.RGBA.size   = gdk_pixbuf_get_byte_length (RETVAL);
+        config.output.is_external_memory = 1;
+
+        if (WebPDecode (iter.fragment.bytes, iter.fragment.size, &config) != VP8_STATUS_OK)
+          {
+            g_object_unref (RETVAL);
+            RETVAL = 0;
+            goto err_iter;
+          }
+
+	err_iter:
+        WebPDemuxReleaseIterator (&iter);
+	err_demux:
+        WebPDemuxDelete (demux);
+
+        perlinterp_acquire ();
+#else
+	croak ("load_webp: webp not enabled at compile time");
+#endif
+}
+	OUTPUT:
+        RETVAL
+
+GdkPixbuf_noinc *
+decode_jpeg (SV *image_data, int thumbnail = 0, int iw = 0, int ih = 0)
 	CODE:
 {
         struct jpeg_decompress_struct cinfo;
         struct jpg_err_mgr jerr;
-        guchar *data;
         int rs;
-        FILE *fp;
         volatile GdkPixbuf *pb = 0;
+        STRLEN data_len;
+        guchar *data = SvPVbyte (image_data, data_len);
 
         RETVAL = 0;
-
-        fp = fopen (SvPVbyte_nolen (path), "rb");
-
-        if (!fp)
-          XSRETURN_UNDEF;
 
         perlinterp_release ();
 
@@ -345,7 +520,6 @@ load_jpeg (SV *path, int thumbnail = 0, int iw = 0, int ih = 0)
 
         if ((rs = setjmp (jerr.setjmp_buffer)))
           {
-            fclose (fp);
             jpeg_destroy_decompress (&cinfo);
 
             if (pb)
@@ -355,9 +529,12 @@ load_jpeg (SV *path, int thumbnail = 0, int iw = 0, int ih = 0)
             XSRETURN_UNDEF;
           }
 
-        jpeg_create_decompress (&cinfo);
+        if (!data_len)
+          longjmp (jerr.setjmp_buffer, 4);
 
-        jpeg_stdio_src (&cinfo, fp);
+        jpeg_create_decompress (&cinfo);
+        cv_jpeg_mem_src (&cinfo, data, data_len);
+
         jpeg_read_header (&cinfo, TRUE);
 
         cinfo.dct_method          = JDCT_DEFAULT;
@@ -446,7 +623,6 @@ load_jpeg (SV *path, int thumbnail = 0, int iw = 0, int ih = 0)
           }
 
         jpeg_finish_decompress (&cinfo);
-        fclose (fp);
         jpeg_destroy_decompress (&cinfo);
         perlinterp_acquire ();
 }

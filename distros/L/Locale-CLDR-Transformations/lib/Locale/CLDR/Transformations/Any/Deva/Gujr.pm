@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Deva::Gujr;
 # This file auto generated from Data\common\transforms\Devanagari-Gujarati.xml
-#	on Fri 13 Apr  6:59:51 am GMT
+#	on Sun  5 Aug  5:49:14 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

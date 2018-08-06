@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::OperationAccessDenied
 Perl data type class for the XML Schema defined complexType
 OperationAccessDenied from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Operation not permitted due to the invoked service's access policy. 
 
 
 

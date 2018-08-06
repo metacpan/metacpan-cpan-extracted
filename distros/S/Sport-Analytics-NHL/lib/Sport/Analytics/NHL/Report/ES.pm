@@ -118,7 +118,6 @@ sub get_old_headers ($$;$) {
 	my $self         = shift;
 	my $team_summary = shift;
 
-#	print $team_summary->dump;
 	my $header_row = $self->get_sub_tree(0, [ 0 ], $team_summary);
 	my $headers_num = scalar @{$header_row->{_content}};
 	my @headers;
@@ -295,7 +294,6 @@ sub normalize ($$) {
 				$player->{$field} += 0 if $player->{$field} =~ /^\-?\d+$/;
 			}
 			$player->{name} = "$2 $1" if $player->{name} =~ /^(\S.*\S)\,\s+(\S.*)$/;
-#			$self->normalize_field_names($player, \%NORMAL_FIELDS);
 			$player->{start} = 2;
 			$player->{status} = 'X';
 			for my $field (qw(G A PIM)) {

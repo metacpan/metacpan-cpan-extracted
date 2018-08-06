@@ -13,5 +13,6 @@ t/01-procedural-random.t
 t/02-procedural-unrandom.t
 t/03-oop-random.t
 t/04-oop-unrandom.t
+xt/author/minimum-version.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

@@ -74,8 +74,8 @@ if (open my $SRC, '<', $INC{'Mojo/Redis/Database.pm'}) {
 
 =head2 $method
 
-  \@res     = \$self->$method($args);
-  \$self    = \$self->$method($args, sub { my (\$self, \@res) = \@_ });
+  \$res     = \$self->$method($args);
+  \$self    = \$self->$method($args, sub { my (\$self, \$res) = \@_ });
   \$promise = \$self->${method}_p($args);
 
 $summary

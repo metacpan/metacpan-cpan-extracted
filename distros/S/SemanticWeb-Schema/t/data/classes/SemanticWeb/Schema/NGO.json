@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Organization: Non-governmental Organization.",
+      "rdfs:label" : "NGO",
+      "rdfs:subClassOf" : "schema:Organization"
+   },
+   "properties" : {}
+}

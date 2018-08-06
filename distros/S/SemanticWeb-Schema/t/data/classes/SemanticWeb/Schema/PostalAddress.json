@@ -1,0 +1,63 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The mailing address.",
+      "rdfs:label" : "PostalAddress",
+      "rdfs:subClassOf" : "schema:ContactPoint"
+   },
+   "properties" : {
+      "schema:addressCountry" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The country. For example, USA. You can also provide the two-letter <a href=\"http://en.wikipedia.org/wiki/ISO_3166-1\">ISO 3166-1 alpha-2 country code</a>.",
+         "rdfs:label" : "addressCountry",
+         "schema:domainIncludes" : [
+            "schema:GeoCoordinates",
+            "schema:GeoShape",
+            "schema:PostalAddress"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Country",
+            "schema:Text"
+         ]
+      },
+      "schema:addressLocality" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The locality. For example, Mountain View.",
+         "rdfs:label" : "addressLocality",
+         "schema:domainIncludes" : "schema:PostalAddress",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:addressRegion" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The region. For example, CA.",
+         "rdfs:label" : "addressRegion",
+         "schema:domainIncludes" : "schema:PostalAddress",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:postOfficeBoxNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The post office box number for PO box addresses.",
+         "rdfs:label" : "postOfficeBoxNumber",
+         "schema:domainIncludes" : "schema:PostalAddress",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:postalCode" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The postal code. For example, 94043.",
+         "rdfs:label" : "postalCode",
+         "schema:domainIncludes" : [
+            "schema:PostalAddress",
+            "schema:GeoCoordinates",
+            "schema:GeoShape"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:streetAddress" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The street address. For example, 1600 Amphitheatre Pkwy.",
+         "rdfs:label" : "streetAddress",
+         "schema:domainIncludes" : "schema:PostalAddress",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

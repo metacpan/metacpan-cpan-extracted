@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A health club.",
+      "rdfs:label" : "HealthClub",
+      "rdfs:subClassOf" : [
+         "schema:SportsActivityLocation",
+         "schema:HealthAndBeautyBusiness"
+      ]
+   },
+   "properties" : {}
+}

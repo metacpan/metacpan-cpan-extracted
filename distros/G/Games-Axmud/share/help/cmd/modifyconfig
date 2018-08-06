@@ -23,8 +23,8 @@ mcf / modifyconfig            Modifies text-to-speech configurations
          configuration called <name>. You can then use the ';speak' command to
          test the new configuration, if you want. (See also the help for
          ';addconfig', ';cloneconfig', ';deleteconfig' and ';listconfig'. The
-         command ';editconfig' opens a GUI window, from which you can also
-         modify the configuration.)
+         command ';editconfig' opens an object viewer window, from which you can
+         also modify the configuration.)
       Note that the configurations called 'espeak', 'esng', 'flite', 'festival',
          'swift' and 'none' can't be modified (but other configurations using
          these engines can be modified.)

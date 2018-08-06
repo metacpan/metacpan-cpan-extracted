@@ -1,4 +1,4 @@
-package Pcore::API::ReCaptcha v0.2.6;
+package Pcore::API::ReCaptcha v0.2.7;
 
 use Pcore -dist, -class, -res;
 use Pcore::Util::Data qw[from_json];
@@ -13,22 +13,22 @@ sub verify ( $self, $response, $user_ip = undef, $cb = undef ) {
     return P->http->post(
         'https://www.google.com/recaptcha/api/siteverify',
         accept_compressed => 0,
-        headers           => {    #
-            CONTENT_TYPE => 'application/x-www-form-urlencoded',
-        },
-        body => P->data->to_uri( {
+        headers           => [    #
+            'Content-Type' => 'application/x-www-form-urlencoded',
+        ],
+        data => P->data->to_uri( {
             secret   => $self->{secret_key},
             response => $response,
             remoteip => $user_ip,
         } ),
-        on_finish => sub ($res) {
+        sub ($res) {
             my $api_res;
 
             if ( !$res ) {
                 $api_res = res [ $res->{status}, $res->{reason} ];
             }
             else {
-                my $data = from_json( $res->{body} );
+                my $data = from_json( $res->{data} );
 
                 if ( $data->{success} ) {
                     $api_res = res 200,

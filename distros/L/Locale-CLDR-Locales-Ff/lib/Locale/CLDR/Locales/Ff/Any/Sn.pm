@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ff::Any::Sn - Package for language Fulah
 
 package Locale::CLDR::Locales::Ff::Any::Sn;
 # This file auto generated from Data\common\main\ff_SN.xml
-#	on Fri 13 Apr  7:09:33 am GMT
+#	on Sun  5 Aug  6:00:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

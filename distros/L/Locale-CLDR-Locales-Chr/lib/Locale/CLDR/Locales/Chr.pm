@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Chr - Package for language Cherokee
 
 package Locale::CLDR::Locales::Chr;
 # This file auto generated from Data\common\main\chr.xml
-#	on Fri 13 Apr  7:04:59 am GMT
+#	on Sun  5 Aug  5:55:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -815,12 +815,13 @@ has 'display_name_region' => (
  			'151' => 'ᏗᎧᎸᎬ ᏗᏜ ᏳᎳᏛ',
  			'154' => 'ᏧᏴᏢ ᏗᏜ ᏳᎳᏛ',
  			'155' => 'ᏭᏕᎵᎬ ᏗᏜ ᏳᎳᏛ',
+ 			'202' => 'ᎭᏫᏂ-ᏌᎭᏩ ᎬᎿᎨᏍᏛ',
  			'419' => 'ᎳᏘᏂ ᎠᎹᏰᏟ',
  			'AC' => 'ᎤᎵᏌᎳᏓᏅ ᎤᎦᏚᏛᎢ',
  			'AD' => 'ᎠᏂᏙᎳ',
  			'AE' => 'ᏌᏊ ᎢᏳᎾᎵᏍᏔᏅ ᎡᎳᏈ ᎢᎹᎵᏘᏏ',
  			'AF' => 'ᎠᏫᎨᏂᏍᏖᏂ',
- 			'AG' => 'ᎤᏪᏘ ᎠᎴ ᏆᏊᏓ',
+ 			'AG' => 'ᎤᏪᏘ & ᏆᏊᏓ',
  			'AI' => 'ᎠᏂᎩᎳ',
  			'AL' => 'ᎠᎵᏇᏂᏯ',
  			'AM' => 'ᎠᎵᎻᏂᎠ',
@@ -833,7 +834,7 @@ has 'display_name_region' => (
  			'AW' => 'ᎠᎷᏆ',
  			'AX' => 'ᎣᎴᏅᏓ ᏚᎦᏚᏛᎢ',
  			'AZ' => 'ᎠᏎᏆᏣᏂ',
- 			'BA' => 'ᏉᏏᏂᎠ ᎠᎴ ᎲᏤᎪᏫ',
+ 			'BA' => 'ᏉᏏᏂᎠ & ᎲᏤᎪᏫ',
  			'BB' => 'ᏆᏇᏙᏍ',
  			'BD' => 'ᏆᏂᎦᎵᏕᏍ',
  			'BE' => 'ᏇᎵᏥᎥᎻ',
@@ -976,7 +977,7 @@ has 'display_name_region' => (
  			'MK' => 'ᎹᏎᏙᏂᏯ',
  			'MK@alt=variant' => 'ᎹᏎᏙᏂᏯ (FYROM)',
  			'ML' => 'ᎹᎵ',
- 			'MM' => 'ᎹᏯᎹᎵ',
+ 			'MM' => 'ᎹᏯᎹᎵ (ᏇᎵᎹ)',
  			'MN' => 'ᎹᏂᎪᎵᎠ',
  			'MO' => 'ᎹᎧᎣ (ᎤᏓᏤᎵᏓ ᏧᏂᎸᏫᏍᏓᏁᏗ ᎢᎬᎾᏕᎾ) ᏣᎢ',
  			'MO@alt=short' => 'ᎹᎧᎣ',
@@ -1388,10 +1389,10 @@ has 'units' => (
 						'other' => q({0} ᏍᎪᎯᏧᏈ ᏧᏕᏘᏴᏓ),
 					},
 					'coordinate' => {
-						'east' => q({0}Ꮧ),
-						'north' => q({0}ᏧᏴ),
-						'south' => q({0}ᏧᎦ),
-						'west' => q({0}Ꮽ),
+						'east' => q({0} ᏗᎧᎸᎬ),
+						'north' => q({0} ᏧᏴᏢ),
+						'south' => q({0} ᏧᎦᏄᏮ),
+						'west' => q({0} ᏭᏕᎵᎬ),
 					},
 					'cubic-centimeter' => {
 						'name' => q(ᏅᎩ ᏧᏅᏏᏯ ᏧᏍᏗ ᏗᏟᎶᏍᏗ),
@@ -2185,10 +2186,10 @@ has 'units' => (
 						'other' => q({0} c),
 					},
 					'coordinate' => {
-						'east' => q({0}Ꮧ),
-						'north' => q({0}ᏧᏴ),
-						'south' => q({0}ᏧᎦ),
-						'west' => q({0}Ꮽ),
+						'east' => q({0} Ꮧ),
+						'north' => q({0} ᏧᏴ),
+						'south' => q({0} ᏧᎦ),
+						'west' => q({0} Ꮽ),
 					},
 					'cubic-centimeter' => {
 						'name' => q(cm³),
@@ -3319,6 +3320,13 @@ has 'currencies' => (
 				'other' => q(ᏥᎵ ᎠᏕᎳ),
 			},
 		},
+		'CNH' => {
+			display_name => {
+				'currency' => q(ᏣᏂᏏ ᎠᏕᎳ \(ᏓᎹᏳᏟᏗ\)),
+				'one' => q(ᏣᏂᏏ ᎠᏕᎳ \(ᏓᎹᏳᏟᏗ\)),
+				'other' => q(ᏣᏂᏏ ᎠᏕᎳ \(ᏓᎹᏳᏟᏗ\)),
+			},
+		},
 		'CNY' => {
 			symbol => 'CN¥',
 			display_name => {
@@ -3370,9 +3378,9 @@ has 'currencies' => (
 		'CZK' => {
 			symbol => 'CZK',
 			display_name => {
-				'currency' => q(ᏤᎩ ᏍᎦᏚᎩ ᎠᏕᎳ),
-				'one' => q(ᏤᎩ ᏍᎦᏚᎩ ᎠᏕᎳ),
-				'other' => q(ᏤᎩ ᏍᎦᏚᎩ ᎠᏕᎳ),
+				'currency' => q(ᏤᎩ ᎠᏕᎳ),
+				'one' => q(ᏤᎩ ᎠᏕᎳ),
+				'other' => q(ᏤᎩ ᎠᏕᎳ),
 			},
 		},
 		'DJF' => {
@@ -3802,6 +3810,13 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ \(1973–2017\)),
+				'one' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ \(1973–2017\)),
+				'other' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ),
 				'one' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ),
 				'other' => q(ᎼᎵᏏᎥᏍ ᎠᏕᎳ),
@@ -4097,6 +4112,14 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(ᏌᎣᏙᎺ ᎠᎴ ᏈᏂᏏᏇ ᎠᏕᎳ \(1977–2017\)),
+				'one' => q(ᏌᎣᏙᎺ ᎠᎴ ᏈᏂᏏᏇ ᎠᏕᎳ \(1977–2017\)),
+				'other' => q(ᏌᎣᏙᎺ ᎠᎴ ᏈᏂᏏᏇ ᎠᏕᎳ \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
 			display_name => {
 				'currency' => q(ᏌᎣᏙᎺ ᎠᎴ ᏈᏂᏏᏇ ᎠᏕᎳ),
 				'one' => q(ᏌᎣᏙᎺ ᎠᎴ ᏈᏂᏏᏇ ᎠᏕᎳ),
@@ -4646,49 +4669,49 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
+				'abbreviated' => {
+					'pm' => q{ᏒᎯᏱᎢ},
 					'am' => q{ᏌᎾᎴ},
-					'noon' => q{ᎢᎦ},
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
 					'morning1' => q{ᏌᎾᎴ},
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'noon' => q{ᎢᎦ},
 				},
 				'narrow' => {
-					'noon' => q{Ꭲ},
-					'morning1' => q{ᏌᎾᎴ},
 					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'morning1' => q{ᏌᎾᎴ},
 					'pm' => q{Ꮢ},
 					'am' => q{Ꮜ},
+					'noon' => q{Ꭲ},
 				},
-				'abbreviated' => {
+				'wide' => {
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'morning1' => q{ᏌᎾᎴ},
 					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
 					'am' => q{ᏌᎾᎴ},
 					'noon' => q{ᎢᎦ},
-					'morning1' => q{ᏌᎾᎴ},
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
 				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'noon' => q{ᎢᎦ},
+					'morning1' => q{ᏌᎾᎴ},
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'pm' => q{ᏒᎯᏱᎢ},
+					'am' => q{ᏌᎾᎴ},
+				},
+				'narrow' => {
+					'am' => q{ᏌᎾᎴ},
+					'pm' => q{ᏒᎯᏱᎢ},
+					'morning1' => q{ᏌᎾᎴ},
+					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
+					'noon' => q{ᎢᎦ},
+				},
 				'wide' => {
 					'am' => q{ᏌᎾᎴ},
 					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
 					'morning1' => q{ᏌᎾᎴ},
 					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
 					'noon' => q{ᎢᎦ},
-				},
-				'narrow' => {
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
-					'morning1' => q{ᏌᎾᎴ},
-					'noon' => q{ᎢᎦ},
-					'am' => q{ᏌᎾᎴ},
-					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
-				},
-				'abbreviated' => {
-					'afternoon1' => q{ᏒᎯᏱᎢᏗᏢ},
-					'morning1' => q{ᏌᎾᎴ},
-					'noon' => q{ᎢᎦ},
-					'am' => q{ᏌᎾᎴ},
-					'pm' => q{ᏒᎯᏱᎢᏗᏢ},
 				},
 			},
 		},
@@ -4777,12 +4800,22 @@ has 'datetime_formats_available_formats' => (
 	init_arg	=> undef,
 	default		=> sub { {
 		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
 			Ed => q{d E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
 			Gy => q{y G},
 			GyMMM => q{MMM y G},
 			GyMMMEd => q{E, MMM d, y G},
 			GyMMMd => q{MMM d, y G},
+			H => q{HH},
 			Hm => q{H:mm},
 			Hms => q{H:mm:ss},
 			M => q{L},
@@ -4793,8 +4826,10 @@ has 'datetime_formats_available_formats' => (
 			MMMd => q{MMM d},
 			Md => q{M/d},
 			d => q{d},
+			h => q{h a},
 			hm => q{h:mm a},
 			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
 			y => q{y G},
 			yyyy => q{y G},
 			yyyyM => q{M/y GGGGG},
@@ -4808,7 +4843,12 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQQ => q{QQQQ y G},
 		},
 		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
 			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
 			EHm => q{E HH:mm},
 			EHms => q{E HH:mm:ss},
 			Ed => q{d E},

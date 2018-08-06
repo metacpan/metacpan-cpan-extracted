@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A file composed primarily of text.",
+      "rdfs:label" : "TextDigitalDocument",
+      "rdfs:subClassOf" : "schema:DigitalDocument"
+   },
+   "properties" : {}
+}

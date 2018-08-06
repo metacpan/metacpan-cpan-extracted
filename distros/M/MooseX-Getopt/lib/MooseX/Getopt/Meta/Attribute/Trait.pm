@@ -1,10 +1,10 @@
 package MooseX::Getopt::Meta::Attribute::Trait;
 # ABSTRACT: Optional meta attribute trait for custom option names
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 use Moose::Role;
-use Moose::Util::TypeConstraints;
+use Moose::Util::TypeConstraints qw(subtype coerce from via as);
 use namespace::autoclean;
 
 has 'cmd_flag' => (
@@ -47,7 +47,7 @@ MooseX::Getopt::Meta::Attribute::Trait - Optional meta attribute trait for custo
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SYNOPSIS
 

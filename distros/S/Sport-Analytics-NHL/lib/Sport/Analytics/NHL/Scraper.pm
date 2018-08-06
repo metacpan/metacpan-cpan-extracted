@@ -107,10 +107,8 @@ our @GAME_FILES = (
 		validate  => sub {
 			my $json = shift;
 			my $bs = Sport::Analytics::NHL::Report::BS->new($json);
-			return 0 unless $bs;
+			return scalar @{$bs->{json}{liveData}{plays}{allPlays}};
 			1;
-#			$bs->compile();
-#			scalar(@{$bs->{events}});
 		},
 	},
 	{

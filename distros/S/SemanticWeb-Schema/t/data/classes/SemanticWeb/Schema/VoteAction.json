@@ -1,0 +1,18 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of expressing a preference from a fixed/finite/structured set of choices/options.",
+      "rdfs:label" : "VoteAction",
+      "rdfs:subClassOf" : "schema:ChooseAction"
+   },
+   "properties" : {
+      "schema:candidate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of object. The candidate subject of this action.",
+         "rdfs:label" : "candidate",
+         "rdfs:subPropertyOf" : "schema:object",
+         "schema:domainIncludes" : "schema:VoteAction",
+         "schema:rangeIncludes" : "schema:Person"
+      }
+   }
+}

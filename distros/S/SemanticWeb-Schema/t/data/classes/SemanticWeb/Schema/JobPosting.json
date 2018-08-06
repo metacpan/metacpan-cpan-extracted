@@ -1,0 +1,178 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A listing that describes a job opening in a certain organization.",
+      "rdfs:label" : "JobPosting",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:baseSalary" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The base salary of the job or of an employee in an EmployeeRole.",
+         "rdfs:label" : "baseSalary",
+         "schema:domainIncludes" : [
+            "schema:JobPosting",
+            "schema:EmployeeRole"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:Number",
+            "schema:PriceSpecification"
+         ]
+      },
+      "schema:benefits" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Description of benefits associated with the job.",
+         "rdfs:label" : "benefits",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:supersededBy" : "schema:jobBenefits"
+      },
+      "schema:datePosted" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Publication date for the job posting.",
+         "rdfs:label" : "datePosted",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Date"
+      },
+      "schema:educationRequirements" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Educational background needed for the position.",
+         "rdfs:label" : "educationRequirements",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:employmentType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Type of employment (e.g. full-time, part-time, contract, temporary, seasonal, internship).",
+         "rdfs:label" : "employmentType",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:experienceRequirements" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Description of skills and experience needed for the position.",
+         "rdfs:label" : "experienceRequirements",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:hiringOrganization" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Organization offering the job position.",
+         "rdfs:label" : "hiringOrganization",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:incentiveCompensation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Description of bonus and commission compensation aspects of the job.",
+         "rdfs:label" : "incentiveCompensation",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:incentives" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Description of bonus and commission compensation aspects of the job.",
+         "rdfs:label" : "incentives",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:supersededBy" : "schema:incentiveCompensation"
+      },
+      "schema:industry" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The industry associated with the job position.",
+         "rdfs:label" : "industry",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:jobBenefits" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Description of benefits associated with the job.",
+         "rdfs:label" : "jobBenefits",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:jobLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A (typically single) geographic location associated with the job position.",
+         "rdfs:label" : "jobLocation",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Place"
+      },
+      "schema:occupationalCategory" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Category or categories describing the job. Use BLS O*NET-SOC taxonomy: http://www.onetcenter.org/taxonomy.html. Ideally includes textual label and formal code, with the property repeated for each applicable value.",
+         "rdfs:label" : "occupationalCategory",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:qualifications" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specific qualifications required for this role.",
+         "rdfs:label" : "qualifications",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:responsibilities" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Responsibilities associated with this role.",
+         "rdfs:label" : "responsibilities",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:salaryCurrency" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The currency (coded using <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217</a> ) used for the main salary information in this job posting or for this employee.",
+         "rdfs:label" : "salaryCurrency",
+         "schema:domainIncludes" : [
+            "schema:EmployeeRole",
+            "schema:JobPosting"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:skills" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Skills required to fulfill this role.",
+         "rdfs:label" : "skills",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:specialCommitments" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any special commitments associated with this job posting. Valid entries include VeteranCommit, MilitarySpouseCommit, etc.",
+         "rdfs:label" : "specialCommitments",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:title" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The title of the job.",
+         "rdfs:label" : "title",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:validThrough" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
+         "rdfs:label" : "validThrough",
+         "schema:domainIncludes" : [
+            "schema:Offer",
+            "schema:LocationFeatureSpecification",
+            "schema:OpeningHoursSpecification",
+            "schema:JobPosting",
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount",
+            "schema:Demand"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:workHours" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The typical working hours for this job (e.g. 1st shift, night shift, 8am-5pm).",
+         "rdfs:label" : "workHours",
+         "schema:domainIncludes" : "schema:JobPosting",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

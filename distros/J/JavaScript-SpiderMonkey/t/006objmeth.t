@@ -1,8 +1,8 @@
 ######################################################################
 # Testcase:     Functions/Methods for different objects
-# Revision:     $Revision: 1.1.1.1 $
-# Last Checkin: $Date: 2006/02/01 06:00:49 $
-# By:           $Author: mschilli $
+# Revision:     $Revision$
+# Last Checkin: $Date$
+# By:           $Author$
 #
 # Author: Mike Schilli m@perlmeister.com, 2004
 ######################################################################

@@ -1,0 +1,153 @@
+package SemanticWeb::Schema::DatedMoneySpecification;
+
+# ABSTRACT: A DatedMoneySpecification represents monetary values with optional start and end dates
+
+use Moo;
+
+extends qw/ SemanticWeb::Schema::StructuredValue /;
+
+
+use MooX::JSON_LD 'DatedMoneySpecification';
+use Ref::Util qw/ is_plain_hashref /;
+# RECOMMEND PREREQ: Ref::Util::XS
+
+use namespace::autoclean;
+
+our $VERSION = 'v0.0.1';
+
+
+has amount => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'amount',
+);
+
+
+
+has currency => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'currency',
+);
+
+
+
+has end_date => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'endDate',
+);
+
+
+
+has start_date => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'startDate',
+);
+
+
+
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+SemanticWeb::Schema::DatedMoneySpecification - A DatedMoneySpecification represents monetary values with optional start and end dates
+
+=head1 VERSION
+
+version v0.0.1
+
+=head1 DESCRIPTION
+
+=for html A DatedMoneySpecification represents monetary values with optional start
+and end dates. For example, this could represent an employee's salary over
+a specific period of time. <strong>Note:</strong> This type has been
+superseded by <a class="localLink"
+href="http://schema.org/MonetaryAmount">MonetaryAmount</a> use of that type
+is recommended
+
+=head1 ATTRIBUTES
+
+=head2 C<amount>
+
+The amount of money.
+
+A amount should be one of the following types:
+
+=over
+
+=item C<Num>
+
+=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
+=back
+
+=head2 C<currency>
+
+=for html The currency in which the monetary amount is expressed (in 3-letter <a
+href="http://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a> format).
+
+A currency should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<end_date>
+
+C<endDate>
+
+=for html The end date and time of the item (in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).
+
+A end_date should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<start_date>
+
+C<startDate>
+
+=for html The start date and time of the item (in <a
+href="http://en.wikipedia.org/wiki/ISO_8601">ISO 8601 date format</a>).
+
+A start_date should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head1 SEE ALSO
+
+L<SemanticWeb::Schema::StructuredValue>
+
+=head1 AUTHOR
+
+Robert Rothenberg <rrwo@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Robert Rothenberg.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

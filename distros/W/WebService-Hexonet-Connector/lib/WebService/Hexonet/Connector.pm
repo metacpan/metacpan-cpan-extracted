@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use WebService::Hexonet::Connector::Connection;
 
-our $VERSION = '1.05';
+our $VERSION = '1.11';
 
 sub connect {
     return WebService::Hexonet::Connector::Connection->new(@_);
@@ -31,7 +31,9 @@ WebService::Hexonet::Connector - Connector library for the insanely fast L<HEXON
 	cpanm WebService::Hexonet::Connector
 	# NOTE: We suggest to use cpanm (App::cpanminus) for several reasons.
 
-	# Import the Hexonet package
+
+	use strict;
+	use warnings;
 	use WebService::Hexonet::Connector;
 
 	# Create a connection with the URL, entity, login and password
@@ -52,13 +54,14 @@ WebService::Hexonet::Connector - Connector library for the insanely fast L<HEXON
 
 	# Display the result in the format you want
 	my $res = $response->as_list();
-	my $res = $response->as_list_hash();
-	my $res = $response->as_hash();
+	$res = $response->as_list_hash();
+	$res = $response->as_hash();
 
 	# Get the response code and the response description
 	my $code = $response->code();
 	my $description = $response->description();
 
+	print "$code $description";
 
 =head1 DESCRIPTION
 

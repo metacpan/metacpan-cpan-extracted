@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A legislative building&#x2014;for example, the state capitol.",
+      "rdfs:label" : "LegislativeBuilding",
+      "rdfs:subClassOf" : "schema:GovernmentBuilding"
+   },
+   "properties" : {}
+}

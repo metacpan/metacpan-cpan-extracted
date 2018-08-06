@@ -23,3 +23,6 @@ Makefile$
 ^chrome-versions
 ^WWW-Mechanize-Chrome
 ^frame-\d+.png
+^demo/
+^android-remote.pl
+^development/

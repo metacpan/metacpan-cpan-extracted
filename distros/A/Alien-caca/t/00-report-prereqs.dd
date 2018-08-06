@@ -15,6 +15,7 @@ do { my $x = {
                       'requires' => {
                                       'Alien::Base' => '0.005',
                                       'File::ShareDir' => '1.03',
+                                      'parent' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

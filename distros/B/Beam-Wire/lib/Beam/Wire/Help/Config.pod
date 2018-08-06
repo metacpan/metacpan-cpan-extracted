@@ -13,7 +13,7 @@ Beam::Wire::Help::Config - A brief introduction to dependency injection with Bea
 
 =head1 VERSION
 
-version 1.021
+version 1.022
 
 =head1 DESCRIPTION
 

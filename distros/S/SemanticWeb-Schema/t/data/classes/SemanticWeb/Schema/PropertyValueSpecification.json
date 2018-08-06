@@ -1,0 +1,103 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_ActionCollabClass",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A Property value specification.",
+      "rdfs:label" : "PropertyValueSpecification",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:defaultValue" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The default value of the input.  For properties that expect a literal, the default is a literal value, for properties that expect an object, it's an ID reference to one of the current values.",
+         "rdfs:label" : "defaultValue",
+         "schema:domainIncludes" : "schema:PropertyValueSpecification",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:Thing"
+         ]
+      },
+      "schema:maxValue" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The upper value of some characteristic or property.",
+         "rdfs:label" : "maxValue",
+         "schema:domainIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:PropertyValue",
+            "schema:QuantitativeValue",
+            "schema:PropertyValueSpecification"
+         ],
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:minValue" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The lower value of some characteristic or property.",
+         "rdfs:label" : "minValue",
+         "schema:domainIncludes" : [
+            "schema:PropertyValueSpecification",
+            "schema:MonetaryAmount",
+            "schema:QuantitativeValue",
+            "schema:PropertyValue"
+         ],
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:multipleValues" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Whether multiple values are allowed for the property.  Default is false.",
+         "rdfs:label" : "multipleValues",
+         "schema:domainIncludes" : "schema:PropertyValueSpecification",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:readonlyValue" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Whether or not a property is mutable.  Default is false. Specifying this for a property that also has a value makes it act similar to a \"hidden\" input in an HTML form.",
+         "rdfs:label" : "readonlyValue",
+         "schema:domainIncludes" : "schema:PropertyValueSpecification",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:stepValue" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The stepValue attribute indicates the granularity that is expected (and required) of the value in a PropertyValueSpecification.",
+         "rdfs:label" : "stepValue",
+         "schema:domainIncludes" : "schema:PropertyValueSpecification",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:valueMaxLength" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifies the allowed range for number of characters in a literal value.",
+         "rdfs:label" : "valueMaxLength",
+         "schema:domainIncludes" : "schema:PropertyValueSpecification",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:valueMinLength" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifies the minimum allowed range for number of characters in a literal value.",
+         "rdfs:label" : "valueMinLength",
+         "schema:domainIncludes" : "schema:PropertyValueSpecification",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:valueName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates the name of the PropertyValueSpecification to be used in URL templates and form encoding in a manner analogous to HTML's input@name.",
+         "rdfs:label" : "valueName",
+         "schema:domainIncludes" : "schema:PropertyValueSpecification",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:valuePattern" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifies a regular expression for testing literal values according to the HTML spec.",
+         "rdfs:label" : "valuePattern",
+         "schema:domainIncludes" : "schema:PropertyValueSpecification",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:valueRequired" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Whether the property must be filled in to complete the action.  Default is false.",
+         "rdfs:label" : "valueRequired",
+         "schema:domainIncludes" : "schema:PropertyValueSpecification",
+         "schema:rangeIncludes" : "schema:Boolean"
+      }
+   }
+}

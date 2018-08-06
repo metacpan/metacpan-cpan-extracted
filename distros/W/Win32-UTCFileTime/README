@@ -1,8 +1,3 @@
-________________________________________________________________________________
-
-                        Win32::UTCFileTime, Version 1.58
-________________________________________________________________________________
-
 NAME
 
     Win32::UTCFileTime - Get/set UTC file times with stat/utime on Win32
@@ -37,9 +32,9 @@ INSTALLATION
 
 COPYRIGHT
 
-    Copyright (C) 2003-2008, 2012-2014 Steve Hay.  All rights reserved.
-    Portions Copyright (C) 2001 Jonathan M Gilligan.  Used with permission.
-    Portions Copyright (C) 2001 Tony M Hoyle.  Used with permission.
+    Copyright (C) 2003-2008, 2012-2015 Steve Hay. All rights reserved.
+    Portions Copyright (C) 2001 Jonathan M Gilligan. Used with permission.
+    Portions Copyright (C) 2001 Tony M Hoyle. Used with permission.
 
 LICENCE
 
@@ -47,4 +42,3 @@ LICENCE
     under the same terms as Perl itself, i.e. under the terms of either the GNU
     General Public License or the Artistic License, as specified in the LICENCE
     file.
-________________________________________________________________________________

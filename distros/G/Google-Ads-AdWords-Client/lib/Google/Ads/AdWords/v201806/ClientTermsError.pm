@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::ClientTermsError
 Perl data type class for the XML Schema defined complexType
 ClientTermsError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Error due to user not accepting the AdWords terms of service. 
 
 
 

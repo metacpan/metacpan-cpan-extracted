@@ -9,7 +9,7 @@ my $js1 = JavaScript::SpiderMonkey->new ();
 $js1->init ();
 ok (!$js1->eval ($jscode1));
 ok ($@ !~ "\n");
-ok ($@ =~ "SyntaxError");
+ok ($@ =~ "SyntaxError" || $@ =~ "ReferenceError: invalid assignment left-hand side");
 #print "$@\n";
 my $jscode2 =<<EOF;
 var fruit = non_existant_function ();

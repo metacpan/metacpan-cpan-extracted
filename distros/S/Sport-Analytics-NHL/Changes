@@ -9,3 +9,8 @@ Revision history for Sport::Analytics::NHL
 1.11	Wed Jul 18 14:45:28 PDT 2018
 	Fixed MongoDB requirement configuration
 
+1.20	Tue Jul 24 16:10:20 PDT 2018
+	Added report merging
+
+1.30	Fri Aug 03 21:02:15 PDT 2018
+	Added report normalizing

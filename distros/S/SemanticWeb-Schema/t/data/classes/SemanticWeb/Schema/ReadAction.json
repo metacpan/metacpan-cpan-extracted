@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of consuming written content.",
+      "rdfs:label" : "ReadAction",
+      "rdfs:subClassOf" : "schema:ConsumeAction"
+   },
+   "properties" : {}
+}

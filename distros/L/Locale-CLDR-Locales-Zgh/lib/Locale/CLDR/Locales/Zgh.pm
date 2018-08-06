@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Zgh - Package for language Standard Moroccan Tamazight
 
 package Locale::CLDR::Locales::Zgh;
 # This file auto generated from Data\common\main\zgh.xml
-#	on Fri 13 Apr  7:35:15 am GMT
+#	on Sun  5 Aug  6:29:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -644,6 +644,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(ⵓⵇⵉⵢⵢⴰ ⵏ ⵎⵓⵕⵉⵟⴰⵏⵢⴰ \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(ⵓⵇⵉⵢⵢⴰ ⵏ ⵎⵓⵕⵉⵟⴰⵏⵢⴰ),
 			},
 		},
@@ -713,6 +718,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(ⴰⴷⵓⴱⵔⴰ ⵏ ⵙⴰⵏⵟⵓⵎⵉ \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(ⴰⴷⵓⴱⵔⴰ ⵏ ⵙⴰⵏⵟⵓⵎⵉ),
 			},
@@ -1051,31 +1061,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
-					'am' => q{ⵜⵉⴼⴰⵡⵜ},
-				},
 				'narrow' => {
-					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
+					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
 				'wide' => {
+					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
+					'am' => q{ⵜⵉⴼⴰⵡⵜ},
+				},
+				'abbreviated' => {
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'am' => q{ⵜⵉⴼⴰⵡⵜ},
-					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
-				},
 				'wide' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
 				},
-				'abbreviated' => {
+				'narrow' => {
 					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
+				},
+				'abbreviated' => {
+					'pm' => q{ⵜⴰⴷⴳⴳⵯⴰⵜ},
+					'am' => q{ⵜⵉⴼⴰⵡⵜ},
 				},
 			},
 		},
@@ -1159,14 +1169,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
-			M => q{M},
-			MMM => q{MMM},
-			MMMEd => q{E d MMM},
-			MMMd => q{d MMM},
-			Md => q{d/M},
-			y => q{y},
-		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E HH:mm},
@@ -1209,6 +1211,14 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 			yw => q{'week' w 'of' Y},
+		},
+		'generic' => {
+			M => q{M},
+			MMM => q{MMM},
+			MMMEd => q{E d MMM},
+			MMMd => q{d MMM},
+			Md => q{d/M},
+			y => q{y},
 		},
 	} },
 );

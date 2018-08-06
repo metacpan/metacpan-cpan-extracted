@@ -302,12 +302,27 @@ sub test_cgi_param_charsets {
     $self->assert($cgi->get_param_charset eq 'UTF-8',
                   "Expected cgi->get_param_charset to return 'UTF-8', got '".($cgi->get_param_charset || '<UNDEF>')."'");
 
-    my $ucode=$cgi->param('ucode');
-    $self->assert($ucode ne '',
-                  "Expected to have a ucode param from base.pm");
+    my $ucode1=$cgi->param('ucode');
+    $self->assert($ucode1 ne '',
+                  "Expected to have a ucode param from base.pm (1)");
 
-    $self->assert(Encode::is_utf8($ucode),
-                  "Expected ucode to be perl UTF-8");
+    $self->assert(Encode::is_utf8($ucode1),
+                  "Expected ucode to be perl UTF-8 (1)");
+
+    my $ucode2=$cgi->Vars->{'ucode'};
+    $self->assert(defined $ucode2 && $ucode2 ne '',
+                  "Expected to have a ucode param from base.pm (2)");
+
+    $self->assert(Encode::is_utf8($ucode2),
+                  "Expected ucode to be perl UTF-8 (2)");
+
+    my %vvv=$cgi->Vars;
+    my $ucode3=$vvv{'ucode'};
+    $self->assert(defined $ucode3 && $ucode3 ne '',
+                  "Expected to have a ucode param from base.pm (3)");
+
+    $self->assert(Encode::is_utf8($ucode3),
+                  "Expected ucode to be perl UTF-8 (3)");
 
     my %tests=(
         t1  => {

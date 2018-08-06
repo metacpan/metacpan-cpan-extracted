@@ -1,5 +1,5 @@
 {
-   "abstract" : "Alien package for the Colored ASCII Art library",
+   "abstract" : "Alien package for the Colored ASCII Art library ",
    "author" : [
       "Yanick Champoux <yanick@cpan.org>"
    ],
@@ -30,6 +30,7 @@
          "requires" : {
             "Alien::Base" : "0.005",
             "File::ShareDir" : "1.03",
+            "parent" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -51,7 +52,7 @@
    "provides" : {
       "Alien::caca" : {
          "file" : "lib/Alien/caca.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
@@ -66,7 +67,7 @@
          "web" : "https://github.com/yanick/Alien-caca"
       }
    },
-   "version" : "0.0.2",
+   "version" : "0.0.3",
    "x_author_pledge" : {
       "version" : 1
    },

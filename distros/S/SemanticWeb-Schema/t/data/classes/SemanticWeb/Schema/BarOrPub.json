@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A bar or pub.",
+      "rdfs:label" : "BarOrPub",
+      "rdfs:subClassOf" : "schema:FoodEstablishment"
+   },
+   "properties" : {}
+}

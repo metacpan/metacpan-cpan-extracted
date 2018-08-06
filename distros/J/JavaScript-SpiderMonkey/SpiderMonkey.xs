@@ -2,10 +2,6 @@
 /* SpiderMonkey.xs -- Perl Interface to the SpiderMonkey JavaScript      */
 /*                    implementation.                                    */
 /*                                                                       */
-/* Revision:     $Revision: 1.7 $                                        */
-/* Last Checkin: $Date: 2010/05/29 06:49:31 $                            */
-/* By:           $Author: thomas_busch $                                     */
-/*                                                                       */
 /* Author: Mike Schilli mschilli1@aol.com, 2001                          */
 /* --------------------------------------------------------------------- */
 
@@ -20,10 +16,13 @@
 #define snprintf _snprintf 
 #endif
 
+#ifndef JSCLASS_GLOBAL_FLAGS
+#define JSCLASS_GLOBAL_FLAGS 0
+#endif
 /* JSRuntime needs this global class */
 static
 JSClass global_class = {
-    "Global", 0,
+    "Global", JSCLASS_GLOBAL_FLAGS,
     JS_PropertyStub,  JS_PropertyStub,  JS_PropertyStub,  JS_PropertyStub,
     JS_EnumerateStub, JS_ResolveStub,   JS_ConvertStub,   JS_FinalizeStub
 };
@@ -67,10 +66,18 @@ JSBool getsetter_dispatcher(
          * I hope all reasonable machines can hold an address in
          * an int.
          */
-    XPUSHs(sv_2mortal(newSViv((int)obj)));
+    XPUSHs(sv_2mortal(newSViv(PTR2IV(obj))));
+#if JS_VERSION < 185
     XPUSHs(sv_2mortal(newSVpv(JS_GetStringBytes(JSVAL_TO_STRING(id)), 0)));
+#else
+    XPUSHs(sv_2mortal(newSVpv(JS_EncodeString(cx, JSVAL_TO_STRING(id)), 0)));
+#endif
     XPUSHs(sv_2mortal(newSVpv(what, 0)));
+#if JS_VERSION < 185
     XPUSHs(sv_2mortal(newSVpv(JS_GetStringBytes(JSVAL_TO_STRING(*vp)), 0)));
+#else
+    XPUSHs(sv_2mortal(newSVpv(JS_EncodeString(cx, JSVAL_TO_STRING(*vp)), 0)));
+#endif
     PUTBACK;
     call_pv("JavaScript::SpiderMonkey::getsetter_dispatcher", G_DISCARD);
     FREETMPS;
@@ -83,10 +90,21 @@ JSBool getsetter_dispatcher(
 JSBool getter_dispatcher(
     JSContext *cx, 
     JSObject  *obj,
+#if JS_VERSION < 185
     jsval      id,
+#else
+    jsid       iid,
+#endif
     jsval     *vp
 /* --------------------------------------------------------------------- */
 ) {
+#if JS_VERSION >= 185
+    jsval id;
+    if (!JS_IdToValue(cx,iid,&id)) {
+        fprintf(stderr, "getter_dispatcher: JS_IdToValue failed.\n");
+	return JS_FALSE;
+    }
+#endif
     return getsetter_dispatcher(cx, obj, id, vp, "getter");
 }
 
@@ -94,10 +112,22 @@ JSBool getter_dispatcher(
 JSBool setter_dispatcher(
     JSContext *cx, 
     JSObject  *obj,
+#if JS_VERSION < 185
     jsval      id,
+#else
+    jsid       iid,
+    JSBool     strict,
+#endif
     jsval     *vp
 /* --------------------------------------------------------------------- */
 ) {
+#if JS_VERSION >= 185
+    jsval id;
+    if (!JS_IdToValue(cx,iid,&id)) {
+        fprintf(stderr, "setter_dispatcher: JS_IdToValue failed.\n");
+	return JS_FALSE;
+    }
+#endif
     return getsetter_dispatcher(cx, obj, id, vp, "setter");
 }
 
@@ -128,10 +158,19 @@ int debug_enabled(
 
 /* --------------------------------------------------------------------- */
 static JSBool
+#if JS_VERSION < 185
 FunctionDispatcher(JSContext *cx, JSObject *obj, uintN argc, 
     jsval *argv, jsval *rval) {
+#else
+FunctionDispatcher(JSContext *cx, uintN argc, jsval *vp) {
+#endif
 /* --------------------------------------------------------------------- */
     dSP; 
+#if JS_VERSION >= 185
+    JSObject *obj = JS_THIS_OBJECT(cx,vp);
+    jsval *argv = JS_ARGV(cx,vp);
+    jsval rval;
+#endif
     SV          *sv;
     char        *n_jstr;
     int         n_jnum;
@@ -149,12 +188,20 @@ FunctionDispatcher(JSContext *cx, JSObject *obj, uintN argc,
     ENTER ; 
     SAVETMPS ;
     PUSHMARK(SP);
-    XPUSHs(sv_2mortal(newSViv((int)obj)));
+    XPUSHs(sv_2mortal(newSViv(PTR2IV(obj))));
     XPUSHs(sv_2mortal(newSVpv(
-        JS_GetFunctionName(fun), 0)));
+#if JS_VERSION < 185
+        JS_GetStringBytes(JS_GetFunctionId(fun)), 0)));
+#else
+        JS_EncodeString(cx, JS_GetFunctionId(fun)), 0)));
+#endif
     for(i=0; i<argc; i++) {
         XPUSHs(sv_2mortal(newSVpv(
+#if JS_VERSION < 185
             JS_GetStringBytes(JS_ValueToString(cx, argv[i])), 0)));
+#else
+            JS_EncodeString(cx, JS_ValueToString(cx, argv[i])), 0)));
+#endif
     }
     PUTBACK;
     count = call_pv("JavaScript::SpiderMonkey::function_dispatcher", G_SCALAR);
@@ -174,7 +221,11 @@ FunctionDispatcher(JSContext *cx, JSObject *obj, uintN argc,
 
             if(Debug)
                 fprintf(stderr, "DEBUG: %lx is a ref!\n", (long) sv);
-            *rval = OBJECT_TO_JSVAL(SvIV(SvRV(sv)));
+#if JS_VERSION < 185
+            *rval = OBJECT_TO_JSVAL(INT2PTR(JSObject *,SvIV(SvRV(sv))));
+#else
+            JS_SET_RVAL(cx,vp,OBJECT_TO_JSVAL(INT2PTR(JSObject *,SvIV(SvRV(sv)))));
+#endif
         }
         else if(SvIOK(sv)) {
             /* It appears that we have been sent an int return
@@ -183,7 +234,11 @@ FunctionDispatcher(JSContext *cx, JSObject *obj, uintN argc,
             n_jnum=SvIV(sv);
             if(Debug)
                 fprintf(stderr, "DEBUG: %lx is an int (%d)\n", (long) sv,n_jnum);
+#if JS_VERSION < 185
             *rval = INT_TO_JSVAL(n_jnum);
+#else
+            JS_SET_RVAL(cx,vp,INT_TO_JSVAL(n_jnum));
+#endif
         } else if(SvNOK(sv)) {
             /* It appears that we have been sent an double return
              * value.  Thats fine we can give javascript an double
@@ -192,11 +247,20 @@ FunctionDispatcher(JSContext *cx, JSObject *obj, uintN argc,
 
             if(Debug) 
                 fprintf(stderr, "DEBUG: %lx is a double(%f)\n", (long) sv,n_jdbl);
+#if JS_VERSION < 185
             *rval = DOUBLE_TO_JSVAL(JS_NewDouble(cx, n_jdbl));
+#else
+            JS_NewNumberValue(cx, n_jdbl, &rval);
+            JS_SET_RVAL(cx,vp,rval);
+#endif
         } else if(SvPOK(sv)) {
             n_jstr = SvPV(sv, PL_na);
             //warn("DEBUG: %s (%d)\n", n_jstr);
+#if JS_VERSION < 185
             *rval = STRING_TO_JSVAL(JS_NewStringCopyZ(cx, n_jstr));
+#else
+            JS_SET_RVAL(cx,vp,STRING_TO_JSVAL(JS_NewStringCopyZ(cx, n_jstr)));
+#endif
         }
     }
 
@@ -240,8 +304,13 @@ ErrorReporter(JSContext *cx, const char *message, JSErrorReport *report) {
 }
 
 /* --------------------------------------------------------------------- */
+#if JS_VERSION < 181
 static JSBool
 BranchHandler(JSContext *cx, JSScript *script) {
+#else
+static JSBool
+BranchHandler(JSContext *cx) {
+#endif
 /* --------------------------------------------------------------------- */
   PJS_Context* pcx = (PJS_Context*) JS_GetContextPrivate(cx);
 
@@ -374,11 +443,46 @@ JS_NewObject(cx, class, proto, parent)
     JSObject *obj;
     CODE:
     {
+#ifdef JS_THREADSAFE
+        JS_BeginRequest(cx);
+#endif
         obj = JS_NewObject(cx, class, NULL, NULL);
         if(!obj) {
             XSRETURN_UNDEF;
         }
         RETVAL = obj;
+#ifdef JS_THREADSAFE
+        JS_EndRequest(cx);
+#endif
+    }
+    OUTPUT:
+    RETVAL
+
+######################################################################
+JSObject *
+JS_NewCompartmentAndGlobalObject(cx, class)
+    JSContext * cx
+    JSClass   * class
+######################################################################
+    PREINIT:
+    JSObject *obj;
+    CODE:
+    {
+#ifdef JS_THREADSAFE
+        JS_BeginRequest(cx);
+#endif
+#if JS_VERSION < 185
+        obj = JS_NewObject(cx, class, NULL, NULL);
+#else
+        obj = JS_NewCompartmentAndGlobalObject(cx, class, NULL);
+#endif
+        if(!obj) {
+            XSRETURN_UNDEF;
+        }
+        RETVAL = obj;
+#ifdef JS_THREADSAFE
+        JS_EndRequest(cx);
+#endif
     }
     OUTPUT:
     RETVAL
@@ -404,6 +508,9 @@ JS_InitClass(cx, iobj, parent_proto, clasp, constructor, nargs, ps, fs, static_p
     na = (uintN) nargs;
     CODE:
     {
+#ifdef JS_THREADSAFE
+        JS_BeginRequest(cx);
+#endif
         obj = JS_InitClass(cx, iobj, parent_proto, clasp,
                            constructor, nargs, ps, fs, static_ps,
                            static_fs);
@@ -411,6 +518,9 @@ JS_InitClass(cx, iobj, parent_proto, clasp, constructor, nargs, ps, fs, static_p
             XSRETURN_UNDEF;
         }
         RETVAL = obj;
+#ifdef JS_THREADSAFE
+        JS_EndRequest(cx);
+#endif
     }
     OUTPUT:
     RETVAL
@@ -469,11 +579,17 @@ JS_InitStandardClasses(cx, gobj)
     JSBool rc;
     CODE:
     {
+#ifdef JS_THREADSAFE
+        JS_BeginRequest(cx);
+#endif
         rc = JS_InitStandardClasses(cx, gobj);
         if(!rc) {
             XSRETURN_UNDEF;
         }
         RETVAL = (int) rc;
+#ifdef JS_THREADSAFE
+        JS_BeginRequest(cx);
+#endif
     }
     OUTPUT:
     RETVAL
@@ -582,10 +698,18 @@ JS_GetProperty(cx, obj, name)
         rc = JS_GetProperty(cx, obj, name, &vp);
         if(rc) {
             str = JS_ValueToString(cx, vp);
+#if JS_VERSION < 185
             if(strcmp(JS_GetStringBytes(str), "undefined") == 0) {
+#else
+            if(strcmp(JS_EncodeString(cx, str), "undefined") == 0) {
+#endif
                 sv = &PL_sv_undef;
             } else {
+#if JS_VERSION < 185
                 sv_setpv(sv, JS_GetStringBytes(str));
+#else
+                sv_setpv(sv, JS_EncodeString(cx, str));
+#endif
             }
         } else {
             sv = &PL_sv_undef;
@@ -675,10 +799,18 @@ JS_GetElement(cx, obj, idx)
         rc = JS_GetElement(cx, obj, idx, &vp);
         if(rc) {
             str = JS_ValueToString(cx, vp);
+#if JS_VERSION < 185
             if(strcmp(JS_GetStringBytes(str), "undefined") == 0) {
+#else
+            if(strcmp(JS_EncodeString(cx, str), "undefined") == 0) {
+#endif
                 sv = &PL_sv_undef;
             } else {
+#if JS_VERSION < 185
                 sv_setpv(sv, JS_GetStringBytes(str));
+#else
+                sv_setpv(sv, JS_EncodeString(cx, str));
+#endif
             }
         } else {
             sv = &PL_sv_undef;
@@ -718,7 +850,11 @@ JS_SetMaxBranchOperations(cx, max_branch_operations)
         PJS_Context* pcx = (PJS_Context *) JS_GetContextPrivate(cx);
         pcx->branch_count = 0;
         pcx->branch_max = max_branch_operations;
+#if JS_VERSION < 181
         JS_SetBranchCallback(cx, BranchHandler);
+#else
+        JS_SetOperationCallback(cx, BranchHandler);
+#endif
     }
     OUTPUT:
 

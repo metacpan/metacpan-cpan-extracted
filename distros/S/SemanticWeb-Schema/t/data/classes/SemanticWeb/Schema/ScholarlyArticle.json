@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A scholarly article.",
+      "rdfs:label" : "ScholarlyArticle",
+      "rdfs:subClassOf" : "schema:Article"
+   },
+   "properties" : {}
+}

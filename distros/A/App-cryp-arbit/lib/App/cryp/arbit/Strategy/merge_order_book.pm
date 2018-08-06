@@ -1,7 +1,7 @@
 package App::cryp::arbit::Strategy::merge_order_book;
 
-our $DATE = '2018-06-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-08-04'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -71,7 +71,7 @@ sub _calculate_order_pairs_for_base_currency {
                 if ($account_balances) {
                     # we don't have any inventory left to sell on this selling
                     # exchange
-                    unless (@{ $account_balances->{ $sell->{exchange} }{$base_currency} }) {
+                    unless (@{ $account_balances->{ $sell->{exchange} }{$base_currency} // [] }) {
                         $sell_index++; next;
                     }
                 }
@@ -93,7 +93,7 @@ sub _calculate_order_pairs_for_base_currency {
                 }
                 if ($account_balances) {
                     # we don't have any inventory left to buy from this exchange
-                    unless (@{ $account_balances->{ $buy->{exchange} }{$buy->{quote_currency}} }) {
+                    unless (@{ $account_balances->{ $buy->{exchange} }{$buy->{quote_currency}} // [] }) {
                         $buy_index++; next;
                     }
                 }
@@ -686,7 +686,7 @@ App::cryp::arbit::Strategy::merge_order_book - Using merged order books for arbi
 
 =head1 VERSION
 
-This document describes version 0.001 of App::cryp::arbit::Strategy::merge_order_book (from Perl distribution App-cryp-arbit), released on 2018-06-25.
+This document describes version 0.003 of App::cryp::arbit::Strategy::merge_order_book (from Perl distribution App-cryp-arbit), released on 2018-08-04.
 
 =head1 SYNOPSIS
 
@@ -716,25 +716,25 @@ In your F<cryp.conf>:
 
 This arbitration strategy uses information from merged order books. Below is the
 description of the algorithm. Suppose we are arbitraging the pair BTC/USD.
-I<E1>, I<E2>, ... I<En> are exchanges. I<P*> are prices. I<A*> are amounts. I<i>
+I<E1>, I<E2>, ... I<En> are exchanges. I<P*> are prices. I<S*> are sizes. I<i>
 denotes exchange index.
 
 B<First step:> get order books from all of the involved exchanges, for example:
 
  # buy orders on E1            # sell orders on E1
- price  amount                 price  amount
- -----  ------                 -----  ------
- P1b1   A1b1                   P1s1   A1s1
- P1b2   A1b2                   P1s2   A1s2
- P1b3   A1b3                   P1s3   A1s3
+ price  size                   price  size
+ -----  ----                   -----  ----
+ P1b1   S1b1                   P1s1   S1s1
+ P1b2   S1b2                   P1s2   S1s2
+ P1b3   S1b3                   P1s3   S1s3
  ...                           ...
 
  # buy orders on E2            # sell orders on E2
- price  amount                 price  amount
- -----  ------                 -----  ------
- P2b1   A2b1                   P2s1   A2s1
- P2b2   A2b2                   P2s2   A2s2
- P2b3   A2b3                   P2s3   A2s3
+ price  size                   price  size
+ -----  ----                   -----  ----
+ P2b1   S2b1                   P2s1   S2s1
+ P2b2   S2b2                   P2s2   S2s2
+ P2b3   S2b3                   P2s3   S2s3
  ...                           ...
 
  ...
@@ -749,12 +749,12 @@ sell orders. Sort buy orders, as usual, from highest to lowest price. Sort sell
 orders, as usual, from lowest to highest. For example:
 
  # buy orders                  # sell orders
- price  amount                 price  amount
- -----  ------                 -----  ------
- P1b1   A1b1                   P2s1   A2s1
- P2b1   A2b1                   P3s1   A3s1
- P2b2   A2b2                   P3s2   A3s2
- P1b2   A1b2                   P1s1   A1s1
+ price  size                   price  size
+ -----  ----                   -----  ----
+ P1b1   S1b1                   P2s1   S2s1
+ P2b1   S2b1                   P3s1   S3s1
+ P2b2   S2b2                   P3s2   S3s2
+ P1b2   S1b2                   P1s1   S1s1
  ...
 
 Arbitrage can happen if we can buy cheap bitcoin and sell our expensive bitcoin.
@@ -806,8 +806,8 @@ Number 0-100. Default is 100. This setting is used for more safety since order
 books are rapidly changing. For example, there is an item in the merged order
 book as follows:
 
- type  exchange   price  amount   item#
- ----  --------   -----  ------   -----
+ type  exchange   price  size     item#
+ ----  --------   -----  ----     -----
  buy   exchange1  800.1  12       B1
  buy   exchange1  798.1  24       B2
  ...

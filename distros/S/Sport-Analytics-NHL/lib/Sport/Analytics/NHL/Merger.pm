@@ -250,7 +250,6 @@ sub find_player_by_name ($$$) {
 	my $team   = shift;
 	my $on_ice = shift;
 
-#	print Dumper $player;
 	$player->{name} = uc $player->{name};
 	my ($name, $fname) = ($player->{name}, '');
 	if ($player->{name} =~ /\.\s*(\S+.*)$/ && $name !~ /^st\./i) {
@@ -259,13 +258,14 @@ sub find_player_by_name ($$$) {
 		$fname =~ s/\)//g;
 	}
 	my @found_players = grep {
-#		print Dumper [ $_->{name}, $fname, $name];
 		$_->{name} =~ /^$fname.*$name$/i
 		|| $NAME_VARIATIONS{$_->{name}}
 			&& $NAME_VARIATIONS{$_->{name}} eq $player->{name}
 		} @{$team->{roster}};
 	return undef unless @found_players;
-	@found_players = grep {!$_->{broken}} @found_players if (@found_players > 1);
+	@found_players = grep {
+		! $_->{broken}
+	} @found_players if (@found_players > 1);
 	if (@found_players > 1) {
 		@found_players = $CURRENT eq 'GS'
 			? ($found_players[0])
@@ -295,17 +295,18 @@ sub find_player ($$;$) {
 	}
 	my $bs_player;
 	if ($player->{_id} && $player->{_id} =~ /^8\d{6}/) {
-		$bs_player = find_player_by_id($player, $team) if ($player->{_id} && $player->{_id} =~ /^8\d{6}/);
+		$bs_player = find_player_by_id($player, $team)
+			if ($player->{_id} && $player->{_id} =~ /^8\d{6}/);
 	}
 	elsif ($player->{number}) {
-		#print Dumper $player->{number}, $team->{name}, $PLAYER_RESOLVE_CACHE->{$team->{name}};
-		$bs_player = ${$PLAYER_RESOLVE_CACHE->{$team->{name}}{$player->{number}}}
-			if $PLAYER_RESOLVE_CACHE->{$team->{name}}{$player->{number}};
+		$bs_player = ${
+			$PLAYER_RESOLVE_CACHE->{$team->{name}}{$player->{number}}
+		} if $PLAYER_RESOLVE_CACHE->{$team->{name}}{$player->{number}};
 		return undef unless $bs_player || $player->{name};
 	}
 	$bs_player ||= find_player_by_name($player, $team, $on_ice);
 	return undef unless $bs_player;
-	$player->{number} = $bs_player->{number} if defined $bs_player->{number};
+	$player->{number} = $bs_player->{number} if defined $bs_player->{number} && ! $bs_player->{broken};
 	$player->{_id}    = $bs_player->{_id};
 	$player;
 }
@@ -353,7 +354,6 @@ sub find_event ($$$) {
 	return -1 if $event->{special};
 	return -1 if ! $event->{player1} && $type ne 'PL';
 	my @candidates = grep {
-#		print Dumper $event;
 		$_->{t} == $event->{t}
 		&& $_->{period} == $event->{period}
 		&& $_->{type}   eq $event->{type}
@@ -379,13 +379,10 @@ sub resolve_report_on_ice ($$) {
 	my $event = shift;
 	my $bs    = shift;
 
-#	print Dumper $event;
-	return if $event->{sources}{GS} && $event->{period} == 5 && $event->{stage} == 2 || $event->{penaltyshot};
+	return if $event->{sources}{GS} && $event->{period} == 5 && $event->{stage} == $REGULAR;
 	for my $t (0,1) {
 		for my $on_ice (@{$event->{on_ice}[$t]}) {
 			next unless $on_ice =~ /^\d{1,2}$/;
-#			print Dumper $PLAYER_RESOLVE_CACHE->{$bs->{teams}[$t]{name}};
- #			print Dumper $on_ice;
 			my $new_on_ice =
 				$PLAYER_RESOLVE_CACHE->{$bs->{teams}[$t]{name}}{$on_ice} ||
 				check_player_names(
@@ -394,14 +391,12 @@ sub resolve_report_on_ice ($$) {
 					$on_ice,
 				);
 			if (! ref $new_on_ice) {
-				print "Failed to detect $on_ice for " . Dumper $event;
 				if ($CURRENT eq 'GS') {
 					$on_ice += 8400000;
 					next;
 				}
 			}
 			$on_ice = ${$new_on_ice}->{_id};
-#			print Dumper $on_ice;
 		}
 	}
 }
@@ -457,11 +452,9 @@ sub check_player_names ($$$) {
 		my $player = ${$player_ref};
 		my ($last_name) = ($player->{name} =~ /\b(\S+)$/);
 		$last_name = $REVERSE_NAME_TYPOS{$last_name} if $REVERSE_NAME_TYPOS{$last_name};
-		print "LN $last_name DS $description\n";
 		if ($description =~ /\b$last_name\b/i) {
 			debug "Matched $description with $last_name";
 			$cache->{$number} = $player_ref;
-#		print Dumper $player_ref;
 			return $player_ref;
 		}
 	}
@@ -484,9 +477,11 @@ sub resolve_report_event_fields ($$) {
 			elsif (!($CURRENT eq 'GS' && $event->{type} eq 'GOAL')) {
 				die "Can't resolve player for event: " . Dumper $player, $event, $field;
 			}
+			if ($event->{player1} && $event->{servedby} && $event->{player1} == $event->{servedby}) {
+				delete $event->{servedby};
+			}
 		}
 		else {
-#			print Dumper [  $event->{description}, $event->{id}, $event->{game_id}, $field, $event->{$team},$event->{$field}, $event->{ts} ];
 			my $matched_player =
 				$PLAYER_RESOLVE_CACHE->{$event->{$team}}{$event->{$field}}
 				|| check_player_names(
@@ -494,9 +489,7 @@ sub resolve_report_event_fields ($$) {
 					$PLAYER_RESOLVE_CACHE->{$event->{$team}},
 					$event->{$field},
 				) || $PLAYER_RESOLVE_CACHE->{$event->{$team2}}{$event->{$field}};
-#		print Dumper $matched_player;
 			$event->{$field} = ${$matched_player}->{_id};
-#		print Dumper [ $event->{description}, $field, $event->{$field}, ];
 		}
 	}
 }
@@ -509,12 +502,6 @@ sub resolve_report ($$) {
 	for my $t (0,1) {
 		$rp->{teams}[$t]{name} = resolve_team($rp->{teams}[$t]{name});
 		resolve_report_roster($rp->{teams}[$t]{roster}, $bs, $t);
-		#my $roster = [];
-		#for my $player_ref (values %{$PLAYER_RESOLVE_CACHE{$bs->{teams}[$t]{name}}}) {
-		#	next if ${$player_ref}->{broken};
-		#	push(@{$roster}, $$player_ref);
-		#}
-		#$bs->{teams}[$t]{roster} = $roster;
 	}
 	if ($rp->{events}) {
 		$rp->set_event_extra_data();
@@ -537,10 +524,8 @@ sub merge_me ($$;$$) {
 		&& (! defined $bs_event->{$_})
 		&& $rp_event->{$_} ne 'XX' && $rp_event->{$_} !~ /^Unk/i
 	} keys %{$rp_event}];
-
 	push(@{$fields}, 'stopreason') if $rp_event->{stopreason};
 	for (@{$fields}) {
-		#print "merging $_\n";
 		when ('stopreason') {
 			$bs_event->{$_} = [ uniq (@{$bs_event->{stopreason}}, @{$rp_event->{stopreason}}) ];
 		}
@@ -560,7 +545,6 @@ sub merge_me ($$;$$) {
 			$bs_event->{$_} = $rp_event->{$_};
 		}
 	}
-	#print Dumper $rp_event, $bs_event;
 	if (defined $bs_event->{position}) {
 		for my $field (keys %{$rp_event}) {
 			if (! defined $bs_event->{$field}
@@ -582,11 +566,10 @@ sub merge_roster ($$;$) {
 		next if $rp_player->{error};
 		next unless $rp_player->{timeOnIce} || defined $rp_player->{start};
 		next if $rp_player->{_id} && $rp_player->{_id} == $EMPTY_NET_ID;
-#		print Dumper $rp_player;
 		merge_me(
 			${$PLAYER_RESOLVE_CACHE->{$bs_team->{name}}{$rp_player->{number}}},
 			$rp_player, 0
-		);
+		) if $rp_player->{number};
 	}
 }
 
@@ -621,7 +604,6 @@ sub copy_events ($$) {
 				$event->{assist2} || (),
 			]
 		}
-		#$event->{game_id} = $boxscore->{_id};
 	}
 }
 
@@ -686,9 +668,6 @@ sub merge_events ($$) {
 		}
 		die "UNDEF e  " . Dumper($rp_event) unless defined $e;
 		next if $e == -1;
-		#next if $BROKEN_TIMES{$boxscore->{_id}}
-		#	|| $rp_event->{type} eq 'PENL' && $type eq 'BH' && $rp_event->{season} >= 2010;
-		#$e->{bsjs_id} ||= -1;
 		$e->{sources}{$type} = 1;
 		merge_me($e, $rp_event);
 	}
@@ -704,7 +683,6 @@ sub merge_report ($$) {
 	$CURRENT = $type;
 	$BOXSCORE = $boxscore;
 	$PLAYER_RESOLVE_CACHE = $boxscore->{resolve_cache};
-	#print Dumper $report;
 	debug "Merging $type";
 	resolve_report($boxscore, $report);
 

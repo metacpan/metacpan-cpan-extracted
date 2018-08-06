@@ -1,5 +1,8 @@
 Revision history for Twitter::API
 
+1.0003  2018-08-04 10:37:24 PDT
+  - add support for new Direct Messages API endpoints (drumsoft)
+
 1.0002  2018-05-25 18:07:26 PDT
   - fixed authentication error in RetryOnError (thanks Rob Hoelz)
 

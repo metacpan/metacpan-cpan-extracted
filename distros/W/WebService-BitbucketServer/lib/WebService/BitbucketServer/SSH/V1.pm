@@ -6,7 +6,7 @@ package WebService::BitbucketServer::SSH::V1;
 use warnings;
 use strict;
 
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 use Moo;
 use namespace::clean;
@@ -214,7 +214,7 @@ WebService::BitbucketServer::SSH::V1 - Bindings for a Bitbucket Server REST API
 
 =head1 VERSION
 
-version 0.604
+version 0.605
 
 =head1 SYNOPSIS
 

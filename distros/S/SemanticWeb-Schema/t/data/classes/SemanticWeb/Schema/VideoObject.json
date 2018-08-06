@@ -1,0 +1,149 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_rNews",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A video file.",
+      "rdfs:label" : "VideoObject",
+      "rdfs:subClassOf" : "schema:MediaObject"
+   },
+   "properties" : {
+      "schema:actor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc., or in an event. Actors can be associated with individual items or with a series, episode, clip.",
+         "rdfs:label" : "actor",
+         "schema:domainIncludes" : [
+            "schema:TVSeries",
+            "schema:Event",
+            "schema:VideoGameSeries",
+            "schema:Clip",
+            "schema:VideoObject",
+            "schema:RadioSeries",
+            "schema:Movie",
+            "schema:Episode",
+            "schema:CreativeWorkSeason",
+            "schema:MovieSeries",
+            "schema:VideoGame"
+         ],
+         "schema:rangeIncludes" : "schema:Person"
+      },
+      "schema:actors" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc. Actors can be associated with individual items or with a series, episode, clip.",
+         "rdfs:label" : "actors",
+         "schema:domainIncludes" : [
+            "schema:TVSeries",
+            "schema:VideoGameSeries",
+            "schema:Clip",
+            "schema:VideoGame",
+            "schema:RadioSeries",
+            "schema:Movie",
+            "schema:VideoObject",
+            "schema:Episode",
+            "schema:MovieSeries"
+         ],
+         "schema:rangeIncludes" : "schema:Person",
+         "schema:supersededBy" : "schema:actor"
+      },
+      "schema:caption" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The caption for this object.",
+         "rdfs:label" : "caption",
+         "schema:domainIncludes" : [
+            "schema:VideoObject",
+            "schema:ImageObject"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:director" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A director of e.g. tv, radio, movie, video gaming etc. content, or of an event. Directors can be associated with individual items or with a series, episode, clip.",
+         "rdfs:label" : "director",
+         "schema:domainIncludes" : [
+            "schema:Movie",
+            "schema:VideoGameSeries",
+            "schema:Clip",
+            "schema:VideoObject",
+            "schema:TVSeries",
+            "schema:Episode",
+            "schema:MovieSeries",
+            "schema:RadioSeries",
+            "schema:Event",
+            "schema:CreativeWorkSeason",
+            "schema:VideoGame"
+         ],
+         "schema:rangeIncludes" : "schema:Person"
+      },
+      "schema:directors" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A director of e.g. tv, radio, movie, video games etc. content. Directors can be associated with individual items or with a series, episode, clip.",
+         "rdfs:label" : "directors",
+         "schema:domainIncludes" : [
+            "schema:Clip",
+            "schema:VideoGameSeries",
+            "schema:VideoObject",
+            "schema:VideoGame",
+            "schema:Movie",
+            "schema:RadioSeries",
+            "schema:MovieSeries",
+            "schema:Episode",
+            "schema:TVSeries"
+         ],
+         "schema:rangeIncludes" : "schema:Person",
+         "schema:supersededBy" : "schema:director"
+      },
+      "schema:musicBy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The composer of the soundtrack.",
+         "rdfs:label" : "musicBy",
+         "schema:domainIncludes" : [
+            "schema:Clip",
+            "schema:Movie",
+            "schema:TVSeries",
+            "schema:VideoGame",
+            "schema:RadioSeries",
+            "schema:VideoObject",
+            "schema:VideoGameSeries",
+            "schema:Episode",
+            "schema:MovieSeries"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:MusicGroup",
+            "schema:Person"
+         ]
+      },
+      "schema:thumbnail" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Thumbnail image for an image or video.",
+         "rdfs:label" : "thumbnail",
+         "schema:domainIncludes" : [
+            "schema:VideoObject",
+            "schema:ImageObject"
+         ],
+         "schema:rangeIncludes" : "schema:ImageObject"
+      },
+      "schema:transcript" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "If this MediaObject is an AudioObject or VideoObject, the transcript of that object.",
+         "rdfs:label" : "transcript",
+         "schema:domainIncludes" : [
+            "schema:AudioObject",
+            "schema:VideoObject"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:videoFrameSize" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The frame size of the video.",
+         "rdfs:label" : "videoFrameSize",
+         "schema:domainIncludes" : "schema:VideoObject",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:videoQuality" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The quality of the video.",
+         "rdfs:label" : "videoQuality",
+         "schema:domainIncludes" : "schema:VideoObject",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

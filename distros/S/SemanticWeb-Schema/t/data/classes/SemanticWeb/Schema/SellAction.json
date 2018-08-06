@@ -1,0 +1,29 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of taking money from a buyer in exchange for goods or services rendered. An agent sells an object, product, or service to a buyer for a price. Reciprocal of BuyAction.",
+      "rdfs:label" : "SellAction",
+      "rdfs:subClassOf" : "schema:TradeAction"
+   },
+   "properties" : {
+      "schema:buyer" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The participant/person/organization that bought the object.",
+         "rdfs:label" : "buyer",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : "schema:SellAction",
+         "schema:rangeIncludes" : "schema:Person"
+      },
+      "schema:warrantyPromise" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The warranty promise(s) included in the offer.",
+         "rdfs:label" : "warrantyPromise",
+         "schema:domainIncludes" : [
+            "schema:SellAction",
+            "schema:BuyAction"
+         ],
+         "schema:rangeIncludes" : "schema:WarrantyPromise",
+         "schema:supersededBy" : "schema:warranty"
+      }
+   }
+}

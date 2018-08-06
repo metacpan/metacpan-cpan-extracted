@@ -1,0 +1,40 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A blog.",
+      "rdfs:label" : "Blog",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:blogPost" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A posting that is part of this blog.",
+         "rdfs:label" : "blogPost",
+         "schema:domainIncludes" : "schema:Blog",
+         "schema:rangeIncludes" : "schema:BlogPosting"
+      },
+      "schema:blogPosts" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The postings that are part of this blog.",
+         "rdfs:label" : "blogPosts",
+         "schema:domainIncludes" : "schema:Blog",
+         "schema:rangeIncludes" : "schema:BlogPosting",
+         "schema:supersededBy" : "schema:blogPost"
+      },
+      "schema:issn" : {
+         "dc:source" : "schemadotorgsources:source_bibex",
+         "owl:equivalentProperty" : "bibo:issn",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The International Standard Serial Number (ISSN) that identifies this serial publication. You can repeat this property to identify different formats of, or the linking ISSN (ISSN-L) for, this serial publication.",
+         "rdfs:label" : "issn",
+         "rdfs:subPropertyOf" : "schema:identifier",
+         "schema:domainIncludes" : [
+            "schema:Blog",
+            "schema:CreativeWorkSeries",
+            "schema:WebSite",
+            "schema:Dataset"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

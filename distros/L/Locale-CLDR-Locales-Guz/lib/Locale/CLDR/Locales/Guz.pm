@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Guz - Package for language Gusii
 
 package Locale::CLDR::Locales::Guz;
 # This file auto generated from Data\common\main\guz.xml
-#	on Fri 13 Apr  7:12:34 am GMT
+#	on Sun  5 Aug  6:03:36 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -561,6 +561,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ugwiya ya Moritania \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ugwiya ya Moritania),
 			},
 		},
@@ -625,6 +630,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dobra ya Sao Tome na Principe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dobra ya Sao Tome na Principe),
 			},
@@ -829,13 +839,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
+				'abbreviated' => {
+					'pm' => q{Mo},
+					'am' => q{Ma},
+				},
 				'wide' => {
 					'am' => q{Mambia},
 					'pm' => q{Mog},
-				},
-				'abbreviated' => {
-					'am' => q{Ma},
-					'pm' => q{Mo},
 				},
 			},
 		},
@@ -915,7 +925,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},
@@ -938,7 +948,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
 			M => q{L},

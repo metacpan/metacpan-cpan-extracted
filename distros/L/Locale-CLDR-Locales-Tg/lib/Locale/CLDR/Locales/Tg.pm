@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Tg - Package for language Tajik
 
 package Locale::CLDR::Locales::Tg;
 # This file auto generated from Data\common\main\tg.xml
-#	on Fri 13 Apr  7:30:44 am GMT
+#	on Sun  5 Aug  6:23:59 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1078,11 +1078,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'pm' => q{па. чо.},
-					'am' => q{пе. чо.},
-				},
 				'abbreviated' => {
+					'am' => q{пе. чо.},
+					'pm' => q{па. чо.},
+				},
+				'wide' => {
 					'am' => q{пе. чо.},
 					'pm' => q{па. чо.},
 				},
@@ -1172,6 +1172,33 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			E => q{ccc},
+			Ed => q{d, E},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, d MMM y G},
+			GyMMMd => q{d MMM y G},
+			M => q{L},
+			MEd => q{E, dd-MM},
+			MMM => q{LLL},
+			MMMEd => q{E, d MMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{dd-MM},
+			d => q{d},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{MM-y GGGGG},
+			yyyyMEd => q{E, d-MM-y GGGGG},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d MMM y G},
+			yyyyMd => q{d-MM-y GGGGG},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E HH:mm},
@@ -1206,34 +1233,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{d/M/y},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
-			yw => q{'ҳафтаи' w, Y},
-		},
-		'generic' => {
-			E => q{ccc},
-			Ed => q{d, E},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E, d MMM y G},
-			GyMMMd => q{d MMM y G},
-			M => q{L},
-			MEd => q{E, dd-MM},
-			MMM => q{LLL},
-			MMMEd => q{E, d MMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{dd-MM},
-			d => q{d},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{MM-y GGGGG},
-			yyyyMEd => q{E, d-MM-y GGGGG},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E, d MMM y G},
-			yyyyMMMM => q{MMMM y G},
-			yyyyMMMd => q{d MMM y G},
-			yyyyMd => q{d-MM-y GGGGG},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
+			yw => q{'ҳафтаи' w, y},
 		},
 	} },
 );
@@ -1254,10 +1254,10 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			fallback => '{0} – {1}',
 		},
-		'generic' => {
+		'gregorian' => {
 			fallback => '{0} – {1}',
 		},
 	} },

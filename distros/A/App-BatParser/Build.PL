@@ -18,7 +18,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "App-BatParser",
-  "dist_version" => "0.010",
+  "dist_version" => "0.011",
   "license" => "perl",
   "module_name" => "App::BatParser",
   "recursive_test_files" => 1,

@@ -57,6 +57,19 @@ static ::       libgnuterm$(LIB_EXT)
 
 test:
 
+test_:
+
+test_static:
+
+test_dynamic:
+
+testdb:
+
+testdb_static:
+
+testdb_dynamic:
+
+
 libgnuterm$(LIB_EXT): $(OBJECT)
 	-$(RM_F) libgnuterm$(LIB_EXT)
 	$(AR) $(ADD_AR_OPT) $(MY_AR_PRE_TARGET)libgnuterm$(LIB_EXT) $(MY_AR_OBJECT)

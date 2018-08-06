@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use DateTime;
 use DateTime::Format::Strptime;
@@ -43,6 +43,7 @@ sub _build_full_data {
 
 my $parser = DateTime::Format::Strptime->new( pattern => '%Y%m%dT%H%M%S%z' );
 
+## no critic (ProhibitUnusedPrivateSubroutines)
 sub _parse_datetime {
     return $parser->parse_datetime( $_[1] );
 }
@@ -55,13 +56,19 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WebService::TeamCity::Entity - Role for anything addressable via the TeamCity REST API
 
 =head1 VERSION
 
-version 0.03
+version 0.04
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/WebService-TeamCity/issues>.
 
 =head1 AUTHOR
 
@@ -69,7 +76,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by MaxMind, Inc..
+This software is copyright (c) 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

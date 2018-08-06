@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A place offering space for \"Recreational Vehicles\", Caravans, mobile homes and the like.",
+      "rdfs:label" : "RVPark",
+      "rdfs:subClassOf" : "schema:CivicStructure"
+   },
+   "properties" : {}
+}

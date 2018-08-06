@@ -3,3 +3,8 @@ Revision history for IO-ReadHandle-Include
 1.0.0   2018-01-30
         First version.
 
+1.1     2018-08-03
+        Declare dependent non-core Perl modules for easier installation.
+
+        If an include file isn't found, then instead of croaking don't
+        replace the include directive.

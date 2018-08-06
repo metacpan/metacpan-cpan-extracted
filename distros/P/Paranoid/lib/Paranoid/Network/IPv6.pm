@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Network/IPv6.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+# $Id: lib/Paranoid/Network/IPv6.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -32,7 +32,7 @@ my @constants = qw(MAXIPV6CIDR IPV6REGEX IPV6CIDRRGX IPV6BASE IPV6BRDCST
     IPV6MASK);
 my @ipv6sort = qw(ipv6StrSort ipv6PackedSort ipv6NumSort);
 
-($VERSION) = ( q$Revision: 2.05 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
 @EXPORT      = @base;
 @EXPORT_OK   = ( @base, @constants, @ipv6sort );
 %EXPORT_TAGS = (
@@ -360,7 +360,7 @@ Paranoid::Network::IPv6 - IPv6-related functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Network/IPv6.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+$Id: lib/Paranoid/Network/IPv6.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 
 =head1 SYNOPSIS
 

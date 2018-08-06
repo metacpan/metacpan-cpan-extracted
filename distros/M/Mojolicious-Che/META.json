@@ -46,6 +46,6 @@
          "web" : "https://github.com/mche/Mojolicious-Che"
       }
    },
-   "version" : "0.034",
+   "version" : "0.035",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Hi - Package for language Hindi
 
 package Locale::CLDR::Locales::Hi;
 # This file auto generated from Data\common\main\hi.xml
-#	on Fri 13 Apr  7:12:56 am GMT
+#	on Sun  5 Aug  6:04:02 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -953,6 +953,7 @@ has 'display_name_language' => (
  				'arc' => 'ऐरेमेक',
  				'arn' => 'मापूचे',
  				'arp' => 'अरापाहो',
+ 				'ars' => 'नज्दी अरबी',
  				'arw' => 'अरावक',
  				'as' => 'असमिया',
  				'asa' => 'असु',
@@ -1424,6 +1425,7 @@ has 'display_name_language' => (
  				'was' => 'वाशो',
  				'wbp' => 'वॉल्पेरी',
  				'wo' => 'वोलोफ़',
+ 				'wuu' => 'वू चीनी',
  				'xal' => 'काल्मिक',
  				'xh' => 'ख़ोसा',
  				'xog' => 'सोगा',
@@ -1645,6 +1647,7 @@ has 'display_name_region' => (
  			'151' => 'पूर्वी यूरोप',
  			'154' => 'उत्तरी यूरोप',
  			'155' => 'पश्चिमी यूरोप',
+ 			'202' => 'उप-सहारा अफ़्रीका',
  			'419' => 'लैटिन अमेरिका',
  			'AC' => 'असेंशन द्वीप',
  			'AD' => 'एंडोरा',
@@ -4932,6 +4935,13 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(मॉरीटेनियन ओगुइया \(1973–2017\)),
+				'one' => q(मॉरीटेनियन ओगुइया \(1973–2017\)),
+				'other' => q(मॉरीटेनियन ओगुइया \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(मॉरीटेनियन ओगुइया),
 				'one' => q(मॉरीटेनियन ओगुइया),
 				'other' => q(मॉरीटेनियन ओगुइया),
@@ -5257,6 +5267,14 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(साओ तोम और प्रिंसिपे डोबरा \(1977–2017\)),
+				'one' => q(साओ तोम और प्रिंसिपे डोबरा \(1977–2017\)),
+				'other' => q(साओ तोम और प्रिंसिपे डोबरा \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'STN',
 			display_name => {
 				'currency' => q(साओ तोम और प्रिंसिपे डोबरा),
 				'one' => q(साओ तोम और प्रिंसिपे डोबरा),
@@ -5983,171 +6001,171 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'ethiopic') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1600
 						&& $time < 2000;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 				}
-				last SWITCH;
-				}
-			if ($_ eq 'islamic') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1600
 						&& $time < 2000;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'persian') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-				}
-				last SWITCH;
-				}
-			if ($_ eq 'japanese') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'indian') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1600
 						&& $time < 2000;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 				}
-				last SWITCH;
-				}
-			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'night1' if $time >= 2000;
-					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1600
 						&& $time < 2000;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1600
-						&& $time < 2000;
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
 				}
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
 					return 'morning1' if $time >= 400
 						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'islamic') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2000;
 					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1600
 						&& $time < 2000;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'japanese') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'ethiopic') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				last SWITCH;
+				}
+			if ($_ eq 'persian') {
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+				}
+				if($day_period_type eq 'selection') {
+					return 'night1' if $time >= 2000;
+					return 'night1' if $time < 400;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
+					return 'evening1' if $time >= 1600
+						&& $time < 2000;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
 				}
 				last SWITCH;
 				}
@@ -6167,61 +6185,61 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'morning1' => q{सुबह},
-					'afternoon1' => q{अपराह्न},
-					'night1' => q{रात},
-					'pm' => q{अपराह्न},
-					'evening1' => q{शाम},
-					'am' => q{पूर्वाह्न},
-					'midnight' => q{मध्यरात्रि},
-				},
 				'narrow' => {
-					'night1' => q{रात},
-					'afternoon1' => q{अपराह्न},
-					'morning1' => q{सुबह},
 					'pm' => q{अ},
-					'evening1' => q{शाम},
-					'midnight' => q{मध्यरात्रि},
 					'am' => q{पू},
+					'morning1' => q{सुबह},
+					'evening1' => q{शाम},
+					'afternoon1' => q{अपराह्न},
+					'midnight' => q{मध्यरात्रि},
+					'night1' => q{रात},
+				},
+				'wide' => {
+					'night1' => q{रात},
+					'evening1' => q{शाम},
+					'afternoon1' => q{अपराह्न},
+					'midnight' => q{मध्यरात्रि},
+					'morning1' => q{सुबह},
+					'pm' => q{अपराह्न},
+					'am' => q{पूर्वाह्न},
 				},
 				'abbreviated' => {
-					'night1' => q{रात},
+					'pm' => q{अपराह्न},
+					'am' => q{पूर्वाह्न},
+					'midnight' => q{मध्यरात्रि},
+					'evening1' => q{शाम},
 					'afternoon1' => q{अपराह्न},
 					'morning1' => q{सुबह},
-					'evening1' => q{शाम},
-					'pm' => q{अपराह्न},
-					'midnight' => q{मध्यरात्रि},
-					'am' => q{पूर्वाह्न},
+					'night1' => q{रात},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'night1' => q{रात},
-					'morning1' => q{सुबह},
-					'afternoon1' => q{दोपहर},
-					'evening1' => q{शाम},
-					'midnight' => q{मध्यरात्रि},
-					'pm' => q{अपराह्न},
 					'am' => q{पूर्वाह्न},
-				},
-				'wide' => {
-					'evening1' => q{शाम},
-					'midnight' => q{मध्यरात्रि},
 					'pm' => q{अपराह्न},
-					'am' => q{पूर्वाह्न},
-					'night1' => q{रात},
+					'evening1' => q{शाम},
 					'afternoon1' => q{दोपहर},
 					'morning1' => q{सुबह},
+					'midnight' => q{मध्यरात्रि},
+					'night1' => q{रात},
 				},
 				'narrow' => {
-					'morning1' => q{सुबह},
-					'afternoon1' => q{अपराह्न},
 					'night1' => q{रात},
 					'evening1' => q{शाम},
-					'am' => q{पू},
-					'pm' => q{अ},
 					'midnight' => q{आधी रात},
+					'afternoon1' => q{अपराह्न},
+					'morning1' => q{सुबह},
+					'pm' => q{अ},
+					'am' => q{पू},
+				},
+				'wide' => {
+					'night1' => q{रात},
+					'midnight' => q{मध्यरात्रि},
+					'evening1' => q{शाम},
+					'afternoon1' => q{दोपहर},
+					'morning1' => q{सुबह},
+					'pm' => q{अपराह्न},
+					'am' => q{पूर्वाह्न},
 				},
 			},
 		},

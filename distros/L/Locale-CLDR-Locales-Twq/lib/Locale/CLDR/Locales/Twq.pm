@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Twq - Package for language Tasawaq
 
 package Locale::CLDR::Locales::Twq;
 # This file auto generated from Data\common\main\twq.xml
-#	on Fri 13 Apr  7:32:59 am GMT
+#	on Sun  5 Aug  6:26:30 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -591,6 +591,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Mooritaani Ugiya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Mooritaani Ugiya),
 			},
 		},
@@ -660,6 +665,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Sao Tome nda Prinsipe Dobra \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Sao Tome nda Prinsipe Dobra),
 			},
@@ -865,8 +875,8 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{Subbaahi},
 					'pm' => q{Zaarikay b},
+					'am' => q{Subbaahi},
 				},
 				'wide' => {
 					'pm' => q{Zaarikay b},

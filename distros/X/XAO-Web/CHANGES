@@ -1,6 +1,12 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 5707134fce103e393d48a57b07b10de7146cbcd8
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Sat Jul 7 10:30:15 2018 -0700
+
+    Cleaner testing, no DESTROY warnings
+
 commit 9babe4b24e5067f5babccdf80e23a189a916ea48
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Sat Jul 7 09:37:06 2018 -0700
@@ -67,10 +73,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Wed Jul 4 17:40:09 2018 -0700
 
     1.67: Fixed PSGI no cookies issue
-
-commit 31e97d6937e20fcb5e0fe5870f2d04d7299015b4
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Jul 4 10:43:41 2018 -0700
-
-    PSGI_RUNNER and a couple of dockerfile changes
 

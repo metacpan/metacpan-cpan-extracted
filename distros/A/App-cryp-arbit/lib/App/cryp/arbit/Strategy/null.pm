@@ -1,7 +1,7 @@
 package App::cryp::arbit::Strategy::null;
 
-our $DATE = '2018-06-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-08-04'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +32,7 @@ App::cryp::arbit::Strategy::null - Do nothing (for testing)
 
 =head1 VERSION
 
-This document describes version 0.001 of App::cryp::arbit::Strategy::null (from Perl distribution App-cryp-arbit), released on 2018-06-25.
+This document describes version 0.003 of App::cryp::arbit::Strategy::null (from Perl distribution App-cryp-arbit), released on 2018-08-04.
 
 =head1 SYNOPSIS
 

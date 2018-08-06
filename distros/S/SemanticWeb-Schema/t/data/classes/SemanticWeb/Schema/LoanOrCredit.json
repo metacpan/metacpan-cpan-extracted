@@ -1,0 +1,45 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:FIBO",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A financial product for the loaning of an amount of money under agreed terms and charges.",
+      "rdfs:label" : "LoanOrCredit",
+      "rdfs:subClassOf" : "schema:FinancialProduct"
+   },
+   "properties" : {
+      "schema:amount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The amount of money.",
+         "rdfs:label" : "amount",
+         "schema:domainIncludes" : [
+            "schema:DatedMoneySpecification",
+            "schema:InvestmentOrDeposit",
+            "schema:LoanOrCredit"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:MonetaryAmount"
+         ]
+      },
+      "schema:loanTerm" : {
+         "dc:source" : "schemadotorgsources:FIBO",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The duration of the loan or credit agreement.",
+         "rdfs:label" : "loanTerm",
+         "rdfs:subPropertyOf" : "schema:duration",
+         "schema:domainIncludes" : "schema:LoanOrCredit",
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      },
+      "schema:requiredCollateral" : {
+         "dc:source" : "schemadotorgsources:FIBO",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Assets required to secure loan or credit repayments. It may take form of third party pledge, goods, financial instruments (cash, securities, etc.)",
+         "rdfs:label" : "requiredCollateral",
+         "schema:domainIncludes" : "schema:LoanOrCredit",
+         "schema:rangeIncludes" : [
+            "schema:Thing",
+            "schema:Text"
+         ]
+      }
+   }
+}

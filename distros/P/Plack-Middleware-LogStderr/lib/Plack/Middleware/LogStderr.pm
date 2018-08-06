@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 package Plack::Middleware::LogStderr;
-$Plack::Middleware::LogStderr::VERSION = '0.001';
+$Plack::Middleware::LogStderr::VERSION = '0.002';
 # ABSTRACT: Everything printed to STDERR sent to psgix.logger or other logger
 # KEYWORDS: plack middleware errors logging environment I/O handle stderr
 
 use parent 'Plack::Middleware';
 
-use Plack::Util::Accessor qw/logger callback tie_callback capture_callback no_tie log_level log_level_capture/;
+use Plack::Util::Accessor qw/logger callback tie_callback capture_callback no_tie log_level log_level_capture no_warnings/;
 use Scalar::Util ();
 use Capture::Tiny 'capture_stderr';
 
@@ -41,7 +41,7 @@ sub call {
     my ($stderr, @app) = capture_stderr {
         my ($app, $err);
 
-        tie *STDERR, 'Plack::Middleware::LogStderr::Handle2Logger', $stderr_logger
+        tie *STDERR, 'Plack::Middleware::LogStderr::Handle2Logger', $stderr_logger, $self->no_warnings
             unless $self->no_tie ;
 
         eval {
@@ -103,8 +103,8 @@ our $VERSION = '0.001';
 use warnings::register;
 
 sub TIEHANDLE {
-    my ($pkg, $logger) = @_;
-    return bless {logger => $logger}, $pkg;
+    my ($pkg, $logger, $no_warnings) = @_;
+    return bless {logger => $logger, no_warnings => $no_warnings}, $pkg;
 }
 sub PRINT {
     my ($self, @msg) = @_;
@@ -119,14 +119,15 @@ sub PRINTF {
 ## if something tries to reopen FILEHANDLE just return true -- noop
 sub OPEN {
     my ($self) = @_;
-    if (warnings::enabled()) {
+    if (warnings::enabled() && !$self->{no_warnings}) {
         warnings::warn("open called on tied handle Handle2Logger");
     }
     return 1;
 }
 ## if something tries to set BINMODE -- noop
 sub BINMODE {
-    if (warnings::enabled()) {
+    my ($self) = @_;
+    if (warnings::enabled() && !$self->{no_warnings}) {
         warnings::warn("binmode called on tied handle Handle2Logger");
     }
     return undef;
@@ -147,7 +148,7 @@ Plack::Middleware::LogStderr - Everything printed to STDERR sent to psgix.logger
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -210,10 +211,6 @@ C<STDERR> output into one message. The drawback here is log messages may not be
 interleaved temporally with messages generated from the tied method or other
 calls to the logger.
 
-=head1 NAME
-
-Plack::Middleware::LogStderr - redirect STDERR output to a defined logger
-
 =head1 CONFIGURATION
 
 =head2 C<logger>
@@ -255,6 +252,12 @@ The drawback is all C<STDERR> output created during a request is grouped
 together as one message and logged together after the request has finished
 processesing.
 
+=head2 C<no_warnings>
+
+By default when C<STDERR> is tied the package will emit a warning if OPEN or BINMODE
+is called on the tied handle.  Using C<no_warnings> will silence the warnings.
+Very useful if you are using warnings fatal all.
+
 =head1 SEE ALSO
 
 =over 4
@@ -292,10 +295,6 @@ Karen Etheridge
 =head1 SOURCE
 
 The source code repository for Plack-Middleware-LogStderr can be found at L<https://github.com/amalek215/Plack-Middleware-LogStderr>
-
-=head1 AUTHOR
-
-Alex Malek <amalek@cpan.org>
 
 =head1 AUTHOR
 

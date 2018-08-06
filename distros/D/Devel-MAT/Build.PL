@@ -6,7 +6,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Devel::MAT',
    requires => {
-      'Commandable::Invocation' => 0,
+      'Commandable::Invocation' => '0.02', # ->putback_tokens
       'Devel::MAT::Dumper' => '0.35',
       'File::ShareDir' => 0,
       'File::Spec' => 0,

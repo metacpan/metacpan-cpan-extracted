@@ -1,3 +1,84 @@
+v1.1.050 (31 Jul 2018)
+----------------------
+
+Pre-configured worlds
+- Ten new pre-configured worlds: Age of Chaos, Avalon (Germany), Carrion Fields, CyberASSAULT,
+    Elysium RPG, HellMOO, Miriani, MUME, RoninMUD, Tsunami
+- Improved handling of new and existing pre-configured worlds for users who have just installed a
+    new version of Axmud
+- Major improvements to the existing pre-configured worlds: Avalon RPG, Discworld and SWMud (if
+    you've ever connected to any of these worlds, you'll be prompted to update them; if not, the
+    world profiles will be automatically updated)
+- Minor improvements to the existing pre-configured worlds: Dead Souls Dev, Dead Souls Local, Dead
+    Souls Prime, DuneMUD, Medievia, MorgenGrauen. If you want to import the improvements into your
+    existing world profiles, use ';updateworld' (for example ';updatworld empire'). If you don't
+    want to risk overwriting any changes you've made to those profiles, don't use ';updateworld'
+
+Major new features
+- New 'quick preferences' window, containing the most useful configuration options, such as changing
+    fonts, turning on sound, etc (hopefully useful for users who couldn't find where they were). In
+    the main window, click the blue book icon to open it
+- The GUI window has been renamed the object viewer window, and expanded to include more kinds of
+    object and more help files. The commands to open/close it are now ';openobjectviewer' and
+    ';closeobjectviewer'
+- New client commands to backup the entire Axmud data directory: 'backupdata', ';restoredata' and,
+    for automated backups ';autobackup'. (This does not affect ordinary data file load/save
+    operations. To avoid confusion, ';retainbackups' has been renamed ';retainfilecopy')
+- A complete list of strings used in peek/poke operations (such as with the client commands ';peek'
+    and ';poke', and with several Axbasic statements including PEEK and POKE) is now available in
+    the About window, in the Axmud Guide and by using the new ';peekhelp' command
+- For worlds that use room commands (such as EmpireMUD 2.0 and Avalon Germany), some new client
+    commands: ';rommcommand', ';ignoreroomcommand', ';noticeroomcommand' and ';listroomcommand'.
+    If the current location has a list of room commands like 'chop, harvest, gather', use
+    ';roomcommand' to cycle through them. For best effect, open the Compass task and assign
+    ';roomcommand' to one of the keys on your keypad
+- New commands, aimed at worlds with a language that's not English, allowing you to set the
+    dictionary's directions from the command line (e.g. at a German-language MUD, to replace 'east'
+    with 'ost'): ';modifyprimary', ';addsecondary', ';modifysecondary', ';deletesecondary',
+    ';setautosecondary', ';listautosecondary', ';listdirection'. Also fixed several problems setting
+    directions in the dictionary's edit window
+
+Major fixes
+- Fixed crash due to problems with clickable links occasionally seen at MXP-heavy worlds
+- Axmud is supposed to be able to recover from a Perl crash, commonly seen if you try to use an
+    invalid regex (pattern) in your triggers and aliases. This wasn't working, which caused the
+    connection to freeze, but it's now fixed
+- Fixed multiple problems with command histories (used when you press the up/down cursor keys to
+    show recent commands in the main window's command entry box)
+- Fixed various ATCP problems which caused numerous error messages at some worlds
+- At a few non-English worlds, the automapper produced a load of errors when leaving a dark room (a
+    room with no light). Fixed
+
+Minor new features
+- The Inventory task can now cope with lines of text containing multiple items of inventory (in
+    addition to the usual code, which could already cope with commas, the word 'and', and so on).
+    Connect to HellMOO to see it in action
+- ';copyrecording' now displays an abbreviated list of world commands, as well as the unabbreviated
+    list
+
+Minor fixes
+- Some task windows (such as the Status task window) didn't have their fonts updated when the user
+    updated fonts generally. Fixed
+- ';playsoundeffect' now plays a random sound effect, if you don't specify one
+- Fixed various problems in the zonemap and winmap edit windows. Fixed issue that prevented user
+    adding winzones to a cloned winmap
+- In the client preferences window, Workspaces > Page 5, fixed the faulty 'Reset Grids' button
+- Autosaves no longer take place when connected to a world in 'offline' mode
+- Fixed a few terminal error messages, occasionally seen when Axmud shuts down
+- When Axmud displayed explicit line numbers and/or colour/style tags in the main window, clickable
+    links appeared in the wrong place. Fixed
+- Could not open the edit window for some room components from the world profile's edit window.
+    Fixed, and in those edit windows there's a new button allowing you to specify RGB colour tags
+- Fixed various problems in edit windows for TTS (text-to-speech) configurations
+- New ';worldcompass' command, complementing the existing ';compass' and ';permcompass', and also
+    improvements to the task's edit window, which make it easier to modify the commands for each
+    keypad key that apply whenever Axmud starts
+- ';listotherworld' has been renamed as ';listbasicworld' for consistency
+- Fixed faulty handling, rarely affecting the user, of the delimiters in exit lists (for example
+    the commas in 'You can go north, south, west'
+- In the Connections window, you can now read English translations of the descriptions of non-
+    English worlds
+
 v1.1.012 (8 Jun 2018)
 ---------------------
 

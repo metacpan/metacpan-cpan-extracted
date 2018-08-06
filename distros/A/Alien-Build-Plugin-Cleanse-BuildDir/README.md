@@ -1,4 +1,4 @@
-# Alien::Build::Plugin::Cleanse::BuildDir [![Build Status](https://secure.travis-ci.org/shawnlaffan/Alien-Build-Plugin-Cleanse-BuildDir.png)](http://travis-ci.org/plicease/Alien-Build-Plugin-Cleanse-BuildDir)
+# Alien::Build::Plugin::Cleanse::BuildDir [![Build Status](https://secure.travis-ci.org/shawnlaffan/Alien-Build-Plugin-Cleanse-BuildDir.png)](http://travis-ci.org/shawnlaffan/Alien-Build-Plugin-Cleanse-BuildDir)
 
 Alien::Build plugin to cleanse the build dir
 

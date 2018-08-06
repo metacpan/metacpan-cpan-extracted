@@ -1,3 +1,6 @@
+v0.2.7 2018-08-03T23:55:42Z
+ - Pcore::HTTP refactoring
+
 v0.2.6 2018-04-24T11:57:04Z
  - fix cpan dist
 

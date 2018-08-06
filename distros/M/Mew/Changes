@@ -1,5 +1,8 @@
 Revision history for Mew
 
+1.002003  2018-07-31
+  - Fix regression with `Maybe` handling
+
 1.002002  2018-07-29
   - Fix INC in test suite for modern perls (#5)
 

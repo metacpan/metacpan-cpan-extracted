@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A post office.",
+      "rdfs:label" : "PostOffice",
+      "rdfs:subClassOf" : "schema:GovernmentOffice"
+   },
+   "properties" : {}
+}

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Wae::Any::Ch - Package for language Walser
 
 package Locale::CLDR::Locales::Wae::Any::Ch;
 # This file auto generated from Data\common\main\wae_CH.xml
-#	on Fri 13 Apr  7:34:27 am GMT
+#	on Sun  5 Aug  6:28:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

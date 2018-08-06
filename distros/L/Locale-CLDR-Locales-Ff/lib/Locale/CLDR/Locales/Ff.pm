@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ff - Package for language Fulah
 
 package Locale::CLDR::Locales::Ff;
 # This file auto generated from Data\common\main\ff.xml
-#	on Fri 13 Apr  7:09:32 am GMT
+#	on Sun  5 Aug  6:00:14 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -22,6 +22,426 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
+has 'valid_algorithmic_formats' => (
+	is => 'ro',
+	isa => ArrayRef,
+	init_arg => undef,
+	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal','spellout-cardinal-class-o','spellout-ordinal' ]},
+);
+
+has 'algorithmic_number_format_data' => (
+	is => 'ro',
+	isa => HashRef,
+	init_arg => undef,
+	default => sub { 
+		use bignum;
+		return {
+		'spellout-cardinal' => {
+			'public' => {
+				'-x' => {
+					divisor => q(1),
+					rule => q(minus →→),
+				},
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(ɓolum),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← poofirgel →→),
+				},
+				'1' => {
+					base_value => q(1),
+					divisor => q(1),
+					rule => q(goʼo),
+				},
+				'2' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(ɗiɗi),
+				},
+				'3' => {
+					base_value => q(3),
+					divisor => q(1),
+					rule => q(tati),
+				},
+				'4' => {
+					base_value => q(4),
+					divisor => q(1),
+					rule => q(nawi),
+				},
+				'5' => {
+					base_value => q(5),
+					divisor => q(1),
+					rule => q(jowi),
+				},
+				'6' => {
+					base_value => q(6),
+					divisor => q(1),
+					rule => q(jeegoʼo),
+				},
+				'7' => {
+					base_value => q(7),
+					divisor => q(1),
+					rule => q(jeeɗiɗi),
+				},
+				'8' => {
+					base_value => q(8),
+					divisor => q(1),
+					rule => q(jeetati),
+				},
+				'9' => {
+					base_value => q(9),
+					divisor => q(1),
+					rule => q(jeenawi),
+				},
+				'10' => {
+					base_value => q(10),
+					divisor => q(10),
+					rule => q(sappo[ e →→]),
+				},
+				'20' => {
+					base_value => q(20),
+					divisor => q(10),
+					rule => q(noogas[ e →→]),
+				},
+				'30' => {
+					base_value => q(30),
+					divisor => q(10),
+					rule => q(cepanze ←←[ e →→]),
+				},
+				'100' => {
+					base_value => q(100),
+					divisor => q(100),
+					rule => q(temedere ←←[ e →→]),
+				},
+				'1000' => {
+					base_value => q(1000),
+					divisor => q(1000),
+					rule => q(ujunere ←←[ e →→]),
+				},
+				'1000000' => {
+					base_value => q(1000000),
+					divisor => q(1000000),
+					rule => q(miliyo ←←[, →→]),
+				},
+				'1000000000' => {
+					base_value => q(1000000000),
+					divisor => q(1000000000),
+					rule => q(miliyaari ←←[, →→]),
+				},
+				'1000000000000' => {
+					base_value => q(1000000000000),
+					divisor => q(1000000000000),
+					rule => q(biliyo ←←[, →→]),
+				},
+				'1000000000000000' => {
+					base_value => q(1000000000000000),
+					divisor => q(1000000000000000),
+					rule => q(biliyaari ←←[, →→]),
+				},
+				'1000000000000000000' => {
+					base_value => q(1000000000000000000),
+					divisor => q(1000000000000000000),
+					rule => q(=#,##0=),
+				},
+				'Inf' => {
+					divisor => q(1),
+					rule => q(infinity),
+				},
+				'NaN' => {
+					divisor => q(1),
+					rule => q(alaa limoore),
+				},
+				'max' => {
+					divisor => q(1),
+					rule => q(alaa limoore),
+				},
+			},
+		},
+		'spellout-cardinal-class-o' => {
+			'public' => {
+				'-x' => {
+					divisor => q(1),
+					rule => q(minus →→),
+				},
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(ɓolum),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← poofirgel →→),
+				},
+				'1' => {
+					base_value => q(1),
+					divisor => q(1),
+					rule => q(gooto),
+				},
+				'2' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(ɗiɗo),
+				},
+				'3' => {
+					base_value => q(3),
+					divisor => q(1),
+					rule => q(tato),
+				},
+				'4' => {
+					base_value => q(4),
+					divisor => q(1),
+					rule => q(nawo),
+				},
+				'5' => {
+					base_value => q(5),
+					divisor => q(1),
+					rule => q(njowo),
+				},
+				'6' => {
+					base_value => q(6),
+					divisor => q(1),
+					rule => q(jeegomo),
+				},
+				'7' => {
+					base_value => q(7),
+					divisor => q(1),
+					rule => q(jeeɗiɗo),
+				},
+				'8' => {
+					base_value => q(8),
+					divisor => q(1),
+					rule => q(jeetato),
+				},
+				'9' => {
+					base_value => q(9),
+					divisor => q(1),
+					rule => q(jeenawo),
+				},
+				'10' => {
+					base_value => q(10),
+					divisor => q(10),
+					rule => q(sappo[ e →→]),
+				},
+				'20' => {
+					base_value => q(20),
+					divisor => q(10),
+					rule => q(noogas[ e →→]),
+				},
+				'30' => {
+					base_value => q(30),
+					divisor => q(10),
+					rule => q(cepanze ←←[ e →→]),
+				},
+				'100' => {
+					base_value => q(100),
+					divisor => q(100),
+					rule => q(temedere ←←[ e →→]),
+				},
+				'1000' => {
+					base_value => q(1000),
+					divisor => q(1000),
+					rule => q(ujunere ←←[ e →→]),
+				},
+				'1000000' => {
+					base_value => q(1000000),
+					divisor => q(1000000),
+					rule => q(miliyo ←←[, →→]),
+				},
+				'1000000000' => {
+					base_value => q(1000000000),
+					divisor => q(1000000000),
+					rule => q(miliyaari ←←[, →→]),
+				},
+				'1000000000000' => {
+					base_value => q(1000000000000),
+					divisor => q(1000000000000),
+					rule => q(biliyo ←←[, →→]),
+				},
+				'1000000000000000' => {
+					base_value => q(1000000000000000),
+					divisor => q(1000000000000000),
+					rule => q(biliyaari ←←[, →→]),
+				},
+				'1000000000000000000' => {
+					base_value => q(1000000000000000000),
+					divisor => q(1000000000000000000),
+					rule => q(=#,##0=),
+				},
+				'Inf' => {
+					divisor => q(1),
+					rule => q(infinity),
+				},
+				'NaN' => {
+					divisor => q(1),
+					rule => q(alaa limoore),
+				},
+				'max' => {
+					divisor => q(1),
+					rule => q(alaa limoore),
+				},
+			},
+		},
+		'spellout-numbering' => {
+			'public' => {
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-cardinal=),
+				},
+				'max' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-cardinal=),
+				},
+			},
+		},
+		'spellout-numbering-year' => {
+			'public' => {
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-numbering=),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=0.0=),
+				},
+				'max' => {
+					divisor => q(1),
+					rule => q(=0.0=),
+				},
+			},
+		},
+		'spellout-ordinal' => {
+			'public' => {
+				'-x' => {
+					divisor => q(1),
+					rule => q(minus →→),
+				},
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(ɓolum),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=#,##0.0=),
+				},
+				'1' => {
+					base_value => q(1),
+					divisor => q(1),
+					rule => q(arande),
+				},
+				'2' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(ɗiɗaɓo),
+				},
+				'3' => {
+					base_value => q(3),
+					divisor => q(1),
+					rule => q(tatiaɓo),
+				},
+				'4' => {
+					base_value => q(4),
+					divisor => q(1),
+					rule => q(nawaɓo),
+				},
+				'5' => {
+					base_value => q(5),
+					divisor => q(1),
+					rule => q(jowaɓo),
+				},
+				'6' => {
+					base_value => q(6),
+					divisor => q(1),
+					rule => q(jeearande),
+				},
+				'7' => {
+					base_value => q(7),
+					divisor => q(1),
+					rule => q(jeeɗiɗaɓo),
+				},
+				'8' => {
+					base_value => q(8),
+					divisor => q(1),
+					rule => q(jeetataɓo),
+				},
+				'9' => {
+					base_value => q(9),
+					divisor => q(1),
+					rule => q(jeenawaɓo),
+				},
+				'10' => {
+					base_value => q(10),
+					divisor => q(10),
+					rule => q(sappo[ e →→]),
+				},
+				'20' => {
+					base_value => q(20),
+					divisor => q(10),
+					rule => q(noogas[ e →→]),
+				},
+				'30' => {
+					base_value => q(30),
+					divisor => q(10),
+					rule => q(cepanze ←←[ e →→]),
+				},
+				'100' => {
+					base_value => q(100),
+					divisor => q(100),
+					rule => q(temedere ←←[ e →→]),
+				},
+				'1000' => {
+					base_value => q(1000),
+					divisor => q(1000),
+					rule => q(ujunere ←←[ e →→]),
+				},
+				'1000000' => {
+					base_value => q(1000000),
+					divisor => q(1000000),
+					rule => q(miliyo ←←[, →→]),
+				},
+				'1000000000' => {
+					base_value => q(1000000000),
+					divisor => q(1000000000),
+					rule => q(miliyaari ←←[, →→]),
+				},
+				'1000000000000' => {
+					base_value => q(1000000000000),
+					divisor => q(1000000000000),
+					rule => q(biliyo ←←[, →→]),
+				},
+				'1000000000000000' => {
+					base_value => q(1000000000000000),
+					divisor => q(1000000000000000),
+					rule => q(biliyaari ←←[, →→]),
+				},
+				'1000000000000000000' => {
+					base_value => q(1000000000000000000),
+					divisor => q(1000000000000000000),
+					rule => q(=#,##0=),
+				},
+				'Inf' => {
+					divisor => q(1),
+					rule => q(infinity),
+				},
+				'NaN' => {
+					divisor => q(1),
+					rule => q(alaa limoore),
+				},
+				'max' => {
+					divisor => q(1),
+					rule => q(alaa limoore),
+				},
+			},
+		},
+	} },
+);
+
 has 'display_name_language' => (
 	is			=> 'ro',
 	isa			=> CodeRef,
@@ -569,6 +989,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ugiyya Muritani \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ugiyya Muritani),
 			},
 		},
@@ -633,6 +1058,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dobra Sawo Tome e Prensipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dobra Sawo Tome e Prensipe),
 			},
@@ -837,11 +1267,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{kikiiɗe},
 					'am' => q{subaka},
 				},
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{kikiiɗe},
 					'am' => q{subaka},
 				},
@@ -923,7 +1353,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
+		'generic' => {
 			M => q{M},
 			MMM => q{MMM},
 			MMMEd => q{E d MMM},
@@ -945,7 +1375,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'generic' => {
+		'gregorian' => {
 			M => q{M},
 			MMM => q{MMM},
 			MMMEd => q{E d MMM},

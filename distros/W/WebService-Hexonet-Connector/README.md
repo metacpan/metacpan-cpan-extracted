@@ -82,7 +82,7 @@ Please read [our development guide](https://github.com/hexonet/perl-sdk/wiki/Dev
 
 ## Authors
 
-* **Anthony Schneider** - *development* - [ISharky](https://github.com/isharky)
+* **Anthony Schneider** - *development* - [AnthonySchn](https://github.com/anthonyschn)
 * **Kai Schwarz** - *development* - [PapaKai](https://github.com/papakai)
 
 See also the list of [contributors](https://github.com/hexonet/perl-sdk/graphs/contributors) who participated in this project.

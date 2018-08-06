@@ -11,7 +11,7 @@ use warnings;
 
 package Pod::Perldoc::ToMarkdown;
 our $AUTHORITY = 'cpan:RWSTAUNER';
-$Pod::Perldoc::ToMarkdown::VERSION = '3.005';
+$Pod::Perldoc::ToMarkdown::VERSION = '3.100';
 # ABSTRACT: Enable `perldoc -o Markdown`
 
 use parent qw(Pod::Markdown);
@@ -60,7 +60,7 @@ Pod::Perldoc::ToMarkdown - Enable `perldoc -o Markdown`
 
 =head1 VERSION
 
-version 3.005
+version 3.100
 
 =for test_synopsis 1;
 __END__

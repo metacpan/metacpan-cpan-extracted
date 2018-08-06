@@ -1,7 +1,20 @@
 Revision history for OpenOffice::OODoc::InsertDocument
 
+0.02  2018-08-01 14:46Z VANHOESEL
+
+      - Fix Styling issues
+        - refactor transliteration_map
+        - add transliteration mapping, include default style
+        - conditionally (create and) apply 'custom' styles
+        - improve POD
+        - fix issues with non-existing styles and 'undef's
+
+      - Developer release
+        - Use MINTLAB plugin bundle
+        - Add .gitlab-ci.yml
+        - Add Dockerfile
+
 0.01  2018-06-28 16:19Z VANHOESEL
 
-      - fixup! initial commit
       - initial release
 

@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.0.14] - 2018-07-31
+
+### Changed
+
+- Changed context attribute to be lazy.
+
+- Removed dependency on Ref::Util
+
 ## [0.0.13] - 2018-06-02
 
 ### Fixed

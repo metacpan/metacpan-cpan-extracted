@@ -1,0 +1,59 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Used to describe membership in a loyalty programs (e.g. \"StarAliance\"), traveler clubs (e.g. \"AAA\"), purchase clubs (\"Safeway Club\"), etc.",
+      "rdfs:label" : "ProgramMembership",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:hostingOrganization" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The organization (airline, travelers' club, etc.) the membership is made with.",
+         "rdfs:label" : "hostingOrganization",
+         "schema:domainIncludes" : "schema:ProgramMembership",
+         "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:member" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A member of an Organization or a ProgramMembership. Organizations can be members of organizations; ProgramMembership is typically for individuals.",
+         "rdfs:label" : "member",
+         "schema:domainIncludes" : [
+            "schema:Organization",
+            "schema:ProgramMembership"
+         ],
+         "schema:inverseOf" : "schema:memberOf",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:members" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A member of this organization.",
+         "rdfs:label" : "members",
+         "schema:domainIncludes" : [
+            "schema:ProgramMembership",
+            "schema:Organization"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ],
+         "schema:supersededBy" : "schema:member"
+      },
+      "schema:membershipNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A unique identifier for the membership.",
+         "rdfs:label" : "membershipNumber",
+         "schema:domainIncludes" : "schema:ProgramMembership",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:programName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The program providing the membership.",
+         "rdfs:label" : "programName",
+         "schema:domainIncludes" : "schema:ProgramMembership",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

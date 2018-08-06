@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Ga - Package for language Irish
 
 package Locale::CLDR::Locales::Ga;
 # This file auto generated from Data\common\main\ga.xml
-#	on Fri 13 Apr  7:11:15 am GMT
+#	on Sun  5 Aug  6:02:09 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1810,6 +1810,7 @@ has 'display_name_region' => (
  			'151' => 'Oirthear na hEorpa',
  			'154' => 'Tuaisceart na hEorpa',
  			'155' => 'Iarthar na hEorpa',
+ 			'202' => 'an Afraic fho-Shahárach',
  			'419' => 'Meiriceá Laidineach',
  			'AC' => 'Oileán na Deascabhála',
  			'AD' => 'Andóra',
@@ -1858,6 +1859,7 @@ has 'display_name_region' => (
  			'CG@alt=variant' => 'an Congó (Poblacht)',
  			'CH' => 'an Eilvéis',
  			'CI' => 'an Cósta Eabhair',
+ 			'CI@alt=variant' => 'Côte d’Ivoire',
  			'CK' => 'Oileáin Cook',
  			'CL' => 'an tSile',
  			'CM' => 'Camarún',
@@ -7900,6 +7902,16 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(Ouguiya na Máratáine \(1973–2017\)),
+				'few' => q(ouguiya na Máratáine \(1973–2017\)),
+				'many' => q(n-ouguiya na Máratáine \(1973–2017\)),
+				'one' => q(ouguiya na Máratáine \(1973–2017\)),
+				'other' => q(ouguiya na Máratáine \(1973–2017\)),
+				'two' => q(ouguiya na Máratáine \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ouguiya na Máratáine),
 				'few' => q(ouguiya na Máratáine),
 				'many' => q(n-ouguiya na Máratáine),
@@ -8526,6 +8538,17 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(Dobra São Tomé agus Príncipe \(1977–2017\)),
+				'few' => q(dhobra São Tomé agus Príncipe \(1977–2017\)),
+				'many' => q(ndobra São Tomé agus Príncipe \(1977–2017\)),
+				'one' => q(dobra São Tomé agus Príncipe \(1977–2017\)),
+				'other' => q(dobra São Tomé agus Príncipe \(1977–2017\)),
+				'two' => q(dhobra São Tomé agus Príncipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
 			display_name => {
 				'currency' => q(Dobra São Tomé agus Príncipe),
 				'few' => q(dhobra São Tomé agus Príncipe),
@@ -9495,31 +9518,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
+				'wide' => {
 					'pm' => q{i.n.},
 					'am' => q{r.n.},
 				},
 				'narrow' => {
-					'pm' => q{p},
 					'am' => q{a},
+					'pm' => q{p},
 				},
-				'wide' => {
-					'pm' => q{i.n.},
+				'abbreviated' => {
 					'am' => q{r.n.},
+					'pm' => q{i.n.},
 				},
 			},
 			'stand-alone' => {
-				'narrow' => {
-					'pm' => q{p},
-					'am' => q{a},
+				'abbreviated' => {
+					'am' => q{a.m.},
+					'pm' => q{p.m.},
 				},
 				'wide' => {
 					'pm' => q{p.m.},
 					'am' => q{a.m.},
 				},
-				'abbreviated' => {
-					'pm' => q{p.m.},
-					'am' => q{a.m.},
+				'narrow' => {
+					'pm' => q{p},
+					'am' => q{a},
 				},
 			},
 		},

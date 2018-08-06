@@ -10,8 +10,10 @@
 #   Copyright (C) 2001-2006, 2014 Steve Hay.  All rights reserved.
 #
 # LICENCE
-#   You may distribute under the terms of either the GNU General Public License
-#   or the Artistic License, as specified in the LICENCE file.
+#   This script is free software; you can redistribute it and/or modify it under
+#   the same terms as Perl itself, i.e. under the terms of either the GNU
+#   General Public License or the Artistic License, as specified in the LICENCE
+#   file.
 #
 #===============================================================================
 
@@ -24,6 +26,8 @@ use Config qw(%Config);
 use Errno qw(EACCES ENOENT);
 use Test::More tests => 52;
 use Win32::WinError qw(ERROR_ACCESS_DENIED ERROR_FILE_NOT_FOUND);
+
+## no critic (Subroutines::ProhibitSubroutinePrototypes)
 
 sub new_filename();
 
@@ -73,8 +77,8 @@ MAIN: {
 
         seek $fh, 0, 0;
         {
-            no warnings 'io';
-            is(<$fh>, undef, '... but not read');
+        no warnings 'io';
+        is(<$fh>, undef, '... but not read');
         }
 
         ok(close($fh), '... and the file closes ok');
@@ -87,8 +91,8 @@ MAIN: {
             diag("\$! = '$errno', \$^E = '$lasterror'");
 
         {
-            no warnings 'io';
-            ok(!print($fh "$str\n"), "... and we cannot print");
+        no warnings 'io';
+        ok(!print($fh "$str\n"), "... and we cannot print");
         }
 
         seek $fh, 0, 0;
@@ -108,8 +112,8 @@ MAIN: {
 
         seek $fh, 0, 0;
         {
-            no warnings 'io';
-            is(<$fh>, undef, '... but not read');
+        no warnings 'io';
+        is(<$fh>, undef, '... but not read');
         }
 
         ok(close($fh), '... and the file closes ok');

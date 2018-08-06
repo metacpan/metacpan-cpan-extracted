@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Exception
 
+3.17  Mon Jul 30 15:10:00 2018
+      - Added exception for invalid background color.
+
 3.16  Sun Apr 15 21:20:00 2018
       - Added exceptions for Invalid line/station structure.
 

@@ -3,7 +3,7 @@ use warnings;
 
 package Test::Deep::HashRec;
 # ABSTRACT:  test hash entries for required and optional fields
-$Test::Deep::HashRec::VERSION = '0.002';
+$Test::Deep::HashRec::VERSION = '0.003';
 #pod =func hashrec
 #pod
 #pod   cmp_deeply(
@@ -73,7 +73,7 @@ sub init {
 sub diagnostics {
   my ($self, $where, $last) = @_;
 
-  my $error = $self->{diag} =~ s/^/  /rgm;
+  (my $error = $self->{diag}) =~ s/^/  /gm;
   my $diag  = <<EOM;
 In hash record $where
 $error
@@ -113,7 +113,8 @@ sub descend {
   }
 
   my %effective = (
-    map   {; $_ => ($self->{required}{$_} // $self->{optional}{$_}) }
+    map   {; $_ => (exists $self->{required}{$_}  ? $self->{required}{$_}
+                                                  : $self->{optional}{$_}) }
     grep  {; $self->{is_permitted}{$_} }
     keys %$got
   );
@@ -140,7 +141,7 @@ Test::Deep::HashRec - test hash entries for required and optional fields
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 FUNCTIONS
 

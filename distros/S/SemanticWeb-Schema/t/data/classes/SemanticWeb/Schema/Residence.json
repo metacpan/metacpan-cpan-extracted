@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The place where a person lives.",
+      "rdfs:label" : "Residence",
+      "rdfs:subClassOf" : "schema:Place"
+   },
+   "properties" : {}
+}

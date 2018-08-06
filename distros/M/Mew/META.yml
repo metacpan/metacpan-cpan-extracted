@@ -26,10 +26,10 @@ name: Mew
 provides:
   Mew:
     file: lib/Mew.pm
-    version: '1.002002'
+    version: '1.002003'
   ew:
     file: lib/ew.pm
-    version: '1.002002'
+    version: '1.002003'
 requires:
   Filter::Simple: '0'
   FindBin: '0'
@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/zoffixznet/mew/issues
   homepage: http://metacpan.org/release/Mew
   repository: git://github.com/zoffixznet/mew.git
-version: '1.002002'
+version: '1.002003'
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -387,7 +387,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.002002
+          tag: v1.002003
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

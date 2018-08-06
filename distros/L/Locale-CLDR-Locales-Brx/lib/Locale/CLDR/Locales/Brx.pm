@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Brx - Package for language Bodo
 
 package Locale::CLDR::Locales::Brx;
 # This file auto generated from Data\common\main\brx.xml
-#	on Fri 13 Apr  7:03:21 am GMT
+#	on Sun  5 Aug  5:53:19 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1992,6 +1992,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(मौरिटानी ऊगुया \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(मौरिटानी ऊगुया),
 			},
 		},
@@ -2261,6 +2266,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(साँव तोमे एवं प्रीन्सीपे का डोब्रा \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(साँव तोमे एवं प्रीन्सीपे का डोब्रा),
 			},
@@ -2724,8 +2734,8 @@ has 'day_periods' => (
 					'am' => q{फुं},
 				},
 				'abbreviated' => {
-					'pm' => q{बेलासे},
 					'am' => q{फुं},
+					'pm' => q{बेलासे},
 				},
 			},
 		},

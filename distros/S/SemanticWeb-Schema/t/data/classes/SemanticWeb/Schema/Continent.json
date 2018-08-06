@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "One of the continents (for example, Europe or Africa).",
+      "rdfs:label" : "Continent",
+      "rdfs:subClassOf" : "schema:Landform"
+   },
+   "properties" : {}
+}

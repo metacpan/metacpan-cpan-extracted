@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-FiatX
   homepage: https://metacpan.org/release/Finance-Currency-FiatX
   repository: git://github.com/perlancar/perl-Finance-Currency-FiatX.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -356,7 +356,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
-      version: '0.04'
+      version: '0.050'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'

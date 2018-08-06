@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A locksmith.",
+      "rdfs:label" : "Locksmith",
+      "rdfs:subClassOf" : "schema:HomeAndConstructionBusiness"
+   },
+   "properties" : {}
+}

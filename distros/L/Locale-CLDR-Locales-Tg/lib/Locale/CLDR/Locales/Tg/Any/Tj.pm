@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Tg::Any::Tj - Package for language Tajik
 
 package Locale::CLDR::Locales::Tg::Any::Tj;
 # This file auto generated from Data\common\main\tg_TJ.xml
-#	on Fri 13 Apr  7:30:45 am GMT
+#	on Sun  5 Aug  6:24:00 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

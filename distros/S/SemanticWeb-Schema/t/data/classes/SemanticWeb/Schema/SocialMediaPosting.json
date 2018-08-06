@@ -1,0 +1,17 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A post to a social media platform, including blog posts, tweets, Facebook posts, etc.",
+      "rdfs:label" : "SocialMediaPosting",
+      "rdfs:subClassOf" : "schema:Article"
+   },
+   "properties" : {
+      "schema:sharedContent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A CreativeWork such as an image, video, or audio clip shared as part of this posting.",
+         "rdfs:label" : "sharedContent",
+         "schema:domainIncludes" : "schema:SocialMediaPosting",
+         "schema:rangeIncludes" : "schema:CreativeWork"
+      }
+   }
+}

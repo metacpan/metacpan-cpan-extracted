@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Af - Package for language Afrikaans
 
 package Locale::CLDR::Locales::Af;
 # This file auto generated from Data\common\main\af.xml
-#	on Fri 13 Apr  7:00:31 am GMT
+#	on Sun  5 Aug  5:49:56 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -899,6 +899,8 @@ has 'display_name_language' => (
  				'yue' => 'Kantonees',
  				'zgh' => 'Standaard Marokkaanse Tamazight',
  				'zh' => 'Sjinees',
+ 				'zh_Hans' => 'Chinees (Vereenvoudig)',
+ 				'zh_Hant' => 'Chinees (Tradisioneel)',
  				'zu' => 'Zoeloe',
  				'zun' => 'Zuni',
  				'zxx' => 'Geen taalinhoud nie',
@@ -1019,6 +1021,7 @@ has 'display_name_region' => (
  			'151' => 'Oos-Europa',
  			'154' => 'Noord-Europa',
  			'155' => 'Wes-Europa',
+ 			'202' => 'Afrika suid van die Sahara',
  			'419' => 'Latyns-Amerika',
  			'AC' => 'Ascensioneiland',
  			'AD' => 'Andorra',
@@ -4247,6 +4250,13 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(Mauritaniese ouguiya \(1973–2017\)),
+				'one' => q(Mauritaniese ouguiya \(1973–2017\)),
+				'other' => q(Mauritaniese ouguiya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Mauritaniese ouguiya),
 				'one' => q(Mauritaniese ouguiya),
 				'other' => q(Mauritaniese ouguiya),
@@ -4552,6 +4562,14 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(São Tomé en Príncipe dobra \(1977–2017\)),
+				'one' => q(São Tomé en Príncipe dobra \(1977–2017\)),
+				'other' => q(São Tomé en Príncipe dobra \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
 			display_name => {
 				'currency' => q(São Tomé en Príncipe dobra),
 				'one' => q(São Tomé en Príncipe dobra),
@@ -5068,51 +5086,51 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'generic') {
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'night1' if $time >= 0
 						&& $time < 500;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'gregorian') {
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
-					return 'evening1' if $time >= 1800
-						&& $time < 2400;
 					return 'night1' if $time >= 0
 						&& $time < 500;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
+					return 'evening1' if $time >= 1800
+						&& $time < 2400;
 					return 'morning1' if $time >= 500
 						&& $time < 1200;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
 				}
 				if($day_period_type eq 'default') {
 					return 'midnight' if $time == 0;
-					return 'night1' if $time >= 0
-						&& $time < 500;
-					return 'morning1' if $time >= 500
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1800;
 					return 'evening1' if $time >= 1800
 						&& $time < 2400;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1800;
+					return 'morning1' if $time >= 500
+						&& $time < 1200;
+					return 'night1' if $time >= 0
+						&& $time < 500;
 				}
 				last SWITCH;
 				}
@@ -5132,61 +5150,61 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
+					'night1' => q{die nag},
 					'evening1' => q{die aand},
-					'pm' => q{nm.},
+					'afternoon1' => q{die middag},
+					'morning1' => q{die oggend},
 					'midnight' => q{middernag},
 					'am' => q{vm.},
-					'night1' => q{die nag},
-					'morning1' => q{die oggend},
-					'afternoon1' => q{die middag},
+					'pm' => q{nm.},
 				},
 				'narrow' => {
-					'night1' => q{n},
-					'morning1' => q{o},
-					'afternoon1' => q{m},
-					'pm' => q{n},
-					'evening1' => q{a},
 					'midnight' => q{mn},
+					'evening1' => q{a},
+					'afternoon1' => q{m},
+					'morning1' => q{o},
 					'am' => q{v},
+					'pm' => q{n},
+					'night1' => q{n},
 				},
-				'abbreviated' => {
-					'evening1' => q{die aand},
-					'midnight' => q{middernag},
+				'wide' => {
+					'night1' => q{die nag},
 					'pm' => q{nm.},
 					'am' => q{vm.},
-					'night1' => q{die nag},
-					'afternoon1' => q{die middag},
 					'morning1' => q{die oggend},
+					'evening1' => q{die aand},
+					'afternoon1' => q{die middag},
+					'midnight' => q{middernag},
 				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'evening1' => q{aand},
-					'midnight' => q{middernag},
-					'pm' => q{nm.},
-					'am' => q{vm.},
-					'morning1' => q{oggend},
-					'afternoon1' => q{middag},
+				'abbreviated' => {
 					'night1' => q{nag},
+					'am' => q{vm.},
+					'pm' => q{nm.},
+					'evening1' => q{aand},
+					'afternoon1' => q{middag},
+					'midnight' => q{middernag},
+					'morning1' => q{oggend},
 				},
 				'narrow' => {
+					'night1' => q{n},
+					'afternoon1' => q{m},
 					'evening1' => q{a},
+					'morning1' => q{o},
 					'midnight' => q{mn},
 					'pm' => q{n},
 					'am' => q{v},
-					'afternoon1' => q{m},
-					'morning1' => q{o},
-					'night1' => q{n},
 				},
-				'abbreviated' => {
-					'afternoon1' => q{middag},
-					'morning1' => q{oggend},
+				'wide' => {
 					'night1' => q{nag},
 					'evening1' => q{aand},
-					'am' => q{vm.},
-					'pm' => q{nm.},
+					'morning1' => q{oggend},
+					'afternoon1' => q{middag},
 					'midnight' => q{middernag},
+					'pm' => q{nm.},
+					'am' => q{vm.},
 				},
 			},
 		},

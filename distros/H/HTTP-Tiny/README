@@ -2,7 +2,7 @@ NAME
     HTTP::Tiny - A small, simple, correct HTTP/1.1 client
 
 VERSION
-    version 0.070
+    version 0.076
 
 SYNOPSIS
         use HTTP::Tiny;
@@ -163,6 +163,10 @@ METHODS
     'POST', 'PUT', etc.) on the given URL. The URL must have unsafe
     characters escaped and international domain names encoded.
 
+    NOTE: Method names are case-sensitive per the HTTP/1.1 specification.
+    Don't use "get" when you really want "GET". See LIMITATIONS for how this
+    applies to redirection.
+
     If the URL includes a "user:password" stanza, they will be used for
     Basic-style authorization headers. (Authorization headers will not be
     included in a redirected request.) For example:
@@ -198,7 +202,9 @@ METHODS
         only to a specific peer address, regardless of the URL of the
         request. This will include any redirections! This options should be
         used with extreme caution (e.g. debugging or very special
-        circumstances).
+        circumstances). It can be given as either a scalar or a code
+        reference that will receive the hostname and whose response will be
+        taken as the address.
 
     The "Host" header is generated from the URL in accordance with RFC 2616.
     It is a fatal error to specify "Host" in the "headers" option. Other
@@ -241,6 +247,9 @@ METHODS
         be normalized to be lower case. If a header is repeated, the value
         will be an arrayref; it will otherwise be a scalar string containing
         the value
+
+    *   "protocol" - If this field exists, it is the protocol of the
+        response such as HTTP/1.0 or HTTP/1.1
 
     *   "redirects" If this field exists, it is an arrayref of response hash
         references from redirects in the same order that redirections
@@ -515,11 +524,17 @@ CONTRIBUTORS
 
     *   Craig A. Berry <craigberry@mac.com>
 
+    *   Craig Berry <cberry@cpan.org>
+
     *   David Golden <xdg@xdg.me>
+
+    *   David Mitchell <davem@iabyn.com>
 
     *   Dean Pearce <pearce@pythian.com>
 
     *   Edward Zborowski <ed@rubensteintech.com>
+
+    *   Felipe Gasper <felipe@felipegasper.com>
 
     *   James Raspass <jraspass@gmail.com>
 
@@ -545,6 +560,10 @@ CONTRIBUTORS
 
     *   Petr Písař <ppisar@redhat.com>
 
+    *   Serguei Trouchelle <stro@cpan.org>
+
+    *   Shoichi Kaji <skaji@cpan.org>
+
     *   SkyMarshal <skymarshal1729@gmail.com>
 
     *   Sören Kornetzki <soeren.kornetzki@delti.com>
@@ -560,7 +579,7 @@ CONTRIBUTORS
     *   Tony Cook <tony@develop-help.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2016 by Christian Hansen.
+    This software is copyright (c) 2018 by Christian Hansen.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

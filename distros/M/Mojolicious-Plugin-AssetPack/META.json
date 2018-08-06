@@ -53,6 +53,6 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-assetpack"
       }
    },
-   "version" : "2.04",
+   "version" : "2.05",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Rwk - Package for language Rwa
 
 package Locale::CLDR::Locales::Rwk;
 # This file auto generated from Data\common\main\rwk.xml
-#	on Fri 13 Apr  7:27:17 am GMT
+#	on Sun  5 Aug  6:20:07 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -556,6 +556,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ugwiya ya Moritania \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ugwiya ya Moritania),
 			},
 		},
@@ -625,6 +630,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dobra ya Sao Tome na Principe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dobra ya Sao Tome na Principe),
 			},

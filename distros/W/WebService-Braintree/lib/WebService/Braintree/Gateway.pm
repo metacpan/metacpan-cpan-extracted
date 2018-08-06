@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::Gateway;
-$WebService::Braintree::Gateway::VERSION = '1.6';
+$WebService::Braintree::Gateway::VERSION = '1.7';
 use 5.010_001;
 use strictures 1;
 
@@ -43,7 +43,7 @@ around BUILDARGS => sub {
 
     if ( !exists $args->{config} ) {
         $args = {
-            config => WebService::Braintree::Config->new( $args ),
+            config => WebService::Braintree::Configuration->new( $args ),
         };
     }
 

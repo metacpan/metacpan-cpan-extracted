@@ -10,8 +10,10 @@
 #   Copyright (C) 2003-2008, 2012-2014 Steve Hay.  All rights reserved.
 #
 # LICENCE
-#   You may distribute under the terms of either the GNU General Public License
-#   or the Artistic License, as specified in the LICENCE file.
+#   This module is free software; you can redistribute it and/or modify it under
+#   the same terms as Perl itself, i.e. under the terms of either the GNU
+#   General Public License or the Artistic License, as specified in the LICENCE
+#   file.
 #
 #===============================================================================
 
@@ -25,6 +27,8 @@ use warnings;
 use Carp qw(croak);
 use Exporter qw();
 use XSLoader qw();
+
+## no critic (Subroutines::ProhibitSubroutinePrototypes)
 
 sub stat(;$);
 sub lstat(;$);
@@ -52,7 +56,7 @@ BEGIN {
         alt_stat
     );
     
-    $VERSION = '1.58';
+    $VERSION = '1.59';
 
     XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -87,8 +91,8 @@ sub AUTOLOAD {
 
     # Generate an in-line subroutine returning the required value.
     {
-        no strict 'refs';
-        *$AUTOLOAD = sub { return $value };
+    no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
+    *$AUTOLOAD = sub { return $value };
     }
 
     # Switch to the subroutine that we have just generated.
@@ -106,12 +110,12 @@ sub import {
     my @args = grep {
         my $passthrough;
         if ($_ eq ':globally') {
-	    no warnings 'redefine';
+            no warnings 'redefine';
             *CORE::GLOBAL::stat  = \&Win32::UTCFileTime::stat;
             *CORE::GLOBAL::lstat = \&Win32::UTCFileTime::lstat;
             *CORE::GLOBAL::utime = \&Win32::UTCFileTime::utime;
-	}
-	else {
+        }
+        else {
             $passthrough = 1;
         }
         $passthrough;
@@ -794,13 +798,13 @@ available for Visual C++ 6.0.)
 
 An excellent overview of the problem with Microsoft's C<stat(2)> was written by
 Jonathan M Gilligan and posted on the Code Project website
-(F<http://www.codeproject.com/>).  He has kindly granted permission to use his
+(L<http://www.codeproject.com/>).  He has kindly granted permission to use his
 article here to describe the problem more fully.  A slightly edited version of
 it now follows; the original article can be found at the URL
-F<http://www.codeproject.com/datetime/dstbugs.asp>.
+L<http://www.codeproject.com/datetime/dstbugs.asp>.
 
 (The article was accompanied by a C library, adapted from code written for CVSNT
-(F<http://www.cvsnt.org/>) by Jonathan and Tony M Hoyle, which implemented the
+(L<http://www.cvsnt.org/>) by Jonathan and Tony M Hoyle, which implemented the
 solution outlined at the end of his article.  The solution provided by this
 module is partly based on that library and the original CVSNT code itself
 (version 2.0.4), which both authors kindly granted permission to use under the
@@ -931,7 +935,7 @@ such as "leap seconds."  TAI measures raw atomic time.  UTC measures time
 coordinated to the motion of the earth (i.e., so we don't end up having midnight
 while the sun is shining or January in midsummer).  Details of what UTC really
 means, together with a more detailed history of timekeeping, can be found at
-F<http://ecco.bsee.swin.edu.au/chronos/GMT-explained.html>.
+L<http://ecco.bsee.swin.edu.au/chronos/GMT-explained.html>.
 
 =head2 UTC, time zones, and Windows file times
 
@@ -1498,20 +1502,23 @@ even become redundant.
 
 Patches, bug reports, suggestions or any other feedback is welcome.
 
-Bugs can be reported on the CPAN Request Tracker at
-F<https://rt.cpan.org/Public/Bug/Report.html?Queue=Win32-UTCFileTime>.
+Patches can be sent as GitHub pull requests at
+L<https://github.com/steve-m-hay/Win32-UTCFileTime/pulls>.
 
-Open bugs on the CPAN Request Tracker can be viewed at
-F<https://rt.cpan.org/Public/Dist/Display.html?Status=Active;Dist=Win32-UTCFileTime>.
+Bug reports and suggestions can be made on the CPAN Request Tracker at
+L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Win32-UTCFileTime>.
+
+Currently active requests on the CPAN Request Tracker can be viewed at
+L<https://rt.cpan.org/Public/Dist/Display.html?Status=Active;Queue=Win32-UTCFileTime>.
 
 Please test this distribution.  See CPAN Testers Reports at
-F<http://www.cpantesters.org/> for details of how to get involved.
+L<http://www.cpantesters.org/> for details of how to get involved.
 
 Previous test results on CPAN Testers can be viewed at
-F<http://www.cpantesters.org/distro/W/Win32-UTCFileTime.html>.
+L<http://www.cpantesters.org/distro/W/Win32-UTCFileTime.html>.
 
 Please rate this distribution on CPAN Ratings at
-F<http://cpanratings.perl.org/rate/?distribution=Win32-UTCFileTime>.
+L<http://cpanratings.perl.org/rate/?distribution=Win32-UTCFileTime>.
 
 =head1 SEE ALSO
 
@@ -1524,16 +1531,18 @@ L<Win32::FileTime>.
 
 =head1 ACKNOWLEDGEMENTS
 
-Many thanks to Jonathan M Gilligan E<lt>jonathan.gilligan@vanderbilt.eduE<gt>
-and Tony M Hoyle E<lt>tmh@nodomain.orgE<gt> who wrote much of the C code that
-this module is based on and granted permission to use it under the terms of the
-Perl Artistic License as well as the GNU GPL.  Extra thanks to Jonathan for also
-granting permission to use his article describing the problem and his solution
-to it in the L<"BACKGROUND REFERENCE"> section of this manpage.
+Many thanks to Jonathan M Gilligan
+E<lt>L<jonathan.gilligan@vanderbilt.edu|mailto:jonathan.gilligan@vanderbilt.edu>E<gt>
+and Tony M Hoyle E<lt>L<tmh@nodomain.org|mailto:tmh@nodomain.org>E<gt> who wrote
+much of the C code that this module is based on and granted permission to use it
+under the terms of the Perl Artistic License as well as the GNU GPL.  Extra
+thanks to Jonathan for also granting permission to use his article describing
+the problem and his solution to it in the L<"BACKGROUND REFERENCE"> section of
+this manpage.
 
 Credit is also due to Slaven Rezic for finding Jonathan's work on the Code
-Project website (F<http://www.codeproject.com/>) in response to my bug report
-([perl #18513] on the Perl Bugs website, F<http://rt.perl.org/>).
+Project website (L<http://www.codeproject.com/>) in response to my bug report
+(Perl RT#18513).
 
 The custom C<import()> method is based on that in the standard library module
 File::Glob (version 1.23), written by Nathan Torkington and others.
@@ -1553,13 +1562,14 @@ the C<win32_str_os_error()> function in Perl (version 5.19.10).
 The latest version of this module is available from CPAN (see
 L<perlmodlib/"CPAN"> for details) at
 
-F<https://metacpan.org/release/Win32-UTCFileTime> or
+L<https://metacpan.org/release/Win32-UTCFileTime> or
 
-F<http://search.cpan.org/dist/Win32-UTCFileTime/> or
+L<http://www.cpan.org/authors/id/S/SH/SHAY/> or
 
-F<http://www.cpan.org/authors/id/S/SH/SHAY/> or
+L<http://www.cpan.org/modules/by-module/Win32/>.
 
-F<http://www.cpan.org/modules/by-module/Win32/>.
+The latest source code is available from GitHub at
+L<https://github.com/steve-m-hay/Win32-UTCFileTime>.
 
 =head1 INSTALLATION
 
@@ -1567,11 +1577,11 @@ See the F<INSTALL> file.
 
 =head1 AUTHOR
 
-Steve Hay E<lt>shay@cpan.orgE<gt>
+Steve Hay E<lt>L<shay@cpan.org|mailto:shay@cpan.org>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2003-2008, 2012-2014 Steve Hay.  All rights reserved.
+Copyright (C) 2003-2008, 2012-2015 Steve Hay.  All rights reserved.
 
 Portions Copyright (C) 2001 Jonathan M Gilligan.  Used with permission.
 
@@ -1585,11 +1595,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 1.58
+Version 1.59
 
 =head1 DATE
 
-30 May 2014
+31 Jul 2018
 
 =head1 HISTORY
 

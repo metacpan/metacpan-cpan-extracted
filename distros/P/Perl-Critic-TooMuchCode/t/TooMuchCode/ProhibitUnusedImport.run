@@ -1,0 +1,6 @@
+## name Data::Dumper;
+## failures 1
+## cut
+
+use Data::Dumper qw<Dumper>;
+print 42;

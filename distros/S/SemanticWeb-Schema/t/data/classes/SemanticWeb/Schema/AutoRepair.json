@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Car repair business.",
+      "rdfs:label" : "AutoRepair",
+      "rdfs:subClassOf" : "schema:AutomotiveBusiness"
+   },
+   "properties" : {}
+}

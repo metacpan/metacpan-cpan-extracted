@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Term-Caca</name>
+  <shortdesc>perl interface for libcaca (Colour AsCii Art library)</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>John Beppu</foaf:name>
+      <foaf:mbox rdf:resource="mailto:beppu@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.dyndns.org" />
+    </foaf:Person>
+  </helper>
+  <homepage rdf:resource="https://github.com/yanick/Term-Caca" />
+  <bug-database rdf:resource="https://github.com/yanick/Term-Caca/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/yanick/Term-Caca" />
+      <location rdf:resource="https://github.com/yanick/Term-Caca.git" />
+    </GitRepository>
+  </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.95</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2006-03-05</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.96</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-05-08</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.97</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-05-12</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.0_0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-06-05</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.1.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-09-25</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.2.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-12-03</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.0_1</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-06-09</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.0_0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-03-02</dc:issued>
+    </Version>
+  </release>
+  <programming-language>Perl</programming-language>
+</Project>

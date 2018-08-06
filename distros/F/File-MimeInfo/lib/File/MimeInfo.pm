@@ -10,7 +10,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(mimetype);
 our @EXPORT_OK = qw(extensions describe globs inodetype mimetype_canon mimetype_isa);
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 our $DEBUG;
 
 our ($_hashed, $_hashed_aliases, $_hashed_subclasses);
@@ -108,6 +108,15 @@ sub default {
 		binmode FILE, ':utf8' unless $] < 5.008;
 		read FILE, $line, 32;
 		close FILE;
+	}
+	elsif (ref $file eq 'Path::Tiny') {
+		return undef unless $file->exists;
+		print STDERR "> File is Path::Tiny object and exists, "
+			. "trying default method\n" if $DEBUG;
+		open my $fh, '<', $file or return undef;
+		binmode FILE, ':utf8' unless $] < 5.008;
+		read $fh, $line, 32;
+		close $fh;
 	}
 	else {
 		print STDERR "> Trying default method on object\n" if $DEBUG;
@@ -234,10 +243,11 @@ sub _read_map_files {
 		next if grep {$_ eq $file} @done;
 		open MAP, '<', $file || croak "Could not open file '$file' for reading";
 		binmode MAP, ':utf8' unless $] < 5.008;
-		while (<MAP>) {
-			next if /^\s*#/ or ! /\S/; # skip comments and empty lines
-			chomp;
-			my ($k, $v) = split /\s+/, $_, 2;
+		while (my $line = <MAP>) {
+			next unless $line =~ m/\S/; # skip empty lines
+			next if $line =~ m/^\s*#/;  # skip comment lines
+			chomp $line;
+			my ($k, $v) = split m/\s+/, $line, 2;
 			if ($list) {
 				$map{$k} = [] unless $map{$k};
 				push @{$map{$k}}, $v;

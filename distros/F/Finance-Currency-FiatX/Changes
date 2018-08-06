@@ -1,9 +1,19 @@
+0.010   2018-08-01 (PERLANCAR)
+
+        - [Bugfix] Forgot to call the source's get_spot_rate() with hash
+          arguments.
+
+
 0.009   2018-07-15 (PERLANCAR)
+
+        - UPDATE 2018-08-01: this release is broken.
 
         - Add source: mandiri.
 
 
 0.008   2018-06-27 (PERLANCAR)
+
+        - UPDATE 2018-08-01: this release is broken.
 
 	[INCOMPATIBLE CHANGES]
 

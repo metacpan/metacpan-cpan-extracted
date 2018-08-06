@@ -1,6 +1,6 @@
                               Source Filters
  
-                               Version 1.58
+                               Version 1.59
  
                               2017-11-15 rurban
  
@@ -85,8 +85,8 @@ systems (at least):
 	irix 6.x	
 	Windows XP (Visual C++ 6.0)
 
-On Windows tr.exe and cpp.exe should be really the gnu/mingw tools in the path
-for the testsuite to pass successfully.
+On Windows tr.exe, cpp.exe, and m4.exe should be really the gnu/mingw tools
+in the path for the testsuite to pass successfully.
 
 INSTALLATION
 ------------

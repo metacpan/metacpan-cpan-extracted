@@ -4,11 +4,11 @@ use warnings;
 use Moo;
 use MooX::Types::MooseLike::Base qw( Int CodeRef );
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 NAME
 
-Retry
+Retry - Try an action repeatedly with callback support
 
 =head1 SYNOPSIS
 

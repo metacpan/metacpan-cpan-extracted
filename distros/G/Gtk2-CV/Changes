@@ -11,6 +11,28 @@ TODO: up == select dir
 TODO: turbojpeg
 TODO: CV_THUMBNAIL_SCALE
 TODO: Pango-WARNING **: Invalid UTF-8 string passed to pango_layout_set_text() at /opt/bin/cv line 224.
+TODO: dir_is_movie in load_image bluray: ffmpeg etc.
+
+1.71 Tue Jul 31 00:57:03 CEST 2018
+	- fix 'o' key osd level switching in mpv (similar to old mplayer mode).
+	- do not error out on incomplete JPEG files, generate fake EOI marker instead
+          to enable the decoder to output a partial file.
+
+1.7  Wed Dec 27 18:47:50 CET 2017
+	- DEFAULT CHANGED: cv will now default to mpv instead of mplayer.
+          use CV_MPLAYER=mplayer to get the previous behaviour.
+	- new env variable, CV_MPLAYER, defaulting to mpv.
+	- make "mplayer" configurable via CV_MPLAYER, support mpv.
+        - support mpv ipc protocol for remote control.
+        - implement audio visualisation when playing audio streams,
+          remove support for CV_AUDIO_PLAYER.
+        - port to newer versions of gtk2, which require including gdkx.h.
+        - preliminary & optional webp load and thumbnail support.
+        - use mmap to "load" files and decode from memory buffers.
+        - use internal fileype function to detect filetype when generating
+          hthumbnails, instead of relaying on file extension (for speed).
+        - add internal magic_buffer/magic_buffer_mime functions.
+        - add more fallback extensions for audio when mimetype detection fails.
 
 1.61 Sat Jun 24 01:55:48 CEST 2017
 	- work around parser bug in 5.18.1 (-a).

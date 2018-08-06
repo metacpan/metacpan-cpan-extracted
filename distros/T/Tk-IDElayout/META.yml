@@ -1,0 +1,27 @@
+---
+abstract: 'Tk Widget for Layout of Frames Similar to an IDE'
+author:
+  - 'jcerney@home.com (John Cerney)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tk-IDElayout
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Graph: '0.20105'
+  Tk: '804.027'
+  Tk::DynaTabFrame: '0.23'
+resources:
+  repository: https://github.com/asb-capfan/Tk-IDElayout.git
+version: '0.34'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

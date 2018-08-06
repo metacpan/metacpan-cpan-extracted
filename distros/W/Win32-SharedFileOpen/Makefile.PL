@@ -7,11 +7,13 @@
 #   Makefile creation script.
 #
 # COPYRIGHT
-#   Copyright (C) 2001-2008, 2012, 2014 Steve Hay.  All rights reserved.
+#   Copyright (C) 2001-2008, 2012, 2014-2015 Steve Hay.  All rights reserved.
 #
 # LICENCE
-#   You may distribute under the terms of either the GNU General Public License
-#   or the Artistic License, as specified in the LICENCE file.
+#   This script is free software; you can redistribute it and/or modify it under
+#   the same terms as Perl itself, i.e. under the terms of either the GNU
+#   General Public License or the Artistic License, as specified in the LICENCE
+#   file.
 #
 #===============================================================================
 
@@ -66,12 +68,45 @@ MAIN: {
             },
 
             optional_features => {
+                changestest => {
+                    description => 'Changes testing',
+                    prereqs => {
+                        test => {
+                            requires => {
+                                'Test::CPAN::Changes' => '0'
+                            }
+                        }
+                    }
+                },
+
+                critictest => {
+                    description => 'Perl::Critic testing',
+                    prereqs => {
+                        test => {
+                            requires => {
+                                'Test::Perl::Critic' => '0'
+                            }
+                        }
+                    }
+                },
+
                 podtest => {
                     description => 'POD testing',
                     prereqs => {
                         test => {
                             requires => {
                                 'Test::Pod' => '1.00'
+                            }
+                        }
+                    }
+                },
+
+                podcoveragetest => {
+                    description => 'POD coverage testing',
+                    prereqs => {
+                        test => {
+                            requires => {
+                                'Test::Pod::Coverage' => '0.08'
                             }
                         }
                     }
@@ -92,28 +127,23 @@ MAIN: {
         },
 
         TEST_REQUIRES => {
-            'Config'          => '0',
-            'Errno'           => '0',
-            'FileHandle'      => '0',
-            'IO::File'        => '0',
-            'IO::Handle'      => '0',
-            'Symbol'          => '0',
-            'Test::More'      => '0',
-            'Time::HiRes'     => '0',
-            'Win32::WinError' => '0',
-            'perl'            => '5.008001',
-            'strict'          => '0',
-            'warnings'        => '0'
+            'FileHandle' => '0',
+            'IO::File'   => '0',
+            'IO::Handle' => '0',
+            'Test::More' => '0'
         },
 
         PREREQ_PM => {
+            'Carp'            => '0',
+            'Config'          => '0',
             'Errno'           => '0',
             'Exporter'        => '0',
             'Symbol'          => '0',
             'Time::HiRes'     => '0',
             'Win32::WinError' => '0',
             'XSLoader'        => '0',
-            'perl'            => '5.008001'
+            'strict'          => '0',
+            'warnings'        => '0'
         },
 
         clean => {
@@ -127,7 +157,7 @@ MAIN: {
         }
     );
 
-    if  (eval { require ExtUtils::Constant; 1 }) {
+    if  (eval { require ExtUtils::Constant }) {
         my @oflags = qw(
             O_APPEND
             O_BINARY

@@ -1,8 +1,3 @@
-________________________________________________________________________________
-
-                        Win32::UTCFileTime, Version 1.58
-________________________________________________________________________________
-
 PREREQUISITES
 
     Microsoft Windows
@@ -17,8 +12,9 @@ PREREQUISITES
 
         Ideally you should try to use the same compiler as was used to build
         your perl itself, although this is not essential.  (However, there is a
-        known compatibility problem when building this module with VC7 or
-        earlier if your perl was built with VC8 or later: see [perl #121448].)
+        known compatibility problem when building this module with Visual Studio
+        .NET 2002/2003 (VC7) or earlier if your perl was built with Visual
+        Studio 2005 (VC8) or later: see Perl RT#121448.)
 
     Perl
 
@@ -39,9 +35,8 @@ INSTALLATION
         nmake test
         nmake install
 
-    Use "dmake" rather than "nmake" in the commands above if that is what your
-    perl was built with.  To determine which make program was used to build your
-    perl type the following:
+    Use the appropriate program name instead of "nmake" in the above commands if
+    your perl was built with a different make program.  To determine which make
+    program was used to build your perl type the following:
 
         perl -V:make
-________________________________________________________________________________

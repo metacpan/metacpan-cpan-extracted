@@ -1,16 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use List::Util qw( any );
+use Commandable::Invocation;
+Commandable::Invocation->VERSION( '0.02' ); # ->putback_tokens
 
 sub new
 {
@@ -110,67 +112,91 @@ sub run_cmd
       return $self->find_subcommand( $subcmd )->run_cmd( $inv );
    }
 
-   my %optspec = $self->CMD_OPTS;
+   my @args;
+
+   if( my %optspec = $self->CMD_OPTS ) {
+      push @args, $self->get_opts_from_inv( $inv, \%optspec );
+   }
+
+   if( $self->CMD_ARGS_SV ) {
+      push @args, $self->get_sv_from_inv( $inv );
+   }
+
+   if( my @argspec = $self->CMD_ARGS ) {
+      push @args, $self->get_args_from_inv( $inv, @argspec );
+   }
+
+   $self->run( @args );
+}
+
+sub get_opts_from_inv
+{
+   my $self = shift;
+   my ( $inv, $optspec, %args ) = @_;
+
+   my $permute = $args{permute} // 1;
 
    my %opts;
    my %aliases;
 
-   foreach my $name ( keys %optspec ) {
-      my $spec = $optspec{$name};
+   foreach my $name ( keys %$optspec ) {
+      my $spec = $optspec->{$name};
 
       $opts{$name} = $spec->{default};
 
       $aliases{ $spec->{alias} } = $name if defined $spec->{alias};
    }
 
+   my @remaining;
+
+   while( defined( my $opt = $inv->pull_token ) ) {
+      last if $opt eq "--";
+
+      if( $opt =~ m/^--(.*)$/ ) {
+         $opt = $1;
+      }
+      elsif( $opt =~ m/^-(.)$/ ) {
+         $opt = $aliases{$1} or die "No such option '-$1'\n";
+      }
+      else {
+         push @remaining, $opt;
+
+         last if !$permute;
+         next;
+      }
+
+      my $spec = $optspec->{$opt} or die "No such option '--$opt'\n";
+
+      for( $spec->{type} // "" ) {
+         m/^$/ and $opts{$opt} = 1, last;
+         m/^[si]$/ and $opts{$opt} = $inv->pull_token, last; # TODO: check number
+         die "TODO: unrecognised type $_\n";
+      }
+   }
+
+   $inv->putback_tokens( @remaining );
+
+   return \%opts;
+}
+
+sub get_args_from_inv
+{
+   my $self = shift;
+   my ( $inv, @argspec ) = @_;
+
    my @args;
 
-   if( %optspec ) {
-      my @remaining;
-
-      while( defined( my $opt = $inv->pull_token ) ) {
-         last if $opt eq "--";
-         push @remaining, $opt and next unless $opt =~ m/^-/;
-
-         if( $opt =~ m/^--(.*)$/ ) {
-            $opt = $1;
-         }
-         if( $opt =~ m/^-(.)$/ ) {
-            $opt = $aliases{$1} or die "No such option '$opt'\n";
-         }
-         my $spec = $optspec{$opt} or die "No such option '--$opt'\n";
-
-         for( $spec->{type} // "" ) {
-            m/^$/ and $opts{$opt} = 1, last;
-            m/^[si]$/ and $opts{$opt} = $inv->pull_token, last; # TODO: check number
-            die "TODO: unrecognised type $_\n";
-         }
-      }
-      while( defined( my $opt = $inv->pull_token ) ) {
-         push @remaining, $opt;
-      }
-
-      push @args, \%opts;
-
-      # This is a bit ugly :/
-      $inv = Commandable::Invocation->new( join " ", map { m/\s/ ? qq("$_") : $_ } @remaining );
-   }
-
-   if( $self->CMD_ARGS_SV ) {
-      my $sv = $self->get_sv_from_inv( $inv );
-      push @args, $sv;
-   }
-
-   foreach my $argspec ( $self->CMD_ARGS ) {
-      defined( my $val = $inv->pull_token ) or last;
-      # TODO: mandatory arguments
+   foreach my $argspec ( @argspec ) {
+      my $val = $inv->pull_token;
+      defined $val or !$argspec->{required} or
+         die "Expected a value for '$argspec->{name}' argument\n";
       push @args, $val;
       if( $argspec->{slurpy} ) {
          push @args, $inv->pull_token while length $inv->remaining;
       }
    }
 
-   $self->run( @args );
+   return @args;
 }
 
 0x55AA;

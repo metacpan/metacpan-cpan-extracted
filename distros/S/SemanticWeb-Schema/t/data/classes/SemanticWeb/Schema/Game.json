@@ -1,0 +1,64 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The Game type represents things which are games. These are typically rule-governed recreational activities, e.g. role-playing games in which players assume the role of characters in a fictional setting.",
+      "rdfs:label" : "Game",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:characterAttribute" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A piece of data that represents a particular aspect of a fictional character (skill, power, character points, advantage, disadvantage).",
+         "rdfs:label" : "characterAttribute",
+         "schema:domainIncludes" : [
+            "schema:Game",
+            "schema:VideoGameSeries"
+         ],
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:gameItem" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An item is an object within the game world that can be collected by a player or, occasionally, a non-player character.",
+         "rdfs:label" : "gameItem",
+         "schema:domainIncludes" : [
+            "schema:Game",
+            "schema:VideoGameSeries"
+         ],
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:gameLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Real or fictional location of the game (or part of game).",
+         "rdfs:label" : "gameLocation",
+         "schema:domainIncludes" : [
+            "schema:VideoGameSeries",
+            "schema:Game"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Place",
+            "schema:PostalAddress"
+         ]
+      },
+      "schema:numberOfPlayers" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicate how many people can play this game (minimum, maximum, or range).",
+         "rdfs:label" : "numberOfPlayers",
+         "schema:domainIncludes" : [
+            "schema:Game",
+            "schema:VideoGameSeries"
+         ],
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      },
+      "schema:quest" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The task that a player-controlled character, or group of characters may complete in order to gain a reward.",
+         "rdfs:label" : "quest",
+         "schema:domainIncludes" : [
+            "schema:Game",
+            "schema:VideoGameSeries"
+         ],
+         "schema:rangeIncludes" : "schema:Thing"
+      }
+   }
+}

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A defence establishment, such as an army or navy base.",
+      "rdfs:label" : "DefenceEstablishment",
+      "rdfs:subClassOf" : "schema:GovernmentBuilding"
+   },
+   "properties" : {}
+}

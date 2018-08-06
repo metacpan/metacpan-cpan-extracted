@@ -23,7 +23,7 @@ no_index:
 provides:
   App::cpm:
     file: lib/App/cpm.pm
-    version: '0.977'
+    version: '0.978'
   App::cpm::CLI:
     file: lib/App/cpm/CLI.pm
   App::cpm::CircularDependency:
@@ -104,7 +104,7 @@ resources:
   bugtracker: https://github.com/skaji/cpm/issues
   homepage: https://github.com/skaji/cpm
   repository: https://github.com/skaji/cpm.git
-version: '0.977'
+version: '0.978'
 x_contributors:
   - 'Andrew Rodland <andrew@cleverdomain.org>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'

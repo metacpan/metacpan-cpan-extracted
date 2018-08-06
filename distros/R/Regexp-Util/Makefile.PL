@@ -7,7 +7,7 @@ my $meta = {
   "abstract"       => "A selection of general-utility regexp subroutines",
   "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config" => 1,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640",
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"       => [],
   "license"        => ["perl_5"],
   "meta-spec"      => {
@@ -18,11 +18,11 @@ my $meta = {
   "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
   "prereqs"        => {
                         configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => { requires => { perl => "5.010" } },
+                        runtime => { requires => { "Exporter::Tiny" => 0, "perl" => "5.010" } },
                         test => { requires => { "Test::More" => 0.92 } },
                       },
   "provides"       => {
-                        "Regexp::Util" => { file => "lib/Regexp/Util.pm", version => 0.003 },
+                        "Regexp::Util" => { file => "lib/Regexp/Util.pm", version => 0.005 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -36,7 +36,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Util/project",
                       },
-  "version"        => 0.003,
+  "version"        => 0.005,
 };
 
 my %dynamic_config;

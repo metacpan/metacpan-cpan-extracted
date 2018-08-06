@@ -21,6 +21,7 @@ my @files = (
     't/named/const-hash.t',
     't/named/locked-hash.t',
     't/named/required.t',
+    't/named/return-object.t',
     't/named/slurpy.t',
     't/pairs-to-value-list.t',
     't/positional/default.t',

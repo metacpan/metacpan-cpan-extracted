@@ -117,7 +117,6 @@ sub read_file ($;$) {
 		$content = <$fh>;
 	}
 	close $fh;
-#	$content =~ tr/ / /;
 	$content =~ s/\xC2\xA0/ /g unless $no_strip;
 	$content;
 }
@@ -160,12 +159,9 @@ sub fill_broken($$;$) {
 	my $broken = shift;
 
 	return unless $broken;
-#	print Dumper $item, $broken;
 	for my $field (keys %{$broken}) {
 		$item->{$field} = $broken->{$field};
 	}
-#	print Dumper $item, $broken;
-#	exit;
 }
 
 sub get_seconds ($) {

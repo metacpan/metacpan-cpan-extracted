@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A navigation element of the page.",
+      "rdfs:label" : "SiteNavigationElement",
+      "rdfs:subClassOf" : "schema:WebPageElement"
+   },
+   "properties" : {}
+}

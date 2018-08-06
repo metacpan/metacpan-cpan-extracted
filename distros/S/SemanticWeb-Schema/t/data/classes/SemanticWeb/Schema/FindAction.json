@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>The act of finding an object.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/SearchAction\">SearchAction</a>: FindAction is generally lead by a SearchAction, but not necessarily.</li>\n</ul>\n",
+      "rdfs:label" : "FindAction",
+      "rdfs:subClassOf" : "schema:Action"
+   },
+   "properties" : {}
+}

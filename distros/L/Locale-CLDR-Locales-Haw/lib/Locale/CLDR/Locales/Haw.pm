@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Haw - Package for language Hawaiian
 
 package Locale::CLDR::Locales::Haw;
 # This file auto generated from Data\common\main\haw.xml
-#	on Fri 13 Apr  7:12:37 am GMT
+#	on Sun  5 Aug  6:03:40 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -574,7 +574,7 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
@@ -582,21 +582,21 @@ has 'day_periods' => (
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
-				'abbreviated' => {
-					'pm' => q{PM},
+				'wide' => {
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 			},
 			'stand-alone' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'narrow' => {
-					'pm' => q{PM},
 					'am' => q{AM},
+					'pm' => q{PM},
 				},
 				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'abbreviated' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},

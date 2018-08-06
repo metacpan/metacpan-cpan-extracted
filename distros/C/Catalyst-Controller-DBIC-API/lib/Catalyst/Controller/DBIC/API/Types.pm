@@ -1,5 +1,5 @@
 package Catalyst::Controller::DBIC::API::Types;
-$Catalyst::Controller::DBIC::API::Types::VERSION = '2.006002';
+$Catalyst::Controller::DBIC::API::Types::VERSION = '2.007002';
 #ABSTRACT: Provides shortcut types and coercions for DBIC::API
 use warnings;
 use strict;
@@ -58,7 +58,7 @@ Catalyst::Controller::DBIC::API::Types - Provides shortcut types and coercions f
 
 =head1 VERSION
 
-version 2.006002
+version 2.007002
 
 =head1 TYPES
 
@@ -144,7 +144,7 @@ Samuel Kaufman <sam@socialflow.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al..
+This software is copyright (c) 2018 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

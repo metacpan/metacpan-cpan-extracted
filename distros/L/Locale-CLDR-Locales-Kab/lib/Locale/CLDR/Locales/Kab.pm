@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Kab - Package for language Kabyle
 
 package Locale::CLDR::Locales::Kab;
 # This file auto generated from Data\common\main\kab.xml
-#	on Fri 13 Apr  7:15:51 am GMT
+#	on Sun  5 Aug  6:07:19 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -69,10 +69,10 @@ has 'display_name_language' => (
  				'av' => 'Tavarikt',
  				'awa' => 'Tawadhit',
  				'ay' => 'Taymarat',
- 				'az' => 'Tazeṛbayǧant',
+ 				'az' => 'Tazerbayǧant',
  				'az@alt=short' => 'Tazrit',
  				'ba' => 'Tabackirt',
- 				'ban' => 'Tabalinizit',
+ 				'ban' => 'Tabalinit',
  				'bas' => 'Tabasat',
  				'be' => 'Tabilarusit',
  				'bem' => 'Tabimbat',
@@ -88,7 +88,7 @@ has 'display_name_language' => (
  				'br' => 'Tabrutunt',
  				'brx' => 'Tabudut',
  				'bs' => 'Tabusnit',
- 				'bug' => 'Tabuginizt',
+ 				'bug' => 'Tabujinit',
  				'byn' => 'Tablint',
  				'ca' => 'Takaṭalant',
  				'ce' => 'Tačičant',
@@ -101,7 +101,7 @@ has 'display_name_language' => (
  				'chr' => 'Tacirukit',
  				'chy' => 'Taciyant',
  				'ckb' => 'Takurdit Talemmast',
- 				'co' => 'Takuṛsikant',
+ 				'co' => 'Takuṛsit',
  				'crs' => 'Takriyult n Saycal',
  				'cs' => 'Tačikit',
  				'cu' => 'Taslavt n tmezgida',
@@ -112,8 +112,8 @@ has 'display_name_language' => (
  				'dar' => 'Tadargwat',
  				'dav' => 'Tataytat',
  				'de' => 'Talmant',
- 				'de_AT' => 'Talmanit n Ustriya',
- 				'de_CH' => 'Talmanit n Swis n ufella',
+ 				'de_AT' => 'Talmant n Ustriya',
+ 				'de_CH' => 'Talmant n Swis',
  				'dgr' => 'Tadugribt',
  				'dje' => 'Tazarmat',
  				'dsb' => 'Tasiṛbit n wadda',
@@ -139,7 +139,7 @@ has 'display_name_language' => (
  				'es_419' => 'Taspanit n Temrikt Talaṭinit',
  				'es_ES' => 'Taspanit n Turuft',
  				'es_MX' => 'Taspanit n Miksik',
- 				'et' => 'Tastunit',
+ 				'et' => 'Tasṭunit',
  				'eu' => 'Tabaskit',
  				'ewo' => 'Tawundut',
  				'fa' => 'Tafarisit',
@@ -151,8 +151,8 @@ has 'display_name_language' => (
  				'fon' => 'Tafunit',
  				'fr' => 'Tafransist',
  				'fr_CA' => 'Tafransist n Kanada',
- 				'fr_CH' => 'Tafransist n Swiss',
- 				'fur' => 'Tafriuliant',
+ 				'fr_CH' => 'Tafransist n Swis',
+ 				'fur' => 'Tafriyulant',
  				'fy' => 'Tafrizunt n umalu',
  				'ga' => 'Tirlandit',
  				'gaa' => 'Tagat',
@@ -160,7 +160,7 @@ has 'display_name_language' => (
  				'gez' => 'Tagizit',
  				'gil' => 'Tajibṛaltart',
  				'gl' => 'Tagalisyant',
- 				'gn' => 'Tagaranit',
+ 				'gn' => 'Tagwaranit',
  				'gor' => 'Taguruntalut',
  				'gsw' => 'Talmanit n Swis',
  				'gu' => 'Tagujaratit',
@@ -173,7 +173,7 @@ has 'display_name_language' => (
  				'hi' => 'Tahendit',
  				'hil' => 'Tahiligaynunt',
  				'hmn' => 'Tahmungt',
- 				'hr' => 'Takaṛwasit',
+ 				'hr' => 'Takeṛwasit',
  				'hsb' => 'Tasirbit n ufella',
  				'ht' => 'Takriyult n Hayti',
  				'hu' => 'Tahungarit',
@@ -188,7 +188,7 @@ has 'display_name_language' => (
  				'ii' => 'Yi n Sicwan',
  				'ilo' => 'Tilukanut',
  				'inh' => 'Tinguct',
- 				'io' => 'Tadut',
+ 				'io' => 'Tidut',
  				'is' => 'Taslandit',
  				'it' => 'Taṭalyanit',
  				'iu' => 'Tinuktitut',
@@ -222,13 +222,13 @@ has 'display_name_language' => (
  				'kok' => 'Takunkanit',
  				'kpe' => 'Takpilit',
  				'kr' => 'Takanurit',
- 				'krc' => 'karatchaï balkar',
+ 				'krc' => 'Takaračayt Tabalkart',
  				'krl' => 'Takarilyant',
  				'kru' => 'Takuruxt',
  				'ks' => 'Takacmirit',
  				'ksb' => 'Tacambalat',
  				'ksf' => 'Tabafyat',
- 				'ksh' => 'Takulugnyant',
+ 				'ksh' => 'Takulunyant',
  				'ku' => 'Takurdit',
  				'kum' => 'Takumyakt',
  				'kv' => 'Takumit',
@@ -280,7 +280,7 @@ has 'display_name_language' => (
  				'ms' => 'Tamalawit',
  				'mt' => 'Tamaltit',
  				'mua' => 'Tamundangt',
- 				'mul' => 'aget-n-tutlayin',
+ 				'mul' => 'Tugett n tutlayin',
  				'mus' => 'Takrikt',
  				'mwl' => 'Tamirandit',
  				'my' => 'Taburmisit',
@@ -323,8 +323,6 @@ has 'display_name_language' => (
  				'prg' => 'Taprusit',
  				'ps' => 'Tapactunt',
  				'pt' => 'Tapurtugalit',
- 				'pt_BR' => 'Tapurtugit n Brizil',
- 				'pt_PT' => 'Tapurtugit n Turfuft',
  				'qu' => 'Takicwat',
  				'quc' => 'Takict',
  				'rap' => 'Tarapanwit',
@@ -403,7 +401,7 @@ has 'display_name_language' => (
  				'twq' => 'Tatasawaqt',
  				'ty' => 'Tatahitant',
  				'tyv' => 'Tatuvat',
- 				'tzm' => 'Tamaziɣt n Merruk Alemmas',
+ 				'tzm' => 'Tamaziɣt n Waṭlas alemmas',
  				'udm' => 'Tudmurt',
  				'ug' => 'Tawigurt',
  				'uk' => 'Tukranit',
@@ -497,7 +495,7 @@ has 'display_name_script' => (
  			'Zmth' => 'Tira tusnakt',
  			'Zsye' => 'Emoji',
  			'Zsym' => 'Izamulen',
- 			'Zxxx' => 'Ur yettwaru ara',
+ 			'Zxxx' => 'War tira',
  			'Zyyy' => 'Ucrik',
  			'Zzzz' => 'Tira tarussint',
 
@@ -832,7 +830,7 @@ has 'display_name_key' => (
 		{
 			'calendar' => 'Awitay',
  			'cf' => 'Amasal n tedrimt',
- 			'collation' => 'Tanila n usmizzwer',
+ 			'collation' => 'Amizzwer deg ufran',
  			'currency' => 'Tadrimt',
  			'hc' => 'Anagraw usrig (12 mgal 24)',
  			'lb' => 'Aɣanib n tuɣalin ar udur',
@@ -850,11 +848,11 @@ has 'display_name_type' => (
 	default		=> sub {
 		{
 			'calendar' => {
- 				'buddhist' => q{Awitay Abudi},
- 				'chinese' => q{Awitay Acinwa},
+ 				'buddhist' => q{Awitay abudi},
+ 				'chinese' => q{Awitay acinwa},
  				'dangi' => q{Awitay n Dangi},
  				'ethiopic' => q{Awitay n Ityupya},
- 				'gregorian' => q{Awitay Agriguryan},
+ 				'gregorian' => q{Awitay agriguryan},
  				'hebrew' => q{Awitay aɛebri},
  				'islamic' => q{Awitay ineslem},
  				'iso8601' => q{Awitay ISO-8601},
@@ -869,7 +867,7 @@ has 'display_name_type' => (
  			'collation' => {
  				'ducet' => q{Tanila n usmizzwer Unicode amezwer},
  				'search' => q{Anadi amatu},
- 				'standard' => q{Tanila n usmizzwer izeɣ},
+ 				'standard' => q{Amizzwer deg ufran izeɣ},
  			},
  			'hc' => {
  				'h11' => q{Anagraw usrig 12 (0–11)},
@@ -3574,6 +3572,13 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(Agiya Amuriṭani \(1973–2017\)),
+				'one' => q(Ugiya n Muritaniya \(1973–2017\)),
+				'other' => q(Ugiyaten n Muritaniya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Agiya Amuriṭani),
 				'one' => q(Ugiya n Muritaniya),
 				'other' => q(Ugiyaten n Muritaniya),
@@ -4029,6 +4034,14 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(Asw Ṭum d Udubra Amenzay \(1977–2017\)),
+				'one' => q(Adubra n Sint-Toma \(1977–2017\)),
+				'other' => q(Idubrayen n Sint-Toma \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
 			display_name => {
 				'currency' => q(Asw Ṭum d Udubra Amenzay),
 				'one' => q(Adubra n Sint-Toma),
@@ -4852,27 +4865,27 @@ has 'day_periods' => (
 					'am' => q{n tufat},
 					'pm' => q{n tmeddit},
 				},
-				'narrow' => {
-					'am' => q{f},
-					'pm' => q{m},
-				},
 				'wide' => {
 					'pm' => q{n tmeddit},
 					'am' => q{n tufat},
 				},
+				'narrow' => {
+					'pm' => q{m},
+					'am' => q{f},
+				},
 			},
 			'stand-alone' => {
-				'wide' => {
-					'pm' => q{MD},
-					'am' => q{FT},
-				},
 				'narrow' => {
 					'pm' => q{MD},
 					'am' => q{FT},
 				},
-				'abbreviated' => {
-					'pm' => q{MD},
+				'wide' => {
 					'am' => q{FT},
+					'pm' => q{MD},
+				},
+				'abbreviated' => {
+					'am' => q{FT},
+					'pm' => q{MD},
 				},
 			},
 		},
@@ -4960,58 +4973,6 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{d, E},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{G y},
-			GyMMM => q{G y MMM},
-			GyMMMEd => q{G y MMM d, E},
-			GyMMMd => q{G y MMM d},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			Hmsv => q{HH:mm:ss v},
-			Hmv => q{HH:mm v},
-			M => q{M},
-			MEd => q{MM-dd, E},
-			MMM => q{MMM},
-			MMMEd => q{E d MMM},
-			MMMMEd => q{E d MMMM},
-			MMMMW => q{'amalas' W 'n' MMMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			MMd => q{d/MM},
-			MMdd => q{dd/MM},
-			Md => q{d/M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			hmsv => q{h:mm:ss a v},
-			hmv => q{h:mm a v},
-			ms => q{m:ss},
-			y => q{y},
-			yM => q{M/y},
-			yMEd => q{E d/M/y},
-			yMM => q{MM/y},
-			yMMM => q{MMM y},
-			yMMMEd => q{E d MMM y},
-			yMMMM => q{MMMM y},
-			yMMMd => q{d MMM y},
-			yMd => q{M/d/y},
-			yQQQ => q{QQQ y},
-			yQQQQ => q{QQQQ y},
-			yw => q{'amalas' w 'n' Y},
-		},
 		'generic' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -5067,6 +5028,58 @@ has 'datetime_formats_available_formats' => (
 			yyyyQQQ => q{G y QQQ},
 			yyyyQQQQ => q{G y QQQQ},
 		},
+		'gregorian' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{d, E},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{G y},
+			GyMMM => q{G y MMM},
+			GyMMMEd => q{G y MMM d, E},
+			GyMMMd => q{G y MMM d},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			Hmsv => q{HH:mm:ss v},
+			Hmv => q{HH:mm v},
+			M => q{M},
+			MEd => q{MM-dd, E},
+			MMM => q{MMM},
+			MMMEd => q{E d MMM},
+			MMMMEd => q{E d MMMM},
+			MMMMW => q{'amalas' W 'n' MMMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			MMd => q{d/MM},
+			MMdd => q{dd/MM},
+			Md => q{d/M},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			hmsv => q{h:mm:ss a v},
+			hmv => q{h:mm a v},
+			ms => q{m:ss},
+			y => q{y},
+			yM => q{M/y},
+			yMEd => q{E d/M/y},
+			yMM => q{MM/y},
+			yMMM => q{MMM y},
+			yMMMEd => q{E d MMM y},
+			yMMMM => q{MMMM y},
+			yMMMd => q{d MMM y},
+			yMd => q{M/d/y},
+			yQQQ => q{QQQ y},
+			yQQQQ => q{QQQQ y},
+			yw => q{'amalas' w 'n' Y},
+		},
 	} },
 );
 
@@ -5096,6 +5109,69 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			M => {
+				M => q{MM–MM},
+			},
+			MEd => {
+				M => q{MM-dd, E – MM-dd, E},
+				d => q{MM-dd, E – MM-dd, E},
+			},
+			MMM => {
+				M => q{MMM – MMM},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{MM-dd – MM-dd},
+				d => q{MM-dd – MM-dd},
+			},
+			d => {
+				d => q{d–d},
+			},
+			fallback => '{0} – {1}',
+			y => {
+				y => q{G y–y},
+			},
+			yM => {
+				M => q{GGGGG y-MM – y-MM},
+				y => q{GGGGG y-MM – y-MM},
+			},
+			yMEd => {
+				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
+			},
+			yMMM => {
+				M => q{G y MMM–MMM},
+				y => q{G y MMM – y MMM},
+			},
+			yMMMEd => {
+				M => q{G y MMM d, E – MMM d, E},
+				d => q{G y MMM d, E – MMM d, E},
+				y => q{G y MMM d, E – y MMM d, E},
+			},
+			yMMMM => {
+				M => q{G y MMMM–MMMM},
+				y => q{G y MMMM – y MMMM},
+			},
+			yMMMd => {
+				M => q{G y MMM d – MMM d},
+				d => q{G y MMM d–d},
+				y => q{G y MMM d – y MMM d},
+			},
+			yMd => {
+				M => q{GGGGG y-MM-dd – y-MM-dd},
+				d => q{GGGGG y-MM-dd – y-MM-dd},
+				y => q{GGGGG y-MM-dd – y-MM-dd},
+			},
+		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -5189,69 +5265,6 @@ has 'datetime_formats_interval' => (
 				M => q{y-MM-dd – y-MM-dd},
 				d => q{y-MM-dd – y-MM-dd},
 				y => q{y-MM-dd – y-MM-dd},
-			},
-		},
-		'generic' => {
-			M => {
-				M => q{MM–MM},
-			},
-			MEd => {
-				M => q{MM-dd, E – MM-dd, E},
-				d => q{MM-dd, E – MM-dd, E},
-			},
-			MMM => {
-				M => q{MMM – MMM},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{MM-dd – MM-dd},
-				d => q{MM-dd – MM-dd},
-			},
-			d => {
-				d => q{d–d},
-			},
-			fallback => '{0} – {1}',
-			y => {
-				y => q{G y–y},
-			},
-			yM => {
-				M => q{GGGGG y-MM – y-MM},
-				y => q{GGGGG y-MM – y-MM},
-			},
-			yMEd => {
-				M => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				d => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-				y => q{GGGGG y-MM-dd, E – y-MM-dd, E},
-			},
-			yMMM => {
-				M => q{G y MMM–MMM},
-				y => q{G y MMM – y MMM},
-			},
-			yMMMEd => {
-				M => q{G y MMM d, E – MMM d, E},
-				d => q{G y MMM d, E – MMM d, E},
-				y => q{G y MMM d, E – y MMM d, E},
-			},
-			yMMMM => {
-				M => q{G y MMMM–MMMM},
-				y => q{G y MMMM – y MMMM},
-			},
-			yMMMd => {
-				M => q{G y MMM d – MMM d},
-				d => q{G y MMM d–d},
-				y => q{G y MMM d – y MMM d},
-			},
-			yMd => {
-				M => q{GGGGG y-MM-dd – y-MM-dd},
-				d => q{GGGGG y-MM-dd – y-MM-dd},
-				y => q{GGGGG y-MM-dd – y-MM-dd},
 			},
 		},
 	} },

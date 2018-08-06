@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Vai - Package for language Vai
 
 package Locale::CLDR::Locales::Vai;
 # This file auto generated from Data\common\main\vai.xml
-#	on Fri 13 Apr  7:34:04 am GMT
+#	on Sun  5 Aug  6:27:42 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -633,6 +633,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(ꗞꔸꕚꕇꕰ ꖳꕅꕩ \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(ꗞꔸꕚꕇꕰ ꖳꕅꕩ),
 			},
 		},
@@ -699,6 +704,11 @@ has 'currencies' => (
 		},
 		'STD' => {
 			display_name => {
+				'currency' => q(ꕢꕴ ꕿꔈ ꗪ ꕉ ꕗꕴ ꖁꖜꕟ \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			display_name => {
 				'currency' => q(ꕢꕴ ꕿꔈ ꗪ ꕉ ꕗꕴ ꖁꖜꕟ),
 			},
 		},
@@ -760,7 +770,7 @@ has 'calendar_months' => (
 				'format' => {
 					abbreviated => {
 						nonleap => [
-							'ꖨꕪꖃ',
+							'ꖨꖕꔞ',
 							'ꕒꕡ',
 							'ꕾꖺ',
 							'ꖢꖕ',
@@ -771,7 +781,7 @@ has 'calendar_months' => (
 							'ꕢꕌ',
 							'ꕭꖃ',
 							'ꔞꘋ',
-							'ꖨꕪꕱ'
+							'ꖨꖕꗏ'
 						],
 						leap => [
 							
@@ -779,7 +789,7 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'ꖨꕪꖃ ꔞꕮ',
+							'ꖨꖕ ꕪꕴ ꔞꔀꕮꕊ',
 							'ꕒꕡꖝꖕ',
 							'ꕾꖺ',
 							'ꖢꖕ',
@@ -790,7 +800,7 @@ has 'calendar_months' => (
 							'ꕢꕌ',
 							'ꕭꖃ',
 							'ꔞꘋꕔꕿ ꕸꖃꗏ',
-							'ꖨꕪꕱ ꗏꕮ'
+							'ꖨꖕ ꕪꕴ ꗏꖺꕮꕊ'
 						],
 						leap => [
 							
@@ -800,7 +810,7 @@ has 'calendar_months' => (
 				'stand-alone' => {
 					abbreviated => {
 						nonleap => [
-							'ꖨꕪꖃ',
+							'ꖨꖕꔞ',
 							'ꕒꕡ',
 							'ꕾꖺ',
 							'ꖢꖕ',
@@ -811,7 +821,7 @@ has 'calendar_months' => (
 							'ꕢꕌ',
 							'ꕭꖃ',
 							'ꔞꘋ',
-							'ꖨꕪꕱ'
+							'ꖨꖕꗏ'
 						],
 						leap => [
 							
@@ -819,7 +829,7 @@ has 'calendar_months' => (
 					},
 					wide => {
 						nonleap => [
-							'ꖨꕪꖃ ꔞꕮ',
+							'ꖨꖕ ꕪꕴ ꔞꔀꕮꕊ',
 							'ꕒꕡꖝꖕ',
 							'ꕾꖺ',
 							'ꖢꖕ',
@@ -830,7 +840,7 @@ has 'calendar_months' => (
 							'ꕢꕌ',
 							'ꕭꖃ',
 							'ꔞꘋꕔꕿ ꕸꖃꗏ',
-							'ꖨꕪꕱ ꗏꕮ'
+							'ꖨꖕ ꕪꕴ ꗏꖺꕮꕊ'
 						],
 						leap => [
 							

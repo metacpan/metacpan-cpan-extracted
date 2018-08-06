@@ -4,14 +4,17 @@ use strict;
 use warnings;
 
 use Devel::MAT;
+use Getopt::Long;
 use List::UtilsBy qw( nsort_by );
 
-STDOUT->autoflush(1);
+GetOptions(
+   '1|onefile' => \( my $ONE ),
+) or exit 1;
 
-my $findex = 1;
-my $progress = ( -t STDOUT ) ?
-   sub { print "\r\e[K";
-         print "[$findex]: $_[0]" if @_; } :
+my $findex = 0;
+my $progress = ( -t STDERR ) ?
+   sub { print STDERR "\r\e[K";
+         print STDERR "[$findex]: $_[0]" if @_; } :
    undef;
 
 # A leaking SV is one that appears and then never gets touched again
@@ -40,6 +43,8 @@ sub list_svs
 $pmat = Devel::MAT->load( shift @ARGV, progress => $progress );
 $previous_svs = list_svs;
 
+$findex++;
+
 while( my $file = shift @ARGV ) {
    $pmat = Devel::MAT->load( $file, progress => $progress );
    my $svs = list_svs;
@@ -52,6 +57,8 @@ while( my $file = shift @ARGV ) {
    # No point looking for more candidates if there's no files left to
    # invalidate any new temporaries with
    last unless @ARGV;
+
+   next if $ONE and %candidates;
 
    # Any new SV that wasn't seen previously is a candidate for leaking
    exists $previous_svs->{$_} or $candidates{$_} = $findex

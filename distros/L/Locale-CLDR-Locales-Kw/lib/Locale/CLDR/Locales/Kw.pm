@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Kw - Package for language Cornish
 
 package Locale::CLDR::Locales::Kw;
 # This file auto generated from Data\common\main\kw.xml
-#	on Fri 13 Apr  7:17:42 am GMT
+#	on Sun  5 Aug  6:09:23 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -263,12 +263,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{a.m.},
 					'pm' => q{p.m.},
+					'am' => q{a.m.},
 				},
 				'wide' => {
-					'pm' => q{p.m.},
 					'am' => q{a.m.},
+					'pm' => q{p.m.},
 				},
 			},
 		},

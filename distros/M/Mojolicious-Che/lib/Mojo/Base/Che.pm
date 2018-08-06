@@ -3,7 +3,7 @@ package Mojo::Base::Che;
 
 use Mojo::Base -strict;
 
-# copy-paste sub Mojo::Base::attr + patch
+# copy-paste sub Mojo::Base::attr + patch 1 line
 sub Mojo::Base::attr {
   my ($self, $attrs, $value) = @_;
   return unless (my $class = ref $self || $self) && $attrs;

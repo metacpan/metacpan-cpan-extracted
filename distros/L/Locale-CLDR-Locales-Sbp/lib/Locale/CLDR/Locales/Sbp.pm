@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Sbp - Package for language Sangu
 
 package Locale::CLDR::Locales::Sbp;
 # This file auto generated from Data\common\main\sbp.xml
-#	on Fri 13 Apr  7:27:21 am GMT
+#	on Sun  5 Aug  6:20:11 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -591,6 +591,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ihela ya Molitaniya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ihela ya Molitaniya),
 			},
 		},
@@ -655,6 +660,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Ihela ya Sao Tome ni Pilinsipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Ihela ya Sao Tome ni Pilinsipe),
 			},
@@ -839,11 +849,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'pm' => q{Pashamihe},
 					'am' => q{Lwamilawu},
 				},
-				'abbreviated' => {
+				'wide' => {
 					'am' => q{Lwamilawu},
 					'pm' => q{Pashamihe},
 				},
@@ -925,7 +935,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -949,7 +959,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
 		},
-		'gregorian' => {
+		'generic' => {
 			Ed => q{E d},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},

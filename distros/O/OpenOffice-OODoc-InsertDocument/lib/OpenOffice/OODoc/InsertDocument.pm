@@ -3,42 +3,18 @@ package OpenOffice::OODoc::InsertDocument;
 use strict;
 use warnings;
 
-=head1 NAME
+# ABSTRACT: Insert, merge or append OpenOffice::OODoc objects
+#
+# LICENSE: This file is covered by the EUPL license, please see the
+# LICENSE file in this repository for more information
 
-OpenOffice::OODoc::InsertDocument - insert, merge or append OpenOffice::OODoc objects
-
-=head1 VERSION
-
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use OpenOffice::OODoc;
 
 use List::Util 'max';
 use Readonly;
 
-=head1 SYNOPSIS
-
-    use OpenOffice::OODoc;
-    
-    my $oodoc_dest_document = odfDocument(file => "MyDestFile.odt");
-    my $oodoc_from_document = odfDocument(file => "MyFromFile.odt");
-    
-    my $replace_me_element = $oodoc_dest_document
-        ->selectElementByContent("[[ replace_me ]]");
-    $oodoc_dest_document
-        ->insertDocument( $replace_me_element, 'before', $oodoc_from_document );
-    $replace_me_element->delete;
-
-=head1 DESCRIPTION
-
-This module will enable to merge the content from one L<OpenOffice::OODoc> into
-another.
-
-=cut
 
 # patch the original OpenOffice::OODoc module and add these subroutines
 #
@@ -51,27 +27,11 @@ Readonly my %stylefamily_map => (
     'list-style' => 'L',
 );
 
-=head1 METHODS
-
-=head2 appendDocument TODO
-
-Inserts an OpenOffice::OODoc at the end off the document.
-
-    $oodoc_orig->appendDocument( $oodoc_from, new_page => 1 );
-
-=cut
 
 sub appendDocument {
     ...
 }
 
-=head2 insertDocument
-
-Inserts a OODoc document at location.
-
-    $oodoc_dest_document->insertDocument( $oodoc_element, 'after', $oodoc_from );
-
-=cut
 
 sub insertDocument {
     my $oodoc_dest_document = shift; # or $self
@@ -79,10 +39,18 @@ sub insertDocument {
     my $position            = shift;
     my $oodoc_from_document = shift;
 
-        my $transliteration_map =
+    # if we have a $oodoc_dest_test_style, it means we have a custom, local
+    # style, otherwise we are using this insertDocument in 'default' styling.
+    my $oodoc_dest_text_style_name =
+        $oodoc_dest_document->textStyle($oodoc_path);
+    my $oodoc_dest_text_style =
+        $oodoc_dest_document->getStyleElement($oodoc_dest_text_style_name);
+
+    my $transliteration_map =
         _getStyleNameTransliterationMap(
             $oodoc_dest_document,
             $oodoc_from_document,
+            include_body_styles => defined($oodoc_dest_text_style),
         );
 
     # rename, select, and paste the auto-style definitions
@@ -113,6 +81,46 @@ sub insertDocument {
             $oodoc_from_text_element, position => $position, );
     }
 
+    return unless defined($oodoc_dest_text_style);
+
+    # update or create styles
+    my $style_attributes = { text => {}, paragraph => {} };
+    foreach my $area ( keys %$style_attributes ) {
+        my $style_property = "(style:$area-properties)";
+        my ($style_element) =
+            $oodoc_dest_text_style->selectChildElements($style_property)
+            or
+            next;
+
+        $style_attributes->{$area} =
+            { $oodoc_dest_document->getStyleAttributes($style_element) }->{references} || {};
+    };
+
+    foreach my $style_name ( values %$transliteration_map ) {
+
+        next if $style_name =~ /T\d+/;
+
+        my $oodoc_style =
+            $oodoc_dest_document->textStyle($style_name)
+            or
+            $oodoc_dest_document->createStyle( $style_name =>
+                'class'                        => 'text',
+                'display-name'                 => "Default",
+                'family'                       => 'paragraph',
+                'next'                         => 'Text_20_body',
+                'parent'                       => 'Heading',
+            )
+            or
+            next;
+
+        $oodoc_from_document->updateStyle( $style_name =>
+            'properties' => {
+                '-area' => $_,
+                %{$style_attributes->{$_}},
+            }
+        ) foreach qw/ paragraph text /;
+    }
+
 }
 
 # _getStyleNameTransliterationMap
@@ -123,14 +131,36 @@ sub insertDocument {
 sub _getStyleNameTransliterationMap {
     my $oodoc_dest_document = shift;
     my $oodoc_from_document = shift;
+    my %params = @_;
 
+    my $family_max = {};
     my $transliteration_map = {};
+
     foreach my $family ( keys %stylefamily_map ) {
-        my $family_dest_max = _maxUsedNumberAutoStyleFamily($oodoc_dest_document, $family);
+        $family_max->{$family}->{dest} =
+            _maxUsedNumberAutoStyleFamily($oodoc_dest_document, $family);
+        $family_max->{$family}->{from} =
+            _maxUsedNumberAutoStyleFamily($oodoc_from_document, $family);
+
         $transliteration_map->{ $stylefamily_map{$family} . $_ } =
-            $stylefamily_map{$family} . ( $_ + $family_dest_max )
-                for 1 .. _maxUsedNumberAutoStyleFamily($oodoc_from_document, $family)
+            $stylefamily_map{$family} . ( $_ + $family_max->{$family}->{dest} )
+                for 1 .. $family_max->{$family}->{from}
+
+    };
+
+    # create aditional mappings, just in case we might need them
+    if ( $params{include_body_styles} ) {
+        foreach my $style_name ( qw/ Text_20_body First_20_paragraph /) {
+            my @elements = $oodoc_from_document->getBody->selectChildElements(
+                'text:p',,'text:style-name="'.$style_name.'"'
+            );
+            if ( @elements ) {
+                $transliteration_map->{$style_name} = 'P' .
+                    ( $family_max->{'paragraph'}{dest} + ++$family_max->{'paragraph'}{from} )
+            }
+        }
     }
+
     return $transliteration_map
 }
 
@@ -147,7 +177,7 @@ sub _maxUsedNumberAutoStyleFamily {
         ->getAutoStyleRoot
         ->selectChildElements('(style:style|text:list-style)');
 
-    return max ( 
+    return max (
         map {
             $oodoc_document->getAttribute($_, 'style:name') =~ /$stylefamily_map{$family}(\d+)/
         } @oodoc_styles
@@ -182,7 +212,7 @@ sub _transliterateStyleNamesAtrr{
     my $transliteration_map = shift;
     my $attribute_name      = shift;
 
-    my $xpath = sprintf './/[@%s =~ /^[LPT]\d+$/ ]', $attribute_name;
+    my $xpath = sprintf './/[@%s =~ /^([LPT]\d+|Text_20_body|First_20_paragraph)$/ ]', $attribute_name;
     foreach my $node ( $oodoc_element->findnodes($xpath) ) {
         my $stylename_old = $node->getAttribute($attribute_name);
         my $stylename_new = $transliteration_map->{$stylename_old};
@@ -194,20 +224,66 @@ sub _transliterateStyleNamesAtrr{
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+OpenOffice::OODoc::InsertDocument - Insert, merge or append OpenOffice::OODoc objects
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+    use OpenOffice::OODoc;
+    
+    my $oodoc_dest_document = odfDocument(file => "MyDestFile.odt");
+    my $oodoc_from_document = odfDocument(file => "MyFromFile.odt");
+    
+    my $replace_me_element = $oodoc_dest_document
+        ->selectElementByContent("[[ replace_me ]]");
+    $oodoc_dest_document
+        ->insertDocument( $replace_me_element, 'before', $oodoc_from_document );
+    $replace_me_element->delete;
+
+=head1 DESCRIPTION
+
+This module will enable to merge the content from one L<OpenOffice::OODoc> into
+another.
+
+=head1 METHODS
+
+=head2 appendDocument TODO
+
+Inserts an OpenOffice::OODoc at the end off the document.
+
+    $oodoc_orig->appendDocument( $oodoc_from, new_page => 1 );
+
+=head2 insertDocument
+
+Inserts a OODoc document at location.
+
+    $oodoc_dest_document->insertDocument( $oodoc_element, 'after', $oodoc_from );
+
+If there is any style associated with the C<$oodoc_element>, than that will be
+used for styling the document to be inserted. Otherwise, it will use default
+body styles instead.
+
 =head1 CAVEAT
 
+=head1 AUTHOR
 
+Theo van Hoesel <theo@mintlab.nl>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018, Th. J. van Hoesel - Mintlab B.V.
+This software is Copyright (c) 2018 by Mintlab / Zaaksysteem.nl.
 
-=head1 LICENCE
+This is free software, licensed under:
 
-This software is distributed, subject to the EUPL. You may not use this file
-except in compliance with the License. You may obtain a copy of the License at
-<http://joinup.ec.europa.eu/software/page/eupl>
+  The European Union Public License (EUPL) v1.1
 
-Software distributed under the License is distributed on an "AS IS"vbasis,
-WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the
-specific language governing rights and limitations under the License.
+=cut

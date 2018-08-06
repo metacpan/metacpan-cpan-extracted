@@ -2,12 +2,8 @@
 #
 # MakeMaker file for JavaScript::SpiderMonkey
 #
-# Revision:     $Revision: 1.7 $
-# Last Checkin: $Date: 2011/10/23 10:27:21 $
-# By:           $Author: thomas_busch $
-#
 # Authors: Mike Schilli  m@perlmeister.com, 2002-2005
-#          Thomas Busch  tbusch@cpan.org, 2006-2011
+#          Thomas Busch  tbusch@cpan.org, 2006-2018
 #
 ######################################################################
 
@@ -28,6 +24,8 @@ my @possible_libraries = qw(
   libjs.a
   js32.dll
   libmozjs.so
+  libmozjs185.so
+  libmozjs187.so
 );
 
 my %possible_install_paths = (

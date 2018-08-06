@@ -10,8 +10,10 @@
 #   Copyright (C) 2003-2006, 2014 Steve Hay.  All rights reserved.
 #
 # LICENCE
-#   You may distribute under the terms of either the GNU General Public License
-#   or the Artistic License, as specified in the LICENCE file.
+#   This script is free software; you can redistribute it and/or modify it under
+#   the same terms as Perl itself, i.e. under the terms of either the GNU
+#   General Public License or the Artistic License, as specified in the LICENCE
+#   file.
 #
 #===============================================================================
 
@@ -21,6 +23,8 @@ use strict;
 use warnings;
 
 use Test::More tests => 67;
+
+## no critic (Subroutines::ProhibitSubroutinePrototypes)
 
 sub new_filename();
 
@@ -46,7 +50,7 @@ MAIN: {
     my($file, $fh, $time, $errno, $lasterror, @stats, @lstats, @alt_stats);
 
     $file = new_filename();
-    open $fh, ">$file" or die "Can't create file '$file': $!\n";
+    open $fh, '>', $file or die "Can't create file '$file': $!\n";
     close $fh;
     $time  = time;
     @stats = stat $file;
@@ -61,7 +65,7 @@ MAIN: {
     unlink $file;
 
     $file = new_filename();
-    open $fh, ">$file" or die "Can't create file '$file': $!\n";
+    open $fh, '>', $file or die "Can't create file '$file': $!\n";
     close $fh;
     $time   = time;
     @lstats = lstat $file;
@@ -76,7 +80,7 @@ MAIN: {
     unlink $file;
 
     $file = new_filename();
-    open $fh, ">$file" or die "Can't create file '$file': $!\n";
+    open $fh, '>', $file or die "Can't create file '$file': $!\n";
     close $fh;
     $time   = time;
     @alt_stats = Win32::UTCFileTime::alt_stat($file);
@@ -91,7 +95,7 @@ MAIN: {
     unlink $file;
 
     $file = new_filename();
-    open $fh, ">$file" or die "Can't create file '$file': $!\n";
+    open $fh, '>', $file or die "Can't create file '$file': $!\n";
     close $fh;
     my($age, $utime, $ret);
     $time = time;

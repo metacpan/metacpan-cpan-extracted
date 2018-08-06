@@ -13,7 +13,7 @@ use Carp;
 use English qw/ -no_match_vars /;
 use base qw/Exporter/;
 
-our $VERSION     = version->new('0.004');
+our $VERSION     = version->new('0.005');
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
 
@@ -27,7 +27,7 @@ App::filewatch - Watch files and directories for changes
 
 =head1 VERSION
 
-This documentation refers to App::filewatch version 0.004
+This documentation refers to App::filewatch version 0.005
 
 =head1 SYNOPSIS
 

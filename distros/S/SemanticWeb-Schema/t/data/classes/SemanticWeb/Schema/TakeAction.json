@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>The act of gaining ownership of an object from an origin. Reciprocal of GiveAction.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/GiveAction\">GiveAction</a>: The reciprocal of TakeAction.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/ReceiveAction\">ReceiveAction</a>: Unlike ReceiveAction, TakeAction implies that ownership has been transfered.</li>\n</ul>\n",
+      "rdfs:label" : "TakeAction",
+      "rdfs:subClassOf" : "schema:TransferAction"
+   },
+   "properties" : {}
+}

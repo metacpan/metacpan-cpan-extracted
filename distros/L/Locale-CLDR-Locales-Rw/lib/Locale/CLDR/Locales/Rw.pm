@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Rw - Package for language Kinyarwanda
 
 package Locale::CLDR::Locales::Rw;
 # This file auto generated from Data\common\main\rw.xml
-#	on Fri 13 Apr  7:27:16 am GMT
+#	on Sun  5 Aug  6:20:06 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -559,7 +559,7 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
@@ -567,21 +567,21 @@ has 'day_periods' => (
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
-				'abbreviated' => {
-					'am' => q{AM},
+				'wide' => {
 					'pm' => q{PM},
+					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
+				'abbreviated' => {
+					'pm' => q{PM},
+					'am' => q{AM},
+				},
 				'wide' => {
 					'pm' => q{PM},
 					'am' => q{AM},
 				},
 				'narrow' => {
-					'am' => q{AM},
-					'pm' => q{PM},
-				},
-				'abbreviated' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},
@@ -708,7 +708,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{y-MM-dd},
 			yQQQ => q{y QQQ},
 			yQQQQ => q{y QQQQ},
-			yw => q{'week' w 'of' Y},
+			yw => q{'week' w 'of' y},
 		},
 	} },
 );

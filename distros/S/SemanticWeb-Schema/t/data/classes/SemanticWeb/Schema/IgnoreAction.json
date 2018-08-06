@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of intentionally disregarding the object. An agent ignores an object.",
+      "rdfs:label" : "IgnoreAction",
+      "rdfs:subClassOf" : "schema:AssessAction"
+   },
+   "properties" : {}
+}

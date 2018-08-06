@@ -13,7 +13,7 @@ use curry;
 
 use MojoX::JSON::RPC::Client;
 
-our $VERSION = '0.08';    ## VERSION
+our $VERSION = '0.09';    ## VERSION
 
 __PACKAGE__->register_type('jsonrpc');
 
@@ -43,7 +43,7 @@ sub call_rpc {
 
     my $callobj = {
         # enough for short-term uniqueness
-        id     => join('_', $$, $request_number++, time, (0 + [])),
+        id => join('_', $$, $request_number++, time, (0 + [])),
         method => $method,
         params => $self->make_call_params($c, $req_storage),
     };

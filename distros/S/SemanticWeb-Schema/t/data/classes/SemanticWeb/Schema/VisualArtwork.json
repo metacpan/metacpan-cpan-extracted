@@ -1,0 +1,107 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_VisualArtworkClass",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A work of art that is primarily visual in character.",
+      "rdfs:label" : "VisualArtwork",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:artEdition" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of copies when multiple copies of a piece of artwork are produced - e.g. for a limited edition of 20 prints, 'artEdition' refers to the total number of copies (in this example \"20\").",
+         "rdfs:label" : "artEdition",
+         "schema:domainIncludes" : "schema:VisualArtwork",
+         "schema:rangeIncludes" : [
+            "schema:Integer",
+            "schema:Text"
+         ]
+      },
+      "schema:artMedium" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The material used. (e.g. Oil, Watercolour, Acrylic, Linoprint, Marble, Cyanotype, Digital, Lithograph, DryPoint, Intaglio, Pastel, Woodcut, Pencil, Mixed Media, etc.)",
+         "rdfs:label" : "artMedium",
+         "rdfs:subPropertyOf" : "schema:material",
+         "schema:domainIncludes" : "schema:VisualArtwork",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      },
+      "schema:artform" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "e.g. Painting, Drawing, Sculpture, Print, Photograph, Assemblage, Collage, etc.",
+         "rdfs:label" : "artform",
+         "schema:domainIncludes" : "schema:VisualArtwork",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text"
+         ]
+      },
+      "schema:artworkSurface" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The supporting materials for the artwork, e.g. Canvas, Paper, Wood, Board, etc.",
+         "rdfs:label" : "artworkSurface",
+         "schema:domainIncludes" : "schema:VisualArtwork",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      },
+      "schema:depth" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The depth of the item.",
+         "rdfs:label" : "depth",
+         "schema:domainIncludes" : [
+            "schema:VisualArtwork",
+            "schema:Product"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Distance"
+         ]
+      },
+      "schema:height" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The height of the item.",
+         "rdfs:label" : "height",
+         "schema:domainIncludes" : [
+            "schema:Person",
+            "schema:Product",
+            "schema:VisualArtwork",
+            "schema:MediaObject"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Distance",
+            "schema:QuantitativeValue"
+         ]
+      },
+      "schema:surface" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A material used as a surface in some artwork, e.g. Canvas, Paper, Wood, Board, etc.",
+         "rdfs:label" : "surface",
+         "rdfs:subPropertyOf" : "schema:material",
+         "schema:domainIncludes" : "schema:VisualArtwork",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text"
+         ],
+         "schema:supersededBy" : "schema:artworkSurface"
+      },
+      "schema:width" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The width of the item.",
+         "rdfs:label" : "width",
+         "schema:domainIncludes" : [
+            "schema:VisualArtwork",
+            "schema:Product",
+            "schema:MediaObject"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Distance",
+            "schema:QuantitativeValue"
+         ]
+      }
+   }
+}

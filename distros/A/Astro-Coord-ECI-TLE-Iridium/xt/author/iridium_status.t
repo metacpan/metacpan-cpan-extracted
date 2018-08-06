@@ -31,7 +31,7 @@ my $ua = LWP::UserAgent->new(
 #    ssl_opts	=> { verify_hostname	=> 0 },	# Necessary until Perl recognizes McCants' cert.
 );
 
-my $asof = time_gm( 0, 0, 1, 20, 6, 2018 );
+my $asof = time_gm( 0, 0, 18, 30, 6, 2018 );
 
 foreach (
 	["T. S. Kelso's Iridium list",
@@ -63,7 +63,6 @@ foreach (
 24950IRIDIUM 31 [B]
 24966IRIDIUM 35 [B]
 24967IRIDIUM 36 [-]
-25040IRIDIUM 41 [-]
 25041IRIDIUM 40 [-]
 25042IRIDIUM 39 [-]
 25043IRIDIUM 38 [-]
@@ -107,7 +106,7 @@ foreach (
 27375IRIDIUM 95 [+]
 27376IRIDIUM 96 [-]
 27450IRIDIUM 97 [B]
-27451IRIDIUM 98 [P]
+27451IRIDIUM 98 [-]
 KELSO
 	["Rod Sladen's Iridium Constellation Status",
 	'http://www.rod.sladen.org.uk/iridium.htm',
@@ -126,78 +125,18 @@ content="text/html; charset=iso-8859-1">
 
 <h1 align="center">Iridium Constellation Status</h1>
 
-<p align="center"><strong>** Updated 19 July 2018 **</strong></p>
+<p align="center"><strong>** Updated 27 July 2018 **</strong></p>
 
 <p align="left"><strong>Latest changes </strong>(see below for
 earlier changes):</p>
 
-<p align="left">(19 July 2018): <strong>Iridium 65 (25288,
-1998-021D) decayed on 19 July 2018</strong></p>
+<p align="left"><strong>Iridium 41 (25040, 1997-069B) is expected
+to decay on 28 July 2018.</strong></p>
 
-<p align="left">(17 July 2018): <strong>Iridium 81 (25468,
-1998-051B) decayed on 17 July 2018</strong></p>
-
-<p align="left">(12 July 2018): <strong>The process of
-de-orbiting Iridium 80 (25469, 1998-051C) has started.</strong></p>
-
-<p align="left">(10 July 2018): <strong>Iridium 75 (25346,
-1998-032B) decayed on 10 July 2018</strong></p>
-
-<p align="left">(07 July 2018): <strong>The process of
-de-orbiting Iridium 98 (27451, 2002-031B) has started.</strong></p>
-
-<p align="left">(02 July 2018): <strong>Iridium 67 (25290,
-1998-021F) decayed on 02 July 2018</strong></p>
-
-<p align="left">(28 June 2018): <strong>The process of
-de-orbiting Iridium 65 (25288, 1998-021D) has started.</strong></p>
-
-<p align="left">(21 June 2018): <strong>The process of
-de-orbiting Iridium 41 (25040, 1997-069B) has started.</strong></p>
-
-<p align="left">(15 June 2018): <strong>The process of
-de-orbiting Iridium 75 (25346, 1998-032B) has started.</strong></p>
-
-<p align="left">(14 June 2018): Iridium 152 (43479, 2018-047D)
-has entered the operational constellation at Plane 6, Slot 8, a
-few seconds behind Iridium 80 (25469, 1998-051C).</p>
-
-<p align="left">(13 June 2018): <strong>The process of
-de-orbiting Iridium 81 (25468, 1998-051B) has started.</strong></p>
-
-<p align="left">(12 June 2018): The orbit of Iridium 70 (25342,
-1998-032A) has been lowered by 15km and it is presumably being
-retained as a spare for plane 1.</p>
-
-<p align="left">(10 June 2018): Iridium 147 (43480, 2018-047E)
-has entered the operational constellation at Plane 6, Slot 9, a
-few seconds behind Iridium 98 (27451, 2002-031B).<br>
-(09 June 2018): Iridium 110 (43481, 2018-047F) has entered the
-operational constellation at Plane 6, Slot 10, a few seconds
-behind Iridium 41 (25040, 1997-069B).</p>
-
-<p align="left">(08 June 2018): <strong>The process of
-de-orbiting Iridium 67 (25290, 1998-021F) has started.</strong></p>
-
-<p align="left">(06 June 2018): <strong>Iridium 68 (25291,
-1998-021G) decayed on 06 June 2018</strong></p>
-
-<p align="left">(05 June 2018): Iridium 115 (42806, 2017-039D)
-has completed migration from Orbital Plane 3 to Orbital Plane 2,
-and will presumably be kept as on-orbit spare for Orbital Plane
-2.</p>
-
-<p align="left">(01 June 2018): <strong>The process of
-de-orbiting Iridium 18 (24872, 1997-034D has started.</strong></p>
-
-<p align="left">(26 May 2018): <strong>Iridium 37 (24968,
-1997-056D) decayed on 26 May 2018<br>
-</strong>(24 May 2018): <strong>Iridium 21 (25778, 1999-032B)
-decayed on 24 May 2018</strong></p>
-
-<p align="left">(22 May 2018): <strong>The sixth Iridium Next
-launch took place on 22 May 2018 and was directed towards orbital
-plane 6. It included Iridiums 110, 147, 152, 161 and 162.</strong></p>
+<p align="left">(25 July 2018): <strong>The seventh Iridium Next
+launch took place on 25 July 2018 and was directed towards
+orbital plane 5. It included Iridiums 154, 155, 156, 158, 159,
+160, 163, 164, 165 and 166.</strong></p>
 
 <p align="left">For a summary of the Iridium launch sequence, see
 my <a href="iridium_launch.htm">Iridium Launch Chronology</a>.
@@ -211,16 +150,16 @@ Plane
 
 Plane 1: <strong>145</strong>    <strong>143</strong>    <strong>140</strong>    <strong>148</strong>    <strong>150</strong>     14    <strong>144</strong>    <strong>149</strong>    <strong>146</strong>    <strong>142</strong>    <strong>157</strong> <strong>    </strong>(62) (64) (70) (66)
                                                                              <strong>          (Iridium 153 is migrating from Plane 2 towards Plane 1) (Iridium 124 is migrating from Plane 3 towards Plane 1</strong>)
-Plane 2: <strong>134</strong>    <strong>141</strong>    <strong>137   </strong> <strong>116</strong>    <strong>135</strong>    <strong>151</strong>    <strong>120</strong>    <strong>113</strong>    <strong>138</strong>    <strong>130</strong> <strong>   131</strong>     <strong>115</strong>  (20) (11) (47) (76)<em> Note that Iridiums 113 and 120 were migrated from Plane 3 to Plane 2.</em> <em>Iridium 115 was migrated from Plane 3 to Plane 2</em>
-                                                                          <strong>             </strong>
+Plane 2: <strong>134</strong>    <strong>141</strong>    <strong>137   </strong> <strong>116</strong>    <strong>135</strong>    <strong>151</strong>    <strong>120</strong>    <strong>113</strong>    <strong>138</strong>    <strong>130</strong> <strong>   131</strong>     <strong>115</strong>  (20) (11) (47) (76)<em> </em>
+                                                                          <strong>             </strong><em>Note that Iridiums 113 and 120 were migrated from Plane 3 to Plane 2.</em> <em>Iridium 115 was migrated from Plane 3 to Plane 2</em>
 Plane 3: <strong>117</strong>     <a href="iridium28and95.htm">95</a>     45    <strong>123</strong>    <strong>126</strong>     32     <a
-href="iridium33collision.htm">91</a>    <strong>121</strong>    <strong>118</strong>     59     60  <strong> </strong>  (31) (55) ((58))
-
-Plane 4: <strong>119</strong>    <strong>122</strong>    <strong>128    107</strong>   <strong> 132</strong>    <strong>129</strong>    <strong>127</strong>    <strong>133 </strong>   <strong>125</strong>    <strong>136</strong>    <strong>139</strong>     (97) (61) (35) <em>Note that Iridium 128 was migrated from Plane 3 to Plane 4.
+href="iridium33collision.htm">91</a>    <strong>121</strong>    <strong>118</strong>     59     60  <strong> </strong>  (31) (55) (58)
+                                                                                       <em>Note that Iridium 128 was migrated from Plane 3 to Plane 4.</em>
+Plane 4: <strong>119</strong>    <strong>122</strong>    <strong>128    107</strong>   <strong> 132</strong>    <strong>129</strong>    <strong>127</strong>    <strong>133 </strong>   <strong>125</strong>    <strong>136</strong>    <strong>139</strong>     (97) (61) (35) <em>
 </em>
 Plane 5:  50     56     52     53     <a href="iridium9and84.htm">84</a>     10     54    <strong>105</strong>    <strong>108</strong>     83     <a
-href="iridium16and86.htm">86</a>     (12) <em>Note that Iridiums 108 and 105 were migrated from Plane 6 to Plane 5. </em>
-                                                                           <strong>           </strong>
+href="iridium16and86.htm">86</a>     (12) (<strong>154, 155, 156, 158, 159, 160, 163, 164, 165, 166</strong>)
+                                                                           <strong>           </strong><em> Note that Iridiums 108 and 105 were migrated from Plane 6 to Plane 5. </em>
 Plane 6: <strong>102    112    104    114    103    109    106</strong>    <strong>152</strong>    <strong>147</strong>    <strong>110</strong>    <strong>111</strong>     <strong>162  161</strong>  (15)<strong>
 </strong>                                                            </pre>
 
@@ -299,6 +238,74 @@ Spacecom as Iridium 20, and correctly tracked, but under 25577
 which originally belonged to (the second) Iridium 11. </p>
 
 <p><a name="Recent changes"><strong>Recent changes</strong></a>: </p>
+
+<p align="left">(19 July 2018): <strong>Iridium 65 (25288,
+1998-021D) decayed on 19 July 2018</strong></p>
+
+<p align="left">(17 July 2018): <strong>Iridium 81 (25468,
+1998-051B) decayed on 17 July 2018</strong></p>
+
+<p align="left">(12 July 2018): <strong>The process of
+de-orbiting Iridium 80 (25469, 1998-051C) has started.</strong></p>
+
+<p align="left">(10 July 2018): <strong>Iridium 75 (25346,
+1998-032B) decayed on 10 July 2018</strong></p>
+
+<p align="left">(07 July 2018): <strong>The process of
+de-orbiting Iridium 98 (27451, 2002-031B) has started.</strong></p>
+
+<p align="left">(02 July 2018): <strong>Iridium 67 (25290,
+1998-021F) decayed on 02 July 2018</strong></p>
+
+<p align="left">(28 June 2018): <strong>The process of
+de-orbiting Iridium 65 (25288, 1998-021D) has started.</strong></p>
+
+<p align="left">(21 June 2018): <strong>The process of
+de-orbiting Iridium 41 (25040, 1997-069B) has started.</strong></p>
+
+<p align="left">(15 June 2018): <strong>The process of
+de-orbiting Iridium 75 (25346, 1998-032B) has started.</strong></p>
+
+<p align="left">(14 June 2018): Iridium 152 (43479, 2018-047D)
+has entered the operational constellation at Plane 6, Slot 8, a
+few seconds behind Iridium 80 (25469, 1998-051C).</p>
+
+<p align="left">(13 June 2018): <strong>The process of
+de-orbiting Iridium 81 (25468, 1998-051B) has started.</strong></p>
+
+<p align="left">(12 June 2018): The orbit of Iridium 70 (25342,
+1998-032A) has been lowered by 15km and it is presumably being
+retained as a spare for plane 1.</p>
+
+<p align="left">(10 June 2018): Iridium 147 (43480, 2018-047E)
+has entered the operational constellation at Plane 6, Slot 9, a
+few seconds behind Iridium 98 (27451, 2002-031B).<br>
+(09 June 2018): Iridium 110 (43481, 2018-047F) has entered the
+operational constellation at Plane 6, Slot 10, a few seconds
+behind Iridium 41 (25040, 1997-069B).</p>
+
+<p align="left">(08 June 2018): <strong>The process of
+de-orbiting Iridium 67 (25290, 1998-021F) has started.</strong></p>
+
+<p align="left">(06 June 2018): <strong>Iridium 68 (25291,
+1998-021G) decayed on 06 June 2018</strong></p>
+
+<p align="left">(05 June 2018): Iridium 115 (42806, 2017-039D)
+has completed migration from Orbital Plane 3 to Orbital Plane 2,
+and will presumably be kept as on-orbit spare for Orbital Plane
+2.</p>
+
+<p align="left">(01 June 2018): <strong>The process of
+de-orbiting Iridium 18 (24872, 1997-034D has started.</strong></p>
+
+<p align="left">(26 May 2018): <strong>Iridium 37 (24968,
+1997-056D) decayed on 26 May 2018<br>
+</strong>(24 May 2018): <strong>Iridium 21 (25778, 1999-032B)
+decayed on 24 May 2018</strong></p>
+
+<p align="left">(22 May 2018): <strong>The sixth Iridium Next
+launch took place on 22 May 2018 and was directed towards orbital
+plane 6. It included Iridiums 110, 147, 152, 161 and 162.</strong></p>
 
 <p align="left">(14 May 2018): <strong>Iridium 25 (24904,
 1997-043B) decayed on 14 May 2018<br>

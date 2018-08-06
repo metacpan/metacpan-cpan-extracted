@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Pa::Arab - Package for language Punjabi
 
 package Locale::CLDR::Locales::Pa::Arab;
 # This file auto generated from Data\common\main\pa_Arab.xml
-#	on Fri 13 Apr  7:24:58 am GMT
+#	on Sun  5 Aug  6:17:32 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -248,8 +248,7 @@ has 'day_period_data' => (
 		SWITCH:
 		for ($type) {
 			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
+				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
 					return 'morning1' if $time >= 400
@@ -259,21 +258,21 @@ has 'day_period_data' => (
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
 				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
+				if($day_period_type eq 'selection') {
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
 					return 'morning1' if $time >= 400
@@ -283,15 +282,16 @@ has 'day_period_data' => (
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
 				}
-				if($day_period_type eq 'selection') {
-					return 'morning1' if $time >= 400
-						&& $time < 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
+				if($day_period_type eq 'default') {
+					return 'midnight' if $time == 0;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 400;
 					return 'evening1' if $time >= 1600
 						&& $time < 2100;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 400
+						&& $time < 1200;
 				}
 				last SWITCH;
 				}
@@ -377,17 +377,17 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			HHmmss => q{HH:mm:ss},
-			Md => q{d/M},
-			mmss => q{mm:ss},
-			yMMM => q{MMM y},
-			yQQQ => q{QQQ y},
-		},
 		'generic' => {
 			HHmmss => q{HH:mm:ss},
 			Md => q{d/M},
 			ms => q{mm:ss},
+			yMMM => q{MMM y},
+			yQQQ => q{QQQ y},
+		},
+		'gregorian' => {
+			HHmmss => q{HH:mm:ss},
+			Md => q{d/M},
+			mmss => q{mm:ss},
 			yMMM => q{MMM y},
 			yQQQ => q{QQQ y},
 		},

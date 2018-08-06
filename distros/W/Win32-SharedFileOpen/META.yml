@@ -3,19 +3,11 @@ abstract: 'Open a file for shared reading and/or writing'
 author:
   - 'Steve Hay <shay@cpan.org>'
 build_requires:
-  Config: '0'
-  Errno: '0'
   ExtUtils::MakeMaker: '0'
   FileHandle: '0'
   IO::File: '0'
   IO::Handle: '0'
-  Symbol: '0'
   Test::More: '0'
-  Time::HiRes: '0'
-  Win32::WinError: '0'
-  perl: '5.008001'
-  strict: '0'
-  warnings: '0'
 configure_requires:
   Config: '0'
   ExtUtils::MakeMaker: '6.66'
@@ -25,7 +17,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,9 +30,17 @@ no_index:
   package:
     - Win32::SharedFileOpen::_NaturalNumber
 optional_features:
+  changestest:
+    description: 'Changes testing'
+  critictest:
+    description: 'Perl::Critic testing'
+  podcoveragetest:
+    description: 'POD coverage testing'
   podtest:
     description: 'POD testing'
 requires:
+  Carp: '0'
+  Config: '0'
   Errno: '0'
   Exporter: '0'
   Symbol: '0'
@@ -48,6 +48,8 @@ requires:
   Win32::WinError: '0'
   XSLoader: '0'
   perl: '5.008001'
+  strict: '0'
+  warnings: '0'
 resources:
   repository: https://github.com/steve-m-hay/Win32-SharedFileOpen.git
-version: '4.02'
+version: '4.03'

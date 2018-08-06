@@ -24,6 +24,9 @@ WriteMakefile (
   'CONFIGURE_REQUIRES' => {
     "ExtUtils::MakeMaker" => "6.30"
   },
+  'TEST_REQUIRES' => {
+      'Test::More' => '0.88',
+  },
   'LIBS'      => [''],
   'EXE_FILES' => [ 'mimetype', 'mimeopen' ],
   'dist' => {
@@ -50,9 +53,11 @@ WriteMakefile (
         'Michiel Beijen <michiel.beijen@gmail.com>',
         'Nitish Bezzala <nbezzala@yahoo.com>',
         'Patrick Burroughs (Celti) <celti@celti.name>',
+        'Rudolf Leermakers <rudolf@hatsuseno.org>',
         'Sean Smith <ssmith@ncsgraphics.com>',
         'Stefan Seifert <nine@detonation.org>',
         'brian m. carlson <sandals@crustytoothpaste.net>',
+        'gregor herrmann <gregoa@debian.org>',
     ],
   },
 );

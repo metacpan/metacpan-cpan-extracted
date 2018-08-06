@@ -1,0 +1,48 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::CleanNamespaces' => '0.15',
+                                      'Test::EOF' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Portability::Files' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Ref::Util::XS' => '0',
+                                        'Type::Tiny::XS' => '0',
+                                        'aliased' => '0'
+                                      },
+                      'requires' => {
+                                      'List::Util' => '1.33',
+                                      'Moo' => '0',
+                                      'MooX::JSON_LD' => 'v0.0.13',
+                                      'Ref::Util' => '0',
+                                      'Types::Standard' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'perl' => 'v5.10.1'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::Spec' => '0',
+                                   'Module::Metadata' => '0',
+                                   'Test::JSON::More' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'aliased' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

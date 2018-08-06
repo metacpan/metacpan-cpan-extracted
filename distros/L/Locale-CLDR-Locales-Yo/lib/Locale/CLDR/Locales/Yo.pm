@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Yo - Package for language Yoruba
 
 package Locale::CLDR::Locales::Yo;
 # This file auto generated from Data\common\main\yo.xml
-#	on Fri 13 Apr  7:34:31 am GMT
+#	on Sun  5 Aug  6:28:13 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -671,6 +671,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ouguiya ti Orílẹ́ède Maritania \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ouguiya ti Orílẹ́ède Maritania),
 			},
 		},
@@ -741,6 +746,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dobira ti Orílẹ́ède Sao tome Ati Pirisipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dobira ti Orílẹ́ède Sao tome Ati Pirisipe),
 			},
@@ -1051,17 +1061,17 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{Àárọ̀},
-					'pm' => q{Ọ̀sán},
-				},
 				'narrow' => {
 					'pm' => q{Ọ̀sán},
 					'am' => q{Àárọ̀},
 				},
-				'abbreviated' => {
-					'am' => q{Àárọ̀},
+				'wide' => {
 					'pm' => q{Ọ̀sán},
+					'am' => q{Àárọ̀},
+				},
+				'abbreviated' => {
+					'pm' => q{Ọ̀sán},
+					'am' => q{Àárọ̀},
 				},
 			},
 			'stand-alone' => {
@@ -1070,12 +1080,12 @@ has 'day_periods' => (
 					'am' => q{Àárọ̀},
 				},
 				'narrow' => {
-					'am' => q{Àárọ̀},
 					'pm' => q{Ọ̀sán},
+					'am' => q{Àárọ̀},
 				},
 				'wide' => {
-					'am' => q{Àárọ̀},
 					'pm' => q{Ọ̀sán},
+					'am' => q{Àárọ̀},
 				},
 			},
 		},
@@ -1201,7 +1211,7 @@ has 'datetime_formats_available_formats' => (
 			yMd => q{y-MM-dd},
 			yQQQ => q{QQQ y},
 			yQQQQ => q{QQQQ y},
-			yw => q{'week' w 'of' Y},
+			yw => q{'week' w 'of' y},
 		},
 		'generic' => {
 			Hm => q{HH:mm},

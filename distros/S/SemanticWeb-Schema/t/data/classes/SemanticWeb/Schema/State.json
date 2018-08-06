@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A state or province of a country.",
+      "rdfs:label" : "State",
+      "rdfs:subClassOf" : "schema:AdministrativeArea"
+   },
+   "properties" : {}
+}

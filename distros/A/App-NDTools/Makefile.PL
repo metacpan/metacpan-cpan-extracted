@@ -55,7 +55,7 @@ WriteMakefile(
         'Storable'                  => 0,
         'Struct::Diff'              => 0.96,
         'Struct::Path'              => 0.81,
-        'Struct::Path::PerlStyle'   => 0.80,
+        'Struct::Path::PerlStyle'   => 0.90,
         'Term::ANSIColor'           => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

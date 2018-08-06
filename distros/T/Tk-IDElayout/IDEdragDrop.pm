@@ -2,9 +2,9 @@ package Tk::IDEdragDrop;
 require Tk::Toplevel;
 require Tk::Label;
 use Tk::IDEdragShadowToplevel;
+use English;
 
-
-our ($VERSION) = ('0.33');
+our ($VERSION) = ('0.34');
 
 use base  qw( Tk::DragDrop);
 
@@ -12,7 +12,7 @@ our($DEBUG);
 
 =head1 NAME 
 
-Tk::IDEdragDrop - Tk::DragDrop subclass for IDE Drag/Drop Behavoir
+Tk::IDEdragDrop - Tk::DragDrop subclass for IDE Drag/Drop Behavior
 
 =head1 DESCRIPTION
 
@@ -94,32 +94,40 @@ sub event
 
 sub Drop
 {
- my $ewin  = shift;
- print "In Drop\n" if($DEBUG);
- my $e     = $ewin->parent->XEvent;
- my $token = $ewin->toplevel;
- my $site  = $ewin->FindSite($e->X,$e->Y,$e);
- if (defined $site)
-  {
-   my $seln = $token->cget('-selection');
-   unless ($token->Callback(-predropcommand => $seln, $site))
-    {
-# XXX This is ugly if the user restarts a drag within the 2000 ms:
-#     my $id = $token->after(2000,[$token,'Done']);
-     my $w = $token->parent;
-     $token->InstallHandlers;
-     $site->Drop($token,$seln,$e);
-     $token->Callback(-postdropcommand => $seln);
-     $token->Done;
-     #print "Hiding DragShowTopLevel after Drop\n";
-     $token->DragShadowToplevelHide();
+	my $ewin  = shift;
+	print "In Drop\n" if($DEBUG);
+	my $e     = $ewin->parent->XEvent;
+	my $token = $ewin->toplevel;
+	my $site  = $ewin->FindSite($e->X,$e->Y,$e);
+	if (defined $site)
+	{
+		my $seln = $token->cget('-selection');
+		unless ($token->Callback(-predropcommand => $seln, $site))
+		{
+			# XXX This is ugly if the user restarts a drag within the 2000 ms:
+			#     my $id = $token->after(2000,[$token,'Done']);
+			my $w = $token->parent;
+			$token->InstallHandlers;
+			$site->Drop($token,$seln,$e);
+			$token->Callback(-postdropcommand => $seln);
+			$token->Done;
+			#print "Hiding DragShowTopLevel after Drop\n";
+			$token->DragShadowToplevelHide();
+		}
+	}
+	else
+	{
+		$token->Done;
+	}
+	
+	eval{
+		$token->Callback('-endcommand');
+	};
+	if ( $EVAL_ERROR ) {
+        print STDERR "Error calling -endcommand: " . $EVAL_ERROR;
+		print STDERR "Possible source of error: widgets need containers to properly work with Tk::CaptureRelease";
+		print STDERR "See method createTextWindow in testTextEdit file in dist for details";
     }
-  }
- else
-  {
-   $token->Done;
-  }
- $token->Callback('-endcommand');
 }
 #
 

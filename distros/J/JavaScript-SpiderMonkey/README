@@ -1,5 +1,5 @@
 ######################################################################
-    JavaScript::SpiderMonkey 0.17
+    JavaScript::SpiderMonkey 0.23
 ######################################################################
 
 NAME
@@ -36,7 +36,7 @@ SYNOPSIS
 
 INSTALL
     JavaScript::SpiderMonkey requires Mozilla's readily compiled
-    SpiderMonkey 1.5 distribution or better. Please check "SpiderMonkey
+    SpiderMonkey 1.6 distribution or better. Please check "SpiderMonkey
     Installation".
 
 DESCRIPTION
@@ -154,16 +154,16 @@ DESCRIPTION
 
 SpiderMonkey Installation
     First, get the latest SpiderMonkey distribution from mozilla.org:
-    http://www.mozilla.org/js/spidermonkey shows which releases are
-    available. "js-1.5-rc3a.tar.gz" has been proven to work.
+    http://ftp.mozilla.org/pub/spidermonkey/releases/ shows which releases are
+    available. "js-1.60.tar.gz" has been proven to work.
 
     Untar it at the same directory level as you just untarred the
     "JavaScript::SpiderMonkey" distribution you're currently reading. So, if
     you're currently in "/my/path/JavaScript-SpiderMonkey-v.vv", do this:
 
-        cp js-1.5-rc3a.tar.gz /my/path
+        cp js-1.60.tar.gz /my/path
         cd /my/path
-        tar zxfv js-1.5-rc3a.tar.gz
+        tar zxfv js-1.60.tar.gz
 
     Then, compile the SpiderMonkey distribution, if you're on Linux, just
     use:
@@ -177,7 +177,7 @@ SpiderMonkey Installation
         [/my/path]$ ls
         JavaScript-SpiderMonkey-v.vv
         js
-        js-1.5-rc3a.tar.gz
+        js-1.60.tar.gz
         [/my/path]$
 
     (Note that you *can* untar the SpiderMonkey distribution elsewhere, but,
@@ -200,11 +200,13 @@ SpiderMonkey Installation
         make test
         make install
 
-AUTHOR
-    Mike Schilli, <m@perlmeister.com>
+AUTHORS 
+    Mike Schilli
+    Thomas Busch
 
 COPYRIGHT AND LICENSE
-    Copyright 2002 by Mike Schilli
+    Copyright (c) 2002-2005 Mike Schilli
+    Copyright (c) 2006-2018 Thomas Busch
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

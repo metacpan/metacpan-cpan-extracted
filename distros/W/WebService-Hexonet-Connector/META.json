@@ -31,10 +31,23 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Data::Dumper" : "2.161",
+            "LWP::UserAgent" : "6.35",
+            "MIME::Base64" : "0",
+            "Time::Local" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test::Exception" : "0.43",
+            "Test::More" : "0",
+            "Test::RequiresInternet" : "0.05"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "1.05",
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -25,4 +25,4 @@ requires:
   Fcntl: 0
   File::Glob: 0
   POSIX: 0
-version: 2.05
+version: 2.06

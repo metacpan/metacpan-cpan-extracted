@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of distributing content to people for their amusement or edification.",
+      "rdfs:label" : "ShareAction",
+      "rdfs:subClassOf" : "schema:CommunicateAction"
+   },
+   "properties" : {}
+}

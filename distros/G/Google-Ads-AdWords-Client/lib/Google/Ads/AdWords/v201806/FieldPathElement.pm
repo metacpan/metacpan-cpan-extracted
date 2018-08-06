@@ -64,7 +64,7 @@ Google::Ads::AdWords::v201806::FieldPathElement
 Perl data type class for the XML Schema defined complexType
 FieldPathElement from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+A segment of a field path. Each dot in a field path defines a new segment. 
 
 
 

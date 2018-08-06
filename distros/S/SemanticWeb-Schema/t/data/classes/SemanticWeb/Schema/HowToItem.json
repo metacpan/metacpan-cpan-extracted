@@ -1,0 +1,21 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An item used as either a tool or supply when performing the instructions for how to to achieve a result.",
+      "rdfs:label" : "HowToItem",
+      "rdfs:subClassOf" : "schema:ListItem"
+   },
+   "properties" : {
+      "schema:requiredQuantity" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The required quantity of the item(s).",
+         "rdfs:label" : "requiredQuantity",
+         "schema:domainIncludes" : "schema:HowToItem",
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Text",
+            "schema:Number"
+         ]
+      }
+   }
+}

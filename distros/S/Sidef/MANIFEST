@@ -285,6 +285,7 @@ scripts/RosettaCode/bitwise_operations.sf
 scripts/RosettaCode/boolean_values.sf
 scripts/RosettaCode/boolean_values_1.sf
 scripts/RosettaCode/brace_expansion.sf
+scripts/RosettaCode/burrows_wheeler_transform.sf
 scripts/RosettaCode/cantor_set.sf
 scripts/RosettaCode/case-sensitivity_of_identifiers.sf
 scripts/RosettaCode/catalan_numbers.sf
@@ -636,6 +637,7 @@ scripts/Tests/averages_mode.sf
 scripts/Tests/balanced_brakets.sf
 scripts/Tests/bare_multiplication.sf
 scripts/Tests/base64_decoder.sf
+scripts/Tests/basic_interpreter.sf
 scripts/Tests/beadsort.sf
 scripts/Tests/best_shuffle.sf
 scripts/Tests/binary_search.sf
@@ -681,6 +683,7 @@ scripts/Tests/def_primitive_type.sf
 scripts/Tests/def_primitive_type_2.sf
 scripts/Tests/default_param_values.sf
 scripts/Tests/default_var_values.sf
+scripts/Tests/divisor_functions.sf
 scripts/Tests/draw_grid_of_squares_multi.sf
 scripts/Tests/draw_grid_of_squares_multi_2.sf
 scripts/Tests/dump_cyclic_references.sf
@@ -918,6 +921,7 @@ scripts/Tests/unary_inc_dec.sf
 scripts/Tests/unexecuted_arguments.sf
 scripts/Tests/unicode.sf
 scripts/Tests/unicode_support.sf
+scripts/Tests/unicode_whitespaces.sf
 scripts/Tests/url_encoding_decoding.sf
 scripts/Tests/var_ref.sf
 scripts/Tests/var_scoping.sf

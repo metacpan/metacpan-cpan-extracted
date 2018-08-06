@@ -1,42 +1,42 @@
 package Term::Caca::Event;
-BEGIN {
-  $Term::Caca::Event::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $Term::Caca::Event::VERSION = '1.2.0';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: base class for Term::Caca events
-
+$Term::Caca::Event::VERSION = '3.0.0';
 
 use strict;
 use warnings;
 
-use Method::Signatures;
-use Term::Caca;
+use FFI::Platypus::Memory;
 
-sub new {
-    my $self = bless {}, shift;
+use Moose;
 
-    my %args = @_;
+has event => (
+    is => 'ro',
+    required => 1,
+    predicate => 'has_event',
+);
 
-    $self->{event} = $args{event};
+has type => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        ( ref $_[0] ) =~ s/Term::Caca::Event:://r;
+    }
+);
 
-    return $self;
-}
-
-method _event { $self->{event} }
-
-sub DESTROY {
+sub DEMOLISH {
     my $self = shift;
 
-    Term::Caca::_free_event($self->_event) if $self->_event;
+    free $self->event if $self->has_event;
 }
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -44,12 +44,24 @@ Term::Caca::Event - base class for Term::Caca events
 
 =head1 VERSION
 
-version 1.2.0
+version 3.0.0
 
 =head1 DESCRIPTION
 
 This class is inherited by the C<Term::Caca::Event::*>
 classes, and shouldn't be used directly.
+
+=head1 ATTRIBUTES
+
+=head2 event 
+
+Required. The underlying caca event structure.
+
+=head2 type 
+
+Holds the name of the event (which is the 
+name of the class without the 
+leading C<Term::Caca::Event::>.
 
 =head1 AUTHORS
 
@@ -67,11 +79,10 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by John Beppu.
+This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
 
 This is free software, licensed under:
 
   DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
 
 =cut
-

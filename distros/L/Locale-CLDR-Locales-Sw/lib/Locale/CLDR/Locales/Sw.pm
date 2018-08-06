@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Sw - Package for language Swahili
 
 package Locale::CLDR::Locales::Sw;
 # This file auto generated from Data\common\main\sw.xml
-#	on Fri 13 Apr  7:29:58 am GMT
+#	on Sun  5 Aug  6:23:07 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -22,6 +22,245 @@ use Types::Standard qw( Str Int HashRef ArrayRef CodeRef RegexpRef );
 use Moo;
 
 extends('Locale::CLDR::Locales::Root');
+has 'valid_algorithmic_formats' => (
+	is => 'ro',
+	isa => ArrayRef,
+	init_arg => undef,
+	default => sub {[ 'spellout-numbering-year','spellout-numbering','spellout-cardinal','spellout-ordinal' ]},
+);
+
+has 'algorithmic_number_format_data' => (
+	is => 'ro',
+	isa => HashRef,
+	init_arg => undef,
+	default => sub { 
+		use bignum;
+		return {
+		'spellout-cardinal' => {
+			'public' => {
+				'-x' => {
+					divisor => q(1),
+					rule => q(kasoro →→),
+				},
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(sifuri),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← nukta →→),
+				},
+				'1' => {
+					base_value => q(1),
+					divisor => q(1),
+					rule => q(moja),
+				},
+				'2' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(mbili),
+				},
+				'3' => {
+					base_value => q(3),
+					divisor => q(1),
+					rule => q(tatu),
+				},
+				'4' => {
+					base_value => q(4),
+					divisor => q(1),
+					rule => q(nne),
+				},
+				'5' => {
+					base_value => q(5),
+					divisor => q(1),
+					rule => q(tano),
+				},
+				'6' => {
+					base_value => q(6),
+					divisor => q(1),
+					rule => q(sita),
+				},
+				'7' => {
+					base_value => q(7),
+					divisor => q(1),
+					rule => q(saba),
+				},
+				'8' => {
+					base_value => q(8),
+					divisor => q(1),
+					rule => q(nane),
+				},
+				'9' => {
+					base_value => q(9),
+					divisor => q(1),
+					rule => q(tisa),
+				},
+				'10' => {
+					base_value => q(10),
+					divisor => q(10),
+					rule => q(kumi[ na →→]),
+				},
+				'20' => {
+					base_value => q(20),
+					divisor => q(10),
+					rule => q(ishirini[ na →→]),
+				},
+				'30' => {
+					base_value => q(30),
+					divisor => q(10),
+					rule => q(thelathini[ na →→]),
+				},
+				'40' => {
+					base_value => q(40),
+					divisor => q(10),
+					rule => q(arobaini[ na →→]),
+				},
+				'50' => {
+					base_value => q(50),
+					divisor => q(10),
+					rule => q(hamsini[ na →→]),
+				},
+				'60' => {
+					base_value => q(60),
+					divisor => q(10),
+					rule => q(sitini[ na →→]),
+				},
+				'70' => {
+					base_value => q(70),
+					divisor => q(10),
+					rule => q(sabini[ na →→]),
+				},
+				'80' => {
+					base_value => q(80),
+					divisor => q(10),
+					rule => q(themanini[ na →→]),
+				},
+				'90' => {
+					base_value => q(90),
+					divisor => q(10),
+					rule => q(tisini[ na →→]),
+				},
+				'100' => {
+					base_value => q(100),
+					divisor => q(100),
+					rule => q(mia ←←[ na →→]),
+				},
+				'1000' => {
+					base_value => q(1000),
+					divisor => q(1000),
+					rule => q(elfu ←←[, →→]),
+				},
+				'1000000' => {
+					base_value => q(1000000),
+					divisor => q(1000000),
+					rule => q(milioni ←←[, →→]),
+				},
+				'1000000000' => {
+					base_value => q(1000000000),
+					divisor => q(1000000000),
+					rule => q(bilioni ←←[, →→]),
+				},
+				'1000000000000' => {
+					base_value => q(1000000000000),
+					divisor => q(1000000000000),
+					rule => q(trilioni ←←[, →→]),
+				},
+				'1000000000000000' => {
+					base_value => q(1000000000000000),
+					divisor => q(1000000000000000),
+					rule => q(kvadrilioni ←←[, →→]),
+				},
+				'1000000000000000000' => {
+					base_value => q(1000000000000000000),
+					divisor => q(1000000000000000000),
+					rule => q(=#,##0.#=),
+				},
+				'Inf' => {
+					divisor => q(1),
+					rule => q(usio),
+				},
+				'NaN' => {
+					divisor => q(1),
+					rule => q(si nambari),
+				},
+				'max' => {
+					divisor => q(1),
+					rule => q(si nambari),
+				},
+			},
+		},
+		'spellout-numbering' => {
+			'public' => {
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-cardinal=),
+				},
+				'max' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-cardinal=),
+				},
+			},
+		},
+		'spellout-numbering-year' => {
+			'public' => {
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(=%spellout-numbering=),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=0.0=),
+				},
+				'max' => {
+					divisor => q(1),
+					rule => q(=0.0=),
+				},
+			},
+		},
+		'spellout-ordinal' => {
+			'public' => {
+				'-x' => {
+					divisor => q(1),
+					rule => q(wa kasoro →%spellout-cardinal→),
+				},
+				'0' => {
+					base_value => q(0),
+					divisor => q(1),
+					rule => q(wa sifuri),
+				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=0.0=),
+				},
+				'1' => {
+					base_value => q(1),
+					divisor => q(1),
+					rule => q(kwanza),
+				},
+				'2' => {
+					base_value => q(2),
+					divisor => q(1),
+					rule => q(pili),
+				},
+				'3' => {
+					base_value => q(3),
+					divisor => q(1),
+					rule => q(wa =%spellout-cardinal=),
+				},
+				'max' => {
+					base_value => q(3),
+					divisor => q(1),
+					rule => q(wa =%spellout-cardinal=),
+				},
+			},
+		},
+	} },
+);
+
 # Need to add code for Key type pattern
 sub display_name_pattern {
 	my ($self, $name, $region, $script, $variant) = @_;
@@ -3803,6 +4042,13 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(Ouguiya ya Mauritania \(1973–2017\)),
+				'one' => q(ouguiya ya Mauritania \(1973–2017\)),
+				'other' => q(ouguiya za Mauritania \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ouguiya ya Mauritania),
 				'one' => q(ouguiya ya Mauritania),
 				'other' => q(ouguiya za Mauritania),
@@ -4112,6 +4358,14 @@ has 'currencies' => (
 		},
 		'STD' => {
 			symbol => 'STD',
+			display_name => {
+				'currency' => q(Dobra ya Sao Tome na Principe \(1977–2017\)),
+				'one' => q(dobra ya Sao Tome na Principe \(1977–2017\)),
+				'other' => q(dobra za Sao Tome na Principe \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
 			display_name => {
 				'currency' => q(Dobra ya Sao Tome na Principe),
 				'one' => q(dobra ya Sao Tome na Principe),
@@ -4623,61 +4877,61 @@ has 'day_period_data' => (
 		$day_period_type //= 'default';
 		SWITCH:
 		for ($type) {
-			if ($_ eq 'gregorian') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 400
-						&& $time < 700;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
-					return 'morning2' if $time >= 700
-						&& $time < 1200;
-				}
+			if ($_ eq 'generic') {
 				if($day_period_type eq 'selection') {
 					return 'morning2' if $time >= 700
 						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
 					return 'night1' if $time >= 1900;
 					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 1900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 400
+						&& $time < 700;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1600
+						&& $time < 1900;
 					return 'morning1' if $time >= 400
 						&& $time < 700;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
+					return 'morning2' if $time >= 700
+						&& $time < 1200;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
 				}
 				last SWITCH;
 				}
-			if ($_ eq 'generic') {
-				if($day_period_type eq 'default') {
-					return 'midnight' if $time == 0;
-					return 'noon' if $time == 1200;
-					return 'afternoon1' if $time >= 1200
-						&& $time < 1600;
-					return 'morning1' if $time >= 400
-						&& $time < 700;
-					return 'night1' if $time >= 1900;
-					return 'night1' if $time < 400;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
-					return 'morning2' if $time >= 700
-						&& $time < 1200;
-				}
+			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'selection') {
 					return 'morning2' if $time >= 700
 						&& $time < 1200;
-					return 'evening1' if $time >= 1600
-						&& $time < 1900;
 					return 'night1' if $time >= 1900;
 					return 'night1' if $time < 400;
+					return 'evening1' if $time >= 1600
+						&& $time < 1900;
+					return 'afternoon1' if $time >= 1200
+						&& $time < 1600;
+					return 'morning1' if $time >= 400
+						&& $time < 700;
+				}
+				if($day_period_type eq 'default') {
+					return 'noon' if $time == 1200;
+					return 'midnight' if $time == 0;
+					return 'evening1' if $time >= 1600
+						&& $time < 1900;
 					return 'morning1' if $time >= 400
 						&& $time < 700;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1600;
+					return 'morning2' if $time >= 700
+						&& $time < 1200;
+					return 'night1' if $time >= 1900;
+					return 'night1' if $time < 400;
 				}
 				last SWITCH;
 				}
@@ -4697,71 +4951,71 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'midnight' => q{saa sita za usiku},
+				'narrow' => {
+					'morning2' => q{asubuhi},
+					'noon' => q{mchana},
+					'am' => q{am},
+					'evening1' => q{jioni},
 					'afternoon1' => q{mchana},
 					'morning1' => q{alfajiri},
 					'night1' => q{usiku},
-					'noon' => q{saa sita za mchana},
-					'am' => q{AM},
-					'evening1' => q{jioni},
-					'morning2' => q{asubuhi},
-				},
-				'narrow' => {
-					'evening1' => q{jioni},
-					'am' => q{am},
-					'morning2' => q{asubuhi},
 					'pm' => q{pm},
 					'midnight' => q{usiku},
-					'noon' => q{mchana},
-					'night1' => q{usiku},
-					'morning1' => q{alfajiri},
-					'afternoon1' => q{mchana},
 				},
 				'wide' => {
-					'morning2' => q{asubuhi},
-					'am' => q{AM},
-					'evening1' => q{jioni},
-					'afternoon1' => q{mchana},
-					'morning1' => q{alfajiri},
-					'night1' => q{usiku},
 					'noon' => q{saa sita za mchana},
-					'pm' => q{PM},
+					'morning2' => q{asubuhi},
+					'afternoon1' => q{mchana},
+					'evening1' => q{jioni},
+					'morning1' => q{alfajiri},
+					'am' => q{AM},
+					'night1' => q{usiku},
 					'midnight' => q{saa sita za usiku},
+					'pm' => q{PM},
+				},
+				'abbreviated' => {
+					'night1' => q{usiku},
+					'midnight' => q{saa sita za usiku},
+					'pm' => q{PM},
+					'noon' => q{saa sita za mchana},
+					'morning2' => q{asubuhi},
+					'afternoon1' => q{mchana},
+					'evening1' => q{jioni},
+					'morning1' => q{alfajiri},
+					'am' => q{AM},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'evening1' => q{jioni},
-					'am' => q{AM},
-					'morning2' => q{asubuhi},
-					'pm' => q{PM},
 					'midnight' => q{saa sita za usiku},
+					'pm' => q{PM},
 					'night1' => q{usiku},
-					'noon' => q{saa sita za mchana},
 					'morning1' => q{alfajiri},
+					'evening1' => q{jioni},
 					'afternoon1' => q{alasiri},
-				},
-				'narrow' => {
-					'afternoon1' => q{mchana},
-					'morning1' => q{alfajiri},
-					'noon' => q{saa sita za mchana},
-					'night1' => q{usiku},
-					'midnight' => q{saa sita za usiku},
-					'pm' => q{PM},
 					'am' => q{AM},
+					'noon' => q{saa sita za mchana},
 					'morning2' => q{asubuhi},
-					'evening1' => q{jioni},
 				},
 				'wide' => {
-					'am' => q{AM},
-					'morning2' => q{asubuhi},
-					'evening1' => q{jioni},
 					'night1' => q{usiku},
+					'pm' => q{PM},
+					'midnight' => q{saa sita za usiku},
+					'morning2' => q{asubuhi},
 					'noon' => q{saa sita za mchana},
+					'am' => q{AM},
+					'evening1' => q{jioni},
 					'afternoon1' => q{mchana},
 					'morning1' => q{alfajiri},
+				},
+				'narrow' => {
+					'morning2' => q{asubuhi},
+					'noon' => q{saa sita za mchana},
+					'am' => q{AM},
+					'afternoon1' => q{mchana},
+					'evening1' => q{jioni},
+					'morning1' => q{alfajiri},
+					'night1' => q{usiku},
 					'pm' => q{PM},
 					'midnight' => q{saa sita za usiku},
 				},
@@ -4851,6 +5105,50 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			Bh => q{h B},
+			Bhm => q{h:mm B},
+			Bhms => q{h:mm:ss B},
+			E => q{ccc},
+			EBhm => q{E h:mm B},
+			EBhms => q{E h:mm:ss B},
+			EHm => q{E HH:mm},
+			EHms => q{E HH:mm:ss},
+			Ed => q{E d},
+			Ehm => q{E h:mm a},
+			Ehms => q{E h:mm:ss a},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E, d MMM y G},
+			GyMMMd => q{d MMM y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L},
+			MEd => q{E, d/M},
+			MMM => q{LLL},
+			MMMEd => q{E, d MMM},
+			MMMMEd => q{E, d MMMM},
+			MMMMd => q{d MMMM},
+			MMMd => q{d MMM},
+			Md => q{d-M},
+			d => q{d},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M/y G},
+			yyyyMEd => q{E, d/M/y G},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E, d MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d MMM y G},
+			yyyyMd => q{d/M/y G},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
 		'gregorian' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -4900,50 +5198,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 			yw => q{'wiki' w 'ya' Y},
 		},
-		'generic' => {
-			Bh => q{h B},
-			Bhm => q{h:mm B},
-			Bhms => q{h:mm:ss B},
-			E => q{ccc},
-			EBhm => q{E h:mm B},
-			EBhms => q{E h:mm:ss B},
-			EHm => q{E HH:mm},
-			EHms => q{E HH:mm:ss},
-			Ed => q{E d},
-			Ehm => q{E h:mm a},
-			Ehms => q{E h:mm:ss a},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E, d MMM y G},
-			GyMMMd => q{d MMM y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L},
-			MEd => q{E, d/M},
-			MMM => q{LLL},
-			MMMEd => q{E, d MMM},
-			MMMMEd => q{E, d MMMM},
-			MMMMd => q{d MMMM},
-			MMMd => q{d MMM},
-			Md => q{d-M},
-			d => q{d},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{M/y G},
-			yyyyMEd => q{E, d/M/y G},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E, d MMM y G},
-			yyyyMMMM => q{MMMM y G},
-			yyyyMMMd => q{d MMM y G},
-			yyyyMd => q{d/M/y G},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
 	} },
 );
 
@@ -4963,101 +5217,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			H => {
-				H => q{HH – HH},
-			},
-			Hm => {
-				H => q{HH:mm – HH:mm},
-				m => q{HH:mm – HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm – HH:mm v},
-				m => q{HH:mm – HH:mm v},
-			},
-			Hv => {
-				H => q{HH – HH v},
-			},
-			M => {
-				M => q{M – M},
-			},
-			MEd => {
-				M => q{E, d/M – E, d/M},
-				d => q{E, d/M – E, d/M},
-			},
-			MMM => {
-				M => q{LLL–LLL},
-			},
-			MMMEd => {
-				M => q{MMM d, E – MMM d, E},
-				d => q{MMM d, E – MMM d, E},
-			},
-			MMMd => {
-				M => q{MMM d – MMM d},
-				d => q{MMM d–d},
-			},
-			Md => {
-				M => q{d/M – d/M},
-				d => q{d/M – d/M},
-			},
-			d => {
-				d => q{d – d},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h – h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm – h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm – h:mm a v},
-				m => q{h:mm – h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h – h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
-			yM => {
-				M => q{M/y – M/y},
-				y => q{M/y – M/y},
-			},
-			yMEd => {
-				M => q{E, d/M/y – E, d/M/y},
-				d => q{E, d/M/y – E, d/M/y},
-				y => q{E, d/M/y – E, d/M/y},
-			},
-			yMMM => {
-				M => q{MMM – MMM y},
-				y => q{MMM y – MMM y},
-			},
-			yMMMEd => {
-				M => q{E, MMM d– E, MMM d y},
-				d => q{E, MMM d – E, MMM d y},
-				y => q{E, MMM d y – E, MMM d y},
-			},
-			yMMMM => {
-				M => q{MMMM–MMMM y},
-				y => q{MMMM y – MMMM y},
-			},
-			yMMMd => {
-				M => q{MMM d – d, y},
-				d => q{MMM d – d, y},
-				y => q{MMM d y – MMM d y},
-			},
-			yMd => {
-				M => q{d/M/y – d/M/y},
-				d => q{d/M/y – d/M/y},
-				y => q{d/M/y – d/M/y},
-			},
-		},
 		'generic' => {
 			H => {
 				H => q{HH – HH},
@@ -5151,6 +5310,101 @@ has 'datetime_formats_interval' => (
 				M => q{d/M/y – d/M/y G},
 				d => q{d/M/y – d/M/y G},
 				y => q{d/M/y – d/M/y G},
+			},
+		},
+		'gregorian' => {
+			H => {
+				H => q{HH – HH},
+			},
+			Hm => {
+				H => q{HH:mm – HH:mm},
+				m => q{HH:mm – HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm – HH:mm v},
+				m => q{HH:mm – HH:mm v},
+			},
+			Hv => {
+				H => q{HH – HH v},
+			},
+			M => {
+				M => q{M – M},
+			},
+			MEd => {
+				M => q{E, d/M – E, d/M},
+				d => q{E, d/M – E, d/M},
+			},
+			MMM => {
+				M => q{LLL–LLL},
+			},
+			MMMEd => {
+				M => q{MMM d, E – MMM d, E},
+				d => q{MMM d, E – MMM d, E},
+			},
+			MMMd => {
+				M => q{MMM d – MMM d},
+				d => q{MMM d–d},
+			},
+			Md => {
+				M => q{d/M – d/M},
+				d => q{d/M – d/M},
+			},
+			d => {
+				d => q{d – d},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h – h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm – h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm – h:mm a v},
+				m => q{h:mm – h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h – h a v},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yM => {
+				M => q{M/y – M/y},
+				y => q{M/y – M/y},
+			},
+			yMEd => {
+				M => q{E, d/M/y – E, d/M/y},
+				d => q{E, d/M/y – E, d/M/y},
+				y => q{E, d/M/y – E, d/M/y},
+			},
+			yMMM => {
+				M => q{MMM – MMM y},
+				y => q{MMM y – MMM y},
+			},
+			yMMMEd => {
+				M => q{E, MMM d– E, MMM d y},
+				d => q{E, MMM d – E, MMM d y},
+				y => q{E, MMM d y – E, MMM d y},
+			},
+			yMMMM => {
+				M => q{MMMM–MMMM y},
+				y => q{MMMM y – MMMM y},
+			},
+			yMMMd => {
+				M => q{MMM d – d, y},
+				d => q{MMM d – d, y},
+				y => q{MMM d y – MMM d y},
+			},
+			yMd => {
+				M => q{d/M/y – d/M/y},
+				d => q{d/M/y – d/M/y},
+				y => q{d/M/y – d/M/y},
 			},
 		},
 	} },

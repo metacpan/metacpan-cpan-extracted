@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.99';
+our $VERSION = '1.01';
 
 use Code::TidyAll::Config::INI::Reader 0.44;
 use List::Util 1.45 qw( uniqstr );
@@ -306,7 +306,7 @@ Dist::Zilla::Plugin::DROLSKY::TidyAll - Creates default tidyall.ini, perltidyrc,
 
 =head1 VERSION
 
-version 0.99
+version 1.01
 
 =for Pod::Coverage .*
 

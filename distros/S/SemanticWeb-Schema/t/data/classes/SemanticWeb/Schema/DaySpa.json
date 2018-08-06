@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A day spa.",
+      "rdfs:label" : "DaySpa",
+      "rdfs:subClassOf" : "schema:HealthAndBeautyBusiness"
+   },
+   "properties" : {}
+}

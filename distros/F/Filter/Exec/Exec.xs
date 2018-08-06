@@ -3,7 +3,7 @@
  * 
  * Author   : Paul Marquess 
  * Date     : 2014-12-09 02:50:27 rurban
- * Version  : 1.58
+ * Version  : 1.59
  *
  */
 
@@ -531,7 +531,7 @@ filter_exec(pTHX_ int idx, SV *buf_sv, int maxlen)
                     if (fdebug)
                         warn("recycle(%d) - leaving %d [%s], returning %" IVdf " %" IVdf " [%s]",
 				idx, n, 
-				SvPVX(buffer), p - out_ptr + 1, 
+                                SvPVX(buffer), (IV)(p - out_ptr + 1),
 				SvCUR(buf_sv), SvPVX(buf_sv)) ;
      
                     return SvCUR(buf_sv);

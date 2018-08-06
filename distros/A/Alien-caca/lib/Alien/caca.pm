@@ -1,9 +1,11 @@
 package Alien::caca;
 our $AUTHORITY = 'cpan:YANICK';
-# ABSTRACT: Alien package for the Colored ASCII Art library
-$Alien::caca::VERSION = '0.0.2';
+# ABSTRACT: Alien package for the Colored ASCII Art library 
+$Alien::caca::VERSION = '0.0.3';
 use strict;
 use warnings;
+
+use parent 'Alien::Base';
 
 1;
 
@@ -15,11 +17,11 @@ __END__
 
 =head1 NAME
 
-Alien::caca - Alien package for the Colored ASCII Art library
+Alien::caca - Alien package for the Colored ASCII Art library 
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 SYNOPSIS 
 

@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Nnh - Package for language Ngiemboon
 
 package Locale::CLDR::Locales::Nnh;
 # This file auto generated from Data\common\main\nnh.xml
-#	on Fri 13 Apr  7:24:24 am GMT
+#	on Sun  5 Aug  6:16:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -370,11 +370,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{ncwònzém},
-					'am' => q{mbaʼámbaʼ},
-				},
 				'wide' => {
+					'am' => q{mbaʼámbaʼ},
+					'pm' => q{ncwònzém},
+				},
+				'abbreviated' => {
 					'am' => q{mbaʼámbaʼ},
 					'pm' => q{ncwònzém},
 				},
@@ -456,14 +456,14 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			yMEd => q{E , 'lyɛ'̌ʼ d 'na' M, y},
 			yMMM => q{MMM y},
 			yMMMEd => q{E , 'lyɛ'̌ʼ d 'na' MMM, y},
 			yMMMd => q{'lyɛ'̌ʼ d 'na' MMMM, y},
 			yMd => q{d/M/y},
 		},
-		'gregorian' => {
+		'generic' => {
 			yMEd => q{E , 'lyɛ'̌ʼ d 'na' M, y},
 			yMMM => q{MMM y},
 			yMMMEd => q{E , 'lyɛ'̌ʼ d 'na' MMM, y},

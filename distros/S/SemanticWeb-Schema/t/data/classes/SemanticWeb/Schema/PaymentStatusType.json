@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A specific payment status. For example, PaymentDue, PaymentComplete, etc.",
+      "rdfs:label" : "PaymentStatusType",
+      "rdfs:subClassOf" : "schema:Enumeration"
+   },
+   "properties" : {}
+}

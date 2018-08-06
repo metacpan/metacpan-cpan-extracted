@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Rn - Package for language Rundi
 
 package Locale::CLDR::Locales::Rn;
 # This file auto generated from Data\common\main\rn.xml
-#	on Fri 13 Apr  7:26:16 am GMT
+#	on Sun  5 Aug  6:18:59 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -591,6 +591,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Ugwiya ryo muri Moritaniya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Ugwiya ryo muri Moritaniya),
 			},
 		},
@@ -655,6 +660,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Idobura ryo muri Sawotome na Perensipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Idobura ryo muri Sawotome na Perensipe),
 			},
@@ -818,12 +828,12 @@ has 'day_periods' => (
 		'gregorian' => {
 			'format' => {
 				'abbreviated' => {
-					'am' => q{Z.MU.},
 					'pm' => q{Z.MW.},
+					'am' => q{Z.MU.},
 				},
 				'wide' => {
-					'pm' => q{Z.MW.},
 					'am' => q{Z.MU.},
+					'pm' => q{Z.MW.},
 				},
 			},
 		},

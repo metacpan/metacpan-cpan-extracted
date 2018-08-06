@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A body of water, such as a sea, ocean, or lake.",
+      "rdfs:label" : "BodyOfWater",
+      "rdfs:subClassOf" : "schema:Landform"
+   },
+   "properties" : {}
+}

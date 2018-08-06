@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of interacting with another person or organization.",
+      "rdfs:label" : "InteractAction",
+      "rdfs:subClassOf" : "schema:Action"
+   },
+   "properties" : {}
+}

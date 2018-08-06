@@ -1,0 +1,56 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_rNews",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "UserInteraction and its subtypes is an old way of talking about users interacting with pages. It is generally better to use <a class=\"localLink\" href=\"http://schema.org/Action\">Action</a>-based vocabulary, alongside types such as <a class=\"localLink\" href=\"http://schema.org/Comment\">Comment</a>.",
+      "rdfs:label" : "UserComments",
+      "rdfs:subClassOf" : "schema:UserInteraction",
+      "schema:supersededBy" : "schema:InteractionCounter"
+   },
+   "properties" : {
+      "schema:commentText" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The text of the UserComment.",
+         "rdfs:label" : "commentText",
+         "schema:domainIncludes" : "schema:UserComments",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:commentTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The time at which the UserComment was made.",
+         "rdfs:label" : "commentTime",
+         "schema:domainIncludes" : "schema:UserComments",
+         "schema:rangeIncludes" : [
+            "schema:DateTime",
+            "schema:Date"
+         ]
+      },
+      "schema:creator" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The creator/author of this CreativeWork. This is the same as the Author property for CreativeWork.",
+         "rdfs:label" : "creator",
+         "schema:domainIncludes" : [
+            "schema:UserComments",
+            "schema:CreativeWork"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      },
+      "schema:discusses" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifies the CreativeWork associated with the UserComment.",
+         "rdfs:label" : "discusses",
+         "schema:domainIncludes" : "schema:UserComments",
+         "schema:rangeIncludes" : "schema:CreativeWork"
+      },
+      "schema:replyToUrl" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The URL at which a reply may be posted to the specified UserComment.",
+         "rdfs:label" : "replyToUrl",
+         "schema:domainIncludes" : "schema:UserComments",
+         "schema:rangeIncludes" : "schema:URL"
+      }
+   }
+}

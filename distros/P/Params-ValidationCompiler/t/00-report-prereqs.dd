@@ -6,6 +6,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Class::XSAccessor' => '0',
                                       'Code::TidyAll' => '0.56',
                                       'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Code::TidyAll::Plugin::Test::Vars' => '0.02',
@@ -49,6 +50,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
+                                        'Class::XSAccessor' => '0',
                                         'Sub::Util' => '1.40'
                                       },
                       'requires' => {

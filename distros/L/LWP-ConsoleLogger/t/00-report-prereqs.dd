@@ -79,7 +79,8 @@ do { my $x = {
                                    'Test::RequiresInternet' => '0',
                                    'URI::file' => '0',
                                    'WWW::Mechanize' => '0',
-                                   'perl' => '5.013010'
+                                   'perl' => '5.013010',
+                                   'version' => '0'
                                  }
                  }
      };

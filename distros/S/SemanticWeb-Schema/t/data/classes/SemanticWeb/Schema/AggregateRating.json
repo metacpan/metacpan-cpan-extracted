@@ -1,0 +1,34 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The average rating based on multiple ratings or reviews.",
+      "rdfs:label" : "AggregateRating",
+      "rdfs:subClassOf" : "schema:Rating"
+   },
+   "properties" : {
+      "schema:itemReviewed" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The item that is being reviewed/rated.",
+         "rdfs:label" : "itemReviewed",
+         "schema:domainIncludes" : [
+            "schema:Review",
+            "schema:AggregateRating"
+         ],
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:ratingCount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The count of total number of ratings.",
+         "rdfs:label" : "ratingCount",
+         "schema:domainIncludes" : "schema:AggregateRating",
+         "schema:rangeIncludes" : "schema:Integer"
+      },
+      "schema:reviewCount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The count of total number of reviews.",
+         "rdfs:label" : "reviewCount",
+         "schema:domainIncludes" : "schema:AggregateRating",
+         "schema:rangeIncludes" : "schema:Integer"
+      }
+   }
+}

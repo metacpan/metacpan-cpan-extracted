@@ -1,0 +1,42 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Event type: Sports event.",
+      "rdfs:label" : "SportsEvent",
+      "rdfs:subClassOf" : "schema:Event"
+   },
+   "properties" : {
+      "schema:awayTeam" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The away team in a sports event.",
+         "rdfs:label" : "awayTeam",
+         "rdfs:subPropertyOf" : "schema:competitor",
+         "schema:domainIncludes" : "schema:SportsEvent",
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:SportsTeam"
+         ]
+      },
+      "schema:competitor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A competitor in a sports event.",
+         "rdfs:label" : "competitor",
+         "schema:domainIncludes" : "schema:SportsEvent",
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:SportsTeam"
+         ]
+      },
+      "schema:homeTeam" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The home team in a sports event.",
+         "rdfs:label" : "homeTeam",
+         "rdfs:subPropertyOf" : "schema:competitor",
+         "schema:domainIncludes" : "schema:SportsEvent",
+         "schema:rangeIncludes" : [
+            "schema:SportsTeam",
+            "schema:Person"
+         ]
+      }
+   }
+}

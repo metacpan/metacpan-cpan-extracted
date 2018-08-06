@@ -3,7 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 1;
 
@@ -37,6 +37,7 @@ cpanx - A CPAN downloader script
 
     -I=<loc>   sets install base path. e.g. /usr/local
     -L=<loc>   sets library install path. e.g. /Library/Perl/5.18
+    -LL=<loc>  sets library install path including the architecture dependent dirs.
     -B=<loc>   sets the binary install path. e.g. ~/bin
     -SC=<loc>  sets the script install path. e.g. ~/scripts
     -M1=<loc>  sets the man1 install path e.g. /usr/share/man/man1
@@ -101,6 +102,72 @@ Modules are cached and reused between calls, so you can look at the contents of 
 This script has no dependencies. It uses the curl program to download.
 
 This script is self contained. It's runnable if all you have is the one file.
+
+=head1 EXAMPLE OUTPUT
+
+    jacob@prism ~ $ cpanx Acme::MetaSyntactic
+    curl http://www.cpan.org/modules/02packages.details.txt.gz -z /Users/jacob/.cpanx/02packages.details.txt.gz -R
+      % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+				     Dload  Upload   Total   Spent    Left  Speed
+    100 2028k  100 2028k    0     0   910k      0  0:00:02  0:00:02 --:--:--  911k
+    curl http://www.cpan.org/modules/by-authors/id/B/BO/BOOK/Acme-MetaSyntactic-1.014.tar.gz -R
+      % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+				     Dload  Upload   Total   Spent    Left  Speed
+    100 56300  100 56300    0     0  70964      0 --:--:-- --:--:-- --:--:-- 70906
+    tar -x -v -f ~/.cpanx/Acme-MetaSyntactic-1.014.tar.gz -C ~/.cpanx
+    x Acme-MetaSyntactic-1.014/
+    curl http://www.cpan.org/modules/by-authors/id/S/SB/SBURKE/Win32-Locale-0.04.tar.gz -R
+      % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+				     Dload  Upload   Total   Spent    Left  Speed
+    100  7598  100  7598    0     0  49572      0 --:--:-- --:--:-- --:--:-- 49660
+    tar -x -v -f ~/.cpanx/Win32-Locale-0.04.tar.gz -C ~/.cpanx
+    x Win32-Locale-0.04/
+    /usr/bin/perl Makefile.PL
+    Checking if your kit is complete...
+    Looks good
+    Generating a Unix-style Makefile
+    Writing Makefile for Win32::Locale
+    Writing MYMETA.yml and MYMETA.json
+
+    Acme-MetaSyntactic 1.014 (not installed)
+    Themed metasyntactic variables names
+    By Philippe Bruhat (BooK) <book@cpan.org>
+    Repository http://github.com/book/Acme-MetaSyntactic
+
+    Dependencies:
+    Carp 0 (have 1.29)
+    Cwd 0 (have 3.40)
+    ExtUtils::MakeMaker 0 (have 7.34)
+    File::Basename 0 (have 2.84)
+    File::Find 0 (have 1.23)
+    File::Glob 0 (have 1.20_01)
+    File::Spec 0 (have 3.40)
+    File::Spec::Functions 0 (have 3.40)
+    Getopt::Long 0 (have 2.49)
+    IO::Handle 0 (have 1.34)
+    IPC::Open3 0 (have 1.13)
+    LWP::UserAgent 0 (have 6.15)
+    List::Util 0 (have 1.50)
+    Test::Builder::Module 0 (have 1.302136)
+    Test::More 0 (have 1.302136)
+    Win32::Locale 0 (not installed) *
+	ExtUtils::MakeMaker 0 (have 7.34)
+    base 0 (have 2.18)
+    lib 0 (have 0.63)
+    perl 5.006 (have 5.018002)
+    strict 0 (have 1.07)
+    warnings 0 (have 1.18)
+
+    Install Order:
+    Win32::Locale 0.04 (not installed)
+    Acme::MetaSyntactic 1.014 (not installed)
+
+    Do you want to install? [n]
+    Not installing.
+
+=head1 POSSIBLE ALTERNATIVE
+
+If you don't want to install this module, you can use the existing cpan program to see what will actually be installed. Run "cpan" on the command line to enter its shell. Run "test Module", it will test the module and all it's dependencies, then run "is_tested", it will show the list of modules that will be installed. The format isn't as good as what would be shown by this program, but might be good enough.
 
 =head1 METACPAN
 

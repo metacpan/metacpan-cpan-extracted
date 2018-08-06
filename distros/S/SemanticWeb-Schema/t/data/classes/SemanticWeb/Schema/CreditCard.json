@@ -1,0 +1,16 @@
+{
+   "class" : {
+      "dc:source" : [
+         "schemadotorgsources:source_GoodRelationsClass",
+         "schemadotorgsources:FIBO"
+      ],
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>A card payment method of a particular brand or name.  Used to mark up a particular payment method and/or the financial product/service that supplies the card account.</p>\n\n<p>Commonly used values:</p>\n\n<ul>\n<li>http://purl.org/goodrelations/v1#AmericanExpress</li>\n<li>http://purl.org/goodrelations/v1#DinersClub</li>\n<li>http://purl.org/goodrelations/v1#Discover</li>\n<li>http://purl.org/goodrelations/v1#JCB</li>\n<li>http://purl.org/goodrelations/v1#MasterCard</li>\n<li>http://purl.org/goodrelations/v1#VISA</li>\n</ul>\n",
+      "rdfs:label" : "CreditCard",
+      "rdfs:subClassOf" : [
+         "schema:PaymentCard",
+         "schema:LoanOrCredit"
+      ]
+   },
+   "properties" : {}
+}

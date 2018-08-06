@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of producing a painting, typically with paint and canvas as instruments.",
+      "rdfs:label" : "PaintAction",
+      "rdfs:subClassOf" : "schema:CreateAction"
+   },
+   "properties" : {}
+}

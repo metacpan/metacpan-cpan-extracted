@@ -1,0 +1,29 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A permission for a particular person or group to access a particular file.",
+      "rdfs:label" : "DigitalDocumentPermission",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:grantee" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The person, organization, contact point, or audience that has been granted this permission.",
+         "rdfs:label" : "grantee",
+         "schema:domainIncludes" : "schema:DigitalDocumentPermission",
+         "schema:rangeIncludes" : [
+            "schema:ContactPoint",
+            "schema:Person",
+            "schema:Organization",
+            "schema:Audience"
+         ]
+      },
+      "schema:permissionType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of permission granted the person, organization, or audience.",
+         "rdfs:label" : "permissionType",
+         "schema:domainIncludes" : "schema:DigitalDocumentPermission",
+         "schema:rangeIncludes" : "schema:DigitalDocumentPermissionType"
+      }
+   }
+}

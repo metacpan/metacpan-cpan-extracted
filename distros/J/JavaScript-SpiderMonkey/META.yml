@@ -3,20 +3,20 @@ abstract: 'Perl interface to the JavaScript Engine'
 author:
   - 'Mike Schilli <m@perlmeister.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.59, CPAN::Meta::Converter version 2.112621'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: JavaScript-SpiderMonkey
 no_index:
   directory:
     - t
     - inc
 requires:
-  Data::Dumper: 0
-version: 0.21
+  Data::Dumper: '0'
+version: '0.23'

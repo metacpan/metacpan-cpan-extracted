@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A radio episode which can be part of a series or season.",
+      "rdfs:label" : "RadioEpisode",
+      "rdfs:subClassOf" : "schema:Episode"
+   },
+   "properties" : {}
+}

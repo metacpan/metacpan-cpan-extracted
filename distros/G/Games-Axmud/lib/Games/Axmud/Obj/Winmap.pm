@@ -262,7 +262,7 @@
             $count++;
         }
 
-        $self->ivPoke('zoneCount', $count);
+        $clone->ivPoke('zoneCount', $count);
 
         return $clone;
     }

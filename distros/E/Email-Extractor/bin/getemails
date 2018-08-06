@@ -1,0 +1,84 @@
+#!perl
+
+# ABSTRACT: command line utility that return emails from file or url
+
+package getemails;
+$getemails::VERSION = '0.01';
+
+
+use strict;
+use warnings;
+use Email::Extractor;
+use Data::Dumper;
+
+my $params = {
+    uri            => $ARGV[0],
+    check_contacts => $ARGV[1],
+    verbose        => $ARGV[2]
+};
+
+die 'No uri specified' unless defined $params->{uri} && length $params->{uri};
+
+my $crawler = Email::Extractor->new();
+my $a       = $crawler->get_emails_from_uri( $params->{uri} );
+
+print "No emails found on specified url\n" if ( !@$a && $params->{verbose} );
+
+my $links_checked = 1;
+
+if ( $params->{check_contacts} ) {
+
+    while ( !@$a && $links_checked <= 10 ) {    # but no more than 10 iterations
+
+        my $urls = $crawler->extract_contact_links;
+        for my $u (@$urls) {
+            $a = $crawler->get_emails_from_uri($u);
+            $links_checked++;
+        }
+    }
+
+}
+
+print "$_\n" for (@$a);
+
+print "Links checked: " . $links_checked . "\n" if ( $params->{verbose} );
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+getemails - command line utility that return emails from file or url
+
+=head1 VERSION
+
+version 0.01
+
+=head1 SYNOPSIS
+
+    getemails http://example.com
+    getemails http://example.com 0 v
+
+second parameter is to check or not to check contact links
+
+v - verbose
+
+By default it checks contact links in all languages
+
+=head1 AUTHOR
+
+Pavel Serikov <pavelsr@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Pavel Serikov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

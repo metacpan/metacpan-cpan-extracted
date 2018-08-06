@@ -1,5 +1,16 @@
 Revision history for Devel-MAT
 
+0.38    2018-08-02 17:47:44
+        [CHANGES]
+         * Improvements to 'pmat-diff'
+            + Added --one mode
+         * Improvements to 'find' command
+            + Added 'blessed' filter
+            + Allow filters to be combined
+            + Added --count option
+         * Added --quiet option to main 'pmat' script
+         * Report progress to STDERR, not STDOUT
+
 0.37    2018-07-24 16:56:49
         [CHANGES]
          * Optional splitting of SCALAR by subtype in 'count' command

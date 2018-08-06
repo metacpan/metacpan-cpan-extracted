@@ -1,0 +1,90 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Used to describe a ticket to an event, a flight, a bus ride, etc.",
+      "rdfs:label" : "Ticket",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:dateIssued" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date the ticket was issued.",
+         "rdfs:label" : "dateIssued",
+         "schema:domainIncludes" : "schema:Ticket",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:issuedBy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The organization issuing the ticket or permit.",
+         "rdfs:label" : "issuedBy",
+         "schema:domainIncludes" : [
+            "schema:Ticket",
+            "schema:Permit"
+         ],
+         "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:priceCurrency" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The currency (in 3-letter ISO 4217 format) of the price or a price component, when attached to <a class=\"localLink\" href=\"http://schema.org/PriceSpecification\">PriceSpecification</a> and its subtypes.",
+         "rdfs:label" : "priceCurrency",
+         "schema:domainIncludes" : [
+            "schema:PriceSpecification",
+            "schema:Reservation",
+            "schema:Ticket",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:ticketNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The unique identifier for the ticket.",
+         "rdfs:label" : "ticketNumber",
+         "schema:domainIncludes" : "schema:Ticket",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:ticketToken" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Reference to an asset (e.g., Barcode, QR code image or PDF) usable for entrance.",
+         "rdfs:label" : "ticketToken",
+         "schema:domainIncludes" : "schema:Ticket",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      },
+      "schema:ticketedSeat" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The seat associated with the ticket.",
+         "rdfs:label" : "ticketedSeat",
+         "schema:domainIncludes" : "schema:Ticket",
+         "schema:rangeIncludes" : "schema:Seat"
+      },
+      "schema:totalPrice" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The total price for the reservation or ticket, including applicable taxes, shipping, etc.",
+         "rdfs:label" : "totalPrice",
+         "schema:domainIncludes" : [
+            "schema:Ticket",
+            "schema:Reservation"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:PriceSpecification",
+            "schema:Text"
+         ]
+      },
+      "schema:underName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The person or organization the reservation or ticket is for.",
+         "rdfs:label" : "underName",
+         "schema:domainIncludes" : [
+            "schema:Ticket",
+            "schema:Reservation"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      }
+   }
+}

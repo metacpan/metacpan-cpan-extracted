@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2009-2018, Roland van Ipenburg
-package HTML::Hyphenate v1.0.0;
+package HTML::Hyphenate v1.1.0;
 
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ use charnames qw(:full);
 use Log::Log4perl qw(:easy get_logger);
 use Set::Scalar;
 use TeX::Hyphen;
-use TeX::Hyphen::Pattern;
+use TeX::Hyphen::Pattern 0.100;
 use Mojo::DOM;
 
 use Readonly;
@@ -33,10 +33,7 @@ Readonly::Scalar my $LANG         => q{lang};
 Readonly::Scalar my $TEXT         => q{text};
 Readonly::Scalar my $TAG          => q{tag};
 Readonly::Scalar my $RAW          => q{raw};
-Readonly::Scalar my $NOBR         => q{nobr};
 Readonly::Scalar my $PRE          => q{pre};
-Readonly::Scalar my $NOWRAP       => q{*[nowrap]};
-Readonly::Scalar my $STYLE        => q{style};
 Readonly::Scalar my $CLASS        => q{class};
 Readonly::Scalar my $CLASS_JOINER => q{, .};
 
@@ -56,10 +53,9 @@ Readonly::Scalar my $LOG_REGISTER =>
   q{Registering TeX::Hyphen object for label '%s'};
 
 # HTML %Text attributes <http://www.w3.org/TR/REC-html40/index/attributes.html>
-my $text_attr = Set::Scalar->new(qw/abbr alt label standby summary title/);
-
-# Match inline style requesting not to wrap anyway:
-my $STYLE_NOWRAP = q{[style*=nowrap]};
+# HTML5 %Text attributes <https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes>
+my $text_attr =
+  Set::Scalar->new(qw/abbr alt label list placeholder standby summary title/);
 
 Log::Log4perl->easy_init($ERROR);
 my $log = get_logger();
@@ -236,10 +232,7 @@ sub _hyphenable_by_class {
 
 sub _hyphenable {
     my ( $self, $node ) = @_;
-    return !( $node->ancestors($NOBR)->size
-        || $node->ancestors($PRE)->size
-        || $node->ancestors($NOWRAP)->size
-        || $node->ancestors($STYLE_NOWRAP)->size
+    return !( $node->ancestors($PRE)->size
         || !$self->_hyphenable_by_class($node) );
 }
 
@@ -281,7 +274,7 @@ HTML::Hyphenate - insert soft hyphens into HTML.
 
 =head1 VERSION
 
-This document describes HTML::Hyphenate version v1.0.0.
+This document describes HTML::Hyphenate version v1.1.0.
 
 =head1 SYNOPSIS
 

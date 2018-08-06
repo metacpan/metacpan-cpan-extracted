@@ -1,6 +1,6 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.52';
+$Map::Tube::CLI::VERSION   = '0.54';
 $Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.52
+Version 0.54
 
 =cut
 
@@ -17,8 +17,10 @@ use 5.006;
 use utf8::all;
 use Data::Dumper;
 use MIME::Base64;
+use Map::Tube::Utils qw(is_valid_color);
 use Map::Tube::Exception::MissingStationName;
 use Map::Tube::Exception::InvalidStationName;
+use Map::Tube::Exception::InvalidBackgroundColor;
 use Map::Tube::Exception::InvalidLineName;
 use Map::Tube::Exception::MissingSupportedMap;
 use Map::Tube::Exception::FoundUnsupportedMap;
@@ -47,19 +49,20 @@ You can list all command line options by giving C<-h> flag.
     $ map-tube -h
     USAGE: map-tube [-h] [long options...]
 
-        --map=String     Map name
-        --start=String   Start station name
-        --end=String     End station name
-        --preferred      Show preferred route
-        --generate_map   Generate map as image
-        --line=String    Line name for map
-        --line_mappings  Generate line mappings
-        --line_notes     Generate line notes
+        --map=String      Map name
+        --start=String    Start station name
+        --end=String      End station name
+        --preferred       Show preferred route
+        --generate_map    Generate map as image
+        --line=String     Line name for map
+        --bgcolor=String  Map background color
+        --line_mappings   Generate line mappings
+        --line_notes      Generate line notes
 
-        --usage          show a short help message
-        -h               show a compact help message
-        --help           show a long help message
-        --man            show the manual
+        --usage           show a short help message
+        -h                show a compact help message
+        --help            show a long help message
+        --man             show the manual
 
 =head1 COMMON USAGES
 
@@ -67,7 +70,7 @@ You can list all command line options by giving C<-h> flag.
 
 You can also ask for shortest route in London Tube Map as below:
 
-    $ map-tube --map 'London' --start 'Baker Street' --end 'Wembley Park'
+    $ map-tube --map London --start 'Baker Street' --end 'Wembley Park'
 
     Baker Street (Bakerloo, Circle, Hammersmith & City, Jubilee, Metropolitan), Finchley Road (Jubilee, Metropolitan), Wembley Park (Jubilee, Metropolitan)
 
@@ -75,7 +78,7 @@ You can also ask for shortest route in London Tube Map as below:
 
 Now request for preferred route as below:
 
-    $ map-tube --map 'London' --start 'Baker Street' --end 'Euston Square' --preferred
+    $ map-tube --map London --start 'Baker Street' --end 'Euston Square' --preferred
 
     Baker Street (Circle, Hammersmith & City, Metropolitan), Great Portland Street (Circle, Hammersmith & City, Metropolitan), Euston Square (Circle, Hammersmith & City, Metropolitan)
 
@@ -83,31 +86,39 @@ Now request for preferred route as below:
 
 To generate entire map, follow the command below:
 
-    $ map-tube --map 'Delhi' --generate_map
+    $ map-tube --map Delhi --generate_map
+
+In case you want different background color to the map then you can try below:
+
+    $ map-tube --map Delhi --bgcolor gray --generate_map
 
 =head2 Generate Just a Line Map
 
 To generate just a particular line map, follow the command below:
 
-    $ map-tube --map 'London' --line 'Bakerloo' --generate_map
+    $ map-tube --map London --line Bakerloo --generate_map
+
+In case you want different background color to the map then you can try below:
+
+    $ map-tube --map London --line DLR --bgcolor yellow --generate_map
 
 =head2 Generate Line Mappings
 
-    $ map-tube --map 'London' --line 'Bakerloo' --line_mappings
+    $ map-tube --map London --line Bakerloo --line_mappings
 
 =head2 Generate Line Notes
 
-    $ map-tube --map 'London' --line 'Bakerloo' --line_notes
+    $ map-tube --map London --line Bakerloo --line_notes
 
 =head2 General Error
 
 If encountered  invalid  map  or  missing map i.e not installed, you get an error
 message like below:
 
-    $ map-tube --map 'xYz' --start 'Baker Street' --end 'Euston Square'
+    $ map-tube --map xYz --start 'Baker Street' --end 'Euston Square'
     ERROR: Unsupported Map [xYz].
 
-    $ map-tube --map 'Kazan' --start 'Baker Street' --end 'Euston Square'
+    $ map-tube --map Kazan --start 'Baker Street' --end 'Euston Square'
     ERROR: Missing Map [Kazan].
 
 =head1 SUPPORTED MAPS
@@ -233,23 +244,30 @@ expect any parameter. Here is the code from the supplied C<map-tube> script.
 sub run {
     my ($self) = @_;
 
-    my $start = $self->start;
-    my $end   = $self->end;
-    my $map   = $self->map;
-    my $line  = $self->line;
+    my $start   = $self->start;
+    my $end     = $self->end;
+    my $map     = $self->map;
+    my $line    = $self->line;
+    my $bgcolor = $self->bgcolor;
+    my $map_obj = $self->{maps}->{uc($map)};
 
     if ($self->preferred) {
-        print $self->{maps}->{uc($map)}->get_shortest_route($start, $end)->preferred, "\n";
+        print $map_obj->get_shortest_route($start, $end)->preferred, "\n";
     }
     elsif ($self->generate_map) {
         my ($image_file, $image_data);
+
+        if (defined $bgcolor) {
+            $map_obj->bgcolor($bgcolor);
+        }
+
         if (defined $line) {
             $image_file = sprintf(">%s.png", $line);
-            $image_data = $self->{maps}->{uc($map)}->as_image($line);
+            $image_data = $map_obj->as_image($line);
         }
         else {
             $image_file = sprintf(">%s.png", $map);
-            $image_data = $self->{maps}->{uc($map)}->as_image;
+            $image_data = $map_obj->as_image;
         }
 
         open(my $IMAGE, $image_file);
@@ -258,19 +276,18 @@ sub run {
         close($IMAGE);
     }
     elsif ($self->line_mappings || $self->line_notes) {
-        my $map_object = $self->{maps}->{uc($map)};
-        my ($line_map_table, $line_map_notes) = _prepare_mapping_notes($map_object, $line);
+        my ($line_map_table, $line_map_notes) = _prepare_mapping_notes($map_obj, $line);
 
         if ($self->line_mappings) {
             print sprintf("\n=head1 DESCRIPTION\n\n%s Metro Map: %s Line.\n\n", $map, $line);
             print $line_map_table;
         }
         if ($self->line_notes) {
-            print _line_notes($map_object, $map, $line, $line_map_notes);
+            print _line_notes($map_obj, $map, $line, $line_map_notes);
         }
     }
     else {
-        print $self->{maps}->{uc($map)}->get_shortest_route($start, $end), "\n";
+        print $map_obj->get_shortest_route($start, $end), "\n";
     }
 }
 
@@ -401,10 +418,11 @@ sub _validate_param {
     my @caller = caller(0);
     @caller = caller(2) if $caller[3] eq '(eval)';
 
-    my $start = $self->start;
-    my $end   = $self->end;
-    my $map   = $self->map;
-    my $line  = $self->line;
+    my $start   = $self->start;
+    my $end     = $self->end;
+    my $map     = $self->map;
+    my $line    = $self->line;
+    my $bgcolor = $self->bgcolor;
 
     my $supported_maps = _supported_maps();
     Map::Tube::Exception::FoundUnsupportedMap->throw({
@@ -422,6 +440,14 @@ sub _validate_param {
         unless (exists $self->{maps}->{uc($map)});
 
     if ($self->generate_map) {
+        if (defined $bgcolor && !(is_valid_color($bgcolor))) {
+            Map::Tube::Exception::InvalidBackgroundColor->throw({
+                method      => __PACKAGE__."::_validate_param",
+                message     => "ERROR: Invalid background Color [$bgcolor].",
+                filename    => $caller[1],
+                line_number => $caller[2] });
+        }
+
         if (defined $line) {
             Map::Tube::Exception::InvalidLineName->throw({
                 method      => __PACKAGE__."::_validate_param",

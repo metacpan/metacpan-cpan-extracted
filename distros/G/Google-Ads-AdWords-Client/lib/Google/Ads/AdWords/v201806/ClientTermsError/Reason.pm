@@ -25,7 +25,7 @@ __END__
 Perl data type class for the XML Schema defined simpleType
 ClientTermsError.Reason from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Enums for the various reasons an error can be thrown as a result of ClientTerms violation. 
 
 
 

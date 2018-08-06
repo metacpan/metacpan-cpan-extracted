@@ -1,0 +1,62 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A food-related business.",
+      "rdfs:label" : "FoodEstablishment",
+      "rdfs:subClassOf" : "schema:LocalBusiness"
+   },
+   "properties" : {
+      "schema:acceptsReservations" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates whether a FoodEstablishment accepts reservations. Values can be Boolean, an URL at which reservations can be made or (for backwards compatibility) the strings <code>Yes</code> or <code>No</code>.",
+         "rdfs:label" : "acceptsReservations",
+         "schema:domainIncludes" : "schema:FoodEstablishment",
+         "schema:rangeIncludes" : [
+            "schema:Boolean",
+            "schema:URL",
+            "schema:Text"
+         ]
+      },
+      "schema:hasMenu" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Either the actual menu as a structured representation, as text, or a URL of the menu.",
+         "rdfs:label" : "hasMenu",
+         "schema:domainIncludes" : "schema:FoodEstablishment",
+         "schema:rangeIncludes" : [
+            "schema:Menu",
+            "schema:URL",
+            "schema:Text"
+         ]
+      },
+      "schema:menu" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Either the actual menu as a structured representation, as text, or a URL of the menu.",
+         "rdfs:label" : "menu",
+         "schema:domainIncludes" : "schema:FoodEstablishment",
+         "schema:rangeIncludes" : [
+            "schema:Menu",
+            "schema:URL",
+            "schema:Text"
+         ],
+         "schema:supersededBy" : "schema:hasMenu"
+      },
+      "schema:servesCuisine" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The cuisine of the restaurant.",
+         "rdfs:label" : "servesCuisine",
+         "schema:domainIncludes" : "schema:FoodEstablishment",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:starRating" : {
+         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An official rating for a lodging business or food establishment, e.g. from national associations or standards bodies. Use the author property to indicate the rating organization, e.g. as an Organization with name such as (e.g. HOTREC, DEHOGA, WHR, or Hotelstars).",
+         "rdfs:label" : "starRating",
+         "schema:domainIncludes" : [
+            "schema:FoodEstablishment",
+            "schema:LodgingBusiness"
+         ],
+         "schema:rangeIncludes" : "schema:Rating"
+      }
+   }
+}

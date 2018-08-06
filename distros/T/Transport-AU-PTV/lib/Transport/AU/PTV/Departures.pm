@@ -1,5 +1,8 @@
 package Transport::AU::PTV::Departures;
-$Transport::AU::PTV::Departures::VERSION = '0.01';
+$Transport::AU::PTV::Departures::VERSION = '0.03';
+# VERSION
+# PODNAME
+# ABSTRACT: a collection of departures on the Victorian Public Transport Network.
 
 use strict;
 use warnings;
@@ -42,11 +45,11 @@ __END__
 
 =head1 NAME
 
-Transport::AU::PTV::Departures
+Transport::AU::PTV::Departures - a collection of departures on the Victorian Public Transport Network.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 

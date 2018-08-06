@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A short segment/part of a movie.",
+      "rdfs:label" : "MovieClip",
+      "rdfs:subClassOf" : "schema:Clip"
+   },
+   "properties" : {}
+}

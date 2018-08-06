@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Cpanel::JSON::XS;
 use Data::Visitor::Callback;
@@ -14,7 +14,15 @@ use LWP::UserAgent;
 use String::CamelSnakeKebab qw( lower_snake_case );
 use Try::Tiny;
 use Type::Utils qw( class_type );
-use Types::Standard qw( ArrayRef Bool Dict InstanceOf Int Optional Str );
+use Types::Standard qw(
+    ArrayRef
+    Bool
+    Dict
+    InstanceOf
+    Int
+    Optional
+    Str
+);
 use URI::FromHash qw( uri_object );
 use URI::QueryParam;
 use URI;
@@ -23,7 +31,7 @@ use WebService::TeamCity::Entity::BuildType;
 use WebService::TeamCity::Iterator;
 use WebService::TeamCity::LocatorSpec;
 use WebService::TeamCity::Entity::Project;
-use WebService::TeamCity::Types qw( BuildStatus DateTimeObject );
+use WebService::TeamCity::Types qw( BuildStatus DateTimeObject JSONBool );
 
 use Moo;
 
@@ -100,7 +108,6 @@ sub build_types {
             include_paging_args => 1 );
         my ($args) = $check->(@_);
 
-        my $path = 'builds';
         my %query;
         if (
             my $locator
@@ -108,7 +115,7 @@ sub build_types {
                 search_args         => $args,
                 include_paging_args => 1,
             )
-            ) {
+        ) {
 
             $query{locator} = $locator;
         }
@@ -136,15 +143,15 @@ sub build_types {
                 agent_name       => Str,
                 branch           => Str,
                 build_type       => $self->_build_type_locator_spec,
-                canceled         => Bool,
-                failed_to_start  => Bool,
+                canceled         => Bool | JSONBool,
+                failed_to_start  => Bool | JSONBool,
                 id               => Str,
                 lookup_limit     => Int,
                 number           => Int,
-                personal         => Bool,
-                pinned           => Bool,
+                personal         => Bool | JSONBool,
+                pinned           => Bool | JSONBool,
                 project          => $project_spec,
-                running          => Bool,
+                running          => Bool | JSONBool,
                 since_date       => DateTimeObject,
                 status           => BuildStatus,
                 tags             => ArrayRef [Str],
@@ -181,9 +188,9 @@ sub build_types {
                 affected_project => $project_spec,
                 id               => Str,
                 name             => Str,
-                paused           => Bool,
+                paused           => Bool | JSONBool,
                 project          => $project_spec,
-                template_flag    => Bool,
+                template_flag    => Bool | JSONBool,
             );
 
             # We're not going to allow arbitrarily nested template build
@@ -316,13 +323,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WebService::TeamCity - Client for the TeamCity REST API
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -448,7 +457,7 @@ Only return build types matching this id.
 
 Only return build types matching this name.
 
-=item * paused => Bool
+=item * paused => Bool | JSONBool
 
 Only return build types which are or are not paused.
 
@@ -464,7 +473,7 @@ Only return build types which use the specified template. The template is
 defined the same way as a build type, but you cannot include a C<template> key
 for the template spec too.
 
-=item * template_flag => Bool
+=item * template_flag => Bool | JSONBool
 
 Only return build types which are or are not templates.
 
@@ -498,11 +507,11 @@ Only return builds which were built against the specified branch.
 Only return builds which were built using the specific build type. Build types
 can be specified as defined for the C<build_types> method.
 
-=item * canceled => Bool
+=item * canceled => Bool | JSONBool
 
 Only returns builds which were or were not canceled.
 
-=item * failed_to_start => Bool
+=item * failed_to_start => Bool | JSONBool
 
 Only returns builds which did or did not fail to start.
 
@@ -522,11 +531,11 @@ Only return builds matching this name.
 
 Only return builds matching this number.
 
-=item * personal => Bool
+=item * personal => Bool | JSONBool
 
 Only returns builds which are or are not marked as personal builds.
 
-=item * pinned => Bool
+=item * pinned => Bool | JSONBool
 
 Only returns builds which are or are not pinned.
 
@@ -536,7 +545,7 @@ Only return builds which affect the specified project. Projects can be
 specified as defined for the C<projects> method. This only includes the
 project itself, not its sub-projects.
 
-=item * running => Bool
+=item * running => Bool | JSONBool
 
 Only returns builds which are or are not running.
 
@@ -556,19 +565,41 @@ as strings.
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<https://github.com/maxmind/WebService-TeamCity/issues>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Dave Rolsky
+=for stopwords Dave Rolsky Greg Oschwald Mark Fowler Olaf Alders
+
+=over 4
+
+=item *
 
 Dave Rolsky <drolsky@maxmind.com>
 
+=item *
+
+Greg Oschwald <goschwald@maxmind.com>
+
+=item *
+
+Mark Fowler <mark@twoshortplanks.com>
+
+=item *
+
+Olaf Alders <oalders@maxmind.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by MaxMind, Inc..
+This software is copyright (c) 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

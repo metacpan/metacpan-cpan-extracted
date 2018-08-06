@@ -1,8 +1,8 @@
 ######################################################################
 # Testcase:     Returning values from perl callbacks
-# Revision:     $Revision: 1.2 $
-# Last Checkin: $Date: 2006/06/13 13:42:58 $
-# By:           $Author: thomas_busch $
+# Revision:     $Revision$
+# Last Checkin: $Date$
+# By:           $Author$
 #
 # Author:       Mike Schilli m@perlmeister.com, 2004
 ######################################################################

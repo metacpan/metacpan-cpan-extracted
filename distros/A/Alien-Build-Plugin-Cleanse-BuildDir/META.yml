@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/Alien-Build-Plugin-Cleanse-BuildDir/issues
   repository: https://github.com/shawnlaffan/Alien-Build-Plugin-Cleanse-BuildDir/
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

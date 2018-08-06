@@ -1,0 +1,51 @@
+{
+   "abstract" : "Tk Widget for Layout of Frames Similar to an IDE",
+   "author" : [
+      "jcerney@home.com (John Cerney)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Tk-IDElayout",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Graph" : "0.20105",
+            "Tk" : "804.027",
+            "Tk::DynaTabFrame" : "0.23"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/asb-capfan/Tk-IDElayout.git",
+         "web" : "https://github.com/asb-capfan/Tk-IDElayout"
+      }
+   },
+   "version" : "0.34",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

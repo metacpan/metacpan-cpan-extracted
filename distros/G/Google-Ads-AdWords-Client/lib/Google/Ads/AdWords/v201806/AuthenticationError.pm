@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::AuthenticationError
 Perl data type class for the XML Schema defined complexType
 AuthenticationError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Errors returned when Authentication failed. 
 
 
 

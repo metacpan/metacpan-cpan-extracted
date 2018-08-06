@@ -1,39 +1,55 @@
 Revision history for Term::Caca
 
-1.2.0     2011-12-03
-    [ENHANCEMENTS]  
-        * add possibility to chose display driver.
+3.0.0 2018-08-01
+  [ API CHANGES ]
+    - Massive update moving the package to Moose and using Alien::caca for
+      the library building.
 
-    [BUG FIXES]
-        * protect against a potential memory leak (rt62971)
-            Reported by Kevin Ryde.
+  [ STATISTICS ]
+    - code churn: 387 files changed, 1146 insertions(+), 115871
+      deletions(-)
 
+2.0_0 2013-03-02
+  [ API CHANGES ]
+    - remove Term::Kaka.
+    - include libcaca with the distribution.
 
-1.1.0     2011-09-25
-    [BUG FIXES]
-        * strip leftover 0.x stuff from Caca.pm and Caca.xs
+  [ DOCUMENTATIONS ]
+    - add META 'Help Wanted' information
 
-1.0_1     2011-06-09
-    [ENHANCEMENTS]  
-        * add export() method
+1.0_1 2011-06-09
+  [ ENHANCEMENTS ]
+    - add export() method
 
-1.0_0     2011-06-05
-  * upgrade to API 1.x of libcaca
-  * add maze.pl example
-  * remove script caca-sprite
+1.2.0 2011-12-03
+  [ BUG FIXES ]
+    - protect against a potential memory leak (rt62971) Reported by Kevin
+      Ryde.
+
+  [ ENHANCEMENTS ]
+    - add possibility to chose display driver.
+
+1.1.0 2011-09-25
+  [ BUG FIXES ]
+    - strip leftover 0.x stuff from Caca.pm and Caca.xs
+
+1.0_0 2011-06-05
+  - upgrade to API 1.x of libcaca
+  - add maze.pl example
+  - remove script caca-sprite
 
 0.97 2011-05-12
-  * draw_thin_line was erronously _draw_line (rt62969)
-  * Build.PL now verify that libcaca is available
+  - draw_thin_line was erronously _draw_line (rt62969)
+  - Build.PL now verify that libcaca is available
 
 0.96 2011-05-08
-  * add support for API 1.x of libcaca (rt68008)
-  * remove dependency to Tie::Array::Pointer (rt62970)
-  * add basic test
-  * drop Makefile.PL support
+  - add support for API 1.x of libcaca (rt68008)
+  - remove dependency to Tie::Array::Pointer (rt62970)
+  - add basic test
+  - drop Makefile.PL support
 
-0.95  2006-03-05
-  * first release in a long time
-  * added much pod
-  * killed memory leaks
-  * added pod coverage tests
+0.95 2006-03-05
+  - first release in a long time
+  - added much pod
+  - killed memory leaks
+  - added pod coverage tests

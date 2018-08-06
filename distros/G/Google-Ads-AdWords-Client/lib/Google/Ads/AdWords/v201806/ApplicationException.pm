@@ -64,7 +64,7 @@ Google::Ads::AdWords::v201806::ApplicationException
 Perl data type class for the XML Schema defined complexType
 ApplicationException from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Base class for exceptions. 
 
 
 

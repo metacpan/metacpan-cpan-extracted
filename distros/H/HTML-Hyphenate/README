@@ -1,6 +1,6 @@
 HTML::Hyphenate is Copyright (C) 2009-2018, Roland van Ipenburg
 
-HTML::Hyphenate version 1.0.0
+HTML::Hyphenate version v1.1.0
 =============================
 
 This module can be used to insert soft hyphens into HTML.
@@ -22,10 +22,10 @@ This module requires these other modules and libraries:
   Encode
   Mojo::DOM
   Log::Log4perl
-  Readonly 	       1.03
+  Readonly              1.03
   Set::Scalar
   TeX::Hyphen
-  TeX::Hyphen::Pattern
+  TeX::Hyphen::Pattern  0.103
   version
 
 LICENSE INFORMATION

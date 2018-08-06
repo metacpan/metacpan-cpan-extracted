@@ -1,0 +1,21 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of generating a comment about a subject.",
+      "rdfs:label" : "CommentAction",
+      "rdfs:subClassOf" : "schema:CommunicateAction"
+   },
+   "properties" : {
+      "schema:resultComment" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of result. The Comment created or sent as a result of this action.",
+         "rdfs:label" : "resultComment",
+         "rdfs:subPropertyOf" : "schema:result",
+         "schema:domainIncludes" : [
+            "schema:CommentAction",
+            "schema:ReplyAction"
+         ],
+         "schema:rangeIncludes" : "schema:Comment"
+      }
+   }
+}

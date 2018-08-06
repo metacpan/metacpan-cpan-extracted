@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::RequiredError
 Perl data type class for the XML Schema defined complexType
 RequiredError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Errors due to missing required field. 
 
 
 

@@ -1,12 +1,12 @@
 package Locale::CLDR::ValidCodes;
 # This file auto generated from Data\common\supplemental\supplementalMetadata.xml
-#	on Fri 13 Apr  6:59:46 am GMT
+#	on Sun  5 Aug  5:49:09 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -9202,6 +9202,7 @@ has 'valid_variants' => (
  hsistemo
  ijekavsk
  itihasa
+ ivanchov
  jauer
  jyutping
  kkcor
@@ -9390,7 +9391,7 @@ has 'valid_currencies' => (
  SOS
  SRD
  SSP
- STD
+ STN
  SYP
  SZL
  THB
@@ -15054,6 +15055,7 @@ has 'valid_keys' => (
 			'mnt',
 			'mop',
 			'mro',
+			'mru',
 			'mtl',
 			'mtp',
 			'mur',
@@ -16468,6 +16470,7 @@ has 'language_aliases' => (
 	'no_NYNORSK' => 'nn',
 	'aa_SAAHO' => 'ssy',
 	'sh' => 'sr_Latn',
+	'cnr' => 'sr_ME',
 	'no' => 'nb',
 	'tl' => 'fil',
 	'az_AZ' => 'az_Latn_AZ',

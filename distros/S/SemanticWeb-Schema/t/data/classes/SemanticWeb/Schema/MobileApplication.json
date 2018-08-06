@@ -1,0 +1,17 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A software application designed specifically to work well on a mobile device such as a telephone.",
+      "rdfs:label" : "MobileApplication",
+      "rdfs:subClassOf" : "schema:SoftwareApplication"
+   },
+   "properties" : {
+      "schema:carrierRequirements" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifies specific carrier(s) requirements for the application (e.g. an application may only work on a specific carrier network).",
+         "rdfs:label" : "carrierRequirements",
+         "schema:domainIncludes" : "schema:MobileApplication",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

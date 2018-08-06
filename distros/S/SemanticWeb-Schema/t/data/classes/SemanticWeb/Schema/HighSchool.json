@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A high school.",
+      "rdfs:label" : "HighSchool",
+      "rdfs:subClassOf" : "schema:EducationalOrganization"
+   },
+   "properties" : {}
+}

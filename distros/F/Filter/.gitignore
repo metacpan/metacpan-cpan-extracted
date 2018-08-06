@@ -46,3 +46,4 @@ inline.h.gcov
 */*.gcda
 */*.gcno
 /cover_db
+nytprof.out

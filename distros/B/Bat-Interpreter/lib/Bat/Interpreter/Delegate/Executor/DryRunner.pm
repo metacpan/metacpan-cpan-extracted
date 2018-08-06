@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 with 'Bat::Interpreter::Role::Executor';
 
-our $VERSION = '0.010';    # VERSION
+our $VERSION = '0.012';    # VERSION
 
 has 'commands_executed' => ( is      => 'ro',
                              isa     => ArrayRef,
@@ -56,7 +56,7 @@ Bat::Interpreter::Delegate::Executor::DryRunner
 
 =head1 VERSION
 
-version 0.010
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -88,9 +88,17 @@ Bat::Interpreter::Delegate::Executor::DryRunner - Executor for register all comm
 
 Returns an arrayref to the commands that are going to be executed but not part of a for command (aka: backticks executed in perl)
 
+=head2 add_command
+
+Add a command to the list of commands executed
+
 =head2 for_commands_executed
 
 Returns an arrayref to the commands that are going to be executed as part of a for command (aka: bacticks executed in perl)
+
+=head2 add_for_command
+
+Add a for command to the list of for commands executed
 
 =head2 execute_command
 

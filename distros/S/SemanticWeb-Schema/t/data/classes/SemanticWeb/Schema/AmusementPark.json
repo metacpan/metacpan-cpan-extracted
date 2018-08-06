@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An amusement park.",
+      "rdfs:label" : "AmusementPark",
+      "rdfs:subClassOf" : "schema:EntertainmentBusiness"
+   },
+   "properties" : {}
+}

@@ -1,0 +1,11 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_DatasetClass",
+      "owl:equivalentClass" : "dcat:Distribution",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A dataset in downloadable form.",
+      "rdfs:label" : "DataDownload",
+      "rdfs:subClassOf" : "schema:MediaObject"
+   },
+   "properties" : {}
+}

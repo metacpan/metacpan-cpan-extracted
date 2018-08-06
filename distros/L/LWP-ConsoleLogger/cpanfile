@@ -50,6 +50,7 @@ on 'test' => sub {
   requires "URI::file" => "0";
   requires "WWW::Mechanize" => "0";
   requires "perl" => "5.013010";
+  requires "version" => "0";
 };
 
 on 'test' => sub {

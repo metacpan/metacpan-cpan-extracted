@@ -1,5 +1,9 @@
 Revision history for Perl module NetRabbitMQPerl
 
+0.06 2018-08-02
+    - [add] SSL support - requires optional IO::Socket::SSL (GH #9)
+      thanks to Jonathan Briggs for the above patch
+
 0.05 2017-05-12
     - [fix] install failures due to dependencies not listed
 

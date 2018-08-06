@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Lrc - Package for language Northern Luri
 
 package Locale::CLDR::Locales::Lrc;
 # This file auto generated from Data\common\main\lrc.xml
-#	on Fri 13 Apr  7:18:32 am GMT
+#	on Sun  5 Aug  6:10:20 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1144,11 +1144,11 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'abbreviated' => {
-					'pm' => q{PM},
-					'am' => q{AM},
-				},
 				'wide' => {
+					'am' => q{AM},
+					'pm' => q{PM},
+				},
+				'abbreviated' => {
 					'am' => q{AM},
 					'pm' => q{PM},
 				},

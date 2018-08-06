@@ -1,5 +1,9 @@
 package Transport::AU::PTV::NoError;
-$Transport::AU::PTV::NoError::VERSION = '0.01';
+$Transport::AU::PTV::NoError::VERSION = '0.03';
+# VERSION
+# PODNAME
+# ABSTRACT: parent class with C<error> method returning false.
+
 use strict;
 use warnings;
 use 5.010;
@@ -18,11 +22,11 @@ __END__
 
 =head1 NAME
 
-Transport::AU::PTV::NoError
+Transport::AU::PTV::NoError - parent class with C<error> method returning false.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 NAME
 

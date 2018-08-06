@@ -5,7 +5,7 @@ requires 'indirect';
 requires 'curry', '>= 1.001';
 requires 'JSON::MaybeUTF8';
 requires 'MojoX::JSON::RPC';
-requires 'Mojolicious', '== 7.29';
+requires 'Mojolicious', '>= 7.29';
 requires 'IO::Async::Loop::Mojo';
 requires 'Scalar::Util';
 requires 'Unicode::Normalize', '>= 1.25';

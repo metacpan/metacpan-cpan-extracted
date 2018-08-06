@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Bgn::Ja_hrkt::Ja_latn;
 # This file auto generated from Data\common\transforms\Katakana-Latin-BGN.xml
-#	on Fri 13 Apr  6:59:53 am GMT
+#	on Sun  5 Aug  5:49:16 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -26,14 +26,19 @@ has 'transforms' => (
 	isa => ArrayRef,
 	init_arg => undef,
 	default => sub { [
-		qr/(?^umi:\G[あいうえおかがきぎくぐけげこごさざしじすずせぜそぞただちぢっつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもゃやゅゆょよらりるれろわゐゑをんゔアイウエオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロワヰヱヲンヴ])/,
+		qr/(?^umi:\G[あいうえおかがきぎくぐけげこごさざしじすずせぜそぞただちぢっつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもゃやゅゆょよらりるれろわゐゑをんゔアイウエオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロワヰヱヲンヴ゙゚ー｡-ﾟ])/,
 		{
 			type => 'transform',
 			data => [
 				{
 					from => q(Any),
-					to => q(NFD),
+					to => q(NFC),
 				},
+			],
+		},
+		{
+			type => 'filter',
+			data => [
 			],
 		},
 		{
@@ -533,35 +538,35 @@ has 'transforms' => (
 					before  => q(),
 					after   => q(),
 					replace => q(ミョウ),
-					result  => q(hyō),
+					result  => q(myō),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
 					replace => q(ミュウ),
-					result  => q(hyū),
+					result  => q(myū),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
 					replace => q(ミャ),
-					result  => q(hya),
+					result  => q(mya),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
 					replace => q(ミョ),
-					result  => q(hyo),
+					result  => q(myo),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
 					replace => q(ミュ),
-					result  => q(hyu),
+					result  => q(myu),
 					revisit => 0,
 				},
 				{
@@ -1562,35 +1567,35 @@ has 'transforms' => (
 					before  => q(),
 					after   => q(),
 					replace => q(みょう),
-					result  => q(hyō),
+					result  => q(myō),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
 					replace => q(みゅう),
-					result  => q(hyū),
+					result  => q(myū),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
 					replace => q(みゃ),
-					result  => q(hya),
+					result  => q(mya),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
 					replace => q(みょ),
-					result  => q(hyo),
+					result  => q(myo),
 					revisit => 0,
 				},
 				{
 					before  => q(),
 					after   => q(),
 					replace => q(みゅ),
-					result  => q(hyu),
+					result  => q(myu),
 					revisit => 0,
 				},
 				{
@@ -2123,6 +2128,69 @@ has 'transforms' => (
 					after   => q(),
 					replace => q(ゔ),
 					result  => q(v),
+					revisit => 0,
+				},
+			],
+		},
+		{
+			type => 'transform',
+			data => [
+				{
+					from => q(Any),
+					to => q(NULL),
+				},
+			],
+		},
+		{
+			type => 'conversion',
+			data => [
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(aー),
+					result  => q(ā),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(iー),
+					result  => q(ī),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(uー),
+					result  => q(ū),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(eー),
+					result  => q(ē),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(oー),
+					result  => q(ō),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(vー),
+					result  => q(vū),
+					revisit => 0,
+				},
+				{
+					before  => q(),
+					after   => q(),
+					replace => q(ー),
+					result  => q(),
 					revisit => 0,
 				},
 			]

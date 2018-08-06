@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,14 +22,12 @@ requires:
   JSON::MaybeXS: '0'
   Moo: '0'
   Moose: '0'
-  Ref::Util: '0'
   Sub::Quote: '0'
   Types::Standard: '0'
   perl: '5.006000'
 resources:
   repository: git://github.com/davorg/moox-role-json_ld.git
-version: v0.0.13
+version: v0.0.15
 x_contributors:
   - 'Robert Rothenberg <rrwo@cpan.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

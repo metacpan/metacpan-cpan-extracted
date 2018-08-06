@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of manipulating/administering/supervising/controlling one or more objects.",
+      "rdfs:label" : "OrganizeAction",
+      "rdfs:subClassOf" : "schema:Action"
+   },
+   "properties" : {}
+}

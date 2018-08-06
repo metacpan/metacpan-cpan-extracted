@@ -1,0 +1,17 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of ingesting information/resources/food.",
+      "rdfs:label" : "ConsumeAction",
+      "rdfs:subClassOf" : "schema:Action"
+   },
+   "properties" : {
+      "schema:expectsAcceptanceOf" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An Offer which must be accepted before the user can perform the Action. For example, the user may need to buy a movie before being able to watch it.",
+         "rdfs:label" : "expectsAcceptanceOf",
+         "schema:domainIncludes" : "schema:ConsumeAction",
+         "schema:rangeIncludes" : "schema:Offer"
+      }
+   }
+}

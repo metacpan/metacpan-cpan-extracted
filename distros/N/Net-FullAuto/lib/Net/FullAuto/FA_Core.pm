@@ -18288,8 +18288,7 @@ sub ftm_login
                $hostlabel}{'IdentityFile'} &&
                $Net::FullAuto::FA_Core::Hosts{
                $hostlabel}{'IdentityFile'})) {
-            $determine_password->('',0,'localhost') if $spawn eq 'ssh';
-            #$determine_password->('',0,$hostlabel,$password);
+            $determine_password->('',0,'localhost');
             unless ($password) {
                if ($su_id) {
                   $ftm_passwd=&Net::FullAuto::FA_Core::getpasswd($hostlabel,

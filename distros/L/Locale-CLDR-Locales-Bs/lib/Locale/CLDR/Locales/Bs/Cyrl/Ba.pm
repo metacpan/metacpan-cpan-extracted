@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Bs::Cyrl::Ba - Package for language Bosnian
 
 package Locale::CLDR::Locales::Bs::Cyrl::Ba;
 # This file auto generated from Data\common\main\bs_Cyrl_BA.xml
-#	on Fri 13 Apr  7:04:08 am GMT
+#	on Sun  5 Aug  5:54:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

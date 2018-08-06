@@ -389,11 +389,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           return SPECIAL_ASSIGN;
         }
-        /* Bit and */
+        /* AMPERSAND - Bit and or type reference*/
         else {
           SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_BIT_AND);
           yylvalp->opval = op;
-          return BIT_AND;
+          return AMPERSAND;
         }
       
       /* Comment */
@@ -747,9 +747,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       }
       case '\\':
         compiler->bufptr++;
-        SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_REF);
-        yylvalp->opval = op;
-        return REF;
+        return BACKSLASH;
       default:
         /* Variable */
         if (ch == '$') {
@@ -1053,10 +1051,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_BYTE);
                   return BYTE;
                 }
-                if (strcmp(keyword, "byte_ref") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_BYTE_REF);
-                  return BYTE_REF;
-                }
                 break;
               case 'c' :
                 if (strcmp(keyword, "case") == 0) {
@@ -1080,10 +1074,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "double") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_DOUBLE);
                   return DOUBLE;
-                }
-                else if (strcmp(keyword, "double_ref") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_DOUBLE_REF);
-                  return DOUBLE_REF;
                 }
                 break;
               case 'e' :
@@ -1116,10 +1106,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "float") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_FLOAT);
                   return FLOAT;
-                }
-                else if (strcmp(keyword, "float_ref") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_FLOAT_REF);
-                  return FLOAT_REF;
                 }
                 break;
               case 'g' :
@@ -1157,10 +1143,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_INT);
                   return INT;
                 }
-                else if (strcmp(keyword, "int_ref") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_INT_REF);
-                  return INT_REF;
-                }
                 break;
               case 'l' :
                 if (strcmp(keyword, "last") == 0) {
@@ -1182,10 +1164,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "long") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_LONG);
                   return LONG;
-                }
-                else if (strcmp(keyword, "long_ref") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_LONG_REF);
-                  return LONG_REF;
                 }
                 break;
               case 'm' :
@@ -1287,10 +1265,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "short") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SHORT);
                   return SHORT;
-                }
-                else if (strcmp(keyword, "short_ref") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SHORT_REF);
-                  return SHORT_REF;
                 }
                 else if (strcmp(keyword, "scalar") == 0) {
                   compiler->bufptr++;

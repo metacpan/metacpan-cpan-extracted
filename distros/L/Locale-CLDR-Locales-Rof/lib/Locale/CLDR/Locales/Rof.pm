@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Rof - Package for language Rombo
 
 package Locale::CLDR::Locales::Rof;
 # This file auto generated from Data\common\main\rof.xml
-#	on Fri 13 Apr  7:26:35 am GMT
+#	on Sun  5 Aug  6:19:20 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -556,6 +556,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(heleri sa Moritania \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(heleri sa Moritania),
 			},
 		},
@@ -620,6 +625,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(heleri sa Sao Tome na Principe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(heleri sa Sao Tome na Principe),
 			},
@@ -825,13 +835,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
+				'abbreviated' => {
 					'am' => q{kang’ama},
 					'pm' => q{kingoto},
 				},
-				'abbreviated' => {
-					'pm' => q{kingoto},
+				'wide' => {
 					'am' => q{kang’ama},
+					'pm' => q{kingoto},
 				},
 			},
 		},

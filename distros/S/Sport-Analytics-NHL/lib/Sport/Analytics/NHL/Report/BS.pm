@@ -246,7 +246,6 @@ sub set_timestamps ($$) {
 
 	my $ts = $json->{metaData}{timeStamp}; $ts =~ s/_/ /;
 	$self->{last_updated} = str3time($ts);
-	#print Dumper $json->{gameData}{datetime};
 	$self->{start_ts}     = str3time($json->{gameData}{datetime}{dateTime});
 	$self->{stop_ts}      = $json->{gameData}{datetime}{endDateTime}
 		? str3time($json->{gameData}{datetime}{endDateTime})
@@ -328,12 +327,10 @@ sub set_player ($$) {
 			%{dclone $ld_player->{stats}{skaterStats}} :
 			%{dclone ($ld_player->{stats}{goalieStats} || {})},
 	};
-	#print Dumper $player if $player->{position} eq 'G';
 	if ($BROKEN_PLAYERS{BS}->{$self->{_id}}
 		&& $BROKEN_PLAYERS{BS}->{$self->{_id}}->{$ld_player->{person}{id}}
 		&& ref $BROKEN_PLAYERS{BS}->{$self->{_id}}->{$ld_player->{person}{id}}) {
 		for my $stat (keys %{$BROKEN_PLAYERS{BS}->{$self->{_id}}->{$ld_player->{person}{id}}}) {
-			print "bkey $stat bp $ld_player->{person}{id}\n";
 			$player->{$stat} = $BROKEN_PLAYERS{BS}->{$self->{_id}}->{$ld_player->{person}{id}}{$stat};
 		}
 	}
@@ -447,7 +444,6 @@ sub assign_specific_penalty_data ($$) {
 	my $ld_event = shift;
 
 	place_players($event, $ld_event);
-	#print Dumper $event->{penalty};
 	$event->{penalty}  = $ld_event->{result}{secondaryType};
 	$event->{severity} = uc($ld_event->{result}{penaltySeverity} || '');
 	$event->{length}   = $ld_event->{result}{penaltyMinutes};
@@ -455,8 +451,8 @@ sub assign_specific_penalty_data ($$) {
 		$event->{servedby} = $event->{player1} if $event->{player1};
 		$event->{player1}  = $BENCH_PLAYER_ID;
 	}
-	if ($event->{penalty} =~ /too many/i) {
-		$event->{servedby} = $event->{player1} if $event->{player1};
+	if ($event->{penalty} =~ /too many/i || $event->{description} =~ /^\s+against/i) {
+		$event->{servedby} ||= $event->{player1} if $event->{player1};
 		$event->{player1}  = $BENCH_PLAYER_ID;
 		$event->{pim_correction} += 2;
 	}
@@ -466,7 +462,6 @@ sub assign_specific_penalty_data ($$) {
 		$event->{penalty} = $1;
 	}
 	$event->{penalty} = normalize_penalty($event->{penalty});
-		#print "$event->{time} $event->{description}, $event->{player1}\n"; #if $event->{player1} == 8467899;
 }
 
 sub assign_specific_goal_data ($$) {
@@ -481,7 +476,6 @@ sub assign_specific_goal_data ($$) {
 	$event->{shot_type} = vocabulary_lookup('shot_type', $ld_event->{result}{secondaryType} || '');
 	$event->{en}        = $ld_event->{result}{emptyNet};
 	$event->{gwg}       = $ld_event->{result}{gameWinningGoal};
-	#print "$event->{description}, $event->{player1}\n"; #if $event->{player1} == 8467899;
 }
 
 sub assign_specific_event_data ($$) {
@@ -501,7 +495,6 @@ sub assign_specific_event_data ($$) {
 		when ('MISS') {
 			$event->{player1} = $ld_event->{players}[0]{player}{id};
 			$event->{description} =~ /\- (.*)/;
-#			print Dumper $event;
 			$event->{miss}    = vocabulary_lookup('miss', $1 || '');
 		}
 		when ('STOP')  { $event->{stopreason} = [ vocabulary_lookup('stopreason', $event->{description})] }
@@ -514,7 +507,6 @@ sub assign_specific_event_data ($$) {
 		}
 		when ('SHOT') {
 			place_players($event, $ld_event);
-			#print Dumper $ld_event;
 			$event->{shot_type} = vocabulary_lookup('shot_type', $ld_event->{result}{secondaryType} || '');
 		}
 		when ('PENL') { assign_specific_penalty_data($event, $ld_event); }
@@ -545,14 +537,18 @@ sub fix_servedby ($) {
 	if ($event->{type} eq 'PENL'
 		&& $event->{description} =~ /served by/i
 		&& ! $event->{servedby}) {
+		$event->{_servedby} = 1;
 		my @pl = (
 			3,2,
-			$event->{description} =~ /\b(illegal|official|proceed|dress|refusal|objects|misconduct|conduct|bench|coach|delay|abus)/i
-				|| $event->{severity} =~ /BENCH/ ? 1 : ()
+			($event->{description} =~ /\b(illegal|official|proceed|dress|refusal|objects|misconduct|ineligible|conduct|bench|coach|delay|abus|leaving)/i && $event->{description} !~ /leaves.*bench/i)
+			|| $event->{severity} =~ /BENCH/
+			|| $event->{description} =~ /minor served by/i
+			? 1 : ()
 		);
 		for my $p (@pl) {
 			my $field = "player$p";
 			if (defined $event->{$field}) {
+				delete $event->{_servedby};
 				$event->{servedby} = delete $event->{$field};
 				if ($field eq 'player1') {
 					$event->{$field} = $event->{description} =~ /coach/i ?
@@ -581,10 +577,7 @@ sub fix_old_goalie ($$) {
 		} grep {
 			$_->{position} eq 'G'
 		} @{$team->{roster}};
-		#print Dumper \@goalies;
 		my $goalie = $goalies[0];
-		#print Dumper $goalie;
-		#exit;
 		$event->{player2} = $goalie->{_id};
 		$event->{team2}   = $team->{name};
 	}
@@ -673,7 +666,7 @@ sub process ($) {
 		$self->set_events($self->{json}{liveData}{plays}{allPlays});
 	}
 	else {
-		$BROKEN_FILES{$self->{_id}}->{BS} = 1;
+		$BROKEN_FILES{$self->{_id}}->{BS} = $NO_EVENTS;
 		$self->{events} = [];
 	}
 	$self->{type} = 'BS';

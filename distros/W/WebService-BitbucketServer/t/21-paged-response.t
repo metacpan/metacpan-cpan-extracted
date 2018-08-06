@@ -7,6 +7,7 @@ use lib 't/lib';
 
 use WebService::BitbucketServer;
 use HTTP::AnyUA;
+use Test::Deep;
 use Test::More tests => 10;
 
 HTTP::AnyUA->register_backend(Mock => '+MockBackend');
@@ -48,8 +49,8 @@ is $response->context, $api, 'context object is correct';
 ok $response->is_success, 'response is a success';
 ok !$response->error, 'response has no error';
 ok $response->is_paged, 'response is paged';
-is_deeply $response->page_info, {
-    is_last_page    => \1,
+cmp_deeply $response->page_info, {
+    is_last_page    => bool(1),
     limit           => 15,
     start           => 0,
     size            => 2,
@@ -58,14 +59,14 @@ is_deeply $response->page_info, {
 }, 'page info is correct';
 is $response->next, undef, 'next page is not defined';
 is $response->status, '200', 'response status is correct';
-is_deeply $response->raw, $backend->response, 'raw response is correct';
-is_deeply $response->request_args, {
+cmp_deeply $response->raw, $backend->response, 'raw response is correct';
+cmp_deeply $response->request_args, {
     method => 'GET',
     url => 'api/1.0/profile/recent/repos',
 }, 'request args are correct';
 my $expected = [
           {
-            'forkable' => bless( do{\(my $o = 1)}, 'JSON::PP::Boolean' ),
+            'forkable' => bool(1),
             'id' => 1,
             'scmId' => 'git',
             'name' => 'myrepo',
@@ -83,7 +84,7 @@ my $expected = [
                                         'emailAddress' => 'bob@example.com',
                                         'slug' => 'bob',
                                         'type' => 'NORMAL',
-                                        'active' => bless( do{\(my $o = 1)}, 'JSON::PP::Boolean' ),
+                                        'active' => bool(1),
                                         'id' => 30,
                                         'displayName' => 'Bob Person',
                                         'links' => {
@@ -99,7 +100,7 @@ my $expected = [
                            'name' => 'Bob Person'
                          },
             'state' => 'AVAILABLE',
-            'public' => bless( do{\(my $o = 1)}, 'JSON::PP::Boolean' ),
+            'public' => bool(1),
             'links' => {
                          'self' => [
                                      {
@@ -122,12 +123,12 @@ my $expected = [
           },
           {
             'slug' => 'orgrepo',
-            'forkable' => bless( do{\(my $o = 1)}, 'JSON::PP::Boolean' ),
+            'forkable' => bool(1),
             'id' => 2,
             'scmId' => 'git',
             'state' => 'AVAILABLE',
             'project' => {
-                           'public' => bless( do{\(my $o = 0)}, 'JSON::PP::Boolean' ),
+                           'public' => bool(0),
                            'links' => {
                                         'self' => [
                                                     {
@@ -160,8 +161,8 @@ my $expected = [
                                    ]
                        },
             'statusMessage' => 'Available',
-            'public' => bless( do{\(my $o = 0)}, 'JSON::PP::Boolean' )
+            'public' => bool(0),
           }
         ];
-is_deeply $response->data, $expected, 'response data parses correctly';
+cmp_deeply $response->data, $expected, 'response data parses correctly';
 

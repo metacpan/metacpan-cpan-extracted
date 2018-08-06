@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Khq::Any::Ml - Package for language Koyra Chiini
 
 package Locale::CLDR::Locales::Khq::Any::Ml;
 # This file auto generated from Data\common\main\khq_ML.xml
-#	on Fri 13 Apr  7:16:14 am GMT
+#	on Sun  5 Aug  6:07:44 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

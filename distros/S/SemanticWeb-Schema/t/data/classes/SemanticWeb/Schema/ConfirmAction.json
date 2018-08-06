@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>The act of notifying someone that a future event/action is going to happen as expected.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/CancelAction\">CancelAction</a>: The antonym of ConfirmAction.</li>\n</ul>\n",
+      "rdfs:label" : "ConfirmAction",
+      "rdfs:subClassOf" : "schema:InformAction"
+   },
+   "properties" : {}
+}

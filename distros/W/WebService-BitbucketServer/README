@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.604
+    version 0.605
 
 SYNOPSIS
 
@@ -60,7 +60,8 @@ ATTRIBUTES
 
  password
 
-    Get the password of the user for authenticating.
+    Get the password (or personal access token) of the user for
+    authenticating.
 
  ua
 
@@ -77,7 +78,7 @@ ATTRIBUTES
 
  json
 
-    Get the JSON (or compatible) object used for encoding and decoding
+    Get the JSON::XS (or compatible) object used for encoding and decoding
     documents.
 
  no_security_warning

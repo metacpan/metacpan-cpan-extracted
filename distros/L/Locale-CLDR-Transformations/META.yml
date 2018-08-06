@@ -24,1138 +24,1150 @@ provides:
     file: lib/Locale/CLDR/Transformations.pm
   Locale::CLDR::Transformations::Any::Accents::Any:
     file: lib/Locale/CLDR/Transformations/Any/Accents/Any.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Am::Am_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Am/Am_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Am::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Am/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Am::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Am/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Am::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Am/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Am_fonipa::Am:
     file: lib/Locale/CLDR/Transformations/Any/Am_fonipa/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Any::Accents:
     file: lib/Locale/CLDR/Transformations/Any/Any/Accents.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Any::Publishing:
     file: lib/Locale/CLDR/Transformations/Any/Any/Publishing.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Arab::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Arab/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Armn::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Armn/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ascii::Latin:
     file: lib/Locale/CLDR/Transformations/Any/Ascii/Latin.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Az::Lower:
     file: lib/Locale/CLDR/Transformations/Any/Az/Lower.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Az::Title:
     file: lib/Locale/CLDR/Transformations/Any/Az/Title.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Az::Upper:
     file: lib/Locale/CLDR/Transformations/Any/Az/Upper.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Beng::Arab:
     file: lib/Locale/CLDR/Transformations/Any/Beng/Arab.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Beng::Deva:
     file: lib/Locale/CLDR/Transformations/Any/Beng/Deva.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Beng::Gujr:
     file: lib/Locale/CLDR/Transformations/Any/Beng/Gujr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Beng::Guru:
     file: lib/Locale/CLDR/Transformations/Any/Beng/Guru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Beng::Knda:
     file: lib/Locale/CLDR/Transformations/Any/Beng/Knda.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Beng::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Beng/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Beng::Mlym:
     file: lib/Locale/CLDR/Transformations/Any/Beng/Mlym.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Beng::Orya:
     file: lib/Locale/CLDR/Transformations/Any/Beng/Orya.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Beng::Taml:
     file: lib/Locale/CLDR/Transformations/Any/Beng/Taml.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Beng::Telu:
     file: lib/Locale/CLDR/Transformations/Any/Beng/Telu.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Beng::Ur:
     file: lib/Locale/CLDR/Transformations/Any/Beng/Ur.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Bengali::Interindic:
     file: lib/Locale/CLDR/Transformations/Any/Bengali/Interindic.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Blt::Blt_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Blt/Blt_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Bopo::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Bopo/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cans::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Cans/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ch::Am:
     file: lib/Locale/CLDR/Transformations/Any/Ch/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ch::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Ch/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ch::Ch_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Ch/Ch_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ch::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Ch/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ch::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Ch/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Chr::Chr_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Chr/Chr_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Conjoiningjamo::Latin:
     file: lib/Locale/CLDR/Transformations/Any/Conjoiningjamo/Latin.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cs::Am:
     file: lib/Locale/CLDR/Transformations/Any/Cs/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cs::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Cs/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cs::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Cs/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cs::Cs_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Cs/Cs_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cs::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Cs/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cs::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Cs/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cs::Ko:
     file: lib/Locale/CLDR/Transformations/Any/Cs/Ko.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cs_fonipa::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Cs_fonipa/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cs_fonipa::Ko:
     file: lib/Locale/CLDR/Transformations/Any/Cs_fonipa/Ko.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cy::Cy_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Cy/Cy_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Cyrl::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Cyrl/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::De::Ascii:
     file: lib/Locale/CLDR/Transformations/Any/De/Ascii.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Deva::Arab:
     file: lib/Locale/CLDR/Transformations/Any/Deva/Arab.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Deva::Beng:
     file: lib/Locale/CLDR/Transformations/Any/Deva/Beng.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Deva::Gujr:
     file: lib/Locale/CLDR/Transformations/Any/Deva/Gujr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Deva::Guru:
     file: lib/Locale/CLDR/Transformations/Any/Deva/Guru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Deva::Knda:
     file: lib/Locale/CLDR/Transformations/Any/Deva/Knda.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Deva::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Deva/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Deva::Mlym:
     file: lib/Locale/CLDR/Transformations/Any/Deva/Mlym.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Deva::Orya:
     file: lib/Locale/CLDR/Transformations/Any/Deva/Orya.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Deva::Taml:
     file: lib/Locale/CLDR/Transformations/Any/Deva/Taml.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Deva::Telu:
     file: lib/Locale/CLDR/Transformations/Any/Deva/Telu.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Deva::Ur:
     file: lib/Locale/CLDR/Transformations/Any/Deva/Ur.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Devanagari::Interindic:
     file: lib/Locale/CLDR/Transformations/Any/Devanagari/Interindic.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Dsb::Dsb_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Dsb/Dsb_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::El::Lower:
     file: lib/Locale/CLDR/Transformations/Any/El/Lower.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::El::Title:
     file: lib/Locale/CLDR/Transformations/Any/El/Title.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::El::Upper:
     file: lib/Locale/CLDR/Transformations/Any/El/Upper.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Eo::Am:
     file: lib/Locale/CLDR/Transformations/Any/Eo/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Eo::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Eo/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Eo::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Eo/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Eo::Eo_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Eo/Eo_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Eo::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Eo/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es::Am:
     file: lib/Locale/CLDR/Transformations/Any/Es/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Es/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Es/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es::Es_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Es/Es_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Es/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Es/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es::Zh:
     file: lib/Locale/CLDR/Transformations/Any/Es/Zh.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es_419::Am:
     file: lib/Locale/CLDR/Transformations/Any/Es_419/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es_419::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Es_419/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es_419::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Es_419/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es_419::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Es_419/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es_419::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Es_419/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es_419::Zh:
     file: lib/Locale/CLDR/Transformations/Any/Es_419/Zh.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es_fonipa::Am:
     file: lib/Locale/CLDR/Transformations/Any/Es_fonipa/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es_fonipa::Es_419_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Es_fonipa/Es_419_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es_fonipa::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Es_fonipa/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Es_fonipa::Zh:
     file: lib/Locale/CLDR/Transformations/Any/Es_fonipa/Zh.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ethi::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Ethi/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
+  Locale::CLDR::Transformations::Any::Fa::Fa_fonipa:
+    file: lib/Locale/CLDR/Transformations/Any/Fa/Fa_fonipa.pm
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Fullwidth::Halfwidth:
     file: lib/Locale/CLDR/Transformations/Any/Fullwidth/Halfwidth.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Geor::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Geor/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Grek::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Grek/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujarati::Interindic:
     file: lib/Locale/CLDR/Transformations/Any/Gujarati/Interindic.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujr::Arab:
     file: lib/Locale/CLDR/Transformations/Any/Gujr/Arab.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujr::Beng:
     file: lib/Locale/CLDR/Transformations/Any/Gujr/Beng.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujr::Deva:
     file: lib/Locale/CLDR/Transformations/Any/Gujr/Deva.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujr::Guru:
     file: lib/Locale/CLDR/Transformations/Any/Gujr/Guru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujr::Knda:
     file: lib/Locale/CLDR/Transformations/Any/Gujr/Knda.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujr::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Gujr/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujr::Mlym:
     file: lib/Locale/CLDR/Transformations/Any/Gujr/Mlym.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujr::Orya:
     file: lib/Locale/CLDR/Transformations/Any/Gujr/Orya.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujr::Taml:
     file: lib/Locale/CLDR/Transformations/Any/Gujr/Taml.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujr::Telu:
     file: lib/Locale/CLDR/Transformations/Any/Gujr/Telu.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gujr::Ur:
     file: lib/Locale/CLDR/Transformations/Any/Gujr/Ur.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Gurmukhi::Interindic:
     file: lib/Locale/CLDR/Transformations/Any/Gurmukhi/Interindic.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Guru::Arab:
     file: lib/Locale/CLDR/Transformations/Any/Guru/Arab.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Guru::Beng:
     file: lib/Locale/CLDR/Transformations/Any/Guru/Beng.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Guru::Deva:
     file: lib/Locale/CLDR/Transformations/Any/Guru/Deva.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Guru::Gujr:
     file: lib/Locale/CLDR/Transformations/Any/Guru/Gujr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Guru::Knda:
     file: lib/Locale/CLDR/Transformations/Any/Guru/Knda.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Guru::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Guru/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Guru::Mlym:
     file: lib/Locale/CLDR/Transformations/Any/Guru/Mlym.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Guru::Orya:
     file: lib/Locale/CLDR/Transformations/Any/Guru/Orya.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Guru::Taml:
     file: lib/Locale/CLDR/Transformations/Any/Guru/Taml.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Guru::Telu:
     file: lib/Locale/CLDR/Transformations/Any/Guru/Telu.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Guru::Ur:
     file: lib/Locale/CLDR/Transformations/Any/Guru/Ur.pm
-    version: v0.32.0
+    version: v0.33.0
+  Locale::CLDR::Transformations::Any::Ha::Ha_ne:
+    file: lib/Locale/CLDR/Transformations/Any/Ha/Ha_ne.pm
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Halfwidth::Fullwidth:
     file: lib/Locale/CLDR/Transformations/Any/Halfwidth/Fullwidth.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Han::Spacedhan:
     file: lib/Locale/CLDR/Transformations/Any/Han/Spacedhan.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hang::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Hang/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hani::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Hani/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hans::Hant:
     file: lib/Locale/CLDR/Transformations/Any/Hans/Hant.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hant::Hans:
     file: lib/Locale/CLDR/Transformations/Any/Hant/Hans.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hebr::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Hebr/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hira::Kana:
     file: lib/Locale/CLDR/Transformations/Any/Hira/Kana.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hira::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Hira/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hy::Am:
     file: lib/Locale/CLDR/Transformations/Any/Hy/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hy::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Hy/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hy::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Hy/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hy::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Hy/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hy::Hy_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Hy/Hy_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hy_arevmda::Am:
     file: lib/Locale/CLDR/Transformations/Any/Hy_arevmda/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hy_arevmda::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Hy_arevmda/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hy_arevmda::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Hy_arevmda/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hy_arevmda::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Hy_arevmda/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Hy_arevmda::Hy_arevmda_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Hy_arevmda/Hy_arevmda_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ia::Am:
     file: lib/Locale/CLDR/Transformations/Any/Ia/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ia::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Ia/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ia::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Ia/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ia::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Ia/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ia::Ia_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Ia/Ia_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Arabic:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Arabic.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Bengali:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Bengali.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Devanagari:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Devanagari.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Gujarati:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Gujarati.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Gurmukhi:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Gurmukhi.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Kannada:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Kannada.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Latin:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Latin.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Malayalam:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Malayalam.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Oriya:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Oriya.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Tamil:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Tamil.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Telugu:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Telugu.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Interindic::Ur:
     file: lib/Locale/CLDR/Transformations/Any/Interindic/Ur.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::It::Am:
     file: lib/Locale/CLDR/Transformations/Any/It/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::It::Ja:
     file: lib/Locale/CLDR/Transformations/Any/It/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ja_latn::Ko:
     file: lib/Locale/CLDR/Transformations/Any/Ja_latn/Ko.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ja_latn::Ru:
     file: lib/Locale/CLDR/Transformations/Any/Ja_latn/Ru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Jamo::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Jamo/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Kana::Hira:
     file: lib/Locale/CLDR/Transformations/Any/Kana/Hira.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Kana::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Kana/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Kannada::Interindic:
     file: lib/Locale/CLDR/Transformations/Any/Kannada/Interindic.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Kk::Am:
     file: lib/Locale/CLDR/Transformations/Any/Kk/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Kk::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Kk/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Kk::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Kk/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Kk::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Kk/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Kk::Kk_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Kk/Kk_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Knda::Arab:
     file: lib/Locale/CLDR/Transformations/Any/Knda/Arab.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Knda::Beng:
     file: lib/Locale/CLDR/Transformations/Any/Knda/Beng.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Knda::Deva:
     file: lib/Locale/CLDR/Transformations/Any/Knda/Deva.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Knda::Gujr:
     file: lib/Locale/CLDR/Transformations/Any/Knda/Gujr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Knda::Guru:
     file: lib/Locale/CLDR/Transformations/Any/Knda/Guru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Knda::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Knda/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Knda::Mlym:
     file: lib/Locale/CLDR/Transformations/Any/Knda/Mlym.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Knda::Orya:
     file: lib/Locale/CLDR/Transformations/Any/Knda/Orya.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Knda::Taml:
     file: lib/Locale/CLDR/Transformations/Any/Knda/Taml.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Knda::Telu:
     file: lib/Locale/CLDR/Transformations/Any/Knda/Telu.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Knda::Ur:
     file: lib/Locale/CLDR/Transformations/Any/Knda/Ur.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ky::Am:
     file: lib/Locale/CLDR/Transformations/Any/Ky/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ky::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Ky/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ky::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Ky/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ky::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Ky/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ky::Ky_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Ky/Ky_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::La::La_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/La/La_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latin::Ascii:
     file: lib/Locale/CLDR/Transformations/Any/Latin/Ascii.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latin::Conjoiningjamo:
     file: lib/Locale/CLDR/Transformations/Any/Latin/Conjoiningjamo.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latin::Interindic:
     file: lib/Locale/CLDR/Transformations/Any/Latin/Interindic.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latin::Numericpinyin:
     file: lib/Locale/CLDR/Transformations/Any/Latin/Numericpinyin.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latin::Thailogical:
     file: lib/Locale/CLDR/Transformations/Any/Latin/Thailogical.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Arab:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Arab.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Armn:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Armn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Beng:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Beng.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Bopo:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Bopo.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Cans:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Cans.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Cyrl:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Cyrl.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Deva:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Deva.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Ethi:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Ethi.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Geor:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Geor.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Grek:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Grek.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Gujr:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Gujr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Guru:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Guru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Hang:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Hang.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Hebr:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Hebr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Hira:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Hira.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Jamo:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Jamo.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Kana:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Kana.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Knda:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Knda.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Mlym:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Mlym.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Orya:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Orya.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Syrc:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Syrc.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Taml:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Taml.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Telu:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Telu.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Thaa:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Thaa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Latn::Thai:
     file: lib/Locale/CLDR/Transformations/Any/Latn/Thai.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Lt::Lower:
     file: lib/Locale/CLDR/Transformations/Any/Lt/Lower.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Lt::Title:
     file: lib/Locale/CLDR/Transformations/Any/Lt/Title.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Lt::Upper:
     file: lib/Locale/CLDR/Transformations/Any/Lt/Upper.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Malayalam::Interindic:
     file: lib/Locale/CLDR/Transformations/Any/Malayalam/Interindic.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Mlym::Arab:
     file: lib/Locale/CLDR/Transformations/Any/Mlym/Arab.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Mlym::Beng:
     file: lib/Locale/CLDR/Transformations/Any/Mlym/Beng.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Mlym::Deva:
     file: lib/Locale/CLDR/Transformations/Any/Mlym/Deva.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Mlym::Gujr:
     file: lib/Locale/CLDR/Transformations/Any/Mlym/Gujr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Mlym::Guru:
     file: lib/Locale/CLDR/Transformations/Any/Mlym/Guru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Mlym::Knda:
     file: lib/Locale/CLDR/Transformations/Any/Mlym/Knda.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Mlym::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Mlym/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Mlym::Orya:
     file: lib/Locale/CLDR/Transformations/Any/Mlym/Orya.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Mlym::Taml:
     file: lib/Locale/CLDR/Transformations/Any/Mlym/Taml.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Mlym::Telu:
     file: lib/Locale/CLDR/Transformations/Any/Mlym/Telu.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Mlym::Ur:
     file: lib/Locale/CLDR/Transformations/Any/Mlym/Ur.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::My::Am:
     file: lib/Locale/CLDR/Transformations/Any/My/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::My::Ar:
     file: lib/Locale/CLDR/Transformations/Any/My/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::My::Chr:
     file: lib/Locale/CLDR/Transformations/Any/My/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::My::Fa:
     file: lib/Locale/CLDR/Transformations/Any/My/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::My::My_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/My/My_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Nl::Title:
     file: lib/Locale/CLDR/Transformations/Any/Nl/Title.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Numericpinyin::Latin:
     file: lib/Locale/CLDR/Transformations/Any/Numericpinyin/Latin.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Numericpinyin::Pinyin:
     file: lib/Locale/CLDR/Transformations/Any/Numericpinyin/Pinyin.pm
-    version: v0.32.0
+    version: v0.33.0
+  Locale::CLDR::Transformations::Any::Nv::Nv_fonipa:
+    file: lib/Locale/CLDR/Transformations/Any/Nv/Nv_fonipa.pm
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Oriya::Interindic:
     file: lib/Locale/CLDR/Transformations/Any/Oriya/Interindic.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Orya::Arab:
     file: lib/Locale/CLDR/Transformations/Any/Orya/Arab.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Orya::Beng:
     file: lib/Locale/CLDR/Transformations/Any/Orya/Beng.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Orya::Deva:
     file: lib/Locale/CLDR/Transformations/Any/Orya/Deva.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Orya::Gujr:
     file: lib/Locale/CLDR/Transformations/Any/Orya/Gujr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Orya::Guru:
     file: lib/Locale/CLDR/Transformations/Any/Orya/Guru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Orya::Knda:
     file: lib/Locale/CLDR/Transformations/Any/Orya/Knda.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Orya::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Orya/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Orya::Mlym:
     file: lib/Locale/CLDR/Transformations/Any/Orya/Mlym.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Orya::Taml:
     file: lib/Locale/CLDR/Transformations/Any/Orya/Taml.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Orya::Telu:
     file: lib/Locale/CLDR/Transformations/Any/Orya/Telu.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Orya::Ur:
     file: lib/Locale/CLDR/Transformations/Any/Orya/Ur.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Pinyin::Numericpinyin:
     file: lib/Locale/CLDR/Transformations/Any/Pinyin/Numericpinyin.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Pl::Am:
     file: lib/Locale/CLDR/Transformations/Any/Pl/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Pl::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Pl/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Pl::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Pl/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Pl::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Pl/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Pl::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Pl/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Pl::Pl_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Pl/Pl_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Pl_fonipa::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Pl_fonipa/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Publishing::Any:
     file: lib/Locale/CLDR/Transformations/Any/Publishing/Any.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Rm_sursilv::Am:
     file: lib/Locale/CLDR/Transformations/Any/Rm_sursilv/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Rm_sursilv::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Rm_sursilv/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Rm_sursilv::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Rm_sursilv/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Rm_sursilv::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Rm_sursilv/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Rm_sursilv::Rm_fonipa_sursilv:
     file: lib/Locale/CLDR/Transformations/Any/Rm_sursilv/Rm_fonipa_sursilv.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ro::Am:
     file: lib/Locale/CLDR/Transformations/Any/Ro/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ro::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Ro/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ro::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Ro/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ro::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Ro/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ro::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Ro/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ro::Ro_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Ro/Ro_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ro_fonipa::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Ro_fonipa/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ru::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Ru/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ru::Zh:
     file: lib/Locale/CLDR/Transformations/Any/Ru/Zh.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sat::Am:
     file: lib/Locale/CLDR/Transformations/Any/Sat/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sat::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Sat/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sat::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Sat/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sat::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Sat/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sat_olck::Sat_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Sat_olck/Sat_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Si::Am:
     file: lib/Locale/CLDR/Transformations/Any/Si/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Si::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Si/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Si::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Si/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Si::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Si/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Si::Si_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Si/Si_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Si::Si_latn:
     file: lib/Locale/CLDR/Transformations/Any/Si/Si_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sk::Am:
     file: lib/Locale/CLDR/Transformations/Any/Sk/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sk::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Sk/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sk::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Sk/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sk::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Sk/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sk::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Sk/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sk::Sk_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Sk/Sk_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Sk_fonipa::Ja:
     file: lib/Locale/CLDR/Transformations/Any/Sk_fonipa/Ja.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Spacedhan::Han:
     file: lib/Locale/CLDR/Transformations/Any/Spacedhan/Han.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Syrc::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Syrc/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Ta::Ta_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Ta/Ta_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Tamil::Interindic:
     file: lib/Locale/CLDR/Transformations/Any/Tamil/Interindic.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Taml::Arab:
     file: lib/Locale/CLDR/Transformations/Any/Taml/Arab.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Taml::Beng:
     file: lib/Locale/CLDR/Transformations/Any/Taml/Beng.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Taml::Deva:
     file: lib/Locale/CLDR/Transformations/Any/Taml/Deva.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Taml::Gujr:
     file: lib/Locale/CLDR/Transformations/Any/Taml/Gujr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Taml::Guru:
     file: lib/Locale/CLDR/Transformations/Any/Taml/Guru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Taml::Knda:
     file: lib/Locale/CLDR/Transformations/Any/Taml/Knda.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Taml::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Taml/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Taml::Mlym:
     file: lib/Locale/CLDR/Transformations/Any/Taml/Mlym.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Taml::Orya:
     file: lib/Locale/CLDR/Transformations/Any/Taml/Orya.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Taml::Telu:
     file: lib/Locale/CLDR/Transformations/Any/Taml/Telu.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Taml::Ur:
     file: lib/Locale/CLDR/Transformations/Any/Taml/Ur.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telu::Arab:
     file: lib/Locale/CLDR/Transformations/Any/Telu/Arab.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telu::Beng:
     file: lib/Locale/CLDR/Transformations/Any/Telu/Beng.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telu::Deva:
     file: lib/Locale/CLDR/Transformations/Any/Telu/Deva.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telu::Gujr:
     file: lib/Locale/CLDR/Transformations/Any/Telu/Gujr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telu::Guru:
     file: lib/Locale/CLDR/Transformations/Any/Telu/Guru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telu::Knda:
     file: lib/Locale/CLDR/Transformations/Any/Telu/Knda.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telu::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Telu/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telu::Mlym:
     file: lib/Locale/CLDR/Transformations/Any/Telu/Mlym.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telu::Orya:
     file: lib/Locale/CLDR/Transformations/Any/Telu/Orya.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telu::Taml:
     file: lib/Locale/CLDR/Transformations/Any/Telu/Taml.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telu::Ur:
     file: lib/Locale/CLDR/Transformations/Any/Telu/Ur.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Telugu::Interindic:
     file: lib/Locale/CLDR/Transformations/Any/Telugu/Interindic.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Thaa::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Thaa/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Thai::Latn:
     file: lib/Locale/CLDR/Transformations/Any/Thai/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Thai::Thailogical:
     file: lib/Locale/CLDR/Transformations/Any/Thai/Thailogical.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Thai::Thaisemi:
     file: lib/Locale/CLDR/Transformations/Any/Thai/Thaisemi.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Thailogical::Latin:
     file: lib/Locale/CLDR/Transformations/Any/Thailogical/Latin.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Thailogical::Thai:
     file: lib/Locale/CLDR/Transformations/Any/Thailogical/Thai.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Thaisemi::Thai:
     file: lib/Locale/CLDR/Transformations/Any/Thaisemi/Thai.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Tlh::Am:
     file: lib/Locale/CLDR/Transformations/Any/Tlh/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Tlh::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Tlh/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Tlh::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Tlh/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Tlh::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Tlh/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Tlh::Tlh_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Tlh/Tlh_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Tr::Lower:
     file: lib/Locale/CLDR/Transformations/Any/Tr/Lower.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Tr::Title:
     file: lib/Locale/CLDR/Transformations/Any/Tr/Title.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Tr::Upper:
     file: lib/Locale/CLDR/Transformations/Any/Tr/Upper.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Und_fonipa::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Und_fonipa/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Und_fonipa::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Und_fonipa/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Und_fonipa::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Und_fonipa/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Und_fonipa::Und_fonxsamp:
     file: lib/Locale/CLDR/Transformations/Any/Und_fonipa/Und_fonxsamp.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Und_fonxsamp::Und_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Und_fonxsamp/Und_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Uz_cyrl::Uz_latn:
     file: lib/Locale/CLDR/Transformations/Any/Uz_cyrl/Uz_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Uz_latn::Uz_cyrl:
     file: lib/Locale/CLDR/Transformations/Any/Uz_latn/Uz_cyrl.pm
-    version: v0.32.0
+    version: v0.33.0
+  Locale::CLDR::Transformations::Any::Vec::Vec_fonipa:
+    file: lib/Locale/CLDR/Transformations/Any/Vec/Vec_fonipa.pm
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Xh::Am:
     file: lib/Locale/CLDR/Transformations/Any/Xh/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Xh::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Xh/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Xh::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Xh/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Xh::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Xh/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Xh::Xh_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Xh/Xh_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Yo::Yo_bj:
     file: lib/Locale/CLDR/Transformations/Any/Yo/Yo_bj.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Zawgyi::My:
     file: lib/Locale/CLDR/Transformations/Any/Zawgyi/My.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Zh_latn_pinyin::Ru:
     file: lib/Locale/CLDR/Transformations/Any/Zh_latn_pinyin/Ru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Zu::Am:
     file: lib/Locale/CLDR/Transformations/Any/Zu/Am.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Zu::Ar:
     file: lib/Locale/CLDR/Transformations/Any/Zu/Ar.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Zu::Chr:
     file: lib/Locale/CLDR/Transformations/Any/Zu/Chr.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Zu::Fa:
     file: lib/Locale/CLDR/Transformations/Any/Zu/Fa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Any::Zu::Zu_fonipa:
     file: lib/Locale/CLDR/Transformations/Any/Zu/Zu_fonipa.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Am::Am_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Am/Am_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Ar::Ar_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Ar/Ar_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Az_cyrl::Az:
     file: lib/Locale/CLDR/Transformations/Bgn/Az_cyrl/Az.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Be::Be_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Be/Be_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Bg::Bg_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Bg/Bg_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Dv::Dv_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Dv/Dv_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::El::El_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/El/El_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Fa::Fa_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Fa/Fa_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::He::He_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/He/He_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Hy::Hy_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Hy/Hy_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Ja_hrkt::Ja_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Ja_hrkt/Ja_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Ka::Ka_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Ka/Ka_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Kk::Kk_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Kk/Kk_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Ko::Ko_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Ko/Ko_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Ky::Ky_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Ky/Ky_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Mk::Mk_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Mk/Mk_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Mn::Mn_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Mn/Mn_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Ps::Ps_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Ps/Ps_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Ru::Ru_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Ru/Ru_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Ru_latn::Ru:
     file: lib/Locale/CLDR/Transformations/Bgn/Ru_latn/Ru.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Sr::Sr_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Sr/Sr_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Tk_cyrl::Tk:
     file: lib/Locale/CLDR/Transformations/Bgn/Tk_cyrl/Tk.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Uk::Uk_latn:
     file: lib/Locale/CLDR/Transformations/Bgn/Uk/Uk_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn::Uz_cyrl::Uz:
     file: lib/Locale/CLDR/Transformations/Bgn/Uz_cyrl/Uz.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Bgn_1981::Ka::Ka_latn:
     file: lib/Locale/CLDR/Transformations/Bgn_1981/Ka/Ka_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Mns::Mn::Mn_latn:
     file: lib/Locale/CLDR/Transformations/Mns/Mn/Mn_latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Names::Han::Latin:
     file: lib/Locale/CLDR/Transformations/Names/Han/Latin.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Ungegn::Grek::Latn:
     file: lib/Locale/CLDR/Transformations/Ungegn/Grek/Latn.pm
-    version: v0.32.0
+    version: v0.33.0
   Locale::CLDR::Transformations::Ungegn::Latn::Grek:
     file: lib/Locale/CLDR/Transformations/Ungegn/Latn/Grek.pm
-    version: v0.32.0
+    version: v0.33.0
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.32.0
+  Locale::CLDR: v0.33.0
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -1165,5 +1177,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.32.0
+version: v0.33.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

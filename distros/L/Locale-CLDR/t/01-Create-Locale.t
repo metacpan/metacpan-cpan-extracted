@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 use if $^V ge v5.12.0, feature => 'unicode_strings';
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 use Test::Exception;
 
 use ok 'Locale::CLDR';
@@ -46,6 +46,9 @@ is($locale->id, 'en_1994', 'Set Language and variant implicitly');
 
 $locale = Locale::CLDR->new('en_latn_gb_1994');
 is($locale->id, 'en_Latn_GB_1994', 'Set Language, Region, Script and variant implicitly');
+
+$locale = Locale::CLDR->new('latn_gb');
+is($locale->id, 'und_Latn_GB', 'Set likely Language, Region, and Script implicitly');
 
 throws_ok { $locale = Locale::CLDR->new('wibble') } qr/Invalid language/, "Caught invalid language";
 throws_ok { $locale = Locale::CLDR->new('en_wi') } qr/Invalid region/, "Caught invalid region";

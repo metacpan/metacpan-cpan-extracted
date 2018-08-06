@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An electrician.",
+      "rdfs:label" : "Electrician",
+      "rdfs:subClassOf" : "schema:HomeAndConstructionBusiness"
+   },
+   "properties" : {}
+}

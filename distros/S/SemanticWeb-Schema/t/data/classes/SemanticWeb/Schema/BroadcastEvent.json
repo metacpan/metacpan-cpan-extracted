@@ -1,0 +1,35 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An over the air or online broadcast event.",
+      "rdfs:label" : "BroadcastEvent",
+      "rdfs:subClassOf" : "schema:PublicationEvent"
+   },
+   "properties" : {
+      "schema:broadcastOfEvent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The event being broadcast such as a sporting event or awards ceremony.",
+         "rdfs:label" : "broadcastOfEvent",
+         "schema:domainIncludes" : "schema:BroadcastEvent",
+         "schema:rangeIncludes" : "schema:Event"
+      },
+      "schema:isLiveBroadcast" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "True is the broadcast is of a live event.",
+         "rdfs:label" : "isLiveBroadcast",
+         "schema:domainIncludes" : "schema:BroadcastEvent",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:videoFormat" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of screening or video broadcast used (e.g. IMAX, 3D, SD, HD, etc.).",
+         "rdfs:label" : "videoFormat",
+         "schema:domainIncludes" : [
+            "schema:BroadcastEvent",
+            "schema:BroadcastService",
+            "schema:ScreeningEvent"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

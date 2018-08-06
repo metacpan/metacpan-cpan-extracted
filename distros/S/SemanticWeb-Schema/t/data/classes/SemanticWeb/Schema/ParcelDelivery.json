@@ -1,0 +1,113 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The delivery of a parcel either via the postal service or a commercial service.",
+      "rdfs:label" : "ParcelDelivery",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:carrier" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "'carrier' is an out-dated term indicating the 'provider' for parcel delivery and flights.",
+         "rdfs:label" : "carrier",
+         "schema:domainIncludes" : [
+            "schema:Flight",
+            "schema:ParcelDelivery"
+         ],
+         "schema:rangeIncludes" : "schema:Organization",
+         "schema:supersededBy" : "schema:provider"
+      },
+      "schema:deliveryAddress" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Destination address.",
+         "rdfs:label" : "deliveryAddress",
+         "schema:domainIncludes" : "schema:ParcelDelivery",
+         "schema:rangeIncludes" : "schema:PostalAddress"
+      },
+      "schema:deliveryStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "New entry added as the package passes through each leg of its journey (from shipment to final delivery).",
+         "rdfs:label" : "deliveryStatus",
+         "schema:domainIncludes" : "schema:ParcelDelivery",
+         "schema:rangeIncludes" : "schema:DeliveryEvent"
+      },
+      "schema:expectedArrivalFrom" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The earliest date the package may arrive.",
+         "rdfs:label" : "expectedArrivalFrom",
+         "schema:domainIncludes" : "schema:ParcelDelivery",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:expectedArrivalUntil" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The latest date the package may arrive.",
+         "rdfs:label" : "expectedArrivalUntil",
+         "schema:domainIncludes" : "schema:ParcelDelivery",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:hasDeliveryMethod" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Method used for delivery or shipping.",
+         "rdfs:label" : "hasDeliveryMethod",
+         "schema:domainIncludes" : [
+            "schema:ParcelDelivery",
+            "schema:DeliveryEvent"
+         ],
+         "schema:rangeIncludes" : "schema:DeliveryMethod"
+      },
+      "schema:itemShipped" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Item(s) being shipped.",
+         "rdfs:label" : "itemShipped",
+         "schema:domainIncludes" : "schema:ParcelDelivery",
+         "schema:rangeIncludes" : "schema:Product"
+      },
+      "schema:originAddress" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Shipper's address.",
+         "rdfs:label" : "originAddress",
+         "schema:domainIncludes" : "schema:ParcelDelivery",
+         "schema:rangeIncludes" : "schema:PostalAddress"
+      },
+      "schema:partOfOrder" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The overall order the items in this delivery were included in.",
+         "rdfs:label" : "partOfOrder",
+         "schema:domainIncludes" : "schema:ParcelDelivery",
+         "schema:rangeIncludes" : "schema:Order"
+      },
+      "schema:provider" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
+         "rdfs:label" : "provider",
+         "schema:domainIncludes" : [
+            "schema:ParcelDelivery",
+            "schema:BusTrip",
+            "schema:CreativeWork",
+            "schema:Service",
+            "schema:TrainTrip",
+            "schema:Reservation",
+            "schema:Flight",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:trackingNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Shipper tracking number.",
+         "rdfs:label" : "trackingNumber",
+         "schema:domainIncludes" : "schema:ParcelDelivery",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:trackingUrl" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Tracking url for the parcel delivery.",
+         "rdfs:label" : "trackingUrl",
+         "schema:domainIncludes" : "schema:ParcelDelivery",
+         "schema:rangeIncludes" : "schema:URL"
+      }
+   }
+}

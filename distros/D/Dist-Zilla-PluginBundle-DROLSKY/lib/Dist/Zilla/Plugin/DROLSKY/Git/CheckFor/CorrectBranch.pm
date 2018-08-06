@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.99';
+our $VERSION = '1.01';
 
 use Moose;
 
@@ -39,7 +39,7 @@ Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch - Checks the branch o
 
 =head1 VERSION
 
-version 0.99
+version 1.01
 
 =for Pod::Coverage .*
 

@@ -4,7 +4,7 @@ use Mojolicious::Plugin::RoutesAuthDBI::Util qw(load_class);
 use Mojo::Util qw(hmac_sha1_sum);
 use Hash::Merge qw( merge );
 
-my $pkg = __PACKAGE__;
+use constant  PKG => __PACKAGE__;
 
 has [qw(app dbh conf)];
 
@@ -13,14 +13,14 @@ has default => sub {
   require Mojolicious::Plugin::RoutesAuthDBI::Schema;
   {
   auth => {
-    stash_key => $pkg."__user__",
+    stash_key => PKG."__user__",
     current_user_fn => 'auth_user',# helper
     load_user => \&load_user,
     validate_user => \&validate_user,
   },
   
   access => {
-    namespace => $pkg,
+    namespace => PKG,
     module => 'Access',
     fail_auth_cb => sub {
       shift->render(status => 401, format=>'txt', text=>"Please sign in.\n");
@@ -32,7 +32,7 @@ has default => sub {
   },
   
   admin => {
-    namespace => $pkg,
+    namespace => PKG,
     controller => 'Admin',
     prefix => lc($self->conf->{admin}{controller} || 'admin'),
     trust => hmac_sha1_sum('admin', $self->app->secrets->[0]),
@@ -40,40 +40,46 @@ has default => sub {
   },
   
   oauth => {
-    namespace => $pkg,
+    namespace => PKG,
     controller => 'OAuth',
     fail_auth_cb => sub {shift->render(format=>'txt', text=>"@_")},
   },
   
   template => $Mojolicious::Plugin::RoutesAuthDBI::Schema::defaults,
   
-  model_namespace => $pkg.'::Model',
+  model_namespace => PKG.'::Model',
   
   guest => {# from Mojolicious::Plugin::Authentication
     #~ autoload_user => 1,
     session_key => 'guest_data',
-    stash_key => $pkg."__guest__",
+    stash_key => PKG."__guest__",
     #~ current_user_fn => 'current_guest',# helper
     #~ load_user => \&load_guest,
     #~ validate_user => not need
     #~ fail_render => not need
     #######end Mojolicious::Plugin::Authentication conf#######
-    namespace => $pkg,
+    namespace => PKG,
     module => 'Guest',
     #~ import => [qw(load_guest)],
   },
+  log=>{
+    namespace => PKG,
+    module => 'Log',
+    disabled=>0,
+  },
   };
-};
+};# end defaults
 
 has merge_conf => sub {#hashref
   my $self = shift;
-  #~ @{ $self->conf }{qw(app plugin)} = ($self->app, $self);
   merge($self->conf, $self->default);
 };
 
 has access => sub {# object
   my $self = shift;
   my $conf = $self->merge_conf->{'access'};
+  @{$self->merge_conf->{template}{tables}}{keys %{$conf->{tables}}} = values %{$conf->{tables}}
+    if $conf->{tables};
   my $class = load_class($conf);
   $class->import( @{ $conf->{import} });
   $class->new(app=>$self->app, plugin=>$self,);
@@ -82,23 +88,45 @@ has access => sub {# object
 has admin => sub {# object
   my $self = shift;
   my $conf = $self->merge_conf->{'admin'};
-  #~ $conf->{module} ||= $conf->{controller};
+  @{$self->merge_conf->{template}{tables}}{keys %{$conf->{tables}}} = values %{$conf->{tables}}
+    if $conf->{tables};
   load_class($conf)->init(%$conf, app=>$self->app, plugin=>$self,);
 };
 
 has oauth => sub {
   my $self = shift;
   my $conf = $self->merge_conf->{'oauth'};
+  @{$self->merge_conf->{template}{tables}}{keys %{$conf->{tables}}} = values %{$conf->{tables}}
+    if $conf->{tables};
   load_class($conf)->init(%$conf, app=>$self->app, plugin=>$self, model=>$self->model($conf->{controller}),);
 };
 
 has guest => sub {# object
   my $self = shift;
   my $conf = $self->merge_conf->{'guest'};
-  my $class = load_class($conf);
-  #~ $class->import( @{ $conf->{import} });
+  @{$self->merge_conf->{template}{tables}}{keys %{$conf->{tables}}} = values %{$conf->{tables}}
+    if $conf->{tables};
   
-  $class->new( %$conf, app=>$self->app, plugin=>$self, model=>$self->model($conf->{module}), );# plugin=>$self,
+  $self->merge_conf->{template}{tables}{guests} = $conf->{table}
+    if $conf->{table};
+  
+  my $class = load_class($conf);
+  $class->new( %$conf, app=>$self->app, plugin=>$self, model=>$self->model($conf->{module}), );
+};
+
+has log => sub {# object
+  my $self = shift;
+  my $conf = $self->merge_conf->{'log'};
+  
+  @{$self->merge_conf->{template}{tables}}{keys %{$conf->{tables}}} = values %{$conf->{tables}}
+    if $conf->{tables};
+  
+  $self->merge_conf->{template}{tables}{logs} = $conf->{table}
+    if $conf->{table};
+  
+  my $class = load_class($conf);
+  $class->new( %$conf, app=>$self->app, plugin=>$self, model=>$self->model($conf->{module}), )
+    unless $conf->{disabled};
 };
 
 #~ has model => sub {
@@ -117,7 +145,7 @@ sub register {
   die "Plugin must work with dbh, see SYNOPSIS" unless $self->dbh;
   
   # init base model
-  load_class('DBIx::Mojo::Model')->singleton(dbh=>$self->dbh, template_vars=>$self->merge_conf->{template}, mt=>{tag_start=>'{%', tag_end=>'%}'});
+  load_class($self->merge_conf->{model_namespace}."::Base")->singleton(dbh=>$self->dbh, template_vars=>$self->merge_conf->{template}, mt=>{tag_start=>'{%', tag_end=>'%}'});
   
   my $access = $self->access;
   
@@ -144,6 +172,9 @@ sub register {
   $self->guest
     if $self->conf->{guest};
   
+  $self->log
+    if $self->conf->{log};
+  
   $self->app->helper('access', sub {$access});
   
   return $self, $access;
@@ -152,7 +183,8 @@ sub register {
 
 sub cond_access {# add_condition
   my $self= shift;
-  my ($route, $c, $captures, $args) = @_;
+  my ($route, $c, $captures, $args) = @_;# $args - это маршрут-хэш из запроса БД или хэш-конфиг из кода 
+  $route->{(PKG)}{route} = $args;# может пригодиться: $c->match->endpoint->{'Mojolicious::Plugin::RoutesAuthDBI'}...
   my $conf = $self->merge_conf;
   my $app = $c->app;
   my $access = $self->access;
@@ -164,7 +196,7 @@ sub cond_access {# add_condition
   
   if (ref $args eq 'CODE') {
     $args->($u, @_)
-      or $self->deny_log($route, $args, $u)
+      or $self->deny_log($route, $args, $u, $c)
       and $c->$fail_auth_cb()
       and return undef;
     $app->log->debug(sprintf(qq[Access allow [%s] by callback condition],
@@ -189,7 +221,7 @@ sub cond_access {# add_condition
   }
   
   # не авторизовался
-  $self->deny_log($route, $args, $u)
+  $self->deny_log($route, $args, $u, $c)
     and $c->$fail_auth_cb()
     and return undef
     unless $u && $u->{id};
@@ -235,7 +267,7 @@ sub cond_access {# add_condition
   
   my $fail_access_cb = $conf->{access}{fail_access_cb};
   
-  $self->deny_log($route, $args, $u)
+  $self->deny_log($route, $args, $u, $c)
     and $c->$fail_access_cb()
     and return undef
     unless $controller && $namespace;# failed load class
@@ -273,7 +305,7 @@ sub cond_access {# add_condition
     && return 1;
   
   my $action = $args->{action} || $route->pattern->defaults->{action}
-    or $self->deny_log($route, $args, $u)
+    or $self->deny_log($route, $args, $u, $c)
     and $c->$fail_access_cb()
     and return undef;
   
@@ -299,14 +331,14 @@ sub cond_access {# add_condition
     )
     && return 1;
     
-  $self->deny_log($route, $args, $u);
+  $self->deny_log($route, $args, $u, $c);
   $c->$fail_access_cb();
   return undef;
 }
 
 sub deny_log {
   my $self = shift;
-  my ($route, $args, $u) = @_;
+  my ($route, $args, $u, $c) = @_;
   my $app = $self->app;
   $app->log->debug(sprintf "Access deny [%s] for profile id=[%s]; args=[%s]; defaults=[%s]",
     $route->pattern->unparsed,
@@ -322,13 +354,13 @@ sub model {
   my $class =  load_class(namespace => $ns, module=> $name)
     or die "Model module [$name] not found at namespace [$ns] or has errors";
   
-  $class->new(app=>$self->app); # синглетоны в общем
+  $class->new(app=>$self->app, plugin=>$self); # синглетоны в общем
   
   #~ my $m = { map {$_ => load_class("Mojolicious::Plugin::RoutesAuthDBI::Model::$_")->new} qw(Profiles Namespaces Routes Refs Controllers Actions Roles Logins) };
   
 };
 
-our $VERSION = '0.842';
+our $VERSION = '0.851';
 
 =pod
 
@@ -344,7 +376,7 @@ Plugin makes an auth operations throught the plugin L<Mojolicious::Plugin::Authe
 
 =head1 VERSION
 
-0.842
+0.851
 
 =head1 NAME
 
@@ -631,7 +663,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016 Mikhail Che.
+Copyright 2016+ Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

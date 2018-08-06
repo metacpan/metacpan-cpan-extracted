@@ -8,7 +8,7 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name => q/Data::Format::Validate/,
     license => q/MIT/,
-    dist_author => q/Israel Costa <israel.batista@univem.edu.br>/,
+    dist_author => q/Israel Batista <rozcovo@cpan.org>/,
     dist_abstract => q/Perl module to validate data/,
     create_makefile_pl => 0,
     create_readme => 0,

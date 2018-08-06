@@ -51,7 +51,7 @@ package t::SampleWorker {
                 return Future->done;
             }
             while => sub { 0 + @::PENDING_JOBS }
-        )->on_ready(
+            )->on_ready(
             sub {
                 delete $self->{active};
             });

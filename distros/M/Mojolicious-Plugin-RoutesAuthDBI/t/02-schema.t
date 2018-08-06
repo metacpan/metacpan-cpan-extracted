@@ -2,13 +2,22 @@ use Mojo::Base 'Mojolicious';
 use Test::More;
 use Test::Mojo;
 
+my $config = do 't/config.pm';
+
 sub startup {
-  my $r = shift->routes;
+  my $app = shift;
+  #~ $app->plugin('RoutesAuthDBI',
+    #~ admin=>{prefix=>$config->{prefix}, trust=>$config->{trust}, role_admin=>$config->{role_admin},},
+    #~ guest=>{},
+    #~ log=>{},
+    #~ template=>$config,
+  #~ );
+  my $r = $app->routes;
   $r->route('/schema/:schema')
     ->to('Schema#schema', namespace=>'Mojolicious::Plugin::RoutesAuthDBI');
 }
 
-my $config = do 't/config.pm';
+
 
 my $t = Test::Mojo->new(__PACKAGE__);
 
@@ -21,6 +30,8 @@ $t->get_ok("/schema/$config->{schema}?sequence=$config->{sequence}&".join('&', m
   ->content_like(qr/table\s+(?:IF NOT EXISTS)?\s*"$config->{schema}"\."$config->{tables}{oauth_sites}"/i)
   ->content_like(qr/table\s+(?:IF NOT EXISTS)?\s*"$config->{schema}"\."$config->{tables}{roles}"/i)
   ->content_like(qr/table\s+(?:IF NOT EXISTS)?\s*"$config->{schema}"\."$config->{tables}{routes}"/i)
+  ->content_like(qr/table\s+(?:IF NOT EXISTS)?\s*"$config->{schema}"\."$config->{tables}{guests}"/i)
+  ->content_like(qr/table\s+(?:IF NOT EXISTS)?\s*"$config->{schema}"\."$config->{tables}{logs}"/i)
   ;
 
 my $create = $t->tx->res->text;
@@ -32,7 +43,7 @@ subtest 'need_conn' => sub {
   my ($dsn, $user, $pw) = split m|[/]|, $ENV{TEST_CONN_PG};
   require DBI;
   my $dbh = DBI->connect($dsn, $user, $pw);
-  is $dbh->do($create), '0E0', 'done';
+  is $dbh->do($create), '0E0', 'create schema tables';
 };
 
 

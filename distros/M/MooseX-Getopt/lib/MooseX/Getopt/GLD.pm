@@ -1,7 +1,7 @@
 package MooseX::Getopt::GLD;
 # ABSTRACT: A Moose role for processing command line options with Getopt::Long::Descriptive
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 use strict;
 use warnings;
@@ -27,7 +27,7 @@ role {
 
     # captures the options: --help --usage --? -? -h
     has help_flag => (
-        is => 'ro', isa => 'Bool',
+        is => 'ro',
         traits => ['Getopt'],
         cmd_flag => 'help',
         cmd_aliases => [ qw(usage ? h) ],
@@ -97,7 +97,7 @@ MooseX::Getopt::GLD - A Moose role for processing command line options with Geto
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SYNOPSIS
 

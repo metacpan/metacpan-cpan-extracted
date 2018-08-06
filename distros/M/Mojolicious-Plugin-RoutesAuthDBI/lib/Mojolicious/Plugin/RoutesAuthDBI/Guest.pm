@@ -104,11 +104,11 @@ sub logout {
 
 Доброго всем
 
-¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
+
 
 =head1 Mojolicious::Plugin::RoutesAuthDBI::Guest
 
-The code of module is mostly copy/paste from Mojolicious::Plugin::Authentication 1.29
+¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
 
 =head1 NAME
 
@@ -118,25 +118,32 @@ Mojolicious::Plugin::RoutesAuthDBI::Guest - session for guests. Store guests in 
 
     $app->plugin('RoutesAuthDBI', 
         ...
-        guest => {< options list below >},
+        guest => {< hashref options list below >},
         ...
     );
 
 =head1 OPTIONS
 
-=over 4
+=head2 namespace
 
-=item * B<namespace> - default 'Mojolicious::Plugin::RoutesAuthDBI',
+String, default to 'Mojolicious::Plugin::RoutesAuthDBI'.
 
-=item * B<module> - default 'Guest' (this module),
+=head2 module
 
-=item * B<session_key> - session storage of guest data. Default 'guest_data'.
+String, default to 'Guest' (this module).
 
-=item * B<stash_key> - 
+=head2 session_key
 
-=item * B<> - 
+String, session storage of guest data. Default to 'guest_data'.
 
-=back
+=head2 tables
+
+Hashref, any DB tables names. See L<Mojolicious::Plugin::RoutesAuthDBI::Schema#Default-variables-for-SQL-templates>.
+
+=head2 table
+
+String, DB table B<guests> name. See L<Mojolicious::Plugin::RoutesAuthDBI::Schema#Default-variables-for-SQL-templates>.
+
 
 =head1 METHODS
 
@@ -184,7 +191,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016 Mikhail Che.
+Copyright 2016+ Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

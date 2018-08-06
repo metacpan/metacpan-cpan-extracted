@@ -6,7 +6,7 @@ use Regexp::Grammars;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '0.010';    # VERSION
+our $VERSION = '0.011';    # VERSION
 
 # ABSTRACT: Parse DOS .bat and .cmd files
 
@@ -51,7 +51,7 @@ has 'grammar' => (
 
            <rule: Set> set <Variable=Token>=<Value=Token>
 
-           <rule: For> for <Token> DO <Statement>
+           <rule: For> for <Token> (?:\s+DO\s+) <Statement>
 
            <token: Operator> NEQ | EQU | GTR | == | LSS | LEQ | GEQ
 
@@ -106,7 +106,7 @@ App::BatParser - Parse DOS .bat and .cmd files
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 DESCRIPTION
 

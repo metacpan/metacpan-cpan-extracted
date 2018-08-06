@@ -1,5 +1,6 @@
 requires "Alien::Base" => "0.005";
 requires "File::ShareDir" => "1.03";
+requires "parent" => "0";
 requires "strict" => "0";
 requires "warnings" => "0";
 

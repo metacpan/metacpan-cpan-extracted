@@ -1,0 +1,27 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of managing by changing/editing the state of the object.",
+      "rdfs:label" : "UpdateAction",
+      "rdfs:subClassOf" : "schema:Action"
+   },
+   "properties" : {
+      "schema:collection" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of object. The collection target of the action.",
+         "rdfs:label" : "collection",
+         "rdfs:subPropertyOf" : "schema:object",
+         "schema:domainIncludes" : "schema:UpdateAction",
+         "schema:rangeIncludes" : "schema:Thing",
+         "schema:supersededBy" : "schema:targetCollection"
+      },
+      "schema:targetCollection" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of object. The collection target of the action.",
+         "rdfs:label" : "targetCollection",
+         "rdfs:subPropertyOf" : "schema:object",
+         "schema:domainIncludes" : "schema:UpdateAction",
+         "schema:rangeIncludes" : "schema:Thing"
+      }
+   }
+}

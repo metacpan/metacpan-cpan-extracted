@@ -179,8 +179,8 @@
             #   used - 'external' windows keep their own icons)
             externalWinIconList         => [],
 
-            # A list of Gtk2::Gdk::Pixbufs for 'gui' windows
-            guiWinIconList              => [],
+            # A list of Gtk2::Gdk::Pixbufs for 'viewer' windows
+            viewerWinIconList           => [],
             # A list of Gtk2::Gdk::Pixbufs for 'edit' windows
             editWinIconList             => [],
             # A list of Gtk2::Gdk::Pixbufs for 'pref' windows
@@ -2434,8 +2434,8 @@
     sub externalWinIconList
         { my $self = shift; return @{$self->{externalWinIconList}}; }
 
-    sub guiWinIconList
-        { my $self = shift; return @{$self->{guiWinIconList}}; }
+    sub viewerWinIconList
+        { my $self = shift; return @{$self->{viewerWinIconList}}; }
     sub editWinIconList
         { my $self = shift; return @{$self->{editWinIconList}}; }
     sub prefWinIconList

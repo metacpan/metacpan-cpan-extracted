@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A motorcycle dealer.",
+      "rdfs:label" : "MotorcycleDealer",
+      "rdfs:subClassOf" : "schema:AutomotiveBusiness"
+   },
+   "properties" : {}
+}

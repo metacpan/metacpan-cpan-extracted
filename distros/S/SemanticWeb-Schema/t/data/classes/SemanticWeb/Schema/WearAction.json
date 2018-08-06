@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of dressing oneself in clothing.",
+      "rdfs:label" : "WearAction",
+      "rdfs:subClassOf" : "schema:UseAction"
+   },
+   "properties" : {}
+}

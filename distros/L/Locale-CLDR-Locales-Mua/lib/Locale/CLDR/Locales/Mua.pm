@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Mua - Package for language Mundang
 
 package Locale::CLDR::Locales::Mua;
 # This file auto generated from Data\common\main\mua.xml
-#	on Fri 13 Apr  7:20:48 am GMT
+#	on Sun  5 Aug  6:12:51 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -595,6 +595,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Solai Mauritaniya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Solai Mauritaniya),
 			},
 		},
@@ -664,6 +669,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Solai Sao Tome \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Solai Sao Tome),
 			},
@@ -868,13 +878,13 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'wide' => {
-					'am' => q{comme},
-					'pm' => q{lilli},
-				},
 				'abbreviated' => {
 					'pm' => q{lilli},
 					'am' => q{comme},
+				},
+				'wide' => {
+					'am' => q{comme},
+					'pm' => q{lilli},
 				},
 			},
 		},

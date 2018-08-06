@@ -1,12 +1,7 @@
 package Term::Caca::Bitmap;
-BEGIN {
-  $Term::Caca::Bitmap::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $Term::Caca::Bitmap::VERSION = '1.2.0';
-}
+our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: an OO-interface to caca_bitmap
-
+$Term::Caca::Bitmap::VERSION = '3.0.0';
 use strict;
 use warnings;
 use Term::Caca;
@@ -34,9 +29,9 @@ sub DESTROY {
 
 1;
 
-
-
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -44,7 +39,7 @@ Term::Caca::Bitmap - an OO-interface to caca_bitmap
 
 =head1 VERSION
 
-version 1.2.0
+version 3.0.0
 
 =head1 SYNOPSIS
 
@@ -116,14 +111,13 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by John Beppu.
+This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
 
 This is free software, licensed under:
 
   DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
 
 =cut
-
 
 __END__
 

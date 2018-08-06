@@ -16,9 +16,18 @@ SYNOPSIS
      # Non-blocking API request
      $twitter->get_tweet($tweet_id, sub {
        my ($twitter, $err, $tweet) = @_;
-       say $err ? "Error: $err" : 'Tweet: ' . $tweet->text;
+       print $err ? "Error: $err" : 'Tweet: ' . $tweet->text . "\n";
      });
      Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+     
+     # Non-blocking API request using promises
+     $twitter->get_tweet_p($tweet_id)->then(sub {
+       my ($tweet) = @_;
+       print 'Tweet: ' . $tweet->text . "\n";
+     })->catch(sub {
+       my ($err) = @_;
+       print "Error: $err";
+     })->wait;
      
      # Some requests require authentication on behalf of a user
      $twitter->authentication(oauth => $token, $secret);
@@ -46,15 +55,19 @@ DESCRIPTION
     <https://dev.twitter.com/web/sign-in/implementing> for more details.
 
     All methods which query the Twitter API can be called with an optional
-    trailing callback argument to run a non-blocking API query. On
-    transport, HTTP, or API error, blocking API queries will throw a
-    Mojo::WebService::Twitter::Error exception, while non-blocking API
-    queries will pass the exception object to the callback. Consider
-    organizing complex sequences of non-blocking queries with "delay" in
-    Mojo::IOLoop.
+    trailing callback argument to run a non-blocking API query.
+    Alternatively, the _p variant will run a non-blocking API query and
+    return a Mojo::Promise, which can simplify complex sequences of
+    non-blocking queries. On connection, HTTP, or API error, blocking API
+    queries will throw a Mojo::WebService::Twitter::Error exception.
+    Non-blocking API queries will pass this exception object to the
+    callback or reject the promise, and otherwise pass the results to the
+    callback or resolve the promise.
 
     Note that this distribution implements only a subset of the Twitter
-    API. Additional features may be added as requested.
+    API. Additional features may be added as requested. See Twitter::API
+    for a more fully-featured lightweight and modern twitter client
+    library.
 
 ATTRIBUTES
 
@@ -107,11 +120,14 @@ METHODS
 
  request_oauth
 
+ request_oauth_p
+
      my $res = $twitter->request_oauth;
      my $res = $twitter->request_oauth($callback_url);
      $twitter->request_oauth(sub {
        my ($twitter, $error, $res) = @_;
      });
+     my $p = $twitter->request_oauth_p;
 
     Send an OAuth 1.0 authorization request and return a hashref containing
     oauth_token and oauth_token_secret (request token and secret). An
@@ -126,10 +142,13 @@ METHODS
 
  verify_oauth
 
+ verify_oauth_p
+
      my $res = $twitter->verify_oauth($verifier, $request_token, $request_token_secret);
      $twitter->verify_oauth($verifier, $request_token, $request_token_secret, sub {
        my ($twitter, $error, $res) = @_;
      });
+     my $p = $twitter->verify_oauth_p($verifier, $request_token, $request_token_secret);
 
     Verify an OAuth 1.0 authorization request with the verifier string or
     PIN from the authorizing user, and the previously obtained request
@@ -141,10 +160,13 @@ METHODS
 
  request_oauth2
 
+ request_oauth2_p
+
      my $res = $twitter->request_oauth2;
      $twitter->request_oauth2(sub {
        my ($twitter, $error, $res) = @_;
      });
+     my $p = $twitter->request_oauth2_p;
 
     Request OAuth 2 credentials and return a hashref containing an
     access_token that can be passed directly to "authentication" to
@@ -152,29 +174,38 @@ METHODS
 
  get_tweet
 
+ get_tweet_p
+
      my $tweet = $twitter->get_tweet($tweet_id);
      $twitter->get_tweet($tweet_id, sub {
        my ($twitter, $err, $tweet) = @_;
      });
+     $twitter->get_tweet_p($tweet_id);
 
     Retrieve a Mojo::WebService::Twitter::Tweet by tweet ID.
 
  get_user
+
+ get_user_p
 
      my $user = $twitter->get_user(user_id => $user_id);
      my $user = $twitter->get_user(screen_name => $screen_name);
      $twitter->get_user(screen_name => $screen_name, sub {
        my ($twitter, $err, $user) = @_;
      });
+     my $p = $twitter->get_user_p(user_id => $user_id);
 
     Retrieve a Mojo::WebService::Twitter::User by user ID or screen name.
 
  post_tweet
 
+ post_tweet_p
+
      my $tweet = $twitter->post_tweet($text, %options);
      $twitter->post_tweet($text, %options, sub {
             my ($twitter, $err, $tweet) = @_;
      });
+     my $p = $twitter->post_tweet_p($text, %options);
 
     Post a status update (tweet) and retrieve the resulting
     Mojo::WebService::Twitter::Tweet. Requires OAuth 1.0 authentication.
@@ -225,10 +256,13 @@ METHODS
 
  retweet
 
+ retweet_p
+
      my $tweet = $twitter->retweet($tweet_id);
      $twitter->retweet($tweet_id, sub {
        my ($twitter, $err, $tweet) = @_;
      });
+     my $p = $twitter->retweet_p($tweet_id);
 
     Retweet the tweet ID or Mojo::WebService::Twitter::Tweet object.
     Returns a Mojo::WebService::Twitter::Tweet representing the original
@@ -236,11 +270,14 @@ METHODS
 
  search_tweets
 
+ search_tweets_p
+
      my $tweets = $twitter->search_tweets($query);
      my $tweets = $twitter->search_tweets($query, %options);
      $twitter->search_tweets($query, %options, sub {
        my ($twitter, $err, $tweets) = @_;
      });
+     my $p = $twitter->search_tweets_p($query, %options);
 
     Search Twitter and return a Mojo::Collection of
     Mojo::WebService::Twitter::Tweet objects. Accepts the following
@@ -304,10 +341,13 @@ METHODS
 
  verify_credentials
 
+ verify_credentials_p
+
      my $user = $twitter->verify_credentials;
      $twitter->verify_credentials(sub {
        my ($twitter, $error, $user) = @_;
      });
+     my $p = $twitter->verify_credentials_p;
 
     Verify the authorizing user's credentials and return a representative
     Mojo::WebService::Twitter::User object. Requires OAuth 1.0
@@ -331,5 +371,5 @@ COPYRIGHT AND LICENSE
 
 SEE ALSO
 
-    Net::Twitter, WWW::OAuth
+    Twitter::API, WWW::OAuth
 

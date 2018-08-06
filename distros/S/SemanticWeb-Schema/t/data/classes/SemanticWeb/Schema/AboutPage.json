@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Web page type: About page.",
+      "rdfs:label" : "AboutPage",
+      "rdfs:subClassOf" : "schema:WebPage"
+   },
+   "properties" : {}
+}

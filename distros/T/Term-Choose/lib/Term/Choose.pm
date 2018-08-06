@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.609';
+our $VERSION = '1.610';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -234,6 +234,7 @@ sub __choose {
     };
     $self->__init_term();
     $self->__write_first_screen();
+    my $saved_pos;
 
     GET_KEY: while ( 1 ) {
         my $key = $self->__get_key();
@@ -264,6 +265,9 @@ sub __choose {
         if ( exists $ENV{TC_RESET_AUTO_UP} ) {
             $ENV{TC_RESET_AUTO_UP} = 1 if $key != KEY_ENTER;
         }
+        if ( $saved_pos && $key != VK_PAGE_UP && $key != CONTROL_B && $key != VK_PAGE_DOWN && $key != CONTROL_F ) {
+            $saved_pos = undef;
+        }
 
         # $self->{rc2idx} holds the new list (AoA) formatted in "__size_and_layout" appropriate to the chosen layout.
         # $self->{rc2idx} does not hold the values directly but the respective list indexes from the original list.
@@ -289,7 +293,7 @@ sub __choose {
                 $self->{pos}[ROW]++;
                 if ( $self->{pos}[ROW] <= $self->{p_end} ) {
                     $self->__wr_cell( $self->{pos}[ROW] - 1, $self->{pos}[COL] );
-                    $self->__wr_cell( $self->{pos}[ROW],     $self->{pos}[COL] );
+                    $self->__wr_cell( $self->{pos}[ROW]    , $self->{pos}[COL] );
                 }
                 else {
                     $self->{p_begin} = $self->{p_end} + 1;
@@ -307,7 +311,7 @@ sub __choose {
                 $self->{pos}[ROW]--;
                 if ( $self->{pos}[ROW] >= $self->{p_begin} ) {
                     $self->__wr_cell( $self->{pos}[ROW] + 1, $self->{pos}[COL] );
-                    $self->__wr_cell( $self->{pos}[ROW],     $self->{pos}[COL] );
+                    $self->__wr_cell( $self->{pos}[ROW]    , $self->{pos}[COL] );
                 }
                 else {
                     $self->{p_end}   = $self->{p_begin} - 1;
@@ -334,7 +338,7 @@ sub __choose {
                     if ( $self->{pos}[ROW] <= $self->{p_end} ) {
                         $self->{pos}[COL] = 0;
                         $self->__wr_cell( $self->{pos}[ROW] - 1, $#{$self->{rc2idx}[$self->{pos}[ROW] - 1]} );
-                        $self->__wr_cell( $self->{pos}[ROW],     $self->{pos}[COL] );
+                        $self->__wr_cell( $self->{pos}[ROW]    , $self->{pos}[COL] );
                     }
                     else {
                         $self->{p_begin} = $self->{p_end} + 1;
@@ -361,7 +365,7 @@ sub __choose {
                     if ( $self->{pos}[ROW] >= $self->{p_begin} ) {
                         $self->{pos}[COL] = $#{$self->{rc2idx}[$self->{pos}[ROW]]};
                         $self->__wr_cell( $self->{pos}[ROW] + 1, 0 );
-                        $self->__wr_cell( $self->{pos}[ROW],     $self->{pos}[COL] );
+                        $self->__wr_cell( $self->{pos}[ROW]    , $self->{pos}[COL] );
                     }
                     else {
                         $self->{p_end}   = $self->{p_begin} - 1;
@@ -398,9 +402,16 @@ sub __choose {
                 $self->{plugin}->__beep();
             }
             else {
-                $self->{p_begin} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) - 1 );;
+                $self->{p_begin} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) - 1 );
                 $self->{p_end}   = $self->{p_begin} + $self->{avail_height} - 1;
-                $self->{pos}[ROW] -= $self->{avail_height};
+                if ( $saved_pos ) {
+                    $self->{pos}[ROW] = $saved_pos->[ROW];
+                    $self->{pos}[COL] = $saved_pos->[COL];
+                    $saved_pos = undef;
+                }
+                else {
+                    $self->{pos}[ROW] -= $self->{avail_height};
+                }
                 $self->__wr_screen();
             }
         }
@@ -412,19 +423,17 @@ sub __choose {
                 $self->{p_begin} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) + 1 );
                 $self->{p_end}   = $self->{p_begin} + $self->{avail_height} - 1;
                 $self->{p_end}   = $#{$self->{rc2idx}} if $self->{p_end} > $#{$self->{rc2idx}};
-                $self->{pos}[ROW] += $self->{avail_height};
-                if ( $self->{pos}[ROW] >= $#{$self->{rc2idx}} ) {
-                    if ( $#{$self->{rc2idx}} == $self->{p_begin} || ! $self->{rest} || $self->{pos}[COL] <= $self->{rest} - 1 ) {
-                        if ( $self->{pos}[ROW] != $#{$self->{rc2idx}} ) {
-                            $self->{pos}[ROW] = $#{$self->{rc2idx}};
-                        }
-                        if ( $self->{rest} && $self->{pos}[COL] > $self->{rest} - 1 ) {
-                            $self->{pos}[COL] = $#{$self->{rc2idx}[$self->{pos}[ROW]]};
-                        }
+                if (   $self->{pos}[ROW] + $self->{avail_height} > $#{$self->{rc2idx}}
+                    || $self->{pos}[COL] > $#{$self->{rc2idx}[$self->{pos}[ROW] + $self->{avail_height}]}
+                ) {
+                    $saved_pos = [ $self->{pos}[ROW], $self->{pos}[COL] ];
+                    $self->{pos}[ROW] = $#{$self->{rc2idx}};
+                    if ( $self->{pos}[COL] > $#{$self->{rc2idx}[$self->{pos}[ROW]]} ) {
+                        $self->{pos}[COL] = $#{$self->{rc2idx}[$self->{pos}[ROW]]};
                     }
-                    else {
-                        $self->{pos}[ROW] = $#{$self->{rc2idx}} - 1;
-                    }
+                }
+                else {
+                    $self->{pos}[ROW] += $self->{avail_height};
                 }
                 $self->__wr_screen();
             }
@@ -1074,7 +1083,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.609
+Version 1.610
 
 =cut
 

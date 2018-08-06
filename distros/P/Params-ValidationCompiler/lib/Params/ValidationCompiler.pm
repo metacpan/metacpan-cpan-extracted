@@ -3,7 +3,7 @@ package Params::ValidationCompiler;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.30';
 
 use Params::ValidationCompiler::Compiler;
 
@@ -40,7 +40,7 @@ Params::ValidationCompiler - Build an optimized subroutine parameter validator o
 
 =head1 VERSION
 
-version 0.27
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -111,14 +111,12 @@ parameters, and extra "slurpy" parameters.
 
 =for Pod::Coverage compile
 
-=head1 EXPORTS
+=head1 PARAMETERS
 
 This module has two options exports, C<validation_for> and C<source_for>. Both
 of these subs accept the same options:
 
-=over 4
-
-=item * params
+=head2 params
 
 An arrayref or hashref containing a parameter specification.
 
@@ -140,7 +138,7 @@ this indicates required (true) or optional (false).
 
 The spec hashref accepts the following keys:
 
-=over 8
+=over 4
 
 =item * type
 
@@ -161,7 +159,7 @@ parameters are required unless you provide a default.
 
 =back
 
-=item * slurpy
+=head2 slurpy
 
 If this is a simple true value, then the generated subroutine accepts
 additional arguments not specified in C<params>. By default, extra arguments
@@ -170,7 +168,7 @@ cause an exception.
 You can also pass a type constraint here, in which case all extra arguments
 must be values of the specified type.
 
-=item * named_to_list
+=head2 named_to_list
 
 If this is true, the generated subroutine will expect a list of key-value
 pairs or a hashref and it will return a list containing only values. The
@@ -180,7 +178,48 @@ pairs determines the order in which values are returned.
 You cannot combine C<slurpy> with C<named_to_list> as there is no way to know
 how to order the extra return values.
 
+=head2 return_object
+
+If this is true, the generated subroutine will return an object instead of a
+hashref. You cannot set this option to true if you set either or C<slurpy> or
+C<named_to_list>.
+
+The object's methods correspond to the parameter names passed to the
+subroutine. While calling methods on an object is slower than accessing a
+hashref, the advantage is that if you typo a parameter name you'll get a
+helpful error.
+
+If you have L<Class::XSAccessor> installed then this will be used to create
+the class's methods, which makes it fairly fast.
+
+The returned object is in a generated class. Do not rely on this class name
+being anything in specific, and don't check this object using C<isa>, C<DOES>,
+or anything similar.
+
+When C<return_object> is true, the parameter spec hashref also accepts to the
+following additional keys:
+
+=over 4
+
+=item * getter
+
+Use this to set an explicit getter method name for the parameter. By default
+the method name will be the same as the parameter name. Note that if the
+parameter name is not a valid sub name, then you will get an error compiling
+the validation sub unless you specify a getter for the parameter.
+
+=item * predicate
+
+Use this to ask for a predicate method to be created for this parameter. The
+predicate method returns true if the parameter was passed and false if it
+wasn't. Note that this is only useful for optional parameters, but you can ask
+for a predicate for any parameter.
+
 =back
+
+=head1 EXPORTS
+
+The exported subs are:
 
 =head2 validation_for(...)
 

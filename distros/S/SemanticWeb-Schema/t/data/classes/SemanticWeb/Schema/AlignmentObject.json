@@ -1,0 +1,46 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_LRMIClass",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An intangible item that describes an alignment between a learning resource and a node in an educational framework.",
+      "rdfs:label" : "AlignmentObject",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:alignmentType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A category of alignment between the learning resource and the framework node. Recommended values include: 'assesses', 'teaches', 'requires', 'textComplexity', 'readingLevel', 'educationalSubject', and 'educationalLevel'.",
+         "rdfs:label" : "alignmentType",
+         "schema:domainIncludes" : "schema:AlignmentObject",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:educationalFramework" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The framework to which the resource being described is aligned.",
+         "rdfs:label" : "educationalFramework",
+         "schema:domainIncludes" : "schema:AlignmentObject",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:targetDescription" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The description of a node in an established educational framework.",
+         "rdfs:label" : "targetDescription",
+         "schema:domainIncludes" : "schema:AlignmentObject",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:targetName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The name of a node in an established educational framework.",
+         "rdfs:label" : "targetName",
+         "schema:domainIncludes" : "schema:AlignmentObject",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:targetUrl" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The URL of a node in an established educational framework.",
+         "rdfs:label" : "targetUrl",
+         "schema:domainIncludes" : "schema:AlignmentObject",
+         "schema:rangeIncludes" : "schema:URL"
+      }
+   }
+}

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.066';
+our $VERSION = '0.067';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -15,8 +15,9 @@ use File::Basename        qw( dirname );
 use File::Spec::Functions qw( catdir catfile );
 use List::Util            qw( sum );
 
-use Encode::Locale         qw();
-use File::HomeDir          qw();
+use Encode::Locale qw();
+use File::HomeDir  qw();
+
 use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( line_fold cut_to_printwidth print_columns );
 
@@ -75,7 +76,7 @@ sub choose_dirs {
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
             { prompt => $lines, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse}, lf => [ 0, length $o->{name} ],
-              justify => $o->{justify}, layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
+              justify => $o->{justify}, layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen}, hide_cursor => $o->{hide_cursor} }
         );
         if ( ! defined $choice ) {
             if ( @$new ) {
@@ -114,7 +115,7 @@ sub _prepare_opt_choose_path {
     my $dir = encode( 'locale_fs', $opt->{dir} );
     if ( defined $dir && ! -d $dir ) {
         my $prompt = "Could not find the directory \"$dir\". Falling back to the home directory.";
-        choose( [ 'Press ENTER to continue' ], { prompt => $prompt } );
+        choose( [ 'Press ENTER to continue' ], { prompt => $prompt, hide_cursor => $opt->{hide_cursor} } );
         $dir = File::HomeDir->my_home();
     }
     $dir = File::HomeDir->my_home()                  if ! defined $dir;
@@ -129,6 +130,7 @@ sub _prepare_opt_choose_path {
         layout       => 1,
         order        => 1,
         justify      => 0,
+        hide_cursor  => 1,
         enchanted    => 1,
         confirm      => ' OK ',
         add_dir      => ' ++ ',
@@ -205,7 +207,7 @@ sub _choose_a_path {
         my $lines = join( "\n", @tmp );
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
-            { prompt => $lines, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
+            { prompt => $lines, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse}, hide_cursor => $o->{hide_cursor},
               justify => $o->{justify}, layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
         );
         if ( ! defined $choice ) {
@@ -280,8 +282,8 @@ sub _a_file {
         my @pre = ( undef, $o->{confirm} );
         my $choice = choose(
             [ @pre, sort( @files ) ],
-            { prompt => $lines, undef => $o->{back}, mouse => $o->{mouse}, justify => $o->{justify},
-            layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
+            { prompt => $lines, undef => $o->{back}, mouse => $o->{mouse}, justify => $o->{justify}, layout => $o->{layout},
+              order => $o->{order}, clear_screen => $o->{clear_screen}, hide_cursor => $o->{hide_cursor} }
         );
         if ( ! length $choice ) {
             return;
@@ -304,15 +306,16 @@ sub choose_a_number {
         $digits = 7;
     }
     $opt = {} if ! defined $opt;
-    my $info       = defined $opt->{info}         ? $opt->{info}         : '';
-    my $prompt     = defined $opt->{prompt}       ? $opt->{prompt}       : '';
-    my $name       =         $opt->{name};
-    my $clear      = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
-    my $small      = defined $opt->{small_on_top} ? $opt->{small_on_top} : 0;
-    my $thsd_sep   = defined $opt->{thsd_sep}     ? $opt->{thsd_sep}     : ',';
-    my $mouse      = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
-    my $back       = defined $opt->{back}         ? $opt->{back}         : '<<'; #'BACK';
-    my $confirm    = defined $opt->{confirm}      ? $opt->{confirm}      : 'OK'; #'CONFIRM';
+    my $info        = defined $opt->{info}         ? $opt->{info}         : '';
+    my $prompt      = defined $opt->{prompt}       ? $opt->{prompt}       : '';
+    my $name        =         $opt->{name};
+    my $clear       = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
+    my $small       = defined $opt->{small_on_top} ? $opt->{small_on_top} : 0;
+    my $thsd_sep    = defined $opt->{thsd_sep}     ? $opt->{thsd_sep}     : ',';
+    my $mouse       = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
+    my $back        = defined $opt->{back}         ? $opt->{back}         : '<<'; #'BACK';
+    my $confirm     = defined $opt->{confirm}      ? $opt->{confirm}      : 'OK'; #'CONFIRM';
+    my $hide_cursor = defined $opt->{hide_cursor}  ? $opt->{hide_cursor}  : 1;
     #-------------------------------------------#
     my $back_short = defined $opt->{back_short}   ? $opt->{back_short}   : '<<';
     my $reset      = defined $opt->{reset}        ? $opt->{reset}        : 'reset';
@@ -366,7 +369,7 @@ sub choose_a_number {
         my $range = choose(
             $small ? [ @pre, reverse @choices_range ] : [ @pre, @choices_range ],
             { prompt => $lines, layout => 3, justify => 1, mouse => $mouse,
-              clear_screen => $clear, undef => $back_tmp }
+              clear_screen => $clear, undef => $back_tmp, hide_cursor => $hide_cursor }
         );
         if ( ! defined $range ) {
             if ( defined $result ) {
@@ -397,7 +400,7 @@ sub choose_a_number {
         # Choose
         my $number = choose(
             [ undef, @choices, $reset ],
-            { prompt => $lines, layout => 1, justify => 2, order => 0,
+            { prompt => $lines, layout => 1, justify => 2, order => 0, hide_cursor => $hide_cursor,
               mouse => $mouse, clear_screen => $clear, undef => $back_short }
         );
         next if ! defined $number;
@@ -432,6 +435,7 @@ sub choose_a_subset {
     my $justify       = defined $opt->{justify}       ? $opt->{justify}       : 0;
     my $confirm       = defined $opt->{confirm}       ? $opt->{confirm}       : ( ' ' x length $prefix ) . '-OK-';
     my $back          = defined $opt->{back}          ? $opt->{back}          : ( ' ' x length $prefix ) . ' << ';
+    my $hide_cursor   = defined $opt->{hide_cursor}   ? $opt->{hide_cursor}   : 1;
     #--------------------------------------#
     #my $subseq_tab = 4;
     #my $subseq_tab = print_columns( $name || '  ' );
@@ -465,7 +469,7 @@ sub choose_a_subset {
             [ @pre, map { $prefix . ( defined $_ ? $_ : '' ) } @$curr_avail ],
             { prompt => $lines, layout => $layout, mouse => $mouse, clear_screen => $clear, justify => $justify,
               index => 1, lf => [ 0, 2 ], order => $order, meta_items => [ 0 .. $#pre ], undef => $back,
-              mark => $mark, include_highlighted => 2 }
+              hide_cursor => $hide_cursor, mark => $mark, include_highlighted => 2 }
         );
         $mark = undef;
         if ( ! defined $idx[0] || $idx[0] == 0 ) {
@@ -501,12 +505,13 @@ sub settings_menu {
     my ( $menu, $curr, $opt ) = @_;
     $opt = {} if ! defined $opt;
     die "'in_place' is no longer a valid option!'" if exists $opt->{in_place} && defined $opt->{in_place}; ###
-    my $info    = defined $opt->{info}         ? $opt->{info}         : '';
-    my $prompt  = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
-    my $clear   = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
-    my $mouse   = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
-    my $confirm = defined $opt->{confirm}      ? $opt->{confirm}      : 'CONFIRM';
-    my $back    = defined $opt->{back}         ? $opt->{back}         : 'BACK';
+    my $info        = defined $opt->{info}         ? $opt->{info}         : '';
+    my $prompt      = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
+    my $clear       = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
+    my $mouse       = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
+    my $confirm     = defined $opt->{confirm}      ? $opt->{confirm}      : 'CONFIRM';
+    my $back        = defined $opt->{back}         ? $opt->{back}         : 'BACK';
+    my $hide_cursor = defined $opt->{hide_cursor}  ? $opt->{hide_cursor}  : 1;
     $back    = '  ' . $back;
     $confirm = '  ' . $confirm;
     my $longest = 0;
@@ -542,8 +547,8 @@ sub settings_menu {
         # Choose
         my $idx = choose(
             $choices,
-            { prompt => $lines, index => 1, layout => 3, justify => 0,
-              mouse => $mouse, clear_screen => $clear, undef => $back }
+            { prompt => $lines, index => 1, layout => 3, justify => 0, mouse => $mouse,
+              clear_screen => $clear, undef => $back, hide_cursor => $hide_cursor }
         );
         return if ! defined $idx;
         my $choice = $choices->[$idx];
@@ -604,6 +609,7 @@ sub print_hash {
     my $clear        = defined $opt->{clear_screen} ? $opt->{clear_screen} : 0;
     my $mouse        = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
     my $prompt       = defined $opt->{prompt}       ? $opt->{prompt}       : ( defined $opt->{preface} ? '' : 'Close with ENTER' );
+    my $hide_cursor  = defined $opt->{hide_cursor}  ? $opt->{hide_cursor}  : 1;
     my $preface      = $opt->{preface};
     #-----------------------------------------------------------------#
     my $term_width = term_width();
@@ -644,7 +650,7 @@ sub print_hash {
     return join "\n", @vals if defined wantarray;
     choose(
         [ @vals ],
-        { prompt => $prompt, layout => 3, justify => 0, mouse => $mouse, clear_screen => $clear }
+        { prompt => $prompt, layout => 3, justify => 0, mouse => $mouse, clear_screen => $clear, hide_cursor => $hide_cursor }
     );
 }
 
@@ -705,7 +711,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.066
+Version 0.067
 
 =cut
 
@@ -752,6 +758,16 @@ mouse
 See the option I<mouse> in L<Term::Choose>
 
 Values: [0],1,2,3,4.
+
+=item
+
+hide_cursor
+
+Hide the cursor
+
+Values: 0,[1].
+
+=item
 
 prompt
 

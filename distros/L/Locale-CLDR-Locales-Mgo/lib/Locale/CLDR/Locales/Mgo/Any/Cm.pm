@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Mgo::Any::Cm - Package for language Metaʼ
 
 package Locale::CLDR::Locales::Mgo::Any::Cm;
 # This file auto generated from Data\common\main\mgo_CM.xml
-#	on Fri 13 Apr  7:19:18 am GMT
+#	on Sun  5 Aug  6:11:11 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

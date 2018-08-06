@@ -10,8 +10,10 @@
 #   Copyright (C) 2003-2005, 2014 Steve Hay.  All rights reserved.
 #
 # LICENCE
-#   You may distribute under the terms of either the GNU General Public License
-#   or the Artistic License, as specified in the LICENCE file.
+#   This script is free software; you can redistribute it and/or modify it under
+#   the same terms as Perl itself, i.e. under the terms of either the GNU
+#   General Public License or the Artistic License, as specified in the LICENCE
+#   file.
 #
 #===============================================================================
 
@@ -21,6 +23,8 @@ use strict;
 use warnings;
 
 use Test::More tests => 9;
+
+## no critic (Subroutines::ProhibitSubroutinePrototypes)
 
 sub new_filename();
 
@@ -48,7 +52,7 @@ MAIN: {
     {
         $file = new_filename();
 
-        open $fh, ">$file";
+        open $fh, '>', $file;
         close $fh;
 
         stat $file;
@@ -64,7 +68,7 @@ MAIN: {
     {
         $file = new_filename();
 
-        open $fh, ">$file";
+        open $fh, '>', $file;
         close $fh;
 
         lstat $file;
@@ -80,7 +84,7 @@ MAIN: {
     {
         $file = new_filename();
 
-        open $fh, ">$file";
+        open $fh, '>', $file;
         close $fh;
 
         Win32::UTCFileTime::alt_stat($file);
@@ -96,7 +100,7 @@ MAIN: {
     {
         $file = new_filename();
 
-        open $fh, ">$file";
+        open $fh, '>', $file;
         close $fh;
 
         utime undef, undef, $file;

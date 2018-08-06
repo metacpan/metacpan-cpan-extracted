@@ -3,10 +3,13 @@ use strict;
 use warnings;
 use Config;
 
+use FindBin;
+use lib "$FindBin::Bin"; # required to load filter-util.pl
+
 BEGIN {
     my $cpp;
     my $sep;
-    unshift @INC, 't';
+
     if ($^O eq 'MSWin32') {
         $cpp = 'cpp.exe' ;
         $sep = ';';

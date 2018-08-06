@@ -1,0 +1,25 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>An agent leaves an event / group with participants/friends at a location.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/JoinAction\">JoinAction</a>: The antonym of LeaveAction.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/UnRegisterAction\">UnRegisterAction</a>: Unlike UnRegisterAction, LeaveAction implies leaving a group/team of people rather than a service.</li>\n</ul>\n",
+      "rdfs:label" : "LeaveAction",
+      "rdfs:subClassOf" : "schema:InteractAction"
+   },
+   "properties" : {
+      "schema:event" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Upcoming or past event associated with this place, organization, or action.",
+         "rdfs:label" : "event",
+         "schema:domainIncludes" : [
+            "schema:JoinAction",
+            "schema:PlayAction",
+            "schema:InformAction",
+            "schema:Organization",
+            "schema:Place",
+            "schema:LeaveAction",
+            "schema:InviteAction"
+         ],
+         "schema:rangeIncludes" : "schema:Event"
+      }
+   }
+}

@@ -4,7 +4,7 @@
       "Vladimir Lettiev <thecrux@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.4",
+   "generated_by" : "Minilla/v3.0.1",
    "license" : [
       "perl_5"
    ],
@@ -63,7 +63,7 @@
    "provides" : {
       "Protocol::HTTP2" : {
          "file" : "lib/Protocol/HTTP2.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       },
       "Protocol::HTTP2::Client" : {
          "file" : "lib/Protocol/HTTP2/Client.pm"
@@ -146,9 +146,13 @@
          "web" : "https://github.com/vlet/p5-Protocol-HTTP2"
       }
    },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_contributors" : [
-      "Daniil Bondarev <bondarev@amazon.com>"
+      "Daniil Bondarev <bondarev@amazon.com>",
+      "gregor herrmann <gregoa@debian.org>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Felipe Gasper <felipe@felipegasper.com>",
+      "Junho Choi <junho@cloudflare.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

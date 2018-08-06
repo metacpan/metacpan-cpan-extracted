@@ -44,6 +44,7 @@ do { my $x = {
                                       'Cwd' => '0',
                                       'Digest' => '1.03',
                                       'Digest::SHA' => '5.45',
+                                      'Encode' => '0',
                                       'Exporter' => '5.57',
                                       'Fcntl' => '0',
                                       'File::Copy' => '0',

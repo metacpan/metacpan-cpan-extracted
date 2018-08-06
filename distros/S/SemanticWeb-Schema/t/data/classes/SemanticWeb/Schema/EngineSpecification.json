@@ -1,0 +1,26 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Information about the engine of the vehicle. A vehicle can have multiple engines represented by multiple engine specification entities.",
+      "rdfs:label" : "EngineSpecification",
+      "rdfs:subClassOf" : "schema:StructuredValue"
+   },
+   "properties" : {
+      "schema:fuelType" : {
+         "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of fuel suitable for the engine or engines of the vehicle. If the vehicle has only one engine, this property can be attached directly to the vehicle.",
+         "rdfs:label" : "fuelType",
+         "schema:domainIncludes" : [
+            "schema:Vehicle",
+            "schema:EngineSpecification"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text",
+            "schema:QualitativeValue"
+         ]
+      }
+   }
+}

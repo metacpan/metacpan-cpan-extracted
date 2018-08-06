@@ -1,0 +1,75 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 beab7898d2bd72e5c617d67f70e5557a83f21dd0 AUTHOR_PLEDGE
+SHA1 dc51cae02a67955fe2ced58ef55493e147c48e84 CODE_OF_CONDUCT.md
+SHA1 dd5fec2019741994c9e428e6d0324d00414ab9eb Changes
+SHA1 43e96a6537b87bdb646389ed017e9b9064756132 INSTALL
+SHA1 eb157f25f1e662b3d0a5085afbb8d20427d1348e LICENSE
+SHA1 5e9d6e7508c4e8daa43f033c5d486ebdc0b47f66 MANIFEST
+SHA1 7e7b73002d11b891890f267c405fe47a88194229 META.json
+SHA1 41c824e473b919ea18a9596c6736856601a22c5d META.yml
+SHA1 0858ebb57c4d359ef85f06b67f8ef0ce5f1721d7 Makefile.PL
+SHA1 3a053cdc170239374ac593ded2ef6bc434e53a08 README.mkdn
+SHA1 e58969f0d27e7c834206df7036a31a973b3aab39 bin/podknit
+SHA1 a58f712732ebfe28ee0392c64a5f369bbb985288 cpanfile
+SHA1 8cd410c2f107186273a54feed23a841a4a36b72f doap.xml
+SHA1 3733a43bb48cf0d74584627c089d505a835cdc10 eventual.pl
+SHA1 8147d7da427f39393c0722792a6c24d52d86b251 knit.yml
+SHA1 4d5984a183f98adc7390bc0c3eefb4d8e15e7289 lib/Pod/Knit.pm
+SHA1 e034c57effd7cf20a53c84a039701bc081338c94 lib/Pod/Knit/DOM/Mojo.pm
+SHA1 899a35af6000fb07b8fdce44281010ebac1f4734 lib/Pod/Knit/DOM/WebQuery.pm
+SHA1 030f5d0b8db3d0bc4f6a8484ee2faa78db6d01e8 lib/Pod/Knit/Document.pm
+SHA1 397bf6fbb8cb0bf15da8f09546f7953cc3c4e202 lib/Pod/Knit/Document/Mojo.pm
+SHA1 3245a8791513db2cd545ee0cc2a8d88230fe3286 lib/Pod/Knit/Document/WebQuery.pm
+SHA1 aba93229b9c8f38360432e102851f3d65ec1ea7b lib/Pod/Knit/Manual.pm
+SHA1 5e648c1e240a9a90994b23f4f7a6e7b9836b596d lib/Pod/Knit/Output/Pod.pm
+SHA1 3b13c63f1ef014a2a4116c588c6edd88e56f91fa lib/Pod/Knit/Plugin.pm
+SHA1 08197e52dd826cbefdf22d7d39bbe3d3d9a70e9c lib/Pod/Knit/Plugin/Abstract.pm
+SHA1 1ae76810a49e44fbfc12af12ad4ee89cb84f8aa7 lib/Pod/Knit/Plugin/Attributes.pm
+SHA1 d79e3306bb81203dcc0c26c4af447ad977c1d040 lib/Pod/Knit/Plugin/Authors.pm
+SHA1 625e250ba824d0b0df35574d06e7eed62d94878e lib/Pod/Knit/Plugin/HeadsToSections.pm
+SHA1 f22ad7f6e0dd6818ca8825d8daef6101cdb06981 lib/Pod/Knit/Plugin/Legal.pm
+SHA1 76eaae0de73fbe9bf2c1fe69ad8799f9b885fe20 lib/Pod/Knit/Plugin/Methods.pm
+SHA1 aa4aa0ba9a4a245caeaebb120478ad4593e0bead lib/Pod/Knit/Plugin/NamedSections.pm
+SHA1 4b0fef7f7cd36ec9edf3e5e9270a6b047dccf5e2 lib/Pod/Knit/Plugin/Sort.pm
+SHA1 f5a26f60a4599a6575922cbe8f95a28c5113fcfd lib/Pod/Knit/Plugin/Version.pm
+SHA1 75bee6c5fc6f85d06c8ec7bf0741367c186a37d0 lib/Pod/Knit/PodParser.pm
+SHA1 4c9b407df9a187f4b660f43ebcadd56b12f06cec lib/Pod/Knit/Zilla.pm
+SHA1 b7da1bb691d1ee20a16bb60cd1ce8c8b378b9596 perf
+SHA1 7724b5187d2a6696c4044e8fca266f3ef53008c5 sample.pod
+SHA1 15d88577d668952aa48d3fa4299b173091ab4910 t/00-compile.t
+SHA1 ade6d31be0d824cfbaa623e3c51c381a7976a650 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 5f293e8e268df0a713114945a7c0cfede476e1c7 t/basic.t
+SHA1 d06b120795c5b500d14e45eefcf927fb87718a58 t/document.t
+SHA1 33419d6d21c78b62a63a3bd590f0db5eeef69cb8 t/plugin-abstract.t
+SHA1 5dd69f9419e391df3aebb02abc5f33d1ba8210d7 t/plugin-authors.t
+SHA1 925d5bdcde9e3adbd76eb7026d2e74ebe5b825be t/plugin-legal.t
+SHA1 f85349906ac89fa1f03fca86ebde6779deafa323 t/plugin-methods.t
+SHA1 595ea2c9494f27a8ebd4604d8ff88d1e4f337404 t/plugin-namedsections.t
+SHA1 d4aac1b4fbd265d38c9df23b697bd7453bf61777 t/plugin-sort.t
+SHA1 77a3e739be28cb77aaf21d9063eed8aa343b9ee4 t/plugin-version.t
+SHA1 8aa854d514dea2f5cb61e3916497fbbb104afc80 t/plugins.t
+SHA1 616bbe590bf3d52e3128b95f1cba9ec49357d0c4 t/podparser.t
+SHA1 d53d9aeb7b31cc18abf09fa43d9eb20e1a3db506 use.pl
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAltiPGUACgkQ34Hwf+GwC4wftQCdFJOI4u0n0hPDBO2Xh3bVbKwg
+/GEAn16U1qQW8hO97852RsoX0LnwbOI5
+=rQTb
+-----END PGP SIGNATURE-----

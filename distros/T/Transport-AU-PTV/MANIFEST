@@ -6,9 +6,6 @@ META.yml
 Makefile.PL
 README
 Session.vim
-backup_xt/author/00-routes.t
-backup_xt/author/01-stops.t
-backup_xt/author/02-departures.t
 dist.ini
 lib/Transport/AU/PTV.pm
 lib/Transport/AU/PTV/APIRequest.pm
@@ -26,3 +23,5 @@ lib/Transport/AU/PTV/Stops.pm
 t/author-00-PTV.t
 t/author-01-Routes.t
 t/author-02-Route.t
+t/author-03-Stop.t
+t/author-04-Departure.t

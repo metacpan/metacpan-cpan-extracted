@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Mn - Package for language Mongolian
 
 package Locale::CLDR::Locales::Mn;
 # This file auto generated from Data\common\main\mn.xml
-#	on Fri 13 Apr  7:19:54 am GMT
+#	on Sun  5 Aug  6:11:52 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -136,6 +136,9 @@ has 'display_name_language' => (
  				'en_US@alt=short' => 'америк-англи',
  				'eo' => 'эсперанто',
  				'es' => 'испани',
+ 				'es_419' => 'испани хэл (Латин Америк)',
+ 				'es_ES' => 'испани хэл (Европ)',
+ 				'es_MX' => 'испани хэл (Мексик)',
  				'et' => 'эстони',
  				'eu' => 'баск',
  				'ewo' => 'эвондо',
@@ -325,6 +328,8 @@ has 'display_name_language' => (
  				'prg' => 'прусс',
  				'ps' => 'пашто',
  				'pt' => 'португал',
+ 				'pt_BR' => 'португал хэл (Бразил)',
+ 				'pt_PT' => 'португал хэл (Европ)',
  				'qu' => 'кечуа',
  				'quc' => 'киче',
  				'rap' => 'рапануи',
@@ -410,7 +415,7 @@ has 'display_name_language' => (
  				'ug' => 'уйгур',
  				'uk' => 'украин',
  				'umb' => 'умбунду',
- 				'und' => 'тодорхойгүй хэл',
+ 				'und' => 'Үл мэдэгдэх хэл',
  				'ur' => 'урду',
  				'uz' => 'узбек',
  				'vai' => 'вай',
@@ -458,7 +463,7 @@ has 'display_name_script' => (
 			my %scripts = (
 			'Arab' => 'араб',
  			'Armn' => 'армени',
- 			'Beng' => 'бенгал',
+ 			'Beng' => 'бенгал хэл',
  			'Bopo' => 'вопомофо',
  			'Brai' => 'брайл',
  			'Cyrl' => 'кирилл',
@@ -547,6 +552,7 @@ has 'display_name_region' => (
  			'151' => 'Зүүн Европ',
  			'154' => 'Хойд Европ',
  			'155' => 'Баруун Европ',
+ 			'202' => 'Сахарын цөлийн урд хэсгийн Африк',
  			'419' => 'Латин Америк',
  			'AC' => 'Асенсион арал',
  			'AD' => 'Андорра',
@@ -774,7 +780,7 @@ has 'display_name_region' => (
  			'SO' => 'Сомали',
  			'SR' => 'Суринам',
  			'SS' => 'Өмнөд Судан',
- 			'ST' => 'Сан-Томе ба Принсипи',
+ 			'ST' => 'Сан-Томе Принсипи',
  			'SV' => 'Эль Сальвадор',
  			'SX' => 'Синт Мартен',
  			'SY' => 'Сири',
@@ -1124,7 +1130,7 @@ has 'units' => (
 						'other' => q({0}зуун),
 					},
 					'coordinate' => {
-						'east' => q({0}E),
+						'east' => q({0}Зүүн),
 						'north' => q({0}Умард),
 						'south' => q({0}Өмнөд),
 						'west' => q({0}Өрнөд),
@@ -2213,7 +2219,7 @@ has 'units' => (
 						'per' => q({0}/инч),
 					},
 					'inch-hg' => {
-						'name' => q(МөУсИн),
+						'name' => q(МөУс инч),
 						'one' => q({0} МөУсИн),
 						'other' => q({0} МөУсИн),
 					},
@@ -3225,9 +3231,9 @@ has 'currencies' => (
 		'CZK' => {
 			symbol => 'CZK',
 			display_name => {
-				'currency' => q(чехийн коруна),
-				'one' => q(чехийн коруна),
-				'other' => q(чехийн коруна),
+				'currency' => q(Чех крон),
+				'one' => q(Чех крон),
+				'other' => q(Чех крон),
 			},
 		},
 		'DJF' => {
@@ -3673,6 +3679,13 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(мавритан угия \(1973–2017\)),
+				'one' => q(мавритан угия \(1973–2017\)),
+				'other' => q(мавритан угия \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(мавритан угия),
 				'one' => q(мавритан угия),
 				'other' => q(мавритан угия),
@@ -3698,7 +3711,7 @@ has 'currencies' => (
 			symbol => 'MWK',
 			display_name => {
 				'currency' => q(малави квача),
-				'one' => q(малави квача),
+				'one' => q(Малавигийн квача),
 				'other' => q(малави квача),
 			},
 		},
@@ -3969,9 +3982,17 @@ has 'currencies' => (
 		'STD' => {
 			symbol => 'STD',
 			display_name => {
+				'currency' => q(сан-томе ба принсипи добра \(1977–2017\)),
+				'one' => q(Сан-Томе Принсипигийн мөнгөн тэмдэгт добра \(1977–2017\)),
+				'other' => q(Сан-Томе Принсипигийн мөнгөн тэмдэгт добра \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
+			display_name => {
 				'currency' => q(сан-томе ба принсипи добра),
-				'one' => q(сан-томе ба принсипи добра),
-				'other' => q(сан-томе ба принсипи добра),
+				'one' => q(Сан-Томе Принсипигийн мөнгөн тэмдэгт добра),
+				'other' => q(Сан-Томе Принсипигийн мөнгөн тэмдэгт добра),
 			},
 		},
 		'SYP' => {
@@ -4478,51 +4499,51 @@ has 'day_period_data' => (
 		for ($type) {
 			if ($_ eq 'gregorian') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 				}
 				last SWITCH;
 				}
 			if ($_ eq 'generic') {
 				if($day_period_type eq 'default') {
-					return 'noon' if $time == 1200;
 					return 'midnight' if $time == 0;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
+					return 'noon' if $time == 1200;
 					return 'night1' if $time >= 2100;
 					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
 				}
 				if($day_period_type eq 'selection') {
-					return 'night1' if $time >= 2100;
-					return 'night1' if $time < 600;
+					return 'evening1' if $time >= 1800
+						&& $time < 2100;
 					return 'afternoon1' if $time >= 1200
 						&& $time < 1800;
 					return 'morning1' if $time >= 600
 						&& $time < 1200;
-					return 'evening1' if $time >= 1800
-						&& $time < 2100;
+					return 'night1' if $time >= 2100;
+					return 'night1' if $time < 600;
 				}
 				last SWITCH;
 				}
@@ -4542,33 +4563,33 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'noon' => q{үд дунд},
-					'night1' => q{шөнө},
-					'afternoon1' => q{өдөр},
-					'morning1' => q{өглөө},
-					'pm' => q{үх},
-					'midnight' => q{шөнө дунд},
-					'evening1' => q{орой},
-					'am' => q{үө},
-				},
 				'wide' => {
-					'am' => q{ү.ө},
-					'evening1' => q{орой},
+					'night1' => q{шөнө},
 					'midnight' => q{шөнө дунд},
 					'pm' => q{ү.х},
-					'afternoon1' => q{өдөр},
-					'morning1' => q{өглөө},
 					'noon' => q{үд дунд},
+					'morning1' => q{өглөө},
+					'evening1' => q{орой},
+					'afternoon1' => q{өдөр},
+					'am' => q{ү.ө},
+				},
+				'narrow' => {
+					'midnight' => q{шөнө дунд},
+					'pm' => q{үх},
 					'night1' => q{шөнө},
+					'afternoon1' => q{өдөр},
+					'evening1' => q{орой},
+					'morning1' => q{өглөө},
+					'am' => q{үө},
+					'noon' => q{үд дунд},
 				},
 				'abbreviated' => {
+					'noon' => q{үд дунд},
 					'am' => q{ҮӨ},
 					'evening1' => q{орой},
-					'noon' => q{үд дунд},
-					'night1' => q{шөнө},
-					'morning1' => q{өглөө},
 					'afternoon1' => q{өдөр},
+					'morning1' => q{өглөө},
+					'night1' => q{шөнө},
 					'pm' => q{ҮХ},
 					'midnight' => q{шөнө дунд},
 				},
@@ -4576,33 +4597,33 @@ has 'day_periods' => (
 			'stand-alone' => {
 				'abbreviated' => {
 					'noon' => q{үд дунд},
-					'night1' => q{шөнө},
-					'afternoon1' => q{өдөр},
-					'morning1' => q{өглөө},
-					'midnight' => q{шөнө дунд},
-					'pm' => q{ҮХ},
 					'am' => q{ҮӨ},
+					'afternoon1' => q{өдөр},
 					'evening1' => q{орой},
+					'morning1' => q{өглөө},
+					'night1' => q{шөнө},
+					'pm' => q{ҮХ},
+					'midnight' => q{шөнө дунд},
 				},
 				'narrow' => {
-					'afternoon1' => q{өдөр},
-					'morning1' => q{өглөө},
 					'noon' => q{үд дунд},
+					'afternoon1' => q{өдөр},
+					'evening1' => q{орой},
+					'morning1' => q{өглөө},
+					'am' => q{ҮӨ},
 					'night1' => q{шөнө},
 					'midnight' => q{шөнө дунд},
 					'pm' => q{ҮХ},
-					'am' => q{ҮӨ},
-					'evening1' => q{орой},
 				},
 				'wide' => {
+					'noon' => q{үд дунд},
 					'evening1' => q{орой},
-					'am' => q{ҮӨ},
-					'pm' => q{ҮХ},
-					'midnight' => q{шөнө дунд},
 					'afternoon1' => q{өдөр},
 					'morning1' => q{өглөө},
-					'noon' => q{үд дунд},
+					'am' => q{ҮӨ},
 					'night1' => q{шөнө},
+					'midnight' => q{шөнө дунд},
+					'pm' => q{ҮХ},
 				},
 			},
 		},
@@ -4645,8 +4666,8 @@ has 'date_formats' => (
 			'short' => q{y-MM-dd},
 		},
 		'gregorian' => {
-			'full' => q{y 'оны' MMM'ын' d. EEEE 'гараг'.},
-			'long' => q{y 'оны' MMM'ын' d},
+			'full' => q{y.MM.dd, EEEE},
+			'long' => q{y.MM.dd},
 			'medium' => q{y.MM.dd},
 			'short' => q{y.MM.dd},
 		},
@@ -6993,7 +7014,7 @@ has 'time_zone_names' => (
 			long => {
 				'daylight' => q#Сен-Пьер ба Микелоны зуны цаг#,
 				'generic' => q#Сен-Пьер ба Микелоны цаг#,
-				'standard' => q#Сен-Пьер ба Микелоны стандарт цаг#,
+				'standard' => q#Сент-Пьер ба Микелоны стандарт цаг#,
 			},
 		},
 		'Pitcairn' => {

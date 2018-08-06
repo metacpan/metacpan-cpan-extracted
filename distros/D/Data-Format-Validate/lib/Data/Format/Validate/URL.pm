@@ -1,5 +1,5 @@
 package Data::Format::Validate::URL;
-our $VERSION = q/0.2/;
+our $VERSION = q/0.3/;
 
 use Carp;
 use base q/Exporter/;
@@ -18,22 +18,22 @@ our %EXPORT_TAGS = (
 
 sub looks_like_any_url ($) {
 
-    $_ = shift || croak q/Value must be provided/;
-    /^
-        ((https?|ftp):\/\/)?
-        [a-z0-9-]+(\.[a-z0-9-]+)+
-        ([\/?].*)?
+    my $url = shift || croak q/Value must be provided/;
+    $url =~ /^
+        ((https?|ftp):\/\/)?        # Protocol (optional)
+        [a-z0-9-]+(\.[a-z0-9-]+)+   # URL name (with optional hostname)
+        ([\/?].*)?                  # URL path & params (both optional)
     $/ix
 }
 
 sub looks_like_full_url ($) {
 
-    $_ = shift || croak q/Value must be provided/;
-    /^
-        (https?|ftp):\/\/
-        (www|ftp)\.
-        [a-z0-9-]+(\.[a-z0-9-]+)+
-        ([\/?].*)?
+    my $url = shift || croak q/Value must be provided/;
+    $url =~ /^
+        (https?|ftp):\/\/           # Protocol
+        (www|ftp)\.                 # Hostname
+        [a-z0-9-]+(\.[a-z0-9-]+)+   # URL name
+        ([\/?].*)?                  # URL path & params (both optional)
     $/ix
 }
 1;
@@ -48,9 +48,11 @@ Data::Format::Validate::URL - A URL validating module.
 
 =head1 SYNOPSIS
 
-Module that validate URL.
+Function-oriented module capable of validating:
+- Any URL with name, with or without protocol, hostname, path or params
+- Full URL, with protocol, hostname and name, with or without path or params
 
-=head1 Utilities
+=head1 UTILITIES
 
 =over 4
 
@@ -58,32 +60,15 @@ Module that validate URL.
 
     use Data::Format::Validate::URL 'looks_like_any_url';
 
-    looks_like_any_url 'duckduckgo.com';                              # 1
-    looks_like_any_url 'www.duckduckgo.com';                          # 1
-    looks_like_any_url 'ftp.duckduckgo.com';                          # 1
-    looks_like_any_url 'http://duckduckgo.com';                       # 1
-    looks_like_any_url 'ftp://www.duckduckgo.com';                    # 1
-    looks_like_any_url 'https://www.duckduckgo.com';                  # 1
-    looks_like_any_url 'https://www.youtube.com/watch?v=tqgBN44orKs'; # 1
-
-    looks_like_any_url '.com';                                        # 0
-    looks_like_any_url 'www. duckduckgo';                             # 0
-    looks_like_any_url 'this is not an url';                          # 0
-    looks_like_any_url 'perl.com is the best website';                # 0
+    looks_like_any_url 'duckduckgo.com';    # returns 1
+    looks_like_any_url 'www. duckduckgo';   # returns 0
 
 =item Only full URL
 
     use Data::Format::Validate::URL 'looks_like_full_url';
 
-    looks_like_full_url 'ftp://www.duckduckgo.com';                 # 1
-    looks_like_full_url 'http://www.duckduckgo.com';                # 1
-    looks_like_full_url 'https://www.duckduckgo.com';               # 1
-    looks_like_full_url 'http://www.duckduckgo.com/search?q=perl';  # 1
-
-    looks_like_full_url 'duckduckgo.com';                           # 0
-    looks_like_full_url 'www.duckduckgo.com';                       # 0
-    looks_like_full_url 'ftp.duckduckgo.com';                       # 0
-    looks_like_full_url 'http://duckduckgo.com';                    # 0
+    looks_like_full_url 'http://www.duckduckgo.com/search?q=perl';  # returns 1
+    looks_like_full_url 'http://duckduckgo.com';                    # returns 0
     
 =back
 
@@ -95,6 +80,6 @@ This source is on Github:
 
 =head1 AUTHOR
 
-Created by Israel Batista <<israel.batista@univem.edu.br>>
+Created by Israel Batista <rozcovo@cpan.org>
 
 =cut

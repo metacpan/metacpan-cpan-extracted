@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An Insurance agency.",
+      "rdfs:label" : "InsuranceAgency",
+      "rdfs:subClassOf" : "schema:FinancialService"
+   },
+   "properties" : {}
+}

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of allocating an action/event/task to some destination (someone or something).",
+      "rdfs:label" : "AssignAction",
+      "rdfs:subClassOf" : "schema:AllocateAction"
+   },
+   "properties" : {}
+}

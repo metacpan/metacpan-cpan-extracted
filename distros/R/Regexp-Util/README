@@ -25,9 +25,6 @@ DESCRIPTION
         (Since Perl 5.10, it has been possible to use regexp engine plugins,
         such as re::engine::PCRE and re::engine::RE2.)
 
-    `regexp_is_anchored($re)`
-        Returns true if $re is anchored at the start (e.g. `qr/^foo/`).
-
     `serialize_regexp($re)`
         Serializes the regexp to a string of Perl code.
 
@@ -39,6 +36,10 @@ DESCRIPTION
         return the original regexp object. Uses Safe, and also checks that the
         return value is a regexp, so should be *somewhat* safer than
         `eval($str)`.
+
+    This module can also re-export `regexp_pattern($re)`, `regmust($re)`,
+    `regname($name, $all)`, `regnames($all)`, and `regnames_count()` from re
+    for convenience.
 
 BUGS
     Please report any bugs to
@@ -53,7 +54,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2014 by Toby Inkster.
+    This software is copyright (c) 2014, 2018 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

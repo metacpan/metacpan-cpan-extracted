@@ -1,0 +1,101 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The most generic type of item.",
+      "rdfs:label" : "Thing"
+   },
+   "properties" : {
+      "schema:additionalType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An additional type for the item, typically used for adding more specific types from external vocabularies in microdata syntax. This is a relationship between something and a class that the thing is in. In RDFa syntax, it is better to use the native RDFa syntax - the 'typeof' attribute - for multiple types. Schema.org tools may have only weaker understanding of extra types, in particular those defined externally.",
+         "rdfs:label" : "additionalType",
+         "rdfs:subPropertyOf" : "rdf:type",
+         "schema:domainIncludes" : "schema:Thing",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:alternateName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An alias for the item.",
+         "rdfs:label" : "alternateName",
+         "schema:domainIncludes" : "schema:Thing",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:description" : {
+         "owl:equivalentProperty" : "dc:description",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A description of the item.",
+         "rdfs:label" : "description",
+         "schema:domainIncludes" : "schema:Thing",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:disambiguatingDescription" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of description. A short description of the item used to disambiguate from other, similar items. Information from other properties (in particular, name) may be necessary for the description to be useful for disambiguation.",
+         "rdfs:label" : "disambiguatingDescription",
+         "rdfs:subPropertyOf" : "schema:description",
+         "schema:domainIncludes" : "schema:Thing",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:identifier" : {
+         "owl:equivalentProperty" : "dc:identifier",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The identifier property represents any kind of identifier for any kind of <a class=\"localLink\" href=\"http://schema.org/Thing\">Thing</a>, such as ISBNs, GTIN codes, UUIDs etc. Schema.org provides dedicated properties for representing many of these, either as textual strings or as URL (URI) links. See <a href=\"/docs/datamodel.html#identifierBg\">background notes</a> for more details.",
+         "rdfs:label" : "identifier",
+         "schema:domainIncludes" : "schema:Thing",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL",
+            "schema:PropertyValue"
+         ]
+      },
+      "schema:image" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An image of the item. This can be a <a class=\"localLink\" href=\"http://schema.org/URL\">URL</a> or a fully described <a class=\"localLink\" href=\"http://schema.org/ImageObject\">ImageObject</a>.",
+         "rdfs:label" : "image",
+         "schema:domainIncludes" : "schema:Thing",
+         "schema:rangeIncludes" : [
+            "schema:ImageObject",
+            "schema:URL"
+         ]
+      },
+      "schema:mainEntityOfPage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates a page (or other CreativeWork) for which this thing is the main entity being described. See <a href=\"/docs/datamodel.html#mainEntityBackground\">background notes</a> for details.",
+         "rdfs:label" : "mainEntityOfPage",
+         "schema:domainIncludes" : "schema:Thing",
+         "schema:inverseOf" : "schema:mainEntity",
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:CreativeWork"
+         ]
+      },
+      "schema:name" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The name of the item.",
+         "rdfs:label" : "name",
+         "schema:domainIncludes" : "schema:Thing",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:potentialAction" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates a potential Action, which describes an idealized action in which this thing would play an 'object' role.",
+         "rdfs:label" : "potentialAction",
+         "schema:domainIncludes" : "schema:Thing",
+         "schema:rangeIncludes" : "schema:Action"
+      },
+      "schema:sameAs" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "URL of a reference Web page that unambiguously indicates the item's identity. E.g. the URL of the item's Wikipedia page, Wikidata entry, or official website.",
+         "rdfs:label" : "sameAs",
+         "schema:domainIncludes" : "schema:Thing",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:url" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "URL of the item.",
+         "rdfs:label" : "url",
+         "schema:domainIncludes" : "schema:Thing",
+         "schema:rangeIncludes" : "schema:URL"
+      }
+   }
+}

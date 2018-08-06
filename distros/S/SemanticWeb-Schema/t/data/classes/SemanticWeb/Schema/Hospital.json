@@ -1,0 +1,13 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A hospital.",
+      "rdfs:label" : "Hospital",
+      "rdfs:subClassOf" : [
+         "schema:MedicalOrganization",
+         "schema:CivicStructure",
+         "schema:EmergencyService"
+      ]
+   },
+   "properties" : {}
+}

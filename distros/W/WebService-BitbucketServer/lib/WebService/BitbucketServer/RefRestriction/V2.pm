@@ -6,7 +6,7 @@ package WebService::BitbucketServer::RefRestriction::V2;
 use warnings;
 use strict;
 
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 use Moo;
 use namespace::clean;
@@ -124,7 +124,7 @@ WebService::BitbucketServer::RefRestriction::V2 - Bindings for a Bitbucket Serve
 
 =head1 VERSION
 
-version 0.604
+version 0.605
 
 =head1 SYNOPSIS
 
@@ -278,6 +278,7 @@ See the Branch REST API for more information.
 =item *
 
 Type: Set and be one of
+
 =over 4
 
 =item *
@@ -295,6 +296,8 @@ Type: Set and be one of
 =item *
 
 'read-only'
+
+=back
 
 =back
 
@@ -503,6 +506,7 @@ See the Branch REST API for more information.
 =item *
 
 Type: Set and be one of
+
 =over 4
 
 =item *
@@ -520,6 +524,8 @@ Type: Set and be one of
 =item *
 
 'read-only'
+
+=back
 
 =back
 

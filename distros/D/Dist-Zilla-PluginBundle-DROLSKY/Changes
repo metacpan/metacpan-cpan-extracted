@@ -1,3 +1,13 @@
+1.01     2018-08-01
+
+- More tweaks to the generated CONTRIBUTING.md file.
+
+
+1.00     2018-07-30
+
+- More tweaks and typo fixes in the generated CONTRIBUTING.md file.
+
+
 0.99     2018-06-21
 
 - Add a plugin to generate a CODE_OF_CONDUCT.md and copy this into the repo

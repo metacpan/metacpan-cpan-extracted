@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Os - Package for language Ossetic
 
 package Locale::CLDR::Locales::Os;
 # This file auto generated from Data\common\main\os.xml
-#	on Fri 13 Apr  7:24:41 am GMT
+#	on Sun  5 Aug  6:17:12 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -882,7 +882,7 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -905,7 +905,7 @@ has 'datetime_formats_available_formats' => (
 			yQQQ => q{y-'ӕм' 'азы' QQQ},
 			yQQQQ => q{y-'ӕм' 'азы' QQQQ},
 		},
-		'gregorian' => {
+		'generic' => {
 			H => q{HH},
 			Hm => q{HH:mm},
 			Hms => q{HH:mm:ss},
@@ -944,7 +944,7 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'generic' => {
+		'gregorian' => {
 			H => {
 				H => q{HH–HH},
 			},
@@ -989,7 +989,7 @@ has 'datetime_formats_interval' => (
 				h => q{h–h a v},
 			},
 		},
-		'gregorian' => {
+		'generic' => {
 			H => {
 				H => q{HH–HH},
 			},

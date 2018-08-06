@@ -87,7 +87,7 @@ Google::Ads::AdWords::v201806::QuotaCheckError
 Perl data type class for the XML Schema defined complexType
 QuotaCheckError from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Encapsulates the errors thrown during developer quota checks. 
 
 
 

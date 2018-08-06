@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A car is a wheeled, self-powered motor vehicle used for transportation.",
+      "rdfs:label" : "Car",
+      "rdfs:subClassOf" : "schema:Vehicle"
+   },
+   "properties" : {}
+}

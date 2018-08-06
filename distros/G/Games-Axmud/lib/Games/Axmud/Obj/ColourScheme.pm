@@ -158,9 +158,9 @@
             $self->ivPoke('backgroundColour', '#FFFFFF');
             $self->ivPoke('font', $axmud::CLIENT->constFont);
 
-            if ($self->name eq 'gui') {
+            if ($self->name eq 'viewer') {
 
-                # (Fit a little more help text into the GUI window)
+                # (Fit a little more help text into the object viewer window)
                 $self->ivPoke('fontSize', ($axmud::CLIENT->constFontSize - 1));
 
             } else {

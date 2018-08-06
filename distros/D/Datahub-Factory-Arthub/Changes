@@ -1,5 +1,9 @@
 Revision history for Datahub-Factory-VKC
 
+0.99  2018-08-01 16:24:13 CEST
+
+    - Changed: Yanked out SQL code and put in separate SQL file.
+
 0.98  2018-06-20 16:33:07 CEST
 
     - Changed: updated KMSKA modules for TMS 2017.

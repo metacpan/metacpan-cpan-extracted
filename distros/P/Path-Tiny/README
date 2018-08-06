@@ -2,7 +2,7 @@ NAME
     Path::Tiny - File path utility
 
 VERSION
-    version 0.106
+    version 0.108
 
 SYNOPSIS
       use Path::Tiny;
@@ -1089,6 +1089,8 @@ CONTRIBUTORS
     *   Karen Etheridge <ether@cpan.org>
 
     *   Mark Ellis <mark.ellis@cartridgesave.co.uk>
+
+    *   Martin H. Sluka <fany@cpan.org>
 
     *   Martin Kjeldsen <mk@bluepipe.dk>
 

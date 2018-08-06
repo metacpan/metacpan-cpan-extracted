@@ -1,5 +1,9 @@
 Revision history for MooseX-Getopt
 
+0.72      2018-08-04 04:45:57Z
+ - fix tests that broke with Getopt::Long::Descriptive 0.103 (RT#125992,
+   Damyan Ivanov, debian-perl group)
+
 0.71      2016-06-19 04:08:13Z
  - private attributes (i.e., lead "_) with a public init_arg now work.
 

@@ -6,7 +6,7 @@ use Mojolicious::Plugin::AssetPack::Asset::Null;
 use Mojolicious::Plugin::AssetPack::Store;
 use Mojolicious::Plugin::AssetPack::Util qw(diag has_ro load_module DEBUG);
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 has minify => sub { shift->_app->mode eq 'development' ? 0 : 1 };
 
@@ -86,7 +86,7 @@ sub register {
 sub tag_for {
   my $self = shift;
   deprecated
-    'tag_for() is DEPRECATED in favor of Mojolicious::Plugin::AssetPack::Asset::renderer()';
+    'tag_for() is DEPRECATED in favor of Mojolicious::Plugin::AssetPack::Asset::tag_for()';
   return $self->{tag_for} unless @_;
   $self->{tag_for} = shift;
   return $self;
@@ -144,8 +144,8 @@ sub _process {
     }
   }
 
-  if (my $renderer = $self->{tag_for}) {
-    $_->{renderer} or $_->{renderer} = $renderer for @$assets;
+  if (my $tag_for = $self->{tag_for}) {
+    $_->{tag_for} or $_->{tag_for} = $tag_for for @$assets;
   }
 
   my @checksum = map { $_->checksum } @$assets;
@@ -195,25 +195,25 @@ sub _render_tags {
 
   return Mojo::ByteStream->new(
     join "\n",
-    map { $_->renderer->($_, $c, \%args, @attrs) }
+    map { $_->tag_for->($_, $c, \%args, @attrs) }
       grep { !$_->isa('Mojolicious::Plugin::AssetPack::Asset::Null') } @$assets
   );
 }
 
 sub _serve {
-  my $c        = shift;
-  my $checksum = $c->stash('checksum');
-  my $helper   = $c->stash('assetpack.helper');
-  my $self     = $c->$helper;
+  my $c      = shift;
+  my $helper = $c->stash('assetpack.helper');
+  my $self   = $c->$helper;
 
-  if (my $f = $self->{by_checksum}{$checksum}) {
-    $self->store->serve_asset($c, $f);
+  my $checksum = $c->stash('checksum');
+  if (my $asset = $self->{by_checksum}{$checksum}) {
+    $self->store->serve_asset($c, $asset);
     return $c->rendered;
   }
 
   my $topic = $c->stash('name');
-  if ($self->{by_topic}{$topic}) {
-    return $c->render(text => "// Invalid checksum for topic '$topic'\n", status => 404);
+  if (my $assets = $self->{by_topic}{$topic}) {
+    return $self->store->serve_fallback_for_assets($c, $topic, $assets);
   }
 
   $c->render(text => "// No such asset '$topic'\n", status => 404);
@@ -238,7 +238,7 @@ Mojolicious::Plugin::AssetPack - Compress and convert css, less, sass, javascrip
 
 =head1 VERSION
 
-2.04
+2.05
 
 =head1 SYNOPSIS
 

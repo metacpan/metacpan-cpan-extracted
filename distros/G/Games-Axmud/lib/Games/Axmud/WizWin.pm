@@ -4832,7 +4832,7 @@
                     $self->profileUpdatePush('verboseExitRightMarkerList', $pattern);
                 }
 
-                $self->profileUpdatePush('verboseExitDelimiterList', @delimList);
+                $self->profileUpdatePushSort('verboseExitDelimiterList', @delimList);
             }
 
         } elsif (
@@ -4958,7 +4958,7 @@
                     $self->profileUpdatePush('briefExitRightMarkerList', quotemeta($stopText));
                 }
 
-                $self->profileUpdatePush('briefExitDelimiterList', @delimList);
+                $self->profileUpdatePushSort('briefExitDelimiterList', @delimList);
 
             } else {
 
@@ -5709,6 +5709,60 @@
             push (@$listRef, $newItem);
         }
 
+        $self->ivAdd('profUpdateHash', $iv, $listRef);
+
+        return 1;
+    }
+
+    sub profileUpdatePushSort {
+
+        # Called by $self->analysisPage and analyseComponent
+        # Companion to $self->profileUpdatePush, called for delimiter lists which need to be
+        #   sorted, longest first
+        #
+        # Expected arguments
+        #   $iv         - A list IV (a key in $self->profUpdateHash)
+        #
+        # Optional arguments
+        #   @itemList   - A list of items to add to the corresponding value in $self->profUpdateHash
+        #                   (can be an empty list)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $iv, @itemList) = @_;
+
+        # Local variables
+        my $listRef;
+
+        # Check for improper arguments
+        if (! defined $iv) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->profileUpdatePush', @_);
+        }
+
+        if ($self->ivExists('profUpdateHash', $iv)) {
+
+            $listRef = $self->ivShow('profUpdateHash', $iv);
+        }
+
+        OUTER: foreach my $newItem (@itemList) {
+
+            INNER: foreach my $oldItem (@$listRef) {
+
+                if ($newItem eq $oldItem) {
+
+                    # Don't add the duplicate
+                    next OUTER;
+                }
+            }
+
+            # Not a duplicate
+            push (@$listRef, $newItem);
+        }
+
+        @$listRef = sort {length($b) <=> length($a)} (@$listRef);
         $self->ivAdd('profUpdateHash', $iv, $listRef);
 
         return 1;

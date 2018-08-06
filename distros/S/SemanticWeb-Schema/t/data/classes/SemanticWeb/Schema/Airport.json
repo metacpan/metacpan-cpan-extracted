@@ -1,0 +1,27 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An airport.",
+      "rdfs:label" : "Airport",
+      "rdfs:subClassOf" : "schema:CivicStructure"
+   },
+   "properties" : {
+      "schema:iataCode" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "IATA identifier for an airline or airport.",
+         "rdfs:label" : "iataCode",
+         "schema:domainIncludes" : [
+            "schema:Airline",
+            "schema:Airport"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:icaoCode" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "ICAO identifier for an airport.",
+         "rdfs:label" : "icaoCode",
+         "schema:domainIncludes" : "schema:Airport",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

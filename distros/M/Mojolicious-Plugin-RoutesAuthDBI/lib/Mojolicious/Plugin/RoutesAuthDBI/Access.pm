@@ -63,7 +63,7 @@ sub apply_ns {# Plugin
 }
 
 sub apply_route {# meth in Plugin
-  my ($self, $r_hash) = @_;
+  my ($self, $r_hash) = @_;# $r_hash - это строка запроса маршрута из БД
   my $r = $self->app->routes;
   
   $self->app->log->debug("Skip disabled route id=[$r_hash->{id}] [$r_hash->{request}]")
@@ -90,7 +90,7 @@ sub apply_route {# meth in Plugin
   #~ $nr->over(authenticated=>$r_hash->{auth});
   # STEP ACCESS
   $nr->over(access => $r_hash);
-  my $host = eval($r_hash->{host_re} || $r_hash->{host});
+  my $host = eval($r_hash->{host_re} || $r_hash->{host} || '');
   $nr->over(host => $host)
     if $host;
   
@@ -296,7 +296,7 @@ See detail L<Mojolicious::Plugin::RoutesAuthDBI#access>
 
     $app->plugin('RoutesAuthDBI', 
         ...
-        access => {< options list below >},
+        access => {< hashref options list below >},
         ...
     );
 
@@ -323,6 +323,10 @@ This callback invoke when request need auth route but authentication was failure
   fail_access_cb => sub {my ($c, $route, $r_hash, $u) = @_;...}
 
 This callback invoke when request need auth route but access was failure. $route - L<Mojolicious::Routes::Route> object, $r_hash - route hashref db item, $u - useer hashref.
+
+=head2 tables
+
+Hashref of any DB tables names. See L<Mojolicious::Plugin::RoutesAuthDBI::Schema#Default-variables-for-SQL-templates>.
 
 
 =head1 EXPORT SUBS
@@ -397,7 +401,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016 Mikhail Che.
+Copyright 2016+ Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

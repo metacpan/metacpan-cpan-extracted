@@ -60,7 +60,7 @@
          "web" : "https://github.com/rjbs/Test-Deep-HashRec"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -432,7 +432,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.002",
+                  "tag" : "0.003",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },

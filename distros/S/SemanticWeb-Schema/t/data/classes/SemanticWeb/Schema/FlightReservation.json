@@ -1,0 +1,41 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A reservation for air travel.</p>\n\n<p>Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations. For offers of tickets, use <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a>.",
+      "rdfs:label" : "FlightReservation",
+      "rdfs:subClassOf" : "schema:Reservation"
+   },
+   "properties" : {
+      "schema:boardingGroup" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The airline-specific indicator of boarding order / preference.",
+         "rdfs:label" : "boardingGroup",
+         "schema:domainIncludes" : "schema:FlightReservation",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:passengerPriorityStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The priority status assigned to a passenger for security or boarding (e.g. FastTrack or Priority).",
+         "rdfs:label" : "passengerPriorityStatus",
+         "schema:domainIncludes" : "schema:FlightReservation",
+         "schema:rangeIncludes" : [
+            "schema:QualitativeValue",
+            "schema:Text"
+         ]
+      },
+      "schema:passengerSequenceNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The passenger's sequence number as assigned by the airline.",
+         "rdfs:label" : "passengerSequenceNumber",
+         "schema:domainIncludes" : "schema:FlightReservation",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:securityScreening" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of security screening the passenger is subject to.",
+         "rdfs:label" : "securityScreening",
+         "schema:domainIncludes" : "schema:FlightReservation",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

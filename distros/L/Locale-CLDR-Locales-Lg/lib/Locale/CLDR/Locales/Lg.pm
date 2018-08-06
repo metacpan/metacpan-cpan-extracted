@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Lg - Package for language Ganda
 
 package Locale::CLDR::Locales::Lg;
 # This file auto generated from Data\common\main\lg.xml
-#	on Fri 13 Apr  7:18:09 am GMT
+#	on Sun  5 Aug  6:09:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -556,6 +556,11 @@ has 'currencies' => (
 		},
 		'MRO' => {
 			display_name => {
+				'currency' => q(Wugwiya ey’eMawritenya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(Wugwiya ey’eMawritenya),
 			},
 		},
@@ -625,6 +630,11 @@ has 'currencies' => (
 			},
 		},
 		'STD' => {
+			display_name => {
+				'currency' => q(Dobura ey’eSantome ne Purincipe \(1977–2017\)),
+			},
+		},
+		'STN' => {
 			display_name => {
 				'currency' => q(Dobura ey’eSantome ne Purincipe),
 			},

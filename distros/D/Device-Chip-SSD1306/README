@@ -32,7 +32,14 @@ DEVICE MODELS
     SSD1306-128x32
 
       An SSD1306 driving a display with 128 columns and 32 rows. This is
-      the usual "half-height" display.
+      the usual "half-height" module, often found with a 0.91 inch display.
+      This uses only even-numbered rows.
+
+    SSD1306-64x32
+
+      An SSD1306 driving a display with 64 columns and 32 rows. This is the
+      usual "quarter" size module, often found with a 0.49 inch display.
+      This uses the only the middle 64 columns.
 
     SH1106-128x64
 
@@ -93,12 +100,50 @@ METHODS
     Sends an entire screen-worth of pixel data. The $pixels should be in a
     packed binary string containing one byte per 8 pixels.
 
+DRAWING METHODS
+
+    The following methods operate on an internal framebuffer stored by the
+    instance. The user must invoke the "refresh" method to update the
+    actual chip after calling them.
+
+ clear
+
+       $chip->clear
+
+    Resets the stored framebuffer to blank.
+
+ draw_pixel
+
+       $chip->draw_pixel( $x, $y, $val = 1 )
+
+    Draw the given pixel. If the third argument is false, the pixel will be
+    cleared instead of set.
+
+ draw_hline
+
+       $chip->draw_hline( $x1, $x2, $y, $val = 1 )
+
+    Draw a horizontal line in the given $y row, between the columns $x1 and
+    $x2 (inclusive). If the fourth argument is false, the pixels will be
+    cleared instead of set.
+
+ draw_vline
+
+       $chip->draw_vline( $x, $y1, $y2, $val = 1 )
+
+    Draw a vertical line in the given $x column, between the rows $y1 and
+    $y2 (inclusive). If the fourth argument is false, the pixels will be
+    cleared instead of set.
+
+ refresh
+
+       $chip->refresh->get
+
+    Sends the framebuffer to the display chip.
+
 TODO
 
       * More interfaces - 3-wire SPI
-
-      * Maintain a framebuffer. Add some drawing commands like pixels and
-      lines.
 
 AUTHOR
 

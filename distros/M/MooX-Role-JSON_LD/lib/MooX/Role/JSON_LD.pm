@@ -146,10 +146,9 @@ use 5.6.0;
 use Moo::Role;
 use Carp;
 use JSON::MaybeXS;
-use Ref::Util qw/ is_plain_coderef is_plain_hashref is_ref is_blessed_ref /;
-use Types::Standard qw[ArrayRef HashRef InstanceOf Str];
+use Types::Standard qw[ArrayRef HashRef InstanceOf Str is_CodeRef is_HashRef is_Ref is_Object];
 
-our $VERSION = '0.0.13';
+our $VERSION = '0.0.15';
 
 requires qw[json_ld_type json_ld_fields];
 
@@ -166,7 +165,7 @@ sub _build_json_ld_encoder {
 
 has context => (
   isa => Str | HashRef | ArrayRef,
-  is  => 'ro',
+  is  => 'lazy',
   builder => '_build_context',
 );
 
@@ -176,7 +175,7 @@ sub _build_context {
 
 sub _resolve_nested {
     my ($val) = @_;
-    is_blessed_ref($val) && $val->can('json_ld_data')
+    is_Object($val) && $val->can('json_ld_data')
         ? $val->json_ld_data
         : $val;
 }
@@ -191,13 +190,13 @@ sub json_ld_data {
 
   foreach (@{$self->json_ld_fields}) {
 
-      if (is_ref($_)) {
+      if (is_Ref($_)) {
 
-          if (is_plain_hashref($_)) {
+          if (is_HashRef($_)) {
 
               while (my ($key, $val) = each %{$_}) {
 
-                  if (defined (my $res = is_plain_coderef($val)
+                  if (defined (my $res = is_CodeRef($val)
                                ? $val->($self)
                                : $self->$val)) {
                       $data->{$key} = _resolve_nested($res);

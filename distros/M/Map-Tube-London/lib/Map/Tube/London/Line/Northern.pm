@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Northern;
 
-$Map::Tube::London::Line::Northern::VERSION   = '1.13';
+$Map::Tube::London::Line::Northern::VERSION   = '1.15';
 $Map::Tube::London::Line::Northern::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Northern - London Tube Map: Northern Line.
 
 =head1 VERSION
 
-Version 1.13
+Version 1.15
 
 =head1 DESCRIPTION
 

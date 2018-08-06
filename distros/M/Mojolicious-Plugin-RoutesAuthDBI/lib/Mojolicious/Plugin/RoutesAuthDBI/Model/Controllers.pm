@@ -1,9 +1,10 @@
 package Mojolicious::Plugin::RoutesAuthDBI::Model::Controllers;
-use Mojo::Base 'DBIx::Mojo::Model';
+#~ use Mojo::Base 'DBIx::Mojo::Model';
+use Mojo::Base 'Mojolicious::Plugin::RoutesAuthDBI::Model::Base';
 
-sub new {
-  state $self = shift->SUPER::new(@_);
-}
+#~ sub new {
+  #~ state $self = shift->SUPER::new(@_);
+#~ }
 
 sub controller_ns {
   my $self = ref($_[0]) ? shift : shift->new;

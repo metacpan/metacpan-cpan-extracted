@@ -1,0 +1,71 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of conveying information to another person via a communication medium (instrument) such as speech, email, or telephone conversation.",
+      "rdfs:label" : "CommunicateAction",
+      "rdfs:subClassOf" : "schema:InteractAction"
+   },
+   "properties" : {
+      "schema:about" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The subject matter of the content.",
+         "rdfs:label" : "about",
+         "schema:domainIncludes" : [
+            "schema:CommunicateAction",
+            "schema:Event",
+            "schema:CreativeWork"
+         ],
+         "schema:rangeIncludes" : "schema:Thing"
+      },
+      "schema:inLanguage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/availableLanguage\">availableLanguage</a>.",
+         "rdfs:label" : "inLanguage",
+         "schema:domainIncludes" : [
+            "schema:CommunicateAction",
+            "schema:CreativeWork",
+            "schema:WriteAction",
+            "schema:Event"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Language",
+            "schema:Text"
+         ]
+      },
+      "schema:language" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of instrument. The language used on this action.",
+         "rdfs:label" : "language",
+         "rdfs:subPropertyOf" : "schema:instrument",
+         "schema:domainIncludes" : [
+            "schema:CommunicateAction",
+            "schema:WriteAction"
+         ],
+         "schema:rangeIncludes" : "schema:Language",
+         "schema:supersededBy" : "schema:inLanguage"
+      },
+      "schema:recipient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The participant who is at the receiving end of the action.",
+         "rdfs:label" : "recipient",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : [
+            "schema:TipAction",
+            "schema:GiveAction",
+            "schema:CommunicateAction",
+            "schema:PayAction",
+            "schema:SendAction",
+            "schema:Message",
+            "schema:ReturnAction",
+            "schema:AuthorizeAction",
+            "schema:DonateAction"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:ContactPoint",
+            "schema:Organization",
+            "schema:Audience",
+            "schema:Person"
+         ]
+      }
+   }
+}

@@ -1,5 +1,12 @@
 Revision history for Perl module Mojo::WebSocketProxy
 
+0.09      2018-08-01 10:09:57+08:00 Asia/Manila
+    - Fix character encoding issues on Dispatcher::open_connection() due
+      to Mojo::Transaction::WebSockets emitting JSON-decoded `message` events;
+      listen on `text` events instead, which pass raw WS_TEXT frames for
+      decoding via JSON::MaybeUTF8
+    - Relax Mojolicious dependency to >= 7.29
+
 0.08      2018-07-09 10:08:29+08:00 Asia/Manila
     - Fix Changelog
 

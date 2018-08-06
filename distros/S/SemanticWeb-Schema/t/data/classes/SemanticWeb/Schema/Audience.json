@@ -1,0 +1,24 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Intended audience for an item, i.e. the group for whom the item was created.",
+      "rdfs:label" : "Audience",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:audienceType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The target group associated with a given audience (e.g. veterans, car owners, musicians, etc.).",
+         "rdfs:label" : "audienceType",
+         "schema:domainIncludes" : "schema:Audience",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:geographicArea" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The geographic area associated with the audience.",
+         "rdfs:label" : "geographicArea",
+         "schema:domainIncludes" : "schema:Audience",
+         "schema:rangeIncludes" : "schema:AdministrativeArea"
+      }
+   }
+}

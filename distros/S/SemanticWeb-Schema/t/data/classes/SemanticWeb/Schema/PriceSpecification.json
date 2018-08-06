@@ -1,0 +1,117 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A structured value representing a price or price range. Typically, only the subclasses of this type are used for markup. It is recommended to use <a class=\"localLink\" href=\"http://schema.org/MonetaryAmount\">MonetaryAmount</a> to describe independent amounts of money such as a salary, credit card limits, etc.",
+      "rdfs:label" : "PriceSpecification",
+      "rdfs:subClassOf" : "schema:StructuredValue"
+   },
+   "properties" : {
+      "schema:eligibleQuantity" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The interval and unit of measurement of ordering quantities for which the offer or price specification is valid. This allows e.g. specifying that a certain freight charge is valid only for a certain quantity.",
+         "rdfs:label" : "eligibleQuantity",
+         "schema:domainIncludes" : [
+            "schema:Demand",
+            "schema:Offer",
+            "schema:PriceSpecification"
+         ],
+         "schema:rangeIncludes" : "schema:QuantitativeValue"
+      },
+      "schema:eligibleTransactionVolume" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The transaction volume, in a monetary unit, for which the offer or price specification is valid, e.g. for indicating a minimal purchasing volume, to express free shipping above a certain order volume, or to limit the acceptance of credit cards to purchases to a certain minimal amount.",
+         "rdfs:label" : "eligibleTransactionVolume",
+         "schema:domainIncludes" : [
+            "schema:Demand",
+            "schema:PriceSpecification",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : "schema:PriceSpecification"
+      },
+      "schema:maxPrice" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The highest price if the price is a range.",
+         "rdfs:label" : "maxPrice",
+         "schema:domainIncludes" : "schema:PriceSpecification",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:minPrice" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The lowest price if the price is a range.",
+         "rdfs:label" : "minPrice",
+         "schema:domainIncludes" : "schema:PriceSpecification",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:price" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "<p>The offer price of a product, or of a price component when attached to PriceSpecification and its subtypes.</p>\n\n<p>Usage guidelines:</p>\n\n<ul>\n<li>Use the <a class=\"localLink\" href=\"http://schema.org/priceCurrency\">priceCurrency</a> property (with <a href=\"http://en.wikipedia.org/wiki/ISO_4217#Active_codes\">ISO 4217 codes</a> e.g. \"USD\") instead of\n  including <a href=\"http://en.wikipedia.org/wiki/Dollar_sign#Currencies_that_use_the_dollar_or_peso_sign\">ambiguous symbols</a> such as '$' in the value.</li>\n<li>Use '.' (Unicode 'FULL STOP' (U+002E)) rather than ',' to indicate a decimal point. Avoid using these symbols as a readability separator.</li>\n<li>Note that both <a href=\"http://www.w3.org/TR/xhtml-rdfa-primer/#using-the-content-attribute\">RDFa</a> and Microdata syntax allow the use of a \"content=\" attribute for publishing simple machine-readable values alongside more human-friendly formatting.</li>\n<li>Use values from 0123456789 (Unicode 'DIGIT ZERO' (U+0030) to 'DIGIT NINE' (U+0039)) rather than superficially similiar Unicode symbols.</li>\n</ul>\n",
+         "rdfs:label" : "price",
+         "schema:domainIncludes" : [
+            "schema:Offer",
+            "schema:TradeAction",
+            "schema:PriceSpecification"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:Text"
+         ]
+      },
+      "schema:priceCurrency" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The currency (in 3-letter ISO 4217 format) of the price or a price component, when attached to <a class=\"localLink\" href=\"http://schema.org/PriceSpecification\">PriceSpecification</a> and its subtypes.",
+         "rdfs:label" : "priceCurrency",
+         "schema:domainIncludes" : [
+            "schema:PriceSpecification",
+            "schema:Reservation",
+            "schema:Ticket",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:validFrom" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date when the item becomes valid.",
+         "rdfs:label" : "validFrom",
+         "schema:domainIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:Permit",
+            "schema:Demand",
+            "schema:PriceSpecification",
+            "schema:OpeningHoursSpecification",
+            "schema:LocationFeatureSpecification",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:validThrough" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
+         "rdfs:label" : "validThrough",
+         "schema:domainIncludes" : [
+            "schema:Offer",
+            "schema:LocationFeatureSpecification",
+            "schema:OpeningHoursSpecification",
+            "schema:JobPosting",
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount",
+            "schema:Demand"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:valueAddedTaxIncluded" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifies whether the applicable value-added tax (VAT) is included in the price specification or not.",
+         "rdfs:label" : "valueAddedTaxIncluded",
+         "schema:domainIncludes" : "schema:PriceSpecification",
+         "schema:rangeIncludes" : "schema:Boolean"
+      }
+   }
+}

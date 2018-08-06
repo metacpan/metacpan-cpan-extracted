@@ -8,10 +8,12 @@ ats / autosave                Turns auto-saves on/off
  
    Notes:
       Autosaving is turned on by default.
-      ';autosave on' turns on auto-saves for every session, but each session 
-         performs its own auto-save operation.
-      <minutes> must be an integer number. The default time between autosaves
-         is five minutes, and the minimum value is one minute.
+      ';autosave on' and ';autosave off' turn auto-saves on/off for every
+         session, but each session performs its own auto-save operation (so
+         those operations will probably be staggered).
+      If specified, <minutes> must be an integer number. The default time
+         between autosaves is five minutes, and the minimum value is one minute.
+      Autosaves don't take place when in 'offline' mode.
 
    User commands:
       ats / autosave

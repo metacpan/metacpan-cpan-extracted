@@ -1,3 +1,6 @@
+v0.3.3 2018-08-03T23:57:18Z
+ - Pcore::HTTP refactoring
+
 v0.3.2 2018-04-12T18:24:28Z
  - result pragma replaced
  - access to http status using hash key

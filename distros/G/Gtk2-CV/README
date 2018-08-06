@@ -234,8 +234,23 @@ ENVIRONMENT VARIABLES
         Schnauzer or image window. The default is "gimp".
 
     CV_AUDIO_PLAYER
+        EXPERIMENTAL: audio playback is now via mpv, this variable is
+        currently ignored.
+
         Program used to play all sorts of audio (wav, aif, mp3, ogg...),
         default "play". Will be called like "$CV_AUDIO_PLAYER -- <path>".
+
+    CV_MPLAYER
+        Program used to play all sorts of video files. Unlike
+        "CV_AUDIO_PLAYER", this really must be one of the "mplayer",
+        "mplayer2" or "mpv" programs, or something that is very command-line
+        compatible to them.
+
+        Currently, if this string contains the substring "mpv", then it is
+        assumed to be mpv-compatible, otherwise it is assumed to be
+        mplayer-compatible.
+
+        Note: for video-thumbnailing, mplayer is still used (and hardcoded).
 
     CV_PRINT_DESTINATION
         The default (perl-style) destination to use in the print dialog.

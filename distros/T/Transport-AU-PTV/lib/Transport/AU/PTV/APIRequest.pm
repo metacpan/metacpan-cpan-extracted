@@ -1,5 +1,9 @@
 package Transport::AU::PTV::APIRequest;
-$Transport::AU::PTV::APIRequest::VERSION = '0.01';
+$Transport::AU::PTV::APIRequest::VERSION = '0.03';
+# VERSION
+# PODNAME
+# ABSTRACT: PTV API object.
+
 use strict;
 use warnings;
 use 5.010;
@@ -104,11 +108,11 @@ __END__
 
 =head1 NAME
 
-Transport::AU::PTV::APIRequest
+Transport::AU::PTV::APIRequest - PTV API object.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 NAME
 

@@ -1,5 +1,14 @@
 Revision history for App-filewatch
 
+0.005   2018-08-05
+        Updating for release of version 0.005
+        Added configure_requires (Ivan Wills)
+        Updated date (Ivan Wills)
+        De-supporting old perl (Ivan Wills)
+        Cleaning up output (Ivan Wills)
+        Added default editing (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
 0.004   2016-10-23
         Updating for release of version 0.004
         Updated License file (Ivan Wills)

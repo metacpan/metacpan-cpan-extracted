@@ -14,6 +14,7 @@ use DBI;
 use Carp qw(croak);
 use Data::Dumper;
 use Net::SugarCRM::Entry;
+use Tie::IxHash;
 
 BEGIN {
     if(!(Log::Log4perl->initialized())) {
@@ -42,7 +43,7 @@ Version $Revision$
 
 =cut
 
-our $VERSION = sprintf "3.23144", q$Revision$ =~ /(\d+)/xg;
+our $VERSION = sprintf "3.320000", q$Revision$ =~ /(\d+)/xg;
 
 =head1 DESCRIPTION
 
@@ -349,15 +350,18 @@ sub _rest_request {
     } catch {
         return({}, "SugarCRM internal error: ".$res->content);
     };
+
     if ($msg or (exists($$response{number}) && exists($$response{name}) &&
         exists($$response{description}))) {
         $msg = "Error getting id <".$res->status_line."> fetching ".Dumper($res->content)
             unless $msg;
         $self->log->logconfess($msg);
     }
+
     $self->log->debug("Success rest method <$method>\n");
     return $response;
 }
+
 
 sub _rest_request_no_json {
     my ($self, $method, $rest_data) = @_;
@@ -367,6 +371,7 @@ sub _rest_request_no_json {
         response_type   => 'json',
         rest_data       => $rest_data
     ]);
+
 
     my $res = $self->globalua->request($req);
     if ($res->is_error) {
@@ -400,22 +405,24 @@ On error the method croaks
 sub login {
     my ($self) = @_;
 
+
     my $application = $self->application;
     my $user_auth = {
             user_name => $self->restuser,
             password => $self->restpasswd
     };
+    $self->log->debug( "Received rest parameters: restuser: ". $self->restuser." ; restpasswd: ".$self->restpasswd);
 
     $user_auth->{encryption} = $self->encryption if ($self->encryption);
 
-    my $rest_data = encode_json({
-        user_auth => $user_auth,
-	application => $application});
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'user_auth'} = $user_auth;
+    $rest_data{'application'} = $application;
 
-    use Data::Dumper;
-    print STDERR Dumper($rest_data);
+    my $rest_data_json = encode_json(\%rest_data);
 
-    my $response = $self->_rest_request('login', $rest_data);
+    my $response = $self->_rest_request('login', $rest_data_json);
+
     my $sessionid=$response->{id};
     $self->log->debug( "Successfully logged in for user ".$self->restuser."x with session id $sessionid");
     $self->_sessionid($sessionid);
@@ -490,11 +497,13 @@ Output:
 
 sub get_available_modules {
     my ($self) = @_;
-    my $rest_data = encode_json({
-            session => $self->sessionid,
-        });
 
-    my $response = $self->_rest_request('get_available_modules', $rest_data);
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+
+    my $rest_data_json = encode_json(\%rest_data);
+ 
+    my $response = $self->_rest_request('get_available_modules', $rest_data_json);
     return $response;
 }
 
@@ -511,8 +520,14 @@ Output:
 
 sub get_module_fields {
     my ($self, $module_name) = @_;
-    my $rest_data = '{ "session": "'.$self->sessionid.'", "module_name": "'.$module_name.'" }';
-    my $response = $self->_rest_request('get_module_fields', $rest_data);
+
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = $module_name;
+
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('get_module_fields', $rest_data_json);
     return $response;
 }
 
@@ -541,11 +556,16 @@ sub create_module_entry {
                 $$attributes{$required_attr} eq '');
     }
 
-    my $rest_data = '{"session": "'.$self->sessionid.'", "module_name": "'.$module.'", "name_value_list": '.
-        encode_json($attributes).
-        ',"track_view": "false" }';
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = $module;
+    $rest_data{'name_value_list'} = encode_json($attributes);
+    $rest_data{'track_view'} = 'false';
 
-    my $response = $self->_rest_request('set_entry', $rest_data);
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('set_entry', $rest_data_json);
+
     $self->log->info( "Successfully created module entry $module <".encode_json($attributes)."> entry with sessionid ".$self->sessionid."\n");
     $self->log->debug("Entry created in module $module was:".Dumper($response));
     return $response->{id};
@@ -582,9 +602,21 @@ Output:
 
 sub get_module_entries {
     my ($self, $module, $query) = @_;
-    $query =~ s/"/\\"/xg;
-    my $rest_data = '{"session": "'.$self->sessionid.'", "module_name": "'.$module.'", "query": "'.$query.'", "order_by": "", "offset": "", "select_fields": "", "link_name_to_fields_array": "", "max_results": "'.$self->max_results.'" } ';
-    my $response = $self->_rest_request('get_entry_list', $rest_data);
+
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = $module;
+    $rest_data{'query'} = $query;
+    $rest_data{'order_by'} = "";
+    $rest_data{'offset'} = "";
+    $rest_data{'select_fields'} = "";
+    $rest_data{'link_name_to_fields_array'} = "";
+    $rest_data{'max_results'} = $self->max_results;
+
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('get_entry_list', $rest_data_json);
+
     $self->log->debug("Module entry for module $module with query <$query> found was:".Dumper($response));
     if ($response->{total_count} == 0) {
         $self->log->debug( "No entries found for module $module and query $query and sessionid ".$self->sessionid."\n");
@@ -668,8 +700,16 @@ sub get_module_entry {
         $self->log->logconfess("The module $module cannot be used to search by ID");
     }
     $self->log->logconfess("ID is required") unless defined $id;
-    my $rest_data = '{"session": "'.$self->sessionid.'", "module_name": "'.$module.'", "query": "'.$self->_module_id_for_search->{$module}.' = \"'.$id.'\"" } ';
-    my $response = $self->_rest_request('get_entry_list', $rest_data);
+
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = $module;
+    $rest_data{'query'} = $self->_module_id_for_search->{$module} . ' = "' . $id . '"'; 
+
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('get_entry_list', $rest_data_json);
+
     $self->log->debug("Module entry for module $module and id $id found was:".Dumper($response));
     if ($response->{total_count} == 0) {
         $self->log->debug( "No entries found found for id $id in module $module and sessionid ".$self->sessionid."\n");
@@ -847,8 +887,17 @@ Output:
 
 sub delete_module_entry_by_id {
     my ($self, $module, $id) = @_;
-    my $rest_data = '{"session": "'.$self->sessionid.'", "module_name": "'.$module.'", "name_value_list": { "id" : "'.$id.'", "deleted" : "1" } } ';
-    my $response = $self->_rest_request('set_entry', $rest_data);
+
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = $module;
+    $rest_data{'name_value_list'} = '{ "id" : "' . $id . '", "deleted" : "1" }';
+    $rest_data{'track_view'} = 'false';
+
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('set_entry', $rest_data_json);
+
     $self->log->debug("Module entry in module $module deleted was:".Dumper($response));
     if ($response->{id} ne $id) {
         $self->log->info( "No entries updated found for module id $id module $module and sessionid ".$self->sessionid."\n");
@@ -897,10 +946,18 @@ sub get_module_link_ids {
 	$relatedfieldsjson = Dumper($relatedfields);
     }
 
-    my $sessionid = $self->sessionid;
-    my $rest_data = qq({"session":"$sessionid","module_name":"$module","module_id":"$id","link_field_name":"$link","related_module_query":"$query","related_fields":$relatedfieldsjson});
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = $module;
+    $rest_data{'module_id'} = $id;
+    $rest_data{'link_field_name'} = $link;
+    $rest_data{'related_module_query'} = $query;
+    $rest_data{'related_fields'} = $relatedfieldsjson;
 
-    my $response = $self->_rest_request('get_relationships', $rest_data);
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('get_relationships', $rest_data_json);
+
     $self->log->debug("Module entry for module $module with id <$id> found was:".Dumper($response));
 
     my @entriesids = map { $_->{id} } @{$response->{entry_list}};
@@ -938,10 +995,16 @@ Output:
 sub update_module_entry {
     my ($self, $module, $id, $attributes) = @_;
     $$attributes{id} = $id;
-    my $rest_data = '{"session": "'.$self->sessionid.'", "module_name": "'.$module.'", "name_value_list": '.
-        encode_json($attributes).
-        ' } ';
-    my $response = $self->_rest_request('set_entry', $rest_data);
+
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = $module;
+    $rest_data{'name_value_list'} = encode_json($attributes);
+
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('set_entry', $rest_data_json);
+
     $self->log->debug("Module entry updated for module $module was:".Dumper($response));
     if ($response->{id} ne $id) {
         $self->log->info( "No entries updated found for in module $module and id $id and sessionid ".$self->sessionid."\n");
@@ -2465,8 +2528,16 @@ Output:
 sub get_mail_entry {
     my ($self, $mail) = @_;
     my $umail = uc $mail;
-    my $rest_data = '{"session": "'.$self->sessionid.'", "module_name": "EmailAddresses", "query": "email_address_caps = \"'.$umail.'\"" }';
-    my $response = $self->_rest_request('get_entry_list', $rest_data);
+
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = "EmailAddresses";
+    $rest_data{'query'} = 'email_address_caps = "'.$umail.'"';
+
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('get_entry_list', $rest_data_json);
+
     $self->log->debug("Email found was:".Dumper($response));
     if ($response->{total_count} > 1) {
         $self->log->logconfess("Found more than one entry with for mail $mail and sessionid $self->sessionid:".Dumper($response));
@@ -2798,9 +2869,18 @@ sub add_module_id_to_prospect_list {
     if (!defined($self->get_module_entry($PROSPECTLISTS, $prospect_list))) {
         $self->log->logconfess("Not found module $module and id $id. Check that the id is valid");
     }
-    my $rest_data = '{"session": "'.$self->sessionid.'", "module_name": "'.$module.'", "module_id": "'.$id.'", "link_field_name": "prospect_lists", "related_ids": '.
-        '"'.$prospect_list.'" }';
-    my $response = $self->_rest_request('set_relationship', $rest_data);
+
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = $module;
+    $rest_data{'module_id'} = $id;
+    $rest_data{'link_field_name'} = "prospect_lists";
+    $rest_data{'related_ids'} = $prospect_list;
+
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('set_relationship', $rest_data_json);
+
     $self->log->info( "Successfully created link from module \"$module\" and "
         ."id \"$id\" to target list \"$prospect_list\" entry with sessionid "
         ."\"".$self->sessionid."\"");
@@ -2828,11 +2908,20 @@ sub delete_module_id_from_prospect_list {
     $self->log->logconfess("Module $module cannot be added to a target list")
         if (!exists($self->_module_id_for_prospect_list->{$module}));
 
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = $module;
+    $rest_data{'module_id'} = $id;
+    $rest_data{'link_field_name'} = "prospect_lists";
+    $rest_data{'related_ids'} = $prospect_list;
     # Need to set both deleted and delete, if not it doesn't work in 6.2.1 at least...
-    my $rest_data = '{"session": "'.$self->sessionid.'", "module_name": "'.$module.'", "module_id": "'.$id.'", "link_field_name": "prospect_lists", "related_ids": '.
-        ' "'.$prospect_list.'"  , "deleted" : "1", "delete" : "1" }';
+    $rest_data{'deleted'} = "1";
+    $rest_data{'delete'} = "1";
 
-    my $response = $self->_rest_request('set_relationship', $rest_data);
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('set_relationship', $rest_data_json);
+
     $self->log->info( "Successfully deleted link from module $module and $id to target list  <".$prospect_list.."> entry with sessionid ".$self->sessionid."\n");
     $self->log->debug("Module id $id in module $module linked was:".Dumper($response));
     return ($response->{deleted} == 1) ? 1 : undef;
@@ -3108,11 +3197,17 @@ sub add_to_emailman {
 #        send_date_time => "$now",
 #        in_queue_date => "$now",
 #    };
-    my $rest_data = '{"session": "'.$self->sessionid.'", "module_name": "EmailMan", "name_value_list": '.
-        encode_json($attributes).
-        ',"track_view": "false" }';
 
-    my $response = $self->_rest_request('set_entry', $rest_data);
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = "EmailMan";
+    $rest_data{'name_value_list'} = encode_json($attributes);
+    $rest_data{'track_view'} = 'false';
+
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('set_entry', $rest_data_json);
+
     $self->log->info( "Successfully created emailman entry entry with sessionid ".$self->sessionid."\n");
     $self->log->debug("Module entry created was:".Dumper($response));
     return $response;
@@ -3154,8 +3249,15 @@ sub get_ids_from_campaignlog {
         "' ) OR campaign_log.more_information = '".$$attributes{'email'}."'";
 
 
-    my $rest_data = '{"session": "'.$self->sessionid.'", "module_name": "CampaignLog", "query": "'.$query.'" } ';
-    my $response = $self->_rest_request('get_entry_list', $rest_data);
+    tie my %rest_data, 'Tie::IxHash';
+    $rest_data{'session'} = $self->sessionid;
+    $rest_data{'module_name'} = "CampaignLog";
+    $rest_data{'query'} = $query;
+
+    my $rest_data_json = encode_json(\%rest_data);
+
+    my $response = $self->_rest_request('get_entry_list', $rest_data_json);
+
     $self->log->debug("Campaign log ids for found was:".Dumper($query, $attributes,$response));
 
     my @ids = map { $_->{id} } @{$response->{entry_list}};

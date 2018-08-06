@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of marrying a person.",
+      "rdfs:label" : "MarryAction",
+      "rdfs:subClassOf" : "schema:InteractAction"
+   },
+   "properties" : {}
+}

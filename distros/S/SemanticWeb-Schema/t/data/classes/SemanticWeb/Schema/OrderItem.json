@@ -1,0 +1,54 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An order item is a line of an order. It includes the quantity and shipping details of a bought offer.",
+      "rdfs:label" : "OrderItem",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:orderDelivery" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The delivery of the parcel related to this order or order item.",
+         "rdfs:label" : "orderDelivery",
+         "schema:domainIncludes" : [
+            "schema:OrderItem",
+            "schema:Order"
+         ],
+         "schema:rangeIncludes" : "schema:ParcelDelivery"
+      },
+      "schema:orderItemNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The identifier of the order item.",
+         "rdfs:label" : "orderItemNumber",
+         "schema:domainIncludes" : "schema:OrderItem",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:orderItemStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The current status of the order item.",
+         "rdfs:label" : "orderItemStatus",
+         "schema:domainIncludes" : "schema:OrderItem",
+         "schema:rangeIncludes" : "schema:OrderStatus"
+      },
+      "schema:orderQuantity" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of the item ordered. If the property is not set, assume the quantity is one.",
+         "rdfs:label" : "orderQuantity",
+         "schema:domainIncludes" : "schema:OrderItem",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:orderedItem" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The item ordered.",
+         "rdfs:label" : "orderedItem",
+         "schema:domainIncludes" : [
+            "schema:Order",
+            "schema:OrderItem"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Product",
+            "schema:OrderItem"
+         ]
+      }
+   }
+}

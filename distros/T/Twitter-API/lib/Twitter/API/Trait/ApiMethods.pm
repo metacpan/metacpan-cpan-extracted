@@ -1,6 +1,6 @@
 package Twitter::API::Trait::ApiMethods;
 # ABSTRACT: Convenient API Methods
-$Twitter::API::Trait::ApiMethods::VERSION = '1.0002';
+$Twitter::API::Trait::ApiMethods::VERSION = '1.0003';
 use 5.14.1;
 use Carp;
 use Moo::Role;
@@ -1198,6 +1198,56 @@ sub upload_media {
 }
 alias upload => 'upload_media';
 
+#pod =method direct_messages_events([ \%args ])
+#pod
+#pod L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/list-events.html>
+#pod
+#pod =cut
+
+sub direct_messages_events {
+    shift->request(get => 'direct_messages/events/list', @_);
+}
+
+#pod =method show_direct_messages_event([ $id, ][ \%args ])
+#pod
+#pod L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-event>
+#pod
+#pod =cut
+
+sub show_direct_messages_event {
+    shift->request_with_pos_args(id => get => 'direct_messages/events/show', @_);
+}
+
+#pod =method destroy_direct_messages_event([ $id, ][ \%args ])
+#pod
+#pod L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/delete-message-event>
+#pod
+#pod =cut
+
+sub destroy_direct_messages_event {
+    shift->request_with_pos_args(id => delete => 'direct_messages/events/destroy', @_);
+}
+
+#pod =method new_direct_messages_event([ $text, [ $recipient_id, ]][ \%args ])
+#pod
+#pod L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message>
+#pod
+#pod =cut
+
+sub new_direct_messages_event {
+    shift->request(post => 'direct_messages/events/new', {
+        -to_json => {
+            event => {
+                type => 'message_create',
+                message_create => {
+                    message_data => { text => shift },
+                    target => { recipient_id => shift },
+                }
+            },
+        }
+    }, @_);
+}
+
 1;
 
 __END__
@@ -1212,7 +1262,7 @@ Twitter::API::Trait::ApiMethods - Convenient API Methods
 
 =head1 VERSION
 
-version 1.0002
+version 1.0003
 
 =head1 DESCRIPTION
 
@@ -1737,6 +1787,22 @@ L<https://dev.twitter.com/rest/reference/post/account/update_profile_image>
 Aliases: upload
 
 L<https://dev.twitter.com/rest/reference/post/media/upload>
+
+=head2 direct_messages_events([ \%args ])
+
+L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/list-events.html>
+
+=head2 show_direct_messages_event([ $id, ][ \%args ])
+
+L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/get-event>
+
+=head2 destroy_direct_messages_event([ $id, ][ \%args ])
+
+L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/delete-message-event>
+
+=head2 new_direct_messages_event([ $text, [ $recipient_id, ]][ \%args ])
+
+L<https://developer.twitter.com/en/docs/direct-messages/sending-and-receiving/api-reference/new-message>
 
 =head1 AUTHOR
 

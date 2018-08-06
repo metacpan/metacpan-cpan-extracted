@@ -139,7 +139,7 @@
         my (
             $cmdCount, $keywordCount, $funcCount, $taskCount, $errorCount, $limit, $lastLine,
             $scriptObj, $file, $fileHandle,
-            @sortedList, @aboutList, @quickList,
+            @sortedList, @aboutList, @quickList, @peekList,
             %cmdHash, %fileHash,
         );
 
@@ -608,10 +608,10 @@
         }
 
         # Test Axmud quick help
-        $session->writeText('Testing ' . $axmud::SCRIPT . ' quick help...');
+        $session->writeText('Testing quick help...');
 
         # Load the quick help file
-        $file = $axmud::SHARE_DIR . '/help/quick/quickhelp';
+        $file = $axmud::SHARE_DIR . '/help/misc/quickhelp';
         if (! (-e $file)) {
 
             $session->writeText('   Missing quick help file');
@@ -638,6 +638,48 @@
 
                         $session->writeText(
                             '   Quick help file, line #' . ($index + 1) . ', length '
+                            . length ($line) . ':',
+                        );
+
+                        $session->writeText('   > ' . $line);
+                        $errorCount++;
+                        last OUTER;
+                    }
+                }
+            }
+        }
+
+        # Test Axmud peek/poke help
+        $session->writeText('Testing peek/poke help...');
+
+        # Load the peek/poke help file
+        $file = $axmud::SHARE_DIR . '/help/misc/peekpoke';
+        if (! (-e $file)) {
+
+            $session->writeText('   Missing peek/poke help file');
+            $errorCount++;
+
+        } else {
+
+            if (! open($fileHandle, $file)) {
+
+                $session->writeText('   Unable to read peek/poke help file');
+                $errorCount++;
+
+            } else {
+
+                @peekList = <$fileHandle>;
+                close($fileHandle);
+
+                OUTER: for (my $index = 0; $index < scalar @peekList; $index++) {
+
+                    my $line = $peekList[$index];
+
+                    chomp $line;
+                    if (length ($line) > $limit) {
+
+                        $session->writeText(
+                            '   Peek/poke help file, line #' . ($index + 1) . ', length '
                             . length ($line) . ':',
                         );
 
@@ -805,6 +847,7 @@
             $session->writeText(sprintf('   %3d   ', $num) . "$chr\t$text");
         }
 
+        # Display footer
         return $self->complete($session, $standardCmd, 'End of list');
     }
 }
@@ -1119,6 +1162,7 @@
             }
         }
 
+        # Display footer
         return $self->complete($session, $standardCmd, 'XTerm colour tag test complete');
     }
 }
@@ -4016,6 +4060,106 @@
     }
 }
 
+{ package Games::Axmud::Cmd::PeekHelp;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('peekhelp', TRUE, TRUE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['pkh', 'pokehelp', 'peekhelp'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Shows strings for \';peek\' and \';poke\' operations';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my (
+            $file, $fileHandle,
+            @list,
+        );
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Load the quick help file
+        $file = $axmud::SHARE_DIR . '/help/misc/peekpoke';
+        if (! (-e $file)) {
+
+            return $self->error(
+                $session, $inputString,
+                'Peek/poke help file not available',
+            );
+
+        } else {
+
+            if (! open($fileHandle, $file)) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Unable to read peek/poke help file',
+                );
+
+            } else {
+
+                @list = <$fileHandle>;
+                close($fileHandle);
+            }
+        }
+
+        # Display the help
+        foreach my $string (@list) {
+
+            chomp $string;
+            $session->writeText($string);
+        }
+
+        return $self->complete(
+            $session, $standardCmd,
+            'Peek/poke help displayed',
+        );
+    }
+}
+
 # Client commands
 
 { package Games::Axmud::Cmd::Help;
@@ -4412,7 +4556,7 @@
         }
 
         # Load the quick help file
-        $file = $axmud::SHARE_DIR . '/help/quick/quickhelp';
+        $file = $axmud::SHARE_DIR . '/help/misc/quickhelp';
         if (! (-e $file)) {
 
             return $self->error(
@@ -5119,15 +5263,20 @@
                 $name = 'help';
                 $page = 2;
 
+            } elsif ($switch eq '-p') {
+
+                $name = 'peek';
+                $page = 3;
+
             } elsif ($switch eq '-g') {
 
                 $name = 'license';
-                $page = 3;
+                $page = 4;
 
             } elsif ($switch eq '-l') {
 
                 $name = 'license_2';
-                $page = 4;
+                $page = 5;
 
             } else {
 
@@ -5256,6 +5405,85 @@
                     $axmud::SCRIPT . ' information window closed',
                 );
             }
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::EditQuick;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('editquick', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['edq', 'editquick'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Opens the quick preference window';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $check,
+        ) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Open up a 'pref' window to edit the GA::Client
+        if (
+            ! $session->mainWin->createFreeWin(
+                'Games::Axmud::PrefWin::Quick',
+                $session->mainWin,
+                $session,
+                'Quick preferences',
+            )
+        ) {
+            return $self->error(
+                $session, $inputString,
+                'Could not open the quick preference window',
+            );
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Opened quick preference window',
+            );
         }
     }
 }
@@ -6254,11 +6482,10 @@
                     $offlineFlag,
                 )
             ) {
-
-            return $self->error(
-                $session, $inputString,
-                'General error connecting to \'' . $world . '\'',
-            );
+                return $self->error(
+                    $session, $inputString,
+                    'General error connecting to \'' . $world . '\'',
+                );
 
             } else {
 
@@ -6677,7 +6904,6 @@
                 TRUE,           # Temporary profile
             )
         ) {
-
             return $self->error(
                 $session, $inputString,
                 'General error connecting to \'' . $world . '\'',
@@ -6806,7 +7032,6 @@
                 TRUE,           # Temporary profile
             )
         ) {
-
             return $self->error(
                 $session, $inputString,
                 'General error connecting to \'' . $world . '\'',
@@ -6935,7 +7160,6 @@
                 TRUE,           # Temporary profile
             )
         ) {
-
             return $self->error(
                 $session, $inputString,
                 'General error connecting to \'' . $world . '\'',
@@ -17363,7 +17587,7 @@
     }
 }
 
-{ package Games::Axmud::Cmd::RetainBackups;
+{ package Games::Axmud::Cmd::RetainFileCopy;
 
     use strict;
     use warnings;
@@ -17390,12 +17614,12 @@
         my ($class, $check) = @_;
 
         # Setup
-        my $self = Games::Axmud::Generic::Cmd->new('retainbackups', TRUE, FALSE);
+        my $self = Games::Axmud::Generic::Cmd->new('retainfilecopy', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['rbu', 'retainbackups'];
+        $self->{defaultUserCmdList} = ['rfc', 'retaincopy', 'retainfilecopy'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
-        $self->{descrip} = 'Retains backup files after file-save operations';
+        $self->{descrip} = 'Retains copy of old files in file-save operations';
 
         # Bless the object into existence
         bless $self, $class;
@@ -17422,14 +17646,14 @@
             return $self->improper($session, $inputString);
         }
 
-        # ;rbu on
+        # ;rfc on
         if ($arg eq 'on') {
 
             if ($axmud::CLIENT->autoRetainFileFlag) {
 
                 return $self->error(
                     $session, $inputString,
-                    'Backup files are already retained after file save operations',
+                    'Copies of old files are already retained after file save operations',
                 );
 
             } else {
@@ -17437,19 +17661,19 @@
                 $axmud::CLIENT->set_autoRetainFileFlag(TRUE);
                 return $self->complete(
                     $session, $standardCmd,
-                    'Backup file retention turned \'on\' (backup files created during file save'
-                    . ' operations are not deleted automatically)',
+                    'Retention of copies of old files turned \'on\' (copies created during file'
+                    . ' file save operations are not deleted automatically)',
                 );
             }
 
-        # ;rbu off
+        # ;rfc off
         } elsif ($arg eq 'off') {
 
             if (! $axmud::CLIENT->autoRetainFileFlag) {
 
                 return $self->error(
                     $session, $inputString,
-                    'Backup files are already deleted after file save operations',
+                    'Copies of old files are already deleted after file save operations',
                 );
 
             } else {
@@ -17457,10 +17681,741 @@
                 $axmud::CLIENT->set_autoRetainFileFlag(FALSE);
                 return $self->complete(
                     $session, $standardCmd,
-                    'Backup file retention turned \'off\' (backup files created during file save'
-                    . ' operations are deleted automatically)',
+                    'Retention of copies of old files turned \'off\' (copies created during file'
+                    . ' save operations are deleted automatically)',
                 );
             }
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::BackupData;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('backupdata', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['bud', 'backup', 'backupdata'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Creates a backup copy of the ' . $axmud::SCRIPT . ' data directory';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $switch,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my (
+            $dataDir, $ext, $fileName, $backupPath, $zipObj, $tarObj,
+            @fileList,
+        );
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Import the Axmud data directory for use in regexes
+        $dataDir = $axmud::DATA_DIR;
+
+        # Check the switch is valid, if specified
+        if (defined $switch && $switch ne '-z' && $switch ne '-t') {
+
+            return $self->error(
+                $session, $inputString,
+                'Unrecognised switch \'' . $switch . '\' (try -t for .tgz, -z for .zip)',
+            );
+        }
+
+        # Check that the data directory actually exists (no reason why it shouldn't, but still we'll
+        #   still check)
+        if (! -e $dataDir) {
+
+            return $self->error(
+                $session, $inputString,
+                'Data backup failed, cannot find data directory \'' . $dataDir . '\'',
+            );
+        }
+
+        # For convenience, archive to .zip on MS Windows, and to .tgz on Linux
+        if (! defined $switch) {
+
+            if ($^O eq 'MSWin32') {
+                $ext = 'zip';
+            } else {
+                $ext = 'tgz';
+            }
+
+        } elsif ($switch eq '-z') {
+            $ext = 'zip';
+        } else {
+            $ext = 'tgz';
+        }
+
+        # Set the filename, appending the time if required
+        if (! $axmud::CLIENT->autoBackupAppendFlag) {
+
+            $fileName = $axmud::NAME_FILE . '_backup_' . $axmud::CLIENT->localDateString() . '.'
+                            . $ext;
+
+        } else {
+
+            $fileName = $axmud::NAME_FILE . '_backup_' . $axmud::CLIENT->localDateString() . '_'
+                            . $axmud::CLIENT->localClockString() . '.' . $ext;
+        }
+
+        # If necessary, open a file chooser dialog to decide where to save the exported file
+        if ($axmud::CLIENT->autoBackupDir && -e $axmud::CLIENT->autoBackupDir) {
+
+            $backupPath = $axmud::CLIENT->autoBackupDir;
+
+        } else {
+
+            $backupPath = $session->mainWin->showFileChooser(
+                'Backup ' . $axmud::SCRIPT . ' data',
+                'save',
+                $fileName,
+            );
+        }
+
+        if (! $backupPath) {
+
+            return $self->complete($session, $standardCmd, 'Data backup not completed');
+        }
+
+        # In case the data directory is large, display an initial message to explain the pause
+        $session->writeText('Backing up ' . $axmud::SCRIPT . ' data directory...');
+        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->do');
+
+        # Get a list of files in the data directory, recursively searching sub-directories
+        File::Find::find(
+            sub { push (@fileList, $File::Find::name); },
+            $dataDir . '/',
+        );
+
+        # Perform the backup
+        if ($ext eq 'zip') {
+
+            # Create a zip object
+            $zipObj = Archive::Zip->new();
+
+            foreach my $file (@fileList) {
+
+                my $modFile;
+
+                if ($file ne $dataDir) {
+
+                    $modFile = $file;
+                    $modFile =~ s/$dataDir//;
+
+                    # 6 is the default compression level
+                    $zipObj->addFile($file, $modFile, 6);
+                }
+            }
+
+            # Save the .zip file. Successful operation returns 0
+            if ($zipObj->writeToFileNamed($backupPath)) {
+
+                return $self->complete(
+                    $session, $standardCmd,
+                    'Data backup failed (archive error)',
+                );
+
+            } else {
+
+                return $self->complete(
+                    $session, $standardCmd,
+                    'Backup of ' . $axmud::SCRIPT . ' data directory saved to ' . $backupPath,
+                );
+            }
+
+        } else {
+
+            # Create a tar object
+            $tarObj = Archive::Tar->new();
+
+            foreach my $file (@fileList) {
+
+                if ($file ne $dataDir) {
+
+                    $tarObj->add_files($file);
+                    # Rename each file in the archive to remove the directory structure
+                    $tarObj->rename(substr($file, 1), substr($file, length($dataDir)));
+                }
+            }
+
+            # Save the .tgz file
+            if (
+                ! $tarObj->write(
+                    $backupPath,
+                    Archive::Tar::COMPRESS_GZIP,
+                    $axmud::NAME_SHORT . '-data',
+                )
+            ) {
+                return $self->complete(
+                    $session, $standardCmd,
+                    'Data backup failed (archive error)',
+                );
+
+            } else {
+
+                return $self->complete(
+                    $session, $standardCmd,
+                    'Backup of ' . $axmud::SCRIPT . ' data directory saved to ' . $backupPath,
+                );
+            }
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::RestoreData;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('restoredata', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['rsd', 'restore', 'restoredata'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Restores ' . $axmud::SCRIPT . ' data directory from backup';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $backupPath,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my ($choice, $oldDataDir, $extractObj);
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Always prompt the user for confirmation
+        $choice = $session->mainWin->showMsgDialogue(
+            'Restore data from backup',
+            'question',
+            "Are you sure you want to restore data from backup?\n\n"
+            . "This operation will completely replace the current " . $axmud::SCRIPT
+            . " data directory.\n\nIn addition, you won't be able to save any data files until you"
+            . " restart " . $axmud::SCRIPT . ", so any data currently in memory will be lost.",
+            'yes-no',
+        );
+
+        if (! defined $choice || $choice eq 'no') {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Restore data from backup not completed',
+            );
+        }
+
+        # If a file path was not specified, open a file chooser dialog to decide which file to
+        #   import
+        if (! $backupPath) {
+
+            $backupPath = $session->mainWin->showFileChooser(
+                'Restore data from backup',
+                'open',
+            );
+
+            if (! $backupPath) {
+
+                return $self->complete(
+                    $session, $standardCmd,
+                    'Restore data from backup not completed',
+                );
+            }
+        }
+
+        # ;backupdata only creates archives in .tgz or .zip formats, but this command can recognise
+        #   the usual list of archive types
+        if (
+            ! ($backupPath =~ m/\.tar$/)
+            && ! ($backupPath =~ m/\.tgz$/)
+            && ! ($backupPath =~ m/\.gz$/)
+            && ! ($backupPath =~ m/\.zip$/)
+            && ! ($backupPath =~ m/\.bz2$/)
+            && ! ($backupPath =~ m/\.tbz$/)
+            && ! ($backupPath =~ m/\.lzma$/)
+        ) {
+            return $self->error(
+                $session, $inputString,
+                'Restore data from backup not completed (you specified something that doesn\'t'
+                . ' appear to be a compressed archive, e.g. a .zip or .tgz file)',
+            );
+        }
+
+        # For large files, we need to display an initial message to explain the pause
+        $session->writeText('Restoring data from backup...');
+        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->do');
+
+        # The old directory is not replaced, but renamed. Cycle through a list of possible names
+        #   until we find one that isn't in use (give up after a reasonable time)
+        if (! -e $axmud::DATA_DIR . '_OLD') {
+
+            $oldDataDir = $axmud::DATA_DIR . '_OLD';
+
+        } else {
+
+            OUTER: for (my $count = 2; $count <= 1024; $count++) {
+
+                $oldDataDir = $axmud::DATA_DIR . '_OLD_' . $count;
+                if (! -e $oldDataDir) {
+
+                    last OUTER;
+                }
+            }
+        }
+
+        if (! $oldDataDir) {
+
+           return $self->error(
+                $session, $inputString,
+                'Cannot restore data from backup - unable to find a new name for the existing'
+                . ' data directory (try deleting a few of them first)',
+            );
+
+        } elsif (-e $axmud::DATA_DIR) {
+
+            rename($axmud::DATA_DIR, $oldDataDir);
+        }
+
+        # Build an Archive::Extract object
+        $extractObj = Archive::Extract->new(archive => $backupPath);
+        # (The archive contains an 'axmud-data' directory, so we need to extract the archive into
+        #   the parent directory)
+        if (! $extractObj || ! $extractObj->extract(to => $axmud::DATA_DIR . '/..')) {
+
+            # The data directory which was just renamed can be returned to its original name, as if
+            #   nothing had happened
+            rename($oldDataDir, $axmud::DATA_DIR);
+
+            return $self->error(
+                $session, $inputString,
+                'Cannot restore data from backup (file decompression error)',
+            );
+
+        } else {
+
+            # Operation successful. Disable load/save, forcing the user to restart Axmud
+            $axmud::CLIENT->set_loadConfigFlag(FALSE);
+            $axmud::CLIENT->set_saveConfigFlag(FALSE);
+            $axmud::CLIENT->set_loadDataFlag(FALSE);
+            $axmud::CLIENT->set_saveDataFlag(FALSE);
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Successfully restored data files from backup. No data has been loaded into memory'
+                . ' and file load/save is now disabled, so you should restart ' . $axmud::SCRIPT
+                . ' as soon as possible',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::AutoBackup;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('autobackup', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['abu', 'autobu', 'autobackup'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Configures settings for auto-backups';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            @args,
+        ) = @_;
+
+        # Local variables
+        my (
+            $modeCount, $typeCount, $noArgsFlag, $switch, $noBackupFlag, $allStartFlag,
+            $allStopFlag, $intStartFlag, $intStopFlag, $dir, $dirFlag, $resetDirFlag, $number,
+            $intervalFlag, $fileDefaultFlag, $fileTarFlag, $fileZipFlag, $appendFlag, $noAppendFlag,
+            %modeHash, %typeHash,
+        );
+
+        # Extract switches
+        $modeCount = 0;
+        $typeCount = 0;
+        if (! @args) {
+
+            $noArgsFlag = TRUE;
+        }
+
+        ($switch, @args) = $self->extract('-n', 0, @args);
+        if (defined $switch) {
+
+            $noBackupFlag = TRUE;
+            $modeCount++;
+        }
+
+        ($switch, @args) = $self->extract('-s', 0, @args);
+        if (defined $switch) {
+
+            $allStartFlag = TRUE;
+            $modeCount++;
+        }
+
+        ($switch, @args) = $self->extract('-p', 0, @args);
+        if (defined $switch) {
+
+            $allStopFlag = TRUE;
+            $modeCount++;
+        }
+
+        ($switch, @args) = $self->extract('-x', 0, @args);
+        if (defined $switch) {
+
+            $intStartFlag = TRUE;
+            $modeCount++;
+        }
+
+        ($switch, @args) = $self->extract('-y', 0, @args);
+        if (defined $switch) {
+
+            $intStopFlag = TRUE;
+            $modeCount++;
+        }
+
+        ($switch, $dir, @args) = $self->extract('-f', 1, @args);
+        if (defined $switch) {
+
+            $dirFlag = TRUE;
+        }
+
+        ($switch, @args) = $self->extract('-o', 0, @args);
+        if (defined $switch) {
+
+            $resetDirFlag = TRUE;
+        }
+
+        ($switch, $number, @args) = $self->extract('-i', 1, @args);
+        if (defined $switch) {
+
+            $intervalFlag = TRUE;
+        }
+
+        ($switch, @args) = $self->extract('-d', 0, @args);
+        if (defined $switch) {
+
+            $fileDefaultFlag = TRUE;
+            $typeCount++;
+        }
+
+        ($switch, @args) = $self->extract('-t', 0, @args);
+        if (defined $switch) {
+
+            $fileTarFlag = TRUE;
+            $typeCount++;
+        }
+
+        ($switch, @args) = $self->extract('-z', 0, @args);
+        if (defined $switch) {
+
+            $fileZipFlag = TRUE;
+            $typeCount++;
+        }
+
+        ($switch, @args) = $self->extract('-a', 0, @args);
+        if (defined $switch) {
+
+            $appendFlag = TRUE;
+        }
+
+        ($switch, @args) = $self->extract('-e', 0, @args);
+        if (defined $switch) {
+
+            $noAppendFlag = TRUE;
+        }
+
+        # There should be 0 arguments left
+        if (@args) {
+
+            return $self->improper($session, $inputString);
+
+        # Can't combine certain switches
+        } elsif ($modeCount > 1) {
+
+           return $self->error(
+                $session, $inputString,
+                'The switches -n, -s, -p, -x and -y can\'t be combined',
+            );
+
+        } elsif ($dirFlag && $resetDirFlag) {
+
+           return $self->error(
+                $session, $inputString,
+                'The switches -f and -o can\'t be combined',
+            );
+
+        } elsif ($fileDefaultFlag && $resetDirFlag) {
+
+           return $self->error(
+                $session, $inputString,
+                'The switches -f and -o can\'t be combined',
+            );
+
+        } elsif ($typeCount > 1) {
+
+           return $self->error(
+                $session, $inputString,
+                'The switches -d, -t and -z can\'t be combined',
+            );
+
+        } elsif ($appendFlag && $noAppendFlag) {
+
+           return $self->error(
+                $session, $inputString,
+                'The switches -a and -e can\'t be combined',
+            );
+
+        # The interval, if specified, must be an integer in the range 0-366
+        } elsif ($intervalFlag && ! $axmud::CLIENT->intCheck($number, 0, 366)) {
+
+           return $self->error(
+                $session, $inputString,
+                'Invalid interval \'' . $number . '\' - must be an integer in the range 0-366',
+            );
+        }
+
+        # ;abu
+        if ($noArgsFlag) {
+
+            # Display header
+            $session->writeText('Auto-backup settings');
+
+            # Display list
+            $session->writeText('   ' . $axmud::SCRIPT . ' base directory (folder)');
+            $session->writeText('      ' . $axmud::TOP_DIR);
+            $session->writeText('   ' . $axmud::SCRIPT . ' data directory (folder)');
+            $session->writeText('      ' . $axmud::DATA_DIR);
+
+            %modeHash = (
+                'no_backup'         => 'Don\'t perform auto-backups',
+                'all_start'         => 'Perform auto-backup when ' . $axmud::SCRIPT . ' starts',
+                'all_stop'          => 'Perform auto-backup when ' . $axmud::SCRIPT . ' stops',
+                'interval_start'    => 'Perform auto-backup when ' . $axmud::SCRIPT . ' starts,'
+                                            . ' after certain interval',
+                'interval_stop'     => 'Perform auto-backup when ' . $axmud::SCRIPT . ' stops,'
+                                            . ' after certain interval',
+            );
+
+            $session->writeText('   Auto-backup mode');
+            $session->writeText(
+                sprintf(
+                    '      %-16.16s : %-64.64s',
+                    $axmud::CLIENT->autoBackupMode,
+                    $modeHash{$axmud::CLIENT->autoBackupMode},
+                ),
+            );
+
+            $session->writeText('   Directory where the backup file is stored');
+            if (! $axmud::CLIENT->autoBackupDir) {
+                $session->writeText('      <not set>');
+            } else {
+                $session->writeText('      ' . $axmud::CLIENT->autoBackupDir);
+            }
+
+            $session->writeText(
+                '   Interval (in days) between backups (0 - no auto-backups at intervals)',
+            );
+
+            if (
+                $axmud::CLIENT->autoBackupMode eq 'interval_start'
+                || $axmud::CLIENT->autoBackupMode eq 'interval_stop'
+            ) {
+
+                $session->writeText('      ' . $axmud::CLIENT->autoBackupInterval);
+
+            } else {
+
+                $session->writeText(
+                    '      ' . $axmud::CLIENT->autoBackupInterval . ' (not used in current'
+                    . ' auto-backup mode)',
+                );
+            }
+
+            $session->writeText('   Date of last successful auto-backup');
+            if (! $axmud::CLIENT->autoBackupDate) {
+                $session->writeText('      <not set>');
+            } else {
+                $session->writeText('      ' . $axmud::CLIENT->autoBackupDate);
+            }
+
+            %typeHash = (
+                'default'   => 'Create .tgz file on Linux, .zip file on MS Windows',
+                'tar'       => 'Create .tgz file (ideal for Linux)',
+                'zip'       => 'Create .zip file (ideal for MS Windows)',
+            );
+
+            $session->writeText('   Auto-backup file type');
+            $session->writeText(
+                sprintf(
+                    '      %-16.16s : %-64.64s',
+                    $axmud::CLIENT->autoBackupFileType,
+                    $typeHash{$axmud::CLIENT->autoBackupFileType},
+                )
+            );
+
+            if (! $axmud::CLIENT->autoBackupAppendFlag) {
+                $session->writeText('   Append time to back-up file - NO');
+            } else {
+                $session->writeText('   Append time to back-up file - YES');
+            }
+
+            # Display footer
+            return $self->complete($session, $standardCmd, 'End of list');
+
+        # ;abu <args>
+        } else {
+
+            if ($noBackupFlag) {
+                $axmud::CLIENT->set_autoBackupMode('no_backup');
+            } elsif ($allStartFlag) {
+                $axmud::CLIENT->set_autoBackupMode('all_start');
+            } elsif ($allStopFlag) {
+                $axmud::CLIENT->set_autoBackupMode('all_stop');
+            } elsif ($intStartFlag) {
+                $axmud::CLIENT->set_autoBackupMode('interval_start');
+            } elsif ($intStopFlag) {
+                $axmud::CLIENT->set_autoBackupMode('interval_stop');
+            }
+
+            if ($dirFlag) {
+                $axmud::CLIENT->set_autoBackupDir($dir);
+            } elsif ($resetDirFlag) {
+                $axmud::CLIENT->set_autoBackupDir();
+            }
+
+            if ($intervalFlag) {
+
+                $axmud::CLIENT->set_autoBackupInterval($number);
+            }
+
+            if ($fileDefaultFlag) {
+                $axmud::CLIENT->set_autoBackupFileType('default');
+            } elsif ($fileTarFlag) {
+                $axmud::CLIENT->set_autoBackupFileType('tar');
+            } elsif ($fileZipFlag) {
+                $axmud::CLIENT->set_autoBackupFileType('zip');
+            }
+
+            if ($appendFlag) {
+                $axmud::CLIENT->set_autoBackupAppendFlag(TRUE);
+            } elsif ($noAppendFlag) {
+                $axmud::CLIENT->set_autoBackupAppendFlag(FALSE);
+            }
+
+            return $self->complete($session, $standardCmd, 'Auto-backup settings modified');
         }
     }
 }
@@ -21810,10 +22765,23 @@
             $check,
         ) = @_;
 
+        # Local variables
+        my @list;
+
         # Check for improper arguments
-        if (! defined $name || defined $check) {
+        if (defined $check) {
 
             return $self->improper($session, $inputString);
+        }
+
+        # If no sound effect was specified, chose a random one
+        if (! defined $name) {
+
+            @list = $axmud::CLIENT->ivKeys('customSoundHash');
+            if (@list) {
+
+                $name = $list[int(rand(scalar @list))];
+            }
         }
 
         # Check the sound effect exists
@@ -25171,7 +26139,7 @@
 
 # Other windows
 
-{ package Games::Axmud::Cmd::OpenGUIWindow;
+{ package Games::Axmud::Cmd::OpenObjectViewer;
 
     use strict;
     use warnings;
@@ -25198,12 +26166,12 @@
         my ($class, $check) = @_;
 
         # Setup
-        my $self = Games::Axmud::Generic::Cmd->new('openguiwindow', TRUE, FALSE);
+        my $self = Games::Axmud::Generic::Cmd->new('openobjectviewer', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['ogw', 'gui', 'opengui', 'openguiwindow'];
+        $self->{defaultUserCmdList} = ['oov', 'viewer', 'openviewer', 'openobjectviewer'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
-        $self->{descrip} = 'Opens the GUI window';
+        $self->{descrip} = 'Opens the object viewer window';
 
         # Bless the object into existence
         bless $self, $class;
@@ -25226,37 +26194,37 @@
             return $self->improper($session, $inputString);
         }
 
-        # Check that a GUI window for this session isn't already open
-        if ($session->guiWin) {
+        # Check that an object viewer window for this session isn't already open
+        if ($session->viewerWin) {
 
             # Window already open; draw attention to the fact by presenting it
-            $session->guiWin->restoreFocus();
+            $session->viewerWin->restoreFocus();
 
             return $self->error(
                 $session, $inputString,
-                'A GUI window is already open for this session',
+                'An object viewer window is already open for this session',
             );
         }
 
-        # Open the GUI window
-        if (! $session->mainWin->quickFreeWin('Games::Axmud::OtherWin::GUI', $session)) {
+        # Open the object viewer window
+        if (! $session->mainWin->quickFreeWin('Games::Axmud::OtherWin::Viewer', $session)) {
 
             return $self->error(
                 $session, $inputString,
-                'Failed to open a GUI window for this session',
+                'Failed to open an object viewer window for this session',
             );
 
         } else {
 
             return $self->complete(
                 $session, $standardCmd,
-                'GUI window opened',
+                'Object viewer window opened',
             );
         }
     }
 }
 
-{ package Games::Axmud::Cmd::CloseGUIWindow;
+{ package Games::Axmud::Cmd::CloseObjectViewer;
 
     use strict;
     use warnings;
@@ -25283,12 +26251,12 @@
         my ($class, $check) = @_;
 
         # Setup
-        my $self = Games::Axmud::Generic::Cmd->new('closeguiwindow', TRUE, FALSE);
+        my $self = Games::Axmud::Generic::Cmd->new('closeobjectviewer', TRUE, FALSE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['cgw', 'closegui', 'closeguiwindow'];
+        $self->{defaultUserCmdList} = ['cov', 'closeviewer', 'closeobjectviewer'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
-        $self->{descrip} = 'Closes the GUI window';
+        $self->{descrip} = 'Closes the object viewer window';
 
         # Bless the object into existence
         bless $self, $class;
@@ -25314,27 +26282,27 @@
             return $self->improper($session, $inputString);
         }
 
-        if (! $session->guiWin) {
+        if (! $session->viewerWin) {
 
             return $self->error(
                 $session, $inputString,
-                'The GUI window is already closed for this session',
+                'The object viewer window is already closed for this session',
             );
 
         } else {
 
             # Close the window
-            $session->guiWin->winDestroy();
-            if ($session->guiWin) {
+            $session->viewerWin->winDestroy();
+            if ($session->viewerWin) {
 
                 return $self->error(
                     $session, $inputString,
-                    'Failed to close the GUI window for this session',
+                    'Failed to close the object viewer window for this session',
                 );
 
             } else {
 
-                return $self->complete($session, $standardCmd, 'GUI window closed');
+                return $self->complete($session, $standardCmd, 'Object viewer window closed');
             }
         }
     }
@@ -29080,6 +30048,860 @@
 
         # Display footer
         return $self->complete($session, $standardCmd, 'Dictionary list(s) complete');
+    }
+}
+
+{ package Games::Axmud::Cmd::ModifyPrimary;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('modifyprimary', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['mpr', 'modprimary', 'modifyprimary'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Modifies a primary direction';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $standard, $custom, $abbrev,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my (
+            $dictObj,
+            %checkHash,
+        );
+
+        # Check for improper arguments
+        if (! defined $standard || ! defined $custom || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Use 'undef' rather than an empty string
+        if (defined $abbrev && $abbrev eq '') {
+
+            $abbrev = undef;
+        }
+
+        # Check there is a current dictionary
+        $dictObj = $session->currentDict;
+        if (! $dictObj) {
+
+            return $self->error(
+                $session, $inputString,
+                'Can\'t modify primary directions because there is no current dictionary for this'
+                . ' session',
+            );
+        }
+
+        # Check that the standard primary direction $standard exists
+        if (! $axmud::CLIENT->constOppDirHash('standard')) {
+
+            return $self->error(
+                $session, $inputString,
+                '\'' . $standard . '\' isn\'t a standard primary direction',
+            );
+        }
+
+        # $custom must not already exist anywhere in the dictionary (unless it's the entry
+        #   corresponding to $standard, in which case this function updates its abbreviated
+        #   direction)
+        foreach my $key ($dictObj->ivKeys('primaryDirHash')) {
+
+            my $value = $dictObj->ivShow('primaryDirHash', $key);
+
+            $checkHash{$value} = $key;
+        }
+
+        foreach my $key ($dictObj->ivKeys('primaryAbbrevHash')) {
+
+            my $value = $dictObj->ivShow('primaryDirHash', $key);
+
+            $checkHash{$value} = $key;
+        }
+
+        foreach my $key ($dictObj->ivKeys('secondaryDirHash')) {
+
+            $checkHash{$key} = $key;
+        }
+
+        foreach my $key ($dictObj->ivKeys('secondaryAbbrevHash')) {
+
+            $checkHash{$key} = $key;
+        }
+
+        if (exists $checkHash{$custom} && $checkHash{$custom} ne $standard) {
+
+            return $self->error(
+                $session, $inputString,
+                'The direction \'' . $custom . '\' already exists in the current dictionary as a'
+                . ' primary or secondary direction (perhaps abbreviated)',
+            );
+
+        } elsif (
+            defined $abbrev
+            && exists $checkHash{$abbrev}
+            && $checkHash{$custom} ne $standard
+        ) {
+            return $self->error(
+                $session, $inputString,
+                'The abbreivated direction \'' . $abbrev . '\' already exists in the current'
+                . ' dictionary as a primary or secondary direction (perhaps abbreviated)',
+            );
+        }
+
+        # Update the dictonary
+        if (! $dictObj->modifyPrimaryDir($standard, $custom, $abbrev)) {
+
+            return $self->error(
+                $session, $inputString,
+                'Unable to update the current dictionary (internal error)',
+            );
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Added the custom primary direction \'' . $custom . '\' to the current dictionary',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::AddSecondary;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('addsecondary', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['ads', 'addsecond', 'addsecondary'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Adds a secondary direction';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $custom, $abbrev, $opp, $oppAbbrev,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my (
+            $dictObj,
+            %checkHash,
+        );
+
+        # Check for improper arguments
+        if (! defined $custom || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Use 'undef' rather than an empty string
+        if (defined $abbrev && $abbrev eq '') {
+
+            $abbrev = undef;
+        }
+
+        # Check there is a current dictionary
+        $dictObj = $session->currentDict;
+        if (! $dictObj) {
+
+            return $self->error(
+                $session, $inputString,
+                'Can\'t add secondary directions because there is no current dictionary for this'
+                . ' session',
+            );
+        }
+
+        # $custom must not already exist anywhere in the dictionary (unless it's the entry
+        #   corresponding to $standard, in which case this function updates its abbreviated
+        #   direction)
+        foreach my $key ($dictObj->ivKeys('primaryDirHash')) {
+
+            my $value = $dictObj->ivShow('primaryDirHash', $key);
+
+            $checkHash{$value} = $key;
+        }
+
+        foreach my $key ($dictObj->ivKeys('primaryAbbrevHash')) {
+
+            my $value = $dictObj->ivShow('primaryDirHash', $key);
+
+            $checkHash{$value} = $key;
+        }
+
+        foreach my $key ($dictObj->ivKeys('secondaryDirHash')) {
+
+            $checkHash{$key} = $key;
+        }
+
+        foreach my $key ($dictObj->ivKeys('secondaryAbbrevHash')) {
+
+            $checkHash{$key} = $key;
+        }
+
+        if (exists $checkHash{$custom}) {
+
+            return $self->error(
+                $session, $inputString,
+                'The direction \'' . $custom . '\' already exists in the current dictionary as a'
+                . ' primary or secondary direction (perhaps abbreviated)',
+            );
+
+        } elsif (defined $abbrev && exists $checkHash{$abbrev}) {
+
+            return $self->error(
+                $session, $inputString,
+                'The abbreivated direction \'' . $abbrev . '\' already exists in the current'
+                . ' dictionary as a primary or secondary direction (perhaps abbreviated)',
+            );
+        }
+
+        # Update the dictonary
+        if (! $dictObj->addSecondaryDir($custom, $abbrev)) {
+
+            return $self->error(
+                $session, $inputString,
+                'Unable to update the current dictionary (internal error)',
+            );
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Added the custom secondary direction \'' . $custom
+                . '\' to the current dictionary',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::ModifySecondary;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('modifysecondary', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['mds', 'modsecond', 'modifysecondary'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Sets a secondary direction\'s opposite direction';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $custom, $opp,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $dictObj;
+
+        # Check for improper arguments
+        if (! defined $custom || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Use an empty string rather than 'undef'
+        if (! defined $opp) {
+
+            $opp = '';
+        }
+
+        # Check there is a current dictionary
+        $dictObj = $session->currentDict;
+        if (! $dictObj) {
+
+            return $self->error(
+                $session, $inputString,
+                'Can\'t modify secondary directions because there is no current dictionary for this'
+                . ' session',
+            );
+        }
+
+        # Check that both $custom and $opp exist as custom secondary directions in the dictionary
+        if (! $dictObj->ivExists('secondaryDirHash', $custom)) {
+
+            return $self->error(
+                $session, $inputString,
+                'The custom secondary direction \'' . $custom . '\' doesn\'t exist in the current'
+                . ' dictionary (see the help for \';addsecondary\')',
+            );
+
+        } elsif (defined $opp && ! $dictObj->ivExists('secondaryDirHash', $opp)) {
+
+            return $self->error(
+                $session, $inputString,
+                'The custom secondary direction \'' . $opp . '\' doesn\'t exist in the current'
+                . ' dictionary (see the help for \';addsecondary\')',
+            );
+        }
+
+        # Update the dictonary
+        if (! $dictObj->modifySecondaryDir($custom, $opp)) {
+
+            return $self->error(
+                $session, $inputString,
+                'Unable to update the current dictionary (internal error)',
+            );
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Set the opposite of the custom secondary direction \'' . $custom
+                . '\' in the current dictionary',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::DeleteSecondary;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('deletesecondary', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['dds', 'delsecond', 'deletesecondary'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Deletes a secondary direction';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $custom,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $dictObj;
+
+        # Check for improper arguments
+        if (! defined $custom || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check there is a current dictionary
+        $dictObj = $session->currentDict;
+        if (! $dictObj) {
+
+            return $self->error(
+                $session, $inputString,
+                'Can\'t delete secondary directions because there is no current dictionary for this'
+                . ' session',
+            );
+        }
+
+        # Check that $custom exists as a custom secondary direction in the dictionary
+        if (! $dictObj->ivExists('secondaryDirHash', $custom)) {
+
+            return $self->error(
+                $session, $inputString,
+                'The custom secondary direction \'' . $custom . '\' doesn\'t exist in the current'
+                . ' dictionary (see the help for \';addsecondary\')',
+            );
+        }
+
+        # Update the dictonary
+        if (! $dictObj->deleteSecondaryDir($custom)) {
+
+            return $self->error(
+                $session, $inputString,
+                'Unable to update the current dictionary (internal error)',
+            );
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Deleted the custom secondary direction \'' . $custom
+                . '\' in the current dictionary',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::ListDirection;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('listdirection', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['ldi', 'listdirection'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Lists primary/secondary directions';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $dictObj;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check there is a current dictionary
+        $dictObj = $session->currentDict;
+        if (! $dictObj) {
+
+            return $self->error(
+                $session, $inputString,
+                'Can\'t list secondary directions because there is no current dictionary for this'
+                . ' session',
+            );
+        }
+
+        # Display header
+        $session->writeText('List of primary directions in dictionary');
+        $session->writeText(
+            '   Standard         Custom           Abbrev.          Opposite         Opp. abbrev.',
+        );
+
+        # Display list
+        foreach my $standard ($axmud::CLIENT->constPrimaryDirList) {
+
+            $session->writeText(
+                sprintf(
+                    '   %-16.16s %-16.16s %-16.16s %-16.16s %-16.16s',
+                    $standard,
+                    $dictObj->ivShow('primaryDirHash', $standard),
+                    $dictObj->ivShow('primaryAbbrevHash', $standard),
+                    $dictObj->ivShow('primaryOppHash', $standard),
+                    $dictObj->ivShow('primaryOppAbbrevHash', $standard),
+                ),
+            );
+        }
+
+        # Display header
+        $session->writeText('List of secondary directions (no standard forms exist)');
+        $session->writeText(
+            '                    Custom           Abbrev.          Opposite         Opp. abbrev.',
+        );
+
+        # Display list
+        foreach my $custom ($dictObj->secondaryDirList) {
+
+            my ($abbrev, $oppAbbrev);
+
+            $abbrev = $dictObj->ivShow('secondaryAbbrevHash', $custom);
+            if (! defined $abbrev || $abbrev eq '') {
+
+                $abbrev = '<not set>';
+            }
+
+            $oppAbbrev = $dictObj->ivShow('secondaryOppAbbrevHash', $custom);
+            if (! defined $oppAbbrev || $oppAbbrev eq '') {
+
+                $oppAbbrev = '<not set>';
+            }
+
+            $session->writeText(
+                sprintf(
+                    '                    %-16.16s %-16.16s %-16.16s %-16.16s',
+                    $dictObj->ivShow('secondaryDirHash', $custom),
+                    $abbrev,
+                    $dictObj->ivShow('secondaryOppHash', $custom),
+                    $oppAbbrev,
+                ),
+            );
+        }
+
+        # Display footer
+        return $self->complete(
+            $session, $standardCmd,
+            'End of lists (primary directions: ' . scalar ($axmud::CLIENT->constPrimaryDirList)
+            . ', secondary directions: ' . scalar ($dictObj->secondaryDirList) . ')',
+        );
+    }
+}
+
+{ package Games::Axmud::Cmd::SetAutoSecondary;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('setautosecondary', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['sas', 'setsecond', 'setautosecond', 'setautosecondary'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Sets preferred way to draw secondary directions';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $custom, $standard,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $dictObj;
+
+        # Check for improper arguments
+        if (! defined $custom || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check there is a current dictionary
+        $dictObj = $session->currentDict;
+        if (! $dictObj) {
+
+            return $self->error(
+                $session, $inputString,
+                'Can\'t modify secondary directions because there is no current dictionary for this'
+                . ' session',
+            );
+        }
+
+        # Check that $custom exists as a custom secondary direction in the dictionary
+        if (! $dictObj->ivExists('secondaryDirHash', $custom)) {
+
+            return $self->error(
+                $session, $inputString,
+                'The custom secondary direction \'' . $custom . '\' doesn\'t exist in the current'
+                . ' dictionary (see the help for \';addsecondary\')',
+            );
+
+        # If $auto was specified, check it's a standard priamry direction
+        } elsif (defined $standard && ! $axmud::CLIENT->ivExists('constOppDirHash', $standard)) {
+
+            return $self->error(
+                $session, $inputString,
+                'The standard primary direction \'' . $standard . '\' doesn\'t exist',
+            );
+        }
+
+        # Update the dictonary
+        $dictObj->ivPoke('secondaryAutoHash', $custom, $standard);
+
+        if (! defined $standard) {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Set the custom secondary direction \'' . $custom . '\' to be drawn in no specified'
+                . ' standard primary direction',
+            );
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Set the custom secondary direction \'' . $custom . '\' to be drawn in the'
+                . ' standard primary direction \'' . $standard . '\'',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::ListAutoSecondary;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('listautosecondary', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['las', 'listsecond', 'listautosecond', 'listautosecondary'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Lists preferred ways to draw secondary directions';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my ($dictObj, $count);
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check there is a current dictionary
+        $dictObj = $session->currentDict;
+        if (! $dictObj) {
+
+            return $self->error(
+                $session, $inputString,
+                'Can\'t list secondary directions because there is no current dictionary for this'
+                . ' session',
+            );
+        }
+
+        # Display header
+        $session->writeText('List of preferred map directions for secondary directions');
+        $session->writeText('   Secondary dir    Drawn in primary direction');
+
+        # Display list
+        foreach my $dir ($dictObj->secondaryDirList) {
+
+            my $standard = $dictObj->ivShow('secondaryAutoHash', $dir);
+
+            if (! defined $standard) {
+                $session->writeText(sprintf('   %-16.16s <none>', $dir));
+            } else {
+                $session->writeText(sprintf('   %-16.16s %-16.16s', $dir, $standard));
+            }
+        }
+
+        # Display footer
+        $count = scalar $dictObj->secondaryDirList;
+        if ($count == 1) {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'End of list (1 secondary direction found)',
+            );
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'End of list (' . $count . ' secondary directions found)',
+            );
+        }
     }
 }
 
@@ -33759,7 +35581,7 @@
     }
 }
 
-{ package Games::Axmud::Cmd::ListOtherWorld;
+{ package Games::Axmud::Cmd::ListBasicWorld;
 
     use strict;
     use warnings;
@@ -33786,12 +35608,12 @@
         my ($class, $check) = @_;
 
         # Setup
-        my $self = Games::Axmud::Generic::Cmd->new('listotherworld', TRUE, TRUE);
+        my $self = Games::Axmud::Generic::Cmd->new('listbasicworld', TRUE, TRUE);
         if (! $self) {return undef}
 
-        $self->{defaultUserCmdList} = ['low', 'listother', 'listotherworld'];
+        $self->{defaultUserCmdList} = ['lbw', 'listbasic', 'listbasicworld'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
-        $self->{descrip} = 'Displays the long mudlist';
+        $self->{descrip} = 'Displays the basic mudlist';
 
         # Bless the object into existence
         bless $self, $class;
@@ -33822,13 +35644,13 @@
 
             return $self->error(
                 $session, $inputString,
-                'The long mudlist was not loaded, or was empty',
+                'The basic mudlist was not loaded, or was empty',
             );
         }
 
         # Display header
-        $session->writeText('Long mudlist (* adult or sexual theme, + world profile exists)');
-        $session->writeText('    Name             Long name                        Address');
+        $session->writeText('Basic mudlist (* adult or sexual themes, + world profile exists)');
+        $session->writeText('    Name             Long name                        Host');
 
         # Display list
         @list = sort {lc($a->name) cmp lc($b->name)}
@@ -33857,9 +35679,9 @@
                 $longName = '(not set)';
             }
 
-            if ($obj->address) {
+            if ($obj->host) {
 
-                $host = $obj->address;
+                $host = $obj->host;
                 if ($obj->port) {
 
                     $host .= ' ' . $obj->port;
@@ -40383,109 +42205,6 @@
     }
 }
 
-{ package Games::Axmud::Cmd::EditKeycodeObject;
-
-    use strict;
-    use warnings;
-    use diagnostics;
-
-    use Glib qw(TRUE FALSE);
-
-    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
-
-    ##################
-    # Constructors
-
-    sub new {
-
-        # Create a new instance of this command object (there should only be one)
-        #
-        # Expected arguments
-        #   (none besides $class)
-        #
-        # Return values
-        #   'undef' if GA::Generic::Cmd->new reports an error
-        #   Blessed reference to the new object on success
-
-        my ($class, $check) = @_;
-
-        # Setup
-        my $self = Games::Axmud::Generic::Cmd->new('editkeycodeobject', TRUE, FALSE);
-        if (! $self) {return undef}
-
-        $self->{defaultUserCmdList} = ['eko', 'editko', 'editkeycodeobject'];
-        $self->{userCmdList} = $self->{defaultUserCmdList};
-        $self->{descrip} = 'Opens an \'edit\' window for a keycode object';
-
-        # Bless the object into existence
-        bless $self, $class;
-        return $self;
-    }
-
-    ##################
-    # Methods
-
-    sub do {
-
-        my (
-            $self, $session, $inputString, $userCmd, $standardCmd,
-            $name,
-            $check,
-        ) = @_;
-
-        # Local variables
-        my $obj;
-
-        # Check for improper arguments
-        if (defined $check) {
-
-            return $self->improper($session, $inputString);
-        }
-
-        # Check the keycode object exists
-        if (! $name) {
-
-            $obj = $axmud::CLIENT->currentKeycodeObj;
-            $name = $obj->name;
-
-        } elsif (! $axmud::CLIENT->ivExists('keycodeObjHash', $name)) {
-
-            return $self->error(
-                $session, $inputString,
-                'Could not edit the \'' . $name . '\' keycode object - object does not exist',
-            );
-
-        } else {
-
-            $obj = $axmud::CLIENT->ivShow('keycodeObjHash', $name);
-        }
-
-        # Open an 'edit' window for the keycode object
-        if (
-            ! $session->mainWin->createFreeWin(
-                'Games::Axmud::EditWin::Keycode',
-                $session->mainWin,
-                $session,
-                'Edit keycode object \'' . $name . '\'',
-                $obj,
-                FALSE,                  # Not temporary
-            )
-        ) {
-            return $self->error(
-                $session, $inputString,
-                'Could not edit the \'' . $name . '\' keycode object',
-            );
-
-        } else {
-
-            return $self->complete(
-                $session, $standardCmd,
-                'Opened \'edit\' window for the \'' . $name . '\' keycode object',
-            );
-        }
-    }
-}
-
 { package Games::Axmud::Cmd::CloneKeycodeObject;
 
     use strict;
@@ -40592,6 +42311,109 @@
                 $session, $standardCmd,
                 'Cloned the current keycode object \'' . $original . '\' into one named \''
                 . $copy . '\'',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::EditKeycodeObject;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('editkeycodeobject', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['eko', 'editko', 'editkeycodeobject'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Opens an \'edit\' window for a keycode object';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $name,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $obj;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check the keycode object exists
+        if (! $name) {
+
+            $obj = $axmud::CLIENT->currentKeycodeObj;
+            $name = $obj->name;
+
+        } elsif (! $axmud::CLIENT->ivExists('keycodeObjHash', $name)) {
+
+            return $self->error(
+                $session, $inputString,
+                'Could not edit the \'' . $name . '\' keycode object - object does not exist',
+            );
+
+        } else {
+
+            $obj = $axmud::CLIENT->ivShow('keycodeObjHash', $name);
+        }
+
+        # Open an 'edit' window for the keycode object
+        if (
+            ! $session->mainWin->createFreeWin(
+                'Games::Axmud::EditWin::Keycode',
+                $session->mainWin,
+                $session,
+                'Edit keycode object \'' . $name . '\'',
+                $obj,
+                FALSE,                  # Not temporary
+            )
+        ) {
+            return $self->error(
+                $session, $inputString,
+                'Could not edit the \'' . $name . '\' keycode object',
+            );
+
+        } else {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Opened \'edit\' window for the \'' . $name . '\' keycode object',
             );
         }
     }
@@ -49789,7 +51611,7 @@
 
         my (
             $self, $session, $inputString, $userCmd, $standardCmd,
-            $name,
+            $arg,
             $check,
         ) = @_;
 
@@ -49807,7 +51629,7 @@
 
         # ;lwm
         # ;lwm -s
-        if (! defined $name || $name eq '-s') {
+        if (! defined $arg || $arg eq '-s') {
 
             # Import a list of winmap names, sorted alphabetically
             @list = sort {lc($a) cmp lc($b)} ($axmud::CLIENT->ivKeys('winmapHash'));
@@ -49834,7 +51656,7 @@
 
                 if (! $axmud::CLIENT->ivExists('standardWinmapHash', $name)) {
 
-                    if ($name) {
+                    if (defined $arg && $arg eq '-s') {
 
                         # This isn't a standard winmap, so don't list it
                         next OUTER;
@@ -49885,7 +51707,7 @@
             }
 
             # Display footer
-            if ($name) {
+            if (defined $arg) {
 
                 return $self->complete(
                     $session, $standardCmd,
@@ -49905,17 +51727,17 @@
         } else {
 
             # Check the winmap exists
-            $winmapObj = $axmud::CLIENT->ivShow('winmapHash', $name);
+            $winmapObj = $axmud::CLIENT->ivShow('winmapHash', $arg);
             if (! $winmapObj) {
 
                 return $self->error(
                     $session, $inputString,
-                    'The winmap \'' . $name . '\' doesn\'t exist',
+                    'The winmap \'' . $arg . '\' doesn\'t exist',
                 );
             }
 
             # Display header
-            $session->writeText('Properties of winmap \'' . $name . '\'');
+            $session->writeText('Properties of winmap \'' . $arg . '\'');
 
             # Display list
             if ($winmapObj->fullFlag) {
@@ -60799,10 +62621,7 @@
         ) = @_;
 
         # Local variables
-        my (
-            $result,
-            @list,
-        );
+        my (@list, @list2, @list3);
 
         # Check for improper arguments
         if (defined $check) {
@@ -60847,9 +62666,6 @@
             }
         }
 
-        # Compile a string of commands, separated by the usual command separator, and ignoring
-        #   comments and breaks
-        $result = join ($axmud::CLIENT->cmdSep, @list);
 
         # Display header
         $session->writeText(
@@ -60857,7 +62673,27 @@
         );
 
         # Display list
-        $session->writeText($result);
+
+        # Compile a string of commands, separated by the usual command separator, and ignoring
+        #   comments and breaks
+        $session->writeText(' ');
+        $session->writeText('Actual recording:');
+        $session->writeText(join ($axmud::CLIENT->cmdSep, @list));
+
+        # Show unabbreviated and abbreviated versions
+        foreach my $item (@list) {
+
+            push (@list2, $session->currentDict->unabbrevDir($item));
+            push (@list3, $session->currentDict->abbrevDir($item));
+        }
+
+        $session->writeText(' ');
+        $session->writeText('Unabbreviated version:');
+        $session->writeText(join ($axmud::CLIENT->cmdSep, @list2));
+
+        $session->writeText(' ');
+        $session->writeText('Abbreviated version:');
+        $session->writeText(join ($axmud::CLIENT->cmdSep, @list3));
 
         # Display footer
         if (@list == 1) {
@@ -72823,7 +74659,7 @@
 
         $self->{defaultUserCmdList} = ['pcm', 'permcompass'];
         $self->{userCmdList} = $self->{defaultUserCmdList};
-        $self->{descrip} = 'Modifies the initial Compass task';
+        $self->{descrip} = 'Modifies the global initial Compass task';
 
         # Bless the object into existence
         bless $self, $class;
@@ -72841,11 +74677,7 @@
         ) = @_;
 
         # Local variables
-        my (
-            $hashRef, $otherHashRef, $count, $errorCount, $key, $keycode, $cmd,
-            @taskList, @permTaskList,
-            %hash, %otherHash,
-        );
+        my (@taskList, @initTaskList);
 
         # For the benefit of visually-impaired users, display an error message rather than improper
         #   args
@@ -72857,130 +74689,102 @@
             );
         }
 
-        # %hash to convert all the <key>s that the Compass task allows us to customise
-        # %otherHash of other keypad <key>s that the Compass task doesn't allow us to customise
-        ($hashRef, $otherHashRef) = $self->getKeypadHashes();
-        %hash = %$hashRef;
-        %otherHash = %$otherHashRef;
+        # Get all tasks of this kind from the current tasklist...
+        push (@taskList, $self->findTask($session, 'compass_task'));
+        # ...and also from the global initial tasklist
+        push (@initTaskList, $self->findGlobalInitialTask('compass_task'));
+
+        # The called function produces its own ->complete or ->error messages
+        return $self->updateCompass(
+            $session,
+            $inputString,
+            $standardCmd,
+            \@args,
+            \@taskList,
+            \@initTaskList,
+        );
+    }
+}
+
+{ package Games::Axmud::Cmd::WorldCompass;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('worldcompass', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['wcm', 'worldcompass'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Modifies the world\'s initial Compass task';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            @args,
+        ) = @_;
+
+        # Local variables
+        my (@taskList, @initTaskList);
+
+        # For the benefit of visually-impaired users, display an error message rather than improper
+        #   args
+        if (! @args) {
+
+            return $self->complete(
+                $session, $standardCmd,
+                'Do what to your Compass tasks? (Try \';help permcompass\')',
+            );
+        }
 
         # Get all tasks of this kind from the current tasklist...
         push (@taskList, $self->findTask($session, 'compass_task'));
         # ...and also from the global initial tasklist
-        push (@permTaskList, $self->findGlobalInitialTask('compass_task'));
+        push (
+            @initTaskList,
+            $self->findProfileInitialTask('compass_task', $session->currentWorld),
+        );
 
-        if (! @taskList && ! @permTaskList) {
-
-            return $self->error(
-                $session, $inputString,
-                'Could not find a Compass task in the current tasklist or the global initial'
-                . ' tasklist',
-            );
-        }
-
-        # Count successes and errors, to show in confirmation messages
-        $count = 0;
-        $errorCount = 0;
-
-        # ;pcm on
-        # ;pcm -o
-        if ($args[0] eq 'on' || $args[0] eq '-o') {
-
-            # (For the benefit of visually-impaired users, ignore everything after the first
-            #   argument)
-            foreach my $taskObj (@taskList) {
-
-                if (! $taskObj->enable()) {
-                    $errorCount++;
-                } else {
-                    $count++;
-                }
-            }
-
-            foreach my $taskObj (@permTaskList) {
-
-                $count++;
-                $taskObj->set_enabledFlag(TRUE);
-            }
-
-            return $self->complete(
-                $session, $standardCmd,
-                'Compass tasks set to \'enabled\'. (Found tasks: ' . ($count + $errorCount)
-                . ', errors: ' . $errorCount . ').',
-            )
-
-        # ;pcm off
-        # ;pcm -f
-        } elsif ($args[0] eq 'off' || $args[0] eq '-f') {
-
-            foreach my $taskObj (@taskList) {
-
-                if (! $taskObj->disable()) {
-                    $errorCount++;
-                } else {
-                    $count++;
-                }
-            }
-
-            foreach my $taskObj (@permTaskList) {
-
-                $count++;
-                $taskObj->set_enabledFlag(FALSE);
-            }
-
-            return $self->complete(
-                $session, $standardCmd,
-                'Compass tasks set to \'disabled\'. (Found tasks: ' . ($count + $errorCount)
-                . ', errors: ' . $errorCount . ').',
-            );
-
-        # ;pcm <key> <command>
-        # ;pcm <key>
-        } elsif ($args[0]) {
-
-            # Get the Axmud standard keycode
-            $key = shift @args;
-            if (! exists $hash{$key} && ! exists $otherHash{$key}) {
-
-                return $self->error(
-                    $session, $inputString,
-                    'Unrecognised keypad key (try \';help compass\' for a list of recognised keys)',
-                );
-
-            } elsif (exists $otherHash{$key}) {
-
-                return $self->error(
-                    $session, $inputString,
-                    'The Compass task doesn\'t allow us to customise the \'' . $otherHash{$key}
-                    . '\' key',
-                );
-
-            } else {
-
-                $keycode = $hash{$key};
-            }
-
-            # Set the corresponding world <command> (if one was specified)
-            if (@args) {
-
-                $cmd = join (' ', @args);
-            }
-
-            # Update the task(s)
-            foreach my $taskObj (@taskList, @permTaskList) {
-
-                if (! $taskObj->set_key($keycode, $cmd)) {
-                    $errorCount++;
-                } else {
-                    $count++;
-                }
-            }
-
-            return $self->complete(
-                $session, $standardCmd,
-                'Set a world command for the keypad key \'' . $key . '\'. (Found tasks: '
-                . ($count + $errorCount) . ', errors: ' . $errorCount . ').',
-            );
-        }
+        # The called function produces its own ->complete or ->error messages
+        return $self->updateCompass(
+            $session,
+            $inputString,
+            $standardCmd,
+            \@args,
+            \@taskList,
+            \@initTaskList,
+        );
     }
 }
 
@@ -84249,7 +86053,14 @@
                 'Can\'t locate the current room because the Locator task is not running',
             );
 
-        } elsif (! $taskObj->roomObj && $session->status ne 'offline') {
+        } elsif ($session->status eq 'offline') {
+
+            return $self->error(
+                $session, $inputString,
+                'Can\'t locate the current room in \'offline\' mode',
+            );
+
+        } elsif (! $taskObj->roomObj) {
 
             return $self->error(
                 $session, $inputString,
@@ -85219,6 +87030,398 @@
                 'Invalid setting - try \';setprotectedmoves on\' or \';setprotectedmoves off\'',
             );
         }
+    }
+}
+
+{ package Games::Axmud::Cmd::RoomCommand;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('roomcommand', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['room', 'roomcmd', 'roomcommand'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Executes a room command';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $cmd;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check the Locator task knows the current location
+        if (! $session->locatorTask) {
+
+            return $self->error(
+                $session, $inputString,
+                'The Locator task is not running',
+            );
+
+        } elsif (! $session->locatorTask->roomObj) {
+
+            return $self->error(
+                $session, $inputString,
+                'The Locator task doesn\'t know anything about the current location',
+            );
+
+        } elsif (! $session->locatorTask->roomObj->tempRoomCmdList) {
+
+            return $self->error(
+                $session, $inputString,
+                'There are no room commands available in the current room',
+            );
+
+        } else {
+
+            $cmd = $session->locatorTask->useRoomCmd();
+
+            if (! $cmd) {
+
+                return $self->error(
+                    $session, $inputString,
+                    'Internal error while trying to execute a room command',
+                );
+
+            } else {
+
+                return $self->complete(
+                    $session, $standardCmd,
+                    'Executed room command \'' . $cmd . '\'',
+                );
+            }
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::IgnoreRoomCommand;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('ignoreroomcommand', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['iro', 'ignoreroom', 'ignoreroomcmd', 'ignoreroomcommand'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Marks a room command as ignorable';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $cmd,
+            $check,
+        ) = @_;
+
+        # Check for improper arguments
+        if (! defined $cmd || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check the room command isn't already ignored
+        if (defined $session->currentWorld->ivFind('roomCmdIgnoreList', $cmd)) {
+
+            return $self->error(
+                $session, $inputString,
+                'The room command \'' . $cmd . '\' is already marked as ignorable by the current'
+                . ' world',
+            );
+
+        } else {
+
+            $session->currentWorld->ivPush('roomCmdIgnoreList', $cmd);
+
+            return $self->complete(
+                $session, $standardCmd,
+                'The room command \'' . $cmd . '\' has been marked as ignorable by the current'
+                . ' world',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::NoticeRoomCommand;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('noticeroomcommand', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['nro', 'noticeroom', 'noticeroomcmd', 'noticeroomcommand'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Marks a room command as usable';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $cmd,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $index;
+
+        # Check for improper arguments
+        if (! defined $cmd || defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Check the room command isn't already usable
+        $index = $session->currentWorld->ivFind('roomCmdIgnoreList', $cmd);
+        if (! defined $index) {
+
+            return $self->error(
+                $session, $inputString,
+                'The room command \'' . $cmd . '\' is already marked as usable by the current'
+                . ' world',
+            );
+
+        } else {
+
+            $session->currentWorld->ivSplice('roomCmdIgnoreList', $index, 1);
+
+            return $self->complete(
+                $session, $standardCmd,
+                'The room command \'' . $cmd . '\' has been marked as usable by the current world',
+            );
+        }
+    }
+}
+
+{ package Games::Axmud::Cmd::ListRoomCommand;
+
+    use strict;
+    use warnings;
+    use diagnostics;
+
+    use Glib qw(TRUE FALSE);
+
+    our @ISA = qw(Games::Axmud::Generic::Cmd Games::Axmud);
+
+    ##################
+    # Constructors
+
+    sub new {
+
+        # Create a new instance of this command object (there should only be one)
+        #
+        # Expected arguments
+        #   (none besides $class)
+        #
+        # Return values
+        #   'undef' if GA::Generic::Cmd->new reports an error
+        #   Blessed reference to the new object on success
+
+        my ($class, $check) = @_;
+
+        # Setup
+        my $self = Games::Axmud::Generic::Cmd->new('listroomcommand', TRUE, FALSE);
+        if (! $self) {return undef}
+
+        $self->{defaultUserCmdList} = ['lro', 'listroom', 'listroomcmd', 'listroomcommand'];
+        $self->{userCmdList} = $self->{defaultUserCmdList};
+        $self->{descrip} = 'Displays room command settings';
+
+        # Bless the object into existence
+        bless $self, $class;
+        return $self;
+    }
+
+    ##################
+    # Methods
+
+    sub do {
+
+        my (
+            $self, $session, $inputString, $userCmd, $standardCmd,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my (
+            $taskObj, $string,
+            @list,
+        );
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $self->improper($session, $inputString);
+        }
+
+        # Import the Locator task (for convenience)
+        $taskObj = $session->locatorTask;
+
+        # Display header
+        $session->writeText('Room command settings');
+
+        # Display list
+        if (! $taskObj || ! $taskObj->roomObj) {
+            $string = 'NO';
+        } else {
+            $string = 'YES';
+        }
+
+        $session->writeText('   Locator task running and knows current location : ' . $string);
+
+        if ($string eq 'YES') {
+
+            $session->writeText('   Current location\'s room commands (in original order)');
+
+            if (! $taskObj->roomObj->roomCmdList) {
+                $session->writeText('      <empty>');
+            } else {
+                $session->writeText('      ' . join(', ', $taskObj->roomObj->roomCmdList));
+            }
+        }
+
+        $session->writeText('   Current world\'s ignorable room command list');
+
+        if (! $session->currentWorld->roomCmdIgnoreList) {
+
+            $session->writeText('      <empty>');
+
+        } else {
+
+            $session->writeText(
+                '      ' . join(', ', $session->currentWorld->roomCmdIgnoreList),
+            );
+        }
+
+        if ($string eq 'YES') {
+
+            $session->writeText('   Next world commands to send with \';roomcommand\'');
+            if (! $taskObj->roomObj->tempRoomCmdList) {
+
+                $session->writeText('      <none>');
+
+            } else {
+
+                # Filter out ignorable commands
+                foreach my $cmd ($taskObj->roomObj->tempRoomCmdList) {
+
+                    if (! defined $session->currentWorld->ivMatch('roomCmdIgnoreList', $cmd)) {
+
+                        push (@list, $cmd);
+                    }
+                }
+
+                if (! @list) {
+                    $session->writeText('      <empty, after removing ignorable commands>');
+                } else {
+                    $session->writeText('      ' . join(', ', @list));
+                }
+            }
+        }
+
+        # Display footer
+        return $self->complete($session, $standardCmd, 'End of room command list');
     }
 }
 

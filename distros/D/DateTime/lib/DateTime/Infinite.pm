@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.49';
+our $VERSION = '1.50';
 
 use DateTime;
 use DateTime::TimeZone;
@@ -214,7 +214,7 @@ DateTime::Infinite - Infinite past and future DateTime objects
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,146 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A short TV or radio program or a segment/part of a program.",
+      "rdfs:label" : "Clip",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:actor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc., or in an event. Actors can be associated with individual items or with a series, episode, clip.",
+         "rdfs:label" : "actor",
+         "schema:domainIncludes" : [
+            "schema:TVSeries",
+            "schema:Event",
+            "schema:VideoGameSeries",
+            "schema:Clip",
+            "schema:VideoObject",
+            "schema:RadioSeries",
+            "schema:Movie",
+            "schema:Episode",
+            "schema:CreativeWorkSeason",
+            "schema:MovieSeries",
+            "schema:VideoGame"
+         ],
+         "schema:rangeIncludes" : "schema:Person"
+      },
+      "schema:actors" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc. Actors can be associated with individual items or with a series, episode, clip.",
+         "rdfs:label" : "actors",
+         "schema:domainIncludes" : [
+            "schema:TVSeries",
+            "schema:VideoGameSeries",
+            "schema:Clip",
+            "schema:VideoGame",
+            "schema:RadioSeries",
+            "schema:Movie",
+            "schema:VideoObject",
+            "schema:Episode",
+            "schema:MovieSeries"
+         ],
+         "schema:rangeIncludes" : "schema:Person",
+         "schema:supersededBy" : "schema:actor"
+      },
+      "schema:clipNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Position of the clip within an ordered group of clips.",
+         "rdfs:label" : "clipNumber",
+         "rdfs:subPropertyOf" : "schema:position",
+         "schema:domainIncludes" : "schema:Clip",
+         "schema:rangeIncludes" : [
+            "schema:Integer",
+            "schema:Text"
+         ]
+      },
+      "schema:director" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A director of e.g. tv, radio, movie, video gaming etc. content, or of an event. Directors can be associated with individual items or with a series, episode, clip.",
+         "rdfs:label" : "director",
+         "schema:domainIncludes" : [
+            "schema:Movie",
+            "schema:VideoGameSeries",
+            "schema:Clip",
+            "schema:VideoObject",
+            "schema:TVSeries",
+            "schema:Episode",
+            "schema:MovieSeries",
+            "schema:RadioSeries",
+            "schema:Event",
+            "schema:CreativeWorkSeason",
+            "schema:VideoGame"
+         ],
+         "schema:rangeIncludes" : "schema:Person"
+      },
+      "schema:directors" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A director of e.g. tv, radio, movie, video games etc. content. Directors can be associated with individual items or with a series, episode, clip.",
+         "rdfs:label" : "directors",
+         "schema:domainIncludes" : [
+            "schema:Clip",
+            "schema:VideoGameSeries",
+            "schema:VideoObject",
+            "schema:VideoGame",
+            "schema:Movie",
+            "schema:RadioSeries",
+            "schema:MovieSeries",
+            "schema:Episode",
+            "schema:TVSeries"
+         ],
+         "schema:rangeIncludes" : "schema:Person",
+         "schema:supersededBy" : "schema:director"
+      },
+      "schema:musicBy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The composer of the soundtrack.",
+         "rdfs:label" : "musicBy",
+         "schema:domainIncludes" : [
+            "schema:Clip",
+            "schema:Movie",
+            "schema:TVSeries",
+            "schema:VideoGame",
+            "schema:RadioSeries",
+            "schema:VideoObject",
+            "schema:VideoGameSeries",
+            "schema:Episode",
+            "schema:MovieSeries"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:MusicGroup",
+            "schema:Person"
+         ]
+      },
+      "schema:partOfEpisode" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The episode to which this clip belongs.",
+         "rdfs:label" : "partOfEpisode",
+         "rdfs:subPropertyOf" : "schema:isPartOf",
+         "schema:domainIncludes" : "schema:Clip",
+         "schema:rangeIncludes" : "schema:Episode"
+      },
+      "schema:partOfSeason" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The season to which this episode belongs.",
+         "rdfs:label" : "partOfSeason",
+         "rdfs:subPropertyOf" : "schema:isPartOf",
+         "schema:domainIncludes" : [
+            "schema:Episode",
+            "schema:Clip"
+         ],
+         "schema:rangeIncludes" : "schema:CreativeWorkSeason"
+      },
+      "schema:partOfSeries" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The series to which this episode or season belongs.",
+         "rdfs:label" : "partOfSeries",
+         "rdfs:subPropertyOf" : "schema:isPartOf",
+         "schema:domainIncludes" : [
+            "schema:Clip",
+            "schema:CreativeWorkSeason",
+            "schema:Episode"
+         ],
+         "schema:rangeIncludes" : "schema:CreativeWorkSeries"
+      }
+   }
+}

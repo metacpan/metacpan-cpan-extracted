@@ -142,10 +142,10 @@ sub recaptcha_proxy ( $self, @ ) {
 sub get_balance ( $self, $cb ) {
     P->http->post(
         'https://api.anti-captcha.com/getBalance',
-        body => to_json( {    #
+        data => to_json( {    #
             clientKey => $self->api_key,
         } ),
-        on_finish => sub ($res) {
+        sub ($res) {
             my $result;
 
             # HTTP ERROR
@@ -153,7 +153,7 @@ sub get_balance ( $self, $cb ) {
                 $result = res [ $res->{status}, $res->{reason} ];
             }
             else {
-                my $data = from_json $res->{body}->$*;
+                my $data = from_json $res->{data}->$*;
 
                 # OK
                 if ( !$data->{errorId} ) {
@@ -178,11 +178,11 @@ sub get_balance ( $self, $cb ) {
 sub get_queue_stats ( $self, $queue_id, $cb ) {
     P->http->post(
         'https://api.anti-captcha.com/getQueueStats',
-        body => to_json( {
+        data => to_json( {
             clientKey => $self->api_key,
             queueId   => $queue_id,
         } ),
-        on_finish => sub ($res) {
+        sub ($res) {
             my $result;
 
             # HTTP ERROR
@@ -190,7 +190,7 @@ sub get_queue_stats ( $self, $queue_id, $cb ) {
                 $result = res [ $res->{status}, $res->{reason} ];
             }
             else {
-                my $data = from_json $res->{body}->$*;
+                my $data = from_json $res->{data}->$*;
 
                 # OK
                 if ( !$data->{errorId} ) {
@@ -215,8 +215,8 @@ sub get_queue_stats ( $self, $queue_id, $cb ) {
 sub _resolve ( $self, $captcha, $body, $cb ) {
     P->http->post(
         'https://api.anti-captcha.com/createTask',
-        body      => to_json($body),
-        on_finish => sub ($res) {
+        data => to_json($body),
+        sub ($res) {
 
             # HTTP ERROR
             if ( !$res ) {
@@ -225,7 +225,7 @@ sub _resolve ( $self, $captcha, $body, $cb ) {
                 $cb->($captcha);
             }
             else {
-                my $data = from_json $res->{body}->$*;
+                my $data = from_json $res->{data}->$*;
 
                 # ACCEPTED
                 if ( !$data->{errorId} ) {
@@ -279,13 +279,13 @@ sub _run_resolver ($self) {
 
             P->http->post(
                 'https://api.anti-captcha.com/getTaskResult',
-                body => to_json( {
+                data => to_json( {
                     clientKey => $self->api_key,
                     taskId    => $id,
                 } ),
-                on_finish => sub ($res) {
+                sub ($res) {
                     if ($res) {
-                        my $data = from_json $res->{body}->$*;
+                        my $data = from_json $res->{data}->$*;
 
                         # ERROR
                         if ( $data->{errorId} ) {

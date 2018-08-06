@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Kl::Any::Gl - Package for language Kalaallisut
 
 package Locale::CLDR::Locales::Kl::Any::Gl;
 # This file auto generated from Data\common\main\kl_GL.xml
-#	on Fri 13 Apr  7:16:32 am GMT
+#	on Sun  5 Aug  6:08:04 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

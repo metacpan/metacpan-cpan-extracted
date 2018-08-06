@@ -58,8 +58,11 @@ sub AUTOLOAD {
     my $self=shift;
     my @mpath=split('::',$AUTOLOAD);
     my $method=$mpath[$#mpath];
-    my $code=$self->{'cgi'}->can($method) ||
+    my $code=$self->{'cgi'}->can($method);
+    if(!$code) {
+        return if $method eq 'DESTROY';
         die "No method $method on $self->{'cgi'}";
+    }
     return $code->($self->{'cgi'},@_);
 }
 
@@ -128,6 +131,30 @@ sub param ($;$) {
             return ref($value) ? $value : Encode::decode($charset,$value);
         }
     }
+}
+
+###############################################################################
+
+sub Vars ($) {
+    my $self=shift;
+
+    my $charset=$self->{'xao_param_charset'};
+
+    if(!$charset) {
+        return $self->{'cgi'}->Vars();
+    }
+
+    # There is a known incompatibility in this implementation -- our
+    # hash is never tied and cannot be used to modify the CGI object
+    # values.
+    #
+    my %vb=$self->{'cgi'}->Vars();
+    my %vu;
+    foreach my $param (keys %vb) {
+        $vu{Encode::decode($charset,$param)}=Encode::decode($charset,$vb{$param});
+    }
+
+    return wantarray ? %vu : \%vu;
 }
 
 ###############################################################################

@@ -1,5 +1,5 @@
 package Data::Format::Validate::IP;
-our $VERSION = q/0.2/;
+our $VERSION = q/0.3/;
 
 use Carp qw/croak/;
 use base q/Exporter/;
@@ -18,14 +18,20 @@ our %EXPORT_TAGS = (
 
 sub looks_like_ipv4 ($) {
 
-    $_ = shift || croak q/Value must be provided/;
-    /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+    my $ip = shift || croak q/Value must be provided/;
+    $ip =~ /^
+        (?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}   # Three groups of numbers from 0 to 255 joined by '.'
+        (?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)            # Final group of numbers, but without '.'
+    $/x
 }
 
 sub looks_like_ipv6 ($) {
 
-    $_ = shift || croak q/Value must be provided/;
-    /^(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}$/i
+    my $ip = shift || croak q/Value must be provided/;
+    $ip =~ /^
+        (?:[A-F0-9]{1,4}:){7}   # Seven groups with 1 to 4 hexadecimal digits joined by ':'
+        [A-F0-9]{1,4}           # Final group of digits, but without ':'
+    $/ix
 }
 1;
 
@@ -39,9 +45,9 @@ Data::Format::Validate::IP - A IP validating module.
 
 =head1 SYNOPSIS
 
-Module that validate IP addressess.
+Function-oriented module capable of validating the format of IPV4 or IPV6 addresses.
 
-=head1 Utilities
+=head1 UTILITIES
 
 =over 4
 
@@ -49,25 +55,15 @@ Module that validate IP addressess.
 
     use Data::Format::Validate::IP 'looks_like_ipv4';
 
-    looks_like_ipv4 '127.0.0.1';        # 1
-    looks_like_ipv4 '192.168.0.1';      # 1
-    looks_like_ipv4 '255.255.255.255';  # 1
-
-    looks_like_ipv4 '255255255255';     # 0
-    looks_like_ipv4 '255.255.255.256';  # 0
+    looks_like_ipv4 '127.0.0.1';    # returns 1
+    looks_like_ipv4 '255255255255'; # returns 0
 
 =item IP (ipv6)
 
     use Data::Format::Validate::IP 'looks_like_ipv6';
 
-    looks_like_ipv6 '1762:0:0:0:0:B03:1:AF18';                  # 1
-    looks_like_ipv6 '1762:ABC:464:4564:0:BA03:1000:AA1F';       # 1
-    looks_like_ipv6 '1762:4546:A54f:d6fd:5455:B03:1fda:dFde';   # 1
-
-    looks_like_ipv6 '17620000AFFFB031AF187';                    # 0
-    looks_like_ipv6 '1762:0:0:0:0:B03:AF18';                    # 0
-    looks_like_ipv6 '1762:0:0:0:0:B03:1:Ag18';                  # 0
-    looks_like_ipv6 '1762:0:0:0:0:AFFFB03:1:AF187';             # 0
+    looks_like_ipv6 '1762:0:0:0:0:B03:1:AF18';  # returns 1
+    looks_like_ipv6 '17620000AFFFB031AF187';    # returns 0
 
 =back
 
@@ -79,6 +75,6 @@ This source is on Github:
 
 =head1 AUTHOR
 
-Created by Israel Batista <<israel.batista@univem.edu.br>>
+Created by Israel Batista <rozcovo@cpan.org>
 
 =cut

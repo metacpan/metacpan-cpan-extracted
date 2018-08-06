@@ -15,3 +15,4 @@ t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/basic.t
+t/browser.t

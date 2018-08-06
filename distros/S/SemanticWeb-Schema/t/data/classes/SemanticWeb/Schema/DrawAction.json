@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of producing a visual/graphical representation of an object, typically with a pen/pencil and paper as instruments.",
+      "rdfs:label" : "DrawAction",
+      "rdfs:subClassOf" : "schema:CreateAction"
+   },
+   "properties" : {}
+}

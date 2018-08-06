@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A store that sells mobile phones and related accessories.",
+      "rdfs:label" : "MobilePhoneStore",
+      "rdfs:subClassOf" : "schema:Store"
+   },
+   "properties" : {}
+}

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Data type: Integer.",
+      "rdfs:label" : "Integer",
+      "rdfs:subClassOf" : "schema:Number"
+   },
+   "properties" : {}
+}

@@ -42,7 +42,7 @@ has pubsub => sub {
   return $pubsub;
 };
 
-our $VERSION = '4.08';
+our $VERSION = '4.09';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -216,7 +216,7 @@ Mojo::Pg - Mojolicious ♥ PostgreSQL
 
 L<Mojo::Pg> is a tiny wrapper around L<DBD::Pg> that makes
 L<PostgreSQL|http://www.postgresql.org> a lot of fun to use with the
-L<Mojolicious|http://mojolicious.org> real-time web framework. Perform queries
+L<Mojolicious|https://mojolicious.org> real-time web framework. Perform queries
 blocking and non-blocking, use all
 L<SQL features|https://www.postgresql.org/docs/current/static/sql.html>
 PostgreSQL has to offer, generate CRUD queries from data structures, manage your
@@ -559,6 +559,8 @@ Flavio Poletti
 
 Hernan Lopes
 
+Matt S Trout
+
 Peter Rabbitson
 
 William Lindley
@@ -575,6 +577,6 @@ the terms of the Artistic License version 2.0.
 =head1 SEE ALSO
 
 L<https://github.com/kraih/mojo-pg>, L<Mojolicious::Guides>,
-L<http://mojolicious.org>.
+L<https://mojolicious.org>.
 
 =cut

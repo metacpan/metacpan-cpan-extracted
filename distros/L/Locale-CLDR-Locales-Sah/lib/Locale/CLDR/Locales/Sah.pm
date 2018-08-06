@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Sah - Package for language Sakha
 
 package Locale::CLDR::Locales::Sah;
 # This file auto generated from Data\common\main\sah.xml
-#	on Fri 13 Apr  7:27:18 am GMT
+#	on Sun  5 Aug  6:20:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -1361,31 +1361,31 @@ has 'day_periods' => (
 	default		=> sub { {
 		'gregorian' => {
 			'format' => {
-				'narrow' => {
-					'pm' => q{ЭК},
+				'abbreviated' => {
 					'am' => q{ЭИ},
+					'pm' => q{ЭК},
 				},
 				'wide' => {
-					'pm' => q{ЭК},
 					'am' => q{ЭИ},
+					'pm' => q{ЭК},
 				},
-				'abbreviated' => {
+				'narrow' => {
 					'pm' => q{ЭК},
 					'am' => q{ЭИ},
 				},
 			},
 			'stand-alone' => {
 				'abbreviated' => {
-					'am' => q{ЭИ},
-					'pm' => q{ЭК},
-				},
-				'narrow' => {
 					'pm' => q{ЭК},
 					'am' => q{ЭИ},
 				},
 				'wide' => {
-					'am' => q{ЭИ},
 					'pm' => q{ЭК},
+					'am' => q{ЭИ},
+				},
+				'narrow' => {
+					'pm' => q{ЭК},
+					'am' => q{ЭИ},
 				},
 			},
 		},
@@ -1473,6 +1473,12 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			E => q{ccc},
+			Ed => q{d, E},
+			Gy => q{G y},
+			d => q{d},
+		},
 		'gregorian' => {
 			E => q{ccc},
 			EHm => q{E HH:mm},
@@ -1516,12 +1522,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{y QQQQ},
 			yw => q{Y 'сыл' w 'нэдиэлэтэ'},
 		},
-		'generic' => {
-			E => q{ccc},
-			Ed => q{d, E},
-			Gy => q{G y},
-			d => q{d},
-		},
 	} },
 );
 
@@ -1541,6 +1541,9 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			fallback => '{0} – {1}',
+		},
 		'gregorian' => {
 			H => {
 				H => q{HH–HH},
@@ -1635,9 +1638,6 @@ has 'datetime_formats_interval' => (
 				d => q{dd.MM.y – dd.MM.y},
 				y => q{y-MM-dd – y-MM-dd},
 			},
-		},
-		'generic' => {
-			fallback => '{0} – {1}',
 		},
 	} },
 );

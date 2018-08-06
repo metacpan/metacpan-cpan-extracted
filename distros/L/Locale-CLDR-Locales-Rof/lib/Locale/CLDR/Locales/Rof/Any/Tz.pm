@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Rof::Any::Tz - Package for language Rombo
 
 package Locale::CLDR::Locales::Rof::Any::Tz;
 # This file auto generated from Data\common\main\rof_TZ.xml
-#	on Fri 13 Apr  7:26:36 am GMT
+#	on Sun  5 Aug  6:19:21 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

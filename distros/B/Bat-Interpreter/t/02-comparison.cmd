@@ -1,10 +1,8 @@
 @echo off
 
-If 130 GTR 14
+If 130 GTR 14 goto label
 
-goto label
-
-echo Never get executed
+rm file1
 
 :label
 

@@ -72,7 +72,7 @@ Google::Ads::AdWords::v201806::ApiException
 Perl data type class for the XML Schema defined complexType
 ApiException from the namespace https://adwords.google.com/api/adwords/cm/v201806.
 
-
+Exception class for holding a list of service errors. 
 
 
 

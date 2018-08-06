@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Yo::Any::Ng - Package for language Yoruba
 
 package Locale::CLDR::Locales::Yo::Any::Ng;
 # This file auto generated from Data\common\main\yo_NG.xml
-#	on Fri 13 Apr  7:34:33 am GMT
+#	on Sun  5 Aug  6:28:15 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

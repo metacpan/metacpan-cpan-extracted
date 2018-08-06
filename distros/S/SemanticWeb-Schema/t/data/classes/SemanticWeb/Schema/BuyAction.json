@@ -1,0 +1,50 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of giving money to a seller in exchange for goods or services rendered. An agent buys an object, product, or service from a seller for a price. Reciprocal of SellAction.",
+      "rdfs:label" : "BuyAction",
+      "rdfs:subClassOf" : "schema:TradeAction"
+   },
+   "properties" : {
+      "schema:seller" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An entity which offers (sells / leases / lends / loans) the services / goods.  A seller may also be a provider.",
+         "rdfs:label" : "seller",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : [
+            "schema:BuyAction",
+            "schema:Demand",
+            "schema:Flight",
+            "schema:Order",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:vendor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "'vendor' is an earlier term for 'seller'.",
+         "rdfs:label" : "vendor",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : "schema:BuyAction",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ],
+         "schema:supersededBy" : "schema:seller"
+      },
+      "schema:warrantyPromise" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The warranty promise(s) included in the offer.",
+         "rdfs:label" : "warrantyPromise",
+         "schema:domainIncludes" : [
+            "schema:SellAction",
+            "schema:BuyAction"
+         ],
+         "schema:rangeIncludes" : "schema:WarrantyPromise",
+         "schema:supersededBy" : "schema:warranty"
+      }
+   }
+}

@@ -18,11 +18,11 @@ facility
 
 =head1 VERSION
 
-Version 1.0.0
+Version 1.1
 
 =cut
 
-use version; our $VERSION = version->declare('v1.0.0');
+use version; our $VERSION = version->declare('v1.1');
 
 =head1 SYNOPSIS
 
@@ -71,8 +71,10 @@ The include directives are identified through a regular expression
 If the text read from the source file matches the regular expression,
 then, in the output, the part of the text matching the regular
 expression is replaced with the contents of the identified include
-file.  This works recursively: The included file can itself include
-other files, using the same format for include directives.
+file, if that include file exists.  This works recursively: The
+included file can itself include other files, using the same format
+for include directives.  If an include file does not exist, then the
+include directive naming that file is not replaced.
 
 The include file is identified by the text corresponding to a
 particular capture group (C<< (?<include>...) >> or C<$1>) of the
@@ -116,7 +118,7 @@ not always be recognized.
 This works well for the L<CORE::readline|perlfunc/readline> function,
 for the L</getline> and L</getlines> methods, and for the angle
 brackets operator (C<< <$ih> >>), which read text up to and including
-the an input record separator (or the end of the data, whichever comes
+the input record separator (or the end of the data, whichever comes
 first).
 
 =head2 INCLUDE DIRECTIVES AND THE READ FUNCTION
@@ -127,12 +129,12 @@ text does not necessarily end with the input record separator, so it
 might end in the middle of an include directive, and then the include
 directive cannot be recognized.
 
-To resolve this problem, the L</read> function/method by default
-quietly read beyond the requested number of characters until the next
-input record separator or the end of the data is seen, so it can
-properly detect and resolve any include directives.  It then returns
-only up to the requested number of characters, and remembers the
-remainder for the next call.
+To resolve this problem, the L</read> function/method when called on
+an IO::ReadHandle::Include object by default quietly read beyond the
+requested number of characters until the next input record separator
+or the end of the data is seen, so it can properly detect and resolve
+any include directives.  It then returns only up to the requested
+number of characters, and remembers the remainder for the next call.
 
 This means that if the source file or an include file contains no
 input record separator at all and is read using the L</read>
@@ -480,20 +482,21 @@ sub READLINE {
 
         # the path is relative; it is relative to the directory of the
         # including file
-        $path = file( file( $self->_get('source') )->parent, $path )->resolve;
+        $path = file( file( $self->_get('source') )->parent, $path );
       }
-      CORE::open my $newifh, '<', "$path"
-        or croak "Cannot open include file '$path': $!";
-      my $suffix = substr( $line, $+[0] );    # text beyond the regex match
-      push @{ $self->_get('suffixes') }, $suffix;    # save for later
+      if ( CORE::open my $newifh, '<', "$path" ) {
+        my $suffix = substr( $line, $+[0] );    # text beyond the regex match
+        push @{ $self->_get('suffixes') }, $suffix;    # save for later
 
-      push @{ $self->_get('ifhs') },    $self->_get('ifh');     # save for later
-      push @{ $self->_get('sources') }, $self->_get('source');  # save for later
+        push @{ $self->_get('ifhs') }, $self->_get('ifh');    # save for later
+        push @{ $self->_get('sources') },
+          $self->_get('source');                              # save for later
 
-      $self->_set( ifh => $newifh )    # current source is included file
-        ->_set( source => $path );     # current source
-      $line = substr( $line, 0, $-[0] )    # text before the regex match
-        . $self->READLINE;    # append first line from included file
+        $self->_set( ifh => $newifh )    # current source is included file
+          ->_set( source => $path );     # current source
+        $line = substr( $line, 0, $-[0] )    # text before the regex match
+          . $self->READLINE;    # append first line from included file
+      }    # otherwise we leave the original text
     }
     return $line;
   }

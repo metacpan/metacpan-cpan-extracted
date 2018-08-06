@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A stadium.",
+      "rdfs:label" : "StadiumOrArena",
+      "rdfs:subClassOf" : [
+         "schema:SportsActivityLocation",
+         "schema:CivicStructure"
+      ]
+   },
+   "properties" : {}
+}

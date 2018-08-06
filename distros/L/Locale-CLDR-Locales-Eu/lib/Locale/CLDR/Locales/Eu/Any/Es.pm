@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Eu::Any::Es - Package for language Basque
 
 package Locale::CLDR::Locales::Eu::Any::Es;
 # This file auto generated from Data\common\main\eu_ES.xml
-#	on Fri 13 Apr  7:09:13 am GMT
+#	on Sun  5 Aug  5:59:52 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-APIcast
 
+0.17 2018-08-03T16:11:14Z
+   - Reset ServerPort variable when using custom test block.
+
 0.16 2018-07-25T15:11:19Z
    - Properly cleanup ENV back to uninitialized state.
 

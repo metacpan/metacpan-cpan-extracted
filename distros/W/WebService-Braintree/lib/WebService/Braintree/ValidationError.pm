@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::ValidationError;
-$WebService::Braintree::ValidationError::VERSION = '1.6';
+$WebService::Braintree::ValidationError::VERSION = '1.7';
 =head1 NAME
 
 WebService::Braintree::ValidationError

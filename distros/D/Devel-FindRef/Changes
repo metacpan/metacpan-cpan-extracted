@@ -14,6 +14,9 @@ TODO: 2], which is the global %main::main::`
 TODO:  on perl-5.22.3 or later versions. It makes me a little unhappy, but it's
 TODO: still acceptable to me~
 
+1.46 Sun Aug  5 13:28:55 CEST 2018
+	- work around API changes on debug perls, reported by various people.
+
 1.45 Fri Jun 23 20:27:07 CEST 2017
 	- port to 5.22 and maybe later versions, mostly based on the
           patch by Cindy Wang.

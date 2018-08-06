@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of capturing still images of objects using a camera.",
+      "rdfs:label" : "PhotographAction",
+      "rdfs:subClassOf" : "schema:CreateAction"
+   },
+   "properties" : {}
+}

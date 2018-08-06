@@ -176,7 +176,7 @@ find_ (SV *target_ref)
 
                           case SVt_PVCV:
                             {
-                              PADLIST *padlist = CvPADLIST (sv);
+                              PADLIST *padlist = CvISXSUB (cv) ? 0 : CvPADLIST (sv);
 
                               if (padlist)
                                 {

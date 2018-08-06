@@ -1,4 +1,4 @@
-package Pcore::API::PayPal v0.3.2;
+package Pcore::API::PayPal v0.3.3;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Util::Data qw[from_json to_json to_b64];
@@ -21,14 +21,14 @@ sub _get_access_token ( $self, $cb ) {
 
     P->http->post(
         ( $self->{sandbox} ? $SANDBOX_ENDPOINT : $LIVE_ENDPOINT ) . '/v1/oauth2/token',
-        headers => {
-            CONTENT_TYPE  => 'application/x-www-form-urlencoded',
-            ACCCEPT       => 'application/json',
-            AUTHORIZATION => 'Basic ' . to_b64( "$self->{id}:$self->{secret}", q[] ),
-        },
-        body      => 'grant_type=client_credentials',
-        on_finish => sub ($res) {
-            $self->{_access_token} = from_json $res->{body};
+        headers => [
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            Acccept        => 'application/json',
+            Authorization  => 'Basic ' . to_b64( "$self->{id}:$self->{secret}", q[] ),
+        ],
+        data => 'grant_type=client_credentials',
+        sub ($res) {
+            $self->{_access_token} = from_json $res->{data};
 
             $self->{_access_token}->{expires} = time + $self->{_access_token}->{expires_in} - 5;
 
@@ -48,22 +48,22 @@ sub create_payment ( $self, $payment, $cb ) {
 
         P->http->post(
             $url,
-            headers => {
-                CONTENT_TYPE  => 'application/json',
-                ACCCEPT       => 'application/json',
-                AUTHORIZATION => "$access_token->{token_type} $access_token->{access_token}",
-            },
-            body      => to_json($payment),
-            on_finish => sub ($res) {
+            headers => [
+                'Content-Type' => 'application/json',
+                Acccept        => 'application/json',
+                Authorization  => "$access_token->{token_type} $access_token->{access_token}",
+            ],
+            data => to_json($payment),
+            sub ($res) {
                 my $api_res;
 
                 if ( !$res ) {
-                    my $data = $res->{body} ? from_json $res->{body} : {};
+                    my $data = $res->{data} ? from_json $res->{data} : {};
 
                     $api_res = res [ $res->{status}, $data->{message} // $res->{reason} ];
                 }
                 else {
-                    my $data = from_json $res->{body};
+                    my $data = from_json $res->{data};
 
                     if ( $data->{state} eq 'failed' ) {
                         $api_res = res [ 400, $data->{failure_reason} ], $data;
@@ -92,22 +92,22 @@ sub exec_payment ( $self, $payment_id, $payer_id, $cb ) {
 
         P->http->post(
             $url,
-            headers => {
-                CONTENT_TYPE  => 'application/json',
-                ACCCEPT       => 'application/json',
-                AUTHORIZATION => "$access_token->{token_type} $access_token->{access_token}",
-            },
-            body      => to_json( { payer_id => $payer_id } ),
-            on_finish => sub ($res) {
+            headers => [
+                'Content-Type' => 'application/json',
+                Acccept        => 'application/json',
+                Authorization  => "$access_token->{token_type} $access_token->{access_token}",
+            ],
+            data => to_json( { payer_id => $payer_id } ),
+            sub ($res) {
                 my $api_res;
 
                 if ( !$res ) {
-                    my $data = $res->{body} ? from_json $res->{body} : {};
+                    my $data = $res->{data} ? from_json $res->{data} : {};
 
                     $api_res = res [ $res->{status}, $data->{message} // $res->{reason} ];
                 }
                 else {
-                    my $data = from_json $res->{body};
+                    my $data = from_json $res->{data};
 
                     if ( $data->{state} eq 'failed' ) {
                         $api_res = res [ 400, $data->{failure_reason} ], $data;
@@ -136,22 +136,22 @@ sub payout ( $self, $payment, $cb ) {
 
         P->http->post(
             $url,
-            headers => {
-                CONTENT_TYPE  => 'application/json',
-                ACCCEPT       => 'application/json',
-                AUTHORIZATION => "$access_token->{token_type} $access_token->{access_token}",
-            },
-            body      => to_json($payment),
-            on_finish => sub ($res) {
+            headers => [
+                'Content-Type' => 'application/json',
+                Acccept        => 'application/json',
+                Authorization  => "$access_token->{token_type} $access_token->{access_token}",
+            ],
+            data => to_json($payment),
+            sub ($res) {
                 my $api_res;
 
                 if ( !$res ) {
-                    my $data = $res->{body} ? from_json $res->{body} : {};
+                    my $data = $res->{data} ? from_json $res->{data} : {};
 
                     $api_res = res [ $res->{status}, $res->{reason} ], $data;
                 }
                 else {
-                    my $data = from_json $res->{body};
+                    my $data = from_json $res->{data};
 
                     $api_res = res 200, $data;
                 }

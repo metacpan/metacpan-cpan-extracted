@@ -129,12 +129,18 @@ CHANGES			(XXX - todo, +++ - where-todo/now-done)
 0.90_38b_00:
 	extract_help moved to ./utils/.
 	Update to version 3.8b with applied mouse patch
+		Apparently, mouse support (with back-connection) was added on 2000/01/22.
+			Between  GNUPLOT_20000122 and  GNUPLOT_20000211 ??? on https://github.com/gnuplot/gnuplot-old/releases?after=GNUPLOT_3_8_c
+				(These are between 3.8b and 3.8c.)
+		(We needed to remove this to allow executables to be standalone.)
 	gnuplot-3709-Nov-01-99.diff by Piotr Mikulik.
 	Make the x11 modified executable named gplt_x11b.
 	Update to Gnuplot.h from GP/PARI 2.2.3.
 
 0.90_38i_00:
 	Updated to CVS state of 2002/09/05.
+			The last commit https://github.com/gnuplot/gnuplot-old/commit/5cf666659aa4f215ab45b2de6ea03ce39f38fe84
+		Compare with state 3.8i (of 2002/11/27) on https://github.com/gnuplot/gnuplot-old/releases?after=gnuplot-3-8k-3
 	Make a PM modified executable named gplpmdrb.
 	Regenerate the POD.
 	Allow a missing ',' at the end of the line in the docs
@@ -262,3 +268,13 @@ XXX		temporarily disable sleep() in tek.trm.
 	New option 'none' to test.pl, which would test bookkeeping only.
 	Use $Config{cpprun} if present.
 XXX	When -DPNG_FOR_GIF???
+
+0.90380906:
+	Makefile.PL: use '&&' and $(MAKE) when passing to the subdirectory.
+	util.c and my_utils.c were missing windows.h.
+	MakeMaker of 5.22 (and, maybe, 5.20) started to call test_dynamic target in the daughter Makefile; need to include dummies.
+	(Now builds on Windows! — without "interesting” drivers.)
+	On Windows, ExtUtils::Liblist has different semantic.
+		(now builds with gd/png drivers, but crashes in png generation on Windows' strawberry-perl-5.22.2.1-32bit-PDL.)
+	Update gd.trm to match the new calling convention in libgd.  (Crash disappears.)
+	In test.pl, allow the terminal name to be builtin=NAME or perl=NAME to run only 1 test of 2 as: test.pl perl=png o.png p.png.

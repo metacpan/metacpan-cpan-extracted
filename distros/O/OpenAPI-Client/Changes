@@ -1,5 +1,8 @@
 Revision history for perl distribution OpenAPI-Client
 
+0.17 2018-08-02T16:00:20+0800
+ - Fix duplicate keys in test #13
+
 0.16 2018-07-06T16:08:35+0800
  - Fix "host" can contain port #12
 

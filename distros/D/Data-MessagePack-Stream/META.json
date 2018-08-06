@@ -1,0 +1,86 @@
+{
+   "abstract" : "yet another messagepack streaming deserializer",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-MessagePack-Stream",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Devel::PPPort" : "3.42",
+            "Module::Build" : "0.4005",
+            "Module::Build::XSUtil" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::MessagePack" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Data::MessagePack::Stream" : {
+         "file" : "lib/Data/MessagePack/Stream.pm",
+         "version" : "1.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/typester/Data-MessagePack-Stream/issues"
+      },
+      "homepage" : "https://github.com/typester/Data-MessagePack-Stream",
+      "repository" : {
+         "url" : "git://github.com/typester/Data-MessagePack-Stream.git",
+         "web" : "https://github.com/typester/Data-MessagePack-Stream"
+      }
+   },
+   "version" : "1.04",
+   "x_authority" : "cpan:TYPESTER",
+   "x_contributors" : [
+      "Daisuke Murase <typester@gmail.com>",
+      "Kang-min Liu <gugod@gugod.org>",
+      "Olivier Mengué <dolmen@cpan.org>",
+      "Sergey Zhuravlev <zhur@yandex-team.ru>",
+      "Shoichi Kaji <skaji@cpan.org>",
+      "Syohei YOSHIDA <syohex@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 0
+}

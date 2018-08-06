@@ -4,7 +4,7 @@
       "Jaap Karssenberg <pardus@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,6 +39,11 @@
          "requires" : {
             "perl" : "5.006001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
@@ -50,7 +55,7 @@
          "url" : "https://github.com/mbeijen/File-MimeInfo"
       }
    },
-   "version" : "0.28",
+   "version" : "0.29",
    "x_contributors" : [
       "Bernhard RosenkrÃ¤nzer <bero@lindev.ch>",
       "Christian Ludwig <chrissicool@gmail.com>",
@@ -60,9 +65,11 @@
       "Michiel Beijen <michiel.beijen@gmail.com>",
       "Nitish Bezzala <nbezzala@yahoo.com>",
       "Patrick Burroughs (Celti) <celti@celti.name>",
+      "Rudolf Leermakers <rudolf@hatsuseno.org>",
       "Sean Smith <ssmith@ncsgraphics.com>",
       "Stefan Seifert <nine@detonation.org>",
-      "brian m. carlson <sandals@crustytoothpaste.net>"
+      "brian m. carlson <sandals@crustytoothpaste.net>",
+      "gregor herrmann <gregoa@debian.org>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

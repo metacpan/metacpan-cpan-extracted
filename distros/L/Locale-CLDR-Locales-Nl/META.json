@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.32.0",
+            "Locale::CLDR" : "v0.33.0",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,39 +46,39 @@
    "provides" : {
       "Locale::CLDR::Locales::Nl" : {
          "file" : "lib/Locale/CLDR/Locales/Nl.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.33.0"
       },
       "Locale::CLDR::Locales::Nl::Any" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Any.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.33.0"
       },
       "Locale::CLDR::Locales::Nl::Any::Aw" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Any/Aw.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.33.0"
       },
       "Locale::CLDR::Locales::Nl::Any::Be" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Any/Be.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.33.0"
       },
       "Locale::CLDR::Locales::Nl::Any::Bq" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Any/Bq.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.33.0"
       },
       "Locale::CLDR::Locales::Nl::Any::Cw" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Any/Cw.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.33.0"
       },
       "Locale::CLDR::Locales::Nl::Any::Nl" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Any/Nl.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.33.0"
       },
       "Locale::CLDR::Locales::Nl::Any::Sr" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Any/Sr.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.33.0"
       },
       "Locale::CLDR::Locales::Nl::Any::Sx" : {
          "file" : "lib/Locale/CLDR/Locales/Nl/Any/Sx.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.33.0"
       }
    },
    "release_status" : "stable",
@@ -91,6 +91,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.32.0",
+   "version" : "v0.33.0",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

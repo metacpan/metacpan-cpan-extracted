@@ -37,6 +37,10 @@ static char *RCSid() { return RCSid("$Id: util.c,v 1.35 2002/09/02 21:03:27 miku
 #include <sys/types.h>
 #include <dirent.h>
 
+#ifdef WIN32		/* Need WIN32_FIND_DATA etc */
+#include <windows.h>
+#endif
+
 #include "util.h"
 
 #include "alloc.h"

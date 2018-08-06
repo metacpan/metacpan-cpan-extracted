@@ -674,7 +674,7 @@ Actions without controller (@{[scalar @$list2]}):
 TXT
 }
 
-my @route_cols = qw(request to name descr auth disable interval_ts);
+my @route_cols = qw(request host_re to name descr auth disable interval_ts);
 sub new_route {# показать маршруты к действию
   my $c = shift;
   my ($ns, $controll, $act) = $c->vars(qw'ns controll act');
@@ -930,7 +930,7 @@ See L<https://github.com/mche/Mojolicious-Plugin-RoutesAuthDBI/blob/master/Diagr
 
     $app->plugin('RoutesAuthDBI', 
         ...
-        admin => {< options below >},
+        admin => {< hashref options list below >},
         ...
     );
 
@@ -958,6 +958,10 @@ String. Is a url subprefix for trust admin urls of this module. See defaults bel
 =head3 role_admin
 
 String. Is a name of role for admonistrators.
+
+=head3 tables
+
+Hashref of any DB tables names. See L<Mojolicious::Plugin::RoutesAuthDBI::Schema#Default-variables-for-SQL-templates>.
 
 =head2 Default options
 

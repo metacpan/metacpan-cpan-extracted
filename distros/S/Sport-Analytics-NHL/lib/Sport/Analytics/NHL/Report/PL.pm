@@ -278,7 +278,6 @@ sub parse_penalty ($$) {
 	my $desc;
 	my $use_servedby = 0;
 	($event->{team1}, $desc) = ($event->{description} =~ /^\s*(\S\S\S)\s+(\S.*)/);
-	#print "D $desc\n";
 	if (! $event->{team1}) {
 		die "Strange no team in penalty " . Dumper($event)
 			unless $event->{description} =~ /team/i;
@@ -292,9 +291,7 @@ sub parse_penalty ($$) {
 		}
 		$desc =~ s/^(\#\d+)(\D.*?)\s+(?:PS\-)?([A-Z][a-z])/"$1 $3"/e;
 	}
-	#print "D $desc\n";
 	($event->{player1}, $desc) = ($desc =~ /^\#?(\d+|TEAM|\s)\s*(\S.*)/i);
-	#print "D $desc\n";
 	($event->{penalty}, $event->{length}, $desc) = ($desc =~ /^([A-Z][a-z].*\S)\((\d+) min\)(.*)/);
 	die "Bad description $event->{id}/$event->{description}" unless defined $desc;
 	if ($desc =~ /Drawn.By: (\S\S\S) #(\d+)/i) {
@@ -319,6 +316,7 @@ sub parse_penalty ($$) {
 			$COACH_PLAYER_ID : $BENCH_PLAYER_ID;
 	}
 	$event->{location} ||= 'Unk';
+	delete $event->{servedby} if $event->{servedby} && $event->{servedby} =~ /^80/;
 	$event;
 }
 
@@ -428,7 +426,6 @@ sub parse_description ($$) {
 	$event->{description} =~ tr/ / /;
 	my $evx = $BROKEN_EVENTS{PL}->{$self->{_id}};
 		$event->{description} = $evx->{$event->{id}}{description} if defined $evx->{$event->{id}} && $evx->{$event->{id}}{description};
-	#$event->{description} =~ tr/ / /;
 
 	return $self->parse_penalty($event) if $event->{type} eq 'PENL';
 
@@ -633,9 +630,6 @@ sub read_old_line ($$) {
 	my $event = {};
 	$event->{id} = $self->{so} ? $self->{events}[-1]{id}+3 : substr($line, 0, 5);
 	$event->{id} =~ s/\s//g;
-	#print Dumper $event;
-#	return $BROKEN_EVENTS{PL}->{$self->{_id}}{$event->{id}}
-#		if ($BROKEN_EVENTS{PL}->{$self->{_id}}{$event->{id}});
 	$event->{id}         += $self->{missed_events};
 	return undef if
 		defined $BROKEN_EVENTS{PL}->{$self->{_id}}->{$event->{id}} &&
@@ -646,7 +640,6 @@ sub read_old_line ($$) {
 	}
 	$event->{period}      = $self->{so} ? 5                   : substr($line, 5, 5);
 	$event->{period}      =~ s/\s//g;
-#	print Dumper $event->{period}, $self->{stage};
 	return undef if $event->{period} > 5 && $self->{stage} == $REGULAR;
 	$event->{type}        = substr($line, 16, 16);
 	$event->{team}        = substr($line, 34, 3);
@@ -736,7 +729,6 @@ sub read_playbyplay_old ($) {
 		for my $line (@lines) {
 			my $event = $self->read_old_line($line, $self);
 			next unless $event;
-#			print Dumper $event;
 			next if $event_cache->{$event->{id}};
 			$event_cache->{$event->{id}} = 1;
 			$self->cleanup_old_event($event);
@@ -808,9 +800,6 @@ sub read_event ($$) {
 		}
 	}
 	$event->{time} = '5:00' if $event->{type} eq 'PEND' && $event->{time} !~ /^\d+/;
-	#$Data::Dumper::Maxdepth = 1;
-	#print Dumper $event;
-	#$Data::Dumper::Maxdepth = 0;
 	$event;
 }
 
@@ -848,9 +837,7 @@ sub fill_broken_events ($) {
 	}
 	for my $event (@{$self->{events}}) {
 		next unless $evx->{$event->{id}};
-#		print Dumper $evx;
 		next if $event->{special};
-#		print Dumper $evx->{$event->{id}};
 		if ($evx->{$event->{id}}{on_ice}) {
 			$event->{on_ice} = $evx->{$event->{id}}{on_ice};
 		}
@@ -860,8 +847,6 @@ sub fill_broken_events ($) {
 		elsif ($evx->{$event->{id}}{on_ice}) {
 			$event->{on_ice}[1] = $evx->{$event->{id}}{on_ice2};
 		}
-#		print Dumper $event;
-#		exit;
 	}
 }
 
@@ -904,9 +889,7 @@ sub read_playbyplay ($) {
 		while (my $play_row = $self->get_sub_tree(0, [++$p], $main_table)) {
 			next unless ref $play_row && scalar @{$play_row->{_content}} >= @event_fields;
 			my $event = $self->read_event($play_row, $self->{_id});
-			#print Dumper $event;
 			next if ! $event || $self->skip_event($event);
-			#print $play_row->dump;
 			$self->parse_description($event);
 			next if $event->{type} eq 'CHL' && $event->{team1} eq 'html';
 			$self->parse_on_ice($event) unless $event->{type} eq 'GEND';
@@ -953,12 +936,8 @@ sub normalize ($$) {
 			}
 			$event->{penalty} =~ s/(game)-(\S)/"$1 - $2"/ie;
 		}
-		#$Data::Dumper::Maxdepth = 1;
-		#print Dumper $event;
-		#$Data::Dumper::Maxdepth = 0;
 		for my $v (qw(penalty miss shot_type stopreason strength)) {
 			next unless exists $event->{$v};
-			#print "$v was $event->{$v}\n";
 			if ($v eq 'stopreason') {
 				$event->{$v} = [ split(/\,/, $event->{$v}) ];
 				for my $ev (@{$event->{$v}}) {
@@ -971,7 +950,6 @@ sub normalize ($$) {
 			else {
 				$event->{$v} = vocabulary_lookup($v, $event->{$v});
 			}
-			#print "$v became $event->{$v}\n";
 		}
 		if ($event->{assist1}) {
 			$event->{assists} = [ $event->{assist1} ];

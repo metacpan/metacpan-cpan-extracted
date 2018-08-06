@@ -71,6 +71,7 @@
             "Cwd" : "0",
             "Digest" : "1.03",
             "Digest::SHA" : "5.45",
+            "Encode" : "0",
             "Exporter" : "5.57",
             "Fcntl" : "0",
             "File::Copy" : "0",
@@ -111,11 +112,11 @@
    "provides" : {
       "Path::Tiny" : {
          "file" : "lib/Path/Tiny.pm",
-         "version" : "0.106"
+         "version" : "0.108"
       },
       "Path::Tiny::Error" : {
          "file" : "lib/Path/Tiny.pm",
-         "version" : "0.106"
+         "version" : "0.108"
       }
    },
    "release_status" : "stable",
@@ -130,7 +131,7 @@
          "web" : "https://github.com/dagolden/Path-Tiny"
       }
    },
-   "version" : "0.106",
+   "version" : "0.108",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Alex Efros <powerman@powerman.name>",
@@ -151,6 +152,7 @@
       "John Karr <brainbuz@brainbuz.org>",
       "Karen Etheridge <ether@cpan.org>",
       "Mark Ellis <mark.ellis@cartridgesave.co.uk>",
+      "Martin H. Sluka <fany@cpan.org>",
       "Martin Kjeldsen <mk@bluepipe.dk>",
       "Michael G. Schwern <mschwern@cpan.org>",
       "Nigel Gregoire <nigelgregoire@gmail.com>",

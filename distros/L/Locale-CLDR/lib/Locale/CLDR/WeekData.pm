@@ -1,12 +1,12 @@
 package Locale::CLDR::WeekData;
 # This file auto generated from Data.xml
-#	on Fri 13 Apr  6:59:50 am GMT
+#	on Sun  5 Aug  5:49:13 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -153,7 +153,6 @@ has '_week_data_first_day' => (
 		'VA' => 'mon',
 		'VN' => 'mon',
 		'XK' => 'mon',
-		'BD' => 'fri',
 		'MV' => 'fri',
 		'AE' => 'sat',
 		'AF' => 'sat',
@@ -175,6 +174,7 @@ has '_week_data_first_day' => (
 		'AR' => 'sun',
 		'AS' => 'sun',
 		'AU' => 'sun',
+		'BD' => 'sun',
 		'BR' => 'sun',
 		'BS' => 'sun',
 		'BT' => 'sun',

@@ -1,9 +1,9 @@
-package Dist::Zilla::Plugin::GitHub; # git description: v0.44-11-g3a88cd8
+package Dist::Zilla::Plugin::GitHub; # git description: v0.45-15-g0dd51d0
 # ABSTRACT: Plugins to integrate Dist::Zilla with GitHub
 use strict;
 use warnings;
 
-our $VERSION = '0.45';
+our $VERSION = '0.46';
 
 use JSON::MaybeXS;
 use Moose;
@@ -33,6 +33,13 @@ has prompt_2fa => (
     is  => 'rw',
     isa => 'Bool',
     default => 0
+);
+
+has _login => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    builder => '_build_login',
 );
 
 has _credentials => (
@@ -65,10 +72,10 @@ has _credentials => (
 #pod
 #pod =cut
 
-sub _build_credentials {
+sub _build_login {
     my $self = shift;
 
-    my ($login, $pass, $token, $otp);
+    my ($login);
 
     my %identity = Config::Identity::GitHub->load
         if try_load_class('Config::Identity::GitHub');
@@ -85,8 +92,25 @@ sub _build_credentials {
             "Err: Missing value 'github.user' in git config";
 
         $self->log($error);
-        return [];
+        return undef;
     }
+
+    return $login;
+}
+
+sub _build_credentials {
+    my $self = shift;
+
+    my ($login, $pass, $token, $otp);
+
+    $login = $self->_login;
+
+    if (!$login) {
+        return {};
+    }
+
+    my %identity = Config::Identity::GitHub->load
+        if try_load_class('Config::Identity::GitHub');
 
     if (%identity) {
         $token = $identity{token};
@@ -165,7 +189,7 @@ sub _get_repo_name {
     $repo = $self->zilla->name unless $repo;
 
     if ($repo !~ /.*\/.*/) {
-        ($login, undef, undef) = $self->_get_credentials(1);
+        $login = $self->_login;
         if (defined $login) {
             $repo = "$login/$repo";
         }
@@ -203,6 +227,7 @@ sub _check_response {
     }
 }
 
+__PACKAGE__->meta->make_immutable;
 1; # End of Dist::Zilla::Plugin::GitHub
 
 __END__
@@ -217,7 +242,7 @@ Dist::Zilla::Plugin::GitHub - Plugins to integrate Dist::Zilla with GitHub
 
 =head1 VERSION
 
-version 0.45
+version 0.46
 
 =head1 DESCRIPTION
 
@@ -257,7 +282,7 @@ Alessandro Ghedini <alexbio@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alessandro Ghedini Karen Etheridge Dave Rolsky Mike Friedman Jeffrey Ryan Thalhammer Doherty Rafael Kitover Ricardo Signes Vyacheslav Matyukhin Alexandr Ciornii Brian Phillips Chris Weyl Ioan Rogers Jose Luis Perez Diez Mohammad S Anwar
+=for stopwords Alessandro Ghedini Karen Etheridge Dave Rolsky Mike Friedman Rafael Kitover Jeffrey Ryan Thalhammer Doherty Mohammad S Anwar Ricardo Signes Vyacheslav Matyukhin Alexandr Ciornii Brian Phillips Chris Weyl Ioan Rogers Joelle Maslak Jose Luis Perez Diez
 
 =over 4
 
@@ -279,6 +304,10 @@ Mike Friedman <mike.friedman@10gen.com>
 
 =item *
 
+Rafael Kitover <rkitover@cpan.org>
+
+=item *
+
 Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
 
 =item *
@@ -287,7 +316,7 @@ Mike Doherty <doherty@cs.dal.ca>
 
 =item *
 
-Rafael Kitover <rkitover@cpan.org>
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 
@@ -315,11 +344,11 @@ Ioan Rogers <ioan.rogers@gmail.com>
 
 =item *
 
-Jose Luis Perez Diez <jluis@escomposlinux.org>
+Joelle Maslak <jmaslak@antelope.net>
 
 =item *
 
-Mohammad S Anwar <mohammad.anwar@yahoo.com>
+Jose Luis Perez Diez <jluis@escomposlinux.org>
 
 =back
 

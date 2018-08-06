@@ -1,0 +1,49 @@
+{
+   "class" : {
+      "dc:source" : [
+         "schemadotorgsources2:TP-draws",
+         "schemadotorgsources:source_rNews"
+      ],
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A NewsArticle is an article whose content reports news, or provides background context and supporting materials for understanding the news.</p>\n\n<p>A more detailed overview of <a href=\"/docs/news.html\">schema.org News markup</a> is also available.",
+      "rdfs:label" : "NewsArticle",
+      "rdfs:subClassOf" : "schema:Article"
+   },
+   "properties" : {
+      "schema:dateline" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A <a href=\"https://en.wikipedia.org/wiki/Dateline\">dateline</a> is a brief piece of text included in news articles that describes where and when the story was written or filed though the date is often omitted. Sometimes only a placename is provided.",
+         "rdfs:label" : "dateline",
+         "schema:domainIncludes" : "schema:NewsArticle",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:printColumn" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The number of the column in which the NewsArticle appears in the print edition.",
+         "rdfs:label" : "printColumn",
+         "schema:domainIncludes" : "schema:NewsArticle",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:printEdition" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The edition of the print product in which the NewsArticle appears.",
+         "rdfs:label" : "printEdition",
+         "schema:domainIncludes" : "schema:NewsArticle",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:printPage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "If this NewsArticle appears in print, this field indicates the name of the page on which the article is found. Please note that this field is intended for the exact page name (e.g. A5, B18).",
+         "rdfs:label" : "printPage",
+         "schema:domainIncludes" : "schema:NewsArticle",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:printSection" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "If this NewsArticle appears in print, this field indicates the print section in which the article appeared.",
+         "rdfs:label" : "printSection",
+         "schema:domainIncludes" : "schema:NewsArticle",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

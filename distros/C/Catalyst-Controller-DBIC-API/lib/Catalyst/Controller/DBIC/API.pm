@@ -1,12 +1,12 @@
 package Catalyst::Controller::DBIC::API;
-$Catalyst::Controller::DBIC::API::VERSION = '2.006002';
+$Catalyst::Controller::DBIC::API::VERSION = '2.007002';
 #ABSTRACT: Provides a DBIx::Class web service automagically
 use Moose;
 BEGIN { extends 'Catalyst::Controller'; }
 
 use CGI::Expand ();
 use DBIx::Class::ResultClass::HashRefInflator;
-use JSON ();
+use JSON::MaybeXS ();
 use Test::Deep::NoTest('eq_deeply');
 use MooseX::Types::Moose(':all');
 use Moose::Util;
@@ -17,14 +17,14 @@ use namespace::autoclean;
 
 has '_json' => (
     is         => 'ro',
-    isa        => 'JSON',
+    isa        => JSON::MaybeXS::JSON(),
     lazy_build => 1,
 );
 
 sub _build__json {
 
     # no ->utf8 here because the request params get decoded by Catalyst
-    return JSON->new;
+    return JSON::MaybeXS->new;
 }
 
 with 'Catalyst::Controller::DBIC::API::StoredResultSource',
@@ -429,7 +429,7 @@ sub validate_object {
             }
 
             # check for multiple values
-            if ( ref($value) && !( reftype($value) eq reftype(JSON::true) ) )
+            if ( ref($value) && !( reftype($value) eq reftype(JSON::MaybeXS::true) ) )
             {
                 require Data::Dumper;
                 die
@@ -497,7 +497,7 @@ sub update_object_from_params {
 
     foreach my $key ( keys %$params ) {
         my $value = $params->{$key};
-        if ( ref($value) && !( reftype($value) eq reftype(JSON::true) ) ) {
+        if ( ref($value) && !( reftype($value) eq reftype(JSON::MaybeXS::true) ) ) {
             $self->update_object_relation( $c, $object,
                 delete $params->{$key}, $key );
         }
@@ -526,7 +526,7 @@ sub update_object_relation {
     if ($row) {
         foreach my $key ( keys %$related_params ) {
             my $value = $related_params->{$key};
-            if ( ref($value) && !( reftype($value) eq reftype(JSON::true) ) )
+            if ( ref($value) && !( reftype($value) eq reftype(JSON::MaybeXS::true) ) )
             {
                 $self->update_object_relation( $c, $row,
                     delete $related_params->{$key}, $key );
@@ -559,7 +559,7 @@ sub insert_object_from_params {
 
     my %rels;
     while ( my ( $key, $value ) = each %{$params} ) {
-        if ( ref($value) && !( reftype($value) eq reftype(JSON::true) ) ) {
+        if ( ref($value) && !( reftype($value) eq reftype(JSON::MaybeXS::true) ) ) {
             $rels{$key} = $value;
         }
 
@@ -615,8 +615,10 @@ sub end : Private {
 
     if ( $c->res->status == 200 ) {
         $c->stash->{ $self->stash_key }->{success} =
-            $self->use_json_boolean ? JSON::true : 'true';
-        if ( $self->return_object && $c->req->has_objects ) {
+            $self->use_json_boolean ? JSON::MaybeXS::true : 'true';
+        if ( $self->return_object
+            && $c->req->has_objects
+            && ! exists $c->stash->{ $self->stash_key }->{ $self->data_root } ) {
             my $returned_objects = [];
             push( @$returned_objects, $self->each_object_inflate( $c, $_ ) )
                 for map { $_->[0] } $c->req->all_objects;
@@ -628,7 +630,7 @@ sub end : Private {
     }
     else {
         $c->stash->{ $self->stash_key }->{success} =
-            $self->use_json_boolean ? JSON::false : 'false';
+            $self->use_json_boolean ? JSON::MaybeXS::false : 'false';
         $c->stash->{ $self->stash_key }->{messages} = $self->get_errors($c)
             if $self->has_errors($c);
 
@@ -697,7 +699,7 @@ Catalyst::Controller::DBIC::API - Provides a DBIx::Class web service automagical
 
 =head1 VERSION
 
-version 2.006002
+version 2.007002
 
 =head1 SYNOPSIS
 
@@ -728,7 +730,8 @@ version 2.006002
       ],
       ordered_by       => ['age'],
       search_exposes   => ['age', 'nickname', { cds => ['title', 'year'] }],
-      data_root        => 'data',
+      data_root        => 'list',
+      item_root        => 'data',
       use_json_boolean => 1,
       return_object    => 1,
       );
@@ -817,16 +820,23 @@ Controls where in stash request_data should be stored, and defaults to 'response
 
 =head3 data_root
 
-By default, the response data is serialized into
+By default, the response data of multiple item actions is serialized into
 $c->stash->{$self->stash_key}->{$self->data_root} and data_root defaults to
 'list' to preserve backwards compatibility. This is now configuable to meet
 the needs of the consuming client.
 
+=head3 item_root
+
+By default, the response data of single item actions is serialized into
+$c->stash->{$self->stash_key}->{$self->item_root} and item_root default to
+'data'.
+
 =head3 use_json_boolean
 
 By default, the response success status is set to a string value of "true" or
-"false". If this attribute is true, JSON's true() and false() will be used
-instead. Note, this does not effect other internal processing of boolean values.
+"false". If this attribute is true, JSON::MaybeXS's true() and false() will be
+used instead. Note, this does not effect other internal processing of boolean
+values.
 
 =head3 count_arg, page_arg, select_arg, search_arg, grouped_by_arg, ordered_by_arg, prefetch_arg, as_arg, total_entries_arg
 
@@ -1296,9 +1306,10 @@ status quo. The internals were revamped to use more modern tools such as Moose
 and its role system to refactor functionality out into self-contained roles.
 
 To this end, internally, this module now understands JSON boolean values (as
-represented by the JSON module) and will Do The Right Thing in handling those
-values. This means you can have ColumnInflators installed that can covert
-between JSON booleans and whatever your database wants for boolean values.
+represented by the JSON::MaybeXS module) and will Do The Right Thing in
+handling those values. This means you can have ColumnInflators installed that
+can covert between JSON booleans and whatever your database wants for boolean
+values.
 
 Validation for various *_allows or *_exposes is now accomplished via
 Data::DPath::Validator with a lightly simplified, via a subclass of
@@ -1352,7 +1363,7 @@ Samuel Kaufman <sam@socialflow.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al..
+This software is copyright (c) 2018 by Luke Saunders, Nicholas Perez, Alexander Hartmaier, et al.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,222 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An order is a confirmation of a transaction (a receipt), which can contain multiple line items, each represented by an Offer that has been accepted by the customer.",
+      "rdfs:label" : "Order",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:acceptedOffer" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The offer(s) -- e.g., product, quantity and price combinations -- included in the order.",
+         "rdfs:label" : "acceptedOffer",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : "schema:Offer"
+      },
+      "schema:billingAddress" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The billing address for the order.",
+         "rdfs:label" : "billingAddress",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : "schema:PostalAddress"
+      },
+      "schema:broker" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An entity that arranges for an exchange between a buyer and a seller.  In most cases a broker never acquires or releases ownership of a product or service involved in an exchange.  If it is not clear whether an entity is a broker, seller, or buyer, the latter two terms are preferred.",
+         "rdfs:label" : "broker",
+         "schema:domainIncludes" : [
+            "schema:Service",
+            "schema:Invoice",
+            "schema:Reservation",
+            "schema:Order"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      },
+      "schema:confirmationNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A number that confirms the given order or payment has been received.",
+         "rdfs:label" : "confirmationNumber",
+         "rdfs:subPropertyOf" : "schema:identifier",
+         "schema:domainIncludes" : [
+            "schema:Invoice",
+            "schema:Order"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:customer" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Party placing the order or paying the invoice.",
+         "rdfs:label" : "customer",
+         "schema:domainIncludes" : [
+            "schema:Order",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      },
+      "schema:discount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any discount applied (to an Order).",
+         "rdfs:label" : "discount",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:Text"
+         ]
+      },
+      "schema:discountCode" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Code used to redeem a discount.",
+         "rdfs:label" : "discountCode",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:discountCurrency" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The currency (in 3-letter ISO 4217 format) of the discount.",
+         "rdfs:label" : "discountCurrency",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:isGift" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Was the offer accepted as a gift for someone other than the buyer.",
+         "rdfs:label" : "isGift",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:merchant" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "'merchant' is an out-dated term for 'seller'.",
+         "rdfs:label" : "merchant",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ],
+         "schema:supersededBy" : "schema:seller"
+      },
+      "schema:orderDate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Date order was placed.",
+         "rdfs:label" : "orderDate",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:orderDelivery" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The delivery of the parcel related to this order or order item.",
+         "rdfs:label" : "orderDelivery",
+         "schema:domainIncludes" : [
+            "schema:OrderItem",
+            "schema:Order"
+         ],
+         "schema:rangeIncludes" : "schema:ParcelDelivery"
+      },
+      "schema:orderNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The identifier of the transaction.",
+         "rdfs:label" : "orderNumber",
+         "rdfs:subPropertyOf" : "schema:identifier",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:orderStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The current status of the order.",
+         "rdfs:label" : "orderStatus",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : "schema:OrderStatus"
+      },
+      "schema:orderedItem" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The item ordered.",
+         "rdfs:label" : "orderedItem",
+         "schema:domainIncludes" : [
+            "schema:Order",
+            "schema:OrderItem"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Product",
+            "schema:OrderItem"
+         ]
+      },
+      "schema:partOfInvoice" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The order is being paid as part of the referenced Invoice.",
+         "rdfs:label" : "partOfInvoice",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : "schema:Invoice"
+      },
+      "schema:paymentDue" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date that payment is due.",
+         "rdfs:label" : "paymentDue",
+         "schema:domainIncludes" : [
+            "schema:Order",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime",
+         "schema:supersededBy" : "schema:paymentDueDate"
+      },
+      "schema:paymentDueDate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date that payment is due.",
+         "rdfs:label" : "paymentDueDate",
+         "schema:domainIncludes" : [
+            "schema:Order",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:paymentMethod" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The name of the credit card or other method of payment for the order.",
+         "rdfs:label" : "paymentMethod",
+         "schema:domainIncludes" : [
+            "schema:Invoice",
+            "schema:Order"
+         ],
+         "schema:rangeIncludes" : "schema:PaymentMethod"
+      },
+      "schema:paymentMethodId" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An identifier for the method of payment used (e.g. the last 4 digits of the credit card).",
+         "rdfs:label" : "paymentMethodId",
+         "schema:domainIncludes" : [
+            "schema:Invoice",
+            "schema:Order"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:paymentUrl" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The URL for sending a payment.",
+         "rdfs:label" : "paymentUrl",
+         "schema:domainIncludes" : "schema:Order",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:seller" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An entity which offers (sells / leases / lends / loans) the services / goods.  A seller may also be a provider.",
+         "rdfs:label" : "seller",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : [
+            "schema:BuyAction",
+            "schema:Demand",
+            "schema:Flight",
+            "schema:Order",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Organization",
+            "schema:Person"
+         ]
+      }
+   }
+}

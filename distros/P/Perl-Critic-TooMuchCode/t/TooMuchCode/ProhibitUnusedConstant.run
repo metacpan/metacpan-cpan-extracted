@@ -1,0 +1,14 @@
+## name Basic
+## failures 1
+## cut
+
+use constant ANSWER => 42;
+say 42;
+
+## name Basic 1
+## failures 2
+## cut
+
+use constant QUESTION => 42;
+use constant ANSWER => 42;
+say 42;

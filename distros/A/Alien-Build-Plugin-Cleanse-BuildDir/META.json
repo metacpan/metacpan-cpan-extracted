@@ -59,6 +59,6 @@
          "url" : "https://github.com/shawnlaffan/Alien-Build-Plugin-Cleanse-BuildDir/"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

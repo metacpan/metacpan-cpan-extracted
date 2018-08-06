@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A public swimming pool.",
+      "rdfs:label" : "PublicSwimmingPool",
+      "rdfs:subClassOf" : "schema:SportsActivityLocation"
+   },
+   "properties" : {}
+}

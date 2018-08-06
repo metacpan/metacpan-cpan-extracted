@@ -1,0 +1,21 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:source_rNews",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An audio file.",
+      "rdfs:label" : "AudioObject",
+      "rdfs:subClassOf" : "schema:MediaObject"
+   },
+   "properties" : {
+      "schema:transcript" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "If this MediaObject is an AudioObject or VideoObject, the transcript of that object.",
+         "rdfs:label" : "transcript",
+         "schema:domainIncludes" : [
+            "schema:AudioObject",
+            "schema:VideoObject"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

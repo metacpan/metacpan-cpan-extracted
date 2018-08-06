@@ -1,5 +1,9 @@
 package Transport::AU::PTV::Run;
-$Transport::AU::PTV::Run::VERSION = '0.01';
+$Transport::AU::PTV::Run::VERSION = '0.03';
+# VERSION
+# PODNAME
+# ABSTRACT: a run on the Victorian Public Transport Network.
+
 use strict;
 use warnings;
 use 5.010;
@@ -42,11 +46,11 @@ __END__
 
 =head1 NAME
 
-Transport::AU::PTV::Run
+Transport::AU::PTV::Run - a run on the Victorian Public Transport Network.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 NAME
 

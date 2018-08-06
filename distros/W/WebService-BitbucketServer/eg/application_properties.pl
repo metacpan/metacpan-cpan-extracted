@@ -21,7 +21,7 @@ my $response = $api->core->get_application_properties;
 if (my $err = $response->error) {
     my $raw = $response->raw;
     print STDERR "Call failed: $raw->{status} $raw->{reason}\n";
-    print STDERR Dumper($response->error);
+    print STDERR Dumper($err);
     exit 1;
 }
 

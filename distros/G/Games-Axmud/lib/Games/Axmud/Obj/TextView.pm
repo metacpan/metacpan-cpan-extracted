@@ -600,17 +600,23 @@
 
                 return undef;
 
-            } elsif (! $self->monochromeFlag) {
+            } else {
 
                 # Make sure the colour scheme's colour/font values are acceptable, to avoid getting
                 #   nasty Gtk errors
                 $colourSchemeObj->repair();
 
-                # Update IVs (changes to colour schemes aren't applied in monochrome mode)
+                # Update IVs. When the colour scheme is updated, the scheme's colours aren't applied
+                #   in monochrome mode (but the fonts still are)
                 $self->ivPoke('colourScheme', $colourSchemeObj->name);
-                $self->ivPoke('textColour', $colourSchemeObj->textColour);
-                $self->ivPoke('underlayColour', $colourSchemeObj->underlayColour);
-                $self->ivPoke('backgroundColour', $colourSchemeObj->backgroundColour);
+
+                if (! $self->monochromeFlag) {
+
+                    $self->ivPoke('textColour', $colourSchemeObj->textColour);
+                    $self->ivPoke('underlayColour', $colourSchemeObj->underlayColour);
+                    $self->ivPoke('backgroundColour', $colourSchemeObj->backgroundColour);
+                }
+
                 $self->ivPoke('font', $colourSchemeObj->font);
                 $self->ivPoke('fontSize', $colourSchemeObj->fontSize);
             }
@@ -5489,6 +5495,17 @@
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->add_incompleteLink', @_);
         }
+
+        # DEBUG
+        # Temporary fix for (rare) problem of links placed after a line has finished, which causes
+        #   Gtk2 to crash
+        my $checkIter = $self->buffer->get_iter_at_line_offset($linkObj->lineNum, 0);
+        if ($checkIter->get_chars_in_line() <= $linkObj->posn) {
+
+            # Don't apply this link
+            return undef;
+        }
+        # DEBUG
 
         if ($linkObj->number != -1) {
 

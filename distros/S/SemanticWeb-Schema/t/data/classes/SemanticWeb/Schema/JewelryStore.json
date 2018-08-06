@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A jewelry store.",
+      "rdfs:label" : "JewelryStore",
+      "rdfs:subClassOf" : "schema:Store"
+   },
+   "properties" : {}
+}

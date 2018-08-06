@@ -1,0 +1,30 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A structured representation of food or drink items available from a FoodEstablishment.",
+      "rdfs:label" : "Menu",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:hasMenuItem" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A food or drink item contained in a menu or menu section.",
+         "rdfs:label" : "hasMenuItem",
+         "schema:domainIncludes" : [
+            "schema:MenuSection",
+            "schema:Menu"
+         ],
+         "schema:rangeIncludes" : "schema:MenuItem"
+      },
+      "schema:hasMenuSection" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A subgrouping of the menu (by dishes, course, serving time period, etc.).",
+         "rdfs:label" : "hasMenuSection",
+         "schema:domainIncludes" : [
+            "schema:Menu",
+            "schema:MenuSection"
+         ],
+         "schema:rangeIncludes" : "schema:MenuSection"
+      }
+   }
+}

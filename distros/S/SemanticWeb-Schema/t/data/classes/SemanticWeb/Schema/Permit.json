@@ -1,0 +1,71 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A permit issued by an organization, e.g. a parking pass.",
+      "rdfs:label" : "Permit",
+      "rdfs:subClassOf" : "schema:Intangible"
+   },
+   "properties" : {
+      "schema:issuedBy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The organization issuing the ticket or permit.",
+         "rdfs:label" : "issuedBy",
+         "schema:domainIncludes" : [
+            "schema:Ticket",
+            "schema:Permit"
+         ],
+         "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:issuedThrough" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The service through with the permit was granted.",
+         "rdfs:label" : "issuedThrough",
+         "schema:domainIncludes" : "schema:Permit",
+         "schema:rangeIncludes" : "schema:Service"
+      },
+      "schema:permitAudience" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The target audience for this permit.",
+         "rdfs:label" : "permitAudience",
+         "schema:domainIncludes" : "schema:Permit",
+         "schema:rangeIncludes" : "schema:Audience"
+      },
+      "schema:validFor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The time validity of the permit.",
+         "rdfs:label" : "validFor",
+         "schema:domainIncludes" : "schema:Permit",
+         "schema:rangeIncludes" : "schema:Duration"
+      },
+      "schema:validFrom" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date when the item becomes valid.",
+         "rdfs:label" : "validFrom",
+         "schema:domainIncludes" : [
+            "schema:MonetaryAmount",
+            "schema:Permit",
+            "schema:Demand",
+            "schema:PriceSpecification",
+            "schema:OpeningHoursSpecification",
+            "schema:LocationFeatureSpecification",
+            "schema:Offer"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:validIn" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The geographic area where the permit is valid.",
+         "rdfs:label" : "validIn",
+         "schema:domainIncludes" : "schema:Permit",
+         "schema:rangeIncludes" : "schema:AdministrativeArea"
+      },
+      "schema:validUntil" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date when the item is no longer valid.",
+         "rdfs:label" : "validUntil",
+         "schema:domainIncludes" : "schema:Permit",
+         "schema:rangeIncludes" : "schema:Date"
+      }
+   }
+}

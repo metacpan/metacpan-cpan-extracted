@@ -41,7 +41,7 @@ if ($] >= 5.005)
  {
   # Add PPM support stuff
   push(@macro,
-       ABSTRACT => 'Tk::tkTable - a Spreadsheet/Table Widget',
+       ABSTRACT => 'Tk Widget for Layout of Frames Similar to an IDE',
        AUTHOR   => 'jcerney@home.com (John Cerney)'
       );
   my $arch = ($^O eq 'MSWin32') ? $ENV{'PROCESSOR_ARCHITECTURE'} : $Config{'archname'};

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A city or town.",
+      "rdfs:label" : "City",
+      "rdfs:subClassOf" : "schema:AdministrativeArea"
+   },
+   "properties" : {}
+}

@@ -1,18 +1,16 @@
 Artistic                                 The "Artistic License"
 Changes                                  Differences from previous version
 Copying                                  The GNU General Public License
+fallback/const-c.inc                     Win32::UTCFileTime extension constants fallback file
+fallback/const-xs.inc                    Win32::UTCFileTime extension constants fallback file
 INSTALL                                  Detailed installation instructions
+lib/Win32/UTCFileTime.pm                 Win32::UTCFileTime extension Perl module
 LICENCE                                  The Licence
 Makefile.PL                              Makefile writer
 MANIFEST                                 This list of files
 MANIFEST.SKIP                            Manifest skip specs
-README                                   The Instructions
 ppport.h                                 Perl/Pollution/Portability header
-typemap                                  Win32::UTCFileTime extension interface types
-UTCFileTime.xs                           Win32::UTCFileTime extension external subroutines
-fallback/const-c.inc                     Win32::UTCFileTime extension constants fallback file
-fallback/const-xs.inc                    Win32::UTCFileTime extension constants fallback file
-lib/Win32/UTCFileTime.pm                 Win32::UTCFileTime extension Perl module
+README                                   The Instructions
 t/01_imports_01.t                        See if import options work
 t/01_imports_02.t                        See if import options work
 t/01_imports_03.t                        See if import options work
@@ -34,6 +32,11 @@ t/09_default_arg.t                       See if default arguments work
 t/10_stat_fh_leak.t                      See if stat(), lstat() or alt_stat() leak filehandles
 t/11_utime_fh_leak.t                     See if utime() leaks filehandles
 t/12_errstr.t                            See if $ErrStr variable works
-t/13_pod.t                               See if POD is OK
+t/13_changes.t                           See if Changes file format is OK
+t/14_critic.t                            See if coding style is OK
+t/15_pod.t                               See if POD is OK
+t/16_pod_coverage.t                      See if POD coveage is OK
+typemap                                  Win32::UTCFileTime extension interface types
+UTCFileTime.xs                           Win32::UTCFileTime extension external subroutines
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

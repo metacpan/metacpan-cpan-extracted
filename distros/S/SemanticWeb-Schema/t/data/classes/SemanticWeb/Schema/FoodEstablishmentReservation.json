@@ -1,0 +1,43 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A reservation to dine at a food-related business.Note: This type is for information about actual reservations, e.g. in confirmation emails or HTML pages with individual confirmations of reservations.",
+      "rdfs:label" : "FoodEstablishmentReservation",
+      "rdfs:subClassOf" : "schema:Reservation"
+   },
+   "properties" : {
+      "schema:endTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The endTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to end. For actions that span a period of time, when the action was performed. e.g. John wrote a book from January to <em>December</em>.</p>\n\n<p>Note that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
+         "rdfs:label" : "endTime",
+         "schema:domainIncludes" : [
+            "schema:FoodEstablishmentReservation",
+            "schema:Action"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
+      "schema:partySize" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Number of people the reservation should accommodate.",
+         "rdfs:label" : "partySize",
+         "schema:domainIncludes" : [
+            "schema:TaxiReservation",
+            "schema:FoodEstablishmentReservation"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:QuantitativeValue",
+            "schema:Integer"
+         ]
+      },
+      "schema:startTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The startTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to start. For actions that span a period of time, when the action was performed. e.g. John wrote a book from <em>January</em> to December.</p>\n\n<p>Note that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
+         "rdfs:label" : "startTime",
+         "schema:domainIncludes" : [
+            "schema:FoodEstablishmentReservation",
+            "schema:Action"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      }
+   }
+}

@@ -1,0 +1,39 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>The act of playing/exercising/training/performing for enjoyment, leisure, recreation, Competition or exercise.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/ListenAction\">ListenAction</a>: Unlike ListenAction (which is under ConsumeAction), PlayAction refers to performing for an audience or at an event, rather than consuming music.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/WatchAction\">WatchAction</a>: Unlike WatchAction (which is under ConsumeAction), PlayAction refers to showing/displaying for an audience or at an event, rather than consuming visual content.</li>\n</ul>\n",
+      "rdfs:label" : "PlayAction",
+      "rdfs:subClassOf" : "schema:Action"
+   },
+   "properties" : {
+      "schema:audience" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An intended audience, i.e. a group for whom something was created.",
+         "rdfs:label" : "audience",
+         "schema:domainIncludes" : [
+            "schema:Product",
+            "schema:Service",
+            "schema:LodgingBusiness",
+            "schema:Event",
+            "schema:CreativeWork",
+            "schema:PlayAction"
+         ],
+         "schema:rangeIncludes" : "schema:Audience"
+      },
+      "schema:event" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Upcoming or past event associated with this place, organization, or action.",
+         "rdfs:label" : "event",
+         "schema:domainIncludes" : [
+            "schema:JoinAction",
+            "schema:PlayAction",
+            "schema:InformAction",
+            "schema:Organization",
+            "schema:Place",
+            "schema:LeaveAction",
+            "schema:InviteAction"
+         ],
+         "schema:rangeIncludes" : "schema:Event"
+      }
+   }
+}

@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An historical landmark or building.",
+      "rdfs:label" : "LandmarksOrHistoricalBuildings",
+      "rdfs:subClassOf" : "schema:Place"
+   },
+   "properties" : {}
+}

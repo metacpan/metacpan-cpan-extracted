@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A house painting service.",
+      "rdfs:label" : "HousePainter",
+      "rdfs:subClassOf" : "schema:HomeAndConstructionBusiness"
+   },
+   "properties" : {}
+}

@@ -1,5 +1,9 @@
 package Transport::AU::PTV::Collection;
-$Transport::AU::PTV::Collection::VERSION = '0.01';
+$Transport::AU::PTV::Collection::VERSION = '0.03';
+# VERSION
+# PODNAME
+# ABSTRACT: collection parent class.
+
 use strict;
 use warnings;
 use 5.010;
@@ -103,11 +107,11 @@ __END__
 
 =head1 NAME
 
-Transport::AU::PTV::Collection
+Transport::AU::PTV::Collection - collection parent class.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 NAME
 

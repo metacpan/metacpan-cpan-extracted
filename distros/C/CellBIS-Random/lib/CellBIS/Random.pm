@@ -8,7 +8,7 @@ use Scalar::Util qw(blessed weaken);
 use List::SomeUtils qw(part);
 
 # ABSTRACT: Tool for Randomize characters in strings.
-our $VERSION = '0.1';
+our $VERSION = '0.3';
 
 # Constructor :
 # ------------------------------------------------------------------------
@@ -43,13 +43,12 @@ sub random {
     unless $arg_len == 2 or $arg_len >= 3;
   
   if (blessed($self)) {
-    $string = $self->{string};
+    $string = $self->{string} if defined($self->{string});
+    $string //= 'Is Empty';
     ($count_odd, $count_even) = @_ if ($arg_len >= 2);
-    ($count_odd, $count_even, $nested) = @_ if ($arg_len >= 3);
-    ($string, $count_odd, $count_even, $nested) = @_ if ($arg_len >= 4);
+    ($string, $count_odd, $count_even) = @_ if ($arg_len >= 3);
   } else {
     ($string, $count_odd, $count_even) = @_ if ($arg_len >= 3);
-    ($string, $count_odd, $count_even, $nested) = @_ if ($arg_len >= 4);
   }
   
   my $result = $string;
@@ -128,13 +127,12 @@ sub unrandom {
     unless $arg_len == 2 or $arg_len >= 3;
   
   if (blessed($self)) {
-    $string = $self->{string};
+    $string = $self->{string} if $self->{string};
+    $string //= 'Is Empty';
     ($count_odd, $count_even) = @_ if ($arg_len >= 2);
-    ($count_odd, $count_even, $nested) = @_ if ($arg_len >= 3);
-    ($string, $count_odd, $count_even, $nested) = @_ if ($arg_len >= 4);
+    ($string, $count_odd, $count_even) = @_ if ($arg_len >= 3);
   } else {
     ($string, $count_odd, $count_even) = @_ if ($arg_len >= 3);
-    ($string, $count_odd, $count_even, $nested) = @_ if ($arg_len >= 4);
   }
   
   my $result = $string;
@@ -422,6 +420,10 @@ If using Object Oriented, you can use 2 arguments. But if using Procedural, you 
   $rand->random(2, 3);
   $rand->unrandom(2, 3);
   
+  # Or Arguments : <your_string_to_random>, <number_of_random_odd>, <number_of_random_even>
+  $rand->random('your string to random', 2, 3);
+  $rand->unrandom('result of random to extract', 2, 3);
+  
   # Procedural
   # Arguemnts : <your_string_to_random>, <number_of_random_odd>, <number_of_random_even>
   CellBIS::Random->random('your string to random', 2, 3);
@@ -525,6 +527,24 @@ Case 2
   
   # For Random
   $rand->set_string('my string here');
+  my $result_random = $rand->random('my string here', 2, 3);
+  
+  print "Random Result : $result_random \n";
+  
+  =====================================================
+  
+  # For Extract Random
+  my $extract_random = $rand->unrandom($result_random, 2, 3);
+  
+  print "Extract Random Result : $extract_random \n";
+  
+Case 3
+
+  use CellBIS::Random;
+  
+  my $rand = CellBIS::Random->new();
+  
+  # For Random
   my $result_random = $rand->random('my string here', 2, 3);
   
   print "Random Result : $result_random \n";

@@ -52,8 +52,8 @@ INSTALLATION
 
     for more details.
 
-    On Windows, you will need to use "nmake" or "dmake" rather than "make" in
-    the commands above, depending on what your perl was built with.  To
-    determine which make program was used to build your perl type the following:
+    Use the appropriate program name instead of "make" in the above commands if
+    your perl was built with a different make program.  To determine which make
+    program was used to build your perl type the following:
 
         perl -V:make

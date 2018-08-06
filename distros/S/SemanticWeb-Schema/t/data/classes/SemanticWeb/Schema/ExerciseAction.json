@@ -1,0 +1,94 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of participating in exertive activity for the purposes of improving health and fitness.",
+      "rdfs:label" : "ExerciseAction",
+      "rdfs:subClassOf" : "schema:PlayAction"
+   },
+   "properties" : {
+      "schema:course" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of location. The course where this action was taken.",
+         "rdfs:label" : "course",
+         "rdfs:subPropertyOf" : "schema:location",
+         "schema:domainIncludes" : "schema:ExerciseAction",
+         "schema:rangeIncludes" : "schema:Place",
+         "schema:supersededBy" : "schema:exerciseCourse"
+      },
+      "schema:distance" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The distance travelled, e.g. exercising or travelling.",
+         "rdfs:label" : "distance",
+         "schema:domainIncludes" : [
+            "schema:TravelAction",
+            "schema:ExerciseAction"
+         ],
+         "schema:rangeIncludes" : "schema:Distance"
+      },
+      "schema:exerciseCourse" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of location. The course where this action was taken.",
+         "rdfs:label" : "exerciseCourse",
+         "rdfs:subPropertyOf" : "schema:location",
+         "schema:domainIncludes" : "schema:ExerciseAction",
+         "schema:rangeIncludes" : "schema:Place"
+      },
+      "schema:fromLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of location. The original location of the object or the agent before the action.",
+         "rdfs:label" : "fromLocation",
+         "rdfs:subPropertyOf" : "schema:location",
+         "schema:domainIncludes" : [
+            "schema:MoveAction",
+            "schema:TransferAction",
+            "schema:ExerciseAction"
+         ],
+         "schema:rangeIncludes" : "schema:Place"
+      },
+      "schema:opponent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The opponent on this action.",
+         "rdfs:label" : "opponent",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : "schema:ExerciseAction",
+         "schema:rangeIncludes" : "schema:Person"
+      },
+      "schema:sportsActivityLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of location. The sports activity location where this action occurred.",
+         "rdfs:label" : "sportsActivityLocation",
+         "rdfs:subPropertyOf" : "schema:location",
+         "schema:domainIncludes" : "schema:ExerciseAction",
+         "schema:rangeIncludes" : "schema:SportsActivityLocation"
+      },
+      "schema:sportsEvent" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of location. The sports event where this action occurred.",
+         "rdfs:label" : "sportsEvent",
+         "rdfs:subPropertyOf" : "schema:location",
+         "schema:domainIncludes" : "schema:ExerciseAction",
+         "schema:rangeIncludes" : "schema:SportsEvent"
+      },
+      "schema:sportsTeam" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The sports team that participated on this action.",
+         "rdfs:label" : "sportsTeam",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : "schema:ExerciseAction",
+         "schema:rangeIncludes" : "schema:SportsTeam"
+      },
+      "schema:toLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of location. The final location of the object or the agent after the action.",
+         "rdfs:label" : "toLocation",
+         "rdfs:subPropertyOf" : "schema:location",
+         "schema:domainIncludes" : [
+            "schema:InsertAction",
+            "schema:ExerciseAction",
+            "schema:TransferAction",
+            "schema:MoveAction"
+         ],
+         "schema:rangeIncludes" : "schema:Place"
+      }
+   }
+}

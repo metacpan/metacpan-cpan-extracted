@@ -1,0 +1,37 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The act of authoring written creative content.",
+      "rdfs:label" : "WriteAction",
+      "rdfs:subClassOf" : "schema:CreateAction"
+   },
+   "properties" : {
+      "schema:inLanguage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/availableLanguage\">availableLanguage</a>.",
+         "rdfs:label" : "inLanguage",
+         "schema:domainIncludes" : [
+            "schema:CommunicateAction",
+            "schema:CreativeWork",
+            "schema:WriteAction",
+            "schema:Event"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Language",
+            "schema:Text"
+         ]
+      },
+      "schema:language" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of instrument. The language used on this action.",
+         "rdfs:label" : "language",
+         "rdfs:subPropertyOf" : "schema:instrument",
+         "schema:domainIncludes" : [
+            "schema:CommunicateAction",
+            "schema:WriteAction"
+         ],
+         "schema:rangeIncludes" : "schema:Language",
+         "schema:supersededBy" : "schema:inLanguage"
+      }
+   }
+}

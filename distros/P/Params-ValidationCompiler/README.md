@@ -4,7 +4,7 @@ Params::ValidationCompiler - Build an optimized subroutine parameter validator o
 
 # VERSION
 
-version 0.27
+version 0.30
 
 # SYNOPSIS
 
@@ -73,68 +73,107 @@ parameters as key/value pairs or a list of values.
 In addition to type checks, it also supports parameter defaults, optional
 parameters, and extra "slurpy" parameters.
 
-# EXPORTS
+# PARAMETERS
 
 This module has two options exports, `validation_for` and `source_for`. Both
 of these subs accept the same options:
 
-- params
+## params
 
-    An arrayref or hashref containing a parameter specification.
+An arrayref or hashref containing a parameter specification.
 
-    If you pass a hashref then the generated validator sub will expect named
-    parameters. The `params` value should be a hashref where the parameter names
-    are keys and the specs are the values.
+If you pass a hashref then the generated validator sub will expect named
+parameters. The `params` value should be a hashref where the parameter names
+are keys and the specs are the values.
 
-    If you pass an arrayref and `named_to_list` is false, the validator will
-    expect positional params. Each element of the `params` arrayref should be a
-    parameter spec.
+If you pass an arrayref and `named_to_list` is false, the validator will
+expect positional params. Each element of the `params` arrayref should be a
+parameter spec.
 
-    If you pass an arrayref and `named_to_list` is true, the validator will
-    expect named params, but will return a list of values. In this case the
-    arrayref should contain a _list_ of key/value pairs, where parameter names
-    are the keys and the specs are the values.
+If you pass an arrayref and `named_to_list` is true, the validator will
+expect named params, but will return a list of values. In this case the
+arrayref should contain a _list_ of key/value pairs, where parameter names
+are the keys and the specs are the values.
 
-    Each spec can contain either a boolean or hashref. If the spec is a boolean,
-    this indicates required (true) or optional (false).
+Each spec can contain either a boolean or hashref. If the spec is a boolean,
+this indicates required (true) or optional (false).
 
-    The spec hashref accepts the following keys:
+The spec hashref accepts the following keys:
 
-    - type
+- type
 
-        A type object. This can be a [Moose](https://metacpan.org/pod/Moose) type (from [Moose](https://metacpan.org/pod/Moose) or
-        [MooseX::Types](https://metacpan.org/pod/MooseX::Types)), a [Type::Tiny](https://metacpan.org/pod/Type::Tiny) type, or a [Specio](https://metacpan.org/pod/Specio) type.
+    A type object. This can be a [Moose](https://metacpan.org/pod/Moose) type (from [Moose](https://metacpan.org/pod/Moose) or
+    [MooseX::Types](https://metacpan.org/pod/MooseX::Types)), a [Type::Tiny](https://metacpan.org/pod/Type::Tiny) type, or a [Specio](https://metacpan.org/pod/Specio) type.
 
-        If the type has coercions, those will always be used.
+    If the type has coercions, those will always be used.
 
-    - default
+- default
 
-        This can either be a simple (non-reference) scalar or a subroutine
-        reference. The sub ref will be called without any arguments (for now).
+    This can either be a simple (non-reference) scalar or a subroutine
+    reference. The sub ref will be called without any arguments (for now).
 
-    - optional
+- optional
 
-        A boolean indicating whether or not the parameter is optional. By default,
-        parameters are required unless you provide a default.
+    A boolean indicating whether or not the parameter is optional. By default,
+    parameters are required unless you provide a default.
 
-- slurpy
+## slurpy
 
-    If this is a simple true value, then the generated subroutine accepts
-    additional arguments not specified in `params`. By default, extra arguments
-    cause an exception.
+If this is a simple true value, then the generated subroutine accepts
+additional arguments not specified in `params`. By default, extra arguments
+cause an exception.
 
-    You can also pass a type constraint here, in which case all extra arguments
-    must be values of the specified type.
+You can also pass a type constraint here, in which case all extra arguments
+must be values of the specified type.
 
-- named\_to\_list
+## named\_to\_list
 
-    If this is true, the generated subroutine will expect a list of key-value
-    pairs or a hashref and it will return a list containing only values. The
-    `params` you pass must be a arrayref of key-value pairs. The order of these
-    pairs determines the order in which values are returned.
+If this is true, the generated subroutine will expect a list of key-value
+pairs or a hashref and it will return a list containing only values. The
+`params` you pass must be a arrayref of key-value pairs. The order of these
+pairs determines the order in which values are returned.
 
-    You cannot combine `slurpy` with `named_to_list` as there is no way to know
-    how to order the extra return values.
+You cannot combine `slurpy` with `named_to_list` as there is no way to know
+how to order the extra return values.
+
+## return\_object
+
+If this is true, the generated subroutine will return an object instead of a
+hashref. You cannot set this option to true if you set either or `slurpy` or
+`named_to_list`.
+
+The object's methods correspond to the parameter names passed to the
+subroutine. While calling methods on an object is slower than accessing a
+hashref, the advantage is that if you typo a parameter name you'll get a
+helpful error.
+
+If you have [Class::XSAccessor](https://metacpan.org/pod/Class::XSAccessor) installed then this will be used to create
+the class's methods, which makes it fairly fast.
+
+The returned object is in a generated class. Do not rely on this class name
+being anything in specific, and don't check this object using `isa`, `DOES`,
+or anything similar.
+
+When `return_object` is true, the parameter spec hashref also accepts to the
+following additional keys:
+
+- getter
+
+    Use this to set an explicit getter method name for the parameter. By default
+    the method name will be the same as the parameter name. Note that if the
+    parameter name is not a valid sub name, then you will get an error compiling
+    the validation sub unless you specify a getter for the parameter.
+
+- predicate
+
+    Use this to ask for a predicate method to be created for this parameter. The
+    predicate method returns true if the parameter was passed and false if it
+    wasn't. Note that this is only useful for optional parameters, but you can ask
+    for a predicate for any parameter.
+
+# EXPORTS
+
+The exported subs are:
 
 ## validation\_for(...)
 

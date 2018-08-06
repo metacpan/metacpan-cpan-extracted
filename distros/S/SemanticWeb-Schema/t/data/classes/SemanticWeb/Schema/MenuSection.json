@@ -1,0 +1,30 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A sub-grouping of food or drink items in a menu. E.g. courses (such as 'Dinner', 'Breakfast', etc.), specific type of dishes (such as 'Meat', 'Vegan', 'Drinks', etc.), or some other classification made by the menu provider.",
+      "rdfs:label" : "MenuSection",
+      "rdfs:subClassOf" : "schema:CreativeWork"
+   },
+   "properties" : {
+      "schema:hasMenuItem" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A food or drink item contained in a menu or menu section.",
+         "rdfs:label" : "hasMenuItem",
+         "schema:domainIncludes" : [
+            "schema:MenuSection",
+            "schema:Menu"
+         ],
+         "schema:rangeIncludes" : "schema:MenuItem"
+      },
+      "schema:hasMenuSection" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A subgrouping of the menu (by dishes, course, serving time period, etc.).",
+         "rdfs:label" : "hasMenuSection",
+         "schema:domainIncludes" : [
+            "schema:Menu",
+            "schema:MenuSection"
+         ],
+         "schema:rangeIncludes" : "schema:MenuSection"
+      }
+   }
+}

@@ -1021,7 +1021,7 @@ BEGIN {
   require DynaLoader;
   require Exporter;
 
-  $VERSION = '0.90380905';	# 3.8i + our build (05 etc)
+  $VERSION = '0.90380906';	# pre-3.8i + our build (06 etc)
   @ISA = qw(Exporter DynaLoader);
   bootstrap Term::Gnuplot;		# Get prototypes early
 }

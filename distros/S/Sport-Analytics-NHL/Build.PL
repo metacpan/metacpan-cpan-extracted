@@ -44,12 +44,18 @@ my $builder = Module::Build->new(
 	},
 	recommends         => {
 		'MongoDB' => 'v1.6.0',
+		'File::Touch' => 0,
 	},
 	add_to_cleanup     => [ 'Sport-Analytics-NHL-*' ],
 	script_files       => {
 		'scripts/scrape'           => 'blib/scripts/scrape',
 		'scripts/compile'          => 'blib/scripts/compile',
 		'scripts/compile-schedule' => 'blib/scripts/compile-schedule',
+		'scripts/merge'          => 'blib/scripts/merge',
+		'scripts/merge-schedule' => 'blib/scripts/merge-schedule',
+		'scripts/normalize'          => 'blib/scripts/normalize',
+		'scripts/normalize-schedule' => 'blib/scripts/normalize-schedule',
+		'scripts/test-consistency' => 'blib/scripts/test-consistency',
 	},
 );
 

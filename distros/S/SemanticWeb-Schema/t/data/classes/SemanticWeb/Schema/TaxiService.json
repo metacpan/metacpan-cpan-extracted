@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A service for a vehicle for hire with a driver for local travel. Fares are usually calculated based on distance traveled.",
+      "rdfs:label" : "TaxiService",
+      "rdfs:subClassOf" : "schema:Service"
+   },
+   "properties" : {}
+}

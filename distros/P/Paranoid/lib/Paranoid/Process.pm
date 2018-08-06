@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Process.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+# $Id: lib/Paranoid/Process.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -28,7 +28,7 @@ use Paranoid::Debug qw(:all);
 use POSIX qw(getuid setuid setgid WNOHANG setsid);
 use Carp;
 
-($VERSION) = ( q$Revision: 2.05 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT    = qw(switchUser daemonize);
 @EXPORT_OK = (
@@ -187,6 +187,7 @@ use Carp;
 {
     my $maxChildren = 0;
     my $numChildren = 0;
+    my @forkedPIDs  = ();
     my $chldRef     = undef;
 
     sub MAXCHILDREN : lvalue {
@@ -202,6 +203,11 @@ use Carp;
     sub _incrChildren { $numChildren++ }
     sub _decrChildren { $numChildren-- }
 
+    sub _resetChildren {
+        @forkedPIDs  = ();
+        $numChildren = 0;
+    }
+
     sub installChldHandler (\&) {
 
         # Purpose:  Installs a code reference to execute whenever a child
@@ -214,6 +220,19 @@ use Carp;
         return 1;
     }
     sub _chldHandler { return $chldRef }
+
+    sub _addPID { push @forkedPIDs, shift }
+
+    sub _grepPID {
+        my $pid = shift;
+        return scalar grep { $_ == $pid } @forkedPIDs;
+    }
+
+    sub _delPID {
+        my $pid = shift;
+        @forkedPIDs = grep { $_ != $pid } @forkedPIDs;
+        return 1;
+    }
 }
 
 sub sigchld {
@@ -226,15 +245,16 @@ sub sigchld {
     my $sref = _chldHandler();
 
     # Remove the signal handler so we're not preempted
-    local $SIG{CHLD} = sub { 1 };
+    local $SIG{CHLD} = sub {1};
 
     # Process children exit values
     do {
         $pid = waitpid -1, WNOHANG;
-        if ( $pid > 0 ) {
+        if ( $pid > 0 and _grepPID($pid) ) {
             _decrChildren();
+            _delPID($pid);
             pdebug( 'child %d reaped w/rv: %s', PDLEVEL1, $pid, $? );
-            pdebug( 'children remaining: %s', PDLEVEL1, childrenCount());
+            pdebug( 'children remaining: %s', PDLEVEL1, childrenCount() );
 
             # Call the user's sig handler if defined
             &$sref( $pid, $? ) if defined $sref;
@@ -306,7 +326,14 @@ sub pfork {
 
     # Fork and return
     $rv = fork;
-    _incrChildren() if defined $rv;
+    if ( defined $rv ) {
+        if ( $rv > 0 ) {
+            _incrChildren();
+            _addPID($rv);
+        } else {
+            _resetChildren();
+        }
+    }
 
     pOut();
     pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
@@ -525,7 +552,7 @@ Paranoid::Process - Process Management Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Process.pm, 2.05 2017/02/06 01:48:57 acorliss Exp $
+$Id: lib/Paranoid/Process.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -576,6 +603,11 @@ forked at a time by B<pfork>.  The default is zero, which allows unlimited
 children.  Once the limit is met pfork becomes a blocking call until a child 
 exits so the new one can be spawned.
 
+B<NOTE:> This limit on children is enforced on a per-process basis.  That
+means that while a process is limited to the max threshold, its children
+could also fork their own batch of children as well, up to whatever max is set
+in those processes.
+
 =head2 childrenCount
 
   $count = childrenCount();
@@ -587,8 +619,8 @@ This function returns the current number of children spawned by B<pfork>.
   installChldHandler(&cleanup);
 
 This function takes a reference to a subroutine.  If used the subroutine will
-be called every time a child exits.  That subroutine will be called with the
-child's PID and exit value as arguments.
+be called every time a child exits and triggers L<sigchild>.  That subroutine 
+will be called with the child's PID and exit value as arguments.
 
 =head2 sigchld
 

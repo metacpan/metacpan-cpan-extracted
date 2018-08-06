@@ -1,0 +1,48 @@
+{
+   "class" : {
+      "owl:equivalentClass" : "dcmitype:Image",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An image file.",
+      "rdfs:label" : "ImageObject",
+      "rdfs:subClassOf" : "schema:MediaObject"
+   },
+   "properties" : {
+      "schema:caption" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The caption for this object.",
+         "rdfs:label" : "caption",
+         "schema:domainIncludes" : [
+            "schema:VideoObject",
+            "schema:ImageObject"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:exifData" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "exif data for this object.",
+         "rdfs:label" : "exifData",
+         "schema:domainIncludes" : "schema:ImageObject",
+         "schema:rangeIncludes" : [
+            "schema:PropertyValue",
+            "schema:Text"
+         ]
+      },
+      "schema:representativeOfPage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates whether this image is representative of the content of the page.",
+         "rdfs:label" : "representativeOfPage",
+         "schema:domainIncludes" : "schema:ImageObject",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:thumbnail" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Thumbnail image for an image or video.",
+         "rdfs:label" : "thumbnail",
+         "schema:domainIncludes" : [
+            "schema:VideoObject",
+            "schema:ImageObject"
+         ],
+         "schema:rangeIncludes" : "schema:ImageObject"
+      }
+   }
+}

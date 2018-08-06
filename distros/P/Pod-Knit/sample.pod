@@ -1,0 +1,42 @@
+package Foo::Bar;
+# ABSTRACT: Do things
+
+=head1 SYNOPSIS
+
+    blah blah
+    blah
+
+=method one
+
+Do things
+
+    $self->one
+    and   some    stuff
+
+
+=method two
+
+Do other things.
+
+Not used often.
+
+=head1 DESCRIPTION
+
+Blah
+
+=head2 subtitle
+
+More blah
+
+=over
+
+=item foo
+
+something
+
+=item bar
+
+=back
+
+
+

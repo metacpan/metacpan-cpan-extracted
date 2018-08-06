@@ -1,0 +1,67 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A DatedMoneySpecification represents monetary values with optional start and end dates. For example, this could represent an employee's salary over a specific period of time. <strong>Note:</strong> This type has been superseded by <a class=\"localLink\" href=\"http://schema.org/MonetaryAmount\">MonetaryAmount</a> use of that type is recommended",
+      "rdfs:label" : "DatedMoneySpecification",
+      "rdfs:subClassOf" : "schema:StructuredValue",
+      "schema:supersededBy" : "schema:MonetaryAmount"
+   },
+   "properties" : {
+      "schema:amount" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The amount of money.",
+         "rdfs:label" : "amount",
+         "schema:domainIncludes" : [
+            "schema:DatedMoneySpecification",
+            "schema:InvestmentOrDeposit",
+            "schema:LoanOrCredit"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:MonetaryAmount"
+         ]
+      },
+      "schema:currency" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The currency in which the monetary amount is expressed (in 3-letter <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217</a> format).",
+         "rdfs:label" : "currency",
+         "schema:domainIncludes" : [
+            "schema:DatedMoneySpecification",
+            "schema:MonetaryAmount"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:endDate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The end date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
+         "rdfs:label" : "endDate",
+         "schema:domainIncludes" : [
+            "schema:CreativeWorkSeries",
+            "schema:CreativeWorkSeason",
+            "schema:Role",
+            "schema:Event",
+            "schema:DatedMoneySpecification"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:DateTime",
+            "schema:Date"
+         ]
+      },
+      "schema:startDate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The start date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
+         "rdfs:label" : "startDate",
+         "schema:domainIncludes" : [
+            "schema:Event",
+            "schema:DatedMoneySpecification",
+            "schema:CreativeWorkSeries",
+            "schema:Role",
+            "schema:CreativeWorkSeason"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Date",
+            "schema:DateTime"
+         ]
+      }
+   }
+}

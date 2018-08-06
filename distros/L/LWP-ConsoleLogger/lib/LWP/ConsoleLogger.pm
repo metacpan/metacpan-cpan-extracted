@@ -4,7 +4,7 @@ use warnings;
 use 5.006;
 
 package LWP::ConsoleLogger;
-our $VERSION = '0.000038';
+our $VERSION = '0.000039';
 use Data::Printer { end_separator => 1, hash_separator => ' => ' };
 use DateTime qw();
 use HTML::Restrict qw();
@@ -556,7 +556,7 @@ LWP::ConsoleLogger - LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000038
+version 0.000039
 
 =head1 SYNOPSIS
 

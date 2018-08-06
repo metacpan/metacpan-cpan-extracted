@@ -1,5 +1,12 @@
 Revision history for perl distribution Mojolicious-Plugin-AssetPack
 
+2.05 2018-08-01T14:19:35+0800
+ - Fix s///r is not supported in older Perls #136
+ - Fix Favicon rendering of manifest and browserconfig
+ - Add Asset::renderer() for dynamic assets
+ - Add fallback for serving assets with wrong checksum
+ - Renamed Asset::renderer() to tag_for()
+
 2.04 2018-07-19T17:39:06+0800
  - Add support for generating manifest with Favicon pipe
  - Marked AssetPack::tag_for() as deprecated

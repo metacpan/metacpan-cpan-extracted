@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A nightclub or discotheque.",
+      "rdfs:label" : "NightClub",
+      "rdfs:subClassOf" : "schema:EntertainmentBusiness"
+   },
+   "properties" : {}
+}

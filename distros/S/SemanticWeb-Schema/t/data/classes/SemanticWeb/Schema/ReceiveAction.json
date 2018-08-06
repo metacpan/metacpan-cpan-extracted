@@ -1,0 +1,38 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "<p>The act of physically/electronically taking delivery of an object thathas been transferred from an origin to a destination. Reciprocal of SendAction.</p>\n\n<p>Related actions:</p>\n\n<ul>\n<li><a class=\"localLink\" href=\"http://schema.org/SendAction\">SendAction</a>: The reciprocal of ReceiveAction.</li>\n<li><a class=\"localLink\" href=\"http://schema.org/TakeAction\">TakeAction</a>: Unlike TakeAction, ReceiveAction does not imply that the ownership has been transfered (e.g. I can receive a package, but it does not mean the package is now mine).</li>\n</ul>\n",
+      "rdfs:label" : "ReceiveAction",
+      "rdfs:subClassOf" : "schema:TransferAction"
+   },
+   "properties" : {
+      "schema:deliveryMethod" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of instrument. The method of delivery.",
+         "rdfs:label" : "deliveryMethod",
+         "rdfs:subPropertyOf" : "schema:instrument",
+         "schema:domainIncludes" : [
+            "schema:OrderAction",
+            "schema:ReceiveAction",
+            "schema:TrackAction",
+            "schema:SendAction"
+         ],
+         "schema:rangeIncludes" : "schema:DeliveryMethod"
+      },
+      "schema:sender" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of participant. The participant who is at the sending end of the action.",
+         "rdfs:label" : "sender",
+         "rdfs:subPropertyOf" : "schema:participant",
+         "schema:domainIncludes" : [
+            "schema:ReceiveAction",
+            "schema:Message"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Audience",
+            "schema:Organization"
+         ]
+      }
+   }
+}

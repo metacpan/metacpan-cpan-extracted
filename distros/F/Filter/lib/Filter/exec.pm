@@ -4,7 +4,7 @@ use Filter::Util::Exec ;
 use strict ;
 use warnings ;
 
-our $VERSION = "1.58" ;
+our $VERSION = "1.59" ;
 
 sub import
 {

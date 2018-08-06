@@ -1,0 +1,24 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A set of characteristics describing parents, who can be interested in viewing some content.",
+      "rdfs:label" : "ParentAudience",
+      "rdfs:subClassOf" : "schema:PeopleAudience"
+   },
+   "properties" : {
+      "schema:childMaxAge" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Maximal age of the child.",
+         "rdfs:label" : "childMaxAge",
+         "schema:domainIncludes" : "schema:ParentAudience",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:childMinAge" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Minimal age of the child.",
+         "rdfs:label" : "childMinAge",
+         "schema:domainIncludes" : "schema:ParentAudience",
+         "schema:rangeIncludes" : "schema:Number"
+      }
+   }
+}

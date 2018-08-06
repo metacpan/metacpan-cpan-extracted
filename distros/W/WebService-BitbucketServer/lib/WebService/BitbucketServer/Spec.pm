@@ -4,7 +4,7 @@ package WebService::BitbucketServer::Spec;
 use warnings;
 use strict;
 
-our $VERSION = '0.604'; # VERSION
+our $VERSION = '0.605'; # VERSION
 
 use Exporter qw(import);
 use namespace::clean -except => [qw(import)];
@@ -191,7 +191,7 @@ WebService::BitbucketServer::Spec - Databases for mapping Bitbucket Server REST 
 
 =head1 VERSION
 
-version 0.604
+version 0.605
 
 =head1 FUNCTIONS
 

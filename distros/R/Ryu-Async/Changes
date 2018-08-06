@@ -1,5 +1,16 @@
 Revision history for Ryu-Async
 
+0.010     2018-07-31 23:56:46+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - now aware of Job::Async-related modules
+    - udp_client improvements
+
+    Bugs fixed:
+
+    - the ->timer method was emitting extra events
+    - previous udp_client release would raise spurious warnings
+
 0.009     2017-12-28 01:15:18+08:00 Asia/Kuala_Lumpur
     New features:
 

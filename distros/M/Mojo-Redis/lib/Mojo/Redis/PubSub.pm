@@ -6,7 +6,7 @@ has redis          => sub { Carp::confess('redis is requried in constructor') };
 has _db_connection => sub { shift->redis->_connection };
 
 sub channels_p {
-  shift->_db_connection->write_p(qw(PUBSUB CHANNELS), @_)->then(sub { +[@_] });
+  shift->_db_connection->write_p(qw(PUBSUB CHANNELS), @_);
 }
 
 sub keyspace_listen {
@@ -35,7 +35,7 @@ sub notify {
 }
 
 sub numsub_p {
-  shift->_db_connection->write_p(qw(PUBSUB NUMSUB), @_)->then(sub { +{@_} });
+  shift->_db_connection->write_p(qw(PUBSUB NUMSUB), @_)->then(sub { +{@{$_[0]}} });
 }
 
 sub numpat_p {
@@ -74,8 +74,8 @@ sub _setup {
   Scalar::Util::weaken($self);
   $self->{cb} = $self->connection->on(
     response => sub {
-      my ($conn, $type, $name, $payload) = @_;
-      for my $cb (@{$self->{chans}{$name}}) { $self->$cb($payload) }
+      my ($conn, $res) = @_;    # $res = [$type, $name, $payload]
+      for my $cb (@{$self->{chans}{$res->[1]}}) { $self->$cb($res->[2]) }
     }
   );
 }

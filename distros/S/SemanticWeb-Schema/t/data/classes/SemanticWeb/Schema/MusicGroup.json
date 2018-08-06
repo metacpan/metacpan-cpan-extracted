@@ -1,0 +1,72 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A musical group, such as a band, an orchestra, or a choir. Can also be a solo musician.",
+      "rdfs:label" : "MusicGroup",
+      "rdfs:subClassOf" : "schema:PerformingGroup"
+   },
+   "properties" : {
+      "schema:album" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A music album.",
+         "rdfs:label" : "album",
+         "schema:domainIncludes" : "schema:MusicGroup",
+         "schema:rangeIncludes" : "schema:MusicAlbum"
+      },
+      "schema:albums" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A collection of music albums.",
+         "rdfs:label" : "albums",
+         "schema:domainIncludes" : "schema:MusicGroup",
+         "schema:rangeIncludes" : "schema:MusicAlbum",
+         "schema:supersededBy" : "schema:album"
+      },
+      "schema:genre" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Genre of the creative work, broadcast channel or group.",
+         "rdfs:label" : "genre",
+         "schema:domainIncludes" : [
+            "schema:MusicGroup",
+            "schema:CreativeWork",
+            "schema:BroadcastChannel"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:URL",
+            "schema:Text"
+         ]
+      },
+      "schema:musicGroupMember" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A member of a music group&#x2014;for example, John, Paul, George, or Ringo.",
+         "rdfs:label" : "musicGroupMember",
+         "schema:domainIncludes" : "schema:MusicGroup",
+         "schema:rangeIncludes" : "schema:Person",
+         "schema:supersededBy" : "schema:member"
+      },
+      "schema:track" : {
+         "dc:source" : "schemadotorgsources:MBZ",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A music recording (track)&#x2014;usually a single song. If an ItemList is given, the list should contain items of type MusicRecording.",
+         "rdfs:label" : "track",
+         "schema:domainIncludes" : [
+            "schema:MusicGroup",
+            "schema:MusicPlaylist"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:MusicRecording",
+            "schema:ItemList"
+         ]
+      },
+      "schema:tracks" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A music recording (track)&#x2014;usually a single song.",
+         "rdfs:label" : "tracks",
+         "schema:domainIncludes" : [
+            "schema:MusicGroup",
+            "schema:MusicPlaylist"
+         ],
+         "schema:rangeIncludes" : "schema:MusicRecording",
+         "schema:supersededBy" : "schema:track"
+      }
+   }
+}

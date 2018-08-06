@@ -1,0 +1,9 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A mountain, like Mount Whitney or Mount Everest.",
+      "rdfs:label" : "Mountain",
+      "rdfs:subClassOf" : "schema:Landform"
+   },
+   "properties" : {}
+}

@@ -1,12 +1,12 @@
 package Locale::CLDR::Plurals;
 # This file auto generated from Data\common\supplemental\ordinals.xml
-#	on Fri 13 Apr  6:59:46 am GMT
+#	on Sun  5 Aug  5:49:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -2086,7 +2086,7 @@ my %_plurals = (
 				my $w = length $t;
 				$t ||= 0;
 
-				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (1)) ||  scalar (grep {$f % 10 == $_} (1)) ;
+				return  scalar (grep {$v == $_} (0)) &&  scalar (grep {$i % 10 == $_} (1)) && ! scalar (grep {$i % 100 == $_} (11)) ||  scalar (grep {$f % 10 == $_} (1)) && ! scalar (grep {$f % 100 == $_} (11)) ;
 			},
 		},
 		ml => {
@@ -2771,6 +2771,22 @@ my %_plurals = (
 				$t ||= 0;
 
 				return  scalar (grep {$n == $_} (1)) ;
+			},
+		},
+		scn => {
+			one => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$i == $_} (1)) &&  scalar (grep {$v == $_} (0)) ;
 			},
 		},
 		sd => {
@@ -4573,6 +4589,22 @@ my %_plurals = (
 				return  scalar (grep {$n == $_} (1)) ;
 			},
 		},
+		scn => {
+			many => sub {
+				
+				my $number = shift;
+				my $n = abs($number);
+				my $i = int($n);
+				my ($f) = $number =~ /\.(.*)$/;
+				$f //= '';
+				my $t = length $f ? $f + 0 : '';
+				my $v = length $f;
+				my $w = length $t;
+				$t ||= 0;
+
+				return  scalar (grep {$n == $_} (11,8,80,800)) ;
+			},
+		},
 		sq => {
 			many => sub {
 				
@@ -5435,6 +5467,15 @@ my %_plural_ranges = (
 		other => {
 			few => 'few',
 			many => 'many',
+			one => 'one',
+			other => 'other',
+		},
+	},
+	scn => {
+		one => {
+			other => 'other',
+		},
+		other => {
 			one => 'one',
 			other => 'other',
 		},

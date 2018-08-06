@@ -20,6 +20,13 @@
 #######################################################################
 
 
+2018-07-31  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000407 released
+
+        * Use "determine_password" every time.
+
+
 2018-07-23  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000406 released

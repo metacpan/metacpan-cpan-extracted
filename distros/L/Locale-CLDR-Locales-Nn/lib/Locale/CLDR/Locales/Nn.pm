@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Nn - Package for language Norwegian Nynorsk
 
 package Locale::CLDR::Locales::Nn;
 # This file auto generated from Data\common\main\nn.xml
-#	on Fri 13 Apr  7:24:08 am GMT
+#	on Sun  5 Aug  6:16:35 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';
@@ -4648,6 +4648,13 @@ has 'currencies' => (
 		'MRO' => {
 			symbol => 'MRO',
 			display_name => {
+				'currency' => q(mauritanske ouguiya \(1973–2017\)),
+				'one' => q(mauritansk ouguiya \(1973–2017\)),
+				'other' => q(mauritanske ouguiya \(1973–2017\)),
+			},
+		},
+		'MRU' => {
+			display_name => {
 				'currency' => q(mauritanske ouguiya),
 				'one' => q(mauritansk ouguiya),
 				'other' => q(mauritanske ouguiya),
@@ -5083,6 +5090,14 @@ has 'currencies' => (
 		'STD' => {
 			symbol => 'STD',
 			display_name => {
+				'currency' => q(saotomesiske dobra \(1977–2017\)),
+				'one' => q(saotomesisk dobra \(1977–2017\)),
+				'other' => q(saotomesiske dobra \(1977–2017\)),
+			},
+		},
+		'STN' => {
+			symbol => 'Db',
+			display_name => {
 				'currency' => q(saotomesiske dobra),
 				'one' => q(saotomesisk dobra),
 				'other' => q(saotomesiske dobra),
@@ -5143,7 +5158,7 @@ has 'currencies' => (
 		},
 		'TMM' => {
 			display_name => {
-				'currency' => q(turkmenske manat \(1993–2009\)),
+				'currency' => q(turkmensk manat \(1993–2009\)),
 				'one' => q(turkmensk manat \(1993–2009\)),
 				'other' => q(turkmenske manat \(1993–2009\)),
 			},
@@ -5842,17 +5857,17 @@ has 'day_periods' => (
 				},
 			},
 			'stand-alone' => {
+				'wide' => {
+					'pm' => q{e.m.},
+					'am' => q{f.m.},
+				},
 				'narrow' => {
 					'pm' => q{e.m.},
 					'am' => q{f.m.},
 				},
-				'wide' => {
-					'am' => q{f.m.},
-					'pm' => q{e.m.},
-				},
 				'abbreviated' => {
-					'am' => q{f.m.},
 					'pm' => q{e.m.},
+					'am' => q{f.m.},
 				},
 			},
 		},
@@ -5944,6 +5959,42 @@ has 'datetime_formats_available_formats' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
+		'generic' => {
+			E => q{ccc},
+			Ed => q{E d.},
+			Gy => q{y G},
+			GyMMM => q{MMM y G},
+			GyMMMEd => q{E d. MMM y G},
+			GyMMMd => q{d. MMM y G},
+			H => q{HH},
+			Hm => q{HH:mm},
+			Hms => q{HH:mm:ss},
+			M => q{L.},
+			MEd => q{E d.M},
+			MMM => q{LLL},
+			MMMEd => q{E d. MMM},
+			MMMMd => q{d. MMMM},
+			MMMd => q{d. MMM},
+			MMdd => q{d.M.},
+			Md => q{d.M.},
+			d => q{d.},
+			h => q{h a},
+			hm => q{h:mm a},
+			hms => q{h:mm:ss a},
+			ms => q{mm:ss},
+			y => q{y G},
+			yyyy => q{y G},
+			yyyyM => q{M.y G},
+			yyyyMEd => q{E d.M.y G},
+			yyyyMM => q{MM.y G},
+			yyyyMMM => q{MMM y G},
+			yyyyMMMEd => q{E d. MMM y G},
+			yyyyMMMM => q{MMMM y G},
+			yyyyMMMd => q{d. MMM y G},
+			yyyyMd => q{d.M.y G},
+			yyyyQQQ => q{QQQ y G},
+			yyyyQQQQ => q{QQQQ y G},
+		},
 		'gregorian' => {
 			Bh => q{h B},
 			Bhm => q{h:mm B},
@@ -5994,42 +6045,6 @@ has 'datetime_formats_available_formats' => (
 			yQQQQ => q{QQQQ y},
 			yw => q{'veke' w 'i' Y},
 		},
-		'generic' => {
-			E => q{ccc},
-			Ed => q{E d.},
-			Gy => q{y G},
-			GyMMM => q{MMM y G},
-			GyMMMEd => q{E d. MMM y G},
-			GyMMMd => q{d. MMM y G},
-			H => q{HH},
-			Hm => q{HH:mm},
-			Hms => q{HH:mm:ss},
-			M => q{L.},
-			MEd => q{E d.M},
-			MMM => q{LLL},
-			MMMEd => q{E d. MMM},
-			MMMMd => q{d. MMMM},
-			MMMd => q{d. MMM},
-			MMdd => q{d.M.},
-			Md => q{d.M.},
-			d => q{d.},
-			h => q{h a},
-			hm => q{h:mm a},
-			hms => q{h:mm:ss a},
-			ms => q{mm:ss},
-			y => q{y G},
-			yyyy => q{y G},
-			yyyyM => q{M.y G},
-			yyyyMEd => q{E d.M.y G},
-			yyyyMM => q{MM.y G},
-			yyyyMMM => q{MMM y G},
-			yyyyMMMEd => q{E d. MMM y G},
-			yyyyMMMM => q{MMMM y G},
-			yyyyMMMd => q{d. MMM y G},
-			yyyyMd => q{d.M.y G},
-			yyyyQQQ => q{QQQ y G},
-			yyyyQQQQ => q{QQQQ y G},
-		},
 	} },
 );
 
@@ -6049,101 +6064,6 @@ has 'datetime_formats_interval' => (
 	isa			=> HashRef,
 	init_arg	=> undef,
 	default		=> sub { {
-		'gregorian' => {
-			H => {
-				H => q{HH–HH},
-			},
-			Hm => {
-				H => q{HH:mm–HH:mm},
-				m => q{HH:mm–HH:mm},
-			},
-			Hmv => {
-				H => q{HH:mm–HH:mm v},
-				m => q{HH:mm–HH:mm v},
-			},
-			Hv => {
-				H => q{HH–HH v},
-			},
-			M => {
-				M => q{M.–M.},
-			},
-			MEd => {
-				M => q{E dd.MM.–E dd.MM.},
-				d => q{E dd.MM.–E dd.MM.},
-			},
-			MMM => {
-				M => q{MMM–MMM},
-			},
-			MMMEd => {
-				M => q{E d. MMM–E d. MMM},
-				d => q{E d.–E d. MMM},
-			},
-			MMMd => {
-				M => q{d. MMM–d. MMM},
-				d => q{d.–d. MMM},
-			},
-			Md => {
-				M => q{dd.MM–dd.MM},
-				d => q{dd.MM–dd.MM},
-			},
-			d => {
-				d => q{d.–d.},
-			},
-			fallback => '{0} – {1}',
-			h => {
-				a => q{h a – h a},
-				h => q{h–h a},
-			},
-			hm => {
-				a => q{h:mm a – h:mm a},
-				h => q{h:mm–h:mm a},
-				m => q{h:mm–h:mm a},
-			},
-			hmv => {
-				a => q{h:mm a – h:mm a v},
-				h => q{h:mm–h:mm a v},
-				m => q{h:mm–h:mm a v},
-			},
-			hv => {
-				a => q{h a – h a v},
-				h => q{h–h a v},
-			},
-			y => {
-				y => q{y–y},
-			},
-			yM => {
-				M => q{MM.y–MM.y},
-				y => q{MM.y–MM.y},
-			},
-			yMEd => {
-				M => q{E dd.MM.y–E dd.MM.y},
-				d => q{E dd.MM.y–E dd.MM.y},
-				y => q{E dd.MM.y–E dd.MM.y},
-			},
-			yMMM => {
-				M => q{MMM–MMM y},
-				y => q{MMM y–MMM y},
-			},
-			yMMMEd => {
-				M => q{E d. MMM–E d. MMM y},
-				d => q{E d.–E d. MMM y},
-				y => q{E d. MMM y–E d. MMM y},
-			},
-			yMMMM => {
-				M => q{MMMM–MMMM y},
-				y => q{MMMM y–MMMM y},
-			},
-			yMMMd => {
-				M => q{d. MMM–d. MMM y},
-				d => q{d.–d. MMM y},
-				y => q{d. MMM y–d. MMM y},
-			},
-			yMd => {
-				M => q{dd.MM.y–dd.MM.y},
-				d => q{dd.MM.y–dd.MM.y},
-				y => q{dd.MM.y–dd.MM.y},
-			},
-		},
 		'generic' => {
 			H => {
 				H => q{HH–HH},
@@ -6237,6 +6157,101 @@ has 'datetime_formats_interval' => (
 				M => q{dd.MM.y–dd.MM.y G},
 				d => q{dd.MM.y–dd.MM.y G},
 				y => q{dd.MM.y–dd.MM.y G},
+			},
+		},
+		'gregorian' => {
+			H => {
+				H => q{HH–HH},
+			},
+			Hm => {
+				H => q{HH:mm–HH:mm},
+				m => q{HH:mm–HH:mm},
+			},
+			Hmv => {
+				H => q{HH:mm–HH:mm v},
+				m => q{HH:mm–HH:mm v},
+			},
+			Hv => {
+				H => q{HH–HH v},
+			},
+			M => {
+				M => q{M.–M.},
+			},
+			MEd => {
+				M => q{E dd.MM.–E dd.MM.},
+				d => q{E dd.MM.–E dd.MM.},
+			},
+			MMM => {
+				M => q{MMM–MMM},
+			},
+			MMMEd => {
+				M => q{E d. MMM–E d. MMM},
+				d => q{E d.–E d. MMM},
+			},
+			MMMd => {
+				M => q{d. MMM–d. MMM},
+				d => q{d.–d. MMM},
+			},
+			Md => {
+				M => q{dd.MM–dd.MM},
+				d => q{dd.MM–dd.MM},
+			},
+			d => {
+				d => q{d.–d.},
+			},
+			fallback => '{0} – {1}',
+			h => {
+				a => q{h a – h a},
+				h => q{h–h a},
+			},
+			hm => {
+				a => q{h:mm a – h:mm a},
+				h => q{h:mm–h:mm a},
+				m => q{h:mm–h:mm a},
+			},
+			hmv => {
+				a => q{h:mm a – h:mm a v},
+				h => q{h:mm–h:mm a v},
+				m => q{h:mm–h:mm a v},
+			},
+			hv => {
+				a => q{h a – h a v},
+				h => q{h–h a v},
+			},
+			y => {
+				y => q{y–y},
+			},
+			yM => {
+				M => q{MM.y–MM.y},
+				y => q{MM.y–MM.y},
+			},
+			yMEd => {
+				M => q{E dd.MM.y–E dd.MM.y},
+				d => q{E dd.MM.y–E dd.MM.y},
+				y => q{E dd.MM.y–E dd.MM.y},
+			},
+			yMMM => {
+				M => q{MMM–MMM y},
+				y => q{MMM y–MMM y},
+			},
+			yMMMEd => {
+				M => q{E d. MMM–E d. MMM y},
+				d => q{E d.–E d. MMM y},
+				y => q{E d. MMM y–E d. MMM y},
+			},
+			yMMMM => {
+				M => q{MMMM–MMMM y},
+				y => q{MMMM y–MMMM y},
+			},
+			yMMMd => {
+				M => q{d. MMM–d. MMM y},
+				d => q{d.–d. MMM y},
+				y => q{d. MMM y–d. MMM y},
+			},
+			yMd => {
+				M => q{dd.MM.y–dd.MM.y},
+				d => q{dd.MM.y–dd.MM.y},
+				y => q{dd.MM.y–dd.MM.y},
 			},
 		},
 	} },

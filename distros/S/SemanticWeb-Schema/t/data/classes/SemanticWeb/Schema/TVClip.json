@@ -1,0 +1,23 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A short TV program or a segment/part of a TV program.",
+      "rdfs:label" : "TVClip",
+      "rdfs:subClassOf" : "schema:Clip"
+   },
+   "properties" : {
+      "schema:partOfTVSeries" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The TV series to which this episode or season belongs.",
+         "rdfs:label" : "partOfTVSeries",
+         "rdfs:subPropertyOf" : "schema:isPartOf",
+         "schema:domainIncludes" : [
+            "schema:TVEpisode",
+            "schema:TVSeason",
+            "schema:TVClip"
+         ],
+         "schema:rangeIncludes" : "schema:TVSeries",
+         "schema:supersededBy" : "schema:partOfSeries"
+      }
+   }
+}

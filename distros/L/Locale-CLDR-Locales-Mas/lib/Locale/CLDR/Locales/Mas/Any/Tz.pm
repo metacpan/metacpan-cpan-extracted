@@ -6,13 +6,13 @@ Locale::CLDR::Locales::Mas::Any::Tz - Package for language Masai
 
 package Locale::CLDR::Locales::Mas::Any::Tz;
 # This file auto generated from Data\common\main\mas_TZ.xml
-#	on Fri 13 Apr  7:19:14 am GMT
+#	on Sun  5 Aug  6:11:06 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.32.0');
+our $VERSION = version->declare('v0.33.0');
 
 use v5.10.1;
 use mro 'c3';

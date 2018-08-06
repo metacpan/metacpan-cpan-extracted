@@ -1,13 +1,13 @@
 package Map::Tube::Exception::MissingNodeObject;
 $Map::Tube::Exception::MissingNodeObject::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::MissingNodeObject::VERSION = '3.16';
+$Map::Tube::Exception::MissingNodeObject::VERSION = '3.17';
 =head1 NAME
 
 Map::Tube::Exception::MissingNodeObject - Represent 'missing node object' exception.
 
 =head1 VERSION
 
-version 3.16
+version 3.17
 
 =cut
 
