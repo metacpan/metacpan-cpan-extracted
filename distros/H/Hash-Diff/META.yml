@@ -2,28 +2,32 @@
 abstract: 'Return difference between two hashes as a hash'
 author:
   - 'Bjorn-Olav Strand <bo@startsiden.no>'
-  - 'Bjorn-Olav Strand <bo@startsiden.no>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
-  Test::More: 0
+  Test::More: '0'
+  ok: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Hash-Diff
-no_index:
-  directory:
-    - inc
-    - t
 requires:
-  Hash::Merge: 0
-  ok: 0
+  Carp: '0'
+  Exporter: '0'
+  Hash::Merge: '0'
+  base: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/bolav/hash-diff
-version: 0.009
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Diff
+  homepage: https://github.com/bolav/hash-diff
+  repository: git://github.com/bolav/hash-diff.git
+version: '0.010'
+x_contributors:
+  - 'Charles McGarvey <ccm@cpan.org>'
+x_generated_by_perl: v5.24.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

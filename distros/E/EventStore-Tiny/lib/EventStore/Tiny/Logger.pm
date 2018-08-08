@@ -1,27 +1,32 @@
 package EventStore::Tiny::Logger;
-use Mo qw(default);
 
-has print_target => sub {select}; # selected output file handle
+use strict;
+use warnings;
 
-sub log {
+use Class::Tiny {
+    print_target => sub {select}, # Selected output file handle
+};
+
+sub log_event {
     my ($self, $event) = @_;
 
-    # stringify
+    # Stringify
     use Data::Dump 'dump';
-    my $output = $event->name . ': ' . dump $event->data;
+    my $data    = $event->can('data') ? dump $event->data : 'NO DATA';
+    my $output  = $event->name . ": $data";
 
-    # print to given print handle
-    $self->print_target->print("$output\n");
+    # Print to given print handle
+    return $self->print_target->print("$output\n");
 }
 
 sub log_cb {
     my ($self, @args) = @_;
 
-    # create a new logger if called as a package procedure
+    # Create a new logger if called as a package procedure
     $self = EventStore::Tiny::Logger->new(@args) unless ref $self;
 
-    # create a logging callback function
-    return sub {$self->log(shift)};
+    # Create a logging callback function
+    return sub {$self->log_event(shift)};
 }
 
 1;
@@ -44,9 +49,9 @@ EventStore::Tiny::Logger implements the following attributes and methods.
 
 Set or get the print target of this logger. By default it uses the L<"select"|perlfunc/"select RBITS,WBITS,EBITS,TIMEOUT">ed file handle (normally STDOUT) but everything with a print method will do.
 
-=head2 log
+=head2 log_event
 
-    $log->log($event);
+    $log->log_event($event);
 
 Logs the type name together with a dump of the concrete data of the given event to its L<print_target>.
 

@@ -6,30 +6,22 @@ use warnings;
 
 use Test::More;
 
-plan tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Net/SAML2.pm',
-    'Net/SAML2/Binding/POST.pm',
-    'Net/SAML2/Binding/Redirect.pm',
-    'Net/SAML2/Binding/SOAP.pm',
-    'Net/SAML2/IdP.pm',
-    'Net/SAML2/Protocol/ArtifactResolve.pm',
-    'Net/SAML2/Protocol/Assertion.pm',
-    'Net/SAML2/Protocol/AuthnRequest.pm',
-    'Net/SAML2/Protocol/LogoutRequest.pm',
-    'Net/SAML2/Protocol/LogoutResponse.pm',
-    'Net/SAML2/Role/ProtocolMessage.pm',
-    'Net/SAML2/SP.pm',
-    'Net/SAML2/XML/Sig.pm',
     'Net/SPID.pm',
     'Net/SPID/OpenID.pm',
     'Net/SPID/SAML.pm',
-    'Net/SPID/SAML/Assertion.pm',
-    'Net/SPID/SAML/AuthnRequest.pm',
     'Net/SPID/SAML/IdP.pm',
-    'Net/SPID/SAML/LogoutRequest.pm',
-    'Net/SPID/SAML/LogoutResponse.pm',
+    'Net/SPID/SAML/In/Base.pm',
+    'Net/SPID/SAML/In/LogoutRequest.pm',
+    'Net/SPID/SAML/In/LogoutResponse.pm',
+    'Net/SPID/SAML/In/Response.pm',
+    'Net/SPID/SAML/Out/AuthnRequest.pm',
+    'Net/SPID/SAML/Out/Base.pm',
+    'Net/SPID/SAML/Out/LogoutRequest.pm',
+    'Net/SPID/SAML/Out/LogoutResponse.pm',
+    'Net/SPID/SAML/ProtocolMessage.pm',
     'Net/SPID/Session.pm'
 );
 

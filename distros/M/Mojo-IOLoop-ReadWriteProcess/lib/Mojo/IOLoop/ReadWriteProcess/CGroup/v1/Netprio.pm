@@ -19,7 +19,7 @@ sub prioidx { shift->cgroup->_list(PRIOIDX_INTERFACE) }
 
 =head1 NAME
 
-Mojo::IOLoop::ReadWriteProcess::CGroup::v1::Netcls - CGroups v1 Netcls Controller.
+Mojo::IOLoop::ReadWriteProcess::CGroup::v1::Netprio - CGroups v1 Netprio Controller.
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ and requires cgroups and capability for unshare syscalls to achieve pid isolatio
 
 =head1 METHODS
 
-L<Mojo::IOLoop::ReadWriteProcess::CGroup::v1::Netcls> inherits all methods from L<Mojo::Base> and implements
+L<Mojo::IOLoop::ReadWriteProcess::CGroup::v1::Netprio> inherits all methods from L<Mojo::Base> and implements
 the following new ones.
 
 =head1 LICENSE

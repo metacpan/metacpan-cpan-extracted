@@ -1,7 +1,7 @@
 ##############################################################################
 #
 #  Data::Tools perl module
-#  2013-2017 (c) Vladi Belperchinov-Shabanski "Cade"
+#  2013-2018 (c) Vladi Belperchinov-Shabanski "Cade"
 #  http://cade.datamax.bg
 #  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 #
@@ -14,7 +14,7 @@ use Exporter;
 use Carp;
 use Data::Tools;
 
-our $VERSION = '1.14';
+our $VERSION = '1.17';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -168,9 +168,9 @@ sub julian_date_diff_in_words_relative
 
 =head1 SYNOPSIS
 
-  use Data::Tools qw( :all );  # import all functions
-  use Data::Tools;             # the same as :all :) 
-  use Data::Tools qw( :none ); # do not import anything, use full package names
+  use Data::Tools::Time qw( :all );  # import all functions
+  use Data::Tools::Time;             # the same as :all :) 
+  use Data::Tools::Time qw( :none ); # do not import anything
 
   # --------------------------------------------------------------------------
 
@@ -266,6 +266,7 @@ I know this is no good for longer sentences but works fine in this case.
   <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 
   http://cade.datamax.bg
+
 
 =cut
 

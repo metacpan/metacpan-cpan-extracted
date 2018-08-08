@@ -4,7 +4,7 @@ package UR::BoolExpr::Template::PropertyComparison::NotLike;
 use strict;
 use warnings;
 use UR;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 UR::Object::Type->define(
     class_name  => __PACKAGE__, 
@@ -36,7 +36,7 @@ UR::BoolExpr::Template::PropertyComparison::NotLike - perform a negated SQL-ish 
 
 =head1 DESCRIPTION
 
-The input test value is assummed to be an SQL 'like' value, where '_'
+The input test value is assumed to be an SQL 'like' value, where '_'
 represents a one character wildcard, and '%' means a 0 or more character
 wildcard.  It gets converted to a perl regular expression and used in a
 negated match against an object's properties

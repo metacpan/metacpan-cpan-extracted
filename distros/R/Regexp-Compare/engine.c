@@ -8,32 +8,14 @@
 #if PERL_API_REVISION != 5
 #error This module is only for Perl 5
 #else
-#if PERL_API_VERSION == 22
-
-#define RC_ANYOF_UTF8 ANYOF_HAS_UTF8_NONBITMAP_MATCHES
-
-#define ANYOF_NON_UTF8_LATIN1_ALL ANYOF_MATCHES_ALL_NON_UTF8_NON_ASCII
-
-#define ANYOF_NONBITMAP(node)	(ANYOF_FLAGS(node) & ANYOF_HAS_UTF8_NONBITMAP_MATCHES)
-#else
 #if PERL_API_VERSION == 24
-#define RC_ANYOFS
-
-#define RC_ANYOF_UTF8 ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP
-/* what about ANYOF_MATCHES_POSIXL? */
-
-#define ANYOF_NON_UTF8_LATIN1_ALL ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER
-
-#define ANYOF_NONBITMAP(node)	(ANYOF_FLAGS(node) & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP)
+/* nothing special */
 #else
 #if PERL_API_VERSION == 26
-#define RC_ANYOFS
-
-#define RC_ANYOF_UTF8 ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP
-
-#define ANYOF_NON_UTF8_LATIN1_ALL ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER
-
-#define ANYOF_NONBITMAP(node)	(ANYOF_FLAGS(node) & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP)
+/* nothing special */
+#else
+#if PERL_API_VERSION == 28
+#define RC_ANYOFM
 #else
 #error Unsupported PERL_API_VERSION
 #endif
@@ -483,14 +465,14 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
     };
 
     static UV xposix_alnum_invlist[] = { 128,
-#if PERL_API_VERSION == 22
-#include "XPosixAlnum.22"
-#else
 #if PERL_API_VERSION == 24
 #include "XPosixAlnum.24"
 #else
 #if PERL_API_VERSION == 26
 #include "XPosixAlnum.26"
+#else
+#if PERL_API_VERSION == 28
+#include "XPosixAlnum.28"
 #else
 #error unexpected PERL_API_VERSION
 #endif
@@ -499,14 +481,14 @@ static int convert_invlist_to_map(SV *invlist, int invert, U32 *map)
     };
 
     static UV xposix_alpha_invlist[] = { 128,
-#if PERL_API_VERSION == 22
-#include "XPosixAlpha.22"
-#else
 #if PERL_API_VERSION == 24
 #include "XPosixAlpha.24"
 #else
 #if PERL_API_VERSION == 26
 #include "XPosixAlpha.26"
+#else
+#if PERL_API_VERSION == 28
+#include "XPosixAlpha.28"
 #else
 #error unexpected PERL_API_VERSION
 #endif
@@ -759,12 +741,7 @@ static int convert_regclass_map(Arrow *a, U32 *map)
 
     /* fprintf(stderr, "enter convert_regclass_map\n"); */
 
-    assert((a->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a->rn->type == ANYOFD)
-#endif
-	);
-    assert(ANYOF_NONBITMAP(a->rn));
+    assert((a->rn->type == ANYOF) || (a->rn->type == ANYOFD));
 
     /* basically copied from regexec.c:regclass_swash */
     n = ARG_LOC(a->rn);
@@ -829,11 +806,7 @@ static SV *get_invlist_sv(Arrow *a)
     RXi_GET_DECL(a->origin, progi);
     struct reg_data *data = progi->data;
 
-    assert((a->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a->rn->type == ANYOFD)
-#endif
-	);
+    assert((a->rn->type == ANYOF) || (a->rn->type == ANYOFD));
 
     if (data && data->count)
     {
@@ -861,14 +834,10 @@ static int convert_map(Arrow *a, U32 *map)
 {
     /* fprintf(stderr, "enter convert_map\n"); */
 
-    assert((a->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a->rn->type == ANYOFD)
-#endif
-	);
+    assert((a->rn->type == ANYOF) || (a->rn->type == ANYOFD));
     assert(map);
 
-    if (ANYOF_NONBITMAP(a->rn))
+    if (ANYOF_FLAGS(a->rn) & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP)
     {
         return convert_regclass_map(a, map);
     }
@@ -903,6 +872,38 @@ static int convert_class_narrow(Arrow *a, U32 *map)
     *map = mask;
     return 1;
 }
+
+#ifdef RC_ANYOFM
+/* Adapted from regcomp.c:get_ANYOFM_contents. b must point to
+   ANYOF_BITMAP_SIZE bytes. Returns 1 OK (b set), 0 matches something
+   above the bitmap. */
+static int convert_anyofm_to_bitmap(Arrow *a, unsigned char *b)
+{
+    regnode *n = a->rn;
+    U8 lowest = (U8)ARG(n);
+    unsigned count = 0;
+    unsigned needed = 1U << PL_bitcount[(U8)~FLAGS(n)];
+    unsigned i;
+    BitFlag bf;
+    
+    memset(b, 0, ANYOF_BITMAP_SIZE);
+    for (i = lowest; i <= 0xFF; i++)
+    {
+        if ((i & FLAGS(n)) == ARG(n))
+        {
+            init_bit_flag(&bf, i);
+            b[bf.offs] |= bf.mask;
+            
+            if (++count >= needed)
+            {
+                return 1;
+            }
+        }
+    }
+    
+    return 0;
+}
+#endif
 
 /* returns 1 OK (map set), 0 map not recognized/representable */
 static int convert_class(Arrow *a, U32 *map)
@@ -960,20 +961,12 @@ static int get_synth_offset(regnode *p)
     {
 	return 1;  
     }
-    else if ((p->type == ANYOF)
-#ifdef RC_ANYOFS
-	    || (p->type == ANYOFD)
-#endif
-	)
+    else if ((p->type == ANYOF) || (p->type == ANYOFD))
     {
         /* other flags obviously exist, but they haven't been seen yet
 	   and it isn't clear what they mean */
         unsigned int unknown = p->flags & ~(ANYOF_INVERT |
-	    ANYOF_MATCHES_ALL_ABOVE_BITMAP | RC_ANYOF_UTF8
-#ifdef RC_ANYOFS
-	    | ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP
-#endif
-	    );
+	    ANYOF_MATCHES_ALL_ABOVE_BITMAP | ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP | ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP);
         if (unknown)
 	{
 	    /* p[10] seems always 0 on Linux, but 0xfbfaf9f8 seen on
@@ -985,6 +978,12 @@ static int get_synth_offset(regnode *p)
 
 	return 11;
     }
+#ifdef RC_ANYOFM
+    else if (p->type == ANYOFM)
+    {
+        return 2;
+    }
+#endif
     else if ((p->type == IFMATCH) || (p->type == UNLESSM) || 
 	(p->type == SUSPEND))
     {
@@ -1634,8 +1633,7 @@ static int compare_bol(int anchored, Arrow *a1, Arrow *a2)
 {
     int rv;
 
-    assert((a1->rn->type == BOL) || (a1->rn->type == MBOL) ||
-	(a1->rn->type == SBOL));
+    assert((a1->rn->type == MBOL) || (a1->rn->type == SBOL));
 
     if (anchored)
     {
@@ -1661,11 +1659,7 @@ static unsigned char get_bitmap_byte(regnode *p, int i)
     unsigned char *bitmap;
     unsigned char loc;
 
-    assert((p->type == ANYOF)
-#ifdef RC_ANYOFS
-	    || (p->type == ANYOFD)
-#endif
-    );
+    assert((p->type == ANYOF) || (p->type == ANYOFD));
 
     bitmap = (unsigned char *)(p + 2);
     loc = bitmap[i];
@@ -1680,18 +1674,16 @@ static unsigned char get_bitmap_byte(regnode *p, int i)
 static int compare_bitmaps(int anchored, Arrow *a1, Arrow *a2,
     unsigned char *b1, unsigned char *b2)
 {
+    /* Note that aN->flags must be ignored when bN is set (necessary
+    for ANYOFM, where they aren't really flags and can't be used as
+    such). */
     unsigned char loc1, loc2;
-    int i, sz;
+    int i;
 
     /* fprintf(stderr, "enter compare_bitmaps(%d, %d, %d)\n", anchored,
         a1->rn->type, a2->rn->type); */
 
-    sz = (((a1->rn->flags & ANYOF_INVERT) &&
-	    (a1->rn->flags & ANYOF_NON_UTF8_LATIN1_ALL)) ||
-	(!(a2->rn->flags & ANYOF_INVERT) &&
-	    (a2->rn->flags & ANYOF_NON_UTF8_LATIN1_ALL))) ? 16
-        : ANYOF_BITMAP_SIZE;
-    for (i = 0; i < sz; ++i)
+    for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
     {
         loc1 = b1 ? b1[i] : get_bitmap_byte(a1->rn, i);
         loc2 = b2 ? b2[i] : get_bitmap_byte(a2->rn, i); 
@@ -1715,11 +1707,7 @@ static int compare_anyof_multiline(int anchored, Arrow *a1, Arrow *a2)
 
     /* fprintf(stderr, "enter compare_anyof_multiline\n"); */
 
-    assert((a1->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a1->rn->type == ANYOFD)
-#endif
-	);
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
     assert((a2->rn->type == MBOL) || (a2->rn->type == MEOL));
 
     if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
@@ -1752,24 +1740,60 @@ static int compare_anyof_multiline(int anchored, Arrow *a1, Arrow *a2)
     return compare(1, &tail1, &tail2);
 }
 
+#ifdef RC_ANYOFM
+static int compare_anyofm_multiline(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char req;
+    int i;
+    BitFlag bf;
+    Arrow tail1, tail2;
+    unsigned char left[ANYOF_BITMAP_SIZE];
+
+    assert(a1->rn->type == ANYOFM);
+    assert((a2->rn->type == MBOL) || (a2->rn->type == MEOL));
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    init_bit_flag(&bf, '\n');
+    for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
+    {
+        req = (i != bf.offs) ? 0 : bf.mask;
+	if (left[i] != req)
+	{
+	    return compare_mismatch(anchored, a1, a2);
+	}
+    }
+
+    tail1 = *a1;
+    if (bump_regular(&tail1) <= 0)
+    {
+	return -1;
+    }
+
+    tail2 = *a2;
+    if (bump_regular(&tail2) <= 0)
+    {
+	return -1;
+    }
+
+    return compare(1, &tail1, &tail2);
+}
+#endif
+
 static int compare_anyof_anyof(int anchored, Arrow *a1, Arrow *a2)
 {
     int extra_left;
 
     /* fprintf(stderr, "enter compare_anyof_anyof(%d\n", anchored); */
 
-    assert((a1->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a1->rn->type == ANYOFD)
-#endif
-	);
-    assert((a2->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a2->rn->type == ANYOFD)
-#endif
-	);
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
+    assert((a2->rn->type == ANYOF) || (a2->rn->type == ANYOFD));
 
-    extra_left = ANYOF_NONBITMAP(a1->rn);
+    extra_left = ANYOF_FLAGS(a1->rn) &
+        ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP;
     if ((extra_left || (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)) &&
 	!(a2->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP))
     {
@@ -1781,8 +1805,8 @@ static int compare_anyof_anyof(int anchored, Arrow *a1, Arrow *a2)
 	   aren't the same - this duplicates the code to get to the
 	   invlist, but works even for non-standard ones,
 	   e.g. [\da] */
-	if ((a1->rn->flags & RC_ANYOF_UTF8) &&
-	    (a2->rn->flags & RC_ANYOF_UTF8))
+	if ((a1->rn->flags & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP) &&
+	    (a2->rn->flags & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP))
 	{
 	    SV *invlist1 = get_invlist_sv(a1);
 	    SV *invlist2 = get_invlist_sv(a2);
@@ -1832,6 +1856,68 @@ static int compare_anyof_anyof(int anchored, Arrow *a1, Arrow *a2)
 
     return compare_bitmaps(anchored, a1, a2, 0, 0);
 }
+
+#ifdef RC_ANYOFM
+static int compare_anyof_anyofm(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char right[ANYOF_BITMAP_SIZE];
+    
+    /* fprintf(stderr, "enter compare_anyof_anyofm(%d\n", anchored); */
+
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
+    assert(a2->rn->type == ANYOFM);
+
+    if (ANYOF_FLAGS(a1->rn) & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP)
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    if (!convert_anyofm_to_bitmap(a2, right))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_bitmaps(anchored, a1, a2, 0, right);
+}
+
+static int compare_anyofm_anyof(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char left[ANYOF_BITMAP_SIZE];
+    
+    /* fprintf(stderr, "enter compare_anyofm_anyof(%d\n", anchored); */
+
+    assert(a1->rn->type == ANYOFM);
+    assert((a2->rn->type == ANYOF) || (a2->rn->type == ANYOFD));
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_bitmaps(anchored, a1, a2, left, 0);
+}
+
+static int compare_anyofm_anyofm(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char left[ANYOF_BITMAP_SIZE];
+    unsigned char right[ANYOF_BITMAP_SIZE];
+    
+    assert(a1->rn->type == ANYOFM);
+    assert(a2->rn->type == ANYOFM);
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+      
+    if (!convert_anyofm_to_bitmap(a2, right))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+      
+    return compare_bitmaps(anchored, a1, a2, left, right);
+}
+#endif
 
 /* compare_bitmaps could replace this method, but when a class
    contains just a few characters, it seems more natural to compare
@@ -2024,11 +2110,7 @@ static int compare_exactf_negative_posix(int anchored, Arrow *a1, Arrow *a2)
 static int compare_reg_any_anyof(int anchored, Arrow *a1, Arrow *a2)
 {
     assert(a1->rn->type == REG_ANY);
-    assert((a2->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a2->rn->type == ANYOFD)
-#endif
-	);
+    assert((a2->rn->type == ANYOF) || (a2->rn->type == ANYOFD));
 
     return compare_bitmaps(anchored, a1, a2, ndot.nbitmap, 0);
 }
@@ -2042,11 +2124,7 @@ static int compare_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
 
     assert((a1->rn->type == POSIXD) || (a1->rn->type == POSIXU) ||
 	(a1->rn->type == POSIXA));
-    assert((a2->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a2->rn->type == ANYOFD)
-#endif
-	);
+    assert((a2->rn->type == ANYOF) || (a2->rn->type == ANYOFD));
 
     if (!convert_class_narrow(a1, &left_block))
     {
@@ -2102,11 +2180,7 @@ static int compare_negative_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
 
     assert((a1->rn->type == NPOSIXD) || (a1->rn->type == NPOSIXU) ||
         (a1->rn->type == NPOSIXA));
-    assert((a2->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a2->rn->type == ANYOFD)
-#endif
-	);
+    assert((a2->rn->type == ANYOF) || (a2->rn->type == ANYOFD));
 
     if (!convert_class_narrow(a1, &left_block))
     {
@@ -2163,11 +2237,7 @@ static int compare_exact_anyof(int anchored, Arrow *a1, Arrow *a2)
     /* fprintf(stderr, "enter compare_exact_anyof(%d, \n", anchored); */
 
     assert(a1->rn->type == EXACT);
-    assert((a2->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a2->rn->type == ANYOFD)
-#endif
-	);
+    assert((a2->rn->type == ANYOF) || (a2->rn->type == ANYOFD));
 
     seq = GET_LITERAL(a1);
     init_bit_flag(&bf, (unsigned char)(*seq));
@@ -2190,11 +2260,7 @@ static int compare_exactf_anyof(int anchored, Arrow *a1, Arrow *a2)
     /* fprintf(stderr, "enter compare_exactf_anyof(%d, \n", anchored); */
 
     assert((a1->rn->type == EXACTF) || (a1->rn->type == EXACTFU));
-    assert((a2->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a2->rn->type == ANYOFD)
-#endif
-	);
+    assert((a2->rn->type == ANYOF) || (a2->rn->type == ANYOFD));
 
     seq = GET_LITERAL(a1);
     init_unfolded(unf, *seq);
@@ -2210,6 +2276,68 @@ static int compare_exactf_anyof(int anchored, Arrow *a1, Arrow *a2)
 
     return compare_tails(anchored, a1, a2);
 }
+
+#ifdef RC_ANYOFM
+static int compare_exact_anyofm(int anchored, Arrow *a1, Arrow *a2)
+{
+    char *seq;
+    unsigned char right[ANYOF_BITMAP_SIZE];
+    BitFlag bf;
+
+    /* fprintf(stderr, "enter compare_exact_anyofm(%d, \n", anchored); */
+
+    assert(a1->rn->type == EXACT);
+    assert(a2->rn->type == ANYOFM);
+
+    seq = GET_LITERAL(a1);
+    init_bit_flag(&bf, *seq);
+
+    if (!convert_anyofm_to_bitmap(a2, right))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    if (right[bf.offs] & bf.mask)
+    {
+        return compare_tails(anchored, a1, a2);
+    }
+    
+    return compare_mismatch(anchored, a1, a2);
+}
+
+static int compare_exactf_anyofm(int anchored, Arrow *a1, Arrow *a2)
+{
+    char *seq;
+    int i;
+    char left[2];
+    unsigned char right[ANYOF_BITMAP_SIZE];
+    BitFlag bf;
+
+    /* fprintf(stderr, "enter compare_exactf_anyofm(%d, \n", anchored); */
+
+    assert((a1->rn->type == EXACTF) || (a1->rn->type == EXACTFU));
+    assert(a2->rn->type == ANYOFM);
+
+    seq = GET_LITERAL(a1);
+    init_unfolded(left, *seq);
+
+    if (!convert_anyofm_to_bitmap(a2, right))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    for (i = 0; i < 2; ++i)
+    {
+        init_bit_flag(&bf, left[i]);
+        if (!(right[bf.offs] & bf.mask))
+	{
+	    return compare_mismatch(anchored, a1, a2);
+	}
+    }
+    
+    return compare_tails(anchored, a1, a2);
+}
+#endif
 
 static int compare_exact_byte_class(int anchored, Arrow *a1, Arrow *a2,
     char *lookup)
@@ -2243,11 +2371,7 @@ static int compare_sany_anyof(int anchored, Arrow *a1, Arrow *a2)
     /* fprintf(stderr, "enter compare_sany_anyof\n"); */
 
     assert(a1->rn->type == SANY);
-    assert((a2->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a2->rn->type == ANYOFD)
-#endif
-	);
+    assert((a2->rn->type == ANYOF) || (a2->rn->type == ANYOFD));
 
     /* fprintf(stderr, "left flags = 0x%x, right flags = 0x%x\n", 
        a1->rn->flags, a2->rn->flags); */
@@ -2262,16 +2386,29 @@ static int compare_sany_anyof(int anchored, Arrow *a1, Arrow *a2)
 
 static int compare_anyof_reg_any(int anchored, Arrow *a1, Arrow *a2)
 {
-    assert((a1->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a1->rn->type == ANYOFD)
-#endif
-	);
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
     assert(a2->rn->type == REG_ANY);
 
     return compare_bitmaps(anchored, a1, a2, 0, ndot.nbitmap);
 }
 
+#ifdef RC_ANYOFM
+static int compare_anyofm_reg_any(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char left[ANYOF_BITMAP_SIZE];
+    
+    assert(a1->rn->type == ANYOFM);
+    assert(a2->rn->type == REG_ANY);
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_bitmaps(anchored, a1, a2, left, ndot.nbitmap);
+}
+#endif
+	
 static int compare_exact_reg_any(int anchored, Arrow *a1, Arrow *a2)
 {
     assert((a1->rn->type == EXACT) || (a1->rn->type == EXACTF) || (a1->rn->type == EXACTFU));
@@ -2286,12 +2423,8 @@ static int compare_anyof_posix(int anchored, Arrow *a1, Arrow *a2)
 
     /* fprintf(stderr, "enter compare_anyof_posix\n"); */
 
-    assert((a1->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a1->rn->type == ANYOFD)
-#endif
-	);
-    assert((a2->rn->type == POSIXD) || (a2->rn->type == POSIXU));
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
+    assert((a2->rn->type == POSIXD) || (a2->rn->type == POSIXU) || (a2->rn->type == POSIXA));
 
     if (a2->rn->flags >= SIZEOF_ARRAY(posix_regclass_bitmaps))
     {
@@ -2309,20 +2442,42 @@ static int compare_anyof_posix(int anchored, Arrow *a1, Arrow *a2)
     return compare_bitmaps(anchored, a1, a2, 0, b);
 }
 
+#ifdef RC_ANYOFM
+static int compare_anyofm_posix(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char *b;
+    unsigned char left[ANYOF_BITMAP_SIZE];
+    
+    /* fprintf(stderr, "enter compare_anyofm_posix\n"); */
+
+    assert(a1->rn->type == ANYOFM);
+    assert((a2->rn->type == POSIXD) || (a2->rn->type == POSIXU) || (a2->rn->type == POSIXA));
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+    
+    b = posix_regclass_bitmaps[a2->rn->flags];
+    if (!b)
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+    
+    return compare_bitmaps(anchored, a1, a2, left, b);
+}
+#endif
+
 static int compare_anyof_posixa(int anchored, Arrow *a1, Arrow *a2)
 {
     unsigned char *b;
 
     /* fprintf(stderr, "enter compare_anyof_posixa\n"); */
 
-    assert((a1->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a1->rn->type == ANYOFD)
-#endif
-	);
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
     assert(a2->rn->type == POSIXA);
 
-    if (ANYOF_NONBITMAP(a1->rn))
+    if (ANYOF_FLAGS(a1->rn) & ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP)
     {
 	return compare_mismatch(anchored, a1, a2);
     }
@@ -2349,11 +2504,7 @@ static int compare_anyof_negative_posix(int anchored, Arrow *a1, Arrow *a2)
 
     /* fprintf(stderr, "enter compare_anyof_negative_posix\n"); */
 
-    assert((a1->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a1->rn->type == ANYOFD)
-#endif
-	);
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
     assert((a2->rn->type == NPOSIXD) || (a2->rn->type == NPOSIXU) ||
         (a2->rn->type == NPOSIXA));
 
@@ -2372,6 +2523,40 @@ static int compare_anyof_negative_posix(int anchored, Arrow *a1, Arrow *a2)
 
     return compare_bitmaps(anchored, a1, a2, 0, b);
 }
+
+#ifdef RC_ANYOFM
+static int compare_anyofm_negative_posix(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char *posix_bitmap;
+    unsigned char anyof_bitmap[ANYOF_BITMAP_SIZE];
+
+    /* fprintf(stderr, "enter compare_anyofm_negative_posix\n"); */
+
+    assert(a1->rn->type == ANYOFM);
+    assert((a2->rn->type == NPOSIXD) || (a2->rn->type == NPOSIXU) ||
+        (a2->rn->type == NPOSIXA));
+
+    if (!convert_anyofm_to_bitmap(a1, anyof_bitmap))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    if (a2->rn->flags >= SIZEOF_ARRAY(posix_regclass_nbitmaps))
+    {
+        /* fprintf(stderr, "flags = %d\n", a2->rn->flags); */
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    posix_bitmap = posix_regclass_nbitmaps[a2->rn->flags];
+    if (!posix_bitmap)
+    {
+        /* fprintf(stderr, "no negative bitmap for flags = %d\n", a2->rn->flags); */
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_bitmaps(anchored, a1, a2, anyof_bitmap, posix_bitmap);
+}
+#endif
 
 static int compare_posix_reg_any(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -2423,11 +2608,7 @@ static int compare_anyof_exact(int anchored, Arrow *a1, Arrow *a2)
     int i;
     unsigned char req;
 
-    assert((a1->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a1->rn->type == ANYOFD)
-#endif
-	);
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
     assert(a2->rn->type == EXACT);
 
     if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
@@ -2450,6 +2631,39 @@ static int compare_anyof_exact(int anchored, Arrow *a1, Arrow *a2)
     return compare_tails(anchored, a1, a2);
 }
 
+#ifdef RC_ANYOFM
+static int compare_anyofm_exact(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char left[ANYOF_BITMAP_SIZE];
+    BitFlag bf;
+    char *seq;
+    int i;
+    unsigned char req;
+
+    assert(a1->rn->type == ANYOFM);
+    assert(a2->rn->type == EXACT);
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+    
+    seq = GET_LITERAL(a2);
+    init_bit_flag(&bf, *((unsigned char *)seq));
+
+    for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
+    {
+        req = (i != bf.offs) ? 0 : bf.mask;
+	if (left[i] != req)
+	{
+	    return compare_mismatch(anchored, a1, a2);
+	}
+    }
+
+    return compare_tails(anchored, a1, a2);
+}
+#endif
+
 static int compare_anyof_exactf(int anchored, Arrow *a1, Arrow *a2)
 {
     char *seq;
@@ -2458,11 +2672,7 @@ static int compare_anyof_exactf(int anchored, Arrow *a1, Arrow *a2)
     unsigned char right[ANYOF_BITMAP_SIZE];
     int i;
 
-    assert((a1->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a1->rn->type == ANYOFD)
-#endif
-	);
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
     assert((a2->rn->type == EXACTF) || (a2->rn->type == EXACTFU));
 
     if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
@@ -2492,6 +2702,40 @@ static int compare_anyof_exactf(int anchored, Arrow *a1, Arrow *a2)
     return compare_bitmaps(anchored, a1, a2, 0, right);
 }
 
+#ifdef RC_ANYOFM
+static int compare_anyofm_exactf(int anchored, Arrow *a1, Arrow *a2)
+{
+    char *seq;
+    int i;
+    BitFlag bf;
+    unsigned char left[ANYOF_BITMAP_SIZE];
+    unsigned char right[ANYOF_BITMAP_SIZE];
+    char unf[2];
+
+    /* fprintf(stderr, "enter compare_anyofm_exactf(%d, \n", anchored); */
+
+    assert(a1->rn->type == ANYOFM);
+    assert((a2->rn->type == EXACTF) || (a2->rn->type == EXACTFU));
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    seq = GET_LITERAL(a2);
+    init_unfolded(unf, *seq);
+
+    memset(right, 0, ANYOF_BITMAP_SIZE);
+    for (i = 0; i < 2; ++i)
+    {
+        init_bit_flag(&bf, unf[i]);
+        right[bf.offs] = bf.mask;
+    }
+    
+    return compare_bitmaps(anchored, a1, a2, left, right);
+}
+#endif
+    
 static int compare_exact_exact(int anchored, Arrow *a1, Arrow *a2)
 {
     char *q1, *q2;
@@ -2635,18 +2879,12 @@ static int compare_left_branch(int anchored, Arrow *a1, Arrow *a2)
     return 1;
 }
 
-static int compare_anyof_branch(int anchored, Arrow *a1, Arrow *a2)
+static int compare_set(int anchored, Arrow *a1, Arrow *a2, unsigned char *b1)
 {
     regnode *alt, *t1;
     Arrow left, right;
     int i, j, power, rv, sz, offs;
-
-    assert((a1->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a1->rn->type == ANYOFD)
-#endif
-	);
-    assert(a2->rn->type == BRANCH);
+    unsigned char loc;
 
     offs = GET_OFFSET(a1->rn);
     if (offs <= 0)
@@ -2682,7 +2920,8 @@ static int compare_anyof_branch(int anchored, Arrow *a1, Arrow *a2)
         power = 1;
 	for (j = 0; j < 8; ++j)
 	{
-	    if (get_bitmap_byte(a1->rn, i) & power)
+            loc = b1 ? b1[i] : get_bitmap_byte(a1->rn, i);
+	    if (loc & power)
 	    {
 	        alt[1].flags = 8 * i + j;
 		left.rn = alt;
@@ -2726,6 +2965,31 @@ static int compare_anyof_branch(int anchored, Arrow *a1, Arrow *a2)
 
     return 1;
 }
+
+static int compare_anyof_branch(int anchored, Arrow *a1, Arrow *a2)
+{
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
+    assert(a2->rn->type == BRANCH);
+    
+    return compare_set(anchored, a1, a2, 0);
+}
+
+#ifdef RC_ANYOFM
+static int compare_anyofm_branch(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char left[ANYOF_BITMAP_SIZE];
+    
+    assert(a1->rn->type == ANYOFM);
+    assert(a2->rn->type == BRANCH);
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+    
+    return compare_set(anchored, a1, a2, left);
+}
+#endif
 
 static int compare_right_branch(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -3752,7 +4016,7 @@ static int compare_next_nword(int anchored, Arrow *a1, Arrow *a2)
 }
 
 static int compare_anyof_bounds(int anchored, Arrow *a1, Arrow *a2,
-    unsigned char *bitmap)
+    unsigned char *bitmap1, unsigned char *bitmap2)
 {
     unsigned char loc;
     FCompare cmp[2];
@@ -3762,14 +4026,14 @@ static int compare_anyof_bounds(int anchored, Arrow *a1, Arrow *a2,
     cmp[1] = compare_next_nword;
     for (i = 0; (i < ANYOF_BITMAP_SIZE) && (cmp[0] || cmp[1]); ++i)
     {
-        loc = get_bitmap_byte(a1->rn, i);
+        loc = bitmap1 ? bitmap1[i] : get_bitmap_byte(a1->rn, i);
 
-        if (loc & ~bitmap[i])
+        if (loc & ~bitmap2[i])
 	{
 	     cmp[0] = 0;
 	}
 
-        if (loc & bitmap[i])
+        if (loc & bitmap2[i])
 	{
 	     cmp[1] = 0;
 	}
@@ -3797,11 +4061,7 @@ static int compare_anyof_bounds(int anchored, Arrow *a1, Arrow *a2,
 
 static int compare_anyof_bound(int anchored, Arrow *a1, Arrow *a2)
 {
-    assert((a1->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a1->rn->type == ANYOFD)
-#endif
-	);
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
     assert(a2->rn->type == BOUND);
 
     if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
@@ -3809,16 +4069,12 @@ static int compare_anyof_bound(int anchored, Arrow *a1, Arrow *a2)
 	return compare_mismatch(anchored, a1, a2);
     }
 
-    return compare_anyof_bounds(anchored, a1, a2, word_bc.nbitmap);
+    return compare_anyof_bounds(anchored, a1, a2, 0, word_bc.nbitmap);
 }
 
 static int compare_anyof_nbound(int anchored, Arrow *a1, Arrow *a2)
 {
-    assert((a1->rn->type == ANYOF)
-#ifdef RC_ANYOFS
-	|| (a1->rn->type == ANYOFD)
-#endif
-	);
+    assert((a1->rn->type == ANYOF) || (a1->rn->type == ANYOFD));
     assert(a2->rn->type == NBOUND);
 
     if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
@@ -3826,8 +4082,40 @@ static int compare_anyof_nbound(int anchored, Arrow *a1, Arrow *a2)
 	return compare_mismatch(anchored, a1, a2);
     }
 
-    return compare_anyof_bounds(anchored, a1, a2, word_bc.bitmap);
+    return compare_anyof_bounds(anchored, a1, a2, 0, word_bc.bitmap);
 }
+
+#ifdef RC_ANYOFM
+static int compare_anyofm_bound(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char left[ANYOF_BITMAP_SIZE];
+    
+    assert(a1->rn->type == ANYOFM);
+    assert(a2->rn->type == BOUND);
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_anyof_bounds(anchored, a1, a2, left, word_bc.nbitmap);
+}
+
+static int compare_anyofm_nbound(int anchored, Arrow *a1, Arrow *a2)
+{
+    unsigned char left[ANYOF_BITMAP_SIZE];
+    
+    assert(a1->rn->type == ANYOFM);
+    assert(a2->rn->type == BOUND);
+
+    if (!convert_anyofm_to_bitmap(a1, left))
+    {
+	return compare_mismatch(anchored, a1, a2);
+    }
+
+    return compare_anyof_bounds(anchored, a1, a2, left, word_bc.bitmap);
+}
+#endif
 
 static int compare_exact_bound(int anchored, Arrow *a1, Arrow *a2)
 {
@@ -4180,34 +4468,15 @@ void rc_init()
 
     dispatch[SUCCEED][SUCCEED] = compare_tails;
 
-    dispatch[SUCCEED][BOL] = compare_left_tail;
-    dispatch[BOL][BOL] = compare_tails;
-    dispatch[SBOL][BOL] = compare_tails;
-    dispatch[BRANCH][BOL] = compare_left_branch;
-    dispatch[NOTHING][BOL] = compare_left_tail;
-    dispatch[TAIL][BOL] = compare_left_tail;
-    dispatch[STAR][BOL] = compare_mismatch;
-    dispatch[PLUS][BOL] = compare_left_plus;
-    dispatch[CURLY][BOL] = compare_left_curly;
-    dispatch[CURLYM][BOL] = compare_left_curly;
-    dispatch[CURLYX][BOL] = compare_left_curly;
-    dispatch[WHILEM][BOL] = compare_left_tail;
-    dispatch[OPEN][BOL] = compare_left_open;
-    dispatch[CLOSE][BOL] = compare_left_tail;
-    dispatch[IFMATCH][BOL] = compare_after_assertion;
-    dispatch[UNLESSM][BOL] = compare_after_assertion;
-    dispatch[MINMOD][BOL] = compare_left_tail;
-    dispatch[OPTIMIZED][BOL] = compare_left_tail;
-
     dispatch[SUCCEED][MBOL] = compare_left_tail;
-    dispatch[BOL][MBOL] = compare_tails;
     dispatch[MBOL][MBOL] = compare_tails;
     dispatch[SBOL][MBOL] = compare_tails;
     dispatch[REG_ANY][MBOL] = compare_mismatch;
     dispatch[SANY][MBOL] = compare_mismatch;
     dispatch[ANYOF][MBOL] = compare_anyof_multiline;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][MBOL] = compare_anyof_multiline;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][MBOL] = compare_anyofm_multiline;
 #endif
     dispatch[POSIXD][MBOL] = compare_mismatch;
     dispatch[POSIXU][MBOL] = compare_mismatch;
@@ -4235,7 +4504,6 @@ void rc_init()
     dispatch[OPTIMIZED][MBOL] = compare_left_tail;
 
     dispatch[SUCCEED][SBOL] = compare_left_tail;
-    dispatch[BOL][SBOL] = compare_tails;
     dispatch[SBOL][SBOL] = compare_tails;
     dispatch[BRANCH][SBOL] = compare_left_branch;
     dispatch[NOTHING][SBOL] = compare_left_tail;
@@ -4353,7 +4621,6 @@ void rc_init()
     dispatch[OPTIMIZED][SEOL] = compare_left_tail;
 
     dispatch[SUCCEED][BOUND] = compare_left_tail;
-    dispatch[BOL][BOUND] = compare_bol_word;
     dispatch[MBOL][BOUND] = compare_bol_word;
     dispatch[SBOL][BOUND] = compare_bol_word;
     dispatch[BOUND][BOUND] = compare_tails;
@@ -4361,8 +4628,9 @@ void rc_init()
     dispatch[REG_ANY][BOUND] = compare_mismatch;
     dispatch[SANY][BOUND] = compare_mismatch;
     dispatch[ANYOF][BOUND] = compare_anyof_bound;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][BOUND] = compare_anyof_bound;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][BOUND] = compare_anyofm_bound;
 #endif
     dispatch[POSIXD][BOUND] = compare_posix_bound;
     dispatch[POSIXU][BOUND] = compare_posix_bound;
@@ -4388,7 +4656,6 @@ void rc_init()
     dispatch[OPTIMIZED][BOUND] = compare_left_tail;
 
     dispatch[SUCCEED][NBOUND] = compare_left_tail;
-    dispatch[BOL][NBOUND] = compare_bol_nword;
     dispatch[MBOL][NBOUND] = compare_bol_nword;
     dispatch[SBOL][NBOUND] = compare_bol_nword;
     dispatch[BOUND][NBOUND] = compare_mismatch;
@@ -4396,8 +4663,9 @@ void rc_init()
     dispatch[REG_ANY][NBOUND] = compare_mismatch;
     dispatch[SANY][NBOUND] = compare_mismatch;
     dispatch[ANYOF][NBOUND] = compare_anyof_nbound;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][NBOUND] = compare_anyof_nbound;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][NBOUND] = compare_anyofm_nbound;
 #endif
     dispatch[POSIXD][NBOUND] = compare_posix_nbound;
     dispatch[POSIXU][NBOUND] = compare_posix_nbound;
@@ -4423,7 +4691,6 @@ void rc_init()
     dispatch[OPTIMIZED][NBOUND] = compare_left_tail;
 
     dispatch[SUCCEED][REG_ANY] = compare_left_tail;
-    dispatch[BOL][REG_ANY] = compare_bol;
     dispatch[MBOL][REG_ANY] = compare_bol;
     dispatch[SBOL][REG_ANY] = compare_bol;
     dispatch[BOUND][REG_ANY] = compare_mismatch;
@@ -4431,8 +4698,9 @@ void rc_init()
     dispatch[REG_ANY][REG_ANY] = compare_tails;
     dispatch[SANY][REG_ANY] = compare_mismatch;
     dispatch[ANYOF][REG_ANY] = compare_anyof_reg_any;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][REG_ANY] = compare_anyof_reg_any;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][REG_ANY] = compare_anyofm_reg_any;
 #endif
     dispatch[POSIXD][REG_ANY] = compare_posix_reg_any;
     dispatch[POSIXU][REG_ANY] = compare_posix_reg_any;
@@ -4460,7 +4728,6 @@ void rc_init()
     dispatch[OPTIMIZED][REG_ANY] = compare_left_tail;
 
     dispatch[SUCCEED][SANY] = compare_left_tail;
-    dispatch[BOL][SANY] = compare_bol;
     dispatch[MBOL][SANY] = compare_bol;
     dispatch[SBOL][SANY] = compare_bol;
     dispatch[BOUND][SANY] = compare_mismatch;
@@ -4468,8 +4735,9 @@ void rc_init()
     dispatch[REG_ANY][SANY] = compare_tails;
     dispatch[SANY][SANY] = compare_tails;
     dispatch[ANYOF][SANY] = compare_tails;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][SANY] = compare_tails;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][SANY] = compare_tails;
 #endif
     dispatch[POSIXD][SANY] = compare_tails;
     dispatch[POSIXU][SANY] = compare_tails;
@@ -4497,7 +4765,6 @@ void rc_init()
     dispatch[OPTIMIZED][SANY] = compare_left_tail;
 
     dispatch[SUCCEED][ANYOF] = compare_left_tail;
-    dispatch[BOL][ANYOF] = compare_bol;
     dispatch[MBOL][ANYOF] = compare_bol;
     dispatch[SBOL][ANYOF] = compare_bol;
     dispatch[BOUND][ANYOF] = compare_mismatch;
@@ -4505,8 +4772,9 @@ void rc_init()
     dispatch[REG_ANY][ANYOF] = compare_reg_any_anyof;
     dispatch[SANY][ANYOF] = compare_sany_anyof;
     dispatch[ANYOF][ANYOF] = compare_anyof_anyof;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][ANYOF] = compare_anyof_anyof;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][ANYOF] = compare_anyofm_anyof;
 #endif
     dispatch[POSIXD][ANYOF] = compare_posix_anyof;
     dispatch[POSIXU][ANYOF] = compare_posix_anyof;
@@ -4533,16 +4801,18 @@ void rc_init()
     dispatch[MINMOD][ANYOF] = compare_left_tail;
     dispatch[OPTIMIZED][ANYOF] = compare_left_tail;
 
-#ifdef RC_ANYOFS
     dispatch[SUCCEED][ANYOFD] = compare_left_tail;
-    dispatch[BOL][ANYOFD] = compare_bol;
     dispatch[MBOL][ANYOFD] = compare_bol;
+    dispatch[SBOL][ANYOFD] = compare_bol;
     dispatch[BOUND][ANYOFD] = compare_mismatch;
     dispatch[NBOUND][ANYOFD] = compare_mismatch;
     dispatch[REG_ANY][ANYOFD] = compare_reg_any_anyof;
     dispatch[SANY][ANYOFD] = compare_sany_anyof;
     dispatch[ANYOF][ANYOFD] = compare_anyof_anyof;
     dispatch[ANYOFD][ANYOFD] = compare_anyof_anyof;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][ANYOFD] = compare_anyofm_anyof;
+#endif
     dispatch[POSIXD][ANYOFD] = compare_posix_anyof;
     dispatch[POSIXU][ANYOFD] = compare_posix_anyof;
     dispatch[POSIXA][ANYOFD] = compare_posix_anyof;
@@ -4553,6 +4823,7 @@ void rc_init()
     dispatch[EXACT][ANYOFD] = compare_exact_anyof;
     dispatch[EXACTFU][ANYOFD] = compare_exactf_anyof;
     dispatch[NOTHING][ANYOFD] = compare_left_tail;
+    dispatch[TAIL][ANYOFD] = compare_left_tail;
     dispatch[STAR][ANYOFD] = compare_mismatch;
     dispatch[PLUS][ANYOFD] = compare_left_plus;
     dispatch[CURLY][ANYOFD] = compare_left_curly;
@@ -4564,10 +4835,44 @@ void rc_init()
     dispatch[UNLESSM][ANYOFD] = compare_after_assertion;
     dispatch[MINMOD][ANYOFD] = compare_left_tail;
     dispatch[OPTIMIZED][ANYOFD] = compare_left_tail;
-#endif
 
+#ifdef RC_ANYOFM
+    dispatch[SUCCEED][ANYOFM] = compare_left_tail;
+    dispatch[MBOL][ANYOFM] = compare_bol;
+    dispatch[SBOL][ANYOFM] = compare_bol;
+    dispatch[BOUND][ANYOFM] = compare_mismatch;
+    dispatch[NBOUND][ANYOFM] = compare_mismatch;
+    dispatch[REG_ANY][ANYOFM] = compare_mismatch;
+    dispatch[SANY][ANYOFM] = compare_mismatch;
+    dispatch[ANYOF][ANYOFM] = compare_anyof_anyofm;
+    dispatch[ANYOFD][ANYOFM] = compare_anyof_anyofm;
+    dispatch[ANYOFM][ANYOFM] = compare_anyofm_anyofm;
+    dispatch[POSIXD][ANYOFM] = compare_mismatch;
+    dispatch[POSIXU][ANYOFM] = compare_mismatch;
+    dispatch[POSIXA][ANYOFM] = compare_mismatch;
+    dispatch[NPOSIXD][ANYOFM] = compare_mismatch;
+    dispatch[NPOSIXU][ANYOFM] = compare_mismatch;
+    dispatch[NPOSIXA][ANYOFM] = compare_mismatch;
+    dispatch[BRANCH][ANYOFM] = compare_left_branch;
+    dispatch[EXACT][ANYOFM] = compare_exact_anyofm;
+    dispatch[EXACTF][ANYOFM] = compare_exactf_anyofm;
+    dispatch[EXACTFU][ANYOFM] = compare_exactf_anyofm;
+    dispatch[NOTHING][ANYOFM] = compare_left_tail;
+    dispatch[TAIL][ANYOFM] = compare_left_tail;
+    dispatch[STAR][ANYOFM] = compare_mismatch;
+    dispatch[PLUS][ANYOFM] = compare_left_plus;
+    dispatch[CURLY][ANYOFM] = compare_left_curly;
+    dispatch[CURLYM][ANYOFM] = compare_left_curly;
+    dispatch[CURLYX][ANYOFM] = compare_left_curly;
+    dispatch[OPEN][ANYOFM] = compare_left_open;
+    dispatch[CLOSE][ANYOFM] = compare_left_tail;
+    dispatch[IFMATCH][ANYOFM] = compare_after_assertion;
+    dispatch[UNLESSM][ANYOFM] = compare_after_assertion;
+    dispatch[MINMOD][ANYOFM] = compare_left_tail;
+    dispatch[OPTIMIZED][ANYOFM] = compare_left_tail;
+#endif
+    
     dispatch[SUCCEED][POSIXD] = compare_left_tail;
-    dispatch[BOL][POSIXD] = compare_bol;
     dispatch[MBOL][POSIXD] = compare_bol;
     dispatch[SBOL][POSIXD] = compare_bol;
     dispatch[BOUND][POSIXD] = compare_mismatch;
@@ -4575,8 +4880,9 @@ void rc_init()
     dispatch[REG_ANY][POSIXD] = compare_mismatch;
     dispatch[SANY][POSIXD] = compare_mismatch;
     dispatch[ANYOF][POSIXD] = compare_anyof_posix;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][POSIXD] = compare_anyof_posix;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][POSIXD] = compare_anyofm_posix;
 #endif
     dispatch[POSIXD][POSIXD] = compare_posix_posix;
     dispatch[POSIXU][POSIXD] = compare_posix_posix;
@@ -4602,7 +4908,6 @@ void rc_init()
     dispatch[OPTIMIZED][POSIXD] = compare_left_tail;
 
     dispatch[SUCCEED][POSIXU] = compare_left_tail;
-    dispatch[BOL][POSIXU] = compare_bol;
     dispatch[MBOL][POSIXU] = compare_bol;
     dispatch[SBOL][POSIXU] = compare_bol;
     dispatch[BOUND][POSIXU] = compare_mismatch;
@@ -4610,8 +4915,9 @@ void rc_init()
     dispatch[REG_ANY][POSIXU] = compare_mismatch;
     dispatch[SANY][POSIXU] = compare_mismatch;
     dispatch[ANYOF][POSIXU] = compare_anyof_posix;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][POSIXU] = compare_anyof_posix;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][POSIXU] = compare_anyofm_posix;
 #endif
     dispatch[POSIXD][POSIXU] = compare_posix_posix;
     dispatch[POSIXA][POSIXU] = compare_posix_posix;
@@ -4624,6 +4930,7 @@ void rc_init()
     dispatch[EXACTF][POSIXU] = compare_exact_posix;
     dispatch[EXACTFU][POSIXU] = compare_exact_posix;
     dispatch[NOTHING][POSIXU] = compare_left_tail;
+    dispatch[TAIL][POSIXU] = compare_left_tail;
     dispatch[STAR][POSIXU] = compare_mismatch;
     dispatch[PLUS][POSIXU] = compare_left_plus;
     dispatch[CURLY][POSIXU] = compare_left_curly;
@@ -4637,7 +4944,6 @@ void rc_init()
     dispatch[OPTIMIZED][POSIXU] = compare_left_tail;
 
     dispatch[SUCCEED][POSIXA] = compare_left_tail;
-    dispatch[BOL][POSIXA] = compare_bol;
     dispatch[MBOL][POSIXA] = compare_bol;
     dispatch[SBOL][POSIXA] = compare_bol;
     dispatch[BOUND][POSIXA] = compare_mismatch;
@@ -4645,8 +4951,9 @@ void rc_init()
     dispatch[REG_ANY][POSIXA] = compare_mismatch;
     dispatch[SANY][POSIXA] = compare_mismatch;
     dispatch[ANYOF][POSIXA] = compare_anyof_posixa;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][POSIXA] = compare_anyof_posixa;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][POSIXA] = compare_anyofm_posix;
 #endif
     dispatch[POSIXD][POSIXA] = compare_mismatch;
     dispatch[POSIXU][POSIXA] = compare_mismatch;
@@ -4672,7 +4979,6 @@ void rc_init()
     dispatch[OPTIMIZED][POSIXA] = compare_left_tail;
 
     dispatch[SUCCEED][NPOSIXD] = compare_left_tail;
-    dispatch[BOL][NPOSIXD] = compare_bol;
     dispatch[MBOL][NPOSIXD] = compare_bol;
     dispatch[SBOL][NPOSIXD] = compare_bol;
     dispatch[BOUND][NPOSIXD] = compare_mismatch;
@@ -4680,8 +4986,9 @@ void rc_init()
     dispatch[REG_ANY][NPOSIXD] = compare_mismatch;
     dispatch[SANY][NPOSIXD] = compare_mismatch;
     dispatch[ANYOF][NPOSIXD] = compare_anyof_negative_posix;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][NPOSIXD] = compare_anyof_negative_posix;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][NPOSIXD] = compare_anyofm_negative_posix;
 #endif
     dispatch[POSIXD][NPOSIXD] = compare_posix_negative_posix;
     dispatch[POSIXU][NPOSIXD] = compare_posix_negative_posix;
@@ -4707,7 +5014,6 @@ void rc_init()
     dispatch[OPTIMIZED][NPOSIXD] = compare_left_tail;
 
     dispatch[SUCCEED][NPOSIXU] = compare_left_tail;
-    dispatch[BOL][NPOSIXU] = compare_bol;
     dispatch[MBOL][NPOSIXU] = compare_bol;
     dispatch[SBOL][NPOSIXU] = compare_bol;
     dispatch[BOUND][NPOSIXU] = compare_mismatch;
@@ -4715,8 +5021,9 @@ void rc_init()
     dispatch[REG_ANY][NPOSIXU] = compare_mismatch;
     dispatch[SANY][NPOSIXU] = compare_mismatch;
     dispatch[ANYOF][NPOSIXU] = compare_anyof_negative_posix;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][NPOSIXU] = compare_anyof_negative_posix;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][NPOSIXU] = compare_anyofm_negative_posix;
 #endif
     dispatch[POSIXD][NPOSIXU] = compare_posix_negative_posix;
     dispatch[POSIXU][NPOSIXU] = compare_posix_negative_posix;
@@ -4742,7 +5049,6 @@ void rc_init()
     dispatch[OPTIMIZED][NPOSIXU] = compare_left_tail;
 
     dispatch[SUCCEED][NPOSIXA] = compare_left_tail;
-    dispatch[BOL][NPOSIXA] = compare_bol;
     dispatch[MBOL][NPOSIXA] = compare_bol;
     dispatch[SBOL][NPOSIXA] = compare_bol;
     dispatch[BOUND][NPOSIXA] = compare_mismatch;
@@ -4750,8 +5056,9 @@ void rc_init()
     dispatch[REG_ANY][NPOSIXA] = compare_mismatch;
     dispatch[SANY][NPOSIXA] = compare_mismatch;
     dispatch[ANYOF][NPOSIXA] = compare_anyof_negative_posix;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][NPOSIXA] = compare_anyof_negative_posix;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][NPOSIXA] = compare_anyofm_negative_posix;
 #endif
     dispatch[POSIXD][NPOSIXA] = compare_posix_negative_posix;
     dispatch[POSIXU][NPOSIXA] = compare_posix_negative_posix;
@@ -4783,8 +5090,9 @@ void rc_init()
 
     dispatch[SUCCEED][BRANCH] = compare_left_tail;
     dispatch[ANYOF][BRANCH] = compare_anyof_branch;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][BRANCH] = compare_anyof_branch;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][BRANCH] = compare_anyofm_branch;
 #endif
     dispatch[BRANCH][BRANCH] = compare_left_branch;
     dispatch[NOTHING][BRANCH] = compare_left_tail;
@@ -4798,7 +5106,6 @@ void rc_init()
     dispatch[OPTIMIZED][BRANCH] = compare_left_tail;
 
     dispatch[SUCCEED][EXACT] = compare_left_tail;
-    dispatch[BOL][EXACT] = compare_bol;
     dispatch[MBOL][EXACT] = compare_bol;
     dispatch[SBOL][EXACT] = compare_bol;
     dispatch[BOUND][EXACT] = compare_mismatch;
@@ -4806,9 +5113,10 @@ void rc_init()
     dispatch[REG_ANY][EXACT] = compare_mismatch;
     dispatch[SANY][EXACT] = compare_mismatch;
     dispatch[ANYOF][EXACT] = compare_anyof_exact;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][EXACT] = compare_anyof_exact;
-#endif
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][EXACT] = compare_anyofm_exact;
+#endif    
     dispatch[POSIXD][EXACT] = compare_mismatch;
     dispatch[POSIXU][EXACT] = compare_mismatch;
     dispatch[POSIXA][EXACT] = compare_mismatch;
@@ -4835,7 +5143,6 @@ void rc_init()
     dispatch[OPTIMIZED][EXACT] = compare_left_tail;
 
     dispatch[SUCCEED][EXACTF] = compare_left_tail;
-    dispatch[BOL][EXACTF] = compare_bol;
     dispatch[MBOL][EXACTF] = compare_bol;
     dispatch[SBOL][EXACTF] = compare_bol;
     dispatch[BOUND][EXACTF] = compare_mismatch;
@@ -4843,6 +5150,10 @@ void rc_init()
     dispatch[REG_ANY][EXACTF] = compare_mismatch;
     dispatch[SANY][EXACTF] = compare_mismatch;
     dispatch[ANYOF][EXACTF] = compare_anyof_exactf;
+    dispatch[ANYOFD][EXACTF] = compare_anyof_exactf;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][EXACTF] = compare_anyofm_exactf;
+#endif
     dispatch[POSIXD][EXACTF] = compare_mismatch;
     dispatch[POSIXU][EXACTF] = compare_mismatch;
     dispatch[POSIXA][EXACTF] = compare_mismatch;
@@ -4868,7 +5179,6 @@ void rc_init()
     dispatch[OPTIMIZED][EXACTF] = compare_left_tail;
 
     dispatch[SUCCEED][EXACTFU] = compare_left_tail;
-    dispatch[BOL][EXACTFU] = compare_bol;
     dispatch[MBOL][EXACTFU] = compare_bol;
     dispatch[SBOL][EXACTFU] = compare_bol;
     dispatch[BOUND][EXACTFU] = compare_mismatch;
@@ -4876,8 +5186,9 @@ void rc_init()
     dispatch[REG_ANY][EXACTFU] = compare_mismatch;
     dispatch[SANY][EXACTFU] = compare_mismatch;
     dispatch[ANYOF][EXACTFU] = compare_anyof_exactf;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][EXACTFU] = compare_anyof_exactf;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][EXACTFU] = compare_anyofm_exactf;
 #endif
     dispatch[POSIXD][EXACTFU] = compare_mismatch;
     dispatch[POSIXU][EXACTFU] = compare_mismatch;
@@ -5069,7 +5380,6 @@ void rc_init()
     dispatch[OPTIMIZED][CLOSE] = compare_tails;
 
     dispatch[SUCCEED][IFMATCH] = compare_left_tail;
-    dispatch[BOL][IFMATCH] = compare_bol;
     dispatch[MBOL][IFMATCH] = compare_bol;
     dispatch[SBOL][IFMATCH] = compare_bol;
     dispatch[BOUND][IFMATCH] = compare_mismatch;
@@ -5077,8 +5387,9 @@ void rc_init()
     dispatch[REG_ANY][IFMATCH] = compare_mismatch;
     dispatch[SANY][IFMATCH] = compare_mismatch;
     dispatch[ANYOF][IFMATCH] = compare_mismatch;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][IFMATCH] = compare_mismatch;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][IFMATCH] = compare_mismatch;
 #endif
     dispatch[POSIXD][IFMATCH] = compare_mismatch;
     dispatch[POSIXU][IFMATCH] = compare_mismatch;
@@ -5106,7 +5417,6 @@ void rc_init()
     dispatch[OPTIMIZED][IFMATCH] = compare_left_tail;
 
     dispatch[SUCCEED][UNLESSM] = compare_left_tail;
-    dispatch[BOL][UNLESSM] = compare_bol;
     dispatch[MBOL][UNLESSM] = compare_bol;
     dispatch[SBOL][UNLESSM] = compare_bol;
     dispatch[BOUND][UNLESSM] = compare_mismatch;
@@ -5114,8 +5424,9 @@ void rc_init()
     dispatch[REG_ANY][UNLESSM] = compare_mismatch;
     dispatch[SANY][UNLESSM] = compare_mismatch;
     dispatch[ANYOF][UNLESSM] = compare_mismatch;
-#ifdef RC_ANYOFS
     dispatch[ANYOFD][UNLESSM] = compare_mismatch;
+#ifdef RC_ANYOFM
+    dispatch[ANYOFM][UNLESSM] = compare_mismatch;
 #endif
     dispatch[POSIXD][UNLESSM] = compare_mismatch;
     dispatch[POSIXU][UNLESSM] = compare_mismatch;

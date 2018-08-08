@@ -3,11 +3,9 @@ package Pcore::Util::CA;
 use Pcore -class;
 
 sub update ($cb = undef) {
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
-
     print 'updating ca_file.pem ... ';
 
-    P->http->get(
+    return P->http->get(
         'https://curl.haxx.se/ca/cacert.pem',
         sub ($res) {
             my $status;
@@ -15,18 +13,14 @@ sub update ($cb = undef) {
             say $res;
 
             if ($res) {
-                $ENV->{share}->write( 'Pcore', 'data/ca_file.pem', $res->{body} );
+                $ENV->{share}->write( 'Pcore', 'data/ca_file.pem', $res->{data} );
 
                 $status = 1;
             }
 
-            $rouse_cb ? $cb ? $rouse_cb->( $cb->($status) ) : $rouse_cb->($status) : $cb ? $cb->($status) : ();
-
-            return;
+            return $cb ? $cb->($status) : $status;
         }
     );
-
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
 }
 
 sub ca_file {

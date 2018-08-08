@@ -86,13 +86,13 @@ sub _req ( $self, $method, $endpoint, $require_auth, $data, $cb = undef ) {
     my $request = sub {
         P->http->$method(
             $BASE_URL . $endpoint,
-            headers => {
-                CONTENT_TYPE => 'application/json',
-                $require_auth ? ( AUTHORIZATION => 'JWT ' . $self->{_login_token} ) : (),
-            },
-            body => $data ? P->data->to_json($data) : undef,
+            headers => [
+                'Content-Type' => 'application/json',
+                $require_auth ? ( Authorization => 'JWT ' . $self->{_login_token} ) : (),
+            ],
+            data => $data ? P->data->to_json($data) : undef,
             sub ($res) {
-                my $api_res = res [ $res->{status}, $res->{reason} ], $res->{body} && $res->{body}->$* ? P->data->from_json( $res->{body} ) : ();
+                my $api_res = res [ $res->{status}, $res->{reason} ], $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : ();
 
                 $rouse_cb ? $cb ? $rouse_cb->( $cb->($api_res) ) : $rouse_cb->($api_res) : $cb ? $cb->($api_res) : ();
 

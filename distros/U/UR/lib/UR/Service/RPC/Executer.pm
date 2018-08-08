@@ -4,7 +4,7 @@ use UR;
 
 use strict;
 use warnings;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 class UR::Service::RPC::Executer {
     has => [
@@ -78,18 +78,25 @@ sub execute {
 
 
         my $method_name = join('::',$target_class, $method);
-        if ($wantarray) {
-            my @retval;
-            eval { no strict 'refs'; @retval = &{$method_name}(@arglist); };
-            $resp_msg_args{'return_values'} = \@retval unless ($@);
-        } elsif (defined $wantarray) {
-            my $retval;
-            eval { no strict 'refs'; no warnings; $retval = &{$method_name}(@arglist); };
-            $resp_msg_args{'return_values'} = [$retval] unless ($@);
+        if (! $target_class->can($method)) {
+            $resp_msg_args{exception} =
+                qq(Can't locate object method "$method" via package "$target_class" (perhaps you forgot to load "$target_class"?));
+
         } else {
-            eval { no strict 'refs'; &{$method_name}(@arglist); };
+            local $@;
+            if ($wantarray) {
+                my @retval;
+                eval { no strict 'refs'; @retval = &{$method_name}(@arglist); };
+                $resp_msg_args{return_values} = \@retval unless ($@);
+            } elsif (defined $wantarray) {
+                my $retval;
+                eval { no strict 'refs'; no warnings; $retval = &{$method_name}(@arglist); };
+                $resp_msg_args{return_values} = [$retval] unless ($@);
+            } else {
+                eval { no strict 'refs'; &{$method_name}(@arglist); };
+            }
+            $resp_msg_args{exception} = $@ if $@;
         }
-        $resp_msg_args{'exception'} = $@ if $@;
         $response = UR::Service::RPC::Message->create(%resp_msg_args);
 
     } else {

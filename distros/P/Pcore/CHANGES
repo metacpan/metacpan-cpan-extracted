@@ -1,3 +1,26 @@
+v0.72.2 2018-08-08T07:22:24Z
+ - syntax
+ - Pcore::Handle fix
+ - HTTP server refactored
+ - Pcore::Handle timeout fixed
+ - Pcore::Handle improvements
+ - Pcore::Handle websocket fix
+
+v0.72.1 2018-08-07T18:14:27Z
+ - uri ->connect method removed
+ - Pcore::Handle TLS windows fix
+
+v0.72.0 2018-08-07T11:48:41Z
+ - Coro::Handle patch
+ - Coro::Handle patch removed
+ - IO::Socket::SSL added
+ - Pcore::Handle updated
+ - read handle returns scalar ref
+ - Pcore::Handle improvements
+ - Pcore::HTTP refactoring
+ - Pcore::HTTP::Headers removed
+ - Pcore::Handle uri parser
+
 v0.71.1 2018-07-13T07:14:58Z
  - File::Copy import under Coro fixed
 

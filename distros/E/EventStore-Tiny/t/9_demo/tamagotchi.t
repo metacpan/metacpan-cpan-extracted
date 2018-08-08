@@ -26,7 +26,7 @@ subtest 'User handling' => sub {
         is $bob  => 1, 'Correct second user ID';
 
         subtest 'Events' => sub {
-            is $tama_sto->_event_store->events->length => 2,
+            is $tama_sto->_event_store->events->size => 2,
                 '2 events recorded';
 
             # first user
@@ -64,7 +64,7 @@ subtest 'User handling' => sub {
     subtest 'Renaming' => sub {
 
         subtest 'Event' => sub {
-            is $tama_sto->_event_store->events->length => 3,
+            is $tama_sto->_event_store->events->size => 3,
                 'Three events recorded';
 
             # check event data
@@ -92,7 +92,7 @@ subtest 'User handling' => sub {
     subtest 'Removal' => sub {
 
         subtest 'Events' => sub {
-            is $tama_sto->_event_store->events->length => 4,
+            is $tama_sto->_event_store->events->size => 4,
                 'Four events recorded';
 
             # check event data
@@ -123,7 +123,7 @@ subtest 'Tamagotchi' => sub {
         is $tama => 0, 'Correct first tamagotchi ID';
 
         subtest 'Events' => sub {
-            is $tama_sto->_event_store->events->length => 5,
+            is $tama_sto->_event_store->events->size => 5,
                 '5 events recorded';
 
             # check event data
@@ -155,7 +155,7 @@ subtest 'Tamagotchi' => sub {
     subtest 'Life' => sub {
 
         subtest 'Events' => sub {
-            is $tama_sto->_event_store->events->length => 8,
+            is $tama_sto->_event_store->events->size => 8,
                 '8 events recorded';
 
             # check event data
@@ -188,7 +188,7 @@ subtest 'Tamagotchi' => sub {
     subtest 'Death' => sub {
 
         subtest 'Events' => sub {
-            is $tama_sto->_event_store->events->length => 9,
+            is $tama_sto->_event_store->events->size => 9,
                 '9 events recorded';
 
             # check event data

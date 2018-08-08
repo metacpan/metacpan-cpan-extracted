@@ -2,7 +2,7 @@ package UR::Role::MethodModifier::Before;
 use strict;
 use warnings;
 
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 use UR;
 

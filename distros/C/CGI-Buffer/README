@@ -1,4 +1,4 @@
-CGI-Buffer Version 0.81
+CGI-Buffer Version 0.82
 
 INSTALLATION
 
@@ -30,6 +30,11 @@ You can also look for information at:
     Search CPAN
         http://search.cpan.org/dist/CGI-Buffer/
 
+Before filing a bug report, test against the latest version on GitHub:
+
+	https://github.com/nigelhorne/CGI-Buffer
+
+When filing a bug, please include a patch or pull request.
 
 LICENSE AND COPYRIGHT
 

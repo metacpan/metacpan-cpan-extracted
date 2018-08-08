@@ -1,9 +1,228 @@
 ==================================================
-Changes from 2017-02-07 00:00:00 +0000 to present.
+Changes from 2017-08-06 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.12 at 2018-02-07 10:58:20 +0000
+version 0.15 at 2018-08-06 23:26:28 +0000
+-----------------------------------------
+
+  Change: f27f53ad3b23416a403a9d22263c9f411a1eda09
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-07 01:03:15 +0000
+
+    Fix HTTP-Redirect parsing and validation 
+
+  Change: c53e542ee34fe5adf0ffd3e2ff6daf525101d4f0
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 23:04:03 +0000
+
+    Parse sub-StatusCode and StatusMessage 
+
+  Change: 2de9984405181cebd6002dee376de82fb5cbb638
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 22:59:29 +0000
+
+    Use absolute XPath selectors for security. Fixes #7 
+
+-----------------------------------------
+version 0.14 at 2018-08-06 19:18:57 +0000
+-----------------------------------------
+
+  Change: 63a2c939b961fb95eec2268b2235c3a2cba8aee9
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 21:18:57 +0000
+
+    Apply some nice Bootstrap to the example app 
+
+  Change: 8df77f97efdb2019772dad54a2ea8e497e5ff6df
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 21:10:48 +0000
+
+    Fix session->level 
+
+  Change: 00d600185a95211d1c653cd4bb278149e5abac69
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 20:31:47 +0000
+
+    Remove cacert.pem as it's not used anymore 
+
+-----------------------------------------
+version 0.13 at 2018-08-06 18:21:13 +0000
+-----------------------------------------
+
+  Change: 6c56a250392ccd447eaee17c9f56ebd2efc78d79
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 20:21:13 +0000
+
+    Replace example key and cert 
+
+  Change: ccdd4acd76cef07be9547a3da9935cab2f4c1741
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 20:19:27 +0000
+
+    Make tests happy 
+
+  Change: afacf9a87bd3fc68bfaaa62557cff9cc7ea52f00
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 20:19:15 +0000
+
+    Skip testing deps on TravisCI, speed up build 
+
+  Change: 7fd9f8ba194bb75f69ee7041690974204786c12e
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 19:51:35 +0000
+
+    Skip testing deps on TravisCI, speed up build 
+
+  Change: 6e988fa0cad78b59b4f5cc1c97ae74914463747a
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 19:38:46 +0000
+
+    Remove Net::SAML2 from README 
+
+  Change: b215a2153f23ea24a13886b594c783c2756ae391
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 19:37:04 +0000
+
+    Rename ::Assertion to ::Response as it's more correct 
+
+  Change: 139f4bff691724abb1dafc1afcacb4e42c751544
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 19:32:46 +0000
+
+    Parsing of Response message without Assertion 
+
+  Change: 302377b4db8e4793f7ca3c74c1547aef66301153
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 19:18:34 +0000
+
+    Refactor Net::SPID::SAML::In::Base accessors 
+
+  Change: a23e94b1b6254d49717b816d1997a3b11540642f
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 19:16:22 +0000
+
+    Refactor Assertion validation 
+
+  Change: 1ddb0d743f3765cf73711dc365ccf7c93f483db8
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 19:08:23 +0000
+
+    Make InResponseTo validation mandatory 
+
+  Change: 9e76a7c0fd6dc88ae1aa5c8813bea449a74e4f6e
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 18:53:04 +0000
+
+    Refactor Destination parsing 
+
+  Change: 1a9610f12aa88091f0e10e223db39eea1f2cbb72
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 16:34:51 +0000
+
+    Metadata generation and Destination validation 
+
+  Change: e2236e5772b16dd2375318fe3e639684313b4df9
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-05 19:39:34 +0000
+
+    Remove comment; we're now using ResponseLocation 
+
+  Change: d129eb271af36ed82818c99e814b67a450ef97cf
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-05 19:38:42 +0000
+
+    Ditch Net::SAML2 and XML::Sig 
+
+  Change: 53630e8e5dbe70f312ecc1beb18803504e86a1ed
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-05 19:30:54 +0000
+
+    Ported Net::SPID::SAML::IdP 
+
+  Change: aaec956efa2c978ad2f9dfbfa27fcadbc53597e7
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-05 18:51:36 +0000
+
+    Finished porting LogoutRequest and LogoutResponse 
+
+  Change: 112e539937aae3984808d184f38e8a0023729dc2
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-04 11:44:51 +0000
+
+    Rename classes with a nicer scheme 
+
+  Change: 29ab775de05011559a4eac1231bb6e0d0362d80e
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-04 11:37:16 +0000
+
+    Support HTTP-POST binding for outgoing messages 
+
+  Change: 65a27ba0154207b4ebdb993980989f4539be976a
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-04 10:18:31 +0000
+
+    Ported LogoutResponse parsing 
+
+  Change: e19727c21481b2c695bcc806dfb2f750eaece615
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-02 16:53:34 +0000
+
+    Move HTTP-Redirect URL generation to ProtocolMessage::Outgoing base
+    class 
+
+  Change: bef1006fb7bd1d77a1f73a68af4481a8c6655a37
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-07-31 01:04:26 +0000
+
+    Minor note to self in example/app.pl 
+
+  Change: f04167350cef8440e89d4191df902345258bb687
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-07-31 01:03:57 +0000
+
+    Re-enable signature verification and fix attribute parsing 
+
+  Change: 2131614f33b3f2db630e214c4f2a1963480bb38f
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-07-21 20:26:35 +0000
+
+    Fix POD 
+
+  Change: ca21aa6d08b9e6a45ae66abb1bc0e787d348fa4f
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-07-21 20:25:02 +0000
+
+    Reimplement LogoutRequest without Net::SAML2 
+
+  Change: ea77bfccf06f1795e25e6eee97dd21be84d8ee5d
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-07-21 19:08:15 +0000
+
+    Fix documentation coverage and example app 
+
+  Change: 15b99241443f9deef334040d54b1d895d1392408
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-07-21 00:37:03 +0000
+
+    Implement AuthnRequest and Assertion directly, no more usage of
+    Net::SAML2 
+
+  Change: cb863d0dc54d219828ad39e97476ac4a7a48a179
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-07-13 11:59:55 +0000
+
+    Rewrite AuthnRequest generation. Hand-crafting XML messages is much
+    easier. 
+
+  Change: f5d87a93273e1fdf513b1cd81b506797d2d680a2
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-03-15 18:23:12 +0000
+
+    Nicer checklist formatting 
+
+-----------------------------------------
+version 0.12 at 2018-02-07 10:40:00 +0000
 -----------------------------------------
 
   Change: ec4b61152e3fd905ac7f894c314ec58b83bfc1d2

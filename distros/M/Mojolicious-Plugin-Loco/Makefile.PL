@@ -13,13 +13,8 @@ install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "launch local GUI via default web browser",
+  "ABSTRACT" => "launch a web browser; easy local GUI",
   "AUTHOR" => "Roger Crew <wrog\@cpan.org>",
-  "BUILD_REQUIRES" => {
-    "Pod::Coverage::TrustPod" => 0,
-    "Test::Pod" => 0,
-    "Test::Pod::Coverage" => 0
-  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
@@ -34,9 +29,13 @@ my %WriteMakefileArgs = (
     "Mojolicious" => "7.87"
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "Pod::Coverage::TrustPod" => 0,
+    "Test::Fatal" => 0,
+    "Test::More" => 0,
+    "Test::Pod" => 0,
+    "Test::Pod::Coverage" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +47,7 @@ my %FallbackPrereqs = (
   "File::ShareDir" => 0,
   "Mojolicious" => "7.87",
   "Pod::Coverage::TrustPod" => 0,
+  "Test::Fatal" => 0,
   "Test::More" => 0,
   "Test::Pod" => 0,
   "Test::Pod::Coverage" => 0

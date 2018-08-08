@@ -43,7 +43,7 @@ a formal UR class.
 require 5.006_000;
 use warnings;
 use strict;
-our $VERSION = "0.46"; # UR $VERSION;;
+our $VERSION = "0.47"; # UR $VERSION;
 
 # set up module
 use Carp;
@@ -804,7 +804,7 @@ sub _carp_sprintf {
         local $SIG{__WARN__} = sub {
             my $msg = $_[0];
             my ($filename, $line) = (caller)[1, 2];
-            my $short_msg = ($msg =~ /(.*) at $filename line $line./)[0];
+            my $short_msg = ($msg =~ /(.*) at \Q$filename\E line $line./)[0];
             $warn_msg = ($short_msg || $msg);
         };
         $formatted_string = sprintf($format, @list);

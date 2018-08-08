@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-<title>spid-perl Example Application</title>
-<link rel="stylesheet" href="/css/style.css" />
-<meta charset=UTF-8" />
+    <title>spid-perl-dancer2 Example Application</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <meta charset=UTF-8" />
 </head>
 <body>
-<h1>spid-perl Example Application</h1>
-<div id="content">
-[% content %]
-</div>
+    <div class="container">
+        <h1>spid-perl-dancer2 Example Application</h1>
+        <div id="content">
+        [% content %]
+        </div>
+    </div>
 </body>
 </html>

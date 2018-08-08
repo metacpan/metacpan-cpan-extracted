@@ -1,3 +1,8 @@
+0.006   2018-08-07 (PERLANCAR)
+
+	- Observe LOG_ADD_TIMESTAMP.
+
+
 0.005   2018-01-17 (PERLANCAR)
 
 	- [Bugfix] Don't even initialize output when level is off (e.g.

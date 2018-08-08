@@ -16,7 +16,7 @@ package UR::DataSource::File;
 use UR;
 use strict;
 use warnings;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 use Fcntl qw(:DEFAULT :flock);
 use Errno qw(EINTR EAGAIN EOPNOTSUPP);
@@ -995,7 +995,7 @@ sub _sync_database {
     my $changed_objects = delete $params{changed_objects};
 
 
-    # We're going to assumme all the passed-in objects are of the same class *gulp*
+    # We're going to assume all the passed-in objects are of the same class *gulp*
     my $class_name = $changed_objects->[0]->class;
     my $class_meta = UR::Object::Type->get(class_name => $class_name);
     my %column_name_to_property_meta = map { $_->column_name => $_ }
@@ -1321,7 +1321,7 @@ is no default.
 If the data file is sorted in some way, sort_order() should return a listref of column names (which must
 exist in column_order()) by which the file is sorted.  This gives the system a hint about how the file
 is structured, and is able to make shortcuts when reading the file to speed up data access.  The default
-is to assumme the file is not sorted.
+is to assume the file is not sorted.
 
 =back
 

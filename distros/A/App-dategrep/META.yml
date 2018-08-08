@@ -1,19 +1,16 @@
 ---
-abstract: 'grep for dates'
+abstract: 'print lines matching a time range'
 author:
   - 'Mario Domgoergen C<< <mario@domgoergen.com> >>'
 build_requires:
-  FindBin: '0'
-  POSIX: '0'
   Test::MockTime: '0'
-  Test::More: '0'
   Test::Output: '0'
-  lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'Minilla/v3.1.1, CPAN::Meta::Converter version 2.150005'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -22,32 +19,36 @@ no_index:
   directory:
     - t
     - xt
-requires:
-  Config::Tiny: '0'
-  Date::Manip::Date: '0'
-  Date::Manip::Delta: '0'
-  Exporter: '0'
-  Fcntl: '0'
-  File::Basename: '0'
-  File::stat: '0'
-  FileHandle: '0'
-  Getopt::Long: '0'
-  IO::Uncompress::Bunzip2: '0'
-  IO::Uncompress::Gunzip: '0'
-  IPC::Cmd: '0'
-  Moo: '0'
-  Pod::Usage: '0'
-  base: '0'
-  parent: '0'
-  strict: '0'
-  warnings: '0'
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::dategrep:
+    file: lib/App/dategrep.pm
+    version: '2.03'
+  App::dategrep::Date:
+    file: lib/App/dategrep/Date.pm
+  App::dategrep::Iterator:
+    file: lib/App/dategrep/Iterator.pm
+  App::dategrep::Iterator::File:
+    file: lib/App/dategrep/Iterator/File.pm
+  App::dategrep::Iterator::Stream:
+    file: lib/App/dategrep/Iterator/Stream.pm
+  App::dategrep::Iterators:
+    file: lib/App/dategrep/Iterators.pm
+  App::dategrep::Strptime:
+    file: lib/App/dategrep/Strptime.pm
 resources:
   bugtracker: https://github.com/mdom/dategrep/issues
   homepage: https://github.com/mdom/dategrep
-  repository: https://github.com/mdom/dategrep.git
-version: '0.58'
+  repository: git://github.com/mdom/dategrep.git
+version: '2.03'
 x_contributors:
   - 'Mario Domgoergen <mario@domgoergen.com>'
   - 'Mario Domgoergen <mdom@taz.de>'
   - 'Viktor Szépe <viktor@szepe.net>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

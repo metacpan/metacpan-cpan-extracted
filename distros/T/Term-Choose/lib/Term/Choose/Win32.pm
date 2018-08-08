@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.610';
+our $VERSION = '1.622';
 
 use Win32::Console qw( STD_INPUT_HANDLE ENABLE_MOUSE_INPUT ENABLE_PROCESSED_INPUT STD_OUTPUT_HANDLE
                        RIGHT_ALT_PRESSED LEFT_ALT_PRESSED RIGHT_CTRL_PRESSED LEFT_CTRL_PRESSED SHIFT_PRESSED
@@ -56,8 +56,8 @@ sub __get_key_OS {
             elsif ( $v_key_code == VK_CODE_UP )        { return VK_UP }
             elsif ( $v_key_code == VK_CODE_RIGHT )     { return VK_RIGHT }
             elsif ( $v_key_code == VK_CODE_DOWN )      { return VK_DOWN }
-            elsif ( $v_key_code == VK_CODE_INSERT )    { return VK_INSERT } # unused
-            elsif ( $v_key_code == VK_CODE_DELETE )    { return VK_DELETE } # unused
+            elsif ( $v_key_code == VK_CODE_INSERT )    { return VK_INSERT }
+            elsif ( $v_key_code == VK_CODE_DELETE )    { return VK_DELETE }
             else                                       { return NEXT_get_key }
         }
     }

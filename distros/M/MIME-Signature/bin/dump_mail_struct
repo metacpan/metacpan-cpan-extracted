@@ -1,0 +1,116 @@
+#!perl
+
+use 5.014;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use MIME::Parser;
+
+GetOptions
+  'files-from-stdin' => \my $FilesFromStdin,
+  'help' =>
+  sub { exec perldoc => -F => $0 or die "Cannot execute perldoc: $!\n" },
+  'quiet'    => \my $Quiet,
+  'uniq'     => \my $Uniq,
+  'verbose+' => \my $Verbose,
+  or exit 1;
+
+sub read_line {
+    return unless $FilesFromStdin;
+    defined( my $line = <STDIN> ) or return;
+    chomp $line;
+    $line;
+}
+
+sub recursive_parse {
+    my ( $entity, $level ) = @_;
+    $level //= '';
+    my $struct  = '';
+    my $charset = $entity->head->mime_attr('content-type.charset');
+    $struct =
+        ( $level && "$level " )
+      . $entity->mime_type
+      . ( defined $charset && " \L[$charset]" ) . "\n";
+    $struct .= recursive_parse( $_, "$level+" ) for $entity->parts;
+    $struct;
+}
+
+my $parser = MIME::Parser->new;
+$parser->tmp_to_core(1);
+$parser->output_to_core(1);
+
+my $tty;
+open $tty, '>', '/dev/tty' or undef $tty unless $Quiet;
+
+my %seen;
+if ( @ARGV > 1 || $FilesFromStdin ) {
+    my %frequency;
+    my $previous = '';
+    while ( defined( my $file = shift @ARGV || read_line ) ) {
+        if ($tty) {
+            my $ldiff = length($previous) - length($file);
+            print $tty $file, $ldiff > 0 && ' ' x $ldiff, "\r";
+            $previous = $file;
+        }
+        ++$frequency{ my $struct =
+              recursive_parse( $parser->parse_open($file) or die ) };
+        say "$file:\n$struct" if $Verbose;
+        say $file if $Uniq && !$seen{$struct}++;
+    }
+    exit if $Uniq;
+    printf "%7d\t%s\n", $frequency{$_}, s/\n(?=.)/\n\t/gr
+      for sort { $frequency{$b} <=> $frequency{$a} || $a cmp $b }
+      keys %frequency;
+}
+else {
+    print recursive_parse( $parser->parse( \*STDIN ) or die );
+}
+
+__END__
+
+=head1 NAME
+
+dump_mail_struct - analyze MIME structure of e-mails
+
+=head1 SYNOPSIS
+
+    dump_mail_struct <efile.eml
+
+    dump_mail_struct */archive/*/??
+
+    find . -type f -path '*/archive/*' -name '??' |
+        dump_mail_struct -files-from-stdin
+
+=head1 DESCRIPTION
+
+Analyzes the MIME structure of the given e-mails.
+If only the content of one eml file is given, prints its structure.
+If several are given, prints a historgram of the frequency of all
+different structures found.
+
+=head1 OPTIONS
+
+=head2 -files-from-stdin
+
+Read a list of filenames frmm standard input,
+one file per line.
+Useful if you want to analyze so many files
+that their names would not fit on the commandline.
+
+=head2 -quiet
+
+Do not show filenames on the terminal while analyzing.
+
+=head2 -uniq
+
+Only output the name of the first file containing a new structure.
+Useful to find interesting mails for test purposes.
+
+=head2 -verbose
+
+Immediately output the structure of each message analyzed.
+
+=head2 -help
+
+Only show this documentation.
+

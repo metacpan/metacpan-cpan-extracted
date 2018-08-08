@@ -25,7 +25,8 @@
             "runtime" : {
                "requires" : {
                   "AnyEvent::AIO" : "0",
-                  "IO::AIO" : "0"
+                  "IO::AIO" : "0",
+                  "IO::Uncompress::Brotli" : "0"
                }
             }
          }
@@ -58,6 +59,7 @@
             "CSS::Packer" : "0",
             "Devel::Cover" : "0",
             "Devel::NYTProf" : "0",
+            "Filter::Crypto" : "0",
             "HTML::Packer" : "0",
             "JavaScript::Packer" : "0",
             "Module::Build::Tiny" : "0",
@@ -67,9 +69,6 @@
             "Perl::Strip" : "0",
             "Perl::Stripper" : "0",
             "Test::Pod" : "v1.51.0"
-         },
-         "suggests" : {
-            "Filter::Crypto" : "0"
          }
       },
       "runtime" : {
@@ -104,6 +103,7 @@
             "HTTP::Message" : "v6.13.0",
             "HTTP::Parser::XS" : "v0.17.0",
             "IO::FDPass" : "0",
+            "IO::Socket::SSL" : "0",
             "Inline" : "0",
             "Inline::C" : "0",
             "List::AllUtils" : "0",
@@ -158,6 +158,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.71.1",
+   "version" : "v0.72.2",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

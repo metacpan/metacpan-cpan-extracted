@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-08-04'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-08-07'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +11,7 @@ use Perinci::CmdLine::cryp;
 
 my $prefix = '/App/cryp/arbit/';
 
+$ENV{LOG_ADD_TIMESTAMP} //= 1;
 Perinci::CmdLine::cryp->new(
     url => $prefix,
     log => 1,
@@ -41,7 +42,7 @@ cryp-arbit - Cryptocurrency arbitrage utility
 
 =head1 VERSION
 
-This document describes version 0.003 of cryp-arbit (from Perl distribution App-cryp-arbit), released on 2018-08-04.
+This document describes version 0.005 of cryp-arbit (from Perl distribution App-cryp-arbit), released on 2018-08-07.
 
 =head1 SYNOPSIS
 
@@ -150,11 +151,13 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>, B<-c>
+=item B<--config-path>=I<filename>
 
 Set path to configuration file.
 
-=item B<--config-profile>=I<s>, B<-P>
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
 
 Set configuration profile to use.
 
@@ -203,7 +206,7 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--no-config>, B<-C>
+=item B<--no-config>
 
 Do not use any configuration file.
 

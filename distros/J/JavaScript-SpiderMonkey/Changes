@@ -1,5 +1,12 @@
 Revision history for Perl extension JavaScript::SpiderMonkey.
 
+0.25 (07/08/2018)
+    (tb) Added missing license
+    (tb) Made sure module works with ExtUtils::MakeMaker below 6.46
+
+0.24 (06/08/2018)
+    (tb) Added reference to git repo
+
 0.23 (02/08/2018)
     (tb) Applied patch to fix issue where tests fail when no ',' in @INC (RT #121452)
 

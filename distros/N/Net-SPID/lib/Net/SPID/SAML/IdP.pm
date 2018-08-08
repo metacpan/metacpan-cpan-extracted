@@ -1,83 +1,95 @@
 package Net::SPID::SAML::IdP;
-$Net::SPID::SAML::IdP::VERSION = '0.12';
+$Net::SPID::SAML::IdP::VERSION = '0.15';
 use Moo;
 
-extends 'Net::SAML2::IdP';
 has '_spid' => (is => 'ro', required => 1, weak_ref => 1);  # Net::SPID::SAML
 
+has 'xml'           => (is => 'ro', required => 1);
+has 'entityID'      => (is => 'ro', required => 1);
+has 'cert'          => (is => 'ro', required => 1);
+has 'sso_urls'      => (is => 'ro', default => sub { {} });
+has 'sloreq_urls'   => (is => 'ro', default => sub { {} });
+has 'slores_urls'   => (is => 'ro', default => sub { {} });
+
 use Carp;
+use Crypt::OpenSSL::X509;
+use Mojo::XMLSig;
+use XML::XPath;
+
+sub new_from_xml {
+    my ($class, %args) = @_;
+
+    my $xpath = XML::XPath->new(xml => $args{xml});
+    $xpath->set_namespace('md', 'urn:oasis:names:tc:SAML:2.0:metadata');
+    $xpath->set_namespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
+    
+    if ($xpath->findnodes('/md:EntityDescriptor/dsig:Signature')->size > 0) {
+        # TODO: validate certificate against a known CA
+        Mojo::XMLSig::verify($args{xml})
+            or croak "Signature verification failed";
+    }
+    
+    $args{entityID} = $xpath->findvalue('/md:EntityDescriptor/@entityID')->value;
+    
+    $args{sso_urls} //= {};
+    for my $sso ($xpath->findnodes('/md:EntityDescriptor/md:IDPSSODescriptor/md:SingleSignOnService')){
+        my $binding = $sso->getAttribute('Binding');
+        $args{sso_urls}{$binding} = $sso->getAttribute('Location');
+    }
+
+    $args{sloreq_urls} //= {};
+    $args{slores_urls} //= {};
+    for my $slo ($xpath->findnodes('/md:EntityDescriptor/md:IDPSSODescriptor/md:SingleLogoutService')) {
+        my $binding = $slo->getAttribute('Binding');
+        $args{sloreq_urls}{$binding} = $slo->getAttribute('Location');
+        $args{slores_urls}{$binding} = $slo->getAttribute('Location') // $slo->getAttribute('ResponseLocation');
+    }
+    
+    for my $certnode ($xpath->findnodes('/md:EntityDescriptor/md:IDPSSODescriptor/md:KeyDescriptor[@use="signing"]/ds:KeyInfo/ds:X509Data/ds:X509Certificate/text()')) {
+        my $cert = $certnode->getValue;
+        
+        # rewrap the base64 data from the metadata; it may not
+        # be wrapped at 64 characters as PEM requires
+        $cert =~ s/\s//g;
+        $cert = join "\n", $cert =~ /.{1,64}/gs;
+        
+        # form a PEM certificate
+        $args{cert} = Crypt::OpenSSL::X509->new_from_string(
+            "-----BEGIN CERTIFICATE-----\n$cert\n-----END CERTIFICATE-----\n",
+            Crypt::OpenSSL::X509::FORMAT_PEM,
+        );
+    }
+
+    return $class->new(%args);
+}
 
 sub authnrequest {
     my ($self, %args) = @_;
     
-    my $authnreq = $self->_spid->_sp->authn_request(
-        $self->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
-        $self->format,  # always urn:oasis:names:tc:SAML:2.0:nameid-format:transient
-    );
-    
-    if (defined $args{acs_url} || defined $self->_spid->sp_acs_url) {
-        $authnreq->assertion_url($args{acs_url} // $self->_spid->sp_acs_url);
-    } elsif (defined $args{acs_index} || defined $self->_spid->sp_acs_index) {
-        $authnreq->assertion_index($args{acs_index} // $self->_spid->sp_acs_index);
-    } else {
-        croak "sp_acs_url or sp_acs_index are required\n";
-    }
-    
-    if (defined $args{attr_index} || defined $self->_spid->sp_attr_index) {
-        $authnreq->attribute_index($args{attr_index} // $self->_spid->sp_attr_index);
-    }
-    
-    $authnreq->protocol_binding('HTTP-POST');
-    $authnreq->issuer_namequalifier($self->_spid->sp_entityid);
-    $authnreq->issuer_format('urn:oasis:names:tc:SAML:2.0:nameid-format:entity');
-    $authnreq->nameidpolicy_format('urn:oasis:names:tc:SAML:2.0:nameid-format:transient');
-    $authnreq->AuthnContextClassRef([ 'https://www.spid.gov.it/SpidL' . ($args{level} // 1) ]);
-    $authnreq->RequestedAuthnContext_Comparison($args{comparison} // 'minimum');
-    $authnreq->ForceAuthn(1) if ($args{level} // 1) > 1;
-    
-    return Net::SPID::SAML::AuthnRequest->new(
+    return Net::SPID::SAML::Out::AuthnRequest->new(
         _spid       => $self->_spid,
         _idp        => $self,
-        _authnreq   => $authnreq,
+        %args,
     );
 }
 
 sub logoutrequest {
     my ($self, %args) = @_;
     
-    my $req = $self->_spid->_sp->logout_request(
-        $self->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
-        $args{session}->nameid,
-        $self->format,  # always urn:oasis:names:tc:SAML:2.0:nameid-format:transient
-        $args{session}->session,
-    );
-    
-    return Net::SPID::SAML::LogoutRequest->new(
+    return Net::SPID::SAML::Out::LogoutRequest->new(
         _spid       => $self->_spid,
         _idp        => $self,
-        _logoutreq  => $req,
+        %args,
     );
 }
 
 sub logoutresponse {
     my ($self, %args) = @_;
     
-    my $res = $self->_spid->_sp->logout_response(
-        # FIXME: what is the correct Destination for a LogoutResponse?
-        $self->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'),
-        'success',
-        $args{in_response_to},
-    );
-    
-    if ($args{status} && $args{status} eq 'partial') {
-        $res->status($res->status_uri('requester'));
-        $res->substatus($res->status_uri('partial'));
-    }
-    
-    return Net::SPID::SAML::LogoutResponse->new(
+    return Net::SPID::SAML::Out::LogoutResponse->new(
         _spid       => $self->_spid,
         _idp        => $self,
-        _logoutres  => $res,
+        %args,
     );
 }
 
@@ -95,7 +107,7 @@ Net::SPID::SAML::IdP
 
 =head1 VERSION
 
-version 0.12
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -124,13 +136,21 @@ This class represents an Identity Provider.
 
 =head1 CONSTRUCTOR
 
-This method is not supposed to be instantiated directly. Use the C<Net::SPID::SAML/get_idp> method in L<Net::SPID::SAML>.
+=head2 new_from_xml
+
+This constructor takes the metadata in XML form and parses it into a Net::SPID::SAML::IdP object:
+
+    my $idp = Net::SPID::SAML::IdP->new_from_xml(xml => $xml);
+
+If the metadata is signed, this method will croak in case the signature is not valid.
+
+Note that you don't usually need to construct this object manually. You load metadata using the methods offered by L<Net::SPID::SAML> and then you retrieve the IdP you need using L<Net::SPID::SAML/get_idp>.
 
 =head1 METHODS
 
 =head2 authnrequest
 
-This method generates an AuthnRequest addressed to this Identity Provider. Note that this method does not perform any network call, it just generates a L<Net::SPID::SAML::AuthnRequest> object.
+This method generates an AuthnRequest addressed to this Identity Provider. Note that this method does not perform any network call, it just generates a L<Net::SPID::SAML::Out::AuthnRequest> object.
 
     my $authnrequest = $idp->authnrequest(
         #acs_url    => 'https://...',   # URL of AssertionConsumerServiceURL to use
@@ -145,15 +165,15 @@ The following arguments can be supplied to C<authnrequest()>:
 
 =item I<acs_url>
 
-The value to use for C<AssertionConsumerServiceURL> in AuthnRequest. This is the URL where the user will be redirected (via GET or POST) by the Identity Provider after Single Sign-On. This must be one of the URLs contained in our Service Provider metadata. This is required if L<acs_index> is not set, but it can be omitted if the L<Net::SPID/sp_acs_url> option was set in L<Net::SPID>.
+The value to use for C<AssertionConsumerServiceURL> in AuthnRequest. This is the URL where the user will be redirected (via GET or POST) by the Identity Provider after Single Sign-On. This should be one of the URLs configured in the L<Net::SPID/sp_assertionconsumerservice> parameter at initialization time, otherwise the Response will not be validated. If omitted, the first configured one will be used.
 
 =item I<acs_index>
 
-The value to use for C<AssertionConsumerServiceIndex> in AuthnRequest. As an alternative to specifying the URL explicitely in each AuthnRequest using L<acs_url>, a numeric index referring to the URL(s) specified in the Service Provider metadata can be supplied. It can be omitted if the L<Net::SPID/sp_acs_index> option was set in L<Net::SPID>. This is required if L<acs_url> is not set, but it can be omitted if the L<Net::SPID/acs_index> option was set in L<Net::SPID>.
+The value to use for C<AssertionConsumerServiceIndex> in AuthnRequest. As an alternative to specifying the URL explicitely in each AuthnRequest using L<acs_url>, a numeric index referring to the URL(s) specified in the Service Provider metadata can be supplied. Make sure the corresponding URL is listed in the L<Net::SPID/sp_assertionconsumerservice> parameter, otherwise the response will not be validated.
 
 =item I<attr_index>
 
-(Optional.) The value to use for C<AttributeConsumingServiceIndex> in AuthnRequest. This refers to the C<AttributeConsumingService> specified in the Service Provider metadata. If omitted, the L<Net::SPID/sp_attr_index> option set in L<Net::SPID> will be used. If that was not set, no attributes will be requested at all.
+(Optional.) The value to use for C<AttributeConsumingServiceIndex> in AuthnRequest. This refers to the C<AttributeConsumingService> specified in the Service Provider metadata. If omitted, no attributes will be requested at all.
 
 =item I<level>
 
@@ -171,9 +191,9 @@ The following arguments can be supplied to C<logoutrequest()>:
 
 =over
 
-=item I<session>
+=item I<session_index>
 
-The L<Net::SPID::Session> object (originally returned by L<Net::SPID::SAML/parse_assertion> through a L<Net::SPID::SAML::Assertion> object) representing the SPID session to close.
+The L<Net::SPID::Session> object (originally returned by L<Net::SPID::SAML/parse_response> through a L<Net::SPID::SAML::In::Response> object) representing the SPID session to close.
 
 =back
 
@@ -195,6 +215,30 @@ The following arguments can be supplied to C<logoutresponse()>:
 This can be either C<success>, C<partial>, C<requester> or C<responder> according to the SAML specs.
 
 =back
+
+=head2 cert
+
+Returns the signing certificate for this Identity Provider as a L<Crypt::OpenSSL::X509> object.
+
+=head2 xml
+
+Returns the XML representation of this Identity Provider's metadata.
+
+=head2 entityID
+
+Returns the entityID of this Identity Provider.
+
+=head2 sso_urls
+
+Hashref of SingleSignOnService bindings, whose keys are the binding methods (C<urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST> or C<urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect>) and values contain the URLs.
+
+=head2 sloreq_urls
+
+Hashref of SingleLogoutService bindings to be used for sending C<LogoutRequest> messages. Keys are the binding methods (C<urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST> or C<urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect>) and values contain the URLs.
+
+=head2 slores_urls
+
+Hashref of SingleLogoutService bindings to be used for sending C<LogoutResponse> messages. Keys are the binding methods (C<urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST> or C<urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect>) and values contain the URLs.
 
 =head1 AUTHOR
 

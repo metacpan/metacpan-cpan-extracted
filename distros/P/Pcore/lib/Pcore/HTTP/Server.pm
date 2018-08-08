@@ -1,7 +1,6 @@
 package Pcore::HTTP::Server;
 
 use Pcore -class, -const, -res;
-use Pcore::AE::Handle;
 use AnyEvent::Socket qw[];
 use Pcore::HTTP::Server::Request;
 
@@ -14,39 +13,17 @@ use Pcore::HTTP::Server::Request;
 has listen => ();    # ( is => 'ro', isa => Str, required => 1 );
 has app    => ();    # ( is => 'ro', isa => CodeRef | InstanceOf ['Pcore::App::Router'], required => 1 );
 
-has backlog          => 0;    # ( is => 'ro', isa => Maybe [PositiveOrZeroInt], default => 0 );
-has tcp_no_delay     => 1;    # ( is => 'ro', isa => Bool,                      default => 1 );
-has tcp_so_keepalive => 1;    # ( is => 'ro', isa => Bool,                      default => 1 );
+has backlog      => 0;    # ( is => 'ro', isa => Maybe [PositiveOrZeroInt], default => 0 );
+has so_no_delay  => 1;    # ( is => 'ro', isa => Bool,                      default => 1 );
+has so_keepalive => 1;    # ( is => 'ro', isa => Bool,                      default => 1 );
 
 has server_tokens         => "Pcore-HTTP-Server/$Pcore::VERSION";    # ( is => 'ro', isa => Maybe [Str] );
 has keepalive_timeout     => 60;                                     # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - disable keepalive
 has client_header_timeout => 60;                                     # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - do not use
 has client_body_timeout   => 60;                                     # ( is => 'ro', isa => PositiveOrZeroInt, default => 60 ); # 0 - do not use
-has client_max_body_size  => 0;                                      # ( is => 'ro', isa => PositiveOrZeroInt, default => 0 );  # 0 - do not check
+has client_max_body_size  => 0;                                      # 0 - do not check
 
 has _listen_socket => ();                                            # ( is => 'ro', isa => Object, init_arg => undef );
-
-const our $PSGI_ENV => {
-    'psgi.version'      => [ 1, 1 ],
-    'psgi.url_scheme'   => 'http',
-    'psgi.input'        => undef,
-    'psgi.errors'       => undef,
-    'psgi.multithread'  => 0,
-    'psgi.multiprocess' => 0,
-    'psgi.run_once'     => 0,
-    'psgi.nonblocking'  => 1,
-    'psgi.streaming'    => 1,
-
-    # extensions
-    'psgix.io'              => undef,
-    'psgix.input.buffered'  => 1,
-    'psgix.logger'          => undef,
-    'psgix.session'         => undef,
-    'psgix.session.options' => undef,
-    'psgix.harakiri'        => 0,
-    'psgix.harakiri.commit' => 0,
-    'psgix.cleanup'         => 0,
-};
 
 # TODO implement shutdown and graceful shutdown
 
@@ -56,7 +33,7 @@ sub run ($self) {
     if ( $self->{listen} =~ /\Aunix:(.+)/sm ) {
         my $path = $1;
 
-        $self->{_listen_socket} = AnyEvent::Socket::tcp_server( 'unix/', $path, sub { return $self->_on_accept(@_) }, sub { return $self->_on_prepare(@_) } );
+        $self->{_listen_socket} = AnyEvent::Socket::tcp_server( 'unix/', $path, Coro::unblock_sub { return $self->_on_accept(@_) }, sub { return $self->_on_prepare(@_) } );
 
         chmod oct 777, $path or die if substr( $path, 0, 1 ) eq '/';
     }
@@ -67,7 +44,7 @@ sub run ($self) {
 
         undef $host if $host eq '*';
 
-        $self->{_listen_socket} = AnyEvent::Socket::tcp_server( $host, $port, sub { return $self->_on_accept(@_) }, sub { return $self->_on_prepare(@_) } );
+        $self->{_listen_socket} = AnyEvent::Socket::tcp_server( $host, $port, Coro::unblock_sub { return $self->_on_accept(@_) }, sub { return $self->_on_prepare(@_) } );
     }
 
     return $self;
@@ -78,221 +55,178 @@ sub _on_prepare ( $self, $fh, $host, $port ) {
 }
 
 sub _on_accept ( $self, $fh, $host, $port ) {
-    Pcore::AE::Handle->new(
-        fh              => $fh,
-        tcp_no_delay    => $self->{tcp_no_delay},
-        tcp_so_kepalive => $self->{tcp_so_keepalive},
-        on_connect      => sub ( $h, @ ) {
-            $self->wait_headers($h);
-
-            return;
-        }
+    my $h = P->handle(
+        $fh,
+        so_no_delay  => $self->{so_no_delay},
+        so_keepalive => $self->{so_keepalive},
     );
 
-    return;
-}
+    # read HTTP headers
+  READ_HEADERS: my $env = $h->read_http_req_headers( timeout => $self->{client_header_timeout} );
 
-sub _read_body ( $self, $h, $env, $cb ) {
-    my ( $chunked, $content_length ) = ( 0, 0 );
+    # HTTP headers read error
+    if ( !$env ) {
+        if ( $h->is_timeout ) {
+            $self->return_xxx( $h, 408 );
+        }
+        else {
+            $self->return_xxx( $h, 400 );
+        }
 
+        return;
+    }
+
+    # read HTTP body
     # https://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.4
     # Transfer-Encoding has priority before Content-Length
 
+    my $data;
+
     # chunked body
     if ( $env->{TRANSFER_ENCODING} && $env->{TRANSFER_ENCODING} =~ /\bchunked\b/smi ) {
-        $chunked = 1;
+        my $payload_too_large;
+
+        my $on_read_len = do {
+            if ( $self->{client_max_body_size} ) {
+                sub ( $len, $total_bytes ) {
+                    if ( $total_bytes > $self->{client_max_body_size} ) {
+                        $payload_too_large = 1;
+
+                        return;
+                    }
+                    else {
+                        return 1;
+                    }
+                };
+            }
+            else {
+                undef;
+            }
+        };
+
+        $data = $h->read_http_chunked_data( timeout => $self->{client_body_timeout}, on_read_len => $on_read_len );
+
+        # HTTP body read error
+        if ( !$data ) {
+
+            # payload too large
+            if ($payload_too_large) {
+                return $self->return_xxx( $h, 413 );
+            }
+
+            # timeout
+            elsif ( $h->is_timeout ) {
+                return $self->return_xxx( $h, 408 );
+            }
+
+            # read error
+            else {
+                return $self->return_xxx( $h, 400 );
+            }
+        }
+
+        $env->{CONTENT_LENGTH} = length $data->$*;
     }
 
     # fixed body size
     elsif ( $env->{CONTENT_LENGTH} ) {
-        $content_length = $env->{CONTENT_LENGTH};
-    }
 
-    # no body
-    else {
-        $cb->(undef);
+        # payload too large
+        return $self->return_xxx( $h, 413 ) if $self->{client_max_body_size} && $self->{client_max_body_size} > $env->{CONTENT_LENGTH};
 
-        return;
-    }
+        $data = $h->readchunk( $env->{CONTENT_LENGTH}, timeout => $self->{client_body_timeout} );
 
-    # set client body timeout
-    if ( $self->{client_body_timeout} ) {
-        $h->rtimeout_reset;
-        $h->rtimeout( $self->{client_body_timeout} );
-        $h->on_rtimeout( sub ($h) {
+        # HTTP body read error
+        if ( !$data ) {
 
-            # client body read timeout
-            $self->return_xxx( $h, 408 );
-
-            return;
-        } );
-    }
-
-    $h->read_http_body(
-        sub ( $h1, $buf_ref, $total_bytes_readed, $error_reason ) {
-
-            # read body error
-            if ($error_reason) {
-
-                # read body error
-                $cb->(400);
+            # timeout
+            if ( $h->is_timeout ) {
+                return $self->return_xxx( $h, 408 );
             }
+
+            # read error
             else {
-
-                # read body finished
-                if ( !$buf_ref ) {
-
-                    # clear client body timeout
-                    $h->rtimeout(undef);
-
-                    $cb->(undef);
-                }
-
-                # read body chunk
-                else {
-                    if ( $self->{client_max_body_size} && $total_bytes_readed > $self->{client_max_body_size} ) {
-
-                        # payload too large
-                        $cb->(413);
-                    }
-                    else {
-                        $env->{'psgi.input'} .= $buf_ref->$*;
-
-                        $env->{CONTENT_LENGTH} = $total_bytes_readed;
-
-                        return 1;
-                    }
-                }
+                return $self->return_xxx( $h, 400 );
             }
+        }
+    }
 
-            return;
-        },
-        chunked  => $chunked,
-        length   => $content_length,
-        headers  => 0,
-        buf_size => 65_536,
-    );
-
-    return;
-}
-
-sub wait_headers ( $self, $h ) {
-    state $destroy = sub ( $h, @ ) {
-        $h->destroy;
-
-        return;
-    };
-
-    $h->on_error($destroy);
-    $h->on_eof(undef);
-    $h->on_rtimeout(undef);
-    $h->rtimeout_reset;
-
-    # set keepalive timeout
-    $h->rtimeout( $self->{keepalive_timeout} || $self->{client_header_timeout} );
-
-    $h->on_read( sub {
-
-        # clear on_read callback
-        $h->on_read(undef);
-
-        # set client header timeout
-        if ( $self->{client_header_timeout} ) {
-            $h->rtimeout_reset;
-            $h->rtimeout( $self->{client_header_timeout} );
-            $h->on_rtimeout( sub ($h) {
-
-                # client header read timeout
-                $self->return_xxx( $h, 408 );
-
-                return;
-            } );
+    my $keepalive = do {
+        if ( !$self->{keepalive_timeout} ) {
+            0;
         }
         else {
-
-            # clear keepalive timeout
-            $h->rtimeout(undef);
-        }
-
-        # read HTTP headers
-        $h->read_http_req_headers(
-            sub ( $h1, $env, $error_reason ) {
-                if ($error_reason) {
-
-                    # HTTP headers parsing error, request is invalid
-                    # return standard error response and destroy the handle
-                    # 400 - Bad Request
-                    $self->return_xxx( $h, 400 );
-                }
-                else {
-
-                    # clear client header timeout
-                    $h->rtimeout(undef);
-
-                    # add default psgi env keys
-                    $env->@{ keys $PSGI_ENV->%* } = values $PSGI_ENV->%*;
-
-                    # read HTTP body
-                    $self->_read_body(
-                        $h, $env,
-                        sub ($body_error_status) {
-                            if ($body_error_status) {
-
-                                # body read error
-                                $self->return_xxx( $h, $body_error_status );
-                            }
-                            else {
-
-                                # create request object
-                                my $req = bless {
-                                    _server          => $self,
-                                    _h               => $h,
-                                    env              => $env,
-                                    _response_status => 0,
-                                  },
-                                  'Pcore::HTTP::Server::Request';
-
-                                # evaluate application
-                                eval { $self->{app}->($req); 1; } or do {
-                                    $@->sendlog if $@;
-                                };
-                            }
-
-                            return;
-                        }
-                    );
-                }
-
-                return;
+            if ( $env->{SERVER_PROTOCOL} eq 'HTTP/1.1' ) {
+                $env->{HTTP_CONNECTION} && $env->{HTTP_CONNECTION} =~ /\bclose\b/smi ? 0 : 1;
             }
-        );
+            elsif ( $env->{SERVER_PROTOCOL} eq 'HTTP/1.0' ) {
+                !$env->{HTTP_CONNECTION} || $env->{HTTP_CONNECTION} !~ /\bkeep-?alive\b/smi ? 0 : 1;
+            }
+            else {
+                1;
+            }
+        }
+    };
 
-        return;
-    } );
+    my $rouse_cb = Coro::rouse_cb;
+
+    Coro::async_pool {
+
+        # create request object
+        my $req = bless {
+            _server          => $self,
+            _h               => $h,
+            _cb              => $rouse_cb,
+            env              => $env,
+            data             => $data,
+            keepalive        => $keepalive,
+            _response_status => 0,
+          },
+          'Pcore::HTTP::Server::Request';
+
+        # evaluate application
+        eval { $self->{app}->($req); 1; } or do {
+            $@->sendlog if $@;
+        };
+    };
+
+    # keep-alive
+    goto READ_HEADERS if !Coro::rouse_wait $rouse_cb && $keepalive;
 
     return;
 }
 
-sub return_xxx ( $self, $h, $status, $use_keepalive = 0 ) {
+sub return_xxx ( $self, $h, $status, $close_connection = 1 ) {
+
+    # handle closed, do nothing
+    return if !$h;
+
     $status = 0+ $status;
+
     my $reason = Pcore::Util::Result::get_standard_reason($status);
 
     my $buf = "HTTP/1.1 $status $reason\r\nContent-Length:0\r\n";
 
-    $buf .= 'Connection:' . ( $use_keepalive ? 'keep-alive' : 'close' ) . $CRLF;
+    $buf .= 'Connection:' . ( $close_connection ? 'close' : 'keep-alive' ) . $CRLF;
 
     $buf .= "Server:$self->{server_tokens}\r\n" if $self->{server_tokens};
 
-    $h->push_write( $buf . $CRLF );
-
-    # process handle
-    if   ($use_keepalive) { $self->wait_headers($h) }
-    else                  { $h->destroy }
+    $h->write( $buf . $CRLF );
 
     return;
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 57                   | Subroutines::ProhibitExcessComplexity - Subroutine "_on_accept" with high complexity score (33)                |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

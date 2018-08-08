@@ -186,6 +186,16 @@ Array or arrayref of options to pass by to the external binary or the code block
 
 Set it to 1 if you want to do blocking stop of the process.
 
+## channels
+
+    use Mojo::IOLoop::ReadWriteProcess;
+    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { print "Hello" }, channels => 0 );
+    $process->start();
+    $process->on( stop => sub { print "Process: ".(+shift()->pid)." finished"; } );
+    $process->stop(); # Will wait indefinitely until the process is stopped
+
+Set it to 0 if you want to disable internal channels.
+
 ## session
 
     use Mojo::IOLoop::ReadWriteProcess;

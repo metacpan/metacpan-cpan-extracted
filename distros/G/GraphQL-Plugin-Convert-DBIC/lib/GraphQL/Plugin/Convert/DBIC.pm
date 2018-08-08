@@ -4,84 +4,105 @@ use strict;
 use warnings;
 use GraphQL::Schema;
 use GraphQL::Debug qw(_debug);
+use Lingua::EN::Inflect::Number qw(to_S);
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
+my %GRAPHQL_TYPE2SQLS = (
+  String => [
+    'wlongvarchar',
+    'guid',
+    'uuid',
+    'wvarchar',
+    'wchar',
+    'longvarbinary',
+    'varbinary',
+    'binary',
+    'longvarchar',
+    'unknown_type',
+    'all_types',
+    'char',
+    'varchar',
+    'udt',
+    'udt_locator',
+    'row',
+    'ref',
+    'blob',
+    'blob_locator',
+    'clob',
+    'clob_locator',
+    'array',
+    'array_locator',
+    'multiset',
+    'multiset_locator',
+    # mysql
+    'text',
+    'tinytext',
+    'mediumtext',
+    'longtext',
+  ],
+  Int => [
+    'bigint',
+    'bit',
+    'tinyint',
+    'integer',
+    'smallint',
+    'interval',
+    'interval_year',
+    'interval_month',
+    'interval_day',
+    'interval_hour',
+    'interval_minute',
+    'interval_second',
+    'interval_year_to_month',
+    'interval_day_to_hour',
+    'interval_day_to_minute',
+    'interval_day_to_second',
+    'interval_hour_to_minute',
+    'interval_hour_to_second',
+    'interval_minute_to_second',
+    # not DBI SQL_* types
+    'int',
+  ],
+  Float => [
+    'numeric',
+    'decimal',
+    'float',
+    'real',
+    'double',
+  ],
+  DateTime => [
+    'datetime',
+    'date',
+    'time',
+    'timestamp',
+    'type_date',
+    'type_time',
+    'type_timestamp',
+    'type_time_with_timezone',
+    'type_timestamp_with_timezone',
+    # pgsql
+    'timestamp with time zone',
+    'timestamp without time zone',
+  ],
+  Boolean => [
+    'boolean',
+  ],
+  ID => [
+    'wvarchar',
+  ],
+);
 my %TYPEMAP = (
-  guid => 'String',
-  uuid => 'String',
-  wlongvarchar => 'String',
-  wvarchar => 'String',
-  wchar => 'String',
-  bigint => 'Int',
-  bit => 'Int',
-  tinyint => 'Int',
-  longvarbinary => 'String',
-  varbinary => 'String',
-  binary => 'String',
-  longvarchar => 'String',
-  unknown_type => 'String',
-  all_types => 'String',
-  char => 'String',
-  numeric => 'Float',
-  decimal => 'Float',
-  integer => 'Int',
-  smallint => 'Int',
-  float => 'Float',
-  real => 'Float',
-  double => 'Float',
-  datetime => 'DateTime',
-  date => 'DateTime',
-  interval => 'Int',
-  time => 'DateTime',
-  timestamp => 'DateTime',
-  varchar => 'String',
-  boolean => 'Boolean',
-  udt => 'String',
-  udt_locator => 'String',
-  row => 'String',
-  ref => 'String',
-  blob => 'String',
-  blob_locator => 'String',
-  clob => 'String',
-  clob_locator => 'String',
-  array => 'String',
-  array_locator => 'String',
-  multiset => 'String',
-  multiset_locator => 'String',
-  type_date => 'DateTime',
-  type_time => 'DateTime',
-  type_timestamp => 'DateTime',
-  type_time_with_timezone => 'DateTime',
-  type_timestamp_with_timezone => 'DateTime',
-  interval_year => 'Int',
-  interval_month => 'Int',
-  interval_day => 'Int',
-  interval_hour => 'Int',
-  interval_minute => 'Int',
-  interval_second => 'Int',
-  interval_year_to_month => 'Int',
-  interval_day_to_hour => 'Int',
-  interval_day_to_minute => 'Int',
-  interval_day_to_second => 'Int',
-  interval_hour_to_minute => 'Int',
-  interval_hour_to_second => 'Int',
-  interval_minute_to_second => 'Int',
-  # not DBI SQL_* types
-  int => 'Int',
-  # mysql
-  text => 'String',
-  tinytext => 'String',
-  mediumtext => 'String',
-  longtext => 'String',
-  # pgsql
-  'timestamp with time zone' => 'DateTime',
-  'timestamp without time zone' => 'DateTime',
+  (map {
+    my $gql_type = $_;
+    map {
+      ($_ => $gql_type)
+    } @{ $GRAPHQL_TYPE2SQLS{$gql_type} }
+  } keys %GRAPHQL_TYPE2SQLS),
   enum => sub {
     my $info = shift;
     my $extra = $info->{extra};
-
     return {
       kind => 'enum',
       name => _dbicsource2pretty($extra->{custom_type_name}),
@@ -95,6 +116,7 @@ sub _dbicsource2pretty {
   my ($source) = @_;
   $source = eval { $source->source_name } || $source;
   $source =~ s#.*::##;
+  $source = to_S $source;
   join '', map ucfirst, split /_+/, $source;
 }
 
@@ -116,7 +138,7 @@ sub _apply_modifier {
 
 sub _remove_modifiers {
   my ($typespec) = @_;
-  return $typespec->{type} if ref $typespec eq 'HASH';
+  return _remove_modifiers($typespec->{type}) if ref $typespec eq 'HASH';
   return $typespec if ref $typespec ne 'ARRAY';
   _remove_modifiers($typespec->[1]);
 }

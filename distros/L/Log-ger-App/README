@@ -2,7 +2,7 @@ NAME
     Log::ger::App - An easy way to use Log::ger in applications
 
 VERSION
-    version 0.005
+    version 0.006
 
 SYNOPSIS
     In your script:
@@ -71,6 +71,10 @@ FUNCTIONS
         configuration.
 
 ENVIRONMENT
+  LOG_ADD_TIMESTAMP
+    Boolean. Default to false. If set to true, will add timestamps to the
+    screen log. Normally, timestamps will only be added to the file log.
+
   LOG_LEVEL => str
     Can be set to "off" or numeric/string log level.
 

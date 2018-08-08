@@ -4,7 +4,6 @@ use Pcore -const, -export;
 use parent qw[AnyEvent::Handle];
 use AnyEvent::Socket qw[];
 use Pcore::AE::DNS::Cache;
-use Pcore::HTTP::Headers;
 use HTTP::Parser::XS qw[HEADERS_AS_ARRAYREF HEADERS_NONE];
 use Pcore::AE::Handle::Cache;
 use Pcore::Util::Scalar qw[is_ref is_plain_arrayref];
@@ -212,103 +211,6 @@ sub DESTROY ($self) {
 }
 
 # READERS
-sub read_http_res_headers {
-    my $self = shift;
-    my $cb   = pop;
-    my %args = (
-        headers  => 0,    # true - create new headers obj, false - do not parse headers, ref - headers obj to add headers to
-        trailing => 0,    # read trailing headers, mandatory if trailing headers are expected
-        @_,
-    );
-
-    $self->unshift_read(
-        http_headers => sub ( $h, @ ) {
-            if ( $_[1] ) {
-                my $res;
-
-                my $headers = $args{trailing} ? 'HTTP/1.1 200 OK' . $CRLF . $_[1] : $_[1];
-
-                # $len = -1 - incomplete headers, -2 - errors, >= 0 - headers length
-                ( my $len, $res->{minor_version}, $res->{status}, $res->{reason}, my $parsed_headers ) = HTTP::Parser::XS::parse_http_response( $headers, !$args{headers} ? HEADERS_NONE : HEADERS_AS_ARRAYREF );
-
-                # fallback to pure-perl parser in case of errors
-                # TODO can be removed after this issue will be fixed - https://github.com/kazuho/p5-http-parser-xs/issues/10
-                # NOTE http://www.bizcoder.com/everything-you-need-to-know-about-http-header-syntax-but-were-afraid-to-ask
-                if ( $len == -1 ) {
-                    $len = length $headers;
-
-                    my @lines = split /\x0D\x0A/sm, $headers;
-
-                    if ( my $proto = shift @lines ) {
-                        if ( $proto =~ m[\AHTTP/\d[.](\d)\s(\d\d\d)\s(.+)]sm ) {
-                            $res->{minor_version} = $1;
-
-                            $res->{status} = $2;
-
-                            $res->{reason} = $3;
-
-                            while ( my $header = shift @lines ) {
-                                if ( substr( $header, 0, 1 ) eq q[ ] ) {
-                                    if ($parsed_headers) {
-                                        $parsed_headers->[-1] .= $header;
-                                    }
-                                    else {
-                                        $len = -2;
-
-                                        last;
-                                    }
-                                }
-                                elsif ( $header =~ /(.+?)\s*:\s*(.+)/sm ) {
-
-                                    # TODO remove trailing spaces from the value
-                                    push $parsed_headers->@*, $1, $2;
-                                }
-                            }
-                        }
-                        else {
-                            $len = -2;
-                        }
-                    }
-                    else {
-                        $len = -1;
-                    }
-                }
-
-                if ( $len == -1 ) {
-                    $cb->( $h, undef, q[Headers are incomplete] );
-                }
-                elsif ( $len == -2 ) {
-                    $cb->( $h, undef, q[Headers are corrupt] );
-                }
-                else {
-                    if ( $args{headers} ) {
-                        $res->{headers} = ref $args{headers} ? $args{headers} : Pcore::HTTP::Headers->new;
-
-                        # repack received headers to the standard format
-                        for ( my $i = 0; $i <= $parsed_headers->$#*; $i += 2 ) {
-                            $parsed_headers->[$i] = uc $parsed_headers->[$i] =~ tr/-/_/r;
-                        }
-
-                        $res->{headers}->add($parsed_headers);
-                    }
-
-                    $cb->( $h, $res, undef );
-                }
-            }
-            elsif ( $args{trailing} ) {    # trailing headers can be empty, this is not an error
-                $cb->( $h, undef, undef );
-            }
-            else {
-                $cb->( $h, undef, 'No headers' );
-            }
-
-            return;
-        }
-    );
-
-    return;
-}
-
 sub read_http_req_headers ( $self, $cb, $env = undef ) {
     $self->unshift_read(
         http_headers => sub ( $h, @ ) {
@@ -436,18 +338,11 @@ sub read_http_body ( $self, $on_read, @ ) {
                 else {
 
                     # read trailing headers
-                    $h->read_http_res_headers(
-                        headers  => $args{headers},
-                        trailing => 1,
-                        sub ( $h, $res, $error_reason ) {
+                    $self->unshift_read(
+                        http_headers => sub ( $h, @ ) {
                             undef $read_chunk;
 
-                            if ($error_reason) {
-                                $on_read_buf->( undef, 'Garbled chunked transfer encoding (invalid trailing headers)' );
-                            }
-                            else {
-                                $on_read_buf->( undef, undef );
-                            }
+                            $on_read_buf->( undef, undef );
 
                             return;
                         }
@@ -551,12 +446,13 @@ sub get_connect ($connect) {
 
     # parse connect attribute
     if ( !is_plain_arrayref $connect ) {
-        if ( !is_ref $connect ) {    # parse uri string
-            $connect = P->uri( $connect, authority => 1 )->connect;
-        }
-        else {                       # already uri object
-            $connect = $connect->connect;
-        }
+
+        # parse uri string
+        $connect = P->uri( $connect, authority => 1 ) if !is_ref $connect;
+
+        my $scheme = $connect->scheme eq q[] ? 'tcp' : $connect->scheme;
+
+        $connect = [ $connect->host->name, $connect->connect_port, $scheme, $scheme . q[_] . $connect->connect_port ];
     }
     else {
 
@@ -577,28 +473,22 @@ sub get_connect ($connect) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 215                  | * Subroutine "read_http_res_headers" with high complexity score (22)                                           |
-## |      | 341                  | * Subroutine "read_http_body" with high complexity score (29)                                                  |
+## |    3 | 243                  | Subroutines::ProhibitExcessComplexity - Subroutine "read_http_body" with high complexity score (27)            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 251, 252             | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    2 | 51                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 52                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 164                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 288                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 163                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 606                  | * Link L<AnyEvent::Handle> on line 612 does not specify text                                                   |
-## |      | 606                  | * Link L<AnyEvent::Handle> on line 620 does not specify text                                                   |
-## |      | 606                  | * Link L<AnyEvent::Handle> on line 648 does not specify text                                                   |
-## |      | 606                  | * Link L<AnyEvent::Handle> on line 664 does not specify text                                                   |
-## |      | 606                  | * Link L<AnyEvent::Socket> on line 664 does not specify text                                                   |
-## |      | 606, 606             | * Link L<Pcore::Proxy> on line 630 does not specify text                                                       |
-## |      | 606                  | * Link L<Pcore::Proxy> on line 664 does not specify text                                                       |
+## |      | 496                  | * Link L<AnyEvent::Handle> on line 502 does not specify text                                                   |
+## |      | 496                  | * Link L<AnyEvent::Handle> on line 510 does not specify text                                                   |
+## |      | 496                  | * Link L<AnyEvent::Handle> on line 538 does not specify text                                                   |
+## |      | 496                  | * Link L<AnyEvent::Handle> on line 554 does not specify text                                                   |
+## |      | 496                  | * Link L<AnyEvent::Socket> on line 554 does not specify text                                                   |
+## |      | 496, 496             | * Link L<Pcore::Proxy> on line 520 does not specify text                                                       |
+## |      | 496                  | * Link L<Pcore::Proxy> on line 554 does not specify text                                                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 48, 53               | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 47, 52               | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

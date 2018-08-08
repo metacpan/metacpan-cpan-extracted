@@ -1,7 +1,7 @@
 package Pcore::HTTP::Server::Request;
 
 use Pcore -class, -const, -res;
-use Pcore::Util::Scalar qw[is_plain_arrayref];
+use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_plain_arrayref];
 use Pcore::Util::List qw[pairs];
 use Pcore::Util::Text qw[encode_utf8];
 use Pcore::App::API::Auth;
@@ -12,12 +12,14 @@ use overload    #
   },
   fallback => undef;
 
-has _server => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Server'], required => 1 );
-has _h      => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'],   required => 1 );
-has env     => ();    # ( is => 'ro', isa => HashRef, required => 1 );
+has _server   => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Server'], required => 1 );
+has _h        => ();    # ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'],   required => 1 );
+has _cb       => ();    # rouse callback
+has env       => ();    # ( is => 'ro', isa => HashRef, required => 1 );
+has data      => ();
+has keepalive => ();
 
 has is_websocket_connect_request => ( is => 'lazy' );    # ( is => 'lazy', isa => Bool, init_arg => undef );
-has _use_keepalive               => ( is => 'lazy' );    # ( is => 'lazy', isa => Bool, init_arg => undef );
 
 has _response_status => 0;                               # ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
 has _auth            => ();                              # ( is => 'ro', isa => Object, init_arg => undef );    # request authentication result
@@ -43,32 +45,20 @@ const our $HTTP_SERVER_RESPONSE_FINISHED => 2;           # body written
 # };
 
 sub DESTROY ( $self ) {
+
+    # request is destroyed without ->finish call
     if ( ( ${^GLOBAL_PHASE} ne 'DESTRUCT' ) && $self->{_response_status} != $HTTP_SERVER_RESPONSE_FINISHED ) {
 
-        # request is destroyed without ->finish call, possible unhandled error in AE callback
-        $self->return_xxx(500);
+        # HTTP headers is not written
+        if ( !$self->{_response_status} ) {
+            $self->return_xxx( 500, 1 );
+        }
+        else {
+            $self->{_cb}->(1);
+        }
     }
 
     return;
-}
-
-sub _build__use_keepalive($self) {
-    return 0 if !$self->{_server}->{keepalive_timeout};
-
-    my $env = $self->{env};
-
-    if ( $env->{SERVER_PROTOCOL} eq 'HTTP/1.1' ) {
-        return 0 if $env->{HTTP_CONNECTION} && $env->{HTTP_CONNECTION} =~ /\bclose\b/smi;
-    }
-    elsif ( $env->{SERVER_PROTOCOL} eq 'HTTP/1.0' ) {
-        return 0 if !$env->{HTTP_CONNECTION} || $env->{HTTP_CONNECTION} !~ /\bkeep-?alive\b/smi;
-    }
-
-    return 1;
-}
-
-sub body ($self) {
-    return $self->{env}->{'psgi.input'} ? \$self->{env}->{'psgi.input'} : undef;
 }
 
 # TODO serialize body related to body ref type and content type
@@ -77,6 +67,7 @@ sub _respond ( $self, @ ) {
 
     my ( $buf, $body );
 
+    # first call, $status, $headers, $body
     if ( !$self->{_response_status} ) {
 
         # compose headers
@@ -94,7 +85,7 @@ sub _respond ( $self, @ ) {
         $buf .= "Transfer-Encoding:chunked\r\n";
 
         # keepalive
-        $buf .= 'Connection:' . ( $self->_use_keepalive ? 'keep-alive' : 'close' ) . $CRLF;
+        $buf .= 'Connection:' . ( $self->{keepalive} ? 'keep-alive' : 'close' ) . $CRLF;
 
         # add custom headers
         $buf .= join( $CRLF, map {"$_->[0]:$_->[1]"} pairs $_[2]->@* ) . $CRLF if $_[2] && $_[2]->@*;
@@ -110,18 +101,16 @@ sub _respond ( $self, @ ) {
     }
 
     if ($body) {
-        my $body_ref = ref $body;
-
-        if ( !$body_ref ) {
-            $buf .= sprintf( '%x', bytes::length $body ) . $CRLF . encode_utf8($body) . $CRLF;
+        if ( !is_ref $body ) {
+            $buf .= sprintf "%x$CRLF%s$CRLF", bytes::length $body, encode_utf8 $body;
         }
-        elsif ( $body_ref eq 'SCALAR' ) {
-            $buf .= sprintf( '%x', bytes::length $body->$* ) . $CRLF . encode_utf8( $body->$* ) . $CRLF;
+        elsif ( is_plain_scalarref $body ) {
+            $buf .= sprintf "%x$CRLF%s$CRLF", bytes::length $body->$*, encode_utf8 $body->$*;
         }
-        elsif ( is_plain_arrayref $body_ref ) {
+        elsif ( is_plain_arrayref $body ) {
             my $buf1 = join q[], map { encode_utf8 $_} $body->@*;
 
-            $buf .= sprintf( '%x', bytes::length $buf1 ) . $CRLF . $buf1 . $CRLF;
+            $buf .= sprintf "%x$CRLF%s$CRLF", bytes::length $buf1, $buf1;
         }
         else {
 
@@ -130,10 +119,7 @@ sub _respond ( $self, @ ) {
         }
     }
 
-    # TODO this call can be removed after issue in AnyEvent::Handle, lines 1021 and 1024, will be fixed
-    utf8::downgrade $buf;
-
-    $self->{_h}->push_write($buf);
+    $self->{_h}->write($buf);
 
     return $self;
 }
@@ -143,14 +129,16 @@ sub finish ( $self, $trailing_headers = undef ) {
 
     die q[Unable to finish already finished HTTP request] if $response_status == $HTTP_SERVER_RESPONSE_FINISHED;
 
-    my $use_keepalive = $self->_use_keepalive;
-
+    # HTTP headers are not written
     if ( !$response_status ) {
 
         # return 204 No Content - the server successfully processed the request and is not returning any content
-        $self->return_xxx( 204, $use_keepalive );
+        $self->return_xxx(204);
     }
+
+    # HTTP headers are written
     else {
+
         # mark request as finished
         $self->{_response_status} = $HTTP_SERVER_RESPONSE_FINISHED;
 
@@ -164,27 +152,24 @@ sub finish ( $self, $trailing_headers = undef ) {
         # close response
         $buf .= $CRLF;
 
-        $self->{_h}->push_write($buf);
+        $self->{_h}->write($buf);
 
-        # process handle
-        if   ($use_keepalive) { $self->{_server}->wait_headers( $self->{_h} ) }
-        else                  { $self->{_h}->destroy }
-
-        undef $self->{_h};
+        $self->{_cb}->(0);
     }
 
     return;
 }
 
 # return simple response and finish request
-sub return_xxx ( $self, $status, $use_keepalive = 0 ) {
+sub return_xxx ( $self, $status, $close_connection = 0 ) {
     die q[Unable to finish already started HTTP request] if $self->{_response_status};
 
+    # mark request as finished
     $self->{_response_status} = $HTTP_SERVER_RESPONSE_FINISHED;
 
-    $self->{_server}->return_xxx( $self->{_h}, $status, $use_keepalive );
+    $self->{_server}->return_xxx( $self->{_h}, $status, $close_connection || !$self->{keepalive} );
 
-    undef $self->{_h};
+    $self->{_cb}->($close_connection);
 
     return;
 }
@@ -201,6 +186,7 @@ sub accept_websocket ( $self, $headers = undef ) {
 
     die q[Unable to finish already started HTTP request] if $self->{_response_status};
 
+    # mark response as finished
     $self->{_response_status} = $HTTP_SERVER_RESPONSE_FINISHED;
 
     my $buf = "HTTP/1.1 101 $reason\r\nContent-Length:0\r\nUpgrade:websocket\r\nConnection:upgrade\r\n";
@@ -209,11 +195,11 @@ sub accept_websocket ( $self, $headers = undef ) {
 
     $buf .= ( join $CRLF, map {"$_->[0]:$_->[1]"} pairs $headers->@* ) . $CRLF if $headers && $headers->@*;
 
-    my $h = $self->{_h};
+    my $h = delete $self->{_h};
 
-    undef $self->{_h};
+    $h->write( $buf . $CRLF );
 
-    $h->push_write( $buf . $CRLF );
+    $self->{_cb}->(1);
 
     return $h;
 }

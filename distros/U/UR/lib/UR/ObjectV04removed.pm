@@ -25,7 +25,7 @@ only change with major releases number increments.
 package UR::BoolExpr;
 use strict;
 use warnings;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 *get_rule_template = \&template;
 *rule_template = \&template;

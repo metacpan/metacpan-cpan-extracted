@@ -1,0 +1,41 @@
+Date: Tue, 7 Aug 2018 19:29:30 +0200
+From: "Martin H. Sluka" <fany@cpan.org>
+To: fany@cpan.org
+Subject: signed test mail created with mutt
+Message-ID: <20180807172930.GA26180@sluka.de>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Nq2Wo0NMKNjxTN9z"
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+
+
+--Nq2Wo0NMKNjxTN9z
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Das ist der Rand von Ostermundigen.
+
+--Nq2Wo0NMKNjxTN9z
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEElsowEFDyKk/qxsifYL636+FGwpQFAltp1vIACgkQYL636+FG
+wpSZ6hAAkylwfGuO6YCv2hEPvWIEZNJ0IdJvBWufogF7d6y2cILZ6y4/HfsobBdz
+LbWvWOXrAkXpKYN4VmDw2nhAjvtwxLS9ZMJWGXxLDWH776QqdbSKGYbUHKdW5Nvk
+No7OGxkL27IR1ezI6MduRFsyPGy2lQsfGGvcXvTKK62SDmKIdek2JIJ2dnUZcNx+
+cOXO6vsxV8487qSVy5nBBVgsYlm9BKXXUn4RpAGdNpudqFhFNuatyUCdDHVgj3iG
+ZuOnmRjm5iTQNj9po3BI0R9XNHBJsnRE0eP15Du84TwWUMBmIW3Rweqs7LWUmZ4T
+HMSJc5+0uAMI7AC0GLMwJVV4R/yLCW3L4ZcX3Z8y0J+YuKgGQKYtza3/jPZ4vrIR
+rVzslJJcIH9BXMHNPPbPmyUfxuUaFbko3Pi/6uUMPA6bflj3DFqk/KTo0xiNqm93
+lLflH0FqSZ2HRKkIb6l4XBSg1qxFVVTUFKUTyzAsvAj7BY3kfKRzC50jr+JF53cO
+RQ0AbAamZApQJhEbTw3Q0NO3tNkxESu3Ay9NvUMNAfiC/Vhi1cThEhoeJogskx2w
+yvqVg0etgo+DA8ceiRTqM7r+AegZuZ/rImCBYCL+u3twVhwyp/Dz68mz1Ys4ItFU
+0FtapMZqZPTGIKA556R9YkgRS9n8wGhhvlUTnx0wtpGWK060ry8=
+=JFuL
+-----END PGP SIGNATURE-----
+
+--Nq2Wo0NMKNjxTN9z--
+

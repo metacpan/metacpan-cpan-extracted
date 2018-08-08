@@ -55,7 +55,7 @@
    "provides" : {
       "Mojo::IOLoop::ReadWriteProcess" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess.pm",
-         "version" : "0.20"
+         "version" : "0.22"
       },
       "Mojo::IOLoop::ReadWriteProcess::CGroup" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup.pm"
@@ -125,6 +125,15 @@
       },
       "Mojo::IOLoop::ReadWriteProcess::Session" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Session.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::Shared::Lock" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Shared/Lock.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::Shared::Memory" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Shared/Memory.pm"
+      },
+      "Mojo::IOLoop::ReadWriteProcess::Shared::Semaphore" : {
+         "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Shared/Semaphore.pm"
       }
    },
    "release_status" : "stable",
@@ -138,7 +147,7 @@
          "web" : "https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess"
       }
    },
-   "version" : "0.20",
+   "version" : "0.22",
    "x_contributors" : [
       "Ettore Di Giacinto <mudler@gentoo.org>",
       "Ettore Di Giacinto <mudler@users.noreply.github.com>"

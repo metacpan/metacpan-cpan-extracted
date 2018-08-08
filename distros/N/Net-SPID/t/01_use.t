@@ -14,6 +14,12 @@ BEGIN {
         sp_entityid     => 'https://www.prova.it/',
         sp_key_file     => 'sp.key',
         sp_cert_file    => 'sp.pem',
+        sp_assertionconsumerservice => [
+            'http://localhost:3000/spid-sso',
+        ],
+        sp_singlelogoutservice => {
+            'http://localhost:3000/spid-slo' => 'HTTP-Redirect',
+        },
     );
     isa_ok($spid, 'Net::SPID::SAML');
 }

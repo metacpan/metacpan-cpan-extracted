@@ -3,7 +3,6 @@ INSTALL
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-META.yml			Module meta-data (added by MakeMaker)
 README
 SpiderMonkey.pm
 SpiderMonkey.xs
@@ -34,4 +33,5 @@ t/init.pl
 t/error.t
 typemap
 util/download.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

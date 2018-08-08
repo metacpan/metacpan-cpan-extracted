@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojo::IOLoop::ReadWriteProcess:
     file: lib/Mojo/IOLoop/ReadWriteProcess.pm
-    version: '0.20'
+    version: '0.22'
   Mojo::IOLoop::ReadWriteProcess::CGroup:
     file: lib/Mojo/IOLoop/ReadWriteProcess/CGroup.pm
   Mojo::IOLoop::ReadWriteProcess::CGroup::v1:
@@ -74,13 +74,19 @@ provides:
     file: lib/Mojo/IOLoop/ReadWriteProcess/Queue.pm
   Mojo::IOLoop::ReadWriteProcess::Session:
     file: lib/Mojo/IOLoop/ReadWriteProcess/Session.pm
+  Mojo::IOLoop::ReadWriteProcess::Shared::Lock:
+    file: lib/Mojo/IOLoop/ReadWriteProcess/Shared/Lock.pm
+  Mojo::IOLoop::ReadWriteProcess::Shared::Memory:
+    file: lib/Mojo/IOLoop/ReadWriteProcess/Shared/Memory.pm
+  Mojo::IOLoop::ReadWriteProcess::Shared::Semaphore:
+    file: lib/Mojo/IOLoop/ReadWriteProcess/Shared/Semaphore.pm
 requires:
   Mojolicious: '7.24'
 resources:
   bugtracker: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess/issues
   homepage: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess
   repository: git://github.com/mudler/Mojo-IOLoop-ReadWriteProcess.git
-version: '0.20'
+version: '0.22'
 x_contributors:
   - 'Ettore Di Giacinto <mudler@gentoo.org>'
   - 'Ettore Di Giacinto <mudler@users.noreply.github.com>'

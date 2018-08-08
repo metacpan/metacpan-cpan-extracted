@@ -28,8 +28,7 @@ Mojo::IOLoop::ReadWriteProcess::CGroup::v2::RDMA - CGroups v2 RDMA Controller
 
 =head1 DESCRIPTION
 
-This module uses features that are only available on Linux,
-and requires cgroups and capability for unshare syscalls to achieve pid isolation.
+This module uses features that are only available on Linux kernels.
 
 =head1 METHODS
 

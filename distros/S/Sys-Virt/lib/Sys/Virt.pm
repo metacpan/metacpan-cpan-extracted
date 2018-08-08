@@ -75,10 +75,11 @@ use Sys::Virt::NodeDevice;
 use Sys::Virt::Interface;
 use Sys::Virt::Secret;
 use Sys::Virt::NWFilter;
+use Sys::Virt::NWFilterBinding;
 use Sys::Virt::DomainSnapshot;
 use Sys::Virt::Stream;
 
-our $VERSION = '4.5.0';
+our $VERSION = '4.6.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 

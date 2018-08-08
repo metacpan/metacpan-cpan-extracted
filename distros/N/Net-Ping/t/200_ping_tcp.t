@@ -17,6 +17,9 @@ BEGIN {
   }
 }
 
+# Hopefully this is never a routeable host
+my $fail_ip = $ENV{NET_PING_FAIL_IP} || "172.29.249.249";
+
 # Remote network test using tcp protocol.
 #
 # NOTE:
@@ -50,8 +53,7 @@ isnt($p->{port_num} = (getservbyname("http", "tcp") || 80), undef);
 
 isnt($p->ping("localhost"), 0, 'Test localhost on the web port');
 
-# Hopefully this is never a routeable host
-is($p->ping("172.29.249.249"), 0, "Can't reach 172.29.249.249");
+is($p->ping($fail_ip), 0, "Can't reach $fail_ip");
 
 # Test a few remote servers
 # Hopefully they are up when the tests are run.

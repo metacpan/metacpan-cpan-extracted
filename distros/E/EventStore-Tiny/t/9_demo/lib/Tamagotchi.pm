@@ -1,11 +1,13 @@
 package Tamagotchi;
-use Mo qw(default build);
+
+use strict;
+use warnings;
 
 use FindBin;
 use lib "$FindBin::Bin/../../lib";
 use EventStore::Tiny;
 
-has _event_store => EventStore::Tiny->new;
+use Class::Tiny {_event_store => sub {EventStore::Tiny->new}};
 
 sub data {shift->_event_store->snapshot->state}
 sub _register_event {shift->_event_store->register_event(@_)}
@@ -14,14 +16,14 @@ sub _store_event {shift->_event_store->store_event(@_)}
 sub BUILD {
     my $self = shift;
 
-    # prepare all possible event templates
+    # Prepare all possible event templates
     $self->_register_events;
 }
 
 sub _register_events {
     my $self = shift;
 
-    # user events
+    # User events
     $self->_register_event(UserAdded => sub {
         my ($state, $data) = @_;
         $state->{users}{$data->{user_id}} = {
@@ -38,7 +40,7 @@ sub _register_events {
         delete $state->{users}{$data->{user_id}};
     });
 
-    # tamagotchi events
+    # Tamagotchi events
     $self->_register_event(TamagotchiAdded => sub {
         my ($state, $data) = @_;
         $state->{tamas}{$data->{tama_id}} = {
@@ -67,28 +69,28 @@ sub _register_events {
 sub add_user {
     my ($self, $name) = @_;
 
-    # find free user id
+    # Find free user id
     my $user_id = 0;
     $user_id++ while exists $self->data->{users}{$user_id};
 
-    # ok, store event
+    # OK, store event
     $self->_store_event(UserAdded => {
         user_id     => $user_id,
         user_name   => $name,
     });
 
-    # tell them how to address the user
+    # Tell them how to address the user
     return $user_id;
 }
 
 sub rename_user {
     my ($self, $user_id, $name) = @_;
 
-    # try to find user
+    # Try to find user
     die "Unknown user: $user_id\n"
         unless exists $self->data->{users}{$user_id};
 
-    # ok, store rename event
+    # OK, store rename event
     $self->_store_event(UserRenamed => {
         user_id     => $user_id,
         user_name   => $name,
@@ -98,54 +100,54 @@ sub rename_user {
 sub remove_user {
     my ($self, $user_id) = @_;
 
-    # try to find user
+    # Try to find user
     die "Unknown user: $user_id\n"
         unless exists $self->data->{users}{$user_id};
 
-    # ok, store removal event
+    # OK, store removal event
     $self->_store_event(UserRemoved => {user_id => $user_id});
 }
 
 sub add_tamagotchi {
     my ($self, $user_id) = @_;
 
-    # try to find user
+    # Try to find user
     die "Unknown user: $user_id\n"
         unless exists $self->data->{users}{$user_id};
 
-    # find free tamagotchi id
+    # Find free tamagotchi id
     my $tama_id = 0;
     $tama_id++ while exists $self->data->{tamas}{$tama_id};
 
-    # ok, store event
+    # OK, store event
     $self->_store_event(TamagotchiAdded => {
         user_id => $user_id,
         tama_id => $tama_id,
     });
 
-    # tell them how to address the tamagotchi
+    # Tell them how to address the tamagotchi
     return $tama_id;
 }
 
 sub feed_tamagotchi {
     my ($self, $tama_id) = @_;
 
-    # try to find tamagotchi
+    # Try to find tamagotchi
     die "Unknown tamagotchi: $tama_id\n"
         unless exists $self->data->{tamas}{$tama_id};
 
-    # ok, feed it
+    # OK, feed it
     $self->_store_event(TamagotchiFed => {tama_id => $tama_id});
 }
 
 sub age_tamagotchi {
     my ($self, $tama_id) = @_;
 
-    # try to find tamagotchi
+    # Try to find tamagotchi
     die "Unknown tamagotchi: $tama_id\n"
         unless exists $self->data->{tamas}{$tama_id};
 
-    # ok, feed it
+    # OK, feed it
     $self->_store_event(TamagotchiDayPassed => {
         tama_id => $tama_id
     });
@@ -154,11 +156,11 @@ sub age_tamagotchi {
 sub die_tamagotchi {
     my ($self, $tama_id) = @_;
 
-    # try to find tamagotchi
+    # Try to find tamagotchi
     die "Unknown tamagotchi: $tama_id\n"
         unless exists $self->data->{tamas}{$tama_id};
 
-    # ok, murder it
+    # OK, murder it
     $self->_store_event(TamagotchiDied => {tama_id => $tama_id});
 }
 

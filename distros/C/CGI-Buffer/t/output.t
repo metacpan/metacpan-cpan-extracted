@@ -615,8 +615,8 @@ OUTPUT: {
 			print $tmp "use lib '$_';\n";
 		}
 	}
-	print $tmp "use strict;\n";
-	print $tmp "use CGI::Buffer;\n";
+	print $tmp "use strict;\n",
+		"use CGI::Buffer;\n";
 
 	open($fin, '-|', "$^X -Iblib/lib " . $filename);
 

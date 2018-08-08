@@ -1,56 +1,46 @@
 package Pcore::HTTP::Response;
 
 use Pcore -class;
-use Pcore::HTTP::Headers;
 use Pcore::Util::Scalar qw[is_plain_coderef is_plain_scalarref];
 
 with qw[Pcore::Util::Result::Status];
 
-has url      => ();    # ( is => 'ro', isa => Str | Object );
-has buf_size => 0;     # ( is => 'ro', isa => PositiveOrZeroInt, default => 0 );    # write body to fh if body length > this value, 0 - always store in memory, 1 - always store to file
+has url => ();
 
-has version => ();     # ( is => 'ro', isa => Num, init_arg => undef );
-has headers => ();     # ( is => 'ro', isa => InstanceOf ['Pcore::HTTP::Headers'], init_arg => undef );
-has body    => ();     # ( is => 'ro', isa => Ref,                                 init_arg => undef );
-has path    => ();     # ( is => 'ro', isa => Str,                                 init_arg => undef );
+has version => ();
+has headers => ();
+has data    => ();
 
-has content_length   => 0;                   # ( is => 'ro', isa => PositiveOrZeroInt, default => 0, init_arg => undef );
-has redirect         => ();                  # ( is => 'ro', isa => ArrayRef, init_arg => undef );
-has is_connect_error => 0;                   # ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
-has decoded_body     => ( is => 'lazy' );    # , isa => Maybe [ScalarRef], init_arg => undef );
-has tree             => ( is => 'lazy' );    # , isa => Maybe [ InstanceOf ['HTML::TreeBuilder::LibXML'] ], init_arg => undef );
+has content_length => 0;
+has is_redirect    => ();
+has decoded_data   => ( is => 'lazy' );
+has tree           => ( is => 'lazy' );
+has redirects      => ();                 # ArrayRef of intermadiate redirects
 
 sub BUILDARGS ( $self, $args ) {
-    if ( $args->{headers} ) {
-        $args->{headers} = Pcore::HTTP::Headers->new( $args->{headers} );
-    }
-    else {
-        $args->{headers} = Pcore::HTTP::Headers->new;
-    }
-
     return $args;
 }
 
-sub _build_decoded_body ($self) {
-    return if !$self->{body};
+sub _build_decoded_data ($self) {
+    return if !$self->{data};
 
-    return if !is_plain_scalarref $self->{body};
+    return if !is_plain_scalarref $self->{data};
 
     state $init = !!require HTTP::Message;
 
-    return HTTP::Message->new( [ 'Content-Type' => $self->{headers}->{CONTENT_TYPE} ], $self->{body}->$* )->decoded_content( raise_error => 1, ref => 1 );
+    return HTTP::Message->new( [ 'Content-Type' => $self->{headers}->{CONTENT_TYPE} ], $self->{data}->$* )->decoded_content( raise_error => 1, ref => 1 );
 }
 
 sub _build_tree ($self) {
-    return if !$self->{body};
+    return if !$self->{data};
 
-    return if !is_plain_scalarref $self->{body};
+    return if !is_plain_scalarref $self->{data};
 
     state $init = !!require HTML::TreeBuilder::LibXML;
 
     my $tree = HTML::TreeBuilder::LibXML->new;
 
-    $tree->parse( $self->decoded_body->$* );
+    $tree->parse( $self->decoded_data->$* );
 
     $tree->eof;
 

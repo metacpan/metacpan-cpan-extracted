@@ -6,7 +6,7 @@ package UR::Object::Type;
 use strict;
 use warnings;
 require UR;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 #use warnings FATAL => 'all';
 
 use Carp ();

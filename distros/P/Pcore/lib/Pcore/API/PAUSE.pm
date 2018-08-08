@@ -38,104 +38,75 @@ sub upload ( $self, $path, $cb = undef ) {
 
     return P->http->post(
         'https://pause.perl.org/pause/authenquery',
-        headers => {
-            AUTHORIZATION => $self->_auth_header,
-            CONTENT_TYPE  => qq[multipart/form-data; boundary=$boundary],
-        },
-        body => \$body,
+        headers => [
+            Authorization  => $self->_auth_header,
+            'Content-Type' => qq[multipart/form-data; boundary=$boundary],
+        ],
+        data => \$body,
         $cb // ()
     );
 }
 
 sub clean ( $self, @args ) {
-    my $rouse_cb = defined wantarray ? Coro::rouse_cb : ();
-
-    my $cb = is_coderef $args[-1] ? pop @args : undef;
-
     my %args = (
         keep => 2,
         @args,
     );
 
-    my $on_finish = sub ($res) {
-        $rouse_cb ? $cb ? $rouse_cb->( $cb->($res) ) : $rouse_cb->($res) : $cb ? $cb->($res) : ();
+    return res [ 400, q[Bad "keep" arument.] ] if !$args{keep};
 
-        return;
-    };
+    my $res = P->http->get( 'https://pause.perl.org/pause/authenquery?ACTION=delete_files', headers => [ Authorization => $self->_auth_header ] );
 
-    if ( !$args{keep} ) {
-        $on_finish->( res [ 400, q[Bad "keep" arument.] ] );
+    return res [ $res->{status}, $res->{reason} ] if !$res;
+
+    my $releases;
+
+    for my $node ( $res->tree->findnodes(q[//tbody[@class="list"]/tr]) ) {
+        my ( $name, $ver ) = $node->findvalue(q[./td[@class="file"]]) =~ /\A(.+)-v([[:alnum:].]+)[.]tar[.]gz\z/sm;
+
+        next if !$name;
+
+        next if $node->findvalue(q[./td[@class="modified"]]) =~ /Scheduled for deletion/sm;
+
+        $releases->{$name}->{$ver} = undef;
     }
 
-    P->http->get(
-        'https://pause.perl.org/pause/authenquery?ACTION=delete_files',
-        headers => { AUTHORIZATION => $self->_auth_header, },
-        sub ($res) {
-            if ( !$res ) {
-                $on_finish->( res [ $res->{status}, $res->{reason} ] );
+    my $params = [
+        HIDDENNAME                         => uc encode_utf8( $self->username ),
+        SUBMIT_pause99_delete_files_delete => 'Delete',
+    ];
+
+    my $releases_to_remove;
+
+    for my $release ( keys $releases->%* ) {
+        my $versions = [ map {"$_"} reverse sort map { version->new($_) } keys $releases->{$release}->%* ];
+
+        # keep last releases
+        splice $versions->@*, 0, $args{keep}, ();
+
+        if ( $versions->@* ) {
+            for my $version ( $versions->@* ) {
+                $releases_to_remove->{"$release-v$version"} = undef;
+
+                push $params->@*, pause99_delete_files_FILE => "$release-v$version.tar.gz";
+                push $params->@*, pause99_delete_files_FILE => "$release-v$version.meta";
+                push $params->@*, pause99_delete_files_FILE => "$release-v$version.readme";
             }
-            else {
-                my $releases;
-
-                for my $node ( $res->tree->findnodes(q[//tbody[@class="list"]/tr]) ) {
-                    my ( $name, $ver ) = $node->findvalue(q[./td[@class="file"]]) =~ /\A(.+)-v([[:alnum:].]+)[.]tar[.]gz\z/sm;
-
-                    next if !$name;
-
-                    next if $node->findvalue(q[./td[@class="modified"]]) =~ /Scheduled for deletion/sm;
-
-                    $releases->{$name}->{$ver} = undef;
-                }
-
-                my $params = [
-                    HIDDENNAME                         => uc encode_utf8( $self->username ),
-                    SUBMIT_pause99_delete_files_delete => 'Delete',
-                ];
-
-                my $releases_to_remove;
-
-                for my $release ( keys $releases->%* ) {
-                    my $versions = [ map {"$_"} reverse sort map { version->new($_) } keys $releases->{$release}->%* ];
-
-                    # keep last releases
-                    splice $versions->@*, 0, $args{keep}, ();
-
-                    if ( $versions->@* ) {
-                        for my $version ( $versions->@* ) {
-                            $releases_to_remove->{"$release-v$version"} = undef;
-
-                            push $params->@*, pause99_delete_files_FILE => "$release-v$version.tar.gz";
-                            push $params->@*, pause99_delete_files_FILE => "$release-v$version.meta";
-                            push $params->@*, pause99_delete_files_FILE => "$release-v$version.readme";
-                        }
-                    }
-                }
-
-                if ( !$releases_to_remove ) {
-                    $on_finish->( res [ 200, 'Nothing to do' ] );
-                }
-                else {
-                    P->http->post(
-                        'https://pause.perl.org/pause/authenquery?ACTION=delete_files',
-                        headers => {
-                            AUTHORIZATION => $self->_auth_header,
-                            CONTENT_TYPE  => 'application/x-www-form-urlencoded',
-                        },
-                        body => P->data->to_uri($params),
-                        sub ($res) {
-                            $on_finish->( res [ $res->{status}, $res->{reason} ], [ sort keys $releases_to_remove->%* ] );
-
-                            return;
-                        }
-                    );
-                }
-            }
-
-            return;
         }
+    }
+
+    return res [ 200, 'Nothing to do' ] if !$releases_to_remove;
+
+    $res = P->http->post(
+        'https://pause.perl.org/pause/authenquery?ACTION=delete_files',
+        headers => [
+            Authorization  => $self->_auth_header,
+            'Content-Type' => 'application/x-www-form-urlencoded',
+        ],
+        data => P->data->to_uri($params),
     );
 
-    return $rouse_cb ? Coro::rouse_wait $rouse_cb : ();
+    return res [ $res->{status}, $res->{reason} ], [ sort keys $releases_to_remove->%* ];
 }
 
 sub _pack_multipart ( $self, $body, $boundary, $name, $content, $filename = undef ) {
@@ -161,9 +132,9 @@ sub _pack_multipart ( $self, $body, $boundary, $name, $content, $filename = unde
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 141                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 112                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 80, 81, 85           | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 64, 65, 69           | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

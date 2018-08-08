@@ -1,0 +1,30 @@
+Revision history for TextFileParser
+
+0.202     2018-08-08 00:03:52-07:00 America/Los_Angeles
+  - Added bugtracking info to POD
+
+0.201     2018-08-07 23:19:45-07:00 America/Los_Angeles
+  - Improved documentation
+  - Removed the use Role::Tiny from the tests
+
+0.200     2018-08-07 16:31:53-07:00 America/Los_Angeles
+  - Changed versioning scheme
+  - Updated documentation
+
+0.1821907 2018-08-07 14:37:11-07:00 America/Los_Angeles
+  - Removed record_list_pointer method
+  - Updated documentation
+  - Added tests using a Role::Tiny
+
+0.1821905 2018-08-07 09:22:12-07:00 America/Los_Angeles
+  - Added a new method pop_record
+  - Updated POD and simplified examples
+  - Added more tests
+
+0.1821902 2018-08-06 23:33:10-07:00 America/Los_Angeles
+  - Added the first tests
+  - Removed method make_sense_of_line. Derived classes override only save_record
+  - Updated documentation briefly.
+
+0.1821900 2018-08-06 20:41:42-07:00 America/Los_Angeles
+  - Put your comment here

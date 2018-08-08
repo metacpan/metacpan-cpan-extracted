@@ -86,7 +86,6 @@ virt_newSVull(unsigned long long val) {
 }
 
 
-
 static void
 ignoreVirErrorFunc(void * userData, virErrorPtr error) {
   /* Do nothing */
@@ -263,7 +262,8 @@ vir_typed_param_from_hv(HV *newparams, virTypedParameterPtr params, int nparams)
 
         case VIR_TYPED_PARAM_STRING:
             ptr = SvPV(*val, len);
-            params[i].value.s = (char *)ptr;
+            if (!(params[i].value.s = strdup((char *)ptr)))
+                abort();
             break;
         }
     }
@@ -300,11 +300,20 @@ vir_typed_param_add_string_list_from_hv(HV *newparams,
       localparams[*nparams + i].field[VIR_TYPED_PARAM_FIELD_LENGTH - 1] = '\0';
 
       localparams[*nparams + i].type = VIR_TYPED_PARAM_STRING;
-      localparams[*nparams + i].value.s = ptr;
+      if (!(localparams[*nparams + i].value.s = strdup(ptr)))
+	  abort();
     }
 
     *params = localparams;
     *nparams += nstr;
+}
+
+
+static void
+vir_typed_param_safe_free(virTypedParameterPtr params, int nparams)
+{
+    virTypedParamsClear(params, nparams);
+    Safefree(params);
 }
 
 
@@ -2403,15 +2412,15 @@ get_node_sev_info(conn, flags=0)
       virConnectPtr conn;
       unsigned int flags;
   PREINIT:
-      virTypedParameterPtr params;
-      int nparams;
+      virTypedParameterPtr params = NULL;
+      int nparams = 0;
     CODE:
       if (virNodeGetSEVInfo(conn, &params, &nparams, flags) < 0) {
           _croak_error();
       }
 
       RETVAL = vir_typed_param_to_hv(params, nparams);
-      free(params);
+      virTypedParamsFree(params, nparams);
   OUTPUT:
       RETVAL
 
@@ -2651,12 +2660,12 @@ get_node_memory_parameters(conn, flags=0)
       Newx(params, nparams, virTypedParameter);
 
       if (virNodeGetMemoryParameters(conn, params, &nparams, flags) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       RETVAL = vir_typed_param_to_hv(params, nparams);
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
   OUTPUT:
       RETVAL
 
@@ -2677,15 +2686,17 @@ set_node_memory_parameters(conn, newparams, flags=0)
       Newx(params, nparams, virTypedParameter);
 
       if (virNodeGetMemoryParameters(conn, params, &nparams, 0) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       nparams = vir_typed_param_from_hv(newparams, params, nparams);
 
-      if (virNodeSetMemoryParameters(conn, params, nparams, flags) < 0)
+      if (virNodeSetMemoryParameters(conn, params, nparams, flags) < 0) {
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
-      Safefree(params);
+      }
+      vir_typed_param_safe_free(params, nparams);
 
 
 
@@ -4554,19 +4565,18 @@ get_job_stats(dom, flags=0)
       unsigned int flags;
   PREINIT:
       int type;
-      virTypedParameterPtr params;
-      int nparams;
+      virTypedParameterPtr params = NULL;
+      int nparams = 0;
       HV *paramsHv;
       SV *typeSv;
     PPCODE:
       if (virDomainGetJobStats(dom, &type, &params, &nparams, flags) < 0) {
-          Safefree(params);
           _croak_error();
       }
 
       typeSv = newSViv(type);
       paramsHv = vir_typed_param_to_hv(params, nparams);
-      Safefree(params);
+      virTypedParamsFree(params, nparams);
 
       EXTEND(SP, 2);
       PUSHs(newRV_noinc((SV*)typeSv));
@@ -4674,11 +4684,11 @@ block_copy(dom, path, destxml, newparams, flags=0)
       nparams = vir_typed_param_from_hv(newparams, params, nparams);
 
       if (virDomainBlockCopy(dom, path, destxml, params, nparams, flags) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
 
 
 void
@@ -4739,17 +4749,17 @@ get_scheduler_parameters(dom, flags=0)
       Newx(params, nparams, virTypedParameter);
       if (flags) {
           if (virDomainGetSchedulerParametersFlags(dom, params, &nparams, flags) < 0) {
-              Safefree(params);
+              vir_typed_param_safe_free(params, nparams);
               _croak_error();
           }
       } else {
           if (virDomainGetSchedulerParameters(dom, params, &nparams) < 0) {
-              Safefree(params);
+              vir_typed_param_safe_free(params, nparams);
               _croak_error();
           }
       }
       RETVAL = vir_typed_param_to_hv(params, nparams);
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
   OUTPUT:
       RETVAL
 
@@ -4770,18 +4780,22 @@ set_scheduler_parameters(dom, newparams, flags=0)
       free(type);
       Newx(params, nparams, virTypedParameter);
       if (virDomainGetSchedulerParameters(dom, params, &nparams) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
       nparams = vir_typed_param_from_hv(newparams, params, nparams);
       if (flags) {
-          if (virDomainSetSchedulerParametersFlags(dom, params, nparams, flags) < 0)
+          if (virDomainSetSchedulerParametersFlags(dom, params, nparams, flags) < 0) {
+              vir_typed_param_safe_free(params, nparams);
               _croak_error();
+          }
       } else {
-          if (virDomainSetSchedulerParameters(dom, params, nparams) < 0)
+          if (virDomainSetSchedulerParameters(dom, params, nparams) < 0) {
+              vir_typed_param_safe_free(params, nparams);
               _croak_error();
+          }
       }
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
 
 
 HV *
@@ -4799,12 +4813,12 @@ get_memory_parameters(dom, flags=0)
       Newx(params, nparams, virTypedParameter);
 
       if (virDomainGetMemoryParameters(dom, params, &nparams, flags) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       RETVAL = vir_typed_param_to_hv(params, nparams);
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
   OUTPUT:
       RETVAL
 
@@ -4825,15 +4839,17 @@ set_memory_parameters(dom, newparams, flags=0)
       Newx(params, nparams, virTypedParameter);
 
       if (virDomainGetMemoryParameters(dom, params, &nparams, 0) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       nparams = vir_typed_param_from_hv(newparams, params, nparams);
 
-      if (virDomainSetMemoryParameters(dom, params, nparams, flags) < 0)
+      if (virDomainSetMemoryParameters(dom, params, nparams, flags) < 0) {
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
-      Safefree(params);
+      }
+      vir_typed_param_safe_free(params, nparams);
 
 
 HV *
@@ -4851,12 +4867,12 @@ get_numa_parameters(dom, flags=0)
       Newx(params, nparams, virTypedParameter);
 
       if (virDomainGetNumaParameters(dom, params, &nparams, flags) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       RETVAL = vir_typed_param_to_hv(params, nparams);
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
   OUTPUT:
       RETVAL
 
@@ -4877,15 +4893,17 @@ set_numa_parameters(dom, newparams, flags=0)
       Newx(params, nparams, virTypedParameter);
 
       if (virDomainGetNumaParameters(dom, params, &nparams, 0) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       nparams = vir_typed_param_from_hv(newparams, params, nparams);
 
-      if (virDomainSetNumaParameters(dom, params, nparams, flags) < 0)
+      if (virDomainSetNumaParameters(dom, params, nparams, flags) < 0) {
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
-      Safefree(params);
+      }
+      vir_typed_param_safe_free(params, nparams);
 
 
 HV *
@@ -4903,12 +4921,12 @@ get_blkio_parameters(dom, flags=0)
       Newx(params, nparams, virBlkioParameter);
 
       if (virDomainGetBlkioParameters(dom, params, &nparams, flags) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       RETVAL = vir_typed_param_to_hv(params, nparams);
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
   OUTPUT:
       RETVAL
 
@@ -4929,16 +4947,18 @@ set_blkio_parameters(dom, newparams, flags=0)
       Newx(params, nparams, virBlkioParameter);
 
       if (virDomainGetBlkioParameters(dom, params, &nparams, 0) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       nparams = vir_typed_param_from_hv(newparams, params, nparams);
 
       if (virDomainSetBlkioParameters(dom, params, nparams,
-                                      flags) < 0)
+                                      flags) < 0) {
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
-      Safefree(params);
+      }
+      vir_typed_param_safe_free(params, nparams);
 
 
 HV *
@@ -4950,12 +4970,12 @@ get_perf_events(dom, flags=0)
       int nparams = 0;
     CODE:
       if (virDomainGetPerfEvents(dom, &params, &nparams, flags) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       RETVAL = vir_typed_param_to_hv(params, nparams);
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
   OUTPUT:
       RETVAL
 
@@ -4970,7 +4990,7 @@ set_perf_events(dom, newparams, flags=0)
       int nparams = 0;
     PPCODE:
       if (virDomainGetPerfEvents(dom, &params, &nparams, 0) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
@@ -4978,7 +4998,7 @@ set_perf_events(dom, newparams, flags=0)
 
       if (virDomainSetPerfEvents(dom, params, nparams, flags) < 0)
           _croak_error();
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
 
 
 HV *
@@ -4986,14 +5006,14 @@ get_launch_security_info(dom, flags=0)
       virDomainPtr dom;
       unsigned int flags;
   PREINIT:
-      virTypedParameterPtr params;
-      int nparams;
+      virTypedParameterPtr params = NULL;
+      int nparams = 0;
     CODE:
       if (virDomainGetLaunchSecurityInfo(dom, &params, &nparams, flags) < 0) {
           _croak_error();
       }
       RETVAL = vir_typed_param_to_hv(params, nparams);
-      free(params);
+      virTypedParamsFree(params, nparams);
   OUTPUT:
       RETVAL
 
@@ -5103,8 +5123,8 @@ get_guest_vcpus(dom, flags=0)
       virDomainPtr dom;
       unsigned int flags;
   PREINIT:
-      virTypedParameterPtr params;
-      unsigned int nparams;
+      virTypedParameterPtr params = NULL;
+      unsigned int nparams = 0;
     CODE:
       if (virDomainGetGuestVcpus(dom, &params, &nparams, flags) < 0) {
           _croak_error();
@@ -5374,10 +5394,10 @@ _migrate(dom, destcon, newparams, flags=0)
       * if it is possible todo so
       */
      if ((RETVAL = virDomainMigrate3(dom, destcon, params, nparams, flags)) == NULL) {
-         Safefree(params);
+         vir_typed_param_safe_free(params, nparams);
          _croak_error();
      }
-     Safefree(params);
+     vir_typed_param_safe_free(params, nparams);
  OUTPUT:
      RETVAL
 
@@ -5465,10 +5485,10 @@ _migrate_to_uri(dom, desturi, newparams, flags=0)
       * if it is possible todo so
       */
      if (virDomainMigrateToURI3(dom, desturi, params, nparams, flags) < 0) {
-         Safefree(params);
+         vir_typed_param_safe_free(params, nparams);
          _croak_error();
      }
-     Safefree(params);
+     vir_typed_param_safe_free(params, nparams);
 
 
 void
@@ -5627,12 +5647,12 @@ get_block_iotune(dom, disk, flags=0)
 
       Newx(params, nparams, virTypedParameter);
       if (virDomainGetBlockIoTune(dom, disk, params, &nparams, flags) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       RETVAL = vir_typed_param_to_hv(params, nparams);
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
   OUTPUT:
       RETVAL
 
@@ -5653,13 +5673,16 @@ set_block_iotune(dom, disk, newparams, flags=0)
       Newx(params, nparams, virTypedParameter);
 
       if (virDomainGetBlockIoTune(dom, disk, params, &nparams, 0) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       nparams = vir_typed_param_from_hv(newparams, params, nparams);
-      if (virDomainSetBlockIoTune(dom, disk, params, nparams, flags) < 0)
+      if (virDomainSetBlockIoTune(dom, disk, params, nparams, flags) < 0) {
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
+      }
+      vir_typed_param_safe_free(params, nparams);
 
 
 HV *
@@ -5678,12 +5701,12 @@ get_interface_parameters(dom, intf, flags=0)
 
       Newx(params, nparams, virTypedParameter);
       if (virDomainGetInterfaceParameters(dom, intf, params, &nparams, flags) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       RETVAL = vir_typed_param_to_hv(params, nparams);
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
   OUTPUT:
       RETVAL
 
@@ -5704,13 +5727,16 @@ set_interface_parameters(dom, intf, newparams, flags=0)
       Newx(params, nparams, virTypedParameter);
 
       if (virDomainGetInterfaceParameters(dom, intf, params, &nparams, 0) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
       nparams = vir_typed_param_from_hv(newparams, params, nparams);
-      if (virDomainSetInterfaceParameters(dom, intf, params, nparams, flags) < 0)
+      if (virDomainSetInterfaceParameters(dom, intf, params, nparams, flags) < 0) {
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
+      }
+      vir_typed_param_safe_free(params, nparams);
 
 
 HV *
@@ -5746,7 +5772,7 @@ block_stats(dom, path, flags=0)
           Newx(params, nparams, virTypedParameter);
 
           if (virDomainBlockStatsFlags(dom, path, params, &nparams, flags) < 0) {
-              Safefree(params);
+              vir_typed_param_safe_free(params, nparams);
               _croak_error();
           }
 
@@ -5766,7 +5792,7 @@ block_stats(dom, path, flags=0)
                   (void)hv_store(RETVAL, field, strlen(field), val, 0);
               }
           }
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
       }
   OUTPUT:
       RETVAL
@@ -5849,6 +5875,10 @@ memory_stats(dom, flags=0)
 
           case VIR_DOMAIN_MEMORY_STAT_USABLE:
               (void)hv_store (RETVAL, "usable", 6, virt_newSVll(stats[i].val), 0);
+              break;
+
+          case VIR_DOMAIN_MEMORY_STAT_DISK_CACHES:
+              (void)hv_store (RETVAL, "disk_caches", 11, virt_newSVll(stats[i].val), 0);
               break;
           }
       }
@@ -6000,7 +6030,7 @@ get_cpu_stats(dom, start_cpu, ncpus, flags=0)
 
       Newx(params, ncpus * nparams, virTypedParameter);
       if ((ret = virDomainGetCPUStats(dom, params, nparams, start_cpu, ncpus, flags)) < 0) {
-          Safefree(params);
+          vir_typed_param_safe_free(params, nparams);
           _croak_error();
       }
 
@@ -6010,7 +6040,7 @@ get_cpu_stats(dom, start_cpu, ncpus, flags=0)
           PUSHs(newRV_noinc((SV *)rec));
       }
 
-      Safefree(params);
+      vir_typed_param_safe_free(params, nparams);
 
 
 void
@@ -9040,6 +9070,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_MEMORY_STAT_RSS, MEMORY_STAT_RSS);
       REGISTER_CONSTANT(VIR_DOMAIN_MEMORY_STAT_LAST_UPDATE, MEMORY_STAT_LAST_UPDATE);
       REGISTER_CONSTANT(VIR_DOMAIN_MEMORY_STAT_USABLE, MEMORY_STAT_USABLE);
+      REGISTER_CONSTANT(VIR_DOMAIN_MEMORY_STAT_DISK_CACHES, MEMORY_STAT_DISK_CACHES);
 
 
       REGISTER_CONSTANT_STR(VIR_DOMAIN_BLOCK_IOTUNE_TOTAL_BYTES_SEC, BLOCK_IOTUNE_TOTAL_BYTES_SEC);

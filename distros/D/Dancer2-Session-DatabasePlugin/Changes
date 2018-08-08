@@ -16,3 +16,5 @@
 1.0006
   -- Should now only reset our sth cache if it was our DBI connection
   -- added unit tests to validate selective db cache clean up
+1.0007
+  -- Reduced min version over Carp to 1.38

@@ -7,7 +7,7 @@ require UR;
 use Lingua::EN::Inflect;
 use Class::AutoloadCAN;
 
-our $VERSION = "0.46"; # UR $VERSION;;
+our $VERSION = "0.47"; # UR $VERSION;
 our @CARP_NOT = qw( UR::DataSource::RDBMS UR::Object::Type );
 
 # class_meta and r_class_meta duplicate the functionality if two properties of the same name,
@@ -99,7 +99,10 @@ sub _convert_data_type_for_source_class_to_final_class {
         else {
             my ($ns_value_class, $ur_value_class);
 
-            if ($ns and $ns->can("get")) {
+            if ($ns
+                and $ns ne 'UR' and $ns ne 'URT'
+                and $ns->can("get")
+            ) {
                 $ns_value_class = $ns . '::Value::' . $foreign_class;
                 if ($ns_value_class->can('__meta__')) {
                     $final_class = $ns_value_class;
@@ -108,13 +111,11 @@ sub _convert_data_type_for_source_class_to_final_class {
 
             if (!$final_class) {
                 $ur_value_class = 'UR::Value::' . $foreign_class;
-                if ($ur_value_class->can('__meta__')) {
-                    $final_class = $ur_value_class;
-                }
-            }
-            if (!$final_class) {
-                $ur_value_class = 'UR::Value::' . ucfirst(lc($foreign_class));
-                if ($ur_value_class->can('__meta__')) {
+                my $normalized_ur_value_class = 'UR::Value::' . ucfirst(lc($foreign_class));
+                if ($normalized_ur_value_class->can('__meta__')) {
+                    $final_class = $normalized_ur_value_class;
+
+                } elsif ($ur_value_class->can('__meta__')) {
                     $final_class = $ur_value_class;
                 }
             }
@@ -129,6 +130,7 @@ sub _convert_data_type_for_source_class_to_final_class {
             return $foreign_class;
         }
         else {
+            local $@;
             eval "use $foreign_class;";
             if (!$@) {
                 return $foreign_class;
@@ -475,7 +477,7 @@ is how one-to-one relationships are implemented.
 =item via property
 
 When a class has some object accessor property, and it is helpful for an
-object to assumme the value of the remote class's properties, you can set 
+object to assume the value of the remote class's properties, you can set
 up a 'via' property.  In the example above, an object of this class 
 gets the value of its 'bar' property via the 'other' object it's linked
 to, from that object's 'bar' property.

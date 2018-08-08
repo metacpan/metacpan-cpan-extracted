@@ -20,6 +20,13 @@
 #######################################################################
 
 
+2018-08-06  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000408 released
+
+        * Fix to move_tarfile routine.
+
+
 2018-07-31  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000407 released

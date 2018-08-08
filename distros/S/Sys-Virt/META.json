@@ -41,7 +41,7 @@
    "provides" : {
       "Sys::Virt" : {
          "file" : "lib/Sys/Virt.pm",
-         "version" : "v4.5.0"
+         "version" : "v4.6.0"
       },
       "Sys::Virt::Domain" : {
          "file" : "lib/Sys/Virt/Domain.pm"
@@ -60,6 +60,9 @@
       },
       "Sys::Virt::NWFilter" : {
          "file" : "lib/Sys/Virt/NWFilter.pm"
+      },
+      "Sys::Virt::NWFilterBinding" : {
+         "file" : "lib/Sys/Virt/NWFilterBinding.pm"
       },
       "Sys::Virt::Network" : {
          "file" : "lib/Sys/Virt/Network.pm"
@@ -91,6 +94,6 @@
       },
       "x_MailingList" : "http://www.redhat.com/mailman/listinfo/libvir-list"
    },
-   "version" : "v4.5.0",
+   "version" : "v4.6.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

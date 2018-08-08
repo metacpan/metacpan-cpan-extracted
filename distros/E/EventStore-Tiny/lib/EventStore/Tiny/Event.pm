@@ -1,35 +1,53 @@
 package EventStore::Tiny::Event;
-use Mo qw(default required build);
+
+use strict;
+use warnings;
 
 use UUID::Tiny qw(create_uuid_as_string);
 use Time::HiRes qw(time);
 
-has uuid            => sub {create_uuid_as_string};
-has timestamp       => is => 'ro';
-has name            => required => 1;
-has transformation  => sub {sub {}};
-has data            => {};
+use Class::Tiny {
+    uuid            => sub {create_uuid_as_string},
+    timestamp       => sub {time},
+    name            => sub {die "name is required.\n"},
+    transformation  => sub {sub {}},
+};
 
 sub BUILD {
     my $self = shift;
 
-    # make sure to set the timestamp non-lazy
-    # see Mo issue #36 @ github
-    $self->timestamp(time);
+    # Set non-lazy
+    $self->name;
+    $self->timestamp;
+
+    # Return nothing (will be ignored anyway)
+    return;
 }
 
-# lets transformation work on state by side-effect
+# Lets transformation work on state by side-effect
 sub apply_to {
     my ($self, $state, $logger) = @_;
 
-    # apply the transformation by side effect
-    $self->transformation->($state, $self->data);
+    # Apply the transformation by side effect
+    $self->transformation->($state);
 
-    # log this event, if logger present
+    # Log this event, if logger present
     $logger->($self) if defined $logger;
 
-    # returned the same state just in case
+    # Returned the same state just in case
     return $state;
+}
+
+# Return a one-line summary of this event
+sub summary {
+    my $self = shift;
+    my $decimals    = $self->timestamp =~ /(\.\d+)$/ ? $1 : '';
+    my @time_parts  = localtime $self->timestamp;
+    return sprintf '[%s (%4d-%02d-%02dT%02d:%02d:%02d%s)]',
+        $self->name,
+        $time_parts[5] + 1900,      # Year
+        @time_parts[4, 3, 2, 1, 0], # Rest of time representation
+        $decimals;                  # Possibly empty
 }
 
 1;
@@ -75,6 +93,12 @@ This event's state transformation function, represented by a subref. By default 
     $event->apply_to(\%state, $logger);
 
 Applies this event's L<transformation> to the given state (by side-effect). If a C<$logger> as a subref is given, it is used to log this application.
+
+=head3 summary
+
+    say $event->summary;
+
+Returns a one-line summarized stringification of this event.
 
 =head1 SEE ALSO
 

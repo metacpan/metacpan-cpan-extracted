@@ -3,7 +3,7 @@ package UR::Object::View::Default::Json;
 use strict;
 use warnings;
 require UR;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 use JSON;
 
@@ -24,6 +24,7 @@ sub _json {
 
     $json = JSON->new;
     foreach my $opt ( @{ $self->encode_options } ) {
+        local $@;
         eval { $json = $json->$opt; };
         if ($@) {
             Carp::croak("Can't initialize JSON object for encoding.  Calling method $opt from encode_options died: $@");
@@ -67,6 +68,7 @@ sub _generate_content_for_aspect {
     #warn $aspect_name if ref($subject) =~ /Set/;
 
     my @value;
+    local $@;
     eval {
         @value = $subject->$aspect_name;
     };

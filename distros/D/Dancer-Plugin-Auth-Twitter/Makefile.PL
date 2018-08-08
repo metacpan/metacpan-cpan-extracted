@@ -18,14 +18,13 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Dancer-Plugin-Auth-Twitter",
   "EXE_FILES" => [],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.014", # required by Twitter::API
   "NAME" => "Dancer::Plugin::Auth::Twitter",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Class::Load" => 0,
     "Dancer" => 0,
     "Dancer::Plugin" => 0,
-    "Net::Twitter::Lite::WithAPIv1_1" => "0.12006",
+    "Twitter::API" => "1.0002",
     "strict" => 0,
     "warnings" => 0
   },
@@ -39,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "lib" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION_FROM" => "lib/Dancer/Plugin/Auth/Twitter.pm",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +47,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Class::Load" => 0,
   "Dancer" => 0,
   "Dancer::Plugin" => 0,
   "Dancer::Test" => 0,
@@ -57,7 +55,7 @@ my %FallbackPrereqs = (
   "HTTP::Request::Common" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Net::Twitter::Lite::WithAPIv1_1" => "0.12006",
+  "Twitter::API" => "1.0002",
   "Test::MockObject::Extends" => 0,
   "Test::More" => "0.88",
   "lib" => 0,

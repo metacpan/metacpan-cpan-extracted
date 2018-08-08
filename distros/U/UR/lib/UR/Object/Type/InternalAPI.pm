@@ -3,7 +3,7 @@ use warnings;
 use strict;
 
 require UR;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 use Sys::Hostname;
 use Cwd;

@@ -8,14 +8,14 @@ use_ok 'EventStore::Tiny';
 # prepare event store with event application counter (via logging)
 my $ea_count    = 0;
 my $est         = EventStore::Tiny->new(logger => sub {$ea_count++});
-is $est->cache_size => 0, 'Default cache size: 0';
+is $est->cache_distance => 0, 'Default cache size: 0';
 
 # prepare simple counter event
 $est->register_event(EventApplied => sub {shift->{x}++});
 
 my $cs = 100;
 subtest "Cache size: $cs" => sub {
-    $est->cache_size($cs);
+    $est->cache_distance($cs);
 
     # fill with the cache size of events and some more, just because
     my $init_ec = $cs + 10;
@@ -54,11 +54,11 @@ subtest "Cache size: $cs" => sub {
 
 subtest 'Caching disabled' => sub {
 
-    # reset with cache_size undef (caching disabled)
+    # reset with cache_distance undef (caching disabled)
     $ea_count = 0;
     $est->events->events([]);
     $est->_cached_snapshot(undef);
-    $est->cache_size(undef);
+    $est->cache_distance(undef);
 
     # add some events
     my $ec = 17;

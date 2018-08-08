@@ -6,7 +6,7 @@ package UR::BoolExpr::Util;
 use strict;
 use warnings;
 require UR;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 use Scalar::Util qw(blessed reftype refaddr);
 use Data::Dumper;

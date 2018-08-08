@@ -5,7 +5,7 @@ use warnings;
 use UR;
 use File::Basename qw/basename/;
 
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 class Command::Tree {
     is => 'Command::V2',
@@ -369,7 +369,7 @@ sub _build_sub_command_mapping {
 
             # find My::Foo::Command::*
             if (-d $subdir_full_path) {
-                my @files = glob($subdir_full_path . '/*');
+                my @files = glob("\Q${subdir_full_path}/*");
                 for my $file (@files) {
                     my $basename = basename($file);
                     $basename =~ s/.pm$// or next;
@@ -394,7 +394,7 @@ sub _build_sub_command_mapping {
             # find My::Foo::*::Command
             $subdir_full_path = $lib . '/' . $subdir2;
             my $pattern = $subdir_full_path . '/*/Command.pm';
-            my @paths = glob($pattern);
+            my @paths = glob("\Q$pattern\E");
             for my $file (@paths) {
                 next unless defined $file;
                 next unless length $file;

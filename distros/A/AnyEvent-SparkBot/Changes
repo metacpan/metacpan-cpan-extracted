@@ -31,3 +31,5 @@
   -- t/AnyEvent-SparkBot.t no longer tries to get to the internet without $ENV{RUN_HTTP_TESTS} being true
 1.009
   -- Changed min version of Data::Dumper to 2.161
+1.010
+  -- Changed min version of Carp to 1.38

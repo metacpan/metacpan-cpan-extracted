@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# If you want the original e-mail to be posted
+# in case appending the trailer fails, you may use
+# this as a wrapper to ezmlm-append-trailer.
+
+in="$(mktemp)"
+out="$(mktemp)"
+cat >"$in"
+if <"$in" "$@" >"$out"; then
+    cat "$out"
+else
+    cat "$in"
+fi
+rm -f "$in" "$out"

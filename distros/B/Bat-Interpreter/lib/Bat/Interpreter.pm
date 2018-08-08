@@ -2,6 +2,7 @@ package Bat::Interpreter;
 
 use utf8;
 
+use 5.014;
 use Moo;
 use Types::Standard qw(ConsumerOf);
 use App::BatParser 0.011;
@@ -11,7 +12,7 @@ use Bat::Interpreter::Delegate::FileStore::LocalFileSystem;
 use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use namespace::autoclean;
 
-our $VERSION = '0.012';    # VERSION
+our $VERSION = '0.013';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -399,7 +400,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 

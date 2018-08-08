@@ -49,10 +49,10 @@ no_index:
 provides:
   Pod::Markdown:
     file: lib/Pod/Markdown.pm
-    version: '3.100'
+    version: '3.101'
   Pod::Perldoc::ToMarkdown:
     file: lib/Pod/Perldoc/ToMarkdown.pm
-    version: '3.100'
+    version: '3.101'
 recommends:
   HTML::Entities: '0'
 requires:
@@ -69,7 +69,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Markdown
   homepage: https://github.com/rwstauner/Pod-Markdown
   repository: https://github.com/rwstauner/Pod-Markdown.git
-version: '3.100'
+version: '3.101'
 x_Dist_Zilla:
   perl:
     version: '5.024004'
@@ -367,9 +367,40 @@ x_Dist_Zilla:
       name: '@Author::RWSTAUNER/Test::ReportPrereqs'
       version: '0.027'
     -
-      class: Dist::Zilla::Plugin::Test::Version
-      name: '@Author::RWSTAUNER/@TestingMania/Test::Version'
-      version: '1.09'
+      class: Dist::Zilla::Plugin::Test::PodSpelling
+      config:
+        Dist::Zilla::Plugin::Test::PodSpelling:
+          directories:
+            - bin
+            - lib
+          spell_cmd: ''
+          stopwords: []
+          wordlist: Pod::Wordlist
+      name: '@Author::RWSTAUNER/Test::PodSpelling'
+      version: '2.007005'
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@Author::RWSTAUNER/@TestingMania/Test::DistManifest'
+      version: '2.000005'
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      config:
+        Dist::Zilla::Plugin::Test::Portability:
+          options: ''
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Portability'
+      version: '2.001000'
+    -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@Author::RWSTAUNER/@TestingMania/MojibakeTests'
+      version: '0.8'
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Synopsis'
+      version: '2.000007'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@Author::RWSTAUNER/@TestingMania/PodCoverageTests'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::EOL
       config:
@@ -383,40 +414,9 @@ x_Dist_Zilla:
       name: '@Author::RWSTAUNER/@TestingMania/Test::EOL'
       version: '0.19'
     -
-      class: Dist::Zilla::Plugin::PodCoverageTests
-      name: '@Author::RWSTAUNER/@TestingMania/PodCoverageTests'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::Test::Kwalitee
-      config:
-        Dist::Zilla::Plugin::Test::Kwalitee:
-          filename: xt/release/kwalitee.t
-          skiptest: []
-      name: '@Author::RWSTAUNER/@TestingMania/Test::Kwalitee'
-      version: '2.12'
-    -
-      class: Dist::Zilla::Plugin::Test::Synopsis
-      name: '@Author::RWSTAUNER/@TestingMania/Test::Synopsis'
-      version: '2.000007'
-    -
-      class: Dist::Zilla::Plugin::Test::CPAN::Changes
-      config:
-        Dist::Zilla::Plugin::Test::CPAN::Changes:
-          changelog: Changes
-      name: '@Author::RWSTAUNER/@TestingMania/Test::CPAN::Changes'
-      version: '0.012'
-    -
-      class: Dist::Zilla::Plugin::MojibakeTests
-      name: '@Author::RWSTAUNER/@TestingMania/MojibakeTests'
-      version: '0.8'
-    -
-      class: Dist::Zilla::Plugin::MetaTests
-      name: '@Author::RWSTAUNER/@TestingMania/MetaTests'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::Test::MinimumVersion
-      name: '@Author::RWSTAUNER/@TestingMania/Test::MinimumVersion'
-      version: '2.000008'
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Perl::Critic'
+      version: '3.001'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -429,12 +429,40 @@ x_Dist_Zilla:
       name: '@Author::RWSTAUNER/@TestingMania/Test::NoTabs'
       version: '0.15'
     -
-      class: Dist::Zilla::Plugin::Test::Portability
+      class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
-        Dist::Zilla::Plugin::Test::Portability:
-          options: ''
-      name: '@Author::RWSTAUNER/@TestingMania/Test::Portability'
-      version: '2.001000'
+        Dist::Zilla::Plugin::Test::Kwalitee:
+          filename: xt/release/kwalitee.t
+          skiptest: []
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Kwalitee'
+      version: '2.12'
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: '@Author::RWSTAUNER/@TestingMania/Test::CPAN::Meta::JSON'
+      version: '0.004'
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: '@Author::RWSTAUNER/@TestingMania/Test::MinimumVersion'
+      version: '2.000008'
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@Author::RWSTAUNER/@TestingMania/MetaTests'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      config:
+        Dist::Zilla::Plugin::Test::CPAN::Changes:
+          changelog: Changes
+      name: '@Author::RWSTAUNER/@TestingMania/Test::CPAN::Changes'
+      version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@Author::RWSTAUNER/@TestingMania/Test::Version'
+      version: '1.09'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::RWSTAUNER/@TestingMania/PodSyntaxTests'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -453,22 +481,6 @@ x_Dist_Zilla:
           switch: []
       name: '@Author::RWSTAUNER/@TestingMania/Test::Compile'
       version: '2.058'
-    -
-      class: Dist::Zilla::Plugin::Test::DistManifest
-      name: '@Author::RWSTAUNER/@TestingMania/Test::DistManifest'
-      version: '2.000005'
-    -
-      class: Dist::Zilla::Plugin::PodSyntaxTests
-      name: '@Author::RWSTAUNER/@TestingMania/PodSyntaxTests'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::Test::Perl::Critic
-      name: '@Author::RWSTAUNER/@TestingMania/Test::Perl::Critic'
-      version: '3.001'
-    -
-      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
-      name: '@Author::RWSTAUNER/@TestingMania/Test::CPAN::Meta::JSON'
-      version: '0.004'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::RWSTAUNER/Manifest'
@@ -539,7 +551,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.100
+          tag: v3.101
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

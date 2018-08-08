@@ -23,7 +23,7 @@ only change with major releases number increments.
 
 use warnings;
 use strict;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 use Data::Dumper;
 use Scalar::Util qw(blessed);
 

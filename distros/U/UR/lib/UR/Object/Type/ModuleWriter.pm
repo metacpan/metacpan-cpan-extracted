@@ -8,7 +8,7 @@ require UR;
 use List::MoreUtils qw(first_index);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 our %meta_classes;
 our $bootstrapping = 1;
@@ -290,6 +290,12 @@ sub _get_display_fields_for_property {
         # do nothing
     }
     elsif ($property->is_calculated) {
+        if ($property->column_name) {
+            if (! $property->is_mutable) {
+                push @fields, q(is_mutable => 0);
+            }
+            push @fields, q(column_name => ') . $property->column_name . q(');
+        }
         if (my $calc_from = $property->calculate_from) {
             if ($calc_from and @$calc_from == 1) {
                 push @fields, "calculate_from => '" . $calc_from->[0] . "'";

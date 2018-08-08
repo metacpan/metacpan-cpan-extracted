@@ -1,23 +1,25 @@
+0.005     Aug 06 2018
+        * fixed build/test prerequisites
+
 0.004     Aug 05 2018
-	 * moar tests
-	 * changes to plugin options
-             'browser' - new
-             'allow_other_browsers' -> 'allow_other_sessions'                               
-             'initial_wait' new default (15) and settable
-              {csrf} abolished in favor of explicit session id
-	 * changes to helpers 
-              introduced 'loco->id' and 'loco->id_fail'
-	 * fixed non-mswin32 browser launch
-         * removed restrictions on listening points
+        * moar tests
+        * changes to plugin options
+            'browser' - new option
+            'allow_other_browsers' -> 'allow_other_sessions'
+            'initial_wait' - new default (15), now settable
+        * explicit session id identifes launched browser
+            new helpers 'loco->id' and 'loco->id_fail'
+        * fixed non-mswin32 browser launch
+        * removed restrictions on listening points
 
 0.003     Jul 31 2018
 
 0.002     Jul 31 2018
-         * loco->jsload now takes 'jquery' option rather than 'nojquery'
-         * New config option: allow_other_browsers 
-         * New helpers: loco->quit, loco->csrf_fail
-         * Added SECURITY CONSIDERATIONS
-         * Fixed module packaging issues
+        * loco->jsload now takes 'jquery' option rather than 'nojquery'
+        * New config option: allow_other_browsers
+        * New helpers: loco->quit, loco->csrf_fail
+        * Added SECURITY CONSIDERATIONS
+        * Fixed module packaging issues
 
 0.001     Jul 29 2018
-         * Initial version
+        * Initial version

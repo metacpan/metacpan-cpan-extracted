@@ -1,5 +1,9 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-DBIC
 
+0.07	Wed  8 Aug 05:29:08 BST 2018
+ - incorporate SQL::Translator::Producer::GraphQL with new version
+ - minor bugfix for GraphQL types with modifiers
+
 0.06	Fri Feb 23 02:32:52 GMT 2018
  - handle multiply-used enums (thanks @nohuhu)
  - DBIC schema test refactored to use Test::Snapshot (thanks @nohuhu)

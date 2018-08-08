@@ -1,0 +1,57 @@
+NAME
+    Test::Deeply::Float - Test equality of data structure, compare numbers
+    with tolerance
+
+VERSION
+    This document describes version 0.001 of Test::Deeply::Float (from Perl
+    distribution Test-Deeply-Float), released on 2018-08-07.
+
+SYNOPSIS
+     use Test::More; # exports is_deeply(), etc
+     use Test::Deeply::Float; # exports is_deeply_float()
+
+     is_deeply      ({a => 1, b => 1.1234567}, {a => 1, b => 1.1234568}); # fail
+     is_deeply_float({a => 1, b => 1.1234567}, {a => 1, b => 1.1234568}); # pass
+     is_deeply_float({a => 1, b => 1.12345  }, {a => 1, b => 1.12346  }); # fail
+
+    To customize tolerance level:
+
+     $Test::Deeply::Float::EPSILON = 1e-9; # default is 1e-6
+
+DESCRIPTION
+    This module exports "is_deeply_float()" which is just like Test::More's
+    "is_deeply()", except that when comparing two numbers (ints or floats) a
+    tolerance is allowed to work around floating point rounding problem.
+
+FUNCTIONS
+  is_deeply_float
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Test-Deeply-Float>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Test-Deeply-Float>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Deeply-Float>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Based on Test::More's "is_deeply()".
+
+    Test::Number::Delta and Test::Deep's "num()" can also compare floats
+    with tolerance, but not in data structures.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

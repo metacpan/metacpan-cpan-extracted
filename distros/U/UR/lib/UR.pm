@@ -9,7 +9,7 @@ use strict;
 use warnings FATAL => 'all';
 
 # Set the version at compile time, since some other modules borrow it.
-our $VERSION = "0.46"; # UR $VERSION
+our $VERSION = "0.47"; # UR $VERSION
 
 # Ensure we get detailed errors while starting up.
 # This is disabled at the bottom of the module.
@@ -42,7 +42,7 @@ for my $e (keys %ENV) {
     if ($@) {
         my $path = __FILE__;
         $path =~ s/.pm$//;
-        my @files = glob($path . '/Env/*');
+        my @files = glob("\Q${path}\E/Env/*");
         my @vars = map { /UR\/Env\/(.*).pm/; $1 } @files;
         print STDERR "Environment variable $e set to $ENV{$e} but there were errors using UR::Env::$e:\n"
         . "Available variables:\n\t"
@@ -475,7 +475,7 @@ UR - rich declarative transactional objects
 
 =head1 VERSION
 
-This document describes UR version 0.46
+This document describes UR version 0.47
 
 =head1 SYNOPSIS
 

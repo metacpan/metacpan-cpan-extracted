@@ -7,12 +7,10 @@ use FindBin qw($Bin);
 use lib "$Bin/lib";
 use Test::Dategrep;
 
-$ENV{DATEGREP_DEFAULT_FORMAT} = 'iso8601';
-
 # files with line before and after date range
 test_dategrep [
-    '--start=1 hour ago from 2014-03-20 08:15:00 -0000',
-    '--end=2014-03-20 08:15:00 -0000',
+    '--start=2014-03-20T08:15:00-0000 add -1h',
+    '--end=2014-03-20T08:15:00-0000',
     "$Bin/files/syslog01.log",
   ],
   <<'EOF', 'relative dates';

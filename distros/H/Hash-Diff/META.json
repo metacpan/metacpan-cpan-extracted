@@ -1,0 +1,60 @@
+{
+   "abstract" : "Return difference between two hashes as a hash",
+   "author" : [
+      "Bjorn-Olav Strand <bo@startsiden.no>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Hash-Diff",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Hash::Merge" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "ok" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Hash-Diff@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Diff"
+      },
+      "homepage" : "https://github.com/bolav/hash-diff",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bolav/hash-diff.git",
+         "web" : "https://github.com/bolav/hash-diff"
+      }
+   },
+   "version" : "0.010",
+   "x_contributors" : [
+      "Charles McGarvey <ccm@cpan.org>"
+   ],
+   "x_generated_by_perl" : "v5.24.1",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}
+

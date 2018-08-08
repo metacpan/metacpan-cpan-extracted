@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Method::Modifiers" : "2.12",
             "Cpanel::JSON::XS" : "4.04",
             "Mojo::SQLite" : "3.001",
             "Mojolicious" : "7.89",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2018.08.00",
+   "version" : "v2018.08.08",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

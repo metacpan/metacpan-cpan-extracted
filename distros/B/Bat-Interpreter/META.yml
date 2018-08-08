@@ -27,13 +27,13 @@ requires:
   Path::Tiny: '0'
   Types::Standard: '0'
   namespace::autoclean: '0'
-  perl: '5.012'
+  perl: '5.014'
   utf8: '0'
 resources:
   bugtracker: https://github.com/pablrod/p5-Bat-Interpreter/issues
   homepage: https://github.com/pablrod/p5-Bat-Interpreter
   repository: https://github.com/pablrod/p5-Bat-Interpreter.git
-version: '0.012'
+version: '0.013'
 x_contributors:
   - 'eva.dominguez <eva.dominguez@meteologica.com>'
   - 'Eva Dominguez <meloncego@gmail.com>'

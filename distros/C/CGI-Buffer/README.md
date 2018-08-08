@@ -3,13 +3,13 @@
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/CGI-Buffer/badge)](https://dependencyci.com/github/nigelhorne/CGI-Buffer)
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/CGI-Buffer/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Buffer?branch=master)
 
-# NAME
+# CGI::Buffer
 
-CGI::Buffer - Verify, Cache and Optimise CGI Output
+Verify, Cache and Optimise CGI Output
 
 # VERSION
 
-Version 0.81
+Version 0.82
 
 # SYNOPSIS
 

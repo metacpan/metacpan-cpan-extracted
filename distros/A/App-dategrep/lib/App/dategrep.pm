@@ -1,17 +1,14 @@
+package App::dategrep;
 use strict;
 use warnings;
 
-package App::dategrep;
-use App::dategrep::Date qw(intervall_to_epoch date_to_epoch minutes_ago);
 use App::dategrep::Iterators;
-use Config::Tiny;
+use App::dategrep::Date;
 use Pod::Usage;
 use Getopt::Long;
 use File::Basename qw(basename);
-use base 'Exporter';
-our @EXPORT_OK = qw(run);
 
-our $VERSION = '0.58';
+our $VERSION = '2.03';
 
 our $app;
 
@@ -27,22 +24,25 @@ sub error {
     return $rc;
 }
 
+sub new {
+    my ( $class, @args ) = @_;
+    bless { date => App::dategrep::Date->new }, $class;
+}
+
 sub run {
+    my $self = shift;
     my %options;
-    if ( $ENV{DATEGREP_DEFAULT_FORMAT} ) {
-        $options{format} = $ENV{DATEGREP_DEFAULT_FORMAT};
-    }
 
     my $rc = GetOptions(
         \%options,        'start|from=s',
-        'end|to=s',       'format=s',
+        'end|to=s',       'format=s@',
         'last-minutes=i', 'multiline!',
         'blocksize=i',    'help|?',
         'sort-files',     'man',
-        'configfile=s',   'interleave',
-        'byte-offsets',   'debug=s',
+        'interleave',     'debug=s',
         'version!',       'skip-unparsable!',
     );
+
     if ( !$rc ) {
         pod2usage( -exitstatus => "NOEXIT", -verbose => 0 );
         return 2;
@@ -62,44 +62,35 @@ sub run {
         return 0;
     }
 
-    my $config = loadconfig( $options{configfile} );
-
-    my %named_formats = (
-        'iso8601' => "%O%Z",
-        'rsyslog' => "%b %e %H:%M:%S",
-        'apache'  => "%d/%b/%Y:%T %z",
-    );
-
-    if ( exists $config->{formats} ) {
-        %named_formats = ( %named_formats, %{ $config->{formats} } );
+    if ( $ENV{DATEGREP_DEFAULT_FORMAT} ) {
+        $self->{date}->add_format( $ENV{DATEGREP_DEFAULT_FORMAT} );
     }
 
-    if ( not defined $options{'format'} ) {
-        return error("--format is a required parameter");
+    $self->{date}->add_format( grep { /%/ } @{ $options{'format'} } );
+
+    delete $options{'format'};    # Don't call new on iterators with format
+
+    $options{skip_unparsable} = delete $options{'skip-unparsable'};
+
+    if ( $options{skip_unparsable} ) {
+        $options{multiline} = 0;
     }
 
-    if ( exists $named_formats{ $options{'format'} } ) {
-        $options{'format'} = $named_formats{ $options{'format'} };
-    }
+    my ( $start, $end ) = ( 0, time );
 
-    if ( $options{'skip-unparsable'} ) {
-        $options{'multiline'} = 0;
-    }
-
-    my ( $start, $end ) = ( 0, time() );
-
-    if ( defined $options{'start'} ) {
-        ($start) = intervall_to_epoch( $options{'start'}, $options{'format'} );
+    if ( defined $options{start} ) {
+        ($start) = $self->{date}->to_epoch_with_modifiers( $options{start} );
         return error("Illegal start time.") if not defined $start;
     }
 
     if ( defined $options{'end'} ) {
-        ($end) = intervall_to_epoch( $options{'end'}, $options{'format'} );
+        ($end) = $self->{date}->to_epoch_with_modifiers( $options{'end'} );
         return error("Illegal end time.") if not defined $end;
     }
 
     if ( defined $options{'last-minutes'} ) {
-        ( $start, $end ) = minutes_ago( $options{'last-minutes'} );
+        ( $start, $end ) =
+          $self->{date}->minutes_ago( $options{'last-minutes'} );
     }
 
     if ( $end < $start ) {
@@ -117,32 +108,16 @@ sub run {
 
     eval {
 
-        if ( $options{'byte-offsets'} ) {
-            if ( @ARGV == 1 and -f $ARGV[0] ) {
-                my $iter = App::dategrep::Iterator::File->new(
-                    %options,
-                    filename => $ARGV[0],
-                    start    => $start,
-                    end      => $end,
-                );
-                my ( $byte_beg, $byte_end ) = $iter->byte_offsets();
-                if ( not defined $byte_end ) {
-                    $byte_end = ( stat( $iter->fh ) )[7];
-                }
-                print "$byte_beg $byte_end\n";
-                return 0;
-            }
-        }
-
         my $iterators = App::dategrep::Iterators->new(
             %options,
             filenames => \@ARGV,
             start     => $start,
             end       => $end,
+            date      => $self->{date},
         );
 
         if ( $options{'interleave'} && @ARGV > 1 ) {
-            $iterators->interleave();
+            $iterators->interleave;
             return 0;
         }
 
@@ -158,22 +133,6 @@ sub run {
     };
     return error($@) if $@;
     return 0;
-}
-
-sub loadconfig {
-    my $configfile = shift;
-    if ( not $configfile and $ENV{HOME} ) {
-        $configfile = "$ENV{HOME}/.dategreprc";
-    }
-    if ( not defined $configfile or not -e $configfile ) {
-        return;
-    }
-
-    my $config = Config::Tiny->read($configfile);
-    if ( not defined $config ) {
-        die "Error while parsing configfile: " . Config::Tiny->errstr() . "\n";
-    }
-    return $config;
 }
 
 1;

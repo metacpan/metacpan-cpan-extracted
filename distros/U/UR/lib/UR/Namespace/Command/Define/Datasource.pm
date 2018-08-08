@@ -6,7 +6,7 @@ package UR::Namespace::Command::Define::Datasource;
 use warnings;
 use strict;
 use UR;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 UR::Object::Type->define(
     class_name => __PACKAGE__,
@@ -65,7 +65,7 @@ sub dsname {
     my $dsname = $self->__dsname;
     unless ($dsname) {
         my $dsid = $self->__dsid;
-        # assumme the name is the last portion of the class name
+        # assume the name is the last portion of the class name
         $dsname = (split(/::/,$dsid))[-1];
         $self->__dsname($dsname);
     }

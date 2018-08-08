@@ -4,7 +4,7 @@ package UR::Namespace::Command::Test::Use;
 use strict;
 use warnings;
 use UR;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 use Cwd;
 use YAML;
 

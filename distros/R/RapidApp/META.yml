@@ -4,7 +4,7 @@ author:
   - 'Henry Van Styn <vanstyn@cpan.org>'
 build_requires:
   Catalyst: 0
-  Catalyst::Runtime: 5.90115
+  Catalyst::Runtime: 5.90118
   HTTP::Headers::Util: 6.03
   HTTP::Request::Common: 6.04
   LWP::UserAgent: 6.02
@@ -36,7 +36,7 @@ requires:
   Catalyst::Component::ApplicationAttribute: 0
   Catalyst::Controller: 0
   Catalyst::Controller::AutoAssets: 0.40
-  Catalyst::Controller::SimpleCAS: 1.001
+  Catalyst::Controller::SimpleCAS: 1.002
   Catalyst::Devel: 1.39
   Catalyst::Helper: 0
   Catalyst::Helper::Model::DBIC::Schema: 0
@@ -47,7 +47,7 @@ requires:
   Catalyst::Plugin::Session::State::Cookie: 0.17
   Catalyst::Plugin::Session::Store::DBIC: 0.14
   Catalyst::Plugin::SimpleCAS: 1.001
-  Catalyst::Runtime: 5.90115
+  Catalyst::Runtime: 5.90118
   Catalyst::ScriptRunner: 0
   Catalyst::Test: 0
   Catalyst::Utils: 0
@@ -58,6 +58,7 @@ requires:
   Class::Load: 0.22
   Class::MOP::Class: 0
   Clone: 0.37
+  Clone::PP: 0
   DBD::SQLite: 1.42
   DBI::Const::GetInfoType: 0
   DBIx::Class: 0.082840
@@ -69,7 +70,7 @@ requires:
   DBIx::Class::ResultSet: 0
   DBIx::Class::Schema: 0
   DBIx::Class::Schema::Diff: 1.07
-  DBIx::Class::Schema::Loader: 0.07047
+  DBIx::Class::Schema::Loader: 0.07049
   DBIx::Class::Schema::Loader::DBI: 0
   DBIx::Class::Schema::Loader::Table: 0
   DBIx::Class::_Util: 0
@@ -82,6 +83,7 @@ requires:
   Digest::SHA1: 2.13
   Excel::Writer::XLSX: 0.81
   Exporter: 5.70
+  File::Copy::Recursive: 0.44
   File::ShareDir: 1.102
   File::Spec: 3.47
   File::Temp: 0.2304
@@ -91,7 +93,6 @@ requires:
   HTML::Parser: 3.71
   HTML::TokeParser::Simple: 3.16
   HTTP::Request::Common: 6.04
-  Hash::Merge: 0.12
   IPC::Cmd: 0.94
   Import::Into: 1.002004
   JSON: 2.90
@@ -113,7 +114,7 @@ requires:
   PPI: 1.220
   Path::Class: 0.37
   Perl::Tidy: 20160302
-  Plack: 1.0044
+  Plack: 1.0047
   Plack::Builder: 0
   Plack::Component: 0
   Plack::Middleware: 0
@@ -167,7 +168,7 @@ resources:
   bugtracker: https://github.com/vanstyn/RapidApp/issues
   homepage: http://www.rapidapp.info
   repository: https://github.com/vanstyn/RapidApp.git
-version: 1.3100
+version: 1.3101
 x_contributors:
   - 'Michael Conrad <mconrad@intellitree.com>'
   - 'Torsten Raudssus <torsten@raudss.us>'

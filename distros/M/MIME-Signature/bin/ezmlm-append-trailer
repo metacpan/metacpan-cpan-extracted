@@ -1,0 +1,113 @@
+#!perl
+
+use 5.014;
+use warnings;
+
+use constant {
+    EXIT_SOFT_ERROR => 111,
+    EXIT_SUCCESS    => 0,
+};
+
+BEGIN {
+    $SIG{__DIE__} = sub {
+        print STDERR @_;
+        exit EXIT_SOFT_ERROR;
+    };
+}
+
+use Getopt::Long qw(GetOptions);
+use Path::Tiny qw(path);
+use MIME::Signature;
+
+GetOptions
+  'debug+' => \my $Debug,
+  'help' => sub { exec perldoc => -F => $0 or die "Cannot exec perldoc: $!\n" },
+  'unsign!' => \my $Unsign,
+  or exit EXIT_SOFT_ERROR;
+
+die "USAGE: $0 <list-dir>\n" if @ARGV != 1;
+
+my $dir = path(shift);
+die "Mailing list directory $dir does not exist.\n" unless $dir->exists;
+
+sub debug {
+    warn "@_\n" if $Debug;
+}
+
+sub read_file {
+    my $file = path $dir, @_;
+    unless ( $file->exists ) {
+        debug "$file does not exist.";
+        return;
+    }
+
+    # Cannot safely ->slurp_utf8, because Path::Tiny::check_UU would trigger
+    # our $SIG{__DIE__} handler unless Unicode::UTF8 is installed up to
+    # Path::Tiny version 0.104
+    $file->slurp( { binmode => ':encoding(UTF-8)' } );
+}
+
+my %options;
+unless ( defined( $options{plain} = read_file qw/text trailer.plain/ ) ) {
+    debug 'No trailer found; aborting.';
+    local $/ = \8192;
+    print while <STDIN>;
+    exit EXIT_SUCCESS;
+}
+for (qw(enriched html)) {
+    defined( my $trailer = read_file text => "trailer.$_" ) or next;
+    $options{$_} = $trailer;
+}
+
+MIME::Signature->new(
+    parse  => \*STDIN,
+    unsign => $Unsign,
+    %options
+)->append->print;
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+ezmlm-append-trailer - append trailer to mail message
+
+=head1 SYNOPSIS
+
+    ezmlm-add-trailer /path/to/ezmlm/list
+
+=head1 DESCRIPTION
+
+This filter adds a trailer to the first text/plain, text/enriched
+or text/html part (or several of them, if they are contained in a
+multipart/alternative) of the message/rfc822 given on the standard
+input and emits the result to the standard output.
+
+The trailer text must be stored in C<dir/text/trailer>.
+Other than ezmlm-send, we do not look for C<dir/addtrailer> and do
+I<not> use a trailer from C</etc/ezmlm/default/text/trailer>.
+
+The trailer text is expected to be UTF-8 encoded.
+
+Since we cannot safely add text to signed messages, we will not do
+that.
+
+=head1 OPTIONS
+
+=head2 -debug
+
+Write additional messages to standard error.
+
+=head2 -strict
+
+Die if there is a trailer defined, but it could not be added to
+the message.
+
+=head2 -help
+
+Show this documentation and exit.
+
+=head1 AUTHOR
+
+Martin H. Sluka C<< <fany@cpan.org> >>

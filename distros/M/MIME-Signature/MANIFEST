@@ -1,0 +1,37 @@
+bin/append-signature		filter to append signatures to mails
+bin/dump_mail_struct		helper tool to analyze MIME structures of mails
+bin/ezmlm-append-trailer	filter designed for ezmlm to append signatures to mails
+bin/ignore_errors		wrapper to pass through mails unchanged if no signature can be added
+Changes
+lib/MIME/Signature.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP			lists files not required in the distribution, for t/manifest.t
+README
+t/00-load.t
+t/10-append-signature.t
+t/mails/attachment-mutt/ascii
+t/mails/attachment-mutt/lines
+t/mails/attachment-mutt/testsig
+t/mails/attachment-mutt/utf8
+t/mails/orig/attachment-mutt
+t/mails/orig/signed-mutt
+t/mails/orig/simple-mutt
+t/mails/signed-mutt/ascii
+t/mails/signed-mutt/lines
+t/mails/signed-mutt/testsig
+t/mails/signed-mutt/utf8
+t/mails/simple-mutt/ascii
+t/mails/simple-mutt/lines
+t/mails/simple-mutt/testsig
+t/mails/simple-mutt/utf8
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/sigs/ascii
+t/sigs/lines
+t/sigs/testsig
+t/sigs/utf8
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

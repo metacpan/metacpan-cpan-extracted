@@ -6,7 +6,7 @@ use File::Find;
 
 require UR;
 use UR::AttributeHandlers;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 UR::Object::Type->define(
     class_name => 'UR::Namespace',
@@ -100,7 +100,7 @@ sub get_data_sources
         foreach my $inc ( @main::INC ) {
             my $path = join('/', $inc,$namespace_name,'DataSource');
             if (-d $path) {
-                foreach ( glob($path . '/*.pm') ) { 
+                foreach ( glob("\Q${path}\E/*.pm") ) {
                     my($module_name) = m/DataSource\/([^\/]+)\.pm$/;
                     my $ds_class_name = $namespace_name . '::DataSource::' . $module_name;
                     $found{$ds_class_name} = 1;

@@ -17,13 +17,13 @@ sub BUILDARGS ( $self, $args = undef ) {
 sub _req ( $self, $method, $endpoint, $data, $cb = undef ) {
     return P->http->$method(
         'https://api.github.com' . $endpoint,
-        headers => {
-            AUTHORIZATION => "token $self->{token}",
-            CONTENT_TYPE  => 'application/json',
-        },
-        body => $data ? P->data->to_json($data) : undef,
+        headers => [
+            Authorization  => "token $self->{token}",
+            'Content-Type' => 'application/json',
+        ],
+        data => $data ? P->data->to_json($data) : undef,
         sub ($res) {
-            my $data = $res->{body} && $res->{body}->$* ? P->data->from_json( $res->{body} ) : undef;
+            my $data = $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : undef;
 
             my $api_res;
 

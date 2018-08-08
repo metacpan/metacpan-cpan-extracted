@@ -10,9 +10,9 @@ build_requires:
   Test::More: '0.98'
   Test::Snapshot: '0.05'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,11 +25,13 @@ no_index:
 requires:
   DBIx::Class::Schema: '0'
   GraphQL: '0.21'
+  Lingua::EN::Inflect::Number: '0'
+  SQL::Translator: '0'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#graphql-perl
   bugtracker: https://github.com/graphql-perl/GraphQL-Plugin-Convert-DBIC/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/GraphQL-Plugin-Convert-DBIC
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

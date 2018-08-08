@@ -1,7 +1,7 @@
 ##############################################################################
 #
 #  Data::Tools perl module
-#  (c) Vladi Belperchinov-Shabanski "Cade" 2013-2016
+#  2013-2018 (c) Vladi Belperchinov-Shabanski "Cade"
 #  http://cade.datamax.bg
 #  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 #
@@ -19,13 +19,14 @@ use Digest::SHA1;
 use File::Glob;
 use Hash::Util qw( lock_hashref unlock_hashref lock_ref_keys );
 
-our $VERSION = '1.15';
+our $VERSION = '1.17';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
 
               file_save
               file_load
+              file_load_ar
 
               file_mtime
               file_ctime
@@ -59,6 +60,9 @@ our @EXPORT = qw(
               hash_unlock_recursive
               hash_keys_lock_recursive
 
+              str_escape 
+              str_unescape 
+
               str_url_escape 
               str_url_unescape 
               
@@ -72,7 +76,7 @@ our @EXPORT = qw(
               str_pad
               str_pad_center
               str_countable
-              
+
               perl_package_to_file
 
               wp_hex
@@ -98,14 +102,33 @@ our %EXPORT_TAGS = (
 
 sub file_load
 {
-  my $fn = shift; # file name
+  my $fn  = shift; # file name
+  my $opt = shift;
   
   my $i;
-  open( $i, $fn ) or return undef;
+  my $encoding = $opt->{ 'encoding' } || $opt->{ 'ENCODING' };
+  my $mopt;
+  $mopt = ":encoding($encoding)" if $encoding;
+  open( $i, "<" . $mopt, $fn ) or return undef;
   local $/ = undef;
   my $s = <$i>;
   close $i;
   return $s;
+}
+
+sub file_load_ar
+{
+  my $fn  = shift; # file name
+  my $opt = shift;
+  
+  my $i;
+  my $encoding = $opt->{ 'encoding' } || $opt->{ 'ENCODING' };
+  my $mopt;
+  $mopt = ":encoding($encoding)" if $encoding;
+  open( $i, "<" . $mopt, $fn ) or return undef;
+  my @all = <$i>;
+  close $i;
+  return \@all;
 }
 
 sub file_save
@@ -113,7 +136,7 @@ sub file_save
   my $fn = shift; # file name
 
   my $o;
-  open( $o, ">$fn" ) or return 0;
+  open( $o, ">:encoding(UTF-8)", $fn ) or return 0;
   print $o @_;
   close $o;
   return 1;
@@ -203,6 +226,29 @@ sub dir_path_ensure
 }
 
 ##############################################################################
+
+sub str_escape
+{
+  my $text = shift;
+  
+  $text =~ s/\\/\\\\/g;
+  $text =~ s/\r/\\r/g;
+  $text =~ s/\n/\\n/g;
+  return $text;
+}
+
+sub str_unescape
+{
+  my $text = shift;
+
+  $text =~ s/\\r/\r/g;
+  $text =~ s/\\n/\n/g;
+  $text =~ s/\\\\/\\/g;
+  
+  return $text;
+}
+
+##############################################################################
 #   url-style escape & hex escape
 ##############################################################################
 
@@ -280,8 +326,9 @@ sub str_unhex
 sub str_num_comma
 {
   my $data = shift;
+  my $pad  = shift || '`';
   $data = reverse $data;
-  $data =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1`/g;
+  $data =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1$pad/g;
   $data = reverse $data;
   return $data;
 }
@@ -655,6 +702,8 @@ INIT  { __url_escapes_init(); }
   my $res     = file_save( $file_name, 'file content here' );
   my $content = file_load( $file_name );
 
+  my $content_arrayref = file_load_ar( $file_name );
+
   # --------------------------------------------------------------------------
 
   my $file_modification_time_in_seconds = file_mtime( $file_name );
@@ -753,7 +802,8 @@ INIT  { __url_escapes_init(); }
 
   # --------------------------------------------------------------------------
 
-  my $formatted_str = str_num_comma( 1234567.89 );  # returns "1'234'567.89"
+  my $formatted_str = str_num_comma( 1234567.89 );   # returns "1'234'567.89"
+  my $formatted_str = str_num_comma( 4325678, '_' ); # returns "4_325_678"
   my $padded_str    = str_pad( 'right', -12, '*' ); # returns "right*******"
   my $str_c         = str_countable( $dc, 'day', 'days' );
                       # returns 'days' for $dc == 0
@@ -821,6 +871,7 @@ check Data::Validate::Struct module by Thomas Linden, cheers :)
   <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 
   http://cade.datamax.bg
+
 
 =cut
 

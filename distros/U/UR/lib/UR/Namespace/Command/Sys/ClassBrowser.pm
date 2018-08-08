@@ -22,7 +22,7 @@ use Template;
 use Plack::Request;
 use Class::Inspector;
 
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 UR::Object::Type->define(
     class_name => __PACKAGE__,
@@ -200,7 +200,7 @@ sub _generate_class_name_cache {
     my $cwd = Cwd::getcwd . '/';
     my $namespace_meta = $namespace->__meta__;
     my $namespace_dir = $namespace_meta->module_directory;
-    (my $path = $namespace_meta->module_path) =~ s/^$cwd//;
+    (my $path = $namespace_meta->module_path) =~ s/^\Q$cwd\E//;
     my $by_class_name = {  $namespace => {
                                 name  => $namespace,
                                 is    => $namespace_meta->is,
@@ -226,7 +226,7 @@ sub _class_name_cache_data_for_class_name {
     }
     my $namespace_dir = $class_meta->namespace->__meta__->module_directory;
     my $module_path = $class_meta->module_path;
-    (my $relpath = $module_path) =~ s/^$namespace_dir//;
+    (my $relpath = $module_path) =~ s/^\Q$namespace_dir\E//;
     return {
         name    => $class_meta->class_name,
         relpath => $relpath,

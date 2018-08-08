@@ -1,11 +1,10 @@
 {
    "abstract" : "Authenticate with Twitter",
    "author" : [
-      "Alexis Sukrieh <sukria@sukria.net>",
-      "Dancer Core Developers"
+      "Alexis Sukrieh <sukria@sukria.net>, Dancer Core Developers"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -14,24 +13,30 @@
       "version" : "2"
    },
    "name" : "Dancer-Plugin-Auth-Twitter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "develop" : {
-         "requires" : {
-            "version" : "0.9901"
-         }
-      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Class::Load" : "0",
             "Dancer" : "0",
             "Dancer::Plugin" : "0",
-            "Net::Twitter::Lite::WithAPIv1_1" : "0.12006",
+            "Twitter::API" : "1.0002",
+            "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -45,38 +50,10 @@
             "IPC::Open3" : "0",
             "Test::MockObject::Extends" : "0",
             "Test::More" : "0.88",
-            "lib" : "0",
-            "perl" : "5.006"
+            "lib" : "0"
          }
       }
    },
-   "provides" : {
-      "Dancer::Plugin::Auth::Twitter" : {
-         "file" : "lib/Dancer/Plugin/Auth/Twitter.pm",
-         "version" : "0.07"
-      }
-   },
    "release_status" : "stable",
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/PerlDancer/Dancer-Plugin-Auth-Twitter/issues"
-      },
-      "homepage" : "https://github.com/PerlDancer/Dancer-Plugin-Auth-Twitter",
-      "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/PerlDancer/Dancer-Plugin-Auth-Twitter.git",
-         "web" : "https://github.com/PerlDancer/Dancer-Plugin-Auth-Twitter"
-      }
-   },
-   "version" : "0.07",
-   "x_authority" : "cpan:SUKRIA",
-   "x_contributors" : [
-      "Alexis Sukrieh <alexis@weborama.com>",
-      "Michal Wojciechowski <odyniec@odyniec.net>",
-      "Simon Elsbrock <simon@iodev.org>",
-      "Vyacheslav Matyukhin <mmcleric@yandex-team.ru>",
-      "Will Orr <will@worrbase.com>",
-      "Yanick Champoux <yanick@babyl.dyndns.org>"
-   ]
+   "version" : "0.08"
 }
-

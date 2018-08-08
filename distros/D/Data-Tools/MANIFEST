@@ -6,6 +6,7 @@ Makefile.PL
 lib/Data/Tools.pm
 lib/Data/Tools/Socket.pm
 lib/Data/Tools/Time.pm
+lib/Data/Tools/Math.pm
 
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

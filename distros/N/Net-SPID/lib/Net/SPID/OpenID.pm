@@ -1,5 +1,5 @@
 package Net::SPID::OpenID;
-$Net::SPID::OpenID::VERSION = '0.12';
+$Net::SPID::OpenID::VERSION = '0.15';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Net::SPID::OpenID
 
 =head1 VERSION
 
-version 0.12
+version 0.15
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,11 @@
 
 =head1 NAME
 
-Mojolicious::Plugin::Loco - launch local GUI via default web browser
+Mojolicious::Plugin::Loco - launch a web browser; easy local GUI
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

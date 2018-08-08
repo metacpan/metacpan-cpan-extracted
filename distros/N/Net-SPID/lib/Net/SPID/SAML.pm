@@ -1,42 +1,47 @@
 package Net::SPID::SAML;
-$Net::SPID::SAML::VERSION = '0.12';
+$Net::SPID::SAML::VERSION = '0.15';
 use Moo;
 
 use Carp;
+use Crypt::OpenSSL::RSA;
+use Crypt::OpenSSL::X509;
+use File::Slurp qw(read_file);
 use MIME::Base64 qw(decode_base64);
-use Net::SAML2;
-use Net::SPID::SAML::Assertion;
-use Net::SPID::SAML::AuthnRequest;
 use Net::SPID::SAML::IdP;
-use Net::SPID::SAML::LogoutRequest;
-use Net::SPID::SAML::LogoutResponse;
+use Net::SPID::SAML::In::LogoutRequest;
+use Net::SPID::SAML::In::LogoutResponse;
+use Net::SPID::SAML::In::Response;
+use Net::SPID::SAML::Out::AuthnRequest;
+use Net::SPID::SAML::Out::LogoutRequest;
+use Net::SPID::SAML::Out::LogoutResponse;
 use URI::Escape qw(uri_escape);
+use XML::Writer;
 
 has 'sp_entityid'   => (is => 'ro', required => 1);
 has 'sp_key_file'   => (is => 'ro', required => 1);
 has 'sp_cert_file'  => (is => 'ro', required => 1);
-has 'sp_acs_url'    => (is => 'ro', required => 0);
-has 'sp_acs_index'  => (is => 'ro', required => 0);
-has 'sp_attr_index' => (is => 'ro', required => 0);
-has 'cacert_file'   => (is => 'ro', required => 0);
+has 'sp_key'        => (is => 'lazy');
+has 'sp_cert'       => (is => 'lazy');
+has 'sp_assertionconsumerservice'   => (is => 'ro', required => 1);
+has 'sp_singlelogoutservice'        => (is => 'ro', required => 1);
+has 'sp_attributeconsumingservice'  => (is => 'ro', default => sub {[]});
 has '_idp'          => (is => 'ro', default => sub { {} });
-has '_sp'           => (is => 'lazy');
 
 extends 'Net::SPID';
 
-sub _build__sp {
+sub _build_sp_key {
     my ($self) = @_;
     
-    return Net::SAML2::SP->new(
-        id               => $self->sp_entityid,
-        url              => 'xxx',
-        key              => $self->sp_key_file,
-        cert             => $self->sp_cert_file,
-        cacert           => $self->cacert_file,
-        org_name         => 'xxx',
-        org_display_name => 'xxx',
-        org_contact      => 'xxx',
-    );
+    my $key_string = read_file($self->sp_key_file);
+    my $key = Crypt::OpenSSL::RSA->new_private_key($key_string);
+    $key->use_sha256_hash;
+    return $key;
+}
+
+sub _build_sp_cert {
+    my ($self) = @_;
+    
+    return Crypt::OpenSSL::X509->new_from_file($self->sp_cert_file);
 }
 
 # TODO: generate the actual SPID button.
@@ -53,7 +58,7 @@ sub get_button {
     
     my $html = '';
     foreach my $idp_id (sort keys %{$self->_idp}) {
-        $html .= sprintf qq!<p><a href="%s">Log In (%s)</a></p>\n!,
+        $html .= sprintf qq!<p><a class="btn btn-primary" href="%s">Login with SPID</a> <small>(%s)</small></p>\n!,
             $url_cb->($idp_id), $idp_id;
     }
     return $html;
@@ -80,20 +85,8 @@ sub load_idp_from_xml {
     my $idp = Net::SPID::SAML::IdP->new_from_xml(
         _spid   => $self,
         xml     => $xml,
-        cacert  => $self->cacert_file,
     );
-    $self->_idp->{$idp->entityid} = $idp;
-    
-    if ($self->cacert_file) {
-        # TODO: verify IdP certificate and return 0 if invalid
-    }
-    
-    # Since we only support HTTP-Redirect SSO and SLO requests, warn user if the loaded
-    # Identity Provider does not expose such bindings (they are not mandatory).
-    warn sprintf "IdP '%s' does not have a HTTP-Redirect SSO binding", $idp->entityid,
-        if !$idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect');
-    warn sprintf "IdP '%s' does not have a HTTP-Redirect SLO binding", $idp->entityid,
-        if !$idp->slo_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect');
+    $self->_idp->{$idp->entityID} = $idp;
     
     return 1;
 }
@@ -110,88 +103,120 @@ sub get_idp {
     return $self->_idp->{$idp_entityid};
 }
 
-sub parse_assertion {
+sub parse_response {
     my ($self, $payload, $in_response_to) = @_;
     
-    my $xml = decode_base64($payload);
-    print STDERR $xml;
-    
-    # verify signature and CA
-    my $post = Net::SAML2::Binding::POST->new(
-        cacert => $self->cacert_file,
-    );
-    $post->handle_response($payload)
-        or croak "Failed to parse SAML LogoutResponse";
-    
-    # parse assertion
-    my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
-        xml => $xml,
-    );
-    
-    my $a = Net::SPID::SAML::Assertion->new(
+    my $a = Net::SPID::SAML::In::Response->new(
         _spid       => $self,
-        _assertion  => $assertion,
-        xml         => $xml,
+        base64      => $payload,
     );
     
-    # Validate audience and timestamps. This will throw an exception in case of failure.
-    $a->validate($in_response_to);
+    # Validate response. This will throw an exception in case of failure.
+    $a->validate(in_response_to => $in_response_to);
     
     return $a;
 }
 
 sub parse_logoutresponse {
-    my ($self, $payload, $in_response_to) = @_;
+    my ($self, $payload, $url, $in_response_to) = @_;
     
-    my $xml = decode_base64($payload);
-    print STDERR $xml;
-    
-    # verify signature and CA
-    my $post = Net::SAML2::Binding::POST->new(
-        cacert => $self->cacert_file,
-    );
-    $post->handle_response($payload)
-        or croak "Failed to parse SAML LogoutResponse";
-    
-    # parse message
-    my $response = Net::SAML2::Protocol::LogoutResponse->new_from_xml(
-        xml => $xml,
-    );
-    
-    # validate response
-    croak "Invalid SAML LogoutResponse"
-        if !$response->valid($in_response_to);
-    
-    return Net::SPID::SAML::LogoutResponse->new(
+    my $r = Net::SPID::SAML::In::LogoutResponse->new(
         _spid       => $self,
-        _logoutres  => $response,
-        xml         => $xml,
+        base64      => $payload,
+        url         => $url,
     );
+    
+    # Validate response. This will throw an exception in case of failure.
+    $r->validate(in_response_to => $in_response_to);
+    
+    return $r;
 }
 
 sub parse_logoutrequest {
-    my ($self, $payload) = @_;
+    my ($self, $payload, $url) = @_;
     
-    my $xml = decode_base64($payload);
-    print STDERR $xml;
-    
-    # verify signature and CA
-    my $post = Net::SAML2::Binding::POST->new(
-        cacert => $self->cacert_file,
-    );
-    $post->handle_response($payload)
-        or croak "Failed to parse SAML LogoutResponse";
-    
-    # parse message
-    my $request = Net::SAML2::Protocol::LogoutRequest->new_from_xml(
-        xml => $xml,
-    );
-    
-    return Net::SPID::SAML::LogoutRequest->new(
+    my $r = Net::SPID::SAML::In::LogoutRequest->new(
         _spid       => $self,
-        _logoutreq  => $request,
-        xml         => $xml,
+        base64      => $payload,
+        url         => $url,
     );
+    
+    # Validate request. This will throw an exception in case of failure.
+    $r->validate;
+    
+    return $r;
+}
+
+sub metadata {
+    my ($self) = @_;
+    
+    my $md   = 'urn:oasis:names:tc:SAML:2.0:metadata';
+    my $dsig = 'http://www.w3.org/2000/09/xmldsig#';
+    my $x = XML::Writer->new( 
+        OUTPUT          => 'self', 
+        NAMESPACES      => 1,
+        PREFIX_MAP      => {
+            $md   => 'md',
+            $dsig => 'ds',
+        },
+    );
+    
+    my $ID = $self->sp_entityid;
+    $ID =~ s/[^a-z0-9_-]/_/g;
+    $x->startTag([$md, 'EntityDescriptor'],
+        entityID => $self->sp_entityid,
+        ID => $ID);
+    
+    $x->startTag([$md, 'SPSSODescriptor'],
+        protocolSupportEnumeration => 'urn:oasis:names:tc:SAML:2.0:protocol',
+        AuthnRequestsSigned => 'true',
+        WantAssertionsSigned => 'true');
+    
+    {
+        $x->startTag([$md, 'KeyDescriptor'], use => 'signing');
+        $x->startTag([$dsig, 'KeyInfo']);
+        $x->startTag([$dsig, 'X509Data']);
+        
+        my $cert = $self->sp_cert->as_string;
+        $cert =~ s/^-+BEGIN CERTIFICATE-+\n//;
+        $cert =~ s/\n-+END CERTIFICATE-+\n?//;
+        $x->dataElement([$dsig, 'X509Certificate'], $cert);
+        
+        $x->endTag(); #ds:X509Data
+        $x->endTag(); #ds:KeyInfo
+        $x->endTag(); #KeyDescriptor
+    }
+    $x->dataElement([$md, 'NameIDFormat'],
+        'urn:oasis:names:tc:SAML:2.0:nameid-format:transient');
+    
+    foreach my $acs_index (0..$#{$self->sp_assertionconsumerservice}) {
+        $x->emptyTag([$md, 'SingleSignOnService'],
+            Location => $self->sp_assertionconsumerservice->[$acs_index],
+            index => $acs_index,
+            isDefault => $acs_index ? 'false' : 'true');
+    }
+    
+    foreach my $url (keys %{$self->sp_singlelogoutservice}) {
+        my $binding = 'urn:oasis:names:tc:SAML:2.0:bindings:'
+            . $self->sp_singlelogoutservice->{$url};
+        $x->emptyTag([$md, 'SingleLogoutService'],
+            Location => $url,
+            Binding => $binding);
+    }
+    
+    foreach my $attr_index (0..$#{$self->sp_attributeconsumingservice}) {
+        my $attr = $self->sp_attributeconsumingservice->[$attr_index];
+        $x->startTag([$md, 'AttributeConsumingService'], index => $attr_index);
+        $x->dataElement([$md, 'ServiceName'], $attr->{servicename});
+        $x->dataElement([$md, 'RequestedAttribute'], $_)
+            for @{$attr->{attributes}};
+        $x->endTag();
+    }
+    
+    $x->endTag(); #SPSSODescriptor
+    $x->endTag(); #EntityDescriptor
+    
+    return $x->to_string;
 }
 
 1;
@@ -208,7 +233,7 @@ Net::SPID::SAML
 
 =head1 VERSION
 
-version 0.12
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -218,6 +243,12 @@ version 0.12
         sp_entityid     => 'https://www.prova.it/',
         sp_key_file     => 'sp.key',
         sp_cert_file    => 'sp.pem',
+        sp_assertionconsumerservice => [
+            'http://localhost:3000/spid-sso',
+        ],
+        sp_singlelogoutservice => {
+            'http://localhost:3000/spid-slo' => 'HTTP-Redirect',
+        },
     );
     
     # load Identity Providers
@@ -266,17 +297,27 @@ The preferred way to instantiate this class is to call C<Net::SPID->new(protocol
 
 (Required.) The absolute or relative file path to our certificate file.
 
-=item I<sp_acs_url>
+=item I<sp_assertionconsumerservice>
 
-(Optional.) The default value to use for C<AssertionConsumerServiceURL> in AuthnRequest. This is the URL where the user will be redirected (via GET or POST) by the Identity Provider after Single Sign-On. This must be one of the URLs contained in our Service Provider metadata. Note that this can be overridden using the L</acs_url> argument when generating the AuthnRequest. Using this default value is only convenient when you have a simple application that only exposes a single C<AssertionConsumerService>.
+An arrayref with the URL(s) of our AssertionConsumerService endpoint(s). It is used for metadata generation and for validating the C<Destination> XML attribute of the incoming responses.
 
-=item I<sp_acs_index>
+=item I<sp_singlelogoutservice>
 
-(Optional.) The default value to use for C<AssertionConsumerServiceIndex> in AuthnRequest. As an alternative to specifying the URL explicitely in each AuthnRequest using L<sp_acs_url> or L<acs_url>, a numeric index referring to the URL(s) specified in the Service Provider metadata can be supplied. Note that this can be overridden using the L</acs_index> argument when generating the AuthnRequest. Using this default value is only convenient when you have a simple application that only exposes a single C<AssertionConsumerService>.
+A hashref with the URL(s) of our SingleLogoutService endpoint(s), along with the specification of the binding. It is used for metadata generation and for validating the C<Destination> XML attribute of the incoming responses.
 
-=item I<sp_attr_index>
+=item I<sp_attributeconsumingservice>
 
-(Optional.) The default value to use for C<AttributeConsumingServiceIndex> in AuthnRequest. This refers to the C<AttributeConsumingService> specified in the Service Provider metadata. Note that this can be overridden using the L</attr_index> argument when generating the AuthnRequest. Using this default value is only convenient when you have a simple application that only uses a single C<AttributeConsumingService>.
+(Optional.) An arrayref with the AttributeConsumingServices to list in metadata, each one described by a C<servicename> and a list of C<attributes>. This is optional as it's only used for metadata generation.
+
+    my $spid = Net::SPID->new(
+        ...
+        sp_attributeconsumingservice => [
+            {
+                servicename => 'Service 1',
+                attributes => [qw(fiscalNumber name familyName dateOfBirth)],
+            },
+        ],
+    );
 
 =back
 
@@ -292,6 +333,10 @@ This method generates the HTML markup for the SPID login button:
     my $html = $spid->get_button('/spid-login?idp=%s');
 
 The first argument can be a subroutine which will get passed the clicked IdP entityID and will need to return the full URL. As an alternative a string can be supplied, which will be handled as a format argument for a C<sprintf()> call.
+
+=head2 metadata
+
+This method returns the XML representation of metadata for this Service Provider.
 
 =head2 load_idp_metadata
 
@@ -323,25 +368,28 @@ This method accepts an entityID and returns the corresponding L<Net::SPID::SAML:
 
     my $idp = $spid->get_idp('https://www.prova.it/');
 
-=head2 parse_assertion
+=head2 parse_response
 
-This method accepts a XML payload and parses it as a Response/Assertion, returning a L<Net::SPID::SAML::Assertion> object. Validation is performed (see the documentation for the L<Net::SPID::SAML::Assertion/validate> method), so this method may throw an exception.
+This method accepts a XML payload and parses it as a Response/Assertion, returning a L<Net::SPID::SAML::In::Response> object. Validation is performed (see the documentation for the L<Net::SPID::SAML::In::Response/validate> method), so this method may throw an exception.
 A second argument can be supplied, containing the C<ID> of the request message; in this case validation will also check the C<InResponseTo> attribute.
 
     my $assertion = $spid->parse_assertion($xml, $request_id);
 
 =head2 parse_logoutresponse
 
-This method accepts a XML payload and parses it as a LogoutResponse, returning a L<Net::SPID::SAML::LogoutResponse> object. Validation is performed, so this method may throw an exception.
-A second argument can be supplied, containing the C<ID> of the request message; in this case validation will also check the C<InResponseTo> attribute.
+This method accepts a XML payload and parses it as a LogoutResponse, returning a L<Net::SPID::SAML::LogoutResponse> object. Validation is performed automatically by calling the C<validate()> method, so this method may throw an exception.
+The XML payload can be supplied also in Base64-encoded form, thus you can supply the value of C<SAMLResponse> parameter directly.
+In case the LogoutResponse was supplied through a HTTP-Redirect binding (in other words, via GET), the request URI (inclusive of the query string) must be supplied as second argument. This is used for signature validation. If HTTP-POST was used the second argument is ignored.
+A third argument must be supplied, containing the C<ID> of the request message; this is used for the mandatory security check of the C<InResponseTo> attribute.
 
-    my $response = $spid->parse_logoutresponse($xml, $request_id);
+    my $response = $spid->parse_logoutresponse($xml, $url, $request_id);
 
 =head2 parse_logoutrequest
 
 This method accepts a XML payload and parses it as a LogoutRequest, returning a L<Net::SPID::SAML::LogoutRequest>. Use this to handle third-party-initiated logout procedures. Validation is performed, so this method may throw an exception.
+In case HTTP-Redirect was used to deliver this LogoutRequest to our application, a second argument is required containing the request URI (see L<parse_logoutresponse>).
 
-    my $request = $spid->parse_logoutrequest($xml);
+    my $request = $spid->parse_logoutrequest($xml, $url);
 
 =head1 AUTHOR
 

@@ -1,5 +1,8 @@
 Revision history for CGI-Buffer
 
+0.82	Tue Aug  7 09:45:13 EDT 2018
+	Fix RT#123101
+
 0.81	Thu Jul 19 08:50:53 EDT 2018
 	Get the return status from the CGI::Info object
 	Optimise lists a bit more

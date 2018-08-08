@@ -65,7 +65,7 @@ has ua       => sub {
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Doughnut';
-our $VERSION  = '7.88';
+our $VERSION  = '7.89';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -845,8 +845,19 @@ have been used in the past.
 
 =head1 SPONSORS
 
+=over 2
+
+=item
+
+L<Stix|https://stix.no> sponsored the creation of the Mojolicious logo (designed
+by Nicolai Graesdal) and transferred its copyright to Sebastian Riedel.
+
+=item
+
 Some of the work on this distribution has been sponsored by
-L<The Perl Foundation|http://www.perlfoundation.org>, thank you!
+L<The Perl Foundation|http://www.perlfoundation.org>.
+
+=back
 
 =head1 PROJECT FOUNDER
 
@@ -899,6 +910,8 @@ Anatoly Sharifulin
 Andre Parker
 
 Andre Vieth
+
+Andreas Guldstrand
 
 Andreas Jaekel
 

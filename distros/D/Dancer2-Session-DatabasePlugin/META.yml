@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '1.42'
+  Carp: '1.38'
   Dancer2::Core::Role::SessionFactory: '0.206000'
   Dancer2::Plugin::Database: '2.17'
   Data::Dumper: '2.161'
@@ -30,5 +30,5 @@ requires:
   Storable: '2.62'
   Test::More: '1.302073'
   namespace::clean: '0.27'
-version: 1.0006
+version: 1.0007
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

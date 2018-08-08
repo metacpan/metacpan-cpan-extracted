@@ -125,18 +125,18 @@ sub _send_http ( $self, $method, $args, $cb ) {
         persistent      => $self->{persistent},
         tls_ctx         => $self->{tls_ctx},
         ( $self->{timeout} ? ( timeout => $self->{timeout} ) : () ),
-        headers => {
-            REFERER       => undef,
-            AUTHORIZATION => "Token $self->{token}",
-            CONTENT_TYPE  => 'application/cbor',
-        },
-        body => to_cbor($payload),
+        headers => [
+            Referer        => undef,
+            Authorization  => "Token $self->{token}",
+            'Content-Type' => 'application/cbor',
+        ],
+        data => to_cbor($payload),
         sub ($res) {
             if ( !$res ) {
                 $cb->( res [ $res->{status}, $res->{reason} ] ) if $cb;
             }
             else {
-                my $msg = eval { from_cbor $res->{body} };
+                my $msg = eval { from_cbor $res->{data} };
 
                 if ($@) {
                     $cb->( res [ 500, 'Error decoding response' ] ) if $cb;

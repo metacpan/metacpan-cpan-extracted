@@ -4,7 +4,7 @@ use warnings;
 use strict;
 require UR;
 
-our $VERSION = "0.46"; # UR $VERSION;;
+our $VERSION = "0.47"; # UR $VERSION;
 
 class UR::Object::View::Aspect {
     id_by => [
@@ -156,16 +156,6 @@ no warnings;
             Carp::confess("Undefined aspect type. Set 'is' for $name in class " . $property_meta->class_name);
         }
 
-        unless ($aspect_type) {
-            if (my $delegated_to_meta = $property_meta->final_property_meta) {
-                $aspect_type = $delegated_to_meta->data_type;
-            }
-        }
-
-        unless ($aspect_type) {
-            Carp::confess("Property meta for class ".$property_meta->class_name." property ".$property_meta->property_name." has no data_type");
-        }
-
         unless ($aspect_type->can("__meta__")) {
             Carp::croak("$aspect_type has no meta data?  cannot generate a view for $subject_class_name $name!"); 
         }
@@ -182,6 +172,7 @@ no warnings;
     my $aspect_meta = $aspect_type->__meta__;
 
     my $delegate_view;
+    local $@;
     eval {
         $delegate_view = $aspect_type->create_view(
             subject_class_name => $aspect_type,
@@ -224,12 +215,11 @@ no warnings;
         my $aspect_property_meta = $aspect_meta->property($aspect_param_name);
         no strict; no warnings;
         next if (!$aspect_property_meta or !$property_meta);
-        if ($aspect_property_meta->reverse_as() eq $name) {
-            
-        }
-        elsif ($property_meta->reverse_as eq $aspect_param_name) {
-        }
-        else {
+
+        if ($aspect_property_meta->reverse_as ne $name
+            and
+            $property_meta->reverse_as ne $aspect_param_name
+        ) {
             $delegate_view->add_aspect(ref($aspect_params) ? %$aspect_params : $aspect_params);
         }
     }

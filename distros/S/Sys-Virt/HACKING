@@ -82,13 +82,13 @@ effective way to update the Perl binding.
    built libvirt library
 
     # cd $HOME/src/libvirt-perl
-    # ../libvirt/run perl Makefile.PL
-    # ../libvirt/run make
+    # ../libvirt/run perl Build.PL
+    # ../libvirt/run ./Build
 
  - Run the test suite to identify which new functions/constants need
    handling
 
-    # ../libvirt/run make test TEST_MAINTAINER=1
+    #  TEST_MAINTAINER=1 ../libvirt/run ./Build test
 
  - For each missing item reported in the test suite...
 
@@ -191,7 +191,7 @@ file should be uploaded to CPAN using https://pause.cpan.org form.
 The upload is currently done by Daniel Berrange (username DANBERR).
 
 Now open the tree for the next release version by editing the files
-lib/Sys/Virt.pm, README, Makefile.PL to update the version number
+lib/Sys/Virt.pm, README, Build.PL to update the version number
 listed. Also edit Changes to add a placeholder entry for the new
 release number. Run 'make test' to ensure Changes file is syntax
 valid.

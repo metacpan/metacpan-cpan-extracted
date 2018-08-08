@@ -1,7 +1,7 @@
 package App::cryp::arbit::Strategy::merge_order_book;
 
-our $DATE = '2018-08-04'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-08-07'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -686,7 +686,7 @@ App::cryp::arbit::Strategy::merge_order_book - Using merged order books for arbi
 
 =head1 VERSION
 
-This document describes version 0.003 of App::cryp::arbit::Strategy::merge_order_book (from Perl distribution App-cryp-arbit), released on 2018-08-04.
+This document describes version 0.005 of App::cryp::arbit::Strategy::merge_order_book (from Perl distribution App-cryp-arbit), released on 2018-08-07.
 
 =head1 SYNOPSIS
 

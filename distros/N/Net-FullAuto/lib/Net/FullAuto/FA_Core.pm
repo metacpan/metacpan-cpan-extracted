@@ -469,7 +469,6 @@ BEGIN {
                   }
                   ($stdout,$stderr)=$handle->cmd(
                      "if [ -f /usr/bin/$cmd ];then echo \"FOUND\";fi");
-                  print "STDOUT=$stdout<==\n";
                   if (-1<index $stdout,'FOUND') {
                      $Net::FullAuto::FA_Core::cmdinfo->{$object}->{$cmd}=
                         "/usr/bin/";
@@ -488,7 +487,6 @@ BEGIN {
                      (-1<index $handle->{_shell}, 'ksh')) {
                   ($stdout,$stderr)=$handle->cmd(
                      "if [ -f /bin/$cmd ];then echo \"FOUND\";fi");
-                  print "STDOUT=$stdout<==\n";
                   if (-1<index $stdout,'FOUND') {
                      $Net::FullAuto::FA_Core::cmdinfo->{$object}->{$cmd}=
                         "/bin/";
@@ -8273,7 +8271,6 @@ print $Net::FullAuto::FA_Core::LOG "GETTING CURDIR FOR TRANSFER=",cwd(),"\n"
 sub getpasswd
 {
 
-#print "GETPASSCALLER=",caller,"\n";sleep 4;
    my @topcaller=caller;
    print "\nINFO: main::getpasswd() (((((((CALLER))))))):\n       ",
       (join ' ',@topcaller),"\n\n"
@@ -14763,7 +14760,6 @@ print $Net::FullAuto::FA_Core::LOG "PRINTING PASSWORD NOW<==\n"
    -1<index $Net::FullAuto::FA_Core::LOG,'*';
          if ($launch_local_ssh_telnet) {
          if ($dcipher && !$ignore) { 
-#print "WHAT IS PASSWORD=",$dcipher->decrypt($passetts->[0]),"\n";sleep 3;
             $local_host->print($dcipher->decrypt($passetts->[0]));
          }
          if (!$Net::FullAuto::FA_Core::cron &&
@@ -18289,6 +18285,7 @@ sub ftm_login
                $Net::FullAuto::FA_Core::Hosts{
                $hostlabel}{'IdentityFile'})) {
             $determine_password->('',0,'localhost');
+            #$determine_password->('',0,$hostlabel,$password);
             unless ($password) {
                if ($su_id) {
                   $ftm_passwd=&Net::FullAuto::FA_Core::getpasswd($hostlabel,
@@ -21290,7 +21287,6 @@ print "KEYS=",(join " | ",keys %{$cache}),"\n" if $cache;
              ."\n              the Following Unrecoverable Error "
              ."Condition\n              at ".(caller(0))[1]." "
              ."line ".(caller(0))[2]." :\n\n       ";
-
       my $err='';
       ($dest_output,$dest_dir,$err)=get_dest_ls_output(
          $destFH,$dest_fdr,$dms_share,$dhost,$die);
@@ -21299,7 +21295,6 @@ print "KEYS=",(join " | ",keys %{$cache}),"\n" if $cache;
             return '',$err;
          } else { &Net::FullAuto::FA_Core::handle_error($err,'-7'); }
       }
-
       if (ref $dest_first_hash eq 'HASH') {
          deep_delete_data_hash($destFH,'_dhash');
       }
@@ -22297,7 +22292,7 @@ print $Net::FullAuto::FA_Core::LOG "ACTIVITY3" if $Net::FullAuto::FA_Core::log &
                         if $stderr;
                   }
                   &move_tarfile($baseFH,$btransfer_dir,$destFH,
-                                $shortcut,$cache,$tarlistmpdir);
+                                $shortcut,$cache,$tarlistmpdir,$dest_fdr);
 #print "BASEFH=$baseFH\n";
 #print "DESTFH=$destFH\n";
 #print "BMS_SHARE=$bms_share\n";
@@ -22667,7 +22662,7 @@ print $Net::FullAuto::FA_Core::LOG "TARRRPWDDDDD=$output\n" if $Net::FullAuto::F
                }
 #print "DO MOVETARFILE\n";
                &move_tarfile($baseFH,$btransfer_dir,$destFH,
-                             $shortcut,$cache,$tarlistmpdir);
+                             $shortcut,$cache,$tarlistmpdir,$dest_fdr);
                if (keys %{$timehash}) {
 #my $logreset=1;
 #if ($Net::FullAuto::FA_Core::log) { $logreset=0 }
@@ -23283,11 +23278,11 @@ sub move_tarfile
    print $Net::FullAuto::FA_Core::LOG "move_tarfile() CALLER=",
       (join ' ',@topcaller),"\n" if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
-   my ($baseFH,$btransfer_dir,$destFH,$shortcut,$cache,$tarlistmpdir)=
-      ('','','','','','');
-   ($baseFH,$btransfer_dir,$destFH,$shortcut,$cache,$tarlistmpdir)=@_;
+   my ($baseFH,$btransfer_dir,$destFH,$shortcut,$cache,$tarlistmpdir,
+       $dest_fdr)=('','','','','','','');
+   ($baseFH,$btransfer_dir,$destFH,$shortcut,$cache,$tarlistmpdir,
+       $dest_fdr)=@_;
    my ($output,$stdout,$stderr)=('','','');
-   my $dest_fdr=$destFH->{_work_dirs}->{_cwd};
    my $bprxFH='';my $dprxFH='';my $d_fdr='';
    my $trandir_parent='';
    my $phost= $baseFH->{_hostlabel}->[1]?
@@ -23329,14 +23324,15 @@ sub move_tarfile
          &Net::FullAuto::FA_Core::handle_error($stderr,'-1') if $stderr &&
                (-1==index $stderr,'command success');
       } elsif ($baseFH->{_hostlabel}->[0] eq "__Master_${$}__") {
-         if ($baseFH->{_work_dirs}->{_tmp} &&
-               exists $baseFH->{_ftp_handle}) {
+         if ($baseFH->{_work_dirs}->{_tmp}) {
             ($output,$stderr)=&Rem_Command::ftpcmd($destFH,
                   "lcd \"$baseFH->{_work_dirs}->{_tmp}\"",$cache);
-            $Net::FullAuto::FA_Core::ftpcwd{$baseFH->{_ftp_handle}}{lcd}=
-               $baseFH->{_work_dirs}->{_tmp};
-            &Net::FullAuto::FA_Core::handle_error($stderr,'-1') if $stderr &&
+            if (exists $baseFH->{_ftp_handle}) {
+               $Net::FullAuto::FA_Core::ftpcwd{$baseFH->{_ftp_handle}}{lcd}=
+                  $baseFH->{_work_dirs}->{_tmp};
+               &Net::FullAuto::FA_Core::handle_error($stderr,'-1') if $stderr &&
                   (-1==index $stderr,'command success');
+            }
          }
          if ($destFH->{_work_dirs}->{_tmp}) {            # If DEST has trandir
             ($output,$stderr)=&Rem_Command::ftpcmd($destFH,
@@ -23509,7 +23505,6 @@ sub move_tarfile
          "tar xovf ${tdr}transfer".
          "$Net::FullAuto::FA_Core::tran[3].tar"); # un-tar it
       &Net::FullAuto::FA_Core::handle_error($stderr,'-1') if $stderr;
-#print "WHAT IS THE SHORTCUT HERE=$shortcut\n";sleep 6;
       if (!$shortcut) {
          foreach my $file (keys %Net::FullAuto::FA_Core::rename_file) {
             my $cmd="mv \"$file\" ".

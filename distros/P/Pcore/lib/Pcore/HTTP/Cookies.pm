@@ -1,9 +1,9 @@
 package Pcore::HTTP::Cookies;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[is_ref];
+use Pcore::Util::Scalar qw[is_ref is_plain_arrayref];
 
-has cookies => sub { {} };    # ( is => 'ro', isa => HashRef );
+has cookies => sub { {} };
 
 # https://tools.ietf.org/html/rfc6265#section-4.1.1
 sub parse_cookies ( $self, $url, $set_cookie_header ) {
@@ -12,7 +12,7 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
     my $origin_domain = $url->host->name;
     my $origin_path   = $url->path->to_string;
 
-  COOKIE: for my $str ( $set_cookie_header->@* ) {
+  COOKIE: for my $str ( is_plain_arrayref $set_cookie_header ? $set_cookie_header->@* : $set_cookie_header ) {
         my $is_attr;
 
         my ( $domain, $path, $cookie );
@@ -171,7 +171,7 @@ sub remove_cookie ( $self, $domain, $path, $name ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 9                    | Subroutines::ProhibitExcessComplexity - Subroutine "parse_cookies" with high complexity score (27)             |
+## |    3 | 9                    | Subroutines::ProhibitExcessComplexity - Subroutine "parse_cookies" with high complexity score (28)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 48, 51, 65, 66       | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

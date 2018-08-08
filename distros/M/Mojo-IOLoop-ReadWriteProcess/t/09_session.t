@@ -82,4 +82,28 @@ subtest reset => sub {
 
 };
 
+subtest protect => sub {
+
+  my $handler;
+  session->on(protect => sub { shift; $handler = pop @{shift()} });
+  session->protect(sub { });
+  is $handler, SIGCHLD;
+
+  Mojo::IOLoop::ReadWriteProcess::Session->new->protect(sub { });
+  is $handler, SIGCHLD;
+
+  Mojo::IOLoop::ReadWriteProcess::Session::protect(sub { });
+  is $handler, SIGCHLD;
+
+  session->protect(sub { } => SIGTERM);
+  is $handler, SIGTERM;
+
+  Mojo::IOLoop::ReadWriteProcess::Session->new->protect(sub { } => SIGTERM);
+  is $handler, SIGTERM;
+
+  Mojo::IOLoop::ReadWriteProcess::Session::protect(sub { } => SIGTERM);
+  is $handler, SIGTERM;
+
+};
+
 done_testing();

@@ -20,7 +20,7 @@ no_index:
 requires:
   AnyEvent::WebSocket::Client: '0.39'
   B: '1.68'
-  Carp: '1.42'
+  Carp: '1.38'
   Data::Dumper: '2.161'
   Data::Result: '1.0'
   Exporter: '5.72'
@@ -45,5 +45,5 @@ requires:
   UUID::Tiny: '1.04'
   namespace::clean: '0.27'
   overload: '1.28'
-version: 1.009
+version: '1.010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

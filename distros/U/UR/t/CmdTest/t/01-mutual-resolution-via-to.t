@@ -24,11 +24,11 @@ my $path = $INC{"CmdTest/C3.pm"};
 ok($path, "found path to test module")
     or die "cannot continue!";
 
-my $result1 = `$^X $path --thing=two`;
+my $result1 = `$^X \Q$path\E --thing=two`;
 chomp $result1;
 is($result1, "thing_id is 222", "specifying an object automatically specifies its indirect value");
 
-my $result2 = `$^X $path --thing-name=two`;
+my $result2 = `$^X \Q$path\E --thing-name=two`;
 chomp $result2;
 is($result2, "thing_id is 222", "specifying an indirect value automatically sets the value it is via");
 

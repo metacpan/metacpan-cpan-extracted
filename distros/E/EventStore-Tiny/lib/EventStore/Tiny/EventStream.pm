@@ -1,16 +1,23 @@
 package EventStore::Tiny::EventStream;
-use Mo 'default';
 
-has events => [];
+use strict;
+use warnings;
+
+use Class::Tiny {
+    events => sub {[]},
+};
 
 sub add_event {
     my ($self, $event) = @_;
 
-    # append event to internal list
+    # Append event to internal list
     push @{$self->events}, $event;
+
+    # Done
+    return $event;
 }
 
-sub length {
+sub size {
     my $self = shift;
     return scalar @{$self->events};
 }
@@ -24,46 +31,46 @@ sub first_timestamp {
 sub last_timestamp {
     my $self = shift;
     return unless @{$self->events};
-    return $self->events->[$self->length - 1]->timestamp;
+    return $self->events->[$self->size - 1]->timestamp;
 }
 
 sub apply_to {
     my ($self, $state, $logger) = @_;
 
-    # start with empty state by default
+    # Start with empty state by default
     $state = {} unless defined $state;
 
-    # apply all events
+    # Apply all events
     $_->apply_to($state, $logger) for @{$self->events};
 
-    # done
+    # Done
     return $state;
 }
 
 sub substream {
     my ($self, $selector) = @_;
 
-    # default selector: take everything
+    # Default selector: take everything
     $selector = sub {1} unless defined $selector;
 
-    # filter events
+    # Filter events
     my @filtered = grep {$selector->($_)} @{$self->events};
 
-    # build new sub stream
+    # Build new sub stream
     return EventStore::Tiny::EventStream->new(events => \@filtered);
 }
 
-sub until {
+sub before {
     my ($self, $timestamp) = @_;
 
-    # all events until the given timestamp (including)
+    # All events until the given timestamp (including)
     return $self->substream(sub {$_->timestamp <= $timestamp});
 }
 
 sub after {
     my ($self, $timestamp) = @_;
 
-    # all events after the given timestamp (excluding)
+    # All events after the given timestamp (excluding)
     return $self->substream(sub {$_->timestamp > $timestamp});
 }
 
@@ -93,9 +100,9 @@ Internal list representation (arrayref) of all events of this stream.
 
 Adds an event to the stream.
 
-=head2 length
+=head2 size
 
-    my $event_count = $stream->length;
+    my $event_count = $stream->size;
 
 Returns the number of events in this stream.
 
@@ -126,9 +133,9 @@ Applies the whole stream (all events one after another) to a given state (by def
 
 Creates a substream using a given filter. All events the given subref returns true for are selected for this substream.
 
-=head2 until
+=head2 before
 
-    my $pre_stream = $stream->until($timestamp);
+    my $pre_stream = $stream->before($timestamp);
 
 Returns a substream with all events before or at the same time of a given timestamp.
 

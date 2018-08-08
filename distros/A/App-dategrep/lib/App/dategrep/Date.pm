@@ -1,56 +1,120 @@
 package App::dategrep::Date;
 use strict;
 use warnings;
-use parent 'Exporter';
-use Date::Manip::Delta;
-use Date::Manip::Date;
+use App::dategrep::Strptime;
 
-our @EXPORT_OK = qw(intervall_to_epoch date_to_epoch minutes_ago);
+sub new {
+    my ( $class, @args ) = @_;
+    bless {
+        formats => [
+            '%b %e %H:%M:%S',         # rsyslog
+            '%b %e %H:%M',            # rsyslog
+            '%d/%b/%Y:%T %z',         # apache
+            '%Y-%m-%dT%H:%M:%S%Z',    # iso8601
+            '%Y-%m-%d %H:%M:%S%Z',    # iso8601
+            '%Y-%m-%dT%H:%M%Z',       # iso8601
+            '%Y-%m-%d %H:%M%Z',       # iso8601
+            '%Y-%m-%d_%H:%M%Z',       # iso8601
+        ],
+        now => time,
+    }, $class;
+}
 
-sub intervall_to_epoch {
-    my ( $time, $format ) = @_;
-    if ( $time =~ /^(.*) from (.*)$/ ) {
-        my ( $delta, $date ) =
-          ( Date::Manip::Delta->new($1), Date::Manip::Date->new($2) );
-        ## TODO: $date->is_date is missing in Date::Manip::Date
-        ## will be fixed in next major release
-        if ( $delta->is_delta() ) {    ## and $date->is_date() ) {
-            return $date->calc($delta)->secs_since_1970_GMT();
+sub add_format {
+    my $self    = shift;
+    my %formats = map { $_ => 1 } @{ $self->{formats} };
+    my @new     = grep { !$formats{$_} } @_;
+    unshift @{ $self->{formats} }, @new;
+}
+
+sub duration_to_seconds {
+    my ( $self, $duration ) = @_;
+    if ( $duration =~ m{ ([+-])?  (?:(\d+)h)?  (?:(\d+)m)?  (?:(\d+)s)?  }x ) {
+        my ( $op, $hours, $minutes, $seconds ) =
+          ( $1 || '+', $2 || 0, $3 || 0, $4 || 0 );
+        return ( $hours * 3600 + $minutes * 60 + $seconds ) *
+          ( $op eq '+' ? 1 : -1 );
+    }
+    die "Error parsing duration $duration\n";
+}
+
+sub to_epoch_with_modifiers {
+    my ( $self, $time ) = @_;
+
+    $time =~ s/^\s+//;
+    $time =~ s/\s+$//;
+
+    my ( $truncate, $add );
+
+    if ( $time =~ s/\s+ truncate \s+ (\S+)//x ) {
+        $truncate = $1;
+    }
+
+    if ( $time =~ s/\s+ add \s+ (\S+)//x ) {
+        $add = $1;
+    }
+
+    my $epoch;
+    if ( $time eq 'now' ) {
+        $epoch = time;
+    }
+    else {
+        for ( @{ $self->{formats} }, '%T', '%Y-%m-%d', '%d.%m.%Y' ) {
+            $epoch = eval { App::dategrep::Strptime::strptime( $time, $_ ) };
+            warn "$@" if $@;
+            last if $epoch;
         }
     }
-    return date_to_epoch( $time, $format );
+
+    return if !$epoch;
+
+    if ($truncate) {
+        my $duration = $self->duration_to_seconds($truncate);
+        $epoch -= $epoch % $duration;
+    }
+
+    if ($add) {
+        $epoch += $self->duration_to_seconds($add);
+    }
+
+    return $epoch;
 }
 
 sub minutes_ago {
-    my $minutes = shift;
-    my $now     = Date::Manip::Date->new("now");
-    $now->set( 's', 0 );
-    my $ago = Date::Manip::Date->new("$minutes minutes ago");
-    $ago->set( 's', 0 );
-    return ( $ago->secs_since_1970_GMT(), $now->secs_since_1970_GMT() );
+    my ( $self, $minutes ) = @_;
+    my $to = $self->{now};
+    $to -= $to % 60;
+    my $from = $to - $minutes * 60;
+    return ( $from, $to );
 }
 
-{
-    my $date;
-
-    sub date_to_epoch {
-        my ( $str, $format ) = @_;
-        if ( !$date ) {
-            $date = Date::Manip::Date->new();
-        }
-
-        my $error;
-        if ($format) {
-            $error = $date->parse_format( $format, $str );
-        }
-
-        if ( !$format or $error ) {
-            $error = $date->parse($str);
-        }
-
-        return ( undef, $date->err ) if $error;
-        return ( $date->secs_since_1970_GMT() );
+sub guess_format {
+    my ( $self, $line ) = @_;
+    for my $format ( @{ $self->{formats} } ) {
+        my $date = eval { App::dategrep::Strptime::strptime( $line, $format ) };
+        warn "$@" if $@;
+        return $format if $date;
     }
+    return;
+}
+
+sub to_epoch {
+    my ( $self, $line, $format, $defaults ) = @_;
+
+    $format ||= $self->guess_format($line);
+
+    if ( !$format ) {
+        return ( undef, "No date found in line $line" );
+    }
+
+    my $t =
+      eval { App::dategrep::Strptime::strptime( $line, $format, $defaults ) };
+
+    if ( !$t ) {
+        return ( undef, $@ );
+    }
+
+    return $t;
 }
 
 1;

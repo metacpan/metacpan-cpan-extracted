@@ -22,9 +22,9 @@ requires:
   Exporter: '0'
   List::Util: '0'
   Scalar::Util: '0'
-  Term::Choose: '1.604'
-  Term::Choose::Constants: '1.604'
-  Term::Choose::LineFold: '1.604'
+  Term::Choose: '1.621'
+  Term::Choose::Constants: '1.621'
+  Term::Choose::LineFold: '1.621'
   Term::Choose::Util: '0.066'
   Term::ProgressBar: '0'
   constant: '0'
@@ -33,5 +33,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/Term-TablePrint.git
-version: '0.069'
+version: '0.070'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,10 +3,10 @@
    "cats" : [
       {
          "age" : "2 yrs",
-         "fluf" : "11",
+         "fluf" : 11,
          "name" : "fluffy",
          "owner" : {
-            "id" : "111"
+            "id" : 111
          }
       },
       {
@@ -14,7 +14,7 @@
          "fluf" : "22 yrs",
          "name" : "nestor",
          "owner" : {
-            "id" : "111"
+            "id" : 111
          }
       }
    ],

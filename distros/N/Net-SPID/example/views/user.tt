@@ -1,7 +1,12 @@
-<h1>User: [% session.spid_session.nameid %]</h1>
-<h2>SPID Level: [% session.spid_session.spid_level %]</h2>
+<p>This page shows details about the currently logged user.</p>
  
-<p><a href="/logout">Logout</a></p>
+<p><a class="btn btn-primary" href="/logout">Logout</a></p>
+
+<h1>NameID:</h1>
+<p>[% session.spid_session.nameid %]</p>
+
+<h2>SPID Level:</h2>
+<p>[% session.spid_session.level %]</p>
  
 <h2>Attributes</h2>
  
@@ -17,3 +22,6 @@
       </tr>
   [% END %]
 </table>
+
+<h2>Assertion:</h2>
+<p><pre>[% session.spid_session.assertion_xml | html %]</pre></p>

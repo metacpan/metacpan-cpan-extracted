@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Jubilee;
 
-$Map::Tube::London::Line::Jubilee::VERSION   = '1.15';
+$Map::Tube::London::Line::Jubilee::VERSION   = '1.17';
 $Map::Tube::London::Line::Jubilee::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Jubilee - London Tube Map: Jubilee Line.
 
 =head1 VERSION
 
-Version 1.15
+Version 1.17
 
 =head1 DESCRIPTION
 
@@ -54,55 +54,58 @@ London Tube Map: Jubilee Line.
 
 =over 2
 
-=item * The station "Canada Water" is also part of
-          L<London Overground Line|Map::Tube::London::Line::Overground>.
-
-=item * The station "Canning Town" is also part of
-          L<Dockland Light Railway Line|Map::Tube::London::Line::DLR>.
-
-=item * The station "Wembley Park" is also part of
-          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
+=item * The station "Baker Street" is also part of
+          L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
+        | L<Circle Line|Map::Tube::London::Line::Circle>
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
 
 =item * The station "Bond Street" is also part of
-          L<Central Line|Map::Tube::London::Line::Central>.
+          L<Central Line|Map::Tube::London::Line::Central>
 
-=item * The station "Green Park" is also part of
-          L<Victoria Line|Map::Tube::London::Line::Victoria>
-        | L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>.
+=item * The station "Canada Water" is also part of
+          L<Overground Line|Map::Tube::London::Line::Overground>
+
+=item * The station "Canary Wharf" is also part of
+          L<DLR Line|Map::Tube::London::Line::Dlr>
+
+=item * The station "Canning Town" is also part of
+          L<DLR Line|Map::Tube::London::Line::Dlr>
 
 =item * The station "Finchley Road" is also part of
-          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
+          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
 
-=item * The station "Baker Street" is also part of
-          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
-        | L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
-        | L<Circle Line|Map::Tube::London::Line::Circle>
-        | L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>.
+=item * The station "Green Park" is also part of
+          L<Piccadilly Line|Map::Tube::London::Line::Piccadilly>
+        | L<Victoria Line|Map::Tube::London::Line::Victoria>
+
+=item * The station "London Bridge" is also part of
+          L<Northern Line|Map::Tube::London::Line::Northern>
+
+=item * The station "Stratford" is also part of
+          L<Central Line|Map::Tube::London::Line::Central>
+        | L<DLR Line|Map::Tube::London::Line::Dlr>
+        | L<Overground Line|Map::Tube::London::Line::Overground>
 
 =item * The station "Waterloo" is also part of
           L<Bakerloo Line|Map::Tube::London::Line::Bakerloo>
         | L<Northern Line|Map::Tube::London::Line::Northern>
-        | L<Waterloo & City Line|Map::Tube::London::Line::WaterlooCity>.
+        | L<Waterloo & City Line|Map::Tube::London::Line::WaterlooCity>
 
-=item * The station "Stratford" is also part of
-          L<Central Line|Map::Tube::London::Line::Central>
-        | L<Dockland Light Railway Line|Map::Tube::London::Line::DLR>
-        | L<London Overground Line|Map::Tube::London::Line::Overground>.
-
-=item * The station "London Bridge" is also part of
-          L<Northern Line|Map::Tube::London::Line::Northern>.
+=item * The station "Wembley Park" is also part of
+          L<Metropolitan Line|Map::Tube::London::Line::Metropolitan>
 
 =item * The station "West Ham" is also part of
-          L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
+          L<DLR Line|Map::Tube::London::Line::Dlr>
         | L<District Line|Map::Tube::London::Line::District>
-        | L<Dockland Light Railway Line|Map::Tube::London::Line::DLR>.
+        | L<Hammersmith & City Line|Map::Tube::London::Line::HammersmithCity>
 
 =item * The station "West Hampstead" is also part of
-          L<London Overground Line|Map::Tube::London::Line::Overground>.
+          L<Overground Line|Map::Tube::London::Line::Overground>
 
 =item * The station "Westminster" is also part of
           L<Circle Line|Map::Tube::London::Line::Circle>
-        | L<District Line|Map::Tube::London::Line::District>.
+        | L<District Line|Map::Tube::London::Line::District>
 
 =back
 

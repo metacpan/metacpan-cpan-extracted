@@ -1,11 +1,11 @@
-[![Build Status](https://travis-ci.org/genome/UR.png?branch=master)](https://travis-ci.org/genome/UR)
+[![Build Status](https://travis-ci.org/genome/UR.svg?branch=master)](https://travis-ci.org/genome/UR)
 # NAME
 
 UR - rich declarative transactional objects
 
 # VERSION
 
-This document describes UR version 0.46
+This document describes UR version 0.47
 
 # SYNOPSIS
 

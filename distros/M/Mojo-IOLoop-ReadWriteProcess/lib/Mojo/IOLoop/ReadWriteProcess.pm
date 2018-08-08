@@ -1,6 +1,6 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
@@ -12,6 +12,10 @@ use Mojo::IOLoop::ReadWriteProcess::Pool;
 use Mojo::IOLoop::ReadWriteProcess::Queue;
 use Mojo::IOLoop::ReadWriteProcess::Session;
 
+use Mojo::IOLoop::ReadWriteProcess::Shared::Lock;
+use Mojo::IOLoop::ReadWriteProcess::Shared::Memory;
+use Mojo::IOLoop::ReadWriteProcess::Shared::Semaphore;
+
 use B::Deparse;
 use Carp 'confess';
 use IO::Handle;
@@ -21,7 +25,8 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Storable;
 use POSIX qw( :sys_wait_h :signal_h );
-our @EXPORT_OK = qw(parallel batch process pool queue);
+our @EXPORT_OK
+  = (qw(parallel batch process pool queue), qw(shared_memory lock semaphore));
 use Exporter 'import';
 
 use constant DEBUG => $ENV{MOJO_PROCESS_DEBUG};
@@ -29,10 +34,10 @@ use constant DEBUG => $ENV{MOJO_PROCESS_DEBUG};
 has [
   qw(kill_sleeptime sleeptime_during_kill),
   qw(separate_err autoflush set_pipes verbose),
-  qw(internal_pipes)
+  qw(internal_pipes channels)
 ] => 1;
 
-has [qw(blocking_stop serialize)] => 0;
+has [qw(blocking_stop serialize quirkiness)] => 0;
 
 has [
   qw(execute code process_id pidfile return_status),
@@ -76,9 +81,12 @@ sub to_ioloop {
   return $stream;
 }
 
-sub process { __PACKAGE__->new(@_) }
-sub batch   { Mojo::IOLoop::ReadWriteProcess::Pool->new(@_) }
-sub queue   { Mojo::IOLoop::ReadWriteProcess::Queue->new(@_) }
+sub process       { __PACKAGE__->new(@_) }
+sub batch         { Mojo::IOLoop::ReadWriteProcess::Pool->new(@_) }
+sub queue         { Mojo::IOLoop::ReadWriteProcess::Queue->new(@_) }
+sub lock          { Mojo::IOLoop::ReadWriteProcess::Shared::Lock->new(@_) }
+sub semaphore     { Mojo::IOLoop::ReadWriteProcess::Shared::Semaphore->new(@_) }
+sub shared_memory { Mojo::IOLoop::ReadWriteProcess::Shared::Memory->new(@_) }
 
 sub parallel {
   my $c = batch();
@@ -218,10 +226,12 @@ sub _fork {
       or $self->_new_err('Failed creating output pipe');
     $output_err_pipe = IO::Pipe->new()
       or $self->_new_err('Failed creating output error pipe');
-    $channel_in = IO::Pipe->new()
-      or $self->_new_err('Failed creating Channel input pipe');
-    $channel_out = IO::Pipe->new()
-      or $self->_new_err('Failed creating Channel output pipe');
+    if ($self->channels) {
+      $channel_in = IO::Pipe->new()
+        or $self->_new_err('Failed creating Channel input pipe');
+      $channel_out = IO::Pipe->new()
+        or $self->_new_err('Failed creating Channel output pipe');
+    }
   }
   if ($self->internal_pipes) {
     my $internal_err = IO::Pipe->new()
@@ -250,24 +260,26 @@ sub _fork {
     my $return;
     my $internal_err;
 
-    if ($self->_internal_err) {
-      $internal_err
-        = $self->_internal_err->isa("IO::Pipe::End") ?
-        $self->_internal_err
-        : $self->_internal_err->writer();
-      $internal_err->autoflush(1);
-    }
+    if ($self->internal_pipes) {
+      if ($self->_internal_err) {
+        $internal_err
+          = $self->_internal_err->isa("IO::Pipe::End") ?
+          $self->_internal_err
+          : $self->_internal_err->writer();
+        $internal_err->autoflush(1);
+      }
 
-    if ($self->_internal_return) {
-      $return
-        = $self->_internal_return->isa("IO::Pipe::End")
-        ?
-        $self->_internal_return
-        : $self->_internal_return->writer();
-      $return->autoflush(1);
-    }
-    else {
-      eval { $internal_err->write("Can't setup return status pipe") };
+      if ($self->_internal_return) {
+        $return
+          = $self->_internal_return->isa("IO::Pipe::End")
+          ?
+          $self->_internal_return
+          : $self->_internal_return->writer();
+        $return->autoflush(1);
+      }
+      else {
+        eval { $internal_err->write("Can't setup return status pipe") };
+      }
     }
 
     # Set pipes to redirect STDIN/STDOUT/STDERR + channels if desired
@@ -295,15 +307,19 @@ sub _fork {
       $self->read_stream($stdin);
       $self->error_stream($stderr);
       $self->write_stream($stdout);
+      if ($self->channels) {
 
-      $self->channel_in($channel_in->reader)   if $channel_in;
-      $self->channel_out($channel_out->writer) if $channel_out;
+        $self->channel_in($channel_in->reader)   if $channel_in;
+        $self->channel_out($channel_out->writer) if $channel_out;
+        eval { $self->$_->autoflush($self->autoflush) }
+          for qw(  channel_in channel_out );
+      }
       eval { $self->$_->autoflush($self->autoflush) }
-        for qw(read_stream error_stream write_stream channel_in channel_out);
+        for qw(read_stream error_stream write_stream );
     }
     $self->session->reset;
     $self->session->subreaper(0);    # Subreaper bit does not persist in fork
-
+    $self->process_id($$);
     $! = 0;
     my $rt;
     eval { $rt = [$code->($self, @args)]; };
@@ -329,10 +345,17 @@ sub _fork {
     : $output_err_pipe ? $output_err_pipe->reader()
     :                    undef);
   $self->write_stream($input_pipe->writer) if $input_pipe;
-  $self->channel_in($channel_in->writer)   if $channel_in;
-  $self->channel_out($channel_out->reader) if $channel_out;
-  eval { $self->$_->autoflush($self->autoflush) }
-    for qw(read_stream error_stream write_stream channel_in channel_out);
+
+  if ($self->set_pipes) {
+    if ($self->channels) {
+      $self->channel_in($channel_in->writer)   if $channel_in;
+      $self->channel_out($channel_out->reader) if $channel_out;
+      eval { $self->$_->autoflush($self->autoflush) }
+        for qw(  channel_in channel_out );
+    }
+    eval { $self->$_->autoflush($self->autoflush) }
+      for qw(read_stream error_stream write_stream );
+  }
 
   return $self;
 }
@@ -359,9 +382,17 @@ sub wait {
   return $self;
 }
 
-sub wait_stop   { shift->wait->stop }
-sub errored     { !!@{shift->error} ? 1 : 0 }
-sub exit_status { defined $_[0]->_status ? shift->_status >> 8 : undef }
+sub wait_stop { shift->wait->stop }
+sub errored { !!@{shift->error} ? 1 : 0 }
+
+# PPC64: Treat msb on neg (different cpu/perl interpreter version)
+sub _st { my $st = shift >> 8; ($st & 0x80) ? (0x100 - ($st & 0xFF)) : $st }
+
+sub exit_status {
+      defined $_[0]->_status && $_[0]->quirkiness ? _st(shift->_status)
+    : defined $_[0]->_status ? shift->_status >> 8
+    :                          undef;
+}
 
 sub restart {
   $_[0]->{_status} = undef;
@@ -771,6 +802,16 @@ Array or arrayref of options to pass by to the external binary or the code block
 
 Set it to 1 if you want to do blocking stop of the process.
 
+
+=head2 channels
+
+    use Mojo::IOLoop::ReadWriteProcess;
+    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { print "Hello" }, channels => 0 );
+    $process->start();
+    $process->on( stop => sub { print "Process: ".(+shift()->pid)." finished"; } );
+    $process->stop(); # Will wait indefinitely until the process is stopped
+
+Set it to 0 if you want to disable internal channels.
 
 =head2 session
 

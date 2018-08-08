@@ -10,7 +10,7 @@ use List::MoreUtils;
 use File::Basename;
 
 require UR;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 UR::Object::Type->define(
     class_name => 'UR::DataSource::RDBMS',
@@ -1353,7 +1353,7 @@ sub _resolve_table_name_for_class_name {
 
 # For when there's no metaDB info for a class' table, it walks up the
 # ancestry of the class, and uses the ID properties to get the column
-# names, and assummes they must be the table primary keys.
+# names, and assumes they must be the table primary keys.
 #
 # From there, it guesses the sequence name
 sub _resolve_sequence_name_from_class_id_properties {

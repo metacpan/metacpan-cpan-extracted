@@ -8,7 +8,7 @@ use Hash::Merge;
 use base 'Exporter';
 use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION     = 0.009;
+$VERSION     = 0.010;
 @EXPORT_OK   = qw( diff left_diff );
 
 sub left_diff {
@@ -100,6 +100,10 @@ Report here: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Hash::Diff
 =head1 AUTHOR
 
 Bjorn-Olav Strand E<lt>bo@startsiden.noE<gt>
+
+=head1 CONTRIBUTOR
+
+Charles McGarvey E<lt>ccm@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 

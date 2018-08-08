@@ -9,7 +9,7 @@ use Scalar::Util qw(looks_like_number refaddr isweak);
 use List::MoreUtils qw(any);
 
 our @ISA = ('UR::ModuleBase');
-our $VERSION = "0.46"; # UR $VERSION;;
+our $VERSION = "0.47"; # UR $VERSION;
 
 # Base object API
 

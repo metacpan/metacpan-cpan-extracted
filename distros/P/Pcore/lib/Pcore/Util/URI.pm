@@ -45,7 +45,6 @@ has is_secure => 0, is => 'lazy';                           # init_arg => undef 
 
 has default_port => 0, is => 'lazy';                        # init_arg => undef );
 has connect_port => ( is => 'lazy', init_arg => undef );
-has connect      => ( is => 'lazy', init_arg => undef );
 
 around new => sub ( $orig, $self, $uri, @ ) {
     my %args = (
@@ -289,12 +288,6 @@ sub _build_connect_port ($self) {
     return $self->port || $self->default_port;
 }
 
-sub _build_connect ($self) {
-    my $scheme = $self->scheme eq q[] ? 'tcp' : $self->scheme;
-
-    return [ $self->host->name, $self->connect_port, $scheme, $scheme . q[_] . $self->connect_port ];
-}
-
 # UTIL
 sub clear_fragment ($self) {
     $self->{fragment} = q[];
@@ -343,10 +336,10 @@ sub TO_DUMP ( $self, $dumper, @ ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 109, 112, 119, 129,  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
-## |      | 140, 145, 148        |                                                                                                                |
+## |    3 | 108, 111, 118, 128,  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |      | 139, 144, 147        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 93                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 92                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

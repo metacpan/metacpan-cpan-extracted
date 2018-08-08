@@ -3,6 +3,7 @@
 use 5.010001;
 use strict;
 use warnings;
+use Test::Deeply::Float;
 use Test::More 0.98;
 
 use App::cryp::arbit::Strategy::merge_order_book;
@@ -78,7 +79,7 @@ subtest 'opt:min_net_profit_margin' => sub {
         forex_spreads => {"USD/IDR" => 0},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -153,7 +154,7 @@ subtest 'opt:forex_spreads' => sub {
         forex_spreads => {"USD/IDR" => 0.5},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -229,7 +230,7 @@ subtest 'opt:max_order_pairs' => sub {
         forex_spreads => {"USD/IDR" => 0},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -295,7 +296,7 @@ subtest 'buy & sell size match' => sub {
         forex_spreads => {"USD/IDR"=>0},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -396,7 +397,7 @@ subtest 'buy size > sell size' => sub {
         forex_spreads => {"USD/IDR"=>0},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -497,7 +498,7 @@ subtest 'buy size < sell size' => sub {
         forex_spreads => {"USD/IDR"=>0},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -584,7 +585,7 @@ subtest 'selling account balance (1)' => sub {
         forex_spreads => {"USD/IDR"=>0},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -699,7 +700,7 @@ subtest 'selling account balance (2)' => sub {
         forex_spreads => {"USD/IDR"=>0},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -797,10 +798,10 @@ subtest 'selling account balance (3: re-sorting)' => sub {
         forex_spreads => {"USD/IDR"=>0},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 
-    is_deeply($account_balances, $correct_final_account_balances)
+    is_deeply_float($account_balances, $correct_final_account_balances)
         or diag explain $account_balances;
 };
 
@@ -920,10 +921,10 @@ subtest 'buying account balance (1)' => sub {
         forex_spreads => {"USD/IDR"=>0},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 
-    is_deeply($account_balances, $correct_final_account_balances)
+    is_deeply_float($account_balances, $correct_final_account_balances)
         or diag explain $account_balances;
 };
 
@@ -1155,7 +1156,7 @@ subtest 'opt:max_order_quote_size' => sub {
         forex_spreads => {"USD/IDR"=>0},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -1259,7 +1260,7 @@ subtest 'opt:max_order_size_as_book_item_size_pct' => sub {
 
     #use DD; dd $order_pairs;
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -1385,10 +1386,10 @@ subtest 'opt:min_account_balance' => sub {
         forex_spreads => {"USD/IDR"=>0},
     );
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 
-    is_deeply($account_balances, $correct_final_account_balances)
+    is_deeply_float($account_balances, $correct_final_account_balances)
         or diag explain $account_balances;
 };
 
@@ -1468,7 +1469,7 @@ subtest "minimum buy base size" => sub {
 
     #use DD; dd $order_pairs;
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -1548,7 +1549,7 @@ subtest "minimum buy quote size" => sub {
 
     #use DD; dd $order_pairs;
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -1628,7 +1629,7 @@ subtest "minimum sell base size" => sub {
 
     #use DD; dd $order_pairs;
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 
@@ -1718,7 +1719,7 @@ subtest "minimum sell quote size" => sub {
 
     #use DD; dd $order_pairs;
 
-    is_deeply($order_pairs, $correct_order_pairs)
+    is_deeply_float($order_pairs, $correct_order_pairs)
         or diag explain $order_pairs;
 };
 

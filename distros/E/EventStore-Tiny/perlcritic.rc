@@ -1,0 +1,8 @@
+severity = 3
+verbose  = [%p] %m at line %l near '%r' in %F (Severity %s)\n
+
+[Variables::ProhibitPackageVars]
+packages = Storable
+
+[-RegularExpressions::RequireExtendedFormatting]
+[-BuiltinFunctions::ProhibitComplexMappings]

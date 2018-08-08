@@ -42,5 +42,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Buffer
   repository: git://github.com/nigelhorne/CGI-Buffer.git
-version: '0.81'
+version: '0.82'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

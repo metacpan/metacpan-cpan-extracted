@@ -1,3 +1,21 @@
+0.41    2018-08-06
+    - Add a summary method to event classes
+
+0.4     2018-07-17
+    - Rename the cache_size attribute to cache_distance
+
+0.3     2018-06-21
+    - Some internal interface changes to satisfy Perl::Critic:
+        - Rename ES::T::store to store_to_file to improve API consistency
+        - Rename ES::T::EventStream::length to size to avoid clashes with the built-in function
+        - Rename ES::T::EventStream::until to before to improve API consistency
+        - Rename ES::T::Logger::log to log_event to avoid clashes with the built-in function
+
+0.22    2018-06-20
+    - Fix POD (@manwar)
+    - Use Class::Tiny instead of Mo (@tobyink)
+    - Improve test suite
+
 0.21    2018-06-17
     - Add POD documentation to all classes
 

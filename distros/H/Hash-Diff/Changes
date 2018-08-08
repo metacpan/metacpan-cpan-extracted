@@ -1,5 +1,8 @@
 Revision history for Perl module Hash::Diff
 
+0.010 2018-08-06
+  - Fix "Can't locate inc/Module/Install.pm in @INC" on perl >= 5.26.
+
 0.009 2016-10-15
   - Remove unnecessary Data::Dump to make tests pass.
 

@@ -3,15 +3,14 @@ BEGIN {
   $Dancer::Plugin::Auth::Twitter::AUTHORITY = 'cpan:SUKRIA';
 }
 #ABSTRACT: Authenticate with Twitter
-$Dancer::Plugin::Auth::Twitter::VERSION = '0.07';
+$Dancer::Plugin::Auth::Twitter::VERSION = '0.08';
 use strict;
 use warnings;
 
 use Dancer ':syntax';
 use Dancer::Plugin;
 use Carp 'croak';
-use Class::Load qw/ load_class /;
-use Net::Twitter::Lite::WithAPIv1_1 0.12006;
+use Twitter::API 1.0002;
 
 # Net::Twitter singleton, accessible via 'twitter'
 our $_twitter;
@@ -24,8 +23,6 @@ my $consumer_secret;
 my $callback_url;
 my $callback_success;
 my $callback_fail;
-
-my $engine;
 
 register 'auth_twitter_init' => sub {
     my $config = plugin_setting;
@@ -44,18 +41,10 @@ register 'auth_twitter_init' => sub {
 
     debug "new twitter with $consumer_key , $consumer_secret, $callback_url";
 
-    $engine = $config->{engine} || 'Net::Twitter::Lite::WithAPIv1_1';
-
-    $engine .= '::WithAPIv1_1' if $engine eq 'Net::Twitter::Lite';
-
-    die "engine must be 'Net::Twitter' or 'Net::Twitter::Lite::WithAPIv1_1': '$engine' not supported\n"
-        unless grep { $engine eq $_ } qw/ Net::Twitter Net::Twitter::Lite::WithAPIv1_1 /;
-
-    $_twitter = load_class($engine)->new(
-        ( traits => [ qw/ API::RESTv1_1 OAuth / ] ) x ( $engine eq 'Net::Twitter' ),
-        'consumer_key'      => $consumer_key, 
+    $_twitter = Twitter::API->new_with_traits(
+        traits => [ qw/Enchilada/ ],
+        'consumer_key'      => $consumer_key,
         'consumer_secret'   => $consumer_secret,
-         ssl                 => 1,
     );
 
 };
@@ -66,14 +55,16 @@ register 'auth_twitter_authorize_url' => sub {
         croak "auth_twitter_init must be called first";
     }
 
-    my $uri = twitter->get_authorization_url( 
-        'callback' => $callback_url
-    );
+    my $oauth_tokens = twitter->oauth_request_token({
+        callback => $callback_url
+    });
 
-    session request_token        => twitter->request_token;
-    session request_token_secret => twitter->request_token_secret;
-    session access_token         => '';
-    session access_token_secret  => '';
+    my $uri = twitter->oauth_authorization_url({
+        oauth_token => $oauth_tokens->{oauth_token}
+    });
+
+    session request_token        => $oauth_tokens->{oauth_token};
+    session request_token_secret => $oauth_tokens->{oauth_token_secret};
 
     debug "auth URL : $uri";
     return $uri;
@@ -85,74 +76,64 @@ register 'auth_twitter_authenticate_url' => sub {
         croak "auth_twitter_init must be called first";
     }
 
-    my $uri = twitter->get_authentication_url(
-        'callback' => $callback_url
-    );
+    my $oauth_tokens = twitter->oauth_request_token({
+        callback => $callback_url
+    });
 
-    session request_token        => twitter->request_token;
-    session request_token_secret => twitter->request_token_secret;
-    session access_token         => '';
-    session access_token_secret  => '';
+    my $uri = twitter->oauth_authentication_url({
+        oauth_token => $oauth_tokens->{oauth_token}
+    });
+
+    session request_token        => $oauth_tokens->{oauth_token};
+    session request_token_secret => $oauth_tokens->{oauth_token_secret};
 
     debug "auth URL : $uri";
     return $uri;
 };
 
 get '/auth/twitter/callback' => sub {
+    my $token        = session('request_token');
+    my $token_secret = session('request_token_secret');
+    my $verifier     = params->{'oauth_verifier'};
+    my $denied       = params->{'denied'};
 
-    debug "in callback...";
+    if (!$denied && $token && $token_secret && $verifier) {
+        # everything went well:
+        my $access = twitter->oauth_access_token({
+            token        => $token,
+            token_secret => $token_secret,
+            verifier     => $verifier,
+        });
+        my $twitter_user_hash;
+        my $success = eval {
+            $twitter_user_hash = twitter->verify_credentials({
+                -token        => $access->{oauth_token},
+                -token_secret => $access->{oauth_token_secret},
+            });
+            1;
+        };
+        if (!$success || !$twitter_user_hash) {
+            Dancer::Logger::core("no twitter_user_hash or error: $@");
+            return redirect $callback_fail;
+        }
+        $twitter_user_hash->{'access_token'} = $access->{oauth_token},
+            unless exists $twitter_user_hash->{'access_token'};
+        $twitter_user_hash->{'access_token_secret'} = $access->{oauth_token_secret}
+            unless exists $twitter_user_hash->{'access_token_secret'};
 
-    # A user denying access should be considered a failure
-    return redirect $callback_fail if (params->{'denied'});
-
-    if (   !session('request_token')
-        || !session('request_token_secret')
-        || !params->{'oauth_verifier'})
-    {
+        # save the user
+        session 'twitter_user' => $twitter_user_hash;
+        return redirect $callback_success;
+    }
+    else {
+        # user did NOT authenticate/authorize:
+        session request_token        => '';
+        session request_token_secret => '';
+        return redirect $callback_fail if $denied; # user denied access
         return send_error 'no request token present, or no verifier';
     }
-
-    my $token               = session('request_token');
-    my $token_secret        = session('request_token_secret');
-    my $access_token        = session('access_token');
-    my $access_token_secret = session('access_token_secret');
-    my $verifier            = params->{'oauth_verifier'};
-
-    if (!$access_token && !$access_token_secret) {
-        twitter->request_token($token);
-        twitter->request_token_secret($token_secret);
-        ($access_token, $access_token_secret) = twitter->request_access_token('verifier' => $verifier);
-
-        # this is in case we need to register the user after the oauth process
-        session access_token        => $access_token;
-        session access_token_secret => $access_token_secret;
-    }
-
-    # get the user
-    twitter->access_token($access_token);
-    twitter->access_token_secret($access_token_secret);
-
-    my $twitter_user_hash;
-    eval {
-        $twitter_user_hash = twitter->verify_credentials();
-    };
-
-    if ($@ || !$twitter_user_hash) {
-        Dancer::Logger::core("no twitter_user_hash or error: ".$@);
-        return redirect $callback_fail;
-    }
-
-    $twitter_user_hash->{'access_token'} = $access_token;
-    $twitter_user_hash->{'access_token_secret'} = $access_token_secret;
-
-    # save the user
-    session 'twitter_user'                => $twitter_user_hash;
-    session 'twitter_access_token'        => $access_token,
-    session 'twitter_access_token_secret' => $access_token_secret,
-
-    redirect $callback_success;
 };
- 
+
 register_plugin;
 
 __END__
@@ -206,7 +187,7 @@ In order for this plugin to work, you need the following:
 
 =item * Twitter application
 
-Anyone can register a Twitter application at L<http://dev.twitter.com/>. When
+Anyone can register a Twitter application at L<http://developer.twitter.com/>. When
 done, make sure to configure the application as a I<Web> application.
 
 =item * Configuration
@@ -219,23 +200,29 @@ C<plugins/Auth::Twitter>:
     ...
     plugins:
       "Auth::Twitter":
-        consumer_key:     "1234"
-        consumer_secret:  "abcd"
+        consumer_key:     "insert your comsumer key here"
+        consumer_secret:  "insert your consumer secret here"
         callback_url:     "http://localhost:3000/auth/twitter/callback"
         callback_success: "/"
         callback_fail:    "/fail"
-        engine:           Net::Twitter::Lite::WithAPIv1_1
+
+C<callback_url> is the URL in your app that Twitter will call after
+authentication. Unless you really know what you're doing, it should B<always>
+be C<your app url + /auth/twitter/callback>, like the example above. This
+route is implemented by this plugin to properly handle the necessary OAuth
+final steps and log your user.
 
 C<callback_success> and C<callback_fail> are optional and default to 
-'/' and '/fail', respectively.
+'/' and '/fail', respectively. Once the callback_url processes the
+authentication/authorization returned by Twitter, it will redirect the user
+to those routes.
 
-The engine is optional as well. The supported engines are
-C<Net::Twitter> and C<Net::Twitter::Lite::WithAPIv1_1> (C<Net::Twitter::Lite> can also 
-be used as a synonym for the latter).
-By default the plugin will use L<Net::Twitter::Lite::WithAPIv1_1>.
+Before version 0.08, this module allowed the use of either C<Net::Twitter> or
+C<Net::Twitter::Lite> as backend engines. Those modules have been merged into
+the modern and up to date L<Twitter::API>, by the same author. Because Twitter
+no longer supports the methods used in those modules, this plugin was updated
+to use C<Twitter::API> as well.
 
-Note that you also need to provide your callback url, whose route handler is automatically
-created by the plugin.
 
 =item * Session backend
 
@@ -246,6 +233,11 @@ Use the session backend of your choice, it doesn't make a difference, see
 L<Dancer::Session> for details about supported session engines, or
 L<search the CPAN for new ones|http://search.cpan.org/search?query=Dancer-Session>.
 
+However, please note that the user access token will be stored on the session,
+and that token may be used to query extra information from Twitter on behalf
+of your users! As such, please keep your user's privacy in mind and
+encrypt+secure your session data.
+
 =back
 
 =head1 EXPORT
@@ -254,19 +246,17 @@ The plugin exports the following symbols to your application's namespace:
 
 =head2 twitter
 
-The plugin uses a L<Net::Twitter> or L<Net::Twitter::Lite::WithAPIv1_1> 
-object to do its job. You can access this
+The plugin uses a L<Twitter::API> object to do its job. You can access this
 object with the C<twitter> symbol, exported by the plugin.
 
 =head2 auth_twitter_init
 
 This function should be called before your route handlers, in order to
-initialize the underlying L<Net::Twitter> or L<Net::Twitter::Lite::WithAPIv1_1> 
-object. 
+initialize the underlying L<Twitter::API> object.
 
 =head2 auth_twitter_authorize_url
 
-This function returns an authorize URI for redirecting unauthenticated users.
+This function returns an authorization URI to redirect unauthenticated users.
 You should use this in a before filter like the following:
 
     before sub {
@@ -278,7 +268,7 @@ You should use this in a before filter like the following:
         }
     };
 
-When the user authenticate with Twitter's OAuth interface, she's going to be
+When the user authenticates with Twitter's OAuth interface, she's going to be
 bounced back to C</auth/twitter/callback>.
 
 =head2 auth_twitter_authenticate_url
@@ -306,13 +296,9 @@ the user will be redirect to the URI specified by C<callback_fail>.
 
 =head1 TIPS AND TRICKS
 
-If you get the error
-
-    Net::Twitter::Role::OAuth::get_authorization_url(): 
-        GET https://api.twitter.com/oauth/request_token failed: 500 
-        Can't verify SSL peers without knowing which Certificate Authorities to trust
-
-you can silence it by setting the environment variable C<PERL_LWP_SSL_VERIFY_HOSTNAME> to C<0>.
+You should probably wrap your calls to C<auth_twitter_authorize_url> and
+C<auth_twitter_authenticate_url> under C<eval>, as they make requests to
+the Twitter API and may fail.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -338,7 +324,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Alexis Sukrieh.
+This software is copyright (c) 2010-18 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

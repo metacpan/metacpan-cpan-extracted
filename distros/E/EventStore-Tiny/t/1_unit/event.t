@@ -6,29 +6,57 @@ use Test::More;
 use_ok 'EventStore::Tiny::Event';
 use_ok 'EventStore::Tiny::DataEvent';
 
-subtest 'Default UUID' => sub {
+subtest 'Defaults' => sub {
 
-    # init and check UUID
-    my $ev = EventStore::Tiny::Event->new(name => 'foo');
-    ok defined $ev->uuid, 'Event has an UUID';
-    like $ev->uuid => qr/^(\w+-){4}\w+$/, 'UUID looks like an UUID string';
+    subtest 'UUID' => sub {
 
-    # check another event's UUID
-    my $ev2 = EventStore::Tiny::Event->new(name => 'foo');
-    isnt $ev->uuid => $ev2->uuid, 'Two different UUIDs';
-};
+        # init and check UUID
+        my $ev = EventStore::Tiny::Event->new(name => 'foo');
+        ok defined $ev->uuid, 'Event has an UUID';
+        like $ev->uuid => qr/^(\w+-){4}\w+$/, 'UUID looks like an UUID string';
 
-subtest 'Default high-resolution timestamp' => sub {
+        # check another event's UUID
+        my $ev2 = EventStore::Tiny::Event->new(name => 'foo');
+        isnt $ev->uuid => $ev2->uuid, 'Two different UUIDs';
+    };
 
-    # init and check timestamp
-    my $ev = EventStore::Tiny::Event->new(name => 'foo');
-    ok defined $ev->timestamp, 'Event has a timestamp';
-    like $ev->timestamp => qr/^\d+\.\d+$/, 'Timestamp looks like a decimal';
-    isnt $ev->timestamp => time, 'Timestamp is not the integer timestamp';
+    subtest 'High-resolution timestamp' => sub {
 
-    # check another event's timestamp
-    my $ev2 = EventStore::Tiny::Event->new(name => 'foo');
-    isnt $ev->timestamp => $ev2->timestamp, 'Time has passed.';
+        # init and check timestamp
+        my $ev = EventStore::Tiny::Event->new(name => 'foo');
+        ok defined $ev->timestamp, 'Event has a timestamp';
+        like $ev->timestamp => qr/^\d+\.\d+$/, 'Timestamp looks like a decimal';
+        isnt $ev->timestamp => time, 'Timestamp is not the integer timestamp';
+
+        # check another event's timestamp
+        my $ev2 = EventStore::Tiny::Event->new(name => 'foo');
+        isnt $ev->timestamp => $ev2->timestamp, 'Time has passed.';
+    };
+
+    subtest 'Name' => sub {
+        eval {EventStore::Tiny::Event->new};
+        like $@ => qr/name is required/, 'Name is required';
+    };
+
+    subtest 'Transformation' => sub {
+        my $tr = EventStore::Tiny::Event->new(name => 'foo')->transformation;
+        is ref($tr) => 'CODE', 'ISA subref';
+        is $tr->($_), undef, 'Does nothing';
+    };
+
+    subtest 'Summary' => sub {
+        my $s = EventStore::Tiny::Event->new(name => 'foo')->summary;
+        ok defined $s, 'Summary is defined';
+        like $s => qr/^\[
+            foo                     # Name
+            \s \(
+                \d\d\d\d-\d\d-\d\d  # Date
+                T                   # ISO 8601 separator
+                \d\d:\d\d:\d\d      # Time
+                (\.\d+)?            # Optional: high res time
+            \)
+        \]$/x, 'Correct summary';
+    };
 };
 
 subtest 'Construction arguments' => sub {
@@ -68,8 +96,12 @@ subtest 'Application' => sub {
 
 subtest 'Data event' => sub {
 
+    # check defaults
+    my $ev = EventStore::Tiny::DataEvent->new(name => 'quux');
+    is_deeply $ev->data => {}, 'Default data is an empty hash';
+
     # construct data-driven event
-    my $ev = EventStore::Tiny::DataEvent->new(
+    $ev = EventStore::Tiny::DataEvent->new(
         name            => 'foo',
         transformation  => sub {
             my ($state, $data) = @_;
@@ -80,6 +112,42 @@ subtest 'Data event' => sub {
 
     # apply to empty state
     is $ev->apply_to({})->{quux} => 42, 'Correct state-update from data';
+
+    subtest 'Summarizing summary' => sub {
+
+        # Extended summary regex
+        my $summary_rx = qr/^\[
+            foo                     # Name
+            \s \(
+                \d\d\d\d-\d\d-\d\d  # Date
+                T                   # ISO 8601 separator
+                \d\d:\d\d:\d\d      # Time
+                (?:\.\d+)?          # Optional: high res time
+            \)
+            \s \| \s
+            (.*)                    # Data representation
+        \]$/x;
+
+        # Prepare expected results
+        my %expected = (
+            'quux'                      => 'quux',
+            "A    \nB\n\n\nC     D\n"   => 'A B C D',
+            '123456789012345678'        => '123456789012345678',
+            '1234567890123456789'       => '1234567890123456789',
+            '12345678901234567890'      => '12345678901234567...',
+            '123456789012345678901'     => '12345678901234567...',
+            "12345678901\n4'6' ABCDEF"  => '12345678901 46 AB...',
+        );
+
+        # Check
+        for my $ed (sort keys %expected) {
+            $ev->data->{key} = $ed;
+            like $ev->summary => $summary_rx, 'Correct extended summary';
+            $ev->summary =~ $summary_rx;
+            is $1 => "key: '$expected{$ed}'",
+                "Correct data summary $expected{$ed}";
+        }
+    };
 };
 
 subtest 'Specialization' => sub {

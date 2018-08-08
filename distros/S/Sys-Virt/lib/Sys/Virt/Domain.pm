@@ -3903,6 +3903,10 @@ Amount of usable memory
 
 Time of last stats refresh from guest
 
+=item Sys::Virt::Domain::MEMORY_STAT_DISK_CACHES
+
+Disk cache size
+
 =back
 
 =head2 DOMAIN LIST CONSTANTS

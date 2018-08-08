@@ -15,10 +15,7 @@ config->{plugins}->{'Auth::Twitter'} = {
 };
 config->{session} = 'Simple';
 
-sub change_engine {
-    config->{plugins}{'Auth::Twitter'}{engine} = shift;
-    auth_twitter_init();
-}
+auth_twitter_init();
 
 hook before => sub {
     return if request->path =~ m{/auth/twitter/callback};

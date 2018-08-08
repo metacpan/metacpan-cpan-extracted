@@ -43,6 +43,9 @@ no_index:
     - MyClass_Good
     - _MyClass_Bad
 requires:
+  Alien::Base::ModuleBuild: '1.02'
+  Alien::GMP: '1.08'
+  Alien::GSL: '1.01'
   Alien::JPCRE2: '0.012'
   Alien::PCRE2: '0.015'
   Alien::astyle: '0.009'
@@ -52,6 +55,7 @@ requires:
   ExtUtils::MakeMaker: '7.04'
   File::Which: '1.21'
   Filter::Simple: '0.91'
+  IO::Socket::SSL: '2.043'
   IPC::Run3: '0.048'
   Inline: '0.80'
   Inline::C: '0.76'
@@ -81,5 +85,5 @@ resources:
   homepage: http://www.rperl.org
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/rperl.git
-version: '4.000000'
+version: '4.001000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

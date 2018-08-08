@@ -181,7 +181,7 @@ sub _build_sub_command_mapping {
         for my $lib (@INC) {
             my $subdir_full_path = $lib . '/' . $subdir;
             next unless -d $subdir_full_path;
-            my @files = glob($subdir_full_path . '/*');
+            my @files = glob("\Q${subdir_full_path}\E/*");
             next unless @files;
             for my $file (@files) {
                 my $basename = basename($file);

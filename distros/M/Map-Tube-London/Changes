@@ -1,5 +1,11 @@
 Revision history for Map::Tube::London
 
+1.17  2018-08-07
+      - Updated section NOTE for the line "Jubilee".
+
+1.16  2018-08-06
+      - Updated section NOTE for the line "Hammersmith & City".
+
 1.15  2018-08-05
       - Updated map for line DLR with different bgcolor.
 

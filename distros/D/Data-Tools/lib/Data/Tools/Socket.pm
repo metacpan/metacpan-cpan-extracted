@@ -1,7 +1,7 @@
 ##############################################################################
 #
 #  Data::Tools::Socket perl module
-#  (c) Vladi Belperchinov-Shabanski "Cade" 2013-2017
+#  2013-2018 (c) Vladi Belperchinov-Shabanski "Cade"
 #  http://cade.datamax.bg
 #  <cade@bis.bg> <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 #
@@ -13,7 +13,7 @@ use strict;
 use Exporter;
 use Time::HiRes qw( time );
 
-our $VERSION = '1.14';
+our $VERSION = '1.17';
 
 our @ISA    = qw( Exporter );
 our @EXPORT = qw(
@@ -185,9 +185,9 @@ sub socket_can_read
 
 =head1 SYNOPSIS
 
-  use Data::Tools qw( :all );  # import all functions
-  use Data::Tools;             # the same as :all :) 
-  use Data::Tools qw( :none ); # do not import anything, use full package names
+  use Data::Tools::Socket qw( :all );  # import all functions
+  use Data::Tools::Socket;             # the same as :all :) 
+  use Data::Tools::Socket qw( :none ); # do not import anything, use full package names
 
   # --------------------------------------------------------------------------
 
@@ -270,6 +270,7 @@ Data::Tools::Socket uses:
   <cade@biscom.net> <cade@datamax.bg> <cade@cpan.org>
 
   http://cade.datamax.bg
+
 
 =cut
 

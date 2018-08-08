@@ -24,19 +24,19 @@ sub _build__auth ($self) {
 sub _req1 ( $self, $method, $endpoint, $data, $cb = undef ) {
     return P->http->$method(
         'https://bitbucket.org/api/1.0' . $endpoint,
-        headers => {
-            AUTHORIZATION => $self->_auth,
-            CONTENT_TYPE  => 'application/x-www-form-urlencoded; charset=UTF-8',
-        },
-        body => $data ? P->data->to_uri($data) : undef,
+        headers => [
+            Authorization  => $self->_auth,
+            'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+        ],
+        data => $data ? P->data->to_uri($data) : undef,
         sub ($res) {
             my $api_res;
 
             if ( !$res ) {
-                $api_res = res [ $res->{status}, $res->{reason} ], $res->{body};
+                $api_res = res [ $res->{status}, $res->{reason} ], $res->{data};
             }
             else {
-                my $data = $res->{body} && $res->{body}->$* ? P->data->from_json( $res->{body} ) : undef;
+                my $data = $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : undef;
 
                 $api_res = res $res->{status}, $data;
             }
@@ -49,13 +49,13 @@ sub _req1 ( $self, $method, $endpoint, $data, $cb = undef ) {
 sub _req2 ( $self, $method, $endpoint, $data, $cb = undef ) {
     return P->http->$method(
         'https://api.bitbucket.org/2.0' . $endpoint,
-        headers => {
-            AUTHORIZATION => $self->_auth,
-            CONTENT_TYPE  => 'application/json',
-        },
-        body => $data ? P->data->to_json($data) : undef,
+        headers => [
+            Authorization  => $self->_auth,
+            'Content-Type' => 'application/json',
+        ],
+        data => $data ? P->data->to_json($data) : undef,
         sub ($res) {
-            my $data = $res->{body} && $res->{body}->$* ? P->data->from_json( $res->{body} ) : undef;
+            my $data = $res->{data} && $res->{data}->$* ? P->data->from_json( $res->{data} ) : undef;
 
             my $api_res;
 

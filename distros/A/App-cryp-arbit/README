@@ -2,8 +2,8 @@ NAME
     App::cryp::arbit - Cryptocurrency arbitrage utility
 
 VERSION
-    This document describes version 0.003 of App::cryp::arbit (from Perl
-    distribution App-cryp-arbit), released on 2018-08-04.
+    This document describes version 0.005 of App::cryp::arbit (from Perl
+    distribution App-cryp-arbit), released on 2018-08-07.
 
 SYNOPSIS
     Please see included script cryp-arbit.

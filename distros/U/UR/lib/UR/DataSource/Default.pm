@@ -5,7 +5,7 @@ package UR::DataSource::Default;
 use strict;
 use warnings;
 use UR;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 class UR::DataSource::Default {
     is => ['UR::DataSource','UR::Singleton'],

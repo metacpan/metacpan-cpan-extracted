@@ -1,5 +1,5 @@
 package Dancer2::Plugin::SPID;
-$Dancer2::Plugin::SPID::VERSION = '0.10';
+$Dancer2::Plugin::SPID::VERSION = '0.11';
 # ABSTRACT: SPID authentication for Dancer2 web applications
 use Dancer2::Plugin;
 
@@ -11,21 +11,19 @@ use Crypt::JWT qw(encode_jwt decode_jwt);
 use Net::SPID;
 use URI::Escape;
 
-plugin_hooks qw(before_login after_login before_logout after_logout);
+plugin_hooks qw(before_login after_login after_failed_login before_logout after_logout);
 
 my $DEFAULT_JWT_SECRET = 'default.jwt.secret';
 
 sub _build__spid {
     my ($self) = @_;
     
-    # Initialize our Net::SPID object with information about this SP and the
-    # CA certificate used for validation of IdP certificates (if cacert_file
-    # is omitted, CA validation is skipped).
+    # Initialize our Net::SPID object with information about this SP.
     my $spid = Net::SPID->new(
-        sp_entityid     => $self->config->{sp_entityid},
-        sp_key_file     => $self->config->{sp_key_file},
-        sp_cert_file    => $self->config->{sp_cert_file},
-        cacert_file     => $self->config->{cacert_file},
+        map { $_ => $self->config->{$_} } grep defined $self->config->{$_},
+            qw(sp_entityid sp_key_file sp_cert_file 
+            sp_assertionconsumerservice sp_singlelogoutservice
+            sp_attributeconsumingservice)
     );
     
     # Load Identity Providers from their XML metadata.
@@ -100,6 +98,18 @@ sub BUILD {
         }
     ));
     
+    # Create a route for the metadata endpoint.
+    if ($self->config->{metadata_endpoint}) {
+        $self->app->add_route(
+            method  => 'get',
+            regexp  => $self->config->{metadata_endpoint},
+            code    => sub {
+                $self->dsl->content_type('application/xml');
+                return $self->_spid->metadata;
+            },
+        );
+    }
+    
     # Create a route for the login endpoint.
     # This endpoint initiates SSO through the user-chosen Identity Provider.
     $self->app->add_route(
@@ -128,7 +138,7 @@ sub BUILD {
     
             # Save the ID of the Authnreq so that we can check it in the response
             # in order to prevent forgery.
-            $self->dsl->session('__spid_authnreq_id' => $authnreq->id);
+            $self->dsl->session('__spid_authnreq_id' => $authnreq->ID);
             
             # Save the redirect destination to be used after successful login.
             $self->dsl->session('__spid_sso_redirect' => $jwt->{redirect} || '/');
@@ -147,8 +157,8 @@ sub BUILD {
         code    => sub {
             # Parse and verify the incoming assertion. This may throw exceptions so we
             # enclose it in an eval {} block.
-            my $assertion = eval {
-                $self->_spid->parse_assertion(
+            my $response = eval {
+                $self->_spid->parse_response(
                     $self->dsl->param('SAMLResponse'),
                     $self->dsl->session('__spid_authnreq_id'),  # Match the ID of our authentication request for increased security.
                 );
@@ -164,29 +174,34 @@ sub BUILD {
             # - unavailable SPID level
             
             # In case of SSO failure, display an error page.
-            if (!$assertion) {
+            if (!$response) {
                 $self->dsl->warning("Bad Assertion received: $@");
                 $self->dsl->status(400);
                 $self->dsl->content_type('text/plain');
                 return "Bad Assertion: $@";
             }
             
-            # Login successful! Initialize our application session and store
-            # the SPID information for later retrieval.
-            # $assertion->spid_session is a Net::SPID::Session object which is a
-            # simple hashref thus it's easily serializable.
-            # TODO: this should be stored in a database instead of the current Dancer
-            # session, and it should be indexed by SPID SessionID so that we can delete
-            # it when we get a LogoutRequest from an IdP.
-            $self->dsl->session('__spid_session' => $assertion->spid_session);
+            if ($response->success) {
+                # Login successful! Initialize our application session and store
+                # the SPID information for later retrieval.
+                # $response->spid_session is a Net::SPID::Session object which is a
+                # simple hashref thus it's easily serializable.
+                # TODO: this should be stored in a database instead of the current Dancer
+                # session, and it should be indexed by SPID SessionID so that we can delete
+                # it when we get a LogoutRequest from an IdP.
+                $self->dsl->session('__spid_session' => $response->spid_session);
             
-            # TODO: handle SPID level upgrade:
-            # - does session ID remain the same? better assume it changes
+                # TODO: handle SPID level upgrade:
+                # - does session ID remain the same? better assume it changes
+                $self->execute_plugin_hook('after_login');
+            } else {
+                $self->dsl->session('__spid_session' => undef);
+                $self->execute_plugin_hook('after_failed_login');
+            }
             
+            # Regardless of the login result, redirect user to the saved destination
             $self->dsl->redirect($self->dsl->session('__spid_sso_redirect'));
             $self->dsl->session('__spid_sso_redirect' => undef);
-            
-            $self->execute_plugin_hook('after_login');
         },
     );
     
@@ -207,7 +222,7 @@ sub BUILD {
             
             # Save the ID of the LogoutRequest so that we can check it in the response
             # in order to prevent forgery.
-            $self->dsl->session('__spid_logoutreq_id' => $logoutreq->id);
+            $self->dsl->session('__spid_logoutreq_id' => $logoutreq->ID);
             
             # Redirect user to the Identity Provider for logout.
             $self->dsl->redirect($logoutreq->redirect_url, 302);
@@ -224,15 +239,13 @@ sub BUILD {
         regexp  => $self->config->{slo_endpoint},
         code    => sub {
             if ($self->dsl->param('SAMLResponse') && $self->dsl->session('__spid_logoutreq_id')) {
-                my $response = eval {
+                my $logoutres = eval {
                     $self->_spid->parse_logoutresponse(
                         $self->dsl->param('SAMLResponse'),
+                        $self->dsl->request->uri,
                         $self->dsl->session('__spid_logoutreq_id'),
                     )
                 };
-                
-                # Clear the ID of the outgoing LogoutRequest, regardless of whether we accept the response or not.
-                $self->dsl->session('spid_logoutreq_id' => undef);
                 
                 if ($@) {
                     $self->dsl->warning("Bad LogoutResponse received: $@");
@@ -242,16 +255,20 @@ sub BUILD {
                 }
                 
                 # Call the hook *before* clearing spid_session.
-                $self->execute_plugin_hook('after_logout', $response->success);
+                $self->execute_plugin_hook('after_logout', $logoutres->status);
                 
                 # Logout was successful! Clear the local session.
+                $self->dsl->session('__spid_logoutreq_id' => undef);
                 $self->dsl->session('__spid_session' => undef);
                 
                 # Redirect user back to main page.
                 $self->dsl->redirect('/');
             } elsif ($self->dsl->param('SAMLRequest')) {
-                my $request = eval {
-                    $spid->parse_logoutrequest($self->dsl->param('SAMLRequest'))
+                my $logoutreq = eval {
+                    $spid->parse_logoutrequest(
+                        $self->dsl->param('SAMLRequest'),
+                        $self->dsl->request->uri,
+                    )
                 };
                 
                 if ($@) {
@@ -262,13 +279,13 @@ sub BUILD {
                 }
                 
                 # Now we should retrieve the local session corresponding to the SPID
-                # session $request->session. However, since we are implementing a HTTP-POST
+                # session $logoutreq->session. However, since we are implementing a HTTP-POST
                 # binding, this HTTP request comes from the user agent so the current Dancer
                 # session is automatically the right one. This simplifies things a lot as
                 # retrieving another session by SPID session ID is tricky without a more
                 # complex architecture.
                 my $status = 'success';
-                if ($request->session eq $self->spid_session->session) {
+                if ($logoutreq->session eq $self->spid_session->session) {
                     # Call the hook *before* clearing spid_session.
                     $self->execute_plugin_hook('after_logout', 'success');
                     
@@ -277,16 +294,15 @@ sub BUILD {
                     $status = 'partial';
                     $self->dsl->warning(
                         sprintf "SAML LogoutRequest session (%s) does not match current SPID session (%s)",
-                            $request->session, $self->spid_session->session
+                            $logoutreq->session, $self->spid_session->session
                     );
                 }
                 
                 # Craft a LogoutResponse and send it back to the Identity Provider.
-                my $idp = $self->_spid->get_idp($request->issuer);
-                my $response = $idp->logoutresponse(in_response_to => $request->id, status => $status);
+                my $logoutres = $logoutreq->make_response(status => $status);
     
                 # Redirect user to the Identity Provider; it will continue handling the logout process.
-                $self->dsl->redirect($response->redirect_url, 302);
+                $self->dsl->redirect($logoutres->redirect_url, 302);
             } else {
                 $self->dsl->status(400);
             }
@@ -308,7 +324,7 @@ Dancer2::Plugin::SPID - SPID authentication for Dancer2 web applications
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -346,6 +362,10 @@ Configuration options can be set in the Dancer2 config file:
         sp_entityid: "https://www.prova.it/"
         sp_key_file: "sp.key"
         sp_cert_file: "sp.pem"
+        sp_assertionconsumerservice:
+          - "http://localhost:3000/spid-sso"
+        sp_singlelogoutservice:
+          "http://localhost:3000/spid-slo": "HTTP-Redirect"
         idp_metadata_dir: "idp_metadata/"
         login_endpoint: "/spid-login"
         logout_endpoint: "/spid-logout"
@@ -366,6 +386,26 @@ Configuration options can be set in the Dancer2 config file:
 
 (Required.) The absolute or relative file path to our certificate file.
 
+=item I<sp_assertionconsumerservice>
+
+An arrayref with the URL(s) of our AssertionConsumerService endpoint(s). It is used for metadata generation and for validating the C<Destination> XML attribute of the incoming responses.
+
+=item I<sp_singlelogoutservice>
+
+A hashref with the URL(s) of our SingleLogoutService endpoint(s), along with the specification of the binding. It is used for metadata generation and for validating the C<Destination> XML attribute of the incoming responses.
+
+=item I<sp_attributeconsumingservice>
+
+(Optional.) An arrayref with the AttributeConsumingServices to list in metadata, each one described by a C<servicename> and a list of C<attributes>. This is optional as it's only used for metadata generation.
+
+    sp_attributeconsumingservice:
+      - servicename: "Service 1"
+        attributes:
+          - "fiscalNumber"
+          - "name"
+          - "familyName"
+          - "dateOfBirth"
+
 =item I<idp_metadatadir>
 
 (Required.) The absolute or relative path to a directory containing metadata files for Identity Providers in XML format (their file names are expected to end in C<.xml>).
@@ -385,6 +425,10 @@ Configuration options can be set in the Dancer2 config file:
 =item I<slo_endpoint>
 
 (Required.) The relative HTTP path we want to expose as SingleLogoutService. This must match the URL advertised in the Service Provider metadata.
+
+=item I<metadata_endpoint>
+
+(Optional.) The relative HTTP path we want to use for publishing our SP metadata. If omitted, no endpoint will be exposed.
 
 =item I<jwt_secret>
 
@@ -460,7 +504,7 @@ This hook is called when the login endpoint is called (i.e. the SPID button is c
 
 =head2 after_login
 
-This hook is called after the user returns to us after initiating the SPID session with the Identity Provider.
+This hook is called after the user returns to us after a successful SPID login.
 
     hook 'plugin.SPID.after_login' => sub {
         info "User " . spid_session->nameid . " logged in";
@@ -474,6 +518,15 @@ This hook is called after the user returns to us after initiating the SPID sessi
         # permanent way than regular Dancer logs, so you'd better use a database
         # or a dedicated log file.
         info "SPID Assertion: " . spid_session->assertion_xml;
+    };
+
+=head2 after_failed_login
+
+This hook is called after the user returns to us after a failed SPID login. The SAML C<StatusCode> value is supplied as first argument. You can use this hook in order to display the correct error message according the error.
+
+    hook 'plugin.SPID.after_failed_login' => sub {
+        my $statuscode = shift;
+        info "SPID login failed: $statuscode";
     };
 
 =head2 before_logout

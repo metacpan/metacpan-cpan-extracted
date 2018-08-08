@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::BusPirate::Mode );
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Carp;
 

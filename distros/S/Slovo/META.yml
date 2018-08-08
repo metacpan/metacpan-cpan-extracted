@@ -19,6 +19,7 @@ no_index:
     - inc
     - t
 requires:
+  Class::Method::Modifiers: '2.12'
   Cpanel::JSON::XS: '4.04'
   Mojo::SQLite: '3.001'
   Mojolicious: '7.89'
@@ -32,5 +33,5 @@ resources:
   homepage: https://github.com/kberov/Slovo
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/kberov/Slovo.git
-version: v2018.08.00
+version: v2018.08.08
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

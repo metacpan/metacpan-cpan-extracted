@@ -32,7 +32,7 @@ sub test_events {
     subtest "$name events" => sub {
 
     # test resulting events
-    is $es->events->length => 3, 'Got 3 events';
+    is $es->events->size => 3, 'Got 3 events';
     my $e1 = $es->events->events->[0];
     is $e1->name => 'FooTested', 'Correct first event name';
     is_deeply $e1->data => {name => 'test_field'},
@@ -58,7 +58,7 @@ test_events(Prepared => $es);
 
 # store and load roundtrip
 my $tmp_fn = tmpnam;
-$es->store($tmp_fn);
+$es->store_to_file($tmp_fn);
 my $nes = EventStore::Tiny->new_from_file($tmp_fn);
 isa_ok $nes => 'EventStore::Tiny';
 

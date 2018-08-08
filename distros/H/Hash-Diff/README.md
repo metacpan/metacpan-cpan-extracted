@@ -1,6 +1,6 @@
 # Hash-Diff [![Build Status](https://travis-ci.org/bolav/hash-diff.svg?branch=master)](https://travis-ci.org/bolav/hash-diff)
 
-Hash::Diff returns the diffrence between to hashes as a hash.
+Hash::Diff returns the difference between two hashes as a hash.
 
 
 ## INSTALLATION

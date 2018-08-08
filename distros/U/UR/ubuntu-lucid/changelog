@@ -1,3 +1,18 @@
+libur-perl (0.47-1) unstable; urgency=low
+
+  * Fixed test breakage from changes in the JSON serialzer for Views
+  * Fixed test breakage from behavior changes in Perl 5.26 and 5.28
+  * Other misc bug fixes
+
+ -- Anthony Brummett <brummett@cpan.org>  Sun, 5 Aug 2018 14:30:00 -600
+
+libur-perl (0.46-1) unstable; urgency=low
+
+  * Documentation fixes
+  * Bug fixes for the mysql data source
+
+ -- Anthony Brummett <brummett@cpan.org>  Fri, 24 Mar 2017 14:59:00 -600
+
 libur-perl (0.45-1) unstable; urgency=low
 
   * UR now supports Roles.  See the docs in UR::Role.

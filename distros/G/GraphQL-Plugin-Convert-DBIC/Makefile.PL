@@ -11,7 +11,7 @@ WriteMakefile(
   LICENSE          => 'artistic_2',
   MIN_PERL_VERSION => '5.014',
   CONFIGURE_REQUIRES => {
-    'ExtUtils::MakeMaker' => '0',
+    'ExtUtils::MakeMaker' => '6.64', # TEST_REQUIRES
   },
   TEST_REQUIRES => {
     'Test::More' => '0.98',
@@ -23,6 +23,8 @@ WriteMakefile(
   PREREQ_PM => {
     'DBIx::Class::Schema' => 0,
     'GraphQL' => '0.21', # DateTime scalar type
+    'SQL::Translator' => '0',
+    'Lingua::EN::Inflect::Number' => '0',
   },
   clean => { FILES => 'GraphQL-Plugin-Convert-DBIC-*' },
   META_MERGE => {

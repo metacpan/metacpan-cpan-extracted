@@ -6,7 +6,7 @@ require UR;
 
 # Used during bootstrapping.
 our @ISA = qw(UR::Object);
-our $VERSION = "0.46"; # UR $VERSION;;
+our $VERSION = "0.47"; # UR $VERSION;
 
 our @CARP_NOT = qw( UR::Object UR::Context  UR::ModuleLoader Class::Autouse UR::BoolExpr );
 

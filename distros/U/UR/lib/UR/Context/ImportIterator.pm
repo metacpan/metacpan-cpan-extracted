@@ -8,7 +8,7 @@ package UR::Context;
 use strict;
 use warnings;
 
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 
 # A wrapper around the method of the same name in UR::DataSource::* to iterate over the
@@ -638,7 +638,7 @@ sub _create_import_iterator_for_underlying_context {
                         # The last time this happened, it was because a get() was done on an abstract
                         # base class with only 'id' as a param.  When the subclassified rule was
                         # turned into SQL in UR::DataSource::QueryPlan()
-                        # it removed that one 'id' filter, since it assummed any class with more than
+                        # it removed that one 'id' filter, since it assumed any class with more than
                         # one ID property (usually classes have a named whatever_id property, and an alias 'id'
                         # property) will have a rule that covered both ID properties
                         Carp::carp("Leftover objects in subordinate iterator for $class.  This shouldn't happen, but it's not fatal...");

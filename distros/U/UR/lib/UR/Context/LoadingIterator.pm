@@ -7,7 +7,7 @@ use UR::Context;
 
 use List::MoreUtils qw(any);
 
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 # A helper package for UR::Context to handling queries which require loading
 # data from outside the current context.  It is responsible for collating 

@@ -72,6 +72,6 @@
          "web" : "https://github.com/nigelhorne/CGI-Buffer"
       }
    },
-   "version" : "0.81",
+   "version" : "0.82",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,9 +1,55 @@
 ==================================================
-Changes from 2017-02-07 00:00:00 +0000 to present.
+Changes from 2017-08-06 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.10 at 2018-02-07 09:50:23 +0000
+version 0.11 at 2018-08-06 19:23:46 +0000
+-----------------------------------------
+
+  Change: ed7efef88cece543d593c586293c92875b2276f4
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 21:23:22 +0000
+
+    Skip tests for deps in TravisCI 
+
+  Change: b96056c189625ae29ebf202f4be64f078f1f6607
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 21:22:33 +0000
+
+    Apply some nice Bootstrap to the example app 
+
+  Change: 740adaba378f7ce475bd2e934368821328828f89
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 21:06:58 +0000
+
+    Added metadata_endpoint 
+
+  Change: 7dfe9b4a6cd609cab24513ec2bae1fdc4b810897
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 21:02:10 +0000
+
+    Update to the newest Net::SPID API 
+
+  Change: 486cc691cd3a4125ea061532467baddafeed8608
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-08-06 20:27:12 +0000
+
+    Update example key and cert 
+
+  Change: 4698bd2590cc013b44cc37554109d103edf56d34
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-02-07 12:15:26 +0000
+
+    Fix module name in README 
+
+  Change: 700165cc6c04ef6001fe1b5c1ef4e498e9e08678
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-02-07 11:28:53 +0000
+
+    Added link to CPAN and TravisCI 
+
+-----------------------------------------
+version 0.10 at 2018-02-07 09:50:02 +0000
 -----------------------------------------
 
   Change: 20add8cd5dbae10ab4d19789d31fe0dc927db1b3

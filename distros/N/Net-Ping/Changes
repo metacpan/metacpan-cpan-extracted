@@ -1,6 +1,16 @@
 CHANGES
 -------
 
+2.70  Tue Aug  7 10:33:24 CEST 2018 (rurban)
+       Test fixes
+       - Fix broken skip count on 510_ping_udp.t (windows only)
+
+2.69  Mon Aug  6 15:13:25 CEST 2018 (rurban)
+       Test fixes
+       - Allow NET_PING_FAIL_IP override for testing an IP which should not exist,
+         RT #126006 hmbrand
+       META Changes
+       - Updated README
 
 2.68  Wed Jun 27 11:55:06 CEST 2018 (rurban)
        Bugfixes

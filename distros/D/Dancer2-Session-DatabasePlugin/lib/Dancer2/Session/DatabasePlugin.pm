@@ -9,7 +9,7 @@ use Carp qw(croak);
 use Ref::Util qw(is_plain_hashref);
 use Storable qw(nfreeze thaw);
 with 'Dancer2::Core::Role::SessionFactory';
-our $VERSION=1.0006;
+our $VERSION=1.0007;
 
 our $CACHE={};
 

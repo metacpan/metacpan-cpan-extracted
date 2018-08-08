@@ -43,6 +43,12 @@ hook 'plugin.SPID.after_login' => sub {
     info "SPID Assertion: " . spid_session->assertion_xml;
 };
 
+# This hook is called after a failed SPID login.
+hook 'plugin.SPID.after_failed_login' => sub {
+    my $statuscode = shift;
+    info "SPID login failed: $statuscode";
+};
+
 # This hook is called when the logout endpoint is called and the LogoutRequest
 # is about to be crafted.
 hook 'plugin.SPID.before_logout' => sub {

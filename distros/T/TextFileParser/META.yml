@@ -1,0 +1,33 @@
+---
+abstract: 'an extensible Perl class to parse any text file by specifying grammar in derived classes.'
+author:
+  - 'Balaji Ramasubramanian <balajiram@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  parent: '0'
+  perl: '5.012'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.012'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TextFileParser
+requires:
+  Exception::Class: '0'
+  Exporter: '0'
+  Try::Tiny: '0'
+  perl: '5.012'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=TextFileParser
+version: '0.202'
+x_contributors:
+  - 'Balaji Ramasubramanian <balaji.ramasubramanian@gmail.com>'
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

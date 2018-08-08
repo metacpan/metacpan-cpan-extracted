@@ -32,10 +32,12 @@ BEGIN {
 #
 # $ PERL_CORE=1 make test
 
+# Hopefully this is never a routeable host
+my $fail_ip = $ENV{NET_PING_FAIL_IP} || "172.29.249.249";
+
 # Try a few remote servers
 my %webs = (
-  # Hopefully this is never a routeable host
-  "172.29.249.249" => 0,
+  $fail_ip => 0,
 
   # Hopefully all these web ports are open
   "yahoo.com." => 1,

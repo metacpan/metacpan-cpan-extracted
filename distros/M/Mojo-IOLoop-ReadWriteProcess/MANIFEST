@@ -31,6 +31,9 @@ lib/Mojo/IOLoop/ReadWriteProcess/Namespace.pm
 lib/Mojo/IOLoop/ReadWriteProcess/Pool.pm
 lib/Mojo/IOLoop/ReadWriteProcess/Queue.pm
 lib/Mojo/IOLoop/ReadWriteProcess/Session.pm
+lib/Mojo/IOLoop/ReadWriteProcess/Shared/Lock.pm
+lib/Mojo/IOLoop/ReadWriteProcess/Shared/Memory.pm
+lib/Mojo/IOLoop/ReadWriteProcess/Shared/Semaphore.pm
 minil.toml
 t/00_compile.t
 t/01_run.t
@@ -46,6 +49,7 @@ t/10_cgroupv1.t
 t/10_cgroupv2.t
 t/11_containers.t
 t/12_mocked_container.t
+t/13_shared.t
 t/data/process_check.sh
 t/data/subreaper/child.sh
 t/data/subreaper/dead_child.sh

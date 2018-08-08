@@ -76,7 +76,7 @@ sub _build_all_sub_commands {
 
     my $full_ref_path = $base_path . '/' . $ref_path;
 
-    my @target_paths = glob("$full_ref_path/*.pm");
+    my @target_paths = glob("\Q$full_ref_path\E/*.pm");
 
     my @target_class_names;
     for my $target_path (@target_paths) {

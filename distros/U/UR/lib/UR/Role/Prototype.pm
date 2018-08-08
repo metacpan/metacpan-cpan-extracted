@@ -14,7 +14,7 @@ use List::MoreUtils qw(any);
 use Carp;
 our @CARP_NOT = qw(UR::Object::Type);
 
-our $VERSION = "0.46"; # UR $VERSION;;
+our $VERSION = "0.47"; # UR $VERSION;
 
 UR::Object::Type->define(
     class_name => 'UR::Role::Prototype',

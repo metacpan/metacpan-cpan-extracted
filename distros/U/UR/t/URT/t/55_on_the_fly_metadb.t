@@ -11,7 +11,7 @@ use Sub::Install;
 use strict;
 use warnings;
 
-# This test assummes the storage DB schema already exists, but that the metaDB has
+# This test assumes the storage DB schema already exists, but that the metaDB has
 # no record of it.  
 
 plan tests => 20;

@@ -45,6 +45,7 @@ is($age2->__display_name__, "22 yrs", "$age2 has id " . $age2->id . " and displa
 ## entity data types
 class Acme::Animal {
     has => [
+        id      => { is => 'Integer' },
         name    => { is => 'Text' },
         age     => { is => 'Years' },
     ]

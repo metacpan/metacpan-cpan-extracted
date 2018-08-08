@@ -2242,7 +2242,6 @@ lib/typemap.rperl
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.json
 README
 README.md
 script/demo/bubble_sort.pl
@@ -2325,3 +2324,4 @@ t/20_compile_oo_inherit.t.empty
 t/22_compile_execute.t.not_ready_yet
 THANKS
 META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

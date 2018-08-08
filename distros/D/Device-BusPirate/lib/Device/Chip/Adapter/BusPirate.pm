@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
 
 package Device::Chip::Adapter::BusPirate;
 
@@ -9,7 +9,9 @@ use strict;
 use warnings;
 use base qw( Device::Chip::Adapter );
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
+
+use Carp;
 
 use Device::BusPirate;
 
@@ -47,6 +49,7 @@ sub new
 
    bless {
       bp => $bp,
+      mode => undef,
    }, $class;
 }
 
@@ -63,11 +66,19 @@ sub new_from_description
 This module provides no new methods beyond the basic API documented in
 L<Device::Chip::Adapter/METHODS> at version 0.01.
 
+Since version I<NEXT> this module now supports multiple instances of the I2C
+protocol, allowing multiple chips to be shared on the same bus.
+
 =cut
+
+sub _modename { return ( ref($_[0]) =~ m/.*::(.*?)$/ )[0] }
 
 sub make_protocol_GPIO
 {
    my $self = shift;
+
+   $self->{mode} and
+      croak "Cannot enter GPIO protocol when " . _modename( $self->{mode} ) . " already active";
 
    $self->{bp}->enter_mode( "BB" )->then( sub {
       my ( $mode ) = @_;
@@ -84,6 +95,9 @@ sub make_protocol_SPI
 {
    my $self = shift;
 
+   $self->{mode} and
+      croak "Cannot enter SPI protocol when " . _modename( $self->{mode} ) . " already active";
+
    $self->{bp}->enter_mode( "SPI" )->then( sub {
       my ( $mode ) = @_;
       $self->{mode} = $mode;
@@ -95,19 +109,33 @@ sub make_protocol_SPI
    });
 }
 
+sub _enter_mode_I2C
+{
+   my $self = shift;
+
+   return Future->done( $self->{mode} ) if
+      $self->{mode} and _modename( $self->{mode} ) eq "I2C";
+
+   $self->{mode} and
+      croak "Cannot enter I2C protocol when " . _modename( $self->{mode} ) . " already active";
+
+   return $self->{bp}->enter_mode( "I2C" )->then( sub {
+      my ( $mode ) = @_;
+      $self->{mode} = $mode;
+
+      $mode->configure( open_drain => 1 )->then_done( $mode );
+   });
+}
+
 sub make_protocol_I2C
 {
-    my $self = shift;
+   my $self = shift;
 
-    $self->{bp}->enter_mode( "I2C" )->then( sub {
-        my ( $mode ) = @_;
-        $self->{mode} = $mode;
+   $self->_enter_mode_I2C->then( sub {
+      my ( $mode ) = @_;
 
-        $mode->configure( open_drain => 1 )
-            ->then_done(
-                Device::Chip::Adapter::BusPirate::_I2C->new( $mode )
-            );
-    });
+      return Future->done( Device::Chip::Adapter::BusPirate::_I2C->new( $mode ) );
+   });
 }
 
 sub shutdown

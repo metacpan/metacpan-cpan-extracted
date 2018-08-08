@@ -59,10 +59,10 @@ sub update_all ( $self ) {
     # update TLD
     print 'updating tld.dat ... ';
 
-    if ( my $res = P->http->get( 'https://data.iana.org/TLD/tlds-alpha-by-domain.txt', buf_size => 0, on_progress => 0 ) ) {
+    if ( my $res = P->http->get('https://data.iana.org/TLD/tlds-alpha-by-domain.txt') ) {
         my $domains;
 
-        for my $domain_ascii ( map {lc} grep { $_ && !/\A\s*#/sm } split /\n/sm, $res->{body}->$* ) {
+        for my $domain_ascii ( map {lc} grep { $_ && !/\A\s*#/sm } split /\n/sm, $res->{data}->$* ) {
             $domains->{$domain_ascii} = domain_to_utf8($domain_ascii);
         }
 
@@ -81,12 +81,12 @@ sub update_all ( $self ) {
     # update pub. suffixes, should be updated after TLDs
     print 'updating pub_suffix.dat ... ';
 
-    if ( my $res = P->http->get( 'https://publicsuffix.org/list/effective_tld_names.dat', buf_size => 0, on_progress => 0 ) ) {
+    if ( my $res = P->http->get('https://publicsuffix.org/list/effective_tld_names.dat') ) {
         my $suffixes = {};
 
-        decode_utf8 $res->{body}->$*;
+        decode_utf8 $res->{data}->$*;
 
-        for my $domain_utf8 ( split /\n/sm, $res->{body}->$* ) {
+        for my $domain_utf8 ( split /\n/sm, $res->{data}->$* ) {
 
             # remove spaces
             $domain_utf8 =~ s/\s//smg;

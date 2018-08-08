@@ -1,8 +1,23 @@
 package EventStore::Tiny::Snapshot;
-use Mo qw(default required );
 
-has state       => (required => 1);
-has timestamp   => (required => 1, is => 'ro');
+use strict;
+use warnings;
+
+use Class::Tiny {
+    state       => sub {die "state is required.\n"},
+    timestamp   => sub {die "timestamp is required.\n"},
+};
+
+sub BUILD {
+    my $self = shift;
+
+    # Check non-lazy
+    $self->state;
+    $self->timestamp;
+
+    # Return nothing (will be ignored anyway)
+    return;
+}
 
 1;
 

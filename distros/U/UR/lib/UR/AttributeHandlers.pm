@@ -6,7 +6,7 @@ use attributes;
 
 our @CARP_NOT = qw(UR::Namespace);
 
-our $VERSION = "0.46"; # UR $VERSION;;
+our $VERSION = "0.47"; # UR $VERSION;
 
 # implement's UR's mechanism for sub/variable attributes.
 my %support_functions = (

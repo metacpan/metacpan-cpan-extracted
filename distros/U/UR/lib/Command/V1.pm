@@ -10,7 +10,7 @@ use Getopt::Long;
 use Term::ANSIColor qw();
 require Text::Wrap;
 
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 UR::Object::Type->define(
     class_name => __PACKAGE__,
@@ -1275,7 +1275,7 @@ sub sub_command_classes {
     return unless @paths;
     @paths =
         grep { s/\.pm$// }
-        map { glob("$_/*") }
+        map { glob("\Q$_\E/*") }
         grep { -d $_ }
         grep { defined($_) and length($_) }
         @paths;

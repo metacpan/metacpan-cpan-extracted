@@ -141,6 +141,7 @@ lib/RapidApp/Test.pm
 lib/RapidApp/Test/Client.pm
 lib/RapidApp/Test/EnvUtil.pm
 lib/RapidApp/Util.pm
+lib/RapidApp/Util/Hash/Merge.pm
 lib/RapidApp/Util/MetaKeys.pm
 lib/RapidApp/Util/MetaKeys/FK.pm
 lib/RapidApp/Util/MetaKeys/Loader.pm

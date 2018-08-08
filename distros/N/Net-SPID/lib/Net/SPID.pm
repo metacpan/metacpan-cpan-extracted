@@ -1,5 +1,5 @@
 package Net::SPID;
-$Net::SPID::VERSION = '0.12';
+$Net::SPID::VERSION = '0.15';
 # ABSTRACT: SPID implementation for Perl
 use strict;
 use warnings;
@@ -35,7 +35,7 @@ Net::SPID - SPID implementation for Perl
 
 =head1 VERSION
 
-version 0.12
+version 0.15
 
 =head1 SYNOPSIS
 

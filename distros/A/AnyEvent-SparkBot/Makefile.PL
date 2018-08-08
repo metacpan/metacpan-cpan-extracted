@@ -13,7 +13,7 @@ WriteMakefile(
       overload 1.28
       Modern::Perl 1.20170117
       MooX::Types::MooseLike::Base 0.29
-      Carp 1.42
+      Carp 1.38
       namespace::clean 0.27
       Data::Dumper  2.161
       Test::More    1.302073

@@ -1,6 +1,6 @@
 package UR::Object::Command::List::Style;
 
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 sub new {
     my ($class, %args) = @_;

@@ -11,7 +11,7 @@ use List::Util qw(reduce);
 use Command::V2;
 use Carp qw();
 
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 class UR::Object::Command::List {
     is => 'Command::V2',

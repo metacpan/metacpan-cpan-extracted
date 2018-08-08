@@ -11,17 +11,16 @@ sub isWindowsVista {
    #is this Vista or later?
    my ($string, $major, $minor, $build, $id) = Win32::GetOSVersion();
    return $build >= 6;
-
 }
 
 use Test::More tests => 3;
 BEGIN {use_ok('Net::Ping')};
 
 SKIP: {
-    skip "No udp echo port", 1 unless getservbyname('echo', 'udp');
-    skip "udp ping blocked by Window's default settings", 1 if isWindowsVista();
-    skip "No getprotobyname", 1 unless $Config{d_getpbyname};
-    skip "Not allowed on $^O", 1 if $^O =~ /^(hpux|irix|aix)$/;
+    skip "No udp echo port", 2 unless getservbyname('echo', 'udp');
+    skip "udp ping blocked by Window's default settings", 2 if isWindowsVista();
+    skip "No getprotobyname", 2 unless $Config{d_getpbyname};
+    skip "Not allowed on $^O", 2 if $^O =~ /^(hpux|irix|aix)$/;
     my $p = new Net::Ping "udp";
     # message_type can't be used
     eval {

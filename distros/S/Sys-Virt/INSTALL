@@ -5,20 +5,16 @@ Sys::Virt requires that libvirt already be installed on the
 system. The libvirt libraries and header files are located using
 the pkg-config database. If libvirt is installed to a prefix
 other than /usr, then be sure to set the PKG_CONFIG_PATH environment
-variable before building this module.
-
-Regular installation:
-
-  $ perl Makefile.PL
-  $ make
-  $ sudo make install
-
-
-Install from non-standard location
+variable before building this module:
 
   $ export PKG_CONFIG_PATH=/some/prefix/lib/pkgconfig
-  $ perl Makefile.PL
-  $ make
-  $ sudo make install
+
+Then follow the standard procedure for a Module::Build based
+installation:
+
+  $ perl Build.PL
+  $ ./Build
+  $ ./Build test
+  $ sudo ./Build install
 
 -- End

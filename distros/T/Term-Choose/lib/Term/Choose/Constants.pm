@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.610';
+our $VERSION = '1.622';
 
 use Exporter qw( import );
 
@@ -37,7 +37,7 @@ our %EXPORT_TAGS = (
         NEXT_get_key
         CONTROL_SPACE CONTROL_A CONTROL_B CONTROL_C CONTROL_D CONTROL_E CONTROL_F CONTROL_H KEY_BTAB CONTROL_I KEY_TAB
         KEY_ENTER KEY_SPACE KEY_h KEY_j KEY_k KEY_l KEY_q KEY_Tilde KEY_BSPACE
-        VK_PAGE_UP VK_PAGE_DOWN VK_END VK_HOME VK_LEFT VK_UP VK_RIGHT VK_DOWN
+        VK_PAGE_UP VK_PAGE_DOWN VK_END VK_HOME VK_LEFT VK_UP VK_RIGHT VK_DOWN VK_INSERT VK_DELETE
     ) ],
     form => [ qw(
         NEXT_get_key

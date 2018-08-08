@@ -1,7 +1,7 @@
 package Log::ger::App;
 
-our $DATE = '2018-01-17'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-08-07'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -75,10 +75,11 @@ sub import {
         last if $is_daemon;
         my $level = _level_from_env("SCREEN_");
         last if defined $level && $level eq 'off';
+        my $fmt = ($ENV{LOG_ADD_TIMESTAMP} ? '[%d] ': ''). '%m';
         $conf{outputs}{Screen} = {
             conf   => { formatter => sub { "$progname: $_[0]" } },
             level  => $level,
-            #layout => [Pattern => {format => '%m'}],
+            layout => [Pattern => {format => $fmt}],
         };
     }
 
@@ -133,7 +134,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -207,6 +208,11 @@ configuration.
 =back
 
 =head1 ENVIRONMENT
+
+=head2 LOG_ADD_TIMESTAMP
+
+Boolean. Default to false. If set to true, will add timestamps to the screen
+log. Normally, timestamps will only be added to the file log.
 
 =head2 LOG_LEVEL => str
 

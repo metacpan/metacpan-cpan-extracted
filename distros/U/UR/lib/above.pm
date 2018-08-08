@@ -65,6 +65,7 @@ sub use_package {
     my $dev = _dev($cwd);
     my $abort_crawl = sub {
         my @parts = @_;
+        return 1 if (@parts == 0); # nothing left to try
         return 1 if (@parts == 1 && $parts[0] eq ''); # hit root dir
         my $path = File::Spec->join(@parts);
         return !($xdev || _dev($path) == $dev); # crossed device

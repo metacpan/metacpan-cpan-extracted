@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.070   2018-08-07
+        - The Insert key goes back 25 pages, the Delete key goes forward 25 pages.
+        - "Term::Choose": minimum version "1.621".
+
 0.069   2018-07-15
         - Hide the cursor.
         - Bugfix in backup self.

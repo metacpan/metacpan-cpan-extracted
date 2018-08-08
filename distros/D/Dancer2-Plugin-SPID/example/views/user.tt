@@ -1,9 +1,16 @@
-<h1>User: [% spid_session.nameid %]</h1>
-<h2>SPID Level: [% spid_session.spid_level %]</h2>
- 
-<p><a href="[% spid_login(level => 2, redirect => '/') %]">Upgrade to L2</a></p>
- 
-<p><a href="[% spid_logout(redirect => '/') %]">Logout</a></p>
+<p>This page shows details about the currently logged user.</p>
+
+[% IF spid_session.level < 2 %]
+<p><a class="btn btn-primary" href="[% spid_login(level => 2, redirect => '/') %]">Upgrade to L2</a></p>
+[% END %]
+
+<p><a class="btn btn-primary" href="[% spid_logout(redirect => '/') %]">Logout</a></p>
+
+<h1>NameID:</h1>
+<p>[% spid_session.nameid %]</p>
+
+<h2>SPID Level:</h2>
+<p>[% spid_session.level %]</p>
  
 <h2>Attributes</h2>
  
@@ -19,3 +26,6 @@
       </tr>
   [% END %]
 </table>
+
+<h2>Assertion:</h2>
+<p><pre>[% spid_session.assertion_xml | html %]</pre></p>

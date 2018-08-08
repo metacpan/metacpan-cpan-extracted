@@ -1,5 +1,7 @@
 .travis.yml
 Changes
+EventStore-Tiny-0.41/META.json
+EventStore-Tiny-0.41/META.yml
 lib/EventStore/Tiny.pm
 lib/EventStore/Tiny/DataEvent.pm
 lib/EventStore/Tiny/Event.pm
@@ -9,11 +11,14 @@ lib/EventStore/Tiny/Snapshot.pm
 LICENSE.txt
 Makefile.PL
 MANIFEST			This list of files
+perlcritic.rc
 README.md
+t/0_qa/critic.t
 t/0_qa/pod.t
 t/0_qa/pod_coverage.t
 t/1_unit/event.t
 t/1_unit/eventstream.t
+t/1_unit/snapshot.t
 t/2_integration/api.t
 t/2_integration/caching.t
 t/2_integration/logging.t

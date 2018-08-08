@@ -18,7 +18,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Bat-Interpreter",
-  "dist_version" => "0.012",
+  "dist_version" => "0.013",
   "license" => "mit",
   "module_name" => "Bat::Interpreter",
   "recursive_test_files" => 1,
@@ -31,7 +31,7 @@ my %module_build_args = (
     "Path::Tiny" => 0,
     "Types::Standard" => 0,
     "namespace::autoclean" => 0,
-    "perl" => "5.012",
+    "perl" => "5.014",
     "utf8" => 0
   },
   "test_requires" => {

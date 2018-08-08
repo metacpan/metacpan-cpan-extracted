@@ -105,12 +105,11 @@ lib/Pcore/Dist/CLI/Update.pm
 lib/Pcore/Dist/CLI/Wiki.pm
 lib/Pcore/HTTP.pm
 lib/Pcore/HTTP/Cookies.pm
-lib/Pcore/HTTP/Headers.pm
 lib/Pcore/HTTP/Response.pm
 lib/Pcore/HTTP/Server.pm
 lib/Pcore/HTTP/Server/Request.pm
-lib/Pcore/HTTP/Util.pm
 lib/Pcore/Handle.pm
+lib/Pcore/Handle/Base.pm
 lib/Pcore/Handle/DBI.pm
 lib/Pcore/Handle/DBI/Const.pm
 lib/Pcore/Handle/DBI/Query/GROUP_BY.pm

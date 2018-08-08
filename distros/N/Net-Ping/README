@@ -261,6 +261,14 @@ DESCRIPTION
         The bind() call can be omitted when specifying the "bind" option to
         new().
 
+    $p->message_type([$ping_type]);
+        When you are using the "icmp" protocol, this call permit to change
+        the message type to 'echo' or 'timestamp' (only for IPv4, see RFC
+        792).
+
+        Without argument, it returns the currently used icmp protocol
+        message type. By default, it returns 'echo'.
+
     $p->open($host);
         When you are using the "stream" protocol, this call pre-opens the
         tcp socket. It's only necessary to do this if you want to provide a
@@ -419,7 +427,7 @@ NOTES
 INSTALL
     The latest source tree is available via git:
 
-      git clone https://github.com/rurban/net-ping.git Net-Ping
+      git clone https://github.com/rurban/Net-Ping.git
       cd Net-Ping
 
     The tarball can be created as follows:
@@ -431,11 +439,12 @@ INSTALL
 BUGS
     For a list of known issues, visit:
 
-    <https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Ping>
+    <https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Ping> and
+    <https://github.com/rurban/Net-Ping/issues>
 
     To report a new bug, visit:
 
-    <https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Ping> (stale)
+    <https://github.com/rurban/Net-Ping/issues>
 
 AUTHORS
       Current maintainers:
@@ -463,7 +472,7 @@ AUTHORS
         mose@ns.ccsn.edu (Russell Mosemann)
 
 COPYRIGHT
-    Copyright (c) 2017, Reini Urban. All rights reserved.
+    Copyright (c) 2017-2018, Reini Urban. All rights reserved.
 
     Copyright (c) 2016, cPanel Inc. All rights reserved.
 

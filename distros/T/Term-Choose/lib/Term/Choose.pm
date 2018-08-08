@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.610';
+our $VERSION = '1.622';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -234,6 +234,10 @@ sub __choose {
     };
     $self->__init_term();
     $self->__write_first_screen();
+    my $fast_page = 25;
+    #if ( $self->{count_pp} > 30_000 ) {
+    #    $fast_page = $self->{count_pp} / 5000 * 5;
+    #}
     my $saved_pos;
 
     GET_KEY: while ( 1 ) {
@@ -265,6 +269,15 @@ sub __choose {
         if ( exists $ENV{TC_RESET_AUTO_UP} ) {
             $ENV{TC_RESET_AUTO_UP} = 1 if $key != KEY_ENTER;
         }
+        my $page_step = 1;
+        if ( $key == VK_INSERT ) {
+            $page_step = $fast_page if $self->{p_begin} - $fast_page * $self->{avail_height} >= 0;
+            $key = VK_PAGE_UP;
+        }
+        elsif ( $key == VK_DELETE ) {
+            $page_step = $fast_page if $self->{p_end} + $fast_page * $self->{avail_height} <= $#{$self->{rc2idx}};
+            $key = VK_PAGE_DOWN;
+        }
         if ( $saved_pos && $key != VK_PAGE_UP && $key != CONTROL_B && $key != VK_PAGE_DOWN && $key != CONTROL_F ) {
             $saved_pos = undef;
         }
@@ -283,7 +296,7 @@ sub __choose {
         # On the other hand the index of the last row of the new list would be $#{$self->{rc2idx}}
         # or the index of the last column in the first row would be $#{$self->{rc2idx}[0]}.
 
-        if ( $key == KEY_j || $key == VK_DOWN ) {
+        if ( $key == VK_DOWN || $key == KEY_j ) {
             if (     ! $self->{rc2idx}[$self->{pos}[ROW]+1]
                   || ! $self->{rc2idx}[$self->{pos}[ROW]+1][$self->{pos}[COL]]
             ) {
@@ -303,7 +316,7 @@ sub __choose {
                 }
             }
         }
-        elsif ( $key == KEY_k || $key == VK_UP ) {
+        elsif ( $key == VK_UP || $key == KEY_k ) {
             if ( $self->{pos}[ROW] == 0 ) {
                 $self->{plugin}->__beep();
             }
@@ -377,7 +390,7 @@ sub __choose {
                 }
             }
         }
-        elsif ( $key == KEY_l || $key == VK_RIGHT ) {
+        elsif ( $key == VK_RIGHT || $key == KEY_l ) {
             if ( $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]} ) {
                 $self->{plugin}->__beep();
             }
@@ -387,7 +400,7 @@ sub __choose {
                 $self->__wr_cell( $self->{pos}[ROW], $self->{pos}[COL] );
             }
         }
-        elsif ( $key == KEY_h || $key == VK_LEFT ) {
+        elsif ( $key == VK_LEFT || $key == KEY_h ) {
             if ( $self->{pos}[COL] == 0 ) {
                 $self->{plugin}->__beep();
             }
@@ -397,48 +410,49 @@ sub __choose {
                 $self->__wr_cell( $self->{pos}[ROW], $self->{pos}[COL] );
             }
         }
-        elsif ( $key == CONTROL_B || $key == VK_PAGE_UP ) {
+        elsif ( $key == VK_PAGE_UP || $key == CONTROL_B ) {
             if ( $self->{p_begin} <= 0 ) {
                 $self->{plugin}->__beep();
             }
             else {
-                $self->{p_begin} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) - 1 );
+                $self->{p_begin} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) - $page_step );
                 $self->{p_end}   = $self->{p_begin} + $self->{avail_height} - 1;
                 if ( $saved_pos ) {
-                    $self->{pos}[ROW] = $saved_pos->[ROW];
+                    $self->{pos}[ROW] = $saved_pos->[ROW] + $self->{p_begin};
                     $self->{pos}[COL] = $saved_pos->[COL];
                     $saved_pos = undef;
                 }
                 else {
-                    $self->{pos}[ROW] -= $self->{avail_height};
+                    $self->{pos}[ROW] -= $self->{avail_height} * $page_step;
                 }
                 $self->__wr_screen();
             }
         }
-        elsif ( $key == CONTROL_F || $key == VK_PAGE_DOWN ) {
+        elsif ( $key == VK_PAGE_DOWN || $key == CONTROL_F ) {
             if ( $self->{p_end} >= $#{$self->{rc2idx}} ) {
                 $self->{plugin}->__beep();
             }
             else {
-                $self->{p_begin} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) + 1 );
+                my $backup_p_begin = $self->{p_begin};
+                $self->{p_begin} = $self->{avail_height} * ( int( $self->{pos}[ROW] / $self->{avail_height} ) + $page_step );
                 $self->{p_end}   = $self->{p_begin} + $self->{avail_height} - 1;
                 $self->{p_end}   = $#{$self->{rc2idx}} if $self->{p_end} > $#{$self->{rc2idx}};
                 if (   $self->{pos}[ROW] + $self->{avail_height} > $#{$self->{rc2idx}}
                     || $self->{pos}[COL] > $#{$self->{rc2idx}[$self->{pos}[ROW] + $self->{avail_height}]}
                 ) {
-                    $saved_pos = [ $self->{pos}[ROW], $self->{pos}[COL] ];
+                    $saved_pos = [ $self->{pos}[ROW] - $backup_p_begin, $self->{pos}[COL] ];
                     $self->{pos}[ROW] = $#{$self->{rc2idx}};
                     if ( $self->{pos}[COL] > $#{$self->{rc2idx}[$self->{pos}[ROW]]} ) {
                         $self->{pos}[COL] = $#{$self->{rc2idx}[$self->{pos}[ROW]]};
                     }
                 }
                 else {
-                    $self->{pos}[ROW] += $self->{avail_height};
+                    $self->{pos}[ROW] += $self->{avail_height} * $page_step;
                 }
                 $self->__wr_screen();
             }
         }
-        elsif ( $key == CONTROL_A || $key == VK_HOME ) {
+        elsif ( $key == VK_HOME || $key == CONTROL_A ) {
             if ( $self->{pos}[COL] == 0 && $self->{pos}[ROW] == 0 ) {
                 $self->{plugin}->__beep();
             }
@@ -451,7 +465,7 @@ sub __choose {
                 $self->__wr_screen();
             }
         }
-        elsif ( $key == CONTROL_E || $key == VK_END ) {
+        elsif ( $key == VK_END || $key == CONTROL_E ) {
             if ( $self->{order} == 1 && $self->{rest} ) {
                 if (    $self->{pos}[ROW] == $#{$self->{rc2idx}} - 1
                      && $self->{pos}[COL] == $#{$self->{rc2idx}[$self->{pos}[ROW]]}
@@ -888,6 +902,7 @@ sub __goto {
 
 sub __prepare_page_number {
     my ( $self ) = @_;
+    #my $total_pp = 0;
     if ( $#{$self->{rc2idx}} / ( $self->{avail_height} + $self->{pp_row} ) > 1 ) {
         my $total_pp = int( $#{$self->{rc2idx}} / $self->{avail_height} ) + 1;
         my $total_pp_w = length $total_pp;
@@ -904,6 +919,7 @@ sub __prepare_page_number {
         $self->{avail_height} += $self->{pp_row};
         $self->{pp_row} = 0;
     }
+    #$self->{count_pp} = $total_pp;
 }
 
 
@@ -1083,7 +1099,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.610
+Version 1.622
 
 =cut
 
@@ -1239,6 +1255,10 @@ the C<Tab> key (or C<Ctrl-I>) to move forward, the C<BackSpace> key (or C<Ctrl-H
 =item *
 
 the C<PageUp> key (or C<Ctrl-B>) to go back one page, the C<PageDown> key (or C<Ctrl-F>) to go forward one page,
+
+=item *
+
+the C<Insert> key to go back 25 pages, the C<Delete> key to go forward 25 pages,
 
 =item *
 
@@ -1493,7 +1513,7 @@ Allowed values: 1 or greater
 
 If defined sets the maximal number of rows used for printing list items.
 
-If the available height is less than I<max_height> I<max_height> is set to the available height.
+If the available height is less than I<max_height> then I<max_height> is set to the available height.
 
 Height in this context means print rows.
 

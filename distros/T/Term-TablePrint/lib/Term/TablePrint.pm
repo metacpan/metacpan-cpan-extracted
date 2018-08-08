@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.069';
+our $VERSION = '0.070';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -608,7 +608,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.069
+Version 0.070
 
 =cut
 
@@ -716,6 +716,10 @@ the C<ArrowDown> key (or the C<j> key) to move down and  the C<ArrowUp> key (or 
 =item *
 
 the C<PageUp> key (or C<Ctrl-B>) to go back one page, the C<PageDown> key (or C<Ctrl-F>) to go forward one page.
+
+=item *
+
+the C<Insert> key to go back 25 pages, the C<Delete> key to go forward 25 pages.
 
 =item *
 

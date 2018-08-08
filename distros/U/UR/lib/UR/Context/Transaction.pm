@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 require UR;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 use Carp qw(croak confess shortmess);
 use constant TRANSACTION_STATE_OPEN => 'open';

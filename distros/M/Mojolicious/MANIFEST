@@ -128,6 +128,7 @@ lib/Mojolicious/resources/public/mojo/logo-black-2x.png
 lib/Mojolicious/resources/public/mojo/logo-black.png
 lib/Mojolicious/resources/public/mojo/logo-white-2x.png
 lib/Mojolicious/resources/public/mojo/logo-white.png
+lib/Mojolicious/resources/public/mojo/logo.png
 lib/Mojolicious/resources/public/mojo/noraptor.png
 lib/Mojolicious/resources/public/mojo/notfound.png
 lib/Mojolicious/resources/public/mojo/pinstripe-dark.png

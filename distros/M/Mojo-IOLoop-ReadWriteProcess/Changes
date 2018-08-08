@@ -1,5 +1,16 @@
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+0.22 2018-08-07T13:29:57Z
+
+   - Disable experimental shared tests by default
+
+0.21 2018-08-07T12:17:21Z
+
+   - Add Experimental Mojo::IOLoop::ReadWriteProcess::Shared::* for IPC (Lock, Memory, Sempahores)
+   - Add possibility to turn off channels only
+   - Fix incorrect handling of return in case internal_pipes is disabled
+   - Provide alternative exit status computation for exotic arches/setup
+
 0.20 2018-03-26T13:32:58Z
 
    - Add preliminar CGroup support

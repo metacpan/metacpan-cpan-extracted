@@ -9,6 +9,9 @@
     Mojo::IOLoop::ReadWriteProcess::Exception
     Mojo::IOLoop::ReadWriteProcess::Queue
     Mojo::IOLoop::ReadWriteProcess::Session
+    Mojo::IOLoop::ReadWriteProcess::Shared::Lock
+    Mojo::IOLoop::ReadWriteProcess::Shared::Semaphore
+    Mojo::IOLoop::ReadWriteProcess::Shared::Memory
     Mojo::IOLoop::ReadWriteProcess::Container
     Mojo::IOLoop::ReadWriteProcess::CGroup
     Mojo::IOLoop::ReadWriteProcess::CGroup::v1

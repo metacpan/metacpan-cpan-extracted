@@ -16,7 +16,7 @@ It's important that the js and JavaScript-SpiderMonkey-v.vv directories
 are at the same level:
 
 $ls
-JavaScript-SpiderMonkey-0.23
+JavaScript-SpiderMonkey-0.XX
 js
 js-1.60.tar.gz
 
@@ -27,7 +27,7 @@ perl Makefile.PL --js_lib_dir /path/to/library/ --js_lib_name js
 
 Next, build JavaScript::SpiderMonkey in the standard way:
 
-cd JavaScript-SpiderMonkey-0.23
+cd JavaScript-SpiderMonkey-0.XX
 perl Makefile.PL
 gmake
 gmake test

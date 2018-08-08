@@ -9,18 +9,90 @@ use strict;
 use warnings;
 use utf8;
 
+BEGIN { push @INC, '.' }
 use builder::UR;
 use File::Basename;
 use File::Spec;
-use CPAN::Meta;
-use CPAN::Meta::Prereqs;
 
 my %args = (
-    license              => 'perl',
+    license              => 'perl_5',
     dynamic_config       => 0,
 
     configure_requires => {
-        'Module::Build' => 0.38,
+        'Module::Build' => '0.4005',
+    },
+
+    requires => {
+        'Carp' => '0',
+        'Class::AutoloadCAN' => '0.03',
+        'Class::Autouse' => '2.0',
+        'Class::Inspector' => '0',
+        'Clone::PP' => '1.02',
+        'Cwd' => '0',
+        'DBD::SQLite' => '1.14',
+        'DBI' => '1.601',
+        'Data::Compare' => '0.13',
+        'Data::Dumper' => '0',
+        'Data::UUID' => '0.148',
+        'Date::Format' => '0',
+        'Devel::GlobalDestruction' => '0',
+        'File::Basename' => '2.73',
+        'File::Path' => '0',
+        'File::Spec' => '0',
+        'File::Temp' => '0',
+        'FreezeThaw' => '0.43',
+        'Getopt::Complete' => '0.26',
+        'Getopt::Long' => '0',
+        'HTTP::Request' => '0',
+        'IO::Dir' => '0',
+        'IO::File' => '0',
+        'IO::Handle' => '0',
+        'IO::Select' => '0',
+        'IO::Socket' => '0',
+        'IO::Socket::INET' => '0',
+        'JSON' => '0',
+        'Lingua::EN::Inflect' => '1.88',
+        'List::MoreUtils' => '0',
+        'List::Util' => '0',
+        'MRO::Compat' => '0',
+        'Module::Runtime' => 'v0.14.0',
+        'Net::HTTPServer' => '0',
+        'Path::Class' => '0',
+        'Plack' => '0',
+        'Pod::Simple::HTML' => '3.03',
+        'Pod::Simple::Text' => '2.02',
+        'Scalar::Util' => '0',
+        'Sub::Install' => '0.924',
+        'Sub::Name' => '0.04',
+        'Sys::Hostname' => '1.11',
+        'Template' => '0',
+        'Term::ANSIColor' => '0',
+        'Text::Diff' => '0.35',
+        'Text::Glob' => '0',
+        'Time::HiRes' => '0',
+        'XML::Dumper' => '0',
+        'XML::LibXML' => '0',
+        'XML::LibXSLT' => '0',
+        'YAML' => '0',
+        'perl' => 'v5.8.7',
+        'version' => '0',
+    },
+
+    recommends => {
+    },
+
+    suggests => {
+    },
+
+    build_requires => {
+    },
+
+    test_requires => {
+        'Test::Deep' => '0',
+        'Test::Exception' => '0',
+        'Test::Fatal' => '0',
+        'Test::Fork' => '0',
+        'Test::More' => '0.98',
     },
 
     name            => 'UR',
@@ -28,7 +100,6 @@ my %args = (
     allow_pureperl => 0,
 
     script_files => [glob('script/*'), glob('bin/*')],
-    c_source     => [qw()],
     PL_files => {},
 
     test_files           => ((-d '.git' || $ENV{RELEASE_TESTING}) && -d 'xt') ? 't/ xt/' : 't/',
@@ -53,20 +124,3 @@ my $builder = builder::UR->subclass(
 )->new(%args);
 $builder->create_build_script();
 
-my $mbmeta = CPAN::Meta->load_file('MYMETA.json');
-my $meta = CPAN::Meta->load_file('META.json');
-my $prereqs_hash = CPAN::Meta::Prereqs->new(
-    $meta->prereqs
-)->with_merged_prereqs(
-    CPAN::Meta::Prereqs->new($mbmeta->prereqs)
-)->as_string_hash;
-my $mymeta = CPAN::Meta->new(
-    {
-        %{$meta->as_struct},
-        prereqs => $prereqs_hash
-    }
-);
-print "Merging cpanfile prereqs to MYMETA.yml\n";
-$mymeta->save('MYMETA.yml', { version => 1.4 });
-print "Merging cpanfile prereqs to MYMETA.json\n";
-$mymeta->save('MYMETA.json', { version => 2 });

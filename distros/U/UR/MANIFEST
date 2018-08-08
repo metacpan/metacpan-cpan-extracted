@@ -2,7 +2,6 @@ Build.PL
 Changes
 INSTALL
 LICENSE
-META.json
 README.md
 bin/ur
 builder/UR.pm
@@ -784,5 +783,6 @@ ubuntu-lucid/control
 ubuntu-lucid/copyright
 ubuntu-lucid/rules
 ubuntu-lucid/watch
+META.json
 META.yml
 MANIFEST

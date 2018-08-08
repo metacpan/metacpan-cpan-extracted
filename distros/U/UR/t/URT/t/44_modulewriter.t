@@ -150,6 +150,13 @@ my $test_class_definition = q(
             id_by => 'subclass_by_id',
             id_class_by => 'subclass_by_prop',
         },
+        calc_immutable_columned => {
+            is => 'Text',
+            is_mutable => 0,
+            column_name => 'calc_immutable_columned_column',
+            calculate_from => 'some_enum',
+            calculate => q($some_enum . "foo"),
+        },
     ],
     has_many => [
         property_cs => { is => 'String', is_optional => 1 },

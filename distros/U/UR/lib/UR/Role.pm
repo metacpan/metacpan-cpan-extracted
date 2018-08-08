@@ -23,7 +23,7 @@ our @CARP_NOT = qw(UR::Object::Type);
 use Exporter qw(import);
 our @EXPORT_OK = qw(before after around);
 
-our $VERSION = "0.46"; # UR $VERSION;;
+our $VERSION = "0.47"; # UR $VERSION;
 
 Class::Autouse->sugar(\&_define_role);
 
@@ -137,7 +137,7 @@ many class-meta attributes such as 'id_generator', 'valid_signals', and 'doc'.
 
 Roles may implement operator overloading via the 'use overload' mechanism.
 
-Roles also have unique atributes to declare restrictions on their use.
+Roles also have unique attributes to declare restrictions on their use.
 
 =over 4
 

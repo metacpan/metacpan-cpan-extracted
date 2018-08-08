@@ -4,7 +4,7 @@ package UR::Object::Set::View::Default::Html;
 use strict;
 use warnings;
 require UR;
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 class UR::Object::Set::View::Default::Html {
     is => 'UR::Object::View::Default::Html',

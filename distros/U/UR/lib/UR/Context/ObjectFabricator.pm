@@ -6,7 +6,7 @@ use warnings;
 use Scalar::Util;
 use UR::Context;
 
-our $VERSION = "0.46"; # UR $VERSION;
+our $VERSION = "0.47"; # UR $VERSION;
 
 # A helper package for UR::Context to keep track of the subrefs used
 # to create objects from database data

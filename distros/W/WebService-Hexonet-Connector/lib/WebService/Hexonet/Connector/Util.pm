@@ -7,7 +7,7 @@ use base 'Exporter';
 use Time::Local;
 use MIME::Base64;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 our @EXPORT    = qw();
 our @EXPORT_OK = qw(sqltime timesql);

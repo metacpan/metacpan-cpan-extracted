@@ -14,7 +14,7 @@
 # first While/Until up While/Until last While/Until and perhaps isOnlyChild and SingleChild as well
 # L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines>
 package Data::Edit::Xml;
-our $VERSION = 20180805;
+our $VERSION = 20180806;
 use v5.8.0;
 use warnings FATAL => qw(all);
 use strict;

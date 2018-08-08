@@ -77,7 +77,7 @@ use Log::Log4perl qw(:easy);
 require Exporter;
 require DynaLoader;
 
-our $VERSION     = '0.23';
+our $VERSION     = '0.25';
 our @ISA         = qw(Exporter DynaLoader);
 our %EXPORT_TAGS = ( 'all' => [ qw() ] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );

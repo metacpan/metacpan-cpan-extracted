@@ -1,5 +1,12 @@
 Revision history for Dancer-Plugin-Auth-Twitter
 
+0.08 2018-08-07
+[ BUG FIXES ]
+ - This wasn't working for ages because of Twitter API changes which
+   Net::Twitter::Lite wasn't updated for - so now use the new
+   Twitter::API which works.  (Side effect: we now require Perl 5.14, because
+   Twitter::API does.) (GH #19, Breno G. de Oliveira (GARU) - thanks!)
+
 0.07 2015-02-03
  [DOCUMENTATION]
  - Add note about 'can't verify ssl peer'. (GH#16)
